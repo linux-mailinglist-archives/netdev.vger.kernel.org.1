@@ -1,344 +1,215 @@
-Return-Path: <netdev+bounces-112010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B47F934867
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 08:56:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7E193483D
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 08:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA7B5B217EB
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 06:56:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E39B51F23744
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 06:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C2A60275;
-	Thu, 18 Jul 2024 06:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5C66F2F6;
+	Thu, 18 Jul 2024 06:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="acv/jEjt";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Rt6as/TF";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="virH7j9U";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="g7MgKene"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0090626ACF
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 06:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA88E2AD29
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 06:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721285771; cv=none; b=mEcStd67xMV9J+WEI537FG/xA0234j8y8lq1Ddl18M3DFXoPjSVfWv24xPR63UceZIObL+3i3CN95ni3dLwOfG5TdSOeNZy8N4pOXnKd4vjNL6+rAaLH654+RnNSs+OuyQG12Od4n4GdOToOiXS+n5qemcgwxYntISbxESTjyyQ=
+	t=1721284956; cv=none; b=fDPWorKyPGbICUEV7JjLh0ISw/mor8znvwulfDlw94Qh8psiYeozl1PhQniFw5wT8w+gKETzwOC1eV4UDMPnhiki/Cuu71mWsEcBvcGFk0Txl+kcm+DnOH8ug0P0QLUzy2c0BP6MXaWRo8Nts3gAABp5WuxtIxMH9dP138E3eog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721285771; c=relaxed/simple;
-	bh=pTt9jlugQv4Lu24ZXA7GsTNtjKFEZVI9KlaBOv8lzbQ=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=qv2Wsfdf0bJ0qpQEDZGuqavevsznkzXzl4bV35pIlG1Jh+Mq/BvsuByO6pLZGfDrvhpTRzJgaXScIoonmQwuDSrAN4eRuYcwKUJfaT4hpnlQN0VtwqsOnoIRRUS4nplyOhfJ4ZCTQRWB/51O8iw33MGGVxoVuzEhtLqUcWab+qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from vapr.local.chopps.org (unknown [50.229.122.68])
+	s=arc-20240116; t=1721284956; c=relaxed/simple;
+	bh=Rr5XeNOzaHjqOcOMZSG74dWwTWDUxwMq/RPs6e6nytI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PcsydOmD9XB3uYEviMjkyDA26DixwG7xhLeO/8BRg/S68du/t5RJS28OGd8a/CSQjaq72Li6Ov/caq24vmWqQr+uCyJKyDhvjofUzAB83fFHTDShPQoDbRzu2TDRUftyInAWC5z4+X0ZPiFV7C+kRGAE0Xx6Y0uTQcb6joemMJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=acv/jEjt; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Rt6as/TF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=virH7j9U; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=g7MgKene; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id A52357D06B;
-	Thu, 18 Jul 2024 06:56:08 +0000 (UTC)
-References: <20240714202246.1573817-1-chopps@chopps.org>
- <20240714202246.1573817-10-chopps@chopps.org>
- <20240715125555.GC45692@kernel.org> <m2cynbdz19.fsf@chopps.org>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Christian Hopps <chopps@chopps.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian Hopps
- <chopps@labn.net>, devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v5 09/17] xfrm: iptfs: add user
- packet (tunnel ingress) handling
-Date: Wed, 17 Jul 2024 23:32:36 -0700
-In-reply-to: <m2cynbdz19.fsf@chopps.org>
-Message-ID: <m2v813cho8.fsf@chopps.org>
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C0B521F8B0;
+	Thu, 18 Jul 2024 06:42:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1721284953; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wCdLaYYq2GRwcs8qxNxqcH/pkFKjVkJISd0LjkS/0x0=;
+	b=acv/jEjtWB4IXU2y4B8WpLEVlwInvbuIGlBcbWCPvJanYx/oyh9cdOm3lw5v1ECPL4Enjx
+	a5bL9yhlZYAswrvmUgEMELeZeUOhz2DICQcMc8mLh106t2R10bO3YPaAtRgNx96iaMeYbK
+	/eCBtjyi1QWxm1oCMDB0BjrmtKfs5Qc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1721284953;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wCdLaYYq2GRwcs8qxNxqcH/pkFKjVkJISd0LjkS/0x0=;
+	b=Rt6as/TF5DqXzen7wq52pZAxIQjx/J4ldEV3OnQH1BU17TB8qPYOtj4H6hZIS5zj9xuc8W
+	QSNoJ3VX1AhXVUBw==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=virH7j9U;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=g7MgKene
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1721284951; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wCdLaYYq2GRwcs8qxNxqcH/pkFKjVkJISd0LjkS/0x0=;
+	b=virH7j9USiPJQZgRLgodRJb3oeraSW5cfy09+mmBzEV8+G/hBrKgsyViSwwjrEkb15BkJr
+	VcaggOlqjbqCtoJU+KcTrarZitqL2Zv/3H5UCJE7VTIcpsFG35GjatlzvGCQ77kqBH6NUe
+	0UwfN++K3uaZleBCuCarXaFVJDuHdJQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1721284951;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wCdLaYYq2GRwcs8qxNxqcH/pkFKjVkJISd0LjkS/0x0=;
+	b=g7MgKenewqNLO5UNv7M1bZ2w3tEWaWbZm3jVnHzQpFsDGUPZ+wovvLDJIIYf4D+VL8RG5g
+	RI9/Z2uAGnYjiiBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8E78B136F7;
+	Thu, 18 Jul 2024 06:42:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id H5GAIFe5mGZOAwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 18 Jul 2024 06:42:31 +0000
+Message-ID: <a5473f69-5404-4c38-85d9-ca91c5160361@suse.de>
+Date: Thu, 18 Jul 2024 08:42:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/8] nvme-tcp: reduce callback lock contention
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@kernel.org>,
+ Christoph Hellwig <hch@lst.de>, netdev@vger.kernel.org
+Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org
+References: <20240716073616.84417-1-hare@kernel.org>
+ <20240716073616.84417-7-hare@kernel.org>
+ <9b8b57ca-83ae-43a4-84c6-33017dc81a32@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <9b8b57ca-83ae-43a4-84c6-33017dc81a32@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: C0B521F8B0
+X-Spam-Flag: NO
+X-Spam-Score: -0.50
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-0.50 / 50.00];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCPT_COUNT_FIVE(0.00)[6];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Level: 
+X-Spamd-Bar: /
 
---=-=-=
-Content-Type: text/plain; format=flowed
+On 7/17/24 23:19, Sagi Grimberg wrote:
+> 
+> 
+> On 16/07/2024 10:36, Hannes Reinecke wrote:
+>> From: Hannes Reinecke <hare@suse.de>
+>>
+>> We have heavily queued tx and rx flows, so callbacks might happen
+>> at the same time. As the callbacks influence the state machine we
+>> really should remove contention here to not impact I/O performance.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@kernel.org>
+>> ---
+>>   drivers/nvme/host/tcp.c | 14 ++++++++------
+>>   1 file changed, 8 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+>> index a758fbb3f9bb..9634c16d7bc0 100644
+>> --- a/drivers/nvme/host/tcp.c
+>> +++ b/drivers/nvme/host/tcp.c
+>> @@ -1153,28 +1153,28 @@ static void nvme_tcp_data_ready(struct sock *sk)
+>>       trace_sk_data_ready(sk);
+>> -    read_lock_bh(&sk->sk_callback_lock);
+>> -    queue = sk->sk_user_data;
+>> +    rcu_read_lock();
+>> +    queue = rcu_dereference_sk_user_data(sk);
+>>       if (likely(queue && queue->rd_enabled) &&
+>>           !test_bit(NVME_TCP_Q_POLLING, &queue->flags)) {
+>>           queue_work_on(queue->io_cpu, nvme_tcp_wq, &queue->io_work);
+>>           queue->data_ready_cnt++;
+>>       }
+>> -    read_unlock_bh(&sk->sk_callback_lock);
+>> +    rcu_read_unlock();
+> 
+> Umm, this looks dangerous...
+> 
+> Please give a concrete (numeric) justification for this change, and 
+> preferably a big fat comment
+> on why it is safe to do (for either .data_ready or .write_space).
+> 
+> Is there any precedence of another tcp ulp that does this? I'd like to 
+> have the netdev folks review this change. CC'ing netdev.
+> 
+Reasoning here is that the queue itself (and with that, the workqueue
+element) will _not_ be deleted once we set 'sk_user_data' to NULL.
 
+The shutdown sequence is:
 
-Christian Hopps <chopps@chopps.org> writes:
+         kernel_sock_shutdown(queue->sock, SHUT_RDWR);
+         nvme_tcp_restore_sock_ops(queue);
+         cancel_work_sync(&queue->io_work);
 
-> [[PGP Signed Part:Good signature from 2E1D830ED7B83025 Christian Hopps <chopps@gmail.com> (trust ultimate) created at 2024-07-17T22:55:46-0700 using RSA]]
->
-> Simon Horman via Devel <devel@linux-ipsec.org> writes:
->
->> On Sun, Jul 14, 2024 at 04:22:37PM -0400, Christian Hopps wrote:
->>> From: Christian Hopps <chopps@labn.net>
->>>
->>> Add tunnel packet output functionality. This is code handles
->>> the ingress to the tunnel.
->>>
->>> Signed-off-by: Christian Hopps <chopps@labn.net>
->>> ---
->>>  net/xfrm/xfrm_iptfs.c | 535 +++++++++++++++++++++++++++++++++++++++++-
->>>  1 file changed, 532 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
->>
->> ...
->>
->>> +static int iptfs_get_cur_pmtu(struct xfrm_state *x,
->>> +			      struct xfrm_iptfs_data *xtfs, struct sk_buff *skb)
->>> +{
->>> +	struct xfrm_dst *xdst = (struct xfrm_dst *)skb_dst(skb);
->>> +	u32 payload_mtu = xtfs->payload_mtu;
->>> +	u32 pmtu = iptfs_get_inner_mtu(x, xdst->child_mtu_cached);
->>
->> Hi Christian,
->>
->> Please consider arranging local variable declarations in Networking
->> code in reverse xmas tree order - longest line to shortest.
->> I think that in this case that would involve separating the
->> declaration and assignment of pmtu.
->>
->> Edward Cree's tool can be helpful here:
->> https://github.com/ecree-solarflare/xmastree
->
-> This does not appear to be a style that is required by the net/xfrm code. I
-> verified this by running the above tool on the other files in net/xfrm/*.c. In
-> this case I'd prefer to not increase the number of lines in the function in
-> order to satisfy the optional style guideline.
->
->>> +
->>> +	if (payload_mtu && payload_mtu < pmtu)
->>> +		pmtu = payload_mtu;
->>> +
->>> +	return pmtu;
->>> +}
->>
->> ...
->>
->>> +/* IPv4/IPv6 packet ingress to IPTFS tunnel, arrange to send in IPTFS payload
->>> + * (i.e., aggregating or fragmenting as appropriate).
->>> + * This is set in dst->output for an SA.
->>> + */
->>> +static int iptfs_output_collect(struct net *net, struct sock *sk,
->>> +				struct sk_buff *skb)
->>> +{
->>> +	struct dst_entry *dst = skb_dst(skb);
->>> +	struct xfrm_state *x = dst->xfrm;
->>> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
->>> +	struct sk_buff *segs, *nskb;
->>> +	u32 pmtu = 0;
->>> +	bool ok = true;
->>> +	bool was_gso;
->>> +
->>> +	/* We have hooked into dst_entry->output which means we have skipped the
->>> +	 * protocol specific netfilter (see xfrm4_output, xfrm6_output).
->>> +	 * when our timer runs we will end up calling xfrm_output directly on
->>> +	 * the encapsulated traffic.
->>> +	 *
->>> +	 * For both cases this is the NF_INET_POST_ROUTING hook which allows
->>> +	 * changing the skb->dst entry which then may not be xfrm based anymore
->>> +	 * in which case a REROUTED flag is set. and dst_output is called.
->>> +	 *
->>> +	 * For IPv6 we are also skipping fragmentation handling for local
->>> +	 * sockets, which may or may not be good depending on our tunnel DF
->>> +	 * setting. Normally with fragmentation supported we want to skip this
->>> +	 * fragmentation.
->>> +	 */
->>> +
->>> +	BUG_ON(!xtfs);
->>> +
->>> +	pmtu = iptfs_get_cur_pmtu(x, xtfs, skb);
->>> +
->>> +	/* Break apart GSO skbs. If the queue is nearing full then we want the
->>> +	 * accounting and queuing to be based on the individual packets not on the
->>> +	 * aggregate GSO buffer.
->>> +	 */
->>> +	was_gso = skb_is_gso(skb);
->>> +	if (!was_gso) {
->>> +		segs = skb;
->>> +	} else {
->>> +		segs = skb_gso_segment(skb, 0);
->>> +		if (IS_ERR_OR_NULL(segs)) {
->>> +			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
->>> +			kfree_skb(skb);
->>> +			return PTR_ERR(segs);
->>
->> This will return 0 is skb_gso_segment returns NULL,
->> which occurs if skb doesn't require segmentation.
->> Is that intentional?
->>
->> If so, I wonder if it would be slightly nicer
->> to use PTR_ERR_OR_ZERO() instead of PTR_ERR().
->>
->> Flagged by Smatch (suggestion is my own).
->>  (suggestion is my own)
->
-> Thanks! Actually in the case of NULL I've changed the code to return -EINVAL as xfrm_output_gso() does.
->
->>> +		}
->>> +		consume_skb(skb);
->>> +		skb = NULL;
->>> +	}
->>> +
->>> +	/* We can be running on multiple cores and from the network softirq or
->>> +	 * from user context depending on where the packet is coming from.
->>> +	 */
->>> +	spin_lock_bh(&x->lock);
->>> +
->>> +	skb_list_walk_safe(segs, skb, nskb)
->>> +	{
->>> +		skb_mark_not_on_list(skb);
->>> +
->>> +		/* Once we drop due to no queue space we continue to drop the
->>> +		 * rest of the packets from that GRO.
->>> +		 */
->>> +		if (!ok) {
->>> +nospace:
->>> +			if (skb->dev)
->>> +				XFRM_INC_STATS(dev_net(skb->dev),
->>> +					       LINUX_MIB_XFRMOUTNOQSPACE);
->>> +			kfree_skb_reason(skb, SKB_DROP_REASON_FULL_RING);
->>> +			continue;
->>> +		}
->>> +
->>> +		/* Fragmenting handled in following commits. */
->>> +		if (iptfs_is_too_big(sk, skb, pmtu)) {
->>> +			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
->>> +			continue;
->>> +		}
->>> +
->>> +		/* Enqueue to send in tunnel */
->>> +		ok = iptfs_enqueue(xtfs, skb);
->>> +		if (!ok)
->>> +			goto nospace;
->>> +	}
->>> +
->>> +	/* Start a delay timer if we don't have one yet */
->>> +	if (!hrtimer_is_queued(&xtfs->iptfs_timer)) {
->>> +		hrtimer_start(&xtfs->iptfs_timer, xtfs->init_delay_ns,
->>> +			      IPTFS_HRTIMER_MODE);
->>> +		xtfs->iptfs_settime = ktime_get_raw_fast_ns();
->>> +	}
->>> +
->>> +	spin_unlock_bh(&x->lock);
->>> +	return 0;
->>> +}
->>
->> ...
->>
->>> +static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
->>> +{
->>> +	struct sk_buff_head list;
->>> +	struct xfrm_iptfs_data *xtfs;
->>> +	struct xfrm_state *x;
->>> +	time64_t settime;
->>> +
->>> +	xtfs = container_of(me, typeof(*xtfs), iptfs_timer);
->>> +	x = xtfs->x;
->>> +
->>> +	/* Process all the queued packets
->>> +	 *
->>> +	 * softirq execution order: timer > tasklet > hrtimer
->>> +	 *
->>> +	 * Network rx will have run before us giving one last chance to queue
->>> +	 * ingress packets for us to process and transmit.
->>> +	 */
->>> +
->>> +	spin_lock(&x->lock);
->>> +	__skb_queue_head_init(&list);
->>> +	skb_queue_splice_init(&xtfs->queue, &list);
->>> +	xtfs->queue_size = 0;
->>> +	settime = xtfs->iptfs_settime;
->>
->> nit: settime is set but otherwise unused in this function.
->>
->>      Flagged by W=1 x86_64 allmodconfig builds with gcc-14 and clang-18.
->>
->
-> Hmm, this value is in fact used inside a trace point function call in this function.
+So first we're shutting down the socket (which cancels all I/O
+calls in io_work), then restore the socket callbacks.
+As these are rcu protected I'm calling synchronize_rcu() to
+ensure all callbacks have left the rcu-critical section on
+exit.
+At a final step we are cancelling all work, ie ensuring that
+any action triggered by the callbacks have completed.
 
+But sure, comment is fine.
 
-Realized this is another artifact of splitting the commit, I've moved settime to the later tracepoint commit now.
+Cheers,
 
-Thanks,
-Chris.
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
->
->>> +	spin_unlock(&x->lock);
->>> +
->>> +	/* After the above unlock, packets can begin queuing again, and the
->>> +	 * timer can be set again, from another CPU either in softirq or user
->>> +	 * context (not from this one since we are running at softirq level
->>> +	 * already).
->>> +	 */
->>> +
->>> +	iptfs_output_queued(x, &list);
->>> +
->>> +	return HRTIMER_NORESTART;
->>> +}
->>
->> ...
->>
->>> @@ -98,10 +607,23 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
->>>  {
->>>  	struct xfrm_iptfs_data *xtfs = x->mode_data;
->>>  	struct xfrm_iptfs_config *xc = &xtfs->cfg;
->>> -	int ret = 0;
->>> +	int ret;
->>> +	u64 q;
->>> +
->>> +	if (x->dir == XFRM_SA_DIR_OUT) {
->>> +		q = xtfs->init_delay_ns;
->>> +		(void)do_div(q, NSECS_IN_USEC);
->>> +		ret = nla_put_u32(skb, XFRMA_IPTFS_INIT_DELAY, q);
->>> +		if (ret)
->>> +			return ret;
->>> +
->>> +		ret = nla_put_u32(skb, XFRMA_IPTFS_MAX_QSIZE,
->>> +				  xc->max_queue_size);
->>> +		if (ret)
->>> +			return ret;
->>>
->>> -	if (x->dir == XFRM_SA_DIR_OUT)
->>>  		ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
->>> +	}
->>
->> ret will be used uninitialised here unless the if condition above is true.
->>
->> Flagged by W=1 x86_64 allmodconfig build with clang-18, and Smatch.
->
-> Sigh, this is an artifact of splitting up the new file into multiple
-> functionality commits. The final resulting code does not leave the value
-> uninitialized. In any case I will fix it in this middle commit too.
->
-> Thanks!
-> Chris.
->
->>
->>>
->>>  	return ret;
->>>  }
->> ...
->
-> [[End of PGP Signed Part]]
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmaYvIcSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAlUdAP/iEnFHr/AFyBFDYLwH48R5DmRZ/uG4aV
-O7sjeSJnijaBGa/odPoGht46XGDiIv+F9bJujd2MStsrheJSIp1fOVO96IHCGKtC
-ak9SYqjgAB56jKI92ALPs8pzlHS8LGzG5E+h4HivLLncMDXEcfWEbwberX+VS3jY
-2nUNxAXD1iABfyqjhvIbH3HDz8wFz5g2plcKvnp7hPiLvsf8XZbPv7oBB8lj9ejk
-67QQ098Pa8jAICYIUsyEmmnS1G+c+emM9/AYFqVm3oR7Xjht8Mp0Da8f7mAKnWng
-L8RV0afDUbnWSl5IMNpwA6M9HahnT2Dtf5tHaClsBuQqVp7NH+PVVJGPyTPmCJXN
-D7U6c9DbjVwR9V5gviTvEnH8zRqwJWd9tUvYNH7MNfnK/Z+SguCBKQEjihUpJty9
-7T/gBYhpf7Ffi0KfmCsQxOAsNBYP8cepo+wHjt40VN6BRUV3KPjP8a3tPuYBY5CO
-rNXqfM5YkhCeF8zIyhkKx0XejOeuGCLkhp77OMTtSWwP1Sbd0NJY5aYRKibU8fBp
-RfA0B6RHyGlYLKl50TzSHYH5vVnlZuM+kti8kFni/ZcZnIcvyM228qnCpHTGbkFj
-aajwZMFz2ibvX4sJSS655ZnubR3OT/KzOM73vzgru5DrK77bxG1FNUUeEZD76Oa+
-7qEdSeNCQFQ9
-=zH4n
------END PGP SIGNATURE-----
---=-=-=--
 
