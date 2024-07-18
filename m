@@ -1,98 +1,95 @@
-Return-Path: <netdev+bounces-111998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-111999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A85934725
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 06:32:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764A293474B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 06:55:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F4E4B2208F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 04:32:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 264E8283283
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 04:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FD938FB0;
-	Thu, 18 Jul 2024 04:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B877538DE5;
+	Thu, 18 Jul 2024 04:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="OK96QppL"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="I7RfWNzK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDEA800;
-	Thu, 18 Jul 2024 04:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8594A1E515
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 04:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721277146; cv=none; b=Uuqzcso9Vkg2I06qZeP4GEm27MzHISlKG7urPvhwkNspkdblMQ8Wbkm48kOE1crD23bXNPKGdG7Sl2TBBAhCr0ANgHYJSMzUNHAhD/1TCzcs0IqJ9sDxwOI2RIHEQ/BcG2oixHjQxI6PR0WSAdPPkGhuJxr11dxroblhGOv6Uk8=
+	t=1721278551; cv=none; b=uR+kDe3FtZaD5NxTSg19krYxm8vRDzkHpldr5aSri+SJNGrt5q1BmXkYzcHPfsraWXi4YtXz5Y3vXd60DMImV4WdK0IFkK0bDKAZ/1sswwygSO6hJ4nCl7T5daebh0CUvsXi9jvIfA8MV3AqqQwuTYjuX7RWiB3Fui396H0qBLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721277146; c=relaxed/simple;
-	bh=AHE/exxIC/GVu8KrXuIJpWf3GMf6rRdL9In6Hys9Aug=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=u54MefqU5msCCN5kvLHAsNcjnBNystzM2Nylg5oUH1AsaiQ1VEeCaaJOidtB1NxUx9o5qpEOsWvkk+ghncRftJWZiPLYw7zI0xyYV7irOqp7v54ls30OKltOFXE0nyg1IyOyThBuJf5ZetQXoKGW+s6/r1wzjKCVW1Vag74jGb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=OK96QppL; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1721277141;
-	bh=nZ8Os7OjJ+T31mYxH8zBOPqMWZ2Rhz1IZxjZyJjTNQY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=OK96QppLpdw3gwSvIOppK3dtb0PZapVJyY7jE6TH1R2uEgKf+GCvjX4kXkisOGaRN
-	 pjSnU95yKIhayJ+5rwdhlUklkfO5afMZHq9w2aJVDStjhHoPQOA6t2/eO0S6MFJ5yE
-	 iSdMv0jLOLfIKb8vhSSpcp/jmGqa/wkm9EwxJf3zWkeMMqB7MFLGZ2/t+XVYKhJYPS
-	 dHz36/VraOUwwCiPPyWpq7AKoo0TTwR72gCbH7pgMOadJfPIqLz2iSIWEGdJn9z7zv
-	 kL9DvLJaAGxZ9F4cJIbxDsljPiq2r6GsOGCPJjbqElkBnL5Wp3Ij+fPjRlqP0qI55v
-	 v8eihWXHOSyUQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WPfzS6f49z4w2D;
-	Thu, 18 Jul 2024 14:32:20 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann
- <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>
-Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, PowerPC
- <linuxppc-dev@lists.ozlabs.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: duplicate patch in the powerpc tree
-In-Reply-To: <20240718095428.56145ce1@canb.auug.org.au>
-References: <20240718095428.56145ce1@canb.auug.org.au>
-Date: Thu, 18 Jul 2024 14:32:19 +1000
-Message-ID: <87plrbwca4.fsf@mail.lhotse>
+	s=arc-20240116; t=1721278551; c=relaxed/simple;
+	bh=5whHljIK83xoQGTv1LH0pWbRELkWRQb/sE4r4yFQcr8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RYamyG7z366BGHms5ML+KrfrrLDhycAj3Q46aySl6o5Kv1TdYxWTRRtIKcKGsjEpgND3EF8ev6/fnNW6Ek9sym3OLogIVusBpBTj9T6VZ2YafK/PGOCwCfQxo2PN1JqMjh5+lWOzeH8CEJQ7l011dgdzU0fep26pnuuCbbIUuqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=I7RfWNzK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71CC0C116B1;
+	Thu, 18 Jul 2024 04:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1721278551;
+	bh=5whHljIK83xoQGTv1LH0pWbRELkWRQb/sE4r4yFQcr8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I7RfWNzKtroZQiVfn0Yk8B9RG333kZBX2wKafgGIX4C/zliPpuQRWhfQaHRii5M01
+	 UFZEZEvWenFBg+7ufW9qWAe/zIDWVx8NU3rWbAOnpZMVfHdOtvQX2lm8VPQwmSQIER
+	 /GM7MTWbSgVSXoEh/w0lxjf7QmKK4zR2eRdwDIAw=
+Date: Thu, 18 Jul 2024 06:55:42 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Shay Drory <shayd@nvidia.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH net-next] driver core: auxiliary bus: Fix documentation
+ of auxiliary_device
+Message-ID: <2024071825-resurface-ruckus-b875@gregkh>
+References: <20240717172916.595808-1-saeed@kernel.org>
+ <20240717170254.39dc7180@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240717170254.39dc7180@kernel.org>
 
-Stephen Rothwell <sfr@canb.auug.org.au> writes:
-> Hi all,
->
-> The following commit is also in the bpf tree as a different commit
-> (but the same patch):
->
->   358492fc426f ("MAINTAINERS: Update email address of Naveen")
->
-> This is commit
->
->   afcc8e1ef7bb ("MAINTAINERS: Update email address of Naveen")
->
-> in the bpf tree.
->
-> Note also that commit
->
->   e8061392ee09 ("MAINTAINERS: Update powerpc BPF JIT maintainers")
->
-> from the powerpc tree is almost identical to commit
->
->   c638b130e83e ("MAINTAINERS: Update powerpc BPF JIT maintainers")
->
-> from the bpf tree.
+On Wed, Jul 17, 2024 at 05:02:54PM -0700, Jakub Kicinski wrote:
+> On Wed, 17 Jul 2024 10:29:16 -0700 Saeed Mahameed wrote:
+> > From: Shay Drory <shayd@nvidia.com>
+> > 
+> > Fix the documentation of the below field of struct auxiliary_device
+> > 
+> > include/linux/auxiliary_bus.h:150: warning: Function parameter or struct member 'sysfs' not described in 'auxiliary_device'
+> > include/linux/auxiliary_bus.h:150: warning: Excess struct member 'irqs' description in 'auxiliary_device'
+> > include/linux/auxiliary_bus.h:150: warning: Excess struct member 'lock' description in 'auxiliary_device'
+> > include/linux/auxiliary_bus.h:150: warning: Excess struct member 'irq_dir_exists' description in 'auxiliary_device'
+> > 
+> > Fixes: a808878308a8 ("driver core: auxiliary bus: show auxiliary device IRQs")
+> > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> > Signed-off-by: Shay Drory <shayd@nvidia.com>
+> > Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> 
+> Thanks!
+> 
+> Greg, please let us know if you'd like to handle this yourself.
 
-I'll drop them from my tree.
+I can't, it came in through your tree :)
 
-cheers
+> Otherwise we'll ship it to Linus tomorrow or Friday.
+
+Please do so.
+
+thanks,
+
+greg k-h
 
