@@ -1,180 +1,394 @@
-Return-Path: <netdev+bounces-112073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35F2934D47
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 14:35:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E27934D7A
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 14:52:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7741B2113C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 12:35:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D2E328119E
+	for <lists+netdev@lfdr.de>; Thu, 18 Jul 2024 12:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39351386A7;
-	Thu, 18 Jul 2024 12:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2714813C697;
+	Thu, 18 Jul 2024 12:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JrtkIjeg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T04yDx62"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2076.outbound.protection.outlook.com [40.107.236.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0303D40875
-	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 12:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721306122; cv=fail; b=cQoIAa/ui9sAMyUKdhT8D/nCmzbSLB2rPPgB/cCdpmuA5iobROlHVyLZq4YYi6+pz2KBz3ME2gYpu9aGEcAx35JImTorC2NuEhjXqGkryhW+JlQJNyRXLFsu6Te6udkOUbHvzSWgTHSuPBAUcN2EQjXg/0e8YCckUl6HZuMGUxs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721306122; c=relaxed/simple;
-	bh=RMCppnaFWJxnALZR/kTTWS8RrvkZg8iTb3dSv6Ft9eQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GhHow8Mgd09Aq1HEg7c34Eedp7yPxqD5Gi2+R5l0lPgDIpSMgIbWuAIs/u7tqPlWFl6Yh0giHAh1zXzSMQuMsNqi3/w6sfD3u0V7hLMekYG3YwdRYLzTUkvQnjbkqVb9dZ3BqoCgtt/iOeNwL9UHrp3XH5AtkmaHGFCbWSwcV1I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JrtkIjeg; arc=fail smtp.client-ip=40.107.236.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Bv1W7/wwMpbjQDZmJqYFWRNg3NEpU2fcDmjiOqba76W40Rou0Orc9FpTYKLtARyr4S6kCn+ugfW0LJyU+lVVKu+KrQnqfE5OI+H1eFJPjACzEdwzFaBC9K8hiP3AD85o6cRIRGsydnm/97/2DFrxoEjiKWpXKNO5EnTxOx/xQxbJsvovbIFV3mOm0H90aEFvOZ0UdB2yrDWB+VLSc3CYvNng0bi3KPNYhC3MQmFx7UZ5mLjrN7zo/EolXt0ApccNSlBrfZSC0C6W6JwsjqtUCowcvo7yIvtnPEf5ssxj9xPgbg6jYsCUdRK43WpnEOSnt+2GDVguFvu0JuE/9Z8wXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=93Xsn+en5tv1hdh9j1nMzAYLPOQw6pE+wqbnMl6YaJM=;
- b=kRnCtjSKr5NyRumfMg4JlBnkRbR7zcXnIWm+ajN6O03vNyHhYBocaRafqmNuM4s8xRhQSZJT8Z31ErMdUl8NI4g7cj0VmzGkB7vNMV+DT6KGxSjOAC3p8piiaFGO55dplg+/xKj3uIl+XBhtcMSYvQ6yVqUoXjQzB06NOi9++Lj/7R42wXcREsPui34rgAq3aKPkXgmSE7VzU3FcA26beb0AX9Q4SkLgzRrD+dMRXODQgYX+MrlJYx5WEaFcMHRrN5N9Aff7Q9c40ppNEDPMvsIOBJHwRVbrYBRwJH69+6FB/fQGcOKhCzF+abLSHw4u/dhQjHcoMIL+erBKzev/cA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=93Xsn+en5tv1hdh9j1nMzAYLPOQw6pE+wqbnMl6YaJM=;
- b=JrtkIjegyZjGfcEgDeIIDnlNPe5PPQAGkBRvfwJqygEnnoc4UevQJ0/xoQ+bKDPdmvqopx9Q1mMFXbAjnyOkhNLL9Iaqia5PjwEtMULJotiO8fo8jfhgkMpIWwSpfSaYlIgIoDTqCpCB90odbzfP+xsKaTt1jf4tvJE0tZ5aMoff1XeoT96brPVV+Jkf5DU9h7kug9qmQpV/4M1JDWsFWXhOrKsGURNgf2K8uwq33NN1WzXDYcOkkhPYW27E+GqoN8Min4lyKEqf7u4v8JvvHPTrPcOSmswQMrMl3Hg6MtPOpLJd+pzrv9VIexm8EAZs3sspcwpI1ZXxg+iRCz089g==
-Received: from SJ0PR05CA0009.namprd05.prod.outlook.com (2603:10b6:a03:33b::14)
- by MN2PR12MB4253.namprd12.prod.outlook.com (2603:10b6:208:1de::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.17; Thu, 18 Jul
- 2024 12:35:13 +0000
-Received: from SJ5PEPF000001CB.namprd05.prod.outlook.com
- (2603:10b6:a03:33b:cafe::ed) by SJ0PR05CA0009.outlook.office365.com
- (2603:10b6:a03:33b::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.17 via Frontend
- Transport; Thu, 18 Jul 2024 12:35:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ5PEPF000001CB.mail.protection.outlook.com (10.167.242.40) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7784.11 via Frontend Transport; Thu, 18 Jul 2024 12:35:13 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Jul
- 2024 05:35:00 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 18 Jul 2024 05:34:57 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dsahern@kernel.org>, <gnault@redhat.com>, "Ido
- Schimmel" <idosch@nvidia.com>
-Subject: [PATCH net] ipv4: Fix incorrect source address in Record Route option
-Date: Thu, 18 Jul 2024 15:34:07 +0300
-Message-ID: <20240718123407.434778-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.45.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD9313BC30
+	for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 12:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721307120; cv=none; b=qpADSeL+D6KUkzI4hzmtbG+bNfSSOtbYfqeOuQ6E7jCwJJpfnZ1PUdodFmvMyU5jbkF6UHSWzgX75DKFeW/4YRzHB5GMsFaHWUY0IaeEUsluHi5OBEXdITeRiReRFzwlhgMB60fymwOdqWS2YMabG6pySwdAhfrpTfZ32aRC7+E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721307120; c=relaxed/simple;
+	bh=EuOyxngGrY7nsVHp5Ez2dF5N9HdzLFg2Ou9Q3HFYto8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4+ZQvST5rFDPxlX7yc5SR99/PzsdozLCn8K+U28dAxwCAfqn7kOf+Hu0YhWlwilurWam6FXWpFx6HTzckQgBwaJB+ZqEx2k+tt7umn23sWjNxYKtHMFE0T81YTMsS856Tf07d3gI5mTmoMV0N+fbq/8mcqL9/zRybBbKECaBF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T04yDx62; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-78964fd9f2dso499025a12.3
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 05:51:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721307118; x=1721911918; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iGLtgrWUhu6mOevXq8fD4VuteLw6ANaOq0hILe6MREs=;
+        b=T04yDx622tZVbLd6/afLKe5+bxvHj3yx+cjr347EMg+ITsM6rfwNjNH+AUNl0rTr5n
+         3v0qa+d83dX92Q0OhPUIqGNHqfDIr3ITL6Qr9McStQTxhCr5E01/mO8Rw3i4GrmNSs6m
+         FOup4lM5/G4z5SYCZRsyMaAPTOD/tApc42NwZAgQUVUNdBQ+1ovvAwf9b7eYQC88yAAf
+         dW42qx4Fupa3cMaysJ/LtY7qbUY2jnAOeThWYZeaOi/qbT9/OPs6uEU8MoYiV+qJPyBu
+         rxYRtr7sBaRSxnKmXqEtxwTUNDbbAFCbHD7ROpZ8ZcwYLfPFGsMteEoJi4QOKuEdu0cM
+         zXXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721307118; x=1721911918;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iGLtgrWUhu6mOevXq8fD4VuteLw6ANaOq0hILe6MREs=;
+        b=dJjtaFeVIsYfYA9b+Hv67dHxOcl5haqivrjSnwSNo3W3HkCEP+FZ268LBNecj96ess
+         fGheWst7YrcqsdNwQUQWvMHQBohKvebJvDV6UjVIBl6ntjeepo1FF6fIjtou6kwu+UIn
+         S/mAaszL/GOFHZxtt6vem/dmwyoOhQT3bSvyf1MXRPisG3ncDWPOH99ZdIsUXdmtWSCo
+         wzxUO0jJxokBIIOaXdYBt/See9cGaMSXVRCn/LeF20ZhQoSo23b49dkf7z2aXY/yhMKq
+         S6KEpjsha85BvK999C26peQCxSu35awOciVG21q1UqJYYaPNKs0OXRHhyPCrkwNuhBUz
+         MuRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXVtKnPSJ98rCPGZGWFL/sD4ltOooiHPsFkh6MVIwhp0nHQOVRqG6kOQYrasZ7CMd1K+6+3jTDtryrIuHs2V/Y8AuafWeMe
+X-Gm-Message-State: AOJu0Yx+JT0YpeZXF+RqUf7mMP80euLS3DMe8vgDMmN0nOLp8TfHO4Sh
+	F5TDGeE6wUF6VgxAuUgMndgAYZuRgE7uu69exFmwrdoUIe0B24EA
+X-Google-Smtp-Source: AGHT+IE1/U9a1nmlTROM5Fg4OavoDYAw0fEGEip1ApzMlHe9I5jSMcFRQNk3tXu4tucBZZ377efRag==
+X-Received: by 2002:a05:6a20:8423:b0:1c0:f6d5:be9a with SMTP id adf61e73a8af0-1c3fddc4176mr6635247637.36.1721307117482;
+        Thu, 18 Jul 2024 05:51:57 -0700 (PDT)
+Received: from mobilestation ([176.15.243.150])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fc692109aasm8993935ad.104.2024.07.18.05.51.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 05:51:56 -0700 (PDT)
+Date: Thu, 18 Jul 2024 15:51:50 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev
+Subject: Re: [PATCH net-next v14 11/14] net: stmmac: dwmac-loongson: Add
+ DT-less GMAC PCI-device support
+Message-ID: <4nblf3m3quobk2tmycrdp4v3zltdmhmvrmoqh6mtroj45i5yjc@dmpmh7ohgsde>
+References: <cover.1720512634.git.siyanteng@loongson.cn>
+ <c558c9ff8e5a8a3657c1e60d6dfc4fa3a121ae93.1720512634.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001CB:EE_|MN2PR12MB4253:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c759fbd-af47-4da7-2fb2-08dca7261246
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0gAmnSWo0euwLzrJ4Vv82qWnfbHYstm7nZN8TBro3WAKSUHQ53DIyNxDFIc5?=
- =?us-ascii?Q?JUJ1F9WwBZ8+pJ4d0zvaRc1q7UO8TJVrPemgTfn7EgkMgzXataXGd2q2OmnH?=
- =?us-ascii?Q?zi0H/gG5kX8MuU73472opouuZs9IQN0mq6UwR5xjMNJFk9eg1KeMzdmXp21B?=
- =?us-ascii?Q?lam341iIZUDgfMjcK8g9N1CPGxiki8Cl65rI/PROrRtxE/NekdVtfwQt9+lE?=
- =?us-ascii?Q?ojlX1MF+UV4p8MC0m3r126fwS7BDuyUzFmSK4XRh0oly8zivMgt0KAqoualI?=
- =?us-ascii?Q?965Is1TZoIbXZdnjkFKHNpIzan7kkp+5NhDNHakmTv4R1THHef9pAanKowCq?=
- =?us-ascii?Q?Vh+7O954PG2KtzzEpNYGnMHvIDLog5gkDMCYHYE9O+eoJqfPhnus8JZAYX45?=
- =?us-ascii?Q?OXZmvkaWFa5SwC/pq2vIFafXO4zoLX8skFY0Ez7gbzuvRRFjfTPU4G5KbEsu?=
- =?us-ascii?Q?e/mfFr31ZixkWqgkob9qxe6ctqPtKq6mGIiffshPohtgIFQg4mX7O4Lbkaio?=
- =?us-ascii?Q?MMMqrS/ET/gN77KNi4+Rf4jCGFn9lCURBUBMRA5O50LD0hRePkJZnfNCerGp?=
- =?us-ascii?Q?WVwVvEyHXc1xPb47FydTDO1PbS46GQPLHI3XdIDy26eP+EOdEosUNKop6Mbp?=
- =?us-ascii?Q?SUUS+BF2VI9bFTNBfH7n0s6qS/6Q6BCOW+6sVqCRzZ74atFuDo/v8/jsT1Oh?=
- =?us-ascii?Q?5mrMSebebzYrcXklWe7WEqcTZnM1nhU5HXR58BAMfKCX1LH3h1/WldpZ2re1?=
- =?us-ascii?Q?Qp2Op3lUaDx86PgAqpEyv+Tcu8OCpYHNwfX6lRGqRgndOAUbzMwAps3t7mP5?=
- =?us-ascii?Q?ftYBMUOSbf241V5Dan46eeQg+571upLn6mdl0VHpomb3DPvebmiazKb8J3HL?=
- =?us-ascii?Q?MvY0sTeF7TN7W3NQbTDXwjnikTnVcWpuEF+faUJa1qcglwX/iWtINtrpC6sF?=
- =?us-ascii?Q?0o2MnjDQhbXOyYz/OfDISnjBVD748Tc4E6SdcwSSB0607xZh8QP7YwuWLb3l?=
- =?us-ascii?Q?lTldV2x5CIfcJGfOO/Dfi/jAdiht1+sg+1WiVLT4ph6xtjfUoWnrNue72gkc?=
- =?us-ascii?Q?QOr/WfWCd1qCqJpR8YziaVDArIJWWfhYpuB670SktWEx1i+7gJ1HEHgsMdc8?=
- =?us-ascii?Q?RYHyVyZoKNsSBclAq6yANkXLn5QqKrFtucFSQ78OhLqW9cACdcblznp59cmu?=
- =?us-ascii?Q?dpkUja3RXsvNa1A0P5Hf2KcNd/sG1VD6ccaA62ML7W9aFp7Hfzl0rhLOcUn3?=
- =?us-ascii?Q?FiR2sxS8MqDBlEj3DVPNEnR5nZvVGQG3uoCw8cGGcn8VIUx73+MiUHQ9NKM5?=
- =?us-ascii?Q?acfMEfti7uhmKZvkUvhvhcUDbfXOpFs5EJZaBt8LSZpdylrSefT6VAN0mNsg?=
- =?us-ascii?Q?nxC99l5fe/cPD1ykDZjFBODoEdOgOM1v/tZxRGXI5I/ThFLACcuIumKko11M?=
- =?us-ascii?Q?OHo/34DnJDfZNt9uRP+v1WmDW/J4rBH3?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2024 12:35:13.5703
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c759fbd-af47-4da7-2fb2-08dca7261246
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001CB.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4253
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c558c9ff8e5a8a3657c1e60d6dfc4fa3a121ae93.1720512634.git.siyanteng@loongson.cn>
 
-The Record Route IP option records the addresses of the routers that
-routed the packet. In the case of forwarded packets, the kernel performs
-a route lookup via fib_lookup() and fills in the preferred source
-address of the matched route.
+On Tue, Jul 09, 2024 at 05:37:04PM +0800, Yanteng Si wrote:
+> The Loongson GMAC driver currently supports the network controllers
+> installed on the LS2K1000 SoC and LS7A1000 chipset, for which the GMAC
+> devices are required to be defined in the platform device tree source.
+> But Loongson machines may have UEFI (implies ACPI) or PMON/UBOOT
+> (implies FDT) as the system bootloaders. In order to have both system
+> configurations support let's extend the driver functionality with the
+> case of having the Loongson GMAC probed on the PCI bus with no device
+> tree node defined for it. That requires to make the device DT-node
+> optional, to rely on the IRQ line detected by the PCI core and to
+> have the MDIO bus ID calculated using the PCIe Domain+BDF numbers.
 
-The lookup is performed with the DS field of the forwarded packet, but
-using the RT_TOS() macro which only masks one of the two ECN bits. If
-the packet is ECT(0) or CE, the matched route might be different than
-the route via which the packet was forwarded as the input path masks
-both of the ECN bits, resulting in the wrong address being filled in the
-Record Route option.
+Let's extend the log with an additional note:
 
-Fix by masking both of the ECN bits.
+"In order to have the device probe() and remove() methods less
+complicated let's move the DT- and ACPI-specific code to the
+respective sub-functions."
 
-Fixes: 8e36360ae876 ("ipv4: Remove route key identity dependencies in ip_rt_get_source().")
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- net/ipv4/route.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 136 ++++++++++--------
+>  1 file changed, 79 insertions(+), 57 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 10b49bea8e3c..b4704068321f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -12,11 +12,15 @@
+>  #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+>  
+>  struct stmmac_pci_info {
+> -	int (*setup)(struct plat_stmmacenet_data *plat);
+> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+>  };
+>  
+> -static void loongson_default_data(struct plat_stmmacenet_data *plat)
+> +static void loongson_default_data(struct pci_dev *pdev,
+> +				  struct plat_stmmacenet_data *plat)
+>  {
+> +	/* Get bus_id, this can be overwritten later */
+> +	plat->bus_id = pci_dev_id(pdev);
+> +
+>  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>  	plat->has_gmac = 1;
+>  	plat->force_sf_dma_mode = 1;
+> @@ -49,9 +53,10 @@ static void loongson_default_data(struct plat_stmmacenet_data *plat)
+>  	plat->dma_cfg->pblx8 = true;
+>  }
+>  
+> -static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
+> +static int loongson_gmac_data(struct pci_dev *pdev,
+> +			      struct plat_stmmacenet_data *plat)
+>  {
+> -	loongson_default_data(plat);
+> +	loongson_default_data(pdev, plat);
+>  
+>  	plat->tx_queues_to_use = 1;
+>  	plat->rx_queues_to_use = 1;
+> @@ -65,21 +70,72 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+>  	.setup = loongson_gmac_data,
+>  };
+>  
+> -static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +static int loongson_dwmac_dt_config(struct pci_dev *pdev,
+> +				    struct plat_stmmacenet_data *plat,
+> +				    struct stmmac_resources *res)
+>  {
+> -	struct plat_stmmacenet_data *plat;
+> -	struct stmmac_pci_info *info;
+> -	struct stmmac_resources res;
+> -	struct device_node *np;
+> -	int ret, i, phy_mode;
+> +	struct device_node *np = dev_of_node(&pdev->dev);
+> +	int ret;
+> +
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 5090912533d6..1110f69bf9bc 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1263,7 +1263,7 @@ void ip_rt_get_source(u8 *addr, struct sk_buff *skb, struct rtable *rt)
- 		struct flowi4 fl4 = {
- 			.daddr = iph->daddr,
- 			.saddr = iph->saddr,
--			.flowi4_tos = RT_TOS(iph->tos),
-+			.flowi4_tos = iph->tos & IPTOS_RT_MASK,
- 			.flowi4_oif = rt->dst.dev->ifindex,
- 			.flowi4_iif = skb->dev->ifindex,
- 			.flowi4_mark = skb->mark,
--- 
-2.45.1
+> +	plat->mdio_node = of_get_child_by_name(np, "mdio");
+> +	if (plat->mdio_node) {
+> +		dev_info(&pdev->dev, "Found MDIO subnode\n");
+> +		plat->mdio_bus_data->needs_reset = true;
+> +	}
 
+This needs to be reverted in case if the following up code fails.
+So ...
+
+> +
+> +	ret = of_alias_get_id(np, "ethernet");
+> +	if (ret >= 0)
+> +		plat->bus_id = ret;
+> +
+> +	res->irq = of_irq_get_byname(np, "macirq");
+> +	if (res->irq < 0) {
+> +		dev_err(&pdev->dev, "IRQ macirq not found\n");
+
+> +		return -ENODEV;
+
+		ret = -ENODEV;
+		goto err_put_node;
+
+> +	}
+>  
+> -	np = dev_of_node(&pdev->dev);
+> +	res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> +	if (res->wol_irq < 0) {
+> +		dev_info(&pdev->dev,
+> +			 "IRQ eth_wake_irq not found, using macirq\n");
+> +		res->wol_irq = res->irq;
+> +	}
+>  
+> -	if (!np) {
+> -		pr_info("dwmac_loongson_pci: No OF node\n");
+> +	res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> +	if (res->lpi_irq < 0) {
+> +		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+
+>  		return -ENODEV;
+
+		err = -ENODEV;
+		goto err_put_node;
+
+>  	}
+>  
+> +	ret = device_get_phy_mode(&pdev->dev);
+> +	if (ret < 0) {
+> +		dev_err(&pdev->dev, "phy_mode not found\n");
+
+> +		return -ENODEV;
+
+		goto err_put_node;
+
+> +	}
+> +
+> +	plat->phy_interface = ret;
+> +
+> +	return 0;
+
+err_put_node:
+	of_node_put(plat->mdio_node);
+
+	return ret;
+
+> +}
+
+static void loongson_dwmac_dt_clear(struct pci_dev *pdev,
+				    struct plat_stmmacenet_data *plat)
+{
+	of_node_put(plat->mdio_node);
+}
+
+and ...
+
+> +
+> +static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
+> +				      struct plat_stmmacenet_data *plat,
+> +				      struct stmmac_resources *res)
+> +{
+> +	if (!pdev->irq)
+> +		return -EINVAL;
+> +
+> +	res->irq = pdev->irq;
+> +
+> +	return 0;
+> +}
+> +
+> +static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> +{
+> +	struct plat_stmmacenet_data *plat;
+> +	struct stmmac_pci_info *info;
+> +	struct stmmac_resources res;
+> +	int ret, i;
+> +
+>  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+>  	if (!plat)
+>  		return -ENOMEM;
+> @@ -90,17 +146,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  	if (!plat->mdio_bus_data)
+>  		return -ENOMEM;
+>  
+> -	plat->mdio_node = of_get_child_by_name(np, "mdio");
+> -	if (plat->mdio_node) {
+> -		dev_info(&pdev->dev, "Found MDIO subnode\n");
+> -		plat->mdio_bus_data->needs_reset = true;
+> -	}
+> -
+>  	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+> -	if (!plat->dma_cfg) {
+> -		ret = -ENOMEM;
+> -		goto err_put_node;
+> -	}
+> +	if (!plat->dma_cfg)
+> +		return -ENOMEM;
+>  
+>  	/* Enable pci device */
+>  	ret = pci_enable_device(pdev);
+> @@ -109,6 +157,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+
+>  		goto err_put_node;
+
+		return ret;
+
+>  	}
+>  
+> +	pci_set_master(pdev);
+> +
+>  	/* Get the base address of device */
+>  	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>  		if (pci_resource_len(pdev, i) == 0)
+> @@ -119,48 +169,20 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  		break;
+>  	}
+>  
+> -	plat->bus_id = of_alias_get_id(np, "ethernet");
+> -	if (plat->bus_id < 0)
+> -		plat->bus_id = pci_dev_id(pdev);
+> -
+> -	phy_mode = device_get_phy_mode(&pdev->dev);
+> -	if (phy_mode < 0) {
+> -		dev_err(&pdev->dev, "phy_mode not found\n");
+> -		ret = phy_mode;
+> -		goto err_disable_device;
+> -	}
+> -
+> -	plat->phy_interface = phy_mode;
+> -
+> -	pci_set_master(pdev);
+> -
+>  	memset(&res, 0, sizeof(res));
+>  	res.addr = pcim_iomap_table(pdev)[0];
+>  
+>  	info = (struct stmmac_pci_info *)id->driver_data;
+> -	ret = info->setup(plat);
+> +	ret = info->setup(pdev, plat);
+>  	if (ret)
+>  		goto err_disable_device;
+>  
+> -	res.irq = of_irq_get_byname(np, "macirq");
+> -	if (res.irq < 0) {
+> -		dev_err(&pdev->dev, "IRQ macirq not found\n");
+> -		ret = -ENODEV;
+> -		goto err_disable_device;
+> -	}
+> -
+> -	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> -	if (res.wol_irq < 0) {
+> -		dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
+> -		res.wol_irq = res.irq;
+> -	}
+> -
+> -	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> -	if (res.lpi_irq < 0) {
+> -		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> -		ret = -ENODEV;
+> +	if (dev_of_node(&pdev->dev))
+> +		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+> +	else
+> +		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
+> +	if (ret)
+>  		goto err_disable_device;
+> -	}
+>  
+>  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>  	if (ret)
+
+... make sure loongson_dwmac_dt_clear() is called in the
+cleanup-on-error path:
+
+        ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+        if (ret)
+                goto err_plat_clear;
+
+        return 0;
+
+err_plat_clear:
+	if (dev_of_node(&pdev->dev))
+		loongson_dwmac_dt_clear(pdev, plat);
+
+err_disable_device:
+        pci_disable_device(pdev);
+
+        return ret;
+
+... and in the loongson_dwmac_remove() method:
+
+static void loongson_dwmac_remove(struct pci_dev *pdev)
+{
+	...
+
+        stmmac_dvr_remove(&pdev->dev);
+
+	if (dev_of_node(&pdev->dev))
+		loongson_dwmac_dt_clear(pdev, priv->plat);
+
+	...
+}
+
+-Serge(y)
+
+> -- 
+> 2.31.4
+> 
 
