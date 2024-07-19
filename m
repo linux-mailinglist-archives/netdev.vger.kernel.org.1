@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-112249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13BCE937B12
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 18:32:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0A79937B23
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 18:37:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B055C1F21A79
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 16:32:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E7D7B20A49
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 16:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E1D14601E;
-	Fri, 19 Jul 2024 16:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C32145FF4;
+	Fri, 19 Jul 2024 16:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="tEZ9IAWe"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dsaDwT+E"
 X-Original-To: netdev@vger.kernel.org
 Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07BA145B1F
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 16:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E889E1B86D9
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 16:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721406717; cv=none; b=Mz7PxD+vzwD4nfhR6Jsq5cAb+ftwk8SN0eWHJAgY0HQ4BsVfPve06LCmPtd7JCIQsoVcaYwjhaLWfa0RO6ag4pd2FUo3B0aNJ3S9Mcw7bOw8I5bRjeBbKTYoksPW6PJQeLWWCNpqEsae/n0vVGxmLYGKHjA9yqXStNW3P8VIObQ=
+	t=1721407057; cv=none; b=sKd1/8EVTuZDvxAJcbLBS0Bx+SUuAwtUy8vh0uqw2HScAKVhz1dJli+2ycpAvcU/S7Wo32iFdw13MMctRbGH9/lPBEiEsW4rTXM/82BXMDA7LovYxsCQMWKX5Q1c2tigUZQglIB/NqDF3o1mXLeJj/03XQd3wjrTwJ1TXZa7pmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721406717; c=relaxed/simple;
-	bh=v1mNnXDj27KqVtlI9I1CpNHzTJ8lfxuQCjaq0ALt4HE=;
+	s=arc-20240116; t=1721407057; c=relaxed/simple;
+	bh=EWFZmS0QHfj/WPVVbx2hzEOiB6F/jZck/wb3H7CwPJ0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hdBy7Q9vGd13DevTYkw/NnVcOOzvjjaOXyiroTFklOwXYd6YcR1y/72iwT+pe9LE+g1RARa/YSaemddE61IKhIyHnfbJFzU5OYiDk9IEZTACyI01idSOOxUKBZOKaah0Fy7oOq5DVQiTVJkmf+qP/6D3ghJ8w3zfz5UryuTnafA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=tEZ9IAWe; arc=none smtp.client-ip=168.119.38.16
+	 Content-Type:MIME-Version; b=UiwIDQwUHzQYlzCaeZQjn+vVQMW8NFCypfH63B3b8RLM1q/EGP62m3FvbKaY+hg9CWnBp1n+81krXl2FN5WLyjAv8B6kGS5CW+lHIJxjkz3AjKLS66i/IS5RmvV2L/6ihV6NQRAcsxJY3MXF01KvpztjRu14eotImtFx7+eUCxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dsaDwT+E; arc=none smtp.client-ip=168.119.38.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
 	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=v1mNnXDj27KqVtlI9I1CpNHzTJ8lfxuQCjaq0ALt4HE=;
-	t=1721406716; x=1722616316; b=tEZ9IAWetLLeqjMriaWOwRdtAO2fDsorhTxBGRPpZ/UGXER
-	zSgIggP1BSqSQnkpVdwehh7JvQSP0bkT+a/oRBWJPXjeN7/X3jaaz7uo6MuR+IVSnCgPCpyl3rUCB
-	e+y326+xOVst7No8yYkQVRsHiwC8OtZKXRiHOzVJL0xW1iUIsKIFZG8pb9XfZUAgAkSMP73liDYSm
-	zhpdcvUqmmUT5xV1vB+4VBTzcYFItp3RO0UEqJLoMapjZwqO+ED1zIaAkA8u6nRgT6SiqNvcty4HF
-	hfTE9l/GKiQ8U//mMCg1U5f0c/Y59HfpHq413Nhk2m7qwCN1sFaNjhPhn4r/Qksw==;
+	Resent-Cc:Resent-Message-ID; bh=yig1URcXHQaX3DtoDaRkgMbQM+IVH96dMhptxEBpZIU=;
+	t=1721407056; x=1722616656; b=dsaDwT+EB8uuOiuiO62JN4B2uuID6aCP3Z8nr8lKaLxY0a+
+	RWr4bj+o8Rh4i58p7XFBmnnQ3bsfm7q3boVhq2sui7lFWLr8wxHYtruGe8WfDMx7KnvAiXi93pAez
+	07ngVLJTHBfvZB4yJ71YgdoU9bl/802S7ns3KAbV9GAHRiCSyBhXc8Q6xdXAzskrMGL8v6gE3t3PF
+	X+JtOlBDixe2XeQ9RUbLuoaDLW6v5PF0u+T7XQEQ5rYZ3VbMiXnKxl4j1ubTt/yy0T2IrFNdzfrVn
+	Vk8FtkaaHhQbcqEk6uori/xMxLTE9yqZnrQS0XUFMX8336hbHqT67WAlCgnuX8nA==;
 Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.97)
 	(envelope-from <johannes@sipsolutions.net>)
-	id 1sUqWO-000000041W3-3sW8;
-	Fri, 19 Jul 2024 18:31:53 +0200
-Message-ID: <af2dae8e1628b43afc898262b64c10128f7d1a7d.camel@sipsolutions.net>
+	id 1sUqbr-0000000422G-3wAL;
+	Fri, 19 Jul 2024 18:37:32 +0200
+Message-ID: <58b1501ddd7299164cf71768f10d0f4771b18b4f.camel@sipsolutions.net>
 Subject: Re: [RFC PATCH 2/2] net: bonding: don't call ethtool methods under
  RCU
 From: Johannes Berg <johannes@sipsolutions.net>
-To: Jiri Pirko <jiri@resnulli.us>
+To: Jay Vosburgh <jv@jvosburgh.net>
 Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	syzbot+2120b9a8f96b3fa90bad@syzkaller.appspotmail.com
-Date: Fri, 19 Jul 2024 09:31:50 -0700
-In-Reply-To: <Zpo27pq6lWYyVv_y@nanopsycho.orion>
+	syzbot+2120b9a8f96b3fa90bad@syzkaller.appspotmail.com, Hillf Danton
+	 <hdanton@sina.com>
+Date: Fri, 19 Jul 2024 09:37:28 -0700
+In-Reply-To: <2649494.1721337149@famine>
 References: 
 	<20240718122017.b1051af4e7f7.I68eb9c0f02545b364b79a59f2110f2cf5682a8e2@changeid>
 	 <20240718122017.d2e33aaac43a.I10ab9c9ded97163aef4e4de10985cd8f7de60d28@changeid>
-	 <Zpo27pq6lWYyVv_y@nanopsycho.orion>
+	 <2649494.1721337149@famine>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
@@ -70,31 +71,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-malware-bazaar: not-scanned
 
-On Fri, 2024-07-19 at 11:50 +0200, Jiri Pirko wrote:
-> Thu, Jul 18, 2024 at 09:20:17PM CEST, johannes@sipsolutions.net wrote:
-> > From: Johannes Berg <johannes.berg@intel.com>
-> >=20
-> > Currently, bond_miimon_inspect() is called under RCU, but it
-> > calls ethtool ops. Since my earlier commit facd15dfd691
-> > ("net: core: synchronize link-watch when carrier is queried")
-> > this is no longer permitted in the general ethtool case, but
-> > it was already not permitted for many drivers such as USB in
-> > which it can sleep to do MDIO register accesses etc.
-> >=20
-> > Therefore, it's better to simply not do this. Change bonding
-> > to acquire the RTNL for the MII monitor work directly to call
-> > the bond_miimon_inspect() function and thus ethtool ops.
+On Thu, 2024-07-18 at 14:12 -0700, Jay Vosburgh wrote:
 >=20
-> Is there a good reason why to directly query device here using whatever?
+> 	We can't do this, as it will hit RTNL every monitor interval,
+> which can be many times per second.
 
-See Jay's email for that, I think?
+Fair.
 
-> I mean, why netif_oper_up() would not return the correct bool here?
-> Introduction of periodic rtnl locking for no good reason is not probably
-> something we should do :/
+>   The logic is structured to
+> specifically avoid acquiring RTNL during the inspection pass.
+
+We also cannot do _that_, however, it's just broken with devices that
+want to sleep there. Arguably the common ethtool op that syzbot
+complains about is just a distraction, because while that does sleep
+(now), it's also equivalent to use_carrier=3D=3D1, so we could just say "oh
+if it's the common ethtool op then use the carrier directly", but while
+that'd prevent syzbot from reporting the issue again, it'd not actually
+fix the problem with all the USB drivers etc.
+
+> 	The issue that szybot is seeing only happens if bonding's
+> use_carrier option is set to 0, which is not the normal case.
+
+Sure, but like I said above, syzbot doesn't really matter. Don't get too
+hung up on it.
+
+> use_carrier is a backwards compatibility option from years ago for
+> drivers that do not implement netif_carrier_on/off (and thus calling
+> netif_carrier_ok() would be unreliable).
+
+Sure, OK.
+
+> 	This also came up in [0], and looking now I see there's a patch
+> that syzbot tested, although I haven't reviewed it.
+
++Hillf, I believe that patch is broken because it completely defeats the
+purpose of my original patch there, and also addresses only the "syzbot
+complains about common ethtool op" issue, not the more general problem.
+
+> 	Another option is to for the Powers That Be to declare that it's
+> safe to assume that network drivers implement netif_carrier_on/off to
+> advertise their link state, in which case the use_carrier logic in
+> bonding can be removed.
+
+No objection to that, if you don't have proper carrier reporting then a
+lot of other things will likely be broken anyway?
+
+> 	Or we can somehow isolate the "must acquire RTNL instead of RCU"
+> to the problematic use_carrier=3D0 path, but that's a nontrivial change.
 >=20
 
-Yeah, fair.
+I guess.
 
 johannes
 
