@@ -1,201 +1,159 @@
-Return-Path: <netdev+bounces-112141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77039371F0
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 03:19:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C7A6937218
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 03:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06C0F1C20DB5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 01:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5BC3281B74
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 01:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2CA2913;
-	Fri, 19 Jul 2024 01:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B42A32;
+	Fri, 19 Jul 2024 01:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9jYEYUA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vFtARIBq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A528423B0
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 01:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E6015CB
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 01:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721351991; cv=none; b=k92UuXyK5Qsr0+9gZMf+j7yYpNgdyj7LI4wmN/x4FosT78Gg/le+2XwEfI2QYMQCNqJXevuc1G503pXvH8IJvJpJXNJaldqDbft1vwksyA3OZAlGgvmXvSZnFhJfB7T0MJ8BxAY/8RpQX7Db0AQVS+rRS/vow1zCE0groyyk77k=
+	t=1721353934; cv=none; b=L4VqrVZVxDG4ufqMQDSjtaRcMf34MlB/nQOBQztjoAiRIzH1xQNjHIvPsVgdIOfqoYZ3eAXUlG4Ya9zbYmeZ9cEJDSUssTsNK3biZTTngk1PnaHDPvKWnTb0QnungzG0nmFr1f5nf5LkzuXLf6kF9m8cwAVkrDlj8Bn5ftxyvxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721351991; c=relaxed/simple;
-	bh=93QVP4WJoS9Hpv2j9SWPhGJjYy+NR2J0K6SXL1NRHxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iFCPz7rhGNP2sFHO1RQB96zbUGKmCuukjmtId4dnIeHtgsY6OD1eWUrkwyrZW9slTLUJVxuC3brop3Oove2HBWyckbzyPVEKk91b3VRxbF2t6u1n6wn4tzmKMjePAdmZKngQx7RfxOwgD7Y1yTxuyE8RHtRuVCquDzrcVfTmstM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H9jYEYUA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721351988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jwmop9WL4f0jJYAYbZ5p9p7R5dVY3Lpor/+2jEVRnP0=;
-	b=H9jYEYUAt03F3GOZPrAfeMp/DLE9rLbZHSJr0SEXCBGhGJndkPfGXISQ0gOrb/yybTC7rs
-	jT7HK018KyRgM6IKnnp5ptslC7LkR05lG3WO7ZSOSCb669NuGc9So1qm9m1xs4dV4k76Ov
-	y9/Dwmai/dlUnkJC73pvtkix0yd5QSg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-253-gjk_j3RWM_2TPEbmhD_aVQ-1; Thu, 18 Jul 2024 21:19:47 -0400
-X-MC-Unique: gjk_j3RWM_2TPEbmhD_aVQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-367a058fa21so166713f8f.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 18:19:46 -0700 (PDT)
+	s=arc-20240116; t=1721353934; c=relaxed/simple;
+	bh=XUl1P733PPNfgX/NDlSNZK52UZMhUVKC0goVY2NU5dU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MH0Jo0MSUk55+GJanbRpDiwMMAnVhkzR7nOCD6N2b9xj+IKRD1bgt6HkXwGJCENvs/cRRbgR1EmOF38cU/0LBFuQL5W8ORz9jcNpe3TUphCxQGCyaa7z9kvl5QDHBkxTM8LTaB1iGGd2g9rAkDrykUAxxp9LHYHPvcKoaF/2N+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vFtARIBq; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52ea879de63so1178e87.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 18:52:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721353931; x=1721958731; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CG6v2dmDXP0zBr7n4M7RscIKtOL7XXlzUCOr6fiNfxA=;
+        b=vFtARIBqrfr9lgzynPYFlq0PKQkNW5Gu6+/46S6KtC9SxHZLa05nYEvdN4qB5Gr0tp
+         Sr9nw2dUD586GqLXmptIuvVrvvZa7C0CN7zFzYFklyEFAclPWA7BdoZdMTg0qpOmf6+U
+         SkUxvmwzwJ7do/Rae1MjtVH3zlPrFg/RA/lscFOkVL+iTBXjCcYO4fkBIE9NX8E73LI/
+         2/Ay12n9os4115f2+KpegCJHOO3OS0qT9SjjAKkoxHKahDW2D2EdxAc2lQaMGGUfEK9d
+         2Xw6/dVuSjWmcPSHv4tuDvI6UA2wXKEQWJZy7f1XLefu4ym766cfdeQk9MZBG8/wJhza
+         AnDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721351986; x=1721956786;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jwmop9WL4f0jJYAYbZ5p9p7R5dVY3Lpor/+2jEVRnP0=;
-        b=mZnlvk3ET2Kz7mbGzDwBWKADND8Ty4iYxl2SPCNphT3nXb2fhVzSPxFWERYWTBnnvf
-         A3aL0PtvwvXUBfPhuixEvpGuiFSr8Ri6O/J324SGlTWL7pksxic1EBhVgh3q+SGZQ9+U
-         YPKBbRTIXGMhE3mohB1pb1Dscma6m1+WhMZN+6J3Or54SmWA4zGT9oHFr/SPF3OU8fs4
-         xeigUi4ycIxt6/rQsnySzskr9i9jY9PWqnrS340C6CFozq0IyWzLOa/DhR41ME1/gB2r
-         ngTEYoNW3x21ElLM3ERWSwknr0Ug5arROpl69PW1M6Y9dzCrI/7ZNiqJanrBSpTzOJFN
-         6Byg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3GrDPuMt0bsbeJFKYZzR9c6/o1hUxZ4glEf99bPnbe8puum0eR7gJw7TVXYm3XdooaOLiXRdvOJABCdoleMyYFPj9DL7M
-X-Gm-Message-State: AOJu0Yyrr3fNJKA0CeC7BKiwrqJcPP/Cg2j5DqcYA4GX/9QlAb7vAD2j
-	mmF7MCSCzu+E3Yv9FjI2zNKGSrLDUkeCfihD2UdW3FUWpRRAyqEExhoPrGGGPEJpm7SOa0jwOqD
-	+HR4P5pgP++BW2nWahDlBkb18Z+GgTX7GwEKl6Z4TPiekXiDb1SwNLQ==
-X-Received: by 2002:a5d:69ca:0:b0:360:7856:fa62 with SMTP id ffacd0b85a97d-36873ed7d99mr569853f8f.15.1721351986000;
-        Thu, 18 Jul 2024 18:19:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9Rox38d1XVqs4VIGXwyGyO0EsaiwHZh55nSHLLk1r/xY/5ex8srk4eo3DwsusIcXSuOqn2Q==
-X-Received: by 2002:a5d:69ca:0:b0:360:7856:fa62 with SMTP id ffacd0b85a97d-36873ed7d99mr569841f8f.15.1721351985275;
-        Thu, 18 Jul 2024 18:19:45 -0700 (PDT)
-Received: from redhat.com (mob-5-90-112-15.net.vodafone.it. [5.90.112.15])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2a3b800sm35187425e9.5.2024.07.18.18.19.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 18:19:44 -0700 (PDT)
-Date: Thu, 18 Jul 2024 21:19:41 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
-	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
-Subject: Re: [PATCH net-next v3 3/3] virtio-net: synchronize operstate with
- admin state on up/down
-Message-ID: <20240718211816-mutt-send-email-mst@kernel.org>
-References: <20240709080214.9790-1-jasowang@redhat.com>
- <20240709080214.9790-4-jasowang@redhat.com>
- <20240709090743-mutt-send-email-mst@kernel.org>
- <CACGkMEv4CVK4YdOvHEbMY3dLc3cxF_tPN8H4YO=0rvFLaK-Upw@mail.gmail.com>
- <CACGkMEvDiQHfLaBRoaFtpYJHKTqicqbrpeZWzat43YveTa9Wyg@mail.gmail.com>
- <20240717015904-mutt-send-email-mst@kernel.org>
- <CACGkMEtntsAyddgrtxrbQe407dZkitac4ogC7cASF=iYgsum_A@mail.gmail.com>
- <CACGkMEsd63vH3J5m_4srO3ww2MWGOPc31L4171PfQ7uersN7PQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1721353931; x=1721958731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CG6v2dmDXP0zBr7n4M7RscIKtOL7XXlzUCOr6fiNfxA=;
+        b=rgzIaQWlLVtCDxblPCx47Y8wtC2A2TWj0nGBC/V+vqXFrinfRyKzJw8UEKYHk3EGK9
+         0V1IIemZhZ61OdfIAWQH2qIEDHbZCY5TK6H1TAxmnyLVRqRkrd0nUxKjC8LLDLYtLuVV
+         wp+FyU+Oukqa9TKi66be728ofW1fcvhoQqcL2qKUHLUt9Xv/3TUinDwNt5ZKFshe80ld
+         9FrFd16ZEn+1rwAgkmaVWSUnPaoEHD2Clx2q8Zh7LsARiMl7Ht1vPZ+x8cHvLCIdhvz3
+         g1q6eUksJFhEVdYYrXusrDIMpJbkGF+CHzy1mP+m9vcwNoRHcHCS/e4+TZX2gA+OJErs
+         hUMQ==
+X-Gm-Message-State: AOJu0Yxhfj0WIxMlB6MqScrZ2wRT8kcWvW2DHDe5FVzB/bNvUVWeVOCW
+	vWUjnJ/6J7RIg2sZkDCaMOEmzQjx1y2G1aWSuka4DqNkqEU0Czy5KnyWBee1XWeY4NnMUbR9EIv
+	fIIEXZj9U0rOlfQAWjRwb+jYEGPcSH0CCA3e5
+X-Google-Smtp-Source: AGHT+IGpSt8DWtE0/1gnZmnIXDnkRRnB7rLKdvzdfjas6V6fTRDr+gQAYFRSUf4gOFMKd/+eiezGu8Ndrdvq2PV3xl0=
+X-Received: by 2002:a05:6512:3f03:b0:52c:cc9b:be20 with SMTP id
+ 2adb3069b0e04-52ef4ef6ecemr29785e87.1.1721353930343; Thu, 18 Jul 2024
+ 18:52:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEsd63vH3J5m_4srO3ww2MWGOPc31L4171PfQ7uersN7PQ@mail.gmail.com>
+References: <20240718190221.2219835-1-pkaligineedi@google.com> <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch>
+From: Praveen Kaligineedi <pkaligineedi@google.com>
+Date: Thu, 18 Jul 2024 18:51:58 -0700
+Message-ID: <CA+f9V1PsjukhgLDjWQvbTyhHkOWt7JDY0zPWc_G322oKmasixA@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Fix an edge case for TSO skb validity check
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, shailend@google.com, 
+	hramamurthy@google.com, csully@google.com, jfraker@google.com, 
+	stable@vger.kernel.org, Bailey Forrest <bcf@google.com>, 
+	Jeroen de Borst <jeroendb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 19, 2024 at 09:02:29AM +0800, Jason Wang wrote:
-> On Wed, Jul 17, 2024 at 2:53 PM Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Wed, Jul 17, 2024 at 2:00 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > On Wed, Jul 17, 2024 at 09:19:02AM +0800, Jason Wang wrote:
-> > > > On Wed, Jul 10, 2024 at 11:03 AM Jason Wang <jasowang@redhat.com> wrote:
-> > > > >
-> > > > > On Tue, Jul 9, 2024 at 9:28 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > > >
-> > > > > > On Tue, Jul 09, 2024 at 04:02:14PM +0800, Jason Wang wrote:
-> > > > > > > This patch synchronize operstate with admin state per RFC2863.
-> > > > > > >
-> > > > > > > This is done by trying to toggle the carrier upon open/close and
-> > > > > > > synchronize with the config change work. This allows propagate status
-> > > > > > > correctly to stacked devices like:
-> > > > > > >
-> > > > > > > ip link add link enp0s3 macvlan0 type macvlan
-> > > > > > > ip link set link enp0s3 down
-> > > > > > > ip link show
-> > > > > > >
-> > > > > > > Before this patch:
-> > > > > > >
-> > > > > > > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
-> > > > > > >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
-> > > > > > > ......
-> > > > > > > 5: macvlan0@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-> > > > > > >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
-> > > > > > >
-> > > > > > > After this patch:
-> > > > > > >
-> > > > > > > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000
-> > > > > > >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
-> > > > > > > ...
-> > > > > > > 5: macvlan0@enp0s3: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DOWN> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default qlen 1000
-> > > > > > >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
-> > > > > >
-> > > > > > I think that the commit log is confusing. It seems to say that
-> > > > > > the issue fixed is synchronizing state with hardware
-> > > > > > config change.
-> > > > > > But your example does not show any
-> > > > > > hardware change. Isn't this example really just
-> > > > > > a side effect of setting carrier off on close?
-> > > > >
-> > > > > The main goal for this patch is to make virtio-net follow RFC2863. The
-> > > > > main thing that is missed is to synchronize the operstate with admin
-> > > > > state, if we do this, we get several good results, one of the obvious
-> > > > > one is to allow virtio-net to propagate status to the upper layer, for
-> > > > > example if the admin state of the lower virtio-net is down it should
-> > > > > be propagated to the macvlan on top, so I give the example of using a
-> > > > > stacked device. I'm not we had others but the commit log is probably
-> > > > > too small to say all of it.
-> > > >
-> > > > Michael, any more comments on this?
-> > > >
-> > > > Thans
-> > >
-> > >
-> > > Still don't get it, sorry.
-> > > > > > > This is done by trying to toggle the carrier upon open/close and
-> > > > > > > synchronize with the config change work.
-> > > What does this sentence mean? What is not synchronized with config
-> > > change that needs to be?
-> >
-> > I meant,
-> >
-> > 1) maclvan depends on the linkwatch to transfer operstate from the
-> > lower device to itself.
-> > 2) ndo_open()/close() will not trigger the linkwatch so we need to do
-> > it by ourselves in virtio-net to make sure macvlan get the correct
-> > opersate
-> > 3) consider config change work can change the state so ndo_close()
-> > needs to synchronize with it
-> >
-> > Thanks
-> 
-> Michael, are you fine with the above or I miss something there?
-> 
-> Thanks
+On Thu, Jul 18, 2024 at 4:07=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 
-
-I don't understand 3. config change can always trigger.
-what I do not like is all these reads from config space
-that now trigger on open/close. previously we did
-read
-- on probe
-- after probe, if config changed
-
-
-and that made sense.
-
--- 
-MST
-
+> > +                      * segment, then it will count as two descriptors=
+.
+> > +                      */
+> > +                     if (last_frag_size > GVE_TX_MAX_BUF_SIZE_DQO) {
+> > +                             int last_frag_remain =3D last_frag_size %
+> > +                                     GVE_TX_MAX_BUF_SIZE_DQO;
+> > +
+> > +                             /* If the last frag was evenly divisible =
+by
+> > +                              * GVE_TX_MAX_BUF_SIZE_DQO, then it will =
+not be
+> > +                              * split in the current segment.
+>
+> Is this true even if the segment did not start at the start of the frag?
+The comment probably is a bit confusing here. The current segment
+we are tracking could have a portion in the previous frag. The code
+assumed that the portion on the previous frag (if present) mapped to only
+one descriptor. However, that portion could have been split across two
+descriptors due to the restriction that each descriptor cannot exceed 16KB.
+That's the case this fix is trying to address.
+I will work on simplifying the logic based on your suggestion below so
+that the fix is easier to follow
+>
+> Overall, it's not trivial to follow. Probably because the goal is to
+> count max descriptors per segment, but that is not what is being
+> looped over.
+>
+The comment
+> Intuitive (perhaps buggy, a quick sketch), this is what is intended,
+> right?
+>
+> static bool gve_can_send_tso(const struct sk_buff *skb)
+> {
+>         int frag_size =3D skb_headlen(skb) - header_len;
+>         int gso_size_left;
+>         int frag_idx =3D 0;
+>         int num_desc;
+>         int desc_len;
+>         int off =3D 0;
+>
+>         while (off < skb->len) {
+>                 gso_size_left =3D shinfo->gso_size;
+>                 num_desc =3D 0;
+>
+>                 while (gso_size_left) {
+>                         desc_len =3D min(gso_size_left, frag_size);
+>                         gso_size_left -=3D desc_len;
+>                         frag_size -=3D desc_len;
+>                         num_desc++;
+>
+>                         if (num_desc > max_descs_per_seg)
+>                                 return false;
+>
+>                         if (!frag_size)
+>                                 frag_size =3D skb_frag_size(&shinfo->frag=
+s[frag_idx++]);
+>                 }
+>         }
+>
+>         return true;
+> }
+>
+> This however loops skb->len / gso_size. While the above modulo
+> operation skips many segments that span a frag. Not sure if the more
+> intuitive approach could be as performant.
+>
+> Else, I'll stare some more at the suggested patch to convince myself
+> that it is correct and complete..
 
