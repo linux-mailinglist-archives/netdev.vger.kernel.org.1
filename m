@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-112145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFBBA93722A
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 04:08:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5965F937231
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 04:08:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09BA11C20D57
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 02:08:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD4B1C20B6D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 02:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F888F45;
-	Fri, 19 Jul 2024 02:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB118472;
+	Fri, 19 Jul 2024 02:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="Fb+oEyI1"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="cEbdi4nK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D0C8472
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 02:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AE28BEE
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 02:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721354883; cv=none; b=CEdmBJTo/Z7x/doh5QoyCR9w/7Y6FOQwVyGcwMilgrJY34b+gdo3uIH8u2UtelnTG29ndgO/+StVIqvOK5LWV6MUXNtSxLV/N8H/BpBzIZBKsSpFzTn4FFIsWjNAdjO0rzwXaOO+qX+t8d2zOyvol0PqqzRQSqwzOBgguK4fc7A=
+	t=1721354884; cv=none; b=s/k9qStzJ/JP3qvdfIO0vJSrKqBhq6cVmo40FCgXlLsotv199Jh3tDoR1i8tvoRk4AcQC/4qyAe5QXNk1f/AzXYn9jp6abuzj32S7cKx//nExpYOY4ee/4FSNbj+5VdyOE1avebzZcDUJeTCfN+UpyBAaHonUNeEGjQ1v/t+0yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721354883; c=relaxed/simple;
-	bh=q1GvNezgH341Zylsv1zLw1qihz6L+mDOT/lLwblP/PQ=;
+	s=arc-20240116; t=1721354884; c=relaxed/simple;
+	bh=TIiCRfwsESdbLtKgeaQrmG3fq3E7OOPlwiNVagskwcM=;
 	h=Date:Message-ID:MIME-Version:Content-Type:Content-Disposition:
-	 From:To:Cc:Subject:References:In-Reply-To; b=ne9RQj9MDI8nO1B1CkwJUmb4qPJGkTqcgVZwSt6S4swcsopdK71YazjGHwUGDP0qbN5Z7PT7ItHDuyYpX6/Sd3i+zp2/OqMDSiTf/+BOoVgXEIqHLegtiGbbHuGX6d9UBuvG/+kRNOImPbOOGqvSe/E6mBzjQX7nGrwO3gnFvhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=Fb+oEyI1; arc=none smtp.client-ip=209.85.160.172
+	 From:To:Cc:Subject:References:In-Reply-To; b=STKvJjppXXb1e6Vjz2d+flizxDGd9xNUp+DBzQNqb9XMqKZEQeolH39UyAT5+2e0lagHiuLRmhulrAsJPbWuwVIRkeni/DFDjRTc/gqBY84myOwPowvK3RV/kurQNr8tLaNG5EglBOoEfNxSyecwHW9joLwB4es+SApeBW2QLEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=cEbdi4nK; arc=none smtp.client-ip=209.85.219.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-44f666d9607so5570121cf.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:08:01 -0700 (PDT)
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e05f25fb96eso1404654276.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:08:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1721354880; x=1721959680; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1721354881; x=1721959681; darn=vger.kernel.org;
         h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
          :content-disposition:mime-version:message-id:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=YN0F7LIerr4cOX46aig6AMcwfRaF/WeNOJ4mdmcIzMM=;
-        b=Fb+oEyI1QiZ7CBhJpNqYPr2cWJnHrXGy+S3NPRerxT+S6x5wBku7pW8JSnLLbgXbbz
-         9/DiSc2DNp9TFDQeYK0YZuaVb/T9joah1RHjqodWoAqPuCc9zyMl8DXQla3EBLDRIolI
-         2Un815nffuUEg/vRa0/WSUjYbnVoeA2LIe998RzweHzlDgJe9SV7n/xCrWp5K0xSo68w
-         fxI+D+JfZhAM1NVwiyj3pbCxGTXRsFvgf7tzRgrKczEGqmIOVjZJFyKi5ewUiZnxA0EY
-         ZmemRTZ3rurD9W08lmA6P/1tB8YYuCrdwxVZ4VawTyfUGtP7wkAkMidcDX0snlyOs4kv
-         MCbg==
+        bh=QKuyM+4kk8m0EihN3f+xyfQVB73TFF9bKWS4LxZBLS0=;
+        b=cEbdi4nKTdqf+e9wDjKGw0OKJBfI3a7o5TcpIRwkAetMvuGGg3Tpf7n3WjnUUqBSWv
+         1tHQUCT9iz72cTMKAlLnCy7YtW+I6DPUsG3FEGwPwUk3AHQsP+xV7QLuwxRzVq7199gx
+         8w8fgV/BGv3RMz8Fa8fifdZOULrboM3/CVcjNT3JI8a/NmrWx5f3gn7/svQjIO6uDztV
+         1Tmg1DnFG4+8D0GTdHBUsKJvyt0ppIaRRjYCXAIbEOk3/1uZqVe3NDD6/pmF/w3IOY5i
+         gRPyf7vGhIjWKOF04J0kCgMP8dmrrIf/IS8jNA6MdvyxzSgHRDkyPgjbx6ACPM9gAQf2
+         YIqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721354880; x=1721959680;
+        d=1e100.net; s=20230601; t=1721354881; x=1721959681;
         h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
          :content-disposition:mime-version:message-id:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=YN0F7LIerr4cOX46aig6AMcwfRaF/WeNOJ4mdmcIzMM=;
-        b=bxSov3Q0JmOk1bpZVSksfo28DLnk7KpB3sHY23pxKexuC//aMTdk9/DvOu/MTV7HYu
-         nKI/37KUQ19uyUXqXfUZm43In+RTBQZqSdgkFnNYywlXF6Kepa//YYUILj7BOpvHLNJF
-         pA0Lw10fyyFQqLiC8YzolVQsiIUYCB+SpbFVy6OERhg9lpgeiRlF9Siy1xYRhAfM0nMr
-         PSe2U4IeNp8nvCUKToKXR8ceQkoG5cpnpZQgBnGSnP1v1REmfMF2Op8S0J+L2g9CjLyq
-         jJU44Q8zJlbAeh2BmQzqpLopjEA1lYuCPBF37riwuF3HKyBsBDMVNFfrMLsq5WMknAKl
-         ITgg==
-X-Forwarded-Encrypted: i=1; AJvYcCW1xwTKmiMc+hjiEv7E700wQ/WmclW6zEph0IOZDLAjF9XpIFCnAxCZ+jCx6dUxh5CbJFCVrEux2COGJ0GRsLnkbM/mUjj1
-X-Gm-Message-State: AOJu0YznFBEpmcXeC8l0RYoKH5aiqdbAbVhNDMu4CLdZKW15/Mcgpck2
-	UU+hikQYlovpwS99BRk6gFRGJv8kwbfSdFJVg64dxGm2s4U4ulSVLAIDYYprNw==
-X-Google-Smtp-Source: AGHT+IEJE9bHW4MkqmVWTJe4nMZnX+ZemFrNsydAipO8flZxWwZcYvxCDwNTgld7OQbeKd7vnKjGpw==
-X-Received: by 2002:a05:620a:4725:b0:79d:61e3:97f5 with SMTP id af79cd13be357-7a1874412dcmr781338685a.10.1721354880438;
-        Thu, 18 Jul 2024 19:08:00 -0700 (PDT)
+        bh=QKuyM+4kk8m0EihN3f+xyfQVB73TFF9bKWS4LxZBLS0=;
+        b=vZGg0wluZRLL9RPe+QdSjhFmxdMm29H8scyyJ+XKYuWY2UkOUk46ZejM2+70o6F1ZR
+         lDEzpVgE2UjdVEhAfTsN6ljb2JAloVQJENgjx16uAyCuCqLdepyVB0oWEIoIlCBvb2XA
+         p8wGxhu36oYB8blgi/J0Zh4JAufUhVok7P6P9rUxM1cR0lWiPdZjgIsAretJXeZ7DZxc
+         VvBuvZfFIoy1baLfXjFdqgIFkZIoWszs7lP5+qZqiIhNrPMPfDgEwedhifo9f8Z/Ud8z
+         H+NqfdVQ6QF2C+2snB590KIDlwEBlbZ1M8muQE6LNBUnXyD7r8MZtvk6U6wpLvy3os8N
+         8myA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTddiUXwrcQvL6fux6asj9D30De8wtp1bND6R01Lew5XDbpApiWfr1rzpBAreLkqhC4c37tj4cbAk8vuhXr3uhbjO/NFDD
+X-Gm-Message-State: AOJu0Yz4BY5PPYHbkZ6R5ZmuOEGDZ1UhSKASr9utCV1JSXaJo6kAIWs1
+	kpx0gqfMVPEFLSr6sbV36GZw1i4TqwOpewwJD1LIX/Pg7TlZCgK6pxQNEK/6HA==
+X-Google-Smtp-Source: AGHT+IFhEnM0FFuvbGMDBqr4RfedhNiC4rUoTP3U8yQRjvYSpvaZNyWktchidi14cnppVOezDB7uag==
+X-Received: by 2002:a05:6902:2082:b0:e03:a2d0:3387 with SMTP id 3f1490d57ef6-e05feb0e4f2mr5413750276.23.1721354881403;
+        Thu, 18 Jul 2024 19:08:01 -0700 (PDT)
 Received: from localhost ([70.22.175.108])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a198fbfba7sm21203885a.53.2024.07.18.19.08.00
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a19905a8f3sm21057585a.80.2024.07.18.19.08.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 19:08:00 -0700 (PDT)
-Date: Thu, 18 Jul 2024 22:07:59 -0400
-Message-ID: <075e4eb5185cbc5156136240d56b6d0d@paul-moore.com>
+        Thu, 18 Jul 2024 19:08:01 -0700 (PDT)
+Date: Thu, 18 Jul 2024 22:08:00 -0400
+Message-ID: <1cc57fedd0b012874a031dc3d3d4a0fd@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,34 +96,222 @@ Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
 	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Stephen Smalley <stephen.smalley.work@gmail.com>
-Subject: Re: [PATCH v4 1/20] lsm: Refactor return value of LSM hook  vm_enough_memory
-References: <20240711111908.3817636-2-xukuohai@huaweicloud.com>
-In-Reply-To: <20240711111908.3817636-2-xukuohai@huaweicloud.com>
+Subject: Re: [PATCH v4 2/20] lsm: Refactor return value of LSM hook  inode_need_killpriv
+References: <20240711111908.3817636-3-xukuohai@huaweicloud.com>
+In-Reply-To: <20240711111908.3817636-3-xukuohai@huaweicloud.com>
 
 On Jul 11, 2024 Xu Kuohai <xukuohai@huaweicloud.com> wrote:
 > 
 > To be consistent with most LSM hooks, convert the return value of
-> hook vm_enough_memory to 0 or a negative error code.
+> hook inode_need_killpriv to 0 or a negative error code.
 > 
 > Before:
-> - Hook vm_enough_memory returns 1 if permission is granted, 0 if not.
-> - LSM_RET_DEFAULT(vm_enough_memory_mm) is 1.
+> - Both hook inode_need_killpriv and func security_inode_need_killpriv
+>   return > 0 if security_inode_killpriv is required, 0 if not, and < 0
+>   to abort the operation.
 > 
 > After:
-> - Hook vm_enough_memory reutrns 0 if permission is granted, negative
->   error code if not.
-> - LSM_RET_DEFAULT(vm_enough_memory_mm) is 0.
+> - Both hook inode_need_killpriv and func security_inode_need_killpriv
+>   return 0 on success and a negative error code on failure.
+>   On success, hook inode_need_killpriv sets output param @need to true
+>   if security_inode_killpriv is required, and false if not. When @need
+>   is true, func security_inode_need_killpriv sets ATTR_KILL_PRIV flag
+>   in @attr; when false, it clears the flag.
+>   On failure, @need and @attr remains unchanged.
 > 
 > Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
 > ---
+>  fs/attr.c                     |  5 ++---
+>  fs/inode.c                    |  4 +---
 >  include/linux/lsm_hook_defs.h |  2 +-
->  include/linux/security.h      |  2 +-
->  security/commoncap.c          | 11 +++--------
->  security/security.c           | 11 +++++------
->  security/selinux/hooks.c      | 15 ++++-----------
->  5 files changed, 14 insertions(+), 27 deletions(-)
+>  include/linux/security.h      | 20 ++++++++++++++++----
+>  security/commoncap.c          | 12 ++++++++----
+>  security/security.c           | 29 ++++++++++++++++++++++++-----
+>  6 files changed, 52 insertions(+), 20 deletions(-)
 
-A nice improvement, thank you!
+In general I think a lot of these changes are a good improvement, thank
+you very much for the time and effort you've spent on this.  However,
+I'm not in favor of passing the new hook parameter as a way of reducing
+the number of states represented by the security_inode_killpriv() return
+value.  This particular hook may need to remain as one of the odd special
+cases.
+
+> diff --git a/fs/attr.c b/fs/attr.c
+> index 960a310581eb..aaadc721c982 100644
+> --- a/fs/attr.c
+> +++ b/fs/attr.c
+> @@ -427,11 +427,10 @@ int notify_change(struct mnt_idmap *idmap, struct dentry *dentry,
+>  		attr->ia_mtime = timestamp_truncate(attr->ia_mtime, inode);
+>  
+>  	if (ia_valid & ATTR_KILL_PRIV) {
+> -		error = security_inode_need_killpriv(dentry);
+> +		error = security_inode_need_killpriv(dentry, &ia_valid);
+>  		if (error < 0)
+>  			return error;
+> -		if (error == 0)
+> -			ia_valid = attr->ia_valid &= ~ATTR_KILL_PRIV;
+> +		attr->ia_valid = ia_valid;
+>  	}
+>  
+>  	/*
+> diff --git a/fs/inode.c b/fs/inode.c
+> index 3a41f83a4ba5..cd335dc3a3bc 100644
+> --- a/fs/inode.c
+> +++ b/fs/inode.c
+> @@ -2012,11 +2012,9 @@ int dentry_needs_remove_privs(struct mnt_idmap *idmap,
+>  		return 0;
+>  
+>  	mask = setattr_should_drop_suidgid(idmap, inode);
+> -	ret = security_inode_need_killpriv(dentry);
+> +	ret = security_inode_need_killpriv(dentry, &mask);
+>  	if (ret < 0)
+>  		return ret;
+> -	if (ret)
+> -		mask |= ATTR_KILL_PRIV;
+>  	return mask;
+>  }
+>  
+> diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+> index e6e6f8473955..964849de424b 100644
+> --- a/include/linux/lsm_hook_defs.h
+> +++ b/include/linux/lsm_hook_defs.h
+> @@ -165,7 +165,7 @@ LSM_HOOK(int, 0, inode_remove_acl, struct mnt_idmap *idmap,
+>  	 struct dentry *dentry, const char *acl_name)
+>  LSM_HOOK(void, LSM_RET_VOID, inode_post_remove_acl, struct mnt_idmap *idmap,
+>  	 struct dentry *dentry, const char *acl_name)
+> -LSM_HOOK(int, 0, inode_need_killpriv, struct dentry *dentry)
+> +LSM_HOOK(int, 0, inode_need_killpriv, struct dentry *dentry, bool *need)
+>  LSM_HOOK(int, 0, inode_killpriv, struct mnt_idmap *idmap,
+>  	 struct dentry *dentry)
+>  LSM_HOOK(int, -EOPNOTSUPP, inode_getsecurity, struct mnt_idmap *idmap,
+> diff --git a/include/linux/security.h b/include/linux/security.h
+> index 454f96307cb9..1614ef5b2dd2 100644
+> --- a/include/linux/security.h
+> +++ b/include/linux/security.h
+> @@ -161,7 +161,7 @@ int cap_inode_setxattr(struct dentry *dentry, const char *name,
+>  		       const void *value, size_t size, int flags);
+>  int cap_inode_removexattr(struct mnt_idmap *idmap,
+>  			  struct dentry *dentry, const char *name);
+> -int cap_inode_need_killpriv(struct dentry *dentry);
+> +int cap_inode_need_killpriv(struct dentry *dentry, bool *need);
+>  int cap_inode_killpriv(struct mnt_idmap *idmap, struct dentry *dentry);
+>  int cap_inode_getsecurity(struct mnt_idmap *idmap,
+>  			  struct inode *inode, const char *name, void **buffer,
+> @@ -389,7 +389,7 @@ int security_inode_listxattr(struct dentry *dentry);
+>  int security_inode_removexattr(struct mnt_idmap *idmap,
+>  			       struct dentry *dentry, const char *name);
+>  void security_inode_post_removexattr(struct dentry *dentry, const char *name);
+> -int security_inode_need_killpriv(struct dentry *dentry);
+> +int security_inode_need_killpriv(struct dentry *dentry, int *attr);
+>  int security_inode_killpriv(struct mnt_idmap *idmap, struct dentry *dentry);
+>  int security_inode_getsecurity(struct mnt_idmap *idmap,
+>  			       struct inode *inode, const char *name,
+> @@ -971,9 +971,21 @@ static inline void security_inode_post_removexattr(struct dentry *dentry,
+>  						   const char *name)
+>  { }
+>  
+> -static inline int security_inode_need_killpriv(struct dentry *dentry)
+> +static inline int security_inode_need_killpriv(struct dentry *dentry, int *attr)
+>  {
+> -	return cap_inode_need_killpriv(dentry);
+> +	int rc;
+> +	bool need = false;
+> +
+> +	rc = cap_inode_need_killpriv(dentry, &need);
+> +	if (rc < 0)
+> +		return rc;
+> +
+> +	if (need)
+> +		*attr |= ATTR_KILL_PRIV;
+> +	else
+> +		*attr &= ~ATTR_KILL_PRIV;
+> +
+> +	return 0;
+>  }
+>  
+>  static inline int security_inode_killpriv(struct mnt_idmap *idmap,
+> diff --git a/security/commoncap.c b/security/commoncap.c
+> index cefad323a0b1..17d6188d22cf 100644
+> --- a/security/commoncap.c
+> +++ b/security/commoncap.c
+> @@ -286,21 +286,25 @@ int cap_capset(struct cred *new,
+>  /**
+>   * cap_inode_need_killpriv - Determine if inode change affects privileges
+>   * @dentry: The inode/dentry in being changed with change marked ATTR_KILL_PRIV
+> + * @need: If inode_killpriv() is needed
+>   *
+>   * Determine if an inode having a change applied that's marked ATTR_KILL_PRIV
+>   * affects the security markings on that inode, and if it is, should
+>   * inode_killpriv() be invoked or the change rejected.
+>   *
+> - * Return: 1 if security.capability has a value, meaning inode_killpriv()
+> - * is required, 0 otherwise, meaning inode_killpriv() is not required.
+> + * Return: Always returns 0. If security.capability has a value, meaning
+> + * inode_killpriv() is required, @need is set to true.
+>   */
+> -int cap_inode_need_killpriv(struct dentry *dentry)
+> +int cap_inode_need_killpriv(struct dentry *dentry, bool *need)
+>  {
+>  	struct inode *inode = d_backing_inode(dentry);
+>  	int error;
+>  
+>  	error = __vfs_getxattr(dentry, inode, XATTR_NAME_CAPS, NULL, 0);
+> -	return error > 0;
+> +	if (error > 0)
+> +		*need = true;
+> +
+> +	return 0;
+>  }
+>  
+>  /**
+> diff --git a/security/security.c b/security/security.c
+> index 3475f0cab3da..a4abcd86eb36 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -2490,17 +2490,36 @@ void security_inode_post_removexattr(struct dentry *dentry, const char *name)
+>  /**
+>   * security_inode_need_killpriv() - Check if security_inode_killpriv() required
+>   * @dentry: associated dentry
+> + * @attr: attribute flags
+>   *
+>   * Called when an inode has been changed to determine if
+>   * security_inode_killpriv() should be called.
+>   *
+> - * Return: Return <0 on error to abort the inode change operation, return 0 if
+> - *         security_inode_killpriv() does not need to be called, return >0 if
+> - *         security_inode_killpriv() does need to be called.
+> + * Return: Return 0 on success, negative error code on failure.
+> + *         On success, set ATTR_KILL_PRIV flag in @attr when @need is true,
+> + *         clears it when false.
+>   */
+> -int security_inode_need_killpriv(struct dentry *dentry)
+> +int security_inode_need_killpriv(struct dentry *dentry, int *attr)
+>  {
+> -	return call_int_hook(inode_need_killpriv, dentry);
+> +	int rc;
+> +	bool need = false;
+> +	struct security_hook_list *hp;
+> +
+> +	hlist_for_each_entry(hp, &security_hook_heads.inode_need_killpriv,
+> +			     list) {
+> +		rc = hp->hook.inode_need_killpriv(dentry, &need);
+> +		if (rc < 0)
+> +			return rc;
+> +		if (need)
+> +			break;
+> +	}
+> +
+> +	if (need)
+> +		*attr |= ATTR_KILL_PRIV;
+> +	else
+> +		*attr &= ~ATTR_KILL_PRIV;
+> +
+> +	return 0;
+>  }
+>  
+>  /**
+> -- 
+> 2.30.2
 
 --
 paul-moore.com
