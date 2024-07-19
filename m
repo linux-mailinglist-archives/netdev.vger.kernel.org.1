@@ -1,234 +1,268 @@
-Return-Path: <netdev+bounces-112183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69641937518
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:33:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ADE093751D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63ADF1C212A9
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:33:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11908281CFB
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D98158ABC;
-	Fri, 19 Jul 2024 08:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE8F7641D;
+	Fri, 19 Jul 2024 08:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Ga2Gyc2j"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="P91P3LgQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129741E519
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 08:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721377976; cv=none; b=kzbRO/zhUVwCtBqQ358eamW/IA1zjnLl52YLE0sSY9bh2GQ66HWe4nZLjqiyLiMpNMG/IqOI0s4hBhJ+5CB0TYCKhZXzlrSgZpiXEot/WGQsFZ6uMlzyqdwopY7QvXAkCUEeOhH8SNYsj5LyGFmQIYhY1jokCwGz9KyjRK76zGM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721377976; c=relaxed/simple;
-	bh=tqlljZDqPsjuEPOqij/qbHuHkpYguvm1T3LFUipCdwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FWWdzFpBpop9og5WQ1faroNklXgelEdyoKK27rk37pwV/K8gDgkOw+5NPVtiuRE21HgW23RqpyNR3QUcRj1xaM0UYd+2aJP5KpqhX8ZJFOuAdNv0zoV6mvtFaTknRaEDBmptfVki0tjqS/t6cmlxwl5Wi8BaQsFJhqG4Db8ulu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Ga2Gyc2j; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2eedeca1c79so19189851fa.3
-        for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 01:32:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1721377972; x=1721982772; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U2qzdMCMaBunb3VwzFFRhO7nSvcysVHwnXI6R9cE5vg=;
-        b=Ga2Gyc2jndkemMkOkKi58Sq3SL5Uz+0xOzs5bX74Sv4TYilRPzbn4xYArZOgSMNAuX
-         9hrIyfgPVxXY2RsCEKd6TcRE4at8wENSQ5WpApao2DrfHwZsX59/Dj10qbpomp9Kolsd
-         CzIe+kdr/1jbAGy0TMCYPzoFeAX0wVyaE6GMwBq1gBawe0Ltrc9O9+sbjU+wxiCJY+m4
-         Js3YtXs3VGYR91HWe4dFbf7vYprfYHsrtvxkNbDuIDbvPhPtTiUBAKikEewtw5yAY7+e
-         Jw9T7M9XURQ1AiKs46W7D5litscSvObom9TeZ86bYIWkzP4OdpWwRxP+aq5z5KH6iiI0
-         NblA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721377972; x=1721982772;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U2qzdMCMaBunb3VwzFFRhO7nSvcysVHwnXI6R9cE5vg=;
-        b=afJRL7CjcM0u9o624K1yDvLlaSDci4myHmBRM0HHnV6WE/GBkSnb/RRAC2iNFptBcj
-         gSomsmRxiqS4h10nQ3z5p4tCQcYHkvB81S0Df9QCOjwUlFeD2SWbhMr8vGltG2zeIiV5
-         JQOwYQ8IU512UbpYYcy6xp7kyIh7rXxF+YKXsJsN9kJjFVEbLo1uVc3BMsRVF+8dbNgi
-         /vloeQRaRw4KDEOgnm166mCqgx9QUxf38WMk7aq2n51JEzhhLfCMwUcdorkkzNKfkvN3
-         1ohNoCfa5UtP+dZCqSxKoJCOb6TyjPnliXGsNbgQbz8O0qJFjXChPsCxWr1f7f5Dr+rr
-         QFNw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5M665IzwifZC1Vz1Qu/bTLO5crJcxAStVgx4yFk0cOMY2VwgfbFyFUk3WrzD1SBC+4Eus2QlXxQSs/Y6iPyl3NxoDMhNb
-X-Gm-Message-State: AOJu0YzpvFeyaGC1yGTow3M0c7FtJZLZnh7abZuWBtJYeA7mEQZINcdR
-	InO3f2F0zekzRcrGfvrNPbUs73HcUZT2hEL17dHLi3+c4Xg0GL+UJdeCuYgZKHQ=
-X-Google-Smtp-Source: AGHT+IFQQpn7WlmwJwA7hccacgPSMAB3ncmRoqlZoZ6xH4MvZWxO3tnWysZL/tUIg5QhD56G77YWaA==
-X-Received: by 2002:a2e:9a87:0:b0:2ee:7a71:6e2d with SMTP id 38308e7fff4ca-2ef05c9e03amr34012691fa.28.1721377972079;
-        Fri, 19 Jul 2024 01:32:52 -0700 (PDT)
-Received: from u94a ([2401:e180:8852:770b:e576:e894:caae:7245])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cb77353847sm2138101a91.33.2024.07.19.01.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 01:32:51 -0700 (PDT)
-Date: Fri, 19 Jul 2024 16:32:44 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: Xu Kuohai <xukuohai@huaweicloud.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Harishankar Vishwanathan <harishankar.vishwanathan@gmail.com>, 
-	Santosh Nagarakatte <santosh.nagarakatte@rutgers.edu>, Srinivas Narayana <srinivas.narayana@rutgers.edu>, 
-	Matan Shachnai <m.shachnai@rutgers.edu>
-Subject: Re: [RFC bpf-next] bpf, verifier: improve signed ranges inference
- for BPF_AND
-Message-ID: <7iajfyinzgxoxzfnwt4auwaaqqwtsf3n3yjbuvtd3opomvnwxp@tshunnh3w6lk>
-References: <20240711113828.3818398-1-xukuohai@huaweicloud.com>
- <20240711113828.3818398-4-xukuohai@huaweicloud.com>
- <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
- <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
- <ykuhustu7vt2ilwhl32kj655xfdgdlm2xkl5rff6tw2ycksovp@ss2n4gpjysnw>
- <be239a5581e5b7d5c6f310c2a4c11282aa5896b5.camel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C82569959;
+	Fri, 19 Jul 2024 08:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721378187; cv=fail; b=MYFB9lWNs01fiMqewxboIcXuaBUYnjodQdRfbtSLxn/KjSbF7Dy7OvZzM39HsM/GjWmtXWLbCcjW06JjZKk/2claKGwl/9b/uIlvgUCBkPYV232shcM1RLKRjuIy1mOZOewONGAJEQekq/CfMpmmkkK2Qti6GDCMkcWq2OsNadE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721378187; c=relaxed/simple;
+	bh=rbnuIzpPtEHxoXCMKJX+tDT6THeO4VZ4pk1fW6t2NBQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=VZDmy7b1FYwBEUk3rTNets+CLNLNsbmoofm0TlPiNwKQ2tniPtiDLfoidhCk6OmUS/izLnAors0z1eVtBZiTZvdPtzpIkvs+98hJin3HoCqVe7hpk/X/ObLO7pIQsawRPNYoBdsw7FdH6UY6xY0H6VhvV+Wx1vQoxPvt7KiQzHM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=P91P3LgQ; arc=fail smtp.client-ip=40.107.243.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jdPdOx6BscaW9GmDRE1mGGqqOlL2bi6bJA75+xa1n/ou61G5k0yjNAX65Ua7q1YL8WFHYuNMsgbVfOONI02wqxrrwsm9mJlxP79Xaup09tPdfFqc4q1ad9JC5dGQvK/JWKlUYtoMtaHkJLuanTX+4mSAmq2dCxrvilzLHfkquVVjB38YY9SVE1RRs3KDcKp5NGvtJWGCuaIcReX9rim2TOdDIkbAZxjtcaBnLUJA3krFtQtRkO6Sp5SV0cQQT78jtbOFttHZ+oWypoGmTRns42XA8QI2tVL2zjKV6n8Jf/xKj1wjhRzAFMgGlF1Cghd+AdohS2ppMB4WpAr67QJRvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ftC+7e+OKxyGrVpM2QOTWOO2BR4mAfDpaPMPolUD8Ns=;
+ b=ybLfNA/EDoZfiOY/ovHdXlapPms/LVw6P1odL2ubUUsXHh8woQPoGOiDab+SmRmSHXvr5NDArsfaYoPvDDTeuuXMb9Et0Ojrdfx5ERuNvMb08hSB4xCIx52ptNgKM9tvI+B3j4ABSH+BZPDauj1bOC2hVjzu/0K9t+qLrtSoqNesgUpmCFDorMUFBoUoEogk4Xx+sMTtGiNgPFS1Esmxbo4F3yp/p91oecNsEWU8SHDOT8LHxURF9ltLE4+VV0ho9MpQCaIsqub++FunlTRUjE3JaVYMYANsefC0A8JBunvvisS68Zm+XMBd9KQemIbujGzudIrW0+AtAzSLwRDKZg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ftC+7e+OKxyGrVpM2QOTWOO2BR4mAfDpaPMPolUD8Ns=;
+ b=P91P3LgQwzjCEFqlt4CT8TAW53oi9mhT8mTW3+NMJTNlYds0Q1rCWNLeEaEkQrq607O0JyqZchaeUOUTMFSGANURQYc2CE8ZCyGpU4K7ioLvVXYnJ57IgHRqV9fcqOJws0MIr6zXK8WrEwul7P6xm9bneIQoWMLjepJFwaoucRunudzPfp2dcJGZ5cq1hWOeQ7OybFX940aYUmegUXS42BZoX4aMivEjv6JLMFwe8tVDKTkB4tggO3Mkw4mG/abSJvGE8+qjoo228YQDRm4CQyADpOJz9wfHtF6HfXCiDeCTlmTuDY1d4sWGyNsHwwPzM+yuMelT0waxx+BQN1ebGQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
+ IA1PR12MB6306.namprd12.prod.outlook.com (2603:10b6:208:3e6::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.14; Fri, 19 Jul
+ 2024 08:36:22 +0000
+Received: from CO6PR12MB5444.namprd12.prod.outlook.com
+ ([fe80::ae68:3461:c09b:e6e3]) by CO6PR12MB5444.namprd12.prod.outlook.com
+ ([fe80::ae68:3461:c09b:e6e3%6]) with mapi id 15.20.7784.017; Fri, 19 Jul 2024
+ 08:36:21 +0000
+Message-ID: <e5b5420a-4280-4c46-8a5c-d575dc74d3f8@nvidia.com>
+Date: Fri, 19 Jul 2024 09:36:15 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFT PATCH net] net: phy: aquantia: only poll GLOBAL_CFG
+ registers on aqr113c and aqr115c
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+ Brad Griffis <bgriffis@nvidia.com>
+References: <20240718145747.131318-1-brgl@bgdev.pl>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <20240718145747.131318-1-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0145.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:9::13) To CO6PR12MB5444.namprd12.prod.outlook.com
+ (2603:10b6:5:35e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <be239a5581e5b7d5c6f310c2a4c11282aa5896b5.camel@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|IA1PR12MB6306:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47beff31-659f-4c4f-bcbe-08dca7cdde00
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TTN1cjg0SytvRGovckNlQWllR1B5aUtES2NrMmxYQjhHcDhkaVVjVDZ2OG1X?=
+ =?utf-8?B?RHdFQTlxaWsyRTloVitUMjEvZ1l4TW1JMUd2RTlTWkhrczU3cWloWEFyTGNY?=
+ =?utf-8?B?MU5FcUg2S2owOVYxRzdsdGZEWkVnRjN6MG9sb09RT0gzWGtWZ1FCWHJTcmRE?=
+ =?utf-8?B?YU5tRC8vSVR1K0JiWlViaUpRb2hjbkh2UkdOT24rSUR4dUZqa2ZiMGFObWNR?=
+ =?utf-8?B?UDN5blJjWVh4dm4rK2RiOU1vRzRlakdlZWpCK0dWV0hDR2xVdGtNNmRxbDVp?=
+ =?utf-8?B?RW9xOTVKNDJJKzcxc1lqL01na0lreHR5YW5mdVVLUHRCYStyclF4dWpZQmU4?=
+ =?utf-8?B?bm84dVZSNmpPMnR2U1N6TjRBdGJWaDR3eHRiUWJtOW92YnNyQWt1L3FpS3Zq?=
+ =?utf-8?B?WCtwV3VnN01CS1lWNFRpdUlqSWI5eTBPM3V0dmZPUG9YTHVJT3NDeDBKd3FC?=
+ =?utf-8?B?UERlaTBKeHNJR2laZjJ0L3BDdmw5OFNVaTRDZ2NqUjR5blF6MDY4OXlDYXd5?=
+ =?utf-8?B?elBRMmc4MkZjS2lSTnlVMzVnUVA5VEU2R0hJaGhjcXlpclBvV3I1cWdmZWZQ?=
+ =?utf-8?B?a0UxL2R5TExVYXlqbG1FS0dRamIvZUltUDQ0RjdGSkhHRHJmSUh6Uk5vZk10?=
+ =?utf-8?B?N3BpRWY0Qll0YzdPV01sQjI5VGhpUm0rVUJJbTlNalJnZndYZUZ6N2cxaWVp?=
+ =?utf-8?B?NStUWlltVVY0c244YzNWd05rdEdZMnhsQzQ4VEJJTEM2RFhWV1dGYUxMTkJi?=
+ =?utf-8?B?aVI5V2VqR3BCYk44eUpuS3ZOam9NMk1maHNUb1NJNlErK25TbVBRWDBpeWlO?=
+ =?utf-8?B?c0ZWOEVIWUp5K3ZWS2RpWFZKRzZKRlNYNkRqcm91L2dvb3ZhK1BHQktaWWpS?=
+ =?utf-8?B?TXRVcnpSdDRpQTRLV2lmWlFWMFZ5Y0NMYUR3TnFpME0zWUhjNy9WZ3J2Q2xO?=
+ =?utf-8?B?NXBqMUxTQ3Vua2ROUldvZXZSaHhmeWxEUGFzY1ZmUG14cTRnL3p6MHdEUkJQ?=
+ =?utf-8?B?MFh1ZVlEVG5lYWJYM0VWV1FPZFlZVk1DdWw4bUgrS0JtWTduT1VKOG9HcDNG?=
+ =?utf-8?B?ZUlmeGVaUC9odFRERWZ5Q2xDbTB3VkgzaE5YVlBqbWlKZEhWTldmaEVzRkFN?=
+ =?utf-8?B?USt4TU5BNk5YWEZ3bmpLTHhyeXNHM1lmSEllb2NIVjRweGd3WGpDWUdva3BC?=
+ =?utf-8?B?bEtWVElJWUd4YUVUbjdET0Zzay9JY3dnSUxvdThpbTZya1N2WHNHSzJna3Ez?=
+ =?utf-8?B?UXNtL202ZmhJVXBnMzUzYk5QN25ZMGZNMHQ3VHBWNlJURlZqVlV1SVVTZXhw?=
+ =?utf-8?B?Q2R0cVBsUi9TMGYydGFRTzVJK3NmbmdoNzMzanY3L21RRjIyWWlZK0NlemZ1?=
+ =?utf-8?B?cDJodmtYb3hPTUcvNjJSakg0TzBmN3ZmYVBYRzJ5R2prYXZpcEZhUVVuTGxl?=
+ =?utf-8?B?Ym8zbnk3cGZ4a3RzSGtiRmNZcGRLOThFTmZMWXVVQ2RCOHhxVGprWnI5NDRj?=
+ =?utf-8?B?NWtNUGduR0VjNFFud1ZoYjEwZ1ZHcDBWa0JnZ3hoaHNzOE1qYzlaU0Zrak5E?=
+ =?utf-8?B?RklXSzljTTRXZ3pUMmErMVA2RGl2UXZsVWkwSE9LQ2JWMHNNeElZRGMyazdm?=
+ =?utf-8?B?cEdaV3k0OGVadVNVMGxrQ2Z3QUpXdVBZdmxIclpNVmxZSE40Wm1MQnFteHhB?=
+ =?utf-8?B?WDdyblhLbzgzQlo3WWMxNkROUzdkTFNvUmVpbUxsMmE0aGJ6Z2g0NFZBS0s1?=
+ =?utf-8?B?WnMrQWpPMnVidXJXNHQzRE5kcTBDeHJBTmRjcEtjWlQ0clo3MGxFN0dqclls?=
+ =?utf-8?Q?dalSXZ+vB1H33+Dm8lxc4IVysuJvSHAiRqSN0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?b2cwNEpKZjJLWm9vaW96QXpVYzI2Zy95OFltR3BXZ09VUTVmNktPbW5pWURF?=
+ =?utf-8?B?cVU0ZXJFQ3dnbGNmOTFQc0cxSSs2TGVSTG02TGlhZlh6SWJHRysxaHhpRzdx?=
+ =?utf-8?B?YkU1WE9UYWhMa2hiZ3FyWGVybXBqT3hFWVAzNFJXSFN5dmRweGxpZkJLb0dP?=
+ =?utf-8?B?VEhTUnJqeGNCN3BscEJMRW10UlRMS3o3R2FJZ0NaR1JiWHFhM3ZlbEtEY1cx?=
+ =?utf-8?B?NGNINVgrbDUrV2VqZ0ZMeG5wd0t0cWNzbWNHbDJSL1pSUVdGbk1LT2tKMzBo?=
+ =?utf-8?B?dEU4QklxUUFKYlZxRVVCK1dWOWZhS3AzUzVIdE1uck5PdDNCQm5pVkJzNWRy?=
+ =?utf-8?B?T09nMGFsNWUraU5Ka20zOG5wZFpDem9NamtKRGhpc0lNZ2RqWEQ2VHBaYmJP?=
+ =?utf-8?B?YTBlYXBKRSt4OFFhRVlPS3JPT1lFLzJIeGlaYlk4UHJiSVBGcWFncm8zVGdw?=
+ =?utf-8?B?RXVQeDFoZjg2VlNTMG1tL3IvM2dCOW1LSUJSUVR1R0dCTTFSWkplT01yZnJP?=
+ =?utf-8?B?cU15TUpvUXNGbGprdS9wTy96cnJySVRXRFRwNE9YbkdsbElWaVVOZG5EU1dI?=
+ =?utf-8?B?V293QllxclM4dWZDNWY1MC80SHlhbmgvMWJXS2dBYnlXWjQ0aFpFd25CSS9G?=
+ =?utf-8?B?WFc4VWtRQUpyVUtlSzVXTWFXdzZ2QndvSitScW9WdStXY3psNWlaWkRhN2hI?=
+ =?utf-8?B?NWxmS0RDa3JlRnhsZDFiY2w3bmFqK1crZitMV1UxNXdYUGRrUzFiVWlkNU1o?=
+ =?utf-8?B?UzlPTk9jcmxJVWNsWHcxUmNOV2NIR2R5cVJsYVYvb09rV0E3RjBCNUI2M0M5?=
+ =?utf-8?B?MTFPK3JFZzAzQlgzUE8zUjVUV1NUNU1qNjBUVXRaSFVxaW9rditrbGVDWlND?=
+ =?utf-8?B?U2h6dGpEUUx0VGtTakh4c2FQUVZmYk5SQ3piVDJONjlIMXJ0NGJzSzh2Uk0v?=
+ =?utf-8?B?eUV1N1dNU25MMFI5MmN5Wk9ScVIvYktZbGwxeE5WQldINHlGZVRqalV2eVBy?=
+ =?utf-8?B?dU4venNkNXY2NE5sdmdzdno5bU1RTlBHRjFnM3RTSWpvNjQwejdhWkZoZE15?=
+ =?utf-8?B?SkIvYmdqM3lNaHNBRDI2ekNqUVUyQVJqUHo3WEdYYUN6ejZwRUFUaWdwQ0lP?=
+ =?utf-8?B?QlVsMWgxTjB6N05YVFpMOXdYKy9lN3p0bjlycmpreW5JMzFIV01Gd1NKaVA1?=
+ =?utf-8?B?NFlSSEhacTBYNUpuVkRWRUlXb1hkeEg3eGIxS1hUZlR5Z2dGM2s4YWNLaTdV?=
+ =?utf-8?B?dzg4QW9wbU5jWE0vL1FkdW8rYW54ZEpIcmRuZmF5M3JockVuMkVKQWg3Y3BN?=
+ =?utf-8?B?WGpTQUdFZFhhUW9lOVZPcExBbW1XeFF0WnpHajYxenN0YnlpaHVXNDR4T21l?=
+ =?utf-8?B?U2x1K1FncmU0YmE0RkNHT2lVSFJTcXpGaTlSbExYM05YRHpRalJGKzRrSDBl?=
+ =?utf-8?B?TFRDb2oxZG9odDVxSUlNVDUvQnRXcklMRkZmM0hBYzg2dW5MRExGaFd6bEhW?=
+ =?utf-8?B?aWhqUDd4Z3VsV0w3aTZDaWZZNksrVVpvZ29sSDJ6YkFpYVFVZUVuclY3dXlV?=
+ =?utf-8?B?K00wR3ZUVGQ1eHZqZEhPa045R1A5eENiU29KVTliRmZOQWZlOC9vbm5CcnJY?=
+ =?utf-8?B?aHBmV0lGeEQxUkJwZktXdnl1SmVPd05sRHVoK2s2dHo0RU52c0Z4MU94SWxK?=
+ =?utf-8?B?dWlrR3k0NXNRVU9VN0VvZWtWYVB3SnNrVEIyMEdBeTYzREZINjhobDBhVkFm?=
+ =?utf-8?B?N09VOVczWUIxbjVyQTZ3b09OdDQ1NUhidDJKV3lxQndDK09wNjFQZDM0L1B6?=
+ =?utf-8?B?bUQwODM4cW5BTGM3ZjByZzJLZGhFWkM3T1NJZnJOMllETFQ5bGpPYmcxcnk5?=
+ =?utf-8?B?LzA3REpLOU1KUG1taE5DQmFXSkN6QlhZSnBmZ3N0Y3dNQ3JnSmx2MytjYTdm?=
+ =?utf-8?B?ZndPZUU5dkZiQzlxR081WmMzNCs0NWVRRlgrLzcrck4vdTZPY3VsajFPWHVV?=
+ =?utf-8?B?K1dqVmd3U00zMkJyaDBLNVJGeDJ0QWJaV3B1NzFHdm8zNkExVHFYcXpmT0xO?=
+ =?utf-8?B?bS83d0Eza1VJSi9ZdXVrVjNtazNkNlM0SWlYL2ZDVlY2UmV3TXl1Njh1Z29x?=
+ =?utf-8?B?blBrS0NRV2JEaEVPV29WUWZOYnhzMk1RZHR4dkNjZ1VyNFVOd28xL1pEZnpu?=
+ =?utf-8?Q?BiMgKK7JMsZK53Hjyjb4R2Iq+xE694Lq3p59Rt/aYHIC?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47beff31-659f-4c4f-bcbe-08dca7cdde00
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2024 08:36:21.7340
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H5/6cduFAkJu/pevQ9cQOZDBw3mW9W6uLK3RPjqxwDazRIAUmB4w41F2myLklqtRU7iuH28f6AbYMQmZcCzbUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6306
 
-On Wed, Jul 17, 2024 at 02:10:35PM GMT, Eduard Zingerman wrote:
-> On Tue, 2024-07-16 at 22:52 +0800, Shung-Hsi Yu wrote:
-> 
-> [...]
-> 
-> > To allow verification of such instruction pattern, update
-> > scalar*_min_max_and() to infer signed ranges directly from signed ranges
-> > of the operands. With BPF_AND, the resulting value always gains more
-> > unset '0' bit, thus it only move towards 0x0000000000000000. The
-> > difficulty lies with how to deal with signs. While non-negative
-> > (positive and zero) value simply grows smaller, a negative number can
-> > grows smaller, but may also underflow and become a larger value.
-> > 
-> > To better address this situation we split the signed ranges into
-> > negative range and non-negative range cases, ignoring the mixed sign
-> > cases for now; and only consider how to calculate smax_value.
-> > 
-> > Since negative range & negative range preserve the sign bit, so we know
-> > the result is still a negative value, thus it only move towards S64_MIN,
-> > but never underflow, thus a save bet is to use a value in ranges that is
-> > closet to 0, thus "max(dst_reg->smax_value, src->smax_value)". For
-> > negative range & positive range the sign bit is always cleared, thus we
-> > know the resulting is a non-negative, and only moves towards 0, so a
-> > safe bet is to use smax_value of the non-negative range. Last but not
-> > least, non-negative range & non-negative range is still a non-negative
-> > value, and only moves towards 0; however same as the unsigned range
-> > case, the maximum is actually capped by the lesser of the two, and thus
-> > min(dst_reg->smax_value, src_reg->smax_value);
-> > 
-> > Listing out the above reasoning as a table (dst_reg abbreviated as dst,
-> > src_reg abbreviated as src, smax_value abbrivated as smax) we get:
-> > 
-> >                         |                         src_reg
-> >        smax = ?         +---------------------------+---------------------------
-> >                         |        negative           |       non-negative
-> > ---------+--------------+---------------------------+---------------------------
-> >          | negative     | max(dst->smax, src->smax) |         src->smax
-> > dst_reg  +--------------+---------------------------+---------------------------
-> >          | non-negative |         dst->smax         | min(dst->smax, src->smax)
-> > 
-> > However this is quite complicated, luckily it can be simplified given
-> > the following observations
-> > 
-> >     max(dst_reg->smax_value, src_reg->smax_value) >= src_reg->smax_value
-> >     max(dst_reg->smax_value, src_reg->smax_value) >= dst_reg->smax_value
-> >     max(dst_reg->smax_value, src_reg->smax_value) >= min(dst_reg->smax_value, src_reg->smax_value)
-> > 
-> > So we could substitute the cells in the table above all with max(...),
-> > and arrive at:
-> > 
-> >                         |                         src_reg
-> >       smax' = ?         +---------------------------+---------------------------
-> >                         |        negative           |       non-negative
-> > ---------+--------------+---------------------------+---------------------------
-> >          | negative     | max(dst->smax, src->smax) | max(dst->smax, src->smax)
-> > dst_reg  +--------------+---------------------------+---------------------------
-> >          | non-negative | max(dst->smax, src->smax) | max(dst->smax, src->smax)
-> > 
-> > Meaning that simply using
-> > 
-> >   max(dst_reg->smax_value, src_reg->smax_value)
-> > 
-> > to calculate the resulting smax_value would work across all sign combinations.
-> > 
-> > 
-> > For smin_value, we know that both non-negative range & non-negative
-> > range and negative range & non-negative range both result in a
-> > non-negative value, so an easy guess is to use the minimum non-negative
-> > value, thus 0.
-> > 
-> >                         |                         src_reg
-> >        smin = ?         +----------------------------+---------------------------
-> >                         |          negative          |       non-negative
-> > ---------+--------------+----------------------------+---------------------------
-> >          | negative     |             ?              |             0
-> > dst_reg  +--------------+----------------------------+---------------------------
-> >          | non-negative |             0              |             0
-> > 
-> > This leave the negative range & negative range case to be considered. We
-> > know that negative range & negative range always yield a negative value,
-> > so a preliminary guess would be S64_MIN. However, that guess is too
-> > imprecise to help with the r0 <<= 62, r0 s>>= 63, r0 &= -13 pattern
-> > we're trying to deal with here.
-> > 
-> > This can be further improve with the observation that for negative range
-> > & negative range, the smallest possible value must be one that has
-> > longest _common_ most-significant set '1' bits sequence, thus we can use
-> > min(dst_reg->smin_value, src->smin_value) as the starting point, as the
-> > smaller value will be the one with the shorter most-significant set '1'
-> > bits sequence. But that alone is not enough, as we do not know whether
-> > rest of the bits would be set, so the safest guess would be one that
-> > clear alls bits after the most-significant set '1' bits sequence,
-> > something akin to bit_floor(), but for rounding to a negative power-of-2
-> > instead.
-> > 
-> >     negative_bit_floor(0xffff000000000003) == 0xffff000000000000
-> >     negative_bit_floor(0xf0ff0000ffff0000) == 0xf000000000000000
-> >     negative_bit_floor(0xfffffb0000000000) == 0xfffff80000000000
-> > 
-> > With negative range & negative range solve, we now have:
-> > 
-> >                         |                         src_reg
-> >        smin = ?         +----------------------------+---------------------------
-> >                         |        negative            |       non-negative
-> > ---------+--------------+----------------------------+---------------------------
-> >          |   negative   |negative_bit_floor(         |             0
-> >          |              |  min(dst->smin, src->smin))|
-> > dst_reg  +--------------+----------------------------+---------------------------
-> >          | non-negative |           0                |             0
-> > 
-> > This can be further simplied since min(dst->smin, src->smin) < 0 when both
-> > dst_reg and src_reg have a negative range. Which means using
-> > 
-> >     negative_bit_floor(min(dst_reg->smin_value, src_reg->smin_value)
-> > 
-> > to calculate the resulting smin_value would work across all sign combinations.
-> > 
-> > Together these allows us to infer the signed range of the result of BPF_AND
-> > operation using the signed range from its operands.
-> 
-> Hi Shung-Hsi,
-> 
-> This seems quite elegant.
-> As an additional check, I did a simple brute-force for all possible
-> ranges of 6-bit integers and bounds are computed safely.
 
-Thanks for looking into this, as well as the complement.
+On 18/07/2024 15:57, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Commit 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to
+> start returning real values") introduced a workaround for an issue
+> observed on aqr115c. However there were never any reports of it
+> happening on other models and the workaround has been reported to cause
+> and issue on aqr113c (and it may cause the same on any other model not
+> supporting 10M mode).
+> 
+> Let's limit the impact of the workaround to aqr113c and aqr115c and poll
+> the 100M GLOBAL_CFG register instead as both models are known to support
+> it correctly.
+> 
+> Reported-by: Jon Hunter <jonathanh@nvidia.com>
+> Closes: https://lore.kernel.org/lkml/7c0140be-4325-4005-9068-7e0fc5ff344d@nvidia.com/
+> Fixes: 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to start returning real values")
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>   drivers/net/phy/aquantia/aquantia_main.c | 29 +++++++++++++++++-------
+>   1 file changed, 21 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+> index d12e35374231..6e3e0fc6ea27 100644
+> --- a/drivers/net/phy/aquantia/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> @@ -653,13 +653,7 @@ static int aqr107_fill_interface_modes(struct phy_device *phydev)
+>   	unsigned long *possible = phydev->possible_interfaces;
+>   	unsigned int serdes_mode, rate_adapt;
+>   	phy_interface_t interface;
+> -	int i, val, ret;
+> -
+> -	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+> -					VEND1_GLOBAL_CFG_10M, val, val != 0,
+> -					1000, 100000, false);
+> -	if (ret)
+> -		return ret;
+> +	int i, val;
+>   
+>   	/* Walk the media-speed configuration registers to determine which
+>   	 * host-side serdes modes may be used by the PHY depending on the
+> @@ -708,6 +702,25 @@ static int aqr107_fill_interface_modes(struct phy_device *phydev)
+>   	return 0;
+>   }
+>   
+> +static int aqr113c_fill_interface_modes(struct phy_device *phydev)
+> +{
+> +	int val, ret;
+> +
+> +	/* It's been observed on some models that - when coming out of suspend
+> +	 * - the FW signals that the PHY is ready but the GLOBAL_CFG registers
+> +	 * continue on returning zeroes for some time. Let's poll the 10M
+> +	 * register until it returns a real value as both 113c and 115c support
+> +	 * this mode.
+> +	 */
+> +	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+> +					VEND1_GLOBAL_CFG_100M, val, val != 0,
+> +					1000, 100000, false);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return aqr107_fill_interface_modes(phydev);
+> +}
+> +
+>   static int aqr113c_config_init(struct phy_device *phydev)
+>   {
+>   	int ret;
+> @@ -725,7 +738,7 @@ static int aqr113c_config_init(struct phy_device *phydev)
+>   	if (ret)
+>   		return ret;
+>   
+> -	return aqr107_fill_interface_modes(phydev);
+> +	return aqr113c_fill_interface_modes(phydev);
+>   }
+>   
+>   static int aqr107_probe(struct phy_device *phydev)
 
-Did took me quite awhile to try come up with a simple solution that
-works just well enough without further complication, felt quite proud :)
 
-> [...]
+This works for Tegra ...
+
+Tested-by: Jon Hunter <jonathanh@nvidia.com>
+
+Thanks!
+Jon
+
+-- 
+nvpublic
 
