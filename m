@@ -1,475 +1,329 @@
-Return-Path: <netdev+bounces-112228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AE7F9377D6
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 14:40:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA0F93781D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 15:07:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EFC61C20C61
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 12:40:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87F241C216C8
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 13:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D801137776;
-	Fri, 19 Jul 2024 12:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61AD13CA9C;
+	Fri, 19 Jul 2024 13:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Imll2wMK"
+	dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b="CSEvwZUw";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tSExF9+9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from fhigh1-smtp.messagingengine.com (fhigh1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAD884D3E;
-	Fri, 19 Jul 2024 12:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A52383CC7;
+	Fri, 19 Jul 2024 13:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721392797; cv=none; b=O+d/CfTNiSYw9QsyysebsJFpgX8ucBn9g3Kmk/dj6M0r+/MjCBdkRSf7qcA57KCJe07TL41/Wfew/b1J7bbUdZeFk6fRaCOHoNdNmBA6KveffQn+Y8jgPyou8bIeZ4vAyXn5Ip8kQNuPAWgqFhb7ZqZXA3OvlYyEzOf3rBxLs4M=
+	t=1721394462; cv=none; b=kCjF7j/GzSR8NiVKDH025A61XGG5djADGMaZLlFvtgVmO8ruoAElSe7mSI+z5P8J7JKH8kky7VO6Mzqu29usqFMV8rGC5sPSf8mkiKu4pIiSV88a50kPkJijSkmKwmbBqvrBuIpa55xGYtwabtj67LT+mIoMpG3moDHfIIBNxYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721392797; c=relaxed/simple;
-	bh=78TqD3O6kzNatjvK85E0ioV49FJmp0SGDTx7IHuzfEQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GipgBs6DEbl1V3z6v9PvBmXBKcIFD/gi+9r0ZTr+v5xcI0PSJIR+zwOs7Y4/ZTp+O34mpUxUqbiZ02tgAWvTJ1wsQaEaBVBuj4vkK0LuUj6e5uG3GWTXP8z0Ixe5jUhiLQLdotdA6HuisJflApGUZsoRk0+G2OYQImQYrQLqzFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Imll2wMK; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46JBUCcl021411;
-	Fri, 19 Jul 2024 05:39:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=6Sto2vACFW4OjbnTsyaxOP9Ia
-	4hUF7CoKat9XLfaWQc=; b=Imll2wMK7aH0NKu6mXUIh+erokzSHhn4MIKRlSuGh
-	yPXFOhL431xucT0YNTQCOhu2bs6NBMTha8fuwHEOZA41OepEwmmdyeAZ2ojF7BZU
-	4N6n5qHVTc69I+SaCCv/YqBXmpfNFlTCp/jl+dNXN8g36EzXkw4l7xhdv2/eNE3e
-	rpjRmmSwogWsdQ4gYq9rBeTGIrgCpEGEdUsyuBU4HlUKNCWHg8Nyg9Xf85EpPOwy
-	nOiY2MAavd/zXpPkDmux/0ShiQoDqKX0BPIsdpcYYqIxy4OTBPof+6hW7sUdtrT+
-	ZLYRax+K+r9BEl/t6SPFCQ4wIa9sQsrV0TpnOChPUeIPw==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40fe5et4m1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Jul 2024 05:39:39 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 19 Jul 2024 05:39:38 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Fri, 19 Jul 2024 05:39:38 -0700
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id B2B553F7052;
-	Fri, 19 Jul 2024 05:39:32 -0700 (PDT)
-Date: Fri, 19 Jul 2024 18:09:31 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Ayush Singh <ayush@beagleboard.org>
-CC: <jkridner@beagleboard.org>, <robertcnelson@beagleboard.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Tero Kristo <kristo@kernel.org>, Johan Hovold
-	<johan@kernel.org>,
-        Alex Elder <elder@kernel.org>,
-        Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>,
-        <greybus-dev@lists.linaro.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 3/3] greybus: gb-beagleplay: Add firmware upload API
-Message-ID: <Zppeg3eKcKEifJNW@test-OptiPlex-Tower-Plus-7010>
-References: <20240719-beagleplay_fw_upgrade-v1-0-8664d4513252@beagleboard.org>
- <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
+	s=arc-20240116; t=1721394462; c=relaxed/simple;
+	bh=iLxnxhzlc/hqtixIoP9wCXXRxauEVOvT0+noWpLVgnU=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=V1WWkjSTBefsjn0kqKE+aTHx4hl1g+YIVWCZPf5gs6h2xDOFeJq6EmLO2/NhHoHxk1JVIV963XTmZuKFlKvbuQh/1wWLAYYz/3J21UqbVjkF5+qOVw9YgVPek4bkPt+biBIgI00JiHL/ZHxpBD6aqUOaq42s7cVbSynYY6JWTds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca; spf=pass smtp.mailfrom=squebb.ca; dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b=CSEvwZUw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tSExF9+9; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=squebb.ca
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 142AF1140592;
+	Fri, 19 Jul 2024 09:07:39 -0400 (EDT)
+Received: from wimap25 ([10.202.2.85])
+  by compute5.internal (MEProxy); Fri, 19 Jul 2024 09:07:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=squebb.ca; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm3; t=1721394459; x=1721480859; bh=5oOS1jK3dU
+	GUkbOI8kCpb5VD+vZM4dIqmVl+yS2Gb6A=; b=CSEvwZUw6IGr5ZwguY/AXOeyEy
+	xEWg1GWvlqJtdsKIuNIIIeesYU1tpN5Q9rnEOTzIcq6+HZoTNRuczyAWdqqL7Frw
+	ZMTBmiqFUF5mnQxFHDxHiAMIR9yfNJ5/FP6CVoENKDlwESjI6HegHn55GaR/ufgV
+	D9PARHcn79Nvr2yo2YB40bmHOEymaWtSrD1pYB9LMpXhBh5R7IeLhR7cKLQkdKWO
+	Gtuw/LpWrPVjSU5pqMwuVXWrHNl8Rd7sdMbEIa3Ufw3hmnISKunF8SbRX5A8iZMX
+	mIZviyAABN/RoZL8UAGKr3OSSWHnTe/1fHHK1IWIUBsh0+f0neVK8xZ8wePA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1721394459; x=1721480859; bh=5oOS1jK3dUGUkbOI8kCpb5VD+vZM
+	4dIqmVl+yS2Gb6A=; b=tSExF9+9aEq8KSQ5h4l9G6lObUQH2+/NK28eWBDNkdHI
+	JD2TAzmzlpKWDJRggrVVp2U9Ulexy0+X0sNPgMzi3PqppumQbvceZrf1KCxG0lFz
+	x8GbF1BOhfkeEix9VIXZV/Skr2HTZkvcVjsZEYB+JF1zZQlHm5Z1PhF71cHgIO/k
+	x4Vz+Eaq/boPUvuUVtuMowX1U13V0lFtGNxykkEBGIeVsFyRciOKvadp4ADhP5CY
+	I+1u3hXhXkxrGACsOPPhtpOC08XMtluBQvUyI0qLGeJo7/1iXVs6DX+F1WhWss0o
+	QBWdepfzXbYano51qGfd7g1qykpmy+jplsLNV+Ui+Q==
+X-ME-Sender: <xms:GmWaZld2p54E1GWiUETdjUYg4SrPm7DNvoTVnOg8NdwLUBHPeIML7g>
+    <xme:GmWaZjOpydOFg9dGfteXsLnQrdOmAZwcn8oxgEyrbjdR22n-CHnhF627hqSrn7ZBM
+    34A0A4dQC9ye_YXqPU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrhedugdeitdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdforghr
+    khcurfgvrghrshhonhdfuceomhhpvggrrhhsohhnqdhlvghnohhvohesshhquhgvsggsrd
+    gtrgeqnecuggftrfgrthhtvghrnhepieeufeejieevteduvdekteefledtveffveduheff
+    feejudefvdeijeegudegkefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepmhhpvggrrhhsohhnqdhlvghnohhvohesshhquhgvsggsrdgtrg
+X-ME-Proxy: <xmx:GmWaZug0RYdrqDWslFglQCJkSU-Jff4sfXNPLsEKT08qPzccQusdcQ>
+    <xmx:GmWaZu9iwwDSlouNpGTizuIEfyE7QYWXoah0vjCdzvEmf9dz0m_nAQ>
+    <xmx:GmWaZhueq5Drtml5F1GNnCONq6bNlPMMO5oZTe_6NmfGOVUvJJNoiA>
+    <xmx:GmWaZtEv6XS_n3kJxayAvqFXACvYFt2k0ByU2JY-A6gtX8XTdyIijQ>
+    <xmx:G2WaZrIP_kndas84E5wOow_YhhMvMb8feRoYfhZ7_OUkrSVWGIYTz4d4>
+Feedback-ID: ibe194615:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id BADE31040061; Fri, 19 Jul 2024 09:07:38 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-568-g843fbadbe-fm-20240701.003-g843fbadb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
-X-Proofpoint-GUID: tGX4uRD_WjnLeEuD2y3l-visZJL3i78N
-X-Proofpoint-ORIG-GUID: tGX4uRD_WjnLeEuD2y3l-visZJL3i78N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-19_06,2024-07-18_01,2024-05-17_01
+Message-Id: <2cdac1e1-dff4-451c-a214-510c4736160a@app.fastmail.com>
+In-Reply-To: <20240715023814.20242-1-quic_bqiang@quicinc.com>
+References: <20240715023814.20242-1-quic_bqiang@quicinc.com>
+Date: Fri, 19 Jul 2024 09:07:18 -0400
+From: "Mark Pearson" <mpearson-lenovo@squebb.ca>
+To: "Baochen Qiang" <quic_bqiang@quicinc.com>, ath12k@lists.infradead.org
+Cc: linux-wireless@vger.kernel.org, kernel@quicinc.com, netdev@vger.kernel.org
+Subject: Re: [PATCH] wifi: ath12k: use 128 bytes aligned iova in transmit path for
+ WCN7850
+Content-Type: text/plain
 
-On 2024-07-19 at 15:15:12, Ayush Singh (ayush@beagleboard.org) wrote:
-> Register with firmware upload API to allow updating firmware on cc1352p7
-> without resorting to overlay for using the userspace flasher.
-> 
-> Communication with the bootloader can be moved out of gb-beagleplay
-> driver if required, but I am keeping it here since there are no
-> immediate plans to use the on-board cc1352p7 for anything other than
-> greybus (BeagleConnect Technology). Additionally, there do not seem to
-> any other devices using cc1352p7 or it's cousins as a co-processor.
-> 
-> Boot and Reset GPIOs are used to enable cc1352p7 bootloader backdoor for
-> flashing. The delays while starting bootloader are taken from the
-> userspace flasher since the technical specification does not provide
-> sufficient information regarding it.
-> 
-> Flashing is skipped in case we are trying to flash the same
-> image as the one that is currently present. This is determined by CRC32
-> calculation of the supplied firmware and Flash data.
-> 
-> We also do a CRC32 check after flashing to ensure that the firmware was
-> flashed properly.
-> 
-> Link: https://www.ti.com/lit/ug/swcu192/swcu192.pdf Ti CC1352p7 Tecnical Specification
-> Link: https://openbeagle.org/beagleconnect/cc1352-flasher Userspace
-> Flasher
-> 
-> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+On Sun, Jul 14, 2024, at 10:38 PM, Baochen Qiang wrote:
+> In transmit path, it is likely that the iova is not aligned to PCIe TLP
+> max payload size, which is 128 for WCN7850. Normally in such cases hardware
+> is expected to split the packet into several parts in a manner such that
+> they, other than the first one, have aligned iova. However due to hardware
+> limitations, WCN7850 does not behave like that properly with some specific
+> unaligned iova in transmit path. This easily results in target hang in a
+> KPI transmit test: packet send/receive failure, WMI command send timeout
+> etc. Also fatal error seen in PCIe level:
+>
+> 	...
+> 	Capabilities: ...
+> 		...
+> 		DevSta: ... FatalErr+ ...
+> 		...
+> 	...
+>
+> Work around this by manually moving/reallocating payload buffer such that
+> we can map it to a 128 bytes aligned iova. The moving requires sufficient
+> head room or tail room in skb: for the former we can do ourselves a favor
+> by asking some extra bytes when registering with mac80211, while for the
+> latter we can do nothing.
+>
+> Moving/reallocating buffer consumes additional CPU cycles, but the good news
+> is that an aligned iova increases PCIe efficiency. In my tests on some X86
+> platforms the KPI results are almost consistent.
+>
+> Since this is seen only with WCN7850, add a new hardware parameter to
+> differentiate from others.
+>
+> Tested-on: WCN7850 hw2.0 PCI 
+> WLAN.HMT.1.0.c5-00481-QCAHMTSWPL_V1.0_V2.0_SILICONZ-3
+>
+> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
 > ---
->  drivers/greybus/Kconfig         |   1 +
->  drivers/greybus/gb-beagleplay.c | 625 +++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 614 insertions(+), 12 deletions(-)
+>  drivers/net/wireless/ath/ath12k/dp_tx.c | 72 +++++++++++++++++++++++++
+>  drivers/net/wireless/ath/ath12k/hw.c    |  6 +++
+>  drivers/net/wireless/ath/ath12k/hw.h    |  4 ++
+>  drivers/net/wireless/ath/ath12k/mac.c   |  1 +
+>  4 files changed, 83 insertions(+)
+>
+>
+> base-commit: db1ce56e6e1d395dd42a3cd6332a871d9be59c45
+>
+> diff --git a/drivers/net/wireless/ath/ath12k/dp_tx.c 
+> b/drivers/net/wireless/ath/ath12k/dp_tx.c
+> index d08c04343e90..00475d0848e1 100644
+> --- a/drivers/net/wireless/ath/ath12k/dp_tx.c
+> +++ b/drivers/net/wireless/ath/ath12k/dp_tx.c
+> @@ -162,6 +162,60 @@ static int ath12k_dp_prepare_htt_metadata(struct 
+> sk_buff *skb)
+>  	return 0;
+>  }
 > 
-> diff --git a/drivers/greybus/Kconfig b/drivers/greybus/Kconfig
-> index ab81ceceb337..d485a99959cb 100644
-> --- a/drivers/greybus/Kconfig
-> +++ b/drivers/greybus/Kconfig
-> @@ -21,6 +21,7 @@ config GREYBUS_BEAGLEPLAY
->  	tristate "Greybus BeaglePlay driver"
->  	depends on SERIAL_DEV_BUS
->  	select CRC_CCITT
-> +	select FW_UPLOAD
->  	help
->  	  Select this option if you have a BeaglePlay where CC1352
->  	  co-processor acts as Greybus SVC.
-> diff --git a/drivers/greybus/gb-beagleplay.c b/drivers/greybus/gb-beagleplay.c
-> index 33f8fad70260..aecbfb5b5eaf 100644
-> --- a/drivers/greybus/gb-beagleplay.c
-> +++ b/drivers/greybus/gb-beagleplay.c
-> @@ -6,21 +6,18 @@
->   * Copyright (c) 2023 BeagleBoard.org Foundation
->   */
->  
-> -#include <linux/gfp.h>
-> +#include <asm-generic/unaligned.h>
-> +#include <linux/crc32.h>
-> +#include <linux/gpio/consumer.h>
-> +#include <linux/firmware.h>
->  #include <linux/greybus.h>
-> -#include <linux/module.h>
-> -#include <linux/of.h>
-> -#include <linux/printk.h>
->  #include <linux/serdev.h>
-> -#include <linux/tty.h>
-> -#include <linux/tty_driver.h>
-> -#include <linux/greybus/hd.h>
-> -#include <linux/init.h>
-> -#include <linux/device.h>
->  #include <linux/crc-ccitt.h>
->  #include <linux/circ_buf.h>
-> -#include <linux/types.h>
-> -#include <linux/workqueue.h>
-> +
-> +#define CC1352_BOOTLOADER_TIMEOUT 2000
-> +#define CC1352_BOOTLOADER_ACK 0xcc
-> +#define CC1352_BOOTLOADER_NACK 0x33
->  
->  #define RX_HDLC_PAYLOAD 256
->  #define CRC_LEN 2
-> @@ -57,6 +54,17 @@
->   * @rx_buffer_len: length of receive buffer filled.
->   * @rx_buffer: hdlc frame receive buffer
->   * @rx_in_esc: hdlc rx flag to indicate ESC frame
-> + *
-> + * @fwl: underlying firmware upload device
-> + * @boot_gpio: cc1352p7 boot gpio
-> + * @rst_gpio: cc1352p7 reset gpio
-> + * @flashing_mode: flag to indicate that flashing is currently in progress
-> + * @fwl_ack_com: completion to signal an Ack/Nack
-> + * @fwl_ack: Ack/Nack byte received
-> + * @fwl_cmd_response_com: completion to signal a bootloader command response
-> + * @fwl_cmd_response: bootloader command response data
-> + * @fwl_crc32: crc32 of firmware to flash
-> + * @fwl_reset_addr: flag to indicate if we need to send COMMAND_DOWNLOAD again
->   */
->  struct gb_beagleplay {
->  	struct serdev_device *sd;
-> @@ -72,6 +80,17 @@ struct gb_beagleplay {
->  	u16 rx_buffer_len;
->  	bool rx_in_esc;
->  	u8 rx_buffer[MAX_RX_HDLC];
-> +
-> +	struct fw_upload *fwl;
-> +	struct gpio_desc *boot_gpio;
-> +	struct gpio_desc *rst_gpio;
-> +	bool flashing_mode;
-> +	struct completion fwl_ack_com;
-> +	u8 fwl_ack;
-> +	struct completion fwl_cmd_response_com;
-> +	u32 fwl_cmd_response;
-> +	u32 fwl_crc32;
-> +	bool fwl_reset_addr;
->  };
->  
->  /**
-> @@ -100,6 +119,69 @@ struct hdlc_greybus_frame {
->  	u8 payload[];
->  } __packed;
->  
-> +/**
-> + * enum cc1352_bootloader_cmd: CC1352 Bootloader Commands
-> + */
-> +enum cc1352_bootloader_cmd {
-> +	COMMAND_DOWNLOAD = 0x21,
-> +	COMMAND_GET_STATUS = 0x23,
-> +	COMMAND_SEND_DATA = 0x24,
-> +	COMMAND_RESET = 0x25,
-> +	COMMAND_CRC32 = 0x27,
-> +	COMMAND_BANK_ERASE = 0x2c,
-> +};
-> +
-> +/**
-> + * enum cc1352_bootloader_status: CC1352 Bootloader COMMAND_GET_STATUS response
-> + */
-> +enum cc1352_bootloader_status {
-> +	COMMAND_RET_SUCCESS = 0x40,
-> +	COMMAND_RET_UNKNOWN_CMD = 0x41,
-> +	COMMAND_RET_INVALID_CMD = 0x42,
-> +	COMMAND_RET_INVALID_ADR = 0x43,
-> +	COMMAND_RET_FLASH_FAIL = 0x44,
-> +};
-> +
-> +/**
-> + * struct cc1352_bootloader_packet: CC1352 Bootloader Request Packet
-> + *
-> + * @len: length of packet + optional request data
-> + * @checksum: 8-bit checksum excluding len
-> + * @cmd: bootloader command
-> + */
-> +struct cc1352_bootloader_packet {
-> +	u8 len;
-> +	u8 checksum;
-> +	u8 cmd;
-> +} __packed;
-> +
-> +#define CC1352_BOOTLOADER_PKT_MAX_SIZE \
-> +	(U8_MAX - sizeof(struct cc1352_bootloader_packet))
-> +
-> +/**
-> + * struct cc1352_bootloader_download_cmd_data: CC1352 Bootloader COMMAND_DOWNLOAD request data
-> + *
-> + * @addr: address to start programming data into
-> + * @size: size of data that will be sent
-> + */
-> +struct cc1352_bootloader_download_cmd_data {
-> +	__be32 addr;
-> +	__be32 size;
-> +} __packed;
-> +
-> +/**
-> + * struct cc1352_bootloader_crc32_cmd_data: CC1352 Bootloader COMMAND_CRC32 request data
-> + *
-> + * @addr: address where crc32 calculation starts
-> + * @size: number of bytes comprised by crc32 calculation
-> + * @read_repeat: number of read repeats for each data location
-> + */
-> +struct cc1352_bootloader_crc32_cmd_data {
-> +	__be32 addr;
-> +	__be32 size;
-> +	__be32 read_repeat;
-> +} __packed;
-> +
->  static void hdlc_rx_greybus_frame(struct gb_beagleplay *bg, u8 *buf, u16 len)
->  {
->  	struct hdlc_greybus_frame *gb_frame = (struct hdlc_greybus_frame *)buf;
-> @@ -331,11 +413,131 @@ static void hdlc_deinit(struct gb_beagleplay *bg)
->  	flush_work(&bg->tx_work);
->  }
->  
-> +/**
-> + * csum8: Calculate 8-bit checksum on data
-> + */
-> +static u8 csum8(const u8 *data, size_t size, u8 base)
+> +static void ath12k_dp_tx_move_payload(struct sk_buff *skb,
+> +				      unsigned long delta,
+> +				      bool head)
 > +{
-> +	size_t i;
-> +	u8 sum = base;
-follow reverse x-mas tree
+> +	unsigned long len = skb->len;
 > +
-> +	for (i = 0; i < size; ++i)
-> +		sum += data[i];
-> +
-> +	return sum;
-> +}
-> +
-> +static void cc1352_bootloader_send_ack(struct gb_beagleplay *bg)
-> +{
-> +	static const u8 ack[] = { 0x00, CC1352_BOOTLOADER_ACK };
-> +
-> +	serdev_device_write_buf(bg->sd, ack, sizeof(ack));
-> +}
-> +
-> +static void cc1352_bootloader_send_nack(struct gb_beagleplay *bg)
-> +{
-> +	static const u8 nack[] = { 0x00, CC1352_BOOTLOADER_NACK };
-> +
-> +	serdev_device_write_buf(bg->sd, nack, sizeof(nack));
-> +}
-> +
-> +/**
-> + * cc1352_bootloader_pkt_rx: Process a CC1352 Bootloader Packet
-> + *
-> + * @bg: beagleplay greybus driver
-> + * @data: packet buffer
-> + * @count: packet buffer size
-> + *
-> + * @return: number of bytes processed
-> + *
-> + * Here are the steps to successfully receive a packet from cc1352 bootloader
-> + * according to the docs:
-> + * 1. Wait for nonzero data to be returned from the device. This is important
-> + *    as the device may send zero bytes between a sent and a received data
-> + *    packet. The first nonzero byte received is the size of the packet that is
-> + *    being received.
-> + * 2. Read the next byte, which is the checksum for the packet.
-> + * 3. Read the data bytes from the device. During the data phase, packet size
-> + *    minus 2 bytes is sent.
-> + * 4. Calculate the checksum of the data bytes and verify it matches the
-> + *    checksum received in the packet.
-> + * 5. Send an acknowledge byte or a not-acknowledge byte to the device to
-> + *    indicate the successful or unsuccessful reception of the packet.
-> + */
-> +static int cc1352_bootloader_pkt_rx(struct gb_beagleplay *bg, const u8 *data,
-> +				    size_t count)
-> +{
-> +	bool is_valid = false;
-> +
-> +	switch (data[0]) {
-> +	/* Skip 0x00 bytes.  */
-> +	case 0x00:
-> +		return 1;
-> +	case CC1352_BOOTLOADER_ACK:
-> +	case CC1352_BOOTLOADER_NACK:
-> +		WRITE_ONCE(bg->fwl_ack, data[0]);
-> +		complete(&bg->fwl_ack_com);
-> +		return 1;
-> +	case 3:
-> +		if (count < 3)
-> +			return 0;
-> +		is_valid = data[1] == data[2];
-> +		WRITE_ONCE(bg->fwl_cmd_response, (u32)data[2]);
-> +		break;
-> +	case 6:
-> +		if (count < 6)
-> +			return 0;
-> +		is_valid = csum8(&data[2], sizeof(__be32), 0) == data[1];
-> +		WRITE_ONCE(bg->fwl_cmd_response, get_unaligned_be32(&data[2]));
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (is_valid) {
-> +		cc1352_bootloader_send_ack(bg);
-> +		complete(&bg->fwl_cmd_response_com);
+> +	if (head) {
+> +		skb_push(skb, delta);
+> +		memmove(skb->data, skb->data + delta, len);
+> +		skb_trim(skb, len);
 > +	} else {
-> +		dev_warn(&bg->sd->dev,
-> +			 "Dropping bootloader packet with invalid checksum");
-> +		cc1352_bootloader_send_nack(bg);
-> +	}
-> +
-> +	return data[0];
-> +}
-> +
-> +static size_t cc1352_bootloader_rx(struct gb_beagleplay *bg, const u8 *data,
-> +				   size_t count)
-> +{
-> +	int ret;
-> +	size_t off = 0;
-> +
-        Same here
-      
-> +	memcpy(bg->rx_buffer + bg->rx_buffer_len, data, count);
-> +	bg->rx_buffer_len += count;
-> +
-> +	do {
-> +		ret = cc1352_bootloader_pkt_rx(bg, bg->rx_buffer + off,
-> +					       bg->rx_buffer_len - off);
-> +		if (ret < 0)
-> +			return dev_err_probe(&bg->sd->dev, ret,
-> +					     "Invalid Packet");
-> +		off += ret;
-> +	} while (ret > 0 && off < count);
-> +
-> +	bg->rx_buffer_len -= off;
-> +	memmove(bg->rx_buffer, bg->rx_buffer + off, bg->rx_buffer_len);
-> +
-> +	return count;
-> +}
-> +
->  static size_t gb_tty_receive(struct serdev_device *sd, const u8 *data,
->  			     size_t count)
->  {
->  	struct gb_beagleplay *bg = serdev_device_get_drvdata(sd);
->  
-> +	if (READ_ONCE(bg->flashing_mode))
-> +		return cc1352_bootloader_rx(bg, data, count);
-> +
->  	return hdlc_rx(bg, data, count);
->  }
->  
-> @@ -343,7 +545,8 @@ static void gb_tty_wakeup(struct serdev_device *serdev)
->  {
->  	struct gb_beagleplay *bg = serdev_device_get_drvdata(serdev);
->  
-> -	schedule_work(&bg->tx_work);
-> +	if (!READ_ONCE(bg->flashing_mode))
-> +		schedule_work(&bg->tx_work);
->  }
->  
->  static struct serdev_device_ops gb_beagleplay_ops = {
-> @@ -412,6 +615,192 @@ static void gb_beagleplay_stop_svc(struct gb_beagleplay *bg)
->  	hdlc_tx_frames(bg, ADDRESS_CONTROL, 0x03, &payload, 1);
->  }
->  
-> +static int cc1352_bootloader_wait_for_ack(struct gb_beagleplay *bg)
-> +{
-> +	int ret;
-> +
-> +	ret = wait_for_completion_timeout(
-> +		&bg->fwl_ack_com, msecs_to_jiffies(CC1352_BOOTLOADER_TIMEOUT));
-> +	if (ret < 0)
-> +		return dev_err_probe(&bg->sd->dev, ret,
-> +				     "Failed to acquire ack semaphore");
-> +
-> +	switch (READ_ONCE(bg->fwl_ack)) {
-> +	case CC1352_BOOTLOADER_ACK:
-> +		return 0;
-> +	case CC1352_BOOTLOADER_NACK:
-> +		return -EAGAIN;
-> +	default:
-> +		return -EINVAL;
+> +		skb_put(skb, delta);
+> +		memmove(skb->data + delta, skb->data, len);
+> +		skb_pull(skb, delta);
 > +	}
 > +}
 > +
-> +static int cc1352_bootloader_sync(struct gb_beagleplay *bg)
+> +static int ath12k_dp_tx_align_payload(struct ath12k_base *ab,
+> +				      struct sk_buff **pskb)
 > +{
-> +	static const u8 sync_bytes[] = { 0x55, 0x55 };
+> +	u32 iova_mask = ab->hw_params->iova_mask;
+> +	unsigned long offset, delta1, delta2;
+> +	struct sk_buff *skb2, *skb = *pskb;
+> +	unsigned int headroom = skb_headroom(skb);
+> +	int tailroom = skb_tailroom(skb);
+> +	int ret = 0;
 > +
-> +	serdev_device_write_buf(bg->sd, sync_bytes, sizeof(sync_bytes));
-> +	return cc1352_bootloader_wait_for_ack(bg);
+> +	offset = (unsigned long)skb->data & iova_mask;
+> +	delta1 = offset;
+> +	delta2 = iova_mask - offset + 1;
+> +
+> +	if (headroom >= delta1) {
+> +		ath12k_dp_tx_move_payload(skb, delta1, true);
+> +	} else if (tailroom >= delta2) {
+> +		ath12k_dp_tx_move_payload(skb, delta2, false);
+> +	} else {
+> +		skb2 = skb_realloc_headroom(skb, iova_mask);
+> +		if (!skb2) {
+> +			ret = -ENOMEM;
+> +			goto out;
+> +		}
+> +
+> +		dev_kfree_skb_any(skb);
+> +
+> +		offset = (unsigned long)skb2->data & iova_mask;
+> +		if (offset)
+> +			ath12k_dp_tx_move_payload(skb2, offset, true);
+> +		*pskb = skb2;
+> +	}
+> +
+> +out:
+> +	return ret;
 > +}
 > +
-> +static int cc1352_bootloader_get_status(struct gb_beagleplay *bg)
-> +{
-> +	int ret;
-> +	static const struct cc1352_bootloader_packet pkt = {
-> +		.len = sizeof(pkt),
-> +		.checksum = COMMAND_GET_STATUS,
-> +		.cmd = COMMAND_GET_STATUS
-> +	};
+>  int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
+>  		 struct sk_buff *skb)
+>  {
+> @@ -184,6 +238,7 @@ int ath12k_dp_tx(struct ath12k *ar, struct 
+> ath12k_vif *arvif,
+>  	bool tcl_ring_retry;
+>  	bool msdu_ext_desc = false;
+>  	bool add_htt_metadata = false;
+> +	u32 iova_mask = ab->hw_params->iova_mask;
+> 
+>  	if (test_bit(ATH12K_FLAG_CRASH_FLUSH, &ar->ab->dev_flags))
+>  		return -ESHUTDOWN;
+> @@ -279,6 +334,23 @@ int ath12k_dp_tx(struct ath12k *ar, struct 
+> ath12k_vif *arvif,
+>  		goto fail_remove_tx_buf;
+>  	}
+> 
+> +	if (iova_mask &&
+> +	    (unsigned long)skb->data & iova_mask) {
+> +		ret = ath12k_dp_tx_align_payload(ab, &skb);
+> +		if (ret) {
+> +			dev_warn_once(ab->dev, "failed to align TX buffer %d\n", ret);
+> +			/* don't bail out, give original buffer
+> +			 * a chance even unaligned.
+> +			 */
+> +			goto map;
+> +		}
 > +
-     same here. please run checkpatch before submitting to know coding
-     style issues.
+> +		/* hdr is pointing to a wrong place after alignment,
+> +		 * so refresh it for later use.
+> +		 */
+> +		hdr = (void *)skb->data;
+> +	}
+> +map:
+>  	ti.paddr = dma_map_single(ab->dev, skb->data, skb->len, 
+> DMA_TO_DEVICE);
+>  	if (dma_mapping_error(ab->dev, ti.paddr)) {
+>  		atomic_inc(&ab->soc_stats.tx_err.misc_fail);
+> diff --git a/drivers/net/wireless/ath/ath12k/hw.c 
+> b/drivers/net/wireless/ath/ath12k/hw.c
+> index 2e11ea763574..7b3e2420e3c5 100644
+> --- a/drivers/net/wireless/ath/ath12k/hw.c
+> +++ b/drivers/net/wireless/ath/ath12k/hw.c
+> @@ -924,6 +924,8 @@ static const struct ath12k_hw_params 
+> ath12k_hw_params[] = {
+> 
+>  		.acpi_guid = NULL,
+>  		.supports_dynamic_smps_6ghz = true,
+> +
+> +		.iova_mask = 0,
+>  	},
+>  	{
+>  		.name = "wcn7850 hw2.0",
+> @@ -1000,6 +1002,8 @@ static const struct ath12k_hw_params 
+> ath12k_hw_params[] = {
+> 
+>  		.acpi_guid = &wcn7850_uuid,
+>  		.supports_dynamic_smps_6ghz = false,
+> +
+> +		.iova_mask = PCIE_MAX_PAYLOAD_SIZE - 1,
+>  	},
+>  	{
+>  		.name = "qcn9274 hw2.0",
+> @@ -1072,6 +1076,8 @@ static const struct ath12k_hw_params 
+> ath12k_hw_params[] = {
+> 
+>  		.acpi_guid = NULL,
+>  		.supports_dynamic_smps_6ghz = true,
+> +
+> +		.iova_mask = 0,
+>  	},
+>  };
+> 
+> diff --git a/drivers/net/wireless/ath/ath12k/hw.h 
+> b/drivers/net/wireless/ath/ath12k/hw.h
+> index e792eb6b249b..49668aa0efc8 100644
+> --- a/drivers/net/wireless/ath/ath12k/hw.h
+> +++ b/drivers/net/wireless/ath/ath12k/hw.h
+> @@ -96,6 +96,8 @@
+>  #define ATH12K_M3_FILE			"m3.bin"
+>  #define ATH12K_REGDB_FILE_NAME		"regdb.bin"
+> 
+> +#define PCIE_MAX_PAYLOAD_SIZE		128
+> +
+>  enum ath12k_hw_rate_cck {
+>  	ATH12K_HW_RATE_CCK_LP_11M = 0,
+>  	ATH12K_HW_RATE_CCK_LP_5_5M,
+> @@ -215,6 +217,8 @@ struct ath12k_hw_params {
+> 
+>  	const guid_t *acpi_guid;
+>  	bool supports_dynamic_smps_6ghz;
+> +
+> +	u32 iova_mask;
+>  };
+> 
+>  struct ath12k_hw_ops {
+> diff --git a/drivers/net/wireless/ath/ath12k/mac.c 
+> b/drivers/net/wireless/ath/ath12k/mac.c
+> index 8106297f0bc1..ce41c8153080 100644
+> --- a/drivers/net/wireless/ath/ath12k/mac.c
+> +++ b/drivers/net/wireless/ath/ath12k/mac.c
+> @@ -9193,6 +9193,7 @@ static int ath12k_mac_hw_register(struct 
+> ath12k_hw *ah)
+> 
+>  	hw->vif_data_size = sizeof(struct ath12k_vif);
+>  	hw->sta_data_size = sizeof(struct ath12k_sta);
+> +	hw->extra_tx_headroom = ab->hw_params->iova_mask;
+> 
+>  	wiphy_ext_feature_set(wiphy, NL80211_EXT_FEATURE_CQM_RSSI_LIST);
+>  	wiphy_ext_feature_set(wiphy, NL80211_EXT_FEATURE_STA_TX_PWR);
 
+We've tested this in the Lenovo lab using the T14 G5 AMD with a 6.10.0-rc7+ kernel from wireless-next and this patch applied.
+Previously we had stability issues under traffic load. With the patch applied we can no longer reproduce the issue.
+
+Tested-by: Mark Pearson <mpearson-lenovo@squebb.ca>
+
+Can this be tagged for stable backporting? It's an important fix.
+
+Thanks for getting this fix done. Very much appreciated.
+
+Mark
 
