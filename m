@@ -1,226 +1,150 @@
-Return-Path: <netdev+bounces-112155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF65493726D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 04:13:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05374937295
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 04:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7487728231F
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 02:13:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A951282564
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 02:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27138847C;
-	Fri, 19 Jul 2024 02:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEDD8BE7;
+	Fri, 19 Jul 2024 02:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="H4ZNR+Eh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZbHJdevf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655E08C1E
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 02:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70E2C13B;
+	Fri, 19 Jul 2024 02:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721355209; cv=none; b=eCh5b08b6+OW0XHqMGmv24cV9zJ2KKjOz1VmPGbgBHUeERh4oYsV3xiICY5wYRpuxG7WzYzECX6gXH/mHGif2zmFzoNZcAGVcpofppkPNe10nhb+A5sqR1PjO3uhR2csD63a4nbo1KYJW5Ke8rm4UlUZ5t8QJ7knZRjvvyTL7CE=
+	t=1721357225; cv=none; b=rHRJYuCjRNJ+ya4tFMiZkJfRm/x3MIhXlGD+JAW+TOtLuvZlO7Jq5GOEouq5tot3bIRD6+qapiKc1TdnTL9Ldgl8t9NknutyBYNMmkAn9m4FxyLXNSLWGw2sPsaVZJOHKaHvHX93onMjLQ0gPt7j5U1yDeZGNwreGd/DAHz/fUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721355209; c=relaxed/simple;
-	bh=kRRp8LD5NDSju3eOBa9wP1KCbXySfixz28vLN27H/7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G9J9ZA7NWOoPvNDYN7wb2NmC28e4dMBARFGFxsZqfXO8p9OQfe9U9skuRhZXU2HkbJo93UBPNhkS3Mm7EHRpCj66ioqgJ7T6FSjxGwq/YD1nf4Rv6Ka1byv5YhS3M+BsTsDlFcXVjL6B/lRkoN/9ZRXCBvIN+4ZjLebuTyDSsYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=H4ZNR+Eh; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e0365588ab8so1571909276.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 19:13:27 -0700 (PDT)
+	s=arc-20240116; t=1721357225; c=relaxed/simple;
+	bh=09oA/1MGILVHtDLQKLMrs4vatq7Tvf0hfrVKuBV/mLY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KNbFMShRqQCKM9vhLuky4eSOu8Kd4IVSi/iQrnCtYVgHttbWlnwIOXTH77ZLRjL1e4V5sOLJMRumG89+w5OlPxtd9MU0btzOyc0DUU+NbJheXxmXzT9HoTvieKaAWr22U5EnIixzzz9FzZQpQarvs9Y3JWpAg8OYjtokMUpk8nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZbHJdevf; arc=none smtp.client-ip=209.85.210.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-70cdc91b227so400695b3a.2;
+        Thu, 18 Jul 2024 19:47:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1721355206; x=1721960006; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1721357223; x=1721962023; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X6xBCyZt4LBr3NtFQ/tQHQNxox1QnJWXPeKeevVBbMo=;
-        b=H4ZNR+EhK/YQfniLDA6xNzaGoijxnVSvkTOCUwTz9DjbWuGXUpzA1CywazFlz/4JSy
-         i9gQouuiqgbtLyjjpK054Cxp8E7jmeT08KthgMkM7Tfax2roODvw5bigaPtStJ5VcqJ/
-         4DsyXyeM9OvjR+UaGK/S/XnKGErDdbb3qKiV7Ug4XkAWt93NO8xLGltO3TFXCIqYzMqY
-         dHIBu94/vZgCanKC+6a50mLnsyV1IdN3EYgsI6E0VIZKS8Z/vYLF9Q9hV0Vb0Hb6gyLr
-         jR6neljtrP0OOiLXGe3DgRbROMNPGwoeO4p3hpbQKL2OXY+PzPRFr9eLO3fBR6hsh2g6
-         e3Vw==
+        bh=bBtl8tqIPwr4kM7w/vnxS7d5O+npgCgYI2eDxbd6XM4=;
+        b=ZbHJdevfgVJNwfLYZa2rkZ+Bh3U4sMCMzXztuzL6xPuUCp25BUmPUTNhMJIpLESQPg
+         hbVnBuLqsDXtn5cXarX6VwPiJE4T4td/HfPxwGgonA1eLclVViReYzgojO7/930w4OTD
+         9MA7FWIJeYeF5mwF/U4n1HVz5AVaRDGXa34J1OYeg4ZO6P7NU35Q7ecXBcOe+He74ys/
+         ObZWtjUutyD+DivenXl4EB+Yf7CRMWizWkMzfWwy4JcZV7XL34QTcRU3k97pbC0VqmVp
+         4w2C7hfPbSPRJ2DMaGV+EnfPwMTcEwZPRbqNM/xBlIqHppImfRJuJz0G3Go91qwYyyK9
+         D/8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721355206; x=1721960006;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1721357223; x=1721962023;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X6xBCyZt4LBr3NtFQ/tQHQNxox1QnJWXPeKeevVBbMo=;
-        b=vNd3oG5oURFKlupFC0hiY6LCpNbboqEGRfoCX581ZjddYLJXB4rsaquMlRTUI69U1d
-         ztXpTUlRNNGTYKlYtQSdj3klsd3tlKbMlXHXeS2uck8IIrkGlhXratWdnvRtGRJP+QgD
-         rjHyE0HBY0dlQva+gditGGi6IsqFuVV5cCzUkbgUk78plz3toG72nVKDXxZoLA1Hl968
-         99kAwhPVkzxLNSsN7gUqCyQygfF/azeyR6N43JQAiQIbiM/7MdtDDCZLR4hVPgnoocnD
-         E/1z9qb7ByjIWjmoQZIznn0cv8yc9OaOeGOXwFOsGuo0ZSdQYphpRkWDMWHIIW1njVIK
-         uYXg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+hyh9hCdOrjwjC78qbgr1+NRCHNX2hg+v0GHPhTcb1UwlhENzcVfanvnTEXTU3Z8VNBc8yqdzsAxrePsLPjFlLxssooiK
-X-Gm-Message-State: AOJu0Yz0btbr3kY74jwbfhzDO9dcIp0NYDgsNcMYkMKbkwBLCIZ+R6dq
-	ftVP5SWCX20LEjH1wUcQjQVOq6Zy7DDQhW7qd4PftZePU7iwM1pqXY5Ach0uZ5ygp8L/QHxr1ox
-	0upVRIUtbflbyyIBMLhbGjgC8ZKT8BxD5rMFv
-X-Google-Smtp-Source: AGHT+IHwwjQ8DinlK2wiNjovzG9BbNQIqAzdn4+/PROiJook0A2yi5g37Z7O91pcNOMATN+y4DlCwQYj+RCQbJxAIt0=
-X-Received: by 2002:a05:6902:725:b0:e05:f07f:7d2e with SMTP id
- 3f1490d57ef6-e0640c4a3acmr4231663276.6.1721355206291; Thu, 18 Jul 2024
- 19:13:26 -0700 (PDT)
+        bh=bBtl8tqIPwr4kM7w/vnxS7d5O+npgCgYI2eDxbd6XM4=;
+        b=qNNl2PsDugDdLFQwa9tdaHjrAcW7h43VsbUfHgnW4XVVLdEMPudsOXE223YL8LXL+y
+         RdtmK8IYBJdnJT1R+P4GwmYzSNFOdqDztSHjZbQq0Em4a67KvIo43UrnnqEHGzVt4FSc
+         F4IocsAPR82q3OFEFxkRscy+puU/RTXTwJMOTImP1XzLS/h/4Sh/4AlggoxLWkbrcsFX
+         Hi7oPLAIjULoE5nBZvwqHJJ5SoPg2WvmYbyZwCbasfBeX2HOkA87oPh4JYtqUL+BcKxr
+         nfhHQwfmvEtZEYENRfwK+nJUEJ7Jvx6mIrb/1LaQiUU2JcsCvVQ5zWikaqz8LhC2W1vd
+         QZiw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcX4f3w8unL8POVOHNtIp7tNGwkjrnTesnTWs4iHT1C/q+4/+kr7DFEv0FWMVNIpuQqNwHnCvJxx+YITIEjoutnDa7hDcHlJiKRtr3++XTfpnUklFD1kJlDoYprJGb7AZH5gEXRVBQUOyfcYWtG2F8n5vtKKHEnVFw
+X-Gm-Message-State: AOJu0YxwgNReaCwI0OsLY4uadJllEWsGbaiQIZv33Z7Bqg1NQoCjgoxL
+	gNHp63CamXGzKNa4N30p3k68gF/yRzdwFnDN/r29NAa5aEbsyNmvGCqExZZHSR4=
+X-Google-Smtp-Source: AGHT+IGQ/kwJ7FXSWT/EKM6eyqwOSgULG11mnTX4v7BiH0egzCFmJPIlmTX8dyx2+auRzoNxSNI8Rw==
+X-Received: by 2002:a05:6a20:d50c:b0:1c0:eabc:86a8 with SMTP id adf61e73a8af0-1c3fdc6f592mr7952542637.5.1721357222916;
+        Thu, 18 Jul 2024 19:47:02 -0700 (PDT)
+Received: from localhost.localdomain ([240e:604:203:6020:208b:a5de:1b8b:3692])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd64d073c8sm2974995ad.178.2024.07.18.19.46.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 19:47:02 -0700 (PDT)
+From: Fred Li <dracodingfly@gmail.com>
+To: willemdebruijn.kernel@gmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	dracodingfly@gmail.com,
+	herbert@gondor.apana.org.au,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	song@kernel.org,
+	yonghong.song@linux.dev
+Subject: [PATCH v4] bpf: Fixed a segment issue when downgrade gso_size
+Date: Fri, 19 Jul 2024 10:46:53 +0800
+Message-Id: <20240719024653.77006-1-dracodingfly@gmail.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+In-Reply-To: <6689541517901_12869e29412@willemb.c.googlers.com.notmuch>
+References: <6689541517901_12869e29412@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240711111908.3817636-1-xukuohai@huaweicloud.com> <CAHC9VhRohF+36PQbbEUiiiXjnmx-ZCphjOiAV5VTQwCejuejMA@mail.gmail.com>
-In-Reply-To: <CAHC9VhRohF+36PQbbEUiiiXjnmx-ZCphjOiAV5VTQwCejuejMA@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 18 Jul 2024 22:13:15 -0400
-Message-ID: <CAHC9VhQ-NAfLahQ-eomBrjBUT9t3s6OSzzE4nRLy=fj2AmJVqA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 00/20] Add return value range check for BPF LSM
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	selinux@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Brendan Jackman <jackmanb@chromium.org>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, Khadija Kamran <kamrankhadijadj@gmail.com>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Ondrej Mosnacek <omosnace@redhat.com>, 
-	Kees Cook <keescook@chromium.org>, John Johansen <john.johansen@canonical.com>, 
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>, Edward Cree <ecree.xilinx@gmail.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 12, 2024 at 5:44=E2=80=AFPM Paul Moore <paul@paul-moore.com> wr=
-ote:
-> On Thu, Jul 11, 2024 at 7:13=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.c=
-om> wrote:
-> > From: Xu Kuohai <xukuohai@huawei.com>
-> >
-> > LSM BPF prog returning a positive number attached to the hook
-> > file_alloc_security makes kernel panic.
-> >
-> > Here is a panic log:
-> >
-> > [  441.235774] BUG: kernel NULL pointer dereference, address: 000000000=
-00009
-> > [  441.236748] #PF: supervisor write access in kernel mode
-> > [  441.237429] #PF: error_code(0x0002) - not-present page
-> > [  441.238119] PGD 800000000b02f067 P4D 800000000b02f067 PUD b031067 PM=
-D 0
-> > [  441.238990] Oops: 0002 [#1] PREEMPT SMP PTI
-> > [  441.239546] CPU: 0 PID: 347 Comm: loader Not tainted 6.8.0-rc6-gafe0=
-cbf23373 #22
-> > [  441.240496] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), B=
-IOS rel-1.15.0-0-g2dd4b4
-> > [  441.241933] RIP: 0010:alloc_file+0x4b/0x190
-> > [  441.242485] Code: 8b 04 25 c0 3c 1f 00 48 8b b0 30 0c 00 00 e8 9c fe=
- ff ff 48 3d 00 f0 ff fb
-> > [  441.244820] RSP: 0018:ffffc90000c67c40 EFLAGS: 00010203
-> > [  441.245484] RAX: ffff888006a891a0 RBX: ffffffff8223bd00 RCX: 0000000=
-035b08000
-> > [  441.246391] RDX: ffff88800b95f7b0 RSI: 00000000001fc110 RDI: f089cd0=
-b8088ffff
-> > [  441.247294] RBP: ffffc90000c67c58 R08: 0000000000000001 R09: 0000000=
-000000001
-> > [  441.248209] R10: 0000000000000001 R11: 0000000000000001 R12: 0000000=
-000000001
-> > [  441.249108] R13: ffffc90000c67c78 R14: ffffffff8223bd00 R15: fffffff=
-ffffffff4
-> > [  441.250007] FS:  00000000005f3300(0000) GS:ffff88803ec00000(0000) kn=
-lGS:0000000000000000
-> > [  441.251053] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [  441.251788] CR2: 00000000000001a9 CR3: 000000000bdc4003 CR4: 0000000=
-000170ef0
-> > [  441.252688] Call Trace:
-> > [  441.253011]  <TASK>
-> > [  441.253296]  ? __die+0x24/0x70
-> > [  441.253702]  ? page_fault_oops+0x15b/0x480
-> > [  441.254236]  ? fixup_exception+0x26/0x330
-> > [  441.254750]  ? exc_page_fault+0x6d/0x1c0
-> > [  441.255257]  ? asm_exc_page_fault+0x26/0x30
-> > [  441.255792]  ? alloc_file+0x4b/0x190
-> > [  441.256257]  alloc_file_pseudo+0x9f/0xf0
-> > [  441.256760]  __anon_inode_getfile+0x87/0x190
-> > [  441.257311]  ? lock_release+0x14e/0x3f0
-> > [  441.257808]  bpf_link_prime+0xe8/0x1d0
-> > [  441.258315]  bpf_tracing_prog_attach+0x311/0x570
-> > [  441.258916]  ? __pfx_bpf_lsm_file_alloc_security+0x10/0x10
-> > [  441.259605]  __sys_bpf+0x1bb7/0x2dc0
-> > [  441.260070]  __x64_sys_bpf+0x20/0x30
-> > [  441.260533]  do_syscall_64+0x72/0x140
-> > [  441.261004]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> > [  441.261643] RIP: 0033:0x4b0349
-> > [  441.262045] Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00=
- 48 89 f8 48 89 f7 48 88
-> > [  441.264355] RSP: 002b:00007fff74daee38 EFLAGS: 00000246 ORIG_RAX: 00=
-00000000000141
-> > [  441.265293] RAX: ffffffffffffffda RBX: 00007fff74daef30 RCX: 0000000=
-0004b0349
-> > [  441.266187] RDX: 0000000000000040 RSI: 00007fff74daee50 RDI: 0000000=
-00000001c
-> > [  441.267114] RBP: 000000000000001b R08: 00000000005ef820 R09: 0000000=
-000000000
-> > [  441.268018] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000=
-000000004
-> > [  441.268907] R13: 0000000000000004 R14: 00000000005ef018 R15: 0000000=
-0004004e8
-> >
-> > This is because the filesystem uses IS_ERR to check if the return value
-> > is an error code. If it is not, the filesystem takes the return value
-> > as a file pointer. Since the positive number returned by the BPF prog
-> > is not a real file pointer, this misinterpretation causes a panic.
-> >
-> > Since other LSM modules always return either a negative error code
-> > or a valid pointer, this specific issue only exists in BPF LSM. The
-> > proposed solution is to reject LSM BPF progs returning unexpected
-> > values in the verifier. This patch set adds return value check to
-> > ensure only BPF progs returning expected values are accepted.
-> >
-> > Since each LSM hook has different excepted return values, we need to
-> > know the expected return values for each individual hook to do the
-> > check. Earlier versions of the patch set used LSM hook annotations
-> > to specify the return value range for each hook. Based on Paul's
-> > suggestion, current version gets rid of such annotations and instead
-> > converts hook return values to a common pattern: return 0 on success
-> > and negative error code on failure.
-> >
-> > Basically, LSM hooks are divided into two types: hooks that return a
-> > negative error code and zero or other values, and hooks that do not
-> > return a negative error code. This patch set converts all hooks of the
-> > first type and part of the second type to return 0 on success and a
-> > negative error code on failure (see patches 1-10). For certain hooks,
-> > like ismaclabel and inode_xattr_skipcap, the hook name already imply
-> > that returning 0 or 1 is the best choice, so they are not converted.
-> > There are four unconverted hooks. Except for ismaclabel, which is not
-> > used by BPF LSM, the other three are specified with a BTF ID list to
-> > only return 0 or 1.
->
-> Thank you for following up on your initial work with this patchset, Xu
-> Kuohai.  It doesn't look like I'm going to be able to finish my review
-> by the end of the day today, so expect that a bit later, but so far I
-> think most of the changes look good and provide a nice improvement :)
+Linearizing skb when downgrade gso_size because it may
+trigger the BUG_ON when segment skb as described in [1].
 
-You should have my feedback now, let me know if you have any questions.
+v4 changes:
+  add fixed tag.
 
-One additional comment I might make is that you may either want to
-wait until after v6.11-rc1 is released and I've had a chance to rebase
-the lsm/{dev,next} branches and merge the patchsets which are
-currently queued; there are a few patches queued up which will have an
-impact on this work.  While it's an unstable branch, you can take a
-peek at those queues patches in the lsm/dev-staging branch.
+v3 changes:
+  linearize skb if having frag_list as Willem de Bruijn suggested[2].
 
-https://github.com/LinuxSecurityModule/kernel/blob/main/README.md
+[1] https://lore.kernel.org/all/20240626065555.35460-2-dracodingfly@gmail.com/
+[2] https://lore.kernel.org/all/668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch/
 
---=20
-paul-moore.com
+Fixes: 2be7e212d5419 ("bpf: add bpf_skb_adjust_room helper")
+Signed-off-by: Fred Li <dracodingfly@gmail.com>
+---
+ net/core/filter.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index df4578219e82..71396ecfc574 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -3525,13 +3525,21 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
+ 	if (skb_is_gso(skb)) {
+ 		struct skb_shared_info *shinfo = skb_shinfo(skb);
+ 
+-		/* Due to header grow, MSS needs to be downgraded. */
+-		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO))
+-			skb_decrease_gso_size(shinfo, len_diff);
+-
+ 		/* Header must be checked, and gso_segs recomputed. */
+ 		shinfo->gso_type |= gso_type;
+ 		shinfo->gso_segs = 0;
++
++		/* Due to header grow, MSS needs to be downgraded.
++		 * There is BUG_ON when segment the frag_list with
++		 * head_frag true so linearize skb after downgrade
++		 * the MSS.
++		 */
++		if (!(flags & BPF_F_ADJ_ROOM_FIXED_GSO)) {
++			skb_decrease_gso_size(shinfo, len_diff);
++			if (shinfo->frag_list)
++				return skb_linearize(skb);
++		}
++
+ 	}
+ 
+ 	return 0;
+-- 
+2.33.0
+
 
