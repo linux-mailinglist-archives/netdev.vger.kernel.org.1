@@ -1,79 +1,93 @@
-Return-Path: <netdev+bounces-112268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6629E937CFA
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 21:38:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E4E4937D4F
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 22:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E03F1B218AD
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 19:38:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 589C21C21012
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 20:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E91614831F;
-	Fri, 19 Jul 2024 19:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5230147C76;
+	Fri, 19 Jul 2024 20:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S1Oj05aE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xb5C67sY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B3654BE7;
-	Fri, 19 Jul 2024 19:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A235E59168
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 20:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721417903; cv=none; b=mLYw9OBlmLK8FZEILWBcd83LYhDD+Yt3Ol0F/XPgc6AkKeKWbeAQi7xBzDroRAUVo+INNNEsGH8gA9qYgpnT4V5uPI4tA1NMrzSLx6+a9tSZ/rD093K640KvjwAFDu1LUnyjLRx0ZftOe+D16fLhFegcKK4kXEhzZ4Evo+xCV4M=
+	t=1721421535; cv=none; b=ZA4uf7aWrnr+LM7j3Rs9Zk9q+aUgwecB+iZxRSLRlzCMIY362D3txwBQ8w8ON90r4LeVt4vGD9XHwUjRNydNoW+9MZzHBLViRNNSStJidG0O8zPjwxGVr6MgZslpp5yN0fkhwcQ6O687trpGDuI0+7nbEcB9reRqGhDRshmDsQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721417903; c=relaxed/simple;
-	bh=NWxD6l+tF/NnFkaZBW9wWD7Mbr238N1lcgMrmU841ac=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=uhgmu3tiFD4by+6J3DtWedJXbE48L1oomzbxnMNyMTff2vupElSKXY3v3nozBblimm7/2gNPqgcxaX8DNYcyZhh6JbpRBi2lJgJnhQYhPTwWmlBHUIsZBDfPZfo80loCPSiJR7ttYT7E5wo0+29nFCPl/X43aKId58sva0MyFvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S1Oj05aE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D53CEC4AF0A;
-	Fri, 19 Jul 2024 19:38:22 +0000 (UTC)
+	s=arc-20240116; t=1721421535; c=relaxed/simple;
+	bh=AON9XBl1TCaXqJyKVVpDsSKb6Hr7n3DQkS8P2XAGnBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OI8FZLf3QPfykXVq0Ek4CKmbwgue9zu7va13rcrrG/r9C9bnadvlfEB7N9PPsFtDk8l6TXuFZH3lZUluJfBTQpnoQXNDTG58au2ZeSdEfUEfo0OcfgHl3+9XoaxT/rfh4WEsINxriYsarebhFHBeDv5YcpxC+59Z1dpynwIAFt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xb5C67sY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBEC1C32782;
+	Fri, 19 Jul 2024 20:38:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721417902;
-	bh=NWxD6l+tF/NnFkaZBW9wWD7Mbr238N1lcgMrmU841ac=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=S1Oj05aEkv1Rq7+5YWuTNb+c31C6T7n7dlmWIk0GI46m1Ifi+jb67QW1POoLQe9yp
-	 vrMQjFMtCnxOUNezVTJ/l3MBSGsUT1/CBSYKiUpiBN9c1RMeI6/x4ohp2ouRENfKzy
-	 aVDrX7StH3MufZwvUVietRcChvbQ7UJCH00xN6qxZt8VChmKeB6+oH/4DIOzVS2m38
-	 kD6osb6RFRvAszTEHhQITeGPKYI0biZ1cte/+6QZ4RL9f/6vitGSwtjDfLaE9oE0fe
-	 Ddtwf2eTmg7I9Yhr85dV8yEoTwr+HwOxqmdd5Xbk7PArAjr4iQb8LgcXV3bNohsDng
-	 09iiFV5rTS5qA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C8C62C4332D;
-	Fri, 19 Jul 2024 19:38:22 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240717053034-mutt-send-email-mst@kernel.org>
-References: <20240717053034-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240717053034-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 6c85d6b653caeba2ef982925703cbb4f2b3b3163
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f4f92db4391285ef3a688cdad25d5c76db200a30
-Message-Id: <172141790281.26000.2833728574962008166.pr-tracker-bot@kernel.org>
-Date: Fri, 19 Jul 2024 19:38:22 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, aha310510@gmail.com, arefev@swemel.ru, arseny.krasnov@kaspersky.com, davem@davemloft.net, dtatulea@nvidia.com, eperezma@redhat.com, glider@google.com, iii@linux.ibm.com, jasowang@redhat.com, jiri@nvidia.com, jiri@resnulli.us, kuba@kernel.org, lingshan.zhu@intel.com, mst@redhat.com, ndabilpuram@marvell.com, pgootzen@nvidia.com, pizhenwei@bytedance.com, quic_jjohnson@quicinc.com, schalla@marvell.com, stefanha@redhat.com, sthotton@marvell.com, syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com, vattunuru@marvell.com, will@kernel.org, xuanzhuo@linux.alibaba.com, yskelg@gmail.com
+	s=k20201202; t=1721421535;
+	bh=AON9XBl1TCaXqJyKVVpDsSKb6Hr7n3DQkS8P2XAGnBE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Xb5C67sY+1eQl6g3SCRQP0vLUQVmg+0oBlSZJVQESOUhAH+jZ6DOJtFojmAaN3IZZ
+	 6bLJSyJaB34gUMxZvORFH3ZWuiF2XxjEK9pMCPlzXqRcZCiPvfOEe4tZiJK7JRED/+
+	 LmXm30W+LN1eqDmsIMShbJ5sVsNamDLH6EZg9iVkSpkNSYFO5RVrur7/FIuD9opHzN
+	 XiaPsM0Qj/NZNmMcXxJYV/f+Wo5BhNfeo3uB91Zt/W7ng5zWyZLGmDgt9/DcVy0A0H
+	 LzGKqSQYwlrxkIcGi3OhcqRaGFH3O+eH2oLNArXB8kx2M0DbxudzGbREK6xrfVyibD
+	 nu5alfn+hOHbw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: nbd@nbd.name,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	angelogioacchino.delregno@collabora.com,
+	lorenzo.bianconi83@gmail.com,
+	dan.carpenter@linaro.org
+Subject: [PATCH net] net: airoha: Fix MBI_RX_AGE_SEL_MASK definition
+Date: Fri, 19 Jul 2024 22:38:31 +0200
+Message-ID: <d27d0465be1bff3369e886e5f10c4d37fefc4934.1721419930.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Wed, 17 Jul 2024 05:30:34 -0400:
+Fix copy-paste error in MBI_RX_AGE_SEL_MASK macro definition
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/airoha_eth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f4f92db4391285ef3a688cdad25d5c76db200a30
-
-Thank you!
-
+diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
+index 16761fde6c6c..1c5b85a86df1 100644
+--- a/drivers/net/ethernet/mediatek/airoha_eth.c
++++ b/drivers/net/ethernet/mediatek/airoha_eth.c
+@@ -249,7 +249,7 @@
+ #define REG_FE_GDM_RX_ETH_L1023_CNT_H(_n)	(GDM_BASE(_n) + 0x2fc)
+ 
+ #define REG_GDM2_CHN_RLS		(GDM2_BASE + 0x20)
+-#define MBI_RX_AGE_SEL_MASK		GENMASK(18, 17)
++#define MBI_RX_AGE_SEL_MASK		GENMASK(26, 25)
+ #define MBI_TX_AGE_SEL_MASK		GENMASK(18, 17)
+ 
+ #define REG_GDM3_FWD_CFG		GDM3_BASE
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.45.2
+
 
