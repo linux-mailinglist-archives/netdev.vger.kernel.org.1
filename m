@@ -1,183 +1,99 @@
-Return-Path: <netdev+bounces-112246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C55937A9D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 18:17:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF5E937B01
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 18:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5947D28724E
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 16:17:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D4B71C20B18
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 16:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6D7145B32;
-	Fri, 19 Jul 2024 16:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266CA13C3D2;
+	Fri, 19 Jul 2024 16:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dF13qwcm"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="xz9jjY/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181122071
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 16:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2383D2F30;
+	Fri, 19 Jul 2024 16:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721405830; cv=none; b=leY2Z/SAlUohDLe9OOivls34GTM9ZadmZ59SRnx1jIOy+VjBmKYPR8uB0Sz0iM3AWjkdGYygbelDpBkCMjAeAnOBB3xTPSHMoy1k4jnPBcAi9FggA0enJyYz/nhqL3u3Prorxl8RIr3MxQvvgX0/1+ukLJRbfW0Sv/0JWZHg/fc=
+	t=1721406626; cv=none; b=oAIunjBQBeiB59WcUHxSZEQoY3phJ1dib0RzhFwEfVmRuQKgPMLc3y2iE9Pdb9K1Q0qHw72EuibqNGPrrmcFBBpPqY5rnOHAlvLTJTAbi19Y93/3q8jnRqiL0TJiAJMfBaqO+LcGQ2RcB4KMyJ56KeSB4ffPUYcsylWiK58LAqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721405830; c=relaxed/simple;
-	bh=1Jmu67DY2F2hGF9iW1AGo0oLPdevPTotRKVSLBLe1ho=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rvbT/rslIFsq3l+Ooihmk+NwhsktUBt0FTnHtd6EtafBO+9wThgLHevzf+m2yAlc5M2uM/4mrwfrSsYT/6lujZqr2oYD1nMBw9xdX9uYQXXVvp32AwDCG5ziCmktBPvKaTYphsnidYS02jWP1csGFkhdx9XYGRE7LMJ3gumr/G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dF13qwcm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721405827;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Eph9CwJzf57SdOVK0HqdNZSnk/6hGcQvao+JBlcdGXM=;
-	b=dF13qwcmrRTCqYFA3XSTQKZxWa0O6PVTZWwd5CcY/gTxa/VVwy15yT4neMqQBAcEliVXBk
-	gD98b8A5iZMP/dr4DU+haP2okAtquN9tfVHcFCV10ooUfnK/3889V7usuvMowG3/g3TxZC
-	GlhKBbPnA8Z1KyuQwxsmXezmFYM6dgA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-509-kBaylKSJPHmViWPsQ0haQA-1; Fri,
- 19 Jul 2024 12:17:02 -0400
-X-MC-Unique: kBaylKSJPHmViWPsQ0haQA-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 551B6196E09C;
-	Fri, 19 Jul 2024 16:16:56 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.105])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3ED761955F65;
-	Fri, 19 Jul 2024 16:16:53 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.11-rc0
-Date: Fri, 19 Jul 2024 18:16:38 +0200
-Message-ID: <20240719161638.138354-1-pabeni@redhat.com>
+	s=arc-20240116; t=1721406626; c=relaxed/simple;
+	bh=e0NVU5/QvWmtxtTLF5jE4+fsPTL2De984G1pyVqWgCA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OfQik1vUB+sERJvEzld4eKPk3l6NWwzXcikuEMyoluUApqgddgfC/a//O+bB34DeLpnS8ccrwWD8XeODTSI8rfkuvffd45JTyjuIukwHXyOTxjRNQIXN20iq56T3wvEUc/CW6HzGz1Vx97Bmv5XnRw6mTky35hf/8savaPWwfTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=xz9jjY/h; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=TYVHuHtpoWicDB96C1fux2IstVVFjuVJavo44U+S8tk=;
+	t=1721406622; x=1722616222; b=xz9jjY/hrJH08tD/FooMUe8vYwacv6R2NHZCAJkcrEzooGc
+	qEfoi2ztv3ARETUl7ktcS52Ddij89C6nC0ausC7kIR5bFJ1xNbZgULRn7ywrEnCDQg/TZzUd6Sco3
+	DQUeBPewGwHrNEHLRWpUutI3jiyzCUcZdrsijYNTBH2pASv/sHAi5S4CIw4xj/dXAx4eym0/7bbuY
+	NyBdPhBpJzULKtLm8i37hnbjURfJeMj7mgG67gMKYInz32lXiO9yFZAV6DIHI8kzxW9tPcagH8SNu
+	/k81IIbe4KNGfgJD/VKOwBnWIQyl76tXazCc653WY8Z0yAq/QIrD2PHDNB7HkPhA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1sUqUn-000000041Jf-1yxc;
+	Fri, 19 Jul 2024 18:30:14 +0200
+Message-ID: <c9f8412dac004da0a192376a235ced2412299fb8.camel@sipsolutions.net>
+Subject: Re: [syzbot] [wireless?] INFO: task hung in
+ rfkill_global_led_trigger_worker (3)
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, Krzysztof Kozlowski
+	 <krzk@kernel.org>
+Cc: syzbot+50499e163bfa302dfe7b@syzkaller.appspotmail.com, syzkaller-bugs
+ <syzkaller-bugs@googlegroups.com>, Network Development
+ <netdev@vger.kernel.org>,  LKML <linux-kernel@vger.kernel.org>,
+ linux-wireless <linux-wireless@vger.kernel.org>
+Date: Fri, 19 Jul 2024 09:30:10 -0700
+In-Reply-To: <15930e85-3b82-4119-b1ef-d899ac03fa3d@I-love.SAKURA.ne.jp>
+References: <000000000000114385061d997d9c@google.com>
+	 <15930e85-3b82-4119-b1ef-d899ac03fa3d@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-malware-bazaar: not-scanned
 
-Hi Linus!
+On Fri, 2024-07-19 at 22:59 +0900, Tetsuo Handa wrote:
+> This is a deadlock which lockdep cannot detect.
+> Please check which lock should be taken first.
+>=20
+> 2 locks held by syz.1.2508/23558:
+>  #0: ffff88805ff4f100 (&dev->mutex){....}-{3:3}, at: device_lock include/=
+linux/device.h:1009 [inline]
+>  #0: ffff88805ff4f100 (&dev->mutex){....}-{3:3}, at: nfc_unregister_devic=
+e+0x63/0x2a0 net/nfc/core.c:1165
+>  #1: ffffffff8f8e1b88 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_unreg=
+ister+0xd0/0x230 net/rfkill/core.c:1149
+> 2 locks held by syz.4.2510/23544:
+>  #0: ffffffff8f8e1b88 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_w=
+rite+0x1a9/0x790 net/rfkill/core.c:1297
+>  #1: ffff88805ff4f100 (&dev->mutex){....}-{3:3}, at: device_lock include/=
+linux/device.h:1009 [inline]
+>  #1: ffff88805ff4f100 (&dev->mutex){....}-{3:3}, at: nfc_dev_down net/nfc=
+/core.c:143 [inline]
+>  #1: ffff88805ff4f100 (&dev->mutex){....}-{3:3}, at: nfc_rfkill_set_block=
++0x50/0x310 net/nfc/core.c:179
 
-Small PR, mainly to unbreak the s390 build. We delayed it a little
-bit to try to catch a last-minute fix, but it will have to wait a
-bit more.
+Yeah, this is a well-known issue; I believe this should be fixed in the
+NFC (virtual) device.
 
-The following changes since commit 51835949dda3783d4639cfa74ce13a3c9829de00:
-
-  Merge tag 'net-next-6.11' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-07-16 19:28:34 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.11-rc0
-
-for you to fetch changes up to 4359836129d931fc424370249a1fcdec139fe407:
-
-  eth: fbnic: don't build the driver when skb has more than 21 frags (2024-07-19 16:36:34 +0200)
-
-----------------------------------------------------------------
-Notably this includes fixes for a s390 build breakage.
-
-Including fixes from netfilter.
-
-Current release - new code bugs:
-
-  - eth: fbnic: fix s390 build.
-
-  - eth: airoha: fix NULL pointer dereference in airoha_qdma_cleanup_rx_queue()
-
-Previous releases - regressions:
-
-  - flow_dissector: use DEBUG_NET_WARN_ON_ONCE
-
-  - ipv4: fix incorrect TOS in route get reply
-
-  - dsa: fix chip-wide frame size config in some drivers
-
-Previous releases - always broken:
-
-  - netfilter: nf_set_pipapo: fix initial map fill
-
-  - eth: gve: fix XDP TX completion handling when counters overflow
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Chen Hanxiao (1):
-      ipvs: properly dereference pe in ip_vs_add_service
-
-Florian Westphal (2):
-      netfilter: nf_set_pipapo: fix initial map fill
-      selftests: netfilter: add test case for recent mismatch bug
-
-Ido Schimmel (2):
-      ipv4: Fix incorrect TOS in route get reply
-      ipv4: Fix incorrect TOS in fibmatch route get reply
-
-Jack Wu (1):
-      net: wwan: t7xx: add support for Dell DW5933e
-
-Jakub Kicinski (1):
-      eth: fbnic: don't build the driver when skb has more than 21 frags
-
-Joshua Washington (1):
-      gve: Fix XDP TX completion handling when counters overflow
-
-Lorenzo Bianconi (2):
-      net: airoha: fix error branch in airoha_dev_xmit and airoha_set_gdm_ports
-      net: airoha: Fix NULL pointer dereference in airoha_qdma_cleanup_rx_queue()
-
-Martin Willi (2):
-      net: dsa: mv88e6xxx: Limit chip-wide frame size config to CPU ports
-      net: dsa: b53: Limit chip-wide jumbo frame config to CPU ports
-
-Pablo Neira Ayuso (2):
-      netfilter: ctnetlink: use helper function to calculate expect ID
-      net: flow_dissector: use DEBUG_NET_WARN_ON_ONCE
-
-Paolo Abeni (4):
-      eth: fbnic: fix s390 build.
-      Merge branch 'ipv4-fix-incorrect-tos-in-route-get-reply'
-      Merge branch 'net-dsa-fix-chip-wide-frame-size-config-in-some-drivers'
-      Merge tag 'nf-24-07-17' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Shay Drory (1):
-      driver core: auxiliary bus: Fix documentation of auxiliary_device
-
- drivers/net/dsa/b53/b53_common.c                   |  3 +
- drivers/net/dsa/mv88e6xxx/chip.c                   |  3 +-
- drivers/net/ethernet/google/gve/gve_tx.c           |  5 +-
- drivers/net/ethernet/mediatek/airoha_eth.c         | 13 ++--
- drivers/net/ethernet/meta/Kconfig                  |  2 +
- drivers/net/wwan/t7xx/t7xx_pci.c                   |  1 +
- include/linux/auxiliary_bus.h                      |  7 +-
- include/net/ip_fib.h                               |  1 +
- net/core/flow_dissector.c                          |  2 +-
- net/ipv4/fib_trie.c                                |  1 +
- net/ipv4/route.c                                   | 16 ++---
- net/netfilter/ipvs/ip_vs_ctl.c                     | 10 +--
- net/netfilter/nf_conntrack_netlink.c               |  3 +-
- net/netfilter/nft_set_pipapo.c                     |  4 +-
- net/netfilter/nft_set_pipapo.h                     | 21 ++++++
- net/netfilter/nft_set_pipapo_avx2.c                | 10 +--
- tools/testing/selftests/net/fib_tests.sh           | 24 +++----
- .../selftests/net/netfilter/nft_concat_range.sh    | 76 +++++++++++++++++++++-
- 18 files changed, 156 insertions(+), 46 deletions(-)
-
+johannes
 
