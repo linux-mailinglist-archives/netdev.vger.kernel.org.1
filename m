@@ -1,112 +1,208 @@
-Return-Path: <netdev+bounces-112168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC4D7937417
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:45:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA509374C6
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:11:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 802351F226D5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 06:45:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 089571F20D3A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9DC2C1BA;
-	Fri, 19 Jul 2024 06:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3263559168;
+	Fri, 19 Jul 2024 08:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C21sOn7E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ad9k81Qu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B0517BA1
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 06:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C5F40862;
+	Fri, 19 Jul 2024 08:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721371527; cv=none; b=DZoD+gXPdRDcfx7W7x5Ygzd9TdNyl805lST9IjnODLVcUB0IVebAvdyZ84gudQ1oG44aZM4UpesMhiLs3gG80n1hX26MyTfBF8V0lJ2ll6TUqocBHvBGD0o8s85dp29yQvj88DWN0x4syfISA8lIfRM0plrI+91G8sYvoBrIhLU=
+	t=1721376686; cv=none; b=RZdg9rOfP1KZ1F/+Nvp4HG6+LMm7GH+O53zEEGNzx2ySQf8azy40zJQm7HY9+VYfjCNg7kOcoB8FCiPoZrQmQJXp0HR36Nxp9nAzvz2mMauf1L2itcaJFB7yNUALhZpwMOkpjGsHnktmELFsxirGiuhPoSgfLPIxYxUspTF3A84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721371527; c=relaxed/simple;
-	bh=RHJc+rCNP/iYY3Obr0xHpB5pUregLPBZcRws330Wyf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EnJHuMqugCR7BKX8Prn32IPd63G8vCcg07WMVDbkx+6loewO7ikenX8IGI2XUU+Z/DyBa+CuwFc3+3p0vsn6OMznF9vfZdraOOBY0yaARE5JM8UTMOBto+p6P6iJW3NwUnXj8PlVMC4uL/q/FF2naKr7GAAff7wudhatXrackGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C21sOn7E; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1fd69e44596so899085ad.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 23:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721371525; x=1721976325; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BK2X/XlLDdZfk+vSlCeT+DwvSYrZJ5Q8Y3EgJU7tLY4=;
-        b=C21sOn7EaaeA3aUeS/Q5G085EjJ1yBduB5xGtmpioqXRi7RsnCC/sJH746JMJpm7QU
-         jsESZ2htMcob8QtThrwvW7h3BzGj0wZ54RX0fAPdW+mzWf42JRsPukgKrzaSOp3xkA2T
-         05oQ1+iXDb7Vtbr4ndbRFwD3/crjffFqgVBSzT+80n5/zm+Qcxaw74jJcDM6l7XDFlES
-         yWjZnO58UI2L9C5U4AMhSo6bnOHc3erBATeOkWHSgCsHG06KE15yymWxT0relvUpbti8
-         pEwCv2HLRK8pOCefC7olAJl9y052U4FY7axmV10G7F8vP/svEDGJr42d3sGNNgX3C8TF
-         jAyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721371525; x=1721976325;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BK2X/XlLDdZfk+vSlCeT+DwvSYrZJ5Q8Y3EgJU7tLY4=;
-        b=gkVHDCJnKetSf2gKFNuevekjW6Y7d7qi3QJ7c2L+MP6Q+PGtKjPCMSV1QaQBNOoPby
-         EON9lIt7jLVUobWMuGu4yMQQRCPPH3+RjNPiAe94mVCIIMS/RfPnaxLqp3zgx10sQS49
-         6RPl8gOiImV48wsxbP0wltPknm+dAAV1O4+6Je9DwL9f+ajVJLRNn0fU9yiXRuRVxMbi
-         rkbBZ0uGjOSqHkzT1fwWpZv8Fy7KXLX8lqNlXFOQkjm5KakT7SUMwKgpuvR32ud9j8jB
-         6qIQlH5lkghv0OaxMmoTCFx6bTF2KhV90zFLrGztEaqAaIP8QLxwi5mP98CW6jZxQ7M9
-         pNoA==
-X-Gm-Message-State: AOJu0YzoKbzLGUYVGYUduQs85s5WhRfOlO8Sgdom3TUlwh/HPyIA+0AP
-	LdagchE3SeN2rYAHw9fTvhxjT6i2u3PMyNWkmbIW8EQ8fftimkXAo9wmkSg6
-X-Google-Smtp-Source: AGHT+IEmpbn8VhHWI2FgnMnMb0S4XKCXPRJ/JV6Ifujhj+Bd967faS6I5c05gOK3Wq6NFVK1hQrUcw==
-X-Received: by 2002:a17:902:e844:b0:1fb:5d71:20dd with SMTP id d9443c01a7336-1fc5b0c592dmr93677675ad.0.1721371525069;
-        Thu, 18 Jul 2024 23:45:25 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:7820:f0c0:437c:edbf:e0cc:6fa0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd64d073desm6657255ad.161.2024.07.18.23.45.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 23:45:24 -0700 (PDT)
-Date: Fri, 19 Jul 2024 14:45:21 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-Message-ID: <ZpoLgQtZG5m8gU3L@Laptop-X1>
-References: <89249184-41ac-42f6-b5af-4a46f9b28247@blackwall.org>
- <Zn1mXRRINDQDrIKw@Laptop-X1>
- <1467748.1719498250@famine>
- <Zn4po-wJoFat3CUd@Laptop-X1>
- <efd0bf80-7269-42fc-a466-7ec0a9fd5aeb@blackwall.org>
- <8e978679-4145-445c-88ad-f98ffec6facb@blackwall.org>
- <Zn6Ily5OnRnQvcNo@Laptop-X1>
- <1518279.1719617777@famine>
- <ZoOzge5Xn42QtG91@Laptop-X1>
- <Zo9NtDv8ULtbaJ_k@Laptop-X1>
+	s=arc-20240116; t=1721376686; c=relaxed/simple;
+	bh=W0TBcbt0kxdAcdDSv/013U8B31U4ZsrmKh7hvyyOjn4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=c5XPg/I098RSeLMA/Q9ZivRF03gIHDOMd/MpUIrBQ6hXjCoIzaE6UkCQ7UVaC4gFTMYtfaZXnwlvku2MpPXWlYKgBGrSsQIBlH0Xcj7Nk1afHd+PwBHhjvWkCAV5SiwkFGWZpsgfRHlD5mUusU+o5hCnuSoI91snF453A/FFuwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ad9k81Qu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEB95C32782;
+	Fri, 19 Jul 2024 08:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721376685;
+	bh=W0TBcbt0kxdAcdDSv/013U8B31U4ZsrmKh7hvyyOjn4=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=ad9k81QuKT3QA9fZMjMHAKxEjnGvEVrT53AuhJOkh0LyZ/0mqf4wQQCLxqAdJEvyK
+	 kgGzXmn9zoJq21YGxjBzo9Go+XWzITHf/xGLFHNj7HIJGwEOrtI55Tdklzusmof7c1
+	 TgDWmqoZC0jWUeq6vJxETcWXXpf84z+A2ibGWGVBXRW2fBOAPadkPx4JjVLyv7NiHk
+	 4Iiq/ldqaNdRPPAvNUxYC+uN3P/QZAEzSSA+ZlwpBQNlKgn8yF0b9E/LIfP4LdhhLB
+	 pT4P1ZiJPhiL34lD4I5ohAnBLbMiQ1fqhcOlItCR/YNg9d3+j+bD+Dt1cwEVqWWM+1
+	 yjziOXIWRCxbA==
+Message-ID: <89a21fa6-df1b-4eb3-b564-2376aededc75@kernel.org>
+Date: Fri, 19 Jul 2024 10:11:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zo9NtDv8ULtbaJ_k@Laptop-X1>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [bpf?] [net?] KASAN: slab-use-after-free Read in
+ bq_xmit_all
+To: syzbot <syzbot+707d98c8649695eaf329@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
+ haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
+ song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <000000000000943e1c061d92bdd6@google.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <000000000000943e1c061d92bdd6@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 11, 2024 at 11:12:58AM +0800, Hangbin Liu wrote:
-> On Tue, Jul 02, 2024 at 04:00:06PM +0800, Hangbin Liu wrote:
-> > > 	Looking at the current notifications in bonding, I wonder if it
-> > > would be sufficient to add the desired information to what
-> > > bond_lower_state_changed() sends, rather than trying to shoehorn in
-> > > another rtnl_trylock() gizmo.
-> > 
-> > I'm not sure if the LACP state count for lower state. What do you think of
-> > my previous draft patch[1] that replied to you.
-> > 
-> > [1] https://lore.kernel.org/netdev/Zn0iI3SPdRkmfnS1@Laptop-X1/
-> 
-> Hi Jay,
-> 
-> Any comments?
 
-Ping?
+
+On 19/07/2024 07.12, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    73399b58e5e5 Add linux-next specific files for 20240718
+> git tree:       linux-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=111f2195980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=54e443ddc2b981c8
+> dashboard link: https://syzkaller.appspot.com/bug?extid=707d98c8649695eaf329
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1602cf31980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=106fde5e980000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/fbab059c854f/disk-73399b58.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/874a209f4c3f/vmlinux-73399b58.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/f34e5c7be278/bzImage-73399b58.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+707d98c8649695eaf329@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> UBSAN: array-index-out-of-bounds in ./kernel/bpf/devmap.c:385:28
+> index 16 is out of range for type 'struct xdp_frame *[16]'
+> CPU: 1 UID: 0 PID: 5101 Comm: syz-executor232 Not tainted 6.10.0-next-20240718-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+> Call Trace:
+>   <IRQ>
+>   __dump_stack lib/dump_stack.c:94 [inline]
+>   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+>   ubsan_epilogue lib/ubsan.c:231 [inline]
+>   __ubsan_handle_out_of_bounds+0x121/0x150 lib/ubsan.c:429
+>   bq_xmit_all+0x157/0x11d0 kernel/bpf/devmap.c:385
+>   __dev_flush+0x81/0x160 kernel/bpf/devmap.c:425
+>   xdp_do_check_flushed+0x129/0x240 net/core/filter.c:4300
+
+When xdp_do_check_flushed() calls __dev_flush(), this indicate that some 
+driver didn't call xdp_do_flush() after NAPI finished.
+
+What NIC device driver is this tested on?
+
+--Jesper
+
+>   __napi_poll+0xe4/0x490 net/core/dev.c:6774
+>   napi_poll net/core/dev.c:6840 [inline]
+>   net_rx_action+0x89b/0x1240 net/core/dev.c:6962
+>   handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+>   __do_softirq kernel/softirq.c:588 [inline]
+>   invoke_softirq kernel/softirq.c:428 [inline]
+>   __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+>   irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+>   common_interrupt+0xaa/0xd0 arch/x86/kernel/irq.c:278
+>   </IRQ>
+>   <TASK>
+>   asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+> RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+> RIP: 0010:_raw_spin_unlock_irqrestore+0xd8/0x140 kernel/locking/spinlock.c:194
+> Code: 9c 8f 44 24 20 42 80 3c 23 00 74 08 4c 89 f7 e8 ce cf 5c f6 f6 44 24 21 02 75 52 41 f7 c7 00 02 00 00 74 01 fb bf 01 00 00 00 <e8> c3 69 c4 f5 65 8b 05 04 5f 65 74 85 c0 74 43 48 c7 04 24 0e 36
+> RSP: 0018:ffffc9000369fb60 EFLAGS: 00000206
+> RAX: 3e45100d05912800 RBX: 1ffff920006d3f70 RCX: ffffffff817023ea
+> RDX: dffffc0000000000 RSI: ffffffff8bcad5c0 RDI: 0000000000000001
+> RBP: ffffc9000369fbf0 R08: ffffffff9300f817 R09: 1ffffffff2601f02
+> R10: dffffc0000000000 R11: fffffbfff2601f03 R12: dffffc0000000000
+> R13: 1ffff920006d3f6c R14: ffffc9000369fb80 R15: 0000000000000246
+>   spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+>   do_notify_parent_cldstop+0x9ab/0xb50 kernel/signal.c:2216
+>   ptrace_stop+0x465/0x940 kernel/signal.c:2319
+>   ptrace_do_notify kernel/signal.c:2393 [inline]
+>   ptrace_notify+0x255/0x380 kernel/signal.c:2405
+>   ptrace_report_syscall include/linux/ptrace.h:415 [inline]
+>   ptrace_report_syscall_entry include/linux/ptrace.h:452 [inline]
+>   syscall_trace_enter+0x5d/0x150 kernel/entry/common.c:45
+>   syscall_enter_from_user_mode_work include/linux/entry-common.h:168 [inline]
+>   syscall_enter_from_user_mode include/linux/entry-common.h:198 [inline]
+>   do_syscall_64+0xcc/0x230 arch/x86/entry/common.c:79
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f708ebe0e20
+> Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d 81 e2 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+> RSP: 002b:00007ffd97b2a878 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+> RAX: ffffffffffffffda RBX: 0000000000000015 RCX: 00007f708ebe0e20
+> RDX: ffffffffffffffb8 RSI: 0000000020000240 RDI: 0000000000000014
+> RBP: 0000000000000000 R08: 00007ffd97b2a9a8 R09: 00007ffd97b2a9a8
+> R10: 00007ffd97b2a9a8 R11: 0000000000000202 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007ffd97b2a8b0 R15: 00007ffd97b2a8a0
+>   </TASK>
+> ---[ end trace ]---
+> ----------------
+> Code disassembly (best guess):
+>     0:	9c                   	pushf
+>     1:	8f 44 24 20          	pop    0x20(%rsp)
+>     5:	42 80 3c 23 00       	cmpb   $0x0,(%rbx,%r12,1)
+>     a:	74 08                	je     0x14
+>     c:	4c 89 f7             	mov    %r14,%rdi
+>     f:	e8 ce cf 5c f6       	call   0xf65ccfe2
+>    14:	f6 44 24 21 02       	testb  $0x2,0x21(%rsp)
+>    19:	75 52                	jne    0x6d
+>    1b:	41 f7 c7 00 02 00 00 	test   $0x200,%r15d
+>    22:	74 01                	je     0x25
+>    24:	fb                   	sti
+>    25:	bf 01 00 00 00       	mov    $0x1,%edi
+> * 2a:	e8 c3 69 c4 f5       	call   0xf5c469f2 <-- trapping instruction
+>    2f:	65 8b 05 04 5f 65 74 	mov    %gs:0x74655f04(%rip),%eax        # 0x74655f3a
+>    36:	85 c0                	test   %eax,%eax
+>    38:	74 43                	je     0x7d
+>    3a:	48                   	rex.W
+>    3b:	c7                   	.byte 0xc7
+>    3c:	04 24                	add    $0x24,%al
+>    3e:	0e                   	(bad)
+>    3f:	36                   	ss
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
