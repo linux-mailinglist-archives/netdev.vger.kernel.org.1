@@ -1,188 +1,200 @@
-Return-Path: <netdev+bounces-112163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149A19372FD
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 06:19:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A70D93732D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 07:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C868B2170E
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 04:19:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC152282491
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 05:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C80208BA;
-	Fri, 19 Jul 2024 04:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+15aOVZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12A7376E6;
+	Fri, 19 Jul 2024 05:12:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701AA3236
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 04:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246CE17BA1
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 05:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721362768; cv=none; b=YRlPslNO35627aYq5CLRvFsNNNKtrKeltvj5055geSvkUS5t3p4hep/3CgLsyXpZzVxMhfGL8yeRBib/1JxhT6V/0gn8D4WnNQCnPiV/YoaIj2II9c2UTShOLq+JIRAR7wa5VA58ddMgS2LrqSHMt05YeRjrP96QpwXPCXnEI1Q=
+	t=1721365945; cv=none; b=p3mNEe1rO5kSeUXUwnTg7R+rsPUhbdE5fh5yAqQ/6m6ifZnOTVUM1xE4g+mduCmYQV91cDfLXxLf9bmDKh4PaD+6mx4fGoJ5zWMcfsrv/LIwSBoLx/pLS1qWFVIiZxwN+lfU64EHR3mx5+9Xy7/9UNOhBzMEZL96np95CrUWWSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721362768; c=relaxed/simple;
-	bh=rayf3ltXbMBE84lbu2Hs6KG23jvrSSO3USRzEbCCOu4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jkSEqMM2cDbpfmML2ktlUHq9wW3z6jCro43avBDiaXsydrzQGIWQmGvC3xm0rn63An81XKgTYRb8IFLm4oENQY3yL6f29JJLuRDc6aT5i5KR1JgkCUxPfL0ktN5ObmVO/qKsPRmgVR+u2hl4AzNGIvm2pPM+I/VkzBH/6z/Sp5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+15aOVZ; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2cb4b7fef4aso725253a91.0
-        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 21:19:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721362767; x=1721967567; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CzzDdJbYzzvlTfbiOCs3k5jV/Uot05o3QbGXp8DdQd0=;
-        b=D+15aOVZ+CIWMF4Jt8ZO6C8OUIC0f3N8KbBjJNC3w991Wr86uOxl/r/4V9Xcnmd7CN
-         mBvA2uYtBnH0JGUVD/uQZOdsEM0s6IBOki38QdBKkRsPyf8JdzEVVuoSFVwcUSz0HtPS
-         wLMcZkjWOOuQ/kJzZ7l1gYKgi2JGAvszhx1KvO09ETcR21tXkyEcb/wyNpbyCxBNJSKv
-         5X60TI6vG3/3dEEUeLnPWKfvjRYYpxzlmyRncAzrAFYfp3VEpe8xBUqo0UG9E9FmpR2Z
-         vqlYlkdLo0rjDxPUY3kbAapNxAzDgB8v6C2gB8K7A7VDTDKaAeid0Qp2WJOFybrRHS2k
-         1S3A==
+	s=arc-20240116; t=1721365945; c=relaxed/simple;
+	bh=rzu2dXFAGxZihx9hsnAkMTT9JUHI7FYK+Z27tFdi/6c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=laEvWEJMPuiZBy7GWLTv77iIOfWK94P8OC4qg47H4m/pdtFBJ/QF1tnMseUrIIezmsz0ieufb/uXVVOyi8A9jaTkLvLj0FAtrWoNXwXcacNZN/HkbAtRAv+1Xzlf9xgyReBuXa0syNN6tagZuwC7mqpHHLjRarQ3rEo2uIN5aj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7fb15d52c5cso253325639f.3
+        for <netdev@vger.kernel.org>; Thu, 18 Jul 2024 22:12:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721362767; x=1721967567;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CzzDdJbYzzvlTfbiOCs3k5jV/Uot05o3QbGXp8DdQd0=;
-        b=Q7uwhzr/GCzWp8AeMrfihR2JXym78fHUaN6g150n0JTAGOusralyEFblA0e5VUhmaW
-         UnNfTQJmTmXwjzDKy2M+78tPZqPylk+Rd0J9r8Bsg2qoeeW8qDnT/rT0qtaNWUghVlrX
-         jvZDK/RVhHMQ7CaQ4CNQLVG0Oa5g163XBqMtkqzVJAWNI8vrH5ns7DRhPwBFOXCcw21y
-         A/JwzPUyGYU1heijlqr5wsBahghR8ffMF+S7HJs1yTg+ZbaVLRVHG5BAcxpPjnnAOlR6
-         B1mRYmsmDvT/9yH31jf6Xx8fDQ4eY4i5NcorLC+fW8K7kCwuk6KfZjLBfIBI/j3Bf6KR
-         wduQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXyr8/BWdVJk+vi6i4ydTgtDAFq6r6J0QMBGNJVQToOujZQtKC+Y6y2yRytJD3+Zxp7WuqGAVA0wZ8UAn56f0uRwmjojBgB
-X-Gm-Message-State: AOJu0YwEVOQ2soInoyLjM9fTmMu0DUHMSjGf7e1uLP7fBZxuTT/cIBgM
-	8cuqp5zn7Z76OU0t8E+I9Y+4BJR5Bt23S884lbvq9RQ38haEuznDq0ZMLGwa
-X-Google-Smtp-Source: AGHT+IEha0COo+WzghjWEvoLNOWm+Gu5uJgK6DjQw8gNHXRhGZnnT6p9En0G+4zRebOf4itmaKEjeQ==
-X-Received: by 2002:a17:90b:30ca:b0:2c8:ac1:d8c3 with SMTP id 98e67ed59e1d1-2cb52927e76mr6001588a91.29.1721362766575;
-        Thu, 18 Jul 2024 21:19:26 -0700 (PDT)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cb77540a84sm1609875a91.52.2024.07.18.21.19.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 21:19:25 -0700 (PDT)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	michael.chan@broadcom.com,
-	netdev@vger.kernel.org
-Cc: ap420073@gmail.com,
-	somnath.kotur@broadcom.com,
-	dw@davidwei.uk,
-	horms@kernel.org
-Subject: [PATCH net] bnxt_en: update xdp_rxq_info in queue restart logic
-Date: Fri, 19 Jul 2024 04:19:11 +0000
-Message-Id: <20240719041911.533320-1-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1721365943; x=1721970743;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WQm6CkqhlGN7Er6MHfpxutsEimneH/Rdq4u/3gPfltg=;
+        b=kxApAv6PIHiyNd5dtgjaYrfSCLM+JvKQVqNRDt4CkkhqeP8lRomHdt3ivdyLKOWr7M
+         0nJvlxF+3C6w3WTF4UWhYvBcoy69mOBYdFakz7SCXiW8xWqvFEU+uDESOkvXl3bdhSTg
+         34QnDzpmT7FXqceEcxKKJi6aUnQlXK76vEcwqUJRbFWYLrz2ev8U3CwkgOXS8adgOw2P
+         wK6lZP9mTuGjm8K2VghB6E6VPZY8TgOLOn0UeEbzw0io0xnaeZwcNKcEkIl3A/s0RsLT
+         GdMhoz3AGfST2AXVoOaQhBuWBXQv+AXjZ8M1pJw4fGoal1/8HpAJdV0+fSgW7IkCKE+V
+         NkoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVHBli5jrBEAG4gHoGeFjfq7yqeEGYOmxiHlDM75rDxH4oU/m4xzEFMNEbZ6a8BoyeQG1+N0ca6tHfRxBxCCfKm9nH8yAR6
+X-Gm-Message-State: AOJu0YxiPgfDTsIZANVCZvmUnnE689SqX7v65nVrsJZRfx8XCyjqE2UJ
+	Up8z8TbaePffQyWjKaMcYoEzAUrqAXUAFSqpKSxfYVa0xF/deqSXnBA3E05852//WkXxTgUNxyc
+	WuOwsixsNUZXgoF6z5B6tkRWsgHg6saBy+bhRZvcWSOJXJ+UfAxAL+yk=
+X-Google-Smtp-Source: AGHT+IFrU1x7qZiHaRS56a1WwAgFxNAvf21p2Sqw5cit1k9WfEoa6ZSM6funIRenq0ZA3Ck4My77TDdGR/hwG3+u/st97hlGq8eq
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:8403:b0:4b9:e5b4:67fd with SMTP id
+ 8926c6da1cb9f-4c2158c7954mr439994173.1.1721365943299; Thu, 18 Jul 2024
+ 22:12:23 -0700 (PDT)
+Date: Thu, 18 Jul 2024 22:12:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000943e1c061d92bdd6@google.com>
+Subject: [syzbot] [bpf?] [net?] KASAN: slab-use-after-free Read in bq_xmit_all
+From: syzbot <syzbot+707d98c8649695eaf329@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-When the netdev_rx_queue_restart() restarts queues, the bnxt_en driver
-updates(creates and deletes) a page_pool.
-But it doesn't update xdp_rxq_info, so the xdp_rxq_info is still
-connected to an old page_pool.
-So, bnxt_rx_ring_info->page_pool indicates a new page_pool, but
-bnxt_rx_ring_info->xdp_rxq is still connected to an old page_pool.
+Hello,
 
-An old page_pool is no longer used so it is supposed to be
-deleted by page_pool_destroy() but it isn't.
-Because the xdp_rxq_info is holding the reference count for it and the
-xdp_rxq_info is not updated, an old page_pool will not be deleted in
-the queue restart logic.
+syzbot found the following issue on:
 
-Before restarting 1 queue:
-./tools/net/ynl/samples/page-pool
-enp10s0f1np1[6] page pools: 4 (zombies: 0)
-	refs: 8192 bytes: 33554432 (refs: 0 bytes: 0)
-	recycling: 0.0% (alloc: 128:8048 recycle: 0:0)
+HEAD commit:    73399b58e5e5 Add linux-next specific files for 20240718
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=111f2195980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=54e443ddc2b981c8
+dashboard link: https://syzkaller.appspot.com/bug?extid=707d98c8649695eaf329
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1602cf31980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=106fde5e980000
 
-After restarting 1 queue:
-./tools/net/ynl/samples/page-pool
-enp10s0f1np1[6] page pools: 5 (zombies: 0)
-	refs: 10240 bytes: 41943040 (refs: 0 bytes: 0)
-	recycling: 20.0% (alloc: 160:10080 recycle: 1920:128)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fbab059c854f/disk-73399b58.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/874a209f4c3f/vmlinux-73399b58.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f34e5c7be278/bzImage-73399b58.xz
 
-Before restarting queues, an interface has 4 page_pools.
-After restarting one queue, an interface has 5 page_pools, but it
-should be 4, not 5.
-The reason is that queue restarting logic creates a new page_pool and
-an old page_pool is not deleted due to the absence of an update of
-xdp_rxq_info logic.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+707d98c8649695eaf329@syzkaller.appspotmail.com
 
-Fixes: 2d694c27d32e ("bnxt_en: implement netdev_queue_mgmt_ops")
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in ./kernel/bpf/devmap.c:385:28
+index 16 is out of range for type 'struct xdp_frame *[16]'
+CPU: 1 UID: 0 PID: 5101 Comm: syz-executor232 Not tainted 6.10.0-next-20240718-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ ubsan_epilogue lib/ubsan.c:231 [inline]
+ __ubsan_handle_out_of_bounds+0x121/0x150 lib/ubsan.c:429
+ bq_xmit_all+0x157/0x11d0 kernel/bpf/devmap.c:385
+ __dev_flush+0x81/0x160 kernel/bpf/devmap.c:425
+ xdp_do_check_flushed+0x129/0x240 net/core/filter.c:4300
+ __napi_poll+0xe4/0x490 net/core/dev.c:6774
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0x89b/0x1240 net/core/dev.c:6962
+ handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+ common_interrupt+0xaa/0xd0 arch/x86/kernel/irq.c:278
+ </IRQ>
+ <TASK>
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+RIP: 0010:_raw_spin_unlock_irqrestore+0xd8/0x140 kernel/locking/spinlock.c:194
+Code: 9c 8f 44 24 20 42 80 3c 23 00 74 08 4c 89 f7 e8 ce cf 5c f6 f6 44 24 21 02 75 52 41 f7 c7 00 02 00 00 74 01 fb bf 01 00 00 00 <e8> c3 69 c4 f5 65 8b 05 04 5f 65 74 85 c0 74 43 48 c7 04 24 0e 36
+RSP: 0018:ffffc9000369fb60 EFLAGS: 00000206
+RAX: 3e45100d05912800 RBX: 1ffff920006d3f70 RCX: ffffffff817023ea
+RDX: dffffc0000000000 RSI: ffffffff8bcad5c0 RDI: 0000000000000001
+RBP: ffffc9000369fbf0 R08: ffffffff9300f817 R09: 1ffffffff2601f02
+R10: dffffc0000000000 R11: fffffbfff2601f03 R12: dffffc0000000000
+R13: 1ffff920006d3f6c R14: ffffc9000369fb80 R15: 0000000000000246
+ spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+ do_notify_parent_cldstop+0x9ab/0xb50 kernel/signal.c:2216
+ ptrace_stop+0x465/0x940 kernel/signal.c:2319
+ ptrace_do_notify kernel/signal.c:2393 [inline]
+ ptrace_notify+0x255/0x380 kernel/signal.c:2405
+ ptrace_report_syscall include/linux/ptrace.h:415 [inline]
+ ptrace_report_syscall_entry include/linux/ptrace.h:452 [inline]
+ syscall_trace_enter+0x5d/0x150 kernel/entry/common.c:45
+ syscall_enter_from_user_mode_work include/linux/entry-common.h:168 [inline]
+ syscall_enter_from_user_mode include/linux/entry-common.h:198 [inline]
+ do_syscall_64+0xcc/0x230 arch/x86/entry/common.c:79
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f708ebe0e20
+Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d 81 e2 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+RSP: 002b:00007ffd97b2a878 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000015 RCX: 00007f708ebe0e20
+RDX: ffffffffffffffb8 RSI: 0000000020000240 RDI: 0000000000000014
+RBP: 0000000000000000 R08: 00007ffd97b2a9a8 R09: 00007ffd97b2a9a8
+R10: 00007ffd97b2a9a8 R11: 0000000000000202 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007ffd97b2a8b0 R15: 00007ffd97b2a8a0
+ </TASK>
+---[ end trace ]---
+----------------
+Code disassembly (best guess):
+   0:	9c                   	pushf
+   1:	8f 44 24 20          	pop    0x20(%rsp)
+   5:	42 80 3c 23 00       	cmpb   $0x0,(%rbx,%r12,1)
+   a:	74 08                	je     0x14
+   c:	4c 89 f7             	mov    %r14,%rdi
+   f:	e8 ce cf 5c f6       	call   0xf65ccfe2
+  14:	f6 44 24 21 02       	testb  $0x2,0x21(%rsp)
+  19:	75 52                	jne    0x6d
+  1b:	41 f7 c7 00 02 00 00 	test   $0x200,%r15d
+  22:	74 01                	je     0x25
+  24:	fb                   	sti
+  25:	bf 01 00 00 00       	mov    $0x1,%edi
+* 2a:	e8 c3 69 c4 f5       	call   0xf5c469f2 <-- trapping instruction
+  2f:	65 8b 05 04 5f 65 74 	mov    %gs:0x74655f04(%rip),%eax        # 0x74655f3a
+  36:	85 c0                	test   %eax,%eax
+  38:	74 43                	je     0x7d
+  3a:	48                   	rex.W
+  3b:	c7                   	.byte 0xc7
+  3c:	04 24                	add    $0x24,%al
+  3e:	0e                   	(bad)
+  3f:	36                   	ss
+
+
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index bb3be33c1bbd..11d8459376a9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4052,6 +4052,7 @@ static void bnxt_reset_rx_ring_struct(struct bnxt *bp,
- 
- 	rxr->page_pool->p.napi = NULL;
- 	rxr->page_pool = NULL;
-+	memset(&rxr->xdp_rxq, 0, sizeof(struct xdp_rxq_info));
- 
- 	ring = &rxr->rx_ring_struct;
- 	rmem = &ring->ring_mem;
-@@ -15018,6 +15019,16 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
- 	if (rc)
- 		return rc;
- 
-+	rc = xdp_rxq_info_reg(&clone->xdp_rxq, bp->dev, idx, 0);
-+	if (rc < 0)
-+		goto err_page_pool_destroy;
-+
-+	rc = xdp_rxq_info_reg_mem_model(&clone->xdp_rxq,
-+					MEM_TYPE_PAGE_POOL,
-+					clone->page_pool);
-+	if (rc)
-+		goto err_rxq_info_unreg;
-+
- 	ring = &clone->rx_ring_struct;
- 	rc = bnxt_alloc_ring(bp, &ring->ring_mem);
- 	if (rc)
-@@ -15047,6 +15058,9 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
- 	bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
- err_free_rx_ring:
- 	bnxt_free_ring(bp, &clone->rx_ring_struct.ring_mem);
-+err_rxq_info_unreg:
-+	xdp_rxq_info_unreg(&clone->xdp_rxq);
-+err_page_pool_destroy:
- 	clone->page_pool->p.napi = NULL;
- 	page_pool_destroy(clone->page_pool);
- 	clone->page_pool = NULL;
-@@ -15065,6 +15079,8 @@ static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
- 	page_pool_destroy(rxr->page_pool);
- 	rxr->page_pool = NULL;
- 
-+	xdp_rxq_info_unreg(&rxr->xdp_rxq);
-+
- 	ring = &rxr->rx_ring_struct;
- 	bnxt_free_ring(bp, &ring->ring_mem);
- 
-@@ -15145,6 +15161,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 	rxr->rx_sw_agg_prod = clone->rx_sw_agg_prod;
- 	rxr->rx_next_cons = clone->rx_next_cons;
- 	rxr->page_pool = clone->page_pool;
-+	memcpy(&rxr->xdp_rxq, &clone->xdp_rxq, sizeof(struct xdp_rxq_info));
- 
- 	bnxt_copy_rx_ring(bp, rxr, clone);
- 
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
