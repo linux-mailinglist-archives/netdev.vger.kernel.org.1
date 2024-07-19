@@ -1,90 +1,131 @@
-Return-Path: <netdev+bounces-112159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F6A9372CE
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 05:41:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3700D9372D7
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 05:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32B61C21223
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 03:41:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF851F21F36
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 03:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8527C18EAD;
-	Fri, 19 Jul 2024 03:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E207171C9;
+	Fri, 19 Jul 2024 03:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="upO//+/5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N5i/y1Lr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE949B647;
-	Fri, 19 Jul 2024 03:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDF12C1BA;
+	Fri, 19 Jul 2024 03:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721360481; cv=none; b=tQQK1Ks6wxBA3xAPeLR0+BcJI3AikGwnza6gEALA6r+ptZv0w/XdeKR+6FLbKMaMtLsk0WhTAeEuFV9rLfGxol5QE3JRLXYHZtWDFFy86v9b5vW/wtIS3C27tK7Iwx5YgCMD+b2Y56vc2L1oK3ldVYhNn9Rk/pCQuLHe/4rh3mI=
+	t=1721360827; cv=none; b=cPm6Q5hCA4IO3kR8LGjRyoDmdlY9OsGXQOAQY0M+Ex1vk4weTclZ7WWK2gLhUKrr4ixEzU6WWKI3Uc0oR+EmBUXfocWkbbDrHj+Ja1bkmbtjSbO7QIRnHMwh7akGrq9GHfeidSyoo7BZI6YPfJSIzMS0jW8NzjUa5ucspwLiP6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721360481; c=relaxed/simple;
-	bh=4WKdQq8GuoIscG7M0jS8ZeXv9mS/vGyTZ9wTvMGupak=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XChF0wo7B7quM0/iAEKQYXLMmSs0hv3yCKhFK+xsMyDDCyzI2dil20l3Nd7qpODTng2vfOLYu9mYIhXKd2VsoVuU/yeEsNz32LPghSWChKWOv6wJa/T+eB7bhwpgpGMQSEo551nAX9Mdv4Ol3czwdPrAucCtfvixriYuNXFQo+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=upO//+/5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LccjuBpq1WI9w8ftUT3alSqaP6+1EeLDsXgofkwSyXw=; b=upO//+/5SvhSGctofyVU7VFUOi
-	R5uCSVv9Oua7ozMH79AKrh/0DJFYI5JzPv+fsFPGps/jiNkNqLZ2s9uMFLt/uRJCepOM+TS6dbv4h
-	tC2yP1fvfgtMF7VjRccUA1wr0NVTPVh/CTsTYvbcdHBO4Fulr2KCNOcxc5m2qgTEczP4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sUeUT-002oc2-QT; Fri, 19 Jul 2024 05:41:05 +0200
-Date: Fri, 19 Jul 2024 05:41:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	Brad Griffis <bgriffis@nvidia.com>
-Subject: Re: [RESEND PATCH net-next v3 3/4] net: phy: aquantia: wait for the
- GLOBAL_CFG to start returning real values
-Message-ID: <708b9c82-afdd-46b7-ad63-b0e65be23b6b@lunn.ch>
-References: <20240708075023.14893-1-brgl@bgdev.pl>
- <20240708075023.14893-4-brgl@bgdev.pl>
- <7c0140be-4325-4005-9068-7e0fc5ff344d@nvidia.com>
- <CAMRc=McF93F6YsQ+eT9oOe+c=2ZCQ3rBdj+-3Ruy8iO1B-syjw@mail.gmail.com>
- <CAMRc=Mc=8Sa76TOZujMMZcaF2Dc8OL_HKo=gXuj-YALaH4zKHg@mail.gmail.com>
- <6e12f5a5-8007-4ddc-a5ad-be556656af71@nvidia.com>
+	s=arc-20240116; t=1721360827; c=relaxed/simple;
+	bh=Pmihlnn/dQptJI+Hq2xL/tv7JYrWqbhgus0F/Tlyerc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Tb5OZyLmiHezBG5fsTYn92m/1A9r55DjOLOmiitwSCXoNRz149OS2QSkeAycFACPEkLcEc+QuiKNVBTi6Q7A4hCzVCJfOEyDHXZwW3/aHRIlTiu40ISXldelxFPmPEGwJ0Wpdk17tPNaGuKxmYYG4IUuoqlGN3Jar43DZGEyv1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N5i/y1Lr; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-81f91171316so1113840241.0;
+        Thu, 18 Jul 2024 20:47:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721360825; x=1721965625; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sp6drrNzfbzSqsVZ8Tan+TwIGIyIdS/jLO+8J7vaOrw=;
+        b=N5i/y1LrmDd7qCSKYLe2RbqVvs7Df5DSYPUoNMjgotvMCrAC8SI9hBNYpqzjeUQV+v
+         jSfo9897Pr2pdqKf44nYwt/eXcyhSGsFToNG4N8aiukfSv34PLsA6EoVjXVHm5W7vN0f
+         MMye7Y/DdfrlmyHdopL08T6Hb1VaaHjb0n9e8x3rbhw7YaW40iA7NmcchuH2VdAiNmJd
+         Uy7ID+8BnPH5wSfy60gyNDyMlwtTl6+r5B6yRtg4QjHezXbURIjrNbygY6wMHkUiXiLc
+         LE5iU6C1Ol9SRVGYFDTZwT4ld0Arf9v5KYK5KG2izE7039IUVlFr4d3MM7CNeBnTGN0m
+         VEng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721360825; x=1721965625;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Sp6drrNzfbzSqsVZ8Tan+TwIGIyIdS/jLO+8J7vaOrw=;
+        b=H8cQ7zvWDk3Rdd9AT72HF9JZ5F6ppZj0QdouJNM9RM93erjLGtZb8LycUjzMl1XlBe
+         pkA+vVCnh/q6IxxWi+14Fv6PvFnQ0GEuAMdbAMxtmD8c6whE+rB3/tvcCova1e75lW8l
+         2urBiqKPoDanQ1S0yAs4RS47tAHbjpBZ5a1S1tUUyg0AZJNHjONbD7aMJ2jcvt5mYm1q
+         Ta/USZ6BiI8G6qx87WtHbefUAp3iP7/asZ0a5pK1EFSTWrSf4D77rojFpShbmcALjZ0i
+         iKzpz9oqXqjPiKWoYJh5CMu514Dba+gFLfecqL0HhIeG7gSBIJeX3OSZEbp3XFrOrq4b
+         KtCA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8HAju9YfUbz/8raR15Q2/pslKy1jjydKsvaX8zriHf3yhQ7+w8i0IZ0jwz5OEjFO9Y6T6g9IobFlpBgfRBXf3W5wzzFip
+X-Gm-Message-State: AOJu0Yy8KfNAovQBJUUgCSanMXgOL39d17InK17+SuwaCbRKr9GAmNyI
+	Kc/e4UqJ/OY18IgIdT0DPqbiBXY0OmhbpktLr3DHRCGbI8oB1TR3IDI2ZHPt63NBGMaWBZilfbd
+	kUQjGHk78bU0fuJdvejMT0QlO3Ks=
+X-Google-Smtp-Source: AGHT+IGDQGxGl5bxypB9sF1D7jmfnImAmSa4egh61YyG9pvEkcyF0IT+0CSzxg7mNf7Y4pQbFwx+6U3JNMUlcuMDEwc=
+X-Received: by 2002:a05:6102:3f92:b0:491:36b0:33a4 with SMTP id
+ ada2fe7eead31-4925c25d1dfmr5232683137.14.1721360825186; Thu, 18 Jul 2024
+ 20:47:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e12f5a5-8007-4ddc-a5ad-be556656af71@nvidia.com>
+References: <20240718190221.2219835-1-pkaligineedi@google.com>
+ <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch> <CA+f9V1PsjukhgLDjWQvbTyhHkOWt7JDY0zPWc_G322oKmasixA@mail.gmail.com>
+In-Reply-To: <CA+f9V1PsjukhgLDjWQvbTyhHkOWt7JDY0zPWc_G322oKmasixA@mail.gmail.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 18 Jul 2024 23:46:28 -0400
+Message-ID: <CAF=yD-L67uvVOrmEFz=LOPP9pr7NByx9DhbS8oWMkkNCjRWqLg@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Fix an edge case for TSO skb validity check
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, shailend@google.com, 
+	hramamurthy@google.com, csully@google.com, jfraker@google.com, 
+	stable@vger.kernel.org, Bailey Forrest <bcf@google.com>, 
+	Jeroen de Borst <jeroendb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Interestingly, the product brief for these PHYs [0] do show that both the
-> AQR113C and AQR115C both support 10M. So I wonder if it is our ethernet
-> controller that is not supporting 10M? I will check on this too.
+On Thu, Jul 18, 2024 at 9:52=E2=80=AFPM Praveen Kaligineedi
+<pkaligineedi@google.com> wrote:
+>
+> On Thu, Jul 18, 2024 at 4:07=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+>
+> > > +                      * segment, then it will count as two descripto=
+rs.
+> > > +                      */
+> > > +                     if (last_frag_size > GVE_TX_MAX_BUF_SIZE_DQO) {
+> > > +                             int last_frag_remain =3D last_frag_size=
+ %
+> > > +                                     GVE_TX_MAX_BUF_SIZE_DQO;
+> > > +
+> > > +                             /* If the last frag was evenly divisibl=
+e by
+> > > +                              * GVE_TX_MAX_BUF_SIZE_DQO, then it wil=
+l not be
+> > > +                              * split in the current segment.
+> >
+> > Is this true even if the segment did not start at the start of the frag=
+?
+> The comment probably is a bit confusing here. The current segment
+> we are tracking could have a portion in the previous frag. The code
+> assumed that the portion on the previous frag (if present) mapped to only
+> one descriptor. However, that portion could have been split across two
+> descriptors due to the restriction that each descriptor cannot exceed 16K=
+B.
 
-The PHY should enumerate what it supports, look at
-genphy_read_abilities(), which reads the Basic Mode Status Register,
-and there are bits in there which indicate if the PHY supports 10Half
-and 10Full.
+>>> /* If the last frag was evenly divisible by
+>>> +                                * GVE_TX_MAX_BUF_SIZE_DQO, then it wil=
+l not be
+>>>  +                              * split in the current segment.
 
-The MAC should also be indicating what it support, and ethtool will be
-showing you the combination of the two.
+This is true because the smallest multiple of 16KB is 32KB, and the
+largest gso_size at least for Ethernet will be 9K. But I don't think
+that that is what is used here as the basis for this statement?
 
-	Andrew
+> That's the case this fix is trying to address.
+> I will work on simplifying the logic based on your suggestion below so
+> that the fix is easier to follow
 
