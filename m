@@ -1,877 +1,203 @@
-Return-Path: <netdev+bounces-112188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26FF937563
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:56:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3252B937568
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F1221C208E1
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:56:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2383F1C20C75
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A267D79B96;
-	Fri, 19 Jul 2024 08:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349E569959;
+	Fri, 19 Jul 2024 08:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="KS1n2iKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59503236
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 08:56:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA59F3236
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 08:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721379370; cv=none; b=ekQO6adtie8sYpUiJF8IE9ucIzeWN/yyoBmxKUt710yyG63kYpQSQFLGq2KLyHcM8nr/aB/N5y1w1rKNcJ4Bk/NqUwHIOeq6itllbDhMv1zNeHUNkWNZh3wmi8UpfumlMWUzi20vizkcN285Ak9Uc958Vi7yHIHfz1g4PVdEuFQ=
+	t=1721379448; cv=none; b=UPumazdQBjtKR3ulRs5njuTPk24X1aiKIZ956FNtWTieAuz60E16ZDeOmTBny2Nu7U00shQRv00rkO+Q8Iseh03Xdtozek/7tnzOoa5bBpP/Ysrm88RTh+MEVKobpc0EtXCj68KQdJKQbqhTKVvbUK9FzezJtVO8dHz7S969bB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721379370; c=relaxed/simple;
-	bh=5j0SLQGKtMOAZv2oPX9pNkF7hfx9JNWbVUkLwZk/ccY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nQKpcvrEjFCikThxsJVcxcrEHxqDnA1cUYApe8fqpSJBetTLihnEzXY0NpnbCqAQfeyVkBdRJhZtdRJKVNlxIQ4fYaDiJ1sWCZ5wSNYOsVHZkXAqfjsAwTmYm/HeNn6HdYyOt0QbqbU7pCs2cwbDdOPpwJtXrcD10wEzSUpb+1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <fpf@pengutronix.de>)
-	id 1sUjPI-0006f7-MW; Fri, 19 Jul 2024 10:56:04 +0200
-Received: from [2a0a:edc0:0:1101:1d::54] (helo=dude05.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <fpf@pengutronix.de>)
-	id 1sUjPI-000e2c-57; Fri, 19 Jul 2024 10:56:04 +0200
-Received: from fpf by dude05.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <fpf@pengutronix.de>)
-	id 1sUjPI-009o4D-0L;
-	Fri, 19 Jul 2024 10:56:04 +0200
-From: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-To: mkubecek@suse.cz,
-	netdev@vger.kernel.org
-Cc: entwicklung@pengutronix.de,
-	Fabian Pfitzner <f.pfitzner@pengutronix.de>
-Subject: [PATCH v2 ethtool]: add json support for base command
-Date: Fri, 19 Jul 2024 10:55:44 +0200
-Message-Id: <20240719085544.2337393-1-f.pfitzner@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1721379448; c=relaxed/simple;
+	bh=Ogq5tK5optkI/YJuFWc2cPNg8VNTe7LUcyZXqa4LNdo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r+IF0FOchavuZxIYx3ib89uXO12F6mytSgmNwZafm7ZNFGsjlWHko+kEVc0hEB/+WIMw9nAlDKYvU130JIWuz5XC0vjgrmTc0mBZYNZxvnBYwgdlq793uVCRpDGqTkrBDzj4TePWWagTrmS3rTEZcai+zRidrkQSXw17INuQKyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=KS1n2iKK; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4267300145eso11255485e9.3
+        for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 01:57:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1721379444; x=1721984244; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=O+GwNeposPn0azjqs5L0s0p7UJDRFvmFbvIU73Nfjfs=;
+        b=KS1n2iKKOz5CsSsii0tLX8YKM0Fy1qTku3s8gduQ2ArS/Okj0bAQCUybP+dWNCndB2
+         0m8+eaNgiNotJuZGkvpxMVmzR8VQSpc6S9y376a4lj8yXeGxcvX6Nf3LZ119qhUqMuot
+         4GVUS4TKssxBm70T+7g/bHe75CL65/XLCBT5JrTS9Tgcl8AuJ9egUJV2LgRhBQmb0j2K
+         thJaxZUzomEKKUwN/QU4ALY+Rq4EZvfF16c2W7aZF3fJeF4bWDxlCONFLUzezVnhSR4R
+         TjSOHKQLcRN7mnSvKJb4gPf5+lt9bg+vRfywJDbZ9TjXPZhPCU9W49tKhphXzb2jl2ov
+         KiyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721379444; x=1721984244;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O+GwNeposPn0azjqs5L0s0p7UJDRFvmFbvIU73Nfjfs=;
+        b=BzcoyvV86WpkLD9g+GgkFJaM3i+92sURJ0l/P+80x3VSgDhbIkaM34t2Zcu74ziYgk
+         fkxpMoOw4m2rqbOwbj4Vk2FRbRy6RHTgYukWX3plDDqcjBotyfoDMXZjBAO+cQshFcTj
+         3ohlizEd59a0e0H6Mk4NtcUvlkb3Hd+sfrxpMRrqml66VvGwvj1xhFxmQFN8kLWrPns6
+         GZf+RK02IwfwE7vHqkGKskb71GTN4sC5GH1KB/cRQPHe/6MR0/C8QbeOn0v5Ug9Q5SVO
+         0B6OV2TRCsjok/WD2BFqMhB79uGJmw65jhiIN/oBX1BEKvpgc2z5Fvqn8ZwwVWVexjUy
+         Y/lg==
+X-Forwarded-Encrypted: i=1; AJvYcCV6yv8o044nlkVOVfhtqzkepl7bsGXSlEUOLr5CnMMJW7P3+yjbevTvwLSHjrGUvNw7qrV8B6SL2KxLpAMmSMRiceVIE7OR
+X-Gm-Message-State: AOJu0YxF5++sbr6mmmBi30/vGlkVx/ku490+QYFCzA3ys4GOcnUsmCWm
+	a3x+7unkPp4D/A8juF4qJCnHbwXO6ACUSI5NH5XRS4J3YKjJT2+U/5dpEZHRqAk=
+X-Google-Smtp-Source: AGHT+IETf7Y2O2C2xAlZptcgHLPEEybvcLxQefx2VRaYDRKI7tkxAaDSbLR5X0qS3h6Ae0giET0NMA==
+X-Received: by 2002:a5d:6488:0:b0:367:4dce:1ff4 with SMTP id ffacd0b85a97d-368315f1e56mr7333514f8f.14.1721379444034;
+        Fri, 19 Jul 2024 01:57:24 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:4e9d:c9b7:21b6:5935? ([2001:67c:2fbc:1:4e9d:c9b7:21b6:5935])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36878694450sm1017390f8f.51.2024.07.19.01.57.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jul 2024 01:57:23 -0700 (PDT)
+Message-ID: <4ec02430-e1e1-4180-857b-14c4591e7d87@openvpn.net>
+Date: Fri, 19 Jul 2024 10:59:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: fpf@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 17/25] ovpn: implement keepalive mechanism
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
+ kuba@kernel.org, ryazanov.s.a@gmail.com, pabeni@redhat.com,
+ edumazet@google.com
+References: <20240627130843.21042-1-antonio@openvpn.net>
+ <20240627130843.21042-18-antonio@openvpn.net> <ZpU15_ZNAV5ysnCC@hog>
+ <73a305c5-57c1-40d9-825e-9e8390e093db@openvpn.net>
+ <69bab34d-2bf2-48b8-94f7-748ed71c07d3@lunn.ch>
+ <4c26fc98-1748-4344-bb1c-11d8d47cc3eb@openvpn.net>
+ <ea6e8939-5dc2-4322-a67f-207a6aa65da9@lunn.ch>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ea6e8939-5dc2-4322-a67f-207a6aa65da9@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Most subcommands already implement json support for their output. The
-base command (without supplying any subcommand) still lacks this
-option. This patch implments the needed changes to get json output,
-which is printed via "ethtool --json [iface]"
+On 19/07/2024 05:31, Andrew Lunn wrote:
+> On Thu, Jul 18, 2024 at 09:46:00AM +0200, Antonio Quartulli wrote:
+>> On 18/07/2024 04:01, Andrew Lunn wrote:
+>>>>>> +		if (ovpn_is_keepalive(skb)) {
+>>>>>> +			netdev_dbg(peer->ovpn->dev,
+>>>>>> +				   "ping received from peer %u\n", peer->id);
+>>>>>
+>>>>> That should probably be _ratelimited, but it seems we don't have
+>>>>> _ratelimited variants for the netdev_* helpers.
+>>>>
+>>>> Right.
+>>>> I have used the net_*_ratelimited() variants when needed.
+>>>> Too bad we don't have those.
+>>>
+>>> If you think netdev_dbg_ratelimited() would be useful, i don't see why
+>>> you cannot add it.
+>>>
+>>> I just did an search and found something interesting in the history:
+>>>
+>>> https://lore.kernel.org/all/20190809002941.15341-1-liuhangbin@gmail.com/T/#u
+>>>
+>>> Maybe limit it to netdev_dbg_ratelimited() to avoid the potential
+>>> abuse DaveM was worried about.
+>>
+>> I see what Dave says however...
+>>
+>> ...along the packet processing routine there are several messages (some are
+>> err or warn or info) which require ratelimiting.
+>> Otherwise you end up with a gazilion log entries in case of a long lasting
+>> issue.
+>>
+>> Right now I am using net_dbg/warn/err/info_ratelimited(), therefore not
+>> having a netdev counterpart is not really helping with Dave's argument.
+> 
+> Yes, i think Dave' argument is weak because these alternatives
+> exist. Maybe they did not at the time?
 
-The following design decision were made during implementation:
-- json values like Yes/No are printed as true/false
-- values that are "Unknown" are not printed at all
-- all other json values are not changed
-- keys are printed in lowercase with dashes in between
+They did and it's exactly what Hangbin was introducing:
 
-Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
----
-Changes in v2:
-- Fix wrong indentation
-- Switch fputs's output stream to stderr. This prevents messing up the
-  json output as it gets printed on stdout
+https://lore.kernel.org/all/20190801090347.8258-1-liuhangbin@gmail.com/
 
- common.c           |  70 ++++++++----
- ethtool.c          |   1 +
- netlink/eee.c      |   6 +-
- netlink/netlink.h  |   2 +-
- netlink/settings.c | 269 ++++++++++++++++++++++++++++-----------------
- test-cmdline.c     |   1 +
- 6 files changed, 225 insertions(+), 124 deletions(-)
+before being suggested by Joe to implement the new macros:
 
-diff --git a/common.c b/common.c
-index b8fd4d5..4fda4b4 100644
---- a/common.c
-+++ b/common.c
-@@ -5,6 +5,7 @@
-  */
- 
- #include "internal.h"
-+#include "json_print.h"
- #include "common.h"
- 
- #ifndef HAVE_NETIF_MSG
-@@ -129,21 +130,28 @@ static char *unparse_wolopts(int wolopts)
- 
- int dump_wol(struct ethtool_wolinfo *wol)
- {
--	fprintf(stdout, "	Supports Wake-on: %s\n",
--		unparse_wolopts(wol->supported));
--	fprintf(stdout, "	Wake-on: %s\n",
--		unparse_wolopts(wol->wolopts));
-+	print_string(PRINT_ANY, "supports-wake-on",
-+		    "	Supports Wake-on: %s\n", unparse_wolopts(wol->supported));
-+	print_string(PRINT_ANY, "wake-on",
-+		    "	Wake-on: %s\n", unparse_wolopts(wol->wolopts));
-+
- 	if (wol->supported & WAKE_MAGICSECURE) {
- 		int i;
- 		int delim = 0;
- 
--		fprintf(stdout, "        SecureOn password: ");
-+		open_json_array("secureon-password", "");
-+		if (!is_json_context())
-+			fprintf(stdout, "        SecureOn password: ");
- 		for (i = 0; i < SOPASS_MAX; i++) {
--			fprintf(stdout, "%s%02x", delim ? ":" : "",
--				wol->sopass[i]);
-+			__u8 sopass = wol->sopass[i];
-+
-+			if (!is_json_context())
-+				fprintf(stdout, "%s%02x", delim ? ":" : "", sopass);
-+			else
-+				print_hex(PRINT_JSON, NULL, "%02u", sopass);
- 			delim = 1;
- 		}
--		fprintf(stdout, "\n");
-+		close_json_array("\n");
- 	}
- 
- 	return 0;
-@@ -151,26 +159,50 @@ int dump_wol(struct ethtool_wolinfo *wol)
- 
- void dump_mdix(u8 mdix, u8 mdix_ctrl)
- {
--	fprintf(stdout, "	MDI-X: ");
-+	bool mdi_x = false;
-+	bool mdi_x_forced = false;
-+	bool mdi_x_auto = false;
-+
- 	if (mdix_ctrl == ETH_TP_MDI) {
--		fprintf(stdout, "off (forced)\n");
-+		mdi_x = false;
-+		mdi_x_forced = true;
- 	} else if (mdix_ctrl == ETH_TP_MDI_X) {
--		fprintf(stdout, "on (forced)\n");
-+		mdi_x = true;
-+		mdi_x_forced = true;
- 	} else {
- 		switch (mdix) {
--		case ETH_TP_MDI:
--			fprintf(stdout, "off");
--			break;
- 		case ETH_TP_MDI_X:
--			fprintf(stdout, "on");
-+			mdi_x = true;
- 			break;
- 		default:
--			fprintf(stdout, "Unknown");
--			break;
-+			print_string(PRINT_FP, NULL, "\tMDI-X: %s\n", "Unknown");
-+			return;
- 		}
- 		if (mdix_ctrl == ETH_TP_MDI_AUTO)
--			fprintf(stdout, " (auto)");
--		fprintf(stdout, "\n");
-+			mdi_x_auto = true;
-+	}
-+
-+	if (is_json_context()) {
-+		print_bool(PRINT_JSON, "mdi-x", NULL, mdi_x);
-+		print_bool(PRINT_JSON, "mdi-x-forced", NULL, mdi_x_forced);
-+		print_bool(PRINT_JSON, "mdi-x-auto", NULL, mdi_x_auto);
-+	} else {
-+		fprintf(stdout, "	MDI-X: ");
-+		if (mdi_x_forced) {
-+			if (mdi_x)
-+				fprintf(stdout, "on (forced)\n");
-+			else
-+				fprintf(stdout, "off (forced)\n");
-+		} else {
-+			if (mdi_x)
-+				fprintf(stdout, "on");
-+			else
-+				fprintf(stdout, "off");
-+
-+			if (mdi_x_auto)
-+				fprintf(stdout, " (auto)");
-+			fprintf(stdout, "\n");
-+		}
- 	}
- }
- 
-diff --git a/ethtool.c b/ethtool.c
-index e587597..73c26e2 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -5731,6 +5731,7 @@ static const struct option args[] = {
- 	{
- 		/* "default" entry when no switch is used */
- 		.opts	= "",
-+		.json	= true,
- 		.func	= do_gset,
- 		.nlfunc	= nl_gset,
- 		.help	= "Display standard information about device",
-diff --git a/netlink/eee.c b/netlink/eee.c
-index 04d8f0b..6c53756 100644
---- a/netlink/eee.c
-+++ b/netlink/eee.c
-@@ -69,19 +69,19 @@ int eee_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 	ret = dump_link_modes(nlctx, tb[ETHTOOL_A_EEE_MODES_OURS], true,
- 			      LM_CLASS_REAL,
- 			      "Supported EEE link modes:  ", NULL, "\n",
--			      "Not reported");
-+			      "Not reported", "supported-eee-link-modes");
- 	if (ret < 0)
- 		return err_ret;
- 	ret = dump_link_modes(nlctx, tb[ETHTOOL_A_EEE_MODES_OURS], false,
- 			      LM_CLASS_REAL,
- 			      "Advertised EEE link modes:  ", NULL, "\n",
--			      "Not reported");
-+			      "Not reported", "advertised-eee-link-modes");
- 	if (ret < 0)
- 		return err_ret;
- 	ret = dump_link_modes(nlctx, tb[ETHTOOL_A_EEE_MODES_PEER], false,
- 			      LM_CLASS_REAL,
- 			      "Link partner advertised EEE link modes:  ", NULL,
--			      "\n", "Not reported");
-+			      "\n", "Not reported", "link-partner-advertised-eee-link-modes");
- 	if (ret < 0)
- 		return err_ret;
- 
-diff --git a/netlink/netlink.h b/netlink/netlink.h
-index 1274a3b..4a4b68b 100644
---- a/netlink/netlink.h
-+++ b/netlink/netlink.h
-@@ -98,7 +98,7 @@ int module_reply_cb(const struct nlmsghdr *nlhdr, void *data);
- int dump_link_modes(struct nl_context *nlctx, const struct nlattr *bitset,
- 		    bool mask, unsigned int class, const char *before,
- 		    const char *between, const char *after,
--		    const char *if_none);
-+		    const char *if_none, const char *json_key);
- 
- static inline void show_u32(const char *key,
- 			    const char *fmt,
-diff --git a/netlink/settings.c b/netlink/settings.c
-index a506618..9dd688b 100644
---- a/netlink/settings.c
-+++ b/netlink/settings.c
-@@ -11,6 +11,8 @@
- 
- #include "../internal.h"
- #include "../common.h"
-+#include "json_print.h"
-+#include "json_writer.h"
- #include "netlink.h"
- #include "strset.h"
- #include "bitset.h"
-@@ -192,15 +194,21 @@ static bool lm_class_match(unsigned int mode, enum link_mode_class class)
- }
- 
- static void print_enum(const char *const *info, unsigned int n_info,
--		       unsigned int val, const char *label)
-+		       unsigned int val, const char *label, const char *json_key)
- {
--	if (val >= n_info || !info[val])
--		printf("\t%s: Unknown! (%d)\n", label, val);
--	else
--		printf("\t%s: %s\n", label, info[val]);
-+	if (val >= n_info || !info[val]) {
-+		if (!is_json_context())
-+			printf("\t%s: Unknown! (%d)\n", label, val);
-+	} else {
-+		if (!is_json_context())
-+			printf("\t%s: %s\n", label, info[val]);
-+		else
-+			print_string(PRINT_JSON, json_key, "%s", info[val]);
-+	}
- }
- 
--static int dump_pause(const struct nlattr *attr, bool mask, const char *label)
-+static int dump_pause(const struct nlattr *attr, bool mask, const char *label,
-+		      const char *label_json)
- {
- 	bool pause, asym;
- 	int ret = 0;
-@@ -213,11 +221,13 @@ static int dump_pause(const struct nlattr *attr, bool mask, const char *label)
- 	if (ret < 0)
- 		goto err;
- 
--	printf("\t%s", label);
-+	if (!is_json_context())
-+		printf("\t%s", label);
- 	if (pause)
--		printf("%s\n", asym ?  "Symmetric Receive-only" : "Symmetric");
-+		print_string(PRINT_ANY, label_json, "%s\n",
-+			     asym ?  "Symmetric Receive-only" : "Symmetric");
- 	else
--		printf("%s\n", asym ? "Transmit-only" : "No");
-+		print_string(PRINT_ANY, label_json, "%s\n", asym ? "Transmit-only" : "No");
- 
- 	return 0;
- err:
-@@ -229,13 +239,14 @@ static void print_banner(struct nl_context *nlctx)
- {
- 	if (nlctx->no_banner)
- 		return;
--	printf("Settings for %s:\n", nlctx->devname);
-+	print_string(PRINT_ANY, "ifname", "Settings for %s:\n", nlctx->devname);
- 	nlctx->no_banner = true;
- }
- 
- int dump_link_modes(struct nl_context *nlctx, const struct nlattr *bitset,
- 		    bool mask, unsigned int class, const char *before,
--		    const char *between, const char *after, const char *if_none)
-+		    const char *between, const char *after, const char *if_none,
-+		    const char *json_key)
- {
- 	const struct nlattr *bitset_tb[ETHTOOL_A_BITSET_MAX + 1] = {};
- 	DECLARE_ATTR_TB_INFO(bitset_tb);
-@@ -260,6 +271,7 @@ int dump_link_modes(struct nl_context *nlctx, const struct nlattr *bitset,
- 
- 	bits = bitset_tb[ETHTOOL_A_BITSET_BITS];
- 
-+	open_json_array(json_key, "");
- 	if (!bits) {
- 		const struct stringset *lm_strings;
- 		unsigned int count;
-@@ -280,7 +292,9 @@ int dump_link_modes(struct nl_context *nlctx, const struct nlattr *bitset,
- 		if (mnl_attr_get_payload_len(bits) / 4 < (count + 31) / 32)
- 			goto err_nonl;
- 
--		printf("\t%s", before);
-+		if (!is_json_context())
-+			printf("\t%s", before);
-+
- 		for (idx = 0; idx < count; idx++) {
- 			const uint32_t *raw_data = mnl_attr_get_payload(bits);
- 			char buff[14];
-@@ -298,21 +312,27 @@ int dump_link_modes(struct nl_context *nlctx, const struct nlattr *bitset,
- 				first = false;
- 			/* ugly hack to preserve old output format */
- 			if (class == LM_CLASS_REAL && (idx == prev + 1) &&
--			    prev < link_modes_count &&
--			    link_modes[prev].class == LM_CLASS_REAL &&
--			    link_modes[prev].duplex == DUPLEX_HALF)
--				putchar(' ');
--			else if (between)
--				printf("\t%s", between);
-+				prev < link_modes_count &&
-+				link_modes[prev].class == LM_CLASS_REAL &&
-+				link_modes[prev].duplex == DUPLEX_HALF) {
-+				if (!is_json_context())
-+					putchar(' ');
-+			} else if (between) {
-+				if (!is_json_context())
-+					printf("\t%s", between);
-+			}
- 			else
--				printf("\n\t%*s", before_len, "");
--			printf("%s", name);
-+				if (!is_json_context())
-+					printf("\n\t%*s", before_len, "");
-+			print_string(PRINT_ANY, NULL, "%s", name);
- 			prev = idx;
- 		}
- 		goto after;
- 	}
- 
--	printf("\t%s", before);
-+	if (!is_json_context())
-+		printf("\t%s", before);
-+
- 	mnl_attr_for_each_nested(bit, bits) {
- 		const struct nlattr *tb[ETHTOOL_A_BITSET_BIT_MAX + 1] = {};
- 		DECLARE_ATTR_TB_INFO(tb);
-@@ -342,27 +362,31 @@ int dump_link_modes(struct nl_context *nlctx, const struct nlattr *bitset,
- 			if ((class == LM_CLASS_REAL) && (idx == prev + 1) &&
- 			    (prev < link_modes_count) &&
- 			    (link_modes[prev].class == LM_CLASS_REAL) &&
--			    (link_modes[prev].duplex == DUPLEX_HALF))
--				putchar(' ');
--			else if (between)
--				printf("\t%s", between);
-+			    (link_modes[prev].duplex == DUPLEX_HALF)) {
-+				if (!is_json_context())
-+					putchar(' ');
-+			} else if (between) {
-+				if (!is_json_context())
-+					printf("\t%s", between);
-+			}
- 			else
--				printf("\n\t%*s", before_len, "");
-+				if (!is_json_context())
-+					printf("\n\t%*s", before_len, "");
- 		}
--		printf("%s", name);
-+		print_string(PRINT_ANY, NULL, "%s", name);
- 		prev = idx;
- 	}
- after:
- 	if (first && if_none)
--		printf("%s", if_none);
--	printf("%s", after);
--
-+		print_string(PRINT_FP, NULL, "%s", if_none);
-+	close_json_array(after);
- 	return 0;
- err:
- 	putchar('\n');
- err_nonl:
- 	fflush(stdout);
- 	fprintf(stderr, "malformed netlink message (link_modes)\n");
-+	close_json_array("");
- 	return ret;
- }
- 
-@@ -373,16 +397,16 @@ static int dump_our_modes(struct nl_context *nlctx, const struct nlattr *attr)
- 
- 	print_banner(nlctx);
- 	ret = dump_link_modes(nlctx, attr, true, LM_CLASS_PORT,
--			      "Supported ports: [ ", " ", " ]\n", NULL);
-+			      "Supported ports: [ ", " ", " ]\n", NULL, "supported-ports");
- 	if (ret < 0)
- 		return ret;
- 
- 	ret = dump_link_modes(nlctx, attr, true, LM_CLASS_REAL,
- 			      "Supported link modes:   ", NULL, "\n",
--			      "Not reported");
-+			      "Not reported", "supported-link-modes");
- 	if (ret < 0)
- 		return ret;
--	ret = dump_pause(attr, true, "Supported pause frame use: ");
-+	ret = dump_pause(attr, true, "Supported pause frame use: ", "supported-pause-frame-use");
- 	if (ret < 0)
- 		return ret;
- 
-@@ -390,32 +414,40 @@ static int dump_our_modes(struct nl_context *nlctx, const struct nlattr *attr)
- 				 &ret);
- 	if (ret < 0)
- 		return ret;
--	printf("\tSupports auto-negotiation: %s\n", autoneg ? "Yes" : "No");
-+
-+	if (is_json_context())
-+		print_bool(PRINT_JSON, "supports-auto-negotiation", NULL, autoneg);
-+	else
-+		printf("\tSupports auto-negotiation: %s\n", autoneg ? "Yes" : "No");
- 
- 	ret = dump_link_modes(nlctx, attr, true, LM_CLASS_FEC,
- 			      "Supported FEC modes: ", " ", "\n",
--			      "Not reported");
-+			      "Not reported", "supported-fec-modes");
- 	if (ret < 0)
- 		return ret;
- 
- 	ret = dump_link_modes(nlctx, attr, false, LM_CLASS_REAL,
- 			      "Advertised link modes:  ", NULL, "\n",
--			      "Not reported");
-+			      "Not reported", "advertised-link-modes");
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dump_pause(attr, false, "Advertised pause frame use: ");
-+	ret = dump_pause(attr, false, "Advertised pause frame use: ", "advertised-pause-frame-use");
- 	if (ret < 0)
- 		return ret;
- 	autoneg = bitset_get_bit(attr, false, ETHTOOL_LINK_MODE_Autoneg_BIT,
- 				 &ret);
- 	if (ret < 0)
- 		return ret;
--	printf("\tAdvertised auto-negotiation: %s\n", autoneg ? "Yes" : "No");
-+
-+	if (!is_json_context())
-+		printf("\tAdvertised auto-negotiation: %s\n", autoneg ? "Yes" : "No");
-+	else
-+		print_bool(PRINT_JSON, "advertised-auto-negotiation", NULL, autoneg);
- 
- 	ret = dump_link_modes(nlctx, attr, false, LM_CLASS_FEC,
- 			      "Advertised FEC modes: ", " ", "\n",
--			      "Not reported");
-+			      "Not reported", "advertised-fec-modes");
- 	return ret;
- }
- 
-@@ -427,12 +459,13 @@ static int dump_peer_modes(struct nl_context *nlctx, const struct nlattr *attr)
- 	print_banner(nlctx);
- 	ret = dump_link_modes(nlctx, attr, false, LM_CLASS_REAL,
- 			      "Link partner advertised link modes:  ",
--			      NULL, "\n", "Not reported");
-+			      NULL, "\n", "Not reported", "link-partner-advertised-link-modes");
- 	if (ret < 0)
- 		return ret;
- 
- 	ret = dump_pause(attr, false,
--			 "Link partner advertised pause frame use: ");
-+			 "Link partner advertised pause frame use: ",
-+			 "link-partner-advertised-pause-frame-use");
- 	if (ret < 0)
- 		return ret;
- 
-@@ -440,12 +473,16 @@ static int dump_peer_modes(struct nl_context *nlctx, const struct nlattr *attr)
- 				 ETHTOOL_LINK_MODE_Autoneg_BIT, &ret);
- 	if (ret < 0)
- 		return ret;
--	printf("\tLink partner advertised auto-negotiation: %s\n",
--	       autoneg ? "Yes" : "No");
-+
-+	if (!is_json_context())
-+		print_string(PRINT_FP, NULL, "\tLink partner advertised auto-negotiation: %s\n",
-+			autoneg ? "Yes" : "No");
-+	else
-+		print_bool(PRINT_JSON, "link-partner-advertised-auto-negotiation", NULL, autoneg);
- 
- 	ret = dump_link_modes(nlctx, attr, false, LM_CLASS_FEC,
- 			      "Link partner advertised FEC modes: ",
--			      " ", "\n", "Not reported");
-+			      " ", "\n", "Not reported", "link-partner-advertised-fec-modes");
- 	return ret;
- }
- 
-@@ -479,30 +516,36 @@ int linkmodes_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		uint32_t val = mnl_attr_get_u32(tb[ETHTOOL_A_LINKMODES_SPEED]);
- 
- 		print_banner(nlctx);
--		if (val == 0 || val == (uint16_t)(-1) || val == (uint32_t)(-1))
--			printf("\tSpeed: Unknown!\n");
--		else
--			printf("\tSpeed: %uMb/s\n", val);
-+		if (val == 0 || val == (uint16_t)(-1) || val == (uint32_t)(-1)) {
-+			if (!is_json_context())
-+				printf("\tSpeed: Unknown!\n");
-+		} else {
-+			print_uint(PRINT_ANY, "speed", "\tSpeed: %uMb/s\n", val);
-+		}
- 	}
- 	if (tb[ETHTOOL_A_LINKMODES_LANES]) {
- 		uint32_t val = mnl_attr_get_u32(tb[ETHTOOL_A_LINKMODES_LANES]);
- 
- 		print_banner(nlctx);
--		printf("\tLanes: %u\n", val);
-+		print_uint(PRINT_ANY, "lanes", "\tLanes: %s\n", val);
- 	}
- 	if (tb[ETHTOOL_A_LINKMODES_DUPLEX]) {
- 		uint8_t val = mnl_attr_get_u8(tb[ETHTOOL_A_LINKMODES_DUPLEX]);
- 
- 		print_banner(nlctx);
- 		print_enum(names_duplex, ARRAY_SIZE(names_duplex), val,
--			   "Duplex");
-+			   "Duplex", "duplex");
- 	}
- 	if (tb[ETHTOOL_A_LINKMODES_AUTONEG]) {
- 		int autoneg = mnl_attr_get_u8(tb[ETHTOOL_A_LINKMODES_AUTONEG]);
- 
- 		print_banner(nlctx);
--		printf("\tAuto-negotiation: %s\n",
--		       (autoneg == AUTONEG_DISABLE) ? "off" : "on");
-+		if (!is_json_context())
-+			printf("\tAuto-negotiation: %s\n",
-+						(autoneg == AUTONEG_DISABLE) ? "off" : "on");
-+		else
-+			print_bool(PRINT_JSON, "auto-negotiation", NULL,
-+				   autoneg == AUTONEG_DISABLE);
- 	}
- 	if (tb[ETHTOOL_A_LINKMODES_MASTER_SLAVE_CFG]) {
- 		uint8_t val;
-@@ -512,7 +555,7 @@ int linkmodes_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		print_banner(nlctx);
- 		print_enum(names_master_slave_cfg,
- 			   ARRAY_SIZE(names_master_slave_cfg), val,
--			   "master-slave cfg");
-+			   "master-slave cfg", "master-slave-cfg");
- 	}
- 	if (tb[ETHTOOL_A_LINKMODES_MASTER_SLAVE_STATE]) {
- 		uint8_t val;
-@@ -521,14 +564,14 @@ int linkmodes_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		print_banner(nlctx);
- 		print_enum(names_master_slave_state,
- 			   ARRAY_SIZE(names_master_slave_state), val,
--			   "master-slave status");
-+			   "master-slave status", "master-slave-status");
- 	}
- 
- 	return MNL_CB_OK;
- err:
- 	if (nlctx->is_monitor || nlctx->is_dump)
- 		return MNL_CB_OK;
--	fputs("No data available\n", stdout);
-+	fputs("No data available\n", stderr);
- 	nlctx->exit_code = 75;
- 	return MNL_CB_ERROR;
- }
-@@ -554,14 +597,14 @@ int linkinfo_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		uint8_t val = mnl_attr_get_u8(tb[ETHTOOL_A_LINKINFO_PORT]);
- 
- 		print_banner(nlctx);
--		print_enum(names_port, ARRAY_SIZE(names_port), val, "Port");
-+		print_enum(names_port, ARRAY_SIZE(names_port), val, "Port", "port");
- 		port = val;
- 	}
- 	if (tb[ETHTOOL_A_LINKINFO_PHYADDR]) {
- 		uint8_t val = mnl_attr_get_u8(tb[ETHTOOL_A_LINKINFO_PHYADDR]);
- 
- 		print_banner(nlctx);
--		printf("\tPHYAD: %u\n", val);
-+		print_uint(PRINT_ANY, "phyad", "\tPHYAD: %x\n", val);
- 	}
- 	if (tb[ETHTOOL_A_LINKINFO_TRANSCEIVER]) {
- 		uint8_t val;
-@@ -569,7 +612,7 @@ int linkinfo_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		val = mnl_attr_get_u8(tb[ETHTOOL_A_LINKINFO_TRANSCEIVER]);
- 		print_banner(nlctx);
- 		print_enum(names_transceiver, ARRAY_SIZE(names_transceiver),
--			   val, "Transceiver");
-+			   val, "Transceiver", "transceiver");
- 	}
- 	if (tb[ETHTOOL_A_LINKINFO_TP_MDIX] && tb[ETHTOOL_A_LINKINFO_TP_MDIX_CTRL] &&
- 	    port == PORT_TP) {
-@@ -714,9 +757,9 @@ static void linkstate_link_ext_substate_print(const struct nlattr *tb[],
- 
- 	link_ext_substate_str = link_ext_substate_get(link_ext_state_val, link_ext_substate_val);
- 	if (!link_ext_substate_str)
--		printf(", %u", link_ext_substate_val);
-+		print_uint(PRINT_ANY, NULL, ", %u", link_ext_state_val);
- 	else
--		printf(", %s", link_ext_substate_str);
-+		print_string(PRINT_ANY, NULL, ", %s", link_ext_substate_str);
- }
- 
- static void linkstate_link_ext_state_print(const struct nlattr *tb[])
-@@ -732,13 +775,14 @@ static void linkstate_link_ext_state_print(const struct nlattr *tb[])
- 	link_ext_state_str = get_enum_string(names_link_ext_state,
- 					     ARRAY_SIZE(names_link_ext_state),
- 					     link_ext_state_val);
-+	open_json_array("link-state", "");
- 	if (!link_ext_state_str)
--		printf(" (%u", link_ext_state_val);
-+		print_uint(PRINT_ANY, NULL, " (%u", link_ext_state_val);
- 	else
--		printf(" (%s", link_ext_state_str);
-+		print_string(PRINT_ANY, NULL, " (%s", link_ext_state_str);
- 
- 	linkstate_link_ext_substate_print(tb, link_ext_state_val);
--	printf(")");
-+	close_json_array(")");
- }
- 
- int linkstate_reply_cb(const struct nlmsghdr *nlhdr, void *data)
-@@ -761,24 +805,29 @@ int linkstate_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		uint8_t val = mnl_attr_get_u8(tb[ETHTOOL_A_LINKSTATE_LINK]);
- 
- 		print_banner(nlctx);
--		printf("\tLink detected: %s", val ? "yes" : "no");
-+		if (!is_json_context())
-+			print_string(PRINT_FP, NULL, "\tLink detected: %s", val ? "yes" : "no");
-+		else
-+			print_bool(PRINT_JSON, "link-detected", NULL, val);
- 		linkstate_link_ext_state_print(tb);
--		printf("\n");
-+		if (!is_json_context())
-+			printf("\n");
- 	}
- 
- 	if (tb[ETHTOOL_A_LINKSTATE_SQI]) {
- 		uint32_t val = mnl_attr_get_u32(tb[ETHTOOL_A_LINKSTATE_SQI]);
- 
- 		print_banner(nlctx);
--		printf("\tSQI: %u", val);
-+		print_uint(PRINT_ANY, "sqi", "\tSQI: %u", val);
- 
- 		if (tb[ETHTOOL_A_LINKSTATE_SQI_MAX]) {
- 			uint32_t max;
- 
- 			max = mnl_attr_get_u32(tb[ETHTOOL_A_LINKSTATE_SQI_MAX]);
--			printf("/%u\n", max);
-+			print_uint(PRINT_ANY, "sqi-max", "/%u\n", max);
- 		} else {
--			printf("\n");
-+			if (!is_json_context())
-+				printf("\n");
- 		}
- 	}
- 
-@@ -786,7 +835,7 @@ int linkstate_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		uint32_t val;
- 
- 		val = mnl_attr_get_u32(tb[ETHTOOL_A_LINKSTATE_EXT_DOWN_CNT]);
--		printf("\tLink Down Events: %u\n", val);
-+		print_uint(PRINT_ANY, "link-down-events", "\tLink Down Events: %u\n", val);
- 	}
- 
- 	return MNL_CB_OK;
-@@ -856,7 +905,7 @@ void msgmask_cb2(unsigned int idx __maybe_unused, const char *name,
- 		 bool val, void *data __maybe_unused)
- {
- 	if (val)
--		printf(" %s", name);
-+		print_string(PRINT_FP, NULL, " %s", name);
- }
- 
- int debug_reply_cb(const struct nlmsghdr *nlhdr, void *data)
-@@ -889,13 +938,16 @@ int debug_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 
- 	print_banner(nlctx);
- 	walk_bitset(tb[ETHTOOL_A_DEBUG_MSGMASK], NULL, msgmask_cb, &msg_mask);
--	printf("        Current message level: 0x%08x (%u)\n"
--	       "                              ",
--	       msg_mask, msg_mask);
-+
-+	print_uint(PRINT_ANY, "current-message-level",
-+		   "        Current message level: 0x%1$08x (%1$u)\n                              ",
-+		   msg_mask);
-+
- 	walk_bitset(tb[ETHTOOL_A_DEBUG_MSGMASK], msgmask_strings, msgmask_cb2,
--		    NULL);
--	fputc('\n', stdout);
-+			NULL);
- 
-+	if (!is_json_context())
-+		fputc('\n', stdout);
- 	return MNL_CB_OK;
- }
- 
-@@ -916,18 +968,26 @@ int plca_cfg_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		return MNL_CB_OK;
- 
- 	print_banner(nlctx);
--	printf("\tPLCA support: ");
-+	if (!is_json_context())
-+		printf("\tPLCA support: ");
- 
- 	if (tb[ETHTOOL_A_PLCA_VERSION]) {
- 		uint16_t val = mnl_attr_get_u16(tb[ETHTOOL_A_PLCA_VERSION]);
- 
--		printf("OPEN Alliance v%u.%u",
--		       (unsigned int)((val >> 4) & 0xF),
--		       (unsigned int)(val & 0xF));
--	} else
--		printf("non-standard");
-+		if (!is_json_context()) {
-+			printf("OPEN Alliance v%u.%u\n",
-+			(unsigned int)((val >> 4) & 0xF),
-+			(unsigned int)(val & 0xF));
-+		} else {
-+			unsigned int length = snprintf(NULL, 0, "%1$u.%1$u", val);
-+			char buff[length];
- 
--	printf("\n");
-+			snprintf(buff, length, "%u.%u", (unsigned int)((val >> 4) & 0xF),
-+				(unsigned int)(val & 0xF));
-+			print_string(PRINT_JSON, "open-alliance-v", NULL, buff);
-+		}
-+	} else
-+		print_string(PRINT_ANY, "plca-support", "%s\n", "non-standard");
- 
- 	return MNL_CB_OK;
- }
-@@ -949,16 +1009,14 @@ int plca_status_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		return MNL_CB_OK;
- 
- 	print_banner(nlctx);
--	printf("\tPLCA status: ");
--
-+	const char *status;
- 	if (tb[ETHTOOL_A_PLCA_STATUS]) {
- 		uint8_t val = mnl_attr_get_u8(tb[ETHTOOL_A_PLCA_STATUS]);
--
--		printf(val ? "up" : "down");
--	} else
--		printf("unknown");
--
--	printf("\n");
-+		status = val ? "up" : "down";
-+		print_string(PRINT_ANY, "plca-status", "PLCA status: %s", status);
-+	} else {
-+		print_string(PRINT_FP, NULL, "PLCA status: %s", "unknown");
-+	}
- 
- 	return MNL_CB_OK;
- }
-@@ -984,7 +1042,10 @@ static int gset_request(struct cmd_context *ctx, uint8_t msg_type,
- 
- int nl_gset(struct cmd_context *ctx)
- {
--	int ret;
-+	int ret = 0;
-+
-+	new_json_obj(ctx->json);
-+	open_json_object(NULL);
- 
- 	/* Check for the base set of commands */
- 	if (netlink_cmd_check(ctx, ETHTOOL_MSG_LINKMODES_GET, true) ||
-@@ -999,44 +1060,50 @@ int nl_gset(struct cmd_context *ctx)
- 	ret = gset_request(ctx, ETHTOOL_MSG_LINKMODES_GET,
- 			   ETHTOOL_A_LINKMODES_HEADER, linkmodes_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	ret = gset_request(ctx, ETHTOOL_MSG_LINKINFO_GET,
- 			   ETHTOOL_A_LINKINFO_HEADER, linkinfo_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	ret = gset_request(ctx, ETHTOOL_MSG_WOL_GET, ETHTOOL_A_WOL_HEADER,
- 			   wol_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	ret = gset_request(ctx, ETHTOOL_MSG_PLCA_GET_CFG,
- 			   ETHTOOL_A_PLCA_HEADER, plca_cfg_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	ret = gset_request(ctx, ETHTOOL_MSG_DEBUG_GET, ETHTOOL_A_DEBUG_HEADER,
- 			   debug_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	ret = gset_request(ctx, ETHTOOL_MSG_LINKSTATE_GET,
- 			   ETHTOOL_A_LINKSTATE_HEADER, linkstate_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	ret = gset_request(ctx, ETHTOOL_MSG_PLCA_GET_STATUS,
- 			   ETHTOOL_A_PLCA_HEADER, plca_status_reply_cb);
- 	if (ret == -ENODEV)
--		return ret;
-+		goto out;
- 
- 	if (!ctx->nlctx->no_banner) {
--		printf("No data available\n");
--		return 75;
-+		print_string(PRINT_FP, NULL, "%s", "No data available\n");
-+		ret = 75;
-+		goto out;
- 	}
- 
--	return 0;
-+	ret = 0;
-+
-+out:
-+	close_json_object();
-+	delete_json_obj();
-+	return ret;
- }
- 
- /* SET_SETTINGS */
-diff --git a/test-cmdline.c b/test-cmdline.c
-index cb803ed..daa7829 100644
---- a/test-cmdline.c
-+++ b/test-cmdline.c
-@@ -25,6 +25,7 @@ static struct test_case {
- 	{ 1, "" },
- 	{ 0, "devname" },
- 	{ 0, "15_char_devname" },
-+	{ 0, "--json devname" },
- 	/* netlink interface allows names up to 127 characters */
- 	{ !IS_NL, "16_char_devname!" },
- 	{ !IS_NL, "127_char_devname0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde" },
+https://lore.kernel.org/all/209f7fe62e2a79cd8c02b104b8e3babdd16bff30.camel@perches.com/
+
+> 
+> I suspect he was using it as a way to force fixing the real issue. A
+> driver should not be issues lots of err or info messages. Protocol
+> errors are part of normal behaviour, just increment a counter and keep
+> going. Peer devices disappearing is normal behaviour, count it and
+> keep going. _err is generally reserved for something fatal happened,
+> and there is no recovery, other than unload the kernel module and
+> reload it.
+
+Yeah, it looks like it and David pushed them to rethink the error 
+handling rather than making the error less painful.
+
+But I can still netdev_dbg_ratelimited useful for debugging/development.
+Anyway, I will add this to my todo and see if this specific variant can 
+be accepted.
+
+Regards,
+
 -- 
-2.39.2
-
+Antonio Quartulli
+OpenVPN Inc.
 
