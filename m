@@ -1,143 +1,92 @@
-Return-Path: <netdev+bounces-112238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECE48937934
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 16:31:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD00F93794B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 16:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1F97282D57
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 14:31:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93DF11F22EF5
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 14:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BD6137E;
-	Fri, 19 Jul 2024 14:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0F81DFC7;
+	Fri, 19 Jul 2024 14:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="McZ1aXbt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6DAl2gh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77956C2D6
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 14:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B139AD5E
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 14:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721399509; cv=none; b=jAY43r0OlHmjaP2dBTYOQqAmbilYSwbPTO82Cp+YOJ+dQELZrJQFG7Km1Gzx2E9lTAzEKY+DlPsL62U2gvDzEpDxPvYPBfPnrol6+LXtuMQQ/o4MWhk51Ugw5QZc/1dWf30NuPPQk8l6ydCPZAFN7q3x3HYJPUzEBM78OdSVcQU=
+	t=1721400032; cv=none; b=WUN09V3TMMF46Lylw8MCgp5u2PzDEB4QQqdn4pOZE44YiMoEzV+6hhUqrPzPUbvF9VZ7byjuOjVZNtZUx+x/QQW7ZOinDNSCvMnRJLO4klPRQFEXfoZTs8t7wIdUoqKbmV+EHn8wutxscIuICPGPPnWVDjLuHsMfqx4z9nozNso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721399509; c=relaxed/simple;
-	bh=GhrFRKfnNZV4ejBthLxu3KUQxqgwujK/kThLQChzwHU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LI5gBO4sQ387m+neyi1G77SeeFHA+CrWHiRFQIZutF39SOVrexebemzvYHc8cGHMDw08qLbOQrPGtbeRSvIzCnlYYCKMiLDpMM7gyoKzzwETVYQ7ZRgV7dAl47wr6Rnqoq2IRtNtMuynQapCOOYSPEOQ1N5kxhfwQ7KbNSgvbh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=McZ1aXbt; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42725f8a789so38065e9.1
-        for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 07:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721399506; x=1722004306; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z++eInvMqZjmxYQNqbepqz4rucmQCis52qn077CHf94=;
-        b=McZ1aXbtCyfD874Lz0AlugGXCXdwZO7sH0a1ilbfN8KBZuuUyJ9mEhDsRAouUY6eRh
-         HYKmvaBMqWaxmSbb55NiPGEh2BShTjHyxGyOhKBfm8XXIUdzRA8W/5KUjjxpSnv24SYZ
-         T0cctCOGyVKHVEOckJ9cq7lyYbD4eMjv1NLtyv2NYtvNsVS+luLFcLt6ECvsum0/BQHT
-         uJtJUQuoLyHTDD4Au5wcdYLVX9PF9w2c6fPPKBTj98nGWrw4NtKi0pVcV8qJMpXETadT
-         DLfYjZPOHq/l09yv9VY52XRpc/nnhpwiXPqqTjInF8lskQGDcitX/XohB7lPrrA+QzF9
-         qagA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721399506; x=1722004306;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z++eInvMqZjmxYQNqbepqz4rucmQCis52qn077CHf94=;
-        b=g8yYvg8/bYIxFw8x13GzcqfDtmY9EbJeehmp0Xj6YfQu6d8dxN1bldQ2hwMIn08Ccz
-         I0RnB+H5X+SbzDO/ofPB2woFcIZs39hVl8utRfftdhyayHfHLRs0HElskitiNfwZdm26
-         TwEeqcJswoLZkn6a9I8vzOBxv2vPDFvonEg+KDcjm15clc09ywbCZPSMcQgjtKWtmPVC
-         pEkkaEOxiBGKJnzCyhOOcuoIDHvoJ/FuPyj2P5vnGnWpKMM2KGsvagrAerHZnNl+Tp4J
-         4ot+xi+ysMMGPyYT0W4hpH0t1ts0l4m1OK6fVZbQr0u231PhUTQjSrnF5c/KCV/s8K+V
-         qwWw==
-X-Gm-Message-State: AOJu0YxGxzXsNOa1oEMqSVRnitOgc8MvUrOpD9HlT7czdVTTKgvC+vxs
-	dt0CUTXVaDeYg6pwEOF4WAjoxy/+UR3xYkPYlL1s+VnGfGA53yFM3SvnaDeXIBsGqUc2fuSGZzo
-	ErcnTlpmrFKMZAtML8Gvcrvec5/KdSikA4Q8p
-X-Google-Smtp-Source: AGHT+IFNMOuM2Ozu/t9TE7DB761CXsT8ovt2MTO+o6AIVPKemZY2uzVuF5Rlijz+UhwAtN8UjKJbimcxfhFmlPq8Us4=
-X-Received: by 2002:a05:600c:5683:b0:424:898b:522b with SMTP id
- 5b1f17b1804b1-427d69c0713mr1140195e9.1.1721399505263; Fri, 19 Jul 2024
- 07:31:45 -0700 (PDT)
+	s=arc-20240116; t=1721400032; c=relaxed/simple;
+	bh=hYTAO8tBcvIjaFQj0J2eQqykTAl/Gcac9r4RmCfJs2w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=t3QMomD4AGmimu7PUzg13Kt7IBFUB/hTtc5dNLBhMHTjf8FxqTzJp5mLMW8TX6LtUT0qaZfTQ6qykylpS9UHVCronrnVfQqAPD+nrCKNW5OdhlgMvmCG0ppFmfUGZsVM6+NEqWE/BVkQsxzpBzNBpL6m5OTp8u17XfCMWA8WYhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6DAl2gh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0E642C4AF0D;
+	Fri, 19 Jul 2024 14:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721400032;
+	bh=hYTAO8tBcvIjaFQj0J2eQqykTAl/Gcac9r4RmCfJs2w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=T6DAl2ghJyRpq8xVXKZFDpZxV71fHIWZ7Yo5ALOXs3enFG7oBdz53vcVyH0WJ1PB5
+	 NnZdLqbfZOfZs3OXvZbp26GQzPQDkk2lfiIYmegZ3X8CoVPj61F15u69ZnU3dGE6fw
+	 e24KC+cAPlGnmNUiYrO80RGaHEk85YO8B2QTVZEcJTV12wJiBRaHfsvwIziBdF3JMc
+	 XQzurHYtMomjsX0qAdqch0axCg4cVs+Eg0T6jERkj0pOUd5htfUBXTFZBOBkZcM5+5
+	 gcxKbBsYV49jZ7xc2Eui45tkO0VFRzb/SPgHRYN9xli/230QJEChOYVOjQBAioV4YT
+	 PJud+nmC59elw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EDD91C43335;
+	Fri, 19 Jul 2024 14:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240718190221.2219835-1-pkaligineedi@google.com>
- <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch>
- <CA+f9V1PsjukhgLDjWQvbTyhHkOWt7JDY0zPWc_G322oKmasixA@mail.gmail.com> <CAF=yD-L67uvVOrmEFz=LOPP9pr7NByx9DhbS8oWMkkNCjRWqLg@mail.gmail.com>
-In-Reply-To: <CAF=yD-L67uvVOrmEFz=LOPP9pr7NByx9DhbS8oWMkkNCjRWqLg@mail.gmail.com>
-From: Praveen Kaligineedi <pkaligineedi@google.com>
-Date: Fri, 19 Jul 2024 07:31:32 -0700
-Message-ID: <CA+f9V1NwSNpjMzCK2A3yjai4UoXPrq65=d1=wy50=o-EBvKoNQ@mail.gmail.com>
-Subject: Re: [PATCH net] gve: Fix an edge case for TSO skb validity check
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, shailend@google.com, 
-	hramamurthy@google.com, csully@google.com, jfraker@google.com, 
-	stable@vger.kernel.org, Bailey Forrest <bcf@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] eth: fbnic: don't build the driver when skb has more
+ than 21 frags
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172140003196.32757.15280601174885684237.git-patchwork-notify@kernel.org>
+Date: Fri, 19 Jul 2024 14:40:31 +0000
+References: <20240717161600.1291544-1-kuba@kernel.org>
+In-Reply-To: <20240717161600.1291544-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, alexanderduyck@fb.com, kernel-team@meta.com
 
-On Thu, Jul 18, 2024 at 8:47=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> On Thu, Jul 18, 2024 at 9:52=E2=80=AFPM Praveen Kaligineedi
-> <pkaligineedi@google.com> wrote:
-> >
-> > On Thu, Jul 18, 2024 at 4:07=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > > > +                      * segment, then it will count as two descrip=
-tors.
-> > > > +                      */
-> > > > +                     if (last_frag_size > GVE_TX_MAX_BUF_SIZE_DQO)=
- {
-> > > > +                             int last_frag_remain =3D last_frag_si=
-ze %
-> > > > +                                     GVE_TX_MAX_BUF_SIZE_DQO;
-> > > > +
-> > > > +                             /* If the last frag was evenly divisi=
-ble by
-> > > > +                              * GVE_TX_MAX_BUF_SIZE_DQO, then it w=
-ill not be
-> > > > +                              * split in the current segment.
-> > >
-> > > Is this true even if the segment did not start at the start of the fr=
-ag?
-> > The comment probably is a bit confusing here. The current segment
-> > we are tracking could have a portion in the previous frag. The code
-> > assumed that the portion on the previous frag (if present) mapped to on=
-ly
-> > one descriptor. However, that portion could have been split across two
-> > descriptors due to the restriction that each descriptor cannot exceed 1=
-6KB.
->
-> >>> /* If the last frag was evenly divisible by
-> >>> +                                * GVE_TX_MAX_BUF_SIZE_DQO, then it w=
-ill not be
-> >>>  +                              * split in the current segment.
->
-> This is true because the smallest multiple of 16KB is 32KB, and the
-> largest gso_size at least for Ethernet will be 9K. But I don't think
-> that that is what is used here as the basis for this statement?
->
-The largest Ethernet gso_size (9K) is less than GVE_TX_MAX_BUF_SIZE_DQO
-is an implicit assumption made in this patch and in that comment. Bailey,
-please correct me if I am wrong..
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 17 Jul 2024 09:15:59 -0700 you wrote:
+> Similarly to commit 0e03c643dc93 ("eth: fbnic: fix s390 build."),
+> the driver won't build if skb_shared_info has more than 25 frags
+> assuming a 64B cache line and 21 frags assuming a 128B cache line.
+> 
+>   (512 - 48 -  64) / 16 = 25
+>   (512 - 48 - 128) / 16 = 21
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] eth: fbnic: don't build the driver when skb has more than 21 frags
+    https://git.kernel.org/netdev/net/c/4359836129d9
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-
-> > That's the case this fix is trying to address.
-> > I will work on simplifying the logic based on your suggestion below so
-> > that the fix is easier to follow
 
