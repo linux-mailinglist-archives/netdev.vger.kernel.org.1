@@ -1,312 +1,312 @@
-Return-Path: <netdev+bounces-112176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 688AF9374DB
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:14:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AD89374F1
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 10:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A5C81C20CE7
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:14:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B67D1C20865
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 08:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AEB823AC;
-	Fri, 19 Jul 2024 08:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A449C6F067;
+	Fri, 19 Jul 2024 08:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="APDaSmJ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2126.outbound.protection.outlook.com [40.107.117.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB09764A98;
-	Fri, 19 Jul 2024 08:13:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721376810; cv=none; b=rkNajSUoxbdyp1K+axrRFpqTtKBLpLMgyBVHFipZ9UMGtbnRQukYpyWYd3vIGPlvlNXhMIMn0AQAOAEqRm/ZR3C1Qp/VkgP6jtDG7neBnHUt5tU9ZepSu4JrBOGz7D+7K4uR5855UAr1F5yvnjY7S/ghT70EJgMwBT+cNgLSmiM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721376810; c=relaxed/simple;
-	bh=d2Ah1d9arkHmIdug+puU2JhYyInQUMKL1HRqyvjBT2U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Bv039RXpa9DKDSQCipXjjxhPVO5sH9aCm3D32UPOKptM3zbZZ8iDGDGXVhDdsGhJdlBF/KSZ7WFnbrPqhOuFlEgOKL7EcFadRBxw/hDRZyFee12Tn/uuAPSm68W/uEH1BAK2RqWkbYFxXxliErI91waF3TxSL4PfRo5feQe4vWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WQMqs4qNmz4f3jHl;
-	Fri, 19 Jul 2024 16:13:13 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id CC1B51A016E;
-	Fri, 19 Jul 2024 16:13:25 +0800 (CST)
-Received: from k01.huawei.com (unknown [10.67.174.197])
-	by APP3 (Coremail) with SMTP id _Ch0CgCXo04hIJpm5CslAg--.56491S11;
-	Fri, 19 Jul 2024 16:13:25 +0800 (CST)
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Matt Bobrowski <mattbobrowski@google.com>,
-	Yafang Shao <laoar.shao@gmail.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	"Jose E . Marchesi" <jose.marchesi@oracle.com>,
-	James Morris <jamorris@linux.microsoft.com>,
-	Kees Cook <kees@kernel.org>,
-	Brendan Jackman <jackmanb@google.com>,
-	Florent Revest <revest@google.com>
-Subject: [PATCH bpf-next v1 9/9] selftests/bpf: Add verifier tests for bpf lsm
-Date: Fri, 19 Jul 2024 16:17:49 +0800
-Message-Id: <20240719081749.769748-10-xukuohai@huaweicloud.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240719081749.769748-1-xukuohai@huaweicloud.com>
-References: <20240719081749.769748-1-xukuohai@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CC5208BA;
+	Fri, 19 Jul 2024 08:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.126
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721377244; cv=fail; b=LckPD02bAa/iXSZQ9iHIFs551dp+MI7DPy7K3Q9TQvm3iaH4uG9hoE9ADug9wu3S31YKXgOakXYY8lo877qWcpfNnkwgwmTnqES6DXnAtnzoqwcZVywR95fkHAT36Uh19x6mb0eT6RPKLOtQQo162gwSfWOLAVpnOKatTIQVsp0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721377244; c=relaxed/simple;
+	bh=mtCiNvqRTnt6j4CBx4tR+W+CwIL6pnywhu3oB8SDuG8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=iF79qu1dEALZ5DKaxioc/0zMlNP0R2rGmW/kbWaKyIiOClyObEQUaoKD05UWzy7NDJYwW12W5o51wNjyEXf7rJu7fN36C8jKcCDsrn5JUM8RuAAGJIw2fEa5bB+epdq38B5zKy53W1WHR2Cgbky+ezBmRpTGJASP+oV4DrVkgU8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=APDaSmJ2; arc=fail smtp.client-ip=40.107.117.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dtmAJpNM0bKq9AH43V2440wvWMezt4mwemKJSlcnDsJPTsTr+AGQ8+UmxjaF77Nq5ARqfTzuT7wV2bwpiiIZDAqMvDR5waWSUVkfdG6/Bj/hiWpp+pMhwoAPnFu/L70CQnPWOBxV9rgSU7mvpIdIYpbvlEpZ5J/n25rXMfOkFb4Eepoj+Fh4Lb1TiwVZyRHgdXB6gRI6J2N038weol3oMLxiM/F544IYk8RAMealCHrohyUT0vMFmkHZX4U/MsGWHvjn50vTvz2XHEiNch7Avc/CTqh47o/3R06b0MZSPpVqBbWBInAo73AUuRcBPmWFly8tG1JAD715BUI+aQYW9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AvjG7h5/RQE/wFif1p77WGE11z+YN1aYSMuHwW2zSVQ=;
+ b=wIEkQe1hx5V1hff+GqHoK7KJ2WOgmVDSsrVcLzfu4uILYo7xbwqRutKGLpE5nS3EruvmUXjtpqUPyA8xM+OGnse+znlFgm7Xi7wtnX8BjocfNyjxJMGtv24iKAql8B3XTkbW05v2IsMgtIzpg2mJmlQQOXzJL8fj9tQ2oNf2MsvwVewP4uxU70hIdA5c5oxW2wNbw5QV/7P6WHxz64qz3Sy0Pbpt+J8UKXl2R6j+fSukHmML2LALAefOoq8jopd2NAzWCnSVaqNxvNLhszfWbwXANlt7TKwcs5yJDWgR0cUJiL0Pi2+Sp3OdCXzzYv97kz3snWDZ71XhTvyF8C+fsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AvjG7h5/RQE/wFif1p77WGE11z+YN1aYSMuHwW2zSVQ=;
+ b=APDaSmJ29ZFZRYzyqXlnKjYefvjv+A0m1zpsjyICdUPgfJWUWIPVlUyNixpuQ4PLiJ4cuZWY3ShVu76poXnYBL/zZYpPkYfWINlU+vcuDL3zwJaVL+9pq4rrp9/Wg8kfzZ+16g4ixi+WZrGCNaITS64C6ljvpHPTw9EWEh2Zh9MmUWDab50OjljE05/IH65Q71bCLTkYXaOC80RaYdKIKWfK0W/FmeLsXTSju1P6eZcPznAfUeQqfkobxx+nWJ/dnew1HkUWQIw8UG0EBOpNM0qiu/o97nKXP3iBVbjPwpxQcoDFUZnoV+EBxAQjjDRBuwyG7kfRqzcLiQ63aLJTpA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+ by OS8PR03MB8818.apcprd03.prod.outlook.com (2603:1096:604:28a::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.14; Fri, 19 Jul
+ 2024 08:20:37 +0000
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd%5]) with mapi id 15.20.7784.016; Fri, 19 Jul 2024
+ 08:20:37 +0000
+Message-ID: <30cf7665-ff35-4a1a-ba26-0bbe377512be@amlogic.com>
+Date: Fri, 19 Jul 2024 16:20:03 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add support for
+ Amlogic Bluetooth
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
+ <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+ <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
+From: Yang Li <yang.li@amlogic.com>
+In-Reply-To: <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2P153CA0018.APCP153.PROD.OUTLOOK.COM (2603:1096::28) To
+ JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgCXo04hIJpm5CslAg--.56491S11
-X-Coremail-Antispam: 1UD129KBjvJXoWxKrWrAr17JFy7Gr47tFWfAFb_yoW7Zw15pF
-	9Fk34DGFs5Ary3WFyxCFW7ZF1fGFZ2qFyrXF40vr1YyFs3J3s7XryxW3WUX3s3J3Z5uw4Y
-	vFZIkayakr1UC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2
-	AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6r
-	W5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14
-	v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuY
-	vjxUI-eODUUUU
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|OS8PR03MB8818:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6ee077ed-7db4-4ca2-0bfc-08dca7cbab32
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|1800799024|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZWhGai81Q1o3Z3BQYlhvRkVEdVJxaklGU3QrTFNGZ3RrWHVHZGZpZlJGTnNG?=
+ =?utf-8?B?TGNTUlRjWFNpUkNqZVV1V0JjR1Vjc3V4SXFVc1dlZ3VndHlkczllYXNtK3d5?=
+ =?utf-8?B?VDlCaHQ4aXIxV1R1TXRSWU9jOFZyT21vaFZMcUYrdEY1aG94QWcwTDJHbDhs?=
+ =?utf-8?B?OGNPWXdudlZFQXVmVzRvaVc2bGFpTUVOQlhKMm9LaEhyb3dhZzJzUm1JRUkz?=
+ =?utf-8?B?MmhzeGtnc21QVEU2T3ErWE5hSXRlNjFoR2FOZ284V1BtOS9zNTFvUS9hckhC?=
+ =?utf-8?B?emlWTzBaeGRKUjd5NWJOOHUwbG45K0hEUk0rTXhVeGlxWFJRaGVDeXVQNHdj?=
+ =?utf-8?B?NHlrNkduek1LV1F0bVowNWdhUUNXSTkxT09vcWliWlZkNGNZVllXL3FQV3B0?=
+ =?utf-8?B?UlpPLzg4dzJrQXU1RVUzZXBQUG5HNjcranBuS2l0RHZOSmdOcDloRGo3dmJH?=
+ =?utf-8?B?WjdiRWc3eUI1ZU8xb3hNMjN6QVJzMnlESUhhVGRoanFuWk9SVzJCQ0dnOEly?=
+ =?utf-8?B?WWJvdiszWGpsN2dOMXhVKzJ4c2VrcnN4VDZDdkJ2MDE0M1ZOZURaMnBXMXk2?=
+ =?utf-8?B?dE16Sm1DQjRzc25sZ2lMOE5ydkhkUUVPaDZOYWNUaFM1ZHJNV00ybUVtZVkx?=
+ =?utf-8?B?Zm5vUG9nbjFxSVEwWmtqQ1RTdE82Y3BRR1VubHd6d2JoaEQ0QUJ0V2VqeThX?=
+ =?utf-8?B?am5nNFhZTjJNSDdJcFIvS3V0NG1SRGJvY3ZaSnZGQWdySExpaGIvanhYYkgy?=
+ =?utf-8?B?NVJhNDZmTUMyV0VpYlEzWml1UzY2Q1B6cFhoZWJEQWhLYXYwaEJVNUdwWUJR?=
+ =?utf-8?B?TDN1RHVYbHM2UXVwdjBla0t1N1Rtanhvd0kvRXp4a3BYck5sdkEvSE5oa2hm?=
+ =?utf-8?B?WjNlWUdLS0dVZTFFVmRHZitFc2dtYXVobWcyb3dOd0d1bEFoUmprY2szR0xx?=
+ =?utf-8?B?dGFRNEMxRnVwTE5mTklVdytJZDhmVCtodEtPRElnODg3c1B0cnE1amladU4x?=
+ =?utf-8?B?a2FZQk5nMGhJYWo2Q2RwcXgzQlRYZnVJMjlOZlJCc2x0ZEFLZWVVMHY5bith?=
+ =?utf-8?B?OTRNdVpVTEhGYXBta1BzdU0yUHpXTnFMU0VuOWJNa3R5a2REb0Y5OWxtdUhw?=
+ =?utf-8?B?OU1VQWFKOG84VW1ISGJOTFFKcmZscmtsMGVhL3kxZTZTcXdxeE9hVXY3UG9u?=
+ =?utf-8?B?MCtyQWkzVnpBQ2tlcnpaNVFqUXFsdW1pN0VXaDZMQ0tNUWV3VUltWEpuc2NH?=
+ =?utf-8?B?K0ZDSzcwaWRoZXRpUzExWms5ZXB6cTFtMmlmZlpRN3RSUVA0dVpSSEFvWmpZ?=
+ =?utf-8?B?dEtoMFJhNmZ3Q0RGTDQ0ck9LN1BXVXVRMEswcGFLQVFVQW5mL0hFdUVIR04v?=
+ =?utf-8?B?OUkyQ05ROU00WUQ4bEJpUWN2QjJiQlFFVVZTOW45STg1V0RoZ0xTLzFHaUoy?=
+ =?utf-8?B?OU9QVGIvRnJ4bkZQdGxFWTlWczFLUlhpbWxERXhQNFo1VkU5OEpxUzJOYXJP?=
+ =?utf-8?B?WGFHamJLMXM5eHl0ejhSK2JqY0ZyQVRSMW8raHZqSWtUVW1uY3hZSUlja0dD?=
+ =?utf-8?B?aHZJOWNsanRYWWRZTDFnN3Q4L0VrbUZETzRCQ0lkMkxtbWcxU1d4ZjNyY2k0?=
+ =?utf-8?B?djhROWhScnRIOXRGWXdHcVJTSmt0VmFUSUxOVUlOVEluUno4QkNKZXhSUjJZ?=
+ =?utf-8?B?WS92bUJpR0N0WHpzTlFNS2RXM1BEYlVKcyt4ZzBhUEFSNE5ENlF5UmtqQS9h?=
+ =?utf-8?B?WVlXYlhxaEhTNCs3QS9MTHNURUh6NzZBQjg1d25JS0QwdHZjVk1NbVpac0FU?=
+ =?utf-8?Q?knWDvsNHnWRKeYtwZOA05wI1dM5OkzAwHiAaA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aEJ1Wi9UVzUxMHJnTG16ZlV6TUlVZUxrVWZVVHhsS3kyOG1IUTQ0SVdWTE1X?=
+ =?utf-8?B?VDRnOS9EcisyMHBIRllDM2FUVGw5T2N3dVNhb3VVaEEwSG5kK3BCNGFpZTNB?=
+ =?utf-8?B?SXNpSFJZcnk4MkM3bEQwNm13YS8wMlB2Y3NvZVc5VnRpL1RLRFBNcU5Eb3Jy?=
+ =?utf-8?B?c3ZVU3ZIbmY4K2Z1SlQ1eUtoTUliMEdjcTZ1YjFqWUdxQ2lPS1d0S3BHeVdJ?=
+ =?utf-8?B?czloT0M5TSt2MVpLeGk1d3JFK1BBV3hGZW9LNFdNNlE1c0hic3E4dE12bFNa?=
+ =?utf-8?B?WXJEbzJpUys2NkRocml0MFMvUVZLUWlIS3p5UU8yd2JDL0lEMkdFcHhZTDdy?=
+ =?utf-8?B?Ryt2alNMSmhXcTlDN2JSdVA3QkVCanF0SWJBQkdleCsrUzhSY0lSM09CMjF1?=
+ =?utf-8?B?dzJ2Tk8zd1VvVjVaUTFoVGJCSkFLenpvQ3dCNXNlQTYzc1dSSnBwak5zSEpQ?=
+ =?utf-8?B?aEVab20xZDZYQldoVmh4S3k5NTRFYS85Tnd0eXMwYVpRM0VJMHZuK2plVFlh?=
+ =?utf-8?B?Q0lZU1pHT084cldOc042b1M3L2FDS01kci9nM09BRnVwTTk0K0Z5b3p3VzVn?=
+ =?utf-8?B?eE5SdTZnRU52akFTaFA1ZlF5Q0tiRUJCN0E4T3RUSkZwd21wcHhPQVdFQXh0?=
+ =?utf-8?B?c09JNzN6eGlON0dqSUVUSzJLTlVsclpFV2JHTGlOOEtkMVZHa3Y4TEkyWjRx?=
+ =?utf-8?B?elFVWmtsYzQ5WkE0SVJrMW9lR3B6OXNXdTJCQ1ArMTkybCtuKzlEaTd5Z0Zu?=
+ =?utf-8?B?N0tmL3BwM1RlQ2VRRm8wQnVCTDZTdVh4WkEyY1E3WTROMUpEYXhGY0FleFFv?=
+ =?utf-8?B?TXJ3R25zeGVHOW8vc05YbkZZaFdBN2R1Q0lmUjhCeEZLelRsaEZwanJXRmZW?=
+ =?utf-8?B?Ny90YUh0cytybVBJNWRCNVZnSHlQQUNscnVRbkN6bHhSSFlleUFBbTV1UjI1?=
+ =?utf-8?B?RDdTNXMxUHBXTWRPQ012dXFKZzE5dEcrc0d4ZktwSVVjb2l2dE43bjNJT0RW?=
+ =?utf-8?B?b2xvb3lhY3NkNTNjanpKNDAxaCtsckRNMVB1THgzc1FxKzg1cTBMUjE1MXJG?=
+ =?utf-8?B?R29nd2tPWnpCOTVxai9aaDk0VTZMcjZ3VjFaWnMyankwdlZPQkpXMnViT3Ex?=
+ =?utf-8?B?aGtUMFY4cjErYjlGOWEyeGt1MDhKdFh2dDkwWTNxRzFNTGx5TzZLdFdmL0gw?=
+ =?utf-8?B?clBNVWkvZWo4enFERFhSc0lxdVI2djdRZGpubXJsWHhpYy96NlRRcnE4WGFw?=
+ =?utf-8?B?RVhIbG5YL1E2Unhydk5ubE5XN2l1anVXMFRGaDUvbGorOWRpSHdwUU52NXVy?=
+ =?utf-8?B?cTBCb3ZHdnF3QisvbWpvSXd3bHZ4WkpubEVaUjI0cjV6ZVFVay9TT1IzdDFp?=
+ =?utf-8?B?NlBiRGhMSW9xa0p1eVo0anJZVWJGb3pjNFBUQWJRQXl5V21PWnN0ZjlETUg5?=
+ =?utf-8?B?MG0xWWxMdFFzSm83ZjVzOFF3TEg0UVNQUE01bnVEc1lrMXl4NDBjTkNWOFdE?=
+ =?utf-8?B?VFN6a2dhZzczeTVha1MyMkoxNyt2eGZ6cUVISnA4U3k3Q3c1SVV1YXJnUGxQ?=
+ =?utf-8?B?M2VUc0FDQXJkR0tqVGNMLzNoa3dHbHhuM2dvV2J0SzgzYWVoN1dlNW5GdXgv?=
+ =?utf-8?B?WkdHdlBybUhCZnZXSzZ6UkZ5enB6Y1ozcmY4WlUyTkJXdjhVcFhmcnVIY1NB?=
+ =?utf-8?B?RXBmRkNPcWgxUkNmYjBQZEVpYVg4V0J2QTNvdVljSFdIL2RHcnRLWSsvdEhv?=
+ =?utf-8?B?VEhrekM3cytUU0MwSzhtOTdhRXJTSVBIRkNrTDRmZ0R3eExpK2hFOUJWL2Iv?=
+ =?utf-8?B?R3d1a3F2NTZyUUYvRFFpTVdJK2RjNkh0QTR2U2VGUmRQQm9pT3VkR3k2MzhN?=
+ =?utf-8?B?S3BSc3ltSUNKM2JSQWpESHhMaGRCZEpDV2dNZ0R1Y0twQXZzMG1OUy9TdVAv?=
+ =?utf-8?B?dk1FMDlka0diZDhPUE90UkhpaGlsLzVXcVMxRHJNemQ0b0JLd2drcTVqRG9n?=
+ =?utf-8?B?aDlOMkVISnc1YVBub3RrWEp3WVNLUnorZnZnc0ZaWGMwenlIVjZiZjA1MzNH?=
+ =?utf-8?B?UGpHamF1OFlVTDRkQlpIYXZ3VjZ4VUZTbnVaUDk1V2VQTEJUM1FLellXQ3lY?=
+ =?utf-8?Q?a5rRjzZmezx7OfMgsndkH0aH3?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ee077ed-7db4-4ca2-0bfc-08dca7cbab32
+X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jul 2024 08:20:37.3135
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B200+oRpR519rY93ORodzYuykNdF1sClZqfaL1ggdmzeRy2duFMOD8RiufXmRHm7wfDjmPHqBzgTkdeq2ySsUg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS8PR03MB8818
 
-From: Xu Kuohai <xukuohai@huawei.com>
+Dear Krzysztof
 
-Add verifier tests to check bpf lsm return values and disabled hooks.
+Thanks.
 
-Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
----
- .../selftests/bpf/prog_tests/verifier.c       |   2 +
- .../selftests/bpf/progs/verifier_lsm.c        | 178 ++++++++++++++++++
- 2 files changed, 180 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_lsm.c
+On 2024/7/18 19:40, Krzysztof Kozlowski wrote:
+> On 18/07/2024 09:42, Yang Li via B4 Relay wrote:
+>> From: Yang Li <yang.li@amlogic.com>
+>>
+>> Add binding document for Amlogic Bluetooth chipsets attached over UART.
+>>
+>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+>> ---
+>>   .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  | 66 ++++++++++++++++++++++
+>>   1 file changed, 66 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+>> new file mode 100644
+>> index 000000000000..2e433d5692ff
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+>> @@ -0,0 +1,66 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +# Copyright (C) 2024 Amlogic, Inc. All rights reserved
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/bluetooth/amlogic,w155s2-bt.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Amlogic Bluetooth chips
+>> +
+>> +description:
+>> +  This binding describes UART-attached Amlogic bluetooth chips.
+> <form letter>
+> This is a friendly reminder during the review process.
+>
+> It seems my or other reviewer's previous comments were not fully
+> addressed. Maybe the feedback got lost between the quotes, maybe you
+> just forgot to apply it. Please go back to the previous discussion and
+> either implement all requested changes or keep discussing them.
+>
+> Thank you.
+> </form letter>
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/verifier.c b/tools/testing/selftests/bpf/prog_tests/verifier.c
-index 9dc3687bc406..ff1c7da1d06e 100644
---- a/tools/testing/selftests/bpf/prog_tests/verifier.c
-+++ b/tools/testing/selftests/bpf/prog_tests/verifier.c
-@@ -88,6 +88,7 @@
- #include "verifier_xdp.skel.h"
- #include "verifier_xdp_direct_packet_access.skel.h"
- #include "verifier_bits_iter.skel.h"
-+#include "verifier_lsm.skel.h"
- 
- #define MAX_ENTRIES 11
- 
-@@ -206,6 +207,7 @@ void test_verifier_xadd(void)                 { RUN(verifier_xadd); }
- void test_verifier_xdp(void)                  { RUN(verifier_xdp); }
- void test_verifier_xdp_direct_packet_access(void) { RUN(verifier_xdp_direct_packet_access); }
- void test_verifier_bits_iter(void) { RUN(verifier_bits_iter); }
-+void test_verifier_lsm(void)                  { RUN(verifier_lsm); }
- 
- static int init_test_val_map(struct bpf_object *obj, char *map_name)
- {
-diff --git a/tools/testing/selftests/bpf/progs/verifier_lsm.c b/tools/testing/selftests/bpf/progs/verifier_lsm.c
-new file mode 100644
-index 000000000000..08251c517154
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/verifier_lsm.c
-@@ -0,0 +1,178 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+#include "bpf_misc.h"
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog with -4095~0 retval. test 1")
-+__success
-+__naked int errno_zero_retval_test1(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 0;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog with -4095~0 retval. test 2")
-+__success
-+__naked int errno_zero_retval_test2(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = -4095;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog with -4095~0 retval. test 3")
-+__success
-+__naked int errno_zero_retval_test3(void *ctx)
-+{
-+	asm volatile (
-+	"call %[bpf_get_prandom_u32];"
-+	"r0 <<= 63;"
-+	"r0 s>>= 63;"
-+	"r0 &= -13;"
-+	"exit;"
-+	:
-+	: __imm(bpf_get_prandom_u32)
-+	: __clobber_all);
-+}
-+
-+SEC("lsm/file_mprotect")
-+__description("lsm bpf prog with -4095~0 retval. test 4")
-+__failure __msg("R0 has smin=-4096 smax=-4096 should have been in [-4095, 0]")
-+__naked int errno_zero_retval_test4(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = -4096;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_mprotect")
-+__description("lsm bpf prog with -4095~0 retval. test 5")
-+__failure __msg("R0 has smin=4096 smax=4096 should have been in [-4095, 0]")
-+__naked int errno_zero_retval_test5(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 4096;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_mprotect")
-+__description("lsm bpf prog with -4095~0 retval. test 6")
-+__failure __msg("R0 has smin=1 smax=1 should have been in [-4095, 0]")
-+__naked int errno_zero_retval_test6(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 1;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/audit_rule_known")
-+__description("lsm bpf prog with bool retval. test 1")
-+__success
-+__naked int bool_retval_test1(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 1;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/audit_rule_known")
-+__description("lsm bpf prog with bool retval. test 2")
-+__success
-+__success
-+__naked int bool_retval_test2(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 0;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/audit_rule_known")
-+__description("lsm bpf prog with bool retval. test 3")
-+__failure __msg("R0 has smin=-1 smax=-1 should have been in [0, 1]")
-+__naked int bool_retval_test3(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = -1;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/audit_rule_known")
-+__description("lsm bpf prog with bool retval. test 4")
-+__failure __msg("R0 has smin=2 smax=2 should have been in [0, 1]")
-+__naked int bool_retval_test4(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 2;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_free_security")
-+__success
-+__description("lsm bpf prog with void retval. test 1")
-+__naked int void_retval_test1(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = -4096;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_free_security")
-+__success
-+__description("lsm bpf prog with void retval. test 2")
-+__naked int void_retval_test2(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 4096;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/getprocattr")
-+__description("lsm disabled hook: getprocattr")
-+__failure __msg("points to disabled hook")
-+__naked int disabled_hook_test1(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 0;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/setprocattr")
-+__description("lsm disabled hook: setprocattr")
-+__failure __msg("points to disabled hook")
-+__naked int disabled_hook_test2(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 0;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+SEC("lsm/ismaclabel")
-+__description("lsm disabled hook: ismaclabel")
-+__failure __msg("points to disabled hook")
-+__naked int disabled_hook_test3(void *ctx)
-+{
-+	asm volatile (
-+	"r0 = 0;"
-+	"exit;"
-+	::: __clobber_all);
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.30.2
+Apologies for the earlier omission. I have amended the description of the
 
+UART-attached Amlogic Bluetooth chips in the patch:
+
+"This binding describes Amlogic Bluetooth chips connected via UART,
+
+which function as dual-radio devices supporting Wi-Fi and Bluetooth.
+
+It operates on the H4 protocol over a 4-wire UART, with RTS and CTS lines
+
+used for firmware download. It supports Bluetooth and Wi-Fi coexistence."
+
+>> +
+>> +maintainers:
+>> +  - Yang Li <yang.li@amlogic.com>
+>> +
+>> +properties:
+>> +  compatible:
+>> +    oneOf:
+>> +      - const: amlogic,w155s2-bt
+>> +      - items:
+>> +          - enum:
+>> +              - amlogic,w265s1-bt
+>> +              - amlogic,w265p1-bt
+>> +              - amlogic,w265s2-bt
+>> +          - const: amlogic,w155s2-bt
+>> +
+>> +  bt-enable-gpios:
+> enable-gpios
+will do.
+>
+>> +    maxItems: 1
+>> +    description: gpio specifier used to enable BT
+> Drop, redundant.
+will do.
+>
+>> +
+>> +  bt-supply:
+> It's called "bt" in schematics or datasheet? Feels unusual. Please list
+> all the pins if you claim that's a real name.
+>
+Yes, you are correct, the actual name is 'vddio-supply.' I initially 
+intended to
+
+differentiate it from WiFi, but it seems unnecessary. I will change it 
+to 'vddio-supply'.
+
+>
+>> +    description: bluetooth chip 3.3V supply regulator handle
+>> +
+>> +  clocks:
+>> +    maxItems: 1
+>> +    description: clock provided to the controller (32.768KHz)
+>> +
+>> +  antenna-number:
+>> +    default: 1
+>> +    description: device supports up to two antennas
+> Keep it consistent - either descriptions are the last property or
+> somewhere else. Usually the last.
+>
+>> +    $ref: /schemas/types.yaml#/definitions/uint32
+> And what does it mean? What happens if BT uses antenna number 2, not 1?
+> What is connected to the other antenna? It really feels useless to say
+> which antenna is connected to hardware.
+
+Sorry, the antenna description was incorrect, it should specify whether
+
+Bluetooth and WiFi coexist. I will change it as below:
+
+     aml,work-mode:
+     type: boolean
+     description: specifywhether Bluetooth and WiFi coexist.
+>> +
+>> +  firmware-name:
+>> +    description: specify the path of firmware bin to load
+> Missing maxItems
+will do.
+>
+>> +    $ref: /schemas/types.yaml#/definitions/string-array
+> That's redundant, drop.
+will do.
+>
+>> +
+>
+> Best regards,
+> Krzysztof
+>
 
