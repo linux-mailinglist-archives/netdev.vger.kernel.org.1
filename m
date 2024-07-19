@@ -1,250 +1,339 @@
-Return-Path: <netdev+bounces-112260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD6C937BF6
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 19:57:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB2B937C3B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 20:14:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C1FD2826E5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 17:57:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B68322831A6
+	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 18:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8059F1465A8;
-	Fri, 19 Jul 2024 17:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AF21459F9;
+	Fri, 19 Jul 2024 18:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DboOl3gO"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="OlBdRfZU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-1908.mail.infomaniak.ch (smtp-1908.mail.infomaniak.ch [185.125.25.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3F4146A85
-	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 17:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755FF2746B
+	for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 18:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721411857; cv=none; b=KqEQrRVog450pvY3wjKjnaU9wJmu4bBWp2Etr5s5hWIjz9gEyfpOOnkajjucwq5fnzWvjXTAhYPEuBYVujqHJ9psLBGP4en7pAWrO0msJVh7Is6akkcEimet+rgPQYwjqlCKwwxxOgCB9rmIs8ojUELZnwwS3EgGIkNED3Xdtlg=
+	t=1721412853; cv=none; b=FKR9boWFPLWalIY/7k2MuAPdFbb+445NEcVVsSfwGmy85pm28hqlM4Hh5UnA5DUoe9TRgxaVwTWtB5CSavkLq7dOmocZNPTVYoF91eW9FeUo3Yghg7nVDTH96fgaFn+qHj75J0rcdno+aFXA13tTN0D6E3MET5RS0z/77JcC64s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721411857; c=relaxed/simple;
-	bh=gBSfgHqzMZyfzEG292qR2pPcIdmVtij9j0W9wDUC/Pg=;
+	s=arc-20240116; t=1721412853; c=relaxed/simple;
+	bh=qCrqHdn+cpkWR3yivLl119Ad62YP9Gu7JeJQO9PsfUM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jMayXW+wtq+c6Yl7jdBoIvhZRvwZgn5ORJbCDsPpqS7/DlETgmkZdbvkYJHv/ugQsZJ5lwMpVtGrPMCiLtOEcHFhF99jcf9iqEhl+a5gOaFXJMJTsd/ndQYNZzGSLzA7kcw4YrQu1zQCRB6ReHN5wAtDgO+BmoM8HJpgJrb/8YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DboOl3gO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721411854;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ScE19C0ZbjRjXc1ErXBtrk4kqtnK9/PBxVB1lOMtsB4=;
-	b=DboOl3gON246nqT2019b728K2Zval5r62OEChi39UgAyGTyhi1ZiuGKPGwLlFyMaw9fFDT
-	uq7GdhFMc8P0juLj68d7aDnA4elsk4ULPMV4P4xbn5E/FM3LhyxXfnu+ljGGo6BC9+dItH
-	3xwj5WfwlmW1fTgW9sJHSZVgpC/sNog=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-185-MIF41snmNcW782BgjcQuWA-1; Fri, 19 Jul 2024 13:57:33 -0400
-X-MC-Unique: MIF41snmNcW782BgjcQuWA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36835daf8b7so1167980f8f.2
-        for <netdev@vger.kernel.org>; Fri, 19 Jul 2024 10:57:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721411851; x=1722016651;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ScE19C0ZbjRjXc1ErXBtrk4kqtnK9/PBxVB1lOMtsB4=;
-        b=kmHwIJGL9Nvpbrc00+BuuCg/oTKi0uauLo2SKb+zDusH27Hjp8G+17/W7HChlTDp5L
-         MivpHn97sv6yePUIkxFxJLtaTlc8zy9M8JL8AJY89CXJAw5gSq/TqdWwncatC3gv6a7U
-         Q/3IP95CVGkTEwD5S8BHfu0rOFHJIAaihcaj/AnaoQgS7eFRUjxXZ9wKjxvaFuLhw3QJ
-         Rl0Cvsqupd07HEJhlf2vQOUoSrxQ1cN12GJbRiHCR2ODUgaf7WHRFZrvMi92zpUtPGRT
-         8oadqrVI1KUSaTpklG0O/wDOGCq0QD1IyWNhQdtp/V0/BdQ9AYHn9pRsOlIL0sEickf9
-         UG0w==
-X-Gm-Message-State: AOJu0YwtxZAliDWxI4NcUAyKbjPRHETG1kcC0lpCujuW0bpyRsYqUqw7
-	mShHEtIlqXHcUp41QO1nRyd5+zACTZXUTbeEzc/rhV5aBFlUPd0PY9wl9W/kqFttzHZlA1UN0cD
-	DGG7oeccAqmtNIz3JRiIW78HZ2yX1jPhKy5cJePJIMFv3z8HG+dGa0M8AyLu+Yg==
-X-Received: by 2002:a05:6000:1562:b0:368:4b34:541 with SMTP id ffacd0b85a97d-3684b3405d2mr6071476f8f.16.1721411850985;
-        Fri, 19 Jul 2024 10:57:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzxkuszdZLfxoKFpwNyb1jHEnDFzNmx6ruGw39Qp9b85hUaH5kAf3dHNtAVY4hMrg0An8Ktw==
-X-Received: by 2002:a05:6000:1562:b0:368:4b34:541 with SMTP id ffacd0b85a97d-3684b3405d2mr6071454f8f.16.1721411850288;
-        Fri, 19 Jul 2024 10:57:30 -0700 (PDT)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36878694637sm2219339f8f.56.2024.07.19.10.57.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 10:57:29 -0700 (PDT)
-Date: Fri, 19 Jul 2024 19:57:27 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Matching on DSCP with IPv4 FIB rules
-Message-ID: <ZpqpB8vJU/Q6LSqa@debian>
-References: <ZnwCWejSuOTqriJc@shredder.mtl.com>
- <ZnypieBfn3CxCGDq@debian>
- <Zn3DdfGZIVBxN0DR@shredder.lan>
- <Zobnma+cQPMhIlSy@debian>
- <ZpkVIE1Pod1jrgsc@shredder.mtl.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pxn+GTuZwmENYAxk2h/gGzxKNP/K1xo4Zc6GHNhv6OdGHeWnwxuJnQD8/m8HCrJNFPqeUImrCWLRbjivV6BhLqcLCuvaADUE8yJFlLCyoTY7TNI4Ymd91k5PeVvcQw/NXsH6x4cJ2yJ3FWEhamV55XIf+tYTHLixmkSRD08esxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=OlBdRfZU; arc=none smtp.client-ip=185.125.25.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WQd9B1JHSzYJB;
+	Fri, 19 Jul 2024 20:14:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1721412846;
+	bh=Sfu7kbVhK7l3nqVtAhoPi7msdo+3IQX+4FwZA44EGgw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OlBdRfZUhd534U/aK4GNrmC8QpD79aZSrAOFi/PqN71269udy5dKni70LUqT1DFMC
+	 ZnNwoZFZrMm8XsVV8cdILIOy3aXHyPj3ON0udSwvLVqTaDCVkPSDWwGW0NbOdFeL0M
+	 AGO05GreLlBAJu28zxT3xOw3yg8ug8T+JKVoxeKc=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WQd990l2Wznlr;
+	Fri, 19 Jul 2024 20:14:05 +0200 (CEST)
+Date: Fri, 19 Jul 2024 20:14:02 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	outreachy@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v7 1/4] Landlock: Add abstract unix socket connect
+ restriction
+Message-ID: <20240719.AepeeXeib7sh@digikod.net>
+References: <cover.1721269836.git.fahimitahera@gmail.com>
+ <d7bad636c2e3609ade32fd02875fa43ec1b1d526.1721269836.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZpkVIE1Pod1jrgsc@shredder.mtl.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d7bad636c2e3609ade32fd02875fa43ec1b1d526.1721269836.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
-On Thu, Jul 18, 2024 at 04:14:08PM +0300, Ido Schimmel wrote:
-> On Thu, Jul 04, 2024 at 08:19:05PM +0200, Guillaume Nault wrote:
+On Wed, Jul 17, 2024 at 10:15:19PM -0600, Tahera Fahimi wrote:
+> The patch introduces a new "scoped" attribute to the
+> landlock_ruleset_attr that can specify "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET"
+> to scope abstract unix sockets from connecting to a process outside of
+> the same landlock domain.
 > 
-> > So, do you mean to centralise the effect of all the current RT_TOS()
-> > calls inside a few functions? So that we can eventually remove all
-> > those RT_TOS() calls later?
+> This patch implement two hooks, "unix_stream_connect" and "unix_may_send" to
+> enforce this restriction.
 > 
-> Yes. See this patch:
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
 > 
-> https://github.com/idosch/linux/commit/80f536f629c4dccdb6c015a10ca25d7743233208.patch
-> 
-> I can send it when net-next opens. It should allow us to start removing
-> the masking of the high order DSCP bits without introducing regressions
-> as the masking now happens at the core and not at individual call sites
-> or along the path to the core.
+> -------
 
-Thanks for the sample patch. I think we're on the same page.
+Only "---"
 
-> > > I was only able to find two call paths that can reach these functions
-> > > with a TOS value that does not have its three upper DSCP bits masked:
-> > > 
-> > > nl_fib_input()
-> > > 	nl_fib_lookup()
-> > > 		flowi4_tos = frn->fl_tos	// Directly from user space
-> > > 		fib_table_lookup()
-> > > 
-> > > nft_fib4_eval()
-> > > 	flowi4_tos = iph->tos & DSCP_BITS
-> > > 	fib_lookup()
-> > > 
-> > > The first belongs to an ancient "NETLINK_FIB_LOOKUP" family which I am
-> > > quite certain nobody is using and the second belongs to netfilter's fib
-> > > expression.
-> > 
-> > I agree that nl_fib_input() probably doesn't matter.
-> > 
-> > For nft_fib4_eval() it really looks like the current behaviour is
-> > intended. And even though it's possible that nobody currently relies on
-> > it, I think it's the correct one. So I don't really feel like changing
-> > it.
-> 
-> Yes, I agree. The patch I mentioned takes care of that by setting the
-> new 'FLOWI_FLAG_MATCH_FULL_DSCP' in nft_fib4_eval().
+> v7:
 
-Okay, let me contradict myself... :)
+Thanks for the detailed changelog, it helps!
 
-Considering that the number of users of this new flag has no
-reason to grow and that we can ignore nl_fib_input() (which is close to
-unusable as the necessary fib_result_nl structure isn't exported to
-include/uapi/), does it really make sense to add a special case just
-for nft_fib4_eval()?
+>  - Using socket's file credentials for both connected(STREAM) and
+>    non-connected(DGRAM) sockets.
+>  - Adding "domain_sock_scope" instead of the domain scoping mechanism used in
+>    ptrace ensures that if a server's domain is accessible from the client's
+>    domain (where the client is more privileged than the server), the client
+>    can connect to the server in all edge cases.
+>  - Removing debug codes.
+> v6:
+>  - Removing curr_ruleset from landlock_hierarchy, and switching back to use
+>    the same domain scoping as ptrace.
+>  - code clean up.
+> v5:
+>  - Renaming "LANDLOCK_*_ACCESS_SCOPE" to "LANDLOCK_*_SCOPE"
+>  - Adding curr_ruleset to hierarachy_ruleset structure to have access from
+>    landlock_hierarchy to its respective landlock_ruleset.
+>  - Using curr_ruleset to check if a domain is scoped while walking in the
+>    hierarchy of domains.
+>  - Modifying inline comments.
+> V4:
+>  - Rebased on Günther's Patch:
+>    https://lore.kernel.org/all/20240610082115.1693267-1-gnoack@google.com/
+>    so there is no need for "LANDLOCK_SHIFT_ACCESS_SCOPE", then it is removed.
+>  - Adding get_scope_accesses function to check all scoped access masks in a ruleset.
+>  - Using file's FD credentials instead of credentials stored in peer_cred
+>    for datagram sockets. (see discussion in [1])
+>  - Modifying inline comments.
+> V3:
+>  - Improving commit description.
+>  - Introducing "scoped" attribute to landlock_ruleset_attr for IPC scoping
+>    purpose, and adding related functions.
+>  - Changing structure of ruleset based on "scoped".
+>  - Removing rcu lock and using unix_sk lock instead.
+>  - Introducing scoping for datagram sockets in unix_may_send.
+> V2:
+>  - Removing wrapper functions
+> 
+> [1]https://lore.kernel.org/outreachy/Zmi8Ydz4Z6tYtpY1@tahera-OptiPlex-5000/T/#m8cdf33180d86c7ec22932e2eb4ef7dd4fc94c792
 
-I imagine the pain of describing the tos and dscp keywords in man pages
-for example. There will be enough important details about the ECN bits,
-the behaviour differences between IPv4 and IPv6, the different number
-representation between dscp and tos (bit shift)... If we also have to
-explain that the behaviour also depends on the module at the origin of
-the route lookup, end users are going to get completely lost.
 
-> > > If regressions are reported for any of them (unlikely, IMO), we can add
-> > > a new flow information flag (e.g., 'FLOWI_FLAG_DSCP_NO_MASK') which will
-> > > tell the core routing functions to not apply the 'IPTOS_RT_MASK' mask.
-> > > 
-> > > 3. Removing 'struct flowi4::flowi4_tos'.
-> > > 
-> > > 4. Adding a new DSCP FIB rule attribute (e.g., 'FRA_DSCP') with a
-> > > matching "dscp" keyword in iproute2 that accepts values in the range of
-> > > [0, 63] which both address families will support. IPv4 will support it
-> > > via the new DSCP field ('struct flowi4::dscp') and IPv6 will support it
-> > > using the existing flow label field ('struct flowi6::flowlabel').
-> > 
-> > I'm sorry, something isn't clear to me. Since masking the high order
-> > bits has been centralised at step 2, how will you match them?
-> > 
-> > If we continue to take fib4_rule_match() as an example; do you mean to
-> > extend struct fib4_rule to store the extra information, so that
-> > fib4_rule_match() knows how to test fl4->dscp? For example:
+> -------
 > 
-> Yes. See these patches:
-> 
-> https://github.com/idosch/linux/commit/1a79fb59f66731cfc891e3fecb3b08cda6bb0170.patch
-> https://github.com/idosch/linux/commit/a4990aab8ee4866b9f853777a50de09537255d67.patch
-> https://github.com/idosch/linux/commit/7328d60b7cfe2b07b2d565c9af36f650e96552a5.patch
-> https://github.com/idosch/linux/commit/73a739735d27bef613813f0ac0a9280e6427264d.patch
-> 
-> Specifically these hunks from the second patch:
-> 
-> @@ -37,6 +37,7 @@ struct fib4_rule {
->  	u8			dst_len;
->  	u8			src_len;
->  	dscp_t			dscp;
-> +	u8			is_dscp_sel:1;	/* DSCP or TOS selector */
->  	__be32			src;
->  	__be32			srcmask;
->  	__be32			dst;
-> @@ -186,7 +187,14 @@ INDIRECT_CALLABLE_SCOPE int fib4_rule_match(struct fib_rule *rule,
->  	    ((daddr ^ r->dst) & r->dstmask))
->  		return 0;
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+
+No need for this hunk.
+
+
+> ---
+>  include/uapi/linux/landlock.h |  29 +++++++++
+>  security/landlock/limits.h    |   3 +
+>  security/landlock/ruleset.c   |   7 ++-
+>  security/landlock/ruleset.h   |  23 ++++++-
+>  security/landlock/syscalls.c  |  14 +++--
+>  security/landlock/task.c      | 112 ++++++++++++++++++++++++++++++++++
+>  6 files changed, 181 insertions(+), 7 deletions(-)
+
+> diff --git a/security/landlock/task.c b/security/landlock/task.c
+> index 849f5123610b..597d89e54aae 100644
+> --- a/security/landlock/task.c
+> +++ b/security/landlock/task.c
+> @@ -13,6 +13,8 @@
+>  #include <linux/lsm_hooks.h>
+>  #include <linux/rcupdate.h>
+>  #include <linux/sched.h>
+> +#include <net/sock.h>
+> +#include <net/af_unix.h>
 >  
-> -	if (r->dscp && !fib_dscp_match(r->dscp, fl4))
-> +	/* When DSCP selector is used we need to match on the entire DSCP field
-> +	 * in the flow information structure. When TOS selector is used we need
-> +	 * to mask the upper three DSCP bits prior to matching to maintain
-> +	 * legacy behavior.
-> +	 */
-> +	if (r->is_dscp_sel && r->dscp != inet_dsfield_to_dscp(fl4->flowi4_tos))
+>  #include "common.h"
+>  #include "cred.h"
+> @@ -108,9 +110,119 @@ static int hook_ptrace_traceme(struct task_struct *const parent)
+>  	return task_ptrace(parent, current);
+>  }
+>  
+> +static int walk_and_check(const struct landlock_ruleset *const child,
+> +			  struct landlock_hierarchy **walker, int i, int j,
+
+We don't know what are "i" and "j" are while reading this function's
+signature.  They need a better name.
+
+Also, they are ingegers (signed), whereas l1 and l2 are size_t (unsigned).
+
+> +			  bool check)
+> +{
+> +	if (!child || i < 0)
+> +		return -1;
+> +
+> +	while (i < j && *walker) {
+
+This would be more readable with a for() loop.
+
+> +		if (check && landlock_get_scope_mask(child, j))
+
+This is correct now but it will be a bug when we'll have other scope.
+Instead, you can replace the "check" boolean with a variable containing
+LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET.
+
+> +			return -1;
+> +		*walker = (*walker)->parent;
+> +		j--;
+> +	}
+> +	if (!*walker)
+> +		pr_warn_once("inconsistency in landlock hierarchy and layers");
+
+This must indeed never happen, but WARN_ON_ONCE(!*walker) would be
+better than this check+pr_warn.
+
+Anyway, if this happen this pointer will still be dereferenced in
+domain_sock_scope() right?  This must not be possible.
+
+
+> +	return j;
+
+Because j is now equal to i, no need to return it.  This function can
+return a boolean instead, or a struct landlock_ruleset pointer/NULL to
+avoid the pointer of pointer?
+
+> +}
+> +
+> +/**
+> + * domain_sock_scope - Checks if client domain is scoped in the same
+> + *			domain as server.
+> + *
+> + * @client: Connecting socket domain.
+> + * @server: Listening socket domain.
+> + *
+> + * Checks if the @client domain is scoped, then the server should be
+> + * in the same domain to connect. If not, @client can connect to @server.
+> + */
+> +static bool domain_sock_scope(const struct landlock_ruleset *const client,
+
+This function can have a more generic name if
+LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET is passed as argument.  This could
+be reused as-is for other kind of scope.
+
+> +			      const struct landlock_ruleset *const server)
+> +{
+> +	size_t l1, l2;
+> +	int scope_layer;
+> +	struct landlock_hierarchy *cli_walker, *srv_walker;
+
+We have some room for a bit more characters ;)
+client_walker, server_walker;
+
+> +
+> +	if (!client)
+> +		return true;
+> +
+> +	l1 = client->num_layers - 1;
+
+Please rename variables in a consistent way, in this case something like
+client_layer?
+
+> +	cli_walker = client->hierarchy;
+> +	if (server) {
+> +		l2 = server->num_layers - 1;
+> +		srv_walker = server->hierarchy;
+> +	} else
+> +		l2 = 0;
+> +
+> +	if (l1 > l2)
+> +		scope_layer = walk_and_check(client, &cli_walker, l2, l1, true);
+
+Instead of mixing the layer number with an error code, walk_and_check()
+can return a boolean, take as argument &scope_layer, and update it.
+
+> +	else if (l2 > l1)
+> +		scope_layer =
+> +			walk_and_check(server, &srv_walker, l1, l2, false);
+> +	else
+> +		scope_layer = l1;
+> +
+> +	if (scope_layer == -1)
+> +		return false;
+
+All these domains and layers checks are difficult to review. It needs at
+least some comments, and preferably also some code refactoring to avoid
+potential inconsistencies (checks).
+
+> +
+> +	while (scope_layer >= 0 && cli_walker) {
+
+Why srv_walker is not checked?  Could this happen?  What would be the
+result?
+
+Please also use a for() loop here.
+
+> +		if (landlock_get_scope_mask(client, scope_layer) &
+> +		    LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET) {
+
+The logic needs to be explained.
+
+> +			if (!server)
+> +				return false;
+> +
+> +			if (srv_walker == cli_walker)
+> +				return true;
+> +
+> +			return false;
+> +		}
+> +		cli_walker = cli_walker->parent;
+> +		srv_walker = srv_walker->parent;
+> +		scope_layer--;
+> +	}
+> +	return true;
+> +}
+> +
+> +static bool sock_is_scoped(struct sock *const other)
+> +{
+> +	const struct landlock_ruleset *dom_other;
+> +	const struct landlock_ruleset *const dom =
+> +		landlock_get_current_domain();
+> +
+> +	/* the credentials will not change */
+> +	lockdep_assert_held(&unix_sk(other)->lock);
+> +	dom_other = landlock_cred(other->sk_socket->file->f_cred)->domain;
+> +
+> +	/* other is scoped, they connect if they are in the same domain */
+> +	return domain_sock_scope(dom, dom_other);
+> +}
+> +
+> +static int hook_unix_stream_connect(struct sock *const sock,
+> +				    struct sock *const other,
+> +				    struct sock *const newsk)
+> +{
+> +	if (sock_is_scoped(other))
 > +		return 0;
-> +	else if (!r->is_dscp_sel && r->dscp && !fib_dscp_match(r->dscp, fl4))
->  		return 0;
+> +
+> +	return -EPERM;
+> +}
+> +
+> +static int hook_unix_may_send(struct socket *const sock,
+> +			      struct socket *const other)
+> +{
+> +	if (sock_is_scoped(other->sk))
+> +		return 0;
+> +
+> +	return -EPERM;
+> +}
+> +
+>  static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>  	LSM_HOOK_INIT(ptrace_access_check, hook_ptrace_access_check),
+>  	LSM_HOOK_INIT(ptrace_traceme, hook_ptrace_traceme),
+> +	LSM_HOOK_INIT(unix_stream_connect, hook_unix_stream_connect),
+> +	LSM_HOOK_INIT(unix_may_send, hook_unix_may_send),
+>  };
 >  
->  	if (rule->ip_proto && (rule->ip_proto != fl4->flowi4_proto))
+>  __init void landlock_add_task_hooks(void)
+> -- 
+> 2.34.1
 > 
-> Note that it is just an RFC. I first need to remove the masking of the
-> high order DSCP bits before I can send it.
-
-I find "is_dscp_sel" not very informative as a field name. Maybe
-"dscp_nomask" or "dscp_full" would be better? They're more intuitive
-to me, but I have no problem if you prefer to keep "is_dscp_sel" of
-course.
-
-> >     /* Assuming FRA_DSCP sets ->dscp_mask to 0xff while the default
-> >      * would be 0x1c to keep the old behaviour.
-> >      */
-> >     if (r->dscp && r->dscp != (fl4->dscp & r->dscp_mask))
 > 
-> It's a bit more involved. Even if the old TOS selector is used, we don't
-> always want to mask using 0x1c. If nft_fib4_eval() filled 0xfc in
-> 'flowi4_tos', then by masking using 0x1c it will now match a FIB rule
-> that was configured with 'tos 0x1c' whereas previously it didn't. The
-> new 'FLOWI_FLAG_MATCH_FULL_DSCP' takes care of that, but it only applies
-> to rules configured with the TOS selector. The new DSCP selector will
-> always match against the entire DSCP field.
-
-Back to nft_fib4_eval(), making it behave like the rest of the kernel
-would also mean it'd behave like the existing ipt_rpfilter module. So
-people moving from iptables to nftables would keep the same behaviour.
-Unless you strongly feel about keeping the FLOWI_FLAG_MATCH_FULL_DSCP
-flag, I think we should ask Pablo and Florian if they're okay for
-making nft_fib4_eval() behave like the rest of the stack.
-
-> Are you OK with the approach that I outlined above? Basically:
-> 
-> 1. Submitting the patch that centralizes TOS matching
-> 2. Removing the masking of the high order DSCP bits
-> 3. Adding new DSCP selector for FIB rules
-
-Yes, looks like a good plan!
-
-> If you already have some patches that convert to 'dscp_t', then I can
-> work on top of them to avoid conflicts.
-
-I think we can complete the new dscp feature faster than the dscp_t
-conversion. Therefore I think it'll make more sense for me to rebase
-on top of your patches.
-
 
