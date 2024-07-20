@@ -1,124 +1,117 @@
-Return-Path: <netdev+bounces-112273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03F6E937E81
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 02:28:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D949937E8A
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 02:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90988B21062
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 00:28:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0879228182E
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 00:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C970817FD;
-	Sat, 20 Jul 2024 00:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="IEau3GTE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27236163;
+	Sat, 20 Jul 2024 00:33:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798424404;
-	Sat, 20 Jul 2024 00:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A296979DF
+	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 00:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721435314; cv=none; b=DQiA2EVMAiIXU5lJZibg0lDIlIqHcmL0bapiKobObw4cl51jJXTbJ7pKXNh4ykT8ygDND+1rvea0MJ11c34/hTmwyY6wcxowD0EYVvk16QCtj0X2LF0bHXWy5pAv9FRLnTz5W/kUJ/GeKGHvtz2aZ8PXah4EAIu7Yrft8x68E+M=
+	t=1721435583; cv=none; b=nu/Y9zMbnNBS8EwpFOR/Jd2gMQ6wel68MH5IegDiIYqzyGgtA+dPJlTZRsXLWBsejOBvuny/3YGltc3ueklg0uAp5S8JX+NjzgNbBRV2IuGOheOsw7AQ9/cuU1DK0yCbXvWHsdk3YDhjSnlfv2GTzk5cVpkpVbHE1eszhUPDdWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721435314; c=relaxed/simple;
-	bh=Eul2CBV4qWWvrz4hc9g9QRwccvT28YsfWm7eoLJzhCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMfsjei8jtHDAL8BwvoK7YDTV19vsS76tpep7bpUx2KHSTnTIZCQkyMjKW76sA9l2BNSsbpwyDZ6B+sRilONUt8qo60qf8hTKhzT6+2kSXzH+fPzrcqCgYwsNW3L68JFwxZN38dFcVRT7x8ZP3zSmt11g9BcyHBNW3WynAVpFIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=IEau3GTE; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=VGildi8JKxn7CDz0glPmQSzXJV50SAWGnGDt2jhS1L0=; b=IEau3GTEdY9ViYZz
-	DLYX84kE5Xg3dD7A2fvFcbr7BkqgSa0YTdBx7hyXNWQyo0s1Dj+p94n6RtH0ihDLyeRYoR6jrnyfC
-	fBmJX0qHf+H81kLzUypELPjea5EMO3wAVNPsmSKsC6u2RQl+7bPpMiMiU3/vEgFbQo309f2EkD5QF
-	eaJWaBuaO5qo/DG9kNYnSyc00X1MT/eOSh53zhkYW6uiik/04S0l5AHDMB1+lRNqG+Ofjs+EJ5vMy
-	jO1IlIhRHcqUPwpLdHo2X3zar6N4ncCWA2fP6S7Nit4QtPRtblP1TlYybmSSxs2taO/uIbN4I8gll
-	e/mrVe08G/+RW/iGPw==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sUxxR-00CVvw-0j;
-	Sat, 20 Jul 2024 00:28:17 +0000
-Date: Sat, 20 Jul 2024 00:28:17 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Allison Henderson <allison.henderson@oracle.com>
-Cc: "edumazet@google.com" <edumazet@google.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] RDMA/rds: remove unused struct 'rds_ib_dereg_odp_mr'
-Message-ID: <ZpsEof3hxKGQBmqF@gallifrey>
-References: <20240531233307.302571-1-linux@treblig.org>
- <2442cae88ee4a5f7ba46bb0158735634fa82a305.camel@oracle.com>
+	s=arc-20240116; t=1721435583; c=relaxed/simple;
+	bh=bOf0uaOnZfQ7qrXKBFMeyTIOJP7Ps8jTkXecHZmInI8=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=Dxzjx+dwbNh0LTuBHIo1vQC3F41gl6EFiW+XNlHnEwTSv+RWqmk4Ynf9fD0L1A6Xb1qiyklcsqDw/P+Eo8jtP8oflOZ8Pj5YCs2Sk5fnMK59apWqiKwLuhQK0UeZYtpH31tRp8NLUGYaJtNsr62ubS2DlSwpy9TTEG0iJZEtNRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from vapr.local.chopps.org (unknown [75.104.68.180])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id F14747D018;
+	Sat, 20 Jul 2024 00:32:55 +0000 (UTC)
+References: <20240714202246.1573817-1-chopps@chopps.org>
+ <20240714202246.1573817-9-chopps@chopps.org>
+ <20240719061655.GB29401@breakpoint.cc>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
+ Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
+ Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v5 08/17] xfrm: iptfs: add new
+ iptfs xfrm mode impl
+Date: Fri, 19 Jul 2024 17:30:31 -0700
+In-reply-to: <20240719061655.GB29401@breakpoint.cc>
+Message-ID: <m2frs4x5qn.fsf@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2442cae88ee4a5f7ba46bb0158735634fa82a305.camel@oracle.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 00:27:42 up 72 days, 11:41,  1 user,  load average: 0.08, 0.02, 0.01
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-* Allison Henderson (allison.henderson@oracle.com) wrote:
-> On Sat, 2024-06-01 at 00:33 +0100, linux@treblig.org wrote:
-> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> > 
-> > 'rds_ib_dereg_odp_mr' has been unused since the original
-> > commit 2eafa1746f17 ("net/rds: Handle ODP mr
-> > registration/unregistration").
-> > 
-> > Remove it.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> 
-> This patch looks fine to me, the struct is indeed unused at this point.
-> Thanks for the clean up!
-> 
-> Reviewed-by: Allison Henderson <allison.henderson@oracle.com>
+--=-=-=
+Content-Type: text/plain; format=flowed
 
-Hi,
-  Does anyone know who might pick this one up - I don't think
-it's in -next yet?
 
-Dave
+Florian Westphal <fw@strlen.de> writes:
 
-> > ---
-> >  net/rds/ib_rdma.c | 4 ----
-> >  1 file changed, 4 deletions(-)
-> > 
-> > diff --git a/net/rds/ib_rdma.c b/net/rds/ib_rdma.c
-> > index 8f070ee7e742..d1cfceeff133 100644
-> > --- a/net/rds/ib_rdma.c
-> > +++ b/net/rds/ib_rdma.c
-> > @@ -40,10 +40,6 @@
-> >  #include "rds.h"
-> >  
-> >  struct workqueue_struct *rds_ib_mr_wq;
-> > -struct rds_ib_dereg_odp_mr {
-> > -       struct work_struct work;
-> > -       struct ib_mr *mr;
-> > -};
-> >  
-> >  static void rds_ib_odp_mr_worker(struct work_struct *work);
-> >  
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+> Christian Hopps via Devel <devel@linux-ipsec.org> wrote:
+>> +static int iptfs_clone(struct xfrm_state *x, struct xfrm_state *orig)
+>> +{
+>> +	struct xfrm_iptfs_data *xtfs;
+>> +	int err;
+>> +
+>> +	xtfs = kmemdup(orig->mode_data, sizeof(*xtfs), GFP_KERNEL);
+>> +	if (!xtfs)
+>> +		return -ENOMEM;
+>> +
+>> +	err = __iptfs_init_state(x, xtfs);
+>> +	if (err)
+>> +		return err;
+>
+> Missing kfree on err?
+>
+>> +	xtfs = kzalloc(sizeof(*xtfs), GFP_KERNEL);
+>> +	if (!xtfs)
+>> +		return -ENOMEM;
+>> +
+>> +	err = __iptfs_init_state(x, xtfs);
+>> +	if (err)
+>> +		return err;
+>
+> Likewise.
+
+These originally counted on the fact that the xfrm state is cleaned up on error; however, a later code change did indeed allow for the leak -- added kfree's as suggested.
+
+Thanks,
+Chris.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmabBbASHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAldYwP/jw0Cn2Nxaun8dHsBW/Mibf6hfbIzSK+
+RTeETpREZQOiXzBNF1r8n+XXmp21QPjXDxLFJFA3bsK7SpocHD9DpYArKwdYysPo
+1JX03DsREK07RfXuOzqfwMUmWbXhQLy5F/te/Htma6kXDAliFQgY7nCav7fkAVi6
+bjox7Svefh/9TNVl/1JXsmzV6vtpmMNJ7oVE3XKV5BlFWLsoOko3lik6FSgyZuvV
+T8z9UaTFbHGbu6rDEoi6YZ+x0T6kT9AKEvRRVtl+YU3rBpU99ixaMHyDVLkav269
+5h0XHLXujBwkU0n+w3TC7gxR8qZ01NnYBK3e4vPw905b+Yzq851a5+ge0AOAXHZ8
+uoOZQeFZ9MXTvzG0ZPriDXuX96TteCzNCDn6k6DQYjuZ3ylXCvenq/zJvHC63Kkp
+UnJzgKMWY/ogKXObm6+gQazBXOt71GMTMLzsjmnvsLwoUM3ZUDkspvdWdS8As6gU
+kMJ8IrTUvjxJNyhqf6VAeKPZ/sGggIkCf7/gobbwUb9X1N3e4lWjLhoO2K5ONlyS
+7iKU4xLMpnfJ918gwcjOE9PQypYCgjhNHnwhnQUI03rMAJwO0Cx2cPLYdUaV01Sb
+APVSBDhS/wb/2CTa0Ow0tJgkKAt6byBzZiezWzwO3dmr+EQ5pKkM0gH7WtD28Pl+
+S5C0nPyDAQL2
+=2ySj
+-----END PGP SIGNATURE-----
+--=-=-=--
 
