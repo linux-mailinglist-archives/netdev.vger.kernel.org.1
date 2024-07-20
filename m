@@ -1,79 +1,126 @@
-Return-Path: <netdev+bounces-112271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097B1937DB7
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 00:04:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E74F937E6E
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 02:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8841FB213FD
-	for <lists+netdev@lfdr.de>; Fri, 19 Jul 2024 22:04:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2622820CF
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 00:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF75147C87;
-	Fri, 19 Jul 2024 22:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hV+YPMWv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5D61C27;
+	Sat, 20 Jul 2024 00:10:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97476AD2F;
-	Fri, 19 Jul 2024 22:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8B51C14
+	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 00:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721426646; cv=none; b=RhZcRM5OEskY4tAc/0YlRDRKLzSn/11g6Nme7mXCqhbmtNG6JaR/UQs2L/es/dEJIt7buURoR/VEAG2VC5e+ppIadflcmvp8zyRvih5n1eAfSI68yNyYG0PhVscbtsyHSzOBiawQxZZuJQ0+XMVtz9szqCGjGH62J2hY/I6uyaA=
+	t=1721434230; cv=none; b=rHQenRlVH3ZQLJL/TUxyUY56K4yxdYS/vSW+fbzwUJLVlsTWwi3YVJzfbUCIfZqI3+sFXnR7g76Pl/FLGmev2ZB9Iloj2kEBcX6l79B415tSXEweiaOe+jS75fii1h3esTK6TOen0ZN/9xucACYzpAAaW/5m87WWHbkZwfs4dgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721426646; c=relaxed/simple;
-	bh=3Ug3s6+XQt0ZmfBgqCe7InCCXjeqLSy2VbgIDUyQrsc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=JOH8YeYWuRMQJvS15u9CdqhWBbwta0gLlZkNb2ZH81i5e/ijBLnkU9jlsGlNHawDEZWxYt/LgiI9Nxnl6SpcQ+9xCCJX5XBFFRJMpTGXGwonEK4J8HgyfUQykqEh9tKVU02xlHYV24BLSufsvDt8crigO2AWLoIx0neeP4LeXjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hV+YPMWv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E26BC32782;
-	Fri, 19 Jul 2024 22:04:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721426646;
-	bh=3Ug3s6+XQt0ZmfBgqCe7InCCXjeqLSy2VbgIDUyQrsc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=hV+YPMWvcJYAvttBcvpUt+4/P0vdv60Xf/lWmQAp82G0IVJV4/tuGU8EUkm8blYgG
-	 //KCXbTj7Ftt2P0muhgHPsIeg4bwPpYBue+sfqJVNHXczqbqkshtNmNcgWAh7j3WlP
-	 1OPvfEJo8wzEXsdq8N+dx0UFPXwWQp1kxvPElFIOY8kaypPrD1KXMNvKU2uq3enh5T
-	 MuxsYsRPQKJMZnBTUwsgO0esa3sPz8uk8sI3CDfRu6fQdeDYDxAoWXxqFp5L76x/tM
-	 rtkuO9CctDic/0u4A2GKG+O4VQxpm9K2Ekop12XW/cSCa3JMOxi7C7OcrZsHmtXq9p
-	 WX+Zdz0KNho6w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 634E4C4332C;
-	Fri, 19 Jul 2024 22:04:06 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.11-rc0
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240719161638.138354-1-pabeni@redhat.com>
-References: <20240719161638.138354-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240719161638.138354-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.11-rc0
-X-PR-Tracked-Commit-Id: 4359836129d931fc424370249a1fcdec139fe407
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d7e78951a8b8b53e4d52c689d927a6887e6cfadf
-Message-Id: <172142664639.13042.11435996253239343247.pr-tracker-bot@kernel.org>
-Date: Fri, 19 Jul 2024 22:04:06 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1721434230; c=relaxed/simple;
+	bh=k9hJu3XBZPVlQwdlAGWtbeEt/kiPPCJWHXsxd0avHNE=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=fRidZHWZdS07z/0NHb4RmbpgkrLoB0wiMvlTe8t4ma8NuWAmjZIdpQhEiGijG5V95Pu/VHvBUNMazK/cbbA+qGJ9EWdaVk6hXdqYPPd9B28vrOyy4Jt+pvO49qXSKT5PJZFCrMKL+mDiB9qPPVUPUi3lYs1YDnsN1ZDkuoUAqUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from vapr.local.chopps.org (unknown [75.104.68.180])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 61B487D018;
+	Sat, 20 Jul 2024 00:10:15 +0000 (UTC)
+References: <20240714202246.1573817-1-chopps@chopps.org>
+ <20240714202246.1573817-7-chopps@chopps.org>
+ <20240719061413.GA29401@breakpoint.cc>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
+ Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
+ Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v5 06/17] xfrm: add mode_cbs
+ module functionality
+Date: Fri, 19 Jul 2024 17:06:41 -0700
+In-reply-to: <20240719061413.GA29401@breakpoint.cc>
+Message-ID: <m2jzhgx6sg.fsf@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-The pull request you sent on Fri, 19 Jul 2024 18:16:38 +0200:
+--=-=-=
+Content-Type: text/plain; format=flowed
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.11-rc0
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d7e78951a8b8b53e4d52c689d927a6887e6cfadf
+Florian Westphal <fw@strlen.de> writes:
 
-Thank you!
+> Christian Hopps via Devel <devel@linux-ipsec.org> wrote:
+>> +static struct xfrm_mode_cbs xfrm_mode_cbs_map[XFRM_MODE_MAX];
+>
+> Why not
+> static struct xfrm_mode_cbs *xfrm_mode_cbs_map[XFRM_MODE_MAX];
+> i.e., why does
+>
+>> +int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs)
+>> +{
+>> +	if (mode >= XFRM_MODE_MAX)
+>> +		return -EINVAL;
+>> +
+>> +	xfrm_mode_cbs_map[mode] = *mode_cbs;
+>
+> do a deep copy here rather than
+> 	xfrm_mode_cbs_map[mode] = mode_cbs;
+>
+> ?
+>
+>> +	if (mode == XFRM_MODE_IPTFS && !xfrm_mode_cbs_map[mode].create_state)
+>> +		request_module("xfrm-iptfs");
+>> +	return &xfrm_mode_cbs_map[mode];
+>
+> Sabrina noticed that this looks weird, and I agree.
+>
+> This can, afaics, return a partially initialised structure or an
+> all-zero structure.
+>
+> request_module() might load the module, it can fail to load the
+> module, and, most importantly, there is no guarantee that the
+> module is removed right after.
+>
+> Is there any locking scheme in place that prevents this from
+> happening? If so, a comment should be added that explains this.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I've switched it to the more obvious array of pointers and storing the module provided pointer.
+
+Thanks,
+Chris.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmabAF8SHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlmN8P+wY2S9L+x3KANpEDiZdPj167zWst5T6e
+qE3PcmbA+2GoK0yM4vYRTU9ZCr8ZBDoIPzciq7ksukCwUrrgBZ7UHwHRnYV/z8WS
+lc8L8yCpwfiEVlNj4SbvkPvto03W757J+fDYA9WyE9uIgmxeI5ZFjUwwIqiey2f2
+1SAjtDTnUFOG1sQ5Sq0NvXOFwne2OB5Xlalxm7TSSu8thkleUglPr/DWlPMJwvMl
+ZgB8ObfOtBQShkgYBQB9Z/0rG9rM2u1qdIzhFbcJ/fwZ29/albrSGKoXuSaa97nR
+3FJDK0gyJxm84TlnwZ0lBNoOb30GKXehVumooOWm03XyS/fImz1EanwFfWDRVefQ
+1LyrzAo5LhnWWWRD2djLEboTOmO7xnfQ04PVhEY4VBFXmjplYyUvZD60+zDrvWmL
+VyRwX5A+3M88AtdAoPvE5oUJqpfID3bKWRQRzotgy6ZTiR6+HAELGZzVOK7ifoiA
+FqopshJelNJuoZ+krTa2F8YM7jb5dNpJKM2m23+QS78wh4Yz2vnOVCGj17e7zv/Z
+YyYf2qlg22QsudsjRZ7m/t8FLoV8yf9A3RknkiTes5ZiNvFIqjjCQkhAF/rOvuZd
+RSHepcyx1FqYnMcBfF5/47okjuzpBmZ0yKjkLMvEnxer39cfWt3b5WdIurC3HM79
+aRY0jWEW8R3c
+=3rju
+-----END PGP SIGNATURE-----
+--=-=-=--
 
