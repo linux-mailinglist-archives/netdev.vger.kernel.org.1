@@ -1,91 +1,106 @@
-Return-Path: <netdev+bounces-112293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6355B938156
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:36:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406D693815C
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 941C91C213BF
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 12:36:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC389B2138C
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 12:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9B577E0FC;
-	Sat, 20 Jul 2024 12:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAF37E0FC;
+	Sat, 20 Jul 2024 12:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WU4TZjUm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYqfVG6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E581B86DD;
-	Sat, 20 Jul 2024 12:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDB8257B;
+	Sat, 20 Jul 2024 12:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721478963; cv=none; b=TIBPcv0YpJFIVFDLyn4bTpD96sKXjQEJ8NfSJxikyNIkJYajCGgz//fTxVX032y/a5HfrxEZruJ7HSRd9Yy5ImIk2J24Tdk8OgMpfGSB1XmvtQtqZ9NE+JFkC1GvDlyBxF0IiqTXjj0Q7nA3GC3Vvn3r/hy9rg6V4D/F0cXGzNY=
+	t=1721479464; cv=none; b=BJJ3TpvV1wd24K8/c6Q1lq8SKicgEET3AqCWFrR2LBAj9pLWppDsX+XSxZPSUG5TMfbZBEOvT28dX26nKBrFKjMlvNRitJSvnnMitW1kdEJi9MG8DDwktjAUlpdLZMoIPGg0ZOK6nZgwxPJ+TzHgDD6BfsxZ98x0mMpsXFO6YsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721478963; c=relaxed/simple;
-	bh=wZWGcfCwuvLPkZK8gloKNZXCfUB43TB3Hov3xCYN9XY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EBpI2ajBJFwQjQJhn/xM3rDKs1giZLkZWh9pYB3WYm7EWAD17786Xl/U6GlHa31YjCH5N5pWXgMpISx/aYFFZkoKGI3VEThWL5PmXy+MIrxDayNgWTy7Y7BWp/zfXadgphV2GtdceXIvoljoxlc4qAI46r27z26ldnVKf3zXwFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WU4TZjUm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rfT+wKS03QStuvsuw2Ht5YxWdDs9N54bvyBHm404z5w=; b=WU4TZjUm0bIk6ItpC+MpNQFEM9
-	TZXiGliWrbvUMBLpGi5W6q7W31VrLCwMq0U4hsYt0AVFJ3Ar5G/nVIjMeuSYQwevUR9KqHh4kEnRg
-	g0Qm4nW8G0JmJxnQrDJbRdXFSqHJRuWorLKdVJX9DGSTHW7bofogfD1J/gPMVV6LyVIc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sV9J8-002tkI-JM; Sat, 20 Jul 2024 14:35:26 +0200
-Date: Sat, 20 Jul 2024 14:35:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Zhouyi Zhou <zhouzhouyi@gmail.com>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
-	mcoquelin.stm32@gmail.com, linus.walleij@linaro.org,
-	martin.blumenstingl@googlemail.com, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	"zhili.liu" <zhili.liu@ucas.com.cn>,
-	wangzhiqiang <zhiqiangwang@ucas.com.cn>
-Subject: Re: [PATCH] net: stmmac: fix the mistake of the device tree property
- string of reset gpio in stmmac_mdio_reset
-Message-ID: <0c5f35c1-cf3a-4759-ac17-54e6f8c22c69@lunn.ch>
-References: <20240720040027.734420-1-zhouzhouyi@gmail.com>
+	s=arc-20240116; t=1721479464; c=relaxed/simple;
+	bh=1nsnebR961oPwpt1bU6VHdK6v98hEAP+QPoTD+y2kHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MCPqO+4MUlXAuCcFbwqiaizSlYOz2le526aupWpksMQppeol8ndHtD1REPnAxrALMhaROVvFP8QxXIVuMLazIdxuCvUddYA8Rc4v1BCv2MOeOMMcsS+ZbVX8Hu17j344kq6b9V8XSUEZXvJ7xGHCuR3Oz6cgi2olvW56p4xLLRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QYqfVG6M; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c9cc681ee0so1535531b6e.0;
+        Sat, 20 Jul 2024 05:44:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721479462; x=1722084262; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1nsnebR961oPwpt1bU6VHdK6v98hEAP+QPoTD+y2kHU=;
+        b=QYqfVG6MJZDwBa+ALAdbTabX8v8CaXEqlmuUSzd9lxi/iHW/4liApVR1mv1GC8OUZa
+         G0zn2an9KqxVyJfp4Omx+V4HQhGIwHuVrFGCr/8hhFDHUEDOZ9nONY430k9L+v9Z5p2J
+         UzM2hdp0YuBmG3Ba6EI7/qJ/BeAAE9O7a2xOgdj+s/smO0UisjhLqw+L/7b9MxakK09c
+         WYdQYjISSA3l2ABKn56x073a8tZvKfRR8wXDyXngz0blLGKW9F6d+irj1hjEnKc1A2fq
+         967pXejdqgIrKtkO5sCIrtNDINGo1tgOeHI3/dOqEvXKC6a1at5Bhac1qjDCYnOtAPbs
+         pNvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721479462; x=1722084262;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1nsnebR961oPwpt1bU6VHdK6v98hEAP+QPoTD+y2kHU=;
+        b=bDnrQ+RnDVvAS7V4KBR6u6BI+mSnhmMikXqP28vQu7rd26Pc1YnvXC4VrLsTU2BmNY
+         NJB/ZQFojeIhyvV1dZmTvH9+rGcf+xL4EEeaqgMH3UGZ42c6sJ1XfgNj/UG5E7Z7dYm4
+         7+Gw7kOUnUdr+vPwE8sZnzT7LkaXK0qMcZu/bIvWZyVxrm3uzZrB8OfE4CQJVaw/Y0w8
+         Y1A26X2jX2Gb9+V2/ljIxEVeE+H6Fj8p98bl/vbNmyiSTSuqCad2ZDxUuHgFPRBnmPDm
+         Undg7ksZM3CBR0ao441AF0ltWIcXUcbzAaBkzMT2Q6gqHPHeJIUV2vP0+53kZJ11VzTS
+         v4eg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3zYUE2XT47LT98asTNQ7wSmTEHXEbFbUjg+PTwGutsX/DjgMwEUXdlnU5NvvWBeGOIIruWKA9VwqqmKzdxrn2a921JuCe
+X-Gm-Message-State: AOJu0YwQzXp4oiefV1BqF2sltXW5eZiZ409bcI3fC+DXpaWJIIFsSo1G
+	6057RlN9BqG2ctupXK2pv2b7qS3wewv03dZk9fPQIIOr7AksOrHE2BC0KIR/L1WN2vCpmFKtKDL
+	jVxHCvBPi1U597482dXFFov2sP7Q=
+X-Google-Smtp-Source: AGHT+IEceOhq05EmeqOrV8bmatPizQhGl9TG3AHZbMQocp7H4pzROq5uSk8z+WR9e0ZBcSN6ixBEXE8ewWe7oE/Iai4=
+X-Received: by 2002:a05:6870:a11c:b0:25d:f654:9cd6 with SMTP id
+ 586e51a60fabf-263ab5622a2mr1248158fac.38.1721479461898; Sat, 20 Jul 2024
+ 05:44:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240720040027.734420-1-zhouzhouyi@gmail.com>
+References: <20240717193725.469192-1-vtpieter@gmail.com> <20240717193725.469192-2-vtpieter@gmail.com>
+ <20240717193725.469192-3-vtpieter@gmail.com> <ZppuQo9sGdYJWgBQ@pengutronix.de>
+In-Reply-To: <ZppuQo9sGdYJWgBQ@pengutronix.de>
+From: Pieter <vtpieter@gmail.com>
+Date: Sat, 20 Jul 2024 14:44:10 +0200
+Message-ID: <CAHvy4ArOx2MhMmrgeosPbr8NLE6Kf=wWuL23+g-+2=Uf9UaFtQ@mail.gmail.com>
+Subject: Re: [PATCH 2/4] net: dsa: microchip: ksz8795: add Wake on LAN support
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com, 
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, 
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jul 20, 2024 at 04:00:27AM +0000, Zhouyi Zhou wrote:
-> From: "zhili.liu" <zhili.liu@ucas.com.cn>
-> 
-> According to Documentation/devicetree/bindings/net/snps,dwmac.yaml,
-> the device tree property of PHY Reset GPIO should be "snps,reset-gpio".
-> 
-> Use string "snps,reset-gpio" instead of "snps,reset" in stmmac_mdio_reset
-> when invoking devm_gpiod_get_optional.
+Le ven. 19 juil. 2024 =C3=A0 15:46, Oleksij Rempel
+<o.rempel@pengutronix.de> a =C3=A9crit :
+>
+> Hi Pieter,
+>
+> If I see it correctly, the only difference between KSZ9477 and KSZ8795
+> code is the register access. Even bit offsets are identical. I do not
+> think indirect register access is good justification for duplication
+> this amount of code.
 
-Have you found the current code does not work on a board you have, or
-is this by code inspection?
+Hi Oleksij, thanks for the review! I guess you're right - I must have
+gone too quickly for the easy way out. There's actually one additional
+register access for KSZ8795 but it should be possible to get around
+this as well. I'll work on it but it might take me a few weeks to get
+this ready. Would be great if you still have a KSZ9477 family board
+around to validate.
 
-https://elixir.bootlin.com/linux/v6.10/source/drivers/gpio/gpiolib-of.c#L687
-https://elixir.bootlin.com/linux/v6.10/source/drivers/gpio/gpiolib.h#L93
-
-See how it appends -gpio and -gpios to the name.
-
-I also randomly check a few users of devm_gpiod_get_optional() and non
-of them include the -gpio in the name, leaving the GPIO core to do it.
-
-	Andrew
+Cheers, Pieter
 
