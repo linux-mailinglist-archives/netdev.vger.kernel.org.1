@@ -1,180 +1,123 @@
-Return-Path: <netdev+bounces-112297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5EBA9381C4
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 17:06:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B01C29381D1
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 17:29:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C09D1C20C28
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 15:06:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66C4A2817D6
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 15:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABA212CDBE;
-	Sat, 20 Jul 2024 15:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FDC13C80C;
+	Sat, 20 Jul 2024 15:29:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEd1UByx"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Gwhir+VB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB7B14294
-	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 15:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7DF137C35
+	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 15:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721488002; cv=none; b=XpeNkI2Q0M2onp6qdp/hicK8rNm1j/gv5xfkhExixAvPszagp1OG8cWYePd4iQ4cIYyTQOTf3qwolzE/SqVCkEnTbL4vHC0r1yjX/ybiF+XsRkArd2a3G+EuGGQVefD4W6/JQG0TL/2LiGHLlkOKdjQ7IH6ml87VGg5G6lRRuuo=
+	t=1721489353; cv=none; b=oSMw3D+PnScU57YYVfvvBSxKrDsRLFPZ4vkUxGtkk6RUUu9Pysymdf6KaDnqYyZIwPXNB9oFoOnLtc2GZqgpWCTVEdZf4ZWF9tCefk5M70fvH6j0+Ns96iyT+QqEx5KJG1JAoHouVNUs6IM52f2xdpCKmaiEZDQ4rVWFbozQnCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721488002; c=relaxed/simple;
-	bh=hQYRSIQfYXedSv44PaqnMPMgH1Ckv0BjAYSaEKIFwfk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ggrBb6PMPiBE/NYVXKYA1DwRMTp4tO5wEpMyuye3AXjF62fhYH74L1D3ldQpsaaMbfYk+mZxpddxBttc8bH8j4vGIPhQttDbizzaLPyR83Y+kidPTPavZOuGKHagt0ENB39BKMc1j5nWADkLxAf4yehcEm0sZIQV/9Jd6PhlvoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEd1UByx; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2eede876fccso35334121fa.1
-        for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 08:06:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721487999; x=1722092799; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s+RNAnpMtMJ6n/o9ByYXve4qKgPeHmZptCll5sHCKFc=;
-        b=KEd1UByxuItrXC0M676fnKXI4oGGmc7GBAyAkM0a/qmO3bpu38pCl3m/DGIfJOWeL7
-         INMjhgzgwIqeT8BwKkphFvvmP6Cs10Klu5aj2hhWjSr+SB5RqkLUgU9P3HKfN3SbnOcy
-         S2NKPPGvQZZC0D+RAuAokYKkjj5nNWjQvjMgPHZl1jRBOs3on5wS2VLy8gVVdcWARTGz
-         pP7Gm0x852543a53d6DdxY7Diu+ZMQJyq9VM7Lmpi6D2ENtx/krPG8b+34FURmSs6uvP
-         MnksKgtSn10vITLePg5TnPEXiRAMKiph5BKkhXoaVx+g0D3ZORDTn3lRYhaYZrCjp2O8
-         dZrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721487999; x=1722092799;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s+RNAnpMtMJ6n/o9ByYXve4qKgPeHmZptCll5sHCKFc=;
-        b=e7wsVap1hSqeJDLf0E9pDheBJPAacZT8+DHm7qGLEJjawLZhB4UOCOWztKfQS95ihP
-         0nR+oURsE4Lv2OROOletOiGeLkEtBmXtOeXbNXhi/oYeQfwXxqVQv9uy/EwmLR2WZwA2
-         RxfVNZsS+sRJFQ9pvhClv0RvPdrL3jvjAIwJKsi0ZwnrzO33/z+PrS/jKFuedLaOMpdA
-         Ef11z0wJTpWZh6phpsSNP8v9iZcWBrCcHE9WoYl/ZsvCmgGE+/4e16cxQoOTol9uCgWQ
-         v99U080Abqq40VcRpl1Yuc9EEy91uvGJRRb1oxKw27/VQ+feO1NH9vTJWcudiqivOqqz
-         u+yg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5RSOUQ/gwtFc869VBsAQUB0hmWJ3W8+pbeTTo/2GbzsG5otM+RjP9xFsCIpiAGS7NkbRTwStA246bh6uTaaPdCaMo162F
-X-Gm-Message-State: AOJu0YyfqMEAq+trMWpYTkzObVSc9okWDIBvdgromJ+i8sSmGKIp4mDg
-	ru/nvr3q9Lv+qoTPe7GX1/MGKLtPGcif2w4cei2eg8PQ2MaN+3rfresQQVBSgDu+JxWzFZ6kosf
-	6bal3sJwgWlkG3YktG6m40wBNrOg=
-X-Google-Smtp-Source: AGHT+IH44rv0j7Tt8ez23D7oIFPxE0bffTyn4KWtfGgGKYsDIRhW8wWEzpk2H45Y1MvcAdmr1eWdnx2WPyo6paKYPTA=
-X-Received: by 2002:a2e:9ccb:0:b0:2ee:7a54:3b08 with SMTP id
- 38308e7fff4ca-2ef16738372mr18559881fa.3.1721487998712; Sat, 20 Jul 2024
- 08:06:38 -0700 (PDT)
+	s=arc-20240116; t=1721489353; c=relaxed/simple;
+	bh=YIPVGQPbqp/b+gxzkefVoV6IK0+9SKYvEALFbZiCepQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=j3ChwMstuChi3h7dSYGmKVhDTp+PLjdMjaUsEGOcLkXkHv7FnPC7QF8Nm633QDRB9L7ikxBIANrtuSm2RwkJa+TATwVefCdYZwQlN3EGVeI++VRc1ECKTvXGNiKOQVghR8m7bUrQbe+eQhCK3PPZKeecxs+yYQP+0OirL1ApftI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=Gwhir+VB; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1721489037;
+	bh=QOFI29HmkVBnYiESq5GsNxCNCvc/mgNcD5DvcYXvV/Q=;
+	h=From:To:Cc:Subject:Date;
+	b=Gwhir+VBaAh6uH1U3/FtRWvPdt3zmDhIwvVrIbjcKMMRkD47bDmvp314fcPrOA6OY
+	 lfKpa0jgycbJmgLDLFLetL+N3zTT+kh9IFowxthcQgOAphHdmCiF1md4pkYBSH1UZ/
+	 SwoXMnDE467w5gBOtlmdN5g8n2JEDP1ut569zz64=
+Received: from localhost.localdomain ([1.83.74.4])
+	by newxmesmtplogicsvrszc5-2.qq.com (NewEsmtp) with SMTP
+	id 5F017854; Sat, 20 Jul 2024 23:23:48 +0800
+X-QQ-mid: xmsmtpt1721489028t2ss3hkng
+Message-ID: <tencent_EFD6593E69AD867624E4518D515816F58505@qq.com>
+X-QQ-XMAILINFO: N2DE1hXbKkms1sc//Kl6WrRhZSxMrjOqP1F18bk4ks+S0tx99YZq1XkTZqr+U5
+	 Ffa1vSMWvTR/dstAjVz3VGfsMmK6DXSAneERBeaJeHtMsuNV0xI+h1uLbFXrdb49t8r64VyCl9yi
+	 KMLnaOjDwQxzQfGJoZnO7dJxLes9HH+WG7zdOy7+SFFmsAnZZRU30sYVsqXayFEYWLCX0trSDJAt
+	 vc/77QjtkRFTGpBIoZvGTcfsqJlDkkfBm+80yCktzfyV8DCf9yRsxONJUlvK+ww63oHlOrloUJHJ
+	 8IS1dOOxvgoViIqLah9d8VCXzFhhhYedI6XZcvm1drUo+eGxnUY9NbGVWepZdx4rFbB1NnowqXfd
+	 dzYjdCUwzi7kX12FciCxQYgmDLNNCSUdYqRrNr6exs6tMztXvg7apwOyRw1WaiZQJMIQEFvxIUMa
+	 A+yVypfQXxGWr3Jc4dIz1rFZcS+lS24JciV1EbYpWm6ijeTX4/25LCqevFNjKAn7D0m7kNqJVOaz
+	 u19KGCQXiFpUdaKnhehp8U4C5zgI622GemWSKNlgR+nIQ53NbXiK+2OUrh+vQe+QsHvyratG3kvK
+	 8FqFLsuJmSH/CEbUXF+c8B68FePfe6hxaFL70NckhADqvpLnA2AxSDO9Y6ShDqMXeRM9cOotcg+L
+	 LXbgsRGFi9GnBfo8AvrYbLX22Vlf7TrF+w9fUUnkGMIjcE8wUJrHohxB7zmaT2opx4Os4dx3di0r
+	 QX53nBFRFUJ+Yx+FTSIpKxAMLxzzL6qEBMSgDVIFQcrOG6uCNHDBu7M/P5i/4S3l60ccHs5BQvqI
+	 Rl3cIKNoU0nEAkin1h8Fy45zVOy1+3bPn2ESTXaMBZky3d3qb/CiyixMaCIX7cJr5S0BwJIOIO7P
+	 +VLW89Vn+fQNohXvDuVhdLaseN1bhImeEY88b2Yyt972rYfJKBxFPA9XXVXI0XzuU2+5mVrDWDeB
+	 lXmlUl4g3L6rWdrLh10tuwPY4gyI+OQfsZVF+Xg4YoOkORaPFxrwcFUpvZWdnSmiwd5QfqWV2SEb
+	 eRoZ8dgSxxm+/ejnFfbORlNMoxLaM=
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+From: xixiliguo <xixiliguo@foxmail.com>
+To: stephen@networkplumber.org
+Cc: netdev@vger.kernel.org,
+	xixiliguo <xixiliguo@foxmail.com>
+Subject: [PATCH iproute] ss: fix expired time format of timer
+Date: Sat, 20 Jul 2024 23:23:27 +0800
+X-OQ-MSGID: <20240720152327.47895-1-xixiliguo@foxmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240719041911.533320-1-ap420073@gmail.com> <74fcb647-0226-4aa4-bf99-06fee8d510d0@davidwei.uk>
-In-Reply-To: <74fcb647-0226-4aa4-bf99-06fee8d510d0@davidwei.uk>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sun, 21 Jul 2024 00:06:27 +0900
-Message-ID: <CAMArcTXm=4sfJ3oLf7-ZxobNyoeHWrg+-_Yirm4QszoaVnSbfA@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: update xdp_rxq_info in queue restart logic
-To: David Wei <dw@davidwei.uk>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, michael.chan@broadcom.com, netdev@vger.kernel.org, 
-	somnath.kotur@broadcom.com, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jul 20, 2024 at 2:13=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
+When expired time of time-wait timer is less than or equal to 9 seconds,
+as shown below, result that below 1 sec is incorrect.
+Expect output should be show 9 seconds and 373 millisecond, but 9.373ms
+mean only 9 millisecond and 373 microseconds
 
-Hi David,
-Thanks a lot for the review!
+Before:
+TIME-WAIT 0      0     ...    timer:(timewait,12sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,11sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,10sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,9.373ms,0)
+TIME-WAIT 0      0     ...    timer:(timewait,8.679ms,0)
+TIME-WAIT 0      0     ...    timer:(timewait,1.574ms,0)
+TIME-WAIT 0      0     ...    timer:(timewait,954ms,0)
+TIME-WAIT 0      0     ...    timer:(timewait,303ms,0)
 
-> On 2024-07-18 21:19, Taehee Yoo wrote:
-> > When the netdev_rx_queue_restart() restarts queues, the bnxt_en driver
-> > updates(creates and deletes) a page_pool.
-> > But it doesn't update xdp_rxq_info, so the xdp_rxq_info is still
-> > connected to an old page_pool.
-> > So, bnxt_rx_ring_info->page_pool indicates a new page_pool, but
-> > bnxt_rx_ring_info->xdp_rxq is still connected to an old page_pool.
-> >
-> > An old page_pool is no longer used so it is supposed to be
-> > deleted by page_pool_destroy() but it isn't.
-> > Because the xdp_rxq_info is holding the reference count for it and the
-> > xdp_rxq_info is not updated, an old page_pool will not be deleted in
-> > the queue restart logic.
-> >
-> > Before restarting 1 queue:
-> > ./tools/net/ynl/samples/page-pool
-> > enp10s0f1np1[6] page pools: 4 (zombies: 0)
-> >       refs: 8192 bytes: 33554432 (refs: 0 bytes: 0)
-> >       recycling: 0.0% (alloc: 128:8048 recycle: 0:0)
-> >
-> > After restarting 1 queue:
-> > ./tools/net/ynl/samples/page-pool
-> > enp10s0f1np1[6] page pools: 5 (zombies: 0)
-> >       refs: 10240 bytes: 41943040 (refs: 0 bytes: 0)
-> >       recycling: 20.0% (alloc: 160:10080 recycle: 1920:128)
->
-> Thanks, didn't know this existed! As a follow up once Mina lands his
-> devmem TCP series with netdev_rx_queue_restart(), a netdev netlink
-> selftest using would be great.
->
+After:
+TIME-WAIT 0      0     ...    timer:(timewait,13sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,12sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,10sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,9.501sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,8.990sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,7.865sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,1.098sec,0)
+TIME-WAIT 0      0     ...    timer:(timewait,476ms,0)
 
-Yes, that would be great!
+Signed-off-by: xixiliguo <xixiliguo@foxmail.com>
+---
+ misc/ss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> >
-> > Before restarting queues, an interface has 4 page_pools.
-> > After restarting one queue, an interface has 5 page_pools, but it
-> > should be 4, not 5.
-> > The reason is that queue restarting logic creates a new page_pool and
-> > an old page_pool is not deleted due to the absence of an update of
-> > xdp_rxq_info logic.
-> >
-> > Fixes: 2d694c27d32e ("bnxt_en: implement netdev_queue_mgmt_ops")
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 17 +++++++++++++++++
-> >  1 file changed, 17 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
-hernet/broadcom/bnxt/bnxt.c
-> > index bb3be33c1bbd..11d8459376a9 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> [...]
-> > @@ -15065,6 +15079,8 @@ static void bnxt_queue_mem_free(struct net_devi=
-ce *dev, void *qmem)
-> >       page_pool_destroy(rxr->page_pool);
-> >       rxr->page_pool =3D NULL;
-> >
-> > +     xdp_rxq_info_unreg(&rxr->xdp_rxq);
-> > +
->
-> IMO this should go before page_pool_destroy() for symmetry with
-> bnxt_free_rx_rings(). I know there's already a call deep inside of
-> xdp_rxq_info_unreg().
->
+diff --git a/misc/ss.c b/misc/ss.c
+index 27f0f20d..620f4c8f 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -1516,7 +1516,7 @@ static const char *print_ms_timer(unsigned int timeout)
+ 		sprintf(buf+strlen(buf), "%d%s", secs, msecs ? "." : "sec");
+ 	}
+ 	if (msecs)
+-		sprintf(buf+strlen(buf), "%03dms", msecs);
++		sprintf(buf+strlen(buf), "%03d%s", msecs, secs ? "sec" : "ms");
+ 	return buf;
+ }
+ 
+-- 
+2.43.5
 
-I agree about symmetry. So I will change it.
-
-> >       ring =3D &rxr->rx_ring_struct;
-> >       bnxt_free_ring(bp, &ring->ring_mem);
-> >
-> > @@ -15145,6 +15161,7 @@ static int bnxt_queue_start(struct net_device *=
-dev, void *qmem, int idx)
-> >       rxr->rx_sw_agg_prod =3D clone->rx_sw_agg_prod;
-> >       rxr->rx_next_cons =3D clone->rx_next_cons;
-> >       rxr->page_pool =3D clone->page_pool;
-> > +     memcpy(&rxr->xdp_rxq, &clone->xdp_rxq, sizeof(struct xdp_rxq_info=
-));
->
-> Assignment is fine here.
-
-Okay, I will use the assignment instead of the memcpy.
-
-I will send a v2 patch after some tests.
-
-Thanks a lot!
-Taehee Yoo
 
