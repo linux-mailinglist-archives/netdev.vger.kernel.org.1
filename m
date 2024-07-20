@@ -1,109 +1,165 @@
-Return-Path: <netdev+bounces-112295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04662938192
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 16:09:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A278A9381B4
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 16:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C160281916
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:09:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9C6AB20E97
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6B912C489;
-	Sat, 20 Jul 2024 14:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEE512F581;
+	Sat, 20 Jul 2024 14:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dro/exMM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cl3UmVyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F7412B62
-	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 14:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F2C8564A;
+	Sat, 20 Jul 2024 14:34:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721484567; cv=none; b=uHe2JgP0gJptW3fuY9mIs5lxyj7KHv/PpuN+lmygooOtzHMLaXlvmTmnp9KdrTGl/JTyPDxpnp/B7grcKeO82QNNhVVCp4Za6aduvlrxW+EBlSYYIjxix2szqIxYj9BWFLH/sSu9qkptJe6tFnYpLTwI+9+/pPtZ2p5aKXAxnrI=
+	t=1721486049; cv=none; b=i1MuSMcvFWpCBpqNJDDcimh1Qv3BOJhZO2jNYIgEXt7BZwSo/WCdghNfHtX5oaHxW+JakGcvGUr8s63qKGEyLbY2H4p6giK01sMJ+mkwkSywbx2GjXlvxuZvcHP4pMCHxQOqdOC2TELcX20lRBeOM/61H8aYY3/UwZagdEf3p0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721484567; c=relaxed/simple;
-	bh=eutLgofeiDc4X/cpPIq+2ED1OnLwYhIDhqA71mdRFN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tB2KD2vzKJPuWRk4qY33X293bBRJ4CGgiYTRUWybOinCw/PueQqdo3YMC1867D5FBcdeFEP18+dVF70pB0KwDPP3Y80T20usC9PcU9LwD3TNhuiZI0OHaWB5kM7q3VH82IOe4dro9oxfNlTDsqUFBKeRbJM+sLYmlyMv5UznF7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dro/exMM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721484564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=M6QE8UA40LtVG1HZS4ZJtZy6DSMQAzIuEE9/bGs1BZA=;
-	b=Dro/exMM0Xq4MhmebGWKvlbfL64spQdhO/+dV4NOm3g+CMPptSl2rS+drtbOOj6qgpBdDR
-	hhMreIZcG9RljBmlnFLClrt017HbnbCBee4yoBeq6uZj62oVIhmzOT6o9XL3SP0U6PWP9v
-	xROMtIcs5msWmbuW4pSLmJdQAq9cSDc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-600-J7W6qTwtPi2h2f8BOHR9Aw-1; Sat,
- 20 Jul 2024 10:09:20 -0400
-X-MC-Unique: J7W6qTwtPi2h2f8BOHR9Aw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BEF66195608B;
-	Sat, 20 Jul 2024 14:09:18 +0000 (UTC)
-Received: from jmaloy-thinkpadp16vgen1.rmtcaqc.csb (unknown [10.22.32.27])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C7C113000188;
-	Sat, 20 Jul 2024 14:09:15 +0000 (UTC)
-From: jmaloy@redhat.com
-To: netdev@vger.kernel.org,
-	davem@davemloft.net
-Cc: kuba@kernel.org,
-	passt-dev@passt.top,
-	jmaloy@redhat.com,
-	sbrivio@redhat.com,
-	lvivier@redhat.com,
-	dgibson@redhat.com,
-	eric.dumazet@gmail.com,
-	edumazet@google.com
-Subject: [net] tcp: add SO_PEEK_OFF socket option tor TCPv6
-Date: Sat, 20 Jul 2024 10:09:14 -0400
-Message-ID: <20240720140914.2772902-1-jmaloy@redhat.com>
+	s=arc-20240116; t=1721486049; c=relaxed/simple;
+	bh=dRWWphHhlnVSS4YQZ5YVkQpfXbV2JxEknriVX8N+8J4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZsQhr8TzoH48JxlWNQKSeISCodJXMmryfQaiAsjDFtPteyFDuh+R9DZ3AQFdETkkeeivBpoc0cBXAxj3Gw0t+rWqhyMaN4PRGmMiCJOHJlsoOmOFL4anKLelJl40d6ZOj6yXjxEtgPLfUSFASonYbUK30FtBrNA4gfYPgDN2+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cl3UmVyb; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721486047; x=1753022047;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dRWWphHhlnVSS4YQZ5YVkQpfXbV2JxEknriVX8N+8J4=;
+  b=Cl3UmVybUFujkgn7BtlYtEZRug55DqpcuSbYkdQNftO9QGgjrX6CgB4t
+   ZGcwf11sYyNDhe/K9kZyiZN/OZUnrL3fJWkOBdilurZ1PNfSIBCrUyde0
+   VIq8ZhTGZUOnAUdC7S1whotmlNIUDZtk9X5ZycWiSi5RDIAtVvvEO2wJ9
+   2YkZcSTXYDdYrAqEzDAok5vENKEN9P4fuhw0z2pxQovCxTLvLkYLJ4h8C
+   kW31dIGisJFRXvaaI0JEgrWCTjYdds0+usBYvQ13mnlmvv5WrgtkbREYP
+   YIXtqi5IHeB8hKhmLvweoslNz5P1kwBf+tE5e+5HHfEk4mcibb39rFOJN
+   Q==;
+X-CSE-ConnectionGUID: zcLpz7fjQCKA5UJA9XLLEQ==
+X-CSE-MsgGUID: 5drU0XY5TzWKOsG+221MVw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11139"; a="18720334"
+X-IronPort-AV: E=Sophos;i="6.09,224,1716274800"; 
+   d="scan'208";a="18720334"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2024 07:34:06 -0700
+X-CSE-ConnectionGUID: sAVdlJcxQemXUhP7ZNA62g==
+X-CSE-MsgGUID: GH6ZgubQSE2ZtJfxqVnmVg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,224,1716274800"; 
+   d="scan'208";a="52118364"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 20 Jul 2024 07:34:01 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sVB9q-000jHM-1b;
+	Sat, 20 Jul 2024 14:33:58 +0000
+Date: Sat, 20 Jul 2024 22:33:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ayush Singh <ayush@beagleboard.org>, jkridner@beagleboard.org,
+	robertcnelson@beagleboard.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	greybus-dev@lists.linaro.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Ayush Singh <ayush@beagleboard.org>
+Subject: Re: [PATCH 3/3] greybus: gb-beagleplay: Add firmware upload API
+Message-ID: <202407210006.Wvm3bOm9-lkp@intel.com>
+References: <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
 
-From: Jon Maloy <jmaloy@redhat.com>
+Hi Ayush,
 
-When we added the SO_PEEK_OFF socket option to TCP we forgot
-to add it even for TCP on IPv6.
+kernel test robot noticed the following build warnings:
 
-We do that here.
+[auto build test WARNING on f76698bd9a8ca01d3581236082d786e9a6b72bb7]
 
-Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
+url:    https://github.com/intel-lab-lkp/linux/commits/Ayush-Singh/dt-bindings-net-ti-cc1352p7-Add-boot-gpio/20240719-180050
+base:   f76698bd9a8ca01d3581236082d786e9a6b72bb7
+patch link:    https://lore.kernel.org/r/20240719-beagleplay_fw_upgrade-v1-3-8664d4513252%40beagleboard.org
+patch subject: [PATCH 3/3] greybus: gb-beagleplay: Add firmware upload API
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240721/202407210006.Wvm3bOm9-lkp@intel.com/config)
+compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240721/202407210006.Wvm3bOm9-lkp@intel.com/reproduce)
 
-Signed-off-by: Jon Maloy <jmaloy@redhat.com>
----
- net/ipv6/af_inet6.c | 1 +
- 1 file changed, 1 insertion(+)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407210006.Wvm3bOm9-lkp@intel.com/
 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 90d2c7e3f5e9..ba69b86f1c7d 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -708,6 +708,7 @@ const struct proto_ops inet6_stream_ops = {
- 	.splice_eof	   = inet_splice_eof,
- 	.sendmsg_locked    = tcp_sendmsg_locked,
- 	.splice_read	   = tcp_splice_read,
-+	.set_peek_off      = sk_set_peek_off,
- 	.read_sock	   = tcp_read_sock,
- 	.read_skb	   = tcp_read_skb,
- 	.peek_len	   = tcp_peek_len,
+All warnings (new ones prefixed by >>):
+
+>> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_DOWNLOAD' not described in enum 'cc1352_bootloader_cmd'
+>> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_GET_STATUS' not described in enum 'cc1352_bootloader_cmd'
+>> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_SEND_DATA' not described in enum 'cc1352_bootloader_cmd'
+>> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_RESET' not described in enum 'cc1352_bootloader_cmd'
+>> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_CRC32' not described in enum 'cc1352_bootloader_cmd'
+>> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_BANK_ERASE' not described in enum 'cc1352_bootloader_cmd'
+>> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_SUCCESS' not described in enum 'cc1352_bootloader_status'
+>> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_UNKNOWN_CMD' not described in enum 'cc1352_bootloader_status'
+>> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_INVALID_CMD' not described in enum 'cc1352_bootloader_status'
+>> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_INVALID_ADR' not described in enum 'cc1352_bootloader_status'
+>> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_FLASH_FAIL' not described in enum 'cc1352_bootloader_status'
+>> drivers/greybus/gb-beagleplay.c:420: warning: Function parameter or struct member 'data' not described in 'csum8'
+>> drivers/greybus/gb-beagleplay.c:420: warning: Function parameter or struct member 'size' not described in 'csum8'
+>> drivers/greybus/gb-beagleplay.c:420: warning: Function parameter or struct member 'base' not described in 'csum8'
+>> drivers/greybus/gb-beagleplay.c:712: warning: Function parameter or struct member 'data' not described in 'cc1352_bootloader_empty_pkt'
+>> drivers/greybus/gb-beagleplay.c:712: warning: Function parameter or struct member 'size' not described in 'cc1352_bootloader_empty_pkt'
+
+
+vim +132 drivers/greybus/gb-beagleplay.c
+
+   121	
+   122	/**
+   123	 * enum cc1352_bootloader_cmd: CC1352 Bootloader Commands
+   124	 */
+   125	enum cc1352_bootloader_cmd {
+   126		COMMAND_DOWNLOAD = 0x21,
+   127		COMMAND_GET_STATUS = 0x23,
+   128		COMMAND_SEND_DATA = 0x24,
+   129		COMMAND_RESET = 0x25,
+   130		COMMAND_CRC32 = 0x27,
+   131		COMMAND_BANK_ERASE = 0x2c,
+ > 132	};
+   133	
+   134	/**
+   135	 * enum cc1352_bootloader_status: CC1352 Bootloader COMMAND_GET_STATUS response
+   136	 */
+   137	enum cc1352_bootloader_status {
+   138		COMMAND_RET_SUCCESS = 0x40,
+   139		COMMAND_RET_UNKNOWN_CMD = 0x41,
+   140		COMMAND_RET_INVALID_CMD = 0x42,
+   141		COMMAND_RET_INVALID_ADR = 0x43,
+   142		COMMAND_RET_FLASH_FAIL = 0x44,
+ > 143	};
+   144	
+
 -- 
-2.45.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
