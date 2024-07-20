@@ -1,117 +1,196 @@
-Return-Path: <netdev+bounces-112274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D949937E8A
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 02:33:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52333937E8C
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 02:41:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0879228182E
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 00:33:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F21D5281F38
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 00:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27236163;
-	Sat, 20 Jul 2024 00:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9461C14;
+	Sat, 20 Jul 2024 00:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixTh4/rA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A296979DF
-	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 00:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289DD38B
+	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 00:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721435583; cv=none; b=nu/Y9zMbnNBS8EwpFOR/Jd2gMQ6wel68MH5IegDiIYqzyGgtA+dPJlTZRsXLWBsejOBvuny/3YGltc3ueklg0uAp5S8JX+NjzgNbBRV2IuGOheOsw7AQ9/cuU1DK0yCbXvWHsdk3YDhjSnlfv2GTzk5cVpkpVbHE1eszhUPDdWE=
+	t=1721436102; cv=none; b=hvhyEuekfFgl0xNvnPvfUxXbzWx7c4PJBf/2AVUKjSwCNTgu38GzTp6dwq929/wWVgwOTVGBPZ5dlLjW3zi0W3h0TdBBWUvJ/WnMv2Z/ykxywC+ndsse9Axh+8pSnttIfAANmKD6z1D74uLjknn+2b67++hTTuBFwHQ35FkzMAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721435583; c=relaxed/simple;
-	bh=bOf0uaOnZfQ7qrXKBFMeyTIOJP7Ps8jTkXecHZmInI8=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=Dxzjx+dwbNh0LTuBHIo1vQC3F41gl6EFiW+XNlHnEwTSv+RWqmk4Ynf9fD0L1A6Xb1qiyklcsqDw/P+Eo8jtP8oflOZ8Pj5YCs2Sk5fnMK59apWqiKwLuhQK0UeZYtpH31tRp8NLUGYaJtNsr62ubS2DlSwpy9TTEG0iJZEtNRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from vapr.local.chopps.org (unknown [75.104.68.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id F14747D018;
-	Sat, 20 Jul 2024 00:32:55 +0000 (UTC)
-References: <20240714202246.1573817-1-chopps@chopps.org>
- <20240714202246.1573817-9-chopps@chopps.org>
- <20240719061655.GB29401@breakpoint.cc>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
- Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
- Hopps <chopps@labn.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v5 08/17] xfrm: iptfs: add new
- iptfs xfrm mode impl
-Date: Fri, 19 Jul 2024 17:30:31 -0700
-In-reply-to: <20240719061655.GB29401@breakpoint.cc>
-Message-ID: <m2frs4x5qn.fsf@chopps.org>
+	s=arc-20240116; t=1721436102; c=relaxed/simple;
+	bh=RD1oDEed7ti9Y0a0A4Hx2lgk5j/1qe/7kbL7nED1lmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JMS71EPdEjhcXKP/mwTQBWaBgSX/xq9FIW5qLpLKm7FhtjF2MRSSmZjWWiu9/CjSmueDisqBdhIkXUdlmNA1O7wAfmEoQRK/znj/JxBgDTtWum6GNeBHEpuPEIg24hIHAY4IpNnaZ8mnIBnxVebUGQR89NQ32OaOuy8LaIHC308=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixTh4/rA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53562C32782;
+	Sat, 20 Jul 2024 00:41:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721436101;
+	bh=RD1oDEed7ti9Y0a0A4Hx2lgk5j/1qe/7kbL7nED1lmA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ixTh4/rAqsCGPUyYYP03bYhljqR1gIzLVdM1rP7xTMhyhr1q8W94Fof7S6O/twNsO
+	 E3srE1kcMiaDh9UGXsmwDh+b1yOV4R/D3bVMYoc4QrlinAgnqFZnzb+Xz7eiYKU6pr
+	 HxCcqaaUtI8yZ7jM592ZQpWWqnU/Wy6nBQ32sdjsPddxZI2nlmQbH2U2J1272pUc6E
+	 2Yih1Dru9K+RWPR6NTsWRqTv4esnAvFp8/DBR9NGKj1DDFt79zB9UxgCdeATs8IF5V
+	 yXI0QH3ln0/RuN80UfHjjtUrLjwIzmuLEa9eneF5wcC17e4Q7WZIqlrTJIQ97QnGQK
+	 lv3bVaGtLR/JA==
+Date: Fri, 19 Jul 2024 17:41:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Ken Milmore
+ <ken.milmore@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Realtek linux nic maintainers
+ <nic_swsd@realtek.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: r8169: Crash with TX segmentation offload on RTL8125
+Message-ID: <20240719174140.47a868e6@kernel.org>
+In-Reply-To: <Zpl004GjvJw3A3Af@gmail.com>
+References: <b18ea747-252a-44ad-b746-033be1784114@gmail.com>
+	<75df2de0-9e32-475d-886c-0e65d7cfba1e@gmail.com>
+	<20240522065550.32d37359@kernel.org>
+	<Zpl004GjvJw3A3Af@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
---=-=-=
-Content-Type: text/plain; format=flowed
+On Thu, 18 Jul 2024 13:02:27 -0700 Breno Leitao wrote:
+> > > Yeah, that's an excellent catch and one that is bitten us before, too:
+> > >=20
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3D20d1f2d1b024f6be199a3bedf1578a1d21592bc5
+> > >=20
+> > > unclear what we would do in skb_shinfo() to help driver writers, rath=
+er=20
+> > > than rely upon code inspection to find such bugs. =20
+> >=20
+> > I wonder if we should add a "error injection" hook under DEBUG_NET
+> > to force re-allocation of skbs in any helper which may cause it? =20
+>=20
+> Would you mind detailing a bit more how would see see it implemented?
+>=20
+> Are you talking about something as the Fault-injection framework
+> (CONFIG_FAULT_INJECTION) ?
 
+Yes, I started typing the below but got distracted & uncertain about
+the exact hooks and test coverage:
 
-Florian Westphal <fw@strlen.de> writes:
+=46rom ca7e88fb85f2e905b99c4c35029ea7ac8d35671c Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Wed, 29 May 2024 13:21:19 -0700
+Subject: net: add fault injection for forcing skb reallocation
 
-> Christian Hopps via Devel <devel@linux-ipsec.org> wrote:
->> +static int iptfs_clone(struct xfrm_state *x, struct xfrm_state *orig)
->> +{
->> +	struct xfrm_iptfs_data *xtfs;
->> +	int err;
->> +
->> +	xtfs = kmemdup(orig->mode_data, sizeof(*xtfs), GFP_KERNEL);
->> +	if (!xtfs)
->> +		return -ENOMEM;
->> +
->> +	err = __iptfs_init_state(x, xtfs);
->> +	if (err)
->> +		return err;
->
-> Missing kfree on err?
->
->> +	xtfs = kzalloc(sizeof(*xtfs), GFP_KERNEL);
->> +	if (!xtfs)
->> +		return -ENOMEM;
->> +
->> +	err = __iptfs_init_state(x, xtfs);
->> +	if (err)
->> +		return err;
->
-> Likewise.
+Some helpers (pskb_may_pull()
 
-These originally counted on the fact that the xfrm state is cleaned up on error; however, a later code change did indeed allow for the leak -- added kfree's as suggested.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ include/linux/skbuff.h | 11 +++++++++++
+ net/core/skbuff.c      | 27 +++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-Thanks,
-Chris.
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 9c29bdd5596d..dcc488875374 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -2665,6 +2665,14 @@ static inline void skb_assert_len(struct sk_buff *sk=
+b)
+ #endif /* CONFIG_DEBUG_NET */
+ }
+=20
++#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_FAULT_INJECTION_DEBUG_FS)
++void skb_might_realloc(struct sk_buff *skb);
++#else
++static inline void skb_might_realloc(struct sk_buff *skb)
++{
++}
++#endif
++
+ /*
+  *	Add data to an sk_buff
+  */
+@@ -2765,6 +2773,7 @@ static inline enum skb_drop_reason
+ pskb_may_pull_reason(struct sk_buff *skb, unsigned int len)
+ {
+ 	DEBUG_NET_WARN_ON_ONCE(len > INT_MAX);
++	skb_might_realloc(skb);
+=20
+ 	if (likely(len <=3D skb_headlen(skb)))
+ 		return SKB_NOT_DROPPED_YET;
+@@ -3194,6 +3203,7 @@ static inline int __pskb_trim(struct sk_buff *skb, un=
+signed int len)
+=20
+ static inline int pskb_trim(struct sk_buff *skb, unsigned int len)
+ {
++	skb_might_realloc(skb);
+ 	return (len < skb->len) ? __pskb_trim(skb, len) : 0;
+ }
+=20
+@@ -3900,6 +3910,7 @@ int pskb_trim_rcsum_slow(struct sk_buff *skb, unsigne=
+d int len);
+=20
+ static inline int pskb_trim_rcsum(struct sk_buff *skb, unsigned int len)
+ {
++	skb_might_realloc(skb);
+ 	if (likely(len >=3D skb->len))
+ 		return 0;
+ 	return pskb_trim_rcsum_slow(skb, len);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 83f8cd8aa2d1..a9f4275bb783 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -58,6 +58,7 @@
+ #include <linux/init.h>
+ #include <linux/scatterlist.h>
+ #include <linux/errqueue.h>
++#include <linux/fault-inject.h>
+ #include <linux/prefetch.h>
+ #include <linux/bitfield.h>
+ #include <linux/if_vlan.h>
+@@ -2222,6 +2223,32 @@ struct sk_buff *__pskb_copy_fclone(struct sk_buff *s=
+kb, int headroom,
+ }
+ EXPORT_SYMBOL(__pskb_copy_fclone);
+=20
++#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_FAULT_INJECTION_DEBUG_FS)
++static DECLARE_FAULT_ATTR(skb_force_realloc);
++
++void skb_might_realloc(struct sk_buff *skb)
++{
++	if (should_fail(&skb_force_realloc, 1))
++		pskb_expand_head(skb, 0, 0, GFP_ATOMIC);
++}
++EXPORT_SYMBOL(skb_might_realloc);
++
++static int __init skb_force_realloc_setup(char *str)
++{
++	return setup_fault_attr(&skb_force_realloc, str);
++}
++__setup("skb_force_realloc=3D", skb_force_realloc_setup);
++
++static int __init skb_force_realloc_debugfs(void)
++{
++	fault_create_debugfs_attr("skb_force_realloc", NULL,
++				  &skb_force_realloc);
++	return 0;
++}
++
++late_initcall(skb_force_realloc_debugfs);
++#endif
++
+ /**
+  *	pskb_expand_head - reallocate header of &sk_buff
+  *	@skb: buffer to reallocate
+--=20
+2.45.2
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmabBbASHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAldYwP/jw0Cn2Nxaun8dHsBW/Mibf6hfbIzSK+
-RTeETpREZQOiXzBNF1r8n+XXmp21QPjXDxLFJFA3bsK7SpocHD9DpYArKwdYysPo
-1JX03DsREK07RfXuOzqfwMUmWbXhQLy5F/te/Htma6kXDAliFQgY7nCav7fkAVi6
-bjox7Svefh/9TNVl/1JXsmzV6vtpmMNJ7oVE3XKV5BlFWLsoOko3lik6FSgyZuvV
-T8z9UaTFbHGbu6rDEoi6YZ+x0T6kT9AKEvRRVtl+YU3rBpU99ixaMHyDVLkav269
-5h0XHLXujBwkU0n+w3TC7gxR8qZ01NnYBK3e4vPw905b+Yzq851a5+ge0AOAXHZ8
-uoOZQeFZ9MXTvzG0ZPriDXuX96TteCzNCDn6k6DQYjuZ3ylXCvenq/zJvHC63Kkp
-UnJzgKMWY/ogKXObm6+gQazBXOt71GMTMLzsjmnvsLwoUM3ZUDkspvdWdS8As6gU
-kMJ8IrTUvjxJNyhqf6VAeKPZ/sGggIkCf7/gobbwUb9X1N3e4lWjLhoO2K5ONlyS
-7iKU4xLMpnfJ918gwcjOE9PQypYCgjhNHnwhnQUI03rMAJwO0Cx2cPLYdUaV01Sb
-APVSBDhS/wb/2CTa0Ow0tJgkKAt6byBzZiezWzwO3dmr+EQ5pKkM0gH7WtD28Pl+
-S5C0nPyDAQL2
-=2ySj
------END PGP SIGNATURE-----
---=-=-=--
 
