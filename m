@@ -1,165 +1,180 @@
-Return-Path: <netdev+bounces-112296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A278A9381B4
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 16:34:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5EBA9381C4
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 17:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9C6AB20E97
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:34:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C09D1C20C28
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 15:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEE512F581;
-	Sat, 20 Jul 2024 14:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABA212CDBE;
+	Sat, 20 Jul 2024 15:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cl3UmVyb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEd1UByx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F2C8564A;
-	Sat, 20 Jul 2024 14:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB7B14294
+	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 15:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721486049; cv=none; b=i1MuSMcvFWpCBpqNJDDcimh1Qv3BOJhZO2jNYIgEXt7BZwSo/WCdghNfHtX5oaHxW+JakGcvGUr8s63qKGEyLbY2H4p6giK01sMJ+mkwkSywbx2GjXlvxuZvcHP4pMCHxQOqdOC2TELcX20lRBeOM/61H8aYY3/UwZagdEf3p0E=
+	t=1721488002; cv=none; b=XpeNkI2Q0M2onp6qdp/hicK8rNm1j/gv5xfkhExixAvPszagp1OG8cWYePd4iQ4cIYyTQOTf3qwolzE/SqVCkEnTbL4vHC0r1yjX/ybiF+XsRkArd2a3G+EuGGQVefD4W6/JQG0TL/2LiGHLlkOKdjQ7IH6ml87VGg5G6lRRuuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721486049; c=relaxed/simple;
-	bh=dRWWphHhlnVSS4YQZ5YVkQpfXbV2JxEknriVX8N+8J4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LZsQhr8TzoH48JxlWNQKSeISCodJXMmryfQaiAsjDFtPteyFDuh+R9DZ3AQFdETkkeeivBpoc0cBXAxj3Gw0t+rWqhyMaN4PRGmMiCJOHJlsoOmOFL4anKLelJl40d6ZOj6yXjxEtgPLfUSFASonYbUK30FtBrNA4gfYPgDN2+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cl3UmVyb; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721486047; x=1753022047;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dRWWphHhlnVSS4YQZ5YVkQpfXbV2JxEknriVX8N+8J4=;
-  b=Cl3UmVybUFujkgn7BtlYtEZRug55DqpcuSbYkdQNftO9QGgjrX6CgB4t
-   ZGcwf11sYyNDhe/K9kZyiZN/OZUnrL3fJWkOBdilurZ1PNfSIBCrUyde0
-   VIq8ZhTGZUOnAUdC7S1whotmlNIUDZtk9X5ZycWiSi5RDIAtVvvEO2wJ9
-   2YkZcSTXYDdYrAqEzDAok5vENKEN9P4fuhw0z2pxQovCxTLvLkYLJ4h8C
-   kW31dIGisJFRXvaaI0JEgrWCTjYdds0+usBYvQ13mnlmvv5WrgtkbREYP
-   YIXtqi5IHeB8hKhmLvweoslNz5P1kwBf+tE5e+5HHfEk4mcibb39rFOJN
-   Q==;
-X-CSE-ConnectionGUID: zcLpz7fjQCKA5UJA9XLLEQ==
-X-CSE-MsgGUID: 5drU0XY5TzWKOsG+221MVw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11139"; a="18720334"
-X-IronPort-AV: E=Sophos;i="6.09,224,1716274800"; 
-   d="scan'208";a="18720334"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2024 07:34:06 -0700
-X-CSE-ConnectionGUID: sAVdlJcxQemXUhP7ZNA62g==
-X-CSE-MsgGUID: GH6ZgubQSE2ZtJfxqVnmVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,224,1716274800"; 
-   d="scan'208";a="52118364"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 20 Jul 2024 07:34:01 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sVB9q-000jHM-1b;
-	Sat, 20 Jul 2024 14:33:58 +0000
-Date: Sat, 20 Jul 2024 22:33:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ayush Singh <ayush@beagleboard.org>, jkridner@beagleboard.org,
-	robertcnelson@beagleboard.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Tero Kristo <kristo@kernel.org>, Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	greybus-dev@lists.linaro.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Ayush Singh <ayush@beagleboard.org>
-Subject: Re: [PATCH 3/3] greybus: gb-beagleplay: Add firmware upload API
-Message-ID: <202407210006.Wvm3bOm9-lkp@intel.com>
-References: <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
+	s=arc-20240116; t=1721488002; c=relaxed/simple;
+	bh=hQYRSIQfYXedSv44PaqnMPMgH1Ckv0BjAYSaEKIFwfk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ggrBb6PMPiBE/NYVXKYA1DwRMTp4tO5wEpMyuye3AXjF62fhYH74L1D3ldQpsaaMbfYk+mZxpddxBttc8bH8j4vGIPhQttDbizzaLPyR83Y+kidPTPavZOuGKHagt0ENB39BKMc1j5nWADkLxAf4yehcEm0sZIQV/9Jd6PhlvoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KEd1UByx; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2eede876fccso35334121fa.1
+        for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 08:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721487999; x=1722092799; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s+RNAnpMtMJ6n/o9ByYXve4qKgPeHmZptCll5sHCKFc=;
+        b=KEd1UByxuItrXC0M676fnKXI4oGGmc7GBAyAkM0a/qmO3bpu38pCl3m/DGIfJOWeL7
+         INMjhgzgwIqeT8BwKkphFvvmP6Cs10Klu5aj2hhWjSr+SB5RqkLUgU9P3HKfN3SbnOcy
+         S2NKPPGvQZZC0D+RAuAokYKkjj5nNWjQvjMgPHZl1jRBOs3on5wS2VLy8gVVdcWARTGz
+         pP7Gm0x852543a53d6DdxY7Diu+ZMQJyq9VM7Lmpi6D2ENtx/krPG8b+34FURmSs6uvP
+         MnksKgtSn10vITLePg5TnPEXiRAMKiph5BKkhXoaVx+g0D3ZORDTn3lRYhaYZrCjp2O8
+         dZrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721487999; x=1722092799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s+RNAnpMtMJ6n/o9ByYXve4qKgPeHmZptCll5sHCKFc=;
+        b=e7wsVap1hSqeJDLf0E9pDheBJPAacZT8+DHm7qGLEJjawLZhB4UOCOWztKfQS95ihP
+         0nR+oURsE4Lv2OROOletOiGeLkEtBmXtOeXbNXhi/oYeQfwXxqVQv9uy/EwmLR2WZwA2
+         RxfVNZsS+sRJFQ9pvhClv0RvPdrL3jvjAIwJKsi0ZwnrzO33/z+PrS/jKFuedLaOMpdA
+         Ef11z0wJTpWZh6phpsSNP8v9iZcWBrCcHE9WoYl/ZsvCmgGE+/4e16cxQoOTol9uCgWQ
+         v99U080Abqq40VcRpl1Yuc9EEy91uvGJRRb1oxKw27/VQ+feO1NH9vTJWcudiqivOqqz
+         u+yg==
+X-Forwarded-Encrypted: i=1; AJvYcCX5RSOUQ/gwtFc869VBsAQUB0hmWJ3W8+pbeTTo/2GbzsG5otM+RjP9xFsCIpiAGS7NkbRTwStA246bh6uTaaPdCaMo162F
+X-Gm-Message-State: AOJu0YyfqMEAq+trMWpYTkzObVSc9okWDIBvdgromJ+i8sSmGKIp4mDg
+	ru/nvr3q9Lv+qoTPe7GX1/MGKLtPGcif2w4cei2eg8PQ2MaN+3rfresQQVBSgDu+JxWzFZ6kosf
+	6bal3sJwgWlkG3YktG6m40wBNrOg=
+X-Google-Smtp-Source: AGHT+IH44rv0j7Tt8ez23D7oIFPxE0bffTyn4KWtfGgGKYsDIRhW8wWEzpk2H45Y1MvcAdmr1eWdnx2WPyo6paKYPTA=
+X-Received: by 2002:a2e:9ccb:0:b0:2ee:7a54:3b08 with SMTP id
+ 38308e7fff4ca-2ef16738372mr18559881fa.3.1721487998712; Sat, 20 Jul 2024
+ 08:06:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
+References: <20240719041911.533320-1-ap420073@gmail.com> <74fcb647-0226-4aa4-bf99-06fee8d510d0@davidwei.uk>
+In-Reply-To: <74fcb647-0226-4aa4-bf99-06fee8d510d0@davidwei.uk>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sun, 21 Jul 2024 00:06:27 +0900
+Message-ID: <CAMArcTXm=4sfJ3oLf7-ZxobNyoeHWrg+-_Yirm4QszoaVnSbfA@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt_en: update xdp_rxq_info in queue restart logic
+To: David Wei <dw@davidwei.uk>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, michael.chan@broadcom.com, netdev@vger.kernel.org, 
+	somnath.kotur@broadcom.com, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ayush,
+On Sat, Jul 20, 2024 at 2:13=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
 
-kernel test robot noticed the following build warnings:
+Hi David,
+Thanks a lot for the review!
 
-[auto build test WARNING on f76698bd9a8ca01d3581236082d786e9a6b72bb7]
+> On 2024-07-18 21:19, Taehee Yoo wrote:
+> > When the netdev_rx_queue_restart() restarts queues, the bnxt_en driver
+> > updates(creates and deletes) a page_pool.
+> > But it doesn't update xdp_rxq_info, so the xdp_rxq_info is still
+> > connected to an old page_pool.
+> > So, bnxt_rx_ring_info->page_pool indicates a new page_pool, but
+> > bnxt_rx_ring_info->xdp_rxq is still connected to an old page_pool.
+> >
+> > An old page_pool is no longer used so it is supposed to be
+> > deleted by page_pool_destroy() but it isn't.
+> > Because the xdp_rxq_info is holding the reference count for it and the
+> > xdp_rxq_info is not updated, an old page_pool will not be deleted in
+> > the queue restart logic.
+> >
+> > Before restarting 1 queue:
+> > ./tools/net/ynl/samples/page-pool
+> > enp10s0f1np1[6] page pools: 4 (zombies: 0)
+> >       refs: 8192 bytes: 33554432 (refs: 0 bytes: 0)
+> >       recycling: 0.0% (alloc: 128:8048 recycle: 0:0)
+> >
+> > After restarting 1 queue:
+> > ./tools/net/ynl/samples/page-pool
+> > enp10s0f1np1[6] page pools: 5 (zombies: 0)
+> >       refs: 10240 bytes: 41943040 (refs: 0 bytes: 0)
+> >       recycling: 20.0% (alloc: 160:10080 recycle: 1920:128)
+>
+> Thanks, didn't know this existed! As a follow up once Mina lands his
+> devmem TCP series with netdev_rx_queue_restart(), a netdev netlink
+> selftest using would be great.
+>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ayush-Singh/dt-bindings-net-ti-cc1352p7-Add-boot-gpio/20240719-180050
-base:   f76698bd9a8ca01d3581236082d786e9a6b72bb7
-patch link:    https://lore.kernel.org/r/20240719-beagleplay_fw_upgrade-v1-3-8664d4513252%40beagleboard.org
-patch subject: [PATCH 3/3] greybus: gb-beagleplay: Add firmware upload API
-config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240721/202407210006.Wvm3bOm9-lkp@intel.com/config)
-compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240721/202407210006.Wvm3bOm9-lkp@intel.com/reproduce)
+Yes, that would be great!
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407210006.Wvm3bOm9-lkp@intel.com/
+> >
+> > Before restarting queues, an interface has 4 page_pools.
+> > After restarting one queue, an interface has 5 page_pools, but it
+> > should be 4, not 5.
+> > The reason is that queue restarting logic creates a new page_pool and
+> > an old page_pool is not deleted due to the absence of an update of
+> > xdp_rxq_info logic.
+> >
+> > Fixes: 2d694c27d32e ("bnxt_en: implement netdev_queue_mgmt_ops")
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.c
+> > index bb3be33c1bbd..11d8459376a9 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> [...]
+> > @@ -15065,6 +15079,8 @@ static void bnxt_queue_mem_free(struct net_devi=
+ce *dev, void *qmem)
+> >       page_pool_destroy(rxr->page_pool);
+> >       rxr->page_pool =3D NULL;
+> >
+> > +     xdp_rxq_info_unreg(&rxr->xdp_rxq);
+> > +
+>
+> IMO this should go before page_pool_destroy() for symmetry with
+> bnxt_free_rx_rings(). I know there's already a call deep inside of
+> xdp_rxq_info_unreg().
+>
 
-All warnings (new ones prefixed by >>):
+I agree about symmetry. So I will change it.
 
->> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_DOWNLOAD' not described in enum 'cc1352_bootloader_cmd'
->> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_GET_STATUS' not described in enum 'cc1352_bootloader_cmd'
->> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_SEND_DATA' not described in enum 'cc1352_bootloader_cmd'
->> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_RESET' not described in enum 'cc1352_bootloader_cmd'
->> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_CRC32' not described in enum 'cc1352_bootloader_cmd'
->> drivers/greybus/gb-beagleplay.c:132: warning: Enum value 'COMMAND_BANK_ERASE' not described in enum 'cc1352_bootloader_cmd'
->> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_SUCCESS' not described in enum 'cc1352_bootloader_status'
->> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_UNKNOWN_CMD' not described in enum 'cc1352_bootloader_status'
->> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_INVALID_CMD' not described in enum 'cc1352_bootloader_status'
->> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_INVALID_ADR' not described in enum 'cc1352_bootloader_status'
->> drivers/greybus/gb-beagleplay.c:143: warning: Enum value 'COMMAND_RET_FLASH_FAIL' not described in enum 'cc1352_bootloader_status'
->> drivers/greybus/gb-beagleplay.c:420: warning: Function parameter or struct member 'data' not described in 'csum8'
->> drivers/greybus/gb-beagleplay.c:420: warning: Function parameter or struct member 'size' not described in 'csum8'
->> drivers/greybus/gb-beagleplay.c:420: warning: Function parameter or struct member 'base' not described in 'csum8'
->> drivers/greybus/gb-beagleplay.c:712: warning: Function parameter or struct member 'data' not described in 'cc1352_bootloader_empty_pkt'
->> drivers/greybus/gb-beagleplay.c:712: warning: Function parameter or struct member 'size' not described in 'cc1352_bootloader_empty_pkt'
+> >       ring =3D &rxr->rx_ring_struct;
+> >       bnxt_free_ring(bp, &ring->ring_mem);
+> >
+> > @@ -15145,6 +15161,7 @@ static int bnxt_queue_start(struct net_device *=
+dev, void *qmem, int idx)
+> >       rxr->rx_sw_agg_prod =3D clone->rx_sw_agg_prod;
+> >       rxr->rx_next_cons =3D clone->rx_next_cons;
+> >       rxr->page_pool =3D clone->page_pool;
+> > +     memcpy(&rxr->xdp_rxq, &clone->xdp_rxq, sizeof(struct xdp_rxq_info=
+));
+>
+> Assignment is fine here.
 
+Okay, I will use the assignment instead of the memcpy.
 
-vim +132 drivers/greybus/gb-beagleplay.c
+I will send a v2 patch after some tests.
 
-   121	
-   122	/**
-   123	 * enum cc1352_bootloader_cmd: CC1352 Bootloader Commands
-   124	 */
-   125	enum cc1352_bootloader_cmd {
-   126		COMMAND_DOWNLOAD = 0x21,
-   127		COMMAND_GET_STATUS = 0x23,
-   128		COMMAND_SEND_DATA = 0x24,
-   129		COMMAND_RESET = 0x25,
-   130		COMMAND_CRC32 = 0x27,
-   131		COMMAND_BANK_ERASE = 0x2c,
- > 132	};
-   133	
-   134	/**
-   135	 * enum cc1352_bootloader_status: CC1352 Bootloader COMMAND_GET_STATUS response
-   136	 */
-   137	enum cc1352_bootloader_status {
-   138		COMMAND_RET_SUCCESS = 0x40,
-   139		COMMAND_RET_UNKNOWN_CMD = 0x41,
-   140		COMMAND_RET_INVALID_CMD = 0x42,
-   141		COMMAND_RET_INVALID_ADR = 0x43,
-   142		COMMAND_RET_FLASH_FAIL = 0x44,
- > 143	};
-   144	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks a lot!
+Taehee Yoo
 
