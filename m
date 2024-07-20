@@ -1,106 +1,109 @@
-Return-Path: <netdev+bounces-112294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406D693815C
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:44:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04662938192
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 16:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC389B2138C
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 12:44:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C160281916
+	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 14:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAF37E0FC;
-	Sat, 20 Jul 2024 12:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6B912C489;
+	Sat, 20 Jul 2024 14:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QYqfVG6M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dro/exMM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDB8257B;
-	Sat, 20 Jul 2024 12:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F7412B62
+	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 14:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721479464; cv=none; b=BJJ3TpvV1wd24K8/c6Q1lq8SKicgEET3AqCWFrR2LBAj9pLWppDsX+XSxZPSUG5TMfbZBEOvT28dX26nKBrFKjMlvNRitJSvnnMitW1kdEJi9MG8DDwktjAUlpdLZMoIPGg0ZOK6nZgwxPJ+TzHgDD6BfsxZ98x0mMpsXFO6YsU=
+	t=1721484567; cv=none; b=uHe2JgP0gJptW3fuY9mIs5lxyj7KHv/PpuN+lmygooOtzHMLaXlvmTmnp9KdrTGl/JTyPDxpnp/B7grcKeO82QNNhVVCp4Za6aduvlrxW+EBlSYYIjxix2szqIxYj9BWFLH/sSu9qkptJe6tFnYpLTwI+9+/pPtZ2p5aKXAxnrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721479464; c=relaxed/simple;
-	bh=1nsnebR961oPwpt1bU6VHdK6v98hEAP+QPoTD+y2kHU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MCPqO+4MUlXAuCcFbwqiaizSlYOz2le526aupWpksMQppeol8ndHtD1REPnAxrALMhaROVvFP8QxXIVuMLazIdxuCvUddYA8Rc4v1BCv2MOeOMMcsS+ZbVX8Hu17j344kq6b9V8XSUEZXvJ7xGHCuR3Oz6cgi2olvW56p4xLLRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QYqfVG6M; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3c9cc681ee0so1535531b6e.0;
-        Sat, 20 Jul 2024 05:44:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721479462; x=1722084262; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1nsnebR961oPwpt1bU6VHdK6v98hEAP+QPoTD+y2kHU=;
-        b=QYqfVG6MJZDwBa+ALAdbTabX8v8CaXEqlmuUSzd9lxi/iHW/4liApVR1mv1GC8OUZa
-         G0zn2an9KqxVyJfp4Omx+V4HQhGIwHuVrFGCr/8hhFDHUEDOZ9nONY430k9L+v9Z5p2J
-         UzM2hdp0YuBmG3Ba6EI7/qJ/BeAAE9O7a2xOgdj+s/smO0UisjhLqw+L/7b9MxakK09c
-         WYdQYjISSA3l2ABKn56x073a8tZvKfRR8wXDyXngz0blLGKW9F6d+irj1hjEnKc1A2fq
-         967pXejdqgIrKtkO5sCIrtNDINGo1tgOeHI3/dOqEvXKC6a1at5Bhac1qjDCYnOtAPbs
-         pNvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721479462; x=1722084262;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1nsnebR961oPwpt1bU6VHdK6v98hEAP+QPoTD+y2kHU=;
-        b=bDnrQ+RnDVvAS7V4KBR6u6BI+mSnhmMikXqP28vQu7rd26Pc1YnvXC4VrLsTU2BmNY
-         NJB/ZQFojeIhyvV1dZmTvH9+rGcf+xL4EEeaqgMH3UGZ42c6sJ1XfgNj/UG5E7Z7dYm4
-         7+Gw7kOUnUdr+vPwE8sZnzT7LkaXK0qMcZu/bIvWZyVxrm3uzZrB8OfE4CQJVaw/Y0w8
-         Y1A26X2jX2Gb9+V2/ljIxEVeE+H6Fj8p98bl/vbNmyiSTSuqCad2ZDxUuHgFPRBnmPDm
-         Undg7ksZM3CBR0ao441AF0ltWIcXUcbzAaBkzMT2Q6gqHPHeJIUV2vP0+53kZJ11VzTS
-         v4eg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3zYUE2XT47LT98asTNQ7wSmTEHXEbFbUjg+PTwGutsX/DjgMwEUXdlnU5NvvWBeGOIIruWKA9VwqqmKzdxrn2a921JuCe
-X-Gm-Message-State: AOJu0YwQzXp4oiefV1BqF2sltXW5eZiZ409bcI3fC+DXpaWJIIFsSo1G
-	6057RlN9BqG2ctupXK2pv2b7qS3wewv03dZk9fPQIIOr7AksOrHE2BC0KIR/L1WN2vCpmFKtKDL
-	jVxHCvBPi1U597482dXFFov2sP7Q=
-X-Google-Smtp-Source: AGHT+IEceOhq05EmeqOrV8bmatPizQhGl9TG3AHZbMQocp7H4pzROq5uSk8z+WR9e0ZBcSN6ixBEXE8ewWe7oE/Iai4=
-X-Received: by 2002:a05:6870:a11c:b0:25d:f654:9cd6 with SMTP id
- 586e51a60fabf-263ab5622a2mr1248158fac.38.1721479461898; Sat, 20 Jul 2024
- 05:44:21 -0700 (PDT)
+	s=arc-20240116; t=1721484567; c=relaxed/simple;
+	bh=eutLgofeiDc4X/cpPIq+2ED1OnLwYhIDhqA71mdRFN8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tB2KD2vzKJPuWRk4qY33X293bBRJ4CGgiYTRUWybOinCw/PueQqdo3YMC1867D5FBcdeFEP18+dVF70pB0KwDPP3Y80T20usC9PcU9LwD3TNhuiZI0OHaWB5kM7q3VH82IOe4dro9oxfNlTDsqUFBKeRbJM+sLYmlyMv5UznF7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dro/exMM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721484564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=M6QE8UA40LtVG1HZS4ZJtZy6DSMQAzIuEE9/bGs1BZA=;
+	b=Dro/exMM0Xq4MhmebGWKvlbfL64spQdhO/+dV4NOm3g+CMPptSl2rS+drtbOOj6qgpBdDR
+	hhMreIZcG9RljBmlnFLClrt017HbnbCBee4yoBeq6uZj62oVIhmzOT6o9XL3SP0U6PWP9v
+	xROMtIcs5msWmbuW4pSLmJdQAq9cSDc=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-600-J7W6qTwtPi2h2f8BOHR9Aw-1; Sat,
+ 20 Jul 2024 10:09:20 -0400
+X-MC-Unique: J7W6qTwtPi2h2f8BOHR9Aw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BEF66195608B;
+	Sat, 20 Jul 2024 14:09:18 +0000 (UTC)
+Received: from jmaloy-thinkpadp16vgen1.rmtcaqc.csb (unknown [10.22.32.27])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C7C113000188;
+	Sat, 20 Jul 2024 14:09:15 +0000 (UTC)
+From: jmaloy@redhat.com
+To: netdev@vger.kernel.org,
+	davem@davemloft.net
+Cc: kuba@kernel.org,
+	passt-dev@passt.top,
+	jmaloy@redhat.com,
+	sbrivio@redhat.com,
+	lvivier@redhat.com,
+	dgibson@redhat.com,
+	eric.dumazet@gmail.com,
+	edumazet@google.com
+Subject: [net] tcp: add SO_PEEK_OFF socket option tor TCPv6
+Date: Sat, 20 Jul 2024 10:09:14 -0400
+Message-ID: <20240720140914.2772902-1-jmaloy@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240717193725.469192-1-vtpieter@gmail.com> <20240717193725.469192-2-vtpieter@gmail.com>
- <20240717193725.469192-3-vtpieter@gmail.com> <ZppuQo9sGdYJWgBQ@pengutronix.de>
-In-Reply-To: <ZppuQo9sGdYJWgBQ@pengutronix.de>
-From: Pieter <vtpieter@gmail.com>
-Date: Sat, 20 Jul 2024 14:44:10 +0200
-Message-ID: <CAHvy4ArOx2MhMmrgeosPbr8NLE6Kf=wWuL23+g-+2=Uf9UaFtQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] net: dsa: microchip: ksz8795: add Wake on LAN support
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com, 
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, 
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Le ven. 19 juil. 2024 =C3=A0 15:46, Oleksij Rempel
-<o.rempel@pengutronix.de> a =C3=A9crit :
->
-> Hi Pieter,
->
-> If I see it correctly, the only difference between KSZ9477 and KSZ8795
-> code is the register access. Even bit offsets are identical. I do not
-> think indirect register access is good justification for duplication
-> this amount of code.
+From: Jon Maloy <jmaloy@redhat.com>
 
-Hi Oleksij, thanks for the review! I guess you're right - I must have
-gone too quickly for the easy way out. There's actually one additional
-register access for KSZ8795 but it should be possible to get around
-this as well. I'll work on it but it might take me a few weeks to get
-this ready. Would be great if you still have a KSZ9477 family board
-around to validate.
+When we added the SO_PEEK_OFF socket option to TCP we forgot
+to add it even for TCP on IPv6.
 
-Cheers, Pieter
+We do that here.
+
+Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
+
+Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+---
+ net/ipv6/af_inet6.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 90d2c7e3f5e9..ba69b86f1c7d 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -708,6 +708,7 @@ const struct proto_ops inet6_stream_ops = {
+ 	.splice_eof	   = inet_splice_eof,
+ 	.sendmsg_locked    = tcp_sendmsg_locked,
+ 	.splice_read	   = tcp_splice_read,
++	.set_peek_off      = sk_set_peek_off,
+ 	.read_sock	   = tcp_read_sock,
+ 	.read_skb	   = tcp_read_skb,
+ 	.peek_len	   = tcp_peek_len,
+-- 
+2.45.2
+
 
