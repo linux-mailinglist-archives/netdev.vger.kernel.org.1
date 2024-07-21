@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-112340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE7B9385EC
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 21:25:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FAC09385EF
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 21:33:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D62881C20928
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 19:25:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D861C20ABD
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 19:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8145916A955;
-	Sun, 21 Jul 2024 19:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ABF616A955;
+	Sun, 21 Jul 2024 19:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="EM/o0nGi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SfonLoqH"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AFA1667F6;
-	Sun, 21 Jul 2024 19:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3D0322E;
+	Sun, 21 Jul 2024 19:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721589951; cv=none; b=VNtWXruyQaIT0HpGUZhUt3OhmfdlcPFZ5UAQL0wiJrX901gCPtFV7hN5oDrPuuwyWd1LM9ztRVVK3n6H1pWnABnxO0+ZFLaWY2UVRnJkeNb0R9y6fM6en0prjcJjfKAyiJOs0UExRx8UThvKrz2pdvV0sSZNAOtIpv7xKUuDJhA=
+	t=1721590403; cv=none; b=oL0VTX57kmINGv0p/uOxsFXb/cjAvBh1QwjG1wnbHurOndt0lMfS+QRVUeE+ZQSPLF1UEuymvIifRrujnlcXzp8PmjBtJo5NSc2SW/xkoheLqicvCTr3p7teY78zEnFAnAapIx0g2xGKtsuj4LnjF/XGuHBE5BBiYbcsr3KqQA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721589951; c=relaxed/simple;
-	bh=lpwpH5jRM4NpKfFV7k4ZqvII+1jk44QJ4kC8lDa7xFI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DMI+zPv+EPUAMCSpBwT0ntVrOuIZeraL0ked9u5yDf+7+mA8T/FQQJtTLhQIg9rZG1nxYzyBOljkSHyUv2Fa+LzJK6RugliBsnQYpGhVDZArc+qmcV11sckmeyJ/Gv/vKI/nP9V4T+mb+M8Abn3/l0+4hcGjulgDj6Kp+sNrVhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=EM/o0nGi; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id D13D821E;
-	Sun, 21 Jul 2024 21:25:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721589907;
-	bh=lpwpH5jRM4NpKfFV7k4ZqvII+1jk44QJ4kC8lDa7xFI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EM/o0nGiRNgTQfGa5nahpNo+G+nfHz2mqZCHhQPtvVNTP4hzrel3xJq/uPIJd7G5W
-	 2zWc/5minYzzOuIQG2gTGz6XXS3WnlrP3MNEn+Mjt+tHRdR7WzZ02TGqlrH2CFYxVV
-	 ek+zwI6IaTmUFTnLtt5l6gcT1s/3u+8tIXBqb7Jo=
-Date: Sun, 21 Jul 2024 22:25:30 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240721192530.GD23783@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
+	s=arc-20240116; t=1721590403; c=relaxed/simple;
+	bh=AoT/Uut9stibicIDKBPjE/MdgHvySYO/zLsb99YiRDs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IgwG5KdY/qKSL9eUjlF1WTW5rkyfhJfDvLRJPsZ0GlDdSZ2Gu1pp9bCJ+4ix46FddtsKAyNTB6ulJaoZebCAc5icNmOTn4eCmE0MFlLV1YDhP2wEpAjbLyMwtVyQW/rRnk6PPnSl2h/9SFsqgLGVD60md11tbvYhsFIAj4Tb3rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SfonLoqH; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 97D3DE0003;
+	Sun, 21 Jul 2024 19:33:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1721590392;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZQFTzEsP7Kp/6et5R0JPxrZOQS09vVWQIIZprfMMn4g=;
+	b=SfonLoqHpUyoc7NI2/IpdNwWXebVrXILbM9wifHduS4ZsY9zaUOTlJA1jmbJi6aWx0cDzG
+	+8nAjsRS8zbPSahyReUumG+LJaiJ6yV+ylPlK3O2HXi3x48gjAZAf72eIY6+zSqgdbwcGE
+	I+atMstAk+3kK8MplwpTQ4B1dxDrofNhGrgM4Soe9ZM+ZljWTHRzn6Nd9sLl+HMyVXfbYW
+	EzX2zf9VTr8+vEHkZxW1KrrjB0ebtpE6SO/uPZyLQ8AdaGLmAtrWimF9WiLCZkO4BuGxFI
+	puLkbPu1IQfJfzAUEZDFzf77Dkf2x4bEHarrbZGCeST8m8iPKP19rvRv15BrHw==
+From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
+Subject: [PATCH v4 0/2] selftests/bpf: convert test_xdp_veth to test_progs
+ framework
+Date: Sun, 21 Jul 2024 21:33:02 +0200
+Message-Id: <20240721-convert_test_xdp_veth-v4-0-23bdba21b2f9@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAG5inWYC/3XN0QrCIBTG8VcZXmccdc6tq94jYkx31oSaQ0UWs
+ XfPgqCIXf4/OL/zIAG9xUAOxYN4TDZYN+UodwUxYzddkNo+N+HAS1AMqHFTQh/biCG2Sz+3CeN
+ IoTQG5CClVD3Jt7PHwS5v93TOPdoQnb+/3yT2Wj8i2xATo0Drqu6M0dApro7auXi10964G3mZi
+ X87csvh2Skr3oCu+VD1/N8R30615YjsKA1M1A0Ko8Wvs67rE0tSm2RMAQAA
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: ebpf@linuxfoundation.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+X-Mailer: b4 0.13.0
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> James Bottomley wrote:
-> > > The upstream discussion has yielded the full spectrum of positions on
-> > > device specific functionality, and it is a topic that needs cross-
-> > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > concerns. Please consider it for a Maintainers Summit discussion.
-> > 
-> > I'm with Greg on this ... can you point to some of the contrary
-> > positions?
-> 
-> This thread has that discussion:
-> 
-> http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> 
-> I do not want to speak for others on the saliency of their points, all I
-> can say is that the contrary positions have so far not moved me to drop
-> consideration of fwctl for CXL.
-> 
-> Where CXL has a Command Effects Log that is a reasonable protocol for
-> making decisions about opaque command codes, and that CXL already has a
-> few years of experience with the commands that *do* need a Linux-command
-> wrapper.
-> 
-> Some open questions from that thread are: what does it mean for the fate
-> of a proposal if one subsystem Acks the ABI and another Naks it for a
-> device that crosses subsystem functionality? Would a cynical hardware
-> response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> get device-specific commands past another subsystem's objection?
+Hello everyone,
 
-My default answer would be to trust the maintainers of the relevant
-subsystems (or try to convince them when you disagree :-)). Not only
-should they know the technical implications best, they should also have
-a good view of the whole vertical stack, and the implications of
-pass-through for their ecosystem. This may result in a single NAK
-overriding ACKs, but we could also try to find technical solutions when
-we'll face such issues, to enforce different sets of rules for the
-different functions of a device.
+this small series is a first step in a larger effort aiming to help improve
+eBPF selftests and the testing coverage in CI. It focuses for now on
+test_xdp_veth.sh, a small test which is not integrated yet in test_progs.
+The series is mostly about a rewrite of test_xdp_veth.sh to make it able to
+run under test_progs, relying on libbpf to manipulate bpf programs involved
+in the test.
 
-Subsystem hopping is something we're recently noticed for camera ISPs,
-where a vendor wanted to move from V4L2 to DRM. Technical reasons for
-doing so were given, and they were (in my opinion) rather excuses. The
-unspoken real (again in my opinion) reason was to avoid documenting the
-firmware interface and ship userspace binary blobs with no way for free
-software to use all the device's features. That's something we have been
-fighting against for years, trying to convince vendors that they can
-provide better and more open camera support without the world
-collapsing, with increasing success recently. Saying amen to
-pass-through in this case would be a huge step back that would hurt
-users and the whole ecosystem in the short and long term.
+Signed-off-by: Alexis Lothoré <alexis.lothore@bootlin.com>
+---
+Changes in v4:
+- add missing netns_close in an error path during programs attach
+- Link to v3: https://lore.kernel.org/r/20240716-convert_test_xdp_veth-v3-0-7b01389e3cb3@bootlin.com
 
-> My reconsideration of the "debug-build only" policy for CXL
-> device-specific commands was influenced by a conversation with a distro
-> developer where they asserted, paraphrasing: "at what point is a device
-> vendor incentivized to ship an out-of-tree module just to restore their
-> passthrough functionality?. At that point upstream has lost out on
-> collaboration and distro kernel ABI has gained another out-of-tree
-> consumer."
-> 
-> So the tension is healthy, but it has diminishing returns past a certain
-> point.
+Changes in v3:
+- Fix doc style in the new test
+- Collect acked-by tags
+- Link to v2: https://lore.kernel.org/r/20240715-convert_test_xdp_veth-v2-0-46290b82f6d2@bootlin.com
 
+Changes in v2:
+- fix many formatting issues raised by checkpatch
+- use static namespaces instead of random ones
+- use SYS_NOFAIL instead of snprintf() + system ()
+- squashed the new test addition patch and the old test removal patch
+- Link to v1: https://lore.kernel.org/r/20240711-convert_test_xdp_veth-v1-0-868accb0a727@bootlin.com
+
+---
+Alexis Lothoré (eBPF Foundation) (2):
+      selftests/bpf: update xdp_redirect_map prog sections for libbpf
+      selftests/bpf: integrate test_xdp_veth into test_progs
+
+ tools/testing/selftests/bpf/Makefile               |   1 -
+ .../selftests/bpf/prog_tests/test_xdp_veth.c       | 213 +++++++++++++++++++++
+ .../testing/selftests/bpf/progs/xdp_redirect_map.c |   6 +-
+ tools/testing/selftests/bpf/test_xdp_veth.sh       | 121 ------------
+ 4 files changed, 216 insertions(+), 125 deletions(-)
+---
+base-commit: 4837cbaa1365cdb213b58577197c5b10f6e2aa81
+change-id: 20240710-convert_test_xdp_veth-04cc05f5557d
+
+Best regards,
 -- 
-Regards,
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-Laurent Pinchart
 
