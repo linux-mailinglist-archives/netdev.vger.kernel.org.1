@@ -1,487 +1,189 @@
-Return-Path: <netdev+bounces-112343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A067E9385F6
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 21:34:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB9793860B
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 22:08:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF9C1F211A5
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 19:34:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D338928113E
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 20:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A5216C680;
-	Sun, 21 Jul 2024 19:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8A2167DB7;
+	Sun, 21 Jul 2024 20:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JRSkdXjc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AaUKtbNI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154461667DA;
-	Sun, 21 Jul 2024 19:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A2779F6
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 20:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721590405; cv=none; b=mHIuBa5bO4AbviUnUQakpfR7G1WPblB/+xJGdn+BLpevpYZF4DwDgF8n3CW5luqrL5Sc5PhugtqcGfry7zLpol1iqyFFdtFAqz7dlM79gnn/yxbJPzJTD/yWiNDZm9hVpEU2mtW0uIJBZ7/JPMbXO9T1paGvq6Bg6KxirnggYHs=
+	t=1721592517; cv=none; b=RJxfW4eeHWWFrAG+6lt6CgZrJmsAFa37Y80f3xqtFZOOeaUjgwOWxkPQzlTRILF6A1DhjorKBbR3+2fRVUDonI9uqybLQZJijToRKJSH500Ts5dkZlZyXaPfKsdnYg+nvh/SiA1qjohi1+7vI9Tnr2s1pi9GgElmBKasgrzCQ4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721590405; c=relaxed/simple;
-	bh=joDjOvAOXOZl6uimoS7B/HV3eJkejjhl5w//shP7LVE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Qyk7Tvse98VbUGS0iZ0Bu78dYHjynRPIdxaViY61CWxPbdTs+KbCf+nOrMEshYd/dBnbkYTGCpH1ceH91aXOxaxg1um58P8Pnztht3qDQfJ/RvtqoJ1ALDmqCvwWAZzHrazKXK/U7j41Xq3o+KCaSv4JT4g02kVqTbUUIKZ+j8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JRSkdXjc; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BFB25E0004;
-	Sun, 21 Jul 2024 19:33:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1721590395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wcpIozu/nJaxrJqQxwEVJSVoLocpDesExo7rzBa8dt0=;
-	b=JRSkdXjcg3kux1fUCORtvCmobA5DekCNHSOJe8bkYllUeOCTZAOK1IE1ENo3MGHNVTickc
-	LhXisZjS16gcpAaGgr9uKqKNas8NwX1hG5wl3oWqRhQwLTZbLe4pteDyvNRFPfuuufxHuw
-	KV36l5x6JJa2+IQ7CgaAU/Gt0/pzG75S2MML3bonR61oCmgXe8vfebyX+VBxe0S9VZ01P2
-	UP7OvVtj4QKcVPamYE/KkOrqBknyTAfEgHeni+ymBqYQxRp1+etptaPojtd9HdoG+PQ4dk
-	afw40ff9/NWu+pleurTQLdZYvXBNEzEaAtmtYicSQBZkJ1TSr4yvLhHC8uKEQw==
-From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Date: Sun, 21 Jul 2024 21:33:04 +0200
-Subject: [PATCH v4 2/2] selftests/bpf: integrate test_xdp_veth into
- test_progs
+	s=arc-20240116; t=1721592517; c=relaxed/simple;
+	bh=6LECqKhQlIXUpg7mFcQEr4+oKb6b5zgB96gs0e/gih4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P05OC9Tn60/idt0DMksSbMedSsxBABs9iXO0gHNT4RNHFybF1T7Nk2d6Qt78tVyy+Y/OoP6w6G505BU49eKh8LGM83PeqlBr6otlF9Oja5fj4W1hz+KIpqSXTEfGOHlhG3kuWvzT3r9pyv225d2MWo8HFcOpyQLtCZbOB9MbCL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AaUKtbNI; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5a1337cfbb5so2955420a12.3
+        for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 13:08:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721592514; x=1722197314; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Am3yjgg/9yWu4S/oZ3UlSSFlfvdqVYbggOXsd9kY1bE=;
+        b=AaUKtbNIrwVX6K1xgiflUKiR7QyE/3lN3btVAZsBCHm/x3x5gMhs8S05cIL1UxX254
+         Gy8gQPhi5C6T0E9tfeKYhLiSa6CuG9FB0Okx27xS79an4UGYX4dF4VnukogpCKbOPrYN
+         rS+KfonEcxYYgU1sYvhtsNtNyPqaksJszb85AzO3GkUm/46MBsWFeAHux/1eqd9FmjLC
+         MUG5+pE+DpOPCEo0cY8GtEaTH9wXKyGkUwjBUH7QTJcmoZSgUk/JU7yEdewrxkUs55z6
+         TzADdRiW5c2ZSNSsTugDqlrzeAYXBDgmM9S+N2xEqax+U9vToOrKqBsXaZu5gwrs4HaA
+         qcqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721592514; x=1722197314;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Am3yjgg/9yWu4S/oZ3UlSSFlfvdqVYbggOXsd9kY1bE=;
+        b=UqZDtmPHMukB0Pa1TGEG4S+93A/GEt7tCQM1kN1IWPG21prhiBCJk1GPyS8L6oRDyI
+         BymkQ356qU/DNrteOvGoayK++FL4x/I8FoOdibdVFW3ahRTOxHjUd0/ji+lwG02hUdXw
+         sOIU0Hy1LMBmoxZ2P9Fun9GSWDICoLVkUihhQ1cA+haKEe3EZUoI0XTn6k8s9OoF/7Yf
+         8lwSgvg5OXQEZlljQkwSApKUAcK3UtVKM8intrzFE7d0mTAJimlnAawvPAfMHazs6qav
+         OU2Sdo6G+1rTKofEJ1/Jcbfmt9lOrSWqomRFJ+D/l7IOW43CA1IHbXmil5IaMxI3m2Pw
+         lCYA==
+X-Gm-Message-State: AOJu0YxVTXj+ZIIfZ26f+1enDBgrMbNKuVm6zQ+3YdrksOdT3ocyWD53
+	wLvolm/kYCMFjV2XV3B98fzn76CXaNCpxNFwGeKs7iAqPu+ZVV0v
+X-Google-Smtp-Source: AGHT+IFs7IkEH6FyBeR5Cn7mCsCBBrBLkBdCSXoPENKybb5s2vNmJiD0sVQyR/Gx4Ho+NVuDegu0Kg==
+X-Received: by 2002:a50:f69e:0:b0:58e:4e62:429b with SMTP id 4fb4d7f45d1cf-5a47b5bc534mr2884111a12.33.1721592513509;
+        Sun, 21 Jul 2024 13:08:33 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:72ae:7700:9138:3414:3add:3bc? (dynamic-2a01-0c22-72ae-7700-9138-3414-3add-03bc.c22.pool.telefonica.de. [2a01:c22:72ae:7700:9138:3414:3add:3bc])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5a30c7d3277sm4956135a12.87.2024.07.21.13.08.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Jul 2024 13:08:32 -0700 (PDT)
+Message-ID: <47017183-419c-438b-8b5b-b2b584bd62f2@gmail.com>
+Date: Sun, 21 Jul 2024 22:08:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240721-convert_test_xdp_veth-v4-2-23bdba21b2f9@bootlin.com>
-References: <20240721-convert_test_xdp_veth-v4-0-23bdba21b2f9@bootlin.com>
-In-Reply-To: <20240721-convert_test_xdp_veth-v4-0-23bdba21b2f9@bootlin.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: ebpf@linuxfoundation.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- =?utf-8?q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-X-Mailer: b4 0.13.0
-X-GND-Sasl: alexis.lothore@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: Debian Bookworm requires r8168-dkms for RTL8111D - regression
+ from Buster 10.13.0
+To: Dave Gomboc <dave_gomboc@acm.org>, nic_swsd@realtek.com,
+ romieu@fr.zoreil.com
+Cc: netdev@vger.kernel.org
+References: <CA+dwz-12S8EeJjJ_FHtTvP41-Ru4pcfCS2ub5KjGHSY0=F=jog@mail.gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <CA+dwz-12S8EeJjJ_FHtTvP41-Ru4pcfCS2ub5KjGHSY0=F=jog@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-test_xdp_veth.sh tests that XDP return codes work as expected, by bringing
-up multiple veth pairs isolated in different namespaces, attaching specific
-xdp programs to each interface, and ensuring that the whole chain allows to
-ping one end interface from the first one. The test runs well but is
-currently not integrated in test_progs, which prevents it from being run
-automatically in the CI infrastructure.
+On 21.07.2024 03:33, Dave Gomboc wrote:
+> I am sending this email because of the suggestion in
+> /usr/share/doc/r8168-dkms/README.Debian.
+> 
+> Installation using a Debian Bookworm 12.2.0 amd64 DVD-ROM does not
+> find the onboard gigabit ethernet (RTL8111D-based) on one of my
+> mainboards (Gigabyte GA-890GPA-UD3H).  The network came up fine as
+> soon as I used apt-offline to update/upgrade, then to fetch and
+> install r8168-dkms.
+> 
+> Installation using a Debian Bullseye 11.8.0 amd64 DVD-ROM does not
+> find the onboard NIC either.  However, installation using a Debian
+> Buster 10.13.0 amd64 DVD-ROM does find the onboard NIC and can use it
+> directly.  (Unfortunately, installing from that DVD-ROM later failed
+> for some other reason.)
+> 
+> With r8168-dkms in operation, the relevant part of "lspci -v -v -v" reads:
+> 
+> 03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd.
+> RTL8111/8168/8411 PCI Express Gigabit Ethernet Co
+> ntroller (rev 03)
+>        Subsystem: Gigabyte Technology Co., Ltd Onboard Ethernet
+>        Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop-
+> ParErr- Stepping- SERR- FastB2B- DisINTx+
+>        Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
+> <TAbort- <MAbort- >SERR- <PERR- INTx-
+>        Latency: 0, Cache Line Size: 4 bytes
+>        Interrupt: pin A routed to IRQ 18
+>        NUMA node: 0
+>        Region 0: I/O ports at ee00 [size=256]
+>        Region 2: Memory at fdfff000 (64-bit, prefetchable) [size=4K]
+>        Region 4: Memory at fdff8000 (64-bit, prefetchable) [size=16K]
+>        Expansion ROM at fd600000 [virtual] [disabled] [size=128K]
+>        Capabilities: <access denied>
+>        Kernel driver in use: r8168
+>        Kernel modules: r8168
+> 
+> Please let me know if there is further information I can provide that
+> would assist you in getting this supported directly by the r8169
+> driver.
+> 
+Questions regarding downstream kernels should be addressed to the support
+of the respective distribution.
 
-Rewrite it as a C test relying on libbpf to allow running it in the CI
-infrastructure. The new code brings up the same network infrastructure and
-reuses the same eBPF programs as test_xdp_veth.sh, for which skeletons are
-already generated by the bpf tests makefile.
+Please retest with a recent mainline kernel.
+What do you mean with "does not find the device"? Even lspci doesn't show it?
+Please provide a full dmesg log.
 
-Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
----
-The new code has been tested in an aarch64 qemu instance:
-Summary: 1/0 PASSED, 0 SKIPPED, 0 FAILED
+It's not clear which kernel version you're using. Please make sure that it's a
+version including the following fix:
+5d872c9f46bd ("r8169: fix issue caused by buggy BIOS on certain boards with RTL8168d")
 
-I have also checked that some minor alterations in the network
-configuration (altering the redirect map, or not loading one of the xdp
-programs) make the test fail.
-
-On my testing setup, the test takes a bit more than 3 seconds to run on
-average.
-
-Changes in v4:
-- add missing close_netns in error path
-
-Changes in v3:
-- fix doc style in the new test
-- collect acked-by tag
-
-Changes in v2:
-- fix many formatting issues raised by checkpatch
-- use static namespaces instead of random ones
-- use SYS_NOFAIL instead of snprintf() + system ()
-- squashed the new test addition patch and the old test removal patch
----
- tools/testing/selftests/bpf/Makefile               |   1 -
- .../selftests/bpf/prog_tests/test_xdp_veth.c       | 213 +++++++++++++++++++++
- tools/testing/selftests/bpf/test_xdp_veth.sh       | 121 ------------
- 3 files changed, 213 insertions(+), 122 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index a7932bead77d..2864a0dc04d5 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -117,7 +117,6 @@ TEST_PROGS := test_kmod.sh \
- 	test_xdp_redirect.sh \
- 	test_xdp_redirect_multi.sh \
- 	test_xdp_meta.sh \
--	test_xdp_veth.sh \
- 	test_tunnel.sh \
- 	test_lwt_seg6local.sh \
- 	test_lirc_mode2.sh \
-diff --git a/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-new file mode 100644
-index 000000000000..8d75424fe6bc
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/test_xdp_veth.c
-@@ -0,0 +1,213 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/* Create 3 namespaces with 3 veth peers, and forward packets in-between using
-+ * native XDP
-+ *
-+ *                      XDP_TX
-+ * NS1(veth11)        NS2(veth22)        NS3(veth33)
-+ *      |                  |                  |
-+ *      |                  |                  |
-+ *   (veth1,            (veth2,            (veth3,
-+ *   id:111)            id:122)            id:133)
-+ *     ^ |                ^ |                ^ |
-+ *     | |  XDP_REDIRECT  | |  XDP_REDIRECT  | |
-+ *     | ------------------ ------------------ |
-+ *     -----------------------------------------
-+ *                    XDP_REDIRECT
-+ */
-+
-+#define _GNU_SOURCE
-+#include <net/if.h>
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+#include "xdp_dummy.skel.h"
-+#include "xdp_redirect_map.skel.h"
-+#include "xdp_tx.skel.h"
-+
-+#define VETH_PAIRS_COUNT	3
-+#define NS_SUFFIX_LEN		6
-+#define VETH_NAME_MAX_LEN	16
-+#define IP_SRC				"10.1.1.11"
-+#define IP_DST				"10.1.1.33"
-+#define IP_CMD_MAX_LEN		128
-+
-+struct skeletons {
-+	struct xdp_dummy *xdp_dummy;
-+	struct xdp_tx *xdp_tx;
-+	struct xdp_redirect_map *xdp_redirect_maps;
-+};
-+
-+struct veth_configuration {
-+	char local_veth[VETH_NAME_MAX_LEN]; /* Interface in main namespace */
-+	char remote_veth[VETH_NAME_MAX_LEN]; /* Peer interface in dedicated namespace*/
-+	const char *namespace; /* Namespace for the remote veth */
-+	char next_veth[VETH_NAME_MAX_LEN]; /* Local interface to redirect traffic to */
-+	char *remote_addr; /* IP address of the remote veth */
-+};
-+
-+static struct veth_configuration config[VETH_PAIRS_COUNT] = {
-+	{
-+		.local_veth = "veth1",
-+		.remote_veth = "veth11",
-+		.next_veth = "veth2",
-+		.remote_addr = IP_SRC,
-+		.namespace = "ns-veth11"
-+	},
-+	{
-+		.local_veth = "veth2",
-+		.remote_veth = "veth22",
-+		.next_veth = "veth3",
-+		.remote_addr = NULL,
-+		.namespace = "ns-veth22"
-+	},
-+	{
-+		.local_veth = "veth3",
-+		.remote_veth = "veth33",
-+		.next_veth = "veth1",
-+		.remote_addr = IP_DST,
-+		.namespace = "ns-veth33"
-+	}
-+};
-+
-+static int attach_programs_to_veth_pair(struct skeletons *skeletons, int index)
-+{
-+	struct bpf_program *local_prog, *remote_prog;
-+	struct bpf_link **local_link, **remote_link;
-+	struct nstoken *nstoken;
-+	struct bpf_link *link;
-+	int interface;
-+
-+	switch (index) {
-+	case 0:
-+		local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_0;
-+		local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_0;
-+		remote_prog = skeletons->xdp_dummy->progs.xdp_dummy_prog;
-+		remote_link = &skeletons->xdp_dummy->links.xdp_dummy_prog;
-+		break;
-+	case 1:
-+		local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_1;
-+		local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_1;
-+		remote_prog = skeletons->xdp_tx->progs.xdp_tx;
-+		remote_link = &skeletons->xdp_tx->links.xdp_tx;
-+		break;
-+	case 2:
-+		local_prog = skeletons->xdp_redirect_maps->progs.xdp_redirect_map_2;
-+		local_link = &skeletons->xdp_redirect_maps->links.xdp_redirect_map_2;
-+		remote_prog = skeletons->xdp_dummy->progs.xdp_dummy_prog;
-+		remote_link = &skeletons->xdp_dummy->links.xdp_dummy_prog;
-+		break;
-+	}
-+	interface = if_nametoindex(config[index].local_veth);
-+	if (!ASSERT_NEQ(interface, 0, "non zero interface index"))
-+		return -1;
-+	link = bpf_program__attach_xdp(local_prog, interface);
-+	if (!ASSERT_OK_PTR(link, "attach xdp program to local veth"))
-+		return -1;
-+	*local_link = link;
-+	nstoken = open_netns(config[index].namespace);
-+	if (!ASSERT_OK_PTR(nstoken, "switch to remote veth namespace"))
-+		return -1;
-+	interface = if_nametoindex(config[index].remote_veth);
-+	if (!ASSERT_NEQ(interface, 0, "non zero interface index")) {
-+		close_netns(nstoken);
-+		return -1;
-+	}
-+	link = bpf_program__attach_xdp(remote_prog, interface);
-+	*remote_link = link;
-+	close_netns(nstoken);
-+	if (!ASSERT_OK_PTR(link, "attach xdp program to remote veth"))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static int configure_network(struct skeletons *skeletons)
-+{
-+	int interface_id;
-+	int map_fd;
-+	int err;
-+	int i = 0;
-+
-+	/* First create and configure all interfaces */
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-+		SYS(fail, "ip netns add %s", config[i].namespace);
-+		SYS(fail, "ip link add %s type veth peer name %s netns %s",
-+		    config[i].local_veth, config[i].remote_veth, config[i].namespace);
-+		SYS(fail, "ip link set dev %s up", config[i].local_veth);
-+		if (config[i].remote_addr)
-+			SYS(fail, "ip -n %s addr add %s/24 dev %s",	config[i].namespace,
-+			    config[i].remote_addr, config[i].remote_veth);
-+		SYS(fail, "ip -n %s link set dev %s up", config[i].namespace,
-+		    config[i].remote_veth);
-+	}
-+
-+	/* Then configure the redirect map and attach programs to interfaces */
-+	map_fd = bpf_map__fd(skeletons->xdp_redirect_maps->maps.tx_port);
-+	if (!ASSERT_GE(map_fd, 0, "open redirect map"))
-+		goto fail;
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-+		interface_id = if_nametoindex(config[i].next_veth);
-+		if (!ASSERT_NEQ(interface_id, 0, "non zero interface index"))
-+			goto fail;
-+		err = bpf_map_update_elem(map_fd, &i, &interface_id, BPF_ANY);
-+		if (!ASSERT_OK(err, "configure interface redirection through map"))
-+			goto fail;
-+		if (attach_programs_to_veth_pair(skeletons, i))
-+			goto fail;
-+	}
-+
-+	return 0;
-+
-+fail:
-+	return -1;
-+}
-+
-+static void cleanup_network(void)
-+{
-+	int i;
-+
-+	/* Deleting namespaces is enough to automatically remove veth pairs as well
-+	 */
-+	for (i = 0; i < VETH_PAIRS_COUNT; i++)
-+		SYS_NOFAIL("ip netns del %s", config[i].namespace);
-+}
-+
-+static int check_ping(struct skeletons *skeletons)
-+{
-+	/* Test: if all interfaces are properly configured, we must be able to ping
-+	 * veth33 from veth11
-+	 */
-+	return SYS_NOFAIL("ip netns exec %s ping -c 1 -W 1 %s > /dev/null",
-+					  config[0].namespace, IP_DST);
-+}
-+
-+void test_xdp_veth_redirect(void)
-+{
-+	struct skeletons skeletons = {};
-+
-+	skeletons.xdp_dummy = xdp_dummy__open_and_load();
-+	if (!ASSERT_OK_PTR(skeletons.xdp_dummy, "xdp_dummy__open_and_load"))
-+		return;
-+
-+	skeletons.xdp_tx = xdp_tx__open_and_load();
-+	if (!ASSERT_OK_PTR(skeletons.xdp_tx, "xdp_tx__open_and_load"))
-+		goto destroy_xdp_dummy;
-+
-+	skeletons.xdp_redirect_maps = xdp_redirect_map__open_and_load();
-+	if (!ASSERT_OK_PTR(skeletons.xdp_redirect_maps, "xdp_redirect_map__open_and_load"))
-+		goto destroy_xdp_tx;
-+
-+	if (configure_network(&skeletons))
-+		goto destroy_xdp_redirect_map;
-+
-+	ASSERT_OK(check_ping(&skeletons), "ping");
-+
-+destroy_xdp_redirect_map:
-+	xdp_redirect_map__destroy(skeletons.xdp_redirect_maps);
-+destroy_xdp_tx:
-+	xdp_tx__destroy(skeletons.xdp_tx);
-+destroy_xdp_dummy:
-+	xdp_dummy__destroy(skeletons.xdp_dummy);
-+
-+	cleanup_network();
-+}
-diff --git a/tools/testing/selftests/bpf/test_xdp_veth.sh b/tools/testing/selftests/bpf/test_xdp_veth.sh
-deleted file mode 100755
-index 5211ca9a0239..000000000000
---- a/tools/testing/selftests/bpf/test_xdp_veth.sh
-+++ /dev/null
-@@ -1,121 +0,0 @@
--#!/bin/sh
--# SPDX-License-Identifier: GPL-2.0
--#
--# Create 3 namespaces with 3 veth peers, and
--# forward packets in-between using native XDP
--#
--#                      XDP_TX
--# NS1(veth11)        NS2(veth22)        NS3(veth33)
--#      |                  |                  |
--#      |                  |                  |
--#   (veth1,            (veth2,            (veth3,
--#   id:111)            id:122)            id:133)
--#     ^ |                ^ |                ^ |
--#     | |  XDP_REDIRECT  | |  XDP_REDIRECT  | |
--#     | ------------------ ------------------ |
--#     -----------------------------------------
--#                    XDP_REDIRECT
--
--# Kselftest framework requirement - SKIP code is 4.
--ksft_skip=4
--
--TESTNAME=xdp_veth
--BPF_FS=$(awk '$3 == "bpf" {print $2; exit}' /proc/mounts)
--BPF_DIR=$BPF_FS/test_$TESTNAME
--readonly NS1="ns1-$(mktemp -u XXXXXX)"
--readonly NS2="ns2-$(mktemp -u XXXXXX)"
--readonly NS3="ns3-$(mktemp -u XXXXXX)"
--
--_cleanup()
--{
--	set +e
--	ip link del veth1 2> /dev/null
--	ip link del veth2 2> /dev/null
--	ip link del veth3 2> /dev/null
--	ip netns del ${NS1} 2> /dev/null
--	ip netns del ${NS2} 2> /dev/null
--	ip netns del ${NS3} 2> /dev/null
--	rm -rf $BPF_DIR 2> /dev/null
--}
--
--cleanup_skip()
--{
--	echo "selftests: $TESTNAME [SKIP]"
--	_cleanup
--
--	exit $ksft_skip
--}
--
--cleanup()
--{
--	if [ "$?" = 0 ]; then
--		echo "selftests: $TESTNAME [PASS]"
--	else
--		echo "selftests: $TESTNAME [FAILED]"
--	fi
--	_cleanup
--}
--
--if [ $(id -u) -ne 0 ]; then
--	echo "selftests: $TESTNAME [SKIP] Need root privileges"
--	exit $ksft_skip
--fi
--
--if ! ip link set dev lo xdp off > /dev/null 2>&1; then
--	echo "selftests: $TESTNAME [SKIP] Could not run test without the ip xdp support"
--	exit $ksft_skip
--fi
--
--if [ -z "$BPF_FS" ]; then
--	echo "selftests: $TESTNAME [SKIP] Could not run test without bpffs mounted"
--	exit $ksft_skip
--fi
--
--if ! bpftool version > /dev/null 2>&1; then
--	echo "selftests: $TESTNAME [SKIP] Could not run test without bpftool"
--	exit $ksft_skip
--fi
--
--set -e
--
--trap cleanup_skip EXIT
--
--ip netns add ${NS1}
--ip netns add ${NS2}
--ip netns add ${NS3}
--
--ip link add veth1 index 111 type veth peer name veth11 netns ${NS1}
--ip link add veth2 index 122 type veth peer name veth22 netns ${NS2}
--ip link add veth3 index 133 type veth peer name veth33 netns ${NS3}
--
--ip link set veth1 up
--ip link set veth2 up
--ip link set veth3 up
--
--ip -n ${NS1} addr add 10.1.1.11/24 dev veth11
--ip -n ${NS3} addr add 10.1.1.33/24 dev veth33
--
--ip -n ${NS1} link set dev veth11 up
--ip -n ${NS2} link set dev veth22 up
--ip -n ${NS3} link set dev veth33 up
--
--mkdir $BPF_DIR
--bpftool prog loadall \
--	xdp_redirect_map.bpf.o $BPF_DIR/progs type xdp \
--	pinmaps $BPF_DIR/maps
--bpftool map update pinned $BPF_DIR/maps/tx_port key 0 0 0 0 value 122 0 0 0
--bpftool map update pinned $BPF_DIR/maps/tx_port key 1 0 0 0 value 133 0 0 0
--bpftool map update pinned $BPF_DIR/maps/tx_port key 2 0 0 0 value 111 0 0 0
--ip link set dev veth1 xdp pinned $BPF_DIR/progs/xdp_redirect_map_0
--ip link set dev veth2 xdp pinned $BPF_DIR/progs/xdp_redirect_map_1
--ip link set dev veth3 xdp pinned $BPF_DIR/progs/xdp_redirect_map_2
--
--ip -n ${NS1} link set dev veth11 xdp obj xdp_dummy.bpf.o sec xdp
--ip -n ${NS2} link set dev veth22 xdp obj xdp_tx.bpf.o sec xdp
--ip -n ${NS3} link set dev veth33 xdp obj xdp_dummy.bpf.o sec xdp
--
--trap cleanup EXIT
--
--ip netns exec ${NS1} ping -c 1 -W 1 10.1.1.33
--
--exit 0
-
--- 
-2.45.2
+> Dave Gomboc
+> 
 
 
