@@ -1,125 +1,75 @@
-Return-Path: <netdev+bounces-112314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B94938465
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 13:03:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FBC293846C
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 13:13:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59BFA1F21517
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 11:03:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6C3B1C2084A
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 11:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4D042AA5;
-	Sun, 21 Jul 2024 11:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F7C54657;
+	Sun, 21 Jul 2024 11:13:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="nIO6iD6d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cAjdaxh/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE53256E;
-	Sun, 21 Jul 2024 11:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3C2EEA9
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 11:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721559784; cv=none; b=ESos1srnirc8lgYjQf4F1lfiuy7Fz9a2e9j+qXKGq1hMOUmKCnq3Ydy+KTTYKxWLCwXbR6HCzi6UeKSp8htOiOpYTryxfGqFTEsILMtVBGmuBpjxTVvdUN3SOaB3vHPqBwMDO//LIkEyZIWgCumD+x0yGd0e3XCpitCfiEeJNgE=
+	t=1721560383; cv=none; b=u4mXlWFm6P0GsDSWE41T4APRjPmotzRWPbtBd/H9xuo5/ojZuSJMBNOVayLpm8Aed4FkC7TEBj1Zsllk0ET7wtM2NO25sluvyfquylBYLT5mm4y5gL4pTusDdPvW4I26Z/3D4nR1DPXAh3oR2JV5MS+yCZGZYAeyQ+TVPazk5Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721559784; c=relaxed/simple;
-	bh=aE+4Y3rk5lvBIn+9B7Eaax582KLBcCMWawbNW2aGFxk=;
+	s=arc-20240116; t=1721560383; c=relaxed/simple;
+	bh=G6cOPB+KBxo56wsOhn9rAt+ZnxMNBvnJZL52wCV3QKs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXEgXv6Hi4Wg/WfSBdydeqDW5DOVEa4nReEGsEW0UFKE2dLohNCaVE5OpJx6YVNsttaywaVePHYMFzQUD4Yl1awia7bYpPPskZFrlJTF4/9Z5OZ4nwmiUwvyYoT3i5Wv+szekyDVmkHbXvo/DVCS6Xmw5eMxmaTqu9v3aMHqj6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=nIO6iD6d; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=v2XLy22itE69prZPuiPILVtM5w1lDlpkroWEoLrV9Wo=; b=nIO6iD6dPoKX1n7Z
-	EcAITT6KI2emYWMDQMkOru1+99AXjGU/vz6b9h1ylC2GJ5cW6F2NHEgJzgJRiVEb1M7sR/eBOlZON
-	8hoWD+ytY04LAMGrmqUYxmgJdPsITFsW6TBzlhI+mL9dPgqqZzqM4Z9v+siAZmM0mi2WkgVbcv0nC
-	HWgG5DEj9q8NELisu3Vd1oQyvEO0/vi+CEElNo728r4xGI+SR9MasO9Q4AAmYts+s+Lyz5ModsHsG
-	arDw2wV3+O5yddtonY9XW1x9N9Pci0fDbXAgJpYkI+p+2/oArooMLyKkCKAfN7coJltOk1kBc+62g
-	z7iCwIJipwPS3Po3xA==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sVUL3-00Cb4x-2J;
-	Sun, 21 Jul 2024 11:02:49 +0000
-Date: Sun, 21 Jul 2024 11:02:49 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Allison Henderson <allison.henderson@oracle.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] RDMA/rds: remove unused struct 'rds_ib_dereg_odp_mr'
-Message-ID: <Zpzq2cPc8rS-OUdW@gallifrey>
-References: <20240531233307.302571-1-linux@treblig.org>
- <2442cae88ee4a5f7ba46bb0158735634fa82a305.camel@oracle.com>
- <ZpsEof3hxKGQBmqF@gallifrey>
- <20240721070557.GE1265781@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R4INllb2jysUww4QRTXV3gnyzPN+9azsXE3iFKKYW09SMs0I0RsIENxAcA8BXTp4xZoDqJU8278oKhK1v0QhspilalkRuzwhPC49XPWLE5BuhPiVPMoMd1Eyp7IslLnjbw1bsUz1T75JVNeKug9TOoI3ep+ntZ9xpzmJWli3rKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cAjdaxh/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC208C116B1;
+	Sun, 21 Jul 2024 11:12:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721560383;
+	bh=G6cOPB+KBxo56wsOhn9rAt+ZnxMNBvnJZL52wCV3QKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cAjdaxh/xvcVurWPVG1c1R5lqSMNjLGKRbfHTiANf1qon1kn3cuN4ntDRWzyDFcye
+	 LNKne2MNcyqPnRj7JP0klZPdBXrc3R16vFcv9d+CFPQSSMwSNEp0fcN6iW7nBj/VxC
+	 8fmBitXq0IRshQYw3W0wT7sLF0+5zwOfoWjoTRHU68Dg1kgJBL3I5fJbMc8CTDp9m3
+	 k0nRcKRFJq/1w3k7W/VeiQWoCX/onSeVInt6EJ43C9KgxhW1qFrSmJPd/OwKUNjhg1
+	 474/Ac1ShJ+3JNHOV4uyWrqjfYFz/xb2IRKxVziHLZEMSzEKHdsecC7bDesIBRKuI2
+	 w3RPoE0idi/jw==
+Date: Sun, 21 Jul 2024 12:12:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, nbd@nbd.name, sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	angelogioacchino.delregno@collabora.com,
+	lorenzo.bianconi83@gmail.com, dan.carpenter@linaro.org
+Subject: Re: [PATCH net] net: airoha: Fix MBI_RX_AGE_SEL_MASK definition
+Message-ID: <20240721111256.GE715661@kernel.org>
+References: <d27d0465be1bff3369e886e5f10c4d37fefc4934.1721419930.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240721070557.GE1265781@unreal>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 11:01:20 up 73 days, 22:15,  1 user,  load average: 0.02, 0.01, 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+In-Reply-To: <d27d0465be1bff3369e886e5f10c4d37fefc4934.1721419930.git.lorenzo@kernel.org>
 
-* Leon Romanovsky (leon@kernel.org) wrote:
-> On Sat, Jul 20, 2024 at 12:28:17AM +0000, Dr. David Alan Gilbert wrote:
-> > * Allison Henderson (allison.henderson@oracle.com) wrote:
-> > > On Sat, 2024-06-01 at 00:33 +0100, linux@treblig.org wrote:
-> > > > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> > > > 
-> > > > 'rds_ib_dereg_odp_mr' has been unused since the original
-> > > > commit 2eafa1746f17 ("net/rds: Handle ODP mr
-> > > > registration/unregistration").
-> > > > 
-> > > > Remove it.
-> > > > 
-> > > > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> > > 
-> > > This patch looks fine to me, the struct is indeed unused at this point.
-> > > Thanks for the clean up!
-> > > 
-> > > Reviewed-by: Allison Henderson <allison.henderson@oracle.com>
-> > 
-> > Hi,
-> >   Does anyone know who might pick this one up - I don't think
-> > it's in -next yet?
+On Fri, Jul 19, 2024 at 10:38:31PM +0200, Lorenzo Bianconi wrote:
+> Fix copy-paste error in MBI_RX_AGE_SEL_MASK macro definition
 > 
-> 1. We are in merge window and this patch is not a bug fix, so it should
->    wait until the next merge window.
+> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Yeh I did wonder; it was posted and reviewed back at the start of June.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> 2. Title should be net/rds ... and not RDMA/rds ...
-
-OK, I can easily fix that.
-
-> 3. netdev is closed right now, so it should be resubmitted after next merge
->    window ends.
-
-When you say 'resubmitted' - you mean reposted to the lists with the amended
-title? Or what?
-
-Dave
-
-> Thanks
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
 
