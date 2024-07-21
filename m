@@ -1,113 +1,100 @@
-Return-Path: <netdev+bounces-112308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29EF493839C
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 08:41:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A319383A6
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 09:06:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56F8F1C20A08
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 06:41:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB3E01F213C3
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 07:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC78522F;
-	Sun, 21 Jul 2024 06:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CC379CF;
+	Sun, 21 Jul 2024 07:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uor6/RuC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l4G00I3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AAF79E1
-	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 06:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473B733E1;
+	Sun, 21 Jul 2024 07:06:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721544086; cv=none; b=Sd19yn/A/Qymg0O4kGBsmzH/aoxlHnCPRbnUyNsFMUVktwfb1ljFE/QZ4h89cm8jeybu6og16khOJkNb468ldEsCfho8K+ku2DFjNxDh2WhvsNVXXLay/JfYxGe6yckH/uukuCJ8skJd/1CrloDiIz+vjqj4lmYt7L7jxYQf6Y4=
+	t=1721545564; cv=none; b=Wp9c/F3ROOXT1GMp5zyqz5BS0STMa2TwMdkyWsTMDF8sei+nHJRWSffacC9s0JAp8+wmHEJlEV6w+fA0YtuO7miQscknEtGzhxrYyfF9EBQ2KzWG9uiRQp6AdL4HRCYMZOwxKrR9qgIHqjmIK5L2Li8nIzmlc9eFjZAyUlole4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721544086; c=relaxed/simple;
-	bh=h/FKIp9xMFC2FXIsZqzoruSg8zaMec3+Ui8zW18MmKI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZzbcIQHax4EpvJDgI8hf25kun2y9LvdOUV2nhH//JlcyiRJCY6OeAzWS+SQcpArlz49Qvx5GNVwLbKO6FyRqrz0PSiT8WJIG6WDAypYaZkxRoP9pDc6HFrtWi9hUsT+92xVURfkjTDlL8TFzTKpnBD/OC3l4wxxX891hJAZmHH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uor6/RuC; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: linux@treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1721544081;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BhzfpEAkMtM1dmk7F6Pxzl6Zv6RGXBbJz8lZCjiaexQ=;
-	b=uor6/RuCwrfZtEtZCy6VtHgqA+hWDOenHgRlRfXTHv5Gle8KjTjI/DKXe4bWNxd2aglWyq
-	d5BsLBAtqD3aN0bXBGKL/KnKkQX2hMSa0Yr6Lqeq8pQ8ytbZ+VN5neXfiDSrTHY45Ay13K
-	BJM2+XA9NCPsxiHaH6Xw0ztPDvekqCs=
-X-Envelope-To: allison.henderson@oracle.com
-X-Envelope-To: davem@davemloft.net
-X-Envelope-To: edumazet@google.com
-X-Envelope-To: kuba@kernel.org
-X-Envelope-To: pabeni@redhat.com
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-To: linux-rdma@vger.kernel.org
-X-Envelope-To: rds-devel@oss.oracle.com
-X-Envelope-To: linux-kernel@vger.kernel.org
-Message-ID: <8b5fd878-a952-4cca-87af-aa44319a4f86@linux.dev>
-Date: Sun, 21 Jul 2024 08:41:17 +0200
+	s=arc-20240116; t=1721545564; c=relaxed/simple;
+	bh=JcNXcRaea8TKhma2pE70uqrsVbqr9Glz8MXnp7nl3iE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=me691ukM9dNDp95zISyvl5r337aMEEly+lrMkdzlp8t7+uNmr0MMWeesAH37IJJvTT4P4hZcXqHuze81qb3dHRdBx8B1HOG32+abWU9Hvy0QIr5Ib6xtrGVuvoe1N+7luwaCBrLsawTmccx5lGg5ZJW0CzxEqpC4mJPWaQYQdm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l4G00I3G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D47CC116B1;
+	Sun, 21 Jul 2024 07:06:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721545562;
+	bh=JcNXcRaea8TKhma2pE70uqrsVbqr9Glz8MXnp7nl3iE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l4G00I3G3eI5ce7R2EFdSVzHmFxyBO35lbkFAPBUsYUvicIL0F8zKi397/I7NF66R
+	 SkPpK3SgWAWNK1RLD70KXXirfi++2NYDhGuqxbij1Amaw8srWyCW7IiYocb/2IBQf4
+	 39jwzEQE42XaW5O80mIhgnCPXkMwd1gPdmOADbynntxTXLe265hm6LCX/YS/yy7PYg
+	 QoDn7eTSb4DAp9+LS2+BFesjK3cyNcdAWmoXWo7m0C8Tqmf5BxMML08YgT3m0d0d5Q
+	 Jtt+4smibflY3VdTcUkEjL+bYWQT/gvzkqHWGOFnD/ZsLU9yrBhcw/ybebn4MmJ8H9
+	 0/sC2dXYF6BiA==
+Date: Sun, 21 Jul 2024 10:05:57 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: Allison Henderson <allison.henderson@oracle.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] RDMA/rds: remove unused struct 'rds_ib_dereg_odp_mr'
+Message-ID: <20240721070557.GE1265781@unreal>
+References: <20240531233307.302571-1-linux@treblig.org>
+ <2442cae88ee4a5f7ba46bb0158735634fa82a305.camel@oracle.com>
+ <ZpsEof3hxKGQBmqF@gallifrey>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] RDMA/rds: remove unused struct 'rds_ib_dereg_odp_mr'
-To: linux@treblig.org, allison.henderson@oracle.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
-References: <20240531233307.302571-1-linux@treblig.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240531233307.302571-1-linux@treblig.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZpsEof3hxKGQBmqF@gallifrey>
 
-在 2024/6/1 1:33, linux@treblig.org 写道:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Sat, Jul 20, 2024 at 12:28:17AM +0000, Dr. David Alan Gilbert wrote:
+> * Allison Henderson (allison.henderson@oracle.com) wrote:
+> > On Sat, 2024-06-01 at 00:33 +0100, linux@treblig.org wrote:
+> > > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> > > 
+> > > 'rds_ib_dereg_odp_mr' has been unused since the original
+> > > commit 2eafa1746f17 ("net/rds: Handle ODP mr
+> > > registration/unregistration").
+> > > 
+> > > Remove it.
+> > > 
+> > > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> > 
+> > This patch looks fine to me, the struct is indeed unused at this point.
+> > Thanks for the clean up!
+> > 
+> > Reviewed-by: Allison Henderson <allison.henderson@oracle.com>
 > 
-> 'rds_ib_dereg_odp_mr' has been unused since the original
-> commit 2eafa1746f17 ("net/rds: Handle ODP mr
-> registration/unregistration").
-> 
-> Remove it.
-> 
-Need Fixes?
+> Hi,
+>   Does anyone know who might pick this one up - I don't think
+> it's in -next yet?
 
-Fixes: 2eafa1746f17 ("net/rds: Handle ODP mr
-registration/unregistration")
+1. We are in merge window and this patch is not a bug fix, so it should
+   wait until the next merge window.
+2. Title should be net/rds ... and not RDMA/rds ...
+3. netdev is closed right now, so it should be resubmitted after next merge
+   window ends.
 
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-
-Zhu Yanjun
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> ---
->   net/rds/ib_rdma.c | 4 ----
->   1 file changed, 4 deletions(-)
-> 
-> diff --git a/net/rds/ib_rdma.c b/net/rds/ib_rdma.c
-> index 8f070ee7e742..d1cfceeff133 100644
-> --- a/net/rds/ib_rdma.c
-> +++ b/net/rds/ib_rdma.c
-> @@ -40,10 +40,6 @@
->   #include "rds.h"
->   
->   struct workqueue_struct *rds_ib_mr_wq;
-> -struct rds_ib_dereg_odp_mr {
-> -	struct work_struct work;
-> -	struct ib_mr *mr;
-> -};
->   
->   static void rds_ib_odp_mr_worker(struct work_struct *work);
->   
-
+Thanks
 
