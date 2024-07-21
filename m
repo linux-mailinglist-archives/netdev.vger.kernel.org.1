@@ -1,96 +1,124 @@
-Return-Path: <netdev+bounces-112305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 429299382E8
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 23:26:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D328593833B
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 03:34:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 994222813AC
-	for <lists+netdev@lfdr.de>; Sat, 20 Jul 2024 21:26:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C031C20A6C
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 01:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97D11487F1;
-	Sat, 20 Jul 2024 21:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D591373;
+	Sun, 21 Jul 2024 01:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="Jjz3yLJD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF41145A1A
-	for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 21:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FE81366
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 01:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721510765; cv=none; b=Wp22ZOZyJFlVgn334xt8uJrAmwYaTK69MsuLd1Sf494gkrfHpJo5iQIKmQc95UB7h0jkNmR3TyvEESIVy/lqOaX7Ror/7T8Ippr+gox3c7X6rnzZ6RJH2cyglnBnFjPN/3UpTX4K23a1MAwJMmXd5tU3aUVaEDX9kP/O+o33lcM=
+	t=1721525645; cv=none; b=bdqm2preZhffgwY6FyplzYpqnEch+FShGg2zlXJhdWxtouX856lHwsN5XofJ0g7M03dGZJp1LpbfHOmZU21gCXd1lqbBEf7qCJ4z1BqhBNOEXMQwtFx5JQUxPqSL8gVW3o+7wpM0pUneQ7dj/utbMVsYwGfC9K9fkaoTfTBcc48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721510765; c=relaxed/simple;
-	bh=Jh7GbSSzpoLhE0yBdL+yraTkGtSkAMKNhPfifJWuvcc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=hVs1cNb1Amxo9QokeSW4RI+Sn/SjAg8RQZ+OtmaQEb4wxlZebhocH+gcNLz3U1HC6ePXb5S/OVRLEglKY2ByRr8b5LRGIhIK+IgdNus6FCVfKyv1s1C/5XX+rzNFxuUCl6SGTD04RDH7uH30cN8W44K6lCr7rGDg5Y3OLHFoM1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-8152f0c4837so452409039f.0
-        for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 14:26:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721510763; x=1722115563;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rV3Jud4u6ISVkUf57AM/OWGABipbBpR33pvi9L9imf0=;
-        b=qydwljt1qTp+NEUUARUjZ5IQk35CQTp7OFu9HhAbacMQjbdecD7InMWBMKkvIHtTxB
-         gDmw4vtjwJoBCK+a2pM2FxRkaJzSZCdgEeZClDs+1v3iHpI41zQgHdYJoPkEmwgtFSeb
-         /crEAvafnOmN2lJwYwEh6DsWA7P4OX7ftWuG20wD2v7NbE2Ldo396iC0iP2uYubsnLnz
-         zpNsR1yCGyLQGgEHE5f1zhE/MPfCoR87zthv/L2WVthLG2W7JqdQT0gNspgb5OnN5TJB
-         vMx8O8hJIF82hBaxyNZ8+6p+VNeVCDtDvNT8SjCp7daYhNDsp1rPMGovhNn3Nt0tgIXZ
-         XBAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPaKKy0RuWrMNdAKrTvZ2oLphwA+3X12VQwELz/IFfOWOHzZ2Zl4bqXSdXV6nzRVdmqOBJDq3irpdH2D6oewFFHfggxBAn
-X-Gm-Message-State: AOJu0Yyg882jbcLFKZGIjUgojwlimvNnIorVFbVplOAOVJQ3ID9odyJc
-	AdWz1ujVhmIY7BFNkQ3n8FgMayr6Xs+LX6oDeCd9ywD8JUDWJ5ctzqfCx/N2DG/hdMd9AqkMiv/
-	aOTrRVM6YQLV4x7LHl1kb8AE13dN0gvzK8V7jUasOM5pwWXUkLZ1w4+M=
-X-Google-Smtp-Source: AGHT+IEQTiMIoVKahfKrJ2z1F12FLyLT6dj7lbMUMrda66T2tEwe1m8+YfPSpErFcBqj+DnHlbRP2XsslOt9r3MXMqKSQntflL1k
+	s=arc-20240116; t=1721525645; c=relaxed/simple;
+	bh=g9i4JDr+uPtFirh5pRcoHEC79u82FuNeO1Ot5aBME5E=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Ib/E666P075pj9G5q/HcQniUHWaplJav8T+33bN1vziNGIgiXqeYJcUlEiT5Uy3krkwKmG7hCmSTM2+CN8JVVevdlW2Hl6XutDGRHgw2LvXslTzdhqL9i8vu+lCklu5udt/KgojbyrwBKdfTmZuwNbacTOcIsoMdjYUC/qQ8OWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=Jjz3yLJD; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4WRQtF2lpczlgVnN
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 01:33:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-type:content-type:subject:subject:message-id:date:date
+	:from:from:mime-version:received:received:received; s=mr01; t=
+	1721525636; x=1724117637; bh=66sXb5L8VpwQzrDoVc4XLiBCV7skFuDMSD1
+	AlzCXdRg=; b=Jjz3yLJDBVuM5HJgGqTPOeMhwDI9ZAjwOKxMIk/hmH7VizCyNs1
+	fEbm96QMjBrZ2zfpehuojLooaOyDREJ1jyxzu0443M949KJZbwe3Fo+WHV0FFMTy
+	1Wo8o/vsf26s7VM3pSrt2PXvZzYKggrqsdhl3mA+obUq0rFr2U0Vkzbs9ldHuKgu
+	kGNzcgaoxDeZCOnWEUm189LiUQ4h5T6z5yy3BNQ7kqvf5jS9qsIKFatRPZ46MAkl
+	4FR0sI1JZNOBJD1oJpKzvF8q3IyJDCgybOkhxgQV+46dIcgckwN24gLYfMkU3li6
+	8eXIzSJPzFRhtX1viu1jyD74bF9XEjr6aAw==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id doMvr9zTI9gT for <netdev@vger.kernel.org>;
+ Sun, 21 Jul 2024 01:33:56 +0000 (UTC)
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: dave_gomboc@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4WRQtD4jfhzlgVnF
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 01:33:56 +0000 (UTC)
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-81f91171316so1847244241.0
+        for <netdev@vger.kernel.org>; Sat, 20 Jul 2024 18:33:56 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxNhka9G+ZVlrKzAvB2PNwDGRZamEX2kNPCiSBM/ySOkNXmVapg
+	q1vTFyTzXKIwF/qsI42zG6U42h6TGfgB2a4ycqI6rxSLXwaUKvXM7f0reBAwWFPpLHfRgEFFlEy
+	bmZOU72v/LS5MZLtJVphN35IrLTg=
+X-Google-Smtp-Source: AGHT+IExkHV0nluwCC7x30oSc33L4bUhDjLNYq00BIF0HtbrZZgZ4GUWYAKfaDeUUF2l4SRxQFe8OJtjTMQ32UuV6lA=
+X-Received: by 2002:a05:6102:c02:b0:48f:c0b4:5696 with SMTP id
+ ada2fe7eead31-4925c19ce4cmr7730791137.1.1721525635638; Sat, 20 Jul 2024
+ 18:33:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a5e:d509:0:b0:808:469:7077 with SMTP id
- ca18e2360f4ac-81aa7638413mr4755039f.3.1721510763376; Sat, 20 Jul 2024
- 14:26:03 -0700 (PDT)
-Date: Sat, 20 Jul 2024 14:26:03 -0700
-In-Reply-To: <000000000000eb54bf061cfd666a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008750c8061db47514@google.com>
-Subject: Re: [syzbot] [net?] BUG: sleeping function called from invalid
- context in synchronize_net
-From: syzbot <syzbot+9b277e2c2076e2661f61@syzkaller.appspotmail.com>
-To: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com, 
-	hdanton@sina.com, j.vosburgh@gmail.com, jhs@mojatatu.com, jiri@nvidia.com, 
-	jiri@resnulli.us, johannes.berg@intel.com, jv@jvosburgh.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
+From: Dave Gomboc <dave_gomboc@acm.org>
+Date: Sat, 20 Jul 2024 18:33:19 -0700
+X-Gmail-Original-Message-ID: <CA+dwz-12S8EeJjJ_FHtTvP41-Ru4pcfCS2ub5KjGHSY0=F=jog@mail.gmail.com>
+Message-ID: <CA+dwz-12S8EeJjJ_FHtTvP41-Ru4pcfCS2ub5KjGHSY0=F=jog@mail.gmail.com>
+Subject: Debian Bookworm requires r8168-dkms for RTL8111D - regression from
+ Buster 10.13.0
+To: nic_swsd@realtek.com, romieu@fr.zoreil.com
+Cc: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot has bisected this issue to:
+I am sending this email because of the suggestion in
+/usr/share/doc/r8168-dkms/README.Debian.
 
-commit facd15dfd69122042502d99ab8c9f888b48ee994
-Author: Johannes Berg <johannes.berg@intel.com>
-Date:   Mon Dec 4 20:47:07 2023 +0000
+Installation using a Debian Bookworm 12.2.0 amd64 DVD-ROM does not
+find the onboard gigabit ethernet (RTL8111D-based) on one of my
+mainboards (Gigabyte GA-890GPA-UD3H).  The network came up fine as
+soon as I used apt-offline to update/upgrade, then to fetch and
+install r8168-dkms.
 
-    net: core: synchronize link-watch when carrier is queried
+Installation using a Debian Bullseye 11.8.0 amd64 DVD-ROM does not
+find the onboard NIC either.  However, installation using a Debian
+Buster 10.13.0 amd64 DVD-ROM does find the onboard NIC and can use it
+directly.  (Unfortunately, installing from that DVD-ROM later failed
+for some other reason.)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=116d4a1d980000
-start commit:   523b23f0bee3 Add linux-next specific files for 20240710
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=136d4a1d980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=156d4a1d980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98dd8c4bab5cdce
-dashboard link: https://syzkaller.appspot.com/bug?extid=9b277e2c2076e2661f61
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=148611e1980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10ec9585980000
+With r8168-dkms in operation, the relevant part of "lspci -v -v -v" reads:
 
-Reported-by: syzbot+9b277e2c2076e2661f61@syzkaller.appspotmail.com
-Fixes: facd15dfd691 ("net: core: synchronize link-watch when carrier is queried")
+03:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd.
+RTL8111/8168/8411 PCI Express Gigabit Ethernet Co
+ntroller (rev 03)
+       Subsystem: Gigabyte Technology Co., Ltd Onboard Ethernet
+       Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop-
+ParErr- Stepping- SERR- FastB2B- DisINTx+
+       Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort-
+<TAbort- <MAbort- >SERR- <PERR- INTx-
+       Latency: 0, Cache Line Size: 4 bytes
+       Interrupt: pin A routed to IRQ 18
+       NUMA node: 0
+       Region 0: I/O ports at ee00 [size=256]
+       Region 2: Memory at fdfff000 (64-bit, prefetchable) [size=4K]
+       Region 4: Memory at fdff8000 (64-bit, prefetchable) [size=16K]
+       Expansion ROM at fd600000 [virtual] [disabled] [size=128K]
+       Capabilities: <access denied>
+       Kernel driver in use: r8168
+       Kernel modules: r8168
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Please let me know if there is further information I can provide that
+would assist you in getting this supported directly by the r8169
+driver.
+
+Dave Gomboc
 
