@@ -1,195 +1,105 @@
-Return-Path: <netdev+bounces-112326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A57938540
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 17:21:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2092938543
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 17:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0141E1C209C7
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 15:21:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C8E1C20842
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 15:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3F716C6A9;
-	Sun, 21 Jul 2024 15:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006BD1662E2;
+	Sun, 21 Jul 2024 15:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GO7JI9dD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Las4SBa+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A020416C440;
-	Sun, 21 Jul 2024 15:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55952BE4A
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 15:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721575175; cv=none; b=CnLaCkVd4Dtgf3uXBp9z+L+bOcb4VVb/8rhegIwaZXcqDnOKQg6wkPUAXHRRxpjShKig0gI5zGC1uVtzvcnn30JJEqqf4G0EoNCcvWip6wseptyz+H4+MspNPz5MmTSx4r8k1IkcNpZJ+nTKvz4dm25ESaq8nBKe3MGVhvUBylY=
+	t=1721575380; cv=none; b=RzN4DFp9wNFr2yGBfJ93NQWxCnWzYgz9dEKdBQwpdXl1CbPKvhdlmwoG34K2+HAJAJfNmOA7slH4j7h8JB4LMujfnSvey/cl7K5bkQ3C9p0MB/0ST10cM26XsWAPviVVoFYohvTwkUMLk3Tx/f8FNRnleAcWeti/FLlrxNgVuGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721575175; c=relaxed/simple;
-	bh=7OWJetluoWS/Nf5AUxollSLUqkLBtNYzuJKo21kzZoM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=M/zUGRATrRewvZsMmLFouAhpxuVpwGM8eaNyh43cItGRFr10HLuGHDVVnSu+yl6+aFZmR2+1li6q55lnB+5PbFpFXPoHQeEST4O0QRDYx/q/Oe6woTHq0Q5pQSJs40Oo5MUUV+ag8oA/ATzbXa1SnXGNZ7jq2TMod52EpLnzL6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GO7JI9dD; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-59f9f59b827so2851008a12.1;
-        Sun, 21 Jul 2024 08:19:33 -0700 (PDT)
+	s=arc-20240116; t=1721575380; c=relaxed/simple;
+	bh=Oh0bMNGd+SYQ0S4Nct3T7Nuc3+AfPX3/WlegU6RhweI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XSQolcujdGknDvvR6vkQ2G6GqbOa/p9z1n+4KifS7nZQl/eKR9sI1lOb0uM33coic8jHcZjsd+NI2KBYUXFXVfujix3XBZ91h/oVXMwgpqt8M9ujVrya3SbA2vpSL3eDr1meHLXkzQv7PDj27QQlazP+SmqYrR8gHSJgqLBpj2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Las4SBa+; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso30387a12.0
+        for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 08:22:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721575172; x=1722179972; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vWxQDkg0tjoveNQoAFF0zn3+Cul5K66566bw3Hq4SzU=;
-        b=GO7JI9dDutHPHIPdTGjB5AdkL8QSL9z73dWvASktSLLjvYR8F80SYLYSXu4/q/tOqs
-         N0w+mi8R6xnm2BqKgavgIiASf04RDNpKrmwllshTg8ldSLXF5KTDbeaDalx0/PwCR/hE
-         vMT/fmsqloyLeSfbOc37IFYV129Mj/gE3aRLCYEC0Ggkh8eszlObJwXQCDCIEnXI8++7
-         PbOAUNodDwaBX0ZKZUiU6fn2JC6EtZAEcHA3wk1975pKucj9eL90OG73A22fOweFHq8N
-         rDqp3UrWW8JzC62MYXI0wUB/mJp9y84yt7as9L2AAfcf/m6ONOSYLJgaHaTbclix8pmU
-         BqCA==
+        d=google.com; s=20230601; t=1721575378; x=1722180178; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oh0bMNGd+SYQ0S4Nct3T7Nuc3+AfPX3/WlegU6RhweI=;
+        b=Las4SBa+qx55tIjiNsJ+ayP0mANT2yF/lJIQ8sF57s/5izvJRLFpGaCa7Fgrl06ma9
+         0WbAmxzCukL7evhON58sHFO45iPfYzOXQfsAYbiJroBn2/7OmngvoePn2vimF/iogE3g
+         vnlF34vZpl1AxhpdFHy39H/kVVNExWO6i/83vlsifsQlVNZusHznIBUFYT8KJrDdEGFc
+         PFU9B9VwLb4OTGJ0ltKbtgtfvREYie7+SM/AkSvvK7N5tJkqopZr+5seXqX12nLIzd1z
+         wvVDcP3NGwTzxQ+2WQ53zcsif3kIr79CkP83Tkxjpu7wm1BF+vkHqf719JGH7cMY57sz
+         RZ9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721575172; x=1722179972;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1721575378; x=1722180178;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vWxQDkg0tjoveNQoAFF0zn3+Cul5K66566bw3Hq4SzU=;
-        b=iki50d1tqffTpVvMjwVVNVcXv76DjI9HKgouZPnZlpNXgp60M6nqgC6L3Aw9LbN82U
-         1/vAa9KzI6tnQorDd9MQZxZKc3kNXA18e1qsXBO4Qdm5CsvXkH03+f2yaFTKTsiXw5ed
-         VoPo5FfALrPWACE6Ppua1vG189mO1+cei0WPyJzKjdgmZtroXGGlkjQD4ZQeoACRzJyv
-         ivIEoil9rJ+yp4WxCnyJNFQJUkuBNtmhG43XIVK6j7N3GqaOijr8XagBSqpksSFaQPsj
-         jJItAWBXkhfmasK1noMpVZ0Bpt0asd4P8xgEgnnDWh6e7OMW7OD/J+p6jEMrfeQSxW7r
-         lOGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgmr5rqgSGz/TtL4+f1Epeo2ipMm4jUL1rOKAlQeWBwIxvcTUikwN3IrKoE6vSTaWHZkLTtK9bPBZbrNCg7a+hyy2XE11ISRWIdAK8o/YgJBGYF6NB7lIvLWsMJ/bj0/mWx8FzJwvCoMMXOcimnr0UY0gIE8nGott6X/r5qEdLiWfJyrR2LR/i639CVQGudz9mzQT0FoLhOpXD3YC9
-X-Gm-Message-State: AOJu0YzahdMFJdjD+C8nF4D8Xl+7J4J8qCctqrW+IQ5BUVxjuRO4v6DZ
-	DZBMllgk1s62GYEU7p54+hgR1Ec3iPqMp1WjO/T2aZ77uziRqxMc
-X-Google-Smtp-Source: AGHT+IEVeHfDmq5X+0n82+27QM8fwNYvFlhBRw++xiui7Q80c9Brz+8apBbPFsTFmQPHrqEaUNy4ng==
-X-Received: by 2002:a17:907:da1:b0:a77:d0a0:ea6d with SMTP id a640c23a62f3a-a7a4c011d3bmr308158566b.24.1721575171728;
-        Sun, 21 Jul 2024 08:19:31 -0700 (PDT)
-Received: from [127.0.1.1] (2a02-8389-41cf-e200-859e-243c-21d1-9ff6.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:859e:243c:21d1:9ff6])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7a3c78603dsm302270366b.8.2024.07.21.08.19.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jul 2024 08:19:31 -0700 (PDT)
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Date: Sun, 21 Jul 2024 17:19:06 +0200
-Subject: [PATCH v2 6/6] net: mvpp2: use device_for_each_child_node() to
- access device child nodes
+        bh=Oh0bMNGd+SYQ0S4Nct3T7Nuc3+AfPX3/WlegU6RhweI=;
+        b=DAB0q34GBT4+Vs7JFttRsG88d8vP7A90gHmOnkPKvg1bAYJDxW7/Y//MzbK02rkMLq
+         hO1HeAuviRqA/7ojx7oMjDcyl1kWGdPhGBuI5vspdO7yps+qLMU2CD0TxUvdOBusgWhD
+         1gaO1MOM2uHz9jC4XfzGQ2y8G99oN/EJE4L9V7aN/I07sc701DzErhobhxq9JrmoiTJg
+         fqE1GLVrBV+BfPz3bR5K5JEHFIPQTyI+9lekKSK5HcQWRlC9UZtKG4s/iCFQg8scEj6Y
+         U/Nw4Yaos7oiVVs5TysdP+xwn4kOzHljVwvNauDVG3kW8YkoX30TkDqdHwT0KnpnRr8z
+         Fzjg==
+X-Gm-Message-State: AOJu0YzrwEtk7QlJQjuJTcO1ZqhJGjfSO6jRDepcx4167A86UP//B0ih
+	fpkMDQYIDpvfUx+tlV67UBNlFUhN4oO6EyM3QfedACCIh71LymSgVJVRM1k6XAeQ3+19Jgy10G/
+	fS2w6FgCJ/T6vdpPUYA9hNVTBUQVItT/cgCBiCHSTTlcJF5nMpVlO
+X-Google-Smtp-Source: AGHT+IE+lJe/AejQFBMo3dUg77L+OWLtKdthnwhoL8Ltie7WhfzS/hb+VGu2PIcimMjM1Hax/O0X+c6m8ZyjFUkCyyI=
+X-Received: by 2002:a05:6402:35d6:b0:58b:b1a0:4a2d with SMTP id
+ 4fb4d7f45d1cf-5a4a8428366mr101775a12.1.1721575377228; Sun, 21 Jul 2024
+ 08:22:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240721-device_for_each_child_node-available-v2-6-f33748fd8b2d@gmail.com>
-References: <20240721-device_for_each_child_node-available-v2-0-f33748fd8b2d@gmail.com>
-In-Reply-To: <20240721-device_for_each_child_node-available-v2-0-f33748fd8b2d@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>, 
- Daniel Scally <djrscally@gmail.com>, 
- Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
- Sakari Ailus <sakari.ailus@linux.intel.com>, 
- Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>, 
- Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, 
- Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andreas Kemnade <andreas@kemnade.info>
-Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-hwmon@vger.kernel.org, linux-leds@vger.kernel.org, 
- netdev@vger.kernel.org, Javier Carrasco <javier.carrasco.cruz@gmail.com>, 
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1721575158; l=3125;
- i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
- bh=7OWJetluoWS/Nf5AUxollSLUqkLBtNYzuJKo21kzZoM=;
- b=iNMnJvDJavKxd/cTaIQ/wI2+FJ4kPjgO9E1eheuFfGi79xO65EgIuqoenEmedZS7dH91lzXQt
- cx1BbNkkjcQC1xfO4u/nxdT4RF3p6HMHZwvY1HQLTf43XhDgUcxjsIp
-X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
- pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
+References: <20240720140914.2772902-1-jmaloy@redhat.com>
+In-Reply-To: <20240720140914.2772902-1-jmaloy@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 21 Jul 2024 08:22:43 -0700
+Message-ID: <CANn89iJmdGdAN1OZEfoM2LNVOewkYDuPXObRoNWhGyn93P=8OQ@mail.gmail.com>
+Subject: Re: [net] tcp: add SO_PEEK_OFF socket option tor TCPv6
+To: jmaloy@redhat.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The iterated nodes are direct children of the device node, and the
-`device_for_each_child_node()` macro accounts for child node
-availability.
+On Sat, Jul 20, 2024 at 7:09=E2=80=AFAM <jmaloy@redhat.com> wrote:
+>
+> From: Jon Maloy <jmaloy@redhat.com>
+>
+> When we added the SO_PEEK_OFF socket option to TCP we forgot
+> to add it even for TCP on IPv6.
+>
+> We do that here.
+>
+> Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
+>
+> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
 
-`fwnode_for_each_available_child_node()` is meant to access the child
-nodes of an fwnode, and therefore not direct child nodes of the device
-node.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-The child nodes within mvpp2_probe are not accessed outside the lopps,
-and the socped version of the macro can be used to automatically
-decrement the refcount on early exits.
+It would be nice to add a selftest for SO_PEEK_OFF for TCP and UDP,
+any volunteers ?
 
-Use `device_for_each_child_node()` and its scoped variant to indicate
-device's direct child nodes.
-
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
----
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 8c45ad983abc..f123072b1f87 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -7417,8 +7417,6 @@ static int mvpp2_get_sram(struct platform_device *pdev,
- 
- static int mvpp2_probe(struct platform_device *pdev)
- {
--	struct fwnode_handle *fwnode = pdev->dev.fwnode;
--	struct fwnode_handle *port_fwnode;
- 	struct mvpp2 *priv;
- 	struct resource *res;
- 	void __iomem *base;
-@@ -7591,7 +7589,7 @@ static int mvpp2_probe(struct platform_device *pdev)
- 	}
- 
- 	/* Map DTS-active ports. Should be done before FIFO mvpp2_init */
--	fwnode_for_each_available_child_node(fwnode, port_fwnode) {
-+	device_for_each_child_node_scoped(&pdev->dev, port_fwnode) {
- 		if (!fwnode_property_read_u32(port_fwnode, "port-id", &i))
- 			priv->port_map |= BIT(i);
- 	}
-@@ -7614,7 +7612,7 @@ static int mvpp2_probe(struct platform_device *pdev)
- 		goto err_axi_clk;
- 
- 	/* Initialize ports */
--	fwnode_for_each_available_child_node(fwnode, port_fwnode) {
-+	device_for_each_child_node_scoped(&pdev->dev, port_fwnode) {
- 		err = mvpp2_port_probe(pdev, port_fwnode, priv);
- 		if (err < 0)
- 			goto err_port_probe;
-@@ -7653,10 +7651,8 @@ static int mvpp2_probe(struct platform_device *pdev)
- 	return 0;
- 
- err_port_probe:
--	fwnode_handle_put(port_fwnode);
--
- 	i = 0;
--	fwnode_for_each_available_child_node(fwnode, port_fwnode) {
-+	device_for_each_child_node_scoped(&pdev->dev, port_fwnode) {
- 		if (priv->port_list[i])
- 			mvpp2_port_remove(priv->port_list[i]);
- 		i++;
-@@ -7677,13 +7673,12 @@ static int mvpp2_probe(struct platform_device *pdev)
- static void mvpp2_remove(struct platform_device *pdev)
- {
- 	struct mvpp2 *priv = platform_get_drvdata(pdev);
--	struct fwnode_handle *fwnode = pdev->dev.fwnode;
- 	int i = 0, poolnum = MVPP2_BM_POOLS_NUM;
- 	struct fwnode_handle *port_fwnode;
- 
- 	mvpp2_dbgfs_cleanup(priv);
- 
--	fwnode_for_each_available_child_node(fwnode, port_fwnode) {
-+	device_for_each_child_node(&pdev->dev, port_fwnode) {
- 		if (priv->port_list[i]) {
- 			mutex_destroy(&priv->port_list[i]->gather_stats_lock);
- 			mvpp2_port_remove(priv->port_list[i]);
-
--- 
-2.43.0
-
+Thanks.
 
