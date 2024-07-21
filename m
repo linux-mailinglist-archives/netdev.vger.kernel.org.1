@@ -1,199 +1,113 @@
-Return-Path: <netdev+bounces-112338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837449385DD
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 21:10:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B7C9385E8
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 21:25:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 919C11C20866
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 19:10:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DEB01F211C5
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 19:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3593812F365;
-	Sun, 21 Jul 2024 19:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C474616A397;
+	Sun, 21 Jul 2024 19:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8eywZu9"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cyT32yN8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DACC5228;
-	Sun, 21 Jul 2024 19:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA80323D;
+	Sun, 21 Jul 2024 19:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721589055; cv=none; b=FugZb0ZisGaVKoJtEx5ZTwa+sn2HkbC3z9dfsNtVsA0bXi02lvfRPkQ9Hl8tzj7UQTRbV4SUfdhG62efpEO8faDJIm6VN1BwldToDw737qUXiRIRhEQhPAglu585OUO2y+RVf8ey3nd84fwFLyixRg+o7WwgRLLeHgn7snXn+HI=
+	t=1721589927; cv=none; b=nom/908AKNCMGbGuUo8ucahXnP4R4xi9ALZQ6X0HYf0Z232qcDGMT41gusTROcId8gUjxUkQDF/0Leukz/LIGD9hK1I4xH+XEX+5iueV7n8q13+yPAmkT+V0/ILoNVKBJhJQIqi9/pmPHI5E5YmGSGq4ip1Ed7z8LyMrD5eMVnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721589055; c=relaxed/simple;
-	bh=GZE5IVYWp1qx6afe84x5JhRHv5XZbSBZtHwAfm9CvKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bgUlN1Vos7w29Po39Bk4BE4+AI0sHWpdBK8JLF4tWCKzs3nmN1qgR3Jwga7ZAv6S4FcAoGjWNXa565hHShTHJdCtTXO9KwFRxSor/3EqzDNYy1y0V31cgoWEm6E0P62fzdYNGB/zG5fc+C6Z+2IwrmIJtCV/VFR0ZXCAANq6o1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8eywZu9; arc=none smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4f51e80f894so200708e0c.1;
-        Sun, 21 Jul 2024 12:10:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721589052; x=1722193852; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hsG5wBUVX6uA57qgyRsrmzJFE8fJMHgM8iKbGRrhC6E=;
-        b=f8eywZu9TjNvQIVJjHLv7QiuWtwj/BvsGOdPJWW1Vt77DvwuXBmelvuDtAgtZ/wUq4
-         olLR25vmWd1Qp07gm05CuMkCgom3YexAQ8xKHzjl1Sym7+9eOjdf80ZhNtGeNoiD4vmH
-         +vWHDk/nunqMcXmSREQ3659mbmh2YD7ah1gWabtBvYtuty77LH5jre1eqTBzQYY023U9
-         C4PZaDzhFT/7V6Ycp13JkHfO0nN/Vy4uWoGGTVzJhF2XhtC+r5ufp87oGVfq1fzLWPta
-         Rh3Lfp6sscyVlTT6vErsS576+nHp4RWticxnjLVJrcJ3Eq10bcBBBw4iU2JwTZGIdrk0
-         PxZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721589052; x=1722193852;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hsG5wBUVX6uA57qgyRsrmzJFE8fJMHgM8iKbGRrhC6E=;
-        b=R2QAduzt9I17xrnuSoQ3iM7QnmmytbSJ3Wv2e3SOOcQ6467UQp6YP4/Z1vuYYMB32K
-         Ch/Eux3yeaJl+PO+rXpbatxcG8JqpsTYJ3Ope6KHmU9NhzZfVJgoP05YwbgvCraIhoZy
-         V/MfsFsfZYBpFKEC4PMshoSbvjML9Lpny5jYRSes5R9jjiM5YlDbZDHiL3NtFV1GcAiL
-         PYHVUWiFVuhNRUL0xQprwIXCv7E33/iPN4iGqQtbNNQH/Sa6U7F8c5r0zI1huAbZGITt
-         wzp4MePlzvZx2bwGEforyoJA3FRNOGQ/UaAR3hzkrzo3Ug7QqyfnY7ixOASFMa1kyrnp
-         Jz7g==
-X-Forwarded-Encrypted: i=1; AJvYcCXsvHX7IpEJTEDvNXip9QA//BY324Ecwet+vpebJvysYOcyPhdwP97Xr5Hg84QWPkV4CzWxNhZ9T395F4YplL+5zfBxARnnEq2M/4yb7ZvSFspc1DbVBSYQTcCYWEk4
-X-Gm-Message-State: AOJu0YzfxQIL40MkTia7VisgX703GrZL8v2omkOXbXtS+Po6eSlpIAaF
-	5FmhwTRvhjGSvsSVQR5N9DgXtREQfUtRHjWuv5rjZEudlUZn9rhivzwa46uGXBVo7vutMuNkYvp
-	EV3MYQe8Kmxxvzw53WiQNzGmuX+Y=
-X-Google-Smtp-Source: AGHT+IGZUhWIFpsqLo999dLiGqgmFS9jPSgQKJgzDF7jHnMpHbzPnd6p8a/s68suZgW74/OWwr4dYrZzibgDVxOdb28=
-X-Received: by 2002:a05:6102:80a6:b0:48f:df86:dba with SMTP id
- ada2fe7eead31-49283dc8f53mr8372243137.5.1721589051963; Sun, 21 Jul 2024
- 12:10:51 -0700 (PDT)
+	s=arc-20240116; t=1721589927; c=relaxed/simple;
+	bh=0aMDTS1Q+ke2bybc1XR+ru3LcVw9Wcs/qntj2msfcms=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B9b/3hD+3DqtxPMcCkOxeMEQXMvLrjF+y18ZnWBbps3V11PzTaFi+5R86qkYKFxVVQ3hTuNGQe4e66gzoBZVihL37l/R1cxhR6fUSN/oTtu3sqP912IZ56kILHg5rTcCoxWn0Ps25GTZwqmB2GyNeC/Rh9eIWiKgdMKpHyVgWXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cyT32yN8; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay5-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::225])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id B78B6C6021;
+	Sun, 21 Jul 2024 19:25:15 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B8C431C0003;
+	Sun, 21 Jul 2024 19:25:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1721589907;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ipOvCn4HjAe9SOCKtKgYOzgGnVV6yEDgzBHQOmIDXk0=;
+	b=cyT32yN8ebkxAJm6p7v0v82pOdPdyhlmgY17uvkuiVg2/4/oGNFI/UWNJC4yN2IY4dbPl6
+	lkUDWzJQEKl7o3REkH6j3kLjdqIS0sFqmM0CK4+Vw1py0jt+2PBT+TxB0f4C8hTGCKh+Ex
+	P2LiqPi4Z4HKsBtyp5f5qnoDJpYAiAjERjJruOw/PZ3JQFjOA4Rm/HJMw0w7j3k47KDdXv
+	0hXc8TzT4hsrGsYmH0c/TmopQ/iJCUzv2+ikeUVO72adumAPYr+vtLESgusAd1QeXsAKUL
+	hSyIdUpQyCqx4tU0zSHAN52PA3b3mCqlKZ6ZBVATiwj/Lswqzx2RwiVfx5fB5Q==
+Message-ID: <a348aa4d-d2c2-48f5-a1ed-4f97ffd093d7@bootlin.com>
+Date: Sun, 21 Jul 2024 21:25:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240718190221.2219835-1-pkaligineedi@google.com>
- <6699a042ebdc5_3a5334294df@willemb.c.googlers.com.notmuch>
- <CA+f9V1PsjukhgLDjWQvbTyhHkOWt7JDY0zPWc_G322oKmasixA@mail.gmail.com>
- <CAF=yD-L67uvVOrmEFz=LOPP9pr7NByx9DhbS8oWMkkNCjRWqLg@mail.gmail.com>
- <CA+f9V1NwSNpjMzCK2A3yjai4UoXPrq65=d1=wy50=o-EBvKoNQ@mail.gmail.com> <CANH7hM4FEtF+VNvSg5PPPYWH8HzHpS+oQdW98=MP7cTu+nOA+g@mail.gmail.com>
-In-Reply-To: <CANH7hM4FEtF+VNvSg5PPPYWH8HzHpS+oQdW98=MP7cTu+nOA+g@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sun, 21 Jul 2024 12:10:14 -0700
-Message-ID: <CAF=yD-JHDkDit0wPoKftTt3ZhtJ0gM3+E_YJsACKu916FpuCEg@mail.gmail.com>
-Subject: Re: [PATCH net] gve: Fix an edge case for TSO skb validity check
-To: Bailey Forrest <bcf@google.com>
-Cc: Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, willemb@google.com, 
-	shailend@google.com, hramamurthy@google.com, csully@google.com, 
-	jfraker@google.com, stable@vger.kernel.org, 
-	Jeroen de Borst <jeroendb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] selftests/bpf: integrate test_xdp_veth into
+ test_progs
+To: Daniel Borkmann <daniel@iogearbox.net>,
+ Alexei Starovoitov <ast@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ Simon Horman <horms@kernel.org>
+Cc: ebpf@linuxfoundation.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20240716-convert_test_xdp_veth-v3-0-7b01389e3cb3@bootlin.com>
+ <20240716-convert_test_xdp_veth-v3-2-7b01389e3cb3@bootlin.com>
+ <3b1949b9-775a-8093-6a14-16dec843a446@iogearbox.net>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <3b1949b9-775a-8093-6a14-16dec843a446@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Fri, Jul 19, 2024 at 9:56=E2=80=AFAM Bailey Forrest <bcf@google.com> wro=
-te:
->
-> On Fri, Jul 19, 2024 at 7:31=E2=80=AFAM Praveen Kaligineedi
-> <pkaligineedi@google.com> wrote:
-> >
-> > On Thu, Jul 18, 2024 at 8:47=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > On Thu, Jul 18, 2024 at 9:52=E2=80=AFPM Praveen Kaligineedi
-> > > <pkaligineedi@google.com> wrote:
-> > > >
-> > > > On Thu, Jul 18, 2024 at 4:07=E2=80=AFPM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > > > +                      * segment, then it will count as two des=
-criptors.
-> > > > > > +                      */
-> > > > > > +                     if (last_frag_size > GVE_TX_MAX_BUF_SIZE_=
-DQO) {
-> > > > > > +                             int last_frag_remain =3D last_fra=
-g_size %
-> > > > > > +                                     GVE_TX_MAX_BUF_SIZE_DQO;
-> > > > > > +
-> > > > > > +                             /* If the last frag was evenly di=
-visible by
-> > > > > > +                              * GVE_TX_MAX_BUF_SIZE_DQO, then =
-it will not be
-> > > > > > +                              * split in the current segment.
-> > > > >
-> > > > > Is this true even if the segment did not start at the start of th=
-e frag?
-> > > > The comment probably is a bit confusing here. The current segment
-> > > > we are tracking could have a portion in the previous frag. The code
-> > > > assumed that the portion on the previous frag (if present) mapped t=
-o only
-> > > > one descriptor. However, that portion could have been split across =
-two
-> > > > descriptors due to the restriction that each descriptor cannot exce=
-ed 16KB.
-> > >
-> > > >>> /* If the last frag was evenly divisible by
-> > > >>> +                                * GVE_TX_MAX_BUF_SIZE_DQO, then =
-it will not be
-> > > >>>  +                              * split in the current segment.
-> > >
-> > > This is true because the smallest multiple of 16KB is 32KB, and the
-> > > largest gso_size at least for Ethernet will be 9K. But I don't think
-> > > that that is what is used here as the basis for this statement?
-> > >
-> > The largest Ethernet gso_size (9K) is less than GVE_TX_MAX_BUF_SIZE_DQO
-> > is an implicit assumption made in this patch and in that comment. Baile=
-y,
-> > please correct me if I am wrong..
->
-> If last_frag_size is evenly divisible by GVE_TX_MAX_BUF_SIZE_DQO, it
-> doesn't hit the edge case we're looking for.
->
-> - If it's evenly divisible, then we know it will use exactly
-> (last_frag_size / GVE_TX_MAX_BUF_SIZE_DQO) descriptors
+Hello Daniel,
 
-This assumes that gso_segment start is aligned with skb_frag
-start. That is not necessarily true, right?
+On 7/19/24 17:14, Daniel Borkmann wrote:
+> On 7/16/24 12:13 PM, Alexis Lothoré (eBPF Foundation) wrote:
 
-If headlen minus protocol headers is 1B, then the first segment
-will have two descriptors { 1B, 9KB - 1 }. And the next segment
-can have skb_frag_size - ( 9KB - 1).
+[...]
 
-I think the statement is correct, but because every multiple
-of 16KB is so much larger than the max gso_size of ~9KB,
-that a single segment will never include more than two
-skb_frags.
+>> +    nstoken = open_netns(config[index].namespace);
+>> +    if (!ASSERT_OK_PTR(nstoken, "switch to remote veth namespace"))
+>> +        return -1;
+>> +    interface = if_nametoindex(config[index].remote_veth);
+>> +    if (!ASSERT_NEQ(interface, 0, "non zero interface index"))
+>> +        return -1;
+> 
+> Missing `close_netns(nstoken);` in error path here, otherwise looks reasonable
+> to me.
+Ah yes, good catch, thanks. v4 incoming with the corresponding fix.
 
-Quite possibly the code overestimates the number of
-descriptors per segment now, but that is safe and only a
-performance regression.
+Thanks,
+Alexis
 
-> - GVE_TX_MAX_BUF_SIZE_DQO > 9k, so we know each descriptor won't
-> create a segment which exceeds the limit
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-For a net patch, it is generally better to make a small fix rather than rew=
-rite.
-
-That said, my sketch without looping over every segment:
-
-        while (off < skb->len) {
-                gso_size_left =3D shinfo->gso_size;
-                num_desc =3D 0;
-
-                while (gso_size_left) {
-                        desc_len =3D min(gso_size_left, frag_size_left);
-                        gso_size_left -=3D desc_len;
-                        frag_size_left -=3D desc_len;
-                        num_desc++;
-
-                        if (num_desc > max_descs_per_seg)
-                                return false;
-
-                        if (!frag_size_left)
-                                frag_size_left =3D
-skb_frag_size(&shinfo->frags[frag_idx++]);
-+                      else
-+                              frag_size_left %=3D gso_size;        /*
-skip segments that fit in one desc */
-                }
-        }
 
