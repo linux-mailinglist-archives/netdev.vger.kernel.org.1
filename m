@@ -1,286 +1,212 @@
-Return-Path: <netdev+bounces-112318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB729384A6
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 15:11:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 674529384E9
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 15:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E21C1C20915
-	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 13:11:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE2091F212D1
+	for <lists+netdev@lfdr.de>; Sun, 21 Jul 2024 13:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFE115FA7C;
-	Sun, 21 Jul 2024 13:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C50161339;
+	Sun, 21 Jul 2024 13:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b="PCvWiLjB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QEOLgzVP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpx.fel.cvut.cz (smtpx.feld.cvut.cz [147.32.210.153])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1884379D0;
-	Sun, 21 Jul 2024 13:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.32.210.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B79D4414
+	for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 13:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721567504; cv=none; b=odFyNSzJfL6byYuPFigy7lG3smGlZBBRCZUhL/RPZjTdQjKTe5pwBMgIqatmZdvUOg4TGkODkynSPovh8KC4DH9rMYm61LuqaH/TvMSwQckk/94uSV8aJ5rKJ0F/D/dU/yEuk/QEjUPVVuxRUGhz47/kBKEJo6kE5Sl/+ug9qiM=
+	t=1721570144; cv=none; b=ExWYqKC0veQK+AlmVJN2zrjnkeEVL5/Dt8luqx9hdoK/BCMVj8dWIlV77emBEfVTTpiZ2H7Iu1GrvfV3CmumPmINJisyo3i5Wsg0YgGAGob8Zlgx3aLAqmZu3cYe3UKToWJtBSAeHZz8JWz1u5KH6sHVxBaM0U8jF/fQrtJM+Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721567504; c=relaxed/simple;
-	bh=jCtw0VcwHKu6CDPRFQhmlj5gUtb1og2XNZpenPeZVIA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UmtagkHpTMvUE6IqLA0XVG3gPMHd5BEQj2MmhpA+aOREucyc9gDL7pEL/wCNNOvQwLYYFCWJT+EHEGnf449PW3u9euk32o/1JmAxL309t06WPptgQw+11UtP2ITEfA19vujuNnGY8wOvq6xhMkNR57tACIM5AGANvLBtfnq1IdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz; spf=pass smtp.mailfrom=fel.cvut.cz; dkim=pass (2048-bit key) header.d=fel.cvut.cz header.i=@fel.cvut.cz header.b=PCvWiLjB; arc=none smtp.client-ip=147.32.210.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fel.cvut.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fel.cvut.cz
-Received: from localhost (unknown [192.168.200.27])
-	by smtpx.fel.cvut.cz (Postfix) with ESMTP id 78C737F56;
-	Sun, 21 Jul 2024 15:11:33 +0200 (CEST)
-X-Virus-Scanned: IMAP STYX AMAVIS
-Received: from smtpx.fel.cvut.cz ([192.168.200.2])
- by localhost (cerokez-250.feld.cvut.cz [192.168.200.27]) (amavis, port 10060)
- with ESMTP id vEy9vpAa5eNl; Sun, 21 Jul 2024 15:11:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fel.cvut.cz;
-	s=felmail; t=1721567492;
-	bh=jCtw0VcwHKu6CDPRFQhmlj5gUtb1og2XNZpenPeZVIA=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=PCvWiLjBQBlOQr70rDj3wNAkkmBPd5TiT2tq1OnZhKoj7cCTq75Jm0V6mzwAPsKjz
-	 8CfYwLqejt8mXk3xXogCg66x1oionWsdkEM4X6rpXH14vEn9wTHMDhk/e68e3mJcaE
-	 tW+Sab3nT1I9AS9n9p77gfEBpPtyG9XVO+qlU/2Atce+MXvCefzv7k/4YeeLDh+FNG
-	 cRohjsj57dTzzkncgHe5AGtY8OJI09U6qd4Q8LkEuKuALlK4slu0QrnYOKZEc7pAm9
-	 uzdVJnJEA1PSBm0ya6GRfSJW7D7OnzgQniSN5aU5adBuoBx8S+Mi2K+097IoTKMW/C
-	 UUC3UiOVHANJg==
-Received: from [147.32.215.71] (vpncl-71.feld.cvut.cz [147.32.215.71])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: peckama2)
-	by smtpx.fel.cvut.cz (Postfix) with ESMTPSA id EBB097F55;
-	Sun, 21 Jul 2024 15:11:31 +0200 (CEST)
-Message-ID: <57f07825-b838-4f1a-b91c-1fd944ac928c@fel.cvut.cz>
-Date: Sun, 21 Jul 2024 15:11:13 +0200
+	s=arc-20240116; t=1721570144; c=relaxed/simple;
+	bh=bxseoDb+uRHz1mHEstzv4TtMiiiWJnYUpTlt/lF15sY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=GKBBwOEFre41omd83tyypIe7Z/xa7bj8jp8iK9xLD6DzDj1FwUGqjqeVo0uN2XbxNY/E/phFbpcoIF3Nw5sDQxnfQOkBc2ZlZ1W/OmTEIex/XD/Sx32FtbWcxClIB1n8GonngjJCaE1F0AY1RHl8I8ku57rYeWZK6XaV9BidYwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QEOLgzVP; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-66493332ebfso30814847b3.3
+        for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 06:55:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721570141; x=1722174941; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qdgCLlcc6BKdV14Br9A+jG/cSvwVX8eK0b3c82wpcIA=;
+        b=QEOLgzVPNMxqCVtz+i6VeNaxYADt1DhXd0NYUw/6su+msELq37jpaxXTsX5bGkxS6f
+         OLwtIXo5gaL84LGLPcJVbJo34iIyxsuMIeQwapg+Qc9rHuB+gIFISin0VtHDkOF5nxVp
+         s3AnxtuAZsBL4mhCAydo5FUakeeQpIP9bEujavjKUJBGkI1FIJK9XI0ACI5n0JA6hYZn
+         4CGj5GmKwZ94r1puYFyv/63/TjI+vUMlRPjJu+wPOfRiMtrFYU+mbNW540ienYuC9Q28
+         /3RGIOTL+s0tBMbMCFWJ8Pt5oqYBYARt0pDBAs/5NoCUNaagoaqd51USuq6TwlPgnoKg
+         JzSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721570141; x=1722174941;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qdgCLlcc6BKdV14Br9A+jG/cSvwVX8eK0b3c82wpcIA=;
+        b=cMLNdCjBWt56ElFhM1kQ+SMcpZ/uzuZlovvlRwdWTwoorpjva/xICiIFskqCLc3JN5
+         eEXaFU9xkfH4JE/qUxSWnVUmY86HFacm/XhpPNmK+//GoHTm385E7s+h+Z/oy1ymPj4+
+         U1mtTVLpONRPNm2iheV5MTVi6stLa9rl6BaN06GjkFWD1bwBQk7SoZchlLY+E0q9ldLT
+         k1x+w/+b1CMwI085+heDPgzKM6vqKGPBvZRA69bjHh34xkhVWXuZX/PWKhNI56H8JI6I
+         Nwe9LMc0TWpK2+kq5DLvQKfncAKcsso4uo+6T303O3K/PLf/EDJphmqGUmHXj6TtXDS3
+         3c8w==
+X-Gm-Message-State: AOJu0YxUGkQfZMauYFHDikL04T/+9C2NZgJCrveT9b0i+x4056eEBC+T
+	m1Ol+S2OBcPdKsxdukypCR0K/HysXGmOAH+j1kSTzDiQfGB0DCN8Ju5hRDB4iQFIt/JYcrgULFU
+	FbZw+5W1OF6prwSgIi3cEGQUNL1IjW4Ll28Q=
+X-Google-Smtp-Source: AGHT+IHvAxpNE98EODDwth1Fmh0QKbAmejQkqNxS97612/x8hOwrOpxevoCS25Fxf/HQvGPNxKjUbjMKwP6xWX3uNjQ=
+X-Received: by 2002:a05:690c:1d:b0:65f:7ac6:7f69 with SMTP id
+ 00721157ae682-66a684c2c6dmr73512397b3.6.1721570141098; Sun, 21 Jul 2024
+ 06:55:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Martin Pecka <peckama2@fel.cvut.cz>
-Subject: Re: [EXTERNAL] net: atlantic: PHC time jumps ~4 seconds there and
- back on AQC107
-To: Igor Russkikh <irusskikh@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Dmitrii Bezrukov <dbezrukov@marvell.com>,
- Jackson Pooyappadam <jpooyappadam@marvell.com>
-References: <def1073b-8997-48cd-adf3-e834662881de@fel.cvut.cz>
- <CO1PR18MB4713F904116EA5127017A3C0B7AE2@CO1PR18MB4713.namprd18.prod.outlook.com>
-Content-Language: cs-Cestina, en-US
-In-Reply-To: <CO1PR18MB4713F904116EA5127017A3C0B7AE2@CO1PR18MB4713.namprd18.prod.outlook.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms020705040408020606070808"
+From: Guy Avraham <guyavrah1986@gmail.com>
+Date: Sun, 21 Jul 2024 16:55:30 +0300
+Message-ID: <CAM95viF6QsbSq0u3D361Xif28q-yGLGJT_qk7+C3fj2=Op3o4Q@mail.gmail.com>
+Subject: Potential issue in networking sub system when handling packet with IP
+ router alert option
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-This is a cryptographically signed message in MIME format.
+Hi all,
 
---------------ms020705040408020606070808
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+1. Introduction:
+First, if there is anything I should do differently with respect to
+the mailing list "procedure" please
+let me know (I have never written nor subscribed to any mailing list
+related to Linux kernel
+development).
 
-VGhhbmtzIGZvciB0aGUgcXVpY2sgcmVzcG9uc2UsIElnb3IuDQoNCj4gQVFDMTA3IGlzIG5v
-dyBpbiBsb3cgbWFpbnRlbmFuY2UgbW9kZSBpbiBNYXJ2ZWxsLCBhbmQgeW91IGFyZSByaWdo
-dCANCj4gdGhpcyBhcmUgb2YgRlcgaXMgbm90IHdlbGwgZG9jdW1lbnRlZC4NCk9mZi10b3Bp
-YzogSW50ZXJlc3RpbmcsIGdpdmVuIHRoZSBudW1iZXIgb2YgZGV2aWNlcyBvdXQgdGhlcmUg
-dXNpbmcgDQpBUUMxMDcuLi4NCj4gT25lIHN1Z2dlc3Rpb24uIEhhdmUgeW91IHRyaWVkIHBs
-YXlpbmcgd2l0aCAtUiAoc2xhdmUgdXBkYXRlIHJhdGUpPyANCj4gSW5jcmVhc2luZyBpdD8N
-ClRyaWVkIGl0IG5vdyBhbmQgaXQgc2VlbXMgaXQgaGFzIG5vIGNsZWFyIGluZmx1ZW5jZS4g
-SSB0ZXN0ZWQgd2l0aCAtUiAxMCANCmFuZCAtUiAwLjEgYW5kIGluIG5laXRoZXIgY2FzZSB3
-ZXJlIHRoZSB0aW1lIGp1bXBzIG1vcmUgb3IgbGVzcyBmcmVxdWVudC4NCj4gSSBoYXZlIGEg
-ZmVlbGluZyB0aGUgZmFjdCBpdCBoYXBwZW5zIHBlcmlvZGljYWxseSBhbmQgdGhlbiByZXN0
-b3JlcyANCj4gaGFzIHNvbWV0aGluZyB0byBkbyB3aXRoICJyb3VuZGluZyIgb3IgTlMgY2Fs
-Y3VsYXRpb25zLiBTdXJwcmlzaW5nbHkgDQo+IHVpbnQzMiBmaXRzIDQgQmlsbGlvbnMgb2Yg
-TlMgd2hpY2ggaXMgYXJvdW5kIDQgc2Vjb25kcy4uLg0KDQpJIHdhcyBhbHNvIHdvbmRlcmlu
-ZyB3aGV0aGVyIHRoZSB+NEIgdmFsdWUgY291bGQgYmUgc29tZSBvdmVyZmxvdy4gQnV0IA0K
-dGhlIGZvbGxvd2luZyBpbnZlc3RpZ2F0aW9uIHNob3dzIGl0IGlzIG1vc3QgcHJvYmFibHkg
-bm90IHRoZSBjYXNlLg0KDQpJJ3ZlIGZvdW5kIGFuIGV2ZW4gc2ltcGxlciB3YXkgdG8gdHJp
-Z2dlciB0aGlzIGlzc3VlIHVzaW5nIHBoY19jdGwuIFJ1biANCnRoaXMgY29tbWFuZCBvbmNl
-LCB3YWl0IDUtNjAgc2Vjb25kcyBhbmQgcnVuIGl0IGFnYWluLiBUaGUgc2Vjb25kIHJ1biAN
-CnVzdWFsbHkgc3VmZmVycyBmcm9tIHRoZSBwcm9ibGVtIChpZiBub3QsIHRyeSBhZ2Fpbik6
-DQoNCiQgc3VkbyBwaGNfY3RsIGV0aDIgLS0gZ2V0IGZyZXEgIjk3MzkiIHdhaXQgMC4xIGdl
-dCBmcmVxICI5NzM5IiB3YWl0IDAuMSANCmdldCBmcmVxICI5NzM5IiB3YWl0IDAuMSBnZXQg
-ZnJlcSAiOTczOSIgd2FpdCAwLjEgZ2V0IHwgZ3JlcCAiY2xvY2sgdGltZSBpcyINCnBoY19j
-dGxbMTU4MzMyLjkzNl06IGNsb2NrIHRpbWUgaXMgMTcyMTU2Mzg1Mi41Mzg0Nzc0Mjcgb3Ig
-U3VuIEp1bCAyMSANCjE0OjEwOjUyIDIwMjQNCnBoY19jdGxbMTU4MzMzLjA0N106IGNsb2Nr
-IHRpbWUgaXMgMTcyMTU2Mzg0OC4zNTQ1NTExMzYgb3IgU3VuIEp1bCAyMSANCjE0OjEwOjQ4
-IDIwMjQNCnBoY19jdGxbMTU4MzMzLjE1OV06IGNsb2NrIHRpbWUgaXMgMTcyMTU2Mzg0OC40
-NjYwNDI1NDUgb3IgU3VuIEp1bCAyMSANCjE0OjEwOjQ4IDIwMjQNCnBoY19jdGxbMTU4MzMz
-LjI3MV06IGNsb2NrIHRpbWUgaXMgMTcyMTU2Mzg0OC41Nzg2ODg1NTAgb3IgU3VuIEp1bCAy
-MSANCjE0OjEwOjQ4IDIwMjQNCnBoY19jdGxbMTU4MzMzLjM4NF06IGNsb2NrIHRpbWUgaXMg
-MTcyMTU2Mzg0OC42OTA5Njk2Mzggb3IgU3VuIEp1bCAyMSANCjE0OjEwOjQ4IDIwMjQNCg0K
-OTczOSBpcyBhIGZyZXF1ZW5jeSBhZGp1c3RtZW50IHRoYXQgcmVzdWx0cyBpbiBtYWNfYWRq
-IHZhbHVlIA0KLTEuNzA0MTM1ODE2IChiYXNlIDEwKS4NCg0KUmFyZWx5LCBJIGFsc28gc2Vl
-IHZlcnkgZGlmZmVyZW50IGxlbmd0aHMgb2YgdGhlIHRpbWUganVtcHMgbGlrZSAzMCBzLCAN
-CndoaWNoIGxvd2VycyB0aGUgcHJvYmFiaWxpdHkgdGhhdCB0aGUgb3ZlcmZsb3cgdGhlb3J5
-IGlzIGNvcnJlY3Q6DQoNCnBoY19jdGxbMTU4NzQwLjQ1OF06IGNsb2NrIHRpbWUgaXMgMTcy
-MTU2NDI4NS44Mjk4Njc1NTcgb3IgU3VuIEp1bCAyMSANCjE0OjE4OjA1IDIwMjQNCnBoY19j
-dGxbMTU4NzQwLjU2OV06IGNsb2NrIHRpbWUgaXMgMTcyMTU2NDI1NS44NzYxNTE2NTggb3Ig
-U3VuIEp1bCAyMSANCjE0OjE3OjM1IDIwMjQNCnBoY19jdGxbMTU4NzQwLjY4MV06IGNsb2Nr
-IHRpbWUgaXMgMTcyMTU2NDI1NS45ODc4MjA4MDMgb3IgU3VuIEp1bCAyMSANCjE0OjE3OjM1
-IDIwMjQNCnBoY19jdGxbMTU4NzQwLjc5M106IGNsb2NrIHRpbWUgaXMgMTcyMTU2NDI1Ni4x
-MDAwMzM1NTAgb3IgU3VuIEp1bCAyMSANCjE0OjE3OjM2IDIwMjQNCnBoY19jdGxbMTU4NzQw
-LjkwNV06IGNsb2NrIHRpbWUgaXMgMTcyMTU2NDI1Ni4yMTI1MDM3OTggb3IgU3VuIEp1bCAy
-MSANCjE0OjE3OjM2IDIwMjQNCg0KUnVubmluZyBhIHNsaWdodGx5IGRpZmZlcmVudCBjb21t
-YW5kLCBJJ3ZlIG9ic2VydmVkIHRoZSB0aW1lIGp1bXAgDQpkb2Vzbid0IGhhcHBlbiBpbW1l
-ZGlhdGVseSBhZnRlciB0aGUgZnJlcXVuY3kgYWRqdXN0bWVudCwgYnV0IHdpdGhpbiAwLjEg
-DQpzIGFmdGVyIGl0LiBJdCBpcyB0aGVuIGNvcnJlY3RlZCBiYWNrIHdpdGhpbiBhIGZldyAx
-MDBzIG9mIG1zOg0KDQokIHdoaWxlIHRydWU7IGRvIHN1ZG8gcGhjX2N0bCBldGgyIC0tIGdl
-dCBmcmVxICI5NzM5IiBnZXQgd2FpdCAwLjEgZ2V0IA0Kd2FpdCAwLjEgZ2V0IHdhaXQgMC4x
-OyBkb25lDQpwaGNfY3RsWzE2MDIwMS4zMDRdOiBwcm9jZXNzIHNsZXB0IGZvciAwLjEwMDAw
-MCBzZWNvbmRzDQpwaGNfY3RsWzE2MDIwMS4zMDVdOiBjbG9jayB0aW1lIGlzIDE3MjE1NjU3
-MTYuNjExNzAyMDY3IG9yIFN1biBKdWwgMjEgDQoxNDo0MTo1NiAyMDI0DQpwaGNfY3RsWzE2
-MDIwMS40MDZdOiBwcm9jZXNzIHNsZXB0IGZvciAwLjEwMDAwMCBzZWNvbmRzDQojIHJpZ2h0
-IGJlZm9yZSBhZGpfZnJlcQ0KcGhjX2N0bFsxNjAyMDEuNDM1XTogY2xvY2sgdGltZSBpcyAx
-NzIxNTY1NzE2Ljc0MTU2NTg2NiBvciBTdW4gSnVsIDIxIA0KMTQ6NDE6NTYgMjAyNA0KcGhj
-X2N0bFsxNjAyMDEuNDQ1XTogYWRqdXN0ZWQgY2xvY2sgZnJlcXVlbmN5IG9mZnNldCB0byA5
-NzM5LjAwMDAwMHBwYg0KIyByaWdodCBhZnRlciBhZGpfZnJlcQ0KcGhjX2N0bFsxNjAyMDEu
-NDQ2XTogY2xvY2sgdGltZSBpcyAxNzIxNTY1NzE2Ljc1MjM5MTkzNiBvciBTdW4gSnVsIDIx
-IA0KMTQ6NDE6NTYgMjAyNA0KcGhjX2N0bFsxNjAyMDEuNTQ2XTogcHJvY2VzcyBzbGVwdCBm
-b3IgMC4xMDAwMDAgc2Vjb25kcw0KIzEwMCBtcyBhZnRlciBhZGpfZnJlcSwgdGhlIGp1bXAg
-aGFwcGVucw0KcGhjX2N0bFsxNjAyMDEuNTQ3XTogY2xvY2sgdGltZSBpcyAxNzIxNTY1NzIx
-LjE0Nzk1MTc2NyBvciBTdW4gSnVsIDIxIA0KMTQ6NDI6MDEgMjAyNA0KcGhjX2N0bFsxNjAy
-MDEuNjQ4XTogcHJvY2VzcyBzbGVwdCBmb3IgMC4xMDAwMDAgc2Vjb25kcw0KcGhjX2N0bFsx
-NjAyMDEuNjQ5XTogY2xvY2sgdGltZSBpcyAxNzIxNTY1NzIxLjI1MDM3NzAzOSBvciBTdW4g
-SnVsIDIxIA0KMTQ6NDI6MDEgMjAyNA0KcGhjX2N0bFsxNjAyMDEuNzQ5XTogcHJvY2VzcyBz
-bGVwdCBmb3IgMC4xMDAwMDAgc2Vjb25kcw0KcGhjX2N0bFsxNjAyMDEuNzgwXTogY2xvY2sg
-dGltZSBpcyAxNzIxNTY1NzIxLjM4MTg0MzQxNCBvciBTdW4gSnVsIDIxIA0KMTQ6NDI6MDEg
-MjAyNA0KcGhjX2N0bFsxNjAyMDEuNzkxXTogYWRqdXN0ZWQgY2xvY2sgZnJlcXVlbmN5IG9m
-ZnNldCB0byA5NzM5LjAwMDAwMHBwYg0KcGhjX2N0bFsxNjAyMDEuNzkxXTogY2xvY2sgdGlt
-ZSBpcyAxNzIxNTY1NzIxLjM5MjY5OTg3MiBvciBTdW4gSnVsIDIxIA0KMTQ6NDI6MDEgMjAy
-NA0KcGhjX2N0bFsxNjAyMDEuODkxXTogcHJvY2VzcyBzbGVwdCBmb3IgMC4xMDAwMDAgc2Vj
-b25kcw0KIyAzMDAgbXMgYWZ0ZXIgYWRqX2ZyZXEsIHRoZSB0aW1lIGp1bXBzIGJhY2sNCnBo
-Y19jdGxbMTYwMjAxLjg5Ml06IGNsb2NrIHRpbWUgaXMgMTcyMTU2NTcxNy4xOTgyOTk4NTkg
-b3IgU3VuIEp1bCAyMSANCjE0OjQxOjU3IDIwMjQNCnBoY19jdGxbMTYwMjAxLjk5M106IGNs
-b2NrIHRpbWUgaXMgMTcyMTU2NTcxNy4yOTkzOTgxMjMgb3IgU3VuIEp1bCAyMSANCjE0OjQx
-OjU3IDIwMjQNCnBoY19jdGxbMTYwMjAyLjA5NF06IHByb2Nlc3Mgc2xlcHQgZm9yIDAuMTAw
-MDAwIHNlY29uZHMNCnBoY19jdGxbMTYwMjAyLjEyM106IGNsb2NrIHRpbWUgaXMgMTcyMTU2
-NTcxNy40Mjk0MDAzOTQgb3IgU3VuIEp1bCAyMSANCjE0OjQxOjU3IDIwMjQNCg0KTGFzdCwg
-dHJ5aW5nIHRvIHJlZmluZSB0aGUgZGVsYXkgYmV0d2VlbiBhZGpfZnJlcSBjYWxsIGFuZCB0
-aW1lIGp1bXAsIGl0IA0Kc2VlbXMgdG8gbWUgdGhhdCAzIG1zIGFmdGVyIHRoZSBjYWxsLCB0
-aGUgdGltZSBpcyBjb3JyZWN0LCB3aGlsZSA0IG1zIA0KYWZ0ZXIgdGhlIGNhbGwgaXQgYWxy
-ZWFkeSBqdW1wcyAodGhlc2UgdmFsdWVzIG5lZWQgdG8gYmUgdGFrZW4gd2l0aCBhIA0KZ3Jh
-aW4gb2Ygc2FsdCBhcyB0aGV5J3JlIHRoZSBhcmd1bWVudHMgb2Ygd2FpdCBpbiBwaGNfY3Rs
-OyBidXQgdGhlIA0KcmVzdWx0cyBJIGdvdCB3ZXJlIHF1aXRlIGNvbnNpc3RlbnQpLg0KDQpU
-aGFua3MsDQoNCk1hcnRpbg0KDQo=
+My name is Guy Avraham and I am an embedded Linux engineer.
+I am new in the world of Linux kernel networking domain.
+I am facing an issue related to the handling of IP packets that have
+the IP router alert option present in their options section.
 
---------------ms020705040408020606070808
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: Elektronicky podpis S/MIME
+I am working with kernel version 5.2.20 which is compiled to X86_64
+architecture (let me know if further information is needed). Also, I
+am quite sure that the issue is also present in later versions of the
+kernel.
 
-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
-CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCSz//o3JSH0n6z70Zd49C7PGUOo9Q7JzDjg9cX
-5XxSW77TVcn3KwsTxGuqKHs7IQdIK10240CvpGTPZeA9oKR4J/h0qPcE0AYfr4Ik3Zfc/XT3
-ewx50yRpeUC6hXQmHshDnAKIWIi3RDWR8Vq8iPYIr0XiT7Vmbe6rQXqcTRHpYq9WuW4JPS30
-O8mCWT7L5HaV/sLBqITh8axn39vm3UlMcYiPOXi3kp25MIesT6fANo89JkMU0TDTMQrX0LNf
-kx1m0A0z7YWan6UeKnO1Km5/5jbJLnV7ZnnDklk/wgcp5a8UfUDfVhXUrNVzURwX1A7043jC
-Dc2F4ueQzCNNe6+hAgMBAAGjggHaMIIB1jAfBgNVHSMEGDAWgBRpAKHHIVj44MUbILAK3adR
-vxPZ5DAdBgNVHQ4EFgQU7XtGoEr5iEI04VXMKXwDgk/EbcAwDgYDVR0PAQH/BAQDAgWgMAwG
-A1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMCMFAGA1UdIARJMEcw
-OgYMKwYBBAGyMQECAQoEMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vc2VjdGlnby5jb20vU01J
-TUVDUFMwCQYHZ4EMAQUDAjBCBgNVHR8EOzA5MDegNaAzhjFodHRwOi8vR0VBTlQuY3JsLnNl
-Y3RpZ28uY29tL0dFQU5UUGVyc29uYWxDQTQuY3JsMHgGCCsGAQUFBwEBBGwwajA9BggrBgEF
-BQcwAoYxaHR0cDovL0dFQU5ULmNydC5zZWN0aWdvLmNvbS9HRUFOVFBlcnNvbmFsQ0E0LmNy
-dDApBggrBgEFBQcwAYYdaHR0cDovL0dFQU5ULm9jc3Auc2VjdGlnby5jb20wRwYDVR0RBEAw
-PoEUTWFydGluLlBlY2thQGN2dXQuY3qBEHBlY2thbWEyQGN2dXQuY3qBFHBlY2thbWEyQGZl
-bC5jdnV0LmN6MA0GCSqGSIb3DQEBDAUAA4ICAQAOTtnV864+VORsMVLrp6EoNuPpM6SWuGF1
-a3ToVY8hVaZaxGCls26PlaZ1e1xOUsl6AA7hGQAoC7skWFotnJc1+LpRlsylWvfRYQwhly0r
-qCjXqfkYUZtms2Y2t+0QZe6vZMg3GGo3nB1Nx7yGQRJV6MJI67wP4IFUEOrqzhCf1SQhwKkS
-1nq5KUILq53SE+oQMh1lq1bdo9DBWjSxgIBXPEgEzxcClbqFRfXL4ZiZtlUprB8sBHYFJbPp
-Pw+UbA+1tHV6kt/Ds61AxQxwJMbN07tstf+8zEqTY7lBJx0o4btHG21aH/uOVR0ElughH+Cv
-OzESmVJ1n9O9OkXrxhXOCdZyOH1mNTLeljhhE89ESa8oGULUGwCeoBCdCEu8t2jHhoFz7ItS
-QDO4Gdo0QHy8HIqMHNbqQRL2MtjRJ2AfLVQD94A9tLVpVgWL/DnhQ6W5hAk6B/2Qao95GkJa
-Pw32IY002rwjKIPAi5ZtAhr245sE9M7ficsC3Nc6VWZbwEtOxp9X67EGusdGpX+s8EGAUbTn
-aGZE/9kYx4plpzudPrpnGG7gCxjlUVxtij745QFJkoIGCbL61R2M7tEI4W9X0b8cgVeZuD28
-rvyDpove2ZQlqEuey1oCnQ48VAvH7+Ux1RBRokOYqnktRUgYyF1Z8B9RPvcsInQoFjm4cXyn
-PjCCBuYwggTOoAMCAQICEDECcNQ1vpskmvhW0OHihUkwDQYJKoZIhvcNAQEMBQAwgYgxCzAJ
-BgNVBAYTAlVTMRMwEQYDVQQIEwpOZXcgSmVyc2V5MRQwEgYDVQQHEwtKZXJzZXkgQ2l0eTEe
-MBwGA1UEChMVVGhlIFVTRVJUUlVTVCBOZXR3b3JrMS4wLAYDVQQDEyVVU0VSVHJ1c3QgUlNB
-IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTIwMDIxODAwMDAwMFoXDTMzMDUwMTIzNTk1
-OVowRjELMAkGA1UEBhMCTkwxGTAXBgNVBAoTEEdFQU5UIFZlcmVuaWdpbmcxHDAaBgNVBAMT
-E0dFQU5UIFBlcnNvbmFsIENBIDQwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCz
-SuIiXidb6QRbFAQ1MiAUrrTSMUDGzVDAHqFEyq+eSmF/LZDeYpszai2kQsqWATz/cBA9gGju
-nvJ45G48ycC4D6gwZFvbBt5JotxlunBeB8K+crGar3v+RCQ4VfvToX07v+HTJ6EeEONR3IzJ
-PTMyzgAwENGsAWf9va9HePQFJiChCzXqhKpp0zen53S+8f9itEy06GS8aku7Mvyb4tMBBa9A
-n3Y3ALIqIeymg/iYs8m9WkSkMyekNtFRB1+1KlnNUpM05G8+sY9EucnQQRUIdHzYsvqjP3Xl
-aSuB4Jj0ia66UGfi5Wx31mm5sKAz8Re9UGVWIqq6wKFKxkSfuO4iwYiIPJoiGEux3dqabwFL
-duAroDF1IxE40PqGIdPXzYuZ/wL6BEfFAb0xy8bfm5S9G7y/ts9mIlFpPtkLZ/nQ/iVOWdsu
-9ale/nK/uGF47xsxeW2LIvB4sH5U2+D4ad8vpNbcCrXIXXKtkBnNHgxumNNZ0R1Isq/Pz7TA
-LCxxDzWdsM7AO32/Jn7R4ldtGRZmKpJyfACDn8HU1QPhOtiWsjifrMWnanJhQ6K7M/5qz8Bm
-fPrca+MUrr1Y4NHZb9MrgPtWKQQyGDXy+G5F/iHGdZk7LS+F8NH+Ddolt2wZpz52JqGMTDPI
-H5Qok4LLO95wbxtn+79Tw+wQxmDTuIg+LwIDAQABo4IBizCCAYcwHwYDVR0jBBgwFoAUU3m/
-WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFGkAocchWPjgxRsgsArdp1G/E9nkMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggr
-BgEFBQcDBDA4BgNVHSAEMTAvMC0GBFUdIAAwJTAjBggrBgEFBQcCARYXaHR0cHM6Ly9zZWN0
-aWdvLmNvbS9DUFMwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2VydHJ1c3QuY29t
-L1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUFBwEBBGow
-aDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJTQUFk
-ZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQAKBU57DY8fEzkA/W/sYsbD7e0XquMBzHjcP0eXXXRD4EAEAGCW
-Ss+QRL9XIxmx+52zx9wMa8YTejlR+NKejiyKPTF0q63zMxrO/z/hUwo8IDcRRLS0NSgvTW6A
-N2rCXJe5iLN5fIfYgIBB9cy1L6trPuZ/vjUJm87nQ7ExQzGqWN5F9U8MlAk0c5iLanG7GCMo
-NjHiF1n0baj6guUeG7n5qcwOQTyDS19+NEqfwjUPUGasN1ZH8h1sE6PrzvRpti+rKzWpiU+i
-2/k3l2b5fFDy+Wu9jv6R9BoBh47es/UMzwEZ2kSrIVVr4jSukk+FpmR5ZbtwiYNAV6sdb1sr
-MGsILzXlrdasSE2nGHvZklk2zUdgn7b01MHq67g0mNozGmT6Dam41Kbhv25WMFs871XqwVIb
-4gGoT1yRf/VePMm1jwauqijhKJFvrNweGnebGPeipaLxIo2iEA4qdRztEg/qyzWGogXK/TFd
-mivg322fMPQWjQkMhRGMM8SCjlZN22L8x0ZOYoVA2rHJm5P25IjZe+HPyn7ikJiSJmqlqFmU
-eowXF3D1dFlCCs/5yC06RYRqI2REFu+28t2nswIvY6xCFAR0RtS8Mz2yXNld0js2MmiRUGrc
-7imWzdUPbPcv9sdUF7SsERGPIzYL8dIiHzit+YCoGCSXMg6peF37hHNp1TGCAzgwggM0AgEB
-MFowRjELMAkGA1UEBhMCTkwxGTAXBgNVBAoTEEdFQU5UIFZlcmVuaWdpbmcxHDAaBgNVBAMT
-E0dFQU5UIFBlcnNvbmFsIENBIDQCEDUWEox2/JG2vrpq6E2IPkMwDQYJYIZIAWUDBAIBBQCg
-ggGvMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcyMTEz
-MTExNFowLwYJKoZIhvcNAQkEMSIEIJ/5l1q/dRWN+dWWTn3lYUwSco3YWQttk4jgXLESMflU
-MGkGCSsGAQQBgjcQBDFcMFowRjELMAkGA1UEBhMCTkwxGTAXBgNVBAoTEEdFQU5UIFZlcmVu
-aWdpbmcxHDAaBgNVBAMTE0dFQU5UIFBlcnNvbmFsIENBIDQCEDUWEox2/JG2vrpq6E2IPkMw
-awYLKoZIhvcNAQkQAgsxXKBaMEYxCzAJBgNVBAYTAk5MMRkwFwYDVQQKExBHRUFOVCBWZXJl
-bmlnaW5nMRwwGgYDVQQDExNHRUFOVCBQZXJzb25hbCBDQSA0AhA1FhKMdvyRtr66auhNiD5D
-MGwGCSqGSIb3DQEJDzFfMF0wCwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0D
-BzAOBggqhkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwIC
-ASgwDQYJKoZIhvcNAQEBBQAEggEAEG8TtKWrl1xXb59Chw+e+cgCd0PO4i7eA2e52iaEop3X
-6214d7yO86n85qxtYz9j84OUdfaU5GF1oRaGKsl3W2RegyZ76hw74ehAhNu9MZKLQK2RP4Ev
-+PGY1u4/h2JzzYVYEtfW4WkynCyHcQs1vU5HCLmld03R8GaNiiXlx8a/ErmQiQLJ62v65UTD
-6sBX5Qw5xSpVKsDkIV+HbSNxPiyqiUFjko79+n35Q4cTLVjN1o3ALbjLOva1agAG+75fpsr7
-HF/+/msMyYAlpyjhy3AuPlexxnyL8+UB8W6/3K2ckotp2+dVze06psL62GAO8CAJYoIWSNV7
-gU2uC2Q6bgAAAAAAAA==
---------------ms020705040408020606070808--
+2. Preface (problem description):
+According to RFC 2113, the presence of the IP router alert option in
+the IP packet header means that (section 2.0):
+
+"The goal, then, is to provide a mechanism whereby routers can
+intercept packets not addressed to them directly".
+
+One such protocol that leverages this option, is the RSVP. The
+situation I am facing is the following: I have 4 routers in a "row"
+topology (for the matter and for simplicity). Lets name them:
+
+R1 ---> R2 ---> R3 ---> R4
+
+R1 is the RSVP tunnel "head". R4 is the RSVP tunnel "tail".
+
+The RSVP's goal is to construct a tunnel from R1 ---> R4. For that to
+happen, R1 sends an RSVP message (i.e. - RSVP Path message towards
+R4). Note that the source IP of this packet is R1's IP and the
+destination IP address of this packet is R4's IP. It (the RSVP Path
+message) should pass and be processed by ALL routers along the path,
+which in this case are R2 & R3 (and finally of course R4), just as it
+says according to the RSVP RFC, section 3.1.3:
+
+"Each RSVP-capable node along the path(s) captures a Path message and
+processes it to create path state..."
+
+At some point of time, due to network issues (which are legitimate),
+R2 does NOT have a route to R4, i.e. - in the RIB and FIB (Routing
+Information Base and Forwarding Information Base) of R2, the address
+of R4 is not present, therefor, R2's networking layer in the kernel
+"thinks" it can NOT "route" packets (and in particular the RSVP Path
+message) towards R4. The RSVP application on R2, HOWEVER, as mentioned
+above, due to the presence of the IP router alert option, MUST receive
+the RSVP Path message that arrives at him (in order to process it, and
+forward it to the next "hop" down the tunnel path), but it does NOT.
+
+
+3. Linux kernel networking part:
+When the situation above takes place, i.e. - R2 does NOT have a route
+to R4, it appears, that the ROUTING logic (phase of the netfilter
+flow) that this packet traverses within R2 Linux kernel causing the
+message to be dropped, thus leaving the RSVP application NOT getting
+the message even though it should. While, on the other hand, where the
+same situation takes place, BUT R2 does HAVE a route to R4 --> the
+message is passed towards the RSVP application (via the proper
+socket). The RSVP application opens a socket and set the
+IP_ROUTER_ALERT option for it (like so: setsockopt(sockfd, IPPROTO_IP,
+IP_ROUTER_ALERT, &router_alert, sizeof(router_alert)).
+
+Recall, that in BOTH situations, the IP router alert option is present
+in the IP header packet (of the RSVP Path message), HOWEVER, it seems
+that in the "problematic" situation, it is not being considered (or
+its presence is not "strong enough" to enforce the message to be
+passed to the RSVP application).
+
+4. The "relevant" function:
+I looked a little into the Linux kernel networking code, and found the
+following function: ip_call_ra_chain (from the net/ipv4/ip_input.c
+file).
+The (main) objective of this function is to "pass" the packet to any
+"relevant" socket, which in my case will be the socket of the RSVP
+application.
+This function is invoked (used) twice:
+
+net/ipv4/ip_forward.c, line 110
+net/ipv4/ipmr.c, line 2101
+
+The call to this function in the ipmr.c file is not relevant in this
+case (but is, for example, for IGMP).
+So the only call to the ip_call_ra_chain in the flow that the RSVP
+Path message goes via, is within the ip_forward.c file, within the
+ip_forward function.
+
+5. Linux kernel networking subsystem design:
+As of my understanding of how the networking stack of Linux kernel
+works, the ip_forward function is called AFTER the IP_ROUTING logic
+takes place. So for every IP packet that arrives at some host, where
+the destination IP of the packet is NOT the IP of the host, the
+"trigger" that will pass the packet (of the RSVP path message) to the
+relevant application is the call to the ip_call_ra_chain within the
+ip_forward function (i.e. - will pass the packet to the RSVP
+application in this case).
+However, if the host that receives the IP packet does not have a route
+to the destination IP address of the packet, it will drop the packet
+EARLIER in the routing phase (net/ipv4/route.c line 2310)
+i.e. - in this case, the RSVP path message that has destination IP
+address of 4.4.4.4 arrives at 2.2.2.2 WHILE 2.2.2.2 does not have
+route to 4.4.4.4 --> so the IP router alert is not being
+taken into account, thus causing the kernel to drop the packet and not
+pass it to the RSVP application.
+
+6. Proposed solution:
+As I see it, the call to the ip_call_ra_chain needs "somehow" to be
+used "earlier" in the flow of packet traversal in the Linux kernel.
+What I am thinking to suggest is that RIGHT after the fib_lookup check
+in the above mentioned location in the code (i.e. - in
+net/ipv4/route.c line 2311), if indeed the lookup was unsuccessful
+(i.e. - err != 0) --> then the call to the ip_call_ra_chain will be
+used.
+Then, if the  ip_call_ra_chain function returns false, the code
+continues as is, while if it returns true (i.e. - the packet was
+successfully passed to all relevant sockets), then the err = 0 and the
+code will "goto out".
+
+Does that seem like a valid fix for this issue? Please let me know if
+anything else in this fix is problematic and/or anything I have not
+taken into account.
+
+Please let me know if any kind of information is needed or if anything
+is not clear in this query.
+
+Appreciate your reply!
+
+Thanks,
+Guy.
 
