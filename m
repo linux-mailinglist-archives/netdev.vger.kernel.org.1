@@ -1,125 +1,155 @@
-Return-Path: <netdev+bounces-112378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21526938B8E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:54:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B58D0938BAE
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:00:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4986B21A0D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 08:54:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7DF11C211EF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CD516938C;
-	Mon, 22 Jul 2024 08:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F3118AE4;
+	Mon, 22 Jul 2024 09:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="rCbLLRpF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VqI5usS6"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D452535280;
-	Mon, 22 Jul 2024 08:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC509523A;
+	Mon, 22 Jul 2024 09:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721638418; cv=none; b=n2/fXvNm0knur+c5eJRoL8keY4E9Ryumfx+dGBUk9cN3F7yInHdMHYqMhMXpaQa8hTh90YmYcueqj9g+nOAvY+Mb1G8b2IJ/QVf323NS2VKFYnATZqcSYKRVBjWp/wHnHMc6qkBxGCjZAzB2BABAid41C1i0wdnylN97G0gLDoM=
+	t=1721638835; cv=none; b=Jn+aHlxsVXtoQpvvZe/e5lWvtUX6nc7m60E76rBITyfwgODRxHjLjgjuKS+l9vA0RFOG+I3V3fovzQVCbIpa77PCceYDbBpH45AfyqcCwCk5QMcPCUVtkKgzZBdc/oNfSkZLX7N9Vzjo9I/707KythWQEM+iILIDJXbnLu25j00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721638418; c=relaxed/simple;
-	bh=2M6txpJs4OiG3fc/4Kurm55TcQChxwioxX65X5P68/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TMjJ92uyMTs4Q8UM9bgiiJWZVMV2o0+sfY190cGDocjlrfJlyz2TWieT9FP3fE4hFbLSsqjkAh4Iqoh1VsWPuEAYU4KGKlfGnDPoyi4VGGTf6DqrNHdlyuI8txLAMqpv5zeyuYABnoecJjeu0WNtzCVqvZozxhY1Lf+1aVeAl58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=rCbLLRpF; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 368CE2B3;
-	Mon, 22 Jul 2024 10:52:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721638374;
-	bh=2M6txpJs4OiG3fc/4Kurm55TcQChxwioxX65X5P68/A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rCbLLRpF54/qNxWj+Gvtt3g7rLu6Gz7kwmJwWO6XuJK3zOGyweKtkt2y1M+8whdOn
-	 ozcpPUVFR7Prs+0pTo/RnGqJCCQw2Ktsk4YU3AhtjKBnmCdZMwsnu1KqC3/kymFEht
-	 odC2TqwIv1wdEfVVSuSLH5ZCxD5AUOElM12TrOSU=
-Date: Mon, 22 Jul 2024 11:53:17 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240722085317.GA31279@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
- <20240721192530.GD23783@pendragon.ideasonboard.com>
- <20240722073119.GA4252@unreal>
+	s=arc-20240116; t=1721638835; c=relaxed/simple;
+	bh=e0cxkfUfv3pilNjZXjP1tP2K/9ZSiMjDQ9EsFQlgV7c=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=CcVm5FCl+nq6q0f4zthRLSItdJVFHQgQ4T9m2i2YGHoYGxh/M5uU26lkkGO5uO/0s3zlqQ7eqETXpaD6WdpmatKPTNR0OlLNUp1JMOALlpyQZDKhGvkcG1ojPy2UCERqB6IEBJ2qJciAbFbPjM//J+bH1RXtfSm7W3GMISOsAdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VqI5usS6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9FF6C32782;
+	Mon, 22 Jul 2024 09:00:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721638835;
+	bh=e0cxkfUfv3pilNjZXjP1tP2K/9ZSiMjDQ9EsFQlgV7c=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=VqI5usS676WzWHELnlHyAqGgI4xGLSESNRM4pZGFwzdB51kgDBJlWA+T+E5YcOJa4
+	 GxZF7ZEEecY32uPrxRdlFj3YDvO5UEJ2jj8xqAIhq6XJ2b1+FRK1ZFW4NXlgpepSqE
+	 sNlMBzcKmAwiF8+Nr7Vg0WVk/pWsvC7tSVryucRX2Tg0/nHNfimHMhNLnwgeM/TBge
+	 9ULXvGpS9hrwikycgW3P89YR3GeiKUWhrZIbizMVE+Q3dQw2hAFZjNI4Dbiwpv/vsZ
+	 z2Qahpi3K/H0BznZ6EYeLcFUAqL9G1l0w8ExV1eNIeeMz/GknPsX6EC3iNij5TfY2a
+	 9WEyRud/xwZEA==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240722073119.GA4252@unreal>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240718145747.131318-1-brgl@bgdev.pl>
+References: <20240718145747.131318-1-brgl@bgdev.pl>
+Subject: Re: [RFT PATCH net] net: phy: aquantia: only poll GLOBAL_CFG registers on aqr113c and aqr115c
+From: Antoine Tenart <atenart@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Jon Hunter <jonathanh@nvidia.com>
+To: Andrew Lunn <andrew@lunn.ch>, Bartosz Golaszewski <brgl@bgdev.pl>, David S . Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>
+Date: Mon, 22 Jul 2024 11:00:31 +0200
+Message-ID: <172163883154.3798.5139161262655916040@kwain.local>
 
-On Mon, Jul 22, 2024 at 10:31:19AM +0300, Leon Romanovsky wrote:
-> On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
-> > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> > > James Bottomley wrote:
-> > > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > > device specific functionality, and it is a topic that needs cross-
-> > > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > > concerns. Please consider it for a Maintainers Summit discussion.
-> > > > 
-> > > > I'm with Greg on this ... can you point to some of the contrary
-> > > > positions?
-> > > 
-> > > This thread has that discussion:
-> > > 
-> > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > > 
-> > > I do not want to speak for others on the saliency of their points, all I
-> > > can say is that the contrary positions have so far not moved me to drop
-> > > consideration of fwctl for CXL.
-> > > 
-> > > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > > making decisions about opaque command codes, and that CXL already has a
-> > > few years of experience with the commands that *do* need a Linux-command
-> > > wrapper.
-> > > 
-> > > Some open questions from that thread are: what does it mean for the fate
-> > > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > > device that crosses subsystem functionality? Would a cynical hardware
-> > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > > get device-specific commands past another subsystem's objection?
-> > 
-> > My default answer would be to trust the maintainers of the relevant
-> > subsystems (or try to convince them when you disagree :-)).
-> 
-> You know, trust is a two-way street. If you want to trust maintainers,
-> they need to trust others as well. The situation where one maintainer
-> says "I don't trust you, so I will not allow you and other X maintainers
-> to do Y" is not a healthy situation.
-> 
-> > Not only should they know the technical implications best, they should also have
-> > a good view of the whole vertical stack, and the implications of
-> > pass-through for their ecosystem. 
-> 
-> It is wishful thinking. It is clearly not true for large subsystems
-> and/or complex devices.
+Quoting Bartosz Golaszewski (2024-07-18 16:57:47)
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>=20
+> Commit 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to
+> start returning real values") introduced a workaround for an issue
+> observed on aqr115c. However there were never any reports of it
+> happening on other models and the workaround has been reported to cause
+> and issue on aqr113c (and it may cause the same on any other model not
+> supporting 10M mode).
+>=20
+> Let's limit the impact of the workaround to aqr113c and aqr115c and poll
+> the 100M GLOBAL_CFG register instead as both models are known to support
+> it correctly.
+>=20
+> Reported-by: Jon Hunter <jonathanh@nvidia.com>
+> Closes: https://lore.kernel.org/lkml/7c0140be-4325-4005-9068-7e0fc5ff344d=
+@nvidia.com/
+> Fixes: 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to star=
+t returning real values")
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  drivers/net/phy/aquantia/aquantia_main.c | 29 +++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/a=
+quantia/aquantia_main.c
+> index d12e35374231..6e3e0fc6ea27 100644
+> --- a/drivers/net/phy/aquantia/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> @@ -653,13 +653,7 @@ static int aqr107_fill_interface_modes(struct phy_de=
+vice *phydev)
+>         unsigned long *possible =3D phydev->possible_interfaces;
+>         unsigned int serdes_mode, rate_adapt;
+>         phy_interface_t interface;
+> -       int i, val, ret;
+> -
+> -       ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+> -                                       VEND1_GLOBAL_CFG_10M, val, val !=
+=3D 0,
+> -                                       1000, 100000, false);
+> -       if (ret)
+> -               return ret;
+> +       int i, val;
+> =20
+>         /* Walk the media-speed configuration registers to determine which
+>          * host-side serdes modes may be used by the PHY depending on the
+> @@ -708,6 +702,25 @@ static int aqr107_fill_interface_modes(struct phy_de=
+vice *phydev)
+>         return 0;
+>  }
+> =20
+> +static int aqr113c_fill_interface_modes(struct phy_device *phydev)
+> +{
+> +       int val, ret;
+> +
+> +       /* It's been observed on some models that - when coming out of su=
+spend
+> +        * - the FW signals that the PHY is ready but the GLOBAL_CFG regi=
+sters
+> +        * continue on returning zeroes for some time. Let's poll the 10M
 
-Are you saying that kernel communities behind large subsystems for
-complex devices generally have no idea about what they're doing ? Or
-that in a small number of particular cases those communities are
-clueless ? Or does that apply to just the maintainer, not the whole
-subsystem core developers ? I'd like to better understand the scale of
-your claim here.
+nit: 100M?
 
--- 
-Regards,
-
-Laurent Pinchart
+> +        * register until it returns a real value as both 113c and 115c s=
+upport
+> +        * this mode.
+> +        */
+> +       ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+> +                                       VEND1_GLOBAL_CFG_100M, val, val !=
+=3D 0,
+> +                                       1000, 100000, false);
+> +       if (ret)
+> +               return ret;
+> +
+> +       return aqr107_fill_interface_modes(phydev);
+> +}
+> +
+>  static int aqr113c_config_init(struct phy_device *phydev)
+>  {
+>         int ret;
+> @@ -725,7 +738,7 @@ static int aqr113c_config_init(struct phy_device *phy=
+dev)
+>         if (ret)
+>                 return ret;
+> =20
+> -       return aqr107_fill_interface_modes(phydev);
+> +       return aqr113c_fill_interface_modes(phydev);
+>  }
+> =20
+>  static int aqr107_probe(struct phy_device *phydev)
+> --=20
+> 2.43.0
+>=20
+>
 
