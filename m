@@ -1,103 +1,115 @@
-Return-Path: <netdev+bounces-112473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ABDE939677
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 00:21:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C291293967A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 00:21:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A1A528217B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 22:21:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77D271F22E8A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 22:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BA93FE46;
-	Mon, 22 Jul 2024 22:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18953F9FC;
+	Mon, 22 Jul 2024 22:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="U2espImN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4Q/MvUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA4B381B1
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 22:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF73381B1;
+	Mon, 22 Jul 2024 22:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721686902; cv=none; b=sugI0VCW31lRn0M/27jYrWaS0KN6B76/tfavXPelTTPWrNmBqLOS0AwVUOOTix6N8T9Ges3oj53BXbrLfJT41U0ggfJY9EMQDzVIPlShZm4Tp/FokowocvJ/zqzEX5CTOxqFkfznBsezXu25wdDTVT376+tIjIqFs4GtFI3aw3g=
+	t=1721686916; cv=none; b=HXpRsNwJCd/hT3qhDHIQ797zFRY68BSLDqiucxOrNdoOAZ29TpUpWPkqX423pbAEFKpEvFUUsdW/pMz+1FKmnXCbGVa07C8O4EXLQoiONaKdJs3j7udwgQCLCD29BUGhx8Zwo9QGFTHEZ+kRlsm5ynXPsmWGXqREVQq3FyN+BR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721686902; c=relaxed/simple;
-	bh=34HtSC4duPhf+8JCQbGf+fUCRFdJigXMf/wWHTIHDeM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nF4xU+dqT/wyPGBpWG+w8gywNHQqwK2dUcQ/Yb+BJMHigDRjirG1RQ2sofF4w/l1QxsloA8mJM1/gbft0UjxWA0TQ3uSutbq1eqZIqz1tuJZMK+yXAemA9Akh6fcfWQg0q0i3N5mZrag95kN1PUloIZYzIaAp6HkVsZfwMU46PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=U2espImN; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-6c386a3ac43so37890a12.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 15:21:40 -0700 (PDT)
+	s=arc-20240116; t=1721686916; c=relaxed/simple;
+	bh=zEoJmUDtZk6Beg8/fEEDQ83lRgyHVrYhdSWG5CXCTzE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dYweCnJ9IcxP7HAeeGfhGdb89g0t/xZKKagwnCnzDtBUdJroKez3xIRzGvpKgog43+OFFajVBk2aZNdmaON8Xf+PLunXtiHwueIqY1gO4CVaIqWOdva0LsQd0BAh/n5OB9VpsOfUUT4sSDzW2ETgk5D1KDaeT1NV29OUOki/0m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H4Q/MvUL; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-6bce380eb9bso94964a12.0;
+        Mon, 22 Jul 2024 15:21:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1721686900; x=1722291700; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gRJ2uTLG4AE1W2r135WxVjYfrIn0tz9jHJj9trzpqw0=;
-        b=U2espImN/kPsCHZbznGWrO8qY5uFiuMkyF5juS6aLqDjSgJ7FJzi7fEJ1Dy0V7PAVi
-         gBfSnQgp30/hARg/uio5lqpLqJVaPmlFBRUMFBv8+r+Hm6OJmyeX7YI9HwqgXlymjx4S
-         c5LN5YKsrMOWcTi+v2ogYl3Vo2F7oxhzKtwbzAttGrdux8szT/DebBdBjuBD7XjZt0kP
-         J2TW30lvPN6JfO1C6w4ELbER3oszH5Sh/PePfCrYaUo3xUs4nz6iqtib/PkmAEVTGiJE
-         ARHqFEFBYeAh6TkTwknAigQi9Rbo9ucwor2WorhalcwIiHbA6wQNKh9s9Mz1iSdgFokq
-         hHCw==
+        d=gmail.com; s=20230601; t=1721686915; x=1722291715; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zEoJmUDtZk6Beg8/fEEDQ83lRgyHVrYhdSWG5CXCTzE=;
+        b=H4Q/MvULRpqMbdXIJRtFGxFoNpGDKtsTBWJRl6nQUIOGCm/NqQOTgVbDkU2/YeGjQC
+         8EyhqAKRqn1A1gnigYlVhNPf+KdJCD/gtk5igfhMwUu2yuBG45TiqzKKp5OoQGyZhNfI
+         Ec17G/U1B35ga7Jr4yl6CbaNht4cNuSLTx63DG/D7yDmLVOOxK1WmO7enmUdMSRHWd6f
+         +YWWmuf56QAMGzbl7o1dDr+W7hjhvIrz/Hn2mGvSRUltpq/yGRlSdun9fcELoGCc40kK
+         A4jqB1eZJM1QAlaara8ToapVx8v5PIBKusvPNeyBH/bSZeHvwLkRXLXvuU1r1Y3pWWVM
+         k9Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721686900; x=1722291700;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gRJ2uTLG4AE1W2r135WxVjYfrIn0tz9jHJj9trzpqw0=;
-        b=dMXUcdhMVe9TuoBfK+1LrPZ5KADCpPWNPIxfX1JNcUezwXWAcy8P7Xo3ztsCD0wa4d
-         oSYBLhW43lnlz+EZ5Zt0rs+RqTsq9kf7CpPsrtm5u+ZwOuTaI2r20p5QcpGA5QlxBPcZ
-         737Bd2OUnbGm4fQMguLiVYxl3iV+zMfrKZgeXVqky21IRB3hWSYvgTX9R3O7sgKD72uc
-         7oLQS/I5d1kgboBKGx2b8BU2q0kXv7xPNCFtgBU1IzqTJ+j9hObv62YxOm0nOufjXinm
-         ceFQMv8wKslF9lhs8ga/q0aDJbtAStW42lThsuzagJnih8nFBQrkpGAUglJ/XtdHcJoL
-         9+hA==
-X-Forwarded-Encrypted: i=1; AJvYcCV34avU35/GQNp/yaGYVWhMJ/BMNkawafYiJmB5AEzid/yMU9srpH6C65jfyXJJ8APWsFydkvkoJ6UCHnYYnv29YOPtwa1Q
-X-Gm-Message-State: AOJu0YwDPTHUO5M79lxAH63R5IUU9BvPv6o9XTr/6C3B3QIpMV/3CpLY
-	t7FHKDTEjxXUgG0xYAaWZLPGCx5FyJKFbQ2ob3UEMHc5SV6bnwpfdONa4IJ3k/4=
-X-Google-Smtp-Source: AGHT+IGScHD6XHoPrstmVFPw+Xo8947sWS5UFvpK8ufwAvqfdOvxadY9ZmmXoO25QdpiwaLvvRLgSA==
-X-Received: by 2002:a05:6a00:6006:b0:70d:2cf6:598 with SMTP id d2e1a72fcca58-70d2cf6127amr2260050b3a.5.1721686899902;
-        Mon, 22 Jul 2024 15:21:39 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70d1fc869cdsm2974888b3a.170.2024.07.22.15.21.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jul 2024 15:21:39 -0700 (PDT)
-Message-ID: <0cc50a53-fd8f-433d-bb69-c9d3f73ceace@kernel.dk>
-Date: Mon, 22 Jul 2024 16:21:37 -0600
+        d=1e100.net; s=20230601; t=1721686915; x=1722291715;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zEoJmUDtZk6Beg8/fEEDQ83lRgyHVrYhdSWG5CXCTzE=;
+        b=iD+l+amIZACJ1YT3gBmPcUJ0x+LCRYEpgA+RZgZXDTcCmIUWA3KaIkmVQRhdgf3nZD
+         u0+9jNupoPnxEh8X5msWFTnye5sG2Ya/FFK1PzlgDXjDqkg0lsVU4Pvh0pZHpsJSkJvq
+         jtqENT9Y7cZueGogIJXFaQvNBGEwjiThEls50MOWhWR7dmutQlVS0GKAJL3Bc65A1lgL
+         DKBYULPDKFXRkmOxTwtVLCPWMNp74dnJWYx9QOXOVjpWcoy1ZE8lDMJg3hS8Xrn69h4I
+         4EzfYlZBQDsT4azAB6VxsYB9dBb4+54m6PCRCBP9Rs67x3jKKa9jx8UuhJAxNuk2UIMs
+         BoBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUelxseCeUCybuap2f1fgBtPMzcdH7fWPkecexgbQ3qvmkJS/dI6eq5Aupc+73nXzeBRu/hwkavQLSs5Q+ikrE5YVyz
+X-Gm-Message-State: AOJu0YxWqPTsefwyFlgqVRDoINgwSQ5H1Ag4A2Ii2B+1TIScyqCd2kbS
+	GuAYuIKjlZvsrLWM3b53h1Mhjex6ZPtjFSQaur2/KhkgB+NFlqvJ
+X-Google-Smtp-Source: AGHT+IGV9RvXnCH6UFby8RweMdenwdQkL+BFUsLmkVkN+u+NSDHZMrejwAUwynHCEiDctx84Wot7Aw==
+X-Received: by 2002:a05:6a20:7f87:b0:1c0:f23c:28b1 with SMTP id adf61e73a8af0-1c44f86b056mr1521860637.23.1721686914721;
+        Mon, 22 Jul 2024 15:21:54 -0700 (PDT)
+Received: from [192.168.0.235] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a23c3bd206sm2097052a12.72.2024.07.22.15.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jul 2024 15:21:54 -0700 (PDT)
+Message-ID: <459b8eefe371cb227b729ff89160ec36f69273d8.camel@gmail.com>
+Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
+ unix_inet_redir_to_connected()
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ john.fastabend@gmail.com,  kuniyu@amazon.com, Rao.Shoaib@oracle.com,
+ cong.wang@bytedance.com, Andrii Nakryiko <andrii@kernel.org>, Mykola
+ Lysenko <mykolal@fb.com>
+Date: Mon, 22 Jul 2024 15:21:49 -0700
+In-Reply-To: <205c38e28799bfe4b78a5e61fd369d5a5588694f.camel@gmail.com>
+References: <20240707222842.4119416-1-mhal@rbox.co>
+	 <20240707222842.4119416-3-mhal@rbox.co> <87zfqqnbex.fsf@cloudflare.com>
+	 <fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
+	 <87ikx962wm.fsf@cloudflare.com>
+	 <2eae7943-38d7-4839-ae72-97f9a3123c8a@rbox.co>
+	 <87sew57i4v.fsf@cloudflare.com>
+	 <027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co>
+	 <87ed7lcjnw.fsf@cloudflare.com>
+	 <205c38e28799bfe4b78a5e61fd369d5a5588694f.camel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/3] bugfix: Introduce sendpages_ok() to check
- sendpage_ok() on contiguous pages
-To: Ofir Gal <ofir.gal@volumez.com>, davem@davemloft.net,
- linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, ceph-devel@vger.kernel.org
-Cc: dhowells@redhat.com, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
- philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
- christoph.boehmwalder@linbit.com, idryomov@gmail.com, xiubli@redhat.com
-References: <20240718084515.3833733-1-ofir.gal@volumez.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240718084515.3833733-1-ofir.gal@volumez.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi,
+On Mon, 2024-07-22 at 15:07 -0700, Eduard Zingerman wrote:
 
-Who's queuing up these patches? I can certainly do it, but would be nice
-with an ack on the networking patch if so.
+[...]
 
--- 
-Jens Axboe
+Digging a little bit further, I think the behaviour mentioned was fixed
+recently by the following commit:
+
+a3cc56cd2c20 ("selftests/bpf: Use auto-dependencies for test objects")
+
+From 3 days ago.
+
+As the dependency is set from sockmap_basic.test.d,
+generated while sockmap_basic.test.o is compiled.
 
 
