@@ -1,132 +1,116 @@
-Return-Path: <netdev+bounces-112454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84B2C93926E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 18:19:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28565939277
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 18:26:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6732824FB
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:19:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B812819D6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B06616D9B2;
-	Mon, 22 Jul 2024 16:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949AC16E87C;
+	Mon, 22 Jul 2024 16:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="j2YMDRkR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UWSJXu5p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A25E2907
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 16:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A642907
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 16:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721665158; cv=none; b=u/+KMLBOLBbsnQZtCJ67CMF7I0Xm/bLGtAaKp4Od8Gb+hTgSZeHemmGcTryqB8KyFtqQjVBHWHB7MlrbQrznSeZEpVIW+xnTUSVPnZe3pTSrXBnbeKW9MbRqTkBMQEzYZcjm4y1u/QmCZJsXDvAU/tM2ddoegVqXB3vtqF1s40o=
+	t=1721665584; cv=none; b=HcVl9hnTQw1KgnGMTK+SRFrMbrsoTY+Jh9ZzdeP/6+e+LaE1EgvVQO54+Hr3w1tZpqFMS18dfi5dEfeGTpnDiU9Ii/rc6c9pcDT1G7NcH29rTqAUoSx30NuGn2Y3/3cjcN8qWOYe3mgHusRNjIQ/rlCtM78emJRbzrM+j4WSQ7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721665158; c=relaxed/simple;
-	bh=oSuZ9GzwKYm9u9rw3lZZfvwMhKfYoCJ/OrxEZNvF2Xk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=izJ3XPEiYm2KdscL/wyMd29Hjw8io1B6mgdlrsWWE7sFPCCb3khqJaeIcWfYwjmH/9JCYckLKb0QMp4tUL/vRhOczyczHjIDSsGuBGFsUuVzGupxTl6Nh2DYfLYRht1S4FrfEs3ACXTBRFBlx6hzHbdjnUR3tJklo83ognEAQa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=j2YMDRkR; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fc491f9b55so34909905ad.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 09:19:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1721665156; x=1722269956; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yXlksb4Z1J7E3IS7lXfG+qoUB9fXZVAMP1u+8w3MrMQ=;
-        b=j2YMDRkRe0UT9GGnpC8ToD6q4nSf2JLrqwGk4zC/Ft7t1/ez/wyYmem98uUfCmlo0/
-         CJxKfB8De+0A6RI+Sc0fJDcY/IFqOpPrwh6ROlm7b+IoeMPOSC8zGLGC0B6oqbErAG6A
-         ppHlCpxHbX8dQZ93QlL0xSnX6c2MkltfH9Xmo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721665156; x=1722269956;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yXlksb4Z1J7E3IS7lXfG+qoUB9fXZVAMP1u+8w3MrMQ=;
-        b=vKPm1UCmE8N13g1Hx+/LfEBVh60NnWf0o0nmKAERSLF/uZxSWRuWwa7tFdf84J/8bV
-         cam0X6cPU87eSbGB6OckmvikRTLojaCqVfG9BEnOoe0ieUXKMNRdKflovljdJKyVrJYU
-         mwp6HeHc258iyC0Br8fpfPx0NBGkvHQNI7p9Jlahkob71CprRPq0G7d4JgapQt21ZOBf
-         9QIdc7nNP7b9cXWJm4hke5IaYLVMBoo+V/blMG5sd0clnNil0UT5hf5yTUWTkIpBQRI0
-         hzSirLz1y6JCUE4p8Xw1B3AlbiSemtyK0lDIWI7qNkh+ElpNFtyxtO+uoL0V0RjgkRrE
-         RGbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUixiOBFeB53YpscGcIuJAV6lQnaB8VNeohdxOTdl2CeF5br2lmS0eJJ0h/y7RKUgPEGguFSqb1QmvHe/FkOkvTjtbrepsL
-X-Gm-Message-State: AOJu0YyTq/+/PmYY89rR96GJLqSroovMOLugRnYkcaq2uJi+h7lP3KvV
-	oC6q7Le4eKo3CDrSy072ZL7n9wf53xt8zr8qOrmlmHrvi5A3B1Xrj0a/yvTYuYo=
-X-Google-Smtp-Source: AGHT+IHurzTTaVPTX5lLk+TTfSyV3Yu/0YWjmvliHmLuEOZY45K9H7OEpXuodNn8MEGoAsMwHUQWKQ==
-X-Received: by 2002:a17:902:c406:b0:1f6:f0fe:6cc9 with SMTP id d9443c01a7336-1fd7461c163mr47470395ad.54.1721665155867;
-        Mon, 22 Jul 2024 09:19:15 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f290f5dsm56637285ad.71.2024.07.22.09.19.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 09:19:15 -0700 (PDT)
-Date: Mon, 22 Jul 2024 09:19:13 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: David Wei <dw@davidwei.uk>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, netdev@vger.kernel.org,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>
-Subject: Re: [PATCH RFC net-next] bonding: Remove support for use_carrier
-Message-ID: <Zp6GgddK80vPZbCX@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	David Wei <dw@davidwei.uk>, Jay Vosburgh <jv@jvosburgh.net>,
-	netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>
-References: <2730097.1721581672@famine>
- <900054ae-be78-4d5e-aa5a-cb3ad91599e5@davidwei.uk>
+	s=arc-20240116; t=1721665584; c=relaxed/simple;
+	bh=UyZaZjuiGAGlsyQJO9G5s022uxUrMSghFksQSEdmGtA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XRpKz6uzhGhf110sQIvp4SwbVSsyDktpCmJT99mv3j4m5Thd2HJrMSn0rJtX1LrqM5rGOERPKRuq40DRyR2IehGSPKFP5E2x4cn8odEg44q2Vx2BCLETelesQlQWgSKH9fGAVLUz8X5lKUA0IXTezyxokxSiIarsYE2JkTr/h5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UWSJXu5p; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721665583; x=1753201583;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=UyZaZjuiGAGlsyQJO9G5s022uxUrMSghFksQSEdmGtA=;
+  b=UWSJXu5pZmp0O984grAZ/F4qTyM7okPuGoNeh+l1vsuNm3lEMmFS8i/e
+   zBCv4/fjuPJ4z5ru6RO6yisao87euGzviwp+aMtqShELnRKMJdCQV/PX4
+   UhwcU+NPCHAOQQwC7wULKssgC7wfI1Gcj0nq48MD38+qtAyx/OJofKZho
+   fzXQEBJSJJOW26FHRJ69B4BNxjjfI2yPmEMe+CMBmAIPW0TSIQXWoaWwp
+   qCQk+eLhgjoIWzHJL67DvkFXN6nnnfKvnHM2YX8/ZZv8fd4gUq8pY15HI
+   MVE58vmd9KM1uXOQajSpA0dd/qRutaqT4/l4OHrMTwCKz/5B70q8mKQTy
+   A==;
+X-CSE-ConnectionGUID: kA6Do4/3T4Gs8iBpdh08NQ==
+X-CSE-MsgGUID: ceDqzwcZQn6HUAfshaTjuQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11141"; a="18864444"
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="scan'208";a="18864444"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 09:26:22 -0700
+X-CSE-ConnectionGUID: MJfk8nFcR9yhhlSdYKqyrQ==
+X-CSE-MsgGUID: A60aTNn1Sya+WZABJyDnMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="scan'208";a="82950304"
+Received: from dosuchow-mobl2.ger.corp.intel.com (HELO [10.94.250.30]) ([10.94.250.30])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 09:26:21 -0700
+Message-ID: <faaf8123-0450-4ddb-ae86-50b8be1385dc@linux.intel.com>
+Date: Mon, 22 Jul 2024 18:26:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <900054ae-be78-4d5e-aa5a-cb3ad91599e5@davidwei.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: Introduce
+ netif_device_attach/detach into reset flow
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20240722122839.51342-1-dawid.osuchowski@linux.intel.com>
+ <cb7758d3-3ba5-404d-b9e4-b22934d21e68@molgen.mpg.de>
+ <0e5e0952-7792-4b9b-8264-8edd3c788fa8@linux.intel.com>
+ <232df828-baa3-4c87-b5f3-c0dae9d98356@molgen.mpg.de>
+Content-Language: pl
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+In-Reply-To: <232df828-baa3-4c87-b5f3-c0dae9d98356@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jul 21, 2024 at 11:28:23PM -0700, David Wei wrote:
-> On 2024-07-21 10:07, Jay Vosburgh wrote:
-> > 	Remove the implementation of use_carrier, the link monitoring
-> > method that utilizes ethtool or ioctl to determine the link state of an
-> > interface in a bond.  The ability to set or query the use_carrier option
-> > remains, but bonding now always behaves as if use_carrier=1, which
-> > relies on netif_carrier_ok() to determine the link state of interfaces.
-> > 
-> > 	To avoid acquiring RTNL many times per second, bonding inspects
-> > link state under RCU, but not under RTNL.  However, ethtool
-> > implementations in drivers may sleep, and therefore this strategy is
-> > unsuitable for use with calls into driver ethtool functions.
-> > 
-> > 	The use_carrier option was introduced in 2003, to provide
-> > backwards compatibility for network device drivers that did not support
-> > the then-new netif_carrier_ok/on/off system.  Device drivers are now
-> > expected to support netif_carrier_*, and the use_carrier backwards
-> > compatibility logic is no longer necessary.
-> > 
-> > Link: https://lore.kernel.org/lkml/000000000000eb54bf061cfd666a@google.com/
-> > Link: https://lore.kernel.org/netdev/20240718122017.d2e33aaac43a.I10ab9c9ded97163aef4e4de10985cd8f7de60d28@changeid/
-> > Signed-off-by: Jay Vosburgh <jv@jvosburgh.net>
-> > 
-> > ---
-> > 
-> > 	I've done some sniff testing and this seems to behave as
-> > expected, except that writing 0 to the sysfs use_carrier fails.  Netlink
-> > permits setting use_carrier to any value but always returns 1; sysfs and
-> > netlink should behave consistently.
+On 22.07.2024 16:35, Paul Menzel wrote:
+>> Maybe "Add netif_device_attach/detach" would be the best for this, as 
+>> the attaching and detaching doesn't happen only during reset.
 > 
-> Net-next is closed until 28 July. Please resubmit then.
+> I’d consider it too generic and would mention the place. But if it’s not 
+> possible, then it’s not. Maybe:
+> 
+>> Attach/detach device before starting/stopping queues
+>
 
-AFAICT, the subject line is marked as RFC (although it is a bit
-confusing as it mentions both PATCH and RFC), but my understanding
-is that RFCs are accepted at any time.
+Okay, will wait for some more feedback from other folks, maybe they'll 
+have some input about the naming of the title as well.
+
+>> Once the driver is fully initialized:
+>> # echo 1 > /sys/class/net/ens1f0np0/device/reset
+>> and then once that is in progress, from another terminal:
+>> # ethtool -c ens1f0np0
+>>
+>> Would you like me to include those in the commit message as well?
+> 
+> I’d find it helpful, but I am no maintainer.
+
+I will include it in the commit message.
+
+> 
+> Kind regards,
+> 
+> Paul
+
+--Dawid
 
