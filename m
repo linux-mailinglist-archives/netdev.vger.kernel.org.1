@@ -1,165 +1,174 @@
-Return-Path: <netdev+bounces-112384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063E2938C2B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:42:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 757D1938C70
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A18991F219E1
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36CF72845DC
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D459416A945;
-	Mon, 22 Jul 2024 09:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="LwozCgo2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50DDF16D301;
+	Mon, 22 Jul 2024 09:45:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.6])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0508B26ADB
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 09:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.6
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97ADB16CD1C;
+	Mon, 22 Jul 2024 09:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721641317; cv=none; b=hY86SXLxjObpxu2xSSkaEpefK38pD4tjpRj08DyzJsYcahIbxDnVINOIXU2Su0fShh7VEgSgkBl2LD3v9WqrYVfC44zpsUwAF6xenjOjOOAbJPnBRsI9/hYjo1m0xfVFLyinHZgCeg/hE/p2s729O07dwkQxYcEmVKvP4n+R59g=
+	t=1721641505; cv=none; b=THrzRZMZ0xi7k/HfXxeJ0G1p1nc0FobQjyWC9O6D9a6eYI9V8M4vvtVSxVG1BiAF4dfhi5LtcFO1h1nq9rklME24BgVk8oy9CSmH9HyBlfeHZNV4pj4SQh6BUAOwLMjZffwsCpcK+yT/gPsxNI+X+/keAQV+pqVG0qv+9KjCH0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721641317; c=relaxed/simple;
-	bh=Wzq748dIIUkgOnN7auC0wKZzIokzeIK+4vYosMtcUKo=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=quHf5EGJ+unF8g9R0uCnISr4AnQJ2STkWg1fljPGT4JDYGmLYsxom6Y04pgiICG5tfZKpCpvGtXPMCdisBIKbCRte+FzVCqQuYFU9qSnuFU5M4dno40DimNJi8VBlkSNeo7tFL8fzLToQ+u/GjBB/feUg1kcgMpoBskrF14qsIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=LwozCgo2; arc=none smtp.client-ip=220.197.31.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=gPT7hkfMhbHv3fUO2r
-	WQEG4hLgcPuqfdjvaE1i5pT5c=; b=LwozCgo267S24E1ZF5aUtuuCkT8Z/HPnSe
-	Ne+GX8Pn+xE1SuzRP7YyL4a12v3qXG75z/uY15TPb2Yu6waKuPQEd8CCEB1BB6vc
-	nvi/hgytlSbIJNjFf5urVATgFPwiAsY135bR1XGYK3TcJ19DLqvG0Ll2DafDUzNI
-	fCp+Ddsqs=
-Received: from localhost.localdomain (unknown [111.48.58.12])
-	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wDXv2BBKZ5mQRNlAQ--.11942S2;
-	Mon, 22 Jul 2024 17:41:22 +0800 (CST)
-From: xiaolinkui@126.com
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Linkui Xiao <xiaolinkui@kylinos.com>
-Subject: [PATCH] tcp/dccp: replace using only even ports with all ports
-Date: Mon, 22 Jul 2024 17:41:19 +0800
-Message-Id: <20240722094119.31128-1-xiaolinkui@126.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:_____wDXv2BBKZ5mQRNlAQ--.11942S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGryrAw17Jr4Utry8Zr1rtFb_yoW5try7p3
-	yDKr1ktF1DtF1UKr1qvFykArySyw1kAF1DCF4kuwsIka4DJrnIqFZ2krsY9FyUuF40vFyj
-	kay0qr18AF15W3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jjmhwUUUUU=
-X-CM-SenderInfo: p0ld0z5lqn3xa6rslhhfrp/1tbiOgUk1mVExrV7DQAAsp
+	s=arc-20240116; t=1721641505; c=relaxed/simple;
+	bh=1g2d5q1Q7bi70ZFX/boaMrq4aTqtzniQBGMEhshUuWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KsVT7PjBx1fzUUhC13lQd30+mAu9TDqhZlXxQ/I8tklV9+OeyxPux4C6QPUco2UJ4E5MHmIWdAfhk0lGNrN0swe4HOWcX0RQHF7eKB4d4KrLRyfCoGDaiip+yBhlyrLRQfOkfhLIGtH889IQA6GjRc2wVIT8t9QjE9E1Bdcsn7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52f04b3cb33so1135258e87.0;
+        Mon, 22 Jul 2024 02:45:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721641501; x=1722246301;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BqSAPXeU7//xQzF5D3KvNuPxtZjwj+8S9xO2DCeCvNQ=;
+        b=jiLzaJOqJK0srlCJhTHLe/zhpI3XwHTEEPE1QNksGPM1Ca5OsoWP/wjRt0JlupCd5q
+         HklvX3BPxMpUAZlMU67br13N0mQDvUDIXvDQIsz3RW/9QseU/3kBRQuTuy6szuTpOE02
+         E2E7KS49N0OasBD4ydXfsfWu7zvFZEOuek4fVpCXYfimsOn9DFM6Cfpkola4vMKzlP0B
+         EEFs3rrknJUDMEW+ZX3+zxZwC2EMRkPadVTPnfpDtHvrKdG+4eszWtRYIDaRzxLUl9gl
+         K9BeCDZEA9WnIAKw9rF/3rsXpBGcWeLt3wE/j5FLy1JkSqc3SD5QFBJ1ZzBMtSdlylhR
+         LGdg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhUD65Ja/n1J8YGZaMYanJsJyn535gNfQweUzJRBzcRxZicAJdwezKj0bKWQ8l2DZzxQYmcKG1Gq13lsan3kHrPNH1e+Pufd1keCkN1TgSBo9OpD8G5BDTDjx6gEiPIUeXCoY+
+X-Gm-Message-State: AOJu0YxnD6lqu9tgG8AJhAlDEo9SvHLyE/4toZPR3fuq876W/9uiRKev
+	QypJ2QJImbcz+lCOZ4zjsEHYv96I5VcZl4/0VRYR4iy2X/Gq6MJ+
+X-Google-Smtp-Source: AGHT+IGK+uXHXqFkBqoNCUoaMd5o2qIhNCPmbjmyQLSs9GFkgwdEOtcvBDBx1xDF9P5TVdSlKYR3pA==
+X-Received: by 2002:a05:6512:3409:b0:52e:976a:b34b with SMTP id 2adb3069b0e04-52efb53bcc4mr4181809e87.15.1721641500332;
+        Mon, 22 Jul 2024 02:45:00 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7a3c951212sm397529766b.208.2024.07.22.02.44.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jul 2024 02:45:00 -0700 (PDT)
+Date: Mon, 22 Jul 2024 02:44:57 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Rik van Riel <riel@surriel.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, thepacketgeek@gmail.com, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	paulmck@kernel.org, davej@codemonkey.org.uk
+Subject: Re: [RFC PATCH 2/2] netconsole: Defer netpoll cleanup to avoid lock
+ release during list traversal
+Message-ID: <Zp4qGdGk7vLJaCPs@gmail.com>
+References: <20240718184311.3950526-1-leitao@debian.org>
+ <20240718184311.3950526-3-leitao@debian.org>
+ <5145c46c47d98d917c8ef1401cdac15fc5f8b638.camel@surriel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5145c46c47d98d917c8ef1401cdac15fc5f8b638.camel@surriel.com>
 
-From: Linkui Xiao <xiaolinkui@kylinos.com>
+Hello Rik,
 
-In commit 207184853dbd ("tcp/dccp: change source port selection at connect()
-time"), the purpose is to address the issue of increased costs when all even
-ports are in use.
+On Thu, Jul 18, 2024 at 03:53:54PM -0400, Rik van Riel wrote:
+> On Thu, 2024-07-18 at 11:43 -0700, Breno Leitao wrote:
+> > 
+> > +/* Clean up every target in the cleanup_list and move the clean
+> > targets back to the
+> > + * main target_list.
+> > + */
+> > +static void netconsole_process_cleanups_core(void)
+> > +{
+> > +	struct netconsole_target *nt, *tmp;
+> > +	unsigned long flags;
+> > +
+> > +	/* The cleanup needs RTNL locked */
+> > +	ASSERT_RTNL();
+> > +
+> > +	mutex_lock(&target_cleanup_list_lock);
+> > +	list_for_each_entry_safe(nt, tmp, &target_cleanup_list,
+> > list) {
+> > +		/* all entries in the cleanup_list needs to be
+> > disabled */
+> > +		WARN_ON_ONCE(nt->enabled);
+> > +		do_netpoll_cleanup(&nt->np);
+> > +		/* moved the cleaned target to target_list. Need to
+> > hold both locks */
+> > +		spin_lock_irqsave(&target_list_lock, flags);
+> > +		list_move(&nt->list, &target_list);
+> > +		spin_unlock_irqrestore(&target_list_lock, flags);
+> > +	}
+> > +	WARN_ON_ONCE(!list_empty(&target_cleanup_list));
+> > +	mutex_unlock(&target_cleanup_list_lock);
+> > +}
+> > +
+> > +/* Do the list cleanup with the rtnl lock hold */
+> > +static void netconsole_process_cleanups(void)
+> > +{
+> > +	rtnl_lock();
+> > +	netconsole_process_cleanups_core();
+> > +	rtnl_unlock();
+> > +}
+> > 
 
-But in my testing environment, this more cost issue has not been resolved.
+First of all, thanks for reviewing this patch.
 
-The testing environment is as follows:
-1. build an HTTP server(http://192.168.55.1:9999/);
-2. on the client side, use the ab command to test the number of connections,
-then kill it and simulate a large number of TIME-WAIT connections:
+> I've got what may be a dumb question.
+> 
+> If the traversal of the target_cleanup_list happens under
+> the rtnl_lock, why do you need a new lock.
 
-TARGET_TIME_WAIT=16384
-CONCURRENCY=20000
-MAX_CONCURRENCY=20000
-MIN_CONCURRENCY=5000
+Because the lock protect the target_cleanup_list list, and in some
+cases, the list is accessed outside of the region that holds the `rtnl`
+locks.
 
-while true; do
-  CURRENT_TIME_WAIT=$(ss -tanp | grep TIME-WAIT | wc -l)
-  echo "Current TIME_WAIT connections: $CURRENT_TIME_WAIT"
+For instance, enabled_store() is a function that is called from
+user space (through confifs). This function needs to populate
+target_cleanup_list (for targets that are being disabled). This
+code path does NOT has rtnl at all.
 
-  if [ "$CURRENT_TIME_WAIT" -lt "$TARGET_TIME_WAIT" ]; then
-    if [ "$CONCURRENCY" -lt "$MAX_CONCURRENCY" ]; then
-      CONCURRENCY=$((CONCURRENCY + 5000))
-      if [ "$CONCURRENCY" -gt "$MAX_CONCURRENCY" ]; then
-        CONCURRENCY=$MAX_CONCURRENCY
-      fi
-      echo "Increasing concurrency to: $CONCURRENCY"
-    fi
-  elif [ "$CURRENT_TIME_WAIT" -gt "$TARGET_TIME_WAIT" ]; then
-    if [ "$CONCURRENCY" -gt "$MIN_CONCURRENCY" ]; then
-      CONCURRENCY=$((CONCURRENCY - 5000))
-      if [ "$CONCURRENCY" -lt "$MIN_CONCURRENCY" ]; then
-        CONCURRENCY=$MIN_CONCURRENCY
-      fi
-      echo "Decreasing concurrency to: $CONCURRENCY"
-    fi
-  fi
+> and why is there
+> a wrapper function that only takes this one lock, and then
+> calls the other function?
 
-  ab -r -n 100000 -c "$CONCURRENCY" http://192.168.55.1:9999/ &
+I assume that the network cleanup needs to hold rtnl, since  it is going
+to release a network interface. Thus, __netpoll_cleanup() needs to be
+called protected by rtnl lock.
 
-  AB_PID=$!
-  sleep 1
-  kill $AB_PID
-  sleep 1
-done
+That said, netconsole calls `__netpoll_cleanup()` indirectly through 2
+different code paths.
 
-On the client side, use the command "mpstat - P ALL 1" to monitor the load
-situation.It can be observed that the load of %sys decreased by about 50%
-after patching.
+	1) From enabled_store() -- userspace disabling the interface from
+	   configfs.
+		* This code path does not have `rtnl` held, thus, it needs
+		  to be held along the way.
 
-Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.com>
----
- net/ipv4/inet_hashtables.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+	2) From netconsole_netdev_event() -- A network event callback
+		* This function is called with `rtnl` held, thus, no
+		  need to acquire it anymore.
 
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 48d0d494185b..4192531ba2d3 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1007,7 +1007,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	u32 remaining, offset;
- 	int ret, i, low, high;
- 	bool local_ports;
--	int step, l3mdev;
-+	int l3mdev;
- 	u32 index;
- 
- 	if (port) {
-@@ -1020,7 +1020,6 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	l3mdev = inet_sk_bound_l3mdev(sk);
- 
- 	local_ports = inet_sk_get_local_port_range(sk, &low, &high);
--	step = local_ports ? 1 : 2;
- 
- 	high++; /* [32768, 60999] -> [32768, 61000[ */
- 	remaining = high - low;
-@@ -1041,7 +1040,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		offset &= ~1U;
- other_parity_scan:
- 	port = low + offset;
--	for (i = 0; i < remaining; i += step, port += step) {
-+	for (i = 0; i < remaining; i += 1, port += 1) {
- 		if (unlikely(port >= high))
- 			port -= remaining;
- 		if (inet_is_local_reserved_port(net, port))
-@@ -1108,8 +1107,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	 * on low contention the randomness is maximal and on high contention
- 	 * it may be inexistent.
- 	 */
--	i = max_t(int, i, get_random_u32_below(8) * step);
--	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + step);
-+	i = max_t(int, i, get_random_u32_below(8) * 1);
-+	WRITE_ONCE(table_perturb[index], READ_ONCE(table_perturb[index]) + i + 1);
- 
- 	/* Head lock still held and bh's disabled */
- 	inet_bind_hash(sk, tb, tb2, port);
--- 
-2.17.1
 
+> Are you planning a user of netconsole_process_cleanups_core()
+> that already holds the rtnl_lock and should not use this
+> wrapper?
+
+In fact, this patch is already using it today. See its invocation from
+netconsole_netdev_event().
+
+> Also, the comment does not explain why the rtnl_lock is held.
+> We can see that it grabs it, but not why. It would be nice to
+> have that in the comment.
+
+Agree. I will add this comment in my changes.
+
+Thank you!
+--breno
 
