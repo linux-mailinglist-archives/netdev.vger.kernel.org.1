@@ -1,212 +1,330 @@
-Return-Path: <netdev+bounces-112376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33199938AAF
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:06:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A126E938B2E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:26:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E14612819D3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 08:06:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5C8B1C20EB9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 08:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584D015252D;
-	Mon, 22 Jul 2024 08:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C0E1662E9;
+	Mon, 22 Jul 2024 08:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=l-acoustics.com header.i=@l-acoustics.com header.b="a3WTl0Rm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PAUP264CU001.outbound.protection.outlook.com (mail-francecentralazon11021088.outbound.protection.outlook.com [40.107.160.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989BD17C6C
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 08:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721635586; cv=none; b=XHC5eBTdn8B71wqyiEAKOsHnE/mAwz//8xvhM0l4mGKQWvYy09NSs5kFyUavHlALUo3Bn1Hmo2PARCb6Ln+Yvx7dgNcKQ8L4d1zJrd8YAYeAR0ceZAbgPMfXCkcCSUYVEaJ2c20FOWLIRSG9JtJkp08pBMnWImJeUcv17SD/tsg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721635586; c=relaxed/simple;
-	bh=Tztv15GA0jDJ8wirKSfVmwvfoijI42T+uf/er9IoVoc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tbBKBP3wtGLhKp+QuVDBP8PzCeMGia6SneMwpRK90FFXsrjRFM+NL7GXkUs7rqhaYK8Apn+Lhl+5Oe3Miw/tz0vZ1x/+Od6Kh2uNTWp1AEXCndXr6WnrJkh7bk/7lIkAF8rZ6OY+62+xLS+DmU2kq1kJmZwedMYUL4LJjZa7P6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-397fb955949so52312175ab.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 01:06:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721635584; x=1722240384;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=69J89KLrUK12TTHqyH7Dz6jarc8Rim8Ka3YADKSO6rs=;
-        b=aC66un1qgIqjHIor52xXnlx7v61Qn+dNvHPastDDcSVGV+xDxdoy+5/SZwc2/uVqQj
-         ikDdc4/97orQkTcT3/9siuuWG4FZ3fQG5hDBx1Foigdmy+2vpnmECHzCipsEAjjdFgJg
-         A6/7BFgT8ajcwAeAm66IzS0i3rjfIuVL+w8zxyaxNtoVYrua/gYRJrzAgXd0WQ1JHUYD
-         zVjQch/xtfmKTi+mT8fdH3Z/VluFc33PMqg0/L9Xr9HVtF2H5RhFC+ukCEmJseUNgInm
-         dD8pCpCKL7ISx4BCoc+Go/WYv58uQOj3KsRqSuJAfGYunSg/BNmrs07Ha+pFEuSHuuDp
-         91gw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoXjsGXGf216wBMqcmOO10OPBwwKyxqo4Wd2PP8Sv5uAGxqjZGOtSAa141sf7YC/LykJUVgW86ol3iPHTSP8KPJ9i6ZjJR
-X-Gm-Message-State: AOJu0YxsfuwKOdUH80urz+/7Kk9f1BFLa5NP6FWcqGwLy2NfQ18YGV1Q
-	0CTJOdKKCxR/Rjx+9SpGfeZpnJcZyR3VvRfDWs0WdZ3cT87z14wcTsdfRtpgnP20KWwxvep+MVD
-	SrBQ3NNF7qp302roAQUvuJfvzCmJlPrp/B6SPzCOi2mqQN+KuGTOt5b8=
-X-Google-Smtp-Source: AGHT+IEHP2yRvlO8jlbzYGXNfkmKVjT8do1WU2EVTnvMtnOEcpz8Txw568wrkVqCJp//zqtsAWQ4hdOyKw0zD1jbEI6SwuRnyLNA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D143161326;
+	Mon, 22 Jul 2024 08:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.160.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721636758; cv=fail; b=j4B3VmRzY0d5RGXRgfcOvanrWSC8nQeEPZl05uVif5ju5XxMmA7OLqza7vFdMAuUymc8E74IQRm57m9kBGTpK6HVssqXy5Rcy+DlB3GYTOSyqjW1B0o51g131eoQ2yFmAPF1ZcZT0WN8OgVb30O0gjXo4VPyh3ouARSkOK1x0Gs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721636758; c=relaxed/simple;
+	bh=3hWWTKwkMqq1A8gBwRFX1bq3WCcLK+FQMQv3FSjJ52Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=EBTiEQKQ/hAanojkezDfuSNSzAAgTi1RlFGPUh159Igax4cyrqTxXeIFb00HccnGycnBXZfi68vW1inbynI9lfz5TQ8tzRBJiyLFWQLxBPACCfbWOc3QfVGg7NNoIz3leZYy8/XoHXJhUN+zk9TWrci7+LIepxToEndHxDg+15U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=l-acoustics.com; spf=pass smtp.mailfrom=l-acoustics.com; dkim=pass (1024-bit key) header.d=l-acoustics.com header.i=@l-acoustics.com header.b=a3WTl0Rm; arc=fail smtp.client-ip=40.107.160.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=l-acoustics.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=l-acoustics.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TcjeeAGRV0tM6o2AN29vdx3JMg5ZsYM8QM9Ci9rEb0WHCnJpQIMj7s4Ogkal+zUHJrJ4++r4HITLJdnJBK866J+2eUj/nKDHzOBl/aMop2+Du/k2H8aezfA3E9z9Iy8a/BXvxF0wO1O0Vx37TOzKuwU2HxnGs5NFjQA7znTxPENOvOcLc9AqeDG72Aq29k+MHhOIg4gDRBuPYuek69AoorScx0c4L8etALpe8S66R1y7WrFzmNpxyBw/RjHS8vNMgqHdasNntR4lHY+8YqyFxkASCEevuzR7ifv1+mQPOw4jlyExz9hr5IM/YHeYJvVk6TBFVkWkKiobmQe4FWsFXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Y71VKafGctelsd0XLJpasQNfYyj3DBc16kxr8EVIfrs=;
+ b=xx8X86dJVupwTEmNMuu9nwhrsFeDqOrHsutrT/q9KKtpJ6tfAx8PbS9Jr9wh2A8v4aGWo/8iJ40cjuVkF2ChAxSZLjtKUkcrTZfo7PJ94GE9bnD1xiuRKfoT7TNmUwsPu/W8IBKlyy2SwPupAw6AfMZplZA0Su2ziyvuCGMxdXFDbwO7fzpyU7U9jtcbP8MYYHgQjjPJSjN0imNj67M62cgUNLcMozfhN9YAft6GuubDL6meVXHP1ZQqSp7Ul2BRGbBFS6qkuDsugCMDDET9/B3ZpMJoIXCgGdeHi4k0faBE+zn0U6LulEjB5p4dA8AOqh2nzj7Ym91vit9Lya8R+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=l-acoustics.com; dmarc=pass action=none
+ header.from=l-acoustics.com; dkim=pass header.d=l-acoustics.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=l-acoustics.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Y71VKafGctelsd0XLJpasQNfYyj3DBc16kxr8EVIfrs=;
+ b=a3WTl0RmxI8PPKvuVR6MKVDGdpcMfm0xyH8xSTEiCeRYOuFcOH/KXqm2xyeevLUPrv8ScXMuPGovd22TufjVu/svRdJs0glSssDoORbTZHIf2bvEJLp5ugrTH+ndXvUKR9Thq9crNdJjeMVl1QZbT01avxNYmJ6n694LhzF1vjY=
+Received: from PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:25d::9)
+ by MR0P264MB4890.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:4e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.20; Mon, 22 Jul
+ 2024 08:25:51 +0000
+Received: from PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::8062:2bfa:50b2:8368]) by PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::8062:2bfa:50b2:8368%5]) with mapi id 15.20.7784.017; Mon, 22 Jul 2024
+ 08:25:51 +0000
+From: Rodrigo CADORE CATALDO <rodrigo.cadore@l-acoustics.com>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, "Abdul Rahim, Faizal"
+	<faizal.abdul.rahim@linux.intel.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Simon
+ Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>, Paul
+ Menzel <pmenzel@molgen.mpg.de>, Sasha Neftin <sasha.neftin@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2 2/3] igc: Fix reset adapter
+ logics when tx mode change
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2 2/3] igc: Fix reset adapter
+ logics when tx mode change
+Thread-Index: AQHa0yMzVmPogmS4tkOu4N6MFlYsB7HxasMAgABqGoCACLNUAIAA+8EAgAbwiXA=
+Date: Mon, 22 Jul 2024 08:25:51 +0000
+Message-ID:
+ <PR0P264MB446411F81A817554D03922B2C8A82@PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM>
+References: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
+ <20240707125318.3425097-3-faizal.abdul.rahim@linux.intel.com>
+ <87o774u807.fsf@intel.com>
+ <6bb1ba4a-41ba-4bc1-9c4b-abfb27944891@linux.intel.com>
+ <87le27ssu4.fsf@intel.com>
+ <2c5a0dcf-f9b0-49da-9dea-0a276fa4a0d9@linux.intel.com>
+ <87msmf3cdd.fsf@intel.com>
+In-Reply-To: <87msmf3cdd.fsf@intel.com>
+Accept-Language: en-US, fr-FR
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-lsi-version: 1.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=l-acoustics.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PR0P264MB4464:EE_|MR0P264MB4890:EE_
+x-ms-office365-filtering-correlation-id: 4ef00e93-ce8a-4c11-1bd8-08dcaa27e5b5
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?GlGZMDOYDYf6iBhHk7YkU4m6JTQH2QbFpCUhCNADG419Zjenl+LsMVzEskx3?=
+ =?us-ascii?Q?Oi0a1IJ0fFjVG9EsuXt2Pm2M6HRwvwTHEzNpAGBBT7ZQIhuxI0RFsaLvhI87?=
+ =?us-ascii?Q?X7jLsEA9oPlW14HaMdtawBpYTjbJkYY8s75sz+cCpEp9xXL7rIsAGhHHvMML?=
+ =?us-ascii?Q?FBWI9gzFnvI5XC2nWEwET1z/dzJFmDOVIvVipyBfYtmgMpixucxJfKf/vlC4?=
+ =?us-ascii?Q?SF20UY9rBjeDNCldUxG+50LiAF7uugU6kO7ebQaXLn7lyxtlK/0R6GdtT6L/?=
+ =?us-ascii?Q?Qa1EfCpChcQRwd74LNULuFQI2nVi4ohvVzaL4h8DwgnlaB75vLQJySY9r6EB?=
+ =?us-ascii?Q?9x4qxc8cEcMJLzYH/54z8rC94dDT6Bpc9XBtMUn3SnIFUC1l/6smo+M2WnD6?=
+ =?us-ascii?Q?52EaRwRT0nOuaRwJMjnQkYuhEcuYI77R542GXm9r4/+G44FSOTJ1z9G0MHml?=
+ =?us-ascii?Q?OETXmcL4vMcGxuuooSoiXKfoaQAXHAEJqYrScwOV9f/SgByCpaw4j6Qy1DtV?=
+ =?us-ascii?Q?n8iM8RVeVeTFtu30ZUgmAdmvTtxthLZ2usVgvp9CdThzIWFBbQkGZ+vPOpmG?=
+ =?us-ascii?Q?migWDJ0AxhGBPsYoRiWAUwjrgBSlzmwk9luJvtvrcAsdqGeJkvIXw9AqPwh5?=
+ =?us-ascii?Q?NGly12NzoJK0pibc0Y2bPhqpUOYVObf7z9fHRSlVR+vdJo1vUoVAzB/sxiEh?=
+ =?us-ascii?Q?8d0Vnw9LpI/yjKQdsQ8QKejd7o2H50b0s4CPvwBb6BoaGwyVgVdYVl2qWSEB?=
+ =?us-ascii?Q?UPqSrw1rNfA89LFFZaPlAvjEalPt7TBlzyi7YCqz0tVpMjWGXyPUC+cEdlJG?=
+ =?us-ascii?Q?BbvaEprvWrsIcPqxDrhvHuBJSG7/0HDyIpP10YsjnP0Cl2k1JNEsqBLYrU2K?=
+ =?us-ascii?Q?VnsQCQ7GOTahSV5EsP0ZIZZtvsjcORuuLsvuSYm6IQoATM5Ac79IwTYOjkiv?=
+ =?us-ascii?Q?TPh/K4alGbE/WE0j4wCWshPYgSfARyvUNrTt2xGbGQ7IHk4Cougalg9/n3Ex?=
+ =?us-ascii?Q?igrvDYZ7nM3cLswmg4zR/KQgQNpRLm/FospaqUgW7xKAKv8aqP2kOcy4ujj0?=
+ =?us-ascii?Q?KaasNoBshNVDEczGhX1ms2tPUWaYLR4/SqHAZpiTDezZp2VElUzue5etDqFB?=
+ =?us-ascii?Q?y9Oz6OlGVaelKqzLsacUiPS8udB9/+6MyI6cdOuBPq1eZzQad5TNB6BenmSk?=
+ =?us-ascii?Q?fFZsmr08vc+PlyBycBIxANisQ0fy6xJf2Bz19BhAW8eyqoRYbHG8hOdIR/26?=
+ =?us-ascii?Q?a5M8rOyW+GgFKGIx4ZK1X5DJIzIGZDybHR6UX01mV9kAV/q7n8aaN3QhgFdW?=
+ =?us-ascii?Q?d2h7GKzIM1f4uA2t7chCGDIeg+EoMIntJwJTLjhxmM1lHvSQw0FMBPkwisHn?=
+ =?us-ascii?Q?Y64rObqbbTzAku5/gC407mMeZroY87+NuSosDcZqVZnkCEANAf2GzFeyCaGP?=
+ =?us-ascii?Q?FCyAe+eUHRk=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?XgoI6BImgSJtF91URHkg2WwDXZR91AJIhh/4+8naGjUuKVHKQcWWfb9/YCLO?=
+ =?us-ascii?Q?dCbiAoBA6D4SoWWdC7cgd0ysWFMOJUZuUvwvQk0vwnFyURx4UpsP2oTTJCNh?=
+ =?us-ascii?Q?zV8ZlkGklAi4XjLE9zANV1XDxTRcCIyyGMZqheyuNhPwRaDnFwKq1V7zcvub?=
+ =?us-ascii?Q?j4kkfj7AtqEQlFVlt/TO6GabPKlDSz0AEKdhTvCNUJ0UYkl/Hoj2TmjYnwqb?=
+ =?us-ascii?Q?xZ1/eyqOizs+eZbD2uDweNV47e/bBzBydJPgiHgVD6ZRTfF5pIZqMhsuDm7s?=
+ =?us-ascii?Q?feFwSdXB+QYJf7VRLVn9IoKcQ9VP9qndH9bsYMb5zuhGO01bZaJCgV4/y2fX?=
+ =?us-ascii?Q?TptOU0l49r0SFhpcwnL1NnB+REGicCzOxXnNAyrLHGJqO/lGmYuHbokC9hyN?=
+ =?us-ascii?Q?ukDWfnsplAMjSluOKvPOfqmYcOYmSLfGFQCpdcvAEYfK6mC4TwJMQ1It8ABR?=
+ =?us-ascii?Q?lzPQYqFjm5empFjOz9UYy7ZVVVjV1Bx6oQNm5UCD9Q0yN754CLz0KiCK39Dk?=
+ =?us-ascii?Q?IDmiuaKKkTDny+u3glnNX8nHfg+xZYg+sxUXrUGEZmd4nVod+Hq3CBNX17Lw?=
+ =?us-ascii?Q?zst4zLSxQ29dIVFf6zuHE28IvJAyZmTJq+EfZoask3n8i0OVHlwArBLU/SCY?=
+ =?us-ascii?Q?H2FzLAx/xKvxeoADnvdNEc/WCS9SCGVAUihcvuGpSvGd+fR59ON5x8ksD3ae?=
+ =?us-ascii?Q?iCNlb+0Logf1aMlTc8Y7TKI9178l4DNvjNPEb858eQrfXfDQ+Ac8fTTOYXfZ?=
+ =?us-ascii?Q?zgO+eaxUjoIisOqUj4vNd3OhI3HXDQFDyog9WIlOTXoSOUhunIFCSjFjQsTo?=
+ =?us-ascii?Q?lswNqo67Ig5jJ40cUuXe2RNh1A7pOnkmXJ78JK016iUZ8tfo92Aqfd0Kf3Vu?=
+ =?us-ascii?Q?5vEnSIjqjy9zs28IBeMazMUJOFT6LM7aUMEBEJpYP7pRRHBvSXTWFMmDwYwZ?=
+ =?us-ascii?Q?JCIG9oP0Rsr2RXsNwW83ZVoUONqOjpr1hB0ckBTNvmeVP3d36wmFOF/3iS93?=
+ =?us-ascii?Q?fWLsRKzmyHw55tlTDOV7teS68c28HwXmR4htfUjBinHgCb8hovu4buCmhtlj?=
+ =?us-ascii?Q?+eiLzNF1LJSYIlWoug2cVBZ/wGCJGvkh+1OXOfut+CtF1nJZ1PsJEverR6va?=
+ =?us-ascii?Q?Mw0RuDgaOXkgTFA5uuXUN549Gj4mEFy+MuZEOjB/kjM5CgsZ40tHvJE/eE3m?=
+ =?us-ascii?Q?rjo+y6vjiwdTiwD5XYMUaWSSfGEFT+Yb+3htzOurWDQDt2sLPZIfUzeWQ1yh?=
+ =?us-ascii?Q?H1S2nE4kdomSW6dJb9HI6HDmjdmOgq7r2buzCJZQtbYRZYGeAvk2cuPWFR7K?=
+ =?us-ascii?Q?/mXonrp6x1306zLXFMtt+cr+iEmwSleSjGn0BdBNEFJwh8IMeIzzKgI78Wpk?=
+ =?us-ascii?Q?JWTpCm+srhZMxwL1+7jzLRsl3V2wb80q9gpFE6miy22mbDYbLcs0rIm56LR2?=
+ =?us-ascii?Q?NY1ibPKKYd9OekuTUPciXXmA1qTc7GfRcRfd6tS/ymfStxDnKTcEGQbKkFI5?=
+ =?us-ascii?Q?1W6CEkQEqafS/9e6XZ0nwpMY7MeQmGFD1oAbkUqvFuzYr2D9GLoqSSb/9vGB?=
+ =?us-ascii?Q?HsEHufis5QxLXNKWfd2g7If9Yqz6lC4dTLR0HR9T8GGzyAc9w1uaoG7w2C9R?=
+ =?us-ascii?Q?7g=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:218d:b0:381:24e:7a85 with SMTP id
- e9e14a558f8ab-398e430f855mr3255005ab.1.1721635583827; Mon, 22 Jul 2024
- 01:06:23 -0700 (PDT)
-Date: Mon, 22 Jul 2024 01:06:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000683629061dd18557@google.com>
-Subject: [syzbot] [usb?] WARNING: ODEBUG bug in netdev_release
-From: syzbot <syzbot+5ce05015d99fda6eaccd@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: l-acoustics.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4ef00e93-ce8a-4c11-1bd8-08dcaa27e5b5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2024 08:25:51.3450
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 68e431e8-d632-483e-ae79-f28a7b4c69e6
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Z/IglzwGjatOj/mOw4I/gEruDA2tY4k3bq84VQOp11w1v1BO9HTncsR6dO3f70u3Q/VHa/YJeRe98/x1OLR1Lwc5SvuEXNa5CMVMKLMF260=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MR0P264MB4890
 
-Hello,
+Vinicius Costa Gomes <vinicius.gomes@intel.com> writes:=20
 
-syzbot found the following issue on:
+> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Hi,
+>=20
+> "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
+>=20
+> > On 12/7/2024 1:10 am, Vinicius Costa Gomes wrote:
+> >> "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
+> >>
+> >>> Hi Vinicius,
+> >>>
+> >>> On 11/7/2024 6:44 am, Vinicius Costa Gomes wrote:
+> >>>> Faizal Rahim <faizal.abdul.rahim@linux.intel.com> writes:
+> >>>>
+> >>>>> Following the "igc: Fix TX Hang issue when QBV Gate is close" chang=
+es,
+> >>>>> remaining issues with the reset adapter logic in igc_tsn_offload_ap=
+ply()
+> >>>>> have been observed:
+> >>>>>
+> >>>>> 1. The reset adapter logics for i225 and i226 differ, although they=
+ should
+> >>>>>      be the same according to the guidelines in I225/6 HW Design Se=
+ction
+> >>>>>      7.5.2.1 on software initialization during tx mode changes.
+> >>>>> 2. The i225 resets adapter every time, even though tx mode doesn't
+> change.
+> >>>>>      This occurs solely based on the condition  igc_is_device_id_i2=
+25() when
+> >>>>>      calling schedule_work().
+> >>>>> 3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It o=
+nly
+> >>>>>      resets adapter for legacy->tsn tx mode transitions.
+> >>>>> 4. qbv_count introduced in the patch is actually not needed; in thi=
+s
+> >>>>>      context, a non-zero value of qbv_count is used to indicate if =
+tx mode
+> >>>>>      was unconditionally set to tsn in igc_tsn_enable_offload(). Th=
+is could
+> >>>>>      be replaced by checking the existing register
+> >>>>>      IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
+> >>>>>
+> >>>>> This patch resolves all issues and enters schedule_work() to reset =
+the
+> >>>>> adapter only when changing tx mode. It also removes reliance on
+> qbv_count.
+> >>>>>
+> >>>>> qbv_count field will be removed in a future patch.
+> >>>>>
+> >>>>> Test ran:
+> >>>>>
+> >>>>> 1. Verify reset adapter behaviour in i225/6:
+> >>>>>      a) Enrol a new GCL
+> >>>>>         Reset adapter observed (tx mode change legacy->tsn)
+> >>>>>      b) Enrol a new GCL without deleting qdisc
+> >>>>>         No reset adapter observed (tx mode remain tsn->tsn)
+> >>>>>      c) Delete qdisc
+> >>>>>         Reset adapter observed (tx mode change tsn->legacy)
+> >>>>>
+> >>>>> 2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is cl=
+osed"
+> >>>>>      to confirm it remains resolved.
+> >>>>>
+> >>>>> Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is close=
+d")
+> >>>>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> >>>>> Reviewed-by: Simon Horman <horms@kernel.org>
+> >>>>> ---
+> >>>>
+> >>>> There were a quite a few bugs, some of them my fault, on this part o=
+f
+> >>>> the code, changing between the modes in the hardware.
+> >>>>
+> >>>> So I would like some confirmation that ETF offloading/LaunchTime was
+> >>>> also tested with this change. Just to be sure.
+> >>>>
+> >>>> But code-wise, looks good:
+> >>>>
+> >>>> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> >>>>
+> >>>>
+> >>>> Cheers,
+> >>>
+> >>>
+> >>> Tested etf with offload, looks like working correctly.
+> >>>
+> >>> 1. mqprio
+> >>> tc qdisc add dev enp1s0 handle 100: parent root mqprio num_tc 3 \
+> >>> map 2 2 1 0 2 2 2 2 2 2 2 2 2 2 2 2 \
+> >>> queues 1@0 1@1 2@2 \
+> >>> hw 0
+> >>>
+> >>> No reset adapter observed.
+> >>>
+> >>> 2. etf with offload
+> >>> tc qdisc replace dev enp1s0 parent 100:1 etf \
+> >>> clockid CLOCK_TAI delta 300000 offload
+> >>>
+> >>> Reset adapter observed (tx mode legacy -> tsn).
+> >>>
+> >>> 3. delete qdisc
+> >>> tc qdisc delete dev enp1s0 parent root handle 100
+> >>>
+> >>> Reset adapter observed (tx mode tsn -> legacy).
+> >>>
+> >>
+> >> That no unexpected resets are happening, is good.
+> >>
+> >> But what I had in mind was some functional tests that ETF is working. =
+I
+> >> guess that's the only way of knowing that it's still working. Sorry th=
+at
+> >> I wasn't clear about that.
+> >>
+> >>
+> >> Cheers,
+> >
+> > My bad.
+> >
+> > Just tested ETF functionality and it is working.
+> >
+>=20
+> Awesome. Thanks for the confirmation:
+>=20
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+>=20
+>=20
+> Cheers,
+> --
+> Vinicius
 
-HEAD commit:    2c9b3512402e Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1725d011980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4a55984b4a68171
-dashboard link: https://syzkaller.appspot.com/bug?extid=5ce05015d99fda6eaccd
-compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=112544ad980000
+Hello Vinicius and Abdul,
+(I wanted to reply to the original email from Abdul, but I subscribed too
+late, so I'm replying to the last message. Apologies in advance)
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-2c9b3512.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4dd60a3afdae/vmlinux-2c9b3512.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7ddd99272b4b/zImage-2c9b3512.xz
+This patch is very useful for us in L-Acoustics.
+According to Milan/AVB specification, we must use CBS for streaming audio.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5ce05015d99fda6eaccd@syzkaller.appspotmail.com
+Until this patch, we could not change the CBS configuration at runtime for =
+i225.
+For instance, adding or removing streams would cause the card to reset and
+drop all streams.
 
-cdc_ncm 1-1:1.0 usb0: unregister 'cdc_ncm' usb-dummy_hcd.0-1, CDC NCM (NO ZLP)
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 4334 at lib/debugobjects.c:515 debug_print_object+0xc4/0xd8 lib/debugobjects.c:515
-ODEBUG: free active (active state 0) object: 84c3a7cc object type: work_struct hint: usbnet_deferred_kevent+0x0/0x388 drivers/net/usb/usbnet.c:630
-Modules linked in:
-Kernel panic - not syncing: kernel: panic_on_warn set ...
-CPU: 1 PID: 4334 Comm: kworker/1:4 Not tainted 6.10.0-syzkaller #0
-Hardware name: ARM-Versatile Express
-Workqueue: usb_hub_wq hub_event
-Call trace: 
-[<818efbe0>] (dump_backtrace) from [<818efcdc>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:257)
- r7:00000000 r6:82622804 r5:00000000 r4:81feae20
-[<818efcc4>] (show_stack) from [<8190d370>] (__dump_stack lib/dump_stack.c:88 [inline])
-[<818efcc4>] (show_stack) from [<8190d370>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:114)
-[<8190d31c>] (dump_stack_lvl) from [<8190d3b0>] (dump_stack+0x18/0x1c lib/dump_stack.c:123)
- r5:00000000 r4:82864d0c
-[<8190d398>] (dump_stack) from [<818f0784>] (panic+0x120/0x358 kernel/panic.c:347)
-[<818f0664>] (panic) from [<80241f54>] (check_panic_on_warn kernel/panic.c:240 [inline])
-[<818f0664>] (panic) from [<80241f54>] (print_tainted+0x0/0xa0 kernel/panic.c:235)
- r3:8260c5c4 r2:00000001 r1:81fd3f0c r0:81fdb594
- r7:80826ddc
-[<80241ee0>] (check_panic_on_warn) from [<80242148>] (__warn+0x7c/0x180 kernel/panic.c:693)
-[<802420cc>] (__warn) from [<80242434>] (warn_slowpath_fmt+0x1e8/0x1f4 kernel/panic.c:726)
- r8:00000009 r7:8203a2f4 r6:ea749a8c r5:83d81800 r4:00000000
-[<80242250>] (warn_slowpath_fmt) from [<80826ddc>] (debug_print_object+0xc4/0xd8 lib/debugobjects.c:515)
- r10:00000005 r9:84c3a000 r8:81a01b64 r7:82063da4 r6:828c8614 r5:ea749b34
- r4:8260cda8
-[<80826d18>] (debug_print_object) from [<8082867c>] (__debug_check_no_obj_freed lib/debugobjects.c:990 [inline])
-[<80826d18>] (debug_print_object) from [<8082867c>] (debug_check_no_obj_freed+0x254/0x2a0 lib/debugobjects.c:1020)
- r8:84c3a800 r7:84c3a7cc r6:00000100 r5:00000003 r4:00000000
-[<80828428>] (debug_check_no_obj_freed) from [<804bb71c>] (slab_free_hook mm/slub.c:2202 [inline])
-[<80828428>] (debug_check_no_obj_freed) from [<804bb71c>] (slab_free mm/slub.c:4464 [inline])
-[<80828428>] (debug_check_no_obj_freed) from [<804bb71c>] (kfree+0x1a0/0x340 mm/slub.c:4585)
- r10:82778cc0 r9:84f0b080 r8:84c3a000 r7:804614a8 r6:82c023c0 r5:ddea47e0
- r4:84c3a000
-[<804bb57c>] (kfree) from [<804614a8>] (kvfree+0x2c/0x30 mm/util.c:696)
- r10:82778cc0 r9:84f0b080 r8:84c3a000 r7:00000000 r6:85096780 r5:85152000
- r4:84c3a000
-[<8046147c>] (kvfree) from [<8145906c>] (netdev_release+0x2c/0x34 net/core/net-sysfs.c:2031)
- r5:85152000 r4:84c3a000
-[<81459040>] (netdev_release) from [<80a6417c>] (device_release+0x38/0xa8 drivers/base/core.c:2581)
- r5:85152000 r4:84c3a3c0
-[<80a64144>] (device_release) from [<818c9a3c>] (kobject_cleanup lib/kobject.c:689 [inline])
-[<80a64144>] (device_release) from [<818c9a3c>] (kobject_release lib/kobject.c:720 [inline])
-[<80a64144>] (device_release) from [<818c9a3c>] (kref_put include/linux/kref.h:65 [inline])
-[<80a64144>] (device_release) from [<818c9a3c>] (kobject_put+0xc8/0x1f8 lib/kobject.c:737)
- r5:81b49224 r4:84c3a3c0
-[<818c9974>] (kobject_put) from [<80a643a8>] (put_device+0x18/0x1c drivers/base/core.c:3787)
- r7:84f0b800 r6:84c3a10c r5:84c3a000 r4:00000000
-[<80a64390>] (put_device) from [<8140e054>] (free_netdev+0x114/0x18c net/core/dev.c:11196)
-[<8140df40>] (free_netdev) from [<80d3b2d0>] (usbnet_disconnect+0xac/0xf0 drivers/net/usb/usbnet.c:1636)
- r6:84c3a794 r5:84c3a680 r4:00000000
-[<80d3b224>] (usbnet_disconnect) from [<80d9fa70>] (usb_unbind_interface+0x84/0x2c4 drivers/usb/core/driver.c:461)
- r8:00000044 r7:84f0b830 r6:82778cc0 r5:00000000 r4:84f0b800
-[<80d9f9ec>] (usb_unbind_interface) from [<80a6c284>] (device_remove drivers/base/dd.c:568 [inline])
-[<80d9f9ec>] (usb_unbind_interface) from [<80a6c284>] (device_remove+0x64/0x6c drivers/base/dd.c:560)
- r10:00000000 r9:84f0b080 r8:00000044 r7:84f0b874 r6:82778cc0 r5:00000000
- r4:84f0b830
-[<80a6c220>] (device_remove) from [<80a6d79c>] (__device_release_driver drivers/base/dd.c:1270 [inline])
-[<80a6c220>] (device_remove) from [<80a6d79c>] (device_release_driver_internal+0x18c/0x200 drivers/base/dd.c:1293)
- r5:00000000 r4:84f0b830
-[<80a6d610>] (device_release_driver_internal) from [<80a6d828>] (device_release_driver+0x18/0x1c drivers/base/dd.c:1316)
- r9:84f0b080 r8:82cd1f40 r7:82cd1f38 r6:82cd1f0c r5:84f0b830 r4:82cd1f30
-[<80a6d810>] (device_release_driver) from [<80a6b90c>] (bus_remove_device+0xcc/0x120 drivers/base/bus.c:574)
-[<80a6b840>] (bus_remove_device) from [<80a65a24>] (device_del+0x148/0x38c drivers/base/core.c:3868)
- r9:84f0b080 r8:83d81800 r7:04208060 r6:00000000 r5:84f0b830 r4:84f0b874
-[<80a658dc>] (device_del) from [<80d9d48c>] (usb_disable_device+0xdc/0x1f0 drivers/usb/core/message.c:1418)
- r10:00000000 r9:00000000 r8:84f0b800 r7:84f0b000 r6:8508fec8 r5:00000001
- r4:00000038
-[<80d9d3b0>] (usb_disable_device) from [<80d922ec>] (usb_disconnect+0xec/0x29c drivers/usb/core/hub.c:2304)
- r10:00000001 r9:846e9800 r8:84f0b0c4 r7:83d6d400 r6:84f0b080 r5:84f0b000
- r4:60000113
-[<80d92200>] (usb_disconnect) from [<80d94e9c>] (hub_port_connect drivers/usb/core/hub.c:5361 [inline])
-[<80d92200>] (usb_disconnect) from [<80d94e9c>] (hub_port_connect_change drivers/usb/core/hub.c:5661 [inline])
-[<80d92200>] (usb_disconnect) from [<80d94e9c>] (port_event drivers/usb/core/hub.c:5821 [inline])
-[<80d92200>] (usb_disconnect) from [<80d94e9c>] (hub_event+0xd78/0x194c drivers/usb/core/hub.c:5903)
- r10:00000001 r9:00000101 r8:83a3bd00 r7:84f0b000 r6:83d6cc00 r5:83d6d610
- r4:00000001
-[<80d94124>] (hub_event) from [<802658fc>] (process_one_work+0x1b4/0x4f4 kernel/workqueue.c:3231)
- r10:82e5c805 r9:83d81800 r8:01800000 r7:ddde4000 r6:82e5c800 r5:83a3bd00
- r4:85073080
-[<80265748>] (process_one_work) from [<802664e0>] (process_scheduled_works kernel/workqueue.c:3312 [inline])
-[<80265748>] (process_one_work) from [<802664e0>] (worker_thread+0x1ec/0x3f4 kernel/workqueue.c:3390)
- r10:83d81800 r9:850730ac r8:61c88647 r7:ddde4020 r6:82604d40 r5:ddde4000
- r4:85073080
-[<802662f4>] (worker_thread) from [<8026f538>] (kthread+0x104/0x134 kernel/kthread.c:389)
- r10:00000000 r9:df815e78 r8:85020a00 r7:85073080 r6:802662f4 r5:83d81800
- r4:85072440
-[<8026f434>] (kthread) from [<80200114>] (ret_from_fork+0x14/0x20 arch/arm/kernel/entry-common.S:134)
-Exception stack(0xea749fb0 to 0xea749ff8)
-9fa0:                                     00000000 00000000 00000000 00000000
-9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
- r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:8026f434 r4:85072440
-Rebooting in 86400 seconds..
+To be precise, we submit a netlink request via `tc change` command every
+time a stream is added/removed.
 
+We were using a home-made patch that I planned to submit, but I forgot..
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+I tested this patch, and it is working as expected for CBS runtime changes.
+Thank you!
 
