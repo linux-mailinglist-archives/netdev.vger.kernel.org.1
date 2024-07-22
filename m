@@ -1,124 +1,243 @@
-Return-Path: <netdev+bounces-112460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC8B9393D7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 20:48:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 767EC9393EA
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 20:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61294281B4D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 18:48:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7D721F20F17
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 18:58:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF85F16EBFE;
-	Mon, 22 Jul 2024 18:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08689170829;
+	Mon, 22 Jul 2024 18:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JoAHdBDL"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="aHuY+Qr4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8617238DC7;
-	Mon, 22 Jul 2024 18:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6806171068
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 18:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721674082; cv=none; b=JqbwZboyfHA7/13MSwXrafH8Pnw4UNfF9QxzhnCjVj9yC0n6gPirHtZ+SF23E5amwmBG8BmT1IUKcwwvvZnOpicscGjVhQbdSRzuszA8M15BBu7TWXhrasKtsqiwi/0uvbmeonmDa+MxefSVLJjkW1gh39bDFGJW4J//v3gBQeg=
+	t=1721674710; cv=none; b=dTbG+Lkb2N33BL8wclIdKT3OKLZmHB/3fgxsomKsNIXYyiuCbn8aXrVPgFbfbp+Trz4cLndclgkIpZOe2IAIKHQzj2gqNaqELK+EK7Fivvo3WpXi/7RTEkcIwGr3cE+8+ZSsAKmiLt+6klKjcVBgxVLEiXD6RTm/jPMeDGhlhWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721674082; c=relaxed/simple;
-	bh=YT1G6z6f1UMio3qlxrxQpaN1hLCP2KlC0vYZ7ZElp8M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IJghtrGr/7ak08YSqI81swoJ8bAGdgAlMjAJamvFODKmV5vqW3Wd2ZTgEWaBEkXPMkvJwGtKdi7bJwm2u7Edx0Y5Ro09tnaD07UCFGIXScXoQyuoAxxgW1uw43UpdYGukxRcZOinzzgMQQ2ITfaCZSeU6t78/UO9bO7Sw0JPXzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JoAHdBDL; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-70d2b27c115so890189b3a.2;
-        Mon, 22 Jul 2024 11:48:01 -0700 (PDT)
+	s=arc-20240116; t=1721674710; c=relaxed/simple;
+	bh=bZnZyVjgC/n7IxgvXCwJgq0MpSi5iqn+Ydo69uBqjEE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uFVoM+iDxG+zrOVAxQAChi+cgxh5Da/7BOFdEJhlyGuA5sSqe7/Rrb25cxx4pDpKWVAZMM1zpfr6ReAAmvwxCHiDIwLmATk55NA/crumOO7nuBrlKcRSncV3OlDueuT4QzsuSjpjhen1+zZn2uGMsnv3JoKovj+ygnXAI5tBFjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=aHuY+Qr4; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so40322245e9.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 11:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721674081; x=1722278881; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YT1G6z6f1UMio3qlxrxQpaN1hLCP2KlC0vYZ7ZElp8M=;
-        b=JoAHdBDLHDCRo3sjj/2eHOAEw/4ZjEo6x7RC8wFayQfTbBsiYcrDR5oOcHIXQJDX2o
-         +F3Ri7IcxB/0JGD8ruPj2ueMWnR+A4EFmg0OjLAk8KX6e+folOSjM01eqAxP95wma267
-         8q4Kb7sT1H2k8QQBnBcDA1zDiFEdlE9TwTt2IudC1t4yuIY0S5d63pU7j2i5SLWE/ZcN
-         K3FXCA34NBJU35BSjRKxgbXBMkmJf7dHVy+rSS4gGCFizj9qyeX0ozHwwIG299XXbdg/
-         X112pzny9hAsIWTmsf17JoPuQTs51IRTE8gr2+G0oYzZw54mVsJWfgsyQrthW7djkF+Y
-         mNxw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1721674707; x=1722279507; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oSZY3a5sCrRsG7FKZtKUzWBxPQy6Q3D03lPoiirtlDM=;
+        b=aHuY+Qr49nXXG9PW/F/ebfeDdoTDKpyS7EZLSQuaKeJ6kRMoBN9Frn46kzYPxUUBvX
+         HA6srX4lHAAw+l3C7Plj4ceyMR+iC2Ssm9u7YLHFqz0BmrevZ81XrgzPLJnWX9BxNXlp
+         ZYY2eU0at4eDrx9W8vh5uvdE8u+iJLtoQLdUrsdhWeTnBsk0AIkU0aJln4MOeabXCBtq
+         TNl1T/5b1LRX0pjVhO1CUlw69Gsmo2g+A6Dimuy+eWsS0VsPdo2qedbjIqtEYNpgPnjB
+         u4k45+l+bp8dtGQewC+1XBCrj3VFGBoEBUZApPV1zugJ/skqwVUawZStxNHH5/xWuavr
+         U8PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721674081; x=1722278881;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YT1G6z6f1UMio3qlxrxQpaN1hLCP2KlC0vYZ7ZElp8M=;
-        b=hHgW554neioFK7OJP08JBfKhOMAMvIGXJH173EymB5F9k+r2yb1Is2dtytnvGDvW2c
-         NJPIFKeAAjvBXWS6TIFtTWV5VvC6QWq51SaCnqQoLVWZ0Tjm6wgyT+exot6j9SwOhEgZ
-         TOEvnIeUjVf+KoYQujn+CfFEnj2RHQj3s/zwdau8omjCEKZOAeIxXOJx+SbLVl7RFJi8
-         hkP32S+qyHIJ28C4YJoXntjttrp8rtye3qVhv7mXZztXJAIFjTAlEuWHc9/Nhj8w0Srk
-         /IfqFQMXLQV18qWJRiZKOQQf7QxebCRWn+VG2X3VILMu1bRrn/HL72LR/QmJ3DoZr5kh
-         fZvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUv0qxVysNat7E2O4aDmdI4SDH4BgggCE+IvURLU5yaBWs9fHLMXFNwtps5xN+q0KyM68K83lE3ow9N2t3sUkVmtTyQuhStCYbPlKfLTRHvlAeCeyhGYoEfGOi99YJQr4oFMHhbGv7dCNgSxEEL
-X-Gm-Message-State: AOJu0Yze0isgIvmk0tcd2rNsji/ok3K3nQBAB97HabyuAASP8LBmj0y2
-	KMZZYaBo4rfKLbS07WakM/uYrmmFwRpuGTu3V+lw/cdFdfSmTiXk
-X-Google-Smtp-Source: AGHT+IFARhx17YmjAw/Ctt/erbqqFO5Sa/JclzO9trxS0oMrVio9oi5pziQSNFQ11V0kvMfY19t0OA==
-X-Received: by 2002:a05:6a00:ac4:b0:704:2f65:4996 with SMTP id d2e1a72fcca58-70d0efa433dmr9672732b3a.11.1721674080736;
-        Mon, 22 Jul 2024 11:48:00 -0700 (PDT)
-Received: from [192.168.0.235] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a0de7abd43sm3162257a12.23.2024.07.22.11.47.59
+        d=1e100.net; s=20230601; t=1721674707; x=1722279507;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oSZY3a5sCrRsG7FKZtKUzWBxPQy6Q3D03lPoiirtlDM=;
+        b=dWO5hY3UAlMTJ/s5vLPhFVLgVTsCipQczAA/yzl0lB32eeC8Rf8AJR1+WilI2FrixM
+         Qm+qzA4O1yV/LBv9SK3daWxzc044F4xyFf4UNIMqo8L55y+QjJ5uA5qZPIihEjdnHbFj
+         IXJ0FGj84w99gOHnjFBFfRCUhTyBs5b9ZedJDnsXWuhzKCRYCz5i49cmLtZ3ljoAdfPx
+         XGnXZEWARzLfq6ySSseLGBCNUgSlN/VC/PjSV1FeNZFAzUu+9YrKrvVqL2hEAJhuHPjt
+         DEikYh7u1ydsu9Z5kQSet0LO342DLIwU4maLvrUkAqDjOREkj5ldqljeAMycXQF0hb12
+         qGrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4rYFatX88KNLDRUFZrm0UUJ1w2rW8k4rc0SkVcqVRa9nh+MrBVjJn1aiNvAX9/cWLgEDnyaHWBd3QgsbHgO8/OBlAIAEe
+X-Gm-Message-State: AOJu0YxiCk+J0SD8wORGJ/B0l3MofyZ3M9gLYlk+Jpf0j+Q42w3nrzkd
+	lG/6U6MQdiEXlsBM39WVKaQQJFjdS0w4jCuQ18ZbRFppVdYrZvD0yttCtHGyVFQ=
+X-Google-Smtp-Source: AGHT+IFKnwma/l8XcIBVJ1AahKfE1nABxV76uuc7X6Caa2pMFz7G3OrOEZawNYjRK/7BL3NpyBzrqA==
+X-Received: by 2002:a05:600c:3109:b0:426:6857:3156 with SMTP id 5b1f17b1804b1-427dc55bc49mr65497715e9.27.1721674706943;
+        Mon, 22 Jul 2024 11:58:26 -0700 (PDT)
+Received: from blmsp ([2001:4091:a245:8609:c1c4:a4f8:94c8:31f2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d7263687sm136561655e9.4.2024.07.22.11.58.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 11:48:00 -0700 (PDT)
-Message-ID: <0e46dcf652ff0b1168fc82e491c3d20eae18b21d.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v2 5/9] bpf, verifier: improve signed ranges
- inference for BPF_AND
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Shung-Hsi Yu <shung-hsi.yu@suse.com>, Xu Kuohai
- <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
- linux-security-module@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-  Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Yonghong Song <yonghong.song@linux.dev>,  KP Singh
- <kpsingh@kernel.org>, Roberto Sassu <roberto.sassu@huawei.com>, Matt
- Bobrowski <mattbobrowski@google.com>, Yafang Shao <laoar.shao@gmail.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>, "Jose E . Marchesi"
- <jose.marchesi@oracle.com>, James Morris <jamorris@linux.microsoft.com>,
- Kees Cook <kees@kernel.org>, Brendan Jackman <jackmanb@google.com>, Florent
- Revest <revest@google.com>
-Date: Mon, 22 Jul 2024 11:47:55 -0700
-In-Reply-To: <wjvdnep2od4kf3f7fiteh73s4gnktcfsii4lbb2ztvudexiyqw@hxqowhgokxf3>
-References: <20240719110059.797546-1-xukuohai@huaweicloud.com>
-	 <20240719110059.797546-6-xukuohai@huaweicloud.com>
-	 <a5afdfca337a59bfe8f730a59ea40cd48d9a3d6b.camel@gmail.com>
-	 <wjvdnep2od4kf3f7fiteh73s4gnktcfsii4lbb2ztvudexiyqw@hxqowhgokxf3>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+        Mon, 22 Jul 2024 11:58:26 -0700 (PDT)
+Date: Mon, 22 Jul 2024 20:58:25 +0200
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Tony Lindgren <tony@atomide.com>, Judith Mendez <jm@ti.com>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux@ew.tq-group.com, 
+	Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: Kernel hang caused by commit "can: m_can: Start/Cancel polling
+ timer together with interrupts"
+Message-ID: <4zzmw4ijqxn4jkycteaz3wv5qcvi5gqdcrsdytk2jhe2f2tb7r@k5hesykr3gmz>
+References: <e72771c75988a2460fa8b557b0e2d32e6894f75d.camel@ew.tq-group.com>
+ <c93ab2cc-d8e9-41ba-9f56-51acb331ae38@leemhuis.info>
+ <h7lmtmqizoipzlazl36fz37w2f5ow7nbghvya3wu766la5hx6d@3jdesa3ltmuz>
+ <08aabeaf-6a81-48a9-9c5b-82a69b071faa@leemhuis.info>
+ <734a29a87613b9052fc795d56a30690833e4aba9.camel@ew.tq-group.com>
+ <76faeb323353b584b310f2f1b53e9b2745d2f12c.camel@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <76faeb323353b584b310f2f1b53e9b2745d2f12c.camel@ew.tq-group.com>
 
-On Mon, 2024-07-22 at 20:57 +0800, Shung-Hsi Yu wrote:
+On Wed, Jul 03, 2024 at 02:50:04PM GMT, Matthias Schiffer wrote:
+> On Tue, 2024-07-02 at 12:03 +0200, Matthias Schiffer wrote:
+> > On Tue, 2024-07-02 at 07:37 +0200, Linux regression tracking (Thorsten Leemhuis) wrote:
+> > > 
+> > > 
+> > > On 01.07.24 16:34, Markus Schneider-Pargmann wrote:
+> > > > On Mon, Jul 01, 2024 at 02:12:55PM GMT, Linux regression tracking (Thorsten Leemhuis) wrote:
+> > > > > [CCing the regression list, as it should be in the loop for regressions:
+> > > > > https://docs.kernel.org/admin-guide/reporting-regressions.html]
+> > > > > 
+> > > > > Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+> > > > > for once, to make this easily accessible to everyone.
+> > > > > 
+> > > > > Hmm, looks like there was not even a single reply to below regression
+> > > > > report. But also seens Markus hasn't posted anything archived on Lore
+> > > > > since about three weeks now, so he might be on vacation.
+> > > > > 
+> > > > > Marc, do you might have an idea what's wrong with the culprit? Or do we
+> > > > > expected Markus to be back in action soon?
+> > > > 
+> > > > Great, ping here.
+> > > 
+> > > Thx for replying!
+> > > 
+> > > > @Matthias: Thanks for debugging and sorry for breaking it. If you have a
+> > > > fix for this, let me know. I have a lot of work right now, so I am not
+> > > > sure when I will have a proper fix ready. But it is on my todo list.
+> > > 
+> > > Thx. This made me wonder: is "revert the culprit to resolve this quickly
+> > > and reapply it later together with a fix" something that we should
+> > > consider if a proper fix takes some time? Or is this not worth it in
+> > > this case or extremely hard? Or would it cause a regression on it's own
+> > > for users of 6.9?
+> > > 
+> > > Ciao, Thorsten
+> > 
+> > Hi,
+> > 
+> > I think on 6.9 a revert is not easily possible (without reverting several other commits adding new
+> > features), but it should be considered for 6.6.
+> > 
+> > I don't think further regressions are possible by reverting, as on 6.6 the timer is only used for
+> > platforms without an m_can IRQ, and on these platforms the current behavior is "the kernel
+> > reproducibly deadlocks in atomic context", so there is not much room for making it worse.
+> > 
+> > Like Markus, I have writing a proper fix for this on my TODO list, but I'm not sure when I can get
+> > to it - hopefully next week.
+> > 
+> > Best regards,
+> > Matthias
+> 
+> A small update from my side:
+> 
+> I had a short look into the issue today, but I've found that I don't quite grasp the (lack of)
+> locking in the m_can driver. The m_can_classdev fields active_interrupts and irqstatus are accessed
+> from a number of different contexts:
 
-[...]
+After looking into the code as well and trying to fix as much as
+possible:
 
-> > As a nitpick, I think that it would be good to have some shortened
-> > version of the derivation in the comments alongside the code.
->=20
-> Agree it would. Will try to add a 2-4 sentence explanation.
->=20
-> > (Maybe with a link to the mailing list).
->=20
-> Adding a link to the mailing list seems out of the usual for comment in
-> verifier.c though, and it would be quite long. That said, it would be
-> nice to hint that there exists a more verbose version of the
-> explanation.
->=20
-> Maybe an explicit "see commit for the full detail" at the end of
-> the added comment?
+> - active_interrupts is *mostly* read and written from the ISR/hrtimer callback, but also from
+> m_can_start()/m_can_stop() and (in error paths) indirectly from m_can_poll() (NAPI callback). It is
+> not clear to me whether start/stop/poll could race with the ISR on a different CPU. Besides being
+> used for ndo_open/stop, m_can_start/stop also happen from PM callbacks.
 
-Tbh, I find bounds deduction code extremely confusing.
-Imho, having lengthy comments there is a good thing.
+I think m_can_start() can't race with any of these. The interrupts
+(incl. active_interrupts) are set before the interrupts in general are
+enabled. So neither normal interrupts or hrtimer should be able to
+interfere as they are started/enabled afterwards.
 
+m_can_poll() shouldn't be able to race with the interrupt handler
+either. The interrupt handler disable interrupts and schedules
+m_can_poll() afterwards. Coalescing is not active when m_can_poll is
+being used. So the option to set coalescing should be removed, but it
+wasn't yet.
+
+Maybe m_can_stop() may be able to interfere with the interrupt handler,
+I am not sure right now. I *think* if there is any interference it
+should be able to recover as m_can_start() basically resets the
+interrupts. I may add a reset of active_interrupts here to make sure.
+
+> - irqstatus is written from the ISR (or hrtimer callback) and read from m_can_poll() (NAPI callback)
+
+Yes, also interrupts are disabled in ISR before napi is scheduled and
+the interrupts are enabled by m_can_poll afterwards. So while m_can_poll
+is running, I think it shouldn't be possible to have another write to
+irqstatus.
+
+
+Also I fixed the hrtimer issues by removing any hrtimer cancellations
+for instances without IRQ. For coalescing hrtimer cancellations are safe
+as the hrtimer for coalescing only triggers the irq thread.
+
+Also found a few other bugs I fixed. I will send a series with fixes
+soon.
+
+Best,
+Markus
+
+> 
+> Is this correct without explicit sychronization, or should there be some locking or atomic for these
+> accesses?
+> 
+> Best regards,
+> Matthias
+> 
+> 
+> 
+> > 
+> > 
+> > 
+> > > 
+> > > > > On 18.06.24 18:12, Matthias Schiffer wrote:
+> > > > > > Hi Markus,
+> > > > > > 
+> > > > > > we've found that recent kernels hang on the TI AM62x SoC (where no m_can interrupt is available and
+> > > > > > thus the polling timer is used), always a few seconds after the CAN interfaces are set up.
+> > > > > > 
+> > > > > > I have bisected the issue to commit a163c5761019b ("can: m_can: Start/Cancel polling timer together
+> > > > > > with interrupts"). Both master and 6.6 stable (which received a backport of the commit) are
+> > > > > > affected. On 6.6 the commit is easy to revert, but on master a lot has happened on top of that
+> > > > > > change.
+> > > > > > 
+> > > > > > As far as I can tell, the reason is that hrtimer_cancel() tries to cancel the timer synchronously,
+> > > > > > which will deadlock when called from the hrtimer callback itself (hrtimer_callback -> m_can_isr ->
+> > > > > > m_can_disable_all_interrupts -> hrtimer_cancel).
+> > > > > > 
+> > > > > > I can try to come up with a fix, but I think you are much more familiar with the driver code. Please
+> > > > > > let me know if you need any more information.
+> > > > > > 
+> > > > > > Best regards,
+> > > > > > Matthias
+> > > > > > 
+> > > > > > 
+> > > > 
+> > > > 
+> > 
+> 
+> -- 
+> TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+> Amtsgericht München, HRB 105018
+> Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+> https://www.tq-group.com/
 
