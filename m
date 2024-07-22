@@ -1,183 +1,177 @@
-Return-Path: <netdev+bounces-112425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7F0939018
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 15:47:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F08A093902F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 15:53:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22535B209EC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:47:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15291F21C21
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA9D16B75B;
-	Mon, 22 Jul 2024 13:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155FE16D9C6;
+	Mon, 22 Jul 2024 13:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ODrcMYI9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEbEwLbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AFB1EB26;
-	Mon, 22 Jul 2024 13:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BCF16D4FF
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 13:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721656016; cv=none; b=Ape177V1x7Gt/MKZTN2M+yfq4xHt+SKIsCmPyLSF3J2wEwC/QzCNFWu08CIh0y24tkUD7TPrLH8aVXQ05upmhF0UruptO75sNXH18gOQW8CWp2JKfUwSoYQX/f62DW3P1Q0hIAWd7YHQMhqWO9aK0lkeIHefBQq7gu/pSef+S6Y=
+	t=1721656386; cv=none; b=HTX25C9vs0STDZmNo1hT45iVQYDOPTcpxeZKpWY5pym5YhY4MBFiuHzSNnhB1erFCfP95FSQ3/hyLJj7/N5G5HFrQNHt5KxGHTh2aZLCKn6QSOR4ckMrUQH7Y8m8Cle+Tek4N3Vxdbxw2Uf3cO+JqREowW4h2AK18xqYRBhTY6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721656016; c=relaxed/simple;
-	bh=oa+Afng6R5K3QmPktSUjt9b3d3Diz8j19/vzUfAKm6k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ohUd5G9ozwgGGSMqNYGsO6YfBO7dqIwBuMHf+jI2lJXXmuFWDL71ZSWZF4S4/KTVkx9Rf3uQ2SG9t9k46Upepglel1SxbSJyxu1TltaSyCnizu5qDr2SEjhW3Rv0ENEdpDc95pDF5XJ3q6xlT3b4rI86h7yf1hQ8s0yUhdvdiBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ODrcMYI9; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46MCBalR003253;
-	Mon, 22 Jul 2024 13:46:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type
-	:content-transfer-encoding; s=corp-2023-11-20; bh=vRACKsqsmtS90X
-	/En0V7eGmEXSmI+PyodfcrJK7YG7k=; b=ODrcMYI9OjjypmQDf5Sj5wZSqM/fhP
-	LEU/OPucRmMpZrhnWc1PxYuKkObnML5Rt/mumvqgyoWN7jBt/DnfRdzWfvjRnsjd
-	q+bXcCOjZSmuFRFtcv8JdG+hqFPdIRGOGeZaKI9GvDDfr4Ha0lpfXWICCRcRrwAL
-	2vAE9av7D/+KdtA9jzLNVJYX7vNnD3yW9g+1Lx9/vxcBcpIKXByc99PRP87NoKcA
-	DQyUizFsnrU0d1amUHqrmKzRJutJsIfsj4wPXkH9PQjD5CU0Cm+1QrkKAK7hdeD+
-	ovOgAyaPILvgS98Wkf+cbRtMIDrXQklxv/JwLudb1f4leUsPX37l7zyw==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 40hft09x4d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Jul 2024 13:46:43 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 46MCkdmD018975;
-	Mon, 22 Jul 2024 13:46:42 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 40h27x6yqc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Jul 2024 13:46:42 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 46MDkgf5011412;
-	Mon, 22 Jul 2024 13:46:42 GMT
-Received: from aakhoje-ol.in.oracle.com (dhcp-10-166-167-232.vpn.oracle.com [10.166.167.232])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 40h27x6ync-1;
-	Mon, 22 Jul 2024 13:46:41 +0000
-From: Anand Khoje <anand.a.khoje@oracle.com>
-To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc: saeedm@mellanox.com, leon@kernel.org, tariqt@nvidia.com,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        davem@davemloft.net, rama.nichanamatlu@oracle.com,
-        manjunath.b.patil@oracle.com
-Subject: [PATCH net-next v7] net/mlx5: Reclaim max 50K pages at once
-Date: Mon, 22 Jul 2024 19:16:33 +0530
-Message-ID: <20240722134633.90620-1-anand.a.khoje@oracle.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1721656386; c=relaxed/simple;
+	bh=BOwZ4vF66z6wa6MKO33rnyYPrAj9i0vfjPJ/MqZzYgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=U9tK58HwYGZbQs86WO+qL/2l8ohksrI+49RVWf4WhgcBtr0bzA0OkM2fttA6xEXO4gATMPCf/TTMEbnSgydxD0D/Y48ncAQ1ZWD0MtFVvFz2sxpP0WxaikAtDWJM6h0R7sgzVQUmOadU2wYACB0kAasVybhAe2EtO9cK3ZI48gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KEbEwLbC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721656383;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZetsGJ5blfoCZSbkciEC6WflLyvv2m8UF1Hjh4ODOYY=;
+	b=KEbEwLbCxI/tpMJ+HB6NqUHr9vAuvPzyhsOWlXZp/8WiVdfd/lWFb5oUj4oLTgoj0NvpwS
+	78rpOT5fWFe0rGQElv9XfbDEP8s9nGuxSS/TMzcmTggN75+E6MitrkZRTYpX7lhUn0v1lr
+	BdLh3HM+hTwi9hmnFxryPj2ZJArdjF8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-wwJ61nsKOciIoNFaQQbK5Q-1; Mon,
+ 22 Jul 2024 09:53:00 -0400
+X-MC-Unique: wwJ61nsKOciIoNFaQQbK5Q-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBFC41944A88;
+	Mon, 22 Jul 2024 13:52:57 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.43.17.6])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5AD021955F40;
+	Mon, 22 Jul 2024 13:52:55 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Artem Savkov <asavkov@redhat.com>
+Subject: [PATCH bpf-next v2] selftests/bpf: fix compilation failure when CONFIG_NET_FOU!=y
+Date: Mon, 22 Jul 2024 15:52:53 +0200
+Message-ID: <20240722135253.3298964-1-asavkov@redhat.com>
+In-Reply-To: <005ef8ac-d48e-304f-65c5-97a17d83fd86@iogearbox.net>
+References: <005ef8ac-d48e-304f-65c5-97a17d83fd86@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-22_09,2024-07-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
- mlxlogscore=999 adultscore=0 phishscore=0 spamscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2407110000 definitions=main-2407220103
-X-Proofpoint-GUID: mykSe0Z5kRZ8HislHmQiIsl_D6QacvAx
-X-Proofpoint-ORIG-GUID: mykSe0Z5kRZ8HislHmQiIsl_D6QacvAx
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-In non FLR context, at times CX-5 requests release of ~8 million FW pages.
-This needs humongous number of cmd mailboxes, which to be released once
-the pages are reclaimed. Release of humongous number of cmd mailboxes is
-consuming cpu time running into many seconds. Which with non preemptible
-kernels is leading to critical process starving on that cpu’s RQ.
-On top of it, the FW does not use all the mailbox messages as it has a
-limit of releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES +
-MLX5_PAGES_TAKE device command. Hence, the allocation of these many
-mailboxes is extra and adds unnecessary overhead.
-To alleviate this, this change restricts the total number of pages
-a worker will try to reclaim to maximum 50K pages in one go.
+Without CONFIG_NET_FOU bpf selftests are unable to build because of
+missing definitions. Add ___local versions of struct bpf_fou_encap and
+enum bpf_fou_encap_type to fix the issue.
 
-Our tests have shown significant benefit of this change in terms of
-time consumed by dma_pool_free().
-During a test where an event was raised by HCA
-to release 1.3 Million pages, following observations were made:
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
 
-- Without this change:
-Number of mailbox messages allocated was around 20K, to accommodate
-the DMA addresses of 1.3 million pages.
-The average time spent by dma_pool_free() to free the DMA pool is between
-16 usec to 32 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@                                        287
-            1024 |@@@                                      1332
-            2048 |@                                        656
-            4096 |@@@@@                                    2599
-            8192 |@@@@@@@@@@                               4755
-           16384 |@@@@@@@@@@@@@@@                          7545
-           32768 |@@@@@                                    2501
-           65536 |                                         0
-
-- With this change:
-Number of mailbox messages allocated was around 800; this was to
-accommodate DMA addresses of only 50K pages.
-The average time spent by dma_pool_free() to free the DMA pool in this case
-lies between 1 usec to 2 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@@@@@@@@@@@@@@@@@@                       346
-            1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
-            2048 |                                         0
-            4096 |                                         0
-            8192 |                                         1
-           16384 |                                         0
-
-Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-Acked-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+v2: added BPF_NO_KFUNC_PROTOTYPES define to avoid issues when
+CONFIG_NET_FOU is set.
+---
+ .../selftests/bpf/progs/test_tunnel_kern.c    | 25 +++++++++++++------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-index d894a88..972e8e9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-@@ -608,6 +608,11 @@ enum {
- 	RELEASE_ALL_PAGES_MASK = 0x4000,
- };
+diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+index 3f5abcf3ff136..4d526fc73f2bb 100644
+--- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
++++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
+@@ -6,6 +6,7 @@
+  * modify it under the terms of version 2 of the GNU General Public
+  * License as published by the Free Software Foundation.
+  */
++#define BPF_NO_KFUNC_PROTOTYPES
+ #include "vmlinux.h"
+ #include <bpf/bpf_core_read.h>
+ #include <bpf/bpf_helpers.h>
+@@ -26,10 +27,20 @@
+  */
+ #define ASSIGNED_ADDR_VETH1 0xac1001c8
  
-+/* This limit is based on the capability of the firmware as it cannot release
-+ * more than 50000 back to the host in one go.
-+ */
-+#define MAX_RECLAIM_NPAGES (-50000)
++struct bpf_fou_encap___local {
++       __be16 sport;
++       __be16 dport;
++};
 +
- static int req_pages_handler(struct notifier_block *nb,
- 			     unsigned long type, void *data)
++enum bpf_fou_encap_type___local {
++       FOU_BPF_ENCAP_FOU___local,
++       FOU_BPF_ENCAP_GUE___local,
++};
++
+ int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
+-			  struct bpf_fou_encap *encap, int type) __ksym;
++			  struct bpf_fou_encap___local *encap, int type) __ksym;
+ int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
+-			  struct bpf_fou_encap *encap) __ksym;
++			  struct bpf_fou_encap___local *encap) __ksym;
+ struct xfrm_state *
+ bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
+ 		       u32 opts__sz) __ksym;
+@@ -745,7 +756,7 @@ SEC("tc")
+ int ipip_gue_set_tunnel(struct __sk_buff *skb)
  {
-@@ -639,7 +644,16 @@ static int req_pages_handler(struct notifier_block *nb,
+ 	struct bpf_tunnel_key key = {};
+-	struct bpf_fou_encap encap = {};
++	struct bpf_fou_encap___local encap = {};
+ 	void *data = (void *)(long)skb->data;
+ 	struct iphdr *iph = data;
+ 	void *data_end = (void *)(long)skb->data_end;
+@@ -769,7 +780,7 @@ int ipip_gue_set_tunnel(struct __sk_buff *skb)
+ 	encap.sport = 0;
+ 	encap.dport = bpf_htons(5555);
  
- 	req->dev = dev;
- 	req->func_id = func_id;
--	req->npages = npages;
-+
-+	/* npages > 0 means HCA asking host to allocate/give pages,
-+	 * npages < 0 means HCA asking host to reclaim back the pages allocated.
-+	 * Here we are restricting the maximum number of pages that can be
-+	 * reclaimed to be MAX_RECLAIM_NPAGES. Note that MAX_RECLAIM_NPAGES is
-+	 * a negative value.
-+	 * Since MAX_RECLAIM is negative, we are using max() to restrict
-+	 * req->npages (and not min ()).
-+	 */
-+	req->npages = max_t(s32, npages, MAX_RECLAIM_NPAGES);
- 	req->ec_function = ec_function;
- 	req->release_all = release_all;
- 	INIT_WORK(&req->work, pages_work_handler);
+-	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE);
++	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE___local);
+ 	if (ret < 0) {
+ 		log_err(ret);
+ 		return TC_ACT_SHOT;
+@@ -782,7 +793,7 @@ SEC("tc")
+ int ipip_fou_set_tunnel(struct __sk_buff *skb)
+ {
+ 	struct bpf_tunnel_key key = {};
+-	struct bpf_fou_encap encap = {};
++	struct bpf_fou_encap___local encap = {};
+ 	void *data = (void *)(long)skb->data;
+ 	struct iphdr *iph = data;
+ 	void *data_end = (void *)(long)skb->data_end;
+@@ -806,7 +817,7 @@ int ipip_fou_set_tunnel(struct __sk_buff *skb)
+ 	encap.sport = 0;
+ 	encap.dport = bpf_htons(5555);
+ 
+-	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_FOU);
++	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_FOU___local);
+ 	if (ret < 0) {
+ 		log_err(ret);
+ 		return TC_ACT_SHOT;
+@@ -820,7 +831,7 @@ int ipip_encap_get_tunnel(struct __sk_buff *skb)
+ {
+ 	int ret;
+ 	struct bpf_tunnel_key key = {};
+-	struct bpf_fou_encap encap = {};
++	struct bpf_fou_encap___local encap = {};
+ 
+ 	ret = bpf_skb_get_tunnel_key(skb, &key, sizeof(key), 0);
+ 	if (ret < 0) {
 -- 
-1.8.3.1
+2.45.2
 
 
