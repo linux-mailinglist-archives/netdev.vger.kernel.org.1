@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-112396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D454938DC8
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:00:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0688A938DCA
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1446DB20E5A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:00:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88EC6B21135
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FAD16C87A;
-	Mon, 22 Jul 2024 11:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 165B816CD24;
+	Mon, 22 Jul 2024 11:00:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962CD161936
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 11:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459A2161936
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 11:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721646012; cv=none; b=f9BI10XAEEEYyE8VkKOHj986PAyzAbIh8KW6Tx4QPeUihmIS/9l7vtAhFJRrWJrbbJWkummUlO1xrS6627H/+2wz8tz7oJ9W3G4GfkNzv7+GLYrmM+HWFElsCKmnmqaK/IRF7qcEj5VjGsjvBMAglNjDLIT3o7RybkA53dfuQZ0=
+	t=1721646015; cv=none; b=fFgmDhtzbb6pGyfPQds8drHL+iW8wJbVsKBJVdjLpS48eGx8RWndPmbX9n2YpveP+QfD1BuQQxXnDKnNAxB1D18WHcS4s7JyxkL2HvSp8k7QjNMfdwn+kqSQ4VE7oro10GJDZ7lwMmDb9iVO+pnVQB1X4y8gXG6FS92jcgR8bPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721646012; c=relaxed/simple;
-	bh=mGvq9N8Z4PfI0Usd/STL7e8SZnnauKqg9QtPB3tVeVI=;
+	s=arc-20240116; t=1721646015; c=relaxed/simple;
+	bh=N1ez8mnV5MhDJJMnpI/t1p084dljcdJDtSssEaKB/a8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GHi7QpMYnm/aIBlVVwIqnLac+nK9nlSANpx8KJjZLTJnkFDA+MNg2gXLHQDrJ63d4Aci4NqWV69oKtQIJdvsBYbzR3zk+BQuvbDhoOZrFdh1sZ1YK9oexPr1TzSXoYgVgk1UOtEa5J3yYcgW1Lfj7FvMWKzMIJoGS83B78ubcIk=
+	 MIME-Version; b=oMXqTrCbWytAr9PnILF5VPHOy0XPZ/Ewbc6/CvcE0sr5rTmZNghkpFCSRdz0F6Q5h9/TMuA6C/FPmceZIpUdE8AYfZ5Xw9SQES5YtWAdlbUUxdFAC9DNPX4g2FVTLt0RZcZI8U8xsX0jg8a7rQvUbDzjoj0VW57YnQSSRCsrCgk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from localhost.localdomain (unknown [223.64.68.124])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxVcWxO55mOxtUAA--.44786S2;
-	Mon, 22 Jul 2024 19:00:02 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxVcWxO55mOxtUAA--.44786S3;
+	Mon, 22 Jul 2024 19:00:03 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -47,9 +47,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	chris.chenfeiyang@gmail.com,
 	si.yanteng@linux.dev,
 	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH net-next RFC v15 04/14] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
-Date: Mon, 22 Jul 2024 18:59:49 +0800
-Message-Id: <98dbb40627989edcdd33d12f7f815fcce6eef042.1721645682.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next RFC v15 05/14] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+Date: Mon, 22 Jul 2024 18:59:50 +0800
+Message-Id: <6f43579a0aa6e8282b046895c156b5cac80e16c6.1721645682.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1721645682.git.siyanteng@loongson.cn>
 References: <cover.1721645682.git.siyanteng@loongson.cn>
@@ -60,29 +60,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxVcWxO55mOxtUAA--.44786S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF45Zr4xAr15Xr4rJF4Utwb_yoW8Xw4Upr
-	WfCa4qgr9FqF1jy3Z8J3yDAry5Za97tr9F9FWvy3s3uayDKwn0qw15KFWjvr9rZFWDuFy2
-	vF4jkw47Wan8AwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc2xSY4AK67AK6r4kMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUkHUDUUUUU=
+X-CM-TRANSID:AQAAf8BxVcWxO55mOxtUAA--.44786S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw1xXFWfKrW3JFyxGr4rZrb_yoW8tr15pF
+	sxAa4Fgry0qry7ua1DZr4UXFy5XrW7t397GF4jkw1F939ay34vqF1rtFyjvF1xAFWkG3W7
+	XrWqyr18uF4kCwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUPC14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+	x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+	Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
+	xKxwCY02Avz4vE14v_Gw4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l
+	x2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14
+	v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IY
+	x2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z2
+	80aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI
+	43ZEXa7VUUldgtUUUUU==
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
 
-The plat_stmmacenet_data::multicast_filter_bins field is twice
-initialized in the loongson_default_data() method. Drop the redundant
-initialization, but for the readability sake keep the filters init
-statements defined in the same place of the method.
+The Loongson GMAC driver currently doesn't utilize the MSI IRQs, but
+retrieves the IRQs specified in the device DT-node. Let's drop the
+direct pci_enable_msi()/pci_disable_msi() calls then as redundant
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
@@ -90,28 +90,56 @@ Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 Acked-by: Huacai Chen <chenhuacai@loongson.cn>
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 9e40c28d453a..9dbd11766364 100644
+index 9dbd11766364..32814afdf321 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -16,7 +16,7 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
- 	plat->force_sf_dma_mode = 1;
+@@ -114,7 +114,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	pci_set_master(pdev);
  
- 	/* Set default value for multicast hash bins */
--	plat->multicast_filter_bins = HASH_TABLE_SIZE;
-+	plat->multicast_filter_bins = 256;
+ 	loongson_default_data(plat);
+-	pci_enable_msi(pdev);
+ 	memset(&res, 0, sizeof(res));
+ 	res.addr = pcim_iomap_table(pdev)[0];
  
- 	/* Set default value for unicast filter entries */
- 	plat->unicast_filter_entries = 1;
-@@ -41,7 +41,6 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
- 	plat->dma_cfg->pbl = 32;
- 	plat->dma_cfg->pblx8 = true;
+@@ -122,7 +121,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	if (res.irq < 0) {
+ 		dev_err(&pdev->dev, "IRQ macirq not found\n");
+ 		ret = -ENODEV;
+-		goto err_disable_msi;
++		goto err_disable_device;
+ 	}
  
--	plat->multicast_filter_bins = 256;
- 	return 0;
+ 	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+@@ -135,17 +134,15 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	if (res.lpi_irq < 0) {
+ 		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+ 		ret = -ENODEV;
+-		goto err_disable_msi;
++		goto err_disable_device;
+ 	}
+ 
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+ 	if (ret)
+-		goto err_disable_msi;
++		goto err_disable_device;
+ 
+ 	return ret;
+ 
+-err_disable_msi:
+-	pci_disable_msi(pdev);
+ err_disable_device:
+ 	pci_disable_device(pdev);
+ err_put_node:
+@@ -169,7 +166,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+ 		break;
+ 	}
+ 
+-	pci_disable_msi(pdev);
+ 	pci_disable_device(pdev);
  }
  
 -- 
