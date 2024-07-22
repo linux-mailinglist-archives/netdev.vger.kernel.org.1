@@ -1,155 +1,135 @@
-Return-Path: <netdev+bounces-112379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B58D0938BAE
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:00:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91267938BC2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7DF11C211EF
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:00:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F6A4B2110A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F3118AE4;
-	Mon, 22 Jul 2024 09:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91DF1662E7;
+	Mon, 22 Jul 2024 09:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VqI5usS6"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dzmm2rB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC509523A;
-	Mon, 22 Jul 2024 09:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8DF161311;
+	Mon, 22 Jul 2024 09:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721638835; cv=none; b=Jn+aHlxsVXtoQpvvZe/e5lWvtUX6nc7m60E76rBITyfwgODRxHjLjgjuKS+l9vA0RFOG+I3V3fovzQVCbIpa77PCceYDbBpH45AfyqcCwCk5QMcPCUVtkKgzZBdc/oNfSkZLX7N9Vzjo9I/707KythWQEM+iILIDJXbnLu25j00=
+	t=1721639447; cv=none; b=ubBCceRoH/DhWyE+lzJH8+CAToiqoGsDJHfrraU4ZNF+ZErO2BJ8iafmHxL8ubsOuMP+44B4KlvG5ioIMvz0qJfStSltjXYTCQmHO73d+fYOas9MvaTmSBNmlQ9wZIsl1Y/I3R9R6ungcaXsswa6JKo/MNBu02mZF/jYtw+Ixr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721638835; c=relaxed/simple;
-	bh=e0cxkfUfv3pilNjZXjP1tP2K/9ZSiMjDQ9EsFQlgV7c=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=CcVm5FCl+nq6q0f4zthRLSItdJVFHQgQ4T9m2i2YGHoYGxh/M5uU26lkkGO5uO/0s3zlqQ7eqETXpaD6WdpmatKPTNR0OlLNUp1JMOALlpyQZDKhGvkcG1ojPy2UCERqB6IEBJ2qJciAbFbPjM//J+bH1RXtfSm7W3GMISOsAdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VqI5usS6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9FF6C32782;
-	Mon, 22 Jul 2024 09:00:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721638835;
-	bh=e0cxkfUfv3pilNjZXjP1tP2K/9ZSiMjDQ9EsFQlgV7c=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=VqI5usS676WzWHELnlHyAqGgI4xGLSESNRM4pZGFwzdB51kgDBJlWA+T+E5YcOJa4
-	 GxZF7ZEEecY32uPrxRdlFj3YDvO5UEJ2jj8xqAIhq6XJ2b1+FRK1ZFW4NXlgpepSqE
-	 sNlMBzcKmAwiF8+Nr7Vg0WVk/pWsvC7tSVryucRX2Tg0/nHNfimHMhNLnwgeM/TBge
-	 9ULXvGpS9hrwikycgW3P89YR3GeiKUWhrZIbizMVE+Q3dQw2hAFZjNI4Dbiwpv/vsZ
-	 z2Qahpi3K/H0BznZ6EYeLcFUAqL9G1l0w8ExV1eNIeeMz/GknPsX6EC3iNij5TfY2a
-	 9WEyRud/xwZEA==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1721639447; c=relaxed/simple;
+	bh=F5XBAe/GKrCj0xLEXgFxWDYnSZgfCE914QJJeyW8fc8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CIUD50j1vvWZrLLK30jC+Lw6v3LEwwN96fvqoqzEhTiANHFf/NnajNdljAIheRzmHL8+/u/8ojcUPavqJxXcpwB9ZFGkrEDoIn32CWw70xjL+u32ycq1reNQ7q87r9RmrbRNFgmYTRLoB0xjHi+MvdVK+LpAuQpmQMgGB9xslWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=dzmm2rB7; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46M7wtTW005443;
+	Mon, 22 Jul 2024 02:10:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=UZ8qbwV8H5Uru+28S5SaGf9Al
+	hy/rbNI7CI4WhPzKlU=; b=dzmm2rB7zo2tr5pLB+fubm3C4F6L+MIp6nF8GXX04
+	iNvpNVXVUgJWJvk/hBTfDvo3Vg4tmnyR7vFcRV4//Gnk6jGloxEvfVMr+LG4jEEw
+	wxSDKEUJCZM1rKOaGzn0hm/UkdpjRbr3pnDUuCHyR3iVl/6aGVoFhLc3lneECGd/
+	TNYqYgoqztuERvV0GYvJt8y3e2A7AmA06dcOgZVQdrf4CtEsQX1QA0BXgMRjoTqw
+	J25xtF2PNgH9FF56Vj0VYemw/a/WCVeW7297NaUk8soVQS7MPe96oPcYCET+HkS+
+	L03Fssg9crdG1WBhbk6HsMuLkbydqsrbETSKCF6U12w8A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40hkgrr6yj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jul 2024 02:10:15 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 22 Jul 2024 02:10:15 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 22 Jul 2024 02:10:14 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 971D73F7041;
+	Mon, 22 Jul 2024 02:10:08 -0700 (PDT)
+Date: Mon, 22 Jul 2024 14:40:07 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Alex Elder <elder@ieee.org>
+CC: Andrew Lunn <andrew@lunn.ch>, Ayush Singh <ayush@beagleboard.org>,
+        <jkridner@beagleboard.org>, <robertcnelson@beagleboard.org>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Tero Kristo <kristo@kernel.org>, Johan Hovold
+	<johan@kernel.org>,
+        Alex Elder <elder@kernel.org>,
+        Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>,
+        <greybus-dev@lists.linaro.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 3/3] greybus: gb-beagleplay: Add firmware upload API
+Message-ID: <Zp4h72rWwgnGmvcP@test-OptiPlex-Tower-Plus-7010>
+References: <20240719-beagleplay_fw_upgrade-v1-0-8664d4513252@beagleboard.org>
+ <20240719-beagleplay_fw_upgrade-v1-3-8664d4513252@beagleboard.org>
+ <Zppeg3eKcKEifJNW@test-OptiPlex-Tower-Plus-7010>
+ <b3269dc8-85ac-41d2-8691-0a70b630de50@lunn.ch>
+ <e7e88268-a56b-447c-9d59-6a4eb8fcd25a@ieee.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240718145747.131318-1-brgl@bgdev.pl>
-References: <20240718145747.131318-1-brgl@bgdev.pl>
-Subject: Re: [RFT PATCH net] net: phy: aquantia: only poll GLOBAL_CFG registers on aqr113c and aqr115c
-From: Antoine Tenart <atenart@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Jon Hunter <jonathanh@nvidia.com>
-To: Andrew Lunn <andrew@lunn.ch>, Bartosz Golaszewski <brgl@bgdev.pl>, David S . Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>
-Date: Mon, 22 Jul 2024 11:00:31 +0200
-Message-ID: <172163883154.3798.5139161262655916040@kwain.local>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <e7e88268-a56b-447c-9d59-6a4eb8fcd25a@ieee.org>
+X-Proofpoint-ORIG-GUID: uf0FV3BztW2j4yQ85RZegmP76Gjj-a41
+X-Proofpoint-GUID: uf0FV3BztW2j4yQ85RZegmP76Gjj-a41
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-22_05,2024-07-18_01,2024-05-17_01
 
-Quoting Bartosz Golaszewski (2024-07-18 16:57:47)
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->=20
-> Commit 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to
-> start returning real values") introduced a workaround for an issue
-> observed on aqr115c. However there were never any reports of it
-> happening on other models and the workaround has been reported to cause
-> and issue on aqr113c (and it may cause the same on any other model not
-> supporting 10M mode).
->=20
-> Let's limit the impact of the workaround to aqr113c and aqr115c and poll
-> the 100M GLOBAL_CFG register instead as both models are known to support
-> it correctly.
->=20
-> Reported-by: Jon Hunter <jonathanh@nvidia.com>
-> Closes: https://lore.kernel.org/lkml/7c0140be-4325-4005-9068-7e0fc5ff344d=
-@nvidia.com/
-> Fixes: 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to star=
-t returning real values")
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  drivers/net/phy/aquantia/aquantia_main.c | 29 +++++++++++++++++-------
->  1 file changed, 21 insertions(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/a=
-quantia/aquantia_main.c
-> index d12e35374231..6e3e0fc6ea27 100644
-> --- a/drivers/net/phy/aquantia/aquantia_main.c
-> +++ b/drivers/net/phy/aquantia/aquantia_main.c
-> @@ -653,13 +653,7 @@ static int aqr107_fill_interface_modes(struct phy_de=
-vice *phydev)
->         unsigned long *possible =3D phydev->possible_interfaces;
->         unsigned int serdes_mode, rate_adapt;
->         phy_interface_t interface;
-> -       int i, val, ret;
-> -
-> -       ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
-> -                                       VEND1_GLOBAL_CFG_10M, val, val !=
-=3D 0,
-> -                                       1000, 100000, false);
-> -       if (ret)
-> -               return ret;
-> +       int i, val;
-> =20
->         /* Walk the media-speed configuration registers to determine which
->          * host-side serdes modes may be used by the PHY depending on the
-> @@ -708,6 +702,25 @@ static int aqr107_fill_interface_modes(struct phy_de=
-vice *phydev)
->         return 0;
->  }
-> =20
-> +static int aqr113c_fill_interface_modes(struct phy_device *phydev)
-> +{
-> +       int val, ret;
-> +
-> +       /* It's been observed on some models that - when coming out of su=
-spend
-> +        * - the FW signals that the PHY is ready but the GLOBAL_CFG regi=
-sters
-> +        * continue on returning zeroes for some time. Let's poll the 10M
-
-nit: 100M?
-
-> +        * register until it returns a real value as both 113c and 115c s=
-upport
-> +        * this mode.
-> +        */
-> +       ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
-> +                                       VEND1_GLOBAL_CFG_100M, val, val !=
-=3D 0,
-> +                                       1000, 100000, false);
-> +       if (ret)
-> +               return ret;
-> +
-> +       return aqr107_fill_interface_modes(phydev);
-> +}
-> +
->  static int aqr113c_config_init(struct phy_device *phydev)
->  {
->         int ret;
-> @@ -725,7 +738,7 @@ static int aqr113c_config_init(struct phy_device *phy=
-dev)
->         if (ret)
->                 return ret;
-> =20
-> -       return aqr107_fill_interface_modes(phydev);
-> +       return aqr113c_fill_interface_modes(phydev);
->  }
-> =20
->  static int aqr107_probe(struct phy_device *phydev)
-> --=20
-> 2.43.0
->=20
->
+On 2024-07-20 at 03:09:55, Alex Elder (elder@ieee.org) wrote:
+> On 7/19/24 2:15 PM, Andrew Lunn wrote:
+> > > >   drivers/greybus/Kconfig         |   1 +
+> > > >   drivers/greybus/gb-beagleplay.c | 625 +++++++++++++++++++++++++++++++++++++++-
+> > 
+> > > > +static u8 csum8(const u8 *data, size_t size, u8 base)
+> > > > +{
+> > > > +	size_t i;
+> > > > +	u8 sum = base;
+> > > follow reverse x-mas tree
+> > 
+> > Since this is not networking, even thought it was posted to the netdev
+> > list, this comment might not be correct. I had a quick look at some
+> > greybus code and reverse x-mas tree is not strictly used.
+> > 
+> > Please see what the Graybus Maintainers say.
+> 
+> Andrew is correct.  The Greybus code does not strictly follow
+> the "reverse christmas tree" convention, so there is no need
+> to do that here.  Please understand that, while checkpatch.pl
+> offers good and well-intentioned advice, not everything it
+> warns about must be fixed, and in some cases it suggests things
+> certain maintainers don't agree with.
+> 
+> 					-Alex
+> 
+> > 	Andrew
+> 
+> Ok got it. 
 
