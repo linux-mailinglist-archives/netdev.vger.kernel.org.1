@@ -1,169 +1,198 @@
-Return-Path: <netdev+bounces-112374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52889938A8D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:58:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6F2938A9F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 036AB280DD9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 07:58:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 143BB1F21A9D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 08:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FF21607B0;
-	Mon, 22 Jul 2024 07:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B70B166318;
+	Mon, 22 Jul 2024 08:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p3l5QXhO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ib4PgTkW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5EB438DE4;
-	Mon, 22 Jul 2024 07:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF81282FE
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 08:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721635131; cv=none; b=t+b3xtwZPF2p0FsWvwheDphd3Qh6cbBwo4tH1xwK1KjXQiLlMqMRtSb2+l3ykqYWh6wmOePH3deOiQ5lgDDu0cDa5Gz5z2MBgMPku/K4LprKQfzZHR1V3OvZBSM14iZ75ZEw3WKX1wy0KIGY6+YFZNazClTku0NXkeVAcrpFwxo=
+	t=1721635272; cv=none; b=ih9KgiAje8Kh5jq9AM/iGakVUpeIyy3wutcRgaOhr+fAqTHyKmVSw6tLWN9ginnB1mp+s/BxljPucHwqGJ9tu2FZUTRKxfTuuHq/bfx6efVxgTuh3owlgL219uupkMUecD+ds8rsQZEMs5VSgnAps5PYv+uJ2hXA9xFiixX9Lck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721635131; c=relaxed/simple;
-	bh=t4MoDf3FnLMIGWuvFCTqp8O+YxNp0r1Uz8HYq1c6io0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hA0NCl18xBEMjvy66my+HwPWEpexhgcmwzgc9AYUaeGiDLUIXlsGT6Xaxc7uxIKet+yaXbHffsrXbgIrJKRwMFkMZ0+PBlQpaIGnwr3EqZM4m9vWL4g7k/299eHTtMDB0JsHzFff/5imBQaTf1KGNKCukm1RlN+bFOdfms5wD70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p3l5QXhO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD54C116B1;
-	Mon, 22 Jul 2024 07:58:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721635130;
-	bh=t4MoDf3FnLMIGWuvFCTqp8O+YxNp0r1Uz8HYq1c6io0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=p3l5QXhOXSZ1jFehevzYIfybM8OAduoEqqsnzdKajKOkt9T1dBgpjeBicANeDfnvP
-	 TcwznGeeu/bOWZOOxBwBpYuDovwRyTKmQa3qlaBNGxrBrwJ4MnEJN91pLmHUL0gy51
-	 3L3Oa5U0m/glSk8G/RLRtgfic6cBez0KC6dBPxhowXw20Bm961yZ1BO17MI79iROyo
-	 6Qqpxy9JvUYrVSvN4QRMIf2/cJL/cJJ72SyothFh0exS+lOqd6Mbag5Q5J5YLqm66W
-	 FaXxW43sKeMiUbyLAXXlb/PlT84vo41glJR5vwHcJywWhVtnH0yjrmz+qu4m03MxWa
-	 UhBx2hhQhcmnw==
-Message-ID: <bbe8d8ad-d78c-43fe-8beb-39453832b5bf@kernel.org>
-Date: Mon, 22 Jul 2024 09:58:42 +0200
+	s=arc-20240116; t=1721635272; c=relaxed/simple;
+	bh=cv/eDdj7rZ/lIOc0x55LCidh/0YmyV8Os80FAWnpRw4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pHMuW95/WraXqpDHPjezJ0dE3PE0Lah3r7EZxlvG/Q24IkkYPPouLKbFhGA7MOPLP4axEq96hfqveAF4Yxb6e9yLW6vrO2RDPiqG5kbPF1Zg/di50rKeNXYgu2R94rydQ99FOIOK0dFAqso/SAdZIXy6/wuy3KrUT+St7MUf3nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ib4PgTkW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721635269;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5QUfD1YmeCwI0P0HIWL0IY21aE8P6LAnbhy1oMHSUJ0=;
+	b=ib4PgTkWpjlGGCdi8R/w0jyC8Y70JTtsZ4rdj6XQL85pckD/gFtxgj8/3LbFwG7q8p1Iw5
+	zogo06o/Qj4HbIGRVYH12h91L8RPIz4CcCn1Xy+n7VMxWe7GJo7qYK6vESZh8zBe0LCKOU
+	EE7bWjUB34Xben0//zfBqdkY70tR+r8=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-567-xuzA389BN2-qS0VZrE23hQ-1; Mon, 22 Jul 2024 04:01:05 -0400
+X-MC-Unique: xuzA389BN2-qS0VZrE23hQ-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2cb656e4d97so4672063a91.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 01:01:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721635264; x=1722240064;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5QUfD1YmeCwI0P0HIWL0IY21aE8P6LAnbhy1oMHSUJ0=;
+        b=ftNweokMKkl4w9SG7ONMeZqGyjMDBZ1ac7kgqyt1Gtuf95yTnsVQTgu+gAHb9AE9aJ
+         PN9dAatVYZrtTPQGJQUAQ/qwyy3/M66E8n1SCSOhAWgFWmqgtcxrDJddq/v74Nj7CEgP
+         ULRjVrMVCkyMCctwNBuwKDUsm5J9oIh+vmqWy9b6NHpuMbHc9ZpDudKW5ATAnxVLZ5g8
+         fsEBOYiM+JbryJxu1IjYlhpiI3O+8c6TZEYAWp+fcc7GFQm+pOT0SgLpbjWu/xHIWquO
+         GEPq6auNoMFV3MfOoQRBMumiQUUiBBXWz+Du2zu6XwqQEoAF0bCTyI3AQCKsU/N0sUwb
+         bWRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWw4c02Exvb83O6gUeQSoXqVluzfJT1aRcjMaSUAHdF7ooqdF9BQiqXhHTqQ2tOIYGwGmTDzpeLgEfa7IlCjqEkuFR3Sg9u
+X-Gm-Message-State: AOJu0Yyc3wTUxGgoHj4LCAd4Ubbi+DhPEFqZRnhuPN4COIabWpuRnMXq
+	mD6I9urhxvIjQt1ubhlxhjv4XVU6XXeaLqmw4+DaJMuMexI3UEWtUufjXZxV6mNxdczam0nbg3e
+	GtmQVdsrrIwnR70PDtEJj6X439Xgh+vy16W25+/Yk/AElIZzNmS9UyLCdv/HVYHT+Oo//kaLpvF
+	Vmnm/xw9H1z2g+2jyEkxwmc/ANOeVy
+X-Received: by 2002:a17:90a:7307:b0:2c9:81fd:4c27 with SMTP id 98e67ed59e1d1-2cd27415a88mr4770844a91.14.1721635264306;
+        Mon, 22 Jul 2024 01:01:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGnOmbWFvxTc12Z/fU+czmUDIC3h6M95FI8NXEVLeHz/NV5eKtoYowMl6E64RVLXQ+V70jH1p++bYnSZzFW3MI=
+X-Received: by 2002:a17:90a:7307:b0:2c9:81fd:4c27 with SMTP id
+ 98e67ed59e1d1-2cd27415a88mr4770811a91.14.1721635263773; Mon, 22 Jul 2024
+ 01:01:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add support for
- Amlogic Bluetooth
-To: Yang Li <yang.li@amlogic.com>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
- <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
- <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
- <30cf7665-ff35-4a1a-ba26-0bbe377512be@amlogic.com>
- <1582443b-c20a-4e3a-b633-2e7204daf7e0@kernel.org>
- <e8adc4a7-ee03-401d-8a3f-0fb415318ad3@amlogic.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <e8adc4a7-ee03-401d-8a3f-0fb415318ad3@amlogic.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240722010625.1016854-1-lulu@redhat.com> <20240722010625.1016854-3-lulu@redhat.com>
+ <CACGkMEtq=2yO=4te+qQxwSzi4G-4E_kdq=tCQq_N94Pk8Ro3Zw@mail.gmail.com> <CACLfguUaDo3seJZT_yQNp_fa4bELHwwAb8OTbXGwBLw2fGdj+w@mail.gmail.com>
+In-Reply-To: <CACLfguUaDo3seJZT_yQNp_fa4bELHwwAb8OTbXGwBLw2fGdj+w@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 22 Jul 2024 16:00:52 +0800
+Message-ID: <CACGkMEvT-j3GNq0C8nx_oy0KoqgAGhMwJwXbAXPjomkouNxEgg@mail.gmail.com>
+Subject: Re: [PATH v4 2/3] vdpa_sim_net: Add the support of set mac address
+To: Cindy Lu <lulu@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, parav@nvidia.com, sgarzare@redhat.com, 
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 22/07/2024 09:41, Yang Li wrote:
->>>>> +    description: bluetooth chip 3.3V supply regulator handle
->>>>> +
->>>>> +  clocks:
->>>>> +    maxItems: 1
->>>>> +    description: clock provided to the controller (32.768KHz)
->>>>> +
->>>>> +  antenna-number:
->>>>> +    default: 1
->>>>> +    description: device supports up to two antennas
->>>> Keep it consistent - either descriptions are the last property or
->>>> somewhere else. Usually the last.
->>>>
->>>>> +    $ref: /schemas/types.yaml#/definitions/uint32
->>>> And what does it mean? What happens if BT uses antenna number 2, not 1?
->>>> What is connected to the other antenna? It really feels useless to say
->>>> which antenna is connected to hardware.
->>> Sorry, the antenna description was incorrect, it should specify whether
->>>
->>> Bluetooth and WiFi coexist. I will change it as below:
->>>
->>>       aml,work-mode:
->>>       type: boolean
->>>       description: specifywhether Bluetooth and WiFi coexist.
->> So one device can be used on different boards - some without WiFi
->> antenna? But, why in the binding of bluetooth you describe whether there
->> is WiFi antenna?
-> 
-> Yes, it can be used on dirfferent boards. The device can operate in both 
+On Mon, Jul 22, 2024 at 3:57=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> On Mon, 22 Jul 2024 at 15:48, Jason Wang <jasowang@redhat.com> wrote:
+> >
+> > On Mon, Jul 22, 2024 at 9:06=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrot=
+e:
+> > >
+> > > Add the function to support setting the MAC address.
+> > > For vdpa_sim_net, the driver will write the MAC address
+> > > to the config space, and other devices can implement
+> > > their own functions to support this.
+> > >
+> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > ---
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 22 +++++++++++++++++++++-
+> > >  1 file changed, 21 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c b/drivers/vdpa/vdpa=
+_sim/vdpa_sim_net.c
+> > > index cfe962911804..936e33e5021a 100644
+> > > --- a/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+> > > +++ b/drivers/vdpa/vdpa_sim/vdpa_sim_net.c
+> > > @@ -414,6 +414,25 @@ static void vdpasim_net_get_config(struct vdpasi=
+m *vdpasim, void *config)
+> > >         net_config->status =3D cpu_to_vdpasim16(vdpasim, VIRTIO_NET_S=
+_LINK_UP);
+> > >  }
+> > >
+> > > +static int vdpasim_net_set_attr(struct vdpa_mgmt_dev *mdev,
+> > > +                               struct vdpa_device *dev,
+> > > +                               const struct vdpa_dev_set_config *con=
+fig)
+> > > +{
+> > > +       struct vdpasim *vdpasim =3D container_of(dev, struct vdpasim,=
+ vdpa);
+> > > +       struct virtio_net_config *vio_config =3D vdpasim->config;
+> > > +
+> > > +       mutex_lock(&vdpasim->mutex);
+> > > +
+> > > +       if (config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> > > +               memcpy(vio_config->mac, config->net.mac, ETH_ALEN);
+> > > +               mutex_unlock(&vdpasim->mutex);
+> > > +               return 0;
+> > > +       }
+> > > +
+> > > +       mutex_unlock(&vdpasim->mutex);
+> >
+> > Do we need to protect:
+> >
+> >         case VIRTIO_NET_CTRL_MAC_ADDR_SET:
+> > read =3D vringh_iov_pull_iotlb(&cvq->vring, &cvq->in_iov,
+> >                                              vio_config->mac, ETH_ALEN)=
+;
+> >                 if (read =3D=3D ETH_ALEN)
+> >                         status =3D VIRTIO_NET_OK;
+> >                 break;
+> >
+> > As both are modifying vio_config?
+> >
+> > Thanks
+> >
+> i have added a lock for this; CVQ also needs to take this lock to
+> change the MAC address.I thinks maybe this can protect?
 
-Please do not respond to only partial part of the comment. It is obvious
-device can work on different boards. You do not have to confirm it. The
-question was different - why do you need this property? I gave you
-possible answer, but you skipped this and answered with obvious statement.
+Right, I miss that it is done in the vdpasim_net_work().
 
-> standalone mode and coexistence mode. typically running standalone mode.
-> 
-> Therefore, I would like to revise the description as follows:
-> 
-> aml,coexisting:
->      type: boolean
->      description: Enable coexistence mode, allowing shared antenna usage 
-> with Wi-Fi.
+> Do you mean I need to compare the mac address from the vdpa_tool and
+> mac address in vio_config?
+> this vdpa tool should not be used after the guest load, if this is
+> different this is also acceptable
+> thanks
 
-Why this is not enabled always?
+The patch looks good then.
 
-Best regards,
-Krzysztof
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
+> Cindy
+>
+> > > +       return -EINVAL;
+> > > +}
+> > > +
+> > >  static void vdpasim_net_setup_config(struct vdpasim *vdpasim,
+> > >                                      const struct vdpa_dev_set_config=
+ *config)
+> > >  {
+> > > @@ -510,7 +529,8 @@ static void vdpasim_net_dev_del(struct vdpa_mgmt_=
+dev *mdev,
+> > >
+> > >  static const struct vdpa_mgmtdev_ops vdpasim_net_mgmtdev_ops =3D {
+> > >         .dev_add =3D vdpasim_net_dev_add,
+> > > -       .dev_del =3D vdpasim_net_dev_del
+> > > +       .dev_del =3D vdpasim_net_dev_del,
+> > > +       .dev_set_attr =3D vdpasim_net_set_attr
+> > >  };
+> > >
+> > >  static struct virtio_device_id id_table[] =3D {
+> > > --
+> > > 2.45.0
+> > >
+> >
+>
 
 
