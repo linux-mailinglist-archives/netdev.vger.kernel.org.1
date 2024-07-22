@@ -1,113 +1,107 @@
-Return-Path: <netdev+bounces-112368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53E56938A0A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:31:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0322A938A45
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D5E8280EAF
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 07:31:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78B41B213A0
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 07:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950A51BDC8;
-	Mon, 22 Jul 2024 07:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7132E14882E;
+	Mon, 22 Jul 2024 07:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qSeFKj7l"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="mdxOoj9F"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674721B960;
-	Mon, 22 Jul 2024 07:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33883770E6;
+	Mon, 22 Jul 2024 07:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721633484; cv=none; b=KHmX9ItX9/jba1EK6eKBa4jFjjvx9G9w7SW72t5Jg+RnSnCPoPRytJSfEj6iEd6VAR1EOLyRfhRwjxgfJh67T3LUr6GWEQ7mKewnIBO0WsTR1mmZGFqvpEko4RGz2hBdRmejlMKt9nTb08eJ1M1dbkCdEu0Tbgn4nBm/ALhLFlE=
+	t=1721634012; cv=none; b=EZO8XB0HoSaxwIHv+CriAq6Sy4Rpgc6dkX0n96AV53y3kx3BYv1Tlv3rYIClMLdnMZe6/YxkLrcoMA83GVUMPU2KiebuY00XFfy9T9agNh3YJjnZvUlhhyzYybKodfixV+pa50LIQZDGfJ66UH8j58SoPFWUMxbOplrFPUqlQqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721633484; c=relaxed/simple;
-	bh=iYIiUKbc+Z2zBm3LGnTzmWg6zFkv8DUVsKnrd4o2QVY=;
+	s=arc-20240116; t=1721634012; c=relaxed/simple;
+	bh=Gds3YGJhwEOU78oLrFElHnVTEhE1tgxeRJe3NKZ8Gpo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3bCdEAuYQSXHJOakCBoGKBVJamexEv7H+eXn/f7OuQdHiun1Pl0xfJuisrDeljTtqikHOlS/OyswRIXSxLFempjrQtddy2Ip+1LCpprGLEhDFJMkz31+L0d0pOmLWzkj2Ok1YShc/DXee5sAiX7tvk7IZWImqDVoYwG0XMlB1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qSeFKj7l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 906AAC116B1;
-	Mon, 22 Jul 2024 07:31:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721633484;
-	bh=iYIiUKbc+Z2zBm3LGnTzmWg6zFkv8DUVsKnrd4o2QVY=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=KM7/QrR4f3dVlF1Wcyk9+/3DBNHM+cRLvcKBQCUaYoNCwJ7bIjYLdK+646DYTLs8AkwzQ4N1yDwkbZUb3pcpNqVZpa1/4h1Y5zs7auxuF5PaoptUTJFnn8SynCoAW6HudNLRR2kJYE0iBYQbgzix2IR0+9gOgpoun2x3njRXsrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=mdxOoj9F; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B84BC116B1;
+	Mon, 22 Jul 2024 07:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1721634011;
+	bh=Gds3YGJhwEOU78oLrFElHnVTEhE1tgxeRJe3NKZ8Gpo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qSeFKj7lxvq964npqvOUsM/B3k+zCb0OUgJvjEdyZSII9yhZ0z8Oqk5rmomTXxCdG
-	 8xdMxbc668MIhcpe9q5DuhESYlLUl7WtIxOh6+pF2Yophb9b5dJSemHsvjZj22urdi
-	 pbUupZSNSHe+joN/p3dRBmDY99LSIT9dD+4sdZZOuqmMMQuCoJmfh/Aqw6XbWD4qBs
-	 BteBrZW2lemwCYe2BISpxOtTUODBCgy1cplZceShGQEZS8/EL6REmDUoplisnG1Zw1
-	 quv6Z45V8agd6p0+GFDgHxxbYn9XPve8g99EQXzUOka8jdZG+fWcMRXSzqy1/iYR1w
-	 4jhvL4/FDlpnw==
-Date: Mon, 22 Jul 2024 10:31:19 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240722073119.GA4252@unreal>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
- <20240721192530.GD23783@pendragon.ideasonboard.com>
+	b=mdxOoj9FPY8C+BCuN42ENUA2/9pA0cg0lsa+aoLUeXx8AicRmp5ZZ27oDRIec6zJU
+	 KqMVc6ztS1/K4aJmnzriiAWzzh0jag02HX3PAEpmm3xEw6FzAAFBQT99HqirhlWaS8
+	 zkZWqwKJbB7Qqq27dwtbxg641Awi8YTSz+oeMhSM=
+Date: Mon, 22 Jul 2024 09:40:08 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	linux-hwmon@vger.kernel.org, linux-leds@vger.kernel.org,
+	linux-acpi@vger.kernel.org, netdev@vger.kernel.org,
+	Andreas Kemnade <andreas@kemnade.info>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	=?iso-8859-1?Q?G=FCnter_R=F6ck?= <linux@roeck-us.net>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jean Delvare <jdelvare@suse.com>,
+	Jonathan Cameron <jic23@kernel.org>, Lee Jones <lee@kernel.org>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Pavel Machek <pavel@ucw.cz>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v2 1/6] device property: document
+ device_for_each_child_node macro
+Message-ID: <2024072204-jester-exploit-d249@gregkh>
+References: <20240721-device_for_each_child_node-available-v2-1-f33748fd8b2d@gmail.com>
+ <73b3e14a-c1c3-4f7b-aea8-2108912e21ca@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240721192530.GD23783@pendragon.ideasonboard.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <73b3e14a-c1c3-4f7b-aea8-2108912e21ca@web.de>
 
-On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
-> On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> > James Bottomley wrote:
-> > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > device specific functionality, and it is a topic that needs cross-
-> > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > concerns. Please consider it for a Maintainers Summit discussion.
-> > > 
-> > > I'm with Greg on this ... can you point to some of the contrary
-> > > positions?
-> > 
-> > This thread has that discussion:
-> > 
-> > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > 
-> > I do not want to speak for others on the saliency of their points, all I
-> > can say is that the contrary positions have so far not moved me to drop
-> > consideration of fwctl for CXL.
-> > 
-> > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > making decisions about opaque command codes, and that CXL already has a
-> > few years of experience with the commands that *do* need a Linux-command
-> > wrapper.
-> > 
-> > Some open questions from that thread are: what does it mean for the fate
-> > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > device that crosses subsystem functionality? Would a cynical hardware
-> > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > get device-specific commands past another subsystem's objection?
+On Mon, Jul 22, 2024 at 09:15:26AM +0200, Markus Elfring wrote:
+> …
+> > + * Unavailable nodes are skipped i.e. this macro is implicitly _available_.
+> …
 > 
-> My default answer would be to trust the maintainers of the relevant
-> subsystems (or try to convince them when you disagree :-)).
+> How good does presented information fit together in this comment line?
 
-You know, trust is a two-way street. If you want to trust maintainers,
-they need to trust others as well. The situation where one maintainer
-says "I don't trust you, so I will not allow you and other X maintainers
-to do Y" is not a healthy situation.
 
-> Not only should they know the technical implications best, they should also have
-> a good view of the whole vertical stack, and the implications of
-> pass-through for their ecosystem. 
+Hi,
 
-It is wishful thinking. It is clearly not true for large subsystems
-and/or complex devices.
+This is the semi-friendly patch-bot of Greg Kroah-Hartman.
 
-Thanks
+Markus, you seem to have sent a nonsensical or otherwise pointless
+review comment to a patch submission on a Linux kernel developer mailing
+list.  I strongly suggest that you not do this anymore.  Please do not
+bother developers who are actively working to produce patches and
+features with comments that, in the end, are a waste of time.
+
+Patch submitter, please ignore Markus's suggestion; you do not need to
+follow it at all.  The person/bot/AI that sent it is being ignored by
+almost all Linux kernel maintainers for having a persistent pattern of
+behavior of producing distracting and pointless commentary, and
+inability to adapt to feedback.  Please feel free to also ignore emails
+from them.
+
+thanks,
+
+greg k-h's patch email bot
 
