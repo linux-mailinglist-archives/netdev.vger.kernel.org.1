@@ -1,193 +1,215 @@
-Return-Path: <netdev+bounces-112452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255BB939268
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 18:17:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A670093926C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 18:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5AFF1F221F1
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:17:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AA8E1F22357
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D7F16E892;
-	Mon, 22 Jul 2024 16:17:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D129E16E87C;
+	Mon, 22 Jul 2024 16:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Hq5VLwpm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mGMBHIZM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2056.outbound.protection.outlook.com [40.107.93.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B044116C6B5
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 16:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721665057; cv=none; b=ombicmDJNp1op1gS3Dje6w+JTtW4vkoojgIX/+ECRgFS6h/ZK5uh6ubhVv19z3Z2Ykkcm5h4GJ3gG3cmS/hR6lvo7516l6PAgR5ASwqslcC7bpKB/XdriEJ4BF8PrZykE1ciUS1qRkKyAOvzjtB8EuzokyXAo4xlVRQizQRNZx4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721665057; c=relaxed/simple;
-	bh=r+a3M5u9pOMv/hVClE5hBqlyEDdBMEAW8unLWpcUwR0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rm4iGxnHgxTwhC4DzoGA7JkzdBSa+fvevE4GoK+uQcq3sQIE3+qBAkQBYOCACU5qCD2ToTSrETK9WUI58flqAx19HdYvE322xM10LZkSzwAnWlF6t2Zvdw9L9SRByyJ1SIANH2RD6Kg2gpTY5MnOuJl+/IcpSes4RF+v2CMDo6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Hq5VLwpm; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fc66fc35f2so28946105ad.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 09:17:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1721665055; x=1722269855; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ac4TBOhO4Lvkf/O2AokVMuwcwMPMmOE7Ro7pJm1rvQk=;
-        b=Hq5VLwpmREuwnMRPZQ+yCIBn2K2nMg/eykIi9J4qjoyMqf2IgM2qb7gSTVeI7aedH8
-         EEgMn7vBvRZMllGUGzkqfKMIr5tnt2h1HYgLNcd9yz7KaihmfKdoyjIBOuQf2QejlRqM
-         FkcIssgy/2ca0lpYScwZIUPghAoTQX7SRnMh0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721665055; x=1722269855;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ac4TBOhO4Lvkf/O2AokVMuwcwMPMmOE7Ro7pJm1rvQk=;
-        b=ueiekGLUvnUa6pDcOyUyqoHqI1jRQhzEcs32Q69FMF+40b1VGEYI07TJjZfNzi6u9X
-         vxZNtbIGprRkoo1b0S5QLbj2IatButW+pQAs9BUnfRSV/mS4PXeYJwscjnpnoyqN2IeT
-         XV/18HZKZzlCm6XrhXuJLKEb4GOfhQSc/TE7hE/aa1thdo2Empqj1IPzP42baiz6744b
-         m30/9q0NzdXvsmKDdFHep5fa8QJ89TDl5ImMDje34CPCHlWol5AI7hc2/VXKb0Xy1F2c
-         fCCZhMyNAZ7u/N90rK0D+lmiGf+SXCa+pEbkajbKB1A8z+yx+4inYiIPFqOQKN+C9A8l
-         51vA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6zOxC7E9OHcLaXWaZ6iGBrEX5uOsRzeDfYeY05C8B1fEqYARAVSnoA62vrKH44Bn+wgRlUvJLG805V7xQ8gs1TmKNtzcS
-X-Gm-Message-State: AOJu0Ywiy8kDI1YRYyFdc0Ha0PqaKEDVa+BZTasMOIZ4Lp6BvICgc3UQ
-	JsDu02Xa/vIePMw+ThRMScKY+7cl4+f71eXp29ol2Fc3/roWsW0j8/PG/0TcSJw=
-X-Google-Smtp-Source: AGHT+IFB2y7zOFl4+Y01VeT43wEsBkhPo0FQ49eT3GIcwc/I7mB7L8n/Y/dKG9HTsZ7eJjeY9OWniQ==
-X-Received: by 2002:a17:902:cec4:b0:1fd:b5fe:ee91 with SMTP id d9443c01a7336-1fdb5fef138mr3886125ad.25.1721665054849;
-        Mon, 22 Jul 2024 09:17:34 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70d1dbfe395sm2640504b3a.218.2024.07.22.09.17.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 09:17:34 -0700 (PDT)
-Date: Mon, 22 Jul 2024 09:17:31 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Elad Yifee <eladwf@gmail.com>
-Cc: daniel@makrotopia.org, Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next RFC] net: ethernet: mtk_eth_soc: use prefetch
- methods
-Message-ID: <Zp6GGzaJXhBcnGkC@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Elad Yifee <eladwf@gmail.com>, daniel@makrotopia.org,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, bpf@vger.kernel.org
-References: <20240720164621.1983-1-eladwf@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A70116419;
+	Mon, 22 Jul 2024 16:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721665105; cv=fail; b=V2XufZNEkDjcbUlIxTaRGALZK1TPEpt6rUI2BISGTMroNOWMTHaA/X/vnRo1LipjWVlJ1lUgKmymd3yGgiZ3rx+pTm9+nXRG0EpN5VIHbUgBDnyB4AdCXnQsevosl6DkESXF/Dc01V7H7W/cB3oxNFQZVldiIsYPY8zUSiNldGs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721665105; c=relaxed/simple;
+	bh=C/L2DWwa3unvO4XRdkn/kritZwppyT8N6JD4+kbOmPk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=btvv0Z9x56TUl7riCazfC3M///Wau5XKwL507kWsekzW6UrlL+mn9xpyvMwbot4pZ1y7WH9ApiH2gkBbM4pmIwkJFEGvnNXkRhSIIy2pa+lyuzqug/W+0RjOQUIYqaHaI7/3gwlon+Vcl0YysQwHkgPGyO8RAHMlvIhHQbJei7c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mGMBHIZM; arc=fail smtp.client-ip=40.107.93.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DcALo/Wts84ypIr9f5s6HFHiLAMZyIMUYYjVHDndGQ5AnPGBErOagrP6r9aZEV6l4jViKmE8+LT5pNL8XhwH9K9lkgy1W3stWJPw/qsC0FcrIrgMwNRZA5fctoVM7Fy6h2C8q1xVSxOXAvaIxMzoSipliUNRM8VPiFoobK9NG0AEm4MuktqrUxtaJ6RAPk0fya0QoTIiOqOwtUsfXDdvF1i0V1z4iam3hUXot5XdQxafw/ihSfz6VtGLn16W3O5FFMsZawM4Rhtorhge2xkGYKO+wNEd8tUC27oDrDmr5g3cN1v1dH9OgOq4QNUFW8Ad2HmR6s0Hik/LXLLraAxvtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jPUgI70J41umDXgezAo5Tnr9VHKJPRQVUVqzWeB8vGc=;
+ b=IQ1TpzpP2+Dr1unMzcSMo8izoNfrhrtqHZvI+CsnKw8iF9wL1C0GUdlHDMfopjO+ThC/2ZhfZY8EUstr79oHl6/QgNRsZLByi65Htscuooct2ZKtYJ9HwrQt3X1xbE8KAiSCXLeEW/yCKhWL08s4A2GXDwLtmkHOIivU9AIV2x4S+ofdc4E5H5qGeKlSR7JzvvPSDqNl+Bhkq8JChryzBoaSeHwdOgOrn6UpAtWQXxGOaLmnzoL718+CJQ9s/x5uZQyuBH5LMfXf10uIwbUAhlT6QtOW4/+M4jM411w9h/ylaNFdLtcmyCnFptTC2DkwUg7GIwRM8rSsnHcDJ4aDAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jPUgI70J41umDXgezAo5Tnr9VHKJPRQVUVqzWeB8vGc=;
+ b=mGMBHIZMZd78wWqXiMrFRGuaD7i0IOiJf/pwQ5J7N5S5/gDfd3K+Y9EoX7IxojmKfyRBaNI1zaoPIBir0EuabcYH5vxyaAKqtHeOiV/qnVivdcIOaxfGEoJk73M1+zOar8v6lp7P9Yy0OhbLOkxImg12Sh/+Qi2/mpsk9ZM9xJrhILqW87GmYRL+AYuM09tFhyTzHZsvKHJP7RGX0EkcOQ+RJh5q+c+9k+Gofvk0BMDpxiEz8sVUq/KkyC4Kg/pew9HYjvgOeraaR5MBVea6Tc7odSrguJ7FuultC/RVWzdSgfSkFzvq9N1vjAWjP2rHa13dPWEc3OEZoeadW9od/w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by SN7PR12MB6984.namprd12.prod.outlook.com (2603:10b6:806:260::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.17; Mon, 22 Jul
+ 2024 16:18:21 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7784.016; Mon, 22 Jul 2024
+ 16:18:21 +0000
+Date: Mon, 22 Jul 2024 13:18:18 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH v2 6/8] fwctl: Add documentation
+Message-ID: <20240722161818.GK3371438@nvidia.com>
+References: <6-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+ <c1a2b518-f258-41f2-8b0c-173f32756f49@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c1a2b518-f258-41f2-8b0c-173f32756f49@infradead.org>
+X-ClientProxiedBy: MN2PR22CA0006.namprd22.prod.outlook.com
+ (2603:10b6:208:238::11) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240720164621.1983-1-eladwf@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SN7PR12MB6984:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4dfa2652-a7e8-43e9-853d-08dcaa69e73e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?t1TyfmS3v2XwOEKIRj5tjFemZmGpDgbw3A+YO5aXpmxhY0aYPCuhMM6PE1MN?=
+ =?us-ascii?Q?ESN+Iewve41Zrip+bq/Y02U4+frE1v6yIsag2RZ3ohXMaeIaT0p2znmKZ+h0?=
+ =?us-ascii?Q?peiyc7j7+z2jTg40WazSMtjarik2un9AMg6mQfXBe2d+c9jGuI59/pjxnLTH?=
+ =?us-ascii?Q?vn0kZnonoksF6kgto4KA3wWHd0/ehZ/vkMxrO6dVi/tLpwdLqBBedsXXEwTR?=
+ =?us-ascii?Q?cx+/Y1Z7UtA3k8sMFEa9aPNo931FVMgTDs0YhPjoTFGgFFe5eMUvjjJDn81c?=
+ =?us-ascii?Q?Vjs/h2xqYVXm2Yrhoo3dV/+An9h0aWvA/zYfRXQeFBwvMPhh20lytqbNGDT/?=
+ =?us-ascii?Q?mS6VtbBjWYeNUqgVtguJOP1Uz6MfvNGK6rwTisWDwzzEwCLdCpn1ryuuWZuK?=
+ =?us-ascii?Q?1UtzpoNJCkJCnazKW35y/wJOcY92aav+3EzBg28vCwls/PFPaDDrD1HEEesd?=
+ =?us-ascii?Q?/hBNJzEBetupf7H3NrBE2tIqPwqcGcvqS+KwsgPexqCLMytc+OeCzwaT/CSB?=
+ =?us-ascii?Q?xaSMzehqNULmTYjo3mB0oeqis91Xev+QW/DHGfPLxVd2o2OWJhIwgQ84LFxA?=
+ =?us-ascii?Q?ZQ9dFLQaqZzxfka17+K8QLBVFv5ST/GraU6+pemwyo47FPTPVfdrG2pJrQ34?=
+ =?us-ascii?Q?dgFk5uMnJSYc8xNhkjpXPo/gw72bYTSVmMxS5bRnwISyc+RK3txZfYA2T/9n?=
+ =?us-ascii?Q?px5FNBaZxEhX6lJbenFwvXNMh+LAJ+GcxMCy+ISvPdok7fqmOVRflvf/x3ne?=
+ =?us-ascii?Q?twBmY+Q3G5+UDx5oLIrv8R1bcthRs5AGloWQ58Har7L/f0X8X5rs3CSgANJ7?=
+ =?us-ascii?Q?pnqZMufa8SkdxoYIoyzqRoftgwX82SPEpQDG719hEm7+qRz9vADfvXpaDtcc?=
+ =?us-ascii?Q?WIlqBYSQ2JX400kF7R0EJkuKEC6927lRfQoGD4rt2DGFuCBPP/mWL4rCSzR2?=
+ =?us-ascii?Q?ZRGjgGEBL1SuthKspWQCy+b25f5MvdO5Et3NTJKP59q18zw0+4uNIJPfgdSu?=
+ =?us-ascii?Q?QR5nEqB8q4iKDaVihIqdJ3NZPCJ0lLvz65MT2uKO7AOSgVnLqwcIyi6iigyI?=
+ =?us-ascii?Q?f/jQCgfP7UozBBY+iDZZotdXyEOJb2hBIT0OFkqc11fpPRAmpbWG9BGF8woS?=
+ =?us-ascii?Q?+RfkPicGdFuMkOPOmzOTyaepzMSMLSK7LiIPj4sbJ54V3TfnwBGfC/k+0X7S?=
+ =?us-ascii?Q?3Vfj9YXu9Y+eIlFS9LNHunKv3EjKL0R8yRsEiq4VPpbQ/RqWCNVC6QQ1qGZa?=
+ =?us-ascii?Q?0jds7b+VFeYMXpLnVO1K8xZtDbV1JSitE7RZ4vqzyBki5hunyIcc9g0kZ2DX?=
+ =?us-ascii?Q?PqrpqHK5qtl/GttCJ9R4kxWUqtXiFLhBZnNu8npqk+pnlg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XeDPdm6vXD2TdRpVp2ezmPqUVtBrT9qVU8sDaDFEdTN8/qxo41eNdgnRlq5r?=
+ =?us-ascii?Q?p3E3MFIMSJtYx/dAP3O328AnCTSSdFJm0J+/cw7Lip4fizAc/a4zav+RcPA5?=
+ =?us-ascii?Q?zUOE07oym3ct/66Ic2qgqw8EXRBokvkLNxyJYdHvJz1FuMOICJAdjS7D/oW4?=
+ =?us-ascii?Q?59BA2WCzOboxqqRYy8WKxC43RM9BUxFJhKgiaYt4DaI56GvChO5GgtzIRvKh?=
+ =?us-ascii?Q?vgOu4FHlFsn8j+cR4OAjGNeJb8P8AK7I7jCPN8uDq49ObTv4c6bfkqtRXhUu?=
+ =?us-ascii?Q?va1gSTq2MA7AKokvSp9RBdwzw7U1Uq7ZVkbcoJqy6TbzRp7wZ+yJ0H2fHvFA?=
+ =?us-ascii?Q?0pSmHA4+1quYtcjrEeEd5VQcMh57vjS5TnGNKbIvWMCL5gN4NtoR0VTzNW54?=
+ =?us-ascii?Q?XPf0Kmt+QVbiwHB5ZznbA0uvV0i5NBRJSpIQjvY6CKs1Zab4l9jKoMNZa7Qn?=
+ =?us-ascii?Q?Vvg08yiFk9mM3QzvcttfL0TbLuyNH5INvcYoW+VV5me9iFyCNHWcjrOk8rNC?=
+ =?us-ascii?Q?jwVQiaZ4EbrEziXOAD7bBRUZseEZtQJckRWfZ+ExgtfTj1d12obVAn1saGox?=
+ =?us-ascii?Q?bbZhDPhgIjrP8ISuFgmO9/rv1YjO7Yu+YmztTjR/AkQzxpHM3d65cDuEIJA9?=
+ =?us-ascii?Q?zbG7befpWMJrWRXFZBnnW5koEdgmEtKRPwlYYQZyiTThBSgmDIvU0BdPLP1t?=
+ =?us-ascii?Q?ahfB13l2dJ63BRzHH4QXXujoyfLT9anApFKX6gsrCLA5U1uQmsb+H7kCcC6l?=
+ =?us-ascii?Q?KM2XdK8Vr0wypCuq5qDdQJq0I+39J7c4eWMtZAU6MKXcQYZetqrb+RLnz1q8?=
+ =?us-ascii?Q?C1wupik6X03XMOEVm/2CTkrLU4f4d4wIhvEC93vZXMKwuPhIPSy55sUNenwb?=
+ =?us-ascii?Q?vczN02ykn+Kvq37mZbZF3Z1j/vjFVX5jFxow4Im9ccB6bjlcAR8M/p502p4u?=
+ =?us-ascii?Q?/AmJsNUDDSCBSD6Ng5UvZTPd4BwYpOUF8AhLO/X0QTjssPvo5k0nxwX8ora6?=
+ =?us-ascii?Q?hIk/W9ju4s0+QYunJGawSRX8x66c5M46RVrQeSPNdW2UxKge62loOfBOL/Ta?=
+ =?us-ascii?Q?ieep+6Ok4e33dLI+EOQSs7V3wmuS0wrrv77tPDAS6mwI4d75k4ifct9WVuuB?=
+ =?us-ascii?Q?zISj/lsL48S8TQQ7DUtpkBxIuSsLcIkOAaTbzWwKYuNzcgyZvyROfVdSnhnq?=
+ =?us-ascii?Q?U2iagj4WyXvVFENqMqVPEZ61Nqq0kvzB0+r7sZ7pg8i1bzExB7sS9SI/hZFq?=
+ =?us-ascii?Q?HkSxRnC+vusKwy+03UiwyefSe9TOp1koyq2nl9Q5/tdnIYZ7yrDHT80Q4uOG?=
+ =?us-ascii?Q?3Gtze3q/sgRi6ImcCa31fDd1omanqGGlbSi5ejttddk+tU8SbyD5MIamT005?=
+ =?us-ascii?Q?JRmv1lxu0jtlMFC2cEyJnoPXT2qx9nqnTGPZdYYJHJwBfy8sxoekZWUXiUxH?=
+ =?us-ascii?Q?QK/pwefwHnJ2BkmEtHvAyvYVBt6MmTumqC3weX2kyOSoKNPKuZiC172Fcvkc?=
+ =?us-ascii?Q?HYF6O0Y6JZT/+AI3D2nzUcddPAqOQP3m3Csr5OuTH+RIyw8pFpWGnCC5UqFZ?=
+ =?us-ascii?Q?g8JkwrUOIRq0nlXvT8I=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dfa2652-a7e8-43e9-853d-08dcaa69e73e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2024 16:18:20.9077
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kehnYsK44OA5jc/Rs9YKRnFlaZxqLtkWLfa7rVyILEvjWQbnnKXittrlKJhq31Xa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6984
 
-On Sat, Jul 20, 2024 at 07:46:18PM +0300, Elad Yifee wrote:
-> Utilize kernel prefetch methods for faster cache line access.
-> This change boosts driver performance,
-> allowing the CPU to handle about 5% more packets/sec.
-
-Nit: It'd be great to see before/after numbers and/or an explanation of
-how you measured this in the commit message.
-
-> Signed-off-by: Elad Yifee <eladwf@gmail.com>
-> ---
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+On Tue, Jun 25, 2024 at 03:04:42PM -0700, Randy Dunlap wrote:
+> > +There are many things this interface must not allow user space to do (without a
+> > +Taint or CAP), broadly derived from the principles of kernel lockdown. Some
+> > +examples:
+> > +
+> > + 1. DMA to/from arbitrary memory, hang the system, run code in the device, or
 > 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> index 0cc2dd85652f..1a0704166103 100644
-> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-> @@ -1963,6 +1963,7 @@ static u32 mtk_xdp_run(struct mtk_eth *eth, struct mtk_rx_ring *ring,
->  	if (!prog)
->  		goto out;
->  
-> +	prefetchw(xdp->data_hard_start);
+> An RPC message is going to run code in the device. Should this say something instead
+> like:
+> 
+> download [or load] code to be executed in the device,
 
-Is there any reason to mix net_prefetch (as you have below) with
-prefetch and prefetchw ?
+Yeah, it is a hard concept. It is kind of murky as even today's
+devlink flash will let you load untrusted code into the device under
+lockdown AFAICR.
 
-IMHO: you should consider using net_prefetch and net_prefetchw
-everywhere instead of using both in your code.
+How about:
 
->  	act = bpf_prog_run_xdp(prog, xdp);
->  	switch (act) {
->  	case XDP_PASS:
-> @@ -2039,7 +2040,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
->  		idx = NEXT_DESP_IDX(ring->calc_idx, ring->dma_size);
->  		rxd = ring->dma + idx * eth->soc->rx.desc_size;
->  		data = ring->data[idx];
-> -
-> +		prefetch(rxd);
+ 1. DMA to/from arbitrary memory, hang the system, compromise FW integrity with
+    untrusted code, or otherwise compromise device or system security and
+    integrity.
 
-Maybe net_prefetch instead, as mentioned above?
+Which is a little broader I suppose.
 
->  		if (!mtk_rx_get_desc(eth, &trxd, rxd))
->  			break;
->  
-> @@ -2105,6 +2106,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
->  			if (ret != XDP_PASS)
->  				goto skip_rx;
->  
-> +			net_prefetch(xdp.data_meta);
->  			skb = build_skb(data, PAGE_SIZE);
->  			if (unlikely(!skb)) {
->  				page_pool_put_full_page(ring->page_pool,
-> @@ -2113,6 +2115,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
->  				goto skip_rx;
->  			}
->  
-> +			prefetchw(skb->data);
+> > +The kernel remains the gatekeeper for this interface. If violations of the
+> > +scopes, security or isolation principles are found, we have options to let
+> > +devices fix them with a FW update, push a kernel patch to parse and block RPC
+> 
+> fwctl does not do FW updates, is that correct?
 
-Maybe net_prefetchw instead, as mentioned above?
+I think it is up to the specific RPCs the device supports. Given there
+is currently no way to marshal a large amount of data it is not a good
+interface for FW update.
 
->  			skb_reserve(skb, xdp.data - xdp.data_hard_start);
->  			skb_put(skb, xdp.data_end - xdp.data);
->  			skb_mark_for_recycle(skb);
-> @@ -2143,6 +2146,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
->  			dma_unmap_single(eth->dma_dev, ((u64)trxd.rxd1 | addr64),
->  					 ring->buf_size, DMA_FROM_DEVICE);
->  
-> +			net_prefetch(data);
->  			skb = build_skb(data, ring->frag_size);
->  			if (unlikely(!skb)) {
->  				netdev->stats.rx_dropped++;
-> @@ -2150,6 +2154,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
->  				goto skip_rx;
->  			}
->  
-> +			prefetchw(skb->data);
+I'd encourage people to use devlink flash more broadly, but I also
+wouldn't go out of the way to block FW update RPCs that might exist
+from here.
 
-Maybe net_prefetchw instead, as mentioned above?
+I certainly wouldn't want people to make their own FW update ioctls
+(as still seems to be happening) out of fear they shouldn't use
+fwctl :\
+
+Looking particularly at mlx5, we've had devlink flash for a long time
+now, but it hasn't suceeded to displace the mlx5 specific tools, for
+whatever reason.
+
+I grabbed all the changes here thanks!
+
+Jason
 
