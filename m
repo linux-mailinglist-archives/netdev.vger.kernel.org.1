@@ -1,118 +1,224 @@
-Return-Path: <netdev+bounces-112463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818F4939412
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 21:16:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC75993942E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 21:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C7CCB20ED1
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 19:16:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88E71C21587
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 19:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A11438DD6;
-	Mon, 22 Jul 2024 19:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E004716FF5F;
+	Mon, 22 Jul 2024 19:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WS05OsYy"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="UeTXJxIB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EB914287
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 19:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F013816D9DC
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 19:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721675777; cv=none; b=Xshh1ZbZu15ki5X5WUvCT26XUIHKl0iMek+bZPjJtb01JH+p4MztAnnN9e8vwaUy9cLB8CAUdOjBNyWR9lF50OD8LtjvWiLk0lwfO7Kpt76v+S66W5BBlLe3BjJbHHmSn3YmNfEto/7aVIgyE9sxRTBiC3EDSQdMHqzhm0zdod4=
+	t=1721676408; cv=none; b=eb2nFP8aZt96QiqrIT1bWCJ/G07cESEJgK5LSX6BRAgSqgFTJNn8A2L5S62rfQBXPvbgZZA+NE/380divbOKPALHwXKnrrw89LyslApNdedJ9TVj1IBJmSgSJtpsqiYmklSJQ56Xmf+dJTjNGloRbkRp0MEd5u5vrffjUhb9LII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721675777; c=relaxed/simple;
-	bh=yPgiMnhqt31HMeCQSHIny6iV71fk7nKkBHS+bQaVr8s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PEFbFIY4j+SR3QqPeD7+8BcFqd9iXRk9rDd/otH/kAXJ8noyWjDUG3+xBn8iPbpuechUrdecElQNJxuCD2qSWuGXTAdOuND1VskiTQp1EnFOw1mzBzijjXzQmV0exsBVfie4IY4TYnNoQpN0VPZiQWnZILLJHRBXNe2wWGsDcxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WS05OsYy; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1721676408; c=relaxed/simple;
+	bh=RC16Xj2GExN2UNH5sQwynzelC+AZm0hY/uBKoz/E/dQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PyAWmLMBIoypDixDB2KkkilghH7BkzUm5UUn34EWyEGvCmyVMD3cLqhJbR7jPvdauCC7bjeFRQnWqDjBSItnfbbPB7hbUOzt7vGXv+xo737SPdH37Z4V7cOkRP/CdXdjb6JReXfJFBSXyW3d0CyIWhgcuU9TQwYbHzpkbfOOnwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=UeTXJxIB; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso4244132a12.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 12:26:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1721675775; x=1753211775;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=j5XhjdPwNMb/XkgduqS3hivt5F0MEaYRbdq2YDnygYU=;
-  b=WS05OsYy6belceHpVzWGkMYmPgxZa8T4FnKN9L4cGp7q+ZrM0IL0YwhX
-   ay9PpnkwmZ2UQSi69s52eaJxc+tr/CGfX0QQMvRhevJJp4gn2qtiti9P6
-   I4GpoVld2he5SdfKv/OwPC40fuxoB8GuRQPLzoEdsSrVlpSyjo4bX1SXE
-   E=;
-X-IronPort-AV: E=Sophos;i="6.09,228,1716249600"; 
-   d="scan'208";a="108543708"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 19:16:13 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:29330]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.52:2525] with esmtp (Farcaster)
- id 6cbd0530-a040-4281-8c4b-b66e77b20f92; Mon, 22 Jul 2024 19:16:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 6cbd0530-a040-4281-8c4b-b66e77b20f92
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 22 Jul 2024 19:16:13 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.100.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 22 Jul 2024 19:16:10 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: James Chapman <jchapman@katalix.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net] l2tp: Don't assign net->gen->ptr[] for pppol2tp_net_ops.
-Date: Mon, 22 Jul 2024 12:15:56 -0700
-Message-ID: <20240722191556.36224-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=cloudflare.com; s=google09082023; t=1721676405; x=1722281205; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kegZFA65qLO4AJ+rLRcibC4hYdIssGNELpKKk1lmIOA=;
+        b=UeTXJxIBhUKO5qeNdT48Zn9FWkT8mwnzutwicxUesSYtdj8w70gawdlJ5EGjc3/lkI
+         LIHLNkkNZNIo9Aujb1wLOQR5F3mXT6/e5+B0tlpMkUx/N6jyWa21ib/rYHnZQCf4EUVh
+         LZewe7Xcf+ojSO+tgdUNZO+TfvE0LAHj0C2CZYHZRT/TK55X0CDxLPn2OLXn4ZQru+qN
+         iJE1LbLYswOukq2qvio7LfwA9YRufno9jgGBvB26CJAb24XN2PJ2Vp1r9IIuz9l6d+WF
+         bnzA+nRBuDg8mFwjhjBuFD3iy6kzlRmgLqS+PyISS07Grq1h+Y9EddsidXuqtURehFXo
+         85ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721676405; x=1722281205;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kegZFA65qLO4AJ+rLRcibC4hYdIssGNELpKKk1lmIOA=;
+        b=mS/87aJhpkvpKtFeoPUh/IMBxSu29dDiW5cK7F+DHR2YLa9zEUAFg/DTayEQLGzTDW
+         hw09JBwYxdIm3oA67tCcyiIsFyoKU1QiV+X42l0leRICDlYhcRBaYw6NyqR3RPBHVlid
+         lwGlvS0Y3Z2761xsD3lDScsmovO0DgpHdNmmn+ao1w0SBQSAZalGXz/kV8C0LAjAGMvw
+         DGhtjA3ZLu+eGaUsjbLnLMpJ0zl2x/ClXMOjwnJRzNkk9EUA3TJOMdqClXchHAmY9NMU
+         zvOYkBkPhrOpT9vKDXmMAW5x6URxAlWAF9C4VCp2yqU2NH5RC/j+Wjik+wN9YrodBUhQ
+         u++Q==
+X-Gm-Message-State: AOJu0Yy/kKgjKVCRYCHOf/Q8EiJy8bXdyIpq2GRhOeP4KFdEa5bJ4qWS
+	opcZNUZbIRiuf1SflUvGb5Qyt6f56ozoAXF0v8twBk8VX5Lrn4KAinFzCHHPQNQ=
+X-Google-Smtp-Source: AGHT+IFk08DF4nk6DApKnGf17haGiFMZZBC4ibQa7ps0oo5s2Aos6W12At7KcyB+FATmOyLLcvmLJA==
+X-Received: by 2002:a05:6402:34c8:b0:59e:b95d:e769 with SMTP id 4fb4d7f45d1cf-5a941d254b0mr760623a12.5.1721676405318;
+        Mon, 22 Jul 2024 12:26:45 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5a59be83c69sm3126637a12.58.2024.07.22.12.26.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jul 2024 12:26:44 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  davem@davemloft.net,
+  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
+  john.fastabend@gmail.com,  kuniyu@amazon.com,  Rao.Shoaib@oracle.com,
+  cong.wang@bytedance.com, Andrii Nakryiko <andrii@kernel.org>, Eduard
+ Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>
+Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
+ unix_inet_redir_to_connected()
+In-Reply-To: <027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co> (Michal Luczaj's
+	message of "Mon, 22 Jul 2024 15:07:28 +0200")
+References: <20240707222842.4119416-1-mhal@rbox.co>
+	<20240707222842.4119416-3-mhal@rbox.co>
+	<87zfqqnbex.fsf@cloudflare.com>
+	<fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
+	<87ikx962wm.fsf@cloudflare.com>
+	<2eae7943-38d7-4839-ae72-97f9a3123c8a@rbox.co>
+	<87sew57i4v.fsf@cloudflare.com>
+	<027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Mon, 22 Jul 2024 21:26:43 +0200
+Message-ID: <87ed7lcjnw.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Commit fd558d186df2 ("l2tp: Split pppol2tp patch into separate l2tp and
-ppp parts") converted net->gen->ptr[pppol2tp_net_id] in l2tp_ppp.c to
-net->gen->ptr[l2tp_net_id] in l2tp_core.c.
+On Mon, Jul 22, 2024 at 03:07 PM +02, Michal Luczaj wrote:
+> On 7/19/24 13:09, Jakub Sitnicki wrote:
+>> On Wed, Jul 17, 2024 at 10:15 PM +02, Michal Luczaj wrote:
+>>> On 7/13/24 11:45, Jakub Sitnicki wrote:
+>>>> On Thu, Jul 11, 2024 at 10:33 PM +02, Michal Luczaj wrote:
+>>>>> And looking at that commit[1], inet_unix_redir_to_connected() has its
+>>>>> @type ignored, too.  Same treatment?
+>>>>
+>>>> That one will not be a trivial fix like this case. inet_socketpair()
+>>>> won't work for TCP as is. It will fail trying to connect() a listening
+>>>> socket (p0). I recall now that we are in this state due to some
+>>>> abandoned work that began in 75e0e27db6cf ("selftest/bpf: Change udp to
+>>>> inet in some function names").
+>>>> [...]
+>>>
+>>> Is this what you've meant? With this patch inet_socketpair() and
+>>> vsock_socketpair_connectible can be reduced to a single call to
+>>> create_pair(). And pairs creation in inet_unix_redir_to_connected()
+>>> and unix_inet_redir_to_connected() accepts both sotypes.
+>> 
+>> Yes, exactly. This looks great.
+>
+> Happy to hear that. I'll prepare a series, include the little fixes and
+> send it out for a proper review.
+>
+> One more thing: I've noticed changes in sockmap_helpers.h don't trigger
+> test_progs rebuild (seems to be the case for all .h in prog_tests/). No
+> idea if this is the right approach, but adding
+> "$(TRUNNER_TESTS_DIR)/sockmap_helpers.h" to TRUNNER_EXTRA_SOURCES in
+> selftests/bpf/Makefile does the trick.
 
-Now the leftover wastes one entry of net->gen->ptr[] in each netns.
+CC'ed BPF selftests reviewers in case they'd like to chip in.
 
-Let's avoid the unwanted allocation.
+>
+>> Classic cleanup with goto to close sockets is all right, but if you're
+>> feeling brave and aim for something less branchy, I've noticed we have
+>> finally started using __attribute__((cleanup)):
+>> 
+>> https://elixir.bootlin.com/linux/v6.10/source/tools/testing/selftests/bpf/progs/iters.c#L115
+>
+> I've tried. Is such "ownership passing" (to inhibit the cleanup) via
+> construct like take_fd()[1] welcomed?
 
-Fixes: fd558d186df2 ("l2tp: Split pppol2tp patch into separate l2tp and ppp parts")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/l2tp/l2tp_ppp.c | 3 ---
- 1 file changed, 3 deletions(-)
+I'm fine with having such a helper to complement the cleanup attribute.
+Alternatively, we can always open code it like it used to be in systemd
+at first [1], if other reviewers don't warm up to it :-)
 
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index 3596290047b2..246089b17910 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -1406,8 +1406,6 @@ static int pppol2tp_getsockopt(struct socket *sock, int level, int optname,
-  * L2TPv2, we dump only L2TPv2 tunnels and sessions here.
-  *****************************************************************************/
- 
--static unsigned int pppol2tp_net_id;
--
- #ifdef CONFIG_PROC_FS
- 
- struct pppol2tp_seq_data {
-@@ -1641,7 +1639,6 @@ static __net_exit void pppol2tp_exit_net(struct net *net)
- static struct pernet_operations pppol2tp_net_ops = {
- 	.init = pppol2tp_init_net,
- 	.exit = pppol2tp_exit_net,
--	.id   = &pppol2tp_net_id,
- };
- 
- /*****************************************************************************
--- 
-2.30.2
+[1] https://github.com/systemd/systemd/blob/main/coccinelle/take-fd.cocci
 
+
+>
+> [1] https://lore.kernel.org/all/20240627-work-pidfs-v1-1-7e9ab6cc3bb1@kernel.org/
+>
+> static inline void close_fd(int *fd)
+> {
+> 	if (*fd >= 0)
+> 		xclose(*fd);
+> }
+>
+> #define __closefd __attribute__((cleanup(close_fd)))
+>
+> static inline int create_pair(int family, int sotype, int *c, int *p)
+> {
+> 	struct sockaddr_storage addr;
+> 	socklen_t len = sizeof(addr);
+> 	int err;
+>
+> 	int s __closefd = socket_loopback(family, sotype);
+> 	if (s < 0)
+> 		return s;
+>
+> 	err = xgetsockname(s, sockaddr(&addr), &len);
+> 	if (err)
+> 		return err;
+>
+> 	int s0 __closefd = xsocket(family, sotype, 0);
+
+I'd stick to no declarations in the body. Init to -1 or -EBADF.
+
+> 	if (s0 < 0)
+> 		return s0;
+>
+> 	err = connect(s0, sockaddr(&addr), len);
+> 	if (err) {
+> 		if (errno != EINPROGRESS) {
+> 			FAIL_ERRNO("connect");
+> 			return err;
+> 		}
+>
+> 		err = poll_connect(s0, IO_TIMEOUT_SEC);
+> 		if (err) {
+> 			FAIL_ERRNO("poll_connect");
+> 			return err;
+> 		}
+> 	}
+>
+> 	switch (sotype & SOCK_TYPE_MASK) {
+> 	case SOCK_DGRAM:
+> 		err = xgetsockname(s0, sockaddr(&addr), &len);
+> 		if (err)
+> 			return err;
+>
+> 		err = xconnect(s, sockaddr(&addr), len);
+> 		if (err)
+> 			return err;
+>
+> 		*p = take_fd(s);
+> 		break;
+> 	case SOCK_STREAM:
+> 	case SOCK_SEQPACKET:
+> 		*p = xaccept_nonblock(s, NULL, NULL);
+
+I wouldn't touch output arguments until we have succedeed.  Another
+local var will be handy.
+
+> 		if (*p < 0)
+> 			return *p;
+> 		break;
+> 	default:
+> 		FAIL("Unsupported socket type %#x", sotype);
+> 		return -EOPNOTSUPP;
+> 	}
+>
+> 	*c = take_fd(s0);
+> 	return err;
+> }
 
