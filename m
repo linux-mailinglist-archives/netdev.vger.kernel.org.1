@@ -1,207 +1,154 @@
-Return-Path: <netdev+bounces-112471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B9B93958F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 23:35:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C399893963A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 00:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4141D1C21857
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 21:35:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 711C31F219E1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 22:07:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCCDD44C9B;
-	Mon, 22 Jul 2024 21:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C408376E7;
+	Mon, 22 Jul 2024 22:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="I2XpA0Y7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eh0dOOJC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93443BBE3
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 21:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFE11849;
+	Mon, 22 Jul 2024 22:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721684116; cv=none; b=igZsms7+FBL+O64RZiPdHVq3itWfR9HaIejK+u6kHckJr/6VygAuo2WgU32ZmChpjTjA2ueMKjU522E3Qujn/Jv9+weNa8kH2lDXQ/Qw8/mUlaUAz3itptOl1kd5Ubx2HhpooiHMFl14mxAegwiebnh9TPD8/gWRb3I9zFt2DeY=
+	t=1721686069; cv=none; b=GVmg155UPrxh0kgupWhPxZrxvLG98Bfn1rP5JO0ks7X8FpA78z5kig3qXzfCmHnLQntnHQLpPSBwQalMpxH1pNntZr5gFQfibU+86+oikW3aRvcYy7vc0xvRi2s83punwc72MfsEbb4RIC1G6wydRCeBR0jCOYVJb1tc/v5U6fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721684116; c=relaxed/simple;
-	bh=QkalD80DqvTDCz2PN2W94IIv1RWLqf+OXseqlPlrVLI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SX8YeivCZarzmIR6qnTohQp1nmKogz9fh+bbH1MK5gpp3V18F5nBX+gqOn2VwktBv2Hl37wBfy3N5/XcZnTdYlyaYkqoFX+XQEgJoJyXuhTweTZoeSlPPKhCATg3iAHasEnoyhjxYBC9pbW01nlW06MmzMyLsxyBgZkHtC9TG54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=I2XpA0Y7; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e0878971aa9so1663221276.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 14:35:14 -0700 (PDT)
+	s=arc-20240116; t=1721686069; c=relaxed/simple;
+	bh=o3Pca6/nWFvxsPH/LoOBGMfLo6hyA7L5/ALwx7EaTL4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WL5q4UjXAGs2wMLBUZA/Zgb7R0f3uor/EPJKuDVoOktePfizIlgpWGQ38FyaYxQOSS6korEFvOpJq5wFpOJVappvJaWVhQc8RLdgULJIHjTbN/xRLoy8Ot/xxjw9zx8sSgaKsyQ2+ijku1yXXYn1/ADKVQ9AQpmLY1AZy32jrX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eh0dOOJC; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5c669a0b5d1so2872068eaf.3;
+        Mon, 22 Jul 2024 15:07:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1721684114; x=1722288914; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uTsqn/83ZPeaLCYHapIif4YXESvQF8i3Q92iI0P3qBc=;
-        b=I2XpA0Y7yXAFbooqbBs+mjE3d7rVzVMzufMptvTU5Z82mSMfvyIj0LuQlz0IiMFDdg
-         HbiaGPc9EaV541ig95M98Xjh+czaV6bLTP4sXWGojDMA2JjK6XqPe/WHqrh4hVXqKsBj
-         Hdpj6JcJx0WIxXm7hAjJyfpA/RJy7liY4gg2ddBHDgixp2oxEViG67gpUOA1YsR9KyNg
-         lUYd5ryYaNXenrdAHrSubWSl6nls5+Z59e96rTvj8gSu+v8a/wElUHPDkW45LH5/4UoJ
-         Qv0Nuk4DPZ7D+fbaITp7S5STrx30NNvpmifQ0ZPmYpBAESsoL5r9xwz4Vm+zWKkL4MhX
-         wQ0A==
+        d=gmail.com; s=20230601; t=1721686067; x=1722290867; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=i9jYVRlY5Jom6MG8i6PFZi0OTtHKBWec2yXb5FBRRi8=;
+        b=Eh0dOOJCRvs/OkeO0X8VSsX/KAihXW2QNJ3eSBZ/oC0dvUxSY6Bo/Toj8iAjIeJi1H
+         WaTo1g0Q2msM7tOMyNHsEfpu645JEaqgjENV5avnlN5RCTbi5HLKHoOZ3tbtugympyMm
+         DSU7NYDeRsZt9e3BLvvGXa3hYVGJ5L1hJm3hi8sgulNoFpRuZvwtgZUh/kHR/zCHWdWj
+         jjk6LOpG290Ue21DazFAd2QsGKZL7/i5mo5xt9ARBQMU1moWfDOqh8b4kCZdDWipzbc/
+         zCoq0uwiApsBFih0edmpQXlTF9UHfOYejrBmyYYlD+fUgiMuuc6bGTht8oDk3j90+IXJ
+         wgaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721684114; x=1722288914;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uTsqn/83ZPeaLCYHapIif4YXESvQF8i3Q92iI0P3qBc=;
-        b=M/YPC1AUTxZp+nn98dkRlulkUMH+soR9Ws+z04bsMsMiHQptbLtAu2LrzjBrJjcS/5
-         MLGRo8j/C+MeU3WEQcoSeJFVzfuc0FEC7c1BYH/N5aote3hukbO8x2Wc/nwexRgLCR0z
-         1GAVBslFXdRsdxbGNhyACPWDqu+f43JNQcO9ZQ2gCZuUuC3sJlyOPK8l5IBOl35pv4jG
-         CIw6QaCbO3Qs6NZt98xbhYQ9VA5XxBTvXsQ0xbtNXidLSsjDcFdqphIR65WKVfJNyKHu
-         O289A7f7knBugPp67M5QAlS1PW/VrR09Pivce6fL6MxEOk0CK30Iw3uur7JwDIaLCPWQ
-         MtZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/vVzyhj4FDyMGEvxjx/zcQJyW9VWD09zgNBhaJznw/1Ntsy2Cj7Vtm7trmihoTD5Efhyb1Izulf/brNm5o+Brm8pl71Bj
-X-Gm-Message-State: AOJu0YxSh2qaYJhBNfYlvUcc8qz/lcaubTKfZ0JJLvV4EfGr9BUwOdm3
-	XqIntYeAfu2lr5nj+W+VOJRVhRiqO+cIhWmOkzqN0bP68eHZJfqoGmcrMDsMAcSZe9jm25oP4zD
-	YuudMdwPy+CZgvRHhbyP9cQ//ONGO6ZrarfkF
-X-Google-Smtp-Source: AGHT+IFxvRdTpM9J/N/0hPOw4WP6B7wxQLoIxE+F11e00K/b5jjFnXSxfC/5KNaKiSnG10O3MfvJ02z+6becK/m+/x8=
-X-Received: by 2002:a5b:d03:0:b0:e05:e4a6:3f1b with SMTP id
- 3f1490d57ef6-e08b95ce4d8mr146419276.7.1721684113783; Mon, 22 Jul 2024
- 14:35:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721686067; x=1722290867;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i9jYVRlY5Jom6MG8i6PFZi0OTtHKBWec2yXb5FBRRi8=;
+        b=IHNjJShRxOdTcbKawNoT7+GTJNiisu7tpIrbn++WHwBcFJB1hGb+MUe8tuwb60QVCw
+         UUj7tC0XAi5pauSvhCOZbMHyxue4dDZIsYUeRGXa/AXz+ySN4OxY13OHpHlvtkh1iP2s
+         bU6BXJLWFsJic9UVb5Rx4PJSydxAEW94MUzgoVSFSLAk8CVj7TaSHVpf+2OvvQdgtptj
+         e5NqowIa4S33R/HY5soJO8HtRssszwPCzag4W4IeGfQ81AS5M9YGFGd0Vj6Q7/nmw0BJ
+         x1TjjIqqsZi4hdNP1sE3TZ3Jc+DlgyyOf1N9vx7s3FP/oBB+f6HD7hlvcgpdFb0TPMte
+         Cntg==
+X-Forwarded-Encrypted: i=1; AJvYcCXtdnXcDagdnr/xy52u7TqgmQWheOxB97Zv7UozBlPEsHkNa0rXYLrxNW3ggEmOTYHlb1vOAF5lPEBLm0UWIXs92LyQ
+X-Gm-Message-State: AOJu0YyE2jQmalnnsLJWz0aM0/Inl/Y6KAU9QogAEPl9YwMuSz6aWCs8
+	sctVPZ57sJ3kwHfP4NVgmMkajKjSpYBOQFEGtQbb7BwizfkJAFJX
+X-Google-Smtp-Source: AGHT+IFH3aU7Q03ubqj7yL3dombtGXw8/AleHImRaUwZwyIgUkGfiQxvK29Drq4ssgskCFlR+9TpaQ==
+X-Received: by 2002:a05:6359:4c23:b0:1a6:1ed1:2366 with SMTP id e5c5f4694b2df-1acc5b09e71mr974330455d.16.1721686067106;
+        Mon, 22 Jul 2024 15:07:47 -0700 (PDT)
+Received: from [192.168.0.235] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-79f0ba11b1asm5090312a12.47.2024.07.22.15.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jul 2024 15:07:46 -0700 (PDT)
+Message-ID: <205c38e28799bfe4b78a5e61fd369d5a5588694f.camel@gmail.com>
+Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
+ unix_inet_redir_to_connected()
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ john.fastabend@gmail.com,  kuniyu@amazon.com, Rao.Shoaib@oracle.com,
+ cong.wang@bytedance.com, Andrii Nakryiko <andrii@kernel.org>, Mykola
+ Lysenko <mykolal@fb.com>
+Date: Mon, 22 Jul 2024 15:07:41 -0700
+In-Reply-To: <87ed7lcjnw.fsf@cloudflare.com>
+References: <20240707222842.4119416-1-mhal@rbox.co>
+	 <20240707222842.4119416-3-mhal@rbox.co> <87zfqqnbex.fsf@cloudflare.com>
+	 <fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
+	 <87ikx962wm.fsf@cloudflare.com>
+	 <2eae7943-38d7-4839-ae72-97f9a3123c8a@rbox.co>
+	 <87sew57i4v.fsf@cloudflare.com>
+	 <027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co>
+	 <87ed7lcjnw.fsf@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240711111908.3817636-10-xukuohai@huaweicloud.com>
- <94a3b82a1e3e1fec77d676fa382105d4@paul-moore.com> <7711bdba-9fbd-406c-8b81-adf91074d0b7@huaweicloud.com>
-In-Reply-To: <7711bdba-9fbd-406c-8b81-adf91074d0b7@huaweicloud.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 22 Jul 2024 17:35:02 -0400
-Message-ID: <CAHC9VhSsCuJzJ3ReUTyTXfWqRd+_TfShJBnRugZtX6OrMYJkOQ@mail.gmail.com>
-Subject: Re: [PATCH v4 9/20] lsm: Refactor return value of LSM hook key_getsecurity
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, selinux@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Matt Bobrowski <mattbobrowski@google.com>, Brendan Jackman <jackmanb@chromium.org>, 
-	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
-	Khadija Kamran <kamrankhadijadj@gmail.com>, Casey Schaufler <casey@schaufler-ca.com>, 
-	Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>, 
-	John Johansen <john.johansen@canonical.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Shung-Hsi Yu <shung-hsi.yu@suse.com>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
-	Anna Schumaker <anna@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Stephen Smalley <stephen.smalley.work@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jul 20, 2024 at 5:31=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.com=
-> wrote:
-> On 7/19/2024 10:08 AM, Paul Moore wrote:
-> > On Jul 11, 2024 Xu Kuohai <xukuohai@huaweicloud.com> wrote:
-> >>
-> >> To be consistent with most LSM hooks, convert the return value of
-> >> hook key_getsecurity to 0 or a negative error code.
-> >>
-> >> Before:
-> >> - Hook key_getsecurity returns length of value on success or a
-> >>    negative error code on failure.
-> >>
-> >> After:
-> >> - Hook key_getsecurity returns 0 on success or a negative error
-> >>    code on failure. An output parameter @len is introduced to hold
-> >>    the length of value on success.
-> >>
-> >> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-> >> ---
-> >>   include/linux/lsm_hook_defs.h |  3 ++-
-> >>   include/linux/security.h      |  6 ++++--
-> >>   security/keys/keyctl.c        | 11 ++++++++---
-> >>   security/security.c           | 26 +++++++++++++++++++++-----
-> >>   security/selinux/hooks.c      | 11 +++++------
-> >>   security/smack/smack_lsm.c    | 21 +++++++++++----------
-> >>   6 files changed, 51 insertions(+), 27 deletions(-)
+On Mon, 2024-07-22 at 21:26 +0200, Jakub Sitnicki wrote:
+> On Mon, Jul 22, 2024 at 03:07 PM +02, Michal Luczaj wrote:
 
-...
+[...]
 
-> >> diff --git a/security/security.c b/security/security.c
-> >> index 9dd2ae6cf763..2c161101074d 100644
-> >> --- a/security/security.c
-> >> +++ b/security/security.c
-> >> @@ -5338,19 +5338,35 @@ int security_key_permission(key_ref_t key_ref,=
- const struct cred *cred,
-> >>    * security_key_getsecurity() - Get the key's security label
-> >>    * @key: key
-> >>    * @buffer: security label buffer
-> >> + * @len: the length of @buffer (including terminating NULL) on succes=
-s
-> >>    *
-> >>    * Get a textual representation of the security context attached to =
-a key for
-> >>    * the purposes of honouring KEYCTL_GETSECURITY.  This function allo=
-cates the
-> >>    * storage for the NUL-terminated string and the caller should free =
-it.
-> >>    *
-> >> - * Return: Returns the length of @buffer (including terminating NUL) =
-or -ve if
-> >> - *         an error occurs.  May also return 0 (and a NULL buffer poi=
-nter) if
-> >> - *         there is no security label assigned to the key.
-> >> + * Return: Returns 0 on success or -ve if an error occurs. May also r=
-eturn 0
-> >> + *         (and a NULL buffer pointer) if there is no security label =
-assigned
-> >> + *         to the key.
-> >>    */
-> >> -int security_key_getsecurity(struct key *key, char **buffer)
-> >> +int security_key_getsecurity(struct key *key, char **buffer, size_t *=
-len)
-> >>   {
-> >> +    int rc;
-> >> +    size_t n =3D 0;
-> >> +    struct security_hook_list *hp;
-> >> +
-> >>      *buffer =3D NULL;
-> >> -    return call_int_hook(key_getsecurity, key, buffer);
-> >> +
-> >> +    hlist_for_each_entry(hp, &security_hook_heads.key_getsecurity, li=
-st) {
-> >> +            rc =3D hp->hook.key_getsecurity(key, buffer, &n);
-> >> +            if (rc < 0)
-> >> +                    return rc;
-> >> +            if (n)
-> >> +                    break;
-> >> +    }
-> >> +
-> >> +    *len =3D n;
-> >> +
-> >> +    return 0;
-> >>   }
-> >
-> > Help me understand why we can't continue to use the call_int_hook()
-> > macro here?
-> >
->
-> Before this patch, the hook may return +ve, 0, or -ve, and call_int_hook
-> breaks the loop when the hook return value is not 0.
->
-> After this patch, the +ve is stored in @n, so @n and return value should
-> both be checked to determine whether to break the loop. This is not
-> feasible with call_int_hook.
+> > One more thing: I've noticed changes in sockmap_helpers.h don't trigger
+> > test_progs rebuild (seems to be the case for all .h in prog_tests/). No
+> > idea if this is the right approach, but adding
+> > "$(TRUNNER_TESTS_DIR)/sockmap_helpers.h" to TRUNNER_EXTRA_SOURCES in
+> > selftests/bpf/Makefile does the trick.
+>=20
+> CC'ed BPF selftests reviewers in case they'd like to chip in.
 
-Yes, gotcha.  I was focused on the error condition and wasn't thinking
-about the length getting zero'd out by a trailing callback.
-Unfortunately, we *really* want to stick with the
-call_{int,void}_hook() macros so I think we either need to find a way
-to work within that constraint for existing macro callers, or we have
-to leave this hook as-is for the moment.
+Are you sure this is reproducible?
 
---=20
-paul-moore.com
+I tried the following:
+
+$ make clean
+$ make -j test_progs
+$ touch prog_tests/sockmap_helpers.h
+$ make -j test_progs
+
+And I see the following files being remade:
+
+  TEST-OBJ [test_progs] sockmap_basic.test.o
+  TEST-OBJ [test_progs] sockmap_listen.test.o
+  TEST-OBJ [test_progs] verifier.test.o
+  BINARY   test_progs
+
+(Although, there are a few other files,
+ that probably should not be remade, need to look into it).
+
+Also, here is some debug output:
+
+$ make -j24 --print-data-base | grep "sockmap_basic.test.o:" | tr ' ' '\n' =
+| grep '\(:\|sockmap_helpers.h\)'
+
+/home/eddy/work/bpf-next/tools/testing/selftests/bpf/cpuv4/sockmap_basic.te=
+st.o:
+/home/eddy/work/bpf-next/tools/testing/selftests/bpf/prog_tests/sockmap_hel=
+pers.h
+
+/home/eddy/work/bpf-next/tools/testing/selftests/bpf/sockmap_basic.test.o:
+/home/eddy/work/bpf-next/tools/testing/selftests/bpf/prog_tests/sockmap_hel=
+pers.h
+
+/home/eddy/work/bpf-next/tools/testing/selftests/bpf/no_alu32/sockmap_basic=
+.test.o:
+/home/eddy/work/bpf-next/tools/testing/selftests/bpf/prog_tests/sockmap_hel=
+pers.h
+
+
+[...]
+
 
