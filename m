@@ -1,177 +1,167 @@
-Return-Path: <netdev+bounces-112426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08A093902F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 15:53:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60AD4939063
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:14:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15291F21C21
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FBB0282366
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 14:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155FE16D9C6;
-	Mon, 22 Jul 2024 13:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E53A16D9D8;
+	Mon, 22 Jul 2024 14:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KEbEwLbC"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="HK6/JUGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BCF16D4FF
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 13:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57238F5E;
+	Mon, 22 Jul 2024 14:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721656386; cv=none; b=HTX25C9vs0STDZmNo1hT45iVQYDOPTcpxeZKpWY5pym5YhY4MBFiuHzSNnhB1erFCfP95FSQ3/hyLJj7/N5G5HFrQNHt5KxGHTh2aZLCKn6QSOR4ckMrUQH7Y8m8Cle+Tek4N3Vxdbxw2Uf3cO+JqREowW4h2AK18xqYRBhTY6w=
+	t=1721657645; cv=none; b=DOLvOdbA7qNQ0izbqxdktAd9bu5YTAHr25IUmEL41dQVsaQ+QGOevFAbSwm5MtixWWkxJiKaf5gjnRROJuDSEPIMAv0qOzJ/xKux+xmcBfWl91QHnjEF7IpSI2t3e4oXj2DVhd2t0biFVTj6OsLw3Tg4imCh6CBltFq2uqyLa2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721656386; c=relaxed/simple;
-	bh=BOwZ4vF66z6wa6MKO33rnyYPrAj9i0vfjPJ/MqZzYgU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U9tK58HwYGZbQs86WO+qL/2l8ohksrI+49RVWf4WhgcBtr0bzA0OkM2fttA6xEXO4gATMPCf/TTMEbnSgydxD0D/Y48ncAQ1ZWD0MtFVvFz2sxpP0WxaikAtDWJM6h0R7sgzVQUmOadU2wYACB0kAasVybhAe2EtO9cK3ZI48gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KEbEwLbC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721656383;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZetsGJ5blfoCZSbkciEC6WflLyvv2m8UF1Hjh4ODOYY=;
-	b=KEbEwLbCxI/tpMJ+HB6NqUHr9vAuvPzyhsOWlXZp/8WiVdfd/lWFb5oUj4oLTgoj0NvpwS
-	78rpOT5fWFe0rGQElv9XfbDEP8s9nGuxSS/TMzcmTggN75+E6MitrkZRTYpX7lhUn0v1lr
-	BdLh3HM+hTwi9hmnFxryPj2ZJArdjF8=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-352-wwJ61nsKOciIoNFaQQbK5Q-1; Mon,
- 22 Jul 2024 09:53:00 -0400
-X-MC-Unique: wwJ61nsKOciIoNFaQQbK5Q-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BBFC41944A88;
-	Mon, 22 Jul 2024 13:52:57 +0000 (UTC)
-Received: from alecto.usersys.redhat.com (unknown [10.43.17.6])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5AD021955F40;
-	Mon, 22 Jul 2024 13:52:55 +0000 (UTC)
-From: Artem Savkov <asavkov@redhat.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Artem Savkov <asavkov@redhat.com>
-Subject: [PATCH bpf-next v2] selftests/bpf: fix compilation failure when CONFIG_NET_FOU!=y
-Date: Mon, 22 Jul 2024 15:52:53 +0200
-Message-ID: <20240722135253.3298964-1-asavkov@redhat.com>
-In-Reply-To: <005ef8ac-d48e-304f-65c5-97a17d83fd86@iogearbox.net>
-References: <005ef8ac-d48e-304f-65c5-97a17d83fd86@iogearbox.net>
+	s=arc-20240116; t=1721657645; c=relaxed/simple;
+	bh=7krbkr0FK8DqcuZDb5Bm0pBNAW/DS8NOrsIa/1qGT+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NL2RJbJWgTdzq8LM4EixaE5H0JJRRGjOgigNu9mrYawzQIoV+Ac//i7nhiABj8Xqzs/+rQA54yav5Qet/h0R/huvAu5lOxU7M6V4LUFMcs6j6Fy6iAoidMih/OucUj45u+3UBZBamZLLSv3JsLBi0oa651qoAeQklhA7x/UD/W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=HK6/JUGa; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 68FF3D1F;
+	Mon, 22 Jul 2024 16:13:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1721657600;
+	bh=7krbkr0FK8DqcuZDb5Bm0pBNAW/DS8NOrsIa/1qGT+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HK6/JUGazSPW7upEvsYTHZhQUSWwvNFkDBX+3IsRB1/gy4hqxo/SDQa898JFCSfZT
+	 Dg3f17L3sl0qgz+2iOBHdlP04w1KFUzHcd4S5YdHcE1w0EHyLldd6ABbUKgoNEbxUZ
+	 OQYsZe+sG0i0V+YIHk085N3ZYnyNWLiGEMYzdHMU=
+Date: Mon, 22 Jul 2024 17:13:43 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240722141343.GH13497@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
+ <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240721192530.GD23783@pendragon.ideasonboard.com>
+ <20240722073119.GA4252@unreal>
+ <20240722085317.GA31279@pendragon.ideasonboard.com>
+ <20240722104407.GB4252@unreal>
+ <20240722111004.GB13497@pendragon.ideasonboard.com>
+ <20240722132828.GC4252@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240722132828.GC4252@unreal>
 
-Without CONFIG_NET_FOU bpf selftests are unable to build because of
-missing definitions. Add ___local versions of struct bpf_fou_encap and
-enum bpf_fou_encap_type to fix the issue.
+On Mon, Jul 22, 2024 at 04:28:28PM +0300, Leon Romanovsky wrote:
+> On Mon, Jul 22, 2024 at 02:10:04PM +0300, Laurent Pinchart wrote:
+> > On Mon, Jul 22, 2024 at 01:44:07PM +0300, Leon Romanovsky wrote:
+> > > On Mon, Jul 22, 2024 at 11:53:17AM +0300, Laurent Pinchart wrote:
+> > > > On Mon, Jul 22, 2024 at 10:31:19AM +0300, Leon Romanovsky wrote:
+> > > > > On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
+> > > > > > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
+> > > > > > > James Bottomley wrote:
+> > > > > > > > > The upstream discussion has yielded the full spectrum of positions on
+> > > > > > > > > device specific functionality, and it is a topic that needs cross-
+> > > > > > > > > kernel consensus as hardware increasingly spans cross-subsystem
+> > > > > > > > > concerns. Please consider it for a Maintainers Summit discussion.
+> > > > > > > > 
+> > > > > > > > I'm with Greg on this ... can you point to some of the contrary
+> > > > > > > > positions?
+> > > > > > > 
+> > > > > > > This thread has that discussion:
+> > > > > > > 
+> > > > > > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
+> > > > > > > 
+> > > > > > > I do not want to speak for others on the saliency of their points, all I
+> > > > > > > can say is that the contrary positions have so far not moved me to drop
+> > > > > > > consideration of fwctl for CXL.
+> > > > > > > 
+> > > > > > > Where CXL has a Command Effects Log that is a reasonable protocol for
+> > > > > > > making decisions about opaque command codes, and that CXL already has a
+> > > > > > > few years of experience with the commands that *do* need a Linux-command
+> > > > > > > wrapper.
+> > > > > > > 
+> > > > > > > Some open questions from that thread are: what does it mean for the fate
+> > > > > > > of a proposal if one subsystem Acks the ABI and another Naks it for a
+> > > > > > > device that crosses subsystem functionality? Would a cynical hardware
+> > > > > > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
+> > > > > > > get device-specific commands past another subsystem's objection?
+> > > > > > 
+> > > > > > My default answer would be to trust the maintainers of the relevant
+> > > > > > subsystems (or try to convince them when you disagree :-)).
+> > > > > 
+> > > > > You know, trust is a two-way street. If you want to trust maintainers,
+> > > > > they need to trust others as well. The situation where one maintainer
+> > > > > says "I don't trust you, so I will not allow you and other X maintainers
+> > > > > to do Y" is not a healthy situation.
+> > > > > 
+> > > > > > Not only should they know the technical implications best, they should also have
+> > > > > > a good view of the whole vertical stack, and the implications of
+> > > > > > pass-through for their ecosystem. 
+> > > > > 
+> > > > > It is wishful thinking. It is clearly not true for large subsystems
+> > > > > and/or complex devices.
+> > > > 
+> > > > Are you saying that kernel communities behind large subsystems for
+> > > > complex devices generally have no idea about what they're doing ? Or
+> > > > that in a small number of particular cases those communities are
+> > > > clueless ? Or does that apply to just the maintainer, not the whole
+> > > > subsystem core developers ? I'd like to better understand the scale of
+> > > > your claim here.
+> > > 
+> > > I don't know how you jumped from saying "the maintainers of the relevant
+> > > subsystems" to "kernel communities". I'm talking about maintainers, not
+> > > communities.
+> > 
+> > I wasn't too sure, so that's why I asked. I have also not been very
+> > precise in my previous e-mails. When I mentioned trusting maintainers, I
+> > meant trusting the combined knowledge of the relevant maintainer(s) and
+> > core developer(s) for a subsystema
+> 
+> Unfortunately, the reason for this topic proposed for Maintainer's summit
+> is that the maintainer and core developers are disagree and there is no way
+> to resolve it, because it is not technical difference, but a philosophical one.
 
-Signed-off-by: Artem Savkov <asavkov@redhat.com>
+Having been involved in a similar disagreement, I'm not sure
+"philosophical" is the right term. I can't talk about the fwctl issue in
+particular as I have only vaguely followed the saga, and I will
+therefore not take a side there, but in general I tend to use
+"political" instead of "philosophical". The issues of market control,
+competition and vendor lock-in vs. empowerment also play important
+roles. This makes it even more difficult to discuss the disagreements
+openly.
 
----
-v2: added BPF_NO_KFUNC_PROTOTYPES define to avoid issues when
-CONFIG_NET_FOU is set.
----
- .../selftests/bpf/progs/test_tunnel_kern.c    | 25 +++++++++++++------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+> > The number of people that this covers, and how they collectively reach
+> > agreements, very much depends on subsystems.
+> > 
+> > > There is no way to know everything about everything. In large subsystems,
+> > > the stack above kernel is so vast, which makes it impossible to know all
+> > > use cases. This is why some words (... good ... whole ...) in your sentence
+> > > are not accurate.
+> > > 
+> > > So the idea that one maintainer somehow equal to the whole community and
+> > > this person can block something for other members of the larger community
+> > > is overreaching.
 
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index 3f5abcf3ff136..4d526fc73f2bb 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -6,6 +6,7 @@
-  * modify it under the terms of version 2 of the GNU General Public
-  * License as published by the Free Software Foundation.
-  */
-+#define BPF_NO_KFUNC_PROTOTYPES
- #include "vmlinux.h"
- #include <bpf/bpf_core_read.h>
- #include <bpf/bpf_helpers.h>
-@@ -26,10 +27,20 @@
-  */
- #define ASSIGNED_ADDR_VETH1 0xac1001c8
- 
-+struct bpf_fou_encap___local {
-+       __be16 sport;
-+       __be16 dport;
-+};
-+
-+enum bpf_fou_encap_type___local {
-+       FOU_BPF_ENCAP_FOU___local,
-+       FOU_BPF_ENCAP_GUE___local,
-+};
-+
- int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
--			  struct bpf_fou_encap *encap, int type) __ksym;
-+			  struct bpf_fou_encap___local *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
--			  struct bpf_fou_encap *encap) __ksym;
-+			  struct bpf_fou_encap___local *encap) __ksym;
- struct xfrm_state *
- bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts,
- 		       u32 opts__sz) __ksym;
-@@ -745,7 +756,7 @@ SEC("tc")
- int ipip_gue_set_tunnel(struct __sk_buff *skb)
- {
- 	struct bpf_tunnel_key key = {};
--	struct bpf_fou_encap encap = {};
-+	struct bpf_fou_encap___local encap = {};
- 	void *data = (void *)(long)skb->data;
- 	struct iphdr *iph = data;
- 	void *data_end = (void *)(long)skb->data_end;
-@@ -769,7 +780,7 @@ int ipip_gue_set_tunnel(struct __sk_buff *skb)
- 	encap.sport = 0;
- 	encap.dport = bpf_htons(5555);
- 
--	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE);
-+	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE___local);
- 	if (ret < 0) {
- 		log_err(ret);
- 		return TC_ACT_SHOT;
-@@ -782,7 +793,7 @@ SEC("tc")
- int ipip_fou_set_tunnel(struct __sk_buff *skb)
- {
- 	struct bpf_tunnel_key key = {};
--	struct bpf_fou_encap encap = {};
-+	struct bpf_fou_encap___local encap = {};
- 	void *data = (void *)(long)skb->data;
- 	struct iphdr *iph = data;
- 	void *data_end = (void *)(long)skb->data_end;
-@@ -806,7 +817,7 @@ int ipip_fou_set_tunnel(struct __sk_buff *skb)
- 	encap.sport = 0;
- 	encap.dport = bpf_htons(5555);
- 
--	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_FOU);
-+	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_FOU___local);
- 	if (ret < 0) {
- 		log_err(ret);
- 		return TC_ACT_SHOT;
-@@ -820,7 +831,7 @@ int ipip_encap_get_tunnel(struct __sk_buff *skb)
- {
- 	int ret;
- 	struct bpf_tunnel_key key = {};
--	struct bpf_fou_encap encap = {};
-+	struct bpf_fou_encap___local encap = {};
- 
- 	ret = bpf_skb_get_tunnel_key(skb, &key, sizeof(key), 0);
- 	if (ret < 0) {
 -- 
-2.45.2
+Regards,
 
+Laurent Pinchart
 
