@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-112436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3544993913A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 17:01:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6094939143
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 17:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66CE41C21645
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 15:01:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68819B21C35
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 15:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E87216DEAC;
-	Mon, 22 Jul 2024 15:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C43416DC3F;
+	Mon, 22 Jul 2024 15:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ec6beWYo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yq9kbjRL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2703216DEA8
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 15:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E9816DC3A
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 15:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721660500; cv=none; b=M+A8Oyk7HJ5N1Kbi/YPQ5b9D4mUppOsPczxaLiNVyNf9m0ynMk3gtP7UbbZMMSwjDNAX8sMSHEhydpZPOf32fsUoJ3i6ulxfU1dHEizO8Ac0Xo4W8heCLZISK0+h20ZJg76EeCx6zTnPe3WxEH18fsDcXiloqSaB8bqR3HQDEiE=
+	t=1721660558; cv=none; b=eq6VtbokGKWhsqU2nc03wg1+4W/m7ujym5tULQgChQG5E2BneSB12DqZT3KAMgQdk64m7EjmmZCEkPwa9bDixUxgjElr6KUQfP29ndXIkcRPtjo3C1CqGnD1kkauo605DR7upTe1yqnUXQqRi1rntkWdP0lS5LhQNTh8WagjlvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721660500; c=relaxed/simple;
-	bh=BGMMpKXqjmnrN8BBfqoHRGbjQcStSiAQC1ZKUqXjJiM=;
+	s=arc-20240116; t=1721660558; c=relaxed/simple;
+	bh=pAk0rVV50P2Q+ArDebksQq7XsI+EGNKBGEJfMCA5Sqk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJPjJ92nZ1jWKzCQ692nckJcQGmkZrkR6PUvpBo87W5yDyf3J1kOzpt7H4YvQHiYPOeCnldiGoE/VA+hmoLxlGcgxKB9BHVgyW8JRLfZBln+zjMBoCmLqygTEATcWdJyclYZtNADlAp3tbEll43zJfsp8D/N1KTT8XEYKMGGQfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ec6beWYo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53D61C116B1;
-	Mon, 22 Jul 2024 15:01:38 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WI5l68TmF6GuQmoR5+WUaR/AzcDyyTGDFigPTSuBblAq63caAeCCI2RJBATKzpcbP+yP91p/RIjy5+Zg44s/xCWvDI8QUnhMLf+R2HFWYg/8iJkg8xyoBVZRJTt8v240t0VcBKLC5cdfdNhMSbG9wsrul1oJEqS2UT+QBJwg1FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yq9kbjRL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54D26C4AF11;
+	Mon, 22 Jul 2024 15:02:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721660499;
-	bh=BGMMpKXqjmnrN8BBfqoHRGbjQcStSiAQC1ZKUqXjJiM=;
+	s=k20201202; t=1721660557;
+	bh=pAk0rVV50P2Q+ArDebksQq7XsI+EGNKBGEJfMCA5Sqk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ec6beWYo0z08pgi/2APpB4a2j503wFtcKMaLTYKjvhXNqpSPvMi00eTg32VnLB0Vl
-	 G11SQQEJ5HNYUWTe48VES/BkrIyd3M4ZLZ/hm0BMiNHJaF46MABafJyHVvAWR3Zm7i
-	 aFEo9zVL7LFbIABa9pkek8wtoQPmK8FmfRBEi1z43AwvL4nTmSR/iFliNfGfQgnOlO
-	 HWWpjQbn9Dfim2W2l1KJM9jrDgH1N6iWKEP1WLt/tTbebJjI3XWKgoWmJSz0pUmr7l
-	 zHCG1hb0BUtf32GK/7YURBTBPNAVwQWBuJ+cFl5vp9x2UqynORevKL7Pmjixf4p6nC
-	 ZJ1aODSgSKYwA==
-Date: Mon, 22 Jul 2024 16:01:36 +0100
+	b=Yq9kbjRLugWzyckQ9EdM8GYrf3Wl/LbMZXQ69ozdR8Bv9+VZz9C0CJGBYvxSXtIrd
+	 Qzcp+P4Zm8I8QbOYYyjvObn7wVP1XLzL4f0r81R3jP7atc2qjVk/NizMGO3WvHqvL7
+	 LofbBg1ReVb8eBgV9jvr0Tyteu2Y0+KSeqbxSz9KLL2ArgpqcL4AdTIazWK+drY7Zj
+	 LuvPCnRqKvaw/FrKECOxn5yZHYhWJR2+0iA9b8vKby04fLV30dqVKuf8/ABIEewOvS
+	 D7/L7M+DpEMQ1AtbtPqBOwYjN+moN3cwjAYGZ9qi2yxWC8VoUIl6Am3T1MWIPu+Uqc
+	 JtWT+RAp+PfDw==
+Date: Mon, 22 Jul 2024 16:02:34 +0100
 From: Simon Horman <horms@kernel.org>
 To: Ahmed Zaki <ahmed.zaki@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com, Junfeng Guo <junfeng.guo@intel.com>,
 	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: Re: [PATCH iwl-next v3 05/13] ice: add parser execution main loop
-Message-ID: <20240722150136.GH715661@kernel.org>
+Subject: Re: [PATCH iwl-next v3 06/13] ice: support turning on/off the
+ parser's double vlan mode
+Message-ID: <20240722150234.GI715661@kernel.org>
 References: <20240710204015.124233-1-ahmed.zaki@intel.com>
- <20240710204015.124233-6-ahmed.zaki@intel.com>
+ <20240710204015.124233-7-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,42 +60,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240710204015.124233-6-ahmed.zaki@intel.com>
+In-Reply-To: <20240710204015.124233-7-ahmed.zaki@intel.com>
 
-On Wed, Jul 10, 2024 at 02:40:07PM -0600, Ahmed Zaki wrote:
+On Wed, Jul 10, 2024 at 02:40:08PM -0600, Ahmed Zaki wrote:
 > From: Junfeng Guo <junfeng.guo@intel.com>
 > 
-> Implement the core work of the runtime parser via:
-> - ice_parser_rt_execute()
-> - ice_parser_rt_reset()
-> - ice_parser_rt_pkt_buf_set()
+> Add API ice_parser_dvm_set() to support turning on/off the parser's double
+> vlan mode.
 > 
 > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 > Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
 > Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
 > Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice_parser_rt.c b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
+> ---
+>  drivers/net/ethernet/intel/ice/ice_parser.c | 78 ++++++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_parser.h | 18 +++++
+>  2 files changed, 93 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_parser.c b/drivers/net/ethernet/intel/ice/ice_parser.c
 
 ...
 
-> +static u16 ice_ptype_resolve(struct ice_parser_rt *rt)
+>  static void ice_parse_lbl_item(struct ice_hw *hw, u16 idx, void *item,
+> -			       void *data, int size)
+> +			       void *data, int __maybe_unused size)
+>  {
+> -	memcpy(item, data, size);
+> +	struct ice_lbl_item *lbl_item = (struct ice_lbl_item *)item;
+> +	struct ice_lbl_item *lbl_data = (struct ice_lbl_item *)data;
+
+nit: Explicitly casting void * is unnecessary.
+
+> +
+> +	lbl_item->idx = lbl_data->idx;
+> +	memcpy(lbl_item->label, lbl_data->label, sizeof(lbl_item->label));
+> +
+> +	if (strstarts(lbl_item->label, ICE_LBL_BST_DVM))
+> +		lbl_item->type = ICE_LBL_BST_TYPE_DVM;
+> +	else if (strstarts(lbl_item->label, ICE_LBL_BST_SVM))
+> +		lbl_item->type = ICE_LBL_BST_TYPE_SVM;
+>  
+>  	if (hw->debug_mask & ICE_DBG_PARSER)
+> -		ice_lbl_dump(hw, (struct ice_lbl_item *)item);
+> +		ice_lbl_dump(hw, lbl_item);
+>  }
+
+...
+
+> +static void ice_bst_dvm_set(struct ice_parser *psr, enum ice_lbl_type type,
+> +			    bool on)
 > +{
-> +	struct ice_parser *psr = rt->psr;
-> +	struct ice_ptype_mk_tcam_item *item;
-
-nit: Please consider arranging these variables in reverse xmas tree order.
-
-     Flagged by https://github.com/ecree-solarflare/xmastree
-
+> +	u16 i = 0;
 > +
-> +	item = ice_ptype_mk_tcam_match(psr->ptype_mk_tcam_table,
-> +				       rt->markers, ICE_MARKER_ID_SIZE);
-> +	if (item)
-> +		return item->ptype;
+> +	while (true) {
+> +		struct ice_bst_tcam_item *item;
+> +		u8 key;
 > +
-> +	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "Could not resolve PTYPE\n");
-> +	return U16_MAX;
+> +		item = ice_bst_tcam_search(psr->bst_tcam_table,
+> +					   psr->bst_lbl_table,
+> +					   type, &i);
+> +		if (!item)
+> +			break;
+> +
+> +		key = (on ? ICE_BT_VLD_KEY : ICE_BT_INV_KEY);
+
+nit: these parentheses seem unnecessary
+
+> +		item->key[ICE_BT_VM_OFF] = key;
+> +		item->key_inv[ICE_BT_VM_OFF] = key;
+> +		i++;
+> +	}
 > +}
 
 ...
