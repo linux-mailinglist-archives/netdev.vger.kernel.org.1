@@ -1,129 +1,179 @@
-Return-Path: <netdev+bounces-112355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D70F93878F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 04:44:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF51938796
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 04:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2658E1F2128B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 02:44:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6878E1C20C05
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 02:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEE6D53F;
-	Mon, 22 Jul 2024 02:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b="V1lgt3jw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F275C11CBD;
+	Mon, 22 Jul 2024 02:59:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.sandelman.ca (relay.cooperix.net [176.58.120.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA2F748F
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 02:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.58.120.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EC1C125
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 02:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721616284; cv=none; b=mxdSE/vEMo4RqQgKtkm3oq1FYh5Wt2LMwmS/RAYGO1bE4U8DhKQcl872EJQsAJKx7DtpjimMGqfHL75rYn40gjZbvjxXdpj/suPeU21PJHueBs+ggNNh2jncv49ruYwisYi+0h8znfwKQ2OM1kkfQF32s1rv9gov9JOhT+s/dgY=
+	t=1721617167; cv=none; b=t63f5P3oNt1/vLH6ETqydVLrfiT29s9ncuwm6b99u8spdRnhUNon1TcPcXMLZiYWFbZnOr6ELukG3641UaDVfOsxYcDSqwcCffsJ+mHJMxDWCxZfqS0ucBaZjq6P6csBcmTfhwMejHkyt5S1psWylGGtEe2cN3+yRaudfJjnfbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721616284; c=relaxed/simple;
-	bh=I/nwBnIoCcA1Iw3GATduwc2FvnBNNLRBBnZsWM8vX8w=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=auJI1XK0GHw0an077+4iMM9vUwL9rs52nLOevBpfMti4lqAl8bQ3dirP7gNayho1+rKAx6aj9jSTU1C9Ue7voYj0zES5LYbWzoJaJcZWSi6JxgfvghVtmr5Jicl8IrCunWzngxQwFRq4Efdxgt+TRcM4Do30HczCDGMv8hm38Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca; spf=pass smtp.mailfrom=sandelman.ca; dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b=V1lgt3jw; arc=none smtp.client-ip=176.58.120.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandelman.ca
-Authentication-Results: relay.sandelman.ca;
-	dkim=pass (2048-bit key; secure) header.d=sandelman.ca header.i=@sandelman.ca header.a=rsa-sha256 header.s=dyas header.b=V1lgt3jw;
-	dkim-atps=neutral
-Received: from dyas.sandelman.ca (unknown [IPv6:2001:67c:370:128:dde6:75b0:1cee:9a2d])
-	by relay.sandelman.ca (Postfix) with ESMTPS id 882E91F4A3;
-	Mon, 22 Jul 2024 02:37:11 +0000 (UTC)
-Received: by dyas.sandelman.ca (Postfix, from userid 1000)
-	id B0771A1D27; Sun, 21 Jul 2024 19:37:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sandelman.ca; s=dyas;
-	t=1721615874; bh=I/nwBnIoCcA1Iw3GATduwc2FvnBNNLRBBnZsWM8vX8w=;
-	h=From:To:cc:Subject:In-reply-to:References:Date:From;
-	b=V1lgt3jwfB5sm7wbusYkEnkfiOQ/inDo643QG0l/EAryLPxAKQrXOH45XY+rngiQa
-	 Y9X4E8SNHCY3ANgG6tt9d/tFVK1gjVrrPbIvm9Qg9nsIWn0UhTuFvVBAlzl+VkVf+t
-	 HeN33i/YfOlmBbw063WaOOiEI0dpieBjONQbhCbXdHcGq/tfLWuCpa70T9mBZSsgbz
-	 5ISgMWPp52wY7q5ybD1izj5XY8dCFcCBivLhnZeK+f0B6btNxVQYQH2hyjJXDZ9nBn
-	 nk6ZjOGB79z6i6LIDYKg9/lzLM+03xWEz/RDuSM3Y0J8Cp6iDpBSGoYgyeWESo+hAn
-	 7gvJHRC5RAzYA==
-Received: from dyas (localhost [127.0.0.1])
-	by dyas.sandelman.ca (Postfix) with ESMTP id AE462A0115;
-	Sun, 21 Jul 2024 19:37:54 -0700 (PDT)
-From: Michael Richardson <mcr@sandelman.ca>
-To: Christian Hopps <chopps@chopps.org>
-cc: netdev@vger.kernel.org, chopps@labn.net, devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] xfrm/ipsec/iptfs and some new sysctls
-In-reply-to: <m2bk2rx2lb.fsf@dhcp-8377.meeting.ietf.org>
-References: <m2bk2rx2lb.fsf@dhcp-8377.meeting.ietf.org>
-Comments: In-reply-to Christian Hopps via Devel <devel@linux-ipsec.org>
-   message dated "Sat, 20 Jul 2024 12:27:38 -0700."
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; GNU Emacs 26.3
+	s=arc-20240116; t=1721617167; c=relaxed/simple;
+	bh=fnNvtVYu9841oAbcEi/wwNmNti+GwXT0AiQPzlkRTYs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=hq7JFw0kQaG4JApqnpy7i7yETHekeGMfxtpzMNjc/0qfWoE1twyelxTqdUqXNxQyeUBhYaC1xquet5WOeDWncT3ntFckerxymDfokhbiaZkXfgIwWeGpYPp4FoXtEUnRZ+633AdCkc2wsFctUVYwS8C5duR5psqInFg5TnzBPgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-396c41de481so61453735ab.3
+        for <netdev@vger.kernel.org>; Sun, 21 Jul 2024 19:59:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721617165; x=1722221965;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ueGLKV6NVXnEKdgpkNR/ZMhR7GBDaHk0gOzZZ/egVIE=;
+        b=f0WMteOmInkr7+v43Z0vvDjsXDiSiVXg4kTNrHUaiC6K/UubKtZK+WSVMGEINIhBs8
+         AGRne73qSNyp0XBV3Qm24/vr6Ok6+7Bbvw64CZIQ6xOzQESeqSiI+ps/G1wOoKkebWJd
+         V1vv0deIAwjqgbgO219FoZoD4zn5qV1X61Fk9TrVG4MB5CP7Gb35YzT5l0pdExCMRkaA
+         IdSg/7gIHisaPkDEkwUi7DfqyCgnXfjjZajKGcxvcIg4oNYg3vDiyRsDxqpJ3WtWQjCv
+         FIGTAVy4y+/gz6Mdw/bhGDTfUura4BGohXYOy1ZGo9O5dUkBq260rczYL9AS81stSFVe
+         38Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPetlBh8lmj+bu253lG9uX/6k0k9BnVC+/G2teuRqyZWWKFuUaxGHHlYgGuy17ntOXukgMCV8gk465/4OqTU+DN2BbO2Nw
+X-Gm-Message-State: AOJu0YzTkWkYvyM5XltFBzpsvT1ZmGzkJPpzk+/eOgj2aL+FF+Gz6fsK
+	TNUCbqvbKgagB7n48Lrwd265UZdUk73sBKP50XFedqBJfsPGLY+wnu/ANPsBhwX6yB5R4tT33Hm
+	mzqCXq9em9tZGPDApkqGqCm8RrCgjrawY6l0AJQmw/bLAVDxgNS90ZQE=
+X-Google-Smtp-Source: AGHT+IHeFkYVH1icTw/weReGKosNPDp83s0pfcZnWgjIjnJ2FUyfH9iLDVqbjYO62KllVjvyBPNROSRqnhxQ3UlNtz45YuOnA16M
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="==-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Sun, 21 Jul 2024 19:37:54 -0700
-Message-ID: <593029.1721615874@dyas>
+X-Received: by 2002:a05:6e02:219c:b0:397:3e38:eb30 with SMTP id
+ e9e14a558f8ab-398e6d8925dmr4712165ab.3.1721617165354; Sun, 21 Jul 2024
+ 19:59:25 -0700 (PDT)
+Date: Sun, 21 Jul 2024 19:59:25 -0700
+In-Reply-To: <0000000000009d1d0a061d91b803@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000949a14061dcd3b05@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in __dev_flush
+From: syzbot <syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
---==-=-=
-Content-Type: multipart/mixed; boundary="=-=-="
+syzbot has found a reproducer for the following issue on:
 
---=-=-=
-Content-Type: text/plain
+HEAD commit:    7846b618e0a4 Merge tag 'rtc-6.11' of git://git.kernel.org/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=142d3eb5980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=be4129de17851dbe
+dashboard link: https://syzkaller.appspot.com/bug?extid=44623300f057a28baf1e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=154c40b1980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14f3e11d980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-7846b618.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3a2831ffe61c/vmlinux-7846b618.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/575e23a7c452/bzImage-7846b618.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 5389 Comm: syz-executor357 Not tainted 6.10.0-syzkaller-11323-g7846b618e0a4 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__dev_flush+0x49/0x1e0 kernel/bpf/devmap.c:424
+Code: 00 fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 98 01 00 00 48 b8 00 00 00 00 00 fc ff df 49 8b 2f 48 8d 5d 80 48 89 ea 48 c1 ea 03 <80> 3c 02 00 0f 85 69 01 00 00 48 8b 45 00 49 39 ef 4c 8d 60 80 0f
+RSP: 0018:ffffc900008b0c90 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffffffffffffff80 RCX: ffffffff88d6a5bb
+RDX: 0000000000000000 RSI: ffffffff81af9c56 RDI: ffffc9000345fa68
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000345fa58
+R13: ffff888022ec0fb0 R14: ffffc9000345fa68 R15: ffffc9000345fa68
+FS:  0000555568ea6380(0000) GS:ffff88806b100000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff4743880f0 CR3: 0000000023168000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ xdp_do_check_flushed+0x40a/0x4e0 net/core/filter.c:4300
+ __napi_poll.constprop.0+0xd1/0x550 net/core/dev.c:6774
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0xa92/0x1010 net/core/dev.c:6962
+ handle_softirqs+0x216/0x8f0 kernel/softirq.c:554
+ do_softirq kernel/softirq.c:455 [inline]
+ do_softirq+0xb2/0xf0 kernel/softirq.c:442
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ tun_get_user+0x1d9b/0x3c30 drivers/net/tun.c:1936
+ tun_chr_write_iter+0xe8/0x210 drivers/net/tun.c:2052
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0x6b6/0x1140 fs/read_write.c:590
+ ksys_write+0x12f/0x260 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff47430af50
+Code: 40 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 80 3d 51 e1 07 00 00 74 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 28 48 89
+RSP: 002b:00007ffde0326728 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007ffde03267c0 RCX: 00007ff47430af50
+RDX: 0000000000000e80 RSI: 0000000020000100 RDI: 00000000000000c8
+RBP: 00007ffde0326770 R08: 00007ffde0326750 R09: 00007ffde0326750
+R10: 00007ffde0326750 R11: 0000000000000202 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__dev_flush+0x49/0x1e0 kernel/bpf/devmap.c:424
+Code: 00 fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 98 01 00 00 48 b8 00 00 00 00 00 fc ff df 49 8b 2f 48 8d 5d 80 48 89 ea 48 c1 ea 03 <80> 3c 02 00 0f 85 69 01 00 00 48 8b 45 00 49 39 ef 4c 8d 60 80 0f
+RSP: 0018:ffffc900008b0c90 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffffffffffffff80 RCX: ffffffff88d6a5bb
+RDX: 0000000000000000 RSI: ffffffff81af9c56 RDI: ffffc9000345fa68
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000345fa58
+R13: ffff888022ec0fb0 R14: ffffc9000345fa68 R15: ffffc9000345fa68
+FS:  0000555568ea6380(0000) GS:ffff88806b100000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff4743880f0 CR3: 0000000023168000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 4 bytes skipped:
+   0:	48 c1 ea 03          	shr    $0x3,%rdx
+   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   8:	0f 85 98 01 00 00    	jne    0x1a6
+   e:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  15:	fc ff df
+  18:	49 8b 2f             	mov    (%r15),%rbp
+  1b:	48 8d 5d 80          	lea    -0x80(%rbp),%rbx
+  1f:	48 89 ea             	mov    %rbp,%rdx
+  22:	48 c1 ea 03          	shr    $0x3,%rdx
+* 26:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2a:	0f 85 69 01 00 00    	jne    0x199
+  30:	48 8b 45 00          	mov    0x0(%rbp),%rax
+  34:	49 39 ef             	cmp    %rbp,%r15
+  37:	4c 8d 60 80          	lea    -0x80(%rax),%r12
+  3b:	0f                   	.byte 0xf
 
 
-I think that:
-xfrm_iptfs_reorder_window
-and
-xfrm_iptfs_drop_time
-are parameters about receiving.
-
-While
-xfrm_iptfs_init_delay
-and
-xfrm_iptfs_max_qsize
-
-are parameters about sender stuff.. I think the names should include that
-indication.   "xfrm_iptfs_sender_init_delay" maybe.
-1M byte default for max_qsize feels big, it's 1000 x 1K packets.
-I realize that isn't a lot at 10Gb/s+.   I dunno.
-
-How do you plan to get feedback on whether the defaults are working?
-
-
---=-=-=
-Content-Type: text/plain
-Content-Disposition: inline
-Content-Description: Signature
-
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
-
---=-=-=--
-
---==-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEERK+9HEcJHTJ9UqTMlUzhVv38QpAFAmadxgIACgkQlUzhVv38
-QpDLUwf/WPnqoHUNyRMl4vhkyQD3cvk0KBCS8fBl1eZE0SIwFL5OSVOAj9Gnh2Ib
-qWhb04U1HTBtBUGM2W4/YDhUuuXDOnkPxT28AXof82fhGQAv4x+jOqwUIalKpx0a
-34fdhLX3PKMTwKGDSmzx9hY9/fpvDoCAqLX2Me9gQOAQXJDvEi4ltVfgQtUmglb1
-J0Af0MLUv/EPIPslAmlRvRpiKqOCLVcbACmxYntlk5vHpe+qyzvCjFtbMqW1+tr0
-tlvbQOjBn7P01yh/1XMStZMW9SRrcnd7mel+TREKBDICvUNYhvueWfn/kENa7qSE
-9KA+GrQ3YHjYFti1AFxjcyGAXd2B3w==
-=iF/o
------END PGP SIGNATURE-----
---==-=-=--
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
