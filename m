@@ -1,119 +1,121 @@
-Return-Path: <netdev+bounces-112466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3462E939449
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 21:34:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FD5939469
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 21:45:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6669B1C2175F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 19:34:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B905F28257B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 19:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD2617106F;
-	Mon, 22 Jul 2024 19:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3C916EB50;
+	Mon, 22 Jul 2024 19:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="WU3WfH89"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsgyjRlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76836200A3
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 19:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525C91CF96;
+	Mon, 22 Jul 2024 19:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721676862; cv=none; b=M3faHr/WBSGkwfbn9Fx4DX633v1Cx/csYesBjGAJx/hURm4gJoFR+77dQfTOlBbbNAnY40XVmB8lsyp5KTj0ogQFt008u5MLMExqFMgGevvyfmWXCncHQDtivdj3vH4Fb3d+Ci/CN5rrcylNtUSEUl//fz8JdH/hqoe7o+xPktM=
+	t=1721677554; cv=none; b=fG/Hh3IumkHvdqKO7/QWpH3cQbmY5TBMGhoT7Dv01wLF7w4oLTNBX67BzYY42SFFYGE+Mc8hTGLlBjeVz3G0YJbPp/BORnwm6MzrArsqPu6TyugHur7hyMNcmbKKaW4NWzcZ+Srt1ZyT11fXczT+09T9ekQFUz9ACzdLNTHXCUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721676862; c=relaxed/simple;
-	bh=fi4bLVnPbCJMOh1UmYIW4CBHtEc9QZE9R0H9ArF/eWU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=Vs7vQXaBEIiXLDCyubpVkAqvDhQXT0vhNBEVUxIfGq2AnlffF/qss15MCSZbAmA0P5XHWhyK3RnYkG159ILw3RqBd0y8tZP+q0J0R80b6aWfulh+h2wl0u+kKB8z1hRM+JAkMsLNLhewDH8IZLeKbYFcRln1/lWvmcvJBtVUowA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=WU3WfH89; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a77cb7c106dso1397066b.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 12:34:20 -0700 (PDT)
+	s=arc-20240116; t=1721677554; c=relaxed/simple;
+	bh=rpdx/mWodmZ0SquEDYR1BpH3cwDFg+Q/X5PmcRsZPB8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uZNpK2dqoCTwjnUQ4US72o7lKDSHT2X9UL77B3Jfofj2baeRyP/cFzdzq3VrFIQOoyHLbrWXb9T2kwVWonwg0YQxeKjSKwreF8QMXK2rrwiZDLbS5oDKhQuKqD8+ofaZ35BhvsX0X1t2u4wAFb9OKPzVxzr4LCALSZ0XfFHZEtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsgyjRlR; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4279c924ca7so34277205e9.2;
+        Mon, 22 Jul 2024 12:45:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1721676859; x=1722281659; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fi4bLVnPbCJMOh1UmYIW4CBHtEc9QZE9R0H9ArF/eWU=;
-        b=WU3WfH89sgF0RW8kWhEzLYn0WAXdE2WNRm+2dltiQG/PQqDwsUy27OVxseF/Q7namS
-         UbUWJNJJ4c8R0WHIRP4VcKzsd0evWELEHTTjC1qsm9Q+x3QR/G08CRl6S3Jutpa4VDhG
-         Bd/NmosyunCIEX78iKXIzB7zbmXA1iQjm719MsrGBgUmsiVcsje05YSh/+y4gfiBArSE
-         /I+z9608lZiPUl+1vdzZefT/LpaLkOR496BAeefJdzva50DByqKenJVAk/R9BsOmITcY
-         MEO1lBOZuJUCo8JmugJ7QFaBW+oC1/Eh0yKTp3QEwSe0V69vTS26S+c7K//bLVWezvwD
-         9PjQ==
+        d=gmail.com; s=20230601; t=1721677551; x=1722282351; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=smN6Rc/Wck+72a9Qb+Cz7GteVisu31AXXjjg751Q1qc=;
+        b=OsgyjRlRBDT9rvY4MwZct6fASdHU40+ryp0DMRs2fsnuktJYphAp/gZrGwS9RVHqmc
+         HfzJqJfQ0FAoevXyQ9m4n3e6w00aXOkPmmKTWZn6A1F6tG7prrb6DEW2EJzzaQ5EbKWn
+         K7p+s5xMad4+R02MIOxFCKoqWxoImyfjOeiPiWIKOnOub8SAiZT9FgtdQakSZH3iqgzK
+         sSr8qEAP3lIyFMX3CyReu3xCOwlaKPd6z+/pgd5z1A3Nv5NZXNFRLHh5Oqe7sVTdcFjQ
+         iGG35iDaGWpCuHczQTNG5/aZhgy4DmUAY/L2fM3YzisMvXR00P/vpKb/w4EhseUHcO/Q
+         CtOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721676859; x=1722281659;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fi4bLVnPbCJMOh1UmYIW4CBHtEc9QZE9R0H9ArF/eWU=;
-        b=M6x42CpYnBhVeQdB/7qYbITLFXeLSaXA/InQEiG3eLsR2tfeZMJT932fF0CfC5FQxM
-         KFxgE+NNe9jyFLcpdqEP4x/PPCwJ3r2Js0CThF/1NBXb6OHvP22db8j65ZojX+Y8JbAr
-         T5aad/bgmAxrrPVe27CHxVNvZ/1ix/8ffhdlAK3xAX5ell1PMirChPfmdWIBAsRsP4Ua
-         dk5RQoCaIJki6d3hrWgdHoH7iQ8qxtjplfE4Gpzx3qYTBjzwR3g9YrTNuuWJ915zv7hY
-         n9b+t7CI7tTSHquQSBv6RHNnUpt1v/yyfRjQFhxyCFYwigldLtSUanllQt3Efb/p8B+a
-         t36A==
-X-Forwarded-Encrypted: i=1; AJvYcCUYZu+UQxT5e/+lc6sNTPGLkc2synTkIvDeWo84g01bzu320jlJRFavyYwsLC4N6BX7Moft2E7ImRamBlhbNVI6BdjIF8vJ
-X-Gm-Message-State: AOJu0YxE9IunV+iFPfdDo7TnmMBW1ItrQOEUiMzkAYtuSTXAkeK7vMIH
-	uY5KIEFnCH+1E/GXCYL5nvjggTkyxRXnsU7OaK2R5RgIX/5N45bgz9autIvbumc=
-X-Google-Smtp-Source: AGHT+IH0MH/+8seIiuBJ3Gs3Am9JxoYK2yWY1TdfrT/Nm8KdeQf+5AlcM7dCujXTS86xp1i01YFyGw==
-X-Received: by 2002:a17:907:3faa:b0:a72:7d5c:ace0 with SMTP id a640c23a62f3a-a7a4bfa341emr556636166b.11.1721676858606;
-        Mon, 22 Jul 2024 12:34:18 -0700 (PDT)
-Received: from dev-mattc2.dev.purestorage.com ([208.88.159.129])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7a3c7b66ecsm456836466b.51.2024.07.22.12.34.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 12:34:18 -0700 (PDT)
-From: Matthew W Carlis <mattc@purestorage.com>
-To: macro@orcam.me.uk
-Cc: alex.williamson@redhat.com,
-	bhelgaas@google.com,
-	christophe.leroy@csgroup.eu,
-	davem@davemloft.net,
-	david.abdurachmanov@gmail.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	leon@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	lukas@wunner.de,
-	mahesh@linux.ibm.com,
-	mika.westerberg@linux.intel.com,
-	mpe@ellerman.id.au,
-	netdev@vger.kernel.org,
-	npiggin@gmail.com,
-	oohall@gmail.com,
-	pabeni@redhat.com,
-	pali@kernel.org,
-	saeedm@nvidia.com,
-	sr@denx.de,
-	wilson@tuliptree.org
-Subject: PCI: Work around PCIe link training failures
-Date: Mon, 22 Jul 2024 13:34:07 -0600
-Message-Id: <20240722193407.23255-1-mattc@purestorage.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <alpine.DEB.2.21.2306111619570.64925@angie.orcam.me.uk>
-References: <alpine.DEB.2.21.2306111619570.64925@angie.orcam.me.uk>
+        d=1e100.net; s=20230601; t=1721677551; x=1722282351;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=smN6Rc/Wck+72a9Qb+Cz7GteVisu31AXXjjg751Q1qc=;
+        b=WOE+E/osEVl9axC4OUw2NBwB6fDQlltbO0E5JBvAyCIMUBt98z6p0yILIH1eiU3ekg
+         NeLhJichR2FrmE4Ub3s/W86TuRJMF+uKPeaIaV+cDWAF7grYhYOP58TsDn7k1cI+m1yy
+         30aagS5siV+uPRbteAjUKwz68iu1nObVpBRuYMGcTH83g8szlUzh440qekUgNCh5vTMK
+         UkHjgYXYMi3wDFm5O7AqEY3/D1OoJbrPI7X6PEZHd39flO/4e6i0XLLpMKm5TCF0EMq+
+         3bxR34/+IupEuNMypndbOr8sWOr1QWl8b6ZXPfSrCW2xP1Qr2MstwLxFfK2JN2d3pi/x
+         cBTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBa76Gs6SKMcz0HGM+FVPF+poTCJKNBY5A7ab0cUCpsSXojRKzjFDUbfYJ+pFmH0uOYIZdY63/STMKE+1dbA0hib7FIUrf9YIH3bg89Xb6T/eRSB+cQlP6VJQuVB+nifU29YadrVrdCMjezitDv/LAzNMvpWF1Oqg+
+X-Gm-Message-State: AOJu0Yxf5bYf5y4zKbrbRy6DTfa4sm6nUWbLdvAYjjHWIfVfN6CXVplo
+	RBC4i2hBIeznInDtGwuvSYWku0bC1Z9cUa2zLNXPVLrZ5RAJY7TVdCexvrdHlPud+A5BdtHupub
+	/OgmIFClRrISPqKSCS0fTll986Xk=
+X-Google-Smtp-Source: AGHT+IFB/23bqT5w6z+MqT9W5rGgUi4Zxideu4fV6SpRq3sISzra3CZorN9+OPY4XxheppI8c569qtj9ZvD2tNRfOys=
+X-Received: by 2002:a05:600c:3594:b0:426:627d:5542 with SMTP id
+ 5b1f17b1804b1-427dc568ee3mr45870465e9.28.1721677551330; Mon, 22 Jul 2024
+ 12:45:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <005ef8ac-d48e-304f-65c5-97a17d83fd86@iogearbox.net> <20240722135253.3298964-1-asavkov@redhat.com>
+In-Reply-To: <20240722135253.3298964-1-asavkov@redhat.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 22 Jul 2024 12:45:40 -0700
+Message-ID: <CAADnVQKE1Xmjhx3Xwdidmmn=BGzjgc89i+UMhHR7=6HupPQZSA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2] selftests/bpf: fix compilation failure when CONFIG_NET_FOU!=y
+To: Artem Savkov <asavkov@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Sorry to resurrect this one, but I was wondering why the
-PCI device ID in drivers/pci/quirks.c for the ASMedia ASM2824
-isn't checked before forcing the link down to Gen1... We have
-had to revert this patch during our kernel migration due to it
-interacting poorly with at least one older Gen3 PLX PCIe switch
-vendor/generation while using DPC. In another context we have
-found similar issues during system bringup without DPC while
-using a more legacy hot-plug model (BIOS defaults for us..).
-In both contexts our devices are stuck at Gen1 after physical
-hot-plug/insert, power-cycle.
+On Mon, Jul 22, 2024 at 6:53=E2=80=AFAM Artem Savkov <asavkov@redhat.com> w=
+rote:
+>
+>  bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *o=
+pts,
+>                        u32 opts__sz) __ksym;
+> @@ -745,7 +756,7 @@ SEC("tc")
+>  int ipip_gue_set_tunnel(struct __sk_buff *skb)
+>  {
+>         struct bpf_tunnel_key key =3D {};
+> -       struct bpf_fou_encap encap =3D {};
+> +       struct bpf_fou_encap___local encap =3D {};
+>         void *data =3D (void *)(long)skb->data;
+>         struct iphdr *iph =3D data;
+>         void *data_end =3D (void *)(long)skb->data_end;
+> @@ -769,7 +780,7 @@ int ipip_gue_set_tunnel(struct __sk_buff *skb)
+>         encap.sport =3D 0;
+>         encap.dport =3D bpf_htons(5555);
+>
+> -       ret =3D bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE);
+> +       ret =3D bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE___lo=
+cal);
 
-Tried reading through the patch history/review but it was still
-a little bit unclear to me. Can we add the device ID check as a
-precondition to forcing link to Gen1?
+> Casting won't work as the compiler still have no idea about struct
+> bpf_fou_encap.
+
+
+struct bpf_fou_encap;
+
+(struct bpf_fou_encap *)&encap
+
+works just fine.
+
+pw-bot: cr
 
