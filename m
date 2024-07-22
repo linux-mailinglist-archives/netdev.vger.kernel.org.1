@@ -1,190 +1,155 @@
-Return-Path: <netdev+bounces-112408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA90E938DFE
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:19:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A2D2938E08
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:27:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185EC1F21DEB
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:19:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0462D1F21D1D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F30A16C853;
-	Mon, 22 Jul 2024 11:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7BE716CD11;
+	Mon, 22 Jul 2024 11:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="mtIRlKok"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="X6fYLEjP"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BE91C2E;
-	Mon, 22 Jul 2024 11:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B301416C69D;
+	Mon, 22 Jul 2024 11:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721647135; cv=none; b=WEowB04eq0nipabSf2BRBhAHfYc+acI5pjaCSGmZxf45tGNJgy+GfF4sTKAx7Drq+AV5E4Fpe5fh3lR/zhlQQM5Ea7OVR0e2d8nlLIDU/k5QqGTtYNa54vTZAGasZX2aXlvzN1DIqYha/4GEuL7m0N6ZYr3mvBEvHBkikxhbEg8=
+	t=1721647651; cv=none; b=mX+5eO0ZGnWlSUmmwySUHHdHjriLsMSZRZ7K7T1mDgSQGDT5XGKl3rMDU5+XINo9L0l2GPFqgCT+yXGP31JtRdo7l4rUqrVBubLF433bO3pFjdGNvlSu1sfaIkf7Usn4R0qBM0UNvIlu9Yn50BDUYnvNsKD8RJpuNtcM90dS2w4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721647135; c=relaxed/simple;
-	bh=swgTGV0XRNkTA3W9jRX2LqDzlHWaqrN2dct1jvT11Wg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WnOahG3X1HHPpbpARsO57QZ9RZfhz2//bAQpACRd6djUj2duoWe+I8KEnCyzVmB3X5y1L+FbMSMPKwurUHWhAk3g4/flQhB3jk6v64NiZ8wjTNOUjht2dpf9LDGab9aSIXDVuJII7DxT1Qo9A7YA+0LXcAWdjWj2FacPKp0yeLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=mtIRlKok; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id EC6782B3;
-	Mon, 22 Jul 2024 13:18:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721647091;
-	bh=swgTGV0XRNkTA3W9jRX2LqDzlHWaqrN2dct1jvT11Wg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mtIRlKokMuprxMHcz59xVdqrbG+I7HUu8q/3njc6TJFQZi627dxyWAM8urCmL5TVr
-	 Hc69BQ8rOrAKsou05kSSKIusd5uBj49yC4dYNA7mhGZomIHYBqwFx5b019Nlahth1C
-	 8hwSl4vxASAfQAThAytEq9E2JhEI0uRkDYNaUj4k=
-Date: Mon, 22 Jul 2024 14:18:34 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240722111834.GC13497@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
- <20240721192530.GD23783@pendragon.ideasonboard.com>
- <CAPybu_2tUmYtNiSExNGpsxcF=7EO+ZHR8eGammBsg8iFh3B3wg@mail.gmail.com>
+	s=arc-20240116; t=1721647651; c=relaxed/simple;
+	bh=oSFS6BKeTNkRmRISdy2XuP1ZlR2B9rYB5jttdbfekFU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SDX9cU19/sHTDqNHhZPWsLOXY3Mj9bvx8EstONm6K/EVtB3tFBpmGFk2EmRemElE3RDnygS1HiGMIR5hFVniohFq0XfLn3N7GQ1BVHMC8YYIEtqqJEV11U9mc2MpfpPJ6+3xAhh991ICMTFvNrsZ4cdN7riidL2leH4WwKXCRTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=X6fYLEjP; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1721647649; x=1753183649;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=oSFS6BKeTNkRmRISdy2XuP1ZlR2B9rYB5jttdbfekFU=;
+  b=X6fYLEjPi7HFq8ioKRIjgIu275Uv5j/l5iTW9icJqrebRlxihGpk5QZc
+   IPVIbjKCB8W+DWRFdi19q6DXEz22B1PyXab13f4mJDZ++aw9+c/NqJ8yo
+   /XmNGNGGcM/p1la+KfMCPsJsgjlUqCveT3bjImgR6b3VCNmQT8q3NgchQ
+   MMUDPQ4sXrd/HIZKny315k5wz8N5BRVXpXAkYgyxlyjFheENBC+DW4O+F
+   FucGMfGJrTDb/Vo4Ec/ar0D3IRQMLYnuNphvy/ousvb8bHbr/LtzjZqoj
+   iPP62I/gwVNVDV9fheJk+ThgZ+0iZEO56fWjCAfbobNOpmZXJiMUAAGTt
+   g==;
+X-CSE-ConnectionGUID: RvxkDqJwSEWy6LC+mcvpxQ==
+X-CSE-MsgGUID: Y8qXXYTXTpeNozkUlNItGg==
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="asc'?scan'208";a="32268731"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jul 2024 04:27:28 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 22 Jul 2024 04:27:22 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex01.mchp-main.com (10.10.85.143)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Mon, 22 Jul 2024 04:27:19 -0700
+Date: Mon, 22 Jul 2024 12:26:55 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: Ayush Singh <ayush@beagleboard.org>
+CC: Conor Dooley <conor@kernel.org>, <jkridner@beagleboard.org>,
+	<robertcnelson@beagleboard.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Nishanth Menon
+	<nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo
+	<kristo@kernel.org>, Johan Hovold <johan@kernel.org>, Alex Elder
+	<elder@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	<greybus-dev@lists.linaro.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 1/3] dt-bindings: net: ti,cc1352p7: Add boot-gpio
+Message-ID: <20240722-system-judge-bf59954dd79d@wendy>
+References: <20240719-beagleplay_fw_upgrade-v1-0-8664d4513252@beagleboard.org>
+ <20240719-beagleplay_fw_upgrade-v1-1-8664d4513252@beagleboard.org>
+ <20240719-scuttle-strongbox-e573441c45e6@spud>
+ <5a865811-a6c0-47ad-b8a0-265bb31d4124@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="nRMCmbeuxHenOfMm"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPybu_2tUmYtNiSExNGpsxcF=7EO+ZHR8eGammBsg8iFh3B3wg@mail.gmail.com>
+In-Reply-To: <5a865811-a6c0-47ad-b8a0-265bb31d4124@beagleboard.org>
 
-Hi Ricardo,
+--nRMCmbeuxHenOfMm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 22, 2024 at 12:42:52PM +0200, Ricardo Ribalda Delgado wrote:
-> On Sun, Jul 21, 2024 at 9:25 PM Laurent Pinchart wrote:
-> > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> > > James Bottomley wrote:
-> > > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > > device specific functionality, and it is a topic that needs cross-
-> > > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > > concerns. Please consider it for a Maintainers Summit discussion.
-> > > >
-> > > > I'm with Greg on this ... can you point to some of the contrary
-> > > > positions?
-> > >
-> > > This thread has that discussion:
-> > >
-> > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > >
-> > > I do not want to speak for others on the saliency of their points, all I
-> > > can say is that the contrary positions have so far not moved me to drop
-> > > consideration of fwctl for CXL.
-> > >
-> > > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > > making decisions about opaque command codes, and that CXL already has a
-> > > few years of experience with the commands that *do* need a Linux-command
-> > > wrapper.
-> > >
-> > > Some open questions from that thread are: what does it mean for the fate
-> > > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > > device that crosses subsystem functionality? Would a cynical hardware
-> > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > > get device-specific commands past another subsystem's objection?
-> >
-> > My default answer would be to trust the maintainers of the relevant
-> > subsystems (or try to convince them when you disagree :-)). Not only
-> > should they know the technical implications best, they should also have
-> > a good view of the whole vertical stack, and the implications of
-> > pass-through for their ecosystem. This may result in a single NAK
-> > overriding ACKs, but we could also try to find technical solutions when
-> > we'll face such issues, to enforce different sets of rules for the
-> > different functions of a device.
-> >
-> > Subsystem hopping is something we're recently noticed for camera ISPs,
-> > where a vendor wanted to move from V4L2 to DRM. Technical reasons for
-> > doing so were given, and they were (in my opinion) rather excuses. The
-> > unspoken real (again in my opinion) reason was to avoid documenting the
-> > firmware interface and ship userspace binary blobs with no way for free
-> > software to use all the device's features. That's something we have been
-> > fighting against for years, trying to convince vendors that they can
-> > provide better and more open camera support without the world
-> > collapsing, with increasing success recently. Saying amen to
-> > pass-through in this case would be a huge step back that would hurt
-> > users and the whole ecosystem in the short and long term.
-> 
-> In my view, DRM is a more suitable model for complex ISPs than V4L2:
+On Mon, Jul 22, 2024 at 04:15:41PM +0530, Ayush Singh wrote:
+>=20
+> On 7/19/24 20:25, Conor Dooley wrote:
+> > On Fri, Jul 19, 2024 at 03:15:10PM +0530, Ayush Singh wrote:
+> > > boot-gpio (along with reset-gpio) is used to enable bootloader backdo=
+or
+> > > for flashing new firmware.
+> > >=20
+> > > The pin and pin level to enabel bootloader backdoor is configed using
+> > > the following CCFG variables in cc1352p7:
+> > > - SET_CCFG_BL_CONFIG_BL_PIN_NO
+> > > - SET_CCFG_BL_CONFIG_BL_LEVEL
+> > >=20
+> > > Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+> > > ---
+> > >   Documentation/devicetree/bindings/net/ti,cc1352p7.yaml | 4 ++++
+> > >   1 file changed, 4 insertions(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml b=
+/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+> > > index 3dde10de4630..a3511bb59b05 100644
+> > > --- a/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+> > > @@ -29,6 +29,9 @@ properties:
+> > >     reset-gpios:
+> > >       maxItems: 1
+> > > +  boot-gpios:
+> > > +    maxItems: 1
+> > I think this needs a description that explains what this is actually
+> > for, and "boot-gpios" is not really an accurate name for what it is used
+> > for IMO.
+>=20
+> I was using the name `boot-gpios` since cc1352-flasher uses the name
+> boot-line. Anyway, would `bsl-gpios` be better?
 
-I know we disagree on this topic :-) I'm sure we'll continue the
-conversation, but I think the technical discussion likely belongs to a
-different mail thread.
+I dunno, I think that "bsl" is worse.
 
-> - Userspace Complexity: ISPs demand a highly complex and evolving API,
-> similar to Vulkan or OpenGL. Applications typically need a framework
-> like libcamera to utilize ISPs effectively, much like Mesa for
-> graphics cards.
-> 
-> - Lack of Standardization: There's no universal standard for ISPs;
-> each vendor implements unique features and usage patterns. DRM
-> addresses this through vendor-specific IOCTLs
-> 
-> - Proprietary Architectures: Vendors often don't fully disclose their
-> hardware architectures. DRM cleverly only necessitates a Mesa
-> implementation, not comprehensive documentation.
+> Or for more descriptive
+> names, I guess it can be `bootloader-config-gpios` or
 
-This point isn't technical and is more on-topic for this mail thread.
+> `bootloader-backdoor-gpios`.
 
-V4L2 doesn't require hundreds of pages of comprehensive documentation in
-text form. An open-source userspace implementation that covers the
-feature set exposed by the driver is acceptable in place of
-documentation (provided, of course, that the userspace code wouldn't be
-deliberately obfuscated). This is similar in spirit to the rule for GPU
-DRM drivers.
+This is the most descriptive and therefore, IMO, best.
 
-> Our current approach of pushing back against vendors, instead of
-> seeking compromise, has resulted in the vast majority of the market
-> (99% if not more) relying on out-of-tree drivers. This leaves users
-> with no options for utilizing their cameras outside of Android.
-> 
-> DRM allows a hybrid model, where:
-> - Open Source Foundation: Standard use cases are covered by a fully
-> open-source stack.
-> - Vendor Differentiation: Vendors retain the freedom to implement
-> proprietary features (e.g., automatic makeup) as closed source.
+--nRMCmbeuxHenOfMm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-V4L2 does as well, you can implement all kind of closed-source ISP
-control algorithms in userspace, as long as there's an open-source
-implementation that exercises the same hardware features. A good analogy
-for people less familiar with ISPs is shader compilers, GPU vendors are
-free to ship closed-source implementations that include more
-optimizations, as long as the open-source, less optimized implementation
-covers the same GPU ISA, so that open-source developers can also work on
-optimizing it.
+-----BEGIN PGP SIGNATURE-----
 
-Thinking that DRM would offer a free pass-through path compared to V4L2
-doesn't seem realistic to me. Both subsystems will have similar rules.
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZp5B/wAKCRB4tDGHoIJi
+0oboAP4k9VbBxBuzy2qiVbT0/yJkAqBPbUXsQ7j6d1Y+IT5B8wEA+Bku/MTCCpAd
+L0DDz0l+Vc3aeJsXDqqAnKbeSXHiWgY=
+=N3aj
+-----END PGP SIGNATURE-----
 
-> This approach would allow billions of users to access their hardware
-> more securely and with in-tree driver support. Our current stubborn
-> pursuit of an idealistic goal has already negatively impacted both
-> users and the ecosystem.
-> 
-> The late wins, in my opinion, cannot scale to the consumer market, and
-> Linux will remain a niche market for ISPs.
-> 
-> If such a hybrid model goes against Linux goals, this is something
-> that should be agreed upon by the whole community, so we have the same
-> criteria for all subsystems.
-
--- 
-Regards,
-
-Laurent Pinchart
+--nRMCmbeuxHenOfMm--
 
