@@ -1,95 +1,191 @@
-Return-Path: <netdev+bounces-112387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF7C8938D84
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 12:30:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA16938D97
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 12:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DCD51F21AE9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:30:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C5731F21A24
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2641B16CD30;
-	Mon, 22 Jul 2024 10:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E44D616C695;
+	Mon, 22 Jul 2024 10:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kwBbXJ+f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD3F16CD0A
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 10:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8DC16A399;
+	Mon, 22 Jul 2024 10:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721644204; cv=none; b=C4d13Ddyty4VhtTZJ1cxFnbejoh7GIvyr+BZm0DYlAAgbVChmGEgk68b7fOO/tL3fHcpSQwxfLxc+SfHyUMZa+JSR/edLCgai3YxfUg/n/QHs2v1bBaklG941rN0T9biJXlyyFP5+SNeWEFUOODPrGMHDAbRuJyZmZTqIq2vq/8=
+	t=1721644992; cv=none; b=IMV0NLKlcLih4w+Nbeocg4EUXxSniND4E3KVBXkhC5OXaiRizFoKxlquMu/byJya2shjFZ9qvuqZS892Hw03iQjtzu9CTmfy3Mlcq5HmfpFodMSDCnELrckQfTSaug1jtF+67OhYDrQRAHpMMA1hImQTSuHiP3wVf8JZcl7SJoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721644204; c=relaxed/simple;
-	bh=Ur1D8QSGjku8Q7G5VKP6kNkgy6I95SWKMk0a7rsRzXw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=FoBrei3kKAz1jX5Zy4b2swscqhw9hrkTHw6ttCdPp1MDJJl5w5AReq44JtgqGikyn9sHKkWO7ADQUTHrNIaDnuAeh4Of/C+lmx1d6/PQVuYnHe7/7T8XX6hajhVjUwA3pcoReyRm0Jz8AqY46J3um6+C2zyITGjdRGFd5MCv7/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-397810ad718so55174355ab.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 03:30:02 -0700 (PDT)
+	s=arc-20240116; t=1721644992; c=relaxed/simple;
+	bh=i2aicMWrmaQuMvS/7Vlq9vUnRfVdITWeWRbf7ny+PJ4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F7ZJY6pS3Rs/rQnK5cRiqcW017ba4ZPnst17Y9cldT6SX1wBu99PIohDk5MmVMjEhlEcVCjNkYQsE3mAe8DFLPGKgq2r+jUDyDfQiYCtytNgwKdcrL5Jey2b9Cn5CGGf9sX98HTL9GEVNkXLlVxgZEgkdkYmxlssHGIMJk+IOu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kwBbXJ+f; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-82c30468266so168531241.0;
+        Mon, 22 Jul 2024 03:43:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721644990; x=1722249790; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i2aicMWrmaQuMvS/7Vlq9vUnRfVdITWeWRbf7ny+PJ4=;
+        b=kwBbXJ+fiLADZ7/A6BSSKi8Y5mNZIkErKV0Qy4mGd8AL2+akIhTJ0hdHaq/dYslX+6
+         MW22RhLg34PDFvFbrMmwKeIzaYTB8C98QILsGrJ5XYe8ae6H/wrfQvV7M74lwlHzMQdO
+         H6w/xdzaCLI8EgUWTeZJQx1Kzhs56KB5vuwczy5EgwVtOWtkz4vxWYeHZI6/ZE0zai2J
+         GuWlQDcpQ+CCfmq2Hxr16E0MvXqPlK4zi19ulmTve9gEE41/8k2g2U5bAI+joulnqUFf
+         +ZNM/cVV+eCRNFMNVbe5USl0MQp6XSJocmmqx3QKvrcUX+WaftAeYrBDTqkgGtQ2lSJA
+         lx3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721644201; x=1722249001;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TVbnRnfiSWMo/y1Phwm1SFR+PjHhye2aSEowClDCq1g=;
-        b=kvEzxi6H4SIj/hv7p9OZffmbLj8WnA7E+mAT+HutMTSk5zbnYLDUYI6ej8HE9/L6iS
-         oNivdGUjaoyweea9zmnfdFaY/zOTnGChOOYPV4lKDy6mvBX4UmHhPkUhh81t+0dle7cY
-         1UMV3urLXwIsZ9COPnO3CZyD+qPxJekPAeQ+xtbIcVFgYTACorqhFV5LUII7cz5V6bxE
-         LJaqUj/juiPB5OHzdyqAwzkgJ/jN8RmCIDUxYNLpv9hbddlFakKIOSfQadxLQrUfh6vq
-         otCJ3netBzW7keMNHOR2Cn0YKu2NrhxOGZKaK1BpaS2B6PTDiUim9D4dmI2nTiLoY+DF
-         R3qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+MmUWcKTxecuXEhaOnfUhSv7HPP7COF41YXMO5cpOoc8H6m+frmjQlg2dq7YLb7JDW9gHtfetGOEDy74OL+T0K9XzJKvS
-X-Gm-Message-State: AOJu0YxY5up+tEDbmtjYknRpHHrz3W6Hs8lUwSYxUO6buXo8y4Nlejb0
-	a7JnKfBi24WPjq2x4Whu/qXLbjgUi9MpEbVAgq0jn+8ldulgnBG6BpU0zZ3SJIYEGeO3CwWLEeN
-	yiLp0fgGhsLxiFarFFxotPitYhMcEVkqB7MD0z7lThaAN4THF3suHrsM=
-X-Google-Smtp-Source: AGHT+IHDXXNaDlcJzkclmypCXUcUHVIyEECRhqINQl0i+kJKGtZvlBOKr1PmAhs3nOlyECxZcDg4kI8y5bz3TrJBC4Rs/7iSWww/
+        d=1e100.net; s=20230601; t=1721644990; x=1722249790;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i2aicMWrmaQuMvS/7Vlq9vUnRfVdITWeWRbf7ny+PJ4=;
+        b=KQPV8eEwjQ/QAil6YbC9fVrj0gNa9a10FqkpG4OyKwxIOl2EH75eiiA+tnlGTun3eo
+         Pudb9VXQKGGYy8YaoHVi5T/gxiX2nCswNopLqO1OZo5WQH+3Xf6RAqMVf3ud8MVzZe2h
+         ROSeCeJcY65vNIJwlr0UFMa3z+55loAyeRaAhsoGgroOfAVqNC7kgDFj4uzfi90dtEFN
+         QeUhF7Gh04fnwbvOOhUdkgONnDhWPbo7p1vqa7UcpmF827zquiL6pKqVL3uoF8WCDz2I
+         o3QBIJmrX0cUMzo9W8GpuRZT73jf2S00jDDYKD1Wl8POSVKcHLr4GW3Xl09Q/9roUdZF
+         Wo7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWdD6zrEMq9Y8Mcb7RFgsr5xUtksP5KHuIVciOQqDRCoydYzJmaCgPuv5XIM6FFz5TeayOeIe/pUgX4UcQZf6YelhCN0o+rv92nMUPHajJPe0V6C9Pw6Ls8w5pOIAQM0/BO7Z9/K3XnpDB8qzFWWBOKTZodkCjl46NMoR1XtQ==
+X-Gm-Message-State: AOJu0YwoAN+v84Ke6A3HVxMTXIy5cAhwGBrQ5wpY64CnFIsiBTpArHl1
+	7PL2adw/51cbI9t+ioEKMHqaIyZo90m4/6wZYdFWQNDBbKZDb6+b8bjM5I49a0wqVjwTCwaPKVP
+	hY+/4qMUYnoH+crsxDAk9wKwabgs=
+X-Google-Smtp-Source: AGHT+IFhScItchLF1iJqQ4iYhnptQKfT2dckty3sGEo+32YHCTWlDw7U1UawqMZL5QB26JIAFxLk/CC80jRRXwZTRGE=
+X-Received: by 2002:a05:6102:809a:b0:48f:4bba:778c with SMTP id
+ ada2fe7eead31-49283dfaf76mr8861012137.8.1721644990072; Mon, 22 Jul 2024
+ 03:43:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aae:b0:397:7dd7:bea5 with SMTP id
- e9e14a558f8ab-398e17ac737mr8390995ab.0.1721644201658; Mon, 22 Jul 2024
- 03:30:01 -0700 (PDT)
-Date: Mon, 22 Jul 2024 03:30:01 -0700
-In-Reply-To: <000000000000fdef8706191a3f7b@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000011de5f061dd387f0@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in __rate_control_send_low (2)
-From: syzbot <syzbot+8dd98a9e98ee28dc484a@syzkaller.appspotmail.com>
-To: clang-built-linux@googlegroups.com, davem@davemloft.net, 
-	edumazet@google.com, johannes.berg@intel.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	nathan@kernel.org, ndesaulniers@google.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, pkshih@realtek.com, syzkaller-bugs@googlegroups.com
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
+ <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch> <20240721192530.GD23783@pendragon.ideasonboard.com>
+In-Reply-To: <20240721192530.GD23783@pendragon.ideasonboard.com>
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Mon, 22 Jul 2024 12:42:52 +0200
+Message-ID: <CAPybu_2tUmYtNiSExNGpsxcF=7EO+ZHR8eGammBsg8iFh3B3wg@mail.gmail.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, ksummit@lists.linux.dev, 
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	jgg@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has bisected this issue to:
+On Sun, Jul 21, 2024 at 9:25=E2=80=AFPM Laurent Pinchart
+<laurent.pinchart@ideasonboard.com> wrote:
+>
+> On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
+> > James Bottomley wrote:
+> > > > The upstream discussion has yielded the full spectrum of positions =
+on
+> > > > device specific functionality, and it is a topic that needs cross-
+> > > > kernel consensus as hardware increasingly spans cross-subsystem
+> > > > concerns. Please consider it for a Maintainers Summit discussion.
+> > >
+> > > I'm with Greg on this ... can you point to some of the contrary
+> > > positions?
+> >
+> > This thread has that discussion:
+> >
+> > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
+> >
+> > I do not want to speak for others on the saliency of their points, all =
+I
+> > can say is that the contrary positions have so far not moved me to drop
+> > consideration of fwctl for CXL.
+> >
+> > Where CXL has a Command Effects Log that is a reasonable protocol for
+> > making decisions about opaque command codes, and that CXL already has a
+> > few years of experience with the commands that *do* need a Linux-comman=
+d
+> > wrapper.
+> >
+> > Some open questions from that thread are: what does it mean for the fat=
+e
+> > of a proposal if one subsystem Acks the ABI and another Naks it for a
+> > device that crosses subsystem functionality? Would a cynical hardware
+> > response just lead to plumbing an NVME admin queue, or CXL mailbox to
+> > get device-specific commands past another subsystem's objection?
+>
+> My default answer would be to trust the maintainers of the relevant
+> subsystems (or try to convince them when you disagree :-)). Not only
+> should they know the technical implications best, they should also have
+> a good view of the whole vertical stack, and the implications of
+> pass-through for their ecosystem. This may result in a single NAK
+> overriding ACKs, but we could also try to find technical solutions when
+> we'll face such issues, to enforce different sets of rules for the
+> different functions of a device.
+>
+> Subsystem hopping is something we're recently noticed for camera ISPs,
+> where a vendor wanted to move from V4L2 to DRM. Technical reasons for
+> doing so were given, and they were (in my opinion) rather excuses. The
+> unspoken real (again in my opinion) reason was to avoid documenting the
+> firmware interface and ship userspace binary blobs with no way for free
+> software to use all the device's features. That's something we have been
+> fighting against for years, trying to convince vendors that they can
+> provide better and more open camera support without the world
+> collapsing, with increasing success recently. Saying amen to
+> pass-through in this case would be a huge step back that would hurt
+> users and the whole ecosystem in the short and long term.
 
-commit 9df66d5b9f45c39b3925d16e8947cc10009b186d
-Author: Ping-Ke Shih <pkshih@realtek.com>
-Date:   Wed Jun 9 07:59:44 2021 +0000
+In my view, DRM is a more suitable model for complex ISPs than V4L2:
 
-    cfg80211: fix default HE tx bitrate mask in 2G band
+- Userspace Complexity: ISPs demand a highly complex and evolving API,
+similar to Vulkan or OpenGL. Applications typically need a framework
+like libcamera to utilize ISPs effectively, much like Mesa for
+graphics cards.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13e233fd980000
-start commit:   51835949dda3 Merge tag 'net-next-6.11' of git://git.kernel..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=101233fd980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17e233fd980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d3bdd09ea2371c89
-dashboard link: https://syzkaller.appspot.com/bug?extid=8dd98a9e98ee28dc484a
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14608749980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=178b9195980000
+- Lack of Standardization: There's no universal standard for ISPs;
+each vendor implements unique features and usage patterns. DRM
+addresses this through vendor-specific IOCTLs
 
-Reported-by: syzbot+8dd98a9e98ee28dc484a@syzkaller.appspotmail.com
-Fixes: 9df66d5b9f45 ("cfg80211: fix default HE tx bitrate mask in 2G band")
+- Proprietary Architectures: Vendors often don't fully disclose their
+hardware architectures. DRM cleverly only necessitates a Mesa
+implementation, not comprehensive documentation.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+Our current approach of pushing back against vendors, instead of
+seeking compromise, has resulted in the vast majority of the market
+(99% if not more) relying on out-of-tree drivers. This leaves users
+with no options for utilizing their cameras outside of Android.
+
+DRM allows a hybrid model, where:
+- Open Source Foundation: Standard use cases are covered by a fully
+open-source stack.
+- Vendor Differentiation: Vendors retain the freedom to implement
+proprietary features (e.g., automatic makeup) as closed source.
+
+This approach would allow billions of users to access their hardware
+more securely and with in-tree driver support. Our current stubborn
+pursuit of an idealistic goal has already negatively impacted both
+users and the ecosystem.
+
+The late wins, in my opinion, cannot scale to the consumer market, and
+Linux will remain a niche market for ISPs.
+
+
+If such a hybrid model goes against Linux goals, this is something
+that should be agreed upon by the whole community, so we have the same
+criteria for all subsystems.
+
+
+
+--
+Ricardo Ribalda
 
