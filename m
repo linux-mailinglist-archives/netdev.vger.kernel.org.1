@@ -1,330 +1,125 @@
-Return-Path: <netdev+bounces-112377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A126E938B2E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:26:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21526938B8E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:54:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5C8B1C20EB9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 08:26:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4986B21A0D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 08:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C0E1662E9;
-	Mon, 22 Jul 2024 08:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CD516938C;
+	Mon, 22 Jul 2024 08:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=l-acoustics.com header.i=@l-acoustics.com header.b="a3WTl0Rm"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="rCbLLRpF"
 X-Original-To: netdev@vger.kernel.org
-Received: from PAUP264CU001.outbound.protection.outlook.com (mail-francecentralazon11021088.outbound.protection.outlook.com [40.107.160.88])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D143161326;
-	Mon, 22 Jul 2024 08:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.160.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721636758; cv=fail; b=j4B3VmRzY0d5RGXRgfcOvanrWSC8nQeEPZl05uVif5ju5XxMmA7OLqza7vFdMAuUymc8E74IQRm57m9kBGTpK6HVssqXy5Rcy+DlB3GYTOSyqjW1B0o51g131eoQ2yFmAPF1ZcZT0WN8OgVb30O0gjXo4VPyh3ouARSkOK1x0Gs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721636758; c=relaxed/simple;
-	bh=3hWWTKwkMqq1A8gBwRFX1bq3WCcLK+FQMQv3FSjJ52Q=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=EBTiEQKQ/hAanojkezDfuSNSzAAgTi1RlFGPUh159Igax4cyrqTxXeIFb00HccnGycnBXZfi68vW1inbynI9lfz5TQ8tzRBJiyLFWQLxBPACCfbWOc3QfVGg7NNoIz3leZYy8/XoHXJhUN+zk9TWrci7+LIepxToEndHxDg+15U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=l-acoustics.com; spf=pass smtp.mailfrom=l-acoustics.com; dkim=pass (1024-bit key) header.d=l-acoustics.com header.i=@l-acoustics.com header.b=a3WTl0Rm; arc=fail smtp.client-ip=40.107.160.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=l-acoustics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=l-acoustics.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TcjeeAGRV0tM6o2AN29vdx3JMg5ZsYM8QM9Ci9rEb0WHCnJpQIMj7s4Ogkal+zUHJrJ4++r4HITLJdnJBK866J+2eUj/nKDHzOBl/aMop2+Du/k2H8aezfA3E9z9Iy8a/BXvxF0wO1O0Vx37TOzKuwU2HxnGs5NFjQA7znTxPENOvOcLc9AqeDG72Aq29k+MHhOIg4gDRBuPYuek69AoorScx0c4L8etALpe8S66R1y7WrFzmNpxyBw/RjHS8vNMgqHdasNntR4lHY+8YqyFxkASCEevuzR7ifv1+mQPOw4jlyExz9hr5IM/YHeYJvVk6TBFVkWkKiobmQe4FWsFXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y71VKafGctelsd0XLJpasQNfYyj3DBc16kxr8EVIfrs=;
- b=xx8X86dJVupwTEmNMuu9nwhrsFeDqOrHsutrT/q9KKtpJ6tfAx8PbS9Jr9wh2A8v4aGWo/8iJ40cjuVkF2ChAxSZLjtKUkcrTZfo7PJ94GE9bnD1xiuRKfoT7TNmUwsPu/W8IBKlyy2SwPupAw6AfMZplZA0Su2ziyvuCGMxdXFDbwO7fzpyU7U9jtcbP8MYYHgQjjPJSjN0imNj67M62cgUNLcMozfhN9YAft6GuubDL6meVXHP1ZQqSp7Ul2BRGbBFS6qkuDsugCMDDET9/B3ZpMJoIXCgGdeHi4k0faBE+zn0U6LulEjB5p4dA8AOqh2nzj7Ym91vit9Lya8R+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=l-acoustics.com; dmarc=pass action=none
- header.from=l-acoustics.com; dkim=pass header.d=l-acoustics.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=l-acoustics.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y71VKafGctelsd0XLJpasQNfYyj3DBc16kxr8EVIfrs=;
- b=a3WTl0RmxI8PPKvuVR6MKVDGdpcMfm0xyH8xSTEiCeRYOuFcOH/KXqm2xyeevLUPrv8ScXMuPGovd22TufjVu/svRdJs0glSssDoORbTZHIf2bvEJLp5ugrTH+ndXvUKR9Thq9crNdJjeMVl1QZbT01avxNYmJ6n694LhzF1vjY=
-Received: from PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:25d::9)
- by MR0P264MB4890.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:4e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.20; Mon, 22 Jul
- 2024 08:25:51 +0000
-Received: from PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM
- ([fe80::8062:2bfa:50b2:8368]) by PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM
- ([fe80::8062:2bfa:50b2:8368%5]) with mapi id 15.20.7784.017; Mon, 22 Jul 2024
- 08:25:51 +0000
-From: Rodrigo CADORE CATALDO <rodrigo.cadore@l-acoustics.com>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, "Abdul Rahim, Faizal"
-	<faizal.abdul.rahim@linux.intel.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Simon
- Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>, Paul
- Menzel <pmenzel@molgen.mpg.de>, Sasha Neftin <sasha.neftin@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2 2/3] igc: Fix reset adapter
- logics when tx mode change
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2 2/3] igc: Fix reset adapter
- logics when tx mode change
-Thread-Index: AQHa0yMzVmPogmS4tkOu4N6MFlYsB7HxasMAgABqGoCACLNUAIAA+8EAgAbwiXA=
-Date: Mon, 22 Jul 2024 08:25:51 +0000
-Message-ID:
- <PR0P264MB446411F81A817554D03922B2C8A82@PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM>
-References: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
- <20240707125318.3425097-3-faizal.abdul.rahim@linux.intel.com>
- <87o774u807.fsf@intel.com>
- <6bb1ba4a-41ba-4bc1-9c4b-abfb27944891@linux.intel.com>
- <87le27ssu4.fsf@intel.com>
- <2c5a0dcf-f9b0-49da-9dea-0a276fa4a0d9@linux.intel.com>
- <87msmf3cdd.fsf@intel.com>
-In-Reply-To: <87msmf3cdd.fsf@intel.com>
-Accept-Language: en-US, fr-FR
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-lsi-version: 1.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=l-acoustics.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PR0P264MB4464:EE_|MR0P264MB4890:EE_
-x-ms-office365-filtering-correlation-id: 4ef00e93-ce8a-4c11-1bd8-08dcaa27e5b5
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?GlGZMDOYDYf6iBhHk7YkU4m6JTQH2QbFpCUhCNADG419Zjenl+LsMVzEskx3?=
- =?us-ascii?Q?Oi0a1IJ0fFjVG9EsuXt2Pm2M6HRwvwTHEzNpAGBBT7ZQIhuxI0RFsaLvhI87?=
- =?us-ascii?Q?X7jLsEA9oPlW14HaMdtawBpYTjbJkYY8s75sz+cCpEp9xXL7rIsAGhHHvMML?=
- =?us-ascii?Q?FBWI9gzFnvI5XC2nWEwET1z/dzJFmDOVIvVipyBfYtmgMpixucxJfKf/vlC4?=
- =?us-ascii?Q?SF20UY9rBjeDNCldUxG+50LiAF7uugU6kO7ebQaXLn7lyxtlK/0R6GdtT6L/?=
- =?us-ascii?Q?Qa1EfCpChcQRwd74LNULuFQI2nVi4ohvVzaL4h8DwgnlaB75vLQJySY9r6EB?=
- =?us-ascii?Q?9x4qxc8cEcMJLzYH/54z8rC94dDT6Bpc9XBtMUn3SnIFUC1l/6smo+M2WnD6?=
- =?us-ascii?Q?52EaRwRT0nOuaRwJMjnQkYuhEcuYI77R542GXm9r4/+G44FSOTJ1z9G0MHml?=
- =?us-ascii?Q?OETXmcL4vMcGxuuooSoiXKfoaQAXHAEJqYrScwOV9f/SgByCpaw4j6Qy1DtV?=
- =?us-ascii?Q?n8iM8RVeVeTFtu30ZUgmAdmvTtxthLZ2usVgvp9CdThzIWFBbQkGZ+vPOpmG?=
- =?us-ascii?Q?migWDJ0AxhGBPsYoRiWAUwjrgBSlzmwk9luJvtvrcAsdqGeJkvIXw9AqPwh5?=
- =?us-ascii?Q?NGly12NzoJK0pibc0Y2bPhqpUOYVObf7z9fHRSlVR+vdJo1vUoVAzB/sxiEh?=
- =?us-ascii?Q?8d0Vnw9LpI/yjKQdsQ8QKejd7o2H50b0s4CPvwBb6BoaGwyVgVdYVl2qWSEB?=
- =?us-ascii?Q?UPqSrw1rNfA89LFFZaPlAvjEalPt7TBlzyi7YCqz0tVpMjWGXyPUC+cEdlJG?=
- =?us-ascii?Q?BbvaEprvWrsIcPqxDrhvHuBJSG7/0HDyIpP10YsjnP0Cl2k1JNEsqBLYrU2K?=
- =?us-ascii?Q?VnsQCQ7GOTahSV5EsP0ZIZZtvsjcORuuLsvuSYm6IQoATM5Ac79IwTYOjkiv?=
- =?us-ascii?Q?TPh/K4alGbE/WE0j4wCWshPYgSfARyvUNrTt2xGbGQ7IHk4Cougalg9/n3Ex?=
- =?us-ascii?Q?igrvDYZ7nM3cLswmg4zR/KQgQNpRLm/FospaqUgW7xKAKv8aqP2kOcy4ujj0?=
- =?us-ascii?Q?KaasNoBshNVDEczGhX1ms2tPUWaYLR4/SqHAZpiTDezZp2VElUzue5etDqFB?=
- =?us-ascii?Q?y9Oz6OlGVaelKqzLsacUiPS8udB9/+6MyI6cdOuBPq1eZzQad5TNB6BenmSk?=
- =?us-ascii?Q?fFZsmr08vc+PlyBycBIxANisQ0fy6xJf2Bz19BhAW8eyqoRYbHG8hOdIR/26?=
- =?us-ascii?Q?a5M8rOyW+GgFKGIx4ZK1X5DJIzIGZDybHR6UX01mV9kAV/q7n8aaN3QhgFdW?=
- =?us-ascii?Q?d2h7GKzIM1f4uA2t7chCGDIeg+EoMIntJwJTLjhxmM1lHvSQw0FMBPkwisHn?=
- =?us-ascii?Q?Y64rObqbbTzAku5/gC407mMeZroY87+NuSosDcZqVZnkCEANAf2GzFeyCaGP?=
- =?us-ascii?Q?FCyAe+eUHRk=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?XgoI6BImgSJtF91URHkg2WwDXZR91AJIhh/4+8naGjUuKVHKQcWWfb9/YCLO?=
- =?us-ascii?Q?dCbiAoBA6D4SoWWdC7cgd0ysWFMOJUZuUvwvQk0vwnFyURx4UpsP2oTTJCNh?=
- =?us-ascii?Q?zV8ZlkGklAi4XjLE9zANV1XDxTRcCIyyGMZqheyuNhPwRaDnFwKq1V7zcvub?=
- =?us-ascii?Q?j4kkfj7AtqEQlFVlt/TO6GabPKlDSz0AEKdhTvCNUJ0UYkl/Hoj2TmjYnwqb?=
- =?us-ascii?Q?xZ1/eyqOizs+eZbD2uDweNV47e/bBzBydJPgiHgVD6ZRTfF5pIZqMhsuDm7s?=
- =?us-ascii?Q?feFwSdXB+QYJf7VRLVn9IoKcQ9VP9qndH9bsYMb5zuhGO01bZaJCgV4/y2fX?=
- =?us-ascii?Q?TptOU0l49r0SFhpcwnL1NnB+REGicCzOxXnNAyrLHGJqO/lGmYuHbokC9hyN?=
- =?us-ascii?Q?ukDWfnsplAMjSluOKvPOfqmYcOYmSLfGFQCpdcvAEYfK6mC4TwJMQ1It8ABR?=
- =?us-ascii?Q?lzPQYqFjm5empFjOz9UYy7ZVVVjV1Bx6oQNm5UCD9Q0yN754CLz0KiCK39Dk?=
- =?us-ascii?Q?IDmiuaKKkTDny+u3glnNX8nHfg+xZYg+sxUXrUGEZmd4nVod+Hq3CBNX17Lw?=
- =?us-ascii?Q?zst4zLSxQ29dIVFf6zuHE28IvJAyZmTJq+EfZoask3n8i0OVHlwArBLU/SCY?=
- =?us-ascii?Q?H2FzLAx/xKvxeoADnvdNEc/WCS9SCGVAUihcvuGpSvGd+fR59ON5x8ksD3ae?=
- =?us-ascii?Q?iCNlb+0Logf1aMlTc8Y7TKI9178l4DNvjNPEb858eQrfXfDQ+Ac8fTTOYXfZ?=
- =?us-ascii?Q?zgO+eaxUjoIisOqUj4vNd3OhI3HXDQFDyog9WIlOTXoSOUhunIFCSjFjQsTo?=
- =?us-ascii?Q?lswNqo67Ig5jJ40cUuXe2RNh1A7pOnkmXJ78JK016iUZ8tfo92Aqfd0Kf3Vu?=
- =?us-ascii?Q?5vEnSIjqjy9zs28IBeMazMUJOFT6LM7aUMEBEJpYP7pRRHBvSXTWFMmDwYwZ?=
- =?us-ascii?Q?JCIG9oP0Rsr2RXsNwW83ZVoUONqOjpr1hB0ckBTNvmeVP3d36wmFOF/3iS93?=
- =?us-ascii?Q?fWLsRKzmyHw55tlTDOV7teS68c28HwXmR4htfUjBinHgCb8hovu4buCmhtlj?=
- =?us-ascii?Q?+eiLzNF1LJSYIlWoug2cVBZ/wGCJGvkh+1OXOfut+CtF1nJZ1PsJEverR6va?=
- =?us-ascii?Q?Mw0RuDgaOXkgTFA5uuXUN549Gj4mEFy+MuZEOjB/kjM5CgsZ40tHvJE/eE3m?=
- =?us-ascii?Q?rjo+y6vjiwdTiwD5XYMUaWSSfGEFT+Yb+3htzOurWDQDt2sLPZIfUzeWQ1yh?=
- =?us-ascii?Q?H1S2nE4kdomSW6dJb9HI6HDmjdmOgq7r2buzCJZQtbYRZYGeAvk2cuPWFR7K?=
- =?us-ascii?Q?/mXonrp6x1306zLXFMtt+cr+iEmwSleSjGn0BdBNEFJwh8IMeIzzKgI78Wpk?=
- =?us-ascii?Q?JWTpCm+srhZMxwL1+7jzLRsl3V2wb80q9gpFE6miy22mbDYbLcs0rIm56LR2?=
- =?us-ascii?Q?NY1ibPKKYd9OekuTUPciXXmA1qTc7GfRcRfd6tS/ymfStxDnKTcEGQbKkFI5?=
- =?us-ascii?Q?1W6CEkQEqafS/9e6XZ0nwpMY7MeQmGFD1oAbkUqvFuzYr2D9GLoqSSb/9vGB?=
- =?us-ascii?Q?HsEHufis5QxLXNKWfd2g7If9Yqz6lC4dTLR0HR9T8GGzyAc9w1uaoG7w2C9R?=
- =?us-ascii?Q?7g=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D452535280;
+	Mon, 22 Jul 2024 08:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721638418; cv=none; b=n2/fXvNm0knur+c5eJRoL8keY4E9Ryumfx+dGBUk9cN3F7yInHdMHYqMhMXpaQa8hTh90YmYcueqj9g+nOAvY+Mb1G8b2IJ/QVf323NS2VKFYnATZqcSYKRVBjWp/wHnHMc6qkBxGCjZAzB2BABAid41C1i0wdnylN97G0gLDoM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721638418; c=relaxed/simple;
+	bh=2M6txpJs4OiG3fc/4Kurm55TcQChxwioxX65X5P68/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TMjJ92uyMTs4Q8UM9bgiiJWZVMV2o0+sfY190cGDocjlrfJlyz2TWieT9FP3fE4hFbLSsqjkAh4Iqoh1VsWPuEAYU4KGKlfGnDPoyi4VGGTf6DqrNHdlyuI8txLAMqpv5zeyuYABnoecJjeu0WNtzCVqvZozxhY1Lf+1aVeAl58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=rCbLLRpF; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 368CE2B3;
+	Mon, 22 Jul 2024 10:52:54 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1721638374;
+	bh=2M6txpJs4OiG3fc/4Kurm55TcQChxwioxX65X5P68/A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rCbLLRpF54/qNxWj+Gvtt3g7rLu6Gz7kwmJwWO6XuJK3zOGyweKtkt2y1M+8whdOn
+	 ozcpPUVFR7Prs+0pTo/RnGqJCCQw2Ktsk4YU3AhtjKBnmCdZMwsnu1KqC3/kymFEht
+	 odC2TqwIv1wdEfVVSuSLH5ZCxD5AUOElM12TrOSU=
+Date: Mon, 22 Jul 2024 11:53:17 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240722085317.GA31279@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
+ <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240721192530.GD23783@pendragon.ideasonboard.com>
+ <20240722073119.GA4252@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: l-acoustics.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PR0P264MB4464.FRAP264.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ef00e93-ce8a-4c11-1bd8-08dcaa27e5b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2024 08:25:51.3450
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 68e431e8-d632-483e-ae79-f28a7b4c69e6
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Z/IglzwGjatOj/mOw4I/gEruDA2tY4k3bq84VQOp11w1v1BO9HTncsR6dO3f70u3Q/VHa/YJeRe98/x1OLR1Lwc5SvuEXNa5CMVMKLMF260=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MR0P264MB4890
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240722073119.GA4252@unreal>
 
-Vinicius Costa Gomes <vinicius.gomes@intel.com> writes:=20
+On Mon, Jul 22, 2024 at 10:31:19AM +0300, Leon Romanovsky wrote:
+> On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
+> > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
+> > > James Bottomley wrote:
+> > > > > The upstream discussion has yielded the full spectrum of positions on
+> > > > > device specific functionality, and it is a topic that needs cross-
+> > > > > kernel consensus as hardware increasingly spans cross-subsystem
+> > > > > concerns. Please consider it for a Maintainers Summit discussion.
+> > > > 
+> > > > I'm with Greg on this ... can you point to some of the contrary
+> > > > positions?
+> > > 
+> > > This thread has that discussion:
+> > > 
+> > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
+> > > 
+> > > I do not want to speak for others on the saliency of their points, all I
+> > > can say is that the contrary positions have so far not moved me to drop
+> > > consideration of fwctl for CXL.
+> > > 
+> > > Where CXL has a Command Effects Log that is a reasonable protocol for
+> > > making decisions about opaque command codes, and that CXL already has a
+> > > few years of experience with the commands that *do* need a Linux-command
+> > > wrapper.
+> > > 
+> > > Some open questions from that thread are: what does it mean for the fate
+> > > of a proposal if one subsystem Acks the ABI and another Naks it for a
+> > > device that crosses subsystem functionality? Would a cynical hardware
+> > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
+> > > get device-specific commands past another subsystem's objection?
+> > 
+> > My default answer would be to trust the maintainers of the relevant
+> > subsystems (or try to convince them when you disagree :-)).
+> 
+> You know, trust is a two-way street. If you want to trust maintainers,
+> they need to trust others as well. The situation where one maintainer
+> says "I don't trust you, so I will not allow you and other X maintainers
+> to do Y" is not a healthy situation.
+> 
+> > Not only should they know the technical implications best, they should also have
+> > a good view of the whole vertical stack, and the implications of
+> > pass-through for their ecosystem. 
+> 
+> It is wishful thinking. It is clearly not true for large subsystems
+> and/or complex devices.
 
-> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Hi,
->=20
-> "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
->=20
-> > On 12/7/2024 1:10 am, Vinicius Costa Gomes wrote:
-> >> "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com> writes:
-> >>
-> >>> Hi Vinicius,
-> >>>
-> >>> On 11/7/2024 6:44 am, Vinicius Costa Gomes wrote:
-> >>>> Faizal Rahim <faizal.abdul.rahim@linux.intel.com> writes:
-> >>>>
-> >>>>> Following the "igc: Fix TX Hang issue when QBV Gate is close" chang=
-es,
-> >>>>> remaining issues with the reset adapter logic in igc_tsn_offload_ap=
-ply()
-> >>>>> have been observed:
-> >>>>>
-> >>>>> 1. The reset adapter logics for i225 and i226 differ, although they=
- should
-> >>>>>      be the same according to the guidelines in I225/6 HW Design Se=
-ction
-> >>>>>      7.5.2.1 on software initialization during tx mode changes.
-> >>>>> 2. The i225 resets adapter every time, even though tx mode doesn't
-> change.
-> >>>>>      This occurs solely based on the condition  igc_is_device_id_i2=
-25() when
-> >>>>>      calling schedule_work().
-> >>>>> 3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It o=
-nly
-> >>>>>      resets adapter for legacy->tsn tx mode transitions.
-> >>>>> 4. qbv_count introduced in the patch is actually not needed; in thi=
-s
-> >>>>>      context, a non-zero value of qbv_count is used to indicate if =
-tx mode
-> >>>>>      was unconditionally set to tsn in igc_tsn_enable_offload(). Th=
-is could
-> >>>>>      be replaced by checking the existing register
-> >>>>>      IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
-> >>>>>
-> >>>>> This patch resolves all issues and enters schedule_work() to reset =
-the
-> >>>>> adapter only when changing tx mode. It also removes reliance on
-> qbv_count.
-> >>>>>
-> >>>>> qbv_count field will be removed in a future patch.
-> >>>>>
-> >>>>> Test ran:
-> >>>>>
-> >>>>> 1. Verify reset adapter behaviour in i225/6:
-> >>>>>      a) Enrol a new GCL
-> >>>>>         Reset adapter observed (tx mode change legacy->tsn)
-> >>>>>      b) Enrol a new GCL without deleting qdisc
-> >>>>>         No reset adapter observed (tx mode remain tsn->tsn)
-> >>>>>      c) Delete qdisc
-> >>>>>         Reset adapter observed (tx mode change tsn->legacy)
-> >>>>>
-> >>>>> 2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is cl=
-osed"
-> >>>>>      to confirm it remains resolved.
-> >>>>>
-> >>>>> Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is close=
-d")
-> >>>>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> >>>>> Reviewed-by: Simon Horman <horms@kernel.org>
-> >>>>> ---
-> >>>>
-> >>>> There were a quite a few bugs, some of them my fault, on this part o=
-f
-> >>>> the code, changing between the modes in the hardware.
-> >>>>
-> >>>> So I would like some confirmation that ETF offloading/LaunchTime was
-> >>>> also tested with this change. Just to be sure.
-> >>>>
-> >>>> But code-wise, looks good:
-> >>>>
-> >>>> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> >>>>
-> >>>>
-> >>>> Cheers,
-> >>>
-> >>>
-> >>> Tested etf with offload, looks like working correctly.
-> >>>
-> >>> 1. mqprio
-> >>> tc qdisc add dev enp1s0 handle 100: parent root mqprio num_tc 3 \
-> >>> map 2 2 1 0 2 2 2 2 2 2 2 2 2 2 2 2 \
-> >>> queues 1@0 1@1 2@2 \
-> >>> hw 0
-> >>>
-> >>> No reset adapter observed.
-> >>>
-> >>> 2. etf with offload
-> >>> tc qdisc replace dev enp1s0 parent 100:1 etf \
-> >>> clockid CLOCK_TAI delta 300000 offload
-> >>>
-> >>> Reset adapter observed (tx mode legacy -> tsn).
-> >>>
-> >>> 3. delete qdisc
-> >>> tc qdisc delete dev enp1s0 parent root handle 100
-> >>>
-> >>> Reset adapter observed (tx mode tsn -> legacy).
-> >>>
-> >>
-> >> That no unexpected resets are happening, is good.
-> >>
-> >> But what I had in mind was some functional tests that ETF is working. =
-I
-> >> guess that's the only way of knowing that it's still working. Sorry th=
-at
-> >> I wasn't clear about that.
-> >>
-> >>
-> >> Cheers,
-> >
-> > My bad.
-> >
-> > Just tested ETF functionality and it is working.
-> >
->=20
-> Awesome. Thanks for the confirmation:
->=20
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->=20
->=20
-> Cheers,
-> --
-> Vinicius
+Are you saying that kernel communities behind large subsystems for
+complex devices generally have no idea about what they're doing ? Or
+that in a small number of particular cases those communities are
+clueless ? Or does that apply to just the maintainer, not the whole
+subsystem core developers ? I'd like to better understand the scale of
+your claim here.
 
-Hello Vinicius and Abdul,
-(I wanted to reply to the original email from Abdul, but I subscribed too
-late, so I'm replying to the last message. Apologies in advance)
+-- 
+Regards,
 
-This patch is very useful for us in L-Acoustics.
-According to Milan/AVB specification, we must use CBS for streaming audio.
-
-Until this patch, we could not change the CBS configuration at runtime for =
-i225.
-For instance, adding or removing streams would cause the card to reset and
-drop all streams.
-
-To be precise, we submit a netlink request via `tc change` command every
-time a stream is added/removed.
-
-We were using a home-made patch that I planned to submit, but I forgot..
-
-I tested this patch, and it is working as expected for CBS runtime changes.
-Thank you!
+Laurent Pinchart
 
