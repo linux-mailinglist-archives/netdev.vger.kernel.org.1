@@ -1,224 +1,220 @@
-Return-Path: <netdev+bounces-112366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC1B79389FC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:24:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026D0938A04
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 09:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B6EB1C20FB9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 07:24:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8981F2180E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 07:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69D31BC3C;
-	Mon, 22 Jul 2024 07:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E101B977;
+	Mon, 22 Jul 2024 07:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEfIGlaf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J03Bh/ve"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE381B960
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 07:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B5D18AF9
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 07:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721633090; cv=none; b=HleMBHwcoV4H+bdx5pXBgYc/gHWxDziJb71g5B0YHe2kGJyQn/Lf5R48xk335auTcuP1ltSClTA6gekuL+fNfBdUkvU4m2Jkoj6+rnUQJ7vf+UFLBHlve0jOxycnHiWRH1q+QxgTjXKV5WOj7ezghv0Hh+4GUDNlpYekt8cOJho=
+	t=1721633281; cv=none; b=B1gqDlPkb25ZUNjrBKY8imMYoNVvZ4GdmOaIRYrEWTd/86aNWB/7yCs/I+Eo/6PwUt49ZWYWDgrdLnT0yc8T66oxcIS/DvjIv11JL4Q7YC1ip4eRB2NdBdLayYYwpn1RL0nm96g95axncfO25Oq+K/GTbAV/i9GKEOV+5eqBw3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721633090; c=relaxed/simple;
-	bh=v7PvEK9SRryhQ0yl2RVyk/L4XGuIY0eQHGxznJK09FM=;
+	s=arc-20240116; t=1721633281; c=relaxed/simple;
+	bh=Nm/iP+Ef8w5C1p1oN7/SGXtY7xU8KLhZVOqrCxwRuHw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K8KbSmdegq2+LGTnyBInZmwO08oL4VGxo4Jme/GNwmMmNGrN3nbl0mCKDrbaXDLQh5J7UlBGKzNarEHV5aMcq8gAvKVZyvJQdKuC1CAGxIZsUh1lw03SKcqdxK0z6wctGRf90BqJXkJenEgCSyXXleW6BlQGzT4cwvn6HzMmLT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZEfIGlaf; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=lKZStlLqUHsHtKvRK4H+fTirfl2sJ9xf31br3m6xkdPPSLWl3ZwPa6m3XqDa7uAWOIrT7jb4I71J3bVOtuolpo+EIrbSfTVH2OBSo9hAqK4WglODXOW0arQ/yvDJ2aor7ugp4d1SYEznq84iECJKu20RYXzIT7YME7W9Edg3VGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J03Bh/ve; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721633087;
+	s=mimecast20190719; t=1721633279;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6b8DbvMTIZs4UYUWpNzuhLY/mHU8qxZgrbal7u48m9Q=;
-	b=ZEfIGlaf29NhcL9i2THuMka/DELMvfxHE613uQn0md7+BBRMlllbeECLVtScOXHVkeiQ/2
-	kTci21xeKVFpZZak0p1q6BI+fXtWBFm8B1ytrhFXc1wbyPZstvYdow2hZLCa3PLrfALSOc
-	O2TBBwQ2QL7tHqzNJF0NcUdHxG90K40=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=T95/0g9beK9xkQ+nBBsS0HYON2c9LYVJ1w/U2mpnGSc=;
+	b=J03Bh/veIK7PW9otfrbARIh2V1ijXM7ug2umUkuUT2pI2lX6OyWzJjp00ctkWFp8oOddBu
+	3wV/DD1RlgHReUZ7W1TyTOOzUyNqeo1Ayv6usthtftL/2Izem9rDm1H/gzzTcYsaHmlp3g
+	wTRWuRZHtldwUgCzwPDF61AU2pcs5SE=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-hy-bHEP8MNilzNLUniH7-Q-1; Mon, 22 Jul 2024 03:24:45 -0400
-X-MC-Unique: hy-bHEP8MNilzNLUniH7-Q-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2cb567fccf4so3041210a91.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 00:24:45 -0700 (PDT)
+ us-mta-55-zAXuhv3rPYKhiBoO07vuQw-1; Mon, 22 Jul 2024 03:27:57 -0400
+X-MC-Unique: zAXuhv3rPYKhiBoO07vuQw-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-70ac9630e3aso3317778a12.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 00:27:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721633085; x=1722237885;
+        d=1e100.net; s=20230601; t=1721633274; x=1722238074;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6b8DbvMTIZs4UYUWpNzuhLY/mHU8qxZgrbal7u48m9Q=;
-        b=CwN/UQBOUqHuku/9yfNw3Gumcyc2pGt8TM48DxEohHimzRswNM9A3ToxGY3NBwchvq
-         ptmTCHpX0YzmxiubmL9axkCAsAZ62rsMIe1o4ipESrYXOfr9hR/yaWl9v0FDOR0Ix0zL
-         v//bsg/pyE81AotDPJ3zizexIiAxLYAP4RDhQ494Vm7b4+ONH/xcFCUfKj/PnDjFyTbG
-         Xdg0RlBGiA5b2GoSd+iEH2LPAxc/CWOTfn/A/YX83i1s2pa6YcZ1WPgKx+iDhf1hy+1G
-         W/ih0Efk2+TOfedaI+KU/dDtiAosCP0kxaIz97jWkC0KIG0KJS4wv3eaGN1zESwUVOjg
-         EM1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVq0H8BCDEZQ1wkNGGucgxLgZjYINcelgZAEmTf+vO8Efev/I5P20136SwwI83oi9LtZjy48r8ALx97OdLntpwodi6oRgE1
-X-Gm-Message-State: AOJu0YyHfNLs+8vwB10ZjGkrEHtNLO+OmBUmcVPDJ6fqBPzBWVA2QHFH
-	3EauaXxTeqWCDDJEUeIh1w35Ar2oIdbaMFy1eLL04gvkAQs4ixZOLQb3SGLyzMRZjn6i60nztNJ
-	DoxUPv7Ih4yjM7faJ6pdD8sxzjlTtELHEqxOsly3LOzFiYlz6jRgo7ClECiMP68KQrmzRp7QwrP
-	LDveOUV+FP4ixGR4dPLSgjTayU2F3I
-X-Received: by 2002:a17:90a:d804:b0:2c9:5c67:dd9e with SMTP id 98e67ed59e1d1-2cd27432530mr2182481a91.19.1721633084874;
-        Mon, 22 Jul 2024 00:24:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFxdBJ/mcGD/aWunnzQ1cFnQfiRB3cLn9nWcv3t64CQgVrqxXu9zfgIZNks+aHUVpy63rI4Xsl+ZPoOkSNQaEw=
-X-Received: by 2002:a17:90a:d804:b0:2c9:5c67:dd9e with SMTP id
- 98e67ed59e1d1-2cd27432530mr2182471a91.19.1721633084452; Mon, 22 Jul 2024
- 00:24:44 -0700 (PDT)
+        bh=T95/0g9beK9xkQ+nBBsS0HYON2c9LYVJ1w/U2mpnGSc=;
+        b=vAjp1B8kjWcb6EF1jnMf1i31YmI1Tm4/v5tH6kDtZTSbu9cHxIvPmuuT1w3AvqTRSy
+         VDNw5Af+ZOpAIMhuzzSizxPvAFwqZCkGRM7lNvziFrHENBLvoeJKbFVWDsEvIjOYn9M9
+         2Du9SE0lvsZ/mceG8qTUi76W8jJSB9w0SgI0r/vrI5dUV/+i+oysxnobFzgkIWpMIKOq
+         ArsyTqDMV7dL5U92D3UKRFukg3z2QK5R239Lir4C8hQhw/cFojcqNKA9GZgWzKmBv9oe
+         iIUnkzg8VBalrDUfUiEf5MaO8RIb8AsB3I+oDV+PttzXv3UDwUT9JOa8j57ihEs/jBt4
+         oV5Q==
+X-Gm-Message-State: AOJu0YwR9U151C2p8WZ1SQzv0N04QQcrVsKErohtJK8Iu5enbd9mmHSw
+	gjBcbN37F/ltI8PNauapnJDfROPveBeQyXDyTlK/BQ5UZMwzpCmcsCpo9tDi++bdz+h45zk/sfH
+	wM1DtKlUj4/ICgeLZ1bHBnVu2YAWA94ggwsQo2a1XhrxtozCgWSTgxJerYwGmMy1FSEW75mtv4r
+	mNOl8DGP7K1vua4GlqgVjkAqN5NFVz
+X-Received: by 2002:a05:6a21:999b:b0:1c2:1ed4:4f90 with SMTP id adf61e73a8af0-1c4285689f6mr3925556637.19.1721633273709;
+        Mon, 22 Jul 2024 00:27:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGxIPcCd1WW98vl8lXbLzkIH0a8Q+ehSVLCBNp9CRt+/VuFx/jMBlf8mhAQqthIef6gJKjwps/aEk4qySfjQO4=
+X-Received: by 2002:a05:6a21:999b:b0:1c2:1ed4:4f90 with SMTP id
+ adf61e73a8af0-1c4285689f6mr3925519637.19.1721633273096; Mon, 22 Jul 2024
+ 00:27:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240709080214.9790-1-jasowang@redhat.com> <20240709080214.9790-4-jasowang@redhat.com>
- <20240709090743-mutt-send-email-mst@kernel.org> <CACGkMEv4CVK4YdOvHEbMY3dLc3cxF_tPN8H4YO=0rvFLaK-Upw@mail.gmail.com>
- <CACGkMEvDiQHfLaBRoaFtpYJHKTqicqbrpeZWzat43YveTa9Wyg@mail.gmail.com>
- <20240717015904-mutt-send-email-mst@kernel.org> <CACGkMEtntsAyddgrtxrbQe407dZkitac4ogC7cASF=iYgsum_A@mail.gmail.com>
- <CACGkMEsd63vH3J5m_4srO3ww2MWGOPc31L4171PfQ7uersN7PQ@mail.gmail.com> <20240718211816-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240718211816-mutt-send-email-mst@kernel.org>
+References: <20240716064628.1950-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240716064628.1950-1-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 22 Jul 2024 15:24:32 +0800
-Message-ID: <CACGkMEsvCqymNBZdTB03SacL7JW8emAwgRuS+1e+VkzfEarBrw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/3] virtio-net: synchronize operstate with
- admin state on up/down
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>, 
-	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+Date: Mon, 22 Jul 2024 15:27:42 +0800
+Message-ID: <CACGkMEsX5CwQmrwYzosSDMRdOfYVEmaL6x0-M9fWq0whwyRwSQ@mail.gmail.com>
+Subject: Re: [RFC net-next 00/13] virtio-net: support AF_XDP zero copy (tx)
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
+	bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 19, 2024 at 9:19=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
+On Tue, Jul 16, 2024 at 2:46=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
-> On Fri, Jul 19, 2024 at 09:02:29AM +0800, Jason Wang wrote:
-> > On Wed, Jul 17, 2024 at 2:53=E2=80=AFPM Jason Wang <jasowang@redhat.com=
-> wrote:
-> > >
-> > > On Wed, Jul 17, 2024 at 2:00=E2=80=AFPM Michael S. Tsirkin <mst@redha=
-t.com> wrote:
-> > > >
-> > > > On Wed, Jul 17, 2024 at 09:19:02AM +0800, Jason Wang wrote:
-> > > > > On Wed, Jul 10, 2024 at 11:03=E2=80=AFAM Jason Wang <jasowang@red=
-hat.com> wrote:
-> > > > > >
-> > > > > > On Tue, Jul 9, 2024 at 9:28=E2=80=AFPM Michael S. Tsirkin <mst@=
-redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Jul 09, 2024 at 04:02:14PM +0800, Jason Wang wrote:
-> > > > > > > > This patch synchronize operstate with admin state per RFC28=
-63.
-> > > > > > > >
-> > > > > > > > This is done by trying to toggle the carrier upon open/clos=
-e and
-> > > > > > > > synchronize with the config change work. This allows propag=
-ate status
-> > > > > > > > correctly to stacked devices like:
-> > > > > > > >
-> > > > > > > > ip link add link enp0s3 macvlan0 type macvlan
-> > > > > > > > ip link set link enp0s3 down
-> > > > > > > > ip link show
-> > > > > > > >
-> > > > > > > > Before this patch:
-> > > > > > > >
-> > > > > > > > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast =
-state DOWN mode DEFAULT group default qlen 1000
-> > > > > > > >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
-> > > > > > > > ......
-> > > > > > > > 5: macvlan0@enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN=
-> mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
-> > > > > > > >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
-> > > > > > > >
-> > > > > > > > After this patch:
-> > > > > > > >
-> > > > > > > > 3: enp0s3: <BROADCAST,MULTICAST> mtu 1500 qdisc pfifo_fast =
-state DOWN mode DEFAULT group default qlen 1000
-> > > > > > > >     link/ether 00:00:05:00:00:09 brd ff:ff:ff:ff:ff:ff
-> > > > > > > > ...
-> > > > > > > > 5: macvlan0@enp0s3: <NO-CARRIER,BROADCAST,MULTICAST,UP,M-DO=
-WN> mtu 1500 qdisc noqueue state LOWERLAYERDOWN mode DEFAULT group default =
-qlen 1000
-> > > > > > > >     link/ether b2:a9:c5:04:da:53 brd ff:ff:ff:ff:ff:ff
-> > > > > > >
-> > > > > > > I think that the commit log is confusing. It seems to say tha=
-t
-> > > > > > > the issue fixed is synchronizing state with hardware
-> > > > > > > config change.
-> > > > > > > But your example does not show any
-> > > > > > > hardware change. Isn't this example really just
-> > > > > > > a side effect of setting carrier off on close?
-> > > > > >
-> > > > > > The main goal for this patch is to make virtio-net follow RFC28=
-63. The
-> > > > > > main thing that is missed is to synchronize the operstate with =
-admin
-> > > > > > state, if we do this, we get several good results, one of the o=
-bvious
-> > > > > > one is to allow virtio-net to propagate status to the upper lay=
-er, for
-> > > > > > example if the admin state of the lower virtio-net is down it s=
-hould
-> > > > > > be propagated to the macvlan on top, so I give the example of u=
-sing a
-> > > > > > stacked device. I'm not we had others but the commit log is pro=
-bably
-> > > > > > too small to say all of it.
-> > > > >
-> > > > > Michael, any more comments on this?
-> > > > >
-> > > > > Thans
-> > > >
-> > > >
-> > > > Still don't get it, sorry.
-> > > > > > > > This is done by trying to toggle the carrier upon open/clos=
-e and
-> > > > > > > > synchronize with the config change work.
-> > > > What does this sentence mean? What is not synchronized with config
-> > > > change that needs to be?
-> > >
-> > > I meant,
-> > >
-> > > 1) maclvan depends on the linkwatch to transfer operstate from the
-> > > lower device to itself.
-> > > 2) ndo_open()/close() will not trigger the linkwatch so we need to do
-> > > it by ourselves in virtio-net to make sure macvlan get the correct
-> > > opersate
-> > > 3) consider config change work can change the state so ndo_close()
-> > > needs to synchronize with it
-> > >
-> > > Thanks
-> >
-> > Michael, are you fine with the above or I miss something there?
-> >
-> > Thanks
+> ## AF_XDP
+>
+> XDP socket(AF_XDP) is an excellent bypass kernel network framework. The z=
+ero
+> copy feature of xsk (XDP socket) needs to be supported by the driver. The
+> performance of zero copy is very good. mlx5 and intel ixgbe already suppo=
+rt
+> this feature, This patch set allows virtio-net to support xsk's zerocopy =
+xmit
+> feature.
+>
+> At present, we have completed some preparation:
+>
+> 1. vq-reset (virtio spec and kernel code)
+> 2. virtio-core premapped dma
+> 3. virtio-net xdp refactor
+>
+> So it is time for Virtio-Net to complete the support for the XDP Socket
+> Zerocopy.
+>
+> Virtio-net can not increase the queue num at will, so xsk shares the queu=
+e with
+> kernel.
+>
+> This patch set includes some refactor to the virtio-net to let that to su=
+pport
+> AF_XDP.
+>
+> ## About virtio premapped mode
+>
+> The current configuration sets the virtqueue (vq) to premapped mode,
+> implying that all buffers submitted to this queue must be mapped ahead
+> of time. This presents a challenge for the virtnet send queue (sq): the
+> virtnet driver would be required to keep track of dma information for vq
+> size * 17, which can be substantial. However, if the premapped mode were
+> applied on a per-buffer basis, the complexity would be greatly reduced.
+> With AF_XDP enabled, AF_XDP buffers would become premapped, while kernel
+> skb buffers could remain unmapped.
+>
+> We can distinguish them by sg_page(sg), When sg_page(sg) is NULL, this
+> indicates that the driver has performed DMA mapping in advance, allowing
+> the Virtio core to directly utilize sg_dma_address(sg) without
+> conducting any internal DMA mapping. Additionally, DMA unmap operations
+> for this buffer will be bypassed.
+>
+> ## performance
+>
+> ENV: Qemu with vhost-user(polling mode).
+> Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+>
+> ### virtio PMD in guest with testpmd
+>
+> testpmd> show port stats all
+>
+>  ######################## NIC statistics for port 0 #####################=
+###
+>  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+>  RX-errors: 0
+>  RX-nombuf: 0
+>  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
 >
 >
-> I don't understand 3. config change can always trigger.
-> what I do not like is all these reads from config space
-> that now trigger on open/close. previously we did
-> read
-> - on probe
-> - after probe, if config changed
+>  Throughput (since last show)
+>  Rx-pps:   8861574     Rx-bps:  3969985208
+>  Tx-pps:   8861493     Tx-bps:  3969962736
+>  ########################################################################=
+####
 >
+> ### AF_XDP PMD in guest with testpmd
 >
-> and that made sense.
-
-Ok, not sure I get you all but I will post a new version to see.
-
-Thanks
-
+> testpmd> show port stats all
+>
+>   ######################## NIC statistics for port 0  ###################=
+#####
+>   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+>   RX-errors: 0
+>   RX-nombuf:  0
+>   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+>
+>   Throughput (since last show)
+>   Rx-pps:      6333196          Rx-bps:   2837272088
+>   Tx-pps:      6333227          Tx-bps:   2837285936
+>   #######################################################################=
+#####
+>
+> But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+>
+> Please review.
+>
+> Thanks.
+>
+> Xuan Zhuo (13):
+>   virtio_ring: introduce vring_need_unmap_buffer
+>   virtio_ring: split: harden dma unmap for indirect
+>   virtio_ring: packed: harden dma unmap for indirect
+>   virtio_ring: perform premapped operations based on per-buffer
+>   virtio-net: rq submits premapped buffer per buffer
+>   virtio_ring: remove API virtqueue_set_dma_premapped
+>   virtio_net: refactor the xmit type
+>   virtio_net: xsk: bind/unbind xsk for tx
+>   virtio_net: xsk: prevent disable tx napi
+>   virtio_net: xsk: tx: support xmit xsk buffer
+>   virtio_net: xsk: tx: handle the transmitted xsk buffer
+>   virtio_net: update tx timeout record
+>   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+>
+>  drivers/net/virtio_net.c     | 363 ++++++++++++++++++++++++++++-------
+>  drivers/virtio/virtio_ring.c | 302 ++++++++++++-----------------
+>  include/linux/virtio.h       |   2 -
+>  3 files changed, 421 insertions(+), 246 deletions(-)
 >
 > --
-> MST
+> 2.32.0.3.g01195cf9f
 >
+
+Hi Xuan:
+
+I wonder why this series is tagged as "RFC"?
+
+Thanks
 
 
