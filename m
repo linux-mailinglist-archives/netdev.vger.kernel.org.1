@@ -1,106 +1,151 @@
-Return-Path: <netdev+bounces-112405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B0D938DD2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:01:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9BBD938DEF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 13:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 320281C21021
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:01:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEDCF1C21460
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 11:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C38416C852;
-	Mon, 22 Jul 2024 11:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C2E16CD08;
+	Mon, 22 Jul 2024 11:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="CbZzMVLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411C5161936
-	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 11:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FB9316C87D;
+	Mon, 22 Jul 2024 11:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721646112; cv=none; b=UpbF3OdPzBAcahphfK57EgmCtrjw3KG4wOtCGSc4uHpX5EmP5tEWoup5ZUosOrzrxbshQw5rkTtF1iI9VaUu1fLGZU7quNGhC92WjKMsjq9K5ruXUUYKtB/UEb+fxleeNSqQF/GM3vU1l9pER/aYw7sLn+7C0zDfMZp7jrR2Wf8=
+	t=1721646632; cv=none; b=kkSep1FfX/tK+CFpTKt6x0DGYd6qbNI0DbeHK1+aNJaq2g9aUxfW23n3Y6ocMMoLyl3c34ROarwA0XLOHBt0cOi4bZu4mTsIeQgLijawk/XxGqqwobMqQMD9YszTmpW1dPFw47a1bmlbby8la1CNYVasX4bBCWHodE04DDpy6+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721646112; c=relaxed/simple;
-	bh=6h/7SajPiCin0UkJyp1APfVi8raHzC7o7vGnNP35rG4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ba3WH0lCR3mkVWq4B7qWITqpJN7BPMhKEwOkL3oVQlu+qbvbhsqLXSiyTvGmHtyAbJnavaxX3iGJ3qyfraGfXTVvZizeqtgBOPP8Z4zRGwPTDbiBkHVbTTeKh7HDtE10TdL+kXOkZWbDUzpGBRzbWGkKrrzhdInLjTi86Y8nA1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from localhost.localdomain (unknown [223.64.68.124])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxMMQTPJ5mtBtUAA--.19050S3;
-	Mon, 22 Jul 2024 19:01:42 +0800 (CST)
-From: Yanteng Si <siyanteng@loongson.cn>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	fancer.lancer@gmail.com,
-	diasyzhang@tencent.com
-Cc: Yanteng Si <siyanteng@loongson.cn>,
-	Jose.Abreu@synopsys.com,
-	chenhuacai@kernel.org,
-	linux@armlinux.org.uk,
-	guyinggang@loongson.cn,
-	netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com,
-	si.yanteng@linux.dev,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH net-next RFC v15 14/14] net: stmmac: dwmac-loongson: Add loongson module author
-Date: Mon, 22 Jul 2024 19:01:39 +0800
-Message-Id: <a9320bffb9ae6bca71fc687069f39ed68b59d8ee.1721645682.git.siyanteng@loongson.cn>
-X-Mailer: git-send-email 2.31.4
-In-Reply-To: <cover.1721645682.git.siyanteng@loongson.cn>
-References: <cover.1721645682.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1721646632; c=relaxed/simple;
+	bh=oMAMO7sUOdgfshyC1TIa2Qwn/3USkETxBIrUqUtpAYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o5KQXzvfXuOyY2NNWIEdeVEVDGc5+xWK3f4MskTvPV+rsiRhAEtoUkbxkEAmDRjP8wrvkP/PdifucO7wo9i811iWdl4eKlkKNHTJo+v1HX7U4ic7pJGpiuJhwZebIJGmkiFvIyZx7aFaC4ONkaft4XEvPAO5njqlzqWgZpsgBUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=CbZzMVLW; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 606E52B3;
+	Mon, 22 Jul 2024 13:09:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1721646581;
+	bh=oMAMO7sUOdgfshyC1TIa2Qwn/3USkETxBIrUqUtpAYw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CbZzMVLWkHzFV74YUZ4oHY+TeGQPt3u4JS2mp5UT/5pj5ppEZEyWik6S6YFlkZTQU
+	 nAldbNDVyDPGpyirdejQG9HuSW+EzcUCWzvYhQPnpGX4kRecUWKQ7XqVqv64J1dPdW
+	 /hZH+5Z9Pb+tFZ+i3oqV6Vg1VO+6ut24rRF98Wxw=
+Date: Mon, 22 Jul 2024 14:10:04 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Dan Williams <dan.j.williams@intel.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240722111004.GB13497@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
+ <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240721192530.GD23783@pendragon.ideasonboard.com>
+ <20240722073119.GA4252@unreal>
+ <20240722085317.GA31279@pendragon.ideasonboard.com>
+ <20240722104407.GB4252@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8DxMMQTPJ5mtBtUAA--.19050S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw1ftw4kuFy3Gr17JFykGrg_yoWDXFg_GF
-	W2vrn3GF1UJrWSk345W3y5Zrya9ryDWa1Sk3ZFkas3Wa12vwn8Jr95urnxJF13CrWrZFnI
-	qF4fJr1xCw18JjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbyAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY02
-	0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-	wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
-	8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-	xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-	vE14v26r126r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-	r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04
-	v7MxkIecxEwVAFwVW8KwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC2
-	0s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI
-	0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv2
-	0xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z2
-	80aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU
-	0xZFpf9x0pRE_MfUUUUU=
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240722104407.GB4252@unreal>
 
-Add Yanteng Si as MODULE_AUTHOR of  Loongson DWMAC PCI driver.
+Hi Leon,
 
-Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-Acked-by: Huacai Chen <chenhuacai@loongson.cn>
-Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 1 +
- 1 file changed, 1 insertion(+)
+On Mon, Jul 22, 2024 at 01:44:07PM +0300, Leon Romanovsky wrote:
+> On Mon, Jul 22, 2024 at 11:53:17AM +0300, Laurent Pinchart wrote:
+> > On Mon, Jul 22, 2024 at 10:31:19AM +0300, Leon Romanovsky wrote:
+> > > On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
+> > > > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
+> > > > > James Bottomley wrote:
+> > > > > > > The upstream discussion has yielded the full spectrum of positions on
+> > > > > > > device specific functionality, and it is a topic that needs cross-
+> > > > > > > kernel consensus as hardware increasingly spans cross-subsystem
+> > > > > > > concerns. Please consider it for a Maintainers Summit discussion.
+> > > > > > 
+> > > > > > I'm with Greg on this ... can you point to some of the contrary
+> > > > > > positions?
+> > > > > 
+> > > > > This thread has that discussion:
+> > > > > 
+> > > > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
+> > > > > 
+> > > > > I do not want to speak for others on the saliency of their points, all I
+> > > > > can say is that the contrary positions have so far not moved me to drop
+> > > > > consideration of fwctl for CXL.
+> > > > > 
+> > > > > Where CXL has a Command Effects Log that is a reasonable protocol for
+> > > > > making decisions about opaque command codes, and that CXL already has a
+> > > > > few years of experience with the commands that *do* need a Linux-command
+> > > > > wrapper.
+> > > > > 
+> > > > > Some open questions from that thread are: what does it mean for the fate
+> > > > > of a proposal if one subsystem Acks the ABI and another Naks it for a
+> > > > > device that crosses subsystem functionality? Would a cynical hardware
+> > > > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
+> > > > > get device-specific commands past another subsystem's objection?
+> > > > 
+> > > > My default answer would be to trust the maintainers of the relevant
+> > > > subsystems (or try to convince them when you disagree :-)).
+> > > 
+> > > You know, trust is a two-way street. If you want to trust maintainers,
+> > > they need to trust others as well. The situation where one maintainer
+> > > says "I don't trust you, so I will not allow you and other X maintainers
+> > > to do Y" is not a healthy situation.
+> > > 
+> > > > Not only should they know the technical implications best, they should also have
+> > > > a good view of the whole vertical stack, and the implications of
+> > > > pass-through for their ecosystem. 
+> > > 
+> > > It is wishful thinking. It is clearly not true for large subsystems
+> > > and/or complex devices.
+> > 
+> > Are you saying that kernel communities behind large subsystems for
+> > complex devices generally have no idea about what they're doing ? Or
+> > that in a small number of particular cases those communities are
+> > clueless ? Or does that apply to just the maintainer, not the whole
+> > subsystem core developers ? I'd like to better understand the scale of
+> > your claim here.
+> 
+> I don't know how you jumped from saying "the maintainers of the relevant
+> subsystems" to "kernel communities". I'm talking about maintainers, not
+> communities.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index f84b8c573be6..91fbae31f892 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -689,4 +689,5 @@ module_pci_driver(loongson_dwmac_driver);
- 
- MODULE_DESCRIPTION("Loongson DWMAC PCI driver");
- MODULE_AUTHOR("Qing Zhang <zhangqing@loongson.cn>");
-+MODULE_AUTHOR("Yanteng Si <siyanteng@loongson.cn>");
- MODULE_LICENSE("GPL v2");
+I wasn't too sure, so that's why I asked. I have also not been very
+precise in my previous e-mails. When I mentioned trusting maintainers, I
+meant trusting the combined knowledge of the relevant maintainer(s) and
+core developer(s) for a subsystem. The number of people that this
+covers, and how they collectively reach agreements, very much depends on
+subsystems.
+
+> There is no way to know everything about everything. In large subsystems,
+> the stack above kernel is so vast, which makes it impossible to know all
+> use cases. This is why some words (... good ... whole ...) in your sentence
+> are not accurate.
+> 
+> So the idea that one maintainer somehow equal to the whole community and
+> this person can block something for other members of the larger community
+> is overreaching.
+
 -- 
-2.31.4
+Regards,
 
+Laurent Pinchart
 
