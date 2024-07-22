@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-112435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5145193911E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:58:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3544993913A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 17:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C7DD1C214E6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 14:58:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66CE41C21645
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 15:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5701A16DC21;
-	Mon, 22 Jul 2024 14:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E87216DEAC;
+	Mon, 22 Jul 2024 15:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ec6beWYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1817E1598F4;
-	Mon, 22 Jul 2024 14:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2703216DEA8
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 15:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721660303; cv=none; b=S940kzsuxL+X3nchCia/NcNLH5G7kP2b8DBDVKHXmXiLH2ZciSDBVX8xZ9W+uaujqFATG12KevDJD3rBC89eOKuzZFAme+mtt6mY69LduM0PQ4iDfpOglFanZfR/VloYPDYFpCBcUXNS9eZ7T+TBxJgr2VPE0RJNGJQLHKudMjE=
+	t=1721660500; cv=none; b=M+A8Oyk7HJ5N1Kbi/YPQ5b9D4mUppOsPczxaLiNVyNf9m0ynMk3gtP7UbbZMMSwjDNAX8sMSHEhydpZPOf32fsUoJ3i6ulxfU1dHEizO8Ac0Xo4W8heCLZISK0+h20ZJg76EeCx6zTnPe3WxEH18fsDcXiloqSaB8bqR3HQDEiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721660303; c=relaxed/simple;
-	bh=VgvT5Q61KIMWA2CLu8ZknMiK/xT4j6mC8Y+9DX/EtCk=;
+	s=arc-20240116; t=1721660500; c=relaxed/simple;
+	bh=BGMMpKXqjmnrN8BBfqoHRGbjQcStSiAQC1ZKUqXjJiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d3xi+kTy6tyezwwwX0hMhHvcMMphZwE3WAlEZfVhkCoqxNNKSPb4xJB6fmEJLK24J7Xg+Df9q/FMR8GgjfCGC5EBy5XBdsFC2BPMO6aZMJO6DxocXnVDJbhGxMmSHBYPOo8zta0kLPvu+g05K8NW0fKeRfi8zMlUfcqK0EmvRt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 4CBA5100DE9C5;
-	Mon, 22 Jul 2024 16:58:17 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 02B3AF5100; Mon, 22 Jul 2024 16:58:16 +0200 (CEST)
-Date: Mon, 22 Jul 2024 16:58:16 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com, Paul Luse <paul.e.luse@intel.com>,
-	Jing Liu <jing2.liu@intel.com>
-Subject: Re: [PATCH V3 00/10] PCIe TPH and cache direct injection support
-Message-ID: <Zp5ziFP6JidCODF6@wunner.de>
-References: <20240717205511.2541693-1-wei.huang2@amd.com>
- <ZptwfEGaI1NNQYZf@wunner.de>
- <612bf6f2-17a4-46fe-a5cd-ecb7023235ef@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PJPjJ92nZ1jWKzCQ692nckJcQGmkZrkR6PUvpBo87W5yDyf3J1kOzpt7H4YvQHiYPOeCnldiGoE/VA+hmoLxlGcgxKB9BHVgyW8JRLfZBln+zjMBoCmLqygTEATcWdJyclYZtNADlAp3tbEll43zJfsp8D/N1KTT8XEYKMGGQfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ec6beWYo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53D61C116B1;
+	Mon, 22 Jul 2024 15:01:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721660499;
+	bh=BGMMpKXqjmnrN8BBfqoHRGbjQcStSiAQC1ZKUqXjJiM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ec6beWYo0z08pgi/2APpB4a2j503wFtcKMaLTYKjvhXNqpSPvMi00eTg32VnLB0Vl
+	 G11SQQEJ5HNYUWTe48VES/BkrIyd3M4ZLZ/hm0BMiNHJaF46MABafJyHVvAWR3Zm7i
+	 aFEo9zVL7LFbIABa9pkek8wtoQPmK8FmfRBEi1z43AwvL4nTmSR/iFliNfGfQgnOlO
+	 HWWpjQbn9Dfim2W2l1KJM9jrDgH1N6iWKEP1WLt/tTbebJjI3XWKgoWmJSz0pUmr7l
+	 zHCG1hb0BUtf32GK/7YURBTBPNAVwQWBuJ+cFl5vp9x2UqynORevKL7Pmjixf4p6nC
+	 ZJ1aODSgSKYwA==
+Date: Mon, 22 Jul 2024 16:01:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, Junfeng Guo <junfeng.guo@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: Re: [PATCH iwl-next v3 05/13] ice: add parser execution main loop
+Message-ID: <20240722150136.GH715661@kernel.org>
+References: <20240710204015.124233-1-ahmed.zaki@intel.com>
+ <20240710204015.124233-6-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,33 +59,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <612bf6f2-17a4-46fe-a5cd-ecb7023235ef@amd.com>
+In-Reply-To: <20240710204015.124233-6-ahmed.zaki@intel.com>
 
-On Mon, Jul 22, 2024 at 09:44:32AM -0500, Wei Huang wrote:
-> On 7/20/24 03:08, Lukas Wunner wrote:
-> > Paul Luse submitted a patch two years ago to save and restore
-> > TPH registers, perhaps you can include it in your patch set?
+On Wed, Jul 10, 2024 at 02:40:07PM -0600, Ahmed Zaki wrote:
+> From: Junfeng Guo <junfeng.guo@intel.com>
 > 
-> Thanks for pointing them out. I skimmed through Paul's patch and it is
-> straightforward to integrate.
+> Implement the core work of the runtime parser via:
+> - ice_parser_rt_execute()
+> - ice_parser_rt_reset()
+> - ice_parser_rt_pkt_buf_set()
 > 
-> Depending on Bjorn's preference, I can either integrate it into my
-> patchset with full credits to Paul and Jing, or Paul want to resubmit a
-> new version.
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
+> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 
-The former would likely be better as I'm not sure Paul has the time
-to respin the patch.  My recollection is that TPH save/restore support
-was dropped as a requirement for the Intel device this was originally
-developed for, but it would be a shame to lose the time and effort
-that already went into it and I think it might be useful for your
-use case as well to support reset recovery.
+> diff --git a/drivers/net/ethernet/intel/ice/ice_parser_rt.c b/drivers/net/ethernet/intel/ice/ice_parser_rt.c
 
-> I read Bjorn's comments, lots of them have been addressed in my patchset
-> (e.g. move under /pci/pcie, support _DSM and dev->tph).
+...
 
-Indeed, good job!
+> +static u16 ice_ptype_resolve(struct ice_parser_rt *rt)
+> +{
+> +	struct ice_parser *psr = rt->psr;
+> +	struct ice_ptype_mk_tcam_item *item;
 
-Thanks for taking a look!
+nit: Please consider arranging these variables in reverse xmas tree order.
 
-Lukas
+     Flagged by https://github.com/ecree-solarflare/xmastree
+
+> +
+> +	item = ice_ptype_mk_tcam_match(psr->ptype_mk_tcam_table,
+> +				       rt->markers, ICE_MARKER_ID_SIZE);
+> +	if (item)
+> +		return item->ptype;
+> +
+> +	ice_debug(rt->psr->hw, ICE_DBG_PARSER, "Could not resolve PTYPE\n");
+> +	return U16_MAX;
+> +}
+
+...
 
