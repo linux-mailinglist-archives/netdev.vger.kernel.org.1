@@ -1,143 +1,139 @@
-Return-Path: <netdev+bounces-112389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA29938D9A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 12:44:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F6A938D9E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 12:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5C9E280E85
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:44:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6E221C20B77
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 10:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A744916B723;
-	Mon, 22 Jul 2024 10:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B9516A38B;
+	Mon, 22 Jul 2024 10:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrE4/+ub"
+	dkim=pass (2048-bit key) header.d=beagleboard-org.20230601.gappssmtp.com header.i=@beagleboard-org.20230601.gappssmtp.com header.b="0IhFle3D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754D814F9E7;
-	Mon, 22 Jul 2024 10:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DDC5338D
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 10:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721645052; cv=none; b=Ft2Z6Lq+3ARhEYaN/5xzkVNsqHYqYv7dCSBOOBisQCzfg+URCPN10aY1LiP8L9SLVx0xfJhe/mcjuwum1H6rm873prn/k5mMI9undQ41u5n7zq3hvAlWQNFzlhEkB0qCF2IrnWqAF0nELZP/z9PE8olN/mlFAB4DK2nmLoqyvww=
+	t=1721645152; cv=none; b=qTJkx/v6T/F96ZfRJco9qgNevKQ1EHrzI8Le+JIGEIHaMA2vm1abEbSLf15baPksPDMMbvZJPjLhzfsZTj9TmflCP1DRA60/MNrxa099Nwy9DW1dNRVydLO0HVScQjAyAudrlyljcGchGJPqeMGrVb5iJUMaOMckcWhGfmYStpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721645052; c=relaxed/simple;
-	bh=6a+mq5mevJuXl/pBRsILXytr+jCyuraTeT7krfiwnJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GZ9uIxHv6zJxdc+rkEBYotud4Vbx7O/jU8vLIg0ziLmSflLktdO9JZR9+lb6bCLafKjQIb5g9WDu3zpRWCigIF169BcjcVQ5DJHuZg/zo9S2iI7ByuM2bZI9OItxfJ+eKXRVVsrXtx9Pbrwnz1nlgsCkJY5rBPJAoi+ZSU1quYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mrE4/+ub; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B726C116B1;
-	Mon, 22 Jul 2024 10:44:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721645052;
-	bh=6a+mq5mevJuXl/pBRsILXytr+jCyuraTeT7krfiwnJ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mrE4/+ubiXmenVRSb8uNbE/S3Z4USFW1EawP1+V/a7Q39nZCTOKQb581hTGlBP6qR
-	 9Rpy6RqHhXKDPOXgckhsf8a6k9IpGcaKWsU+KpXA2GGe/TMggsGTCR6WPQxcEZFrla
-	 BOz+unAAunJb28BU8R+Jo/5MDKdVSaoSsqWcitlLKkZvPwajIH/VYBQ1uhp0PSaqR0
-	 w3ayLI4bmUIDMb10Vcp7vj32OHaDSoiaNCkpM/4bJq036Ks96DvpWFRdCvcUkmTTIO
-	 7TfL02cPYiSaTyLaHwIeTCKA5KLUbVYkkANAv9h8GFOQIdyqK4IJMHRzvgscjOP5V+
-	 a4jg9Ti3PM6oA==
-Date: Mon, 22 Jul 2024 13:44:07 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240722104407.GB4252@unreal>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
- <20240721192530.GD23783@pendragon.ideasonboard.com>
- <20240722073119.GA4252@unreal>
- <20240722085317.GA31279@pendragon.ideasonboard.com>
+	s=arc-20240116; t=1721645152; c=relaxed/simple;
+	bh=aF3j0TrmnVp1p2npQybDiv9LcE984vxGW4haXJ10hMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o00zcSaqNoQhO4UsnlVnSdVmsIkxD9uLgWeX/RtbvG5NOc3r/OCi2+ChMjNEi/gd8MzKlUZt54G2GIvSsZ5iNTZUBRNlYfAXTrmRrcxpR+cN2S46L5Q7+3V6HGTjzx/a/tP/F8+a3rjynAFNK+xZLgAHoryP8580w/38lPIDUm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=beagleboard.org; spf=fail smtp.mailfrom=beagleboard.org; dkim=pass (2048-bit key) header.d=beagleboard-org.20230601.gappssmtp.com header.i=@beagleboard-org.20230601.gappssmtp.com header.b=0IhFle3D; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=beagleboard.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7a20ab5997eso89290a12.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 03:45:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=beagleboard-org.20230601.gappssmtp.com; s=20230601; t=1721645151; x=1722249951; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Yk4UQACOPEhu0mUYszop0tJksRuFg9b/i8uYeB9F4sQ=;
+        b=0IhFle3DAfFitRliix32nUj3H1My774JMDpbk/6S/WygCcTXtVli0pym5Ga5vqhqR4
+         TxlX6jvvclN4WpajwpMXC+vbbHTsll8QhwSpo7v9UeHZxzOfBukQkNvU/e09GnjVvmfS
+         O/Gc6jRnr+6S+i1VeRUE/t/2ai0n2tqDu3wropDjmB5B9CKchEY8hrYq7hqPs8Bn10Gn
+         fDcD63WBdQsRP4IqOtj1jtc7LJqrcI1No+zxXyXA6swN9670fJCsQNhVCarwyyxDtXgj
+         1Pe9W82Qh+XehAtNRirohnt5T/mgEyHeO6g2da3bGZePVgeNqnNwVQzouYmCATaQZYJI
+         I5Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721645151; x=1722249951;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yk4UQACOPEhu0mUYszop0tJksRuFg9b/i8uYeB9F4sQ=;
+        b=m2eVEuG+pv4UK5RmjOXTcuZ1KPm28XiQYckUdrrVvs8GQLQFy4fyoZpUnPnjw4IisB
+         9ECFBV/KILQABNVcrasfbRbhP8HJBzi3fFeW4WecqjAF3DsL/7GC+bq4ni6Mx3mupaXu
+         wGrjwAR5ZTIxeMSLgZ9XZOOPN9pVCHDmcp9dc+C2ER2erZaNTxlllSK6bucNkRgYIWH4
+         H6ZssAp4g4j87Vj48fsnZe+dlSpsdhyB5X8Bv/WN867sCH4IIkkYOZaGwxhgrBt3sGnp
+         ZaHxSJG0U88OC7ouscdrNSPDBkI9oGmTJSRS7YVX3zp+dnMGMIiBV+K/VSOagLhfR2eU
+         swnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeM81clSPrmWNHtfAoe0iBTy8ZrXJEzn4uHqCJ+veF2TX95OgjzeFiSF83MuhmtaSQUXNFmj8b24/+f50QdkjtQNX/ZhEh
+X-Gm-Message-State: AOJu0YyhoCoIqCmw4yfbt5Knt7f5dQNJGvJjxPLIjJOCPq1Y+nMwKSEC
+	SsonhsXd1Jp3K3u6xSd3cm9MoJnVOcfy2cw96xMC4CJC5XsMV0n6BH1+B+vjHA==
+X-Google-Smtp-Source: AGHT+IGbTDbBwca1C4VrH0/hA3S6xV1DimazE2cwql0k7QUaUo+m4vZviNr4xZ00h+PE/OuBz/gSuA==
+X-Received: by 2002:a05:6a00:391b:b0:704:173c:5111 with SMTP id d2e1a72fcca58-70d08635b76mr5376790b3a.3.1721645150824;
+        Mon, 22 Jul 2024 03:45:50 -0700 (PDT)
+Received: from [172.22.58.167] ([117.250.76.237])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff5a149csm5078144b3a.169.2024.07.22.03.45.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jul 2024 03:45:50 -0700 (PDT)
+Message-ID: <5a865811-a6c0-47ad-b8a0-265bb31d4124@beagleboard.org>
+Date: Mon, 22 Jul 2024 16:15:41 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240722085317.GA31279@pendragon.ideasonboard.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: net: ti,cc1352p7: Add boot-gpio
+To: Conor Dooley <conor@kernel.org>
+Cc: jkridner@beagleboard.org, robertcnelson@beagleboard.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>,
+ Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ greybus-dev@lists.linaro.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240719-beagleplay_fw_upgrade-v1-0-8664d4513252@beagleboard.org>
+ <20240719-beagleplay_fw_upgrade-v1-1-8664d4513252@beagleboard.org>
+ <20240719-scuttle-strongbox-e573441c45e6@spud>
+Content-Language: en-US
+From: Ayush Singh <ayush@beagleboard.org>
+In-Reply-To: <20240719-scuttle-strongbox-e573441c45e6@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 22, 2024 at 11:53:17AM +0300, Laurent Pinchart wrote:
-> On Mon, Jul 22, 2024 at 10:31:19AM +0300, Leon Romanovsky wrote:
-> > On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
-> > > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> > > > James Bottomley wrote:
-> > > > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > > > device specific functionality, and it is a topic that needs cross-
-> > > > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > > > concerns. Please consider it for a Maintainers Summit discussion.
-> > > > > 
-> > > > > I'm with Greg on this ... can you point to some of the contrary
-> > > > > positions?
-> > > > 
-> > > > This thread has that discussion:
-> > > > 
-> > > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > > > 
-> > > > I do not want to speak for others on the saliency of their points, all I
-> > > > can say is that the contrary positions have so far not moved me to drop
-> > > > consideration of fwctl for CXL.
-> > > > 
-> > > > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > > > making decisions about opaque command codes, and that CXL already has a
-> > > > few years of experience with the commands that *do* need a Linux-command
-> > > > wrapper.
-> > > > 
-> > > > Some open questions from that thread are: what does it mean for the fate
-> > > > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > > > device that crosses subsystem functionality? Would a cynical hardware
-> > > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > > > get device-specific commands past another subsystem's objection?
-> > > 
-> > > My default answer would be to trust the maintainers of the relevant
-> > > subsystems (or try to convince them when you disagree :-)).
-> > 
-> > You know, trust is a two-way street. If you want to trust maintainers,
-> > they need to trust others as well. The situation where one maintainer
-> > says "I don't trust you, so I will not allow you and other X maintainers
-> > to do Y" is not a healthy situation.
-> > 
-> > > Not only should they know the technical implications best, they should also have
-> > > a good view of the whole vertical stack, and the implications of
-> > > pass-through for their ecosystem. 
-> > 
-> > It is wishful thinking. It is clearly not true for large subsystems
-> > and/or complex devices.
-> 
-> Are you saying that kernel communities behind large subsystems for
-> complex devices generally have no idea about what they're doing ? Or
-> that in a small number of particular cases those communities are
-> clueless ? Or does that apply to just the maintainer, not the whole
-> subsystem core developers ? I'd like to better understand the scale of
-> your claim here.
 
-I don't know how you jumped from saying "the maintainers of the relevant
-subsystems" to "kernel communities". I'm talking about maintainers, not
-communities.
+On 7/19/24 20:25, Conor Dooley wrote:
+> On Fri, Jul 19, 2024 at 03:15:10PM +0530, Ayush Singh wrote:
+>> boot-gpio (along with reset-gpio) is used to enable bootloader backdoor
+>> for flashing new firmware.
+>>
+>> The pin and pin level to enabel bootloader backdoor is configed using
+>> the following CCFG variables in cc1352p7:
+>> - SET_CCFG_BL_CONFIG_BL_PIN_NO
+>> - SET_CCFG_BL_CONFIG_BL_LEVEL
+>>
+>> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+>> ---
+>>   Documentation/devicetree/bindings/net/ti,cc1352p7.yaml | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml b/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+>> index 3dde10de4630..a3511bb59b05 100644
+>> --- a/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+>> +++ b/Documentation/devicetree/bindings/net/ti,cc1352p7.yaml
+>> @@ -29,6 +29,9 @@ properties:
+>>     reset-gpios:
+>>       maxItems: 1
+>>   
+>> +  boot-gpios:
+>> +    maxItems: 1
+> I think this needs a description that explains what this is actually
+> for, and "boot-gpios" is not really an accurate name for what it is used
+> for IMO.
 
-There is no way to know everything about everything. In large subsystems,
-the stack above kernel is so vast, which makes it impossible to know all
-use cases. This is why some words (... good ... whole ...) in your sentence
-are not accurate.
+I was using the name `boot-gpios` since cc1352-flasher uses the name 
+boot-line. Anyway, would `bsl-gpios` be better? Or for more descriptive 
+names, I guess it can be `bootloader-config-gpios` or 
+`bootloader-backdoor-gpios`.
 
-So the idea that one maintainer somehow equal to the whole community and
-this person can block something for other members of the larger community
-is overreaching.
 
-Thanks
+Ayush Singh
 
-> 
-> -- 
-> Regards,
-> 
-> Laurent Pinchart
 
