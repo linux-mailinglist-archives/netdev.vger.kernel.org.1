@@ -1,167 +1,112 @@
-Return-Path: <netdev+bounces-112427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60AD4939063
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:14:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C78D9390BF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 16:36:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FBB0282366
-	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 14:14:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2297C1F21CA6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jul 2024 14:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E53A16D9D8;
-	Mon, 22 Jul 2024 14:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="HK6/JUGa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FDB166308;
+	Mon, 22 Jul 2024 14:35:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57238F5E;
-	Mon, 22 Jul 2024 14:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF884D512
+	for <netdev@vger.kernel.org>; Mon, 22 Jul 2024 14:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721657645; cv=none; b=DOLvOdbA7qNQ0izbqxdktAd9bu5YTAHr25IUmEL41dQVsaQ+QGOevFAbSwm5MtixWWkxJiKaf5gjnRROJuDSEPIMAv0qOzJ/xKux+xmcBfWl91QHnjEF7IpSI2t3e4oXj2DVhd2t0biFVTj6OsLw3Tg4imCh6CBltFq2uqyLa2I=
+	t=1721658958; cv=none; b=OuC0chxlc1iLxNgABahuG6tU27XeJVl77CC6BPo0Pm+d0lSrCij+B5n8IstMG21N3PKsWpvaXcYdjj/lRk4fZjdTzxK4JE6G9DkOrk4oFwEjvFY5w0OtEmxAlzxY47df7Ix2eRFDS0gz1Ywca0hKiFHbitO7O4Gqo326SWr8nqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721657645; c=relaxed/simple;
-	bh=7krbkr0FK8DqcuZDb5Bm0pBNAW/DS8NOrsIa/1qGT+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NL2RJbJWgTdzq8LM4EixaE5H0JJRRGjOgigNu9mrYawzQIoV+Ac//i7nhiABj8Xqzs/+rQA54yav5Qet/h0R/huvAu5lOxU7M6V4LUFMcs6j6Fy6iAoidMih/OucUj45u+3UBZBamZLLSv3JsLBi0oa651qoAeQklhA7x/UD/W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=HK6/JUGa; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 68FF3D1F;
-	Mon, 22 Jul 2024 16:13:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721657600;
-	bh=7krbkr0FK8DqcuZDb5Bm0pBNAW/DS8NOrsIa/1qGT+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HK6/JUGazSPW7upEvsYTHZhQUSWwvNFkDBX+3IsRB1/gy4hqxo/SDQa898JFCSfZT
-	 Dg3f17L3sl0qgz+2iOBHdlP04w1KFUzHcd4S5YdHcE1w0EHyLldd6ABbUKgoNEbxUZ
-	 OQYsZe+sG0i0V+YIHk085N3ZYnyNWLiGEMYzdHMU=
-Date: Mon, 22 Jul 2024 17:13:43 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240722141343.GH13497@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
- <20240721192530.GD23783@pendragon.ideasonboard.com>
- <20240722073119.GA4252@unreal>
- <20240722085317.GA31279@pendragon.ideasonboard.com>
- <20240722104407.GB4252@unreal>
- <20240722111004.GB13497@pendragon.ideasonboard.com>
- <20240722132828.GC4252@unreal>
+	s=arc-20240116; t=1721658958; c=relaxed/simple;
+	bh=DZw9jpV9/A9EGqJ6erATlMmjQxMSuXH0MTa2pDBCcz4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bua9XxtZLqFEFmCCTTx/q7UnTdK6alZcFLhYkCdQ8iYKOGuSAB/47CJFAGlYfa/QhHM2QXI56uJUqYPnEEAyFxZB7KETa78UXCOj8rBAMFUGLi2Yc/GPbzrDv6MTl070Vlrpma5Z1Whzi7ZiccYNFVs+awo9r2/IOZc7WH7VYI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5CAD961E5FE05;
+	Mon, 22 Jul 2024 16:35:16 +0200 (CEST)
+Message-ID: <232df828-baa3-4c87-b5f3-c0dae9d98356@molgen.mpg.de>
+Date: Mon, 22 Jul 2024 16:35:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240722132828.GC4252@unreal>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: Introduce
+ netif_device_attach/detach into reset flow
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Jakub Kicinski <kuba@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20240722122839.51342-1-dawid.osuchowski@linux.intel.com>
+ <cb7758d3-3ba5-404d-b9e4-b22934d21e68@molgen.mpg.de>
+ <0e5e0952-7792-4b9b-8264-8edd3c788fa8@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <0e5e0952-7792-4b9b-8264-8edd3c788fa8@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 22, 2024 at 04:28:28PM +0300, Leon Romanovsky wrote:
-> On Mon, Jul 22, 2024 at 02:10:04PM +0300, Laurent Pinchart wrote:
-> > On Mon, Jul 22, 2024 at 01:44:07PM +0300, Leon Romanovsky wrote:
-> > > On Mon, Jul 22, 2024 at 11:53:17AM +0300, Laurent Pinchart wrote:
-> > > > On Mon, Jul 22, 2024 at 10:31:19AM +0300, Leon Romanovsky wrote:
-> > > > > On Sun, Jul 21, 2024 at 10:25:30PM +0300, Laurent Pinchart wrote:
-> > > > > > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> > > > > > > James Bottomley wrote:
-> > > > > > > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > > > > > > device specific functionality, and it is a topic that needs cross-
-> > > > > > > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > > > > > > concerns. Please consider it for a Maintainers Summit discussion.
-> > > > > > > > 
-> > > > > > > > I'm with Greg on this ... can you point to some of the contrary
-> > > > > > > > positions?
-> > > > > > > 
-> > > > > > > This thread has that discussion:
-> > > > > > > 
-> > > > > > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > > > > > > 
-> > > > > > > I do not want to speak for others on the saliency of their points, all I
-> > > > > > > can say is that the contrary positions have so far not moved me to drop
-> > > > > > > consideration of fwctl for CXL.
-> > > > > > > 
-> > > > > > > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > > > > > > making decisions about opaque command codes, and that CXL already has a
-> > > > > > > few years of experience with the commands that *do* need a Linux-command
-> > > > > > > wrapper.
-> > > > > > > 
-> > > > > > > Some open questions from that thread are: what does it mean for the fate
-> > > > > > > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > > > > > > device that crosses subsystem functionality? Would a cynical hardware
-> > > > > > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > > > > > > get device-specific commands past another subsystem's objection?
-> > > > > > 
-> > > > > > My default answer would be to trust the maintainers of the relevant
-> > > > > > subsystems (or try to convince them when you disagree :-)).
-> > > > > 
-> > > > > You know, trust is a two-way street. If you want to trust maintainers,
-> > > > > they need to trust others as well. The situation where one maintainer
-> > > > > says "I don't trust you, so I will not allow you and other X maintainers
-> > > > > to do Y" is not a healthy situation.
-> > > > > 
-> > > > > > Not only should they know the technical implications best, they should also have
-> > > > > > a good view of the whole vertical stack, and the implications of
-> > > > > > pass-through for their ecosystem. 
-> > > > > 
-> > > > > It is wishful thinking. It is clearly not true for large subsystems
-> > > > > and/or complex devices.
-> > > > 
-> > > > Are you saying that kernel communities behind large subsystems for
-> > > > complex devices generally have no idea about what they're doing ? Or
-> > > > that in a small number of particular cases those communities are
-> > > > clueless ? Or does that apply to just the maintainer, not the whole
-> > > > subsystem core developers ? I'd like to better understand the scale of
-> > > > your claim here.
-> > > 
-> > > I don't know how you jumped from saying "the maintainers of the relevant
-> > > subsystems" to "kernel communities". I'm talking about maintainers, not
-> > > communities.
-> > 
-> > I wasn't too sure, so that's why I asked. I have also not been very
-> > precise in my previous e-mails. When I mentioned trusting maintainers, I
-> > meant trusting the combined knowledge of the relevant maintainer(s) and
-> > core developer(s) for a subsystema
+Dear Dawid,
+
+
+Thank you for your quick reply.
+
+
+Am 22.07.24 um 14:55 schrieb Dawid Osuchowski:
+> On 22.07.2024 14:37, Paul Menzel wrote:
+
+>> Introduce … into
+>>
+>> sounds a little strange to me. Maybe:
+>>
+>>  > Attach to device in reset flow
+>>
+>> or just
+>>
+>>  > Add netif_device_attach/detach
+>>
+>>  > Serialize …
 > 
-> Unfortunately, the reason for this topic proposed for Maintainer's summit
-> is that the maintainer and core developers are disagree and there is no way
-> to resolve it, because it is not technical difference, but a philosophical one.
+> Maybe "Add netif_device_attach/detach" would be the best for this, as 
+> the attaching and detaching doesn't happen only during reset.
 
-Having been involved in a similar disagreement, I'm not sure
-"philosophical" is the right term. I can't talk about the fwctl issue in
-particular as I have only vaguely followed the saga, and I will
-therefore not take a side there, but in general I tend to use
-"political" instead of "philosophical". The issues of market control,
-competition and vendor lock-in vs. empowerment also play important
-roles. This makes it even more difficult to discuss the disagreements
-openly.
+I’d consider it too generic and would mention the place. But if it’s not 
+possible, then it’s not. Maybe:
 
-> > The number of people that this covers, and how they collectively reach
-> > agreements, very much depends on subsystems.
-> > 
-> > > There is no way to know everything about everything. In large subsystems,
-> > > the stack above kernel is so vast, which makes it impossible to know all
-> > > use cases. This is why some words (... good ... whole ...) in your sentence
-> > > are not accurate.
-> > > 
-> > > So the idea that one maintainer somehow equal to the whole community and
-> > > this person can block something for other members of the larger community
-> > > is overreaching.
+> Attach/detach device before starting/stopping queues
 
--- 
-Regards,
+>> Am 22.07.24 um 14:28 schrieb Dawid Osuchowski:
+>>> Ethtool callbacks can be executed while reset is in progress and try to
+>>> access deleted resources, e.g. getting coalesce settings can result in a
+>>> NULL pointer dereference seen below.
+>>
+>> What command did you execute?
+> 
+> Once the driver is fully initialized:
+> # echo 1 > /sys/class/net/ens1f0np0/device/reset
+> and then once that is in progress, from another terminal:
+> # ethtool -c ens1f0np0
+> 
+> Would you like me to include those in the commit message as well?
 
-Laurent Pinchart
+I’d find it helpful, but I am no maintainer.
+
+
+Kind regards,
+
+Paul
 
