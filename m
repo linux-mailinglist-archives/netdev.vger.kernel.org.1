@@ -1,108 +1,116 @@
-Return-Path: <netdev+bounces-112639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D3393A486
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:48:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5BA93A491
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:50:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E86A283AAF
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:48:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52F70B22033
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E2F157A61;
-	Tue, 23 Jul 2024 16:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B10157A58;
+	Tue, 23 Jul 2024 16:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j77iUv5I"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hCgUakyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027F013B287;
-	Tue, 23 Jul 2024 16:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F54713B287
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 16:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721753301; cv=none; b=ggR9hWGNEXRNx07fB2XdtUbNG9TYp3pRGejujPhP6HB+2mP7hBKdumRn5XrUgKZje6glzUHBTy/KhI9VcYfHLDYr+j9r2u+dQU7ZOZL3A5DtbhskxkXx4dD48Wm/Tb7hXtnubqr/qxh6z07IwyVtPd4JfrGCRGuYowjwnAJ8cJk=
+	t=1721753438; cv=none; b=fzbkvbMFb8/yHvgStC/OzTNyO1p0Uk9Ylh65LmOB3R06HeI/lzev42kOFPAZOqIgllFcSY/y71a0bexGqYYKgq9UL+CQNXzs2rW5mmATLws+5meooupHVSwAhVSdf6dWgmWb6h/LfFACbWSmuR7xkDVawgFDcU+Iu0jcEJyfhsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721753301; c=relaxed/simple;
-	bh=72kqMw43xIKt1+EjiOzFO8x8diXBtCq9Ge6RJyrtpfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=GYaUU6LQgdVmcOA5pDk/YNXZSKGSxGqkjaNZQcZH9MqWxoNSbGkCGhRJqcHvlxKLXyqpoVZPQFI+dxgM92mZYeS8xfEGUGMQo7S1VZspSgeZQFqDuEK0kKxYHjj/iJyvuPp9Zaf30PkK4MiXC+aklcSkH1j1rcscE0NSwSw9480=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j77iUv5I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40EB3C4AF0A;
-	Tue, 23 Jul 2024 16:48:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721753300;
-	bh=72kqMw43xIKt1+EjiOzFO8x8diXBtCq9Ge6RJyrtpfE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=j77iUv5I/A8gz1Vh8m5n44iIzE1I5OlMI40Gse0oetgBQ/NT/cT77RVVwu1chXQVX
-	 VPvbFUrDyck1eSeOsP8ygchWj/c+y2x2KznBeihlUNduZ0bXJneh/sG2DhwWwZnMSN
-	 tFtgdR7pODDyNmCBvPTj5owwmLpb/27SHlsfVXX6LJOI6ZeRgXpDOC7jhTT1Ek6523
-	 KPhLN2K151AnC9To+sfkvYtTAEWUCkR6GRHTHt6RxLfoLSRlkhzFAFtbBc7n6CHilL
-	 VKsHjynniyBLdBxncMBfU5AsdaGA/5fWc6Os0NLWAFmNCof3YOAsrjEDwiouZA4GKN
-	 Loic5wFhh6WSQ==
-Date: Tue, 23 Jul 2024 11:48:18 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com
-Subject: Re: [PATCH V3 09/10] bnxt_en: Add TPH support in BNXT driver
-Message-ID: <20240723164818.GA760263@bhelgaas>
+	s=arc-20240116; t=1721753438; c=relaxed/simple;
+	bh=rjOPepZienLvRBVDmZYnsVN69H/VU3gR3Md07Jb/n2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GjaPUlRSVZ2SjLQCuPcLo/itWodClh260KqwKTHbuBTlMR4wlZjoIzUR9oF+qSlGmW0XxRj8ctMT+dXRyAVccwa3bOsS6diRbT1TNdCaKUwgtMOUUE1fIJQUf8xwhe0yOmh4ArZ2FAOlC+nChUr4RxJZ6mnMCBOLnAtuHbHxLpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hCgUakyh; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5a28b61b880so378a12.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 09:50:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721753435; x=1722358235; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HKWgdAeZuHdBhrsiOBXBN0l4aZDc5ko6p3m24/F8bXM=;
+        b=hCgUakyh09AsmQm4ANR5tFnrXZO7GcwKT6I0HfPPscKa+5MDdwc7xyneFFIsk3tVbN
+         vqIAf6tlFtXLzIwiCefvk+OpXMQ5nKf/t4q+HFFjmJbiymZmzt1JxmocDnYNgZAdBu3m
+         pj0fFKfQT6nPInCnzZjx+epf/2VcNAHcIzhzBsst8mCwttucu0xr2azBKCKimcoxOoyq
+         e5GlUSCBOUQjCH41m4yqLqOlHJAeHAW5VmWWGFZjbFEYKz9CKye/h7SbfGljpD6IVbuW
+         3L7j14U1Sshe8YPONsnrVwFHQfCGb/9uXX7rTsFm2Fo1gHvyGYLR2jKUAFiKMAFXqUGY
+         AV2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721753435; x=1722358235;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HKWgdAeZuHdBhrsiOBXBN0l4aZDc5ko6p3m24/F8bXM=;
+        b=VHheSd5cqZZt3PVyOTplfGUszmsSKEGyzY+MkUceRhJ96T6M4XXKa/BWHY6jNCzCm6
+         Au7Th/5FLlokoHn6/x2eZANDChc8x4MOZlGtP74MFyotlp4CKZd44v6U82jtiU0SbGdq
+         9TRqGWwCow91qOl4aT59BBy247Xcg0tJPof2hXVcDHKBcNrbH2qz9YKTFNdNZDi/U/9g
+         StLQrvqOhQfvXXpcNidPzXel63lDcezeeK2cGmICWVtMIDCKBC0/asgQwFFxXCtyFE/U
+         4waDmohGweizIudUfdceRzsRA4ijkaiy5ZszXn31bBwbmMjfM6KubibmTrXSRIMbcV7D
+         KbVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVImhf+yicdYgnUXh60xcSmQtqEfWgwWgiDziVaTN+GoDVOEsbtil/OQNdx7cKtlvjO2zTbtjATF3PACDITrvHM5xOvhh2M
+X-Gm-Message-State: AOJu0YzuT/NZEPblEvX4l5hxNyFqy5gi2ONqe+u0wCVCIJdIePeeCVJy
+	5fWH47qwbs5JZw9DCPCXuMKINiKEs2z2XDPCtDzGaJcQW4Em8GGkJsM+UoZfOKAyBWmROh1kFp1
+	TB8bXIEAuM3bu5G2mrbxcOoaMx1h5fWMWWK8N
+X-Google-Smtp-Source: AGHT+IEKM142/O9hQcpgaQy80O52RAjBfdLuLzFRcfK1f+9xezNKmTMV22/npfDj7m/hQevPvTWELF1uzkUVJwH6kaE=
+X-Received: by 2002:a05:6402:2681:b0:5a1:4658:cb98 with SMTP id
+ 4fb4d7f45d1cf-5aac71248ddmr20547a12.0.1721753435089; Tue, 23 Jul 2024
+ 09:50:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240717205511.2541693-10-wei.huang2@amd.com>
+References: <8b06dd4ec057d912ca3947bacf15529272dea796.1721749627.git.petrm@nvidia.com>
+In-Reply-To: <8b06dd4ec057d912ca3947bacf15529272dea796.1721749627.git.petrm@nvidia.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 23 Jul 2024 18:50:24 +0200
+Message-ID: <CANn89iJQB4Po=J32rg10CNE+hrGqGZWfdWqKPdY6FK0UgQpxXg@mail.gmail.com>
+Subject: Re: [PATCH net] net: nexthop: Initialize all fields in dumped nexthops
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	David Ahern <dsahern@kernel.org>, mlxsw@nvidia.com, Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 17, 2024 at 03:55:10PM -0500, Wei Huang wrote:
-> From: Manoj Panicker <manoj.panicker2@amd.com>
-> 
-> Implement TPH support in Broadcom BNXT device driver by invoking
-> pcie_tph_set_st() function when interrupt affinity is changed.
+On Tue, Jul 23, 2024 at 6:05=E2=80=AFPM Petr Machata <petrm@nvidia.com> wro=
+te:
+>
+> struct nexthop_grp contains two reserved fields that are not initialized =
+by
+> nla_put_nh_group(), and carry garbage. This can be observed e.g. with
+> strace (edited for clarity):
+>
+>     # ip nexthop add id 1 dev lo
+>     # ip nexthop add id 101 group 1
+>     # strace -e recvmsg ip nexthop get id 101
+>     ...
+>     recvmsg(... [{nla_len=3D12, nla_type=3DNHA_GROUP},
+>                  [{id=3D1, weight=3D0, resvd1=3D0x69, resvd2=3D0x67}]] ..=
+.) =3D 52
+>
+> The fields are reserved and therefore not currently used. But as they are=
+, they
+> leak kernel memory, and the fact they are not just zero complicates repur=
+posing
+> of the fields for new ends. Initialize the full structure.
+>
+> Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-*and* invoking pcie_tph_set_st() when setting up the IRQ in the first
-place, I guess?
+Interesting... not sure why syzbot did not catch this one.
 
-I guess this gives a significant performance benefit?  The series
-includes "pci=nostmode" so the benefit can be quantified, so now I'm
-curious about what you measured :)
-
-> +static void bnxt_rtnl_lock_sp(struct bnxt *bp);
-> +static void bnxt_rtnl_unlock_sp(struct bnxt *bp);
-
-These duplicate declarations can't be right, can they?  OK for
-work-in-progress, but it doesn't look like the final solution.
-
-> +static void __bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
-> +				       const cpumask_t *mask)
-> +{
-> +	struct bnxt_irq *irq;
-> +
-> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-> +	cpumask_copy(irq->cpu_mask, mask);
-> +
-> +	if (!pcie_tph_set_st(irq->bp->pdev, irq->msix_nr,
-> +			     cpumask_first(irq->cpu_mask),
-> +			     TPH_MEM_TYPE_VM, PCI_TPH_REQ_TPH_ONLY))
-> +		netdev_dbg(irq->bp->dev, "error in setting steering tag\n");
-> +
-> +	if (netif_running(irq->bp->dev)) {
-> +		rtnl_lock();
-> +		bnxt_close_nic(irq->bp, false, false);
-> +		bnxt_open_nic(irq->bp, false, false);
-> +		rtnl_unlock();
-> +	}
-> +}
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
