@@ -1,102 +1,120 @@
-Return-Path: <netdev+bounces-112548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6729A939E26
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:45:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEC22939E3C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:51:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98D101C21DF8
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:45:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 977DB1F22045
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B5D14E2C0;
-	Tue, 23 Jul 2024 09:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B316314C59A;
+	Tue, 23 Jul 2024 09:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgUVIOMQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T+pzBrbD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDB414D719;
-	Tue, 23 Jul 2024 09:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE0622097
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 09:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721727903; cv=none; b=qRLsY8/5xDR3sq5IuW96buzCuogXpOFZ+iVCgroFflBysyoTad4dBJOMQtjs0DCg72BwvZ1xxo8Gb9ZbANMik44+uJcx3/5VlC5e8N+CwdpectRkxk5CPYgK42gw/y4Veji2dNYp0z0z9GS9OEEz0IWlsgAs2Xj2rS6oM769cTE=
+	t=1721728280; cv=none; b=teP22nJkNs0wHmzseBv5o4WI1LLpiKWRs0wtIazK5Ixl/8JVBrF7dIA3CjINgy4lK810LfEW3nCAWaX45X03NQZdX5B3umLvPh29RIE5lI/FU9qpCX5TXTbxlqgmA6bcqtVX7ZE1qJ6NxnyFqz/5vl4WvsK/DS/wie0razrr3B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721727903; c=relaxed/simple;
-	bh=m2xIF4fhCBY1NEj1DmL5PlDA+40D/gQnfchARP//8hU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YwPJmMCGKKSKHE25MOfJl+Cpvvs25cMRm+cx5QJc8Ti6APpyw2EjK6rwzsMPF85vaW8ks138igAKRnjvqPEuiFCOkOsXVtKKK8y2vuprdGulWvtuf1idtEgnYIq0sNGUBJ/sRvs9G232FnG/dHVixlOFJppL7V/9oaKwrkLLIYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgUVIOMQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB46AC4AF0A;
-	Tue, 23 Jul 2024 09:45:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721727902;
-	bh=m2xIF4fhCBY1NEj1DmL5PlDA+40D/gQnfchARP//8hU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MgUVIOMQPx3yyGwGMBe5VIxv/dZli+U+vY2bi9PCgzQdo+o6HA0pHPUsvKqW54gMc
-	 duhAbug02xyWTbU3xYA+UuLpi2aeJKrqGxME01PzI3KaN+rlsM9DrChXD9hC35SG4Y
-	 pYFfEhAcO10Ee470SCDb5zc4bzOSMKaanmhoZhdsIF3fNIOYAHena0DxCVZ6dmvu9v
-	 JnjiwCnkKt+5Zw3uXm+akZKTF0joGIjHkG2JMKzXjLL+PyNBsyWUoV7NY3JA7wZEcB
-	 yVJg1/NDXo591Ag/+D9VawzNrlSPAopahM2B5WO+gqZCbJoDOjf2F90ACM8z4pQEiO
-	 XgM9ZuBKnbHEA==
-Date: Tue, 23 Jul 2024 10:44:58 +0100
-From: Simon Horman <horms@kernel.org>
-To: Artem Savkov <asavkov@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3] selftests/bpf: fix compilation failure when
- CONFIG_NET_FOU!=y
-Message-ID: <20240723094458.GC24657@kernel.org>
-References: <CAADnVQKE1Xmjhx3Xwdidmmn=BGzjgc89i+UMhHR7=6HupPQZSA@mail.gmail.com>
- <20240723071031.3389423-1-asavkov@redhat.com>
+	s=arc-20240116; t=1721728280; c=relaxed/simple;
+	bh=i7rNl+67fAT8PKhZRT/GeKiPfF3BELNAyAhPPXTGCBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tF1GTdulyaRq5u99NZvbI/ZEKiLAjYRp147UFQ4FkYwtrFb3YcNCuP/nhCPPY7Hb7R9lMy5kfxN7mWnH2Xvo9HlduiHSqc8E/vrgc2jOP6xNLP/IVeZVQ6K0Mo9xAGF7kztcDfYu8zmuITbLB6PI9UO1LTGYHyeyXX9CXIC7310=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T+pzBrbD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721728277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vzFPsc1ihRqbXe0SoW1BBc62YJIhLbX78dD6XbXDIfs=;
+	b=T+pzBrbDTCJmiRDZvBl58PkxFGiPV3x3gLLb0w/K4t9g9p+/SiBXiFkowU+VsFD9JwYgcB
+	R9UZ+kjqz7wLxxGVzbI/Jh6ynWbi0T85WTiM2qVCiNHesY5rIMbLc0hSMXaOXJeeROon+q
+	MTSrnoGvIGImV85xfuq78Lqtphp64LI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-zn1lm5L-N1mUNKoPjNmdFQ-1; Tue, 23 Jul 2024 05:51:15 -0400
+X-MC-Unique: zn1lm5L-N1mUNKoPjNmdFQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3685b3dbd26so836707f8f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 02:51:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721728274; x=1722333074;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vzFPsc1ihRqbXe0SoW1BBc62YJIhLbX78dD6XbXDIfs=;
+        b=qgCrA1HLWjQ51WTmRsVOKs5TfYsqtCOSzYsvEaAt4Y0Y7w1kbAZMduhZwCba2YYV9n
+         U0hypJDdybrlfxoIReJhDyjco/vg5z+RIERz7HLTnYwlTgwecYCI1is3mqpb31jzMkur
+         aQ1g6dOnAuqIS+p13fU9DFpS1nPXgqoTgppbew60g4yn/HPg9SQcY6o+LLuReynypo1N
+         eY85BYxFWL3mD7Tz5Rblm8ASam2xsO1wGEZLnhOthS4SxUS9P6SoZqgM4EirjwJaNdlX
+         4Ha8essvXe+NOlicAoq7PdKx46kZqB911wP9wxPiMbv7+nnlpaIQ6BCP5vIjgpc7MZsq
+         IuAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXa6I1etWq3pbh9p/uURuZkk60kGmusbeAb5BNOZvZLz8XpCLFhJ6y5Zog6WXydWRKQtYJI0WJl/vkY04KYlqISNk40HgxY
+X-Gm-Message-State: AOJu0YxxdOp8U2j1HADEDI7xHsrR1kQNH+rU6nFb/khbGBNUVpwGX/wh
+	q/MIe8PalgPhWWQWM3up6y3CCTTHMqHOfuv7mhGSJfR7c0x/FEsP5Dxuo1aoy8fK4+SDVPoz/xV
+	RBttjgAsX9w3Drs2jVAjSPQ2JD7wEh6pvSo1YqAM6G3fp2YwIgSfVy7SECWoCSg==
+X-Received: by 2002:a5d:6d0a:0:b0:367:2da6:aa1b with SMTP id ffacd0b85a97d-369b67989b8mr4509594f8f.7.1721728273959;
+        Tue, 23 Jul 2024 02:51:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIytT5cTJP5IKl2UEUGxDWh6vr7lGXjaghfENrcrRRQDxnl6Q2MLi7gFEINuJu1XCISxJ9kQ==
+X-Received: by 2002:a5d:6d0a:0:b0:367:2da6:aa1b with SMTP id ffacd0b85a97d-369b67989b8mr4509586f8f.7.1721728273544;
+        Tue, 23 Jul 2024 02:51:13 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:173f:4f10::f71? ([2a0d:3344:173f:4f10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3687868425esm11217520f8f.23.2024.07.23.02.51.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jul 2024 02:51:13 -0700 (PDT)
+Message-ID: <ebe772a2-9350-45c3-8c73-cda0cc5c804b@redhat.com>
+Date: Tue, 23 Jul 2024 11:51:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240723071031.3389423-1-asavkov@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: drop special comment style
+To: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org
+Cc: Alexandra Winter <wintera@linux.ibm.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ Stephen Hemminger <stephen@networkplumber.org>
+References: <20240718110739.503e986bf647.Ic187fbc5ba452463ef28feebbd5c18668adb0fec@changeid>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240718110739.503e986bf647.Ic187fbc5ba452463ef28feebbd5c18668adb0fec@changeid>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 23, 2024 at 09:10:31AM +0200, Artem Savkov wrote:
-> Without CONFIG_NET_FOU bpf selftests are unable to build because of
-> missing definitions. Add ___local versions of struct bpf_fou_encap and
-> enum bpf_fou_encap_type to fix the issue.
-> 
-> Signed-off-by: Artem Savkov <asavkov@redhat.com>
-> 
-> ---
-> v3: swith from using BPF_NO_KFUNC_PROTOTYPES to casting to keep kfunc
-> prototype intact.
-> 
-> v2: added BPF_NO_KFUNC_PROTOTYPES define to avoid issues when
-> CONFIG_NET_FOU is set.
-> ---
->  .../selftests/bpf/progs/test_tunnel_kern.c    | 26 ++++++++++++++-----
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-> index 3f5abcf3ff136..fcff3010d8a60 100644
-> --- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-> +++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-> @@ -26,6 +26,18 @@
->   */
->  #define ASSIGNED_ADDR_VETH1 0xac1001c8
->  
-> +struct bpf_fou_encap___local {
-> +       __be16 sport;
-> +       __be16 dport;
-> +};
-> +
-> +enum bpf_fou_encap_type___local {
-> +       FOU_BPF_ENCAP_FOU___local,
-> +       FOU_BPF_ENCAP_GUE___local,
-> +};
 
-nit: The above use spaces rather than tabs for indentation.
+
+On 7/18/24 20:07, Johannes Berg wrote:
+> From: Johannes Berg <johannes.berg@intel.com>
+> 
+> As we discussed in the room at netdevconf earlier this week,
+> drop the requirement for special comment style for netdev.
+
+I hope Jakub or Eric were present in that room?
+
+> For checkpatch, the general check accepts both right now, so
+> simply drop the special request there as well.
+> 
+> Acked-by: Stephen Hemminger <stephen@networkplumber.org>
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+
+Makes sense to me, but net-next is currently closed. Please repost after 
+the merge window.
+
+Thanks!
+
+Paolo
+
 
