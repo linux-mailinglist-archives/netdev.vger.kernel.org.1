@@ -1,92 +1,262 @@
-Return-Path: <netdev+bounces-112665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABC5C93A80F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:30:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C5D93A82C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:41:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 659C71F232A7
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 20:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5376B1C208C3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 20:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51FF014373A;
-	Tue, 23 Jul 2024 20:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2184C14372E;
+	Tue, 23 Jul 2024 20:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYbbJSAp"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mnS7IPnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2457B13C823;
-	Tue, 23 Jul 2024 20:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721766636; cv=none; b=QXnjbZ2ANe8ounoprhdIP0eH+TjH6WMgn7jWWdAo2epvQsP/Xtfn1oH27S7CmG0u2nNkT744mPETQ+VsxITo+4TIuQKEEhTg4YFu4OyKQyD/Zfc69aEhccuevoI/D/oGPYxAJXYyHZrtOgIH4KxCdxDUPVSyXolLRI7h8oCjqLE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721766636; c=relaxed/simple;
-	bh=l8Nlo0+S0lvry3MI5IHMaoyWT4SOOKiV/71Ugpz0nXY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=T7pVcZVPaBSQga9FlYrmXWJ6PhEXr4jcNTPD3KWBBzVjDgztxB8IiZR5EdCZZNPIceyx9jrP5Y8lscaP6oA471VmkKG1IuC8QqM/ReFKvmIHTVeaZS+jbzAWNsvmjvLjgwoyBK+zFc3oZlxfwLhw2W05hmnNnefsnp8M3/HWAmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYbbJSAp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B5104C4AF0E;
-	Tue, 23 Jul 2024 20:30:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721766635;
-	bh=l8Nlo0+S0lvry3MI5IHMaoyWT4SOOKiV/71Ugpz0nXY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lYbbJSApwul5V5kh8UkmFOUjvQLVNnord/3nHffW839bjSZWYOnBNQeC8fEBObRhb
-	 fDrW0skgmUjImX5+FPwAdtaNN7sR6sd+SiamDNmOhaz6UnVTB+K6as1kPuANHlGZqC
-	 b1Cy8WSQWHGq5nADLeJofozNNPS/vZ28vJcLLqlEzUBv3UI0iYfging5yvLXp92QxO
-	 bAzi3Dvlh1AoyArJMyvPFhQmYUbJWWJ7i9EqS4sc/BQzmyn7rDggsnZVqcHDwh4Jfs
-	 /lovifW2/scRc/sd2/vL1OV+uBjokSFzTaPzwIm7WLx9oYPM48zM+QwM7RtTrePjqN
-	 xcd+1wpr/DNAw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C5C2C43140;
-	Tue, 23 Jul 2024 20:30:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AFE13C9CB
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 20:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721767284; cv=fail; b=gSmKrT0BVeCk+YRojsd/FDmH3eA9K5gA4ofCGZNdscwLQbVTtN1EYRXlbnxOV6NESGcgZ+cMmt1gMJSRh4R17LkUMT0oxWS/vKUzPJU3UUOK2KIiN82OOZi3Z3kJc/q2rOvrjy/nyioCNT1L7RoGy85WVzOZAIWoWPEkA1ZRpI0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721767284; c=relaxed/simple;
+	bh=lnE4kYOmwJiU0SJkKalhKPEt8Gk51a5Qqai8Q51/CKs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LtwjSguiVP0IpYBuUrmxEVLxgYEGxPDdf8cLRp5U2MUTVtGRzJky+OWjVkBMrtn+jxu/BOqram7ovg0Z9xZe+BcpMDwN5Q8WeLGnh929IfW30tvSN1f3VFtc0bbYxsrS8I1eltjcjR673qivktL7xRmSEmxIyCeE5nw/E1lXOFc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mnS7IPnP; arc=fail smtp.client-ip=40.107.220.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f300jE7ZMrz+knLFW6Xp04lKilH6HAmIQG3mQHbFNoQusryYfcg6uGQ5ffy1ICmGFf6GaqJnjqTixFUK77PevpTOwfrpL/CP5yeetAywdHMn7fzFWwcM0bbC3mI6Ow51RFviWV6y5LkQ7A2PvCkpZIZre2m0gHrFLc8r4seEmRAUcQYbbmRAfJJhOCKehZ5NMMjVp4QVzeNZ4o7BPa4H/+Bk0aWmp/PdmudSBaSJR2c6egMcPCByuqjA2XVTL3y90iycE4oDOeeGGisg9raEuRhvHic9kNTkyDjNt4eV2TnEtdE5beG555E+eD7QfFb1NWQuzHViHJvW2CEQ8npfcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dTgz6dC29C9AwmC9YQGydbz1V+iYw2yjpP1eluRnygc=;
+ b=j6lSITyQC2P66sBA5fXaVHGDbr00pOnDaQcmDoj+6ynSn9gb+PP1H6S1RwrUPBXYAKrGyY6NVq3R0tF0LeRYGMmuldvzLw+SImseFKYRS1YsLE3B3jEMEllH1fcAJB6dG56BNG1ThDgIPeyJgqSJtcUPAPB6szelyy3ieRkqh0MhWxJyckQ40TDO4dStyQrdGEHTxBXbKijWbBdYw4tcnbbBnNVYOzgX1Y+S11dcyK9NF1KvDxeU28I/D2flcxF65CyUT0I0OH1Rg+KisVHvuPQfFQ+fVwKFzxm/87uolHk66svporio25SDEzjUXas12J0sgDsywkq2DjqdLEn4OQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dTgz6dC29C9AwmC9YQGydbz1V+iYw2yjpP1eluRnygc=;
+ b=mnS7IPnPPUvQbuRICMFRFdGZz9Z/+K3b+3GWH3o7CLXk1lX04ujzPXQSRPHVrcpcr9eScytb/dI/O76P2tZZn8pbyXwhSEuCb9+lxA19ES2wppyfU8XBUeoWr9jD5fEMA4ukIvOGagDhZF9LqIMV7DiGksS8nWvzuhMOBPXV5zc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by MW4PR12MB7467.namprd12.prod.outlook.com (2603:10b6:303:212::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.20; Tue, 23 Jul
+ 2024 20:41:20 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%4]) with mapi id 15.20.7762.027; Tue, 23 Jul 2024
+ 20:41:20 +0000
+Message-ID: <42eee0c9-8cc2-40a1-a233-bb87cc4a8324@amd.com>
+Date: Tue, 23 Jul 2024 13:41:17 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2] i40e: Add support for fw health report
+To: Kamal Heib <kheib@redhat.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Ivan Vecera <ivecera@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
+References: <20240718181319.145884-1-kheib@redhat.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20240718181319.145884-1-kheib@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR21CA0022.namprd21.prod.outlook.com
+ (2603:10b6:a03:114::32) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3] selftests/bpf: fix compilation failure when
- CONFIG_NET_FOU!=y
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172176663563.27466.768477846355169392.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Jul 2024 20:30:35 +0000
-References: <20240723071031.3389423-1-asavkov@redhat.com>
-In-Reply-To: <20240723071031.3389423-1-asavkov@redhat.com>
-To: Artem Savkov <asavkov@redhat.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MW4PR12MB7467:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4dd70873-251c-4059-3580-08dcab57ced3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NGVvT1ZvbGd1clhsRnpiQWVUK3BFN1kyMEU5aUlXZnVacWVYUFlBNzJnbW4v?=
+ =?utf-8?B?eWJyeXlsNFBmbWE1SVNXankyWWszWkNvNWplSnc2aE1mallaWkFDclNvYUNp?=
+ =?utf-8?B?dVRBNWxobDF2ZGRDTGpzYy9mdzJZN3M5Q3VDclBKL3Q5bDhyRzdVQjd4MS9D?=
+ =?utf-8?B?WnBNWkJyeCtFTDE0Smp0aTlVS3h6eG44Zlp4RWxCejBJY3EzalFjanpXaDQv?=
+ =?utf-8?B?SndaczExLytocTEwMkZHdE1zMENKWGwzRnpXb0N3YTVlWUxBc2tNUTN6MndC?=
+ =?utf-8?B?UWVFcWpBRE9yYUpSN0VBL1RTb2tvUjVqdnBCNFo0bm0xREtML2lNalRLQi9O?=
+ =?utf-8?B?Q3ZuVEFBUkwvaVZ2bTJEVzNXb2NDQzRIWW5ZT0tHSDc1NU9jeDk4QmRCSTgz?=
+ =?utf-8?B?SWVvc01DT1dFeGZQdWVMc215Um9JUWZUVDNsaWtzaW5NSHBtcEl4ODlGanBY?=
+ =?utf-8?B?UTRXRXNXZzk4bWtlTmtsM0tiLzZIVkhNZGcveS9MYVQwbGdPczFjSXBSb2hD?=
+ =?utf-8?B?UmtBbk4ralk0MElOeEFGZFQ0NExvOC9zSWxCTTlmWkdnejRZcEV5MU1EV1hj?=
+ =?utf-8?B?bisvazR0TndjL2hmc2tzV0hQTWVoc1FrbVFwZHdRbXkwcXcrNEJRcFZYSThJ?=
+ =?utf-8?B?WkdOMzd6ZERMWFQ2NkFQQ3dkbkpmQnVERG5DaE9ETUhZekNHRFZSZUdaTlFy?=
+ =?utf-8?B?U2hlU01GeTNDbDZocS8xajhlWUlVb0pwTUU5VXhkejhjS3BRNXpwWjZJN2dM?=
+ =?utf-8?B?b0hvVmFhK3grRWVsb0N3akhCenNKNzZJSnpCc09vb2lQY2NwQ21ONHUvZDVG?=
+ =?utf-8?B?c2FNYU9DdFhTdTFsNjlXbjRTejM1ZGhVN3JNbFVVME51L244Y3lsOVkxQnVr?=
+ =?utf-8?B?SXllQ3l3cjJmQkEzSW9QUzF0OUNNOUpLTSswaEYrOG4xbURVNkh2UUM2bjIx?=
+ =?utf-8?B?YUx0enBHemdMZkcybWRodW1vMzA3a2Q2a054ZGFMTGxRclQ4NVZmQ2o3NUds?=
+ =?utf-8?B?Y1FMa2prNVVvL2RoVEhRcHdWbTlCc1FLeTZMcjBkUlZsY1BRaHA3SEcvaTJx?=
+ =?utf-8?B?U1ZZUWdYcjdFOUZ2bmpWRnl4djdRblp0N3ZaSkczWG5iaFdEanBLUEQ0aU4w?=
+ =?utf-8?B?dlRSVkRhK3dmVG5HMVNPRjU2by8yR29YSEhnclpNdDg2S1RyYmtFY1BMcFQ1?=
+ =?utf-8?B?NEFWNjNGQzBXZTRWdFVtVEtCbmQ4bGM0eFBXYk90QnVRdXN3c2I0YkNmOVdP?=
+ =?utf-8?B?TFdMQjlUcDc0MlZYRGlPbUMweTZpRmVyejU1dzVJWTg1S3dNRkxsQ1BVWkQy?=
+ =?utf-8?B?Sm9JdHpldEtsZkZTbk9lQ25IZ204TnMvSFFTT09QYmF4dlQ5QndQRENWRUhE?=
+ =?utf-8?B?L3lsZEtMaXFFYUgrbXVuNndMWlcyU2l0OExBRDl5aXIxRjhSZ3JkbE5teDVO?=
+ =?utf-8?B?aFFyRWlZN1BXbUNXWktDWXJnNWpJVGtqV3RJU1V5YnNWa0ViU2dOdmpjTjFI?=
+ =?utf-8?B?bWtwazhaUldrclN5cENRZGNxZzExR2xacEZjWmR0dEJWaVZRUlAzNC9kTVhl?=
+ =?utf-8?B?bG9GbFNUZUpadEhlSWV5T2VpTTU5eXE1NjJrR1Y5bTRhOUR0WE83dEJldWVM?=
+ =?utf-8?B?T1AxV2hWZVdzR1NHSm5HZVhSSHVlaWlOMDR1UWgwMlFOVDB3MkdqS3ZOVGpO?=
+ =?utf-8?B?OVl3LzBZMFQ2WUZmQXRNSkh3QjBBYS94KzFyaE1IUmd0bFRVM3ROSllzQk9Y?=
+ =?utf-8?B?akluTHhqa1F0UGJVNlY2ZThFNjIydkd2YzRiYnhvYmpJNTJha0JtaVJkZ2Nw?=
+ =?utf-8?B?Tjhyelk0RzcxZ3FpVVQxZz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Zm13dnc0Z3pUTEtQN0pIcVR1UmRvT0JvREVoYUlUUFQxc25yM0lIeFhraGow?=
+ =?utf-8?B?RE5rZGtwTk9LaVVuME16cVlMdHJZVXBIa1J0cjRPQ1JnUjMzVG9LYzhkTndw?=
+ =?utf-8?B?YmQ4TW5lS3VUcURHa0diZHVJN2xGditTSnJhMnVjQm1LVlB4aVUyYkJ1YmNi?=
+ =?utf-8?B?VVNpVVROY2lBSngvemdTR0N4TjdtSEVvSWVXSFdxSzVBdUUzV1VabVkxdXVN?=
+ =?utf-8?B?R3g0WFB6QU9hcXNKbEw4UC9BSWIvcXdYRmN4S0ZBTlc4YWFaZTkzbXljcjR1?=
+ =?utf-8?B?MzNrU3NjZTRTT0NOWmxzM05uMGY2TG9TOTB5SHRWby9yUVZPcTZBYnFKL25l?=
+ =?utf-8?B?RFR5VUhQRkl6OWVMTUJ6WE5oSmRCY0ZpMHpvZDhkUnMyWW1ZVzFPMVkycFJG?=
+ =?utf-8?B?bTgrajc4TnF3U0x6VzF4TFlyd3VLRDFlenVKN1BTUTd0clh0cFh4dFFRQStC?=
+ =?utf-8?B?dlRsM3BiRDFGZy9kd0xqNDFkMnMrbmdxVmNqNDNMRHRsd3F6V1BYUzluNjlt?=
+ =?utf-8?B?UzFPVXdFbFBtMWloUEtKYjQ0UXVaamlBZjI0Y2QvUEFHTHR6cWRGNUViOXlh?=
+ =?utf-8?B?V011c3ptMGJ1S2NDK2dMU0JLa3lPa1lsclhna0lnNzI3Q0RGZFU1K21uNnYr?=
+ =?utf-8?B?a3dlSlJDVEdxN2pnUlBGYy8zZDZaalN2MGEwd3NDT3ptUFR3OWExRWtETUov?=
+ =?utf-8?B?UWxqYVZEQkZ2Wm80NGkxL3h3YUNqbGhlVnc0bHRrYjZIT1VuWmMreTVOWS82?=
+ =?utf-8?B?UDdWbjBRMWJ6R1YrOXowUXhjTjhqMThqdTdVcEx3bkovZHhJNjltNnJDazVh?=
+ =?utf-8?B?TXZPMHRQYnFyU0NqbmRSY2FRL2dBOXJpMnFUamJBd0NVUjZ4WTdFVFpjb0Fa?=
+ =?utf-8?B?MGc5aFhuQjdESXF0a3VIZ1pKamxvVm5kaWQ0dzFkU0NZSHd1Z0orY2s2TG9Y?=
+ =?utf-8?B?dEdia3ZNN3M0dlZLTWRmNWgwR0o5bnlRQWowQ3ZtdXJVdmxYamM1SDl4Wjdl?=
+ =?utf-8?B?NFJhcnNIWnYyMTE1K2JNUkIvcGRrVTN6M1lRMlNQMXJhZTIvRElsc2ZNcGI5?=
+ =?utf-8?B?aHhXQmZ3NEJCaWxxaE5jRFNab0hmRHFmdnM2SzhsMHJmd0J6MHdPY3BiL09x?=
+ =?utf-8?B?ZUNoUmNVSGI0U1ZRaW9SRHFLMmFOUUJrelFsUHhhVkdhVnY1dmo3R1lZSTMw?=
+ =?utf-8?B?VGs0VFZ2NnViQk9vcGZaMVl3bVF4cnBXUUxFbUw4NGdncHh6OTF1cHRJMkZu?=
+ =?utf-8?B?NGV3RlBKa3FHbzk0bFVUZ3NrbEZuK0NaYWxkeGIzQXFiY0llUFJoa1RLRE1i?=
+ =?utf-8?B?QVFZMHFLTEtTZGxvVm1hNURaYXptTE00SmZWYWNualNTQk5Nalp3REI5THlY?=
+ =?utf-8?B?Q3c5cSszdkpJeWczbENXeGxNT3FuVEtWNk8vYXRxRmZ0RGVpUmhTSEd4eURR?=
+ =?utf-8?B?dUExVHYwVnVyNVVuZXVMR1dJd3lPQlVCRnY0blo4WTVqTW85dHhqenlMSk92?=
+ =?utf-8?B?b002bEtZZlgwaUU2bmt6aVp1aXRYTi9WM3hQZWtINCtGKzBlenRBOXFUNnl1?=
+ =?utf-8?B?NzhEaU15cTZlMEFMZ0RVdXdlL2VKaFBlTmdzOXVGYzJ0WDZPTGI3UCtHcjN3?=
+ =?utf-8?B?ZVJ0LzBWQ0k4SkUycDkrcWtCMk1zL3RMUWtaTWM4U2JqNFBOZzZJN0dlYVBV?=
+ =?utf-8?B?dm9ibXhOMHZTRTBHNFM4cXRIUmU1enR4cGpOcVozcU5xZ1k5Y2tvU3luaXRi?=
+ =?utf-8?B?eDFNQzJDcnJSQVBTWXZUU0xqbGZDM29BOUNGRnVyT21kRjd5N0RwMG9CTmE5?=
+ =?utf-8?B?V1dodGQrUWZUcWczREt4L1dIaEYrem9manRVcjJ5RXhQV29jSThYZExwSHQv?=
+ =?utf-8?B?Q21Ka3A1SkN0TFlDVWRJMDVWUW9sQnMvUWlNbm56UDdObWM0c0IxRjhnTi9q?=
+ =?utf-8?B?VFFTUUNLQTJlUGhobjZINjRxWHRrQ0NLaDN0NGpHTkQ2SHoyR2NnV0xyVnNs?=
+ =?utf-8?B?NXlQbHByL2tqYlBDNDdMRUwyR1l6NmNvUUViM3h3Qnc5bEEyZG9oamZIaUhy?=
+ =?utf-8?B?cW5MOC9SeXMyVUxyR2x4NXpVVDRZN1lLTS9zQ3VtN3U0M3V5djNHd0QxNkha?=
+ =?utf-8?Q?tXPw8JC8M4GsdBx7fJGn7hZEM?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dd70873-251c-4059-3580-08dcab57ced3
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 20:41:20.1639
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1Tj26/nJjdc7VUFbmKHKJOhP6cbtgp1bh759OovZbdw7d2nT3enzQuryVRJ517u6Ov3fRuYZb8fDFa0rRUwlRA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7467
 
-Hello:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Andrii Nakryiko <andrii@kernel.org>:
 
-On Tue, 23 Jul 2024 09:10:31 +0200 you wrote:
-> Without CONFIG_NET_FOU bpf selftests are unable to build because of
-> missing definitions. Add ___local versions of struct bpf_fou_encap and
-> enum bpf_fou_encap_type to fix the issue.
+On 7/18/2024 11:13 AM, Kamal Heib wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> Signed-off-by: Artem Savkov <asavkov@redhat.com>
+> 
+> Add support for reporting fw status via the devlink health report.
+> 
+> Example:
+>   # devlink health show pci/0000:02:00.0 reporter fw
+>   pci/0000:02:00.0:
+>     reporter fw
+>       state healthy error 0 recover 0
+>   # devlink health diagnose pci/0000:02:00.0 reporter fw
+>   Mode: normal
+> 
+> Signed-off-by: Kamal Heib <kheib@redhat.com>
+> ---
+> v2:
+> - Address comments from Jiri.
+> - Move the creation of the health report.
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
+>   .../net/ethernet/intel/i40e/i40e_devlink.c    | 57 +++++++++++++++++++
+>   .../net/ethernet/intel/i40e/i40e_devlink.h    |  2 +
+>   drivers/net/ethernet/intel/i40e/i40e_main.c   | 14 +++++
+>   4 files changed, 74 insertions(+)
+> 
+
+<snip>
+
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index cbcfada7b357..b6b3ae299b28 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -15370,6 +15370,9 @@ static bool i40e_check_recovery_mode(struct i40e_pf *pf)
+>                  dev_crit(&pf->pdev->dev, "Firmware recovery mode detected. Limiting functionality.\n");
+>                  dev_crit(&pf->pdev->dev, "Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware recovery mode.\n");
+>                  set_bit(__I40E_RECOVERY_MODE, pf->state);
+> +               if (pf->fw_health_report)
+> +                       devlink_health_report(pf->fw_health_report,
+> +                                             "recovery mode detected", pf);
+> 
+>                  return true;
+>          }
+> @@ -15810,6 +15813,13 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>          if (test_bit(__I40E_RECOVERY_MODE, pf->state))
+>                  return i40e_init_recovery_mode(pf, hw);
+> 
+> +       err = i40e_devlink_create_health_reporter(pf);
+> +       if (err) {
+> +               dev_err(&pdev->dev,
+> +                       "Failed to create health reporter %d\n", err);
+> +               goto err_health_reporter;
+
+Do you really want to fail probe if creating this simple health reporter 
+fails?
+
+Thanks,
+
+Brett
+
+> +       }
+> +
+>          err = i40e_init_lan_hmc(hw, hw->func_caps.num_tx_qp,
+>                                  hw->func_caps.num_rx_qp, 0, 0);
+>          if (err) {
+> @@ -16175,6 +16185,8 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>          (void)i40e_shutdown_lan_hmc(hw);
+>   err_init_lan_hmc:
+>          kfree(pf->qp_pile);
+> +       i40e_devlink_destroy_health_reporter(pf);
+> +err_health_reporter:
+>   err_sw_init:
+>   err_adminq_setup:
+>   err_pf_reset:
+> @@ -16209,6 +16221,8 @@ static void i40e_remove(struct pci_dev *pdev)
+> 
+>          i40e_devlink_unregister(pf);
+> 
+> +       i40e_devlink_destroy_health_reporter(pf);
+> +
+>          i40e_dbg_pf_exit(pf);
+> 
+>          i40e_ptp_stop(pf);
+> --
+> 2.45.2
 > 
 > 
-> [...]
-
-Here is the summary with links:
-  - [bpf-next,v3] selftests/bpf: fix compilation failure when CONFIG_NET_FOU!=y
-    https://git.kernel.org/bpf/bpf-next/c/c67b2a6f3b84
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
 
