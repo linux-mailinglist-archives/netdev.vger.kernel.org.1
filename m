@@ -1,188 +1,369 @@
-Return-Path: <netdev+bounces-112633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0DDC93A423
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:05:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D7293A429
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AE64B22EE0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:05:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D99B1F22666
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E737A153838;
-	Tue, 23 Jul 2024 16:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB45157490;
+	Tue, 23 Jul 2024 16:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qChPUPxj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPLcf1bU"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2062.outbound.protection.outlook.com [40.107.244.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288D7156F40
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 16:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721750732; cv=fail; b=ZROCWY5SES+1EbhiFEGye7JqEklA6Y/TkEUGHL5dVeHUff2ZJd1W/Bubi5zpp5OYFyeTtOFVwU6qX4ejbx5kqhp5y/QQeYMnjxLE56phH7BzRzLmzT2afg1KYD2w8ocrHS5mO6bWtZmelGo0OmAmVEHsog7QWTeAIN27TAtnW54=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721750732; c=relaxed/simple;
-	bh=wB7lDMZQHGedOhkq9jStooKc8CMXr4TwWG87T8fChFU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gpRrMmM0Lu8rbggxS2dITmZLb4P9p7yOA0X/gKDJrNwfthAkittQQE8/hfXCcbCeOWvPBPeLhBuP3w3SW8EH+eQN+jJajwvmTXpr6DGuUhI3RuBskkVtZ7xHGPt1anSPPqSKzEKKPpserE9fTAlBj2jjmgjw6T/hdCAs/VDv0e0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qChPUPxj; arc=fail smtp.client-ip=40.107.244.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TJ92XpL8kTjxCMxQdSu7FBXJ0G7rcfK2RLkDWj4enib76h+rtBV/TEw1M0FdOKE4KhR5YZrxI22MMoIJOlyhy6adrPAporpo4qOGHmtKNhbfxkh3k+eLn1qiFPE80uPu6P9LkqxcEf/MrEXzwcN6JSYc7TD2rBF+Z9UY9mucUjzXVIXtR4kYZ5EVwUrdZQyFy7czDdvc2fCsDQQqbwxPwFRwYA6bB+Oycl89etpF+29g9KmIy2PmFHUnQFV9kJ2TbzxeGPTv0XhXo+7ay+DytjNczONpeL9KI5w3s2a5zoqhkR5Cv2etBvMWO18gdWp5gVfYHXc1dtY4S+NcU1wbuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7lHvMQADR7XiMTLAmMVgjgT++rMpPLmfk+G7ktthT0M=;
- b=fyk/ZmttML7egnHye4XlBNoT3Lv6cu+/M3pjy0oYXCJZrm/YCt/KU/t2QnPg4CFodDHVHEw92D8I4nNXpERCQzaqSA2TrstGhsiwvI/03TIRbl8nRPvO+g8D7EBGDXgSLP30/chFPSj+Bmny2BV7PAxt7uAFWHAcsYCiWkPP1VzRErgQ6IZITIFhRaLjKIxf1Pq4nPg93Vwe5Qo8dRPgY3yCoPPImy3mXC20u/tGyAcKmCFcd+jlTWzB6OZCqdMJJmXgcu7R9X0xIsKcggJTTrQZuv4Bq4M7A2+z+joKENPe4PSsC8eJUMZVrazvaNb37nPNoaAaEKx7pzyAMjQNbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7lHvMQADR7XiMTLAmMVgjgT++rMpPLmfk+G7ktthT0M=;
- b=qChPUPxjm6ljB7gW0HhUwJ3hdfll8QFh5leo3CsI6VAUDcA9OHbny11eq6R6guZ+iXiLXvTnQrbllfhRdYUj/5KCbj3YX2UCaoPjpWgwpLvzYWsAJLrNeI2mmptdl3M3SRSzYiolu6XC1XfX50b909mJE6Gq4YJ3C/8OnIfjGy1C28u66UELMltxBlbm4QjafsHK9PaWU2JJ3aie7PYdFX/UxdvrP3M1AA6F19cDWqpmun2avObKchM3uCDb50f4MGq6JAM30+3bmTpxmapbDPtrMYriOCsubWz2WWiYgM47fs/j+6Fk0qQ6FHP6risyPj77kNEeOx51/Qnzhcp0YA==
-Received: from CH2PR19CA0004.namprd19.prod.outlook.com (2603:10b6:610:4d::14)
- by SA1PR12MB6774.namprd12.prod.outlook.com (2603:10b6:806:259::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.20; Tue, 23 Jul
- 2024 16:05:26 +0000
-Received: from CH1PEPF0000A347.namprd04.prod.outlook.com
- (2603:10b6:610:4d:cafe::45) by CH2PR19CA0004.outlook.office365.com
- (2603:10b6:610:4d::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.20 via Frontend
- Transport; Tue, 23 Jul 2024 16:05:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH1PEPF0000A347.mail.protection.outlook.com (10.167.244.7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7784.11 via Frontend Transport; Tue, 23 Jul 2024 16:05:25 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 23 Jul
- 2024 09:05:07 -0700
-Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 23 Jul
- 2024 09:05:03 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: David Ahern <dsahern@kernel.org>, Petr Machata <petrm@nvidia.com>,
-	<mlxsw@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net] net: nexthop: Initialize all fields in dumped nexthops
-Date: Tue, 23 Jul 2024 18:04:16 +0200
-Message-ID: <8b06dd4ec057d912ca3947bacf15529272dea796.1721749627.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A46D156C6C;
+	Tue, 23 Jul 2024 16:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721750902; cv=none; b=audxKlsRj5QCWxGPLzjUm+tjLQJRg2K6UTFElE1zJxKhGsHrz+1xoenAFBlPqXtIfglWTY6kCaHirSC5GWrQhIeNBOJNESf8hE2fMKQvW6BSj3cSTSUcNGiFWgfNT2yIgkoBpBbkvoy5oEBo83mFO+Kb+KGxF15ENvp8kR0tBgY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721750902; c=relaxed/simple;
+	bh=pZBZ7AgRH53/JGtlfofcX9i7ApPL58N1dLliLlryDcw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BRFh6GdYnnE1SYLlxxJIZxVwUmNTmL4LBCAcx71rnGQrz2oPCPNDRL0KErT8ERE1w3/UzKQizNRMp5qA5Awpv2KP1dceBn2VNef4hFWzqjQgqrZNroAiGhA/zuBWUJTaAkHiSCG0GR4CbjIjY+4lFkWOESodcBJSzYjaKw+cD9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPLcf1bU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69C7C4AF09;
+	Tue, 23 Jul 2024 16:08:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721750902;
+	bh=pZBZ7AgRH53/JGtlfofcX9i7ApPL58N1dLliLlryDcw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iPLcf1bUXJDjFMRYNfuiSP3Leae/96X+NvX/wIg/glt2Xz9Fmw8sepuDgNskMQ3Wq
+	 YvCZFq8W0CkzeuYdOyrtTce04dV5rHeOT8uFLNGhfWqz68JAuVJ1ErylNq2M9q3JmM
+	 Ksw9o6Us1JmhtkFfZjgxU5OjjopztU/GKkmbscoWStzBF2hmk2CuM6GlVktLkwhehe
+	 gyqSKBWwBAuW/q1/Y8KP+9fqoZhF3NWXG5zLd+gkkDIJrTygejZ2RMhX6qh5ei1twk
+	 SnMMO9WG7iK+jmSK/knFzTSYvxtwmjiZ6z4TlQJRa+SThvpW82EYGq8AEeHFxDJyJH
+	 nWYMI0259PrYA==
+Message-ID: <4558399b-002b-40ff-8d9b-ac7bf13b3d2e@kernel.org>
+Date: Tue, 23 Jul 2024 18:08:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v2 1/2] tcp: process the 3rd ACK with sk_socket for
+ TFO/MPTCP
+Content-Language: en-GB
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Neal Cardwell <ncardwell@google.com>
+References: <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-0-d653f85639f6@kernel.org>
+ <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-1-d653f85639f6@kernel.org>
+ <CANn89iJNa+UqZrONT0tTgN+MjnFZJQQ8zuH=nG+3XRRMjK9TfA@mail.gmail.com>
+ <2583642a-cc5f-4765-856d-4340adcecf33@kernel.org>
+ <CANn89iKP4y7iMHxsy67o13Eair+tDquGPBr=kS41zPbKz+_0iQ@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <CANn89iKP4y7iMHxsy67o13Eair+tDquGPBr=kS41zPbKz+_0iQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A347:EE_|SA1PR12MB6774:EE_
-X-MS-Office365-Filtering-Correlation-Id: a4b92ec2-3997-4b32-3ab5-08dcab3143df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Nt3LKk8VI8qU6k4EJ9u2NXLm3VLGJ1gG2pvdor049JanndFAA8bfDknD3sM7?=
- =?us-ascii?Q?VD8Ky9I8+nrjCo7g932KS0FA2NEQY+AU//3oww3Xw1hmgfVSfFIB3XjW6ZgY?=
- =?us-ascii?Q?gwHWL6GQFmEEcDNdSendYFg7agL2NH/YCKkQ2W/8NvEfT51w4E2vPfIlqJn4?=
- =?us-ascii?Q?WN/JZduITcqrhBAxYdUNbsx7HSTNOjFe6Gun/FJo43e8ZdrFHGPwonQSLcgL?=
- =?us-ascii?Q?ph8go/d9LlEj+q++fNAEkNjTcNw70GTVQT9IxTAIcDyL8iDABmhe07ApEHvg?=
- =?us-ascii?Q?Sse3C89I/6uedTQQYoNQde9HP9XVkwv8Ke5iZgN8xeMS9L0Fkl33j+lTzZhF?=
- =?us-ascii?Q?+EwE/dC2YXKCrwu9npEPTzFq//fT/hqwwAzT0mAsLg2BFfXgMNsC9i77Sw5f?=
- =?us-ascii?Q?s5yR3+FzQzvJK5h0F+O786Ud/B5PQ3G7fcmVruix+N6RyOCiSJYw5Oh5ghON?=
- =?us-ascii?Q?QN1/TTxW6eOGPGu41kPXsY99L7XmgatsMxKOxtzNYT4gLyN+DsDT5V+rXbmu?=
- =?us-ascii?Q?rRkWgCSEmyAvo0Y8RykmOQLTOovIBEZxOeK9YHQxVQPs5Bhw8EbDXLvipIlm?=
- =?us-ascii?Q?l9BaRDHABe1ChCr1YyQbHqIN2vN/HQNUOcWoBB+hGtnSSKJTm3lsgxYCmAgQ?=
- =?us-ascii?Q?ZPeKDJjIwsRuSyzzU3Ma1B7V2JZfxXj4UPOL6RXTIBIDGMeZ7NtrtUEg6uB4?=
- =?us-ascii?Q?zdQ137qmRu/dZH686olBanCeLTGvlBVILnP2W3Gz+6AacO/LC4qprTDFr6M9?=
- =?us-ascii?Q?UmB/xBTQcZDULnONgkpr/YMWuF/Hu/yy8lP1FKbAEok/oy3qkyPLh6638nEW?=
- =?us-ascii?Q?ouoFSoYtXdPWLgWemPMt6Yg1UoryBtHms8A/3Gux2z5Z2uCqEDSwrw9qgUmG?=
- =?us-ascii?Q?ejkdwLq+z7Mml/2rnqYb9U4Ar6obTMEcnNZPJHAGs3C0nnqg2Jpor18Get/s?=
- =?us-ascii?Q?RkJ88uLYm4tTrOXQj/8eZ6mgXsjBeghz3QvlJ7iJNH6maE1J+P8hcydU+Bik?=
- =?us-ascii?Q?1c6oY9RGH5wRNApefDKSclsWXOQMBFx8BDn1iC/BnXARR0a+UNRdKyShRKjV?=
- =?us-ascii?Q?8DFkephnRUOn4mcP22xDFS/M4Lf1BRaitKgBqpRlUWoh58TtkAuZceby+Xxb?=
- =?us-ascii?Q?XSJ9BTD9n8rFTyF3BdwE8QTuSRgO9d0n8SpgX4hym33fj7W1jmY0r7jZMC4/?=
- =?us-ascii?Q?zaYk45g+ncvr2WdPE+suVrdip1AH3u2EQE7GgD6Fcmj0W0pRLXbj8RqykhWg?=
- =?us-ascii?Q?CSptDiHRPJZY0MDhiLM1QxYohd14tK0eon4aMP3sffibIUD2fU2QmPk0JbBJ?=
- =?us-ascii?Q?bSpCgGx+fxqScHZShB//W0H0zXHFhrJRp0GC0p1TNSbSMe3aR/ATlOUQU5A3?=
- =?us-ascii?Q?A0P0/f8xM0Ni/KDeIPaXHIPsT37cLS0Sydn5RdsQnjZItFPKYflqoYN8Q2pC?=
- =?us-ascii?Q?a+rWzj4nkRFhLj1N/jeLNqA0Wt+mrxee?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 16:05:25.8655
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4b92ec2-3997-4b32-3ab5-08dcab3143df
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A347.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6774
 
-struct nexthop_grp contains two reserved fields that are not initialized by
-nla_put_nh_group(), and carry garbage. This can be observed e.g. with
-strace (edited for clarity):
+Hi Eric,
 
-    # ip nexthop add id 1 dev lo
-    # ip nexthop add id 101 group 1
-    # strace -e recvmsg ip nexthop get id 101
-    ...
-    recvmsg(... [{nla_len=12, nla_type=NHA_GROUP},
-                 [{id=1, weight=0, resvd1=0x69, resvd2=0x67}]] ...) = 52
+On 23/07/2024 17:38, Eric Dumazet wrote:
+> On Tue, Jul 23, 2024 at 4:58 PM Matthieu Baerts <matttbe@kernel.org> wrote:
+>>
+>> Hi Eric,
+>>
+>> +cc Neal
+>> -cc Jerry (NoSuchUser)
+>>
+>> On 23/07/2024 16:37, Eric Dumazet wrote:
+>>> On Thu, Jul 18, 2024 at 12:34 PM Matthieu Baerts (NGI0)
+>>> <matttbe@kernel.org> wrote:
+>>>>
+>>>> The 'Fixes' commit recently changed the behaviour of TCP by skipping the
+>>>> processing of the 3rd ACK when a sk->sk_socket is set. The goal was to
+>>>> skip tcp_ack_snd_check() in tcp_rcv_state_process() not to send an
+>>>> unnecessary ACK in case of simultaneous connect(). Unfortunately, that
+>>>> had an impact on TFO and MPTCP.
+>>>>
+>>>> I started to look at the impact on MPTCP, because the MPTCP CI found
+>>>> some issues with the MPTCP Packetdrill tests [1]. Then Paolo suggested
+>>>> me to look at the impact on TFO with "plain" TCP.
+>>>>
+>>>> For MPTCP, when receiving the 3rd ACK of a request adding a new path
+>>>> (MP_JOIN), sk->sk_socket will be set, and point to the MPTCP sock that
+>>>> has been created when the MPTCP connection got established before with
+>>>> the first path. The newly added 'goto' will then skip the processing of
+>>>> the segment text (step 7) and not go through tcp_data_queue() where the
+>>>> MPTCP options are validated, and some actions are triggered, e.g.
+>>>> sending the MPJ 4th ACK [2] as demonstrated by the new errors when
+>>>> running a packetdrill test [3] establishing a second subflow.
+>>>>
+>>>> This doesn't fully break MPTCP, mainly the 4th MPJ ACK that will be
+>>>> delayed. Still, we don't want to have this behaviour as it delays the
+>>>> switch to the fully established mode, and invalid MPTCP options in this
+>>>> 3rd ACK will not be caught any more. This modification also affects the
+>>>> MPTCP + TFO feature as well, and being the reason why the selftests
+>>>> started to be unstable the last few days [4].
+>>>>
+>>>> For TFO, the existing 'basic-cookie-not-reqd' test [5] was no longer
+>>>> passing: if the 3rd ACK contains data, and the connection is accept()ed
+>>>> before receiving them, these data would no longer be processed, and thus
+>>>> not ACKed.
+>>>>
+>>>> One last thing about MPTCP, in case of simultaneous connect(), a
+>>>> fallback to TCP will be done, which seems fine:
+>>>>
+>>>>   `../common/defaults.sh`
+>>>>
+>>>>    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_MPTCP) = 3
+>>>>   +0 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+>>>>
+>>>>   +0 > S  0:0(0)                 <mss 1460, sackOK, TS val 100 ecr 0,   nop, wscale 8, mpcapable v1 flags[flag_h] nokey>
+>>>>   +0 < S  0:0(0) win 1000        <mss 1460, sackOK, TS val 407 ecr 0,   nop, wscale 8, mpcapable v1 flags[flag_h] nokey>
+>>>>   +0 > S. 0:0(0) ack 1           <mss 1460, sackOK, TS val 330 ecr 0,   nop, wscale 8, mpcapable v1 flags[flag_h] nokey>
+>>>>   +0 < S. 0:0(0) ack 1 win 65535 <mss 1460, sackOK, TS val 700 ecr 100, nop, wscale 8, mpcapable v1 flags[flag_h] key[skey=2]>
+>>>>
+>>>>   +0 write(3, ..., 100) = 100
+>>>>   +0 >  . 1:1(0)     ack 1 <nop, nop, TS val 845707014 ecr 700, nop, nop, sack 0:1>
+>>>>   +0 > P. 1:101(100) ack 1 <nop, nop, TS val 845958933 ecr 700>
+>>>>
+>>>> Simultaneous SYN-data crossing is also not supported by TFO, see [6].
+>>>>
+>>>> Link: https://github.com/multipath-tcp/mptcp_net-next/actions/runs/9936227696 [1]
+>>>> Link: https://datatracker.ietf.org/doc/html/rfc8684#fig_tokens [2]
+>>>> Link: https://github.com/multipath-tcp/packetdrill/blob/mptcp-net-next/gtests/net/mptcp/syscalls/accept.pkt#L28 [3]
+>>>> Link: https://netdev.bots.linux.dev/contest.html?executor=vmksft-mptcp-dbg&test=mptcp-connect-sh [4]
+>>>> Link: https://github.com/google/packetdrill/blob/master/gtests/net/tcp/fastopen/server/basic-cookie-not-reqd.pkt#L21 [5]
+>>>> Link: https://github.com/google/packetdrill/blob/master/gtests/net/tcp/fastopen/client/simultaneous-fast-open.pkt [6]
+>>>> Fixes: 23e89e8ee7be ("tcp: Don't drop SYN+ACK for simultaneous connect().")
+>>>> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+>>>> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>>>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>>>> ---
+>>>> Notes:
+>>>>  - We could also drop this 'goto consume', and send the unnecessary ACK
+>>>>    in this simultaneous connect case, which doesn't seem to be a "real"
+>>>>    case, more something for fuzzers. But that's not what the RFC 9293
+>>>>    recommends to do.
+>>>>  - v2:
+>>>>    - Check if the SYN bit is set instead of looking for TFO and MPTCP
+>>>>      specific attributes, as suggested by Kuniyuki.
+>>>>    - Updated the comment above
+>>>>    - Please note that the v2 has been sent mainly to satisfy the CI (to
+>>>>      be able to catch new bugs with MPTCP), and because the suggestion
+>>>>      from Kuniyuki looks better. It has not been sent to urge TCP
+>>>>      maintainers to review it quicker than it should, please take your
+>>>>      time and enjoy netdev.conf :)
+>>>> ---
+>>>>  net/ipv4/tcp_input.c | 7 ++++++-
+>>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>>>> index ff9ab3d01ced..bfe1bc69dc3e 100644
+>>>> --- a/net/ipv4/tcp_input.c
+>>>> +++ b/net/ipv4/tcp_input.c
+>>>> @@ -6820,7 +6820,12 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>>>>                 if (sk->sk_shutdown & SEND_SHUTDOWN)
+>>>>                         tcp_shutdown(sk, SEND_SHUTDOWN);
+>>>>
+>>>> -               if (sk->sk_socket)
+>>>> +               /* For crossed SYN cases, not to send an unnecessary ACK.
+>>>> +                * Note that sk->sk_socket can be assigned in other cases, e.g.
+>>>> +                * with TFO (if accept()'ed before the 3rd ACK) and MPTCP (MPJ:
+>>>> +                * sk_socket is the parent MPTCP sock).
+>>>> +                */
+>>>> +               if (sk->sk_socket && th->syn)
+>>>>                         goto consume;
+>>>
+>>> I think we should simply remove this part completely, because we
+>>> should send an ack anyway.
+>>
+>> Thank you for having looked, and ran the full packetdrill test suite!
+>>
+>>>
+>>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>>> index ff9ab3d01ced89570903d3a9f649a637c5e07a90..91357d4713182078debd746a224046cba80ea3ce
+>>> 100644
+>>> --- a/net/ipv4/tcp_input.c
+>>> +++ b/net/ipv4/tcp_input.c
+>>> @@ -6820,8 +6820,6 @@ tcp_rcv_state_process(struct sock *sk, struct
+>>> sk_buff *skb)
+>>>                 if (sk->sk_shutdown & SEND_SHUTDOWN)
+>>>                         tcp_shutdown(sk, SEND_SHUTDOWN);
+>>>
+>>> -               if (sk->sk_socket)
+>>> -                       goto consume;
+>>>                 break;
+>>>
+>>>         case TCP_FIN_WAIT1: {
+>>>
+>>>
+>>> I have a failing packetdrill test after  Kuniyuki  patch :
+>>>
+>>>
+>>>
+>>> //
+>>> // Test the simultaneous open scenario that both end sends
+>>> // SYN/data. Although we don't support that the connection should
+>>> // still be established.
+>>> //
+>>> `../../common/defaults.sh
+>>>  ../../common/set_sysctls.py /proc/sys/net/ipv4/tcp_timestamps=0`
+>>>
+>>> // Cache warmup: send a Fast Open cookie request
+>>>     0 socket(..., SOCK_STREAM, IPPROTO_TCP) = 3
+>>>    +0 fcntl(3, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+>>>    +0 sendto(3, ..., 0, MSG_FASTOPEN, ..., ...) = -1 EINPROGRESS
+>>> (Operation is now in progress)
+>>>    +0 > S 0:0(0) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO,nop,nop>
+>>>  +.01 < S. 123:123(0) ack 1 win 14600 <mss
+>>> 1460,nop,nop,sackOK,nop,wscale 6,FO abcd1234,nop,nop>
+>>>    +0 > . 1:1(0) ack 1
+>>>  +.01 close(3) = 0
+>>>    +0 > F. 1:1(0) ack 1
+>>>  +.01 < F. 1:1(0) ack 2 win 92
+>>>    +0 > .  2:2(0) ack 2
+>>>
+>>>
+>>> //
+>>> // Test: simulatenous fast open
+>>> //
+>>>  +.01 socket(..., SOCK_STREAM, IPPROTO_TCP) = 4
+>>>    +0 fcntl(4, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+>>>    +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
+>>>    +0 > S 0:1000(1000) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO
+>>> abcd1234,nop,nop>
+>>> // Simul. SYN-data crossing: we don't support that yet so ack only remote ISN
+>>> +.005 < S 1234:1734(500) win 14600 <mss 1040,nop,nop,sackOK,nop,wscale
+>>> 6,FO 87654321,nop,nop>
+>>>    +0 > S. 0:0(0) ack 1235 <mss 1460,nop,nop,sackOK,nop,wscale 8>
+>>>
+>>> // SYN data is never retried.
+>>> +.045 < S. 1234:1234(0) ack 1001 win 14600 <mss
+>>> 940,nop,nop,sackOK,nop,wscale 6,FO 12345678,nop,nop>
+>>>    +0 > . 1001:1001(0) ack 1
+>>
+>> I recently sent a PR -- already applied -- to Neal to remove this line:
+>>
+>>   https://github.com/google/packetdrill/pull/86
+>>
+>> I thought it was the intension of Kuniyuki's patch not to send this ACK
+>> in this case to follow the RFC 9293's recommendation. This TFO test
+>> looks a bit similar to the example from Kuniyuki's patch:
+>>
+>>
+>> --------------- 8< ---------------
+>>  0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 3
+>> +0 connect(3, ..., ...) = -1 EINPROGRESS (Operation now in progress)
+>>
+>> +0 > S  0:0(0) <mss 1460,sackOK,TS val 1000 ecr 0,nop,wscale 8>
+>> +0 < S  0:0(0) win 1000 <mss 1000>
+>> +0 > S. 0:0(0) ack 1 <mss 1460,sackOK,TS val 3308134035 ecr 0,nop,wscale 8>
+>> +0 < S. 0:0(0) ack 1 win 1000
+>>
+>>   /* No ACK here */
+>>
+>> +0 write(3, ..., 100) = 100
+>> +0 > P. 1:101(100) ack 1
+>> --------------- 8< ---------------
+>>
+>>
+>>
+>> But maybe here that should be different for TFO?
+>>
+>> For my case with MPTCP (and TFO), it is fine to drop this 'goto consume'
+>> but I don't know how "strict" we want to be regarding the RFC and this
+>> marginal case.
+> 
+> Problem of this 'goto consume' is that we are not properly sending a
+> DUPACK in this case.
+> 
+>  +.01 socket(..., SOCK_STREAM, IPPROTO_TCP) = 4
+>    +0 fcntl(4, F_SETFL, O_RDWR|O_NONBLOCK) = 0
+>    +0 sendto(4, ..., 1000, MSG_FASTOPEN, ..., ...) = 1000
+>    +0 > S 0:1000(1000) <mss 1460,nop,nop,sackOK,nop,wscale 8,FO
+> abcd1234,nop,nop>
+> // Simul. SYN-data crossing: we don't support that yet so ack only remote ISN
+> +.005 < S 1234:1734(500) win 14600 <mss 1040,nop,nop,sackOK,nop,wscale
+> 6,FO 87654321,nop,nop>
+>    +0 > S. 0:0(0) ack 1235 <mss 1460,nop,nop,sackOK,nop,wscale 8>
+> 
+> +.045 < S. 1234:1234(0) ack 1001 win 14600 <mss
+> 940,nop,nop,sackOK,nop,wscale 6,FO 12345678,nop,nop>
+>    +0 > . 1001:1001(0) ack 1 <nop,nop,sack 0:1>  // See here
 
-The fields are reserved and therefore not currently used. But as they are, they
-leak kernel memory, and the fact they are not just zero complicates repurposing
-of the fields for new ends. Initialize the full structure.
+I'm sorry, but is it normal to have 'ack 1' with 'sack 0:1' here?
 
-Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
- net/ipv4/nexthop.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+> Not sending a dupack seems wrong and could hurt.
 
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 535856b0f0ed..6b9787ee8601 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -888,9 +888,10 @@ static int nla_put_nh_group(struct sk_buff *skb, struct nexthop *nh,
- 
- 	p = nla_data(nla);
- 	for (i = 0; i < nhg->num_nh; ++i) {
--		p->id = nhg->nh_entries[i].nh->id;
--		p->weight = nhg->nh_entries[i].weight - 1;
--		p += 1;
-+		*p++ = (struct nexthop_grp) {
-+			.id = nhg->nh_entries[i].nh->id,
-+			.weight = nhg->nh_entries[i].weight - 1,
-+		};
- 	}
- 
- 	if (nhg->resilient && nla_put_nh_group_res(skb, nhg))
+Indeed, I thought the RFC 9293 was not allowing that, but I didn't see
+anything forbidding this DUPACK:
+
+  https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5-7
+
+> I had reservations about this part, if you look back to the discussion.
+> 
+> This is why Kuniyuki added in his changelog :
+> 
+>     Note that tcp_ack_snd_check() in tcp_rcv_state_process() is skipped not to
+>     send an unnecessary ACK, but this could be a bit risky for net.git, so this
+>     targets for net-next.
+
+I understand, I can send a v3 dropping this part, and not including
+patch 2/2 for -net. I can also send a PR to Neal re-adding the ACK with
+'sack' (if it is normal).
+
+Cheers,
+Matt
 -- 
-2.45.0
+Sponsored by the NGI0 Core fund.
 
 
