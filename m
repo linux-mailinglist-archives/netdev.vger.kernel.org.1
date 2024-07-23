@@ -1,96 +1,114 @@
-Return-Path: <netdev+bounces-112542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5818F939D45
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:10:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D909939D4F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:13:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 013541F22839
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD082283110
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970E814BF85;
-	Tue, 23 Jul 2024 09:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A1E14BFB4;
+	Tue, 23 Jul 2024 09:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibw833MX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFuUGskK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717BD14B965
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 09:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C989013B2AF
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 09:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721725832; cv=none; b=EtAaIMOfwpYjqN0Xfk5FFbnplfrECKuGOwLlDAAu917Dv4X6XaCxT1eJ8e63+L4YgekC0sNdWtc/iGhgSVr62E9r/4m9ZK1oGzFBZoia/nxS9AuGOPSAq00mC1KFaOxq3KCT/uHXu70RKtFVx+1s4HGdIBVjLSdhCroudFWkXhU=
+	t=1721726003; cv=none; b=oMWa6BAbJNo818afzixjX8k63h/TztmrSyq32mQuq/rVKphWhSzphLLtIT3bmtzu/IFubiCNZnUogq4ifHaHWKiFWEMqI7W7Cm10za0iVLd9y39K4x6VLlOaSb0atcsJbD9lnrO6sKRy5Pr/Aw4hi3cvdJWm+ypubrvAyG2Wpjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721725832; c=relaxed/simple;
-	bh=jKuXc+KYwhcgEedEeLdlT70XF+7xANwiOKeTAqURRdw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lFUeq1Wx/BjHriCk9f6YAMksFX6pmC12WNSxyR/+C8IYFQBzLXgaJC00oLMaQ+8zcx6oiDhilmWnFrUPIU9gezNl9R2ggmr8K2sQ5bTDmxZeNd7F8emNs0OSsvLq/xt4yBnONRGagZqvPtp4jsyYJvVealvR9t/4tjeDzHob1vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibw833MX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DB756C4AF0F;
-	Tue, 23 Jul 2024 09:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721725831;
-	bh=jKuXc+KYwhcgEedEeLdlT70XF+7xANwiOKeTAqURRdw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ibw833MXduX34eZAgPITflqq8toqS0LcL2bUsCflumcgd05d3VvXBKOyek6CAIrJa
-	 GHRJQ1RQ10GCasoGC5wGCPAI3QnbYEcZC/MTPtpZUSB1l/yBtWdqM6nG4vHb6LhQPW
-	 47lsUnKfWBKBL77eQ9I3AKyA48Eh7JBfMI1JNpuAW9l9IajvjVa4GjuriWPTS4uVKo
-	 cO4VTX3PGV13BKSnxGPNW6KSqy/82gtMP8iPg77sHBeC/NXtIWmM+PMR/YIP+c05lJ
-	 zwhhy+Ci34qrBnXfClO6MuMrBdN9IWeRRDk06fjwEqrz+jtEfTTmYCiM94T5YN9ALT
-	 gWezAw7RIMrUg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE046C43638;
-	Tue, 23 Jul 2024 09:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1721726003; c=relaxed/simple;
+	bh=+ye3TbGwDHVRBUVi+ILlMkK4EdIzu3ZNPHjQkCc34WE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cVRMxMAY+hkvqmJ8hKH85g9BFYZcVBrCKPvWXeFxI3xt4QXujsY/FhRAGm7pWuJWnnyVlHpOyNLaFOxFqJ7m7RRY0VSysaUZJvrVcKXYdrCeo7SpMMGwzKdozBP8wyGmuQi7XBmetjtCcqs8Wzt+aDlhUSdVyOdRE+K4thPTEI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MFuUGskK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721726000;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DvbU4BFYRnv+rPsucUG4sbEsSj0ztOqkC9YXGeI05eo=;
+	b=MFuUGskKQaAFYWgZf795/MWtxVBxFOGAMxf8CZHaSTOjjr3s5Ui4Vm/b/+H183XBso/uzF
+	xGPyLV0+du0quwzZqLQPXN0eJ0qRmCfXW+HXYRNS1egtUgeqLJ5JCMBZhveI0lGentBVFp
+	U2x1Zx837bscuQe0nCD62zJdoctMmEE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-ZEd9Ksz-Mzy8b3KVuyupUA-1; Tue, 23 Jul 2024 05:13:19 -0400
+X-MC-Unique: ZEd9Ksz-Mzy8b3KVuyupUA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3684636eb06so639341f8f.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 02:13:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721725997; x=1722330797;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DvbU4BFYRnv+rPsucUG4sbEsSj0ztOqkC9YXGeI05eo=;
+        b=RO/ViPUNMgVqQtwSLih2riI9QxA0mWqmFMz1eNklynPM6/gIBqp7n3v0CDXbzeGzuO
+         vNwgN4Sgr+Vec341ZcCFI1zY+3FziFEZxVYaBjv2uI4I4qNOgRM6I3rnY7l1MyYAnMKn
+         wt2R8DYuGPdERerVkfMvab+xUEZpQ45hs+6uMtW5T7yVoFi5hFD18M5CPGS3KmDiusga
+         R7c7VC/zj++GQyF1XxOr+OHX6Ya8KQ8vpzQKlIK4wIHbn3npOOcWGaSkH7Yy5wdWtugx
+         ZBdfXYeoOGhryGR6vr+VfHuftYfR+3tDGJ0eZVPjlGUJ06pkvIBZ1n7K4LzpmCJfDkag
+         Qhkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZN5PB4xUINf5aZV4B/lNNyUBH2deBCgUtUeIcVS9isTG0jr8Y9s2HOoN6mhi+wWIXgCQkBD0qX6brqQaCrEkBT7dR3Eoc
+X-Gm-Message-State: AOJu0YzOyWW4cjJYxU0TUbVFWHXtdLpqhWBAwpB3nfBWEETLIb7lyTf9
+	Y3tGmX+RzAFSnklPOlkRvwoq2qyy9irvEHCNXhMI43E3wWttWieJ20fEbThJr+/X6ubUk4QTotK
+	L345x3BR6kbV6NUJ2L9P5nxn9/VS6f88Yamwx1gcJW6Tl/hG/MJzqcsKFmpI6/w==
+X-Received: by 2002:a05:6000:2a1:b0:367:4d9d:56a6 with SMTP id ffacd0b85a97d-369b6750465mr4216204f8f.1.1721725997622;
+        Tue, 23 Jul 2024 02:13:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF9r6M0nfIGyt6REY+V1FXPQWmhuUwS4nAOxlTpt+QnoMNPb56n7jI/2Bi+V10KYhTSI9h70w==
+X-Received: by 2002:a05:6000:2a1:b0:367:4d9d:56a6 with SMTP id ffacd0b85a97d-369b6750465mr4216196f8f.1.1721725997226;
+        Tue, 23 Jul 2024 02:13:17 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:173f:4f10::f71? ([2a0d:3344:173f:4f10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-368786943d3sm10868651f8f.50.2024.07.23.02.13.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jul 2024 02:13:16 -0700 (PDT)
+Message-ID: <0a0ebced-e19b-4dbe-9621-08b1867d313b@redhat.com>
+Date: Tue, 23 Jul 2024 11:13:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv4: Fix incorrect source address in Record Route option
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172172583084.17339.14532873737217557138.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Jul 2024 09:10:30 +0000
-References: <20240718123407.434778-1-idosch@nvidia.com>
-In-Reply-To: <20240718123407.434778-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, gnault@redhat.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] l2tp: make session IDR and tunnel session list
+ coherent
+To: James Chapman <jchapman@katalix.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ tparkin@katalix.com, samuel.thibault@ens-lyon.org, thorsten.blum@toblux.com
+References: <20240718134348.289865-1-jchapman@katalix.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240718134348.289865-1-jchapman@katalix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 7/18/24 15:43, James Chapman wrote:
+> Modify l2tp_session_register and l2tp_session_unhash so that the
+> session IDR and tunnel session lists remain coherent. To do so, hold
+> the session IDR lock and the tunnel's session list lock when making
+> any changes to either list.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Looks good for net.
 
-On Thu, 18 Jul 2024 15:34:07 +0300 you wrote:
-> The Record Route IP option records the addresses of the routers that
-> routed the packet. In the case of forwarded packets, the kernel performs
-> a route lookup via fib_lookup() and fills in the preferred source
-> address of the matched route.
-> 
-> The lookup is performed with the DS field of the forwarded packet, but
-> using the RT_TOS() macro which only masks one of the two ECN bits. If
-> the packet is ECT(0) or CE, the matched route might be different than
-> the route via which the packet was forwarded as the input path masks
-> both of the ECN bits, resulting in the wrong address being filled in the
-> Record Route option.
-> 
-> [...]
+AFAICS, after this patch, every time 'l2tp_session_idr_lock' is 
+acquired, 'list_lock' is already held; as a possible net-next follow-up 
+you could remove completely the 'l2tp_session_idr_lock' lock, and update 
+accordingly the related lockdep_assert_held() assertion.
 
-Here is the summary with links:
-  - [net] ipv4: Fix incorrect source address in Record Route option
-    https://git.kernel.org/netdev/net/c/cc73bbab4b1f
+Cheers,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Paolo
 
 
