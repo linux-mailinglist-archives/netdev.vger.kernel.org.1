@@ -1,221 +1,206 @@
-Return-Path: <netdev+bounces-112511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E573939B38
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 08:56:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA2C9939B5D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:05:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 237471C21B16
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 06:56:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86986B210CD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 07:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52B614AD17;
-	Tue, 23 Jul 2024 06:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b="jQqDI2ZA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E852314AD22;
+	Tue, 23 Jul 2024 07:04:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11023076.outbound.protection.outlook.com [52.101.67.76])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF85E14A616;
-	Tue, 23 Jul 2024 06:56:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721717791; cv=fail; b=nS2rX8TpH366g/DYRXBOPXaqzSPZQpeC6UbybtzZMdJnKPtTPQqzgXel0o2CLoWGArCy3kVSdn/PTkHfHgATsqHmh9/eClY7fqmIoKiiCJHEn/LJOjDWLi+T4XVQyx4it65JXE+s5aGIKtcpf6gdgtsbW+ZWk8XPhCfts6UjeUs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721717791; c=relaxed/simple;
-	bh=q/4FhTcQw8Ct3qXSg64D5CY8N29ave52dAbM4g5K8+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SR0x2DLjo4brm0PAP5o5aXulg/kDraMXhcjwYFh7zSlOBeGY/K9FST832eJrEBjIHKTSmUCtBVMqhSvFPxtnFXMX+aoGPp1+OCZm+mnIwR2BFZpbjNCnAVjg68jSeSA7SeV1G3a2uKzoMiTcSNUg4urnvO12byB6v2+LY5eHdgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com; spf=pass smtp.mailfrom=volumez.com; dkim=pass (2048-bit key) header.d=storingio.onmicrosoft.com header.i=@storingio.onmicrosoft.com header.b=jQqDI2ZA; arc=fail smtp.client-ip=52.101.67.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=volumez.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=volumez.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hpaw+9uMWMZPF8Y38R9Se+n2e2caxD1eTNgiNwG0MyZnd/Hhek6l+cLs5GrfSH/gKCogB6UgQQq4M0TEi6CcKbf3qL/S2KqWiO10vslho9JrlNIgvBYBFjz66RxVJr0AWUEBbgIjW3JhC21di3gdz/gWdfeaAxEyppg20rTchm8cKt62Vdl0GzCOd277jj9di4Fwgpbj9mTcdERhf/Md49cxrQg2R6pK1k7krA8AvPX9sg0ser6Ubm3NO+dSjLO0+tCZGwYGbt+Q0HbokbuuVUCURXEP6knYaZZVNZVTLG6MdNRp2hxR3ckwuQYqBULyFth1Hg4sHFIxwMpTj7lPgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YZ0tWBiQ2iqQ8K+UeCzLmCv2laXrL4ME8WggNX5AW9w=;
- b=VW/onWWPBEUyysGXhsYtzpg5OQclUWaMxrPp/ov/iyPLSWoAwU/YfWctg9wEB8Q9LN1tMVU07RppSBQAdZvSS4erTYJJ0euJrG+0JxbKcWxiTwf+mCcxhsBX6lkE0eNYV8VkvJe+9ASGLRTtJy328TpF73+TvPdVEpF9mRMu82G3yL4b4wQaNELGnbREZTkkL1v5K46NmO0o8fQvRKCeSUzU6bMklzvBxKi+UdAQKuiwrkRGHveDHsvd9A/JEmBZvcTMw4HVLDFY/yJU+DWaIt1Wk/eaALwADA6tVS8T3KIwCENgiLYHKn6TxYkzC9l+28owrRHZl7JXW/ECmUNHug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=volumez.com; dmarc=pass action=none header.from=volumez.com;
- dkim=pass header.d=volumez.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=storingio.onmicrosoft.com; s=selector1-storingio-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YZ0tWBiQ2iqQ8K+UeCzLmCv2laXrL4ME8WggNX5AW9w=;
- b=jQqDI2ZAbicn8JxnRl0z0v0EgwB/XtvmmimVbNEBCuexs0i5N08MWndQIvxjml7zyRBxhx7KuVT2d61M9DY36Qey9T6vSFPOLu5S3dkmEpEj1M5cZUyodeBoU1lceNQbHOaLTjQKorD38OyHrJGt9E36M25CQtgdOqgvVlmfmL5TVS6dd4H8JDc9anCSWDpvAB50zNfwzykIeMSbgSIpYfEVHLaiO1w1mzvVVPOb5CbKkNl3GO4huO9rFYR5MN2lvJL1C+bPMoc90QtfJrhxfr/OrD7k/ypFVQTy/OuX1uSncv69BELNGvyBAaAlHzxSLwVbB+BLIPo7j6DProYpoQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=volumez.com;
-Received: from AS8PR04MB8344.eurprd04.prod.outlook.com (2603:10a6:20b:3b3::20)
- by DBBPR04MB8044.eurprd04.prod.outlook.com (2603:10a6:10:1e5::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.19; Tue, 23 Jul
- 2024 06:56:24 +0000
-Received: from AS8PR04MB8344.eurprd04.prod.outlook.com
- ([fe80::d3e7:36d9:18b3:3bc7]) by AS8PR04MB8344.eurprd04.prod.outlook.com
- ([fe80::d3e7:36d9:18b3:3bc7%5]) with mapi id 15.20.7784.016; Tue, 23 Jul 2024
- 06:56:23 +0000
-From: Ofir Gal <ofir.gal@volumez.com>
-To: davem@davemloft.net,
-	linux-block@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: dhowells@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kbusch@kernel.org,
-	axboe@kernel.dk,
-	hch@lst.de,
-	sagi@grimberg.me,
-	philipp.reisner@linbit.com,
-	lars.ellenberg@linbit.com,
-	christoph.boehmwalder@linbit.com
-Subject: [PATCH v6 3/3] drbd: use sendpages_ok() instead of sendpage_ok()
-Date: Tue, 23 Jul 2024 09:56:07 +0300
-Message-ID: <20240723065608.338883-4-ofir.gal@volumez.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240723065608.338883-1-ofir.gal@volumez.com>
-References: <20240723065608.338883-1-ofir.gal@volumez.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TL2P290CA0021.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:3::15) To AS8PR04MB8344.eurprd04.prod.outlook.com
- (2603:10a6:20b:3b3::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BDE13B5A6;
+	Tue, 23 Jul 2024 07:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721718289; cv=none; b=NZfDBNNmXhi2UJwUGVAexlBZII9wGed5QYkqRhRZP/f0a4jgi/xs5hzLVPyS+aHqueC+30z8KU1zu7p5LnK368tpehzK0mLpWXug+aazlw5G9aDOsdliiKSGwCNyDIkSmQQQ20P6OvkDS3QmQaDCN0f1h10XgqVOD+bwkyCoh34=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721718289; c=relaxed/simple;
+	bh=OS7/D2fswcHFX0KJp9WVoT9m3o1j5i+tbBQzNvC5FiU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PM26A4M3wpbhyQpyIZYEmXww1iJ6K1AoSDryHLMCfyH5//D3rDaUXndVfh4FyEjY5qrx7j2iWhV0golj10BBRX903ZgCIzkCDc7+MLCLWcxJSxsf1rtsCDT65K8L3/T1vo9xKy0CIkOZ5BxV1FxZizPeLVUpwM175nV5csvcdDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WSp6h0vm8z4f3l19;
+	Tue, 23 Jul 2024 15:04:28 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id 97B481A0CA0;
+	Tue, 23 Jul 2024 15:04:41 +0800 (CST)
+Received: from [10.67.111.192] (unknown [10.67.111.192])
+	by APP3 (Coremail) with SMTP id _Ch0CgBndE8HVp9mDXyOAw--.51101S2;
+	Tue, 23 Jul 2024 15:04:41 +0800 (CST)
+Message-ID: <b1ba86f7-f943-4913-8265-2a94f3951a88@huaweicloud.com>
+Date: Tue, 23 Jul 2024 15:04:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8344:EE_|DBBPR04MB8044:EE_
-X-MS-Office365-Filtering-Correlation-Id: c4a455ec-78f4-4893-3656-08dcaae490c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OGhSTU5CZVpIWGdheWdpY0YzSS9yQ0pnenJZelN6ZHVXQTU5M0Z4N2E0ZndP?=
- =?utf-8?B?c1ZtdnFUaWFrelVFQk5TcHUyK2xsb1BuVDNhS2EzWW1yTVpwOGJYWUZORnJz?=
- =?utf-8?B?N0dWd2xMN0MrRWhNNDB1Z3RRRVBxNG0xT2tvTkNOL21tZ2RkMXFJOXZNcTNi?=
- =?utf-8?B?emVxajNoRUdiN2t3TTQvVzkvNDZNR2NXK0VvK2xlSFJDNGhUS0EvemJpY0tl?=
- =?utf-8?B?SGR2YkJ1R05vVWFWUS9mNU5aR2ttVmszbFVvVFZ6b3JtV1NrY1JaemZqSlZD?=
- =?utf-8?B?Q2RRNDhQSEVpczE2T3orcG93RWRXSjlRNTA5UGZkTzVVL2xrTGdlUTQ2MU9G?=
- =?utf-8?B?QWtZL0REbWVMdHcwTTNNcS81dlRFTW1odVVLRUhRbzZQRjZEcU0wWFNxeUQ3?=
- =?utf-8?B?aWZEUEU1Y3c0UEQ4T2IrZjhQSWJpT1FBc25zZlVoTWdmUk5Mb0tVQ2dVbkhi?=
- =?utf-8?B?MEpDOGMyTG5NdjdJT0tSV3JHaFRrREVORUhtdEwzbm8rQVJYWkVxdjdXVzM0?=
- =?utf-8?B?ZkNUdFNBWnJKNXdBOHNuSVE1Skt5NUtUMU8vNCtydDVtWFhDY0s2SHhQK2kv?=
- =?utf-8?B?dHVhMHdPTDVaVmpWblU0S1czL0VkQktaSWxabHBPQjdsdUhLV3Fob0hXaXBG?=
- =?utf-8?B?UWxReHcvZHlidjNKU1lqWDlRUGdoWis2eGppak9Jd1dNcHVrVXVPdURHT3hu?=
- =?utf-8?B?d1pwd25MdkdoaHNtZUNWbVZ6NkFHTEZNeVdsUDhubVRxc1dZd2NQakpLUkt6?=
- =?utf-8?B?WHVzeEdCRDRLZ2VvcFFlK0VUR1h2ZUNqaFBKSWZIem9XYTNLTmRwa2dYSXJ1?=
- =?utf-8?B?K1IxMzVza3lVdUNMSE4xN0Zkb3NCN0N3dlJRTHVQMjlOMmh1WHpYWFcvdk96?=
- =?utf-8?B?L0tCOVlQWTdiN0lPc1Z3Tk43UGtyTWljTHhoMFFSZkJtVExTN0NEdkRlNkdG?=
- =?utf-8?B?ODZuV25VRldWVlZqM0pXeFJoK2FVeFU2Q2xoR0lOamRaUTM0ZWFuTDVURVI3?=
- =?utf-8?B?aXFWbVdZOVh2THRveEZyVWx5U3IxWHU4M3JCVnZtV2w3alArcHdQZVFkYUlp?=
- =?utf-8?B?REVHK3JTY0VvR24xVU93KzFZbjh3Y0hWTlJPZTRzNVhQN1lZQktMYkVheita?=
- =?utf-8?B?bXA1K2VoN0pNTEFCdHpIczZSUmhiQnExL3pRZThidDFRRjV6Vk9jVU14K2Vp?=
- =?utf-8?B?RjQzVGw3M2lVUU56c2YzOU5iREdFMWdPU3JLcFAvUE02VU5FQkV6eWVVMjY4?=
- =?utf-8?B?b1laMWhQcGFNQmdQZjZxZDExcTA2WmxJaUhqeXdZY0QzQlVIdFNTbjQzb2ZD?=
- =?utf-8?B?YWtrWUZhbnVHclpBQlUyemZsaFg5QlNXRVhkYS9vS0hFdlViVnFTc3ZQc3hF?=
- =?utf-8?B?dVNDa040RndKV0t1WkU0TVBxRlpmVlNOSG1IdkR2cjV2dVpFRDZ6NkFGUjNW?=
- =?utf-8?B?dE9nWjN2b01xN25SM1FhYVNoem9JN3JSeXV5dy9oNHhUQkRSb0pjRWtXa1Zi?=
- =?utf-8?B?NjVGODNtSnJJTFUyTUswOUxIZ3U1SllzR29VYmdhVmttRWcyVzc1N3YzRDg1?=
- =?utf-8?B?c1JMSFVDeGRQemdyMWRUQ0VXb0Q2bEtPbkpHeTU4WU8zeFladTZ1MkE2NG45?=
- =?utf-8?B?bzdDTDAySTZ3eU9mK01ldE81ejhuczZRWmg0aDdYTW1lRFM3eEJzZ3pXSlBD?=
- =?utf-8?B?ek5lNWFRYmtkU2tCOVRONEFFWDVuK0VvTVBmcTBTNjJzekNDOXpUQ0cycVUv?=
- =?utf-8?B?WjVOVUxiaEYyU0NITG1UcTNEVDRvd3dDQytPYVM4czM5RkxLUllOMUpuazVo?=
- =?utf-8?B?YUpQSkViNlA4dnNZVUs0NE81UGY1dzVIUURSaU81MVNISUFVQXFNQnl2ZDBX?=
- =?utf-8?B?amdKUnViLzVSWGptek5oSGYyY0tseHkvVnIzNmdaekNMNmc9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(52116014)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RHB2WFZFQnVEb1A2R3NsM2NhMC9jcWt0bDNJZE9GakpxNGUrRXQ1K2dPUHJq?=
- =?utf-8?B?aWJXeE1KYlBybmZQdVJxanNxd3FCVUMwVi9PR25nbXVZVW1qVyt1d3p4QlJP?=
- =?utf-8?B?cXRsV1E4YStXK0sxdDA0dWdUdmVsUUhpeXYwZ21mdkNRWFZEVHFuMXhkKzBr?=
- =?utf-8?B?QTVkTHNKWEZwN0hUM1JBeWdYQ2FZZGp1QVBQejRoMnBiSlVtOXB5cG9ZVWNP?=
- =?utf-8?B?a1RkaVlSbTVJUHoyNkZmMThpdDE5MW1BL0FpTVFIbCsrMndwdG8rZ0VxbG0z?=
- =?utf-8?B?U0NrUmxGR1hnN292RmhYU3BEMjQ2eUZXeVBhT2JPTUFDdmovVjV1cjJZVUFN?=
- =?utf-8?B?Skw3UkVmd3psczgxRCthZy9QMUllWnhLb2NUNXFCL1JzU09ZbGw4TlVGcTJQ?=
- =?utf-8?B?UTFLdUpWQTdlS1Q5QXZwOVhjbVJhMkF0bFlzTEQ2WTdUaGxBSDhPWmxSZ2g0?=
- =?utf-8?B?RHhKc2E1RkxhNU1mUTZqTVc4QkxaOUpad3Uyb2lHUGNlNlNLM3hIMlJoNnYv?=
- =?utf-8?B?c0tWMjhhM1NPREVYMlFUVFZsSWVJc0N0WFdFazRJU29kZDFmY08wd2ZJeVhJ?=
- =?utf-8?B?MXVPRDhod09xTi93WUF1anpsWUVWUk5uWDhJbzYreVl4aHFpcTJ4aEJSeXRv?=
- =?utf-8?B?L3grMzRFYUVyWmpuVUp5NnJyOTNqbm9YNWN2blgya1NoS0FrU01VTlBIdU9q?=
- =?utf-8?B?d256UzVVcmhjOEhUYXQ3bUNKK3liS2x1VGdRYWRZVDlodGI5ZCtaN0hobHpi?=
- =?utf-8?B?bDNKa0w1YnZ5dmRUYUZOdFpMNnNLcFNjbVFDajRXeDRaTjZvSnJMQ3J6K0p2?=
- =?utf-8?B?ZUFsQlNNUWZlWnlMMW1BU1J1eEhQdWVOTGRoLzNuR0ltRkJhYlVKVUlsUUZp?=
- =?utf-8?B?QUxpU1BvNFpSTjloSmY0UWJJMklJNVE3WUFiQVpjakRDc254Tk16NkpnV2g0?=
- =?utf-8?B?N2FpOFQrWEtmVGdDZytLNEcvRVh1azV1UkZFTCt1RTY5V2xINm1rRksxZXJV?=
- =?utf-8?B?UWhzdTlkMVZ2ZUhNb3JwMmZWVzRlMzJRWGJ0M3pXL2tHb09vSnBoaEpUVGJq?=
- =?utf-8?B?a2lSeHBOdWEzOS80UURqazg2MFdKOVR5S05ObUVtTUo0d1dzMjR3SFdDdllX?=
- =?utf-8?B?bmd6bnA0Yk5EanVMcTFLTUVlL2h2Z0F1R0dIQVVDdHlIcG1jU3NzZ1AwL251?=
- =?utf-8?B?UjMwL05KMHg1WEczK2hTUTlhR21QRGtINlQzMDlGSTZYSVdqNzZGNEJVNmNV?=
- =?utf-8?B?Rm5wa3ZHOTNDRkJRSEpJZE5tbW1qWGpPVDhJQjVwY2VYQnZzMW5vampUU2ly?=
- =?utf-8?B?cW12KzRHaGszREg3WmFydXF4UXdyR2lacWtCMEVRMTBLRVM5ZWQ3ZENSSnJy?=
- =?utf-8?B?alBGbE42ZU5KU3FhU3RoSDNjUG5UWUt2TC8wbHVFaEtpbGNuQ1JhRjFZTlNv?=
- =?utf-8?B?L2ErY0l3Q2JjVXBKR2V2U0pSdDR2amxBZXpxZTdCV0xvZklaOThGTjVUMGND?=
- =?utf-8?B?bG5FS3ZSZ1htN0hEbURVcFhQdFJNT2tIdEo3U1hMVUJOWVczMURhNEFvZG9G?=
- =?utf-8?B?bnJzdEp1WDBCcTVhMnpHQk1FYTM5WDVCVk1CUGo0MTArMHJMdzRrTDlZMWlZ?=
- =?utf-8?B?L1NNZFJHekVwMWlvdk05UVBKa2RlS3kvMTU1Qmd0WGJjQVpjRkwrZXlrU0Fl?=
- =?utf-8?B?T3BpVUovVXZ4S3FDTUZiakNObTBOVFIrOHlhUkl3MWwwd21Vb0Y2SEQ1eGRQ?=
- =?utf-8?B?bkJnMU8xbzA0dmNEM1dVWldXSXBBU09KYzEzbGlJVU9rODJ0eUU0Q3F1dFBl?=
- =?utf-8?B?STdtdGhtcnNQMC9oME1kMGh6YlJOSXNEVHZLYlZ5U3BhY1h1SVNvWVNieHFC?=
- =?utf-8?B?QzYrbTUzQlRsWkwwTmU1dXdMVzhhZG8vYnp4RTlrTDBDV2JSeDRTVWJ1MWRC?=
- =?utf-8?B?UlhvV2o3WnNSejRoV2FaVUN5cFpsTUFVbUhTRU16YVNRbHNRN21kMWZhSGFx?=
- =?utf-8?B?dzU3MUQwdE1yb01FMXJkczNxSnZWbzgwQ1lYV0s5dTRUQ3JWUFFrSklKSE5Q?=
- =?utf-8?B?anIwTDRtTTVYS0UzaXZNNTc0aDk2QXpXQWRsR0pBWlhCSUhka0kxTkFJcUpw?=
- =?utf-8?Q?XgrVsr+7jwsNCjtZL9OE6lu3u?=
-X-OriginatorOrg: volumez.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4a455ec-78f4-4893-3656-08dcaae490c8
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8344.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 06:56:23.9036
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b1841924-914b-4377-bb23-9f1fac784a1d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bbnasO5W25erGYPS2lkUb8g92aHINibf4xZjIJfUyj0Mjkxs9L75Fq8pJ+YUeSoPF+va7vyciB6JIdRd63AhbQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB8044
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 9/20] lsm: Refactor return value of LSM hook
+ key_getsecurity
+Content-Language: en-US
+To: Paul Moore <paul@paul-moore.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Matt Bobrowski <mattbobrowski@google.com>,
+ Brendan Jackman <jackmanb@chromium.org>, James Morris <jmorris@namei.org>,
+ "Serge E . Hallyn" <serge@hallyn.com>,
+ Khadija Kamran <kamrankhadijadj@gmail.com>,
+ Casey Schaufler <casey@schaufler-ca.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>,
+ John Johansen <john.johansen@canonical.com>,
+ Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>,
+ Shung-Hsi Yu <shung-hsi.yu@suse.com>, Edward Cree <ecree.xilinx@gmail.com>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ Trond Myklebust <trond.myklebust@hammerspace.com>,
+ Anna Schumaker <anna@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Stephen Smalley <stephen.smalley.work@gmail.com>
+References: <20240711111908.3817636-10-xukuohai@huaweicloud.com>
+ <94a3b82a1e3e1fec77d676fa382105d4@paul-moore.com>
+ <7711bdba-9fbd-406c-8b81-adf91074d0b7@huaweicloud.com>
+ <CAHC9VhSsCuJzJ3ReUTyTXfWqRd+_TfShJBnRugZtX6OrMYJkOQ@mail.gmail.com>
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+In-Reply-To: <CAHC9VhSsCuJzJ3ReUTyTXfWqRd+_TfShJBnRugZtX6OrMYJkOQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_Ch0CgBndE8HVp9mDXyOAw--.51101S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZryfGF1fXrW8KFWUZry8AFb_yoWrWryxpr
+	W5Ka1Yyr4kJFy3ur1Iv3W7uF4Sya93GF1UWrZ3Gw1UZr1qvr17Wr1jkr1j9ryrCr1fJr10
+	vw47ZFZxCr1DAFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
+	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
+	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
+	j6a0PUUUUU=
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-Currently _drbd_send_page() use sendpage_ok() in order to enable
-MSG_SPLICE_PAGES, it check the first page of the iterator, the iterator
-may represent contiguous pages.
+On 7/23/2024 5:35 AM, Paul Moore wrote:
+> On Sat, Jul 20, 2024 at 5:31 AM Xu Kuohai <xukuohai@huaweicloud.com> wrote:
+>> On 7/19/2024 10:08 AM, Paul Moore wrote:
+>>> On Jul 11, 2024 Xu Kuohai <xukuohai@huaweicloud.com> wrote:
+>>>>
+>>>> To be consistent with most LSM hooks, convert the return value of
+>>>> hook key_getsecurity to 0 or a negative error code.
+>>>>
+>>>> Before:
+>>>> - Hook key_getsecurity returns length of value on success or a
+>>>>     negative error code on failure.
+>>>>
+>>>> After:
+>>>> - Hook key_getsecurity returns 0 on success or a negative error
+>>>>     code on failure. An output parameter @len is introduced to hold
+>>>>     the length of value on success.
+>>>>
+>>>> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+>>>> ---
+>>>>    include/linux/lsm_hook_defs.h |  3 ++-
+>>>>    include/linux/security.h      |  6 ++++--
+>>>>    security/keys/keyctl.c        | 11 ++++++++---
+>>>>    security/security.c           | 26 +++++++++++++++++++++-----
+>>>>    security/selinux/hooks.c      | 11 +++++------
+>>>>    security/smack/smack_lsm.c    | 21 +++++++++++----------
+>>>>    6 files changed, 51 insertions(+), 27 deletions(-)
+> 
+> ...
+> 
+>>>> diff --git a/security/security.c b/security/security.c
+>>>> index 9dd2ae6cf763..2c161101074d 100644
+>>>> --- a/security/security.c
+>>>> +++ b/security/security.c
+>>>> @@ -5338,19 +5338,35 @@ int security_key_permission(key_ref_t key_ref, const struct cred *cred,
+>>>>     * security_key_getsecurity() - Get the key's security label
+>>>>     * @key: key
+>>>>     * @buffer: security label buffer
+>>>> + * @len: the length of @buffer (including terminating NULL) on success
+>>>>     *
+>>>>     * Get a textual representation of the security context attached to a key for
+>>>>     * the purposes of honouring KEYCTL_GETSECURITY.  This function allocates the
+>>>>     * storage for the NUL-terminated string and the caller should free it.
+>>>>     *
+>>>> - * Return: Returns the length of @buffer (including terminating NUL) or -ve if
+>>>> - *         an error occurs.  May also return 0 (and a NULL buffer pointer) if
+>>>> - *         there is no security label assigned to the key.
+>>>> + * Return: Returns 0 on success or -ve if an error occurs. May also return 0
+>>>> + *         (and a NULL buffer pointer) if there is no security label assigned
+>>>> + *         to the key.
+>>>>     */
+>>>> -int security_key_getsecurity(struct key *key, char **buffer)
+>>>> +int security_key_getsecurity(struct key *key, char **buffer, size_t *len)
+>>>>    {
+>>>> +    int rc;
+>>>> +    size_t n = 0;
+>>>> +    struct security_hook_list *hp;
+>>>> +
+>>>>       *buffer = NULL;
+>>>> -    return call_int_hook(key_getsecurity, key, buffer);
+>>>> +
+>>>> +    hlist_for_each_entry(hp, &security_hook_heads.key_getsecurity, list) {
+>>>> +            rc = hp->hook.key_getsecurity(key, buffer, &n);
+>>>> +            if (rc < 0)
+>>>> +                    return rc;
+>>>> +            if (n)
+>>>> +                    break;
+>>>> +    }
+>>>> +
+>>>> +    *len = n;
+>>>> +
+>>>> +    return 0;
+>>>>    }
+>>>
+>>> Help me understand why we can't continue to use the call_int_hook()
+>>> macro here?
+>>>
+>>
+>> Before this patch, the hook may return +ve, 0, or -ve, and call_int_hook
+>> breaks the loop when the hook return value is not 0.
+>>
+>> After this patch, the +ve is stored in @n, so @n and return value should
+>> both be checked to determine whether to break the loop. This is not
+>> feasible with call_int_hook.
+> 
+> Yes, gotcha.  I was focused on the error condition and wasn't thinking
+> about the length getting zero'd out by a trailing callback.
+> Unfortunately, we *really* want to stick with the
+> call_{int,void}_hook() macros so I think we either need to find a way
+> to work within that constraint for existing macro callers, or we have
+> to leave this hook as-is for the moment.
+> 
 
-MSG_SPLICE_PAGES enables skb_splice_from_iter() which checks all the
-pages it sends with sendpage_ok().
-
-When _drbd_send_page() sends an iterator that the first page is
-sendable, but one of the other pages isn't skb_splice_from_iter() warns
-and aborts the data transfer.
-
-Using the new helper sendpages_ok() in order to enable MSG_SPLICE_PAGES
-solves the issue.
-
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Signed-off-by: Ofir Gal <ofir.gal@volumez.com>
----
- drivers/block/drbd/drbd_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index f92673f05c7a..3d02015c1ddc 100644
---- a/drivers/block/drbd/drbd_main.c
-+++ b/drivers/block/drbd/drbd_main.c
-@@ -1550,7 +1550,7 @@ static int _drbd_send_page(struct drbd_peer_device *peer_device, struct page *pa
- 	 * put_page(); and would cause either a VM_BUG directly, or
- 	 * __page_cache_release a page that would actually still be referenced
- 	 * by someone, leading to some obscure delayed Oops somewhere else. */
--	if (!drbd_disable_sendpage && sendpage_ok(page))
-+	if (!drbd_disable_sendpage && sendpages_ok(page, len, offset))
- 		msg.msg_flags |= MSG_NOSIGNAL | MSG_SPLICE_PAGES;
- 
- 	drbd_update_congested(peer_device->connection);
--- 
-2.45.1
+Let's leave it as is. So we ultimately have four hooks that can be
+converted, two of which require adding additional output parameter to
+hold odd return values. These output parameters require extra work
+on the BPF verifier, and it doesn't seem worthwhile just for two
+hooks. So I prefer to keep only the two patches that handle
+conversion without adding output parameters (patch 1 and 5).
 
 
