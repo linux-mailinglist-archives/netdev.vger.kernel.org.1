@@ -1,243 +1,225 @@
-Return-Path: <netdev+bounces-112653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4779B93A534
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 19:59:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5700693A65C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 20:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8432A28296C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 17:58:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA83F1F22CE9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79938158211;
-	Tue, 23 Jul 2024 17:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9736158A01;
+	Tue, 23 Jul 2024 18:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7zR0Ub/"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="aFepVZkW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0704156C5F
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 17:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D1015887F
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 18:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721757536; cv=none; b=VPrcR0VRg/4d+1g6hkpq2NUjSKBgzi04q4eM7WFSgGa8ngNp752hh67PL+VaujJJfis3Zgo1Xs29VV9Va9n6LIryHeZvh+UK6SrqvWX9Ij4ZtCP5bBhRnKYXxBrHfguMiU1DBTXJGPQFRx8hysU+SuN7mm9WDeDsN4tarKxANXw=
+	t=1721759658; cv=none; b=pdLkcT7J5zUPJP/DIG4If0QEusAHoBwabHB62U9WBLDogQHi93QpOoHfni23rEhi95yiWvH45A6H5/TeV4TdntZg+u+4sYQxN4LpQcvYcLn9TvX7jG/T1TAzV/Mw+kx6npy6GeBBHa15x+zm/5xaIXJYJ9zIYeZD74wcpFkw5nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721757536; c=relaxed/simple;
-	bh=QAFEw8auFi9UumLl2RBo6tL9aOds6/xwHX2unrWLgDo=;
+	s=arc-20240116; t=1721759658; c=relaxed/simple;
+	bh=/BDujCC1m34ov27OfSvcr6YJrOqVpBj1SDvh/3UsOlU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uEaDMILr0ojVqSi7pvyFHxTIiAgromiragV9vTaJLU/bZ/PF4go5+JJ8o1cSvjjT4DBcqxyDN1nHxc6DKe12IGji8JU5fG2aVu6UT+w57T99B4GZ889AU3lzreyUUVXv7IpyTWm1YTtp2LQZ4xYS/lAH3+s3IVcSTdZPnzqxA1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7zR0Ub/; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5a2ffc34677so4884272a12.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 10:58:54 -0700 (PDT)
+	 To:Cc:Content-Type; b=MZvpyHFrsgWJY3V0hOo2/fB83Ij/0lN0mSXUGZgk0Gfh5TYWinb0dAm0J/k+y8WCMDci8S3VNILX7pbt6YzZUnaBnlulldQ2Yt4X7wkttEemHi4tcrH8pQ9hrnKuOVhfRktCs79Nufz0hrgkiT1ktqdLTmMDvsbY1PdZvTIZf14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=aFepVZkW; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e05eccfcdb3so5462943276.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 11:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721757533; x=1722362333; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1721759655; x=1722364455; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HarFZ2y7M06ORFjFQVm6D25MQj8us1WC0TR2iEf/XNQ=;
-        b=b7zR0Ub/Vj2T2Tb4sOWRs+giiS5bbpHpwwAUB9YIwRKZ8x0j7vaHzXUgEHv04oXF24
-         687/mBkfWMSqj5lqzZTylU/fpRH95rfoMec+2hzG5v4syJdOUHvM5tf3V9Y80On0mw95
-         SCSzBleVGUXC+yafunXLuyZU799cbHUlPMDQtM28/1TFJVhxEOfaAyGjaM/Sh3a+YbTm
-         3l+kAOiOzuyRzn4pYJeo+pIX6wPwMAuCAV1iI2/q+w55vig1UP6bHTsim0gRERV917I3
-         eKjkXz8aQvdImAiZpSHclWH8q0sVgq4gz/vgtya5G9nadHlGcGh0BPsfzA1V/24p4vVR
-         FwZQ==
+        bh=Umx7dac9KxgI1oocDLH/hx1evzjsOlrXNT+tzGIsg7k=;
+        b=aFepVZkWo816N4mggXBCyxO8EYpfjir9sv3wzJyUlO/Brxq1ogEQQCmErHOsWvOdpn
+         GEKaw3Ar0YNNjJJXto3U9ymA7CHHwCHvrEZGW2qB1KaWcN4BYF2/eYVSEp5dmIl44ain
+         2qkv+MAeuV1nunFiLAt19CLxls2oALpPIPqkxlTeDO+1DgQv2x3OZ35exOhUf3me8Yvb
+         t1PeWMYKTpQAEdmm47UaoG0jPgaMtux5w0fBctyxEwItK8Mnw7OA35RPafGl4lh62z+H
+         RnI1p+Pb5kwiQxZor2rqBP+jNDgpDHf7QDK0wQ5hHImC7v9Ok0S3afv/4imlHvK6CuWp
+         QBrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721757533; x=1722362333;
+        d=1e100.net; s=20230601; t=1721759655; x=1722364455;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HarFZ2y7M06ORFjFQVm6D25MQj8us1WC0TR2iEf/XNQ=;
-        b=szaeo1ineX+mgIToedptRA+EjhBP5nsrdaRaFhHWn5JmF7dAx809leywhSwcFdQNeg
-         1W/Qtlwt3DUVzYC+9PXrqzM+iR8zKnMhhQbpmoQAGCIOkIiyMKPEvw/GfrTg2QeoFA7b
-         0zo9iEgtDfHYLfrQC+F12AvnqOre8Ryx5DNKxWLrvavtz8gy34TTJJzROoA1v3rz4PkY
-         u1B/6SMsTMgqgCJcAZ6RJP2D9fFN1w/0pPtAFow6OuRzfNaFaDKiy4zh65HPyNvPahCf
-         qlTJxNKfB0Q46g9bMzXipq1R+hJfLisce3ldNEUUEhfocrGWeuUggRNdddKApCA2wWdK
-         cTeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWvLcq4b0EicHFn+1lSd834oEZCGTJGb3Fe4sQu3nAmt9Pl1VJVPrrrHkqtHFXYiimkQLeC1mNSMQvPt6eXPKrQ78F8FofG
-X-Gm-Message-State: AOJu0YyrYBgKiV3sn4ZgUfnQu78IFt4kjh1rkrNNATv3IHrYyFXXwJSO
-	KTuR6li9HXUEcftd4rc1jBX6PHND5JuytRo0FJ4f6F1rFv6D1/tsNlHGBQfXuRFlg7jSbM9/koR
-	K3NLNpNxYb9Xrs7wMvPtDXXRE5EY=
-X-Google-Smtp-Source: AGHT+IGI7QTKJNLmnZq80QjBEMIaOCnaQg3QJD5gLoVZp1EVKOi8GqUMEQAsfB3StQ0QNL/jWqn1tBgnXZbzT5WjKZ4=
-X-Received: by 2002:a50:ccc2:0:b0:5a2:1f7b:dfff with SMTP id
- 4fb4d7f45d1cf-5a478b79a8fmr6326319a12.6.1721757532619; Tue, 23 Jul 2024
- 10:58:52 -0700 (PDT)
+        bh=Umx7dac9KxgI1oocDLH/hx1evzjsOlrXNT+tzGIsg7k=;
+        b=papEUg2YzJlkXevsSaoxg5VpXtlAOJTjhFvOz3K+wsOUWcAKppDJrcHk72BSgEZMUa
+         VIcMnqak5vZaKfWtBnCIAzVMyhKUvhBHppHTZu5xlwr1CD7LmSL4wgEFiJTNHh5kZkCt
+         Jmnl7Xq0lsxYHvV9BO0s0FOtv65tjlSFHVmirNbpm8zYYV+OcKTGAZYBu/InLtKhsGHL
+         ad1PF+zjsiia6ThMXSYTm+jMHwENW62AXlsr99UmTCvnOTuD0O6S7elPXCeHwHZRtBmI
+         E6AJoW4BxwSfnhifm50UzKzohX3KKMOCnt6Mu58gSXE45V/dZw2NRg6uXuyqQEKi9Mtp
+         UXnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEhjWt1FhRmD8tqeZN52/vzKSSX+zG3Hf8U4lYKGvNzl6SwKI3XfMVOVskAtA5kUoK5ttfGp8Wjzss958oQjoymNy7GhdC
+X-Gm-Message-State: AOJu0YxKsw0aQX0r/CrqVzarUulaAnJnfPB1BVZVVDKe5W3jJajM3+zh
+	Rl42lIUndKxXtxZFVAMrFFjQDc7EOirSSDwZx9r4DGPcGLsJkZzJ/7bAN0lqcJIbpd8VtUEmSYg
+	KH2oBWzO+6fkoHa4X1+MkxjY+FCBmSh2Xj5iX
+X-Google-Smtp-Source: AGHT+IEk6clKXMmbj8F9c4ALs9K9k0S5PErz2GXRvQye1XVqqzrWp12U0J4otwfEg5J3qaVWYV/s7JesHhJr3dvtkHg=
+X-Received: by 2002:a05:6902:11cc:b0:e08:551f:c90f with SMTP id
+ 3f1490d57ef6-e087b2eaaa6mr11618458276.7.1721759655226; Tue, 23 Jul 2024
+ 11:34:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240721053554.1233549-1-ap420073@gmail.com> <dcdf039f-4040-4a31-9738-367eda59fd04@amd.com>
-In-Reply-To: <dcdf039f-4040-4a31-9738-367eda59fd04@amd.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 24 Jul 2024 02:58:41 +0900
-Message-ID: <CAMArcTUA9a7Jndk8aNK6cxth=B4UqgPhpJKk1++KXrQrzJXMzA@mail.gmail.com>
-Subject: Re: [PATCH net v2] bnxt_en: update xdp_rxq_info in queue restart logic
-To: Brett Creeley <bcreeley@amd.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, michael.chan@broadcom.com, netdev@vger.kernel.org, 
-	somnath.kotur@broadcom.com, dw@davidwei.uk, horms@kernel.org
+References: <20240711111908.3817636-10-xukuohai@huaweicloud.com>
+ <94a3b82a1e3e1fec77d676fa382105d4@paul-moore.com> <7711bdba-9fbd-406c-8b81-adf91074d0b7@huaweicloud.com>
+ <CAHC9VhSsCuJzJ3ReUTyTXfWqRd+_TfShJBnRugZtX6OrMYJkOQ@mail.gmail.com> <b1ba86f7-f943-4913-8265-2a94f3951a88@huaweicloud.com>
+In-Reply-To: <b1ba86f7-f943-4913-8265-2a94f3951a88@huaweicloud.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 23 Jul 2024 14:34:04 -0400
+Message-ID: <CAHC9VhQhLE8aunBsSvoGv2dWw3TGihXhXCJO1eSbx2VRAf5GDQ@mail.gmail.com>
+Subject: Re: [PATCH v4 9/20] lsm: Refactor return value of LSM hook key_getsecurity
+To: Xu Kuohai <xukuohai@huaweicloud.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-integrity@vger.kernel.org, selinux@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Matt Bobrowski <mattbobrowski@google.com>, Brendan Jackman <jackmanb@chromium.org>, 
+	James Morris <jmorris@namei.org>, "Serge E . Hallyn" <serge@hallyn.com>, 
+	Khadija Kamran <kamrankhadijadj@gmail.com>, Casey Schaufler <casey@schaufler-ca.com>, 
+	Ondrej Mosnacek <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>, 
+	John Johansen <john.johansen@canonical.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Roberto Sassu <roberto.sassu@huawei.com>, Shung-Hsi Yu <shung-hsi.yu@suse.com>, 
+	Edward Cree <ecree.xilinx@gmail.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	Anna Schumaker <anna@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Stephen Smalley <stephen.smalley.work@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 24, 2024 at 12:42=E2=80=AFAM Brett Creeley <bcreeley@amd.com> w=
-rote:
+On Tue, Jul 23, 2024 at 3:04=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.com=
+> wrote:
+> On 7/23/2024 5:35 AM, Paul Moore wrote:
+> > On Sat, Jul 20, 2024 at 5:31=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud=
+.com> wrote:
+> >> On 7/19/2024 10:08 AM, Paul Moore wrote:
+> >>> On Jul 11, 2024 Xu Kuohai <xukuohai@huaweicloud.com> wrote:
+> >>>>
+> >>>> To be consistent with most LSM hooks, convert the return value of
+> >>>> hook key_getsecurity to 0 or a negative error code.
+> >>>>
+> >>>> Before:
+> >>>> - Hook key_getsecurity returns length of value on success or a
+> >>>>     negative error code on failure.
+> >>>>
+> >>>> After:
+> >>>> - Hook key_getsecurity returns 0 on success or a negative error
+> >>>>     code on failure. An output parameter @len is introduced to hold
+> >>>>     the length of value on success.
+> >>>>
+> >>>> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+> >>>> ---
+> >>>>    include/linux/lsm_hook_defs.h |  3 ++-
+> >>>>    include/linux/security.h      |  6 ++++--
+> >>>>    security/keys/keyctl.c        | 11 ++++++++---
+> >>>>    security/security.c           | 26 +++++++++++++++++++++-----
+> >>>>    security/selinux/hooks.c      | 11 +++++------
+> >>>>    security/smack/smack_lsm.c    | 21 +++++++++++----------
+> >>>>    6 files changed, 51 insertions(+), 27 deletions(-)
+> >
+> > ...
+> >
+> >>>> diff --git a/security/security.c b/security/security.c
+> >>>> index 9dd2ae6cf763..2c161101074d 100644
+> >>>> --- a/security/security.c
+> >>>> +++ b/security/security.c
+> >>>> @@ -5338,19 +5338,35 @@ int security_key_permission(key_ref_t key_re=
+f, const struct cred *cred,
+> >>>>     * security_key_getsecurity() - Get the key's security label
+> >>>>     * @key: key
+> >>>>     * @buffer: security label buffer
+> >>>> + * @len: the length of @buffer (including terminating NULL) on succ=
+ess
+> >>>>     *
+> >>>>     * Get a textual representation of the security context attached =
+to a key for
+> >>>>     * the purposes of honouring KEYCTL_GETSECURITY.  This function a=
+llocates the
+> >>>>     * storage for the NUL-terminated string and the caller should fr=
+ee it.
+> >>>>     *
+> >>>> - * Return: Returns the length of @buffer (including terminating NUL=
+) or -ve if
+> >>>> - *         an error occurs.  May also return 0 (and a NULL buffer p=
+ointer) if
+> >>>> - *         there is no security label assigned to the key.
+> >>>> + * Return: Returns 0 on success or -ve if an error occurs. May also=
+ return 0
+> >>>> + *         (and a NULL buffer pointer) if there is no security labe=
+l assigned
+> >>>> + *         to the key.
+> >>>>     */
+> >>>> -int security_key_getsecurity(struct key *key, char **buffer)
+> >>>> +int security_key_getsecurity(struct key *key, char **buffer, size_t=
+ *len)
+> >>>>    {
+> >>>> +    int rc;
+> >>>> +    size_t n =3D 0;
+> >>>> +    struct security_hook_list *hp;
+> >>>> +
+> >>>>       *buffer =3D NULL;
+> >>>> -    return call_int_hook(key_getsecurity, key, buffer);
+> >>>> +
+> >>>> +    hlist_for_each_entry(hp, &security_hook_heads.key_getsecurity, =
+list) {
+> >>>> +            rc =3D hp->hook.key_getsecurity(key, buffer, &n);
+> >>>> +            if (rc < 0)
+> >>>> +                    return rc;
+> >>>> +            if (n)
+> >>>> +                    break;
+> >>>> +    }
+> >>>> +
+> >>>> +    *len =3D n;
+> >>>> +
+> >>>> +    return 0;
+> >>>>    }
+> >>>
+> >>> Help me understand why we can't continue to use the call_int_hook()
+> >>> macro here?
+> >>>
+> >>
+> >> Before this patch, the hook may return +ve, 0, or -ve, and call_int_ho=
+ok
+> >> breaks the loop when the hook return value is not 0.
+> >>
+> >> After this patch, the +ve is stored in @n, so @n and return value shou=
+ld
+> >> both be checked to determine whether to break the loop. This is not
+> >> feasible with call_int_hook.
+> >
+> > Yes, gotcha.  I was focused on the error condition and wasn't thinking
+> > about the length getting zero'd out by a trailing callback.
+> > Unfortunately, we *really* want to stick with the
+> > call_{int,void}_hook() macros so I think we either need to find a way
+> > to work within that constraint for existing macro callers, or we have
+> > to leave this hook as-is for the moment.
+> >
 >
+> Let's leave it as is. So we ultimately have four hooks that can be
+> converted, two of which require adding additional output parameter to
+> hold odd return values. These output parameters require extra work
+> on the BPF verifier, and it doesn't seem worthwhile just for two
+> hooks. So I prefer to keep only the two patches that handle
+> conversion without adding output parameters (patch 1 and 5).
 
-Hi Brett,
-Thanks a lot for the review!
+Fair enough.  Thanks for working on this, between the changes to the
+LSM framework and the BPF verifier, I think this is still a nice
+improvement.
 
->
->
-> On 7/20/2024 10:35 PM, Taehee Yoo wrote:
-> > Caution: This message originated from an External Source. Use proper ca=
-ution when opening attachments, clicking links, or responding.
-> >
-> >
-> > When the netdev_rx_queue_restart() restarts queues, the bnxt_en driver
-> > updates(creates and deletes) a page_pool.
-> > But it doesn't update xdp_rxq_info, so the xdp_rxq_info is still
-> > connected to an old page_pool.
-> > So, bnxt_rx_ring_info->page_pool indicates a new page_pool, but
-> > bnxt_rx_ring_info->xdp_rxq is still connected to an old page_pool.
-> >
-> > An old page_pool is no longer used so it is supposed to be
-> > deleted by page_pool_destroy() but it isn't.
-> > Because the xdp_rxq_info is holding the reference count for it and the
-> > xdp_rxq_info is not updated, an old page_pool will not be deleted in
-> > the queue restart logic.
-> >
-> > Before restarting 1 queue:
-> > ./tools/net/ynl/samples/page-pool
-> > enp10s0f1np1[6] page pools: 4 (zombies: 0)
-> >          refs: 8192 bytes: 33554432 (refs: 0 bytes: 0)
-> >          recycling: 0.0% (alloc: 128:8048 recycle: 0:0)
-> >
-> > After restarting 1 queue:
-> > ./tools/net/ynl/samples/page-pool
-> > enp10s0f1np1[6] page pools: 5 (zombies: 0)
-> >          refs: 10240 bytes: 41943040 (refs: 0 bytes: 0)
-> >          recycling: 20.0% (alloc: 160:10080 recycle: 1920:128)
-> >
-> > Before restarting queues, an interface has 4 page_pools.
-> > After restarting one queue, an interface has 5 page_pools, but it
-> > should be 4, not 5.
-> > The reason is that queue restarting logic creates a new page_pool and
-> > an old page_pool is not deleted due to the absence of an update of
-> > xdp_rxq_info logic.
-> >
-> > Fixes: 2d694c27d32e ("bnxt_en: implement netdev_queue_mgmt_ops")
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v2:
-> >   - Do not use memcpy in the bnxt_queue_start
-> >   - Call xdp_rxq_info_unreg() before page_pool_destroy() in the
-> >     bnxt_queue_mem_free().
-> >
-> >   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 17 +++++++++++++++++
-> >   1 file changed, 17 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
-hernet/broadcom/bnxt/bnxt.c
-> > index bb3be33c1bbd..ffa74c26ee53 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > @@ -4052,6 +4052,7 @@ static void bnxt_reset_rx_ring_struct(struct bnxt=
- *bp,
-> >
-> >          rxr->page_pool->p.napi =3D NULL;
-> >          rxr->page_pool =3D NULL;
-> > +       memset(&rxr->xdp_rxq, 0, sizeof(struct xdp_rxq_info));
-> >
-> >          ring =3D &rxr->rx_ring_struct;
-> >          rmem =3D &ring->ring_mem;
-> > @@ -15018,6 +15019,16 @@ static int bnxt_queue_mem_alloc(struct net_dev=
-ice *dev, void *qmem, int idx)
-> >          if (rc)
-> >                  return rc;
-> >
-> > +       rc =3D xdp_rxq_info_reg(&clone->xdp_rxq, bp->dev, idx, 0);
-> > +       if (rc < 0)
-> > +               goto err_page_pool_destroy;
-> > +
-> > +       rc =3D xdp_rxq_info_reg_mem_model(&clone->xdp_rxq,
-> > +                                       MEM_TYPE_PAGE_POOL,
-> > +                                       clone->page_pool);
-> > +       if (rc)
-> > +               goto err_rxq_info_unreg;
-> > +
-> >          ring =3D &clone->rx_ring_struct;
-> >          rc =3D bnxt_alloc_ring(bp, &ring->ring_mem);
-> >          if (rc)
-> > @@ -15047,6 +15058,9 @@ static int bnxt_queue_mem_alloc(struct net_devi=
-ce *dev, void *qmem, int idx)
-> >          bnxt_free_ring(bp, &clone->rx_agg_ring_struct.ring_mem);
-> >   err_free_rx_ring:
-> >          bnxt_free_ring(bp, &clone->rx_ring_struct.ring_mem);
-> > +err_rxq_info_unreg:
-> > +       xdp_rxq_info_unreg(&clone->xdp_rxq);
->
-> I think care needs to be taken calling xdp_rxq_info_unreg() here and
-> then page_pool_destroy() below due to the xdp_rxq_info_unreg() call flow
-> eventually calling page_pool_destroy(). Similar comment below.
->
-> > +err_page_pool_destroy:
-> >          clone->page_pool->p.napi =3D NULL;
-> >          page_pool_destroy(clone->page_pool);
-> >          clone->page_pool =3D NULL;
-> > @@ -15062,6 +15076,8 @@ static void bnxt_queue_mem_free(struct net_devi=
-ce *dev, void *qmem)
-> >          bnxt_free_one_rx_ring(bp, rxr);
-> >          bnxt_free_one_rx_agg_ring(bp, rxr);
-> >
-> > +       xdp_rxq_info_unreg(&rxr->xdp_rxq);
-> > +
->
-> If the memory type is MEM_TYPE_PAGE_POOL, xdp_rxq_info_unreg() will
-> eventually call page_pool_destroy(). Unless I am missing something I
-> think you want to remove the call below to page_pool_destroy()?
->
-
-I think both page_pool_destroy() and xdp_rxq_info_unreg() are needed here.
-Because the page_pools are managed by reference count.
-
-When a page_pool is created by page_pool_create(), its count is 1 and it
-will be destroyed if the count reaches 0. The page_pool_destroy()
-decreases a reference count so that page_pool will be destroyed.
-The xdp_rxq_info_reg() also holds a reference count for page_pool if
-the memory type is page_pool.
-
-As you mentioned xdp_rxq_info_unreg() internally calls page_pool_destroy()
-if the memory type is page pool.
-So, to destroy page_pool if xdp_rxq_info was registered,
-both xdp_rxq_info_unreg() and page_pool_destroy() should be called.
-
-Thanks a lot!
-Tahee Yoo
-
-> Thanks,
->
-> Brett
->
-> >          page_pool_destroy(rxr->page_pool);
-> >          rxr->page_pool =3D NULL;
-> >
-> > @@ -15145,6 +15161,7 @@ static int bnxt_queue_start(struct net_device *=
-dev, void *qmem, int idx)
-> >          rxr->rx_sw_agg_prod =3D clone->rx_sw_agg_prod;
-> >          rxr->rx_next_cons =3D clone->rx_next_cons;
-> >          rxr->page_pool =3D clone->page_pool;
-> > +       rxr->xdp_rxq =3D clone->xdp_rxq;
-> >
-> >          bnxt_copy_rx_ring(bp, rxr, clone);
-> >
-> > --
-> > 2.34.1
-> >
-> >
+--=20
+paul-moore.com
 
