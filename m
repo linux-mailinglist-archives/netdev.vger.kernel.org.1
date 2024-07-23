@@ -1,180 +1,93 @@
-Return-Path: <netdev+bounces-112657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEDDA93A6C2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 20:38:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0919593A75C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 20:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A816E282FE0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:38:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86915B2099C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AE7158A22;
-	Tue, 23 Jul 2024 18:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC29113C838;
+	Tue, 23 Jul 2024 18:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pQqIIMhG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Wbolrxaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEEC1581F4;
-	Tue, 23 Jul 2024 18:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4862E83F;
+	Tue, 23 Jul 2024 18:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721759900; cv=none; b=C5sGXzE350TTurvtHrmXKpGey6G3z5fn9XqswSGVUrEfDE6M4IbyoXqV3DwcllKWOfGdcq90Mybp6S7gU08RPcgxyM/9Nkk99k+p1EJoTDSYxWUvJrevuUmTQ9yZDNeM0m/n1WIg0sFMYoUtiB9pQmY9LUQykjWLB1K5FkBTAWw=
+	t=1721760321; cv=none; b=oLk2WvfRpNJ9EYJxRyn6Dxn/jn4cl158CMTT2g6lySShShom1iZafgqBb/XU5hGlO5uj9aIOzDh7PeTO4hEWpuEMUGbAGYPkzFD2qhlyaBrwieeGgbk3l5FRhZOLUZVefU+bRtFdqhFZCP0QGhPINpnYlMDFFsTVZ1uD3wY3Y4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721759900; c=relaxed/simple;
-	bh=V536Vqm0KYMwca4TgXD4b7z4Ep/y2muTHHMzmLmNltY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDg9dWYCLqEiKHqnOIeC1VSxD3CKyjC4FxNNlYvnXJ4UIIsF9Uwmb/dZEgFADDWabFLvBTD4+Sw2h4wanysMkztYfZKZVigrBxbflsMrxXdThqn0l0F0i7IMk0IFbzERCW1lVOV1BhtcJzOExIIrspgLzC9CdDoBFT4tRqmgo3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pQqIIMhG; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1721759898; x=1753295898;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jZ5fr5+fKmvdMkTMImNcWRvqdByhBvPSslajQWTEDPI=;
-  b=pQqIIMhGtTTd3YAe8AkIYz+4+OqbOJcTyf4CbtZ6n7IZYnIyWuBcT3Pb
-   Is1yF6art6FAtWn/jlNScvh4OF3070A+h59Q8szVTSWuykYtxctdMHpgT
-   ETWrHsOrth18KYjAUC6xogfsZrZdrUFfexr7u5wH5BeCxuLhxjrVrHM7y
-   U=;
-X-IronPort-AV: E=Sophos;i="6.09,231,1716249600"; 
-   d="scan'208";a="109072445"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 18:38:16 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:20351]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.254:2525] with esmtp (Farcaster)
- id aec1385b-6ebc-4f15-92cc-ad91f28f5955; Tue, 23 Jul 2024 18:38:16 +0000 (UTC)
-X-Farcaster-Flow-ID: aec1385b-6ebc-4f15-92cc-ad91f28f5955
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 23 Jul 2024 18:38:16 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.135.114) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 23 Jul 2024 18:38:13 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <horms@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <linux-can@vger.kernel.org>,
-	<mkl@pengutronix.de>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<socketcan@hartkopp.net>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v1 net] can: bcm: Remove proc entry when dev is unregistered.
-Date: Tue, 23 Jul 2024 11:38:05 -0700
-Message-ID: <20240723183805.31201-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240723090405.GB24657@kernel.org>
-References: <20240723090405.GB24657@kernel.org>
+	s=arc-20240116; t=1721760321; c=relaxed/simple;
+	bh=jnOBruHviiMeh3pNnPGssWCltycJrT40IYLXoFFlhlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OTX1Bs0I1Sjbq0MamquJndPXRAQ9Rw8tXNVgmorskqh1u//Q4hwZIBf+VBnV4aaEIP7VbZznyvEAxDjdgcm1IUl7I9+EepvFVqagyMcGY+2n2NutldD7RtdIjgZJNXD88pGRT2Yz+vYdrc42njhZpuS50KWDUxi+sBV6Huyemyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Wbolrxaj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=olTVMxjXOsU8mUVMWV8+A1UMYa9QIDnG8q/CEGjAZw8=; b=Wbolrxaj2GFm7onLCwu2ynt2th
+	1wAHNlOmz85RQQApeumtJ9mX3dQt11FeraN0x9Tbw65kVFBcdrE/Uau24+4krpDw4+oHmfpnlETyd
+	8dDUTj7RLzdqmApTsOenP+GZ4mkTiTidGt7Ltj6bQyq2u85YOrFsk32FefV81ZEFzPP0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sWKVd-0035J8-6w; Tue, 23 Jul 2024 20:45:13 +0200
+Date: Tue, 23 Jul 2024 20:45:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Cindy Lu <lulu@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com,
+	parav@nvidia.com, sgarzare@redhat.com, netdev@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATH v5 0/3] vdpa: support set mac address from vdpa tool
+Message-ID: <66239ba4-d837-48da-aaba-528c6ab05ce9@lunn.ch>
+References: <20240723054047.1059994-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240723054047.1059994-1-lulu@redhat.com>
 
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 23 Jul 2024 10:04:05 +0100
-> On Mon, Jul 22, 2024 at 12:28:42PM -0700, Kuniyuki Iwashima wrote:
-> > syzkaller reported a warning in bcm_connect() below. [0]
-> > 
-> > The repro calls connect() to vxcan1, removes vxcan1, and calls
-> > connect() with ifindex == 0.
-> > 
-> > Calling connect() for a BCM socket allocates a proc entry.
-> > Then, bcm_sk(sk)->bound is set to 1 to prevent further connect().
-> > 
-> > However, removing the bound device resets bcm_sk(sk)->bound to 0
-> > in bcm_notify().
-> > 
-> > The 2nd connect() tries to allocate a proc entry with the same
-> > name and sets NULL to bcm_sk(sk)->bcm_proc_read, leaking the
-> > original proc entry.
-> > 
-> > Since the proc entry is available only for connect()ed sockets,
-> > let's clean up the entry when the bound netdev is unregistered.
-> > 
-> > [0]:
-> > proc_dir_entry 'can-bcm/2456' already registered
-> > WARNING: CPU: 1 PID: 394 at fs/proc/generic.c:376 proc_register+0x645/0x8f0 fs/proc/generic.c:375
-> > Modules linked in:
-> > CPU: 1 PID: 394 Comm: syz-executor403 Not tainted 6.10.0-rc7-g852e42cc2dd4
-> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-> > RIP: 0010:proc_register+0x645/0x8f0 fs/proc/generic.c:375
-> > Code: 00 00 00 00 00 48 85 ed 0f 85 97 02 00 00 4d 85 f6 0f 85 9f 02 00 00 48 c7 c7 9b cb cf 87 48 89 de 4c 89 fa e8 1c 6f eb fe 90 <0f> 0b 90 90 48 c7 c7 98 37 99 89 e8 cb 7e 22 05 bb 00 00 00 10 48
-> > RSP: 0018:ffa0000000cd7c30 EFLAGS: 00010246
-> > RAX: 9e129be1950f0200 RBX: ff1100011b51582c RCX: ff1100011857cd80
-> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
-> > RBP: 0000000000000000 R08: ffd400000000000f R09: ff1100013e78cac0
-> > R10: ffac800000cd7980 R11: ff1100013e12b1f0 R12: 0000000000000000
-> > R13: 0000000000000000 R14: 0000000000000000 R15: ff1100011a99a2ec
-> > FS:  00007fbd7086f740(0000) GS:ff1100013fd00000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 00000000200071c0 CR3: 0000000118556004 CR4: 0000000000771ef0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-> > PKRU: 55555554
-> > Call Trace:
-> >  <TASK>
-> >  proc_create_net_single+0x144/0x210 fs/proc/proc_net.c:220
-> >  bcm_connect+0x472/0x840 net/can/bcm.c:1673
-> >  __sys_connect_file net/socket.c:2049 [inline]
-> >  __sys_connect+0x5d2/0x690 net/socket.c:2066
-> >  __do_sys_connect net/socket.c:2076 [inline]
-> >  __se_sys_connect net/socket.c:2073 [inline]
-> >  __x64_sys_connect+0x8f/0x100 net/socket.c:2073
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xd9/0x1c0 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> > RIP: 0033:0x7fbd708b0e5d
-> > Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
-> > RSP: 002b:00007fff8cd33f08 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-> > RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fbd708b0e5d
-> > RDX: 0000000000000010 RSI: 0000000020000040 RDI: 0000000000000003
-> > RBP: 0000000000000000 R08: 0000000000000040 R09: 0000000000000040
-> > R10: 0000000000000040 R11: 0000000000000246 R12: 00007fff8cd34098
-> > R13: 0000000000401280 R14: 0000000000406de8 R15: 00007fbd70ab9000
-> >  </TASK>
-> > remove_proc_entry: removing non-empty directory 'net/can-bcm', leaking at least '2456'
-> > 
-> > Fixes: ffd980f976e7 ("[CAN]: Add broadcast manager (bcm) protocol")
-> > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Tue, Jul 23, 2024 at 01:39:19PM +0800, Cindy Lu wrote:
+> Add support for setting the MAC address using the VDPA tool.
+> This feature will allow setting the MAC address using the VDPA tool.
+> For example, in vdpa_sim_net, the implementation sets the MAC address
+> to the config space. However, for other drivers, they can implement their
+> own function, not limited to the config space.
 > 
-> Thanks,
-> 
-> I agree that the problem was introduced by the cited commit
-> and is resolved by this patch.
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> 
-> > ---
-> >  net/can/bcm.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/net/can/bcm.c b/net/can/bcm.c
-> > index 27d5fcf0eac9..46d3ec3aa44b 100644
-> > --- a/net/can/bcm.c
-> > +++ b/net/can/bcm.c
-> > @@ -1470,6 +1470,10 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
-> >  
-> >  		/* remove device reference, if this is our bound device */
-> >  		if (bo->bound && bo->ifindex == dev->ifindex) {
-> > +#if IS_ENABLED(CONFIG_PROC_FS)
-> > +			if (sock_net(sk)->can.bcmproc_dir && bo->bcm_proc_read)
-> > +				remove_proc_entry(bo->procname, sock_net(sk)->can.bcmproc_dir);
-> > +#endif
-> 
-> As a fix this looks good. But I wonder if it is worth following up
-> with a helper for the above as it inlines #if logic and now appears twice.
+> Changelog v2
+>  - Changed the function name to prevent misunderstanding
+>  - Added check for blk device
+>  - Addressed the comments
+> Changelog v3
+>  - Split the function of the net device from vdpa_nl_cmd_dev_attr_set_doit
+>  - Add a lock for the network device's dev_set_attr operation
+>  - Address the comments
+> Changelog v4
+>  - Address the comments
+>  - Add a lock for the vdap_sim?_net device's dev_set_attr operation
+> Changelog v5
+>  - Address the comments
 
-Other places also have #if guard for CONFIG_PROC_FS, so if needed,
-I'd move all of them into helper functions under a single #if in -next.
+This history is to help reviewers of previous versions know if there
+comments have been addressed. Just saying 'Address the comments' is
+not useful. Please give a one line summary of each of the comment
+which has been addressed, maybe including how it was addressed.
+
+      Andrew
+
 
