@@ -1,161 +1,208 @@
-Return-Path: <netdev+bounces-112684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE34893A953
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:28:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7852993A956
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847DA1F2197A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:28:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7B641C22465
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E7A14884B;
-	Tue, 23 Jul 2024 22:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFC213EFFB;
+	Tue, 23 Jul 2024 22:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="heXVl6jS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IlWCgZgm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC271487D1;
-	Tue, 23 Jul 2024 22:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708E2288D1;
+	Tue, 23 Jul 2024 22:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721773703; cv=none; b=KQEbNPZ+t5nvX0z+AVnOp8op+ilR6CqY/MIHDHKygBfGUDz1sXOt73gZvKusOoSKgFixjn9kjx7DhcxnymTocq7WcD/6qbOnss2fm6IUGINSj8FzUiqx/qKfMauNyXPEC6u3QgjGSbGdqPbIuaQfjKXyX3udEVRQXQHJfP8KgcQ=
+	t=1721773872; cv=none; b=HrBx/bWY8MiWA5oRx6eaFFBtFM96PIMsBl5fi23rDB06AijhFm5hdOLqnxfb7g/mTuz051gexzBJNzz0nxXP+3Jf5ETvPwkcLOY3zN+PnxA0VwupKmPqqKPIa7keZrJBohZc8CL0My1qxOPTJnsYtpgjZsUU+LWoefTGx6Jn1As=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721773703; c=relaxed/simple;
-	bh=vhEw1nDBqH/khMJ/eiR0TLM75/0lf2uUyUBKQewwZzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=VE+Sp+Nuit0KqVnjlUebGwFWd9a6e1vCIZ2rHQkw8wMjSOdtl/wzM18yPdU8Jx50aUct5zcnzeSnxU9ZlBxXf5b1I9Myy3oim+d6v2pQKeh9ezr1nk73XURe6YtB489hhmSfzEouXgGdu4CzUU8xdtPfEUE3BpQOQq+eQM4kZlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=heXVl6jS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E30B6C4AF09;
-	Tue, 23 Jul 2024 22:28:22 +0000 (UTC)
+	s=arc-20240116; t=1721773872; c=relaxed/simple;
+	bh=IxBRar1RxH89c3TNuKgry7Njs57mT04USb7aaNO0aFM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GwqhrJkeYswzbcnl7ffLJLuDKKVtH815xjZwXZ3Co2xAYV2SGDroYlQTMZOzYbdxoSxK9sOmIcrK+vzVpX9QGNLqBiTs5QthdpG9AQZK5OgPja0nFybvP0CT9ib5pyZ6ulFJHtzLWwqHaftYc0/IdqvFUj1hOqpUzgpPOpmmV5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IlWCgZgm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F83C4AF09;
+	Tue, 23 Jul 2024 22:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721773703;
-	bh=vhEw1nDBqH/khMJ/eiR0TLM75/0lf2uUyUBKQewwZzU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=heXVl6jS3m6TjPTuu8hwCG9LkYNSXM2Vl+bdRnNixEdHam4wSIDvUKVUtS9QRHsVE
-	 /acPNsL/YlvJHcs6A9uiZ4p/nFZXJSNLszvMBSdTo/wEP4KH0i8ba++af1IxNPdSJ0
-	 5SWi+wH/xzlCNGHmKPBVuqxZc6Waz2zSbgmdyqMiRDqvNZl93hMiLDccgmNUp1qATa
-	 +hciYBamwxKMgNjH9su6B/PMOvXZw5pTYT5P/kX3qw0dNd4VSZjR5jy9PfYMTtmq9s
-	 Gi7U/8Psqg9nhlMbMP1gPr0DigaqX6FzRke/Ssnwi8+zKH7Jr7mKOjLecmluADIVTy
-	 CXK2VYmLiBmxg==
-Date: Tue, 23 Jul 2024 17:28:21 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com
-Subject: Re: [PATCH V3 05/10] PCI/TPH: Introduce API to check interrupt
- vector mode support
-Message-ID: <20240723222821.GA779373@bhelgaas>
+	s=k20201202; t=1721773872;
+	bh=IxBRar1RxH89c3TNuKgry7Njs57mT04USb7aaNO0aFM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IlWCgZgmE18s7gUIX33ab9+TiYNgSArnBFSsBpEWH9JQoLa4QjkY8tD5HKD2Z/Zzt
+	 dSjY13vNr2PIxRd+0ufUbvCK86Rbd9FQCwf7jdbgf9wRQwk+/DnWmBV/HCA5MCofVK
+	 sqmyrYsTzSi6HL/4vYTLIkzsKWSnbPuaV2wstEaeJ7gocgSLvkYZ4VKy+qMF4I/vY3
+	 fHVZmXRSpNgblqXsZpRn0YA5sI8AkRx/jvwAo1wugyzD0rCzXPeYsRmh9HD+gee3O7
+	 q946DsnCvY+0NhVTdWL6XyejDnWlrrzl1W+dDcmDFIApAEs/RmBmQJCoTmLJHUWuGf
+	 C0mRQx+mdVthA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	willemdebruijn.kernel@gmail.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	shuah@kernel.org,
+	arefev@swemel.ru,
+	virtualization@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] virtio: fix GSO with frames unaligned to size
+Date: Tue, 23 Jul 2024 15:31:09 -0700
+Message-ID: <20240723223109.2196886-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240717205511.2541693-6-wei.huang2@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 17, 2024 at 03:55:06PM -0500, Wei Huang wrote:
-> Add an API function to allow endpoint device drivers to check
-> if the interrupt vector mode is allowed. If allowed, drivers
-> can proceed with updating ST tags.
+The commit under fixes added a questionable check to
+virtio_net_hdr_to_skb(). I'm guessing the check was supposed
+to protect from csum offset being outside of a segment
+(especially if len is not multiple of segment size).
 
-Wrap commit log to fill 75 columns
+The condition can't be right, tho, as it breaks previously
+working sending of GSO frames with only one segment
+(i.e. when gso_size <= len we silently ignore the GSO
+request and send a single non-GSO frame).
 
-Wrap code/comments to fit in 80.
+Fix the logic and move it to the GSO part.
 
-Here and below, capitalize technical terms defined in spec ("Interrupt
-Vector Mode", "Steering Tag").
+This has been caught by net/tap and net/psock_send.sh tests.
 
-> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> ---
->  drivers/pci/pcie/tph.c  | 29 +++++++++++++++++++++++++++++
->  include/linux/pci-tph.h |  3 +++
->  2 files changed, 32 insertions(+)
-> 
-> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
-> index fb8e2f920712..7183370b0977 100644
-> --- a/drivers/pci/pcie/tph.c
-> +++ b/drivers/pci/pcie/tph.c
-> @@ -39,6 +39,17 @@ static void set_ctrl_reg_req_en(struct pci_dev *pdev, u8 req_type)
->  	pci_write_config_dword(pdev, pdev->tph_cap + PCI_TPH_CTRL, reg_val);
->  }
->  
-> +static bool int_vec_mode_supported(struct pci_dev *pdev)
-> +{
-> +	u32 reg_val;
-> +	u8 mode;
-> +
-> +	pci_read_config_dword(pdev, pdev->tph_cap + PCI_TPH_CAP, &reg_val);
-> +	mode = FIELD_GET(PCI_TPH_CAP_INT_VEC, reg_val);
-> +
-> +	return !!mode;
-> +}
-> +
->  void pcie_tph_set_nostmode(struct pci_dev *pdev)
->  {
->  	if (!pdev->tph_cap)
-> @@ -60,3 +71,21 @@ void pcie_tph_init(struct pci_dev *pdev)
->  {
->  	pdev->tph_cap = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_TPH);
->  }
-> +
-> +/**
-> + * pcie_tph_intr_vec_supported() - Check if interrupt vector mode supported for dev
-> + * @pdev: pci device
-> + *
-> + * Return:
-> + *        true : intr vector mode supported
-> + *        false: intr vector mode not supported
-> + */
-> +bool pcie_tph_intr_vec_supported(struct pci_dev *pdev)
-> +{
-> +	if (!pdev->tph_cap || pci_tph_disabled() || !pdev->msix_enabled ||
-> +	    !int_vec_mode_supported(pdev))
-> +		return false;
+Fixes: e269d79c7d35 ("net: missing check virtio")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: willemdebruijn.kernel@gmail.com
+CC: mst@redhat.com
+CC: jasowang@redhat.com
+CC: xuanzhuo@linux.alibaba.com
+CC: eperezma@redhat.com
+CC: shuah@kernel.org
+CC: arefev@swemel.ru
+CC: virtualization@lists.linux.dev
+CC: linux-kselftest@vger.kernel.org
+---
+ include/linux/virtio_net.h        | 27 ++++++++++++++++-----------
+ tools/testing/selftests/net/tap.c | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 11 deletions(-)
 
-IMO the int_vec_mode_supported() helper is overkill and could be
-inlined here.  The other booleans can be checked first.
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index d1d7825318c3..c54b7aa42921 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -52,11 +52,11 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 					bool little_endian)
+ {
+ 	unsigned int nh_min_len = sizeof(struct iphdr);
++	unsigned int csum_needed = 0;
+ 	unsigned int gso_type = 0;
+ 	unsigned int thlen = 0;
+ 	unsigned int p_off = 0;
+ 	unsigned int ip_proto;
+-	u64 ret, remainder, gso_size;
+ 
+ 	if (hdr->gso_type != VIRTIO_NET_HDR_GSO_NONE) {
+ 		switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
+@@ -99,16 +99,6 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		u32 off = __virtio16_to_cpu(little_endian, hdr->csum_offset);
+ 		u32 needed = start + max_t(u32, thlen, off + sizeof(__sum16));
+ 
+-		if (hdr->gso_size) {
+-			gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
+-			ret = div64_u64_rem(skb->len, gso_size, &remainder);
+-			if (!(ret && (hdr->gso_size > needed) &&
+-						((remainder > needed) || (remainder == 0)))) {
+-				return -EINVAL;
+-			}
+-			skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
+-		}
+-
+ 		if (!pskb_may_pull(skb, needed))
+ 			return -EINVAL;
+ 
+@@ -119,6 +109,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		p_off = nh_min_len + thlen;
+ 		if (!pskb_may_pull(skb, p_off))
+ 			return -EINVAL;
++
++		csum_needed = needed;
+ 	} else {
+ 		/* gso packets without NEEDS_CSUM do not set transport_offset.
+ 		 * probe and drop if does not match one of the above types.
+@@ -188,6 +180,19 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		if (gso_size == GSO_BY_FRAGS)
+ 			return -EINVAL;
+ 
++		if (csum_needed) {
++			unsigned int p_rem, p_size;
++
++			p_size = gso_size;
++			p_rem = (skb->len - nh_off) % gso_size;
++			if (p_rem)
++				p_size = p_rem;
++
++			/* Make sure csum still within packet after GSO */
++			if (p_size + nh_off < csum_needed)
++				return -EINVAL;
++		}
++
+ 		/* Too small packets are not really GSO ones. */
+ 		if (skb->len - nh_off > gso_size) {
+ 			shinfo->gso_size = gso_size;
+diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
+index 247c3b3ac1c9..8527d51449cf 100644
+--- a/tools/testing/selftests/net/tap.c
++++ b/tools/testing/selftests/net/tap.c
+@@ -418,6 +418,36 @@ TEST_F(tap, test_packet_valid_udp_csum)
+ 	ASSERT_EQ(ret, off);
+ }
+ 
++TEST_F(tap, test_packet_invalid_udp_gso_csum)
++{
++	uint8_t pkt[TEST_PACKET_SZ];
++	uint16_t payload;
++	size_t off;
++	int ret;
++	int i;
++
++	payload = ETH_DATA_LEN - sizeof(struct iphdr) - sizeof(struct udphdr);
++
++	memset(pkt, 0, sizeof(pkt));
++	off = build_test_packet_valid_udp_gso(pkt, payload);
++
++	for (i = -16; i < 16; i++) {
++		ret = write(self->fd, pkt, off + i);
++
++		if (i <= 0 ||
++		    i > __builtin_offsetof(struct udphdr, check) + 1) {
++			EXPECT_EQ(ret, off + i)
++				TH_LOG("mismatch with offset: %d (%zd)",
++				       i, off + i);
++		} else {
++			EXPECT_EQ(ret, -1)
++				TH_LOG("mismatch with offset: %d (%zd)",
++				       i, off + i);
++			EXPECT_EQ(errno, 22);
++		}
++	}
++}
++
+ TEST_F(tap, test_packet_crash_tap_invalid_eth_proto)
+ {
+ 	uint8_t pkt[TEST_PACKET_SZ];
+-- 
+2.45.2
 
-> +
-> +	return true;
-> +}
-> +EXPORT_SYMBOL(pcie_tph_intr_vec_supported);
-> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
-> index 8fce3969277c..854677651d81 100644
-> --- a/include/linux/pci-tph.h
-> +++ b/include/linux/pci-tph.h
-> @@ -12,9 +12,12 @@
->  #ifdef CONFIG_PCIE_TPH
->  void pcie_tph_disable(struct pci_dev *dev);
->  void pcie_tph_set_nostmode(struct pci_dev *dev);
-> +bool pcie_tph_intr_vec_supported(struct pci_dev *dev);
->  #else
->  static inline void pcie_tph_disable(struct pci_dev *dev) {}
->  static inline void pcie_tph_set_nostmode(struct pci_dev *dev) {}
-> +static inline bool pcie_tph_intr_vec_supported(struct pci_dev *dev)
-> +{ return false; }
->  #endif
->  
->  #endif /* LINUX_PCI_TPH_H */
-> -- 
-> 2.45.1
-> 
 
