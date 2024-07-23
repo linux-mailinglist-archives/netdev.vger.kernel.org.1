@@ -1,119 +1,148 @@
-Return-Path: <netdev+bounces-112538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 842BC939CA2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 10:28:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A059939CA9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 10:31:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FCB41F21914
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 08:28:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB91E1C21B52
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 08:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD8514BF8A;
-	Tue, 23 Jul 2024 08:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B148314A0A4;
+	Tue, 23 Jul 2024 08:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sDUYPHVI"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Mrse2xCZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F2E14AD22
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 08:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA05E1370
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 08:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721723312; cv=none; b=pqmIeaTLh7lajLEs8Wp0tXyLDX5s4cUAJGNASfcZDqlo/4AwQCH32eL0VXkLN3nPho3pS94ODWBFqPV3HMp7Au53ELe7bJTgQBCNIOyQvZsDQVajdcGj8M/ibKp3QxwuamQiMUK2oxegeWiFIQKr6VNFZILZYpfs9Nu6cBa43gs=
+	t=1721723460; cv=none; b=pDu3QNNwWCxxz4h70MOcRcdsFCzf3xYs7Aj/Rpe9ZiNAcXqUScdxjkNOKgq1RpoLDxAeh3pKttA1ezMt9DmkTba3tNEeoIu1WDHtQTqJDKBBEfLvkuDOMav3eSTxQsv6ajiFnUVisw7CoWmS4bB/I9+hCSdNeq1C4gE/1e/CVkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721723312; c=relaxed/simple;
-	bh=87LPnRxAwq0qVgYtmAP6rfez3yLfDuM9Myiv4L8t7Q0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X0AdUjqkOfcaprDrU2Vf5HGbjBeRt0dwhXohFie/TMdMPrqMcsmfRpYT3OBMBiyZ2vH4zJBmTeNdQkjQd16rrT3RyV/4OfTyqCkuQWS+2tV5aQ7de45Su/UtT28UdaMopePwwXUQ1WGzDajCtUMRBGZ+zXfi2cmEoJeekaKvzX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sDUYPHVI; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5a869e3e9dfso11967a12.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 01:28:30 -0700 (PDT)
+	s=arc-20240116; t=1721723460; c=relaxed/simple;
+	bh=SrWX3VQijbUeAucWDp6ga4EJ90X99IuuDWOGGHvwIN8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nJ3c4bQI0srv/AVUvSTgXnR/ZvzwdOfCMPfxHjV2SLC4eBVMk8uCRJ6y3LkPF6adSJJj4UyDU4tKOt0+fMt1I37ces7EfrJ6bEBEV5NF0CWcNrw2tHJYVJ7+tR38QNMa0NRBhUEeB+36ngDRMV+3YYYed9dBYei+EuUE7e9XJ2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Mrse2xCZ; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a1c496335aso2236149a12.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 01:30:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721723309; x=1722328109; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VpSaIJz7Dz5ilWwBGo8KpfrsI22OPQJ5ujE4om0cTig=;
-        b=sDUYPHVILqxryRRaznHtid/ImB4UDxVLsIiHjN8R/gpI4iR3LHVY+FcB5l9/n99A9w
-         3darpHdHRdiGrxtb/+2X8n/XR4dEJi3z+1O/ncDwrrlnie+JfFaIYuxe/hHy9W0K3R4k
-         RA0BLvpPj7P1PCNBCzsavtt65ZCBbWi6YOY5oQNfqeSlAdHNfvFqpJM8jN1BmhiXHOuC
-         ZO5tCAoXq/LYHdypZQAjfX6zWq+uaTIjxyaOt64tASfXkfBggUW1xcTiMIrg86dYVjxY
-         ZsqelotyDK1N4I5u6P7dOmzG9nuz1c8s9nL5hfLCdBv7In2tjCFoEulMGHJn+x8rB9AC
-         FbKw==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1721723457; x=1722328257; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RwptGWQr9FAjaFiuNjezpA61ovwu+YVC2AfuPz9vxJI=;
+        b=Mrse2xCZK/YkbB+FXbMlikiaJQtrrFGiG+Tr1jOaNERQYn1MRLsrQ1LkIRVaqD7S5A
+         K0mtUdJlbTQ9XIIJ+VudXCPWtK0XghfPHT4YfX9K8a/w4J1OHKeD7zqWOaFD01loxLZc
+         CzrYvmPdBp9YyOUTM/T83xZ5vd3gSvLIDyoBwaczlHSmbcyQJ8re5Q+xMqN46s9kdLX/
+         6mcDwl3YzoUMH9laRcu2tYehgmrbZI8cKAcQjKcdIFc/xizp3qzb/Gtw5q1ZaTpyG23M
+         /BOTtuUx55zK8pzSoPB5euSvRMIp63EMLo7kpMLtPTbn4LuOT6U8jj8BcQ3Uegq7kj1A
+         r3AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721723309; x=1722328109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VpSaIJz7Dz5ilWwBGo8KpfrsI22OPQJ5ujE4om0cTig=;
-        b=o1sYGxffm8ChMv2I4WGAgqgs3WRVWcRUKCphF8nU0IJjL+vJvkaysw46/Oz5ks1iMt
-         QPdRSCb3jX0mBG2qFt/z3RC7J5+uiUhL2vS2m+fTdRkyYV0SxewgAlg/V29Y7oRKQGE8
-         guUlItywclmn4MvcRLlSzB8qoLM0DWzZfzeAgaZrTQHUXHuu9UDU0PEjZR+wI/STn5Q9
-         wXul3nABsvobiFTHtkW1jjPfiYgE3Myu3RN794KqlllTgh6hjM0/1NmDlr/vAM6yyHuq
-         5ceOA00N5LQVnkG3/Hrn/P81v2DJIfx78Z1wQYyaXnsDQPbN6fhStU5eh8vUODerydzE
-         lVdQ==
-X-Gm-Message-State: AOJu0YygAiBbuZ8l6Q1k1sQLsYuQKYOoxVXkNF2c9cjvS6f+lM/3lQJk
-	r5MVeHC/4i2naSdvKcSqp38MWadXjHm8V2BIihgnr3bRU6Qy/snTKSShRLdP665whyNQ+ut9UgJ
-	6mxrDiyeFXrUsYpPyMa7uRL2YT27YEJ2/2n2+CwCtflJ3Fx6A7QBa+Vs=
-X-Google-Smtp-Source: AGHT+IGUsJ23axFKbLw/h6tDqgKvi522rkbCed2vAtvFeqISi98yaE8W5qB6MxniPm++JgNUlpTnM+19V3FpqmmP1to=
-X-Received: by 2002:a05:6402:5254:b0:57c:b712:47b5 with SMTP id
- 4fb4d7f45d1cf-5a456a63b69mr461088a12.4.1721723308479; Tue, 23 Jul 2024
- 01:28:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721723457; x=1722328257;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RwptGWQr9FAjaFiuNjezpA61ovwu+YVC2AfuPz9vxJI=;
+        b=mpuq51sjgMaS5MIdhwr3n4rLtcgNlYBkUjutPliU52oOvNABTiAwDKV9egAnBMfVae
+         BbclryIJCX+m7ztVyK1xiKCnyGUtfab2CBwdth1ApMiX9mkEs7kpNIqm/TosgVB0emI3
+         0G4OOso1WnfIekeyXTIlVIRmrr0gfLNjd/T6yvsyziYTxwWAD10NOSo+I+n9LQyLRZJD
+         DrX+hLPMMoUSLtINkaOukBUxtN0vsL6cTXmpMo68daBE5WXlrM6l2aG2xJ0pysmaHygH
+         5Yu643gok328vHTl5erNtqF45Pgfs8MEPF7nDnWzJut/3L6ui39AMEDxaAw6QPx5xIM1
+         gefg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPzAVbP7Fx/3kBHFQ3jSSaMqguWzLxTSS/625okCmmZxv5oz3DXLqMjUDd8RJ3yKYZFzXq/rKkyKSJ2W42gAGyUZbrmRYZ
+X-Gm-Message-State: AOJu0Yy1sVKJd0JHW05CRu08Neg1M2OMtgOMXQH2zgYBJ/W0MpDR684Q
+	ZUP0o6nas/yDiSSfbLGFT6Bq/BtO6tmkwP/FqhZKj5zTSaCGy3hwwtiDfrZZAU4=
+X-Google-Smtp-Source: AGHT+IGrY7I9l5X4B1N6ltEEAzUB9BtpqYSGyjjQf9lJiizCpIauD9I/q/fDtPWO1cg/wejtony+Cg==
+X-Received: by 2002:a05:6402:35d5:b0:57d:3df:f881 with SMTP id 4fb4d7f45d1cf-5a478b65c3amr6581151a12.3.1721723457090;
+        Tue, 23 Jul 2024 01:30:57 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5a30aaa449esm7222634a12.38.2024.07.23.01.30.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jul 2024 01:30:56 -0700 (PDT)
+Message-ID: <d5dc8f31-26ed-488c-9d63-a96b95609814@blackwall.org>
+Date: Tue, 23 Jul 2024 11:30:55 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240718085633.1285322-1-vinschen@redhat.com>
-In-Reply-To: <20240718085633.1285322-1-vinschen@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 23 Jul 2024 10:28:17 +0200
-Message-ID: <CANn89iK60X=ugZysD3Njs2FUQth0-s3anEHUv50EKzqZvDm6jw@mail.gmail.com>
-Subject: Re: [PATCH net v3] igb: cope with large MAX_SKB_FRAGS.
-To: Corinna Vinschen <vinschen@redhat.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	linux-kernel@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Jason Xing <kerneljasonxing@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] selftests: forwarding: skip if kernel not support
+ setting bridge fdb learning limit
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Johannes Nixdorf <jnixdorf-oss@avm.de>, linux-kselftest@vger.kernel.org
+References: <20240723082252.2703100-1-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240723082252.2703100-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 18, 2024 at 10:56=E2=80=AFAM Corinna Vinschen <vinschen@redhat.=
-com> wrote:
->
-> From: Paolo Abeni <pabeni@redhat.com>
->
-> Sabrina reports that the igb driver does not cope well with large
-> MAX_SKB_FRAG values: setting MAX_SKB_FRAG to 45 causes payload
-> corruption on TX.
->
-> An easy reproducer is to run ssh to connect to the machine.  With
-> MAX_SKB_FRAGS=3D17 it works, with MAX_SKB_FRAGS=3D45 it fails.
->
-> The root cause of the issue is that the driver does not take into
-> account properly the (possibly large) shared info size when selecting
-> the ring layout, and will try to fit two packets inside the same 4K
-> page even when the 1st fraglist will trump over the 2nd head.
->
-> Address the issue forcing the driver to fit a single packet per page,
-> leaving there enough room to store the (currently) largest possible
-> skb_shared_info.
->
-> Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRA=
-GS")
-> Reported-by: Jan Tluka <jtluka@redhat.com>
-> Reported-by: Jirka Hladky <jhladky@redhat.com>
-> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
-> Tested-by: Sabrina Dubroca <sd@queasysnail.net>
-> Tested-by: Corinna Vinschen <vinschen@redhat.com>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+On 23/07/2024 11:22, Hangbin Liu wrote:
+> If the testing kernel doesn't support setting fdb_max_learned or show
+> fdb_n_learned, just skip it. Or we will get errors like
+> 
+> ./bridge_fdb_learning_limit.sh: line 218: [: null: integer expression expected
+> ./bridge_fdb_learning_limit.sh: line 225: [: null: integer expression expected
+> 
+> Fixes: 6f84090333bb ("selftests: forwarding: bridge_fdb_learning_limit: Add a new selftest")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  .../forwarding/bridge_fdb_learning_limit.sh    | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh b/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh
+> index 0760a34b7114..a21b7085da2e 100755
+> --- a/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh
+> +++ b/tools/testing/selftests/net/forwarding/bridge_fdb_learning_limit.sh
+> @@ -178,6 +178,22 @@ fdb_del()
+>  	check_err $? "Failed to remove a FDB entry of type ${type}"
+>  }
+>  
+> +check_fdb_n_learned_support()
+> +{
+> +	if ! ip link help bridge 2>&1 | grep -q "fdb_max_learned"; then
+> +		echo "SKIP: iproute2 too old, missing bridge max learned support"
+> +		exit $ksft_skip
+> +	fi
+> +
+> +	ip link add dev br0 type bridge
+> +	local learned=$(fdb_get_n_learned)
+> +	ip link del dev br0
+> +	if [ "$learned" == "null" ]; then
+> +		echo "SKIP: kernel too old; bridge fdb_n_learned feature not supported."
+> +		exit $ksft_skip
+> +	fi
+> +}
+> +
+>  check_accounting_one_type()
+>  {
+>  	local type=$1 is_counted=$2 overrides_learned=$3
+> @@ -274,6 +290,8 @@ check_limit()
+>  	done
+>  }
+>  
+> +check_fdb_n_learned_support
+> +
+>  trap cleanup EXIT
+>  
+>  setup_prepare
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Isn't the selftest supposed to be added after the feature was included?
+
+I don't understand why this one is special, we should have the same
+issue with all new features.
+
 
