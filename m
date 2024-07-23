@@ -1,106 +1,205 @@
-Return-Path: <netdev+bounces-112675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1DC293A8D4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:47:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CD7093A8E3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A39EB21F19
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:47:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8A71C20BBB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB530147C82;
-	Tue, 23 Jul 2024 21:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0660B14830D;
+	Tue, 23 Jul 2024 21:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fyfp56ZR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2256145FE9;
-	Tue, 23 Jul 2024 21:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986D8146592
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 21:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721771241; cv=none; b=aj+InhCZL6hRT+CQ6cG1hHbqBxvAnI2AHZB2vKR/XGGJ5N1KH6bMLIw/eg548fpGpTW8KlxTsQHVoOlivw2tcVAsCMUoU3qzp5b0aBfP7+klSAqz/nVQHZQ8zRZxDIAW5pBqnPSYP7nk2ofJBzSttX0He8qqjmRff2H/cphuSwA=
+	t=1721771392; cv=none; b=mPvFh98s4p7IN7F3a48g5RhxESn10nRgbSqZCtuvaGDJ31sDuMYfIhF1pjdPKt5j3D0BAVMvqueYb/jqoKcg33NDgzu1qLcj1p4j1EcFQ1w7XvVgaLa7wU8wsX+0K/z7F0AxLJURZuCSnJq5TgCEmqZzHINZ4dp9ScB01I6ISe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721771241; c=relaxed/simple;
-	bh=xZjrLs8+I+Uxd2mYhKfa05Mbl8pflv30J5AQqjx1YxY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Om1gu/oqoWQBWo55TyGQ7k7HwWcdS9elFPqf0Y7mzQ2UOjhPg2fzTnx/mzB6M9gAzQxkh2sOh49+syrdWfVVjxuCuXvZkkkOGMbW+Qx+aWqkS1RwkRVaWiasztbQdImCfLFHvNgTTHa4lDXTom4jCmZnsURMrWNEUDs+Lqx9jEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sWNLh-000000004Ah-3eHt;
-	Tue, 23 Jul 2024 21:47:09 +0000
-Date: Tue, 23 Jul 2024 22:47:00 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: drop clocks unused by
- Ethernet driver
-Message-ID: <ZqAk1NW4_E9SRjUO@makrotopia.org>
-References: <38559102c729a811dc8a85f6c7cee07228cffd3e.1721739769.git.daniel@makrotopia.org>
- <125775a6-42f2-4294-9593-518ad6c852f7@lunn.ch>
+	s=arc-20240116; t=1721771392; c=relaxed/simple;
+	bh=2SPyJdYRw87M7kH/eiezDyPqKNLNQ+jlKjgodNew6rA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j6mc419trT9bl943AotccOgGjDxT/WGQcBbx8jYhhIsNSKw4raMjw0/tubOHV/uH1LowW2RJ+Z+OBqMmTQd6TpfZVY44gVjCDuGpHnT5ASWoJf9+O9i4+F/3JDA3sTuexZrso1G1WrF9Dpk6OQgBSqeMoKE826Ke8CeRzuTgOIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fyfp56ZR; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e0b10e8b6b7so14539276.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 14:49:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721771388; x=1722376188; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yF33mP3g3PVeShTJgLfx3fwdjlEE8z1s+DJQDSjcr+Y=;
+        b=Fyfp56ZR1ESGsr5WcO9ANtOIhEqOM3JSjZfk33f5RdokqN6GS9KYDSotLO4rDc3quS
+         RjaSdEa0xexo57qp/8eaJFSf+zj5XZipWjYU5j75zimicvyKmO6rnpXwNNJR6lYmWmJk
+         SG8Xxr9K0V+ggX/45/VWRKhbVNl7RGpR5nqlxjZgEbAojfKUDkcdkYwfHCzinB3T4Wye
+         jU2Gr6XsGMiaC47jaEWYclfWUf4OEtEWFLohdXMcuV2HfjZSalRjbdEiMVf9YPTCh+7y
+         F4XQxmwOHpl+ni2pn+YZF4mTb/UoJS4vHc26G62cqtXWxBfuopA2MLJPu0kXOMGaDy+R
+         Ijxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721771388; x=1722376188;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yF33mP3g3PVeShTJgLfx3fwdjlEE8z1s+DJQDSjcr+Y=;
+        b=tFRqHGkf6UGNdbn9zyEWGvUi8PgnwMJ1cHs42zVLwrVCVmRiIddo7hvi/ANc4WkpeN
+         77O1nfK+0pf7UpKn79NnzMhgiP02YosWIJwVTIeICA5rowj6o0Y7gu0Ezsm8FtnuG/JL
+         BBfgsix9WdXqss+0i6XF8xi/C7/23tcdukMAJnVyo+OD5vuijTCHWjRxp7+xMICsUBgZ
+         N8buqLt2o1VOICSfULIrgNILtL3tUh1lv8Exfn97laTu7kIpiYdy1ZxnXDXbDzqZT+Pt
+         NXZeCaXhNNb7FZy9NhLlN0X2GRQAZmEN891tBJzuYDbN1OlHnsnNOwIS8d4hsYjOZUFE
+         /Wyw==
+X-Gm-Message-State: AOJu0Yz42Wtu9/lQOM7UXyRWH5bFtWBuFNfq9lcV4s99E+Mv8Bf9hua2
+	kMf4d+C3kkgLsrHKpwbFZ3II9L+Yt0zD4fJ74y/xPg7xNVGWhNXZD7gQx85YWjM8dQZH9RCjht8
+	4DttbQgavpm7fK852T1YGJ4ZIQ6AYN6j7kivN
+X-Google-Smtp-Source: AGHT+IH5JJRTlNbepSdsOAGPfU8tDz3MNG4de1Wtf/RZgU4beT2V9Y9SRFjNnPwNA1SLBZA82p/Z63pCaOnO/csApGk=
+X-Received: by 2002:a05:6902:1108:b0:e08:7607:bbf3 with SMTP id
+ 3f1490d57ef6-e0b097d5744mr1316657276.34.1721771388342; Tue, 23 Jul 2024
+ 14:49:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <125775a6-42f2-4294-9593-518ad6c852f7@lunn.ch>
+References: <20240628003253.1694510-1-almasrymina@google.com>
+ <20240628003253.1694510-4-almasrymina@google.com> <CAMArcTUqqxam+BPwGExOFOLVi3t=dwA-5sSagKC5dndv07GDLQ@mail.gmail.com>
+ <CAHS8izNS5jZjPfc-sARbHV7mzqzH+UhHfAtCTKRRTfSAdhY4Cw@mail.gmail.com> <CAMArcTUdCxOBYGF3vpbq=eBvqZfnc44KBaQTN7H-wqdUxZdziw@mail.gmail.com>
+In-Reply-To: <CAMArcTUdCxOBYGF3vpbq=eBvqZfnc44KBaQTN7H-wqdUxZdziw@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 23 Jul 2024 14:49:34 -0700
+Message-ID: <CAHS8izMTGgZ+4fOKegUDLqAoxrdVEb+nqjQEt8bP0WLBV=FfrQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 03/14] netdev: support binding dma-buf to netdevice
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Tue, Jul 9, 2024 at 8:37=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
+e:
+...
+> Reproducer:
+> ./ncdevmem -f <interface name> -l -p 5201 -v 7 -t 0 -q 2 &
+> sleep 10
+> modprobe -rv bnxt_en
+> killall ncdevmem
+>
+> I think it's a devmemTCP core bug so this issue would be reproduced
+> with other drivers.
 
-On Tue, Jul 23, 2024 at 08:35:16PM +0200, Andrew Lunn wrote:
-> On Tue, Jul 23, 2024 at 02:04:02PM +0100, Daniel Golle wrote:
-> > Clocks for SerDes and PHY are going to be handled by standalone drivers
-> > for each of those hardware components. Drop them from the Ethernet driver.
-> 
-> Please could you explain in more details how this does not break
-> backwards compatibility. Should there also be a depends on, to ensure
-> the new driver is loaded? Will old DT blobs still work?
+Sorry for the late reply. I was out at netdev.
 
-At this stage the Ethernet driver only supports the first MAC which
-is hard-wired to the built-in DSA switch.
-The clocks which are being removed for this patch are responsible for
-the for the SerDes PCS and PHYs used for the 2nd and 3rd MAC which
-are anyway not yet supported.
+I'm also having trouble reproducing this, not because the bug doesn't
+exist, but quirks with my test setup that I need to figure out. AFAICT
+this diff should fix the issue. If you have time to confirm, let me
+know if it doesn't work for you. It should apply on top of v16:
 
-Those clocks are basically a left-over from the implementation found in
-MediaTek's SDK which does all that inside the Ethernet driver and using
-lots of syscon regmaps to access the various parts of the SoC.
+commit 795b8ff01906d ("fix for release issue")
+Author: Mina Almasry <almasrymina@google.com>
+Date:   Tue Jul 23 00:18:23 2024 +0000
 
-This has been deemed unsuitable for inclusion in upstream Linux[1] and I
-was asked to implement standalone PHY, CLK and PCS drivers instead,
-which is obviously more clean and also results in the device tree being
-more understandable.
+    fix for release issue
 
-By now, a CLK driver and a PHY driver (PHY as in drivers/phy, not
-drivers/net/phy) has landed in upstream Linux([2], [3]), I'm currently
-finalizing the PCS drivers which are going to be in charge of handling
-the clocks which are now going to be removed from the Ethernet driver.
+    Change-Id: Ib45a0aa6cba2918db5f7ba535414ffa860911fa4
 
-tl;dr: The clocks were added by mistake and features of the SoC using
-them are up to now unsupported by vanilla Linux.
 
-[1]: https://patchwork.kernel.org/comment/25517462/
 
-[2]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4b4719437d85f0173d344f2c76fa1a5b7f7d184b
+diff --git a/include/net/devmem.h b/include/net/devmem.h
+index 51b25ba193c96..df52526bb516a 100644
+--- a/include/net/devmem.h
++++ b/include/net/devmem.h
+@@ -68,6 +68,9 @@ net_devmem_bind_dmabuf(struct net_device *dev,
+unsigned int dmabuf_fd);
+ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding);
+ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+                                    struct net_devmem_dmabuf_binding *bindi=
+ng);
++
++void dev_dmabuf_uninstall(struct net_device *dev);
++
+ struct net_iov *
+ net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding);
+ void net_devmem_free_dmabuf(struct net_iov *ppiov);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5882ddc3f8592..7be084e4936e4 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11320,6 +11320,7 @@ void unregister_netdevice_many_notify(struct
+list_head *head,
+                dev_tcx_uninstall(dev);
+                dev_xdp_uninstall(dev);
+                bpf_dev_bound_netdev_unregister(dev);
++               dev_dmabuf_uninstall(dev);
 
-[3]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=ac4aa9dbc702329c447d968325b055af84ae1b59
+                netdev_offload_xstats_disable_all(dev);
+
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index e75057ecfa6de..227bcb1070ec0 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -362,4 +362,20 @@ bool mp_dmabuf_devmem_release_page(struct
+page_pool *pool, netmem_ref netmem)
+        return false;
+ }
+
++void dev_dmabuf_uninstall(struct net_device *dev)
++{
++       unsigned int i, count =3D dev->num_rx_queues;
++       struct net_devmem_dmabuf_binding *binding;
++       struct netdev_rx_queue *rxq;
++       unsigned long xa_idx;
++
++       for (i =3D 0; i < count; i++) {
++               binding =3D dev->_rx[i].mp_params.mp_priv;
++               if (binding)
++                       xa_for_each(&binding->bound_rxqs, xa_idx, rxq)
++                               if (rxq =3D=3D &dev->_rx[i])
++                                       xa_erase(&binding->bound_rxqs, xa_i=
+dx);
++       }
++}
++
+ #endif
+
+--=20
+Thanks,
+Mina
 
