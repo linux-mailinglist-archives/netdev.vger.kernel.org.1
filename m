@@ -1,109 +1,115 @@
-Return-Path: <netdev+bounces-112580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E5E93A086
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 14:32:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E32AF93A0CE
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 15:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 787631F23167
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 12:32:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 204761C21F3B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:04:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24702152790;
-	Tue, 23 Jul 2024 12:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="QmjDZd+7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3E0152DE3;
+	Tue, 23 Jul 2024 13:04:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08206381B1;
-	Tue, 23 Jul 2024 12:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CA415278B;
+	Tue, 23 Jul 2024 13:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721737936; cv=none; b=AkwIjZrHAf/xmtmMoCXA1yKVGnOFrfLCSRsChOzxS63j/LtZtMpAN6+erPdED7+S5U6X6SZFlGufrSiN+ofSK92oad8mgXxHbbG/ZOsn2MT0Y2DsSLLzfrRYmUb9zz6xdi6l9jLbKHhZMPP0LRzXJDWL2ewB/yYmPNYB5i1uxL4=
+	t=1721739874; cv=none; b=OdU9N9KOG2fMex8XEin/TWZ2+tt8N9sCeHaXfjzST9n3uQBo97TLApLoHsMeqotWQ88qrj1896t8KLPjsITMwbzd+rwNbFfW0wqsqnwe4uuw0F+74iZf7k84UlEfCKfKimZ3yk3NV7bG3Qb0FXd/K9H8KrZUl1GUBbGKsubGThA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721737936; c=relaxed/simple;
-	bh=dUrGEVrh/HvvlRpitrwjxPOkIMAXxHqaRf1h9h7gtvU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aVzIL9Ox+RTNtNNudbDEV6auKV7Grsk15r9GdVwNcgl5Ga2jMGv+hdfCJL1ylsFpZlIwX1Q33iiMxe1kNazHZIlQmWurHJYophs4aGSzB4+7VVGblHY4nHurnYFVJQvTfTBjdNm9Mu0dTwPywWvh8Ymg3/QQtEvzuMA7s9j7B50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=QmjDZd+7; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sWEgW-005oEO-Ld; Tue, 23 Jul 2024 14:32:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=HKIrEbrGBmfJtypL/EQ6MZNDqKAtq+m8Oo1XI53MmoE=; b=QmjDZd+73bi4ulCp8zp/YPE4li
-	D8FFrOmFMAqVO6P/JDj7rC9rVE0FcESwtMsXxEr1Llz8II9X6l+tm/xSX+IbGhdI3XER2gVS0pb9Z
-	36362BUBEbDTi0npNS46e/Z6M08wGuVCsaorRA3r4utVbU/6LRok6eYnrWpwlee30BJ7EcefpedvP
-	awMgNisLpgskKLMXlJ+ZoaQbEevFkehz9xsgL3buVXOejh3/6PDUpv2A31yMFXZfX4TLaLMA8076q
-	0ffekiWVorf3eBGseLTEzGjgqhFxxJ3x7mCmuvBZd4qEBMLBD7k5OSXh0MsETQZcl41bdjaH9xXUa
-	eY09QN5A==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sWEgV-0007Ie-Jp; Tue, 23 Jul 2024 14:32:03 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sWEgB-00Dfar-Se; Tue, 23 Jul 2024 14:31:43 +0200
-Message-ID: <ff3e2f59-4d3d-46e0-94a1-4268b62c6d0e@rbox.co>
-Date: Tue, 23 Jul 2024 14:31:42 +0200
+	s=arc-20240116; t=1721739874; c=relaxed/simple;
+	bh=mLZoVtdeN8vsh1LLx1S1tL6hGz3gaMG1cYsa3KbC3og=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZLA7j1X+iMUL/+sR0Axg7Brz5GZRRDJ/xBxZmUnpSncENTaYAwco5kmxe3z+7hQsOyAFTnkf1rjok8AKbjfTBxmhzL9FOKPa1nD6nwNnWv6hABC+hlNWr9IxofG0vvQ0bdp2G2ppXuzAJKNdMW6FTuzX5+zgF4rOq5RUSO37zik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sWFBb-000000001CH-0Ryw;
+	Tue, 23 Jul 2024 13:04:11 +0000
+Date: Tue, 23 Jul 2024 14:04:02 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net] net: ethernet: mtk_eth_soc: drop clocks unused by
+ Ethernet driver
+Message-ID: <38559102c729a811dc8a85f6c7cee07228cffd3e.1721739769.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
- unix_inet_redir_to_connected()
-To: Eduard Zingerman <eddyz87@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- john.fastabend@gmail.com, kuniyu@amazon.com, Rao.Shoaib@oracle.com,
- cong.wang@bytedance.com, Andrii Nakryiko <andrii@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>
-References: <20240707222842.4119416-1-mhal@rbox.co>
- <20240707222842.4119416-3-mhal@rbox.co> <87zfqqnbex.fsf@cloudflare.com>
- <fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
- <87ikx962wm.fsf@cloudflare.com>
- <2eae7943-38d7-4839-ae72-97f9a3123c8a@rbox.co>
- <87sew57i4v.fsf@cloudflare.com>
- <027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co>
- <87ed7lcjnw.fsf@cloudflare.com>
- <205c38e28799bfe4b78a5e61fd369d5a5588694f.camel@gmail.com>
- <459b8eefe371cb227b729ff89160ec36f69273d8.camel@gmail.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <459b8eefe371cb227b729ff89160ec36f69273d8.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 7/23/24 00:21, Eduard Zingerman wrote:
-> On Mon, 2024-07-22 at 15:07 -0700, Eduard Zingerman wrote:
-> 
-> [...]
-> 
-> Digging a little bit further, I think the behaviour mentioned was fixed
-> recently by the following commit:
-> 
-> a3cc56cd2c20 ("selftests/bpf: Use auto-dependencies for test objects")
-> 
-> From 3 days ago.
-> 
-> As the dependency is set from sockmap_basic.test.d,
-> generated while sockmap_basic.test.o is compiled.
+Clocks for SerDes and PHY are going to be handled by standalone drivers
+for each of those hardware components. Drop them from the Ethernet driver.
 
-Ah, yes, you're right: bpf-next works for me. Thank you very much for
-solving this. And I apologise for the noise.
+Fixes: 445eb6448ed3 ("net: ethernet: mtk_eth_soc: add basic support for MT7988 SoC")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+The dt-bindings part has been taken care of already in commit
+cc349b0771dc dt-bindings: net: mediatek: remove wrongly added clocks and SerDes
 
-Michal
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+index eb1708b43aa3..0d5225f1d3ee 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+@@ -724,12 +724,8 @@ enum mtk_clks_map {
+ 	MTK_CLK_ETHWARP_WOCPU2,
+ 	MTK_CLK_ETHWARP_WOCPU1,
+ 	MTK_CLK_ETHWARP_WOCPU0,
+-	MTK_CLK_TOP_USXGMII_SBUS_0_SEL,
+-	MTK_CLK_TOP_USXGMII_SBUS_1_SEL,
+ 	MTK_CLK_TOP_SGM_0_SEL,
+ 	MTK_CLK_TOP_SGM_1_SEL,
+-	MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL,
+-	MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL,
+ 	MTK_CLK_TOP_ETH_GMII_SEL,
+ 	MTK_CLK_TOP_ETH_REFCK_50M_SEL,
+ 	MTK_CLK_TOP_ETH_SYS_200M_SEL,
+@@ -800,19 +796,9 @@ enum mtk_clks_map {
+ 				 BIT_ULL(MTK_CLK_GP3) | BIT_ULL(MTK_CLK_XGP1) | \
+ 				 BIT_ULL(MTK_CLK_XGP2) | BIT_ULL(MTK_CLK_XGP3) | \
+ 				 BIT_ULL(MTK_CLK_CRYPTO) | \
+-				 BIT_ULL(MTK_CLK_SGMII_TX_250M) | \
+-				 BIT_ULL(MTK_CLK_SGMII_RX_250M) | \
+-				 BIT_ULL(MTK_CLK_SGMII2_TX_250M) | \
+-				 BIT_ULL(MTK_CLK_SGMII2_RX_250M) | \
+ 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU2) | \
+ 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU1) | \
+ 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU0) | \
+-				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_0_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_1_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_SGM_0_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_SGM_1_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL) | \
+ 				 BIT_ULL(MTK_CLK_TOP_ETH_GMII_SEL) | \
+ 				 BIT_ULL(MTK_CLK_TOP_ETH_REFCK_50M_SEL) | \
+ 				 BIT_ULL(MTK_CLK_TOP_ETH_SYS_200M_SEL) | \
+-- 
+2.45.2
 
 
