@@ -1,123 +1,260 @@
-Return-Path: <netdev+bounces-112559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4FDA939F56
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:05:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93994939F60
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 845E5B22286
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:05:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 096EBB20B16
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A137A14F130;
-	Tue, 23 Jul 2024 11:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D1114E2CD;
+	Tue, 23 Jul 2024 11:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rjvanq9E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DAXqQjXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1CB14D6E7
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 11:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721732740; cv=none; b=jciZzB21Tx/Vv2OZZHXkQFA/YMZowUDHs61byTK9r6SfIhTYGvoG0mjAt2ywhpWFJeYcaPY0L9ZzsD5NdtoJf9/d5geUXxpb6LEu2bnOiWlpJnAlbZ3jf5ILeU2hEp7b3qc6U/rrHkhUs8rCrp1Zj9x67Ve/wjZW84xOvdeWUPo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721732740; c=relaxed/simple;
-	bh=7XXeSul7UB9LBGW7UFEWmEvnnhBGYXJidgRwX+irI1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dZdmTGSQx3Dlt3t5liNdJyP0NcUFYk2/MJ+lyYtVZuSCAMWxjp3VWXWtkVY17rI4qwrCyB9es7YmnYeJNFbfeTTtQ6/YV0omv9wOaSPZGhtvsdOjzS1ezb4qERmcK5GnfvziDShQzpviDbfDj/n9JlyH6rv2n+sU2LeOj0e6D2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rjvanq9E; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721732737;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A3j4jPgv6Hs0fzu6rXE2M7orTiihZ3jZ0T7426KJgLA=;
-	b=Rjvanq9EvszONB8ofF9OXh4j9hyob7/i6tfVK4Dixd6rKiNbvvkra2fgOBLvF/HG4gv02w
-	gy9UXQxArMcIs6wamwx3iyO5VupjMeRinqo5d0l7SdhklvVXUkC9QN/czxYN+nBVJHuA8L
-	C9GZFNX3tG0rs46qOCZL54+6opVnamM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-4boR_E14MsO2v5VFe7KrGg-1; Tue, 23 Jul 2024 07:05:36 -0400
-X-MC-Unique: 4boR_E14MsO2v5VFe7KrGg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42669213f26so3382215e9.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 04:05:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721732734; x=1722337534;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A3j4jPgv6Hs0fzu6rXE2M7orTiihZ3jZ0T7426KJgLA=;
-        b=ZRtopK/ysMRaGGT4db7evi0ZsNP4MdI1YR3uwBbl4du1jaD8MR7FyylZOq4obm9xzv
-         vBbvCsm71TCydSMHd7A57ItjH81930xBiPqlcV8dWuga/BN3eVZInWHADKBLAV7NwZ9i
-         zKNF3SL9rFjJAqi2VfCVDm4xj2qFYycTT3+ftUdWwuG1DxuRvhV7ecqfE+qVHLFRqfHD
-         2jKdLnGLTGDS7tsRL20IOaYll3K88WmzJHHj1MIsAhmI7obvx0p+LlOmzt61BZCyAEh/
-         iXLARbO2VPQlr85/bdzVIE7i/2U/mjZ9KN7OYjm5vBxm98d0g7cwl1fZCji6sdGHb9+V
-         mqcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUX2M7juEih/Lw1/Ot4aj44Qr1V/wfFQ+SNi9Ka1GeGAR+pAdaIg3nmKLALAlkLBOUb/Ym9MBA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzikwhMcaTFkJ/E3ZoawVP2pWfpK9W3Mk3bIrDYeWjnNwckzPWw
-	iCy/n2cfMmIVCGu1CW0zpGawZu1SvgfC+1s0MaYki0yrEeN9XG7qyhnaWL0bQ7cjvad5DjWFzCS
-	YRC9WtwDajVudnv5h7uhcvs8Ws8mxAvTOHLrE+DQX/6qMbw9DrmTLTzu1M6+J3w==
-X-Received: by 2002:a05:600c:3c97:b0:425:7ac6:96f9 with SMTP id 5b1f17b1804b1-427da9ad357mr45399625e9.0.1721732734661;
-        Tue, 23 Jul 2024 04:05:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGtWCl8LDKZyp3574p+r9uVIoAK1epDaa1iQUNezXTrhZGqQRyRF8Ml82x3u3sW7wHj6udkMg==
-X-Received: by 2002:a05:600c:3c97:b0:425:7ac6:96f9 with SMTP id 5b1f17b1804b1-427da9ad357mr45399415e9.0.1721732734229;
-        Tue, 23 Jul 2024 04:05:34 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:173f:4f10::f71? ([2a0d:3344:173f:4f10::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427d2a6fd5fsm194076715e9.22.2024.07.23.04.05.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jul 2024 04:05:33 -0700 (PDT)
-Message-ID: <0f2ef152-0fbf-492f-a334-89bb700721a2@redhat.com>
-Date: Tue, 23 Jul 2024 13:05:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E736A14D29C
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 11:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721732816; cv=fail; b=AReCk+eXItHC/DVxQQ1EBOwD8YDaU2SxrHHCCU9p6LN7toABXK9mUoW9TWVYI7D1lobJXLFvn2UGAvv04objvfHmFxeqmSLUHA3KoF3PTVGv8J3FNR38uLs3eQYFUhbwHxF7jHKmWBFrs2wH2pblMF06JNr8H7Rwy1Kbl7RT3TE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721732816; c=relaxed/simple;
+	bh=PRhcsnSa2BmNXtCnfNa95Zoh+nU5yjNbUwfPYYist4M=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=AMMe/8TK5az70Cotdc27U/YmLH9RBxgvid825Av5tQgzmvMNdJQTdd5Q14E5K4SwDgZqM9Ycl3LIVDqOTXHA7yBZSXWnwEOblx98/cc1MroXyxLHuMBPV1I3CNdPH8I+evnDI2QttbhIeFhJbJaWAY2mmyWG7bIhi11rkahKD9k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DAXqQjXA; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721732815; x=1753268815;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PRhcsnSa2BmNXtCnfNa95Zoh+nU5yjNbUwfPYYist4M=;
+  b=DAXqQjXAzm+ezKlWzzI6Ex02/mEMvB1mXoqa/hqOODobhBq/D+IGWrQx
+   jQ7wZ52wpy9jKQ56hX2K5AIYyuz7NLeZ93X5UKhOLYOWZZZe+2I4rD7wH
+   L/4t2e51pI4JMrC7uDOP6O1+lBts/G548CRDrLyFCYWcGWSyw+39V7g2y
+   PZ2snfbGSOt37i0d9J6mhbmccKf4FZYGc2ieMAw1H08lGx8kpYXqENADO
+   mNd/7dHOXxZfXVCWUmtlz+Vba9kXuVBn8rq9l8c05xZB/Msq5PSkyP2MG
+   jQAi86Wo/uOBLGRld/pYzG40u9H3c4uhJtEcFWGOX4ejXIDlxKFLMLbHL
+   g==;
+X-CSE-ConnectionGUID: 2+rSpR6TQmGv0ESxvjtGSw==
+X-CSE-MsgGUID: WKx9/X7RRkeYf/jav6UDzQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11141"; a="22248617"
+X-IronPort-AV: E=Sophos;i="6.09,230,1716274800"; 
+   d="scan'208";a="22248617"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 04:06:54 -0700
+X-CSE-ConnectionGUID: +iwIKjD1QLSj8JaTTPnLYg==
+X-CSE-MsgGUID: 08He2d/1SCaaJ2DrmShS3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,230,1716274800"; 
+   d="scan'208";a="56500679"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Jul 2024 04:06:53 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 23 Jul 2024 04:06:52 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 23 Jul 2024 04:06:52 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 23 Jul 2024 04:06:52 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.47) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 23 Jul 2024 04:06:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eHOjnONQLQ3iMCh0nr1SVMiiLURrQ/twKoulVK5HMY5K5AR/aS5GVTpq2O7PJINpzUTjdCZJEt3+0InVsxiPKWWN2NreHgrtn7OvrSjgpmdYD8u6BC10Fmu7Ki8ihiiklL29/AgaHdaR23YUd+P2Lf2BRK5HfNbPKLL/SrSBYcAmsvZu494z4BkggPASHeynDDN5MvOApZO1QR2HF7cJVAqbqFxi1WYYWlP4ZKyNw98PvqZOX7HRANVfAZPn8WktTMXNMqgJJzFIzj4si6xVmKkQScR9LA0klYTwi4RwsGLX2tK/qYvJXhBWAewcYOxir8vxoj7gXnMmyv/veeLhXg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eZWIVSWiZEuT7x3Toh8GeddCVi0G4Wd8FXi1q9Cekpo=;
+ b=O4nBwdNntVo3y3KZKCjM6YmdBGj8ShV36GLOjkVNlDUaXXIpD3lAeBtsIj8I2DUoJNsOpOz9qdSqVAUedc9kE6cOuNqjo3LiZjHpGdOYxz5qjmSMfrjtxuq2Q+TNpHbYm1RgZqb3W4Hp7BwDABwFbrFII1YKQP9plDZx8q3CNdbaieuxOwIVlr7vs4L3EKmKJJ9jpR2fKYtVK4Uxd7+yULjlnJhttt9bAsc7fQ88VaDUR+hj155vjY11Yxr5NV6s933UNzMUjAwwp5PXNI669UOWL9L8YHu3QZ1qTnwACj+AvyARN7uS29dWPp2dru6sR2GEYhl+uFhRTARBFIUmNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
+ by CY5PR11MB6115.namprd11.prod.outlook.com (2603:10b6:930:2c::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.17; Tue, 23 Jul
+ 2024 11:06:48 +0000
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::b615:4475:b6d7:8bc5]) by SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::b615:4475:b6d7:8bc5%5]) with mapi id 15.20.7784.016; Tue, 23 Jul 2024
+ 11:06:48 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "shayd@nvidia.com" <shayd@nvidia.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "horms@kernel.org" <horms@kernel.org>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "jiri@nvidia.com" <jiri@nvidia.com>,
+	"kalesh-anakkur.purayil@broadcom.com" <kalesh-anakkur.purayil@broadcom.com>,
+	"Kubiak, Michal" <michal.kubiak@intel.com>, "pio.raczynski@gmail.com"
+	<pio.raczynski@gmail.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"Drewek, Wojciech" <wojciech.drewek@intel.com>
+Subject: RE: [Intel-wired-lan] [iwl-next v5 01/15] ice: add new VSI type for
+ subfunctions
+Thread-Topic: [Intel-wired-lan] [iwl-next v5 01/15] ice: add new VSI type for
+ subfunctions
+Thread-Index: AQHauAOPUmA1LlfrwkuOOxEtHG4CzrIEcKzw
+Date: Tue, 23 Jul 2024 11:06:48 +0000
+Message-ID: <SJ0PR11MB58650ACE104FE8CF0EBE5E0C8FA92@SJ0PR11MB5865.namprd11.prod.outlook.com>
+References: <20240606112503.1939759-1-michal.swiatkowski@linux.intel.com>
+ <20240606112503.1939759-2-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240606112503.1939759-2-michal.swiatkowski@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|CY5PR11MB6115:EE_
+x-ms-office365-filtering-correlation-id: 2a209afe-494c-4cb4-1f44-08dcab078c2d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?C8f4j37K72cptUem9vgjrrzOoogPWWqncOJOrQnnWxIQObSixdDyYC4LRu9n?=
+ =?us-ascii?Q?yrsP+HOO3PnjK4FHbBCF1PO2HEZsOT+Cf2zZ+pkS55J/O941J1Yu6s+aqufY?=
+ =?us-ascii?Q?gcZboL1biInj55O6YFZLQpz6iqwx9tMdRCrUtzfJFJDlgFH/aifqrvts4HHh?=
+ =?us-ascii?Q?6dpyp7WtFewatSilORnI+G6185nFqW5SpUjuciQD81cyiKE6rHsTYwZpCd6B?=
+ =?us-ascii?Q?+w59wC0pNRiHZaIGwHT3QS4F/2xSC/Psn+36iFFjHVdNtw6inU34n4VD8pf6?=
+ =?us-ascii?Q?m47sCbgYhF18A/h3UN2bLEmsvpyYcpx1/yDzWr7opkRZw9P+P/dP3QD5/NjZ?=
+ =?us-ascii?Q?FwrvvYfuUc/NkxRbiZjpDzsu0EKYjrM4XYO64QPuX9lx0Gr6b2QdEGgAayQT?=
+ =?us-ascii?Q?F9UMj07/N2Urllt88HNgfnPsBpBUZPgHxVrANZo/7C0Mx+ECbDHvB6ECglI6?=
+ =?us-ascii?Q?yc4oQ3O+dLEI2v25uiQNzGxfPVDGo1YdCg39rNBJYeeRBVblG9NPuWlGIKEv?=
+ =?us-ascii?Q?iVcRm1erTeksP5xJhTICjyvmoc/B4eS5Q8gYy2Z/disW1zY4d0rVdNVCa23r?=
+ =?us-ascii?Q?TnSNibvz3TMtNpSf4hLQJIQp8QPPIa4bQf5MKKUiRsw/njZx473iitCGFsAz?=
+ =?us-ascii?Q?Y595KiGr3N2n2nByDWCibmIC8VD3GwkqWVU6AeU8GRdo5pZLOyVYmhKCSaOK?=
+ =?us-ascii?Q?QRVZP8qbzCO9082QgdbAJvxM+0k9RpmtLp8NsExvmg/Vcjsq1oFSP5N66ema?=
+ =?us-ascii?Q?86+cguuTFrvoCljkpkvuM/k2/Onz8TNtVLkPGnzPSaQncVWBYcfAMiuCj40W?=
+ =?us-ascii?Q?ChYGN/ZAybPDfA+I3DPeaTEEVB6hX1xou87IbH/djfjb5KCQI/nVjiNQaemw?=
+ =?us-ascii?Q?bm7aWdO0Gl5pj2OkucicwrGbYxUtdXcJOK3N36sFEOqf6Wze5BZzihuQVHWm?=
+ =?us-ascii?Q?3sH9JkImhwrYQLcQwyiwb1QLcDZJ31w20glOOZQ2MEJYw6G5NKD8y0TR93Jc?=
+ =?us-ascii?Q?t1CBZZV38GXTQIyRvnFCVIY3NzMQ+nSz7c1v+ItiF1DUy2mPPGS+0KHGEJjB?=
+ =?us-ascii?Q?oicuEXFtoQMUOgeK+J8vjXfRwAeFTI1R38B85ypFDXnQTFeryVN3HsuxjD+Q?=
+ =?us-ascii?Q?SdeJmdnsRekchppID5e9lybCx7JYwk7Ndns++pTUIi2ViPDToOurP6urn17q?=
+ =?us-ascii?Q?wvWMDXG5Kh4s0kbG3WDcBQTYciR1hFWXWTj1q828EJAiWmjQamIBtx/ggaYO?=
+ =?us-ascii?Q?S2+oLoYBFT34Om50ZS3cIFTaxNcB89Pw2XH6lsvRDBouoxn+6qxNtxxf3W1O?=
+ =?us-ascii?Q?543+GZbd47zSpdTsZzltpYR4r0rBty77z1CFmi/co4SjHdy1u5eXUKVnLnTn?=
+ =?us-ascii?Q?4LHGSTgEdEconK6BZ+Co//P3H37PJpRjZ5Jxn4MM3B1TaGPgaw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?SnSt3aygx/b4J1mkWdmcRmOZjEZhNeo5XLG9NIQOOq+KsGgqUGVpZ74jd7mZ?=
+ =?us-ascii?Q?kW98KlJ5B/gCxYsAECtz7ILY4v40Q0Uyo6pAbg5z/xWWz+l3AAtvVin08rfe?=
+ =?us-ascii?Q?2al3qhyXzPb8I9GVUDoDVjREFisM9eTGJmLTKoF+xGGqDoAorTpRVN6u0Q+q?=
+ =?us-ascii?Q?zcc21LsYbt4i/a3RE3uyoiWwUq3NSnw7kH2cRUnQlt5nsQT231kBfdpAFtRp?=
+ =?us-ascii?Q?/sDK55AqCKLbC7znKrl30pUyuD73uVjIViWjLnRJL8AVE7mP3DFP+Tr+HcKO?=
+ =?us-ascii?Q?8Ij8FUM8BpXC+SS7gMzo6PpK33APc6R+GnnREXWdb7fY+Mx2wggqO7KaKbs5?=
+ =?us-ascii?Q?cLCQwKJwNLrdCXVxy5i2wbs5uRRkBMBWwlhrGQLasVVmz7G9hIcf70p93Ljj?=
+ =?us-ascii?Q?Ptg8uh73vPsWA8E1D8nkES25Ktldq+nALDFxuGXidD2AlAdZZh/b9lxXgV6Q?=
+ =?us-ascii?Q?/Di2rVrN0gVUvglm4myWwl4qS/N5Pnok9b40jLs0SRTs13ZgoelsrfBOZh6X?=
+ =?us-ascii?Q?F/zFDTlo23mDoywkgiR6edM6F/rMxnaVUR8+6BFC+0n/mEPJUQBZknk60DPt?=
+ =?us-ascii?Q?NPVCvRHY+cgCCvm2d6/MYwZJh19OuRcOat2+8ObNYU6eZw69rncrm55Zdmb3?=
+ =?us-ascii?Q?nNPx71Qb2db6Yp1+IZMdAzQoxGXjvzXxb+w23PNKsT6UoxPrW2TQDvBKOhua?=
+ =?us-ascii?Q?EWEnnsdL+8b1yDX8SGvVr3usSbbe9OS5lEA2P3pL9jJ2qYYqiYaxn708TU3V?=
+ =?us-ascii?Q?0XpLuC6mRj+Tlen30xzixCVachBS5+D6KiFO5YEFsIMm8Yg+8gP+Lhoq5bw/?=
+ =?us-ascii?Q?hHhqRbWndBZSsp2QZQQST7y8dOkj7tNuroFYm5mbKdVMZGJFHl00TJzURo0A?=
+ =?us-ascii?Q?aEVToSs5agBZLK8FcGhTJ8rgJrWsnjIsBBCPhqDJqgS+mi6fQrdDDd8Vg4Xh?=
+ =?us-ascii?Q?BFRyQEcxCiC7R1LrdyfICMowJEDZLftCe7UwMBRSeMN+eOKgVV3ClnJTQ0fp?=
+ =?us-ascii?Q?azsjybmJPdgwDciN2oKz57ky/v3yYemJ7kr0LPrHWnIqQwFqrAUrHdu5IP4o?=
+ =?us-ascii?Q?eq7K6XtxJJCQ1ph4b/CqCfh/MRD/f/Vne8Jh0iXhY5g+doVIPBpPQwG4fs4k?=
+ =?us-ascii?Q?tKV2vS2HkepjAUmfjSa+QfFAxveYDj8Yw885CtsPLO1wGDXDubcFUMVrbAyZ?=
+ =?us-ascii?Q?D+InsNZaZEnhk4laemFt2Jk+WBsuJoAsHW/Xp18DyakGyfPLMMefWUY+4ofo?=
+ =?us-ascii?Q?zgtgXo9muvYPZsm+5C92IpWoflGGaKG+aSoxLnXQPyQnRbN1Twr5GSNk0gtB?=
+ =?us-ascii?Q?GKQ6KHgbxGuiqs9hce6sd+ewz7feu6Rs713Br+3lAAbDQMaD53jrWoY/OZfw?=
+ =?us-ascii?Q?8wwZvHUptPhCfJa5l8xqkH2/KJD18iGx7kUyZL9ms35cRX+kIiebd08Vgpj1?=
+ =?us-ascii?Q?qZgIRsVWDrXo3lI3TXC132bRa4Rtoi/AhIFGbJECZyFb8+bv9pgy5PZtjMgm?=
+ =?us-ascii?Q?twbNDh7NosbVwpa0dDv9yTqdfs/X8QUtQfpgJfvrRDdddMQkv/9SgifSjYp9?=
+ =?us-ascii?Q?Kvn2FAEfJuHnbAV3dT52Or7cCmzo34WhnIF1K+UOhOz7ZuZPrSiELzfMz0pr?=
+ =?us-ascii?Q?rw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: wangxun: use net_prefetch to simplify logic
-To: Simon Horman <horms@kernel.org>, Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
- <mengyuanlou@net-swift.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Duanqiang Wen <duanqiangwen@net-swift.com>
-References: <20240722190815.402355-1-jdamato@fastly.com>
- <20240723072618.GA6652@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240723072618.GA6652@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a209afe-494c-4cb4-1f44-08dcab078c2d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2024 11:06:48.4234
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /rDaBcrpvyyu54cgzFfvGEvwERx6X0jba+JBr5EjSC5PvYrjJ4C/z7WXP5CQlWQGoFeg8xduxNdxnZIJgVmqCM31s/pE0TzIU5GVbu/ggJ8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6115
+X-OriginatorOrg: intel.com
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
+ichal
+> Swiatkowski
+> Sent: Thursday, June 6, 2024 1:25 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: shayd@nvidia.com; Fijalkowski, Maciej <maciej.fijalkowski@intel.com>;
+> horms@kernel.org; Samudrala, Sridhar <sridhar.samudrala@intel.com>;
+> Polchlopek, Mateusz <mateusz.polchlopek@intel.com>; netdev@vger.kernel.or=
+g;
+> jiri@nvidia.com; kalesh-anakkur.purayil@broadcom.com; Kubiak, Michal
+> <michal.kubiak@intel.com>; pio.raczynski@gmail.com; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com=
+>;
+> Drewek, Wojciech <wojciech.drewek@intel.com>
+> Subject: [Intel-wired-lan] [iwl-next v5 01/15] ice: add new VSI type for
+> subfunctions
+>=20
+> From: Piotr Raczynski <piotr.raczynski@intel.com>
+>=20
+> Add required plumbing for new VSI type dedicated to devlink subfunctions.
+> Make sure that the vsi is properly configured and destroyed. Also allow l=
+oading
+> XDP and AF_XDP sockets.
+>=20
+> The first implementation of devlink subfunctions supports only one Tx/Rx =
+queue
+> pair per given subfunction.
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_base.c    |  5 +++-
+>  drivers/net/ethernet/intel/ice/ice_dcb_lib.c |  1 +
+>  drivers/net/ethernet/intel/ice/ice_lib.c     | 25 ++++++++++++++++++--
+>  drivers/net/ethernet/intel/ice/ice_main.c    |  7 ++++--
+>  drivers/net/ethernet/intel/ice/ice_type.h    |  1 +
+>  drivers/net/ethernet/intel/ice/ice_xsk.c     |  2 +-
+>  6 files changed, 35 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c
+> b/drivers/net/ethernet/intel/ice/ice_base.c
+> index 912e92c060f6..70f079f279a4 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_base.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
+> @@ -330,6 +330,9 @@ ice_setup_tx_ctx(struct ice_tx_ring *ring, struct
 
 
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-On 7/23/24 09:26, Simon Horman wrote:
-> On Mon, Jul 22, 2024 at 07:08:13PM +0000, Joe Damato wrote:
->> Use net_prefetch to remove #ifdef and simplify prefetch logic. This
->> follows the pattern introduced in a previous commit f468f21b7af0 ("net:
->> Take common prefetch code structure into a function"), which replaced
->> the same logic in all existing drivers at that time.
->>
->> Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
->> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> 
-> Hi Joe,
-> 
-> I would lean more towards this being a clean-up than a fix
-> (for net-next when it reopens, without a Fixes tag).
 
-Same feeling here, please repost for net-next after the merge window.
-
-Thanks!
-
-Paolo
 
 
