@@ -1,205 +1,220 @@
-Return-Path: <netdev+bounces-112676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CD7093A8E3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:50:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCDD993A8E7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:50:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8A71C20BBB
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93E75283359
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0660B14830D;
-	Tue, 23 Jul 2024 21:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB16145326;
+	Tue, 23 Jul 2024 21:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fyfp56ZR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZLEnu2BB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986D8146592
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 21:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A5F13D898;
+	Tue, 23 Jul 2024 21:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721771392; cv=none; b=mPvFh98s4p7IN7F3a48g5RhxESn10nRgbSqZCtuvaGDJ31sDuMYfIhF1pjdPKt5j3D0BAVMvqueYb/jqoKcg33NDgzu1qLcj1p4j1EcFQ1w7XvVgaLa7wU8wsX+0K/z7F0AxLJURZuCSnJq5TgCEmqZzHINZ4dp9ScB01I6ISe0=
+	t=1721771443; cv=none; b=hiYNPZUgfFOrW4ryVLquB0QRXY9lU73CDgnloY3jjcy6MESGqwSZ2RaRitfz6VHtM/bchBIyFNtL2e1nYXDMhfHi8dqhz9kNTbACMRLpz6tQxCmu7I0H0DsVkgtwfmw70U9GpCW/urHYXgtjm9PnlLKhOyIp5NVUpUnhJWftxfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721771392; c=relaxed/simple;
-	bh=2SPyJdYRw87M7kH/eiezDyPqKNLNQ+jlKjgodNew6rA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j6mc419trT9bl943AotccOgGjDxT/WGQcBbx8jYhhIsNSKw4raMjw0/tubOHV/uH1LowW2RJ+Z+OBqMmTQd6TpfZVY44gVjCDuGpHnT5ASWoJf9+O9i4+F/3JDA3sTuexZrso1G1WrF9Dpk6OQgBSqeMoKE826Ke8CeRzuTgOIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fyfp56ZR; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e0b10e8b6b7so14539276.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 14:49:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721771388; x=1722376188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yF33mP3g3PVeShTJgLfx3fwdjlEE8z1s+DJQDSjcr+Y=;
-        b=Fyfp56ZR1ESGsr5WcO9ANtOIhEqOM3JSjZfk33f5RdokqN6GS9KYDSotLO4rDc3quS
-         RjaSdEa0xexo57qp/8eaJFSf+zj5XZipWjYU5j75zimicvyKmO6rnpXwNNJR6lYmWmJk
-         SG8Xxr9K0V+ggX/45/VWRKhbVNl7RGpR5nqlxjZgEbAojfKUDkcdkYwfHCzinB3T4Wye
-         jU2Gr6XsGMiaC47jaEWYclfWUf4OEtEWFLohdXMcuV2HfjZSalRjbdEiMVf9YPTCh+7y
-         F4XQxmwOHpl+ni2pn+YZF4mTb/UoJS4vHc26G62cqtXWxBfuopA2MLJPu0kXOMGaDy+R
-         Ijxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721771388; x=1722376188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yF33mP3g3PVeShTJgLfx3fwdjlEE8z1s+DJQDSjcr+Y=;
-        b=tFRqHGkf6UGNdbn9zyEWGvUi8PgnwMJ1cHs42zVLwrVCVmRiIddo7hvi/ANc4WkpeN
-         77O1nfK+0pf7UpKn79NnzMhgiP02YosWIJwVTIeICA5rowj6o0Y7gu0Ezsm8FtnuG/JL
-         BBfgsix9WdXqss+0i6XF8xi/C7/23tcdukMAJnVyo+OD5vuijTCHWjRxp7+xMICsUBgZ
-         N8buqLt2o1VOICSfULIrgNILtL3tUh1lv8Exfn97laTu7kIpiYdy1ZxnXDXbDzqZT+Pt
-         NXZeCaXhNNb7FZy9NhLlN0X2GRQAZmEN891tBJzuYDbN1OlHnsnNOwIS8d4hsYjOZUFE
-         /Wyw==
-X-Gm-Message-State: AOJu0Yz42Wtu9/lQOM7UXyRWH5bFtWBuFNfq9lcV4s99E+Mv8Bf9hua2
-	kMf4d+C3kkgLsrHKpwbFZ3II9L+Yt0zD4fJ74y/xPg7xNVGWhNXZD7gQx85YWjM8dQZH9RCjht8
-	4DttbQgavpm7fK852T1YGJ4ZIQ6AYN6j7kivN
-X-Google-Smtp-Source: AGHT+IH5JJRTlNbepSdsOAGPfU8tDz3MNG4de1Wtf/RZgU4beT2V9Y9SRFjNnPwNA1SLBZA82p/Z63pCaOnO/csApGk=
-X-Received: by 2002:a05:6902:1108:b0:e08:7607:bbf3 with SMTP id
- 3f1490d57ef6-e0b097d5744mr1316657276.34.1721771388342; Tue, 23 Jul 2024
- 14:49:48 -0700 (PDT)
+	s=arc-20240116; t=1721771443; c=relaxed/simple;
+	bh=bzv8yP69JRQobNQs9gMg1Wvqa9EoQrlbdR8UpvqyDl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=BzlPjnoJx/RhP8E1vj3kingyLO9BkQcDTy1RLOJ9CVEm1MKXsN5RsydR1SsH1Va0jn7FNORZomfrMjWbOpBWcKMpwUIVcilXn6ATy8ugxfx+uISI+lZHwNCKmYZuRA9SzPdp5IG7I2ZDou/g9IP0ULBxP14gCAHchCFysI9ax3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZLEnu2BB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 466DAC4AF09;
+	Tue, 23 Jul 2024 21:50:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721771442;
+	bh=bzv8yP69JRQobNQs9gMg1Wvqa9EoQrlbdR8UpvqyDl8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=ZLEnu2BBkIERneq3aiidNnhmPmlbxBiFs1WNDWeTQokn0M6o8IZrBHhQal7m4LRoB
+	 8NBn3cTmHkOixRNp88wsBNQHEgPqikS8mOlsBSMse0MsklOTizqeuarshk3+2YWKu1
+	 +NjNFJoIXqElCPCr4MnjLc6u6xoh7YprkTvuOWDhQEMx1WzyIGbylQ9qleXEbMQx91
+	 xKimD5TLTIg0608yT/XDMsCKSpHCWFyUX/IDyTULcrpxOB9Lo14V6piw7q5TQpHxw4
+	 KKM1kLoMh7mVt+PCgyS5GDycj7TWMTIEFGqwfgI9Kd84HIFHU/Zk+cATlBeBlHcBkA
+	 ill/Ng9TeAaug==
+Date: Tue, 23 Jul 2024 16:50:40 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com
+Subject: Re: [PATCH V3 08/10] PCI/TPH: Add TPH documentation
+Message-ID: <20240723215040.GA760037@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240628003253.1694510-1-almasrymina@google.com>
- <20240628003253.1694510-4-almasrymina@google.com> <CAMArcTUqqxam+BPwGExOFOLVi3t=dwA-5sSagKC5dndv07GDLQ@mail.gmail.com>
- <CAHS8izNS5jZjPfc-sARbHV7mzqzH+UhHfAtCTKRRTfSAdhY4Cw@mail.gmail.com> <CAMArcTUdCxOBYGF3vpbq=eBvqZfnc44KBaQTN7H-wqdUxZdziw@mail.gmail.com>
-In-Reply-To: <CAMArcTUdCxOBYGF3vpbq=eBvqZfnc44KBaQTN7H-wqdUxZdziw@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 23 Jul 2024 14:49:34 -0700
-Message-ID: <CAHS8izMTGgZ+4fOKegUDLqAoxrdVEb+nqjQEt8bP0WLBV=FfrQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 03/14] netdev: support binding dma-buf to netdevice
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240717205511.2541693-9-wei.huang2@amd.com>
 
-On Tue, Jul 9, 2024 at 8:37=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
-e:
-...
-> Reproducer:
-> ./ncdevmem -f <interface name> -l -p 5201 -v 7 -t 0 -q 2 &
-> sleep 10
-> modprobe -rv bnxt_en
-> killall ncdevmem
->
-> I think it's a devmemTCP core bug so this issue would be reproduced
-> with other drivers.
+On Wed, Jul 17, 2024 at 03:55:09PM -0500, Wei Huang wrote:
+> Provide a document for TPH feature, including the description of
+> kernel options and driver API interface.
+> 
+> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  Documentation/PCI/index.rst          |  1 +
+>  Documentation/PCI/tph.rst            | 57 ++++++++++++++++++++++++++++
 
-Sorry for the late reply. I was out at netdev.
+Wrap file to fit in 80 columns.  Looks like about 86 now, which is
+kind of a random size.
 
-I'm also having trouble reproducing this, not because the bug doesn't
-exist, but quirks with my test setup that I need to figure out. AFAICT
-this diff should fix the issue. If you have time to confirm, let me
-know if it doesn't work for you. It should apply on top of v16:
+>  Documentation/driver-api/pci/pci.rst |  3 ++
+>  3 files changed, 61 insertions(+)
+>  create mode 100644 Documentation/PCI/tph.rst
+> 
+> diff --git a/Documentation/PCI/index.rst b/Documentation/PCI/index.rst
+> index e73f84aebde3..5e7c4e6e726b 100644
+> --- a/Documentation/PCI/index.rst
+> +++ b/Documentation/PCI/index.rst
+> @@ -18,3 +18,4 @@ PCI Bus Subsystem
+>     pcieaer-howto
+>     endpoint/index
+>     boot-interrupts
+> +   tph
+> diff --git a/Documentation/PCI/tph.rst b/Documentation/PCI/tph.rst
+> new file mode 100644
+> index 000000000000..103f4c3251e2
+> --- /dev/null
+> +++ b/Documentation/PCI/tph.rst
+> @@ -0,0 +1,57 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +===========
+> +TPH Support
+> +===========
+> +
+> +
+> +:Copyright: 2024 Advanced Micro Devices, Inc.
+> +:Authors: - Eric van Tassell <eric.vantassell@amd.com>
+> +          - Wei Huang <wei.huang2@amd.com>
+> +
+> +Overview
+> +========
+> +TPH (TLP Processing Hints) is a PCIe feature that allows endpoint devices
+> +to provide optimization hints, such as desired caching behavior, for
+> +requests that target memory space. These hints, in a format called steering
+> +tags, are provided in the requester's TLP headers and can empower the system
+> +hardware, including the Root Complex, to optimize the utilization of platform
+> +resources for the requests.
 
-commit 795b8ff01906d ("fix for release issue")
-Author: Mina Almasry <almasrymina@google.com>
-Date:   Tue Jul 23 00:18:23 2024 +0000
+I see that this is basically cribbed from sec 6.17, but it sort of
+conflates Processing Hints (Bi-directional data structure, Requester,
+Target, Target with Priority) with Steering Tags (hints about where to
+target a TLP), and "optimize the utilization of platform resources for
+the requests" is pretty vague marketing-speak.
 
-    fix for release issue
+I think it might be useful to at least mention the Processing Hints
+because the distinction between PH and ST helps motivate the need for
+both "pci=notph" and "pci=nostmode".
 
-    Change-Id: Ib45a0aa6cba2918db5f7ba535414ffa860911fa4
+IIUC, we can enable TPH with the TPH Requester Enable bit, but I don't
+see an architected mechanism to control the PH bits in the TLP header.
+I assume there might be device-specific ways or it might be built into
+the hardware.
 
+Use "Steering Tags" to indicate that this is a term defined by the
+spec.
 
+> +User Guide
+> +==========
+> +
+> +Kernel Options
+> +--------------
+> +There are two kernel command line options available to control TPH feature
+> +
+> +   * "notph": TPH will be disabled for all endpoint devices.
+> +   * "nostmode": TPH will be enabled but the ST Mode will be forced to "No ST Mode".
+> +
+> +Device Driver API
+> +-----------------
+> +In brief, an endpoint device driver using the TPH interface to configure
+> +Interrupt Vector Mode will call pcie_tph_set_st() when setting up MSI-X
+> +interrupts as shown below:
 
-diff --git a/include/net/devmem.h b/include/net/devmem.h
-index 51b25ba193c96..df52526bb516a 100644
---- a/include/net/devmem.h
-+++ b/include/net/devmem.h
-@@ -68,6 +68,9 @@ net_devmem_bind_dmabuf(struct net_device *dev,
-unsigned int dmabuf_fd);
- void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding);
- int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
-                                    struct net_devmem_dmabuf_binding *bindi=
-ng);
-+
-+void dev_dmabuf_uninstall(struct net_device *dev);
-+
- struct net_iov *
- net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding);
- void net_devmem_free_dmabuf(struct net_iov *ppiov);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 5882ddc3f8592..7be084e4936e4 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11320,6 +11320,7 @@ void unregister_netdevice_many_notify(struct
-list_head *head,
-                dev_tcx_uninstall(dev);
-                dev_xdp_uninstall(dev);
-                bpf_dev_bound_netdev_unregister(dev);
-+               dev_dmabuf_uninstall(dev);
+I think we should include a spec reference for more details here,
+e.g., PCIe r6.0, sec 6.17, 6.17.3.
 
-                netdev_offload_xstats_disable_all(dev);
+> +.. code-block:: c
+> +
+> +    for (i = 0, j = 0; i < nr_rings; i++) {
 
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index e75057ecfa6de..227bcb1070ec0 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -362,4 +362,20 @@ bool mp_dmabuf_devmem_release_page(struct
-page_pool *pool, netmem_ref netmem)
-        return false;
- }
+"j" is not relevant here and makes the example unnecessarily
+complicated.
 
-+void dev_dmabuf_uninstall(struct net_device *dev)
-+{
-+       unsigned int i, count =3D dev->num_rx_queues;
-+       struct net_devmem_dmabuf_binding *binding;
-+       struct netdev_rx_queue *rxq;
-+       unsigned long xa_idx;
-+
-+       for (i =3D 0; i < count; i++) {
-+               binding =3D dev->_rx[i].mp_params.mp_priv;
-+               if (binding)
-+                       xa_for_each(&binding->bound_rxqs, xa_idx, rxq)
-+                               if (rxq =3D=3D &dev->_rx[i])
-+                                       xa_erase(&binding->bound_rxqs, xa_i=
-dx);
-+       }
-+}
-+
- #endif
+> +        ...
+> +        rc = request_irq(irq->vector, irq->handler, flags, irq->name, NULL);
+> +        ...
+> +        if (!pcie_tph_set_st(pdev, i, cpumask_first(irq->cpu_mask),
+> +                             TPH_MEM_TYPE_VM, PCI_TPH_REQ_TPH_ONLY))
+> +               pr_err("Error in configuring steering tag\n");
 
---=20
-Thanks,
-Mina
+pci_err().  I don't want to encourage drivers to print messages that
+have no connection to a specific device.
+
+> +        ...
+> +    }
+> +
+> +The caller is suggested to check if interrupt vector mode is supported using
+> +pcie_tph_intr_vec_supported() before updating the steering tags.
+
+I guess this refers to "Interrupt Vector Mode", an ST mode of
+operation (PCIe r6.0, sec 6.17.3).  Helpful to style this as
+"Interrupt Vector Mode" to indicate that it is a technical term
+defined in the spec.
+
+> If a device only
+> +supports TPH vendor specific mode, its driver can call pcie_tph_get_st_from_acpi()
+> +to retrieve the steering tag for a specific CPU and uses the tag to control TPH
+> +behavior.
+
+I'm not sure what "vendor specific mode" refers to here.  If it's the
+"Device Specific" ST Mode, use the exact language from the spec to
+help people find the details.
+
+> +.. kernel-doc:: drivers/pci/pcie/tph.c
+> +   :export:
+> +   :identifiers: pcie_tph_intr_vec_supported pcie_tph_get_st_from_acpi pcie_tph_set_st
+> diff --git a/Documentation/driver-api/pci/pci.rst b/Documentation/driver-api/pci/pci.rst
+> index aa40b1cc243b..3d896b2cf16e 100644
+> --- a/Documentation/driver-api/pci/pci.rst
+> +++ b/Documentation/driver-api/pci/pci.rst
+> @@ -46,6 +46,9 @@ PCI Support Library
+>  .. kernel-doc:: drivers/pci/pci-sysfs.c
+>     :internal:
+>  
+> +.. kernel-doc:: drivers/pci/pcie/tph.c
+> +   :export:
+> +
+>  PCI Hotplug Support Library
+>  ---------------------------
+>  
+> -- 
+> 2.45.1
+> 
 
