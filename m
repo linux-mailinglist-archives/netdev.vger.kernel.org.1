@@ -1,167 +1,330 @@
-Return-Path: <netdev+bounces-112615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E49E193A2F2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:40:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3496093A2FD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 694EF1F21841
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 14:40:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E120228522D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 14:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23FE115573D;
-	Tue, 23 Jul 2024 14:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C560C155C94;
+	Tue, 23 Jul 2024 14:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r83cRjq8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7gtwsOB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E820F155321;
-	Tue, 23 Jul 2024 14:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F202E15575F
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 14:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721745621; cv=none; b=YghRTXdK2+2KH3upF8gy5aXc7tD96KoDR7h9nWbpzZVmcoyMYwghOPcgXjKy9b4bL3MfO+RsGPbCP/1wBJOsiHV0QDlaYTuqB1cV5eeZmrmG3mAAm9HmyzNN+5CQL6yc3LUOQCqizTwhgfizuOG2A094ZFlwI4f90acmPwLRyqQ=
+	t=1721745704; cv=none; b=gKiap7od22mCFXFnLzTggckFgPNIRsK5JQqYks7UgbbDLOG3lPcJBgqlx+OaZpg7IPL9L5aYPcC2NMF5qOFMwIloDE7eAhrW/y91HbA1c2bvithYwJzCaXfcwl7VkixslCf4Cf2CnIWMFV8RR7Iubzv9/PSt/xONOEvPBUrfdE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721745621; c=relaxed/simple;
-	bh=N8ZTdNmUIqz46MN1E8bCcCXKIVjipICXzUH6FEPlH+A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NxcJZ9pZtdlUoRULEvFCfukvZC568sWIxRZh1+SxfOOHeSA7OTq3YoIIMuW9+L3vye2SPOLBFRAsj8RCU5odj7lrPnbLgQyf2hx/IYP1fLOUMX848y85uMNR/QVmmVwiMBswa0JOKz2bNDVJckkahf04caVsPhHQ+XTJknxgWeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r83cRjq8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50F45C4AF09;
-	Tue, 23 Jul 2024 14:40:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721745620;
-	bh=N8ZTdNmUIqz46MN1E8bCcCXKIVjipICXzUH6FEPlH+A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r83cRjq8zL5dGH2mSTsXbVvYysAjvKNHVPhYRD+xsmj6r9UeouHF81UVh1PhtJdxa
-	 BsoMn7WytP2wEODGPB2Mt8PmGwx8E1z5Bg2V0eBvFpYjLUdXu9VnaUrub8B4mM0uFL
-	 y2eUXA83RY7dGnqxIgLgEt27cyANq5kXFC1p1lYOHTBpZQYesT+li2Y5EU14DV8Pti
-	 1Ahomm1bMqyI/ecdCG1vqL7KjDCVef7GqzScZrF0MCVkYWkmB4zWrjTumLcou11oZX
-	 9Aicvl99c0XCmwbys8Va9t/Tc9itI3UCOZtm+jeSUIYivS+WdNdDmAKuaOIcBz0ljx
-	 Q4J/uhxoNRMCw==
-Message-ID: <ab8b02fb-c387-47e3-a732-9fad9d5ef48b@kernel.org>
-Date: Tue, 23 Jul 2024 16:40:08 +0200
+	s=arc-20240116; t=1721745704; c=relaxed/simple;
+	bh=WdnJ+hMhGSMponqG4kViC1DgyInGjvuh4n/NZkUg7Bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DWtZiuUq1VJ8p1wL8KafxVNFP+dzDvQjXi6RJOQJyKv63CPZyaBHL1UvmMPutTJDuyALucp5uAUjEDbK2preglVSfp+aR9vnsSNEmAN2YYE6n6EsVLYBcX6LRa2THCcyrpTCtrW7Yb4ev54YFHf+Eykm9ELob26neyODRlIlh58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J7gtwsOB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721745702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/9NlmFu+bsd8CcBEWR/pkh/Yo2pe8bBZ3WwTXW/wFkg=;
+	b=J7gtwsOBPImaG/DCYGbJNsnkSNbMnqsfOYoN5wwWhg9mdcZCbLFoXqa3ozp84LvKbo1J0G
+	7P7IK0UBYR10Gpmsfbl/hiXEHSsv1tQMbhdGmWXAxHGslUMIsDmwi/BKdMJHczOKlKNjDi
+	Q/BIqhcbzGQcSbt53mHge4voPi4WeF8=
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
+ [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-WMr18ePQPM63E4i0GGNVSw-1; Tue, 23 Jul 2024 10:41:38 -0400
+X-MC-Unique: WMr18ePQPM63E4i0GGNVSw-1
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-26103a95b34so5094775fac.3
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 07:41:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721745697; x=1722350497;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/9NlmFu+bsd8CcBEWR/pkh/Yo2pe8bBZ3WwTXW/wFkg=;
+        b=vbghvupztwRlfZkng8BioZUmLl8aVndUIeiBkqRwSNEkYLjVhmjqNZwkwTu8I7tah2
+         9jXz06rrlK6zQBAMfrW3E3dY2TeDwvhvSIFyYMtXVD5hUG8Cz4CSsPotrfxbpScai5Vi
+         UyMO711Lxqybnyi/GZJDOBxvh5VDEnj5ffgjAAYroRCPDzh70nTlD7PyN+kzkSpbb633
+         f+7PK8JAGosbV7oUGx2V2cSK77GUKJoFvFV/ryLki0S6TiaCElPJxlxm/RpQl9OyvIyX
+         Us07UvFq4246EQqXv0Hv342u81rtqwkfZQy4EoTTzdL3jwZsHPSshHUUmHYeLPrAsBMl
+         UGfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSA75y/Q49+1+do5qBHb8WOIsNkHT2ohx8eAD6n21GpXMn11kohCKYSya69N6CKwMXj6Sk/p/COlcIXZBB8YOaLTN/VWna
+X-Gm-Message-State: AOJu0YzueLCiyFN3EeELPmgxuWIkQbEfp1Bph4XeGfjf6ZCJUxDOXn1f
+	ICGvbZNnN/5RSaqJgzrm+XaKopNsG0L4Cc5SdJhPEvSglhz54JF2gAh5G2pWeHFsmqLRR1hefky
+	YAmYfi7x7B5zFwnpUJdhlRpkPOi4v8tMr8ixMmduyZ8vcLYy4OkG86ZY3A8mDEQ==
+X-Received: by 2002:a05:6870:96a9:b0:260:fc8c:2d29 with SMTP id 586e51a60fabf-264690736f3mr2997465fac.20.1721745696874;
+        Tue, 23 Jul 2024 07:41:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1TDBnmRZA2Q8ZLvYfzA17+JeqzePSJLyyDpiBaSk2AXZTKm1LxcD+OQB0EG7X+jHIcZhWGQ==
+X-Received: by 2002:a05:6870:96a9:b0:260:fc8c:2d29 with SMTP id 586e51a60fabf-264690736f3mr2997416fac.20.1721745696294;
+        Tue, 23 Jul 2024 07:41:36 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-79.retail.telecomitalia.it. [82.57.51.79])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a198fad0c0sm486726185a.15.2024.07.23.07.41.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jul 2024 07:41:35 -0700 (PDT)
+Date: Tue, 23 Jul 2024 16:41:29 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
+	decui@microsoft.com, bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
+	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
+Subject: Re: [RFC PATCH net-next v6 05/14] af_vsock: use a separate dgram
+ bind table
+Message-ID: <pghfa4vh7vb7sggelop5asuyj6bqtq4rbgm2q3bdslcoeicihj@6arcanemghjo>
+References: <20240710212555.1617795-1-amery.hung@bytedance.com>
+ <20240710212555.1617795-6-amery.hung@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2 2/2] tcp: limit wake-up for crossed SYN cases to
- SYN-ACK
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Jerry Chu <hkchu@google.com>, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-0-d653f85639f6@kernel.org>
- <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-2-d653f85639f6@kernel.org>
- <CANn89iKOa8YKYjz4jVN0R+3qCpcALTAJ_8W+pd+022jAMT+Zjw@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iKOa8YKYjz4jVN0R+3qCpcALTAJ_8W+pd+022jAMT+Zjw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240710212555.1617795-6-amery.hung@bytedance.com>
 
-Hi Eric,
+On Wed, Jul 10, 2024 at 09:25:46PM GMT, Amery Hung wrote:
+>From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>
+>This commit adds support for bound dgram sockets to be tracked in a
+>separate bind table from connectible sockets in order to avoid address
+>collisions. With this commit, users can simultaneously bind a dgram
+>socket and connectible socket to the same CID and port.
+>
+>Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>---
+> net/vmw_vsock/af_vsock.c | 103 +++++++++++++++++++++++++++++----------
+> 1 file changed, 76 insertions(+), 27 deletions(-)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index d571be9cdbf0..ab08cd81720e 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -10,18 +10,23 @@
+>  * - There are two kinds of sockets: those created by user action (such as
+>  * calling socket(2)) and those created by incoming connection request packets.
+>  *
+>- * - There are two "global" tables, one for bound sockets (sockets that have
+>- * specified an address that they are responsible for) and one for connected
+>- * sockets (sockets that have established a connection with another socket).
+>- * These tables are "global" in that all sockets on the system are placed
+>- * within them. - Note, though, that the bound table contains an extra entry
+>- * for a list of unbound sockets and SOCK_DGRAM sockets will always remain in
+>- * that list. The bound table is used solely for lookup of sockets when packets
+>- * are received and that's not necessary for SOCK_DGRAM sockets since we create
+>- * a datagram handle for each and need not perform a lookup.  Keeping SOCK_DGRAM
+>- * sockets out of the bound hash buckets will reduce the chance of collisions
+>- * when looking for SOCK_STREAM sockets and prevents us from having to check the
+>- * socket type in the hash table lookups.
+>+ * - There are three "global" tables, one for bound connectible (stream /
+>+ * seqpacket) sockets, one for bound datagram sockets, and one for connected
+>+ * sockets. Bound sockets are sockets that have specified an address that
+>+ * they are responsible for. Connected sockets are sockets that have
+>+ * established a connection with another socket. These tables are "global" in
+>+ * that all sockets on the system are placed within them. - Note, though,
+>+ * that the bound tables contain an extra entry for a list of unbound
+>+ * sockets. The bound tables are used solely for lookup of sockets when packets
+>+ * are received.
+>+ *
+>+ * - There are separate bind tables for connectible and datagram sockets to avoid
+>+ * address collisions between stream/seqpacket sockets and datagram sockets.
+>+ *
+>+ * - Transports may elect to NOT use the global datagram bind table by
+>+ * implementing the ->dgram_bind() callback. If that callback is implemented,
+>+ * the global bind table is not used and the responsibility of bound datagram
+>+ * socket tracking is deferred to the transport.
+>  *
+>  * - Sockets created by user action will either be "client" sockets that
+>  * initiate a connection or "server" sockets that listen for connections; we do
+>@@ -116,6 +121,7 @@
+> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+> static void vsock_sk_destruct(struct sock *sk);
+> static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
+>+static bool sock_type_connectible(u16 type);
+>
+> /* Protocol family. */
+> struct proto vsock_proto = {
+>@@ -152,21 +158,25 @@ static DEFINE_MUTEX(vsock_register_mutex);
+>  * VSocket is stored in the connected hash table.
+>  *
+>  * Unbound sockets are all put on the same list attached to the end of the hash
+>- * table (vsock_unbound_sockets).  Bound sockets are added to the hash table in
+>- * the bucket that their local address hashes to (vsock_bound_sockets(addr)
+>- * represents the list that addr hashes to).
+>+ * tables (vsock_unbound_sockets/vsock_unbound_dgram_sockets).  Bound sockets
+>+ * are added to the hash table in the bucket that their local address hashes to
+>+ * (vsock_bound_sockets(addr) and vsock_bound_dgram_sockets(addr) represents
+>+ * the list that addr hashes to).
+>  *
+>- * Specifically, we initialize the vsock_bind_table array to a size of
+>- * VSOCK_HASH_SIZE + 1 so that vsock_bind_table[0] through
+>- * vsock_bind_table[VSOCK_HASH_SIZE - 1] are for bound sockets and
+>- * vsock_bind_table[VSOCK_HASH_SIZE] is for unbound sockets.  The hash function
+>- * mods with VSOCK_HASH_SIZE to ensure this.
+>+ * Specifically, taking connectible sockets as an example we initialize the
+>+ * vsock_bind_table array to a size of VSOCK_HASH_SIZE + 1 so that
+>+ * vsock_bind_table[0] through vsock_bind_table[VSOCK_HASH_SIZE - 1] are for
+>+ * bound sockets and vsock_bind_table[VSOCK_HASH_SIZE] is for unbound sockets.
+>+ * The hash function mods with VSOCK_HASH_SIZE to ensure this.
+>+ * Datagrams and vsock_dgram_bind_table operate in the same way.
+>  */
+> #define MAX_PORT_RETRIES        24
+>
+> #define VSOCK_HASH(addr)        ((addr)->svm_port % VSOCK_HASH_SIZE)
+> #define vsock_bound_sockets(addr) (&vsock_bind_table[VSOCK_HASH(addr)])
+>+#define vsock_bound_dgram_sockets(addr) (&vsock_dgram_bind_table[VSOCK_HASH(addr)])
+> #define vsock_unbound_sockets     (&vsock_bind_table[VSOCK_HASH_SIZE])
+>+#define vsock_unbound_dgram_sockets     (&vsock_dgram_bind_table[VSOCK_HASH_SIZE])
+>
+> /* XXX This can probably be implemented in a better way. */
+> #define VSOCK_CONN_HASH(src, dst)				\
+>@@ -182,6 +192,8 @@ struct list_head vsock_connected_table[VSOCK_HASH_SIZE];
+> EXPORT_SYMBOL_GPL(vsock_connected_table);
+> DEFINE_SPINLOCK(vsock_table_lock);
+> EXPORT_SYMBOL_GPL(vsock_table_lock);
+>+static struct list_head vsock_dgram_bind_table[VSOCK_HASH_SIZE + 1];
+>+static DEFINE_SPINLOCK(vsock_dgram_table_lock);
+>
+> /* Autobind this socket to the local address if necessary. */
+> static int vsock_auto_bind(struct vsock_sock *vsk)
+>@@ -204,6 +216,9 @@ static void vsock_init_tables(void)
+>
+> 	for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++)
+> 		INIT_LIST_HEAD(&vsock_connected_table[i]);
+>+
+>+	for (i = 0; i < ARRAY_SIZE(vsock_dgram_bind_table); i++)
+>+		INIT_LIST_HEAD(&vsock_dgram_bind_table[i]);
+> }
+>
+> static void __vsock_insert_bound(struct list_head *list,
+>@@ -271,13 +286,28 @@ static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
+> 	return NULL;
+> }
+>
+>-static void vsock_insert_unbound(struct vsock_sock *vsk)
+>+static void __vsock_insert_dgram_unbound(struct vsock_sock *vsk)
+>+{
+>+	spin_lock_bh(&vsock_dgram_table_lock);
+>+	__vsock_insert_bound(vsock_unbound_dgram_sockets, vsk);
+>+	spin_unlock_bh(&vsock_dgram_table_lock);
+>+}
+>+
+>+static void __vsock_insert_connectible_unbound(struct vsock_sock *vsk)
+> {
+> 	spin_lock_bh(&vsock_table_lock);
+> 	__vsock_insert_bound(vsock_unbound_sockets, vsk);
+> 	spin_unlock_bh(&vsock_table_lock);
+> }
+>
+>+static void vsock_insert_unbound(struct vsock_sock *vsk)
+>+{
+>+	if (sock_type_connectible(sk_vsock(vsk)->sk_type))
+>+		__vsock_insert_connectible_unbound(vsk);
+>+	else
+>+		__vsock_insert_dgram_unbound(vsk);
+>+}
+>+
+> void vsock_insert_connected(struct vsock_sock *vsk)
+> {
+> 	struct list_head *list = vsock_connected_sockets(
+>@@ -289,6 +319,14 @@ void vsock_insert_connected(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(vsock_insert_connected);
+>
+>+static void vsock_remove_dgram_bound(struct vsock_sock *vsk)
+>+{
+>+	spin_lock_bh(&vsock_dgram_table_lock);
+>+	if (__vsock_in_bound_table(vsk))
+>+		__vsock_remove_bound(vsk);
+>+	spin_unlock_bh(&vsock_dgram_table_lock);
+>+}
+>+
+> void vsock_remove_bound(struct vsock_sock *vsk)
+> {
+> 	spin_lock_bh(&vsock_table_lock);
+>@@ -340,7 +378,10 @@ EXPORT_SYMBOL_GPL(vsock_find_connected_socket);
+>
+> void vsock_remove_sock(struct vsock_sock *vsk)
+> {
+>-	vsock_remove_bound(vsk);
+>+	if (sock_type_connectible(sk_vsock(vsk)->sk_type))
+>+		vsock_remove_bound(vsk);
+>+	else
+>+		vsock_remove_dgram_bound(vsk);
 
-Thank you for the review!
+Can we try to be consistent, for example we have vsock_insert_unbound()
+which calls internally sock_type_connectible(), while
+vsock_remove_bound() is just for connectible sockets. It's a bit
+confusing.
 
-On 23/07/2024 16:32, Eric Dumazet wrote:
-> On Thu, Jul 18, 2024 at 12:34 PM Matthieu Baerts (NGI0)
-> <matttbe@kernel.org> wrote:
->>
->> sk->sk_socket will be assigned in case of marginal crossed SYN, but also
->> in other cases, e.g.
->>
->>  - With TCP Fast Open, if the connection got accept()'ed before
->>    receiving the 3rd ACK ;
->>
->>  - With MPTCP, when accepting additional subflows to an existing MPTCP
->>    connection.
->>
->> In these cases, the switch to TCP_ESTABLISHED is done when receiving the
->> 3rd ACK, without the SYN flag then.
->>
->> To properly restrict the wake-up to crossed SYN cases, it is then
->> required to also limit the check to packets containing the SYN-ACK
->> flags.
->>
->> While at it, also update the attached comment: sk->sk_sleep has been
->> removed in 2010, and replaced by sk->sk_wq in commit 43815482370c ("net:
->> sock_def_readable() and friends RCU conversion").
->>
->> Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
->> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->> ---
->> Notes:
->>  - The above 'Fixes' tag should correspond to the commit introducing the
->>    possibility to have sk->sk_socket being set there in other cases than
->>    the crossed SYN one. But I might have missed other cases. Maybe
->>    1da177e4c3f4 ("Linux-2.6.12-rc2") might be safer? On the other hand,
->>    I don't think this wake-up was causing any visible issue, apart from
->>    not being needed.
-> 
-> This seems a net-next candidate to me ?
+> 	vsock_remove_connected(vsk);
+> }
+> EXPORT_SYMBOL_GPL(vsock_remove_sock);
+>@@ -746,11 +787,19 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> 	return vsock_bind_common(vsk, addr, vsock_bind_table, VSOCK_HASH_SIZE + 1);
+> }
+>
+>-static int __vsock_bind_dgram(struct vsock_sock *vsk,
+>-			      struct sockaddr_vm *addr)
+>+static int vsock_bind_dgram(struct vsock_sock *vsk,
+>+			    struct sockaddr_vm *addr)
 
-Fine by me!
+Why we are renaming this?
 
-I modified this line mainly because Kuniyuki mentioned that it was the
-same check as the new one, modified in patch 1/2. I didn't find any
-visible issue with the wakeup, so I guess it can go to net-next.
+> {
+>-	if (!vsk->transport || !vsk->transport->dgram_bind)
+>-		return -EINVAL;
+>+	if (!vsk->transport || !vsk->transport->dgram_bind) {
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+Why this condition?
+
+Maybe a comment here is needed because I'm lost...
+
+>+		int retval;
+>+
+>+		spin_lock_bh(&vsock_dgram_table_lock);
+>+		retval = vsock_bind_common(vsk, addr, vsock_dgram_bind_table,
+>+					   VSOCK_HASH_SIZE);
+
+Should we use VSOCK_HASH_SIZE + 1 here?
+
+Using ARRAY_SIZE(x) should avoid this problem.
+
+
+>+		spin_unlock_bh(&vsock_dgram_table_lock);
+>+
+>+		return retval;
+>+	}
+>
+> 	return vsk->transport->dgram_bind(vsk, addr);
+> }
+>@@ -781,7 +830,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
+> 		break;
+>
+> 	case SOCK_DGRAM:
+>-		retval = __vsock_bind_dgram(vsk, addr);
+>+		retval = vsock_bind_dgram(vsk, addr);
+> 		break;
+>
+> 	default:
+>-- 
+>2.20.1
+>
 
 
