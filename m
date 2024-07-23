@@ -1,208 +1,109 @@
-Return-Path: <netdev+bounces-112685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7852993A956
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:31:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B2993A95D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:33:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7B641C22465
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:31:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 409FD284213
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BFC213EFFB;
-	Tue, 23 Jul 2024 22:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8C414600C;
+	Tue, 23 Jul 2024 22:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IlWCgZgm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5py/4hH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708E2288D1;
-	Tue, 23 Jul 2024 22:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0DE288D1;
+	Tue, 23 Jul 2024 22:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721773872; cv=none; b=HrBx/bWY8MiWA5oRx6eaFFBtFM96PIMsBl5fi23rDB06AijhFm5hdOLqnxfb7g/mTuz051gexzBJNzz0nxXP+3Jf5ETvPwkcLOY3zN+PnxA0VwupKmPqqKPIa7keZrJBohZc8CL0My1qxOPTJnsYtpgjZsUU+LWoefTGx6Jn1As=
+	t=1721773996; cv=none; b=SvJwhISdbOh0JAd4WNzQtmjv419SuEswgrHNr2gQnU0ZbcPQ9x8Pu0K3/m1fX9ldeyRpS0gK/9bFRSgOop/E7vN5W6kHUw675cfq4dl/pJGGq+rnCg0JRdcW02kuuvMuaXij5XSdeXtj3inFL3dM+QeumWT1s18YJyHVRu27024=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721773872; c=relaxed/simple;
-	bh=IxBRar1RxH89c3TNuKgry7Njs57mT04USb7aaNO0aFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GwqhrJkeYswzbcnl7ffLJLuDKKVtH815xjZwXZ3Co2xAYV2SGDroYlQTMZOzYbdxoSxK9sOmIcrK+vzVpX9QGNLqBiTs5QthdpG9AQZK5OgPja0nFybvP0CT9ib5pyZ6ulFJHtzLWwqHaftYc0/IdqvFUj1hOqpUzgpPOpmmV5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IlWCgZgm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62F83C4AF09;
-	Tue, 23 Jul 2024 22:31:11 +0000 (UTC)
+	s=arc-20240116; t=1721773996; c=relaxed/simple;
+	bh=P1edFubkU42gQM60THhmDmm1fEOb72Ql3vnXb72Yu5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=CN8tPc2/tCRbm15wNa9C8UPDdbklVsATnbuRNmP9g+VWCmnfgstt+AVo/pGD+BMwWLu3a5AGax8nql5LiVQ6J6ngNIsESYrkAzH1/HUQkHZO+p8MvQJqXf6T6GwHKVSYDVYjizO1hidd9KA7xSso7eNHEl4xboIi8ksNI0+cpLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5py/4hH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E3EC4AF09;
+	Tue, 23 Jul 2024 22:33:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721773872;
-	bh=IxBRar1RxH89c3TNuKgry7Njs57mT04USb7aaNO0aFM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IlWCgZgmE18s7gUIX33ab9+TiYNgSArnBFSsBpEWH9JQoLa4QjkY8tD5HKD2Z/Zzt
-	 dSjY13vNr2PIxRd+0ufUbvCK86Rbd9FQCwf7jdbgf9wRQwk+/DnWmBV/HCA5MCofVK
-	 sqmyrYsTzSi6HL/4vYTLIkzsKWSnbPuaV2wstEaeJ7gocgSLvkYZ4VKy+qMF4I/vY3
-	 fHVZmXRSpNgblqXsZpRn0YA5sI8AkRx/jvwAo1wugyzD0rCzXPeYsRmh9HD+gee3O7
-	 q946DsnCvY+0NhVTdWL6XyejDnWlrrzl1W+dDcmDFIApAEs/RmBmQJCoTmLJHUWuGf
-	 C0mRQx+mdVthA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	willemdebruijn.kernel@gmail.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	shuah@kernel.org,
-	arefev@swemel.ru,
-	virtualization@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] virtio: fix GSO with frames unaligned to size
-Date: Tue, 23 Jul 2024 15:31:09 -0700
-Message-ID: <20240723223109.2196886-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=k20201202; t=1721773996;
+	bh=P1edFubkU42gQM60THhmDmm1fEOb72Ql3vnXb72Yu5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=t5py/4hHNHOiryPtmnllAD2G7xyTM5Ng/oRZB3cYWw46Zb++/Zz9dMNEghtTaw7CY
+	 BgDtiQxVbPS5HHTDzX9hLV7vm5z9toTzvYOlCY+laxho+pOyx1k3gQo3WChhOzbLAt
+	 s4gqoIERdgORn/cgjP4x9ezNZUYf4/hhbCOXL7Qp6jwLze11umJkuIT/UDVv0aUFdy
+	 w/9PY/pBSFmOSSTPo9McASPipOTi/AuPu1JTmYJeLSfaXTjWVn9AiZ9Ee6lYH1pf2g
+	 45bsAxvtU3zyUMYUHvRkYOJ3vFIPkTFpUm2H4/6212eLC+cuDY/gM0SFvz1lJCkwy9
+	 e+6fwzwZnu+pQ==
+Date: Tue, 23 Jul 2024 17:33:13 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com
+Subject: Re: [PATCH V3 02/10] PCI: Add TPH related register definition
+Message-ID: <20240723223313.GA779521@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240717205511.2541693-3-wei.huang2@amd.com>
 
-The commit under fixes added a questionable check to
-virtio_net_hdr_to_skb(). I'm guessing the check was supposed
-to protect from csum offset being outside of a segment
-(especially if len is not multiple of segment size).
+On Wed, Jul 17, 2024 at 03:55:03PM -0500, Wei Huang wrote:
+> Linux has some basic, but incomplete, definition for the TPH Requester
+> capability registers. Also the control registers of TPH Requester and
+> the TPH Completer are missing. Add all required definitions to support
+> TPH without changing the existing uapi.
 
-The condition can't be right, tho, as it breaks previously
-working sending of GSO frames with only one segment
-(i.e. when gso_size <= len we silently ignore the GSO
-request and send a single non-GSO frame).
+> +#define  PCI_TPH_CAP_NO_ST	0x00000001 /* no ST mode supported */
+> +#define  PCI_TPH_CAP_INT_VEC	0x00000002 /* interrupt vector mode supported */
+> +#define  PCI_TPH_CAP_DS		0x00000004 /* device specific mode supported */
 
-Fix the logic and move it to the GSO part.
+Capitalize to match spec usage.  Also below.
 
-This has been caught by net/tap and net/psock_send.sh tests.
+> +#define  PCI_TPH_CAP_EXT_TPH	0x00000100 /* extended TPH requestor supported */
 
-Fixes: e269d79c7d35 ("net: missing check virtio")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: willemdebruijn.kernel@gmail.com
-CC: mst@redhat.com
-CC: jasowang@redhat.com
-CC: xuanzhuo@linux.alibaba.com
-CC: eperezma@redhat.com
-CC: shuah@kernel.org
-CC: arefev@swemel.ru
-CC: virtualization@lists.linux.dev
-CC: linux-kselftest@vger.kernel.org
----
- include/linux/virtio_net.h        | 27 ++++++++++++++++-----------
- tools/testing/selftests/net/tap.c | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+), 11 deletions(-)
+s/requestor/requester/
 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index d1d7825318c3..c54b7aa42921 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -52,11 +52,11 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 					bool little_endian)
- {
- 	unsigned int nh_min_len = sizeof(struct iphdr);
-+	unsigned int csum_needed = 0;
- 	unsigned int gso_type = 0;
- 	unsigned int thlen = 0;
- 	unsigned int p_off = 0;
- 	unsigned int ip_proto;
--	u64 ret, remainder, gso_size;
- 
- 	if (hdr->gso_type != VIRTIO_NET_HDR_GSO_NONE) {
- 		switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
-@@ -99,16 +99,6 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		u32 off = __virtio16_to_cpu(little_endian, hdr->csum_offset);
- 		u32 needed = start + max_t(u32, thlen, off + sizeof(__sum16));
- 
--		if (hdr->gso_size) {
--			gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
--			ret = div64_u64_rem(skb->len, gso_size, &remainder);
--			if (!(ret && (hdr->gso_size > needed) &&
--						((remainder > needed) || (remainder == 0)))) {
--				return -EINVAL;
--			}
--			skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
--		}
--
- 		if (!pskb_may_pull(skb, needed))
- 			return -EINVAL;
- 
-@@ -119,6 +109,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		p_off = nh_min_len + thlen;
- 		if (!pskb_may_pull(skb, p_off))
- 			return -EINVAL;
-+
-+		csum_needed = needed;
- 	} else {
- 		/* gso packets without NEEDS_CSUM do not set transport_offset.
- 		 * probe and drop if does not match one of the above types.
-@@ -188,6 +180,19 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		if (gso_size == GSO_BY_FRAGS)
- 			return -EINVAL;
- 
-+		if (csum_needed) {
-+			unsigned int p_rem, p_size;
-+
-+			p_size = gso_size;
-+			p_rem = (skb->len - nh_off) % gso_size;
-+			if (p_rem)
-+				p_size = p_rem;
-+
-+			/* Make sure csum still within packet after GSO */
-+			if (p_size + nh_off < csum_needed)
-+				return -EINVAL;
-+		}
-+
- 		/* Too small packets are not really GSO ones. */
- 		if (skb->len - nh_off > gso_size) {
- 			shinfo->gso_size = gso_size;
-diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
-index 247c3b3ac1c9..8527d51449cf 100644
---- a/tools/testing/selftests/net/tap.c
-+++ b/tools/testing/selftests/net/tap.c
-@@ -418,6 +418,36 @@ TEST_F(tap, test_packet_valid_udp_csum)
- 	ASSERT_EQ(ret, off);
- }
- 
-+TEST_F(tap, test_packet_invalid_udp_gso_csum)
-+{
-+	uint8_t pkt[TEST_PACKET_SZ];
-+	uint16_t payload;
-+	size_t off;
-+	int ret;
-+	int i;
-+
-+	payload = ETH_DATA_LEN - sizeof(struct iphdr) - sizeof(struct udphdr);
-+
-+	memset(pkt, 0, sizeof(pkt));
-+	off = build_test_packet_valid_udp_gso(pkt, payload);
-+
-+	for (i = -16; i < 16; i++) {
-+		ret = write(self->fd, pkt, off + i);
-+
-+		if (i <= 0 ||
-+		    i > __builtin_offsetof(struct udphdr, check) + 1) {
-+			EXPECT_EQ(ret, off + i)
-+				TH_LOG("mismatch with offset: %d (%zd)",
-+				       i, off + i);
-+		} else {
-+			EXPECT_EQ(ret, -1)
-+				TH_LOG("mismatch with offset: %d (%zd)",
-+				       i, off + i);
-+			EXPECT_EQ(errno, 22);
-+		}
-+	}
-+}
-+
- TEST_F(tap, test_packet_crash_tap_invalid_eth_proto)
- {
- 	uint8_t pkt[TEST_PACKET_SZ];
--- 
-2.45.2
-
+> +#define  PCI_TPH_CAP_LOC_MASK	0x00000600 /* location mask */
+> +#define   PCI_TPH_LOC_NONE	0x00000000 /* no location */
+> +#define   PCI_TPH_LOC_CAP	0x00000200 /* in capability */
+> +#define   PCI_TPH_LOC_MSIX	0x00000400 /* in MSI-X */
+>  #define PCI_TPH_CAP_ST_MASK	0x07FF0000	/* ST table mask */
+>  #define PCI_TPH_CAP_ST_SHIFT	16	/* ST table shift */
+>  #define PCI_TPH_BASE_SIZEOF	0xc	/* size with no ST table */
+>  
+> +#define PCI_TPH_CTRL		8	/* control register */
+> +#define  PCI_TPH_CTRL_MODE_SEL_MASK	0x00000007 /* ST mode select mask */
+> +#define   PCI_TPH_NO_ST_MODE		0x0 /*  no ST mode */
+> +#define   PCI_TPH_INT_VEC_MODE		0x1 /*  interrupt vector mode */
+> +#define   PCI_TPH_DEV_SPEC_MODE		0x2 /*  device specific mode */
+> +#define  PCI_TPH_CTRL_REQ_EN_MASK	0x00000300 /* TPH requester mask */
+> +#define   PCI_TPH_REQ_DISABLE		0x0 /*  no TPH request allowed */
+> +#define   PCI_TPH_REQ_TPH_ONLY		0x1 /*  8-bit TPH tags allowed */
+> +#define   PCI_TPH_REQ_EXT_TPH		0x3 /*  16-bit TPH tags allowed */
+> +
+>  /* Downstream Port Containment */
+>  #define PCI_EXP_DPC_CAP			0x04	/* DPC Capability */
+>  #define PCI_EXP_DPC_IRQ			0x001F	/* Interrupt Message Number */
+> -- 
+> 2.45.1
+> 
 
