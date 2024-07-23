@@ -1,108 +1,77 @@
-Return-Path: <netdev+bounces-112645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1E593A4F9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 19:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5235293A50A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 19:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24FE81F21B05
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 17:32:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EAE9283D80
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 17:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC8B157A48;
-	Tue, 23 Jul 2024 17:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1F315886C;
+	Tue, 23 Jul 2024 17:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OYdIrLMy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GeuiCvQs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA9713BC18;
-	Tue, 23 Jul 2024 17:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263F2158869
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 17:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721755952; cv=none; b=Tea7gtIGTCTToQX4I5Z/Q6xwW7yBov4xoroxq07NFozJR8iQ3O5rYXVTwJcS5xzUPYmTdt+4wUn6KdYTF9VTDdtQvZ1WcKn7MRnI8g4yGZm7uXtawHHGXRy/Ld/OIH4u8g6JkocN43JJVfBa4qI/vXvOa5rki6FQoaKLJk+g7VM=
+	t=1721756206; cv=none; b=mfX7ZWWfdHdD3irJgxedrXkLpWMBK9Mxy5CmoqpPceCUZj4sNltuqdLwWkd4mI/urrucTrGtZO1zscSbPxs65XAR2w7/XcbIcFPG6Y7uqxDkVP8K35t8prsGq46/7VX9V0uzx/mm9rJzbHamoDegpkTqqUKQbHMkkE41L0RSZIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721755952; c=relaxed/simple;
-	bh=VeKv1mdM4b2Az2hwXIufGbGyrkqjcYonv0q7odEaJbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i1hbkSbew2HGTNxUTMAzKlTeLjj9kW+aGZn45371q9F11DOFgbf6CDmDRGuaSy/Hvqcaot81xfh/uSnoH4zKnQp2gZdqNvQavxcV0RLv5Td/RkaGW6CWVxOh41wt+nlVes8csRp6JSW2JcMR9R32mU1Kz8bBkb/d9jDRQLXlPOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OYdIrLMy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B792AC4AF0A;
-	Tue, 23 Jul 2024 17:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721755952;
-	bh=VeKv1mdM4b2Az2hwXIufGbGyrkqjcYonv0q7odEaJbU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OYdIrLMyfCk4J6Tu7KzRzullXgcO5GzZ+dgXmbi+rYKn3AcYr7ZGg8/URI+9ktb39
-	 ryxQMQx/FgIRi7W/z84MQSJsAqiJEaGacoIX8G3z1pd76e7xKrfZ9ayHqvHs/3beJw
-	 3tzlHkssxFZgvyRLlC551eHA508kuzd3ZzcbVNJg=
-Date: Tue, 23 Jul 2024 19:32:29 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, liujunliang_ljl@163.com,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] USB2NET: SR9700: fix uninitialized variable use in
- sr_mdio_read
-Message-ID: <2024072305-dinner-prize-bb82@gregkh>
-References: <20240723140434.1330255-1-make24@iscas.ac.cn>
+	s=arc-20240116; t=1721756206; c=relaxed/simple;
+	bh=H+pMoN+Pge9UnPXjUoiqgNe05Mi16Mr4ZYtXey/7ksg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I1ParJSl6Yj7fxXD0guAGpRAZpzw94ir7lF+Dh2W0qEpiAq458pb7x10iufKcJ0HZLFzRYGMaRT/Raj6h4RgwdXaSPYTXARNbTXzGR4qOjZanreJto6nZFqRQ55EvNwp7s25HFBuRZ7FORDV/pxbsLajvIRficZ7YdvH/Q85jwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GeuiCvQs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 515BEC4AF09;
+	Tue, 23 Jul 2024 17:36:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721756205;
+	bh=H+pMoN+Pge9UnPXjUoiqgNe05Mi16Mr4ZYtXey/7ksg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GeuiCvQsKETuh0LR7u9/gwhC2nDqMrQUOtGXhIqFy20w6RhNtYnTAz0cHvTYFoyGs
+	 fhm5Vl2FkdEr2DxG7V27GuY/jzRd6HKHOeY20ylqxa4SlKuUCqevca3FoRhUi9KZBF
+	 WHqZ6LNvqRzCnskJQUy9LqvSEMvDH3xixHng7i3jeisw+WS/dC4gb+gj7+nuDVA0mB
+	 o6sbSK2X5icgSIDN/8YWjzGaBqAG1V7j62P/QI7h949v6llP4vHrBnw7lVYiv7j6uU
+	 dCGohY4Nx1n6KUCqwlNOJplCEABKEZRNiDhY9gSa88nc2FWUqfx99xjdCNc5hoC1+w
+	 n3YDGUHp7aDmg==
+Date: Tue, 23 Jul 2024 10:36:44 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kamal Heib <kheib@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Ivan Vecera <ivecera@redhat.com>, "David S
+ . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH iwl-next v2] i40e: Add support for fw health report
+Message-ID: <20240723103644.1fea5124@kernel.org>
+In-Reply-To: <20240718181319.145884-1-kheib@redhat.com>
+References: <20240718181319.145884-1-kheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240723140434.1330255-1-make24@iscas.ac.cn>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 23, 2024 at 10:04:34PM +0800, Ma Ke wrote:
-> It could lead to error happen because the variable res is not updated if
-> the call to sr_share_read_word returns an error. In this particular case
-> error code was returned and res stayed uninitialized.
+On Thu, 18 Jul 2024 14:13:19 -0400 Kamal Heib wrote:
+> Add support for reporting fw status via the devlink health report.
 > 
-> This can be avoided by checking the return value of sr_share_read_word
-> and propagating the error if the read operation failed.
-> 
-> Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> Example:
+>  # devlink health show pci/0000:02:00.0 reporter fw
+>  pci/0000:02:00.0:
+>    reporter fw
+>      state healthy error 0 recover 0
+>  # devlink health diagnose pci/0000:02:00.0 reporter fw
+>  Mode: normal
 
-You forgot to document how you found this problem.
-
-> ---
->  drivers/net/usb/sr9700.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-
-Hi,
-
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
-
-You are receiving this message because of the following common error(s)
-as indicated below:
-
-- You have marked a patch with a "Fixes:" tag for a commit that is in an
-  older released kernel, yet you do not have a cc: stable line in the
-  signed-off-by area at all, which means that the patch will not be
-  applied to any older kernel releases.  To properly fix this, please
-  follow the documented rules in the
-  Documentation/process/stable-kernel-rules.rst file for how to resolve
-  this.
-
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
+I'm not sure if health reporter is the right fit, depends on what 
+the recovery mode is / does. We need documentation.
 
