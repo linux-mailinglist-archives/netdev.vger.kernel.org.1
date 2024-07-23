@@ -1,124 +1,108 @@
-Return-Path: <netdev+bounces-112644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 049F893A4EC
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 19:26:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1E593A4F9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 19:32:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA2452836D9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 17:26:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24FE81F21B05
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 17:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328FF1581FF;
-	Tue, 23 Jul 2024 17:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC8B157A48;
+	Tue, 23 Jul 2024 17:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AdnuBxZ8"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OYdIrLMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87024158207
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 17:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA9713BC18;
+	Tue, 23 Jul 2024 17:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721755615; cv=none; b=ajZZNLJZePABFR5tz9ZYOc+61rT9rK265BtDGuh1fuoGUpc7WoTr54wjqhF4EbutArJCcYZSfnMK9CxCu3U3CBxcHRGI8V+UCRdFdo0LoYRbghaFnPRFwuHvzTwcZEOpGmWGb8UaSwtQ9kb3XpXWBLtMsn7/4NxQ/nvag6SrCwM=
+	t=1721755952; cv=none; b=Tea7gtIGTCTToQX4I5Z/Q6xwW7yBov4xoroxq07NFozJR8iQ3O5rYXVTwJcS5xzUPYmTdt+4wUn6KdYTF9VTDdtQvZ1WcKn7MRnI8g4yGZm7uXtawHHGXRy/Ld/OIH4u8g6JkocN43JJVfBa4qI/vXvOa5rki6FQoaKLJk+g7VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721755615; c=relaxed/simple;
-	bh=Y7piUmchrBxF7BjjALNLAV6x5CV8s099z8LNa5F0clc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CkQeXD87c3QeU6wEQSRQaAfsg93aE++27EAPre1b3fu1gPVeeLDwjpUnFK1TujDUF5FF/PGP2vFZyvvxeS/H4IL2eAvB0UJTrPJ+Hk4wtYiQa3NRHZuz/eD7rKkhXM9leF1/CFV9LYk3pwcZIF1Tb5j5IzFV7fG1/i12655Rsnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AdnuBxZ8; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a869e3e9dfso1263a12.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 10:26:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721755612; x=1722360412; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AO9JE1mj1Yo0mDWeNJpYtjgiDQqq1GwG91dRnHzCAsE=;
-        b=AdnuBxZ8yKb8IVy+h2NY1jXs4wllqsXy3VWiv2ANJZ2qRlxOmT36iMDWRjiVrpuA32
-         E3szNT/OtrItmogFHNvXeH/cSelrxiBGCu7Xmyxj8t5aUMHedtWEzNGoT8fplyQkpuwo
-         CAioWw96OkdPSSxfh2Hhd2vlVSPCyISWM9NoxVmTLYgOMVAzPDs21KrOnabio4ZEZ6e5
-         zXIhoPRrGxppBQ/BSMKUByWiHwjIGF1Q1HIJgGamz3IJX57zhupIuecVgTHBTf7LpF8A
-         lFmHDCUxOuLIvGrqVEC7vpoJRov/aI2xGusB5u2IpABJAu5PmZg2+oYQWy1D0O3RIJpi
-         xIMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721755612; x=1722360412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AO9JE1mj1Yo0mDWeNJpYtjgiDQqq1GwG91dRnHzCAsE=;
-        b=kyELroSMWawMQCxP0AAxMtT9D3AOa6ExHKwyJb7P19Y3Yb+c4SW3q1++ETfnd1hVoD
-         /5pQX1O3K/kpcmnLfLuIpk54kh0BsuNlsjanj+H1k8Ayy/QK4Qrkzp55IkEvFtVMoIJw
-         HFQALpyFeOr+EX4HeS4V/E0tTBQoH9N5iySLB8uaSN7tsvslU0vPGvN5CvFxPkWUZh9a
-         WI2LgcbFxqqRwU7CgD73Swt1z4F7iSrq2Zjx0m1scve2Ltj2Wo9e/soquZ5MI44e3G80
-         5I1R2zC7ZgYYLYQZ17Gj5uF5fZHvprOcP6tn1tFMOvjF4WwzlO0F2QdPd2MMCbVLVyun
-         9AnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYozHeHYVwjzWJpHiRU2OAT/mD/AvV3WXPm+07U3xfIMzCTM/smIeKLxUjocrkbWmHQn4T34DvNMsTKdpsdZUaeyF55rIc
-X-Gm-Message-State: AOJu0YwjL3Fh72Psqni0FQnUJ9OObmnKcWmd0Qma9Nl0IjfFNtVuxdzT
-	O881CifRQwNBz06Yuw8jxgwvRXC2n2Nq7jHoTY/GHDojigCm/YNRtD2/yEQJXnv3TvLRJ+T9THV
-	eR4Orni+XHk2Vp55XxtTpIiHEWbN5EXu65g4a
-X-Google-Smtp-Source: AGHT+IGCSzQhk0PHRa1eNhpR8/ewWiODcgMGXGszhBhuSuFKDFl94+1xC/41r8h1gNLKQN93ZxT8krx0PZKQjShAWLk=
-X-Received: by 2002:a05:6402:2681:b0:5a1:4658:cb98 with SMTP id
- 4fb4d7f45d1cf-5aac71248ddmr38703a12.0.1721755611484; Tue, 23 Jul 2024
- 10:26:51 -0700 (PDT)
+	s=arc-20240116; t=1721755952; c=relaxed/simple;
+	bh=VeKv1mdM4b2Az2hwXIufGbGyrkqjcYonv0q7odEaJbU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i1hbkSbew2HGTNxUTMAzKlTeLjj9kW+aGZn45371q9F11DOFgbf6CDmDRGuaSy/Hvqcaot81xfh/uSnoH4zKnQp2gZdqNvQavxcV0RLv5Td/RkaGW6CWVxOh41wt+nlVes8csRp6JSW2JcMR9R32mU1Kz8bBkb/d9jDRQLXlPOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OYdIrLMy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B792AC4AF0A;
+	Tue, 23 Jul 2024 17:32:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1721755952;
+	bh=VeKv1mdM4b2Az2hwXIufGbGyrkqjcYonv0q7odEaJbU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OYdIrLMyfCk4J6Tu7KzRzullXgcO5GzZ+dgXmbi+rYKn3AcYr7ZGg8/URI+9ktb39
+	 ryxQMQx/FgIRi7W/z84MQSJsAqiJEaGacoIX8G3z1pd76e7xKrfZ9ayHqvHs/3beJw
+	 3tzlHkssxFZgvyRLlC551eHA508kuzd3ZzcbVNJg=
+Date: Tue, 23 Jul 2024 19:32:29 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ma Ke <make24@iscas.ac.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, liujunliang_ljl@163.com,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] USB2NET: SR9700: fix uninitialized variable use in
+ sr_mdio_read
+Message-ID: <2024072305-dinner-prize-bb82@gregkh>
+References: <20240723140434.1330255-1-make24@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <8b06dd4ec057d912ca3947bacf15529272dea796.1721749627.git.petrm@nvidia.com>
- <CANn89iJQB4Po=J32rg10CNE+hrGqGZWfdWqKPdY6FK0UgQpxXg@mail.gmail.com>
-In-Reply-To: <CANn89iJQB4Po=J32rg10CNE+hrGqGZWfdWqKPdY6FK0UgQpxXg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 23 Jul 2024 19:26:40 +0200
-Message-ID: <CANn89iLvqJXmCktm=8WoSuSWOAVHe35fy+WHet-U+psMW2gAoQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: nexthop: Initialize all fields in dumped nexthops
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	David Ahern <dsahern@kernel.org>, mlxsw@nvidia.com, Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240723140434.1330255-1-make24@iscas.ac.cn>
 
-On Tue, Jul 23, 2024 at 6:50=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Jul 23, 2024 at 6:05=E2=80=AFPM Petr Machata <petrm@nvidia.com> w=
-rote:
-> >
-> > struct nexthop_grp contains two reserved fields that are not initialize=
-d by
-> > nla_put_nh_group(), and carry garbage. This can be observed e.g. with
-> > strace (edited for clarity):
-> >
-> >     # ip nexthop add id 1 dev lo
-> >     # ip nexthop add id 101 group 1
-> >     # strace -e recvmsg ip nexthop get id 101
-> >     ...
-> >     recvmsg(... [{nla_len=3D12, nla_type=3DNHA_GROUP},
-> >                  [{id=3D1, weight=3D0, resvd1=3D0x69, resvd2=3D0x67}]] =
-...) =3D 52
-> >
-> > The fields are reserved and therefore not currently used. But as they a=
-re, they
-> > leak kernel memory, and the fact they are not just zero complicates rep=
-urposing
-> > of the fields for new ends. Initialize the full structure.
-> >
-> > Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
-> > Signed-off-by: Petr Machata <petrm@nvidia.com>
-> > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
->
-> Interesting... not sure why syzbot did not catch this one.
->
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+On Tue, Jul 23, 2024 at 10:04:34PM +0800, Ma Ke wrote:
+> It could lead to error happen because the variable res is not updated if
+> the call to sr_share_read_word returns an error. In this particular case
+> error code was returned and res stayed uninitialized.
+> 
+> This can be avoided by checking the return value of sr_share_read_word
+> and propagating the error if the read operation failed.
+> 
+> Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
 
-Hmmm... Do we have the guarantee that the compiler initializes padding ?
+You forgot to document how you found this problem.
 
-AFAIK, padding at the end of the structure is not initialized.
+> ---
+>  drivers/net/usb/sr9700.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+
+Hi,
+
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
+
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
 
