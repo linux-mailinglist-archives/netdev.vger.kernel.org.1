@@ -1,90 +1,84 @@
-Return-Path: <netdev+bounces-112669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F56093A84F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5994A93A88C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31F331C225F0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 20:49:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60DAF1C22BE5
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DDD146D43;
-	Tue, 23 Jul 2024 20:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CD5143C79;
+	Tue, 23 Jul 2024 21:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="iD5dHPXn"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Yc60Ouc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010011.outbound.protection.outlook.com [52.101.69.11])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBAB1465A3;
-	Tue, 23 Jul 2024 20:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2618142631;
+	Tue, 23 Jul 2024 21:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721767753; cv=fail; b=t6tR3KUTI57do/PH1/6IU+q7qgpiwS+g+5vAeIaKyNaOO91gNXSHIxEaE4/7avPgA4s2b+Hhmc8oUQ5Da2EBTOjnvETipfaBMhiLk4NailNRFSGrLy7EySZGMw+L2qWnDz0lYGtyjMpLD7Fr9XpAgojKUOrdCF+OPW4mhHdsdCA=
+	t=1721769027; cv=fail; b=E3DdBhiMuouKSse7ct7HfCf7YprSDsd4+BeDSURypyIyA9vScGLYRMlxxsKHx6pJSPptNefushOxUFbH2RmpBmIUnM2pdj3gWx0YMckMOrog9GEDkcN/p5K2KJEPZgWTEMxcqxYjZVHn5vvXQsxS6x1Br7pPwjkB2lyb1SYw4Eg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721767753; c=relaxed/simple;
-	bh=IVSQUSfBDeaesbJm52M4rmlYN3OmCbE5ouiCrdgSVOk=;
-	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=n9GhK/WlyKn3/xWcYbP5xx1F2lpKl++u2py67WogUBOJrUVZlOlIw1B8MfMTIVbvkvsntJ0jj1H5XbcuRNO3RZ5SYzJRYe3ytQsvpaPZzVNqv5xSxwuFTt7iDG6/pYB9Qzc44ycdoku3v4709UrGRke6ZOzm2kxAyRrxcBec4ps=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=iD5dHPXn; arc=fail smtp.client-ip=52.101.69.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1721769027; c=relaxed/simple;
+	bh=W9In+c2tLncAuuWULl8D/wZKJMK9KWqXck8rtjc6NCE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=paqwHOQq4zGeU3+CCLpr7T+esbatgvIF9zFOWRAIMEIlENjCJYMTuRFXSDP5sVi+KruFGb3VO7j3QFPHPy2z6pgn2nIc2xRl1NgGN/G2B01BcduY2G53UZrGcH2OBFkBtirTXgDaAefmPX9bKVAr00nJ/l0n0g8NVEHYGiyUfDo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Yc60Ouc3; arc=fail smtp.client-ip=40.107.236.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bTK5OiN41Lfwb2ZcjU0UPuwnrzCYADqB8lpdQr50UhCoisnr/nnFnXyXXST3donzN9CejJPRDt0Pi/S78lgGTc3IUPGYEkBFmVPo5aFwgZ4qK8zrPZwb1R2tjlm9v98A/hWEGj7flqw/Ap901t2Egp69WadSePxUF/DPoMzyVSei+C9ZiEOTBREoKWvJNQlDJsCtwgWinZbC7qkc39KP6kr4Z73CtIHoLVZQtw5YGAt/dljnCAbcYmlfhHU553jwCJ1qCDRNy8LNTZvEN1Dn4xRHZEt+82TJNR942mlPv6FIkkHdsX3uPle3YqFrzd64hdZ8Q/hhDzmlr5DWOuIsBg==
+ b=NbCac5BavqmadeOF44qu/zxGst8DxQoeeMq8taocN0b5yGVYsrlkZ08ha01ndzUgu8ijELPcoiZSvdmlFYYVTidG/VkYeOa8a4fKUmM9hi7VHXPCdp55vuwDVpOdagO9a+yNqz43DXlVNXMAxLw/OMxkSHigFUSx6PKOl8G2qF0KveqzHrqATQgTqqfGSBDk7MSfA9cynTQex12UulXaTprxaM6Xu4yuRzB8o0ZmO36lvDPU/MveOWpp9vUxsVzG67By8Hdi/xw0V9jhbpyBuHzk9JsK564AEt6JinrLBZk8LpaqBwmST5yB3mjDtD0WcLJh+SfOEvdS4eWS8HOVgg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=St4NJuio65wQSfmzYa86IyNljHrNbq7WpnUr3BaOoQo=;
- b=DCYaO/RXNSncpeV/H2xYjLFkr6I0scx7l6siJu9qWBNJRq+k0pUA36K9tEQwTfZ6ksQS6klyN+0VtT4kXBCTcmOJPR4ek9yBjKGvPMbjCHQnVc59L48xV2a5V/MBgQtAyk/MteWQyzd4o0eow20Fixul5GPX1mn1YdbGXdlfHqCah2aV5960BzSTLfZij6raFeqZs5fJlPmBlYIIMWkpHcf8TZutvlLEERnosXsxr83w8mZda7ow5pNpROgfjVsf2+9FRvvk84zH+rNtNHR464UR0spyWHDenm0MqVavbXz/TWY9FpoJKBKeFKIGQH5sp+DskYK/B6sEUhMzohbEMg==
+ bh=pCEiRwWSOS5xeA9DcxGVZtjH/F4L4XNHrSEFlQ7+cmA=;
+ b=GsA98CcMMnPPKhZ6iIDqyJU75MK2+3Ktgp/YuOzEST+EGa1mLbNzvmKhha74OTsZ2363PHUWgw4bOvGnJqmDCt3GPNUkqz9UzfaTLhL4bTu/369arkaiLhCstU1U0KM4IZgomrTMc7emeOjQ4HZWRzzcN9qALrvPldM5Y8oofgZ/qIcZbbW1f88aXTmcyNj44satM8bHoMgb8CNQDvRSSe/hx0yLhYKce6mft7CR5spf7rM4VHr2eRFV1bNdCHnwN50w+kBOCtlcyK+V9R4hXrmVnzsJPvQo5xq+fb91Dzb1kIos/gpz9kdYd8wH4t+0cj+3kPGvAxAHZNHVcp6x2w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=St4NJuio65wQSfmzYa86IyNljHrNbq7WpnUr3BaOoQo=;
- b=iD5dHPXnKFn67aXoEI/AfbXpebJLbdT6U8+N8wONj7CjltvhqWjWtl4Mz2Sf4JCNcaw7H33xfcxIdN4etBkMBR3hmBgRc4Y4ygrzx6oghe+N3sRqWhvFpNo2AVd98FAQWHV7wOmCphpEZPzsPy6PrKrsWRb+KOYA8Z7ZRqijA8M=
+ bh=pCEiRwWSOS5xeA9DcxGVZtjH/F4L4XNHrSEFlQ7+cmA=;
+ b=Yc60Ouc3UGrXVytTzCqbbcn7ZJg8X6At3RumoeMrodPHtJWRGJzipUG7xHYg5M7wk07MAGfypTSJ2M6mYLZ2JIHuCgexVuhRlXMhHuy1H7TYUZA0LLSvD9o34HMRYVRH34hACdK6JIkfmlbc2UuQat+cgtoRKnyRtBwDf5ZVses=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by VE1PR04MB7470.eurprd04.prod.outlook.com (2603:10a6:800:1a3::15) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by SN7PR12MB7954.namprd12.prod.outlook.com (2603:10b6:806:344::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.16; Tue, 23 Jul
- 2024 20:49:07 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.7784.017; Tue, 23 Jul 2024
- 20:49:07 +0000
-From: Frank Li <Frank.Li@nxp.com>
-Date: Tue, 23 Jul 2024 16:48:36 -0400
-Subject: [PATCH v3 2/2] can: flexcan: add wakeup support for imx95
-Content-Type: text/plain; charset="utf-8"
+ 2024 21:10:22 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%4]) with mapi id 15.20.7762.027; Tue, 23 Jul 2024
+ 21:10:21 +0000
+Message-ID: <2a1b2099-e1c4-4d04-bc97-9ff7e0621275@amd.com>
+Date: Tue, 23 Jul 2024 14:10:18 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/6] net: ethernet: ti: am65-cpsw: Introduce
+ multi queue Rx
+To: Roger Quadros <rogerq@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Julien Panis <jpanis@baylibre.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ srk@ti.com, vigneshr@ti.com, danishanwar@ti.com, pekka Varis
+ <p-varis@ti.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-omap@vger.kernel.org
+References: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
+ <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240723-flexcan-v3-2-084056119ac8@nxp.com>
-References: <20240723-flexcan-v3-0-084056119ac8@nxp.com>
-In-Reply-To: <20240723-flexcan-v3-0-084056119ac8@nxp.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- haibo.chen@nxp.com, imx@lists.linux.dev, han.xu@nxp.com, 
- Frank Li <Frank.Li@nxp.com>
-X-Mailer: b4 0.13-dev-e586c
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1721767734; l=6676;
- i=Frank.Li@nxp.com; s=20240130; h=from:subject:message-id;
- bh=DZF8lRBk1z5gCbtmnlwiLvTEP638d+rt+ccnMOssc7U=;
- b=2PGjp3nrhOHz+pKOhG0BHZXpfi4xP2i/PEJAEjEA0C+QGF/GRQt9gfcx6ztozxWeebCtUOTAS
- lGb9oz0pxP3AVhvLBuLExicikHCdFuFQuVBh9+HZ3Bx2egOt4R3AmNg
-X-Developer-Key: i=Frank.Li@nxp.com; a=ed25519;
- pk=I0L1sDUfPxpAkRvPKy7MdauTuSENRq+DnA+G4qcS94Q=
-X-ClientProxiedBy: SJ0PR05CA0115.namprd05.prod.outlook.com
- (2603:10b6:a03:334::30) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+X-ClientProxiedBy: SJ0PR03CA0056.namprd03.prod.outlook.com
+ (2603:10b6:a03:33e::31) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,255 +86,308 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|VE1PR04MB7470:EE_
-X-MS-Office365-Filtering-Correlation-Id: 740d3e29-d6ef-41af-8d74-08dcab58e52f
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SN7PR12MB7954:EE_
+X-MS-Office365-Filtering-Correlation-Id: 21de1d4b-7670-46ea-baeb-08dcab5bdcdc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|52116014|376014|1800799024|366016|38350700014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ak9hdTE1TVcxakFHMTlyVXBkdW90Q3owdHVvZ3dlMmVPUFY3SUUvTi9ySE5p?=
- =?utf-8?B?ek9NV1pnSE9FWWN0aHdaS2xuNjhyQ2ZpNmtJNE5QWHVMcW0rcjVyY2t2UStm?=
- =?utf-8?B?bVlqRldRYzhXenozcXdaK1FRSjZlZkE4TWIwaFVlMXR6ZVFiNVluYmJMcDhm?=
- =?utf-8?B?NUlsaVJtR0pmVmtIb05UWk9JL05INzZLTFJKelJEbWJqYmFpbEpwM0V5dkhu?=
- =?utf-8?B?VjcyQUlTOCs3cHE3MWpORERvanl6azlYSFEzV2JldkVWOW9mcXZERDk1WHcz?=
- =?utf-8?B?Q0J6Wlg4ZGJhSGRtdTdsTGROdnh5N0xLMnBhZFpFVHVMV01aSzVucDBIcXZJ?=
- =?utf-8?B?RGhoU292WXk3RWhvaGkvNExuSDdGMVNobERnUW1hSmFHZWRSaGVFdzdySUdQ?=
- =?utf-8?B?WTFQLzEzS2YwWlpVV2Y5VWo0TFhtY2w0Y0sxOGlrUXBpekhXZnlEUnl5N0Mz?=
- =?utf-8?B?aUt6d0p3Y0hzNm5jUlBodDBXNjF3WUlKTDlZRndaNmFCb3RpNXdzUmdYNFI3?=
- =?utf-8?B?N0d6MmVOMUJNc1E0YXVudmE5dnh2ZlRVRWlUUmFxRHhhSmhwYUoxZjBpUEtY?=
- =?utf-8?B?UWFSQlllUWN5UFhsYnVzZEY3eEtnS3F0WjdkWGtLSTZpbXpGTTZ4aTdUQitJ?=
- =?utf-8?B?Vmw0cEl0Q3NuMHQ4QVRqaTI5YWhOcnlBQVlNUktBQzd3YUJqWHZkRnVOTTVZ?=
- =?utf-8?B?Vmdzd2lFODJZaU5XaE5NbEFhQzBvZXBCTitYVGJqdndzQ0lscXFPd2JzRjJH?=
- =?utf-8?B?aG15Z21IclY0SXJvbWVLOStad3V4cW51c01jd1NMaWQ4cXRqb1luek5xSGJK?=
- =?utf-8?B?czR2ckU5SC9UN3hKMkRKUmY1Z1VQalphOXc0TTJCSGZxRldYOU5QOHNJWWdM?=
- =?utf-8?B?bk5LcVBsaHkyQWNHQm1hTCt2bVhzd25TQlRpNUhQelFwMUZlOHY4OFdrdXUy?=
- =?utf-8?B?a0cwU3lvbWdlSXUrWHlaS3BTMTIxUGJaWWdKaXpQTllVVUJtRlBrbStjOGh5?=
- =?utf-8?B?S2lFL0hsRXRPYXdVSldobU9CdWhva01BV081cjZGRXdDNW1tdkJmV0pTTyty?=
- =?utf-8?B?Q0x5Z2duYTBrVmNpVUhyRXpCcTNONXZyU3plRDVuaE9JN3FvbllRQ3huOVZC?=
- =?utf-8?B?OStKOE40RURXcHdFSHdYNU9DeDhoQnY4UVZIRk1EbnpHMnRVS3hvbmRyZE9Z?=
- =?utf-8?B?WGJnVEdrU3BkSkErcENTY2wwV2hJTWl2dDNXYVc2dVo1VWhwT0JyRzBEdWgw?=
- =?utf-8?B?T0pURGhCM3ZlN1o1M2dYZHVSdEhBRFdBMGQray9veG1LTUxVLzlOVXFaSDdP?=
- =?utf-8?B?a21hMm9jbXBlVzRxWThjY25LN3FMZ2N3Ky9BYmYwTFF5Rms0ZVdGZThocUFU?=
- =?utf-8?B?TXhMekE0UWVOQ0l0aXdBM3Z6aTNpUGZSN1ZaVkNSL1doWGdhUkZlV0RUeTY0?=
- =?utf-8?B?QlpLeWZnVy9WMG54a0FjUElEWEpHS1VCbW1wVDV2c0NYdzJaRVBKc0IxNzc1?=
- =?utf-8?B?UlgvSCswcDZuUHFUQTZBS04yWU9ReUVtK3Y4NCtUQTRnYXZiV1FReTlUYkt4?=
- =?utf-8?B?bXlOSUpwa3FqVTljZ1dMWnFvZU1BckZjN3h0d0lKa2YrdWpBVWoxdmZNN2kv?=
- =?utf-8?B?aXFvOHcwdTEwRUl4cUp6V3FBbTdwTUFjbVdnTUFKM1psYkZiUUNVbHJGMGVZ?=
- =?utf-8?B?SGx6bmhlbGxoZXpiT2JXWXJpcjlsQUtKdXJLUjVTdjByWXE4NXVXUmc0clhn?=
- =?utf-8?B?dHIrbXdFWnpXejRrWkl2VWVyYnhJeWhJY25GWFluWkJsZmtmUFU2YUtlNFNB?=
- =?utf-8?B?TC9iWmE4ejFEL0xlbnBweEcvUlFkcCtuSit4aC9vWlhMNHc0V09Ga2lHUUlD?=
- =?utf-8?B?SE1OYXpRMDg5QThqNWdNa1A4THc0SStLNjhneXYyV09OUnc9PQ==?=
+	=?utf-8?B?TkhRS21Fa2tVbm9oem9idXlKTW5FcngvYVNtbFhXblAzUkFFdC9KT1RJdFdi?=
+ =?utf-8?B?dEh0ZVBuU2VzUXF3UGNRUWErVVRZWDlpTjBiNHFXV1BTMjB2VmgxRUVrc0VE?=
+ =?utf-8?B?bGVmK0p5WlE4anByREN1NzlZQmUrWjZ5QkhUQ0VxR0JkRytjbHFoL2dDZyt1?=
+ =?utf-8?B?cnRsUjNKSE5kM3JWc054TUc4YW9KQmFFMk1kSmhyaXJETUQ4UW1mYWt3aUF5?=
+ =?utf-8?B?ZzBuQ0lTRXFXTFBJZ3VPa1BPQk5memNEQm5CbHh0MHFtKzZmd2JWZExLTnZw?=
+ =?utf-8?B?ZmRLUktVOHZ0OXRlWldpekNVVThHNG93dnJTcnlkYnVCaVUyNmRMZHVTWFE1?=
+ =?utf-8?B?RlpSVDVIb1d4WnJGUDhKRk0vTzhyV0oxVE9ISDFuTm5BTjQ3bFpEOUxVNzJs?=
+ =?utf-8?B?eUlNRTBneE82Q2d2KzUvRnViWFo4ckxKUDZrNCtUMkl2UnZncU5pT01LVWNR?=
+ =?utf-8?B?emhPK2NyS1NPZFZjbVcwcjlFT1RlTVMwWUE4RE95ZlJwcUtOMHhPa3dZOFZG?=
+ =?utf-8?B?MDNQQUFLVzZLemNoRW1kYjFTc2t5K3NjaGdsV1dYbXBBRkNXR1VuMm1qV2tL?=
+ =?utf-8?B?TlZ1bSthZlZhZVdLQjNWeFFXb3I5WkJwV3dLdWJXRUZCMmYzOFlMUXR0STMy?=
+ =?utf-8?B?SGIxbWNCUkhZUWh1Rm9ZZjcrOXlvYlhtdEZ5QS9ISnNJbC91NjJSWXZGWVJs?=
+ =?utf-8?B?eFlucEFCVUNOYk9rK3Y1SU9MK0lEU0s4NWpKanZ6dHNXNGlTY0ltc1NyQjJH?=
+ =?utf-8?B?SFFXMnJGa2hiV0I3VkRlZXRGa1JqSUlZTi9aM0dFaEJ2dDgxbU0zdGtublUx?=
+ =?utf-8?B?UHhqWGJML2lVYXBxbWVpSkJsN2dKWkFGTlliUHlPN1hlZDRwcDBYN1BCc1Nt?=
+ =?utf-8?B?ajVxT1dpcGthdFptV0dFK0xjeWVZUGFSem11dkg2LzBNUTFZWm1zSU9PTll2?=
+ =?utf-8?B?eW5oRVlnRzZnbGI4RENDaUJtNUNjRktmRXVYQ2pZTDRCb3VmN3FWM3hPbmxm?=
+ =?utf-8?B?MVRQSDFENTErd1lnb25aVTFUUUxUbDB2ZlNTbkhycXB3YW1RYjlWZEp2bnZU?=
+ =?utf-8?B?R3hRZ0dhSzkyVnM3aVhLZXVIRTVka1JjQS9ERlREMHhPSVRxVFRIbTA3OXd0?=
+ =?utf-8?B?V3hyR2VuM1JyMmRPQWVHd3VtbDBmeis0OTlzV2grck9RNzR1eUpvMVBSTWNl?=
+ =?utf-8?B?VnJRaVF1RUd1MzJtTW8rRDRRYzVsdi9jaG0vS1dISktjVm8wMEFFNkt5eWZj?=
+ =?utf-8?B?UUpSK1ltd0NZbHhQNlV6eEUwMC9XV3NhTldXOVQ4d0VnZEtLOWFUanZwR3Yw?=
+ =?utf-8?B?QTczcFk5cmljV1pJbWxGQmFRdWFkYmdRMjBSRWpUR25sOEpwR3FNb1VHb2pI?=
+ =?utf-8?B?K2JSL3crdnVoZGdvZzJBbVlnK3UvU0UwV3NyeUZSejlDTTNsUHlRNXF0dUFt?=
+ =?utf-8?B?eVltVDFibXBtOTUzWm9hdTZUTHU3cld6WnMwR05TRUJ3YVZNYTBpcUJFM2ls?=
+ =?utf-8?B?dDMvb0ZiSUw0SFVpSnhYZG83cnFZdWRXWlRYU0d4NTNsY0xIN0JQRUxNRkxT?=
+ =?utf-8?B?MURmQzZLcHJ5bzlHVnpiVHYwR3NmNVZWejJOaURiZHFnVVkwUTUveVZ0bnBF?=
+ =?utf-8?B?YlkrUllWa0J3dXdtZzhFbjlSVXNDV0htNEZqNnhJOEVNaSt0V2M5Y0V1UElq?=
+ =?utf-8?B?eC9QNXhNM01VUGlRbzZjWHNqb0pxOVpQblduR0xIdGZGZGt5V0M3VUljaUVa?=
+ =?utf-8?B?cnJPTjAzMVdxSXRHUTZ5MGh1S1BqVFFkaXdMOXpDNmFUMHlOelR0RVJYNTlj?=
+ =?utf-8?B?b0t4dWZEcFBTc2E1NEhBdz09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YVNXTUd6UGZIa0FrRjV5UVllTG9nL3Y4VmgvVndPM3VSUFhiQmhpcVRtWVA3?=
- =?utf-8?B?MlJOVGlsV3h3ZFBKbU9rL1B3NzZ4VFhPeDZqWTU1K2YxN1BkaDI0Qit3V0VQ?=
- =?utf-8?B?dlFUaFlsSVJCT0NMTFpCYjhKWFF6VDVpZzl2TUZjTWhVc0NHRjNaYmR4TzZh?=
- =?utf-8?B?bFFsWmUwMExxbEtTUk9Xc2VYdHhjL3JOUW1uV3FVaDI0Vk5wWEsyNzNEMjB6?=
- =?utf-8?B?V0JZdGM1a3c2UWZ0VGRZVCtDbGRnb2lCdWNTTG9oR2ZVN0JsYzRCK1E5UzlW?=
- =?utf-8?B?NW85aWRTUXQ0QlVQcldYUktSSWFoSXZoeEladlZCM2o1T2FPZGtjOFZNdWlR?=
- =?utf-8?B?SmRzZ1E4cy9pK0pscGJXbm56OGx1VDgzNlczN21PWnlMb0xmMDVwT1VzaVRM?=
- =?utf-8?B?NDV6aGQ4Vkh3TmNYa29tc2tpZEVvZ0NMWno2cHpVZlh1RW1LOWgzL3NNWWRO?=
- =?utf-8?B?WWE1bzJYRE42TDVnN3hTQ0c1MmZYVzZ2RTlHNDZpY2grNncvOWJkbUhIeHNi?=
- =?utf-8?B?VmRYdFJJNzUxa1Qzb3A5aGtNVVpDaFJDdW1BTnQrVVBJVmNlajZ2Vk9odFhJ?=
- =?utf-8?B?Mjg2c2thNm8zeFJ5Q2FjL2hUU0xQWThsd3drWU5KZTZqWVVXclpoRjVmaHo1?=
- =?utf-8?B?ODFaclpqdDdPcVNLQ2grbXVnbTZxQm1TdzB0MlJGajZWWGY4NUpXODlEbWNN?=
- =?utf-8?B?azNacmwvMWFJa1diNlhtN3Nza2pxbXlrUmttNGhlMk4rWExrMXRSYWtWcFBG?=
- =?utf-8?B?dVJkb1lja1BOZlZzZWM0MXhJZEtBRmR4U2RsVDljbVhIOWplb3VsUjEyZkJx?=
- =?utf-8?B?SUNMcXBvN1U1MVlZeFI5Q1Zvb1FVUUhvd1VmS0NXK3ZtL2ZnNDJJUVN6L09m?=
- =?utf-8?B?d3Vxc05lY2xWdmVWKzk3eWdwVittazBNMUxYeGNYanhNVjNtV0tEL3I5em0v?=
- =?utf-8?B?N3lTZVQzaWg3VHpZMDZPY3grNXk4b3ZVUDI5Rkh4RDlEUlYyREtkdFlhaU9u?=
- =?utf-8?B?MkNLME9xUEdDWU9MZlh5Ym00S3Q1Vk1haWNLenV0VWdUeWx6aHJRdFVaWkhh?=
- =?utf-8?B?cGVzQmxQVDRwNWhlK0NVMXFlMk1QVUNTL3VEUHVzUVpNd1BEeDFPQUNxREkx?=
- =?utf-8?B?VEszNG9sQlFrUzY5cy9MdFVYVmpHdjNlUHFPREx2ZEgwTGgzd25tbGdnUDYy?=
- =?utf-8?B?VXF3S3lHVmdBejJzUFJXU3pWREdQZ2NRR0dneTVTV2QramZjY040ekNLYnBB?=
- =?utf-8?B?YVB5OGZNYTlzSStsTEtyVG5UeEYvTW5tMEl4bWtaWG56S0N1aldCQURzZ3BC?=
- =?utf-8?B?cGM3Mlplc0RqSmxiK09nYk9QdmlJWVBJYmNpQnZ2UFNORUVpdU1yWVpSQnBy?=
- =?utf-8?B?UXNMSDNOUmNtNHc3bFM3K2NqbzlYakxrbS9FQmRCZ2o4eEQ1RGNUWE42WWRi?=
- =?utf-8?B?MFoyTXFadTN3M1hrUGIzSEp0UFBzZE5NTk14K1FoNEQ0TjhnM2xBYUVFMlQ0?=
- =?utf-8?B?Q1FuckQ3YjFqd1NScGt1L0lCNVBaRW1tekUzL1hWaEJKeHZReXdIWWs0cEFG?=
- =?utf-8?B?VnFhbURxT0IvU2owc3BPWHJBcTQybmRhODByajJpZ282MC9ZcHVtSkxWTkpO?=
- =?utf-8?B?L1hCYUJKSHFBTVg3Tlo1SGd2aTUwcy8xVnAybCtqZVoyb0M5aHdHQlM4ekcr?=
- =?utf-8?B?KzNiK2VwaXNMM2VkY1M4T2lsWnJlU1ZONUd6dmpHdFBUZHNRZ3hLdnFLNFI2?=
- =?utf-8?B?Y2JoOGZ5bXlMVElEV1prQXZQN3N5VnFNZ3RnUUpvMVhDRU1jdkF5YmdXZkpm?=
- =?utf-8?B?MEtueDJEOWVxSWFxQURJTkJlOGdFdnpsSmVoMld0ZXBUVytVWDBDaE40MG5x?=
- =?utf-8?B?RGx1ZUZsR3k2eWVDa0VmNlFkSDNyTGcvUTR5Qlhlb011dnhRMXJkZWxEMFQ1?=
- =?utf-8?B?T0d0a3dKdzJpRFltdzloelNINU8zLzRPcFVXWGRES25UZGlteGk1UWJ4akUv?=
- =?utf-8?B?ejJvWlI0VEFEVEFyZm9XdGpCekZ1RkpncGJiR2xRVHQzM0dPT2c5QUtZcUhU?=
- =?utf-8?B?U0dvUWpsSFNHSWZNNnQxYWVqbHZmR3Y3SGZENURtYVMxbG1rdnB1MUJmcWp0?=
- =?utf-8?Q?mcOl1uI8NFXaC3cQn12a3xrEe?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 740d3e29-d6ef-41af-8d74-08dcab58e52f
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+	=?utf-8?B?K1hDT202MkJ2UHVDQnZaQ0d5NVZxdGxBdGNKSVBMUlRsVTdySmlNd3RWMUpL?=
+ =?utf-8?B?U0VkOVEvSnBDd1VxQXBnOUpxMGEwRU9oZEk3b0FCMTJsSEVaS0doOG9Ldk5U?=
+ =?utf-8?B?REpUMExFeVR1V3g4dzhqRFFBcnNSMU9jV1BvMlNxeWRkVWQrQzd1bTMwUGdF?=
+ =?utf-8?B?V1dzVy9ydlFqdXFzdzJPZlBVMER3ajB6NCtXSUt5T3lxYTZMZkVGNGlWcTFm?=
+ =?utf-8?B?MG9xV09mOFpQM2paa004QUxGU05PTFVYcnlrcVlsdDlRUFc0VmJmTDRWOXNK?=
+ =?utf-8?B?NFJJM3owOGVXN3NRY2lESHR5bmlwUksvRFJGR1kvSEMzZGYzMzgwU2xORWg5?=
+ =?utf-8?B?Y2dlSkhCT21tKzVHemowaVY5dmVzbWZDYk1vNzlQalFnVHBub2pObFlLdFRq?=
+ =?utf-8?B?a0hCQkkzYXEvK3FCdEh3aUpSOTBzNmlML0FaWmhIeGtLRE9CV0RJb2JxUS9n?=
+ =?utf-8?B?ZEJiNGhHRnFXdEVPM095VDNTQTNFWHNtNUpMSG9xOFBaUlBkSFVJbjR0akJq?=
+ =?utf-8?B?NUxsN3VIc0xlY3FpWHo4dFY0N2xwMGNBWmZnUUhQNnRyQ2tTSFJPOWp6ZE1L?=
+ =?utf-8?B?Q1AwOWpXUCtBbG5sN3RaMjFYODhHcHkwR1lnSHdiVml6SkxZYkhDTFVBYWxF?=
+ =?utf-8?B?YnBCZ084Y1JBbWtWZkY2aTc0a2NVS2IwL3JJc3ZNV2JNc2lFSDZWK2lva2hY?=
+ =?utf-8?B?aVV4TUZqKzhyU0lJLzd1UW5UcEpQUFF1NWhRVk9lWUh2UVR3SFNGU2NGTmhH?=
+ =?utf-8?B?ZkVkZjZzV0N5Q0o3MDlLWmZKcGFxZUd2QWtMVFZGTmZ3ZzlPc2ZoNHB0a0V3?=
+ =?utf-8?B?aUN5ZWgzTXlPTXYxOWlxYnJBb05pWkc2MlUya1RxdWpSZ3hrdFV6QnZFeWdI?=
+ =?utf-8?B?bkIzekhLVEd3REhWaXVRTG1RYjhmTmNXcXROTm0wZ3JJVUJscHdXOFZTWGhp?=
+ =?utf-8?B?VnBMTmJnU2sxc2cvUnpnQlo2NTc5bXVtd2tSNkl3VExUR0k1Z2hOUVpvWU1x?=
+ =?utf-8?B?UUtGakljM2NmRlNwSEgwb3FYWVZ4YU9ETTE3a1BmczQ3QTlvSU9UeHhGc0h0?=
+ =?utf-8?B?R2JwMVc2Skd0VGNZTjc5WllEdEt4MlA4YWMvZHZXQVlrM2NQOUMrRWVESk0z?=
+ =?utf-8?B?TG5MejFoODFNNmk2dmZJOXRGZjF2Ynh5UW81T1pSWjQvSllwaklTeE41UVNV?=
+ =?utf-8?B?c05hVDhaV2hvTkJGOUk2R2FPc2E1STZ4MElxVkcyS0JtU29NRnl4NEdGRFIw?=
+ =?utf-8?B?ZjNhQ28vSHZ2d2N6ZXlMVHArcXRqMUc4c0JFTitEVldxY0kzbnFQOEgxdVZr?=
+ =?utf-8?B?V2ZleDl4eVFtNmdqbjNUVzVyS21IaG5TUFZRd3RFUjJmc1Mvbk5PVEVwMzJX?=
+ =?utf-8?B?VWVQYThMT0c4S3dESVhMdHdKYjVEbFNUckV5VFJnSEVxZEVsbEdFYzdjVEcy?=
+ =?utf-8?B?c3lMbkk4cFIwdXdSRndjSlFkRnhqM1JaeS9NYTU3MXR6SE9xRGxXeDhSZENh?=
+ =?utf-8?B?eW53TmFXcnZ0dTZncEJ0eFhXdzROcHVteXY2eEV4Zmw3Umh4bWljNkVlY3I5?=
+ =?utf-8?B?RVl2a0ZzK1RMVUlvOThJOTdoT0NZdi9XdE9JelZna2t1UFJ5L0dibHQ2V0R5?=
+ =?utf-8?B?MjNicmFuMU9RcG92cGpGR3BnWitpek1FZGdueXNMLzhsWk10cEFuTTNwclZz?=
+ =?utf-8?B?c3lSb1hONjg2VGFqUjlDLy9ZNlcyNG9ZMTI2bUdMQzdMSUZWZmljaW1xZExh?=
+ =?utf-8?B?UU9zME5aN2pZM0I3cVp0K1JFclU4citnNXZpRnNRdGY4OFVCenVsaWxXTTlw?=
+ =?utf-8?B?SWE4SWRUa2NwRUJwSWh1REkyeGdSL0JKTjZFMk1MYmg2SWNxQjhuWlFzeHlG?=
+ =?utf-8?B?WHIycmVUMnJPT0NWMWJCRkFrdTRCQzYwbjNOVHFqZmVNb1ExbXhoTFkwTHFi?=
+ =?utf-8?B?Wk1QamdNNEJQMFpXRWt4TGV0VFd6QXlXS2ovUlFIbzZ4NVNLcksyZUUrUmZa?=
+ =?utf-8?B?OCszakJOY1VZVVJMSXNTaTQzRDZteFI5b3YwQ0JTOHpVeFVMMTVFWHBJYmJo?=
+ =?utf-8?B?eGdlTGsvVFRja3MvN3NBRzZ6Y1ZON0N4MVlpN3BZUi91UzBabEhCL3pvZXF3?=
+ =?utf-8?Q?gt0I3TJbclXaBi8g+C7XLXO5I?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21de1d4b-7670-46ea-baeb-08dcab5bdcdc
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 20:49:07.1229
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 21:10:21.6704
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vkLRdZwe7wZUzEhEyvoxgKfBDcZjE41obLw+01Bl8W0DybARAK4jS76qo0/bJ8fc30v80O6lzppFczhEt6bOgA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7470
+X-MS-Exchange-CrossTenant-UserPrincipalName: vIcvLfI89jbQHoaPLl4vKtnOwYfuGu3f1mISZCBizNgbZyWlhz6hUQsOsz17fd/T4AWbbFEUlnLQs24bn2E8Bw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7954
 
-From: Haibo Chen <haibo.chen@nxp.com>
 
-iMX95 defines a bit in GPR that sets/unsets the IPG_STOP signal to the
-FlexCAN module, controlling its entry into STOP mode. Wakeup should work
-even if FlexCAN is in STOP mode.
 
-Due to iMX95 architecture design, the A-Core cannot access GPR; only the
-system manager (SM) can configure GPR. To support the wakeup feature,
-follow these steps:
+On 7/3/2024 6:51 AM, Roger Quadros wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> am65-cpsw can support up to 8 queues at Rx.
+> Use a macro AM65_CPSW_MAX_RX_QUEUES to indicate that.
+> As there is only one DMA channel for RX traffic, the
+> 8 queues come as 8 flows in that channel.
+> 
+> By default, we will start with 1 flow as defined by the
+> macro AM65_CPSW_DEFAULT_RX_CHN_FLOWS.
+> 
+> User can change the number of flows by ethtool like so
+> 'ethtool -L ethx rx <N>'
+> 
+> All traffic will still come on flow 0. To get traffic on
+> different flows the Classifiers will need to be set up.
+> 
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> ---
+> Changelog:
+> v3:
+> - style fixes: reverse xmas tree and checkpatch.pl --max-line-length=80
+> - typo fix: Classifer -> Classifier
+> - added Reviewed-by Simon Horman
+> ---
+>   drivers/net/ethernet/ti/am65-cpsw-ethtool.c |  62 +++--
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 367 ++++++++++++++++------------
+>   drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  36 +--
+>   3 files changed, 284 insertions(+), 181 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+> index a1d0935d1ebe..01e3967852e0 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+> @@ -429,7 +429,7 @@ static void am65_cpsw_get_channels(struct net_device *ndev,
+> 
+>          ch->max_rx = AM65_CPSW_MAX_RX_QUEUES;
+>          ch->max_tx = AM65_CPSW_MAX_TX_QUEUES;
+> -       ch->rx_count = AM65_CPSW_MAX_RX_QUEUES;
+> +       ch->rx_count = common->rx_ch_num_flows;
+>          ch->tx_count = common->tx_ch_num;
+>   }
+> 
+> @@ -448,8 +448,10 @@ static int am65_cpsw_set_channels(struct net_device *ndev,
+>                  return -EBUSY;
+> 
+>          am65_cpsw_nuss_remove_tx_chns(common);
+> +       am65_cpsw_nuss_remove_rx_chns(common);
+> 
+> -       return am65_cpsw_nuss_update_tx_chns(common, chs->tx_count);
+> +       return am65_cpsw_nuss_update_tx_rx_chns(common, chs->tx_count,
+> +                                               chs->rx_count);
+>   }
+> 
+>   static void
+> @@ -920,11 +922,13 @@ static int am65_cpsw_get_coalesce(struct net_device *ndev, struct ethtool_coales
+>                                    struct netlink_ext_ack *extack)
+>   {
+>          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+> +       struct am65_cpsw_rx_flow *rx_flow;
+>          struct am65_cpsw_tx_chn *tx_chn;
+> 
+>          tx_chn = &common->tx_chns[0];
+> +       rx_flow = &common->rx_chns.flows[0];
+> 
+> -       coal->rx_coalesce_usecs = common->rx_pace_timeout / 1000;
+> +       coal->rx_coalesce_usecs = rx_flow->rx_pace_timeout / 1000;
+>          coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
+> 
+>          return 0;
+> @@ -934,14 +938,26 @@ static int am65_cpsw_get_per_queue_coalesce(struct net_device *ndev, u32 queue,
+>                                              struct ethtool_coalesce *coal)
+>   {
+>          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+> +       struct am65_cpsw_rx_flow *rx_flow;
+>          struct am65_cpsw_tx_chn *tx_chn;
+> 
+> -       if (queue >= AM65_CPSW_MAX_TX_QUEUES)
+> +       if (queue >= AM65_CPSW_MAX_TX_QUEUES &&
+> +           queue >= AM65_CPSW_MAX_RX_QUEUES)
+>                  return -EINVAL;
+> 
+> -       tx_chn = &common->tx_chns[queue];
+> +       if (queue < AM65_CPSW_MAX_TX_QUEUES) {
+> +               tx_chn = &common->tx_chns[queue];
+> +               coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
+> +       } else {
+> +               coal->tx_coalesce_usecs = ~0;
+> +       }
+> 
+> -       coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
+> +       if (queue < AM65_CPSW_MAX_RX_QUEUES) {
+> +               rx_flow = &common->rx_chns.flows[queue];
+> +               coal->rx_coalesce_usecs = rx_flow->rx_pace_timeout / 1000;
+> +       } else {
+> +               coal->rx_coalesce_usecs = ~0;
+> +       }
 
-- For suspend:
-  1) During Linux suspend, when CAN suspends, do nothing for GPR and keep
-     CAN-related clocks on.
-  2) In ATF, check whether CAN needs to support wakeup; if yes, send a
-     request to SM through the SCMI protocol.
-  3) In SM, configure the GPR and unset IPG_STOP.
-  4) A-Core suspends.
+Minor nit, but after removing the dead code below the check for queue 
+being greater than max values, I think am65_cpsw_get_coalesce() and 
+am65_get_per_queue_coalesce() are identical except the "u32 queue" argument.
 
-- For wakeup and resume:
-  1) A-Core wakeup event arrives.
-  2) In SM, deassert IPG_STOP.
-  3) Linux resumes.
+I think you could do something like the following:
 
-Add a new fsl_imx95_devtype_data and FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI to
-reflect this.
+static int am65_cpsw_get_per_queue_coalesce(struct net_device *ndev,
+				  struct ethtool_coalesce *coal,
+				  struct netlink_ext_ack *extack)
+{
+	return __am65_cpsw_get_coalesce(ndev, coal, 0);
+}
 
-Reviewed-by: Han Xu <han.xu@nxp.com>
-Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Signed-off-by: Frank Li <Frank.Li@nxp.com>
----
-Change from v1 to v2
-- fsl_imx95_devtype_data keep order by value
-- Add empty line after fsl_imx95_devtype_data
-- suspend/resume code look symmetrical
----
- drivers/net/can/flexcan/flexcan-core.c | 50 +++++++++++++++++++++++++++++-----
- drivers/net/can/flexcan/flexcan.h      |  2 ++
- 2 files changed, 45 insertions(+), 7 deletions(-)
+static int am65_cpsw_get_coalesce(struct net_device *ndev, u32 queue,
+				  struct ethtool_coalesce *coal,
+				  struct netlink_ext_ack *extack,
+				  u32 )
+{
+	return __am65_cpsw_get_coalesce(ndev, coal, queue);
+}
 
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index f6e609c388d55..3c98231e25898 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -354,6 +354,14 @@ static struct flexcan_devtype_data fsl_imx93_devtype_data = {
- 		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR,
- };
- 
-+static const struct flexcan_devtype_data fsl_imx95_devtype_data = {
-+	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
-+		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
-+		FLEXCAN_QUIRK_BROKEN_PERR_STATE | FLEXCAN_QUIRK_SUPPORT_FD |
-+		FLEXCAN_QUIRK_SUPPORT_ECC | FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX |
-+		FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR | FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI,
-+};
-+
- static const struct flexcan_devtype_data fsl_vf610_devtype_data = {
- 	.quirks = FLEXCAN_QUIRK_DISABLE_RXFG | FLEXCAN_QUIRK_ENABLE_EACEN_RRS |
- 		FLEXCAN_QUIRK_DISABLE_MECR | FLEXCAN_QUIRK_USE_RX_MAILBOX |
-@@ -548,6 +556,13 @@ static inline int flexcan_enter_stop_mode(struct flexcan_priv *priv)
- 	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR) {
- 		regmap_update_bits(priv->stm.gpr, priv->stm.req_gpr,
- 				   1 << priv->stm.req_bit, 1 << priv->stm.req_bit);
-+	} else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI) {
-+		/* For the SCMI mode, driver do nothing, ATF will send request to
-+		 * SM(system manager, M33 core) through SCMI protocol after linux
-+		 * suspend. Once SM get this request, it will send IPG_STOP signal
-+		 * to Flex_CAN, let CAN in STOP mode.
-+		 */
-+		return 0;
- 	}
- 
- 	return flexcan_low_power_enter_ack(priv);
-@@ -559,7 +574,11 @@ static inline int flexcan_exit_stop_mode(struct flexcan_priv *priv)
- 	u32 reg_mcr;
- 	int ret;
- 
--	/* remove stop request */
-+	/* Remove stop request, for FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI,
-+	 * do nothing here, because ATF already send request to SM before
-+	 * linux resume. Once SM get this request, it will deassert the
-+	 * IPG_STOP signal to Flex_CAN.
-+	 */
- 	if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCFW) {
- 		ret = flexcan_stop_mode_enable_scfw(priv, false);
- 		if (ret < 0)
-@@ -1987,6 +2006,9 @@ static int flexcan_setup_stop_mode(struct platform_device *pdev)
- 		ret = flexcan_setup_stop_mode_scfw(pdev);
- 	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_GPR)
- 		ret = flexcan_setup_stop_mode_gpr(pdev);
-+	else if (priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI)
-+		/* ATF will handle all STOP_IPG related work */
-+		ret = 0;
- 	else
- 		/* return 0 directly if doesn't support stop mode feature */
- 		return 0;
-@@ -2013,6 +2035,7 @@ static const struct of_device_id flexcan_of_match[] = {
- 	{ .compatible = "fsl,imx8qm-flexcan", .data = &fsl_imx8qm_devtype_data, },
- 	{ .compatible = "fsl,imx8mp-flexcan", .data = &fsl_imx8mp_devtype_data, },
- 	{ .compatible = "fsl,imx93-flexcan", .data = &fsl_imx93_devtype_data, },
-+	{ .compatible = "fsl,imx95-flexcan", .data = &fsl_imx95_devtype_data, },
- 	{ .compatible = "fsl,imx6q-flexcan", .data = &fsl_imx6q_devtype_data, },
- 	{ .compatible = "fsl,imx28-flexcan", .data = &fsl_imx28_devtype_data, },
- 	{ .compatible = "fsl,imx53-flexcan", .data = &fsl_imx25_devtype_data, },
-@@ -2314,9 +2337,19 @@ static int __maybe_unused flexcan_noirq_suspend(struct device *device)
- 		if (device_may_wakeup(device))
- 			flexcan_enable_wakeup_irq(priv, true);
- 
--		err = pm_runtime_force_suspend(device);
--		if (err)
--			return err;
-+		/* For FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI, it need ATF to send
-+		 * to SM through SCMI protocol, SM will assert the IPG_STOP
-+		 * signal. But all this works need the CAN clocks keep on.
-+		 * After the CAN module get the IPG_STOP mode, and switch to
-+		 * STOP mode, whether still keep the CAN clocks on or gate them
-+		 * off depend on the Hardware design.
-+		 */
-+		if (!(device_may_wakeup(device) &&
-+		      priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI)) {
-+			err = pm_runtime_force_suspend(device);
-+			if (err)
-+				return err;
-+		}
- 	}
- 
- 	return 0;
-@@ -2330,9 +2363,12 @@ static int __maybe_unused flexcan_noirq_resume(struct device *device)
- 	if (netif_running(dev)) {
- 		int err;
- 
--		err = pm_runtime_force_resume(device);
--		if (err)
--			return err;
-+		if (!(device_may_wakeup(device) &&
-+		      priv->devtype_data.quirks & FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI)) {
-+			err = pm_runtime_force_resume(device);
-+			if (err)
-+				return err;
-+		}
- 
- 		if (device_may_wakeup(device))
- 			flexcan_enable_wakeup_irq(priv, false);
-diff --git a/drivers/net/can/flexcan/flexcan.h b/drivers/net/can/flexcan/flexcan.h
-index 025c3417031f4..4933d8c7439e6 100644
---- a/drivers/net/can/flexcan/flexcan.h
-+++ b/drivers/net/can/flexcan/flexcan.h
-@@ -68,6 +68,8 @@
- #define FLEXCAN_QUIRK_SUPPORT_RX_MAILBOX_RTR BIT(15)
- /* Device supports RX via FIFO */
- #define FLEXCAN_QUIRK_SUPPORT_RX_FIFO BIT(16)
-+/* Setup stop mode with ATF SCMI protocol to support wakeup */
-+#define FLEXCAN_QUIRK_SETUP_STOP_MODE_SCMI BIT(17)
- 
- struct flexcan_devtype_data {
- 	u32 quirks;		/* quirks needed for different IP cores */
+> 
+>          return 0;
+>   }
+> @@ -951,9 +967,11 @@ static int am65_cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coales
+>                                    struct netlink_ext_ack *extack)
+>   {
+>          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+> +       struct am65_cpsw_rx_flow *rx_flow;
+>          struct am65_cpsw_tx_chn *tx_chn;
+> 
+>          tx_chn = &common->tx_chns[0];
+> +       rx_flow = &common->rx_chns.flows[0];
+> 
+>          if (coal->rx_coalesce_usecs && coal->rx_coalesce_usecs < 20)
+>                  return -EINVAL;
+> @@ -961,7 +979,7 @@ static int am65_cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coales
+>          if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20)
+>                  return -EINVAL;
 
--- 
-2.34.1
+Why does this return -EINVAL here, but 
+am65_cpsw_set_per_queue_coalesce() prints a dev_info() and then set the 
+value to 20?
+
+Would it better to have consistent behavior? Maybe I'm missing some 
+context or reasoning here?
+
+> 
+> -       common->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
+> +       rx_flow->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
+>          tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
+> 
+>          return 0;
+> @@ -971,20 +989,36 @@ static int am65_cpsw_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
+>                                              struct ethtool_coalesce *coal)
+>   {
+>          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
+> +       struct am65_cpsw_rx_flow *rx_flow;
+>          struct am65_cpsw_tx_chn *tx_chn;
+> 
+> -       if (queue >= AM65_CPSW_MAX_TX_QUEUES)
+> +       if (queue >= AM65_CPSW_MAX_TX_QUEUES &&
+> +           queue >= AM65_CPSW_MAX_RX_QUEUES)
+>                  return -EINVAL;
+> 
+> -       tx_chn = &common->tx_chns[queue];
+> +       if (queue < AM65_CPSW_MAX_TX_QUEUES) {
+> +               tx_chn = &common->tx_chns[queue];
+> +
+> +               if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20) {
+> +                       dev_info(common->dev, "defaulting to min value of 20us for tx-usecs for tx-%u\n",
+> +                                queue);
+> +                       coal->tx_coalesce_usecs = 20;
+> +               }
+> 
+> -       if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20) {
+> -               dev_info(common->dev, "defaulting to min value of 20us for tx-usecs for tx-%u\n",
+> -                        queue);
+> -               coal->tx_coalesce_usecs = 20;
+> +               tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
+>          }
+> 
+> -       tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
+> +       if (queue < AM65_CPSW_MAX_RX_QUEUES) {
+> +               rx_flow = &common->rx_chns.flows[queue];
+> +
+> +               if (coal->rx_coalesce_usecs && coal->rx_coalesce_usecs < 20) {
+> +                       dev_info(common->dev, "defaulting to min value of 20us for rx-usecs for rx-%u\n",
+> +                                queue);
+
+Would it make more sense to just return -EINVAL here similar to the 
+standard "set_coalesce"?
+
+> +                       coal->rx_coalesce_usecs = 20;
+> +               }
+> +
+> +               rx_flow->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
+> +       }
+> 
+>          return 0;
+>   }
+
+I think my comment to the "get" and "get_per_queue" versions of these 
+functions also applies here, but only if the behavior of returning 
+-EINVAL or setting a value for the user is the same between the "set" 
+and "set_per_queue".
+
+Thanks,
+
+Brett
+
+<snip>
 
 
