@@ -1,109 +1,93 @@
-Return-Path: <netdev+bounces-112686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B2993A95D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:33:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D347B93A960
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 409FD284213
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:33:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87E7E1F212FA
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8C414600C;
-	Tue, 23 Jul 2024 22:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05CB2145B28;
+	Tue, 23 Jul 2024 22:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5py/4hH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/hHYG5D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0DE288D1;
-	Tue, 23 Jul 2024 22:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FA11428E5
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 22:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721773996; cv=none; b=SvJwhISdbOh0JAd4WNzQtmjv419SuEswgrHNr2gQnU0ZbcPQ9x8Pu0K3/m1fX9ldeyRpS0gK/9bFRSgOop/E7vN5W6kHUw675cfq4dl/pJGGq+rnCg0JRdcW02kuuvMuaXij5XSdeXtj3inFL3dM+QeumWT1s18YJyHVRu27024=
+	t=1721774049; cv=none; b=ULbvWW14SUZJwXVKemA7vJlJcCg2zq7gpJ3NKq0nNaz5hP276YZSmHSRouiHtNTIPoZI5Ga+9UaSZEySJZMBByxh7DbsKbGZYnojOT6VCbYK9U3iDpRUgjqbGHt2UCQWs1ew3m06LfcE4EGwuYq52Ke8K/G00xdfEpbfM1wEcpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721773996; c=relaxed/simple;
-	bh=P1edFubkU42gQM60THhmDmm1fEOb72Ql3vnXb72Yu5E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=CN8tPc2/tCRbm15wNa9C8UPDdbklVsATnbuRNmP9g+VWCmnfgstt+AVo/pGD+BMwWLu3a5AGax8nql5LiVQ6J6ngNIsESYrkAzH1/HUQkHZO+p8MvQJqXf6T6GwHKVSYDVYjizO1hidd9KA7xSso7eNHEl4xboIi8ksNI0+cpLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5py/4hH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E3EC4AF09;
-	Tue, 23 Jul 2024 22:33:15 +0000 (UTC)
+	s=arc-20240116; t=1721774049; c=relaxed/simple;
+	bh=BMy/YnGz+1e6M8YIFYOHt7x04txC19mkMvaWiGuOu8k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GT1Ynj6kIWSbJS7VEpE04IjjF+A8VJBr8alXzIsea4GLGuf9USRc8i8t/GqUuu7J98gRPJeZlQPh02TW5i8jGQkn7b5O5+3ntIWSsoJye7D7A4fZ/mty5RmzKd1IsKAQKyMAQRh9K1WL6KY3/mVSbkXZtE5DakRLi1GUvl5cPgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/hHYG5D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22E24C4AF0A;
+	Tue, 23 Jul 2024 22:34:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721773996;
-	bh=P1edFubkU42gQM60THhmDmm1fEOb72Ql3vnXb72Yu5E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=t5py/4hHNHOiryPtmnllAD2G7xyTM5Ng/oRZB3cYWw46Zb++/Zz9dMNEghtTaw7CY
-	 BgDtiQxVbPS5HHTDzX9hLV7vm5z9toTzvYOlCY+laxho+pOyx1k3gQo3WChhOzbLAt
-	 s4gqoIERdgORn/cgjP4x9ezNZUYf4/hhbCOXL7Qp6jwLze11umJkuIT/UDVv0aUFdy
-	 w/9PY/pBSFmOSSTPo9McASPipOTi/AuPu1JTmYJeLSfaXTjWVn9AiZ9Ee6lYH1pf2g
-	 45bsAxvtU3zyUMYUHvRkYOJ3vFIPkTFpUm2H4/6212eLC+cuDY/gM0SFvz1lJCkwy9
-	 e+6fwzwZnu+pQ==
-Date: Tue, 23 Jul 2024 17:33:13 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com
-Subject: Re: [PATCH V3 02/10] PCI: Add TPH related register definition
-Message-ID: <20240723223313.GA779521@bhelgaas>
+	s=k20201202; t=1721774049;
+	bh=BMy/YnGz+1e6M8YIFYOHt7x04txC19mkMvaWiGuOu8k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=n/hHYG5Dv153nb4dzpKDrD/ImOt70Msski44i5Fa86AMkkF2dWEAO2DVlsl04iyX0
+	 3B7nzMs5z3Ry205YPVSPobAfA8AQQ9ZzNoREC6xEnILfGw6pmhEKb3UiC97bnAKNl+
+	 Uf167WcSB0jKv4FgaAX8WXqXpvmgwpsrqBwpeWbgncABBsO9Uf76P2Y2+tn5AKqu+g
+	 hBTds+Zx3RGOUV8sSETSoYSuHHJkT4BysXTMpAKEbcrE0EF63tLlGlcTHy/dBsc1GO
+	 fk8HBMpICMRWofc8ICggqm4WPU0DPQtDkEKI9vusqw3dJ5RtkFiJhaPcKgrAq1BFWP
+	 YCCJ94w3hj40g==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	leitao@debian.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net] MAINTAINERS: make Breno the netconsole maintainer
+Date: Tue, 23 Jul 2024 15:34:05 -0700
+Message-ID: <20240723223405.2198688-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240717205511.2541693-3-wei.huang2@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 17, 2024 at 03:55:03PM -0500, Wei Huang wrote:
-> Linux has some basic, but incomplete, definition for the TPH Requester
-> capability registers. Also the control registers of TPH Requester and
-> the TPH Completer are missing. Add all required definitions to support
-> TPH without changing the existing uapi.
+netconsole has no maintainer, and Breno has been working on
+improving it consistently for some time. So I think we found
+the maintainer :)
 
-> +#define  PCI_TPH_CAP_NO_ST	0x00000001 /* no ST mode supported */
-> +#define  PCI_TPH_CAP_INT_VEC	0x00000002 /* interrupt vector mode supported */
-> +#define  PCI_TPH_CAP_DS		0x00000004 /* device specific mode supported */
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ MAINTAINERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Capitalize to match spec usage.  Also below.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4e3f4416cb03..a85234de4fd0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15704,6 +15704,12 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/hwmon/nuvoton,nct6775.yaml
+ F:	drivers/hwmon/nct6775-i2c.c
+ 
++NETCONSOLE
++M:	Breno Leitao <leitao@debian.org>
++S:	Maintained
++F:	Documentation/networking/netconsole.rst
++F:	drivers/net/netconsole.c
++
+ NETDEVSIM
+ M:	Jakub Kicinski <kuba@kernel.org>
+ S:	Maintained
+-- 
+2.45.2
 
-> +#define  PCI_TPH_CAP_EXT_TPH	0x00000100 /* extended TPH requestor supported */
-
-s/requestor/requester/
-
-> +#define  PCI_TPH_CAP_LOC_MASK	0x00000600 /* location mask */
-> +#define   PCI_TPH_LOC_NONE	0x00000000 /* no location */
-> +#define   PCI_TPH_LOC_CAP	0x00000200 /* in capability */
-> +#define   PCI_TPH_LOC_MSIX	0x00000400 /* in MSI-X */
->  #define PCI_TPH_CAP_ST_MASK	0x07FF0000	/* ST table mask */
->  #define PCI_TPH_CAP_ST_SHIFT	16	/* ST table shift */
->  #define PCI_TPH_BASE_SIZEOF	0xc	/* size with no ST table */
->  
-> +#define PCI_TPH_CTRL		8	/* control register */
-> +#define  PCI_TPH_CTRL_MODE_SEL_MASK	0x00000007 /* ST mode select mask */
-> +#define   PCI_TPH_NO_ST_MODE		0x0 /*  no ST mode */
-> +#define   PCI_TPH_INT_VEC_MODE		0x1 /*  interrupt vector mode */
-> +#define   PCI_TPH_DEV_SPEC_MODE		0x2 /*  device specific mode */
-> +#define  PCI_TPH_CTRL_REQ_EN_MASK	0x00000300 /* TPH requester mask */
-> +#define   PCI_TPH_REQ_DISABLE		0x0 /*  no TPH request allowed */
-> +#define   PCI_TPH_REQ_TPH_ONLY		0x1 /*  8-bit TPH tags allowed */
-> +#define   PCI_TPH_REQ_EXT_TPH		0x3 /*  16-bit TPH tags allowed */
-> +
->  /* Downstream Port Containment */
->  #define PCI_EXP_DPC_CAP			0x04	/* DPC Capability */
->  #define PCI_EXP_DPC_IRQ			0x001F	/* Interrupt Message Number */
-> -- 
-> 2.45.1
-> 
 
