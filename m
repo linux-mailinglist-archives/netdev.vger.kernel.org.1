@@ -1,346 +1,274 @@
-Return-Path: <netdev+bounces-112691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7173393A9A9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:15:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2477493A9AE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E44611F2190E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:15:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4418D1C20BB9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BBF149C42;
-	Tue, 23 Jul 2024 23:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610DF14884B;
+	Tue, 23 Jul 2024 23:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHZzE8me"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZA6xQDL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5651494B1;
-	Tue, 23 Jul 2024 23:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721776502; cv=none; b=aMpC71l92coumUl/2laP18FSYzc0b66mDg4z0csuKatLnNBNUnps26RpaD3I+BsKt4utA4QL5sWlaBViDEkG/WG+0q++/8OkkxlJh0bXsRBecfdOZNcM2bMWxijP5k0VZbnG2ffuJFEH/TIcgeGUZIBPM7iW0gVPzyL23Vlji+s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721776502; c=relaxed/simple;
-	bh=J+shRoyWxjjFtSLRx0IPGcWXX70uvHYdX9iSt+m2JAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=QGA1EwWZ4Z98nKDUl6mtjS2rXAjQhMM5ML+szscTiSLtGiA3gAM9qViIlk+yuwU8ImvYCPfPxJb7G1abkvlXUOuSg0EIABnJNbLKA4tYbljkOZh21INPPSNXEGW7xqDwm9Tx0anKsZ7GoMTqsBjjpYzcDW2npKauWtSJSPS1AVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHZzE8me; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B4CC4AF0A;
-	Tue, 23 Jul 2024 23:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721776502;
-	bh=J+shRoyWxjjFtSLRx0IPGcWXX70uvHYdX9iSt+m2JAs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=cHZzE8mek6vHkvSiyBnoztg4W+HvovQefLXWlpKDiFnSjb+mwvQ0XfEZwxjRuE0kD
-	 L8W+JNSdAh0yVxY7EiqYs2KJdhnKVYq+zWlK2IhgLvlRsx/fXWC6ezoanGH2UdIvtS
-	 bbOsQeKo5xoeZxTyfh/96jxOloIcPuuvt/+ZhXLicVVoHUQ+Pjym9P1cOQk44lybXt
-	 eJeDKziSAYGXbzF4ItxCg9Wopd22Mcoc/gM9U0yZvsUWQ6WBHlw4FrtuoJojr/MCtj
-	 Vcupn2zVpRdLZ0Sgxbgb9lp9Dm9xAD7cXOQhXTZkPJo0hK4d52jX+SzFbHfBVdIUOV
-	 mehJxWND3VYcg==
-Date: Tue, 23 Jul 2024 18:15:00 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com
-Subject: Re: [PATCH V3 07/10] PCI/TPH: Introduce API to update TPH steering
- tags in PCIe devices
-Message-ID: <20240723231500.GA780146@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B2D28E8
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 23:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721776541; cv=fail; b=FbA8CCGvwFo4EU5Vjxc0Ly0iaXUfhvAtcKacdwxOW5PrA5XxUHsxY9ojhjNA1CG7NsPMfIfjabfcXxNwFkGpRQMtw2Bq9SoOfZov9Lhf24K4S/DY9HI1kv2fW2gSbzpAG/wq+xJ2X9eNPcuak7lt6Fms3MKWvOVdDrrcl5KWk50=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721776541; c=relaxed/simple;
+	bh=2gjvznWbJUVUGESSDxC4ooDtOFuudRx+PYMp8wWfW+g=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=POHEFECpj0nB/e8eVu3HLvYsvs/uQX/TZvKlzdIvg4no9fhEW/WzT5kAFvTjbLoqu2y+xF7YoZVaUz5FuYG1HHHp9gGrj5SiZQNWMk4kbgBmh/HFlxD2QjOLtCabMmSzLZMGx+l6o+GthhQqs/Zb/fleP98Xr/ZgRXt+LqSqR/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZA6xQDL; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721776539; x=1753312539;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2gjvznWbJUVUGESSDxC4ooDtOFuudRx+PYMp8wWfW+g=;
+  b=eZA6xQDLvTZJEY+1nsqx4hhkeNc0eZYiy4KMuCdePSVO2U+TsMNbu/BO
+   1kTBfXbHvD8NEdKrRBTx4DA4PcumUTTAbG1d4rut29Ui4E7tg9wjohNMe
+   vb/erW2XNJI2fK2r1lxCtdm99Re3Ky+A/Hk8Qyw3YJu7Z+np4cYKOS2fJ
+   kcl5J1Mhmoorrrv5Xp0sqUd0Yqi4UgSVGg408TJkSX0YwIBglcrMCJo/r
+   YHU4igqNo57JjH7JVCAFTrlqwV3ReKLQas1mPkyZRF75iGCP5CBn0zMMw
+   zKvfcr12Rxy5w4ZIW7izTof6kx+fmkFC77MWUdg9M/nyy+ep1mb567yl+
+   w==;
+X-CSE-ConnectionGUID: I5Ovx5mCTOCEdmQzBVyeWA==
+X-CSE-MsgGUID: IP34lafOQK2G1B4aX5PFtw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="30847089"
+X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
+   d="scan'208";a="30847089"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 16:15:38 -0700
+X-CSE-ConnectionGUID: My7fFtV2Q3e9Y3zHA3kHKg==
+X-CSE-MsgGUID: ygANJzG5Q+WOMMAGC0Ksrg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
+   d="scan'208";a="56544401"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Jul 2024 16:15:39 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 23 Jul 2024 16:15:38 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 23 Jul 2024 16:15:37 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 23 Jul 2024 16:15:37 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 23 Jul 2024 16:15:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FAHUK9X07oBmDlS+N0qSQTHcYOF08FKtojFPcHbFOvtmVl1zP2yDG8AatZp3yy1dlkyi7+/dc45/m2+rNR3S3GX957YNmL2CcF1eFZxjApzD2ENfF3a0Ts19l6SJUvzJOVegB+9W2s/CBDb3bb79LAIHOGV01d1s33mCmXEKxPhx9zUhGOvo79MCoH0o3O806xc+IISWhT+lMqHIWFTGM6ualXP3uB+VxtHYWkQ/qrb4bzJaEfLbCCW+b7cNV3cpPFFKxvAyDvKoUKFxps1gZT4bEMe8jcuL6olkJfA+xcdN0YBy7MyiA08abgjWHGunLlptlHrj6O+edK1H5s3JeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z707vqZDGb8BraCmkv734ajGngNp78fLt/vGNqo/aRs=;
+ b=DXu3KjKcR3B7UcSxx8YwfhlrKjyO5+BtfRnAWYQu6AbY9pKyX0+Zu8lzfXpHAVcEiviL0XCnQhLvaWMvipRh8kmtfax/3Pht9ZQZ+tjrcHObv+p0xLES17URP0rh7f/qMNebhc+MfN98IBUlv2jY1rrRyeGNf0wWMxjRCRD8hQbRicTu2m4THc/CT/a2pdT+PBLY02g28HiUYX7wYRbDTOazeBFvpWUKIKFZ0/cBckdBcRjG3qeRphU9EbjgInbH+Q4w3tDhq2LSPXVgQ2D9eqbyf104nDRIBHvZxiMsjOcF9IBN7VrHThxHJ+PVzy2O1dWBSqiU84B0mdKDwmb2ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ0PR11MB4927.namprd11.prod.outlook.com (2603:10b6:a03:2d6::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.16; Tue, 23 Jul
+ 2024 23:15:34 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%2]) with mapi id 15.20.7784.017; Tue, 23 Jul 2024
+ 23:15:34 +0000
+Message-ID: <0c8a76f6-92fb-4c50-9ef5-b66c241f41c1@intel.com>
+Date: Tue, 23 Jul 2024 16:15:33 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 3/5] ice: Initial support
+ for E825C hardware in ice_adapter
+To: Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>
+References: <20240718105253.72997-1-sergey.temerkhanov@intel.com>
+ <20240718105253.72997-4-sergey.temerkhanov@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240718105253.72997-4-sergey.temerkhanov@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P222CA0014.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:303:114::19) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240717205511.2541693-8-wei.huang2@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ0PR11MB4927:EE_
+X-MS-Office365-Filtering-Correlation-Id: f35f3dd7-6f8d-4b7a-112a-08dcab6d5b08
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SUdYcHlBM0g3NU9ZV2hzQnl5cG90aTNtOWZWSGhmQjlzL3paU2dzRklNNWJW?=
+ =?utf-8?B?RVBFQzNUOFBwZXB2K0pZRm1rTmQ1d2lQeHBJemlDS2REd0dLRXNPU3MxaHBr?=
+ =?utf-8?B?VjJwRmpUMlZaMzIrNFhEdjk1Q3JuUGE3WitJQ3ZxSnpBbXpPVTcvMjdveHdM?=
+ =?utf-8?B?WjZrSE8yZnQzcC9KeExSNzhYNmovM0pJaVBFdTlaZElKaTQvOW8zTDE4b3dO?=
+ =?utf-8?B?YU1YRjluQXlZaExTU3hKdHc1RVhJeGVHUUZnR0laYkQ1clFIR21XWnBaeWMz?=
+ =?utf-8?B?dWVXQzZjWHlqVVlBOFFteVNwd2FqWXNpUFQ3WnRtSUQ5bVhOR0Vna1R6Tklz?=
+ =?utf-8?B?K2gxbThOT3Z1OUJQai8wbFFwMitIalZyRXI5Ym0xa0hncWY0Wi9xU3JYd1Nw?=
+ =?utf-8?B?bjlNVFRKcVZucmZGUHNUVU12N3Z2dU41bVZid1hYNXg0RTlDOW1IZ0dsaitN?=
+ =?utf-8?B?cnB1b283OVVvTmRod0RpWlBXUVQzdHErcXBNc3cvazlvU2ViQTNYa2tPcUpK?=
+ =?utf-8?B?N2x6Rm04MnVlUXR6NktPRitnenk1VVZ2YjlKekFGSTJ3cGxXblBhTmlQY0Nm?=
+ =?utf-8?B?VllYQjRpdytYNnpBMENzaHQrK2NrWXBUSm1tZVRlekdybmtXS1hPWHNFR2I4?=
+ =?utf-8?B?Q0lGSWIvekhOS0JXU0xBUnNsVEQ0VkliY2hVc2t4L1JSY1E2QjQ3QUFZZFoz?=
+ =?utf-8?B?c3RqSXB1R0l4TXBUdElYdGh5amhHb29GYTFMU3U5S01PbXNqYTRVODFCejBl?=
+ =?utf-8?B?WEdKcHVEbTBuemNaRXdrMUJMU1RyK2dsOXJ5dGtuckNGVUphOGdUVUk5OCtK?=
+ =?utf-8?B?cEp3TTNSTnF5aktpNHBBQkM2Zm9zN0pwaFp6WXBHRmRzUE1JSGNDVGF1M1hp?=
+ =?utf-8?B?YndLVnh4TFJ1WFFKd3VZQWY0U2hqcjl3UEFQTitldXRxckdvelVaY1NUNEM1?=
+ =?utf-8?B?VHJ3S3RUMElCS1RiZGxsMUtVSk1oWDVHZHNHWHg0MGhlbWd2d1hPT0ZtbzZ4?=
+ =?utf-8?B?VHdMbk9IZGdtOW1RZjNCeWxITkcvVERnc3M1L3BPY3NUbVRuRk5DNVFvQnBN?=
+ =?utf-8?B?VHJUMGE1WHMyclUyTzh6bm9SVUlTWnlMVWx3RSsvMW5VaTd1T3QrTXVaL2Zj?=
+ =?utf-8?B?WjJoNmRmMk03OFlUekt0a2JqeDJ2Zk9Oa3JYSUNhaThjOEtkaFBmRmk5UEJi?=
+ =?utf-8?B?bll4ajYvUUlJakEycVVvN2xVZXFPRVpUTVJ4dGIzYldhV0Niek16RnlLbURR?=
+ =?utf-8?B?OGRwWWh2c0JsN25kVWpNY3V5dHI3TWRRSTRRQ2RhUWN4UUVIVjdCV0Z3VVhD?=
+ =?utf-8?B?cU5WTHpoRlVReGd4ZWxTclRoRzd4S2FsV2JFeTl2dDBSbWV6TmloTGdjQUpS?=
+ =?utf-8?B?MFczdUdHczdsL0U4WTJaYXo1S3FRb1lkMnF4R3UxUnpyNkYxcjZjQXhmbmxN?=
+ =?utf-8?B?Zk1URHBHblJhSUhkbkcvaXJGOWErNFJLRVUycndnVzZVWksrTjUyT1ErL0xK?=
+ =?utf-8?B?VndmTU1tOWM0UlNXNDM0citWTi9jMjhSblFobTRDWHdUQTdrVEFzVVdiT1Bs?=
+ =?utf-8?B?d0JNajlqRlNaUmRnbjFIMDVkMEl5QlFTdlVZMkVKWlNvN3F6VmpSZkozejdP?=
+ =?utf-8?B?S3k1SlBIbHgrdGRXWnpzc2JJbHp4Tm44eE5ldFhab0RrODYzN09UZm1jZEd6?=
+ =?utf-8?B?NGhObythdHBIM25JaDlDa1EraUwrdmpYK3UwdEtHcjVGekkzMVJUaS9xWGlp?=
+ =?utf-8?B?Q2F5aDQ1d28xN1ZtejhtNzhmV1Q2ZWZhakpPdmJmZ2JEV2psVGlvUm9PTDdp?=
+ =?utf-8?B?YmsrZzRPVUhqb0pxcG5WZz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N3dyc3BBa3ZKRjB0ZW9FU01DWkpmRmFuNCtaTGlrZFNrUnNLOVVjclBDZkR5?=
+ =?utf-8?B?bVkzb3JXTTVzSzdOQnhwWnZPV0JBMTZwWGJHQTBOVVgxSkdIQ0FEV2JJcXls?=
+ =?utf-8?B?NWVBQzRVam8xZTJKd1MyYlVFbXpLMkk5ZVBwdVJ5dlVlL20yS2Z3K2orTXA4?=
+ =?utf-8?B?K3A2NkRocVQ1Rnc3aERMc21pdFR5YUNJZVJ3OUxmL1k3eGdnaTMxT3M0Qmkz?=
+ =?utf-8?B?a2gyaGNpdEp1SFBqRm0vZVc3N1ZYd3dvMXNmYUVqRTRpOVhzQkNvam0wREo5?=
+ =?utf-8?B?M1dTR3dERDl4SDZFN0xSb3NzUnkreTlvVjcwUk8rdG5FYngwL0htazVWRno2?=
+ =?utf-8?B?c2JFWGw2TU8zNU9odWo5NjVHdXBvTjc2dERWT1N6aW95MDJQdEVrY2lBQ090?=
+ =?utf-8?B?NEh4b1lRR2tid3RWY1o2R0FUT0V1eFY1NFZrTlQ4Y29kbHUrd0NnLy93SzhB?=
+ =?utf-8?B?QUxYRlFYb3BOdFBPd3g1U2pGdnlUMnFpc2NTdVh2N0UyNG5wM292N0NTb1FG?=
+ =?utf-8?B?eFA1MWdTY08xV0MxTXduUDZMVFdmajBienRwZWNtR2daL25WSUd1V1hPUElB?=
+ =?utf-8?B?S1hremNxRUZNSVpNQkx0cDIrc2tYZjQyeU1JMVY2RHFPMjlKdklySVBucHMv?=
+ =?utf-8?B?aFNtVkpRUXRPQlBOOVRTZzhaTU9GZU9xRmtmbER0WHZNRkZVcU1rOFZzTVVY?=
+ =?utf-8?B?T1Z3d1NsTTV0QzEvZm81SFBtbENadWdXYzBmQTNsTzl4WVBlbmpMYjlvektv?=
+ =?utf-8?B?QjhaVmpDMGVtMytVTldjeU9kTmV3QnJtR2ZaLzJaRHdtOStpS3VpQW81Qzhq?=
+ =?utf-8?B?UlBnY1dhNjh0TGo4N3JVeTRRRkhNbzVIYTZLZzNZQno3NEVHbG9BdjZqTDAz?=
+ =?utf-8?B?dGhmM3VwaW5lbkUyZnIyWFRQNUk1Q1RDajVPRVVINGlDUERRLy9GUlJDQ003?=
+ =?utf-8?B?TkdFU09IRGY5WlVOTXlKSFF3SWh5eGtsK0VoMWg0eWtMdDBmT01HSFVINHRK?=
+ =?utf-8?B?YVR3Z09qNENOVEN2U3FmbXlkekNTNEorRnE1NTE4QnJpODY5Ky85Vm0xcElq?=
+ =?utf-8?B?aEw0YmY3RE5qZ1Vva2dhQnhyMFZVUFo0dkhvQ2FPMld5UC9sRzhyaHNOTWtP?=
+ =?utf-8?B?c2ZxSzRCWVhCUVplSkl4M3VLYk82d1dVSEFMSjhUV0NZTWdibm1Qb3VjRTQv?=
+ =?utf-8?B?Ry9GTzRVd0p2a1YrL3FkVTE0c1UzQ09xZmxyb21ab1FJb2ZFOG8zWjlsMDZB?=
+ =?utf-8?B?UVZoR2FYUVB3TTF2djRMRk1BNVMza1htcWJKaG5jUzFRS0JpeHYyQU5KakZ5?=
+ =?utf-8?B?ejRWTnp3alRlQ2lqeHFYOFZYemh6cHgzdzgvdkJSWDFrZWJ2RGFTcjlUOGdC?=
+ =?utf-8?B?R3IyY3htVTZTRzBGSThoMkpaTkZzTGFJUVUrZUF0NTVyK3p4eno0c0NvL2Rw?=
+ =?utf-8?B?TDcrSFJHVHY3dXhkeHNSNGpQZmtqcVl1UlNLbEpmWEhnYWN3eWVyMUhkTWFl?=
+ =?utf-8?B?aW0vUDIwZTQ1bFh0MlRRQ2lVQ1hNakhvZmZDRDhvck52NTFvRDRzUG1zQXFr?=
+ =?utf-8?B?eGI1MUJacjFDYjNpRk1vWlVEV0RpRmxYcFRSMU5TQXcxZGlNczFXUFJVU1Va?=
+ =?utf-8?B?NEVNVE1tYXo2d2llSzI1em1jcEtPVEJSSXNoQzQ4NkZqU0pMRDY4Z3ZKd0FB?=
+ =?utf-8?B?ZGRudENZZkpobk5qUXNwd1dXSXAybGVhZDRpUldXc2poeUlsdkhCdTllNXJ2?=
+ =?utf-8?B?S3ZVTEluN3AyY0lZck9RY1FvUW1FQ1MrR1NSNmFqN1hYMElqOW9YZXJGcElG?=
+ =?utf-8?B?Q1ZTbG4zUTE3b2g4K1lSVVlmNlQ1VWlJajNKN3E0N3Z1dXhMTDJnZm5oRU94?=
+ =?utf-8?B?MEVodW1uc05XYWpLeDRkVGRMeURPajRvdG13TElueVllZUN1UVBiOXZtUEpk?=
+ =?utf-8?B?RjJMcjV4Vk1EOWlYMjRSeTFYSWcxUk9sRWFlY3NSN1AzM2NvUi9BZk9qdk14?=
+ =?utf-8?B?VFdRTHNMd2hYV1RDY1JaU28vaWZNR0dtaUZLR1luZUdhdDRYcVRyTWdySmg0?=
+ =?utf-8?B?UlBTbXZ2RGFjeWFmZklYZENRM2x1LzR3ellKTmdYRG14TFFkdG9JMFVnQkVD?=
+ =?utf-8?B?dmNCN1AxdE54RG55UU9FYXdkaWlVYmJPVXlrMWNLODVjOGFaMndacGkyZmNn?=
+ =?utf-8?B?MGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f35f3dd7-6f8d-4b7a-112a-08dcab6d5b08
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 23:15:34.7568
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gHIyzmEixhTAU/Mc1aW2BXYDjA/ay4OkOEacDEOyejweofkctkx85xXEC484C/f5EfgoOAQ/EDD9lqtTznZTSt4NXPE2zbqhySL/DNh/R0o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4927
+X-OriginatorOrg: intel.com
 
-On Wed, Jul 17, 2024 at 03:55:08PM -0500, Wei Huang wrote:
-> Add an API function, pcie_tph_set_st(), to allow endpoint device driver
-> to update the steering tags. Depending on ST table location, the tags
-> will be written into device's MSI-X table or TPH Requester Extended
-> Capability structure.
 
-> +static u32 get_st_table_loc(struct pci_dev *pdev)
-> +{
-> +	u32 reg_val;
-> +
-> +	pci_read_config_dword(pdev, pdev->tph_cap + PCI_TPH_CAP, &reg_val);
-> +
-> +	return FIELD_GET(PCI_TPH_CAP_LOC_MASK, reg_val);
-> +}
-> +
-> +static bool msix_index_in_bound(struct pci_dev *pdev, int msi_idx)
-> +{
-> +	u32 reg_val;
-> +	u16 st_tbl_sz;
-> +
-> +	pci_read_config_dword(pdev, pdev->tph_cap + PCI_TPH_CAP, &reg_val);
-> +	st_tbl_sz = FIELD_GET(PCI_TPH_CAP_ST_MASK, reg_val);
 
-Seems like a one-time enumeration thing, not a config read we need to
-do for every Steering Tag update.  Same for get_st_table_loc(), I
-think.
-
-> +	return msi_idx <= st_tbl_sz;
-> +}
-> +
-> +/* Write ST to MSI-X vector control reg - Return 0 if OK, otherwise errno */
-> +static int tph_write_tag_to_msix(struct pci_dev *pdev, int msi_idx, u16 tag)
-> +{
-> +	struct msi_desc *msi_desc = NULL;
-> +	void __iomem *vec_ctrl;
-> +	u32 val;
-> +	int err = 0;
-> +
-> +	if (!msix_index_in_bound(pdev, msi_idx))
-> +		return -EINVAL;
-> +
-> +	msi_lock_descs(&pdev->dev);
-> +
-> +	/* find the msi_desc entry with matching msi_idx */
-> +	msi_for_each_desc(msi_desc, &pdev->dev, MSI_DESC_ASSOCIATED) {
-> +		if (msi_desc->msi_index == msi_idx)
-> +			break;
-> +	}
-> +
-> +	if (!msi_desc) {
-> +		pci_err(pdev, "MSI-X descriptor for #%d not found\n", msi_idx);
-> +		err = -ENXIO;
-> +		goto err_out;
-> +	}
-> +
-> +	/* get the vector control register (offset 0xc) pointed by msi_idx */
-> +	vec_ctrl = pdev->msix_base + msi_idx * PCI_MSIX_ENTRY_SIZE;
-> +	vec_ctrl += PCI_MSIX_ENTRY_VECTOR_CTRL;
-> +
-> +	val = readl(vec_ctrl);
-> +	val &= 0xffff;
-> +	val |= (tag << 16);
-
-Seems like there should be some kind of #defines here to connect this
-to the MSI-X table structure.  Maybe next to or connected somehow with
-PCI_MSIX_ENTRY_VECTOR_CTRL.
-
-> +	writel(val, vec_ctrl);
-> +
-> +	/* read back to flush the update */
-> +	val = readl(vec_ctrl);
-> +
-> +err_out:
-> +	msi_unlock_descs(&pdev->dev);
-> +	return err;
-> +}
-> +
-> +/* Return root port TPH completer capability - 0 means none */
-> +static u8 get_rp_completer_support(struct pci_dev *pdev)
-> +{
-> +	struct pci_dev *rp;
-> +	u32 reg_val;
-> +	int ret;
-> +
-> +	rp = pcie_find_root_port(pdev);
-> +	if (!rp) {
-> +		pci_err(pdev, "cannot find root port of %s\n", dev_name(&pdev->dev));
-> +		return 0;
-> +	}
-> +
-> +	ret = pcie_capability_read_dword(rp, PCI_EXP_DEVCAP2, &reg_val);
-> +	if (ret) {
-> +		pci_err(pdev, "cannot read device capabilities 2\n");
-> +		return 0;
-> +	}
-> +
-> +	return FIELD_GET(PCI_EXP_DEVCAP2_TPH_COMP_MASK, reg_val);
-> +}
-> +
-> +/*
-> + * TPH device needs to be below a rootport with the TPH Completer and
-> + * the completer must offer a compatible level of completer support to that
-> + * requested by the device driver.
-
-Use spec spelling of "Root Port" (not a mix of "rootport", "root
-port", etc).
-
-> + */
-> +static bool rp_completer_support_ok(struct pci_dev *pdev, u8 req_cap)
-> +{
-> +	u8 rp_cap;
-> +
-> +	rp_cap = get_rp_completer_support(pdev);
-> +
-> +	if (req_cap > rp_cap) {
-> +		pci_err(pdev, "root port lacks proper TPH completer capability\n");
-
-Doesn't look like an error we should log to me.  The *driver* might
-need to know this, but the *user* can't do anything with this message,
-so I don't think we should print it.  There's nothing actually broken
-in the hardware or software here.
-
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +/* Return 0 if OK, otherwise errno on failure */
-> +static int pcie_tph_write_st(struct pci_dev *pdev, unsigned int msix_idx,
-> +			     u8 req_type, u16 tag)
-> +{
-> +	int offset;
-> +	u32 loc;
-> +	int err = 0;
-> +
-> +	/* setting ST isn't needed - not an error, just return OK */
-> +	if (!pdev->tph_cap || pci_tph_disabled() || pci_tph_nostmode() ||
-> +	    !pdev->msix_enabled || !int_vec_mode_supported(pdev))
-
-I see now why you made int_vec_mode_supported() a separate helper.
-Makes sense since you call it several places, so disregard my earlier
-comment about inlining it.
-
-> +		return 0;
-> +
-> +	/* setting ST is incorrect in the following cases - return error */
-> +	if (!msix_index_in_bound(pdev, msix_idx) || !rp_completer_support_ok(pdev, req_type))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * disable TPH before updating the tag to avoid potential instability
-> +	 * as cautioned in PCIE Base Spec r6.2, sect 6.17.3 "ST Modes of Operation"
-
-Wrap to fit in 80 columns.  Capitalize as normal for English
-sentences.
-
-s/PCIE Base Spec/PCIe/
-s/sect/sec/ (as used in similar citations elsewhere)
-
-Apply to all comments in this series.
-
-> +	 */
-> +	pcie_tph_disable(pdev);
-> +
-> +	loc = get_st_table_loc(pdev);
-> +	/* Note: use FIELD_PREP to match PCI_TPH_LOC_* definitions in header */
-> +	loc = FIELD_PREP(PCI_TPH_CAP_LOC_MASK, loc);
-> +
-> +	switch (loc) {
-> +	case PCI_TPH_LOC_MSIX:
-> +		err = tph_write_tag_to_msix(pdev, msix_idx, tag);
-> +		break;
-> +	case PCI_TPH_LOC_CAP:
-> +		offset = pdev->tph_cap + PCI_TPH_BASE_SIZEOF + msix_idx * sizeof(u16);
-> +		err = pci_write_config_word(pdev, offset, tag);
-> +		break;
+On 7/18/2024 3:52 AM, Sergey Temerkhanov wrote:
+> Address E825C devices by PCI ID since dual IP core configurations
+> need 1 ice_adapter for both devices.
+> 
+> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_adapter.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+> index ad84d8ad49a6..903d0bc9e3e5 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_adapter.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+> @@ -9,12 +9,14 @@
+>  #include <linux/spinlock.h>
+>  #include <linux/xarray.h>
+>  #include "ice_adapter.h"
+> +#include "ice.h"
+>  
+>  static DEFINE_XARRAY(ice_adapters);
+>  static DEFINE_MUTEX(ice_adapters_mutex);
+>  
+>  /* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
+>  #define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
+> +#define INDEX_FIELD_DEV    GENMASK(31, 16)
+>  #define INDEX_FIELD_BUS    GENMASK(12, 5)
+>  #define INDEX_FIELD_SLOT   GENMASK(4, 0)
+>  
+> @@ -24,9 +26,17 @@ static unsigned long ice_adapter_index(const struct pci_dev *pdev)
+>  
+>  	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
+>  
+> -	return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
+> -	       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
+> -	       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
+> +	switch (pdev->device) {
+> +	case ICE_DEV_ID_E825C_BACKPLANE:
+> +	case ICE_DEV_ID_E825C_QSFP:
+> +	case ICE_DEV_ID_E825C_SFP:
+> +	case ICE_DEV_ID_E825C_SGMII:
+> +		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
 > +	default:
-> +		pci_err(pdev, "unable to write steering tag for device %s\n",
-> +			dev_name(&pdev->dev));
-
-I *guess* this message is really telling me that the ST Table Location
-field is "Reserved"?  I don't think we should emit an error here
-because if it becomes defined in the future, we'll start warning about
-all devices that use it, even though nothing is actually wrong except
-that we don't know how to use the new value.
-
-In any event, "unable to write steering tag" isn't actually the
-problem here; it's only that "ST Table Location" contains something we
-don't know about.
-
-> +		err = -EINVAL;
-> +		break;
+> +		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
+> +		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
+> +		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
 > +	}
-> +
-> +	if (!err) {
-> +		/* re-enable interrupt vector mode */
-> +		set_ctrl_reg_mode_sel(pdev, PCI_TPH_INT_VEC_MODE);
-> +		set_ctrl_reg_req_en(pdev, req_type);
+>  }
 
-I wish this code *looked* parallel to the pcie_tph_disable() above,
-since it *is* actually paralle.
 
-> +	}
+If we extend the ice_adapter to non-PTP uses (like the RSS or other
+ideas that were pointed out a while ago). How till those be affected by
+this change?
 
-  if (err)
-    return err;
+I think it makes sense still, though we may need some specialized
+handling if some of those configs don't cross the IP core boundary
+(unlike PTP which does).
 
-  /* Re-enable ... */
+Thanks,
+Jake
 
-  return 0;
-
-> +
-> +	return err;
-> +}
-
-> + * pcie_tph_set_st() - Set steering tag in ST table entry
-> + * @pdev: pci device
-> + * @msix_idx: ordinal number of msix interrupt.
-> + * @cpu_acpi_uid: the acpi cpu_uid.
-> + * @mem_type: memory type (vram, nvram)
-> + * @req_type: request type (disable, tph, extended tph)
-> + *
-> + * Return: 0 if success, otherwise errno
-> + */
-> +int pcie_tph_set_st(struct pci_dev *pdev, unsigned int msix_idx,
-> +		    unsigned int cpu_acpi_uid, enum tph_mem_type mem_type,
-> +		    u8 req_type)
-
-I think this function name should include something about "cpu".
-
-Seems like this file uses "cpu_uid" and "cpu_acpi_uid"
-interchangeably.  I'm a little unclear on whether that's actually the
-case or what the legal values are.  Driver passes cpumask_first(),
-which I think is a generic Linux CPU ID.   Is that identical with an
-ACPI CPU UID?  It looks like we assume that since we pass this
-unaltered to the _DSM.  I didn't dig into this, but would like to be
-reassured that all is well here.
-
-In any case, please use a consistent name so I don't have to wonder
-whether "cpu_uid" and "cpu_acpi_uid" are the same.
-
-> +{
-> +	u16 tag;
-> +	int err = 0;
-> +
-> +	if (!pdev->tph_cap)
-> +		return -ENODEV;
-> +
-> +	err = pcie_tph_get_st_from_acpi(pdev, cpu_acpi_uid, mem_type,
-> +					req_type, &tag);
-> +
-> +	if (err)
-> +		return err;
-> +
-> +	pci_dbg(pdev, "%s: writing tag %d for msi-x intr %d (cpu: %d)\n",
-> +		__func__, tag, msix_idx, cpu_acpi_uid);
-> +
-> +	err = pcie_tph_write_st(pdev, msix_idx, req_type, tag);
-> +
-> +	return err;
-
-  return pcie_tph_write_st(...);
-
-> +}
-> +EXPORT_SYMBOL(pcie_tph_set_st);
-
-> +static inline int pcie_tph_set_st(struct pci_dev *dev, unsigned int msix_nr,
-> +				   unsigned int cpu, enum tph_mem_type tag_type,
-> +				   u8 req_enable)
-> +{ return false; }
-
-"false" is not int.  This looks like "success" to the caller, and I'm
-not sure that's what you want.
-
-Bjorn
+>  
+>  static struct ice_adapter *ice_adapter_new(void)
 
