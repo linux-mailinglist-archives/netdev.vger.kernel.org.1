@@ -1,277 +1,270 @@
-Return-Path: <netdev+bounces-112681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC0EF93A911
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:09:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A00F793A91F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0101EB22263
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:09:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57614283CDC
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9662C1448D8;
-	Tue, 23 Jul 2024 22:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A83146D65;
+	Tue, 23 Jul 2024 22:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gQtN0w8T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d2vaU5DY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F3313B58D
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 22:09:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721772557; cv=fail; b=rownWT09MgkfFN4VQV+NQZ71o8ukShge+tYRSqtIyhYOykv6RqP2Ay38RASqKzfgfQKgq6pKP0Gwdfa3B4188vj8oAOI+xuW/PCUHqZsHaEzoqjlnoZBIKMWhrBtm+w5TdkYQTaKmQvan+h9/9L9FahkoohSL+KDU5nXa5+tNVM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721772557; c=relaxed/simple;
-	bh=ZanK5aZc0eKQD+SVgw3RprU/fCqxL/0dVDRp9XhvzgQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=f3kEiGvksrj81UnVo/LJBmjyju6cgLj5ofgTQDXHmO/EgIWo0cuvv9+Nizevo832YWA8lI/AqzPhMm1gthJGeM8I4flPMZUlAfB5LajuB05XdidcPEnE2lzmBB9rmOp/qFpMOh/zulT6CvJQVJmigGo5xx6fiyCy40wpV+2LpIs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gQtN0w8T; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721772556; x=1753308556;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZanK5aZc0eKQD+SVgw3RprU/fCqxL/0dVDRp9XhvzgQ=;
-  b=gQtN0w8T5F+MQeIjndLazMsVZBGK5DqRzUDH6sRDhIL9MpswC0Zus+Jt
-   lmtduFQgk19fbKAT4g4EydhUnAL7yk/h4KkeISAvjtB94BQhQ5oLXJDXe
-   /WL769mCQZGshIAOeIkDMpmhZ7a8xScV8FAnqlVa1nyi3ZKOgpNuP9BBE
-   tLFpPAQhbbYGaB578LeA3AOnupvVOy3TgeleEExqnJwPgoHtTdAggwyH8
-   NB79fmr86tPHpL5bTob4wqwID/WbjGB1/HnJ2cXwP4ghuVt4M8Hd9fYPC
-   Ebzd02PhIL3eOpAxx7LwNJGFNxhWF2F47hK515InMpxGSVj2HvvjuG/FJ
-   A==;
-X-CSE-ConnectionGUID: WnY+PPL6SB2EWH0fM8nllQ==
-X-CSE-MsgGUID: 5iQqhOQkQ+yo+hBjbXW/qg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="30086949"
-X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
-   d="scan'208";a="30086949"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 15:09:15 -0700
-X-CSE-ConnectionGUID: t+gghEduSLyhRdb8g3PfgA==
-X-CSE-MsgGUID: hfslP2PUTy2AIoJw9e67vA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
-   d="scan'208";a="52093224"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Jul 2024 15:09:15 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 23 Jul 2024 15:09:14 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 23 Jul 2024 15:09:14 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 23 Jul 2024 15:09:14 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.170)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 23 Jul 2024 15:09:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HaPAjDqZ9XCpppEF0fTK1Pz2B+2krPqw53Fxf21iYb3CFsDg1SNVDRMGO5hsS77+qiAoJbrmOkZgojlsUiz03rUADhu0+V+O1b+eTgMdSJwdDmNPlkY2DC+IhAq8CNdMLeXZsmt+dVeN+JViaX8LSwb3jheWu24Yk+H9epZxrEMlW1qEXoHoh4OQJcIjg70eXbQfIc8DNwm5Igl01XZXoW+AcbI/Y+Ve2q8sRmgqTp3FfAXgAmFZlwiDU2WoVJB/jO2cwKqx2lWxvaw8tCBymDvjT7plO2NFUX0EJH7fq0W3GHIdXq7lmC9OgO/JVu2l9+QhH7KaVJ1tVjirrWY3fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hh+MW5CLx6jlmYY0yX6/c+TZ9DiaH1gpuTqoPy5+OHU=;
- b=uJOZak3LVfBhN4bh8bMVCa6VjHfwHk8IoCezandXirTCLx/UlhA8K930OJSSQki46669DqMsfXd6R4wORcZ4CfP5b0wiUTpQmyDpCrLBgkgGQkQZHEbTnZqA87xNnx2dFih3Mg+aKXlkg4TJdQsVK/a/ih2cbKd46MAbDjR9aOyFsnqEUJzNpDS3/b5Ro+cOmz5Yb+fFVF/mSWKbzbN3uoHGP0pYL3nyiKdYdz7HV/hJis5miEbgmQVaEFzLMQKG/NpayScMR52MqZUVb8WQOTN5eajXPa9EBbSBBPJz4+WHQyLboAJe9T9QUTSe5D6qBKmt6aBh1drYlLle2c/nHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by IA0PR11MB7863.namprd11.prod.outlook.com (2603:10b6:208:40c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.16; Tue, 23 Jul
- 2024 22:09:11 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::23a7:1661:19d4:c1ab%2]) with mapi id 15.20.7762.027; Tue, 23 Jul 2024
- 22:09:11 +0000
-Message-ID: <d0d500cc-6eba-843d-1ca5-ca1e44bd003e@intel.com>
-Date: Tue, 23 Jul 2024 15:09:08 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH iwl-next v4 4/5] ice: Use ice_adapter for PTP shared data
- instead of auxdev
-Content-Language: en-US
-To: Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>
-References: <20240718105253.72997-1-sergey.temerkhanov@intel.com>
- <20240718105253.72997-5-sergey.temerkhanov@intel.com>
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <20240718105253.72997-5-sergey.temerkhanov@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0078.namprd05.prod.outlook.com
- (2603:10b6:a03:332::23) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025DB1DDD6;
+	Tue, 23 Jul 2024 22:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721773353; cv=none; b=dhbvL4/M/EwronNEgppu16olBbzjLqdeVxCgyzGj4Sb1P6AwSy7hKvniaGLytBq16p7gAQi2+JdJ6oOvor27gpZ6/swBAZvE10QcZxd6I9n+h9g9O2dC+zmgm4Ec0SZgHGN4ImHMXtzaPpwz8iNc9T0S1uqziVaMjtGZh287DiE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721773353; c=relaxed/simple;
+	bh=QcBPciMEEglSS9n38UzLJ7yUmdEkQ+0xU3UWCPIbcJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=IcaojyQbM92Y750hpOz+/0tR8sVuDKsCWHRLeh/Fz5AQJmiWJAV0EiQ0P/F8ZUf6jQX9Qq9L9/tabro5fhF0Sy+ikyicZm+NLN72Q4jFwVtnxg3aF49ne9wgRgDBVCAZjLx2RqbPQV6pqxkn2Xm3/AwaRbzWPN34RXcw1D2AhTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d2vaU5DY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A19C4AF0A;
+	Tue, 23 Jul 2024 22:22:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721773352;
+	bh=QcBPciMEEglSS9n38UzLJ7yUmdEkQ+0xU3UWCPIbcJE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=d2vaU5DYRNG3/ujzG2Lh9oaDL+cbPXoMlZ4dQpCGRZcElPGZKojhfIWcLMQ5+NRkq
+	 o378jrN3zQ2cd1dOTA2NyVaWrXE14PK/RP5sPlIrOZ2fH3ZmR/lj4XVCArxWigNZ9o
+	 6WAkjw9Mye34IcgOgNqXPUmycqrSXhnWWUEai0WyVREa6S+oXcbP+nLBka+pzYMGnS
+	 luAezrQkoRUzte/dI4WIi5liKNry5u40Ypr2lcH5z2g+808/Uj8F8NDC9B48cztNkd
+	 Ro5Q8K62LKn4qBVjkB43Bo24Utt1Mu8xbWhAuErdVt9ZaZmH1vTNlNmqRVzn1Rcsvs
+	 MXqz5VPRHlNVQ==
+Date: Tue, 23 Jul 2024 17:22:29 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com
+Subject: Re: [PATCH V3 06/10] PCI/TPH: Introduce API to retrieve TPH steering
+ tags from ACPI
+Message-ID: <20240723222229.GA759742@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|IA0PR11MB7863:EE_
-X-MS-Office365-Filtering-Correlation-Id: a8b832e4-0231-4ba3-bc0c-08dcab6414e1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UWZMYW1adzZjMDQwVFh1Z3c5YWdoK1kxWXMxalA4bDFWOHdHblh4L3FzbzVp?=
- =?utf-8?B?Tm8zaUZObnpPOTJqTE8rNWllNzF0eHB4aktETkYreWUvQStHbmRJWUpKTDhr?=
- =?utf-8?B?RUprY3FTb1NnN2hybDVtZGpZUkpTaXY0V25Qd0J2QjF6anFzNVVtZDhGSHU3?=
- =?utf-8?B?TGVPN2hZTlZxZWtrRzl2VGdGK3pFOTdhV3o5K3dMUDNZR0FrTnVMVDhRUUov?=
- =?utf-8?B?TWpJU3p6YlNGaUNPNUIwOWNBSWNWZGRGRlBOZlIwT1lKaXpUU0pOOTNWemY4?=
- =?utf-8?B?ckFPZDcraWZXbWlFcmUvVGprMWxVYkpnSHRJOHJ3dkE4S3Joc2lZaldmSW94?=
- =?utf-8?B?K3kvZDdENXhTTDZLVmtFWmtTTVAwVURJZC9SYnVYbkN5TDdLK1ptWlB5U01h?=
- =?utf-8?B?NHpRUk1tU0kyeTgycko5eC9kQXZYWEZjQ2VCQlVCWU9zVWkwU2tPY05wU21V?=
- =?utf-8?B?czdTVVg1cGQvMitpMjdwM1lUM3JPbTYwaExUdnhBK2ZQZ212Y3NIOFhkZVFW?=
- =?utf-8?B?M1lTTUluck5QWU1BRFVaTU1MUVBYRWtvUi9QdXRLQTJObmIvTHBaUm5EMlV5?=
- =?utf-8?B?ejNCc3QzdE9yUjdnTTBBckU2NmxmRHZFZkU5dkxjajdKZ0kxNHRLNjdNMng4?=
- =?utf-8?B?d1M4L2ZMT2ZhR2Yzbjcvc0RsVmw4dWZyWWQ3WFlKVEJqZWZyUDdXd2FOYmtv?=
- =?utf-8?B?RUVlMHBvdVMwWncvUnBiRTBLbDBPZVVBWVYydHBZQ3pKSlVsN1RBVEp6aW9P?=
- =?utf-8?B?WmtaaUVKeHB5YTQySXZpR1BvOGVEV0hDMGxJTzU4QmFGNFVCWGs4WDdQQWhp?=
- =?utf-8?B?S0xoY2ptRjJCYXRnT2t6SnJOUDkxYys3N3RBWjNQL1ZPU0RnclVWR3FmcUlm?=
- =?utf-8?B?RFhRcytSeGxBdklHVHFrTTg0Q3p6OGVrTXozdmNXN2VUSnJMSWRhU1QzZld5?=
- =?utf-8?B?M2grV3pKeUpPaEN5Z2tCc0ROb0tCU3ZGa2dzT0tFSEFWeE1pcGk1aEFBZDht?=
- =?utf-8?B?TlhGNlRKZUQrSHM0ZDE0WG5xUElPMW9oUUVQdlNHT1JYRzh1aUxzcHhUQmNu?=
- =?utf-8?B?eFljS1Y2SE5aaVZiZDVmSEppOUNIVFJ3cHhYNkJPS0VNdkQ2S0FEVzJYNFdl?=
- =?utf-8?B?dTY0M3FneTIxTkR3SWZ5REJCaGMyZkRyL2tKYjV5NGx5VzRaSUlKdmFRaC9w?=
- =?utf-8?B?Z0Q2TXcrQWNWUERSUEpVaHV0dFpjR2JyZER6MklKb2tKNEl1WjdhZUVqb3Zl?=
- =?utf-8?B?QVFxNndFdFh1WWt3b0ROSmlvTW04V1ZNb21WSXRNSFlmVEc0UkRLQTBFU0Nm?=
- =?utf-8?B?MFFrSzJMOWt4MFY1Z2ZUQmZMc3JENGdOZjZEandBaGdneXRDVG0wQ0dTMmhM?=
- =?utf-8?B?Y0s3SnF4Q28wR2hZdERJanowczZqTGNYbWNsZnBEUWFpRDhxeU5BNG1mZUZZ?=
- =?utf-8?B?ZVZRaTV0U0dreFBaU2xOUElBQjQ0a0lIV3RDN21kVzRVKzlENTRaTVdla0ND?=
- =?utf-8?B?aFZPU1lHd2NSQmtrczhsYXgvbC9EOFhUWWRuSHpJMm1WSTlNYlI4U0RoN2NV?=
- =?utf-8?B?OUxBSW5HY1d4d2RrV095TkdDRVVyd1BQb0JIVFVyVTRoL3dtM2dEUEpyVlNR?=
- =?utf-8?B?N3NUMXZPVWNYUjNDM2JZOUhaOEpaQzdmM1laZUV1cVo4dms0WmFuNzgvV3ZS?=
- =?utf-8?B?K3RSdHpjTzRDRHR5ZmdxN0JwVFd1MHA0amp4S0xvSFZ3ZTk5SGxVRW44Nk94?=
- =?utf-8?B?OVd1NFNWNVJqYU51RXNXTTMvUDVBUVdYbjFTSC9ZN0RkeEx4dGwzeHlDemR4?=
- =?utf-8?B?WHVDeGc4TDJ0aGlpTkVtUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eklNc3R0cmtxRkRrTTNQT043am5aTUhUN2NSSldNV2QwdUJvMnM2OTIyVEx1?=
- =?utf-8?B?ZUgwUHJSV2JyZ3o2dTlySVcrMkZDeVJYRm5NQW1FVjBmTnNZWVJrYjlKQi82?=
- =?utf-8?B?eklGaE5SYVd4cTJtanNZVStkL3NVZUlTanZXeUxkcno4bExERFVsM1ZFelpN?=
- =?utf-8?B?NSsvNWhoWDVZVzdGVzBvYTdva3NkRFNSNzUxcjBrc1IyRlhPMWNnTEpBM29V?=
- =?utf-8?B?TWYrdzJxZCtWWUFmcXdZUDdFSUw3ektVdnQ4VGVQYWxLSXc1UklXTGZrd2oy?=
- =?utf-8?B?ZFFlM1pWUDg3L3BtNi9lQmw2UVJGZVdGY0ZrdFdZcmg5L1JZVWdBcTJYd2tQ?=
- =?utf-8?B?aC9EQU1pN2NWNTh0YjdJMUx6MVc1c3ltR0RvSkxWNHpLcWlPRFE5S0d6ZlhO?=
- =?utf-8?B?YStlUjNja001SXpuekdENE9YR1VKcGVHdFA4WHBZcXFzNEZaTXBqYXNIOFcw?=
- =?utf-8?B?SnJPdGhqR2JlS0R2TkZMMExXL0E0ZHJtcUNEOFN6OE43cVRLZ1JXTHN4MUtr?=
- =?utf-8?B?OGIzNklrWURIQm9IN2NIVVNTRVFuMlU4MVZuV2hDUDRUSDU1Ny9wMmlQNTBs?=
- =?utf-8?B?cW5tQUkvU2VSNWU2N040bFh1UzZXU013TmxYSVR1MVJjWWYrUFVyNkI1MkFR?=
- =?utf-8?B?SlJMcXhYcG5OSDBWS0tFclY4NWVNMVJFZ3NSU2xNbURmTFFMVGRnZUxLUDhT?=
- =?utf-8?B?UFZtWkNhT2RQK2VLZWhkN0RXaWpoTVJveTdpZW9pNmp6NVp4MEplcnJ6K05n?=
- =?utf-8?B?WnBqaDQ4dzdXVFpyOXAvcGJWbER1a2tyMDFzanFuY241dFoxbUkzdmNCb2J3?=
- =?utf-8?B?S0dRTmFvSENIQUpkbXZQcWcxcGVKbVNudUxmOUJQK3h3b0x1NjVkQ0ljV3ll?=
- =?utf-8?B?SFRybURBK3ZpSEFxbVZWVmRPNm1oSnpoNUQyY2xVVjFRSlU1RjcxSkJlMzFZ?=
- =?utf-8?B?TXVtRG5mV3JwWm5sb3BXTTBqNTV5a0ltWWwvNE1HQ2ZHUms1ZEFldnpzMVcy?=
- =?utf-8?B?UWZUU0JQemh6a2ZtTnZMOTUxS2d6NnVGQ3pONmZkak9sNmhyWitxOUJkTFBs?=
- =?utf-8?B?bHpTYXZaa1FsUzFqTURuVFUxZnQ1MkZBZG1HS25CT1RNM2NXRHFkR2F2SGo3?=
- =?utf-8?B?MGlLdEszTjRxZXh5UjJJYmx6TjFudnBoS0YwUmhLYi9HY3RnUG5CejdFanly?=
- =?utf-8?B?ZzlvcGtCcy9JTktzSzdIS0ZENXBiVmprWVhmdzlBcDROMTZNZEpKUlp0V0RW?=
- =?utf-8?B?Q2xXaW8zQk5WUGN5Mm5UdC9Xbkk4UzUrRDYwSGRmaVV6dGNJYXFpM2J4OEhX?=
- =?utf-8?B?OE5iQUVsWnlYdW4zRXNURkNKRmZPWmFmNzhkdXFyYVJoOTAyalBTbFEzbXVp?=
- =?utf-8?B?cjMrekRyNFl5dUp6RmU2Q1RpV2ZJbUVEZjVqQUljWTJJbGlHczVjdjBjOWdx?=
- =?utf-8?B?VzByTjh3bHE5ODhqdmF3Qk11N1VXSDRSKy9XY1ErTnNZWWdtdnkxc0tUcU1B?=
- =?utf-8?B?WGpzMUlFZ2dnblFDVndrUWVnM2RrRkdDRCs0SlZ4VWQzZTRLejN6SG9mYWFq?=
- =?utf-8?B?Q2lsMjdJL0xzb1hsSjNielFKRU1Gc01aeTNoZDFtN1IvU0ZQS3RRTWllZDh0?=
- =?utf-8?B?ZkFaUzRWeDNoSVU4MDhxQ1RGSW13NEEya1BJNkYxRTN2NmJUZlhBbWVETTJw?=
- =?utf-8?B?SlVIL1hBbVFCdUhNV1FEWWN6dElGcHdJZ0YrUytGUVhlWTEyclc0VldLR2h6?=
- =?utf-8?B?Q2N3NmtXcXN6TktMVEVLUExWUUpzYk1LZmxiWFJlSmh4bndyYjR3V3ZCTUZF?=
- =?utf-8?B?T0JvTGQ3TmpLUzlqUXJ5QkthQVFqYzU5V1VQekF0N2xqL1UvbDF5VWMwZHNE?=
- =?utf-8?B?Znlha2JTakRvM2dNTXBkTHY0dXJ0b3NpRWtHRDVyaUR3SU5OSitpRVVQeUlU?=
- =?utf-8?B?NmdvVXc5TmdXVWZ3SFg4VkRSeThyRnAzZVQ3QUh1RnRkc21JRllDK3BqUWMz?=
- =?utf-8?B?UGExOEhkYzZ0em1HUURwcVc3bTFtNlJ3dWxaeEZRanpsTnFZa3ZWaHFiYlF3?=
- =?utf-8?B?RDJISThLVUprYXBoeFlFQ2RtTTgwZmhlNzZRK1VxR1RjSGhxMU5zVEhZYVd6?=
- =?utf-8?B?dm9Fc0toaGZva2ZCL0lYcG93WHNMVEZHZnY0US9tOCtSMHMyQVdXdjUySklF?=
- =?utf-8?B?c3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8b832e4-0231-4ba3-bc0c-08dcab6414e1
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 22:09:11.6704
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bbd7meuN2KCBm5NHInI439+nBRnKuCqe57mH+s3vRvG+al05lXDxScyk3jUuTJDKCO5uUVomF+p5HqP8jcTyQxcqyYsWoID/NKLVMoKSEkE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7863
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240717205511.2541693-7-wei.huang2@amd.com>
 
+On Wed, Jul 17, 2024 at 03:55:07PM -0500, Wei Huang wrote:
+> Add an API function to allow endpoint device drivers to retrieve
+> steering tags for a specific cpu_uid. This is achieved by invoking
+> ACPI _DSM on device's root port.
 
+s/an API function/<name of function>/
 
-On 7/18/2024 3:52 AM, Sergey Temerkhanov wrote:
-> Use struct ice_adapter to hold shared PTP data and control PTP
-> related actions instead of auxbus. This allows significant code
-> simplification and faster access to the container fields used in
-> the PTP support code.
-> 
-> Move the PTP port list to the ice_adapter container to simplify
-> the code and avoid race conditions which could occur due to the
-> synchronous nature of the initialization/access and
-> certain memory saving can be achieved by moving PTP data into
-> the ice_adapter itself.
-> 
-> Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
+Also include function name in subject line.
 
-...
+> + * The st_info struct defines the steering tag returned by the firmware _DSM
+> + * method defined in PCI Firmware Spec r3.3, sect 4.6.15 "_DSM to Query Cache
+> + * Locality TPH Features"
 
-> @@ -2967,6 +2967,50 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
->   	dev_err(ice_pf_to_dev(pf), "PTP reset failed %d\n", err);
->   }
->   
-> +static inline bool ice_is_primary(struct ice_hw *hw)
+I don't know what I'm missing, but my copy of the r3.3 spec, dated Jan
+20, 2021, doesn't have sec 4.6.15.
 
-no 'inline' for c files please.
+> +static u16 tph_extract_tag(enum tph_mem_type mem_type, u8 req_type,
+> +			   union st_info *st_tag)
+> +{
+> +	switch (req_type) {
+> +	case PCI_TPH_REQ_TPH_ONLY: /* 8 bit tags */
+> +		switch (mem_type) {
+> +		case TPH_MEM_TYPE_VM:
+> +			if (st_tag->vm_st_valid)
+> +				return st_tag->vm_st;
+> +			break;
+> +		case TPH_MEM_TYPE_PM:
+> +			if (st_tag->pm_st_valid)
+> +				return st_tag->pm_st;
+> +			break;
+> +		}
+> +		break;
+> +	case PCI_TPH_REQ_EXT_TPH: /* 16 bit tags */
+> +		switch (mem_type) {
+> +		case TPH_MEM_TYPE_VM:
+> +			if (st_tag->vm_xst_valid)
+> +				return st_tag->vm_xst;
+> +			break;
+> +		case TPH_MEM_TYPE_PM:
+> +			if (st_tag->pm_xst_valid)
+> +				return st_tag->pm_xst;
+> +			break;
+> +		}
+> +		break;
+> +	default:
+> +		pr_err("invalid steering tag in ACPI _DSM\n");
+
+Needs to mention a specific device.
+
+> +static acpi_status tph_invoke_dsm(acpi_handle handle, u32 cpu_uid, u8 ph,
+> +				  u8 target_type, bool cache_ref_valid,
+> +				  u64 cache_ref, union st_info *st_out)
+
+IMO you can omit ph, target_type, cache_ref_valid, etc until you have
+a need for them.  I don't see the point of parameters that always have
+the same constant values.
 
 > +{
-> +	return ice_is_e825c(hw) && ice_is_dual(hw) ?
-> +		!!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M) : true;
+> +	union acpi_object arg3[3], in_obj, *out_obj;
+> +
+> +	if (!acpi_check_dsm(handle, &pci_acpi_dsm_guid, 7, BIT(TPH_ST_DSM_FUNC_INDEX)))
+
+Wrap the code and comments in this file to fit in 80 columns instead
+of 85 or whatever you used.  Lines longer than 80 are OK for printf
+strings but pointless for comments, etc.
+
+> +		return AE_ERROR;
+> +
+> +	/* DWORD: feature ID (0 for processor cache ST query) */
+> +	arg3[0].integer.type = ACPI_TYPE_INTEGER;
+> +	arg3[0].integer.value = 0;
+> +
+> +	/* DWORD: target UID */
+> +	arg3[1].integer.type = ACPI_TYPE_INTEGER;
+> +	arg3[1].integer.value = cpu_uid;
+> +
+> +	/* QWORD: properties */
+> +	arg3[2].integer.type = ACPI_TYPE_INTEGER;
+> +	arg3[2].integer.value = ph & 3;
+> +	arg3[2].integer.value |= (target_type & 1) << 2;
+> +	arg3[2].integer.value |= (cache_ref_valid & 1) << 3;
+> +	arg3[2].integer.value |= (cache_ref << 32);
+> +
+> +	in_obj.type = ACPI_TYPE_PACKAGE;
+> +	in_obj.package.count = ARRAY_SIZE(arg3);
+> +	in_obj.package.elements = arg3;
+> +
+> +	out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid, 7,
+> +				    TPH_ST_DSM_FUNC_INDEX, &in_obj);
+> +
+> +	if (!out_obj)
+> +		return AE_ERROR;
+> +
+> +	if (out_obj->type != ACPI_TYPE_BUFFER) {
+> +		ACPI_FREE(out_obj);
+> +		return AE_ERROR;
+> +	}
+> +
+> +	st_out->value = *((u64 *)(out_obj->buffer.pointer));
+> +
+> +	ACPI_FREE(out_obj);
+> +
+> +	return AE_OK;
 > +}
 > +
+>  /* Update the ST Mode Select field of TPH Control Register */
+>  static void set_ctrl_reg_mode_sel(struct pci_dev *pdev, u8 st_mode)
+>  {
+> @@ -89,3 +210,44 @@ bool pcie_tph_intr_vec_supported(struct pci_dev *pdev)
+>  	return true;
+>  }
+>  EXPORT_SYMBOL(pcie_tph_intr_vec_supported);
+> +
+> +/**
+> + * pcie_tph_get_st_from_acpi() - Retrieve steering tag for a specific CPU
+> + * using platform ACPI _DSM
 
-...
+1) TPH and Steering Tags are not ACPI-specific, even though the only
+current mechanism to learn the tags happens to be an ACPI _DSM, so I
+think we should omit "acpi" from the name drivers use.
 
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-> @@ -468,6 +468,11 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
->   	}
->   }
->   
-> +static inline bool ice_is_dual(struct ice_hw *hw)
+2) The spec doesn't restrict Steering Tags to be for a CPU; it says
+"processing resource such as a host processor or system cache
+hierarchy ..."  But obviously this interface only comprehends an ACPI
+CPU ID.  Maybe the function name should include "cpu".
+
+3) Nobody outside the file calls this yet, so it should probably be
+static (and removed from the doc) until a driver needs it.
+
+> + * @pdev: pci device
+> + * @cpu_acpi_uid: the acpi cpu_uid.
+> + * @mem_type: memory type (vram, nvram)
+> + * @req_type: request type (disable, tph, extended tph)
+> + * @tag: steering tag return value
+> + *
+> + * Return: 0 if success, otherwise errno
+> + */
+> +int pcie_tph_get_st_from_acpi(struct pci_dev *pdev, unsigned int cpu_acpi_uid,
+> +			      enum tph_mem_type mem_type, u8 req_type,
+> +			      u16 *tag)
 > +{
-> +        return !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_DUAL_M);
-> +}
-
-Please use tabs:
-
-ERROR: code indent should use tabs where possible
-#408: FILE: drivers/net/ethernet/intel/ice/ice_ptp_hw.h:473:
-+        return !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_DUAL_M);$
-
-WARNING: please, no spaces at the start of a line
-#408: FILE: drivers/net/ethernet/intel/ice/ice_ptp_hw.h:473:
-+        return !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_DUAL_M);$
-
-Thanks,
-Tony
-
+> +	struct pci_dev *rp;
+> +	acpi_handle rp_acpi_handle;
+> +	union st_info info;
 > +
->   #define PFTSYN_SEM_BYTES	4
->   
->   #define ICE_PTP_CLOCK_INDEX_0	0x00
+> +	if (!pdev->tph_cap)
+> +		return -ENODEV;
+> +
+> +	/* find ACPI handler for device's root port */
+
+Superfluous comments since the code is obvious.  And this finds a
+"handle", not a "handler" :)
+
+> +	rp = pcie_find_root_port(pdev);
+> +	if (!rp || !rp->bus || !rp->bus->bridge)
+> +		return -ENODEV;
+> +	rp_acpi_handle = ACPI_HANDLE(rp->bus->bridge);
+> +
+> +	/* invoke _DSM to extract tag value */
+> +	if (tph_invoke_dsm(rp_acpi_handle, cpu_acpi_uid, 0, 0, false, 0, &info) != AE_OK) {
+> +		*tag = 0;
+> +		return -EINVAL;
+> +	}
+> +
+> +	*tag = tph_extract_tag(mem_type, req_type, &info);
+> +	pci_dbg(pdev, "%s: cpu=%d tag=%d\n", __func__, cpu_acpi_uid, *tag);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(pcie_tph_get_st_from_acpi);
+> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+> index 854677651d81..b12a592f3d49 100644
+> --- a/include/linux/pci-tph.h
+> +++ b/include/linux/pci-tph.h
+> @@ -9,15 +9,27 @@
+>  #ifndef LINUX_PCI_TPH_H
+>  #define LINUX_PCI_TPH_H
+>  
+> +enum tph_mem_type {
+> +	TPH_MEM_TYPE_VM,	/* volatile memory type */
+> +	TPH_MEM_TYPE_PM		/* persistent memory type */
+
+Where does this come from?  I don't see "vram" or "volatile" used in
+the PCIe spec in this context.  Maybe this is from the PCI Firmware
+spec?
+
+> +static inline int pcie_tph_get_st_from_acpi(struct pci_dev *dev, unsigned int cpu_acpi_uid,
+> +					    enum tph_mem_type tag_type, u8 req_enable,
+> +					    u16 *tag)
+> +{ return false; }
+
+"false" is not "int".
+
+Apparently you want to return "success" in this case, when
+CONFIG_PCIE_TPH is not enabled?  I suggested leaving this non-exported
+for now, which would mean removing this altogether.  But if/when we do
+export it, I think maybe it should return error so a caller doesn't
+assume it succeeded, since *tag will be garbage.
+
+Bjorn
 
