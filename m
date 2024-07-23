@@ -1,122 +1,129 @@
-Return-Path: <netdev+bounces-112605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA95293A208
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 15:53:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD6993A217
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 15:57:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85C9A282E8B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:53:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDA50283C5B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097F5155326;
-	Tue, 23 Jul 2024 13:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C13815358A;
+	Tue, 23 Jul 2024 13:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="TtYnZiAF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSfuI8Gb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76AEC154445
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 13:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9401A13698E
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 13:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721742716; cv=none; b=q4gtrNEgv0sZSlXJ1k6sXm8qZdavE3ISxPMiYa9sonMPTdJymJhR8j58Q1pUkWxoLvuQ9fY6HwtIwHmPOGJs6iIJeunGxYGmqZRCWf6S0XQgElIfrhwtjzNrVfoHjL8GKrLr7CQWuqXtZ2sjtyqz+XN3PB8fiNG7XBCAnhVj0O4=
+	t=1721743073; cv=none; b=ewoRxV/xscD50S/LaIb4haveSYGURiVM9MV50WZP9gWvb4Z+yvuZVWv+/WxTQfMSPdqi/EJRk7xURAxRRRzgyWK12JzrmwwnHz1VfWyM6j24JM0TbtMxK1vkw8QNXk/M5dFnEw22d+NGDOrmO0xTKKUzLt1z3MBna39Sx0J/WFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721742716; c=relaxed/simple;
-	bh=ISsSxzGzLpmvNc3x4vGptCmW4jbr7HyVvZC9ERNLGW8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hAZ1Vz6iWeE2XN9vosbq0TUsaRkLN8fBE0idWadWiXM/n1nVIHYXztQ9743KsteKaphMmTdV2pPQNg0BX/hG/GARve1OyJ6jFT06tkv+IO8K96SPi/EwkH0Kto7wYNTaT2w9dj/Kh0LsjUT/UJnk0M/i4Dg2vaop3+CyLXxmbgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=TtYnZiAF; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:47:b279:6330:ae0d])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id EE55E7DCF6;
-	Tue, 23 Jul 2024 14:51:46 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1721742707; bh=ISsSxzGzLpmvNc3x4vGptCmW4jbr7HyVvZC9ERNLGW8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
-	 hern@kernel.org,=0D=0A=09tparkin@katalix.com|Subject:=20[RFC=20PAT
-	 CH=2015/15]=20l2tp:=20use=20pre_exit=20pernet=20hook=20to=20avoid=
-	 20rcu_barrier|Date:=20Tue,=2023=20Jul=202024=2014:51:43=20+0100|Me
-	 ssage-Id:=20<ce5ffdd299cefef8895fd33ea5153300ce6b46d2.1721733730.g
-	 it.jchapman@katalix.com>|In-Reply-To:=20<cover.1721733730.git.jcha
-	 pman@katalix.com>|References:=20<cover.1721733730.git.jchapman@kat
-	 alix.com>|MIME-Version:=201.0;
-	b=TtYnZiAFssUXjL2tPLudaK5C9eCvGSZJ5KtmSWgUcSWfocnUIbRbjYj2cCXx230VR
-	 3LE9ONoQcnqLC4z6S1qfhBzfHpARtQd0lYFq+wRfRy3//npHCHY0X8PksS4pK5P8Ya
-	 y+eNRQMSRk4W6spq2leca3EeGFIs4qmjYvFpRPpAeghD0ZdScbvFoeW6VCYh4U7Xyn
-	 swWp1q+lF0Iszcwf+0vharpr7dBhb2y5+2MfkLLWWGBa2lqI+RH06raPsu8Z6388qU
-	 0Ma4YdiUe3QAr0CrSzA8sfZFL23clliQGv00l+KML6luDCViOZBbXUfd6gxLJFUXoX
-	 68lIFje7X1lTQ==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1721743073; c=relaxed/simple;
+	bh=Htm7bbcrcTmAnhecPl4n5nUHEvT19cnXeqLqaXmGBZk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=DTXyfQpYcGsVTmiwXlaTOW6D08fXPxJpnt3uI745a0yQSWD4xAaEYXoCVpglNg8yhT9Nh9ufEbnGQ1oe/SpULMMwVVbP8Rj875qtCfZlDjciavARnSJ1AoNlNRLwL6UEmXX0HLGg1iCMCEpIK8WkFIGIoN73kxSklHeSU8KN/M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSfuI8Gb; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7a1c7857a49so1410480a12.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 06:57:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721743072; x=1722347872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tslxhN0AfZHkPjJg6kQWNl6AEidvpdaO4jAT2B2Dqog=;
+        b=JSfuI8GbX8ZXYjcZnYTFZfknqsyw8Qgublx/M8l4SW6iZsUT0LkaS56E9YPKYUILB3
+         0a3gsbxAoky+4teC4jRGAlK1ZOWoQzpESHbM5ru3hRBqAPOsndnUw4r9hiWh03GmoNEu
+         c8KvblCHV2Yb293k6dR+SGMJ4GD/m+zMur5Wqz3QSGuO5eoId7eTmshONmX3AyBhS2AG
+         eLZCHkTXRKU7WzpwSzPQmZECf1azQd+c1+UlM9xCTjWJXznPiZ0SpuykPduLTeWCL4NQ
+         aSLTcpijgvmRkT5DUka+gquSfLU6mBuL5c5+ItWF2SZZy28uwPOABh5IEaYAD0lRIdVs
+         49Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721743072; x=1722347872;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tslxhN0AfZHkPjJg6kQWNl6AEidvpdaO4jAT2B2Dqog=;
+        b=dzEF+B+5+TmqgHBktwk5nD4FA3zp15SMoSyEb6yiHJMPsRRgPp35Y4iv73wj/c33U3
+         //3CNqFT50pOjcmsKnoZoDtL+BzXOuuccOTDKgvXgAzOBEZr2H5638rCJsGLLCshpfVF
+         T2jVKq8NaKP1s8bTpdjkqFh5k8l3vXcHrcrldwnk6l2aqYyZoNm4a/mH8H8OFIuW8rii
+         FQntu+rGsCeBK4Lnr0CUEI4xQzGIx7/CXN1CidX4mmVgTO8fUfUdJr2XIxbkLTBxekF7
+         x+MC1vdvyNI1jVTvpwql+3F15sS2WtbcVXRVLrd1c8Zp8cul72a7q1KNBboDsmuYcrsI
+         MD3A==
+X-Gm-Message-State: AOJu0YynmDeZGUVha1rSscWT+JBj3RBOLNMq4ELYNLEF8KcaeriHNhU9
+	TT7GdIcXYejju2Vv7xjhTpI/eLmIQMbj5GALhXbJxcltzSUiTZth
+X-Google-Smtp-Source: AGHT+IED2cvJJslHT5yoZtSQxhHfTazelZE2VGAFhAreugHS6jAL6GtctMumEbzDbRvdOWpJHMh5kw==
+X-Received: by 2002:a05:6a20:3949:b0:1c0:ef24:4125 with SMTP id adf61e73a8af0-1c4228cece5mr9060980637.26.1721743071693;
+        Tue, 23 Jul 2024 06:57:51 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([114.253.36.103])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f295eaesm76760315ad.99.2024.07.23.06.57.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jul 2024 06:57:51 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	dsahern@kernel.org,
-	tparkin@katalix.com
-Subject: [RFC PATCH 15/15] l2tp: use pre_exit pernet hook to avoid rcu_barrier
-Date: Tue, 23 Jul 2024 14:51:43 +0100
-Message-Id: <ce5ffdd299cefef8895fd33ea5153300ce6b46d2.1721733730.git.jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1721733730.git.jchapman@katalix.com>
-References: <cover.1721733730.git.jchapman@katalix.com>
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [RFC PATCH net-next] net: add an entry for CONFIG_NET_RX_BUSY_POLL
+Date: Tue, 23 Jul 2024 21:57:42 +0800
+Message-Id: <20240723135742.35102-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Move the work of closing all tunnels from the pernet exit hook to
-pre_exit since the core does rcu synchronisation between these steps
-and we can therefore remove rcu_barrier from l2tp code.
----
- net/l2tp/l2tp_core.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+From: Jason Xing <kernelxing@tencent.com>
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index fd03c17dd20c..5d2068b6c778 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1756,7 +1756,7 @@ static __net_init int l2tp_init_net(struct net *net)
- 	return 0;
- }
+When I was doing performance test on unix_poll(), I found out that
+accessing sk->sk_ll_usec when calling sock_poll()->sk_can_busy_loop()
+occupies too much time, which causes around 16% degradation. So I
+decided to turn off this config, which cannot be done apparently
+before this patch.
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+More data not much related if you're interested:
+  5.82 │      mov   0x18(%r13),%rdx
+  0.03 │      mov   %rsi,%r12
+  1.76 │      mov   %rdi,%rbx
+       │    sk_can_busy_loop():
+  0.50 │      mov   0x104(%rdx),%r14d
+ 41.30 │      test  %r14d,%r14d
+Note: I run 'perf record -e  L1-dcache-load-misses' to diagnose
+---
+ net/Kconfig | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/Kconfig b/net/Kconfig
+index d27d0deac0bf..1f1b793984fe 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -335,8 +335,10 @@ config CGROUP_NET_CLASSID
+ 	  being used in cls_cgroup and for netfilter matching.
  
--static __net_exit void l2tp_exit_net(struct net *net)
-+static __net_exit void l2tp_pre_exit_net(struct net *net)
- {
- 	struct l2tp_net *pn = l2tp_pernet(net);
- 	struct l2tp_tunnel *tunnel = NULL;
-@@ -1771,7 +1771,11 @@ static __net_exit void l2tp_exit_net(struct net *net)
+ config NET_RX_BUSY_POLL
+-	bool
++	bool "Low latency busy poll timeout"
+ 	default y if !PREEMPT_RT || (PREEMPT_RT && !NETCONSOLE)
++	help
++	  Approximate time in us to spin waiting for packets on the device queue.
  
- 	if (l2tp_wq)
- 		drain_workqueue(l2tp_wq);
--	rcu_barrier();
-+}
-+
-+static __net_exit void l2tp_exit_net(struct net *net)
-+{
-+	struct l2tp_net *pn = l2tp_pernet(net);
- 
- 	idr_destroy(&pn->l2tp_v2_session_idr);
- 	idr_destroy(&pn->l2tp_v3_session_idr);
-@@ -1781,6 +1785,7 @@ static __net_exit void l2tp_exit_net(struct net *net)
- static struct pernet_operations l2tp_net_ops = {
- 	.init = l2tp_init_net,
- 	.exit = l2tp_exit_net,
-+	.pre_exit = l2tp_pre_exit_net,
- 	.id   = &l2tp_net_id,
- 	.size = sizeof(struct l2tp_net),
- };
+ config BQL
+ 	bool
 -- 
-2.34.1
+2.37.3
 
 
