@@ -1,109 +1,114 @@
-Return-Path: <netdev+bounces-112625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FDB93A3B1
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 17:22:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9C293A244
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C79FBB218DA
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 15:22:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB799284A2E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 14:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876D2154BE0;
-	Tue, 23 Jul 2024 15:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1BF15383B;
+	Tue, 23 Jul 2024 14:04:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51D43D55D
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 15:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB52D15358A;
+	Tue, 23 Jul 2024 14:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721748131; cv=none; b=bHHXaZEJuaTuW/yuWpKvkOS589D/O+eJ+WLPWFGxIROTUC87kw88GZFwmx9jIJaDn3ht+lKiqqrNcupS7Oi8Lfg4f3Mr2U/ZDV7tspM3VdGpJEbTpssjg7oniCVH1Lwnkp4u8v8T6ZsnwE+S4i1kodTyMUvOwVtBPk9gq9/wlVc=
+	t=1721743499; cv=none; b=JVTcxxwFVUGg0pcFbLG0K0MzX57UpaBv9zzZXFg9CLEuPLovy4FwkfQcyvwsLM9rjkM/8iMgF9RvcQQqf2PLGDUi0racGZcPqsHmC2dvyrTX+Njo8DpBk41xjpB99Mq9Dbf92PNEJTK19mDnfP7bRYtESo128FkOR05K/NlPXAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721748131; c=relaxed/simple;
-	bh=a+oDkoHZb77L5/N+VcTCnMX6VOdmmRQzMrOo9Rt46sc=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=Hug9+fdEgQEwqbZMhyiCj99xxyQh5QuiiJq03eZGzu+ruaH5C6Clp/bkG4DK99bBYg8cfBfDZ/5YlPpWd9CIUuBy3EdwbVQE0hSqeVHOyVd08T7g8w+IpD3gR9Qhf/aEbFYM1hE5AI5LaiFtYkhy+nrg2L3R69ko5SkWQnBXzzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from dhcp-9273.meeting.ietf.org.chopps.org (dhcp-9273.meeting.ietf.org [31.133.146.115])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 375E17D08A;
-	Tue, 23 Jul 2024 15:22:03 +0000 (UTC)
-References: <m2bk2rx2lb.fsf@dhcp-8377.meeting.ietf.org>
- <593029.1721615874@dyas>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: Christian Hopps <chopps@chopps.org>, netdev@vger.kernel.org,
- chopps@labn.net, devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] xfrm/ipsec/iptfs and some new sysctls
-Date: Mon, 22 Jul 2024 07:29:02 -0700
-In-reply-to: <593029.1721615874@dyas>
-Message-ID: <m234o0w2ue.fsf@dhcp-9273.meeting.ietf.org>
+	s=arc-20240116; t=1721743499; c=relaxed/simple;
+	bh=gpoIKz3CyyNATjADGveNp10VzH6Ry1z8FkbegxIvs8s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=noQ2r5CkZL9ZyUHTlgjJTq0j1chYVwgalJU7mj4jcKnR6+uikfGNzaGRNrZYVY7lthOnw+FPhmESguTUc/sHs0MOAurMVThdMTPQ3gu06MBO0WwyHzdOM3+BuIt4HtlY/Anj8r6LH8M6cdZPTlW1ucoFpMNDPQRPw21IsPEhz2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-05 (Coremail) with SMTP id zQCowABXPjl0uJ9mLTORAA--.33853S2;
+	Tue, 23 Jul 2024 22:04:43 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	make24@iscas.ac.cn,
+	liujunliang_ljl@163.com
+Cc: linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] USB2NET: SR9700: fix uninitialized variable use in sr_mdio_read
+Date: Tue, 23 Jul 2024 22:04:34 +0800
+Message-Id: <20240723140434.1330255-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABXPjl0uJ9mLTORAA--.33853S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF15XFyrCr4kZr4DuF45Jrb_yoW8Jw1xpr
+	4fWa9YyrWUJa42v3ykX3ykW3WF9ws5WFy3Gay8Ww4fZrZ5JFn5C34FgFyUWw1UGrW5Aa4a
+	va1qyFW3Wa1FvaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
+	WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
+	67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
+	IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
+	0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUQvtAUUUUU=
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
---=-=-=
-Content-Type: text/plain; format=flowed
+It could lead to error happen because the variable res is not updated if
+the call to sr_share_read_word returns an error. In this particular case
+error code was returned and res stayed uninitialized.
 
+This can be avoided by checking the return value of sr_share_read_word
+and propagating the error if the read operation failed.
 
-After talking this over some more with Steffen, we've decided to just remove the new sysctl's for now.
+Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+ drivers/net/usb/sr9700.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Thanks,
-Chris.
+diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
+index 0a662e42ed96..d5bc596f4521 100644
+--- a/drivers/net/usb/sr9700.c
++++ b/drivers/net/usb/sr9700.c
+@@ -179,6 +179,7 @@ static int sr_mdio_read(struct net_device *netdev, int phy_id, int loc)
+ 	struct usbnet *dev = netdev_priv(netdev);
+ 	__le16 res;
+ 	int rc = 0;
++	int err;
+ 
+ 	if (phy_id) {
+ 		netdev_dbg(netdev, "Only internal phy supported\n");
+@@ -193,7 +194,10 @@ static int sr_mdio_read(struct net_device *netdev, int phy_id, int loc)
+ 		if (value & NSR_LINKST)
+ 			rc = 1;
+ 	}
+-	sr_share_read_word(dev, 1, loc, &res);
++	err = sr_share_read_word(dev, 1, loc, &res);
++	if (err < 0)
++		return err;
++
+ 	if (rc == 1)
+ 		res = le16_to_cpu(res) | BMSR_LSTATUS;
+ 	else
+-- 
+2.25.1
 
-Michael Richardson <mcr@sandelman.ca> writes:
-
-> [[PGP Signed Part:Signature made by expired key 954CE156FDFC4290 Michael Richardson (Low Security Key) <mcr+travel@sandelman.ca>]]
->
-> I think that:
-> xfrm_iptfs_reorder_window
-> and
-> xfrm_iptfs_drop_time
-> are parameters about receiving.
->
-> While
-> xfrm_iptfs_init_delay
-> and
-> xfrm_iptfs_max_qsize
->
-> are parameters about sender stuff.. I think the names should include that
-> indication.   "xfrm_iptfs_sender_init_delay" maybe.
-> 1M byte default for max_qsize feels big, it's 1000 x 1K packets.
-> I realize that isn't a lot at 10Gb/s+.   I dunno.
->
-> How do you plan to get feedback on whether the defaults are working?
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmafypkSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAl6g4QAIY6owKfhATBKxLjlQmThSlNdJtss/++
-x9F1MewIayiRaZe0l7q70IULZe53SmN1ZjLxpklk7QihkqY/DxJ01z1Mcg+wJ00A
-O154d/vaAI4lZm+D1gTrC8QkkJMTm7fnr3mcmMGHFfMy6hQgsB70yFF+6eVyylTM
-v/4pY9i44cIifM3wl0K6lW+6395G5SDJEjzKYZJ+1ic1o8Ar1yDWfyXYIo0+moEZ
-JwW7WYnjpPbmZAanE79vAu4sAWT/Eitoo5XIwbbNLF09B9PPWJyNXAkzwQhmBE3+
-DcTKGdvAtg1I05d5OCCdCNM/MvMLE+C8SIUa1IbPNI+NL8nOOZrNUqc4toxdEFso
-IhiH6Yiuk8vB0zAhct0lZ+/5AXMb6uXxFJJgabPFcc8JepEZFu20tnmVMQ2RX2CP
-n++TR8uL7hTuWTxFqzm/Rksidx8CVajZj9QXEWh+AOLbxnBC1EXmQLNcZi9/C41/
-vvwyVKkqx0UypI0EVG+LtdsxwFBRyLoxgQzeUBgQFQjvTPeJC+LcpTatuSuG4R4W
-avA1oxw7QgBfSDuiMYMJnldrtr1+JXMsXC61YIfTWi8Ao9Heb9D/2babZbBrvo/j
-Tx7Y/r+0jVhHM7ZxUDn4t0awDGzPsGw4IVUeNEANR9kbBAKcLF7Shu09XZm5s5Th
-ge4KJtJm3aaN
-=yZfb
------END PGP SIGNATURE-----
---=-=-=--
 
