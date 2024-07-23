@@ -1,393 +1,228 @@
-Return-Path: <netdev+bounces-112670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5994A93A88C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:10:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 935AE93A88E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 23:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60DAF1C22BE5
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:10:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF6E1B230B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 21:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CD5143C79;
-	Tue, 23 Jul 2024 21:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Yc60Ouc3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DF614290C;
+	Tue, 23 Jul 2024 21:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2618142631;
-	Tue, 23 Jul 2024 21:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721769027; cv=fail; b=E3DdBhiMuouKSse7ct7HfCf7YprSDsd4+BeDSURypyIyA9vScGLYRMlxxsKHx6pJSPptNefushOxUFbH2RmpBmIUnM2pdj3gWx0YMckMOrog9GEDkcN/p5K2KJEPZgWTEMxcqxYjZVHn5vvXQsxS6x1Br7pPwjkB2lyb1SYw4Eg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721769027; c=relaxed/simple;
-	bh=W9In+c2tLncAuuWULl8D/wZKJMK9KWqXck8rtjc6NCE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=paqwHOQq4zGeU3+CCLpr7T+esbatgvIF9zFOWRAIMEIlENjCJYMTuRFXSDP5sVi+KruFGb3VO7j3QFPHPy2z6pgn2nIc2xRl1NgGN/G2B01BcduY2G53UZrGcH2OBFkBtirTXgDaAefmPX9bKVAr00nJ/l0n0g8NVEHYGiyUfDo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Yc60Ouc3; arc=fail smtp.client-ip=40.107.236.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NbCac5BavqmadeOF44qu/zxGst8DxQoeeMq8taocN0b5yGVYsrlkZ08ha01ndzUgu8ijELPcoiZSvdmlFYYVTidG/VkYeOa8a4fKUmM9hi7VHXPCdp55vuwDVpOdagO9a+yNqz43DXlVNXMAxLw/OMxkSHigFUSx6PKOl8G2qF0KveqzHrqATQgTqqfGSBDk7MSfA9cynTQex12UulXaTprxaM6Xu4yuRzB8o0ZmO36lvDPU/MveOWpp9vUxsVzG67By8Hdi/xw0V9jhbpyBuHzk9JsK564AEt6JinrLBZk8LpaqBwmST5yB3mjDtD0WcLJh+SfOEvdS4eWS8HOVgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pCEiRwWSOS5xeA9DcxGVZtjH/F4L4XNHrSEFlQ7+cmA=;
- b=GsA98CcMMnPPKhZ6iIDqyJU75MK2+3Ktgp/YuOzEST+EGa1mLbNzvmKhha74OTsZ2363PHUWgw4bOvGnJqmDCt3GPNUkqz9UzfaTLhL4bTu/369arkaiLhCstU1U0KM4IZgomrTMc7emeOjQ4HZWRzzcN9qALrvPldM5Y8oofgZ/qIcZbbW1f88aXTmcyNj44satM8bHoMgb8CNQDvRSSe/hx0yLhYKce6mft7CR5spf7rM4VHr2eRFV1bNdCHnwN50w+kBOCtlcyK+V9R4hXrmVnzsJPvQo5xq+fb91Dzb1kIos/gpz9kdYd8wH4t+0cj+3kPGvAxAHZNHVcp6x2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pCEiRwWSOS5xeA9DcxGVZtjH/F4L4XNHrSEFlQ7+cmA=;
- b=Yc60Ouc3UGrXVytTzCqbbcn7ZJg8X6At3RumoeMrodPHtJWRGJzipUG7xHYg5M7wk07MAGfypTSJ2M6mYLZ2JIHuCgexVuhRlXMhHuy1H7TYUZA0LLSvD9o34HMRYVRH34hACdK6JIkfmlbc2UuQat+cgtoRKnyRtBwDf5ZVses=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by SN7PR12MB7954.namprd12.prod.outlook.com (2603:10b6:806:344::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.16; Tue, 23 Jul
- 2024 21:10:22 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a%4]) with mapi id 15.20.7762.027; Tue, 23 Jul 2024
- 21:10:21 +0000
-Message-ID: <2a1b2099-e1c4-4d04-bc97-9ff7e0621275@amd.com>
-Date: Tue, 23 Jul 2024 14:10:18 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/6] net: ethernet: ti: am65-cpsw: Introduce
- multi queue Rx
-To: Roger Quadros <rogerq@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>, Julien Panis <jpanis@baylibre.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- srk@ti.com, vigneshr@ti.com, danishanwar@ti.com, pekka Varis
- <p-varis@ti.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-omap@vger.kernel.org
-References: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
- <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
-Content-Language: en-US
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0056.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::31) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C3514373A
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 21:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721769028; cv=none; b=Ne0t/rB6myVwHgchaIBrgfQfANBzUd44ApKAqtsSm+qKT0qqdxIhTKXuoscszhLUvkpm0vRhV1pfesBqRMFqiRJ2s02dX7WyTUE53N51vOuAAcPswthUZp6AwLakjDkVNpHtcuzt4RWEYp1pIbevI50x0sVDdil4758FEt9kW80=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721769028; c=relaxed/simple;
+	bh=1uuBevEFlb1Qjw0yjLNrYioqx3PJI0Ka6S27LBl1NoE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NYRhGex0OSu06DF/8XPJgbuvjkO6DeKtYVh2bda7ugYuY9fweUpkxtSThet4KS8mOl/Hn6KfZygMVG7jnQwvvCQUXzLjbG9Z4+wXM/9g6kKyTbxZiLTiNkPwho/1nFOhpUawDmlrPMylnpgxvh1/CIdhKpFV5QTo+2abbAnt43U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-397fb955949so83191615ab.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 14:10:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721769026; x=1722373826;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ob6QkeWrPJRGWmCCA3yd7IryHXaVPhd7BKwi6ydERuw=;
+        b=bdY49ZevesmMIUYW9Z0i2QFffd55HhXRt19ugoAoyGKgsiY6Ti84abPd94iFmOaz+Q
+         YGOa2r4A64xx2+lIMzJEruMAUcK794QMGuLgOFkKu+khtAvlIzk0ZN8UVtMqgFQTibXT
+         dyL7APzIcddmifpNoXqTbmhHJtRQMJqujGMNAhIGOVZRWQywJpBr1bVfpAhtbXXLbte4
+         J93uU7dSYJYyrdl2Uezv78EjsG8kLlnY3eIzlRJB5WFehI0vPXahi2lkJoPGZRmhl77H
+         PNV0SFiv4ST1it0OJGEplfQC4FlibEUaxL9QAa5SHTHvgYd939LTtmjlV9g84X5Ks3qZ
+         yQ4g==
+X-Forwarded-Encrypted: i=1; AJvYcCW2E+yEsAkpz19HhqJzrZj9BkLXCDXvorVGNMcq9knntpqkkhl0NhSsjp9m3x8KnqojeX2wJs0k/rkWyR0NXu0xz0lDgpFP
+X-Gm-Message-State: AOJu0YwI/PYgOf4uAFOiUQQV2VEA3Xa2etRKn5O1u9ErroJens/jrG14
+	wcnuAnR/pWE9UfPYB51SoPj/cBN6TbeJoU8WXPklGJFXHQUkF3LGOVq7KXasUZS5nbungiS8p5H
+	rEvNdeiKLUC4Glu8ipQemU8Y1KEJgxfKdCsB5wOivOXXZ/WXzkxzdtx8=
+X-Google-Smtp-Source: AGHT+IG2x2y923Rwf8dwevBLTzWh7kz0Bi9UufTaKrczgwKPPzHZn9HfPXacPrIOQLpOleXTkcFThnTSN1dXUcbLat6wYaEHrTtB
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SN7PR12MB7954:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21de1d4b-7670-46ea-baeb-08dcab5bdcdc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TkhRS21Fa2tVbm9oem9idXlKTW5FcngvYVNtbFhXblAzUkFFdC9KT1RJdFdi?=
- =?utf-8?B?dEh0ZVBuU2VzUXF3UGNRUWErVVRZWDlpTjBiNHFXV1BTMjB2VmgxRUVrc0VE?=
- =?utf-8?B?bGVmK0p5WlE4anByREN1NzlZQmUrWjZ5QkhUQ0VxR0JkRytjbHFoL2dDZyt1?=
- =?utf-8?B?cnRsUjNKSE5kM3JWc054TUc4YW9KQmFFMk1kSmhyaXJETUQ4UW1mYWt3aUF5?=
- =?utf-8?B?ZzBuQ0lTRXFXTFBJZ3VPa1BPQk5memNEQm5CbHh0MHFtKzZmd2JWZExLTnZw?=
- =?utf-8?B?ZmRLUktVOHZ0OXRlWldpekNVVThHNG93dnJTcnlkYnVCaVUyNmRMZHVTWFE1?=
- =?utf-8?B?RlpSVDVIb1d4WnJGUDhKRk0vTzhyV0oxVE9ISDFuTm5BTjQ3bFpEOUxVNzJs?=
- =?utf-8?B?eUlNRTBneE82Q2d2KzUvRnViWFo4ckxKUDZrNCtUMkl2UnZncU5pT01LVWNR?=
- =?utf-8?B?emhPK2NyS1NPZFZjbVcwcjlFT1RlTVMwWUE4RE95ZlJwcUtOMHhPa3dZOFZG?=
- =?utf-8?B?MDNQQUFLVzZLemNoRW1kYjFTc2t5K3NjaGdsV1dYbXBBRkNXR1VuMm1qV2tL?=
- =?utf-8?B?TlZ1bSthZlZhZVdLQjNWeFFXb3I5WkJwV3dLdWJXRUZCMmYzOFlMUXR0STMy?=
- =?utf-8?B?SGIxbWNCUkhZUWh1Rm9ZZjcrOXlvYlhtdEZ5QS9ISnNJbC91NjJSWXZGWVJs?=
- =?utf-8?B?eFlucEFCVUNOYk9rK3Y1SU9MK0lEU0s4NWpKanZ6dHNXNGlTY0ltc1NyQjJH?=
- =?utf-8?B?SFFXMnJGa2hiV0I3VkRlZXRGa1JqSUlZTi9aM0dFaEJ2dDgxbU0zdGtublUx?=
- =?utf-8?B?UHhqWGJML2lVYXBxbWVpSkJsN2dKWkFGTlliUHlPN1hlZDRwcDBYN1BCc1Nt?=
- =?utf-8?B?ajVxT1dpcGthdFptV0dFK0xjeWVZUGFSem11dkg2LzBNUTFZWm1zSU9PTll2?=
- =?utf-8?B?eW5oRVlnRzZnbGI4RENDaUJtNUNjRktmRXVYQ2pZTDRCb3VmN3FWM3hPbmxm?=
- =?utf-8?B?MVRQSDFENTErd1lnb25aVTFUUUxUbDB2ZlNTbkhycXB3YW1RYjlWZEp2bnZU?=
- =?utf-8?B?R3hRZ0dhSzkyVnM3aVhLZXVIRTVka1JjQS9ERlREMHhPSVRxVFRIbTA3OXd0?=
- =?utf-8?B?V3hyR2VuM1JyMmRPQWVHd3VtbDBmeis0OTlzV2grck9RNzR1eUpvMVBSTWNl?=
- =?utf-8?B?VnJRaVF1RUd1MzJtTW8rRDRRYzVsdi9jaG0vS1dISktjVm8wMEFFNkt5eWZj?=
- =?utf-8?B?UUpSK1ltd0NZbHhQNlV6eEUwMC9XV3NhTldXOVQ4d0VnZEtLOWFUanZwR3Yw?=
- =?utf-8?B?QTczcFk5cmljV1pJbWxGQmFRdWFkYmdRMjBSRWpUR25sOEpwR3FNb1VHb2pI?=
- =?utf-8?B?K2JSL3crdnVoZGdvZzJBbVlnK3UvU0UwV3NyeUZSejlDTTNsUHlRNXF0dUFt?=
- =?utf-8?B?eVltVDFibXBtOTUzWm9hdTZUTHU3cld6WnMwR05TRUJ3YVZNYTBpcUJFM2ls?=
- =?utf-8?B?dDMvb0ZiSUw0SFVpSnhYZG83cnFZdWRXWlRYU0d4NTNsY0xIN0JQRUxNRkxT?=
- =?utf-8?B?MURmQzZLcHJ5bzlHVnpiVHYwR3NmNVZWejJOaURiZHFnVVkwUTUveVZ0bnBF?=
- =?utf-8?B?YlkrUllWa0J3dXdtZzhFbjlSVXNDV0htNEZqNnhJOEVNaSt0V2M5Y0V1UElq?=
- =?utf-8?B?eC9QNXhNM01VUGlRbzZjWHNqb0pxOVpQblduR0xIdGZGZGt5V0M3VUljaUVa?=
- =?utf-8?B?cnJPTjAzMVdxSXRHUTZ5MGh1S1BqVFFkaXdMOXpDNmFUMHlOelR0RVJYNTlj?=
- =?utf-8?B?b0t4dWZEcFBTc2E1NEhBdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?K1hDT202MkJ2UHVDQnZaQ0d5NVZxdGxBdGNKSVBMUlRsVTdySmlNd3RWMUpL?=
- =?utf-8?B?U0VkOVEvSnBDd1VxQXBnOUpxMGEwRU9oZEk3b0FCMTJsSEVaS0doOG9Ldk5U?=
- =?utf-8?B?REpUMExFeVR1V3g4dzhqRFFBcnNSMU9jV1BvMlNxeWRkVWQrQzd1bTMwUGdF?=
- =?utf-8?B?V1dzVy9ydlFqdXFzdzJPZlBVMER3ajB6NCtXSUt5T3lxYTZMZkVGNGlWcTFm?=
- =?utf-8?B?MG9xV09mOFpQM2paa004QUxGU05PTFVYcnlrcVlsdDlRUFc0VmJmTDRWOXNK?=
- =?utf-8?B?NFJJM3owOGVXN3NRY2lESHR5bmlwUksvRFJGR1kvSEMzZGYzMzgwU2xORWg5?=
- =?utf-8?B?Y2dlSkhCT21tKzVHemowaVY5dmVzbWZDYk1vNzlQalFnVHBub2pObFlLdFRq?=
- =?utf-8?B?a0hCQkkzYXEvK3FCdEh3aUpSOTBzNmlML0FaWmhIeGtLRE9CV0RJb2JxUS9n?=
- =?utf-8?B?ZEJiNGhHRnFXdEVPM095VDNTQTNFWHNtNUpMSG9xOFBaUlBkSFVJbjR0akJq?=
- =?utf-8?B?NUxsN3VIc0xlY3FpWHo4dFY0N2xwMGNBWmZnUUhQNnRyQ2tTSFJPOWp6ZE1L?=
- =?utf-8?B?Q1AwOWpXUCtBbG5sN3RaMjFYODhHcHkwR1lnSHdiVml6SkxZYkhDTFVBYWxF?=
- =?utf-8?B?YnBCZ084Y1JBbWtWZkY2aTc0a2NVS2IwL3JJc3ZNV2JNc2lFSDZWK2lva2hY?=
- =?utf-8?B?aVV4TUZqKzhyU0lJLzd1UW5UcEpQUFF1NWhRVk9lWUh2UVR3SFNGU2NGTmhH?=
- =?utf-8?B?ZkVkZjZzV0N5Q0o3MDlLWmZKcGFxZUd2QWtMVFZGTmZ3ZzlPc2ZoNHB0a0V3?=
- =?utf-8?B?aUN5ZWgzTXlPTXYxOWlxYnJBb05pWkc2MlUya1RxdWpSZ3hrdFV6QnZFeWdI?=
- =?utf-8?B?bkIzekhLVEd3REhWaXVRTG1RYjhmTmNXcXROTm0wZ3JJVUJscHdXOFZTWGhp?=
- =?utf-8?B?VnBMTmJnU2sxc2cvUnpnQlo2NTc5bXVtd2tSNkl3VExUR0k1Z2hOUVpvWU1x?=
- =?utf-8?B?UUtGakljM2NmRlNwSEgwb3FYWVZ4YU9ETTE3a1BmczQ3QTlvSU9UeHhGc0h0?=
- =?utf-8?B?R2JwMVc2Skd0VGNZTjc5WllEdEt4MlA4YWMvZHZXQVlrM2NQOUMrRWVESk0z?=
- =?utf-8?B?TG5MejFoODFNNmk2dmZJOXRGZjF2Ynh5UW81T1pSWjQvSllwaklTeE41UVNV?=
- =?utf-8?B?c05hVDhaV2hvTkJGOUk2R2FPc2E1STZ4MElxVkcyS0JtU29NRnl4NEdGRFIw?=
- =?utf-8?B?ZjNhQ28vSHZ2d2N6ZXlMVHArcXRqMUc4c0JFTitEVldxY0kzbnFQOEgxdVZr?=
- =?utf-8?B?V2ZleDl4eVFtNmdqbjNUVzVyS21IaG5TUFZRd3RFUjJmc1Mvbk5PVEVwMzJX?=
- =?utf-8?B?VWVQYThMT0c4S3dESVhMdHdKYjVEbFNUckV5VFJnSEVxZEVsbEdFYzdjVEcy?=
- =?utf-8?B?c3lMbkk4cFIwdXdSRndjSlFkRnhqM1JaeS9NYTU3MXR6SE9xRGxXeDhSZENh?=
- =?utf-8?B?eW53TmFXcnZ0dTZncEJ0eFhXdzROcHVteXY2eEV4Zmw3Umh4bWljNkVlY3I5?=
- =?utf-8?B?RVl2a0ZzK1RMVUlvOThJOTdoT0NZdi9XdE9JelZna2t1UFJ5L0dibHQ2V0R5?=
- =?utf-8?B?MjNicmFuMU9RcG92cGpGR3BnWitpek1FZGdueXNMLzhsWk10cEFuTTNwclZz?=
- =?utf-8?B?c3lSb1hONjg2VGFqUjlDLy9ZNlcyNG9ZMTI2bUdMQzdMSUZWZmljaW1xZExh?=
- =?utf-8?B?UU9zME5aN2pZM0I3cVp0K1JFclU4citnNXZpRnNRdGY4OFVCenVsaWxXTTlw?=
- =?utf-8?B?SWE4SWRUa2NwRUJwSWh1REkyeGdSL0JKTjZFMk1MYmg2SWNxQjhuWlFzeHlG?=
- =?utf-8?B?WHIycmVUMnJPT0NWMWJCRkFrdTRCQzYwbjNOVHFqZmVNb1ExbXhoTFkwTHFi?=
- =?utf-8?B?Wk1QamdNNEJQMFpXRWt4TGV0VFd6QXlXS2ovUlFIbzZ4NVNLcksyZUUrUmZa?=
- =?utf-8?B?OCszakJOY1VZVVJMSXNTaTQzRDZteFI5b3YwQ0JTOHpVeFVMMTVFWHBJYmJo?=
- =?utf-8?B?eGdlTGsvVFRja3MvN3NBRzZ6Y1ZON0N4MVlpN3BZUi91UzBabEhCL3pvZXF3?=
- =?utf-8?Q?gt0I3TJbclXaBi8g+C7XLXO5I?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21de1d4b-7670-46ea-baeb-08dcab5bdcdc
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2024 21:10:21.6704
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vIcvLfI89jbQHoaPLl4vKtnOwYfuGu3f1mISZCBizNgbZyWlhz6hUQsOsz17fd/T4AWbbFEUlnLQs24bn2E8Bw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7954
+X-Received: by 2002:a05:6e02:b47:b0:39a:14c9:3f80 with SMTP id
+ e9e14a558f8ab-39a194e53efmr157485ab.5.1721769026141; Tue, 23 Jul 2024
+ 14:10:26 -0700 (PDT)
+Date: Tue, 23 Jul 2024 14:10:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003054f4061df097f5@google.com>
+Subject: [syzbot] [bpf?] [net?] general protection fault in bq_flush_to_queue
+From: syzbot <syzbot+3c2b6d5d4bec3b904933@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    28bbe4ea686a Merge tag 'i2c-for-6.11-rc1-second-batch' of ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16ab4e19980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9d240b438cabdc8e
+dashboard link: https://syzkaller.appspot.com/bug?extid=3c2b6d5d4bec3b904933
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a6bb49754efa/disk-28bbe4ea.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/68010035620f/vmlinux-28bbe4ea.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/739b01ffb241/bzImage-28bbe4ea.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3c2b6d5d4bec3b904933@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 UID: 0 PID: 9319 Comm: syz.4.1011 Not tainted 6.10.0-syzkaller-12084-g28bbe4ea686a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+RIP: 0010:bq_flush_to_queue+0x44/0x610 kernel/bpf/cpumap.c:675
+Code: df e8 40 d8 d6 ff 49 8d 5e 50 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 08 48 89 df e8 f6 e8 3a 00 48 8b 2b 48 89 e8 48 c1 e8 03 <42> 0f b6 04 38 84 c0 0f 85 1d 05 00 00 44 8b 65 00 4d 8d 6e 58 4c
+RSP: 0018:ffffc90000a18a80 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff8880789a4290 RCX: ffff88801ab78000
+RDX: 0000000000000100 RSI: 0000000000000010 RDI: ffff8880789a4240
+RBP: 0000000000000000 R08: ffffffff896117da R09: 1ffffffff1f5cf4d
+R10: dffffc0000000000 R11: fffffbfff1f5cf4e R12: 0000000000000001
+R13: ffffc9000d1af820 R14: ffff8880789a4240 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f20312356b8 CR3: 0000000079b12000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ __cpu_map_flush+0x5d/0xd0 kernel/bpf/cpumap.c:767
+ xdp_do_check_flushed+0x136/0x240 net/core/filter.c:4304
+ __napi_poll+0xe4/0x490 net/core/dev.c:6774
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0x89b/0x1240 net/core/dev.c:6962
+ handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+ common_interrupt+0xaa/0xd0 arch/x86/kernel/irq.c:278
+ </IRQ>
+ <TASK>
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+RIP: 0010:rcu_preempt_read_enter kernel/rcu/tree_plugin.h:389 [inline]
+RIP: 0010:__rcu_read_lock+0x30/0xb0 kernel/rcu/tree_plugin.h:412
+Code: 57 41 56 53 49 be 00 00 00 00 00 fc ff df 65 4c 8b 3c 25 00 d7 03 00 49 81 c7 44 04 00 00 4c 89 fb 48 c1 eb 03 42 0f b6 04 33 <84> c0 75 35 41 8b 2f ff c5 42 0f b6 04 33 84 c0 75 3e 41 89 2f 42
+RSP: 0018:ffffc9000d1af6b0 EFLAGS: 00000a07
+RAX: 0000000000000000 RBX: 1ffff1100356f088 RCX: ffffffff81701eba
+RDX: dffffc0000000000 RSI: ffffffff8bcad5a0 RDI: ffff88801f942780
+RBP: ffff88813fffa000 R08: ffffffff92fcd837 R09: 1ffffffff25f9b06
+R10: dffffc0000000000 R11: fffffbfff25f9b07 R12: 1ffff11002bddf93
+R13: 0000000000000000 R14: dffffc0000000000 R15: ffff88801ab78444
+ rcu_read_lock include/linux/rcupdate.h:836 [inline]
+ percpu_ref_put_many include/linux/percpu-refcount.h:330 [inline]
+ percpu_ref_put+0x12/0x180 include/linux/percpu-refcount.h:351
+ obj_cgroup_put include/linux/memcontrol.h:802 [inline]
+ __memcg_slab_free_hook+0xa7/0x310 mm/memcontrol.c:3050
+ memcg_slab_free_hook mm/slub.c:2186 [inline]
+ slab_free mm/slub.c:4470 [inline]
+ kmem_cache_free+0x1cf/0x350 mm/slub.c:4548
+ vma_lock_free kernel/fork.c:457 [inline]
+ __vm_area_free+0xe0/0x110 kernel/fork.c:513
+ remove_vma mm/mmap.c:187 [inline]
+ exit_mmap+0x645/0xc80 mm/mmap.c:3406
+ __mmput+0x115/0x380 kernel/fork.c:1345
+ exit_mm+0x220/0x310 kernel/exit.c:571
+ do_exit+0x9b2/0x27f0 kernel/exit.c:869
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1031
+ get_signal+0x1695/0x1730 kernel/signal.c:2917
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xc9/0x370 kernel/entry/common.c:218
+ do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd3c9775f19
+Code: Unable to access opcode bytes at 0x7fd3c9775eef.
+RSP: 002b:00007fd3ca6110f8 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+RAX: fffffffffffffe00 RBX: 00007fd3c9905f68 RCX: 00007fd3c9775f19
+RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007fd3c9905f68
+RBP: 00007fd3c9905f60 R08: 00007fd3ca6116c0 R09: 00007fd3ca6116c0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fd3c9905f6c
+R13: 000000000000000b R14: 00007ffc73d12a30 R15: 00007ffc73d12b18
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bq_flush_to_queue+0x44/0x610 kernel/bpf/cpumap.c:675
+Code: df e8 40 d8 d6 ff 49 8d 5e 50 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 08 48 89 df e8 f6 e8 3a 00 48 8b 2b 48 89 e8 48 c1 e8 03 <42> 0f b6 04 38 84 c0 0f 85 1d 05 00 00 44 8b 65 00 4d 8d 6e 58 4c
+RSP: 0018:ffffc90000a18a80 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff8880789a4290 RCX: ffff88801ab78000
+RDX: 0000000000000100 RSI: 0000000000000010 RDI: ffff8880789a4240
+RBP: 0000000000000000 R08: ffffffff896117da R09: 1ffffffff1f5cf4d
+R10: dffffc0000000000 R11: fffffbfff1f5cf4e R12: 0000000000000001
+R13: ffffc9000d1af820 R14: ffff8880789a4240 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f20312356b8 CR3: 0000000079b12000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	df e8                	fucomip %st(0),%st
+   2:	40 d8 d6             	rex fcom %st(6)
+   5:	ff 49 8d             	decl   -0x73(%rcx)
+   8:	5e                   	pop    %rsi
+   9:	50                   	push   %rax
+   a:	48 89 d8             	mov    %rbx,%rax
+   d:	48 c1 e8 03          	shr    $0x3,%rax
+  11:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
+  16:	74 08                	je     0x20
+  18:	48 89 df             	mov    %rbx,%rdi
+  1b:	e8 f6 e8 3a 00       	call   0x3ae916
+  20:	48 8b 2b             	mov    (%rbx),%rbp
+  23:	48 89 e8             	mov    %rbp,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 0f b6 04 38       	movzbl (%rax,%r15,1),%eax <-- trapping instruction
+  2f:	84 c0                	test   %al,%al
+  31:	0f 85 1d 05 00 00    	jne    0x554
+  37:	44 8b 65 00          	mov    0x0(%rbp),%r12d
+  3b:	4d 8d 6e 58          	lea    0x58(%r14),%r13
+  3f:	4c                   	rex.WR
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 7/3/2024 6:51 AM, Roger Quadros wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> am65-cpsw can support up to 8 queues at Rx.
-> Use a macro AM65_CPSW_MAX_RX_QUEUES to indicate that.
-> As there is only one DMA channel for RX traffic, the
-> 8 queues come as 8 flows in that channel.
-> 
-> By default, we will start with 1 flow as defined by the
-> macro AM65_CPSW_DEFAULT_RX_CHN_FLOWS.
-> 
-> User can change the number of flows by ethtool like so
-> 'ethtool -L ethx rx <N>'
-> 
-> All traffic will still come on flow 0. To get traffic on
-> different flows the Classifiers will need to be set up.
-> 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
-> Changelog:
-> v3:
-> - style fixes: reverse xmas tree and checkpatch.pl --max-line-length=80
-> - typo fix: Classifer -> Classifier
-> - added Reviewed-by Simon Horman
-> ---
->   drivers/net/ethernet/ti/am65-cpsw-ethtool.c |  62 +++--
->   drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 367 ++++++++++++++++------------
->   drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  36 +--
->   3 files changed, 284 insertions(+), 181 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> index a1d0935d1ebe..01e3967852e0 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> @@ -429,7 +429,7 @@ static void am65_cpsw_get_channels(struct net_device *ndev,
-> 
->          ch->max_rx = AM65_CPSW_MAX_RX_QUEUES;
->          ch->max_tx = AM65_CPSW_MAX_TX_QUEUES;
-> -       ch->rx_count = AM65_CPSW_MAX_RX_QUEUES;
-> +       ch->rx_count = common->rx_ch_num_flows;
->          ch->tx_count = common->tx_ch_num;
->   }
-> 
-> @@ -448,8 +448,10 @@ static int am65_cpsw_set_channels(struct net_device *ndev,
->                  return -EBUSY;
-> 
->          am65_cpsw_nuss_remove_tx_chns(common);
-> +       am65_cpsw_nuss_remove_rx_chns(common);
-> 
-> -       return am65_cpsw_nuss_update_tx_chns(common, chs->tx_count);
-> +       return am65_cpsw_nuss_update_tx_rx_chns(common, chs->tx_count,
-> +                                               chs->rx_count);
->   }
-> 
->   static void
-> @@ -920,11 +922,13 @@ static int am65_cpsw_get_coalesce(struct net_device *ndev, struct ethtool_coales
->                                    struct netlink_ext_ack *extack)
->   {
->          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-> +       struct am65_cpsw_rx_flow *rx_flow;
->          struct am65_cpsw_tx_chn *tx_chn;
-> 
->          tx_chn = &common->tx_chns[0];
-> +       rx_flow = &common->rx_chns.flows[0];
-> 
-> -       coal->rx_coalesce_usecs = common->rx_pace_timeout / 1000;
-> +       coal->rx_coalesce_usecs = rx_flow->rx_pace_timeout / 1000;
->          coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-> 
->          return 0;
-> @@ -934,14 +938,26 @@ static int am65_cpsw_get_per_queue_coalesce(struct net_device *ndev, u32 queue,
->                                              struct ethtool_coalesce *coal)
->   {
->          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-> +       struct am65_cpsw_rx_flow *rx_flow;
->          struct am65_cpsw_tx_chn *tx_chn;
-> 
-> -       if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-> +       if (queue >= AM65_CPSW_MAX_TX_QUEUES &&
-> +           queue >= AM65_CPSW_MAX_RX_QUEUES)
->                  return -EINVAL;
-> 
-> -       tx_chn = &common->tx_chns[queue];
-> +       if (queue < AM65_CPSW_MAX_TX_QUEUES) {
-> +               tx_chn = &common->tx_chns[queue];
-> +               coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-> +       } else {
-> +               coal->tx_coalesce_usecs = ~0;
-> +       }
-> 
-> -       coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-> +       if (queue < AM65_CPSW_MAX_RX_QUEUES) {
-> +               rx_flow = &common->rx_chns.flows[queue];
-> +               coal->rx_coalesce_usecs = rx_flow->rx_pace_timeout / 1000;
-> +       } else {
-> +               coal->rx_coalesce_usecs = ~0;
-> +       }
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Minor nit, but after removing the dead code below the check for queue 
-being greater than max values, I think am65_cpsw_get_coalesce() and 
-am65_get_per_queue_coalesce() are identical except the "u32 queue" argument.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-I think you could do something like the following:
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-static int am65_cpsw_get_per_queue_coalesce(struct net_device *ndev,
-				  struct ethtool_coalesce *coal,
-				  struct netlink_ext_ack *extack)
-{
-	return __am65_cpsw_get_coalesce(ndev, coal, 0);
-}
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-static int am65_cpsw_get_coalesce(struct net_device *ndev, u32 queue,
-				  struct ethtool_coalesce *coal,
-				  struct netlink_ext_ack *extack,
-				  u32 )
-{
-	return __am65_cpsw_get_coalesce(ndev, coal, queue);
-}
-
-> 
->          return 0;
->   }
-> @@ -951,9 +967,11 @@ static int am65_cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coales
->                                    struct netlink_ext_ack *extack)
->   {
->          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-> +       struct am65_cpsw_rx_flow *rx_flow;
->          struct am65_cpsw_tx_chn *tx_chn;
-> 
->          tx_chn = &common->tx_chns[0];
-> +       rx_flow = &common->rx_chns.flows[0];
-> 
->          if (coal->rx_coalesce_usecs && coal->rx_coalesce_usecs < 20)
->                  return -EINVAL;
-> @@ -961,7 +979,7 @@ static int am65_cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coales
->          if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20)
->                  return -EINVAL;
-
-Why does this return -EINVAL here, but 
-am65_cpsw_set_per_queue_coalesce() prints a dev_info() and then set the 
-value to 20?
-
-Would it better to have consistent behavior? Maybe I'm missing some 
-context or reasoning here?
-
-> 
-> -       common->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
-> +       rx_flow->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
->          tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
-> 
->          return 0;
-> @@ -971,20 +989,36 @@ static int am65_cpsw_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
->                                              struct ethtool_coalesce *coal)
->   {
->          struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-> +       struct am65_cpsw_rx_flow *rx_flow;
->          struct am65_cpsw_tx_chn *tx_chn;
-> 
-> -       if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-> +       if (queue >= AM65_CPSW_MAX_TX_QUEUES &&
-> +           queue >= AM65_CPSW_MAX_RX_QUEUES)
->                  return -EINVAL;
-> 
-> -       tx_chn = &common->tx_chns[queue];
-> +       if (queue < AM65_CPSW_MAX_TX_QUEUES) {
-> +               tx_chn = &common->tx_chns[queue];
-> +
-> +               if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20) {
-> +                       dev_info(common->dev, "defaulting to min value of 20us for tx-usecs for tx-%u\n",
-> +                                queue);
-> +                       coal->tx_coalesce_usecs = 20;
-> +               }
-> 
-> -       if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20) {
-> -               dev_info(common->dev, "defaulting to min value of 20us for tx-usecs for tx-%u\n",
-> -                        queue);
-> -               coal->tx_coalesce_usecs = 20;
-> +               tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
->          }
-> 
-> -       tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
-> +       if (queue < AM65_CPSW_MAX_RX_QUEUES) {
-> +               rx_flow = &common->rx_chns.flows[queue];
-> +
-> +               if (coal->rx_coalesce_usecs && coal->rx_coalesce_usecs < 20) {
-> +                       dev_info(common->dev, "defaulting to min value of 20us for rx-usecs for rx-%u\n",
-> +                                queue);
-
-Would it make more sense to just return -EINVAL here similar to the 
-standard "set_coalesce"?
-
-> +                       coal->rx_coalesce_usecs = 20;
-> +               }
-> +
-> +               rx_flow->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
-> +       }
-> 
->          return 0;
->   }
-
-I think my comment to the "get" and "get_per_queue" versions of these 
-functions also applies here, but only if the behavior of returning 
--EINVAL or setting a value for the user is the same between the "set" 
-and "set_per_queue".
-
-Thanks,
-
-Brett
-
-<snip>
-
+If you want to undo deduplication, reply with:
+#syz undup
 
