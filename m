@@ -1,108 +1,122 @@
-Return-Path: <netdev+bounces-112578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9B26939FF7
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:32:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4401C939FFF
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 13:36:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 648011F23171
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7370B1C21F2A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 11:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E235314EC43;
-	Tue, 23 Jul 2024 11:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0511509BD;
+	Tue, 23 Jul 2024 11:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="luH2V+9v"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="QxLLppF3";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="QxLLppF3"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F5514F111
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 11:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992FA1509A8;
+	Tue, 23 Jul 2024 11:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721734267; cv=none; b=TQN35s5Rzphkw+we3gEiAJegWdgw1U9w20ZXy0/XQtA9yomvi3oRskq1cPSDYfI1X134hn12v3xR6Q5K0GEgkN1TzTqO6VrWhaz51puZ/E4Dbyelc+/ssLg/XZ1rmvurV4plRGJOHRTEOeb1BDDngdw2k4EsxY2cA8ITeGRHF4E=
+	t=1721734590; cv=none; b=YwlTtxZLcTaBjxaDKTfqiaGcq05RzxB5JIyNuai5hd/Sbc2u16NKPvLURQUBAhXMZUzzLBVn9ksCszgQ4bYaJMjwXjA3uxcK2sNueF53MarmvdVQctyS9Lp7sTs+E7gK6x1jRoPiqZgn7NR6bDZHVdYMk3lu4BO/J6JoH02v9gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721734267; c=relaxed/simple;
-	bh=9W7N+RcPU+hcfWOtUThl48kqfYHUL1J2IWDqtRfdIMk=;
+	s=arc-20240116; t=1721734590; c=relaxed/simple;
+	bh=MS6m6IULi+pEAfK0WMjEkJxpK0tYjHKlQi+2WOHrQPU=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XgMyt0v0Zh7qr1AcDr6okSbz5kFlpyHdXTjTDTTqKm6Csf41TuBREAZKIwC25G8tEnKjRbrz/jPZjG9192mKsIh2c5rIH7GHgTSgduxh3+E6s9bwanLr+Qp9thNtCLAPPZqutPceeaUbe+MEPUHmEK+L8dUq7Crs3S5j925AVCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=luH2V+9v; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=9W7N+RcPU+hcfWOtUThl48kqfYHUL1J2IWDqtRfdIMk=;
-	t=1721734263; x=1722943863; b=luH2V+9veRbeMoxqK0EwDkm0rDDheugh1/t6ip1ZcrZee6l
-	wWymDLUw/ZLFKhr/Co4/jySyWSLlOgf0phcyRFSZQD+17PgyqiXAmmuwbTSQLAFIoQCU/365QJYEs
-	peAIJ1859nNSspfLgnzoS7vbTWzQsA5bqcbTyOIuM8oP4Fc/mYjnbA7czNDzxV5dsxrWvGMh2y4uY
-	dl+vz54ZhmmHoa8m6wti31hHLGsw6Pq443eDlhWJ1aVgzzrXmT/G3XIwtrVZU49XAcktwTQdJo0/Y
-	Jq0JPpH1/dHyama0+7W+3iC3kKOzT985MazHm+iaBhrhkjYh5lwIngr4SIduJt5Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1sWDjJ-0000000BBGi-43xX;
-	Tue, 23 Jul 2024 13:30:54 +0200
-Message-ID: <310c8cfd1dc1747cf8ffc1f5be8994d0c87a008d.camel@sipsolutions.net>
-Subject: Re: [PATCH net-next] net: bonding: correctly annotate RCU in
- bond_should_notify_peers()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
- <andy@greyhouse.net>,  Jiri Pirko <jiri@nvidia.com>
-Date: Tue, 23 Jul 2024 13:30:53 +0200
-In-Reply-To: <0b0cb62e-4e10-458e-8d21-8a082f94aa4d@redhat.com>
-References: 
-	<20240719094119.35c62455087d.I68eb9c0f02545b364b79a59f2110f2cf5682a8e2@changeid>
-	 <0b0cb62e-4e10-458e-8d21-8a082f94aa4d@redhat.com>
+	 Content-Type:MIME-Version; b=PcwnQeIyxwZGfeTfQtSEa5vGPwoY2ZqpOPW/8JzFgf2Wqx8u1m0M4/Z/Yt2k/is4BXVEsyPYLJuazfUjvnbTr6IA8R5V88os0vI4FmMncWuo0VLwV4eWL8lwgxdshGayPiJOwOqIuZnlnlN/sqIUeFg/swjIq00h7/FkmzZ03YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=QxLLppF3; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=QxLLppF3; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1721734587;
+	bh=MS6m6IULi+pEAfK0WMjEkJxpK0tYjHKlQi+2WOHrQPU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=QxLLppF3B4lzL7aV4SHiiGm17Got7OLk9K+Cv8IFtclvFddw69huooyT49bW5pgzW
+	 PxQxtZJ5zJmzR9E2m/5ElMS3F1NWb2Ik1IxnV52CSUa2k7Go3HVdkp5ElI3wtkPBCy
+	 TQhnNl5EN1xJ54iANj9F0rgMCaYQ9Ew997ROMXtU=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 9FD011286E02;
+	Tue, 23 Jul 2024 07:36:27 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id FvTuh8OnonKV; Tue, 23 Jul 2024 07:36:27 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1721734587;
+	bh=MS6m6IULi+pEAfK0WMjEkJxpK0tYjHKlQi+2WOHrQPU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=QxLLppF3B4lzL7aV4SHiiGm17Got7OLk9K+Cv8IFtclvFddw69huooyT49bW5pgzW
+	 PxQxtZJ5zJmzR9E2m/5ElMS3F1NWb2Ik1IxnV52CSUa2k7Go3HVdkp5ElI3wtkPBCy
+	 TQhnNl5EN1xJ54iANj9F0rgMCaYQ9Ew997ROMXtU=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::db7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id BCB4F1286DE3;
+	Tue, 23 Jul 2024 07:36:26 -0400 (EDT)
+Message-ID: <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>
+Cc: ksummit@lists.linux.dev, linux-cxl@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Date: Tue, 23 Jul 2024 07:36:24 -0400
+In-Reply-To: <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+	 <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-07-23 at 12:25 +0200, Paolo Abeni wrote:
->=20
-> On 7/19/24 18:41, Johannes Berg wrote:
-> > From: Johannes Berg <johannes.berg@intel.com>
-> >=20
-> > RCU use in bond_should_notify_peers() looks wrong, since it does
-> > rcu_dereference(), leaves the critical section, and uses the
-> > pointer after that.
-> >=20
-> > Luckily, it's called either inside a nested RCU critical section
-> > or with the RTNL held.
-> >=20
-> > Annotate it with rcu_dereference_rtnl() instead, and remove the
-> > inner RCU critical section.
-> >=20
-> > Fixes: 4cb4f97b7e36 ("bonding: rebuild the lock use for bond_mii_monito=
-r()")
-> > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> > Signed-off-by: Johannes Berg <johannes.berg@intel.com>
->=20
-> Any special reasons to target net-next? this looks like a legit net fix=
-=20
-> to me. If you want to target net, no need to re-post, otherwise it will=
-=20
-> have to wait the merge window end.
+On Tue, 2024-07-23 at 13:20 +0200, Jiri Kosina wrote:
+> On Mon, 8 Jul 2024, Dan Williams wrote:
+> 
+> > 2/ Device passthrough, kernel passing opaque payloads, is already
+> > taken for granted in many subsystems. USB and HID have "raw"
+> > interfaces
+> 
+> Just as a completely random datapoint here: after I implemented
+> hidraw inteface long time ago, I was a little bit hesitant about
+> really merging it, because there was a general fear that this would
+> shatter the HID driver ecosystem, making it difficult for people to
+> find proper drivers  for their devices, etc.
 
-Well, I guess it's kind of a fix, but functionally all it really does is
-remove the RCU critical section which isn't necessary because either we
-hold the lock or there's already one around it. So locally the function
-_looks_ wrong (using the pointer outside the section it uses to deref
-it), but because of other reasons in how the function is used, it's not
-really wrong.
+The problem with hidraw is that userspace has to understand the device
+to use it, but a lot of HID devices (keyboards, mice, serial ports,
+etc.) want to fit into an existing ecosystem so they have to have a
+kernel driver to avoid having to update all the user applications. 
+However, entirely new devices don't have the existing ecosystem
+problem.
 
-I'd really prefer not to have to resend it though ;-)
+> Turns out that that didn't happen. Drivers for generic devices are
+> still implemented properly in the kernel, and hidraw is mostly used
+> for rather specific, one-off solutions, where the vendor's business
+> plan is "ship this one appliance and forget forever", which doesn't
+> really cause any harm to the whole ecosystem.
 
-johannes
+That's not entirely true.  FIDO tokens (the ones Konstantin is
+recommending for kernel.org access) are an entire class of devices that
+use hidraw and don't have a kernel driver.  There's an array of
+manufacturers producing them, but the CTAP specification and its
+conformance is what keeps a single user mode driver (which is now
+present as a separate implementation in all web browsers and the
+userspace libfido2) for all of them.  Fido is definitely not a one off,
+but on the other hand, not having a kernel driver doesn't seem to harm
+the ecosystem and they can get away with it because there was no
+existing device type for them to fit into (except, as you say, an array
+of incompatible and short lived USB key tokens which annoyed everyone
+by having usability limits due to the oneoffness).
+
+James
+
 
