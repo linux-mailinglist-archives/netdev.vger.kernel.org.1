@@ -1,179 +1,145 @@
-Return-Path: <netdev+bounces-112514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B6B939B82
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:11:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B13DD939BB1
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 09:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 132162818A0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 07:11:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DD61C21B20
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 07:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3015414A4E7;
-	Tue, 23 Jul 2024 07:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JyOQpiaJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D1A14039E;
+	Tue, 23 Jul 2024 07:22:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8963E14B084
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 07:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B24513C68A;
+	Tue, 23 Jul 2024 07:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721718648; cv=none; b=NmF0M+vFdtnKZphtg3VSqYCIgZ6tJfTyFrRIOuSbdxGaCCoJG6NgDtCfSh2kqDK4MSN8tVKwAHF0AIEmRxWOqWJDF5OpnooXeTqQVxY93f+M+RFH4kqWSsxcf3XuQg49gHGj3P5w4+D/5Ke0P/35glAmiMIMalAHOBKGJxaJZ2U=
+	t=1721719334; cv=none; b=VvYo7oWaEkCB2kIDh/9ruOAcQF65KOQGNtAzI42ehm2JNc3LVg6rxIep8uNMpDjR7BpVLaNMwUV3GuEB7jcquxDF2JzpHVGwOmlUHwVfNR87UcHxDzaTQXLDG7DthBu5sRmw/hXimJSpDgSp5RZIe9wRx7aSUDvCJCLqpIWodlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721718648; c=relaxed/simple;
-	bh=u/QsKyttUCU09OB5lypgCukROiu0KDjYn/kne8MGZsg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oQnbfTqjvMjr3iueos6TnrF/yU8Wnfgw0KqqByAU9DuL/r545VNARJjcJR1qAbxSG4gP2jlvtMHa0qHfAIMBvIEOvX3c4hf/EEqP0ouU7Rd74hFhRLGaUSLNrWF1Bh+a6M7Oukxll2CtUlhj8PKmwVXdfF3fIacoGbut52Z0fOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JyOQpiaJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721718645;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YdPO/Vt26loGhN/7TbhKVqyyms9ZE6JlxaJFW/Mi4bc=;
-	b=JyOQpiaJNqmRnGut4aQpiTY5mTwGdh39SDA/vP0g5N3Q9S1/cEdC3jX7rA9/BhTdkgksN8
-	cmTeGlpQZAB2R31z8yNAboerqXkBacAYpIx+Vp2lkSS8JYQASAwSYkK6Ck2F9IXKMYNgGF
-	9FRX5j7FTgNPdPUO8c2KuHwsJ/Pb4hE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-422-NxUWQI8GPx6Udv3-oRtnSA-1; Tue,
- 23 Jul 2024 03:10:39 -0400
-X-MC-Unique: NxUWQI8GPx6Udv3-oRtnSA-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E09B81955F43;
-	Tue, 23 Jul 2024 07:10:37 +0000 (UTC)
-Received: from alecto.usersys.redhat.com (unknown [10.45.224.129])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B85293000194;
-	Tue, 23 Jul 2024 07:10:34 +0000 (UTC)
-From: Artem Savkov <asavkov@redhat.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Artem Savkov <asavkov@redhat.com>
-Subject: [PATCH bpf-next v3] selftests/bpf: fix compilation failure when CONFIG_NET_FOU!=y
-Date: Tue, 23 Jul 2024 09:10:31 +0200
-Message-ID: <20240723071031.3389423-1-asavkov@redhat.com>
-In-Reply-To: <CAADnVQKE1Xmjhx3Xwdidmmn=BGzjgc89i+UMhHR7=6HupPQZSA@mail.gmail.com>
-References: <CAADnVQKE1Xmjhx3Xwdidmmn=BGzjgc89i+UMhHR7=6HupPQZSA@mail.gmail.com>
+	s=arc-20240116; t=1721719334; c=relaxed/simple;
+	bh=yZpum7RI2rSFJ32h7kQ5YDh1/k+uXdhnbV3adDGmyec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LU8AHHPhGNstHRHTA9Wul5ctZxHhZbdoF8u6o6OwqxAX2pw80t35Q1lPXnjmKi/+xKpMJcQhlxevXWhEVkHrqidT6W6JRHiTvKFGqXJUF0vO5YyYpDwtLiYlV2gYNH8TKZRVLu9pkZFTrXvf7/ZbOsuUUy10jndAWspmLCCGp/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-66ca536621cso20293787b3.3;
+        Tue, 23 Jul 2024 00:22:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721719328; x=1722324128;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mTdZefJGssY1b1nFywR6a45rF6PMOv6hEJZw7jG+AFM=;
+        b=gVK9RZDkzgRcpSoePuUSquCNJgA9uU87ZAGER0vn7aZG2xwLcDg8BqHiyTSnyf0bYt
+         bv0yXBTvi/dVuuWiW7Z7YZkFUCmJi8oiJSLWvhPRIWYBAi2iTB0svlDz/drXKNKRWqrH
+         xnNcbAtxjnp9RMs/2p3Y/wp5dnY3pGF9aSVegHxROrceNWDL0mgcNV240gbA5JWKEII6
+         bI6qHKveqAYvrnvU8EzIS8jbAa69XM7Nrww0VHizMVg+oEptCPkn6L02NxD9INWXVW+e
+         QDbtDNrkRpmiLFI7lNY5KaRUniV055aMpENnHnEiQD8gQppBixdUhmx+j0qYgcUZJaUH
+         9B0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVaDJ7nfBf9VMUXPgzaEN+1hXvBBGImDdw6FYIQxjlTHyDFq17bakdDYdjx6Grxl5TG+cDdqcQE8Se0MK5c/SIK0f/IJ/O5C/uBHF2FTzJFjQTAuWbLwYK1d14VIKJbEanoJEHiePZDD39FUVFNT8N/YEjoz38Q/u66Gsr10O1filI8DmCjNf1vd7ly617S9u6RMSeIuCtR0nnA9A==
+X-Gm-Message-State: AOJu0YyHbMXm4pXW4ohnyimRjBu3WKQXDxXfmxtFX4D9ocpr+X/cj1jK
+	BWbyZLILMt5rUJbHnhvOh4WGYo4+ty+dN71ZcMl6+UyZVoSlsdfgyFVpUzpG
+X-Google-Smtp-Source: AGHT+IH1ZQ1jGv0iZJjUNbP2rA/3hGPOiLe5y/jfgulRZ1GCFgQL8+3+6iNnBjGv9AjXradJQrTcYA==
+X-Received: by 2002:a05:690c:108:b0:65f:8973:31a2 with SMTP id 00721157ae682-66e4bdbd22fmr29764037b3.13.1721719328645;
+        Tue, 23 Jul 2024 00:22:08 -0700 (PDT)
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com. [209.85.128.180])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-66952940dcasm19267387b3.74.2024.07.23.00.22.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jul 2024 00:22:08 -0700 (PDT)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-65fe1239f12so43108227b3.0;
+        Tue, 23 Jul 2024 00:22:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUIFFn2GnhLIXt6eSJELVlLO6i4UOnoNVNcOqMwMiwTXmwU9/noTL9fCicKBj0fnnQNi6cAzKNQ1XgXMeTWWEnF0UWSQQkQ0aFWDspssnh1S75KhQ2rS3ob0Sh3zERJLEYhm5St9x9rsr4I59naedhEPxuj1S06lCxjyq1WApKsWAlIrLbwyYiRNmIkFXFuqzU7QOyvm65LTqd2Hg==
+X-Received: by 2002:a05:690c:408f:b0:630:f6b0:6c3d with SMTP id
+ 00721157ae682-66e4c57cc12mr19744927b3.23.1721719326975; Tue, 23 Jul 2024
+ 00:22:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20240627091137.370572-1-herve.codina@bootlin.com> <20240627091137.370572-3-herve.codina@bootlin.com>
+In-Reply-To: <20240627091137.370572-3-herve.codina@bootlin.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 23 Jul 2024 09:21:54 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVeAK-2xRzf=kSO5Z9JGR7VTz=vEDHBW5190cctUNFj-g@mail.gmail.com>
+Message-ID: <CAMuHMdVeAK-2xRzf=kSO5Z9JGR7VTz=vEDHBW5190cctUNFj-g@mail.gmail.com>
+Subject: Re: [PATCH v3 2/7] reset: mchp: sparx5: Remove dependencies and allow
+ building as a module
+To: Herve Codina <herve.codina@bootlin.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, UNGLinuxDriver@microchip.com, 
+	Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, 
+	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Allan Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Without CONFIG_NET_FOU bpf selftests are unable to build because of
-missing definitions. Add ___local versions of struct bpf_fou_encap and
-enum bpf_fou_encap_type to fix the issue.
+Hi Herv=C3=A9 and Cl=C3=A9ment,
 
-Signed-off-by: Artem Savkov <asavkov@redhat.com>
+On Thu, Jun 27, 2024 at 11:13=E2=80=AFAM Herve Codina <herve.codina@bootlin=
+.com> wrote:
+> From: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
+>
+> The sparx5 reset controller depends on the SPARX5 architecture or the
+> LAN966x SoC.
+>
+> This reset controller can be used by the LAN966x PCI device and so it
+> needs to be available on all architectures.
+> Also the LAN966x PCI device driver can be built as a module and this
+> reset controller driver has no reason to be a builtin driver in that
+> case.
+>
+> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
----
-v3: swith from using BPF_NO_KFUNC_PROTOTYPES to casting to keep kfunc
-prototype intact.
+Thanks for your patch!
 
-v2: added BPF_NO_KFUNC_PROTOTYPES define to avoid issues when
-CONFIG_NET_FOU is set.
----
- .../selftests/bpf/progs/test_tunnel_kern.c    | 26 ++++++++++++++-----
- 1 file changed, 20 insertions(+), 6 deletions(-)
+> --- a/drivers/reset/Kconfig
+> +++ b/drivers/reset/Kconfig
+> @@ -124,8 +124,7 @@ config RESET_LPC18XX
+>           This enables the reset controller driver for NXP LPC18xx/43xx S=
+oCs.
+>
+>  config RESET_MCHP_SPARX5
+> -       bool "Microchip Sparx5 reset driver"
+> -       depends on ARCH_SPARX5 || SOC_LAN966 || COMPILE_TEST
+> +       tristate "Microchip Sparx5 reset driver"
 
-diff --git a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-index 3f5abcf3ff136..fcff3010d8a60 100644
---- a/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_tunnel_kern.c
-@@ -26,6 +26,18 @@
-  */
- #define ASSIGNED_ADDR_VETH1 0xac1001c8
- 
-+struct bpf_fou_encap___local {
-+       __be16 sport;
-+       __be16 dport;
-+};
-+
-+enum bpf_fou_encap_type___local {
-+       FOU_BPF_ENCAP_FOU___local,
-+       FOU_BPF_ENCAP_GUE___local,
-+};
-+
-+struct bpf_fou_encap;
-+
- int bpf_skb_set_fou_encap(struct __sk_buff *skb_ctx,
- 			  struct bpf_fou_encap *encap, int type) __ksym;
- int bpf_skb_get_fou_encap(struct __sk_buff *skb_ctx,
-@@ -745,7 +757,7 @@ SEC("tc")
- int ipip_gue_set_tunnel(struct __sk_buff *skb)
- {
- 	struct bpf_tunnel_key key = {};
--	struct bpf_fou_encap encap = {};
-+	struct bpf_fou_encap___local encap = {};
- 	void *data = (void *)(long)skb->data;
- 	struct iphdr *iph = data;
- 	void *data_end = (void *)(long)skb->data_end;
-@@ -769,7 +781,8 @@ int ipip_gue_set_tunnel(struct __sk_buff *skb)
- 	encap.sport = 0;
- 	encap.dport = bpf_htons(5555);
- 
--	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_GUE);
-+	ret = bpf_skb_set_fou_encap(skb, (struct bpf_fou_encap *)&encap,
-+				    FOU_BPF_ENCAP_GUE___local);
- 	if (ret < 0) {
- 		log_err(ret);
- 		return TC_ACT_SHOT;
-@@ -782,7 +795,7 @@ SEC("tc")
- int ipip_fou_set_tunnel(struct __sk_buff *skb)
- {
- 	struct bpf_tunnel_key key = {};
--	struct bpf_fou_encap encap = {};
-+	struct bpf_fou_encap___local encap = {};
- 	void *data = (void *)(long)skb->data;
- 	struct iphdr *iph = data;
- 	void *data_end = (void *)(long)skb->data_end;
-@@ -806,7 +819,8 @@ int ipip_fou_set_tunnel(struct __sk_buff *skb)
- 	encap.sport = 0;
- 	encap.dport = bpf_htons(5555);
- 
--	ret = bpf_skb_set_fou_encap(skb, &encap, FOU_BPF_ENCAP_FOU);
-+	ret = bpf_skb_set_fou_encap(skb, (struct bpf_fou_encap *)&encap,
-+				    FOU_BPF_ENCAP_FOU___local);
- 	if (ret < 0) {
- 		log_err(ret);
- 		return TC_ACT_SHOT;
-@@ -820,7 +834,7 @@ int ipip_encap_get_tunnel(struct __sk_buff *skb)
- {
- 	int ret;
- 	struct bpf_tunnel_key key = {};
--	struct bpf_fou_encap encap = {};
-+	struct bpf_fou_encap___local encap = {};
- 
- 	ret = bpf_skb_get_tunnel_key(skb, &key, sizeof(key), 0);
- 	if (ret < 0) {
-@@ -828,7 +842,7 @@ int ipip_encap_get_tunnel(struct __sk_buff *skb)
- 		return TC_ACT_SHOT;
- 	}
- 
--	ret = bpf_skb_get_fou_encap(skb, &encap);
-+	ret = bpf_skb_get_fou_encap(skb, (struct bpf_fou_encap *)&encap);
- 	if (ret < 0) {
- 		log_err(ret);
- 		return TC_ACT_SHOT;
--- 
-2.45.2
+This opens up the question to everyone, so I'd rather add a dependency
+on MFD_LAN966X_PCI.
 
+>         default y if SPARX5_SWITCH
+>         select MFD_SYSCON
+>         help
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
