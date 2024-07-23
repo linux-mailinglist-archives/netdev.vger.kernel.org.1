@@ -1,168 +1,136 @@
-Return-Path: <netdev+bounces-112689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4984D93A96C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:43:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FA293A96F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 00:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0D26283C44
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:42:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E99652841C9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 22:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079EA143C77;
-	Tue, 23 Jul 2024 22:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A52D149001;
+	Tue, 23 Jul 2024 22:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k7keo26u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4IDhQzr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D32D1422AB
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 22:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2E31422AB;
+	Tue, 23 Jul 2024 22:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721774575; cv=none; b=pSz7c9VtbQj/Bht62fcdIaPLWalpzXl06YsZ0uq+A/1Td89s/RkYsCP1nGxm7hVW7wWptYdcBVHhfxZqCL5djJVRy4Mypx0ujfoDhsOkNW+LgA9zfFGT09SPDU80ljx/Of1a2xQcL+MQKL3OmRTqRRgxL7kNP9J9rsAGamkj1Uk=
+	t=1721774651; cv=none; b=eDarMjdGPn+WEWCfrz9vTXK2dVD6YNTsySz6YwPPnukVZMQznSGU8TDP7BkjkKHyIhy27F7NXyXuDqF3qP6WkY7ocNqMmmXVvZaDR9MJBbWpkzuUrWTwj+rQqPEcNXu5/892Ows5S98cWhVBzni8GpkxR9V2xzQRQ7SFCmJz5EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721774575; c=relaxed/simple;
-	bh=rPDMSV4TaHfvcLHnkZDzDcceXeH/zm+J+EMQcNT/0o0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KLpTbW1zov8Lts6gaoajLK8dNwaQbI3D24KGifl/KvPmu19BW3FrIHdBZLXmsERYUiaWhT4/beY6Tqs6azu8loE988BofcQ0HqPammuxyUxXbpMUnED8UuZBixbj/6gBKB4jZxBJxWh3Etl4vFc2pBqdOaV2TQ+HdKWbZELyaTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k7keo26u; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1721774574; x=1753310574;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NiLUZ4w5yHAUnV50wNGvQrLoz6YN+uQCd7L+69WP3Ao=;
-  b=k7keo26u0mR34QJeIfdzsGBIP2f5ycPHkIwzAbFFxK4K1yPTXLmGB+I5
-   WUVL5ED+kTsIs1ufxPMDq0nYOsOWTzQOcWWkqEHVTUnwn3N+eTWzaP8Be
-   pmqyfAD9Dn4tq6AEuhnLV8sjX2lUja2wZxYAHGMMQXPHxMV66taOjGRES
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.09,231,1716249600"; 
-   d="scan'208";a="108928269"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 22:42:44 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:37068]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.254:2525] with esmtp (Farcaster)
- id 0df52a1b-c83d-495b-a38f-cbf6d95e0a05; Tue, 23 Jul 2024 22:42:44 +0000 (UTC)
-X-Farcaster-Flow-ID: 0df52a1b-c83d-495b-a38f-cbf6d95e0a05
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 23 Jul 2024 22:42:38 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.135.114) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 23 Jul 2024 22:42:35 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>,
-	<dust.li@linux.alibaba.com>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <schnelle@linux.ibm.com>,
-	<syzkaller@googlegroups.com>, <wenjia@linux.ibm.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net] net/smc: prevent UAF in inet_create()
-Date: Tue, 23 Jul 2024 15:42:27 -0700
-Message-ID: <20240723224227.68575-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240723175809.537291-1-edumazet@google.com>
-References: <20240723175809.537291-1-edumazet@google.com>
+	s=arc-20240116; t=1721774651; c=relaxed/simple;
+	bh=AQI883Cu7SaB5V4e/b8n1Uo6AlMO7QJgsxnRLVpSvMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=tEOIILnGnNX/FJg4mMx+apSyytezKcmnkl6AYJ+0ow2PO59GJc0QfphW3MSRTyPSV+CQq8850SUqBGaHtCduWfX6/wfbjbsf0CdMRH0XX8b8uN0kwDGlET5CXM1P0OVBa6EgklgS+fCw61Pm8STDXoTwvVEU5v/SxolMwSm+cgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4IDhQzr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8981AC4AF0A;
+	Tue, 23 Jul 2024 22:44:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721774650;
+	bh=AQI883Cu7SaB5V4e/b8n1Uo6AlMO7QJgsxnRLVpSvMI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=d4IDhQzrA0CWCB5XyCIQoSnLdwyQUwg+hE2bGAJdsxkH6CuREP5ZfvjKLDC1ZHF4f
+	 auFYmN89jfk2+KA/BlzrarrmROYC/t1vvrWuWLUErXGQdj6ZluG2/sqrPYIvtXRV+K
+	 3AwpRF1B48turD0JM7y1VZ8PfP8s7ZQjvEI43WH0IY7ccXG7woHffVdXPSHT8G7rYx
+	 FIbAlf4qoCRhc6jnN3r6VWWGZKE2y1rPbAdNR5zcUFRNSokxWgsovm3OIb88bvPbDl
+	 qwgJgUlyn38DdFm9VvyYWEkwArqIXaytvMZOiar0TAzotXR2q9RW0LstKclDnAQo+7
+	 RCqOeHvbcFDIA==
+Date: Tue, 23 Jul 2024 17:44:08 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com
+Subject: Re: [PATCH V3 04/10] PCI/TPH: Add pci=nostmode to force No ST Mode
+Message-ID: <20240723224408.GA779931@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240717205511.2541693-5-wei.huang2@amd.com>
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 23 Jul 2024 17:58:09 +0000
-> Following syzbot repro crashes the kernel:
-> 
-> socketpair(0x2, 0x1, 0x100, &(0x7f0000000140)) (fail_nth: 13)
-> 
-> Fix this by not calling sk_common_release() from smc_create_clcsk().
-> 
-> Stack trace:
-> socket: no more sockets
-> ------------[ cut here ]------------
-> refcount_t: underflow; use-after-free.
->  WARNING: CPU: 1 PID: 5092 at lib/refcount.c:28 refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
-> Modules linked in:
-> CPU: 1 PID: 5092 Comm: syz-executor424 Not tainted 6.10.0-syzkaller-04483-g0be9ae5486cd #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
->  RIP: 0010:refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
-> Code: 80 f3 1f 8c e8 e7 69 a8 fc 90 0f 0b 90 90 eb 99 e8 cb 4f e6 fc c6 05 8a 8d e8 0a 01 90 48 c7 c7 e0 f3 1f 8c e8 c7 69 a8 fc 90 <0f> 0b 90 90 e9 76 ff ff ff e8 a8 4f e6 fc c6 05 64 8d e8 0a 01 90
-> RSP: 0018:ffffc900034cfcf0 EFLAGS: 00010246
-> RAX: 3b9fcde1c862f700 RBX: ffff888022918b80 RCX: ffff88807b39bc00
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: 0000000000000003 R08: ffffffff815878a2 R09: fffffbfff1c39d94
-> R10: dffffc0000000000 R11: fffffbfff1c39d94 R12: 00000000ffffffe9
-> R13: 1ffff11004523165 R14: ffff888022918b28 R15: ffff888022918b00
-> FS:  00005555870e7380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020000140 CR3: 000000007582e000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  inet_create+0xbaf/0xe70
->   __sock_create+0x490/0x920 net/socket.c:1571
->   sock_create net/socket.c:1622 [inline]
->   __sys_socketpair+0x2ca/0x720 net/socket.c:1769
->   __do_sys_socketpair net/socket.c:1822 [inline]
->   __se_sys_socketpair net/socket.c:1819 [inline]
->   __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fbcb9259669
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fffe931c6d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000035
-> RAX: ffffffffffffffda RBX: 00007fffe931c6f0 RCX: 00007fbcb9259669
-> RDX: 0000000000000100 RSI: 0000000000000001 RDI: 0000000000000002
-> RBP: 0000000000000002 R08: 00007fffe931c476 R09: 00000000000000a0
-> R10: 0000000020000140 R11: 0000000000000246 R12: 00007fffe931c6ec
-> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
->  </TASK>
-> 
-> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: D. Wythe <alibuda@linux.alibaba.com>
-> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> Cc: Dust Li <dust.li@linux.alibaba.com>
-> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
-> ---
->  net/smc/af_smc.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 73a875573e7ad5b7a95f7941e33f0d784a91d16d..31b5d8c8c34085b73b011c913cfe032f025cd2e0 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -3319,10 +3319,8 @@ int smc_create_clcsk(struct net *net, struct sock *sk, int family)
->  
->  	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->  			      &smc->clcsock);
-> -	if (rc) {
-> -		sk_common_release(sk);
+On Wed, Jul 17, 2024 at 03:55:05PM -0500, Wei Huang wrote:
+> When "No ST mode" is enabled, endpoint devices can generate TPH headers
+> but with all steering tags treated as zero. A steering tag of zero is
+> interpreted as "using the default policy" by the root complex. This is
+> essential to quantify the benefit of steering tags for some given
+> workloads.
 
-Do we need to move this to __smc_create() ?
+Capitalize technical terms defined by spec.
 
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4656,6 +4656,7 @@
+>  		norid		[S390] ignore the RID field and force use of
+>  				one PCI domain per PCI function
+>  		notph		[PCIE] Do not use PCIe TPH
+> +		nostmode	[PCIE] Force TPH to use No ST Mode
 
-> +	if (rc)
+Needs a little more context here about what this means.  Users won't
+know where to even look for "No ST Mode" unless they have a copy of
+the spec.
+
+> +++ b/drivers/pci/pci-driver.c
+> @@ -324,8 +324,13 @@ static long local_pci_probe(void *_ddi)
+>  	pci_dev->driver = pci_drv;
+>  	rc = pci_drv->probe(pci_dev, ddi->id);
+>  	if (!rc) {
+> -		if (pci_tph_disabled())
+> +		if (pci_tph_disabled()) {
+>  			pcie_tph_disable(pci_dev);
+> +			return rc;
+> +		}
+> +
+> +		if (pci_tph_nostmode())
+> +			pcie_tph_set_nostmode(pci_dev);
+
+Same comment here; can we do this outside the probe() path somehow?
+
 >  		return rc;
-> -	}
+>  	}
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index 4cbfd5b53be8..8745ce1c4a9a 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -160,6 +160,9 @@ static bool pcie_ats_disabled;
+>  /* If set, the PCIe TPH capability will not be used. */
+>  static bool pcie_tph_disabled;
 >  
->  	/* smc_clcsock_release() does not wait smc->clcsock->sk's
->  	 * destruction;  its sk_state might not be TCP_CLOSE after
-> -- 
-> 2.45.2.1089.g2a221341d9-goog
-> 
+> +/* If TPH is enabled, "No ST Mode" will be enforced. */
+> +static bool pcie_tph_nostmode;
+> +
+>  /* If set, the PCI config space of each device is printed during boot. */
+>  bool pci_early_dump;
+>  
+> @@ -175,6 +178,12 @@ bool pci_tph_disabled(void)
+>  }
+>  EXPORT_SYMBOL_GPL(pci_tph_disabled);
+>  
+> +bool pci_tph_nostmode(void)
+> +{
+> +	return pcie_tph_nostmode;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_tph_nostmode);
+
+s/pci/pcie/
+
+Unexport unless it's useful for drivers.
+
+Bjorn
 
