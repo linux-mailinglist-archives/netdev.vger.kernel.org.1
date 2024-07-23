@@ -1,108 +1,184 @@
-Return-Path: <netdev+bounces-112635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1725E93A453
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:23:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 322CB93A463
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 18:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47AD61C228A6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:23:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0491C22C01
+	for <lists+netdev@lfdr.de>; Tue, 23 Jul 2024 16:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05566157A4F;
-	Tue, 23 Jul 2024 16:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD6F157A7C;
+	Tue, 23 Jul 2024 16:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xH9l3GUn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z+RgCbV1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAC5157485
-	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 16:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3B31586C4
+	for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 16:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721751803; cv=none; b=WcSsPUwnroE2tT8rmzQBzCkfwzf8qT3eqkHqtG6fs5uEmBI3ntOGBZMHMSwShQJc0/RTg2c4bL3k6dbJ1FmhN6Y7QxPYb2ZGJtfl8XLruR9IX2OS3I3PrevqD+IMyD1naiWbf+ZLJWWIWuMLRG1d6hip9xOOcs5FlX5FXzeY3no=
+	t=1721752118; cv=none; b=olWgr6YVw1zBA1Vb66RBWssXFaG1sCssPW5nNF/gtUAwJwT3Ug0ToTekc1GIvp5AihJgpqAiOaY+81ODQKyK/A8XGhr/GGaihbWxZKe99ap/HjsDUtYwmDkyXmUP0cTXFY94RwPFT2NGpBPz5YvEXDcLEpI8D4wKpeO9GTOqQU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721751803; c=relaxed/simple;
-	bh=kpdoFInWtlxJOZhj4dvrriq72u3LXp+9lO5P+qNMOiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pFIeYcvHmzTY8Da2pDZJlcydnlrxjwMSTDELCYyVa5gHGRKzKoJHrp3ORuSh8x/AcEBYtDfn7n3JjFbrS/4bTztNll3tejW8ruVIMWWkj09JIdJuKyHzFY3SpRNdAvo6sBDrKdcyO0wjpSJx0ZS5DnIkeWwMU5wzu0RehmzuNsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xH9l3GUn; arc=none smtp.client-ip=209.85.210.173
+	s=arc-20240116; t=1721752118; c=relaxed/simple;
+	bh=He47tfLB1rF0i2GRYw3kXwpAc+FksFIqOfeyxI2EVlo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bfmZ/jVmhnsKcDyRfYLb0vugA7FKbElXpFusC0hswJEv8RrEy+rAw+7D/D9vcQN1KN/5da5EmlQcfuZaOW7ocDTfkcczdQE9dyT9YKvwfvKrTK/woBa2wRIHx1T1LgwAafICD5tFVYY0ZeKtnieUffM5y5JUnt1n4LpzZdRYO5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z+RgCbV1; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-70d2b921c48so1589482b3a.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 09:23:22 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so18058a12.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 09:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721751802; x=1722356602; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kpdoFInWtlxJOZhj4dvrriq72u3LXp+9lO5P+qNMOiE=;
-        b=xH9l3GUneznNrMW5RRtyknN2C7j7LerJl4mO6zNpm/gucPAcNpxmbjnJKIt1JJLcXw
-         LbleDTHS7rFnxk0NjhpKUkGBd27UOBNs3a3xpbrn4/eY0YoRJve5CmXzK2AKL/Q0Gs1A
-         6Yu/GfRkKN9FDTmO2LBe1buSa6gsb30DYprIf2T8TZYgjlKLB7DEmZGidhHzUAMqOxxV
-         c23HUFsAl0xmelc4FDsIbqFIqs0qaRiWzDEiuiWRzkoxXvovFvUlcNJ8wRHCbTDPWPsy
-         R9p+2gJEyvml2zBm52hPkqzGVTJcg4X4x3b666hDb6AZRdbTVvif5HAPfdFYyD/ZGwv0
-         BfQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721751802; x=1722356602;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1721752115; x=1722356915; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kpdoFInWtlxJOZhj4dvrriq72u3LXp+9lO5P+qNMOiE=;
-        b=G3Ombkfv+4Aj2Ph5v3Q/l6S8r+5PdTyRMt3f/hfN/WDeKfXpblZA30uBEowi4Nyx5O
-         TjgDdjxK5s28DDhWcTYgIVQaFQLa8y9uaLMIA8Ap4ehy8j/i7imYiN+UxWWxuiLQFDrx
-         V2b9UokpeU7eosl9+zy8qK2+9ik1b83eoZGHU2+GbIi3uMy1aMVJwmZTIDo35kTJfq0K
-         VaI+bBQHbr1ZZ88TeYVtX/FIRHiT3hmgHtKZN1j+Ld4HZterpgxVCIDzvgHpElKAKtn6
-         ncmYsuL1RIgVb5YqXlBTfDqJ0wpdZe49VZ7MAzRm8qsKiSkEoHlm+A/Z4ChBUyQJj2vK
-         Ys3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUe9ICHpBi+dLI/1rZLOwjrC+ZHGC7P3yFu4dwEQyceJtB+B0Iwsfrdw1TTbCdNrMVt2nbEbTNP3b7BqASh6UiMLeS96rjd
-X-Gm-Message-State: AOJu0Yy2C3McjQwBNzaTOPvKCPYgHsoA6IWzCbXf9g5+gFeTA9lWNPyZ
-	tROpPHAcnPJgE3sYvX+sQpFRCiPvYDVMbktJgyOk6U1byfbi9UbmR7nF0i5ntLg8M6B0zAD4Fvl
-	uDg==
-X-Google-Smtp-Source: AGHT+IEdrmmQ8dNE+UQ2eMIJEKbNb4VqiKAa6r4PqkqL/DW9kEBfHxhsJ2G1DLsSdKXyLOcokzwKIA==
-X-Received: by 2002:a05:6a00:3a0c:b0:70a:fb91:66d7 with SMTP id d2e1a72fcca58-70e99701252mr348933b3a.20.1721751801320;
-        Tue, 23 Jul 2024 09:23:21 -0700 (PDT)
-Received: from google.com (120.153.125.34.bc.googleusercontent.com. [34.125.153.120])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70d1d998317sm4413838b3a.175.2024.07.23.09.23.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 09:23:20 -0700 (PDT)
-Date: Tue, 23 Jul 2024 16:23:15 +0000
-From: Mina Almasry <almasrymina@google.com>
-To: Tom Herbert <tom@herbertland.com>
-Cc: davem@davemloft.net, kuba@kernel.org, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, cai.huoqing@linux.dev,
-	netdev@vger.kernel.org, felipe@sipanda.io
-Subject: Re: [RFC net-next 01/10] skbuff: Rename csum_not_inet to
- csum_is_crc32
-Message-ID: <Zp_Y87B-0yp9Tl3w@google.com>
-References: <20240703224850.1226697-1-tom@herbertland.com>
- <20240703224850.1226697-2-tom@herbertland.com>
+        bh=NMIRP3kimguXBqf/5rQrdgsl/tCRIZsEZMFXHQamnCA=;
+        b=Z+RgCbV1t5vNTGWoix0hjkXijyy3Sj4GT+T0tlsjQmEBGlNMUizqSpukzle2iy7GAn
+         mHazN04NJM+XMjQIlqjKdPC/OCfv/qMH+t/pHhWBWDO/IgvctYt+OhA9wkCn628STBMX
+         fv0T/CaDjILSBvi+KkYOgkaKqfqhiMoU9XtPdQTCm9W2Uq5u09W1/iOx1MZk95srCo2Y
+         iCVnPrSUiFrnmEUUZxQtAebV4b+IXsQpKDXK6akoVTyZiiM6FFfgP2FcUbrChIUBvMKp
+         zsGPmCIAjqOEaFwdr9KoWd6SngddgT1yRyBUuB/LZT+460NtYyvdnfqr1aV0e1pBwL63
+         kwbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721752115; x=1722356915;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NMIRP3kimguXBqf/5rQrdgsl/tCRIZsEZMFXHQamnCA=;
+        b=J8RizMEfSqgqnFeEmlzGnoYiEhT2CHSUt7IkAm6G6y2DXTlEFF6oR2Nt73ggdn9MJz
+         HXs7Ne8CnibhwFN3WpU6faXFNbmvqybkIIuKECvq2sgCbo8mSQ6nznBSXIABHIaPAL/D
+         oltyKWsEWidfB7ioeVVgx3YU6PpXvuljujG10wmr7n8LMUasMblTWSwzWdJKN33MI4gv
+         oSxqzhebgvAD8xVA9ha7IvjZLSOhI6BTxj+mvdap6bxHz6X+LvD28Mkv6F0k9Oynsy78
+         VDBfFAAQgmL2LDK2NbCsGlQ1Ow6GbtxH1e79+Mz+e7uonbdA2/RY68yo7yOmIoo9jg+B
+         zN4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUHxQnfjaSJ7w9dotG4CEJYsWjS/qbUFx/7AZvKdc4PwVtco/vR9GeIXVngi8lHKE8rq5Rnb1UUm8Tx4xznFZ5CDNNuLyJ5
+X-Gm-Message-State: AOJu0YwFm32h77GRBg41MV6WKQzxEdPh8m0Q9KiLeDPGUFpgMFGWueNZ
+	aUE4SRx/FhnZXHdiUPvTk9JsocjLUgjKt4ErtDx41g+Dle1T9pZ7xyU1FAvgc2ykZYBz6d106b9
+	oJiY/4il4C3dRl4kDKSdRWOgGHTr3zUTkYmG0RkmA2IgrtIdhEg==
+X-Google-Smtp-Source: AGHT+IFmT7JsF0R6mLhx9LNISmcf9qtC92Z49jeTKEvaoa6HDFd6ep/JvUMgBlZzurxGS0LGP5YpQPGW0ekC5+pwWmA=
+X-Received: by 2002:a05:6402:35ca:b0:57d:32ff:73ef with SMTP id
+ 4fb4d7f45d1cf-5a456952e27mr623320a12.6.1721752114758; Tue, 23 Jul 2024
+ 09:28:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240703224850.1226697-2-tom@herbertland.com>
+References: <20240723135742.35102-1-kerneljasonxing@gmail.com>
+ <CANn89i+dYsvrVwWCRX=B1ZyL3nZUjnNtaQ5rfizDOV5XhHV2dQ@mail.gmail.com>
+ <CAL+tcoDZ2VDCd00ydv-RzMudq=d+jVukiDLgs7RpsJwvGqBp1Q@mail.gmail.com>
+ <CAL+tcoCC2g1iHA__vr8bbUX-kba2bBi2NbQNZnxOAMTJOQQAWg@mail.gmail.com>
+ <CANn89i+3c3fg1SYEpx02yCKHfBoZvYJt=wTqgZ77nCWzN0q-Wg@mail.gmail.com> <CAL+tcoB3iwsTTt8Bpc62Zc-CoyOGRrAdAjo26XqUvFnBoqXpTw@mail.gmail.com>
+In-Reply-To: <CAL+tcoB3iwsTTt8Bpc62Zc-CoyOGRrAdAjo26XqUvFnBoqXpTw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 23 Jul 2024 18:28:20 +0200
+Message-ID: <CANn89iLDQFbxrcYOvMq+eXkxuArgfnS+uG33dJZmhOGg+xWucQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] net: add an entry for CONFIG_NET_RX_BUSY_POLL
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 03, 2024 at 03:48:41PM -0700, Tom Herbert wrote:
-> csum_not_inet really refers to SCTP or FCOE CRC. Rename
-> to be more precise
+On Tue, Jul 23, 2024 at 6:01=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> Signed-off-by: Tom Herbert <tom@herbertland.com>
+> On Tue, Jul 23, 2024 at 11:26=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > On Tue, Jul 23, 2024 at 5:13=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > On Tue, Jul 23, 2024 at 11:09=E2=80=AFPM Jason Xing <kerneljasonxing@=
+gmail.com> wrote:
+> > > >
+> > > > On Tue, Jul 23, 2024 at 10:57=E2=80=AFPM Eric Dumazet <edumazet@goo=
+gle.com> wrote:
+> > > > >
+> > > > > On Tue, Jul 23, 2024 at 3:57=E2=80=AFPM Jason Xing <kerneljasonxi=
+ng@gmail.com> wrote:
+> > > > > >
+> > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > >
+> > > > > > When I was doing performance test on unix_poll(), I found out t=
+hat
+> > > > > > accessing sk->sk_ll_usec when calling sock_poll()->sk_can_busy_=
+loop()
+> > > > > > occupies too much time, which causes around 16% degradation. So=
+ I
+> > > > > > decided to turn off this config, which cannot be done apparentl=
+y
+> > > > > > before this patch.
+> > > > >
+> > > > > Too many CONFIG_ options, distros will enable it anyway.
+> > > > >
+> > > > > In my builds, offset of sk_ll_usec is 0xe8.
+> > > > >
+> > > > > Are you using some debug options or an old tree ?
+> > >
+> > > I forgot to say: I'm running the latest kernel which I pulled around
+> > > two hours ago. Whatever kind of configs with/without debug options I
+> > > use, I can still reproduce it.
+> >
+> > Ok, please post :
+> >
+> > pahole --hex -C sock vmlinux
+>
+> 1) Enable the config:
+> $ pahole --hex -C sock vmlinux
+> struct sock {
+>         struct sock_common         __sk_common;          /*     0  0x88 *=
+/
+>         /* --- cacheline 2 boundary (128 bytes) was 8 bytes ago --- */
+>         __u8
+> __cacheline_group_begin__sock_write_rx[0]; /*  0x88     0 */
+>         atomic_t                   sk_drops;             /*  0x88   0x4 *=
+/
+>         __s32                      sk_peek_off;          /*  0x8c   0x4 *=
+/
+>         struct sk_buff_head        sk_error_queue;       /*  0x90  0x18 *=
+/
+>         struct sk_buff_head        sk_receive_queue;     /*  0xa8  0x18 *=
+/
+>         /* --- cacheline 3 boundary (192 bytes) --- */
+>         struct {
+>                 atomic_t           rmem_alloc;           /*  0xc0   0x4 *=
+/
+>                 int                len;                  /*  0xc4   0x4 *=
+/
+>                 struct sk_buff *   head;                 /*  0xc8   0x8 *=
+/
+>                 struct sk_buff *   tail;                 /*  0xd0   0x8 *=
+/
+>         } sk_backlog;                                    /*  0xc0  0x18 *=
+/
+>         __u8
+> __cacheline_group_end__sock_write_rx[0]; /*  0xd8     0 */
+>         __u8
+> __cacheline_group_begin__sock_read_rx[0]; /*  0xd8     0 */
+>         struct dst_entry *         sk_rx_dst;            /*  0xd8   0x8 *=
+/
+>         int                        sk_rx_dst_ifindex;    /*  0xe0   0x4 *=
+/
+>         u32                        sk_rx_dst_cookie;     /*  0xe4   0x4 *=
+/
+>         unsigned int               sk_ll_usec;           /*  0xe8   0x4 *=
+/
 
-I checked that you haven't missed any instances of csum_not_inet unmodified.
+See here ? offset of sk_ll_usec is 0xe8, not 0x104 as you posted.
 
-The rename seems straightforward and unobjectionable given that the description
-of the csum_not_inet field said that it was a crc32 anway.
+Do not blindly trust perf here.
 
-The previous name also contained an awkward negation. Removing that seems like
-an improvement.
+Please run a benchmark with 1,000,000 af_unix messages being sent and recei=
+ved.
 
-FWIW,
-
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+I am guessing your patch makes no difference at all (certainly not 16
+% as claimed in your changelog)
 
