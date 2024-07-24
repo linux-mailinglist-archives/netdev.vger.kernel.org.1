@@ -1,238 +1,185 @@
-Return-Path: <netdev+bounces-112861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B4593B891
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 23:32:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B0893B897
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 23:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCFFF1F2200C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 21:32:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A9911F247EA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 21:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7283B139CF6;
-	Wed, 24 Jul 2024 21:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E35E13AD1C;
+	Wed, 24 Jul 2024 21:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G1P64xPd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zn/29rm1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A0C2AE6C;
-	Wed, 24 Jul 2024 21:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CE178C60
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 21:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721856746; cv=none; b=jnXmJKqOYDojScDZr1GxINLrROLRJ87iSHhz9tidY3juDbH/gFpwC8hFxU3WEUhnCVaFseXj5acTYscRPOd7P36XtiYysRdpFvZad8O1ZepHStbnk6OnGq07b4AenP6wjfwezpIafVKg1vFiDSZIidHKqhrQdFuvC2Bj9lwF3SU=
+	t=1721857005; cv=none; b=eu91yX1wqhvHAtZCV4BwFGYddCV0Zd7JlGLiW1GQdRdMplIkysuVkNDn1gCnUezU31WcJWBRtCphAoKWfeksnwbDIdS8lxDZU1tvQuNVsNyoIx9lQ2igDonfnbz/l/x+pfhKM5cm89HZu5iK9m4t+Kw4iip6rC1daQL0aO8YfuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721856746; c=relaxed/simple;
-	bh=+ceRbvkOAsiXk+0vxG/RnajAafcgaRWEjhFXGM+A8OQ=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UreRbXsIMCCjkEhbiYklmxVuJYVbQ13wxDzqTpCI0pC+0o7OChgrUfpeot9VmG0cJhgwQsIb1SNkhHbZVKahy0lXOoEjh3jxEqS9Iv/dBVKJAequRfe0e7m+yOsJoTTq6G7rBASos8XbGi3QRCJD9MCXrGOa1QgIicgMaxbFiZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G1P64xPd; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-64f4fd64773so3182397b3.0;
-        Wed, 24 Jul 2024 14:32:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721856743; x=1722461543; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gkBRhoPvjuzb7AB9u4D8EiiPMWnQNiwyXDpxcHy1w2U=;
-        b=G1P64xPdl/N85hUSvOvRggW4/tq7uCTzUjy/XF6z2PvriKFtyNLt1A6LCbu21vivWc
-         RjHqKehbRjFLzvB2QykPbyefF4xyx+8TdOZvP2PH2l1iMBsYxW1G+gRfTfiyDInsTY2K
-         soI+gnhSLeoa06g+LN8jNNRDReg8IDlrp2zMTkos6DA+zlNav/zfz2UySE5ork0HlDIv
-         Wm306zupqKj0Fg3oJWLmKQpEg9U0TrC67OOlkJWZn3TbNR+Ob0ojlAkKZfwy2X5h6/O5
-         MLtGSb6EyJANv94BMV5zPSkpSMWluiD9BeowigFGRwFLxYBB0wGi1uK3EXM8dnXUeAoM
-         Xkeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721856743; x=1722461543;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gkBRhoPvjuzb7AB9u4D8EiiPMWnQNiwyXDpxcHy1w2U=;
-        b=tTH9sq7PUHAXIHWo934tU/V3GIhJd04w6qzE7A73+qbLLstLYzf6SQ/ddlThbFWEwb
-         Sutblv8+Sdbyo7nme6VC4Yry73HgnEikXT9nJKFbsEQ4v6E3EK+fsAA5JVxHDsrgZE5W
-         ZDfXXEafL5QFZyIjc1BX/+5Z4nS8bLMcmP/gHOWETAeyx/B+fK6IHfjPrnRN6gNgL7tw
-         FSf/nNtJ5aIXZn13oMniE7d+yHTNvBdpKoXLsAuBLVs/6tm9Ay0V8kOnCPJUxZQ0CSiq
-         uG+p5T9ALEDOme+6zlV/2aH/VmMRjPvySHFMdcX5jPy0j3/sx8ezMBAiNcgN10bNgJeI
-         fRXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhG/THSQZA4FOKX3yvRGYGGfOXEBcXcp1SlxCjh20cR349DoyRiGM84vpy1ZsLwzH01pmHJBM6NfXSNPu6lf8/WSinnZP8
-X-Gm-Message-State: AOJu0YyQGidVgvT5hLHNI8lKmSDrZxV9d2wDQn0V/Qhl6iaYZnkLy/2I
-	iOJ1eVAS9mFYJwX21mfKDLG/7vgScEin8/5tMmix2C/bj8A23caE
-X-Google-Smtp-Source: AGHT+IHsG9cid3UIa2iQSmsvwOYgxNuZ9ZpoicAuwYcMFu9F6qhyGAPDsb3jX8kEpNCxMXz4f3KA4A==
-X-Received: by 2002:a81:8541:0:b0:61a:d30f:a9c4 with SMTP id 00721157ae682-67510736cf5mr9345347b3.8.1721856743552;
-        Wed, 24 Jul 2024 14:32:23 -0700 (PDT)
-Received: from debian ([50.205.20.42])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-67566dd9000sm389127b3.27.2024.07.24.14.32.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 14:32:23 -0700 (PDT)
-From: fan <nifan.cxl@gmail.com>
-X-Google-Original-From: fan <fan@debian>
-Date: Wed, 24 Jul 2024 14:32:21 -0700
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, martin.habets@xilinx.com,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, richard.hughes@amd.com,
-	Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v2 07/15] cxl: support type2 memdev creation
-Message-ID: <ZqFy5Qsg_uLncLRr@debian>
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
- <20240715172835.24757-8-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1721857005; c=relaxed/simple;
+	bh=A8yAgvkWWrp8ZCJvP4WVJ0gItCU4rZ/Ypb7eOyH7P4A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rk73nEUxmzbxZycE8ohyiVt9ekWPKQfH1it6pOeP6tZnZZ7zdbv8Lfm62m56DtFp8AmKHhmoe2NOwM1doo/uxDSXV6lZZpjMPEn/PW6SXXte0gdr6fcehKMt8DFDZmDs8W3gB+WJoOJVcdSolgcOUc34CTqL+mKmFpO+SrWpZtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zn/29rm1; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721857003; x=1753393003;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A8yAgvkWWrp8ZCJvP4WVJ0gItCU4rZ/Ypb7eOyH7P4A=;
+  b=Zn/29rm166igdHocrrVpjrdaiwdWuci5/jCQT9gwpSgnB4eCQZUmQoR9
+   FgI+m6Mp1iTtOZtBQkckGAPQZYjXtAnXQyKgXIDEK2V+Bg1jb8bWgbwMD
+   wcfmupNxatqEMhAFbQI4pmlA/4p86HJOfRk2TQiFjwFcTu0rhSSshbMdI
+   IPHBonYd9d37Z06V2TjjLyez92qDdu/DOQWgTk5xe1YUlyGpqF2AstcJx
+   TkCk2GN24kyKie46LKFvpKSVrNnmj7ixv+4s0Q4xMAX2tyX9mVjZu1rkS
+   y9h/5WkTqsfPhX8+ExCFWXxFqTAJHucq9qjtGQlHOq2VKUSfG3b7uZSky
+   w==;
+X-CSE-ConnectionGUID: 9fhLpdVCRSKhbSPe0FYcKQ==
+X-CSE-MsgGUID: STr8gSMrTZ2L2UAJNHxEnQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="19704038"
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="19704038"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 14:36:42 -0700
+X-CSE-ConnectionGUID: IAUDStSTTzKDfBZMtahL3w==
+X-CSE-MsgGUID: yIgbMm/+Swuo7UspD45aAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="52579487"
+Received: from bergbenj-mobl1.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.245.246.206])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 14:36:39 -0700
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	horms@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH iwl-next v4 00/13] ice: iavf: add support for TC U32 filters on VFs
+Date: Wed, 24 Jul 2024 15:36:09 -0600
+Message-ID: <20240724213623.324532-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240715172835.24757-8-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 15, 2024 at 06:28:27PM +0100, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Add memdev creation from sfc driver.
-> 
-> Current cxl core is relying on a CXL_DEVTYPE_CLASSMEM type device when
-> creating a memdev leading to problems when obtaining cxl_memdev_state
-> references from a CXL_DEVTYPE_DEVMEM type. This last device type is
-> managed by a specific vendor driver and does not need same sysfs files
-> since not userspace intervention is expected. This patch checks for the
-> right device type in those functions using cxl_memdev_state.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> ---
->  drivers/cxl/core/cdat.c            |  3 +++
->  drivers/cxl/core/memdev.c          |  9 +++++++++
->  drivers/cxl/mem.c                  | 17 +++++++++++------
->  drivers/net/ethernet/sfc/efx_cxl.c | 10 ++++++++--
->  include/linux/cxl_accel_mem.h      |  3 +++
->  5 files changed, 34 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/cxl/core/cdat.c b/drivers/cxl/core/cdat.c
-> index bb83867d9fec..0d4679c137d4 100644
-> --- a/drivers/cxl/core/cdat.c
-> +++ b/drivers/cxl/core/cdat.c
-> @@ -558,6 +558,9 @@ void cxl_region_perf_data_calculate(struct cxl_region *cxlr,
->  	};
->  	struct cxl_dpa_perf *perf;
->  
-> +	if (!mds)
-> +		return;
-> +
->  	switch (cxlr->mode) {
->  	case CXL_DECODER_RAM:
->  		perf = &mds->ram_perf;
-> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-> index 58a51e7fd37f..b902948b121f 100644
-> --- a/drivers/cxl/core/memdev.c
-> +++ b/drivers/cxl/core/memdev.c
-> @@ -468,6 +468,9 @@ static umode_t cxl_ram_visible(struct kobject *kobj, struct attribute *a, int n)
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_ram_qos_class.attr)
->  		if (mds->ram_perf.qos_class == CXL_QOS_CLASS_INVALID)
->  			return 0;
-> @@ -487,6 +490,9 @@ static umode_t cxl_pmem_visible(struct kobject *kobj, struct attribute *a, int n
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_pmem_qos_class.attr)
->  		if (mds->pmem_perf.qos_class == CXL_QOS_CLASS_INVALID)
->  			return 0;
-> @@ -507,6 +513,9 @@ static umode_t cxl_memdev_security_visible(struct kobject *kobj,
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_security_sanitize.attr &&
->  	    !test_bit(CXL_SEC_ENABLED_SANITIZE, mds->security.enabled_cmds))
->  		return 0;
-> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
-> index 2f1b49bfe162..f76af75a87b7 100644
-> --- a/drivers/cxl/mem.c
-> +++ b/drivers/cxl/mem.c
-> @@ -131,12 +131,14 @@ static int cxl_mem_probe(struct device *dev)
->  	dentry = cxl_debugfs_create_dir(dev_name(dev));
->  	debugfs_create_devm_seqfile(dev, "dpamem", dentry, cxl_mem_dpa_show);
->  
-> -	if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
-> -		debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
-> -				    &cxl_poison_inject_fops);
-> -	if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
-> -		debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
-> -				    &cxl_poison_clear_fops);
-> +	if (mds) {
-> +		if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
-> +			debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
-> +					    &cxl_poison_inject_fops);
-> +		if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
-> +			debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
-> +					    &cxl_poison_clear_fops);
-> +	}
->  
->  	rc = devm_add_action_or_reset(dev, remove_debugfs, dentry);
->  	if (rc)
-> @@ -222,6 +224,9 @@ static umode_t cxl_mem_visible(struct kobject *kobj, struct attribute *a, int n)
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_trigger_poison_list.attr)
->  		if (!test_bit(CXL_POISON_ENABLED_LIST,
->  			      mds->poison.enabled_cmds))
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index a84fe7992c53..0abe66490ef5 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -57,10 +57,16 @@ void efx_cxl_init(struct efx_nic *efx)
->  	if (cxl_accel_request_resource(cxl->cxlds, true))
->  		pci_info(pci_dev, "CXL accel resource request failed");
->  
-> -	if (!cxl_await_media_ready(cxl->cxlds))
-> +	if (!cxl_await_media_ready(cxl->cxlds)) {
->  		cxl_accel_set_media_ready(cxl->cxlds);
-> -	else
-> +	} else {
->  		pci_info(pci_dev, "CXL accel media not active");
-pci_warning() ??
-> +		return;
-> +	}
-> +
-> +	cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
-> +	if (IS_ERR(cxl->cxlmd))
-> +		pci_info(pci_dev, "CXL accel memdev creation failed");
-pci_err()
+The Intel® Ethernet 800 Series is designed with a pipeline that has
+an on-chip programmable capability called Dynamic Device Personalization
+(DDP). A DDP package is loaded by the driver during probe time. The DDP
+package programs functionality in both the parser and switching blocks in
+the pipeline, allowing dynamic support for new and existing protocols.
+Once the pipeline is configured, the driver can identify the protocol and
+apply any HW action in different stages, for example, direct packets to
+desired hardware queues (flow director), queue groups or drop.  
 
-Fan
->  }
->  
->  
-> diff --git a/include/linux/cxl_accel_mem.h b/include/linux/cxl_accel_mem.h
-> index b883c438a132..442ed9862292 100644
-> --- a/include/linux/cxl_accel_mem.h
-> +++ b/include/linux/cxl_accel_mem.h
-> @@ -26,4 +26,7 @@ int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
->  int cxl_accel_request_resource(struct cxl_dev_state *cxlds, bool is_ram);
->  void cxl_accel_set_media_ready(struct cxl_dev_state *cxlds);
->  int cxl_await_media_ready(struct cxl_dev_state *cxlds);
-> +
-> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
-> +				       struct cxl_dev_state *cxlds);
->  #endif
-> -- 
-> 2.17.1
-> 
+Patches 1-8 introduce a DDP package parser API that enables different
+pipeline stages in the driver to learn the HW parser capabilities from 
+the DDP package that is downloaded to HW. The parser library takes raw
+packet patterns and masks (in binary) indicating the packet protocol fields
+to be matched and generates the final HW profiles that can be applied at
+the required stage. With this API, raw flow filtering for FDIR or RSS
+could be done on new protocols or headers without any driver or Kernel
+updates (only need to update the DDP package). These patches were submitted
+before [1] but were not accepted mainly due to lack of a user.
+
+Patches 9-11 extend the virtchnl support to allow the VF to request raw
+flow director filters. Upon receiving the raw FDIR filter request, the PF
+driver allocates and runs a parser lib instance and generates the hardware
+profile definitions required to program the FDIR stage. These were also
+submitted before [2].
+
+Finally, patches 12 and 13 add TC U32 filter support to the iavf driver.
+Using the parser API, the ice driver runs the raw patterns sent by the
+user and then adds a new profile to the FDIR stage associated with the VF's
+VSI. Refer to examples in patch 13 commit message.
+
+[1]: Link: https://lore.kernel.org/netdev/20230904021455.3944605-1-junfeng.guo@intel.com/
+[2]: Link: https://lists.osuosl.org/pipermail/intel-wired-lan/Week-of-Mon-20230814/036333.html 
+
+---
+v4:
+  - Fix idx init value in ice_parser_create_table() (patch 2)
+  - Use non-fixed width types for iterators in ice_disable_fd_swap()
+    (patch 10)
+  - Do not cast return value of ice_parser_create_table() (*void) in all
+    callers (patch 2)
+  - Add kdoc short descriptions (patch 11)
+  - Add description to patch 12 message that a minor bug is also fixed
+    (access FDIR list out of spinlock protection)
+  - Document return values of iavf_add_cls_u32(), iavf_del_cls_u32() and
+    iavf_setup_tc_cls_u32() (patch 13) 
+
+v3:
+  - Remove header inclusion re-order in ice_vf_lib.c (patch 11).
+  - Fix couple of errors reported by smatch:
+      - https://lore.kernel.org/all/202407070634.aTz9Naa1-lkp@intel.com/
+      - https://lore.kernel.org/all/202406100753.38qaQzo9-lkp@intel.com/
+  - Add "Return:" description in kernel-docs for all new functions.
+  - Use new macro ICE_MI_GBDM_GENMASK_ULL for better readability (patch 2)
+  - Remove unnecessary casts in ice_parser.c and ice_parser_rt.c. 
+
+v2:
+  - No changes, just cc netdev
+
+Ahmed Zaki (2):
+  iavf: refactor add/del FDIR filters
+  iavf: add support for offloading tc U32 cls filters
+
+Junfeng Guo (11):
+  ice: add parser create and destroy skeleton
+  ice: parse and init various DDP parser sections
+  ice: add debugging functions for the parser sections
+  ice: add parser internal helper functions
+  ice: add parser execution main loop
+  ice: support turning on/off the parser's double vlan mode
+  ice: add UDP tunnels support to the parser
+  ice: add API for parser profile initialization
+  virtchnl: support raw packet in protocol header
+  ice: add method to disable FDIR SWAP option
+  ice: enable FDIR filters from raw binary patterns for VFs
+
+ drivers/net/ethernet/intel/iavf/iavf.h        |   30 +
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   59 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.c   |   89 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.h   |   13 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  154 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   25 +-
+ drivers/net/ethernet/intel/ice/Makefile       |    2 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |    1 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |   10 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   13 +
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |  101 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |    7 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     |  108 +-
+ drivers/net/ethernet/intel/ice/ice_flow.h     |    5 +
+ drivers/net/ethernet/intel/ice/ice_parser.c   | 2428 +++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h   |  540 ++++
+ .../net/ethernet/intel/ice/ice_parser_rt.c    |  862 ++++++
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |    4 +
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  403 ++-
+ include/linux/avf/virtchnl.h                  |   13 +-
+ 22 files changed, 4786 insertions(+), 90 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
+
+-- 
+2.43.0
+
 
