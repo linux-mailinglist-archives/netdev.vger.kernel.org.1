@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-112847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A6AE93B7FF
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:25:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50E9293B800
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E31D1F2134D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:25:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E330B21600
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B1516D9A6;
-	Wed, 24 Jul 2024 20:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555D116D9A9;
+	Wed, 24 Jul 2024 20:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NxXricwP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZNnPEYB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6B5316D4EB
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 20:25:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBB016D4D1
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 20:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721852746; cv=none; b=euUYRdIrAYYfCgVR2XLOwWoC9jmPuFkqHFTzkz15OXXu8IP+3vTUxzZ0UhBffg1Dhy9RvFpycJjIeAwB0ZcDUy2q9gmcLmt2JHPvkqbwuZHGaHSrQrKMt8d1LBnwxQh3rh/c1Y1ORIaLGWXOgOZ9oTEztlPspE7MhZI0/WUhTqQ=
+	t=1721852752; cv=none; b=PqMRgH8LCGVEBtXzXO8wbG3kJ5GT2isp5htIv9OC0MhiFai8kezQKhVETlibXs5GnfwQRvpq245kj6UYnPr7DMefN7Rko5jBqFz20aUiEgsKl9phDBAxvBw1SPG/WOm1HMn2432IeBj3aa+kyWtSIw+k/xxrTOi7hYxZozycqPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721852746; c=relaxed/simple;
-	bh=tSpSZMhOXoe95sZf/3QKYEavIF0nVCZ74BdhqIxYt1Y=;
+	s=arc-20240116; t=1721852752; c=relaxed/simple;
+	bh=unV8d9IVHtV3AOEZJ6RdrpXb8TPW5h5luWMRl0+Sl1Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ruHyxXzXvKEjbNM0U/GV7tHp87RLI5uu/Frv/dRvAPKt59dsd4f5zQuJ1k4KFGBZCWpuXDH9g0NpTtnQoZdt9qQOzOS8zAgfF4vRsB79oismXOVVsZlUerrXoBC6rK8zcxmPLWEhPER6p4E/EirLXxUcUzV85JgV6IIIMDoknFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NxXricwP; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=Jy5B01UOm9sQaQ8M+gax1AWYjo3OTeVHeIgfLY5hMuIwQBtqHd6Fae69f8hx6MS6JNd4Bo3QZku1wuGmCnyL1c16gMzN4+qchuFsjZTR7Zv8I9sMzynVgw27qhluFpdnJachmd0OtBv1VsG+HM2fphdaHQk+i51P0eZzMg3JlqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IZNnPEYB; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721852743;
+	s=mimecast20190719; t=1721852749;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8PmOZsPrictgXxDk26WLf+INcKSpSv7lBh+EbLrOY9g=;
-	b=NxXricwP+muCpGi8QLG4F/iWWLyL40atyrhLe13nYFvysTfFamZuQn/Tv1PYC2YpcCIJe9
-	MaezU9Yzl+juFlFaUCdTNIGoaYqnrH/ShoR+9EKmoliZ2mPwrRg5L3BOsteFh/sZQG5TUb
-	TnE/veUcTRjsg4soTbdF+fzU3+ICdMc=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=EzodqgvI69Ij87UV6jgBcab+oXlx4TFL9VjKogCtCfo=;
+	b=IZNnPEYB1E2IbaVzMqYFY95F1wfKhoK2Q/zXnOR7kYvNEtpYplWciztkLNwDlTuoBd8dC8
+	c2Y3JHtIlZuy6ZpaDFgDCKOEyVFQtlCLEilary1W6+jvY953hQ0EhN/k6pPyVSdQ0UrnrW
+	I3sbm+WcOjqiGn+oVHwcPdBtpAPL3JE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-173-JJQvUUL6NdqyNvM75CqTMA-1; Wed,
- 24 Jul 2024 16:25:40 -0400
-X-MC-Unique: JJQvUUL6NdqyNvM75CqTMA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-332-gB7PpQDFO5i67aUStT9O7A-1; Wed,
+ 24 Jul 2024 16:25:44 -0400
+X-MC-Unique: gB7PpQDFO5i67aUStT9O7A-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ADC281955D44;
-	Wed, 24 Jul 2024 20:25:37 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 124C61955D52;
+	Wed, 24 Jul 2024 20:25:43 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.6])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6C23A19560AE;
-	Wed, 24 Jul 2024 20:25:33 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1DD671955F6B;
+	Wed, 24 Jul 2024 20:25:37 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH RFC v2 04/11] net-shapers: implement NL group operation
-Date: Wed, 24 Jul 2024 22:24:50 +0200
-Message-ID: <bfa0800bed218c117f7a1bcea80e1ee7f43b486d.1721851988.git.pabeni@redhat.com>
+Subject: [PATCH RFC v2 05/11] netlink: spec: add shaper introspection support
+Date: Wed, 24 Jul 2024 22:24:51 +0200
+Message-ID: <c0dba0fc07eafbdc890cbe762bac969330725635.1721851988.git.pabeni@redhat.com>
 In-Reply-To: <cover.1721851988.git.pabeni@redhat.com>
 References: <cover.1721851988.git.pabeni@redhat.com>
 Precedence: bulk
@@ -80,316 +80,220 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Alllow grouping multiple inputs shaper under the given output's
-one.
-
-Try hard to pre-allocated the needed resources, to avoid non
-trivial H/W configuration rollbacks in case of any failure.
+Allow the user-space to fine-grain query the shaping features
+supported by the NIC on each domain.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- net/shaper/shaper.c | 265 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 264 insertions(+), 1 deletion(-)
+ Documentation/netlink/specs/shaper.yaml | 75 +++++++++++++++++++++++++
+ include/uapi/linux/net_shaper.h         | 17 ++++++
+ net/shaper/shaper.c                     | 11 ++++
+ net/shaper/shaper_nl_gen.c              | 25 +++++++++
+ net/shaper/shaper_nl_gen.h              |  3 +
+ 5 files changed, 131 insertions(+)
 
+diff --git a/Documentation/netlink/specs/shaper.yaml b/Documentation/netlink/specs/shaper.yaml
+index 7327f5596fdb..55bf4e49fb2f 100644
+--- a/Documentation/netlink/specs/shaper.yaml
++++ b/Documentation/netlink/specs/shaper.yaml
+@@ -169,6 +169,52 @@ attribute-sets:
+         name: priority
+       -
+         name: weight
++  -
++    name: capabilities
++    attributes:
++      -
++        name: ifindex
++        type: u32
++      -
++        name: scope
++        type: u32
++        enum: scope
++        doc: The scope to which the queried capabilities apply
++      -
++        name: support-metric-bps
++        type: flag
++        doc: the device accepts 'bps' metric for bw-min, bw-max and burst
++      -
++        name: support-metric-pps
++        type: flag
++        doc: the device accepts 'pps' metric for bw-min, bw-max and burst
++      -
++        name: support-nesting
++        type: flag
++        doc: |
++          the device supports nesting shaper belonging to this scope
++          below 'detached' scoped shapers. Only 'queue' and 'detached'
++          scope and flag 'support-nesting'.
++      -
++        name: support-bw-min
++        type: flag
++        doc: the device supports a minimum guaranteed bw
++      -
++        name: support-bw-max
++        type: flag
++        doc: the device supports maximum bw shaping
++      -
++        name: support-burst
++        type: flag
++        doc: the device supports a maximum burst size
++      -
++        name: support-priority
++        type: flag
++        doc: the device supports priority scheduling
++      -
++        name: support-weight
++        type: flag
++        doc: the device supports weighted round robin scheduling
+ 
+ operations:
+   list:
+@@ -260,3 +306,32 @@ operations:
+         reply:
+           attributes:
+             - handle
++
++    -
++      name: cap-get
++      doc: |
++        Get / Dump the shaper capabilities supported by the given device
++      attribute-set: capabilities
++
++      do:
++        request:
++          attributes:
++            - ifindex
++            - scope
++        reply:
++          attributes: &cap-attrs
++            - support-metric-bps
++            - support-metric-pps
++            - support-nesting
++            - support-bw-min
++            - support-bw-max
++            - support-burst
++            - support-priority
++            - support-weight
++
++      dump:
++        request:
++          attributes:
++            - ifindex
++        reply:
++          attributes: *cap-attrs
+diff --git a/include/uapi/linux/net_shaper.h b/include/uapi/linux/net_shaper.h
+index ab3d4eb0e1ab..12d16d30472e 100644
+--- a/include/uapi/linux/net_shaper.h
++++ b/include/uapi/linux/net_shaper.h
+@@ -61,11 +61,28 @@ enum {
+ 	NET_SHAPER_A_MAX = (__NET_SHAPER_A_MAX - 1)
+ };
+ 
++enum {
++	NET_SHAPER_A_CAPABILITIES_IFINDEX = 1,
++	NET_SHAPER_A_CAPABILITIES_SCOPE,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_METRIC_BPS,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_METRIC_PPS,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_NESTING,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_BW_MIN,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_BW_MAX,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_BURST,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_PRIORITY,
++	NET_SHAPER_A_CAPABILITIES_SUPPORT_WEIGHT,
++
++	__NET_SHAPER_A_CAPABILITIES_MAX,
++	NET_SHAPER_A_CAPABILITIES_MAX = (__NET_SHAPER_A_CAPABILITIES_MAX - 1)
++};
++
+ enum {
+ 	NET_SHAPER_CMD_GET = 1,
+ 	NET_SHAPER_CMD_SET,
+ 	NET_SHAPER_CMD_DELETE,
+ 	NET_SHAPER_CMD_GROUP,
++	NET_SHAPER_CMD_CAP_GET,
+ 
+ 	__NET_SHAPER_CMD_MAX,
+ 	NET_SHAPER_CMD_MAX = (__NET_SHAPER_CMD_MAX - 1)
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index 7802c9ba6d9c..d99d000d7e7a 100644
+index d99d000d7e7a..7b7e9a777929 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -48,6 +48,18 @@ static bool is_detached(u32 handle)
- 	return net_shaper_handle_scope(handle) == NET_SHAPER_SCOPE_DETACHED;
- }
- 
-+/* count the number of [multi] attributes of the given type */
-+static int attr_list_len(struct genl_info *info, int type)
-+{
-+	struct nlattr *attr;
-+	int rem, cnt = 0;
-+
-+	nla_for_each_attr_type(attr, type, genlmsg_data(info->genlhdr),
-+			       genlmsg_len(info->genlhdr), rem)
-+		cnt++;
-+	return cnt;
-+}
-+
- static int fill_handle(struct sk_buff *msg, u32 handle, u32 type,
- 		       const struct genl_info *info)
- {
-@@ -255,6 +267,27 @@ static void sc_commit(struct net_device *dev, int nr_shapers,
- 	xa_unlock(xa);
- }
- 
-+/* rollback all the tentative inserts from the shaper cache */
-+static void sc_rollback(struct net_device *dev)
-+{
-+	struct xarray *xa = __sc_container(dev);
-+	struct net_shaper_info *cur;
-+	unsigned long index;
-+
-+	if (!xa)
-+		return;
-+
-+	xa_lock(xa);
-+	xa_for_each_marked(xa, index, cur, XA_MARK_0) {
-+		if (is_detached(index))
-+			idr_remove(&dev->net_shaper_data->detached_ids,
-+				   net_shaper_handle_id(index));
-+		__xa_erase(xa, index);
-+		kfree(cur);
-+	}
-+	xa_unlock(xa);
-+}
-+
- static int parse_handle(const struct nlattr *attr, const struct genl_info *info,
- 			u32 *handle)
- {
-@@ -354,6 +387,36 @@ static int parse_shaper(struct net_device *dev, const struct nlattr *attr,
- 	return __parse_shaper(dev, tb, info, shaper);
- }
- 
-+/* alike parse_shaper(), but additionally allow the user specifying
-+ * the shaper's parent handle
-+ */
-+static int parse_output_shaper(struct net_device *dev,
-+			       const struct nlattr *attr,
-+			       const struct genl_info *info,
-+			       struct net_shaper_info *shaper)
-+{
-+	struct nlattr *tb[NET_SHAPER_A_PARENT + 1];
-+	int ret;
-+
-+	ret = nla_parse_nested(tb, NET_SHAPER_A_PARENT, attr,
-+			       net_shaper_ns_output_info_nl_policy,
-+			       info->extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = __parse_shaper(dev, tb, info, shaper);
-+	if (ret)
-+		return ret;
-+
-+	if (tb[NET_SHAPER_A_PARENT]) {
-+		ret = parse_handle(tb[NET_SHAPER_A_PARENT], info,
-+				   &shaper->parent);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
- int net_shaper_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct net_shaper_info *shaper;
-@@ -568,9 +631,209 @@ int net_shaper_nl_delete_doit(struct sk_buff *skb, struct genl_info *info)
+@@ -836,6 +836,17 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
  	return ret;
  }
  
-+/* Update the H/W and on success update the local cache, too */
-+static int net_shaper_group(struct net_device *dev, int nr_inputs,
-+			    struct net_shaper_info *inputs,
-+			    struct net_shaper_info *output,
-+			    struct netlink_ext_ack *extack)
++int net_shaper_nl_cap_get_doit(struct sk_buff *skb, struct genl_info *info)
 +{
-+	enum net_shaper_scope scope, output_scope, output_pscope;
-+	struct net_shaper_info *parent = NULL;
-+	int i, ret;
-+
-+	output_scope = net_shaper_handle_scope(output->handle);
-+	if (output_scope != NET_SHAPER_SCOPE_DETACHED &&
-+	    output_scope != NET_SHAPER_SCOPE_NETDEV) {
-+		NL_SET_ERR_MSG_FMT(extack, "Invalid scope %d for output shaper %x",
-+				   output_scope, output->handle);
-+		return -EINVAL;
-+	}
-+
-+	output_pscope = net_shaper_handle_scope(output->parent);
-+	if (output_scope == NET_SHAPER_SCOPE_DETACHED) {
-+		if (net_shaper_handle_id(output->handle) !=
-+		    NET_SHAPER_ID_UNSPEC && !sc_lookup(dev, output->handle)) {
-+			NL_SET_ERR_MSG_FMT(extack, "Output shaper %x does not exists",
-+					   output->handle);
-+			return -EINVAL;
-+		}
-+		if (output_pscope != NET_SHAPER_SCOPE_DETACHED &&
-+		    output_pscope != NET_SHAPER_SCOPE_NETDEV) {
-+			NL_SET_ERR_MSG_FMT(extack, "Invalid scope %d for output parent shaper %x",
-+					   output_pscope, output->parent);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	if (output_pscope == NET_SHAPER_SCOPE_DETACHED) {
-+		parent = sc_lookup(dev, output->parent);
-+		if (!parent) {
-+			NL_SET_ERR_MSG_FMT(extack, "Output parent shaper %x does not exists",
-+					   output->parent);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	/* for newly created detached scope shaper, the following will update the
-+	 * handle, due to id allocation
-+	 */
-+	ret = sc_prepare_insert(dev, &output->handle, extack);
-+	if (ret)
-+		goto rollback;
-+
-+	for (i = 0; i < nr_inputs; ++i) {
-+		scope = net_shaper_handle_scope(inputs[i].handle);
-+		if (scope != NET_SHAPER_SCOPE_QUEUE &&
-+		    scope != NET_SHAPER_SCOPE_DETACHED) {
-+			ret = -EINVAL;
-+			NL_SET_ERR_MSG_FMT(extack, "Invalid scope %d for input shaper %d handle %x",
-+					   scope, i, inputs[i].handle);
-+			goto rollback;
-+		}
-+		if (scope == NET_SHAPER_SCOPE_DETACHED &&
-+		    !sc_lookup(dev, inputs[i].handle)) {
-+			ret = -EINVAL;
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "Can't create detached shaper as input %d handle %x",
-+					   i, inputs[i].handle);
-+			goto rollback;
-+		}
-+
-+		ret = sc_prepare_insert(dev, &inputs[i].handle, extack);
-+		if (ret)
-+			goto rollback;
-+
-+		/* the inputs shapers will be nested to the output */
-+		if (inputs[i].parent != output->handle) {
-+			inputs[i].parent = output->handle;
-+			output->children++;
-+		}
-+	}
-+
-+	ret = dev->netdev_ops->net_shaper_ops->group(dev, nr_inputs,
-+						     inputs, output,
-+						     extack);
-+	if (ret < 0)
-+		goto rollback;
-+
-+	if (parent)
-+		parent->children++;
-+	sc_commit(dev, 1, output);
-+	sc_commit(dev, nr_inputs, inputs);
-+	return ret;
-+
-+rollback:
-+	sc_rollback(dev);
-+	return ret;
++	return 0;
 +}
 +
-+static int nla_handle_total_size(void)
++int net_shaper_nl_cap_get_dumpit(struct sk_buff *skb,
++				 struct netlink_callback *cb)
 +{
-+	return nla_total_size(nla_total_size(sizeof(u32)) +
-+			      nla_total_size(sizeof(u32)));
++	return 0;
 +}
 +
-+static int group_send_reply(struct genl_info *info, u32 handle, int id)
-+{
-+	struct nlattr *handle_attr;
-+	struct sk_buff *msg;
-+	int ret = -EMSGSIZE;
-+	void *hdr;
-+
-+/* prepare the msg reply in advance, to avoid device operation rollback */
-+	msg = genlmsg_new(nla_handle_total_size(), GFP_KERNEL);
-+	if (!msg)
-+		return ret;
-+
-+	hdr = genlmsg_iput(msg, info);
-+	if (!hdr)
-+		goto free_msg;
-+
-+	handle_attr = nla_nest_start(msg, NET_SHAPER_A_HANDLE);
-+	if (!handle_attr)
-+		goto free_msg;
-+
-+	if (nla_put_u32(msg, NET_SHAPER_A_SCOPE,
-+			net_shaper_handle_scope(handle)))
-+		goto free_msg;
-+
-+	if (nla_put_u32(msg, NET_SHAPER_A_ID, id))
-+		goto free_msg;
-+
-+	nla_nest_end(msg, handle_attr);
-+	genlmsg_end(msg, hdr);
-+
-+	ret =  genlmsg_reply(msg, info);
-+	if (ret)
-+		goto free_msg;
-+
-+	return ret;
-+
-+free_msg:
-+	nlmsg_free(msg);
-+	return ret;
-+}
-+
- int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
- {
--	return -EOPNOTSUPP;
-+	struct net_shaper_info *inputs, output;
-+	int i, ret, rem, nr_inputs;
-+	struct net_device *dev;
-+	struct nlattr *attr;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, NET_SHAPER_A_INPUTS) ||
-+	    GENL_REQ_ATTR_CHECK(info, NET_SHAPER_A_OUTPUT))
-+		return -EINVAL;
-+
-+	ret = fetch_dev(info, &dev);
-+	if (ret)
-+		return ret;
-+
-+	nr_inputs = attr_list_len(info, NET_SHAPER_A_INPUTS);
-+	inputs = kcalloc(nr_inputs, sizeof(struct net_shaper_info), GFP_KERNEL);
-+	if (!inputs) {
-+		GENL_SET_ERR_MSG_FMT(info, "Can't allocate memory for %d input shapers",
-+				     nr_inputs);
-+		ret = -ENOMEM;
-+		goto put;
-+	}
-+
-+	ret = parse_output_shaper(dev, info->attrs[NET_SHAPER_A_OUTPUT], info,
-+				  &output);
-+	if (ret)
-+		goto free_shapers;
-+
-+	i = 0;
-+	nla_for_each_attr_type(attr, NET_SHAPER_A_INPUTS,
-+			       genlmsg_data(info->genlhdr),
-+			       genlmsg_len(info->genlhdr), rem) {
-+		if (WARN_ON_ONCE(i >= nr_inputs))
-+			goto free_shapers;
-+
-+		ret = parse_shaper(dev, attr, info, &inputs[i++]);
-+		if (ret)
-+			goto free_shapers;
-+	}
-+
-+	ret = net_shaper_group(dev, nr_inputs, inputs, &output, info->extack);
-+	if (ret < 0)
-+		goto free_shapers;
-+
-+	ret = group_send_reply(info, output.handle, ret);
-+	if (ret) {
-+		/* Error on reply is not fatal to avoid rollback a successful
-+		 * configuration
-+		 */
-+		GENL_SET_ERR_MSG_FMT(info, "Can't send reply %d", ret);
-+		ret = 0;
-+	}
-+
-+free_shapers:
-+	kfree(inputs);
-+
-+put:
-+	dev_put(dev);
-+	return ret;
- }
- 
  void dev_shaper_flush(struct net_device *dev)
+ {
+ 	struct xarray *xa = __sc_container(dev);
+diff --git a/net/shaper/shaper_nl_gen.c b/net/shaper/shaper_nl_gen.c
+index b444d1ff55a1..cc98d58c0862 100644
+--- a/net/shaper/shaper_nl_gen.c
++++ b/net/shaper/shaper_nl_gen.c
+@@ -67,6 +67,17 @@ static const struct nla_policy net_shaper_group_nl_policy[NET_SHAPER_A_OUTPUT +
+ 	[NET_SHAPER_A_OUTPUT] = NLA_POLICY_NESTED(net_shaper_ns_output_info_nl_policy),
+ };
+ 
++/* NET_SHAPER_CMD_CAP_GET - do */
++static const struct nla_policy net_shaper_cap_get_do_nl_policy[NET_SHAPER_A_CAPABILITIES_SCOPE + 1] = {
++	[NET_SHAPER_A_CAPABILITIES_IFINDEX] = { .type = NLA_U32, },
++	[NET_SHAPER_A_CAPABILITIES_SCOPE] = NLA_POLICY_MAX(NLA_U32, 4),
++};
++
++/* NET_SHAPER_CMD_CAP_GET - dump */
++static const struct nla_policy net_shaper_cap_get_dump_nl_policy[NET_SHAPER_A_CAPABILITIES_IFINDEX + 1] = {
++	[NET_SHAPER_A_CAPABILITIES_IFINDEX] = { .type = NLA_U32, },
++};
++
+ /* Ops table for net_shaper */
+ static const struct genl_split_ops net_shaper_nl_ops[] = {
+ 	{
+@@ -104,6 +115,20 @@ static const struct genl_split_ops net_shaper_nl_ops[] = {
+ 		.maxattr	= NET_SHAPER_A_OUTPUT,
+ 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+ 	},
++	{
++		.cmd		= NET_SHAPER_CMD_CAP_GET,
++		.doit		= net_shaper_nl_cap_get_doit,
++		.policy		= net_shaper_cap_get_do_nl_policy,
++		.maxattr	= NET_SHAPER_A_CAPABILITIES_SCOPE,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= NET_SHAPER_CMD_CAP_GET,
++		.dumpit		= net_shaper_nl_cap_get_dumpit,
++		.policy		= net_shaper_cap_get_dump_nl_policy,
++		.maxattr	= NET_SHAPER_A_CAPABILITIES_IFINDEX,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
+ };
+ 
+ struct genl_family net_shaper_nl_family __ro_after_init = {
+diff --git a/net/shaper/shaper_nl_gen.h b/net/shaper/shaper_nl_gen.h
+index 00cee4efd21e..97fbd4502364 100644
+--- a/net/shaper/shaper_nl_gen.h
++++ b/net/shaper/shaper_nl_gen.h
+@@ -21,6 +21,9 @@ int net_shaper_nl_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ int net_shaper_nl_set_doit(struct sk_buff *skb, struct genl_info *info);
+ int net_shaper_nl_delete_doit(struct sk_buff *skb, struct genl_info *info);
+ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info);
++int net_shaper_nl_cap_get_doit(struct sk_buff *skb, struct genl_info *info);
++int net_shaper_nl_cap_get_dumpit(struct sk_buff *skb,
++				 struct netlink_callback *cb);
+ 
+ extern struct genl_family net_shaper_nl_family;
+ 
 -- 
 2.45.2
 
