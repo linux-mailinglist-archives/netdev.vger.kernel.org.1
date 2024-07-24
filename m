@@ -1,119 +1,162 @@
-Return-Path: <netdev+bounces-112704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5702793AA7D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:16:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465B193AA82
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14891281A0D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:16:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53FE1F21101
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFAA4A00;
-	Wed, 24 Jul 2024 01:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684D85672;
+	Wed, 24 Jul 2024 01:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpAhEJ2E"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C393E23B1;
-	Wed, 24 Jul 2024 01:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30474C9A;
+	Wed, 24 Jul 2024 01:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721783788; cv=none; b=j3QNzPEfNKdLkUDPsXrHdMO8xu8m/1fre49NTOCmdmX9cO7pRK/Q6bd76iMv1HO94W89sAvCQGS9iX0stbMdszVX9dLIjREGF+cCSqoRuZWyGf2KBBfakVzNpDVqifotMSwy9i1aF23TDBPOQawubLEeq1HlrZIIdN+fZSD3dJc=
+	t=1721783874; cv=none; b=QS0ntqcplScMAbzXdf01lXU8o6cD46WpnBIu/65Brxq/tBiqpOKbsGzvRCdmrtKIl5WWZwuCRqY3zV8Xtc5gMxZUcQpAtmFziuh+qUD9Kw/FgFrj3iLIbsdSC+KpLfGwl4bdBwnL+gBRufzyUDrN7zHt6blwro5f/D2woeZHzOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721783788; c=relaxed/simple;
-	bh=NF40QjUIzoD6FOsKo0ZbfmOJMF5vcyagGqDfrmVwfJk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a/TgNJuw6vknlKcVJrVIom9v797ysIDEFFM44s6fonKbNLBbsInWYh1VFHKtDjgtC0uPcMcFj9iNAaz/mq/2TvWwncET2SmVIiw2J39XQ6OvnGnpkJnw29ux8QwKl7XKMjGvF4lsoxHqn2iNgAGxfM5vTXGd4PcnIKa2xsILHII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-01 (Coremail) with SMTP id qwCowAB3fUnMVaBmBtutAA--.40410S2;
-	Wed, 24 Jul 2024 09:16:05 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	make24@iscas.ac.cn,
-	liujunliang_ljl@163.com
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net] net: usb: sr9700: fix uninitialized variable use in sr_mdio_read
-Date: Wed, 24 Jul 2024 09:15:54 +0800
-Message-Id: <20240724011554.1445989-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1721783874; c=relaxed/simple;
+	bh=KkecNZKY3nbMCSSkETEzc/mfnZaV7kZfSSY4gRjGJRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W1LcztLkmhY23pMAsMc6l0UaTl4Dsn03mxvy4J9RDXzRx+rt4DooUHl0+So9H3lqu5hwipRb0c1/uym1lDdppumJI5Mu3Do/GnH4Nwzv50AVsDASKgjJuKSzEEEMaYaoJA68TRnN4WeZfH2BjzcXYX7uSRdqVL69Jlee+/rDZLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpAhEJ2E; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4266b1f1b21so45932005e9.1;
+        Tue, 23 Jul 2024 18:17:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721783871; x=1722388671; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rpc/2SwkiTZTr0tB2COZXlj9ID1K7BEkSuF6F5pqIeU=;
+        b=MpAhEJ2EKPqPplis5PuUfb5x05eTQUTy3ORtPhj7SkC8z0jpy3NWHLMclbKHDzZOB8
+         M0ejq/22FdJLrkJGzPCvs9AqAU2lvb0deYyWjgMnL+RKY3zgIAA3zZQvddE70YbxS0zt
+         5DKHKDnU0f+tZrQQmR8kQfxiMbLCiOcytZkVp3nrfXVlzkNhtIX/yoxHtJR//U6Dh7eR
+         e9Gr6v4VWuNeP+WTY1W6gLu8exUPGz86YeQeREUw6GsXzs+1lmrnpe9p7DltAMinT+PR
+         7485hcafXm7WWCpQWd1WhypiNH8CYl3KddNXGNqb9txPfrJx6SSvDA11pspRs09SqvQC
+         WX2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721783871; x=1722388671;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rpc/2SwkiTZTr0tB2COZXlj9ID1K7BEkSuF6F5pqIeU=;
+        b=kW7KkgUJWUQfMpZVjHZ/C980/c+R/Fl0XvTLVzOu5Qs2ZvkRajeCy/yJ896F/xsFAb
+         FL+UMI0cHJQ5U7I1Ky46xgQwNbn4nfnrk8prAAxO3td0IbUC/bd0lsTHg+mNWfyOJNUX
+         FRdhAx9RnZsv8/PWn+Ud6hoZs8GoID9MFJGMCBHBgOvtHc2LSIJmksqJ3TGlXh7QUPuH
+         vs4AbQHp8HK83DKkHouZHq9ofdbnSWN8noOf37n0VRd68oA8VqlhA9Ka62xmaIwYZfPF
+         xMeY09GNHzOVo0UdkacaDri3ULWh1CSX3QMNxGOv5cy0UA3ZvgfEWNbU6Uzkrp3zByYK
+         bpzw==
+X-Forwarded-Encrypted: i=1; AJvYcCWNir4Bt3UrU16JbOC+j7DWSeWvBUGDmxYZUCZIjzktAZtpCFLfgwQ4/kBsYCDe5Y4X96SQTqxe3SKSKPqvakJ7E2Up7C6hQZEOs/nEuvVyusr67/9jqmDO8jejtoZ+RpxkUnRbLWEdUTIIgegXjM8T6kaKCSFYTq05HMZxbfHKuWbA
+X-Gm-Message-State: AOJu0YzOy0PC+Li7H2SOa3VFxWesUs+IgIse5ZS5isRPMvtuK1MiwaeI
+	3qB23FsFHG8KAkJ3/6RpNN8XqxyphDZFi3+xrLp/RMCOInTiKN6AgQBZDvTIRhi+67OXpb4jXBS
+	yZ3gSInKVbbJSG0rsr8hHI+QtoHA=
+X-Google-Smtp-Source: AGHT+IHy0gPavcCN7w+YuH/0mLjZRQm5fwtPN9TUK6LYu1xWYik/PO4O2Ozh9BgSdVar1Jki8LWGHqUKAwwdc8vHvaQ=
+X-Received: by 2002:a05:600c:5487:b0:427:9dad:8063 with SMTP id
+ 5b1f17b1804b1-427dc51d315mr64923375e9.12.1721783870879; Tue, 23 Jul 2024
+ 18:17:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAB3fUnMVaBmBtutAA--.40410S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF15XFyrCr4kZr4DuF45Jrb_yoW8GF48pr
-	4fWa9YyrWUJa47Z3ykXws7W3WFkwsYgFy3GFW8Gw1fZrZ5JFn5C34FgFyjgw1UGrZ8Jay2
-	va1qyFWfXa1YvaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8JV
-	W8Jr1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUQvtAUUUUU=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+References: <20240719110059.797546-1-xukuohai@huaweicloud.com>
+ <20240719110059.797546-6-xukuohai@huaweicloud.com> <a5afdfca337a59bfe8f730a59ea40cd48d9a3d6b.camel@gmail.com>
+ <wjvdnep2od4kf3f7fiteh73s4gnktcfsii4lbb2ztvudexiyqw@hxqowhgokxf3>
+ <0e46dcf652ff0b1168fc82e491c3d20eae18b21d.camel@gmail.com>
+ <CAADnVQJ2bE0cAp8DNh1m6VqphNvWLkq8p=gwyPbbcdopaKcCCA@mail.gmail.com>
+ <2k3v5ywz5hgwc2istobhath7i76azg5yqvbgfgzfvqvyd72zv5@4g3synjlqha4> <cgarsuloniffcqn5zjjomhmm5xd72t4cdiwavjqnvmgqfuc7dd@2itjdtwcq7gk>
+In-Reply-To: <cgarsuloniffcqn5zjjomhmm5xd72t4cdiwavjqnvmgqfuc7dd@2itjdtwcq7gk>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 23 Jul 2024 18:17:39 -0700
+Message-ID: <CAADnVQLZ+fDDR9cFSD8QZghXP6nEmmPP23YWd5-ysA1sZ9ZsGA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 5/9] bpf, verifier: improve signed ranges
+ inference for BPF_AND
+To: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, Xu Kuohai <xukuohai@huaweicloud.com>, 
+	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	LSM List <linux-security-module@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Roberto Sassu <roberto.sassu@huawei.com>, Matt Bobrowski <mattbobrowski@google.com>, 
+	Yafang Shao <laoar.shao@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>, 
+	"Jose E . Marchesi" <jose.marchesi@oracle.com>, James Morris <jamorris@linux.microsoft.com>, 
+	Kees Cook <kees@kernel.org>, Brendan Jackman <jackmanb@google.com>, 
+	Florent Revest <revest@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-It could lead to error happen because the variable res is not updated if
-the call to sr_share_read_word returns an error. In this particular case
-error code was returned and res stayed uninitialized.
+On Tue, Jul 23, 2024 at 12:07=E2=80=AFAM Shung-Hsi Yu <shung-hsi.yu@suse.co=
+m> wrote:
+>
+> On Tue, Jul 23, 2024 at 02:36:18PM GMT, Shung-Hsi Yu wrote:
+> [...]
+> > > +1
+> > > Pls document the logic in the code.
+> > > commit log is good, but good chunk of it probably should be copied
+> > > as a comment.
+> > >
+> > > I've applied the rest of the patches and removed 'test 3' selftest.
+> > > Pls respin this patch and a test.
+> > > More than one test would be nice too.
+> >
+> > Ack. Will send send another series that:
+> >
+> > 1. update current patch
+> >   - add code comment explanation how signed ranges are deduced in
+> >     scalar*_min_max_and()
+> >   - revert 229d6db14942 "selftests/bpf: Workaround strict bpf_lsm retur=
+n
+> >     value check."
+> > 2. reintroduce Xu Kuohai's "test 3" into verifier_lsm.c
+> > 3. add a few tests for BPF_AND's signed range deduction
+> >    - should it be added to verifier_bounds*.c or verifier_and.c?
+> >
+> >      I think former, because if we later add signed range deduction for
+> >      BPF_OR as well...
+>
+> I was curious whether there would be imminent need for signed range
+> deduction for BPF_OR, though looks like there is _not_.
+>
+> Looking at DAGCombiner::SimplifySelectCC() it does not do the
+> bitwise-OR variant of what we've encountered[1,2], that is
+>
+>     fold (select_cc seteq (and x, y), 0, A, -1) -> (or (sra (shl x)) A)
+>
+> In other words, transforming the following theoretial C code that
+> returns -EACCES when certain bit is unset, and -1 when certain bit is
+> set
+>
+>     if (fmode & FMODE_WRITE)
+>         return -1;
+>
+>     return -EACCESS;
+>
+> into the following instructions
+>
+>     r0  <<=3D 62
+>     r0 s>>=3D 63 /* set =3D> r0 =3D -1, unset =3D> r0 =3D 0 */
+>     r0  |=3D -13 /* set =3D> r0 =3D (-1 | -13) =3D -1, unset =3D> r0 =3D =
+(0 | -13) =3D -13 =3D -EACCESS */
+>         exit       /* returns either -1 or -EACCESS */
+>
+> So signed ranged deduction with BPF_OR is probably just a nice-to-have
+> for now.
 
-This can be avoided by checking the return value of sr_share_read_word
-and propagating the error if the read operation failed.
+Yeah. Let's not complicate the verifier until really necessary.
 
-Found by code review.
-
-Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
-Changes in v2:
-- modified the subject as suggestions.
----
- drivers/net/usb/sr9700.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 0a662e42ed96..d5bc596f4521 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -179,6 +179,7 @@ static int sr_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 	struct usbnet *dev = netdev_priv(netdev);
- 	__le16 res;
- 	int rc = 0;
-+	int err;
- 
- 	if (phy_id) {
- 		netdev_dbg(netdev, "Only internal phy supported\n");
-@@ -193,7 +194,10 @@ static int sr_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 		if (value & NSR_LINKST)
- 			rc = 1;
- 	}
--	sr_share_read_word(dev, 1, loc, &res);
-+	err = sr_share_read_word(dev, 1, loc, &res);
-+	if (err < 0)
-+		return err;
-+
- 	if (rc == 1)
- 		res = le16_to_cpu(res) | BMSR_LSTATUS;
- 	else
--- 
-2.25.1
-
+But I wonder whether we should override shouldFoldSelectWithSingleBitTest()
+in the backend to suppress this optimization.
+I guess not, since removal of a branch is a good thing.
 
