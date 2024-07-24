@@ -1,178 +1,222 @@
-Return-Path: <netdev+bounces-112780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA1F93B2BF
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:35:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FFCB93B2D9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD6862852CB
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:35:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE1F5282A23
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B9615A86E;
-	Wed, 24 Jul 2024 14:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32A315ADB1;
+	Wed, 24 Jul 2024 14:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JLBLDXuU"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="uavkczRl";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="vYV9t0cp";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="uavkczRl";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="vYV9t0cp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17C515A858
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 14:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C6215884F;
+	Wed, 24 Jul 2024 14:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721831701; cv=none; b=WWg3mEEwYlSxE/XSjKm6TcjR8n8N8orkasVM6v6etRZMOgWuWoxyf6nXXxQdYvsShMOVA+mQ31P4XENlJT996VcdRECJKi1ejOWXzpM+G9CR4eAoix3e/n5+VJMD4jhh9nvQ2otuhznG+SB5K84YPEyRvMfTMekesoNEt8Cx00I=
+	t=1721832045; cv=none; b=iQtJEoclCV/tau5tcit4vwOG6deRrnSd2L1M/GuglGpezliN/ROKVkUxLKn7jjMdYLIuVAsAh+BHVk7lW1K7ZQwZ8qIHwZsyC0vcu0kAJd1R3BG0PVanAhjMHrg4YoExKHJ7+VAbTIjPiWqtuAyr3J5WVtxiz0y3jVYb4zIkb1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721831701; c=relaxed/simple;
-	bh=HSwQeQKexnGgqVLaYYN251oliUuwb76BW3cdQCAHRbk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DhL6JccGgGqjv347Xc0Wo5P3Hv7utsVUPjYIlfmwOEicXwRCC7B5/JyCs6U+JOhDmbA43mvSUt7g2zFCITXKAnPL3uzYt8ZH5ilbYtmkl2w7niY8uvPyCFtogqIp6lAYmb66+nPMepokmrJtL+ScPRJb/ZfZY9MIPBe0lqPDPas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JLBLDXuU; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e08904584edso7458057276.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 07:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721831699; x=1722436499; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JeMGXcX1cegB/do4cg9zm1gyDlQ+HaTTsOgplmebNZ0=;
-        b=JLBLDXuUW6c2GkB1KRgsoOlbLj9Cwy9HfnCoZsjVmsw2l/FqNC+Sdb0zpd3sp+pAXf
-         UMDkM/KUlJ4pxpK2aqo17p+kqTt/cgh1RoUHg50UwVfPp+x569owOjwU+ppJYo8VhDag
-         rWkvkaTDdAguncTW4Zyyrv42ojQXAJ70lq7JY4Fr6lNthYCzt/4IqKX5BCuPPTaUZy7M
-         vaYOAikyTtsg0ZwA83sdKt2nUm5J+ece8AhGZoRWAds5oYPH9dwLLbY8Uk7ezprBOvBm
-         x1le996CQeTS0OfL6xcnIzo9d6fX4ToV8c8gTf+j9GPxO9A8cTkJ4xd78WWOgJJrg94i
-         lFgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721831699; x=1722436499;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JeMGXcX1cegB/do4cg9zm1gyDlQ+HaTTsOgplmebNZ0=;
-        b=C6EL4NYEaDqss6tVSAnHiBP9Mb8RHV6ZcYTmhjxp7qtNBDtisfIob/4DoOruQkTyrf
-         6f50bHG+qn+W4JiTrD+xTfEEgEuKk1LEsJqsF2DZQBEyzvKHGbQyYuHrfe1O4AhWqxjy
-         VnB/0lPIcTCAMZH3FikICITb7vkJlcM9Kj8HPFM+1Ic/rPR9to1+td5PjPnpl/E2wm8P
-         +u9v62BfFxNNh0hawPIaZ8cN2R6JzY+fW0hght2zbd65I5KqrJ37UmktUo3UJWK9+46l
-         U4L375VLpJUyAO0aCyKSCIZ5Byx4Ii7+4a0aTea5mR7IyPUSrJJ1l2nbSSpM0PZ26IcR
-         DZHQ==
-X-Gm-Message-State: AOJu0YwAq8rcSy3ebswNeuvnWZYfTlaylzqnX44yo1f/CIKIawa/aaAt
-	/zMBW4+LznQL+AKC00xrC4mf1SM8HOH7ndpsUcIWyyp/492n6uIo7pdORMGJDJs8gDr+sAJbLfC
-	F1N+WzZ4Gp/+bHf1Wdz+EoG7uyVQkmsyeYBkx3YxIiL09r1dDd0uLc0zoYhpkMeKbZi7zvYLKt4
-	bII82R++gOFp/lN/k+03z+MiKTIvu7Hp3/UfsnSE1h/Aimh1W7safHm6W3j/XHwfLs
-X-Google-Smtp-Source: AGHT+IEZuyeGwGKdUoIRK4zF9Zbp4w/oa6ZeROlRlWRSwH9jVrHULIW502Jr9RftRka06FDyoDllerEv4wcOmgjiUTI=
-X-Received: from pkaligineedi.sea.corp.google.com ([2620:15c:11c:202:8273:a55:a06b:2955])
- (user=pkaligineedi job=sendgmr) by 2002:a25:820d:0:b0:e05:f2fc:9a37 with SMTP
- id 3f1490d57ef6-e0b0e3b90aemr3769276.6.1721831698504; Wed, 24 Jul 2024
- 07:34:58 -0700 (PDT)
-Date: Wed, 24 Jul 2024 07:34:31 -0700
+	s=arc-20240116; t=1721832045; c=relaxed/simple;
+	bh=Tyv11+StWRcTJYiBlpVVwI64X4RXvYmIxnRwH2GK1sQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=leE2CL8onzCnu8KLi4IHJUrzXmLt9ChDRKszHfAGOXgD9m+MDKO3VxF05DikOjXKSycPZ5u9ghmNBn4YhLQdeanwL+jx36ERSlkQrcE2VZ/Mb+YZ5CyrkFHEpF5whVPjAcHCeQlBDb5xvoteCoGza1tScmKB1NXMR3IZU6m44Pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=uavkczRl; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=vYV9t0cp; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=uavkczRl; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=vYV9t0cp; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 64F991F7A8;
+	Wed, 24 Jul 2024 14:40:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1721832042; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=K2oU6KeNMEKKrmlqYMEEXIL0CAP2uyQ2NxyjtiwdL5s=;
+	b=uavkczRlmYpLPla5thNBXjNOtQrfeZmoLODNnhDoNwt1YT4O7KRINMVR3uU/OdYyzoGAIQ
+	9FmDa6uZAeR/rN8CrdzkDvIJOSiQ6Eg3psRzaw8nQ5NO+0ahoOCTXJ/b807SlT8+0x58L+
+	8NGOxKujsAuumRKkCg0UqP8EKl/44DA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1721832042;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=K2oU6KeNMEKKrmlqYMEEXIL0CAP2uyQ2NxyjtiwdL5s=;
+	b=vYV9t0cpsRrzF4ou/Se02S5+p69GDo3m/rLsX9R3uumUu3wcnC2k2lDLWKnPuNqlVQyM+C
+	r87DOnRYRQ9N6OBw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1721832042; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=K2oU6KeNMEKKrmlqYMEEXIL0CAP2uyQ2NxyjtiwdL5s=;
+	b=uavkczRlmYpLPla5thNBXjNOtQrfeZmoLODNnhDoNwt1YT4O7KRINMVR3uU/OdYyzoGAIQ
+	9FmDa6uZAeR/rN8CrdzkDvIJOSiQ6Eg3psRzaw8nQ5NO+0ahoOCTXJ/b807SlT8+0x58L+
+	8NGOxKujsAuumRKkCg0UqP8EKl/44DA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1721832042;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=K2oU6KeNMEKKrmlqYMEEXIL0CAP2uyQ2NxyjtiwdL5s=;
+	b=vYV9t0cpsRrzF4ou/Se02S5+p69GDo3m/rLsX9R3uumUu3wcnC2k2lDLWKnPuNqlVQyM+C
+	r87DOnRYRQ9N6OBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2C05813411;
+	Wed, 24 Jul 2024 14:40:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id fARjCmoSoWa1KQAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Wed, 24 Jul 2024 14:40:42 +0000
+Message-ID: <38207d5c-c052-4701-8ccd-fe6381a97194@suse.cz>
+Date: Wed, 24 Jul 2024 16:40:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240724143431.3343722-1-pkaligineedi@google.com>
-Subject: [PATCH net v2] gve: Fix an edge case for TSO skb validity check
-From: Praveen Kaligineedi <pkaligineedi@google.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, willemb@google.com, shailend@google.com, 
-	hramamurthy@google.com, csully@google.com, jfraker@google.com, 
-	stable@vger.kernel.org, Bailey Forrest <bcf@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Jeroen de Borst <jeroendb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Content-Language: en-US
+To: paulmck@kernel.org
+Cc: Uladzislau Rezki <urezki@gmail.com>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Jakub Kicinski <kuba@kernel.org>,
+ Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+ linux-trace-kernel@vger.kernel.org,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+ wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+ ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+ linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ kasan-dev <kasan-dev@googlegroups.com>
+References: <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
+ <ZnCDgdg1EH6V7w5d@pc636> <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz> <ZnVInAV8BXhgAjP_@pc636>
+ <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+ <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-4.09 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,zx2c4.com,kernel.org,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org,googlegroups.com];
+	R_RATELIMIT(0.00)[to_ip_from(RLr583pch5u74edj9dsne3chzi)];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -4.09
 
-From: Bailey Forrest <bcf@google.com>
+On 7/24/24 3:53 PM, Paul E. McKenney wrote:
+> On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
+>> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
+>> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+>> > One question. Maybe it is already late but it is better to ask rather than not.
+>> > 
+>> > What do you think if we have a small discussion about it on the LPC 2024 as a
+>> > topic? It might be it is already late or a schedule is set by now. Or we fix
+>> > it by a conference time.
+>> > 
+>> > Just a thought.
+>> 
+>> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
+>> propose a slab topic. We could discuss in hallway track or a BOF, but
+>> hopefully if the current direction taken by my RFC brings no unexpected
+>> surprise, and the necessary RCU barrier side is also feasible, this will be
+>> settled by time of plumbers.
+> 
+> That would be even better!
 
-The NIC requires each TSO segment to not span more than 10
-descriptors. NIC further requires each descriptor to not exceed
-16KB - 1 (GVE_TX_MAX_BUF_SIZE_DQO).
+I should have linked to the RFC :)
 
-The descriptors for an skb are generated by
-gve_tx_add_skb_no_copy_dqo() for DQO RDA queue format.
-gve_tx_add_skb_no_copy_dqo() loops through each skb frag and
-generates a descriptor for the entire frag if the frag size is
-not greater than GVE_TX_MAX_BUF_SIZE_DQO. If the frag size is
-greater than GVE_TX_MAX_BUF_SIZE_DQO, it is split into descriptor(s)
-of size GVE_TX_MAX_BUF_SIZE_DQO and a descriptor is generated for
-the remainder (frag size % GVE_TX_MAX_BUF_SIZE_DQO).
-
-gve_can_send_tso() checks if the descriptors thus generated for an
-skb would meet the requirement that each TSO-segment not span more
-than 10 descriptors. However, the current code misses an edge case
-when a TSO segment spans multiple descriptors within a large frag.
-This change fixes the edge case.
-
-gve_can_send_tso() relies on the assumption that max gso size (9728)
-is less than GVE_TX_MAX_BUF_SIZE_DQO and therefore within an skb
-fragment a TSO segment can never span more than 2 descriptors.
-
-Fixes: a57e5de476be ("gve: DQO: Add TX path")
-Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Signed-off-by: Bailey Forrest <bcf@google.com>
-Reviewed-by: Jeroen de Borst <jeroendb@google.com>
-Cc: stable@vger.kernel.org
----
-Changes from v1:
- - Added 'stable tag'
- - Added more explanation in the commit message
- - Modified comments to clarify the changes made
- - Changed variable names 'last_frag_size' to 'prev_frag_size' and
-   'last_frag_remain' to 'prev_frag_remain'
- - Removed parentheses around single line statement
-
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 22 +++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index 0b3cca3fc792..f879426cb552 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -866,22 +866,42 @@ static bool gve_can_send_tso(const struct sk_buff *skb)
- 	const int header_len = skb_tcp_all_headers(skb);
- 	const int gso_size = shinfo->gso_size;
- 	int cur_seg_num_bufs;
-+	int prev_frag_size;
- 	int cur_seg_size;
- 	int i;
- 
- 	cur_seg_size = skb_headlen(skb) - header_len;
-+	prev_frag_size = skb_headlen(skb);
- 	cur_seg_num_bufs = cur_seg_size > 0;
- 
- 	for (i = 0; i < shinfo->nr_frags; i++) {
- 		if (cur_seg_size >= gso_size) {
- 			cur_seg_size %= gso_size;
- 			cur_seg_num_bufs = cur_seg_size > 0;
-+
-+			if (prev_frag_size > GVE_TX_MAX_BUF_SIZE_DQO) {
-+				int prev_frag_remain = prev_frag_size %
-+					GVE_TX_MAX_BUF_SIZE_DQO;
-+
-+				/* If the last descriptor of the previous frag
-+				 * is less than cur_seg_size, the segment will
-+				 * span two descriptors in the previous frag.
-+				 * Since max gso size (9728) is less than
-+				 * GVE_TX_MAX_BUF_SIZE_DQO, it is impossible
-+				 * for the segment to span more than two
-+				 * descriptors.
-+				 */
-+				if (prev_frag_remain &&
-+				    cur_seg_size > prev_frag_remain)
-+					cur_seg_num_bufs++;
-+			}
- 		}
- 
- 		if (unlikely(++cur_seg_num_bufs > max_bufs_per_seg))
- 			return false;
- 
--		cur_seg_size += skb_frag_size(&shinfo->frags[i]);
-+		prev_frag_size = skb_frag_size(&shinfo->frags[i]);
-+		cur_seg_size += prev_frag_size;
- 	}
- 
- 	return true;
--- 
-2.45.2.1089.g2a221341d9-goog
+https://lore.kernel.org/all/20240715-b4-slab-kfree_rcu-destroy-v1-0-46b2984c2205@suse.cz/
 
 
