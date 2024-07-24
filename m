@@ -1,248 +1,364 @@
-Return-Path: <netdev+bounces-112783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8B7193B2EB
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:44:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7D8893B308
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBB8E1C20B62
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:44:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBD021C2299B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 791D115ADBC;
-	Wed, 24 Jul 2024 14:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF5016D4C8;
+	Wed, 24 Jul 2024 14:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnaysIr0"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nJecBpjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2086.outbound.protection.outlook.com [40.107.236.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467CF157A58
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 14:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721832248; cv=none; b=DWgMzwllPI1SBg1lxssvwWL+YRe0gCvEZnTjjQyI/clKZ+6TjjVaearjOiTdhPAKCZABkbrffUvISyGSNea3QUqwkb+Ccai16Wkk/Q3EcKiMPPg8qSU8XM92N0TYEcKz7ctEHsielE1RhUM7aM+wROl87E/WQXiF8gIX/yw2Cdw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721832248; c=relaxed/simple;
-	bh=lOc6GcA/Z1rVuWCMtRiGU7ChW8toc0BUgpRKF7/FIIM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=eoUjA4fKlpg7BI4oDnPBl/jm+AUPs8zaMxnxUTuiNmcUKvxBgaCMMl5bGbg/DJBDWKYeTTL59ztltCORrOMbUcxEIOPHz4DTVEtFX6XBIFG/smP31Tf3+xoIYVra4uOJJokfKe92MeKLHaEEgSp40MKrZigPlJT2Wjis09kThL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WnaysIr0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721832244;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PtgNm1pOLMsP8Qszrl0K7VKeER149ylQU0rUWgeGkEo=;
-	b=WnaysIr0B9P26NZeMvKqNqPpeFyr1PMF28JDYUvTswJ3RtMPcrU2pOhYGrvGccbtSQFLh0
-	h2MoY46KNbEViMua/6+zdBKibBxHhFNd3qxZmViEa/9oQQkZgKha+FbSWdjwpIjUMUUkWO
-	Tsvdb1D+afwbseCXNty46KrD5ATTYt4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-630-q8v6AX-1O_-EXIhJ6Korxw-1; Wed, 24 Jul 2024 10:44:02 -0400
-X-MC-Unique: q8v6AX-1O_-EXIhJ6Korxw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-36857dd6913so3682269f8f.2
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 07:44:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721832241; x=1722437041;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PtgNm1pOLMsP8Qszrl0K7VKeER149ylQU0rUWgeGkEo=;
-        b=l9BMNwXUestPOIZwN30yafSV28MCuqICbOHO9CgnJPkY4vpqfV/c3pdi6sI94kjcbd
-         PDUmqvv8kIZTlbreN28RpKAoIhQHQb19UElE+BDJqIutsO3/zjR+cqXGjz0OrKQFcxMl
-         9XyKB01evH+UIklZ15dpfDrEwvxuHP8rzzSAeRTLkc7FJLydxeLr7fBYZqyay/wfKBXb
-         z63z3A3y+BAnZhvZSjJYQ2v39pI3GeuZhKjB1+gOGd8WiXcRZa6x3hJnuIvKT3pdswaI
-         NzC5qP1G2deM891YKAoraKJdClzzyVSLCQ2Muhuo4eFQKtEG1QudY6Bl9m97qlMvnSL6
-         zRHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTcqzdgGea20omNHFRDYAVhJ2xuTtGQhY4+KxEn7Y3W6vl8Y3tTHuz6o3E2rClRS771pchQPJyrGZ15T9nRaTWtxuDDvER
-X-Gm-Message-State: AOJu0YyKUKw5mdb8JIBpepovPHtUN09rWy5sfBOkq0te3WbqcnhnK0hM
-	ZQP2RoU/0N1CRpGdbmlSH89vya4kCYLq/I3Y8w3RKVS9wusuRwNpBmHvt6Pl7PpAegJlwYk/jLR
-	wXShZfgY3vlyFUw44g+UyEelTS/1koAKhMOec7s3QlHwfG7sZmpVTJA==
-X-Received: by 2002:a5d:58fa:0:b0:368:3f60:8725 with SMTP id ffacd0b85a97d-369dec1e5d2mr4259507f8f.39.1721832241552;
-        Wed, 24 Jul 2024 07:44:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHbt1Ya9CZQ8TcF7aODRLLParNCtw3ChacXtuHqFCqCgnkFaSHw2MfwC9jTM+m9E2ZRynujw==
-X-Received: by 2002:a5d:58fa:0:b0:368:3f60:8725 with SMTP id ffacd0b85a97d-369dec1e5d2mr4259492f8f.39.1721832241079;
-        Wed, 24 Jul 2024 07:44:01 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36878694833sm14522088f8f.55.2024.07.24.07.44.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 07:44:00 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id CFC2914733D9; Wed, 24 Jul 2024 16:43:59 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: syzbot <syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com>,
- andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com,
- edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me,
- song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in __cpu_map_flush
-In-Reply-To: <000000000000048a4b061dfcd02a@google.com>
-References: <000000000000048a4b061dfcd02a@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 24 Jul 2024 16:43:59 +0200
-Message-ID: <871q3iq28g.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F6D15DBD8;
+	Wed, 24 Jul 2024 14:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721832377; cv=fail; b=TIqwxLiWKCbMqOVPLrh4hxh8Qoc7vuIM3TkF0CSMAeWwerLLR1ZbfXPNWpQuuXwedma/d7uyVwzUzWWz0DdeYEQhEPKARPS/dIjlSRLSrgwurkdwaZuyj1c2UiStHJHxx+CkrG3GmnpHi8oUnhxukDggxj+jLWn6oGWR8SZ+G/Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721832377; c=relaxed/simple;
+	bh=1ubtEBBz5sLzTmOVjQPcMPEixfucGh7Y7MnDNiFgPDA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=O4H1UlFI8lEul0frbVQjFYnmWaxXON/+T6Gs+0mDyMcAj7Xgf0ugxq6wkUQ4C5eHzax1GMsMyGFyOi2KK4a/v0ie/joAbpXS1gmTsPxVCB3MHLPDGrbOfSVqHtkZS7X4EjRHtBlRwa9DoOMQnk9OMfdnJt1wWSyazurqzw+dTqg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nJecBpjf; arc=fail smtp.client-ip=40.107.236.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=frsLlEs9is6XhzJiNlKfqLv+uUoxxW7zN+I9zkTgnPeDYRql8LMEBYOncJvKUr3BgOweJkyBVNIcOvjA4HlVJK8Vww4ppdnGD94cdSFzjTkbAqdifuizrrtNQqPaDVAMi0ZJ5MRtbJsyKrnGKZSh1lS6GOkI3hERJtAZVimKsByxRK6eGy6ZIswBTXri+OxwSzAlzD5nXSVH8R6wGnq45DsdamDqJVTJOuOfifS+zif6FsolPjc9Ok35qgMOY0Au+yElxZ4Fjrp3LKAdu+mD7FzTPRrKnxP2D8qCSL46R+2+a0XegK2eVPNFboJoplcxKUNTxDXW7lwtiezjvW9l1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dSGXonjZLOEP34DtYrGn/A/HPWgwhjfNd3GpxEa2eI4=;
+ b=OE5+WeC3KUMlp7jzMVZh3pAKgUQc7EKnuilyU8b2BOdSgbg4kho35+I2iOrQbJLYiL/g9IcmlCO500RUf1f+vYw99+hCJCGrUf/9OYYjmjLqVdQe+IEtCRR5P6kWyxzH3tBpcyI97sxNCIJ9FImVltmgpFnR/Wd3+Flm/D6mtCg6q2Zfl8Xi1E/tXsGjNcsvnbiKDGQJp5MgmNa95VfLhfN7dBxlF3f9fp5ORLsf1J/2VHEODOrlWV70o06wL8xZNbHhzd/oAEgOggX4XWWBrFvebEJ4kSn1aQEThlrcxui1RpnUVUaPcznzsL/KhJm0hQ/R4bBFZw2aKg24mC+t+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dSGXonjZLOEP34DtYrGn/A/HPWgwhjfNd3GpxEa2eI4=;
+ b=nJecBpjfFuUkrFihTn1VaMC6VC7A4tKaA+epqRKmpGIydq+Jj6toZCjFW1MdEorarh7Q9sa0UBxKa8BkjMhKFHNsJaJB0lnme9rICmOdiYTW1AizkqjbI6z8j+zeWD1UbInyDLuIqCWx7Gk/zV/ct9h+VCQVCgKpNjOK2+GoInY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by DM3PR12MB9433.namprd12.prod.outlook.com (2603:10b6:0:47::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.28; Wed, 24 Jul
+ 2024 14:46:09 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.7784.013; Wed, 24 Jul 2024
+ 14:46:09 +0000
+Message-ID: <fc94330f-1ef0-8b84-ebb8-44fd74c4a3c9@amd.com>
+Date: Wed, 24 Jul 2024 15:45:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH V3 03/10] PCI/TPH: Add pci=notph to prevent use of TPH
+Content-Language: en-US
+To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jonathan.Cameron@Huawei.com, helgaas@kernel.org, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+ michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+ somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+ manoj.panicker2@amd.com, Eric.VanTassell@amd.com, vadim.fedorenko@linux.dev,
+ horms@kernel.org, bagasdotme@gmail.com, bhelgaas@google.com
+References: <20240717205511.2541693-1-wei.huang2@amd.com>
+ <20240717205511.2541693-4-wei.huang2@amd.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240717205511.2541693-4-wei.huang2@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0663.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:316::10) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM3PR12MB9433:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88f84c31-e1b2-430a-b968-08dcabef5aeb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NHFLam92NllaNUl5QzU4ei8rRTZCTnMxQXdPd3N3dEZPMTBTSlVndXRHaVFa?=
+ =?utf-8?B?UlRkMVpYR2dnMWFnbnVxZkJyUnFPOWpENVNlTkFGenFMa2kvNWppeFJQZ2h5?=
+ =?utf-8?B?NkZ5blRhcm9uNjQ2bTlyWDNraTRJVnZTektGYWY1L1I0bi83ZjF3RzJZa3ds?=
+ =?utf-8?B?bTgyMXBpM2YrU3IrUDQwMlJQWGFnK2JsckJYaXV3NEtJcFdPMWxlbHhhVTdp?=
+ =?utf-8?B?bzMzdUR6WXAvK0xlU1pLdDV2Rm9WOC9heXZwbWNCTy9MaSt3SDdmQ28xVEJq?=
+ =?utf-8?B?dzNtV2tzNzBiNjVFSnUzR09SOW0wWXBzbHlqR2hTcXNXbzBkMVNiRlRJbUZV?=
+ =?utf-8?B?cTZnZk1OMnQxczZLclNSWFlTeGhxVzJQYW1xbUVTQ3FnY055ZFVXd1h5UFl2?=
+ =?utf-8?B?OGR1UTYvaFRnTjVQNG9Hb1NKRHZDU2J6WmdLMkMycm5CWUcydWNUV2s4SEV1?=
+ =?utf-8?B?RUhlTjE0b3ZKV3JrMjNRTS9kZ0ZpUXZGQVA2enVXRG5FQW8wdzJLWWpjQlRa?=
+ =?utf-8?B?b1BWYndGeE1sSXJubmkxTWJnU1V3dy9TWXBYNDJEaElFMUpPRFk4dC9vMklT?=
+ =?utf-8?B?ODYydDdaYzJWeG5aeGFRYS9GeEVYVnJjdWIyRWw2aGlSeEVYc1FPZHYxUDBG?=
+ =?utf-8?B?ajBJejhIQ1RQQ2E5MHRwWEhaZDNFOEx6TFA4Mm5rVnJsU0NSWVc0eFZjei9H?=
+ =?utf-8?B?TXlYMU1CNFBPd21KY3NUT3Y0VmdtR3NxdDZrOFdEODR3elI3SHFBemlYU0Rz?=
+ =?utf-8?B?akZreDFFRmtqY2krM0tnU0RRTVFWWlN3eFE0MnJ4WjYzeUlqemtyaTVzVmZx?=
+ =?utf-8?B?TEtyUG5WY0tqdWEvN3JFNlFkblN3UkN4SGRBaVlrZEI4K3AvcDA4UXY2WU1H?=
+ =?utf-8?B?YjZCR2kxYnZYQjUzOXFIdDVqN2t0a2JqRU01bFMzWWJDRzVKTStIRXdtd1A1?=
+ =?utf-8?B?WUlLdnh6UXJSeldWT3BEdGdKaDA1ejN1d1V2YVY4U0duMjVqT0VZS2xQZVdT?=
+ =?utf-8?B?ZEQyQXpZQ3E1Z25pa2VtY0NPQzNyTFRMV0JBeU1tUHZBSVNZc3liUFI5VUlG?=
+ =?utf-8?B?eUR6MDZwUjVSaW4rWGsxeWhRd0J6Qkc1TWczRHZWVEJidGF3a3dseFZDNys2?=
+ =?utf-8?B?dDEvckdIdG5ENE5LUHcwTzVsM09heS9yNHhac2dJKzRjcGlmSm16SEt3aXJX?=
+ =?utf-8?B?UkFMeEVzSEhaajdlNnlQYmxKZ2JqMjQvM0dUb09GazlXcGFoSUEvRlNtSkdj?=
+ =?utf-8?B?bnZKOFdIUWRRcFNqQlRlNXcxczIvd3JzRnBoUEtqczJ2SldLaEV2STBUYXVa?=
+ =?utf-8?B?SjVFbWVuL3h3bTlUNEpnR3RCa2t5YlFXS1hwNExZRFhrWWVwR1dFZmgwdkRG?=
+ =?utf-8?B?blBYUFA3ZHhuVm1XVnNLOHY2bk1KT3NyUDVaYS9FeDV0U1BKelM3UllXci9Y?=
+ =?utf-8?B?QUpqeGxGNzhybWpyUmlGcDdDWHBPbzhCVUtaZ2h2TFJvRjBTTDRaVnJtS0h5?=
+ =?utf-8?B?OWFIOU1tcEJGbjcxR0RhMU52Nlpsc2VncEtKRFlwNWd2NDZLdE5LSUFyWG1Q?=
+ =?utf-8?B?dXdDUkNzZVYxZUxjT0lDR2x4UWpzZmYrSFZrMEZleDZYZzFkVlF6OUtsa2Va?=
+ =?utf-8?B?QzhyaC8wOGpwWjJZNVhyWGFMRDVtRVNOc3Rpc0N4UlJGU3hYbXRjcGhtaEhO?=
+ =?utf-8?B?RlAyeHZENWJhbUovWjEzcjBMNmsrZTRpRTZuamk2Z0ZjejlFME14cVBXd2VP?=
+ =?utf-8?B?RGp3OURHK2lYQkRFamtaZnNsZTBOZFNhT3lkMWF2eTFVMDMzZVlXODlXUzl1?=
+ =?utf-8?B?SUFBaGVhWEo1NGVrZXBRQT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TzA4NVVWZWlBNTc1QjZnNzJkK2xMbENya0NrYkZQUkcyekdTcFR6czg3Sy9N?=
+ =?utf-8?B?UDNDYnl5NjNzQ0FON3NJb3ExakNQNTZNaFE4VUNaYVJOUWxLSE9pdHRWWkww?=
+ =?utf-8?B?THp6cUNTWXN5K2c1OGlJeXA1UFA4UlVyTkZCbTRGM1ZuNnJqWWM4MzI0VjZR?=
+ =?utf-8?B?a2tZL1NjeXdlQ2JHR2F2dlFDU3ZpdHFnNmdMcW1YMkVDRmVscEw4WmROY01v?=
+ =?utf-8?B?WElHWUxIK25CcHZ4Nzh3YXN3TC9WUXcySjl5NjlZQU4xZnRXWEhKT0hlOWd2?=
+ =?utf-8?B?a2w5emJGR1hHOENlci9DTlpodTRmUTJlTGlYOFo2YXRuMkwvQUhPdk1hTHpN?=
+ =?utf-8?B?R0M0a3Jua0dSaVFEYTg3anIyTG1sdjJaTjY0MlpySk1nMDdCdXRBaFpvcDJM?=
+ =?utf-8?B?RVJMcUduajJhdkdZSGJIcUdvQlI2R2IyYjYzSG9NbVdjVktwUVlVRitPbXRL?=
+ =?utf-8?B?ZWRaSVJ6SURidU1SeFNPM1cyVzhIMzJEVGpUT2hkSlRQOEJFNS84VDYrQjBr?=
+ =?utf-8?B?ZUlMZ2RTd0dxenRvUUhZY1VCa0lXblB5T0E5NTNBTW81OFc0Z3FpMzEwdy9E?=
+ =?utf-8?B?dVZUelFKVEpkckY5L3VVVFp3SDErL0g3SEpwYmZVM1F3MmZNdUVIOVRpVXI3?=
+ =?utf-8?B?WlRURlNOMVNQTVQxZ0VyMkJjczZaWCtad3pwVDVoTHpnZ1hYZm1qOFpJS2pT?=
+ =?utf-8?B?cTRaVXpMelVxYWpPbENHYnY3UGw4YTErSjRHZHlldDV1VTdaN0t3ZHhBM3pG?=
+ =?utf-8?B?bmEzQklyMzVTSDRpcmxZWC9vSGFGY0h6djd0ZG9PVlBKL1Q2VjZlcW0yaTJx?=
+ =?utf-8?B?eHdRZ1FpbE5sOXNhMktXeksyYndpajVVK0VyWURNVkVGSTRsMGhKU01lVldL?=
+ =?utf-8?B?WG1jU1NNWGFhVUdjZW1iSWpFdnZPdllqTkNQbmxIUFJvSHdxbGk4TDdXKzYw?=
+ =?utf-8?B?K2c1dVFzbzZoMVhhMzJMZ0RQcUJTZTQ1SXU1V1pUN0JFU0xuQ0FBUzBJYUJR?=
+ =?utf-8?B?bWk4YlpRMlFvcDVhMzV6eGNHbUdWRjJMTEZxd1cxbElCakQvbTVVaGZUSWNJ?=
+ =?utf-8?B?RlBIdnlDOFVFQjR4aFJPRnFjdXh0MkxFcU45WHBpRWRpYklJeS9vRmdVR2xP?=
+ =?utf-8?B?N09CMWZueVhGZjBOVUhrWmZucC9IV05lYzM4WW1UTGRJRktqK28vNW8xdk9U?=
+ =?utf-8?B?UFdNajVKS2UxV3UrdUFYN3gyUjU0TTNyK2hnNW5raytIYzhLTmkwSHg5RGJV?=
+ =?utf-8?B?U2RiZ1pVYnFESVRsRHZ2UlpWbnIxa3VJUWgxUVBKLzM3NUJjNGd0UnZ4Qzhw?=
+ =?utf-8?B?ZVdwUTZ3aG1lS3lzV0JtWmJGRklKYnNVOWlIZC9RczNQdWlGK05hZVMvb3Bj?=
+ =?utf-8?B?bVg3VS96Ty9vQ1VnQ3RneW9SUVQ1Z056MHBiTC9YL0NxMzNWVVNlWm5aUWo4?=
+ =?utf-8?B?SFluaWMwR1h0T0oxWE52eXZleU1jOElsTTJVYjIxWDVSRXpPSzhEc28vVjlo?=
+ =?utf-8?B?SjBXN1VmVVhFenR6TWJneHF2cUswQW5pRXd1NGFBTWFZM1M2eVJVaitrTTdC?=
+ =?utf-8?B?SHVCSGMwdkhFbjdXZkxSNEpGRG95UkpnMlZjUmZVbnZBdDdhVDF1bzJINWFG?=
+ =?utf-8?B?ZlpLWU1Jd1ZnY3hiRHY0Z3FWZ2o2YWhjTHlOZXlISnVRV1pldHl1cTFkeWRD?=
+ =?utf-8?B?cWpKaUlMbklRS2R2V0lobmphK3h0T2U2RTlKUEpUMzZKSVRReVlDdUIvQUJl?=
+ =?utf-8?B?aG9hS3BLWkFCSU11YkpBSzZ3elJQVHZ5ajZtTjliWkl5MDY0d2VOM2pManF5?=
+ =?utf-8?B?YnVrbExhb292YUlIb09IbmZ4N3NIUytoa0V1cUpHb3NjRlYyMy8xSTlsdWVB?=
+ =?utf-8?B?eE1aVGhoMkRzMG9BRGRtODQrNG5IWjZueTFTakRxSDNiNHRPUGZzVHZrNlA1?=
+ =?utf-8?B?NWVHZ09nWXh1Uk5zYkhKVXBycWVpSHdtT29iTU5SRnc1M0E2YlF4V2l5ZVY0?=
+ =?utf-8?B?TnFKZXZvM3dSOTRPRVdrWTZ3ampsNzN3aldYZEZZS09kd3R4elIrTDhndVBn?=
+ =?utf-8?B?cnBQZFhOSEFlQU1SUkk2dm1jUGJndnVaSTJMWUZiUnRZa1MzbWVuOUxrQW5D?=
+ =?utf-8?Q?DCM+G8W+7bjTPQwWSxxphJjMk?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88f84c31-e1b2-430a-b968-08dcabef5aeb
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2024 14:46:09.3171
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2tSFWVLt7ofcMa2b+5G0J8idKU1LNWNrfepXWEfTexSdpfDmmvS59/uM+/CwEVQIqEl7KV4kwq6dLjJVXeOt8w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9433
 
-Hi Sebastian
 
-The syzbot splat below shows up in recent -next kernels which
-sorta-kinda wags its finger suggestively at the bpf_net_ctx_get()
-changes. There's one for __dev_flush() as well:
-https://lore.kernel.org/r/0000000000009d1d0a061d91b803@google.com
-
-Care to take a look? :)
-
-Thanks!
-
--Toke
+On 7/17/24 21:55, Wei Huang wrote:
+> TLP headers with incorrect steering tags (e.g. caused by buggy driver)
+> can potentially cause issues when the system hardware consumes the tags.
+> Provide a kernel option, with related helper functions, to completely
+> prevent TPH from being enabled.
 
 
-syzbot <syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com> writes:
+Maybe rephrase it for including a potential buggy device, including the cpu.
 
-> syzbot has found a reproducer for the following issue on:
->
-> HEAD commit:    9ec6ec93f2c1 Add linux-next specific files for 20240724
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=10e71ca1980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=83e9d0906fa0e2bd
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c226757eb784a9da3e8b
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17c0f8e3980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=151b9919980000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/c0ab2da24b1f/disk-9ec6ec93.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/da6faf16185f/vmlinux-9ec6ec93.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/1ad900571155/bzImage-9ec6ec93.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com
->
-> Oops: general protection fault, probably for non-canonical address 0xe3fffb24002e6fe6: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: maybe wild-memory-access in range [0x1ffff92001737f30-0x1ffff92001737f37]
-> CPU: 1 UID: 0 PID: 11878 Comm: syz-executor412 Not tainted 6.10.0-next-20240724-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-> RIP: 0010:__cpu_map_flush+0x42/0xd0
-> Code: e8 13 8c d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 4d 12 3e 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 2f 12 3e 00 4c 8b 23 48 8d 7b c0
-> RSP: 0018:ffffc90000a18b10 EFLAGS: 00010202
-> RAX: 03ffff24002e6fe6 RBX: 1ffff92001737f30 RCX: ffff888074dc8000
-> RDX: 0000000080000101 RSI: 0000000000000010 RDI: ffffc9000b9bf800
-> RBP: dffffc0000000000 R08: ffffffff896d3b5a R09: 1ffffffff1f5f375
-> R10: dffffc0000000000 R11: fffffbfff1f5f376 R12: ffffc9000b9bf800
-> R13: ffffc9000b9bf820 R14: ffffc9000b9bf800 R15: dffffc0000000000
-> FS:  0000555592677380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fd44da640f0 CR3: 000000001ea68000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <IRQ>
->  xdp_do_check_flushed+0x136/0x240 net/core/filter.c:4304
->  __napi_poll+0xe4/0x490 net/core/dev.c:6774
->  napi_poll net/core/dev.c:6840 [inline]
->  net_rx_action+0x89b/0x1240 net/core/dev.c:6962
->  handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
->  __do_softirq kernel/softirq.c:588 [inline]
->  invoke_softirq kernel/softirq.c:428 [inline]
->  __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
->  irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
->  common_interrupt+0xaa/0xd0 arch/x86/kernel/irq.c:278
->  </IRQ>
->  <TASK>
->  asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
-> RIP: 0010:check_kcov_mode kernel/kcov.c:184 [inline]
-> RIP: 0010:__sanitizer_cov_trace_pc+0x37/0x70 kernel/kcov.c:207
-> Code: 40 d7 03 00 65 8b 15 10 0c 70 7e f7 c2 00 01 ff 00 74 11 f7 c2 00 01 00 00 74 35 83 b9 1c 16 00 00 00 74 2c 8b 91 f8 15 00 00 <83> fa 02 75 21 48 8b 91 00 16 00 00 48 8b 32 48 8d 7e 01 8b 89 fc
-> RSP: 0018:ffffc9000b9bf8a0 EFLAGS: 00000246
-> RAX: ffffffff81410dcc RBX: 0000000000000000 RCX: ffff888074dc8000
-> RDX: 0000000000000000 RSI: ffffffff8b942412 RDI: ffffffff8b942328
-> RBP: 1ffff92001737f30 R08: ffffffff81410c60 R09: ffffc9000b9bfa70
-> R10: 0000000000000003 R11: ffffffff817f7030 R12: ffffffff90294810
-> R13: dffffc0000000000 R14: 1ffff92001737f30 R15: ffffffff90d0fbd4
->  unwind_next_frame+0x67c/0x2a00 arch/x86/kernel/unwind_orc.c:495
->  arch_stack_walk+0x151/0x1b0 arch/x86/kernel/stacktrace.c:25
->  stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
->  kasan_save_stack mm/kasan/common.c:47 [inline]
->  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
->  poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
->  __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
->  kasan_slab_free include/linux/kasan.h:184 [inline]
->  slab_free_hook mm/slub.c:2252 [inline]
->  slab_free mm/slub.c:4473 [inline]
->  kmem_cache_free+0x145/0x350 mm/slub.c:4548
->  __dentry_kill+0x497/0x630 fs/dcache.c:629
->  dput+0x19f/0x2b0 fs/dcache.c:852
->  __fput+0x5f8/0x8a0 fs/file_table.c:430
->  __do_sys_close fs/open.c:1566 [inline]
->  __se_sys_close fs/open.c:1551 [inline]
->  __x64_sys_close+0x7f/0x110 fs/open.c:1551
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fd44d9ed9c0
-> Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d e1 76 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-> RSP: 002b:00007fff7a1e95b8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-> RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fd44d9ed9c0
-> RDX: 0000000000000e80 RSI: 0000000020000100 RDI: 0000000000000004
-> RBP: 00007fff7a1e9600 R08: 00007fff7a1e95e0 R09: 00007fff7a1e95e0
-> R10: 00007fff7a1e95e0 R11: 0000000000000202 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:__cpu_map_flush+0x42/0xd0
-> Code: e8 13 8c d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 4d 12 3e 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 2f 12 3e 00 4c 8b 23 48 8d 7b c0
-> RSP: 0018:ffffc90000a18b10 EFLAGS: 00010202
-> RAX: 03ffff24002e6fe6 RBX: 1ffff92001737f30 RCX: ffff888074dc8000
-> RDX: 0000000080000101 RSI: 0000000000000010 RDI: ffffc9000b9bf800
-> RBP: dffffc0000000000 R08: ffffffff896d3b5a R09: 1ffffffff1f5f375
-> R10: dffffc0000000000 R11: fffffbfff1f5f376 R12: ffffc9000b9bf800
-> R13: ffffc9000b9bf820 R14: ffffc9000b9bf800 R15: dffffc0000000000
-> FS:  0000555592677380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fd44da640f0 CR3: 000000001ea68000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> ----------------
-> Code disassembly (best guess):
->    0:	e8 13 8c d6 ff       	call   0xffd68c18
->    5:	4c 89 f0             	mov    %r14,%rax
->    8:	48 c1 e8 03          	shr    $0x3,%rax
->    c:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
->   11:	74 08                	je     0x1b
->   13:	4c 89 f7             	mov    %r14,%rdi
->   16:	e8 4d 12 3e 00       	call   0x3e1268
->   1b:	49 8b 1e             	mov    (%r14),%rbx
->   1e:	4c 39 f3             	cmp    %r14,%rbx
->   21:	74 77                	je     0x9a
->   23:	48 89 d8             	mov    %rbx,%rax
->   26:	48 c1 e8 03          	shr    $0x3,%rax
-> * 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
->   2f:	74 08                	je     0x39
->   31:	48 89 df             	mov    %rbx,%rdi
->   34:	e8 2f 12 3e 00       	call   0x3e1268
->   39:	4c 8b 23             	mov    (%rbx),%r12
->   3c:	48 8d 7b c0          	lea    -0x40(%rbx),%rdi
->
->
+
+Also, what about handling this with a no-tph-allow device list instead 
+of a generic binary option for the whole system?
+
+Foreseeing some buggy or poor-performance implementations, or specific 
+use cases where it could be counterproductive, maybe supporting both 
+options.
+
+
+> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 > ---
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-
+>   .../admin-guide/kernel-parameters.txt         |  1 +
+>   drivers/pci/pci-driver.c                      |  7 +++++-
+>   drivers/pci/pci.c                             | 12 +++++++++
+>   drivers/pci/pcie/tph.c                        | 25 +++++++++++++++++++
+>   include/linux/pci-tph.h                       | 18 +++++++++++++
+>   include/linux/pci.h                           |  1 +
+>   6 files changed, 63 insertions(+), 1 deletion(-)
+>   create mode 100644 include/linux/pci-tph.h
+>
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index b2057241ea6c..65581ebd9b50 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -4655,6 +4655,7 @@
+>   		nomio		[S390] Do not use MIO instructions.
+>   		norid		[S390] ignore the RID field and force use of
+>   				one PCI domain per PCI function
+> +		notph		[PCIE] Do not use PCIe TPH
+>   
+>   	pcie_aspm=	[PCIE] Forcibly enable or ignore PCIe Active State Power
+>   			Management.
+> diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
+> index af2996d0d17f..9722d070c0ca 100644
+> --- a/drivers/pci/pci-driver.c
+> +++ b/drivers/pci/pci-driver.c
+> @@ -21,6 +21,7 @@
+>   #include <linux/acpi.h>
+>   #include <linux/dma-map-ops.h>
+>   #include <linux/iommu.h>
+> +#include <linux/pci-tph.h>
+>   #include "pci.h"
+>   #include "pcie/portdrv.h"
+>   
+> @@ -322,8 +323,12 @@ static long local_pci_probe(void *_ddi)
+>   	pm_runtime_get_sync(dev);
+>   	pci_dev->driver = pci_drv;
+>   	rc = pci_drv->probe(pci_dev, ddi->id);
+> -	if (!rc)
+> +	if (!rc) {
+> +		if (pci_tph_disabled())
+> +			pcie_tph_disable(pci_dev);
+> +
+>   		return rc;
+> +	}
+>   	if (rc < 0) {
+>   		pci_dev->driver = NULL;
+>   		pm_runtime_put_sync(dev);
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index 02b1d81b1419..4cbfd5b53be8 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -157,6 +157,9 @@ static bool pcie_ari_disabled;
+>   /* If set, the PCIe ATS capability will not be used. */
+>   static bool pcie_ats_disabled;
+>   
+> +/* If set, the PCIe TPH capability will not be used. */
+> +static bool pcie_tph_disabled;
+> +
+>   /* If set, the PCI config space of each device is printed during boot. */
+>   bool pci_early_dump;
+>   
+> @@ -166,6 +169,12 @@ bool pci_ats_disabled(void)
+>   }
+>   EXPORT_SYMBOL_GPL(pci_ats_disabled);
+>   
+> +bool pci_tph_disabled(void)
+> +{
+> +	return pcie_tph_disabled;
+> +}
+> +EXPORT_SYMBOL_GPL(pci_tph_disabled);
+> +
+>   /* Disable bridge_d3 for all PCIe ports */
+>   static bool pci_bridge_d3_disable;
+>   /* Force bridge_d3 for all PCIe ports */
+> @@ -6869,6 +6878,9 @@ static int __init pci_setup(char *str)
+>   				pci_no_domains();
+>   			} else if (!strncmp(str, "noari", 5)) {
+>   				pcie_ari_disabled = true;
+> +			} else if (!strcmp(str, "notph")) {
+> +				pr_info("PCIe: TPH is disabled\n");
+> +				pcie_tph_disabled = true;
+>   			} else if (!strncmp(str, "cbiosize=", 9)) {
+>   				pci_cardbus_io_size = memparse(str + 9, &str);
+>   			} else if (!strncmp(str, "cbmemsize=", 10)) {
+> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+> index e385b871333e..ad58a892792c 100644
+> --- a/drivers/pci/pcie/tph.c
+> +++ b/drivers/pci/pcie/tph.c
+> @@ -7,8 +7,33 @@
+>    *     Wei Huang <wei.huang2@amd.com>
+>    */
+>   
+> +#include <linux/pci.h>
+> +#include <linux/bitfield.h>
+> +#include <linux/pci-tph.h>
+> +
+>   #include "../pci.h"
+>   
+> +/* Update the TPH Requester Enable field of TPH Control Register */
+> +static void set_ctrl_reg_req_en(struct pci_dev *pdev, u8 req_type)
+> +{
+> +	u32 reg_val;
+> +
+> +	pci_read_config_dword(pdev, pdev->tph_cap + PCI_TPH_CTRL, &reg_val);
+> +
+> +	reg_val &= ~PCI_TPH_CTRL_REQ_EN_MASK;
+> +	reg_val |= FIELD_PREP(PCI_TPH_CTRL_REQ_EN_MASK, req_type);
+> +
+> +	pci_write_config_dword(pdev, pdev->tph_cap + PCI_TPH_CTRL, reg_val);
+> +}
+> +
+> +void pcie_tph_disable(struct pci_dev *pdev)
+> +{
+> +	if (!pdev->tph_cap)
+> +		return;
+> +
+> +	set_ctrl_reg_req_en(pdev, PCI_TPH_REQ_DISABLE);
+> +}
+> +
+>   void pcie_tph_init(struct pci_dev *pdev)
+>   {
+>   	pdev->tph_cap = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_TPH);
+> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+> new file mode 100644
+> index 000000000000..e0b782bda929
+> --- /dev/null
+> +++ b/include/linux/pci-tph.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * TPH (TLP Processing Hints)
+> + *
+> + * Copyright (C) 2024 Advanced Micro Devices, Inc.
+> + *     Eric Van Tassell <Eric.VanTassell@amd.com>
+> + *     Wei Huang <wei.huang2@amd.com>
+> + */
+> +#ifndef LINUX_PCI_TPH_H
+> +#define LINUX_PCI_TPH_H
+> +
+> +#ifdef CONFIG_PCIE_TPH
+> +void pcie_tph_disable(struct pci_dev *dev);
+> +#else
+> +static inline void pcie_tph_disable(struct pci_dev *dev) {}
+> +#endif
+> +
+> +#endif /* LINUX_PCI_TPH_H */
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 6631ebe80ca9..05fbbd9ad6b4 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -1840,6 +1840,7 @@ static inline bool pci_aer_available(void) { return false; }
+>   #endif
+>   
+>   bool pci_ats_disabled(void);
+> +bool pci_tph_disabled(void);
+>   
+>   #ifdef CONFIG_PCIE_PTM
+>   int pci_enable_ptm(struct pci_dev *dev, u8 *granularity);
 
