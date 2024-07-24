@@ -1,149 +1,135 @@
-Return-Path: <netdev+bounces-112877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DB4693B919
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 00:21:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E8293B955
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 00:55:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD91F281627
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:21:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E322283CF6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C7113B2B0;
-	Wed, 24 Jul 2024 22:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68EF213DDBD;
+	Wed, 24 Jul 2024 22:54:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="X0R3guBw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQLrXnC1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6C213A412
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 22:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE5A13A40F;
+	Wed, 24 Jul 2024 22:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721859703; cv=none; b=sn83R6UlM9xGSRd8332O17I5K7jfyLnLCd/VPNUK//IhOBT/7zoEm3YmJZYQubkRV2ZxYSp4u2ynBKqP9P/akG3PgmF9U5P2/BzeDW6KCxdnux9kcR/zaNWemLNWaI+EJXm7YeF+8DozXwHrOP/GyA2y2E5bF5IdABEC1wSaXbk=
+	t=1721861699; cv=none; b=UO2FXxd/T9UGKNj52PQxIustm9EJxcv2258Ap9XOKkFQ81QSwZkaukXejcS7XNWYcmPnJFxc+6Cj1ylEeDKvqZaV6PnaS58TAAabfrmaaYGcLw047Wdi7DE0nK4IKOjsFxQvOMLYhqkR6MJ/o7+8mXJ0Ts1KFGrxwXgeE0jLRDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721859703; c=relaxed/simple;
-	bh=M8Ukorx5J6tA2bqKe8hDq6AjhiwrMDQDjZnjtyxjB6c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TPLpRoxpSdlYalC2luBJNzUnu4FTXg2eQCPT6L4qQbIxkZDJpsidu1f9qOd3O1n0RvMbAiGrjYe/OMABWcoP6dZjAi58defzzUti6Urk/9wVQP4eIC8X2UzV6yiMXzPeRPM3UiTuUiGfMInLndCOjWG2nxUY+3WTaZ7fGKKaMg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=X0R3guBw; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2cb576db1c5so244550a91.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 15:21:41 -0700 (PDT)
+	s=arc-20240116; t=1721861699; c=relaxed/simple;
+	bh=8q7IkJjxtzb0aTmQe0EXlGIpImkJtuK206xkJPqHA3E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BULn8SLYUOlBN4Ea2tNKIM9FPq6QohMZrmhv3xivF0kAmr8nCMlav7ytSdwaasl8ZW0pmiLWeAiPPeCXChXElqaxSvIeHxsznF3g0GWioViLV6U9DacVphtjIoCPFPiRn3pU9QoTEXDJYMFmPrW7T2UWFB4cKGQiwwzJJ4jLeVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQLrXnC1; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7aa212c1c9so44952266b.2;
+        Wed, 24 Jul 2024 15:54:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1721859701; x=1722464501; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TPHjRkwe9DFAK6Tgj9UFIlxOjXwkibgW9P2pdkgnuVU=;
-        b=X0R3guBw6yHvVD9677Mhz459ztwUIbnwkyreT36ASDqujpu8VItOnKtdeM+cDu9uhc
-         +/Fy2ov6cLyVExaeA0U4h2Z16KeYciFa7L7kqNftptFz9wfpmYUzmY3l0omlQjLcG+f9
-         5SDOm86KMnSmN2H/cXYDS5I380xpk/O3q5DPk=
+        d=gmail.com; s=20230601; t=1721861696; x=1722466496; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8q7IkJjxtzb0aTmQe0EXlGIpImkJtuK206xkJPqHA3E=;
+        b=IQLrXnC18rdXbBivvYIFYC2vU9yMtR2zhCVJDj4/gDZL/vO7Yysgd8ZNAZCDVzzAxO
+         Hq3qjU+DJU7O8+772G1O2fkh1w6u0ENONT9u/DOHsIY1oQ62EpPwby46y61EKP7NlzH+
+         1P5wQVZV2IgQwnPfG1tkrQE14a24+GtzTJQrsYDfCyt/dYnmELC0WzlNmHoHOnalXilM
+         iVme1SDTd7XrRP4zoOkyMqgbsNHa4iwb17jhWAvWs924gnSAqa3sQT3EIbwC8SNGXiXY
+         M0Kg65zJXha0D9fzA7O1Oia/Bnr2cMzEvPjafLmz2wtfi43ptCjK436LXzWzRU3DCe2w
+         vxZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721859701; x=1722464501;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1721861696; x=1722466496;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TPHjRkwe9DFAK6Tgj9UFIlxOjXwkibgW9P2pdkgnuVU=;
-        b=fN28I17urzUbUjQri7pe68UeYuWN6nofUoqZ/PAKgnEowUAOM04g37yy2rmXcIf9sL
-         /sRzYiyzmyiK+GJOxW4XxTY6MpCFJBJHMOACdsbX6vgKA7UTdQ8wokExKFaKIm+2+6jc
-         Poo2KVYmHfDoKHxvLw6fJZGKEy5kG8nwRS1ehe60iNa0v3f4BZn5u9iCli3oLFB8vOdf
-         QwDM16mptv8IjetvHTLXd5ab1EZQ+E8K5FrvAMGBxXTmMjAWgFu+HP+phO+IOxCRqLTI
-         jzhvnJLGmjYunhGirGsJUWGTYDVN7mXgFs8HXKZVS4x5f5YErzbgSAPcHD/UXc8g+O1z
-         nGrQ==
-X-Gm-Message-State: AOJu0Yyp6Je+yuhLA6feLrvFCxO10fkO2C1kjCb2f8AGB6X/AOstbw5t
-	DOaF5fueVt+8R2HI0RsSFFtVS5uvitzvAVeSpZZyDreWlDyPulALsaofNY0Ynk1XAuXfia/sxDc
-	=
-X-Google-Smtp-Source: AGHT+IHsfHs6F9iNK9ezLWh/OuOeekuWla1m+aEA0T0hBtKnjWEv+rgQTCdFtTFGntXofcgxjTKErA==
-X-Received: by 2002:a17:90a:fe97:b0:2c9:6f06:8009 with SMTP id 98e67ed59e1d1-2cf2380cbd6mr1123366a91.1.1721859700327;
-        Wed, 24 Jul 2024 15:21:40 -0700 (PDT)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cf28c9da78sm161447a91.28.2024.07.24.15.21.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2024 15:21:39 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH] bnxt_en: Fix RSS logic in __bnxt_reserve_rings()
-Date: Wed, 24 Jul 2024 15:21:06 -0700
-Message-ID: <20240724222106.147744-1-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
+        bh=8q7IkJjxtzb0aTmQe0EXlGIpImkJtuK206xkJPqHA3E=;
+        b=cT9t4ydE6qAvvZLMyVbp0LgNnmCrtQz0jeJuKhgcsrpt4rNBStDMDf7ZvzLUNBt+aJ
+         IwAzD6c8CU//RQoOgxZRS97Qykb+RELewVEaUPwUgPknmqBVJCYCwOcA3uZxnYfwa00o
+         Ovt5aYyYJ6SFnXVDkvOcj6FTQf3vscigNYfirsFwwENVKb+5uuVLcUdvDtyczL0o2o8b
+         Ly9sQFK/5DqPBkgjM5sSENLtbpAEZ6g6gbzXQuWJpGVDRG4/yh22V1FG/CraSSCXg9N+
+         Bqj0E+kdJ6ZjBquKJ+4L/arzvH4+7jjT9WvHYQ8MYb4YJTalTTQXCWuMuNhHxmIHJa4M
+         gS3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUMKN0ew1MoOVlvnLcKZ1f8Ei41OXQfds3S+ZEV/76fWiSEHg41ILLIiNW09fGyMa0PN2TrAHEiXi7bBGAU2W5iA6NwQDX1hB6nZCl4
+X-Gm-Message-State: AOJu0YwXgRS0vEpKzW7S6Yq80HcVog/LctYv2eTaH9IQmVT8s+c5h8Od
+	ApfIoLVws2X1Qrg339QelCfUiNmDgaJoO5k4C6QZNhQciJz7RXf6T3iv++1B5ym10RpELBusqGE
+	cvOP6NnB1tDz7MrFD3Sxz5zJ9LODS8eDK
+X-Google-Smtp-Source: AGHT+IHCATzoVX1ibTZlJdNaGcDiy9mq8ZX+68bRfy/aSXImYudAml2L0A/lT9DYNh+QIRmIZt+vM6U6vxZ8gHif3qA=
+X-Received: by 2002:a17:906:e4f:b0:a6f:8265:8f2 with SMTP id
+ a640c23a62f3a-a7ac4f40e11mr48161966b.37.1721861695779; Wed, 24 Jul 2024
+ 15:54:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1721784184.git.jamie.bainbridge@gmail.com>
+ <066463d84fa14d5f61247b95340fca12d4d3bf34.1721784184.git.jamie.bainbridge@gmail.com>
+ <c20dcbc18af57f235974c9e5503491ea07a3ce99.camel@sipsolutions.net> <0042d3c7d695ed7b253ccbc7786888dc3b400867.camel@sipsolutions.net>
+In-Reply-To: <0042d3c7d695ed7b253ccbc7786888dc3b400867.camel@sipsolutions.net>
+From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Date: Thu, 25 Jul 2024 08:54:44 +1000
+Message-ID: <CAAvyFNjipHCvhy0=1T1JDFAFFUDvL_wOVFFGpdyNqY_SOVNfgQ@mail.gmail.com>
+Subject: Re: [PATCH net 1/4] net-sysfs: check device is present when showing carrier
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+On Wed, 24 Jul 2024 at 19:42, Johannes Berg <johannes@sipsolutions.net> wrote:
+>
+> On Wed, 2024-07-24 at 11:35 +0200, Johannes Berg wrote:
+> > On Wed, 2024-07-24 at 01:46 +0000, Jamie Bainbridge wrote:
+> > > A sysfs reader can race with a device reset or removal.
+> >
+> > Kind of, yes, but please check what the race actually is.
+> >
+> > > This was fixed for speed_show with commit 4224cfd7fb65 ("net-sysfs: add
+> > > check for netdevice being present to speed_show") so add the same check
+> > > to carrier_show.
+> >
+> > You didn't say why it's needed here, so ... why is it?
+> >
+> > FWIW, I don't think it actually _is_ needed, since the netdev struct
+> > itself is still around, linkwatch_sync_dev() will not do anything that's
+> > not still needed anyway (the removal from list must clearly either still
+> > happen or nothing happens in the function). This will not call into the
+> > driver (which would be the problematic part).
+> >
+> > So while I don't think this is _wrong_ per se, I also don't think it's
+> > necessary, nor are you demonstrating that it is.
+> >
+> > And for userspace it should be pretty much immaterial whether it gets a
+> > real value or -EINVAL in the race, or -ENOENT because the file
+> > disappeared anyway?
+> >
+>
+> All of which, btw, is also true for patches 3 and 4 in this set.
+>
+> For patch 2 it seems applicable.
+>
+> I do wonder if ethtool itself, at least ethtool netlink, doesn't have a
+> similar problem though, since it just uses netdev_get_by_name() /
+> netdev_get_by_index()?
+>
+> johannes
 
-In __bnxt_reserve_rings(), the existing code unconditionally sets the
-default RSS indirection table to default if netif_is_rxfh_configured()
-returns false.  This used to be correct before we added RSS contexts
-support.  For example, if the user is changing the number of ethtool
-channels, we will enter this path to reserve the new number of rings.
-We will then set the RSS indirection table to default to cover the new
-number of rings if netif_is_rxfh_configured() is false.
+You are correct, patch 2 (duplex) is the one where we panicked during
+device reset. I thought to fix the other "show" functions in advance
+while I was there.
 
-Now, with RSS contexts support, if the user has added or deleted RSS
-contexts, we may now enter this path to reserve the new number of VNICs.
-However, netif_is_rxfh_configured() will not return the correct state if
-we are still in the middle of set_rxfh().  So the existing code may
-set the indirection table of the default RSS context to default by
-mistake.
+I will revise this and re-submit with only the necessary patch.
 
-Fix it to check if the reservation of the RX rings is changing.  Only
-check netif_is_rxfh_configured() if it is changing.  RX rings will not
-change in the middle of set_rxfh() and this will fix the issue.
+Thanks for the review, it is appreciated.
 
-Fixes: b3d0083caf9a ("bnxt_en: Support RSS contexts in ethtool .{get|set}_rxfh()")
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index bb3be33c1bbd..f788f114e430 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7648,8 +7648,8 @@ static int bnxt_get_avail_msix(struct bnxt *bp, int num);
- static int __bnxt_reserve_rings(struct bnxt *bp)
- {
- 	struct bnxt_hw_rings hwr = {0};
-+	int rx_rings, old_rx_rings, rc;
- 	int cp = bp->cp_nr_rings;
--	int rx_rings, rc;
- 	int ulp_msix = 0;
- 	bool sh = false;
- 	int tx_cp;
-@@ -7683,6 +7683,7 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	hwr.grp = bp->rx_nr_rings;
- 	hwr.rss_ctx = bnxt_get_total_rss_ctxs(bp, &hwr);
- 	hwr.stat = bnxt_get_func_stat_ctxs(bp);
-+	old_rx_rings = bp->hw_resc.resv_rx_rings;
- 
- 	rc = bnxt_hwrm_reserve_rings(bp, &hwr);
- 	if (rc)
-@@ -7737,7 +7738,8 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	if (!bnxt_rings_ok(bp, &hwr))
- 		return -ENOMEM;
- 
--	if (!netif_is_rxfh_configured(bp->dev))
-+	if (old_rx_rings != bp->hw_resc.resv_rx_rings &&
-+	    !netif_is_rxfh_configured(bp->dev))
- 		bnxt_set_dflt_rss_indir_tbl(bp, NULL);
- 
- 	if (!bnxt_ulp_registered(bp->edev) && BNXT_NEW_RM(bp)) {
--- 
-2.30.1
-
+Jamie
 
