@@ -1,111 +1,120 @@
-Return-Path: <netdev+bounces-112773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0928793B204
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:53:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E6D93B221
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:56:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FD211C21144
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:53:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DB371F242E3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:56:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C998158DC8;
-	Wed, 24 Jul 2024 13:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897FD158DD4;
+	Wed, 24 Jul 2024 13:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAP2//Vl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hPZD/DCn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D456E13E020;
-	Wed, 24 Jul 2024 13:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021FC156677
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 13:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721829216; cv=none; b=Rv0Kp+InsbzBKLBu2jjtRL8k1OcREHL4Ps0hGnqAqa8NN5Z2xdK1vWK/GbM09zJATconytTYWTr9uYL73vczPY5hh2XIGuLurfbXl9mTK1Yjhd4Nwf5YF+bSP2ndZNCn5sp1ZRe5Wc3xteO1r+V/dMDI7gxPhJAvHXN/WOiQyZ0=
+	t=1721829396; cv=none; b=Jn+Scbf98nxAd62DM2CIPsRG1ppatr6QNFVhY7bSYCP8jmud2VqISS0z6IeJ3UqFpFWrIqU5atX7r06XRgIh8Wr/lfCRllyRSHr168MopYaE9AuMARSKvV0QazcVxwGZ/g5k+SCh1vJF4rgs8ET9TBNRwq2CjTNskqvbdDk743I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721829216; c=relaxed/simple;
-	bh=07Vzl6re9ZHoHnUQaqXa2n0Sm3JNDNE/aQbliYyNUPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tSSzTIBDxdv0JLtBfh0RrFv+uy+NmG1dIcNFaej0eDwcxijtjKZINehLVWPm7sCdlSNsoSfv3hCj2pbUK1/QG83S9OeroYJ032d2MMwcqucsTlIq+EnuvPJ9v+IMC71o5ZXIxlDNbvlVTWO8y48uEycbC9LvRviM0O2ZagUqHrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAP2//Vl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B0F7C32781;
-	Wed, 24 Jul 2024 13:53:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721829215;
-	bh=07Vzl6re9ZHoHnUQaqXa2n0Sm3JNDNE/aQbliYyNUPE=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=WAP2//VlWUSM9jrjWrTnlUR5U9gfJcKWxfEehwSsgCifqJ1HhI5rmor2MgAYiE7Hj
-	 k3H3D8gUK01HrebDYiJ8EV56b+RO+InO4F1HL2zNXYqpPk0VVAstDY9HBgwUy8+jTo
-	 8Kp+cbZnfcsDTxUnkpS1wiQgO6T2KXSlCCZwyOB4EAFefvi0zRPKDPVqPNBGFqV5Kn
-	 m54HgAjJfy8we9Y9tl7LY7L4gaHz6KkuEz0NmtF8JUJfXUWPMHmL6c8XZgfCklah1Y
-	 U/SwoGTJa9N4jZ4SGcPsHczOthJTxHkGyBSbyg3+L/BrGVV8TCmbKAOKTgYYxrZSSF
-	 Ywifo4pkBnatw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A535FCE0A6E; Wed, 24 Jul 2024 06:53:34 -0700 (PDT)
-Date: Wed, 24 Jul 2024 06:53:34 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	kasan-dev <kasan-dev@googlegroups.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
- <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
- <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
- <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
- <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
- <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
- <ZnVInAV8BXhgAjP_@pc636>
- <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+	s=arc-20240116; t=1721829396; c=relaxed/simple;
+	bh=SAjqmh/BLGtim+vtA52dOehpZeqvRWDIVdUK8nzMpbA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MYM+Mwr8Y+yNA7DctKGttvfq8jo273JlwH5uDKbNb7v7w+fJxMQZQeYylRQ05e8TEA/MKJgs7avLYtr5ePHfxuXK7vZKh1jSEbGBIYBpO7Y0peQ9c33Gq9L05A5NkIDbjQm3fRlpFeiPRf/PrP6a/IFtJIATOPhrEEwcBbAZvw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hPZD/DCn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721829393;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=w6G0SfWDui6haP+QkrlZi2OYiAuFOXCgkThuAWcxZVo=;
+	b=hPZD/DCn64ChVE3EM4jPg9L7EJUju5zI5T03D1w8Yz/2zLT+EISS1GnPn0tupb0QHRF7qq
+	eeDVU9E8JNbyf/S9x6Fut5nzEkvpLxPbiBUzl9WYADUiHw7utMZw5l8pQYUOM1rk+ifLiv
+	Jr5K5CrKVBZDXrumYUo/zgZnTHwoRX8=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-648-qd54ccWRPn6wcXy58eHjOQ-1; Wed, 24 Jul 2024 09:56:32 -0400
+X-MC-Unique: qd54ccWRPn6wcXy58eHjOQ-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1fb116ff8bfso20129695ad.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 06:56:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721829391; x=1722434191;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w6G0SfWDui6haP+QkrlZi2OYiAuFOXCgkThuAWcxZVo=;
+        b=Id8vq5260JC810ui7BrZTsUAig6l4hSSNnUBbZNCv8Igq35TBInH9LNdcTbm4oZr6B
+         5crc5zP7TcUfu2neNkSXKrf/Fw9u+xFdcU/Wo1+TzyhABGjgdJqGaii5DOKvP+wnkJ0M
+         UAWCiLmZ04AySDp0Eba7lHZQha807X59nHagY7Z1X8J10YB+acnMB3jqFhEoKIoOFLq3
+         Kbs6c3YTRjD9rfVdEOjPnZfEQA1c4wfMnqDl6SyD97c/sJ+s1ziESF+QfcczhtLEZ1zW
+         UHQf4aMAagc6y2ZqcxeVCI0lIQOcW/J7TP23ivr6JUl/IyLLXo+myjIS2gZArMLv0IpP
+         9jFA==
+X-Gm-Message-State: AOJu0YyUeQCB+EshK+z1iUcOGixULJuzkVlqnYC/yVURIsMzKf1esFq3
+	oRljojyHmSOc3Gy4ltTlCHZwQDTUPgFNZWemipVfUxC7ZCqII/NmDophKnRkZCOEeNnBeBnaHrG
+	IeAYu6JNoEA393cI8LYBds8AGZuIIvueMtQvfUf0Tyz8W+dtdrxm3Kg==
+X-Received: by 2002:a17:902:e892:b0:1fd:6529:7436 with SMTP id d9443c01a7336-1fdd20edc9dmr31053815ad.8.1721829391295;
+        Wed, 24 Jul 2024 06:56:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGcg6fpS+w8IcgfqaKJSV23XPUmGkySpEj5lsBc/ADne3OoONkx6JCt6twOrhpHEzEPRK1Klw==
+X-Received: by 2002:a17:902:e892:b0:1fd:6529:7436 with SMTP id d9443c01a7336-1fdd20edc9dmr31053585ad.8.1721829390812;
+        Wed, 24 Jul 2024 06:56:30 -0700 (PDT)
+Received: from ryzen.local ([240d:1a:c0d:9f00:ca7f:54ff:fe01:979d])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f31bd9bsm94359755ad.157.2024.07.24.06.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 06:56:30 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>
+Subject: [PATCH net] macvlan: Return error on register_netdevice_notifier() failure
+Date: Wed, 24 Jul 2024 22:56:22 +0900
+Message-ID: <20240724135622.1797145-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
-> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
-> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
-> > One question. Maybe it is already late but it is better to ask rather than not.
-> > 
-> > What do you think if we have a small discussion about it on the LPC 2024 as a
-> > topic? It might be it is already late or a schedule is set by now. Or we fix
-> > it by a conference time.
-> > 
-> > Just a thought.
-> 
-> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
-> propose a slab topic. We could discuss in hallway track or a BOF, but
-> hopefully if the current direction taken by my RFC brings no unexpected
-> surprise, and the necessary RCU barrier side is also feasible, this will be
-> settled by time of plumbers.
+register_netdevice_notifier() may fail, but macvlan_init_module() does
+not handle the failure.  Handle the failure by returning an error.
 
-That would be even better!
+Fixes: b863ceb7ddce ("[NET]: Add macvlan driver")
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+ drivers/net/macvlan.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-							Thanx, Paul
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index 24298a33e0e9..ae2f1a8325a5 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -1849,7 +1849,9 @@ static int __init macvlan_init_module(void)
+ {
+ 	int err;
+ 
+-	register_netdevice_notifier(&macvlan_notifier_block);
++	err = register_netdevice_notifier(&macvlan_notifier_block);
++	if (err < 0)
++		return err;
+ 
+ 	err = macvlan_link_register(&macvlan_link_ops);
+ 	if (err < 0)
+-- 
+2.45.2
+
 
