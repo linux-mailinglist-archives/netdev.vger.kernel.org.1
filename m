@@ -1,206 +1,102 @@
-Return-Path: <netdev+bounces-112762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB8C193B0AE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:45:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C39B93B0B6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF37E1C21F9D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:45:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B86F1C203B9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F61158A34;
-	Wed, 24 Jul 2024 11:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6472156886;
+	Wed, 24 Jul 2024 11:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o6i4Ba7o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA69D155A24
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 11:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6395695;
+	Wed, 24 Jul 2024 11:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721821521; cv=none; b=eHp+LnRzOEW96a260s/Rg0GRJMhMZo1f3UkBWlNXclnaKzVc+4nFAG2PvJ0TlRBraSWbhf4JDiuKgcZE/WJp/QL0hD5CNeu5j44TlKD/TsQnrfo2/U6hsdUtwXsLl2TOsQfcUtlwsTUHFAmO6QGN2fLgxZFf1J/KrvutdnjOe/8=
+	t=1721821774; cv=none; b=hasTGAOg2nQ8k0uKzvx1RbhZfom5h3sqf/l4kS2OLiya0CitYAjs9VFeu05gzedz1ripKP0FZuY8luFNKIw2jBvojCm9nP0x3PKj/OKZ3IhwmOQrLjEXO7eDFMvvEtwes1RZdoOSM8S2ainD6XYIaYhshLGnacRh16x4KH5XYdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721821521; c=relaxed/simple;
-	bh=wb3VlPAZu/8KJHmcJT9f5nyFbxv0j84sk/ugoTpnrUA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=bRLegtaui1bZ0FJZO4NtKr9SPBGuxUQapNSVi1DfCNduojZqKqPKaP3/QVcoH6yNzpYgJnJkUt0vphEIanIEL5jUgTi605ODIEcl0ByqXEC8U+wMNyxwQD6iY/UbIham97B+ZZ/k8bZHODNYMaHeuswEHrA2kHkL1sQTC8nC2Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39a1d269982so5587715ab.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 04:45:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721821519; x=1722426319;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ob0VFukh3Hee8onVi5JuQ10r5B1QmZdqH/VPwHjuR70=;
-        b=tEhTmT40phpLCPm2D+Ykp8Kcx0tJx6A4LNjSx+KhP4bSLvNpwVnV+F2K62Gxhi7FYC
-         SuUvHNEx2z9JH5nyaNlaf3FDjnopqLec4Am+luDNsxR1vcXGyjlk6BQUd08DUk//L9sH
-         O3/R6dApfch92jxaC0yGWyo53lP7dXK03KjqCtW0zd/PK+XJ3rCxjZJuSIkrvz76/gPn
-         jYjVdnr3jw6jOgd5+puHiEbx3rkW1Oh2YXMhFBL8HybXCsUDANk7u0z23JQQI/L7csVQ
-         WHObythpNQFg1aQtLASRMMDLImrhsMaoTayO+Ffl71i0L1boq6XOs50LRdalC14hbkpP
-         Izdw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTvbq6m+1j9XS2b+vvPpfxUnbNipWixb6+5B8XcWaT8ECo0uKzF7COyOGa4Bc7d8jzcdqULvDCupcPXNnS2LuIGfXb/JnC
-X-Gm-Message-State: AOJu0YwyKXzAyQS++YwADjxkXeCDjQKhAN/yIP9uh94Q5i+ZZAU1DH6b
-	Vitja4EPjJOBPMnn1+9WIgA5wdqjnSMq67Us9xoyMPlcIRCIWiCsOajc7m2+wX9ZKmSOfxmtbnS
-	WJe417XwYjME/PZ4uAw+XPJj20utfCMAU+Jp5Dqzjb4jLhoG2/iZNinw=
-X-Google-Smtp-Source: AGHT+IH7dm3oj1KL51abMHq9FzXLX639QuSbRtEMAONp+YpvnZJg3TyROuN/DQrLoAGuLxd6Sqkw36kS8Eb6JGv8a3gEyh4NE84u
+	s=arc-20240116; t=1721821774; c=relaxed/simple;
+	bh=yDlumJKmEzhAKRjnL1qUjXcaVNhaH0K7mVcLUeQqiWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQmQ+F8wFzlekGoWt5KwREh3ENeWrjnGM4kmLNug+AApCwEz0ZNgFnPReucCID4Jmc/fgJ2z7Y3kvHIzQfcpfjoIVmU3UNQZGE3fx7auzBz8n5WcUNQedMGnZ3HGb9tNxb5G5CdEcPtxcFSjK6rbxoGV5GH+s6cla501GYdwk0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o6i4Ba7o; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XnfSfb75bly186ZIDAtRd0JeKb7NNesu8aYFDkUskvA=; b=o6i4Ba7oXWczgyVPeJeCBG15IT
+	c2988/t1yHGmz/cToeoN6L4NN/q+7m0q0ABG3WjGwUAp07o0xwz+gQjuHDowPa7pA5InNuBZ2ldIk
+	pOp7wxJ3gW3pFdtbvu9Pi+IQ2A80/IAXQDGLQIRrMzI1dH18n0YZZZto+gSLRzDXavqE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sWaUc-00381H-OR; Wed, 24 Jul 2024 13:49:14 +0200
+Date: Wed, 24 Jul 2024 13:49:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
+ module
+Message-ID: <8a85af94-8911-44b8-9516-2f532cee607d@lunn.ch>
+References: <20240724102349.430078-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a8e:b0:380:fd76:29e4 with SMTP id
- e9e14a558f8ab-39a194fcb1cmr1200105ab.4.1721821519181; Wed, 24 Jul 2024
- 04:45:19 -0700 (PDT)
-Date: Wed, 24 Jul 2024 04:45:19 -0700
-In-Reply-To: <0000000000000f50a4061d8c4d3c@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000048a4b061dfcd02a@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in __cpu_map_flush
-From: syzbot <syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240724102349.430078-1-jtornosm@redhat.com>
 
-syzbot has found a reproducer for the following issue on:
+On Wed, Jul 24, 2024 at 12:23:44PM +0200, Jose Ignacio Tornos Martinez wrote:
+> The related module for the phy is loaded dynamically depending on the
+> current hardware. In order to keep this behavior and have the phy modules
+> available from initramfs, add a 'weak' dependency with the phy modules to
+> allow user tools, like dracut, get this information.
+> 
+> Include micrel phy module because it is the hardware that I have. Other
+> possible phy modules can be added later.
+> 
+> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> ---
+>  drivers/net/usb/lan78xx.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+> index 8adf77e3557e..c3945aebf94e 100644
+> --- a/drivers/net/usb/lan78xx.c
+> +++ b/drivers/net/usb/lan78xx.c
+> @@ -5074,3 +5074,4 @@ module_usb_driver(lan78xx_driver);
+>  MODULE_AUTHOR(DRIVER_AUTHOR);
+>  MODULE_DESCRIPTION(DRIVER_DESC);
+>  MODULE_LICENSE("GPL");
+> +MODULE_WEAKDEP("micrel");
 
-HEAD commit:    9ec6ec93f2c1 Add linux-next specific files for 20240724
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=10e71ca1980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=83e9d0906fa0e2bd
-dashboard link: https://syzkaller.appspot.com/bug?extid=c226757eb784a9da3e8b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17c0f8e3980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=151b9919980000
+~/linux$ grep -r MODULE_WEAKDEP *
+~/linux$ 
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c0ab2da24b1f/disk-9ec6ec93.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/da6faf16185f/vmlinux-9ec6ec93.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1ad900571155/bzImage-9ec6ec93.xz
+Is MODULE_WEAKDEP new?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com
+It seems like a "Wack a Mole" solution, which is not going to
+scale. Does dracut not have a set of configuration files indicating
+what modules should be included, using wildcards? If you want to have
+NFS root, you need all the network drivers, and so you need all the
+PHY drivers?
 
-Oops: general protection fault, probably for non-canonical address 0xe3fffb24002e6fe6: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: maybe wild-memory-access in range [0x1ffff92001737f30-0x1ffff92001737f37]
-CPU: 1 UID: 0 PID: 11878 Comm: syz-executor412 Not tainted 6.10.0-next-20240724-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:__cpu_map_flush+0x42/0xd0
-Code: e8 13 8c d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 4d 12 3e 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 2f 12 3e 00 4c 8b 23 48 8d 7b c0
-RSP: 0018:ffffc90000a18b10 EFLAGS: 00010202
-RAX: 03ffff24002e6fe6 RBX: 1ffff92001737f30 RCX: ffff888074dc8000
-RDX: 0000000080000101 RSI: 0000000000000010 RDI: ffffc9000b9bf800
-RBP: dffffc0000000000 R08: ffffffff896d3b5a R09: 1ffffffff1f5f375
-R10: dffffc0000000000 R11: fffffbfff1f5f376 R12: ffffc9000b9bf800
-R13: ffffc9000b9bf820 R14: ffffc9000b9bf800 R15: dffffc0000000000
-FS:  0000555592677380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd44da640f0 CR3: 000000001ea68000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- xdp_do_check_flushed+0x136/0x240 net/core/filter.c:4304
- __napi_poll+0xe4/0x490 net/core/dev.c:6774
- napi_poll net/core/dev.c:6840 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:6962
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- common_interrupt+0xaa/0xd0 arch/x86/kernel/irq.c:278
- </IRQ>
- <TASK>
- asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
-RIP: 0010:check_kcov_mode kernel/kcov.c:184 [inline]
-RIP: 0010:__sanitizer_cov_trace_pc+0x37/0x70 kernel/kcov.c:207
-Code: 40 d7 03 00 65 8b 15 10 0c 70 7e f7 c2 00 01 ff 00 74 11 f7 c2 00 01 00 00 74 35 83 b9 1c 16 00 00 00 74 2c 8b 91 f8 15 00 00 <83> fa 02 75 21 48 8b 91 00 16 00 00 48 8b 32 48 8d 7e 01 8b 89 fc
-RSP: 0018:ffffc9000b9bf8a0 EFLAGS: 00000246
-RAX: ffffffff81410dcc RBX: 0000000000000000 RCX: ffff888074dc8000
-RDX: 0000000000000000 RSI: ffffffff8b942412 RDI: ffffffff8b942328
-RBP: 1ffff92001737f30 R08: ffffffff81410c60 R09: ffffc9000b9bfa70
-R10: 0000000000000003 R11: ffffffff817f7030 R12: ffffffff90294810
-R13: dffffc0000000000 R14: 1ffff92001737f30 R15: ffffffff90d0fbd4
- unwind_next_frame+0x67c/0x2a00 arch/x86/kernel/unwind_orc.c:495
- arch_stack_walk+0x151/0x1b0 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2252 [inline]
- slab_free mm/slub.c:4473 [inline]
- kmem_cache_free+0x145/0x350 mm/slub.c:4548
- __dentry_kill+0x497/0x630 fs/dcache.c:629
- dput+0x19f/0x2b0 fs/dcache.c:852
- __fput+0x5f8/0x8a0 fs/file_table.c:430
- __do_sys_close fs/open.c:1566 [inline]
- __se_sys_close fs/open.c:1551 [inline]
- __x64_sys_close+0x7f/0x110 fs/open.c:1551
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd44d9ed9c0
-Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d e1 76 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
-RSP: 002b:00007fff7a1e95b8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fd44d9ed9c0
-RDX: 0000000000000e80 RSI: 0000000020000100 RDI: 0000000000000004
-RBP: 00007fff7a1e9600 R08: 00007fff7a1e95e0 R09: 00007fff7a1e95e0
-R10: 00007fff7a1e95e0 R11: 0000000000000202 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__cpu_map_flush+0x42/0xd0
-Code: e8 13 8c d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 4d 12 3e 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 2f 12 3e 00 4c 8b 23 48 8d 7b c0
-RSP: 0018:ffffc90000a18b10 EFLAGS: 00010202
-RAX: 03ffff24002e6fe6 RBX: 1ffff92001737f30 RCX: ffff888074dc8000
-RDX: 0000000080000101 RSI: 0000000000000010 RDI: ffffc9000b9bf800
-RBP: dffffc0000000000 R08: ffffffff896d3b5a R09: 1ffffffff1f5f375
-R10: dffffc0000000000 R11: fffffbfff1f5f376 R12: ffffc9000b9bf800
-R13: ffffc9000b9bf820 R14: ffffc9000b9bf800 R15: dffffc0000000000
-FS:  0000555592677380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd44da640f0 CR3: 000000001ea68000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	e8 13 8c d6 ff       	call   0xffd68c18
-   5:	4c 89 f0             	mov    %r14,%rax
-   8:	48 c1 e8 03          	shr    $0x3,%rax
-   c:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
-  11:	74 08                	je     0x1b
-  13:	4c 89 f7             	mov    %r14,%rdi
-  16:	e8 4d 12 3e 00       	call   0x3e1268
-  1b:	49 8b 1e             	mov    (%r14),%rbx
-  1e:	4c 39 f3             	cmp    %r14,%rbx
-  21:	74 77                	je     0x9a
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 2f 12 3e 00       	call   0x3e1268
-  39:	4c 8b 23             	mov    (%rbx),%r12
-  3c:	48 8d 7b c0          	lea    -0x40(%rbx),%rdi
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+    Andrew
 
