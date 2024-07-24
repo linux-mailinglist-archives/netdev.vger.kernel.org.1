@@ -1,83 +1,77 @@
-Return-Path: <netdev+bounces-112768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8592A93B1B9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:37:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7442F93B1C3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E21D28149E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:37:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05992B226AB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA76158D6A;
-	Wed, 24 Jul 2024 13:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F38156C5F;
+	Wed, 24 Jul 2024 13:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvjm51Xa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K3gt2zeg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E191586D5;
-	Wed, 24 Jul 2024 13:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B34022089;
+	Wed, 24 Jul 2024 13:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721828242; cv=none; b=mJ1SkUL/hcUzyfeMDvFc0JiGX7+FV4ekhE7N3S9Cybo2AvejN5BI/vPSOt+tHwM+9PRpA5Tx5UlodPmnqcYp5KcvqessULm4R9hjQZpdlX44dhhYJyXBvsUxpPap2gfB81fXAcC9WBj70wpEyPzmWsGm3tG8P/rhcqam2EeUfFc=
+	t=1721828445; cv=none; b=tEeN5jrwS/6Wq7i+2xq3Sw3cZJWP0MN6I8Pno+4lqYm5CL1FDtD8hh6NgKZsh4g0PpdV7qy/K+gYT4vfNRHr3C9/9kUwJWogcDetp0huMk6cV4rK0Mr1Ohv9VW+zqBQyxpPw3nPfcDD6JFayUoMlcRIvBN6h+YpOKcLtwzKQI0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721828242; c=relaxed/simple;
-	bh=ta2/8Z37mh5TxPJfz6mZycKBtVDsPV8CcXDS7O6GkZk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HHEA+9n2MkAsVQLOXFBvYgeFByZUOBL3jZ5rAgsBvUZamTIPrh6ytGxdDkmt9iHeNvASwnwJsAePh4Ywk/5yCLxDnOHxfOfsuGwP5Tbxdllv/MxRFIyUz+621B9YnmI3V6sB7JRdYGbxIGvPmSCvrjgmZmMfBmm+QblB800b9f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvjm51Xa; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-1fc6a017abdso7580745ad.0;
-        Wed, 24 Jul 2024 06:37:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721828241; x=1722433041; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RmLOEPjtPW/NoAcNCjzI38rHsdFVG1KX6McVe0oeQa0=;
-        b=lvjm51XauwdSJsDu5zO13MgkTJd2H2c+ZFel1sA6n+JysqJ4bWavkVAOq8o37KzaEP
-         6jzFVVKygb2c8UA1YScTp0UJrlWK9sFWBOvBSBPIOkN3H2mSe217FdVkGt/ETKXzty5A
-         5UYiOE5C7x3yPbwVxeL5czKNwA1jHApn/8tzAfLlaKWt1HzVECmKP0aNXjD+kKAvmEiu
-         fENKhNvBXzgpwCg/BJNmSrtWT7MO1XRab9x0VO+ARJq0gGzuGJrFKWR3CePzYYabYkYH
-         GQ+2LWHB2sJhGPv9c5wsPUwZKbw/yo+UTtvjhg3fGV8CovT3isQuBWDF0owQfIJa0Pf3
-         d05A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721828241; x=1722433041;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RmLOEPjtPW/NoAcNCjzI38rHsdFVG1KX6McVe0oeQa0=;
-        b=BC0MnpSL+ZwaUy5WBahINYmR4qnDKWcCIIt0B43MGeln+5Dj0vAEI4H/FJHVIRdfD8
-         +6XNizp7GaTf4feYFycA7XS5NLHV8cZvF+0QF2i/G9Py8UFi5Lg7IAmJMkaBcZSNIndC
-         KqVSJi999iAgLwFbhlqHkcZp120ORDQoMKOQUohngwJTQcOTEVrc2A7scA4UwUY90/4p
-         BUx7tt0uG6W7inWJdmCKlfO5AbPzkA30HtIl3MS30Klw/hA4vagMvERiT5LPOT2CVyev
-         TfDcYmHI68pGBQQ+ka1aauA94Pdjd9bmcnetEbT0m8ucf35JN3Y9kBMsxo9gdnwmI3SH
-         peAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNgoROKM/1JmCcKj7CMp8h2nsgMx578K0TwvZtRCiPUwfNA3uKxLU63ac+kg0hJZ51fHWde2wqpl3ZD4/LBoa0gDwGrmQtuxYkGbiUUpPJ2ZeS7Yf2dEc81LxmgZmT3qmPKK9n
-X-Gm-Message-State: AOJu0Yx+tMLM7Y37oibTOm+vLwRmR8oo/7Z7xTuveG8cf3a/KKyIFezU
-	YBHZ0Sh+RHUfi7SoonRcKSsyaw2qlObsRtOzRJ0sbAt8EtljKOO/7yrVA7gt6DA=
-X-Google-Smtp-Source: AGHT+IEOt69E513PtiaVIIvBm8JbI6kOl4Aa5PFbXoAAIJvgnylR87hDVuBteEHxoaUIS37EtqmZ/Q==
-X-Received: by 2002:a17:902:bb88:b0:1fd:664b:225 with SMTP id d9443c01a7336-1fd74596fa0mr90868125ad.16.1721828240543;
-        Wed, 24 Jul 2024 06:37:20 -0700 (PDT)
-Received: from localhost.localdomain ([240e:604:203:6020:64ed:1e9d:db67:b575])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f31bd90sm94497425ad.173.2024.07.24.06.37.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 06:37:19 -0700 (PDT)
-From: Fred Li <dracodingfly@gmail.com>
-To: willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf v5] bpf: Fixed segment issue when downgrade gso_size
-Date: Wed, 24 Jul 2024 21:37:12 +0800
-Message-Id: <20240724133712.7263-1-dracodingfly@gmail.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
-In-Reply-To: <CAF=yD-+Hx9Tg-Fj+7hutPJ7inL_GpgiY4WAXXdhN-tzj5Q1caQ@mail.gmail.com>
-References: <CAF=yD-+Hx9Tg-Fj+7hutPJ7inL_GpgiY4WAXXdhN-tzj5Q1caQ@mail.gmail.com>
+	s=arc-20240116; t=1721828445; c=relaxed/simple;
+	bh=0dUlSwLv3mwvkv5Kz61djZ1AXbh+Q3AHHVb7An338Ec=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HFCw5kKMa80BPVQt2xbADh/GbKiJRiuWQrgUNY68XQ+nI6EA5uHZqqoeawFKbxqQXjTBIEewbzefX5c4uvmdrQJ4U3uyrfQcbvsO/DP7rlQb2Pb02Z1aJXxHB9Cl+lvDYh8sPLxaby7te8NZhH2yritN3KSJKYpOUsvuS72stcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K3gt2zeg; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721828444; x=1753364444;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0dUlSwLv3mwvkv5Kz61djZ1AXbh+Q3AHHVb7An338Ec=;
+  b=K3gt2zegzPLKF/80kI/aU7PgmnwrF2q71Ge6p00v6ia94Lok/+yw37GE
+   r3n+NLERZwfGFltMBagssO9uSIMpS+y4Xfuyg2rOg8yewLomuiEBC3ZeF
+   yrZnbc3ES3Z69Rc6ftAgRYe0G8vXTEIzxCqdSwhnFgT1Bd7EAzhs7Jm45
+   pmoey8dBFhGFcQd9wIqW38XIK80FkiAcBzX8c+SGkAMLBQzF8qNWCeueL
+   KNGcM8vdKnJUB1q2j0VxT7QeCGFv0XW6yN7vRN2lcypiuie0df06wuZtk
+   rN8n0TVUTF4ofwCl7J5H5IuliRrHqIAkJe1hs165LohwDV16EPMxWMKde
+   A==;
+X-CSE-ConnectionGUID: CeB40VzvQASChld2cXcSUw==
+X-CSE-MsgGUID: py9DQGN5SFumCdpr5CMw4A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="19469364"
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="19469364"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 06:40:43 -0700
+X-CSE-ConnectionGUID: IdraOJDqQuC9OVR6+RcmMg==
+X-CSE-MsgGUID: KhNxVgLOQKyD+//WxKbLoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="52615636"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa009.jf.intel.com with ESMTP; 24 Jul 2024 06:40:41 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net 0/3] idpf: fix 3 bugs revealed by the Chapter I
+Date: Wed, 24 Jul 2024 15:40:21 +0200
+Message-ID: <20240724134024.2182959-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,33 +80,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-> >
-> > Linearize skb when downgrad gso_size to prevent triggering
-> > the BUG_ON during segment skb as described in [1].
-> >
-> > v5 changes:
-> >  - add bpf subject prefix.
-> >  - adjust message to imperative mood.
-> >
-> > v4 changes:
-> >  - add fixed tag.
-> >
-> > v3 changes:
-> >  - linearize skb if having frag_list as Willem de Bruijn suggested [2].
-> >
-> > [1] https://lore.kernel.org/all/20240626065555.35460-2-dracodingfly@gmail.com/
-> > [2] https://lore.kernel.org/all/668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch/
-> >
-> > Fixes: 2be7e212d541 ("bpf: add bpf_skb_adjust_room helper")
-> > Signed-off-by: Fred Li <dracodingfly@gmail.com>
-> 
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> 
-> My comments were informational, for a next patch if any, really. v4
-> was fine. v5 is too.
+The libeth conversion revealed 2 serious issues which lead to sporadic
+crashes or WARNs under certain configurations. Additional one was found
+while debugging these two with kmemleak.
+This one is targeted stable, the rest can be backported manually later
+if needed. They can be reproduced only after the conversion is applied
+anyway.
 
-Thanks for your advise.
+Alexander Lobakin (2):
+  idpf: fix memory leaks and crashes while performing a soft reset
+  idpf: fix UAFs when destroying the queues
 
-Fred Li
+Michal Kubiak (1):
+  idpf: fix memleak in vport interrupt configuration
+
+ drivers/net/ethernet/intel/idpf/idpf_lib.c  | 48 ++++++++++-----------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 43 ++++--------------
+ 2 files changed, 33 insertions(+), 58 deletions(-)
+
+-- 
+2.45.2
 
 
