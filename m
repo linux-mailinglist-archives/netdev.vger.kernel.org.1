@@ -1,162 +1,108 @@
-Return-Path: <netdev+bounces-112705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 465B193AA82
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:18:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3841393AAA9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53FE1F21101
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:17:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE92B21914
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684D85672;
-	Wed, 24 Jul 2024 01:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FAB6125;
+	Wed, 24 Jul 2024 01:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpAhEJ2E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iv5SKB2E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30474C9A;
-	Wed, 24 Jul 2024 01:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0AB5223
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 01:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721783874; cv=none; b=QS0ntqcplScMAbzXdf01lXU8o6cD46WpnBIu/65Brxq/tBiqpOKbsGzvRCdmrtKIl5WWZwuCRqY3zV8Xtc5gMxZUcQpAtmFziuh+qUD9Kw/FgFrj3iLIbsdSC+KpLfGwl4bdBwnL+gBRufzyUDrN7zHt6blwro5f/D2woeZHzOw=
+	t=1721785628; cv=none; b=G5xgvzf1DOJfkFN3Je3i3nu8KIxXmMvzBtLAM9umSrDQvq2WnR4suvys1+p+4TnAHKTmW9VX8uv/QURcmG2c3fyaB3WVTR++9SQ62iLoknqTWcQacwiG02wwuFSr1yFkom06nr6xYp9Boevgg93GAU+LgHGhTWdCJ67UMz0r26U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721783874; c=relaxed/simple;
-	bh=KkecNZKY3nbMCSSkETEzc/mfnZaV7kZfSSY4gRjGJRM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W1LcztLkmhY23pMAsMc6l0UaTl4Dsn03mxvy4J9RDXzRx+rt4DooUHl0+So9H3lqu5hwipRb0c1/uym1lDdppumJI5Mu3Do/GnH4Nwzv50AVsDASKgjJuKSzEEEMaYaoJA68TRnN4WeZfH2BjzcXYX7uSRdqVL69Jlee+/rDZLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpAhEJ2E; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1721785628; c=relaxed/simple;
+	bh=hlwUkkR6ZCbclLtRWSJQO+QCQGfy1tVxwlEOvNxIor8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iZg8Z7YznEZJ5YvGeD2y5eYLU9BmlfmuQcr3gzmwDTYDWRdN8KDhOg9ZrQ4656pGqZcd9avUmz9CVIN1+xl/plJxG6QQOHOk7535GNMNtOwOo6N6zBvdOGEoqNiGvfLBfVpgNAKUThcUMeZ+5T6QyFTWqru2rNVRcSpVBoHOfkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iv5SKB2E; arc=none smtp.client-ip=209.85.215.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4266b1f1b21so45932005e9.1;
-        Tue, 23 Jul 2024 18:17:52 -0700 (PDT)
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7a211a272c2so271690a12.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 18:47:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721783871; x=1722388671; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rpc/2SwkiTZTr0tB2COZXlj9ID1K7BEkSuF6F5pqIeU=;
-        b=MpAhEJ2EKPqPplis5PuUfb5x05eTQUTy3ORtPhj7SkC8z0jpy3NWHLMclbKHDzZOB8
-         M0ejq/22FdJLrkJGzPCvs9AqAU2lvb0deYyWjgMnL+RKY3zgIAA3zZQvddE70YbxS0zt
-         5DKHKDnU0f+tZrQQmR8kQfxiMbLCiOcytZkVp3nrfXVlzkNhtIX/yoxHtJR//U6Dh7eR
-         e9Gr6v4VWuNeP+WTY1W6gLu8exUPGz86YeQeREUw6GsXzs+1lmrnpe9p7DltAMinT+PR
-         7485hcafXm7WWCpQWd1WhypiNH8CYl3KddNXGNqb9txPfrJx6SSvDA11pspRs09SqvQC
-         WX2Q==
+        d=gmail.com; s=20230601; t=1721785626; x=1722390426; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lAZGFPaCPLEld48/O8CI5jp6PH5A8pSV1pKBW/RDN10=;
+        b=iv5SKB2EGv47DJULnwEgN0XGQz868xbRDNdFDulyK98n9pIGyxbXH1N1cefALSxkc3
+         g1xaR2qeSOOr3ILdh3ooCX+Vqa4ootpviVeqfOWhu3pSUXNz4FSee/O2Kmk2YWMPw+IT
+         aO7EvwQimMfzr5Lc9WxAPaLmnvdxAdtEMof9FQDV8uQuO8XLZa62CDfewkIoweoZZ0oK
+         7JsrX8ZiV7wE+BbJb0KzH/OzleISmwZS6jS7OyBa6dgFuDQQTQgm/krmaB2TToxk6TOq
+         oazI9ha4UP84jmF/4HSynJ0yImC2z6hC/PotSQy6qDOP7pq0zuWoPXtIQ4qaxGxf013y
+         3LPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721783871; x=1722388671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rpc/2SwkiTZTr0tB2COZXlj9ID1K7BEkSuF6F5pqIeU=;
-        b=kW7KkgUJWUQfMpZVjHZ/C980/c+R/Fl0XvTLVzOu5Qs2ZvkRajeCy/yJ896F/xsFAb
-         FL+UMI0cHJQ5U7I1Ky46xgQwNbn4nfnrk8prAAxO3td0IbUC/bd0lsTHg+mNWfyOJNUX
-         FRdhAx9RnZsv8/PWn+Ud6hoZs8GoID9MFJGMCBHBgOvtHc2LSIJmksqJ3TGlXh7QUPuH
-         vs4AbQHp8HK83DKkHouZHq9ofdbnSWN8noOf37n0VRd68oA8VqlhA9Ka62xmaIwYZfPF
-         xMeY09GNHzOVo0UdkacaDri3ULWh1CSX3QMNxGOv5cy0UA3ZvgfEWNbU6Uzkrp3zByYK
-         bpzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNir4Bt3UrU16JbOC+j7DWSeWvBUGDmxYZUCZIjzktAZtpCFLfgwQ4/kBsYCDe5Y4X96SQTqxe3SKSKPqvakJ7E2Up7C6hQZEOs/nEuvVyusr67/9jqmDO8jejtoZ+RpxkUnRbLWEdUTIIgegXjM8T6kaKCSFYTq05HMZxbfHKuWbA
-X-Gm-Message-State: AOJu0YzOy0PC+Li7H2SOa3VFxWesUs+IgIse5ZS5isRPMvtuK1MiwaeI
-	3qB23FsFHG8KAkJ3/6RpNN8XqxyphDZFi3+xrLp/RMCOInTiKN6AgQBZDvTIRhi+67OXpb4jXBS
-	yZ3gSInKVbbJSG0rsr8hHI+QtoHA=
-X-Google-Smtp-Source: AGHT+IHy0gPavcCN7w+YuH/0mLjZRQm5fwtPN9TUK6LYu1xWYik/PO4O2Ozh9BgSdVar1Jki8LWGHqUKAwwdc8vHvaQ=
-X-Received: by 2002:a05:600c:5487:b0:427:9dad:8063 with SMTP id
- 5b1f17b1804b1-427dc51d315mr64923375e9.12.1721783870879; Tue, 23 Jul 2024
- 18:17:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721785626; x=1722390426;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lAZGFPaCPLEld48/O8CI5jp6PH5A8pSV1pKBW/RDN10=;
+        b=DIWDEZOL9cxm6BCpbTCeiLGamQJuF4pJ+idyPcH8/Sf2wO0fDatUZG9tRePvgb1sdx
+         bjRrNDzhbwhX4g9cp0hpsyxqU/k0sNO1TUHIxK0dtBhpLn2oBEVepk+VwYEU4ykpXdvL
+         y4DhXhYdPNDHzqgCc7cV5on/IiG+YvNMXuc/guykHPpgfG4bhy8PWaKw8Qb/9SA2KlQ6
+         WXrAe46UpswM2hyx9F3rY1gfjzOUKaoK/yCbTOfa2y9MKegJisJ4PlyzBsyhZoWPv8iY
+         7baqERM9my64A286IsrM0TzV7exajWMrUbUYFE9S+xq43ipcJ/4mBzy9ak0ICxvAFz1P
+         hodw==
+X-Gm-Message-State: AOJu0YxwpKlqySg20LIibSaSmMvWDDITAyLWBhEB8tcSgIF7dfGA8Cdm
+	gjS0JVXcUkyGWGOjstUD458AHT8wA5kEL9RyC6MMQ96CE+cZoSMrb7WVlfFn
+X-Google-Smtp-Source: AGHT+IGrjhyzWzCniMSoCRepn7ol1wEpbCZ4070LYzTFsVwaCjCE3d0QU1AJ6ZnhVtiJ7AlGoS6zCg==
+X-Received: by 2002:a17:90a:c213:b0:2c8:5055:e24f with SMTP id 98e67ed59e1d1-2cdb9397a98mr761531a91.2.1721785625652;
+        Tue, 23 Jul 2024 18:47:05 -0700 (PDT)
+Received: from localhost.localdomain ([159.196.197.79])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb73a5f5asm314564a91.8.2024.07.23.18.47.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jul 2024 18:47:05 -0700 (PDT)
+From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+To: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Subject: [PATCH net 0/4] net-sysfs: check device is present when showing paths
+Date: Wed, 24 Jul 2024 11:46:49 +1000
+Message-Id: <cover.1721784184.git.jamie.bainbridge@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240719110059.797546-1-xukuohai@huaweicloud.com>
- <20240719110059.797546-6-xukuohai@huaweicloud.com> <a5afdfca337a59bfe8f730a59ea40cd48d9a3d6b.camel@gmail.com>
- <wjvdnep2od4kf3f7fiteh73s4gnktcfsii4lbb2ztvudexiyqw@hxqowhgokxf3>
- <0e46dcf652ff0b1168fc82e491c3d20eae18b21d.camel@gmail.com>
- <CAADnVQJ2bE0cAp8DNh1m6VqphNvWLkq8p=gwyPbbcdopaKcCCA@mail.gmail.com>
- <2k3v5ywz5hgwc2istobhath7i76azg5yqvbgfgzfvqvyd72zv5@4g3synjlqha4> <cgarsuloniffcqn5zjjomhmm5xd72t4cdiwavjqnvmgqfuc7dd@2itjdtwcq7gk>
-In-Reply-To: <cgarsuloniffcqn5zjjomhmm5xd72t4cdiwavjqnvmgqfuc7dd@2itjdtwcq7gk>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 23 Jul 2024 18:17:39 -0700
-Message-ID: <CAADnVQLZ+fDDR9cFSD8QZghXP6nEmmPP23YWd5-ysA1sZ9ZsGA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 5/9] bpf, verifier: improve signed ranges
- inference for BPF_AND
-To: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-Cc: Eduard Zingerman <eddyz87@gmail.com>, Xu Kuohai <xukuohai@huaweicloud.com>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	LSM List <linux-security-module@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Roberto Sassu <roberto.sassu@huawei.com>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Yafang Shao <laoar.shao@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>, 
-	"Jose E . Marchesi" <jose.marchesi@oracle.com>, James Morris <jamorris@linux.microsoft.com>, 
-	Kees Cook <kees@kernel.org>, Brendan Jackman <jackmanb@google.com>, 
-	Florent Revest <revest@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 23, 2024 at 12:07=E2=80=AFAM Shung-Hsi Yu <shung-hsi.yu@suse.co=
-m> wrote:
->
-> On Tue, Jul 23, 2024 at 02:36:18PM GMT, Shung-Hsi Yu wrote:
-> [...]
-> > > +1
-> > > Pls document the logic in the code.
-> > > commit log is good, but good chunk of it probably should be copied
-> > > as a comment.
-> > >
-> > > I've applied the rest of the patches and removed 'test 3' selftest.
-> > > Pls respin this patch and a test.
-> > > More than one test would be nice too.
-> >
-> > Ack. Will send send another series that:
-> >
-> > 1. update current patch
-> >   - add code comment explanation how signed ranges are deduced in
-> >     scalar*_min_max_and()
-> >   - revert 229d6db14942 "selftests/bpf: Workaround strict bpf_lsm retur=
-n
-> >     value check."
-> > 2. reintroduce Xu Kuohai's "test 3" into verifier_lsm.c
-> > 3. add a few tests for BPF_AND's signed range deduction
-> >    - should it be added to verifier_bounds*.c or verifier_and.c?
-> >
-> >      I think former, because if we later add signed range deduction for
-> >      BPF_OR as well...
->
-> I was curious whether there would be imminent need for signed range
-> deduction for BPF_OR, though looks like there is _not_.
->
-> Looking at DAGCombiner::SimplifySelectCC() it does not do the
-> bitwise-OR variant of what we've encountered[1,2], that is
->
->     fold (select_cc seteq (and x, y), 0, A, -1) -> (or (sra (shl x)) A)
->
-> In other words, transforming the following theoretial C code that
-> returns -EACCES when certain bit is unset, and -1 when certain bit is
-> set
->
->     if (fmode & FMODE_WRITE)
->         return -1;
->
->     return -EACCESS;
->
-> into the following instructions
->
->     r0  <<=3D 62
->     r0 s>>=3D 63 /* set =3D> r0 =3D -1, unset =3D> r0 =3D 0 */
->     r0  |=3D -13 /* set =3D> r0 =3D (-1 | -13) =3D -1, unset =3D> r0 =3D =
-(0 | -13) =3D -13 =3D -EACCESS */
->         exit       /* returns either -1 or -EACCESS */
->
-> So signed ranged deduction with BPF_OR is probably just a nice-to-have
-> for now.
+A sysfs reader can race with a device reset or removal.
 
-Yeah. Let's not complicate the verifier until really necessary.
+This was fixed for speed_show with commit 4224cfd7fb65 ("net-sysfs: add
+check for netdevice being present to speed_show") so add the same check
+to carrier, duplex, testing, and dormant paths.
 
-But I wonder whether we should override shouldFoldSelectWithSingleBitTest()
-in the backend to suppress this optimization.
-I guess not, since removal of a branch is a good thing.
+Submitting as separate patches to make Fixes reporting accurate.
+
+Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+
+Jamie Bainbridge (4):
+  net-sysfs: check device is present when showing carrier
+  net-sysfs: check device is present when showing duplex
+  net-sysfs: check device is present when showing testing
+  net-sysfs: check device is present when showing dormant
+
+ net/core/net-sysfs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--
+2.39.2
+
 
