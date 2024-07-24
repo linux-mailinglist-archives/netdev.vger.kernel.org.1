@@ -1,191 +1,286 @@
-Return-Path: <netdev+bounces-112744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1334D93AF76
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:56:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F8193AF82
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 12:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 352281C20D3C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 09:56:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ED34B21BE9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 10:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE0B15572B;
-	Wed, 24 Jul 2024 09:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAA9155A25;
+	Wed, 24 Jul 2024 10:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MpehK8mE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8668915539D
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 09:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9E5155732
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 10:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721814990; cv=none; b=a3kJsi/tdNMXcnptwso2iRQWuofg6tKdB7EQLOfCcYTDac0DB15YSJ5Tf5e9tfzuaxdNpplW1osnIvjC0DSswjQa+kLyIR3vZR5/BfQUM9Dvve0xaIPqA4DC7m4rU7eebZra6i1UWrAvuHOeXyb0KlhioOF8Q3SHHjgnNp6pxMw=
+	t=1721815206; cv=none; b=NV2EYFMPFee3WzSateH56U48YgO+w7FLZ6hYgkZ8zmVErB0IlftP/i38I9Y5zjAHDx4C+L7Wa2ZQ28XwJ/9Q249p/zN0zfG39szqkEyaPzPPp0XHCRuGpApI9ifsUQpEkirV5NjCPcW93fFRId6z221gdX14A1fAdH0iXzUdtY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721814990; c=relaxed/simple;
-	bh=sSJLCMpFH4vbNlcph5k+qJH1dL2+EkN/efPxaTcBxEg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZAZxqD7MwyGouQm8vfRr5O4OXNg3BKfXGJDRRMmCOXlYIowNbxMINvQkvjQGzOwrFeipfiKfSE7tULt4YykLdrGQ/XbcHsTA4Zt9SwynR1B3lQyknz4hGSPuDy9dg2T4dHWij28QMR91tzEoOsUw38+Eysr3kdBxqCYogsnOcZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39858681a32so87429735ab.2
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 02:56:28 -0700 (PDT)
+	s=arc-20240116; t=1721815206; c=relaxed/simple;
+	bh=voS3uNvl56NCYSUlhGPy8XcZuSh94VmcTEkjx2N77dQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=chAmZvBDp+jXAipbbO1jujt9TPj/4zrjku1ziqOX/WCmpsznz/73hbUDy2GkP0ls6GC7zNnfHlVIlamhYkqnt6UdA0nJooaNiClDWcjudVgCGGXk8CdOx5K1iNdE0qrqeyX0KHBLwl4t59AOq3gEzILn2zWT5wzAZE3obbmfk9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MpehK8mE; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5a1b073d7cdso17197a12.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 03:00:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721815202; x=1722420002; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=INN+/7ol+4UcKDli2RZMWn9KSPmuVqeNTfU/yaIvGm4=;
+        b=MpehK8mEvnzI6KVfdj8APC63f/nDvgVjr+BcfneL9IofsX/peBaN3g4VHI5eL3ZFPT
+         3+MwCzsZILxoLBVr40897CKEr/vImerztAfbdy8wj4WhWzgUjqCNJp+sUZOze6BJ42Xn
+         OOVGxw20m+4WzrMc8VFzriEn9hUYSwqNI62PUeSrEV0LR+GzxgOp9c3ZdBFPkxN/mn2N
+         WH7TcAk24yCSCobyel7rX/pfETcw0VM6/3ZbPC+sI97rwydvXfKY35MAjWcX3wkAVwhm
+         qPEf93mpxQ3Qk2/BGPCRRYl1z/XLvrNEpqC/A0kXgBCIVjeNNoV4ZOd1h4KOVMdSebpA
+         KxvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721814988; x=1722419788;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hdqMFB8uU7ImQxxB9QwOMhmQOoKFRjkQMGl26VZ40N8=;
-        b=WBVn6Ox9DVkofl69y4oIKIiewSp0JMy0OW9ejDTndvgNi9G4pFCSOOW5vqokAlhJWd
-         p15gNBLCd2VY+SRLiDLPuZXkjO8kO1QtfkiSuPWZOjI605VDmz6UxajDcA1zhesrPM+s
-         AYAd/RMd2o24P3cKLrXaHLGaSfhkL6MaiRHdycL7YEzHbOKq8Al+80e9LNHCsiNPpDLq
-         JSW4lKlh8xvCIIJnOaL0C3hliuneyfdLTiAMdMbGMuobUS8YuNSi09S+5WZv7YWQwpks
-         SnxfBEJAiji1uSprgl24xuvKgDmbdSOeY/spXcS/zpQA6ec5geON3xcfnfgfUol+LhF3
-         iR5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUb5QSigXvv8kD3lkVJjnrOOY05MTwC3kleZ3bi/g7usKae/qc50cKuywMnMiG+Pfdde7g1TWPvgD6xp3MXVjC4glFyMf34
-X-Gm-Message-State: AOJu0YwE1sr2AOBXQUcQ1Rh6PHy2GbxyEI/n6uYQHkL+Gh8jJLHIRcrs
-	WN7IslDruJgnq7nVaYurMjispHNzSSKYh4AlJo3/JqRYWekNlaJAC9XWbSG9XuXaW/U9QuMb6jL
-	l3YVA0Z0PgBKV7bPH57xDmQYNihhq/B0abKFmfEfDpLQzmAMKseDsAqc=
-X-Google-Smtp-Source: AGHT+IFE6SauzGiVh0EvU29OaXhet+9HlqZNcn1TQUPiXceUvTTA+gknbOY5WhuK8nHg/x6b65FqoAkN14uPE802CUoACmpiyquu
+        d=1e100.net; s=20230601; t=1721815202; x=1722420002;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=INN+/7ol+4UcKDli2RZMWn9KSPmuVqeNTfU/yaIvGm4=;
+        b=d/suyKYjQyXM69S2vXtXIUCsU35ubS8QMcPTGzJmF/eVbkkdlk46iWj9kzLFPEX12m
+         CyQs/bq4oVFl9CcOYkyrsf9rrWixDMJh0U131LkYqdcihVLIdJ9rCI0xbMdVNNFgm3+E
+         V0B6WELITAQS/VKWF9KJFvYPEFJFGnXq0MgSrIOLuQd9StJmXIsYKIBdmly6HEQ5an8p
+         ah3NL6TKYNaQJEc4RkbH9rzUoGR8zYrheby8J4f4q31YGq/RBZMKGq84i/v1MadfGuPg
+         D3Z7HOxUyq0cBGWE2fEDijNwQecWdgFLGkd8GDzPMfRk+21j5BfQH93WxC1MlTMokT50
+         ozNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbDJxTfQ0Ir0FfyJ8CzfM/MYMs6A76zS/iV6fK2l72KnMjFleZUJJtdGuuwO0jQaN6ECiZ9nzu+9xaskWrY0hfUOufiFKo
+X-Gm-Message-State: AOJu0YzPy40lg/r70JDyAkDMa0bLK0aJP3XBXTXRpvljBYcBnKgVcXgG
+	q9YjbQu2rF/yRSKbXUjJxBTVROcSj6KqHMklj9LRjWMGSeaxsCCl6IqiI6SS1MtOEYw25KDPmxN
+	EbmDPpfGIZUst9Fe95iiEPAu+km9A5tQOSLn/
+X-Google-Smtp-Source: AGHT+IHI95yV4pAlEHA4qjFR9K/I32m2cB7EzqtaLIX49oidJ2ab5Nno2laDRlfX6l+QkZH7oJdXT80JC1aqIHfItps=
+X-Received: by 2002:a05:6402:26ce:b0:59f:9f59:9b07 with SMTP id
+ 4fb4d7f45d1cf-5aacb8e1b52mr246793a12.4.1721815201221; Wed, 24 Jul 2024
+ 03:00:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a8e:b0:380:fd76:29e4 with SMTP id
- e9e14a558f8ab-39a194fcb1cmr1038775ab.4.1721814987752; Wed, 24 Jul 2024
- 02:56:27 -0700 (PDT)
-Date: Wed, 24 Jul 2024 02:56:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b6d882061dfb4aa6@google.com>
-Subject: [syzbot] [wireless?] KMSAN: uninit-value in cfg80211_inform_bss_frame_data
-From: syzbot <syzbot+0f3afa93b91202f21939@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <202407241403542217WOxM8U3ABv-nWZT068xe@zte.com.cn>
+In-Reply-To: <202407241403542217WOxM8U3ABv-nWZT068xe@zte.com.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 24 Jul 2024 11:59:49 +0200
+Message-ID: <CANn89i+vYp22bUjfB21V_Rqmo9ZAKAmJxyarFWngq=cCmBQUrQ@mail.gmail.com>
+Subject: Re: [PATCH] net: Provide sysctl to tune local port range to IANA specification
+To: jiang.kun2@zte.com.cn
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, 
+	dsahern@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, fan.yu9@zte.com.cn, xu.xin16@zte.com.cn, 
+	zhang.yunkai@zte.com.cn, tu.qiang35@zte.com.cn, he.peilin@zte.com.cn, 
+	yang.yang29@zte.com.cn
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Jul 24, 2024 at 8:04=E2=80=AFAM <jiang.kun2@zte.com.cn> wrote:
+>
+> From: Fan Yu <fan.yu9@zte.com.cn>
+>
+> The Importance of Following IANA Standards
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> IANA specifies User ports as 1024-49151, and it just so happens
+> that my application uses port 33060 (reserved for MySQL Database Extended=
+),
+> which conflicts with the Linux default dynamic port range (32768-60999)[1=
+].
+>
+> In fact, IANA assigns numbers in port range from 32768 to 49151,
+> which is uniformly accepted by the industry. To do this,
+> it is necessary for the kernel to follow the IANA specification.
+>
+> Drawbacks of existing implementations
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> In past discussions, follow the IANA specification by modifying the
+> system defaults has been discouraged, which would greatly affect
+> existing users[2].
+>
+> Theoretically, this can be done by tuning net.ipv4.local_port_range,
+> but there are inconveniences such as:
+> (1) For cloud-native scenarios, each container is expected to follow
+> the IANA specification uniformly, so it is necessary to do sysctl
+> configuration in each container individually, which increases the user's
+> resource management costs.
+> (2) For new applications, since sysctl(net.ipv4.local_port_range) is
+> isolated across namespaces, the container cannot inherit the host's value=
+,
+> so after startup, it remains at the kernel default value of 32768-60999,
+> which reduces the ease of use of the system.
+>
+> Solution
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> In order to maintain compatibility, we provide a sysctl interface in
+> host namespace, which makes it easy to tune local port range to
+> IANA specification.
+>
+> When ip_local_port_range_use_iana=3D1, the local port range of all networ=
+k
+> namespaces is tuned to IANA specification (49152-60999), and IANA
+> specification is also used for newly created network namespaces. Therefor=
+e,
+> each container does not need to do sysctl settings separately, which
+> improves the convenience of configuration.
+> When ip_local_port_range_use_iana=3D0, the local port range of all networ=
+k
+> namespaces are tuned to the original kernel defaults (32768-60999).
+> For example:
+>         # cat /proc/sys/net/ipv4/ip_local_port_range
+>         32768   60999
+>         # echo 1 > /proc/sys/net/ipv4/ip_local_port_range_use_iana
+>         # cat /proc/sys/net/ipv4/ip_local_port_range
+>         49152   60999
+>
+>         # unshare -n
+>         # cat /proc/sys/net/ipv4/ip_local_port_range
+>         49152   60999
+>
+> Notes
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> The lower value(49152), consistent with IANA dynamic port lower limit.
+> The upper limit value(60999), which differs from the IANA dynamic upper
+> limit due to the fact that Linux will use 61000-65535 as masquarading/NAT=
+,
+> but this does not conflict with the IANA specification[3].
+>
+> Note that following the above specification reduces the number of ephemer=
+al
+> ports by half, increasing the risk of port exhaustion[2].
+>
+> [1]:https://www.iana.org/assignments/service-names-port-numbers/service-n=
+ames-port-numbers.txt
+> [2]:https://lore.kernel.org/all/bf42f6fd-cd06-02d6-d7b6-233a0602c437@gmai=
+l.com/
+> [3]:https://lore.kernel.org/all/20070512210830.514c7709@the-village.bc.nu=
+/
+>
+> Co-developed-by: Kun Jiang <jiang.kun2@zte.com.cn>
+> Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
+> Signed-off-by: Kun Jiang <jiang.kun2@zte.com.cn>
+> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
+> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+> Reviewed-by: Qiang Tu <tu.qiang35@zte.com.cn>
+> Reviewed-by: Peilin He<he.peilin@zte.com.cn>
+> Cc: Yang Yang <yang.yang29@zte.com.cn>
+> ---
+>  Documentation/networking/ip-sysctl.rst | 13 +++++++++++++
+>  net/ipv4/af_inet.c                     |  7 ++++++-
+>  net/ipv4/sysctl_net_ipv4.c             | 31 ++++++++++++++++++++++++++++=
++++
+>  3 files changed, 50 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
+rking/ip-sysctl.rst
+> index bd50df6a5a42..27f4928c2a1d 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -1320,6 +1320,19 @@ ip_local_port_range - 2 INTEGERS
+>         Must be greater than or equal to ip_unprivileged_port_start.
+>         The default values are 32768 and 60999 respectively.
+>
+> +ip_local_port_range_use_iana - BOOLEAN
+> +       Tune ip_local_port_range to IANA specification easily.
+> +       When ip_local_port_range_use_iana=3D1, the local port range of
+> +       all network namespaces is tuned to IANA specification (49152-6099=
+9),
+> +       and IANA specification is also used for newly created network nam=
+espaces.
+> +       Therefore, each container does not need to do sysctl settings sep=
+arately,
+> +       which improves the convenience of configuration.
+> +       When ip_local_port_range_use_iana=3D0, the local port range of
+> +       all network namespaces are tuned to the original kernel
+> +       defaults (32768-60999).
+> +
 
-syzbot found the following issue on:
+IANA means : Internet Assigned Numbers Authority
 
-HEAD commit:    933069701c1b Merge tag '6.11-rc-smb3-server-fixes' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=106cf811980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c062b3d00b275b52
-dashboard link: https://syzkaller.appspot.com/bug?extid=0f3afa93b91202f21939
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+It is very possible a future RFC changes the actual ranges.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+I would have used rfc 6335, because when a new rfc comes in 2030, we
+will have to add a new sysctl, right ?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/11dcaf5ed4bb/disk-93306970.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6b2d786e6c09/vmlinux-93306970.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c6cd729a2bbd/bzImage-93306970.xz
+> +       Default: 0
+> +
+>  ip_local_reserved_ports - list of comma separated ranges
+>         Specify the ports which are reserved for known third-party
+>         applications. These ports will not be used by automatic port
+> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+> index b24d74616637..42b6bc58dc45 100644
+> --- a/net/ipv4/af_inet.c
+> +++ b/net/ipv4/af_inet.c
+> @@ -123,6 +123,8 @@
+>
+>  #include <trace/events/sock.h>
+>
+> +extern u8 sysctl_ip_local_port_range_use_iana;
+> +
+>  /* The inetsw table contains everything that inet_create needs to
+>   * build a new socket.
+>   */
+> @@ -1802,7 +1804,10 @@ static __net_init int inet_init_net(struct net *ne=
+t)
+>         /*
+>          * Set defaults for local port range
+>          */
+> -       net->ipv4.ip_local_ports.range =3D 60999u << 16 | 32768u;
+> +       if (sysctl_ip_local_port_range_use_iana)
+> +               net->ipv4.ip_local_ports.range =3D 60999u << 16 | 49152u;
+> +       else
+> +               net->ipv4.ip_local_ports.range =3D 60999u << 16 | 32768u;
+>
+>         seqlock_init(&net->ipv4.ping_group_range.lock);
+>         /*
+> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+> index 162a0a3b6ba5..a38447889072 100644
+> --- a/net/ipv4/sysctl_net_ipv4.c
+> +++ b/net/ipv4/sysctl_net_ipv4.c
+> @@ -45,6 +45,8 @@ static unsigned int tcp_child_ehash_entries_max =3D 16 =
+* 1024 * 1024;
+>  static unsigned int udp_child_hash_entries_max =3D UDP_HTABLE_SIZE_MAX;
+>  static int tcp_plb_max_rounds =3D 31;
+>  static int tcp_plb_max_cong_thresh =3D 256;
+> +u8 sysctl_ip_local_port_range_use_iana;
+> +EXPORT_SYMBOL(sysctl_ip_local_port_range_use_iana);
+>
+>  /* obsolete */
+>  static int sysctl_tcp_low_latency __read_mostly;
+> @@ -95,6 +97,26 @@ static int ipv4_local_port_range(struct ctl_table *tab=
+le, int write,
+>         return ret;
+>  }
+>
+> +static int ipv4_local_port_range_use_iana(struct ctl_table *table, int w=
+rite,
+> +                                         void *buffer, size_t *lenp, lof=
+f_t *ppos)
+> +{
+> +       struct net *net;
+> +       int ret;
+> +
+> +       ret =3D proc_dou8vec_minmax(table, write, buffer, lenp, ppos);
+> +
+> +       if (write && ret =3D=3D 0) {
+> +               for_each_net(net) {
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0f3afa93b91202f21939@syzkaller.appspotmail.com
+This is quite buggy.
 
-=====================================================
-BUG: KMSAN: uninit-value in cfg80211_find_elem_match net/wireless/scan.c:1364 [inline]
-BUG: KMSAN: uninit-value in cfg80211_find_elem include/net/cfg80211.h:6858 [inline]
-BUG: KMSAN: uninit-value in cfg80211_inform_bss_frame_data+0x3e3/0x9e0 net/wireless/scan.c:3225
- cfg80211_find_elem_match net/wireless/scan.c:1364 [inline]
- cfg80211_find_elem include/net/cfg80211.h:6858 [inline]
- cfg80211_inform_bss_frame_data+0x3e3/0x9e0 net/wireless/scan.c:3225
- ieee80211_bss_info_update+0x900/0xad0 net/mac80211/scan.c:226
- ieee80211_scan_rx+0x8f6/0xbd0 net/mac80211/scan.c:340
- __ieee80211_rx_handle_packet net/mac80211/rx.c:5225 [inline]
- ieee80211_rx_list+0x55c9/0x6690 net/mac80211/rx.c:5462
- ieee80211_rx_napi+0x84/0x3f0 net/mac80211/rx.c:5485
- ieee80211_rx include/net/mac80211.h:5124 [inline]
- ieee80211_handle_queued_frames+0x1a8/0x340 net/mac80211/main.c:439
- ieee80211_tasklet_handler+0x25/0x30 net/mac80211/main.c:458
- tasklet_action_common+0x395/0xd50 kernel/softirq.c:785
- tasklet_action+0x2d/0x40 kernel/softirq.c:811
- handle_softirqs+0x1ce/0x800 kernel/softirq.c:554
- __do_softirq+0x14/0x1a kernel/softirq.c:588
- do_softirq+0x9a/0x100 kernel/softirq.c:455
- __local_bh_enable_ip+0x9f/0xb0 kernel/softirq.c:382
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:908 [inline]
- __dev_queue_xmit+0x2692/0x5610 net/core/dev.c:4450
- dev_queue_xmit include/linux/netdevice.h:3105 [inline]
- __netlink_deliver_tap_skb net/netlink/af_netlink.c:307 [inline]
- __netlink_deliver_tap+0x84c/0xc90 net/netlink/af_netlink.c:325
- netlink_deliver_tap net/netlink/af_netlink.c:338 [inline]
- __netlink_sendskb net/netlink/af_netlink.c:1275 [inline]
- netlink_sendskb+0x23c/0x270 net/netlink/af_netlink.c:1284
- netlink_unicast+0x70e/0x1260 net/netlink/af_netlink.c:1372
- nlmsg_unicast include/net/netlink.h:1158 [inline]
- netlink_ack+0xb04/0xe80 net/netlink/af_netlink.c:2512
- netlink_rcv_skb+0x510/0x650 net/netlink/af_netlink.c:2556
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- __sys_sendto+0x685/0x830 net/socket.c:2204
- __do_sys_sendto net/socket.c:2216 [inline]
- __se_sys_sendto net/socket.c:2212 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
- x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3994 [inline]
- slab_alloc_node mm/slub.c:4037 [inline]
- kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4080
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
- __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
- alloc_skb include/linux/skbuff.h:1320 [inline]
- hwsim_cloned_frame_received_nl+0x311/0x1360 drivers/net/wireless/virtual/mac80211_hwsim.c:5850
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2550
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- __sys_sendto+0x685/0x830 net/socket.c:2204
- __do_sys_sendto net/socket.c:2216 [inline]
- __se_sys_sendto net/socket.c:2212 [inline]
- __x64_sys_sendto+0x125/0x1d0 net/socket.c:2212
- x64_sys_call+0x3799/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:45
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 9452 Comm: syz.4.940 Not tainted 6.10.0-syzkaller-11840-g933069701c1b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+for_each_net() can only be used with care, otherwise list can be
+corrupted, netns can disappear under you.
 
