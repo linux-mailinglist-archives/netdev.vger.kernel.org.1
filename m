@@ -1,128 +1,128 @@
-Return-Path: <netdev+bounces-112786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D367393B324
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:53:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A77A293B334
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FDD7B21B79
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:53:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DDBC283C1E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA4E15B0F2;
-	Wed, 24 Jul 2024 14:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E196158DA3;
+	Wed, 24 Jul 2024 14:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XQcULf2Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D9bUmeKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB1A15ADA1;
-	Wed, 24 Jul 2024 14:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF1D157491
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 14:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721832738; cv=none; b=K/K4zb5Pq9EclbsbqCb2MWq1lmQTcBkuRzItBGqY8iyhAAp/xQ+sZVVOHPWLHT7UCE/AAxGw42SxWiePXy/kZ7WqE71MkllTjHSEAOuC2HXXIgSFEoG1+aKBCQ3TPnoT8SWibHOVYpwWIbcg/0cjfVuan1hqLM90q1n2g/Lkw+o=
+	t=1721832916; cv=none; b=t9bguw3GljujR87xQQsUzAgn+aQ+ndmdYANSS2QlvfrEQwHfyTRmpynb8dVKfpsOroQGmBkfOb+d/v6raJdCO+npV/qDp6s9Oy4YiNe+bpsnFU5iKzlC0D/q38mk/Qut5LYw6tAaHT0UALhgG0OVhX7swwQiFv7SBPipUcgVxvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721832738; c=relaxed/simple;
-	bh=Ln3HGzrlfOKzqGtbw59RdK0phd7oplJGPbSpALOEYSU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W/65LsKMo+9FrsYlZ2WSnm+lulhkisKuJPOYF3thDC611UFd+mGitI33e6VDv+W1e3ehNwoPpnh5PuvKi70zuiy+IFnZaPL6vpvnY8jiFboBnYwM7y7v7RSb6/p++yfDRk77SzTLWHPEcIr8e9m+jpJznPnvIDU6DQlXX5kDrO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XQcULf2Z; arc=none smtp.client-ip=209.85.217.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-4928da539c3so1107978137.1;
-        Wed, 24 Jul 2024 07:52:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721832735; x=1722437535; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ln3HGzrlfOKzqGtbw59RdK0phd7oplJGPbSpALOEYSU=;
-        b=XQcULf2Z1nZwohNwVLmiJNLCs2/+XFSTGYYCQv4R8wEC/tS9dhdaR7lCwiEnuRO47c
-         EMXgDwuCGGUEIRgsrR1wUjmEFxQtxM94FtRPX3v5D+JtAO0yVAIVsLdG1dYDRa3g2EmC
-         zQJ/HdLWSxpM6T5c9KgHYEKnpmqtaihij0YHD6IZr+Rxqwe9cafeTdz5UgikS3bYLDUK
-         NGq9suCqVEuZmf7Loyt/2kwCeKklERHxG0McHtn7SlbEd+k5rlZwf3TQNzmzSJY+S5Sj
-         sO9FUAsJ3vrpc8VUL6+AsTbMuHW1QnXQDEtOtDZx8FclxgI66IszWsJ0K/2cZVNCUKsm
-         RaRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721832735; x=1722437535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ln3HGzrlfOKzqGtbw59RdK0phd7oplJGPbSpALOEYSU=;
-        b=X8RF1wulwG4z5ahD6vt5eKEmKmKU3mf9+2ta28sv9KYxDpsqVvc4EH1J+LyiPMH6nF
-         vZxEelxj1owm34hPq3eO8DGfS8SrogYsRbeqSXJpHguPwwfRF+vAWOvRaC6ZH7DXWfQY
-         aBV2nijek8wkGox92SPGNsU2ZrosvkEcz03Y3oxQy9+rK6g0QqrsAeA20yVySYJDk5S4
-         HXwnTOjXu+MX1PU4B2czlmQSVJn3DNgrx0MwzrUiqaN63w98sRQs8tbkkroz7xpd11IQ
-         VZ/t4jW97l5GAV+xMVDXy43um6gQ+Cg3/vaWMT8wBQFOS7S4gXpgCeSQ1JietahWPf9G
-         6MGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVA4/WNiwnwpygkYSE1Ubl4dz8vbO5S4a0Y3XsSfl27jYNNZgIR59bC8Dm7Toqg860m/ux8HvLcJPL6qvZpKE1am4HCuS7h
-X-Gm-Message-State: AOJu0YyViUq53ixNNxM52YRsQagBKU+2mTyn/SNQZ2Jh4+iQLc6u0jTi
-	M/OE9BtL2pogp1ZMiuunZQjdT+wdfWE/+ODx4YUYpncwzkbqh6SVQLSFJW8917n8N4PdgfEBDsI
-	NshEuSn4z1QhvmV53WKM9Z2ugzgk=
-X-Google-Smtp-Source: AGHT+IFk5nYeYr/7VZTRZ21R6FK7mPQAGXA53+XCraPsBaIg6FPxXz2GMt7WoUG26w0yIkF1KrM8MPzRC7P7sOigt5w=
-X-Received: by 2002:a67:e7ca:0:b0:493:d1c3:1aef with SMTP id
- ada2fe7eead31-493d1c320b4mr807352137.14.1721832735502; Wed, 24 Jul 2024
- 07:52:15 -0700 (PDT)
+	s=arc-20240116; t=1721832916; c=relaxed/simple;
+	bh=nLjXiP4HZkptRsbuUSRu8KiMjkZkkee/nRjBU+GFhwc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PvxGrU4PHDLmWnIXDrAJK15G/oExlSHttd/kmHwcTpfcWUO6YqSCZuIqsZIbD9Ezru6Ve7nv+id/DzSu88qpRHkQkieDrb/NHdmiUcxWZloRDuygq96WMXUXXY27e56E5cAFL1GB40x1N6T8FG6gbtW8sODMMdYPYUu/nBz//GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D9bUmeKK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721832914;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OqaslouRWriEmr41dYglirZKWf9nqPnvwlDNJN3ShwY=;
+	b=D9bUmeKKo2krfBhZcBm277rKxswp+i//oQH4WkLGC+FgMPCA527lX1V9A6YXVAsWnd1ZpD
+	FDphxET3WxOvbpHGelafHBYpUJkPsJi1K5bvIKCWjFF0EuAnZ4VPRFKCGi8EN+LGJqlfN4
+	eJ1XnuRA3dmtaMM0sXF2Lg8Fp0b+UME=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-340-6b0L-_YIOmOwiMs0IdXUrQ-1; Wed,
+ 24 Jul 2024 10:55:08 -0400
+X-MC-Unique: 6b0L-_YIOmOwiMs0IdXUrQ-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 629DE19541BE;
+	Wed, 24 Jul 2024 14:55:05 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.143])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0940A195605A;
+	Wed, 24 Jul 2024 14:54:59 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: gregkh@linuxfoundation.org
+Cc: UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	woojung.huh@microchip.com,
+	lucas.demarchi@intel.com,
+	mcgrof@kernel.org
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy module
+Date: Wed, 24 Jul 2024 16:54:54 +0200
+Message-ID: <20240724145458.440023-1-jtornosm@redhat.com>
+In-Reply-To: <2024072430-scorn-pushover-7d8a@gregkh>
+References: <2024072430-scorn-pushover-7d8a@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240724143431.3343722-1-pkaligineedi@google.com>
-In-Reply-To: <20240724143431.3343722-1-pkaligineedi@google.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Wed, 24 Jul 2024 10:51:39 -0400
-Message-ID: <CAF=yD-+y4Qd4nqTsOKq3cX==HvofeH_9FsgmiPXMcU3i9Hhn1w@mail.gmail.com>
-Subject: Re: [PATCH net v2] gve: Fix an edge case for TSO skb validity check
-To: Praveen Kaligineedi <pkaligineedi@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, shailend@google.com, 
-	hramamurthy@google.com, csully@google.com, jfraker@google.com, 
-	stable@vger.kernel.org, Bailey Forrest <bcf@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Wed, Jul 24, 2024 at 10:35=E2=80=AFAM Praveen Kaligineedi
-<pkaligineedi@google.com> wrote:
->
-> From: Bailey Forrest <bcf@google.com>
->
-> The NIC requires each TSO segment to not span more than 10
-> descriptors. NIC further requires each descriptor to not exceed
-> 16KB - 1 (GVE_TX_MAX_BUF_SIZE_DQO).
->
-> The descriptors for an skb are generated by
-> gve_tx_add_skb_no_copy_dqo() for DQO RDA queue format.
-> gve_tx_add_skb_no_copy_dqo() loops through each skb frag and
-> generates a descriptor for the entire frag if the frag size is
-> not greater than GVE_TX_MAX_BUF_SIZE_DQO. If the frag size is
-> greater than GVE_TX_MAX_BUF_SIZE_DQO, it is split into descriptor(s)
-> of size GVE_TX_MAX_BUF_SIZE_DQO and a descriptor is generated for
-> the remainder (frag size % GVE_TX_MAX_BUF_SIZE_DQO).
->
-> gve_can_send_tso() checks if the descriptors thus generated for an
-> skb would meet the requirement that each TSO-segment not span more
-> than 10 descriptors. However, the current code misses an edge case
-> when a TSO segment spans multiple descriptors within a large frag.
-> This change fixes the edge case.
->
-> gve_can_send_tso() relies on the assumption that max gso size (9728)
-> is less than GVE_TX_MAX_BUF_SIZE_DQO and therefore within an skb
-> fragment a TSO segment can never span more than 2 descriptors.
->
-> Fixes: a57e5de476be ("gve: DQO: Add TX path")
-> Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
-> Signed-off-by: Bailey Forrest <bcf@google.com>
-> Reviewed-by: Jeroen de Borst <jeroendb@google.com>
-> Cc: stable@vger.kernel.org
+Hello Greg,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Agree, this isn't ok, if you have a real dependancy, then show it as a
+> real one please with the tools that we have to show that.
+IMHO, I think it can be very useful.
+Apart from the comments trying to answer Andrew, let me try to explain
+better:
 
-Thanks for the extra description. The way gve_tx_add_skb_no_copy_dqo
-lays out descriptors, and the descriptor and segment max lengths are key.
-Now I follow the calculation.
+I am trying to solve dependencies that are not declared in anyway, but
+without modifying the normal kernel behavior, for special cases in which
+some modules are automatically loaded when something external is needed
+or detected. For this cases, user tools like dracut don't have anyway to
+detect this and if we a use a normal soft dependency, the modules will be
+always loaded in advance.
+
+Yes, it is a real dependency, but for this case, some phy modules are
+possible and I think it doesn't make sense to load all the phy that could
+be possible in advance, because there is an internal mechanism to only load
+the necessary one (the associated phy is read using mdio bus and then
+the associated phy module is loaded during runtime  by means of the
+function phy_request_driver_module).
+
+I think it is better to load only the necessary modules and have only in
+initramfs the necessary modules.
+
+Here you can find the complete/original justification for this:
+https://github.com/kmod-project/kmod/commit/05828b4a6e9327a63ef94df544a042b5e9ce4fe7
+
+Please, take into account that this is the first usage of this feature,
+lan78xx can be completed (others possible phy modules can be added) and it
+can be considered by other modules in the same situation.
+
+Let me add in the thread to the other people that have been involved.
+
+Thanks
+
+Best regards
+José Ignacio
+
 
