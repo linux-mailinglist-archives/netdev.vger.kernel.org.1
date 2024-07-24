@@ -1,139 +1,95 @@
-Return-Path: <netdev+bounces-112752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFC293AFEC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 12:37:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EC2193B047
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B3131F226AB
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 10:37:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 600B61C20E25
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C73C15099A;
-	Wed, 24 Jul 2024 10:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C386156C6C;
+	Wed, 24 Jul 2024 11:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gYL8KmQM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eY4fediI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D187514658F
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 10:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315FD22EF2;
+	Wed, 24 Jul 2024 11:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721817430; cv=none; b=IPKerqRdVX6Zxx/2wyEUecEFOl3gi8W5VfHo5DQwziigwXNZi9vytAJYgjxp7DOlVF8L2o+nI8J2ThNuoCT2LAg8Sjp0PoN9r/ldMG/5M44gtNQyZbOPY3ilEOJP2rZDbx6cIdTmg5K9MVQMUhh4V/tPCyQsURLhEdw6NskKmAs=
+	t=1721820031; cv=none; b=J2tHvHeUHLQxF7xvNimh2qaYlZHWuFv/T9Wp/7LADBcjs/bmYDuFXAsAWwMaJMsEP5WBWejqudoUqkxIAP1uTHjeJmA0SqiBtghznVlsGWq/+s1LCOQ9dHuBu4UiweCVU11pdQsBSLdH9qjdD1b4hWkEh4ePMW4vmpbOoYQzAeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721817430; c=relaxed/simple;
-	bh=pa/6/LCNvsi3TsDP0rS/vJWrnNHp/M3qxsFPShH1/70=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wt0uukzp0Sy8kve337nl1Q3T/fhrOrBtp7gHhJ2b7BgWvtykpdty0XEVhW0BhFEwvGLj1dRoslzqrtYkS+UJp0WIWwAEzV/ir+Tec1HRKuXvbQSCT0QDsmekejrFseme+2NaNLhkgZwmnO43Y7M9GNQrOqGmVEA4XYdxIJ1O5k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gYL8KmQM; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so12384a12.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 03:37:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721817427; x=1722422227; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sGO7kHN4KsIBivy4gaaDJKsKMKsqAfPXI0roq5/QWpE=;
-        b=gYL8KmQME4XnwVsPDqmQvfVcpcOdPrrHlWRNBm4dP08f0RwYf6W0LbNgX6UCl/LSuY
-         qnKVrFg8GUt3asUZpM/yP1au2U7Nm+iPArjMuBEmDVp8mv0uQsBxIhU1Ewh7CRFJE7Ku
-         0kCIEDgI4jfrtO/KylkGjNoHiWBKV82i3tVTXsp/2HYhOgnlOwPjeb4xq0RbWLUYdHFi
-         iVQpaJozPuKRRaE4L1BvyLxWwtqjUOJCBUWlBKhOjINY+SEUKtdeSO/+OBg1RvHlfPrB
-         9Cs/Wro24vfBBtfDE66ds4LWdlZ6fB1zxoITJ5F0nQrhCwlUzA+rS53OVXtiC1iqS+tH
-         lFcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721817427; x=1722422227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sGO7kHN4KsIBivy4gaaDJKsKMKsqAfPXI0roq5/QWpE=;
-        b=m2uKpYVLTpBXZ5dXK3SjfLC4cNMKp8zVypksyDSChiBUPGZDKJOqlcdlxXLraQCyj/
-         ++yifDK4CWACTunqHfXUfphyVyxmYoB9r1c2/8AagX7cwixVDO5Ijxl99xLQFKOA74fk
-         RMDAFEQDwgVKaebR1GR2ZMHDnecMl+OChBEC9WRdr2cxyKzQxRuNcHQHC7QuS0EFVnEf
-         ZGOd1GZD/Je4E+0N6vUW0xorhLVNmv+pHmGJqMUbxCUqiMFMUNHutTkLkl5ye0tBi6a7
-         EXAseS3CE/32PPDScnYAO574RVJ73pUDzkRwRTONHI6VZR+prQClXV6yJaw+qd/GeD+p
-         vzjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWlYUpoUocCcBdKVJxChJzDqVdr/PEmqBifwS/GIoAI1mEfLCsHyJDvgrlMzvbuWui3n9/6JqhprqSuQ9YFm8UJKCEVdvBI
-X-Gm-Message-State: AOJu0Yy5TkoQXP+LflfqDyKJNO8B6xfm8oMuu0Lokx4v4ns3fnSbIr2H
-	fZ4g9Tu8VuSZIQxAfF0MWnsVjD7BcyEeoQrUoOdSR6kW+R9Cp35/sX0slUGnafKEpxGqE6eo7jI
-	N7tAV4iEdq3K+ONChlucaJCJddbeRkI77xxtg
-X-Google-Smtp-Source: AGHT+IFXvNp2GtPHB/rOoVDcBxoOx/jrspmAd0FOI/r802ksTh2sb5Cd59QeeoKSeeZiFMETBAUOz01PFsITpt35NCI=
-X-Received: by 2002:a05:6402:270e:b0:58b:15e4:d786 with SMTP id
- 4fb4d7f45d1cf-5aacbfa0c33mr270635a12.5.1721817425456; Wed, 24 Jul 2024
- 03:37:05 -0700 (PDT)
+	s=arc-20240116; t=1721820031; c=relaxed/simple;
+	bh=LRh0DHRniu5cJw6hEo5aqtxNitGqTiRY2CMNNF+JwyU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qO/fXXgWuMsDptd6XxiqeRUzOxBv1e5dFhQ7RNk6LUee9QP+7xvB/qJrXyFOalcHcQulTL7zfSnQkAg3N4U5xVXDmAskzzJKLviKJZlgM04AK6yi3ShRL5TexiTavVEE2RlMlDsVLGiWxp0V8vHTJaSM0WuM2MLYVvn1XOJay8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eY4fediI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A837DC4AF0E;
+	Wed, 24 Jul 2024 11:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721820030;
+	bh=LRh0DHRniu5cJw6hEo5aqtxNitGqTiRY2CMNNF+JwyU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eY4fediIbsRHooFUpzNQs8SVIDeThG2XNgyb0ldTSUlAP2TFGMoKWqc5Bdg4GYY/q
+	 gB6dyzoDip0M3tT1sgxtFPjX/XCy01CGwWLNQY6dK8vUZHGAKZ4jGIpvPJgRzb4S9E
+	 DZnMhsLnKJhNRG0TdoWqPHHWH5A+Uv/cVrduP0FpZJzOzPQc3KVk5JXk0F1S3dZ5Hc
+	 aEIjS66am1LwFdSFi6LYr5PHcBSPvK3l2Dh/JGNQJVKHikUi6S/zDTWDB7H4MKP9ll
+	 cs5D0Srh5S3FBl5/N0GIv+bbbISbYevLJwhS00cRHZod+o8OAf3gOj2KEIj3RoNL/d
+	 zOdgGRMVU2t3g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 950ACC43445;
+	Wed, 24 Jul 2024 11:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <8b06dd4ec057d912ca3947bacf15529272dea796.1721749627.git.petrm@nvidia.com>
- <CANn89iJQB4Po=J32rg10CNE+hrGqGZWfdWqKPdY6FK0UgQpxXg@mail.gmail.com>
- <CANn89iLvqJXmCktm=8WoSuSWOAVHe35fy+WHet-U+psMW2gAoQ@mail.gmail.com>
- <CANn89iJ6vG3n0bUbGuHosRDwW97z7CT4m4+_D91onPK5rd8xVw@mail.gmail.com>
- <CANn89iLcHERTvExi7zEVwArxBzaa2C-y_W_UPQa2ZWzYdT_d+Q@mail.gmail.com> <87o76n85ml.fsf@nvidia.com>
-In-Reply-To: <87o76n85ml.fsf@nvidia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jul 2024 12:36:54 +0200
-Message-ID: <CANn89iLGh6sG8AhD_dgb15Es6MsATZ+QHkNzHwm5iufTCXZ+SA@mail.gmail.com>
-Subject: Re: [PATCH net] net: nexthop: Initialize all fields in dumped nexthops
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	David Ahern <dsahern@kernel.org>, mlxsw@nvidia.com, Ido Schimmel <idosch@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] tipc: Return non-zero value from tipc_udp_addr2str() on
+ error
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172182003060.2467.7477839388953777484.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Jul 2024 11:20:30 +0000
+References: <20240716020905.291388-1-syoshida@redhat.com>
+In-Reply-To: <20240716020905.291388-1-syoshida@redhat.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org
 
-On Wed, Jul 24, 2024 at 12:09=E2=80=AFPM Petr Machata <petrm@nvidia.com> wr=
-ote:
->
->
-> Eric Dumazet <edumazet@google.com> writes:
->
-> > On Tue, Jul 23, 2024 at 7:41=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> >>
-> >> On Tue, Jul 23, 2024 at 7:26=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> >> >
-> >> > On Tue, Jul 23, 2024 at 6:50=E2=80=AFPM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> >> > >
-> >> > > On Tue, Jul 23, 2024 at 6:05=E2=80=AFPM Petr Machata <petrm@nvidia=
-.com> wrote:
-> >> > > >
-> >> > > > struct nexthop_grp contains two reserved fields that are not ini=
-tialized by
-> >> > > > nla_put_nh_group(), and carry garbage. This can be observed e.g.=
- with
-> >> > > > strace (edited for clarity):
-> >> > > >
-> >> > > >     # ip nexthop add id 1 dev lo
-> >> > > >     # ip nexthop add id 101 group 1
-> >> > > >     # strace -e recvmsg ip nexthop get id 101
-> >> > > >     ...
-> >> > > >     recvmsg(... [{nla_len=3D12, nla_type=3DNHA_GROUP},
-> >> > > >                  [{id=3D1, weight=3D0, resvd1=3D0x69, resvd2=3D0=
-x67}]] ...) =3D 52
-> >> > > >
-> >> > > > The fields are reserved and therefore not currently used. But as=
- they are, they
-> >> > > > leak kernel memory, and the fact they are not just zero complica=
-tes repurposing
-> >> > > > of the fields for new ends. Initialize the full structure.
-> >> > > >
-> >> > > > Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
-> >> > > > Signed-off-by: Petr Machata <petrm@nvidia.com>
-> >> > > > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> >> > >
-> >> > > Interesting... not sure why syzbot did not catch this one.
->
-> Could it? I'm not sure of the exact syzcaller capabilities, but there
-> are no warnings, no splats etc. It just returns values.
+Hello:
 
-Yes, KMSAN can detect such things (uninit-value)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 16 Jul 2024 11:09:05 +0900 you wrote:
+> tipc_udp_addr2str() should return non-zero value if the UDP media
+> address is invalid. Otherwise, a buffer overflow access can occur in
+> tipc_media_addr_printf(). Fix this by returning 1 on an invalid UDP
+> media address.
+> 
+> Fixes: d0f91938bede ("tipc: add ip/udp media type")
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] tipc: Return non-zero value from tipc_udp_addr2str() on error
+    https://git.kernel.org/netdev/net/c/fa96c6baef1b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
