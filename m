@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-112729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F61293ADD9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 10:16:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9631E93ADE9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 10:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 234FB1F21AED
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 08:16:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9C411C20E05
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 08:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67ABD14B968;
-	Wed, 24 Jul 2024 08:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C772814B09C;
+	Wed, 24 Jul 2024 08:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpoyGaeM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSqG3o5I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8E314B960;
-	Wed, 24 Jul 2024 08:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0DBAD23;
+	Wed, 24 Jul 2024 08:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721808961; cv=none; b=VWi608EtyJwf0gWNq/8S+L4vV0mxWQjm3KiBtrWO7EwPJSuZOg7dcHQ44Vf4wIdznpWC6FE1m/PzssE/nzbVeHRuBSnOIneQJUHNZWsIU1CBuv8oUqo8SFnuhCxrL0R2xkv49Y2ggVIfH8QbYpedNY1CmavLW5ym4XlKrmjcj94=
+	t=1721809489; cv=none; b=Sx56vzIk5p4xcHAliwbpzlMb3OghtZ8mTzhkWn9V5B3KZmtrZMTDbITR1eR6S5vfui4P+Eyk0Ya2eYU9Mj6Bjd30HmNiezegDKVrmsykf7zZTE1/bv9mTMd376EfAGgVgTEX7sXLjr/7tXk1s1AAAe6kvrF2twf9R8LoFrMiCR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721808961; c=relaxed/simple;
-	bh=/mIEHHXkDVq16jXgWsjxyuQ8xG0Avx6YZlNQpXLG+5g=;
+	s=arc-20240116; t=1721809489; c=relaxed/simple;
+	bh=HiGKmXRe4u6JuGpziWw1IAJIcZn0wakFfLZ3cyEgqJs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pghAoT1avrZIueycTkZZk7gE/BPXI3KCWLkHq/ILNnvOmZd6E9RWwlUrRcX52ldZWST9gxMMT5onhGh//0Y9hsIC+K1mWyGmahTtbgQtjKsd6pyA4kwz9KBc3tnmX8Jda59oN4SiX2nCDzR7CjjH6BwyFUx1MUx6uyQsr61alYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpoyGaeM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F2C1C4AF0B;
-	Wed, 24 Jul 2024 08:15:55 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=GV/DF4wbzMZUHgnowxcRvmXiRwGkYuUfq8VbXhXizVN/8PJLO/Q1jRlQLaV3trwPs0d4sej0hjS+1vDDGckCHJSSyv9wtt438u+B0dHLWRd9hg0v2DusU/3YjX9eDMU23+69OM3ZrtbY6tf77DYmbjESqZ0NtFaQ/6/eBwVeY1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSqG3o5I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9375FC32782;
+	Wed, 24 Jul 2024 08:24:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721808960;
-	bh=/mIEHHXkDVq16jXgWsjxyuQ8xG0Avx6YZlNQpXLG+5g=;
+	s=k20201202; t=1721809489;
+	bh=HiGKmXRe4u6JuGpziWw1IAJIcZn0wakFfLZ3cyEgqJs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BpoyGaeMppx7PiTxCI3JUwEm/ucho4ymnpXiklBDXAWWhJ9G05hdRWyZI5qxuiF2M
-	 t03P1NxauOLqJkHCMZ+hJzsVN5xKomlDgmJnW4PVVtyUDw1j15ShQ/a0xRq4c01iKt
-	 3VainrhzQvpvVIbEG//NvepFaoma4pf7dogfYHd8InGVnEb0JE5XOqcqq8D9eWihVK
-	 k4X78GBh7Y6Mp7B41NMwaFDbAW5dQ49q5ABpC6fK9yBH8QOFse5tfaEaRybB24g/mk
-	 K/DvPpTxcsGDFcr+ORI2JG1yuupdJWfpj7V9X9oyFwSxHQ2jTBPPUoKfQMGOwl3k37
-	 oEsdxsNDSkYaQ==
-Message-ID: <7c992504-51ad-4104-a039-382fe69ff1c8@kernel.org>
-Date: Wed, 24 Jul 2024 10:15:53 +0200
+	b=hSqG3o5I8vPPUDpmEkImH2WFIMTfajyKfbNxlFTFah7WDiSavAos8wG1DO42lCY9e
+	 cWqKwfIxVHMOIXg2NsrM7XFvLNLDOonpAm+pq39WmSGzT9y5eBHOuB+CaqCzfUKa7m
+	 mh8qDljeVqCGCAh7YIygJXmocACPLyIcYrCCjW2Jt0z6abG5K2tB8yG/JCK7gb6C0f
+	 HXFQTBsAQwtGcAntT/TymK8Kqy864ETtXfolMon+4r5EJL5xSJgFMTUFJdCdQ0KKxG
+	 A5QNCd/iOUP4PplqHm5DoXNzCZzsvNemSBUD0laP55Cgn7lschAib7t5Jc3TckybbO
+	 JMQG7N6UX2cKQ==
+Message-ID: <684fd6c2-ad54-4479-8a6a-ab3270e558a7@kernel.org>
+Date: Wed, 24 Jul 2024 10:24:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,24 +50,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v2 1/2] tcp: process the 3rd ACK with sk_socket for
- TFO/MPTCP
+Subject: Re: [PATCH bpf-next v3 2/3] selftests/bpf: Add mptcp pm_nl_ctl link
 Content-Language: en-GB
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
- mptcp@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-0-d653f85639f6@kernel.org>
- <20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-1-d653f85639f6@kernel.org>
- <CANn89iJNa+UqZrONT0tTgN+MjnFZJQQ8zuH=nG+3XRRMjK9TfA@mail.gmail.com>
- <2583642a-cc5f-4765-856d-4340adcecf33@kernel.org>
- <CANn89iKP4y7iMHxsy67o13Eair+tDquGPBr=kS41zPbKz+_0iQ@mail.gmail.com>
- <4558399b-002b-40ff-8d9b-ac7bf13b3d2e@kernel.org>
- <CANn89iLozLAj67ipRMAmepYG0eq82e+FcriPjXyzXn_np9xX2w@mail.gmail.com>
- <9c0b40e5-2137-423f-85c3-385408ea861e@kernel.org>
- <CADVnQy=Aky08HJGnozv-Nd97kRHBnxhw+caks+42FUyn+9GbPQ@mail.gmail.com>
+To: Geliang Tang <geliang@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>,
+ mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
+References: <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org>
+ <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-2-ebdc2d494049@kernel.org>
+ <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
+ <90e916e8-ec4e-447b-8ee6-eb247f3a72ad@linux.dev>
+ <ab8112e6-ea7b-4b36-b395-049214e1608d@kernel.org>
+ <780ed38257480940def86947b2ee354f298e890b.camel@kernel.org>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -113,85 +116,171 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <CADVnQy=Aky08HJGnozv-Nd97kRHBnxhw+caks+42FUyn+9GbPQ@mail.gmail.com>
+In-Reply-To: <780ed38257480940def86947b2ee354f298e890b.camel@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Neal,
+Hi Geliang,
 
-On 24/07/2024 00:01, Neal Cardwell wrote:
-> On Tue, Jul 23, 2024 at 3:09 PM Matthieu Baerts <matttbe@kernel.org> wrote:
->>
->> Hi Eric,
->>
->> On 23/07/2024 18:42, Eric Dumazet wrote:
->>> On Tue, Jul 23, 2024 at 6:08 PM Matthieu Baerts <matttbe@kernel.org> wrote:
->>>>
->>>> Hi Eric,
->>>>
->>>> On 23/07/2024 17:38, Eric Dumazet wrote:
->>>>> On Tue, Jul 23, 2024 at 4:58 PM Matthieu Baerts <matttbe@kernel.org> wrote:
->>>>>>
->>>>>> Hi Eric,
->>>>>>
->>>>>> +cc Neal
->>>>>> -cc Jerry (NoSuchUser)
->>>>>>
->>>>>> On 23/07/2024 16:37, Eric Dumazet wrote:
->>>>>>> On Thu, Jul 18, 2024 at 12:34 PM Matthieu Baerts (NGI0)
->>>>>>> <matttbe@kernel.org> wrote:
->>>>>>>>
-> ...
->>>>> +.045 < S. 1234:1234(0) ack 1001 win 14600 <mss
->>>>> 940,nop,nop,sackOK,nop,wscale 6,FO 12345678,nop,nop>
->>>>>    +0 > . 1001:1001(0) ack 1 <nop,nop,sack 0:1>  // See here
->>>>
->>>> I'm sorry, but is it normal to have 'ack 1' with 'sack 0:1' here?
->>>
->>> It is normal, because the SYN was already received/processed.
->>>
->>> sack 0:1 represents this SYN sequence.
+Thank you for your reply!
+
+On 24/07/2024 09:42, Geliang Tang wrote:
+> Hi Matt,
+> 
+> On Sat, 2024-07-06 at 02:25 +0200, Matthieu Baerts wrote:
+>> Hi Martin,
 >>
 >> Thank you for your reply!
 >>
->> Maybe it is just me, but does it not look strange to have the SACK
->> covering a segment (0:1) that is before the ACK (1)?
+>> On 06/07/2024 01:10, Martin KaFai Lau wrote:
+>>> On 7/4/24 3:48 AM, Matthieu Baerts wrote:
+>>>>> diff --git a/tools/testing/selftests/bpf/Makefile
+>>>>> b/tools/testing/
+>>>>> selftests/bpf/Makefile
+>>>>> index e0b3887b3d2d..204269d0b5b8 100644
+>>>>> --- a/tools/testing/selftests/bpf/Makefile
+>>>>> +++ b/tools/testing/selftests/bpf/Makefile
+>>>>> @@ -144,7 +144,7 @@ TEST_GEN_PROGS_EXTENDED =
+>>>>> test_skb_cgroup_id_user \
+>>>>>       flow_dissector_load test_flow_dissector
+>>>>> test_tcp_check_syncookie_user \
+>>>>>       test_lirc_mode2_user xdping test_cpp runqslower bench
+>>>>> bpf_testmod.ko \
+>>>>>       xskxceiver xdp_redirect_multi xdp_synproxy veristat
+>>>>> xdp_hw_metadata \
+>>>>> -    xdp_features bpf_test_no_cfi.ko
+>>>>> +    xdp_features bpf_test_no_cfi.ko mptcp_pm_nl_ctl
+>>>> On the BPF CI, we have such errors:
+>>>>
+>>>>     mptcp_pm_nl_ctl.c:20:10: fatal error: 'linux/mptcp.h' file
+>>>> not found
+>>>>       20 | #include "linux/mptcp.h"
+>>>>          |          ^~~~~~~~~~~~~~~
+>>>>
+>>>> On my side, I don't have any issue, because the compiler uses the
+>>>> mptcp.h file from the system: /usr/include/linux/mptcp.h
+>>>>
+>>>> I suppose that's not OK on the BPF CI, as it looks like it
+>>>> doesn't have
+>>>> this file there, probably because it still uses Ubuntu 20.04 as
+>>>> base,
+>>>> which doesn't include this file in the linux-libc-dev package.
+>>>>
+>>>> When I look at how this 'mptcp_pm_nl_ctl' tool -- and all the
+>>>> other
+>>>> programs from that list -- is compiled (V=1), I see that the
+>>>> following
+>>>> "-I" options are given:
+>>>>
+>>>>    -I${PWD}/tools/testing/selftests/bpf
+>>>>    -I${BUILD}//tools/include
+>>>>    -I${BUILD}/include/generated
+>>>>    -I${PWD}/tools/lib
+>>>>    -I${PWD}/tools/include
+>>>>    -I${PWD}/tools/include/uapi
+>>>>    -I${BUILD}/
+>>>>
+>>>> It will then not look at -I${PWD}/usr/include or the directory
+>>>> generated
+>>>> with:
+>>>>
+>>>>    make headers_install INSTALL_HDR_PATH=(...)
+>>>
+>>> It sounds like the tools/testing/selftests/net/mptcp/Makefile is
+>>> looking
+>>> at this include path, so it works?
 >>
->> 'ack 1' and 'sack 0:1' seem to cover the same block, no?
->> Before Kuniyuki's patch, this 'sack 0:1' was not present.
+>> Yes it does work.
+>>
+>>> iiu the bpf/Makefile correctly, it has the bpftool "make" compiled
+>>> and
+>>> installed at tools/testing/selftests/bpf/tools/sbin/. May be
+>>> directly
+>>> compile the pm_nl_ctl by "make tools/testing/selftests/net/mptcp/"?
+>>
+>> That could be an alternative, I didn't know it would be OK to add
+>> such
+>> dependence, good idea.
+>>
+>>>> I guess that's why people have duplicated files in
+>>>> 'tools/include/uapi',
+>>>> but I also understood from Jakub that it is not a good idea to
+>>>> continue
+>>>> to do so.
+>>>>
+>>>> What would be the best solution to avoid a copy? A symlink still
+>>>> looks
+>>>> like a workaround.
+>>>>
+>>>> In the other selftests, KHDR_INCLUDES is used to be able to
+>>>> include the
+>>>> path containing the UAPI headers. So if someone built the headers
+>>>> in a
+>>>
+>>> Meaning KHDR_INCLUDES should be used and -
+>>> I${PWD}/tools/include/uapi can
+>>> be retired?
+>>
+>> That's the idea, yes, for "userspace programs". I mean: for BPF
+>> programs
+>> requiring vmlinux.h (BPF_CFLAGS), I guess you will still need the
+>> bpf.h
+>> file from tools/include/uapi, no?
+>>
+>>> I haven't looked into the details. I quickly tried but it
+>>> fails in my environment.
+>>
+>> Do you not have issues because some files have something like:
+>>
+>>   #include <uapi/linux/(...).h>
+>>
+>> On my side, I had a working version using this patch:
+>>
+>>> diff --git a/tools/testing/selftests/bpf/Makefile
+>>> b/tools/testing/selftests/bpf/Makefile
+>>> index 7c5827d20c2e..112f14d40852 100644
+>>> --- a/tools/testing/selftests/bpf/Makefile
+>>> +++ b/tools/testing/selftests/bpf/Makefile
+>>> @@ -37,7 +37,7 @@ CFLAGS += -g $(OPT_FLAGS) -rdynamic            \
+>>>           -Wall -Werror -fno-omit-frame-pointer                  \
+>>>           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)             \
+>>>           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)   \
+>>> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
+>>> +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
+>>>  LDFLAGS += $(SAN_LDFLAGS)
+>>>  LDLIBS += $(LIBELF_LIBS) -lz -lrt -lpthread
+>>>  
+>>
+>> But only after having removed these extra 'uapi/':
+>>
+>>   $ git grep -l '<uapi/' -- tools/testing/selftests/bpf | \
+>>     xargs sed -i 's|#include <uapi/|#include <|g'
+>>
+>> Is it not OK for you like that?
+>>
+>> Note that I built the selftests using KHDR_INCLUDES=-
+>> I$INSTALL_HDR_PATH.
 > 
-> A SACK that covers a sequence range that was already cumulatively or
-> selectively acknowledged is legal and useful, and is called a
-> Duplicate Selective Acknowledgement (DSACK or D-SACK).
-> 
-> A DSACK indicates that a receiver received duplicate data. That can be
-> very useful in allowing a data sender to determine that a
-> retransmission was not needed (spurious). If a data sender receives
-> DSACKs for all retransmitted data in a loss detection episode then it
-> knows all retransmissions were spurious, and thus it can "undo" its
-> congestion control reaction to that estimated loss, since the
-> congestion control algorithm was responding to an incorrect loss
-> signal. This can be very helpful for performance in the presence of
-> varying delays or reordering, which can cause spurious loss detection
-> episodes..
-> 
-> See:
-> 
-> https://datatracker.ietf.org/doc/html/rfc2883
-> An Extension to the Selective Acknowledgement (SACK) Option for TCP
-> 
-> https://www.rfc-editor.org/rfc/rfc3708.html
-> "Using TCP Duplicate Selective Acknowledgement (DSACKs) and Stream
-> Control Transmission Protocol (SCTP) Duplicate  Transmission Sequence
-> Numbers (TSNs) to Detect Spurious Retransmissions"
+> Do you need me to do anything here? This patchset seems to have been
+> waiting for several months.
 
-Thank you for the great explanations!
+Sorry, I was not sure my suggestion here above was OK for Martin and
+other BPF maintainers. Maybe sending a proper patch implementing these
+modifications would be easier?
 
-I was not expecting this in a 3rd ACK :)
-I don't know if it will help the congestion control algorithm in this
-case, but I guess we don't need to worry about this marginal case.
+> Another option is to roll back to v2, not add this mptcp_pm_nl_ctl
+> tool, and continue to use "ip mptcp". I remember mentioning in the
+> comments of v2 that BPF CI systems will also be upgraded to new Ubuntu
+> system and iproute2 in the future. At this time now we can make a check
+> for "ip mptcp" and only run this test on systems that support "ip
+> mptcp", and skip the test with test__skip() for systems that do not
+> support it, so that CI can also pass.
 
-I will then send the v3, and the Packetdrill modification.
+I think it would be good to get rid of some duplicated header files, but
+well, that's not directly linked to the new test we want to add, it is
+more something to ease the maintenance of these duplicated files.
+
+Then yes, it might be good to skip the test if "ip mptcp" is not supported.
 
 Cheers,
 Matt
