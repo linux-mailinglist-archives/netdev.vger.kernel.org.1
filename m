@@ -1,276 +1,231 @@
-Return-Path: <netdev+bounces-112837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9923293B78F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 21:29:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4261C93B7AC
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 21:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE231C22D71
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:29:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88EF8B245F7
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7DC16C680;
-	Wed, 24 Jul 2024 19:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E4815ECEA;
+	Wed, 24 Jul 2024 19:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aC5Nmvvy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H6J9pa23"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4238816B750
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 19:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721849353; cv=fail; b=qqNGLzhVW56VOdz6cyhyntyoYlc8Z7EwiWe+91Qy+B60BlwqDolBXb2uFmjOTRozulV8i+NYSEfuZ4PX5fSKW+skMtMRPmSO1omYbIKFZsjw4jTeBJLeMuN+Q4Ip/E8p4cidCWfSg9v14qF5b4H09rSafbCU31b2ltymJT1Y5vw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721849353; c=relaxed/simple;
-	bh=95HHNU4HcD+7eaZ4Sz5IYbFDIzH0cpOYa05qxzDPCo8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LTGmJcqFiH8x4BKS6XSvS5KKHe3nA5F2H7piSxUOFtPwBxFpAPjw5j6eI4EfRML4wqWglTObCFFmGzOLDHoMvarexrVn0OgopQAixRk1QEACCIhaOeAXcWaSW3UcGqgjhmIUhFrIN5gWQKeB6MIlndB1gesEO57NCcFQoFE126Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aC5Nmvvy; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721849351; x=1753385351;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=95HHNU4HcD+7eaZ4Sz5IYbFDIzH0cpOYa05qxzDPCo8=;
-  b=aC5NmvvyZK/s9uXY4ztyPMWN3sED7sttiMgU/Et07aaxuLaTA8QO340p
-   XE44P6jk+f4ZZAlO3v0f92Anu/+Bd2+wdM85ByG/mHrGvvzPN8x6mnhKi
-   te/ajoK+/Igb3F/T0mTX5WOnT0DFlWlf0sk7kV2mILpllgpSKyOWVSP7p
-   AKRokEYwnxrHtB0huFZ/JlRUF1qzoWlTNl7tOb4GqHjCDyXGiQv0q9os/
-   0qy8/6haWstn2UrAXRtNtmEtVOtF81GmlQb1HRBML5Gc31/TrbOpMjzSQ
-   RJI5ezQxjSWltvPriU7uQrEawLr1EoYvxL46KJ487SG94x8NEqyJVuFkj
-   Q==;
-X-CSE-ConnectionGUID: aQd0fz2FQeefS3jX9p+CpA==
-X-CSE-MsgGUID: 9eUGIQbaQyGAZSuZajyyhg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="19690514"
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="19690514"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 12:29:11 -0700
-X-CSE-ConnectionGUID: 7OshvyQNTsSGD5lmIOynag==
-X-CSE-MsgGUID: ItvgQQxYSD+5qdsup7Tg+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="83290170"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Jul 2024 12:29:11 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 24 Jul 2024 12:29:10 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 24 Jul 2024 12:29:10 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 24 Jul 2024 12:29:10 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 24 Jul 2024 12:29:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PuNFVAGpA30HhM7HZPfAQTccrMzcKNIsSux425sdPAc3qOAanw1JyjDy7VEi4myGSKSQnJ8GgjfIVE7UK3yR28IL9URFYXMVPEQSZJ6kyKYghtX9w4H/rTjQ8SlUncpRjwBqCmriukN7vmTi+5qN14pg8Pfd/Xn6cAr/IFkV41cb3Fq/l9tEoWWs99+6pYqjrrilYSbC+Lt5PeuHs4Ty6tQ+CJ8JtAbsA1T7EZhsK6By+T0giFpidJ2F0b1IDdHpENJASmV0EUrPbUfpg5K/iZz2qW4pKXYXOXg4hS+VIbAFbbmnSbKAyg6TEcpRBHAnVg+KD3StAOET2Uzkj7E2vA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IfygMEMhehPs5WIkojyjXvXs6h3k67FMdrXvkMhJreU=;
- b=hGRP8dp4tjLh7chCtFmScr41787C5XxxPddKScOFWlP9RWMfiCjBiazYBmwt4vWJuHE5f+Gih4+IBqdhGgp0YoKWf2D90MA/pMyZHaDcknxok7sMq4yE7bIOS1SsnT+LmPTaKzMVJDr8z2z2e5XJvxzrHuRJaEP2ZUja5yt8uyQCln4VeP1NuduAdcQBXOrruMQLoS/4wop4WhdGEuwEWthyg2TAzlNSfFQMlNW+FNUhmAUm3i/QCNSMGyEsnkqCPze58zDp0q/fyOJ1OAzZ9xi33HP2v4kMlgNoa5Gw1nzm6swed0FFLJHxmuj1PI2OEvzjiOpNbp0D0sL7nP9AUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by DM4PR11MB6455.namprd11.prod.outlook.com (2603:10b6:8:ba::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.19; Wed, 24 Jul
- 2024 19:29:05 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f%5]) with mapi id 15.20.7762.027; Wed, 24 Jul 2024
- 19:29:05 +0000
-Message-ID: <9bce05f8-8a57-492c-9567-2ecb1f6b8e10@intel.com>
-Date: Wed, 24 Jul 2024 13:28:51 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3 12/13] iavf: refactor add/del FDIR filters
-To: Simon Horman <horms@kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, Sridhar Samudrala
-	<sridhar.samudrala@intel.com>, Marcin Szycik <marcin.szycik@linux.intel.com>
-References: <20240710204015.124233-1-ahmed.zaki@intel.com>
- <20240710204015.124233-13-ahmed.zaki@intel.com>
- <20240722150431.GK715661@kernel.org>
- <4691e62b-0597-4184-8e85-0e74d8cdab85@intel.com>
- <20240724163016.GB97837@kernel.org>
-Content-Language: en-US
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <20240724163016.GB97837@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI2P293CA0004.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::15) To SN7PR11MB7420.namprd11.prod.outlook.com
- (2603:10b6:806:328::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D1615ECC3
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 19:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721850479; cv=none; b=dnyXSC0mJuiWUNx36HNMVXXwQ3qKcqhH1Ab3bhNuri2pnO6qRFQAuh71+Li7Cs8bSETfuQs6iOyudPHMvh6p2MlL6voUK6ip7WMBAMDQKwrg/5NzTCNsFYc+AdLBPWK+a1bRfhiEPpysWFVmkyw+px9j8y5Lr+3BKRWGq/jJHWk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721850479; c=relaxed/simple;
+	bh=k6FwyC2TQEGHr4zuRg4goZTUWzjhVQKmKTKmITDQEuY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g7mxJAZUkndYwUSmSIkLC33NMW+pf0q1VwjNoP9cKAu+auwdOIL0iWlyJir6yYScYNHRjdGflyavcsSqS27fHMYa/mPG/8K15z6uH7Cl/5Su1n47ArgarXRsJH048OCUA6q19xJaFdnFbim1J+ZaxsjW+paaN4pDw6eavzIiimA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H6J9pa23; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cdba9d7c-e5da-4e3b-a121-1fad4f517917@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1721850474;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7YaV2tZ+kfBixAFIS2ceMaaoLIfoRysDRpw3nqa337M=;
+	b=H6J9pa23EkrNXfqC0xApI0RyKxu3miq3uV7DzOQGSNSV7SWO2lx9NE5PrF0cwhsltlKcCX
+	ILRrjOrHKRSUw3tauG2LEDDI+sMz1Nz75/fBcJqzV6Tl8j3brE7qyjUtN5PBaFPL/3YzGL
+	FUbs4B6XKawy/H/PHczYnnYl/fx63+U=
+Date: Wed, 24 Jul 2024 12:47:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|DM4PR11MB6455:EE_
-X-MS-Office365-Filtering-Correlation-Id: adf1514b-e54a-411b-c7cf-08dcac16e1a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?S0FJRHlTbjMvUXB3TjRtYjNEYVFoN1FxTGNHcnB0V3dON055LzRCcmp4M1U0?=
- =?utf-8?B?bkE5Z0JndG1uREdXcUl3bnhXTEUycnZJNzFidWNnZThwSFRGNnJ4azZ3SFlG?=
- =?utf-8?B?UW5lMmN4U1dHMysxV21VcllKNFZ6NnF2UTRiM2Q4Q3lOUkJPWERJWkp2WFUr?=
- =?utf-8?B?S0M3OHhwSkNDRU5JVkNNL0JUVVpqU01telhTc0dJSnVvZ1oySjFCL3VzT1l0?=
- =?utf-8?B?eStZZHRYbE1WMVZLRWJZZ1BGQVh1dHVYTndHQjZTZ0JQR3BPMzlDRW9OZGlS?=
- =?utf-8?B?UDdqdXlVT2VkQm1pRk5tTHdUdjUxSXc5aVZ5WlhyWmtqeVhxZS9RZnFJS3B0?=
- =?utf-8?B?dDRlaEFKeGw1WDd4cW1nSkphN29zM0QyR0xaUk5Vb3FUTkNtcW8rdU41R0U1?=
- =?utf-8?B?Q2d0TmM3TldoaDQ0aDNLbGpEWk1hS1JGWFR2WlRGWWhSL1d5YVhHdGVMVDZG?=
- =?utf-8?B?bEQ5T1FSQlZSVmp0b0RlWXJSd2x1aEpiM0FPZFNFYTR3azlkKy9XNW11S2Fj?=
- =?utf-8?B?WU1vTEMvR1Z3SVQzb1JkVnJQSnVpMlE4TEhJbjRqSlB6ZFhFaWtZWStVcVA5?=
- =?utf-8?B?aUszaENnTTljQzVydDNrbXNDKzlkR0ErRFFvdWJlRjl3SWZFUFFmczNlUzk2?=
- =?utf-8?B?K2RiOVo0VmwyWmRLc0VyN1gwMDh0eDNSQXlyMkR2SCtQUUpPWlY1ZElEVGt4?=
- =?utf-8?B?ZzZ6UXhOQWxzNFp5eDN5NW9BU1ZRNWplcDhmVmlyV3VzZ1dORFdtM2pjSzNH?=
- =?utf-8?B?Sy9ZZG1tT1FhaTkyb0V1dFVnbmxFL3NuUWk5V2lNQzhCTmR4WW5pMHVLRUJJ?=
- =?utf-8?B?aUIrZDNTWWQ1VktRUzRKNUJuc3VVMGpUclgzckFRd21ZeUQ5YWdCRkYwN29s?=
- =?utf-8?B?TXFFVG5wbXZmTkFJa0ZzVWxjSjZROE9PU0pmcXU5VFpZMi9SQXM3eE54STI3?=
- =?utf-8?B?aUI0cGlPQVRPRGx1OUp1VGVsUFp4SExKTmdhY1RESEViUHU1N1Rrc1dyMVBY?=
- =?utf-8?B?c29BeXhHOVc5M1QyV0w2UGhnbjJ2dVA5NlRNZTkwanRNZmdNR3hJN21haGVK?=
- =?utf-8?B?U3Y0cUxNakcyaTRLQVFIZm9DMDFqRGRuc1VvQTVIb0d1b0VzdkpuR21VZnFo?=
- =?utf-8?B?RG9qUmg4d0hzUEN2eGVUUktLUGNnTEMxc2pIMzQ4MWJzTS9lNm1menMwWFhz?=
- =?utf-8?B?MEVTVS9hSFZKZWZvbFFBZmplSkdZK2VIeGZNbllaTUdUcFdDZlQwVmdvNGpk?=
- =?utf-8?B?c0Z1Q0hYWThMYmp5RFFyQVdCekJEcnAxdG45UDU3VUJOa0N5dFFWK3Y0dWc5?=
- =?utf-8?B?R3BIUTBTMmJKQTRjZ3A4ZDhrcksrSk5WRmsrMFNWa2hSTFpoUENaVEw5QnFt?=
- =?utf-8?B?Si80WGhacmk4SEVIeU5rMGFKNGhvbkYxUjNTL0FXVllLMmU2UEp2NW0vdWg5?=
- =?utf-8?B?ZXhZK2JJdkF5TTltOTdtWWg2d08zVlVyZFlIaFA2ZEN4V1hjdGR6bXRISjF5?=
- =?utf-8?B?UElLcnBTZy9pQ1JUS2VBR01oSnN1RFhHUDdIbzZoK1kzaCtaQzlxUjJCT2wy?=
- =?utf-8?B?TWcxZmlZU2ZnSVYyMFAwVVBJTWp0bVl2YWUrQWF1VytKU2hyN2FqT0dvZ0Vo?=
- =?utf-8?B?K2QwU3VRQ1hBOGRpTEx3ci9XZmdkY09MOVNvWlNIbGY1bElWWTc1MmtFWVBp?=
- =?utf-8?B?VUNmakVwOFpZQTMwS2grMDQvNk5MUWk5ZGJlenczYSt0elNmNzIvWVdmcHFh?=
- =?utf-8?B?eG03V0xnb0ZldFFRY3BLRDY1VGplcUtBTXE1SGJndE1aeC9JN0lLZlVaSU5Q?=
- =?utf-8?B?MG4wZ1o4NWNzZk5IT2Jrdz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SzZTdDZnNWJTL3FZZThPdlVQa2pYcG9LTWQxNy85ZHJOSHZ2dmVzMkxPb2RS?=
- =?utf-8?B?ZHdsN2wwb0RhS29ENGxCbWFMRVhjdHFpaitEdU1zblFmSEszaS9EMHQxWTda?=
- =?utf-8?B?YnVkZytlU3FXakRlTVV1Tzk4ZDkwQ1UvbTFycjc0TGJUM2x2OWlXb1oxWnE0?=
- =?utf-8?B?KzZKdnYzeXFaL01sTTVWZkJJN0tBeUdyV0lqS2ppZUY5UG9IYU1heUZCWm1B?=
- =?utf-8?B?dE4rRFFSd0IrLzdjSGlVNkFyVWJlUGJ6Ykt0eFNHV01yazc4MVZzTSt5bVhF?=
- =?utf-8?B?QkdJQnMzZTBzcTBVTVpFNnZwaG9odndzOUtyYzY4OGZHMC9IMFB1dkJBazdF?=
- =?utf-8?B?akRmcElXNFVFcEp4VVdQMkZWYWEzRG0vM0doVzlObVFmZm91S3VnVzRzOUhU?=
- =?utf-8?B?dFRaOEg5WGF0d2h6MTg0ai9icGZTSEEyU29haVV1RXFNT2NBMmpqa0FqZExR?=
- =?utf-8?B?bFE0Q1pwRHc3bnU3Rkg0WVFzUmE4QjJTS2c5M28rU0cvRk1vU3Q2TXppS3h6?=
- =?utf-8?B?NmxpYWtPODFWdlhNYmM1UW5IM0thTnp5NEx0Rytjb3ZpOVlFU1dub2hsZW54?=
- =?utf-8?B?NThNNWtoRDdUUm1nT2RkNTZEb2RBQTZYcDZZUlFzK1dLc2xkYmhEdU9nMFIz?=
- =?utf-8?B?R2Y1a0JaMjNucXlNaWp3NDVyNWJHOVdhZTVrUXNscjd2Sk1FamVTc3YzYmNj?=
- =?utf-8?B?MzJnZDhnMXZIa2I3M1NZVUcvcVgxSmpCa21ORVRBNkJYTitIKzB0ZVZvMHN6?=
- =?utf-8?B?S2NHK1pJUVZKcEJPbE9UKzlWT21YQ3hCbnE3UEdsd0Z2eStucW0zbmt6aWhE?=
- =?utf-8?B?bDlra2pBMzdsZzJqOWlJaGRrS2NNekdOdUpqaVlyNEhZK0E3SXdqTTB2cGww?=
- =?utf-8?B?Yjk4YVRXM1BCdmJ4TDNpakprMjdxamNBL2M0aUxpMjZ6clhaZkh1NVlMU3ll?=
- =?utf-8?B?MWE2MTkvLzhRekllN2hvSU83ZXU2VnhmK2gxS2xGNGZnb2Vjb1VtYUtmbzZr?=
- =?utf-8?B?bjRueXRXM3RiT3k3Qk9ZNzdUNTQ2RzAwSG5ZWjZkaUZ0SnE3Q21OVllJZkxL?=
- =?utf-8?B?NDVZYml2VXNWSFRPN1QwcGVXUW5yWDIzVVJMd21TR2RYYnZqdVhsUGxaSmlS?=
- =?utf-8?B?eG1Qb3ZkTzhLd3hwdExmVCtudks1YUxadmV3ZHhSUEZoUHdRTFdOcHJVTUZM?=
- =?utf-8?B?ZHlwY2lUbkROTEFRSzF3V3ZMdlQvcENOekt0NHNPVWxHcmQ2c2h3emtlTHVO?=
- =?utf-8?B?bURjbDc5NSt6c01FWDZ3bTdtVkNBd1VmaUd6Y29PT1dIaVZ0ZldZVHI1ajFy?=
- =?utf-8?B?R1NhZ0dQam9FRWxyTU1ESVlUWVVnRVFUQXRTQkgzc2V1V2xTL2VKSjdBdkt0?=
- =?utf-8?B?cHJWbERYRzhFVWpLY0lteVlDVlk3bVc4dUhZRFRTN295OFlMVTlIQzZPYVBm?=
- =?utf-8?B?dG5QbVBuaFJnTjEycjVaOFUzb1FTR2lQSzd6UzcwczFGdTlJeDBSenUydnJH?=
- =?utf-8?B?MkYzaHBQY1lid3hQRmJ0VFZST1RHaS9yNWdXVGQ0YW5IaHd5T2NXZEVLbmxL?=
- =?utf-8?B?ZStLdHBLb0kzU29CTTQwR1V5SEk4U1pleGFLbTFlR1BSRnluV1RlNHZ6VkQv?=
- =?utf-8?B?eFQwYzFzdUFUcmlFU2I1M3RYUnkvejJJVnE2bXdtSElUNTRaRVNscVZrbUt2?=
- =?utf-8?B?SUp0ejljR3JwM3ZCeEtmMFVkK3JDUFFNWkVUOW9Ddm1RSGNrb1AwNGwyNWRk?=
- =?utf-8?B?N1VFemRMWWlEeXl2aFNxaTF4aXJsaS9DdEhZQ3dzSFN1MkFKbXp2NkhrUzZu?=
- =?utf-8?B?MStPdTB0TWNJZ1N0MGVwNm1DT0xaQVVGUlpaL1BRLzZwZm9LNnlsQXBOSWps?=
- =?utf-8?B?NVRqR053UStYbUIzVCtIYTBTZGJ4bVorMWR3TGlYeHdJYXErNjIxUWpTY2dC?=
- =?utf-8?B?Yy85bUZWdnpWd1QrZ0V2cXBYTXg4U3FjdGJLeHEvVDdVUFdNbS9aaGdmVWM5?=
- =?utf-8?B?c3lyQXdHdFk0WW5UVWJTelM3NnpmNzc0WHpKUU85TW1RK05XUnU4Z1hLUDBB?=
- =?utf-8?B?WEM1TVNYd0YzU3dJVU5WZXpVQ0U2TWcrN3Q0RERZREwxdHpLQStVLzhuMFZX?=
- =?utf-8?Q?k97m/2wdzBQ7rxWwRRvxo3cCc?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: adf1514b-e54a-411b-c7cf-08dcac16e1a1
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2024 19:29:05.5539
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BLc0Q+Y0PyoSNa2nV1UxscFRFdZ82jS8JGGFGeHjw6gXc2KMXARQah9B9flRZ6H8++H49FRzEKtiuYqpWJsi+A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6455
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH bpf-next v3 2/3] selftests/bpf: Add mptcp pm_nl_ctl link
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>,
+ mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
+References: <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org>
+ <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-2-ebdc2d494049@kernel.org>
+ <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
+ <90e916e8-ec4e-447b-8ee6-eb247f3a72ad@linux.dev>
+ <ab8112e6-ea7b-4b36-b395-049214e1608d@kernel.org>
+ <780ed38257480940def86947b2ee354f298e890b.camel@kernel.org>
+ <684fd6c2-ad54-4479-8a6a-ab3270e558a7@kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <684fd6c2-ad54-4479-8a6a-ab3270e558a7@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 2024-07-24 10:30 a.m., Simon Horman wrote:
-> On Wed, Jul 24, 2024 at 10:14:19AM -0600, Ahmed Zaki wrote:
+On 7/24/24 1:24 AM, Matthieu Baerts wrote:
+> Hi Geliang,
 > 
-> ...
+> Thank you for your reply!
 > 
->>>> +/**
->>>> + * iavf_fdir_del_fltr - delete a flow director filter from the list
->>>> + * @adapter: pointer to the VF adapter structure
->>>> + * @loc: location to delete.
->>>> + *
->>>> + * Return: 0 on success or negative errno on failure.
->>>> + */
->>>> +int iavf_fdir_del_fltr(struct iavf_adapter *adapter, u32 loc)
->>>> +{
->>>> +	struct iavf_fdir_fltr *fltr = NULL;
->>>> +	int err = 0;
->>>> +
->>>> +	spin_lock_bh(&adapter->fdir_fltr_lock);
->>>> +	fltr = iavf_find_fdir_fltr(adapter, loc);
->>>> +
->>>> +	if (fltr) {
->>>> +		if (fltr->state == IAVF_FDIR_FLTR_ACTIVE) {
->>>> +			fltr->state = IAVF_FDIR_FLTR_DEL_REQUEST;
->>>> +		} else if (fltr->state == IAVF_FDIR_FLTR_INACTIVE) {
->>>> +			list_del(&fltr->list);
->>>> +			kfree(fltr);
->>>> +			adapter->fdir_active_fltr--;
->>>> +			fltr = NULL;
->>>> +		} else {
->>>> +			err = -EBUSY;
->>>> +		}
->>>> +	} else if (adapter->fdir_active_fltr) {
->>>> +		err = -EINVAL;
->>>> +	}
->>>> +
->>>> +	if (fltr && fltr->state == IAVF_FDIR_FLTR_DEL_REQUEST)
->>>> +		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DEL_FDIR_FILTER);
->>>
->>> It seems that prior to this change the condition and call to
->>> iavf_schedule_aq_request were not protected by fdir_fltr_lock, and now they
->>> are. If so, is this change intentional.
->>>
+> On 24/07/2024 09:42, Geliang Tang wrote:
+>> Hi Matt,
 >>
->> yes it is, fltr is member of the list that should be protected by the
->> spinlock.
-> 
-> Thanks,
-> 
-> I would suggest moving this into a separate patch: changing locking is a
-> bit different to refactoring.
-> 
-> Or, if not, at least mentioning it in the patch description.
+>> On Sat, 2024-07-06 at 02:25 +0200, Matthieu Baerts wrote:
+>>> Hi Martin,
+>>>
+>>> Thank you for your reply!
+>>>
+>>> On 06/07/2024 01:10, Martin KaFai Lau wrote:
+>>>> On 7/4/24 3:48 AM, Matthieu Baerts wrote:
+>>>>>> diff --git a/tools/testing/selftests/bpf/Makefile
+>>>>>> b/tools/testing/
+>>>>>> selftests/bpf/Makefile
+>>>>>> index e0b3887b3d2d..204269d0b5b8 100644
+>>>>>> --- a/tools/testing/selftests/bpf/Makefile
+>>>>>> +++ b/tools/testing/selftests/bpf/Makefile
+>>>>>> @@ -144,7 +144,7 @@ TEST_GEN_PROGS_EXTENDED =
+>>>>>> test_skb_cgroup_id_user \
+>>>>>>        flow_dissector_load test_flow_dissector
+>>>>>> test_tcp_check_syncookie_user \
+>>>>>>        test_lirc_mode2_user xdping test_cpp runqslower bench
+>>>>>> bpf_testmod.ko \
+>>>>>>        xskxceiver xdp_redirect_multi xdp_synproxy veristat
+>>>>>> xdp_hw_metadata \
+>>>>>> -    xdp_features bpf_test_no_cfi.ko
+>>>>>> +    xdp_features bpf_test_no_cfi.ko mptcp_pm_nl_ctl
+>>>>> On the BPF CI, we have such errors:
+>>>>>
+>>>>>      mptcp_pm_nl_ctl.c:20:10: fatal error: 'linux/mptcp.h' file
+>>>>> not found
+>>>>>        20 | #include "linux/mptcp.h"
+>>>>>           |          ^~~~~~~~~~~~~~~
+>>>>>
+>>>>> On my side, I don't have any issue, because the compiler uses the
+>>>>> mptcp.h file from the system: /usr/include/linux/mptcp.h
+>>>>>
+>>>>> I suppose that's not OK on the BPF CI, as it looks like it
+>>>>> doesn't have
+>>>>> this file there, probably because it still uses Ubuntu 20.04 as
+>>>>> base,
+>>>>> which doesn't include this file in the linux-libc-dev package.
+>>>>>
+>>>>> When I look at how this 'mptcp_pm_nl_ctl' tool -- and all the
+>>>>> other
+>>>>> programs from that list -- is compiled (V=1), I see that the
+>>>>> following
+>>>>> "-I" options are given:
+>>>>>
+>>>>>     -I${PWD}/tools/testing/selftests/bpf
+>>>>>     -I${BUILD}//tools/include
+>>>>>     -I${BUILD}/include/generated
+>>>>>     -I${PWD}/tools/lib
+>>>>>     -I${PWD}/tools/include
+>>>>>     -I${PWD}/tools/include/uapi
+>>>>>     -I${BUILD}/
+>>>>>
+>>>>> It will then not look at -I${PWD}/usr/include or the directory
+>>>>> generated
+>>>>> with:
+>>>>>
+>>>>>     make headers_install INSTALL_HDR_PATH=(...)
+>>>>
+>>>> It sounds like the tools/testing/selftests/net/mptcp/Makefile is
+>>>> looking
+>>>> at this include path, so it works?
+>>>
+>>> Yes it does work.
+>>>
+>>>> iiu the bpf/Makefile correctly, it has the bpftool "make" compiled
+>>>> and
+>>>> installed at tools/testing/selftests/bpf/tools/sbin/. May be
+>>>> directly
+>>>> compile the pm_nl_ctl by "make tools/testing/selftests/net/mptcp/"?
+>>>
+>>> That could be an alternative, I didn't know it would be OK to add
+>>> such
+>>> dependence, good idea.
+>>>
+>>>>> I guess that's why people have duplicated files in
+>>>>> 'tools/include/uapi',
+>>>>> but I also understood from Jakub that it is not a good idea to
+>>>>> continue
+>>>>> to do so.
+>>>>>
+>>>>> What would be the best solution to avoid a copy? A symlink still
+>>>>> looks
+>>>>> like a workaround.
+>>>>>
+>>>>> In the other selftests, KHDR_INCLUDES is used to be able to
+>>>>> include the
+>>>>> path containing the UAPI headers. So if someone built the headers
+>>>>> in a
+>>>>
+>>>> Meaning KHDR_INCLUDES should be used and -
+>>>> I${PWD}/tools/include/uapi can
+>>>> be retired?
+>>>
+>>> That's the idea, yes, for "userspace programs". I mean: for BPF
+>>> programs
+>>> requiring vmlinux.h (BPF_CFLAGS), I guess you will still need the
+>>> bpf.h
+>>> file from tools/include/uapi, no?
+>>>
+>>>> I haven't looked into the details. I quickly tried but it
+>>>> fails in my environment.
+>>>
+>>> Do you not have issues because some files have something like:
+>>>
+>>>    #include <uapi/linux/(...).h>
+>>>
+>>> On my side, I had a working version using this patch:
+>>>
+>>>> diff --git a/tools/testing/selftests/bpf/Makefile
+>>>> b/tools/testing/selftests/bpf/Makefile
+>>>> index 7c5827d20c2e..112f14d40852 100644
+>>>> --- a/tools/testing/selftests/bpf/Makefile
+>>>> +++ b/tools/testing/selftests/bpf/Makefile
+>>>> @@ -37,7 +37,7 @@ CFLAGS += -g $(OPT_FLAGS) -rdynamic            \
+>>>>            -Wall -Werror -fno-omit-frame-pointer                  \
+>>>>            $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)             \
+>>>>            -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)   \
+>>>> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
+>>>> +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
+>>>>   LDFLAGS += $(SAN_LDFLAGS)
+>>>>   LDLIBS += $(LIBELF_LIBS) -lz -lrt -lpthread
+>>>>   
+>>>
+>>> But only after having removed these extra 'uapi/':
+>>>
+>>>    $ git grep -l '<uapi/' -- tools/testing/selftests/bpf | \
+>>>      xargs sed -i 's|#include <uapi/|#include <|g'
+>>>
+>>> Is it not OK for you like that?
 
-I will mention it in the commit message. A separate patch is an overkill 
-IMHO since the function location has changed and the patch would not be 
-applied to previous versions.
+I tried and it works for me with the above changes. The other $(APIDIR) usages 
+in the Makefile can be replaced also?
 
-Thanks,
-Ahmed
+Matt, do you want to post a patch and see how does it go with the bpf CI?
 
+[ Sorry for the late reply. ]
 
+>>>
+>>> Note that I built the selftests using KHDR_INCLUDES=-
+>>> I$INSTALL_HDR_PATH.
 
 
