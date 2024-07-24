@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-112777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941E693B28D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:20:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD7593B28E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C604C1C23662
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08B441F21F39
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5941B158871;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFD8158875;
 	Wed, 24 Jul 2024 14:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qeTLA2Gu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="egBKb/gF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327621DA26;
-	Wed, 24 Jul 2024 14:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3278B1E867
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 14:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721830832; cv=none; b=dByQiZRZHZCytJ9OgV9Hi/XmGAkBgvgjxEdJyFYweo/hFbbhqlX/0X7SiAcPUYzt43+YHzY+si4uwEie/Jen0QURtAVxLlznPtUX+CkYV+sM8DP5rTbyBAd8uGcgFMkrq+fPnfCRY3Ddqe1thrrjd2Gkg8HM63h7yeEdPUxvYx8=
+	t=1721830832; cv=none; b=O6RMtgHk7ztPEWN+AbTFTyW7PqmcOP11CMbebZhE2+b3QV2kjE7eMdgLb9Lf9bmNhKY+I+QyqEElvNbfovPslhjhZat410YfnMEwc2ZRgfIvxsJ3FcMLqorxWIZJscqTK0GVJxmk7XDp37kwitP1f/n577QN+nTJtFQFwNm/7gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721830832; c=relaxed/simple;
-	bh=J5/Me1+XnZ22kZOEKDyoSGw9tbK3RZSpPcrWZc2vqrg=;
+	bh=Rukc6O3TUn3kCoKQwcb17Ej01IDzKcNV/0uipcAAcgo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ktwBWRap2TgOiq9HeJvm4Q+vaALFV88/hSWigvQjETA8fz2JoTSSo7I+HzKr34FoQ/3evCD4scLBLSJz3d6gl8rZO2KTTyONeMwMNG4xGU+ymUUV0mgk0fekBdzqFqUglf8VWQc7t+0ZwkiLqXiMB1nh2bdSHQqNQTDKGOmooi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qeTLA2Gu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DF9EFC4AF09;
+	 In-Reply-To:To:Cc; b=KhkqhoRM5I7NJDkMFsXuge42WYcna4QvQUkaR7FeKUShWYckDHhrurwP/D8/++xkn8Qsgig3exWWV+2t3QK0eyT2oiolgMTvfVtlnryICLDkXsEibjwvs8zXdXvv2c4hT2gPPrGvZ/SOxyUK5WROxgcvxK8YJbhRwpcA/qbFb6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=egBKb/gF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D3A9CC32782;
 	Wed, 24 Jul 2024 14:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1721830831;
-	bh=J5/Me1+XnZ22kZOEKDyoSGw9tbK3RZSpPcrWZc2vqrg=;
+	bh=Rukc6O3TUn3kCoKQwcb17Ej01IDzKcNV/0uipcAAcgo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qeTLA2Gu6iMHEJS9oKrLW2Y7c3TrGcps8qnp7zmuH5If9SX+d/LhIMf+fj8KV339t
-	 qqof2bDoZ5z51Nrotj8CbnwkS2p8nEnuGAdAM/hOR7XZjG/z38iYYSUvbtbpEB8p8z
-	 ilu5bgq5dh9BaLr3Pu3G1ESORDhupjHfzPjAvNiLXrrvm0+/Jza315jN1Thavg50kL
-	 IxW1l+V6HZ292j57CFnfIVg1ASnieXv2Ury8gT7sN4mRciQMJzqA3TzzbBvLzcOgaX
-	 mFdcMYVUpeT3fyBK18cU6OkBzdYA1hv/8KhCSK8JI76Ime+qFDUR2UOAD/0Z8XDIyY
-	 c2UN2pBg8AGfQ==
+	b=egBKb/gFfr1FDU1kzhsbr04PujEoZb7qvTpIfRAqROUU9ItecReDuSCMd89l1097U
+	 /91iq2H794OQaaf+09WrojyHjhFB2lABA1yqSGgeRsSlkra0AqBljZZojOIfsxFBwv
+	 oywnreAfvgLOzHkr+NcRisBEjQABIQmlWEjfWwH6N//eiSH6Q3KFSotOF2Tl5qG60/
+	 jqEbTM9A+XZJSJA0O8WvwWrb9iIGA4lJDHeuT8ehtBEhv3u8XQSkB6ew56dhVqUZmH
+	 5R5eSPd4YzWgIo/M5V1lF26pjXlVSpnKISSsLbwK0x/hPTRNw2p3PSdJmzbUG08Wyb
+	 w0m/O2bBlp/cQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C9173C43443;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BFA97C43601;
 	Wed, 24 Jul 2024 14:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,34 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] MAINTAINERS: Update bonding entry
+Subject: Re: [PATCH net] net: stmmac: Correct byte order of perfect_match
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172183083182.11114.4188482836036552715.git-patchwork-notify@kernel.org>
+ <172183083178.11114.6015166451648250005.git-patchwork-notify@kernel.org>
 Date: Wed, 24 Jul 2024 14:20:31 +0000
-References: <2800114.1721773356@famine>
-In-Reply-To: <2800114.1721773356@famine>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240723-stmmac-perfect-match-v1-1-678a800343b2@kernel.org>
+In-Reply-To: <20240723-stmmac-perfect-match-v1-1-678a800343b2@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 23 Jul 2024 15:22:36 -0700 you wrote:
-> Update my email address, clarify support status, and delete the
-> web site that hasn't been used in a long time.
+On Tue, 23 Jul 2024 14:29:27 +0100 you wrote:
+> The perfect_match parameter of the update_vlan_hash operation is __le16,
+> and is correctly converted from host byte-order in the lone caller,
+> stmmac_vlan_update().
 > 
-> Signed-off-by: Jay Vosburgh <j.vosburgh@gmail.com>
-> 
-> ---
+> However, the implementations of this caller, dwxgmac2_update_vlan_hash()
+> and dwxgmac2_update_vlan_hash(), both treat this parameter as host byte
+> order, using the following pattern:
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] MAINTAINERS: Update bonding entry
-    https://git.kernel.org/netdev/net/c/0fa9af961102
+  - [net] net: stmmac: Correct byte order of perfect_match
+    https://git.kernel.org/netdev/net/c/e9dbebae2e3c
 
 You are awesome, thank you!
 -- 
