@@ -1,122 +1,125 @@
-Return-Path: <netdev+bounces-112710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1161593AAB4
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:48:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5365493AB28
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 04:18:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99B87284193
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:48:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D34FFB24096
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 02:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17CDDF58;
-	Wed, 24 Jul 2024 01:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427B217547;
+	Wed, 24 Jul 2024 02:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDwMFZfq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhbcdqJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921941C6B2;
-	Wed, 24 Jul 2024 01:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D91134B1
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 02:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721785644; cv=none; b=Y2cqfow//rABzycRameSVDxK5rEWAtqXpDoPxNpPMa3it1TfI340BmLlfZ0K/3no2Y24+W9rR6Eh+oob6EjpkxJ9bxOV62Be6vr96lyz9CSBttHzZKvboena95gS/ynwUGzyeef2S6R2jr48z9vNGvjiS3wFDK4RUr0KcUO2PWU=
+	t=1721787467; cv=none; b=OCRC6USzRDNeMrkTeTQ2ZDPdsh0ZqdpT8nRcjjlT1D1MR9aqlv1diQ1jNXlfOrnU6Gn5eUdWOxnHtcDgyv5G3+PL/k/Iz8p7Bu2FHGjMJwYj5TOCmOeNvhWXfOeWZ4q7w6y2KpzfvD9hAlAOEiKJCi9uO0Bx+wBledaocXBzaY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721785644; c=relaxed/simple;
-	bh=HIPZaFh9Yecwx65PpnkfqLQC2xvEgZhlTWGXWm9wIlk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CPu8vnU+jOsH3PdqRjVzIYAHGw/O3vLOgFzU1U7es9lgJ0A0eBu4gU06NZAEQ+0r6NJOWhQvoihpn/41/mczsYgDwH4bxUXhz6D0Q5fm6XYdEX7ImdIjQwepIWNUhj368QeLG5HTgx6Nl4PgWKfYQWSbKqAynQvqkurSqzOlkew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDwMFZfq; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70d24d0a8d4so1814339b3a.0;
-        Tue, 23 Jul 2024 18:47:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721785642; x=1722390442; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ixBaPt3HwUBSQNgJD5/MCt2lI2he2/bUzlD4zYQg34g=;
-        b=dDwMFZfq5reqpiOFepVaOhIPc/R0rG4nmhLUdQ7jOcn9Yt+vcKp3sZFqlbnlqQ9do3
-         CrCOuM7b3nkf0EydYWwerm+WbYVo4MJo/1vW2FOPMV3bvoJvv7SmIPV7aDZzCoEmKMzs
-         6pETPSuP7SQiXtmcKuMlnK0QnqgViCXdfk38WelJo4s+TVOk54gnC1Ufz3t2kxHCC5Y5
-         L9l7+egf2f27jYZJ5h+OqJTNTxXfXPwPeqXneiQDi9SCwkSL3SxonP5n61xqX+7vF1Uf
-         MO3SJfct/ACQUfOHmKCtSgrpvzeLnu7TyWrNM58FyMgc/KCLxTa6P7rwXhSkNfa2L7Ly
-         Dj1w==
+	s=arc-20240116; t=1721787467; c=relaxed/simple;
+	bh=HqQhCLi2BNPd/ZrfrrIBuLEUl8XjR1USS5+f0zaa3a8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RqrLv3ifLNAsniEXBEp5upWM+nupuvfDTtzeAIy2D1QElQB9zkxsQui2e0WOk6zlmmcjOCMcwddvlQQmdGQjUaAkPjA3AZIddvBcJUMYaHdEPozwiD223EEOTYp9BhtUKMiecIU1X9xorrmD9dh9Sclm08B2TYnDId+nSrPhPto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UhbcdqJ4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721787464;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h/CDtEBkZLf1xoU0C7ksliBZOQvRtEzxEPf2Wwd79pU=;
+	b=UhbcdqJ47uB7R55QBJCNX9UkhPe5zZa+ZCMVbLryIDJpYV2m999ZUrNIeaEz7Kz1IXBGjO
+	ULNkOruZG8KbQWb3Bc8k5akoqKrOIOZ8s+9dnWK6K9hPuid2acmJ/G4+8g84W4X0vG8HVW
+	RdAuxWobGMezTGb8ROR8OXkk6P91kxE=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-616-8RK1m8hlOW-LN6buwWOZJw-1; Tue, 23 Jul 2024 22:12:42 -0400
+X-MC-Unique: 8RK1m8hlOW-LN6buwWOZJw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5a7b90cb746so1772406a12.3
+        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 19:12:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721785642; x=1722390442;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ixBaPt3HwUBSQNgJD5/MCt2lI2he2/bUzlD4zYQg34g=;
-        b=g495qGGoCNo85PVV02nH8liaXHMjfuDxjOL3JVkVitdMtssiKAa478du+gV3t5Ayrs
-         wci9ZjEDxPo2YXAqBKRPwF/NX6H+XLqjUG+qNUO/cIavsRiKRIQyzh1o5Fp3DOQePj3w
-         94+Anmth7Xti4aePYjPEGJQHOdZAvSP9VEW/f+FgrE+zu/xqNrmYtrXGsU09+hX4eS0p
-         x91fB7cLKs+SIsG0NM2pyjKNxQdMTw2aw2OPws0R25XqFImggUMC0xaVQ9mj4lNLZ3BQ
-         ZfFYs6A0lWXrufvsrRFUETO0JGdi5Oxt0YQ5XQ+Rrn3+RXf3blcfWpyjMn8ErHPgvIzI
-         ZEfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzSqamxUv75pBsQCY2t4RIF2rgdCKfzWwK5/14IqTHHnOswTsozzRgRt6/3MKzCW1xFitv74UEXbiJZ0YXDIeHp9QXaxxNUwNHEvuE
-X-Gm-Message-State: AOJu0YwblsyHVm1MdP7qwM5tl7NuLB7yZr+43E/G3h32V15tjLoVrXDd
-	S8GYiP0iz3J6VJUh4Skk9nNaQ0fW8VIO9u7ijFLtPNuLEx2dt2dyO1K/eBvV
-X-Google-Smtp-Source: AGHT+IEzb3HhOlXc05SU9bt4B8hsihQpnQJiUMKfpkiSYXtvWZtRhKv4Q3D5pKN5cYFnan7xoExGSA==
-X-Received: by 2002:a05:6a20:841e:b0:1c4:2540:1735 with SMTP id adf61e73a8af0-1c4254017aemr13020132637.16.1721785642340;
-        Tue, 23 Jul 2024 18:47:22 -0700 (PDT)
-Received: from localhost.localdomain ([159.196.197.79])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb73a5f5asm314564a91.8.2024.07.23.18.47.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 18:47:21 -0700 (PDT)
-From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-To: netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	Stefan Rompf <stefan@loplof.de>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 4/4] net-sysfs: check device is present when showing dormant
-Date: Wed, 24 Jul 2024 11:46:53 +1000
-Message-Id: <5d51ac5ca591bb38cc822376e878f0b30864b916.1721784184.git.jamie.bainbridge@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <cover.1721784184.git.jamie.bainbridge@gmail.com>
-References: <cover.1721784184.git.jamie.bainbridge@gmail.com>
+        d=1e100.net; s=20230601; t=1721787161; x=1722391961;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h/CDtEBkZLf1xoU0C7ksliBZOQvRtEzxEPf2Wwd79pU=;
+        b=mWFJSeMjhHLHHu/CYEWfF3D+/yl4x7pBGZpjrPV9e4yfs/c29QG7eViLPb7dpIIHmn
+         ZkwVAZudD+/Wel3mZLy0fyVQNA+k/BdTrSpCD8uqrFb/fV2odQmlnDnYb8QvRNiEg0Jq
+         8hKShST6e1YfLHo8MOpM54VCpofAhpnMxJ/9BuIIj+M/bEM+knc+jPtL2hU66onADPPc
+         rJliMPJZ7ZZE5/jYLHpGtgUOGwJ4vr/Fng7fTKisBZjdUi/k8i0ty2SvRu7XORC6i8Zf
+         mIOjTUxzEA3BRmI2XnCVk+lTMc7OxHQK/f4MnmlFESn9zXb7iGVJEEprSMq0OWq8hwn1
+         JOZg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1W/yyeasiEUb12QD/GrnedkhgPKo11esRUwHjSi6uJe3xGe4Pd9SI4JOdC1pPjaroUa0DX/dYwWEOda/woG5KvXNkrxIm
+X-Gm-Message-State: AOJu0Yy5EXR5tFvRvJGWS2i+jRcZMqIItBjLbPJwBzjIV+iN16+c6LeV
+	xKQNr4+0zhjg/2VzNpauDa0E2TSIjIQAM+ex6NhyHS/m1enLH3ujI8VQDC1LFduf8eoV4RYIZtw
+	fgwxL20x/MwVybcOGYgt7qTZ+dbcFBcYu1DrzyANXTiqZxlyYlMN46cttff6gSxbeLdDwfsHwXI
+	0EFVdntyiSeEbON8IZOTN10X9G8dnJ
+X-Received: by 2002:a05:6402:234c:b0:5a2:abcb:c4cf with SMTP id 4fb4d7f45d1cf-5aaece39c30mr562182a12.22.1721787160874;
+        Tue, 23 Jul 2024 19:12:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHgP3SMHABHLAK1ShSJyuqULWrGb17ytiwZhc3mKrBjTl8ITd2JHGrsgEsjrJDBGLVMXv7Gi/wR2c5DVGWvAaQ=
+X-Received: by 2002:a05:6402:234c:b0:5a2:abcb:c4cf with SMTP id
+ 4fb4d7f45d1cf-5aaece39c30mr562165a12.22.1721787160493; Tue, 23 Jul 2024
+ 19:12:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240723054047.1059994-1-lulu@redhat.com> <66239ba4-d837-48da-aaba-528c6ab05ce9@lunn.ch>
+In-Reply-To: <66239ba4-d837-48da-aaba-528c6ab05ce9@lunn.ch>
+From: Cindy Lu <lulu@redhat.com>
+Date: Wed, 24 Jul 2024 10:12:03 +0800
+Message-ID: <CACLfguVQT2bpzA6zTyAV4pDRdFttCMXCZc179HqxvjCVRPNnkQ@mail.gmail.com>
+Subject: Re: [PATH v5 0/3] vdpa: support set mac address from vdpa tool
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, 
+	sgarzare@redhat.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-A sysfs reader can race with a device reset or removal.
-
-This was fixed for speed_show with commit 4224cfd7fb65 ("net-sysfs: add
-check for netdevice being present to speed_show") so add the same check
-to dormant_show.
-
-Fixes: b00055aacdb1 ("[NET] core: add RFC2863 operstate")
-
-Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
----
- net/core/net-sysfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 17927832a4fbb56d3e1dfbed29c567d70ab944be..ff2a1f6ef7e18be56c2de51902519066431e47a8 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -303,7 +303,7 @@ static ssize_t dormant_show(struct device *dev,
- {
- 	struct net_device *netdev = to_net_dev(dev);
- 
--	if (netif_running(netdev))
-+	if (netif_running(netdev) && netif_device_present(netdev))
- 		return sysfs_emit(buf, fmt_dec, !!netif_dormant(netdev));
- 
- 	return -EINVAL;
--- 
-2.39.2
+On Wed, 24 Jul 2024 at 02:45, Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Tue, Jul 23, 2024 at 01:39:19PM +0800, Cindy Lu wrote:
+> > Add support for setting the MAC address using the VDPA tool.
+> > This feature will allow setting the MAC address using the VDPA tool.
+> > For example, in vdpa_sim_net, the implementation sets the MAC address
+> > to the config space. However, for other drivers, they can implement their
+> > own function, not limited to the config space.
+> >
+> > Changelog v2
+> >  - Changed the function name to prevent misunderstanding
+> >  - Added check for blk device
+> >  - Addressed the comments
+> > Changelog v3
+> >  - Split the function of the net device from vdpa_nl_cmd_dev_attr_set_doit
+> >  - Add a lock for the network device's dev_set_attr operation
+> >  - Address the comments
+> > Changelog v4
+> >  - Address the comments
+> >  - Add a lock for the vdap_sim?_net device's dev_set_attr operation
+> > Changelog v5
+> >  - Address the comments
+>
+> This history is to help reviewers of previous versions know if there
+> comments have been addressed. Just saying 'Address the comments' is
+> not useful. Please give a one line summary of each of the comment
+> which has been addressed, maybe including how it was addressed.
+>
+>       Andrew
+>
+will change this
+Thanks
+cindy
 
 
