@@ -1,158 +1,217 @@
-Return-Path: <netdev+bounces-112714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E985B93AB3F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 04:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CAF3693ABA5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 05:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A58B8284A4B
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 02:30:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2244B2845E2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD9917547;
-	Wed, 24 Jul 2024 02:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0405220323;
+	Wed, 24 Jul 2024 03:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="X6vd+Yns"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhrLQxbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF074E57D
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 02:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8091C6A1;
+	Wed, 24 Jul 2024 03:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721788211; cv=none; b=U549wZplrgS43h3VRaMj0jpTTs5ugcj4dpA7swOyLmohJ0S21C3MserY5aOJ6ZMQzNjKJgSJNgkMbZ5/jMqMm9glrHQ4O8AFqaj6BuUYMYjJG8PHwrJa6teBmgzULPPvnw1B+kd1LV5E4c/0igs+D099lfe8AtroSApioqKeVwE=
+	t=1721792944; cv=none; b=fok6lP7kRf5WEhvHPT99u7KUuSBs18+RJzJ0qQ3Xn+n/xpcNGVTslq4L4Y7zpdcydB+ZpPa8Ag8oSmFPmPOM8VkNlP3P0iMYFLz+TJ4ekvJCISAlq0XfwsgFXc1r9D/l2ppEeLzMyc/QsrpVIK9csnvqH5Pqbg3oEWzcCr3rH3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721788211; c=relaxed/simple;
-	bh=JamgX0eVYJNkqrVS+r5XDlZvx9EFZixK2xbF76nEJ+Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lNzIlWZd8LJFLCmwNT2GgZDcwmxNOlnjtVVAikOJIWHZHKyWr3775ERJYQSw9z2XThc+bgjiH+TX8QR60WRZTynFKPun/W97J7cR0ecipUwY0ZS0ZMzcydM32pLb9yI567nhqv2ySnIgXGCXL2JCPwaj8jQdzNhJg6spNY7KOOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=X6vd+Yns; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1721788201; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=D4EtLI5pVG9lcIh5By5x83yv055ezXJ8uSDkKVmTKBk=;
-	b=X6vd+Yns/7ifQvdfLt/CdUzKtlV1EtEAw0/xkwu7tnmguznjz9Kwj1HCk54GMwctsl6XM1pPdAtY8IXoMZ5AnBVmUQ3JoWT3kt+1/36LEOQyXSlyRJQMxhlcFNG5J4TFqR0d+Tr/89Dvd1Mg+jL16hb3/doWOdH5e2GOwXqbOdI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBBzfRG_1721788199;
-Received: from 30.221.149.223(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WBBzfRG_1721788199)
-          by smtp.aliyun-inc.com;
-          Wed, 24 Jul 2024 10:30:00 +0800
-Message-ID: <7250f49f-bfc0-4d7e-8de8-0468ff600a75@linux.alibaba.com>
-Date: Wed, 24 Jul 2024 10:29:58 +0800
+	s=arc-20240116; t=1721792944; c=relaxed/simple;
+	bh=NKrj4Xe15h7P+/8akw56axN+QjFD9WXReSS4RVzKxwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b3rnYzlCy7oA5eGTGsdO4qhS3yKxlk/fX1R9K8GN5QDLsS8ors21RKu+kA1us9Cz0TTWSUQriIlrgfsg7juLnTbBg/hExMa7HfUL22WrdzeWLFAI6jnNDOVm2GueQPrcwZC7BSGnNJ+/ywsEPb91LzuJFcDv5q1+vfy/RLPveFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IhrLQxbm; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-8205ceff95cso1935220241.1;
+        Tue, 23 Jul 2024 20:49:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721792942; x=1722397742; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WIIzMgLof7Cy8pOJkAUdfmjOzPX18xl1X4zt9wdck1I=;
+        b=IhrLQxbmIVQzPVfwxoStvcX6ZdR1XNXYlnmjixBvVR9aVm6qKqkL4UFN3pHWh7WKRm
+         SUn994Ry4JRPoiGsSbnvHRkyiC8f2l68n+BgL6SGhMO2g/qeLqypXAkZoziTapyfifYd
+         IrE5P+PmA6OM9tX6yKK6t0ynTPcjVooFtZg2WKquSITJvkFz2X1VCeoMKU1FbhEa7x4R
+         uRWH3Gm0V5O6RcvIcdbj3L0W98ty1ojB9gMd92UyZQk7XqBrDB9BuWrUxREVnUF5aYgf
+         RDjzkcYGXHbPE6nwkacrEkkegYanyH/5cIwEFQAHXVbT44btGo8RFs5JHXD75ZONQZ4O
+         Z8LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721792942; x=1722397742;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WIIzMgLof7Cy8pOJkAUdfmjOzPX18xl1X4zt9wdck1I=;
+        b=EKOJcnOJT3fnKRY7cNHo1C9bCcQsnYC+Njt8n4MPAfAvgHAYv7S/kcKUhm29dBSJtZ
+         wbM5pNC4WNEfxusZdiQqCYIFEYFXGYYKIa5YQ2Fd9p4jxK/TZ1sN0usbUAhtJNtTK61r
+         mJPtOX7SZqqJOAYO9AedF/VwVjICC/hAAYsb5atjnsyNLuwn8Lv5kFkC/U+ndlEz/qEq
+         I7nzJuZMACe2e4FIBZTViecTU1HPoGxKr99yE3rKMO9NUWPS7nvop+umI5pzjbY3ukAk
+         cGEkI+bqZfPLvekBxT3phdPAqCwNgcts3ZKVvMNq2bSZSvdJi0CyDpXCJ9l7ALiaYbep
+         qbtA==
+X-Forwarded-Encrypted: i=1; AJvYcCURPmq+Btqmr2RhKE/tPxIpd8VGTPOulOWL3PuXWp//IufMqogLUqvERi0vwp3kIwa4792+7xjBvhoWkn7UT6XkaixdXoIRmM041zfAPLgqPABpp5cjoLinJ+FI/vjMv0IDHoYhbE8h
+X-Gm-Message-State: AOJu0YwiK0JmcrB3OUdq71nn2HWLxqmvtWFfvBNuK71yGzM63Ihge4Sj
+	4sfroxhbwnwkwIJcAz0pad5o1WxyaoZu2TitYyHrPHu0Idw5hwpHMZ8zg0opsfBVNn3Ieaodr2M
+	JlJiAL+isgmSFK/8Ey48NBsXZDNo=
+X-Google-Smtp-Source: AGHT+IFDvtbe82NNASQ0oM9M0v5+nZcAsCCLz1k3PmRjYQzgoGqz5vUMO4HDkw4dQsjBUNVozxiQ1PzitWivbSxe5zU=
+X-Received: by 2002:a05:6102:158b:b0:493:c631:5eda with SMTP id
+ ada2fe7eead31-493c63160d9mr769729137.9.1721792941922; Tue, 23 Jul 2024
+ 20:49:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: prevent UAF in inet_create()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot <syzkaller@googlegroups.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Dust Li <dust.li@linux.alibaba.com>, Niklas Schnelle <schnelle@linux.ibm.com>
-References: <20240723175809.537291-1-edumazet@google.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20240723175809.537291-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240723223109.2196886-1-kuba@kernel.org>
+In-Reply-To: <20240723223109.2196886-1-kuba@kernel.org>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Tue, 23 Jul 2024 23:48:24 -0400
+Message-ID: <CAF=yD-LJ+-S4gC9EVo6ijJTGjR6KfPMNPrpxoffgoQBFpo8GNQ@mail.gmail.com>
+Subject: Re: [PATCH net] virtio: fix GSO with frames unaligned to size
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com, shuah@kernel.org, 
+	arefev@swemel.ru, virtualization@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, Alexander Duyck <alexander.duyck@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 7/24/24 1:58 AM, Eric Dumazet wrote:
-> Following syzbot repro crashes the kernel:
+On Tue, Jul 23, 2024 at 3:31=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> socketpair(0x2, 0x1, 0x100, &(0x7f0000000140)) (fail_nth: 13)
+> The commit under fixes added a questionable check to
+> virtio_net_hdr_to_skb(). I'm guessing the check was supposed
+> to protect from csum offset being outside of a segment
+> (especially if len is not multiple of segment size).
 >
-> Fix this by not calling sk_common_release() from smc_create_clcsk().
+> The condition can't be right, tho, as it breaks previously
+> working sending of GSO frames with only one segment
+> (i.e. when gso_size <=3D len we silently ignore the GSO
+> request and send a single non-GSO frame).
 >
-> Stack trace:
-> socket: no more sockets
-> ------------[ cut here ]------------
-> refcount_t: underflow; use-after-free.
->   WARNING: CPU: 1 PID: 5092 at lib/refcount.c:28 refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
-> Modules linked in:
-> CPU: 1 PID: 5092 Comm: syz-executor424 Not tainted 6.10.0-syzkaller-04483-g0be9ae5486cd #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
->   RIP: 0010:refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
-> Code: 80 f3 1f 8c e8 e7 69 a8 fc 90 0f 0b 90 90 eb 99 e8 cb 4f e6 fc c6 05 8a 8d e8 0a 01 90 48 c7 c7 e0 f3 1f 8c e8 c7 69 a8 fc 90 <0f> 0b 90 90 e9 76 ff ff ff e8 a8 4f e6 fc c6 05 64 8d e8 0a 01 90
-> RSP: 0018:ffffc900034cfcf0 EFLAGS: 00010246
-> RAX: 3b9fcde1c862f700 RBX: ffff888022918b80 RCX: ffff88807b39bc00
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: 0000000000000003 R08: ffffffff815878a2 R09: fffffbfff1c39d94
-> R10: dffffc0000000000 R11: fffffbfff1c39d94 R12: 00000000ffffffe9
-> R13: 1ffff11004523165 R14: ffff888022918b28 R15: ffff888022918b00
-> FS:  00005555870e7380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020000140 CR3: 000000007582e000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->   <TASK>
->   inet_create+0xbaf/0xe70
->    __sock_create+0x490/0x920 net/socket.c:1571
->    sock_create net/socket.c:1622 [inline]
->    __sys_socketpair+0x2ca/0x720 net/socket.c:1769
->    __do_sys_socketpair net/socket.c:1822 [inline]
->    __se_sys_socketpair net/socket.c:1819 [inline]
->    __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
->    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fbcb9259669
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fffe931c6d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000035
-> RAX: ffffffffffffffda RBX: 00007fffe931c6f0 RCX: 00007fbcb9259669
-> RDX: 0000000000000100 RSI: 0000000000000001 RDI: 0000000000000002
-> RBP: 0000000000000002 R08: 00007fffe931c476 R09: 00000000000000a0
-> R10: 0000000020000140 R11: 0000000000000246 R12: 00007fffe931c6ec
-> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
->   </TASK>
+> Fix the logic and move it to the GSO part.
 
-Oops, that's my bad, I forgot the differences in failure handling 
-between smc_create and inet_create,
-thanks for your fix.
+I missed the previous patch. Should we revert that and create a new
+fix against the original issue?
 
+Normally the checksum start + offset should always be in the header,
+so not even part of gso_size. So needed need not be related to
+gso_size.
+
+The exception to this is UDP fragmentation offload, I suppose. As
+there the network and transport headers are part of the UFO payload.
+
+But even for the normal TSO and USO cases we cannot verify in
+virtio_net_hdr_to_skb that the csum_start + csum_off passed from
+userspace are really pointing into the transport header.
+
+For SKB_GSO_UDP_L4 I added a minimal check that csum_off must be
+offsetof(struct udphdr, check). We can arguably tighten these csum_off
+for all requests, as only UDP and TCP offsets are valid. But no such
+simple check exists for csum_start. This requires full packet parsing,
+which we don't do until skb_gso_segment.
+
+One option may be to test csum_start in tcp_gso_segment and
+udp_gso_fragment and fail segmentation when it points not where
+expected.
+
+Btw, do we have a better idea what exact packet triggered this
+WARN_ON_ONCE in skb_checksum_help? Usually, more interesting than the
+skb_dump of the segment that reached the WARN is the skb_dump at the
+time of virtio_net_hdr_to_skb, along with the vnet_hdr.
+
+> This has been caught by net/tap and net/psock_send.sh tests.
+
+That's very nice!
+
+> Fixes: e269d79c7d35 ("net: missing check virtio")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+> +               if (csum_needed) {
+> +                       unsigned int p_rem, p_size;
+> +
+> +                       p_size =3D gso_size;
+> +                       p_rem =3D (skb->len - nh_off) % gso_size;
+> +                       if (p_rem)
+> +                               p_size =3D p_rem;
+> +
+> +                       /* Make sure csum still within packet after GSO *=
+/
+> +                       if (p_size + nh_off < csum_needed)
+> +                               return -EINVAL;
+> +               }
+> +
+
+A check could even go in the below branch.
+
+The warning apparently was not that csum_needed is outside the segment
+entirely, but that the segment is non-linear and csum_start points in
+the non-linear part (offset >=3D skb_headlen(skb)).
+
+I don't think we should be playing SKBFL_SHARED_FRAG tricks to trigger
+linearization, to be clear.
+
+We also cannot just silence the WARN and trust that the stack detects
+these bad packets and drops them (as ip_do_fragment does), as they
+might end up not in ip_do_fragment, but in a device ndo_start_xmit.
+
+>                 /* Too small packets are not really GSO ones. */
+>                 if (skb->len - nh_off > gso_size) {
+>                         shinfo->gso_size =3D gso_size;
+> diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/=
+net/tap.c
+> index 247c3b3ac1c9..8527d51449cf 100644
+> --- a/tools/testing/selftests/net/tap.c
+> +++ b/tools/testing/selftests/net/tap.c
+> @@ -418,6 +418,36 @@ TEST_F(tap, test_packet_valid_udp_csum)
+>         ASSERT_EQ(ret, off);
+>  }
 >
-> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: D. Wythe <alibuda@linux.alibaba.com>
-> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> Cc: Dust Li <dust.li@linux.alibaba.com>
-> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
-> ---
->   net/smc/af_smc.c | 4 +---
->   1 file changed, 1 insertion(+), 3 deletions(-)
+> +TEST_F(tap, test_packet_invalid_udp_gso_csum)
+> +{
+> +       uint8_t pkt[TEST_PACKET_SZ];
+> +       uint16_t payload;
+> +       size_t off;
+> +       int ret;
+> +       int i;
+> +
+> +       payload =3D ETH_DATA_LEN - sizeof(struct iphdr) - sizeof(struct u=
+dphdr);
+> +
+> +       memset(pkt, 0, sizeof(pkt));
+> +       off =3D build_test_packet_valid_udp_gso(pkt, payload);
+> +
+> +       for (i =3D -16; i < 16; i++) {
+> +               ret =3D write(self->fd, pkt, off + i);
+> +
+> +               if (i <=3D 0 ||
+> +                   i > __builtin_offsetof(struct udphdr, check) + 1) {
+> +                       EXPECT_EQ(ret, off + i)
+> +                               TH_LOG("mismatch with offset: %d (%zd)",
+> +                                      i, off + i);
+> +               } else {
+> +                       EXPECT_EQ(ret, -1)
+> +                               TH_LOG("mismatch with offset: %d (%zd)",
+> +                                      i, off + i);
+> +                       EXPECT_EQ(errno, 22);
+> +               }
+> +       }
+> +}
+> +
+>  TEST_F(tap, test_packet_crash_tap_invalid_eth_proto)
+>  {
+>         uint8_t pkt[TEST_PACKET_SZ];
+> --
+> 2.45.2
 >
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 73a875573e7ad5b7a95f7941e33f0d784a91d16d..31b5d8c8c34085b73b011c913cfe032f025cd2e0 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -3319,10 +3319,8 @@ int smc_create_clcsk(struct net *net, struct sock *sk, int family)
->   
->   	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
->   			      &smc->clcsock);
-> -	if (rc) {
-> -		sk_common_release(sk);
-> +	if (rc)
->   		return rc;
-> -	}
-
-Since __smc_create (for AF_SMC) does not call sk_common_release on failure,
-I think it should be moved to __smc_create instead of beingdeleted.
-
-Best wishes,
-D. Wythe
-
->   
->   	/* smc_clcsock_release() does not wait smc->clcsock->sk's
->   	 * destruction;  its sk_state might not be TCP_CLOSE after
-
 
