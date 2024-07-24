@@ -1,239 +1,111 @@
-Return-Path: <netdev+bounces-112772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E628693B1CF
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:41:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0928793B204
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B52F28355B
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FD211C21144
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0751115A87C;
-	Wed, 24 Jul 2024 13:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C998158DC8;
+	Wed, 24 Jul 2024 13:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZIbZ+vUQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAP2//Vl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4591C15A85A;
-	Wed, 24 Jul 2024 13:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D456E13E020;
+	Wed, 24 Jul 2024 13:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721828453; cv=none; b=QR9KLRTuBrijfmY5W3IbSqLurETkdP5lBbCO0Lv2zvwL6+SuOxqbV34DK6s3yABPihtTRFAxf8rJIa21/vr44hVxeq+cKMAt6pbtiT43KhwayTqHVKxEhE8jAulUQR91AnZzjWVdOoLdByerPTMRZbJ54EGRAUe0qtTpy91BUWo=
+	t=1721829216; cv=none; b=Rv0Kp+InsbzBKLBu2jjtRL8k1OcREHL4Ps0hGnqAqa8NN5Z2xdK1vWK/GbM09zJATconytTYWTr9uYL73vczPY5hh2XIGuLurfbXl9mTK1Yjhd4Nwf5YF+bSP2ndZNCn5sp1ZRe5Wc3xteO1r+V/dMDI7gxPhJAvHXN/WOiQyZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721828453; c=relaxed/simple;
-	bh=rsgxUZRTvl1cNNXgw08umMqld3Xw6cnIB2s9pqul3jY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cjb3Ij5OSm656Y8LynYQJVdvirlh7D32Bb2WJ6SOLSzqGocnD8DPPvKefn7N24r2+CSQYI8XiiEIMjl0y/uUgUDATgu4WT2wN3HkBjnFLNYqhf0oftV0Q5d7pOMRshaVMGqwayQtR/lMNkISDlF8SoHezVi9oMqw7e0edvEpQ44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZIbZ+vUQ; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721828452; x=1753364452;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rsgxUZRTvl1cNNXgw08umMqld3Xw6cnIB2s9pqul3jY=;
-  b=ZIbZ+vUQpdv/mvur0DrzVzwl8gAMb1zxha66lqS6uHAfM8IggUqQGfji
-   hq/m8m4KXg+axbQeU6WuB/gYywueU3UZc/HEL3HAK9kJBM3L0qoV39OyG
-   nuyDQuxRlivTeHn2A7cbIIA3uIzEJkaLyr1huXdJeP62r2mmgHVnspH0A
-   aimB2iSYz7cUZKMk3j45F5Bhcq/jp1ntWQLPrYPNWunyuiRZMI2ZdHI4Z
-   TFOJDhn23KBUJJce/iDOhrqaL0vmliqMW24sUI+oCcIeUx+13UInzEZVQ
-   bzlXtiprTr+/FlQWdILOyiinPjX8dnfV2iivZ536l7QS4k6FUQuRjaUTv
-   Q==;
-X-CSE-ConnectionGUID: pbrrooP5QGSIcD3kvyemaw==
-X-CSE-MsgGUID: /XeA5E9/RVSSiySvg6JKHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="19469396"
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="19469396"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 06:40:52 -0700
-X-CSE-ConnectionGUID: 5Wvo4E6OSBSepv5zfWDn3A==
-X-CSE-MsgGUID: FkMY7tQeSLOee0112W9Z6w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="52615665"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa009.jf.intel.com with ESMTP; 24 Jul 2024 06:40:49 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1721829216; c=relaxed/simple;
+	bh=07Vzl6re9ZHoHnUQaqXa2n0Sm3JNDNE/aQbliYyNUPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tSSzTIBDxdv0JLtBfh0RrFv+uy+NmG1dIcNFaej0eDwcxijtjKZINehLVWPm7sCdlSNsoSfv3hCj2pbUK1/QG83S9OeroYJ032d2MMwcqucsTlIq+EnuvPJ9v+IMC71o5ZXIxlDNbvlVTWO8y48uEycbC9LvRviM0O2ZagUqHrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAP2//Vl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B0F7C32781;
+	Wed, 24 Jul 2024 13:53:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721829215;
+	bh=07Vzl6re9ZHoHnUQaqXa2n0Sm3JNDNE/aQbliYyNUPE=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=WAP2//VlWUSM9jrjWrTnlUR5U9gfJcKWxfEehwSsgCifqJ1HhI5rmor2MgAYiE7Hj
+	 k3H3D8gUK01HrebDYiJ8EV56b+RO+InO4F1HL2zNXYqpPk0VVAstDY9HBgwUy8+jTo
+	 8Kp+cbZnfcsDTxUnkpS1wiQgO6T2KXSlCCZwyOB4EAFefvi0zRPKDPVqPNBGFqV5Kn
+	 m54HgAjJfy8we9Y9tl7LY7L4gaHz6KkuEz0NmtF8JUJfXUWPMHmL6c8XZgfCklah1Y
+	 U/SwoGTJa9N4jZ4SGcPsHczOthJTxHkGyBSbyg3+L/BrGVV8TCmbKAOKTgYYxrZSSF
+	 Ywifo4pkBnatw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id A535FCE0A6E; Wed, 24 Jul 2024 06:53:34 -0700 (PDT)
+Date: Wed, 24 Jul 2024 06:53:34 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH iwl-net 3/3] idpf: fix UAFs when destroying the queues
-Date: Wed, 24 Jul 2024 15:40:24 +0200
-Message-ID: <20240724134024.2182959-4-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240724134024.2182959-1-aleksander.lobakin@intel.com>
-References: <20240724134024.2182959-1-aleksander.lobakin@intel.com>
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
+ <ZnCDgdg1EH6V7w5d@pc636>
+ <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
+ <ZnVInAV8BXhgAjP_@pc636>
+ <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
 
-The second tagged commit started sometimes (very rarely, but possible)
-throwing WARNs from
-net/core/page_pool.c:page_pool_disable_direct_recycling().
-Turned out idpf frees interrupt vectors with embedded NAPIs *before*
-freeing the queues making page_pools' NAPI pointers lead to freed
-memory before these pools are destroyed by libeth.
-It's not clear whether there are other accesses to the freed vectors
-when destroying the queues, but anyway, we usually free queue/interrupt
-vectors only when the queues are destroyed and the NAPIs are guaranteed
-to not be referenced anywhere.
+On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
+> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
+> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+> > One question. Maybe it is already late but it is better to ask rather than not.
+> > 
+> > What do you think if we have a small discussion about it on the LPC 2024 as a
+> > topic? It might be it is already late or a schedule is set by now. Or we fix
+> > it by a conference time.
+> > 
+> > Just a thought.
+> 
+> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
+> propose a slab topic. We could discuss in hallway track or a BOF, but
+> hopefully if the current direction taken by my RFC brings no unexpected
+> surprise, and the necessary RCU barrier side is also feasible, this will be
+> settled by time of plumbers.
 
-Invert the allocation and freeing logic making queue/interrupt vectors
-be allocated first and freed last. Vectors don't require queues to be
-present, so this is safe. Additionally, this change allows to remove
-that useless queue->q_vector pointer cleanup, as vectors are still
-valid when freeing the queues (+ both are freed within one function,
-so it's not clear why nullify the pointers at all).
+That would be even better!
 
-Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
-Fixes: 90912f9f4f2d ("idpf: convert header split mode to libeth + napi_build_skb()")
-Reported-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c  | 24 ++++++++++-----------
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 24 +--------------------
- 2 files changed, 13 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 10b884dd3475..0b6c8fd5bc90 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -900,8 +900,8 @@ static void idpf_vport_stop(struct idpf_vport *vport)
- 
- 	vport->link_up = false;
- 	idpf_vport_intr_deinit(vport);
--	idpf_vport_intr_rel(vport);
- 	idpf_vport_queues_rel(vport);
-+	idpf_vport_intr_rel(vport);
- 	np->state = __IDPF_VPORT_DOWN;
- }
- 
-@@ -1349,43 +1349,43 @@ static int idpf_vport_open(struct idpf_vport *vport)
- 	/* we do not allow interface up just yet */
- 	netif_carrier_off(vport->netdev);
- 
--	err = idpf_vport_queues_alloc(vport);
--	if (err)
--		return err;
--
- 	err = idpf_vport_intr_alloc(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to allocate interrupts for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto queues_rel;
-+		return err;
- 	}
- 
-+	err = idpf_vport_queues_alloc(vport);
-+	if (err)
-+		goto intr_rel;
-+
- 	err = idpf_vport_queue_ids_init(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize queue ids for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	err = idpf_vport_intr_init(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize interrupts for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	err = idpf_rx_bufs_init_all(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize RX buffers for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	err = idpf_queue_reg_init(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize queue registers for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	idpf_rx_init_buf_tail(vport);
-@@ -1452,10 +1452,10 @@ static int idpf_vport_open(struct idpf_vport *vport)
- 	idpf_send_map_unmap_queue_vector_msg(vport, false);
- intr_deinit:
- 	idpf_vport_intr_deinit(vport);
--intr_rel:
--	idpf_vport_intr_rel(vport);
- queues_rel:
- 	idpf_vport_queues_rel(vport);
-+intr_rel:
-+	idpf_vport_intr_rel(vport);
- 
- 	return err;
- }
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index a2f9f252694a..585c3dadd9bf 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3576,9 +3576,7 @@ static void idpf_vport_intr_napi_dis_all(struct idpf_vport *vport)
-  */
- void idpf_vport_intr_rel(struct idpf_vport *vport)
- {
--	int i, j, v_idx;
--
--	for (v_idx = 0; v_idx < vport->num_q_vectors; v_idx++) {
-+	for (u32 v_idx = 0; v_idx < vport->num_q_vectors; v_idx++) {
- 		struct idpf_q_vector *q_vector = &vport->q_vectors[v_idx];
- 
- 		kfree(q_vector->complq);
-@@ -3593,26 +3591,6 @@ void idpf_vport_intr_rel(struct idpf_vport *vport)
- 		free_cpumask_var(q_vector->affinity_mask);
- 	}
- 
--	/* Clean up the mapping of queues to vectors */
--	for (i = 0; i < vport->num_rxq_grp; i++) {
--		struct idpf_rxq_group *rx_qgrp = &vport->rxq_grps[i];
--
--		if (idpf_is_queue_model_split(vport->rxq_model))
--			for (j = 0; j < rx_qgrp->splitq.num_rxq_sets; j++)
--				rx_qgrp->splitq.rxq_sets[j]->rxq.q_vector = NULL;
--		else
--			for (j = 0; j < rx_qgrp->singleq.num_rxq; j++)
--				rx_qgrp->singleq.rxqs[j]->q_vector = NULL;
--	}
--
--	if (idpf_is_queue_model_split(vport->txq_model))
--		for (i = 0; i < vport->num_txq_grp; i++)
--			vport->txq_grps[i].complq->q_vector = NULL;
--	else
--		for (i = 0; i < vport->num_txq_grp; i++)
--			for (j = 0; j < vport->txq_grps[i].num_txq; j++)
--				vport->txq_grps[i].txqs[j]->q_vector = NULL;
--
- 	kfree(vport->q_vectors);
- 	vport->q_vectors = NULL;
- }
--- 
-2.45.2
-
+							Thanx, Paul
 
