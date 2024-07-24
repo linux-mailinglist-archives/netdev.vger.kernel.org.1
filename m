@@ -1,167 +1,290 @@
-Return-Path: <netdev+bounces-112855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8865D93B81A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:37:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3073493B822
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:41:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C5C11F21881
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0FE8283C1C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F6573446;
-	Wed, 24 Jul 2024 20:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C888132494;
+	Wed, 24 Jul 2024 20:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ZcNps47e";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ZcNps47e"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fgBo8SLC"
 X-Original-To: netdev@vger.kernel.org
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFB04AEF6;
-	Wed, 24 Jul 2024 20:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721853445; cv=none; b=irk7nABfOSOuhn+Cj30wyZM9pG3UAPy1ANzN8+qYN4hEv9kvQQ9cl+DfhLwSSfFXdcCXedNa9ifuNXeHydfXCRkirkblRXCgImZU6bNXLpOEjqZiuFcQ54MVUpesa4Wnr2e0zVbAUtETXOXNHRCXEIWi/bX6wFwgYV2EU9TSiyg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721853445; c=relaxed/simple;
-	bh=lPZvqySYXn0Ih/XTQwAHKD1AQY0p+922RJESktRa07s=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YbZ2U52erzHoyGlmD2Fp8Lbx3u+a9XXDhdmIiFb9q4NRpmgC4PiJcyIxQTiLDh3vIQT/uGNJhJxqM3nUV/6FixFkVXgpiwglgXvENYKVPsFLNuY+cJ33GnT9kz1VMxL3F7ka5Gkk03EK/zDdrRnD41DXjf/FskIQFODdYKOZfq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=ZcNps47e; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=ZcNps47e; arc=none smtp.client-ip=96.44.175.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C64965E20;
+	Wed, 24 Jul 2024 20:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721853665; cv=fail; b=gTrdODwhzWcqDU967FTBZIAt2GaZ6vT2VOi7pTgxoE8CBCv99ha4AXsnp3AdtnPGKYx6nr0duXrZDCsbvNjKxX8lw0zOLqUgmJU7NmMxtXBs52UREFZZKTP1CCJJLlgpe+LldRZBDJYXE1ZgRdp9pl7bKteswFH9lCepURfg/fI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721853665; c=relaxed/simple;
+	bh=PnDWz+bqf580fqC0aLo0E5Ibwc9QZ49M154Pfg7tI8E=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=p1ALMfzl8l1SPw3NWV3ffquMUk/1bM+wEdcjXMVWIZtMa0aIKjpXpIZwFu3NH6pPArvgUaf9KSttn60tW0/Yc2GdR6UgpkzZ5SFb/qS6WnrEB/FdkwPoVaQZyq6anRzrOZAtFDDSN+muiZM9I5OW7NBiXPJAy0nR6WFkgfhKazs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fgBo8SLC; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1721853443;
-	bh=lPZvqySYXn0Ih/XTQwAHKD1AQY0p+922RJESktRa07s=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=ZcNps47eri30xAk1Tju9WWaFYf3akmDYtLb32+G5m/O4Lk3zpSUL0gbmCVR30VgdP
-	 yuf5V7oV17But2SQmo+j69gHNcqTM4jJsnWTAdTZHNYgelQ5Q0bEqtlzCNYuTGb7HS
-	 zNk+ZWw6URN4qIHekyPhmzpA3fFwZ7uw+uAsM29A=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 8CD2812868A3;
-	Wed, 24 Jul 2024 16:37:23 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id ZP4tu15uyvwQ; Wed, 24 Jul 2024 16:37:23 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1721853443;
-	bh=lPZvqySYXn0Ih/XTQwAHKD1AQY0p+922RJESktRa07s=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=ZcNps47eri30xAk1Tju9WWaFYf3akmDYtLb32+G5m/O4Lk3zpSUL0gbmCVR30VgdP
-	 yuf5V7oV17But2SQmo+j69gHNcqTM4jJsnWTAdTZHNYgelQ5Q0bEqtlzCNYuTGb7HS
-	 zNk+ZWw6URN4qIHekyPhmzpA3fFwZ7uw+uAsM29A=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::db7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id B23201286899;
-	Wed, 24 Jul 2024 16:37:22 -0400 (EDT)
-Message-ID: <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
-  ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org,  netdev@vger.kernel.org, jgg@nvidia.com
-Date: Wed, 24 Jul 2024 16:37:21 -0400
-In-Reply-To: <20240724200012.GA23293@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
-	 <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
-	 <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
-	 <20240724200012.GA23293@pendragon.ideasonboard.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721853662; x=1753389662;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=PnDWz+bqf580fqC0aLo0E5Ibwc9QZ49M154Pfg7tI8E=;
+  b=fgBo8SLCC1q+H67V3D9zC4I+9LhEA34y9HTGfFu++rIiZIqnCoxlOgX+
+   Uwckw6vnWoQ/dEVRjMgRiZnpqTLAEg5Yij3Y94TJfwdEe8h2PyjweW75V
+   MlUA8nUyD0w/him1Ja95EtRGdCSZWfb9Cg2tcEtg/a4YVIm8X/qV5QSfO
+   vIMfblbKFkhBksoWV6JsjUxp7D1qz8nBAxeqnXpaU+WQ1iSU34WJfCvx2
+   Chzuu9GlSRgopGUF++MS65DkL3fLsOp7gjma6Jo/GAfMl6XQKUngVrwu4
+   to1OOV9i9PV7IAfWuCoE9f3IC8m4H5V6Z4RO9XWyq6G0v+OIaVDPiJdA1
+   Q==;
+X-CSE-ConnectionGUID: EBYTcmoJQJKPyVAaL1D/zA==
+X-CSE-MsgGUID: WM/EiVUNQRuwdMSqECkK7Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="30951260"
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="30951260"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 13:41:01 -0700
+X-CSE-ConnectionGUID: bIRU3E6SRS22Lm4mzoChdw==
+X-CSE-MsgGUID: WQuOUkCDRrmAHHd1aXOTng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="83314734"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Jul 2024 13:41:01 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 24 Jul 2024 13:41:00 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 24 Jul 2024 13:41:00 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 24 Jul 2024 13:41:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QJAEdKXJvuzMZSflrCWWY3cPQXIVJidOzWdD9iS4k3V+azdezFhDi2qQor0i9nVTxaeCKSHJwt6cLwavBs088PDf8IG4U0MeDPQAKV4GywE/a52oyoOL+cROdjAx/9iCK9wlMAI1s6dBeAoTOid59s6xPII5iQwIvjLJ9ioIZyDlfl2o6kQIzEb7Az4FdvmjATZ8wJZ+EMm/dyjy49wEPnyZ4AcbuKYVnmAXfnO2Pae/136PcVm52BXIRj6OCe6xbtDQLKWI33euqp7uLNz1UlqOk8vS2Ra5F5z953tfpDFdJR+xpYG+3oHXNwnbxbcfdUrCJVmGQ3PWzTm32owc+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ckqixfrjr4mfHfORuYxX9AiBu7bJxtyCPlv7dSX/0Co=;
+ b=tNA/S3YzjqG8shyCAIk63hGNqXRBTBrmgRY9FXjl9yQT+3zYpO5uywQWu4NSGzU86BR76r1COxWkq7vikOYXQUDBQkYU5yl+AObZub8reoRWQDnh4hpGiNTEKisl+Y/JIVDF4uz7mukwLqQoExCQU8FUnRSh9dSn6ZHhi6wOCJLpyxK8YeEaY0x8CmvlzKu3oI3NDUaLEFjKUHqLQp6agQszXpkPM461OM7ggHBY6qDC61j26MgJDDFEQnqjdXvC5zTvxxi/jDZLGlxrMgz90DTv0+DKSjt+DygE77RVMDS16maoNrBuywUYIF6Wh7TpH8WaAIhs5ZhQUY2hlMdeKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from IA1PR11MB7869.namprd11.prod.outlook.com (2603:10b6:208:3f6::7)
+ by DM4PR11MB6383.namprd11.prod.outlook.com (2603:10b6:8:bf::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.16; Wed, 24 Jul
+ 2024 20:40:56 +0000
+Received: from IA1PR11MB7869.namprd11.prod.outlook.com
+ ([fe80::18ff:e3c3:1dd7:8a12]) by IA1PR11MB7869.namprd11.prod.outlook.com
+ ([fe80::18ff:e3c3:1dd7:8a12%6]) with mapi id 15.20.7784.020; Wed, 24 Jul 2024
+ 20:40:56 +0000
+Message-ID: <e63d88bc-6927-4cdb-808f-aee4eee686a5@intel.com>
+Date: Wed, 24 Jul 2024 13:40:50 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net v2 1/6] ice: move netif_queue_set_napi to
+ rtnl-protected sections
+To: Larysa Zaremba <larysa.zaremba@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Jacob Keller <jacob.e.keller@intel.com>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<magnus.karlsson@intel.com>, Michal Kubiak <michal.kubiak@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>
+References: <20240724164840.2536605-1-larysa.zaremba@intel.com>
+ <20240724164840.2536605-2-larysa.zaremba@intel.com>
+Content-Language: en-US
+From: "Nambiar, Amritha" <amritha.nambiar@intel.com>
+In-Reply-To: <20240724164840.2536605-2-larysa.zaremba@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR08CA0002.namprd08.prod.outlook.com
+ (2603:10b6:a03:100::15) To IA1PR11MB7869.namprd11.prod.outlook.com
+ (2603:10b6:208:3f6::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR11MB7869:EE_|DM4PR11MB6383:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5df8a119-dae3-48a8-dd1b-08dcac20eae6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WFc1Q0pLeDJHdHFUdVFVTmp2TCt1d0g3R3dFUHhENEZoRlovUkFhWE83VGgz?=
+ =?utf-8?B?aHVCQTRnTDI3WHZad0FJRzZHaG5WR0FGbUZFRWV1TVl5em5IbUlFa1l0dGdL?=
+ =?utf-8?B?cytUbzRIVWtNWWdwNzdLTmUrQ0pEME5xMHZuSjZ1Z3dEUDhKRFpCVHJlK3JJ?=
+ =?utf-8?B?ekRPMkd5RDF2NGUwRlA4S2xZcmZpWGtQQ3drRHhrOFlIOGhxc2R3ejJ5NTEw?=
+ =?utf-8?B?QU5ycTRmUlg3bmoydmxLK09JdUhJaFN4OEc3bVQ5TWtSMGhLcitEZzBBZndx?=
+ =?utf-8?B?TlZCVUVCQVE1WU90bStFblVUUWpzc0FFdWhBdzF0NWMvc2FZVGVWZ212SGZi?=
+ =?utf-8?B?eHNJY0c1MjZXbTVVKzRjT3hPNlZTcHd3NHM0d3ozWEdod3ZOU0FPWU1rRFhC?=
+ =?utf-8?B?Tk8wQ09QSDJFSFdXS0FQbFliUDJQaXdkL2Jhalh6bmFBbzcrWUJIeWFLS1FF?=
+ =?utf-8?B?UlNzQ2F2d0NTSGxEL2V3Sm9yYVA0T0k1aVp2bnk0TkN3Y2Z1NzJJKzBQeW9C?=
+ =?utf-8?B?L2gxRnFUZXJWcm9IbVU5TlJGZkoyczFQYnZrc1BIcEcxUlBNdEh6V0J2WHBv?=
+ =?utf-8?B?cEYrOW55NHgwQmRKcHlhTzloM3FPU1V0YzFuSlZ0a0ZtVFNZeU9DVkJ1ckcx?=
+ =?utf-8?B?bm9INFNJdXlZNXZaMjUxUDc2ak9TaW84TDEycEVWbkdFQWlBUjEzcTlYRnE5?=
+ =?utf-8?B?YldUUnJ3WnkwcHlkMnNZREpDdjBLVUNpQzhWYld4alJ2QkxCb3IrRHEvTEFr?=
+ =?utf-8?B?QXdOWmhPdUZnamIwZVpPc3JMeS95RUFIL0lkK0ptdGxWYktJZGlvdmE5aFcx?=
+ =?utf-8?B?Vy9IR1B5UDFLTytlYjJiVm9xR21IMTdBb0lJUDFwK0swZVNQUmNvVmZ1TVY1?=
+ =?utf-8?B?OFFoZEd1N2JEY0V3eFV0cWZsT3FTZGlLS1pudHlIQnJZTjJ1WEVlcHlWTTg1?=
+ =?utf-8?B?T2JxWENsQk9qbHlCb3JRZitxNk9IR3BOOTBHc3plVU93TnZTb0drT0FpcG5U?=
+ =?utf-8?B?MXhKQ0NwclBONDJXWGQreW9OQlArSzkxcm9YRXF3MnZnVmZ4OXpUZHBMemZP?=
+ =?utf-8?B?eE5KMmNxOWJSc0VoQ09iRFl5QkJOdVFiYzZvMlN6NTdTSThUcXRFRmQzM2Jk?=
+ =?utf-8?B?akwrVlA5MTFVNGpXQ245d0Z5ZlBwd3k0VjNSbldSVUVucGFMTGhmYXpUdkJ3?=
+ =?utf-8?B?S2UwbHRZaWhRTWxNcGFlYVpDaWlUYjlicEpCSlhiWWs2Nm5MVUN1MXBKdHJD?=
+ =?utf-8?B?ZzRmYmRZMUlMb21adHdsSjB2NHB0enpJNkxwZ0RMbmpkZFYyRDBQZlNyeGc2?=
+ =?utf-8?B?d2VjUmlhNEZUdUF1ZzBaL1crYUdWNEV1b1JKRFpvVVJHRy9zaWxET3RyYm9w?=
+ =?utf-8?B?VHJDcXU0dzhCN1JSMk5lbWJrUUZHWktYbmhTc2lWWWJWdjdCQUlkRnE0anB6?=
+ =?utf-8?B?Q0tiTVc2aWpJaGFhbnNUakhjb0hEZnBLbTIraEVNK2xhOE56T2ZPYS9VTWJw?=
+ =?utf-8?B?aDFOaWxqSWhNTW1tUHN0NTkyc2hzRGJkVkU1bjNEMHBsY0dhVmRUdnVhekND?=
+ =?utf-8?B?T0RnWU5xYnZENkllL09RY0ZWbXBBM1EyTGZVTDFXQWZTZkhwait5ZEpwRThj?=
+ =?utf-8?B?bG80T3lpNmtYQWxwK0o4OFRkUmVnL09MWW1wNWMzNlZZMnJwQXl3bk5MUkFo?=
+ =?utf-8?B?R0YxQ1RoeXA1WHVPRWVuRnhML1pkYUFzS0dyMXpwblBUWGIyT2NDYkUzaTIv?=
+ =?utf-8?B?bkxCZ2Nnd3A2RGtwNEhRVkc4NWExUEV3K2dtOHJRSmZlNm1WdEVPL3Zwckc4?=
+ =?utf-8?B?MGVpb0dqTzlyV0ZHZXA4dz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7869.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MC8xMldiSHdjWmJGQVlocmNESlRyblRDQ3RnVjF0QmcrK0R0ekMvQUE4YStk?=
+ =?utf-8?B?eHdVcis5Q2VialJLeW5RTjhRZkNYY09WV2Y3THF1SUxpL0Q2cHF6bXpWMmw3?=
+ =?utf-8?B?WnJXMWNTTHI2a1hSdHd6U3ZYS3BObkNTc1JDSTZRd1lidU1JN1I3VzBsdzZW?=
+ =?utf-8?B?RGpiNTFhUUM3R0FGSzFlU2FDd0EyQ2dzUXpXbFFteTlYZlc0OEhQQ2w0c3Yx?=
+ =?utf-8?B?dGNySHpna2llOU5STndWVjJ1aXRhTXpXYUtWSlNaV0RhMkxGdm55bTJPbDkr?=
+ =?utf-8?B?WWR5djZ4RnpKWjhtZE9wc0J0RzhtK1NKdDk2Z1FlZklTei9QZkJBNFZ0bC9z?=
+ =?utf-8?B?ZGVkaXJuOWI2a0d1eWtWd1hldHF2UGZHcnV1YmxWQWdrTUMxb2dKVzNQZ0lx?=
+ =?utf-8?B?VTlNR3lJSGNKTmtoZkdIM0dkQVJlbWtaK0FaVVI2QmlFeGNPcXFTeUN5dC9x?=
+ =?utf-8?B?R2c5Q21CL2VORGR0dmVQbzMyQU52ZExMWUswR01qVGd2cHNkZUw1OEVCbWFD?=
+ =?utf-8?B?MmcrWVZ0bCtsWmFDV1IzZE9WNVNkZEhwalBQRVBPZmZjcXFEWEJ3NDVnVWcy?=
+ =?utf-8?B?eTF6aDA5YkM1aTRiSDhTZ2I0UDBUNVpWMVAycEVSR0IyeTVad2lqVmU3UEhV?=
+ =?utf-8?B?OENrYW5QZ2hlZFNFYzlRUXF3MXp6TEJMMTZnR1pTQk0vVUpaOG9pcnhpUGxY?=
+ =?utf-8?B?RDROUDNqZEN2aXFEQm9hNk9mZU9SdEtpUHB0MWROeDlJTzQ4ckFEc2IzbmVl?=
+ =?utf-8?B?Rnk0RmJSb1N4U2hNMW9JR2M0NTdsTksxOHc3am9SN3oyUDcyazdER2NlTVlV?=
+ =?utf-8?B?UXcyQVhiWUlXZjdTcC9BSG95Yk9yVTRqR1pOcUF0WTd5bHJ5RlhXQ0ZGZ1dq?=
+ =?utf-8?B?TDlkdWNwb1hOQ0dCdjhBZi9jZDBDR1ArOEZhT2RNV3VkYm80aWpnc3BCQWVF?=
+ =?utf-8?B?UUxqcU1KNzNlU0dWYkl1MHZPK0ZjNFlaa2padmFwaEo5V3RNK3RUdFZybWxE?=
+ =?utf-8?B?UjdiSFNYT1V3dzJzVlhOUUQ1bkR3KzRZQnFFK3RNUU5jNmUxV1htbTNRVnc1?=
+ =?utf-8?B?b1ZsU1o5R1VWRVFiSjZWWENDU1NGeFFCdTVjeU5DMzRTQVp3b2lLZDZEa05W?=
+ =?utf-8?B?bFN6eGtwZkZpNHVHdWV4Yk1wdWlrdjVSOXNYcDN4dHVoQ1FNclk5aHVTUVdG?=
+ =?utf-8?B?MXJGRHYrTjJQRHhGbU9hVm1OOGhOQng4OW9VSEVVa1JHS2RLZFJkMEl0eVlG?=
+ =?utf-8?B?ZHZoNmptUHBuai9NdUY4MVJlekh3VlprTE91Y2EwV3NuazRFVTNuNTY5RFkv?=
+ =?utf-8?B?ZVJVOTEwVjJ4WFRqMGlCSmYzRjM1b1M4RmQ4Zkl0bjJlRXAvWmYzYUVHNTJj?=
+ =?utf-8?B?SDdvaG81blRIeTdSdTREc1RuUkhkUnVXR01JcGprbUV0b2ZPOWw5OG1ZZFRm?=
+ =?utf-8?B?WTBSNDNXMmorNVlUeEoxdjdQWnRLVHRpUnNHOEdtdTNOMnRBa3ZVejFPMStS?=
+ =?utf-8?B?TTNPWGV5b3ZZMCtIVlVOT1lyVmJBS2dyYnJMSGp1UDhtYTRCWVdoZEVIamFh?=
+ =?utf-8?B?ZDZvSW0wVXppeU4zaUdzN05uQXdtdGF6dy9HT1c4bGoxZlhYQTY3WGk5ajkv?=
+ =?utf-8?B?WE9wYkFNRFgyRzlJQy9oRkhUcVJiT2ZPT1lId2h1V0JrQUs4ME5mKzdnUXRt?=
+ =?utf-8?B?OVZIcklGV3h3dnJ4dHh0azJqWEU5MWxleVJCZElFV0d3SE9MVlBWN0g1RzVT?=
+ =?utf-8?B?R0R3Q2h3R2tKRGdyQkhPTmdza0hTbUo0SXhKZjZyN3FKMjR1TTFHdjVCUnh3?=
+ =?utf-8?B?NWhWakhlMVdnZC84TnN5bmZvM3U0YW5TM0NhVXVQNDQvcUYwK2NEeHRoUjcz?=
+ =?utf-8?B?bjdJazFyWGtZQWg4Mk0wZkZXWk5BZWpXZ3BWUFdYaGsyWVQzdzZIQjN0SlBN?=
+ =?utf-8?B?WXRYbDFmYzVxL1dtVVFRL2x3djl4VjFtQzVjLzF5RXJVVE5YclFxMXBkVDFo?=
+ =?utf-8?B?K2dWTEQxbm5YSkJPYXFKQ3RJM3RuTzY5QURLakVkR3JQSHJuTlBLR0N6Qzd4?=
+ =?utf-8?B?N096MUlENFFaM1IrZHBSTFFUTkEzKzBOK2tlWmRWaC84c0g4MHlLOVBLZXFm?=
+ =?utf-8?B?SklJK2g5dnNwc2F2UE5RWGJwRlNZamJZenhJSmJvUExrTUV2aCtXSVJoQ3A4?=
+ =?utf-8?B?eGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5df8a119-dae3-48a8-dd1b-08dcac20eae6
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7869.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2024 20:40:56.2127
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /8Gel5m22hOKaeiKhAoS4zcCR56yRW3fdFCO9K2QN78zqgAxqY0Z0fEgRMBY5wwP228+ucLbKpsJTXY1i3lZFaYX+I1orPZZZzZ5zVTg6Tw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6383
+X-OriginatorOrg: intel.com
 
-On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
-[...]
-> What I get from the discussions I've followed or partcipated in over
-> the years is that the main worry of free software communities is
-> being forced to use closed-source userspace components, whether that
-> would be to make the device usable at all, or to achieve decent level
-> of performance or full feature set. We've been through years of
-> mostly closed-source GPU support, of printer "windrivers", and quite
-> a few other horrors. The good news is that we've so far overcome lots
-> (most) of those challenges. Reverse engineering projects paid off,
-> and so did working hand-in-hand with industry actors in multiple ways
-> (both openly and behind the scenes). One could then legitimately ask
-> why we're still scared.
-
-I don't think I am.  We're mostly fully capable of expounding at length
-on the business rationale for being open if the thing they're hiding
-isn't much of a differentiator anyway (or they're simply hiding it to
-try to retain some illusion of control), so we shouldn't have any fear
-of being able to make our case in language business people understand.
-
-I also think this fear is partly a mindset problem on our part.  We
-came out of the real fight for openness and we do embrace things like a
-licence that forces open code (GPL) and symbols that discourage
-proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
-FSF coolaid that if we don't stand over manufacturers every second and
-force them they'll slide back to their old proprietary ways.  However,
-if you look at the entirely permissive ecosystem that grew up after we
-did (openstack, docker, kubernetes, etc.) they don't have any such fear
-and yet they still have large amounts of uncompelled openness and give
-back.
-
-> I can't fully answer that question, but there are two points that I
-> think are relevant. Note that due to my background and experience,
-> this will be heavily biased towards consumer and embedded hardware,
-> not data centre-grade devices. Some technologies from the latter
-> however have a tendency to migrate to the former over time, so the
-> distinction isn't necessarily as relevant as one may consider.
+On 7/24/2024 9:48 AM, Larysa Zaremba wrote:
+> Currently, netif_queue_set_napi() is called from ice_vsi_rebuild() that is
+> not rtnl-locked when called from the reset. This creates the need to take
+> the rtnl_lock just for a single function and complicates the
+> synchronization with .ndo_bpf. At the same time, there no actual need to
+> fill napi-to-queue information at this exact point.
 > 
-> The first point is that hardware gets more complicated over time, and
-> in some markets there's also an increase in the number of vendors and
-> devices. There's a perceived (whether true or not) danger that we
-> won't be able to keep up with just reverse engineering and a
-> development model relying on hobyists. Getting vendors involved is
-> important if we want to scale.
+> Fill napi-to-queue information when opening the VSI and clear it when the
+> VSI is being closed. Those routines are already rtnl-locked.
+> 
+> Also, rewrite napi-to-queue assignment in a way that prevents inclusion of
+> XDP queues, as this leads to out-of-bounds writes, such as one below.
+> 
+> [  +0.000004] BUG: KASAN: slab-out-of-bounds in netif_queue_set_napi+0x1c2/0x1e0
+> [  +0.000012] Write of size 8 at addr ffff889881727c80 by task bash/7047
+> [  +0.000006] CPU: 24 PID: 7047 Comm: bash Not tainted 6.10.0-rc2+ #2
+> [  +0.000004] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.02.01.0014.082620210524 08/26/2021
+> [  +0.000003] Call Trace:
+> [  +0.000003]  <TASK>
+> [  +0.000002]  dump_stack_lvl+0x60/0x80
+> [  +0.000007]  print_report+0xce/0x630
+> [  +0.000007]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+> [  +0.000007]  ? __virt_addr_valid+0x1c9/0x2c0
+> [  +0.000005]  ? netif_queue_set_napi+0x1c2/0x1e0
+> [  +0.000003]  kasan_report+0xe9/0x120
+> [  +0.000004]  ? netif_queue_set_napi+0x1c2/0x1e0
+> [  +0.000004]  netif_queue_set_napi+0x1c2/0x1e0
+> [  +0.000005]  ice_vsi_close+0x161/0x670 [ice]
+> [  +0.000114]  ice_dis_vsi+0x22f/0x270 [ice]
+> [  +0.000095]  ice_pf_dis_all_vsi.constprop.0+0xae/0x1c0 [ice]
+> [  +0.000086]  ice_prepare_for_reset+0x299/0x750 [ice]
+> [  +0.000087]  pci_dev_save_and_disable+0x82/0xd0
+> [  +0.000006]  pci_reset_function+0x12d/0x230
+> [  +0.000004]  reset_store+0xa0/0x100
+> [  +0.000006]  ? __pfx_reset_store+0x10/0x10
+> [  +0.000002]  ? __pfx_mutex_lock+0x10/0x10
+> [  +0.000004]  ? __check_object_size+0x4c1/0x640
+> [  +0.000007]  kernfs_fop_write_iter+0x30b/0x4a0
+> [  +0.000006]  vfs_write+0x5d6/0xdf0
+> [  +0.000005]  ? fd_install+0x180/0x350
+> [  +0.000005]  ? __pfx_vfs_write+0x10/0xA10
+> [  +0.000004]  ? do_fcntl+0x52c/0xcd0
+> [  +0.000004]  ? kasan_save_track+0x13/0x60
+> [  +0.000003]  ? kasan_save_free_info+0x37/0x60
+> [  +0.000006]  ksys_write+0xfa/0x1d0
+> [  +0.000003]  ? __pfx_ksys_write+0x10/0x10
+> [  +0.000002]  ? __x64_sys_fcntl+0x121/0x180
+> [  +0.000004]  ? _raw_spin_lock+0x87/0xe0
+> [  +0.000005]  do_syscall_64+0x80/0x170
+> [  +0.000007]  ? _raw_spin_lock+0x87/0xe0
+> [  +0.000004]  ? __pfx__raw_spin_lock+0x10/0x10
+> [  +0.000003]  ? file_close_fd_locked+0x167/0x230
+> [  +0.000005]  ? syscall_exit_to_user_mode+0x7d/0x220
+> [  +0.000005]  ? do_syscall_64+0x8c/0x170
+> [  +0.000004]  ? do_syscall_64+0x8c/0x170
+> [  +0.000003]  ? do_syscall_64+0x8c/0x170
+> [  +0.000003]  ? fput+0x1a/0x2c0
+> [  +0.000004]  ? filp_close+0x19/0x30
+> [  +0.000004]  ? do_dup2+0x25a/0x4c0
+> [  +0.000004]  ? __x64_sys_dup2+0x6e/0x2e0
+> [  +0.000002]  ? syscall_exit_to_user_mode+0x7d/0x220
+> [  +0.000004]  ? do_syscall_64+0x8c/0x170
+> [  +0.000003]  ? __count_memcg_events+0x113/0x380
+> [  +0.000005]  ? handle_mm_fault+0x136/0x820
+> [  +0.000005]  ? do_user_addr_fault+0x444/0xa80
+> [  +0.000004]  ? clear_bhb_loop+0x25/0x80
+> [  +0.000004]  ? clear_bhb_loop+0x25/0x80
+> [  +0.000002]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  +0.000005] RIP: 0033:0x7f2033593154
+> 
+> Fixes: 080b0c8d6d26 ("ice: Fix ASSERT_RTNL() warning during certain scenarios")
+> Reviewed-by: Wojciech Drewek<wojciech.drewek@intel.com>
+> Signed-off-by: Larysa Zaremba<larysa.zaremba@intel.com>
 
-Yes, but there are lots of not very useful complex devices being
-produced every day that fail to capture market share.  Not having
-reverse engineered drivers for them is no real loss.  If a device does
-gain market share, it gains a huge pool of users some of whom become
-interested in reverse engineering, so I think market forces actually
-work in our favour: we get reverse engineering mostly where the devices
-are actually interesting and capture market share.  It's self scaling.
-
-> Second, I think there's a fear of regression. For some categories of
-> devices, we have made slow but real progress to try and convince the
-> industry to be more open. This sometimes took a decade of work,
-> patiently building bridges and creating ecosystems brick by brick.
-> Some of those ecosystems are sturdy, some not so. Giving pass-through
-> a blank check will likely have very different effects in different
-> areas. I don't personally believe it will shatter everything, but I'm
-> convinced it carries risk in areas where cooperation with vendors is
-> in its infancy or is fragile for any other reason.
-
-I also think we're on the rise in this space.  Since most cloud
-workloads are on Linux, there's huge market pressure on most "found in
-the cloud" devices (like accelerators and GPUs) to have an easy to
-consume Linux story.  Nvidia is a case in point.  When it only cared
-about fast games on some other OS, we get shafted with a proprietary
-graphics drivers.  Now it's under pressure to be the number one AI
-accelerator provider for the cloud it's suddenly wondering about open
-source drivers to make adoption easier.
-
-> Finally, let's not forget that pass-through APIs are not an all or
-> nothing option. To cite that example only, DRM requires GPU drivers
-> to have an open-source userspace implementation to merge the kernel
-> driver, and the same subsystems strongly pushes for API
-> standardization for display controllers. We can set different rules
-> for different cases.
-
-I certainly think we can afford to experiment here, yes.
-
-James
-
+Reviewed-by: Amritha Nambiar <amritha.nambiar@intel.com>
 
