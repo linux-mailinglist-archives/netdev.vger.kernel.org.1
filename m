@@ -1,231 +1,157 @@
-Return-Path: <netdev+bounces-112838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4261C93B7AC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 21:48:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0C493B7BA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88EF8B245F7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:48:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BAB71C23EA5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E4815ECEA;
-	Wed, 24 Jul 2024 19:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE1C15CD4E;
+	Wed, 24 Jul 2024 20:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H6J9pa23"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="OrYYKkvD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D1615ECC3
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 19:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B3DEED8;
+	Wed, 24 Jul 2024 20:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721850479; cv=none; b=dnyXSC0mJuiWUNx36HNMVXXwQ3qKcqhH1Ab3bhNuri2pnO6qRFQAuh71+Li7Cs8bSETfuQs6iOyudPHMvh6p2MlL6voUK6ip7WMBAMDQKwrg/5NzTCNsFYc+AdLBPWK+a1bRfhiEPpysWFVmkyw+px9j8y5Lr+3BKRWGq/jJHWk=
+	t=1721851235; cv=none; b=KLRG2VQucmI7dlzhMXfM6B6O+OBAY/fklDvRqyBRT7INUsUEGyea2jgM0Np/7oHQR3Q9iY7TdfY7hV2nMEewsQ/iXW+6e/eTO0twaJ5LYoGSMyBkVe/rYOpgAiEqcmUJH9s7BwlTq3sAwJBxNH33Vlf7kczwwcqBL+tkt5WuUsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721850479; c=relaxed/simple;
-	bh=k6FwyC2TQEGHr4zuRg4goZTUWzjhVQKmKTKmITDQEuY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g7mxJAZUkndYwUSmSIkLC33NMW+pf0q1VwjNoP9cKAu+auwdOIL0iWlyJir6yYScYNHRjdGflyavcsSqS27fHMYa/mPG/8K15z6uH7Cl/5Su1n47ArgarXRsJH048OCUA6q19xJaFdnFbim1J+ZaxsjW+paaN4pDw6eavzIiimA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H6J9pa23; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cdba9d7c-e5da-4e3b-a121-1fad4f517917@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1721850474;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7YaV2tZ+kfBixAFIS2ceMaaoLIfoRysDRpw3nqa337M=;
-	b=H6J9pa23EkrNXfqC0xApI0RyKxu3miq3uV7DzOQGSNSV7SWO2lx9NE5PrF0cwhsltlKcCX
-	ILRrjOrHKRSUw3tauG2LEDDI+sMz1Nz75/fBcJqzV6Tl8j3brE7qyjUtN5PBaFPL/3YzGL
-	FUbs4B6XKawy/H/PHczYnnYl/fx63+U=
-Date: Wed, 24 Jul 2024 12:47:44 -0700
+	s=arc-20240116; t=1721851235; c=relaxed/simple;
+	bh=yqHeutwAuHZ84NcqwpxXXX61SqhtOingAlT+nU/ZtBk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dvLM5m5w85UvswSr8GF+cJmHBhfcgCB1apw1ekJMuq4tGur3F2Y+OAggS28/KHkQAormUw/BJa7V6CjvE3aPJlFCw9fqUk5fzdnKoguN8ifhpgYvb3guwh4br0fkemYme+uQQNdrsJmy+3Mlxq51/Lv+/rr63W9ccbXXLAdief4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=OrYYKkvD; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (85-76-97-131-nat.elisa-mobile.fi [85.76.97.131])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 3D880566;
+	Wed, 24 Jul 2024 21:59:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1721851188;
+	bh=yqHeutwAuHZ84NcqwpxXXX61SqhtOingAlT+nU/ZtBk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OrYYKkvDqEjm36nJehszCSZ+jU5ljXXz8DRZCc+HNQQLJ2B4tiGpGqgjTQ6mTOC/y
+	 RqKaHsuWMfdyyNOpp2HdqQjFYU3Gtv6fGJ9HL03+K4PWNCbVSGQKgEqrRL+kfiRv56
+	 mtU6w2rbyRcL9xIJ4bYFZC0ABndxwX1rSw0NhzHU=
+Date: Wed, 24 Jul 2024 23:00:12 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240724200012.GA23293@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+ <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 2/3] selftests/bpf: Add mptcp pm_nl_ctl link
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>,
- mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Shuah Khan <shuah@kernel.org>
-References: <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org>
- <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-2-ebdc2d494049@kernel.org>
- <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
- <90e916e8-ec4e-447b-8ee6-eb247f3a72ad@linux.dev>
- <ab8112e6-ea7b-4b36-b395-049214e1608d@kernel.org>
- <780ed38257480940def86947b2ee354f298e890b.camel@kernel.org>
- <684fd6c2-ad54-4479-8a6a-ab3270e558a7@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <684fd6c2-ad54-4479-8a6a-ab3270e558a7@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
 
-On 7/24/24 1:24 AM, Matthieu Baerts wrote:
-> Hi Geliang,
+On Tue, Jul 23, 2024 at 07:36:24AM -0400, James Bottomley wrote:
+> On Tue, 2024-07-23 at 13:20 +0200, Jiri Kosina wrote:
+> > On Mon, 8 Jul 2024, Dan Williams wrote:
+> > 
+> > > 2/ Device passthrough, kernel passing opaque payloads, is already
+> > > taken for granted in many subsystems. USB and HID have "raw"
+> > > interfaces
+> > 
+> > Just as a completely random datapoint here: after I implemented
+> > hidraw inteface long time ago, I was a little bit hesitant about
+> > really merging it, because there was a general fear that this would
+> > shatter the HID driver ecosystem, making it difficult for people to
+> > find proper drivers  for their devices, etc.
 > 
-> Thank you for your reply!
+> The problem with hidraw is that userspace has to understand the device
+> to use it, but a lot of HID devices (keyboards, mice, serial ports,
+> etc.) want to fit into an existing ecosystem so they have to have a
+> kernel driver to avoid having to update all the user applications. 
+> However, entirely new devices don't have the existing ecosystem
+> problem.
 > 
-> On 24/07/2024 09:42, Geliang Tang wrote:
->> Hi Matt,
->>
->> On Sat, 2024-07-06 at 02:25 +0200, Matthieu Baerts wrote:
->>> Hi Martin,
->>>
->>> Thank you for your reply!
->>>
->>> On 06/07/2024 01:10, Martin KaFai Lau wrote:
->>>> On 7/4/24 3:48 AM, Matthieu Baerts wrote:
->>>>>> diff --git a/tools/testing/selftests/bpf/Makefile
->>>>>> b/tools/testing/
->>>>>> selftests/bpf/Makefile
->>>>>> index e0b3887b3d2d..204269d0b5b8 100644
->>>>>> --- a/tools/testing/selftests/bpf/Makefile
->>>>>> +++ b/tools/testing/selftests/bpf/Makefile
->>>>>> @@ -144,7 +144,7 @@ TEST_GEN_PROGS_EXTENDED =
->>>>>> test_skb_cgroup_id_user \
->>>>>>        flow_dissector_load test_flow_dissector
->>>>>> test_tcp_check_syncookie_user \
->>>>>>        test_lirc_mode2_user xdping test_cpp runqslower bench
->>>>>> bpf_testmod.ko \
->>>>>>        xskxceiver xdp_redirect_multi xdp_synproxy veristat
->>>>>> xdp_hw_metadata \
->>>>>> -    xdp_features bpf_test_no_cfi.ko
->>>>>> +    xdp_features bpf_test_no_cfi.ko mptcp_pm_nl_ctl
->>>>> On the BPF CI, we have such errors:
->>>>>
->>>>>      mptcp_pm_nl_ctl.c:20:10: fatal error: 'linux/mptcp.h' file
->>>>> not found
->>>>>        20 | #include "linux/mptcp.h"
->>>>>           |          ^~~~~~~~~~~~~~~
->>>>>
->>>>> On my side, I don't have any issue, because the compiler uses the
->>>>> mptcp.h file from the system: /usr/include/linux/mptcp.h
->>>>>
->>>>> I suppose that's not OK on the BPF CI, as it looks like it
->>>>> doesn't have
->>>>> this file there, probably because it still uses Ubuntu 20.04 as
->>>>> base,
->>>>> which doesn't include this file in the linux-libc-dev package.
->>>>>
->>>>> When I look at how this 'mptcp_pm_nl_ctl' tool -- and all the
->>>>> other
->>>>> programs from that list -- is compiled (V=1), I see that the
->>>>> following
->>>>> "-I" options are given:
->>>>>
->>>>>     -I${PWD}/tools/testing/selftests/bpf
->>>>>     -I${BUILD}//tools/include
->>>>>     -I${BUILD}/include/generated
->>>>>     -I${PWD}/tools/lib
->>>>>     -I${PWD}/tools/include
->>>>>     -I${PWD}/tools/include/uapi
->>>>>     -I${BUILD}/
->>>>>
->>>>> It will then not look at -I${PWD}/usr/include or the directory
->>>>> generated
->>>>> with:
->>>>>
->>>>>     make headers_install INSTALL_HDR_PATH=(...)
->>>>
->>>> It sounds like the tools/testing/selftests/net/mptcp/Makefile is
->>>> looking
->>>> at this include path, so it works?
->>>
->>> Yes it does work.
->>>
->>>> iiu the bpf/Makefile correctly, it has the bpftool "make" compiled
->>>> and
->>>> installed at tools/testing/selftests/bpf/tools/sbin/. May be
->>>> directly
->>>> compile the pm_nl_ctl by "make tools/testing/selftests/net/mptcp/"?
->>>
->>> That could be an alternative, I didn't know it would be OK to add
->>> such
->>> dependence, good idea.
->>>
->>>>> I guess that's why people have duplicated files in
->>>>> 'tools/include/uapi',
->>>>> but I also understood from Jakub that it is not a good idea to
->>>>> continue
->>>>> to do so.
->>>>>
->>>>> What would be the best solution to avoid a copy? A symlink still
->>>>> looks
->>>>> like a workaround.
->>>>>
->>>>> In the other selftests, KHDR_INCLUDES is used to be able to
->>>>> include the
->>>>> path containing the UAPI headers. So if someone built the headers
->>>>> in a
->>>>
->>>> Meaning KHDR_INCLUDES should be used and -
->>>> I${PWD}/tools/include/uapi can
->>>> be retired?
->>>
->>> That's the idea, yes, for "userspace programs". I mean: for BPF
->>> programs
->>> requiring vmlinux.h (BPF_CFLAGS), I guess you will still need the
->>> bpf.h
->>> file from tools/include/uapi, no?
->>>
->>>> I haven't looked into the details. I quickly tried but it
->>>> fails in my environment.
->>>
->>> Do you not have issues because some files have something like:
->>>
->>>    #include <uapi/linux/(...).h>
->>>
->>> On my side, I had a working version using this patch:
->>>
->>>> diff --git a/tools/testing/selftests/bpf/Makefile
->>>> b/tools/testing/selftests/bpf/Makefile
->>>> index 7c5827d20c2e..112f14d40852 100644
->>>> --- a/tools/testing/selftests/bpf/Makefile
->>>> +++ b/tools/testing/selftests/bpf/Makefile
->>>> @@ -37,7 +37,7 @@ CFLAGS += -g $(OPT_FLAGS) -rdynamic            \
->>>>            -Wall -Werror -fno-omit-frame-pointer                  \
->>>>            $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)             \
->>>>            -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)   \
->>>> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
->>>> +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
->>>>   LDFLAGS += $(SAN_LDFLAGS)
->>>>   LDLIBS += $(LIBELF_LIBS) -lz -lrt -lpthread
->>>>   
->>>
->>> But only after having removed these extra 'uapi/':
->>>
->>>    $ git grep -l '<uapi/' -- tools/testing/selftests/bpf | \
->>>      xargs sed -i 's|#include <uapi/|#include <|g'
->>>
->>> Is it not OK for you like that?
+> > Turns out that that didn't happen. Drivers for generic devices are
+> > still implemented properly in the kernel, and hidraw is mostly used
+> > for rather specific, one-off solutions, where the vendor's business
+> > plan is "ship this one appliance and forget forever", which doesn't
+> > really cause any harm to the whole ecosystem.
+> 
+> That's not entirely true.  FIDO tokens (the ones Konstantin is
+> recommending for kernel.org access) are an entire class of devices that
+> use hidraw and don't have a kernel driver.  There's an array of
+> manufacturers producing them, but the CTAP specification and its
+> conformance is what keeps a single user mode driver (which is now
+> present as a separate implementation in all web browsers and the
+> userspace libfido2) for all of them.  Fido is definitely not a one off,
+> but on the other hand, not having a kernel driver doesn't seem to harm
+> the ecosystem and they can get away with it because there was no
+> existing device type for them to fit into (except, as you say, an array
+> of incompatible and short lived USB key tokens which annoyed everyone
+> by having usability limits due to the oneoffness).
 
-I tried and it works for me with the above changes. The other $(APIDIR) usages 
-in the Makefile can be replaced also?
+While "userspace drivers" often cause allergic reactions, I think I
+won't cause a controversy if I say that we are all used to them in
+certain areas. My heart rate will increase if someone proposes replacing
+a USB webcam driver with a libusb-based solution, but I don't lose sleep
+over the fact that my GPU is mostly controlled by code in Mesa.
 
-Matt, do you want to post a patch and see how does it go with the bpf CI?
+What I get from the discussions I've followed or partcipated in over the
+years is that the main worry of free software communities is being
+forced to use closed-source userspace components, whether that would be
+to make the device usable at all, or to achieve decent level of
+performance or full feature set. We've been through years of mostly
+closed-source GPU support, of printer "windrivers", and quite a few
+other horrors. The good news is that we've so far overcome lots (most)
+of those challenges. Reverse engineering projects paid off, and so did
+working hand-in-hand with industry actors in multiple ways (both openly
+and behind the scenes). One could then legitimately ask why we're still
+scared.
 
-[ Sorry for the late reply. ]
+I can't fully answer that question, but there are two points that I
+think are relevant. Note that due to my background and experience, this
+will be heavily biased towards consumer and embedded hardware, not data
+centre-grade devices. Some technologies from the latter however have a
+tendency to migrate to the former over time, so the distinction isn't
+necessarily as relevant as one may consider.
 
->>>
->>> Note that I built the selftests using KHDR_INCLUDES=-
->>> I$INSTALL_HDR_PATH.
+The first point is that hardware gets more complicated over time, and in
+some markets there's also an increase in the number of vendors and
+devices. There's a perceived (whether true or not) danger that we won't
+be able to keep up with just reverse engineering and a development model
+relying on hobyists. Getting vendors involved is important if we want to
+scale.
 
+Second, I think there's a fear of regression. For some categories of
+devices, we have made slow but real progress to try and convince the
+industry to be more open. This sometimes took a decade of work,
+patiently building bridges and creating ecosystems brick by brick. Some
+of those ecosystems are sturdy, some not so. Giving pass-through a blank
+check will likely have very different effects in different areas. I
+don't personally believe it will shatter everything, but I'm convinced
+it carries risk in areas where cooperation with vendors is in its
+infancy or is fragile for any other reason.
+
+Finally, let's not forget that pass-through APIs are not an all or
+nothing option. To cite that example only, DRM requires GPU drivers to
+have an open-source userspace implementation to merge the kernel driver,
+and the same subsystems strongly pushes for API standardization for
+display controllers. We can set different rules for different cases.
+
+-- 
+Regards,
+
+Laurent Pinchart
 
