@@ -1,148 +1,206 @@
-Return-Path: <netdev+bounces-112761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4374C93B078
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:37:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB8C193B0AE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE5451F24D08
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:37:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF37E1C21F9D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69BC157491;
-	Wed, 24 Jul 2024 11:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="X4NhvTVA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F61158A34;
+	Wed, 24 Jul 2024 11:45:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DFB157A4D
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 11:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA69D155A24
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 11:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721821021; cv=none; b=JOw+AkWb4ANwHgO3eT4k3Y9tw/UskcOOP9bd6Wx9AGxx1rSHq5kSbjTHzCBOosxkWkmCk3bLYshBMTbRvBF1ON69/N1VBpCvP/VXpDdsAPdf4tLKgkPxQ0ZkmbRanVjTOdcLZC56lCOjc3vetIZ+xCVOpp2mGUlP9AZWs/WfunQ=
+	t=1721821521; cv=none; b=eHp+LnRzOEW96a260s/Rg0GRJMhMZo1f3UkBWlNXclnaKzVc+4nFAG2PvJ0TlRBraSWbhf4JDiuKgcZE/WJp/QL0hD5CNeu5j44TlKD/TsQnrfo2/U6hsdUtwXsLl2TOsQfcUtlwsTUHFAmO6QGN2fLgxZFf1J/KrvutdnjOe/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721821021; c=relaxed/simple;
-	bh=SXk3WsBNjDynq25pQIZDkUSYM0QZ+9ZSPnd9uSTDHmA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AE9RLnMU+CUdwndGHD85XSVjpU6us6raU7HAM24pVk/I+F6HSAs82J1zJK4WP2UWG/05uIKetUYlpYYuusk/n5v14ww2XaeRs/K7RPBmUiTv6wGDHZjQG64OWCwkItanv2+3NiyfQGkZMYq24Id6/ERb5MqZ61DxJSS2qaNvge4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=X4NhvTVA; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sWaIh-006Kdo-4h; Wed, 24 Jul 2024 13:36:55 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=nzhloxqdtHODiwkBOZMF69gQ3m2/iOf10YyFwS7HwfY=; b=X4NhvTVACjVdZVtl2XLVA+Oqaq
-	h9EehNzvXSsP1E0Y9a6pDVy7LLjlqRYDBGjWv0+Ox+dsi8AMYhC/9m5h/P6yT1HNllERX57TOhved
-	PIWEThDhGTVa8sky19dKNDwl3j8i3KUIa3mvULi5XOEvZrw//myCuPKbUGEDmXaaSs5XnFki3PoeP
-	bKYNDeE/I5pn0jGWmnoxxqnjsHBdfBbZ9K/5aNhTJImTEi8i45I4l4qrn9rcBNyS8aSZqM3fKYO5h
-	RgMZJRGQcqMRwr9lTakKEYbmBo/4UuAhs9PIBFP5hbvlUsr2uHsVdDyMpwU01cuZaUZU0Cpwv4eRl
-	XZaMgrlA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sWaIa-0004L0-V4; Wed, 24 Jul 2024 13:36:49 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sWaIQ-00GwhV-Eg; Wed, 24 Jul 2024 13:36:38 +0200
-Message-ID: <1612714f-a362-4f42-a05b-53f57b90d6f2@rbox.co>
-Date: Wed, 24 Jul 2024 13:36:36 +0200
+	s=arc-20240116; t=1721821521; c=relaxed/simple;
+	bh=wb3VlPAZu/8KJHmcJT9f5nyFbxv0j84sk/ugoTpnrUA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=bRLegtaui1bZ0FJZO4NtKr9SPBGuxUQapNSVi1DfCNduojZqKqPKaP3/QVcoH6yNzpYgJnJkUt0vphEIanIEL5jUgTi605ODIEcl0ByqXEC8U+wMNyxwQD6iY/UbIham97B+ZZ/k8bZHODNYMaHeuswEHrA2kHkL1sQTC8nC2Ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39a1d269982so5587715ab.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 04:45:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721821519; x=1722426319;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ob0VFukh3Hee8onVi5JuQ10r5B1QmZdqH/VPwHjuR70=;
+        b=tEhTmT40phpLCPm2D+Ykp8Kcx0tJx6A4LNjSx+KhP4bSLvNpwVnV+F2K62Gxhi7FYC
+         SuUvHNEx2z9JH5nyaNlaf3FDjnopqLec4Am+luDNsxR1vcXGyjlk6BQUd08DUk//L9sH
+         O3/R6dApfch92jxaC0yGWyo53lP7dXK03KjqCtW0zd/PK+XJ3rCxjZJuSIkrvz76/gPn
+         jYjVdnr3jw6jOgd5+puHiEbx3rkW1Oh2YXMhFBL8HybXCsUDANk7u0z23JQQI/L7csVQ
+         WHObythpNQFg1aQtLASRMMDLImrhsMaoTayO+Ffl71i0L1boq6XOs50LRdalC14hbkpP
+         Izdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTvbq6m+1j9XS2b+vvPpfxUnbNipWixb6+5B8XcWaT8ECo0uKzF7COyOGa4Bc7d8jzcdqULvDCupcPXNnS2LuIGfXb/JnC
+X-Gm-Message-State: AOJu0YwyKXzAyQS++YwADjxkXeCDjQKhAN/yIP9uh94Q5i+ZZAU1DH6b
+	Vitja4EPjJOBPMnn1+9WIgA5wdqjnSMq67Us9xoyMPlcIRCIWiCsOajc7m2+wX9ZKmSOfxmtbnS
+	WJe417XwYjME/PZ4uAw+XPJj20utfCMAU+Jp5Dqzjb4jLhoG2/iZNinw=
+X-Google-Smtp-Source: AGHT+IH7dm3oj1KL51abMHq9FzXLX639QuSbRtEMAONp+YpvnZJg3TyROuN/DQrLoAGuLxd6Sqkw36kS8Eb6JGv8a3gEyh4NE84u
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v3 2/4] selftest/bpf: Support SOCK_STREAM in
- unix_inet_redir_to_connected()
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- john.fastabend@gmail.com, kuniyu@amazon.com, Rao.Shoaib@oracle.com,
- cong.wang@bytedance.com, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>
-References: <20240707222842.4119416-1-mhal@rbox.co>
- <20240707222842.4119416-3-mhal@rbox.co> <87zfqqnbex.fsf@cloudflare.com>
- <fb95824c-6068-47f2-b9eb-894ea9182ede@rbox.co>
- <87ikx962wm.fsf@cloudflare.com>
- <2eae7943-38d7-4839-ae72-97f9a3123c8a@rbox.co>
- <87sew57i4v.fsf@cloudflare.com>
- <027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co>
- <87ed7lcjnw.fsf@cloudflare.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <87ed7lcjnw.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1a8e:b0:380:fd76:29e4 with SMTP id
+ e9e14a558f8ab-39a194fcb1cmr1200105ab.4.1721821519181; Wed, 24 Jul 2024
+ 04:45:19 -0700 (PDT)
+Date: Wed, 24 Jul 2024 04:45:19 -0700
+In-Reply-To: <0000000000000f50a4061d8c4d3c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000048a4b061dfcd02a@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in __cpu_map_flush
+From: syzbot <syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	edumazet@google.com, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	pabeni@redhat.com, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 7/22/24 21:26, Jakub Sitnicki wrote:
-> On Mon, Jul 22, 2024 at 03:07 PM +02, Michal Luczaj wrote:
->>> Classic cleanup with goto to close sockets is all right, but if you're
->>> feeling brave and aim for something less branchy, I've noticed we have
->>> finally started using __attribute__((cleanup)):
->>>
->>> https://elixir.bootlin.com/linux/v6.10/source/tools/testing/selftests/bpf/progs/iters.c#L115
->>
->> I've tried. Is such "ownership passing" (to inhibit the cleanup) via
->> construct like take_fd()[1] welcomed?
-> 
-> I'm fine with having such a helper to complement the cleanup attribute.
-> Alternatively, we can always open code it like it used to be in systemd
-> at first [1], if other reviewers don't warm up to it :-)
-> 
-> [1] https://github.com/systemd/systemd/blob/main/coccinelle/take-fd.cocci
+syzbot has found a reproducer for the following issue on:
 
-OK, so I've kept create_pair()'s __cleanupfication as the last part of the
-series:
-https://lore.kernel.org/netdev/20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co
+HEAD commit:    9ec6ec93f2c1 Add linux-next specific files for 20240724
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10e71ca1980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=83e9d0906fa0e2bd
+dashboard link: https://syzkaller.appspot.com/bug?extid=c226757eb784a9da3e8b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17c0f8e3980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=151b9919980000
 
->> [1] https://lore.kernel.org/all/20240627-work-pidfs-v1-1-7e9ab6cc3bb1@kernel.org/
->>
->> static inline void close_fd(int *fd)
->> {
->> 	if (*fd >= 0)
->> 		xclose(*fd);
->> }
->>
->> #define __closefd __attribute__((cleanup(close_fd)))
->>
->> static inline int create_pair(int family, int sotype, int *c, int *p)
->> {
->> 	struct sockaddr_storage addr;
->> 	socklen_t len = sizeof(addr);
->> 	int err;
->>
->> 	int s __closefd = socket_loopback(family, sotype);
->> 	if (s < 0)
->> 		return s;
->>
->> 	err = xgetsockname(s, sockaddr(&addr), &len);
->> 	if (err)
->> 		return err;
->>
->> 	int s0 __closefd = xsocket(family, sotype, 0);
-> 
-> I'd stick to no declarations in the body. Init to -1 or -EBADF.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c0ab2da24b1f/disk-9ec6ec93.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/da6faf16185f/vmlinux-9ec6ec93.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1ad900571155/bzImage-9ec6ec93.xz
 
-All right, it just felt wrong to (demand to) initialize variables with some
-magic values. __attribute__((setup(set_negative))) would solve that :) I've
-toyed with `DEFINE_CLASS(fd, int, if (_T >= 0) xclose(_T), -EBADF, void)`
-but it felt wrong, too.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c226757eb784a9da3e8b@syzkaller.appspotmail.com
 
->> 	case SOCK_STREAM:
->> 	case SOCK_SEQPACKET:
->> 		*p = xaccept_nonblock(s, NULL, NULL);
-> 
-> I wouldn't touch output arguments until we have succedeed.  Another
-> local var will be handy.
+Oops: general protection fault, probably for non-canonical address 0xe3fffb24002e6fe6: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: maybe wild-memory-access in range [0x1ffff92001737f30-0x1ffff92001737f37]
+CPU: 1 UID: 0 PID: 11878 Comm: syz-executor412 Not tainted 6.10.0-next-20240724-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+RIP: 0010:__cpu_map_flush+0x42/0xd0
+Code: e8 13 8c d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 4d 12 3e 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 2f 12 3e 00 4c 8b 23 48 8d 7b c0
+RSP: 0018:ffffc90000a18b10 EFLAGS: 00010202
+RAX: 03ffff24002e6fe6 RBX: 1ffff92001737f30 RCX: ffff888074dc8000
+RDX: 0000000080000101 RSI: 0000000000000010 RDI: ffffc9000b9bf800
+RBP: dffffc0000000000 R08: ffffffff896d3b5a R09: 1ffffffff1f5f375
+R10: dffffc0000000000 R11: fffffbfff1f5f376 R12: ffffc9000b9bf800
+R13: ffffc9000b9bf820 R14: ffffc9000b9bf800 R15: dffffc0000000000
+FS:  0000555592677380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd44da640f0 CR3: 000000001ea68000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ xdp_do_check_flushed+0x136/0x240 net/core/filter.c:4304
+ __napi_poll+0xe4/0x490 net/core/dev.c:6774
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0x89b/0x1240 net/core/dev.c:6962
+ handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+ common_interrupt+0xaa/0xd0 arch/x86/kernel/irq.c:278
+ </IRQ>
+ <TASK>
+ asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
+RIP: 0010:check_kcov_mode kernel/kcov.c:184 [inline]
+RIP: 0010:__sanitizer_cov_trace_pc+0x37/0x70 kernel/kcov.c:207
+Code: 40 d7 03 00 65 8b 15 10 0c 70 7e f7 c2 00 01 ff 00 74 11 f7 c2 00 01 00 00 74 35 83 b9 1c 16 00 00 00 74 2c 8b 91 f8 15 00 00 <83> fa 02 75 21 48 8b 91 00 16 00 00 48 8b 32 48 8d 7e 01 8b 89 fc
+RSP: 0018:ffffc9000b9bf8a0 EFLAGS: 00000246
+RAX: ffffffff81410dcc RBX: 0000000000000000 RCX: ffff888074dc8000
+RDX: 0000000000000000 RSI: ffffffff8b942412 RDI: ffffffff8b942328
+RBP: 1ffff92001737f30 R08: ffffffff81410c60 R09: ffffc9000b9bfa70
+R10: 0000000000000003 R11: ffffffff817f7030 R12: ffffffff90294810
+R13: dffffc0000000000 R14: 1ffff92001737f30 R15: ffffffff90d0fbd4
+ unwind_next_frame+0x67c/0x2a00 arch/x86/kernel/unwind_orc.c:495
+ arch_stack_walk+0x151/0x1b0 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2252 [inline]
+ slab_free mm/slub.c:4473 [inline]
+ kmem_cache_free+0x145/0x350 mm/slub.c:4548
+ __dentry_kill+0x497/0x630 fs/dcache.c:629
+ dput+0x19f/0x2b0 fs/dcache.c:852
+ __fput+0x5f8/0x8a0 fs/file_table.c:430
+ __do_sys_close fs/open.c:1566 [inline]
+ __se_sys_close fs/open.c:1551 [inline]
+ __x64_sys_close+0x7f/0x110 fs/open.c:1551
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd44d9ed9c0
+Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d e1 76 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+RSP: 002b:00007fff7a1e95b8 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fd44d9ed9c0
+RDX: 0000000000000e80 RSI: 0000000020000100 RDI: 0000000000000004
+RBP: 00007fff7a1e9600 R08: 00007fff7a1e95e0 R09: 00007fff7a1e95e0
+R10: 00007fff7a1e95e0 R11: 0000000000000202 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__cpu_map_flush+0x42/0xd0
+Code: e8 13 8c d6 ff 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 4d 12 3e 00 49 8b 1e 4c 39 f3 74 77 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 2f 12 3e 00 4c 8b 23 48 8d 7b c0
+RSP: 0018:ffffc90000a18b10 EFLAGS: 00010202
+RAX: 03ffff24002e6fe6 RBX: 1ffff92001737f30 RCX: ffff888074dc8000
+RDX: 0000000080000101 RSI: 0000000000000010 RDI: ffffc9000b9bf800
+RBP: dffffc0000000000 R08: ffffffff896d3b5a R09: 1ffffffff1f5f375
+R10: dffffc0000000000 R11: fffffbfff1f5f376 R12: ffffc9000b9bf800
+R13: ffffc9000b9bf820 R14: ffffc9000b9bf800 R15: dffffc0000000000
+FS:  0000555592677380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd44da640f0 CR3: 000000001ea68000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	e8 13 8c d6 ff       	call   0xffd68c18
+   5:	4c 89 f0             	mov    %r14,%rax
+   8:	48 c1 e8 03          	shr    $0x3,%rax
+   c:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
+  11:	74 08                	je     0x1b
+  13:	4c 89 f7             	mov    %r14,%rdi
+  16:	e8 4d 12 3e 00       	call   0x3e1268
+  1b:	49 8b 1e             	mov    (%r14),%rbx
+  1e:	4c 39 f3             	cmp    %r14,%rbx
+  21:	74 77                	je     0x9a
+  23:	48 89 d8             	mov    %rbx,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 df             	mov    %rbx,%rdi
+  34:	e8 2f 12 3e 00       	call   0x3e1268
+  39:	4c 8b 23             	mov    (%rbx),%r12
+  3c:	48 8d 7b c0          	lea    -0x40(%rbx),%rdi
 
-OK, sure. Thanks.
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
