@@ -1,171 +1,158 @@
-Return-Path: <netdev+bounces-112711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B5B93AAF5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 04:13:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E985B93AB3F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 04:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F762B223F6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 02:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A58B8284A4B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 02:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE93B171BB;
-	Wed, 24 Jul 2024 02:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD9917547;
+	Wed, 24 Jul 2024 02:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P2zUzfv5"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="X6vd+Yns"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E6317758
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 02:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF074E57D
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 02:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721787203; cv=none; b=YJ8OReDSdBKkbcedFrtnwmi0eKKR7dDlSJx2HGsNN8dIHw6ZXhONIH+pGdZSHKBZsybuVX4cCz7Ojsi2iLLUJRx+lMVoQOQ0fdMAzMHjtJEjyBmIWd6aXGymGUcZCvojDDhqDTllUQzcRA8Rm5V4bEWFxfFbKIm7zls4Vq0nOSY=
+	t=1721788211; cv=none; b=U549wZplrgS43h3VRaMj0jpTTs5ugcj4dpA7swOyLmohJ0S21C3MserY5aOJ6ZMQzNjKJgSJNgkMbZ5/jMqMm9glrHQ4O8AFqaj6BuUYMYjJG8PHwrJa6teBmgzULPPvnw1B+kd1LV5E4c/0igs+D099lfe8AtroSApioqKeVwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721787203; c=relaxed/simple;
-	bh=aY2W229IPrwJpsVdE9grFLsD722tHQKjq+jC7vW2vuk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ThHJcUNdnYAGNV9VNGV37HMtu5j+3uFKY0ZaxRF9QMfKBJTcR1ro97H6raKzUv209vJChqhSBa3gr9KKD9dx7VshH6a4QyNxOj3tN39G+ij7qKcCdqKdmp5x0vbPkOo/zUk/7muxUeUmYDcjNtl10vfHH8lFVe+CJay+xDwUXwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P2zUzfv5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721787201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KpQmKrcQvwUzPm1WYMAhk6x806GQpIo0dxtm+FS0LQ4=;
-	b=P2zUzfv53SvI+Ro6EfO9kHKN6bE/f2MGSdWAvwAj3Lopb0MZPrVv7cPQp1fFkhHT1bRQHm
-	mwCEWegz8PFIZpAED/dnb7RXlHYAwriu+UhpynnHjeMFBsqshVGsFQkYNLuqcEesG8S/WL
-	uPKb90PICxFwskfCRkZusDxpAiKE3Wo=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-489-jpyf0iWQP0SANoZblzh3cw-1; Tue, 23 Jul 2024 22:13:18 -0400
-X-MC-Unique: jpyf0iWQP0SANoZblzh3cw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2f01bd7ad5eso20014251fa.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jul 2024 19:13:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721787196; x=1722391996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KpQmKrcQvwUzPm1WYMAhk6x806GQpIo0dxtm+FS0LQ4=;
-        b=A+OuUXbNh5x+73PhJ2kokcV5zgVX8xS90HGwdXwf+moA0Zr8bd/xCzjztTK5UPvupr
-         noWbKsSW1tVXZKWNfXw99+7JORV4AIA7h7wmkoGb02gyfkNn5PAriVeWm9AhBadqvTmo
-         8Q31JfR90U/P+pQu3JgjpsA49Rxi4jOh8DPDOxu67VQTyQiycTZuApkI+4+QEs59XCsw
-         P1CCixsW3nthkz/w4imQwUhRsQ97IqMkOmyHNuVzuJmJGTyJyOYCHJ+MQXi/KlhP9Thk
-         E5UNNLFckuQeiPSwInN0NZbbsIWIneSDPimqdk7/1Xx0Ch4GKOwD3FG3zxCQoTB6CLm4
-         SeWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZSTx5tR1bc4cXvg87PNXeTqTRGB59Mtp6qJb0ZHEOnyDh7jbBSa3pmZgPtTfYoSZLdeXIZidXWqqekhFWDtwBplpSa90K
-X-Gm-Message-State: AOJu0Yz4vYRpDzqqht0WdrNpkfWyIx9EHy5sBIbXhd0UYLVwTrp+dYpA
-	vbAE7POkgYhvblI+rG8lxq+Msy/9c6Cp8/3VLdY8f/o8LogSRpldZKVi40Bz9cMQsWIhXl7rueA
-	Kpax78O9O35UOu1hjnK97FJQEqQV42fylGXufvTHMzv0xzMB4ALM4tjpxSVm/gyMqRvaMT5WqqD
-	NFKsQ6yBHjvX6AOfmkBfi9khn221Tx
-X-Received: by 2002:a2e:7012:0:b0:2ef:284e:1d07 with SMTP id 38308e7fff4ca-2ef284e20edmr67226851fa.13.1721787196496;
-        Tue, 23 Jul 2024 19:13:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfe+PSFOuw1GOx0ba6wih32b5Q24TWF2YXgMjSQkS2m3HAbcXqAiQFID2J6XbwaqHY0X71rjwNpHYBoZFbDPg=
-X-Received: by 2002:a2e:7012:0:b0:2ef:284e:1d07 with SMTP id
- 38308e7fff4ca-2ef284e20edmr67226751fa.13.1721787196155; Tue, 23 Jul 2024
- 19:13:16 -0700 (PDT)
+	s=arc-20240116; t=1721788211; c=relaxed/simple;
+	bh=JamgX0eVYJNkqrVS+r5XDlZvx9EFZixK2xbF76nEJ+Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lNzIlWZd8LJFLCmwNT2GgZDcwmxNOlnjtVVAikOJIWHZHKyWr3775ERJYQSw9z2XThc+bgjiH+TX8QR60WRZTynFKPun/W97J7cR0ecipUwY0ZS0ZMzcydM32pLb9yI567nhqv2ySnIgXGCXL2JCPwaj8jQdzNhJg6spNY7KOOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=X6vd+Yns; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1721788201; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=D4EtLI5pVG9lcIh5By5x83yv055ezXJ8uSDkKVmTKBk=;
+	b=X6vd+Yns/7ifQvdfLt/CdUzKtlV1EtEAw0/xkwu7tnmguznjz9Kwj1HCk54GMwctsl6XM1pPdAtY8IXoMZ5AnBVmUQ3JoWT3kt+1/36LEOQyXSlyRJQMxhlcFNG5J4TFqR0d+Tr/89Dvd1Mg+jL16hb3/doWOdH5e2GOwXqbOdI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBBzfRG_1721788199;
+Received: from 30.221.149.223(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WBBzfRG_1721788199)
+          by smtp.aliyun-inc.com;
+          Wed, 24 Jul 2024 10:30:00 +0800
+Message-ID: <7250f49f-bfc0-4d7e-8de8-0468ff600a75@linux.alibaba.com>
+Date: Wed, 24 Jul 2024 10:29:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240723054047.1059994-1-lulu@redhat.com> <20240723054047.1059994-4-lulu@redhat.com>
- <d8031e518cf47c57c31b903cb9613692bbff7d0d.camel@nvidia.com> <20240723072712-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240723072712-mutt-send-email-mst@kernel.org>
-From: Cindy Lu <lulu@redhat.com>
-Date: Wed, 24 Jul 2024 10:12:39 +0800
-Message-ID: <CACLfguV53JA9Lk_sTr+ug_x+JDxTr3S3rOcjVQVDy7tkL_B--A@mail.gmail.com>
-Subject: Re: [PATH v5 3/3] vdpa/mlx5: Add the support of set mac address
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
-	"sgarzare@redhat.com" <sgarzare@redhat.com>, 
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: prevent UAF in inet_create()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot <syzkaller@googlegroups.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Dust Li <dust.li@linux.alibaba.com>, Niklas Schnelle <schnelle@linux.ibm.com>
+References: <20240723175809.537291-1-edumazet@google.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20240723175809.537291-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 23 Jul 2024 at 19:29, Michael S. Tsirkin <mst@redhat.com> wrote:
+
+
+On 7/24/24 1:58 AM, Eric Dumazet wrote:
+> Following syzbot repro crashes the kernel:
 >
-> On Tue, Jul 23, 2024 at 07:49:44AM +0000, Dragos Tatulea wrote:
-> > On Tue, 2024-07-23 at 13:39 +0800, Cindy Lu wrote:
-> > > Add the function to support setting the MAC address.
-> > > For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
-> > > to set the mac address
-> > >
-> > > Tested in ConnectX-6 Dx device
-> > >
-> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > ---
-> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 28 ++++++++++++++++++++++++++++
-> > >  1 file changed, 28 insertions(+)
-> > >
-> > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/ne=
-t/mlx5_vnet.c
-> > > index ecfc16151d61..7fce952d650f 100644
-> > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > > @@ -3785,10 +3785,38 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgm=
-t_dev *v_mdev, struct vdpa_device *
-> > >     destroy_workqueue(wq);
-> > >     mgtdev->ndev =3D NULL;
-> > >  }
-> > > +static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev,
-> > > +                         struct vdpa_device *dev,
-> > > +                         const struct vdpa_dev_set_config *add_confi=
-g)
-> > > +{
-> > > +   struct virtio_net_config *config;
-> > > +   struct mlx5_core_dev *pfmdev;
-> > > +   struct mlx5_vdpa_dev *mvdev;
-> > > +   struct mlx5_vdpa_net *ndev;
-> > > +   struct mlx5_core_dev *mdev;
-> > > +   int err =3D -EINVAL;
-> > > +
-> > > +   mvdev =3D to_mvdev(dev);
-> > > +   ndev =3D to_mlx5_vdpa_ndev(mvdev);
-> > > +   mdev =3D mvdev->mdev;
-> > > +   config =3D &ndev->config;
-> > > +
-> > > +   down_write(&ndev->reslock);
-> > > +   if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> > > +           pfmdev =3D pci_get_drvdata(pci_physfn(mdev->pdev));
-> > > +           err =3D mlx5_mpfs_add_mac(pfmdev, config->mac);
-> > > +           if (0 =3D=3D err)
-> > if (!err) would be nicer. Not a deal breaker though.
+> socketpair(0x2, 0x1, 0x100, &(0x7f0000000140)) (fail_nth: 13)
 >
->         yes, no yodda style please. It, I can not stand.
+> Fix this by not calling sk_common_release() from smc_create_clcsk().
 >
-sure=EF=BC=8C Will fix this
-Thanks
-cindy
+> Stack trace:
+> socket: no more sockets
+> ------------[ cut here ]------------
+> refcount_t: underflow; use-after-free.
+>   WARNING: CPU: 1 PID: 5092 at lib/refcount.c:28 refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
+> Modules linked in:
+> CPU: 1 PID: 5092 Comm: syz-executor424 Not tainted 6.10.0-syzkaller-04483-g0be9ae5486cd #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+>   RIP: 0010:refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
+> Code: 80 f3 1f 8c e8 e7 69 a8 fc 90 0f 0b 90 90 eb 99 e8 cb 4f e6 fc c6 05 8a 8d e8 0a 01 90 48 c7 c7 e0 f3 1f 8c e8 c7 69 a8 fc 90 <0f> 0b 90 90 e9 76 ff ff ff e8 a8 4f e6 fc c6 05 64 8d e8 0a 01 90
+> RSP: 0018:ffffc900034cfcf0 EFLAGS: 00010246
+> RAX: 3b9fcde1c862f700 RBX: ffff888022918b80 RCX: ffff88807b39bc00
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: 0000000000000003 R08: ffffffff815878a2 R09: fffffbfff1c39d94
+> R10: dffffc0000000000 R11: fffffbfff1c39d94 R12: 00000000ffffffe9
+> R13: 1ffff11004523165 R14: ffff888022918b28 R15: ffff888022918b00
+> FS:  00005555870e7380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020000140 CR3: 000000007582e000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   inet_create+0xbaf/0xe70
+>    __sock_create+0x490/0x920 net/socket.c:1571
+>    sock_create net/socket.c:1622 [inline]
+>    __sys_socketpair+0x2ca/0x720 net/socket.c:1769
+>    __do_sys_socketpair net/socket.c:1822 [inline]
+>    __se_sys_socketpair net/socket.c:1819 [inline]
+>    __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
+>    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fbcb9259669
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fffe931c6d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000035
+> RAX: ffffffffffffffda RBX: 00007fffe931c6f0 RCX: 00007fbcb9259669
+> RDX: 0000000000000100 RSI: 0000000000000001 RDI: 0000000000000002
+> RBP: 0000000000000002 R08: 00007fffe931c476 R09: 00000000000000a0
+> R10: 0000000020000140 R11: 0000000000000246 R12: 00007fffe931c6ec
+> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+>   </TASK>
+
+Oops, that's my bad, I forgot the differences in failure handling 
+between smc_create and inet_create,
+thanks for your fix.
+
 >
-> > Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> >
-> > > +                   memcpy(config->mac, add_config->net.mac, ETH_ALEN=
-);
-> > > +   }
-> > > +
-> > > +   up_write(&ndev->reslock);
-> > > +   return err;
-> > > +}
-> > >
-> > >  static const struct vdpa_mgmtdev_ops mdev_ops =3D {
-> > >     .dev_add =3D mlx5_vdpa_dev_add,
-> > >     .dev_del =3D mlx5_vdpa_dev_del,
-> > > +   .dev_set_attr =3D mlx5_vdpa_set_attr,
-> > >  };
-> > >
-> > >  static struct virtio_device_id id_table[] =3D {
-> >
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: D. Wythe <alibuda@linux.alibaba.com>
+> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> Cc: Dust Li <dust.li@linux.alibaba.com>
+> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+> ---
+>   net/smc/af_smc.c | 4 +---
+>   1 file changed, 1 insertion(+), 3 deletions(-)
 >
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 73a875573e7ad5b7a95f7941e33f0d784a91d16d..31b5d8c8c34085b73b011c913cfe032f025cd2e0 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -3319,10 +3319,8 @@ int smc_create_clcsk(struct net *net, struct sock *sk, int family)
+>   
+>   	rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
+>   			      &smc->clcsock);
+> -	if (rc) {
+> -		sk_common_release(sk);
+> +	if (rc)
+>   		return rc;
+> -	}
+
+Since __smc_create (for AF_SMC) does not call sk_common_release on failure,
+I think it should be moved to __smc_create instead of beingdeleted.
+
+Best wishes,
+D. Wythe
+
+>   
+>   	/* smc_clcsock_release() does not wait smc->clcsock->sk's
+>   	 * destruction;  its sk_state might not be TCP_CLOSE after
 
 
