@@ -1,63 +1,58 @@
-Return-Path: <netdev+bounces-112818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0736893B59E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:14:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3BEF93B5A8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30F541C2171A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 17:14:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 602921F22487
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 17:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FEA15EFC9;
-	Wed, 24 Jul 2024 17:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387E416B385;
+	Wed, 24 Jul 2024 17:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gu0vtcwl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MHGZynhr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6925B15ECEC;
-	Wed, 24 Jul 2024 17:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1159216A95E;
+	Wed, 24 Jul 2024 17:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721841237; cv=none; b=r2bumrolDuz75BoVQMvvsHSbLNtklwNG6ZBlgVuU4kA81DZwNQTQ5b2u28RYtEmmFYb87Pw8UMp5prhyzUS00z4gjr/+4ioZtpHp1WLvJNwvMRTk2P/I7NVpntignoYXZhDyxQEjbn6MwmUXaoqy3pUb0fVvW9UVxb/G0ACEE0g=
+	t=1721841313; cv=none; b=iQt2IkNpjrYwR3l/HtCewBLK2jM0mBOyaTY+yp+5AMb68kklzYSaJ0MA1W2ySOmDdtGyxTs0F8TkVenHUHSId0Od7b/XH+BZWVSMpw+3QBG69cgc/58q9BFyrFhy5BKWzZrs6bnS2bmjd7JWSuVsdzd3GHTCSXe5rlG9MAZF72E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721841237; c=relaxed/simple;
-	bh=oa4BYzZy3kq1pbLBpJsb1owa8AeGXnIShl4WHE1XK7I=;
+	s=arc-20240116; t=1721841313; c=relaxed/simple;
+	bh=E8IFZR1Vge2tEybKij2yROAYQyWSQQckOEgQRR5cKEs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IpaVBYxD6V0uwANP/8vAnzteNAcFIcJImAhFhnqIBGjmDfKB9dSWbtAS1zR/20UyWE8rnQ674ztjQOowB7YzOQUYaOV5GoKEEvZXDc0vSarFsygLhgvKtSceQI/BDZaBO7PjgWnCNM3Bqr6Zt5faubuKE3BZw57k2/Dg7AkQEKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gu0vtcwl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36E45C32781;
-	Wed, 24 Jul 2024 17:13:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=jVpjyk+zhnfuiJAjPFViGsRAr4UyzVZbdG75Qxg4nW0NdTqwekhTuvvs1X8R2WBUHsH0hOISvhmBVSJuBUj3a+0S7vSErQKwg7/kqG/wc5oH5uKZF3j0GdRjdKJ7boioLnwJnevxNioNSlsEFuh4Joom7OcQeZvH2jlUb1sL0ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MHGZynhr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73FCEC4AF0C;
+	Wed, 24 Jul 2024 17:15:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721841237;
-	bh=oa4BYzZy3kq1pbLBpJsb1owa8AeGXnIShl4WHE1XK7I=;
+	s=k20201202; t=1721841312;
+	bh=E8IFZR1Vge2tEybKij2yROAYQyWSQQckOEgQRR5cKEs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gu0vtcwliOaEFO9TQNOi8tIiHqSeJjdQ6j2SxxiNpd5k44RXf7PIXWgRMud8uXVw9
-	 nkmdIt8VFqFuUcYc2446tfUM3jl/6V6w6kMI4JgB6f918SmVTxKrUQe1NieMoZa04D
-	 fXCcajwz8+0QlyxOGe0fsiFw+yVpl4haL+cw+LzbDYOJunwe/q4MsFrEwsEtTm+yuh
-	 TbDgzqEP8i45IpTgkvq9SeRDFwGB5EfjJbLNIi9XZzO9QyGTVYZ6BvEk19IBT75kBp
-	 UtGA5LOnyo3xpZXwQBOqHAUl5MYsYpVt18lnkisTgsQG9DM7OoFtm0QpYl9PotjNzg
-	 uIpqjEbU81oNA==
-Date: Wed, 24 Jul 2024 18:13:51 +0100
+	b=MHGZynhrptdScq8bL4CfpjAaNhSQlP31wTfcAD09a85at1Uluj73OwGafd00ds2Pw
+	 csPI6KMLJcJw/eA4JNcdCgueG2KWxca4frBGpIFaBkazkx+LKxCnaiDkVnJfhpAFwt
+	 71f7TlYiCCWSO9maOBWx22XHgHekoDEr37lChGZ19UxwmuUqNXda9byMNkzUszdaP3
+	 OXPkNQ8ZpYQGt+5zMSnSCuPb7J3H8MCDIw9t1R7E6zCC57P6FN7/S/T6gt5KppFTQv
+	 dFnbNpPRMOhAIMt03DPUYaBHWf1KxJ7ycWFy6aeBTCVWjoJzdLu8zQFNbAqZcqPAhm
+	 0ff3T/APvHnCQ==
+Date: Wed, 24 Jul 2024 18:15:08 +0100
 From: Simon Horman <horms@kernel.org>
-To: Yunseong Kim <yskelg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	stable@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: [PATCH] Bluetooth: hci_core: fix suspicious RCU usage in
- hci_conn_drop()
-Message-ID: <20240724171351.GD97837@kernel.org>
-References: <20240723171756.13755-2-yskelg@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	kuni1840@gmail.com, linux-can@vger.kernel.org, mkl@pengutronix.de,
+	netdev@vger.kernel.org, pabeni@redhat.com, socketcan@hartkopp.net,
+	syzkaller@googlegroups.com
+Subject: Re: [PATCH v1 net] can: bcm: Remove proc entry when dev is
+ unregistered.
+Message-ID: <20240724171508.GE97837@kernel.org>
+References: <20240723090405.GB24657@kernel.org>
+ <20240723183805.31201-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,87 +61,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240723171756.13755-2-yskelg@gmail.com>
+In-Reply-To: <20240723183805.31201-1-kuniyu@amazon.com>
 
-+ Handa-san
+On Tue, Jul 23, 2024 at 11:38:05AM -0700, Kuniyuki Iwashima wrote:
+> From: Simon Horman <horms@kernel.org>
+> Date: Tue, 23 Jul 2024 10:04:05 +0100
+> > On Mon, Jul 22, 2024 at 12:28:42PM -0700, Kuniyuki Iwashima wrote:
+> > > syzkaller reported a warning in bcm_connect() below. [0]
+> > > 
+> > > The repro calls connect() to vxcan1, removes vxcan1, and calls
+> > > connect() with ifindex == 0.
+> > > 
+> > > Calling connect() for a BCM socket allocates a proc entry.
+> > > Then, bcm_sk(sk)->bound is set to 1 to prevent further connect().
+> > > 
+> > > However, removing the bound device resets bcm_sk(sk)->bound to 0
+> > > in bcm_notify().
+> > > 
+> > > The 2nd connect() tries to allocate a proc entry with the same
+> > > name and sets NULL to bcm_sk(sk)->bcm_proc_read, leaking the
+> > > original proc entry.
+> > > 
+> > > Since the proc entry is available only for connect()ed sockets,
+> > > let's clean up the entry when the bound netdev is unregistered.
+> > > 
+> > > [0]:
+> > > proc_dir_entry 'can-bcm/2456' already registered
+> > > WARNING: CPU: 1 PID: 394 at fs/proc/generic.c:376 proc_register+0x645/0x8f0 fs/proc/generic.c:375
+> > > Modules linked in:
+> > > CPU: 1 PID: 394 Comm: syz-executor403 Not tainted 6.10.0-rc7-g852e42cc2dd4
+> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> > > RIP: 0010:proc_register+0x645/0x8f0 fs/proc/generic.c:375
+> > > Code: 00 00 00 00 00 48 85 ed 0f 85 97 02 00 00 4d 85 f6 0f 85 9f 02 00 00 48 c7 c7 9b cb cf 87 48 89 de 4c 89 fa e8 1c 6f eb fe 90 <0f> 0b 90 90 48 c7 c7 98 37 99 89 e8 cb 7e 22 05 bb 00 00 00 10 48
+> > > RSP: 0018:ffa0000000cd7c30 EFLAGS: 00010246
+> > > RAX: 9e129be1950f0200 RBX: ff1100011b51582c RCX: ff1100011857cd80
+> > > RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
+> > > RBP: 0000000000000000 R08: ffd400000000000f R09: ff1100013e78cac0
+> > > R10: ffac800000cd7980 R11: ff1100013e12b1f0 R12: 0000000000000000
+> > > R13: 0000000000000000 R14: 0000000000000000 R15: ff1100011a99a2ec
+> > > FS:  00007fbd7086f740(0000) GS:ff1100013fd00000(0000) knlGS:0000000000000000
+> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > CR2: 00000000200071c0 CR3: 0000000118556004 CR4: 0000000000771ef0
+> > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+> > > PKRU: 55555554
+> > > Call Trace:
+> > >  <TASK>
+> > >  proc_create_net_single+0x144/0x210 fs/proc/proc_net.c:220
+> > >  bcm_connect+0x472/0x840 net/can/bcm.c:1673
+> > >  __sys_connect_file net/socket.c:2049 [inline]
+> > >  __sys_connect+0x5d2/0x690 net/socket.c:2066
+> > >  __do_sys_connect net/socket.c:2076 [inline]
+> > >  __se_sys_connect net/socket.c:2073 [inline]
+> > >  __x64_sys_connect+0x8f/0x100 net/socket.c:2073
+> > >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> > >  do_syscall_64+0xd9/0x1c0 arch/x86/entry/common.c:83
+> > >  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> > > RIP: 0033:0x7fbd708b0e5d
+> > > Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
+> > > RSP: 002b:00007fff8cd33f08 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+> > > RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fbd708b0e5d
+> > > RDX: 0000000000000010 RSI: 0000000020000040 RDI: 0000000000000003
+> > > RBP: 0000000000000000 R08: 0000000000000040 R09: 0000000000000040
+> > > R10: 0000000000000040 R11: 0000000000000246 R12: 00007fff8cd34098
+> > > R13: 0000000000401280 R14: 0000000000406de8 R15: 00007fbd70ab9000
+> > >  </TASK>
+> > > remove_proc_entry: removing non-empty directory 'net/can-bcm', leaking at least '2456'
+> > > 
+> > > Fixes: ffd980f976e7 ("[CAN]: Add broadcast manager (bcm) protocol")
+> > > Reported-by: syzkaller <syzkaller@googlegroups.com>
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > 
+> > Thanks,
+> > 
+> > I agree that the problem was introduced by the cited commit
+> > and is resolved by this patch.
+> > 
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> > 
+> > > ---
+> > >  net/can/bcm.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > > 
+> > > diff --git a/net/can/bcm.c b/net/can/bcm.c
+> > > index 27d5fcf0eac9..46d3ec3aa44b 100644
+> > > --- a/net/can/bcm.c
+> > > +++ b/net/can/bcm.c
+> > > @@ -1470,6 +1470,10 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
+> > >  
+> > >  		/* remove device reference, if this is our bound device */
+> > >  		if (bo->bound && bo->ifindex == dev->ifindex) {
+> > > +#if IS_ENABLED(CONFIG_PROC_FS)
+> > > +			if (sock_net(sk)->can.bcmproc_dir && bo->bcm_proc_read)
+> > > +				remove_proc_entry(bo->procname, sock_net(sk)->can.bcmproc_dir);
+> > > +#endif
+> > 
+> > As a fix this looks good. But I wonder if it is worth following up
+> > with a helper for the above as it inlines #if logic and now appears twice.
+> 
+> Other places also have #if guard for CONFIG_PROC_FS, so if needed,
+> I'd move all of them into helper functions under a single #if in -next.
 
-On Wed, Jul 24, 2024 at 02:17:57AM +0900, Yunseong Kim wrote:
-> Protection from the queuing operation is achieved with an RCU read lock
-> to avoid calling 'queue_delayed_work()' after 'cancel_delayed_work()',
-> but this does not apply to 'hci_conn_drop()'.
-> 
-> commit deee93d13d38 ("Bluetooth: use hdev->workqueue when queuing
->  hdev->{cmd,ncmd}_timer works")
-> 
-> The situation described raises concerns about suspicious RCU usage in a
-> corrupted context.
-> 
-> CPU 1                   CPU 2
->  hci_dev_do_reset()
->   synchronize_rcu()      hci_conn_drop()
->   drain_workqueue()       <-- no RCU read protection during queuing. -->
->                            queue_delayed_work()
-> 
-> It displays a warning message like the following
-> 
-> Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2
-> =============================
-> WARNING: suspicious RCU usage
-> 6.10.0-rc6-01340-gf14c0bb78769 #5 Not tainted
-> -----------------------------
-> net/mac80211/util.c:4000 RCU-list traversed in non-reader section!!
-> 
-> other info that might help us debug this:
-> 
-> rcu_scheduler_active = 2, debug_locks = 1
-> 2 locks held by syz-executor/798:
->  #0: ffff800089a3de50 (rtnl_mutex){+.+.}-{4:4},
->     at: rtnl_lock+0x28/0x40 net/core/rtnetlink.c:79
-> 
-> stack backtrace:
-> CPU: 0 PID: 798 Comm: syz-executor Not tainted
->   6.10.0-rc6-01340-gf14c0bb78769 #5
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace.part.0+0x1b8/0x1d0 arch/arm64/kernel/stacktrace.c:317
->  dump_backtrace arch/arm64/kernel/stacktrace.c:323 [inline]
->  show_stack+0x34/0x50 arch/arm64/kernel/stacktrace.c:324
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0xf0/0x170 lib/dump_stack.c:114
->  dump_stack+0x20/0x30 lib/dump_stack.c:123
->  lockdep_rcu_suspicious+0x204/0x2f8 kernel/locking/lockdep.c:6712
->  ieee80211_check_combinations+0x71c/0x828 [mac80211]
->  ieee80211_check_concurrent_iface+0x494/0x700 [mac80211]
->  ieee80211_open+0x140/0x238 [mac80211]
->  __dev_open+0x270/0x498 net/core/dev.c:1474
->  __dev_change_flags+0x47c/0x610 net/core/dev.c:8837
->  dev_change_flags+0x98/0x170 net/core/dev.c:8909
->  devinet_ioctl+0xdf0/0x18d0 net/ipv4/devinet.c:1177
->  inet_ioctl+0x34c/0x388 net/ipv4/af_inet.c:1003
->  sock_do_ioctl+0xe4/0x240 net/socket.c:1222
->  sock_ioctl+0x4cc/0x740 net/socket.c:1341
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:907 [inline]
->  __se_sys_ioctl fs/ioctl.c:893 [inline]
->  __arm64_sys_ioctl+0x184/0x218 fs/ioctl.c:893
->  __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
->  invoke_syscall+0x90/0x2e8 arch/arm64/kernel/syscall.c:48
->  el0_svc_common.constprop.0+0x200/0x2a8 arch/arm64/kernel/syscall.c:131
->  el0_svc+0x48/0xc0 arch/arm64/kernel/entry-common.c:712
->  el0t_64_sync_handler+0x120/0x130 arch/arm64/kernel/entry-common.c:730
->  el0t_64_sync+0x190/0x198 arch/arm64/kernel/entry.S:598
-> 
-> This patch attempts to fix that issue with the same convention.
-> 
-> Cc: stable@vger.kernel.org # v6.1+
-> Fixes: deee93d13d38 ("Bluetooth: use hdev->workqueue when queuing hdev->
-> {cmd,ncmd}_timer works")
-
-nit: Fixes tags should not be line-wrapped.
-
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> Tested-by: Yunseong Kim <yskelg@gmail.com>
-> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
-
-...
+I'm not saying it's needed.
+But it does sound nice to me.
 
