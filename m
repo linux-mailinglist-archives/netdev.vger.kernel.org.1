@@ -1,364 +1,167 @@
-Return-Path: <netdev+bounces-112854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0C5F93B807
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:26:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8865D93B81A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 22:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1101C20B74
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:26:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C5C11F21881
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 20:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C7416DC0F;
-	Wed, 24 Jul 2024 20:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F6573446;
+	Wed, 24 Jul 2024 20:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LD9lo4EZ"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ZcNps47e";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ZcNps47e"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF5A16D9A3
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 20:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFB04AEF6;
+	Wed, 24 Jul 2024 20:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721852779; cv=none; b=Agg9QyR7cWXfS59wrfn4o2qIo+U3hi7evzkcjMgeyo3fombZGrruvRkaUegUqYf3APkcFriNP9N2VMKi5k1BfLtVLIdyfOKy5maFqI0fUBXoyy3ToJID3jHgqvyy5/EIP/S9+8gQEMKH3isf1R1l4upNdihz/oN07gDhrt0kZ9I=
+	t=1721853445; cv=none; b=irk7nABfOSOuhn+Cj30wyZM9pG3UAPy1ANzN8+qYN4hEv9kvQQ9cl+DfhLwSSfFXdcCXedNa9ifuNXeHydfXCRkirkblRXCgImZU6bNXLpOEjqZiuFcQ54MVUpesa4Wnr2e0zVbAUtETXOXNHRCXEIWi/bX6wFwgYV2EU9TSiyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721852779; c=relaxed/simple;
-	bh=RbzSgmgBBI8YzJU/YPdTaqv2lwrzNnCLPsPZiL+2Pd4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FZ+7Ccs3Cn8DRQsc2tbhpCWFkueKb3c0KEnULeflJUF5m+Hpi6f2JoLZpkL4z0e8S5jSldzkbttANhp3REIcVYGvP2hjhRzNXomzdruhv2INisnpvtUwC07V7lXlNd8u75EZoqSyuz2CmigiacQIGXAkHlDC1oX4wSuEqMJlSlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LD9lo4EZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721852776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MTjvhZQfnXYSVRbGUu7SN6OhlrkRDVnZLAEQiAJ0WzQ=;
-	b=LD9lo4EZ19OpU0mUpmaK1mKCdzn9UIBTF4tvkv4SAU+/5Q9NX2KfmxcGy5afAMp/cEZeqF
-	PrwtNFa3C6JL7e/tP0zlkUKwYVmgoccBruLTGuJfqdJWrW7VHrYt1XHhG+cNBTBx4WCLOZ
-	RscWGsbpkoWoCxb39hn1AKgJXk4lw3E=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-664-kPJTY1WfPtaUcffNls3kOw-1; Wed,
- 24 Jul 2024 16:26:13 -0400
-X-MC-Unique: kPJTY1WfPtaUcffNls3kOw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	s=arc-20240116; t=1721853445; c=relaxed/simple;
+	bh=lPZvqySYXn0Ih/XTQwAHKD1AQY0p+922RJESktRa07s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YbZ2U52erzHoyGlmD2Fp8Lbx3u+a9XXDhdmIiFb9q4NRpmgC4PiJcyIxQTiLDh3vIQT/uGNJhJxqM3nUV/6FixFkVXgpiwglgXvENYKVPsFLNuY+cJ33GnT9kz1VMxL3F7ka5Gkk03EK/zDdrRnD41DXjf/FskIQFODdYKOZfq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=ZcNps47e; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=ZcNps47e; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1721853443;
+	bh=lPZvqySYXn0Ih/XTQwAHKD1AQY0p+922RJESktRa07s=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=ZcNps47eri30xAk1Tju9WWaFYf3akmDYtLb32+G5m/O4Lk3zpSUL0gbmCVR30VgdP
+	 yuf5V7oV17But2SQmo+j69gHNcqTM4jJsnWTAdTZHNYgelQ5Q0bEqtlzCNYuTGb7HS
+	 zNk+ZWw6URN4qIHekyPhmzpA3fFwZ7uw+uAsM29A=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 8CD2812868A3;
+	Wed, 24 Jul 2024 16:37:23 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id ZP4tu15uyvwQ; Wed, 24 Jul 2024 16:37:23 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1721853443;
+	bh=lPZvqySYXn0Ih/XTQwAHKD1AQY0p+922RJESktRa07s=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=ZcNps47eri30xAk1Tju9WWaFYf3akmDYtLb32+G5m/O4Lk3zpSUL0gbmCVR30VgdP
+	 yuf5V7oV17But2SQmo+j69gHNcqTM4jJsnWTAdTZHNYgelQ5Q0bEqtlzCNYuTGb7HS
+	 zNk+ZWw6URN4qIHekyPhmzpA3fFwZ7uw+uAsM29A=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::db7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60B621955BF1;
-	Wed, 24 Jul 2024 20:26:11 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.6])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9DE2519560AE;
-	Wed, 24 Jul 2024 20:26:07 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH RFC v2 11/11] iavf: add support to exchange qos capabilities
-Date: Wed, 24 Jul 2024 22:24:57 +0200
-Message-ID: <b703eefd0cb82597054c53e07df4719080ab1860.1721851988.git.pabeni@redhat.com>
-In-Reply-To: <cover.1721851988.git.pabeni@redhat.com>
-References: <cover.1721851988.git.pabeni@redhat.com>
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id B23201286899;
+	Wed, 24 Jul 2024 16:37:22 -0400 (EDT)
+Message-ID: <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+  ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+ linux-rdma@vger.kernel.org,  netdev@vger.kernel.org, jgg@nvidia.com
+Date: Wed, 24 Jul 2024 16:37:21 -0400
+In-Reply-To: <20240724200012.GA23293@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+	 <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+	 <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+	 <20240724200012.GA23293@pendragon.ideasonboard.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 7bit
 
-From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
+[...]
+> What I get from the discussions I've followed or partcipated in over
+> the years is that the main worry of free software communities is
+> being forced to use closed-source userspace components, whether that
+> would be to make the device usable at all, or to achieve decent level
+> of performance or full feature set. We've been through years of
+> mostly closed-source GPU support, of printer "windrivers", and quite
+> a few other horrors. The good news is that we've so far overcome lots
+> (most) of those challenges. Reverse engineering projects paid off,
+> and so did working hand-in-hand with industry actors in multiple ways
+> (both openly and behind the scenes). One could then legitimately ask
+> why we're still scared.
 
-During driver initialization VF determines QOS capability is allowed
-by PF and receives QOS parameters. After which quanta size for queues
-is configured which is not configurable and is set to 1KB currently.
+I don't think I am.  We're mostly fully capable of expounding at length
+on the business rationale for being open if the thing they're hiding
+isn't much of a differentiator anyway (or they're simply hiding it to
+try to retain some illusion of control), so we shouldn't have any fear
+of being able to make our case in language business people understand.
 
-Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf.h        | 10 ++
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 46 +++++++++-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 92 ++++++++++++++++++-
- 3 files changed, 145 insertions(+), 3 deletions(-)
+I also think this fear is partly a mindset problem on our part.  We
+came out of the real fight for openness and we do embrace things like a
+licence that forces open code (GPL) and symbols that discourage
+proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
+FSF coolaid that if we don't stand over manufacturers every second and
+force them they'll slide back to their old proprietary ways.  However,
+if you look at the entirely permissive ecosystem that grew up after we
+did (openstack, docker, kubernetes, etc.) they don't have any such fear
+and yet they still have large amounts of uncompelled openness and give
+back.
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index f5d1142ea427..dd9cca067360 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -250,6 +250,9 @@ struct iavf_cloud_filter {
- #define IAVF_RESET_WAIT_DETECTED_COUNT 500
- #define IAVF_RESET_WAIT_COMPLETE_COUNT 2000
- 
-+#define IAVF_MAX_QOS_TC_NUM		8
-+#define IAVF_DEFAULT_QUANTA_SIZE	1024
-+
- /* board specific private data structure */
- struct iavf_adapter {
- 	struct workqueue_struct *wq;
-@@ -337,6 +340,8 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
- #define IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW		BIT_ULL(39)
-+#define IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE		BIT_ULL(40)
-+#define IAVF_FLAG_AQ_GET_QOS_CAPS			BIT_ULL(41)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -407,6 +412,8 @@ struct iavf_adapter {
- 			       VIRTCHNL_VF_OFFLOAD_FDIR_PF)
- #define ADV_RSS_SUPPORT(_a) ((_a)->vf_res->vf_cap_flags & \
- 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
-+#define QOS_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+			 VIRTCHNL_VF_OFFLOAD_QOS)
- 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
- 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
- 	struct virtchnl_version_info pf_version;
-@@ -415,6 +422,7 @@ struct iavf_adapter {
- 	struct virtchnl_vlan_caps vlan_v2_caps;
- 	u16 msg_enable;
- 	struct iavf_eth_stats current_stats;
-+	struct virtchnl_qos_cap_list *qos_caps;
- 	struct iavf_vsi vsi;
- 	u32 aq_wait_count;
- 	/* RSS stuff */
-@@ -554,6 +562,8 @@ int iavf_config_rss(struct iavf_adapter *adapter);
- int iavf_lan_add_device(struct iavf_adapter *adapter);
- int iavf_lan_del_device(struct iavf_adapter *adapter);
- void iavf_cfg_queues_bw(struct iavf_adapter *adapter);
-+void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter);
-+void iavf_get_qos_caps(struct iavf_adapter *adapter);
- void iavf_enable_channels(struct iavf_adapter *adapter);
- void iavf_disable_channels(struct iavf_adapter *adapter);
- void iavf_add_cloud_filter(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 3a5ae0cd31c7..0ee128477d59 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2090,6 +2090,16 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return 0;
- 	}
- 
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_QOS_CAPS) {
-+		iavf_get_qos_caps(adapter);
-+		return 0;
-+	}
-+
-+	if (adapter->aq_required & IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE) {
-+		iavf_cfg_queues_quanta_size(adapter);
-+		return 0;
-+	}
-+
- 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES) {
- 		iavf_configure_queues(adapter);
- 		return 0;
-@@ -2675,6 +2685,9 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
- 		/* request initial VLAN offload settings */
- 		iavf_set_vlan_offload_features(adapter, 0, netdev->features);
- 
-+	if (QOS_ALLOWED(adapter))
-+		adapter->aq_required |= IAVF_FLAG_AQ_GET_QOS_CAPS;
-+
- 	iavf_schedule_finish_config(adapter);
- 	return;
- 
-@@ -4809,7 +4822,27 @@ iavf_verify_shaper_info(struct net_device *dev,
- 			const struct net_shaper_info *shaper,
- 			struct netlink_ext_ack *extack)
- {
--	return iavf_verify_handle(dev, shaper->handle, extack);
-+	struct iavf_adapter *adapter = netdev_priv(dev);
-+	enum net_shaper_scope scope;
-+	int ret, qid;
-+	u64 vf_max;
-+
-+	ret = iavf_verify_handle(dev, shaper->handle, extack);
-+	if (ret)
-+		return ret;
-+
-+	scope = net_shaper_handle_scope(shaper->handle);
-+	qid = net_shaper_handle_id(shaper->handle);
-+
-+	if (scope == NET_SHAPER_SCOPE_QUEUE) {
-+		vf_max = adapter->qos_caps->cap[0].shaper.peak;
-+		if (vf_max && shaper->bw_max > vf_max) {
-+			NL_SET_ERR_MSG_FMT(extack, "Max rate (%llu) of queue %d can't exceed max TX rate of VF (%llu kbps)",
-+					   shaper->bw_max, qid,
-+					   vf_max);
-+		}
-+	}
-+	return 0;
- }
- 
- /**
-@@ -5073,7 +5106,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	struct net_device *netdev;
- 	struct iavf_adapter *adapter = NULL;
- 	struct iavf_hw *hw = NULL;
--	int err;
-+	int err, len;
- 
- 	err = pci_enable_device(pdev);
- 	if (err)
-@@ -5141,6 +5174,13 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	hw->bus.func = PCI_FUNC(pdev->devfn);
- 	hw->bus.bus_id = pdev->bus->number;
- 
-+	len = struct_size(adapter->qos_caps, cap, IAVF_MAX_QOS_TC_NUM);
-+	adapter->qos_caps = kzalloc(len, GFP_KERNEL);
-+	if (!adapter->qos_caps) {
-+		err = -ENOMEM;
-+		goto err_alloc_qos_cap;
-+	}
-+
- 	/* set up the locks for the AQ, do this only once in probe
- 	 * and destroy them only once in remove
- 	 */
-@@ -5179,6 +5219,8 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Initialization goes on in the work. Do not add more of it below. */
- 	return 0;
- 
-+err_alloc_qos_cap:
-+	iounmap(hw->hw_addr);
- err_ioremap:
- 	destroy_workqueue(adapter->wq);
- err_alloc_wq:
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index c0611608d332..2f1be42ebd58 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -150,7 +150,8 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_USO |
- 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
- 	       VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF |
--	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED;
-+	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED |
-+	       VIRTCHNL_VF_OFFLOAD_QOS;
- 
- 	adapter->current_op = VIRTCHNL_OP_GET_VF_RESOURCES;
- 	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_CONFIG;
-@@ -1506,6 +1507,76 @@ iavf_set_adapter_link_speed_from_vpe(struct iavf_adapter *adapter,
- 		adapter->link_speed = vpe->event_data.link_event.link_speed;
- }
- 
-+/**
-+ * iavf_get_qos_caps - get qos caps support
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF for Supported QoS Caps.
-+ */
-+void iavf_get_qos_caps(struct iavf_adapter *adapter)
-+{
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot get qos caps, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_GET_QOS_CAPS;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_QOS_CAPS;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_QOS_CAPS, NULL, 0);
-+}
-+
-+/**
-+ * iavf_set_quanta_size - set quanta size of queue chunk
-+ * @adapter: iavf adapter struct instance
-+ * @quanta_size: quanta size in bytes
-+ * @queue_index: starting index of queue chunk
-+ * @num_queues: number of queues in the queue chunk
-+ *
-+ * This function requests PF to set quanta size of queue chunk
-+ * starting at queue_index.
-+ */
-+static void
-+iavf_set_quanta_size(struct iavf_adapter *adapter, u16 quanta_size,
-+		     u16 queue_index, u16 num_queues)
-+{
-+	struct virtchnl_quanta_cfg quanta_cfg;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set queue quanta size, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUANTA;
-+	quanta_cfg.quanta_size = quanta_size;
-+	quanta_cfg.queue_select.type = VIRTCHNL_QUEUE_TYPE_TX;
-+	quanta_cfg.queue_select.start_queue_id = queue_index;
-+	quanta_cfg.queue_select.num_queues = num_queues;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUANTA,
-+			 (u8 *)&quanta_cfg, sizeof(quanta_cfg));
-+}
-+
-+/**
-+ * iavf_cfg_queues_quanta_size - configure quanta size of queues
-+ * @adapter: adapter structure
-+ *
-+ * Request that the PF configure quanta size of allocated queues.
-+ **/
-+void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter)
-+{
-+	int quanta_size = IAVF_DEFAULT_QUANTA_SIZE;
-+
-+	/* Set Queue Quanta Size to default */
-+	iavf_set_quanta_size(adapter, quanta_size, 0,
-+			     adapter->num_active_queues);
-+}
-+
- /**
-  * iavf_cfg_queues_bw - configure bandwidth of allocated queues
-  * @adapter: iavf adapter structure instance
-@@ -2280,6 +2351,14 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 					VIRTCHNL_RSS_ALG_TOEPLITZ_SYMMETRIC;
- 
- 			break;
-+		case VIRTCHNL_OP_GET_QOS_CAPS:
-+			dev_warn(&adapter->pdev->dev, "Failed to Get Qos CAPs, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
-+		case VIRTCHNL_OP_CONFIG_QUANTA:
-+			dev_warn(&adapter->pdev->dev, "Failed to Config Quanta, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
- 		case VIRTCHNL_OP_CONFIG_QUEUE_BW:
- 			dev_warn(&adapter->pdev->dev, "Failed to Config Queue BW, error %s\n",
- 				 iavf_stat_str(&adapter->hw, v_retval));
-@@ -2618,6 +2697,17 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		if (!v_retval)
- 			iavf_netdev_features_vlan_strip_set(netdev, false);
- 		break;
-+	case VIRTCHNL_OP_GET_QOS_CAPS: {
-+		u16 len = struct_size(adapter->qos_caps, cap,
-+				      IAVF_MAX_QOS_TC_NUM);
-+
-+		memcpy(adapter->qos_caps, msg, min(msglen, len));
-+
-+		adapter->aq_required |= IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE;
-+		}
-+		break;
-+	case VIRTCHNL_OP_CONFIG_QUANTA:
-+		break;
- 	case VIRTCHNL_OP_CONFIG_QUEUE_BW: {
- 		int i;
- 		/* shaper configuration is successful for all queues */
--- 
-2.45.2
+> I can't fully answer that question, but there are two points that I
+> think are relevant. Note that due to my background and experience,
+> this will be heavily biased towards consumer and embedded hardware,
+> not data centre-grade devices. Some technologies from the latter
+> however have a tendency to migrate to the former over time, so the
+> distinction isn't necessarily as relevant as one may consider.
+> 
+> The first point is that hardware gets more complicated over time, and
+> in some markets there's also an increase in the number of vendors and
+> devices. There's a perceived (whether true or not) danger that we
+> won't be able to keep up with just reverse engineering and a
+> development model relying on hobyists. Getting vendors involved is
+> important if we want to scale.
+
+Yes, but there are lots of not very useful complex devices being
+produced every day that fail to capture market share.  Not having
+reverse engineered drivers for them is no real loss.  If a device does
+gain market share, it gains a huge pool of users some of whom become
+interested in reverse engineering, so I think market forces actually
+work in our favour: we get reverse engineering mostly where the devices
+are actually interesting and capture market share.  It's self scaling.
+
+> Second, I think there's a fear of regression. For some categories of
+> devices, we have made slow but real progress to try and convince the
+> industry to be more open. This sometimes took a decade of work,
+> patiently building bridges and creating ecosystems brick by brick.
+> Some of those ecosystems are sturdy, some not so. Giving pass-through
+> a blank check will likely have very different effects in different
+> areas. I don't personally believe it will shatter everything, but I'm
+> convinced it carries risk in areas where cooperation with vendors is
+> in its infancy or is fragile for any other reason.
+
+I also think we're on the rise in this space.  Since most cloud
+workloads are on Linux, there's huge market pressure on most "found in
+the cloud" devices (like accelerators and GPUs) to have an easy to
+consume Linux story.  Nvidia is a case in point.  When it only cared
+about fast games on some other OS, we get shafted with a proprietary
+graphics drivers.  Now it's under pressure to be the number one AI
+accelerator provider for the cloud it's suddenly wondering about open
+source drivers to make adoption easier.
+
+> Finally, let's not forget that pass-through APIs are not an all or
+> nothing option. To cite that example only, DRM requires GPU drivers
+> to have an open-source userspace implementation to merge the kernel
+> driver, and the same subsystems strongly pushes for API
+> standardization for display controllers. We can set different rules
+> for different cases.
+
+I certainly think we can afford to experiment here, yes.
+
+James
 
 
