@@ -1,142 +1,160 @@
-Return-Path: <netdev+bounces-112813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD6AB93B574
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:00:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED61C93B57A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 19:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B1E51C23B63
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 17:00:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 983DF1F23BBA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 17:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC15816EB7A;
-	Wed, 24 Jul 2024 16:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1115D15F3ED;
+	Wed, 24 Jul 2024 17:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G4OyGsC1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5/lwebi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2121516D9D7;
-	Wed, 24 Jul 2024 16:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7795415F3FE;
+	Wed, 24 Jul 2024 17:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721840323; cv=none; b=ut9GS8inUhBBq1U+85bbyjGVkyMvcuFlnyq4OgjPQaO3k/hSv2Ds23hIyg5Wnl1MXaOng5PkyCOLD77TpYxnwTovQHGMQiIQlzrTouTnst1/6jX26D/mhHjqUwaM+gNCki4305fu/h7KH1KWDmj+QNMGGc8sfKZ8KM39t4bmy3I=
+	t=1721840444; cv=none; b=Ggwjv+c+vkXqAY9dbyfvAaSRjGdd8SvLcTPw2/hoko5cN41LiSp1kQbaxqUikaqnxmOypT9OOMQfdkDDyrqfcqpcIOd/vXpFDdhOt9vOVIUk99FP2dE+tw2bq7OIvVzfkJ35bcDLtebIxnBLKnsbWkIMYSY1wCndKv1ThLEdHCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721840323; c=relaxed/simple;
-	bh=78cTlGOON8+LDz3iPFPQlv471L1LvIyJOUR08Ru6yKE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=la2+AO+kxSMBriSZ8HiJI0hy6/Ae2yNg4jOMwTY4I994Ze3gL69KG+xfXir/B16jZE9kjrepLO6efZakynuKF1AV4Y7fpS2UjlnbXpgX8IBowYcDRrgHxW2vGe3QWuvSKrCHygFI3N6UcJ5kr7P7q9jRdrxhcLrgsVhDjDI35YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G4OyGsC1; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721840323; x=1753376323;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=78cTlGOON8+LDz3iPFPQlv471L1LvIyJOUR08Ru6yKE=;
-  b=G4OyGsC1fFITed8QPH17fLdZDhQC6OVuIggHU4ZB0Rx2o/WesVAnpnMq
-   GfU3JmvfN1HDyG2NB2nS9Hjsrw0SJbJqC9hW2gORtzR1YrKzxE3knEeNs
-   pdKOle0UdtEVZxRMmFY+km5yv7UUxa3CSrbDuIAHXPu/BVHBC5CLrwFpx
-   vhUJL0j8WSAEhsKLLfKYVMK4xD1qPpKWkGeaXHXzB3uAUdlLylp4JGIh5
-   TsdaeER1XnU5n/K9z+XKmH//ZC0ZxvuRKTZJPfhiCjMAZ6JjZrD2HxyxX
-   9cDt73BrMft+aXKvuBVzKXJXOhCjZjVC1UaEYAcR6OuKYsmD6vsOWValW
-   Q==;
-X-CSE-ConnectionGUID: HUukK3aVRgSUEaXiKgdQfQ==
-X-CSE-MsgGUID: 2W0kx4naT7WHVW0/xQnAnQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="30679808"
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="30679808"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 09:58:42 -0700
-X-CSE-ConnectionGUID: 0P2upW94T22UPkkd7wmRmw==
-X-CSE-MsgGUID: KIIZe/GaQguqGXc9K6DSug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="56960638"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa005.fm.intel.com with ESMTP; 24 Jul 2024 09:58:38 -0700
-Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id AC06228785;
-	Wed, 24 Jul 2024 17:58:36 +0100 (IST)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>
-Subject: [PATCH iwl-net v2 6/6] ice: do not bring the VSI up, if it was down before the XDP setup
-Date: Wed, 24 Jul 2024 18:48:37 +0200
-Message-ID: <20240724164840.2536605-7-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240724164840.2536605-1-larysa.zaremba@intel.com>
-References: <20240724164840.2536605-1-larysa.zaremba@intel.com>
+	s=arc-20240116; t=1721840444; c=relaxed/simple;
+	bh=L9FBaIo9sLKEktVMvBhb0N/RQUJeBgeJKo5uJsvx9Qc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qyi672lm8heA+QUgByR+cs5fZtBk9f5C4/evuP7WJJfAYL1q02TQNKFDACedoJeyFJstggGwjzNj3J+j+gcPHsklvVt3zEJ2SkeUbYNhegU9wLfgfWr1PNmcDoOy3E7YGkxhXpMUwnAxNbPSei11BZKlLR17VbgXITdKzenzvuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E5/lwebi; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e05eccfcdb3so6541338276.1;
+        Wed, 24 Jul 2024 10:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721840441; x=1722445241; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JjWUCwC2vBkyT5arSqYAONMAqVJ7Hmul4z98hr9nc80=;
+        b=E5/lwebiIbSfmry5Td7uWM6y2xgkgqRcqvT6smlS21T00mx0/Cq8aRIcxpJnh/knwr
+         fpB601CDeA2oiX/vFlt/DHYYAPgpTp4CbJALifkwTWJlGDXPXtbrNla95ZitA4bAwONx
+         J2q+VGkBVoelNyIDlD0kGYnBk8x2Uk2vbFjH26ronYbyJpVwta/wN1mTOQqaUwwGhJPn
+         TDnVx9Kum0m9kfc4GrQMfi27+vQVmLLG8/gZaAl3EO4trYRHAK6xgORL8s6uHn30zHoi
+         4cT25F30m6ibExZQTbO9O98an4Wbct1BnQ7NZDH7/0euZE1/UHV6r//iQg9wLU1Nk0oS
+         tP4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721840441; x=1722445241;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JjWUCwC2vBkyT5arSqYAONMAqVJ7Hmul4z98hr9nc80=;
+        b=v3+gaEkKIV6YTNv1I4o3E1OSg2KKb0HW56AI23yvQLkMuZ65n4J8cRdZZKAuIn/xAM
+         YzVxc2XyWsTmtJB97a4NsDBPC9GIxfXYWUAQOSsmKOo8cUuK21efQcTJ2/XfGtnT7CrE
+         HaD/FyRGABKrY/BmgBzri5/EVh83HD+rUedpqthZrLOYUKj4/a2BkUIP4Kf4DyuCjJeC
+         NYdh9H9+MbK5dNIQJY6tlCApyqLDwr3LglXBs1EtSzrLhMSf0V4PjN+A7QdQWx84gRvz
+         vidb6gyuYtaqrrRdML9stps4dwDpofUMWbcdhqACNdYP/LwRzRlc9uVFdpyMaoPA3SVk
+         MXsg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+RzMRkKzEudv3fpUVqg11v2gNFJyvMX3fyRaW7qNzTlIslB/6b7fnjajWpQYNAawjMs9HZIWB9atz5FQbpWr/MXEPpXzf
+X-Gm-Message-State: AOJu0YwP4JxsopyMD4R4r8ON+eJa6uP+jqLJ9gZvkzFZ1Qj8lneP/D6+
+	SvQhikkzab/qzFvK3vEGm9SNe1WkxXMm2V6oW0Y0eJ8SlS+gmzoS8xJzRrKSfk8BMPKFuTtVY80
+	MgTUsI4idoXs63wOIFXdJ0JSHbkM=
+X-Google-Smtp-Source: AGHT+IH7ntmzlI2bt5BYDM95Cjq2pryxaHW7IYCoJvrYqc/u9frLEKpEl/5nLHP3sd/Q+w1yareRKewqel+gVUgZW8Y=
+X-Received: by 2002:a05:6902:2b11:b0:e08:54db:46b8 with SMTP id
+ 3f1490d57ef6-e0b232f9be8mr109925276.43.1721840441251; Wed, 24 Jul 2024
+ 10:00:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+ <20240714175130.4051012-2-amery.hung@bytedance.com> <907f24f2-0f33-415e-85c6-0400ab67f896@linux.dev>
+In-Reply-To: <907f24f2-0f33-415e-85c6-0400ab67f896@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Wed, 24 Jul 2024 10:00:30 -0700
+Message-ID: <CAMB2axNDVCdH7stBj8-duOcV1P=qjyjUAR+YXywVMx8HgRPokg@mail.gmail.com>
+Subject: Re: [RFC PATCH v9 01/11] bpf: Support getting referenced kptr from
+ struct_ops argument
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com, 
+	martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, sdf@google.com, xiyou.wangcong@gmail.com, 
+	yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-After XDP configuration is completed, we bring the interface up
-unconditionally, regardless of its state before the call to .ndo_bpf().
+On Tue, Jul 23, 2024 at 5:32=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 7/14/24 10:51 AM, Amery Hung wrote:
+> > @@ -21004,6 +21025,13 @@ static int do_check_common(struct bpf_verifier=
+_env *env, int subprog)
+> >               mark_reg_known_zero(env, regs, BPF_REG_1);
+> >       }
+> >
+> > +     if (env->prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+> > +             ctx_arg_info =3D (struct bpf_ctx_arg_aux *)env->prog->aux=
+->ctx_arg_info;
+> > +             for (i =3D 0; i < env->prog->aux->ctx_arg_info_size; i++)
+> > +                     if (ctx_arg_info[i].refcounted)
+> > +                             ctx_arg_info[i].ref_obj_id =3D acquire_re=
+ference_state(env, 0);
+> > +     }
+> > +
+>
+> I think this will miss a case when passing the struct_ops prog ctx (i.e. =
+"__u64
+> *ctx") to a global subprog. Something like this:
+>
+> __noinline int subprog_release(__u64 *ctx __arg_ctx)
+> {
+>         struct task_struct *task =3D (struct task_struct *)ctx[1];
+>         int dummy =3D (int)ctx[0];
+>
+>         bpf_task_release(task);
+>
+>         return dummy + 1;
+> }
+>
+> SEC("struct_ops/subprog_ref")
+> __failure
+> int test_subprog_ref(__u64 *ctx)
+> {
+>         struct task_struct *task =3D (struct task_struct *)ctx[1];
+>
+>         bpf_task_release(task);
+>
+>         return subprog_release(ctx);;
+> }
+>
+> SEC(".struct_ops.link")
+> struct bpf_testmod_ops subprog_ref =3D {
+>         .test_refcounted =3D (void *)test_subprog_ref,
+> };
+>
 
-Preserve the information whether the interface had to be brought down and
-later bring it up only in such case.
+Thanks for pointing this out. The test did failed.
 
-Fixes: efc2214b6047 ("ice: Add support for XDP")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+> A quick thought is, I think tracking the ctx's ref id in the env->cur_sta=
+te may
+> not be the correct place.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index d7cc641643f8..d83cde431fa5 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3000,8 +3000,8 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		   struct netlink_ext_ack *extack)
- {
- 	unsigned int frame_size = vsi->netdev->mtu + ICE_ETH_PKT_HDR_PAD;
--	bool if_running = netif_running(vsi->netdev);
- 	int ret = 0, xdp_ring_err = 0;
-+	bool if_running;
- 
- 	if (prog && !prog->aux->xdp_has_frags) {
- 		if (frame_size > ice_max_xdp_frame_size(vsi)) {
-@@ -3018,8 +3018,11 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		return 0;
- 	}
- 
-+	if_running = netif_running(vsi->netdev) &&
-+		     !test_and_set_bit(ICE_VSI_DOWN, vsi->state);
-+
- 	/* need to stop netdev while setting up the program for Rx rings */
--	if (if_running && !test_and_set_bit(ICE_VSI_DOWN, vsi->state)) {
-+	if (if_running) {
- 		ret = ice_down(vsi);
- 		if (ret) {
- 			NL_SET_ERR_MSG_MOD(extack, "Preparing device for XDP attach failed");
--- 
-2.43.0
+I think it is a bit tricky because subprogs are checked independently
+and their state is folded (i.e., there can be multiple edges from the
+main program to a subprog).
 
+Maybe the verifier can rewrite the program: set the refcounted ctx to
+NULL when releasing reference. Then, in do_check_common(), if it is a
+global subprog, we mark refcounted ctx as PTR_MAYBE_NULL to force a
+runtime check. How does it sound?
+
+>
+> [ Just want to bring up what I have noticed so far. I will stop at here f=
+or
+> today and will continue. ]
 
