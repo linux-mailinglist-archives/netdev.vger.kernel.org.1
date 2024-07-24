@@ -1,106 +1,118 @@
-Return-Path: <netdev+bounces-112767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D06393B1B3
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:36:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8592A93B1B9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 15:37:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AE561F24242
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:36:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E21D28149E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB282158DC5;
-	Wed, 24 Jul 2024 13:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA76158D6A;
+	Wed, 24 Jul 2024 13:37:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FQOmzKqO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvjm51Xa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01E1158DA0;
-	Wed, 24 Jul 2024 13:36:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E191586D5;
+	Wed, 24 Jul 2024 13:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721828171; cv=none; b=IyBpufx7U9LXIvZ1jg/1aa4ki7kyn/k2PfGVfDcFcHnUSYsrlIA2Lathqp1Q8sb6Xw/PyDUAvEJdAknNtyihcDvbllnofm1vB9jzpm3w+cVWU1LCoTvxWaNrqAOmg4Qaaz15N4aVszDwdyeWJnRM6dSgT5LqWc5oZqABmykwS7A=
+	t=1721828242; cv=none; b=mJ1SkUL/hcUzyfeMDvFc0JiGX7+FV4ekhE7N3S9Cybo2AvejN5BI/vPSOt+tHwM+9PRpA5Tx5UlodPmnqcYp5KcvqessULm4R9hjQZpdlX44dhhYJyXBvsUxpPap2gfB81fXAcC9WBj70wpEyPzmWsGm3tG8P/rhcqam2EeUfFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721828171; c=relaxed/simple;
-	bh=qDPJZ27dnCT+ZblWUcm8KrCxgsFNh1NJtoEY0poztWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lnDAtjPisoXm8fIdidCkI7WisOQw55jgj9dlm+xVG5lXrarRvm9NoSzpxdhsyJvxfZMgT9X1j8S9q51D74AE+hMOFYYBhqHjPaHbhw498AaVVV8iNuQgY3mghYpQiktodyMd2f584uA9aNmXmH4RTm0lOICVC3WFedChbtK/kyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FQOmzKqO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE208C4AF0C;
-	Wed, 24 Jul 2024 13:36:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1721828171;
-	bh=qDPJZ27dnCT+ZblWUcm8KrCxgsFNh1NJtoEY0poztWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FQOmzKqOZvSYxe7B79yn2ryRFXJ1z92lFjnTiP1I1NK6RT4DESK3MA2O1L5wMnGtO
-	 HzvvOrrJSy/68NLjaDNG41gGDcq4KDRiKIWOsem9au9gGukt7vQIDdd5vHJezOj0p7
-	 puLYtCRXrT7ocyAheQPQgy6wZpKXAKD96QtdmzlQ=
-Date: Wed, 24 Jul 2024 15:36:08 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
- module
-Message-ID: <2024072430-scorn-pushover-7d8a@gregkh>
-References: <20240724102349.430078-1-jtornosm@redhat.com>
- <8a85af94-8911-44b8-9516-2f532cee607d@lunn.ch>
+	s=arc-20240116; t=1721828242; c=relaxed/simple;
+	bh=ta2/8Z37mh5TxPJfz6mZycKBtVDsPV8CcXDS7O6GkZk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HHEA+9n2MkAsVQLOXFBvYgeFByZUOBL3jZ5rAgsBvUZamTIPrh6ytGxdDkmt9iHeNvASwnwJsAePh4Ywk/5yCLxDnOHxfOfsuGwP5Tbxdllv/MxRFIyUz+621B9YnmI3V6sB7JRdYGbxIGvPmSCvrjgmZmMfBmm+QblB800b9f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lvjm51Xa; arc=none smtp.client-ip=209.85.214.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-1fc6a017abdso7580745ad.0;
+        Wed, 24 Jul 2024 06:37:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721828241; x=1722433041; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RmLOEPjtPW/NoAcNCjzI38rHsdFVG1KX6McVe0oeQa0=;
+        b=lvjm51XauwdSJsDu5zO13MgkTJd2H2c+ZFel1sA6n+JysqJ4bWavkVAOq8o37KzaEP
+         6jzFVVKygb2c8UA1YScTp0UJrlWK9sFWBOvBSBPIOkN3H2mSe217FdVkGt/ETKXzty5A
+         5UYiOE5C7x3yPbwVxeL5czKNwA1jHApn/8tzAfLlaKWt1HzVECmKP0aNXjD+kKAvmEiu
+         fENKhNvBXzgpwCg/BJNmSrtWT7MO1XRab9x0VO+ARJq0gGzuGJrFKWR3CePzYYabYkYH
+         GQ+2LWHB2sJhGPv9c5wsPUwZKbw/yo+UTtvjhg3fGV8CovT3isQuBWDF0owQfIJa0Pf3
+         d05A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721828241; x=1722433041;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RmLOEPjtPW/NoAcNCjzI38rHsdFVG1KX6McVe0oeQa0=;
+        b=BC0MnpSL+ZwaUy5WBahINYmR4qnDKWcCIIt0B43MGeln+5Dj0vAEI4H/FJHVIRdfD8
+         +6XNizp7GaTf4feYFycA7XS5NLHV8cZvF+0QF2i/G9Py8UFi5Lg7IAmJMkaBcZSNIndC
+         KqVSJi999iAgLwFbhlqHkcZp120ORDQoMKOQUohngwJTQcOTEVrc2A7scA4UwUY90/4p
+         BUx7tt0uG6W7inWJdmCKlfO5AbPzkA30HtIl3MS30Klw/hA4vagMvERiT5LPOT2CVyev
+         TfDcYmHI68pGBQQ+ka1aauA94Pdjd9bmcnetEbT0m8ucf35JN3Y9kBMsxo9gdnwmI3SH
+         peAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNgoROKM/1JmCcKj7CMp8h2nsgMx578K0TwvZtRCiPUwfNA3uKxLU63ac+kg0hJZ51fHWde2wqpl3ZD4/LBoa0gDwGrmQtuxYkGbiUUpPJ2ZeS7Yf2dEc81LxmgZmT3qmPKK9n
+X-Gm-Message-State: AOJu0Yx+tMLM7Y37oibTOm+vLwRmR8oo/7Z7xTuveG8cf3a/KKyIFezU
+	YBHZ0Sh+RHUfi7SoonRcKSsyaw2qlObsRtOzRJ0sbAt8EtljKOO/7yrVA7gt6DA=
+X-Google-Smtp-Source: AGHT+IEOt69E513PtiaVIIvBm8JbI6kOl4Aa5PFbXoAAIJvgnylR87hDVuBteEHxoaUIS37EtqmZ/Q==
+X-Received: by 2002:a17:902:bb88:b0:1fd:664b:225 with SMTP id d9443c01a7336-1fd74596fa0mr90868125ad.16.1721828240543;
+        Wed, 24 Jul 2024 06:37:20 -0700 (PDT)
+Received: from localhost.localdomain ([240e:604:203:6020:64ed:1e9d:db67:b575])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f31bd90sm94497425ad.173.2024.07.24.06.37.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 06:37:19 -0700 (PDT)
+From: Fred Li <dracodingfly@gmail.com>
+To: willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bpf v5] bpf: Fixed segment issue when downgrade gso_size
+Date: Wed, 24 Jul 2024 21:37:12 +0800
+Message-Id: <20240724133712.7263-1-dracodingfly@gmail.com>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+In-Reply-To: <CAF=yD-+Hx9Tg-Fj+7hutPJ7inL_GpgiY4WAXXdhN-tzj5Q1caQ@mail.gmail.com>
+References: <CAF=yD-+Hx9Tg-Fj+7hutPJ7inL_GpgiY4WAXXdhN-tzj5Q1caQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8a85af94-8911-44b8-9516-2f532cee607d@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 24, 2024 at 01:49:14PM +0200, Andrew Lunn wrote:
-> On Wed, Jul 24, 2024 at 12:23:44PM +0200, Jose Ignacio Tornos Martinez wrote:
-> > The related module for the phy is loaded dynamically depending on the
-> > current hardware. In order to keep this behavior and have the phy modules
-> > available from initramfs, add a 'weak' dependency with the phy modules to
-> > allow user tools, like dracut, get this information.
-> > 
-> > Include micrel phy module because it is the hardware that I have. Other
-> > possible phy modules can be added later.
-> > 
-> > Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> > ---
-> >  drivers/net/usb/lan78xx.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-> > index 8adf77e3557e..c3945aebf94e 100644
-> > --- a/drivers/net/usb/lan78xx.c
-> > +++ b/drivers/net/usb/lan78xx.c
-> > @@ -5074,3 +5074,4 @@ module_usb_driver(lan78xx_driver);
-> >  MODULE_AUTHOR(DRIVER_AUTHOR);
-> >  MODULE_DESCRIPTION(DRIVER_DESC);
-> >  MODULE_LICENSE("GPL");
-> > +MODULE_WEAKDEP("micrel");
+> >
+> > Linearize skb when downgrad gso_size to prevent triggering
+> > the BUG_ON during segment skb as described in [1].
+> >
+> > v5 changes:
+> >  - add bpf subject prefix.
+> >  - adjust message to imperative mood.
+> >
+> > v4 changes:
+> >  - add fixed tag.
+> >
+> > v3 changes:
+> >  - linearize skb if having frag_list as Willem de Bruijn suggested [2].
+> >
+> > [1] https://lore.kernel.org/all/20240626065555.35460-2-dracodingfly@gmail.com/
+> > [2] https://lore.kernel.org/all/668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch/
+> >
+> > Fixes: 2be7e212d541 ("bpf: add bpf_skb_adjust_room helper")
+> > Signed-off-by: Fred Li <dracodingfly@gmail.com>
 > 
-> ~/linux$ grep -r MODULE_WEAKDEP *
-> ~/linux$ 
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 > 
-> Is MODULE_WEAKDEP new?
-> 
-> It seems like a "Wack a Mole" solution, which is not going to
-> scale. Does dracut not have a set of configuration files indicating
-> what modules should be included, using wildcards? If you want to have
-> NFS root, you need all the network drivers, and so you need all the
-> PHY drivers?
+> My comments were informational, for a next patch if any, really. v4
+> was fine. v5 is too.
 
-Agree, this isn't ok, if you have a real dependancy, then show it as a
-real one please with the tools that we have to show that.
+Thanks for your advise.
 
-thanks,
+Fred Li
 
-greg k-h
 
