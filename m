@@ -1,116 +1,164 @@
-Return-Path: <netdev+bounces-112800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12CC93B496
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 18:11:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A395A93B4A2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 18:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 441D1282FAD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:10:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CC941F22D33
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BFA15ECD5;
-	Wed, 24 Jul 2024 16:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C9515EFAE;
+	Wed, 24 Jul 2024 16:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WcZcbIHr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wiNRq8MQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE57E15ECC1
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 16:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9493615EFC9
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 16:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721837439; cv=none; b=vCpwwr8NK6fXzFdrmuPhzo3B4dUgAZrk04Snedf7IGbLoZGGkhiT02xJTotpYbX2okgPJB+qeSbEHjdPDLUo6Q4fb0APrXxdvF3HHkFJ3fGv8nPN411gqG9h7saGFwuYQnCUPYbMCLvhuYuYa3J7rsrZopna5OyrElcCn122IcI=
+	t=1721837508; cv=none; b=bib70HL1Gta3eyyc4RMo5YC3u+SQSzdFYTERK5+xFNF9LGvhg9p6kJz9HavlDYAc1bXHQTn/5QP+vZNtntEiuMNETSkeUNGf1o9xE8EZ5tcdzUcDarb0F8HfBcB1/8Zyr6KlOC0QlK1j6ozsGX1owF+HTfJJ1mfUZo9eWUOk+O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721837439; c=relaxed/simple;
-	bh=xKuqmp5MN+0/pHZT6ZnqgPkG42DPVLE76u7nFnI4lRM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CLVLhYq9jkLmimNj4Jwotu0CzO6qsY2rWYHnWPmZL3qqYtlMT50kiSl6oMiG0aAvVNG66ah63R8w7cfcagY90bZks43n+mEU8eLx1e5pkK0NFMErg4nQ2PlaBJLgcc4RAsA33TPqY3lXCAWJnah/yvQZiVg/HV8CRqaLYq9eM1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WcZcbIHr; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721837436;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GRTjK/ZIhXoCrM7SewCkp9GyuhD3ieaXklrRHxctI+8=;
-	b=WcZcbIHrP0VdyT5KzjtTSxy6v818B+9AIJs9mKqcgz2MD8yglWYIZxqFIqCvIYgTE97C8P
-	hxnWkO1o5Hyb7Tw8TemYH09TVApxKrLOewEDYpyR/ez8PWNeaMDK5jGL+R043Re7KSutPn
-	bJnJ1j29/oeqvgnSP4byjU76oTMVrMM=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-6-7nXhFaTXN8Kz79bQcBuyvw-1; Wed,
- 24 Jul 2024 12:10:30 -0400
-X-MC-Unique: 7nXhFaTXN8Kz79bQcBuyvw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3563019560AD;
-	Wed, 24 Jul 2024 16:10:28 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.143])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C62C61955F40;
-	Wed, 24 Jul 2024 16:10:22 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: jtornosm@redhat.com
-Cc: UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	lucas.demarchi@intel.com,
-	mcgrof@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy module
-Date: Wed, 24 Jul 2024 18:10:19 +0200
-Message-ID: <20240724161020.442958-1-jtornosm@redhat.com>
-In-Reply-To: <20240724145458.440023-1-jtornosm@redhat.com>
-References: <20240724145458.440023-1-jtornosm@redhat.com>
+	s=arc-20240116; t=1721837508; c=relaxed/simple;
+	bh=W2bUjAP7MhfYd0F/wGCLhHPaYybJTOMSFQa7xR+R4+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qa+QnftM2bkjJE2Bdv6pJ6X/8fgp6Qy0LCQwyN2f5qxumEjoRsoxw6ZR2UQBcUDP5enJ3q3Q23l6lY67kKtochGceGvvcuZQ4mFkmXPnyDkcaMSYnDZK21Oc4oMBaHt0dV5dviVK20Rt6sMuaLj9BFOs50dC6YfRkdx8M7H/WMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wiNRq8MQ; arc=none smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3d9de9f8c8dso3726230b6e.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 09:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721837506; x=1722442306; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c35JIAd1RtfxDUn+Ffa74CAGm2VTsGX1wdwv6k5IrP4=;
+        b=wiNRq8MQtVdv0hKYCNGR3GgAABPZQSi1RTOjk/yjKTLbbJVWdp/VgBnKzQlT9T+gFf
+         IBAhrPBOiVnT2DLDzIRZJZvYdVNws+E+gUVHzbgrtct0aQLqlZge02fKmiQwO19ydGH9
+         eKI0ec9KTJUh1anW7Pex5Rlf0QltoPPZQvHq+gYyWoLl6sx7Gp9S2yOVpPsAc2HiDCiz
+         uFyhm9t+P5TeQeHWoTRVngmO5/aZVTKyzv8VCJXVUHTULdqXD0OE9WYe4RRwgDk2FFsG
+         XWPAAWgVDEYP89Y/goYFu2rhbr4MB367tYNGRyk+0MSyo0U43nlmzDxNlKuchvSeIMNY
+         EqcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721837506; x=1722442306;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c35JIAd1RtfxDUn+Ffa74CAGm2VTsGX1wdwv6k5IrP4=;
+        b=QwO6f0ZCMh+N+jYEtG3mzzYFrtCmt0ukA56FkJy6qAEDa05kB1cUrzP6TDzsgF3NK5
+         21L7yy7Lm0kAmhUsJiTwlu5Bf36qjF7qa7kp6ZjgyzXKl2v44uCzAkGoQqxZ6Ks/8uGx
+         lmMW3A32/OM7rdV4/jesjoG8W9zmBfeOL2foQjV4L0c/eUN+6l+xFROf96QF8KBmmOE0
+         M/qznFTyLfMY6tVU0PHh6R82MGOKjvtLhzpq8bW7rOKEnrITxfr95P8ymNoUx52ayhUl
+         IXcAPf7kNcefz2HddoXJ3DuKk9NXnKXdrqWLlkOcUs63qG+yg+usLEYkLiuDwd5/+KXw
+         uF4Q==
+X-Gm-Message-State: AOJu0Ywktg5bDrAZszZ/c/hDZBd6AomINRk95DJprOwbP3nQr0eo8zYb
+	dPiVpsDnfoTwQh1QZvZ6lmchPoatHaFN/rNiqY4g/eMqdmGT4JekAlXXO3UmD7k=
+X-Google-Smtp-Source: AGHT+IHSb8zBqIDnF8s6rDi6ddqCpOgI8zWB2B0SQDQrXsHZ1dzXL1rbc2zdWIwEn57hkeeglNaHIw==
+X-Received: by 2002:a05:6808:158f:b0:3d9:2ab5:c697 with SMTP id 5614622812f47-3db10f279dfmr72708b6e.20.1721837505752;
+        Wed, 24 Jul 2024 09:11:45 -0700 (PDT)
+Received: from localhost ([2603:8080:b800:f700:23ae:46cb:84b6:1002])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3dae09d5fa7sm2442487b6e.48.2024.07.24.09.11.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 09:11:45 -0700 (PDT)
+Date: Wed, 24 Jul 2024 11:11:43 -0500
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Raghu Vatsavayi <rvatsavayi@caviumnetworks.com>
+Cc: netdev@vger.kernel.org
+Subject: [bug report] liquidio: ethtool and led control support
+Message-ID: <7e9fbad4-d040-409c-a4d2-24e9929e63ba@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello Florian,
+Hello Raghu Vatsavayi,
 
-> What is the difference with the existing MODULE_SOFTDEP() which has pre 
-> and post qualifiers and seems just as fit?
-MODULE_SOFTDEP (with pre and/or post qualifiers as you say) causes the
-modules to be directly loaded.
+Commit dc3abcbeaeb9 ("liquidio: ethtool and led control support")
+from Sep 1, 2016 (linux-next), leads to the following Smatch static
+checker warning:
 
-MODULES_WEAKDEP doesn't cause the modules to be loaded. 
-The load will be done later, if necessary, by other mechanisms in the kernel.
-For example for the commented case, the associated phy is read using mdio bus
-and then the associated phy module is loaded during runtime  by means of the
-function phy_request_driver_module.
-It is just informing to user applications, like dracut, about this in order to
-be able to prepare the complete and correct initramfs. 
-Keep in mind that these applications have no way of knowing about this situation
-and if the phy is not included in this case, the driver will not work at
-initramfs stage.
-If we used MODULE_SOFTDEP the modules would be loaded in advance even if they
-were not necessary.
-For the commented case, I have included only one phy because it is the hardware
-that I have, but other phy devices (modules) are possible and they can be some.
+	drivers/net/ethernet/cavium/liquidio/lio_ethtool.c:2721 cn23xx_read_csr_reg()
+	warn: reusing outside iterator: 'i'
 
-Thanks 
+drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
+    2706         /*0x100b0*/
+    2707         for (i = 0; i < CN23XX_MAX_OUTPUT_QUEUES; i++) {
+    2708                 reg = CN23XX_SLI_OQ_PKTS_SENT(i);
+    2709                 len += sprintf(s + len, "\n[%08x] (SLI_PKT%d_CNTS): %016llx\n",
+    2710                                reg, i, (u64)octeon_read_csr64(oct, reg));
+    2711         }
+    2712 
+    2713         /*0x100c0*/
+    2714         for (i = 0; i < CN23XX_MAX_OUTPUT_QUEUES; i++) {
 
-Best regards
-José Ignacio
+You would think this would loop 64 times, but it only loops once
 
+    2715                 reg = 0x100c0 + i * CN23XX_OQ_OFFSET;
+    2716                 len += sprintf(s + len,
+    2717                                "\n[%08x] (SLI_PKT%d_ERROR_INFO): %016llx\n",
+    2718                                reg, i, (u64)octeon_read_csr64(oct, reg));
+    2719 
+    2720                 /*0x10000*/
+--> 2721                 for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++) {
+
+Because these inside loops re-use i and end with i == 64.
+
+    2722                         reg = CN23XX_SLI_IQ_PKT_CONTROL64(i);
+    2723                         len += sprintf(
+    2724                                 s + len,
+    2725                                 "\n[%08x] (SLI_PKT%d_INPUT_CONTROL): %016llx\n",
+    2726                                 reg, i, (u64)octeon_read_csr64(oct, reg));
+    2727                 }
+    2728 
+    2729                 /*0x10010*/
+    2730                 for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++) {
+
+Etc..
+
+    2731                         reg = CN23XX_SLI_IQ_BASE_ADDR64(i);
+    2732                         len += sprintf(
+    2733                             s + len,
+    2734                             "\n[%08x] (SLI_PKT%d_INSTR_BADDR): %016llx\n", reg,
+    2735                             i, (u64)octeon_read_csr64(oct, reg));
+    2736                 }
+    2737 
+    2738                 /*0x10020*/
+    2739                 for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++) {
+    2740                         reg = CN23XX_SLI_IQ_DOORBELL(i);
+    2741                         len += sprintf(
+    2742                             s + len,
+    2743                             "\n[%08x] (SLI_PKT%d_INSTR_BAOFF_DBELL): %016llx\n",
+    2744                             reg, i, (u64)octeon_read_csr64(oct, reg));
+    2745                 }
+    2746 
+    2747                 /*0x10030*/
+    2748                 for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++) {
+    2749                         reg = CN23XX_SLI_IQ_SIZE(i);
+    2750                         len += sprintf(
+    2751                             s + len,
+    2752                             "\n[%08x] (SLI_PKT%d_INSTR_FIFO_RSIZE): %016llx\n",
+    2753                             reg, i, (u64)octeon_read_csr64(oct, reg));
+    2754                 }
+    2755 
+    2756                 /*0x10040*/
+    2757                 for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++)
+    2758                         reg = CN23XX_SLI_IQ_INSTR_COUNT64(i);
+    2759                 len += sprintf(s + len,
+    2760                                "\n[%08x] (SLI_PKT_IN_DONE%d_CNTS): %016llx\n",
+    2761                                reg, i, (u64)octeon_read_csr64(oct, reg));
+    2762         }
+    2763 
+    2764         return len;
+    2765 }
+
+regards,
+dan carpenter
 
