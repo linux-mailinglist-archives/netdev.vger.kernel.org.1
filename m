@@ -1,249 +1,295 @@
-Return-Path: <netdev+bounces-112723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7060393AD2D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 09:34:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8795E93AD4B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 09:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66D591C20E55
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 07:34:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F875281140
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 07:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E64061FDA;
-	Wed, 24 Jul 2024 07:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8746F763E7;
+	Wed, 24 Jul 2024 07:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fta2LNRs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TkJYZZug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4DE210FB
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 07:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DED33D97A;
+	Wed, 24 Jul 2024 07:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721806440; cv=none; b=M1yUJClvdsUoAboUgH+iHefOPImSKCl4WaEhKv5C5lf5uf5x55xB/AIwOQsED93ZWvk0LXwcof3M47p5NtnpPmb9ChPGLLRDLwC24AMD3tt+uHMmdlG+VSJZU2ysuqWZkJt/dV5pZKn/ssYli16SA+HxLAPsTJANVVDAtrsnVA8=
+	t=1721806934; cv=none; b=Gkkp3UjqCYQl6Oea4b30YNL1dHD7451Tke0pyfu50f5m8n8kLxTQtbMuGivCg2ZiVwLzRTbM85hTdIzucAYm3YwFuoY5M+r3QptR5PxCoeffVQTfRDOgerq2iYPRzO6W3OfUEBq+FfR4vXuPYW5mGMJ73/LPAHSbtE8/0ZBjI9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721806440; c=relaxed/simple;
-	bh=f/D8VGMKr44ggMnXzUEbB6qHyfQmQ+JPc49ikJUi1ck=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rhFdbVOrUuPLjDRl/krSgf/y6dz7X2/WR2gVpwHDfcENF6jtBzdeerkfPcYDOXoMChWgwAGECD5SlKBYmaxUSTE0oLVTlKMUPbd0SrGhvrVLSiMA7GAf1pXYamk4Mc/4iWGdaGphtS2XND8A8KnMzKM7zTxgbf86JPsCkdGb16Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fta2LNRs; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-58f9874aeb4so5330803a12.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 00:33:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721806437; x=1722411237; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HLcXJWqM51YlOGxKQmV1hIrMWVZKdDIjA1ycwgxFHqo=;
-        b=fta2LNRs40hoL6tp/+0z8oBeuMpdbmHShIEVlIUpUYbTVlf5vFjgMlkz524eISyNNS
-         /j4JBNfA3vE1I5rhs33R5BA8JMlgDtGxtgp7kuYjzCFCsIDdqRFQrZnhbzo7gvZ5Qatf
-         pz4lxH0MB0NpraNRfqiEgFRMU0ug5UMH8JTrvKVDt79QlnIxBgoqwTHzjA8j+MSLmbz4
-         WCQ0O+RPYIcQp+3wBVsnoJUeeRVWwfODIuDdLrUI8veZ+rN4UqnkUUqp9vz8HFfOqKfd
-         xnCsog9iAroGTZ2b4FjMTUcQKH24Nvvnfz9fcy+oS3BH7aKKF93ANZe4BcP1MnXGti9q
-         I6og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721806437; x=1722411237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HLcXJWqM51YlOGxKQmV1hIrMWVZKdDIjA1ycwgxFHqo=;
-        b=Hm+Z34JVTu39oi40Sj91T4pGeOoAPg2AQwed3PPaFBbxs98UmhkA/pg8f43rDkRtOV
-         ummdAMzicNK7bE6DwduQ5Of8qgpmsNUTa1gQdFOPh4nYLI8ZhC3Zp9QKbu71OC3wmvMi
-         yr0vOQfjwgfgWxBDbbEO62BOhDxWD872SMmu6KtXqrH7/5L0g8u+SIaqjaHUqJ6Yb1Ir
-         Azu9nrxss7HkOESCA7aPEDx26HzvfkDH8AM9YrC0fKI2gZi1rksVJ1S4nul2qKXRr2yk
-         tItAiZazYSxZkJGW7lr6vjtOr9KFH4+6JUzeV0pQIMq5+TOLdmEQir2nv9bT4cBM0jYE
-         Q1fg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnFPYnRzKleqs+ABqqH++RGbYYCu4jn8FYYsAwu8tCciWV5T8uwsUg43hUDTrLb9jv1qEUCzuRzAI06wUk6XblZnKcSrFf
-X-Gm-Message-State: AOJu0YwWj2gA62LNVX6EMOd+lkU4B/DMCgVbmyc9t3SviF9Q3y0e/vti
-	X4oT/FIzRbD21rIESbWbocN6/3BhM5v1vkJwB5HliMQbKmqaY+G3TbiZZeOslIX8Y/WyoxfBWER
-	vjl5ewO1kuoO6+JDunk/0FS4wKuQ=
-X-Google-Smtp-Source: AGHT+IGQGG+89I9kJ+DtqpHwojwtMBdw+GWXiOmjSLyVOvXroimITJfkkpYyCMedSSvLoJMTovTWUEU+0vsQhWPaMMw=
-X-Received: by 2002:a50:8749:0:b0:5a1:c40a:3a81 with SMTP id
- 4fb4d7f45d1cf-5a4f0c7724bmr6371685a12.35.1721806436586; Wed, 24 Jul 2024
- 00:33:56 -0700 (PDT)
+	s=arc-20240116; t=1721806934; c=relaxed/simple;
+	bh=qIRmIsGfOifbd0F+slj35U+RDiwKrNFSa5amWJn8fiM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=spBnj9pUqLAF8ItwLF9syb6J9OiofcwKp8/qwmKKLR7ErOYzkgd6jqRpp+7VMDRBKgf5OFM75/mdirFV42LTZ96/buE1SIhBgyT5j42Ox0ri9FbGS0DSWK2HL+P79R2upgu1KWhTChJe3HEuXDURuE3W/6DSnVUC0+aHy3meAS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TkJYZZug; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A365CC32782;
+	Wed, 24 Jul 2024 07:42:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721806933;
+	bh=qIRmIsGfOifbd0F+slj35U+RDiwKrNFSa5amWJn8fiM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=TkJYZZugd0NUf8tJQyAImQPkUnqngbiiuQv8mHcfTnt8nqgXA8jCOtKi4Isq7KjWO
+	 oSCGBhbFS3M341CPzDzX03RCniqueIawKgoG6CnGIpFjGdzGaZgoj45V7Ccpqffcfp
+	 +zWMVdEDIXnp+lh0a1qT0IqGfeDXihurY42IIYU1JsCfVG7fwy4cy+BtX/HFoEaKs7
+	 k7moWY4mk9Y6yZV74xLTWaSMqQdqkx08TSuHEzMB/TsDl0RjlIK+iDVhJBU+yjHwAh
+	 fql6mKrZhg36UGS1eWBR26v2zOaTs6VQ9xwLA2wxEQG5Sd/+H6vST724MiUrWNp8xi
+	 TbYobkUQ36yeQ==
+Message-ID: <780ed38257480940def86947b2ee354f298e890b.camel@kernel.org>
+Subject: Re: [PATCH bpf-next v3 2/3] selftests/bpf: Add mptcp pm_nl_ctl link
+From: Geliang Tang <geliang@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>, Martin KaFai Lau
+	 <martin.lau@linux.dev>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>,  Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Geliang Tang <tanggeliang@kylinos.cn>, 
+ mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Shuah Khan
+ <shuah@kernel.org>
+Date: Wed, 24 Jul 2024 15:42:01 +0800
+In-Reply-To: <ab8112e6-ea7b-4b36-b395-049214e1608d@kernel.org>
+References: 
+	<20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org>
+	 <20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-2-ebdc2d494049@kernel.org>
+	 <08f925cd-e267-4a6b-84b1-792515c4e199@kernel.org>
+	 <90e916e8-ec4e-447b-8ee6-eb247f3a72ad@linux.dev>
+	 <ab8112e6-ea7b-4b36-b395-049214e1608d@kernel.org>
+Autocrypt: addr=geliang@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ TO0tfEdfAX7IENcV87h2yAFBZkaA==
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.0-1build2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240723135742.35102-1-kerneljasonxing@gmail.com>
- <CANn89i+dYsvrVwWCRX=B1ZyL3nZUjnNtaQ5rfizDOV5XhHV2dQ@mail.gmail.com>
- <CAL+tcoDZ2VDCd00ydv-RzMudq=d+jVukiDLgs7RpsJwvGqBp1Q@mail.gmail.com>
- <CAL+tcoCC2g1iHA__vr8bbUX-kba2bBi2NbQNZnxOAMTJOQQAWg@mail.gmail.com>
- <CANn89i+3c3fg1SYEpx02yCKHfBoZvYJt=wTqgZ77nCWzN0q-Wg@mail.gmail.com>
- <CAL+tcoB3iwsTTt8Bpc62Zc-CoyOGRrAdAjo26XqUvFnBoqXpTw@mail.gmail.com>
- <CANn89iLDQFbxrcYOvMq+eXkxuArgfnS+uG33dJZmhOGg+xWucQ@mail.gmail.com> <CAL+tcoBGRz1ukKe=z2qjPUgjSZ=a-WdXLpTcLj5BxTVNAhnUZg@mail.gmail.com>
-In-Reply-To: <CAL+tcoBGRz1ukKe=z2qjPUgjSZ=a-WdXLpTcLj5BxTVNAhnUZg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 24 Jul 2024 15:33:18 +0800
-Message-ID: <CAL+tcoBXBmSevsfNpERwewgvVmCmabJuhXhi_Hi7ADZ=OLG5Kw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] net: add an entry for CONFIG_NET_RX_BUSY_POLL
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 24, 2024 at 8:38=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Wed, Jul 24, 2024 at 12:28=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Tue, Jul 23, 2024 at 6:01=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > On Tue, Jul 23, 2024 at 11:26=E2=80=AFPM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> > > >
-> > > > On Tue, Jul 23, 2024 at 5:13=E2=80=AFPM Jason Xing <kerneljasonxing=
-@gmail.com> wrote:
-> > > > >
-> > > > > On Tue, Jul 23, 2024 at 11:09=E2=80=AFPM Jason Xing <kerneljasonx=
-ing@gmail.com> wrote:
-> > > > > >
-> > > > > > On Tue, Jul 23, 2024 at 10:57=E2=80=AFPM Eric Dumazet <edumazet=
-@google.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Jul 23, 2024 at 3:57=E2=80=AFPM Jason Xing <kerneljas=
-onxing@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > > > >
-> > > > > > > > When I was doing performance test on unix_poll(), I found o=
-ut that
-> > > > > > > > accessing sk->sk_ll_usec when calling sock_poll()->sk_can_b=
-usy_loop()
-> > > > > > > > occupies too much time, which causes around 16% degradation=
-. So I
-> > > > > > > > decided to turn off this config, which cannot be done appar=
-ently
-> > > > > > > > before this patch.
-> > > > > > >
-> > > > > > > Too many CONFIG_ options, distros will enable it anyway.
-> > > > > > >
-> > > > > > > In my builds, offset of sk_ll_usec is 0xe8.
-> > > > > > >
-> > > > > > > Are you using some debug options or an old tree ?
-> > > > >
-> > > > > I forgot to say: I'm running the latest kernel which I pulled aro=
-und
-> > > > > two hours ago. Whatever kind of configs with/without debug option=
-s I
-> > > > > use, I can still reproduce it.
-> > > >
-> > > > Ok, please post :
-> > > >
-> > > > pahole --hex -C sock vmlinux
-> > >
-> > > 1) Enable the config:
-> > > $ pahole --hex -C sock vmlinux
-> > > struct sock {
-> > >         struct sock_common         __sk_common;          /*     0  0x=
-88 */
-> > >         /* --- cacheline 2 boundary (128 bytes) was 8 bytes ago --- *=
-/
-> > >         __u8
-> > > __cacheline_group_begin__sock_write_rx[0]; /*  0x88     0 */
-> > >         atomic_t                   sk_drops;             /*  0x88   0=
-x4 */
-> > >         __s32                      sk_peek_off;          /*  0x8c   0=
-x4 */
-> > >         struct sk_buff_head        sk_error_queue;       /*  0x90  0x=
-18 */
-> > >         struct sk_buff_head        sk_receive_queue;     /*  0xa8  0x=
-18 */
-> > >         /* --- cacheline 3 boundary (192 bytes) --- */
-> > >         struct {
-> > >                 atomic_t           rmem_alloc;           /*  0xc0   0=
-x4 */
-> > >                 int                len;                  /*  0xc4   0=
-x4 */
-> > >                 struct sk_buff *   head;                 /*  0xc8   0=
-x8 */
-> > >                 struct sk_buff *   tail;                 /*  0xd0   0=
-x8 */
-> > >         } sk_backlog;                                    /*  0xc0  0x=
-18 */
-> > >         __u8
-> > > __cacheline_group_end__sock_write_rx[0]; /*  0xd8     0 */
-> > >         __u8
-> > > __cacheline_group_begin__sock_read_rx[0]; /*  0xd8     0 */
-> > >         struct dst_entry *         sk_rx_dst;            /*  0xd8   0=
-x8 */
-> > >         int                        sk_rx_dst_ifindex;    /*  0xe0   0=
-x4 */
-> > >         u32                        sk_rx_dst_cookie;     /*  0xe4   0=
-x4 */
-> > >         unsigned int               sk_ll_usec;           /*  0xe8   0=
-x4 */
-> >
-> > See here ? offset of sk_ll_usec is 0xe8, not 0x104 as you posted.
->
-> Oh, so sorry. My fault. I remembered only that perf record was
-> executed in an old tree before you optimise the layout of struct sock.
-> Then I found out if I disable the config applying to the latest tree
-> running in my virtual machine, the result is better. So let me find a
-> physical server to run the latest kernel and will get back more
-> accurate information of 'perf record' here.
+Hi Matt,
 
-Now I'm back. The same output of perf when running the latest kernel
-on the virtual server goes like this:
-       =E2=94=82
-       =E2=94=82    static inline bool sk_can_busy_loop(const struct sock *=
-sk)
-       =E2=94=82    {
-       =E2=94=82    return READ_ONCE(sk->sk_ll_usec) && !signal_pending(cur=
-rent);
-       =E2=94=82      mov     0xe8(%rdx),%ebp
- 55.71 =E2=94=82      test    %ebp,%ebp
-       =E2=94=82    =E2=86=93 jne     62
-       =E2=94=82    sock_poll():
-command I used: perf record -g -e cycles:k -F 999 -o tk5_select10.data
--- ./bin-x86_64/select -E -C 200 -L -S -W -M -N "select_10" -n 100 -B
-500
+On Sat, 2024-07-06 at 02:25 +0200, Matthieu Baerts wrote:
+> Hi Martin,
+> 
+> Thank you for your reply!
+> 
+> On 06/07/2024 01:10, Martin KaFai Lau wrote:
+> > On 7/4/24 3:48 AM, Matthieu Baerts wrote:
+> > > > diff --git a/tools/testing/selftests/bpf/Makefile
+> > > > b/tools/testing/
+> > > > selftests/bpf/Makefile
+> > > > index e0b3887b3d2d..204269d0b5b8 100644
+> > > > --- a/tools/testing/selftests/bpf/Makefile
+> > > > +++ b/tools/testing/selftests/bpf/Makefile
+> > > > @@ -144,7 +144,7 @@ TEST_GEN_PROGS_EXTENDED =
+> > > > test_skb_cgroup_id_user \
+> > > >       flow_dissector_load test_flow_dissector
+> > > > test_tcp_check_syncookie_user \
+> > > >       test_lirc_mode2_user xdping test_cpp runqslower bench
+> > > > bpf_testmod.ko \
+> > > >       xskxceiver xdp_redirect_multi xdp_synproxy veristat
+> > > > xdp_hw_metadata \
+> > > > -    xdp_features bpf_test_no_cfi.ko
+> > > > +    xdp_features bpf_test_no_cfi.ko mptcp_pm_nl_ctl
+> > > On the BPF CI, we have such errors:
+> > > 
+> > >     mptcp_pm_nl_ctl.c:20:10: fatal error: 'linux/mptcp.h' file
+> > > not found
+> > >       20 | #include "linux/mptcp.h"
+> > >          |          ^~~~~~~~~~~~~~~
+> > > 
+> > > On my side, I don't have any issue, because the compiler uses the
+> > > mptcp.h file from the system: /usr/include/linux/mptcp.h
+> > > 
+> > > I suppose that's not OK on the BPF CI, as it looks like it
+> > > doesn't have
+> > > this file there, probably because it still uses Ubuntu 20.04 as
+> > > base,
+> > > which doesn't include this file in the linux-libc-dev package.
+> > > 
+> > > When I look at how this 'mptcp_pm_nl_ctl' tool -- and all the
+> > > other
+> > > programs from that list -- is compiled (V=1), I see that the
+> > > following
+> > > "-I" options are given:
+> > > 
+> > >    -I${PWD}/tools/testing/selftests/bpf
+> > >    -I${BUILD}//tools/include
+> > >    -I${BUILD}/include/generated
+> > >    -I${PWD}/tools/lib
+> > >    -I${PWD}/tools/include
+> > >    -I${PWD}/tools/include/uapi
+> > >    -I${BUILD}/
+> > > 
+> > > It will then not look at -I${PWD}/usr/include or the directory
+> > > generated
+> > > with:
+> > > 
+> > >    make headers_install INSTALL_HDR_PATH=(...)
+> > 
+> > It sounds like the tools/testing/selftests/net/mptcp/Makefile is
+> > looking
+> > at this include path, so it works?
+> 
+> Yes it does work.
+> 
+> > iiu the bpf/Makefile correctly, it has the bpftool "make" compiled
+> > and
+> > installed at tools/testing/selftests/bpf/tools/sbin/. May be
+> > directly
+> > compile the pm_nl_ctl by "make tools/testing/selftests/net/mptcp/"?
+> 
+> That could be an alternative, I didn't know it would be OK to add
+> such
+> dependence, good idea.
+> 
+> > > I guess that's why people have duplicated files in
+> > > 'tools/include/uapi',
+> > > but I also understood from Jakub that it is not a good idea to
+> > > continue
+> > > to do so.
+> > > 
+> > > What would be the best solution to avoid a copy? A symlink still
+> > > looks
+> > > like a workaround.
+> > > 
+> > > In the other selftests, KHDR_INCLUDES is used to be able to
+> > > include the
+> > > path containing the UAPI headers. So if someone built the headers
+> > > in a
+> > 
+> > Meaning KHDR_INCLUDES should be used and -
+> > I${PWD}/tools/include/uapi can
+> > be retired?
+> 
+> That's the idea, yes, for "userspace programs". I mean: for BPF
+> programs
+> requiring vmlinux.h (BPF_CFLAGS), I guess you will still need the
+> bpf.h
+> file from tools/include/uapi, no?
+> 
+> > I haven't looked into the details. I quickly tried but it
+> > fails in my environment.
+> 
+> Do you not have issues because some files have something like:
+> 
+>   #include <uapi/linux/(...).h>
+> 
+> On my side, I had a working version using this patch:
+> 
+> > diff --git a/tools/testing/selftests/bpf/Makefile
+> > b/tools/testing/selftests/bpf/Makefile
+> > index 7c5827d20c2e..112f14d40852 100644
+> > --- a/tools/testing/selftests/bpf/Makefile
+> > +++ b/tools/testing/selftests/bpf/Makefile
+> > @@ -37,7 +37,7 @@ CFLAGS += -g $(OPT_FLAGS) -rdynamic            \
+> >           -Wall -Werror -fno-omit-frame-pointer                  \
+> >           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)             \
+> >           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)   \
+> > -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
+> > +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
+> >  LDFLAGS += $(SAN_LDFLAGS)
+> >  LDLIBS += $(LIBELF_LIBS) -lz -lrt -lpthread
+> >  
+> 
+> But only after having removed these extra 'uapi/':
+> 
+>   $ git grep -l '<uapi/' -- tools/testing/selftests/bpf | \
+>     xargs sed -i 's|#include <uapi/|#include <|g'
+> 
+> Is it not OK for you like that?
+> 
+> Note that I built the selftests using KHDR_INCLUDES=-
+> I$INSTALL_HDR_PATH.
 
-If it's running on the physical server, the perf output is like this:
-       =E2=94=82     =E2=86=93 je     e1
-       =E2=94=82       mov    0x18(%r13),%rdx
-  0.03 =E2=94=82       mov    %rsi,%rbx
-  0.00 =E2=94=82       mov    %rdi,%r12
-       =E2=94=82       mov    0xe8(%rdx),%r14d
- 26.48 =E2=94=82       test   %r14d,%r14d
+Do you need me to do anything here? This patchset seems to have been
+waiting for several months.
 
-What a interesting thing I found is that running on the physical
-server the delta output is better than on the virtual server:
-    original kernel, remove access of sk_ll_usec
-physical: 2.26, 2.08 (delta is 8.4%)
-virtual: 2.45, 2.05 (delta is ~16%)
+Another option is to roll back to v2, not add this mptcp_pm_nl_ctl
+tool, and continue to use "ip mptcp". I remember mentioning in the
+comments of v2 that BPF CI systems will also be upgraded to new Ubuntu
+system and iproute2 in the future. At this time now we can make a check
+for "ip mptcp" and only run this test on systems that support "ip
+mptcp", and skip the test with test__skip() for systems that do not
+support it, so that CI can also pass.
 
-I'm still confused about reading this sk_ll_usec can cause such a
-performance degradation situation.
-
-Eric, may I ask if you have more ideas/suggestions about this one?
+WDYT?
 
 Thanks,
-Jason
+-Geliang
 
->
-> >
-> > Do not blindly trust perf here.
-> >
-> > Please run a benchmark with 1,000,000 af_unix messages being sent and r=
-eceived.
-> >
-> > I am guessing your patch makes no difference at all (certainly not 16
-> > % as claimed in your changelog)
->
-> The fact is the performance would improve when I disable the config if
-> I only test unix_poll related paths. The time spent can decrease from
-> 2.45 to 2.05 which is 16%. As I said, it can be easily reproduced.
->
-> Thanks,
-> Jason
+> 
+> > > seperated directory -- INSTALL_HDR_PATH=(...) -- KHDR_INCLUDES
+> > > can be
+> > > overridden to look there, instead of ${KERNEL_SRC}/usr/include.
+> > > Would it
+> > > be OK to do that? Would it work for the CI without extra changes?
+> > > Or do
+> > > you still prefer a copy/symlink to 'tools/include/uapi' instead?
+> 
+> Cheers,
+> Matt
+
 
