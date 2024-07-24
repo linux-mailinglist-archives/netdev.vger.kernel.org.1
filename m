@@ -1,179 +1,118 @@
-Return-Path: <netdev+bounces-112804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4385C93B4F4
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 18:26:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65ACF93B502
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 18:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C49621F21AFD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:26:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2204F282E4F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 16:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E909415ECCA;
-	Wed, 24 Jul 2024 16:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FAC1CD3F;
+	Wed, 24 Jul 2024 16:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="uEaY0P7x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hY5k8GqE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF71A15B554
-	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 16:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9AB17C6A
+	for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 16:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721838361; cv=none; b=PEHa/dGLo8P60rGHohC9ujwu7dGTZyTKvG8v5gHalZB10KtX2IkVpT8wwwZamWEW0gM4kp2J5rmAn+f9RUcmT0s9rVSHKwpCO0vZTvSjpWs75gt4oe80w996I9LMkcQoSkesdlZEHCF39wMeyhxc+DGAqWu1JJ72eLsoujM7LUc=
+	t=1721838620; cv=none; b=HiZNMUfywVY513+lxnrsp3H5gVyE4zhYNXS1hngRLS2dl5kWax66vbKhQXoiaLd525DUuoKLm/vtzD8pmrPjIZOJ1pSMKUvHUV2BBEjnLMM+eqJXq3xXfr1ci3pBdXE5tfoGHh0sD9rysd8DB6dE2/FesHIM61enCcsKKSpiGS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721838361; c=relaxed/simple;
-	bh=AOGywo1iikFtBJXxpD5YsZIJ95hrAtPqukdcsVWqRio=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h4hAampvsuRhpzqFClQJxOG0JN6XIpriRqvTCTgMzwKhM+cG1r8cVc1rkxegH2/9jqMdtd8UoOXUHogL7W9Ct/wnzOBl8Q14cKHEyqNcjlQ6MenzSumIUZzGB0v/ei3M49ejw+xOAlHozhrGExts7Mx0VEjtP0S50+XPOHK+hDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=uEaY0P7x; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2cd5d6b2581so1244a91.2
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 09:25:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1721838358; x=1722443158; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=47rZGXNA+VPEE0h3H688PSCY3FqtCg4+Z4f3yZO4MI8=;
-        b=uEaY0P7xKtxJv/2X5WVnb0r4cJo6uzU5SP2RS1RC5gJDKUjzYnzwcCROyUhdYpemlN
-         MHoLdgRA78Ouewg6F09kaWLVllomyAE0lYzHMSM9GfN1JxZFfIKF5/JV/BmxkaUItF9w
-         LWReSf5RfH8ZBSedO/xX/23U5SkdypbA3sXd1FPKDjz73Mrc7FMNQFzr33iobtbMOTdy
-         tP4w4OWQ2qtq4jex34B4KlkCCXhuSC22pk72qZZaoL4adJoTtAXmsXcZJMuzIInAKx3i
-         cwrmldhYINE+XEXfQhqWCLlrc40PD8ZpYAZEbxySh4YgYaOeOjanozPKCI1Hv+x+Uxea
-         HD2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721838358; x=1722443158;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=47rZGXNA+VPEE0h3H688PSCY3FqtCg4+Z4f3yZO4MI8=;
-        b=bb2yjhCw+luUUarOOYBTJgRRcpvMXENhfc021O7YEUcrVFtGMzpvurcixdAdcajvSM
-         +vzBhVUywXrLfhApdZDtuD8tJRiW9aJ8DJV+DeM44ZsSSKNswCcJQ3mOm+b9pjonDtTv
-         oHhUJxac7ROnyWw/lCyMWXVfQ/9N4JzTwx3IlOElQAyz2mmsvXKzfkNfAEAX3uI+cFHt
-         ZKf729TZqeYBW+fI5k3EjNQdNULgbn0Zyv4LLCh+2+t/KlLZprp/povXi2aLKTZ1shIQ
-         GaAQqvk0rwXkFSHTt4wU+3yfGbgnwkiTHBupAWAc47Z8JEXS4faaJd0xZMnj/4/ay5Sr
-         x9Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3yKqZLlHOoQIFLFNOOThSqCm0OijrtVvDNs7+t24RqOzVSExORu5wpJgiZD8SzQ7X2f4CfxqkLmwFddievdefVaW2v4u0
-X-Gm-Message-State: AOJu0YxSKGA1VM1bQmS7u44BlU0EhMaJLzf474/DKKNuMRy5nBTBxI3P
-	hqo/AJ45sB8nh96oJmsDEX1Rlw8SfuTekOF/16XvrEJU+1GlkTXQbr7D6mJ3SEA=
-X-Google-Smtp-Source: AGHT+IG37fSFaVfTdXtnEFGMTuetughKI1Zmm7Q9idfHFeWury0GvTkEpAx1HaZz6lMROu30tv4oTg==
-X-Received: by 2002:a17:90b:388d:b0:2c9:7616:dec7 with SMTP id 98e67ed59e1d1-2cf23770687mr13999a91.6.1721838357984;
-        Wed, 24 Jul 2024 09:25:57 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb746f9a0sm1858462a91.38.2024.07.24.09.25.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 09:25:57 -0700 (PDT)
-Date: Wed, 24 Jul 2024 09:25:55 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: <jiang.kun2@zte.com.cn>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <corbet@lwn.net>, <dsahern@kernel.org>,
- <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <fan.yu9@zte.com.cn>,
- <xu.xin16@zte.com.cn>, <zhang.yunkai@zte.com.cn>, <tu.qiang35@zte.com.cn>,
- <he.peilin@zte.com.cn>, <yang.yang29@zte.com.cn>
-Subject: Re: [PATCH] net: Provide sysctl to tune local port range to IANA  
- specification
-Message-ID: <20240724092555.3ecc2538@hermes.local>
-In-Reply-To: <202407241403542217WOxM8U3ABv-nWZT068xe@zte.com.cn>
-References: <202407241403542217WOxM8U3ABv-nWZT068xe@zte.com.cn>
+	s=arc-20240116; t=1721838620; c=relaxed/simple;
+	bh=pdloUzkhjOyyHbG95eWHh1DIEfSYhXIR31SEwN6htKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jBz2iCvgrlEYEOdqG8/DOL9WS2T5Ts21Ry89sdZaDnlY4O6lHCb8skD8epBp2HKS9Fxdr9Yw5BWxGzmXdAy9svd3E+i0SLyV7iEW0cFahuVBmR032e5AxMaqEexblnI/q6qh5hEK32FUF4/wscaqZoPRqQVu21m+I4RGHecF3/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hY5k8GqE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 042E8C32781;
+	Wed, 24 Jul 2024 16:30:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721838620;
+	bh=pdloUzkhjOyyHbG95eWHh1DIEfSYhXIR31SEwN6htKM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hY5k8GqENKG0OR27HYyUIxDVN8GPu3pDYZS1R/j9pCzxr7qolas9c3+CdVjq/cxwV
+	 RGYc3u2SSjb/ahXnIJa4x46hRtuOwhwgZl8dc4VUud2+nSnwPqZI+zaAtsqzhRXQhb
+	 Onl4uEPRwBS7btndxhck60b61WDVAIesjxdYGUTflLCqiCQNcG51Ja1enAm2SxyeX7
+	 1/ZRkyI+SSzn1ep71a5J/r6W6DUIi59Fbk5QPQUWsgWlfdhakms6NGCJRTDfnIGCBR
+	 AUUk/9R4BtNP5WOxRxZEWEbbCrcBZlGGBTVJ1dhF+eh2TbfaNpsJm1h46xSW+97fSs
+	 gB7uHDacJ3x/g==
+Date: Wed, 24 Jul 2024 17:30:16 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: Re: [PATCH iwl-next v3 12/13] iavf: refactor add/del FDIR filters
+Message-ID: <20240724163016.GB97837@kernel.org>
+References: <20240710204015.124233-1-ahmed.zaki@intel.com>
+ <20240710204015.124233-13-ahmed.zaki@intel.com>
+ <20240722150431.GK715661@kernel.org>
+ <4691e62b-0597-4184-8e85-0e74d8cdab85@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4691e62b-0597-4184-8e85-0e74d8cdab85@intel.com>
 
-On Wed, 24 Jul 2024 14:03:54 +0800 (CST)
-<jiang.kun2@zte.com.cn> wrote:
+On Wed, Jul 24, 2024 at 10:14:19AM -0600, Ahmed Zaki wrote:
 
-> From: Fan Yu <fan.yu9@zte.com.cn>
-> 
-> The Importance of Following IANA Standards
-> ========================================
-> IANA specifies User ports as 1024-49151, and it just so happens
-> that my application uses port 33060 (reserved for MySQL Database Extended),
-> which conflicts with the Linux default dynamic port range (32768-60999)[1].
-> 
-> In fact, IANA assigns numbers in port range from 32768 to 49151,
-> which is uniformly accepted by the industry. To do this,
-> it is necessary for the kernel to follow the IANA specification.
-> 
-> Drawbacks of existing implementations
-> ========================================
-> In past discussions, follow the IANA specification by modifying the
-> system defaults has been discouraged, which would greatly affect
-> existing users[2].
-> 
-> Theoretically, this can be done by tuning net.ipv4.local_port_range,
-> but there are inconveniences such as:
-> (1) For cloud-native scenarios, each container is expected to follow
-> the IANA specification uniformly, so it is necessary to do sysctl
-> configuration in each container individually, which increases the user's
-> resource management costs.
-> (2) For new applications, since sysctl(net.ipv4.local_port_range) is
-> isolated across namespaces, the container cannot inherit the host's value,
-> so after startup, it remains at the kernel default value of 32768-60999,
-> which reduces the ease of use of the system.
-> 
-> Solution
-> ========================================
-> In order to maintain compatibility, we provide a sysctl interface in
-> host namespace, which makes it easy to tune local port range to
-> IANA specification.
-> 
-> When ip_local_port_range_use_iana=1, the local port range of all network
-> namespaces is tuned to IANA specification (49152-60999), and IANA
-> specification is also used for newly created network namespaces. Therefore,
-> each container does not need to do sysctl settings separately, which
-> improves the convenience of configuration.
-> When ip_local_port_range_use_iana=0, the local port range of all network
-> namespaces are tuned to the original kernel defaults (32768-60999).
-> For example:
-> 	# cat /proc/sys/net/ipv4/ip_local_port_range 
-> 	32768   60999
-> 	# echo 1 > /proc/sys/net/ipv4/ip_local_port_range_use_iana
-> 	# cat /proc/sys/net/ipv4/ip_local_port_range 
-> 	49152   60999
-> 
-> 	# unshare -n
-> 	# cat /proc/sys/net/ipv4/ip_local_port_range 
-> 	49152   60999
-> 
-> Notes
-> ========================================
-> The lower value(49152), consistent with IANA dynamic port lower limit.
-> The upper limit value(60999), which differs from the IANA dynamic upper
-> limit due to the fact that Linux will use 61000-65535 as masquarading/NAT,
-> but this does not conflict with the IANA specification[3].
-> 
-> Note that following the above specification reduces the number of ephemeral
-> ports by half, increasing the risk of port exhaustion[2].
-> 
-> [1]:https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.txt
-> [2]:https://lore.kernel.org/all/bf42f6fd-cd06-02d6-d7b6-233a0602c437@gmail.com/
-> [3]:https://lore.kernel.org/all/20070512210830.514c7709@the-village.bc.nu/
-> 
-> Co-developed-by: Kun Jiang <jiang.kun2@zte.com.cn>
-> Signed-off-by: Fan Yu <fan.yu9@zte.com.cn>
-> Signed-off-by: Kun Jiang <jiang.kun2@zte.com.cn>
-> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-> Reviewed-by: Qiang Tu <tu.qiang35@zte.com.cn>
-> Reviewed-by: Peilin He<he.peilin@zte.com.cn>
-> Cc: Yang Yang <yang.yang29@zte.com.cn>
-> ---
+...
 
-Yet another NAK
+> > > +/**
+> > > + * iavf_fdir_del_fltr - delete a flow director filter from the list
+> > > + * @adapter: pointer to the VF adapter structure
+> > > + * @loc: location to delete.
+> > > + *
+> > > + * Return: 0 on success or negative errno on failure.
+> > > + */
+> > > +int iavf_fdir_del_fltr(struct iavf_adapter *adapter, u32 loc)
+> > > +{
+> > > +	struct iavf_fdir_fltr *fltr = NULL;
+> > > +	int err = 0;
+> > > +
+> > > +	spin_lock_bh(&adapter->fdir_fltr_lock);
+> > > +	fltr = iavf_find_fdir_fltr(adapter, loc);
+> > > +
+> > > +	if (fltr) {
+> > > +		if (fltr->state == IAVF_FDIR_FLTR_ACTIVE) {
+> > > +			fltr->state = IAVF_FDIR_FLTR_DEL_REQUEST;
+> > > +		} else if (fltr->state == IAVF_FDIR_FLTR_INACTIVE) {
+> > > +			list_del(&fltr->list);
+> > > +			kfree(fltr);
+> > > +			adapter->fdir_active_fltr--;
+> > > +			fltr = NULL;
+> > > +		} else {
+> > > +			err = -EBUSY;
+> > > +		}
+> > > +	} else if (adapter->fdir_active_fltr) {
+> > > +		err = -EINVAL;
+> > > +	}
+> > > +
+> > > +	if (fltr && fltr->state == IAVF_FDIR_FLTR_DEL_REQUEST)
+> > > +		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DEL_FDIR_FILTER);
+> > 
+> > It seems that prior to this change the condition and call to
+> > iavf_schedule_aq_request were not protected by fdir_fltr_lock, and now they
+> > are. If so, is this change intentional.
+> > 
+> 
+> yes it is, fltr is member of the list that should be protected by the
+> spinlock.
 
-Rather than buggy and verbose new sysctl, why not just allow setting
-the port range you want through existing sysctls?
+Thanks,
 
-You can configure this through existing sysctl files and startup in your distro.
+I would suggest moving this into a separate patch: changing locking is a
+bit different to refactoring.
+
+Or, if not, at least mentioning it in the patch description.
 
