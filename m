@@ -1,102 +1,95 @@
-Return-Path: <netdev+bounces-112763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C39B93B0B6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 13:49:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09B0D93B0CD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 14:00:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B86F1C203B9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 11:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0771C22B7B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 12:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6472156886;
-	Wed, 24 Jul 2024 11:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE1B156871;
+	Wed, 24 Jul 2024 12:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o6i4Ba7o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DEK128VU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6395695;
-	Wed, 24 Jul 2024 11:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DB179F0;
+	Wed, 24 Jul 2024 12:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721821774; cv=none; b=hasTGAOg2nQ8k0uKzvx1RbhZfom5h3sqf/l4kS2OLiya0CitYAjs9VFeu05gzedz1ripKP0FZuY8luFNKIw2jBvojCm9nP0x3PKj/OKZ3IhwmOQrLjEXO7eDFMvvEtwes1RZdoOSM8S2ainD6XYIaYhshLGnacRh16x4KH5XYdw=
+	t=1721822432; cv=none; b=gH0Cs2HpSdBZkZ0szRDJLxEd1/UzqHBLf2tVUCEXlqzxwZAKROBhbWqQfK+oXPsSo7HDRmJ76zmX/SH9Bx6nU5fUKzD4MIjZJzmgK3G9PQJc8uAJgCw9iJX0bjfR5lRFloFKJFLxSf88VDFvP8fplOm8LCEcv1Xpf/qd8wRKU0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721821774; c=relaxed/simple;
-	bh=yDlumJKmEzhAKRjnL1qUjXcaVNhaH0K7mVcLUeQqiWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQmQ+F8wFzlekGoWt5KwREh3ENeWrjnGM4kmLNug+AApCwEz0ZNgFnPReucCID4Jmc/fgJ2z7Y3kvHIzQfcpfjoIVmU3UNQZGE3fx7auzBz8n5WcUNQedMGnZ3HGb9tNxb5G5CdEcPtxcFSjK6rbxoGV5GH+s6cla501GYdwk0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o6i4Ba7o; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XnfSfb75bly186ZIDAtRd0JeKb7NNesu8aYFDkUskvA=; b=o6i4Ba7oXWczgyVPeJeCBG15IT
-	c2988/t1yHGmz/cToeoN6L4NN/q+7m0q0ABG3WjGwUAp07o0xwz+gQjuHDowPa7pA5InNuBZ2ldIk
-	pOp7wxJ3gW3pFdtbvu9Pi+IQ2A80/IAXQDGLQIRrMzI1dH18n0YZZZto+gSLRzDXavqE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sWaUc-00381H-OR; Wed, 24 Jul 2024 13:49:14 +0200
-Date: Wed, 24 Jul 2024 13:49:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
- module
-Message-ID: <8a85af94-8911-44b8-9516-2f532cee607d@lunn.ch>
-References: <20240724102349.430078-1-jtornosm@redhat.com>
+	s=arc-20240116; t=1721822432; c=relaxed/simple;
+	bh=PBkYQ8eBLHEy0auwrIBbL/xSA8m++mxeWNt2CaKYkJw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pEpKH0lyEJR7iZbKknfgXI1/0TMul4qAT5W6hAew6T7DERIPPBA4OIi4sNd0TxCVOQddTNBwTEFb8YElx1N46JQOMs70NVk8Dz9nyUMpeKd+zlH/nyCU2kiefF+Nc1LaH8SiCLi6tDa/D547S63W2IIGxlwgJhlL36B+noDJrNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DEK128VU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 563B4C4AF0C;
+	Wed, 24 Jul 2024 12:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721822430;
+	bh=PBkYQ8eBLHEy0auwrIBbL/xSA8m++mxeWNt2CaKYkJw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DEK128VUL+debVTWMHHmxyDRc1DANLR8TiMfUIUP0fTfaFwOFN0WSqnWf41V5X0Ez
+	 nYMjlx1dVGMesKPX+xYHv+FUiiAa+KHTeANrZaPRDvccKze3H5A62pstrYRfCqHTzu
+	 2vpN/ZHSPAQuCyucgetx20ffvMMowHvQeHa9x5nDB6FJmEycSR/QYbt9691k6PvF9f
+	 3AHd9phIFnpgWpcaJOHXGGxIYtjow/v+SkDmKlljp8/GQ6qGrzBDfdt3lbJMQ7Xg9z
+	 YYxVaMLvafw+TLlMUQg4iPC1YgUoKS3fsw3K7FiHRhF7M32Alyr6OPve4Q7dY/TsUm
+	 zcMOGh5GhBu1g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E3D5C433E9;
+	Wed, 24 Jul 2024 12:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240724102349.430078-1-jtornosm@redhat.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: forwarding: skip if kernel not support setting
+ bridge fdb learning limit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172182243024.24813.9530655978630105526.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Jul 2024 12:00:30 +0000
+References: <20240723082252.2703100-1-liuhangbin@gmail.com>
+In-Reply-To: <20240723082252.2703100-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, razor@blackwall.org,
+ jnixdorf-oss@avm.de, linux-kselftest@vger.kernel.org
 
-On Wed, Jul 24, 2024 at 12:23:44PM +0200, Jose Ignacio Tornos Martinez wrote:
-> The related module for the phy is loaded dynamically depending on the
-> current hardware. In order to keep this behavior and have the phy modules
-> available from initramfs, add a 'weak' dependency with the phy modules to
-> allow user tools, like dracut, get this information.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 23 Jul 2024 16:22:52 +0800 you wrote:
+> If the testing kernel doesn't support setting fdb_max_learned or show
+> fdb_n_learned, just skip it. Or we will get errors like
 > 
-> Include micrel phy module because it is the hardware that I have. Other
-> possible phy modules can be added later.
+> ./bridge_fdb_learning_limit.sh: line 218: [: null: integer expression expected
+> ./bridge_fdb_learning_limit.sh: line 225: [: null: integer expression expected
 > 
-> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-> ---
->  drivers/net/usb/lan78xx.c | 1 +
->  1 file changed, 1 insertion(+)
+> Fixes: 6f84090333bb ("selftests: forwarding: bridge_fdb_learning_limit: Add a new selftest")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > 
-> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-> index 8adf77e3557e..c3945aebf94e 100644
-> --- a/drivers/net/usb/lan78xx.c
-> +++ b/drivers/net/usb/lan78xx.c
-> @@ -5074,3 +5074,4 @@ module_usb_driver(lan78xx_driver);
->  MODULE_AUTHOR(DRIVER_AUTHOR);
->  MODULE_DESCRIPTION(DRIVER_DESC);
->  MODULE_LICENSE("GPL");
-> +MODULE_WEAKDEP("micrel");
+> [...]
 
-~/linux$ grep -r MODULE_WEAKDEP *
-~/linux$ 
+Here is the summary with links:
+  - [net] selftests: forwarding: skip if kernel not support setting bridge fdb learning limit
+    https://git.kernel.org/netdev/net/c/863ff546fb62
 
-Is MODULE_WEAKDEP new?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-It seems like a "Wack a Mole" solution, which is not going to
-scale. Does dracut not have a set of configuration files indicating
-what modules should be included, using wildcards? If you want to have
-NFS root, you need all the network drivers, and so you need all the
-PHY drivers?
 
-    Andrew
 
