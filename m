@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-112709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C9593AAB0
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:47:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1161593AAB4
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 03:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17FDE1F23781
-	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:47:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99B87284193
+	for <lists+netdev@lfdr.de>; Wed, 24 Jul 2024 01:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD86C138;
-	Wed, 24 Jul 2024 01:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17CDDF58;
+	Wed, 24 Jul 2024 01:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mRlgJSf2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDwMFZfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621AA1AAC4;
-	Wed, 24 Jul 2024 01:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921941C6B2;
+	Wed, 24 Jul 2024 01:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721785640; cv=none; b=dr0QPOpj6VkPzFNUBQTGUbcgloVqvBCFMec9gHWGYIbdpuvqdkGwvG8SMj+LUpoMsOKrc9Wcc7HqLmq4UIqBhXlTxGT9qtY1RRi2gZrAbYpyg03iy6AGtAG4JBw8Gygfy6O1oFERYdvhSBTUue1gUUsQ2TkKqSUpZEMMI5dBsME=
+	t=1721785644; cv=none; b=Y2cqfow//rABzycRameSVDxK5rEWAtqXpDoPxNpPMa3it1TfI340BmLlfZ0K/3no2Y24+W9rR6Eh+oob6EjpkxJ9bxOV62Be6vr96lyz9CSBttHzZKvboena95gS/ynwUGzyeef2S6R2jr48z9vNGvjiS3wFDK4RUr0KcUO2PWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721785640; c=relaxed/simple;
-	bh=c3GncpxPZcA1taNUudoTyAcqB+R4JU5v2hVYCyR26mU=;
+	s=arc-20240116; t=1721785644; c=relaxed/simple;
+	bh=HIPZaFh9Yecwx65PpnkfqLQC2xvEgZhlTWGXWm9wIlk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fsEwm59/EZLyBH7qpHzNxmKI7Vy+4FXw4YbwXBRCC9/AGSjcFyqcpMig9QfVDdmJqZOSqV2U71XJBVQ92KSGzahX90atJNgwCQOrAKsaHBtnuJe++lEvIHkDOTL5ncDGAjxtn+QQs+VSH0dJ/k7HToST3EUnUCNPip93X0uRXpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mRlgJSf2; arc=none smtp.client-ip=209.85.216.43
+	 MIME-Version; b=CPu8vnU+jOsH3PdqRjVzIYAHGw/O3vLOgFzU1U7es9lgJ0A0eBu4gU06NZAEQ+0r6NJOWhQvoihpn/41/mczsYgDwH4bxUXhz6D0Q5fm6XYdEX7ImdIjQwepIWNUhj368QeLG5HTgx6Nl4PgWKfYQWSbKqAynQvqkurSqzOlkew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDwMFZfq; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2cb56c2c30eso293987a91.1;
-        Tue, 23 Jul 2024 18:47:19 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70d24d0a8d4so1814339b3a.0;
+        Tue, 23 Jul 2024 18:47:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721785638; x=1722390438; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1721785642; x=1722390442; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UzoaOAE8mtc4ll9mWUV2yqA7g11y//aTQ0G+wfCrhNk=;
-        b=mRlgJSf2J8jfus5pRxHfp/BLzYeTIIKMTEsnH/M3sUvSxRms9wbE5m5SakYRuHKqkB
-         7205lsCrYrpK714bR00te+tXmqj30lSEfQHcVqfV1qwcrY7mqMpo4Rj7aiKiQHifw6Fd
-         rIQsfmPDhOJJMn/oRHwrAYXvj4QtDj3mh6IZdBAjZracitgGmNN3eanv2IMJqA2bDQNs
-         EbLGPb8EoMHfAuGaKA8dpPEeWPF9RsC2xYEXYMdAuZO07cEM6iyRw9VaOoBggtY9MMn6
-         dNcraBaL9VOHkWAZQdetJVZI+Ud+eDLI/ONTgzQDO54ISJReQQYTYuaHdD8zUgX2UGsj
-         U8LA==
+        bh=ixBaPt3HwUBSQNgJD5/MCt2lI2he2/bUzlD4zYQg34g=;
+        b=dDwMFZfq5reqpiOFepVaOhIPc/R0rG4nmhLUdQ7jOcn9Yt+vcKp3sZFqlbnlqQ9do3
+         CrCOuM7b3nkf0EydYWwerm+WbYVo4MJo/1vW2FOPMV3bvoJvv7SmIPV7aDZzCoEmKMzs
+         6pETPSuP7SQiXtmcKuMlnK0QnqgViCXdfk38WelJo4s+TVOk54gnC1Ufz3t2kxHCC5Y5
+         L9l7+egf2f27jYZJ5h+OqJTNTxXfXPwPeqXneiQDi9SCwkSL3SxonP5n61xqX+7vF1Uf
+         MO3SJfct/ACQUfOHmKCtSgrpvzeLnu7TyWrNM58FyMgc/KCLxTa6P7rwXhSkNfa2L7Ly
+         Dj1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721785638; x=1722390438;
+        d=1e100.net; s=20230601; t=1721785642; x=1722390442;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UzoaOAE8mtc4ll9mWUV2yqA7g11y//aTQ0G+wfCrhNk=;
-        b=tKsIe+KgHJn3BHSZatUKQn9v0A1gUuX89BGC1lDR3EuAUwvueJrhz86dWt4BVwQNv8
-         5mL54zCMFlzSOjdPgxO/0BCEm/5L71QdFZQpe+W27vNtrsCQDnOJX+biycygHts5oyI0
-         pQpOd1OzFFJfheQAXVkGKOcNElRWL+ac8Wi15/Evf6pqlZ1Z9/GaXLnxmQw9qDc31rah
-         mcR+vejr13LCxFoX5K5qFyZBTimfNeDg3rr8XCOamOk7REkhFhp8k1vbJfl15xsywDXc
-         gu9C/VJnaCA4dC2WLDV+ws2Utm8hsC06sxW9pnR1anTn8ki0Ayj953tcuCEWoEMDO2Jf
-         4rZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKg0INRbgcsBYgRI3nd6bLEfc6n9hSczK3MNEPcNwf6p7hRwSbndOza6q0PqRTbnzprwwlZGaeOuC1rKCIgHcLVqvVIYjYhrq0m/aC
-X-Gm-Message-State: AOJu0Yyg0ajkN1XUiD+i1ZkJW4krRKiettEGwAQOLFy1aVO/JoiFd3y8
-	qgjlSSC46FDU/wMWDJvpgVm5hBxR39K5XR3ATc77V8zdwLEvEi0Kv7CHySiK
-X-Google-Smtp-Source: AGHT+IERHuUZtKUvDN6QlVo1a+k+ACP65aDBdLCNUACZKnA1Cw0PbBgvOz/ps4ZWrTlpsQxKn46yMw==
-X-Received: by 2002:a17:90a:3484:b0:2cb:58e1:abc8 with SMTP id 98e67ed59e1d1-2cdb941f681mr635135a91.21.1721785638297;
-        Tue, 23 Jul 2024 18:47:18 -0700 (PDT)
+        bh=ixBaPt3HwUBSQNgJD5/MCt2lI2he2/bUzlD4zYQg34g=;
+        b=g495qGGoCNo85PVV02nH8liaXHMjfuDxjOL3JVkVitdMtssiKAa478du+gV3t5Ayrs
+         wci9ZjEDxPo2YXAqBKRPwF/NX6H+XLqjUG+qNUO/cIavsRiKRIQyzh1o5Fp3DOQePj3w
+         94+Anmth7Xti4aePYjPEGJQHOdZAvSP9VEW/f+FgrE+zu/xqNrmYtrXGsU09+hX4eS0p
+         x91fB7cLKs+SIsG0NM2pyjKNxQdMTw2aw2OPws0R25XqFImggUMC0xaVQ9mj4lNLZ3BQ
+         ZfFYs6A0lWXrufvsrRFUETO0JGdi5Oxt0YQ5XQ+Rrn3+RXf3blcfWpyjMn8ErHPgvIzI
+         ZEfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVzSqamxUv75pBsQCY2t4RIF2rgdCKfzWwK5/14IqTHHnOswTsozzRgRt6/3MKzCW1xFitv74UEXbiJZ0YXDIeHp9QXaxxNUwNHEvuE
+X-Gm-Message-State: AOJu0YwblsyHVm1MdP7qwM5tl7NuLB7yZr+43E/G3h32V15tjLoVrXDd
+	S8GYiP0iz3J6VJUh4Skk9nNaQ0fW8VIO9u7ijFLtPNuLEx2dt2dyO1K/eBvV
+X-Google-Smtp-Source: AGHT+IEzb3HhOlXc05SU9bt4B8hsihQpnQJiUMKfpkiSYXtvWZtRhKv4Q3D5pKN5cYFnan7xoExGSA==
+X-Received: by 2002:a05:6a20:841e:b0:1c4:2540:1735 with SMTP id adf61e73a8af0-1c4254017aemr13020132637.16.1721785642340;
+        Tue, 23 Jul 2024 18:47:22 -0700 (PDT)
 Received: from localhost.localdomain ([159.196.197.79])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb73a5f5asm314564a91.8.2024.07.23.18.47.14
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb73a5f5asm314564a91.8.2024.07.23.18.47.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 18:47:17 -0700 (PDT)
+        Tue, 23 Jul 2024 18:47:21 -0700 (PDT)
 From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
 To: netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
@@ -74,12 +74,11 @@ To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+	Stefan Rompf <stefan@loplof.de>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 3/4] net-sysfs: check device is present when showing testing
-Date: Wed, 24 Jul 2024 11:46:52 +1000
-Message-Id: <2a96f450e4150e9b8c39fb000d82c17987c5bbc5.1721784184.git.jamie.bainbridge@gmail.com>
+Subject: [PATCH net 4/4] net-sysfs: check device is present when showing dormant
+Date: Wed, 24 Jul 2024 11:46:53 +1000
+Message-Id: <5d51ac5ca591bb38cc822376e878f0b30864b916.1721784184.git.jamie.bainbridge@gmail.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <cover.1721784184.git.jamie.bainbridge@gmail.com>
 References: <cover.1721784184.git.jamie.bainbridge@gmail.com>
@@ -95,9 +94,9 @@ A sysfs reader can race with a device reset or removal.
 
 This was fixed for speed_show with commit 4224cfd7fb65 ("net-sysfs: add
 check for netdevice being present to speed_show") so add the same check
-to testing_show.
+to dormant_show.
 
-Fixes: db30a57779b1 ("net: Add testing sysfs attribute")
+Fixes: b00055aacdb1 ("[NET] core: add RFC2863 operstate")
 
 Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
 ---
@@ -105,16 +104,16 @@ Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 3a539a2bd4d11c5f5d7b6f15a23d61439f178c3b..17927832a4fbb56d3e1dfbed29c567d70ab944be 100644
+index 17927832a4fbb56d3e1dfbed29c567d70ab944be..ff2a1f6ef7e18be56c2de51902519066431e47a8 100644
 --- a/net/core/net-sysfs.c
 +++ b/net/core/net-sysfs.c
-@@ -291,7 +291,7 @@ static ssize_t testing_show(struct device *dev,
+@@ -303,7 +303,7 @@ static ssize_t dormant_show(struct device *dev,
  {
  	struct net_device *netdev = to_net_dev(dev);
  
 -	if (netif_running(netdev))
 +	if (netif_running(netdev) && netif_device_present(netdev))
- 		return sysfs_emit(buf, fmt_dec, !!netif_testing(netdev));
+ 		return sysfs_emit(buf, fmt_dec, !!netif_dormant(netdev));
  
  	return -EINVAL;
 -- 
