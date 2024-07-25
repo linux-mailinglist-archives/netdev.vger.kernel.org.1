@@ -1,110 +1,118 @@
-Return-Path: <netdev+bounces-112949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C4893BFB9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:09:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7835E93BFBF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:13:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3C281F21E8F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:09:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3001D1F21C02
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCF7198A36;
-	Thu, 25 Jul 2024 10:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FC0198A3D;
+	Thu, 25 Jul 2024 10:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="WGGHz3VH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PJmMHmHP"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281D7339A0;
-	Thu, 25 Jul 2024 10:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C0F339A0
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721902152; cv=none; b=pkpMew3oHXuT5YYiCFEdsODF0WoU2j8zckbUAeZVJyDZeoLkEWBlZwqJfY4mvc2OtaboI5ZiJzeTALO/aUxevOCIFtGhdcuFDUFNs4noz3zRb4JXqPUJTvYmC7Nd4bT25rs6XVTxSc84+jfpiD1nq+PPcQ5xK2CHpMLeC/4voNg=
+	t=1721902417; cv=none; b=e5B93L2yyxE7kQsUvbip6D7+mVPkXNeuWPC1JmW73UoRGzwONGYVKYWN8wGwcWHldI0/JM2wjjkFfkLUOP1uNHgaumM41Wl6bi7mGVqApqZXhHzNH208eAazsXXJnLo4fEVqLOX7k3dpUXrnrWFv8+PNMOSnK/quxrejDfFK7cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721902152; c=relaxed/simple;
-	bh=dccd50OcfvpBXhYyffFfrcG65sQZ8CMbrc9mal8Ajm8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ieRGTP10LzF8Di76SLFeBzF3osDPNDatAZLvxp3IA0b/6Lt2nti46Hg0zPpmY2qWv2LWeAkC3g/0iYx9l2MaC6OWFl+OkPmYQQese9TzKYvQFZLaTj52n2Xpwi2+OqLPFeEMtcrqxFbLXl5JGbTX7wihyitHneFg1H4YbIKRsew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=WGGHz3VH; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=uIqaPgiuxH40adJRSLEvk9/EV1ojn03gZFl+Izd0gEc=; b=WGGHz3VHywBi8qjcCBVfvfWI3i
-	b3mTh+X7qvwNc0VP9ypeC9ESkMCGJ8sqGcdhQgS6P0njQUEDOUYN3gKxPWF7BjCPiM9hqsX5XQIk3
-	eoXlUCzAz5swvr1JpK8rm6Wux+BxqlhrQ34CtD1d8QhYHQY2YfPXWeMqSiqs7FlEhjcSd6AHIg5Lw
-	aUB+1/ViI7BdWskBABp7oJ8ZfcdDKlnbZkMtJ24MtU09YIEbc4XEv6HX9ZWvCj90l6QC8HS5gJE/O
-	bGVzELPNrWtH1TSIMqVpx5uwIYpzxKlpcOwIK9gh7ThkqoTUZThS5CBFGSf7+QbmxTNNCGjbe0DI6
-	reG4NwEQ==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sWvPI-000PvU-Bj; Thu, 25 Jul 2024 12:09:08 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1sWvPI-0002Ja-1G;
-	Thu, 25 Jul 2024 12:09:07 +0200
-Subject: Re: [PATCH bpf v5] bpf: Fixed segment issue when downgrade gso_size
-To: Fred Li <dracodingfly@gmail.com>, willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <CAF=yD-+Hx9Tg-Fj+7hutPJ7inL_GpgiY4WAXXdhN-tzj5Q1caQ@mail.gmail.com>
- <20240724133712.7263-1-dracodingfly@gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <bc7f6b4a-0474-99d3-ff38-139712b4e8f4@iogearbox.net>
-Date: Thu, 25 Jul 2024 12:09:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1721902417; c=relaxed/simple;
+	bh=kZS/Vvw0CIg2NcQXfwPmF0/EJyNJWFZHLp6wP/n4+b4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ccyFFphR1XHYhQHOckOdGwtY4xXISSQypq47dowo4qy9SAooyLO4vQU/55frMAs9kugmAcOLxOLxMpUWHDTLU5UnYUcDeSzweSV/GOo5onapvU7LhC4YE1s6QHKSH/MJRNA/Yim5u39O7wGJ6PQfcjrPhA95OlAu3Em52xbA0pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PJmMHmHP; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721902414;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h82meJUmBOJNnBSpKMpoM4unVVcCuigUwzLl+zEwfNE=;
+	b=PJmMHmHPn4g13k2UHWNQ+lRgndpMt8TrckvP8VxgSytwLPS0SYbXEKLCh+Bz5ah6STocQ1
+	+fglivr8TqspeO6tpk3LEyUsxju8nZ9VzzSjfdiishSsnA0C8ZruaqCmaHq+3DuybM7BvO
+	yXwRae6cF28sJ7/FcdTKIYkZOG9CJNs=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-vEBHXAg2NDa-nZj6aIrnAg-1; Thu, 25 Jul 2024 06:13:33 -0400
+X-MC-Unique: vEBHXAg2NDa-nZj6aIrnAg-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2f01b609ac9so1744951fa.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 03:13:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721902411; x=1722507211;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h82meJUmBOJNnBSpKMpoM4unVVcCuigUwzLl+zEwfNE=;
+        b=oDXBu6RIiy5Bbl2tbSTO2gvIvsBKALqi/wqLGp7h6wvaXo6K4ZZ7f5PstkTlM8i/2c
+         kR1SqjAeTHFycHzUJ4ho9MPGo0E2k/+aEd7A+Yn5xf9wnbvvTOWILRtg97jEimLGyyfb
+         ThZFiiT+CVGtUnM9jZC/qI05DS0AvcRxkddybDV6W8WIR3VENi77ZkJPmIAtbwtYJjYN
+         zDVuDaEeGX4yhMbN7jpUhIfF7RHzGWJeHwYdpLfM23bw4lNJbOKXAdtKrZxC7KgbgQdW
+         pvVXMxp2rL78jKGlW8PWat+MbXnyC2YRA8hjWPV2NboxWSvAHfmnXEZJhdBuNJVJho83
+         yB8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV4PlpVVQ9NY+PKe3dcs+mj68Fby0ST9vdRtKgBgbUvoMeXVmv4PLGvf7Hsl6kVNwwo/8Z4ZEdg3IfIbJQdlMBcgjTJFW8I
+X-Gm-Message-State: AOJu0Yx3ucZKlP+yCNKXN07bD3m8gh0pObBxY0lkgUD65penpTR/YsHk
+	XxV/y6SS6tEb2pxzaoD5LAnaYctwGgV9HU14GsHTFb0xj2F3yfD21kJrjJAgSrgVAUE5WBE5qpq
+	+jAHRaAZV8VLGENjhKasTeMIjtCg5CDTGZhdZSrCvKQpEUIODeALMDW7HDw+H5w==
+X-Received: by 2002:a2e:a99a:0:b0:2ef:17df:62f9 with SMTP id 38308e7fff4ca-2f03c7dd359mr9051961fa.7.1721902411552;
+        Thu, 25 Jul 2024 03:13:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGWT8OHz5tTVwJV2gJIOLxmAVqK0y9pYW/gbJyo8BSSqXPWh33MRJYqYTSBxb/OEwPjVXWsoQ==
+X-Received: by 2002:a2e:a99a:0:b0:2ef:17df:62f9 with SMTP id 38308e7fff4ca-2f03c7dd359mr9051831fa.7.1721902411113;
+        Thu, 25 Jul 2024 03:13:31 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427f9372a5asm70020375e9.15.2024.07.25.03.13.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jul 2024 03:13:30 -0700 (PDT)
+Message-ID: <d2014eb3-2cea-474a-8f04-a4251fd956c9@redhat.com>
+Date: Thu, 25 Jul 2024 12:13:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240724133712.7263-1-dracodingfly@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] macvlan: Return error on
+ register_netdevice_notifier() failure
+To: Eric Dumazet <edumazet@google.com>, Shigeru Yoshida <syoshida@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240724135622.1797145-1-syoshida@redhat.com>
+ <CANn89iKOWNa28NkQhhey=U_9NgOaymRvzuewb_1=vJ65HX1VgQ@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27347/Thu Jul 25 10:27:42 2024)
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89iKOWNa28NkQhhey=U_9NgOaymRvzuewb_1=vJ65HX1VgQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 7/24/24 3:37 PM, Fred Li wrote:
->>>
->>> Linearize skb when downgrad gso_size to prevent triggering
->>> the BUG_ON during segment skb as described in [1].
->>>
->>> v5 changes:
->>>   - add bpf subject prefix.
->>>   - adjust message to imperative mood.
->>>
->>> v4 changes:
->>>   - add fixed tag.
->>>
->>> v3 changes:
->>>   - linearize skb if having frag_list as Willem de Bruijn suggested [2].
->>>
->>> [1] https://lore.kernel.org/all/20240626065555.35460-2-dracodingfly@gmail.com/
->>> [2] https://lore.kernel.org/all/668d5cf1ec330_1c18c32947@willemb.c.googlers.com.notmuch/
->>>
->>> Fixes: 2be7e212d541 ("bpf: add bpf_skb_adjust_room helper")
->>> Signed-off-by: Fred Li <dracodingfly@gmail.com>
->>
->> Reviewed-by: Willem de Bruijn <willemb@google.com>
->>
->> My comments were informational, for a next patch if any, really. v4
->> was fine. v5 is too.
-> 
-> Thanks for your advise.
-> 
-> Fred Li
 
-lgtm, I slightly improved wording & applied, thanks!
+
+On 7/25/24 11:44, Eric Dumazet wrote:
+> On Wed, Jul 24, 2024 at 3:56 PM Shigeru Yoshida <syoshida@redhat.com> wrote:
+>>
+>> register_netdevice_notifier() may fail, but macvlan_init_module() does
+>> not handle the failure.  Handle the failure by returning an error.
+> 
+> How could this fail exactly ? Please provide details, because I do not
+> think it can.
+
+Yup, it looks like the registration can't fail for macvlan.
+
+It's better to avoid adding unneeded checks, to reduce noise on the 
+tree, keep stable backport easy, etc.
+
+Thanks,
+
+Paolo
+
 
