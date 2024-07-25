@@ -1,84 +1,95 @@
-Return-Path: <netdev+bounces-113125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B00E793CB08
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 01:07:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB9D93CB41
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 01:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 670BF1F239AD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:07:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8020281F28
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED72A145345;
-	Thu, 25 Jul 2024 23:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8F214387B;
+	Thu, 25 Jul 2024 23:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnsKPNyK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAjyYqNg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDB34131E38;
-	Thu, 25 Jul 2024 23:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B4513CFBB
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 23:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721948822; cv=none; b=V8HmdWXFTb6baLvaRuZ35Offm4GR5El7f6sfEx5f9E0bjxLt6af0VFTt7kkNaC0aYLpcCs9WefUaifCPPksWpjTzROd3aqKw0lqgqL8oNJYTF1rWm8KtCRckSy7yLiCngx7VgYPnUcO68l6fUrSMVnXRHC/kFpvNTfK5m6bzykU=
+	t=1721950233; cv=none; b=ToD5tYalOomerY15PNdkHyCrMaUlCMUnvekyEgIvDyMZZ8ZO4LWbivCHcOCIgOQ9zy5Ez8X8xe37zcWEmZICs5D9DfmtJjWftDrKGG0jE+IuKACdiTzkFsQU8K8gvxAUN5SVEzeFqaOFemL026vJ2/xcyGGg4Bh2CkC8x/8frfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721948822; c=relaxed/simple;
-	bh=WcJu4HKSi540Gh4QQTNvr6MDlTHW/9r+T5GZ9rbjlA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iNCpc7uSZk5aPp1xQzxDXHLlbb8+0paCgSrhSxpFXOG16GIQV6MJQ7Lz1ePPQgLq7zwmNEGqNlZwQNH9kpyyk7nD+XIIyHJT6YPcK72USSxmOe/mkybIaFTVn2ptXzn4YeC0ebQSGw5nAIfSMqECZODTWANLChvDNR/wt+KipoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnsKPNyK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9622C4AF07;
-	Thu, 25 Jul 2024 23:07:01 +0000 (UTC)
+	s=arc-20240116; t=1721950233; c=relaxed/simple;
+	bh=RbNMwLG4GM9J+0jlXVKMcsVYZkHH5qo55nIjk8/2OGA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bOTJdTRViQ1qcPeDgEogtCX/wMJXjDCtqOay0rSqyy1hga+ctqEiXHKiG36DfrwkfjfXHXsznApO0AZG4AOzl53XMhuoLfuBVdcSv3OEtTg70dfD5N2FcloVuy5Xu7CmuzOvtOTuj4TzMzFwSTZIXHCFAfjWYh9AyO01LG2PFiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAjyYqNg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 37825C4AF0C;
+	Thu, 25 Jul 2024 23:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721948822;
-	bh=WcJu4HKSi540Gh4QQTNvr6MDlTHW/9r+T5GZ9rbjlA0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OnsKPNyK3FID5EW4dmTQZIav7FB2NmlZWTcN1pObaVuNnO4t53tiTyA7nN1/SG63V
-	 FZm+sMEg95QoT84Y0p7VS9Kgk7GFc7uO4b2/bNhS3b24dGSC2oZ/fMp15qfVmWRfMu
-	 5Z+1y2MkK2rfNxf8hIxiAo+85guFqVvp6PB6REv27GV4F1MOJEXbBr7z7yN0J/8pbx
-	 k/uNlxVNGTc45mwQRV9tJZKBOOucpRiOCKfiVCWmS++X7DyRUw8E4U5PZjmZT8lQBq
-	 b72Pwdf54j1jYmGsueJ0SLx2rVNhXHu3CKjYwzt8RDttoddn5JjoDtLGf7BT3YgjC9
-	 vumwbksDT89yg==
-Date: Thu, 25 Jul 2024 16:07:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
- <magnus.karlsson@intel.com>, <aleksander.lobakin@intel.com>,
- <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
- <john.fastabend@gmail.com>, <bpf@vger.kernel.org>, Shannon Nelson
- <shannon.nelson@amd.com>, Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: Re: [PATCH net 6/8] ice: improve updating ice_{t,
- r}x_ring::xsk_pool
-Message-ID: <20240725160700.449e5b5f@kernel.org>
-In-Reply-To: <ZqKaAz8rNOx/Sz5E@boxer>
-References: <20240708221416.625850-1-anthony.l.nguyen@intel.com>
-	<20240708221416.625850-7-anthony.l.nguyen@intel.com>
-	<20240709184524.232b9f57@kernel.org>
-	<ZqBAw0AEkieW+y4b@boxer>
-	<20240724075742.0e70de49@kernel.org>
-	<ZqEieHlPdMZcPGXI@boxer>
-	<20240725063858.65803c85@kernel.org>
-	<ZqKaAz8rNOx/Sz5E@boxer>
+	s=k20201202; t=1721950233;
+	bh=RbNMwLG4GM9J+0jlXVKMcsVYZkHH5qo55nIjk8/2OGA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SAjyYqNgDUtHHe/PptPKMQsGaEeqUkD+kdVvjBNHomiwXBPKpFg0Ug7oFUESTObmD
+	 GGgh76dB+LEynvUhEMqKPNJ+7Fr/DjM1d3LDWHbkeBNU9tfmJueAL3N8gm9mjlR3Nb
+	 YQYhuFgPvPGOtXarHO/OrmZcIWC0R8p8lqqcs2YVkZwBI2TO3obYukk9oXYzkBcf5z
+	 O/JxjfG+IUwcGSy+SvkZZXT0vtENrNbcYe2miqGZgRY7yVLDOAdK1qVzG9QE4plC0Z
+	 Don8eeNEAqxTVyGYvoShHQnq260iF6j1HmJe/D7o/mYLU0C5uE5Hv57QrcE8H0qG/w
+	 vDVO89psvuHyQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 267E9C43638;
+	Thu, 25 Jul 2024 23:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] bnxt_en: Fix RSS logic in __bnxt_reserve_rings()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172195023315.25262.12343985900887431574.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jul 2024 23:30:33 +0000
+References: <20240724222106.147744-1-michael.chan@broadcom.com>
+In-Reply-To: <20240724222106.147744-1-michael.chan@broadcom.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com
 
-On Thu, 25 Jul 2024 20:31:31 +0200 Maciej Fijalkowski wrote:
-> Does that make any sense now?
+Hello:
 
-Could be brain fog due to post-netdev.conf covid but no, not really.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The _ONCE() helpers basically give you the ability to store the pointer
-to a variable on the stack, and that variable won't change behind your
-back. But the only reason to READ_ONCE(ptr->thing) something multiple
-times is to tell KCSAN that "I know what I'm doing", it just silences
-potential warnings :S
+On Wed, 24 Jul 2024 15:21:06 -0700 you wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> 
+> In __bnxt_reserve_rings(), the existing code unconditionally sets the
+> default RSS indirection table to default if netif_is_rxfh_configured()
+> returns false.  This used to be correct before we added RSS contexts
+> support.  For example, if the user is changing the number of ethtool
+> channels, we will enter this path to reserve the new number of rings.
+> We will then set the RSS indirection table to default to cover the new
+> number of rings if netif_is_rxfh_configured() is false.
+> 
+> [...]
+
+Here is the summary with links:
+  - bnxt_en: Fix RSS logic in __bnxt_reserve_rings()
+    https://git.kernel.org/netdev/net/c/98ba1d931f61
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
