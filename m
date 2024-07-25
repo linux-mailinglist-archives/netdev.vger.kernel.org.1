@@ -1,65 +1,54 @@
-Return-Path: <netdev+bounces-113008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C68A93C323
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:39:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B7A393C337
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 973671C21127
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:39:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37AED1C21A8D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A496F19AD73;
-	Thu, 25 Jul 2024 13:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HomBMwQd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C02C19B3CA;
+	Thu, 25 Jul 2024 13:43:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA94C8DF;
-	Thu, 25 Jul 2024 13:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3529C225D7;
+	Thu, 25 Jul 2024 13:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721914740; cv=none; b=qnqam0LB+ngKGtHchc4u0Kg8XWHz7xvCcy+O5jq7d+GZrZodTemVJ5dcwANr8d9+Dn09ZN7Kr6g4T1abCckHdRfnNZ2OfWEOmPzOBqJuezFhofHq3CpSFJ1iFR7/ql6PYMZ+dAZS3nhO1wDuo7zMcCdxyC90n8abpflKgFyDcDk=
+	t=1721915029; cv=none; b=IfjgKHHH2Lr3aSPsIty0fjXtmgP0ojwDj4xBKCt5iIMLbOgzZCqTEhlH2nNbLo4kvqIt2rSFpABWpAPf5T7JVlpnzmV7w6fLjWNMZVE9u8ht6BrtTa7Utvq0M4LK/hH8bxSwuCrayQyFqlchI1VtCua5/UnPtAJGgQrI7gbgREM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721914740; c=relaxed/simple;
-	bh=uVSdiMT6CHreGqJ++OAGyCpMp24oqatww/pzSiiDJNQ=;
+	s=arc-20240116; t=1721915029; c=relaxed/simple;
+	bh=YKUCT0zwIVfetAmiAL7WYXohNFMTbJ9ulBXs00lVIv0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OLlUJJ/5Utgk2rSZXE1C63EmQI5tKBKgpSZU8jg44PxEo7OnEbGZS6m1cA63DOwRoOVvYuVgTnIhySQqIjVw6HTlDo5IHbqsh8T8bWjcQYNtX2MOh15cK4ruo3mrSgrS1lgdPl+btiROLJHWp3e5aw+CxC+z0qfPImeNZ8eNcn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HomBMwQd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D55BC116B1;
-	Thu, 25 Jul 2024 13:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721914740;
-	bh=uVSdiMT6CHreGqJ++OAGyCpMp24oqatww/pzSiiDJNQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HomBMwQdzgpS3TLMUOocYLEafE2MSr26ytBH3GTAP9Pg5RyPimqZpXohZDY6ZHXu1
-	 cPYAG9MqoqInYFqR78mganK7FGRNtOGl+XNW+QrAUrnvN//VZLHWU0eP40x/HN/Ez2
-	 lnabVjECU3vfYsH6rTQLIqjRVwiz03v0s9WMaegtYN44at9vYnca/l4gCTfyQJ794G
-	 maqG0raJfmgjm6YqsKLEcl49UdPI/QjHnFLUys6o1p8NePsQ9pJzDrkUQ09Ez1u1JJ
-	 I3C0YJAcMqB92H8BP5ReF/N32DLs1HUpeX3V/7QLx3rve7fDY+kOAEvSWpWmLDv113
-	 otFxAEZKjY3dQ==
-Date: Thu, 25 Jul 2024 06:38:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
- <magnus.karlsson@intel.com>, <aleksander.lobakin@intel.com>,
- <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
- <john.fastabend@gmail.com>, <bpf@vger.kernel.org>, Shannon Nelson
- <shannon.nelson@amd.com>, Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: Re: [PATCH net 6/8] ice: improve updating ice_{t,
- r}x_ring::xsk_pool
-Message-ID: <20240725063858.65803c85@kernel.org>
-In-Reply-To: <ZqEieHlPdMZcPGXI@boxer>
-References: <20240708221416.625850-1-anthony.l.nguyen@intel.com>
-	<20240708221416.625850-7-anthony.l.nguyen@intel.com>
-	<20240709184524.232b9f57@kernel.org>
-	<ZqBAw0AEkieW+y4b@boxer>
-	<20240724075742.0e70de49@kernel.org>
-	<ZqEieHlPdMZcPGXI@boxer>
+	 MIME-Version:Content-Type; b=aMcW3stk9n5r1xBxfcadPYVuVKmYu727t64R2genSjE6p4kwrZORLS1tQrEXKozZJvc4ECoC+9w3xPvag8dAPs8TlFF237AhrKQVNWakIgh4VgsZit5B5v6XgridNDZ2v4Mfry+SBicauVCxhoGXVyOOboZsUgmgPG4l39nsvrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962BCC116B1;
+	Thu, 25 Jul 2024 13:43:47 +0000 (UTC)
+Date: Thu, 25 Jul 2024 09:44:07 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Laurent Pinchart
+ <laurent.pinchart@ideasonboard.com>, James Bottomley
+ <James.Bottomley@hansenpartnership.com>, Jiri Kosina <jikos@kernel.org>,
+ Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240725094407.4b062971@gandalf.local.home>
+In-Reply-To: <CAPybu_1XsNq=ExrO+8XLqnV_KvSaqooM=yNy5iuzcD=-k5CdGA@mail.gmail.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+	<nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+	<1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+	<20240724200012.GA23293@pendragon.ideasonboard.com>
+	<CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
+	<20240725122315.GE7022@unreal>
+	<CAPybu_1XsNq=ExrO+8XLqnV_KvSaqooM=yNy5iuzcD=-k5CdGA@mail.gmail.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,16 +58,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Jul 2024 17:49:12 +0200 Maciej Fijalkowski wrote:
-> > So if we are already in the af_xdp handler, and update patch sets pool
-> > to NULL - the af_xdp handler will be fine with the pool becoming NULL?
-> > I guess it may be fine, it's just quite odd to call the function called
-> > _ONCE() multiple times..  
-> 
-> Update path before NULLing pool will go through rcu grace period, stop
-> napis, disable irqs, etc. Running napi won't be exposed to nulled pool in
-> such case.
+On Thu, 25 Jul 2024 15:02:13 +0200
+Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com> wrote:
 
-Could you make it clearer what condition the patch is fixing, then?
-What can go wrong without this patch?
+> As a user, and as an open source Distro developer I have a small hint.
+> But you could also ask users what they think about not being able to
+> use their notebook's cameras. The last time that I could not use some
+> basic hardware from a notebook with Linux was 20 years ago.
+
+FYI, I love my Dell XPS 13. But it's old. The battery died once and I had
+to replace it. I would love to buy a new one, but the new one's webcam is
+not supported by Linux. I'm just waiting for when this will be resolved. :-p
+
+-- Steve
 
