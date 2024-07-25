@@ -1,159 +1,187 @@
-Return-Path: <netdev+bounces-112972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5145093C107
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:42:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68B9E93C10E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC3EA1F212D0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:42:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F9B282FFD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1F31991A8;
-	Thu, 25 Jul 2024 11:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F844199236;
+	Thu, 25 Jul 2024 11:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5HlzDoD"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="lU3s9wyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B13716D4C3
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 11:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9684A199243;
+	Thu, 25 Jul 2024 11:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721907747; cv=none; b=XtLAnS33BEKw05rz7c/zWzEF+mtZjopaRPOlV8kB3u9oJd0Gnh+707wXVvptAw61phMB4xDdWwu8qYHB9B9EyqrQ36mryG5QFg01YcOA2daZ3IVJ6YUOjrCKOjCiHDY3FtdQDO8Piak54CpMbnucmq/5ao2XzGs3oFgtoUwsIrg=
+	t=1721907799; cv=none; b=SavhqWczUwj93XjlXknLVDopZvf3rcIqYlSiYfJULB5SQCaVR05JIPse/ZgK0bQ/ahr24ZGOC1eeZoVjZECVkZRWGfBwmnq+LiydSWYFPxI0oFDq1sxDsSuqcuLt++D87s+g3g1DIVN+6FQYLGHlFFFgliTXR52m8yifvlkguhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721907747; c=relaxed/simple;
-	bh=do3MClTrFLkEOaUJtGQ6PkvAMhyApIKZmBi7frB38iE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZvAE6zZJHMghPgPxCtRWKDGoBUHjyamEHnmCVtuTucavqH7TUFywRST8LwTvbuuf8jynE4Un8bPAGSPEE8SZSQhsoAcgw8IXEiQLlyPoGEF6fVDL+UpD8wtzhDVz8i9QbGW3kkRcW3eojLOdk5Vb/eSgNJH9wEArf/PwphTxA2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D5HlzDoD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721907744;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y7dagFSZOLUUvaFqUleUBFj9zRZOZBodVzNBd/VdwrM=;
-	b=D5HlzDoDaC/V/ioy3cxTiB3vE7RMvZZtEuY0j7Cb9gCieJLZ5138QtYE1Estpfwde/VvF1
-	jD7BNu9B9JTuA4NZoxb++fjr4H3+lAPY0xCZbjbumYhTWdcxdVzLlCRWY+V6T5L45Ghcn5
-	ADBfCgmXT6cw0+jdAb1y0ixI8qGAxo4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-3sMtm0U9OmmrmMWQy2PzsA-1; Thu, 25 Jul 2024 07:42:23 -0400
-X-MC-Unique: 3sMtm0U9OmmrmMWQy2PzsA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4267378f538so1509405e9.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 04:42:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721907741; x=1722512541;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y7dagFSZOLUUvaFqUleUBFj9zRZOZBodVzNBd/VdwrM=;
-        b=hde1zinJQfU67uVp0P7b4K+uOA5o85QNVJ9hnoscvi6kJSW0WLsVVV/PU9kKMbtNkF
-         QU9vtXW4HfrQGJQlAUA2aUY+30AZNOoGF3SQ928S4d/xAR17HLX3sfoSEt/IyKIFUzAk
-         Af869jg6x+5rGYGIVWtBD598cOuDuWSlZsU1Y7gdt2CLFvnC+q+NxF9XiXdST74Kmhmg
-         qgqMkN7gqwqCGI7F1KnbPIfjDM9q7FXyQZCORNfBDwI7g6KqVHSOMCyiRnGVWGl8so99
-         j949a1ccttjBR3Vmo6j8RkBIKcQRFjHOI/4/9D/ANseIGFyxpsY4Wke/9bLp8V2Khp4t
-         M8ow==
-X-Gm-Message-State: AOJu0YwsxnfRxWzEmOB2wekMeqG0zuSvxQiwPkYdQSNAEhruWPP26Sy7
-	nEzZemtXwb4Lu78P03Dzv9rU+lNnV/vggGGyt/Xg1UA8Ve7xD90BlD38AH8qYRLIJQYvYd9pVEF
-	ZjovOJSQpUjahCUjnArRmKID8FI07CJ5n+t2XkhvrMCwJJq98qAtI7ev9/DweAiZlLmesalp4lT
-	wcWLXV+EkZCMIpXfe6R+tUC50Ml3pWvDEAOAE=
-X-Received: by 2002:a05:600c:3ba8:b0:426:4920:2846 with SMTP id 5b1f17b1804b1-428054f12e2mr8876795e9.3.1721907740982;
-        Thu, 25 Jul 2024 04:42:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFUwr/5r9k2e3uO3VgmmiceFmA4gUw2tH91OKsQ3B+d918WYcuYWMpveP9Vu2u1np5fxc+k/g==
-X-Received: by 2002:a05:600c:3ba8:b0:426:4920:2846 with SMTP id 5b1f17b1804b1-428054f12e2mr8876595e9.3.1721907740500;
-        Thu, 25 Jul 2024 04:42:20 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280573eb03sm31388235e9.12.2024.07.25.04.42.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 04:42:19 -0700 (PDT)
-Message-ID: <f5c5f6bb-58ae-4d59-8edb-66fc587e3ff8@redhat.com>
-Date: Thu, 25 Jul 2024 13:42:18 +0200
+	s=arc-20240116; t=1721907799; c=relaxed/simple;
+	bh=Kgftz5XpNQsDjiKjCsqRQjUeT/hJPLW43GoaIfJtv84=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ukz7PToR8iuhptNjwVvD3l4Xt8ZqOaqhHmbSZbmCPivBHKRv1ldxjwRCD9jYA07VKBwplFeGI17mprH8/b3MhHoea8WfcorfrNBThrjF2P7n6SYqPWhQ1EotrOOZOVNRWi5+Dt6AXJfWIbwqHi8fNUaiBVnuv/o5Y6bLJdtKAvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=lU3s9wyM; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=Fs4/iFnoNy7EGfwjse9jOHX7ViUsTi4kKdoAfEBvjfE=; b=lU3s9wyMat9DcdU1ROdtnMN5oT
+	gUw6gTslW/LtvnGH7XR+4qfTfJan/f4/5AN5E0GDxgQZJgUw5qAAjhUvbYQz3XY4qxFvnKi5eOB3+
+	IPEd2h7z7PJ8cyjXr7oonsmymS6mC4loCSJPRLLgAB7hFFgB7WEoAds5Iogi5R7P+/U0v94OXVfsm
+	Ybo1DeyUQ3G62kk/w9EVcKTlnXHCv3AKJ43XRNXWZsU982vfO9Zy2N/I5d4SFdevnP0ZVUPaY4920
+	2q6WKKRFbBqSHcLKA28oCJ+jR6KYOEtdby/NZI9Iuh+2ttaPdO2mXRfx65xYmmNrpZD3fHba4YOcP
+	Io4+NHOA==;
+Received: from 226.206.1.85.dynamic.cust.swisscom.net ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sWwsL-000B6r-6H; Thu, 25 Jul 2024 13:43:13 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-07-25
+Date: Thu, 25 Jul 2024 13:43:12 +0200
+Message-Id: <20240725114312.32197-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v2 01/11] netlink: spec: add shaper YAML spec
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-References: <cover.1721851988.git.pabeni@redhat.com>
- <d84e3a8db21f13268c999074b01ee10d61bceb9d.1721851988.git.pabeni@redhat.com>
-Content-Language: en-US
-In-Reply-To: <d84e3a8db21f13268c999074b01ee10d61bceb9d.1721851988.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27347/Thu Jul 25 10:27:42 2024)
 
-On 7/24/24 22:24, Paolo Abeni wrote:
-> Define the user-space visible interface to query, configure and delete
-> network shapers via yaml definition.
-> 
-> Add dummy implementations for the relevant NL callbacks.
-> 
-> set() and delete() operations touch a single shaper creating/updating or
-> deleting it.
-> The group() operation creates a shaper's group, nesting multiple input
-> shapers under the specified output shaper.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> RFC v1 -> RFC v2:
->   - u64 -> uint
->   - net_shapers -> net-shapers
->   - documented all the attributes
->   - dropped [ admin-perm ] for get() op
->   - group op
->   - set/delete touch a single shaper
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-FWIW, the CI told me I forgot entirely about the generated user-space 
-code, and the naming here is not supported by the current tooling. I'll 
-send something alike the following when net-next re-open.
----
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 51529fabd517..717530bc9c52 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -2668,13 +2668,15 @@ def main():
-          cw.p('#define ' + hdr_prot)
-          cw.nl()
+The following pull-request contains BPF updates for your *net* tree.
 
-+    hdr_file=os.path.basename(args.out_file[:-2]) + ".h"
-+
-      if args.mode == 'kernel':
-          cw.p('#include <net/netlink.h>')
-          cw.p('#include <net/genetlink.h>')
-          cw.nl()
-          if not args.header:
-              if args.out_file:
--                cw.p(f'#include 
-"{os.path.basename(args.out_file[:-2])}.h"')
-+                cw.p(f'#include "{hdr_file}"')
-              cw.nl()
-          headers = ['uapi/' + parsed.uapi_header]
-          headers += parsed.kernel_family.get('headers', [])
-@@ -2686,7 +2688,7 @@ def main():
-              if family_contains_bitfield32(parsed):
-                  cw.p('#include <linux/netlink.h>')
-          else:
--            cw.p(f'#include "{parsed.name}-user.h"')
-+            cw.p(f'#include "{hdr_file}"')
-              cw.p('#include "ynl.h"')
-          headers = [parsed.uapi_header]
-      for definition in parsed['definitions']:
+We've added 14 non-merge commits during the last 8 day(s) which contain
+a total of 19 files changed, 177 insertions(+), 70 deletions(-).
 
+The main changes are:
 
+1) Fix af_unix to disable MSG_OOB handling for sockets in BPF sockmap and
+   BPF sockhash. Also add test coverage for this case, from Michal Luczaj.
+
+2) Fix a segmentation issue when downgrading gso_size in the BPF helper
+   bpf_skb_adjust_room(), from Fred Li.
+
+3) Fix a compiler warning in resolve_btfids due to a missing type cast,
+   from Liwei Song.
+
+4) Fix stack allocation for arm64 to align the stack pointer at a 16 byte
+   boundary in the fexit_sleep BPF selftest, from Puranjay Mohan.
+
+5) Fix a xsk regression to require a flag when actuating tx_metadata_len,
+   from Stanislav Fomichev.
+
+6) Fix function prototype BTF dumping in libbpf for prototypes that have
+   no input arguments, from Andrii Nakryiko.
+
+7) Fix stacktrace symbol resolution in perf script for BPF programs
+   containing subprograms, from Hou Tao.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Christophe Leroy, Daniel Borkmann, Hari Bathini, Jakub Sitnicki, Jiri 
+Olsa, Julian Schindel, Krister Johansen, Kuniyuki Iwashima, Maciej 
+Fijalkowski, Masami Hiramatsu (Google), Quentin Monnet, Stanislav 
+Fomichev, Tejun Heo, Willem de Bruijn, Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit 0e03c643dc9389e61fa484562dae58c8d6e96d63:
+
+  eth: fbnic: fix s390 build. (2024-07-17 06:25:14 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 9b9969c40b0d63a8fca434d4ea01c60a39699aa3:
+
+  selftests/bpf: Add XDP_UMEM_TX_METADATA_LEN to XSK TX metadata test (2024-07-25 11:57:33 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Andrii Nakryiko (1):
+      libbpf: Fix no-args func prototype BTF dumping syntax
+
+Donald Hunter (1):
+      bpftool: Fix typo in usage help
+
+Fred Li (1):
+      bpf: Fix a segment issue when downgrading gso_size
+
+Hou Tao (1):
+      bpf, events: Use prog to emit ksymbol event for main program
+
+Liwei Song (1):
+      tools/resolve_btfids: Fix comparison of distinct pointer types warning in resolve_btfids
+
+Michal Luczaj (4):
+      af_unix: Disable MSG_OOB handling for sockets in sockmap/sockhash
+      selftests/bpf: Support SOCK_STREAM in unix_inet_redir_to_connected()
+      selftests/bpf: Parametrize AF_UNIX redir functions to accept send() flags
+      selftests/bpf: Test sockmap redirect for AF_UNIX MSG_OOB
+
+Naveen N Rao (2):
+      MAINTAINERS: Update email address of Naveen
+      MAINTAINERS: Update powerpc BPF JIT maintainers
+
+Puranjay Mohan (1):
+      selftests/bpf: fexit_sleep: Fix stack allocation for arm64
+
+Stanislav Fomichev (2):
+      xsk: Require XDP_UMEM_TX_METADATA_LEN to actuate tx_metadata_len
+      selftests/bpf: Add XDP_UMEM_TX_METADATA_LEN to XSK TX metadata test
+
+ .mailmap                                           |  2 +
+ Documentation/networking/xsk-tx-metadata.rst       | 16 ++--
+ MAINTAINERS                                        |  8 +-
+ include/uapi/linux/if_xdp.h                        |  4 +
+ kernel/events/core.c                               | 28 ++++---
+ net/core/filter.c                                  | 15 +++-
+ net/unix/af_unix.c                                 | 41 ++++++++++-
+ net/unix/unix_bpf.c                                |  3 +
+ net/xdp/xdp_umem.c                                 |  9 ++-
+ tools/bpf/bpftool/prog.c                           |  2 +-
+ tools/bpf/resolve_btfids/main.c                    |  2 +-
+ tools/include/uapi/linux/if_xdp.h                  |  4 +
+ tools/lib/bpf/btf_dump.c                           |  8 +-
+ tools/testing/selftests/bpf/DENYLIST.aarch64       |  1 -
+ .../testing/selftests/bpf/prog_tests/fexit_sleep.c |  8 +-
+ .../selftests/bpf/prog_tests/sockmap_listen.c      | 85 +++++++++++++++-------
+ .../selftests/bpf/prog_tests/xdp_metadata.c        |  3 +-
+ .../bpf/progs/btf_dump_test_case_multidim.c        |  4 +-
+ .../bpf/progs/btf_dump_test_case_syntax.c          |  4 +-
+ 19 files changed, 177 insertions(+), 70 deletions(-)
 
