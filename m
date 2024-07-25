@@ -1,152 +1,157 @@
-Return-Path: <netdev+bounces-113024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C881693C434
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:32:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B38693C43C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F968B22C2C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:32:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5F49287706
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6CF1993BF;
-	Thu, 25 Jul 2024 14:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/xSlZ81"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C64819ADA4;
+	Thu, 25 Jul 2024 14:33:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF60213DDB8
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7238C13DDB8;
+	Thu, 25 Jul 2024 14:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721917843; cv=none; b=XbyYh79sMiQEAZWVRMrQZ42fNaGkXQDpltI+7Ufv6OBpv/PS/Ee1XLzK8dVajNflX/T/LHsgYHCCCD5hh8gto6xbMxT9BWiHqaf4YjaMJRfED4ZXTBpouH7BsESRE0jQVfxGFNmIem5feKljuvdjUrQQRqjGunyEwq/T0W3VVX8=
+	t=1721918009; cv=none; b=rlBuFrElwKJZuVPzIl8iPreW53oykJdKChTM6XnQuNSp23VEYR3B/4zKxtEkBr89ycTzBY2+VB3EflK3Hl0Rxuar4FSGPrrE/+D5Q0QghqnzBwfZyuOTsLCPZE/tIMiJwFTsB034uslD0+ZpzA23uhnC6RE6gig3Hd2BWDjyFLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721917843; c=relaxed/simple;
-	bh=Lg1FHWf1aLoGClu/OyOiRCCyNvZUhpopi17ZPMg2+2Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mFD4h8vZ9FZFTL2lgDWvCUNw1fr/QE0jnaFuaDyKbahvv3Eo8vp9P1ab4EKlgxJagK77ikxr7bJ1n8RAdCMOP89VtNaHm08GjnItrAB15G4qOO0lYiA4LnpzQNX2OHjUwFYGFAcZ+ggkLzQaIT4+Wd3Yassbcp03HoZUvXR214Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b/xSlZ81; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-8036ce6631bso8447339f.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 07:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721917841; x=1722522641; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uStTdLlrGeKjCaIfgYyuhFLt7Bj/JhLBf8bw+a1gOX0=;
-        b=b/xSlZ81Pp1vkbgB+YunVuYHLjy0q3Mtq95QdBaTSmnu0vaV3ydwGExe+VoInHr527
-         CQ8974joMTcGRpMNjDiyKNqjDPrws9dEgOxhAyRROAgpDnGktIyfH9X0yvOup44TIu2x
-         rtbIDiG4KY3MfHLCgK4JDQFtuP4twgR1x1ReWICzoCFhriTwUqrtG4x8B2uOEBMekVZL
-         TOlS6LfIdCFrQPaHF/d1+kcTN2DxRrwOCfO1DdmP/Zr/JBUf2+Iogty0YRTsQHNkBn0T
-         5gqj1RRa41HW0jy4CuDMIBlGUgNHNP/5UIJ1Fj8SlzV5IsjffFls5pXr6+wo3/bymHs9
-         QoLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721917841; x=1722522641;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uStTdLlrGeKjCaIfgYyuhFLt7Bj/JhLBf8bw+a1gOX0=;
-        b=bu+3qS/Wc9w8HyDr5WFvxaRXJ2jIGhkCgK45s2ra84ARx3aRhPW2OjFpOH0WQobNC7
-         06KE29e3DcqIopYQAkQCAGAr31GxUx7QjxfXrIKqvcK/lO1EJLbpPZPILIn407bWW3L7
-         Jd6dj1nw6npcyo3VgZipxaLTLzTbNKmpdiJALl8sI47JcAb6u7nuSJBsySRLIZIG52Cq
-         aTH66XoWghCQANzktYMOObMWw+Rv+PedbGtBODUcB3nkQ3nsWeEn6JnRJCXq+Kh/rlfc
-         P0J/p/aGc1TSkziSES7/9rr9nPcSjDbJtVl9RHYczWg/dsipA9kOGKgBLsj42PgB6c4W
-         dBDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWX7UhOcEE5DUFc3iRcRcF7MYrsoyYZRF7XcE9ieVJmXUQ/VunLBTHbDHN1DfjWB3uydaPo5lC64KWGDABg2nuevT/xTEw4
-X-Gm-Message-State: AOJu0Yw8ZaI/UdNdk1PQq40E0kp3Svt+3Gsgpnjkr4hCRiSplpTKcmU9
-	pcr4WA7woAeowbVdj4KQMojmLs47pena7gynNjGz1DwAv31XB8He1lAls2OF5hDjMEcuy0+IWKX
-	Rmupi9SPALgZ6YsJiaENtPGc2sIE=
-X-Google-Smtp-Source: AGHT+IFqBFQbRzuELBBkecHjn5yZLQ7dLFt+oM7b2N8hWNaN1pD0VwJREkNlO1tPPTBY0RIremSGEBvxpj27lw38l/Y=
-X-Received: by 2002:a05:6e02:219b:b0:376:4aa0:1a99 with SMTP id
- e9e14a558f8ab-39a217f5f6dmr31681215ab.8.1721917840708; Thu, 25 Jul 2024
- 07:30:40 -0700 (PDT)
+	s=arc-20240116; t=1721918009; c=relaxed/simple;
+	bh=tNUQXUfaXcK0xaAC/za+r66m32S553fXUMDEbyWs4ZQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YrDKmAuGb1gjwhucZEqd/4/0ubeE72csReCZD525C7ajtgWWRW2zceH5HRA0TU0anxr/8zjPEjMQBhuEcrCP8mAVUDvpsMneTEXpekuUkYVmjmit5ImBKr1cgHdvcy4DONaCs6memg/dBt6nmosEIZT3voEN7N+9hVfPtXQL+0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from fsav120.sakura.ne.jp (fsav120.sakura.ne.jp [27.133.134.247])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 46PEWpQT013545;
+	Thu, 25 Jul 2024 23:32:51 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav120.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp);
+ Thu, 25 Jul 2024 23:32:51 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp)
+Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 46PEWpf6013538
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 25 Jul 2024 23:32:51 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <9dc0399a-573a-40c1-b342-a81410864cd9@I-love.SAKURA.ne.jp>
+Date: Thu, 25 Jul 2024 23:32:48 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240725092745.1760161-1-edumazet@google.com>
-In-Reply-To: <20240725092745.1760161-1-edumazet@google.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 25 Jul 2024 10:30:29 -0400
-Message-ID: <CADvbK_eFe==9fLGDQ8HC3CffQqMx7FMiC3CcN=jb1MQrJJPx8A@mail.gmail.com>
-Subject: Re: [PATCH net] sched: act_ct: take care of padding in struct zones_ht_key
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+1b5e4e187cc586d05ea0@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: hci_core: fix suspicious RCU usage in
+ hci_conn_drop()
+To: Yunseong Kim <yskelg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yeoreum Yun <yeoreum.yun@arm.com>
+References: <20240725134741.27281-2-yskelg@gmail.com>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20240725134741.27281-2-yskelg@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 25, 2024 at 5:27=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Blamed commit increased lookup key size from 2 bytes to 16 bytes,
-> because zones_ht_key got a struct net pointer.
->
-> Make sure rhashtable_lookup() is not using the padding bytes
-> which are not initialized.
->
->  BUG: KMSAN: uninit-value in rht_ptr_rcu include/linux/rhashtable.h:376 [=
-inline]
->  BUG: KMSAN: uninit-value in __rhashtable_lookup include/linux/rhashtable=
-.h:607 [inline]
->  BUG: KMSAN: uninit-value in rhashtable_lookup include/linux/rhashtable.h=
-:646 [inline]
->  BUG: KMSAN: uninit-value in rhashtable_lookup_fast include/linux/rhashta=
-ble.h:672 [inline]
->  BUG: KMSAN: uninit-value in tcf_ct_flow_table_get+0x611/0x2260 net/sched=
-/act_ct.c:329
->   rht_ptr_rcu include/linux/rhashtable.h:376 [inline]
->   __rhashtable_lookup include/linux/rhashtable.h:607 [inline]
->   rhashtable_lookup include/linux/rhashtable.h:646 [inline]
->   rhashtable_lookup_fast include/linux/rhashtable.h:672 [inline]
->   tcf_ct_flow_table_get+0x611/0x2260 net/sched/act_ct.c:329
->   tcf_ct_init+0xa67/0x2890 net/sched/act_ct.c:1408
->   tcf_action_init_1+0x6cc/0xb30 net/sched/act_api.c:1425
->   tcf_action_init+0x458/0xf00 net/sched/act_api.c:1488
->   tcf_action_add net/sched/act_api.c:2061 [inline]
->   tc_ctl_action+0x4be/0x19d0 net/sched/act_api.c:2118
->   rtnetlink_rcv_msg+0x12fc/0x1410 net/core/rtnetlink.c:6647
->   netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2550
->   rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6665
->   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->   netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1357
->   netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1901
->   sock_sendmsg_nosec net/socket.c:730 [inline]
->   __sock_sendmsg+0x30f/0x380 net/socket.c:745
->   ____sys_sendmsg+0x877/0xb60 net/socket.c:2597
->   ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2651
->   __sys_sendmsg net/socket.c:2680 [inline]
->   __do_sys_sendmsg net/socket.c:2689 [inline]
->   __se_sys_sendmsg net/socket.c:2687 [inline]
->   __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2687
->   x64_sys_call+0x2dd6/0x3c10 arch/x86/include/generated/asm/syscalls_64.h=
-:47
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Local variable key created at:
->   tcf_ct_flow_table_get+0x4a/0x2260 net/sched/act_ct.c:324
->   tcf_ct_init+0xa67/0x2890 net/sched/act_ct.c:1408
->
-> Fixes: 88c67aeb1407 ("sched: act_ct: add netns into the key of tcf_ct_flo=
-w_table")
-> Reported-by: syzbot+1b5e4e187cc586d05ea0@syzkaller.appspotmail.com
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Xin Long <lucien.xin@gmail.com>
+On 2024/07/25 22:47, Yunseong Kim wrote:
+> =============================
+> WARNING: suspicious RCU usage
+> 6.10.0-rc6-01340-gf14c0bb78769 #5 Not tainted
+> -----------------------------
+> net/mac80211/util.c:4000 RCU-list traversed in non-reader section!!
+> 
+> other info that might help us debug this:
+> 
+> rcu_scheduler_active = 2, debug_locks = 1
+> 2 locks held by syz-executor/798:
+>  #0: ffff800089a3de50 (rtnl_mutex){+.+.}-{4:4},
+>     at: rtnl_lock+0x28/0x40 net/core/rtnetlink.c:79
+> 
+> stack backtrace:
+> CPU: 0 PID: 798 Comm: syz-executor Not tainted
+>   6.10.0-rc6-01340-gf14c0bb78769 #5
+> Hardware name: linux,dummy-virt (DT)
+> Call trace:
+>  dump_backtrace.part.0+0x1b8/0x1d0 arch/arm64/kernel/stacktrace.c:317
+>  dump_backtrace arch/arm64/kernel/stacktrace.c:323 [inline]
+>  show_stack+0x34/0x50 arch/arm64/kernel/stacktrace.c:324
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xf0/0x170 lib/dump_stack.c:114
+>  dump_stack+0x20/0x30 lib/dump_stack.c:123
+>  lockdep_rcu_suspicious+0x204/0x2f8 kernel/locking/lockdep.c:6712
+>  ieee80211_check_combinations+0x71c/0x828 [mac80211]
+>  ieee80211_check_concurrent_iface+0x494/0x700 [mac80211]
+>  ieee80211_open+0x140/0x238 [mac80211]
+>  __dev_open+0x270/0x498 net/core/dev.c:1474
+>  __dev_change_flags+0x47c/0x610 net/core/dev.c:8837
+>  dev_change_flags+0x98/0x170 net/core/dev.c:8909
+>  devinet_ioctl+0xdf0/0x18d0 net/ipv4/devinet.c:1177
+>  inet_ioctl+0x34c/0x388 net/ipv4/af_inet.c:1003
+>  sock_do_ioctl+0xe4/0x240 net/socket.c:1222
+>  sock_ioctl+0x4cc/0x740 net/socket.c:1341
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:907 [inline]
+>  __se_sys_ioctl fs/ioctl.c:893 [inline]
+>  __arm64_sys_ioctl+0x184/0x218 fs/ioctl.c:893
+>  __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+>  invoke_syscall+0x90/0x2e8 arch/arm64/kernel/syscall.c:48
+>  el0_svc_common.constprop.0+0x200/0x2a8 arch/arm64/kernel/syscall.c:131
+>  el0_svc+0x48/0xc0 arch/arm64/kernel/entry-common.c:712
+>  el0t_64_sync_handler+0x120/0x130 arch/arm64/kernel/entry-common.c:730
+>  el0t_64_sync+0x190/0x198 arch/arm64/kernel/entry.S:598
+> 
+> This patch attempts to fix that issue with the same convention.
 
-Reviewed-by: Xin Long <lucien.xin@gmail.com>
+Excuse me, but I can't interpret why this patch solves the warning.
 
-Thanks, didn't know this doesn't get padding bytes initialized:
+The warning says that list_for_each_entry_rcu() { } in
+ieee80211_check_combinations() is called outside of rcu_read_lock() and
+rcu_read_unlock() pair, doesn't it? How does that connected to
+guarding hci_dev_test_flag() and queue_delayed_work() with rcu_read_lock()
+and rcu_read_unlock() pair? Unless you guard list_for_each_entry_rcu() { }
+in ieee80211_check_combinations() with rcu_read_lock() and rcu_read_unlock()
+pair (or annotate that appropriate locks are already held), I can't expect
+that the warning will be solved...
 
-struct zones_ht_key key =3D { .net =3D net, .zone =3D params->zone };
+Also, what guarantees that drain_workqueue() won't be disturbed by
+queue_work(disc_work) which will be called after "timeo" delay, for you are
+not explicitly cancelling scheduled "disc_work" (unlike "cmd_timer" work
+and "ncmd_timer" work shown below) before calling drain_workqueue() ?
+
+	/* Cancel these to avoid queueing non-chained pending work */
+	hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
+	/* Wait for
+	 *
+	 *    if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
+	 *        queue_delayed_work(&hdev->{cmd,ncmd}_timer)
+	 *
+	 * inside RCU section to see the flag or complete scheduling.
+	 */
+	synchronize_rcu();
+	/* Explicitly cancel works in case scheduled after setting the flag. */
+	cancel_delayed_work(&hdev->cmd_timer);
+	cancel_delayed_work(&hdev->ncmd_timer);
+
+	/* Avoid potential lockdep warnings from the *_flush() calls by
+	 * ensuring the workqueue is empty up front.
+	 */
+	drain_workqueue(hdev->workqueue);
+
 
