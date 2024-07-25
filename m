@@ -1,175 +1,251 @@
-Return-Path: <netdev+bounces-113064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1525F93C8B5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:31:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E3C493C8C3
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:35:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C24D52823EA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:31:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34607282A51
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F235B4207D;
-	Thu, 25 Jul 2024 19:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5AE4D8CB;
+	Thu, 25 Jul 2024 19:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="hciy1GXh"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DbP0Y5F+"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC0D288DB;
-	Thu, 25 Jul 2024 19:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE12261FE1;
+	Thu, 25 Jul 2024 19:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721935911; cv=none; b=THE+ApwvaJcjHMMSy47RYh9KvNjYb/2EwPpDKiaazXS8OYH0+Tea1Qyk8EopLLuZJRtD6XDTGwPKm0KmeY64L4fUtsMvKQucOea2tMnFy9TBN1Pt6qWPyq4rnuklLwQNRzl9V8W6OnokV5xHdNhEwhYWg71nALHicYkKm+HY7yE=
+	t=1721936153; cv=none; b=rDJ0Sr35xBIN3fH7eHfm2v4zUoY0EZkEKWPu6T3T4iwe/es4PVXm5A2Y6YH69aqRXKQ36gUOUlPvaN3pIyJDkwSrk1lvobKg2QAK126C2Xx3tXy+f7XTkAsPu/FyBLbmtx8gBrfJENhvRhhB+vpzGV+q4wfxCUbyI1W218TiXg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721935911; c=relaxed/simple;
-	bh=BP7iQaIkCCORsFyjxtE4ytc8EAse9kwiCti6r4ijeGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ofJ1tD7UMVZvZsqUG4OWNzhcws7GJAvPimTD1X0cVipXEYTK9ct/1U7962goPzZ4q/gY9AEyg8JInSVCGOTR/DVsgspVNCMzLe8j+hT+ey00M95LVTfmXkCWDNK5L8CT28pu2keZe/LAQpggD5WUT9SOf0sJ2mlVeFLoUqiYIcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=hciy1GXh; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (85-76-75-219-nat.elisa-mobile.fi [85.76.75.219])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 79FF318BF;
-	Thu, 25 Jul 2024 21:31:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721935864;
-	bh=BP7iQaIkCCORsFyjxtE4ytc8EAse9kwiCti6r4ijeGk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hciy1GXhx0QjNboOK/FWAT9/9BMBepH/+GP8HwDzkeBT7MWRvvGx8UFdmfl97rSrz
-	 xBBIOBVR+37f8PEQ9dZ5Ods4MIG4716BbeOGDpoo2jmhi1QlcmH3+OiZtWp01VQl1O
-	 itbm5BPG/tN/Uxk6VsSxiW8hOgezJ7cT7wKUZyWc=
-Date: Thu, 25 Jul 2024 22:31:25 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240725193125.GD14252@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
- <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
- <20240724200012.GA23293@pendragon.ideasonboard.com>
- <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+	s=arc-20240116; t=1721936153; c=relaxed/simple;
+	bh=PM0ToRsuM1vtkGzPKlJyfacajP7lEKgzUSKuvNfW8lo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VE+s3A/wf3Zr5WQPFE4O8mKx+d8mzIPpDsOey4LPG2l2iZ7DEDFiCTtNCrJ0ZULHRbeQSms9V1AbR4yf8eNr4FS69tSscechaLx17gafBn/WPGYuSwsF+cR0nJ38iqJ0ZyeDsksSWBthkufKDHDqLuM1l4WbA6Zhu0KJjdB+z7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DbP0Y5F+; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PM0ToRsuM1vtkGzPKlJyfacajP7lEKgzUSKuvNfW8lo=; b=DbP0Y5F+0o5uorbcalNbvSLJ1K
+	V4rUuuN8QX5D5v9KemqDar48tp4JIyVxEFbI/nbfLKre8gf6c8S8s+HsXMY27M2udkHv7AkNZltJL
+	pzNBJeTwoAuRkfZmuSAXstYSAgut0IvCEt2OAwo8Pw4O8TbiTxTuZlxubjmH2n8yEqSTvki2z+EEl
+	FOQIgCFxHR8K1QLsMCZUdE8zNjlf5lLkFeig/RRv9vEtBMDHV+i/0LA8zRO5LpEpnQcK5gFGay/Ch
+	E3ADmeq83/vi8ZZjduOXKDjjTaZZUvcwnflJuD0bIfwiBcVQ+8932eWENoSPtu4imF9DfRSU7zLBM
+	i0GLoyyg==;
+Received: from [2001:8b0:10b:5:e4e5:5b2c:372b:ea6f] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sX4FZ-00000009ITf-28j6;
+	Thu, 25 Jul 2024 19:35:41 +0000
+Message-ID: <0959390cad71b451dc19e5f9396d3f4fdb8fd46f.camel@infradead.org>
+Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
+From: David Woodhouse <dwmw2@infradead.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
+ <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org, 
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, 
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
+ David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
+ <abuehaze@amazon.com>,  "Christopher S . Hall"
+ <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>, John
+ Stultz <jstultz@google.com>,  netdev@vger.kernel.org, Stephen Boyd
+ <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alessandro Zummo <a.zummo@towertech.it>,  Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, qemu-devel <qemu-devel@nongnu.org>, Simon
+ Horman <horms@kernel.org>
+Date: Thu, 25 Jul 2024 20:35:40 +0100
+In-Reply-To: <20240725122603-mutt-send-email-mst@kernel.org>
+References: <20240725012730-mutt-send-email-mst@kernel.org>
+	 <7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org>
+	 <20240725081502-mutt-send-email-mst@kernel.org>
+	 <f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org>
+	 <20240725082828-mutt-send-email-mst@kernel.org>
+	 <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org>
+	 <20240725083215-mutt-send-email-mst@kernel.org>
+	 <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org>
+	 <20240725100351-mutt-send-email-mst@kernel.org>
+	 <2a27205bfc61e19355d360f428a98e2338ff68c3.camel@infradead.org>
+	 <20240725122603-mutt-send-email-mst@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-YTRz/9c+u8kv4z0abfSE"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Jul 24, 2024 at 04:37:21PM -0400, James Bottomley wrote:
-> On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
-> [...]
-> > What I get from the discussions I've followed or partcipated in over
-> > the years is that the main worry of free software communities is
-> > being forced to use closed-source userspace components, whether that
-> > would be to make the device usable at all, or to achieve decent level
-> > of performance or full feature set. We've been through years of
-> > mostly closed-source GPU support, of printer "windrivers", and quite
-> > a few other horrors. The good news is that we've so far overcome lots
-> > (most) of those challenges. Reverse engineering projects paid off,
-> > and so did working hand-in-hand with industry actors in multiple ways
-> > (both openly and behind the scenes). One could then legitimately ask
-> > why we're still scared.
-> 
-> I don't think I am.  We're mostly fully capable of expounding at length
-> on the business rationale for being open if the thing they're hiding
-> isn't much of a differentiator anyway (or they're simply hiding it to
-> try to retain some illusion of control), so we shouldn't have any fear
-> of being able to make our case in language business people understand.
-> 
-> I also think this fear is partly a mindset problem on our part.  We
-> came out of the real fight for openness and we do embrace things like a
-> licence that forces open code (GPL) and symbols that discourage
-> proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
-> FSF coolaid that if we don't stand over manufacturers every second and
-> force them they'll slide back to their old proprietary ways.  However,
-> if you look at the entirely permissive ecosystem that grew up after we
-> did (openstack, docker, kubernetes, etc.) they don't have any such fear
-> and yet they still have large amounts of uncompelled openness and give
-> back.
 
-I don't think those are necessarily relevant examples, as far as device
-pass-through goes. Vendors have many times reverted to proprietary ways,
-and they still do, at least in the areas of the kernel I'm most active
-in. I've seen first hand a large SoC vendor very close to opening a
-significant part of their camera stack and changing their mind at the
-last minute when they heard they could possibly merge their code through
-a different subsystem with a pass-through blank cheque.
+--=-YTRz/9c+u8kv4z0abfSE
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I'm willing to believe it can be different in other areas, which may
-partly explain why different subsystems and different developers have
-different biases and have trouble understand each other's point of view.
+On Thu, 2024-07-25 at 12:38 -0400, Michael S. Tsirkin wrote:
+> On Thu, Jul 25, 2024 at 04:18:43PM +0100, David Woodhouse wrote:
+> > The use case isn't necessarily for all users of gettimeofday(), of
+> > course; this is for those applications which *need* precision time.
+> > Like distributed databases which rely on timestamps for coherency, and
+> > users who get fined millions of dollars when LM messes up their clocks
+> > and they put wrong timestamps on financial transactions.
+>=20
+> I would however worry that with all this pass through,
+> applications have to be coded to each hypervisor or even
+> version of the hypervisor.
 
-> > I can't fully answer that question, but there are two points that I
-> > think are relevant. Note that due to my background and experience,
-> > this will be heavily biased towards consumer and embedded hardware,
-> > not data centre-grade devices. Some technologies from the latter
-> > however have a tendency to migrate to the former over time, so the
-> > distinction isn't necessarily as relevant as one may consider.
-> > 
-> > The first point is that hardware gets more complicated over time, and
-> > in some markets there's also an increase in the number of vendors and
-> > devices. There's a perceived (whether true or not) danger that we
-> > won't be able to keep up with just reverse engineering and a
-> > development model relying on hobyists. Getting vendors involved is
-> > important if we want to scale.
-> 
-> Yes, but there are lots of not very useful complex devices being
-> produced every day that fail to capture market share.  Not having
-> reverse engineered drivers for them is no real loss.  If a device does
-> gain market share, it gains a huge pool of users some of whom become
-> interested in reverse engineering, so I think market forces actually
-> work in our favour: we get reverse engineering mostly where the devices
-> are actually interesting and capture market share.  It's self scaling.
+Yes, that would be a problem. Which is why I feel it's so important to
+harmonise the contents of the shared memory, and I'm implementing it
+both QEMU and $DAYJOB, as well as aligning with virtio-rtc.
 
-I can't agree with that, sorry. Not only is the difficulty to
-reverse-engineer some classes of devices increasing, but saying that
-only devices that make it to the top of the market share chart are worth
-considering will leave many users on the side of the road.
+I don't think the structure should be changing between hypervisors (and
+especially versions). We *will* see a progression from simply providing
+the disruption signal, to providing the full clock information so that
+guests don't have to abort transactions while they resync their clock.
+But that's perfectly fine.
 
-> > Second, I think there's a fear of regression. For some categories of
-> > devices, we have made slow but real progress to try and convince the
-> > industry to be more open. This sometimes took a decade of work,
-> > patiently building bridges and creating ecosystems brick by brick.
-> > Some of those ecosystems are sturdy, some not so. Giving pass-through
-> > a blank check will likely have very different effects in different
-> > areas. I don't personally believe it will shatter everything, but I'm
-> > convinced it carries risk in areas where cooperation with vendors is
-> > in its infancy or is fragile for any other reason.
-> 
-> I also think we're on the rise in this space.  Since most cloud
-> workloads are on Linux, there's huge market pressure on most "found in
-> the cloud" devices (like accelerators and GPUs) to have an easy to
-> consume Linux story.  Nvidia is a case in point.  When it only cared
-> about fast games on some other OS, we get shafted with a proprietary
-> graphics drivers.  Now it's under pressure to be the number one AI
-> accelerator provider for the cloud it's suddenly wondering about open
-> source drivers to make adoption easier.
+And it's also entirely agnostic to the mechanism by which the memory
+region is *discovered*. It doesn't matter if it's ACPI, DT, a
+hypervisor enlightenment, a BAR of a simple PCI device, virtio, or
+anything else.
 
-I can't comment on Nvidia and their inference engines in particular. The
-server market may be in a better position that the consumer and embedded
-market, and if that's the case, I'm happy for the servers. That doesn't
-solve the issues in other markets though.
+ACPI is one of the *simplest* options for a hypervisor and guest to
+implement, and doesn't prevent us from using the same structure in
+virtio-rtc. I'm happy enough using ACPI and letting virtio-rtc come
+along later.
 
-> > Finally, let's not forget that pass-through APIs are not an all or
-> > nothing option. To cite that example only, DRM requires GPU drivers
-> > to have an open-source userspace implementation to merge the kernel
-> > driver, and the same subsystems strongly pushes for API
-> > standardization for display controllers. We can set different rules
-> > for different cases.
-> 
-> I certainly think we can afford to experiment here, yes.
+> virtio has been developed with the painful experience that we keep
+> making mistakes, or coming up with new needed features,
+> and that maintaining forward and backward compatibility
+> becomes a whole lot harder than it seems in the beginning.
 
--- 
-Regards,
+Yes. But as you note, this shared memory structure is a userspace ABI
+all of its own, so we get to make a completely *different* kind of
+mistake :)
 
-Laurent Pinchart
+
+--=-YTRz/9c+u8kv4z0abfSE
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNzI1MTkzNTQwWjAvBgkqhkiG9w0BCQQxIgQgccgFqsT4
+um+QZy4AZSU5WCtqzlGE+UW/NNGAhvN4j/owgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCIcaezePEJsMT5X9iu4fhkPddN0OrqKSvy
+cbvhnkY7Xs4hM5sIKIt6XjZzmsufCd1r/fkkuVl8XxS4znzi7q+n/a9XKwHsZYxFvxL/FOfWrRVx
+HFO9IV+/imwAwmkDKdnGASPhyD2mCi3hFOHfmHCHUkuLWg6xL9j79TXWBZoBD7j68oYlo692KESU
+GoP+L1x9VXyeR1e8ELsFE+9WdSpzcQjWEf+gCyAISXhCzGRquVpstDaYuYhfGHLq7CyTRTetF/4O
+qaOH3RdAtungfZ7lAXyaUN4TgIP6jWPVxbdkQP6NW8OzBJfGZDb4GkVfsmXiXNDoQmJJ8xvgkPjy
+XtBWwzWG6nKmZTio85tbzhlJkEanUVlsHYMizLeMWfTeVXL1CNTJ9UzFJfaacHYW2nmCUVrM0KJ0
+RHHFUFZ9uMHP5nke9ryvaUAWz7Ux16gbtyZVxqr/s48pVfoVjyaarIbu/gpXdjo158484j+C9mA7
+mPIx53/4gMdNfrXC4M8bow0T1kSVB3Fz8Hpi32yVcCLjGNgFzwgw/1tL3Q2uxDsV2FgEj3pYgkyw
+0SeS3N+zrx96N7MbNTDnW6i4qi/xWw67nPwFPsxzdM7B7JFX/C9P9U8chflD2+dGF2D7htYycI2J
+QdGYNFeD620/lt73SDfDlQ3NXtPu0Lso4YIWuUN4SAAAAAAAAA==
+
+
+--=-YTRz/9c+u8kv4z0abfSE--
 
