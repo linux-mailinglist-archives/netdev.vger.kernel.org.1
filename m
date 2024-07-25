@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-112941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F9493BF73
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:56:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD7293BF74
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 598711F235BF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:56:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D04B283B74
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EECC0198A21;
-	Thu, 25 Jul 2024 09:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34892198A31;
+	Thu, 25 Jul 2024 09:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DfsAaJ5o"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="eaE0ptpg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B4C197A7E
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B013197A77
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721901371; cv=none; b=GkfX1+XF8aT4OCMsAdKq8xxNkYtNdZgj7BqoYtTNbpGXDCW64SX/EncuJBDbuUvcfWVvbl3q4ic/Tcykj7PTQhDyzszy79p7J5e4AvZgJt6L+h9EEC5sIjTmT05aVBF+U76b+636Fl0gzwcmDdepKCw1pwaKMdOyGyWF9WCpk30=
+	t=1721901373; cv=none; b=cewo0T9xNd2lMeDssCHLF5nx6KrQMer6ZvwfxkGXL+vE8jdnhDJ2e8x/BjCQK+rRl30+w2cTxrQJsFrRgnv2FJFIRi7AC8V6nho1lKknNrmcb++aNjtlp0g1JVFX3nGujl1sUJ79CTrqNug9kBT3qz/fyCjbgJpDCc+j6UMdJm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721901371; c=relaxed/simple;
-	bh=AMepbPBuiAndoZNIqu6LMe+1SuPQ5NAw9ref/4KTv0U=;
+	s=arc-20240116; t=1721901373; c=relaxed/simple;
+	bh=qPQTSM7IcfbUzuoV8DlDFOjOuB8GTsu7TDwQZxQLYpU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rQvhEj2KZNEC06dq0ANeVf6NNbEAoODnrorxP7oNiaQlBhrAXw4S/nHNus55gHzms+hKQkW/pEp42y8wQNTgQSwf2sEOjeqdlnLsrnW/NPYc9AEnwg1Y/3DHQw5tkfOo1RQx7omb3TgvxBgBVIXHAM4rRRGSPfMTsV+A0r1xTMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DfsAaJ5o; arc=none smtp.client-ip=209.85.208.176
+	 In-Reply-To:To:Cc; b=tGn85glK1y37ce7685enM1Su1VSeCatipfA5lN337SwrXiOsCgvr9lS8Sy2y440CdXkEZ6BmpXXilsomfjxTZPa8xs6sZPYrWPgQTDcb7BC0QFV2V6WTim7ehBgFZadH6tj+ZTbce1GZdUqt8nWdC3c5yFM6J/QlJZ4U8ddw/wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=eaE0ptpg; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f040733086so2574111fa.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:56:09 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5a88be88a3aso897842a12.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1721901368; x=1722506168; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1721901370; x=1722506170; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=74Z6aFGKFjtexyskQPjkbYW3PBAHSrDII1Pddn3LbSw=;
-        b=DfsAaJ5oMEq7fYp2CscKfAWRwKv9qOF1QCEExj1Hf4AGnvWdLP/Dr+R3VexxwnvUlg
-         ccFf+g/jKwFuhdG2v2rhqvvE+gg26fvrZj7HnPJ7VOmp9ig8H2byAQ6ahw/IRe29zvqQ
-         0dfyBfqr2eoSFt04RImTKGGZmSIG/ZO/2Gkg74r1meEfF5WrojW/hWEHhthYk4iwCkFf
-         7XZqoOwvrw5QHEsTXtsYa1ejGS+uYS2Db8L2K8oXxSQgUsYzESWOt15UC0U89n+JBqWz
-         Bko2JB97xd1xxRmtFXmGGKa60S01bfAjxyZr4Z7KlOwjkBs4CFZlPLGKy8yXaGqUq7Oy
-         lhLA==
+        bh=5PfwETKfdGwDLGlkZQb23VY4DnXQY3KKUWxXEbNcWpo=;
+        b=eaE0ptpgX5LcBCtjkq1pinWqdGCMlsjxyThTuw6nyCHdTPQ5TdrHeDdb0ZkTkscpne
+         dNbPPdr6Rui7etrX6OUcUY1UC1a8DtmShfDh7iUNw48lp2mwN9yvhm2eSb5IqdLw/43X
+         JkM3NeXBRKHW7KCsaIl/MCL84wGcCgw7bthHTpumHjaJKKaOUuCHSL27V9rYkBJSIwvl
+         3wLdWDv3xjIzzuctTlRimO6AzGRt0LMXoq9PR03yt382z64WaPXFfh+ZMmKYnhgjmF9l
+         sqTDc4cAQNdbBQzgJ/PujJ7sCe4Tw4OFbBFzMuJJUrHMLobU2QLA9EA4JbIhN+QRBSZ7
+         WuKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721901368; x=1722506168;
+        d=1e100.net; s=20230601; t=1721901370; x=1722506170;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=74Z6aFGKFjtexyskQPjkbYW3PBAHSrDII1Pddn3LbSw=;
-        b=o8V+HeiVlgdxEBGtmAaS+QX0t6s/UkCaMZA5XJt+rzJJxJqAG2pOznFg0nua8Mobcr
-         Smzei4x/LLd98X+3kNui7HgbgNbi6ExC1CW4ljPdkkGpdS+yv1Z594PkY8YDMa5y+MtJ
-         HZZt+yQyDWKAt+QycttJvORZnYiEDubodTtPPOYh/504NCnR2exFC24RLiEgylLGBDGe
-         oqrAwm8tTKnZgdKEFGk/sHsewIFryYkLc9SWptMMGR+IhfJfbuiWj8J9xlFHWwMUIjr6
-         OJ+2nk5F10sdc4fnkDZ0/mafsjXQPyStJN6TkUlSWxPVI/g2LEiadQ0VvT6vr5xHqZsh
-         v0wA==
-X-Gm-Message-State: AOJu0YynSuhftJ6taNsT6X2idBZc8a+xolBeHYTdT/sGAwb9MGGiogiM
-	hRlNcF2HpyZhuy6o+NSyiPshzRM3/2VoVLLD3/qxxHmJRL0uOlxcERSl7lSbOEc=
-X-Google-Smtp-Source: AGHT+IHwqjbF1whk//BExo85ZkNTvC+vx72wj4mgpBoZQ8lkJlWkOxbaD197nPUBInkeNzZ22SqM/Q==
-X-Received: by 2002:a2e:8089:0:b0:2ec:56d1:f28 with SMTP id 38308e7fff4ca-2f039ca783dmr15940851fa.26.1721901367744;
-        Thu, 25 Jul 2024 02:56:07 -0700 (PDT)
+        bh=5PfwETKfdGwDLGlkZQb23VY4DnXQY3KKUWxXEbNcWpo=;
+        b=H+6xAta2plPy3GsLVi7tzCsl0CKh/oU3bcoLVodhoyOpyZDTI8YUasJnEITU45OPfF
+         9wz4UbUlvP84KqN8GBdxF3e9EwxTcT6kGDG+p5e6ZDZQmYiZTUkODQxxvUz+3FbsPo0X
+         1IrDQOlRfsFoOwWo0vyXpU6JCyErJzscMo+Y4nj1G8Jtmmt/7VYk2GxUTmSUzmoE2O2q
+         aGk4DTaurJqoH0zbm+i3W085bX8aX5mw52RU4UnPURJhUmXj86/PUg9/wP22VdD8sMK1
+         BYPuJzJaz23vayKbTVYWwvM4aCuqvH73OlsjHuSuaQz3L/+fiyW6RlIFycSQmsNykULA
+         u7xw==
+X-Gm-Message-State: AOJu0YxE7W5+ErrWEO+K9p4ri6k5KOQnKu2vHbWNrfxEc8ZfkfUiiV+9
+	DWHCDHvq1pMXsgcSh8wkhwqpYtceWbJ34h8lwNZxETOxRClVizvUzW7nMM+1RjM=
+X-Google-Smtp-Source: AGHT+IFRiD+3+eLwraxYgKmhpwisv5E0bwNTomP69s0eZy5RgcbjeWPlW7l2e3UQXT/saW4nNhsMBg==
+X-Received: by 2002:a17:907:948f:b0:a77:cf9d:f495 with SMTP id a640c23a62f3a-a7acb4a223bmr125163466b.40.1721901369741;
+        Thu, 25 Jul 2024 02:56:09 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac631b0395sm641490a12.20.2024.07.25.02.56.06
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad426aasm54553566b.105.2024.07.25.02.56.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 02:56:07 -0700 (PDT)
+        Thu, 25 Jul 2024 02:56:09 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Thu, 25 Jul 2024 11:55:54 +0200
-Subject: [PATCH net 1/2] udp: Mark GSO packets as CHECKSUM_UNNECESSARY
- early on on output
+Date: Thu, 25 Jul 2024 11:55:55 +0200
+Subject: [PATCH net 2/2] selftests/net: Add coverage for UDP GSO with
+ egress from tunnel
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,150 +78,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240725-udp-gso-egress-from-tunnel-v1-1-5e5530ead524@cloudflare.com>
+Message-Id: <20240725-udp-gso-egress-from-tunnel-v1-2-5e5530ead524@cloudflare.com>
 References: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
 In-Reply-To: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
- kernel-team@cloudflare.com, 
- syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+ kernel-team@cloudflare.com
 X-Mailer: b4 0.14.1
 
-In commit 10154dbded6d ("udp: Allow GSO transmit from devices with no
-checksum offload") we have added a tweak in the UDP GSO code to mark GSO
-packets being sent out as CHECKSUM_UNNECESSARY when the egress device
-doesn't support checksum offload. This was done to satisfy the offload
-checks in the gso stack.
+After enabling UDP GSO for devices not offering checksum offload, we have
+hit a regression where a bad offload warning can be triggered if egressing
+through a tunnel device.
 
-However, when sending a UDP GSO packet from a tunnel device, we will go
-through the TX path and the GSO offload twice. Once for the tunnel device,
-which acts as a passthru for GSO packets, and once for the underlying
-egress device.
+This can happen when the tunnel device has checksum offload disabled or
+when IPv6 extension headers are present.
 
-Even though a tunnel device acts as a passthru for a UDP GSO packet, GSO
-offload checks still happen on transmit from a tunnel device. So if the skb
-is not marked as CHECKSUM_UNNECESSARY or CHECKSUM_PARTIAL, we will get a
-warning from the gso stack.
+Extend the UDP GSO tests to cover the egress from a tunnel device scenario.
 
-Today this can occur in two situations, which we check for in
-__ip_append_data() and __ip6_append_data():
-
-1) when the tunnel device does not advertise checksum offload, or
-2) when there are IPv6 extension headers present.
-
-Syzbot has triggered the second case, producing a warning as below:
-
-  ip6tnl0: caps=(0x00000006401d7869, 0x00000006401d7869)
-  WARNING: CPU: 0 PID: 5112 at net/core/dev.c:3293 skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
-  Modules linked in:
-  CPU: 0 PID: 5112 Comm: syz-executor391 Not tainted 6.10.0-rc7-syzkaller-01603-g80ab5445da62 #0
-  Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-  RIP: 0010:skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
-  [...]
-  Call Trace:
-   <TASK>
-   __skb_gso_segment+0x3be/0x4c0 net/core/gso.c:127
-   skb_gso_segment include/net/gso.h:83 [inline]
-   validate_xmit_skb+0x585/0x1120 net/core/dev.c:3661
-   __dev_queue_xmit+0x17a4/0x3e90 net/core/dev.c:4415
-   neigh_output include/net/neighbour.h:542 [inline]
-   ip6_finish_output2+0xffa/0x1680 net/ipv6/ip6_output.c:137
-   ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
-   ip6_send_skb+0x112/0x230 net/ipv6/ip6_output.c:1958
-   udp_v6_send_skb+0xbf5/0x1870 net/ipv6/udp.c:1292
-   udpv6_sendmsg+0x23b3/0x3270 net/ipv6/udp.c:1588
-   sock_sendmsg_nosec net/socket.c:730 [inline]
-   __sock_sendmsg+0xef/0x270 net/socket.c:745
-   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
-   ___sys_sendmsg net/socket.c:2639 [inline]
-   __sys_sendmmsg+0x3b2/0x740 net/socket.c:2725
-   __do_sys_sendmmsg net/socket.c:2754 [inline]
-   __se_sys_sendmmsg net/socket.c:2751 [inline]
-   __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2751
-   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   [...]
-   </TASK>
-
-To fix it mark UDP_GSO packets as CHECKSUM_UNNECESSARY early on the TX
-path, when still in the udp layer, since we need to have ip_summed set up
-correctly for GSO processing by tunnel devices.
-
-Note that even if GSO packet gets marked as CHECKSUM_PARTIAL due to tunnel
-advertising HW csum offload, it will not prevent software csum offload in
-UDP GSO from kicking in if the underlying device doesn't offer csum
-offload (for example, a TUN/TAP device with default config). This is
-because we recheck device features in gso stack instead relying on the
-ip_summed hint.
-
-Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checksum offload")
-Reported-by: syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/000000000000e1609a061d5330ce@google.com/
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- net/ipv4/udp.c         | 7 +++++++
- net/ipv4/udp_offload.c | 8 --------
- net/ipv6/udp.c         | 7 +++++++
- 3 files changed, 14 insertions(+), 8 deletions(-)
+ tools/testing/selftests/net/udpgso.sh | 41 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 49c622e743e8..b7254b8a1e56 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -946,6 +946,13 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
- 		}
+diff --git a/tools/testing/selftests/net/udpgso.sh b/tools/testing/selftests/net/udpgso.sh
+index 85d1fa3c1ff7..3fb6fea06b28 100755
+--- a/tools/testing/selftests/net/udpgso.sh
++++ b/tools/testing/selftests/net/udpgso.sh
+@@ -28,9 +28,13 @@ test_route_mtu() {
+ }
  
- 		if (datalen > cork->gso_size) {
-+			/* On the TX path CHECKSUM_NONE and CHECKSUM_UNNECESSARY
-+			 * have the same meaning. However, check for bad
-+			 * offloads in the GSO stack expects the latter, if the
-+			 * checksum can be calculated in software.
-+			 */
-+			if (skb->ip_summed == CHECKSUM_NONE)
-+				skb->ip_summed = CHECKSUM_UNNECESSARY;
- 			skb_shinfo(skb)->gso_size = cork->gso_size;
- 			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
- 			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index aa2e0a28ca61..59448a2dbf2c 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -357,14 +357,6 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 	else
- 		uh->check = gso_make_checksum(seg, ~check) ? : CSUM_MANGLED_0;
+ setup_dummy_sink() {
+-	ip link add name sink mtu 1500 type dummy
+-	ip addr add dev sink 10.0.0.0/24
+-	ip addr add dev sink fd00::2/64 nodad
++	mtu="${1:-1500}"
++	prefix4="${2:-10.0.0.2/24}"
++	prefix6="${3:-fd00::2/48}"
++
++	ip link add name sink mtu "${mtu}" type dummy
++	ip addr add dev sink "${prefix4}"
++	ip addr add dev sink "${prefix6}" nodad
+ 	ip link set dev sink up
+ }
  
--	/* On the TX path, CHECKSUM_NONE and CHECKSUM_UNNECESSARY have the same
--	 * meaning. However, check for bad offloads in the GSO stack expects the
--	 * latter, if the checksum was calculated in software. To vouch for the
--	 * segment skbs we actually need to set it on the gso_skb.
--	 */
--	if (gso_skb->ip_summed == CHECKSUM_NONE)
--		gso_skb->ip_summed = CHECKSUM_UNNECESSARY;
--
- 	/* update refcount for the packet */
- 	if (copy_dtor) {
- 		int delta = sum_truesize - gso_skb->truesize;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 6602a2e9cdb5..360392fc2b68 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1262,6 +1262,13 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
- 		}
+@@ -52,6 +56,25 @@ test_sw_gso_sw_csum() {
+ 	ethtool -K sink tx-udp-segmentation off >/dev/null
+ }
  
- 		if (datalen > cork->gso_size) {
-+			/* On the TX path CHECKSUM_NONE and CHECKSUM_UNNECESSARY
-+			 * have the same meaning. However, check for bad
-+			 * offloads in the GSO stack expects the latter, if the
-+			 * checksum can be calculated in software.
-+			 */
-+			if (skb->ip_summed == CHECKSUM_NONE)
-+				skb->ip_summed = CHECKSUM_UNNECESSARY;
- 			skb_shinfo(skb)->gso_size = cork->gso_size;
- 			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
- 			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
++setup_ipip_tunnel() {
++	setup_dummy_sink 1520 10.1.1.2/24 fd11::2/48
++
++	ip tunnel add iptnl mode ipip local 10.1.1.2 remote 10.1.1.1
++	ip addr add dev iptnl 10.0.0.2/24
++	ip addr add dev iptnl fd00::2/48 nodad
++	ip link set dev iptnl up
++}
++
++test_tunnel_hw_csum() {
++	setup_ipip_tunnel
++	ethtool -K iptnl tx-checksum-ip-generic on >/dev/null
++}
++
++test_tunnel_sw_csum() {
++	setup_ipip_tunnel
++	ethtool -K iptnl tx-checksum-ip-generic off >/dev/null
++}
++
+ if [ "$#" -gt 0 ]; then
+ 	"$1"
+ 	shift 2 # pop "test_*" arg and "--" delimiter
+@@ -99,3 +122,15 @@ echo "ipv4 sw-gso sw-csum"
+ 
+ echo "ipv6 sw-gso sw-csum"
+ ./in_netns.sh "$0" test_sw_gso_sw_csum -- ./udpgso -6 -C -R
++
++echo "ipv4 tunnel hw-csum"
++./in_netns.sh "$0" test_tunnel_hw_csum -- ./udpgso -4 -C -R
++
++echo "ipv6 tunnel hw-csum"
++./in_netns.sh "$0" test_tunnel_hw_csum -- ./udpgso -6 -C -R
++
++echo "ipv4 tunnel sw-csum"
++./in_netns.sh "$0" test_tunnel_sw_csum -- ./udpgso -4 -C -R
++
++echo "ipv6 tunnel sw-csum"
++./in_netns.sh "$0" test_tunnel_sw_csum -- ./udpgso -6 -C -R
 
 -- 
 2.40.1
