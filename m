@@ -1,134 +1,159 @@
-Return-Path: <netdev+bounces-112888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24F8493BA0F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 03:11:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DC3293BA23
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 03:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA2FD2821EA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 01:11:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 475811C21907
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 01:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85154405;
-	Thu, 25 Jul 2024 01:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7254C9F;
+	Thu, 25 Jul 2024 01:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="NUcD6FFP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RL30Y/8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942862901
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 01:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CFB4C84
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 01:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721869873; cv=none; b=UYdil3Eja7YufnWP33smL2dtEZeHcwLOisCsLF+D4HyAKxuhmJ5U2mNslomOddq+6d3JFNiBPh0higa5Vz8I+3MIzBu0FlyIiCshKrUE+2fzrsq9SWIlPleerXI4nRpinQm3WSNyr+iCAFtvFRmt0Kk45BVUCalPTYBC0zWf9AU=
+	t=1721870950; cv=none; b=N8MyoEiy1jKkf7Z2WSSROcxgVH+oHVkDynodtVifLPcKqxQ+yLi93EK+i79XXo4dUcdHON5dOEarPSBdM3WAaJSk9sqVcka1v0UnRJA9xWYyTu5inkfYczcocSpK2qFsChA1aQGWBiJ/JBTcJjBQnXTM29TllSaQaleC2VduOxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721869873; c=relaxed/simple;
-	bh=GuQ7uzO9RR6Btq/IZD/s6I0IN1SiKxdRgJmwLTnBYRA=;
+	s=arc-20240116; t=1721870950; c=relaxed/simple;
+	bh=D4Df2yLlZLjyHvUkvuVJb5Z7AjTh6aj6UA+ZGKokCIc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gSak4f4grQ/JROV4usARM1pHgFvB6GR1q4wglmDtB+5O6Fypeo0xCapJ4MTxp5TMFJ7+Nq9S9EmokcTQEsgAf8wVTCdNqNqGoMpF0I/l6FsZv962KLuTqgVVixnhUMpE9MqRaCQHupBl4pyxC3G9pug+3EPISIN3Vz3iBlwL92E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=NUcD6FFP; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dff1ccdc17bso402594276.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jul 2024 18:11:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1721869870; x=1722474670; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3oR9AQB3i04gqZs2o3tjOMuJV4rhvx1XpYbYSgIhEe4=;
-        b=NUcD6FFPGay+UJslXR+79/lfsT30LIUKGN93CU65KmTWkPCNv/PSQSp/LX/ZG7pcke
-         F1373FPAl7AgQSYqLC6shQeZCzDczw7pcKE8MmacxULFPCPlKJNxq8986inN4Y7mnTMY
-         JWWnb+rEvOoa+EpcjUJ9kSeEhMWNWkFIWNyafO4ZHlE5bSGPLUVlcNEDObZ9qPv2t5xo
-         qQ/ThGk16yh7q/YcVZ6uXFz3+KQtQnfrE2ZGvz79xbgvhnlBRChGs9cKSrl63yjeAybJ
-         9AZhHJya6yk7CXcpgwAO+HFfJCe0enmc/wsZiu4OTZb+Mt/jDGMmP7GCQBzujAsd0I8v
-         ubZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721869870; x=1722474670;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3oR9AQB3i04gqZs2o3tjOMuJV4rhvx1XpYbYSgIhEe4=;
-        b=gpZUItcCXID7542Kq5lgrHsjlfe8iYN2AqskOfZbelPb0g8efMdJOtFrf01cWY4ObH
-         8Xozf872urYu74Jy1jQ527ubdb91aC6IeTayChoL4opzqwqxvZOXCcz7wttPfvlxWWIp
-         Hit63pBBGyjLOxhW6GzXvAutgGPOZLUC8gNzw9z7ooly4Cmpc8DfwUqW3VPy4S57VYQ9
-         Gdev31ixSD36hYaUAJ2FppOA70a7HejGW0BMxugpXorOMzSmPXV/vLEuWQuX05SDitqv
-         yUT9VigISZAJ9BZkWsQnHegZKEv1yvTT925boBp6J3w4vGb+0PKhak/SaRZJMyGHwxyb
-         scjw==
-X-Forwarded-Encrypted: i=1; AJvYcCUsI6lqFAM6v5du1mh3nU6+SsZZSSjlc6r4s3adV7w8gJHy/BmBzQt/fsGsHVArsnSYNty+PxObMsfxRMyirjH6Rxq1oNeY
-X-Gm-Message-State: AOJu0Yy6HdP3Ib97EFW1Do+G1wB4wCJHLkFH5UAIG57M5sXQ1WG1/E/2
-	NTje6H5FFYeFrKrF13RGoABxR7AxOsL9KHPOa2wq2mvtu+OytgVC19Dn32nAMSA=
-X-Google-Smtp-Source: AGHT+IEVJyQ8VA+V1M7uNFddb6HC9zV/OM6qoXJXk7zYNFCSyJ198MO4QT2M6myH/7NjT30VXuVb3g==
-X-Received: by 2002:a25:c512:0:b0:e08:5ee3:7a13 with SMTP id 3f1490d57ef6-e0b2321a116mr1494680276.15.1721869870402;
-        Wed, 24 Jul 2024 18:11:10 -0700 (PDT)
-Received: from [10.5.119.35] (ec2-54-92-141-197.compute-1.amazonaws.com. [54.92.141.197])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3f8dd342sm1676806d6.6.2024.07.24.18.11.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jul 2024 18:11:10 -0700 (PDT)
-Message-ID: <d53adec9-10d5-41e2-8065-3826029f6134@bytedance.com>
-Date: Wed, 24 Jul 2024 18:11:06 -0700
+	 In-Reply-To:Content-Type; b=XjuT2uhw+lV2D1cM6566g/1HUk2Eei7iZg1htLIP+1wFYWRBQq4OAXj2QLK79cZtidNXPM/nl/eLQ0WsInAub7VRDI3YMQ07VseLbGxVlIO3DKYqWTo3y39se/s4FtNi39w84irImllNdbUuXpi1wGvZxSQNYh8lAwdXV3/1TfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RL30Y/8j; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4582b8db-e59d-4ca0-9a0e-4d0f21a1af66@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1721870941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rhmLD46nvN5Sk9l5I+t7MliwEdX33RrU4gOe3PYsSj0=;
+	b=RL30Y/8j3r2fPyxovXYkF6OrruecRsH1+J1fIG3158u3ozslhKSQ51tDq+slWPWnYb/tBs
+	K4XYfhktxqVsk2pt0r7KFkz2rVGre3jOmzsNuHeHSJok/xjhAsF4JL0TzzutmjVdA1O17x
+	mpblnWJ2Ltqr0OfTL1HVyvhfXIZRCA0=
+Date: Wed, 24 Jul 2024 18:28:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/3] sock: support copying cmsgs to the user
- space in sendmsg
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: edumazet@google.com, cong.wang@bytedance.com, xiaochun.lu@bytedance.com
-References: <20240708210405.870930-1-zijianzhang@bytedance.com>
- <20240708210405.870930-2-zijianzhang@bytedance.com>
- <668d680cc7cfc_1c18c329414@willemb.c.googlers.com.notmuch>
+Subject: Re: [RFC PATCH v9 01/11] bpf: Support getting referenced kptr from
+ struct_ops argument
+To: Amery Hung <ameryhung@gmail.com>, alexei.starovoitov@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org,
+ sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
+ sdf@google.com, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+ <20240714175130.4051012-2-amery.hung@bytedance.com>
+ <907f24f2-0f33-415e-85c6-0400ab67f896@linux.dev>
+ <CAMB2axNDVCdH7stBj8-duOcV1P=qjyjUAR+YXywVMx8HgRPokg@mail.gmail.com>
 Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <668d680cc7cfc_1c18c329414@willemb.c.googlers.com.notmuch>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAMB2axNDVCdH7stBj8-duOcV1P=qjyjUAR+YXywVMx8HgRPokg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 7/9/24 9:40 AM, Willem de Bruijn wrote:
-> zijianzhang@ wrote:
->> From: Zijian Zhang <zijianzhang@bytedance.com>
+On 7/24/24 10:00 AM, Amery Hung wrote:
+> On Tue, Jul 23, 2024 at 5:32 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
 >>
->> Users can pass msg_control as a placeholder to recvmsg, and get some info
->> from the kernel upon returning of it, but it's not available for sendmsg.
->> Recvmsg uses put_cmsg to copy info back to the user, while ____sys_sendmsg
->> creates a kernel copy of msg_control and passes that to the callees,
->> put_cmsg in sendmsg path will write into this kernel buffer.
+>> On 7/14/24 10:51 AM, Amery Hung wrote:
+>>> @@ -21004,6 +21025,13 @@ static int do_check_common(struct bpf_verifier_env *env, int subprog)
+>>>                mark_reg_known_zero(env, regs, BPF_REG_1);
+>>>        }
+>>>
+>>> +     if (env->prog->type == BPF_PROG_TYPE_STRUCT_OPS) {
+>>> +             ctx_arg_info = (struct bpf_ctx_arg_aux *)env->prog->aux->ctx_arg_info;
+>>> +             for (i = 0; i < env->prog->aux->ctx_arg_info_size; i++)
+>>> +                     if (ctx_arg_info[i].refcounted)
+>>> +                             ctx_arg_info[i].ref_obj_id = acquire_reference_state(env, 0);
+>>> +     }
+>>> +
 >>
->> If users want to get info after returning of sendmsg, they typically have
->> to call recvmsg on the ERRMSG_QUEUE of the socket, incurring extra system
-> 
-> nit: error queue or MSG_ERRQUEUE
-> 
->> call overhead. This commit supports copying cmsg from the kernel space to
->> the user space upon returning of sendmsg to mitigate this overhead.
+>> I think this will miss a case when passing the struct_ops prog ctx (i.e. "__u64
+>> *ctx") to a global subprog. Something like this:
 >>
->> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
->> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
-> 
-> Overall this approach follows what I had in mind, thanks.
-> 
-> Looking forward to the discussion with a wider audience at netdevconf
-> next week.
-
-
-After wider exposure to netdev, besides the comments in this email
-series, I want to align the next step with you :)
-
-Shall I also make this a config and add conditional compilation in the
-hot path？
-
->> ---
->>   include/linux/socket.h |  6 +++++
->>   include/net/sock.h     |  2 +-
->>   net/core/sock.c        |  6 +++--
->>   net/ipv4/ip_sockglue.c |  2 +-
->>   net/ipv6/datagram.c    |  2 +-
->>   net/socket.c           | 54 ++++++++++++++++++++++++++++++++++++++----
->>   6 files changed, 62 insertions(+), 10 deletions(-)
+>> __noinline int subprog_release(__u64 *ctx __arg_ctx)
+>> {
+>>          struct task_struct *task = (struct task_struct *)ctx[1];
+>>          int dummy = (int)ctx[0];
 >>
+>>          bpf_task_release(task);
+>>
+>>          return dummy + 1;
+>> }
+>>
+>> SEC("struct_ops/subprog_ref")
+>> __failure
+>> int test_subprog_ref(__u64 *ctx)
+>> {
+>>          struct task_struct *task = (struct task_struct *)ctx[1];
+>>
+>>          bpf_task_release(task);
+>>
+>>          return subprog_release(ctx);;
+>> }
+>>
+>> SEC(".struct_ops.link")
+>> struct bpf_testmod_ops subprog_ref = {
+>>          .test_refcounted = (void *)test_subprog_ref,
+>> };
+>>
+> 
+> Thanks for pointing this out. The test did failed.
+> 
+>> A quick thought is, I think tracking the ctx's ref id in the env->cur_state may
+>> not be the correct place.
+> 
+> I think it is a bit tricky because subprogs are checked independently
+> and their state is folded (i.e., there can be multiple edges from the
+> main program to a subprog).
+> 
+> Maybe the verifier can rewrite the program: set the refcounted ctx to
+> NULL when releasing reference. Then, in do_check_common(), if it is a
+> global subprog, we mark refcounted ctx as PTR_MAYBE_NULL to force a
+> runtime check. How does it sound?
+
+don't know how to get the ctx pointer to patch the code. It is not always in r1.
+
+A case like this should still break even with the PTR_MAYBE_NULL marking in all 
+main and subprog (I haven't tried this one myself):
+
+SEC("struct_ops/subprog_ref")
+int test_subprog_ref(__u64 *ctx)
+{
+	struct task_struct *task = (struct task_struct *)ctx[1];
+
+	if (task) {
+		subprog_release(ctx);
+		bpf_task_release(task);
+	}
+
+	return;
+}
+
+afaik, the global subprog is checked independently from the main prog and it 
+does not know the state of the main prog. Take a look at the subprog_is_global() 
+case in the check_func_call().
+
+How about only acquire_reference_state() for the main prog? Yes, the global 
+subprog cannot do the bpf_kptr_xchg() and bpf_qdisc_skb_drop() but it can still 
+read the skb. The non-global subprog (static) should work though (please test).
+
+I don't have other better idea. May be Alexei can provide some guidance here?
+
 
