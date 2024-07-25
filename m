@@ -1,391 +1,254 @@
-Return-Path: <netdev+bounces-112943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A57EA93BF7D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:56:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5614E93BF88
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C2B6B21909
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:56:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8260B209D0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34417198852;
-	Thu, 25 Jul 2024 09:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFE1197A7C;
+	Thu, 25 Jul 2024 09:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G37yyxeg"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bvrDsUQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86973197A77;
-	Thu, 25 Jul 2024 09:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D1413C3DD
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721901387; cv=none; b=AMPW9rS8Vf2QnfeTkr69a9cyYjHi0k/MCeq1+dJWt+H98l6O9GNPNPYbMhnyMNDyL/sqnP5H7AHNfBNmOwCUZyw9J+kGxfHSiSoObBRLBJiqB8A2WtQZdJWJ+E0qtL0zU3KAfkXcpemyKPNif6l848cXC0H+PifVQlgXob/vZV8=
+	t=1721901505; cv=none; b=n7V6UHOoD+7FygtWXEotrtaaVTvGWfydnKE6bKzyIdshhCnJuEWA3Mng4b7/QJh+O4TLK/3mka3d68oqNAgrvqeJGPaXn+FkSOj5byKgbBPkjfWI2g9ajA9caYvMJA0svmAeA+8ADkmbGRYqsshjcYvNCRJ9hMuD+uzjOftCx6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721901387; c=relaxed/simple;
-	bh=NoHdoUNeLmfHI5iwlppoWV2frr16ZLxf2s8E8Afs+u8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cGy7k1TsOesKvziFjrWCMCHcrbFQnSe0kt07dYswWMaCL5jmrsRC5IdaNLrkDNlUczPVI8PcCsgLUPIlLPeUNkU1rBiRJkj8n1tzZxt1IE0iDiAKmVrJSDoo9+1Qyeq9WrrG3ecSNDv1Rb4JLhi85DVzAcVGGNooKPiwNNNtqkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=G37yyxeg; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NoHdoUNeLmfHI5iwlppoWV2frr16ZLxf2s8E8Afs+u8=; b=G37yyxegAudRmueUo2y6ZXfpBT
-	WbK78Xl8vVglPstTZQ0vjn7VmExgtloGfXSm3A4ZMDLJ2TI2OWUoTtkW976dLqXOTdie9EfqDNn+1
-	jVsjvDEncj1nWY0/11TFKLt878zVCtClmZyZ7vYBDnUHa+5+JK1V4ZWcL7xidRj8tnZtDNcVVeKau
-	8PtZO18vh3uNcJZZJQWGtAVucFoB7ATWQjR/tZ7FzEe9UfhKNWw7oMOg0eAzvPQ2H7oCG59JbLzMY
-	KQjo+LpxwX7LIBjJxsy01o5/jrxpsMBfNivcjqIy2G723PV+wbxyAYQcLTDsDHHhyxU1r8mYlI5s0
-	13keeUKQ==;
-Received: from [2001:8b0:10b:5:25df:2ae1:4889:ee99] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sWvCh-00000008ltP-3FON;
-	Thu, 25 Jul 2024 09:56:07 +0000
-Message-ID: <7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org>
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
- <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org, 
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, 
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
- David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
- <abuehaze@amazon.com>,  "Christopher S . Hall"
- <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>, John
- Stultz <jstultz@google.com>,  netdev@vger.kernel.org, Stephen Boyd
- <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,  Alexandre Belloni
- <alexandre.belloni@bootlin.com>, qemu-devel <qemu-devel@nongnu.org>, Simon
- Horman <horms@kernel.org>
-Date: Thu, 25 Jul 2024 10:56:05 +0100
-In-Reply-To: <20240725012730-mutt-send-email-mst@kernel.org>
-References: <14d1626bc9ddae9d8ad19d3c508538d10f5a8e44.camel@infradead.org>
-	 <20240725012730-mutt-send-email-mst@kernel.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Hh5AJCYJEgXbGuGNszvM"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1721901505; c=relaxed/simple;
+	bh=e5OMZwZfe9faaUX60XXlluANvdSJM/xVean0N+HF2zs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TATKJQYo5agbjulLJ3+sJdiNSL42DoEqC5CoHvvE8QXdS90J3WpO361XyhADD3EaFTJBNeT/bTCDktVY1C2N5jYuPdrKPIPjNqz1N7FEvqp52cSApSBmzZD/baBaCVweijByEGtcwdhSTj/AlIIhlSS0grTHRmlCRRsv8KS7BkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bvrDsUQn; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ef2ed592f6so7784821fa.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:58:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1721901502; x=1722506302; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YSDfH26HyMG/R5xewAvCwCj0nO7bN4MX4SbQGxe4O58=;
+        b=bvrDsUQnm8w/vrjDfk5udQHDUMCU8eutylcuhhtKMiMUrD4JPctktktuWMXJfde8iN
+         3fO2dqX0t6K5tNAX8bU4Amh2zyW81Tga8ZcOEAtycs0gOOQlcr/5E31sZAlYBtU5lW/1
+         EjlMWJl2lFgR1sjMm1p18SDiahtLke9xDQnJprEi3y588CQ+U/mmojGHctDVfzNNZ4bv
+         /qtfY+rVGsRM6Be/nnQBmm//+CeqinX8QBuzLZMfQ1T6R1Sow4ggLaxwxDhrCwXEOr2b
+         ceGehDqj7PobxMxLdycognFUShjeNtU+vm7xLuWCV2EWY2bFLrJWz9pvNzDdRNs8DR7J
+         zzGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721901502; x=1722506302;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YSDfH26HyMG/R5xewAvCwCj0nO7bN4MX4SbQGxe4O58=;
+        b=ViteUjtRAC5PXfxFANRPHWuLZz+bbg00DEnr2e9KtY8FWLhTmMuGc/KAofgprq00EV
+         LOheIdJ1pNWIfqzvnJMaLvN0oKtT+JF96q/eqAfqoW7oLZc5Gzecr6jHDKUShmtY+l7f
+         soRsAWFqqbMHVBDeAU1ETza84RWupCstFTMmt6tl1zpzAYzDrbSAUZIgNiov7PZ7sYwZ
+         AJVpj/Ms3qhvn6hdQYssgiWc98bVnt3G9WB0vjsPDy/SPaxglWYDtupHMLOLqSw00uB/
+         ldlrvPFKF27Hi+pB9VvdJS6wKYqna36fDtCc+9qP65mcq5WwK4TyZbybREEZ0le+XAmI
+         VhLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKbnYMPn0wDm5zf5MoU4bn0gwotGzaN4kV29F0hTSoLnOwcU86Xl7pUFLamDCCyrjF622dnncfg8i18UufsJui1ZycUcRj
+X-Gm-Message-State: AOJu0YyHCsXHErEIaPlBusqSWOnHMagSqj7Rem75zxxR7u+b1uPeq3Rf
+	1fHAabbWpPoxsAz7/yX44dQcl2w5kSkBmUvMgGtFIuR2FzfDpHkSXW15cihVMY4=
+X-Google-Smtp-Source: AGHT+IHTaJZOm+82jcIlcCdqbomoCeF3Dmn8tX6pH42zzq7urFN99uHNg9CxNNRu6uZ0ki3xUeP59Q==
+X-Received: by 2002:a05:651c:94:b0:2ef:2638:48cf with SMTP id 38308e7fff4ca-2f03db83022mr10385071fa.7.1721901501549;
+        Thu, 25 Jul 2024 02:58:21 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac63c50fdesm635275a12.56.2024.07.25.02.58.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 02:58:20 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,  syzbot
+ <syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com>,
+  davem@davemloft.net,  dsahern@kernel.org,  kuba@kernel.org,
+  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org,
+  soheil@google.com,  syzkaller-bugs@googlegroups.com,  willemb@google.com,
+  kernel-team@cloudflare.com
+Subject: Re: [syzbot] [net?] WARNING in skb_warn_bad_offload (5)
+In-Reply-To: <877cdbdgdo.fsf@cloudflare.com> (Jakub Sitnicki's message of
+	"Tue, 23 Jul 2024 22:04:35 +0200")
+References: <000000000000e1609a061d5330ce@google.com>
+	<5e4905d7-32e1-4359-9720-a32330aec424@redhat.com>
+	<87wmll7i9n.fsf@cloudflare.com>
+	<CANn89iKa8fyD2s1VdHJ2SQAUUzm-iPEXoKOGF6wvuqxofC4Frw@mail.gmail.com>
+	<87o76t6urw.fsf@cloudflare.com> <877cdbdgdo.fsf@cloudflare.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Thu, 25 Jul 2024 11:58:19 +0200
+Message-ID: <87plr1hjyc.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-
-
---=-Hh5AJCYJEgXbGuGNszvM
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michael, thanks for the review!
+On Tue, Jul 23, 2024 at 10:04 PM +02, Jakub Sitnicki wrote:
+> On Fri, Jul 19, 2024 at 09:34 PM +02, Jakub Sitnicki wrote:
+>> On Tue, Jul 16, 2024 at 07:54 AM -07, Eric Dumazet wrote:
+>>> On Tue, Jul 16, 2024 at 3:17=E2=80=AFAM Jakub Sitnicki <jakub@cloudflar=
+e.com> wrote:
+>>>>
+>>>> On Tue, Jul 16, 2024 at 12:04 PM +02, Paolo Abeni wrote:
+>>>> > On 7/16/24 03:23, syzbot wrote:
+>>>> >> syzbot found the following issue on:
+>>>> >> HEAD commit:    80ab5445da62 Merge tag 'wireless-next-2024-07-11' o=
+f git:/..
+>>>> >> git tree:       net-next
+>>>> >> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D175fb82=
+1980000
+>>>> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D2dbcdd8=
+641c4638f
+>>>> >> dashboard link: https://syzkaller.appspot.com/bug?extid=3De15b7e15b=
+8a751a91d9a
+>>>> >> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils f=
+or Debian) 2.40
+>>>> >> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D172bf=
+566980000
+>>>> >> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D12fff53=
+5980000
+>>>> >> Downloadable assets:
+>>>> >> disk image: https://storage.googleapis.com/syzbot-assets/184da3869c=
+30/disk-80ab5445.raw.xz
+>>>> >> vmlinux: https://storage.googleapis.com/syzbot-assets/85bfe9b60f21/=
+vmlinux-80ab5445.xz
+>>>> >> kernel image: https://storage.googleapis.com/syzbot-assets/06064623=
+a948/bzImage-80ab5445.xz
+>>>> >> The issue was bisected to:
+>>>> >> commit 10154dbded6d6a2fecaebdfda206609de0f121a9
+>>>> >> Author: Jakub Sitnicki <jakub@cloudflare.com>
+>>>> >> Date:   Wed Jun 26 17:51:26 2024 +0000
+>>>> >>      udp: Allow GSO transmit from devices with no checksum offload
+>>>> >> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D142c=
+cbed980000
+>>>> >> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D162c=
+cbed980000
+>>>> >> console output: https://syzkaller.appspot.com/x/log.txt?x=3D122ccbe=
+d980000
+>>>> >> IMPORTANT: if you fix the issue, please add the following tag to th=
+e commit:
+>>>> >> Reported-by: syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+>>>> >> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no =
+checksum offload")
+>>>> >> skb frag:     00000080: 62 3f 77 e4 0e 82 0d 2f 85 cc 44 ea 25 5a 9=
+9 76
+>>>> >> skb frag:     00000090: f2 53
+>>>> >> ------------[ cut here ]------------
+>>>> >> ip6tnl0: caps=3D(0x00000006401d7869, 0x00000006401d7869)
+>>>> >> WARNING: CPU: 0 PID: 5112 at net/core/dev.c:3293 skb_warn_bad_offlo=
+ad+0x166/0x1a0 net/core/dev.c:3291
+>>>> >> Modules linked in:
+>>>> >> CPU: 0 PID: 5112 Comm: syz-executor391 Not tainted 6.10.0-rc7-syzka=
+ller-01603-g80ab5445da62 #0
+>>>> >> Hardware name: Google Google Compute Engine/Google Compute Engine, =
+BIOS Google 06/07/2024
+>>>> >> RIP: 0010:skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+>>>> >> Code: e8 5f 94 a3 f8 49 8b 04 24 48 8d 88 a0 03 00 00 48 85 c0 48 0=
+f 44 cd 48 c7 c7 00 cc c5 8c 4c 89 f6 48 89 da e8 fb 92 ff f7 90 <0f> 0b 90=
+ 90 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc 44 89 f9
+>>>> >> RSP: 0018:ffffc900034bedc8 EFLAGS: 00010246
+>>>> >> RAX: 7d287cad4185da00 RBX: ffff888040cdc0b8 RCX: ffff888023d1bc00
+>>>> >> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+>>>> >> RBP: ffffffff8cc5cbc0 R08: ffffffff815857b2 R09: fffffbfff1c39994
+>>>> >> R10: dffffc0000000000 R11: fffffbfff1c39994 R12: ffff888022880518
+>>>> >> R13: dffffc0000000000 R14: ffff888040cdc130 R15: ffff888040cdc130
+>>>> >> FS:  000055556e9e9380(0000) GS:ffff8880b9400000(0000) knlGS:0000000=
+000000000
+>>>> >> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> >> CR2: 0000000020001180 CR3: 000000007c876000 CR4: 00000000003506f0
+>>>> >> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>> >> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>> >> Call Trace:
+>>>> >>   <TASK>
+>>>> >>   __skb_gso_segment+0x3be/0x4c0 net/core/gso.c:127
+>>>> >>   skb_gso_segment include/net/gso.h:83 [inline]
+>>>> >>   validate_xmit_skb+0x585/0x1120 net/core/dev.c:3661
+>>>> >>   __dev_queue_xmit+0x17a4/0x3e90 net/core/dev.c:4415
+>>>> >>   neigh_output include/net/neighbour.h:542 [inline]
+>>>> >>   ip6_finish_output2+0xffa/0x1680 net/ipv6/ip6_output.c:137
+>>>> >>   ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
+>>>> >>   ip6_send_skb+0x112/0x230 net/ipv6/ip6_output.c:1958
+>>>> >>   udp_v6_send_skb+0xbf5/0x1870 net/ipv6/udp.c:1292
+>>>> >>   udpv6_sendmsg+0x23b3/0x3270 net/ipv6/udp.c:1588
+>>>> >>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>>>> >>   __sock_sendmsg+0xef/0x270 net/socket.c:745
+>>>> >>   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+>>>> >>   ___sys_sendmsg net/socket.c:2639 [inline]
+>>>> >>   __sys_sendmmsg+0x3b2/0x740 net/socket.c:2725
+>>>> >>   __do_sys_sendmmsg net/socket.c:2754 [inline]
+>>>> >>   __se_sys_sendmmsg net/socket.c:2751 [inline]
+>>>> >>   __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2751
+>>>> >>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>>>> >>   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>>>> >>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>>> >> RIP: 0033:0x7f04f688fe89
+>>>> >> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 4=
+8 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01=
+ f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+>>>> >> RSP: 002b:00007ffeebc526e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000=
+133
+>>>> >> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f04f688fe89
+>>>> >> RDX: 0000000000000001 RSI: 0000000020003cc0 RDI: 0000000000000003
+>>>> >> RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000000000001
+>>>> >> R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffeebc52740
+>>>> >> R13: 00007f04f68dd406 R14: 0000000000000003 R15: 00007ffeebc52720
+>>>> >>   </TASK>
+>>>> >
+>>>> > Looking at the console log, the the relevant GSO packet is an UFO on=
+e with
+>>>> > CSUM_NONE. commit 10154dbded6d6a2fecaebdfda206609de0f121a9 only adju=
+st the skb
+>>>> > csum for USO packets. @Jakub S. could you please have a look?
+>>>>
+>>>> Will do. Thanks for the hint.
+>>>
+>>> The trigger for the bug is the following :
+>>>
+>>> setsockopt(3, SOL_IPV6, IPV6_HOPOPTS,
+>>> "\0\3\0\0\0\0\0\0\5\2\0\0\0\1\0\302\4\200\0\0\0\5\2\0\6\302\4\0\0\0\1\3=
+02"...,
+>>> 40) =3D 0
+>>>
+>>> Some random IPV6_HOPTS, with multiple IPV6_TLV_JUMBO options
+>>>
+>>> Non GSO path sends a malformed packet just fine, but GSO complains loud=
+ly.
+>>>
+>>> (flowlabel 0x754ca, hlim 64, next-header Options (0) payload length:
+>>> 186) localhost > localhost: HBH
+>>> (pad1)(pad1)(pad1)(pad1)(pad1)(pad1)(rtalert: 0x0000)
+>>> (pad1)(padn)(jumbo: 2147483648 - payload len !=3D 0) (rtalert: 0x0006)
+>>> (jumbo: 1 - already seen)  [|hbhopt]
+>>
+>> Thank you for the hint. Extracted a reproducer. Fix will follow.
+>
+> Thanks for the patience.
+>
+> I've got a fix to propose which pulls the gso_skb->ip_summed tweak added
+> to __udp_gso_segment() in commit 10154dbded6d ("udp: Allow GSO transmit
+> from devices with no checksum offload") from gso/udp code up to the udp
+> layer (udp[_v6]_send_skb()).
+>
+> This warning can also be triggered for an ipv4 tunnel by turning off
+> csum offload (ethtool -K $tnl tx-checksum-ip-generic off). Will extend
+> udpgso.sh test to cover both v4 and v6.
+>
+> [...]
 
-On Thu, 2024-07-25 at 01:48 -0400, Michael S. Tsirkin wrote:
-> On Wed, Jul 24, 2024 at 06:16:37PM +0100, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > The vmclock "device" provides a shared memory region with precision clo=
-ck
-> > information. By using shared memory, it is safe across Live Migration.
-> >=20
-> > Like the KVM PTP clock, this can convert TSC-based cross timestamps int=
-o
-> > KVM clock values. Unlike the KVM PTP clock, it does so only when such i=
-s
-> > actually helpful.
-> >=20
-> > The memory region of the device is also exposed to userspace so it can =
-be
-> > read or memory mapped by application which need reliable notification o=
-f
-> > clock disruptions.
-> >=20
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> > ---
-> > QEMU implementation at
-> > https://git.infradead.org/users/dwmw2/qemu.git/shortlog/refs/heads/vmcl=
-ock
-> >=20
-> > Although the ACPI device implemented in QEMU (and some other
-> > hypervisor) stands alone, most of the fields and values herein are
-> > aligned as much as possible with the nascent virtio-rtc specification,
-> > with the intent that a version of the same structure can be
-> > incorporated into that standard.
->=20
-> Do you want to just help complete virtio-rtc then? Would be easier than
-> trying to keep two specs in sync.
+Proposed fix now posted:
 
-The ACPI version is much more lightweight and doesn't take up a
-valuable PCI slot#. (I know, you can do virtio without PCI but that's
-complex in other ways).
-
-So I do see these existing in parallel, and I'm happy for the VMCLOCK
-device to defer to the shared memory structure in the virtio-rtc
-specification once that's final.
-
-I've done my best to ensure we have a fair chance of it being adopted
-as-is, and it's versioned so if virtio-rtc gets published with v2 of
-the structure, that's also OK.
->=20
-
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (st->clk->magic !=3D VMCL=
-OCK_MAGIC ||
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 st->clk->=
-size < sizeof(*st->clk) ||
->=20
->=20
-> This is a problem and what I mention below.
-> As structure will evolve, sizeof(*st->clk) will grow,
-> then it will fail on old hosts.
-
-Potentially, yes. At the time a guest starts to support a larger
-version of the struct, it would need to check for the size of the v1
-structure.
-
-We certainly *allow* for the structure to evolve, but as you say this
-is ABI. So we've tried to plan ahead and avoid having to change it
-unless something *really* surprising happens in the field of leap
-seconds.
-
-
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* If the structure is big e=
-nough, it can be mapped to userspace */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (st->clk->size >=3D PAGE_=
-SIZE) {
->=20
-> This is also part of ABI. And a problematic one since linux can
-> increase PAGE_SIZE at any time for its own reasons.
-
-Yes. For it to be mapped to userspace, the hypervisor has to put it
-into a memory region which is large enough for the page granularity
-that the guest happens to use.
-
-The hypervisor implementations so far (for x86 in QEMU since there
-seems to be no ACPI support for Arm?, and for x86+Arm in my other pet
-hypervisor) expose a 4KiB region.
-
-So if the guest uses larger pages (and can't cope with using 4KiB PTEs
-for MMIO mappings), then it can't use this feature unless the
-hypervisor gives it a larger region. I think that's OK.
-
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0st->miscdev.minor =3D MISC_DYNAMIC_MINOR;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0st->miscdev.fops =3D &vmclock_miscdev_fops;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0st->miscdev.name =3D st->name;
-> > +
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0ret =3D misc_register(&st->miscdev);
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0if (ret)
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0goto o=
-ut;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->=20
-> Hmm so you want to map a page to userspace, but who will
-> keep the clock in that memory page up to date?
-> Making hypervisor do it will mean stealing a bunch
-> of hypervisor time and we don't *know* userspace is
-> going to use it.
-
-I think it should scale OK. The bulk of the actual *calculations* are
-done only once by the hypervisor on an NTP skew adjustment anyway,
-rather than per-VM. That gives the period of the actual host counter,
-and the reference time.
-
-Where TSC scaling *isn't* occurring, all that the VMM needs to do is
-copy that information, applying the appropriate TSC offset. I think it
-should be mostly in the noise compared with other VMM overhead?
-
-Where TSC scaling is in use, it's a little more complex. The counter
-value at the reference time needs to be converted using the standard
-mul-and-shift TSC scaling method. But the counter *period* needs to
-undergo the reverse conversion. That would be a bit more work if done
-na=C3=AFvely with a right shift and then a *division*, but an appropriate
-efficient conversion to match the frequency scaling could be
-precalculated, much as KVM already does in kvm_get_time_scale()? Then
-the conversion of the counter period could just be a mul and shift too.
-
-If it's just the TSC scaling which pushes it over the edge, then
-*maybe* we could add the raw host=E2=86=92guest TSC scaling information to =
-the
-structure and make it the guest's problem? I'm not sure I'm overly fond
-of that approach.
-
-(You mention feature negotiation later, so we'll come back to that...)
-
-> > +static const struct acpi_device_id vmclock_acpi_ids[] =3D {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{ "VMCLOCK", 0 },
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0{}
-> > +};
-> > +MODULE_DEVICE_TABLE(acpi, vmclock_acpi_ids);
->=20
-> This is also part of ABI.
-> How do we know no one in the world happens to have a CID like this?
-> We should just reserve a valid HID, I think.
-
-Ack. This was largely just based on the existing VMGENID code. Can I
-assign a QEMUxxxx HID for it?
-
-> > +struct vmclock_abi {
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* CONSTANT FIELDS */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t magic;
-> > +#define VMCLOCK_MAGIC=C2=A0=C2=A00x4b4c4356 /* "VCLK" */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint32_t size;=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Size of region containin=
-g this structure */
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint16_t version;=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* 1 */
->=20
-> I think we need to document how will compatibility be handled,
-> otherwise people will just go
-> (assert(size =3D=3D sizeof(struct vmclock_abi))
-> and we can't extend it ever.
-
-As you noted, the existing guest code only checks for it being large
-*enough*. I've let this "specification" be implementation-led for the
-time being, as I'm planning for Peter to accept it into the virtio-rtc
-spec and for *that* to be the formal definition, where such admonitions
-would reside.=20
-
-> I also feel some kind of negotiation so host can detect guest
-> expectations would be a good idea, basically a la virtio feature
-> negotiation.
->=20
-> Also, I think it's not great that host is just expected to
-> poke at this memory at all times. Being able to know that e.g.
-> system is being shut down and so no need to poke
-> at memory would be good.
-
-Fair enough. I think that when used in virtio-rtc, doing it through
-feature negotiation is probably the right answer?
-
-For the ACPI device, perhaps we can just add an ACPI method to
-enable/disable the timekeeping (the disruption signal can always be
-operational).
-
-
---=-Hh5AJCYJEgXbGuGNszvM
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNzI1MDk1NjA1WjAvBgkqhkiG9w0BCQQxIgQgJctIkNkm
-+V4R2hSCHZrJtXI51BoiKnAP69cBtgsFW08wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB6sZLebi3i3k3Fv1IcDx6pBo7R4pt+LUCb
-6Mdx90Afjqat7bM5OoycqvlBhSgmdIqredfrHLtyLhkswlrWjnR58XWOJgBL/euT6R9IsQB2bJHP
-uVWu5vtZOn3kYjvDX2W7JERgwdZ8dDRTbjuI6r5V1lkTOw2tg0wCxtDZgoD4uPLxsw0GkkEWEsgT
-orqa+C9kwKgzwUm97BQFyLO7F1zjo9BR2MPCFLeGuNkLtHg/JYOW1UIGIJ+m1chazpP26xSfe2Us
-496slGAe+6incFZz14vHJwazfPImJ20tNumd1jHihmTt2lLeHcpme8A9IjwI1QXTDNA2vcpMGA+0
-/jjDc5aLJsyGESvZnyO8MAMkLHSwHGU3Hhs6JCrOc4IAbO5BmoPq0me7eyjDhY1lworePKLZV4pY
-Q/lpQFLJX4x4A0DC0tp0a1SDN3cBn2/P0rA5ZNb7E40qd4nNo6F2d7sZLbJ3JpOjdYth3QmonTJ6
-0ZShE3A1f/I7bgfH+C/E9xl1FrPY/yTRGcoZKeEu6Zg6xONpd9KqhrK6VNCK5TTsNK2bxqSUA3tQ
-Wforp95dmnm4Bd+jSgNLVlMueh2JG2J7ha/nca2YTP3ZM7T02op+Zc6Hd4PCIZHx3l8uaF0k1B6o
-eOiCuSdM2WUEn/wxKRBSCkLah8d7JHpIJ+fB8O9IwQAAAAAAAA==
-
-
---=-Hh5AJCYJEgXbGuGNszvM--
+https://lore.kernel.org/all/20240725-udp-gso-egress-from-tunnel-v1-0-5e5530=
+ead524@cloudflare.com/
 
