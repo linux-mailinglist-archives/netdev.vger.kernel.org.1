@@ -1,155 +1,125 @@
-Return-Path: <netdev+bounces-112916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3FD293BCF5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:15:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4C193BD28
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:32:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695331F21E37
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 07:15:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB9C01F21682
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 07:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE10916EC02;
-	Thu, 25 Jul 2024 07:15:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C9837165;
+	Thu, 25 Jul 2024 07:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EoTZd8wG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fbMjkso3"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F7916CD3A;
-	Thu, 25 Jul 2024 07:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32501CA8A
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 07:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721891722; cv=none; b=hAKJe2rs2Uoe/pDY2Hm0m7XHIRJWZrwJ6tepA1NqhbphNgqQ+ZP6ztUF0u7jWSV4w2w6faA72DhKnx6dZszrHzL593J9N4NPdpF9dF/8K4xN1IwvXrGB1q/joqxc1IhjaErIOSE76txq6qp3yJ5sGgz1xs3sxurg/Co/8t4RMJA=
+	t=1721892766; cv=none; b=YgZYUg6km5G01IWhvk42ZG3KGjrdcbvOzdDrl0VNDAkZhIbXWJ1EEhpRoNvYZ03q6hn7VkVVWwAGxoEkY/1lLq1sd7063aI6uL9B06AVLShdEb5yFFw3Vu18z31kFV0Yf2HW4FEYdFA9BGloSQJDM0hck6NdYiTICdw7JgM/5Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721891722; c=relaxed/simple;
-	bh=C6WRwDUONbCwjMOYbPgm8PvoHT72vL1m8MFet/DFhv4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ew8lDchEjkFkiocmpR/uHRTpe9rg14z4wKB0yaBpLP2IyTLDBgoHTKUu21M8Ah6KbCpeRvEkv9R2CC2FkH9czE24c96KXf3AqALJ3YM7A5pKQ5InDj7lSG+UyFpDpaTTyxS/NPcyT8qZbspgKzQck0q8qwpFnNN17WkclhYJmqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EoTZd8wG; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1721891721; x=1753427721;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=C6WRwDUONbCwjMOYbPgm8PvoHT72vL1m8MFet/DFhv4=;
-  b=EoTZd8wGWKdqN54orOLP7N6V8ATfFpM0SyHC6M1p/k2/T6YiBeyj+gKO
-   0CRW59pMPLjt+rR/Kgk4WMg1h+7cs7Mgjvn7WmqH6BKHgHQInVCD/dOWU
-   ESv8+PPCSgleXua2yDjlFVG98TmWr8cnwcONa4/CVxt/NMINauZp+UrsC
-   dkSUUffM45tNvDFk+GtEJl1zy9P1pBAPnvTRpeOMngUIs/iNwtTpGJ/gd
-   j7TvWqjgPjKYAeoNtgEI+ZU/y/+0/fTDVlGLvdE4MbG0pVLDroFv6Py2t
-   uItUDMb6FuEKurusTioEppOSMEU7Mme8OQ5TU7UfkLZsDC03TNKt0nS8w
-   w==;
-X-CSE-ConnectionGUID: 6oFYj1z4SPSlQiymYK1oBA==
-X-CSE-MsgGUID: R3+59Xb1TRe+XjSfi5TUmw==
-X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
-   d="scan'208";a="30323881"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Jul 2024 00:15:19 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jul 2024 00:14:57 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 25 Jul 2024 00:14:53 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <andrew@lunn.ch>,
-	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <horatiu.vultur@microchip.com>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-Subject: [PATCH net V1] net: phy: micrel: Fix the KSZ9131 MDI-X status issue
-Date: Thu, 25 Jul 2024 12:41:25 +0530
-Message-ID: <20240725071125.13960-1-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1721892766; c=relaxed/simple;
+	bh=mhsrw8ogEGpLPVAj7eghcSQD3WmtTykYhuJiZIrkfk8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hkuj/MDZEG+vE+eZGfwS68W9lm+Dmo06nyqsja+B39lYvsyJxyZqKR5KLHNY6utktZ9aQ0hJJ3/vte1ildjAHAiem/1aPU8XOZSOzLtCuApcKJsfGdJAiomMhPKDAlW3LSpti7eizFVpwvTAMpJUOsRSF2x/PYOJ6pT2zNAF5Vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fbMjkso3; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-428063f4d71so26795e9.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 00:32:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721892763; x=1722497563; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mhsrw8ogEGpLPVAj7eghcSQD3WmtTykYhuJiZIrkfk8=;
+        b=fbMjkso3liEnVbWR449XJsVGbnAPiO1XFyONqlJOvBBjtYVSj3W6lsrjZG1t/HR709
+         bBxdtAm/DBsdn5vYJRwDosgeRBeRQgleRsRF/QOIj9Wd6FbTtvUdG5DyjCLeGqlnKhAM
+         WHHA7n7y4ub8JffXfpcO6gSaTl9qUmXX134QL2QnVl3oNIqQLDCRMWWcPR2/pRyvcQ0R
+         t7k0b+opA48zrfL69ver4Kx6ArhfnFAhQBwemlUpHtqaYBUJqi+4BZGg/GC4p7Iph6G2
+         Gqr2lKV4F2PPpgLbT4jD0ebjihptsmllRSLrbXBw/2EUe/2uu9z7c295gAtwRh/Y9g8Q
+         O9aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721892763; x=1722497563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mhsrw8ogEGpLPVAj7eghcSQD3WmtTykYhuJiZIrkfk8=;
+        b=hTvjJWrIfideLqkeaEqp0wIqRBNMWlhPfaew4xy8bEn0/uylp/aSr67IfpgO3Paw6h
+         gqgD3jPMd62+UpyGyyrpp1C5KHMoOQTu8SEMx/ylj/Ff4V3Hox1hH6LS3yk8Z7OEgMK+
+         F4oV2wPqznczKSdlHYytK4oT8IKsUD5n3jK5CMNCCxFkr8ynHIAZMTcOoxzCpqpp2ExU
+         8uRNGi7h9qZ4lMf1L/vpbM5SkYWwMZkqISzHxzQjLmJT8vGATOmxjFuqKi5k379xUxmx
+         St6Q/bFiEekO+aWKnApsRSW0VnVK9VuASiGVc9chmEGmd+w2RV4VVitKz445OPfxJG4F
+         BjEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWLUb5U4zrdgdl845ASjxjlY31iWuJng4yzXtz1AjxGNwuwfH//hSTWdwveRg6n+pJbqhJVPm1H8TVqcPndokUmI8mZsge1
+X-Gm-Message-State: AOJu0YxNPDHRqnX2dd1pnr+2mMw53QaFDyut+8RCQEfRJcbWbboscWWE
+	XhP4MfHBG8Fd0e0QAlmWa8xNG10ryFfeGfDVOzY+noNcFpNpRhN0a/x9IxirsK3AxMCN/54sRsp
+	iItMja1x1DEvzWQfrg2FEwmiFpLr1UOX3UQyw
+X-Google-Smtp-Source: AGHT+IHrlPzesfUYFOdrI66JQhz2C3XefRHiL5ThLCOeaquCv+BIr6iB+fuX+Gen43Z58/Wd0LH5F6B3GUkFKOdp6m4=
+X-Received: by 2002:a05:600c:3b05:b0:426:5ef2:cd97 with SMTP id
+ 5b1f17b1804b1-42803ffa18amr1015225e9.2.1721892762656; Thu, 25 Jul 2024
+ 00:32:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20240722094119.31128-1-xiaolinkui@126.com> <CANn89iKrebOtKsZptq_NMhwCGOVbrp=QgAYnJE3OPsC1__N+HQ@mail.gmail.com>
+ <4ef5ab3b.171b.190e8b6eedd.Coremail.xiaolinkui@126.com>
+In-Reply-To: <4ef5ab3b.171b.190e8b6eedd.Coremail.xiaolinkui@126.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 25 Jul 2024 09:32:29 +0200
+Message-ID: <CANn89i+8Fn74WWjVvxnPo154JRie69p1Tz+imOUMnrnoRVmoDg@mail.gmail.com>
+Subject: Re: Re: [PATCH] tcp/dccp: replace using only even ports with all ports
+To: xiaolinkui <xiaolinkui@126.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, 
+	Linkui Xiao <xiaolinkui@kylinos.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The MDIX status is not accurately reflecting the current state after the link
-partner has manually altered its MDIX configuration while operating in forced
-mode.
+On Thu, Jul 25, 2024 at 9:07=E2=80=AFAM xiaolinkui <xiaolinkui@126.com> wro=
+te:
+>
+> Thank you for your reply=EF=BC=8E
+>
+> At 2024-07-22 21:50:39, "Eric Dumazet" <edumazet@google.com> wrote:
+> >On Mon, Jul 22, 2024 at 2:41=E2=80=AFAM <xiaolinkui@126.com> wrote:
+> >>
+> >> From: Linkui Xiao <xiaolinkui@kylinos.com>
+> >>
+> >> In commit 207184853dbd ("tcp/dccp: change source port selection at con=
+nect()
+> >> time"), the purpose is to address the issue of increased costs when al=
+l even
+> >> ports are in use.
+> >>
+> >> But in my testing environment, this more cost issue has not been resol=
+ved.
+> >
+> >You missed the whole point of 1580ab63fc9a ("tcp/dccp: better use of
+> >ephemeral ports in connect()")
+> >
+> >Have you read 207184853dbd ("tcp/dccp: change source port selection at
+> >connect() ..." changelog and are you using IP_LOCAL_PORT_RANGE ?
+>
+> There seems to be some difference between IP_LOCAL_PORT_RANGE
+> and "sysctl net.ipv4.ip_local_port_range".We can use the following system
+> calls at the user layer to use IP_LOCAL_PORT_RANGE:
+> setsockopt(sockfd, IPPROTO_IP, IP_LOCAL_PORT_RANGE, &opt, sizeof(opt));
+>
+> But user behavior is uncontrollable=EF=BC=8EIs there any other way to use=
+ IP_LOCAL_PORT_RANGE=EF=BC=9F
 
-Access information about Auto mdix completion and pair selection from the
-KSZ9131's Auto/MDI/MDI-X status register
+If user behavior can not be changed, this is on their end.
 
-Fixes: b64e6a8794d9 ("net: phy: micrel: Add PHY Auto/MDI/MDI-X set driver for KSZ9131")
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
- drivers/net/phy/micrel.c | 34 +++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index dd519805deee..65b0a3115e14 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1389,6 +1389,8 @@ static int ksz9131_config_init(struct phy_device *phydev)
- 	const struct device *dev_walker;
- 	int ret;
- 
-+	phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
-+
- 	dev_walker = &phydev->mdio.dev;
- 	do {
- 		of_node = dev_walker->of_node;
-@@ -1438,28 +1440,30 @@ static int ksz9131_config_init(struct phy_device *phydev)
- #define MII_KSZ9131_AUTO_MDIX		0x1C
- #define MII_KSZ9131_AUTO_MDI_SET	BIT(7)
- #define MII_KSZ9131_AUTO_MDIX_SWAP_OFF	BIT(6)
-+#define MII_KSZ9131_DIG_AXAN_STS	0x14
-+#define MII_KSZ9131_DIG_AXAN_STS_LINK_DET	BIT(14)
-+#define MII_KSZ9131_DIG_AXAN_STS_A_SELECT	BIT(12)
- 
- static int ksz9131_mdix_update(struct phy_device *phydev)
- {
- 	int ret;
- 
--	ret = phy_read(phydev, MII_KSZ9131_AUTO_MDIX);
--	if (ret < 0)
--		return ret;
--
--	if (ret & MII_KSZ9131_AUTO_MDIX_SWAP_OFF) {
--		if (ret & MII_KSZ9131_AUTO_MDI_SET)
--			phydev->mdix_ctrl = ETH_TP_MDI;
--		else
--			phydev->mdix_ctrl = ETH_TP_MDI_X;
-+	if (phydev->mdix_ctrl != ETH_TP_MDI_AUTO) {
-+		phydev->mdix = phydev->mdix_ctrl;
- 	} else {
--		phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
--	}
-+		ret = phy_read(phydev, MII_KSZ9131_DIG_AXAN_STS);
-+		if (ret < 0)
-+			return ret;
- 
--	if (ret & MII_KSZ9131_AUTO_MDI_SET)
--		phydev->mdix = ETH_TP_MDI;
--	else
--		phydev->mdix = ETH_TP_MDI_X;
-+		if (ret & MII_KSZ9131_DIG_AXAN_STS_LINK_DET) {
-+			if (ret & MII_KSZ9131_DIG_AXAN_STS_A_SELECT)
-+				phydev->mdix = ETH_TP_MDI;
-+			else
-+				phydev->mdix = ETH_TP_MDI_X;
-+		} else {
-+			phydev->mdix = ETH_TP_MDI_INVALID;
-+		}
-+	}
- 
- 	return 0;
- }
--- 
-2.34.1
-
+Sorry, we won't accept a patch going to the terrible situation we had
+before, where applications would fail completely in many cases.
 
