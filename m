@@ -1,197 +1,114 @@
-Return-Path: <netdev+bounces-112919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D26793BD50
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:48:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AC0293BDAD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3327A283D6A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 07:48:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 407AF1F24EFC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 08:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E78F171E64;
-	Thu, 25 Jul 2024 07:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68D1158862;
+	Thu, 25 Jul 2024 08:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kCK1M23F"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VICrjWgl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78447171E40
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 07:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B85249ED;
+	Thu, 25 Jul 2024 08:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721893683; cv=none; b=BOHuK8GC3SVhAWvDaGc8SUMK5OevE/JpnJone0ftH9B7X4JOpfkXsw7IjWF3vX9fCi/s/os7wrf1Oph5azUX8aLcBdlhMvpt4p1t5Q85qB+L4dEUhiTdtNolIpSWiUeM9I0BZtLM3vEBlTQ3lNer0z7kJdREFyXwEaWLmj5sdvI=
+	t=1721894829; cv=none; b=knYGrcNY6r8SHxcjuJpokCZtOCkOCcTM5ochkPWxQGiWIWh4kQy/v5sL8Pk30R9unS6L73nA+ArKmjZz/BsRc3NUlp2b+U1OK5XZ3afCYPBoBpaF3NFdvp4aUGLgjTA5LLNhBvIvNo8ecDS+DZKXuPG9G0Sxa3FvJc7MIckE8Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721893683; c=relaxed/simple;
-	bh=Un3ywfhMAKXc1GXVQ6ZW/heu5eZHJL0vPtfHPNGqZ5s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YFxztv8/GlVc4w374ZzLFEMr/3A5O2tsyFzkxus+RxCkYxaGKtI/K3diUSPudR5U3+/MRGgyiTyiz3BuAbgZLJbgqoFtQ8sbtIiw4HmHe26HsKl/7XMOGgeqW0p0s6b9/5OqbjSaPtyAaHZPXFbdyq40SzeV5R+6xsTF9cxlfRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kCK1M23F; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5a869e3e9dfso9752a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 00:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721893680; x=1722498480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hCGWKjrWoshl6H68F9lar6GO9FnrLS6GdyfH/s87qJQ=;
-        b=kCK1M23FWsGPCg7jqnzBfpz18i4Wg3Eb1+UoMLtN1Z1UqSQ0MgrkIVUaBfxWhwhPU8
-         87ahBAD+za1Jp34biPaqdnlB9kMbkj6VIx7bp2+pQ7M9aO00nfEi3Lr17ZGPpPgKYtt4
-         2F5QpEoY+evm/MZL44wcWZEdiV5sZB30weotFhMXE7AfsGeqtt8sg6NKoCMa2J5+v2wl
-         E6eU9e7rtlrveA7lO2KvS5VYkdo6QduWC8F6jB/Q1JL0pmlaM05dpiNaVEXVjpBG6dPk
-         mZAuunucmuUW9B1n09PAOOW6WhbqfBFPHm3/4Vw4hJZ6x8bLZsVA0QpXKrD1dxy05qLb
-         /ZMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721893680; x=1722498480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hCGWKjrWoshl6H68F9lar6GO9FnrLS6GdyfH/s87qJQ=;
-        b=SzmyWt8fbh7D15G0ujG3af6Afyk9Bb/y2AMI6DAzt8bcAPtJsXFAFJSYA/pre1rr9z
-         paw0ulYdUxYdPtPdYU2ZFmP1KPcVV3kZLee0TI92K6GC1DBaJgHhG1VFvJU2HdjKrdQH
-         CcoIyvNfzco0mD2Q1DoeOj5V7rhvFAlNZSB+n6BtYJfs2xcaO9ClPgSkqRG6pTHhBVFN
-         3K7cKxAnhYeDi20/SqO9QUmwxg6OOc25DJG0TKfM8G1JckXc1NoNffkf5ST7uFKXBdsq
-         n1u99AdsIgKKRR4+W5c6ZqxSWEvqAokmiSGsL2WIv+TfeJOa2BbcEt5W96tWVrZNlnAD
-         qKag==
-X-Forwarded-Encrypted: i=1; AJvYcCWKmZLxFLOOvwZkngO6pA7ib+Gn1kZ7+FDK3vw5USbR28ZK0sv5UKPRz1RoK68j2NW+dnUyCdQzVLk6hfoO7Y6jJA8Tslyt
-X-Gm-Message-State: AOJu0YwSmR8oOGPvXN0pFGBoWV0el+fWAKg/KcQRo+G7+Apr8YlJXdfo
-	3br3qA5iXmPO8UPusl7wG4dd4pEZPhPsIn2/+F0cBnNGvJ/GHoDHFr9QKT+3aSps4dCU9vrtkiJ
-	pZOBpSmdh+MTfnxrnYJipLiO6MUCX0xxjwt7+
-X-Google-Smtp-Source: AGHT+IGK9sBoV+zYaXMaYO7SSthTraaty8ZITM3xNb9OcjQAMZpJ4rMAC3af5DduNRkmMYDH5MoVzNoi2Dyn7SuON94=
-X-Received: by 2002:a05:6402:40d5:b0:58b:90c6:c59e with SMTP id
- 4fb4d7f45d1cf-5ac2d052975mr156449a12.7.1721893679261; Thu, 25 Jul 2024
- 00:47:59 -0700 (PDT)
+	s=arc-20240116; t=1721894829; c=relaxed/simple;
+	bh=et8MeDpeM9VgJU3uJLRPA2b7BO3/WQzeSLIZTNsZP3Q=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5WjZqSCuQDYLscj0oh5y+o8eb8qQGnxcodPgpO/gmhLCGRF96b2ld70BmM3JA1hSnCoWjHLkxLH7CcFcaprahcO7A/ICrZnBAq/k5dRsw85njGgA8VFZfAJYXI8duD8sndmFgrJ0HfQWo0MsWKp10aI6qRnctXewF4KlbySUi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VICrjWgl; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46ONvp71022308;
+	Thu, 25 Jul 2024 01:06:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=voXGv9KufQht/hBsYwa1gfH1E
+	e9PQIKr4zcoBTbC64o=; b=VICrjWglr/C9vTUWnRar0dBTtQThFv2Za8KUDQI3k
+	MwvFvNNrET1czJ//Wd41pPOhzq6dLNe6x32+CwqN4siJ1ShA9mx5AvfV3jNX43vk
+	hNB7qjuJNXQp8vvLJuRpGsd23JwjhIgqaUgkMTjoBcOf3IOHf5fq3cNH1vV0MxAW
+	DgRRUiCtpKD38DusrtHgM34XYKNmNfzl5O6wEdQ0EWf5qikb09cbmTGJJY6/cgrY
+	5VCqqJkarTCqAdrFWRNjS68YNt+N39bTMZg7BswTwhvc0vHxkxDHnbWgmv2Tlymk
+	KOrIWpeCElUp7A8yURIf2r5QPgXPAjG3VdhAbhuPXvr0A==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40kbr9s9ca-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jul 2024 01:06:47 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 25 Jul 2024 01:06:47 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 25 Jul 2024 01:06:47 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 5F6CD3F706B;
+	Thu, 25 Jul 2024 01:06:43 -0700 (PDT)
+Date: Thu, 25 Jul 2024 13:36:42 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+CC: <make24@iscas.ac.cn>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <liujunliang_ljl@163.com>,
+        <andrew@lunn.ch>, <horms@kernel.org>, <linux-usb@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>
+Subject: Re: [PATCH net v4] net: usb: sr9700: fix uninitialized variable use
+ in sr_mdio_read
+Message-ID: <ZqIHkubX0KK8psPv@test-OptiPlex-Tower-Plus-7010>
+References: <20240725022942.1720199-1-make24@iscas.ac.cn>
+ <20240725.120100.2041590414991833213.syoshida@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240725-tcp-ao-static-branch-rcu-v1-1-021d009beebf@gmail.com>
-In-Reply-To: <20240725-tcp-ao-static-branch-rcu-v1-1-021d009beebf@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Jul 2024 09:47:47 +0200
-Message-ID: <CANn89iLAhXWKkA5xZoZPDj--=hD7RxOTkAPVf31_xLU8L-qyjQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/tcp: Disable TCP-AO static key after RCU grace period
-To: 0x7f454c46@gmail.com
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240725.120100.2041590414991833213.syoshida@redhat.com>
+X-Proofpoint-ORIG-GUID: Cy5fQBZvMOQ1GOPt0UXNsc6IkZ_aefOF
+X-Proofpoint-GUID: Cy5fQBZvMOQ1GOPt0UXNsc6IkZ_aefOF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-25_08,2024-07-25_02,2024-05-17_01
 
-On Thu, Jul 25, 2024 at 7:00=E2=80=AFAM Dmitry Safonov via B4 Relay
-<devnull+0x7f454c46.gmail.com@kernel.org> wrote:
->
-> From: Dmitry Safonov <0x7f454c46@gmail.com>
->
-> The lifetime of TCP-AO static_key is the same as the last
-> tcp_ao_info. On the socket destruction tcp_ao_info ceases to be
-> with RCU grace period, while tcp-ao static branch is currently deferred
-> destructed. The static key definition is
-> : DEFINE_STATIC_KEY_DEFERRED_FALSE(tcp_ao_needed, HZ);
->
-> which means that if RCU grace period is delayed by more than a second
-> and tcp_ao_needed is in the process of disablement, other CPUs may
-> yet see tcp_ao_info which atent dead, but soon-to-be.
+On 2024-07-25 at 08:31:00, Shigeru Yoshida (syoshida@redhat.com) wrote:
+> On Thu, 25 Jul 2024 10:29:42 +0800, Ma Ke wrote:
+> > It could lead to error happen because the variable res is not updated if
+> > the call to sr_share_read_word returns an error. In this particular case
+> > error code was returned and res stayed uninitialized. Same issue also
+> > applies to sr_read_reg.
+> > 
+> > This can be avoided by checking the return value of sr_share_read_word
+> > and sr_read_reg, and propagating the error if the read operation failed.
+> > 
+> > Found by code review.
+> > 
+> > Cc: stable@vger.kernel.org
+> > Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
+> > Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> 
+> I did a quick check for sr9700.c and there seems to be other
+> suspicious usage of sr_read_reg().  But, for sr_mdio_read(), I think
+> the patch is sufficient.
+> 
+> Reviewed-by: Shigeru Yoshida <syoshida@redhat.com>
+> 
+>  Agree with Shigeru, may be you can submit another patch addressing
+>  "suspicious usage of sr_read_reg" this patch looks good
 
-> And that breaks the assumption of static_key_fast_inc_not_disabled().
-
-I am afraid I do not understand this changelog at all.
-
-What is "the assumption of static_key_fast_inc_not_disabled()"  you
-are referring to ?
-
-I think it would help to provide more details.
-
->
-> Happened on netdev test-bot[1], so not a theoretical issue:
->
-> [] jump_label: Fatal kernel bug, unexpected op at tcp_inbound_hash+0x1a7/=
-0x870 [ffffffffa8c4e9b7] (eb 50 0f 1f 44 !=3D 66 90 0f 1f 00)) size:2 type:=
-1
-> [] ------------[ cut here ]------------
-> [] kernel BUG at arch/x86/kernel/jump_label.c:73!
-> [] Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> [] CPU: 3 PID: 243 Comm: kworker/3:3 Not tainted 6.10.0-virtme #1
-> [] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3=
--0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-> [] Workqueue: events jump_label_update_timeout
-> [] RIP: 0010:__jump_label_patch+0x2f6/0x350
-> ...
-> [] Call Trace:
-> []  <TASK>
-> []  arch_jump_label_transform_queue+0x6c/0x110
-> []  __jump_label_update+0xef/0x350
-> []  __static_key_slow_dec_cpuslocked.part.0+0x3c/0x60
-> []  jump_label_update_timeout+0x2c/0x40
-> []  process_one_work+0xe3b/0x1670
-> []  worker_thread+0x587/0xce0
-> []  kthread+0x28a/0x350
-> []  ret_from_fork+0x31/0x70
-> []  ret_from_fork_asm+0x1a/0x30
-> []  </TASK>
-> [] Modules linked in: veth
-> [] ---[ end trace 0000000000000000 ]---
-> [] RIP: 0010:__jump_label_patch+0x2f6/0x350
->
-> [1]: https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/696681/5-c=
-onnect-deny-ipv6/stderr
->
-> Cc: stable@kernel.org
-> Fixes: 67fa83f7c86a ("net/tcp: Add static_key for TCP-AO")
-> Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
-> ---
-> ---
->  net/ipv4/tcp_ao.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-> index 85531437890c..5ce914d3e3db 100644
-> --- a/net/ipv4/tcp_ao.c
-> +++ b/net/ipv4/tcp_ao.c
-> @@ -267,6 +267,14 @@ static void tcp_ao_key_free_rcu(struct rcu_head *hea=
-d)
->         kfree_sensitive(key);
->  }
->
-> +static void tcp_ao_info_free_rcu(struct rcu_head *head)
-> +{
-> +       struct tcp_ao_info *ao =3D container_of(head, struct tcp_ao_info,=
- rcu);
-> +
-> +       kfree(ao);
-> +       static_branch_slow_dec_deferred(&tcp_ao_needed);
-> +}
-> +
->  void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
->  {
->         struct tcp_ao_info *ao;
-> @@ -290,9 +298,7 @@ void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
->                         atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_a=
-lloc);
->                 call_rcu(&key->rcu, tcp_ao_key_free_rcu);
->         }
-> -
-> -       kfree_rcu(ao, rcu);
-> -       static_branch_slow_dec_deferred(&tcp_ao_needed);
-> +       call_rcu(&ao->rcu, tcp_ao_info_free_rcu);
->  }
->
->  void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *=
-tp)
->
-> ---
-> base-commit: c33ffdb70cc6df4105160f991288e7d2567d7ffa
-> change-id: 20240725-tcp-ao-static-branch-rcu-85ede7b3a1a5
->
-> Best regards,
-> --
-> Dmitry Safonov <0x7f454c46@gmail.com>
->
->
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
 
