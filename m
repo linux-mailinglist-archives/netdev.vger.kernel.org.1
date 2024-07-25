@@ -1,80 +1,68 @@
-Return-Path: <netdev+bounces-113048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F1D93C7B2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:36:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E32893C7B8
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:38:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA2921C219A1
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:36:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 194F12818EB
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2A819D88A;
-	Thu, 25 Jul 2024 17:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7765619DF6E;
+	Thu, 25 Jul 2024 17:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="QWkfPmqK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OUdpgeVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6CA198E6D
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 17:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3560219D889;
+	Thu, 25 Jul 2024 17:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721928983; cv=none; b=KkGx4Kj/7voxdBBj46I1Rhupxo+/y2M5UXRLdW/OIs1vSfWvPUYIHRib/sv0hC99pKBgleaDnEBXWCr5XCrKAMPt3TDu7R9u61bDaoAXFyajDvi1TeVtQgmn7VbnzCe3btbGPbCBmG4v8b3LTQ3/2L50w7BmE6cUhOsamR++RIA=
+	t=1721929074; cv=none; b=tqS4V8cZ0v6sivgkQmehCx5Z7DrcqaLOblGsAZ8snaebEtF3SHKML04XAXAJUQxOPfGL7qW6PRXnCyOE/6UEF/8Wp9T6Zwuhn33jcQROiDG+S/gpKfgJD3WaaYwkSo8gAUSrkVBJkfpXnG71U/N+Fz3HSsv7Ybl19qugiyYRMvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721928983; c=relaxed/simple;
-	bh=9VX7sV4Sak0j2PjeKw/Uhu1mo5Pb8zqSL48R5CiE4pU=;
+	s=arc-20240116; t=1721929074; c=relaxed/simple;
+	bh=kYShI7202uUqTsxcN5MLRjtETtPxifWaKs6rENWee6c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O/L3BfiAcfkHQo0SNGqcPOf4fHU86aw0kO9hiOvu8r3cBfzhPcuKgAsUrsvK9AR6Bdh344q4vQ22SzE3CNNRP8AgTbCLfpV7KX+rDvd+7P+LwRjij5EB5KjZEjPj2vPsP9O7ufzv4ltYTLdFMOs4oESeN9t8Z5mIkxymThyKJT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=QWkfPmqK; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2cb5787b4a5so75546a91.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1721928981; x=1722533781; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tyXn0hfsHWdk2uakwg5TbDGl3rOxYo7Eh2tEoMeKiyI=;
-        b=QWkfPmqK3EmuGs2/edjkVEDNUEgcXwHkArH38Kc8Y9fzEzBapi69mqNwtw0CtNCTrd
-         fAlEI46DWR/D10CjlBDdNFv2QpX/KzZEHEk2meSTtpbRSpkAXIXak3F+auDb/Rawa/Ol
-         LAF4IusmhZcYQKGDLsGv/rSwgOlggeCH2DJgw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721928981; x=1722533781;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tyXn0hfsHWdk2uakwg5TbDGl3rOxYo7Eh2tEoMeKiyI=;
-        b=A9DJxd7mgVmatg3pAi1k9vCQx3LsaDr512rjLFIHb/Z/DOujUjMKsTjpbgsUKUy/2Z
-         hwmNLKhPhdFWK9I63Hl1WWzLMLQfCUvNRmSBM68mAq/Fny/MofmZnns2PludzQQNUFO9
-         Tthdj8KwiKCPL4Jib2VWfvqzEvrYr2i9EmIppkpkSjUzUgbhaHyL0BuVwZltv4n/kiDJ
-         bpOf2o0Kkdf6P3sejeWz449bsJ7I7kEXuVad3H2fNYatcLlF3hL1alL1+tNXSpJHiGvX
-         lLzKWylFf6JdNiSiYIUuFArAiief3Ab/F4Db0smxVKVaUe1DQWdC0CgJf4gh9vGnMXnO
-         ZZtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWB3rMuCa+FjhXwQGtr8IFW/I6jaLVa7P31116v2BowRdprlJPk+Ds6y38F4/lxDLZH5rPEIcl2yZcY5AFdl/ueHkWjfcNX
-X-Gm-Message-State: AOJu0YwVFf7mLrDNsu7VwI/roMvrUvdClKhRTrBSZMdF1UQIsOm+MTsb
-	DnoZ4hXBolP112iYHptldQ7V70VxUWSKG9CMqT9c49U4caA9krUkXIML7ygf/ZA=
-X-Google-Smtp-Source: AGHT+IEP51Aqmfe3Bfzk8kmOA0IGeiTTP8O2AzNB3+NvDFoY42bUarDmeH/y6F2jG7NSxXJoREarQA==
-X-Received: by 2002:a17:90b:3146:b0:2cb:5de9:842c with SMTP id 98e67ed59e1d1-2cf23813344mr4419892a91.25.1721928981433;
-        Thu, 25 Jul 2024 10:36:21 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb75fff4esm3860041a91.51.2024.07.25.10.36.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 10:36:21 -0700 (PDT)
-Date: Thu, 25 Jul 2024 10:36:18 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net 0/2] ethtool: rss: small fixes to spec and GET
-Message-ID: <ZqKNElpqYOVfBHWq@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
-References: <20240724234249.2621109-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=j6fU67Hc5KbWpvmCi9aw+Thsyb5blAS1+gJxm+HXfUMuGIx+ShTj0ieu86aCYyZJPBS18XjIR8fuTun89IRZdv2sQ8EcfuNNCPCNCZkBvu0pQzdWgh2oaY20ZI6MUmX2yWJ9UXk3ZQd6cApBT5gNlwJObGSQCM6NEGf80gqRn/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OUdpgeVf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03AC5C116B1;
+	Thu, 25 Jul 2024 17:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721929073;
+	bh=kYShI7202uUqTsxcN5MLRjtETtPxifWaKs6rENWee6c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OUdpgeVf4TqbnNYWNppOKDILDNSQAaEdVDXpl2EsTyNzhhGygo/kFj/d+wI+sscM0
+	 USrlUhS2r1Z3JgL0W+t6bgswvscmjwi2r+WJGLVpHPhHOSqU8jVRv4d/hfXcB+49hv
+	 VhsPsAVnDbAp5uNRKhMtFX11+udtP3xbLd1exGD3u58jg95lUExGERgvPLnVugRxF6
+	 A86ORSKdm8/OeZl+s9lw6mTw+yLcw16vsYwhb8mSTcXkvxgUxTacl92hDF9sW4C4Sn
+	 br+/bjXtGotEsrmnGZyKDRgMFYtANjuysqTBR/ot/hdxsMCI4Iti1pJAiQTZy49E7+
+	 LGiAhS9mV5kHg==
+Date: Thu, 25 Jul 2024 20:37:47 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Mark Brown <broonie@kernel.org>,
+	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240725173747.GH7022@unreal>
+References: <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+ <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com>
+ <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
+ <20240725122315.GE7022@unreal>
+ <CAPybu_1XsNq=ExrO+8XLqnV_KvSaqooM=yNy5iuzcD=-k5CdGA@mail.gmail.com>
+ <20240725132035.GF7022@unreal>
+ <1d7a4437-d072-42c4-b5fe-21e097eb5b9c@sirena.org.uk>
+ <20240725141856.GG7022@unreal>
+ <b30aa2afd015a4f957a6c0b2353ef7b99716d240.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,22 +71,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240724234249.2621109-1-kuba@kernel.org>
+In-Reply-To: <b30aa2afd015a4f957a6c0b2353ef7b99716d240.camel@HansenPartnership.com>
 
-On Wed, Jul 24, 2024 at 04:42:47PM -0700, Jakub Kicinski wrote:
-> Two small fixes to the ethtool RSS_GET over Netlink.
-> Spec is a bit inaccurate and responses miss an identifier.
+On Thu, Jul 25, 2024 at 10:22:48AM -0400, James Bottomley wrote:
+> On Thu, 2024-07-25 at 17:18 +0300, Leon Romanovsky wrote:
+> > On Thu, Jul 25, 2024 at 02:29:36PM +0100, Mark Brown wrote:
+> > > On Thu, Jul 25, 2024 at 04:20:35PM +0300, Leon Romanovsky wrote:
+> > > > On Thu, Jul 25, 2024 at 03:02:13PM +0200, Ricardo Ribalda Delgado
+> > > > wrote:
+> > > 
+> > > > > As a user, and as an open source Distro developer I have a
+> > > > > small hint.  But you could also ask users what they think about
+> > > > > not being able to use their notebook's cameras. The last time
+> > > > > that I could not use some basic hardware from a notebook with
+> > > > > Linux was 20 years ago.
+> > > 
+> > > > Lucky you, I still have consumer hardware (speaker) that doesn't
+> > > > work with Linux, and even now, there is basic hardware in my
+> > > > current laptop (HP docking station) that doesn't work reliably in
+> > > > Linux.
+> > > 
+> > > FWIW for most audio issues (especially built in stuff) with laptops
+> > > if you report it upstream it'll generally be relatively easy to
+> > > quirk. Unfortunately it's idiomatic for ACPI systems to quirk off
+> > > DMI information for almost everything which means a constant stream
+> > > of per system quirks for subsystems like audio.
+> > 
+> > It is Jabra USB speaker. One day, I will have time to debug it :).
 > 
-> Jakub Kicinski (2):
->   netlink: specs: correct the spec of ethtool
->   ethtool: rss: echo the context number back
+> Those actually do work with Linux.  It's the speakers Plumbers has
+> provided to BoF/Hack sessions that needed remote attendees.  There was
+> a pulseaudio issue a while ago that any Mic/Speaker combination that
+> exported HFP instead of HSP didn't work, but that's fixed upstream (but
+> you might need to upgrade your pulseaudio).
+
+I don't want to hijack this thread, but I tried now my two Jabra
+speakers (one is used and another is brand new which I got from IT)
+and both don't work on my FC40 laptop.
+
+Thanks
+
 > 
->  Documentation/netlink/specs/ethtool.yaml     | 2 +-
->  Documentation/networking/ethtool-netlink.rst | 1 +
->  net/ethtool/rss.c                            | 8 +++++++-
->  3 files changed, 9 insertions(+), 2 deletions(-)
-
-Thanks for fixing this.
-
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+> James
+> 
+> 
 
