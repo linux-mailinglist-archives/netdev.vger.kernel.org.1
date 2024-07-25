@@ -1,143 +1,100 @@
-Return-Path: <netdev+bounces-113079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59F6193C984
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:27:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEBA793C995
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:35:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 864DBB210DB
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:27:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08A941C21C90
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CA781732;
-	Thu, 25 Jul 2024 20:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01ADD7172F;
+	Thu, 25 Jul 2024 20:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ae+9tJiR"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="YTYFMZ3c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446043CF5E;
-	Thu, 25 Jul 2024 20:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4F02B9C9
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 20:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721939243; cv=none; b=c9A8oG4oeeCkjGz695QF569/q8SZ7zru61b/msaMw1HWNKI6dT9Nvf+R75OLsACnLMckIa2UcNKr6gN0LdsmlbaBCbcD4ZcG7gqDRTHh9iqgqOXxMtTAccpsN51LzSk+6QG1qNRv0cscXz9bG86jCWbyQI1YL9e63juudFX2ft0=
+	t=1721939705; cv=none; b=LnKMAdacbl4wh8M2tfsEDPyVy0T430VL+mwHypp8qpNfVG2nau2QGoMNbY8+kLaTYT4wEPSxoI1PcuRMUXoBLhMP7zSeUbpMOXj5u/FHPNP4xwzSu81EFd+AzlYr7z0Yhu7NUQ+3mlzi1jvsiyrbBM5a+ZLyIr76JlylZHydcMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721939243; c=relaxed/simple;
-	bh=rIhpQcHLexoU70NqZ5sOXp9YztY0XGAmkJr7EX7Zec0=;
+	s=arc-20240116; t=1721939705; c=relaxed/simple;
+	bh=+hcuACSrDnXuyK+3nXy13Q6NsIAr/YWO+OR5khRNjm8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rdL7B6v9711rQBIxi5IbFO8G6gkY+EFdt046T05MOxKEy3WxX1iuanxbEavHLg5q/lfzwYWWOhAVw3Ju5XKWg2sRKPk7rXO7/zX5135K/kfX3YtPVYu+wS9xnzJlcerTDhUSzYmQeBogogcxbgLeNX1M1ZWC03jJfo09nX+z7D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ae+9tJiR; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5a3458bf7cfso1749735a12.0;
-        Thu, 25 Jul 2024 13:27:22 -0700 (PDT)
+	 To:Cc:Content-Type; b=WSXVNGS64oAq4gEVBkeHp0j0ykOUIS8mD8ZuoKJJ3NWG13uFqJP5aVk4DAmR4874Q4kaugRXBdFtTPmSauuaqEE+psh1RPsv5N43ePtBR1/1s1VD4E3hwz2JXIOZ6OYRKmprlzsAk4MacI/hc2sbwRmdTp0+z5hxBby5pM+jM1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=YTYFMZ3c; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52efd530a4eso862230e87.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 13:35:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721939241; x=1722544041; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rb8R8eLBfLQ4PUNDUO5vUKAo7AQFDp2s++IGNkKCcOU=;
-        b=ae+9tJiRkkj62a7svvO+rXa5DaDX/1KEbj6sgYv4YviET/tw1nAf706w+eGRZxCrhX
-         tuRZgI9P4E8KgtDmPdp7Mgr1IOEJWHSQknR9PLdsAXBWiaQWJtEC638UU2sC1A0koRVS
-         nTgyQd4kzA1DtMbC7VsRaT1wibxS4jbi8tuET+UYvjGONjMocR+sLE2qaKQVljNrDlEk
-         FjvKcBijJmVnH+8oQYxOEBTiRjGALVp3sd0P7eveuNLLEYhrY+zT5rKIdzbYHs7ft+Wn
-         15ErJMo4N2Wv2jYVAi1Eo7q4Ge44rAU9Eh/jY+2/et5uGgaiAMQ6rw/njJLbFVeIdZEe
-         1MWw==
+        d=linux-foundation.org; s=google; t=1721939702; x=1722544502; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTSgE8O7VMPCTD7fk8+6qaxrJiw/VS+rTSm4VMUyc2M=;
+        b=YTYFMZ3c3gf56lfxm869KK+1IESMInS+OqGssJpHdDdLTeQ8xqPHG9J+zmu/GhYT0g
+         Fv8vQesdQHkSO7b2ndGAvltDJyZMi05WiVWZ+fnSmEDnRUs8Rd6ah353W77R1IHf6Xg0
+         dwvDCZc04nfEQkHHYbpe0QtbknW8nSKIx/A/A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721939241; x=1722544041;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rb8R8eLBfLQ4PUNDUO5vUKAo7AQFDp2s++IGNkKCcOU=;
-        b=fx/wanWJ/KXEfyQDCj7pemQ96itlS6rWpm6RfsHomApNEN+44RX0Y0r20BpTtwgSO5
-         t0IaKfnJJAmwABEWDFCjGXbv0bYt3ep7/16oM4HdSukjfIQBFf5oQ3K9RNcvI8AobpU/
-         ZCK1jGG2UWEmyQCsJiQc+jkO2/kW2TeWqKuy29uVH4z6kDvvq+sAoh/rzcpSVMsNZaU0
-         H20UgONAkOXGPf3wwIe89PqMANEIiLzYkLOBZ0BcNgSzJWywQ0EoFpcA6b0Iz9EMSG2/
-         mChW9h2a27imloBXPwU/69ux1OgB8glXSQGY6edvS0HOfniXXmKcIzvdD6n9PH86YXxd
-         tRCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYa7SZQ/PRMHi2sDE/FZqRTgvj3kmVCZG2qX6xZ442NIoys3cPZnG5MFlH7zUxcuiPUOo7BFRqShbPtf2jmqU8NgxU5x+NSQ5ishzzMIgyR+uFcQONWY5VZ1B5Hk6X4Fi7OV3Q+Rn5
-X-Gm-Message-State: AOJu0YzXAGktiObayagt2ywNFliecEbe76TX+C0JwmwOY2AZulPCB8Mh
-	PJCbx2PaM+I7uFKPNFzj8Nzkmc2IiWj4fUVIF/6HiAxRDaShDz2vkF222gSHeeUzNZkpbnb3P9X
-	moa61pcbP6D/RYb0j+Vhekxng++8=
-X-Google-Smtp-Source: AGHT+IHy0L9fRJnYe/XWQ2G3znrbvTEGOOqdD/yftu7hGD3FQIOewEjpOrlI1k//aSVXc/6tZg4DbEx80E2UNXjLfxo=
-X-Received: by 2002:a17:907:a46:b0:a77:b054:ba7d with SMTP id
- a640c23a62f3a-a7acb92ebe2mr168245066b.46.1721939240288; Thu, 25 Jul 2024
- 13:27:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721939702; x=1722544502;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZTSgE8O7VMPCTD7fk8+6qaxrJiw/VS+rTSm4VMUyc2M=;
+        b=sV9lvE1YoSSMOjOLAT7h4NXdFFDjnbGiMd/OjhHpa9Myl1uGJUY/sYnrMNqlHOp8Ap
+         qyW/17JTpvI7hKZD6SGa9otH8H8UJTWE3Afd//uPjYvRQ6//6f2Cry/Bjg4vBf7lIgKy
+         vgA6u4QvTQq3s+c36wqkXqEZOK5Wpa8vmZyTLLuq07IFaStVI/CnvXGzpWDK/O80OsZA
+         UZ6zyYQvxoM8jXmatGQ1g2H/y0H3GvzSkBFO1hrzq3+9QCg6AemAL1t4ilQtbQToyObj
+         VFwooJQKEUZLwhTkNehxVWMirQ7PVY7TxSLUrYDZdwidDhphx93Ui/DWVdhcyiuvNSx2
+         /7vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkyz0r83yAE+Q68Pxt2q/xAsVD6ydDkA9FOV3Mg9yy7K3skA/CB6v8wF5vKeznnLOp5IFFREvqg102d3xYtV4mATLe5C3H
+X-Gm-Message-State: AOJu0YxzSFE/1Bjtqce4vIjE8f9OPTW5g60bkhNlxwG8ebd/oSa966g+
+	De/Qm5SeF7CuLWkC3oLtYJw2nRU5j3aF/KEFWD/AoAv27qWaUd5Yhn1L8J5xVMa4ZfRNwqt+A6g
+	56SE=
+X-Google-Smtp-Source: AGHT+IHv7HqCRzb/boLkpwRCP6+DZTbnVYZXuT0zW1BEkQtxahS8kqOAuDSejRyW9niX/rsaoTlYNw==
+X-Received: by 2002:a05:6512:304b:b0:52e:767a:ada3 with SMTP id 2adb3069b0e04-52fd60f4f14mr1930448e87.47.1721939702178;
+        Thu, 25 Jul 2024 13:35:02 -0700 (PDT)
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com. [209.85.208.180])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52fd5bc3f1bsm311790e87.1.2024.07.25.13.35.01
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jul 2024 13:35:01 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ef27bfd15bso7015381fa.2
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 13:35:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVREu5HDNHPugkCzBuaX4/Jom5OfNxX6i8LM/oeeS/Pj8Hyriw5H8oxZDHbigXprIcg4I3gPQph7Q7kV6UkAGsZSTzyUwgC
+X-Received: by 2002:a2e:91c9:0:b0:2ef:2c20:e061 with SMTP id
+ 38308e7fff4ca-2f03db8e45amr23043301fa.22.1721939700903; Thu, 25 Jul 2024
+ 13:35:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1721903630.git.tony.ambardar@gmail.com> <847a5b798f24e81b9dec4e8d9eb3eb1e602a909e.1721903630.git.tony.ambardar@gmail.com>
-In-Reply-To: <847a5b798f24e81b9dec4e8d9eb3eb1e602a909e.1721903630.git.tony.ambardar@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Thu, 25 Jul 2024 13:27:03 -0700
-Message-ID: <CAEf4BzauQQgWfc8eKsWF+Fr-j--oY6tJAM2+ZfAPHP7JJqZ6Zg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v1 7/8] selftests/bpf: Fix using stdout, stderr
- as struct field names
-To: Tony Ambardar <tony.ambardar@gmail.com>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Yan Zhai <yan@cloudflare.com>
+References: <20240725153035.808889-1-kuba@kernel.org>
+In-Reply-To: <20240725153035.808889-1-kuba@kernel.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 25 Jul 2024 13:34:44 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjeA5O8i629FHxHmrk=5WtD41cA67paUNBxMH1ooFBgFA@mail.gmail.com>
+Message-ID: <CAHk-=wjeA5O8i629FHxHmrk=5WtD41cA67paUNBxMH1ooFBgFA@mail.gmail.com>
+Subject: Re: [GIT PULL] Networking for v6.11-rc1
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	pabeni@redhat.com, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 25, 2024 at 3:39=E2=80=AFAM Tony Ambardar <tony.ambardar@gmail.=
-com> wrote:
+On Thu, 25 Jul 2024 at 08:30, Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> From: Tony Ambardar <tony.ambardar@gmail.com>
->
-> Typically stdin, stdout, stderr are treated as reserved identifiers under
-> ISO/ANSI C, and a libc implementation is free to define these as macros.
+> A lot of networking people were at a conference last week, busy
+> catching COVID, so relatively short PR.
 
-Ok, wow that. Do you have a pointer to where in the standard it is
-said that stdin/stdout/stderr is some sort of reserved identifier that
-can't be used as a field name?
+.. and here I was blaming people being on vacation. How very insensitive of me,
 
-
-I really don't like these underscored field names. If we have to
-rename, I'd prefer something like env.saved_stdout instead of
-env._stdout. But I'd prefer even more if musl wasn't doing this macro
-definition, of course...
-
-> This is the case in musl libc and results in compile errors when these
-> names are reused as struct fields, as with 'struct test_env' and related
-> usage in test_progs.[ch] and reg_bounds.c.
->
-> Rename the fields to _stdout and _stderr to avoid many errors seen buildi=
-ng
-> against musl, e.g.:
->
->   In file included from test_progs.h:6,
->                    from test_progs.c:5:
->   test_progs.c: In function 'print_test_result':
->   test_progs.c:237:21: error: expected identifier before '(' token
->     237 |         fprintf(env.stdout, "#%-*d %s:", TEST_NUM_WIDTH, test->=
-test_num, test->test_name);
->         |                     ^~~~~~
->   test_progs.c:237:9: error: too few arguments to function 'fprintf'
->     237 |         fprintf(env.stdout, "#%-*d %s:", TEST_NUM_WIDTH, test->=
-test_num, test->test_name);
->         |         ^~~~~~~
->
-> Signed-off-by: Tony Ambardar <tony.ambardar@gmail.com>
-> ---
->  .../selftests/bpf/prog_tests/reg_bounds.c     |  2 +-
->  tools/testing/selftests/bpf/test_progs.c      | 66 +++++++++----------
->  tools/testing/selftests/bpf/test_progs.h      |  8 +--
->  3 files changed, 38 insertions(+), 38 deletions(-)
->
-
-[...]
+              Linus
 
