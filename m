@@ -1,137 +1,139 @@
-Return-Path: <netdev+bounces-112896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 590DB93BAC6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 04:30:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE89C93BAEC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 04:44:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8A25B21F02
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 02:30:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F8A82844C0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 02:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D147101F2;
-	Thu, 25 Jul 2024 02:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA6410A2A;
+	Thu, 25 Jul 2024 02:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRXS/RET"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0DD63D0;
-	Thu, 25 Jul 2024 02:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A30101F2;
+	Thu, 25 Jul 2024 02:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721874609; cv=none; b=APGfn1LouXWiFepe0RpBoRJQr3SvDCJnprCbppHsMgvKLDJk11ESlROXR8cbBBRVPNttOZJEWcD75asnDIpukDKhHWLBFg5lels+7Gb/AiCew1qdWWTwql/x/H8hjL6B/roNigp59o0xVQquyCVRF7jwnY1RxZ5rslm1j1qkSc8=
+	t=1721875435; cv=none; b=Y67WjWShKQLwowRwpnuZSHpGFPMZIHSI98rI2+7roP963ZaKS8ddsYOxPxu4Cb7DbOC/y9BWaHYc5fqhbQG6lsRq974+fXwu+4rYnLlmVrZ8Q+NgCtxvCIrHYHt/42X7CmQBnhEjPlvZL6nyTL5rCfub2Co+fFe3Rm740/iqiqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721874609; c=relaxed/simple;
-	bh=UflBeGAI8Ewd2P0gL0BG4VcOuURnvNeNQ1BGv2VbtmI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NxX2wm9ar8h1OGXVtr3pwU+oCcJT5jvTEN7giyTwYsViiJTBaZ2zYgzTsrB+VDvysCd0EMj0jMdmzuj/FltNmilphrv4wAjEcZJh5d9jUP8D816U8EsLp8tReGfb3KGDK0YGhYNDtWezL26TU2EJrX0NUHl6HGv+JluOSWRPhvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-05 (Coremail) with SMTP id zQCowACnEUGXuKFm2O7cAA--.57002S2;
-	Thu, 25 Jul 2024 10:29:50 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	make24@iscas.ac.cn,
-	liujunliang_ljl@163.com,
-	syoshida@redhat.com,
-	andrew@lunn.ch,
-	horms@kernel.org
-Cc: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v4] net: usb: sr9700: fix uninitialized variable use in sr_mdio_read
-Date: Thu, 25 Jul 2024 10:29:42 +0800
-Message-Id: <20240725022942.1720199-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1721875435; c=relaxed/simple;
+	bh=XmyQ8tULN1U4pgeEwCQuqyP7UJ3aAgGZyKsO4dCLxDY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=r9JKBUajhSxEHp1RInk7VFtv1Ti2wA4qT0T+bGhw0Jib4UVV9hHXnTN2V65wKbGl8myhzWMrmuUBWQMaJYdfJQ7yQ5DRiGMZu9cTzketc+u4bW3WdrME5hLppHQk/zJSgjjUcuRObkkhte8OMl0rPiMXRr6b/FfQAHqgzFUXLVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRXS/RET; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6b7a4668f1fso3095886d6.3;
+        Wed, 24 Jul 2024 19:43:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721875433; x=1722480233; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JjfGIZAA4gtP60LkJTDv3AEUoTM8F0CLiYubK11ZcS8=;
+        b=LRXS/RETb/gvG5QfnBXmxt08Rim/QY2jyS3EMyNnmIcMamV46c0YtyKLgsZbUqyTS1
+         r3IAVFVGmXsPozt9DXU108UsbwABG3x7Y327xKqJTe3BIQRj/U7t9NJE1lLDY8cVEmIW
+         JYhl0I91ifQteWRj3Q9QF0zcF4Fke/HHEXZPIRMfqe4cA82yUuum6aecF/Vc91BUSz3o
+         FwY75TrxeZGUV9HCLDZaf6VCCuhS6SWMLovtQ93bFiLvaI3pwq7twG7JiS1a4oPVdzz/
+         DOBAWJ8Ck70qrgX1xvXGOtDRq6WWNP/ON4rJXmFXOA58oUMQ9BAfAt+Bn4DGStIkegAY
+         +4QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721875433; x=1722480233;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JjfGIZAA4gtP60LkJTDv3AEUoTM8F0CLiYubK11ZcS8=;
+        b=ES2JkcmCsNCynU1AOne2xhXzlplHWb8LIwczmmCOdw3mdp7yH7n/lOC4a5IOlKKH/u
+         Ajvh/LqAK5Y6d0bEs8csMKgfzu3q+eA4QlRehlNwckrSHc+NF30ySaOOKvRKC/Q74yTo
+         WNJmbbRLMPS/qCCHvNV6Atsd/+wIfRtaQvmy1cxT6Tk0INZZqO+kn3DzdTIhIP7T/QLp
+         LLTf4cGwJwXVd69cGFaG4uV2PGpFbLgqQGaVigfrJt8uEoYGsGtXQXM50qTjNdoBu6J6
+         wD1Gfs9qR/GFtQ1NIwLn2TjQYFwOW4ezj6/KdzDuomhqkpwITrSR4SJp+GWcb0/IebBc
+         b4rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUaMVNcFdl2ML5PHEq/WPjxx9tu3x1LZwoA83Q6mqbMoOk5J73SpY/teLmcGAptXP7ItUO25PUSOrNKH9npD8hZkt0Hk7XqSQva5EQTaQKBRX4VhDBuMt9XVKquz35D6uZ7LwuwYDlp8iXQWGobOMKo5s58K6dG6AQp
+X-Gm-Message-State: AOJu0YwhRrhqQHHSKRU6D+0bj+ujtz2nOhCgnhdpOM+7Oge69idye/mG
+	AvtbOAoPUo1lhRhJgBWVk34g5QF7f0JhhTBolnWrkp3C83uhzPkf
+X-Google-Smtp-Source: AGHT+IFWn8bOgktR9bLOhEby3hxW2Zh3fFKXImjybv/vhdVQtoxpZq10MeHIyuaN8FJoQZIXsKaf1A==
+X-Received: by 2002:a05:6214:dae:b0:6b7:affa:6f2d with SMTP id 6a1803df08f44-6bb4071e78amr4680866d6.29.1721875432788;
+        Wed, 24 Jul 2024 19:43:52 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3fa9b045sm2254386d6.97.2024.07.24.19.43.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 19:43:52 -0700 (PDT)
+Date: Wed, 24 Jul 2024 22:43:51 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jeongjun Park <aha310510@gmail.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com
+Cc: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ kuba@kernel.org, 
+ jiri@resnulli.us, 
+ bigeasy@linutronix.de, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ syzkaller-bugs@googlegroups.com, 
+ Jeongjun Park <aha310510@gmail.com>
+Message-ID: <66a1bbe7f05a0_85410294c6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240724152149.11003-1-aha310510@gmail.com>
+References: <000000000000949a14061dcd3b05@google.com>
+ <20240724152149.11003-1-aha310510@gmail.com>
+Subject: Re: [PATCH net] tun: Remove nested call to bpf_net_ctx_set() in
+ do_xdp_generic()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowACnEUGXuKFm2O7cAA--.57002S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF15XFyrCr4kuryfCF1kAFb_yoW8AF1fpr
-	47Ga90yrWUJ347Z3ykXw1vg3WFkw4kKay3W348Gw1fZ395Arn5C34FgFyYgw1UGrW5Aa12
-	qF4qvFWxua10vaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBa14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-	FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-	0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8v
-	x2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20x
-	vY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I
-	3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIx
-	AIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAI
-	cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2js
-	IEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQvtAUUUUU=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-It could lead to error happen because the variable res is not updated if
-the call to sr_share_read_word returns an error. In this particular case
-error code was returned and res stayed uninitialized. Same issue also
-applies to sr_read_reg.
+Jeongjun Park wrote:
+> In the previous commit, bpf_net_context handling was added to 
+> tun_sendmsg() and do_xdp_generic(), but if you write code like this,
+> bpf_net_context overlaps in the call trace below, causing various
+> memory corruptions.
 
-This can be avoided by checking the return value of sr_share_read_word
-and sr_read_reg, and propagating the error if the read operation failed.
+I'm no expert on this code, but commit 401cb7dae813 that introduced
+bpf_net_ctx_set explicitly states that nested calls are allowed.
 
-Found by code review.
+And the function does imply that:
 
-Cc: stable@vger.kernel.org
-Fixes: c9b37458e956 ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
-Changes in v4:
-- added a check for sr_read_reg() as suggestions.
-Changes in v3:
-- added Cc stable line as suggestions.
-Changes in v2:
-- modified the subject as suggestions.
----
- drivers/net/usb/sr9700.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+static inline struct bpf_net_context *bpf_net_ctx_set(struct bpf_net_context *bpf_net_ctx)
+{
+        struct task_struct *tsk = current;
 
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 0a662e42ed96..cb7d2f798fb4 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -179,6 +179,7 @@ static int sr_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 	struct usbnet *dev = netdev_priv(netdev);
- 	__le16 res;
- 	int rc = 0;
-+	int err;
+        if (tsk->bpf_net_context != NULL)
+                return NULL;
+        bpf_net_ctx->ri.kern_flags = 0;
+
+        tsk->bpf_net_context = bpf_net_ctx;
+        return bpf_net_ctx;
+}
+
+
  
- 	if (phy_id) {
- 		netdev_dbg(netdev, "Only internal phy supported\n");
-@@ -189,11 +190,17 @@ static int sr_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 	if (loc == MII_BMSR) {
- 		u8 value;
- 
--		sr_read_reg(dev, SR_NSR, &value);
-+		err = sr_read_reg(dev, SR_NSR, &value);
-+		if (err < 0)
-+			return err;
-+
- 		if (value & NSR_LINKST)
- 			rc = 1;
- 	}
--	sr_share_read_word(dev, 1, loc, &res);
-+	err = sr_share_read_word(dev, 1, loc, &res);
-+	if (err < 0)
-+		return err;
-+
- 	if (rc == 1)
- 		res = le16_to_cpu(res) | BMSR_LSTATUS;
- 	else
--- 
-2.25.1
+> <Call trace>
+> ...
+> tun_sendmsg() // bpf_net_ctx_set()
+>   tun_xdp_one()
+>     do_xdp_generic() // bpf_net_ctx_set() <-- nested
+> ...
+> 
+> This patch removes the bpf_net_context handling that exists in 
+> do_xdp_generic() and modifies it to handle it in the parent function.
 
+Is tun_xdp_one missing? That also calls do_xdp_generic.
 
