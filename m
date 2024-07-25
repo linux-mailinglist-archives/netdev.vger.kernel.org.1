@@ -1,98 +1,107 @@
-Return-Path: <netdev+bounces-113050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7028593C7BD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:40:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C673C93C7ED
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DE7B1F2279E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:40:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40C17B21C3F
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 18:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E810619DF65;
-	Thu, 25 Jul 2024 17:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjrS+pm6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FB5198A2C;
+	Thu, 25 Jul 2024 18:01:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C326B54759
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 17:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3736B23D0;
+	Thu, 25 Jul 2024 18:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721929231; cv=none; b=d6CW23cHMzaReLyj52o++a6V5ZCN/xyIMvaSyucJAQl6AXzSvnySfJmt443F3GJxgitCHV7jTJztSMsPCNkWuzY9dla5uxB6fz9QoOkd4ARVATOpvfV/y4EjvPOLSAye/a+28Sp8mkpHZMbfvGOUHCZKvx6jUDk24dW9A/e5Low=
+	t=1721930482; cv=none; b=q8Ce0LUNyjw7Y8HbMrjemUughn2LW3AF/jJqOLUY4xALBhXXSvH/1NteDyI/1ZP0QUuxYAPtCCTnqJgGB0mRfDtafva+ngwUS2BSYPBmT4rH7jgQbIs9vlg+oJXFJLyF4uGoPxZc6skVodI96aKsPFHCxqkbEh+f78B4PRpwGm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721929231; c=relaxed/simple;
-	bh=Pb5MKhX3kZJQWo38/7qMsElvnHVoruAsDlbCbIk4cxs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AGD6EDYVQxSMjjY1vrfykT2gDmPX3/R2jgOZ8GaRyrpXm8QRQb9vp1kpKla0khFcTYcKr3C6NbY1cVxUwKO7iQOkgXVwtHSEJ2lGdzDuucya4zMa27ymfPqokBa4dgk8CzsKkFq3yyFcJEEyuZQ3204zGD25QbbqES29uTNml68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjrS+pm6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 731F1C32782;
-	Thu, 25 Jul 2024 17:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721929231;
-	bh=Pb5MKhX3kZJQWo38/7qMsElvnHVoruAsDlbCbIk4cxs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LjrS+pm6nrCinPOQRDN2dJKRNEcurTuyyWG3PhctztNTm5uTyu+X7RnUdlBIlPVfU
-	 4dDRvojpQ18B258HPF54HUga74KBygcSyOXoesG/NX/ck38CSrOuLdep/mewDe85YE
-	 vZUa/eQfMFvmigzwR4o92Lb582bPkMhGcpRc0ORtKv1UpjGeuQgWE7MVW4mK+sjMGq
-	 51dsN5O96mA9y/hqX4GQ3knTKpTWVNz/QHrD1Fg1caYBxykD+M3K/OFN5LUO35DUU5
-	 /vYORTB2iX7pGWBTgkyFMeq5IsM9bD6JBHB8nFFRpXptYWO1Mu+EaMvUfFDSRvCRVU
-	 nQeaqtr6WfoNQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61A6FC4332D;
-	Thu, 25 Jul 2024 17:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1721930482; c=relaxed/simple;
+	bh=iH9vl7q5kH55HILOIVDAxx38kfcD1ii9MGjPYepeAl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OwLLY5O8fvCHg/dkeVujQtrHMlrH2wDGen+IZMn6tRBFRNUgqBv+IexwkVNB2HhuevjmHXYCcruu11h20nNFz1/nKJT4+zevqzmuiOFCL/Wz2ow5mneoO6JETv2Qw07A+6xNEXjE9cmR+spiUxTBRF01K5ZODD4drvDmaDN6mxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1fc49c0aaffso10093295ad.3;
+        Thu, 25 Jul 2024 11:01:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721930479; x=1722535279;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L/OZaqwa9tDtUWYU0+YlFrjs0e/nmxV4DhH2nuXeMEs=;
+        b=iJ8UYYsfDaFPgrBaUwqvE9f47f0AYLzKmWyDxbgWYTtQtMvDC8P/Yu9HzsgnxD5ltc
+         V3BRabAqO5dU7Jrp4W9g/exXMJ2ROgw8k63NY8zgiqauhyi4+K37E5PQlva07Irb+NOj
+         qF9mCBST4hzvRSyk3Yzkaemdnz52M3V4LI7VbrCRIoqedP7ENz4wI+FMz7mY5EUTMlIA
+         /mTqMGO9CtIOn4jHByogQwKD7HntN35+G9VcuwZC+5ARYHg9eMoZ/dlpfE40lbE1VH0k
+         BIW9g+Q7gqJSqI9h8A6CezpWL+gAfGoZbyl5da6IadChHIt2wegTdtXv6mGZiZu40cff
+         CwEA==
+X-Forwarded-Encrypted: i=1; AJvYcCU+sZBN3DxGaY1CGwWfEChjgrBuKdnJwOUer9uIMaTt0pZjq1NRVcKvvBiT7SsC56bVv18Q3OTElSEzTxu0Ya+1U7wt0zwe
+X-Gm-Message-State: AOJu0YxflgaEckRPrKW+x3rrJRQ39z+AAvNcn4ucidjDEP21Wpf9v4Pi
+	c3qyrEKfhV4FDt1/9yessXwoOxfpuLmWD4jg2acKZ6IZOKOYqBI=
+X-Google-Smtp-Source: AGHT+IGRk9TMa8fDUbWNAAWfK9ELCceNe8aMmMY5DQo9zgwtIjgKeNRKjeny+sry1eRSIDStSbcD5A==
+X-Received: by 2002:a17:902:f54f:b0:1fc:287f:638 with SMTP id d9443c01a7336-1fed920a7b5mr24667845ad.13.1721930478735;
+        Thu, 25 Jul 2024 11:01:18 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7f2b80bsm17042615ad.205.2024.07.25.11.01.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 11:01:18 -0700 (PDT)
+Date: Thu, 25 Jul 2024 11:01:17 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
+	jolsa@kernel.org, Julian Schindel <mail@arctic-alpaca.de>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>
+Subject: Re: [PATCH bpf 3/3] xsk: Try to make xdp_umem_reg extension a bit
+ more future-proof
+Message-ID: <ZqKS7QAH54vTnJ2z@mini-arch>
+References: <20240713015253.121248-1-sdf@fomichev.me>
+ <20240713015253.121248-4-sdf@fomichev.me>
+ <ZqEcAKWCDp6lyaC9@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute] ss: fix expired time format of timer
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172192923139.10017.10817656814151362713.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Jul 2024 17:40:31 +0000
-References: <tencent_EFD6593E69AD867624E4518D515816F58505@qq.com>
-In-Reply-To: <tencent_EFD6593E69AD867624E4518D515816F58505@qq.com>
-To: xixiliguo <xixiliguo@foxmail.com>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZqEcAKWCDp6lyaC9@boxer>
 
-Hello:
-
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Sat, 20 Jul 2024 23:23:27 +0800 you wrote:
-> When expired time of time-wait timer is less than or equal to 9 seconds,
-> as shown below, result that below 1 sec is incorrect.
-> Expect output should be show 9 seconds and 373 millisecond, but 9.373ms
-> mean only 9 millisecond and 373 microseconds
+On 07/24, Maciej Fijalkowski wrote:
+> On Fri, Jul 12, 2024 at 06:52:53PM -0700, Stanislav Fomichev wrote:
+> > Add a couple of things:
+> > 1. Remove xdp_umem_reg_v2 since its sizeof is the same as xdp_umem_reg
 > 
-> Before:
-> TIME-WAIT 0      0     ...    timer:(timewait,12sec,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,11sec,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,10sec,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,9.373ms,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,8.679ms,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,1.574ms,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,954ms,0)
-> TIME-WAIT 0      0     ...    timer:(timewait,303ms,0)
+> So thing here is that adding __attribute__((packed)) on kernel side
+> wouldn't help because we wouldn't fix old uapi with this, correct? old
+> uapi would still yield 32 bytes for xdp_umem_reg without tx_metadata_len.
 > 
-> [...]
+> Just explaining here to myself.
 
-Here is the summary with links:
-  - [iproute] ss: fix expired time format of timer
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=3e807112fdf3
+Yea :-(
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> > 2. Add BUILD_BUG_ON that checks that the size of xdp_umem_reg_v1 is less
+> >    than xdp_umem_reg; presumably, when we get to v2, there is gonna
+> >    be a similar line to enforce that sizeof(v2) > sizeof(v1)
+> > 3. Add BUILD_BUG_ON to make sure the last field plus its size matches
+> >    the overall struct size. The intent is to demonstrate that we don't
+> >    have any lingering padding.
+> 
+> This is good stuff but I wonder wouldn't it be more feasible to squash
+> this with 1/3 ? And have it backported. Regarding the patch logistics, you
+> did not provide fixes tag here for some reason, but still include the
+> patch routed via bpf tree.
 
-
+SG, will resend this against bpf-next.
 
