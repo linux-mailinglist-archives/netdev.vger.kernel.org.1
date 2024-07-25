@@ -1,109 +1,148 @@
-Return-Path: <netdev+bounces-112970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5F793C0D7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:30:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE7093C0DA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 255781C20F04
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:30:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11E451C211EE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6E31974F4;
-	Thu, 25 Jul 2024 11:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD61199221;
+	Thu, 25 Jul 2024 11:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8383JDg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KPvKSvbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A40416F84F
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 11:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970C9198E7E
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 11:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721907049; cv=none; b=tHvZAXKvGzTx/gBfzIbZefwr47kl5ffUiRBBLGn/rg0CqDWVf4xExTz+SQWdoksS4+zbIDveds0u08KNnI81041xOa+R2cNeEgrQrCq8XzfGTXWPkeFzuwl0sixoRHvRKRZFBZyq/HfmsS1XbJOKt171+1qAT+0D/+yNKfpmb/8=
+	t=1721907124; cv=none; b=IQRHV2uks/gEdvc2GAztfZEar9ss4yTW0i3SG4q2PpadxsrNbvu5H6klSq4Pq5BoYSlmAAtNKHbBZSrnxQYTz/95srEuULmpcTk/sim/Bt1/Y9FHUByXaCnInkZ0QAuxmjSZ3b2EBY9dkFgro8+L7iJKGcXj5M+sV6N7Ta9AE+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721907049; c=relaxed/simple;
-	bh=mR8vNdleb+LIR+96e34GVS7txk+ZqSRloiT1WSuirHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XIW9PvdhQkBApIOVq4dy0V9rrtnwZJl2ENMlp2SgmShhSMNmiSBJtL6RAm8zbTcHR8x29rf+0FJFoJbilBGAzplo3sFADspbNW+2GbthHr8zQe+6eswXOwVxZHW9XSxENC2QKfIe11KyvW6ADoaMMdchaDEWBYPqgorMG+xT4HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S8383JDg; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1721907124; c=relaxed/simple;
+	bh=2PFaAKT/qKzvR5HmQHNT0YtE+EnpJ+3U4z/gAUFLbho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CDcbRASZG9olNde9Nc8Y/1qis349wpGvdQOrAFzYdreJDVWHkQhxU9W1p6edGPPBjepk24GZoFGsGt8kvyy5lO7jyFrKLJX0nejSuNQ5VeOHeeKY0uoDE4Tequ6TR86DCrqnITNMqbwqoe1Grb39mzIIn/M+SwQurFMT7KSE6VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KPvKSvbO; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721907046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+TCYiaLw1eFFyX7ygdBtaBpbIQ73qHwI5agyqkVKBk8=;
-	b=S8383JDgQnpkUJg6TRHbu2dkrqA6lrM8Rm62xJQo1oa17sVoA2cEtg2vn6u4luOm2rzxG7
-	SV5D7E6nW8O8gG0sFjQZ6ham9+qKn9Cdn5PzEjntWgjVq7KKbXfR4jF5l4vR3cmLFLG+IB
-	NefI0gXJ6KczUKugiLQdB6raZM9EhiQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-527-xHUnqrhmOLe3MIEkFIWuqw-1; Thu, 25 Jul 2024 07:30:45 -0400
-X-MC-Unique: xHUnqrhmOLe3MIEkFIWuqw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-428087d1ddfso440555e9.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 04:30:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721907044; x=1722511844;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+TCYiaLw1eFFyX7ygdBtaBpbIQ73qHwI5agyqkVKBk8=;
-        b=J5AXLmfT76PrVJULrPagBGBf/KY64SuNzpbMFiRnfTzZORql0OdZIznLuUkmECS+4p
-         TvgTUaY5iHnp4YX+MeiS+M7GSdIbovxIUds8oi/6JOBLEP5eN4PCCpgVpQhPtJDPQ8r2
-         VUzZmr/fOBKCrjYAhik+KUyDwfbGGvqCmxtT++Ldv5C1JFJA6kscLSdtKpVhujc1GYxj
-         Fi7H9H0DNU893Oi/heYH0xswGhm0F1q8ChxB6SBw7RgIMNq39AIAVjMF1Qy8SC7Y8rIa
-         aHgvhWvMNrVajZ8QlG8dCYgh81WewfRnzwp8tRndJ5du7Eb4XJHWpf8HK7j8EG4uUnTL
-         PYcg==
-X-Gm-Message-State: AOJu0YwhMOkdxS/mijI9fvQZLFByb4a5NE2f+ES5/tVFHooNKeJqatMI
-	kd3IsYc32aeMKK0VLjGejS1GwpMNGf7Tb0Zx3MjaZxo71XflZIiNl3Ne/+PGYzRKHlPZTMPQn6n
-	4dOjUjb3rLaqpe5OiyEfzQVeG9aOt80GPQYECX7wA114cpnTRkNGFzA==
-X-Received: by 2002:a05:600c:3b21:b0:424:ac9f:5c61 with SMTP id 5b1f17b1804b1-428057706aemr8868765e9.3.1721907043965;
-        Thu, 25 Jul 2024 04:30:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6PofD2noFLqZYZq0rkL2/SPm5eXrfUGdYQwYz7YaFmV1r13660mbRRGEiRWbzSYigfJ0Ikg==
-X-Received: by 2002:a05:600c:3b21:b0:424:ac9f:5c61 with SMTP id 5b1f17b1804b1-428057706aemr8868695e9.3.1721907043567;
-        Thu, 25 Jul 2024 04:30:43 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367fc624sm1829687f8f.57.2024.07.25.04.30.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 04:30:43 -0700 (PDT)
-Message-ID: <8c823f84-73a3-4f36-b387-3576ca7123d3@redhat.com>
-Date: Thu, 25 Jul 2024 13:30:41 +0200
+	s=mimecast20190719; t=1721907121;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=vyKLgMRT6i9mXd45Il7wt/ZZwWvsdwnv5UBxyQ1yU1Y=;
+	b=KPvKSvbOgB8EiJTG6LNh3LEXBiz+GyngOcIiw66TCuvN4HTj+nrWaa88jRR7w0MCHAV8AP
+	YJINPh3RtIEWnSf3r/D+SfOg49qMh7ONa3F1EI+K4zeAGQmUal4ku1epFCFXXPcpQ4Sqvr
+	T7eaPSyj51Y1wvr1yLhAEM7mxrrLUak=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-Rp-aJfBJPT209rAmpqTPUg-1; Thu,
+ 25 Jul 2024 07:31:58 -0400
+X-MC-Unique: Rp-aJfBJPT209rAmpqTPUg-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B4C31955D50;
+	Thu, 25 Jul 2024 11:31:54 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.144])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C6C453000197;
+	Thu, 25 Jul 2024 11:31:45 +0000 (UTC)
+Date: Thu, 25 Jul 2024 12:31:42 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Peter Hilber <peter.hilber@opensynergy.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
+	"Luu, Ryan" <rluu@amazon.com>,
+	"Chashper, David" <chashper@amazon.com>,
+	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+	"Christopher S . Hall" <christopher.s.hall@intel.com>,
+	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
+Message-ID: <ZqI3ntUR6bfY1kxo@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <14d1626bc9ddae9d8ad19d3c508538d10f5a8e44.camel@infradead.org>
+ <20240725012730-mutt-send-email-mst@kernel.org>
+ <7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/2] ethtool: rss: small fixes to spec and GET
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com
-References: <20240724234249.2621109-1-kuba@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240724234249.2621109-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 7/25/24 01:42, Jakub Kicinski wrote:
-> Two small fixes to the ethtool RSS_GET over Netlink.
-> Spec is a bit inaccurate and responses miss an identifier.
+On Thu, Jul 25, 2024 at 10:56:05AM +0100, David Woodhouse wrote:
+> Hi Michael, thanks for the review!
 > 
-> Jakub Kicinski (2):
->    netlink: specs: correct the spec of ethtool
->    ethtool: rss: echo the context number back
+> On Thu, 2024-07-25 at 01:48 -0400, Michael S. Tsirkin wrote:
+> > On Wed, Jul 24, 2024 at 06:16:37PM +0100, David Woodhouse wrote:
+> > > From: David Woodhouse <dwmw@amazon.co.uk>
+> > > 
+> > > The vmclock "device" provides a shared memory region with precision clock
+> > > information. By using shared memory, it is safe across Live Migration.
+> > > 
+> > > Like the KVM PTP clock, this can convert TSC-based cross timestamps into
+> > > KVM clock values. Unlike the KVM PTP clock, it does so only when such is
+> > > actually helpful.
+> > > 
+> > > The memory region of the device is also exposed to userspace so it can be
+> > > read or memory mapped by application which need reliable notification of
+> > > clock disruptions.
+> > > 
+> > > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > > ---
+> > > QEMU implementation at
+> > > https://git.infradead.org/users/dwmw2/qemu.git/shortlog/refs/heads/vmclock
+> > > 
+> > > Although the ACPI device implemented in QEMU (and some other
+> > > hypervisor) stands alone, most of the fields and values herein are
+> > > aligned as much as possible with the nascent virtio-rtc specification,
+> > > with the intent that a version of the same structure can be
+> > > incorporated into that standard.
+> > 
+> > Do you want to just help complete virtio-rtc then? Would be easier than
+> > trying to keep two specs in sync.
 > 
->   Documentation/netlink/specs/ethtool.yaml     | 2 +-
->   Documentation/networking/ethtool-netlink.rst | 1 +
->   net/ethtool/rss.c                            | 8 +++++++-
->   3 files changed, 9 insertions(+), 2 deletions(-)
+> The ACPI version is much more lightweight and doesn't take up a
+> valuable PCI slot#. (I know, you can do virtio without PCI but that's
+> complex in other ways).
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+In general it shouldn't have to take up a PCI slot, that's just
+a common default policy. virtio-devices only need a dedicated
+slot if there's a need to do hotplug/unplug of them. There is a
+set of core devices for which hotplug doesn't make sense, which
+could all be put as functions in the same slot. ie virtio-rng,
+virtio-balloon and virtio-rtc, could all live in one slot.
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
