@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-113115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4D893CAD3
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 00:24:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53E5893CAD4
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 00:24:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36E911C21736
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CB621C21920
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A106613E8A5;
-	Thu, 25 Jul 2024 22:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BB51448EF;
+	Thu, 25 Jul 2024 22:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rS4lu/ir"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LnNlsDAH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC4317E9
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 22:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5C0143C4B
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 22:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721946244; cv=none; b=I83L5IyruilLmAekmhB2Tr+WuMfrBnsQD+JeAkp02soTpnbhd0iJw49ya2CzjsvNGrfPGjTB2tOf/c0zAaIVYvcTb2NCPJ8mOqMqzthB7Rd9H+VPTjF7PmwYQfMzTDtMVBeo3NZ7tq8nTy1l4gAvSMUKU47PG6j2yrmxOrzD2sQ=
+	t=1721946245; cv=none; b=FfESLVrTKuYAlv23gt+qzsppoglqGevyNW5exXjrHmVw7WzqQuPV2eyM/spgAbqMzdu7N+uwG/sZwe2iDNYL/C/fyTKmq5KpQ/icJiIRe/84RypPIAwgiD9LEfF8xcKbgJQiFWyeZl0OgiI5Sr1Ap4vsnZZWoUESwsilyJI0tj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721946244; c=relaxed/simple;
-	bh=0q7h+3whQUnZ0Q9YK/JGSjF/d8RNup3SVWwMtVpFyuM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KgemQyT5nuAVa799uCjDd3aEqlGPyPwJluwGkGtamVQ+tkyTfAUBrZjb4z3F0zU1ivoamYkrIY31Ziwsxa0lnKSMznYVAgEYcxfWl/JB8uNfzASeDNyv5hcYGYu+4HrbMZG/5RgYzjk5iGIDggsL4l3dI/zRIC7NJl1mnK6aJas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rS4lu/ir; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 272C6C116B1;
+	s=arc-20240116; t=1721946245; c=relaxed/simple;
+	bh=24rI0zBxjyY2Lqd98zxx0B/rISB/OYL2ybM6TpEh5xY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Fj46OyHPJRc3l4EdEm0Ys8eH3cBYEMNiEGrF8zy1IAN2W7dN4SMKjmKZIPhfXFDldRocdAKNuampq+pXmLBGrkTiJgWlPl5XAFbca6ATNNUXQpsSs8G6qNlq4sMo2Pix0Iuj8/XiFR2+DdPqjkdi4SgADKhmMgPnwkX73/RZNV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LnNlsDAH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02AFEC4AF07;
 	Thu, 25 Jul 2024 22:24:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721946243;
-	bh=0q7h+3whQUnZ0Q9YK/JGSjF/d8RNup3SVWwMtVpFyuM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rS4lu/ird1NmxmYiXh+utTY8ZRDJimZYgRRroPYzL4vG98Nbmn5R0uHZGm+f2DJcF
-	 RnHP9gNqUgb0qajY+zOkL52SypKM0kECEYjnYzsV0HYZfXrJkdFF8V0oZBz+iIOKeV
-	 eCnWq3rADtERAfc3X64KPqNk45Dv8SZ7TOJptp+2O/do2+Hdm+KtgZiOALY4B4b8xg
-	 n64ARTXY+ooPiBAwNQlWvz9Tiq421WDGzuVlenItlHUgLc6F/KK/KYMbpp7HrO/wic
-	 fPOXoVSToJU8S9ie6hxA2tLnpnM5sHtCVzrJ4yP7tIkci4Q2KVAp+IpKgnBhZ74XHp
-	 byFj8FVB9K8uQ==
+	s=k20201202; t=1721946244;
+	bh=24rI0zBxjyY2Lqd98zxx0B/rISB/OYL2ybM6TpEh5xY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LnNlsDAHbV1M2/V3mw0ZgiswVLQadeP6Bz9ZWoLAU6ICFv/469+rHBY7OeNrLgwoB
+	 EG2nMKCTHtS8nmTjvw6CXN16eXsHjsBGn4bhLAz7k1TnnKzwMIz5ZIQ/Sd6x4iAssT
+	 ea1pY3OuAGm2y41AUrWqmoCeGcd3acpf6H3dE7xwJJ1ani22soFpNbhFGMIxEXLiTC
+	 haW9UtRynSIOyyrbhN/hGKHLcOTdkwBJf18NG9kFkTvxqKrO/SA12tvEcsy0bAad8Y
+	 jn3NPt14e/v509TzKAiO7HB52q0A1XJwolnyZSot3Z2nuf2yMVNs9eowbyrQ1KPGkW
+	 AILRBD5UOLJAg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +56,12 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	petrm@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 0/5] ethtool: more RSS fixes
-Date: Thu, 25 Jul 2024 15:23:48 -0700
-Message-ID: <20240725222353.2993687-1-kuba@kernel.org>
+Subject: [PATCH net 1/5] eth: bnxt: reject unsupported hash functions
+Date: Thu, 25 Jul 2024 15:23:49 -0700
+Message-ID: <20240725222353.2993687-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240725222353.2993687-1-kuba@kernel.org>
+References: <20240725222353.2993687-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,24 +70,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-More fixes for RSS setting. First two patches fix my own bugs
-in bnxt conversion to the new API. The third patch fixes
-what seems to be a 10 year old issue (present since the Linux
-RSS API was created). Fourth patch fixes an issue with
-the XArray state being out of sync. And then a small test.
+In commit under Fixes I split the bnxt_set_rxfh_context() function,
+and attached the appropriate chunks to new ops. I missed that
+bnxt_set_rxfh_context() gets called after some initial checks
+in bnxt_set_rxfh(), namely that the hash function is Toeplitz.
 
-Jakub Kicinski (5):
-  eth: bnxt: reject unsupported hash functions
-  eth: bnxt: populate defaults in the RSS context struct
-  ethtool: fix setting key and resetting indir at once
-  ethtool: fix the state of additional contexts with old API
-  selftests: drv-net: rss_ctx: check for all-zero keys
+Fixes: 5c466b4d4e75 ("eth: bnxt: move from .set_rxfh to .create_rxfh_context and friends")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 14 +++++-
- net/ethtool/ioctl.c                           | 43 ++++++++++++++-----
- .../selftests/drivers/net/hw/rss_ctx.py       | 37 ++++++++++++++--
- 3 files changed, 79 insertions(+), 15 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index d00ef0063820..0425a54eca98 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -1863,8 +1863,14 @@ static void bnxt_modify_rss(struct bnxt *bp, struct ethtool_rxfh_context *ctx,
+ }
+ 
+ static int bnxt_rxfh_context_check(struct bnxt *bp,
++				   const struct ethtool_rxfh_param *rxfh,
+ 				   struct netlink_ext_ack *extack)
+ {
++	if (rxfh->hfunc && rxfh->hfunc != ETH_RSS_HASH_TOP) {
++		NL_SET_ERR_MSG_MOD(extack, "RSS hash function not supported");
++		return -EOPNOTSUPP;
++	}
++
+ 	if (!BNXT_SUPPORTS_MULTI_RSS_CTX(bp)) {
+ 		NL_SET_ERR_MSG_MOD(extack, "RSS contexts not supported");
+ 		return -EOPNOTSUPP;
+@@ -1888,7 +1894,7 @@ static int bnxt_create_rxfh_context(struct net_device *dev,
+ 	struct bnxt_vnic_info *vnic;
+ 	int rc;
+ 
+-	rc = bnxt_rxfh_context_check(bp, extack);
++	rc = bnxt_rxfh_context_check(bp, rxfh, extack);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -1953,7 +1959,7 @@ static int bnxt_modify_rxfh_context(struct net_device *dev,
+ 	struct bnxt_rss_ctx *rss_ctx;
+ 	int rc;
+ 
+-	rc = bnxt_rxfh_context_check(bp, extack);
++	rc = bnxt_rxfh_context_check(bp, rxfh, extack);
+ 	if (rc)
+ 		return rc;
+ 
 -- 
 2.45.2
 
