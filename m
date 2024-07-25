@@ -1,105 +1,106 @@
-Return-Path: <netdev+bounces-113058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C41BA93C861
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:33:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C21D693C874
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017DE1C2104A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 18:33:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A1B42831BD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 18:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E603BB32;
-	Thu, 25 Jul 2024 18:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB604206D;
+	Thu, 25 Jul 2024 18:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p6e8sGMu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6244639AD5
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 18:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A080039AD5;
+	Thu, 25 Jul 2024 18:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721932398; cv=none; b=LmwPfqMq9/6Yo3hdR/2eO+ADeYB4ChR9/SBEVzMTWZBi92y1Uo7JrD8us28Va2X0mp9S0UUBOfk9+te0CDhmpB4wh0C1RpfqD6YVDNpHjId9fHrQuZuHBmlxCbzZ6OIrOhW+p9jVvD1l2t6yvjUcZL59iqTJEE79+EkA3cckA3Y=
+	t=1721932842; cv=none; b=pF2WujRm2KFvXzZnMhrmwnMIiANYY7IFRifpwN39k3iqlJ22SSGPDOZQKtBbDt5uMyR4lgYu8h0KGNx5IiNy0GgvULc4acA7Dw0FPHMGODRWjjwQAYdo+LqJPf71+FcCvpcbt3iEaRHBuUsouuB5zqRsguX0C9Jd5cBx/l3sEwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721932398; c=relaxed/simple;
-	bh=x3Uplq3g9tRJ63VMtyTiFluF2YqaQGF7G74yVJkKC50=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=aYhTMHrT+tkMqcwcDm+dR5uGiq5DsDbFIuBvmetbtZEQzCMtVkGMk9KccC1ruvhxv1XPgrPcPlA+B6KldNLDKhBgaUruGHUNkPA9nEygvfth+ke9FBo3ze/jvvUWl9ZKLG3VEhWH+U/Hbq0Bq6kHFztzoaMbvsv115EOFmKxpMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-397052a7bcbso11265195ab.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 11:33:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721932396; x=1722537196;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x3Uplq3g9tRJ63VMtyTiFluF2YqaQGF7G74yVJkKC50=;
-        b=Yrbrm8hEzdSmMNHiQDh/iVZ8brxQJe30JWk+h1Bbc709Apy2NR0xR1k0JaKy5vBpl+
-         jz9lQz9gacPJNbA0IbCi4G2+vQ3KU7PdlkvwKGgsKCCsOgvXJSkRTmgG2nqZWS8P2Gxa
-         AyRF3SOGVV7FslDWMxzqPaEI+Hg57MsUvDYQA0gY8lpsknXPripDMWzAJd/EZbV8kXx7
-         mxsi28ZL6QvRG6FWrly8SUEXE4ak2qtYJTpMlK/6jAhkNUfhHkpeG9LUI1+t53fbjOBl
-         gi6w+eB+sETOc8a3Pb0kkszVOZ5py6esZIcYWRgyJZ6iFi1vHG5XOK04bRY1CfcBdUMZ
-         TBog==
-X-Forwarded-Encrypted: i=1; AJvYcCVtFlr/G2P2INfsDXvUSjkQFOgenj2+8Y57b4gHQ/gu+LehNyFNPUkljc4ZBnsornPVLwM8PlC0LQk6s6mr+Oz0bNt26aZQ
-X-Gm-Message-State: AOJu0YyGhrz+yTWuxAjWd9rUf+5h01xMuhLa3LOxDKk5Pj7bEJJsM7oO
-	e7evtsUgM8TMhdwZoBdt5cyaQTrDUuaVDqjyTKxTCIMjgr5qhjj8V7lGoxOxOK6P3Nb4K7duU0Y
-	sWPxx0bGkTg+ftc/gERQDlvw/BvUT4wgWysj9Vn+E3O/bapDze0c/h6w=
-X-Google-Smtp-Source: AGHT+IH2jrqSfCw2gZLBit8Qdra7oizjuhXH36fBGkIDykjebFbU4C6K+slm8yVokO3OVjbqARCt15UY+rRic7ZwAjmAWSVEBrNa
+	s=arc-20240116; t=1721932842; c=relaxed/simple;
+	bh=ti9OgG1fket+Vo/GzksXCs7kfWJxrTXjBuZDRW6tBfo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dSYk9TPWTyBjsfE8l2szTUrDlxf4xSmFTAnwJMwDkv4FRuWsUgtr8A8Qzvdytifugmg3Cdtd+sCYHdaQjnaVqJB3WhfH7MrfdhcVPzB5AvQWUTAmmSO0qO5F+Z0ghD9Nu5kOMcNhq22UrnRKAWZhp9it7w8eTC4+bkesVwWlB3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p6e8sGMu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85118C116B1;
+	Thu, 25 Jul 2024 18:40:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721932842;
+	bh=ti9OgG1fket+Vo/GzksXCs7kfWJxrTXjBuZDRW6tBfo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p6e8sGMuFNg3VBdLLFuf8mZ1FZT6qSWbFZOLV1GCNPpjn0GDEFfnya1Ie5zGCBkJb
+	 vH9OmoZ21CsaO3A4PiCoZeVIXnSUd/KjzdV0YD2i2ggqJSQLeQX0AAIHy3/dYeSClc
+	 auEs7fIrkM351YOMOfwd6nj/FDQfOHy0C4zLQbXDpI+yYcVdPrWYn3DiT/NOLkPsMy
+	 WUJJv/6Ex/mFArIPxCdTSaz3bOZVMkwmP1h5PraqXVD71Tp2KPf1ZNGsUmTaoE2Rhy
+	 oWdB/MKM1Iulz3g03ipszwIvK1pedRJPK5AUiYmGcCQt4a5Gs1oKaaxfAX4+ZveqGP
+	 ISDhZOLp0Tdhg==
+Date: Thu, 25 Jul 2024 11:40:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Manu Bretelle <chantra@meta.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, "davem@davemloft.net"
+ <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
+ "edumazet@google.com" <edumazet@google.com>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>
+Subject: Re: pull-request: bpf 2024-07-25
+Message-ID: <20240725114040.26c1f483@kernel.org>
+In-Reply-To: <76460C8C-42B3-454F-BD5D-2815E6FB598A@meta.com>
+References: <20240725114312.32197-1-daniel@iogearbox.net>
+	<20240725063054.0f82cff5@kernel.org>
+	<ce07f53f-bbe3-77d1-df59-ab5ce9e750d2@iogearbox.net>
+	<20240725071600.2b9c0f62@kernel.org>
+	<76460C8C-42B3-454F-BD5D-2815E6FB598A@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:168f:b0:374:9a34:a0a with SMTP id
- e9e14a558f8ab-39a2187f30dmr2884075ab.6.1721932396538; Thu, 25 Jul 2024
- 11:33:16 -0700 (PDT)
-Date: Thu, 25 Jul 2024 11:33:16 -0700
-In-Reply-To: <000000000000a62351060e363bdc@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d2bf2d061e16a028@google.com>
-Subject: Re: [syzbot] memory leak in ___neigh_create (2)
-From: syzbot <syzbot+42cfec52b6508887bbe8@syzkaller.appspotmail.com>
-To: alexander.mikhalitsyn@virtuozzo.com, davem@davemloft.net, den@openvz.org, 
-	dsahern@kernel.org, edumazet@google.com, f.fainelli@gmail.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	nogikh@google.com, pabeni@redhat.com, razor@blackwall.org, 
-	syzkaller-bugs@googlegroups.com, thomas.zeitlhofer+lkml@ze-it.at, 
-	thomas.zeitlhofer@ze-it.at, wangyuweihx@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This bug is marked as fixed by commit:
-net: stop syzbot
+On Thu, 25 Jul 2024 18:30:22 +0000 Manu Bretelle wrote:
+> I did not play with llvm19 yet.
+> 
+> Checking the BPF CI netdev builds that went red yesterday 8pm PST leads to 
+> https://github.com/kernel-patches/bpf/actions/runs/10087416772
+> 
+> BPF selftests build is failing with:
+> 
+>     CC bench_local_storage_create.o 
+> 3298 CC bench_htab_mem.o 
+> 3299 CC bench_bpf_crypto.o 
+> 3300 BINARY xskxceiver 
+> 3301 <command-line>: error: "_GNU_SOURCE" redefined [-Werror] 
+> 3302 <command-line>: note: this is the location of the previous definition 
+> 3303 BINARY xdp_hw_metadata 
+> 3304 BINARY xdp_features 
+> 3305 TEST-OBJ [test_maps] htab_map_batch_ops.test.o 
+> 3306 TEST-OBJ [test_maps] lpm_trie_map_batch_ops.test.o 
+> 3307 TEST-OBJ [test_maps] sk_storage_map.test.o 
+> 3308 TEST-OBJ [test_maps] map_percpu_stats.test.o
+> 
+> across all combos or architectures/compilers. I did not see anything related to LLVM19 though.
+> 
+> last failing build was today 5:17 am PST https://github.com/kernel-patches/bpf/actions/runs/10093925751
+> with the same symptoms.
+> 
+> First successful at 8:02am: https://github.com/kernel-patches/bpf/actions/runs/10096557745
 
-But I can't find it in the tested trees[1] for more than 90 days.
-Is it a correct commit? Please update it by replying:
+Ugh, seems like the GitHub UI messes up Firefox's ability to search :(
+I see it now, and it makes sense. Linus ended up with cc937dad85aea
+which was supposed to never make it upstream.
 
-#syz fix: exact-commit-title
+On the LLVM19 I see this in all outputs:
+ar: libLLVM.so.19.0: cannot open shared object file: No such file or directory
 
-Until then the bug is still considered open and new crashes with
-the same signature are ignored.
-
-Kernel: Linux
-Dashboard link: https://syzkaller.appspot.com/bug?extid=42cfec52b6508887bbe8
-
----
-[1] I expect the commit to be present in:
-
-1. for-kernelci branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
-
-2. master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
-
-3. master branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
-
-4. main branch of
-git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
-
-The full list of 10 trees can be found at
-https://syzkaller.appspot.com/upstream/repos
+But presumably that's harmless, then.
 
