@@ -1,116 +1,120 @@
-Return-Path: <netdev+bounces-113016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 996CC93C3EA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:18:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C04893C3EC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34267B21B2C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:18:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2537E1F22FA4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8CA19CCF5;
-	Thu, 25 Jul 2024 14:18:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732F519B3C8;
+	Thu, 25 Jul 2024 14:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="hP9mc1za"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ciJhflOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp-190d.mail.infomaniak.ch (smtp-190d.mail.infomaniak.ch [185.125.25.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2264A3FB3B;
-	Thu, 25 Jul 2024 14:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A573319CD03;
+	Thu, 25 Jul 2024 14:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721917105; cv=none; b=Gz04zZDpbyW55eazj0m99LZ9OAs1erK900ZfDx8n4JAC6b3yN56JrWrmQf3i83gS3rpAaMcBDPH42mEjy/MEJa+noYuRtTaASrRIae6hhk6QS7XaH3VTT/Qkv/AanWiAotU9Nuor9vF83jkEU07o9oi+lOiES+DiVJAB2QJ45d0=
+	t=1721917124; cv=none; b=LtKo0oXEooCoQIKsNZ9ii9vksCcRUnFUx5UpoHzbF7oN0iPInHkJCvDd895pmX23FiqfB0jE+/StGyX+uGgrB4MyC8in4EyAo1BbT0G0wmieVppqM+3H7mTmz4SsDNW1OI1l4oIjypGJbOIe+hp3Ut+LS/GvgEg+auVm8xJcJbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721917105; c=relaxed/simple;
-	bh=ygDnth1C28xLAe3h8ElguVvzIpLxChuKUvV5W0V4ulk=;
+	s=arc-20240116; t=1721917124; c=relaxed/simple;
+	bh=tuSX/unVuxmJMrbQnnbLtHNpnc+B7rpxT3sHE2xxegs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOwf5iLkrYJnIxBiGiNsUAwJc/jD1pC9a/KOiVMAJ9RHBqWlvF4OqyETaxpuv8+gUewHptjvOpINKGsLWg9+YZ39USOVk9PV9/jZaDqr5gWRML08ycGv1vIzfJcenuZYbF9gjXD4VSpcOprMhKRxKMdMPw+pzoZuJHv3zbCPGTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=hP9mc1za; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=IhE5GEFyRJBbsPlOyYM3ajXD3ZfpIhn5ydfRA/yrrKc=; b=hP9mc1zaqq3kHqnz
-	gfpnUUGwHfv03WegqUrk9kCPaRMQtJNRj+JsANQZ/DASsCM/R5e8+SLQjNi0PNLAd+ELhoPcF2yck
-	UIbJQdliDQgKuAPLJmhICFC2d9qUh6PZ7/RK6ewflWmSWjPAIutkgmZzjfZbIVJo2UGg/FDmmbqcM
-	LwegCYh8u1BX2M3bjH7lz8xWOTXEdeEIc9SCulDpCvvHizNERWOVkpcZT28TYrITtlDF+r8jlqhDS
-	hZXcpsGfLdy+iOdvmc5Hk8t55mHeb6+c378ol/nQeBMSfGjVKmgUzmWrsfkJIqmWa7Fug0YdLtzN7
-	ZAvj2LYrF+P3uQwkMg==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sWzIP-00DCtU-2c;
-	Thu, 25 Jul 2024 14:18:17 +0000
-Date: Thu, 25 Jul 2024 14:18:17 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, edumazet@google.com,
-	dsahern@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kennetkl@ifi.uio.no
-Subject: Re: [PATCH] net/tcp: Expand goo.gl link
-Message-ID: <ZqJeqWO7xVjA88Zd@gallifrey>
-References: <20240724172508.73466-1-linux@treblig.org>
- <20240724191215.GJ97837@kernel.org>
- <b399e0bf-07fd-4da6-9ab4-19cd1ceaa456@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=C5qxXDY4it3IYZqGxtLa2ywWRnYXZeUlXUbgato+BNZWlsGoNIno2nJyZQDkzoX4ccaCMljIW8NBaCBMvQ4bOAKH9FE6h7Q2ZzcUUzC1BVQuQltnANDVa3Oj+mCZboRonzhNXSzTCsBq/iVNrp+XtKvg0WDP9ErfYRc2QvCio4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ciJhflOI; arc=none smtp.client-ip=185.125.25.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WVCfc40T9z2FF;
+	Thu, 25 Jul 2024 16:18:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1721917112;
+	bh=LGvBAeI7d3TP5tpuWK69jj0d9WRNKvh+Tnvf3Z/TFyk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ciJhflOItcdduxPcIY8GWhg/oNRV/IgsM1uSU6Y1pi/BRMhCXDsCwsWmdiolXRiFy
+	 qYMsoYb41f08J5YM6N7mHNkERVfFO+VB6ZZO+6GOynzmHGFKrLBO5s1W1BXFzjr5s/
+	 wI8zHv3gRba3R93DzxQWwuBTD5Fb7Z3oyWswOWvQ=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WVCfb30tVz4tp;
+	Thu, 25 Jul 2024 16:18:31 +0200 (CEST)
+Date: Thu, 25 Jul 2024 16:18:29 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	outreachy@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v7 1/4] Landlock: Add abstract unix socket connect
+ restriction
+Message-ID: <20240725.wahChei0Hoo4@digikod.net>
+References: <cover.1721269836.git.fahimitahera@gmail.com>
+ <d7bad636c2e3609ade32fd02875fa43ec1b1d526.1721269836.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <b399e0bf-07fd-4da6-9ab4-19cd1ceaa456@redhat.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 14:17:58 up 78 days,  1:32,  1 user,  load average: 0.11, 0.04, 0.01
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d7bad636c2e3609ade32fd02875fa43ec1b1d526.1721269836.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
-* Paolo Abeni (pabeni@redhat.com) wrote:
+On Wed, Jul 17, 2024 at 10:15:19PM -0600, Tahera Fahimi wrote:
+> The patch introduces a new "scoped" attribute to the
+> landlock_ruleset_attr that can specify "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET"
+> to scope abstract unix sockets from connecting to a process outside of
+> the same landlock domain.
 > 
+> This patch implement two hooks, "unix_stream_connect" and "unix_may_send" to
+> enforce this restriction.
 > 
-> On 7/24/24 21:12, Simon Horman wrote:
-> > On Wed, Jul 24, 2024 at 06:25:08PM +0100, linux@treblig.org wrote:
-> > > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> > > 
-> > > The goo.gl URL shortener is deprecated and is due to stop
-> > > expanding existing links in 2025.
-> > > 
-> > > Expand the link in Kconfig.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> > 
-> > Both the motivation and updated link look correct to me.
-> > I also checked that there is no other usage of goo.gl in this file.
-> > 
-> > Not sure if this should be for net or net-next.
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
 > 
-> I also think this should go via net-next.
-> 
-> ## Form letter - net-next-closed
-> 
-> The merge window for v6.11 and therefore net-next is closed for new
-> drivers, features, code refactoring and optimizations. We are currently
-> accepting bug fixes only.
-> 
-> Please repost when net-next reopens after July 29th.
+> -------
 
-OK, I'll repost next week.
+> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
+> index 03b470f5a85a..799a50f11d79 100644
+> --- a/security/landlock/syscalls.c
+> +++ b/security/landlock/syscalls.c
+> @@ -97,8 +97,9 @@ static void build_check_abi(void)
+>  	 */
+>  	ruleset_size = sizeof(ruleset_attr.handled_access_fs);
+>  	ruleset_size += sizeof(ruleset_attr.handled_access_net);
+> +	ruleset_size += sizeof(ruleset_attr.scoped);
+>  	BUILD_BUG_ON(sizeof(ruleset_attr) != ruleset_size);
+> -	BUILD_BUG_ON(sizeof(ruleset_attr) != 16);
+> +	BUILD_BUG_ON(sizeof(ruleset_attr) != 24);
+>  
+>  	path_beneath_size = sizeof(path_beneath_attr.allowed_access);
+>  	path_beneath_size += sizeof(path_beneath_attr.parent_fd);
+> @@ -149,7 +150,7 @@ static const struct file_operations ruleset_fops = {
+>  	.write = fop_dummy_write,
+>  };
+>  
+> -#define LANDLOCK_ABI_VERSION 5
+> +#define LANDLOCK_ABI_VERSION 6
+>  
+>  /**
+>   * sys_landlock_create_ruleset - Create a new ruleset
+> @@ -170,7 +171,7 @@ static const struct file_operations ruleset_fops = {
+>   * Possible returned errors are:
+>   *
+>   * - %EOPNOTSUPP: Landlock is supported by the kernel but disabled at boot time;
+> - * - %EINVAL: unknown @flags, or unknown access, or too small @size;
+> + * - %EINVAL: unknown @flags, or unknown access, or uknown scope, or too small @size;
 
-Dave
+You'll need to rebase on top of my next branch to take into account
+recent Günther's changes.
 
-> RFC patches sent for review only are obviously welcome at any time.
-> 
-> See:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-> -- 
-> pw-bot: defer
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+>   * - %E2BIG or %EFAULT: @attr or @size inconsistencies;
+>   * - %ENOMSG: empty &landlock_ruleset_attr.handled_access_fs.
+>   */
 
