@@ -1,190 +1,118 @@
-Return-Path: <netdev+bounces-113089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679A693CA27
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:25:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E103793CA30
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:29:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8411F21BE7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:25:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C35E283269
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A2D13AD23;
-	Thu, 25 Jul 2024 21:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B0C13D893;
+	Thu, 25 Jul 2024 21:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dT+jRFAg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7uSG0EQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5481C6BE
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 21:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558215C8FC;
+	Thu, 25 Jul 2024 21:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721942713; cv=none; b=aYtnzCk+fAraZVNlLXlpNKCsBv5yTFGr8nq2rXJKrPiT0FZxp2w5Hvuig8imJH+tkDfLwph706b8+12cknCkjJ8O7gjLK+xgURKEeGyUvOnl2qKCmAB+wzGlvAfGjR99na+sLeisyndtGOxXpq36Dy5yyzVNARLt074vLmJtKTU=
+	t=1721942957; cv=none; b=uCiYQejkKDeNFwGrnC6E5rgZVdv0Vcfsp0AFhMgvOoujLtBildh27yLBwnBDro71RPyXyRCcd7hRvWRjKUBZx/U129F2MOSVL8ZjcHkXz8H6tiz1qc64u9cHN931IuBrRAmBs10ayJSoA6+kY62T90CHVx84EGnivFygQxHMldY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721942713; c=relaxed/simple;
-	bh=0JC/WLN6BjuTUQVH8BKpfB1ZXi6mkyKsqHg7uaUydkk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ccVs5IVfyOiRFac4GRtKq1KWMfse0NX0FvNFOHfb4nADMicQXMkPJUrttVM3GTZFboY9X6Haom13oUC0Zr23gyX+BT+ezFCRj6IVs7yZ2YFHVJSA+uiDJZ8J6F9LZ2POT4rK9ghK6fpUkFKfgHp1sZDZLws4lBZKqgKwVAsKzmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dT+jRFAg; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d0ff81d2-3297-4b13-855b-810c11390dc9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1721942708;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SuxSTTda5CLjkytbbMkgs4nkmCaGaqv3jbRpvg9tUx8=;
-	b=dT+jRFAgntc0bRa03UTutPpwXrDGISJ3rNOyp987z4ExZgFup6rS6/0XnuRgG3C2skb8Ty
-	qSJ52w5v67KAyCb//6iMHao0A4ZDDGzXC+DwpXvCFBP+FUzkTZafQqLi6YVVwovneLpPMw
-	HW5GTocSZyLP0QEfDMn9NFRG3QLv0jc=
-Date: Thu, 25 Jul 2024 14:24:59 -0700
+	s=arc-20240116; t=1721942957; c=relaxed/simple;
+	bh=lnN5uNt25R6rIIaIjMOOnVgIMOYI1FYNCbwGHt7UT+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=FLZ7wM27uWFpC6J4NnxqjfV7Q2W0zLtp5nFAcVp2dHNjFKHzqmj5jM37XvyayrkUWgUqZAQCwLDLoLVgRhla8f5m/Kj/9LN7HnQ0hAfshnEUHLyExMQb8jOEVZRd5m4y108fW5CjcprmV+vAokZdQ8ARHQV6Mh94MP+N5+fJ9YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7uSG0EQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 999D0C116B1;
+	Thu, 25 Jul 2024 21:29:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721942956;
+	bh=lnN5uNt25R6rIIaIjMOOnVgIMOYI1FYNCbwGHt7UT+Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=I7uSG0EQKSCpqnl8k630y+G2a/d+iURlIhmmLhzu5a12ewKrdwMpdyAWqYfCPjlZx
+	 C5pFEjRpNNHjOmFpyF9hJGWNtcLWMd3G3c/4/r/CCUFV6oiyNVBv9bJEDZe9WtSoZ1
+	 AeXaGs03fedb7Zx2BVuHvYTkNMT/yS4GMDOXsJeWumnsoZJVO4BoIwF7tvCkxYtpQi
+	 TsPHWrgb4zpkYveRsySqJ9mdoBgojGr9OA3iqIekQ/e+lpQFiQkTEiSRsT5qGqkPde
+	 OYndUBteZH7p9W6PExNJcy767hejpsRouA+QwhvE3wd6ZLbPS8w+MhpKB7mxWlSsp4
+	 rR3fe24a/uC4A==
+Date: Thu, 25 Jul 2024 16:29:15 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com
+Subject: Re: [PATCH V3 03/10] PCI/TPH: Add pci=notph to prevent use of TPH
+Message-ID: <20240725212915.GA860294@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v9 05/11] bpf: net_sched: Support implementation of
- Qdisc_ops in bpf
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn,
- daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com,
- martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-References: <20240714175130.4051012-1-amery.hung@bytedance.com>
- <20240714175130.4051012-6-amery.hung@bytedance.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20240714175130.4051012-6-amery.hung@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28b953c3-ef66-4bd2-a024-ec860399ffbf@amd.com>
 
-On 7/14/24 10:51 AM, Amery Hung wrote:
-> +static const struct bpf_func_proto *
-> +bpf_qdisc_get_func_proto(enum bpf_func_id func_id,
-> +			 const struct bpf_prog *prog)
-> +{
-> +	switch (func_id) {
+On Wed, Jul 24, 2024 at 03:05:59PM -0500, Wei Huang wrote:
+> 
+> 
+> On 7/23/24 17:41, Bjorn Helgaas wrote:
+> > On Wed, Jul 17, 2024 at 03:55:04PM -0500, Wei Huang wrote:
+> >> TLP headers with incorrect steering tags (e.g. caused by buggy driver)
+> >> can potentially cause issues when the system hardware consumes the tags.
+> > 
+> > Hmm.  What kind of issues?  Crash?  Data corruption?  Poor
+> > performance?
+> 
+> Not crash or functionality errors. Usually it is QoS related because of
+> resource competition. AMD has
 
-Instead of an empty switch, it should be useful to provide the skb->data related 
-helper. It can start with read only dynptr first, the BPF_FUNC_dynptr_read 
-helper here.
+Looks like you had more to say here?
 
-Also, the kfuncs: bpf_dynptr_slice and bpf_dynptr_from_skb_rdonly.
+I *assume* that both the PH hint and the Steering Tags are only
+*hints* and there's no excuse for hardware to corrupt anything (e.g.,
+by omitting cache maintenance) even if the hint turns out to be wrong.
+If that's the case, I assume "can potentially cause issues" really
+just means "might lead to lower performance".  That's what I want to
+clarify and confirm.
 
-> +	default:
-> +		return bpf_base_func_proto(func_id, prog);
+> >> Provide a kernel option, with related helper functions, to completely
+> >> prevent TPH from being enabled.
+> > 
+> > Also would be nice to have a hint about the difference between "notph"
+> > and "nostmode".  Maybe that goes in the "nostmode" patch?  I'm not
+> > super clear on all the differences here.
+> 
+> I can combine them. Here is the combination and it meaning based on TPH
+> Control Register values:
+> 
+> Requestor Enable | ST Mode | Meaning
+> ---------------------------------------------------------------
+> 00               | xx      | TPH disabled (i.e. notph)
+> 01               | 00      | TPH enabled, NO ST Mode (i.e. nostmode)
+> 01 or 11         | 01      | Interrupt Vector mode
+> 01 or 11         | 10      | Device specific mode
+> 
+> If you have any other thoughts on how to approach these modes, please
+> let me know.
 
-[ ... ]
+IIRC, there's no interface in this series that reall does anything
+with TPH per se; drivers would only use the ST-related things.
 
-> +	}
-> +}
-> +
-> +BTF_ID_LIST_SINGLE(bpf_sk_buff_ids, struct, sk_buff)
-> +BTF_ID_LIST_SINGLE(bpf_sk_buff_ptr_ids, struct, bpf_sk_buff_ptr)
-> +
-> +static bool bpf_qdisc_is_valid_access(int off, int size,
-> +				      enum bpf_access_type type,
-> +				      const struct bpf_prog *prog,
-> +				      struct bpf_insn_access_aux *info)
-> +{
-> +	struct btf *btf = prog->aux->attach_btf;
-> +	u32 arg;
-> +
-> +	arg = get_ctx_arg_idx(btf, prog->aux->attach_func_proto, off);
-> +	if (!strcmp(prog->aux->attach_func_name, "enqueue")) {
-> +		if (arg == 2) {
-> +			info->reg_type = PTR_TO_BTF_ID | PTR_TRUSTED;
-> +			info->btf = btf;
-> +			info->btf_id = bpf_sk_buff_ptr_ids[0];
-> +			return true;
+If that's the case, maybe "pci=notph" isn't needed yet.
 
-This will allow type == BPF_WRITE to ctx which should be rejected. The below 
-bpf_tracing_btf_ctx_access() could have rejected it.
-
-> +		}
-> +	}
-> +
-> +	return bpf_tracing_btf_ctx_access(off, size, type, prog, info);
-> +}
-> +
-
-[ ... ]
-
-> +
-> +static bool is_unsupported(u32 member_offset)
-> +{
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(unsupported_ops); i++) {
-> +		if (member_offset == unsupported_ops[i])
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static int bpf_qdisc_check_member(const struct btf_type *t,
-> +				  const struct btf_member *member,
-> +				  const struct bpf_prog *prog)
-> +{
-> +	if (is_unsupported(__btf_member_bit_offset(t, member) / 8))
-
-Note that the ".check_member" and the "is_unsupported" can be removed as you 
-also noticed on the recent unsupported ops cleanup patches.
-
-> +		return -ENOTSUPP;
-> +	return 0;
-> +}
-
-[ ... ]
-
-> +static struct Qdisc_ops __bpf_ops_qdisc_ops = {
-> +	.enqueue = Qdisc_ops__enqueue,
-> +	.dequeue = Qdisc_ops__dequeue,
-> +	.peek = Qdisc_ops__peek,
-> +	.init = Qdisc_ops__init,
-> +	.reset = Qdisc_ops__reset,
-> +	.destroy = Qdisc_ops__destroy,
-> +	.change = Qdisc_ops__change,
-> +	.attach = Qdisc_ops__attach,
-> +	.change_tx_queue_len = Qdisc_ops__change_tx_queue_len,
-> +	.change_real_num_tx = Qdisc_ops__change_real_num_tx,
-> +	.dump = Qdisc_ops__dump,
-> +	.dump_stats = Qdisc_ops__dump_stats,
-
-Similar to the above is_unsupported comment. The unsupported ops should be 
-removed from the cfi_stubs.
-
-> +	.ingress_block_set = Qdisc_ops__ingress_block_set,
-> +	.egress_block_set = Qdisc_ops__egress_block_set,
-> +	.ingress_block_get = Qdisc_ops__ingress_block_get,
-> +	.egress_block_get = Qdisc_ops__egress_block_get,
-> +};
-> +
-> +static struct bpf_struct_ops bpf_Qdisc_ops = {
-> +	.verifier_ops = &bpf_qdisc_verifier_ops,
-> +	.reg = bpf_qdisc_reg,
-> +	.unreg = bpf_qdisc_unreg,
-> +	.check_member = bpf_qdisc_check_member,
-> +	.init_member = bpf_qdisc_init_member,
-> +	.init = bpf_qdisc_init,
-> +	.validate = bpf_qdisc_validate,
-
-".validate" is optional. The empty "bpf_qdisc_validate" can be removed.
-
-> +	.name = "Qdisc_ops",
-> +	.cfi_stubs = &__bpf_ops_qdisc_ops,
-> +	.owner = THIS_MODULE,
-> +};
-
-
+Bjorn
 
