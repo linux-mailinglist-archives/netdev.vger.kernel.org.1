@@ -1,135 +1,175 @@
-Return-Path: <netdev+bounces-113063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314F793C8B2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:29:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1525F93C8B5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D01D01F220C9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:29:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C24D52823EA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC1451C4A;
-	Thu, 25 Jul 2024 19:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F235B4207D;
+	Thu, 25 Jul 2024 19:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JEafkARv"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="hciy1GXh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BCC2B9BC;
-	Thu, 25 Jul 2024 19:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC0D288DB;
+	Thu, 25 Jul 2024 19:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721935769; cv=none; b=SfVP9GTiO21g6eHH1nTMLiJvZ3tzef+UDK1oh5iidOdbq0uaEdOvfL6oZpT8U5HZI713or35FnWNbyrvX2Z+iOo9krat5u2nskcJ14lBJXQpL7u/mHdF70QEdYQS++5eFEatwcnNdwqdb9BzY2qGpypeJrg6ydPzBh7kWbAqBRA=
+	t=1721935911; cv=none; b=THE+ApwvaJcjHMMSy47RYh9KvNjYb/2EwPpDKiaazXS8OYH0+Tea1Qyk8EopLLuZJRtD6XDTGwPKm0KmeY64L4fUtsMvKQucOea2tMnFy9TBN1Pt6qWPyq4rnuklLwQNRzl9V8W6OnokV5xHdNhEwhYWg71nALHicYkKm+HY7yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721935769; c=relaxed/simple;
-	bh=l60CdqWsTH7bN/sWdfttIwkmtyFbUVureRpQqjQ3Clk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gOT+LOoW8jsItZ2B99Q5YEoWpwbThvKMIQiRzxDXHeeX6c1cc10cqLI5Ni1ix1TDPG+KNiSrpvtJ8YSCQXT1Bc5rlBh9NCJVomQkB4xQSvyaUg8ouie/bNHBeo8pEI9Bzg4Y78GRZp0UDCvtll7YwHFDG6Nw+CciiYMJBhb6v04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JEafkARv; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1721935767; x=1753471767;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=d33HhOG5NKWjKAdfBkwmZosAnO77BQeIN7MJ7W1KQlI=;
-  b=JEafkARvYXV2Hr4nwdAN8/rCHUtTcoRZVN8pN8iL/puMo/+qtzKFpmmS
-   Q4CkjTLNRjf9nW6MQrZ9Y0p83cUN8x23+ibmjPquY4mz85yOmHpVNGBqe
-   FcFaUQ4j7zDTtK/pDzUatZKeqHKD3N6jjNP2qYIwH+Jr1aAYEnS6S+qvS
-   w=;
-X-IronPort-AV: E=Sophos;i="6.09,236,1716249600"; 
-   d="scan'208";a="109762214"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 19:29:26 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:45626]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.34.254:2525] with esmtp (Farcaster)
- id 809b5de6-769b-438e-8d3c-e8c8fad31ea4; Thu, 25 Jul 2024 19:29:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 809b5de6-769b-438e-8d3c-e8c8fad31ea4
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 25 Jul 2024 19:29:24 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.167.203) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 25 Jul 2024 19:29:22 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>
-CC: Florian Westphal <fw@strlen.de>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 nf 2/2] netfilter: iptables: Fix potential null-ptr-deref in ip6table_nat_table_init().
-Date: Thu, 25 Jul 2024 12:28:21 -0700
-Message-ID: <20240725192822.4478-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240725192822.4478-1-kuniyu@amazon.com>
-References: <20240725192822.4478-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1721935911; c=relaxed/simple;
+	bh=BP7iQaIkCCORsFyjxtE4ytc8EAse9kwiCti6r4ijeGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ofJ1tD7UMVZvZsqUG4OWNzhcws7GJAvPimTD1X0cVipXEYTK9ct/1U7962goPzZ4q/gY9AEyg8JInSVCGOTR/DVsgspVNCMzLe8j+hT+ey00M95LVTfmXkCWDNK5L8CT28pu2keZe/LAQpggD5WUT9SOf0sJ2mlVeFLoUqiYIcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=hciy1GXh; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (85-76-75-219-nat.elisa-mobile.fi [85.76.75.219])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 79FF318BF;
+	Thu, 25 Jul 2024 21:31:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1721935864;
+	bh=BP7iQaIkCCORsFyjxtE4ytc8EAse9kwiCti6r4ijeGk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hciy1GXhx0QjNboOK/FWAT9/9BMBepH/+GP8HwDzkeBT7MWRvvGx8UFdmfl97rSrz
+	 xBBIOBVR+37f8PEQ9dZ5Ods4MIG4716BbeOGDpoo2jmhi1QlcmH3+OiZtWp01VQl1O
+	 itbm5BPG/tN/Uxk6VsSxiW8hOgezJ7cT7wKUZyWc=
+Date: Thu, 25 Jul 2024 22:31:25 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240725193125.GD14252@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+ <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com>
+ <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
 
-ip6table_nat_table_init() accesses net->gen->ptr[ip6table_nat_net_ops.id],
-but the function is exposed to user space before the entry is allocated
-via register_pernet_subsys().
+On Wed, Jul 24, 2024 at 04:37:21PM -0400, James Bottomley wrote:
+> On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
+> [...]
+> > What I get from the discussions I've followed or partcipated in over
+> > the years is that the main worry of free software communities is
+> > being forced to use closed-source userspace components, whether that
+> > would be to make the device usable at all, or to achieve decent level
+> > of performance or full feature set. We've been through years of
+> > mostly closed-source GPU support, of printer "windrivers", and quite
+> > a few other horrors. The good news is that we've so far overcome lots
+> > (most) of those challenges. Reverse engineering projects paid off,
+> > and so did working hand-in-hand with industry actors in multiple ways
+> > (both openly and behind the scenes). One could then legitimately ask
+> > why we're still scared.
+> 
+> I don't think I am.  We're mostly fully capable of expounding at length
+> on the business rationale for being open if the thing they're hiding
+> isn't much of a differentiator anyway (or they're simply hiding it to
+> try to retain some illusion of control), so we shouldn't have any fear
+> of being able to make our case in language business people understand.
+> 
+> I also think this fear is partly a mindset problem on our part.  We
+> came out of the real fight for openness and we do embrace things like a
+> licence that forces open code (GPL) and symbols that discourage
+> proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
+> FSF coolaid that if we don't stand over manufacturers every second and
+> force them they'll slide back to their old proprietary ways.  However,
+> if you look at the entirely permissive ecosystem that grew up after we
+> did (openstack, docker, kubernetes, etc.) they don't have any such fear
+> and yet they still have large amounts of uncompelled openness and give
+> back.
 
-Let's call register_pernet_subsys() before xt_register_template().
+I don't think those are necessarily relevant examples, as far as device
+pass-through goes. Vendors have many times reverted to proprietary ways,
+and they still do, at least in the areas of the kernel I'm most active
+in. I've seen first hand a large SoC vendor very close to opening a
+significant part of their camera stack and changing their mind at the
+last minute when they heard they could possibly merge their code through
+a different subsystem with a pass-through blank cheque.
 
-Fixes: fdacd57c79b7 ("netfilter: x_tables: never register tables by default")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv6/netfilter/ip6table_nat.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+I'm willing to believe it can be different in other areas, which may
+partly explain why different subsystems and different developers have
+different biases and have trouble understand each other's point of view.
 
-diff --git a/net/ipv6/netfilter/ip6table_nat.c b/net/ipv6/netfilter/ip6table_nat.c
-index 52cf104e3478..e119d4f090cc 100644
---- a/net/ipv6/netfilter/ip6table_nat.c
-+++ b/net/ipv6/netfilter/ip6table_nat.c
-@@ -147,23 +147,27 @@ static struct pernet_operations ip6table_nat_net_ops = {
- 
- static int __init ip6table_nat_init(void)
- {
--	int ret = xt_register_template(&nf_nat_ipv6_table,
--				       ip6table_nat_table_init);
-+	int ret;
- 
-+	/* net->gen->ptr[ip6table_nat_net_id] must be allocated
-+	 * before calling ip6t_nat_register_lookups().
-+	 */
-+	ret = register_pernet_subsys(&ip6table_nat_net_ops);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = register_pernet_subsys(&ip6table_nat_net_ops);
-+	ret = xt_register_template(&nf_nat_ipv6_table,
-+				   ip6table_nat_table_init);
- 	if (ret)
--		xt_unregister_template(&nf_nat_ipv6_table);
-+		unregister_pernet_subsys(&ip6table_nat_net_ops);
- 
- 	return ret;
- }
- 
- static void __exit ip6table_nat_exit(void)
- {
--	unregister_pernet_subsys(&ip6table_nat_net_ops);
- 	xt_unregister_template(&nf_nat_ipv6_table);
-+	unregister_pernet_subsys(&ip6table_nat_net_ops);
- }
- 
- module_init(ip6table_nat_init);
+> > I can't fully answer that question, but there are two points that I
+> > think are relevant. Note that due to my background and experience,
+> > this will be heavily biased towards consumer and embedded hardware,
+> > not data centre-grade devices. Some technologies from the latter
+> > however have a tendency to migrate to the former over time, so the
+> > distinction isn't necessarily as relevant as one may consider.
+> > 
+> > The first point is that hardware gets more complicated over time, and
+> > in some markets there's also an increase in the number of vendors and
+> > devices. There's a perceived (whether true or not) danger that we
+> > won't be able to keep up with just reverse engineering and a
+> > development model relying on hobyists. Getting vendors involved is
+> > important if we want to scale.
+> 
+> Yes, but there are lots of not very useful complex devices being
+> produced every day that fail to capture market share.  Not having
+> reverse engineered drivers for them is no real loss.  If a device does
+> gain market share, it gains a huge pool of users some of whom become
+> interested in reverse engineering, so I think market forces actually
+> work in our favour: we get reverse engineering mostly where the devices
+> are actually interesting and capture market share.  It's self scaling.
+
+I can't agree with that, sorry. Not only is the difficulty to
+reverse-engineer some classes of devices increasing, but saying that
+only devices that make it to the top of the market share chart are worth
+considering will leave many users on the side of the road.
+
+> > Second, I think there's a fear of regression. For some categories of
+> > devices, we have made slow but real progress to try and convince the
+> > industry to be more open. This sometimes took a decade of work,
+> > patiently building bridges and creating ecosystems brick by brick.
+> > Some of those ecosystems are sturdy, some not so. Giving pass-through
+> > a blank check will likely have very different effects in different
+> > areas. I don't personally believe it will shatter everything, but I'm
+> > convinced it carries risk in areas where cooperation with vendors is
+> > in its infancy or is fragile for any other reason.
+> 
+> I also think we're on the rise in this space.  Since most cloud
+> workloads are on Linux, there's huge market pressure on most "found in
+> the cloud" devices (like accelerators and GPUs) to have an easy to
+> consume Linux story.  Nvidia is a case in point.  When it only cared
+> about fast games on some other OS, we get shafted with a proprietary
+> graphics drivers.  Now it's under pressure to be the number one AI
+> accelerator provider for the cloud it's suddenly wondering about open
+> source drivers to make adoption easier.
+
+I can't comment on Nvidia and their inference engines in particular. The
+server market may be in a better position that the consumer and embedded
+market, and if that's the case, I'm happy for the servers. That doesn't
+solve the issues in other markets though.
+
+> > Finally, let's not forget that pass-through APIs are not an all or
+> > nothing option. To cite that example only, DRM requires GPU drivers
+> > to have an open-source userspace implementation to merge the kernel
+> > driver, and the same subsystems strongly pushes for API
+> > standardization for display controllers. We can set different rules
+> > for different cases.
+> 
+> I certainly think we can afford to experiment here, yes.
+
 -- 
-2.30.2
+Regards,
 
+Laurent Pinchart
 
