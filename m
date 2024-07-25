@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-113092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A91E93CA3E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:33:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A952393CA43
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A71E1F2334D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:33:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29DB71F231F6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E9013CABC;
-	Thu, 25 Jul 2024 21:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4301C6BE;
+	Thu, 25 Jul 2024 21:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QAt5klfK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qURu7pn2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59C513C906
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 21:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DF613A3E8
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 21:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721943202; cv=none; b=LOPup4/G5h+GkqxEgQzClWVpSYY9gI3OrQzR2gY3CROwzmKhjfYJNm9A8fJmN7O4TUGtriB2BAapLk3u84QelK3VWxuKQgpukF/x9fHtqdYHGJfW2yX9HGNFLFZzzfjexXJQC8dk/0FVggNNd+Gb20CtVZsouNIc8z4zpdkVH/M=
+	t=1721943305; cv=none; b=EWeZ94il5FC1CXRLuszvTtxVxYNcLCwl/hqFMX8e65QqhSB4cjrro5EWaVH7jsfNkdcDQGXof4jcA/o1Hu9PWumMr9ZCt5OEiDfw6awrr6s5qvUzvzd6C9JsUuNJ4z35MypH+H7j0SYDoTqn/JgGugsH4355UzpZ0lMKTH+TUUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721943202; c=relaxed/simple;
-	bh=oGwYrvp8P5QF03oit1mtRcqKPil3j6i4YJQ15qjBmhE=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kU/WgmMVZlG8v0qS0Akpr18clVKrpw4z6M6em42u81katNspmyRv76VKLoh/TqV36eWPUSCgK2e8uVLnAYFs+ImrRJPdugxJL7IaXhRAfy4JxSq+PAYtOInqEz7RJ02xOsU6aMbByGgqBYF5x/crFMgj5785/6Rx9dUvSLofdtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QAt5klfK; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-39a19fb5a18so4713655ab.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:33:19 -0700 (PDT)
+	s=arc-20240116; t=1721943305; c=relaxed/simple;
+	bh=fX996tynQjZs/DK5PfNlpDTlyLALxXGkzJfemk9uqR8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tpUHVrYeVjszmJfBHum/OOcB9XLlcunpe8t0i1Z+XZb8JODmLlihH4XqcDMlAoYVxX33FG++bfn0B8VPyNz/abJYqmUIq+HaGmYv9wJzX/7tZw/JEO+c3q6+IHVslO1Ny1IfjlAXzXNLaxIoQm/erI084nfkxSDtRaLuxssj5Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qURu7pn2; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-70eaf5874ddso273259b3a.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:35:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1721943199; x=1722547999; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721943303; x=1722548103; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1fE6JM00dEWDFqi14hn3iG7rF7lvidTL7Y9/FSB1RQ=;
-        b=QAt5klfKubljd8m1LOqOIQrM7inILHO5bsztWzqWEocZtEpxgwg4AW4EaiUb1s8jhW
-         G55jIyTV9jXWBCAmVZcvh7mEu1bBdrosJndjOsSO3LRTVXNoZw2hoH3S+uS76Qzd4rfy
-         r1GVACm4InZ/ZjifwFEzeIufyKIj1ZAXCuHc8=
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IPMhmN39tmeqnE+K6hmwwZK2U3XPX4OF5ZMMS8nmlI0=;
+        b=qURu7pn2dmOVaXXC0zGz9EP5DSnwfFXRs/64p1VOhke/f/iNe6Ntz9j2Y7lJeCR+7u
+         8rlhY2lv+gocn/cWBsGIQCo+b7GnmgtuwpTvW+JKLmNaN26uITFcIWQtYrQ2FiD7tYyb
+         +c/zj1fIjViMu4OvYR1O7yD6cGZarzmlVrSxYhykY2gqNZcVXWvJXSKTVhmb1BRsNwjp
+         DOyvus175jEj5CA9aXigFWdLyP9ZVYC1rMhuq6HMXS+rdvnMlzdkwZZSznHCTYL/OC4Z
+         Ta8ak5qe06rIO6FU8IAz7scAQMc/k7ESsw9TRmx35RPtjTl5w0hYG68oyL1u4fHoq33P
+         9IKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721943199; x=1722547999;
+        d=1e100.net; s=20230601; t=1721943303; x=1722548103;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z1fE6JM00dEWDFqi14hn3iG7rF7lvidTL7Y9/FSB1RQ=;
-        b=E74qABVnl3/+0k++OZSK5o7K5I3okZWYMDoqEj2Rv/2ZdwFXu4NWfL/DV11lT3IkYo
-         bLqsY3uhwHTYyk/kB/Pvjb7ILOZ9JLonfGosC9B1uppJDMbXypJkOo1klR5iBiMz1JWU
-         /1QOp4qRxF1YSHobbpLXgzdwdnwBpJ/YZfnYK5hOp1m+s5uLzPVYnwcsTO8CcVDvRlCF
-         x8TbS3QHu7R8aENG+fFY4/rZN+DyvSQEY6D3F0MVAGdQEa2x5k2wbK4DxoiFuKsG/OGq
-         T3qL6AoBFTSA3NHsfao9Q9Q1LnlNOVb5uFfg7yFwqtnn/Efipv4GFhruuVfWyAfo0zI5
-         0+BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4w8nnq4L21NSO3M3NsFs8XkAkAxNWuoWA1zOIEV1/Q4/zx7RerlcIaftri2O5Ect956ceibXr5jXDy3VbA2xRmQeKZf68
-X-Gm-Message-State: AOJu0Yx8fChN+546MmXduoK0HeuD1bct7PkZipity/YHsICXcgLURo6P
-	yAXijTjd6UKDhvAgNfkcjDTn+UNLPDY+NODvgQjz9ugqAxQsxZT/aOcrq8BgdOiKVIkl2sNK5+U
-	=
-X-Google-Smtp-Source: AGHT+IFDDUkD9chPoM/JLNgwkr4RoyWAWzfbdgVKyq6r7iI4wPBq+RWnMeM3zMmuX0e3TR0MpkqK3w==
-X-Received: by 2002:a05:6e02:1d81:b0:398:e585:7be4 with SMTP id e9e14a558f8ab-39a217c0dd5mr58818165ab.1.1721943199159;
-        Thu, 25 Jul 2024 14:33:19 -0700 (PDT)
-Received: from C02YVCJELVCG.dhcp.broadcom.net ([192.19.144.250])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f9ec374bsm1605689a12.67.2024.07.25.14.33.17
+        bh=IPMhmN39tmeqnE+K6hmwwZK2U3XPX4OF5ZMMS8nmlI0=;
+        b=UtMDAkJDism1bKF3xSyxmFxgMwlD8MZVmCFKWOA73nnyz8ksaxjTBYyHNykbOb/FuL
+         UVZSab/B7aUvl+EdEw4QYX5b579IIwUqoF1gQ77xJOGHjAFeFyEu1wuOMvnGHQTbWTU0
+         zzRcHADA4tSv4J91KIA/VfIFku03IhHe4SbSBsAbVuumG4ADwogo4W7ICmjuWYWuw5PE
+         Eyn+zI3giOHZim16pnxZfvqKjZMWgHSeOkoWQr4zmuoqIl9fh4ayUEikRWltABR2eV2j
+         1plGzmnlL4hSw9g3s7im8Ni2GH708AW/jgImLS3APTehUb+LySacTfPCiCiuVPUane8H
+         w2tg==
+X-Gm-Message-State: AOJu0YyDpfVP26EoRcXRMvxhjUf9Q6/O9uGb2EC8zEWeaBD2gmeCydy1
+	FMtukQC+NZiX87k5H+pohbxtSdurI6Qr2SDTHqIvTi380Lz4iU46zKJJAM5b5EHImklkA0cURlF
+	Klw==
+X-Google-Smtp-Source: AGHT+IFpfXZRBxWXDV+deBvkXUp/wjVdoueeG4DByUoaCB3jGG8pUttBbP6bMj2POIVu4gJfpAnA3A==
+X-Received: by 2002:a05:6a00:94a3:b0:70d:3354:a190 with SMTP id d2e1a72fcca58-70eae9a10fcmr3706195b3a.27.1721943302046;
+        Thu, 25 Jul 2024 14:35:02 -0700 (PDT)
+Received: from google.com (175.199.125.34.bc.googleusercontent.com. [34.125.199.175])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead71269csm1556868b3a.56.2024.07.25.14.35.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 14:33:18 -0700 (PDT)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-Date: Thu, 25 Jul 2024 17:33:10 -0400
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
-Subject: Re: [PATCH] bnxt_en: Fix RSS logic in __bnxt_reserve_rings()
-Message-ID: <ZqLEfyNLtCy25g6w@C02YVCJELVCG.dhcp.broadcom.net>
-References: <20240724222106.147744-1-michael.chan@broadcom.com>
- <20240724172536.318fb6f8@kernel.org>
- <20240725111912.7bc17cf6@kernel.org>
+        Thu, 25 Jul 2024 14:35:01 -0700 (PDT)
+Date: Thu, 25 Jul 2024 21:34:50 +0000
+From: Mina Almasry <almasrymina@google.com>
+To: zijianzhang@bytedance.com
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+	willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com
+Subject: Re: [PATCH net-next v7 1/3] sock: support copying cmsgs to the user
+ space in sendmsg
+Message-ID: <ZqLE-vmo_L1JgUrn@google.com>
+References: <20240708210405.870930-1-zijianzhang@bytedance.com>
+ <20240708210405.870930-2-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,80 +85,253 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240725111912.7bc17cf6@kernel.org>
+In-Reply-To: <20240708210405.870930-2-zijianzhang@bytedance.com>
 
-On Thu, Jul 25, 2024 at 11:19:12AM -0700, Jakub Kicinski wrote:
-> On Wed, 24 Jul 2024 17:25:36 -0700 Jakub Kicinski wrote:
-> > On Wed, 24 Jul 2024 15:21:06 -0700 Michael Chan wrote:
-> > > Now, with RSS contexts support, if the user has added or deleted RSS
-> > > contexts, we may now enter this path to reserve the new number of VNICs.
-> > > However, netif_is_rxfh_configured() will not return the correct state if
-> > > we are still in the middle of set_rxfh().  So the existing code may
-> > > set the indirection table of the default RSS context to default by
-> > > mistake.  
-> > 
-> > I feel like my explanation was more clear :S
-> > 
-> > The key point is that ethtool::set_rxfh() calls the "reload" functions
-> > and expects the scope of the "reload" to be quite narrow, because only
-> > the RSS table has changed. Unfortunately the add / delete of additional
-> > contexts de-sync the resource counts, so ethtool::set_rxfh() now ends
-> > up "reloading" more than it intended. The "more than intended" includes
-> > going down the RSS indir reset path, which calls netif_is_rxfh_configured().
-> > Return value from netif_is_rxfh_configured() during ethtool::set_rxfh()
-> > is undefined.
-> > 
-> > Reported tag would have been nice too..
-> 
+On Mon, Jul 08, 2024 at 09:04:03PM +0000, zijianzhang@bytedance.com wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+>
+> Users can pass msg_control as a placeholder to recvmsg, and get some info
+> from the kernel upon returning of it, but it's not available for sendmsg.
+> Recvmsg uses put_cmsg to copy info back to the user, while ____sys_sendmsg
+> creates a kernel copy of msg_control and passes that to the callees,
+> put_cmsg in sendmsg path will write into this kernel buffer.
+>
+> If users want to get info after returning of sendmsg, they typically have
+> to call recvmsg on the ERRMSG_QUEUE of the socket, incurring extra system
+> call overhead. This commit supports copying cmsg from the kernel space to
+> the user space upon returning of sendmsg to mitigate this overhead.
+>
+> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
+> ---
+>  include/linux/socket.h |  6 +++++
+>  include/net/sock.h     |  2 +-
+>  net/core/sock.c        |  6 +++--
+>  net/ipv4/ip_sockglue.c |  2 +-
+>  net/ipv6/datagram.c    |  2 +-
+>  net/socket.c           | 54 ++++++++++++++++++++++++++++++++++++++----
+>  6 files changed, 62 insertions(+), 10 deletions(-)
+>
+> diff --git a/include/linux/socket.h b/include/linux/socket.h
+> index 2a1ff91d1914..75461812a7a3 100644
+> --- a/include/linux/socket.h
+> +++ b/include/linux/socket.h
+> @@ -71,6 +71,7 @@ struct msghdr {
+>  		void __user	*msg_control_user;
+>  	};
+>  	bool		msg_control_is_user : 1;
+> +	bool		msg_control_copy_to_user : 1;
 
-Agreed.  Sorry that was missed.
+Please add some docs explaining what this does if possible. From reading the
+code, it seems if this is true then we should copy cmsg to user. Not sure where
+or how it's set though.
 
-> Reported-and-tested-by: Jakub Kicinski <kuba@kernel.org>
-> Link: https://lore.kernel.org/20240625010210.2002310-1-kuba@kernel.org
-> 
-> There's one more problem. It looks like changing queue count discards
-> existing ntuple filters:
-> 
-> # Check| At /root/./ksft/drivers/net/hw/rss_ctx.py, line 387, in test_rss_context_queue_reconfigure:
-> # Check|     test_rss_queue_reconfigure(cfg, main_ctx=False)
-> # Check| At /root/./ksft/drivers/net/hw/rss_ctx.py, line 230, in test_rss_queue_reconfigure:
-> # Check|     _send_traffic_check(cfg, port, ctx_ref, { 'target': (0, 3),
-> # Check| At /root/./ksft/drivers/net/hw/rss_ctx.py, line 92, in _send_traffic_check:
-> # Check|     ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
-> # Check failed 1045235 >= 405823.5 traffic on other queues (context 1)':[460068, 351995, 565970, 351579, 127270]
-> # Exception while handling defer / cleanup (callback 1 of 3)!
-> # Defer Exception| Traceback (most recent call last):
-> # Defer Exception|   File "/root/ksft/net/lib/py/ksft.py", line 129, in ksft_flush_defer
-> # Defer Exception|     entry.exec_only()
-> # Defer Exception|   File "/root/ksft/net/lib/py/utils.py", line 93, in exec_only
-> # Defer Exception|     self.func(*self.args, **self.kwargs)
-> # Defer Exception|   File "/root/ksft/net/lib/py/utils.py", line 121, in ethtool
-> # Defer Exception|     return tool('ethtool', args, json=json, ns=ns, host=host)
-> # Defer Exception|   File "/root/ksft/net/lib/py/utils.py", line 108, in tool
-> # Defer Exception|     cmd_obj = cmd(cmd_str, ns=ns, host=host)
-> # Defer Exception|   File "/root/ksft/net/lib/py/utils.py", line 32, in __init__
-> # Defer Exception|     self.process(terminate=False, fail=fail, timeout=timeout)
-> # Defer Exception|   File "/root/ksft/net/lib/py/utils.py", line 50, in process
-> # Defer Exception|     raise CmdExitFailure("Command failed: %s\nSTDOUT: %s\nSTDERR: %s" %
-> # Defer Exception| net.lib.py.utils.CmdExitFailure: Command failed: ethtool -N eth0 delete 0
-> # Defer Exception| STDOUT: b''
-> # Defer Exception| STDERR: b'rmgr: Cannot delete RX class rule: No such file or directory\nCannot delete classification rule\n'
-> not ok 8 rss_ctx.test_rss_context_queue_reconfigure
-> 
-> This is from the following chunk of the test:
-> 
->    225      # We should be able to increase queues, but table should be left untouched
->    226      ethtool(f"-L {cfg.ifname} combined 5")
->    227      data = get_rss(cfg, context=ctx_id)
->    228      ksft_eq({0, 3}, set(data['rss-indirection-table']))
->    229  
->    230      _send_traffic_check(cfg, port, ctx_ref, { 'target': (0, 3),
->    231                                                other_key: (1, 2, 4) })
-> 
-> The Check failure tells us the traffic was sprayed.
-> The Defer Exception, well, self-explanatory: 
->   "Cannot delete RX class rule: No such file or directory"
+>  	bool		msg_get_inq : 1;/* return INQ after receive */
+>  	unsigned int	msg_flags;	/* flags on received message */
+>  	__kernel_size_t	msg_controllen;	/* ancillary data buffer length */
+> @@ -168,6 +169,11 @@ static inline struct cmsghdr * cmsg_nxthdr (struct msghdr *__msg, struct cmsghdr
+>  	return __cmsg_nxthdr(__msg->msg_control, __msg->msg_controllen, __cmsg);
+>  }
+>
+> +static inline bool cmsg_copy_to_user(struct cmsghdr *__cmsg)
+> +{
+> +	return 0;
+> +}
+> +
+>  static inline size_t msg_data_left(struct msghdr *msg)
+>  {
+>  	return iov_iter_count(&msg->msg_iter);
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index cce23ac4d514..9c728287d21d 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1804,7 +1804,7 @@ static inline void sockcm_init(struct sockcm_cookie *sockc,
+>  	};
+>  }
+>
+> -int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+> +int __sock_cmsg_send(struct sock *sk, struct msghdr *msg, struct cmsghdr *cmsg,
+>  		     struct sockcm_cookie *sockc);
+>  int sock_cmsg_send(struct sock *sk, struct msghdr *msg,
+>  		   struct sockcm_cookie *sockc);
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 9abc4fe25953..efb30668dac3 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2826,7 +2826,7 @@ struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_len,
+>  }
+>  EXPORT_SYMBOL(sock_alloc_send_pskb);
+>
+> -int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+> +int __sock_cmsg_send(struct sock *sk, struct msghdr *msg, struct cmsghdr *cmsg,
+>  		     struct sockcm_cookie *sockc)
+>  {
+>  	u32 tsflags;
+> @@ -2866,6 +2866,8 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+>  	default:
+>  		return -EINVAL;
+>  	}
+> +	if (cmsg_copy_to_user(cmsg))
+> +		msg->msg_control_copy_to_user = true;
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL(__sock_cmsg_send);
+> @@ -2881,7 +2883,7 @@ int sock_cmsg_send(struct sock *sk, struct msghdr *msg,
+>  			return -EINVAL;
+>  		if (cmsg->cmsg_level != SOL_SOCKET)
+>  			continue;
+> -		ret = __sock_cmsg_send(sk, cmsg, sockc);
+> +		ret = __sock_cmsg_send(sk, msg, cmsg, sockc);
+>  		if (ret)
+>  			return ret;
+>  	}
+> diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+> index cf377377b52d..6360b8ba9c84 100644
+> --- a/net/ipv4/ip_sockglue.c
+> +++ b/net/ipv4/ip_sockglue.c
+> @@ -267,7 +267,7 @@ int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
+>  		}
+>  #endif
+>  		if (cmsg->cmsg_level == SOL_SOCKET) {
+> -			err = __sock_cmsg_send(sk, cmsg, &ipc->sockc);
+> +			err = __sock_cmsg_send(sk, msg, cmsg, &ipc->sockc);
+>  			if (err)
+>  				return err;
+>  			continue;
+> diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
+> index fff78496803d..c9ae30acf895 100644
+> --- a/net/ipv6/datagram.c
+> +++ b/net/ipv6/datagram.c
+> @@ -777,7 +777,7 @@ int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
+>  		}
+>
+>  		if (cmsg->cmsg_level == SOL_SOCKET) {
+> -			err = __sock_cmsg_send(sk, cmsg, &ipc6->sockc);
+> +			err = __sock_cmsg_send(sk, msg, cmsg, &ipc6->sockc);
+>  			if (err)
+>  				return err;
+>  			continue;
+> diff --git a/net/socket.c b/net/socket.c
+> index e416920e9399..6a9c9e24d781 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -2525,8 +2525,43 @@ static int copy_msghdr_from_user(struct msghdr *kmsg,
+>  	return err < 0 ? err : 0;
+>  }
+>
+> -static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
+> -			   unsigned int flags, struct used_address *used_address,
+> +static int sendmsg_copy_cmsg_to_user(struct msghdr *msg_sys,
+> +				     struct user_msghdr __user *umsg)
+> +{
+> +	struct compat_msghdr __user *umsg_compat =
+> +				(struct compat_msghdr __user *)umsg;
+> +	unsigned int flags = msg_sys->msg_flags;
+> +	struct msghdr msg_user = *msg_sys;
+> +	unsigned long cmsg_ptr;
+> +	struct cmsghdr *cmsg;
+> +	int err;
+> +
+> +	msg_user.msg_control_is_user = true;
+> +	msg_user.msg_control_user = umsg->msg_control;
+> +	cmsg_ptr = (unsigned long)msg_user.msg_control;
+> +	for_each_cmsghdr(cmsg, msg_sys) {
+> +		if (!CMSG_OK(msg_sys, cmsg))
+> +			break;
+> +		if (cmsg_copy_to_user(cmsg))
+> +			put_cmsg(&msg_user, cmsg->cmsg_level, cmsg->cmsg_type,
+> +				 cmsg->cmsg_len - sizeof(*cmsg), CMSG_DATA(cmsg));
 
-We can take a look at that, but we currently do this on purpose.
+put_cmsg() can fail as far as I can tell. Any reason we don't have to check for
+failure here?
 
+What happens when these failures happen. Do we end up putting the ZC
+notification later, or is the zc notification lost forever because we did not
+detect the failure to put_cmsg() it?
+
+> +	}
+> +
+> +	err = __put_user((msg_sys->msg_flags & ~MSG_CMSG_COMPAT), COMPAT_FLAGS(umsg));
+> +	if (err)
+> +		return err;
+> +	if (MSG_CMSG_COMPAT & flags)
+> +		err = __put_user((unsigned long)msg_user.msg_control - cmsg_ptr,
+> +				 &umsg_compat->msg_controllen);
+> +	else
+> +		err = __put_user((unsigned long)msg_user.msg_control - cmsg_ptr,
+> +				 &umsg->msg_controllen);
+> +	return err;
+> +}
+> +
+> +static int ____sys_sendmsg(struct socket *sock, struct user_msghdr __user *msg,
+> +			   struct msghdr *msg_sys, unsigned int flags,
+> +			   struct used_address *used_address,
+>  			   unsigned int allowed_msghdr_flags)
+>  {
+>  	unsigned char ctl[sizeof(struct cmsghdr) + 20]
+> @@ -2537,6 +2572,7 @@ static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
+>  	ssize_t err;
+>
+>  	err = -ENOBUFS;
+> +	msg_sys->msg_control_copy_to_user = false;
+
+
+This may be a lack of knowledge on my part, but i'm very confused that
+msg_control_copy_to_user is set to false here, and then checked below, and it's
+not touched in between. How could it evaluate to true below? Is it because something
+overwrites the value in msg_sys between this set and the check?
+
+If something is overwriting it, is the initialization to false necessary?
+I don't see other fields of msg_sys initialized this way.
+
+>
+>  	if (msg_sys->msg_controllen > INT_MAX)
+>  		goto out;
+> @@ -2594,6 +2630,14 @@ static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
+>  			       used_address->name_len);
+>  	}
+>
+> +	if (msg && msg_sys->msg_control_copy_to_user && err >= 0) {
+> +		ssize_t len = err;
+> +
+> +		err = sendmsg_copy_cmsg_to_user(msg_sys, msg);
+> +		if (!err)
+> +			err = len;
+
+I'm a bit surprised there isn't any cleanup here if copying the cmsg to user
+fails. It seems that that __sock_sendmsg() is executed, then if we fail here,
+we just return an error without unrolling what __sock_sendmsg() did. Why is
+this ok?
+
+Should sendmsg_copy_cmsg_to_user() be done before __sock_sendms() with a goto
+out if it fails?
+
+> +	}
+> +
+>  out_freectl:
+>  	if (ctl_buf != ctl)
+>  		sock_kfree_s(sock->sk, ctl_buf, ctl_len);
+> @@ -2636,8 +2680,8 @@ static int ___sys_sendmsg(struct socket *sock, struct user_msghdr __user *msg,
+>  	if (err < 0)
+>  		return err;
+>
+> -	err = ____sys_sendmsg(sock, msg_sys, flags, used_address,
+> -				allowed_msghdr_flags);
+> +	err = ____sys_sendmsg(sock, msg, msg_sys, flags, used_address,
+> +			      allowed_msghdr_flags);
+>  	kfree(iov);
+>  	return err;
+>  }
+> @@ -2648,7 +2692,7 @@ static int ___sys_sendmsg(struct socket *sock, struct user_msghdr __user *msg,
+>  long __sys_sendmsg_sock(struct socket *sock, struct msghdr *msg,
+>  			unsigned int flags)
+>  {
+> -	return ____sys_sendmsg(sock, msg, flags, NULL, 0);
+> +	return ____sys_sendmsg(sock, NULL, msg, flags, NULL, 0);
+>  }
+>
+>  long __sys_sendmsg(int fd, struct user_msghdr __user *msg, unsigned int flags,
+> --
+> 2.20.1
+>
 
