@@ -1,260 +1,196 @@
-Return-Path: <netdev+bounces-112994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DA393C24A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BD5193C286
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:56:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C14BC1F21846
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:45:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 908D41C20D8E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4387C44C97;
-	Thu, 25 Jul 2024 12:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4217719AD72;
+	Thu, 25 Jul 2024 12:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PSpSx33N"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB631219EB;
-	Thu, 25 Jul 2024 12:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB8919AD6E
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 12:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721911522; cv=none; b=lO8Zxi+xnDa6TuBQw8wMo3LnkmJVsu1rZoAtihDF6YoeNBLMSO5FTKBuomO+ONqBmCvecKfVTDNaB9JeoFuEowAQgxiXTFOiKLFb6tAg1Uucgm1CY/oFp1E8a2kXO9RdM/myr2QM8SB6VQNcJL8SOlaVaG59/zTiLpNumd0tU3g=
+	t=1721912193; cv=none; b=ULVSOfyViTwJEwsgK7kbxS4SrG0ZvCP9LwVSMlnHr78lTcwuS/ZlWLwaD57R4DSmUno3UyAUk65U7I573ye/E6RSQsvVnpIJmFjooIxvp/VIwEk4WUF5SF/a1obpvm1pyclQtOg5U3mk/Iz+fPQnxoWI0k2/53T1pA8w449+hqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721911522; c=relaxed/simple;
-	bh=Kno7oXfRynZA04n185N0SSwq7t3bgmw59672KoymYrc=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Q6IODlmL0O7s0YIQqAxScTqjO3ExBAFDzgRWxRw2JW3jnlf2t6bwIPd5JLXhJ7IG/s08KsVgFcvkSsOHTkGFTas4OTU0H06a6d1j9oXQd6rCJWsmXg3aRCx6wjxcTMBAPU19i9AilSFYVYLRb4BTKc13997zYxBxFS/1Xyc9+DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sWxq9-000000002Yy-3gXn;
-	Thu, 25 Jul 2024 12:45:02 +0000
-Date: Thu, 25 Jul 2024 13:44:49 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Crispin <john@phrozen.org>, Felix Fietkau <nbd@nbd.name>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
-	Sam Shih <Sam.Shih@mediatek.com>,
-	Weijie Gao <Weijie.Gao@mediatek.com>,
-	Steven Liu <steven.liu@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH RFC net-next] net: pcs: add helper module for standalone
- drivers
-Message-ID: <ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1721912193; c=relaxed/simple;
+	bh=W+wn0GlOw0Gf8eTKdYVnQsoy5a7TOWTISZPM87pGBkY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rpu90oIkR5IdBLpkrlgpTrPdMmByBR7ZTYSDoE8gpcZSnx80OUraeW7fPZ1elux83B/KrzBoLU9JxCX37MHD7/7sm7S9UZwNTSxombh1HZQqfWG7rJMLV8EswAH/8KFpnf6mzEEhKjckuV8NHKrDfSjA89dCxTvVjjXncToTvTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PSpSx33N; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52f04150796so185436e87.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 05:56:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1721912189; x=1722516989; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J36xabAj2bKInLJhB2Kp1HMkLRnJXufSHyFnP7004CA=;
+        b=PSpSx33NJKP/ArKf2Klir+NRPUFjRcJ+81zpng344POaanyiZGoOf7fARnvuuHf+Qa
+         aBUlAboixii+dR90vvYLVKasQMpI6mzo6Zr4EE8kYxZyIMGEiu04ovDRQEOVl/vQxQsU
+         1uyOJD+vsTnWHV7E9UzoXYDpS21SyA7zO87kw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721912189; x=1722516989;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J36xabAj2bKInLJhB2Kp1HMkLRnJXufSHyFnP7004CA=;
+        b=EsJZtnZUM2Kd/N8m22v812A+srM/SSHIzDskHoLeo+sxnwdv8AJjUWNH73FxwvRFSd
+         u/zC9xM3t/GBcOyTwCxspOyBSWJhQ0pzBVWyuYa2VovEUOGfKJz5ITtyZb30Gl3mTeuH
+         AqRnv1Tb4DgqwPE7Pc3amuplDL1jf08FSqeClrqp/mGRM0gLrtF6pqsBn1aP/+SMfMMD
+         CFIzIg1UQK+1eWmAuvh76CGHnRjOMdQOwwanyAGLnNaC47SA+gY9RLqFm+6U/907peUC
+         4OwJKCw8d+HLXN6LhE2Fs/RgPxZblqm+8t2MXbZWA0K+u21ERC0qJMeyAu7uxBg3lBou
+         uQWA==
+X-Forwarded-Encrypted: i=1; AJvYcCVtazCmS6LWb/GV4Hu4MeOlKg1J/ui2kwNsPl1Ohu3DlYNZLCmQUEJ5j4AkSBpBqf6FUXLpPhtc1/qddIirkgvC5UcRAjYC
+X-Gm-Message-State: AOJu0YxjQBqroIGbfLnhXSm7VsXpxtBiav7XEhmy/TZQYtRIhH5wCVTY
+	kEhXWrU++zOm0bWfsENu6l6606yfcOHUjmXPJKYn5NEbfYG/nXS1WIKmR9XEYZxdQErch8dhGZZ
+	84pA1yvJBSuZzWGTgkdLfDxYEHG/wuGjI1D2D
+X-Google-Smtp-Source: AGHT+IHqe58dpuQj44+fi+BabiviB+bKNn8yQfGDBzJey5WA1EPHom3t+V10YXvWL2j00LON9G2edsy2X6K/lIjK1NY=
+X-Received: by 2002:a05:6512:3092:b0:52c:e312:2082 with SMTP id
+ 2adb3069b0e04-52fd3f9e81dmr2126031e87.54.1721912189402; Thu, 25 Jul 2024
+ 05:56:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <CACfW=qpNmSeQVG_qSeYpEdk9pf_RTAEEKp+OiBYrRFd3d6HOXg@mail.gmail.com>
+ <20240710213837.GA257340@bhelgaas>
+In-Reply-To: <20240710213837.GA257340@bhelgaas>
+From: George-Daniel Matei <danielgeorgem@chromium.org>
+Date: Thu, 25 Jul 2024 14:56:18 +0200
+Message-ID: <CACfW=qqPmiV6ez8Gf6GT6jyN5JEvF=mVeAqckWYVycsRuD746w@mail.gmail.com>
+Subject: Re: [PATCH] PCI: r8169: add suspend/resume aspm quirk
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, nic_swsd@realtek.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Implement helper module for standalone PCS drivers which allows
-standaline PCS drivers to register and users to get instances of
-'struct phylink_pcs' using device tree nodes.
+On Wed, Jul 10, 2024 at 11:38=E2=80=AFPM Bjorn Helgaas <helgaas@kernel.org>=
+ wrote:
+>
+> On Wed, Jul 10, 2024 at 05:09:08PM +0200, George-Daniel Matei wrote:
+> > >> Added aspm suspend/resume hooks that run
+> > >> before and after suspend and resume to change
+> > >> the ASPM states of the PCI bus in order to allow
+> > >> the system suspend while trying to prevent card hangs
+> > >
+> > > Why is this needed?  Is there a r8169 defect we're working around?
+> > > A BIOS defect?  Is there a problem report you can reference here?
+> >
+> > We encountered this issue while upgrading from kernel v6.1 to v6.6.
+> > The system would not suspend with 6.6. We tracked down the problem to
+> > the NIC of the device, mainly that the following code was removed in
+> > 6.6:
+> >
+> > > else if (tp->mac_version >=3D RTL_GIGA_MAC_VER_46)
+> > >         rc =3D pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);
+> >
+> > For the listed devices, ASPM L1 is disabled entirely in 6.6. As for
+> > the reason, L1 was observed to cause some problems
+> > (https://bugzilla.kernel.org/show_bug.cgi?id=3D217814). We use a Raptor
+> > Lake soc and it won't change residency if the NIC doesn't have L1
+> > enabled. I saw in 6.1 the following comment:
+>
+> Can you verify that the problem still exists in a current kernel,
+> e.g., v6.9?
+>
+I tested it with v6.9, still the same problem.
 
-At this point only a single instance for each device tree node is
-supported, once we got devices providing more than one PCS we can
-extend it and introduce an xlate function as well as '#pcs-cells',
-similar to how this is done by the PHY framework.
+> If this is a regression that's still present in v6.9, we need to
+> identify the commit that broke it.  Maybe it's 90ca51e8c654 ("r8169:
+> fix ASPM-related issues on a number of systems with NIC version from
+> RTL8168h")?
+>
+I also tried v6.9 with 90ca51e8c654 reverted and it works ok.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-This is meant to provide the infrastructure suggested by
-Russell King in an earlier review. It just took me a long while to
-find the time to implement this.
-Users are going to be the standalone PCS drivers for 8/10 LynxI as
-well as 64/66 USXGMII PCS found on MediaTek MT7988 SoC.
-See also https://patchwork.kernel.org/comment/25636726/
+> > > Chips from RTL8168h partially have issues with L1.2, but seem
+> > > to work fine with L1 and L1.1.
+> >
+> > I was thinking that disabling/enabling L1.1 on the fly before/after
+> > suspend could help mitigate the risk associated with L1/L1.1 . I know
+> > that ASPM settings are exposed in sysfs and that this could be done
+> > from outside the kernel, that was my first approach, but it was
+> > suggested to me that this kind of workaround would be better suited
+> > for quirks. I did around 1000 suspend/resume cycles of 16-30 seconds
+> > each (correcting the resume dev->bus->self being configured twice
+> > mistake) and did not notice any problems. What do you think, is this a
+> > good approach ... ?
+>
+> Whatever the problem is, it definitely should be fixed in the kernel,
+> and Ilpo is right that it *should* be done in the PCI core ASPM
+> support (aspm.c) or at least with interfaces it supplies.
+>
+The problem is actually the system not being able to reach
+depper power saving states without certain ASPM states enabled.
+It was mentioned in the other thread replies that this kind of problem
+has been reported several times in the past.
 
-The full tree where this is being used can be found at
+> Generally speaking, drivers should not need to touch ASPM at all
+> except to work around hardware defects in their device, but r8169 has
+> a long history of weird ASPM stuff.  I dunno if that stuff is related
+> to hardware defects in the r8169 devices or if it is workarounds for
+> past or current defects in aspm.c.
+>
+What would be a good approach to move forward with this issue to
+get a fix approved?
 
-https://github.com/dangowrt/linux/commits/mt7988-for-next/
+Make a general version of this toggle workaround in the aspm core
+that would be controllable & configurable for each pci device individually?
+Keep the quirks and fix the aforementioned comments?
 
- drivers/net/pcs/Kconfig            |  4 ++
- drivers/net/pcs/Makefile           |  1 +
- drivers/net/pcs/pcs-standalone.c   | 95 +++++++++++++++++++++++++++++
- include/linux/pcs/pcs-standalone.h | 25 ++++++++
- 4 files changed, 129 insertions(+)
- create mode 100644 drivers/net/pcs/pcs-standalone.c
- create mode 100644 include/linux/pcs/pcs-standalone.h
-
-diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-index f6aa437473de..2b02b9351fa4 100644
---- a/drivers/net/pcs/Kconfig
-+++ b/drivers/net/pcs/Kconfig
-@@ -5,6 +5,10 @@
- 
- menu "PCS device drivers"
- 
-+config PCS_STANDALONE
-+	tristate
-+	select PHYLINK
-+
- config PCS_XPCS
- 	tristate "Synopsys DesignWare Ethernet XPCS"
- 	select PHYLINK
-diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
-index 4f7920618b90..0cb0057f2b8e 100644
---- a/drivers/net/pcs/Makefile
-+++ b/drivers/net/pcs/Makefile
-@@ -4,6 +4,7 @@
- pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-plat.o \
- 				   pcs-xpcs-nxp.o pcs-xpcs-wx.o
- 
-+obj-$(CONFIG_PCS_STANDALONE)	+= pcs-standalone.o
- obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
- obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
- obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
-diff --git a/drivers/net/pcs/pcs-standalone.c b/drivers/net/pcs/pcs-standalone.c
-new file mode 100644
-index 000000000000..1569793328a1
---- /dev/null
-+++ b/drivers/net/pcs/pcs-standalone.c
-@@ -0,0 +1,95 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Helpers for standalone PCS drivers
-+ *
-+ * Copyright (C) 2024 Daniel Golle <daniel@makrotopia.org>
-+ */
-+
-+#include <linux/pcs/pcs-standalone.h>
-+#include <linux/phylink.h>
-+
-+static LIST_HEAD(pcs_list);
-+static DEFINE_MUTEX(pcs_mutex);
-+
-+struct pcs_standalone {
-+	struct device *dev;
-+	struct phylink_pcs *pcs;
-+	struct list_head list;
-+};
-+
-+static void devm_pcs_provider_release(struct device *dev, void *res)
-+{
-+	struct pcs_standalone *pcssa = (struct pcs_standalone *)res;
-+
-+	mutex_lock(&pcs_mutex);
-+	list_del(&pcssa->list);
-+	mutex_unlock(&pcs_mutex);
-+}
-+
-+int devm_pcs_register(struct device *dev, struct phylink_pcs *pcs)
-+{
-+	struct pcs_standalone *pcssa;
-+
-+	pcssa = devres_alloc(devm_pcs_provider_release, sizeof(*pcssa),
-+			     GFP_KERNEL);
-+	if (!pcssa)
-+		return -ENOMEM;
-+
-+	devres_add(dev, pcssa);
-+	pcssa->pcs = pcs;
-+	pcssa->dev = dev;
-+
-+	mutex_lock(&pcs_mutex);
-+	list_add_tail(&pcssa->list, &pcs_list);
-+	mutex_unlock(&pcs_mutex);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(devm_pcs_register);
-+
-+static struct pcs_standalone *of_pcs_locate(const struct device_node *_np, u32 index)
-+{
-+	struct device_node *np;
-+	struct pcs_standalone *iter, *pcssa = NULL;
-+
-+	if (!_np)
-+		return NULL;
-+
-+	np = of_parse_phandle(_np, "pcs-handle", index);
-+	if (!np)
-+		return NULL;
-+
-+	mutex_lock(&pcs_mutex);
-+	list_for_each_entry(iter, &pcs_list, list) {
-+		if (iter->dev->of_node != np)
-+			continue;
-+
-+		pcssa = iter;
-+		break;
-+	}
-+	mutex_unlock(&pcs_mutex);
-+
-+	of_node_put(np);
-+
-+	return pcssa ?: ERR_PTR(-ENODEV);
-+}
-+
-+struct phylink_pcs *devm_of_pcs_get(struct device *dev,
-+				    const struct device_node *np,
-+				    unsigned int index)
-+{
-+	struct pcs_standalone *pcssa;
-+
-+	pcssa = of_pcs_locate(np ?: dev->of_node, index);
-+	if (IS_ERR_OR_NULL(pcssa))
-+		return ERR_PTR(PTR_ERR(pcssa));
-+
-+	device_link_add(dev, pcssa->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
-+
-+	return pcssa->pcs;
-+}
-+EXPORT_SYMBOL_GPL(devm_of_pcs_get);
-+
-+MODULE_DESCRIPTION("Helper for standalone PCS drivers");
-+MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/pcs/pcs-standalone.h b/include/linux/pcs/pcs-standalone.h
-new file mode 100644
-index 000000000000..ad7819f4a2eb
---- /dev/null
-+++ b/include/linux/pcs/pcs-standalone.h
-@@ -0,0 +1,25 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __LINUX_PCS_STANDALONE_H
-+#define __LINUX_PCS_STANDALONE_H
-+
-+#include <linux/device.h>
-+#include <linux/phylink.h>
-+#include <linux/phy/phy.h>
-+#include <linux/of.h>
-+
-+#if IS_ENABLED(CONFIG_PCS_STANDALONE)
-+int devm_pcs_register(struct device *dev, struct phylink_pcs *pcs);
-+struct phylink_pcs *devm_of_pcs_get(struct device *dev,
-+				    const struct device_node *np, unsigned int index);
-+#else
-+static inline int devm_pcs_register(struct device *dev, struct phylink_pcs *pcs);
-+	return -EOPNOTSUPP;
-+}
-+static inline struct phylink_pcs *devm_of_pcs_get(struct device *dev,
-+						  const struct device_node *np,
-+						  unsigned int index)
-+{
-+	return ERR_PTR(-EOPNOTSUPP);
-+}
-+#endif /* CONFIG_PCS_STANDALONE */
-+#endif /* __LINUX_PCS_STANDALONE_H */
--- 
-2.45.2
-
+> > > This doesn't restore the state as it existed before suspend.  Does
+> > > this rely on other parts of restore to do that?
+> >
+> > It operates on the assumption that after driver initialization
+> > PCI_EXP_LNKCTL_ASPMC is 0 and that there are no states enabled in
+> > CTL1. I did a lspci -vvv dump on the affected devices before and after
+> > the quirks ran and saw no difference. This could be improved.
+>
+> Yep, we can't assume any of that because the PCI core owns ASPM
+> config, not the driver itself.
+>
+> > > What's the root cause of the issue?
+> > > A silicon bug on the host side?
+> >
+> > I think it's the ASPM implementation of the soc.
+>
+> As Heiner pointed out, if it's a SoC defect, it would potentially
+> affect all devices and a workaround would have to cover them all.
+>
+> Side note: oops, quoting error below, see note about top-posting here:
+> https://people.kernel.org/tglx/notes-about-netiquette
+>
+> > On Tue, Jul 9, 2024 at 12:15=E2=80=AFAM Heiner Kallweit <hkallweit1@gma=
+il.com> wrote:
+> > >
+> > > On 08.07.2024 19:23, Bjorn Helgaas wrote:
+> > > > [+cc r8169 folks]
+> > > >
+> > > > On Mon, Jul 08, 2024 at 03:38:15PM +0000, George-Daniel Matei wrote=
+:
+> > > >> Added aspm suspend/resume hooks that run
+> > > >> before and after suspend and resume to change
+> > > >> the ASPM states of the PCI bus in order to allow
+> > > >> the system suspend while trying to prevent card hangs
+> > > >
+> > > > Why is this needed?  Is there a r8169 defect we're working around?
+> > > > A BIOS defect?  Is there a problem report you can reference here?
+> > ...
 
