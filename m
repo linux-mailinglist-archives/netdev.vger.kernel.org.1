@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-113027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A69393C55E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:50:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6573C93C55C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C399AB228CA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:50:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 250D6280F0D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC37719CD05;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE1219AD91;
 	Thu, 25 Jul 2024 14:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/TVp7Nz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbgQsMCw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A261E895;
-	Thu, 25 Jul 2024 14:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACD78468
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721919034; cv=none; b=NzyMvUjMwFpqA/nMgOOW9sm5ndjHK8+qoxYxPnDczBTKpSMBeYjBbzjWWQ85dvDr7/F5TYvxyEs4pamXQpT/ohLyjsvhPs/kGmmSY24oy5bFLQhIjEpYAVAU9Lsx7+li4Z2LIictH4qE8jVQMUZkh8I0wulQUmnd7L0tdWDjM8M=
+	t=1721919034; cv=none; b=k4VRhe0s7bcKn7jw01oNs9hsyEteY5EWLduTvKL1XMR3JvEeCDMlnL1Vpryb2QIEonDa62fwiGqQa5kHwFsw/6COGVJIbXrPbyHVtMLy8X7A+WZzON5rALJYItbRMkbA0ffVHs718ICyJUNUX9tFsOYacXtj+I53dngZKqFr/N8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1721919034; c=relaxed/simple;
-	bh=cumSC9cNmw/VWuz19u05QQhciFybrAYBeZp2cynmQUM=;
+	bh=JVm43ljPpKFsU/CaChcVfHId7f2g8Qi/NIn0kPoJb3s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jFB66pJQTn/yk0JmJofqsLYU3rKM1fbJ5OawXtJM06uXu3mJRlXXB9MR1wfrAlZNH85YEtTQOwk32WRnULUFCtritboJiRFucP5fBz36VnZ0K4HfUzGGY/hADFqFTaQHfGjJTwqXhFZMFZV5IRwrHGppevAlrmFAG/7f6W6+tpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q/TVp7Nz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5596AC4AF10;
+	 In-Reply-To:To:Cc; b=oDmbH7Podzk0ZdtynINcGPLzV61rENmDkzcwCJppFhTP229Nejen8JWt/HbCrA7aAm0dmHFv2s7p+69Jg2XXhSXsvve0PePUsyfkwcmsaZypjVf7gfwmoh429t2dKY7eslj6vekKC28F1wl+/sqM9vkKLgCuuc/OL9+pvg5q7Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbgQsMCw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 43AE7C4AF07;
 	Thu, 25 Jul 2024 14:50:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1721919034;
-	bh=cumSC9cNmw/VWuz19u05QQhciFybrAYBeZp2cynmQUM=;
+	bh=JVm43ljPpKFsU/CaChcVfHId7f2g8Qi/NIn0kPoJb3s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q/TVp7Nzm/5vv4uehWhU5Ib9VDJCA7SGqsik4wP4Da3KDa7qxKkY4QGculCZb9I9C
-	 OYfq/OGqp0X7yU2sbg2oyjphGcj0iMFRTJ76lUxxWnX7djVRrFqKKVtDZZ9chvdIA8
-	 IRCPwbCYxwa6v9mhPOAo4u6bvblXGcM7RW1qYBNE7X7eVYOBkO4nYpO4WxOheMeReL
-	 hPls3k3EeYD83wTXETlW40G9aGfyZBiCKUPWZ9MCWH7Gp3Ac3UtmbvQnXFT2tL/6uL
-	 0aGTTAd6uVfo+Xbv9hiAEK8NdNFsfoCPelzVblOuuMY8CRsPWfCdB34qihtOgdoDlS
-	 8dIPRQeSj7xRw==
+	b=hbgQsMCwv1bvYkADvpe3VXCKv7GYu9aHaAjsEoFZTdZTifALP3WE66qnmuFQ29n0l
+	 2GP994LsXywqgzlbrUfL1XM8SJ2Rj8Vz+uyHHLvQFIDljGCgstVY4yIx7IjJ7hRToM
+	 yBgy1S5/T9MSVq1f7gr3FfFRz2r+yrCOBS6aR1Ggh2wMXLjzzQkuc20Ok02U8dEEOs
+	 Xun5ly41R5iclPzx2q5hsoI7qnSTkaLzWXXxDvwxCQaRt6qGaBPIk/Z2W/VLHOe9mB
+	 MxucspC9p9SCqO4N5ZYSpmh5pMoS8boLdyM9huXTnX2ywy1j6NLaWpius1y+FHXBe4
+	 P6SiGc3l7W0Eg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3D0C8C4332C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 33B04C4332F;
 	Thu, 25 Jul 2024 14:50:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-07-25
+Subject: Re: [PATCH net v2] bnxt_en: update xdp_rxq_info in queue restart logic
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172191903424.31720.13837669286654307002.git-patchwork-notify@kernel.org>
+ <172191903420.31720.11517062632371090454.git-patchwork-notify@kernel.org>
 Date: Thu, 25 Jul 2024 14:50:34 +0000
-References: <20240725114312.32197-1-daniel@iogearbox.net>
-In-Reply-To: <20240725114312.32197-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
+References: <20240721053554.1233549-1-ap420073@gmail.com>
+In-Reply-To: <20240721053554.1233549-1-ap420073@gmail.com>
+To: Taehee Yoo <ap420073@gmail.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+ edumazet@google.com, michael.chan@broadcom.com, netdev@vger.kernel.org,
+ somnath.kotur@broadcom.com, dw@davidwei.uk, horms@kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 25 Jul 2024 13:43:12 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 14 non-merge commits during the last 8 day(s) which contain
-> a total of 19 files changed, 177 insertions(+), 70 deletions(-).
+On Sun, 21 Jul 2024 05:35:54 +0000 you wrote:
+> When the netdev_rx_queue_restart() restarts queues, the bnxt_en driver
+> updates(creates and deletes) a page_pool.
+> But it doesn't update xdp_rxq_info, so the xdp_rxq_info is still
+> connected to an old page_pool.
+> So, bnxt_rx_ring_info->page_pool indicates a new page_pool, but
+> bnxt_rx_ring_info->xdp_rxq is still connected to an old page_pool.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: bpf 2024-07-25
-    https://git.kernel.org/netdev/net/c/f7578df91304
+  - [net,v2] bnxt_en: update xdp_rxq_info in queue restart logic
+    https://git.kernel.org/netdev/net/c/b537633ce57b
 
 You are awesome, thank you!
 -- 
