@@ -1,131 +1,114 @@
-Return-Path: <netdev+bounces-113043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E70593C782
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:05:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5467193C79B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 19:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01F3C1F230F4
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:05:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0BC11F22C9C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D69719D891;
-	Thu, 25 Jul 2024 17:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3AF19D06C;
+	Thu, 25 Jul 2024 17:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mentovai.com header.i=@mentovai.com header.b="aPfwoEpD"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="CRyBwqga"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3CA199EA5
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 17:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8F614A82
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 17:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721927124; cv=none; b=KhmCjGeuvP7848hrFrxBYllj2cDUtuT+fwLylOgD8QRm9tfJDDRR45yO1uZxMuhoCvOCmrAIxp+FOWIY4w0iWTc7kfNKyb1PzRa/Lt3J4DO4pndnkGGkJMwHx51S6zZyaUYYEGfhSTNa3v1zVMcNHKPte8oMu43yOTnxot24HNY=
+	t=1721927875; cv=none; b=XqcFKRVHgwviGD67VAZ/K8BVw+4sIzeXsahu+zKNa+g/j4nCbkJK48ALbqFJPVcSfvA0eorFOGkXFPO6zdf8Kud4cHE6cZsvfV37nTrOWEGufNQ3cApeNRSSbj4RbLeiVq1l05JZHDwJUEdCljguNSd92IQEBY4yU23Sx7yVsY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721927124; c=relaxed/simple;
-	bh=0qvlF0z+W69f0VM9zRlqTHHhCzgFSjLYfgyhx97A8xs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D5aVINIux1arYMEizPtheCkgk2Tbd6ZDJk+6LTVt24IDwmc5z6AycY2mZjBakwNnZkzzzfSJbYkoaSWvzPjg6cKBTkAvroeMCw/ur9zbeqs3rwI++uanXukZ7WqYAW/aMIEe2jNj7gPx5cQk57d0v9mhy2OfANzc1cSsMZ8YxMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mentovai.com; spf=pass smtp.mailfrom=mentovai.com; dkim=pass (1024-bit key) header.d=mentovai.com header.i=@mentovai.com header.b=aPfwoEpD; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mentovai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mentovai.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a1dd2004e1so7068085a.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:05:22 -0700 (PDT)
+	s=arc-20240116; t=1721927875; c=relaxed/simple;
+	bh=gHwMmMr2pG0U1Cq5giNh6ZjpT8ogqD0NDu8mJn+QLio=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rvsZORA6QLtqF1M0cD82zzdv5nGrKBoV5dCR7j4tYK0yly7PwID0ZdvN9v37N+19GGoUmA63AX0H3g82kf0g6YV83uFm+gTQMEJ0dc+ZuJoVa/3ZTJaLIZGKiiad3/39DWR40KXZrgV5QdWGC5ESYlDslrjvjN/9mEl6ATtHUCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=CRyBwqga; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7a1be7b7bb5so79157a12.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:17:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mentovai.com; s=google; t=1721927121; x=1722531921; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iL/4KMSZN6XD67fqJQklqdxeiI1GyJnNUyuo727b0Ns=;
-        b=aPfwoEpDnR4PJeVdnOIppaNakg9lCZL/6mNbPFIP8llB/G5/YIGcyaW44dSPm88S4x
-         bo5Vcma1fon9iJekrn1TuylU8vGwqdGtOnb00QjVbDVWKxixDtfhLLAkvsQ0oAJfrWQS
-         7o2cNsZGLkxJWZO6WUB7nAyB2tOzGzpRL/FbA=
+        d=fastly.com; s=google; t=1721927873; x=1722532673; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1zgo53W/TfcA2xok0D0en6xpPVQcKpFXmHfnkkp2U8I=;
+        b=CRyBwqgaQczZfu7wKvIeU9hnGgDryxHBCs/Ubc+TBQk/mzPonGH7erNuOei9d0G9jY
+         40wvNFhPynCN3hjNpl/fmW4+x+TmUhEiUc/MAkE6mF6glhBh1Bp4nRMAtoYsWQZ7p7hk
+         lIwEHExVpMeFdvm2gUYRDqwPNQ6/tAZRQckYU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721927121; x=1722531921;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iL/4KMSZN6XD67fqJQklqdxeiI1GyJnNUyuo727b0Ns=;
-        b=Q1g2xGCrDpQm7r3D3EbySXrsWB9qA8otgFuCkYVqSItj2Ca+cECk2FppXoAnfMIzsA
-         /vCNFutZZzliI7gjvNoLtnSBjePcyyIorGtJZ0oca5cucz4smdvpGVbDEOJiimAH/K17
-         unH/LSs+xuzmZN+0Y5Z/1vv4FAyFwFKvQ9gRKP5v7bZfGEOjy3DijcvN6Ek35JPs2Jqh
-         gG+auZASZwB2+Ca+NChnIWetIf6Eq/Shb1egVXsylhYzcVdB5egcsnXS7PDGaF3S0c15
-         UPVi2PCxoLfhBMJjIV2sybfLqRbWESzguS26LKqpeZYcoPVQANBQchL3Gwcsinii55S2
-         9OWA==
-X-Gm-Message-State: AOJu0Yww1595LwXeoN7kmQJ+UvvUOkvDPO36gA6Y63HPKM1HzT5aOccw
-	dvC4FGiXi80JpSi5UvSkH+h3nKAWV1vLPqSsVbJ3ee1Zbth262xU+WEsmOPVPiuZx/+muuLEnUk
-	iUrM=
-X-Google-Smtp-Source: AGHT+IGYMJlb4MeNRB6hGkW8I8J20GB1qlmNlfQ9itynIkAZ6t0HMzIxxZcjAEQ+Mhx42wXpbEKuPA==
-X-Received: by 2002:a05:620a:318a:b0:7a1:d9a1:b9b with SMTP id af79cd13be357-7a1d9a10fb9mr265021085a.60.1721927121104;
-        Thu, 25 Jul 2024 10:05:21 -0700 (PDT)
-Received: from redacted ([2600:4040:9ce0:6400:b9f3:7389:4965:5876])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d7444bfesm100705985a.118.2024.07.25.10.05.20
+        d=1e100.net; s=20230601; t=1721927873; x=1722532673;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1zgo53W/TfcA2xok0D0en6xpPVQcKpFXmHfnkkp2U8I=;
+        b=gc+S94ju+NkKs+bR0YCik0D3CBcUak9cJdVXC4tOJVbtQTGCunxOF6kgySinpj6H7u
+         bG4njeX42Br3ZDwqz5bJrdqaeWU6swii6WtMu4H2LMujljmjLR6RHbv9HutBYL53gkoN
+         yDKsNyjPexvubHi+d6yjFDHa0dRDeqdG+JSZH7FphyQwACcifUKxlQAe5JcJmR70MO7G
+         7YMe1qW/DQcgv05P9uv60vH54Orz2P3WFN4yAeJzABIjG31gCSB2I74XSST5v9lgi68e
+         jZV7TVcSLjfsjSt0CF3Mdlp1zstmDlDEBl/Qj4yAA0dWN1cge8MG7jchACmcZBPp4cqG
+         cSrw==
+X-Gm-Message-State: AOJu0YwZYnXeLMRdENlbgewot2HfXA2U8+zmvn7SigyrWMSOOruqM82p
+	iCbazYlAhflOukm4tPnExBO4Uo6flYokFDesu0x0cVwbl+Ug/z/hXOV14LT8pP4=
+X-Google-Smtp-Source: AGHT+IFmaVd6AYr4PVs7dsn1rKcCIpjOTJ5hcQZupqk/JFPuS+AmYX8u5wkoanhPTblVpYmQs9Oumg==
+X-Received: by 2002:a17:90a:ac06:b0:2ca:8baf:abe9 with SMTP id 98e67ed59e1d1-2cf2ec146e1mr2425028a91.40.1721927873305;
+        Thu, 25 Jul 2024 10:17:53 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7c7fcfcsm16712835ad.56.2024.07.25.10.17.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 10:05:20 -0700 (PDT)
-From: Mark Mentovai <mark@mentovai.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	Russell Senior <russell@personaltelco.net>,
-	=?UTF-8?q?L=C3=B3r=C3=A1nd=20Horv=C3=A1th?= <lorand.horvath82@gmail.com>,
-	Mieczyslaw Nalewaj <namiltd@yahoo.com>,
-	Shiji Yang <yangshiji66@outlook.com>
-Subject: [PATCH] net: phy: realtek: add support for RTL8366S Gigabit PHY
-Date: Thu, 25 Jul 2024 13:05:19 -0400
-Message-ID: <20240725170519.43401-1-mark@mentovai.com>
-X-Mailer: git-send-email 2.45.2
+        Thu, 25 Jul 2024 10:17:52 -0700 (PDT)
+Date: Thu, 25 Jul 2024 10:17:50 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+	pabeni@redhat.com, kernel-team@meta.com
+Subject: Re: [net PATCH] fbnic: Change kconfig prompt from S390=n to !S390
+Message-ID: <ZqKIvuKvbsucyd2m@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	kernel-team@meta.com
+References: <172192698293.1903337.4255690118685300353.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <172192698293.1903337.4255690118685300353.stgit@ahduyck-xeon-server.home.arpa>
 
-The PHY built in to the Realtek RTL8366S switch controller was
-previously supported by genphy_driver. This PHY does not implement MMD
-operations. Since 9b01c885be36 (2023-02-13, in 6.3), MMD register reads
-have been made during phy_probe to determine EEE support. For
-genphy_driver, these reads are transformed into 802.3 annex 22D clause
-45-over-clause 22 mmd_phy_indirect operations that perform MII register
-writes to MII_MMD_CTRL and MII_MMD_DATA. This overwrites those two MII
-registers, which on this PHY are reserved and have another function,
-rendering the PHY unusable while so configured.
+On Thu, Jul 25, 2024 at 10:03:54AM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> In testing the recent kernel I found that the fbnic driver couldn't be
+> enabled on x86_64 builds. A bit of digging showed that the fbnic driver was
+> the only one to check for S390 to be n, all others had checked for !S390.
+> Since it is a boolean and not a tristate I am not sure it will be N. So
+> just update it to use the !S390 flag.
+> 
+> A quick check via "make menuconfig" verified that after making this change
+> there was an option to select the fbnic driver.
+> 
+> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 
-Proper support for this PHY is restored by providing a phy_driver that
-declares MMD operations as unsupported by using the helper functions
-provided for that purpose, while remaining otherwise identical to
-genphy_driver.
+[...]
 
-Fixes: 9b01c885be36 ("net: phy: c22: migrate to genphy_c45_write_eee_adv()")
-Fixes: https://github.com/openwrt/openwrt/issues/15981
-Link: https://github.com/openwrt/openwrt/issues/15739
-Reported-by: Russell Senior <russell@personaltelco.net>
-Signed-off-by: Mark Mentovai <mark@mentovai.com>
----
- drivers/net/phy/realtek.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+This seems fine to me (and matches other drivers as you mentioned),
+but does it need:
 
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index bed839237fb5..87865918dab6 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -1465,6 +1465,13 @@ static struct phy_driver realtek_drvs[] = {
- 		.handle_interrupt = genphy_handle_interrupt_no_ack,
- 		.suspend	= genphy_suspend,
- 		.resume		= genphy_resume,
-+	}, {
-+		PHY_ID_MATCH_EXACT(0x001cc960),
-+		.name		= "RTL8366S Gigabit Ethernet",
-+		.suspend	= genphy_suspend,
-+		.resume		= genphy_resume,
-+		.read_mmd	= genphy_read_mmd_unsupported,
-+		.write_mmd	= genphy_write_mmd_unsupported,
- 	},
- };
- 
--- 
-2.45.2
+Fixes 0e03c643dc93 ("eth: fbnic: fix s390 build.") 
 
+for it be applied to net?
+
+In either case:
+
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
