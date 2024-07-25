@@ -1,141 +1,108 @@
-Return-Path: <netdev+bounces-112939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F37193BF63
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:54:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1694D93BF72
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBE5F1F22658
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:54:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8880B219AC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106AE198A28;
-	Thu, 25 Jul 2024 09:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC16197A7C;
+	Thu, 25 Jul 2024 09:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQLK2DGk"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="VbSsezv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84495172BD8
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86197197A77
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721901243; cv=none; b=mt34uzNd/9s4163UTUBp+6e6J89EGn5uyp5cuNxdmDQis+mARAPE2xZFW4HFqnCffSAFINOguS16YlxhtdmydtPc5hUHZ/0GjfcgAo260JDYMdUe1Ro4DoCqjiIdj1opxx4C2tiyx75Fr2qOfh5e6YFNRZWtVtSX+J9trBKyPNw=
+	t=1721901369; cv=none; b=jdfWpvDgUMrjmbOPzKZkTaM5Uo8SWUUnV4w8MSt7f/ajWKJZeP8IwqJLrq7gN62Ij7u5UyMl9X13zOLJF0U1WBtAwJE5DPu17AmU8tzmVgMXLOPttOu+/aoyoX7zy7+kOM/x0ht//jXVspleYQOkAYK8OfRBRSPYs593qkIruvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721901243; c=relaxed/simple;
-	bh=TRogKpvrGbqxUvdw8euZYKuVBYuIo9/CTs0zy8grZV4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V+Pq3h0CvQm/HNTLtc/Uk9BSB6d4tuYVWHdIgBk7pEJ6eVzHdGjq6FJfyB8yljZMjQvtpE97F0+e4FFVFd/oRLCPfDY7kANhvahCxrCLAg7JLElZbb827jrQMBi4xKesEmqY1kYcmovlW64F6083JTftsGgcc6taF9OuYPL8D/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AQLK2DGk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721901240;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Azo1YWuyIM0irZB6B+BIwEhaWJ15+/vkqjauTRjqjt8=;
-	b=AQLK2DGkWfGqc1vaUIsptF+7z9EBsrHfK85S4sO2aHnnuSgZQIOL98PWfDjnIcmxk/S+wG
-	cl1F8aHGry60K6XCfyS0zkcbxOuZf5jXAdCSLy/Pb97B3f0toKvBRBxCD5RBf+pRIrjhxS
-	I9trwIbKuHkKaR19uamMUQr+KyooO9g=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-dDyB6DmHP1iInhyvc9jsUA-1; Thu, 25 Jul 2024 05:53:58 -0400
-X-MC-Unique: dDyB6DmHP1iInhyvc9jsUA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-369c99e4a88so142502f8f.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:53:58 -0700 (PDT)
+	s=arc-20240116; t=1721901369; c=relaxed/simple;
+	bh=+OIqBmJoGz1XxpdVsaMHS322ySwy4JJdHRtFiijt92Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QRj4wJzTQEZwydqqJmPaHv01iDSDUdKJRPqxJCL//pIXoGCGPDeXdOZqfwE0g2xQDoz5ME30K8oPOz2nUTJlEfT+k3+EGrvbtTyeWH86eT9dQ2DTRPAxTpBiUDxoQ9O259+rV758H9xEPJaZPUUZsqB7qEyGIRfRGlkpy6bjkWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=VbSsezv7; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-58f9874aeb4so781779a12.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1721901366; x=1722506166; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VmFtdftxbi5uXANrCeTOaJsmhJhvhXxqeLNdYaVB9KE=;
+        b=VbSsezv7MbK+Z52JIlrlR1M7B4j/YuazOOlVBmu8FMaZb0LtxAkK6Oddphi3/oEyDK
+         hGkJ+lWPHTBnY+uz9sxTKZz80niBbA/CYFrG3rvTpN/lz0zCC219hj6MLrAPQqH38Lhr
+         iveLfAYuoYO7Imj23se3Rh02niqkTBZH5z74o4G94fSxL4v2CBZ2pfXiqshVp+/zxmKS
+         xWVmz8wefnrrEC7YyxWX1RtSq/A5DZuVB0NtwHl/8iHIdHaO8URfgKL7QDnTJCNS2fz5
+         E7tbvEMH5YF/x88Hg/NaMfMWzqfsxEC0iag+0se+zJv9RQy8FVvs82rgEYKUt0zz+OS6
+         foKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721901238; x=1722506038;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Azo1YWuyIM0irZB6B+BIwEhaWJ15+/vkqjauTRjqjt8=;
-        b=b+0U/tZs7FrPG6Hsjr5WSp75eX3v3u/gzmGS9i5WYOJAIckFOjSXkHOAWKXwP7hgzX
-         QiZ4MqvlfB7aFIKKyfG1DypRpBM1lchKJad3l9szd+u0cCWQhXq72uCTAYmfSyZqnJ78
-         3X5sjh2jDMTie0UCsnlgsLm4itccYgwkBo9KSJTcKEY06oYjW2NHKFGwkSWT+R5M5y3O
-         dG58vgo4sVeaG1sZn//ut/LlvsIDIPiH9pQW8yvyldr+oylRE1++zZswHMpDV4IIYYhR
-         nor5hm3czd06+ntUVOoC6T4LT/l3TeXimD4Bjl1nRg9QshRdNDz4/N9H1jkrkYgh8Ucg
-         DIWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUMfvD4HwZ7+Q8pvmh65hf3COjy8n5LkdaZAhBzTR1vB6LI7c+vC5oD8KV/4IdpG0SJziybSkk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYgdOFwciCoe9LOCG5hWELJ4xYV/PSHlUIrJM4CWPogxac74wa
-	Hj67q3byBXsbzawtDYQgEelpYug25OVjLpdxNOyW1cKu6NfA4A6EFpbQniIhyD5wznpg8ovwO00
-	SJdvR04wNQT1EUQFDzTgd4epeN8em7tdX7cboyQu3Ib23eL4t1sJ1fQ==
-X-Received: by 2002:a05:600c:3c89:b0:425:6dfa:c005 with SMTP id 5b1f17b1804b1-42805440493mr7672545e9.2.1721901237836;
-        Thu, 25 Jul 2024 02:53:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFI9xUvHg0R+EO/RKq9ufzKkJZaoU8wz7XHuGLoen5hz1S74CdRTqMxjnghTCleM8tL0hE06w==
-X-Received: by 2002:a05:600c:3c89:b0:425:6dfa:c005 with SMTP id 5b1f17b1804b1-42805440493mr7672425e9.2.1721901237386;
-        Thu, 25 Jul 2024 02:53:57 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427f941352asm67749725e9.41.2024.07.25.02.53.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 02:53:56 -0700 (PDT)
-Message-ID: <d3d97260-f840-4ea8-b964-64e36448bf96@redhat.com>
-Date: Thu, 25 Jul 2024 11:53:54 +0200
+        d=1e100.net; s=20230601; t=1721901366; x=1722506166;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VmFtdftxbi5uXANrCeTOaJsmhJhvhXxqeLNdYaVB9KE=;
+        b=RpmxmS+blXAIXU0KQ6nlbGtbmu5b1JSOr4wX3I4tOCRQi+QNGaZduIqBqWh4XR1MLq
+         DCgx14wkJmPLo7t9a41W9g927eUNFn/5PuweIxi/GJ9rsw4IHaoFtvs1B4xYCS1N5PRM
+         nSjsetWk5dUP8JuFb1PAm0utNdo7hlSMrIxSAWXdE3gVkhVo7bUeqedHOCU6Z0/sCHqL
+         VVEuIBYXD6BaVYPrKY8jS6BQMMatUKYdGL4rO7aM4nB+D8eMnFIedKOhB30SluUS65ES
+         +Q6SJqJKiZR3SK9Q3pgGGMYSTmTABPMQ+2TNkJf1ZpLtqBHSkWCYDE2nhePsaxgYXxxZ
+         jvIw==
+X-Gm-Message-State: AOJu0YwkQ838w7UqqmhAEXSFAA0gFotwbhmF7r5o1LHS9cIXN9XLLIoK
+	Z+YB+ajn+hGcwIOIclYSbnkw+9tErN9JrkRBogRwIKKQG/vOGy3aQi/cAj7fcKo=
+X-Google-Smtp-Source: AGHT+IHxIBEMwg134tOeAdgqCtkp5ChdUeBxDUeQBABmYjvmfgehSTQRtZ6ESLcBEz8J40uW/d2qgw==
+X-Received: by 2002:a50:a697:0:b0:5a2:594b:be56 with SMTP id 4fb4d7f45d1cf-5ac6358f490mr1115847a12.12.1721901365834;
+        Thu, 25 Jul 2024 02:56:05 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac65783561sm637430a12.92.2024.07.25.02.56.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 02:56:05 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH net 0/2] Fix bad offload warning when sending UDP GSO from
+ a tunnel device
+Date: Thu, 25 Jul 2024 11:55:53 +0200
+Message-Id: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
- module
-To: Lucas De Marchi <lucas.demarchi@intel.com>,
- Florian Fainelli <f.fainelli@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
- UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com,
- gregkh@linuxfoundation.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, mcgrof@kernel.org, netdev@vger.kernel.org,
- woojung.huh@microchip.com, Masahiro Yamada <masahiroy@kernel.org>,
- linux-kbuild@vger.kernel.org
-References: <20240724145458.440023-1-jtornosm@redhat.com>
- <20240724161020.442958-1-jtornosm@redhat.com>
- <8a267e73-1acc-480f-a9b3-6c4517ba317a@lunn.ch>
- <v6uovbn7ld3vlym65twtcvximgudddgvvhsh6heicbprcs5ii3@nernzyc5vu3i>
- <32be761b-cebc-48e4-a36f-bbf90654df82@gmail.com>
- <ybluy4bqgow5qurzfame6kxx2sflsh5trmnlyaifrlurasid3e@73kpadpk5d3p>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <ybluy4bqgow5qurzfame6kxx2sflsh5trmnlyaifrlurasid3e@73kpadpk5d3p>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACkhomYC/x3MQQrCQAwF0KuUrA20Q4vgVcRFdX7GgGZK0opQe
+ ncHl2/zdgq4IujS7eT4aGi1huHU0eM5WwFrbqbUp7E/p4m3vHCJyiiOCBavb143M7wYk0AGzPk
+ uI7VgcYh+//mVDCvdjuMHsFiUlHEAAAA=
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+ kernel-team@cloudflare.com, 
+ syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+X-Mailer: b4 0.14.1
 
-On 7/25/24 08:50, Lucas De Marchi wrote:
-> if you are saying that the build system should automatically convert
-> this:
-> 
-> 	config USB_LAN78XX
-> 		tristate "Microchip LAN78XX Based USB Ethernet Adapters"
-> 		select MII
-> 		select PHYLIB
-> 		select MICROCHIP_PHY
-> 		select FIXED_PHY
-> 		select CRC32
-> 
-> into (for my config):
-> 
-> 	MODULE_WEAKDEP("mii");
-> 	MODULE_WEAKDEP("microchip");
-> 
-> then humn... why is CONFIG_MICREL (being added in this patch) not there?
-> It seems even if we automatically derive that information it wouldn't
-> fix the problem Jose is trying to solve.
+This series addresses a recent regression report from syzbot [1].
+Please see patch 1 description for details.
 
-I hoped that the 'weak dependency' towards mii and microchip could be 
-inferred greping for 'request_module()' in the relevant code, but 
-apparently it's not the case.
+[1] https://lore.kernel.org/all/000000000000e1609a061d5330ce@google.com/
 
-The MODULE_WEAKDEP() construct usage makes sense to me, but this patch 
-will need at least for MODULE_WEAKDEP() to land into net-next, and to 
-grasp more consensus in the phy land.
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+Jakub Sitnicki (2):
+      udp: Mark GSO packets as CHECKSUM_UNNECESSARY early on on output
+      selftests/net: Add coverage for UDP GSO with egress from tunnel
 
-Cheers,
-
-Paolo
+ net/ipv4/udp.c                        |  7 ++++++
+ net/ipv4/udp_offload.c                |  8 -------
+ net/ipv6/udp.c                        |  7 ++++++
+ tools/testing/selftests/net/udpgso.sh | 41 ++++++++++++++++++++++++++++++++---
+ 4 files changed, 52 insertions(+), 11 deletions(-)
 
 
