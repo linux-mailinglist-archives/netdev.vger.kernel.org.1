@@ -1,110 +1,84 @@
-Return-Path: <netdev+bounces-113007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61B5A93C318
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:33:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C68A93C323
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1942728247B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:33:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 973671C21127
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D79319AD73;
-	Thu, 25 Jul 2024 13:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A496F19AD73;
+	Thu, 25 Jul 2024 13:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HomBMwQd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAA3C8DF
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 13:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA94C8DF;
+	Thu, 25 Jul 2024 13:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721914434; cv=none; b=WppXc8kMghdcaQRretMdZ5VrK3OvT+dT1v9XO5M+nemq29JUfJFJaViqPSH2w/9TPlR+8mjF/Is4kW8jFfk5p7/Y2ZOvXb7s7k3dCBX1T2qx7exv+7AXI8qRvjfmiAM4L2zHQDlklpvUn+ZK3L8xz5TrTDHcDDLGqL2rGUCfJfo=
+	t=1721914740; cv=none; b=qnqam0LB+ngKGtHchc4u0Kg8XWHz7xvCcy+O5jq7d+GZrZodTemVJ5dcwANr8d9+Dn09ZN7Kr6g4T1abCckHdRfnNZ2OfWEOmPzOBqJuezFhofHq3CpSFJ1iFR7/ql6PYMZ+dAZS3nhO1wDuo7zMcCdxyC90n8abpflKgFyDcDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721914434; c=relaxed/simple;
-	bh=i+y62vTZk1PO4zViyEPNtQqAhwonNsS+hXxRE7gi3eY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=eMK6nXUgt8XYJETwHlYWyyol/YXee1w0TjwAHD3ay5qbJfKTI9NxEv9W7DSW72VsoTpFf5vcpWSD+3b0cfXLoLUtnGebRkDCjWU24A+0GVwGZRgjaf3XQTZbY2xGrWLADT6gOfehP8khSli0pF19X5+6WosR1X0UAgGT+MV+bmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-643-R2Kny4dkMOeDBT4g5lqk7Q-1; Thu,
- 25 Jul 2024 09:33:44 -0400
-X-MC-Unique: R2Kny4dkMOeDBT4g5lqk7Q-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BA7761955BED;
-	Thu, 25 Jul 2024 13:33:41 +0000 (UTC)
-Received: from hog (unknown [10.39.192.3])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4735819560AE;
-	Thu, 25 Jul 2024 13:33:39 +0000 (UTC)
-Date: Thu, 25 Jul 2024 15:33:36 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Christian Hopps <chopps@chopps.org>
-Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v5 08/17] xfrm: iptfs: add new iptfs xfrm mode
- impl
-Message-ID: <ZqJUMLVOTR812ACs@hog>
-References: <20240714202246.1573817-1-chopps@chopps.org>
- <20240714202246.1573817-9-chopps@chopps.org>
+	s=arc-20240116; t=1721914740; c=relaxed/simple;
+	bh=uVSdiMT6CHreGqJ++OAGyCpMp24oqatww/pzSiiDJNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OLlUJJ/5Utgk2rSZXE1C63EmQI5tKBKgpSZU8jg44PxEo7OnEbGZS6m1cA63DOwRoOVvYuVgTnIhySQqIjVw6HTlDo5IHbqsh8T8bWjcQYNtX2MOh15cK4ruo3mrSgrS1lgdPl+btiROLJHWp3e5aw+CxC+z0qfPImeNZ8eNcn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HomBMwQd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D55BC116B1;
+	Thu, 25 Jul 2024 13:38:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721914740;
+	bh=uVSdiMT6CHreGqJ++OAGyCpMp24oqatww/pzSiiDJNQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HomBMwQdzgpS3TLMUOocYLEafE2MSr26ytBH3GTAP9Pg5RyPimqZpXohZDY6ZHXu1
+	 cPYAG9MqoqInYFqR78mganK7FGRNtOGl+XNW+QrAUrnvN//VZLHWU0eP40x/HN/Ez2
+	 lnabVjECU3vfYsH6rTQLIqjRVwiz03v0s9WMaegtYN44at9vYnca/l4gCTfyQJ794G
+	 maqG0raJfmgjm6YqsKLEcl49UdPI/QjHnFLUys6o1p8NePsQ9pJzDrkUQ09Ez1u1JJ
+	 I3C0YJAcMqB92H8BP5ReF/N32DLs1HUpeX3V/7QLx3rve7fDY+kOAEvSWpWmLDv113
+	 otFxAEZKjY3dQ==
+Date: Thu, 25 Jul 2024 06:38:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <magnus.karlsson@intel.com>, <aleksander.lobakin@intel.com>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+ <john.fastabend@gmail.com>, <bpf@vger.kernel.org>, Shannon Nelson
+ <shannon.nelson@amd.com>, Chandan Kumar Rout <chandanx.rout@intel.com>
+Subject: Re: [PATCH net 6/8] ice: improve updating ice_{t,
+ r}x_ring::xsk_pool
+Message-ID: <20240725063858.65803c85@kernel.org>
+In-Reply-To: <ZqEieHlPdMZcPGXI@boxer>
+References: <20240708221416.625850-1-anthony.l.nguyen@intel.com>
+	<20240708221416.625850-7-anthony.l.nguyen@intel.com>
+	<20240709184524.232b9f57@kernel.org>
+	<ZqBAw0AEkieW+y4b@boxer>
+	<20240724075742.0e70de49@kernel.org>
+	<ZqEieHlPdMZcPGXI@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240714202246.1573817-9-chopps@chopps.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-2024-07-14, 16:22:36 -0400, Christian Hopps wrote:
-> +struct xfrm_iptfs_config {
-> +=09u32 pkt_size;=09    /* outer_packet_size or 0 */
+On Wed, 24 Jul 2024 17:49:12 +0200 Maciej Fijalkowski wrote:
+> > So if we are already in the af_xdp handler, and update patch sets pool
+> > to NULL - the af_xdp handler will be fine with the pool becoming NULL?
+> > I guess it may be fine, it's just quite odd to call the function called
+> > _ONCE() multiple times..  
+> 
+> Update path before NULLing pool will go through rcu grace period, stop
+> napis, disable irqs, etc. Running napi won't be exposed to nulled pool in
+> such case.
 
-Please convert this to kdoc.
-
-> +};
-> +
-> +struct xfrm_iptfs_data {
-> +=09struct xfrm_iptfs_config cfg;
-> +
-> +=09/* Ingress User Input */
-> +=09struct xfrm_state *x;=09    /* owning state */
-
-And this too.
-
-> +=09u32 payload_mtu;=09    /* max payload size */
-> +};
-
-
-> +static int iptfs_create_state(struct xfrm_state *x)
-> +{
-> +=09struct xfrm_iptfs_data *xtfs;
-> +=09int err;
-> +
-> +=09xtfs =3D kzalloc(sizeof(*xtfs), GFP_KERNEL);
-> +=09if (!xtfs)
-> +=09=09return -ENOMEM;
-> +
-> +=09err =3D __iptfs_init_state(x, xtfs);
-> +=09if (err)
-> +=09=09return err;
-
-BTW, I wrote that this was leaking xtfs in my previous review, back in
-March :/
-
---=20
-Sabrina
-
+Could you make it clearer what condition the patch is fixing, then?
+What can go wrong without this patch?
 
