@@ -1,121 +1,141 @@
-Return-Path: <netdev+bounces-112938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6364793BF41
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:45:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F37193BF63
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94E9B1C20C27
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:45:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBE5F1F22658
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A0A198A2B;
-	Thu, 25 Jul 2024 09:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106AE198A28;
+	Thu, 25 Jul 2024 09:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I3JWQSla"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQLK2DGk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2AA198A20
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84495172BD8
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721900712; cv=none; b=RX/rr8yOT4XJVLXMdaer6rPP4C2bA3T8Pbqan5sOmsQKlEqCU+wbFLdYvJySBr/pGqwIxZCr2YORoa/J6GpI2h9fhjNKL2jWmgtncLvbbFT7wkWiJ2yArQEwmtXp7Ndba4/vvu1sskqV/8a4D6efEFISJtSkXfBLktYoIrVIZwo=
+	t=1721901243; cv=none; b=mt34uzNd/9s4163UTUBp+6e6J89EGn5uyp5cuNxdmDQis+mARAPE2xZFW4HFqnCffSAFINOguS16YlxhtdmydtPc5hUHZ/0GjfcgAo260JDYMdUe1Ro4DoCqjiIdj1opxx4C2tiyx75Fr2qOfh5e6YFNRZWtVtSX+J9trBKyPNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721900712; c=relaxed/simple;
-	bh=cTGmVzxz48I8nx9ljE2V1sbWqEgzP1TM7ZccMjBT4R4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VJQhGWV8TEXRX/06OSaAobSoTKKY+gE4q6PmhIZCfbJLxAMcRNm0XaedxBHJRqlJ/xdK4q9jMWs/N6yG+Ie6pzXkh6Ztiqr6Tm2C86hRnjTNLtyaUlsOhAvTuL8fcKQo0pKXF9mBo8ZTjHO0R5jHu1BCT84WRA/QIREaAnTWmxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I3JWQSla; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5a1b073d7cdso13825a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:45:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721900709; x=1722505509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oeGMhTbFu7+/JGAR3lcMYypAKm4OWpVaWyGrv2COnm0=;
-        b=I3JWQSla3NA0zyS8Oky+F8CDbFcW+QDX5usRfG58P0Acpgq9+FGorH8nBlr4H5jUNe
-         L36o4AVd4tkuJFkheIhBDo5qyr2Sksq8xrJ9Ylgf3WuqSWYwJ9sVdwRSi9lydw+JyrfB
-         CHOSF+208Ug1Hxk2bDD6uGnLpF5caUQR6l8jMqNusrcGlZBAMpVKXkJ0/sqcn5lTTn5S
-         y2MKoNFTQeuakFj8Ujf3l2DSof7qm/yN3gp4GOPj296VdyQQ9xZ5mPN+oKMPBpKyxm2J
-         TtvicLAzTIzeZy9kAme64HNRbIXakibz2iTUhm2QoLuIL8A+XR6PdA7O24E0cxl/jw2F
-         YFYw==
+	s=arc-20240116; t=1721901243; c=relaxed/simple;
+	bh=TRogKpvrGbqxUvdw8euZYKuVBYuIo9/CTs0zy8grZV4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V+Pq3h0CvQm/HNTLtc/Uk9BSB6d4tuYVWHdIgBk7pEJ6eVzHdGjq6FJfyB8yljZMjQvtpE97F0+e4FFVFd/oRLCPfDY7kANhvahCxrCLAg7JLElZbb827jrQMBi4xKesEmqY1kYcmovlW64F6083JTftsGgcc6taF9OuYPL8D/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AQLK2DGk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721901240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Azo1YWuyIM0irZB6B+BIwEhaWJ15+/vkqjauTRjqjt8=;
+	b=AQLK2DGkWfGqc1vaUIsptF+7z9EBsrHfK85S4sO2aHnnuSgZQIOL98PWfDjnIcmxk/S+wG
+	cl1F8aHGry60K6XCfyS0zkcbxOuZf5jXAdCSLy/Pb97B3f0toKvBRBxCD5RBf+pRIrjhxS
+	I9trwIbKuHkKaR19uamMUQr+KyooO9g=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-663-dDyB6DmHP1iInhyvc9jsUA-1; Thu, 25 Jul 2024 05:53:58 -0400
+X-MC-Unique: dDyB6DmHP1iInhyvc9jsUA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-369c99e4a88so142502f8f.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:53:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721900709; x=1722505509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oeGMhTbFu7+/JGAR3lcMYypAKm4OWpVaWyGrv2COnm0=;
-        b=FR+zESO97Qkfp+47KRl76WIYKyJPwWo2IGmjmGWSTYktGz7jdn3xeOnEn0ERuYXM7r
-         7I81l3Tpv2fdxlc7n4XlLdkWJGFk689RAymwRIPZqAVRtyHf4GmNKaE3aI+iJLs10SXU
-         62BwkO4Lpj+P1mg/n+nSnqdbSRwzC5LTvSd3L2PV7pvTueVkG6xeHc9JngM4ICc8/oUS
-         yrSpBKwE+zEDNA3gR8k/sfG5ga4cYRrdbpjyuyrRjDmgXtxnRkx4yToJIH0Z5OxRgS2M
-         cyJzAI4sxdD8wC9GjDy7T/peMP/F4X5glecTwlEv7BlRQkdJUZBftUNqNlZmmzqqWkmy
-         HJqA==
-X-Forwarded-Encrypted: i=1; AJvYcCXoRhfUhpjchbdloK881Y4aHycxzGHIQJHLamlCGNojCZih2fj0/3FZjcOI51kR2bwIpj/W0+58WsBThC7WhNmBt96NYXkc
-X-Gm-Message-State: AOJu0YxctgRpkZm2RBnRAc85IiKVkI/O3+tBIC4kplI0xTYaR1jleP3r
-	W337WKtnxMZVOus3H81Fp8ugaUWw4Q/2GzIhOPk1oD5YkzqEU9PDiCZIKUAg/40Z5xFwRr6QLIG
-	W4zJF8awgwvNMupZh8Uhjkrq13l+gmQ74mVOeVE1LkA1TzpJQtw==
-X-Google-Smtp-Source: AGHT+IF5a8GLUBdMM8rC+HXTpMcIfTCzxxUZDPzAmu60Ru/iLxOnwc1GzaQyitPVfaWGH4at6uRiw5oO9e5xVJGXvsg=
-X-Received: by 2002:a05:6402:40c3:b0:58b:93:b624 with SMTP id
- 4fb4d7f45d1cf-5ac2a3d8998mr198983a12.1.1721900709071; Thu, 25 Jul 2024
- 02:45:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721901238; x=1722506038;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Azo1YWuyIM0irZB6B+BIwEhaWJ15+/vkqjauTRjqjt8=;
+        b=b+0U/tZs7FrPG6Hsjr5WSp75eX3v3u/gzmGS9i5WYOJAIckFOjSXkHOAWKXwP7hgzX
+         QiZ4MqvlfB7aFIKKyfG1DypRpBM1lchKJad3l9szd+u0cCWQhXq72uCTAYmfSyZqnJ78
+         3X5sjh2jDMTie0UCsnlgsLm4itccYgwkBo9KSJTcKEY06oYjW2NHKFGwkSWT+R5M5y3O
+         dG58vgo4sVeaG1sZn//ut/LlvsIDIPiH9pQW8yvyldr+oylRE1++zZswHMpDV4IIYYhR
+         nor5hm3czd06+ntUVOoC6T4LT/l3TeXimD4Bjl1nRg9QshRdNDz4/N9H1jkrkYgh8Ucg
+         DIWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUMfvD4HwZ7+Q8pvmh65hf3COjy8n5LkdaZAhBzTR1vB6LI7c+vC5oD8KV/4IdpG0SJziybSkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYgdOFwciCoe9LOCG5hWELJ4xYV/PSHlUIrJM4CWPogxac74wa
+	Hj67q3byBXsbzawtDYQgEelpYug25OVjLpdxNOyW1cKu6NfA4A6EFpbQniIhyD5wznpg8ovwO00
+	SJdvR04wNQT1EUQFDzTgd4epeN8em7tdX7cboyQu3Ib23eL4t1sJ1fQ==
+X-Received: by 2002:a05:600c:3c89:b0:425:6dfa:c005 with SMTP id 5b1f17b1804b1-42805440493mr7672545e9.2.1721901237836;
+        Thu, 25 Jul 2024 02:53:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFI9xUvHg0R+EO/RKq9ufzKkJZaoU8wz7XHuGLoen5hz1S74CdRTqMxjnghTCleM8tL0hE06w==
+X-Received: by 2002:a05:600c:3c89:b0:425:6dfa:c005 with SMTP id 5b1f17b1804b1-42805440493mr7672425e9.2.1721901237386;
+        Thu, 25 Jul 2024 02:53:57 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427f941352asm67749725e9.41.2024.07.25.02.53.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jul 2024 02:53:56 -0700 (PDT)
+Message-ID: <d3d97260-f840-4ea8-b964-64e36448bf96@redhat.com>
+Date: Thu, 25 Jul 2024 11:53:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240724135622.1797145-1-syoshida@redhat.com>
-In-Reply-To: <20240724135622.1797145-1-syoshida@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Jul 2024 11:44:56 +0200
-Message-ID: <CANn89iKOWNa28NkQhhey=U_9NgOaymRvzuewb_1=vJ65HX1VgQ@mail.gmail.com>
-Subject: Re: [PATCH net] macvlan: Return error on register_netdevice_notifier()
- failure
-To: Shigeru Yoshida <syoshida@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
+ module
+To: Lucas De Marchi <lucas.demarchi@intel.com>,
+ Florian Fainelli <f.fainelli@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+ Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+ UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com,
+ gregkh@linuxfoundation.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, mcgrof@kernel.org, netdev@vger.kernel.org,
+ woojung.huh@microchip.com, Masahiro Yamada <masahiroy@kernel.org>,
+ linux-kbuild@vger.kernel.org
+References: <20240724145458.440023-1-jtornosm@redhat.com>
+ <20240724161020.442958-1-jtornosm@redhat.com>
+ <8a267e73-1acc-480f-a9b3-6c4517ba317a@lunn.ch>
+ <v6uovbn7ld3vlym65twtcvximgudddgvvhsh6heicbprcs5ii3@nernzyc5vu3i>
+ <32be761b-cebc-48e4-a36f-bbf90654df82@gmail.com>
+ <ybluy4bqgow5qurzfame6kxx2sflsh5trmnlyaifrlurasid3e@73kpadpk5d3p>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ybluy4bqgow5qurzfame6kxx2sflsh5trmnlyaifrlurasid3e@73kpadpk5d3p>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 24, 2024 at 3:56=E2=80=AFPM Shigeru Yoshida <syoshida@redhat.co=
-m> wrote:
->
-> register_netdevice_notifier() may fail, but macvlan_init_module() does
-> not handle the failure.  Handle the failure by returning an error.
+On 7/25/24 08:50, Lucas De Marchi wrote:
+> if you are saying that the build system should automatically convert
+> this:
+> 
+> 	config USB_LAN78XX
+> 		tristate "Microchip LAN78XX Based USB Ethernet Adapters"
+> 		select MII
+> 		select PHYLIB
+> 		select MICROCHIP_PHY
+> 		select FIXED_PHY
+> 		select CRC32
+> 
+> into (for my config):
+> 
+> 	MODULE_WEAKDEP("mii");
+> 	MODULE_WEAKDEP("microchip");
+> 
+> then humn... why is CONFIG_MICREL (being added in this patch) not there?
+> It seems even if we automatically derive that information it wouldn't
+> fix the problem Jose is trying to solve.
 
-How could this fail exactly ? Please provide details, because I do not
-think it can.
+I hoped that the 'weak dependency' towards mii and microchip could be 
+inferred greping for 'request_module()' in the relevant code, but 
+apparently it's not the case.
 
->
-> Fixes: b863ceb7ddce ("[NET]: Add macvlan driver")
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> ---
->  drivers/net/macvlan.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
-> index 24298a33e0e9..ae2f1a8325a5 100644
-> --- a/drivers/net/macvlan.c
-> +++ b/drivers/net/macvlan.c
-> @@ -1849,7 +1849,9 @@ static int __init macvlan_init_module(void)
->  {
->         int err;
->
-> -       register_netdevice_notifier(&macvlan_notifier_block);
-> +       err =3D register_netdevice_notifier(&macvlan_notifier_block);
-> +       if (err < 0)
-> +               return err;
->
->         err =3D macvlan_link_register(&macvlan_link_ops);
->         if (err < 0)
-> --
-> 2.45.2
->
+The MODULE_WEAKDEP() construct usage makes sense to me, but this patch 
+will need at least for MODULE_WEAKDEP() to land into net-next, and to 
+grasp more consensus in the phy land.
+
+Cheers,
+
+Paolo
+
 
