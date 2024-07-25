@@ -1,98 +1,112 @@
-Return-Path: <netdev+bounces-113072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB32093C943
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:01:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95AFA93C953
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85405282C3F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:01:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 498F21F21D03
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D8B4779D;
-	Thu, 25 Jul 2024 20:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B51A770E2;
+	Thu, 25 Jul 2024 20:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QLZZI2pi"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="PJ8T1cIr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3C93A8C0;
-	Thu, 25 Jul 2024 20:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7402074C14;
+	Thu, 25 Jul 2024 20:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721937708; cv=none; b=KaDI6OnlAWyjzaHogHMIiaeNv82vOiB4uovszmLGkH1A4B0DEf/4zH19EuLDAnjxRfNmk68h90jwK4To4rHaXghhyftywzgV2uePN0WWthGQkfsr4RhzCOhVKvtUQKPNpp5O+7lkr6S3ShtE+P7cgRPim2k0BfvH1Zz0MTmO5g4=
+	t=1721938046; cv=none; b=AS9nrioezgsvaVqQ8Olca9OP5my8SV/hNHEWMCXhDrUl2maxdGvI0kVCpWRlmZTr33TFrvcBM8TCevi15cRQu9HFvlDXYqtJNlv/o4XnhV1Ej7EXPT6s/Bau92MM5OIns7cWrqBr8cf+DrRivSvZg3kNiKYBPNhNJmOmGEMB1hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721937708; c=relaxed/simple;
-	bh=S4YLwFo1Xpgy87t4jbnIqhIKlr97surhtYd896uaa58=;
+	s=arc-20240116; t=1721938046; c=relaxed/simple;
+	bh=35dVAUVjA+Qv/ORD37Iu0sEtS6k6TBUJehX9nFWZ6/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TSbaMFFz/GW31PZkY63b3iPRZzPz+Ve6MAl7WFkBnESgAlNAE6HO1kLf1+2PLamzbCHkqfHRKdM96kya+Rpm49FP1oEybmpxSco2v1eoDlhaSCp+qkwLXK3Eapb96M3E0SWKnR/3dSwckFjNAjey51YAdYIFthQ2KsQa2HDmGOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QLZZI2pi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97F6C116B1;
-	Thu, 25 Jul 2024 20:01:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721937707;
-	bh=S4YLwFo1Xpgy87t4jbnIqhIKlr97surhtYd896uaa58=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=smxsRA12d7SlsXU0ge2CIMLQI8ZDVM6s5fu1OGlioi/cFsABP2hy6LV0KASMzFhb/i3FYpzZjAmaqXyerzGTqPfZoHR9FtuZLYUfQbrLSAmU+EqFHBzK1X+SkYSn/EIWdodUQ+qZJUudL9DOE7If+/WUomc37a49iI+2Due55jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=PJ8T1cIr; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (85-76-73-91-nat.elisa-mobile.fi [85.76.73.91])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id CF211471;
+	Thu, 25 Jul 2024 22:06:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1721937999;
+	bh=35dVAUVjA+Qv/ORD37Iu0sEtS6k6TBUJehX9nFWZ6/Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QLZZI2piJPIqEMQuKsNePfgr4JUPfDbd1AwZ9NczBgensSqv8Hi1ySY66XcD1v+9h
-	 et08zFPQH3+pjRRTDnT4pMkTrhqBZXh0rMFZzFeIaV16jMPuXs64wsdgERDy0aDBEf
-	 cqJXWrqRZOYV+UG4SlFaTBNq5IxJQJDn+3oe4zqXJ/quNKidrqb8xLWisw2uxFDVOj
-	 Rk0o+of3xG29/XIwiKVDpHwb9Y+f6ifLGgOERopK2yQgenANw+ltJphdD1qtkuPuIy
-	 HiWdtJk9xo6xQmD3xCrW+VGU8fl9x4kL3Ij49XstPWeHLr0ELKHjkFlrLOi4Jghj3D
-	 9hOycJlK/JUdg==
-Date: Thu, 25 Jul 2024 21:01:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mark Mentovai <mark@mentovai.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Jonas Gorski <jonas.gorski@gmail.com>,
-	Russell Senior <russell@personaltelco.net>,
-	=?utf-8?B?TMOzcsOhbmQgSG9ydsOhdGg=?= <lorand.horvath82@gmail.com>,
-	Mieczyslaw Nalewaj <namiltd@yahoo.com>,
-	Shiji Yang <yangshiji66@outlook.com>
-Subject: Re: [PATCH] net: phy: realtek: add support for RTL8366S Gigabit PHY
-Message-ID: <20240725200143.GM97837@kernel.org>
-References: <20240725170519.43401-1-mark@mentovai.com>
+	b=PJ8T1cIr8cfp4APgPK76+TxiIfJHAGV0ympS3DUmGOF76UcC4/MsoaWlyGPbycpQg
+	 nnG/siG3qmmSMqstIQl74omn9gldYRgh8JjVKMr6yDl2lOixQyRBGBaLKmVlzqrtRO
+	 6u7EWTlEfVL9YI9tR+pcs3k4fO4len0OORZg1p5Q=
+Date: Thu, 25 Jul 2024 23:07:03 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240725200703.GG14252@pendragon.ideasonboard.com>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+ <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com>
+ <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+ <20240725193125.GD14252@pendragon.ideasonboard.com>
+ <20240725194314.GS3371438@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240725170519.43401-1-mark@mentovai.com>
+In-Reply-To: <20240725194314.GS3371438@nvidia.com>
 
-On Thu, Jul 25, 2024 at 01:05:19PM -0400, Mark Mentovai wrote:
-> The PHY built in to the Realtek RTL8366S switch controller was
-> previously supported by genphy_driver. This PHY does not implement MMD
-> operations. Since 9b01c885be36 (2023-02-13, in 6.3), MMD register reads
-> have been made during phy_probe to determine EEE support. For
-> genphy_driver, these reads are transformed into 802.3 annex 22D clause
-> 45-over-clause 22 mmd_phy_indirect operations that perform MII register
-> writes to MII_MMD_CTRL and MII_MMD_DATA. This overwrites those two MII
-> registers, which on this PHY are reserved and have another function,
-> rendering the PHY unusable while so configured.
+Hi Jason,
+
+On Thu, Jul 25, 2024 at 04:43:14PM -0300, Jason Gunthorpe wrote:
+> On Thu, Jul 25, 2024 at 10:31:25PM +0300, Laurent Pinchart wrote:
 > 
-> Proper support for this PHY is restored by providing a phy_driver that
-> declares MMD operations as unsupported by using the helper functions
-> provided for that purpose, while remaining otherwise identical to
-> genphy_driver.
+> > I don't think those are necessarily relevant examples, as far as device
+> > pass-through goes. Vendors have many times reverted to proprietary ways,
+> > and they still do, at least in the areas of the kernel I'm most active
+> > in. I've seen first hand a large SoC vendor very close to opening a
+> > significant part of their camera stack and changing their mind at the
+> > last minute when they heard they could possibly merge their code through
+> > a different subsystem with a pass-through blank cheque.
 > 
-> Fixes: 9b01c885be36 ("net: phy: c22: migrate to genphy_c45_write_eee_adv()")
-> Fixes: https://github.com/openwrt/openwrt/issues/15981
+> If someone came with a fully open source framework for (say) some
+> camera,
 
-nit: AFAIK, the line immediately above is not a correct use of the Fixes
-     tag. I think Link or Closes would be appropriate instead.
+We have such a framework, it's called libcamera :-) Multiple vendors are
+already collaborating.
 
-> Link: https://github.com/openwrt/openwrt/issues/15739
-> Reported-by: Russell Senior <russell@personaltelco.net>
-> Signed-off-by: Mark Mentovai <mark@mentovai.com>
+> with a passthrough kernel driver design, would you reject it
+> soley because it is passthrough based and you are scared that
+> something else will use it to do something not open source?
 
-Also, as a fix, this should be targeted at the net tree.
+It depends what "passthrough kernel driver design" means. If it means
+accessing the PCI registers directly from userspace, yes. That's what X
+used to do before KMS, and I'm glad it's now a distant past.
 
-	Subject: [PATCH net] ...
+If it means a kernel driver that takes the majority of its runtime
+parameters from a buffer blob assembled by userspace, while controlling
+clocks, power domains and performing basic validation in kernelspace,
+then I've already acked multiple drivers with such a design, exactly
+because they have open-source userspace that doesn't try to keep many
+device features proprietary and usable by closed-source userspace only.
 
-Please see https://docs.kernel.org/process/maintainer-netdev.html
+> I wouldn't agree with that position, I think denying users useful open
+> source solutions out of fear is not what Linux should be doing.
+
+-- 
+Regards,
+
+Laurent Pinchart
 
