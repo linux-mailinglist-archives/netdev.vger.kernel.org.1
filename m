@@ -1,207 +1,131 @@
-Return-Path: <netdev+bounces-113123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C3293CAEB
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 00:39:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319D193CAFC
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 01:04:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E30E1F2239D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:39:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 565AC1C20F34
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2745143738;
-	Thu, 25 Jul 2024 22:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A734E13E05F;
+	Thu, 25 Jul 2024 23:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tf1gK9Y4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zz5xsFLt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2653B7347D
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 22:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0022C131E38
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 23:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721947149; cv=none; b=lzwhwyVk1irNDBCquWRZRU0bFuV7pg+ZNYaIZuFC9Lpdzlw8TI+gSZoKRypYYyJQ68Tbm1a9pZfRqFcMLlT7XkKVkse+hrtEPgHua+RS4xl0GM6/YD0pjLg+h6BLPwsjbsFYYb8KZ8kYOT7zq2AgE2T1h4b1Hx7igNp9skMyhxE=
+	t=1721948650; cv=none; b=SWiz0fr5YMqstxRmrGAKuZrnEsaOqYKp5GGzc8EXVq99ST2cwu3vinwk2lLEAbXYFOYJ954uESNfAxJPOsJQm+NLtkfK1D2G80iROMMTjMAJGg/mnbwHAVwA1ZT1+Z8OCNVAYr8Bun/f5XzV4qp9q+uk1uYoweI2eV5ySlh+p1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721947149; c=relaxed/simple;
-	bh=G//iJSa3IhesNuYZbOgBau1tJTw5yhxL21uNzhIuLdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ul6VK40jpGOIuutdwjmzXN8ptN5cuSwFCSFLX1lpH31cZjBEsEqqUTdc+bHkKy3whTC0E8U/9uwiH6GNVvWlkKZ5mvny55D2cYwgMxiG/bXi8OyXm9Qbw97tiD0r5pVm1+rAju+DCtc84UfclJrHSvU/Awwjlam7VDMhQOiAmIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tf1gK9Y4; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <47a1dae1-7196-4991-b008-b50fb92fd5c3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1721947144;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b+WsqTy3XWxKBCiHHYlMYNaBdSeO0PURDUUK4R0AMuU=;
-	b=tf1gK9Y4B9Slb0WfyaJ7+WBrTo2CF8R28YQJwrxjuOcnF+CdhAYqwzvciAugkmglkrOO6l
-	xH3/xMF1nNGku5262Xd51HlZRTKwLX4/lkrsAQdlYgm4NQ5LlX38vJcs/HprhMhxaThdXw
-	uPGfV39OaVq0QT20+AE635YsVoVPMpU=
-Date: Thu, 25 Jul 2024 15:38:54 -0700
+	s=arc-20240116; t=1721948650; c=relaxed/simple;
+	bh=DTCe8q/PokuRY2SzyaMN/o9jKKAuVjNiJbnHDqlsgAg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=GxYHkNnBjZ/A3+b9SyJzSlI2oyC+Q3hvAgShhGbd7sFSyeaV3oP29Iqk6y1lre5c19ZVDEYv9GausNOw/heQ+ne6jIAGoBqzQYG9dNt12aPKpvQn4K3AjgJbOSier7KwQR3IyA8nhGGNLQypkcXN37LY4kJUtvhxHi9dasBUZnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zz5xsFLt; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3687fd09251so856464f8f.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 16:04:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721948647; x=1722553447; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DTCe8q/PokuRY2SzyaMN/o9jKKAuVjNiJbnHDqlsgAg=;
+        b=Zz5xsFLtWZ7mbB9pYaGr5fkOWCuwo4tfVA2sCwUniLLyQBIqDMZvOtfYF9BwVYyKLc
+         B4IyjquRQkns5chlkv0gipn0MzaYVfrLg17fUbLFGTDhjogaC19VKuGV14lV1sZOwPPV
+         ZvJXalS5HBY1ofZlqGIY5phvODjAbkz5VMauGOViyInCBzvRI3UjsTyjlEPdZtDgMZMi
+         F0NuPskLc2NwvsAgIqdZO1L7qLF1XkkgDtgXcHB44LWO9+H3/AcjFZHUiCbLKE5YbfqV
+         tgNCB7hwFIozzJFgdSqh/0rg+4xFHCmNTq6mMo58Gu6s4q1yBKRQr68I0jWoO0s6FsjT
+         2wMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721948647; x=1722553447;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DTCe8q/PokuRY2SzyaMN/o9jKKAuVjNiJbnHDqlsgAg=;
+        b=MdsClcSIbIgPv3Ov3WzZTlegZVRj9IlWEGgqMLZOvrw2ZqN2nHG8ZwoRF0Ke+mL/S+
+         LB/T6cmQcYNk8bIIA+NsfsifFTnyGvD0SD8gaPmiR0gUc8bXW1lS79dcJ9+csOPrDuvw
+         3QHQnQ52AMQup4b9CGgteBnHQxxFoxLFbpdFtfjo94JGQtPHje0fUV4IPDNaq0WFcgSo
+         qTbI6T7UUjP2KmJP68rfdDr5ByccoSsXwi256K+FNsA09zBBlTcGlEmGE45booN8I8bK
+         PQtTRF/rC9IdRL9BVqvhxpb8bSNKyKiwJCP3xL1LX5V/TGNZEUV08zrnvnBWGCK+ujn0
+         xHxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBUzvOBN4N0ESWpo58x5SxtQ5LrcBq7ODDfqJSRc7YS14GGIs8GEvTyNXTdRZvwsyYFanRbGqV+usNXhfDsWjwt5ylgmn4
+X-Gm-Message-State: AOJu0YyPPRataQscQsC8BtVfbqcR1Xg/BJANg2C6jLyFIG+hLJVcXyAu
+	vClx+DfB2dLn7DcZl8zk0DkKvzydmYr9Lx4kzJnpWCnk0N+sCmMixNkOlX2Mi6tNDDNstXFaAyP
+	cOcYzpg0M1+Ch5GKyzm6h0EtSVPs=
+X-Google-Smtp-Source: AGHT+IHWKWck4AliTIgUSUdzSblOwLylYiSNaS8BloNvXR1lY44iqGlBM4c90Mwhl+niO4AAV6j3uQXEvMKRmpEjVwg=
+X-Received: by 2002:adf:fa06:0:b0:367:9088:fecd with SMTP id
+ ffacd0b85a97d-36b3637ef57mr2311202f8f.7.1721948646938; Thu, 25 Jul 2024
+ 16:04:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v9 06/11] bpf: net_sched: Add bpf qdisc kfuncs
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn,
- daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com,
- martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
- jhs@mojatatu.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- yepeilin.cs@gmail.com
-References: <20240714175130.4051012-1-amery.hung@bytedance.com>
- <20240714175130.4051012-7-amery.hung@bytedance.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240714175130.4051012-7-amery.hung@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <172192698293.1903337.4255690118685300353.stgit@ahduyck-xeon-server.home.arpa>
+ <ZqKIvuKvbsucyd2m@LQ3V64L9R2>
+In-Reply-To: <ZqKIvuKvbsucyd2m@LQ3V64L9R2>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 25 Jul 2024 16:03:30 -0700
+Message-ID: <CAKgT0UdyHu3jT1qutVjuGRx97OSf+YGMuniuc2v6zeOvBJDsYA@mail.gmail.com>
+Subject: Re: [net PATCH] fbnic: Change kconfig prompt from S390=n to !S390
+To: Joe Damato <jdamato@fastly.com>, Alexander Duyck <alexander.duyck@gmail.com>, 
+	netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net, 
+	pabeni@redhat.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/14/24 10:51 AM, Amery Hung wrote:
-> Add kfuncs for working on skb in qdisc.
-> 
-> Both bpf_qdisc_skb_drop() and bpf_skb_release() can be used to release
-> a reference to an skb. However, bpf_qdisc_skb_drop() can only be called
-> in .enqueue where a to_free skb list is available from kernel to defer
+On Thu, Jul 25, 2024 at 10:17=E2=80=AFAM Joe Damato <jdamato@fastly.com> wr=
+ote:
+>
+> On Thu, Jul 25, 2024 at 10:03:54AM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexanderduyck@fb.com>
+> >
+> > In testing the recent kernel I found that the fbnic driver couldn't be
+> > enabled on x86_64 builds. A bit of digging showed that the fbnic driver=
+ was
+> > the only one to check for S390 to be n, all others had checked for !S39=
+0.
+> > Since it is a boolean and not a tristate I am not sure it will be N. So
+> > just update it to use the !S390 flag.
+> >
+> > A quick check via "make menuconfig" verified that after making this cha=
+nge
+> > there was an option to select the fbnic driver.
+> >
+> > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+>
+> [...]
+>
+> This seems fine to me (and matches other drivers as you mentioned),
+> but does it need:
+>
+> Fixes 0e03c643dc93 ("eth: fbnic: fix s390 build.")
+>
+> for it be applied to net?
+>
+> In either case:
+>
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
 
-Enforcing the bpf_qdisc_skb_drop() kfunc only available to the ".enqueue" is 
-achieved by the  "struct bpf_sk_buff_ptr" pointer type only available to the 
-".enqueue" ops ?
+I will add it and resubmit if/when the patch is dropped from the
+patchwork queue.
 
-> the release. Otherwise, bpf_skb_release() should be used elsewhere. It
-> is also used in bpf_obj_free_fields() when cleaning up skb in maps and
-> collections.
-> 
-> bpf_qdisc_schedule() can be used to schedule the execution of the qdisc.
-> An example use case is to throttle a qdisc if the time to dequeue the
-> next packet is known.
-> 
-> bpf_skb_get_hash() returns the flow hash of an skb, which can be used
-> to build flow-based queueing algorithms.
-> 
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> ---
->   net/sched/bpf_qdisc.c | 74 ++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 73 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-> index a68fc115d8f8..eff7559aa346 100644
-> --- a/net/sched/bpf_qdisc.c
-> +++ b/net/sched/bpf_qdisc.c
-> @@ -148,6 +148,64 @@ static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
->   	return 0;
->   }
->   
-> +__bpf_kfunc_start_defs();
-> +
-> +/* bpf_skb_get_hash - Get the flow hash of an skb.
-> + * @skb: The skb to get the flow hash from.
-> + */
-> +__bpf_kfunc u32 bpf_skb_get_hash(struct sk_buff *skb)
-> +{
-> +	return skb_get_hash(skb);
-> +}
-> +
-> +/* bpf_skb_release - Release an skb reference acquired on an skb immediately.
-> + * @skb: The skb on which a reference is being released.
-> + */
-> +__bpf_kfunc void bpf_skb_release(struct sk_buff *skb)
-> +{
-> +	consume_skb(skb);
+It has been a while since I submitted anything to the net queue and
+previously I don't recall needing to bother with that unless it
+required backports to stable kernels which then also required Ccing
+stable.
 
-snippet from the comment of consume_skb():
+Thanks,
 
-  *      Functions identically to kfree_skb, but kfree_skb assumes that the frame
-  *      is being dropped after a failure and notes that
-
-consume_skb() has a different tracepoint from the kfree_skb also. It is better 
-not to confuse the tracing.
-
-I think at least the Qdisc_ops.reset and the btf_id_dtor_kfunc don't fall into 
-the consume_skb(). May be useful to add the kfree_skb[_reason?]() kfunc also?
-
-> +}
-> +
-> +/* bpf_qdisc_skb_drop - Add an skb to be dropped later to a list.
-> + * @skb: The skb on which a reference is being released and dropped.
-> + * @to_free_list: The list of skbs to be dropped.
-> + */
-> +__bpf_kfunc void bpf_qdisc_skb_drop(struct sk_buff *skb,
-> +				    struct bpf_sk_buff_ptr *to_free_list)
-> +{
-> +	__qdisc_drop(skb, (struct sk_buff **)to_free_list);
-> +}
-> +
-> +/* bpf_qdisc_watchdog_schedule - Schedule a qdisc to a later time using a timer.
-> + * @sch: The qdisc to be scheduled.
-> + * @expire: The expiry time of the timer.
-> + * @delta_ns: The slack range of the timer.
-> + */
-> +__bpf_kfunc void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 expire, u64 delta_ns)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +
-> +	qdisc_watchdog_schedule_range_ns(&q->watchdog, expire, delta_ns);
-> +}
-> +
-> +__bpf_kfunc_end_defs();
-> +
-> +BTF_KFUNCS_START(bpf_qdisc_kfunc_ids)
-> +BTF_ID_FLAGS(func, bpf_skb_get_hash)
-
-Add KF_TRUSTED_ARGS. Avoid cases like getting a skb from walking the skb->next 
-for now.
-
-> +BTF_ID_FLAGS(func, bpf_skb_release, KF_RELEASE)
-> +BTF_ID_FLAGS(func, bpf_qdisc_skb_drop, KF_RELEASE)
-> +BTF_ID_FLAGS(func, bpf_qdisc_watchdog_schedule)
-
-Also add KF_TRUSTED_ARGS here.
-
-> +BTF_KFUNCS_END(bpf_qdisc_kfunc_ids)
-> +
-> +static const struct btf_kfunc_id_set bpf_qdisc_kfunc_set = {
-> +	.owner = THIS_MODULE,
-> +	.set   = &bpf_qdisc_kfunc_ids,
-> +};
-> +
-> +BTF_ID_LIST(skb_kfunc_dtor_ids)
-> +BTF_ID(struct, sk_buff)
-> +BTF_ID_FLAGS(func, bpf_skb_release, KF_RELEASE)
-> +
->   static const struct bpf_verifier_ops bpf_qdisc_verifier_ops = {
->   	.get_func_proto		= bpf_qdisc_get_func_proto,
->   	.is_valid_access	= bpf_qdisc_is_valid_access,
-> @@ -347,6 +405,20 @@ static struct bpf_struct_ops bpf_Qdisc_ops = {
->   
->   static int __init bpf_qdisc_kfunc_init(void)
->   {
-> -	return register_bpf_struct_ops(&bpf_Qdisc_ops, Qdisc_ops);
-> +	int ret;
-> +	const struct btf_id_dtor_kfunc skb_kfunc_dtors[] = {
-> +		{
-> +			.btf_id       = skb_kfunc_dtor_ids[0],
-> +			.kfunc_btf_id = skb_kfunc_dtor_ids[1]
-> +		},
-> +	};
-> +
-> +	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_qdisc_kfunc_set);
-> +	ret = ret ?: register_btf_id_dtor_kfuncs(skb_kfunc_dtors,
-> +						 ARRAY_SIZE(skb_kfunc_dtors),
-> +						 THIS_MODULE);
-> +	ret = ret ?: register_bpf_struct_ops(&bpf_Qdisc_ops, Qdisc_ops);
-> +
-> +	return ret;
->   }
->   late_initcall(bpf_qdisc_kfunc_init);
-
+- Alex
 
