@@ -1,159 +1,195 @@
-Return-Path: <netdev+bounces-112926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF8893BF04
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:25:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA07593BF15
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4525B282395
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:25:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 890EFB22029
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30DA16DC00;
-	Thu, 25 Jul 2024 09:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA8619755A;
+	Thu, 25 Jul 2024 09:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGeFiqhV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192C113A414
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F4116C690;
+	Thu, 25 Jul 2024 09:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721899525; cv=none; b=BsK+Mf5e45U6PEVGshJnYH9hwnvrneMBfr+EYNz1MUCuk9jCB0vXlGZ5Lb+y5at2Ko7essSARnLc8h4XoQjvLWMXCDK4WMhiLbCKc/TGDdM6DZp2cmQ1CUfojNJOZguwmfecS6GN9r/T12pSStHQxsj6zBXuGtbFid6xQXRHgEI=
+	t=1721899618; cv=none; b=noqy2x+klKuz8DMZz3uRUCaaEWr7uFWdIAtROsbcdklDkbAft6+1ya4hdIFCt+Ogurh2j9P6cZOs9/eoepMrtjxX8GFkwxL0YfaTnlIoWauwtHI1vQp4E3SS7rXEqNYtIXS6guiP7lm2sC2HuVEyro/qPeO/lp7X8F9xR4MRLIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721899525; c=relaxed/simple;
-	bh=7+pTOH70jbWhWoxBAjAx7SkOLjGys8ogsCmYQxJKZic=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=e0r0DmwT8iEZmUabfhGXymGsTtXGb+uH3C/T8xEXrzj7fBB+Kd1Jsp0bgP00hKFW8JO5buQZGdfK78FC3gq/P/z94MM3ZCd6dTuXv81EhS4AWS9raVLmNC98XrGBckGa8H0FQQzjG+Lz8PQFhyLfBdosjApocusvTcRSZ9h3tzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81f7fb0103fso49297039f.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 02:25:23 -0700 (PDT)
+	s=arc-20240116; t=1721899618; c=relaxed/simple;
+	bh=GxfeIqEMhSlZx5VfQdJ/o64sqUdkOvLZVRFcbIn5WlU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aWCAIqkfk5S1nQyyhesa34OsjDr4M6cDVO60HTD8iP0ij1s5T2b9ej5p/XMWs1VFEPD5VqsXXogQ67n62Py/77r01VNpfTHtPNDi2LYItpc0mROSbtbr96tUrQgmmlrLmWtO+8Tvx0q56vfnjSU7Q4e58MInR6pphKGOAslNxfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGeFiqhV; arc=none smtp.client-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-4f6b7250d6dso298396e0c.0;
+        Thu, 25 Jul 2024 02:26:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721899616; x=1722504416; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GxfeIqEMhSlZx5VfQdJ/o64sqUdkOvLZVRFcbIn5WlU=;
+        b=QGeFiqhVN/cqIDa8QlUXkQ1LryQ81aFltyuaA5eAKCe4mEDA/VCWfFtsKOI8KHPAqk
+         8o5rozg2ZDhAbMdLWLW4+Nfa3lXAvVsvT2HrT7M8tYXEsxVGpITCWzNr0yMex9ngUMB+
+         nSRq0kVzMbMATFWVx4WP968WkW4JFBZxtURG/hED4T8ZunNVd1+HW3L/2fEtEniTglAK
+         XWLElVlhTw/bWt5nou6+09qS1RG/P49ugqy3xI7k/uQVMLLXkS4xkbp5f28yf9QxbY8s
+         FyS1PzBoJC0PlDAmYaVMQEVzzXP+6yq2F6eHP7h9eJ3NEHB5WRCmhwZsFueImgD1omAi
+         Yw3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721899523; x=1722504323;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LjodSsB9JtA/9m/UKEOeRSgXZ/EYlSu/L2hWiwbPn6Y=;
-        b=atVeChVHVBaP+j92CdC9+E8tBB7PPQP1poO7BhmMfEQqiTCIv5He+tCtwbIntDmy2V
-         41b84CPc3qeKYPZT5ffNbSmFNZF8/XKd6B/6DG7fywK/p9XH7YDakg0f+F6mq9pVvbs5
-         dJQOQ+KWk3yNV7xTUXWiDPL1Dw4iMa1JNQ1P+8uFXwWxrDx7AKUUKFgvOLX9v6x1Cfmf
-         S4witdKvqEhHNkqwz723EI20PwJQWkUqPBC6GiSmlZAeemWGv0Wy0OZgbT2tltfW3Uhm
-         udX7ybahJfmjhfv96you8znqVbxz5gA2n8tkacuZFTqlzFSjFHdbLDu2cVTzXf5dv+c3
-         lK2A==
-X-Forwarded-Encrypted: i=1; AJvYcCVyc4sLHU4LDm+DyBIqPUx5NxbzvoEBK2IPvqpUPa9n7mOrNI6uk3S6R0obno7l7vZrajiMVoP1qaypJoHVTS4Y+W3K93A4
-X-Gm-Message-State: AOJu0YyojmL/zehb31Lzsx+DNxg1XeXVyY+VLqClkQx97mqpHpGJYlr7
-	/1wptliCE2UwLEiBd61yTrSQtmiKzej5KY0NhL2YVkfQSKdYBJJjafIMk4mev1elrJyZyRcSCeb
-	WpuYYkq4idWMC07ZxwyWuZi4ZslOOP1iWjRTP0naOHCnyeF7xQZEf8yI=
-X-Google-Smtp-Source: AGHT+IHNZo0QRqKrtwAT4xad4uFv0IYOpncHq78GT7NoGFn/TRNjsDl6ZnR41uLR+vRJBXDevK8zogWqkZXJbmkTXJX7TYwOk3ox
+        d=1e100.net; s=20230601; t=1721899616; x=1722504416;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GxfeIqEMhSlZx5VfQdJ/o64sqUdkOvLZVRFcbIn5WlU=;
+        b=oC+4WP72Hu+i+WDr0MNSeZO6EjY/oM3q29x4YS/GgWC9N+sKULsWtEse2Rss63YCnI
+         htSG7D2qL8RCIaquH4e2MewEmnhckDNso3YJdHeZkDRN2ePdeoBL3jT9kLe+be2i3xmD
+         RLSPs2Dj1jMvjhk/lY1yaz/ezCU4GrIW+uQf/tHIKfWFKEAZw+KrTG4hxDigRoFQ7e25
+         4B5vzTpGTjIcNvkFqLsdr/PUsQpChHpsAS0bu2n9HlF7ZJOztqBx5eYy1teXRVVRmDqg
+         QyscosXmKxEdy7Yczr3MLw7XWjBdDw3tFT+8HFKjZLuk8YoYVcY7vmgF8qpn2Qmhf9MB
+         /QfA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPEPUm23/bXcK/ckRGs4IDiVW056EWpmMpiJbIUqzeVa4eWnbcZUUXHoaTGgrLTpobXVBQ3I0hsZeBffKAJh/TvqBN6ZaeQqqeJSF+hErNX5zL3yJ2kmvJ/Oj4OeNesRxTuWe4laJHcikzCFHrNSmjAhVzykUtB/napBHwHA==
+X-Gm-Message-State: AOJu0YzsOYwngl2mrEdKOr8yTLswVSPpmJFMX5kLrYl1tnZa/2LI6eQl
+	6CwzXKGsNjFsBU0viZA2mN9u8N3T7WgX7AaLPH1H2ttxuZrF1sQrOEgjyB8c4yb/0PDrGDxhoBM
+	1mCKjN/te7EY7FeqLcy96ER+Famg=
+X-Google-Smtp-Source: AGHT+IGbHyep8xJMWEks+3bmG2i9KzcJWzZdjHeXmEmYSyDNJX/F+ls2Zg1ZbMJP/MznJjE1fg7/QYQz9ZGxRYkjnbg=
+X-Received: by 2002:a05:6102:5709:b0:492:ad30:b6e8 with SMTP id
+ ada2fe7eead31-493d9a83cc7mr1593183137.3.1721899615871; Thu, 25 Jul 2024
+ 02:26:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cc0f:0:b0:380:e1e4:4ba3 with SMTP id
- e9e14a558f8ab-39a1a7cc450mr1102225ab.2.1721899523301; Thu, 25 Jul 2024
- 02:25:23 -0700 (PDT)
-Date: Thu, 25 Jul 2024 02:25:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006cf49f061e0ef955@google.com>
-Subject: [syzbot] [net?] KMSAN: uninit-value in tcf_ct_flow_table_get
-From: syzbot <syzbot+1b5e4e187cc586d05ea0@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	xiyou.wangcong@gmail.com
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm> <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com>
+In-Reply-To: <20240724200012.GA23293@pendragon.ideasonboard.com>
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Thu, 25 Jul 2024 11:26:38 +0200
+Message-ID: <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>, Jiri Kosina <jikos@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev, 
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	jgg@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Jul 24, 2024 at 10:02=E2=80=AFPM Laurent Pinchart
+<laurent.pinchart@ideasonboard.com> wrote:
 
-syzbot found the following issue on:
+>
+> While "userspace drivers" often cause allergic reactions, I think I
+> won't cause a controversy if I say that we are all used to them in
+> certain areas. My heart rate will increase if someone proposes replacing
+> a USB webcam driver with a libusb-based solution, but I don't lose sleep
+> over the fact that my GPU is mostly controlled by code in Mesa.
 
-HEAD commit:    2c9b3512402e Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=11d643fd980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6bfb33a8ad10458f
-dashboard link: https://syzkaller.appspot.com/bug?extid=1b5e4e187cc586d05ea0
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17495ec3980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=126076b5980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f8543636ba6c/disk-2c9b3512.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/403c612b7ac5/vmlinux-2c9b3512.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/88dc686d170a/bzImage-2c9b3512.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1b5e4e187cc586d05ea0@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in rht_ptr_rcu include/linux/rhashtable.h:376 [inline]
-BUG: KMSAN: uninit-value in __rhashtable_lookup include/linux/rhashtable.h:607 [inline]
-BUG: KMSAN: uninit-value in rhashtable_lookup include/linux/rhashtable.h:646 [inline]
-BUG: KMSAN: uninit-value in rhashtable_lookup_fast include/linux/rhashtable.h:672 [inline]
-BUG: KMSAN: uninit-value in tcf_ct_flow_table_get+0x611/0x2260 net/sched/act_ct.c:329
- rht_ptr_rcu include/linux/rhashtable.h:376 [inline]
- __rhashtable_lookup include/linux/rhashtable.h:607 [inline]
- rhashtable_lookup include/linux/rhashtable.h:646 [inline]
- rhashtable_lookup_fast include/linux/rhashtable.h:672 [inline]
- tcf_ct_flow_table_get+0x611/0x2260 net/sched/act_ct.c:329
- tcf_ct_init+0xa67/0x2890 net/sched/act_ct.c:1408
- tcf_action_init_1+0x6cc/0xb30 net/sched/act_api.c:1425
- tcf_action_init+0x458/0xf00 net/sched/act_api.c:1488
- tcf_action_add net/sched/act_api.c:2061 [inline]
- tc_ctl_action+0x4be/0x19d0 net/sched/act_api.c:2118
- rtnetlink_rcv_msg+0x12fc/0x1410 net/core/rtnetlink.c:6647
- netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2550
- rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6665
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- ____sys_sendmsg+0x877/0xb60 net/socket.c:2597
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2651
- __sys_sendmsg net/socket.c:2680 [inline]
- __do_sys_sendmsg net/socket.c:2689 [inline]
- __se_sys_sendmsg net/socket.c:2687 [inline]
- __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2687
- x64_sys_call+0x2dd6/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Local variable key created at:
- tcf_ct_flow_table_get+0x4a/0x2260 net/sched/act_ct.c:324
- tcf_ct_init+0xa67/0x2890 net/sched/act_ct.c:1408
-
-CPU: 0 PID: 5048 Comm: syz-executor374 Not tainted 6.10.0-syzkaller-11185-g2c9b3512402e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-=====================================================
+I think the key point here is that USB webcams follow a standard, and
+GPUs don't.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> What I get from the discussions I've followed or partcipated in over the
+> years is that the main worry of free software communities is being
+> forced to use closed-source userspace components, whether that would be
+> to make the device usable at all, or to achieve decent level of
+> performance or full feature set. We've been through years of mostly
+> closed-source GPU support, of printer "windrivers", and quite a few
+> other horrors. The good news is that we've so far overcome lots (most)
+> of those challenges. Reverse engineering projects paid off, and so did
+> working hand-in-hand with industry actors in multiple ways (both openly
+> and behind the scenes). One could then legitimately ask why we're still
+> scared.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+It would be great to define what are the free software communities
+here. Distros and final users are also "free software communities" and
+they do not care about niche use cases covered by proprietary
+software.
+They only care (and should care) about normal workflows.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+>
+> I can't fully answer that question, but there are two points that I
+> think are relevant. Note that due to my background and experience, this
+> will be heavily biased towards consumer and embedded hardware, not data
+> centre-grade devices. Some technologies from the latter however have a
+> tendency to migrate to the former over time, so the distinction isn't
+> necessarily as relevant as one may consider.
+>
+> The first point is that hardware gets more complicated over time, and in
+> some markets there's also an increase in the number of vendors and
+> devices. There's a perceived (whether true or not) danger that we won't
+> be able to keep up with just reverse engineering and a development model
+> relying on hobyists. Getting vendors involved is important if we want to
+> scale.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+If we want vendors involved, we need to build an ecosystem where they
+feel invited.
 
-If you want to undo deduplication, reply with:
-#syz undup
+We should not take as hostages our users and impose rules on how they
+should build or even sell their product.
+
+>
+> Second, I think there's a fear of regression. For some categories of
+> devices, we have made slow but real progress to try and convince the
+> industry to be more open. This sometimes took a decade of work,
+> patiently building bridges and creating ecosystems brick by brick. Some
+> of those ecosystems are sturdy, some not so. Giving pass-through a blank
+> check will likely have very different effects in different areas. I
+> don't personally believe it will shatter everything, but I'm convinced
+> it carries risk in areas where cooperation with vendors is in its
+> infancy or is fragile for any other reason.
+
+We control what is accepted and what is not. We just need clear rules,
+to avoid regressions like:
+- For areas where there is a standard (NVME, UVC,...) most of the
+drivers must be in-kernel, and use generic system calls.
+- For areas with no standard, custom system calls are allowed, and
+some part of the driver can be in userspace.
+- To land a driver, there must be a full open source stack capable of
+using it for standard use cases.
+- If there is an established open source stack (mesa, openVINO,
+libcamera...), the open source stack must be based on it.
+- Vendor passthrough mechanisms are allowed for niche use cases or
+development/experimentation.
+
+I believe those rules are already in place in some subsystems. We just
+have to agree what rules should apply to all the kernel by policy.
+
+We can agree that this kind of discussion is done better face to face.
+
+Regards!
+
+
+
+>
+> Finally, let's not forget that pass-through APIs are not an all or
+> nothing option. To cite that example only, DRM requires GPU drivers to
+> have an open-source userspace implementation to merge the kernel driver,
+> and the same subsystems strongly pushes for API standardization for
+> display controllers. We can set different rules for different cases.
+>
+> --
+> Regards,
+>
+> Laurent Pinchart
+>
+
+
+--
+Ricardo Ribalda
 
