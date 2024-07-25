@@ -1,134 +1,115 @@
-Return-Path: <netdev+bounces-112932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C895393BF29
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:38:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F6B93BF36
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA881F211FA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:38:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A2DE281854
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DC9197A9B;
-	Thu, 25 Jul 2024 09:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710A4197A9B;
+	Thu, 25 Jul 2024 09:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fG32LBEB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PZoMZvHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1AC197A95;
-	Thu, 25 Jul 2024 09:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4AC16DED1
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 09:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721900283; cv=none; b=mkPbFLWU/Kd/eV6mhwYJEkaGGR2NrpDMhcK8jP7Z6cDvYmkbg7xCsFuiKR7a/2zga6Js6alXL5qT291xBzusOolHIkbsxycs4MDXbCQlsSUnzh4+EoHcJCcOzV4cQMRKI6gZYGD7AYu4iUdIjsCbcIMHw7TY4F1BUoFh+pAYcB0=
+	t=1721900396; cv=none; b=ln/vyTB09GMrf84pOR1Do+VwpgVUwpua8Q+ZjsohWMdY9Ho/+TJxhaZRm0PMReAFNn37KCOGKivMjD2ykIO1wdt9BPOj+AYZ8wixb6wiQvgPoPLYgU5YlCE5XhCpnlznnYhDxj4iDCtzzQCWDrgwdtDOBfABQsysKDZZC2lUPUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721900283; c=relaxed/simple;
-	bh=VkQQmC+cDGpTHqGfwkH4J5cRWYSBvrFqnFYBf3GcYYE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zv/cjgRG0J/TT4rqKaASDEJ+oxiu8Na7O1lgQs/MWpAfWV+tUnukizpotsl8FTRfEP2nx09kj4GYMo0qQ9DKDKOJJHMPf0clLFR8w8uKsXhJQAl+G4Qw2eZJ6QNBPTvpg56MU2b4iiu8N0LYyPc8MS0KBQ5BFBI2m4a+PKmd07o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fG32LBEB; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1721900396; c=relaxed/simple;
+	bh=KapfvudN6qowP+CmN1qoLY2G78wBaetCRp+8Y2atz6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nEgJlpj6BXlVaClxM17Nb+7DUz9NBEtLwsjyh4z8VnRj2Uy2UBAjDS5LhSM6S+VsxtbuJ/QhKPs0UzcSczj5Ab0sdk721pXq1Lb8YlpnP5q9ClfP6d9iZPPoAzG9lxKoJV1CTQsxFwBiv8d1h1nUhDD1eZPKfNL5ucoUyQI8rDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PZoMZvHo; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1721900282; x=1753436282;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VkQQmC+cDGpTHqGfwkH4J5cRWYSBvrFqnFYBf3GcYYE=;
-  b=fG32LBEBZo5nAGVdplztkP682p36F7druScbqgNdQUxd8blOQTvQwe6Z
-   mvpeJs9VWbZVGHP16aMYmDz9f2I7ZxV6GkbMaAs+/qjfgdEvMvwyVbBqW
-   MPtweBZYnbBgmUOSIaFogI0VLCmw56PUzI0h1rZmhPa0+vL4nXhDrnP73
-   qYbwgbEKALS9k3F3gtzm3reUOMysTGeICyhNC+QxSgqrSRZqr5rgVtZ2k
-   yjXSso/tsrR/6A8Lm+cjZGYctZtT6Qvz0EaS2YkgS/3gPs0UFG/fIOUXz
-   rTf662jA78v3kQeiA5yF5NV3Wg3y4K2auoGVPAiQdMxcGG4D5uR0NAhkt
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721900394; x=1753436394;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KapfvudN6qowP+CmN1qoLY2G78wBaetCRp+8Y2atz6M=;
+  b=PZoMZvHon5MS3JBvk6vuJCQueLC6kzKK1kreQShQUzS7z65FuldIYY9Q
+   JXVzMQyIN6lJjcPJT24DPqdFIyCi/64EAh1fMSvuE/9Fb2EYdOPhFuOhR
+   LY4I1uTWNSVUJbji54if4W6DEepRrYuWR3y0+V3/dsUf9m2b4cQba0v13
+   cODdYdbtotj4S9Qu/mxELkaFuwqdAfC+JbkB0eIEUaWD+qOgH2FRweVeh
+   UI2w2ZKeG3X57OwYb1HThv5nxTsTjKAvIjaHW2iNw062HgybjGl8ZwBuC
+   Ew5mZXZ/4iPqc9lO7ZQptESHmIXEKqDawVQ5YBfYd8BsQfvMAcHaYnOCY
    A==;
-X-CSE-ConnectionGUID: hEn5OPxASvWCQ96luVzNJg==
-X-CSE-MsgGUID: b0zKuWM8S2qIBfEsrbIeYg==
+X-CSE-ConnectionGUID: ia3f1yJ3QN++DzsU+GZ9cg==
+X-CSE-MsgGUID: ZOz3+DHqTMKVyiWTLSxLzw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="12707089"
 X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
-   d="scan'208";a="29674287"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Jul 2024 02:37:55 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jul 2024 02:37:28 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 25 Jul 2024 02:37:27 -0700
-Date: Thu, 25 Jul 2024 15:04:17 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <horms@kernel.org>,
-	<hkallweit1@gmail.com>, <richardcochran@gmail.com>, <rdunlap@infradead.org>,
-	<linux@armlinux.org.uk>, <bryan.whitehead@microchip.com>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next V2 3/4] net: lan743x: Migrate phylib to phylink
-Message-ID: <ZqIcGbGktHjsILeu@HYD-DK-UNGSW21.microchip.com>
-References: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
- <20240716113349.25527-4-Raju.Lakkaraju@microchip.com>
- <cdf2e1e8-39ff-48b3-84b6-73c673ab1eb1@lunn.ch>
+   d="scan'208";a="12707089"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 02:39:53 -0700
+X-CSE-ConnectionGUID: R9eXoyA9Q7CTKXbDutv56Q==
+X-CSE-MsgGUID: Oe1qJPIkTOyAYJk4Gs5pWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
+   d="scan'208";a="57170843"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.132])
+  by fmviesa005.fm.intel.com with ESMTP; 25 Jul 2024 02:39:48 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v3 iwl-next 0/4] ice: Implement PTP support for E830 devices
+Date: Thu, 25 Jul 2024 11:34:47 +0200
+Message-ID: <20240725093932.54856-6-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <cdf2e1e8-39ff-48b3-84b6-73c673ab1eb1@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+Add specific functions and definitions for E830 devices to enable
+PTP support.
+Refactor processing of timestamping interrupt and cross timestamp
+to avoid code redundancy.
 
-Thank you for review the patches.
+Jacob Keller (1):
+  ice: combine cross timestamp functions for E82x and E830
 
-The 07/18/2024 05:43, Andrew Lunn wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> 
-> On Tue, Jul 16, 2024 at 05:03:48PM +0530, Raju Lakkaraju wrote:
-> > Migrate phy support from phylib to phylink.
-> > Fixed phy support is still used together with phylink since we need to support
-> > dynamic fallback when a phy is not found over mdio. While phylink's FIXED mode
-> > supports fixed phys that, it's dynamic and requires device tree entries which
-> > are most of the time not present for LAN743x devices
-> 
-> > +static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
-> > +{
-> > +     struct device_node *dn = adapter->pdev->dev.of_node;
-> > +     struct net_device *dev = adapter->netdev;
-> > +     struct fixed_phy_status fphy_status = {
-> > +             .link = 1,
-> > +             .speed = SPEED_1000,
-> > +             .duplex = DUPLEX_FULL,
-> > +     };
-> 
-> 
-> So you are happy to limit it to 1G, even thought it can do more? That
-> is the problem with fixed PHY done this way. If you were to use
-> PHYLINK fixed PHY you can use the full bandwidth of the hardware.
-> 
+Karol Kolacinski (2):
+  ice: Process TSYN IRQ in a separate function
+  ice: Add timestamp ready bitmap for E830 products
 
-I accept your comments. Fixed PHY hard coded to 1Gpbs.
+Michal Michalik (1):
+  ice: Implement PTP support for E830 devices
 
-Currenly, LAN743x chip don't have Device Tree implemented. 
-As part of SFP support, I would like to add software nodes.
-After SFP support development, I will add "fixed-link" option in software nodes.
+ drivers/net/ethernet/intel/Kconfig            |  10 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |  13 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |  25 +-
+ drivers/net/ethernet/intel/ice/ice_osdep.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 356 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   9 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 199 +++++++++-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  25 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 11 files changed, 497 insertions(+), 157 deletions(-)
 
-> You might want to look at what the wangxun drivers do for some ideas
-> how you can make use of PHYLINK fixed link without having DT.
+V2 -> V3: Rebased and fixed kdoc in "ice: Implement PTP support for
+          E830 devices"
+V1 -> V2: Fixed compilation issue in "ice: Implement PTP support for
+          E830 devices"
 
-I refer the wangxun drivers for "fixed-link". currently wangxun driver did not
-implement "fixed-link" in software node.
- 
-> 
->     Andrew
-> 
-
+base-commit: 0942d0846f6305b3ac645a7294470df8fe6c3dd0
 -- 
-Thanks,                                                                         
-Raju
+2.45.2
+
 
