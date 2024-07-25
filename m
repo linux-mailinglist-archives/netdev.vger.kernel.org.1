@@ -1,193 +1,141 @@
-Return-Path: <netdev+bounces-113019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7646A93C3F3
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:19:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DC793C401
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 16:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED2041F21021
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:19:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3D4B1C20E2D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792E719D072;
-	Thu, 25 Jul 2024 14:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F8519D886;
+	Thu, 25 Jul 2024 14:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="zcFW9nQ7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HW08Grr6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [83.166.143.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDA319D06D
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:19:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC103FB3B
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721917152; cv=none; b=NAXLkHz2dxr/NIxrPvlqwTneodXm41vXVcXtetfL6H8uOAwL90Ub8t+cbauJGzMmitgt95BTBpfpj76dLVRMyDHstFEuKjHFj4SzcnJeW9Tx0+qnPbZjTMK6JB5aLccmWvWc/am9Ri9KK4/mRJUOPNKDjSy8QjuzxgWo/vKLbJc=
+	t=1721917350; cv=none; b=LHR79J/ngbxY+njG7C+NQBDkVglm37GLI1FmcFPNfxgwcko6PJNu5VrJB/4NqQM44bzXHep60ayGdjN/dmvUSGN7+LCQh6fM5Ppv+l7SEtu9ipz4xMn/CefwlZQkwJcKgClVFE2EaSyp3WHFZYXwBeCSjef8evazGfbU698ztqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721917152; c=relaxed/simple;
-	bh=cyEcSr+BhonFVEnaLt8EGxFa7DNtRZULsVk42jLsu3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTu+xZk6/m2x8820XXFqcPOjx/JgYK4I8cFKp3Y9k/VIir8oa0qcIeAEPv6FZYw+vH5S81RUg9wu6di5XgyPRrGi0D1K7OCYZpHPxc4Lvuh2+orNLHuq2u+Aw+2OVC4hVccZUBYVeSp1lpkFBfy2tKMrTsfrZZ0j1vctiXfwWPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=zcFW9nQ7; arc=none smtp.client-ip=83.166.143.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WVCg75W6Vz6mt;
-	Thu, 25 Jul 2024 16:18:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1721917139;
-	bh=A637sdMYYX6WYQ5znC+hqJDdcWKIM518ApZarQd9nwY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=zcFW9nQ7pI98dhdsjoDJXcYXA0xWq1pKaQp2dgMZRLQPY1XICzqreGW5nNnFNVt9g
-	 t+xSTi5rrQEj9HyDotsxUooDtgmwl0jAXhouWM8GVVlnzyWcX7D04UyT8auVzoKKez
-	 a7hN/QlVDcWRJMq3msmH2ZWUQvkMYuomZjUzRTZc=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WVCg71zk6zwKy;
-	Thu, 25 Jul 2024 16:18:59 +0200 (CEST)
-Date: Thu, 25 Jul 2024 16:18:57 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, 
-	serge@hallyn.com, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
-	outreachy@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 3/4] samples/landlock: Support abstract unix socket
- restriction
-Message-ID: <20240725.dei1Kaimi8ze@digikod.net>
-References: <cover.1721269836.git.fahimitahera@gmail.com>
- <4f533a80d56d9f57d50a87d55101cfdeb03404c3.1721269836.git.fahimitahera@gmail.com>
+	s=arc-20240116; t=1721917350; c=relaxed/simple;
+	bh=dL+ncTGj0c7P9TZPCMPPG/bCCf4hnCMnk3zt1HkISu4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I3ZV0sQpR09nS3K5NyqYkWstn9aTfSr08cAftaU+UT5fDtINoNbv3wbZw2KgxiB8f4y1lZhJkCCUUSk15W/m9RDk8wur7DNvYHZl5+asSeAiwHOa1gFsJzCe6gTwLa3ka8vyD3M80IfMDZeq/FWDTSdcgPPS0Ruan9pntr87q+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HW08Grr6; arc=none smtp.client-ip=209.85.161.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5d5aecbe0a9so577850eaf.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 07:22:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721917348; x=1722522148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3qIHtU0dTBcBvX7PEaPl4vxMCo7I8tXXeU8cK3cnUGk=;
+        b=HW08Grr6bB7Enm/5hOekr9nCpJBEUmOlrBvoetEjxA74HzAgX/KF6yB6b+m5zgKPXk
+         7CeqBFOngy6w3FIno2R5DQs2o7/C2cBylUrvaE4xgCjUUdW7tBy7koNdEcDEeKaBnu6m
+         VjdjDBvxp8Fivj17/pa67okmObFsOM8nT4VAMP7Qj/BSzddBneuQFhFveKLk46eh8OdI
+         FaTPV3w3xuYuknd9OIIq5XGWAv+3VQpXxbDg9ORUCMIsjNFesFSGY5y+QafTOdhai5Y+
+         Lb5dXYTMyw3w6uw0VdPj6FbHet2jt5wLQTOI/HLdN8FL5jYlsDJfUsxXMfnTTVu/6u7q
+         NFTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721917348; x=1722522148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3qIHtU0dTBcBvX7PEaPl4vxMCo7I8tXXeU8cK3cnUGk=;
+        b=KaYDLoCDdCYVecFpvDF20fPnkalKrBjR0sWwp17CIHJlu47A66+Tj/XC89SnYCNAFa
+         h/9g7wLxzQsJ8YP9JsMWZYGpfRBb+mVeG6LnoKPC/ZX7PfOrQrjlj9GCFWwE3BDwj5G1
+         ocvHSfTEcKvaMjE9V1UpDy8LHf78KrcIClHsTB8QzPhDf5Sx9cafe4R03yGClwC9fHy7
+         JGBgSB856ETua0CRUUjDII3DPNW8Uwao9biwLA0StzT7QuixFiikJu/JZ4cNVsVexMVN
+         sbopTNpXufTbFFoWdKC5+6HjgTZJmGd6BE4pxKIObKLzkLnXlz+bLerwrGahexAwzr5X
+         ihJg==
+X-Gm-Message-State: AOJu0YyJAob0No0oI6nUflFTDUIQ8ghadc6Y8GIQGn+iF8gUM+uZX1QS
+	vlTl3c34H40gwDrbYnphEGBkGp9srFjohRg1tn+c4jhXcaFSa+5sdgWItiHpTiaXfWz8vUWDpe0
+	Ur4HyY1io4O8pYG9fH90yNcTRLuY=
+X-Google-Smtp-Source: AGHT+IGD8qq5L2+1BObayoqeXim5P6jiGxmNADkCrzrkriJkJ2MlEjRiG4AB1UZ+XlrJcX8JSEmUvUY8WHtw9oM0mHE=
+X-Received: by 2002:a05:6358:33a2:b0:1ac:f109:e248 with SMTP id
+ e5c5f4694b2df-1acfb894d4bmr272130955d.2.1721917347739; Thu, 25 Jul 2024
+ 07:22:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4f533a80d56d9f57d50a87d55101cfdeb03404c3.1721269836.git.fahimitahera@gmail.com>
-X-Infomaniak-Routing: alpha
+References: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
+ <20240725-udp-gso-egress-from-tunnel-v1-1-5e5530ead524@cloudflare.com>
+In-Reply-To: <20240725-udp-gso-egress-from-tunnel-v1-1-5e5530ead524@cloudflare.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 25 Jul 2024 10:21:50 -0400
+Message-ID: <CAF=yD-LLPPg77MUhdXrHUVJj4o2+rnOC_qsHc_8tKurTsAGkYw@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] udp: Mark GSO packets as CHECKSUM_UNNECESSARY
+ early on on output
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, kernel-team@cloudflare.com, 
+	syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 17, 2024 at 10:15:21PM -0600, Tahera Fahimi wrote:
-> - Adding IPC scoping to the sandbox demo by defining a new "LL_SCOPED"
->   environment variable. "LL_SCOPED" gets value "a" to restrict abstract
->   unix sockets.
-> - Change to LANDLOCK_ABI_LAST to 6.
-> 
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> ---
->  samples/landlock/sandboxer.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
-> 
-> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-> index e8223c3e781a..d280616585d4 100644
-> --- a/samples/landlock/sandboxer.c
-> +++ b/samples/landlock/sandboxer.c
-> @@ -14,6 +14,7 @@
->  #include <fcntl.h>
->  #include <linux/landlock.h>
->  #include <linux/prctl.h>
-> +#include <linux/socket.h>
->  #include <stddef.h>
->  #include <stdio.h>
->  #include <stdlib.h>
-> @@ -55,6 +56,7 @@ static inline int landlock_restrict_self(const int ruleset_fd,
->  #define ENV_FS_RW_NAME "LL_FS_RW"
->  #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
->  #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
-> +#define ENV_SCOPED_NAME "LL_SCOPED"
->  #define ENV_DELIMITER ":"
->  
->  static int parse_path(char *env_path, const char ***const path_list)
-> @@ -208,7 +210,7 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->  
->  /* clang-format on */
->  
-> -#define LANDLOCK_ABI_LAST 5
-> +#define LANDLOCK_ABI_LAST 6
->  
->  int main(const int argc, char *const argv[], char *const *const envp)
->  {
-> @@ -216,6 +218,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	char *const *cmd_argv;
->  	int ruleset_fd, abi;
->  	char *env_port_name;
-> +	char *env_scoped_name;
->  	__u64 access_fs_ro = ACCESS_FS_ROUGHLY_READ,
->  	      access_fs_rw = ACCESS_FS_ROUGHLY_READ | ACCESS_FS_ROUGHLY_WRITE;
->  
-> @@ -223,14 +226,15 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  		.handled_access_fs = access_fs_rw,
->  		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->  				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		.scoped = LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET,
->  	};
->  
->  	if (argc < 2) {
->  		fprintf(stderr,
-> -			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
-> +			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s "
->  			"<cmd> [args]...\n\n",
->  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -			ENV_TCP_CONNECT_NAME, argv[0]);
-> +			ENV_TCP_CONNECT_NAME, ENV_SCOPED_NAME, argv[0]);
->  		fprintf(stderr,
->  			"Execute a command in a restricted environment.\n\n");
->  		fprintf(stderr,
-> @@ -251,15 +255,18 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  		fprintf(stderr,
->  			"* %s: list of ports allowed to connect (client).\n",
->  			ENV_TCP_CONNECT_NAME);
-> +		fprintf(stderr, "* %s: list of allowed restriction on IPCs.\n",
+On Thu, Jul 25, 2024 at 5:56=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> In commit 10154dbded6d ("udp: Allow GSO transmit from devices with no
+> checksum offload") we have added a tweak in the UDP GSO code to mark GSO
+> packets being sent out as CHECKSUM_UNNECESSARY when the egress device
+> doesn't support checksum offload. This was done to satisfy the offload
+> checks in the gso stack.
+>
+> However, when sending a UDP GSO packet from a tunnel device, we will go
+> through the TX path and the GSO offload twice. Once for the tunnel device=
+,
+> which acts as a passthru for GSO packets, and once for the underlying
+> egress device.
+>
+> Even though a tunnel device acts as a passthru for a UDP GSO packet, GSO
+> offload checks still happen on transmit from a tunnel device. So if the s=
+kb
+> is not marked as CHECKSUM_UNNECESSARY or CHECKSUM_PARTIAL, we will get a
+> warning from the gso stack.
 
-"allowed restrictions" or "restrictions"?
+I don't entirely understand. The check should not hit on pass through,
+where segs =3D=3D skb:
 
-> +			ENV_SCOPED_NAME);
->  		fprintf(stderr,
->  			"\nexample:\n"
->  			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
->  			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
->  			"%s=\"9418\" "
->  			"%s=\"80:443\" "
-> +			"%s=\"a\" "
->  			"%s bash -i\n\n",
->  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -			ENV_TCP_CONNECT_NAME, argv[0]);
-> +			ENV_TCP_CONNECT_NAME, ENV_SCOPED_NAME, argv[0]);
->  		fprintf(stderr,
->  			"This sandboxer can use Landlock features "
->  			"up to ABI version %d.\n",
-> @@ -326,7 +333,10 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	case 4:
->  		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
->  		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
-> -
+        if (segs !=3D skb && unlikely(skb_needs_check(skb, tx_path) &&
+!IS_ERR(segs)))
+                skb_warn_bad_offload(skb);
 
-No need to remove this line.
+> Today this can occur in two situations, which we check for in
+> __ip_append_data() and __ip6_append_data():
+>
+> 1) when the tunnel device does not advertise checksum offload, or
+> 2) when there are IPv6 extension headers present.
+>
+> To fix it mark UDP_GSO packets as CHECKSUM_UNNECESSARY early on the TX
+> path, when still in the udp layer, since we need to have ip_summed set up
+> correctly for GSO processing by tunnel devices.
 
-> +		__attribute__((fallthrough));
-> +	case 5:
-> +		/* Removes IPC scoping mechanism for ABI < 6 */
-> +		ruleset_attr.scoped &= ~LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET;
+The previous patch converted segments post segmentation to
+CHECKSUM_UNNECESSARY, which is fine as they had
+already been checksummed in software, and CHECKSUM_NONE
+packets on egress are common.
 
-There is an inconsistency here, please take a look at previous similar
-changes.
+This creates GSO packets without CHECKSUM_PARTIAL.
+Segmentation offload always requires checksum offload. So these
+would be weird new packets. And having CHECKSUM_NONE (or
+equivalent), but entering software checksumming is also confusing.
 
->  		fprintf(stderr,
->  			"Hint: You should update the running kernel "
->  			"to leverage Landlock features "
-> @@ -357,7 +367,10 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  		ruleset_attr.handled_access_net &=
->  			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->  	}
-> -
-> +	/* Removes IPC scoping attribute if not supported by a user. */
-> +	env_scoped_name = getenv(ENV_SCOPED_NAME);
-> +	if (!env_scoped_name)
-> +		ruleset_attr.scoped &= ~LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET;
->  	ruleset_fd =
->  		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->  	if (ruleset_fd < 0) {
-> -- 
-> 2.34.1
-> 
-> 
+The crux is that I don't understand why the warning fires on tunnel
+exit when no segmentation takes place there. Hopefully we can fix
+in a way that does not introduce these weird GSO packets (but if
+not, so be it).
 
