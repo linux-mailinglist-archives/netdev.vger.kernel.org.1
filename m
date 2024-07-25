@@ -1,144 +1,132 @@
-Return-Path: <netdev+bounces-112965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C0C193C06E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:51:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA31193C08E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4772D1C21AF6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:51:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B03BB21394
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15AD1991A0;
-	Thu, 25 Jul 2024 10:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E9A1991CF;
+	Thu, 25 Jul 2024 11:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="BKL4KzhZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XrEHCewf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7762197A8B
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0B21991B4
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 11:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721904708; cv=none; b=qlKRqZ3cB/aVH71HNUJA/XZlJOz/tCBMmXqXRfScIed+XUmKPHBvuZgXSqZaFM5w74LA0Jhil2rrfYy4/FOhENJc6hfyxR8R6aRA+XVBYTZMMO9WPZViU/T69QTHJcM2HF8xNF7cDJ1JBhpru/U7ScshvjKe4JJeF1/6E4XIQYo=
+	t=1721905598; cv=none; b=h/CZQsSu2+Bx7ibXykEUDKSfw+1YeHzXxyyBl4cH8YmLr2OFgYwoArQTrnLa0WPWbaeSo9EjUPLGhRxn6SWRgK8sKcbHkpdzjql4CuZejMTZIvoOWP7qUsDwdtfVqQbgStfQBZakNriQaf+LTVrSpzV9mUk/G7aWzRAPeRR5vws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721904708; c=relaxed/simple;
-	bh=3fcLBujA8oEJ6hlp8dEqRtvI9FgUBp6fr0LxMsx9NvQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R8u8co6pj3MWAdj0ZgTmfHYqWuHTywJMgXSzLdxZnnJ16w6lP4uL+3fc15aFe67FE7wzIGnBplCbANmuIkVxdwbXsrr6NkaD43ejvPzGlASHWUOYu/OKJGd+v8lEzedYPt7WgMttDfM0ks4GgGrnzvieftv4bCpqs9gN5tm8xeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=BKL4KzhZ; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=kcFe
-	Yku6GJhrCR24Aw9mdE9/gi7I04NxDXXehgOMSOk=; b=BKL4KzhZz7eoQX4DqhK/
-	/6oba79W938TvUqntDFMmBEZS6VRRAlblh2z985GTl9t4+21pFopA03vBYYI8Y7C
-	zlBPlfqu2OEY5EzpwWRQ4Xr4m0PX/6ohTIDtIL/HT9SO7KdN6Es7M7RiekR+PmEj
-	dOZZWW+CxXu98k5CQCJ/SLJE+hp2rAV4h6AklD5Jzr5hwFvu1H8ej7vPaO+eExrK
-	Lp+9OB5x0sgnlWBQ4olz9vE4psZGaxbSggZ2px+cqe/IorBDjNs6oda4KhWsF3id
-	QGj9qbsrjGme2P054wEqHqbNavIVtRKhEc1M5OnyqBN74JKsMS3vujEBfGMt9qdu
-	bg==
-Received: (qmail 2964050 invoked from network); 25 Jul 2024 12:51:35 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 25 Jul 2024 12:51:35 +0200
-X-UD-Smtp-Session: l3s3148p1@Hxu0LRAehq0ujnsv
-Date: Thu, 25 Jul 2024 12:51:35 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <ZqIuN2JR_mRgZiJ1@shikoro>
-Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, jgg@nvidia.com
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
- <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
- <20240724200012.GA23293@pendragon.ideasonboard.com>
- <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
+	s=arc-20240116; t=1721905598; c=relaxed/simple;
+	bh=Z+/cf+NofFzA35SddKTJMioN4/UdboRja1QQUFeoI2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MZQfVIda7NVpsinvmHBTI28ZBythajHGxkRoA4LdQJ2paLYyIfMKcgsZXgLP41wCUFBSVctTduoQKkKs/podofnDr6hwikR09o9Gt16lmePLQg0Kb5Cu7YLzZOMiACq7kRdxJVprmYw9hE/eGYgeoFR6lZrEVBFv6l6/AQ9CHAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XrEHCewf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721905594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WN1T7ImyHgIlrYMLiebMiQokg+VGDY2/N/KmNsun8Ek=;
+	b=XrEHCewfXMZt5pyDHYzLdjC+FBjjVBe/gRZwojK4SX2XE2XjdX11ynzsqCm4p5saKEgzd8
+	nKn859LJv6JhQvvkgufxiKa7LKm7JhzxEKHUBhP/scs4DXMTA4lmpBHh+x1Ai2l+WEAsbE
+	r5mef35Zc1OSbGtlQo+x+fu3pbNsIKc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-257-Vu9HUkqgNkq5hAxW9ASABQ-1; Thu, 25 Jul 2024 07:06:33 -0400
+X-MC-Unique: Vu9HUkqgNkq5hAxW9ASABQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4267378f538so1458625e9.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 04:06:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721905592; x=1722510392;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WN1T7ImyHgIlrYMLiebMiQokg+VGDY2/N/KmNsun8Ek=;
+        b=pw/4h1zBjfgVzmBKyyb+pYfMpoNodXMvFH+EOKPgE2LaV29fdYoUOyMxMe/K8CikeP
+         NFfRQaa/eioGs0MSCa5JnzuMDhMK0NZj6ay89VgcYQjM+HOMDBS135UzXzesTukMjWoG
+         GuCm+1kyjahqNP53EXNX5lGV5agQ9coUZjxRQApt2MLlzu2K3kCfEqQYyZ3K8NZdaxTp
+         xXzHwYEmEYPrt+Apw0l2m5HHUdphbNYJ48xy4EhO+UooPXm79jmOw5ldIkaKpeE3S4XO
+         B9V8obWYLTP4tYW6IFmnjht0S4KV7vi8h5gtlKZPl/ThCYFRvJNnNF0VkSAR8MoySKLi
+         vPPg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/hz60wzrMQCqATKkHmlreitp06+YxAcvTQTjcOj8luvAazvTgosyRCPMf33L/wBFZwE5FTiKAZmVFtnZSy5Tt4mh0FWzP
+X-Gm-Message-State: AOJu0Yz5tkB8Egmo18/wN2AHa8bnx2Z+WeS62J3lLbnkoTRHFq7UoBbP
+	Iis2jpCwHl0WcCBqm4Yuvg6HPjtt9rq8uSMhFr7c3mMqvh3QWGETsHceWAgZrNQQ1SLGLicyZaz
+	WV8ZwSxtiKEWgrnVCyYt08LpcUCPt018ji+iNUgDWc37vCWpCD3SEGg==
+X-Received: by 2002:a05:600c:35ca:b0:427:9f71:16bb with SMTP id 5b1f17b1804b1-42805713a1emr8546025e9.6.1721905591986;
+        Thu, 25 Jul 2024 04:06:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBatNBk5gs/dWyR7c2T51W0nIxSSE/Dn9TTMdkHW3H4iQrQEZARNdPQXiwOCI42zCxVqSW5A==
+X-Received: by 2002:a05:600c:35ca:b0:427:9f71:16bb with SMTP id 5b1f17b1804b1-42805713a1emr8545885e9.6.1721905591458;
+        Thu, 25 Jul 2024 04:06:31 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280574b21dsm29367305e9.27.2024.07.25.04.06.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jul 2024 04:06:30 -0700 (PDT)
+Message-ID: <b399e0bf-07fd-4da6-9ab4-19cd1ceaa456@redhat.com>
+Date: Thu, 25 Jul 2024 13:06:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="25JKoLVFGJsXZT50"
-Content-Disposition: inline
-In-Reply-To: <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/tcp: Expand goo.gl link
+To: Simon Horman <horms@kernel.org>, linux@treblig.org
+Cc: edumazet@google.com, dsahern@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kennetkl@ifi.uio.no
+References: <20240724172508.73466-1-linux@treblig.org>
+ <20240724191215.GJ97837@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240724191215.GJ97837@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---25JKoLVFGJsXZT50
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hi Ricardo,
+On 7/24/24 21:12, Simon Horman wrote:
+> On Wed, Jul 24, 2024 at 06:25:08PM +0100, linux@treblig.org wrote:
+>> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>>
+>> The goo.gl URL shortener is deprecated and is due to stop
+>> expanding existing links in 2025.
+>>
+>> Expand the link in Kconfig.
+>>
+>> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> 
+> Both the motivation and updated link look correct to me.
+> I also checked that there is no other usage of goo.gl in this file.
+> 
+> Not sure if this should be for net or net-next.
 
-> It would be great to define what are the free software communities
-> here. Distros and final users are also "free software communities" and
-> they do not care about niche use cases covered by proprietary
-> software.
-> They only care (and should care) about normal workflows.
+I also think this should go via net-next.
 
-Don't you think there are distros and final users who do care about
-proprietary influences, in general. For sure, though, I think they
-should not be told what they should care about?
+## Form letter - net-next-closed
 
-> If we want vendors involved, we need to build an ecosystem where they
-> feel invited.
+The merge window for v6.11 and therefore net-next is closed for new
+drivers, features, code refactoring and optimizations. We are currently
+accepting bug fixes only.
 
-Definitely. Invited as in "you are welcome to work with us on this",
-though. Not as in "come here and do what you want". This is why we have
-a coding-style etc...
+Please repost when net-next reopens after July 29th.
 
-> We should not take as hostages our users and impose rules on how they
-> should build or even sell their product.
+RFC patches sent for review only are obviously welcome at any time.
 
-Right, it should be a plain buisness decision. I totally agree with your
-"clear rules" request below. And yeah, face to face is probably best
-suited.
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
 
-> - Vendor passthrough mechanisms are allowed for niche use cases or
-> development/experimentation.
-
-Problem with "niche" is that it can grow really big. See Linux :)
-
-All the best,
-
-   Wolfram
-
-
---25JKoLVFGJsXZT50
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmaiLjMACgkQFA3kzBSg
-KbYVFxAAo3/PCWMxZwmHL8MWxA34jXcOM9odcmry6DNofkZ5hGEHjT8XjhaYB9l4
-7jbWHf78CsCBAT5g+km2MfYbpy7INfWa+7whZAwNVMuDSndFG4lbCpG6x7qA/dVw
-bM5eRdbS6EUkP9oSSpJ/RvFH3dmtEZ7CULl/wYdUiCjn6JbjVF/0+q0m0SKNskA3
-3HDjVebHimY3oMM37njXTO3Gv0W4H83VEvHt8ExPXwoq8pdr0SflaGFxQ0Bv7dfX
-5pSarLw/Xn2kFx/8MbHigRX74iApoxeUsI94N9uZx7pnSc8Hhxa5vVueKjFOg2/A
-4+TbumL0y5cQYga5Mav5FEStXEj6Lc1ICvrQfpYmiEqsf/TbtTUOmtwpKxV2WZvw
-9egngAuxTOs1WS1MEBWjc7rR1Cvij9zJc0XEPlcgWbd6zMGJSlm5uG7xMudP49Hh
-tuyjr4B08bK5K4ilNfT2E6OkRZSQ3yjHHlj/p0SUj19q9uL+anxvPP7RIbH+/wDT
-mQ0iMoVsIyxtKSzE7YdDg2U5XQJc+jjX7BJ3jotxn0nvMLoHgrmv+6MRCBVR5jvE
-eQdI0dOx1WQr/oJs6Eu+YxWynjLFhEp+keIYerWqAsCUFADBH+2zeu4hpI/SBOz8
-X5vzHqMEh/YaYBF4OH2ZT91fRlXfQQajzDzKhcTkee/z5Nq1Vxw=
-=z870
------END PGP SIGNATURE-----
-
---25JKoLVFGJsXZT50--
 
