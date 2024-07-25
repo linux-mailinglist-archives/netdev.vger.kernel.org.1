@@ -1,125 +1,102 @@
-Return-Path: <netdev+bounces-112917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4C193BD28
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:32:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28B0693BD45
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:44:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB9C01F21682
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 07:32:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A1A61C21503
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 07:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C9837165;
-	Thu, 25 Jul 2024 07:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F95016F8EF;
+	Thu, 25 Jul 2024 07:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fbMjkso3"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="3SobZUtl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32501CA8A
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 07:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25B615FA72
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 07:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721892766; cv=none; b=YgZYUg6km5G01IWhvk42ZG3KGjrdcbvOzdDrl0VNDAkZhIbXWJ1EEhpRoNvYZ03q6hn7VkVVWwAGxoEkY/1lLq1sd7063aI6uL9B06AVLShdEb5yFFw3Vu18z31kFV0Yf2HW4FEYdFA9BGloSQJDM0hck6NdYiTICdw7JgM/5Gs=
+	t=1721893467; cv=none; b=VwV1kVLnnzv3LNJ+vSqFrXXswto63bhL86awper4vB7LoEZ7ZG7zwZ0lW14YB45Fx7+JHULjNCMXl3an3ckOYqBBgETpRRq6D1FwdZBBGWda8wuCQ9T+xblFsLmB6dMz7Qmp3QLlyOo5FgJXVpqtDP/PHQWv8nBlob4DGMDvYt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721892766; c=relaxed/simple;
-	bh=mhsrw8ogEGpLPVAj7eghcSQD3WmtTykYhuJiZIrkfk8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hkuj/MDZEG+vE+eZGfwS68W9lm+Dmo06nyqsja+B39lYvsyJxyZqKR5KLHNY6utktZ9aQ0hJJ3/vte1ildjAHAiem/1aPU8XOZSOzLtCuApcKJsfGdJAiomMhPKDAlW3LSpti7eizFVpwvTAMpJUOsRSF2x/PYOJ6pT2zNAF5Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fbMjkso3; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-428063f4d71so26795e9.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 00:32:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721892763; x=1722497563; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mhsrw8ogEGpLPVAj7eghcSQD3WmtTykYhuJiZIrkfk8=;
-        b=fbMjkso3liEnVbWR449XJsVGbnAPiO1XFyONqlJOvBBjtYVSj3W6lsrjZG1t/HR709
-         bBxdtAm/DBsdn5vYJRwDosgeRBeRQgleRsRF/QOIj9Wd6FbTtvUdG5DyjCLeGqlnKhAM
-         WHHA7n7y4ub8JffXfpcO6gSaTl9qUmXX134QL2QnVl3oNIqQLDCRMWWcPR2/pRyvcQ0R
-         t7k0b+opA48zrfL69ver4Kx6ArhfnFAhQBwemlUpHtqaYBUJqi+4BZGg/GC4p7Iph6G2
-         Gqr2lKV4F2PPpgLbT4jD0ebjihptsmllRSLrbXBw/2EUe/2uu9z7c295gAtwRh/Y9g8Q
-         O9aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721892763; x=1722497563;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mhsrw8ogEGpLPVAj7eghcSQD3WmtTykYhuJiZIrkfk8=;
-        b=hTvjJWrIfideLqkeaEqp0wIqRBNMWlhPfaew4xy8bEn0/uylp/aSr67IfpgO3Paw6h
-         gqgD3jPMd62+UpyGyyrpp1C5KHMoOQTu8SEMx/ylj/Ff4V3Hox1hH6LS3yk8Z7OEgMK+
-         F4oV2wPqznczKSdlHYytK4oT8IKsUD5n3jK5CMNCCxFkr8ynHIAZMTcOoxzCpqpp2ExU
-         8uRNGi7h9qZ4lMf1L/vpbM5SkYWwMZkqISzHxzQjLmJT8vGATOmxjFuqKi5k379xUxmx
-         St6Q/bFiEekO+aWKnApsRSW0VnVK9VuASiGVc9chmEGmd+w2RV4VVitKz445OPfxJG4F
-         BjEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLUb5U4zrdgdl845ASjxjlY31iWuJng4yzXtz1AjxGNwuwfH//hSTWdwveRg6n+pJbqhJVPm1H8TVqcPndokUmI8mZsge1
-X-Gm-Message-State: AOJu0YxNPDHRqnX2dd1pnr+2mMw53QaFDyut+8RCQEfRJcbWbboscWWE
-	XhP4MfHBG8Fd0e0QAlmWa8xNG10ryFfeGfDVOzY+noNcFpNpRhN0a/x9IxirsK3AxMCN/54sRsp
-	iItMja1x1DEvzWQfrg2FEwmiFpLr1UOX3UQyw
-X-Google-Smtp-Source: AGHT+IHrlPzesfUYFOdrI66JQhz2C3XefRHiL5ThLCOeaquCv+BIr6iB+fuX+Gen43Z58/Wd0LH5F6B3GUkFKOdp6m4=
-X-Received: by 2002:a05:600c:3b05:b0:426:5ef2:cd97 with SMTP id
- 5b1f17b1804b1-42803ffa18amr1015225e9.2.1721892762656; Thu, 25 Jul 2024
- 00:32:42 -0700 (PDT)
+	s=arc-20240116; t=1721893467; c=relaxed/simple;
+	bh=ghUE9jxQtyL6a4bP38s7WHXwYlKVG8wVw6pfkCIyOJM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=SghoYV0LqoX4X8HTIuNIcQ3dxw3VgVxvdpc9gqho1/qn4tvMi6GcJdB+CBkMdL7h/cfPzlxb2UQ24BnbZCtLZ/PrDEpN4UixRDNq6INzVdzjNPnVViMbqEjKhbIfyoRjlgzf8gJwG71YA5E14RNW0f8soz53Im77XynYxp4XgtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=3SobZUtl; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:2:e181:9992:7c46:d034] (unknown [IPv6:2a02:8010:6359:2:e181:9992:7c46:d034])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 8208C7DA34;
+	Thu, 25 Jul 2024 08:44:18 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1721893458; bh=ghUE9jxQtyL6a4bP38s7WHXwYlKVG8wVw6pfkCIyOJM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<dd7fd63c-3d7d-1c47-d8ae-1ff4d6f65221@katalix.com>|
+	 Date:=20Thu,=2025=20Jul=202024=2008:44:18=20+0100|MIME-Version:=20
+	 1.0|To:=20Simon=20Horman=20<horms@kernel.org>|Cc:=20netdev@vger.ke
+	 rnel.org,=20davem@davemloft.net,=20edumazet@google.com,=0D=0A=20ku
+	 ba@kernel.org,=20pabeni@redhat.com,=20dsahern@kernel.org,=20tparki
+	 n@katalix.com|References:=20<cover.1721733730.git.jchapman@katalix
+	 .com>=0D=0A=20<be825ed1ae6e5756e85dbae8ac0afc6c48ce86fb.1721733730
+	 .git.jchapman@katalix.com>=0D=0A=20<20240724163316.GC97837@kernel.
+	 org>|From:=20James=20Chapman=20<jchapman@katalix.com>|Subject:=20R
+	 e:=20[RFC=20PATCH=2001/15]=20l2tp:=20lookup=20tunnel=20from=20sock
+	 et=20without=20using=0D=0A=20sk_user_data|In-Reply-To:=20<20240724
+	 163316.GC97837@kernel.org>;
+	b=3SobZUtlZYmF1XDAGzg2oZRbVSXDJEsq+tQQjuX3XK5yCqt8oJB8EhUK41+da8Hjc
+	 SfIgeq+0BPUEP/zyJPQUhcZBow9wdSbhYfA5477gVdi5MEUO9ndKr5LiJ6NOKrCp1S
+	 LNmxavzeOrdUg0bfrtoASprKY4VIYsEM5GGsnXP3emizhoI5tcGlDdQ5iiofYFdo0t
+	 EX86o1RvUR/3l21XX88cZH053c64Y052Hs1z4RwTk7K3RMW26er1iRm0AQXbFxGdGd
+	 D8VSXDE/ovwO57MwMZ5mddW1rkXEYti0OciaWvVYtVJhU/l9cxED67HjgOQZc6xAuT
+	 7xLFktCk1ug2A==
+Message-ID: <dd7fd63c-3d7d-1c47-d8ae-1ff4d6f65221@katalix.com>
+Date: Thu, 25 Jul 2024 08:44:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240722094119.31128-1-xiaolinkui@126.com> <CANn89iKrebOtKsZptq_NMhwCGOVbrp=QgAYnJE3OPsC1__N+HQ@mail.gmail.com>
- <4ef5ab3b.171b.190e8b6eedd.Coremail.xiaolinkui@126.com>
-In-Reply-To: <4ef5ab3b.171b.190e8b6eedd.Coremail.xiaolinkui@126.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Jul 2024 09:32:29 +0200
-Message-ID: <CANn89i+8Fn74WWjVvxnPo154JRie69p1Tz+imOUMnrnoRVmoDg@mail.gmail.com>
-Subject: Re: Re: [PATCH] tcp/dccp: replace using only even ports with all ports
-To: xiaolinkui <xiaolinkui@126.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, 
-	Linkui Xiao <xiaolinkui@kylinos.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com
+References: <cover.1721733730.git.jchapman@katalix.com>
+ <be825ed1ae6e5756e85dbae8ac0afc6c48ce86fb.1721733730.git.jchapman@katalix.com>
+ <20240724163316.GC97837@kernel.org>
+Content-Language: en-US
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: [RFC PATCH 01/15] l2tp: lookup tunnel from socket without using
+ sk_user_data
+In-Reply-To: <20240724163316.GC97837@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 25, 2024 at 9:07=E2=80=AFAM xiaolinkui <xiaolinkui@126.com> wro=
-te:
->
-> Thank you for your reply=EF=BC=8E
->
-> At 2024-07-22 21:50:39, "Eric Dumazet" <edumazet@google.com> wrote:
-> >On Mon, Jul 22, 2024 at 2:41=E2=80=AFAM <xiaolinkui@126.com> wrote:
-> >>
-> >> From: Linkui Xiao <xiaolinkui@kylinos.com>
-> >>
-> >> In commit 207184853dbd ("tcp/dccp: change source port selection at con=
-nect()
-> >> time"), the purpose is to address the issue of increased costs when al=
-l even
-> >> ports are in use.
-> >>
-> >> But in my testing environment, this more cost issue has not been resol=
-ved.
-> >
-> >You missed the whole point of 1580ab63fc9a ("tcp/dccp: better use of
-> >ephemeral ports in connect()")
-> >
-> >Have you read 207184853dbd ("tcp/dccp: change source port selection at
-> >connect() ..." changelog and are you using IP_LOCAL_PORT_RANGE ?
->
-> There seems to be some difference between IP_LOCAL_PORT_RANGE
-> and "sysctl net.ipv4.ip_local_port_range".We can use the following system
-> calls at the user layer to use IP_LOCAL_PORT_RANGE:
-> setsockopt(sockfd, IPPROTO_IP, IP_LOCAL_PORT_RANGE, &opt, sizeof(opt));
->
-> But user behavior is uncontrollable=EF=BC=8EIs there any other way to use=
- IP_LOCAL_PORT_RANGE=EF=BC=9F
+On 24/07/2024 17:33, Simon Horman wrote:
+> On Tue, Jul 23, 2024 at 02:51:29PM +0100, James Chapman wrote:
+>> l2tp_sk_to_tunnel derives the tunnel from sk_user_data. Instead,
+>> lookup the tunnel by walking the tunnel IDR for a tunnel using the
+>> indicated sock. This is slow but l2tp_sk_to_tunnel is not used in
+>> the datapath so performance isn't critical.
+>>
+>> l2tp_tunnel_destruct needs a variant of l2tp_sk_to_tunnel which does
+>> not bump the tunnel refcount since the tunnel refcount is already 0.
+>>
+>> Change l2tp_sk_to_tunnel sk arg to const since it does not modify sk.
+> 
+> nit: This needs a Signed-off-by line
 
-If user behavior can not be changed, this is on their end.
+I thought Signed-off-by tags weren't necessary for RFC patches. I'll add 
+them when I resubmit the series when netdev reopens.
 
-Sorry, we won't accept a patch going to the terrible situation we had
-before, where applications would fail completely in many cases.
+Thanks for looking at the patches.
+
 
