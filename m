@@ -1,115 +1,86 @@
-Return-Path: <netdev+bounces-112925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2161493BE2F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:50:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0083C93BF1D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11EE282639
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 08:50:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35B12819B1
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 09:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F24196C9B;
-	Thu, 25 Jul 2024 08:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566BB196D90;
+	Thu, 25 Jul 2024 09:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sB3obELb"
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="F6e9yuw0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0261F196438;
-	Thu, 25 Jul 2024 08:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E92D2746C;
+	Thu, 25 Jul 2024 09:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721897448; cv=none; b=sbJDDekcGRP2oOJ83JqGPdVQKf5lxGD2+Rl3Pb7mgS8ebb3aNjnv5xalvUN+HwijildWQVCulFPeQsMfGNWlkO6Omm4EXETgm7y5U8oOc6sinSJBqWrSRLYSdUzXKIY1hh7zBsWVv4ZOhsvcdZ4JoYzP39fsmZrN4c9cBxggxhQ=
+	t=1721899886; cv=none; b=b34z9i/Pe02X8VioP8QfAC1g58LdWBP98/Iy3qR7TMLbKac3yah1dVqtcMuHFcj2+YrK+GN2qUHlAOiW8NrBUBF4UnQS4PmtJG3FBMwecGn7Mfe6YgcYn/FVLEvQQMPhnxw2kHTk0HaSbKXZYqOf10bXck0l4Kb2YlAtYh39LU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721897448; c=relaxed/simple;
-	bh=OMp3CeWOcFvJAbm8g0YrxAISAwsJbKz6fXeARcHiXeA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J90mMM10J5uV0Az93emFhh+QwghHxBiFLssdyh1hXNTPneCSCwloqvIVTpsfUq6S7tm7NfqYquoqjYJZp1lq6MNWI4EYhrUyZpE0HQWnNU7CRAnibHhfuc8aLaB6sfjjE0zs+UXl5hbck/HiAuMeWK8ZU43ISCUWxEXwhPrq0JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sB3obELb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64714C116B1;
-	Thu, 25 Jul 2024 08:50:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721897447;
-	bh=OMp3CeWOcFvJAbm8g0YrxAISAwsJbKz6fXeARcHiXeA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sB3obELbDzy14mAk6Q5dSOmz8rx6pSmfinJySv7QDQAeTkNvsHeqRpTXcZTKomCmG
-	 5cOqLG8xAKun5rZW63YRB/WkrzuU/vY+eSvwJDKJEpdJ7GFPBFH6KIxQ4DSFwBhaXd
-	 ktVYB0vaIOWXVaZh93ngKRbQewFrpJknDHCA846w5HndeOpEZF6AiZXUQb4WbJJVNU
-	 Oa2TxJwSKV7f89xPB7z7JgIX7x63/910S+EckNqVH1jcGoJmDwYMNVzy1WTMA86JH3
-	 eGSGcnfk+16SXaQkigGDRUeGrXhKVBZ3+44m7srZ9rC+nS9Ng2ft8xXC9y8MngVEXE
-	 0/TVSH1M66rew==
-Date: Thu, 25 Jul 2024 09:50:42 +0100
-From: Lee Jones <lee@kernel.org>
-To: Marek Vasut <marex@denx.de>
-Cc: devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Rob Herring <robh@kernel.org>,
-	linux-leds@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] dt-bindings: leds: Document "netdev" trigger
-Message-ID: <20240725085042.GC501857@google.com>
-References: <20240708114653.18566-1-marex@denx.de>
+	s=arc-20240116; t=1721899886; c=relaxed/simple;
+	bh=S515Rp4aO9NR9Mhpii9h5FGmHF3y2s7v4/62ieXiZxA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=WoPScVImpDSwuiNkkARSnRz/DqHXx1pw2vmIuRNveHLbkudV+Au+AxYtdDyyb5bnpwyGIgfKPx6A5Ki+MSMdg4awxPTfBlRxZLInMFZ6kFp+9eOunytJdQAQXFtst3K4pTTA07P6Xc4G/l02qFIIdGcZFGgPoFHCg0YCUABEY8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=F6e9yuw0; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1721899323;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S515Rp4aO9NR9Mhpii9h5FGmHF3y2s7v4/62ieXiZxA=;
+	b=F6e9yuw0kiFlGCKFgQWLhGP6McJBu/kWmMYnD5xIV51IQxTbaLVimOb1g6iY2nZCQw72GI
+	pefcvVUSch/1+UA5RwQZEVgfl+LSy4oJnXCEokEstHvO70HSI3qVOpEJ30IrigLxChYvmT
+	+D1O8n66RrYeM+Jt9tcc4RUP5KC1g4I=
+To: kuba@kernel.org
+Cc: arefev@swemel.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	jasowang@redhat.com,
+	linux-kselftest@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	virtualization@lists.linux.dev,
+	willemdebruijn.kernel@gmail.com,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH net] virtio: fix GSO with frames unaligned to size
+Date: Thu, 25 Jul 2024 12:22:03 +0300
+Message-Id: <20240725092203.26366-1-arefev@swemel.ru>
+In-Reply-To: <20240723223109.2196886-1-kuba@kernel.org>
+References: <20240723223109.2196886-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240708114653.18566-1-marex@denx.de>
 
-Cc: Andrew and netdev
+I checked the patch on three reproducers and all three DEFINITELY broke the core.
 
-On Mon, 08 Jul 2024, Marek Vasut wrote:
+There are two malfunctions.
 
-> Document the "netdev" trigger which is used to control LEDs by
-> network device activity. This is an existing trigger used in
-> existing DTs, document it so validation of those DTs would pass.
-> 
-> Signed-off-by: Marek Vasut <marex@denx.de>
-> ---
-> Cc: Conor Dooley <conor+dt@kernel.org>
-> Cc: Jacek Anaszewski <jacek.anaszewski@gmail.com>
-> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> Cc: Lee Jones <lee@kernel.org>
-> Cc: Pavel Machek <pavel@ucw.cz>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-leds@vger.kernel.org
-> ---
-> V2: Expand the commit message slightly
-> ---
->  Documentation/devicetree/bindings/leds/common.yaml | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
-> index 8a3c2398b10ce..bf9a101e4d420 100644
-> --- a/Documentation/devicetree/bindings/leds/common.yaml
-> +++ b/Documentation/devicetree/bindings/leds/common.yaml
-> @@ -113,6 +113,8 @@ properties:
->              # LED indicates NAND memory activity (deprecated),
->              # in new implementations use "mtd"
->            - nand-disk
-> +            # LED indicates network activity
-> +          - netdev
+1. No flag skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
+ If it is not set then __skb_linearize will not be executed in skb_checksum_help.
+ sk_buff remains fragmented (non-linear) and this is the first warning.
+ OR add skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG.
+ OR ask Eric Dumazet (cef401de7be8c). Is checking if (skb_has_shared_frag(skb)) so important?
+ in the skb_checksum_help function, is it enough if (skb_is_nonlinear(skb)) ?
 
-netdev is the description of the network development ML/repo, right?
+2. The skb_segment algorithm and related checks, this is where you need time to think ...
 
-Seems like an odd name for an OS agnostic property?
-
->              # No trigger assigned to the LED. This is the default mode
->              # if trigger is absent
->            - none
-> -- 
-> 2.43.0
-> 
-
--- 
-Lee Jones [李琼斯]
+Best regards Denis.
 
