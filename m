@@ -1,138 +1,144 @@
-Return-Path: <netdev+bounces-112964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C725093C045
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:44:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0C193C06E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48EF3B209CE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:44:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4772D1C21AF6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2351990BB;
-	Thu, 25 Jul 2024 10:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15AD1991A0;
+	Thu, 25 Jul 2024 10:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TXJjTL62"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="BKL4KzhZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDA516A95E
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7762197A8B
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721904275; cv=none; b=pX7RpHrlXhP2fO2p/ME38MKtE8Y2WYwcQTbsCU3FsWcNksSJpD+hh2ocKSTEeJ6kwjukt91BRnyWrGcYWECEn2cJsvbqxw6GmCT3c+Iq+OYC7/0lm48NvwYOrc3Zv9983vSCd3BmV04/5c4P/InZNmwbfkq/WbOuNaZ8d+Opj80=
+	t=1721904708; cv=none; b=qlKRqZ3cB/aVH71HNUJA/XZlJOz/tCBMmXqXRfScIed+XUmKPHBvuZgXSqZaFM5w74LA0Jhil2rrfYy4/FOhENJc6hfyxR8R6aRA+XVBYTZMMO9WPZViU/T69QTHJcM2HF8xNF7cDJ1JBhpru/U7ScshvjKe4JJeF1/6E4XIQYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721904275; c=relaxed/simple;
-	bh=0vq0rDUT6bKO2W9H+6WFqSg/9iuDLDwHFDr3lWX1Za4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FQCAU84Ce2OBBi+MSd+bk9yqmciHIYXs40yCRCXd5YL5wiJh3Qj6+bW8V4QTmqwY66l0dVie8GiYBxlJfrgCrbFOTGQS2ElwX3WQ0+nLZoN+ujoxylL8hwXMES5mgliIMcu3xEp1IyzpRvsDxeXB0+txeg6VFWPSynFigmLkyQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TXJjTL62; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721904273;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zRI06KBbgnO+Bpzme7unWL6gNnWyJ2ogiXiY5GeACt8=;
-	b=TXJjTL623oUtRoATckil8p/mgqxgcjZKb7iptAQh1fbk9zRCinr9taPYTToGFrECwQV30v
-	YrBGrMW0N5HgbAOHVZU7RCxPawJMb+WWNtJjMvpSboVfsB1igiox9yS0T6gT/MX4h2Xya5
-	q1xRQEufY+qS7nmu3hVBRYnbNxSGwxI=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645--N6UudkBMwKRmqkD43yIAA-1; Thu, 25 Jul 2024 06:44:32 -0400
-X-MC-Unique: -N6UudkBMwKRmqkD43yIAA-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ef185db2b4so2361fa.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 03:44:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721904270; x=1722509070;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zRI06KBbgnO+Bpzme7unWL6gNnWyJ2ogiXiY5GeACt8=;
-        b=hX4m0qxANkxK+Y5xRvUOXB5OthgRzNuvpcfEBsEZw5URw1PGEjMFZlZEGPEejDO5Fg
-         tytyxD370Y+6/Q/lo0EO95Lhe++FrDsUC93kyiSc/cI3/ig/K8ITwmMEWKVj6ln2eUIl
-         dxI5WdMYs4baokQQA6v5h6V9CLitJRU4QaS8y69JhVcSOVGy6MLsMYu+5k3RrI7QF2oY
-         xrww1eThtvy/cB6mfgyoUk6vgIyEc4yflJvPXLqGTllWQawQIQqcKRso5CaCLJWolnjU
-         Zu814u6+dAu4DkQnjYsKILhC9BWZRA4d+TWiuj5VAGd5+uLAHfIqSwL/A09Am92feaxz
-         w2Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCUgcEH9Y+5pcQgw+qOyDullcFW00I9dIv/Avz5Q0FLu0FTXZvIjMSTWDW+ila/vlVFFf34LPPM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEJbrxfJbjGP6+2+0AlcDTzMEAbAyTUiWvbWwF9BlMsj+yz2PZ
-	DWkYwk+ndADTDnMZYHaDFgAfnk2/IgXOOEPiG8c62eralIwrisjMIhqTG1yImcvkwf3lFkk5WB1
-	UALrKNpbkxy5KgPkAZWevDWnm1wvrNg5JZVYgbpF2rIKR6MrS/xqbvg==
-X-Received: by 2002:a05:651c:155:b0:2ef:2346:9135 with SMTP id 38308e7fff4ca-2f03c8000e0mr7282361fa.9.1721904270476;
-        Thu, 25 Jul 2024 03:44:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFUBK6W2GUS8+jtAqWZDWCnsmj9yGfBQkRTr8Yb+Fe36zV0LVzufyszMXt+QAvJPZG2mpdWvg==
-X-Received: by 2002:a05:651c:155:b0:2ef:2346:9135 with SMTP id 38308e7fff4ca-2f03c8000e0mr7282221fa.9.1721904269873;
-        Thu, 25 Jul 2024 03:44:29 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427f9386b87sm67279135e9.19.2024.07.25.03.44.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 03:44:29 -0700 (PDT)
-Message-ID: <e263f723-0b9c-4059-982d-2bb4b5636759@redhat.com>
-Date: Thu, 25 Jul 2024 12:44:27 +0200
+	s=arc-20240116; t=1721904708; c=relaxed/simple;
+	bh=3fcLBujA8oEJ6hlp8dEqRtvI9FgUBp6fr0LxMsx9NvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8u8co6pj3MWAdj0ZgTmfHYqWuHTywJMgXSzLdxZnnJ16w6lP4uL+3fc15aFe67FE7wzIGnBplCbANmuIkVxdwbXsrr6NkaD43ejvPzGlASHWUOYu/OKJGd+v8lEzedYPt7WgMttDfM0ks4GgGrnzvieftv4bCpqs9gN5tm8xeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=BKL4KzhZ; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=kcFe
+	Yku6GJhrCR24Aw9mdE9/gi7I04NxDXXehgOMSOk=; b=BKL4KzhZz7eoQX4DqhK/
+	/6oba79W938TvUqntDFMmBEZS6VRRAlblh2z985GTl9t4+21pFopA03vBYYI8Y7C
+	zlBPlfqu2OEY5EzpwWRQ4Xr4m0PX/6ohTIDtIL/HT9SO7KdN6Es7M7RiekR+PmEj
+	dOZZWW+CxXu98k5CQCJ/SLJE+hp2rAV4h6AklD5Jzr5hwFvu1H8ej7vPaO+eExrK
+	Lp+9OB5x0sgnlWBQ4olz9vE4psZGaxbSggZ2px+cqe/IorBDjNs6oda4KhWsF3id
+	QGj9qbsrjGme2P054wEqHqbNavIVtRKhEc1M5OnyqBN74JKsMS3vujEBfGMt9qdu
+	bg==
+Received: (qmail 2964050 invoked from network); 25 Jul 2024 12:51:35 +0200
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 25 Jul 2024 12:51:35 +0200
+X-UD-Smtp-Session: l3s3148p1@Hxu0LRAehq0ujnsv
+Date: Thu, 25 Jul 2024 12:51:35 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <ZqIuN2JR_mRgZiJ1@shikoro>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, jgg@nvidia.com
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+ <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com>
+ <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tun: Remove nested call to bpf_net_ctx_set() in
- do_xdp_generic()
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jeongjun Park <aha310510@gmail.com>, jasowang@redhat.com
-Cc: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, jiri@resnulli.us,
- bigeasy@linutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <000000000000949a14061dcd3b05@google.com>
- <20240724152149.11003-1-aha310510@gmail.com>
- <66a1bbe7f05a0_85410294c6@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <66a1bbe7f05a0_85410294c6@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="25JKoLVFGJsXZT50"
+Content-Disposition: inline
+In-Reply-To: <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
 
-On 7/25/24 04:43, Willem de Bruijn wrote:
-> Jeongjun Park wrote:
->> In the previous commit, bpf_net_context handling was added to
->> tun_sendmsg() and do_xdp_generic(), but if you write code like this,
->> bpf_net_context overlaps in the call trace below, causing various
->> memory corruptions.
-> 
-> I'm no expert on this code, but commit 401cb7dae813 that introduced
-> bpf_net_ctx_set explicitly states that nested calls are allowed.
-> 
-> And the function does imply that:
-> 
-> static inline struct bpf_net_context *bpf_net_ctx_set(struct bpf_net_context *bpf_net_ctx)
-> {
->          struct task_struct *tsk = current;
-> 
->          if (tsk->bpf_net_context != NULL)
->                  return NULL;
->          bpf_net_ctx->ri.kern_flags = 0;
-> 
->          tsk->bpf_net_context = bpf_net_ctx;
->          return bpf_net_ctx;
-> }
 
-I agree with Willem, the ctx nesting looks legit generally speaking. 
-@Jeongjun: you need to track down more accurately the issue root cause 
-and include such info into the commit message.
+--25JKoLVFGJsXZT50
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Skimming over the code I *think* do_xdp_generic() is not cleaning the 
-nested context in all the paths before return and that could cause the 
-reported issue.
+Hi Ricardo,
 
-Thanks,
+> It would be great to define what are the free software communities
+> here. Distros and final users are also "free software communities" and
+> they do not care about niche use cases covered by proprietary
+> software.
+> They only care (and should care) about normal workflows.
 
-Paolo
+Don't you think there are distros and final users who do care about
+proprietary influences, in general. For sure, though, I think they
+should not be told what they should care about?
 
+> If we want vendors involved, we need to build an ecosystem where they
+> feel invited.
+
+Definitely. Invited as in "you are welcome to work with us on this",
+though. Not as in "come here and do what you want". This is why we have
+a coding-style etc...
+
+> We should not take as hostages our users and impose rules on how they
+> should build or even sell their product.
+
+Right, it should be a plain buisness decision. I totally agree with your
+"clear rules" request below. And yeah, face to face is probably best
+suited.
+
+> - Vendor passthrough mechanisms are allowed for niche use cases or
+> development/experimentation.
+
+Problem with "niche" is that it can grow really big. See Linux :)
+
+All the best,
+
+   Wolfram
+
+
+--25JKoLVFGJsXZT50
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmaiLjMACgkQFA3kzBSg
+KbYVFxAAo3/PCWMxZwmHL8MWxA34jXcOM9odcmry6DNofkZ5hGEHjT8XjhaYB9l4
+7jbWHf78CsCBAT5g+km2MfYbpy7INfWa+7whZAwNVMuDSndFG4lbCpG6x7qA/dVw
+bM5eRdbS6EUkP9oSSpJ/RvFH3dmtEZ7CULl/wYdUiCjn6JbjVF/0+q0m0SKNskA3
+3HDjVebHimY3oMM37njXTO3Gv0W4H83VEvHt8ExPXwoq8pdr0SflaGFxQ0Bv7dfX
+5pSarLw/Xn2kFx/8MbHigRX74iApoxeUsI94N9uZx7pnSc8Hhxa5vVueKjFOg2/A
+4+TbumL0y5cQYga5Mav5FEStXEj6Lc1ICvrQfpYmiEqsf/TbtTUOmtwpKxV2WZvw
+9egngAuxTOs1WS1MEBWjc7rR1Cvij9zJc0XEPlcgWbd6zMGJSlm5uG7xMudP49Hh
+tuyjr4B08bK5K4ilNfT2E6OkRZSQ3yjHHlj/p0SUj19q9uL+anxvPP7RIbH+/wDT
+mQ0iMoVsIyxtKSzE7YdDg2U5XQJc+jjX7BJ3jotxn0nvMLoHgrmv+6MRCBVR5jvE
+eQdI0dOx1WQr/oJs6Eu+YxWynjLFhEp+keIYerWqAsCUFADBH+2zeu4hpI/SBOz8
+X5vzHqMEh/YaYBF4OH2ZT91fRlXfQQajzDzKhcTkee/z5Nq1Vxw=
+=z870
+-----END PGP SIGNATURE-----
+
+--25JKoLVFGJsXZT50--
 
