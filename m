@@ -1,193 +1,138 @@
-Return-Path: <netdev+bounces-112954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FB893C002
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:37:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C725093C045
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:44:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5691F21800
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:37:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48EF3B209CE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E1E198E92;
-	Thu, 25 Jul 2024 10:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2351990BB;
+	Thu, 25 Jul 2024 10:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TXJjTL62"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487D6197A7E
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDA516A95E
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721903846; cv=none; b=byGF4JmkxQ+Jvf3N6RSwGkiMu/mCw+0exbZ+z6KZTQ+M2PisqugMNQgOi8MKl7P2pbQBbWARJtlVOZCCXhDU1uwDvEM2Qv6s16XXuzNck1TwlmUU68l9tthYNokfayeSApFTQTRS3ghy9fH7d/a3BhgL0NZcgxo169VKXJ5NLeQ=
+	t=1721904275; cv=none; b=pX7RpHrlXhP2fO2p/ME38MKtE8Y2WYwcQTbsCU3FsWcNksSJpD+hh2ocKSTEeJ6kwjukt91BRnyWrGcYWECEn2cJsvbqxw6GmCT3c+Iq+OYC7/0lm48NvwYOrc3Zv9983vSCd3BmV04/5c4P/InZNmwbfkq/WbOuNaZ8d+Opj80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721903846; c=relaxed/simple;
-	bh=qSKX9p5YVWAvitEQ24g+XcA8SWuCHO5k7LZTcK93pRU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kSUXjIjcH+ohWja1FEqz1z1eYYnWzpJQSEjYF4eeenTJ9F3rSg70ueUfgh5umxiZLe1+FpkW8jhI/jRFKsi2ZbyavLXM9+NIF9pE1G7KmKoxiFBIro1hqMi06qthBlV5nQrSWsrKHAS5K4uX9oSgtTgBCn8mz5pvKF55vv9unms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3988d01a236so6806865ab.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 03:37:25 -0700 (PDT)
+	s=arc-20240116; t=1721904275; c=relaxed/simple;
+	bh=0vq0rDUT6bKO2W9H+6WFqSg/9iuDLDwHFDr3lWX1Za4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FQCAU84Ce2OBBi+MSd+bk9yqmciHIYXs40yCRCXd5YL5wiJh3Qj6+bW8V4QTmqwY66l0dVie8GiYBxlJfrgCrbFOTGQS2ElwX3WQ0+nLZoN+ujoxylL8hwXMES5mgliIMcu3xEp1IyzpRvsDxeXB0+txeg6VFWPSynFigmLkyQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TXJjTL62; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721904273;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zRI06KBbgnO+Bpzme7unWL6gNnWyJ2ogiXiY5GeACt8=;
+	b=TXJjTL623oUtRoATckil8p/mgqxgcjZKb7iptAQh1fbk9zRCinr9taPYTToGFrECwQV30v
+	YrBGrMW0N5HgbAOHVZU7RCxPawJMb+WWNtJjMvpSboVfsB1igiox9yS0T6gT/MX4h2Xya5
+	q1xRQEufY+qS7nmu3hVBRYnbNxSGwxI=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645--N6UudkBMwKRmqkD43yIAA-1; Thu, 25 Jul 2024 06:44:32 -0400
+X-MC-Unique: -N6UudkBMwKRmqkD43yIAA-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ef185db2b4so2361fa.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 03:44:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721903844; x=1722508644;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U0pc+mI4+ATyUGYpTpDp/lsXoG4NSyaYIoXdPooAzhE=;
-        b=o3M/SDQOBotCxdt9vELp7bSMwPQA+LPJeeCpHpYMecp42o2D75aQVDiMw1UgkNdPPN
-         yVxqZ9qmbWT4VUUeiBiC88hEAoCTGta17IiyJzsQ+Zs7wup7SqOgHrzTbESkmIoqke+0
-         vhY9Ye2q3BDdI6Cj2WEE50xkediMC8CRc0WzrXQ/ndz/q1Mh0nprxrXDUKIr0iO8BqT5
-         LqdkhYop/AZ/cJxR6SdRyiEu4rWbdm3HPG4oCkm/5z6LAPed9OYxVgKdMji9Qy34l0eQ
-         AWlJkiWWI2W3mLLjZLXO8uZnkjdl4n136Uo6/BR/0CUVC2qyMd8gF/AVTBXvpD8PCug1
-         /2oA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUqv5aBeehGejciO+ABjnsgrPAxvzlv5Nj4AXoof3FQGxQUm8XofXe3tEo4wiyLJAWJo8mmOnjSs1jYZoC5Etg6bhMBtwF
-X-Gm-Message-State: AOJu0YzV/Tzv5J+mPZQIRZuwktQKL7fGe/y1nwpxle8c/7Iomgv/9kkf
-	L9twwVPTApoOmeSKASr66UYRIt8QeTwsXYgSGV/xopvT8mmNMXVpfgCFgV24ncfHmKF+jJnrDeu
-	3diYIZ9I07fCpcpyljnw2zEFdmz1X5dy7HlnBtyjXQKBQvL/+urAj+kA=
-X-Google-Smtp-Source: AGHT+IGuyq/HTso4AkXAK6GX3rN5MFwy22n9vWGz3ph4z5vxpyJy3fDzwORE1DGON3OQ/bKYdvK6gKwJz1uc3mdeKu0oa5SF5Oms
+        d=1e100.net; s=20230601; t=1721904270; x=1722509070;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zRI06KBbgnO+Bpzme7unWL6gNnWyJ2ogiXiY5GeACt8=;
+        b=hX4m0qxANkxK+Y5xRvUOXB5OthgRzNuvpcfEBsEZw5URw1PGEjMFZlZEGPEejDO5Fg
+         tytyxD370Y+6/Q/lo0EO95Lhe++FrDsUC93kyiSc/cI3/ig/K8ITwmMEWKVj6ln2eUIl
+         dxI5WdMYs4baokQQA6v5h6V9CLitJRU4QaS8y69JhVcSOVGy6MLsMYu+5k3RrI7QF2oY
+         xrww1eThtvy/cB6mfgyoUk6vgIyEc4yflJvPXLqGTllWQawQIQqcKRso5CaCLJWolnjU
+         Zu814u6+dAu4DkQnjYsKILhC9BWZRA4d+TWiuj5VAGd5+uLAHfIqSwL/A09Am92feaxz
+         w2Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgcEH9Y+5pcQgw+qOyDullcFW00I9dIv/Avz5Q0FLu0FTXZvIjMSTWDW+ila/vlVFFf34LPPM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEJbrxfJbjGP6+2+0AlcDTzMEAbAyTUiWvbWwF9BlMsj+yz2PZ
+	DWkYwk+ndADTDnMZYHaDFgAfnk2/IgXOOEPiG8c62eralIwrisjMIhqTG1yImcvkwf3lFkk5WB1
+	UALrKNpbkxy5KgPkAZWevDWnm1wvrNg5JZVYgbpF2rIKR6MrS/xqbvg==
+X-Received: by 2002:a05:651c:155:b0:2ef:2346:9135 with SMTP id 38308e7fff4ca-2f03c8000e0mr7282361fa.9.1721904270476;
+        Thu, 25 Jul 2024 03:44:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUBK6W2GUS8+jtAqWZDWCnsmj9yGfBQkRTr8Yb+Fe36zV0LVzufyszMXt+QAvJPZG2mpdWvg==
+X-Received: by 2002:a05:651c:155:b0:2ef:2346:9135 with SMTP id 38308e7fff4ca-2f03c8000e0mr7282221fa.9.1721904269873;
+        Thu, 25 Jul 2024 03:44:29 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427f9386b87sm67279135e9.19.2024.07.25.03.44.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jul 2024 03:44:29 -0700 (PDT)
+Message-ID: <e263f723-0b9c-4059-982d-2bb4b5636759@redhat.com>
+Date: Thu, 25 Jul 2024 12:44:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b24:b0:396:ec3b:df65 with SMTP id
- e9e14a558f8ab-39a24011ffemr1540995ab.4.1721903844284; Thu, 25 Jul 2024
- 03:37:24 -0700 (PDT)
-Date: Thu, 25 Jul 2024 03:37:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f9eeec061e0ffa03@google.com>
-Subject: [syzbot] [net?] BUG: unable to handle kernel paging request in net_generic
-From: syzbot <syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tun: Remove nested call to bpf_net_ctx_set() in
+ do_xdp_generic()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jeongjun Park <aha310510@gmail.com>, jasowang@redhat.com
+Cc: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, jiri@resnulli.us,
+ bigeasy@linutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <000000000000949a14061dcd3b05@google.com>
+ <20240724152149.11003-1-aha310510@gmail.com>
+ <66a1bbe7f05a0_85410294c6@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <66a1bbe7f05a0_85410294c6@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 7/25/24 04:43, Willem de Bruijn wrote:
+> Jeongjun Park wrote:
+>> In the previous commit, bpf_net_context handling was added to
+>> tun_sendmsg() and do_xdp_generic(), but if you write code like this,
+>> bpf_net_context overlaps in the call trace below, causing various
+>> memory corruptions.
+> 
+> I'm no expert on this code, but commit 401cb7dae813 that introduced
+> bpf_net_ctx_set explicitly states that nested calls are allowed.
+> 
+> And the function does imply that:
+> 
+> static inline struct bpf_net_context *bpf_net_ctx_set(struct bpf_net_context *bpf_net_ctx)
+> {
+>          struct task_struct *tsk = current;
+> 
+>          if (tsk->bpf_net_context != NULL)
+>                  return NULL;
+>          bpf_net_ctx->ri.kern_flags = 0;
+> 
+>          tsk->bpf_net_context = bpf_net_ctx;
+>          return bpf_net_ctx;
+> }
 
-syzbot found the following issue on:
+I agree with Willem, the ctx nesting looks legit generally speaking. 
+@Jeongjun: you need to track down more accurately the issue root cause 
+and include such info into the commit message.
 
-HEAD commit:    c912bf709078 Merge remote-tracking branches 'origin/arm64-..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1625a15e980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=79a49b0b9ffd6585
-dashboard link: https://syzkaller.appspot.com/bug?extid=6acef9e0a4d1f46c83d4
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
+Skimming over the code I *think* do_xdp_generic() is not cleaning the 
+nested context in all the paths before return and that could cause the 
+reported issue.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thanks,
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/fea69a9d153c/disk-c912bf70.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/be06762a72ef/vmlinux-c912bf70.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6c8e58b4215d/Image-c912bf70.gz.xz
+Paolo
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com
-
-Unable to handle kernel paging request at virtual address dfff800000000257
-KASAN: probably user-memory-access in range [0x00000000000012b8-0x00000000000012bf]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[dfff800000000257] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
-Modules linked in:
-CPU: 1 PID: 6969 Comm: syz.2.105 Not tainted 6.10.0-rc7-syzkaller-gc912bf709078 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : net_generic+0xd0/0x250 include/net/netns/generic.h:46
-lr : rcu_read_lock include/linux/rcupdate.h:782 [inline]
-lr : net_generic+0x54/0x250 include/net/netns/generic.h:45
-sp : ffff8000a6c86c10
-x29: ffff8000a6c86c10 x28: dfff800000000000 x27: 0000000000000802
-x26: 0000000000000002 x25: 1ffff00014d90d88 x24: dfff800000000000
-x23: ffff0000ca3fbd70 x22: ffff8000a6c86c40 x21: dfff800000000000
-x20: 00000000000012b8 x19: 000000000000004e x18: 1ffff00014d90cfe
-x17: 000000000003099a x16: ffff80008054bde8 x15: 0000000000000001
-x14: ffff80008f100568 x13: dfff800000000000 x12: 00000000af8628cd
-x11: 0000000068a0e22d x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : 0000000000000257 x7 : ffff80008a4326a8 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000002
-x2 : 0000000000000008 x1 : ffff80008b681f20 x0 : 0000000000000001
-Call trace:
- net_generic+0xd0/0x250 include/net/netns/generic.h:46
- l2tp_pernet net/l2tp/l2tp_core.c:125 [inline]
- l2tp_tunnel_get+0x90/0x464 net/l2tp/l2tp_core.c:207
- l2tp_udp_recv_core net/l2tp/l2tp_core.c:852 [inline]
- l2tp_udp_encap_recv+0x314/0xb3c net/l2tp/l2tp_core.c:933
- udpv6_queue_rcv_one_skb+0x1870/0x1ad4 net/ipv6/udp.c:727
- udpv6_queue_rcv_skb+0x3bc/0x574 net/ipv6/udp.c:789
- udp6_unicast_rcv_skb+0x1cc/0x320 net/ipv6/udp.c:929
- __udp6_lib_rcv+0xbcc/0x1330 net/ipv6/udp.c:1018
- udpv6_rcv+0x88/0x9c net/ipv6/udp.c:1133
- ip6_protocol_deliver_rcu+0x988/0x12a4 net/ipv6/ip6_input.c:438
- ip6_input_finish+0x164/0x298 net/ipv6/ip6_input.c:483
- NF_HOOK+0x328/0x3d4 include/linux/netfilter.h:314
- ip6_input+0x90/0xa8 net/ipv6/ip6_input.c:492
- dst_input include/net/dst.h:460 [inline]
- ip6_rcv_finish+0x1f0/0x21c net/ipv6/ip6_input.c:79
- NF_HOOK+0x328/0x3d4 include/linux/netfilter.h:314
- ipv6_rcv+0x9c/0xbc net/ipv6/ip6_input.c:310
- __netif_receive_skb_one_core net/core/dev.c:5625 [inline]
- __netif_receive_skb+0x18c/0x3c8 net/core/dev.c:5739
- netif_receive_skb_internal net/core/dev.c:5825 [inline]
- netif_receive_skb+0x1f0/0x93c net/core/dev.c:5885
- tun_rx_batched+0x568/0x6e4
- tun_get_user+0x260c/0x3978 drivers/net/tun.c:2002
- tun_chr_write_iter+0xfc/0x204 drivers/net/tun.c:2048
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0x8f8/0xc38 fs/read_write.c:590
- ksys_write+0x15c/0x26c fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __arm64_sys_write+0x7c/0x90 fs/read_write.c:652
- __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:131
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:150
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-Code: d2d00015 f2fbfff5 8b080294 d343fe88 (38756908) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	d2d00015 	mov	x21, #0x800000000000        	// #140737488355328
-   4:	f2fbfff5 	movk	x21, #0xdfff, lsl #48
-   8:	8b080294 	add	x20, x20, x8
-   c:	d343fe88 	lsr	x8, x20, #3
-* 10:	38756908 	ldrb	w8, [x8, x21] <-- trapping instruction
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
