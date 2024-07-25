@@ -1,148 +1,173 @@
-Return-Path: <netdev+bounces-112955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C88D93C003
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:37:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FB893C002
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D74F1C21AB7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:37:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5691F21800
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0AC1990B2;
-	Thu, 25 Jul 2024 10:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E1E198E92;
+	Thu, 25 Jul 2024 10:37:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80136198E84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487D6197A7E
 	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721903847; cv=none; b=eCciqhO0OJwJoLNy0MK4AfmQ9WbTmHdz4CGBpf2yERBujyXvo3cvq9fQ+ESfQiQNWX6afgY098zRL6HK1gsZba4iv9C+bmFjv98GkQD3ZY0SsSC3LaUI8BRd9jZItN9rdfXrtvnAqhisZes9ljBq3AEefFkOMwj2FyKL0vNHvpk=
+	t=1721903846; cv=none; b=byGF4JmkxQ+Jvf3N6RSwGkiMu/mCw+0exbZ+z6KZTQ+M2PisqugMNQgOi8MKl7P2pbQBbWARJtlVOZCCXhDU1uwDvEM2Qv6s16XXuzNck1TwlmUU68l9tthYNokfayeSApFTQTRS3ghy9fH7d/a3BhgL0NZcgxo169VKXJ5NLeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721903847; c=relaxed/simple;
-	bh=e+HgzfBixzkSmh99gsFRir3r3MIuP1EvSEc7+bTstsc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AEebi0TFDpnS8/KnMkf1T2Y3EYxw5TLJbQpxnEWY+s1UYcQbFBI+4wVv/ZyOm2drq4Jtig7dHVxmBYp6jf7oiXa2aMh0fqEYkkLgFHj4KHqBkSDcp6FXImJ/TUkmPnmKQ8L0CA6HX6BdmvD6icpM8WcRuDn/fX5lef6YLPNdBwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+	s=arc-20240116; t=1721903846; c=relaxed/simple;
+	bh=qSKX9p5YVWAvitEQ24g+XcA8SWuCHO5k7LZTcK93pRU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kSUXjIjcH+ohWja1FEqz1z1eYYnWzpJQSEjYF4eeenTJ9F3rSg70ueUfgh5umxiZLe1+FpkW8jhI/jRFKsi2ZbyavLXM9+NIF9pE1G7KmKoxiFBIro1hqMi06qthBlV5nQrSWsrKHAS5K4uX9oSgtTgBCn8mz5pvKF55vv9unms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8152f0c4e1bso134323239f.1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3988d01a236so6806865ab.1
         for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 03:37:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721903845; x=1722508645;
+        d=1e100.net; s=20230601; t=1721903844; x=1722508644;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=S3qf9QcL2Ze6DFtKZYBjpyF713HONXLgftyPCH25s68=;
-        b=QhfXzx5CRW3yJjo/AJQDruPtC6vWjk2CGlv8apU2iHw4Rp/aCJr0wIgX5jiTKTl8M9
-         nEzvbOdalJI/4XCPwMtE+jlhvfKSopjDkQdNyAwRU/04R5w6h+Jkck/lo/ojKRTf3M/M
-         LytavVfxFHihDUN4xEfdN1LEeq4Zza+YI8GKRU60OWaYWDsQXXXhq0T8YfD5J5APjzI+
-         cI7n7z5qnzUg/Z+AU3lxQjo1SSDPvLmMW2SXNbP1V3t1j6cCewq42+5N0aQlK/d0kQwj
-         CUHfppMDySk8EpEZnXH7AwybdCpRWDwGBLEeg9cZ75n4n8XXJnc3CQAQFsCxZ046pijR
-         IlVA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTrrTr4WylNBPyKIXnVu8lgt3J0rXFdwoOEQC/BbWHqVEoYZhY0D2YRSUQHjNV0723QB8Q22FGeqc0MShRI7k2ol9K9O+K
-X-Gm-Message-State: AOJu0YxfYyny0pZOCUcaOfDlG8NYD3xHpcA2RDnsAffO6lR0XB/H2qEX
-	W6iY3eX6UGp1gSCoqkQTwHOT7vvVN1j3FY3Qlynofb+I9huoxAqctrueV09C9Te+OyE1Mv2zEcj
-	t2Cw2ltQx5M4DD/WbQ+vPJ9cytZxaGlLaSNTbXGDj/V4VRFmgmnud6qE=
-X-Google-Smtp-Source: AGHT+IHquEr9IB4p4qNZw3ugs6DFMLLyttRQ6rcaOQPg4RE6OsaHR06OOFlSW1Ym1omKfR/j6AmiNHW+yLCH1lZNRJov0CTso4cx
+        bh=U0pc+mI4+ATyUGYpTpDp/lsXoG4NSyaYIoXdPooAzhE=;
+        b=o3M/SDQOBotCxdt9vELp7bSMwPQA+LPJeeCpHpYMecp42o2D75aQVDiMw1UgkNdPPN
+         yVxqZ9qmbWT4VUUeiBiC88hEAoCTGta17IiyJzsQ+Zs7wup7SqOgHrzTbESkmIoqke+0
+         vhY9Ye2q3BDdI6Cj2WEE50xkediMC8CRc0WzrXQ/ndz/q1Mh0nprxrXDUKIr0iO8BqT5
+         LqdkhYop/AZ/cJxR6SdRyiEu4rWbdm3HPG4oCkm/5z6LAPed9OYxVgKdMji9Qy34l0eQ
+         AWlJkiWWI2W3mLLjZLXO8uZnkjdl4n136Uo6/BR/0CUVC2qyMd8gF/AVTBXvpD8PCug1
+         /2oA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUqv5aBeehGejciO+ABjnsgrPAxvzlv5Nj4AXoof3FQGxQUm8XofXe3tEo4wiyLJAWJo8mmOnjSs1jYZoC5Etg6bhMBtwF
+X-Gm-Message-State: AOJu0YzV/Tzv5J+mPZQIRZuwktQKL7fGe/y1nwpxle8c/7Iomgv/9kkf
+	L9twwVPTApoOmeSKASr66UYRIt8QeTwsXYgSGV/xopvT8mmNMXVpfgCFgV24ncfHmKF+jJnrDeu
+	3diYIZ9I07fCpcpyljnw2zEFdmz1X5dy7HlnBtyjXQKBQvL/+urAj+kA=
+X-Google-Smtp-Source: AGHT+IGuyq/HTso4AkXAK6GX3rN5MFwy22n9vWGz3ph4z5vxpyJy3fDzwORE1DGON3OQ/bKYdvK6gKwJz1uc3mdeKu0oa5SF5Oms
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:91cf:0:b0:806:f9d1:52b2 with SMTP id
- ca18e2360f4ac-81f7be70b0emr2428339f.2.1721903844566; Thu, 25 Jul 2024
+X-Received: by 2002:a05:6e02:b24:b0:396:ec3b:df65 with SMTP id
+ e9e14a558f8ab-39a24011ffemr1540995ab.4.1721903844284; Thu, 25 Jul 2024
  03:37:24 -0700 (PDT)
 Date: Thu, 25 Jul 2024 03:37:24 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fe34b1061e0ffa36@google.com>
-Subject: [syzbot] [rdma?] WARNING: ODEBUG bug in siw_netdev_event (2)
-From: syzbot <syzbot+3e6d53405f58eda0bd6c@syzkaller.appspotmail.com>
-To: bmt@zurich.ibm.com, jgg@ziepe.ca, leon@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000f9eeec061e0ffa03@google.com>
+Subject: [syzbot] [net?] BUG: unable to handle kernel paging request in net_generic
+From: syzbot <syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    d7e78951a8b8 Merge tag 'net-6.11-rc0' of git://git.kernel...
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=14da0779980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8d1cf7c29e32ce12
-dashboard link: https://syzkaller.appspot.com/bug?extid=3e6d53405f58eda0bd6c
+HEAD commit:    c912bf709078 Merge remote-tracking branches 'origin/arm64-..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=1625a15e980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=79a49b0b9ffd6585
+dashboard link: https://syzkaller.appspot.com/bug?extid=6acef9e0a4d1f46c83d4
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
 
 Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3c208b51873e/disk-d7e78951.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/adec146cf41c/vmlinux-d7e78951.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/52f09b8f7356/bzImage-d7e78951.xz
+disk image: https://storage.googleapis.com/syzbot-assets/fea69a9d153c/disk-c912bf70.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/be06762a72ef/vmlinux-c912bf70.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6c8e58b4215d/Image-c912bf70.gz.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3e6d53405f58eda0bd6c@syzkaller.appspotmail.com
+Reported-by: syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com
 
-------------[ cut here ]------------
-ODEBUG: init active (active state 0) object: ffff88801e645208 object type: work_struct hint: siw_netdev_down+0x0/0x1f0
-WARNING: CPU: 0 PID: 5666 at lib/debugobjects.c:518 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:515
+Unable to handle kernel paging request at virtual address dfff800000000257
+KASAN: probably user-memory-access in range [0x00000000000012b8-0x00000000000012bf]
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[dfff800000000257] address between user and kernel address ranges
+Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
 Modules linked in:
-CPU: 0 PID: 5666 Comm: syz.3.129 Not tainted 6.10.0-syzkaller-09703-gd7e78951a8b8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:debug_print_object+0x17a/0x1f0 lib/debugobjects.c:515
-Code: e8 1b 7f 42 fd 4c 8b 0b 48 c7 c7 c0 72 20 8c 48 8b 74 24 08 48 89 ea 44 89 e1 4d 89 f8 ff 34 24 e8 db 5b 9e fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 fc 35 f8 0a 48 83 c4 10 5b 41 5c 41 5d 41 5e 41
-RSP: 0018:ffffc90016e2e7b8 EFLAGS: 00010286
-RAX: e1f1ce699f2edb00 RBX: ffffffff8bc9f240 RCX: ffff88801e51da00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffffff8c207440 R08: ffffffff815565a2 R09: fffffbfff1c39f60
-R10: dffffc0000000000 R11: fffffbfff1c39f60 R12: 0000000000000000
-R13: ffffffff8c207358 R14: dffffc0000000000 R15: ffff88801e645208
-FS:  00007fda35fff6c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c352547 CR3: 000000007f7da000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __debug_object_init+0x2a9/0x400 lib/debugobjects.c:654
- siw_device_goes_down drivers/infiniband/sw/siw/siw_main.c:395 [inline]
- siw_netdev_event+0x3bd/0x620 drivers/infiniband/sw/siw/siw_main.c:422
- notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
- call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
- call_netdevice_notifiers net/core/dev.c:2046 [inline]
- __dev_close_many+0x146/0x300 net/core/dev.c:1532
- __dev_close net/core/dev.c:1570 [inline]
- __dev_change_flags+0x30e/0x6f0 net/core/dev.c:8835
- dev_change_flags+0x8b/0x1a0 net/core/dev.c:8909
- do_setlink+0xccd/0x41f0 net/core/rtnetlink.c:2900
- rtnl_setlink+0x40d/0x5a0 net/core/rtnetlink.c:3201
- rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6647
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f0/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- sock_write_iter+0x2dd/0x400 net/socket.c:1160
- do_iter_readv_writev+0x60a/0x890
- vfs_writev+0x37c/0xbb0 fs/read_write.c:971
- do_writev+0x1b1/0x350 fs/read_write.c:1018
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fda35175f19
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fda35fff048 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 00007fda35305f60 RCX: 00007fda35175f19
-RDX: 0000000000000001 RSI: 00000000200003c0 RDI: 0000000000000006
-RBP: 00007fda351e4e68 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fda35305f60 R15: 00007ffc0c742898
- </TASK>
+CPU: 1 PID: 6969 Comm: syz.2.105 Not tainted 6.10.0-rc7-syzkaller-gc912bf709078 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : net_generic+0xd0/0x250 include/net/netns/generic.h:46
+lr : rcu_read_lock include/linux/rcupdate.h:782 [inline]
+lr : net_generic+0x54/0x250 include/net/netns/generic.h:45
+sp : ffff8000a6c86c10
+x29: ffff8000a6c86c10 x28: dfff800000000000 x27: 0000000000000802
+x26: 0000000000000002 x25: 1ffff00014d90d88 x24: dfff800000000000
+x23: ffff0000ca3fbd70 x22: ffff8000a6c86c40 x21: dfff800000000000
+x20: 00000000000012b8 x19: 000000000000004e x18: 1ffff00014d90cfe
+x17: 000000000003099a x16: ffff80008054bde8 x15: 0000000000000001
+x14: ffff80008f100568 x13: dfff800000000000 x12: 00000000af8628cd
+x11: 0000000068a0e22d x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 0000000000000257 x7 : ffff80008a4326a8 x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000002
+x2 : 0000000000000008 x1 : ffff80008b681f20 x0 : 0000000000000001
+Call trace:
+ net_generic+0xd0/0x250 include/net/netns/generic.h:46
+ l2tp_pernet net/l2tp/l2tp_core.c:125 [inline]
+ l2tp_tunnel_get+0x90/0x464 net/l2tp/l2tp_core.c:207
+ l2tp_udp_recv_core net/l2tp/l2tp_core.c:852 [inline]
+ l2tp_udp_encap_recv+0x314/0xb3c net/l2tp/l2tp_core.c:933
+ udpv6_queue_rcv_one_skb+0x1870/0x1ad4 net/ipv6/udp.c:727
+ udpv6_queue_rcv_skb+0x3bc/0x574 net/ipv6/udp.c:789
+ udp6_unicast_rcv_skb+0x1cc/0x320 net/ipv6/udp.c:929
+ __udp6_lib_rcv+0xbcc/0x1330 net/ipv6/udp.c:1018
+ udpv6_rcv+0x88/0x9c net/ipv6/udp.c:1133
+ ip6_protocol_deliver_rcu+0x988/0x12a4 net/ipv6/ip6_input.c:438
+ ip6_input_finish+0x164/0x298 net/ipv6/ip6_input.c:483
+ NF_HOOK+0x328/0x3d4 include/linux/netfilter.h:314
+ ip6_input+0x90/0xa8 net/ipv6/ip6_input.c:492
+ dst_input include/net/dst.h:460 [inline]
+ ip6_rcv_finish+0x1f0/0x21c net/ipv6/ip6_input.c:79
+ NF_HOOK+0x328/0x3d4 include/linux/netfilter.h:314
+ ipv6_rcv+0x9c/0xbc net/ipv6/ip6_input.c:310
+ __netif_receive_skb_one_core net/core/dev.c:5625 [inline]
+ __netif_receive_skb+0x18c/0x3c8 net/core/dev.c:5739
+ netif_receive_skb_internal net/core/dev.c:5825 [inline]
+ netif_receive_skb+0x1f0/0x93c net/core/dev.c:5885
+ tun_rx_batched+0x568/0x6e4
+ tun_get_user+0x260c/0x3978 drivers/net/tun.c:2002
+ tun_chr_write_iter+0xfc/0x204 drivers/net/tun.c:2048
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0x8f8/0xc38 fs/read_write.c:590
+ ksys_write+0x15c/0x26c fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __arm64_sys_write+0x7c/0x90 fs/read_write.c:652
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:131
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:150
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Code: d2d00015 f2fbfff5 8b080294 d343fe88 (38756908) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	d2d00015 	mov	x21, #0x800000000000        	// #140737488355328
+   4:	f2fbfff5 	movk	x21, #0xdfff, lsl #48
+   8:	8b080294 	add	x20, x20, x8
+   c:	d343fe88 	lsr	x8, x20, #3
+* 10:	38756908 	ldrb	w8, [x8, x21] <-- trapping instruction
 
 
 ---
