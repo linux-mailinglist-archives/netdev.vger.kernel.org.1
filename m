@@ -1,71 +1,96 @@
-Return-Path: <netdev+bounces-113005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06E9F93C314
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:31:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C7993C317
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:32:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 389961C20C8C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:31:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C56F91C20E34
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7720C19B3C4;
-	Thu, 25 Jul 2024 13:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nvkIQukz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564451991C2;
+	Thu, 25 Jul 2024 13:32:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A841991C2;
-	Thu, 25 Jul 2024 13:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596A5C8DF
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 13:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721914256; cv=none; b=OsBdkM1dyIf2OMnFs6wqkZJhiulRushQYvFzkkKVU2j8/uLQ0natW85TazhOgCd3rOUctNoaQaDKQe0NLvTc8Z1e/tK7jmY+GQIWuTPvpjsvoAKHHKbSvKEoIOS3qSRcWMuoOk/SCTSRT1oMZhroNrXChszJdzWY2GT3p/rRH24=
+	t=1721914359; cv=none; b=IFNOYkcejLdk5aBFjEiuZcxaigrQA8Ocpb8u/VYVSyyvajiUKwu2PmziWAnmz0avdZjbB3VTx+z/a6PEDKFzIOwpBBao70P6vvxzLjVUkAzj0qfkhBBUg3OIT5jLQHWOIa4T9S5+512rtHqejbzVA2tXUMwIOBK+8hxCYlWYah4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721914256; c=relaxed/simple;
-	bh=P3eEGO6WJVHL/6FRedqgnF5UFgz3V6FKYvYv3CZGFVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fPzsBiMnWEmS3ksa2uGZM84l4xZzVNnglAEEd5SywBIS8+U10SrhKle9LW6QNU46ygZKfu2GHs7J1RWOUf196M/0QtNvkfeTQGODV/s11YmGlqnDX9YYCFt3tXMSbwYX4aXR1I30Noo6lttjpB1Nz9pcmtoiB2L8y8MwactohdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nvkIQukz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DC4AC4AF0A;
-	Thu, 25 Jul 2024 13:30:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721914255;
-	bh=P3eEGO6WJVHL/6FRedqgnF5UFgz3V6FKYvYv3CZGFVc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nvkIQukzXqLhkxNG2L+J/bd7zSR7kE4IqVjYm4wOABADjcwggjlzREF/zVkBoHzIv
-	 5JQP8ucxaNXOzNZx4zJggFMrALrRkOovRHyNZZjC2cnxKGq+5mcSNUZbPBBfz3n5k2
-	 CKU39MlpQkM+LhzsQbjnfFPKSg0UJCVHLAc0PzwVYjSqtBcr3knMdbx3h88GKl1tWX
-	 fMbujcf49rEbsd1T7PoiAQ2NxWbw/Hn6cVkcs7PoayCirCMsJYoo9L9nzb0O3/wpFe
-	 uvapiWXKCsAjkYFlxM//SwLMAGPX/PfhKsHUgZO0CysTCvAzqDSTy0BCeskh/Wei7s
-	 htty2kjjuu7qg==
-Date: Thu, 25 Jul 2024 06:30:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: pull-request: bpf 2024-07-25
-Message-ID: <20240725063054.0f82cff5@kernel.org>
-In-Reply-To: <20240725114312.32197-1-daniel@iogearbox.net>
-References: <20240725114312.32197-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1721914359; c=relaxed/simple;
+	bh=K4PTR5RVg2pOKD+K6GouP8AuPg4312hCwMR2q2BzxKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=QUYstJfOMwyfdOAN7Ag7Xi/d2QRf53u0Nnn4A2IUAKsp7vpJHztvAUQ6zR8wqOeG9Wtq8LQyrDJtqV9dvwTwlO7tl2RmdQOfFhMOl/NzsGOQkgHFIY1pcrjmh7fT1X4VtpcBiwr2lXBMKIZ3rFBIb5N2yVJJaPhMjvPTwa95vm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-539-fHE8KkJHPdmlpXb_nemvMw-1; Thu,
+ 25 Jul 2024 09:32:25 -0400
+X-MC-Unique: fHE8KkJHPdmlpXb_nemvMw-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A814A1955EB4;
+	Thu, 25 Jul 2024 13:32:23 +0000 (UTC)
+Received: from hog (unknown [10.39.192.3])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 06F231955D45;
+	Thu, 25 Jul 2024 13:32:20 +0000 (UTC)
+Date: Thu, 25 Jul 2024 15:32:18 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v5 06/17] xfrm: add mode_cbs module
+ functionality
+Message-ID: <ZqJT4llwpzag1TUr@hog>
+References: <20240714202246.1573817-1-chopps@chopps.org>
+ <20240714202246.1573817-7-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20240714202246.1573817-7-chopps@chopps.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 25 Jul 2024 13:43:12 +0200 Daniel Borkmann wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+2024-07-14, 16:22:34 -0400, Christian Hopps wrote:
+> +struct xfrm_mode_cbs {
 
-While I have you, is this a known in BPF CI problem?
+It would be nice to add kdoc for the whole thing.
 
- ar: libLLVM.so.19.0: cannot open shared object file: No such file or directory
 
-Looks like our BPF CI builds are failing since 8pm PST yesterday.
+> diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+> index 7cee9c0a2cdc..6ff05604f973 100644
+> --- a/net/xfrm/xfrm_input.c
+> +++ b/net/xfrm/xfrm_input.c
+> @@ -494,6 +497,10 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __b=
+e32 spi, int encap_type)
+> =20
+>  =09=09family =3D x->props.family;
+> =20
+> +=09=09/* An encap_type of -3 indicates reconstructed inner packet */
+
+And I think it's time to document all the encap_types above the
+function (and in particular, how xfrm_inner_mode_input/encap_type=3D-3
+pair together), and/or define some constants. Also, is -2 used
+anywhere (I only see -1 and -3)? If not, then why -3?
+
+--=20
+Sabrina
+
 
