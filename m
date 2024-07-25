@@ -1,55 +1,71 @@
-Return-Path: <netdev+bounces-113035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5CA93C687
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:34:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F284D93C6C6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 17:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1C421C2217C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:34:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74D60B232CC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505D119CD0C;
-	Thu, 25 Jul 2024 15:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492CE19D895;
+	Thu, 25 Jul 2024 15:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eaM3lN+i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCA3QYTE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DA71993AE;
-	Thu, 25 Jul 2024 15:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1168F18028;
+	Thu, 25 Jul 2024 15:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721921689; cv=none; b=DFJ0iPJPL0fkLyJ8aX79u3RaxWAOlDWk0Sz6+3JrOPAWB7CKKpg8pNjBu/CY5MrpQzvqDPaif6DZspb74jzV6T9Dugx287CFtUy/7SrO8+CXqHb+5LpXV77nu8KhpmAUJx0nZTvgZ0oJhS/elI/y2g1Jya1yv0exy2sOd2Su3s4=
+	t=1721922502; cv=none; b=Qm6RUUJJOBYmZ1ezJi4or741sJnfSqOG/m4qypUJKYnheT+t9ZwPepb2Fyg56Obs9kceMJCfQWEKcrvJpDF7oCulqW5yyL2CSVw0zbAbMfYqHSCgrkp17i9r3StRaBVTG0NpiecRb4HcXX2O1ByzKtWcAU9W3tYu10fE1zCoh7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721921689; c=relaxed/simple;
-	bh=XwYVVIPGvDLM+Mi4lkud9Ay/FNg2RmftzXEjlRISXXo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=SpWl0ujHBxD8uJ+gJXwnzBxPnbGusgxH+AufoLe2dbuio3b3rb/NYS9oyRmfcFSI+qU8ThnMg4jVNdKsMJ8BXOVSQ/eAmLEOlipscHCigDBcLd227Se5V6QhE67ewANiWEfE+tGkhFAlSZ/JsX1+qDsu8GE4IxpeNlkfkj2xYns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eaM3lN+i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 736C4C116B1;
-	Thu, 25 Jul 2024 15:34:48 +0000 (UTC)
+	s=arc-20240116; t=1721922502; c=relaxed/simple;
+	bh=FLTJ7x08G9e+q6Iydwv973CWTvKTcuWdEIk3gHa7gXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PYm/TN83rVuZJva8iTTtF8c1e66/7xclS/CQ3R+lOPheq4dRkLO+sA1VZc2aySlmHKR2PPVpxIFncdnZtpESey6ac5OMNo4lZg2sfPOGYHUehRslH11jYSnK/xAiHcNPUulSdx2llHRrX1B4fha2sjcWtRn0F8YdDm5ZNFUVfuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCA3QYTE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB77CC116B1;
+	Thu, 25 Jul 2024 15:48:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721921688;
-	bh=XwYVVIPGvDLM+Mi4lkud9Ay/FNg2RmftzXEjlRISXXo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=eaM3lN+iLVyBPPl+yEcq6t0yIUHQzrNxG0e56HJ4cYuskPpcE2Myp72XAU77I8f9Q
-	 56nrZ1j5Sps8BYWLpkdNaMvGQzPDo4DBKAYGsq/GRnc/HHmBXUhfXdVa4i0bxv5QOa
-	 vrgr8lGA5k/wR74+3OIqOX+BJ5SLAckQqdTbThWIsf7AXRUQzXuVLrxoM2nM+1kVnu
-	 k2+Yih1sZFgYaA3Tcc+xRWvSR/VdwocYU0hBKmnqTRvkNWKlUc/72f9QZyNu9xGUVQ
-	 FmQp0sLXS9i6XS4DNIX2Ukur2ZMhgNyaJw4ZQLcFx6ZHaa114gdgESkylHcL0BvS8Z
-	 nih0jxLIPhIaQ==
-Date: Thu, 25 Jul 2024 10:34:46 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: George-Daniel Matei <danielgeorgem@chromium.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org, nic_swsd@realtek.com,
-	netdev@vger.kernel.org, "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Subject: Re: [PATCH] PCI: r8169: add suspend/resume aspm quirk
-Message-ID: <20240725153446.GA841157@bhelgaas>
+	s=k20201202; t=1721922501;
+	bh=FLTJ7x08G9e+q6Iydwv973CWTvKTcuWdEIk3gHa7gXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DCA3QYTEwh31gVhDB+a/iAG0lmZiwqo1s2DpqJPvihGjKrs1NHXpI/EYqfsq0df1B
+	 qKJ/Dvk1OSL/tGK9P3WaR8rGLYHtnDNSGEdZv+PvAYukRRVlDgitqPQuewcBa1d9Ll
+	 uuea7a5aRox86ofp7pCfY3uvgcTLprGeINO0YweIQ1Fi2+kz3VLR11hR6hQC1tdBPl
+	 LHwFmOKg8hFYNnyDWj+o7ZgpHcgw3ncuKjrgO9wvcZt2V4ylsXm1p5HwJ2e2Yqkyji
+	 5Nx83IC9IBy1SHY+RIMC0EyInmyZoYOoie7zcxV45wlQDzKx4Jr3Dj/j9t5q011Np7
+	 8doYYw8IEX8JQ==
+Date: Thu, 25 Jul 2024 16:48:13 +0100
+From: Lee Jones <lee@kernel.org>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andreas Kemnade <andreas@kemnade.info>, linux-acpi@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v2 0/6] use device_for_each_child_node() to access device
+ child nodes
+Message-ID: <20240725154813.GI501857@google.com>
+References: <20240721-device_for_each_child_node-available-v2-0-f33748fd8b2d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,66 +75,77 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <3e0e1ceb-9da8-4227-8964-04e891c1d9e3@gmail.com>
+In-Reply-To: <20240721-device_for_each_child_node-available-v2-0-f33748fd8b2d@gmail.com>
 
-[+cc Rafael in case you have suspend debug help]
+On Sun, 21 Jul 2024, Javier Carrasco wrote:
 
-On Tue, Jul 16, 2024 at 09:25:40PM +0200, Heiner Kallweit wrote:
-> On 16.07.2024 14:13, George-Daniel Matei wrote:
-> > On Thu, Jul 11, 2024 at 7:45 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> >> On 10.07.2024 17:09, George-Daniel Matei wrote:
-> >>>>> Added aspm suspend/resume hooks that run
-> >>>>> before and after suspend and resume to change
-> >>>>> the ASPM states of the PCI bus in order to allow
-> >>>>> the system suspend while trying to prevent card hangs
-> >>>>
-> >>>> Why is this needed?  Is there a r8169 defect we're working around?
-> >>>> A BIOS defect?  Is there a problem report you can reference here?
-> >>>
-> >>> We encountered this issue while upgrading from kernel v6.1 to v6.6.
-> >>> The system would not suspend with 6.6. We tracked down the problem to
-> >>> the NIC of the device, mainly that the following code was removed in
-> >>> 6.6:
-> >>>> else if (tp->mac_version >= RTL_GIGA_MAC_VER_46)
-> >>>>         rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);1
-> >>
-> >> With this (older) 6.1 version everything is ok?
-> >> Would mean that L1.1 is active and the system suspends (STR?) properly
-> >> also with L1.1 being active.
-> >>
-> > Yes, with 6.1 everything was ok. L1 was active and just the L1.1 substate
-> > was enabled, L1.2 was disabled.
-> > 
-> >> Under 6.6 per default L1 (incl. sub-states) is disabled.
-> >> Then you manually enable L1 (incl. L1.1, but not L1.2?) via sysfs,
-> >> and now the system hangs on suspend?
-> >>
-> > Yes, in 6.6 L1 (+substates) is disabled. Like Bjorn mentioned, I
-> > think that is because of 90ca51e8c654 ("r8169:
-> > fix ASPM-related issues on a number of systems with NIC version from
-> > RTL8168h". With L1 disabled the system would not suspend so I enabled
-> > back L1 along with just L1.1 substate through sysfs, just to test, and
-> > saw that the system could
+> This series aims to clarify the use cases of:
 > 
-> It still sounds very weird that a system does not suspend to ram
-> just because ASPM L1 is disabled for a single device.
-> What if a PCI device is used which doesn't support ASPM?
+> - device_for_each_child_node[_scoped]()
+> - fwnode_for_each_available_child_node[_scoped]()
 > 
-> Which subsystem fails to suspend? Can you provide a log showing
-> the suspend error?
+> to access firmware nodes.
+> 
+> There have been multiple discussions [1][2] about what the first macro
+> implies in the sense of availability, and a number of users have opted
+> for the second macro in cases where the first one should have been
+> preferred.
+> 
+> The second macro is intended to be used over child nodes of a firmware
+> node, not direct child nodes of the device node. Instead, those users
+> retrieve the fwnode member from the device struct just to have access to
+> a macro that explicitly indicates node availability.
+> 
+> That workaround is not necessary because `device_for_each_child_node()`
+> implies availability for the existing backends (ACPI, DT, swnode).
+> 
+> This series does not cover other points discussed in [2] like addressing
+> uses of `fwnode_for_each_child_node()` where `device_*` should have been
+> used, using the `_avaialble_` variant of the fwnode loop whenever
+> possible, or adding new `_scoped` macros. Such points will be covered by
+> subsequent series to keep focus on the "availability" issue.
+> 
+> The conversion has been validated with an LTC2992 hwmon sensor, which is
+> one of the affected drivers. The rest of the drivers could only be
+> compiled and checked with static-analysis tools.
+> 
+> Link: https://lore.kernel.org/all/20211205190101.26de4a57@jic23-huawei/ [1]
+> Link: https://lore.kernel.org/all/20240523-fwnode_for_each_available_child_node_scoped-v2-0-701f3a03f2fb@gmail.com/ [2]
+> 
+> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+> ---
+> Changes in v2:
+> - [1/6] property.h: drop "if found" from the description of
+>   device_for_each_child_node()
+> - [3/6] bd2607mvv.c: fix child node usage.
+> - Link to v1: https://lore.kernel.org/r/20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com
+> 
+> ---
+> Javier Carrasco (6):
+>       device property: document device_for_each_child_node macro
+>       hwmon: (ltc2992) use device_for_each_child_node_scoped() to access child nodes
+>       leds: bd2606mvv: fix device child node usage in bd2606mvv_probe()
+>       leds: is31fl319x: use device_for_each_child_node_scoped() to access child nodes
+>       leds: pca995x: use device_for_each_child_node() to access device child nodes
+>       net: mvpp2: use device_for_each_child_node() to access device child nodes
+> 
+>  drivers/hwmon/ltc2992.c                         | 19 ++++----------
+>  drivers/leds/leds-bd2606mvv.c                   | 23 ++++++++---------
+>  drivers/leds/leds-is31fl319x.c                  | 34 ++++++++-----------------
+>  drivers/leds/leds-pca995x.c                     | 15 ++++-------
+>  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 13 +++-------
+>  include/linux/property.h                        | 10 ++++++++
+>  6 files changed, 45 insertions(+), 69 deletions(-)
+> ---
+> base-commit: 41c196e567fb1ea97f68a2ffb7faab451cd90854
+> change-id: 20240701-device_for_each_child_node-available-1c1eca4b6495
 
-Can we push on this a little bit?  The fact that suspend fails is
-super interesting to me.  I'd like to know exactly how this fails and
-whether it's in the kernel or in firmware.  If we're violating some
-assumption firmware is making, maybe there would be a more generic
-fix.
+fatal: bad object 41c196e567fb1ea97f68a2ffb7faab451cd90854
 
-How exactly do you suspend?  Is there any debugging output you can
-collect while doing that?  Maybe [1] has hints.  I see a bunch of
-trace_suspend_resume() calls, and I think they're connected to [2],
-which looks like it might generate console/dmesg output, but I don't
-know how to enable that.
+And the LED patches do not apply to LED.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/power/basic-pm-debugging.rst?id=v6.10
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/trace/events/power.h?id=v6.10#n247
+Please rebase onto -next.
+
+-- 
+Lee Jones [李琼斯]
 
