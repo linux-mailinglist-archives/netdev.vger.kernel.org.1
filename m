@@ -1,196 +1,222 @@
-Return-Path: <netdev+bounces-112996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD5193C286
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 14:56:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555BC93C295
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 15:00:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 908D41C20D8E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:56:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 051AA2824A4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4217719AD72;
-	Thu, 25 Jul 2024 12:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D76919AD6E;
+	Thu, 25 Jul 2024 12:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PSpSx33N"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="My7d1R1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2064.outbound.protection.outlook.com [40.107.236.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB8919AD6E
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 12:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721912193; cv=none; b=ULVSOfyViTwJEwsgK7kbxS4SrG0ZvCP9LwVSMlnHr78lTcwuS/ZlWLwaD57R4DSmUno3UyAUk65U7I573ye/E6RSQsvVnpIJmFjooIxvp/VIwEk4WUF5SF/a1obpvm1pyclQtOg5U3mk/Iz+fPQnxoWI0k2/53T1pA8w449+hqI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721912193; c=relaxed/simple;
-	bh=W+wn0GlOw0Gf8eTKdYVnQsoy5a7TOWTISZPM87pGBkY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rpu90oIkR5IdBLpkrlgpTrPdMmByBR7ZTYSDoE8gpcZSnx80OUraeW7fPZ1elux83B/KrzBoLU9JxCX37MHD7/7sm7S9UZwNTSxombh1HZQqfWG7rJMLV8EswAH/8KFpnf6mzEEhKjckuV8NHKrDfSjA89dCxTvVjjXncToTvTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PSpSx33N; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-52f04150796so185436e87.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 05:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1721912189; x=1722516989; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J36xabAj2bKInLJhB2Kp1HMkLRnJXufSHyFnP7004CA=;
-        b=PSpSx33NJKP/ArKf2Klir+NRPUFjRcJ+81zpng344POaanyiZGoOf7fARnvuuHf+Qa
-         aBUlAboixii+dR90vvYLVKasQMpI6mzo6Zr4EE8kYxZyIMGEiu04ovDRQEOVl/vQxQsU
-         1uyOJD+vsTnWHV7E9UzoXYDpS21SyA7zO87kw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721912189; x=1722516989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J36xabAj2bKInLJhB2Kp1HMkLRnJXufSHyFnP7004CA=;
-        b=EsJZtnZUM2Kd/N8m22v812A+srM/SSHIzDskHoLeo+sxnwdv8AJjUWNH73FxwvRFSd
-         u/zC9xM3t/GBcOyTwCxspOyBSWJhQ0pzBVWyuYa2VovEUOGfKJz5ITtyZb30Gl3mTeuH
-         AqRnv1Tb4DgqwPE7Pc3amuplDL1jf08FSqeClrqp/mGRM0gLrtF6pqsBn1aP/+SMfMMD
-         CFIzIg1UQK+1eWmAuvh76CGHnRjOMdQOwwanyAGLnNaC47SA+gY9RLqFm+6U/907peUC
-         4OwJKCw8d+HLXN6LhE2Fs/RgPxZblqm+8t2MXbZWA0K+u21ERC0qJMeyAu7uxBg3lBou
-         uQWA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtazCmS6LWb/GV4Hu4MeOlKg1J/ui2kwNsPl1Ohu3DlYNZLCmQUEJ5j4AkSBpBqf6FUXLpPhtc1/qddIirkgvC5UcRAjYC
-X-Gm-Message-State: AOJu0YxjQBqroIGbfLnhXSm7VsXpxtBiav7XEhmy/TZQYtRIhH5wCVTY
-	kEhXWrU++zOm0bWfsENu6l6606yfcOHUjmXPJKYn5NEbfYG/nXS1WIKmR9XEYZxdQErch8dhGZZ
-	84pA1yvJBSuZzWGTgkdLfDxYEHG/wuGjI1D2D
-X-Google-Smtp-Source: AGHT+IHqe58dpuQj44+fi+BabiviB+bKNn8yQfGDBzJey5WA1EPHom3t+V10YXvWL2j00LON9G2edsy2X6K/lIjK1NY=
-X-Received: by 2002:a05:6512:3092:b0:52c:e312:2082 with SMTP id
- 2adb3069b0e04-52fd3f9e81dmr2126031e87.54.1721912189402; Thu, 25 Jul 2024
- 05:56:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C665019AD56
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 12:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721912391; cv=fail; b=MikQlluzVvMFwmF/GVnFg+mWQPXPDr7bzmVeAB2NfGgJjvUUBSeyBeUU1p8/++KlFDfIgqpam2NKxQsPjQOJZ3QmvWHBI6heuokK1e2tl+ccxQDmXTSdE968aif76rEo8Ngc7UQM1yNvjLFiQcLWeJ8F3gCUxbyU/NbFI3uvLgk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721912391; c=relaxed/simple;
+	bh=Zyr6f+dtZp6FBn6Eh0PKzq3rajaVYhyZWeBhBlsHIn4=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=cE+j0FFHA9KdTb7eWr7S/aI53o9LTN+Is/DA1srluSDCNvzG561cOLtXoswnwdWGPE0nfbu3ROjELHkHLaBAHEPoeNezM7p9b6lnErq2dXEl8KTZfRwmCd3oahZkzDGg6Qq+lm2bQMAIoYkaEhtMnmbynaHVenFeb8YSZ5V2PZQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=My7d1R1y; arc=fail smtp.client-ip=40.107.236.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qlxGA/2useOTLYIV2rFsVgv/s5w3vC6Gm5eLs+CCL6boeaZTbwGVhAxL1ieLBLDNo5Nt73Vr33uh3g2LZeZyr+Ec3dW1zPMznwrHkn7HnHMM+TTCEuTGPoRW/eS2sIFNUOVyrSzQ0zGYF6MOz6cVqZh4jsTT2DS6iuPZTHy8KHujPwVK+SyVj6PnVZ9DpBOMAP2GWFJmttFiRoB3mAk15zNy738FYHs3BE9JatCBYUiPWrZtHeSxaKdZXfD4Z5p9rM6gYcuGjOrr9/rMwPV0hqnxbYx1P99nrMLNjvCNSdY5xvuV+xyb2twlLdrw9PI8ezlT8/EWWK3ptd0rWSf0wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VyIW6bDttWvKPQti8JMqOlCcVvXkOyBe5pN5/wX5d8A=;
+ b=AjqErewLLU9dVHnL94aUjFWK6IwZoQ/6DNV4vPmX2Sqpg35bLPsRYo7+N0rUMw+SbIfrA6hFEblX8vVlwts/AvEYq75sNuJtwVSUaYbE2hNjP6QI5N+rgvtS7150+V3PSOVCrGbBx3dVMGCE/p3M2ayrxVMeqBYJL6VGf8ZKdcQ483yaOgpjAI8z8bll/jduh+w95hP9y5C6VNFEHeveqA0QBRml7pcOG6irivUuZTzCzgP25fnIrKd5LSS08PEXfjVXlEiz88Mv7h/36cMVqL7O7x/qIlv1UdFCIekdgiOt2HrZqNv4OW6nbPEzegiXtm7OUcZnFSCpAyeXcRdq4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VyIW6bDttWvKPQti8JMqOlCcVvXkOyBe5pN5/wX5d8A=;
+ b=My7d1R1yrMp5VuHinFAuqBDHF8vUEqxXfonszps7KuR+gJGEE4cJ1QHT7V4ogNGoUZ6umR4blJxxCNuPaXsO4Djk/fKSeLxgE6SmR9HQWrz0GR5ivw/2VH8bB5ltnwSuWiMbfz2RAUBScK4HCmnQjiGBieSxMb/YagZocTcLMKOowjU311B3rhs8HT4O7L91unRrdADRj+xzG3z2Nmr4CcoD6HiFwYO2IS1e+EVGoWimbmioKvuyBPrUqHlU8+qSMr72gWh58STdbAi4CmcJi1ISPpq7heouo58zps735Z6OC59G7gh3PJ116HHjICdGfPsaW7uPwtp3XoQl4it1MA==
+Received: from DS0PR17CA0021.namprd17.prod.outlook.com (2603:10b6:8:191::16)
+ by MW4PR12MB7238.namprd12.prod.outlook.com (2603:10b6:303:229::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Thu, 25 Jul
+ 2024 12:59:45 +0000
+Received: from CY4PEPF0000FCC5.namprd03.prod.outlook.com
+ (2603:10b6:8:191:cafe::9b) by DS0PR17CA0021.outlook.office365.com
+ (2603:10b6:8:191::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29 via Frontend
+ Transport; Thu, 25 Jul 2024 12:59:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000FCC5.mail.protection.outlook.com (10.167.242.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7784.11 via Frontend Transport; Thu, 25 Jul 2024 12:59:45 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 25 Jul
+ 2024 05:59:34 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 25 Jul
+ 2024 05:59:29 -0700
+References: <8b06dd4ec057d912ca3947bacf15529272dea796.1721749627.git.petrm@nvidia.com>
+ <CANn89iJQB4Po=J32rg10CNE+hrGqGZWfdWqKPdY6FK0UgQpxXg@mail.gmail.com>
+ <CANn89iLvqJXmCktm=8WoSuSWOAVHe35fy+WHet-U+psMW2gAoQ@mail.gmail.com>
+ <CANn89iJ6vG3n0bUbGuHosRDwW97z7CT4m4+_D91onPK5rd8xVw@mail.gmail.com>
+ <CANn89iLcHERTvExi7zEVwArxBzaa2C-y_W_UPQa2ZWzYdT_d+Q@mail.gmail.com>
+ <87o76n85ml.fsf@nvidia.com>
+ <CANn89iLGh6sG8AhD_dgb15Es6MsATZ+QHkNzHwm5iufTCXZ+SA@mail.gmail.com>
+ <877cd98woh.fsf@nvidia.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+CC: Eric Dumazet <edumazet@google.com>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, David Ahern
+	<dsahern@kernel.org>, <mlxsw@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCH net] net: nexthop: Initialize all fields in dumped nexthops
+Date: Thu, 25 Jul 2024 14:56:47 +0200
+In-Reply-To: <877cd98woh.fsf@nvidia.com>
+Message-ID: <8734nx8w6s.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CACfW=qpNmSeQVG_qSeYpEdk9pf_RTAEEKp+OiBYrRFd3d6HOXg@mail.gmail.com>
- <20240710213837.GA257340@bhelgaas>
-In-Reply-To: <20240710213837.GA257340@bhelgaas>
-From: George-Daniel Matei <danielgeorgem@chromium.org>
-Date: Thu, 25 Jul 2024 14:56:18 +0200
-Message-ID: <CACfW=qqPmiV6ez8Gf6GT6jyN5JEvF=mVeAqckWYVycsRuD746w@mail.gmail.com>
-Subject: Re: [PATCH] PCI: r8169: add suspend/resume aspm quirk
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, nic_swsd@realtek.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC5:EE_|MW4PR12MB7238:EE_
+X-MS-Office365-Filtering-Correlation-Id: c361fc36-6c4e-4ea0-256f-08dcaca9a83f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MGlHczVHMVJ5MExNSEFvb2IyL2IwNXRmZnBJYks5d0dyV3FUd0hsME5IK2RK?=
+ =?utf-8?B?RndrT0djb3hNRWlWdG4zWUZrMnZTZ2ZRMDBWRFBqRHJ4U3R3Q09JcmpocFp4?=
+ =?utf-8?B?TFNVelJHa09JYU1laENUTUllaWY5KzZsNW5XeEUrU3NyOHVyanZQQUV4MzNH?=
+ =?utf-8?B?Z0NQbnRYalU4cFdFeW5HbkhLalhVd0lNRmU0TGF1UmxOVWRxa2NjV0E4Y1Nh?=
+ =?utf-8?B?b09iRjVsNE5lcElScGF2c3BYODJTR3V0QXRYQWxHZEorSnROY0VtQWxMUzJU?=
+ =?utf-8?B?T0tpekR1bUk0NEhKY3lQdkJjV2lUVWJaZG9hNmV4K2xVRzFUTkdLWGQybWpi?=
+ =?utf-8?B?ZDM4czd1THFJS1pEN2ZycTFoU0hWWkdMUUdXUitjOURRS0lHQnAyNHdlMnZL?=
+ =?utf-8?B?WUtCNnp3MW5nRjJ3czhaNjdpWThpVkx4bklsOXNidkdvWmdqOWpCNGRjU01h?=
+ =?utf-8?B?bHdPMHFrTXdVcDRNaC9ETEtYYzI3NWxSSFk3RnFzakVWWWVYeXMrRDFBNktm?=
+ =?utf-8?B?Qkp1a21TalYvdjRnVE45Y00xajIxcmVPcmY2Zlp6N0FBaE1PY0N6OFREWXJ3?=
+ =?utf-8?B?TDV2azlzYi81NVc1aVpzYWpMSm51dUFDTEJYai9MME83WUVJRHordFRsNG9a?=
+ =?utf-8?B?RDVnekJiVUg3VVdacnJGQ1NGdjRFc0RXNE15MHU1MzM1Wk1ZU2JiT2RWT0lU?=
+ =?utf-8?B?M0svQXdxNkp5TDU4Z0FrTmRYeG1TQ2pjMk1NeExVUG92OHRaVEZFMEFjOXhh?=
+ =?utf-8?B?amIwcXBYRzV6R1RHWDR0dTZuWjFjTXZwNE85alpWb2hoMjYyNi9LUEVuWGVm?=
+ =?utf-8?B?aTkzSkVqUnZ1U3lORU5FN3FPTDVaT2ZNa2U3TENMamtDekVmRkFqWWNWYzVU?=
+ =?utf-8?B?VUVWTDZOZnpoMVBreDF3N1E1cVlhOWVLL3A4ZlZnNkk0bTlHdkphZlgwUTVG?=
+ =?utf-8?B?QW54VytYWktvMjc0NzhQOElvWG1xQitYanI0RVZxOG9Ucms0UlZRKzlOeGNK?=
+ =?utf-8?B?S093SGY0VkdpMGxWTkt6OXppOUVlMEhqalhiWkl4R2NXeG42cFIvdm9sdnNa?=
+ =?utf-8?B?a3o5TVl4NDlWM1djZEd3dm0xUFplT3YwMjhFZDlabTU3V3IxUVJiZGNGZkhD?=
+ =?utf-8?B?aWprVUlwYUdjKzh0M3B4VzZnOGJPaS96NkxJWDZKWWpEdmdjZVY1Z2tOcUhB?=
+ =?utf-8?B?aFQwdDRqaURNRFNDdmNBbjdXSzd0bi9LWU45YUdoNGxleCtiR05hRDlCMjN1?=
+ =?utf-8?B?SHp6RTFPZVR2R2dBR2RMalh4b1RLZUJZd3hTaCthUEhZa1pZZ3lPUDkvejJC?=
+ =?utf-8?B?WGFUc1VsVFFta3lnTGhVZ3g5dE9UMHY5TzJMdkVhNW9HY1p0REhoUnNYYkJC?=
+ =?utf-8?B?TjVHa3lhZVF0T2xMYjMyZzRMSXFyVE8rbytxcnhNU3I2VnJhempINUVmOWMv?=
+ =?utf-8?B?ZUpNMHZwNTQ2amhrOG5MdDZYWFRkOFNoLzRZR0REdW5mUTRYV0Z0ZFBwVzZh?=
+ =?utf-8?B?T1J4b0wvRkpiRDFpdHp6VGc0WW9JWmMweTJaQU9oZEZWZENqU3ZKaFZMelBS?=
+ =?utf-8?B?VUxERzN0ZHkwMUVvOEVmRGlCU1NENWJRR1VSQkNzNGxtOUNYeHZOZ2h1cm0y?=
+ =?utf-8?B?eXR5MmxUME9VOWZoZ3dHVnpSTDkzdE1kSVp2TFZkSEllamp1ZHlCcTBZQWJH?=
+ =?utf-8?B?RmFQUnlRZXU1ODdkcHZUMUpTaXBiTC80VEZZZ0U0ekUrWXhhMHB4YW5BNlBP?=
+ =?utf-8?B?cjlmaXpMUDZLZmMvNXM2VU4wVGorNVNPU3pLTDBZZXR6Y21LWnBwbG85VnB1?=
+ =?utf-8?B?TDRockgycS85SlFuc1d6alRiL0VDYkdQUnlkWDVVU2dFNEZRUDBNdmsyUFdS?=
+ =?utf-8?B?QWRBbDlXd1dCSTBJYjFoK1JQQmpWdG5sRUdOWi9ENDQ4MzRvZTk1TXUyZk1V?=
+ =?utf-8?Q?TV0z+VzjVx0W/ZLvxXy2BE+P2cvHxicp?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2024 12:59:45.0835
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c361fc36-6c4e-4ea0-256f-08dcaca9a83f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC5.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7238
 
-On Wed, Jul 10, 2024 at 11:38=E2=80=AFPM Bjorn Helgaas <helgaas@kernel.org>=
+
+Petr Machata <petrm@nvidia.com> writes:
+
+> Eric Dumazet <edumazet@google.com> writes:
+>
+>> On Wed, Jul 24, 2024 at 12:09=E2=80=AFPM Petr Machata <petrm@nvidia.com>=
  wrote:
+>>>
+>>>
+>>> Eric Dumazet <edumazet@google.com> writes:
+>>>
+>>> > On Tue, Jul 23, 2024 at 7:41=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+>>> >>
+>>> >> On Tue, Jul 23, 2024 at 7:26=E2=80=AFPM Eric Dumazet <edumazet@googl=
+e.com> wrote:
+>>> >> >
+>>> >> > On Tue, Jul 23, 2024 at 6:50=E2=80=AFPM Eric Dumazet <edumazet@goo=
+gle.com> wrote:
+>>> >> > >
+>>> >> > > On Tue, Jul 23, 2024 at 6:05=E2=80=AFPM Petr Machata <petrm@nvid=
+ia.com> wrote:
+>>> >> > > >
+>>> >> > > > struct nexthop_grp contains two reserved fields that are not i=
+nitialized by
+>>> >> > > > nla_put_nh_group(), and carry garbage. This can be observed e.=
+g. with
+>>> >> > > > strace (edited for clarity):
+>>> >> > > >
+>>> >> > > >     # ip nexthop add id 1 dev lo
+>>> >> > > >     # ip nexthop add id 101 group 1
+>>> >> > > >     # strace -e recvmsg ip nexthop get id 101
+>>> >> > > >     ...
+>>> >> > > >     recvmsg(... [{nla_len=3D12, nla_type=3DNHA_GROUP},
+>>> >> > > >                  [{id=3D1, weight=3D0, resvd1=3D0x69, resvd2=
+=3D0x67}]] ...) =3D 52
+>>> >> > > >
+>>> >> > > > The fields are reserved and therefore not currently used. But =
+as they are, they
+>>> >> > > > leak kernel memory, and the fact they are not just zero compli=
+cates repurposing
+>>> >> > > > of the fields for new ends. Initialize the full structure.
+>>> >> > > >
+>>> >> > > > Fixes: 430a049190de ("nexthop: Add support for nexthop groups")
+>>> >> > > > Signed-off-by: Petr Machata <petrm@nvidia.com>
+>>> >> > > > Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+>>> >> > >
+>>> >> > > Interesting... not sure why syzbot did not catch this one.
+>>>
+>>> Could it? I'm not sure of the exact syzcaller capabilities, but there
+>>> are no warnings, no splats etc. It just returns values.
+>>
+>> Yes, KMSAN can detect such things (uninit-value)
 >
-> On Wed, Jul 10, 2024 at 05:09:08PM +0200, George-Daniel Matei wrote:
-> > >> Added aspm suspend/resume hooks that run
-> > >> before and after suspend and resume to change
-> > >> the ASPM states of the PCI bus in order to allow
-> > >> the system suspend while trying to prevent card hangs
-> > >
-> > > Why is this needed?  Is there a r8169 defect we're working around?
-> > > A BIOS defect?  Is there a problem report you can reference here?
-> >
-> > We encountered this issue while upgrading from kernel v6.1 to v6.6.
-> > The system would not suspend with 6.6. We tracked down the problem to
-> > the NIC of the device, mainly that the following code was removed in
-> > 6.6:
-> >
-> > > else if (tp->mac_version >=3D RTL_GIGA_MAC_VER_46)
-> > >         rc =3D pci_disable_link_state(pdev, PCIE_LINK_STATE_L1_2);
-> >
-> > For the listed devices, ASPM L1 is disabled entirely in 6.6. As for
-> > the reason, L1 was observed to cause some problems
-> > (https://bugzilla.kernel.org/show_bug.cgi?id=3D217814). We use a Raptor
-> > Lake soc and it won't change residency if the NIC doesn't have L1
-> > enabled. I saw in 6.1 the following comment:
->
-> Can you verify that the problem still exists in a current kernel,
-> e.g., v6.9?
->
-I tested it with v6.9, still the same problem.
+> But that would involve a splat. There's no splat with this issue, even
+> though I'm testing on a CONFIG_HAVE_ARCH_KMSAN kernel.
 
-> If this is a regression that's still present in v6.9, we need to
-> identify the commit that broke it.  Maybe it's 90ca51e8c654 ("r8169:
-> fix ASPM-related issues on a number of systems with NIC version from
-> RTL8168h")?
->
-I also tried v6.9 with 90ca51e8c654 reverted and it works ok.
-
-> > > Chips from RTL8168h partially have issues with L1.2, but seem
-> > > to work fine with L1 and L1.1.
-> >
-> > I was thinking that disabling/enabling L1.1 on the fly before/after
-> > suspend could help mitigate the risk associated with L1/L1.1 . I know
-> > that ASPM settings are exposed in sysfs and that this could be done
-> > from outside the kernel, that was my first approach, but it was
-> > suggested to me that this kind of workaround would be better suited
-> > for quirks. I did around 1000 suspend/resume cycles of 16-30 seconds
-> > each (correcting the resume dev->bus->self being configured twice
-> > mistake) and did not notice any problems. What do you think, is this a
-> > good approach ... ?
->
-> Whatever the problem is, it definitely should be fixed in the kernel,
-> and Ilpo is right that it *should* be done in the PCI core ASPM
-> support (aspm.c) or at least with interfaces it supplies.
->
-The problem is actually the system not being able to reach
-depper power saving states without certain ASPM states enabled.
-It was mentioned in the other thread replies that this kind of problem
-has been reported several times in the past.
-
-> Generally speaking, drivers should not need to touch ASPM at all
-> except to work around hardware defects in their device, but r8169 has
-> a long history of weird ASPM stuff.  I dunno if that stuff is related
-> to hardware defects in the r8169 devices or if it is workarounds for
-> past or current defects in aspm.c.
->
-What would be a good approach to move forward with this issue to
-get a fix approved?
-
-Make a general version of this toggle workaround in the aspm core
-that would be controllable & configurable for each pci device individually?
-Keep the quirks and fix the aforementioned comments?
-
-> > > This doesn't restore the state as it existed before suspend.  Does
-> > > this rely on other parts of restore to do that?
-> >
-> > It operates on the assumption that after driver initialization
-> > PCI_EXP_LNKCTL_ASPMC is 0 and that there are no states enabled in
-> > CTL1. I did a lspci -vvv dump on the affected devices before and after
-> > the quirks ran and saw no difference. This could be improved.
->
-> Yep, we can't assume any of that because the PCI core owns ASPM
-> config, not the driver itself.
->
-> > > What's the root cause of the issue?
-> > > A silicon bug on the host side?
-> >
-> > I think it's the ASPM implementation of the soc.
->
-> As Heiner pointed out, if it's a SoC defect, it would potentially
-> affect all devices and a workaround would have to cover them all.
->
-> Side note: oops, quoting error below, see note about top-posting here:
-> https://people.kernel.org/tglx/notes-about-netiquette
->
-> > On Tue, Jul 9, 2024 at 12:15=E2=80=AFAM Heiner Kallweit <hkallweit1@gma=
-il.com> wrote:
-> > >
-> > > On 08.07.2024 19:23, Bjorn Helgaas wrote:
-> > > > [+cc r8169 folks]
-> > > >
-> > > > On Mon, Jul 08, 2024 at 03:38:15PM +0000, George-Daniel Matei wrote=
-:
-> > > >> Added aspm suspend/resume hooks that run
-> > > >> before and after suspend and resume to change
-> > > >> the ASPM states of the PCI bus in order to allow
-> > > >> the system suspend while trying to prevent card hangs
-> > > >
-> > > > Why is this needed?  Is there a r8169 defect we're working around?
-> > > > A BIOS defect?  Is there a problem report you can reference here?
-> > ...
+OK, Ido tells me this is just the "it's available on this arch" option
+and the actual option apparently needs clang. So disregard what I said.
 
