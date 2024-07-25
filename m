@@ -1,252 +1,226 @@
-Return-Path: <netdev+bounces-112968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A721393C0A6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:21:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8994E93C0D5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 13:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0532828C1
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:21:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA8A51C20F04
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 11:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E48199248;
-	Thu, 25 Jul 2024 11:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2C71991D8;
+	Thu, 25 Jul 2024 11:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mgf3u5nz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WI21nj7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231EB19923F
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 11:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721906465; cv=none; b=FCTx8PqEHeJzWA2inTFTLln9558shTc7aGaaSTRR0x1cInsPYkVS5k7xJwQL+4CE51z1IMS36sMksC/JfV74Z6T1ww9l7xUW1tm9su4r+fE8Bp8cwfj3m2FCoIUve+F/FzGNlP1+Mf8hTNskTNs+fboLqjr3hdwvuFMOfsQpz0k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721906465; c=relaxed/simple;
-	bh=E393x25IIG2PjHFTyTTWubra+t3kSqI48PhdEqj3xsw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ff1Gz31WglUFxp4ak6IvnPwK+ug9RUljq9jHZIJ3OidOLymD7akMpnaJhT9I7emX/7MrpkVYhgd5kL5DpaqFKdo+f7aGgXeIb4EQP7h9CTZ3wG2WW2HEYnE2YZ5UaI1J4VbV9yDhXgTr/dr5hhPxDStqpPVRDDvZ2/aycI7dQdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mgf3u5nz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721906463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W/RcU6ENJ/Nt41p8RxOylXqN7jgSp+MCYSjVSMYB2J4=;
-	b=Mgf3u5nzIYlNjJLXNtHpEwy0jSpD3NFLteFy5pRZo/GPsVAuLQOlR3AHkPRgaF/dy2pEmK
-	M5J65qyZkjz9eYtyJ3X9ubMqn882QJPmjE18PYH5pvHEzUf/PMYjMHSLkBphy8etB4UxEW
-	WGtTWWyJME8/0xKdKfopHMOj+xjs+1c=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-67-iJvB41_QORu7oub58220AA-1; Thu, 25 Jul 2024 07:21:01 -0400
-X-MC-Unique: iJvB41_QORu7oub58220AA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-369c99e4a88so157099f8f.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 04:21:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721906460; x=1722511260;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/RcU6ENJ/Nt41p8RxOylXqN7jgSp+MCYSjVSMYB2J4=;
-        b=EmC1gUhmqC7XDBdIbTgrKDy64OCHgqaUjB7kTiCqyz7LOzfATCV96bmVBdyVvBwSx2
-         7DrLVM0NthIEhSjaSGx7yOD/zWerRPXXRxMhErj0BaRl9L02lgsXYgenj7I4ewIzmK+X
-         gXei9Fz8dQLIvPhZVqnR/w8uzceY4O4RoDybjuLIHUS8W9bVnbwqAJmuVL3RN3xYF6Lb
-         o16vili/5h9caK9jvM3hVIbyJIRffWwSqxeRHmnJSC0jApo5KfKlMNlOSzfLvPAyJNYJ
-         Ihf1/OQAah9HTTUH335dJfeW1GxYtIJjao51d7TFTkPI/ZnkTiCnMsUcVAqkz7RUH05S
-         Rvsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXiXfrbzFfXu3IHfbh25Qi+jZ2sDzIGvcCNEnVzkDhj2IEB0HH7eikJOjNA7cQt4cMoIf11UdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmWKvoHt18iU1KM1ofchDyud0lRugCfw7gVRzVrYr1BoQRlyxR
-	vhqGOORviAFVHqx+8GLcc1m3REkJvZq6yUbtyQfg9XavMEERT6nVC7p4WzOJMio7ASjDwWyjzPH
-	HI5CcvLsi3bS9px4MRMtEXC1/DyMfHUtjgI+b53vr4N+SBNctv6i3iQ==
-X-Received: by 2002:a05:600c:4511:b0:425:7ac6:96f9 with SMTP id 5b1f17b1804b1-428053c0936mr8553555e9.0.1721906460452;
-        Thu, 25 Jul 2024 04:21:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFs0hS+4jr12gekyxSSo+/sBI5EgsvR7qp+YV72mbT4WUmt0CTs2xCHVE2M9xlSdygkPfJGjA==
-X-Received: by 2002:a05:600c:4511:b0:425:7ac6:96f9 with SMTP id 5b1f17b1804b1-428053c0936mr8553185e9.0.1721906459941;
-        Thu, 25 Jul 2024 04:20:59 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b231:be10::f71? ([2a0d:3341:b231:be10::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42807246ca4sm22683535e9.11.2024.07.25.04.20.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 04:20:59 -0700 (PDT)
-Message-ID: <541d338f-bffc-4393-a501-92d01e5c8edb@redhat.com>
-Date: Thu, 25 Jul 2024 13:20:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76BC1991CF;
+	Thu, 25 Jul 2024 11:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721906947; cv=fail; b=S4OQ4S1DcHkZr8KyTb+IpPZOA+g0kGFaBbHNfOzgIVBha9//tSTSgjGlGBK3zM4fuu3YOk4lnV09nmNsRCgACAhTOVGRO5I1qV1w2GuT16upsMpKDTG3L5F6Efx5GtP2B/OMY6sY1mqYkOB8SBOL0CLHpoNu73OUaXTEYdrt1+8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721906947; c=relaxed/simple;
+	bh=i6WIZRtwOR8MOCm9LEmKIHDvKdZPWZGXroq6czyHU9I=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LdeMtmhXlGM4rqsmsqyKGzR7mmEzmrBkPi77Kc8dWNiHvT4kxAjmFrqDfHfy8mDa2BIMzS8KjC4s5Y0WQLh9KBy1fC5IEoVnIxaXZWDrcGUCZFmVCgEtDeVPFOS1A3DD9+ycl6O8SRHu85qjTCElnZ3ecAkO1jthbUAcA11lytI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WI21nj7+; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721906946; x=1753442946;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=i6WIZRtwOR8MOCm9LEmKIHDvKdZPWZGXroq6czyHU9I=;
+  b=WI21nj7+5fHpoRj98HZ43YXoBMxfEcrhyyVyOR+c6ecRznegEHN0F/ft
+   /zQGrY5ITGBtR+BQ86FF1gD8von5dIfjXV9vhRoPp5m1Aqqr15XQOUODm
+   P1ubaZwvMzlf29WJey6rsmkZUeNaL926Ul1zorLpRSSQdg2iqqG53Glob
+   CPlPJBWllOfEALQJxg6y/iaSlOFiUEZx3uyCqvYmqVwhN7ZkzBczhJBkM
+   DzmJatuydv+RXjBOLd+LkZBDnZ/bHHjOcUUG76Og6qM/8dbTpY3DNNRRU
+   thWGkVFc9gw3F/YieIAVHhSQ8iBtJ/UHyhg0OzA+LrPISaj+TftcAt+1q
+   Q==;
+X-CSE-ConnectionGUID: oLsRE/7XSSWlvffn9ztxOA==
+X-CSE-MsgGUID: WBMKI/DgSVikhnDCLla9Ug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="37091102"
+X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
+   d="scan'208";a="37091102"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 04:29:06 -0700
+X-CSE-ConnectionGUID: CS2q9FhmTmu28j9OIMwvlQ==
+X-CSE-MsgGUID: yiIJ7sxHTIqVoPC9gFtL/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
+   d="scan'208";a="57702627"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Jul 2024 04:29:05 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 25 Jul 2024 04:29:03 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 25 Jul 2024 04:29:03 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 25 Jul 2024 04:29:03 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 25 Jul 2024 04:29:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RyeFI1lxDhtG5u487U97E3ZIfm7+NlsvSHf/YP26MPZc6Wvn7sGEDvEAZEx83CZiFHgmq52B7pPG9JI5d5S0jhpjv9E8DMgIzXJGDnF4u7/9L5K9+VR/Dl/47V6SrSaoolX8pnCyiyNZ+VZ4Rv+NAJmgPuDV0PEYXMdfWSMkRdBYnm7Sfb3qeASJ+XYYrFNUMDdxg9N04FGYlBq4SBrKiIgaJpIYv3J5fsmJeaXrkBKQsjugy0GS71Zm3fEDSCVZ9RFFh7YOeO6Ol4BbHDp4YqxJUaw5r2pO8BK5B4+9PjtngJ4ZRgplRGWSOlB+tw9o9otJNH4LCqqA5ZRz/VIjWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3tBdQUknU3wu41OlIH2dpiVuEq4DENoRunqjqvgUAq8=;
+ b=sp0DO69P6tDF3T2szWhaDkrPmNxWVLSFzdaI5LhdzthIjEe/2GDDKpBAwV/D5LR7LU/XSswit27kKD/vR/uEjNg+XXjnpHp7kxUW+EP0Utnhwvv7O1tRlzd8yLeHiDq6zk81F7MekYvvMW4v1fVbRiV3pmnyqtRtNn5cGS6BjFzcKO3RIH7WwYhIBRbbKkscc6aUbSyq+sjGSMB+nluwDLxufq6mbJ7gUHlupynQg9fC1fo0wZVCSkH9QDflYNcRCmf1T17zXd+EBA0nHeogGpx7veMfGMSBrJ+EEK7D64iaBE0uPGqsi4J+qvd330ZIHME4kjn3og8HNFbfNJexSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ SA2PR11MB5017.namprd11.prod.outlook.com (2603:10b6:806:11e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.28; Thu, 25 Jul
+ 2024 11:29:00 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%7]) with mapi id 15.20.7784.020; Thu, 25 Jul 2024
+ 11:29:00 +0000
+Date: Thu, 25 Jul 2024 13:28:53 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+CC: Stanislav Fomichev <sdf@fomichev.me>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <ast@kernel.org>, <andrii@kernel.org>,
+	<martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, Julian Schindel
+	<mail@arctic-alpaca.de>, Magnus Karlsson <magnus.karlsson@gmail.com>
+Subject: Re: [PATCH bpf 0/3] xsk: require XDP_UMEM_TX_METADATA_LEN to actuate
+ tx_metadata_len
+Message-ID: <ZqI29QE+5JnkdPmE@boxer>
+References: <20240713015253.121248-1-sdf@fomichev.me>
+ <ZqEcim8E0qK8MRQO@boxer>
+ <f30e6532-28e3-dca8-1274-e6b31531b84e@iogearbox.net>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <f30e6532-28e3-dca8-1274-e6b31531b84e@iogearbox.net>
+X-ClientProxiedBy: DB3PR06CA0017.eurprd06.prod.outlook.com (2603:10a6:8:1::30)
+ To DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-To: David Woodhouse <dwmw2@infradead.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
- "Chashper, David" <chashper@amazon.com>,
- "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
-Cc: "Christopher S . Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
- Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-References: <14d1626bc9ddae9d8ad19d3c508538d10f5a8e44.camel@infradead.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <14d1626bc9ddae9d8ad19d3c508538d10f5a8e44.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SA2PR11MB5017:EE_
+X-MS-Office365-Filtering-Correlation-Id: 908139cd-3630-4645-65a5-08dcac9cfad6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?fyvM/WINZdtXWUhcqoVA1fH57eSH3na9ik2xIggjn3UX93zVMCKVH4TMKv4L?=
+ =?us-ascii?Q?pZUoWzmQ3E9xNtk4kAoHXeZegZyX8Pg1gbwUikISWr7mp/PCQ3Q5SbHtwbKE?=
+ =?us-ascii?Q?RssjH/uP8N0VBtVRIJ3+HuzI/U/m+mLdVU59qDCt2ak7VDMbbCYLVpRnvpTO?=
+ =?us-ascii?Q?0ltwNgtXfz3JXIrvjOA2nB8s/jxRZpXhStQDrL/MwhHHPnF+BB+paKoIvcu3?=
+ =?us-ascii?Q?Wi+eidVDtGSVtq4uJrqWRg78WzZPsj3nESm2qfaQKxJPT56DVKPDaseRtkBy?=
+ =?us-ascii?Q?14EsEnOXDu7jgqbdro0/UQGlJqZTUIziAp7W1ii3oO/ebU+fKbruFwXxcnCm?=
+ =?us-ascii?Q?Oj1uSZXGaSfmj1aG6SZD/HWHkFvo6aZ8omzWIYwmHm+VGz5LgiP+inbunMGn?=
+ =?us-ascii?Q?G/Te8f1JQ3nxRtK6QKe293fyWyqmW8J3nwPqgeSir5tHrZJ1dQ3rjQH59kkb?=
+ =?us-ascii?Q?KmPeQkDikn/ICN1ZWY/c/wlxRPIJGx64qDln1cTAJW4JqnNbcnwCvfMJwtH4?=
+ =?us-ascii?Q?pxXSDcvkqo3ZjOAFO51Rs9tc7WB6i41Lt9mCuJiT3rRzSVVefgTiStw3qGyT?=
+ =?us-ascii?Q?308bGedQD5hYNN0OCtF0rkdHqyOMEoT+RK4DTh3RahPkp3ac6m/qoURBsUs6?=
+ =?us-ascii?Q?0jwpxLjontUEP25CzWdZP5TD0IucBQdEhltEqf+mwojQ1vGe4AW5PBG2RjIK?=
+ =?us-ascii?Q?F9rOEg/NpGRvyKWUIWWCpLdrWlJhY9MIhErd6Q85FxAbXW4/vbG6qeLjwUMY?=
+ =?us-ascii?Q?5xV2Omsf1h6hkNf/sLPU6ZAmv1KjjRK+Jm4d7o/EjFPhG9KnNsTxVLxi/2z/?=
+ =?us-ascii?Q?n92nBU+AQ1YATZqJ5AYiT+VHdFO/jPG3RiwFGsjhjXFiJke8tyLRPQG2qxeA?=
+ =?us-ascii?Q?9+yIuzxm3q1dqlIwhfJxc8J60fIOCzGM7nvt3ZGtMmCaLEkXNecTQ4W7xzXG?=
+ =?us-ascii?Q?VWAxY7IMgMaLtnw+pkU5XnDbsSpAKDRoUESyT/lllOYUYNbfU0rQtyoITZrO?=
+ =?us-ascii?Q?Iz0tTy7M+1Ey0EPTdR074yGhmlCTbXbpGm8mg/Qw5/lVivg97O4FKadRiG3L?=
+ =?us-ascii?Q?+ZJ3wYmjKAb+CgD4mFXm+9xuwVfw55IZP0cXJM5tE1/XEXJa2odT9+M6UfND?=
+ =?us-ascii?Q?USQEZNjjF6DWsqSJB99F16uEQyVJIWE9CQ7JXlsf/XyTIsfBFteUiEqCwHhf?=
+ =?us-ascii?Q?iaMeRjrpqyfxoRw8sGJ0hNW0WqCCNUQD4+9Jg6/M6ANHqh+Y0pzi3J7TPM0z?=
+ =?us-ascii?Q?Jl+5oPh6OQj1WdnWkDGw615OCRhA31Qicr0HBa8k+cD4BTbkqkbJrEiKiICe?=
+ =?us-ascii?Q?IKNYNjeWovzmkQQJyQrNMRQlohq/92/AgSwQLLD1whnhiQ=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/cb4r4uhfJkNP5hnmmQ8nV//ClsknScDVStV3yJmgbp7B4tWS2PQlYUusffU?=
+ =?us-ascii?Q?J4QST8BUzYqyN9F71NIRpa/oCQ0+Mh78st4WJG4NqbBG+dApqR4zfQ9gUrk6?=
+ =?us-ascii?Q?pEcfB+uoRSyLoqq5aWES0cg6GQslujw2MX+CJd6ZnVSU/j2U9bN5qs0CtW73?=
+ =?us-ascii?Q?KTaZqfJxTUm5lKidVFi9+R7nZIXS1VxvKPbHYBVmXxaaT/zBmOuVoCJnqFLj?=
+ =?us-ascii?Q?/hXN06Qvgwia/BJ2ui2QD+XXOsqDWbRTw5CQZB/Kl053XfTjnbSq1/+OYbPQ?=
+ =?us-ascii?Q?yNtIz/jiX8L12dUAla30arTe0oIwZwvuERXg2pOeKusk3q6vHDtnIP/5kcRX?=
+ =?us-ascii?Q?7Q6jZVVHdmddulH2fqLyBx8c0wxJ1f2LPuWYGPZCv+DrYZ5cEsH2Aw0vyJgd?=
+ =?us-ascii?Q?tnFaNNkNkLf1h/P76tZXR5YkSmWz6kA1qol6/b2PCyWOhSGadQ2516XQwCzx?=
+ =?us-ascii?Q?yjdsuIbP9l/l0oaCOlJfKDAjVQx12hsI8Ij3IS9TUinkOa/XEUWnikulhsFW?=
+ =?us-ascii?Q?uoPCDmAIN2c7Tsp+P/0EiLwZDrXYCF31lr1rJjK1qcLIqfIxAlB/pQx0Lv0B?=
+ =?us-ascii?Q?bnmSjrlMTEc/ySPOWUhd2kt8w5i+fbvm6ttxjog6kFon/pTrcszB2lb5o/nx?=
+ =?us-ascii?Q?x7kDtEAPsEIyIKP9vIjcIetXsaWE06K3bLqXMjRIk3JqCOEOzrsbabT5dQSr?=
+ =?us-ascii?Q?fSEEtVIIYcRJJF8pqyjKUc7tlf7H6YfeP5LqiFi5DDaTZhTWOhTjXVfFs4lZ?=
+ =?us-ascii?Q?tyCxVdsVon2QqKQe6bpmTstPYsAyPzHRoJA/8nVTrVzVvgwHkO3jDSlhLXZc?=
+ =?us-ascii?Q?Uj/U+SXFSdD1O376q1tOUM6oN8RdSSosbqh4l2gDrcUd1xC/3blccJ5hbziB?=
+ =?us-ascii?Q?YrKxgN4DALaO34CSh0Ce1373axU/v6ak1Vm6dWofyL8cd7FeBsAtXeLmVx8s?=
+ =?us-ascii?Q?haOEvpiXsQSM9taE6CXaPh2V+JXnctsqyq5upOQrz4dpXimk6CF5ZPD2tzOr?=
+ =?us-ascii?Q?YmStUlqQm6XmW51VISOsMGBI4CJ3QNXdonnvVTXNg1orUPJVuNnOvXbog8RJ?=
+ =?us-ascii?Q?jLWbw04wsUfVs+R/7ErxFiiB+YLl7hkJz+B75W3733Qmhf1VtOM2ze27iJm1?=
+ =?us-ascii?Q?h7J+kH37eb5HrJVn+zAxnIbZhT2zfJGSTvjMfoQ3MtkM1F939M2S6on9JHOE?=
+ =?us-ascii?Q?8CD8+/vsX58Q1CFAUigAZQiZUqXi6r+Eu7BW03tkzoMd8t+25MpHNVcnuG5f?=
+ =?us-ascii?Q?lH8Z96xOz6eB2rc5Jp6CXuUclAl37AaQl5/GzMGWHkUM1Wf5z7jbOOykXu1q?=
+ =?us-ascii?Q?4Xwb2i6n6cshSQNL0iEWb4UL8abxuc5BI6vuCMec8fRQ12S/F1lNx95Xgetj?=
+ =?us-ascii?Q?cJtqecjToE2DabdnsgTZ0647Cl/6gedaCv92VUE7qYnFSImxMBJJGPXGD0ba?=
+ =?us-ascii?Q?TtdlhpE8NB4SHS5cn5x9qP06ddaBIUY+HaRrcxy75yrzxPi89GQm/aRsDQYw?=
+ =?us-ascii?Q?+WP9siKLssllYqn7hv6bq8/Dlt6UQP79WZM9NF7Q58JEpCZoMcpIBL4f2O7Q?=
+ =?us-ascii?Q?ObKPqbhakVG/bA4hRoE7aysAo6hmZ5kKZiYS+blzkaV6m1tbTu9zRxBWbl38?=
+ =?us-ascii?Q?gg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 908139cd-3630-4645-65a5-08dcac9cfad6
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2024 11:29:00.3962
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gujvnEe5lJ+GGC2P0e3k841matj0GHHd7Dl+CgFsw9DBeaXjRGjr7fj6rvCdW5Ikt+3tEoyvrSLn7sdfpyK7fCLRVCrloXrW1QyMLwEhmsk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5017
+X-OriginatorOrg: intel.com
 
-Hi,
+On Thu, Jul 25, 2024 at 12:06:22PM +0200, Daniel Borkmann wrote:
+> On 7/24/24 5:23 PM, Maciej Fijalkowski wrote:
+> > On Fri, Jul 12, 2024 at 06:52:50PM -0700, Stanislav Fomichev wrote:
+> > > Julian reports that commit 341ac980eab9 ("xsk: Support tx_metadata_len")
+> > > can break existing use cases which don't zero-initialize xdp_umem_reg
+> > > padding. Fix it (while still breaking a minority of new users of tx
+> > > metadata), update the docs, update the selftest and sprinkle some
+> > > BUILD_BUG_ONs to hopefully catch similar issues in the future.
+> > > 
+> > > Thank you Julian for the report and for helping to chase it down!
+> > > 
+> > > Reported-by: Julian Schindel <mail@arctic-alpaca.de>
+> > > Cc: Magnus Karlsson <magnus.karlsson@gmail.com>
+> > 
+> > For the content series,
+> > 
+> > Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > 
+> > However I was not sure about handling patch 3/3.
+> 
+> Ok, then I'm taking in the first two for now as they seem to actually
+> address the fix and the 3rd seems like an improvement which could also
+> get routed via bpf-next. In either case, if one of you could follow-up
+> on the latter, that would be great.
 
-Just a bunch of 'nits below
+My first thought was about squashing 1 and 3 but I hope Stan doesn't mind
+sending 3 solely to bpf-next...
 
-On 7/24/24 19:16, David Woodhouse wrote:
-> diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
-> new file mode 100644
-> index 000000000000..9c508c21c062
-> --- /dev/null
-> +++ b/drivers/ptp/ptp_vmclock.c
-
-[...]
-
-> +/*
-> + * Multiply a 64-bit count by a 64-bit tick 'period' in units of seconds >> 64
-> + * and add the fractional second part of the reference time.
-> + *
-> + * The result is a 128-bit value, the top 64 bits of which are seconds, and
-> + * the low 64 bits are (seconds >> 64).
-> + *
-> + * If __int128 isn't available, perform the calculation 32 bits at a time to
-> + * avoid overflow.
-> + */
-> +static inline uint64_t mul_u64_u64_shr_add_u64(uint64_t *res_hi, uint64_t delta,
-> +					       uint64_t period, uint8_t shift,
-> +					       uint64_t frac_sec)
-
-Please, no 'inline' in \.c files
-
-> +{
-> +	unsigned __int128 res = (unsigned __int128)delta * period;
-> +
-> +	res >>= shift;
-> +	res += frac_sec;
-> +	*res_hi = res >> 64;
-> +	return (uint64_t)res;
-> +}
-> +
-> +static inline bool tai_adjust(struct vmclock_abi *clk, uint64_t *sec)
-> +{
-
-Same here
-
-> +	if (likely(clk->time_type == VMCLOCK_TIME_UTC))
-> +		return true;
-> +
-> +	if (clk->time_type == VMCLOCK_TIME_TAI &&
-> +	    (clk->flags & VMCLOCK_FLAG_TAI_OFFSET_VALID)) {
-> +		if (sec)
-> +			*sec += clk->tai_offset_sec;
-> +		return true;
-> +	}
-> +	return false;
-> +}
-> +
-> +static int vmclock_get_crosststamp(struct vmclock_state *st,
-> +				   struct ptp_system_timestamp *sts,
-> +				   struct system_counterval_t *system_counter,
-> +				   struct timespec64 *tspec)
-> +{
-> +	ktime_t deadline = ktime_add(ktime_get(), VMCLOCK_MAX_WAIT);
-> +	struct system_time_snapshot systime_snapshot;
-> +	uint64_t cycle, delta, seq, frac_sec;
-> +
-> +#ifdef CONFIG_X86
-> +	/*
-> +	 * We'd expect the hypervisor to know this and to report the clock
-> +	 * status as VMCLOCK_STATUS_UNRELIABLE. But be paranoid.
-> +	 */
-> +	if (check_tsc_unstable())
-> +		return -EINVAL;
-> +#endif
-> +
-> +	while (1) {
-> +		seq = st->clk->seq_count & ~1ULL;
-> +		virt_rmb();
-
-Please document which other barrier pair witht this one
-
-> +
-> +		if (st->clk->clock_status == VMCLOCK_STATUS_UNRELIABLE)
-> +			return -EINVAL;
-> +
-> +		/*
-> +		 * When invoked for gettimex64(), fill in the pre/post system
-> +		 * times. The simple case is when system time is based on the
-> +		 * same counter as st->cs_id, in which case all three times
-> +		 * will be derived from the *same* counter value.
-> +		 *
-> +		 * If the system isn't using the same counter, then the value
-> +		 * from ktime_get_snapshot() will still be used as pre_ts, and
-> +		 * ptp_read_system_postts() is called to populate postts after
-> +		 * calling get_cycles().
-> +		 *
-> +		 * The conversion to timespec64 happens further down, outside
-> +		 * the seq_count loop.
-> +		 */
-> +		if (sts) {
-> +			ktime_get_snapshot(&systime_snapshot);
-> +			if (systime_snapshot.cs_id == st->cs_id) {
-> +				cycle = systime_snapshot.cycles;
-> +			} else {
-> +				cycle = get_cycles();
-> +				ptp_read_system_postts(sts);
-> +			}
-> +		} else
-> +			cycle = get_cycles();
-
-Please use the brackets even for the else case
-
-[...]
-> +static int ptp_vmclock_get_time_fn(ktime_t *device_time,
-> +				   struct system_counterval_t *system_counter,
-> +				   void *ctx)
-> +{
-> +	struct vmclock_state *st = ctx;
-> +	struct timespec64 tspec;
-> +	int ret;
-> +
-> +#ifdef SUPPORT_KVMCLOCK
-> +	if (READ_ONCE(st->sys_cs_id) == CSID_X86_KVM_CLK)
-> +		ret = vmclock_get_crosststamp_kvmclock(st, NULL, system_counter,
-> +						       &tspec);
-> +	else
-> +#endif
-> +		ret = vmclock_get_crosststamp(st, NULL, system_counter, &tspec);
-> +
-> +	if (!ret)
-> +		*device_time = timespec64_to_ktime(tspec);
-> +
-> +	return ret;
-> +}
-> +
-> +
-
-Please, don't add 2 consecutive blank lines.
-
-Cheers,
-
-Paolo
-
+> 
+> Thanks,
+> Daniel
 
