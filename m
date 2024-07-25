@@ -1,164 +1,200 @@
-Return-Path: <netdev+bounces-113087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043BC93CA0F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:03:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD09193CA11
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 23:04:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54467B22723
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:02:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 382871F22C44
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 21:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F07A13A26F;
-	Thu, 25 Jul 2024 21:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2616413C8E2;
+	Thu, 25 Jul 2024 21:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNqBPCpZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hz73QVdY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA6FD299;
-	Thu, 25 Jul 2024 21:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859D07347D
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 21:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721941377; cv=none; b=XWfNvbcgVdElb8mM6xa5e3PvOhsbR+RSC7QMpqKKpL9t+m5d0uGU2ZSuClsxnDy9y61EPALOQ02DDcT21kV6sfu0S5BBmoYpAAdp13Szhynw51C5wekZEp1Wv/671Z1Yxsq0YtFtwfcDnfju9ulOvg3AHB27gPlTCKUSj1c4DiQ=
+	t=1721941481; cv=none; b=JZElHqtadmvWYNLVi3FXAYUOtLiikHQzAlRzmtsywRvfElZC1SS3nzjwCxAGJW7ur908iiSAFAcKNj4AAhukvJHhl3+SujvgOTI04/HySJKhvj6hpboIeWpPNAb63NGcWwbTxIItnfT42BOPTNw7/0VQYrTI0BnvT6bW5CVZ6GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721941377; c=relaxed/simple;
-	bh=EEs0PsVZtmXovIP4elBP1rkP5kAYWDF0gM35V4qrISY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BGKi3S3FHgii2s6QVF0DvOxdj94ARQR3a67zisoMd62xvOEhq4CkyOpBR2R42xdo7Y7PWQ4TIj7BoGTxGKTE7Zq8JfYkamQC/5RXSi7Uqf0E7Nt6qiuFMuK4qy6/kr16bcKQeDtxZr9xVrQLG1Pgy9IEBIILeCaFhAqfEuS1IbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UNqBPCpZ; arc=none smtp.client-ip=209.85.161.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5d5aeaa9751so209478eaf.1;
-        Thu, 25 Jul 2024 14:02:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721941373; x=1722546173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b0R3aNtSay58/lkjvIqsiNk76d3Gj29c33jDe7aDrYg=;
-        b=UNqBPCpZ3DUDd3G+qmclclDYz+capChaSglXChRR1bjHLj43LRXZeVb1PRxrddS0zy
-         wAxsTck9fbyA3et40kwow2j35vDb8kYb0EsJdq31XAuFdITckyC72nOBJYDipAy175HV
-         g63GmYW1qHWxU+NPUms0ZlCZxdSg5g/1p0lH7w0V7X+3MYy/x3xIm1hC9yCsK1A8Srwi
-         CbhA3SZYs9sEPxdf/pglVSLi6yxsX3qghlPHvyPh5ZdL3iydqeKPDpP+0Jb2MzjR/HQv
-         BpCtMoVNMClKhPM5V3ZDWSF+3QEE05L4hyxiQ2aXd+5VDpIbXJRNH0cu+9Plr+wxnqVJ
-         yQDg==
+	s=arc-20240116; t=1721941481; c=relaxed/simple;
+	bh=FEWVOD3+yRKcEuqLgqxmvL5aypghEhU0c65lOoNrXl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tafTV6/OMh2IQmLgi29E+J2sEFM6+idHeBddpDx1LlXWu/gnlYHWH/0TWGANcE1WR8LT8cZynPal0y6v2nrRl94T6QrQSFKp+9nV/6foefSihV6PLQelw6rVbPTeaizQO0WCfUT1e0ccfs44vbJxc8udh00Ynay9xgrDtMaC8jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hz73QVdY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721941478;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tTDtUQaLZ7CrF67TfvKh0JSNTMNAlAQ/IuXCIFvbTU8=;
+	b=Hz73QVdYJSgFJ9U9vYr8Cia9eiPCuKUqcojCIQvi/nzkLmVEpEKaAb+EdNRcBNaRjzgVxX
+	5hYxly59IhviuwPBU/lAs9UKXJVtdajQHd8F8G2dB5rWR7kpYyc/QC+WS0G0s2+h3B2tOm
+	7eVqJguzNJgCVp3OYsFL9S64cb2L1C8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-329-fNmj5R8-OrGMYc48YPmfuA-1; Thu, 25 Jul 2024 17:04:37 -0400
+X-MC-Unique: fNmj5R8-OrGMYc48YPmfuA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-36873a449dfso1224598f8f.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 14:04:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721941373; x=1722546173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b0R3aNtSay58/lkjvIqsiNk76d3Gj29c33jDe7aDrYg=;
-        b=EuxKajNpe7ocu6wPPR5HQ1z2U2NNIlQ6M2ATh+eBBSBcWN3jfRC8pyw0sN83HalOAc
-         KBGP5FQOqCjqJMRFIQFVtm0qKf2ZIoKhq6j/g92FrYczO9pb7p4wIiWWFn6VJcSYxV+o
-         gNwoVBxyWXGCLxwUG+IOHVcfPWd0I2HivlE6P9W/REammhpG0DLNTNCwkgGlLgfsO0sj
-         F4eL2wmGxyVgK/Kg3wsbjYpdNzPyWKhCwfn4AzLI9WswRXwTK9NANEJFCK5rmxn/vycc
-         JfPg0K6lbNZyHF5CN3JJAQ6SFBcW0LPqT1RAHeaGMETJb87VlT7U2KUYGqpIFTbk/f7T
-         JDYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUk2W1yGBf8dY2GmJbvpUfMrqM0bsF3nwYpNCwHa2/dpHXHKab6bSo/XAsQdtuKiV76nIo2MeP6oImVlS02rxkqEn5P8qYsc43C5piR6D0wZDNEmPqVja50tsxdJEhSKQxDNLI4nvpS
-X-Gm-Message-State: AOJu0Yy7+YiNXYTuAeals1h4cRFN/p97fUxDo+Ahp4FRfvLIEWhp337m
-	wSL9G2cWa9VpGyMpdjbywaaoTfVBCQz1Qfo6nKMAqYz89tYI8r8irN4nP6QeMEJtXF0C5wWD9NZ
-	FeiyROzSeyCy4Yf8mY16cKJMzl0o=
-X-Google-Smtp-Source: AGHT+IHpabHVk/SwCJqR5J+AVsCV6XSW/pF6eWZyyTvY8O3GCcoIlZgV1sQr+Tvs0AhJPuNVGamq2GTyOXZXWbEDO18=
-X-Received: by 2002:a05:6358:7202:b0:1a6:799b:b06c with SMTP id
- e5c5f4694b2df-1acf8908280mr570291155d.23.1721941372869; Thu, 25 Jul 2024
- 14:02:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721941476; x=1722546276;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tTDtUQaLZ7CrF67TfvKh0JSNTMNAlAQ/IuXCIFvbTU8=;
+        b=vmYmyFz0BSS1SSm9U94Rw5mPRgNQee9/8dSsuGCd1TqTIL9EulZbZICZTTDlTE89ZK
+         NvfAfas0pXu4wQzBlcKolnm6UNMutc5ZePK7QM/75kYaE/ag1nyyAutekTS3zGEN9xfx
+         c5C+rZYdEO06UOiNOSAdRNdinY+iob3WVNnaX2777toE020x+btZ/UG83FQSn7G3q6z2
+         LvTuwT8BhpGQpATZk/pnWWwO8uG/OOmSNACh5LMbf4jHTDogkSOGlu1HfqqZP2Q0+kWS
+         Dquw2OzHCGivXLmIIWJZJwgiGGp0H/18WkTYh63D1UTyKA1HV3FgqQcAw3V45HgPQdls
+         3WWg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEfcD77kmicEeIE3a8HSefGHc3M+SPgsPE0H6XlH2KSeHWNh/J5GBYBTBAgvhvFcqRo6uUCSGEIolL+Vkkq18fHRDqqfJh
+X-Gm-Message-State: AOJu0Yy2P75FGh96+CegraP5Uz39gQ/9gvIFJ6KtDE6+OnCyEu/93gyw
+	H1ar4h2gjtmQIzdoaDbDNYdO4iHw0FK9uNyc3XQI1cpj7+9Cj/uOvMSvHdv+ZFsdf20ehCq848b
+	b6J0HeyfNjzfM+sFAOHDx9DYFIK87FSaUORBU2hu7TLwhrlZlIXHCUw==
+X-Received: by 2002:adf:ed90:0:b0:367:8fee:4434 with SMTP id ffacd0b85a97d-36b31b4d48dmr2687324f8f.16.1721941476018;
+        Thu, 25 Jul 2024 14:04:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHhpTnkp42p1F3wTt6Fx20U3s9cQUoElQmJjW+LG0DsT7CR4O+1x/Cg4YZh3CZ7ii4p+45m0A==
+X-Received: by 2002:adf:ed90:0:b0:367:8fee:4434 with SMTP id ffacd0b85a97d-36b31b4d48dmr2687298f8f.16.1721941475033;
+        Thu, 25 Jul 2024 14:04:35 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f7:28ce:f21a:7e1e:6a9:f708])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36863d87sm3172908f8f.110.2024.07.25.14.04.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 14:04:34 -0700 (PDT)
+Date: Thu, 25 Jul 2024 17:04:29 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Peter Hilber <peter.hilber@opensynergy.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
+	"Luu, Ryan" <rluu@amazon.com>,
+	"Chashper, David" <chashper@amazon.com>,
+	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+	"Christopher S . Hall" <christopher.s.hall@intel.com>,
+	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
+Message-ID: <20240725170328-mutt-send-email-mst@kernel.org>
+References: <20240725082828-mutt-send-email-mst@kernel.org>
+ <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org>
+ <20240725083215-mutt-send-email-mst@kernel.org>
+ <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org>
+ <20240725100351-mutt-send-email-mst@kernel.org>
+ <2a27205bfc61e19355d360f428a98e2338ff68c3.camel@infradead.org>
+ <20240725122603-mutt-send-email-mst@kernel.org>
+ <0959390cad71b451dc19e5f9396d3f4fdb8fd46f.camel@infradead.org>
+ <20240725163843-mutt-send-email-mst@kernel.org>
+ <d62925d94a28b4f8e07d14c1639023f3b78b0769.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240723223109.2196886-1-kuba@kernel.org> <20240725092203.26366-1-arefev@swemel.ru>
- <CAF=yD-Kz3PRncy4N0LkTSDGm95Zg7yfKDm+BOHBs4NfkEDSJUw@mail.gmail.com>
-In-Reply-To: <CAF=yD-Kz3PRncy4N0LkTSDGm95Zg7yfKDm+BOHBs4NfkEDSJUw@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 25 Jul 2024 17:02:15 -0400
-Message-ID: <CAF=yD-J7P=5V+Ksx9KRT2nm+UzK42HoBVCDed-EYH4KzMPWtkw@mail.gmail.com>
-Subject: Re: [PATCH net] virtio: fix GSO with frames unaligned to size
-To: Denis Arefev <arefev@swemel.ru>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	eperezma@redhat.com, jasowang@redhat.com, linux-kselftest@vger.kernel.org, 
-	mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org, 
-	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d62925d94a28b4f8e07d14c1639023f3b78b0769.camel@infradead.org>
 
-On Thu, Jul 25, 2024 at 10:27=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> On Thu, Jul 25, 2024 at 5:22=E2=80=AFAM Denis Arefev <arefev@swemel.ru> w=
-rote:
-> >
-> > I checked the patch on three reproducers and all three DEFINITELY broke=
- the core.
-> >
-> > There are two malfunctions.
-> >
-> > 1. No flag skb_shinfo(skb)->tx_flags |=3D SKBFL_SHARED_FRAG;
-> >  If it is not set then __skb_linearize will not be executed in skb_chec=
-ksum_help.
-> >  sk_buff remains fragmented (non-linear) and this is the first warning.
-> >  OR add skb_shinfo(skb)->tx_flags |=3D SKBFL_SHARED_FRAG.
-> >  OR ask Eric Dumazet (cef401de7be8c). Is checking if (skb_has_shared_fr=
-ag(skb)) so important?
-> >  in the skb_checksum_help function, is it enough if (skb_is_nonlinear(s=
-kb)) ?
->
-> Thanks for sharing the reproducers. Having a look.
+On Thu, Jul 25, 2024 at 10:00:24PM +0100, David Woodhouse wrote:
+> On Thu, 2024-07-25 at 16:50 -0400, Michael S. Tsirkin wrote:
+> > On Thu, Jul 25, 2024 at 08:35:40PM +0100, David Woodhouse wrote:
+> > > On Thu, 2024-07-25 at 12:38 -0400, Michael S. Tsirkin wrote:
+> > > > On Thu, Jul 25, 2024 at 04:18:43PM +0100, David Woodhouse wrote:
+> > > > > The use case isn't necessarily for all users of gettimeofday(), of
+> > > > > course; this is for those applications which *need* precision time.
+> > > > > Like distributed databases which rely on timestamps for coherency, and
+> > > > > users who get fined millions of dollars when LM messes up their clocks
+> > > > > and they put wrong timestamps on financial transactions.
+> > > > 
+> > > > I would however worry that with all this pass through,
+> > > > applications have to be coded to each hypervisor or even
+> > > > version of the hypervisor.
+> > > 
+> > > Yes, that would be a problem. Which is why I feel it's so important to
+> > > harmonise the contents of the shared memory, and I'm implementing it
+> > > both QEMU and $DAYJOB, as well as aligning with virtio-rtc.
+> > 
+> > 
+> > Writing an actual spec for this would be another thing that might help.
+> > 
+> 
+> > > I don't think the structure should be changing between hypervisors (and
+> > > especially versions). We *will* see a progression from simply providing
+> > > the disruption signal, to providing the full clock information so that
+> > > guests don't have to abort transactions while they resync their clock.
+> > > But that's perfectly fine.
+> > > 
+> > > And it's also entirely agnostic to the mechanism by which the memory
+> > > region is *discovered*. It doesn't matter if it's ACPI, DT, a
+> > > hypervisor enlightenment, a BAR of a simple PCI device, virtio, or
+> > > anything else.
+> > > 
+> > > ACPI is one of the *simplest* options for a hypervisor and guest to
+> > > implement, and doesn't prevent us from using the same structure in
+> > > virtio-rtc. I'm happy enough using ACPI and letting virtio-rtc come
+> > > along later.
+> > > 
+> > > > virtio has been developed with the painful experience that we keep
+> > > > making mistakes, or coming up with new needed features,
+> > > > and that maintaining forward and backward compatibility
+> > > > becomes a whole lot harder than it seems in the beginning.
+> > > 
+> > > Yes. But as you note, this shared memory structure is a userspace ABI
+> > > all of its own, so we get to make a completely *different* kind of
+> > > mistake :)
+> > > 
+> > 
+> > 
+> > So, something I still don't completely understand.
+> > Can't the VDSO thing be written to by kernel?
+> > Let's say on LM, an interrupt triggers and kernel copies
+> > data from a specific device to the VDSO.
+> > 
+> > Is that problematic somehow? I imagine there is a race where
+> > userspace reads vdso after lm but before kernel updated
+> > vdso - is that the concern?
+> > 
+> > Then can't we fix it by interrupting all CPUs right after LM?
+> > 
+> > To me that seems like a cleaner approach - we then compartmentalize
+> > the ABI issue - kernel has its own ABI against userspace,
+> > devices have their own ABI against kernel.
+> > It'd mean we need a way to detect that interrupt was sent,
+> > maybe yet another counter inside that structure.
+> > 
+> > WDYT?
+> > 
+> > By the way the same idea would work for snapshots -
+> > some people wanted to expose that info to userspace, too.
+> > 
+> 
 
-Reproduced https://syzkaller.appspot.com/bug?extid=3De1db31216c789f552871
 
-That is against a v6.1 kernel, and the syzkaller page reports that it
-did not fail against a recent upstream commit. Will take a closer look
-at that.
 
-But on v6.1, at least, the following did catch it:
+was there supposed to be text here, or did you just like this
+so much you decided to repost my mail ;) 
 
-@@ -72,6 +72,18 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
-        if (thlen < sizeof(*th))
-                goto out;
+-- 
+MST
 
-+       if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL &&
-+           skb->csum_start !=3D skb->transport_header) {
-+               skb_dump(KERN_INFO, skb, false);
-+               goto out;
-+        }
-+
-
-And the geometry of the bad packet at that point:
-
-[   52.003050][ T8403] skb len=3D12202 headroom=3D244 headlen=3D12093 tailr=
-oom=3D0
-[   52.003050][ T8403] mac=3D(168,24) mac_len=3D24 net=3D(192,52) trans=3D2=
-44
-[   52.003050][ T8403] shinfo(txflags=3D0 nr_frags=3D1 gso(size=3D1552 type=
-=3D3 segs=3D0))
-[   52.003050][ T8403] csum(0x60000c7 start=3D199 offset=3D1536
-ip_summed=3D3 complete_sw=3D0 valid=3D0 level=3D0)
-
-Sharing sketch patch for any feedback. A few downsides:
-
-The patch adds a branch in the semi hot path of TCP software
-segmentation for every packet. Including for the more common kernel
-stack generated packets. And it needs the same test in two locations
-in net/ipv4/udp_offload.c, for USO and UFO.
-
-It is tempting to move it to the if (skb_gso_ok(skb, features |
-NETIF_F_GSO_ROBUST)) branch below, as then it is limited to
-SKB_GSO_DODGY. But that does not catch dodgy packets that need
-software segmentation. Conversely, we could check in skb_segment
-before calling skb_checksum_help.
-
-I'll be out for four days over the weekend. May have to delay until next we=
-ek.
-
-> > Should we revert that and create a new fix against the original issue?
->
-> We can, no strong preference.
-
-On second thought, since this has to go to all the stable trees, let's
-keep it a single patch. Rather than a revert + new fix.
 
