@@ -1,122 +1,190 @@
-Return-Path: <netdev+bounces-113084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D4A93C9D0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:48:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7E693C9DE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 22:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 742A91C21EA1
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:48:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2EF91F23BC7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 20:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A1413CA93;
-	Thu, 25 Jul 2024 20:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B104139D19;
+	Thu, 25 Jul 2024 20:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mentovai.com header.i=@mentovai.com header.b="UlcBtrw5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FwCzZBTA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7301A208A5
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 20:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741CD78289
+	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 20:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721940483; cv=none; b=GgM0CactDbaYI/FvUD4aDbTyPIC3ujyeLxvcZZG0Q0dOEpPYN7aUmEmY+4h13D6d6YY9fRri2U4R3KMmpXgsibeGYPWnxhxCgUsK13R62911awmCTqalyDcd41rQ7sUr0+RmbuTU5BxMcDW3J5S/odqlQ8P45U/x7QVqSxY6wHU=
+	t=1721940662; cv=none; b=ehrFDxBG3gPFtmdqv6dAdibchHLn7y2BVsb668LimpnLWKZxK+BYARCJZJ5dMLyP6+3uc9a3iwY8CnTKd3BN/jXUjE3gEVUrneS6SoJP6bo6Fgyej3IsK+vTlH1xcS1qvDpfjZqMuSnuhdhMLF11lf19EOjhoFYEPup6qOz+Ki0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721940483; c=relaxed/simple;
-	bh=tCc7yzfwMwX+3wHm11uN8y+ogivJbHvtbMIOTwN5S10=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=fuq98m1Es3+xB9uXjjGdg4NtWX+90lWUo+OsHTnnFb2Mh4tlQhAO3sc1VjejixdYx/T5xDEGqouE7scIHvuoNhij3I2sLG/oj0Ofd9wTs0P10mOpvTp4K9k29ngT9nYSa3EpYoXQEaNQfnKFos7sMGFPECtwl5PmMfnjUaxCcNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mentovai.com; spf=pass smtp.mailfrom=mentovai.com; dkim=pass (1024-bit key) header.d=mentovai.com header.i=@mentovai.com header.b=UlcBtrw5; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mentovai.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mentovai.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6b5dfcfb165so8147626d6.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 13:48:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mentovai.com; s=google; t=1721940479; x=1722545279; darn=vger.kernel.org;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gDVR3WOcutJRJbF1ISjhWZ6SEFHi8sF6jbKuLCY1/p4=;
-        b=UlcBtrw57z5DFff+al+sZ6OH4r7jSvQ1alrf8cRDyoul4s2UJoxT2MOKRpnd4LiVJ/
-         6pAZRjGUmdvQVKRQVqZUiQsiSeMTC/eIwYL1TgMMBKlQVO6a68u64X2FFu7LHMkpLW3y
-         FqH9Gz41cotWh7/pccCr4XvPiJ2m/JNBVXuQ0=
+	s=arc-20240116; t=1721940662; c=relaxed/simple;
+	bh=kuusY9XGv6HlTmCnkp2wdWjx/n7YuXhw4w52RHy3fwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9Jqpp5jIsb6WnSUDYObBWPkbbvbKXoV4aVllCau5U1KkPMIW/9lKlRv6bp9zhcmSTks3z71I7riz4TKmzXNmZazw28dApjOlkGNeLXKGVBw0Ms2uPIeVSwrSIKOX6bFahX7YHrm+Qec4Rw/M7HIa4JBA4qkxXm+4anqxZ4PHZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FwCzZBTA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721940660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0TRSzPBcxjm5TEyUVQiD4/U25Z4w4e7FZY73nOkT9RE=;
+	b=FwCzZBTAF/5r/uUqKOsjvkd6qmjSpgWjPjmbegm2ix4ZJKChfL4zknrO5jZRLsIffon8pj
+	a16WI8oYUVQywGuP7T7dQ3ZU+0vr72l3HVIoxH3swDvudEScYhN+6gbma3xbi+FlQSi0KT
+	Jf5otsVzGOb8bd7hKZE5Yc7Mi4Kew5o=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-367-FwF4Gkl1MpmIkQZgpujcew-1; Thu, 25 Jul 2024 16:50:59 -0400
+X-MC-Unique: FwF4Gkl1MpmIkQZgpujcew-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-428076fef5dso7055175e9.2
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 13:50:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721940479; x=1722545279;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gDVR3WOcutJRJbF1ISjhWZ6SEFHi8sF6jbKuLCY1/p4=;
-        b=qUEerLDkS8B4l+bV+yk0b1zsQ5uSy6cAziyMfoKfVmlYWyOidd68J5Td4/KKdAkw3c
-         pRT13Jp6xhiY2FtAobBOrDc253v3Ot3va2be1H6+asenEz+waNXTTq9b3aY3jk15rfSq
-         bWka9k26vABjeNNDblnu1FNOVQhCH4cZjAg0QUjCso+g1d07mmiJY3T5Lqos+XprYoFt
-         F+bmGCida8kClna9cCBmPVdcRRFQJk/L39sfl86YkBSbzdkz5KbrHJz/q0t9uhihjMeQ
-         famkVlwVMDEKo7S9CH9Kqs9niGMvjYA8kk6PirzrzAckhMql5a9Dc/FZiUCDxc1HMECE
-         ZclA==
-X-Gm-Message-State: AOJu0Yyqh39AmY/hTnokSFQoY35Lln4sYNxVgITReP6FuXSl8wkpDhHp
-	60s15YwcyhXC9jAIfDjo1YN3/6Y5yM+B8hQydPPgvZA5DX+Z9GGj1Yzrn1KQe14=
-X-Google-Smtp-Source: AGHT+IFiCqO0eALgHXDnMjwjSkiPUpvhtE5QV3jaP735DrNnryAZp59sy10aVVD1GnajR0Hgb6fSEg==
-X-Received: by 2002:a05:6214:1c07:b0:6b9:5b57:f690 with SMTP id 6a1803df08f44-6bb3ca2fe58mr49398106d6.25.1721940479206;
-        Thu, 25 Jul 2024 13:47:59 -0700 (PDT)
-Received: from [2600:4040:9ce0:6400:a8a9:9eca:3c60:83f7] ([2600:4040:9ce0:6400:a8a9:9eca:3c60:83f7])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3facb1e9sm10380386d6.119.2024.07.25.13.47.58
+        d=1e100.net; s=20230601; t=1721940658; x=1722545458;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0TRSzPBcxjm5TEyUVQiD4/U25Z4w4e7FZY73nOkT9RE=;
+        b=pRI7JvAI55PShVv8nFXtRjdRbTR1i0vRTFEks/Lg+cR9nzLfc2mrf8kCj7vXcWX7Mu
+         QzKEQYf67/KrxUJVzaB5T1zUzx8ixxvAs0SY6jFeuHbk1kGov0iaGKYYxwNryLPhT1+b
+         QdcD9tYJlTqtm1hGZfwlas2b/bv7fn8pB9zjyjy+mwGfk+ht1GJrbE4Z6xY1q/aU9CMA
+         UnAqhCYXXohV5JaK2eDMXRUe39LS6m16kdV3VyexRbkFOzKvgZRPw9jwxk3/LoMIPa56
+         WCYPENOv+pMRms4oiWiF5XdTDGkzYodw+DS6jDoEXLBRX+ZJU24ogyov9rSDJrZpG/Kd
+         i/ww==
+X-Forwarded-Encrypted: i=1; AJvYcCWWRZivzQ6reuf3HBe3xbf14L+glh7O+0M0h1R4/6+zlpM84T+QO9TE8NSUIXkH1bUkJgfubc640FwXCk8+tCS9ZcRwaDsA
+X-Gm-Message-State: AOJu0YxNOmKMPJxMVPBMh36pb8RhyRxaRirNn6FmjuabxdYuLVLsIUtf
+	bSK2eBHwWXP1p1NaoJLkbqo05kVQXgxcrrPRU8bPP67C44h3DO78iX9rdAkMgxFYcQeKe9F8s46
+	LQ2m4tHHRZRt+8/ss9BGyDKMR5Qt7aQu8flnqaZIkgG3a/MT850uhqg==
+X-Received: by 2002:a05:600c:5494:b0:426:6ed2:6130 with SMTP id 5b1f17b1804b1-42805708639mr26435555e9.14.1721940657758;
+        Thu, 25 Jul 2024 13:50:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHoEPQMNc9hD+uG29YGXpuoiH409yodxUDLC7kZ9PMGvkPO91aZcH5CMLfzEXGDuU2yH4Kk6w==
+X-Received: by 2002:a05:600c:5494:b0:426:6ed2:6130 with SMTP id 5b1f17b1804b1-42805708639mr26435175e9.14.1721940656863;
+        Thu, 25 Jul 2024 13:50:56 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f7:28ce:f21a:7e1e:6a9:f708])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280573f935sm50565255e9.14.2024.07.25.13.50.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 13:47:58 -0700 (PDT)
-Date: Thu, 25 Jul 2024 16:47:57 -0400 (EDT)
-From: Mark Mentovai <mark@mentovai.com>
-To: Simon Horman <horms@kernel.org>
-cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    Oleksij Rempel <o.rempel@pengutronix.de>, 
-    Jonas Gorski <jonas.gorski@gmail.com>, 
-    Russell Senior <russell@personaltelco.net>, 
-    =?ISO-8859-15?Q?L=F3r=E1nd_Horv=E1th?= <lorand.horvath82@gmail.com>, 
-    Mieczyslaw Nalewaj <namiltd@yahoo.com>, 
-    Shiji Yang <yangshiji66@outlook.com>
-Subject: Re: [PATCH] net: phy: realtek: add support for RTL8366S Gigabit
- PHY
-In-Reply-To: <20240725200143.GM97837@kernel.org>
-Message-ID: <cb4710ff-c55c-e7e7-487d-a0e1c6f10972@mentovai.com>
-References: <20240725170519.43401-1-mark@mentovai.com> <20240725200143.GM97837@kernel.org>
+        Thu, 25 Jul 2024 13:50:56 -0700 (PDT)
+Date: Thu, 25 Jul 2024 16:50:48 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Peter Hilber <peter.hilber@opensynergy.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
+	"Luu, Ryan" <rluu@amazon.com>,
+	"Chashper, David" <chashper@amazon.com>,
+	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+	"Christopher S . Hall" <christopher.s.hall@intel.com>,
+	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
+Message-ID: <20240725163843-mutt-send-email-mst@kernel.org>
+References: <20240725081502-mutt-send-email-mst@kernel.org>
+ <f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org>
+ <20240725082828-mutt-send-email-mst@kernel.org>
+ <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org>
+ <20240725083215-mutt-send-email-mst@kernel.org>
+ <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org>
+ <20240725100351-mutt-send-email-mst@kernel.org>
+ <2a27205bfc61e19355d360f428a98e2338ff68c3.camel@infradead.org>
+ <20240725122603-mutt-send-email-mst@kernel.org>
+ <0959390cad71b451dc19e5f9396d3f4fdb8fd46f.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0959390cad71b451dc19e5f9396d3f4fdb8fd46f.camel@infradead.org>
 
-Simon Horman wrote:
-> On Thu, Jul 25, 2024 at 01:05:19PM -0400, Mark Mentovai wrote:
->> The PHY built in to the Realtek RTL8366S switch controller was
->> previously supported by genphy_driver. This PHY does not implement MMD
->> operations. Since 9b01c885be36 (2023-02-13, in 6.3), MMD register reads
->> have been made during phy_probe to determine EEE support. For
->> genphy_driver, these reads are transformed into 802.3 annex 22D clause
->> 45-over-clause 22 mmd_phy_indirect operations that perform MII register
->> writes to MII_MMD_CTRL and MII_MMD_DATA. This overwrites those two MII
->> registers, which on this PHY are reserved and have another function,
->> rendering the PHY unusable while so configured.
->>
->> Proper support for this PHY is restored by providing a phy_driver that
->> declares MMD operations as unsupported by using the helper functions
->> provided for that purpose, while remaining otherwise identical to
->> genphy_driver.
->>
->> Fixes: 9b01c885be36 ("net: phy: c22: migrate to genphy_c45_write_eee_adv()")
->> Fixes: https://github.com/openwrt/openwrt/issues/15981
->
-> nit: AFAIK, the line immediately above is not a correct use of the Fixes
->     tag. I think Link or Closes would be appropriate instead.
->
->> Link: https://github.com/openwrt/openwrt/issues/15739
->> Reported-by: Russell Senior <russell@personaltelco.net>
->> Signed-off-by: Mark Mentovai <mark@mentovai.com>
->
-> Also, as a fix, this should be targeted at the net tree.
->
-> 	Subject: [PATCH net] ...
->
-> Please see https://docs.kernel.org/process/maintainer-netdev.html
+On Thu, Jul 25, 2024 at 08:35:40PM +0100, David Woodhouse wrote:
+> On Thu, 2024-07-25 at 12:38 -0400, Michael S. Tsirkin wrote:
+> > On Thu, Jul 25, 2024 at 04:18:43PM +0100, David Woodhouse wrote:
+> > > The use case isn't necessarily for all users of gettimeofday(), of
+> > > course; this is for those applications which *need* precision time.
+> > > Like distributed databases which rely on timestamps for coherency, and
+> > > users who get fined millions of dollars when LM messes up their clocks
+> > > and they put wrong timestamps on financial transactions.
+> > 
+> > I would however worry that with all this pass through,
+> > applications have to be coded to each hypervisor or even
+> > version of the hypervisor.
+> 
+> Yes, that would be a problem. Which is why I feel it's so important to
+> harmonise the contents of the shared memory, and I'm implementing it
+> both QEMU and $DAYJOB, as well as aligning with virtio-rtc.
 
-Thanks for your feedback, Simon. I've sent an updated (v2) patch, now at 
-https://lore.kernel.org/netdev/20240725204147.69730-1-mark@mentovai.com/.
+
+Writing an actual spec for this would be another thing that might help.
+
+> I don't think the structure should be changing between hypervisors (and
+> especially versions). We *will* see a progression from simply providing
+> the disruption signal, to providing the full clock information so that
+> guests don't have to abort transactions while they resync their clock.
+> But that's perfectly fine.
+> 
+> And it's also entirely agnostic to the mechanism by which the memory
+> region is *discovered*. It doesn't matter if it's ACPI, DT, a
+> hypervisor enlightenment, a BAR of a simple PCI device, virtio, or
+> anything else.
+> 
+> ACPI is one of the *simplest* options for a hypervisor and guest to
+> implement, and doesn't prevent us from using the same structure in
+> virtio-rtc. I'm happy enough using ACPI and letting virtio-rtc come
+> along later.
+> 
+> > virtio has been developed with the painful experience that we keep
+> > making mistakes, or coming up with new needed features,
+> > and that maintaining forward and backward compatibility
+> > becomes a whole lot harder than it seems in the beginning.
+> 
+> Yes. But as you note, this shared memory structure is a userspace ABI
+> all of its own, so we get to make a completely *different* kind of
+> mistake :)
+> 
+
+
+So, something I still don't completely understand.
+Can't the VDSO thing be written to by kernel?
+Let's say on LM, an interrupt triggers and kernel copies
+data from a specific device to the VDSO.
+
+Is that problematic somehow? I imagine there is a race where
+userspace reads vdso after lm but before kernel updated
+vdso - is that the concern?
+
+Then can't we fix it by interrupting all CPUs right after LM?
+
+To me that seems like a cleaner approach - we then compartmentalize
+the ABI issue - kernel has its own ABI against userspace,
+devices have their own ABI against kernel.
+It'd mean we need a way to detect that interrupt was sent,
+maybe yet another counter inside that structure.
+
+WDYT?
+
+By the way the same idea would work for snapshots -
+some people wanted to expose that info to userspace, too.
+
+-- 
+MST
+
 
