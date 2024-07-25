@@ -1,119 +1,110 @@
-Return-Path: <netdev+bounces-112947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-112948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B612093BF96
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:03:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5933E93BFB0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 12:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB8261C21571
-	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:03:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 048B41F21C43
+	for <lists+netdev@lfdr.de>; Thu, 25 Jul 2024 10:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF4B196D9D;
-	Thu, 25 Jul 2024 10:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFA8198A2E;
+	Thu, 25 Jul 2024 10:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYwHoU71"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="eWAox3aU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7BD1386C0
-	for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 10:03:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D28198A10;
+	Thu, 25 Jul 2024 10:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721901831; cv=none; b=qoZ+YC99mE92AenFijZ3LtLDtp+McThTT3uJyquqtBjkUhkOAqPxCsDHaOjLoWzW6KKl8fZ9u7VOeiSweE0mKmPqoZ2n/xtaAeFLYBpxcdiPsDyXzx3sPkMc/ry1sXYiVc8PJvBT10c2P+d+eTBruqrxA/4vKIjRxZIPAawHkUI=
+	t=1721901999; cv=none; b=F35e6QZNg6yGWw4SlCbiHtIqQhz7Sjf1MrvPLNc4I8NTAsoZmnXjO3tPsPLRQJvrmwldiVVIdCkx5wAoc2naH021CjMEcKCzUYaEkJrjOBA8jwZ/Ch2fN6T6JPyuMhCE5eAWRQSiHmVe8ayae4ID9WYcmBM5W7jFMA8NDAtCoDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721901831; c=relaxed/simple;
-	bh=fW3eblInzQrm81i6hy43Aei6W5uy9FNkcUnKFD9Dpmw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRKRpsnEz/9zU0XEuy7gULCDd5cDSFfc6JqlcLw1jlF5kT9Fy8H8mBwcyEXwMl4IzWRIW2SIxq/vYtImaRjF5KnI4mqlNelwn1puEHYVqnf27HyP0ydxeQGNPrWqsxP5He+hoEI0Yt2O6J3As2zzlmnjNb1I8Px9LgVW23j8j1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYwHoU71; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85AE6C116B1;
-	Thu, 25 Jul 2024 10:03:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721901830;
-	bh=fW3eblInzQrm81i6hy43Aei6W5uy9FNkcUnKFD9Dpmw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IYwHoU71EaDw4P88HVk4IWLhefvRmz2J62G31WVmLRjkyxEPH6j41DtB297rbjlor
-	 CWKCcTkAAcP/wWwAKYdcquYme6xw/V3BFrj0MTt/D2LQWcPmaV0Iqz1PePQ9ZohzuZ
-	 oTYJpgx/Rs3dMSwe6hQnxX6TljS2Yo9socqbZlEomPelSYUfoMRrk8DwQT7RHzTFLe
-	 8CrKzoU8scbymBsNM1C3axTX1VArG7In7vub9qGBvr75ACS0TQfTLREkfNcIgs4kke
-	 U0GBemHkW7iqzRvDX8kytCAWh7/n3+/DgvvgmpUHEq3+70ENYi7wQUL4NDw3Wrg10F
-	 lEDdZF7WIeG2w==
-Date: Thu, 25 Jul 2024 11:03:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot+1b5e4e187cc586d05ea0@syzkaller.appspotmail.com,
-	Xin Long <lucien.xin@gmail.com>
-Subject: Re: [PATCH net] sched: act_ct: take care of padding in struct
- zones_ht_key
-Message-ID: <20240725100346.GK97837@kernel.org>
-References: <20240725092745.1760161-1-edumazet@google.com>
+	s=arc-20240116; t=1721901999; c=relaxed/simple;
+	bh=y3SzuDLuN3SD8cshoI2kRhdkI0fGgKaJMvIy2WeNvfk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c7gWB7zF2coguFOo+x1GMaVsXSib3HuEwpP1zkPJmCtJKwZFZf/2Q4ZPbIa+Y73Q+0iNHWr7W7xrGVdXUYqUPKsI+OaiG1X/Nfj2KGgHarhhia8QHeiBG/mK7NUVFpc7bIsOgLjdsjmOo4iWK2o2KWgWASN8TKSyaVoT6NI7VVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=eWAox3aU; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=twcHJYaQHj1ZnBWPjAKSfpapMe9QUdtveRxFV8eT7Dc=; b=eWAox3aUtXVRJFodtyRK1M6ZOQ
+	JUqMdY4UxE4si5ShUPxnUh+gYILcPaVZsvaSIGh1QkiTXoIvVues91ffLqzFYSYBULK5bm2YsRI6B
+	tkoUF9CAm8LqUTrkKX6uFubkUtG+ykmrBnCudhnl+vcxtoHsmnrBlHSyAO7eJyNU+sEe1HbWAyF7M
+	trgJiW8s70mlxuUcwk+90ONx4uEn+VhjJJe0I9jmZgqL85m0Szv4F5vR2oBPlNIGyJQSByJpsArDM
+	pNYPGtbFhAHNb2dRaLh8knXBfTnyhVjZpZg3F/za4ZvwRMrlz7s4CiEZyT0WZ1SUSiQC8MgXAPRew
+	XmcgjHNw==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sWvMe-000PiP-Nd; Thu, 25 Jul 2024 12:06:24 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sWvMe-000C4y-0t;
+	Thu, 25 Jul 2024 12:06:23 +0200
+Subject: Re: [PATCH bpf 0/3] xsk: require XDP_UMEM_TX_METADATA_LEN to actuate
+ tx_metadata_len
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Stanislav Fomichev <sdf@fomichev.me>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, Julian Schindel
+ <mail@arctic-alpaca.de>, Magnus Karlsson <magnus.karlsson@gmail.com>
+References: <20240713015253.121248-1-sdf@fomichev.me> <ZqEcim8E0qK8MRQO@boxer>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <f30e6532-28e3-dca8-1274-e6b31531b84e@iogearbox.net>
+Date: Thu, 25 Jul 2024 12:06:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240725092745.1760161-1-edumazet@google.com>
+In-Reply-To: <ZqEcim8E0qK8MRQO@boxer>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27347/Thu Jul 25 10:27:42 2024)
 
-On Thu, Jul 25, 2024 at 09:27:45AM +0000, Eric Dumazet wrote:
-> Blamed commit increased lookup key size from 2 bytes to 16 bytes,
-> because zones_ht_key got a struct net pointer.
+On 7/24/24 5:23 PM, Maciej Fijalkowski wrote:
+> On Fri, Jul 12, 2024 at 06:52:50PM -0700, Stanislav Fomichev wrote:
+>> Julian reports that commit 341ac980eab9 ("xsk: Support tx_metadata_len")
+>> can break existing use cases which don't zero-initialize xdp_umem_reg
+>> padding. Fix it (while still breaking a minority of new users of tx
+>> metadata), update the docs, update the selftest and sprinkle some
+>> BUILD_BUG_ONs to hopefully catch similar issues in the future.
+>>
+>> Thank you Julian for the report and for helping to chase it down!
+>>
+>> Reported-by: Julian Schindel <mail@arctic-alpaca.de>
+>> Cc: Magnus Karlsson <magnus.karlsson@gmail.com>
 > 
-> Make sure rhashtable_lookup() is not using the padding bytes
-> which are not initialized.
+> For the content series,
 > 
->  BUG: KMSAN: uninit-value in rht_ptr_rcu include/linux/rhashtable.h:376 [inline]
->  BUG: KMSAN: uninit-value in __rhashtable_lookup include/linux/rhashtable.h:607 [inline]
->  BUG: KMSAN: uninit-value in rhashtable_lookup include/linux/rhashtable.h:646 [inline]
->  BUG: KMSAN: uninit-value in rhashtable_lookup_fast include/linux/rhashtable.h:672 [inline]
->  BUG: KMSAN: uninit-value in tcf_ct_flow_table_get+0x611/0x2260 net/sched/act_ct.c:329
->   rht_ptr_rcu include/linux/rhashtable.h:376 [inline]
->   __rhashtable_lookup include/linux/rhashtable.h:607 [inline]
->   rhashtable_lookup include/linux/rhashtable.h:646 [inline]
->   rhashtable_lookup_fast include/linux/rhashtable.h:672 [inline]
->   tcf_ct_flow_table_get+0x611/0x2260 net/sched/act_ct.c:329
->   tcf_ct_init+0xa67/0x2890 net/sched/act_ct.c:1408
->   tcf_action_init_1+0x6cc/0xb30 net/sched/act_api.c:1425
->   tcf_action_init+0x458/0xf00 net/sched/act_api.c:1488
->   tcf_action_add net/sched/act_api.c:2061 [inline]
->   tc_ctl_action+0x4be/0x19d0 net/sched/act_api.c:2118
->   rtnetlink_rcv_msg+0x12fc/0x1410 net/core/rtnetlink.c:6647
->   netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2550
->   rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6665
->   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->   netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1357
->   netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1901
->   sock_sendmsg_nosec net/socket.c:730 [inline]
->   __sock_sendmsg+0x30f/0x380 net/socket.c:745
->   ____sys_sendmsg+0x877/0xb60 net/socket.c:2597
->   ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2651
->   __sys_sendmsg net/socket.c:2680 [inline]
->   __do_sys_sendmsg net/socket.c:2689 [inline]
->   __se_sys_sendmsg net/socket.c:2687 [inline]
->   __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2687
->   x64_sys_call+0x2dd6/0x3c10 arch/x86/include/generated/asm/syscalls_64.h:47
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 > 
-> Local variable key created at:
->   tcf_ct_flow_table_get+0x4a/0x2260 net/sched/act_ct.c:324
->   tcf_ct_init+0xa67/0x2890 net/sched/act_ct.c:1408
-> 
-> Fixes: 88c67aeb1407 ("sched: act_ct: add netns into the key of tcf_ct_flow_table")
-> Reported-by: syzbot+1b5e4e187cc586d05ea0@syzkaller.appspotmail.com
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Xin Long <lucien.xin@gmail.com>
+> However I was not sure about handling patch 3/3.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Ok, then I'm taking in the first two for now as they seem to actually
+address the fix and the 3rd seems like an improvement which could also
+get routed via bpf-next. In either case, if one of you could follow-up
+on the latter, that would be great.
+
+Thanks,
+Daniel
 
