@@ -1,141 +1,177 @@
-Return-Path: <netdev+bounces-113268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D629D93D6B7
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 18:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0850193D6BA
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 18:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 131EE1C23D53
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 169F81C23D4C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A09D17C7B0;
-	Fri, 26 Jul 2024 16:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gMOBOmrm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9A217C9E5;
+	Fri, 26 Jul 2024 16:10:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A3E17A580;
-	Fri, 26 Jul 2024 16:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119F2200AF;
+	Fri, 26 Jul 2024 16:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722010198; cv=none; b=FujfP3ejeOhCSWUVEstwvMEZAKt9aI2uHdfQyf29i+b/yznF5k8bg4bbNiOmvuphMp8rF0XziVc0wV9Ctm1PJ/JfRho+Dlt9AkhXurh1zEvznYervvYocuZ0eCUIgYfoWmHhQYps0Nk0NVliG5eyvwRajniBGIQGQ9w3k0GFsKM=
+	t=1722010219; cv=none; b=GWX7I5sELOWvNA5/54b6pwUFnkhBC2roZdlaKz9LqNoPdJhHOJaYUTobo0t29OKsqpUYKznROro9dpOKUW75SUM5oCMjqjWBAS7tAY0Nk5K7GqSPKhmMsaXStDsmJw39RLrCe70j7/FlUtNQk/tOhJUhTczl4QRuaM2MBiQy0XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722010198; c=relaxed/simple;
-	bh=AWvw3eax2CYJAfNzSApso/eG5j5f7iJdJCcd66tWino=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M5Q+kSv8Wmm0rPnAgACipsRO0nvvl3kldB3gGOKbXzOvQ5qIYhjMaiNYUD7NzhsAKasw9Y6PU8sYsMA785KwvhJRIO84kPOUJB5JAlwpaKASKvQZBFjLMc5OxwJKfGAEIMZIlWRC3N/5GRp1BCJgwil6RVn5EfJbi9lWMciBYQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gMOBOmrm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F6BC32782;
-	Fri, 26 Jul 2024 16:09:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722010198;
-	bh=AWvw3eax2CYJAfNzSApso/eG5j5f7iJdJCcd66tWino=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gMOBOmrmvE9PBAcK9qnC2qsWdm1FDQ0prQUdITFLNu/ot0o9cpabw+1b/Jz7Vrjzv
-	 te/QS5k6U6w8uSLzmU5mvxTbh+nCZ0vLEtgueNHkNkKYMVhr5LSWqe2jHo9kWITeS8
-	 vt+pw5qhcCFeMvNKV60L7D7V/DAxkv4JnWeWkLswuHdUsbSMYznmCzNK2pV0tXdYAR
-	 xFo8EK3iUVm5p67uA5yszAMPIelCWJFoNMm42Dm93RSdfkPEEnoFj5zClwjVeyvsKm
-	 Q8t5KfqQdinnpW2rOy19i81d2ls1GhzjTA6qt7MHyhCi4aN1PaWXqc6ov6NO1RGIaO
-	 Jk0MP4MZPT82w==
-Date: Fri, 26 Jul 2024 17:09:54 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-net 1/3] idpf: fix memory leaks and crashes while
- performing a soft reset
-Message-ID: <20240726160954.GO97837@kernel.org>
-References: <20240724134024.2182959-1-aleksander.lobakin@intel.com>
- <20240724134024.2182959-2-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1722010219; c=relaxed/simple;
+	bh=YKgmSzZlu4BIydzWn7bGVh7bITwoK6YWkJlzgZoKcWs=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ax+PGVZdJWy16Qhnqhopq++Dkfvb9SsOdqmzxoUiHFfpzyHxpbv7OIMlcpNXgStMGQIav9dh+jpEDJ5Wl+OA9KsM6kdXdJiSKVa1afLHXGiw8IWDqCn/5IV6YMnK8KzU97nkBYZ4aHPeLhEF92n0d2VJle4lDHeoUq28hz94/oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WVt2C0zlDz6K9Kk;
+	Sat, 27 Jul 2024 00:07:47 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id D2AAB1404FC;
+	Sat, 27 Jul 2024 00:10:14 +0800 (CST)
+Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 26 Jul
+ 2024 17:10:14 +0100
+Date: Fri, 26 Jul 2024 17:10:13 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, Jakub
+ Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
+	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid
+ Bloch <lbloch@nvidia.com>, "Leon Romanovsky" <leonro@nvidia.com>,
+	<linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
+Subject: Re: [PATCH v2 7/8] fwctl/mlx5: Support for communicating with mlx5
+ fw
+Message-ID: <20240726171013.00006e67@Huawei.com>
+In-Reply-To: <7-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+	<7-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240724134024.2182959-2-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Wed, Jul 24, 2024 at 03:40:22PM +0200, Alexander Lobakin wrote:
-> The second tagged commit introduced a UAF, as it removed restoring
-> q_vector->vport pointers after reinitializating the structures.
-> This is due to that all queue allocation functions are performed here
-> with the new temporary vport structure and those functions rewrite
-> the backpointers to the vport. Then, this new struct is freed and
-> the pointers start leading to nowhere.
-> 
-> But generally speaking, the current logic is very fragile. It claims
-> to be more reliable when the system is low on memory, but in fact, it
-> consumes two times more memory as at the moment of running this
-> function, there are two vports allocated with their queues and vectors.
-> Moreover, it claims to prevent the driver from running into "bad state",
-> but in fact, any error during the rebuild leaves the old vport in the
-> partially allocated state.
-> Finally, if the interface is down when the function is called, it always
-> allocates a new queue set, but when the user decides to enable the
-> interface later on, vport_open() allocates them once again, IOW there's
-> a clear memory leak here.
-> 
-> Just don't allocate a new queue set when performing a reset, that solves
-> crashes and memory leaks. Readd the old queue number and reopen the
-> interface on rollback - that solves limbo states when the device is left
-> disabled and/or without HW queues enabled.
-> 
-> Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-> Fixes: e4891e4687c8 ("idpf: split &idpf_queue into 4 strictly-typed queue structures")
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_lib.c | 30 +++++++++++-----------
->  1 file changed, 15 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+On Mon, 24 Jun 2024 19:47:31 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-...
+> From: Saeed Mahameed <saeedm@nvidia.com>
+> 
+> mlx5's fw has long provided a User Context concept. This has a long
+> history in RDMA as part of the devx extended verbs programming
+> interface. A User Context is a security envelope that contains objects and
+> controls access. It contains the Protection Domain object from the
+> InfiniBand Architecture and both togther provide the OS with the necessary
+> tools to bind a security context like a process to the device.
+> 
+> The security context is restricted to not be able to touch the kernel or
+> other processes. In the RDMA verbs case it is also restricted to not touch
+> global device resources.
+> 
+> The fwctl_mlx5 takes this approach and builds a User Context per fwctl
+> file descriptor and uses a FW security capability on the User Context to
+> enable access to global device resources. This makes the context useful
+> for provisioning and debugging the global device state.
+> 
+> mlx5 already has a robust infrastructure for delivering RPC messages to
+> fw. Trivially connect fwctl's RPC mechanism to mlx5_cmd_do(). Enforce the
+> User Context ID in every RPC header so the FW knows the security context
+> of the issuing ID.
+> 
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-> @@ -1932,17 +1926,23 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
->  
->  	err = idpf_set_real_num_queues(vport);
->  	if (err)
-> -		goto err_reset;
-> +		goto err_open;
->  
->  	if (current_state == __IDPF_VPORT_UP)
-> -		err = idpf_vport_open(vport, false);
-> +		err = idpf_vport_open(vport);
->  
->  	kfree(new_vport);
->  
->  	return err;
->  
->  err_reset:
-> -	idpf_vport_queues_rel(new_vport);
-> +	idpf_send_add_queues_msg(vport, vport->num_txq, vport->num_complq,
-> +				 vport->num_rxq, vport->num_bufq);
+A few minor comments + a reference counting question.
+
+> diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
+> index 37147a695add9a..e5ee2d46d43126 100644
+> --- a/drivers/fwctl/Kconfig
+> +++ b/drivers/fwctl/Kconfig
+> @@ -7,3 +7,17 @@ menuconfig FWCTL
+>  	  support a wide range of lockdown compatible device behaviors including
+>  	  manipulating device FLASH, debugging, and other activities that don't
+>  	  fit neatly into an existing subsystem.
 > +
-> +err_open:
-> +	if (current_state == __IDPF_VPORT_UP)
-> +		idpf_vport_open(vport);
+> +if FWCTL
 
-Hi Alexander,
+Why not use depends on FWCTL?
 
-Can the system end up in an odd state if this call to idpf_vport_open(), or
-the one above, fails. Likewise if the above call to
-idpf_send_add_queues_msg() fails.
+> +config FWCTL_MLX5
+> +	tristate "mlx5 ConnectX control fwctl driver"
+> +	depends on MLX5_CORE
+> +	help
+> +	  MLX5CTL provides interface for the user process to access the debug and
+> +	  configuration registers of the ConnectX hardware family
+> +	  (NICs, PCI switches and SmartNIC SoCs).
+> +	  This will allow configuration and debug tools to work out of the box on
+> +	  mainstream kernel.
+> +
+> +	  If you don't know what to do here, say N.
+> +endif
+
+> diff --git a/drivers/fwctl/mlx5/main.c b/drivers/fwctl/mlx5/main.c
+> new file mode 100644
+> index 00000000000000..5e64371d7e5508
+> --- /dev/null
+> +++ b/drivers/fwctl/mlx5/main.c
+
+
+
+> +static void mlx5ctl_remove(struct auxiliary_device *adev)
+> +{
+> +	struct mlx5ctl_dev *mcdev __free(mlx5ctl) = auxiliary_get_drvdata(adev);
+
+So this is calling fwctl_put(&mcdev->fwctl) on scope exit.
+
+Why do you need to drop a reference beyond the one fwctl_unregister() is dropping
+in cdev_device_del()?  Where am I missing a reference get?
 
 > +
->  free_vport:
->  	kfree(new_vport);
->  
+> +	fwctl_unregister(&mcdev->fwctl);
+> +}
+> +
+> +static const struct auxiliary_device_id mlx5ctl_id_table[] = {
+> +	{.name = MLX5_ADEV_NAME ".fwctl",},
+> +	{},
 
-...
+No point in comma after terminating entries
+
+> +};
+> +MODULE_DEVICE_TABLE(auxiliary, mlx5ctl_id_table);
+> +
+> +static struct auxiliary_driver mlx5ctl_driver = {
+> +	.name = "mlx5_fwctl",
+> +	.probe = mlx5ctl_probe,
+> +	.remove = mlx5ctl_remove,
+> +	.id_table = mlx5ctl_id_table,
+> +};
+> +
+> +module_auxiliary_driver(mlx5ctl_driver);
+> +
+> +MODULE_IMPORT_NS(FWCTL);
+> +MODULE_DESCRIPTION("mlx5 ConnectX fwctl driver");
+> +MODULE_AUTHOR("Saeed Mahameed <saeedm@nvidia.com>");
+> +MODULE_LICENSE("Dual BSD/GPL");
+
+> +#endif
+
 
