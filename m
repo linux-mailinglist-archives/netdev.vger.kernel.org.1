@@ -1,134 +1,237 @@
-Return-Path: <netdev+bounces-113136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D9293CCAF
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 04:21:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C90F593CCC2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 04:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C706C282D85
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 02:21:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 263A5B21D03
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 02:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB39D208C4;
-	Fri, 26 Jul 2024 02:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA5A442F;
+	Fri, 26 Jul 2024 02:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KLw3n2c8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SeSaDTBg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2CC1BC49
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 02:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6791B947;
+	Fri, 26 Jul 2024 02:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721960497; cv=none; b=YbVHo7dXLVjzWpMgDg6ylPrRn0dRg/HNfXpamsXT1eFXRdtTzmTKq78QBV6YVXo/BoTrmddArEVkeQUDmll4y9dzS+LBbQHX3d/8WD4Nf8MwDfYuNP0nouSfmNlqGwPFsenqNlOIc8wa8vpxL+fhLqmiAHApV3IfZB0boZFV7Mo=
+	t=1721961246; cv=none; b=Yr1/RxCZaRObiIY3n8YwRMkLvI/eZpVDv5OgLGJJjRosEu7XsonGKKq9Cppd6J2WNYTHVUuzHaZrtdehwuc+JnXS4zYJDGOpmg1grpM0x72xWsXjs4PFoDhLWnZpXyiEjyUgmLXcsqwwLSyhsJ8kUCWZ6sj+pAtTUnr5ibDX4sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721960497; c=relaxed/simple;
-	bh=9pPNleW41JbaEoT5d7ZdvPpk9ik8QLyyrEts7kTbW5E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iBw0IQENdRfZoeevwCvp0yUbJ0a7yT9ZxiaVwj2aFTSbv8GY7G7pAK/vf4ECjjnVzG8F3COZPYwImzM2uRxBuLQPCrLzsJDAxBMkeOdqdEBGVAppXb+nR5Wn1+TQaZWzcBwDhR1p8flJthcYXKpIaWoff/gyb6SpZUux3gqroik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KLw3n2c8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721960495;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cD9M07/PagDrXP2ta/1b1JQMk5bjY/PWuJ+NKQsHVrI=;
-	b=KLw3n2c8MjAvd9hMVm6MHYVRzK8xTerC2tXMXrQBPqTPjDgo9/M8S8woepkOxXGwjAi5Y0
-	HXmZPzCH9RfnWsemNEi4hN5JSeJhJUD8gr6z7rrkP8WufTtWVC059DDXeTV4SNIb0t/66V
-	k1rrPSpDiBh5gfwvvvRUDmRGz4a/7OI=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-t1xj1VevPOG09w3AQ2DpZQ-1; Thu, 25 Jul 2024 22:21:29 -0400
-X-MC-Unique: t1xj1VevPOG09w3AQ2DpZQ-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2cb696be198so569611a91.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 19:21:29 -0700 (PDT)
+	s=arc-20240116; t=1721961246; c=relaxed/simple;
+	bh=fGO7zgAjSKLGmo/Nb/TQ4yUxCHvoxiuh+5KbAxDkpUY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qCA7EQDn7HxmuLFda7D7K0b+30CylQ8ViBCpUfMekWy7eYNbjJ1BnTbVGB6ugCEfKXwdnqo23GPJmWnzgGDHW0uwnU1g2u6TyCHbfrGsisQM6Gpmo8pDBhy/YKxH9FcGf2/cNLYYJQTlM5i1d+hI9yyH3F03lWFToHFckGlPbRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SeSaDTBg; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-44fdde0c8dcso1105591cf.0;
+        Thu, 25 Jul 2024 19:34:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721961244; x=1722566044; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B1DrkWVH1N3/4i4ZMI9uWQ4G3glJcw7jxGQQ1U+yfBg=;
+        b=SeSaDTBg7YpW4KrFtRa9+H6DtwZ07V2OViTOZL0r91fcYGZYO61auSAThiVMlDJTdS
+         Yss3Nyr6IJD9jy0X+FwQ7gn/t4gD+fEc+QOkuQMT6F48Gm/BRVCI7ZQlVClmdYqgr7QU
+         KwRH+5Q838c3vSPqy35H+7JT+mkHTm9A6bL3RhpfkY+Z+YuV3/ZkMck0tw/JjU5CUXFk
+         4rDarMFube7Nek67+XXZsv8JFAc0D+VHA/mTpXUDVI/rvMt5UdWJ+eEXTz+ym9yBhaHW
+         knON7gC+g9Qld+nd/wVpOMX5n0Wjsk5dGkoUXJIKF9h26lZsJ0+RGeo5L7hIEFgZp/A3
+         d/kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721960488; x=1722565288;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cD9M07/PagDrXP2ta/1b1JQMk5bjY/PWuJ+NKQsHVrI=;
-        b=wV/DZgRxIXcjH0PHQLYkiSJfEF/RN3jPChgy66ia1G88YILYmnhlW5NMV+vJMAQwA8
-         wuUu/Zp00SNb1Y4PVDMwQ3HZr1G77KIvnmNb2qJv1ao5AiuOM5CmYJWwF1tYV8o/2dm7
-         kGcfnMCYmHlxu4u7rikMp7Av7BA7EXlFixWeMGBlBchKTECelQym0P6MrgtzzJZjtvzR
-         9N1JYK7Ze52lCf+hM0PDBdscl5HYDftMoCdVX2Tjd82Om+5b/czR0yN1y/h6lpi19L2r
-         zi3VoIucPvcFe8yTb2Hv00jRkVir6Wpqa9kvynYDVz4QBLfGJ4AKT0Hvfs0nybgDZIV0
-         P0KA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3WeLIUSzIdLtd3GcvVZBceRLXpNwN7fdhw/IrPb73WiH/Xvch+pIdntQW965uUVlzx92DHEx54AjMx0D/Ozol0I2t7/K2
-X-Gm-Message-State: AOJu0Yyup83aGXAJ5mnPs0JGH0DJ2vH7yiC8scddsb4quBofnDT/a8iN
-	oh7ebu6/zkUSFwb61mzYbYa0cvNsbuwMUGyLCvWf5XUORnlOtrPIoKJ4zApCOIvA60CuUzlLdcI
-	5YJpM21vBq+eg9TicT/e6JXkmtbugee5R3OKFrNtalMeTR1gQuOhEqQZ0IQUpw6sCj3zTIdJVkO
-	8VuuQCA/DV23oG39DX3LqdK7g9fozC
-X-Received: by 2002:a17:90a:e50e:b0:2c4:aae7:e27 with SMTP id 98e67ed59e1d1-2cf2ea0f4e6mr4277358a91.23.1721960488163;
-        Thu, 25 Jul 2024 19:21:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF0mJhruNRcMlENqGhBASXD6O3mnsHAgEZxCXB60xz9QTVgQMj2Rq6goVxIFQ40Heya4tJ4Y2caqJ4tY1oGqOI=
-X-Received: by 2002:a17:90a:e50e:b0:2c4:aae7:e27 with SMTP id
- 98e67ed59e1d1-2cf2ea0f4e6mr4277333a91.23.1721960487690; Thu, 25 Jul 2024
- 19:21:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721961244; x=1722566044;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B1DrkWVH1N3/4i4ZMI9uWQ4G3glJcw7jxGQQ1U+yfBg=;
+        b=drI18XgYnHbOiV8UeeCO9mCBzaPvQwbDgvQIEnsJrYA7Sx1SUngxb7s++OI7WIVTeW
+         hQrU7QdnFS0ikeITijSKzQos+tVX+Q7B605uuUY9qSK2VFB4C8mWiGeTJncEM6GXJ0T3
+         5mEbFI0/JrlF8uXvxYqSKOJBa5KlCvV65OdVB/tErLtfXvlMU8i+7DhizUgZTRVkjniN
+         tzAgSBMvGdWW+l0z5Mu0RzbaOioySQrHSPq7kHhhTGJAcH4Z65nUYuDB5JmzRaypuFI0
+         STa3ndFlmHb8k5+J9c47QP6VoZRccqeZ6+tyF9q1xmEaQATWsjlEJg636vFXXvJS3y5k
+         75gQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJcQwaET5i7o5bmhQKlFVeO5NDBQVlIRaOLFZsLHvPlaFlJn2SbEIt44zoI6GJkbRY/S5frWEOdx0mimj80632S8crLx0L
+X-Gm-Message-State: AOJu0Yybl++cLWHManAxbL+en5J7rFi+qdLZGWMfulRou2SRp+POpkro
+	UNoAJAHFYq1d7fwM1XiX0mUKt7Byq0XZH5DhkS4VHdgs2STGttjrgngT6w==
+X-Google-Smtp-Source: AGHT+IGJi0rlpnoJDnkh4TLgoJ0OhF3ZU6Eqq5O6eZw/kgN+3qP6bMAfcdpvbsLZXT3bI68so+xGaA==
+X-Received: by 2002:a05:622a:448:b0:447:df17:5116 with SMTP id d75a77b69052e-44fe32a19f4mr47893061cf.7.1721961243818;
+        Thu, 25 Jul 2024 19:34:03 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44fe81463easm10677521cf.26.2024.07.25.19.34.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 19:34:03 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	arefev@swemel.ru,
+	alexander.duyck@gmail.com,
+	Willem de Bruijn <willemb@google.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: drop bad gso csum_start and offset in virtio_net_hdr
+Date: Thu, 25 Jul 2024 22:32:49 -0400
+Message-ID: <20240726023359.879166-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000009d1d0a061d91b803@google.com> <20240725214049.2439-1-aha310510@gmail.com>
-In-Reply-To: <20240725214049.2439-1-aha310510@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 26 Jul 2024 10:21:16 +0800
-Message-ID: <CACGkMEv2DZhp71-QdckH+9ycerdNd7+F5vFyq3g=qquEsm9rHw@mail.gmail.com>
-Subject: Re: [PATCH net] tun: Add missing bpf_net_ctx_clear() in do_xdp_generic()
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	willemdebruijn.kernel@gmail.com, bigeasy@linutronix.de, bpf@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 26, 2024 at 5:41=E2=80=AFAM Jeongjun Park <aha310510@gmail.com>=
- wrote:
->
-> There are cases where do_xdp_generic returns bpf_net_context without
-> clearing it. This causes various memory corruptions, so the missing
-> bpf_net_ctx_clear must be added.
->
-> Reported-by: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com
-> Fixes: fecef4cd42c6 ("tun: Assign missing bpf_net_context.")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+From: Willem de Bruijn <willemb@google.com>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Tighten csum_start and csum_offset checks in virtio_net_hdr_to_skb
+for GSO packets.
 
-(Looks like the do_xdp_generic() needs some tweak for example we can
-merge the two paths for XDP_DROP at least).
+The function already checks that a checksum requested with
+VIRTIO_NET_HDR_F_NEEDS_CSUM is in skb linear. But for GSO packets
+this might not hold for segs after segmentation.
 
-Thanks
+Syzkaller demonstrated to reach this warning in skb_checksum_help
 
-> ---
->  net/core/dev.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 6ea1d20676fb..751d9b70e6ad 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -5150,6 +5150,7 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, struc=
-t sk_buff **pskb)
->                         bpf_net_ctx_clear(bpf_net_ctx);
->                         return XDP_DROP;
->                 }
-> +               bpf_net_ctx_clear(bpf_net_ctx);
->         }
->         return XDP_PASS;
->  out_redir:
-> --
->
+	offset = skb_checksum_start_offset(skb);
+	ret = -EINVAL;
+	if (WARN_ON_ONCE(offset >= skb_headlen(skb)))
+
+By injecting a TSO packet:
+
+WARNING: CPU: 1 PID: 3539 at net/core/dev.c:3284 skb_checksum_help+0x3d0/0x5b0
+ ip_do_fragment+0x209/0x1b20 net/ipv4/ip_output.c:774
+ ip_finish_output_gso net/ipv4/ip_output.c:279 [inline]
+ __ip_finish_output+0x2bd/0x4b0 net/ipv4/ip_output.c:301
+ iptunnel_xmit+0x50c/0x930 net/ipv4/ip_tunnel_core.c:82
+ ip_tunnel_xmit+0x2296/0x2c70 net/ipv4/ip_tunnel.c:813
+ __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+ ipgre_xmit+0x759/0xa60 net/ipv4/ip_gre.c:661
+ __netdev_start_xmit include/linux/netdevice.h:4850 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4864 [inline]
+ xmit_one net/core/dev.c:3595 [inline]
+ dev_hard_start_xmit+0x261/0x8c0 net/core/dev.c:3611
+ __dev_queue_xmit+0x1b97/0x3c90 net/core/dev.c:4261
+ packet_snd net/packet/af_packet.c:3073 [inline]
+
+The geometry of the bad input packet at tcp_gso_segment:
+
+[   52.003050][ T8403] skb len=12202 headroom=244 headlen=12093 tailroom=0
+[   52.003050][ T8403] mac=(168,24) mac_len=24 net=(192,52) trans=244
+[   52.003050][ T8403] shinfo(txflags=0 nr_frags=1 gso(size=1552 type=3 segs=0))
+[   52.003050][ T8403] csum(0x60000c7 start=199 offset=1536
+ip_summed=3 complete_sw=0 valid=0 level=0)
+
+Migitage with stricter input validation.
+
+csum_offset: for GSO packets, deduce the correct value from gso_type.
+This is already done for USO. Extend it to TSO. Let UFO be:
+udp[46]_ufo_fragment ignores these fields and always computes the
+checksum in software.
+
+csum_start: finding the real offset requires parsing to the transport
+header. Do not add a parser, use existing segmentation parsing. Thanks
+to SKB_GSO_DODGY, that also catches bad packets that are hw offloaded.
+Again test both TSO and USO. Do not test UFO for the above reason, and
+do not test UDP tunnel offload.
+
+GSO packet are almost always CHECKSUM_PARTIAL. USO packets may be
+CHECKSUM_NONE since commit 10154dbded6d6 ("udp: Allow GSO transmit
+from devices with no checksum offload"), but then still these fields
+are initialized correctly in udp4_hwcsum/udp6_hwcsum_outgoing. So no
+need to test for ip_summed == CHECKSUM_PARTIAL first.
+
+This revises an existing fix mentioned in the Fixes tag, which broke
+small packets with GSO offload, as detected by kselftests.
+
+Link: https://syzkaller.appspot.com/bug?extid=e1db31216c789f552871
+Link: https://lore.kernel.org/netdev/20240723223109.2196886-1-kuba@kernel.org
+Fixes: e269d79c7d35 ("net: missing check virtio")
+Cc: stable@vger.kernel.org
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ include/linux/virtio_net.h | 16 +++++-----------
+ net/ipv4/tcp_offload.c     |  3 +++
+ net/ipv4/udp_offload.c     |  3 +++
+ 3 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index d1d7825318c32..6c395a2600e8d 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -56,7 +56,6 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 	unsigned int thlen = 0;
+ 	unsigned int p_off = 0;
+ 	unsigned int ip_proto;
+-	u64 ret, remainder, gso_size;
+ 
+ 	if (hdr->gso_type != VIRTIO_NET_HDR_GSO_NONE) {
+ 		switch (hdr->gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
+@@ -99,16 +98,6 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 		u32 off = __virtio16_to_cpu(little_endian, hdr->csum_offset);
+ 		u32 needed = start + max_t(u32, thlen, off + sizeof(__sum16));
+ 
+-		if (hdr->gso_size) {
+-			gso_size = __virtio16_to_cpu(little_endian, hdr->gso_size);
+-			ret = div64_u64_rem(skb->len, gso_size, &remainder);
+-			if (!(ret && (hdr->gso_size > needed) &&
+-						((remainder > needed) || (remainder == 0)))) {
+-				return -EINVAL;
+-			}
+-			skb_shinfo(skb)->tx_flags |= SKBFL_SHARED_FRAG;
+-		}
+-
+ 		if (!pskb_may_pull(skb, needed))
+ 			return -EINVAL;
+ 
+@@ -182,6 +171,11 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 			if (gso_type != SKB_GSO_UDP_L4)
+ 				return -EINVAL;
+ 			break;
++		case SKB_GSO_TCPV4:
++		case SKB_GSO_TCPV6:
++			if (skb->csum_offset != offsetof(struct tcphdr, check))
++				return -EINVAL;
++			break;
+ 		}
+ 
+ 		/* Kernel has a special handling for GSO_BY_FRAGS. */
+diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+index 4b791e74529e1..9e49ffcc77071 100644
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -140,6 +140,9 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+ 	if (thlen < sizeof(*th))
+ 		goto out;
+ 
++	if (unlikely(skb->csum_start != skb->transport_header))
++		goto out;
++
+ 	if (!pskb_may_pull(skb, thlen))
+ 		goto out;
+ 
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index aa2e0a28ca613..f521152c40871 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -278,6 +278,9 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	if (gso_skb->len <= sizeof(*uh) + mss)
+ 		return ERR_PTR(-EINVAL);
+ 
++	if (unlikely(gso_skb->csum_start != gso_skb->transport_header))
++		return ERR_PTR(-EINVAL);
++
+ 	if (skb_gso_ok(gso_skb, features | NETIF_F_GSO_ROBUST)) {
+ 		/* Packet is from an untrusted source, reset gso_segs. */
+ 		skb_shinfo(gso_skb)->gso_segs = DIV_ROUND_UP(gso_skb->len - sizeof(*uh),
+-- 
+2.46.0.rc1.232.g9752f9e123-goog
 
 
