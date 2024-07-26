@@ -1,63 +1,59 @@
-Return-Path: <netdev+bounces-113306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC11E93D9F5
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 22:44:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBA3893D9F6
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 22:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83F2A28265A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:44:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56621C221FA
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98007149C45;
-	Fri, 26 Jul 2024 20:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E3A55893;
+	Fri, 26 Jul 2024 20:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NFt+XvOB"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pMjBjA0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0A418641
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 20:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2A71862A
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 20:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722026680; cv=none; b=DmVSSTI72bNCDcqFJwFSvfPkLyhbsznTraCEhWvi6tb+qWyU5m+gi/wf6mV2bFCP19X83DL30kwfTTvsmPYr+S4k3jEiFrZFpYh6QHWfgaMoiibOPqE3B0lA0hQdfmQJRQoBJLWMWjRLpYs2SJi+It2I61FlXBJfE7Nvsf1CTt4=
+	t=1722026736; cv=none; b=bG0moCn045O1rAS9YcBk2Np79l6XKaSkUmDqS7AHdcUUf+VqfQxSsL2rQvdfr6XsvSaKt8+102uUdG+0ICpJjlGXH8Y5DKJgv4ESjDlGy+faT9y0ooKCa+fp9pQPuFIxV2xwRw6AqG4ct8O+/R+bl5RWELbx6QEVMlt8xlTL5Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722026680; c=relaxed/simple;
-	bh=yo5IJPIYdUzkxkWYr7kywSn3pZSlnPmArx0lgNP2t/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OoplDdBIu4s00FlT1IMiWm972fFDucYk65wtXdKDpqnW64b4iuCNCxyVqXYbQHIWGTcBnXn5KxY7ZCdeBmuUFrTrMY3zuwmvOE2Ec/+vn4h3Lp+RW882jbN6SmRGybUhuWLHm0BON5zVsZRz7zlMsHH8VUqnkhxGzK2vShaCPJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NFt+XvOB; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46QBaWwl014138;
-	Fri, 26 Jul 2024 20:44:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	L8tARZs2c0FVJ1VgmiHYwfPTLAMgxsUgZ742SZHGH4o=; b=NFt+XvOBVXwAkCRH
-	QxQRjRQDGOW6Q/4ChKctFOcfdpLtg2nPojthAB1AADoEA7/etNkzk+ul3hWoqQ4X
-	tNJds8tNxC44q5B7lL9ZGtLFPyvA0Du84kkC+CeVQbhcgRXHs21Qvmb87Y4OIEDH
-	rC5qZuCaxWU8zOr890v9ecaObe9PEaMfYUIZfEmPKR1jFGxj4QNDCS0Fdvd0jIPK
-	OjPptLP2NEo5KTn5Ux+3BIFlVu4VRVL/X9yBMStFJAI09zdKH95gaoDH+JZsxw4X
-	j4SVXKuP0XACxMJj7APq3aAvkWc70tdIgYG1exvlYCcSBX4B49ylZuBjqsmwYSnM
-	8VoaWg==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40m1vq2da8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 20:44:32 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46QKiWXw022609
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 20:44:32 GMT
-Received: from [10.38.246.7] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 26 Jul
- 2024 13:44:29 -0700
-Message-ID: <bba8b50d-d116-42c4-adde-a8045df36961@quicinc.com>
-Date: Fri, 26 Jul 2024 14:43:53 -0600
+	s=arc-20240116; t=1722026736; c=relaxed/simple;
+	bh=D5Kds4oTdYUJDagA9z1q5H3IBWQMpKsWEDMHLLY5CUw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=VchTWmQmfboFXCY/xYJ0dzB4t6By99kowr15pJXmrXwYvjFVNYLOIt9zyOSZj58onmw/68lnydlULf+OGgUijgDSeao4Owig8KlWsFcdygRe8xZPceUjWkXISrxluQPsJBCUB8MdMzghKmS5vuK3/pRECr5kb0ihSwMd09DJaQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pMjBjA0S; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sXRoa-00FCPs-1m; Fri, 26 Jul 2024 22:45:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=zrT9ifHlIsnaqKTjRvsVB3EVCGFeERnZ55LV4Q/VAL8=; b=pMjBjA0SyNoB4RUHbVyFS95oYu
+	kEUuyIL5E2jLLOPj8jooKrEBmrL1+Oon0iLTvoSDO9Q20yoUZa6jjaDVVcvJ7mt8KHAjbbutCl2mB
+	zTJNJuOZAks7Btrye4sHVmV3yw9rLFLe7AGtciZjgDjU6d/FvM+Dvd9MxE8OWL23N6ZIUh9wU8Uds
+	+tAgPakzbR22oOcbeH/vv5c+O3j68FanVoKc++zvRBBeHgu20QjnABtEYFgBdf1LUMKtev5CV/z3x
+	rAMbr5g8noG6anUIBSI8fwfUjfs0k4RoX6mt1w3uBkyH3AnnFv0L0k3MBoRYZEiVFvjeTSoKSq4YW
+	+TqkP23g==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sXRoZ-0004QX-CT; Fri, 26 Jul 2024 22:45:23 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sXRoO-007VgG-KS; Fri, 26 Jul 2024 22:45:12 +0200
+Message-ID: <da8502d6-38b7-44a8-bd9a-708a64e9fd83@rbox.co>
+Date: Fri, 26 Jul 2024 22:45:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,83 +61,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tcp: Adjust clamping window for applications
- specifying SO_RCVBUF
-To: Eric Dumazet <edumazet@google.com>
-CC: <soheil@google.com>, <ncardwell@google.com>, <yyd@google.com>,
-        <ycheng@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-        <netdev@vger.kernel.org>, Sean Tranchetti <quic_stranche@quicinc.com>
-References: <20240725215542.894348-1-quic_subashab@quicinc.com>
- <CANn89iJ5eGCGgF+_4VxXXV_oMv8Bi-Ugq+MG6=bs+74FR63GUQ@mail.gmail.com>
-Content-Language: en-US
-From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-In-Reply-To: <CANn89iJ5eGCGgF+_4VxXXV_oMv8Bi-Ugq+MG6=bs+74FR63GUQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: N20cBhYTVZf5YXTl90t7aAvGyOvXXnxN
-X-Proofpoint-ORIG-GUID: N20cBhYTVZf5YXTl90t7aAvGyOvXXnxN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-26_12,2024-07-26_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0
- priorityscore=1501 mlxlogscore=837 impostorscore=0 bulkscore=0 mlxscore=0
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2407260139
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH bpf 0/6] selftest/bpf: Various sockmap-related fixes
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
+ <871q3gkqd6.fsf@cloudflare.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <871q3gkqd6.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 7/26/24 19:36, Jakub Sitnicki wrote:
+> On Wed, Jul 24, 2024 at 01:32 PM +02, Michal Luczaj wrote:
+>> Series takes care of few bugs and missing features with the aim to improve
+>> the test coverage of sockmap/sockhash.
+>>
+>> Last patch is a create_pair() rewrite making use of
+>> __attribute__((cleanup)) to handle socket fd lifetime.
+>>
+>> v0: https://lore.kernel.org/netdev/027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co/
+>>   - No declarations in function body (Jakub)
+>>   - Don't touch output arguments until function succeeds (Jakub)
+>>
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+> 
+> I see this depends on your previous series that got applied onto bpf
+> tree, but this seems more like bpf-next material considering it's all
+> tests, and a mix of improvements and fixups.
 
-On 7/26/2024 3:40 AM, Eric Dumazet wrote:
-> On Thu, Jul 25, 2024 at 11:55 PM Subash Abhinov Kasiviswanathan
-> <quic_subashab@quicinc.com> wrote:
->>
->>           */
->>
->> -       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
->> -           !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
->> +       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf)) {
->>                  u64 rcvwin, grow;
->>                  int rcvbuf;
->>
->> @@ -771,12 +770,24 @@ void tcp_rcv_space_adjust(struct sock *sk)
->>
->>                  rcvbuf = min_t(u64, tcp_space_from_win(sk, rcvwin),
->>                                 READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
->> -               if (rcvbuf > sk->sk_rcvbuf) {
->> -                       WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
->> +               if (!(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
->> +                       if (rcvbuf > sk->sk_rcvbuf) {
->> +                               WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
->>
->> -                       /* Make the window clamp follow along.  */
->> -                       WRITE_ONCE(tp->window_clamp,
->> -                                  tcp_win_from_space(sk, rcvbuf));
->> +                               /* Make the window clamp follow along.  */
->> +                               WRITE_ONCE(tp->window_clamp,
->> +                                          tcp_win_from_space(sk, rcvbuf));
->> +                       }
->> +               } else {
->> +                       /* Make the window clamp follow along while being bounded
->> +                        * by SO_RCVBUF.
->> +                        */
->> +                       if (rcvbuf <= sk->sk_rcvbuf) {
-> 
-> I do not really understand this part.
-> I am guessing this test will often be false and your problem won't be fixed.
-> You do not handle all  sysctl_tcp_adv_win_scale values (positive and negative)
-> 
-> I would instead not use "if (rcvbuf <= sk->sk_rcvbuf) {"
-> 
-> and instead :
-> 
-> else {
->        int clamp = tcp_win_from_space(sk, min(rcvbuf, sk->sk_rcvbuf));
-> 
->        if (clamp > tp->window_clamp)
->              WRITE_ONCE(tp->window_clamp, clamp);
-> }
-Thanks Eric, I've updated this in v2.
+Yeah, I guess you're right. I'll just wait for bpf-next to catch up, then
+rebase and respin.
 
