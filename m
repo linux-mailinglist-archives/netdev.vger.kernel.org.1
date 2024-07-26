@@ -1,125 +1,89 @@
-Return-Path: <netdev+bounces-113139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C1C93CCFA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 05:27:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E101093CCFE
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 05:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 064811C20F10
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:27:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65E27B20B0C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA4D224F6;
-	Fri, 26 Jul 2024 03:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="jml3XhKW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A138224F6;
+	Fri, 26 Jul 2024 03:29:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76944D299;
-	Fri, 26 Jul 2024 03:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A524436D;
+	Fri, 26 Jul 2024 03:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721964451; cv=none; b=qLafVAeCoMar7urUuP0ZcNkqhS9fR/fUpz25hcn6DQhfCu99x0dUOzG90sSQ605vO7et2jZliE59090hEwwe+0Ot6cUvl3tITNCpCjCR72ycXzPBhveo5V8mKzx3M1f8QSFU7uiy92QglJ5QiL4z9SNPD89Z6r+QItByLIPZ7fg=
+	t=1721964593; cv=none; b=XDaJRG2CG/s9HthCGNZH/SOaJkY9z7bb813AyND/Luh+xDiAgCqngnW3Vla9PG/atZWGxJjEKuo1OJXdgrifGyhlFnj9aU6qkvizH9/O5o7ZbTtViRAEbdu+N5XQugidBlSEsOqL6V5/KTNgHmOqLY0WNbKGuPC5xKDEGnlKNy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721964451; c=relaxed/simple;
-	bh=87lvqZGx1ddg3kiAFcaM/B4GCaBLdsnwkTGBUe8+qaY=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DW00Zpafkq3l1bzKJfB30DHwrrsA1F/MNtt2K5nAKUlLspk22so0CD+evyTsMtNjtqkxukcR3JwX7ilw7xFW8xkOrZg5vAeuDEBYwcTe5mi74Le7sK54rAGwKeBetSmqT0/S1ZFkbLpmkajGDSURSK/Y/tKuqYzVnayZ53Gk+Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=jml3XhKW; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 46Q3QlNW2031537, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1721964407; bh=87lvqZGx1ddg3kiAFcaM/B4GCaBLdsnwkTGBUe8+qaY=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=jml3XhKWAxs+f7QgxoJpbe3EWUCuUsDocEmkds8tgi24m4XlZ8Rt8A9RUREyMcmiC
-	 GMLsUGmOfruh5UJZPXXY88uD3iGlxdhVRVLoGuUv5l7WtUzoA8X5XcM70RTShuuEI6
-	 XNL07urq/rRMpiMU0OV+loUIoqVM3wyQ58EfvuK+hjjviFpUJ2iWuKamlhUzBHmzM6
-	 DLAsuFZeQPEbkemcOAfvTd0WyJRwTNOGj6X1MPtCarLCJdGaJ4zO1SWkTW3WX6LekA
-	 itqp5xb/SLHJ+7Y0P7vcAjnw8F+fRG124+NuOqBRZsOw24TMxI16lM6Lyzs0LW50Wm
-	 XTu+28VA0Fajg==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 46Q3QlNW2031537
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 26 Jul 2024 11:26:47 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 26 Jul 2024 11:26:48 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Jul 2024 11:26:47 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
- RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
- 15.01.2507.035; Fri, 26 Jul 2024 11:26:47 +0800
-From: Ping-Ke Shih <pkshih@realtek.com>
-To: syzbot <syzbot+8dd98a9e98ee28dc484a@syzkaller.appspotmail.com>,
-        "clang-built-linux@googlegroups.com" <clang-built-linux@googlegroups.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "johannes.berg@intel.com" <johannes.berg@intel.com>,
-        "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>,
-        "nathan@kernel.org" <nathan@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>
-Subject: RE: [syzbot] [wireless?] WARNING in __rate_control_send_low (2)
-Thread-Topic: [syzbot] [wireless?] WARNING in __rate_control_send_low (2)
-Thread-Index: AQHa3CIb46s02EiOlEu+9T1Wemoj4rIIXHzg
-Date: Fri, 26 Jul 2024 03:26:47 +0000
-Message-ID: <c06f8308cc84412a93b81418aaa32fa8@realtek.com>
-References: <000000000000fdef8706191a3f7b@google.com>
- <00000000000011de5f061dd387f0@google.com>
-In-Reply-To: <00000000000011de5f061dd387f0@google.com>
-Accept-Language: en-US, zh-TW
-Content-Language: zh-TW
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1721964593; c=relaxed/simple;
+	bh=MX3S4xFhl5JUdGTw8lSleq8F1xXDRForZhuJShMwBOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ezunPvllAkp8splkR2KEbQVvTbyIF6yTa97QuKPc0/LK5LQNMzKzxan3uxbeRHn5kxuEP8/LTGtLRnhdOeNrFnvqZcG1tuelIwNit6URzCvOdgnf4K6kPraUnGnuQeTsQIuufk9sgT1VhFXiF7MxlHQX43qsy/aAa25QMfKJdT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fc5239faebso1829835ad.1;
+        Thu, 25 Jul 2024 20:29:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721964591; x=1722569391;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OPCOqUxRe4HpKCHulx3jzZ69jtM3iGZkqcwYDzljxWU=;
+        b=i6HCIPeZmEEnyYaIX0TSLV0tlsS14nbfNcQAZqsB4o9aT18fHG/YzYHeGYATrmAK4c
+         gNZuiyLt5suV4n7X414hoBpR7kU+fXYEt2wdVxH8mtoAzfvVf0JO7Ntwe3qEjtJkUF1n
+         eDf87+I7InpwtV7iG/xgooRpGOuSvrdQd9OgVAXLzIe+0LKZnrzsz5F4CWgY5UMLn5gu
+         KVtn6KyJ3cvhpE3ifqO8GW+nuKwFSU1mDF+KIafwrNyiZ16ykG3ISmEe+QU76xQbAOld
+         cBOXmgfOr0I2ekrHTblnmdJbeALGB3W5VF5MGkkwWpNZJYhD+4+AzlWApl3BfyfCeAfS
+         OPOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVceY5ZR99G9eHm6h64qMI2p/PvLVqbVS+UE76vjoaMqZM2s5ECCkPtJRygBabvFdKWVtc=@vger.kernel.org, AJvYcCWvyC8FwSBZPB+g22SL31Rg5WgjHtHfu8EZuoKdc+evezOTFopSBmCcHOsgZqZh78mFHyXvWRio@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFPtunJyy9uA9QEO0G06yPscmI8K7Ed6n4ClGxVN/h04Dy7AgN
+	LeRqCEtNGfVjVEVx+pYOMML+rrW7ORNSKaadDeQkM1243d2oLef3y7ujHs0=
+X-Google-Smtp-Source: AGHT+IGasw4hobeHMoqOVtJJ7RT0a3xLWzniolZdHOnz54sKcMdpE/NRLN7xnlOnO0lIgftG8c2u2Q==
+X-Received: by 2002:a17:903:18e:b0:1fa:7e0:d69a with SMTP id d9443c01a7336-1fed92a71e6mr42311865ad.46.1721964590813;
+        Thu, 25 Jul 2024 20:29:50 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7cbedefsm22138605ad.67.2024.07.25.20.29.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jul 2024 20:29:50 -0700 (PDT)
+Date: Thu, 25 Jul 2024 20:29:49 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Rao Shoaib <rao.shoaib@oracle.com>
+Cc: sdf@google.com, Eric Dumazet <edumazet@google.com>,
+	priyarjha@google.com, ycheng@google.com, soheil@google.com,
+	daniel@iogearbox.net, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: bpf: add BPF_CGROUP_SOCK_OPS callback that is executed on every
+ RTT (commit: 23729ff23186424)
+Message-ID: <ZqMYLWFWEC0OWjrl@mini-arch>
+References: <2628656e-ea6f-4885-8fbc-bd14f07a5b00@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2628656e-ea6f-4885-8fbc-bd14f07a5b00@oracle.com>
 
-PHN5emJvdCs4ZGQ5OGE5ZTk4ZWUyOGRjNDg0YUBzeXprYWxsZXIuYXBwc3BvdG1haWwuY29tPiB3
-cm90ZToNCj4gc3l6Ym90IGhhcyBiaXNlY3RlZCB0aGlzIGlzc3VlIHRvOg0KPiANCj4gY29tbWl0
-IDlkZjY2ZDViOWY0NWMzOWIzOTI1ZDE2ZTg5NDdjYzEwMDA5YjE4NmQNCj4gQXV0aG9yOiBQaW5n
-LUtlIFNoaWggPHBrc2hpaEByZWFsdGVrLmNvbT4NCj4gRGF0ZTogICBXZWQgSnVuIDkgMDc6NTk6
-NDQgMjAyMSArMDAwMA0KPiANCj4gICAgIGNmZzgwMjExOiBmaXggZGVmYXVsdCBIRSB0eCBiaXRy
-YXRlIG1hc2sgaW4gMkcgYmFuZA0KPiANCj4gYmlzZWN0aW9uIGxvZzogIGh0dHBzOi8vc3l6a2Fs
-bGVyLmFwcHNwb3QuY29tL3gvYmlzZWN0LnR4dD94PTEzZTIzM2ZkOTgwMDAwDQo+IHN0YXJ0IGNv
-bW1pdDogICA1MTgzNTk0OWRkYTMgTWVyZ2UgdGFnICduZXQtbmV4dC02LjExJyBvZiBnaXQ6Ly9n
-aXQua2VybmVsLi4NCj4gZ2l0IHRyZWU6ICAgICAgIG5ldC1uZXh0DQo+IGZpbmFsIG9vcHM6ICAg
-ICBodHRwczovL3N5emthbGxlci5hcHBzcG90LmNvbS94L3JlcG9ydC50eHQ/eD0xMDEyMzNmZDk4
-MDAwMA0KPiBjb25zb2xlIG91dHB1dDogaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20veC9s
-b2cudHh0P3g9MTdlMjMzZmQ5ODAwMDANCj4ga2VybmVsIGNvbmZpZzogIGh0dHBzOi8vc3l6a2Fs
-bGVyLmFwcHNwb3QuY29tL3gvLmNvbmZpZz94PWQzYmRkMDllYTIzNzFjODkNCj4gZGFzaGJvYXJk
-IGxpbms6IGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3QuY29tL2J1Zz9leHRpZD04ZGQ5OGE5ZTk4
-ZWUyOGRjNDg0YQ0KPiBzeXogcmVwcm86ICAgICAgaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5j
-b20veC9yZXByby5zeXo/eD0xNDYwODc0OTk4MDAwMA0KPiBDIHJlcHJvZHVjZXI6ICAgaHR0cHM6
-Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20veC9yZXByby5jP3g9MTc4YjkxOTU5ODAwMDANCj4gDQo+
-IFJlcG9ydGVkLWJ5OiBzeXpib3QrOGRkOThhOWU5OGVlMjhkYzQ4NGFAc3l6a2FsbGVyLmFwcHNw
-b3RtYWlsLmNvbQ0KPiBGaXhlczogOWRmNjZkNWI5ZjQ1ICgiY2ZnODAyMTE6IGZpeCBkZWZhdWx0
-IEhFIHR4IGJpdHJhdGUgbWFzayBpbiAyRyBiYW5kIikNCj4gDQo+IEZvciBpbmZvcm1hdGlvbiBh
-Ym91dCBiaXNlY3Rpb24gcHJvY2VzcyBzZWU6IGh0dHBzOi8vZ29vLmdsL3Rwc21FSiNiaXNlY3Rp
-b24NCg0KSSBzZW50IGEgcGF0Y2ggWzFdIHRvIGF2b2lkIHRoZSB3YXJuaW5nIG9mDQoNCiAgIG5v
-IHN1cHBvcnRlZCByYXRlcyBmb3Igc3RhIChudWxsKSAoMHhmZmZmZmZmZiwgYmFuZCAwKSBpbiBy
-YXRlX21hc2sgMHgwIHdpdGggZmxhZ3MgMHgwDQoNClsxXSBodHRwczovL2xvcmUua2VybmVsLm9y
-Zy9saW51eC13aXJlbGVzcy8yMDI0MDcyNjAzMTUyMC43NjE2LTEtcGtzaGloQHJlYWx0ZWsuY29t
-L1QvI3UNCg0K
+On 07/25, Rao Shoaib wrote:
+> Hi Stanislav,
+> 
+> I have a question about the placement of tcp_bpf_rtt() call in
+> tcp_rtt_estimator(). Why is the call made before the assignment
+> 
+> tp->srtt_us = max(1U, srtt);
+> 
+> How is the attached eBPF program suppose the get the new value?
+
+Take a look at the way tcp_bpf_rtt is invoked. It gets mrtt_us
+and srtt arguments. Those are passed via bpf_sock_ops args field.
+See tools/testing/selftests/bpf/progs/tcp_rtt.c. Hope that helps!
 
