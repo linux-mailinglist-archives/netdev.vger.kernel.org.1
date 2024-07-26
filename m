@@ -1,138 +1,162 @@
-Return-Path: <netdev+bounces-113144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 491B893CDF0
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 08:06:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F1293CDFC
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 08:09:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACE9CB21C92
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 06:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88691F21C91
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 06:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB710173355;
-	Fri, 26 Jul 2024 06:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93A9156677;
+	Fri, 26 Jul 2024 06:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzmDsLME"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="b2V3yxMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609213BB25
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268B420DF4
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721973986; cv=none; b=NWv40A/znvuZ8Jk3I9cTehtPHbqv8X59mK4trMzmmc6Rvrq5AdS6fa+LtGyw2wiPDczfi3WQ+L3PwoN49smpfraRGS1XpHmHHlXaOvtQ57CN/ns+ljhc4j+IRESchuhAdGHMaYmkUHRFXcG5CObadVPuZIOGoKiaaXr9IaeGlS4=
+	t=1721974185; cv=none; b=rhBXoPKJm+JrtcBLZK+1PKnSLLuCAWFeyR0BnjS6o7hnE1knU3MTH3dF8q3yRE9nrQ9V9tIWROR6ncds5gCKGeqOOzqVd+44sf0NPiymN1WbPR7efO11SnSuOwM+l/ZeZANzoaps7CCIxseYTqjHZvXupJ9qu43zqHCYrM80YRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721973986; c=relaxed/simple;
-	bh=6a7x76ue8Tb/QiSBhzrn7bO0FzEBds6B8ZU9VxKhPik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A3cpwSsuyNc07QE0aibhLNgy5bHw8PqtHmPxLcrOp6zZ0RzYSHoHqLDCopiMiFDYnkrJPeyHzx4Pq+vEpClLbOSeiTdDpT7XdL95J+yAANebpuHd+SXxstgg6lZto/vnuTlNwCA6apqMuk5Nh7qG43Xd5bhncjFRN/zPihRaaFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NzmDsLME; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721973984;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SsMd5ReUoNivIVt7CipMVyDPULIY2oYNW6l4qiM7rgQ=;
-	b=NzmDsLMEH51FVrxuW8qTQIm4jt/MsjPaxk+KOCognl04vjKTxqVyTskmGzpugtznMYFp3A
-	y5l9Yped6e6+oJGORlxSekLMGRfVmmvlq+Cwc/BvvVgWuKUj3H79i+4PZuiayoC3q37qR5
-	fp4Gnz2tswU7Wo061mKpzGvYYeT3uSc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-gr4HDwNYM1yML3WhRZEnIQ-1; Fri, 26 Jul 2024 02:06:21 -0400
-X-MC-Unique: gr4HDwNYM1yML3WhRZEnIQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36863648335so1041041f8f.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 23:06:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721973980; x=1722578780;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SsMd5ReUoNivIVt7CipMVyDPULIY2oYNW6l4qiM7rgQ=;
-        b=Hv8JcDLMOkpuLEgDCSJZp5MJkT1+kWhUptgE4/EJjJBrieb1w/tH95p7Yt9jvuyurK
-         ri+0eZ5UvQ6s7VaD2xyYAgjeQsJS86jM9Xg1L/slxo2lH6b8veipAFZdW3vXsBzZWD3r
-         pa7dG9W7BMDeCtTWIUDEIxNSzuevkec4HlfZd5/4sD5aZ19v3w1xN9NjN/J8jzDEKZhp
-         4G+Btv3fPz+Zg//WhTRiE0xuVgeLqpv0sUQo5Z0M2yPVSfTwJqsKf1RD1cAoXcVCUBpU
-         3GV4aYrb9ok8bDX4U3TVS9BjEWdl5Kz/U7yaY1PNTmN7ftTyaSPeEI0QuQ6nE5xPFNzO
-         LuVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVH1z+7v1s3QyjY6eo0MsJ4qBB4gkcZpSr5bMSc9uVi+uocsmFdtGXHEDAFB7MuY/R8Uwtp6G9HVClkbihbffaXeVKvquql
-X-Gm-Message-State: AOJu0Yx5WA2ku1Bp1kj/4JKTIpLkxJc1fpu6pkPV+NlTRvqQjlj2yxhN
-	kosFXlBXjEE7wsYnrty4pHUtnDS+0EFVoilcO/lGzAnsdAfvlxhkvsH/v/lQMqBJeVAkLgCCQRY
-	IpJ9YcZ6kQ11ZED6KbXAjF9pNGkMWXlavqdNkkDqSFh4CvhB9d/G4Dw==
-X-Received: by 2002:adf:e3d0:0:b0:368:3731:1614 with SMTP id ffacd0b85a97d-36b3639c90cmr2555961f8f.32.1721973980465;
-        Thu, 25 Jul 2024 23:06:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECcqinn2RbOzn7J7peOWcha9uEPwJVbe5Fk8jNLudEw/NhTNHYXX4sldsTgb73GWvF/16VyA==
-X-Received: by 2002:adf:e3d0:0:b0:368:3731:1614 with SMTP id ffacd0b85a97d-36b3639c90cmr2555913f8f.32.1721973979719;
-        Thu, 25 Jul 2024 23:06:19 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f7:28ce:f21a:7e1e:6a9:f708])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36863aa7sm4031338f8f.109.2024.07.25.23.06.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 23:06:19 -0700 (PDT)
-Date: Fri, 26 Jul 2024 02:06:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Peter Hilber <peter.hilber@opensynergy.com>,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
-	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
-	"Luu, Ryan" <rluu@amazon.com>,
-	"Chashper, David" <chashper@amazon.com>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"Christopher S . Hall" <christopher.s.hall@intel.com>,
-	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
-	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-Message-ID: <20240726015613-mutt-send-email-mst@kernel.org>
-References: <20240725100351-mutt-send-email-mst@kernel.org>
- <2a27205bfc61e19355d360f428a98e2338ff68c3.camel@infradead.org>
- <20240725122603-mutt-send-email-mst@kernel.org>
- <0959390cad71b451dc19e5f9396d3f4fdb8fd46f.camel@infradead.org>
- <20240725163843-mutt-send-email-mst@kernel.org>
- <d62925d94a28b4f8e07d14c1639023f3b78b0769.camel@infradead.org>
- <20240725170328-mutt-send-email-mst@kernel.org>
- <c5a48c032a2788ecd98bbcec71f6f3fb0fb65e8c.camel@infradead.org>
- <20240725174327-mutt-send-email-mst@kernel.org>
- <9261e393083bcd151a017a5af3345a1364b3e0f3.camel@infradead.org>
+	s=arc-20240116; t=1721974185; c=relaxed/simple;
+	bh=vhRMebRWHedfAvjW4y83t75B3Vc7ZJj25CI8eriWcZw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HcaUmZGKzsMzCa3jP57SC7Ib7/uRBidb3VVbgDPdu8lgv0eFoVdFNs3vy6knDQwYfIBjGiCG1UNyjWlarNjRCQqIFywMV7OzbevbVYlFxkCZiZu1Q/KJonUA1SsXM2k/I8dhljxxCKeRRQXIC1GnQGxi84R0X22y922n8HStBxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=b2V3yxMZ; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1721974174; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=iL1UmY7iZ9aqyxlqE5apw8qtoymaIl2aQtn6gpHj+ic=;
+	b=b2V3yxMZcpoyGfTTsAOMo2txOS++e8bomK/TUZmshsSbrqeUKm/YItDSIKxt2L+nyOEwFIlneMIEjshVN0rEaiPI/pOHU70T4Ttg3XffVj06aJ0dKxE9qu/0mDk5udokRkKg25dnyfqVN0LWB5+b4oTcuxWGcxehw+QoEvsuBXk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032019045;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBKeFme_1721974173;
+Received: from 30.221.149.136(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WBKeFme_1721974173)
+          by smtp.aliyun-inc.com;
+          Fri, 26 Jul 2024 14:09:34 +0800
+Message-ID: <666dcd14-1626-4496-a56f-26060a222259@linux.alibaba.com>
+Date: Fri, 26 Jul 2024 14:09:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9261e393083bcd151a017a5af3345a1364b3e0f3.camel@infradead.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: prevent UAF in inet_create()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Dust Li <dust.li@linux.alibaba.com>,
+ Niklas Schnelle <schnelle@linux.ibm.com>
+References: <20240723175809.537291-1-edumazet@google.com>
+ <7250f49f-bfc0-4d7e-8de8-0468ff600a75@linux.alibaba.com>
+ <CANn89iJXx_CG04cTaQE6ROAhvqpUOGHDQXbLc_pEY7PDiXVgxg@mail.gmail.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <CANn89iJXx_CG04cTaQE6ROAhvqpUOGHDQXbLc_pEY7PDiXVgxg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 25, 2024 at 11:20:56PM +0100, David Woodhouse wrote:
-> We're rolling out the AMZNVCLK device for internal use cases, and plan
-> to add it in public instances some time later.
 
-Let's be real. If amazon does something in its own hypervisor, and the
-only way to use that is to expose the interface to userspace, there is
-very little the linux community can do.  Moreover, userspace will be
-written to this ABI, and be locked in to the specific hypervisor. It
-might be a win for amazon short term but long term you will want to
-extend things and it will be a mess.
 
-So I feel you have chosen ACPI badly.  It just does not have the APIs
-that you need. Virtio does, and would not create a userpspace lock-in
-to a specific hypervisor. It's not really virtio specific either,
-you can write a bare pci device with a BAR and a bunch of msix
-vectors and it will get you the same effect.
+On 7/24/24 5:32 PM, Eric Dumazet wrote:
+> On Wed, Jul 24, 2024 at 4:30 AM D. Wythe <alibuda@linux.alibaba.com> wrote:
+>>
+>>
+>> On 7/24/24 1:58 AM, Eric Dumazet wrote:
+>>> Following syzbot repro crashes the kernel:
+>>>
+>>> socketpair(0x2, 0x1, 0x100, &(0x7f0000000140)) (fail_nth: 13)
+>>>
+>>> Fix this by not calling sk_common_release() from smc_create_clcsk().
+>>>
+>>> Stack trace:
+>>> socket: no more sockets
+>>> ------------[ cut here ]------------
+>>> refcount_t: underflow; use-after-free.
+>>>    WARNING: CPU: 1 PID: 5092 at lib/refcount.c:28 refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
+>>> Modules linked in:
+>>> CPU: 1 PID: 5092 Comm: syz-executor424 Not tainted 6.10.0-syzkaller-04483-g0be9ae5486cd #0
+>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+>>>    RIP: 0010:refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
+>>> Code: 80 f3 1f 8c e8 e7 69 a8 fc 90 0f 0b 90 90 eb 99 e8 cb 4f e6 fc c6 05 8a 8d e8 0a 01 90 48 c7 c7 e0 f3 1f 8c e8 c7 69 a8 fc 90 <0f> 0b 90 90 e9 76 ff ff ff e8 a8 4f e6 fc c6 05 64 8d e8 0a 01 90
+>>> RSP: 0018:ffffc900034cfcf0 EFLAGS: 00010246
+>>> RAX: 3b9fcde1c862f700 RBX: ffff888022918b80 RCX: ffff88807b39bc00
+>>> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+>>> RBP: 0000000000000003 R08: ffffffff815878a2 R09: fffffbfff1c39d94
+>>> R10: dffffc0000000000 R11: fffffbfff1c39d94 R12: 00000000ffffffe9
+>>> R13: 1ffff11004523165 R14: ffff888022918b28 R15: ffff888022918b00
+>>> FS:  00005555870e7380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> CR2: 0000000020000140 CR3: 000000007582e000 CR4: 00000000003506f0
+>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>> Call Trace:
+>>>    <TASK>
+>>>    inet_create+0xbaf/0xe70
+>>>     __sock_create+0x490/0x920 net/socket.c:1571
+>>>     sock_create net/socket.c:1622 [inline]
+>>>     __sys_socketpair+0x2ca/0x720 net/socket.c:1769
+>>>     __do_sys_socketpair net/socket.c:1822 [inline]
+>>>     __se_sys_socketpair net/socket.c:1819 [inline]
+>>>     __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
+>>>     do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>>>     do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>>>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>> RIP: 0033:0x7fbcb9259669
+>>> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+>>> RSP: 002b:00007fffe931c6d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000035
+>>> RAX: ffffffffffffffda RBX: 00007fffe931c6f0 RCX: 00007fbcb9259669
+>>> RDX: 0000000000000100 RSI: 0000000000000001 RDI: 0000000000000002
+>>> RBP: 0000000000000002 R08: 00007fffe931c476 R09: 00000000000000a0
+>>> R10: 0000000020000140 R11: 0000000000000246 R12: 00007fffe931c6ec
+>>> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+>>>    </TASK>
+>> Oops, that's my bad, I forgot the differences in failure handling
+>> between smc_create and inet_create,
+>> thanks for your fix.
+>>
+>>> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+>>> Reported-by: syzbot <syzkaller@googlegroups.com>
+>>> Signed-off-by: Eric Dumazet <edumazet@google.com>
+>>> Cc: D. Wythe <alibuda@linux.alibaba.com>
+>>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+>>> Cc: Dust Li <dust.li@linux.alibaba.com>
+>>> Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+>>> ---
+>>>    net/smc/af_smc.c | 4 +---
+>>>    1 file changed, 1 insertion(+), 3 deletions(-)
+>>>
+>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>>> index 73a875573e7ad5b7a95f7941e33f0d784a91d16d..31b5d8c8c34085b73b011c913cfe032f025cd2e0 100644
+>>> --- a/net/smc/af_smc.c
+>>> +++ b/net/smc/af_smc.c
+>>> @@ -3319,10 +3319,8 @@ int smc_create_clcsk(struct net *net, struct sock *sk, int family)
+>>>
+>>>        rc = sock_create_kern(net, family, SOCK_STREAM, IPPROTO_TCP,
+>>>                              &smc->clcsock);
+>>> -     if (rc) {
+>>> -             sk_common_release(sk);
+>>> +     if (rc)
+>>>                return rc;
+>>> -     }
+>> Since __smc_create (for AF_SMC) does not call sk_common_release on failure,
+>> I think it should be moved to __smc_create instead of beingdeleted.
+> Please provide an updated and tested patch, thanks.
 
--- 
-MST
+That's okay, I'll take it. Maybe next week,  I need some time to 
+complete the testing.
+
+Best wishes,
+D. Wythe
+
 
 
