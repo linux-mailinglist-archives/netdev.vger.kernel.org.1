@@ -1,297 +1,170 @@
-Return-Path: <netdev+bounces-113185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2DFB93D235
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:23:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F259C93D246
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:29:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 170461C20E74
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 11:23:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 809531F226BE
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 11:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941AD179204;
-	Fri, 26 Jul 2024 11:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2468F17A92C;
+	Fri, 26 Jul 2024 11:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WsbqXiDd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HAuhOMP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2081.outbound.protection.outlook.com [40.107.102.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724301B27D
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 11:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721992999; cv=none; b=F0BDnjADUgZrtOA90/xZv7ygWr7ddL7SB2tdZQttSiaDiHv+4E7M83E16EIbk/5t9fr7DyFeKJZxZA2Y9n3b1pW2HIPgatPDoNiNdYlwErsh2rcOelo3tFDCV8KxOo8S+7jy0vlQAeJZqRXSU/GUTO4BWPR3Y3vX9XPz/k8MVKQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721992999; c=relaxed/simple;
-	bh=g3iYoJ/xOC5CXkzy85OGGPvaJijHXAGfBV9Ykxb/4/I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ieKFRM+p6SRQ+rA8O5lu13IhA2wOYRkl0+wfWhC/oak55PcfwRaBTLEX3ZOTwBzXgooFqPWrcYTHWrK8Cbua56sHPEgIhWbvzzcWALGGqhJcR0VHylU/IdorOosXB/Kls3qmy/QbeQninqsZVdOLQd7G+zyZ9HOiQW2yMC9epmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WsbqXiDd; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ef1c12ae23so13444711fa.0
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 04:23:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1721992995; x=1722597795; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Zs5/9dh9kzNZF0soHgfl7sH+psZq9eVrKa0HlKF7us=;
-        b=WsbqXiDdHxxUWzU3frAt5E0cT9uPYkRVSmRjfJ9gJTr+S+CAaSqFJ2giUEtdIkwz16
-         iaFuDS6ykq6UzLXOTyjwnEzAbKXE6QVn2q2JxR5E0q7htB5llGZ+rbRxuuVRIPnYNrCl
-         Nghn0MHtPXLou1GJSyVjo2efDN6AZqav8G8bf5KgeLF8koEa4soPgzJrLpezEBouOy7a
-         2p4+eXjsw82SNKAn5s0PMeLHwFTIWEm0W4YL9amZ0UqwAeFoiuv1RomkLK5WhTrQ9ARj
-         87jPF+qkOrpQKGRW7fZ9Ewtm4IzDD2hNLB6qwpwhmDMVGOjkNmCCsn5aoJVNXYK9RiY/
-         kEqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721992995; x=1722597795;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0Zs5/9dh9kzNZF0soHgfl7sH+psZq9eVrKa0HlKF7us=;
-        b=Cg6lZRNugRXUSSiiM+n5ORdRvyvLI/SDvrfAwaIkzUfYo1+EAZ7P+sCB/44GNQk2xo
-         6Ae8o2yp2qJjJ04h1Oh/d7RS6OHM404jSl578NwH7CsO1h0lNTLNCI16HcoLbkIAy1x4
-         0z8t7KWfkCpSg4F1+O2dpqzeltEzkExzAQQ5JbeLBXJXgN421gxVw2pP61snkZweoP2E
-         iRs66txkgSY8d5xG6PN/eJsUdtcJU5aNp4XQt9pyYASVLzCKFliofN1D2LKsxXWRMo5s
-         2TmfOOeR+4ADN1B8NfTifohy23577gsIkhUZqsEBv5D1GbB7nx8eX9ICItmc4Lua+qBq
-         dSGQ==
-X-Gm-Message-State: AOJu0Yxqae35NHpv/cFJzfJnbTf78cDe2lr4TBZHiBeJKhqICIwUnjNr
-	XdAHgezabuzQiEU1cSZfaws9qLuxC1TyNMMc4A8rkFWfOs/y0H+vJ+SaVTQ8+SY=
-X-Google-Smtp-Source: AGHT+IEes6Dgxn/QOeEAPPRRjxbv/ux9ajPyEOzR9oCgq7dxIkgd125b3gXuNn63KnWaFlM+9+dT/w==
-X-Received: by 2002:a2e:a9a0:0:b0:2ef:2c20:e064 with SMTP id 38308e7fff4ca-2f039cac142mr50798011fa.12.1721992995390;
-        Fri, 26 Jul 2024 04:23:15 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac63590d1esm1807685a12.27.2024.07.26.04.23.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 04:23:14 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Willem de Bruijn <willemb@google.com>,
-  kernel-team@cloudflare.com,
-  syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
-Subject: Re: [PATCH net 1/2] udp: Mark GSO packets as CHECKSUM_UNNECESSARY
- early on on output
-In-Reply-To: <CAF=yD-LLPPg77MUhdXrHUVJj4o2+rnOC_qsHc_8tKurTsAGkYw@mail.gmail.com>
-	(Willem de Bruijn's message of "Thu, 25 Jul 2024 10:21:50 -0400")
-References: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
-	<20240725-udp-gso-egress-from-tunnel-v1-1-5e5530ead524@cloudflare.com>
-	<CAF=yD-LLPPg77MUhdXrHUVJj4o2+rnOC_qsHc_8tKurTsAGkYw@mail.gmail.com>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Fri, 26 Jul 2024 13:23:13 +0200
-Message-ID: <87h6ccl7mm.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5207517A588
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 11:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721993364; cv=fail; b=U1WW430jQwLFa00Q1b/qJD2JyhyLliVr6CB6VQ58tVfaH4xmMOZFgH9JPOcBRBc0ZOL4FcKzHx/UPSW1mSTMU0nm+9Xc1+IUH/wGunGFzytDxxGB4p6SFTGI9LxWKMr4OHpC0gkZOZmya0Wyg4wZeuyKR5VW/4qglpOIcbmfxfY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721993364; c=relaxed/simple;
+	bh=FoLEUWU7JtRrbBu3wq7+uKCniy03Cy4vl7NcLCYuzwU=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=p4sO+MzsKRi90ZA5IOIaDGqcgEYQjnFRJguseyvu/2Ghko0hMLcT01sBpe+kIM0eKZRq51aHlSpFdk1iHNnHj1BGBTL3HIz1wBcVbwmS9bwYnynKjJlB2TU1nSqSCfjy0ZGI5RF4lG2UPMwe8rQVDyEV8peqZ7COpOFRyQ9o4A8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HAuhOMP2; arc=fail smtp.client-ip=40.107.102.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XADQ+yrJ4Ab6Aj5dRtDUdOAhnSKeTN0L9BzY6kJzgpluakFWI77YgzT85YE4feBpiov5FHXleloPZ3v3yjhgmQNxz7rrvn1Ax/C45QV+/jKbwR1u0UHRx4chxcHFBvFvKnMSVbkS3ZIQtRHMxkyRvtjgt2JTXcM2J1nmeh/3vct7eCIkshRTqrc4b0CwhJ8V6Mp8kEQd1/21A7Gb3uE6rdocK/UwYOJUUcyDjNG36XFf0RQ0nW1vyOsbV5w3Gkkbk9N0QFoKQ7LGlyTKvMdFw+yLfSBVfzy0TqHbTDaN/br04V6/Z7hr/Wv1hRUO/H12Unyz3RITI/xo/nSHKqgizQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2I1hi+uU9cgD12fTjG33iWNNbLpkzjN87NL4kQ3pCRM=;
+ b=kCn0aIROP83IYE8FiSGjV3//QDFGxkiTaZeRHC6oP7+17BPhcoOaYpBdX8eTr6XV6etaEmRVEzJf5cnmz2Vg/hO7X4sdhT+JpNEGU8vv7+GAn4HrHXyrpuugPSRUzhx4ZoLRYsZae0KMgkQKl7U/ExFeejeN1SUgRtvpPmyiEQIedy1Wm4qWodWtLViFQOMWsAJKBYihMEGJdcuMMoSbq+/cPvDRReYEm0u/VN7r2Mym9zfR7t5YYgr8o7vrt7CcJDc6Bb0++48WJy29UJmMFxSt/H0RnWYF+cv1ZWJloVCHR5XEaYQv05sESbC5Xpvd3eRvgZZRhGbfCvL+ANzKxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=broadcom.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2I1hi+uU9cgD12fTjG33iWNNbLpkzjN87NL4kQ3pCRM=;
+ b=HAuhOMP28uYV3LFqNpLYqOj4/+ZzjatoOUqVRu1aV6GJOBwtbL/4P6j+TZHBGzWsmpO2/pClJ/r9wy5m7Qt/pukdG4Wfo6H8CqsOxT+k1UrlRHPOLot2M3zvFvI4nkZ/aPLL39CH/M9Mm7Wm1Fdj0KwlYaRH/w02YQNpFQhsIlOMPZgvboWWlml6929iY2oaSgCYXCfmCneLZmY2XrJu7DmX7a4Z9JHKz4g1/Wyy738CMVBLKgj0hQXVn22JqXcnPApicasJ7R/BC+4OYCG/yj5HRneGMu+8zBZGhTkFFCdYlEP2E3jYHMyItpgBlWBx4u68MbZcbtXq0Yfp3qwalA==
+Received: from DM6PR03CA0009.namprd03.prod.outlook.com (2603:10b6:5:40::22) by
+ CY8PR12MB7491.namprd12.prod.outlook.com (2603:10b6:930:92::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7784.31; Fri, 26 Jul 2024 11:29:19 +0000
+Received: from DS1PEPF00017097.namprd05.prod.outlook.com
+ (2603:10b6:5:40:cafe::45) by DM6PR03CA0009.outlook.office365.com
+ (2603:10b6:5:40::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28 via Frontend
+ Transport; Fri, 26 Jul 2024 11:29:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ DS1PEPF00017097.mail.protection.outlook.com (10.167.18.101) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7784.11 via Frontend Transport; Fri, 26 Jul 2024 11:29:18 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 26 Jul
+ 2024 04:29:08 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 26 Jul
+ 2024 04:29:02 -0700
+References: <20240725222353.2993687-1-kuba@kernel.org>
+ <20240725222353.2993687-6-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <michael.chan@broadcom.com>, <shuah@kernel.org>,
+	<ecree.xilinx@gmail.com>, <przemyslaw.kitszel@intel.com>,
+	<ahmed.zaki@intel.com>, <andrew@lunn.ch>, <willemb@google.com>,
+	<pavan.chebbi@broadcom.com>, <petrm@nvidia.com>
+Subject: Re: [PATCH net 5/5] selftests: drv-net: rss_ctx: check for all-zero
+ keys
+Date: Fri, 26 Jul 2024 13:25:06 +0200
+In-Reply-To: <20240725222353.2993687-6-kuba@kernel.org>
+Message-ID: <87ttgc75ol.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017097:EE_|CY8PR12MB7491:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfe12d18-a795-457d-b4d0-08dcad663049
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?hlAAaEC7uqlJHeaIRKF93qec71S122SBeULQpxJoNcA8jxk5S3BJS+q//VQ2?=
+ =?us-ascii?Q?tH0o6ydsiGgYtcrnhI4FWeMfcgsg840iPmsxacnUFZK1MGJafc6cnwc09VSZ?=
+ =?us-ascii?Q?IjhTubDRUq7wFGTaie6xMH+8chEP28AQ/NN+RjKCvcQkIsdNAsEsVv2PbD1f?=
+ =?us-ascii?Q?cr6Q+O7SoECe1IkkS49B8oIkR6v00tBNy84WHB+qOPdytE256hBtCWeCvDYB?=
+ =?us-ascii?Q?++I4/vwPVRQ0W1fPs7oDdpGehDrRj+4nzyTa7eNGlxyZVSDDFzndSlNRlVZm?=
+ =?us-ascii?Q?W0Kx9wGC/Iaa9h7xty8MTjlLaAES+mV9yLTPnnd0mqtMHEoiWJ4nmVmb8ZHt?=
+ =?us-ascii?Q?o76IodOJ6YYIw0IBmApCGYslRTN4blm0VwIJw3BfAAhQCP4ymFUgg8LoIHSx?=
+ =?us-ascii?Q?obGmoqjdq74l1CRdrwbFCzIMrbhsIAziy0uYwb8fVdXfhdKFYr2wIcH63sFD?=
+ =?us-ascii?Q?G/TIETr/+O5O4XKW+98i5xfjbIl6z0bA4WhYEQYDDvHpT02DROnKgZxaLSsd?=
+ =?us-ascii?Q?FoFVE87HSkFpla8pi30q9e+wTlHWyQZAF3eo8iR8SG8zKZ8Keb5+3FNvBsMc?=
+ =?us-ascii?Q?IeP7CwUnyxfx9IV7OKz5SaTp/ckkKaOgYOS97+mydiSeYt7qvP4E27lR+mdd?=
+ =?us-ascii?Q?q0pSBNDEZorx8lUdCu4CJjNacM7fJfvImZnFzRhKLmuSY73rV69ZiwLeKu8L?=
+ =?us-ascii?Q?9kQA59ekgPpSJNC9hx6gR/ZU81EixTet75pUAB0IFD5q1+C1ZJXvdplDiVpT?=
+ =?us-ascii?Q?99PcLNVJib/4A41cfppfExaPmEEGfxCLz+GW3L1cCqkCBIQOiAqVrfiWyQhC?=
+ =?us-ascii?Q?0n63Hk62Fwc9ZIeFnXGf1bf8fBohI58LCViEQukv4euk62SODWuMc1SKdEj2?=
+ =?us-ascii?Q?NI/C/f+DEiD+ixO+aaMDGcQMoMe6BOspVgyP1avQnXAc0ib9Fj32KGOCR4QX?=
+ =?us-ascii?Q?sDskQp38BhLeFqR00iOcmA+c0QYXOF3vhgARx4tAsGzmUBDEHW7oXW1emgBc?=
+ =?us-ascii?Q?mcIc5+2jlx4L+uwilImbsxYQxVI5BxjCwxuhufcXduMiw2qkatXOET6s9MaZ?=
+ =?us-ascii?Q?dZylaGoxr78IMHcL+qb5+ITE2BLsiIQc0Z2iTIjb681I636nDS0BYLcOaPjf?=
+ =?us-ascii?Q?nOtp1yY+uTmZVeyzB7504+3xX8pyqfRWEjqwEYWvq7SG+DqlMAtVUr5KTroQ?=
+ =?us-ascii?Q?JbPveQOuC/j8Ikyy/B96MlxNR/NncmoqCaAIe+Cb3PlOkqhJqvcpjw93okd4?=
+ =?us-ascii?Q?bylxpcEPcwz5GIi5n8Jun6vSr5itRIaoFB7L2qz3u59diiHp9Cm76oCZFDaS?=
+ =?us-ascii?Q?bgnRg4RTHFEmiPqvUV3Bs5bkKLgWNoKJayislEgjBJqb2UvoFdqxa55dLWC8?=
+ =?us-ascii?Q?YeZIEN2QaV55tuc5y/ZuZqI9uEpRs+k0dQBqPVC1aYFJTOIOmEv9NwaX0BA9?=
+ =?us-ascii?Q?P6BgjPAu3CiVPaaa3fZGLtsI851F7yUg?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2024 11:29:18.6767
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfe12d18-a795-457d-b4d0-08dcad663049
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017097.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7491
 
-On Thu, Jul 25, 2024 at 10:21 AM -04, Willem de Bruijn wrote:
-> On Thu, Jul 25, 2024 at 5:56=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.=
-com> wrote:
->>
->> In commit 10154dbded6d ("udp: Allow GSO transmit from devices with no
->> checksum offload") we have added a tweak in the UDP GSO code to mark GSO
->> packets being sent out as CHECKSUM_UNNECESSARY when the egress device
->> doesn't support checksum offload. This was done to satisfy the offload
->> checks in the gso stack.
->>
->> However, when sending a UDP GSO packet from a tunnel device, we will go
->> through the TX path and the GSO offload twice. Once for the tunnel devic=
-e,
->> which acts as a passthru for GSO packets, and once for the underlying
->> egress device.
->>
->> Even though a tunnel device acts as a passthru for a UDP GSO packet, GSO
->> offload checks still happen on transmit from a tunnel device. So if the =
-skb
->> is not marked as CHECKSUM_UNNECESSARY or CHECKSUM_PARTIAL, we will get a
->> warning from the gso stack.
+
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> We had a handful of bugs relating to key being either all 0
+> or just reported incorrectly as all 0. Check for this in
+> the tests.
 >
-> I don't entirely understand. The check should not hit on pass through,
-> where segs =3D=3D skb:
->
->         if (segs !=3D skb && unlikely(skb_needs_check(skb, tx_path) &&
-> !IS_ERR(segs)))
->                 skb_warn_bad_offload(skb);
->
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-That's something I should have explained better. Let me try to shed some
-light on it now. We're hitting the skb_warn_bad_offload warning because
-skb_mac_gso_segment doesn't return any segments (segs =3D=3D NULL).
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-And that's because we bail out early out of __udp_gso_segment when we
-detect that the tunnel device is capable of tx-udp-segmentation
-(GSO_UDP_L4):
+> +def _rss_key_check(cfg, data=None, context=0):
+> +    if data is None:
+> +        data = get_rss(cfg, context=context)
+> +    if 'rss-hash-key' not in data:
+> +        return
+> +    non_zero = [x for x in data['rss-hash-key'] if x != 0]
+> +    ksft_eq(bool(non_zero), True, comment=f"RSS key is all zero {data['rss-hash-key']}")
 
-	if (skb_gso_ok(gso_skb, features | NETIF_F_GSO_ROBUST)) {
-		/* Packet is from an untrusted source, reset gso_segs. */
-		skb_shinfo(gso_skb)->gso_segs =3D DIV_ROUND_UP(gso_skb->len - sizeof(*uh),
-							     mss);
-		return NULL;
-	}
-
-It has not occurred to me before, but in the spirit of commit
-8d74e9f88d65 "net: avoid skb_warn_bad_offload on IS_ERR" [1], we could
-tighten the check to exclude cases when segs =3D=3D NULL. I'm thinking of:
-
-	if (segs !=3D skb && !IS_ERR_OR_NULL(segs) && unlikely(skb_needs_check(skb=
-, tx_path)))
-		skb_warn_bad_offload(skb);
-
-That would be an alternative. Though I'm not sure I understand the
-consequences of such change fully yet. Namely if we're wouldn't be
-losing some diagnostics from the bad offload warning.
-
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3D8d74e9f88d65af8bb2e095aff506aa6eac755ada
-
->> Today this can occur in two situations, which we check for in
->> __ip_append_data() and __ip6_append_data():
->>
->> 1) when the tunnel device does not advertise checksum offload, or
->> 2) when there are IPv6 extension headers present.
->>
->> To fix it mark UDP_GSO packets as CHECKSUM_UNNECESSARY early on the TX
->> path, when still in the udp layer, since we need to have ip_summed set up
->> correctly for GSO processing by tunnel devices.
->
-> The previous patch converted segments post segmentation to
-> CHECKSUM_UNNECESSARY, which is fine as they had
-> already been checksummed in software, and CHECKSUM_NONE
-> packets on egress are common.
->
-> This creates GSO packets without CHECKSUM_PARTIAL.
-> Segmentation offload always requires checksum offload. So these
-> would be weird new packets. And having CHECKSUM_NONE (or
-> equivalent), but entering software checksumming is also confusing.
-
-I agree this is confusing to reason about. That is a GSO packet with
-CHECKSUM_UNNECESSARY which has not undergone segmentation and csum
-offload in software.
-
-Kind of related, I noticed that turning off tx-checksum-ip-generic with
-ethtool doesn't disable tx-udp-segmentation. That looks like a bug.
-
-> The crux is that I don't understand why the warning fires on tunnel
-> exit when no segmentation takes place there. Hopefully we can fix
-> in a way that does not introduce these weird GSO packets (but if
-> not, so be it).
-
-Attaching a self contained repro which I've been using to trace and
-understand the GSO code:
-
----8<---
-
-sh# cat repro-full.py
-#!/bin/env python
-#
-# `modprobe ip6_tunnel` might be needed.
-#
-
-import os
-import subprocess
-import shutil
-from socket import *
-
-UDP_SEGMENT =3D 103
-
-cmd =3D [shutil.which("ip"), "-batch", "/dev/stdin"]
-script =3D b"""
-link set dev lo up
-
-link add name sink mtu 1540 type dummy
-addr add dev sink fd11::2/48 nodad
-link set dev sink up
-
-tunnel add iptnl mode ip6ip6 remote fd11::1 local fd11::2 dev sink
-link set dev iptnl mtu 1500
-addr add dev iptnl fd00::2/48 nodad
-link set dev iptnl up
-"""
-proc =3D subprocess.Popen(cmd, stdin=3Dsubprocess.PIPE)
-proc.communicate(input=3Dscript)
-
-os.system("ethtool -K sink tx-udp-segmentation off > /dev/null")
-os.system("ethtool -K sink tx-checksum-ip-generic off > /dev/null")
-
-# Alternatively to hopopts:
-# os.system("ethtool -K iptnl tx-checksum-ip-generic off")
-
-hopopts =3D b"\x00" * 8
-s =3D socket(AF_INET6, SOCK_DGRAM)
-s.setsockopt(IPPROTO_IPV6, IPV6_HOPOPTS, hopopts)
-s.setsockopt(SOL_UDP, UDP_SEGMENT, 145)
-s.sendto(b"x" * 3000, ("fd00::1", 9))
-sh# perf ftrace -G __skb_gso_segment --graph-opts noirqs,depth=3D5 -- unsha=
-re -n python repro-full.py
-# tracer: function_graph
-#
-# CPU  DURATION                  FUNCTION CALLS
-# |     |   |                     |   |   |   |
- 16)               |  __skb_gso_segment() {
- 16)   0.288 us    |    irq_enter_rcu(); /* =3D 0xffffa00c03d89ac0 */
- 16)   0.172 us    |    idle_cpu(); /* =3D 0x0 */
- 16)               |    skb_mac_gso_segment() {
- 16)   0.184 us    |      skb_network_protocol(); /* =3D 0xdd86 */
- 16)   0.161 us    |      __rcu_read_lock(); /* =3D 0x2 */
- 16)               |      ipv6_gso_segment() {
- 16)               |        rcu_read_lock_held() {
- 16)   0.151 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
-*/
- 16)   0.514 us    |        } /* rcu_read_lock_held =3D 0x1 */
- 16)               |        rcu_read_lock_held() {
- 16)   0.152 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
-*/
- 16)   0.459 us    |        } /* rcu_read_lock_held =3D 0x1 */
- 16)               |        rcu_read_lock_held() {
- 16)   0.151 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
-*/
- 16)   0.459 us    |        } /* rcu_read_lock_held =3D 0x1 */
- 16)               |        udp6_ufo_fragment() {
- 16)   0.237 us    |          __udp_gso_segment(); /* =3D 0x0 */
- 16)   0.727 us    |        } /* udp6_ufo_fragment =3D 0x0 */
- 16)   3.049 us    |      } /* ipv6_gso_segment =3D 0x0 */
- 16)   0.171 us    |      __rcu_read_unlock(); /* =3D 0x1 */
- 16)   4.748 us    |    } /* skb_mac_gso_segment =3D 0x0 */
- 16)               |    skb_warn_bad_offload() {
- [...]
- 16) ! 785.215 us  |    } /* skb_warn_bad_offload =3D 0x0 */
- 16) ! 800.986 us  |  } /* __skb_gso_segment =3D 0x0 */
- 16)               |  __skb_gso_segment() {
- 16)   0.394 us    |    irq_enter_rcu(); /* =3D 0xffffa00c03d89ac0 */
- 16)   0.181 us    |    idle_cpu(); /* =3D 0x0 */
- 16)               |    skb_mac_gso_segment() {
- 16)   0.182 us    |      skb_network_protocol(); /* =3D 0xdd86 */
- 16)   0.178 us    |      __rcu_read_lock(); /* =3D 0x3 */
- 16)               |      ipv6_gso_segment() {
- 16)               |        rcu_read_lock_held() {
- 16)   0.155 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
-*/
- 16)   0.556 us    |        } /* rcu_read_lock_held =3D 0x1 */
- 16)               |        rcu_read_lock_held() {
- 16)   0.159 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
-*/
- 16)   0.480 us    |        } /* rcu_read_lock_held =3D 0x1 */
- 16)               |        rcu_read_lock_held() {
- 16)   0.159 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
-*/
- 16)   0.480 us    |        } /* rcu_read_lock_held =3D 0x1 */
- 16)               |        ip6ip6_gso_segment() {
- 16) + 22.176 us   |          ipv6_gso_segment(); /* =3D 0xffffa00c03018c00=
- */
- 16) + 24.875 us   |        } /* ip6ip6_gso_segment =3D 0xffffa00c03018c00 =
-*/
- 16) + 27.416 us   |      } /* ipv6_gso_segment =3D 0xffffa00c03018c00 */
- 16)   0.230 us    |      __rcu_read_unlock(); /* =3D 0x2 */
- 16) + 29.065 us   |    } /* skb_mac_gso_segment =3D 0xffffa00c03018c00 */
- 16) + 32.828 us   |  } /* __skb_gso_segment =3D 0xffffa00c03018c00 */
-sh#
+If there's a v2, consider changing this to len(non_zero) > 0, or
+non_zero != [].
 
