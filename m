@@ -1,100 +1,70 @@
-Return-Path: <netdev+bounces-113236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AB593D42E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:30:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D6193D431
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0CCD1C22999
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D731C22B55
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 475011E517;
-	Fri, 26 Jul 2024 13:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktrj8l3I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EEF17BB05;
+	Fri, 26 Jul 2024 13:32:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D47DE57E;
-	Fri, 26 Jul 2024 13:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F292F1E4B0;
+	Fri, 26 Jul 2024 13:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722000632; cv=none; b=LeiF43L+EN165eFEs7uF9vY/Pr02Je8zGrHLLt8r0c+chhHlUh9I1GC8mddSuKTGFTbBaEXsVUErKkN3QhFoIAYijf8LrNrEyu69FF3jvXCp7Sfe/pGp3aC5PH+ElZna44w5Xf6ejobXg6FAyOsFVt4TaQOIyrcrAJHytS+syRE=
+	t=1722000775; cv=none; b=lM+ToYRxr1AJgm7VgDBH+KtosjBzNO2tyiQswOqzzTOFZgmOniq1a0HviQDo9IQO/XH96Om8HuWgvCKxlOg6TZVOnUbszV1UFlSvRC9Vp5/S1hw646SaVyKblwWdMmu45e3UAwc/SBVU6cCCdvk7B2SRhWnCG0L8MKqcSk+hyiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722000632; c=relaxed/simple;
-	bh=uTbBoK37ylBykX+vr7rtacCO1SdI2RkHBIOWabeQEk0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XYZkXXGmnl/y6rDbQ2px2/m+3RrfuG1OwfX8D8aKGitHDRM9bWhU5JCADLRpavbzL8WdzdgRmrygtEPoboAstcyKAk+2o/jJLhk30zUbISvP7+/boITGz23nlbKbU3e9KuR3A4DzJz7PtDDyyZNTtgydVD4ywkBYZOxH+FgckN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ktrj8l3I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9B88AC32786;
-	Fri, 26 Jul 2024 13:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722000631;
-	bh=uTbBoK37ylBykX+vr7rtacCO1SdI2RkHBIOWabeQEk0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ktrj8l3I32Zu6m0MDN/Xo3NLkmzAp8M8nkQbUXmjcJrcG/R32DSSvTJPECLgoHf/a
-	 D00UJVeWiEbyc3SYVu0oQPqLA9CbCcvoprsjRmvSxY2oE5yL+TG2LXY11L9gyjdt9G
-	 W4I7g1n5xI1Ezb7VnJU2YWpKTAgMDCCZzP1HzUmx/U9e3+aO790KIl0x8S3NE6UOJY
-	 nlfTvWaIxnAzSpStUHI39th9uM43s39Kmqn0cKLltAQ5r++PWCH+3VEnRwiqxBn3r8
-	 DQ4YpLlxttPiYSjs32VjqfUBkhm2t+zSa8GEbVlaIqUCzs9mWNChEkW26rRg085sf7
-	 FsZYjPnZ7VbZQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8AFD8C433E9;
-	Fri, 26 Jul 2024 13:30:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722000775; c=relaxed/simple;
+	bh=ttdpt+jvQmXT0eJ7KYhCDK83FXS8fxW5pSifxEgr0HI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WWmF28yTDDMywWeFyDhcIVQ9t1fGAZc62FHeccRXWciFlPqLnaZLKAnTxF6WPzdBfOJFU/7ZRy/M7myToVIhyVlDSe4Mk4zl8fM5CzHB3dmQjjFaTjlk2Xgvbg/25UqE6Ib6W6v0yIWAnS9jpqKmNhnfLLby6EPf2eeM8xqk28Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sXL3w-0001aW-DT; Fri, 26 Jul 2024 15:32:48 +0200
+Date: Fri, 26 Jul 2024 15:32:48 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, gnault@redhat.com,
+	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
+Subject: Re: [RFC PATCH net-next 2/3] netfilter: nft_fib: Mask upper DSCP
+ bits before FIB lookup
+Message-ID: <20240726133248.GA5302@breakpoint.cc>
+References: <20240725131729.1729103-1-idosch@nvidia.com>
+ <20240725131729.1729103-3-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: phy: realtek: add support for RTL8366S Gigabit
- PHY
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172200063156.21287.9187549435807655006.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Jul 2024 13:30:31 +0000
-References: <20240725204147.69730-1-mark@mentovai.com>
-In-Reply-To: <20240725204147.69730-1-mark@mentovai.com>
-To: Mark Mentovai <mark@mentovai.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- o.rempel@pengutronix.de, jonas.gorski@gmail.com, russell@personaltelco.net,
- lorand.horvath82@gmail.com, namiltd@yahoo.com, yangshiji66@outlook.com,
- horms@kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240725131729.1729103-3-idosch@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello:
+Ido Schimmel <idosch@nvidia.com> wrote:
+> @@ -110,7 +108,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct nft_regs *regs,
+>  	if (priv->flags & NFTA_FIB_F_MARK)
+>  		fl4.flowi4_mark = pkt->skb->mark;
+>  
+> -	fl4.flowi4_tos = iph->tos & DSCP_BITS;
+> +	fl4.flowi4_tos = iph->tos & IPTOS_RT_MASK;
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+If this is supposed to get centralised, wouldn't it
+make more sense to not mask it, or will that happen later?
 
-On Thu, 25 Jul 2024 16:41:44 -0400 you wrote:
-> The PHY built in to the Realtek RTL8366S switch controller was
-> previously supported by genphy_driver. This PHY does not implement MMD
-> operations. Since commit 9b01c885be36 ("net: phy: c22: migrate to
-> genphy_c45_write_eee_adv()"), MMD register reads have been made during
-> phy_probe to determine EEE support. For genphy_driver, these reads are
-> transformed into 802.3 annex 22D clause 45-over-clause 22
-> mmd_phy_indirect operations that perform MII register writes to
-> MII_MMD_CTRL and MII_MMD_DATA. This overwrites those two MII registers,
-> which on this PHY are reserved and have another function, rendering the
-> PHY unusable while so configured.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] net: phy: realtek: add support for RTL8366S Gigabit PHY
-    https://git.kernel.org/netdev/net/c/225990c487c1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I thought plan was to ditch RT_MASK...
 
