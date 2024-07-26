@@ -1,146 +1,147 @@
-Return-Path: <netdev+bounces-113146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C1593CE0E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 08:15:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEFB293CE0F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 08:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19D8D1C20DBB
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 06:15:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D23DF1C20D56
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 06:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E72D17334E;
-	Fri, 26 Jul 2024 06:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3AE3175560;
+	Fri, 26 Jul 2024 06:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ShphM2P0"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LRjO8shK"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5BBA2A
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C90E57E
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721974546; cv=none; b=XDP9q8OpPgaDE5AA97shkFeUEQZJgtI9uzGKeHuGDglZKV2ZdEL5xFCyhoWa3pdPLEZXLT5oVeUE2iTRbROsgB5xOMwpQMqcnxbVedGjFs0sSOvm6eXW7Rt+eZqw0kkyEJ8J4subZCYoMFcvRappEioDJQBdJS9LSfdINI+N4mQ=
+	t=1721974577; cv=none; b=HgLTko3xIiGi7W6S6CcN971eXZZqRiikZvEYYB1VKJ8p85+ip54MA3wXYXGan7MBaX9NBCwFtV8zsaHQ3fFqB/A3zzrh8/89KjlA+dt2DDVshua+/GucYeTnFUJb/DoTRi48U7VaRDSaqGXDf3+bsN8/ymJbCPS24m6AiRBU3C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721974546; c=relaxed/simple;
-	bh=pDuftObZdHi/Pz9ALL5dOqDyERZ51xmOA4XnItAdY20=;
+	s=arc-20240116; t=1721974577; c=relaxed/simple;
+	bh=VN+zE3L3FnTCj/TzWE6s97DY8gK13TdLiIyxZznHv4g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jOkwMGt+FJUC4CS/ixNIR3ewzzKmS4T8iYb2WnCcdSNHSozfLo+AqDPlb/wNI4XmJlAUzs/snxHxiSw2PdKYB6HBU0fefntrtGnbHC+/CrkyExwY4+VQVDrlAumXk8oVMIxC1ON4tvXF3DR+x9dkCLQJ8qJXVB5xqDoQIj6C3bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ShphM2P0; arc=none smtp.client-ip=209.85.210.177
+	 To:Cc:Content-Type; b=DmQ2lvn/wGtCKLpO5RjwhlUXI/IsRAlLU357BVOLfpS3aXK7B7OmCtGtjsWZBIdEGWVikKMzKE3SDL4zXQP213fEgPLVyd9DxGfsbZlN1tmwvWIC1p9XQOa4qjQpefPTZNTvc9uKTGQSeqaPhITg+mNsMZ88+xRqHutgnmwopHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LRjO8shK; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70d333d57cdso518776b3a.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 23:15:44 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-70ea93aa9bdso524743b3a.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 23:16:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1721974544; x=1722579344; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1721974575; x=1722579375; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=tOwOaWXkKDN+ye88S+GTFlH/FASrNbhfoNo3ONjRspA=;
-        b=ShphM2P0bD8lpgzGtFeWlaOYZJtqvCcTCYSqyiglqPE9OwE8CqJEMzmuh8DtVSr2vN
-         a75lkuAaiKD2PRb7FNXCmUODb7F2Ng++sR6NfZi2OqXDcyZTMcl4Fm27BvLYr9eQFYJ5
-         51cKMzr/QB9QVHtNKBrIjW+NmFCKG5UKtAoOk=
+        bh=Z2eIMo35NYOe6YlLtuh1NOC5sHJSXVRf/NP7fv7zqc0=;
+        b=LRjO8shKJEYpFRWtmEa0NUuQsDpiX8cHx3j22EnXYgQ4L3HvNekFpADvz/t5JtO/Lh
+         s0gDCdcsqdGH1XbGZH2Qz32LMiza7kU/NDPeGQrD9+d0OgT2Zz7S5EGkfs1wHZuKummo
+         OFXdChj7jYtvuLqCnPZctBGu+ibkatrGLvwk4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721974544; x=1722579344;
+        d=1e100.net; s=20230601; t=1721974575; x=1722579375;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tOwOaWXkKDN+ye88S+GTFlH/FASrNbhfoNo3ONjRspA=;
-        b=UH5TzxNlS/jog3gbkDREZDTrQB1KJ/vxqo5a9E4RRyN77fI9/QnoTcJ+3QGaWSLPTE
-         MnZJh9Aaooppuzm3wgjEUuYAFPlI7C5qjKIBjr934zUeZQkstp3QtgXwGBC1viitJ0wE
-         FvU9ovWEp3zyIde0qnCWv17L+pdu1N8MqtQaYeNmMzkdkAgyEM2IP3q4VwyxNSF/912N
-         JqNUEOW57VLYqqL29wI79DsjvDmOcMlzRCJfp7NN9u0E4wXXu929L3JXvn7w6VYBoROJ
-         uOQoNQEt6qQmApAAcO+oLFeSGwWh/C8EbWXzkfpH4o5jtF075gF9MAV1Y0iRX0rVy7rg
-         ukfA==
-X-Forwarded-Encrypted: i=1; AJvYcCULBnopw5PSc+135rOTOpHfu+jzo7leNhNdhXGCB0e35eqrGJPG30ioYUERgeNgrMAWlp65aiySszb+dpijuqyxFaGlS7ya
-X-Gm-Message-State: AOJu0Ywzcp0XimZ0VXIYtkzNg8UBWdk//iQpbJHB5zv8lPRqC3fQvA7Y
-	L3kKJltFKaZJqJBdYbFsZWPFVsRLd+hm/ZtHIaU6ARX3xN5zDDQhGsDjJYK6Omuryd8/ilYGfhH
-	Lk5BqCK9+r9UXEqlVzyZFAqJJfAVNlGRN+R0x
-X-Google-Smtp-Source: AGHT+IFlh/0hBNJy8GPpfjMAQv+N6znmMsirTQczDnnYuN2qQaxKs9MXEsViJKhfpNw0vUzweEybgdHO0++2H1W2Uek=
-X-Received: by 2002:a05:6a20:12c7:b0:1c3:b1e2:f826 with SMTP id
- adf61e73a8af0-1c47b2d2d7emr4468577637.35.1721974543458; Thu, 25 Jul 2024
- 23:15:43 -0700 (PDT)
+        bh=Z2eIMo35NYOe6YlLtuh1NOC5sHJSXVRf/NP7fv7zqc0=;
+        b=Of6EnjGB+1+ezAi3qQrbqrYMwn47iGE8jjM9syRi+ggWIc5lvq8j+YLi4FDylaLRzj
+         mwDRuhz0RiEq3vNTwxppB1L7yfR6P81MF1Lhz4fAxNFKAkLsw7BrzypF2nL7ZJH6B+ky
+         D3pOigv6fTHx5D8QZa7J4lgtwBWNKwlWAvB+OtGxEQfZi9gwlaSyf5j+Fwc/6EL3ctqS
+         HJ1E619j4W37OUFo4DNtnAMLjK2dB9TC4FOAEueuQ265KqMVIpJgnNXxymtVHJxGWeho
+         5XFq25sVF625vUffoZDCY3Gf4VQ6BmSx95ZUCQJ+zLUGPHuGnjCVdc8SY94y9L85GolV
+         Abdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWToTmurMHVYNHLqx4fV44CEcVqLKxUDnLqkcfYRPWPybgRTaC30BW7zQnFpJD8dCzfMrC9xUzvoO7E0Ldj5eIZtlwU0jMQ
+X-Gm-Message-State: AOJu0Yz5u1xW0rXWz1mpprebgEmLZOKriCEJWGYMSfIHUMj6g72JwShm
+	BevvV3llMWB9Q7BpECjYnRPZI57lBLMXdH2ZzbUEY91cldHroRPXCBFuMZWqZCsvX4iWehnxWgq
+	eV8IEm4gj6ydrjkYzrGnUpNbG4QRI1Zu+sB1X
+X-Google-Smtp-Source: AGHT+IFsgcqD6MoZGGyQ4vHcJOxcYjKWx65mFV44CE517UaZ3ToPI3JOkY9NCGZeajZ2i0ZTpNnpmhTn8Dk7wqhQCXU=
+X-Received: by 2002:a05:6a20:7291:b0:1be:ca6c:d93 with SMTP id
+ adf61e73a8af0-1c472c6a0c6mr6417112637.52.1721974575292; Thu, 25 Jul 2024
+ 23:16:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240725222353.2993687-1-kuba@kernel.org> <20240725222353.2993687-3-kuba@kernel.org>
-In-Reply-To: <20240725222353.2993687-3-kuba@kernel.org>
+References: <20240725222353.2993687-1-kuba@kernel.org> <20240725222353.2993687-2-kuba@kernel.org>
+In-Reply-To: <20240725222353.2993687-2-kuba@kernel.org>
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Fri, 26 Jul 2024 11:45:30 +0530
-Message-ID: <CALs4sv1osSgvgHysDTgR=d=6cLGNyn-ha0y9fh+=wUpOKR3m=Q@mail.gmail.com>
-Subject: Re: [PATCH net 2/5] eth: bnxt: populate defaults in the RSS context struct
+Date: Fri, 26 Jul 2024 11:46:03 +0530
+Message-ID: <CALs4sv1jFBQugb8MXny09Qu+xUj5o+GFnWveh=G3g6-GMsPNow@mail.gmail.com>
+Subject: Re: [PATCH net 1/5] eth: bnxt: reject unsupported hash functions
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
 	pabeni@redhat.com, michael.chan@broadcom.com, shuah@kernel.org, 
 	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com, 
 	andrew@lunn.ch, willemb@google.com, petrm@nvidia.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000008d6b7061e207124"
+	boundary="000000000000e8003a061e207208"
 
---00000000000008d6b7061e207124
+--000000000000e8003a061e207208
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Jul 26, 2024 at 3:54=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
 ote:
 >
-> As described in the kdoc for .create_rxfh_context we are responsible
-> for populating the defaults. The core will not call .get_rxfh
-> for non-0 context.
+> In commit under Fixes I split the bnxt_set_rxfh_context() function,
+> and attached the appropriate chunks to new ops. I missed that
+> bnxt_set_rxfh_context() gets called after some initial checks
+> in bnxt_set_rxfh(), namely that the hash function is Toeplitz.
 >
-> The problem can be easily observed since Netlink doesn't currently
-> use the cache. Using netlink ethtool:
->
->   $ ethtool -x eth0 context 1
->   [...]
->   RSS hash key:
->   13:60:cd:60:14:d3:55:36:86:df:90:f2:96:14:e2:21:05:57:a8:8f:a5:12:5e:54=
-:62:7f:fd:3c:15:7e:76:05:71:42:a2:9a:73:80:09:9c
->   RSS hash function:
->       toeplitz: on
->       xor: off
->       crc32: off
->
-> But using IOCTL ethtool shows:
->
->   $ ./ethtool-old -x eth0 context 1
->   [...]
->   RSS hash key:
->   00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00=
-:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
->   RSS hash function:
->       Operation not supported
->
-> Fixes: 7964e7884643 ("net: ethtool: use the tracking array for get_rxfh o=
-n custom RSS contexts")
+> Fixes: 5c466b4d4e75 ("eth: bnxt: move from .set_rxfh to .create_rxfh_cont=
+ext and friends")
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 >
 > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/=
 net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index 0425a54eca98..ab8e3f197e7b 100644
+> index d00ef0063820..0425a54eca98 100644
 > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
 > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -1921,8 +1921,12 @@ static int bnxt_create_rxfh_context(struct net_dev=
-ice *dev,
+> @@ -1863,8 +1863,14 @@ static void bnxt_modify_rss(struct bnxt *bp, struc=
+t ethtool_rxfh_context *ctx,
+>  }
+>
+>  static int bnxt_rxfh_context_check(struct bnxt *bp,
+> +                                  const struct ethtool_rxfh_param *rxfh,
+>                                    struct netlink_ext_ack *extack)
+>  {
+> +       if (rxfh->hfunc && rxfh->hfunc !=3D ETH_RSS_HASH_TOP) {
+> +               NL_SET_ERR_MSG_MOD(extack, "RSS hash function not support=
+ed");
+> +               return -EOPNOTSUPP;
+> +       }
+> +
+>         if (!BNXT_SUPPORTS_MULTI_RSS_CTX(bp)) {
+>                 NL_SET_ERR_MSG_MOD(extack, "RSS contexts not supported");
+>                 return -EOPNOTSUPP;
+> @@ -1888,7 +1894,7 @@ static int bnxt_create_rxfh_context(struct net_devi=
+ce *dev,
+>         struct bnxt_vnic_info *vnic;
+>         int rc;
+>
+> -       rc =3D bnxt_rxfh_context_check(bp, extack);
+> +       rc =3D bnxt_rxfh_context_check(bp, rxfh, extack);
 >         if (rc)
->                 goto out;
+>                 return rc;
 >
-> +       /* Populate defaults in the context */
->         bnxt_set_dflt_rss_indir_tbl(bp, ctx);
-> +       ctx->hfunc =3D ETH_RSS_HASH_TOP;
->         memcpy(vnic->rss_hash_key, bp->rss_hash_key, HW_HASH_KEY_SIZE);
-> +       memcpy(ethtool_rxfh_context_key(ctx),
-> +              bp->rss_hash_key, HW_HASH_KEY_SIZE);
+> @@ -1953,7 +1959,7 @@ static int bnxt_modify_rxfh_context(struct net_devi=
+ce *dev,
+>         struct bnxt_rss_ctx *rss_ctx;
+>         int rc;
 >
->         rc =3D bnxt_hwrm_vnic_alloc(bp, vnic, 0, bp->rx_nr_rings);
->         if (rc) {
+> -       rc =3D bnxt_rxfh_context_check(bp, extack);
+> +       rc =3D bnxt_rxfh_context_check(bp, rxfh, extack);
+>         if (rc)
+>                 return rc;
+>
 > --
 > 2.45.2
 >
@@ -148,7 +149,7 @@ Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
 Thank you.
 
---00000000000008d6b7061e207124
+--000000000000e8003a061e207208
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -219,14 +220,14 @@ pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
 Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGIxZ0FD+p0NL6PLF10OU0mtemX2t+Ha
-igEKW9+SQpcAMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcy
-NjA2MTU0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHUPFuHZSW8TsJtQhY9LxqBUI2Z7nFGD
+rrsR3XVISfJKMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDcy
+NjA2MTYxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBUfvqhrO+PJyY63vMUQPvr/efimTdMVRy99BK4UCWpg4zSLHtA
-i+HVLYFuG3HXDkPaoWBMXGT8qt4nuGPYyz1didCdIpbchn+MK4mP4r2yl98841CNAVe9dJIVGBju
-2zffdVrpUNk3l+Aj0mlNETEH2JBvNlNqCPdrlDSt+JE3C9al70G/8KNGOvDxPW0E1G5VMsnvxafH
-Br0LEPNqyDyWTcA34L1kBzanSFDNHUapCvn/mY9NMeVAF+Q2+XxgFY00/90747GI20Mn2NByzTfo
-0ltdrOBoXM4muyIZJzuQfupZDD9CPH9KdhvWqvEcvy8EVyUR/XcySHMIXw+RAgJy
---00000000000008d6b7061e207124--
+ATANBgkqhkiG9w0BAQEFAASCAQAGTvatDzR1a/uV/VaQq1/m/mE60t8iVD/S1Lhbj1TuXE0ixdPL
+aHsAx9Zs71ztuw2dirMgmxBpOoLi6gHeQ/0ALaLfcN0zhl1lNAKCEMq5Nbx5uEnEYyfbU0ca6Hwe
+rS7zxmqF9sgsB0n6RZG730VOnahZRwiExw9QgLjRc3+mXZ5HUjIduIkEMJoNb6e8qmIBYjhZYuSn
+YsWRi9+y4v9CQF3foq+TXWA6hqXtHTwTZR61iRZ7yv5vhXACHAwu4YA88WCHtTuZVWsKIeMXgwfg
+3w/F1UH86GdOtHdasBvX1+mz/j9Ct49Rime9eiqCcjxVxgirMpvSKEKEmWRrtEHS
+--000000000000e8003a061e207208--
 
