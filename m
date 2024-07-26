@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-113203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999BB93D339
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:41:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51B193D331
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:40:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9B41F25A34
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:41:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E7DB281C90
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF8317C9FF;
-	Fri, 26 Jul 2024 12:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875B517C23A;
+	Fri, 26 Jul 2024 12:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="m+ezN04N"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bs/83qSh"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D413D17C9F3;
-	Fri, 26 Jul 2024 12:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE44117B51E;
+	Fri, 26 Jul 2024 12:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721997594; cv=none; b=Uhpj0eGP5cd2pqEnK6uhAW6+JB1TQs+J0Kdf7/T3YOC6lJ41Qb+u8O2Lr6LwQ3toalD00aXOlk0HAdRwg4Ldvw5gjg5XBPUxlYpCNmz+5fXllBa1FPIOfLIldTx120G+CmiUdgDG6akJt3pBOZx/Wt4AeQPlXj+e6NhuqtP9DYY=
+	t=1721997587; cv=none; b=EVgXDPAXaZraH7aAAaYWChFawVxH1wp5rZkw1fT1wdgsd3dIyRSC7ZSVI567k7R1aaYPUyWFsXe/Tm6duyGegnh2CxfFciaMtAUFbNWnfTUFcA/WsCjM8mfl5m+5tDh+Uqs5B6J/QPtQ6MZBnHl96wMPHPfqR05Q58OPDSh4R5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721997594; c=relaxed/simple;
-	bh=7Q6DPxstv1mi5uIjJY6qqNAI5YBD/244F7PLAMwmxh8=;
+	s=arc-20240116; t=1721997587; c=relaxed/simple;
+	bh=7r0hGPchYNf5SeF4aVGShXvreNLAnj/tG7dq/eXQlRE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qTsF/Y1ZB6MhFMm+6WlFj4iirtifFuK4WuO2/CYqcVUC8/usWtx9E2uyRS9VNDMKiblZm5yVlQb3wd2tfzmjyec4vzWya9QpRteTW4sozNJSmJLTLbNLj3NqkH2jxEQb4XSE4ew2/wStEDCAk37kVC9NYae0h2PvQ9pJL4lwuJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=m+ezN04N; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=SUFE6jXj9//6wGbwr/+CcpgddLTRjT9tE3cVQl+PqFE+saLu/tZAhwgYlSxJjMKSDXzhGsQfIFZX/HBDmHSME9/gTiC/Wrn0Z+TYSeFpHgUwRWtS9J0lPaaGYI55EeLrWhD5A0bEuxaKD9oI6/BEvmsl/RTJqYe6/2kdHshFg5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bs/83qSh; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1721997592; x=1753533592;
+  t=1721997586; x=1753533586;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7Q6DPxstv1mi5uIjJY6qqNAI5YBD/244F7PLAMwmxh8=;
-  b=m+ezN04NfeoveFmRgjvreCCQDBPbQwvEOFTUTtSE3ykY6Bvh7vMbiaUL
-   NLc+uclFWwKqUUp+CfpXbdojWG5TwIWVFl9h1uFNBLcUPbAHb/m973RJI
-   iEejfLFaIIUp9dd3Eu630GfVx3cmh3RWIlheu2dp7rGuQuZfg/edUGH/I
-   dbmA3Y3SaR6rEkj535J9ETMYvRD0Zjc6TT2TFKIAKgo5mZlj1uPMbdLcX
-   0TAb/odQIVx4PukcfN0Dc8HzFEhUJ/s8OBcIh0IaeCAXbgFWF1TjTLzeN
-   hb+utAF9ulm+LE7oa9B457l1dYY3jcG+bNRTawAmSpAkwlWsNLJNWfVkU
-   Q==;
-X-CSE-ConnectionGUID: 9QqqTNubSCyt71n4eg2Syg==
-X-CSE-MsgGUID: Nk3RwfHzSk+tQlyMRgxQnw==
+  bh=7r0hGPchYNf5SeF4aVGShXvreNLAnj/tG7dq/eXQlRE=;
+  b=bs/83qSh20rHuE3GvNDrzxB1Ft5KW9QoV2x4QXh2D++sc7wvY0Vljvf0
+   YzPg8z8KfgmGcHat9o1S+bxMCIJkUXZglk2IzacpHZIiJHV/S5WJO5Ios
+   ai83rrdvXVH9pSKWUFMEs+Q9r9pfS/WpglCrzBbS5bwx5yD5txF2QeuYB
+   0MmaHnWtUGvGRRBSTmAl+x2DWGcQes6pg85Lse6cqPvdOHkF1yLBm4GJO
+   8gAMcq0ek59c26W/ddBYiT+Ap7g8N20fYeg4wtObkNulHmrBugEEerleL
+   44Iwb7bkURtv1PwahjWrui1CCXrUFyLqp2B9qtvt4tbmlQmJXkyYhd31A
+   g==;
+X-CSE-ConnectionGUID: Z0ZRY1iBSJuTZIUmLX6uJg==
+X-CSE-MsgGUID: zdbJ7iEYQIehco5Yb4dVlQ==
 X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="32523225"
+   d="scan'208";a="260629579"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jul 2024 05:39:51 -0700
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jul 2024 05:39:44 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jul 2024 05:39:14 -0700
+ 15.1.2507.35; Fri, 26 Jul 2024 05:39:23 -0700
 Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Jul 2024 05:39:05 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 26 Jul 2024 05:39:15 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
@@ -73,9 +73,9 @@ CC: <UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
 	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
 	<linux@bigler.io>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v5 04/14] net: ethernet: oa_tc6: implement software reset
-Date: Fri, 26 Jul 2024 18:08:57 +0530
-Message-ID: <20240726123907.566348-5-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v5 05/14] net: ethernet: oa_tc6: implement error interrupts unmasking
+Date: Fri, 26 Jul 2024 18:08:58 +0530
+Message-ID: <20240726123907.566348-6-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
 References: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
@@ -88,106 +88,71 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Reset complete bit is set when the MAC-PHY reset completes and ready for
-configuration. Additionally reset complete bit in the STS0 register has
-to be written by one upon reset complete to clear the interrupt.
+This will unmask the following error interrupts from the MAC-PHY.
+  tx protocol error
+  rx buffer overflow error
+  loss of framing error
+  header error
+The MAC-PHY will signal an error by setting the EXST bit in the receive
+data footer which will then allow the host to read the STATUS0 register
+to find the source of the error.
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/ethernet/oa_tc6.c | 56 +++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ drivers/net/ethernet/oa_tc6.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index 187f2fe0c790..15db24d87a00 100644
+index 15db24d87a00..5fd7c0735af8 100644
 --- a/drivers/net/ethernet/oa_tc6.c
 +++ b/drivers/net/ethernet/oa_tc6.c
-@@ -6,8 +6,18 @@
-  */
+@@ -18,6 +18,13 @@
+ #define OA_TC6_REG_STATUS0			0x0008
+ #define STATUS0_RESETC				BIT(6)	/* Reset Complete */
  
- #include <linux/bitfield.h>
-+#include <linux/iopoll.h>
- #include <linux/oa_tc6.h>
- 
-+/* OPEN Alliance TC6 registers */
-+/* Reset Control and Status Register */
-+#define OA_TC6_REG_RESET			0x0003
-+#define RESET_SWRESET				BIT(0)	/* Software Reset */
-+
-+/* Status Register #0 */
-+#define OA_TC6_REG_STATUS0			0x0008
-+#define STATUS0_RESETC				BIT(6)	/* Reset Complete */
++/* Interrupt Mask Register #0 */
++#define OA_TC6_REG_INT_MASK0			0x000C
++#define INT_MASK0_HEADER_ERR_MASK		BIT(5)
++#define INT_MASK0_LOSS_OF_FRAME_ERR_MASK	BIT(4)
++#define INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK	BIT(3)
++#define INT_MASK0_TX_PROTOCOL_ERR_MASK		BIT(0)
 +
  /* Control command header */
  #define OA_TC6_CTRL_HEADER_DATA_NOT_CTRL	BIT(31)
  #define OA_TC6_CTRL_HEADER_WRITE_NOT_READ	BIT(29)
-@@ -24,6 +34,8 @@
- 						(OA_TC6_CTRL_MAX_REGISTERS *\
- 						OA_TC6_CTRL_REG_VALUE_SIZE) +\
- 						OA_TC6_CTRL_IGNORED_SIZE)
-+#define STATUS0_RESETC_POLL_DELAY		1000
-+#define STATUS0_RESETC_POLL_TIMEOUT		1000000
- 
- /* Internal structure for MAC-PHY drivers */
- struct oa_tc6 {
-@@ -279,6 +291,42 @@ int oa_tc6_write_register(struct oa_tc6 *tc6, u32 address, u32 value)
+@@ -327,6 +334,23 @@ static int oa_tc6_sw_reset_macphy(struct oa_tc6 *tc6)
+ 	return oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, regval);
  }
- EXPORT_SYMBOL_GPL(oa_tc6_write_register);
  
-+static int oa_tc6_read_status0(struct oa_tc6 *tc6)
++static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
 +{
 +	u32 regval;
 +	int ret;
 +
-+	ret = oa_tc6_read_register(tc6, OA_TC6_REG_STATUS0, &regval);
-+	if (ret) {
-+		dev_err(&tc6->spi->dev, "STATUS0 register read failed: %d\n",
-+			ret);
-+		return 0;
-+	}
-+
-+	return regval;
-+}
-+
-+static int oa_tc6_sw_reset_macphy(struct oa_tc6 *tc6)
-+{
-+	u32 regval = RESET_SWRESET;
-+	int ret;
-+
-+	ret = oa_tc6_write_register(tc6, OA_TC6_REG_RESET, regval);
++	ret = oa_tc6_read_register(tc6, OA_TC6_REG_INT_MASK0, &regval);
 +	if (ret)
 +		return ret;
 +
-+	/* Poll for soft reset complete for every 1ms until 1s timeout */
-+	ret = readx_poll_timeout(oa_tc6_read_status0, tc6, regval,
-+				 regval & STATUS0_RESETC,
-+				 STATUS0_RESETC_POLL_DELAY,
-+				 STATUS0_RESETC_POLL_TIMEOUT);
-+	if (ret)
-+		return -ENODEV;
++	regval &= ~(INT_MASK0_TX_PROTOCOL_ERR_MASK |
++		    INT_MASK0_RX_BUFFER_OVERFLOW_ERR_MASK |
++		    INT_MASK0_LOSS_OF_FRAME_ERR_MASK |
++		    INT_MASK0_HEADER_ERR_MASK);
 +
-+	/* Clear the reset complete status */
-+	return oa_tc6_write_register(tc6, OA_TC6_REG_STATUS0, regval);
++	return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
 +}
 +
  /**
   * oa_tc6_init - allocates and initializes oa_tc6 structure.
   * @spi: device with which data will be exchanged.
-@@ -289,6 +337,7 @@ EXPORT_SYMBOL_GPL(oa_tc6_write_register);
- struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
- {
- 	struct oa_tc6 *tc6;
-+	int ret;
- 
- 	tc6 = devm_kzalloc(&spi->dev, sizeof(*tc6), GFP_KERNEL);
- 	if (!tc6)
-@@ -311,6 +360,13 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
- 	if (!tc6->spi_ctrl_rx_buf)
+@@ -367,6 +391,13 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
  		return NULL;
+ 	}
  
-+	ret = oa_tc6_sw_reset_macphy(tc6);
++	ret = oa_tc6_unmask_macphy_error_interrupts(tc6);
 +	if (ret) {
 +		dev_err(&tc6->spi->dev,
-+			"MAC-PHY software reset failed: %d\n", ret);
++			"MAC-PHY error interrupts unmask failed: %d\n", ret);
 +		return NULL;
 +	}
 +
