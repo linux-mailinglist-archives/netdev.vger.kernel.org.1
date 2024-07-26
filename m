@@ -1,148 +1,112 @@
-Return-Path: <netdev+bounces-113281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965AF93D7AF
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:33:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB5C993D7B9
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22134B20EC2
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:33:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76FAD281CC1
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4764817D342;
-	Fri, 26 Jul 2024 17:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C6217D347;
+	Fri, 26 Jul 2024 17:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="L/AxQ2X/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="B0wnUgTg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F66817C7DF
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E656117838E
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722015220; cv=none; b=QKhcvKkpH0PG4hW7f06ZWTJl06vNP+3N7/aE1UkUHSp2odz+G+FbZLOkocXFk23iv62xhojAdgXpiBWqXLmPyXVmo+cO91rFOydVtH5aF28UXTvSG3/Grg4rQdGHyYyU6Oa5zXtQDXafDaa0yVuQwPbrmBcplNqUVEijv8KGeoM=
+	t=1722015370; cv=none; b=CJ30N8y8+Btnw/SrkHVSHornRMWYY4EaI4HddHO+AvFCFcWg6kRuihIQHbvJtZuSD2MCVZOOQRBOWTP4ZjsuaPmomzNKAACXQOwOKucJg/+hr6o3Dv7mng/tPzLv/k8VNcA+tKoLy17Jwd7WJzpJISdjZ+3l8ghFGgTse615Su8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722015220; c=relaxed/simple;
-	bh=e3N5bWu4r8Swl4BzWy7i9jr2amOi1C9JqeLg+IveS6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CB3JSCK97Qb2kkBTSFqXBFhvXQ1ZfT0gRfbW2k2yxHykoZA77/wfXGSz+jEaQJT6l+RguN/nEEVnGO2bIYko7bFBL/+RXWXx9J+1aayggSpc/GzPkNL873Lpmr1f3PiuKB76V3133JZezX67ytZ8kuDkZIuiNwpKJJVsv81X1kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=L/AxQ2X/; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3684b48d586so177067f8f.0
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:33:38 -0700 (PDT)
+	s=arc-20240116; t=1722015370; c=relaxed/simple;
+	bh=P3XyIo3R4arE45x8ffW/mmiyN4CSBGFSQO01bTvWo8A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FgwzBgajEf77XMqlb4qO7YTj+3lmKbkOrtf/EQu/B696uinUIOKKKJW0PACwA6qTrJdeb7gbq9udTZTXj+XoOdk+IrdK0tlAPpJhzrrcCo1XRWs2+GRPLPq5YuwqPH0E1Fbr22/CwFz+QYH+Bt+ZXq3KsJTzaZU6imFg+L/BUY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=B0wnUgTg; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5af6a1afa63so694516a12.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:36:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1722015217; x=1722620017; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c/B7g0UHHGpKr5sLCW2cjeH3RTgEO1uT2YFJABG6Bsg=;
-        b=L/AxQ2X/vE1foV9AVQePKmFWvxkRMHronlqCPy6jXR/gyJELOmzyDLNeyI6VRBvaku
-         oQMl7tjz6k3zcRCvZN+wmSk3ZYyrga5l2odxYIe9VuIY/GDNigCm2+SWhBd8lZYRA5ZC
-         aaRsduoOGrqWQ6HqDTHLMI/YlcbG9KQAZnhFU=
+        d=cloudflare.com; s=google09082023; t=1722015367; x=1722620167; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ho3v43VUSeiXA5xt2OR6F6u287xxMm9s+P8qGJiEG2w=;
+        b=B0wnUgTgOW2AVpThET/ZEPVIN7EF4O4k3XBoMoGhjmA702g3lEtw/SAsUZVDGLg2/N
+         5izsB0iaYIMJ/ysUkg17m7BdPT8fThbvU90k81+amEcJ2DK4P/eX+SwCQ+C8Z1elM4jE
+         X9nQHonEj3tqNvUqk3UblsxOaCGZ2bDNM98jurh/Ikl0w+Y3e+bV95ygNFiZ4MWhlmLl
+         SZJT7BYFEAu9qZpLel0JMrbBJk/OTb0JO1Fjwq4HeO16amIap58EE1o3QcWs2VUofo12
+         QVOY0yy4BBuKJLCLLUKfOfVtsGS+NeancbiawEyhRpM1uzNCkB2LvAlqqLlad+rQSEC2
+         cYyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722015217; x=1722620017;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1722015367; x=1722620167;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c/B7g0UHHGpKr5sLCW2cjeH3RTgEO1uT2YFJABG6Bsg=;
-        b=DvP4IzujyF+0n4LqRg3jOPuCWrNHenSh1g+jlb/0rbDS0fmB3pVcrFwIGoKiMhEhEV
-         y1wrz4cZe9QtYL3EnMCBYqzu32begeqEanfSDYlU7QXVgyONHGkQIPJ84kzyGIrjV2b1
-         FyhhcWC4KFyXjpVkj4prNFwRefNlT8yjGQJ5+hUa2AcGOcXx1/4VUZ430n8Aqt/rUp9T
-         MC1XbCwPs5FwvsoLFWuHwLxcrgCIeimM/b7BPBcxPAR9jTepLc4zje5m/6HWx6GlwcE+
-         DF+53MZVIIihGowBeR3kDZZfMk2Px0pp03BMKotDl15NMONTskhbspiX26li09U4CbiG
-         4Ktw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHDaa+cf7geIleVq2nYWuF73E48SigI0N/S7NrW9Xv1ZXYx7j1De6tY6/vj3LmQDyefbP9rxs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMkL/h0KhXi10cxjimZEdZEj4vDXQI/QDb1PWtJ0jXDP26VwNW
-	htXj0nPJRDGzyMhVA30c2IYnxmCdaxg+Z5Rk8QokBoh0/ilZuyaclA4tpo26Pbg=
-X-Google-Smtp-Source: AGHT+IG3ue2Wp3NAwG+80cC1hBEBaxqYkh1o6tYlzluNcJg5ps4z/XxOoMXpw4ib8InHKvN9IoLe0A==
-X-Received: by 2002:a5d:59a2:0:b0:367:95e3:e4c6 with SMTP id ffacd0b85a97d-36b34cec909mr2845449f8f.1.1722015216751;
-        Fri, 26 Jul 2024 10:33:36 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36858179sm5684617f8f.88.2024.07.26.10.33.35
+        bh=ho3v43VUSeiXA5xt2OR6F6u287xxMm9s+P8qGJiEG2w=;
+        b=VWPlM8XZSBkcxaVDA5rILWAmHst64+fcGna7Ff2c9N2T7jYFNBxp+6czMMGzX95hAg
+         CCsqpcPInfH1cFxNrZeSvD71JSP0QPlhpPri34Kt2pMSuYvGEJ5g/NpRN7f7boSjIQaq
+         NEGn0M8s4g6pxensCrJrReF98vTpDHoQwpAAZyKfKTJEFi6x0nl5WoYO8kLU8VRPrWLT
+         TzQyxdoU46gbRm7ULJWaj05P55zDPGy76sHTv3Rv9OOSvbAxy6yGXiKgBViD4CqAi0gn
+         CPRD9T+V3MiKoF7Rqqjk3sYpbdgdLKCXNooG05UlrCWQp7oWf/pzM96J7EkxupZgwpqE
+         N8pg==
+X-Forwarded-Encrypted: i=1; AJvYcCXS4FPxNBdETjsh6kD2S0y2h6raCnKtVvAh6UtvpZdIgZymTaYTFQYypJHeLWMxHa/RUFm+H0z0h56vGFE7C4c5R4RMH4BJ
+X-Gm-Message-State: AOJu0Ywi/eAGQ9cd1w8gefgh6plA+ed+v6vAqrMpOS7Tz9oK9lJwdKQw
+	fEkx18oScr8NxqlhZIF60loX9VjRWjfSL0+2NZmMqrhzjKqxl2nRQH6PNJERmrs=
+X-Google-Smtp-Source: AGHT+IHAAs6rashs3VUJdqFq7L9KZw0J+O+BWPDkdi/7GTQuTGrXRGsfwBjXUcOXij9YKstTeHW0KA==
+X-Received: by 2002:a17:906:c142:b0:a77:e48d:bae with SMTP id a640c23a62f3a-a7d3ffe7145mr20773366b.28.1722015367224;
+        Fri, 26 Jul 2024 10:36:07 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadafd9asm198150266b.187.2024.07.26.10.36.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 10:33:36 -0700 (PDT)
-Date: Fri, 26 Jul 2024 19:33:34 +0200
-From: Daniel Vetter <daniel.vetter@ffwll.ch>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <ZqPd7i22_oyPB2UN@phenom.ffwll.local>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
- <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
- <20240724200012.GA23293@pendragon.ideasonboard.com>
- <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+        Fri, 26 Jul 2024 10:36:06 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Mykola Lysenko <mykolal@fb.com>,  Alexei Starovoitov
+ <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Martin KaFai
+ Lau <martin.lau@linux.dev>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  John Fastabend <john.fastabend@gmail.com>,  KP
+ Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
+ Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
+ <shuah@kernel.org>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf 0/6] selftest/bpf: Various sockmap-related fixes
+In-Reply-To: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
+	(Michal Luczaj's message of "Wed, 24 Jul 2024 13:32:36 +0200")
+References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Fri, 26 Jul 2024 19:36:05 +0200
+Message-ID: <871q3gkqd6.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
-X-Operating-System: Linux phenom 6.9.7-amd64 
+Content-Type: text/plain
 
-On Wed, Jul 24, 2024 at 04:37:21PM -0400, James Bottomley wrote:
-> On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
-> [...]
-> > What I get from the discussions I've followed or partcipated in over
-> > the years is that the main worry of free software communities is
-> > being forced to use closed-source userspace components, whether that
-> > would be to make the device usable at all, or to achieve decent level
-> > of performance or full feature set. We've been through years of
-> > mostly closed-source GPU support, of printer "windrivers", and quite
-> > a few other horrors. The good news is that we've so far overcome lots
-> > (most) of those challenges. Reverse engineering projects paid off,
-> > and so did working hand-in-hand with industry actors in multiple ways
-> > (both openly and behind the scenes). One could then legitimately ask
-> > why we're still scared.
-> 
-> I don't think I am.  We're mostly fully capable of expounding at length
-> on the business rationale for being open if the thing they're hiding
-> isn't much of a differentiator anyway (or they're simply hiding it to
-> try to retain some illusion of control), so we shouldn't have any fear
-> of being able to make our case in language business people understand.
-> 
-> I also think this fear is partly a mindset problem on our part.  We
-> came out of the real fight for openness and we do embrace things like a
-> licence that forces open code (GPL) and symbols that discourage
-> proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
-> FSF coolaid that if we don't stand over manufacturers every second and
-> force them they'll slide back to their old proprietary ways.  However,
-> if you look at the entirely permissive ecosystem that grew up after we
-> did (openstack, docker, kubernetes, etc.) they don't have any such fear
-> and yet they still have large amounts of uncompelled openness and give
-> back.
+On Wed, Jul 24, 2024 at 01:32 PM +02, Michal Luczaj wrote:
+> Series takes care of few bugs and missing features with the aim to improve
+> the test coverage of sockmap/sockhash.
+>
+> Last patch is a create_pair() rewrite making use of
+> __attribute__((cleanup)) to handle socket fd lifetime.
+>
+> v0: https://lore.kernel.org/netdev/027fdb41-ee11-4be0-a493-22f28a1abd7c@rbox.co/
+>   - No declarations in function body (Jakub)
+>   - Don't touch output arguments until function succeeds (Jakub)
+>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
 
-This matches my experience. Legal and technical roadblocks help a bit in
-the margins, but they don't matter. The open gpu stack is 90% MIT, and
-nvidia and all the others have demonstrated for years how easy it is to
-ignore the GPL'ed part.
-
-What gets vendors involved is a successful project that drives revenue,
-where they have a clear need for a seat at the table to make sure the good
-times for them continue. Clear rules what it takes to get that seat is in
-my experience really the driving force for private discussions with
-vendors, and from that pov the most important thing I've ever done for the
-open gpu stack is this little documentation section:
-
-https://dri.freedesktop.org/docs/drm/gpu/drm-uapi.html#open-source-userspace-requirements
-
-Unlike laws you can legalese around and code you can trick with hacks for
-an endless game of whack-a-mole the above doc was the real stick. And it
-absolutely needed the carrot of the successful project that financially
-matters to work.
-
-Cheers, Sima
--- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+I see this depends on your previous series that got applied onto bpf
+tree, but this seems more like bpf-next material considering it's all
+tests, and a mix of improvements and fixups.
 
