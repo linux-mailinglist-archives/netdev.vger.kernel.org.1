@@ -1,171 +1,222 @@
-Return-Path: <netdev+bounces-113132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1BA93CBCA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 02:06:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2F8993CC39
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB6ADB21464
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 00:06:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FB04281177
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 01:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C284B816;
-	Fri, 26 Jul 2024 00:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC36D80B;
+	Fri, 26 Jul 2024 01:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="j2ARMZQs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P5zLeFNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B0219A
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 00:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CBEAD2D
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 01:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721952356; cv=none; b=XWBI77aLHIvr9PibUXgFouv0eQno4YPsyFQ3z0+G+tg5FbQ8nJcfi+TB6azmRmulsXQMtLKdm/pmOMbuGakOsvnrdfhMN2C0u04TrJSz05V1jCCX+/LsqPqDBAeK4z/zpbCAiSeKUsKp44cv6ln6DiakpADNGM17LcsYTIuNoY0=
+	t=1721955996; cv=none; b=LL12HraOAVl7u9viF8farNY0gDc/AGDpmSoxGmsg1sJ0BFLOMRAHSUWb573SX/yJEh2GHB3npAoTg8e3SFXzPKece0wXr8ufFfOEclt5VPF3SrTnNnlrLHjxCJVp5WgUnMEYLtakvScpqAQQlSyGMrVKR618P2+q7x0tzChiEJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721952356; c=relaxed/simple;
-	bh=G+tK5LJ9MxvpsWXTauo8dSY+BpUIBbQm4mmnumvMLGs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ORDg3Pm/ezCI7HLtiH6L0WsKxz4J+OpNLcNumV/D/XgymGGi/Bb77gHKZcJRQLZR9tIDAERHdPu9OWHxDQoW+uugjEk15bQNWX7n8ydpz7EH26htvlTxeEHdDusGRdJ1coy0geRiEUqX3HQvoYygl433KALFtIKd5GCLz7aU34E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=j2ARMZQs; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7a1d1578cbeso7372985a.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 17:05:54 -0700 (PDT)
+	s=arc-20240116; t=1721955996; c=relaxed/simple;
+	bh=Uh4MQlD82vSNoup83RKQ6r9QXdWD5HUMlYZukdkKH6k=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qDJSokIxcDyPWONz988VqSQ9W2JaZ01oADvZHVsyAkwalXft1edeGpv7C0SDZy+4O8B+bHjV6hoPH3u/6slz9/6zVirJfcy1W2HyTFkWQFwdfn4kdq0I/ddZR7d6GwwtcTqBhITsZysJF1HfPixthMsqXp5YMCtDYIh3tzKBWcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--prohr.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P5zLeFNi; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--prohr.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e035f7b5976so4433512276.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 18:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1721952353; x=1722557153; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8NqB/Umg+x0bHrL33JrlAJwFQQd1HhbucjxA2SIunNo=;
-        b=j2ARMZQsF6kr9SZe+1FajALruR0AKkVdq/MZPr7LOQcIOEwegk4OrR3MXIhHsIuaYp
-         KJEHzaPFswXOyJdatslZDtZzgTbKPRiYQD9sNyHmHCZveVvFRQywdDSjkRg8Rs/ASWyI
-         aANgncCgdgHKEIxqG8nflZVI9LQkugCQnOP3S97WMYQ9bR0LufaeQzOzNGa7xTVaci5a
-         +6DN7HADoF+u1TsCIGJMh5uY7ys0fRV3pa+B64fA58M3rVUukMpKNIHxj0yf3Y/UkkwQ
-         CL5TyIuXde4pKmchOTmqzhOA0GRxOE6EsTMcaNry13qHBSH3e2i0jP+E2k1hrQwflj0e
-         EhGA==
+        d=google.com; s=20230601; t=1721955994; x=1722560794; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ablXhylOaV+szIIh1rFKrx1sJi5HFmBEAmvD3bHKLcs=;
+        b=P5zLeFNizMDhY1SWhjNrym41zDXZ2EOTnW/JEdsJgW6d6K+BB0IkJAXhueN8QKDrf2
+         xt7DrTKr8RBbZYl4l9mdM/j8+ApvS+CXpZ7rdBMeB0Z4yZcfUd0HD9Hjp9NsbPnqynNd
+         bbBTqX5iOAvwO3S+ZDmqZY2yANm9EpOJJVlSlo2Fsce28kE+yu9BZWH0Qh8+1As6r1qi
+         NgwEwVEFqJygk6q5ji6u8MRxbN8JV4CLzM/GAkt/aK8fWyKytDsqWfB/T57dUuschau/
+         b6T167Kj045a9R9KvD4AeDMftMnRt0ZyuyOxhjFrsa1SrXW3MXEk1S7D53WdK1yMdWtK
+         PIUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721952353; x=1722557153;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8NqB/Umg+x0bHrL33JrlAJwFQQd1HhbucjxA2SIunNo=;
-        b=uzwoBA3NCRo8GNw0VSRya7q4aWM3x8zW7kiZz/r8lQTHmVDUdG2UMpO91yhtGC8RK3
-         V/oMpGSXM+YnRiArJAZx64J+hR1yYQuk5YHMke3AzDjgFaUJ3INV45LvMEXv3TRJ54zo
-         fk/XFcan6Kt3QuYRyA2BVunaq275I/OVMIu4bYkZV6+VdwxhFtSPFq/gVD0f2rg890C/
-         FN+LjjmjyZSf8214/OqzcaB3Rw2IeK/0dpflphhGBkVrD0jrr8zrfHs8ojVzGxXt9hQZ
-         5Us1dA2X43DNmomB++Ttx7MTmSHVxHlDIf5zEasM7MtqIlKLX7mF3zKtinBHQ+tShqtm
-         kdhg==
-X-Gm-Message-State: AOJu0YxC0r7rlh3pdEDmlD+/CMEhMn9PG5GbHzHYBOge96ep4OyuPxMi
-	kAqFgI3WfIc8avlv8mt/ZibASnGFFHEy2maGBUq9kn11h+5QfB8rmvFzXPKThz0TwOA0XVjlCQA
-	B
-X-Google-Smtp-Source: AGHT+IE8xGS9xBzx5MEhT3l0OOPsOb1SbDpmSf5NvDUxjoaXxpPXWCh1uELhy2aXl0mmhWCAZAC8uw==
-X-Received: by 2002:a05:620a:390d:b0:79f:17e6:fe8a with SMTP id af79cd13be357-7a1d7e49262mr384454285a.20.1721952353612;
-        Thu, 25 Jul 2024 17:05:53 -0700 (PDT)
-Received: from [10.5.119.35] (ec2-54-92-141-197.compute-1.amazonaws.com. [54.92.141.197])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d73e53desm126377485a.54.2024.07.25.17.05.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jul 2024 17:05:53 -0700 (PDT)
-Message-ID: <231e099e-ce57-442b-901f-2a9d11149a2f@bytedance.com>
-Date: Thu, 25 Jul 2024 17:05:51 -0700
+        d=1e100.net; s=20230601; t=1721955994; x=1722560794;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ablXhylOaV+szIIh1rFKrx1sJi5HFmBEAmvD3bHKLcs=;
+        b=iqh+KsKb25JNlTb2GyBC5BRTJ9gRZNBHSn1EVQC5M9TRiQzf3M8lTKsqHJrknVnlO7
+         hB/G5SOduIc0gWoeoAjU25FmiAqNdJ0ZaIrnWfNV6uL9/yZyttxwVTCezuksoZWNgawW
+         3P2/eR2UWvtjMbIVNCtkGpjQUiE5tMcU31GiQLYOt8H1+e6/T/SceMda70iK/RSoeHq4
+         k2b4TZSqldpaHsaJFMHopbGv8ga5aYKVPIQS2OJIm+QhTQ1xKOZoCDS1TeIGo/iaTuPe
+         2x3TH+ZHvZEfJ4YsyD84nllvVe4e05z4s2lH62HxJZtqqZOZUm0tk40inIjTLKndSZLs
+         Y6/w==
+X-Gm-Message-State: AOJu0YzcZXRYHhidRWdEjjzs5YzkjBAxMTuDjiQrK+LKXAjtLY76/skY
+	bGvW5MIEnZ7R1/R63bY8MJjY/w9/pXaAwrOe35CL/TwFS7brGDthK6AixX+yBgEcjtgvsOVahQ=
+	=
+X-Google-Smtp-Source: AGHT+IHgcdUdCfDR5SDVp0OkFkho2J9I7YtU9dvwgPeCbveFm8DcYhMpmwOdevhxqxN3Ssn2F9Hg7Tr8JQ==
+X-Received: from prohr-desktop.mtv.corp.google.com ([2620:15c:211:200:709b:73ce:5137:a99f])
+ (user=prohr job=sendgmr) by 2002:a25:9c08:0:b0:e0b:2dfe:d74b with SMTP id
+ 3f1490d57ef6-e0b2dfeef87mr23823276.0.1721955994219; Thu, 25 Jul 2024 18:06:34
+ -0700 (PDT)
+Date: Thu, 25 Jul 2024 18:06:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 1/3] sock: support copying cmsgs to the user
- space in sendmsg
-From: Zijian Zhang <zijianzhang@bytedance.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com,
- willemdebruijn.kernel@gmail.com, cong.wang@bytedance.com,
- xiaochun.lu@bytedance.com
-References: <20240708210405.870930-1-zijianzhang@bytedance.com>
- <20240708210405.870930-2-zijianzhang@bytedance.com>
- <ZqLE-vmo_L1JgUrn@google.com>
- <6b977a8c-d984-4d1a-b33d-15e2e875602c@bytedance.com>
-Content-Language: en-US
-In-Reply-To: <6b977a8c-d984-4d1a-b33d-15e2e875602c@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
+Message-ID: <20240726010629.111077-1-prohr@google.com>
+Subject: [PATCH net-next] Add support for PIO p flag
+From: Patrick Rohr <prohr@google.com>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Patrick Rohr <prohr@google.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, 
+	David Lamparter <equinox@opensourcerouting.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/25/24 4:50 PM, Zijian Zhang wrote:
->>> diff --git a/net/core/sock.c b/net/core/sock.c
->>> index 9abc4fe25953..efb30668dac3 100644
->>> --- a/net/core/sock.c
->>> +++ b/net/core/sock.c
->>> @@ -2826,7 +2826,7 @@ struct sk_buff *sock_alloc_send_pskb(struct 
->>> sock *sk, unsigned long header_len,
->>>   }
->>>   EXPORT_SYMBOL(sock_alloc_send_pskb);
->>>
->>> -int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
->>> +int __sock_cmsg_send(struct sock *sk, struct msghdr *msg, struct 
->>> cmsghdr *cmsg,
->>>                struct sockcm_cookie *sockc)
->>>   {
->>>       u32 tsflags;
->>> @@ -2866,6 +2866,8 @@ int __sock_cmsg_send(struct sock *sk, struct 
->>> cmsghdr *cmsg,
->>>       default:
->>>           return -EINVAL;
->>>       }
->>> +    if (cmsg_copy_to_user(cmsg))
->>> +        msg->msg_control_copy_to_user = true;
->>>       return 0;
->>>   }
+draft-ietf-6man-pio-pflag is adding a new flag to the Prefix Information
+Option to signal the pd-per-device addressing mechanism.
 
-msg_control_copy_to_user is set to true here.
+When accept_pio_pflag is enabled, the presence of the p-flag will cause
+an a flag in the same PIO to be ignored.
 
->>
->>
->> This may be a lack of knowledge on my part, but i'm very confused that
->> msg_control_copy_to_user is set to false here, and then checked below, 
->> and it's
->> not touched in between. How could it evaluate to true below? Is it 
->> because something
->> overwrites the value in msg_sys between this set and the check?
->>
->> If something is overwriting it, is the initialization to false necessary?
->> I don't see other fields of msg_sys initialized this way.
->>
-> 
-> ```
-> msg_sys->msg_control_copy_to_user = false;
-> ...
-> err = __sock_sendmsg(sock, msg_sys); -> __sock_cmsg_send
-> ...
-> if (msg && msg_sys->msg_control_copy_to_user && err >= 0)
-> ```
-> 
-> The msg_control_copy_to_user maybe updated by the cmsg handler in
-> the function __sock_cmsg_send. In patch 2/3, we have
-> msg_control_copy_to_user updated to true in SCM_ZC_NOTIFICATION
-> handler.
+An automated test has been added in Android (r.android.com/3195335) to
+go along with this change.
 
-Not in patch 2/3 In this patchset msg_control_copy_to_user is set in
-this patch, in __sock_cmsg_send.
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Cc: David Lamparter <equinox@opensourcerouting.org>
+Signed-off-by: Patrick Rohr <prohr@google.com>
+---
+ Documentation/networking/ip-sysctl.rst | 11 +++++++++++
+ include/linux/ipv6.h                   |  1 +
+ include/net/addrconf.h                 |  8 ++++++--
+ net/ipv6/addrconf.c                    | 15 ++++++++++++++-
+ 4 files changed, 32 insertions(+), 3 deletions(-)
 
-> 
-> As for the initialization,
-> 
-> msg_sys is allocated from the kernel stack, if we don't initialize
-> it to false, it might be randomly true, even though there is no
-> cmsg wants to be copied back.
-> 
-> Why is there only one initialization here? The existing bit 
-> msg_control_is_user only get initialized where the following code
-> path will use it. msg_control_is_user is initialized in multiple
-> locations in net/socket.c. However, In function hidp_send_frame,
-> msg_control_is_user is not initialized, because the following path will
-> not use this bit.
-> 
-> We only initialize msg_control_copy_to_user in function
-> ____sys_sendmsg, because only in this function will we check this bit.
-> 
-> If the initialization here makes people confused, I will add some docs.
-> 
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/network=
+ing/ip-sysctl.rst
+index 3616389c8c2d..322a0329b366 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2362,6 +2362,17 @@ ra_honor_pio_life - BOOLEAN
+=20
+ 	Default: 0 (disabled)
+=20
++accept_pio_pflag - BOOLEAN
++	Used to indicate userspace support for a DHCPv6-PD client.
++	If enabled, the presence of the PIO p flag indicates to the
++	kernel to ignore the autoconf flag.
++
++	- If disabled, the P flag is ignored.
++	- If enabled, disables SLAAC to obtain new addresses from
++	  prefixes with the P flag set.
++
++	Default: 0 (disabled)
++
+ accept_ra_rt_info_min_plen - INTEGER
+ 	Minimum prefix length of Route Information in RA.
+=20
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index 383a0ea2ab91..396b87d76b55 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -89,6 +89,7 @@ struct ipv6_devconf {
+ 	__u8		ioam6_enabled;
+ 	__u8		ndisc_evict_nocarrier;
+ 	__u8		ra_honor_pio_life;
++	__u8		accept_pio_pflag;
+=20
+ 	struct ctl_table_header *sysctl_header;
+ };
+diff --git a/include/net/addrconf.h b/include/net/addrconf.h
+index 62a407db1bf5..59496aa23012 100644
+--- a/include/net/addrconf.h
++++ b/include/net/addrconf.h
+@@ -38,9 +38,13 @@ struct prefix_info {
+ #if defined(__BIG_ENDIAN_BITFIELD)
+ 			__u8	onlink : 1,
+ 			 	autoconf : 1,
+-				reserved : 6;
++			 	routeraddr : 1,
++				pdpreferred : 1,
++				reserved : 4;
+ #elif defined(__LITTLE_ENDIAN_BITFIELD)
+-			__u8	reserved : 6,
++			__u8	reserved : 4,
++				pdpreferred : 1,
++			 	routeraddr : 1,
+ 				autoconf : 1,
+ 				onlink : 1;
+ #else
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 55a0fd589fc8..3e27725a12fc 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -239,6 +239,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly =
+=3D {
+ 	.ioam6_id_wide		=3D IOAM6_DEFAULT_IF_ID_WIDE,
+ 	.ndisc_evict_nocarrier	=3D 1,
+ 	.ra_honor_pio_life	=3D 0,
++	.accept_pio_pflag	=3D 0,
+ };
+=20
+ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly =3D {
+@@ -302,6 +303,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mos=
+tly =3D {
+ 	.ioam6_id_wide		=3D IOAM6_DEFAULT_IF_ID_WIDE,
+ 	.ndisc_evict_nocarrier	=3D 1,
+ 	.ra_honor_pio_life	=3D 0,
++	.accept_pio_pflag	=3D 0,
+ };
+=20
+ /* Check if link is ready: is it up and is a valid qdisc available */
+@@ -2762,6 +2764,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *=
+opt, int len, bool sllao)
+ 	u32 addr_flags =3D 0;
+ 	struct inet6_dev *in6_dev;
+ 	struct net *net =3D dev_net(dev);
++	bool ignore_autoconf_flag =3D false;
+=20
+ 	pinfo =3D (struct prefix_info *) opt;
+=20
+@@ -2864,7 +2867,8 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *=
+opt, int len, bool sllao)
+=20
+ 	/* Try to figure out our local address for this prefix */
+=20
+-	if (pinfo->autoconf && in6_dev->cnf.autoconf) {
++	ignore_autoconf_flag =3D READ_ONCE(in6_dev->cnf.accept_pio_pflag) && pinf=
+o->pdpreferred;
++	if (pinfo->autoconf && in6_dev->cnf.autoconf && !ignore_autoconf_flag) {
+ 		struct in6_addr addr;
+ 		bool tokenized =3D false, dev_addr_generated =3D false;
+=20
+@@ -6926,6 +6930,15 @@ static const struct ctl_table addrconf_sysctl[] =3D =
+{
+ 		.extra1		=3D SYSCTL_ZERO,
+ 		.extra2		=3D SYSCTL_ONE,
+ 	},
++	{
++		.procname	=3D "accept_pio_pflag",
++		.data		=3D &ipv6_devconf.accept_pio_pflag,
++		.maxlen		=3D sizeof(u8),
++		.mode		=3D 0644,
++		.proc_handler	=3D proc_dou8vec_minmax,
++		.extra1		=3D SYSCTL_ZERO,
++		.extra2		=3D SYSCTL_ONE,
++	},
+ #ifdef CONFIG_IPV6_ROUTER_PREF
+ 	{
+ 		.procname	=3D "accept_ra_rtr_pref",
+--=20
+2.46.0.rc1.232.g9752f9e123-goog
+
 
