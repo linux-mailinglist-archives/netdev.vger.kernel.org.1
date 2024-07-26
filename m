@@ -1,189 +1,110 @@
-Return-Path: <netdev+bounces-113221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C52D93D3CB
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:11:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 331D193D3CF
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:12:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF0942837B8
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D45571F24253
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D970C17B4E0;
-	Fri, 26 Jul 2024 13:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA31017BB02;
+	Fri, 26 Jul 2024 13:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="NV1HQ+kl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5b+kJGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CCA817BB02;
-	Fri, 26 Jul 2024 13:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FE117B4E0
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 13:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721999492; cv=none; b=as0xc+7/U5A3nAyz1BRyecCpbWLBvaDE/nR7ELmQVOL1jUrS97QtkseQrs15eeBY1OC845TjbUQ/J71SV3j2hVJPcUaBUC3ZZ3MUd+4aQ9v+wNuE2rWoM97o0BTeEQCbd8OW5wyVzXss+RZnMCrPMnAW7kfBWzzAvNUID+M+mcc=
+	t=1721999538; cv=none; b=kyJntSc6K6DsfzuhUiHJqcf5yPJZSRknNIHLPRqiuELXT8IjU9CClzygfzDOqbLAT5YEg4jARzBM/VdZsJ81frZrxj2hhgMuk6ssGDMFgB6WF15AVjXCIXZPN89bJW3Dhp9u5btz4DxKUCMuLFePNajKeQ95Hjn6UPbVK4eFLJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721999492; c=relaxed/simple;
-	bh=0cZokRbRzTb8ENdZ9ZJdrYbD9c3DsS5jIGWcAudXj5s=;
+	s=arc-20240116; t=1721999538; c=relaxed/simple;
+	bh=h72+a98KprrWyPci+WolzqJ6KSeDATMGbgOUIBmI8cs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bT4kJKydb+mfzF6lnxSEPAuYJvDl6LX3duTXb/36rSPBA4xC6hXiHkJBFf09s6Ude59mH6bHnH0ql7Ho2J1AduqVssSiwZMlLesvjCv39dav+uP+m83G3IOWh0TM5nBsl0gpmrpVfCTrU3Nmnic3R9SyJu0pKQvJqaeOlLjIJfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=NV1HQ+kl; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 27DC583F;
-	Fri, 26 Jul 2024 15:10:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721999445;
-	bh=0cZokRbRzTb8ENdZ9ZJdrYbD9c3DsS5jIGWcAudXj5s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NV1HQ+klgtw/G7AjrLtkdcyWUd9tdBpoQMiolh0jppVzKbGkT4KDDBVOwI3YIJwgO
-	 6Tw09fUZSvSHe/62abMyie0rCJ6uXCdmMm13xFYn/YoSp28FPEgvYPWsAY6iwC9Six
-	 mCRW08Ax/rdbWnlrBR0qWKk+iLLs5wTgjaVzX3jo=
-Date: Fri, 26 Jul 2024 16:11:10 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Cc: Leon Romanovsky <leon@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240726131110.GD28621@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
- <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
- <20240724200012.GA23293@pendragon.ideasonboard.com>
- <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
- <20240725122315.GE7022@unreal>
- <CAPybu_1XsNq=ExrO+8XLqnV_KvSaqooM=yNy5iuzcD=-k5CdGA@mail.gmail.com>
- <20240725132035.GF7022@unreal>
- <20240725194202.GE14252@pendragon.ideasonboard.com>
- <CAPybu_3T8JNkZxf3pgCo4E4VJ3AZvY7NzeXdd7w9Qqe8=eV=9A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iUEPyEtmPR3JhyBgJJpdqHblzxedMuVEjpzhzBO94dJK12bBmPLs1jdtOZi/Fv047rqH8v8vCt8njcBbKCNp/cAtPzNewhCf6ZTtYtylEsDfJoV1hD8YmkzzJw6CY5XBTeflc6QN80hgmZ9DvIqvBOK8e29o7LMfeWzf4vERUOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M5b+kJGV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721999535;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lsFdNBSg3GvSCBXb3m0nQOmqj5eLSOCce+7I1qVBgnc=;
+	b=M5b+kJGVPv5fEh4CE4rlTsCGzsGlYv3jt1Fdx3o1bum72jxg1niZWy46qMOK8MxAnm4y5D
+	/7/Cx5g7MKpSsQBZZCuSWWBQFEi6EMUFFXgdnmeIJ8o/YfZT2ReGmptTOiumQR2Jn7Ta6l
+	dMiSUn6ZHzJLQ3vlrRJvoqbLy8HDcws=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-287-kNB9weZyMBu-V_l_MuzrrQ-1; Fri, 26 Jul 2024 09:12:13 -0400
+X-MC-Unique: kNB9weZyMBu-V_l_MuzrrQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-367990b4beeso1232524f8f.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:12:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721999532; x=1722604332;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lsFdNBSg3GvSCBXb3m0nQOmqj5eLSOCce+7I1qVBgnc=;
+        b=MXaBQ+E5oRRqvKDR3DMAfLhSOE49cgArGpcr/2uQyFZW9E0HzesewnTD57mqkHgEkH
+         Qv5BKoKan6wdAmbcVoFfjMe07MmBduft047U8UTfc6MWUy1P4OhIrppCaC5vSbNjDT7U
+         QYpT/R857YYs5WoESkJnWaAoWtLWftsdhB4jCmfh4fMzC9HhazyTSBrRhsAtRFTm/+vW
+         YwR5VuLM4U5VgKVfjM+zGnHWqKdcqiS9752LRup6dUnH5eQzLoQpZCkASQdD1hHULCXu
+         SXPyUvIi4Vat6QsSVOsUZVaeqJ3p687SMP8qRCRc48uFRFJUNUzw0zYjVnpKL4ATwWPa
+         twtA==
+X-Gm-Message-State: AOJu0YwXGLk0VdyzqB/y40CvHQbiwneWGpcJe6uFhWd8RP32Xllta3ij
+	7SKnDxnxGcTxDANropaxkXZ3E477VSjTiBY+yRw7tAHxJkNoURotUaTfOTVJPKpOXUiUJhZTOjC
+	+JCI28rHTs0d4d1aJWmCsRYLRGkzaazRorc6fJRBpD2ECk9SQCytweg7srbMniw==
+X-Received: by 2002:a5d:4c86:0:b0:368:65a0:a423 with SMTP id ffacd0b85a97d-36b319f26b3mr3693022f8f.27.1721999532336;
+        Fri, 26 Jul 2024 06:12:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXbBJu1f7PaSWFiflUVfFPnDcIdALL9LcSAKL69RJROgW1jJl3MeNJ7yWaxIhL6qAgjduClw==
+X-Received: by 2002:a5d:4c86:0:b0:368:65a0:a423 with SMTP id ffacd0b85a97d-36b319f26b3mr3692989f8f.27.1721999531622;
+        Fri, 26 Jul 2024 06:12:11 -0700 (PDT)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367fc873sm5157425f8f.60.2024.07.26.06.12.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 06:12:10 -0700 (PDT)
+Date: Fri, 26 Jul 2024 15:12:08 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, pablo@netfilter.org,
+	kadlec@netfilter.org, fw@strlen.de
+Subject: Re: [RFC PATCH net-next 1/3] ipv4: Mask upper DSCP bits and ECN bits
+ in NETLINK_FIB_LOOKUP family
+Message-ID: <ZqOgqJWJ9cATghR/@debian>
+References: <20240725131729.1729103-1-idosch@nvidia.com>
+ <20240725131729.1729103-2-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPybu_3T8JNkZxf3pgCo4E4VJ3AZvY7NzeXdd7w9Qqe8=eV=9A@mail.gmail.com>
+In-Reply-To: <20240725131729.1729103-2-idosch@nvidia.com>
 
-On Fri, Jul 26, 2024 at 10:02:27AM +0200, Ricardo Ribalda Delgado wrote:
-> On Thu, Jul 25, 2024 at 9:44 PM Laurent Pinchart wrote:
-> > On Thu, Jul 25, 2024 at 04:20:35PM +0300, Leon Romanovsky wrote:
-> > > On Thu, Jul 25, 2024 at 03:02:13PM +0200, Ricardo Ribalda Delgado wrote:
-> > > > On Thu, Jul 25, 2024 at 2:23 PM Leon Romanovsky wrote:
-> > > > > On Thu, Jul 25, 2024 at 11:26:38AM +0200, Ricardo Ribalda Delgado wrote:
-> > > > > > On Wed, Jul 24, 2024 at 10:02 PM Laurent Pinchart wrote:
-> > > > >
-> > > > > <...>
-> > > > >
-> > > > > > It would be great to define what are the free software communities
-> > > > > > here. Distros and final users are also "free software communities" and
-> > > > > > they do not care about niche use cases covered by proprietary
-> > > > > > software.
-> > > > >
-> > > > > Are you certain about that?
-> > > >
-> > > > As a user, and as an open source Distro developer I have a small hint.
-> > > > But you could also ask users what they think about not being able to
-> > > > use their notebook's cameras. The last time that I could not use some
-> > > > basic hardware from a notebook with Linux was 20 years ago.
-> > >
-> > > Lucky you, I still have consumer hardware (speaker) that doesn't work
-> > > with Linux, and even now, there is basic hardware in my current
-> > > laptop (HP docking station) that doesn't work reliably in Linux.
-> > >
-> > > > > > They only care (and should care) about normal workflows.
-> > > > >
-> > > > > What is a normal workflow?
-> > > > > Does it mean that if user bought something very expensive he
-> > > > > should not be able to use it with free software, because his
-> > > > > usage is different from yours?
-> > > > >
-> > > > > Thanks
-> > > >
-> > > > It means that we should not block the standard usage for 99% of the
-> > > > population just because 1% of the users cannot do something fancy with
-> > > > their device.
-> > >
-> > > Right, the problem is that in some areas the statistics slightly different.
-> > > 99% population is blocked because 1% of the users don't need it and
-> > > don't think that it is "normal" flow.
-> > >
-> > > > Let me give you an example. When I buy a camera I want to be able to
-> > > > do Video Conferencing and take some static photos of documents. I do
-> > > > not care about: automatic makeup, AI generated background, unicorn
-> > > > filters, eyes recentering... But we need to give a way to vendors to
-> > > > implement those things closely, without the marketing differentiators,
-> > > > vendors have zero incentive to invest in Linux, and that affects all
-> > > > the population.
-> >
-> > I've seen these kind of examples being repeatedly given in discussions
-> > related to camera ISP support in Linux. They are very misleading. These
-> > are not the kind of features that are relevant for the device
-> > pass-through discussion these day. Those are high-level use cases
-> > implemented in userspace, and vendors can ship any closed-source
-> > binaries they want there. What I care about is the features exposed by
-> > the kernel to userspace API.
+On Thu, Jul 25, 2024 at 04:17:27PM +0300, Ido Schimmel wrote:
+> The NETLINK_FIB_LOOKUP netlink family can be used to perform a FIB
+> lookup according to user provided parameters and communicate the result
+> back to user space.
 > 
-> The ISPs are gradually becoming programmable devices and they indeed
-> help during all of those examples.
+> However, unlike other users of the FIB lookup API, the upper DSCP bits
+> and the ECN bits of the DS field are not masked, which can result in the
+> wrong result being returned.
+> 
+> Solve this by masking the upper DSCP bits and the ECN bits using
+> IPTOS_RT_MASK.
 
-I'd like to see more technical information to substantiate this claim.
-So far what I've sometimes seen is ISPs that include programmable
-elements, but hiding those behind a firmware that exposes a fixed
-(configurable) pipeline. I've also heard of attempts to expose some of
-that programmability to the operating system, which were abandoned in
-the end due to lack usefulness.
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
-> Userspace needs to send/receive information from the ISP, and that is
-> exactly what vendors want to keep in the close.
-
-But that's exactly what we need to implement an open userspace ecosystem
-:-)
-
-> Describing how they implement those algorithms is a patent minefield
-> and their differentiating factor.
-
-Those are also arguments I've heard many times before. The
-differentiating factor for cameras today is mostly in userspace ISP
-control algorithms, and nobody is telling vendors they need to open all
-that.
-
-When it comes to patents, we all know how software patents is a
-minefield, and hardware is also affected. I can't have much sympathy for
-this argument though, those patents mostly benefit the largest players
-in the market, and those are the ones who currently claim they can't
-open anything due to patents.
-
-> > > > This challenge seems to be solved for GPUs. I am using my AMD GPU
-> > > > freely and my nephew can install the amdgpu-pro proprietary user space
-> > > > driver to play duke nukem (or whatever kids play now) at 2000 fps.
-> > > >
-> > > > There are other other subsystems that allow vendor passthrough and
-> > > > their ecosystem has not collapsed.
-> > >
-> > > Yes, I completely agree with you on that.
-> > >
-> > > > Can we have some general guidance of what is acceptable? Can we define
-> > > > together the "normal workflow" and focus on a *full* open source
-> > > > implementation of that?
-> > >
-> > > I don't think that is possible to define "normal workflow". Requirement
-> > > to have open-source counterpart to everything exposed through UAPI is a
-> > > valid one. I'm all for that.
-> >
-> > That's my current opinion as well, as least when it comes to the kernel
-> > areas I mostly work with.
-
--- 
-Regards,
-
-Laurent Pinchart
 
