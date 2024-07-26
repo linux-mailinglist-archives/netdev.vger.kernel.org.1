@@ -1,205 +1,165 @@
-Return-Path: <netdev+bounces-113274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DF893D72C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 18:49:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4073793D72F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 18:50:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 917D3B20EF6
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:49:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFCAD284659
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F94D17C216;
-	Fri, 26 Jul 2024 16:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="wWaPX4Ph";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="wWaPX4Ph"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0020317C7B2;
+	Fri, 26 Jul 2024 16:50:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575EB11C83;
-	Fri, 26 Jul 2024 16:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E644C23774;
+	Fri, 26 Jul 2024 16:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722012565; cv=none; b=VNaMu29K52dS7lGosvQPSGo3tqgdnnKJlZY7JdCEtCazX3HxNd74rusDNct2wzBZ3X4zWQk8Bu2SU0RJnVC6pyo7t1x+V4gjLWc4AgMROrisutkTB+EIgkwGzgNP42lp4oRwWE+jL3J44jNpZL9s+ZbBoIH8MSycOG9xE7ck714=
+	t=1722012605; cv=none; b=ZkIemdEoQmDCTD83EC0oTNLzOKtSIhVipwndPAFdaCR6n3FSb67dhUAFEcV9YyC+i6jFhtF1VZ728tuecbiEobxpilGaMsPWIwHqEUg3lLmyoEymK1bYw6AWWZca6cAlivELeJGR5ROx/n4sA8cNtB2vyrQR2hkZdc8reB9bKLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722012565; c=relaxed/simple;
-	bh=9CUA/RHQppq7pAtBlnYBLi9+Q+DOIxlO5I4+RhBfrFc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dMQEJZXuq53nPYAlNNl+kCThqDt5BA5K4cA0USIu6fg5XBZy8zk7Ieb4MgtZ9D3uhLHQ3KYyO4uOdXfp8GvtCVGZnpqdnBgXjsErBMG1cyAJnJLXMaPtHU5yQ7QW365Hk95UoNtNuT6ZiBWXjOJQ/RbkZTmKkhLgbHr+Nq5acV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=wWaPX4Ph; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=wWaPX4Ph; arc=none smtp.client-ip=96.44.175.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1722012562;
-	bh=9CUA/RHQppq7pAtBlnYBLi9+Q+DOIxlO5I4+RhBfrFc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=wWaPX4PhwjtGjv0soStizvhp4NuFo+GJJmxK2UiSDnLO992CybmbeexxFZRI7LC0A
-	 tOHnvUcnkxEkVbDeEScBQSn92qJz5bHrioVZgtjsiqnGv+9htj+shHAEBLAYJV9v/A
-	 tLwoMta4f+TS6x/jt7vig0h3ElKiVgHKft485s5s=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 9FFA5128122D;
-	Fri, 26 Jul 2024 12:49:22 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id BpIxJsMyLd-n; Fri, 26 Jul 2024 12:49:22 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1722012562;
-	bh=9CUA/RHQppq7pAtBlnYBLi9+Q+DOIxlO5I4+RhBfrFc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=wWaPX4PhwjtGjv0soStizvhp4NuFo+GJJmxK2UiSDnLO992CybmbeexxFZRI7LC0A
-	 tOHnvUcnkxEkVbDeEScBQSn92qJz5bHrioVZgtjsiqnGv+9htj+shHAEBLAYJV9v/A
-	 tLwoMta4f+TS6x/jt7vig0h3ElKiVgHKft485s5s=
-Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::db7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id B8DA4128100C;
-	Fri, 26 Jul 2024 12:49:21 -0400 (EDT)
-Message-ID: <89671fdc060bcb845373a4453f5eea8ee32311ba.camel@HansenPartnership.com>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Jiri Kosina <jikos@kernel.org>, Dan Williams <dan.j.williams@intel.com>,
-  ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org,  netdev@vger.kernel.org, jgg@nvidia.com
-Date: Fri, 26 Jul 2024 12:49:20 -0400
-In-Reply-To: <20240725193125.GD14252@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
-	 <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
-	 <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
-	 <20240724200012.GA23293@pendragon.ideasonboard.com>
-	 <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
-	 <20240725193125.GD14252@pendragon.ideasonboard.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+	s=arc-20240116; t=1722012605; c=relaxed/simple;
+	bh=TcPkGrfOB/5scQGj+9p3hEKoE41ONhI5mBWu6d+4ikY=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jJwB4aD9BdTfS1WgYlbgUIOjl+d4eOOqbb6FH3LKXAWYaqm0oGomdGfHtSad48wmM/ajubtYSEa2Dqv6gmapBZ34G34NKLV7E4sCM2CvDEagYPjCsL5yhlcHl8E130RzeIi7vH3vXFg+q6rWBSyiaED23rMiQ2a5paJQ2NbJ9s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WVtw42Qqrz6K9Lm;
+	Sat, 27 Jul 2024 00:47:32 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1A1191404FC;
+	Sat, 27 Jul 2024 00:50:00 +0800 (CST)
+Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 26 Jul
+ 2024 17:49:59 +0100
+Date: Fri, 26 Jul 2024 17:49:58 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: David Woodhouse <dwmw2@infradead.org>
+CC: "Michael S. Tsirkin" <mst@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>, Peter Hilber <peter.hilber@opensynergy.com>,
+	<linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-rtc@vger.kernel.org>, "Ridoux,
+ Julien" <ridouxj@amazon.com>, <virtio-dev@lists.linux.dev>, "Luu, Ryan"
+	<rluu@amazon.com>, "Chashper, David" <chashper@amazon.com>, "Mohamed
+ Abuelfotoh, Hazem" <abuehaze@amazon.com>, "Christopher S . Hall"
+	<christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>, "John
+ Stultz" <jstultz@google.com>, <netdev@vger.kernel.org>, Stephen Boyd
+	<sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>, Mark Rutland
+	<mark.rutland@arm.com>, Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, qemu-devel <qemu-devel@nongnu.org>, "Simon
+ Horman" <horms@kernel.org>
+Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
+Message-ID: <20240726174958.00007d10@Huawei.com>
+In-Reply-To: <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org>
+References: <14d1626bc9ddae9d8ad19d3c508538d10f5a8e44.camel@infradead.org>
+	<20240725012730-mutt-send-email-mst@kernel.org>
+	<7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org>
+	<20240725081502-mutt-send-email-mst@kernel.org>
+	<f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org>
+	<20240725082828-mutt-send-email-mst@kernel.org>
+	<db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org>
+	<20240725083215-mutt-send-email-mst@kernel.org>
+	<98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Thu, 2024-07-25 at 22:31 +0300, Laurent Pinchart wrote:
-> On Wed, Jul 24, 2024 at 04:37:21PM -0400, James Bottomley wrote:
-> > On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
-> > [...]
-> > > What I get from the discussions I've followed or partcipated in
-> > > over the years is that the main worry of free software
-> > > communities is being forced to use closed-source userspace
-> > > components, whether that would be to make the device usable at
-> > > all, or to achieve decent level of performance or full feature
-> > > set. We've been through years of mostly closed-source GPU
-> > > support, of printer "windrivers", and quite a few other horrors.
-> > > The good news is that we've so far overcome lots (most) of those
-> > > challenges. Reverse engineering projects paid off, and so did
-> > > working hand-in-hand with industry actors in multiple ways
-> > > (both openly and behind the scenes). One could then legitimately
-> > > ask why we're still scared.
-> > 
-> > I don't think I am.  We're mostly fully capable of expounding at
-> > length on the business rationale for being open if the thing
-> > they're hiding isn't much of a differentiator anyway (or they're
-> > simply hiding it to try to retain some illusion of control), so we
-> > shouldn't have any fear of being able to make our case in language
-> > business people understand.
-> > 
-> > I also think this fear is partly a mindset problem on our part.  We
-> > came out of the real fight for openness and we do embrace things
-> > like a licence that forces open code (GPL) and symbols that
-> > discourage proprietary drivers (EXPORT_SYMBOL_GPL), so we've
-> > somewhat drunk the FSF coolaid that if we don't stand over
-> > manufacturers every second and force them they'll slide back to
-> > their old proprietary ways.  However, if you look at the entirely
-> > permissive ecosystem that grew up after we did (openstack, docker,
-> > kubernetes, etc.) they don't have any such fear and yet they still
-> > have large amounts of uncompelled openness and give back.
-> 
-> I don't think those are necessarily relevant examples,
+On Thu, 25 Jul 2024 14:50:50 +0100
+David Woodhouse <dwmw2@infradead.org> wrote:
 
-Well they do show it is possible to get an open ecosystem based on the
-pull of business need instead of using a forcing function like the
-licence.
-
->  as far as device pass-through goes. Vendors have many times reverted
-> to proprietary ways, and they still do, at least in the areas of the
-> kernel I'm most active in.
-
-I'm not going to argue that companies don't make bad business
-decisions: they definitely do.  And also there are huge reservoirs of
-proprietary mindset or fear of losing control in most of them which
-tend to drive these bad decisions.  I'm just saying we don't have to be
-all stick and no carrot.  If we can use the carrot to help them make
-better business decisions, and overcome the proprietary mindset that
-way, so much the better.
-
-There are also valid reasons to do pass-through, like you don't want to
-invest in standardising the interface until you see that you have an
-actual market, which is how mixed standardised/pass through systems
-like DRM work (they allow innovation and experimentation, not all of
-which works).
-
->  I've seen first hand a large SoC vendor very close to opening a
-> significant part of their camera stack and changing their mind at the
-> last minute when they heard they could possibly merge their code
-> through a different subsystem with a pass-through blank cheque.
-
-So is the learning here is that perhaps we should co-ordinate better?
-
-> I'm willing to believe it can be different in other areas, which may
-> partly explain why different subsystems and different developers have
-> different biases and have trouble understand each other's point of
-> view.
-
-I think that's true, due to different companies having different levels
-of proprietary mindset and other fears of not controlling their own
-destiny.  However, the basic fact remains that it will be in their best
-business interests to be more open if we can encourage it.
-
-> > > I can't fully answer that question, but there are two points that
-> > > I think are relevant. Note that due to my background and
-> > > experience, this will be heavily biased towards consumer and
-> > > embedded hardware, not data centre-grade devices. Some
-> > > technologies from the latter however have a tendency to migrate
-> > > to the former over time, so the distinction isn't necessarily as
-> > > relevant as one may consider.
+> On Thu, 2024-07-25 at 08:33 -0400, Michael S. Tsirkin wrote:
+> > On Thu, Jul 25, 2024 at 01:31:19PM +0100, David Woodhouse wrote:  
+> > > On Thu, 2024-07-25 at 08:29 -0400, Michael S. Tsirkin wrote:  
+> > > > On Thu, Jul 25, 2024 at 01:27:49PM +0100, David Woodhouse wrote:  
+> > > > > On Thu, 2024-07-25 at 08:17 -0400, Michael S. Tsirkin wrote:  
+> > > > > > On Thu, Jul 25, 2024 at 10:56:05AM +0100, David Woodhouse wrote:  
+> > > > > > > > Do you want to just help complete virtio-rtc then? Would be easier than
+> > > > > > > > trying to keep two specs in sync.  
+> > > > > > > 
+> > > > > > > The ACPI version is much more lightweight and doesn't take up a
+> > > > > > > valuable PCI slot#. (I know, you can do virtio without PCI but that's
+> > > > > > > complex in other ways).
+> > > > > > >   
+> > > > > > 
+> > > > > > Hmm, should we support virtio over ACPI? Just asking.  
+> > > > > 
+> > > > > Given that we support virtio DT bindings, and the ACPI "PRP0001" device
+> > > > > exists with a DSM method which literally returns DT properties,
+> > > > > including such properties as "compatible=virtio,mmio" ... do we
+> > > > > already?
+> > > > > 
+> > > > >   
+> > > > 
+> > > > In a sense, but you are saying that is too complex?
+> > > > Can you elaborate?  
 > > > 
-> > > The first point is that hardware gets more complicated over time,
-> > > and in some markets there's also an increase in the number of
-> > > vendors and devices. There's a perceived (whether true or not)
-> > > danger that we won't be able to keep up with just reverse
-> > > engineering and a development model relying on hobyists. Getting
-> > > vendors involved is important if we want to scale.
+> > > No, I think it's fine. I encourage the use of the PRP0001 device to
+> > > expose DT devices through ACPI. I was just reminding you of its
+> > > existence.  
 > > 
-> > Yes, but there are lots of not very useful complex devices being
-> > produced every day that fail to capture market share.  Not having
-> > reverse engineered drivers for them is no real loss.  If a device
-> > does gain market share, it gains a huge pool of users some of whom
-> > become interested in reverse engineering, so I think market forces
-> > actually work in our favour: we get reverse engineering mostly
-> > where the devices are actually interesting and capture market
-> > share.  It's self scaling.
+> > Confused. You said "I know, you can do virtio without PCI but that's
+> > complex in other ways" as the explanation why you are doing a custom
+> > protocol.  
 > 
-> I can't agree with that, sorry. Not only is the difficulty to
-> reverse-engineer some classes of devices increasing,
+> Ah, apologies, I wasn't thinking that far back in the conversation.
+> 
+> If we wanted to support virtio over ACPI, I think PRP0001 can be made
+> to work and isn't too complex (even though it probably doesn't yet work
+> out of the box).
+> 
+> But for the VMCLOCK thing, yes, the simple ACPI device is a lot simpler
+> than virtio-rtc and much more attractive.
+> 
+> Even if the virtio-rtc specification were official today, and I was
+> able to expose it via PCI, I probably wouldn't do it that way. There's
+> just far more in virtio-rtc than we need; the simple shared memory
+> region is perfectly sufficient for most needs, and especially ours.
+> 
+> I have reworked
+> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/vmclock
+> to take your other feedback into account.
+> 
+> It's now more flexible about the size handling, and explicitly checking
+> that specific fields are present before using them. 
+> 
+> I think I'm going to add a method on the ACPI device to enable the
+> precise clock information. I haven't done that in the driver yet; it
+> still just consumes the precise clock information if it happens to be
+> present already. The enable method can be added in a compatible fashion
+> (the failure mode is that guests which don't invoke this method when
+> the hypervisor needs them to will see only the disruption signal and
+> not precise time).
+> 
+> For the HID I'm going to use AMZNVCLK. I had used QEMUVCLK in the QEMU
+> patches, but I'll change that to use AMZNVCLK too when I repost the
+> QEMU patch.
 
-So it's a higher hill to climb: I didn't say it wasn't.  However for
-hugely popular devices there's still more likelihood of finding someone
-willing to climb it.  It's not a guarantee, just a probability, though.
+That doesn't fit with ACPI _HID definitions.
+Second set 4 characters need to be hex digits as this is an
+ACPI style ID (which I assume this is given AMZN is a valid
+vendor ID.  6.1.5 in ACPI v6.5
 
-> but saying that only devices that make it to the top of the market
-> share chart are worth considering will leave many users on the side
-> of the road.
+Maybe I'm missing something...
 
-I'm afraid this is simple economics.  Suppose we had the budget to pay
-for reverse engineering, it's not going to cover everything, so we'd
-have to make choices and that would necessarily mean investing in
-devices that have utility to the greatest number of people.  So low
-market share devices would still be left out.
+J
 
-James
 
 
