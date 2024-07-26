@@ -1,222 +1,243 @@
-Return-Path: <netdev+bounces-113133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F8993CC39
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:06:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D6B93CC4C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:15:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FB04281177
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 01:06:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DE69281D90
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 01:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC36D80B;
-	Fri, 26 Jul 2024 01:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D43F368;
+	Fri, 26 Jul 2024 01:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P5zLeFNi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r/cdEkWY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CBEAD2D
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 01:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50CF370
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 01:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721955996; cv=none; b=LL12HraOAVl7u9viF8farNY0gDc/AGDpmSoxGmsg1sJ0BFLOMRAHSUWb573SX/yJEh2GHB3npAoTg8e3SFXzPKece0wXr8ufFfOEclt5VPF3SrTnNnlrLHjxCJVp5WgUnMEYLtakvScpqAQQlSyGMrVKR618P2+q7x0tzChiEJ8=
+	t=1721956551; cv=none; b=pqH5zuOuTsrRnFcPsIro1v/PmZzOpUvTR1TBwhIljvCHxoFxvZE8q9Kd7d6+dNS8Gi4RBUv5m8fh3C+dUXsPsQs2q+T/Wa2vrryFSnwWdkAj4+byF8KqRKSS1Vg7F2frezmJ7jO2sYC2HTXDkjWmccsrW+3Ta/fZ9BHr8Pml16o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721955996; c=relaxed/simple;
-	bh=Uh4MQlD82vSNoup83RKQ6r9QXdWD5HUMlYZukdkKH6k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qDJSokIxcDyPWONz988VqSQ9W2JaZ01oADvZHVsyAkwalXft1edeGpv7C0SDZy+4O8B+bHjV6hoPH3u/6slz9/6zVirJfcy1W2HyTFkWQFwdfn4kdq0I/ddZR7d6GwwtcTqBhITsZysJF1HfPixthMsqXp5YMCtDYIh3tzKBWcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--prohr.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P5zLeFNi; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--prohr.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e035f7b5976so4433512276.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jul 2024 18:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721955994; x=1722560794; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ablXhylOaV+szIIh1rFKrx1sJi5HFmBEAmvD3bHKLcs=;
-        b=P5zLeFNizMDhY1SWhjNrym41zDXZ2EOTnW/JEdsJgW6d6K+BB0IkJAXhueN8QKDrf2
-         xt7DrTKr8RBbZYl4l9mdM/j8+ApvS+CXpZ7rdBMeB0Z4yZcfUd0HD9Hjp9NsbPnqynNd
-         bbBTqX5iOAvwO3S+ZDmqZY2yANm9EpOJJVlSlo2Fsce28kE+yu9BZWH0Qh8+1As6r1qi
-         NgwEwVEFqJygk6q5ji6u8MRxbN8JV4CLzM/GAkt/aK8fWyKytDsqWfB/T57dUuschau/
-         b6T167Kj045a9R9KvD4AeDMftMnRt0ZyuyOxhjFrsa1SrXW3MXEk1S7D53WdK1yMdWtK
-         PIUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721955994; x=1722560794;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ablXhylOaV+szIIh1rFKrx1sJi5HFmBEAmvD3bHKLcs=;
-        b=iqh+KsKb25JNlTb2GyBC5BRTJ9gRZNBHSn1EVQC5M9TRiQzf3M8lTKsqHJrknVnlO7
-         hB/G5SOduIc0gWoeoAjU25FmiAqNdJ0ZaIrnWfNV6uL9/yZyttxwVTCezuksoZWNgawW
-         3P2/eR2UWvtjMbIVNCtkGpjQUiE5tMcU31GiQLYOt8H1+e6/T/SceMda70iK/RSoeHq4
-         k2b4TZSqldpaHsaJFMHopbGv8ga5aYKVPIQS2OJIm+QhTQ1xKOZoCDS1TeIGo/iaTuPe
-         2x3TH+ZHvZEfJ4YsyD84nllvVe4e05z4s2lH62HxJZtqqZOZUm0tk40inIjTLKndSZLs
-         Y6/w==
-X-Gm-Message-State: AOJu0YzcZXRYHhidRWdEjjzs5YzkjBAxMTuDjiQrK+LKXAjtLY76/skY
-	bGvW5MIEnZ7R1/R63bY8MJjY/w9/pXaAwrOe35CL/TwFS7brGDthK6AixX+yBgEcjtgvsOVahQ=
-	=
-X-Google-Smtp-Source: AGHT+IHgcdUdCfDR5SDVp0OkFkho2J9I7YtU9dvwgPeCbveFm8DcYhMpmwOdevhxqxN3Ssn2F9Hg7Tr8JQ==
-X-Received: from prohr-desktop.mtv.corp.google.com ([2620:15c:211:200:709b:73ce:5137:a99f])
- (user=prohr job=sendgmr) by 2002:a25:9c08:0:b0:e0b:2dfe:d74b with SMTP id
- 3f1490d57ef6-e0b2dfeef87mr23823276.0.1721955994219; Thu, 25 Jul 2024 18:06:34
- -0700 (PDT)
-Date: Thu, 25 Jul 2024 18:06:29 -0700
+	s=arc-20240116; t=1721956551; c=relaxed/simple;
+	bh=ABAeF0td+V7Qmx/XI7YPqrOcTMb09W0mytpLgntAAR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RqI+xaMO7L8gPk9QhJ+VVzzmfmutWtxjoVj/YfY8xA2syBbNxnJxsF6XnI8iB6yVgS1Oe28GtivSM1OLMGVvY8uejNcFqY+eqCmKiMK2AJL3gIADrmXHTwwtwK0UDoVkbl/SC7cCGzYrIDQIzMi9wwkfRakTXV5cNA21pK1Nyg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r/cdEkWY; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f3bfe9a5-40e8-4a1c-a5e5-0f7f24b9e395@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1721956545;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uDUIjNwdKuDXe19nnD/XMgqnauA4XCg7yVYXDqBO1KU=;
+	b=r/cdEkWY/S3w1h7OOWNO/5wabQX+dNGUTj8UFs1d6bODc+emoWntnmMOh2Z30+HUHx7x6Z
+	/+UCLsk1vkeD+ymrewOE7hn2pacsSK44aJKZHv2npS448WnhG5aUxKRPu3aUSyk2oBu/WE
+	U83Q7PhCT3MUVLVsjmXo06XUdk3Oj9I=
+Date: Thu, 25 Jul 2024 18:15:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726010629.111077-1-prohr@google.com>
-Subject: [PATCH net-next] Add support for PIO p flag
-From: Patrick Rohr <prohr@google.com>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Patrick Rohr <prohr@google.com>, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, 
-	David Lamparter <equinox@opensourcerouting.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [RFC PATCH v9 07/11] bpf: net_sched: Allow more optional
+ operators in Qdisc_ops
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn,
+ daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com,
+ martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
+ jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
+ xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+ <20240714175130.4051012-8-amery.hung@bytedance.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240714175130.4051012-8-amery.hung@bytedance.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-draft-ietf-6man-pio-pflag is adding a new flag to the Prefix Information
-Option to signal the pd-per-device addressing mechanism.
+On 7/14/24 10:51 AM, Amery Hung wrote:
+> So far, init, reset, and destroy are implemented by bpf qdisc infra as
+> fixed operators that manipulate the watchdog according to the occasion.
+> This patch allows users to implement these three operators to perform
+> desired work alongside the predefined ones.
+> 
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
+>   include/net/sch_generic.h |  6 ++++++
+>   net/sched/bpf_qdisc.c     | 20 ++++----------------
+>   net/sched/sch_api.c       | 11 +++++++++++
+>   net/sched/sch_generic.c   |  8 ++++++++
+>   4 files changed, 29 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index 214ed2e34faa..3041782b7527 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -1359,4 +1359,10 @@ static inline void qdisc_synchronize(const struct Qdisc *q)
+>   		msleep(1);
+>   }
+>   
+> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_BPF_JIT)
+> +int bpf_qdisc_init_pre_op(struct Qdisc *sch, struct nlattr *opt, struct netlink_ext_ack *extack);
+> +void bpf_qdisc_destroy_post_op(struct Qdisc *sch);
+> +void bpf_qdisc_reset_post_op(struct Qdisc *sch);
+> +#endif
+> +
+>   #endif
+> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
+> index eff7559aa346..903b4eb54510 100644
+> --- a/net/sched/bpf_qdisc.c
+> +++ b/net/sched/bpf_qdisc.c
+> @@ -9,9 +9,6 @@
+>   static struct bpf_struct_ops bpf_Qdisc_ops;
+>   
+>   static u32 unsupported_ops[] = {
+> -	offsetof(struct Qdisc_ops, init),
+> -	offsetof(struct Qdisc_ops, reset),
+> -	offsetof(struct Qdisc_ops, destroy),
+>   	offsetof(struct Qdisc_ops, change),
+>   	offsetof(struct Qdisc_ops, attach),
+>   	offsetof(struct Qdisc_ops, change_real_num_tx),
+> @@ -36,8 +33,8 @@ static int bpf_qdisc_init(struct btf *btf)
+>   	return 0;
+>   }
+>   
+> -static int bpf_qdisc_init_op(struct Qdisc *sch, struct nlattr *opt,
+> -			     struct netlink_ext_ack *extack)
+> +int bpf_qdisc_init_pre_op(struct Qdisc *sch, struct nlattr *opt,
+> +			  struct netlink_ext_ack *extack)
+>   {
+>   	struct bpf_sched_data *q = qdisc_priv(sch);
+>   
+> @@ -45,14 +42,14 @@ static int bpf_qdisc_init_op(struct Qdisc *sch, struct nlattr *opt,
+>   	return 0;
+>   }
+>   
+> -static void bpf_qdisc_reset_op(struct Qdisc *sch)
+> +void bpf_qdisc_reset_post_op(struct Qdisc *sch)
+>   {
+>   	struct bpf_sched_data *q = qdisc_priv(sch);
+>   
+>   	qdisc_watchdog_cancel(&q->watchdog);
+>   }
+>   
+> -static void bpf_qdisc_destroy_op(struct Qdisc *sch)
+> +void bpf_qdisc_destroy_post_op(struct Qdisc *sch)
 
-When accept_pio_pflag is enabled, the presence of the p-flag will cause
-an a flag in the same PIO to be ignored.
+The reset_post_ops and destroy_post_op are identical. They only do 
+qdisc_watchdog_cancel().
 
-An automated test has been added in Android (r.android.com/3195335) to
-go along with this change.
+>   {
+>   	struct bpf_sched_data *q = qdisc_priv(sch);
+>   
+> @@ -235,15 +232,6 @@ static int bpf_qdisc_init_member(const struct btf_type *t,
+>   			return -EINVAL;
+>   		qdisc_ops->static_flags = TCQ_F_BPF;
+>   		return 1;
+> -	case offsetof(struct Qdisc_ops, init):
+> -		qdisc_ops->init = bpf_qdisc_init_op;
+> -		return 1;
+> -	case offsetof(struct Qdisc_ops, reset):
+> -		qdisc_ops->reset = bpf_qdisc_reset_op;
+> -		return 1;
+> -	case offsetof(struct Qdisc_ops, destroy):
+> -		qdisc_ops->destroy = bpf_qdisc_destroy_op;
+> -		return 1;
+>   	case offsetof(struct Qdisc_ops, peek):
+>   		if (!uqdisc_ops->peek)
+>   			qdisc_ops->peek = qdisc_peek_dequeued;
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index 5064b6d2d1ec..9fb9375e2793 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -1352,6 +1352,13 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+>   		rcu_assign_pointer(sch->stab, stab);
+>   	}
+>   
+> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_BPF_JIT)
+> +	if (sch->flags & TCQ_F_BPF) {
 
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Cc: David Lamparter <equinox@opensourcerouting.org>
-Signed-off-by: Patrick Rohr <prohr@google.com>
----
- Documentation/networking/ip-sysctl.rst | 11 +++++++++++
- include/linux/ipv6.h                   |  1 +
- include/net/addrconf.h                 |  8 ++++++--
- net/ipv6/addrconf.c                    | 15 ++++++++++++++-
- 4 files changed, 32 insertions(+), 3 deletions(-)
+I can see the reason why this patch is needed. It is a few line changes and they 
+are not in the fast path... still weakly not excited about them but I know it 
+could be a personal preference.
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/network=
-ing/ip-sysctl.rst
-index 3616389c8c2d..322a0329b366 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2362,6 +2362,17 @@ ra_honor_pio_life - BOOLEAN
-=20
- 	Default: 0 (disabled)
-=20
-+accept_pio_pflag - BOOLEAN
-+	Used to indicate userspace support for a DHCPv6-PD client.
-+	If enabled, the presence of the PIO p flag indicates to the
-+	kernel to ignore the autoconf flag.
-+
-+	- If disabled, the P flag is ignored.
-+	- If enabled, disables SLAAC to obtain new addresses from
-+	  prefixes with the P flag set.
-+
-+	Default: 0 (disabled)
-+
- accept_ra_rt_info_min_plen - INTEGER
- 	Minimum prefix length of Route Information in RA.
-=20
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 383a0ea2ab91..396b87d76b55 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -89,6 +89,7 @@ struct ipv6_devconf {
- 	__u8		ioam6_enabled;
- 	__u8		ndisc_evict_nocarrier;
- 	__u8		ra_honor_pio_life;
-+	__u8		accept_pio_pflag;
-=20
- 	struct ctl_table_header *sysctl_header;
- };
-diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-index 62a407db1bf5..59496aa23012 100644
---- a/include/net/addrconf.h
-+++ b/include/net/addrconf.h
-@@ -38,9 +38,13 @@ struct prefix_info {
- #if defined(__BIG_ENDIAN_BITFIELD)
- 			__u8	onlink : 1,
- 			 	autoconf : 1,
--				reserved : 6;
-+			 	routeraddr : 1,
-+				pdpreferred : 1,
-+				reserved : 4;
- #elif defined(__LITTLE_ENDIAN_BITFIELD)
--			__u8	reserved : 6,
-+			__u8	reserved : 4,
-+				pdpreferred : 1,
-+			 	routeraddr : 1,
- 				autoconf : 1,
- 				onlink : 1;
- #else
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 55a0fd589fc8..3e27725a12fc 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -239,6 +239,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly =
-=3D {
- 	.ioam6_id_wide		=3D IOAM6_DEFAULT_IF_ID_WIDE,
- 	.ndisc_evict_nocarrier	=3D 1,
- 	.ra_honor_pio_life	=3D 0,
-+	.accept_pio_pflag	=3D 0,
- };
-=20
- static struct ipv6_devconf ipv6_devconf_dflt __read_mostly =3D {
-@@ -302,6 +303,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mos=
-tly =3D {
- 	.ioam6_id_wide		=3D IOAM6_DEFAULT_IF_ID_WIDE,
- 	.ndisc_evict_nocarrier	=3D 1,
- 	.ra_honor_pio_life	=3D 0,
-+	.accept_pio_pflag	=3D 0,
- };
-=20
- /* Check if link is ready: is it up and is a valid qdisc available */
-@@ -2762,6 +2764,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *=
-opt, int len, bool sllao)
- 	u32 addr_flags =3D 0;
- 	struct inet6_dev *in6_dev;
- 	struct net *net =3D dev_net(dev);
-+	bool ignore_autoconf_flag =3D false;
-=20
- 	pinfo =3D (struct prefix_info *) opt;
-=20
-@@ -2864,7 +2867,8 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *=
-opt, int len, bool sllao)
-=20
- 	/* Try to figure out our local address for this prefix */
-=20
--	if (pinfo->autoconf && in6_dev->cnf.autoconf) {
-+	ignore_autoconf_flag =3D READ_ONCE(in6_dev->cnf.accept_pio_pflag) && pinf=
-o->pdpreferred;
-+	if (pinfo->autoconf && in6_dev->cnf.autoconf && !ignore_autoconf_flag) {
- 		struct in6_addr addr;
- 		bool tokenized =3D false, dev_addr_generated =3D false;
-=20
-@@ -6926,6 +6930,15 @@ static const struct ctl_table addrconf_sysctl[] =3D =
-{
- 		.extra1		=3D SYSCTL_ZERO,
- 		.extra2		=3D SYSCTL_ONE,
- 	},
-+	{
-+		.procname	=3D "accept_pio_pflag",
-+		.data		=3D &ipv6_devconf.accept_pio_pflag,
-+		.maxlen		=3D sizeof(u8),
-+		.mode		=3D 0644,
-+		.proc_handler	=3D proc_dou8vec_minmax,
-+		.extra1		=3D SYSCTL_ZERO,
-+		.extra2		=3D SYSCTL_ONE,
-+	},
- #ifdef CONFIG_IPV6_ROUTER_PREF
- 	{
- 		.procname	=3D "accept_ra_rtr_pref",
---=20
-2.46.0.rc1.232.g9752f9e123-goog
+I think at the very least, instead of adding a new TCQ_F_BPF, let see if the 
+"owner == BPF_MODULE_OWNER" test can be reused like how it is done in the 
+bpf_try_module_get().
+
+
+A rough direction I am spinning...
+
+The pre/post is mainly to initialize and cleanup the "struct bpf_sched_data" 
+before/after calling the bpf prog.
+
+For the pre (init), there is a ".gen_prologue(...., const struct bpf_prog 
+*prog)" in the "bpf_verifier_ops". Take a look at the tc_cls_act_prologue().
+It calls a BPF_FUNC_skb_pull_data helper. It potentially can call a kfunc 
+bpf_qdisc_watchdog_cancel. However, the gen_prologue is invoked too late in the 
+verifier for kfunc calling now. This will need some thoughts and works.
+
+For the post (destroy,reset), there is no "gen_epilogue" now. If 
+bpf_qdisc_watchdog_schedule() is not allowed to be called in the ".reset" and 
+".destroy" bpf prog. I think it can be changed to pre also? There is a ".filter" 
+function in the "struct btf_kfunc_id_set" during the kfunc register.
+
+> +		err = bpf_qdisc_init_pre_op(sch, tca[TCA_OPTIONS], extack);
+> +		if (err != 0)
+> +			goto err_out4;
+> +	}
+> +#endif
+>   	if (ops->init) {
+>   		err = ops->init(sch, tca[TCA_OPTIONS], extack);
+>   		if (err != 0)
+> @@ -1388,6 +1395,10 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+>   	 */
+>   	if (ops->destroy)
+>   		ops->destroy(sch);
+> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_BPF_JIT)
+> +	if (sch->flags & TCQ_F_BPF)
+> +		bpf_qdisc_destroy_post_op(sch);
+> +#endif
+>   	qdisc_put_stab(rtnl_dereference(sch->stab));
+>   err_out3:
+>   	lockdep_unregister_key(&sch->root_lock_key);
+> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> index 76e4a6efd17c..0ac05665c69f 100644
+> --- a/net/sched/sch_generic.c
+> +++ b/net/sched/sch_generic.c
+> @@ -1033,6 +1033,10 @@ void qdisc_reset(struct Qdisc *qdisc)
+>   
+>   	if (ops->reset)
+>   		ops->reset(qdisc);
+> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_BPF_JIT)
+> +	if (qdisc->flags & TCQ_F_BPF)
+> +		bpf_qdisc_reset_post_op(qdisc);
+> +#endif
+>   
+>   	__skb_queue_purge(&qdisc->gso_skb);
+>   	__skb_queue_purge(&qdisc->skb_bad_txq);
+> @@ -1076,6 +1080,10 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+>   
+>   	if (ops->destroy)
+>   		ops->destroy(qdisc);
+> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_BPF_JIT)
+> +	if (qdisc->flags & TCQ_F_BPF)
+> +		bpf_qdisc_destroy_post_op(qdisc);
+> +#endif
+>   
+>   	lockdep_unregister_key(&qdisc->root_lock_key);
+>   	bpf_module_put(ops, ops->owner);
 
 
