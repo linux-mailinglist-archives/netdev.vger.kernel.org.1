@@ -1,64 +1,88 @@
-Return-Path: <netdev+bounces-113184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FBE793D167
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:00:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2DFB93D235
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:23:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BC7A281DF9
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 11:00:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 170461C20E74
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 11:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F4F178396;
-	Fri, 26 Jul 2024 10:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941AD179204;
+	Fri, 26 Jul 2024 11:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="lX0Q1WKd"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WsbqXiDd"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BC413A240;
-	Fri, 26 Jul 2024 10:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724301B27D
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 11:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721991598; cv=none; b=nCgyFwaV1b6yJ7zvmz2OKmuZigo29+L2S6kUY0DcW3bQXrFGj+ymiQ8w4aysg8C1D/svk9dvETL5NtVZ9sZn0uyBCHyTEGdjIMPScgJ/32aDYgoYSzSXc302ook3Rjp2cCC/VCMM98oWRLQiFNLTRj8wAWvo1j7tGb9FoBetuMQ=
+	t=1721992999; cv=none; b=F0BDnjADUgZrtOA90/xZv7ygWr7ddL7SB2tdZQttSiaDiHv+4E7M83E16EIbk/5t9fr7DyFeKJZxZA2Y9n3b1pW2HIPgatPDoNiNdYlwErsh2rcOelo3tFDCV8KxOo8S+7jy0vlQAeJZqRXSU/GUTO4BWPR3Y3vX9XPz/k8MVKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721991598; c=relaxed/simple;
-	bh=l6BKn5Rf+25HyR+STqqg2Anngh5cnBkr3f6y/Ps2SrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HPTYasRz+VqR+Dl0T/787wFajQtTNSaTIagspI8Y/kxiPLYmZisxFahJkw61wrEx5CWE21BpdJrNwk4F9qMD2JV5jk794HXAwhT/Jdw318DymvV+Tb7LKF12Jwb2oEIsqatUJ29A5b2vZZl6k0MNLhOVmDWA5MYg4wj9F47CtOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=lX0Q1WKd; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 7326983F;
-	Fri, 26 Jul 2024 12:59:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1721991550;
-	bh=l6BKn5Rf+25HyR+STqqg2Anngh5cnBkr3f6y/Ps2SrM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lX0Q1WKdu1wlVOAIGnPOueVyfc/gUEhEBSIxriuGjciHPbGN+ZRbx1wKRhax9a59V
-	 XKK4OqbfnkND8gahbL2g2bZSbgArktVs6k7KBMTCfGihya8zXz6SW2gK83oOa+iFI+
-	 e3HaNIrk9Ekvj4Ey7esmMcgz366Raet1fZghnoWc=
-Date: Fri, 26 Jul 2024 13:59:36 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Cc: Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240726105936.GC28621@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <3b9631cf12f451fc08f410255ebbba23081ada7c.camel@HansenPartnership.com>
- <668db67196ca3_1bc8329416@dwillia2-xfh.jf.intel.com.notmuch>
- <20240721192530.GD23783@pendragon.ideasonboard.com>
- <CAPybu_2tUmYtNiSExNGpsxcF=7EO+ZHR8eGammBsg8iFh3B3wg@mail.gmail.com>
- <20240722111834.GC13497@pendragon.ideasonboard.com>
- <CAPybu_1SiMmegv=4dys+1tzV6=PumKxfB5p12ST4zasCjwzS9g@mail.gmail.com>
- <20240725200142.GF14252@pendragon.ideasonboard.com>
- <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
+	s=arc-20240116; t=1721992999; c=relaxed/simple;
+	bh=g3iYoJ/xOC5CXkzy85OGGPvaJijHXAGfBV9Ykxb/4/I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ieKFRM+p6SRQ+rA8O5lu13IhA2wOYRkl0+wfWhC/oak55PcfwRaBTLEX3ZOTwBzXgooFqPWrcYTHWrK8Cbua56sHPEgIhWbvzzcWALGGqhJcR0VHylU/IdorOosXB/Kls3qmy/QbeQninqsZVdOLQd7G+zyZ9HOiQW2yMC9epmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WsbqXiDd; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2ef1c12ae23so13444711fa.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 04:23:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1721992995; x=1722597795; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Zs5/9dh9kzNZF0soHgfl7sH+psZq9eVrKa0HlKF7us=;
+        b=WsbqXiDdHxxUWzU3frAt5E0cT9uPYkRVSmRjfJ9gJTr+S+CAaSqFJ2giUEtdIkwz16
+         iaFuDS6ykq6UzLXOTyjwnEzAbKXE6QVn2q2JxR5E0q7htB5llGZ+rbRxuuVRIPnYNrCl
+         Nghn0MHtPXLou1GJSyVjo2efDN6AZqav8G8bf5KgeLF8koEa4soPgzJrLpezEBouOy7a
+         2p4+eXjsw82SNKAn5s0PMeLHwFTIWEm0W4YL9amZ0UqwAeFoiuv1RomkLK5WhTrQ9ARj
+         87jPF+qkOrpQKGRW7fZ9Ewtm4IzDD2hNLB6qwpwhmDMVGOjkNmCCsn5aoJVNXYK9RiY/
+         kEqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721992995; x=1722597795;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0Zs5/9dh9kzNZF0soHgfl7sH+psZq9eVrKa0HlKF7us=;
+        b=Cg6lZRNugRXUSSiiM+n5ORdRvyvLI/SDvrfAwaIkzUfYo1+EAZ7P+sCB/44GNQk2xo
+         6Ae8o2yp2qJjJ04h1Oh/d7RS6OHM404jSl578NwH7CsO1h0lNTLNCI16HcoLbkIAy1x4
+         0z8t7KWfkCpSg4F1+O2dpqzeltEzkExzAQQ5JbeLBXJXgN421gxVw2pP61snkZweoP2E
+         iRs66txkgSY8d5xG6PN/eJsUdtcJU5aNp4XQt9pyYASVLzCKFliofN1D2LKsxXWRMo5s
+         2TmfOOeR+4ADN1B8NfTifohy23577gsIkhUZqsEBv5D1GbB7nx8eX9ICItmc4Lua+qBq
+         dSGQ==
+X-Gm-Message-State: AOJu0Yxqae35NHpv/cFJzfJnbTf78cDe2lr4TBZHiBeJKhqICIwUnjNr
+	XdAHgezabuzQiEU1cSZfaws9qLuxC1TyNMMc4A8rkFWfOs/y0H+vJ+SaVTQ8+SY=
+X-Google-Smtp-Source: AGHT+IEes6Dgxn/QOeEAPPRRjxbv/ux9ajPyEOzR9oCgq7dxIkgd125b3gXuNn63KnWaFlM+9+dT/w==
+X-Received: by 2002:a2e:a9a0:0:b0:2ef:2c20:e064 with SMTP id 38308e7fff4ca-2f039cac142mr50798011fa.12.1721992995390;
+        Fri, 26 Jul 2024 04:23:15 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac63590d1esm1807685a12.27.2024.07.26.04.23.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 04:23:14 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Willem de Bruijn <willemb@google.com>,
+  kernel-team@cloudflare.com,
+  syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net 1/2] udp: Mark GSO packets as CHECKSUM_UNNECESSARY
+ early on on output
+In-Reply-To: <CAF=yD-LLPPg77MUhdXrHUVJj4o2+rnOC_qsHc_8tKurTsAGkYw@mail.gmail.com>
+	(Willem de Bruijn's message of "Thu, 25 Jul 2024 10:21:50 -0400")
+References: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
+	<20240725-udp-gso-egress-from-tunnel-v1-1-5e5530ead524@cloudflare.com>
+	<CAF=yD-LLPPg77MUhdXrHUVJj4o2+rnOC_qsHc_8tKurTsAGkYw@mail.gmail.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Fri, 26 Jul 2024 13:23:13 +0200
+Message-ID: <87h6ccl7mm.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,265 +90,208 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 26, 2024 at 10:04:33AM +0200, Ricardo Ribalda Delgado wrote:
-> On Thu, Jul 25, 2024 at 10:02 PM Laurent Pinchart wrote:
-> > On Mon, Jul 22, 2024 at 01:56:11PM +0200, Ricardo Ribalda Delgado wrote:
-> > > On Mon, Jul 22, 2024 at 1:18 PM Laurent Pinchart wrote:
-> > > > On Mon, Jul 22, 2024 at 12:42:52PM +0200, Ricardo Ribalda Delgado wrote:
-> > > > > On Sun, Jul 21, 2024 at 9:25 PM Laurent Pinchart wrote:
-> > > > > > On Tue, Jul 09, 2024 at 03:15:13PM -0700, Dan Williams wrote:
-> > > > > > > James Bottomley wrote:
-> > > > > > > > > The upstream discussion has yielded the full spectrum of positions on
-> > > > > > > > > device specific functionality, and it is a topic that needs cross-
-> > > > > > > > > kernel consensus as hardware increasingly spans cross-subsystem
-> > > > > > > > > concerns. Please consider it for a Maintainers Summit discussion.
-> > > > > > > >
-> > > > > > > > I'm with Greg on this ... can you point to some of the contrary
-> > > > > > > > positions?
-> > > > > > >
-> > > > > > > This thread has that discussion:
-> > > > > > >
-> > > > > > > http://lore.kernel.org/0-v1-9912f1a11620+2a-fwctl_jgg@nvidia.com
-> > > > > > >
-> > > > > > > I do not want to speak for others on the saliency of their points, all I
-> > > > > > > can say is that the contrary positions have so far not moved me to drop
-> > > > > > > consideration of fwctl for CXL.
-> > > > > > >
-> > > > > > > Where CXL has a Command Effects Log that is a reasonable protocol for
-> > > > > > > making decisions about opaque command codes, and that CXL already has a
-> > > > > > > few years of experience with the commands that *do* need a Linux-command
-> > > > > > > wrapper.
-> > > > > > >
-> > > > > > > Some open questions from that thread are: what does it mean for the fate
-> > > > > > > of a proposal if one subsystem Acks the ABI and another Naks it for a
-> > > > > > > device that crosses subsystem functionality? Would a cynical hardware
-> > > > > > > response just lead to plumbing an NVME admin queue, or CXL mailbox to
-> > > > > > > get device-specific commands past another subsystem's objection?
-> > > > > >
-> > > > > > My default answer would be to trust the maintainers of the relevant
-> > > > > > subsystems (or try to convince them when you disagree :-)). Not only
-> > > > > > should they know the technical implications best, they should also have
-> > > > > > a good view of the whole vertical stack, and the implications of
-> > > > > > pass-through for their ecosystem. This may result in a single NAK
-> > > > > > overriding ACKs, but we could also try to find technical solutions when
-> > > > > > we'll face such issues, to enforce different sets of rules for the
-> > > > > > different functions of a device.
-> > > > > >
-> > > > > > Subsystem hopping is something we're recently noticed for camera ISPs,
-> > > > > > where a vendor wanted to move from V4L2 to DRM. Technical reasons for
-> > > > > > doing so were given, and they were (in my opinion) rather excuses. The
-> > > > > > unspoken real (again in my opinion) reason was to avoid documenting the
-> > > > > > firmware interface and ship userspace binary blobs with no way for free
-> > > > > > software to use all the device's features. That's something we have been
-> > > > > > fighting against for years, trying to convince vendors that they can
-> > > > > > provide better and more open camera support without the world
-> > > > > > collapsing, with increasing success recently. Saying amen to
-> > > > > > pass-through in this case would be a huge step back that would hurt
-> > > > > > users and the whole ecosystem in the short and long term.
-> > > > >
-> > > > > In my view, DRM is a more suitable model for complex ISPs than V4L2:
-> > > >
-> > > > I know we disagree on this topic :-) I'm sure we'll continue the
-> > > > conversation, but I think the technical discussion likely belongs to a
-> > > > different mail thread.
-> > > >
-> > > > > - Userspace Complexity: ISPs demand a highly complex and evolving API,
-> > > > > similar to Vulkan or OpenGL. Applications typically need a framework
-> > > > > like libcamera to utilize ISPs effectively, much like Mesa for
-> > > > > graphics cards.
-> > > > >
-> > > > > - Lack of Standardization: There's no universal standard for ISPs;
-> > > > > each vendor implements unique features and usage patterns. DRM
-> > > > > addresses this through vendor-specific IOCTLs
-> > > > >
-> > > > > - Proprietary Architectures: Vendors often don't fully disclose their
-> > > > > hardware architectures. DRM cleverly only necessitates a Mesa
-> > > > > implementation, not comprehensive documentation.
-> > > >
-> > > > This point isn't technical and is more on-topic for this mail thread.
-> > > >
-> > > > V4L2 doesn't require hundreds of pages of comprehensive documentation in
-> > > > text form. An open-source userspace implementation that covers the
-> > > > feature set exposed by the driver is acceptable in place of
-> > > > documentation (provided, of course, that the userspace code wouldn't be
-> > > > deliberately obfuscated). This is similar in spirit to the rule for GPU
-> > > > DRM drivers.
-> > >
-> > > In DRM vendors typically define a custom IOCTL per driver to pass
-> > > command buffers.
-> > > Only the command buffer structure, and a mesa implementation using
-> > > that command buffer to support the standard features is required.
-> > >
-> > > In V4l2 custom IOCTLs are discouraged. Random command buffers cannot
-> > > be passed from userspace, they are typically formed in the driver from
-> > > a strictly checked struct.
-> >
-> > V4L2 has a mechanism to pass buffers between userspace and kernelspace,
-> > and that mechanism is used in mainline drivers to pass camera ISP
-> > parameters. They're not called "command buffers" but that's just a
-> > difference in terminology. The technical means to pass command buffers
-> > to the driver is thus there, I see no meaningful difference with DRM.
-> > Where things can differ is in the contents of those buffers, and the
-> > requirements for documentation or open userspace implementations, but
-> > that's not a technical question.
-> 
-> There are two things here:
-> 
-> - The political/strategic/philosophical/religious aspect: The industry
-> definitely prefers the strategic requirements imposed by DRM. In fact
-> some vendors had some huge legal troubles when they had tried to
-> follow v4l2 requirements.
+On Thu, Jul 25, 2024 at 10:21 AM -04, Willem de Bruijn wrote:
+> On Thu, Jul 25, 2024 at 5:56=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.=
+com> wrote:
+>>
+>> In commit 10154dbded6d ("udp: Allow GSO transmit from devices with no
+>> checksum offload") we have added a tweak in the UDP GSO code to mark GSO
+>> packets being sent out as CHECKSUM_UNNECESSARY when the egress device
+>> doesn't support checksum offload. This was done to satisfy the offload
+>> checks in the gso stack.
+>>
+>> However, when sending a UDP GSO packet from a tunnel device, we will go
+>> through the TX path and the GSO offload twice. Once for the tunnel devic=
+e,
+>> which acts as a passthru for GSO packets, and once for the underlying
+>> egress device.
+>>
+>> Even though a tunnel device acts as a passthru for a UDP GSO packet, GSO
+>> offload checks still happen on transmit from a tunnel device. So if the =
+skb
+>> is not marked as CHECKSUM_UNNECESSARY or CHECKSUM_PARTIAL, we will get a
+>> warning from the gso stack.
+>
+> I don't entirely understand. The check should not hit on pass through,
+> where segs =3D=3D skb:
+>
+>         if (segs !=3D skb && unlikely(skb_needs_check(skb, tx_path) &&
+> !IS_ERR(segs)))
+>                 skb_warn_bad_offload(skb);
+>
 
-That's I'm willing to debate.
+That's something I should have explained better. Let me try to shed some
+light on it now. We're hitting the skb_warn_bad_offload warning because
+skb_mac_gso_segment doesn't return any segments (segs =3D=3D NULL).
 
-> - The technical aspect: DRM is more mature when it comes to
-> sending/receiving buffers to the hardware, and an ISP looks *much*
-> more similar to an accel device or a GPU than a UVC camera.
+And that's because we bail out early out of __udp_gso_segment when we
+detect that the tunnel device is capable of tx-udp-segmentation
+(GSO_UDP_L4):
 
-But this I don't agree with. I think we should forgo the technical
-discussion and stop pretending that DRM is better for this use case from
-a technical point of view, and focus on the other aspect of the
-discussion. (We can of course reopen the technical discussion if new
-concrete arguments emerge.)
+	if (skb_gso_ok(gso_skb, features | NETIF_F_GSO_ROBUST)) {
+		/* Packet is from an untrusted source, reset gso_segs. */
+		skb_shinfo(gso_skb)->gso_segs =3D DIV_ROUND_UP(gso_skb->len - sizeof(*uh),
+							     mss);
+		return NULL;
+	}
 
-> > > > > Our current approach of pushing back against vendors, instead of
-> > > > > seeking compromise, has resulted in the vast majority of the market
-> > > > > (99% if not more) relying on out-of-tree drivers. This leaves users
-> > > > > with no options for utilizing their cameras outside of Android.
-> > > > >
-> > > > > DRM allows a hybrid model, where:
-> > > > > - Open Source Foundation: Standard use cases are covered by a fully
-> > > > > open-source stack.
-> > > > > - Vendor Differentiation: Vendors retain the freedom to implement
-> > > > > proprietary features (e.g., automatic makeup) as closed source.
-> > > >
-> > > > V4L2 does as well, you can implement all kind of closed-source ISP
-> > > > control algorithms in userspace, as long as there's an open-source
-> > > > implementation that exercises the same hardware features. A good analogy
-> > >
-> > > Is it really mandatory to have an open-source 3A algorithm? I thought
-> > > defining the input and output from the algorithm was good enough.
-> >
-> > What really matters is documenting the ISP parameters with enough
-> > details to allow for the implementation of open-source userspace code.
-> > Once you have that, 3A is quite simple. You can refine it (especially
-> > AWB) to great length, for instance using NPUs to compute parameters, and
-> > there's absolutely no issue with such userspace implementations being
-> > closed.
-> >
-> > In practice, some vendors prefer documenting the parameters by writing
-> > an open-source userspace implementation, partly maybe because developers
-> > are more familiar writing code than formal documentation. I would be
-> > fine either way, as long as there's enough information to make use of
-> > the ISP.
-> 
-> Even with vendor passthrough there is still a need to provide a full
-> open source implementation (probably based on libcamera).
+It has not occurred to me before, but in the spirit of commit
+8d74e9f88d65 "net: avoid skb_warn_bad_offload on IS_ERR" [1], we could
+tighten the check to exclude cases when segs =3D=3D NULL. I'm thinking of:
 
-We have a different interpretation of "full" :-) I want to aim for
-"full" to cover all the features exposed by the driver UAPI. There could
-be some exceptions that we can discuss if there are compeling arguments,
-but that would result in a 99% coverage, not a 20%, 50% or 80% coverage.
+	if (segs !=3D skb && !IS_ERR_OR_NULL(segs) && unlikely(skb_needs_check(skb=
+, tx_path)))
+		skb_warn_bad_offload(skb);
 
-> So you will have enough information to use all the common
-> functionality of a camera.
-> 
-> > > AFAIK for some time there was no ipu3 open source algorithm, and the
-> > > driver has been upstream.
-> >
-> > It sneaked in before we realized we had to enforce rules :-) That's
-> > actually a good example, when we wrote open-source userspace support, we
-> > realized that the level of documentation included in the IPU3 kernel
-> > header was nowhere close to what was needed to make use of the device.
-> >
-> > > > for people less familiar with ISPs is shader compilers, GPU vendors are
-> > > > free to ship closed-source implementations that include more
-> > > > optimizations, as long as the open-source, less optimized implementation
-> > > > covers the same GPU ISA, so that open-source developers can also work on
-> > > > optimizing it.
-> > >
-> > > I believe a more accurate description is that in v4l2 is that we
-> > > expect that all the registers, device architecture and behaviour to be
-> > > documented and accessed with standard IOCTLs. Anything not documented
-> > > cannot be accessed by userspace.
-> > >
-> > > In DRM their concern is that there is a fully open source
-> > > implementation that the user can use. Vendors have custom IOCTLs and
-> > > they can offer proprietary software for some use cases.
-> >
-> > Custom ioctls are not closed secrets in DRM, so comparing custom ioctls
-> > vs. standard ioctls isn't very relevant to this discussion. I really
-> > don't see how this would be about ioctls, it's about making the featured
-> > exposed by the drivers, through whatever means a particular subsystem
-> > allows, usable by open userspace.
-> >
-> > > > Thinking that DRM would offer a free pass-through path compared to V4L2
-> > > > doesn't seem realistic to me. Both subsystems will have similar rules.
-> > >
-> > > DRM does indeed allow vendors to pass random command buffers and they
-> > > will be sent to the hardware. We cannot do that in v4l2.
-> >
-> > You can pass a command buffer to a V4L2 device and have the driver send
-> > it to the device firmware (ISPs using real command buffers usually run a
-> > firmware). If you want the driver to be merged upstream, you have to
-> > document the command buffer in enough details.
-> 
-> Documenting with "enough details" is not enough. In V4L2, we have to
-> deeply inspect every single buffer to make sure that it is not sending
-> an unknown combination of command+arguments, or in other situations we
-> construct the command buffer in the driver.
-> 
-> > > I might be wrong, but GPU drivers do not deeply inspect the command
-> > > buffers to make sure that they do not use any feature not covered by
-> > > mesa.
-> >
-> > That's correct, but I don't think that's relevant. The GPU market has
-> > GLSL and Vulkan. An open-source compliant implementation will end up
-> > exercising a very very large part of the device ISA, command submission
-> > mechanism and synchronization primitives, if not all of it. There's
-> > little a vendor would keep under the hood and use in closed-source
-> > userspace only. For cameras, there's no standard userspace API that
-> > covers by design a very large part of what is the ISP equivalent of a
-> 
-> Libcamera supports Camera HAL3, gstreamer, v4l2, pipewire...
+That would be an alternative. Though I'm not sure I understand the
+consequences of such change fully yet. Namely if we're wouldn't be
+losing some diagnostics from the bad offload warning.
 
-Those are not comparable to GLSL or Vulkan, they are much higher level.
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3D8d74e9f88d65af8bb2e095aff506aa6eac755ada
 
-> If we are afraid of vendors providing "toy" implemententations to pass
-> the openness requirements, we can add more features/tests to
-> libcamera.
-> 
-> And at the end of the day, there will be humans deciding if what a
-> vendor has provided is good enough or not.
-> 
-> > GPU ISA. Even "command buffers" are not a proper description of the
-> > parameters the vast majority of ISPs consume.
-> 
-> Modern ISPs are definitely going in the direction of "command buffers"
+>> Today this can occur in two situations, which we check for in
+>> __ip_append_data() and __ip6_append_data():
+>>
+>> 1) when the tunnel device does not advertise checksum offload, or
+>> 2) when there are IPv6 extension headers present.
+>>
+>> To fix it mark UDP_GSO packets as CHECKSUM_UNNECESSARY early on the TX
+>> path, when still in the udp layer, since we need to have ip_summed set up
+>> correctly for GSO processing by tunnel devices.
+>
+> The previous patch converted segments post segmentation to
+> CHECKSUM_UNNECESSARY, which is fine as they had
+> already been checksummed in software, and CHECKSUM_NONE
+> packets on egress are common.
+>
+> This creates GSO packets without CHECKSUM_PARTIAL.
+> Segmentation offload always requires checksum offload. So these
+> would be weird new packets. And having CHECKSUM_NONE (or
+> equivalent), but entering software checksumming is also confusing.
 
-Examples please, with technical details. I've seen this argument being
-used for at least a year, with very little evidence. There are ISPs that
-are more programmable than others, but in practice firmwares mostly
-expose fixed functions, not ISA-level programmability.
+I agree this is confusing to reason about. That is a GSO packet with
+CHECKSUM_UNNECESSARY which has not undergone segmentation and csum
+offload in software.
 
-> > > > > This approach would allow billions of users to access their hardware
-> > > > > more securely and with in-tree driver support. Our current stubborn
-> > > > > pursuit of an idealistic goal has already negatively impacted both
-> > > > > users and the ecosystem.
-> > > > >
-> > > > > The late wins, in my opinion, cannot scale to the consumer market, and
-> > > > > Linux will remain a niche market for ISPs.
-> > > > >
-> > > > > If such a hybrid model goes against Linux goals, this is something
-> > > > > that should be agreed upon by the whole community, so we have the same
-> > > > > criteria for all subsystems.
+Kind of related, I noticed that turning off tx-checksum-ip-generic with
+ethtool doesn't disable tx-udp-segmentation. That looks like a bug.
 
--- 
-Regards,
+> The crux is that I don't understand why the warning fires on tunnel
+> exit when no segmentation takes place there. Hopefully we can fix
+> in a way that does not introduce these weird GSO packets (but if
+> not, so be it).
 
-Laurent Pinchart
+Attaching a self contained repro which I've been using to trace and
+understand the GSO code:
+
+---8<---
+
+sh# cat repro-full.py
+#!/bin/env python
+#
+# `modprobe ip6_tunnel` might be needed.
+#
+
+import os
+import subprocess
+import shutil
+from socket import *
+
+UDP_SEGMENT =3D 103
+
+cmd =3D [shutil.which("ip"), "-batch", "/dev/stdin"]
+script =3D b"""
+link set dev lo up
+
+link add name sink mtu 1540 type dummy
+addr add dev sink fd11::2/48 nodad
+link set dev sink up
+
+tunnel add iptnl mode ip6ip6 remote fd11::1 local fd11::2 dev sink
+link set dev iptnl mtu 1500
+addr add dev iptnl fd00::2/48 nodad
+link set dev iptnl up
+"""
+proc =3D subprocess.Popen(cmd, stdin=3Dsubprocess.PIPE)
+proc.communicate(input=3Dscript)
+
+os.system("ethtool -K sink tx-udp-segmentation off > /dev/null")
+os.system("ethtool -K sink tx-checksum-ip-generic off > /dev/null")
+
+# Alternatively to hopopts:
+# os.system("ethtool -K iptnl tx-checksum-ip-generic off")
+
+hopopts =3D b"\x00" * 8
+s =3D socket(AF_INET6, SOCK_DGRAM)
+s.setsockopt(IPPROTO_IPV6, IPV6_HOPOPTS, hopopts)
+s.setsockopt(SOL_UDP, UDP_SEGMENT, 145)
+s.sendto(b"x" * 3000, ("fd00::1", 9))
+sh# perf ftrace -G __skb_gso_segment --graph-opts noirqs,depth=3D5 -- unsha=
+re -n python repro-full.py
+# tracer: function_graph
+#
+# CPU  DURATION                  FUNCTION CALLS
+# |     |   |                     |   |   |   |
+ 16)               |  __skb_gso_segment() {
+ 16)   0.288 us    |    irq_enter_rcu(); /* =3D 0xffffa00c03d89ac0 */
+ 16)   0.172 us    |    idle_cpu(); /* =3D 0x0 */
+ 16)               |    skb_mac_gso_segment() {
+ 16)   0.184 us    |      skb_network_protocol(); /* =3D 0xdd86 */
+ 16)   0.161 us    |      __rcu_read_lock(); /* =3D 0x2 */
+ 16)               |      ipv6_gso_segment() {
+ 16)               |        rcu_read_lock_held() {
+ 16)   0.151 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
+*/
+ 16)   0.514 us    |        } /* rcu_read_lock_held =3D 0x1 */
+ 16)               |        rcu_read_lock_held() {
+ 16)   0.152 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
+*/
+ 16)   0.459 us    |        } /* rcu_read_lock_held =3D 0x1 */
+ 16)               |        rcu_read_lock_held() {
+ 16)   0.151 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
+*/
+ 16)   0.459 us    |        } /* rcu_read_lock_held =3D 0x1 */
+ 16)               |        udp6_ufo_fragment() {
+ 16)   0.237 us    |          __udp_gso_segment(); /* =3D 0x0 */
+ 16)   0.727 us    |        } /* udp6_ufo_fragment =3D 0x0 */
+ 16)   3.049 us    |      } /* ipv6_gso_segment =3D 0x0 */
+ 16)   0.171 us    |      __rcu_read_unlock(); /* =3D 0x1 */
+ 16)   4.748 us    |    } /* skb_mac_gso_segment =3D 0x0 */
+ 16)               |    skb_warn_bad_offload() {
+ [...]
+ 16) ! 785.215 us  |    } /* skb_warn_bad_offload =3D 0x0 */
+ 16) ! 800.986 us  |  } /* __skb_gso_segment =3D 0x0 */
+ 16)               |  __skb_gso_segment() {
+ 16)   0.394 us    |    irq_enter_rcu(); /* =3D 0xffffa00c03d89ac0 */
+ 16)   0.181 us    |    idle_cpu(); /* =3D 0x0 */
+ 16)               |    skb_mac_gso_segment() {
+ 16)   0.182 us    |      skb_network_protocol(); /* =3D 0xdd86 */
+ 16)   0.178 us    |      __rcu_read_lock(); /* =3D 0x3 */
+ 16)               |      ipv6_gso_segment() {
+ 16)               |        rcu_read_lock_held() {
+ 16)   0.155 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
+*/
+ 16)   0.556 us    |        } /* rcu_read_lock_held =3D 0x1 */
+ 16)               |        rcu_read_lock_held() {
+ 16)   0.159 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
+*/
+ 16)   0.480 us    |        } /* rcu_read_lock_held =3D 0x1 */
+ 16)               |        rcu_read_lock_held() {
+ 16)   0.159 us    |          rcu_lockdep_current_cpu_online(); /* =3D 0x1 =
+*/
+ 16)   0.480 us    |        } /* rcu_read_lock_held =3D 0x1 */
+ 16)               |        ip6ip6_gso_segment() {
+ 16) + 22.176 us   |          ipv6_gso_segment(); /* =3D 0xffffa00c03018c00=
+ */
+ 16) + 24.875 us   |        } /* ip6ip6_gso_segment =3D 0xffffa00c03018c00 =
+*/
+ 16) + 27.416 us   |      } /* ipv6_gso_segment =3D 0xffffa00c03018c00 */
+ 16)   0.230 us    |      __rcu_read_unlock(); /* =3D 0x2 */
+ 16) + 29.065 us   |    } /* skb_mac_gso_segment =3D 0xffffa00c03018c00 */
+ 16) + 32.828 us   |  } /* __skb_gso_segment =3D 0xffffa00c03018c00 */
+sh#
 
