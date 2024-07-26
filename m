@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-113204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD01A93D33D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:41:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAAC093D347
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 982B7283AA6
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:41:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B9F3B22787
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5C117D347;
-	Fri, 26 Jul 2024 12:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3B917B4F3;
+	Fri, 26 Jul 2024 12:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="f846Wd7/"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="0i7Ti99Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE10E17CA16;
-	Fri, 26 Jul 2024 12:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E4CA953;
+	Fri, 26 Jul 2024 12:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721997597; cv=none; b=WzGqF/EQrgIevWlfsa62HD1SXZJdvNo3B5je3a+kD5Xe1triJZ31CBRAmsPZqCjB+u5Y0dLbbUPUedOIS7Jg5tNi+bv81tpzzEWr7D1GV0K/AVdoEaBw58KJG06LH/H1r0zbTrQhR5M8MhXYxrTQG2E8XHUfn2QwNV8PosM6koE=
+	t=1721997628; cv=none; b=ZGe52DuK9FZu/I6BiYZqrB4oRt9Ly1vnmjWaYvOeDx3W+1SVVLTB4UliE5/1qYy7awLtF6+BsoMc8qft8PLkztyZdz1CgY89kni7gsROXLUEn4DhyOOWXQcZ2EAlld+YMmvh8teWIJLVAF7hQMEc6tTDYpEMDTE85DwMLIUbSac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721997597; c=relaxed/simple;
-	bh=jvYmE+tnyPlUCgCyhjI+/EZE9ItdD0OGY+p0y6rbJhQ=;
+	s=arc-20240116; t=1721997628; c=relaxed/simple;
+	bh=HTMQZME4GZqTFjwi5R+yunpA7xVUytFNf1qf2m5+vKg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kVtOSoKp3LPujr1DAYf+yL6F1bLXxuR60qfciP/hbVXUaAWDEzJgLAfTYkmN7H6dJd01EGx36lttwxvTqje8cmXpjuMTkJYSu7MihySwlJzTGf+CW8xFaD/wHQm9Tmn+tHGBfhC8JcAO1OdgOUtBMtDCqeEsGHV+JV7PdiYZ0ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=f846Wd7/; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=aMT1BiAh+1KzXOomIQDq5Qo4V2CuCPVwo8d4bCTeylTfV2HcHepKmvwu9ZO/HWrSjwBrwoJF9pMK0x1EMj+x27iHE0um1iqSQrJ3RIZVC/I+xvxFIVm/8PmXM7fS5ktK4IMbOt74kIxgXlSyKGnhtiiSNF5Lj6f7NsoC5+/IQHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=0i7Ti99Q; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1721997595; x=1753533595;
+  t=1721997627; x=1753533627;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jvYmE+tnyPlUCgCyhjI+/EZE9ItdD0OGY+p0y6rbJhQ=;
-  b=f846Wd7/YUREPQl93KzuJjS3bR9NmU8iSdadnpAad2x1G9Q8K5sgZvKA
-   nPLewSVU+BvY+XxP1GqHJi5BnfNsxSLijRggxwKh3V/wEtTQbAKKR/Nyd
-   veQVFxtWC6eZxh2WD6LjCTJXG4xWU1Iu7VLr8MbewLkz2oBySL2yB5k9p
-   Xu7xGyRH5hQtXlSqWxDzeb2up4ee1nfcmYw0x1y+Yd6exVaVlv6VjjrzN
-   rW3Top0C3jXCcDv+ZjPg1BEBccnuPZAFukPQVPzlqDej5S9miqKTTuAph
-   u6HSXZs0N3nrZw3/nI6oLbtoaEib6KpaEpQVWUHJi9pQwYBskbTziibkn
-   A==;
-X-CSE-ConnectionGUID: 9QqqTNubSCyt71n4eg2Syg==
-X-CSE-MsgGUID: dx4gLh1TRxuekPRrHEAPrQ==
+  bh=HTMQZME4GZqTFjwi5R+yunpA7xVUytFNf1qf2m5+vKg=;
+  b=0i7Ti99Qai3AEraJ+/12AW0pFWaNguBTnZkdYk5xEMARj21zSEicVmDp
+   4hTdyOItLgiMZB5XnAfjg0Nw56xeyVggyziMO/OBnLw1KYnT01lP/2fQg
+   rakziv4ivX+u4P1M2My/92GPi5bt/zV8t9UIf4s7PWtDjo2NfpQLIZXVw
+   VGXuEpwM3TR3vIGg/R8cg3mib58zO3n6kyTQA3KYPVw1cw97WVmFA+IdS
+   PBBmU5mTMwmFt9R8DeJSgghXyf82H2zvWxzcBPxG09lgZVq9JfjcjD93A
+   VPMvLIz6vH84NJmEReCtfiMlG0aYdtNwpg2xm4BRBM4y+kJV5w7m0yBpB
+   w==;
+X-CSE-ConnectionGUID: 8p2anauWQXeBrQFhbv5Fng==
+X-CSE-MsgGUID: Gg3pc2Q/QUmaogdKY/mixQ==
 X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="32523227"
+   d="scan'208";a="197145183"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jul 2024 05:39:52 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jul 2024 05:40:25 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jul 2024 05:39:42 -0700
+ 15.1.2507.35; Fri, 26 Jul 2024 05:39:51 -0700
 Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Jul 2024 05:39:33 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 26 Jul 2024 05:39:42 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
@@ -73,9 +73,9 @@ CC: <UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
 	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
 	<linux@bigler.io>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v5 07/14] net: phy: microchip_t1s: add c45 direct access in LAN865x internal PHY
-Date: Fri, 26 Jul 2024 18:09:00 +0530
-Message-ID: <20240726123907.566348-8-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v5 08/14] net: ethernet: oa_tc6: enable open alliance tc6 data communication
+Date: Fri, 26 Jul 2024 18:09:01 +0530
+Message-ID: <20240726123907.566348-9-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
 References: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
@@ -88,72 +88,72 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch adds c45 registers direct access support in Microchip's
-LAN865x internal PHY.
+Enabling Configuration Synchronization bit (SYNC) in the Configuration
+Register #0 enables data communication in the MAC-PHY. The state of this
+bit is reflected in the data footer SYNC bit.
 
-OPEN Alliance 10BASE-T1x compliance MAC-PHYs will have both C22 and C45
-registers space. If the PHY is discovered via C22 bus protocol it assumes
-it uses C22 protocol and always uses C22 registers indirect access to
-access C45 registers. This is because, we don't have a clean separation
-between C22/C45 register space and C22/C45 MDIO bus protocols. Resulting,
-PHY C45 registers direct access can't be used which can save multiple SPI
-bus access. To support this feature, set .read_mmd/.write_mmd in the PHY
-driver to call .read_c45/.write_c45 in the OPEN Alliance framework
-drivers/net/ethernet/oa_tc6.c
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/phy/microchip_t1s.c | 30 ++++++++++++++++++++++++++++++
+ drivers/net/ethernet/oa_tc6.c | 30 ++++++++++++++++++++++++++++++
  1 file changed, 30 insertions(+)
 
-diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-index 534ca7d1b061..3614839a8e51 100644
---- a/drivers/net/phy/microchip_t1s.c
-+++ b/drivers/net/phy/microchip_t1s.c
-@@ -268,6 +268,34 @@ static int lan86xx_read_status(struct phy_device *phydev)
- 	return 0;
+diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+index b9906d18840d..542d68d4b338 100644
+--- a/drivers/net/ethernet/oa_tc6.c
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -20,6 +20,10 @@
+ #define OA_TC6_REG_RESET			0x0003
+ #define RESET_SWRESET				BIT(0)	/* Software Reset */
+ 
++/* Configuration Register #0 */
++#define OA_TC6_REG_CONFIG0			0x0004
++#define CONFIG0_SYNC				BIT(15)
++
+ /* Status Register #0 */
+ #define OA_TC6_REG_STATUS0			0x0008
+ #define STATUS0_RESETC				BIT(6)	/* Reset Complete */
+@@ -559,6 +563,21 @@ static int oa_tc6_unmask_macphy_error_interrupts(struct oa_tc6 *tc6)
+ 	return oa_tc6_write_register(tc6, OA_TC6_REG_INT_MASK0, regval);
  }
  
-+/* OPEN Alliance 10BASE-T1x compliance MAC-PHYs will have both C22 and
-+ * C45 registers space. If the PHY is discovered via C22 bus protocol it assumes
-+ * it uses C22 protocol and always uses C22 registers indirect access to access
-+ * C45 registers. This is because, we don't have a clean separation between
-+ * C22/C45 register space and C22/C45 MDIO bus protocols. Resulting, PHY C45
-+ * registers direct access can't be used which can save multiple SPI bus access.
-+ * To support this feature, set .read_mmd/.write_mmd in the PHY driver to call
-+ * .read_c45/.write_c45 in the OPEN Alliance framework
-+ * drivers/net/ethernet/oa_tc6.c
-+ */
-+static int lan865x_phy_read_mmd(struct phy_device *phydev, int devnum,
-+				u16 regnum)
++static int oa_tc6_enable_data_transfer(struct oa_tc6 *tc6)
 +{
-+	struct mii_bus *bus = phydev->mdio.bus;
-+	int addr = phydev->mdio.addr;
++	u32 value;
++	int ret;
 +
-+	return __mdiobus_c45_read(bus, addr, devnum, regnum);
++	ret = oa_tc6_read_register(tc6, OA_TC6_REG_CONFIG0, &value);
++	if (ret)
++		return ret;
++
++	/* Enable configuration synchronization for data transfer */
++	value |= CONFIG0_SYNC;
++
++	return oa_tc6_write_register(tc6, OA_TC6_REG_CONFIG0, value);
 +}
 +
-+static int lan865x_phy_write_mmd(struct phy_device *phydev, int devnum,
-+				 u16 regnum, u16 val)
-+{
-+	struct mii_bus *bus = phydev->mdio.bus;
-+	int addr = phydev->mdio.addr;
+ /**
+  * oa_tc6_init - allocates and initializes oa_tc6 structure.
+  * @spi: device with which data will be exchanged.
+@@ -616,7 +635,18 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
+ 		return NULL;
+ 	}
+ 
++	ret = oa_tc6_enable_data_transfer(tc6);
++	if (ret) {
++		dev_err(&tc6->spi->dev, "Failed to enable data transfer: %d\n",
++			ret);
++		goto phy_exit;
++	}
 +
-+	return __mdiobus_c45_write(bus, addr, devnum, regnum, val);
-+}
+ 	return tc6;
 +
- static struct phy_driver microchip_t1s_driver[] = {
- 	{
- 		PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVB1),
-@@ -285,6 +313,8 @@ static struct phy_driver microchip_t1s_driver[] = {
- 		.features           = PHY_BASIC_T1S_P2MP_FEATURES,
- 		.config_init        = lan865x_revb0_config_init,
- 		.read_status        = lan86xx_read_status,
-+		.read_mmd           = lan865x_phy_read_mmd,
-+		.write_mmd          = lan865x_phy_write_mmd,
- 		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
- 		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
- 		.get_plca_status    = genphy_c45_plca_get_status,
++phy_exit:
++	oa_tc6_phy_exit(tc6);
++	return NULL;
+ }
+ EXPORT_SYMBOL_GPL(oa_tc6_init);
+ 
 -- 
 2.34.1
 
