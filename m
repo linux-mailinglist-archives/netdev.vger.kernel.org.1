@@ -1,326 +1,98 @@
-Return-Path: <netdev+bounces-113247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64BA193D521
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:30:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7975993D530
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4219D1F24B3F
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:30:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 225F51F248F4
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6DE13AF2;
-	Fri, 26 Jul 2024 14:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360E917583;
+	Fri, 26 Jul 2024 14:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LV3tcX3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D32125DE;
-	Fri, 26 Jul 2024 14:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1037D14A82;
+	Fri, 26 Jul 2024 14:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722004249; cv=none; b=J1NmYixnl1MS3Gfa9j0ml0WN7KYgD1voTFOxuw8nbcKDpv88GlImGzUkr/qFDcK8BruIs8C0NGd0SLQh5JuDOvE8qULuJ30MsopLOAINtftkmVw0X7kbTkxY/Tf6tS8Qyd2fUx5+MBNm4gX/OVXmuRThAw3wrHZbg016sav26/Y=
+	t=1722004643; cv=none; b=gnx6UcWLEqVFaK74TRZTBXttOpXdbn4Y/QODzBzzQ69f+MP/8Ag44m+4ltpolnixeQLiblmUDVo3jXlGXo6BUI1DeewUZp+kJReHMOyJlNaXyROiN2Yw0QdtGBy/ovnxwPmX1QZS8+gs5RG+0L76m4sFq1oV7fCj1oNqQnzDeBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722004249; c=relaxed/simple;
-	bh=hOesA2QWedcPj35Rmx+Hknb/KLR2+krxr/tfRQkK0IM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XnLG9ThYCEGrjE0u9p/34X20nvja0eW4tKc+/caUQIymlF/pA8GTjNMIlbetDeTCCuc3BcbO2Mv0NGuGURdN+wWEjHPGY0JzDxA8wmHIhQjA04Epr/LTZehlcclL26WMAJyJrRqfkfSlPr0lOpM8xiMc0hAZgKuWapIyL9P4E/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WVqqN5K68z6K7JW;
-	Fri, 26 Jul 2024 22:28:16 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2E1C4140D27;
-	Fri, 26 Jul 2024 22:30:44 +0800 (CST)
-Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 26 Jul
- 2024 15:30:43 +0100
-Date: Fri, 26 Jul 2024 15:30:42 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, Jakub
- Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
-	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid
- Bloch <lbloch@nvidia.com>, "Leon Romanovsky" <leonro@nvidia.com>,
-	<linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
-Subject: Re: [PATCH v2 1/8] fwctl: Add basic structure for a class subsystem
- with a cdev
-Message-ID: <20240726153042.00002749@Huawei.com>
-In-Reply-To: <1-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-	<1-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1722004643; c=relaxed/simple;
+	bh=K9n6/9ljGvN8OE9MvsVVA2kxnO51XIKmmlv7tH6PkhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gEUc6IDtIfn8xRu1FnJDveTBYgQu/Xk07JxWckKx/m0w/OufymX3vM+wf/jTZO6i71ZPsIJ425GraOkfz9q5xCU7n6DNiCWxuATTu3xagR4lIH6Oxt5bCuWsmtV4+EqFZRvmhZiY5ZdHyQMXOjreq2XID+0qWOwuNhS4M4G0CkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LV3tcX3Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E65C32782;
+	Fri, 26 Jul 2024 14:37:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722004642;
+	bh=K9n6/9ljGvN8OE9MvsVVA2kxnO51XIKmmlv7tH6PkhM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LV3tcX3ZY5uxA5zaIQDO0D7AjIPDH5rfeirV+afOqWWDFsFnZsuI/Pq6TVvXMLpMW
+	 4zjjEAwTn0yTi8K1Je3k59W7l8RaPbCu+7LY/xnHpKSSgWHGEZ+bO7tX4OXPAGJY7/
+	 l3dmEeRfMHdjXB5bLoy0YJgrBDahG5VVP7e+KakYr4Sl5POlak1oT9hklBhzSFcpdF
+	 RIWaT5kflebpBQoe5MJpOGw8EADcHHu4TWP0/7idcNDcnHU2CmTgbE8ZlCasWb1oF2
+	 kp8E+Ot4hJQ4qfE1P6lH5v0lCccR5QZ3LGqFAjtgUVcbw9EAYfq1quNHV+fzFo0Jf8
+	 uDnxEKBjVG/rQ==
+Date: Fri, 26 Jul 2024 07:37:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <magnus.karlsson@intel.com>, <aleksander.lobakin@intel.com>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+ <john.fastabend@gmail.com>, <bpf@vger.kernel.org>, Shannon Nelson
+ <shannon.nelson@amd.com>, Chandan Kumar Rout <chandanx.rout@intel.com>
+Subject: Re: [PATCH net 6/8] ice: improve updating ice_{t,
+ r}x_ring::xsk_pool
+Message-ID: <20240726073721.042b4d88@kernel.org>
+In-Reply-To: <ZqOn+Lgr2DoEae6d@boxer>
+References: <20240708221416.625850-1-anthony.l.nguyen@intel.com>
+	<20240708221416.625850-7-anthony.l.nguyen@intel.com>
+	<20240709184524.232b9f57@kernel.org>
+	<ZqBAw0AEkieW+y4b@boxer>
+	<20240724075742.0e70de49@kernel.org>
+	<ZqEieHlPdMZcPGXI@boxer>
+	<20240725063858.65803c85@kernel.org>
+	<ZqKaAz8rNOx/Sz5E@boxer>
+	<20240725160700.449e5b5f@kernel.org>
+	<ZqOn+Lgr2DoEae6d@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Mon, 24 Jun 2024 19:47:25 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> Create the class, character device and functions for a fwctl driver to
-> un/register to the subsystem.
+On Fri, 26 Jul 2024 15:43:20 +0200 Maciej Fijalkowski wrote:
+> > The _ONCE() helpers basically give you the ability to store the pointer
+> > to a variable on the stack, and that variable won't change behind your
+> > back. But the only reason to READ_ONCE(ptr->thing) something multiple
+> > times is to tell KCSAN that "I know what I'm doing", it just silences
+> > potential warnings :S  
 > 
-> A typical fwctl driver has a sysfs presence like:
+> I feel like you keep on referring to _ONCE (*) being used multiple times
+> which might be counter-intuitive whereas I was trying from the beginning
+> to explain my point that xsk pool from driver POV should get the very same
+> treatment as xdp prog has currently. So, either mark it as __rcu variable
+> and use rcu helpers or use _ONCE variants plus some sync.
 > 
-> $ ls -l /dev/fwctl/fwctl0
-> crw------- 1 root root 250, 0 Apr 25 19:16 /dev/fwctl/fwctl0
+> (*) Ok, if you meant from the very beginning that two READ_ONCE against
+> pool per single critical section is suspicious then I didn't get that,
+> sorry. With diff below I would have single READ_ONCE and work on that
+> variable for rest of the napi. Patch was actually trying to limit xsk_pool
+> accesses from ring struct by working on stack variable.
 > 
-> $ ls /sys/class/fwctl/fwctl0
-> dev  device  power  subsystem  uevent
-> 
-> $ ls /sys/class/fwctl/fwctl0/device/infiniband/
-> ibp0s10f0
-> 
-> $ ls /sys/class/infiniband/ibp0s10f0/device/fwctl/
-> fwctl0/
-> 
-> $ ls /sys/devices/pci0000:00/0000:00:0a.0/fwctl/fwctl0
-> dev  device  power  subsystem  uevent
-> 
-> Which allows userspace to link all the multi-subsystem driver components
-> together and learn the subsystem specific names for the device's
-> components.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Hi Jason,
+> Would you be okay with that?
 
-Mostly looking at this to get my head around what the details are,
-but whilst I'm reading might as well offer some review comments.
-
-I'm not a fan of too many mini patches as it makes it harder
-to review rather than easier, but meh, I know others prefer
-it this way.  If you are going to do it though, comments
-need to be carefully tracking what they are talking about.
-
-Jonathan
-
-
-
-...
-
-> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
-> new file mode 100644
-> index 00000000000000..6e9bf15c743b5c
-> --- /dev/null
-> +++ b/drivers/fwctl/main.c
-> @@ -0,0 +1,177 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> + */
-> +#define pr_fmt(fmt) "fwctl: " fmt
-> +#include <linux/fwctl.h>
-> +#include <linux/module.h>
-> +#include <linux/slab.h>
-> +#include <linux/container_of.h>
-> +#include <linux/fs.h>
-
-Trivial: Pick an ordering scheme perhaps as then we know where you'd
-like new headers to be added.
-
-> +
-> +enum {
-> +	FWCTL_MAX_DEVICES = 256,
-> +};
-> +static dev_t fwctl_dev;
-> +static DEFINE_IDA(fwctl_ida);
-
-
-> +static struct fwctl_device *
-> +_alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
-> +{
-> +	struct fwctl_device *fwctl __free(kfree) = kzalloc(size, GFP_KERNEL);
-> +	int devnum;
-> +
-> +	if (!fwctl)
-> +		return NULL;
-
-I'd put a blank line here.
-
-> +	fwctl->dev.class = &fwctl_class;
-> +	fwctl->dev.parent = parent;
-> +
-> +	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
-> +	if (devnum < 0)
-> +		return NULL;
-> +	fwctl->dev.devt = fwctl_dev + devnum;
-> +
-> +	device_initialize(&fwctl->dev);
-> +	return_ptr(fwctl);
-> +}
-> +
-> +/* Drivers use the fwctl_alloc_device() wrapper */
-> +struct fwctl_device *_fwctl_alloc_device(struct device *parent,
-> +					 const struct fwctl_ops *ops,
-> +					 size_t size)
-> +{
-> +	struct fwctl_device *fwctl __free(fwctl) =
-> +		_alloc_device(parent, ops, size);
-> +
-> +	if (!fwctl)
-> +		return NULL;
-> +
-> +	cdev_init(&fwctl->cdev, &fwctl_fops);
-> +	fwctl->cdev.owner = THIS_MODULE;
-
-Owned by fwctl core, not the parent driver?  Perhaps a comment on why.
-I guess related to the lifetime being independent of parent driver.
-
-> +
-> +	if (dev_set_name(&fwctl->dev, "fwctl%d", fwctl->dev.devt - fwctl_dev))
-> +		return NULL;
-> +
-> +	fwctl->ops = ops;
-> +	return_ptr(fwctl);
-> +}
-> +EXPORT_SYMBOL_NS_GPL(_fwctl_alloc_device, FWCTL);
-> +
-> +/**
-> + * fwctl_register - Register a new device to the subsystem
-> + * @fwctl: Previously allocated fwctl_device
-> + *
-> + * On return the device is visible through sysfs and /dev, driver ops may be
-> + * called.
-> + */
-> +int fwctl_register(struct fwctl_device *fwctl)
-> +{
-> +	int ret;
-> +
-> +	ret = cdev_device_add(&fwctl->cdev, &fwctl->dev);
-> +	if (ret)
-> +		return ret;
-> +	return 0;
-
-Doesn't look like this ever gets more complex so 
-
-	return cdev_device_add(...)
-
-If you expect to see more here in near future maybe fair enough
-to keep the handling as is.
-
-
-> +}
-> +EXPORT_SYMBOL_NS_GPL(fwctl_register, FWCTL);
-> +
-> +/**
-> + * fwctl_unregister - Unregister a device from the subsystem
-> + * @fwctl: Previously allocated and registered fwctl_device
-> + *
-> + * Undoes fwctl_register(). On return no driver ops will be called. The
-> + * caller must still call fwctl_put() to free the fwctl.
-> + *
-> + * Unregister will return even if userspace still has file descriptors open.
-> + * This will call ops->close_uctx() on any open FDs and after return no driver
-> + * op will be called. The FDs remain open but all fops will return -ENODEV.
-
-Perhaps bring the docs in with the support?  I got (briefly) confused
-by the lack of a path to close_uctx() in here.
-
-> + *
-> + * The design of fwctl allows this sort of disassociation of the driver from the
-> + * subsystem primarily by keeping memory allocations owned by the core subsytem.
-> + * The fwctl_device and fwctl_uctx can both be freed without requiring a driver
-> + * callback. This allows the module to remain unlocked while FDs are open.
-> + */
-> +void fwctl_unregister(struct fwctl_device *fwctl)
-> +{
-> +	cdev_device_del(&fwctl->cdev, &fwctl->dev);
-> +
-> +	/*
-> +	 * The driver module may unload after this returns, the op pointer will
-> +	 * not be valid.
-> +	 */
-> +	fwctl->ops = NULL;
-I'd bring that in with the logic doing close_uctx() etc as then it will align
-with the comments that I'd also suggest only adding there (patch 2 I think).
-
-> +}
-> +EXPORT_SYMBOL_NS_GPL(fwctl_unregister, FWCTL);
-> diff --git a/include/linux/fwctl.h b/include/linux/fwctl.h
-> new file mode 100644
-> index 00000000000000..ef4eaa87c945e4
-> --- /dev/null
-> +++ b/include/linux/fwctl.h
-> @@ -0,0 +1,68 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> + */
-> +#ifndef __LINUX_FWCTL_H
-> +#define __LINUX_FWCTL_H
-> +#include <linux/device.h>
-> +#include <linux/cdev.h>
-> +#include <linux/cleanup.h>
-> +
-> +struct fwctl_device;
-> +struct fwctl_uctx;
-> +
-> +struct fwctl_ops {
-> +};
-> +
-> +/**
-> + * struct fwctl_device - Per-driver registration struct
-> + * @dev: The sysfs (class/fwctl/fwctlXX) device
-> + *
-> + * Each driver instance will have one of these structs with the driver
-> + * private data following immeidately after. This struct is refcounted,
-
-immediately
-
-> + * it is freed by calling fwctl_put().
-> + */
-> +struct fwctl_device {
-> +	struct device dev;
-> +	/* private: */
-> +	struct cdev cdev;
-> +	const struct fwctl_ops *ops;
-> +};
-> +
-> +struct fwctl_device *_fwctl_alloc_device(struct device *parent,
-> +					 const struct fwctl_ops *ops,
-> +					 size_t size);
-> +/**
-> + * fwctl_alloc_device - Allocate a fwctl
-> + * @parent: Physical device that provides the FW interface
-> + * @ops: Driver ops to register
-> + * @drv_struct: 'struct driver_fwctl' that holds the struct fwctl_device
-> + * @member: Name of the struct fwctl_device in @drv_struct
-> + *
-> + * This allocates and initializes the fwctl_device embedded in the drv_struct.
-> + * Upon success the pointer must be freed via fwctl_put(). Returns NULL on
-> + * failure. Returns a 'drv_struct *' on success, NULL on error.
-> + */
-> +#define fwctl_alloc_device(parent, ops, drv_struct, member)                  \
-> +	container_of(_fwctl_alloc_device(                                    \
-> +			     parent, ops,                                    \
-> +			     sizeof(drv_struct) +                            \
-> +				     BUILD_BUG_ON_ZERO(                      \
-> +					     offsetof(drv_struct, member))), \
-Doesn't that fire a build_bug when the member is at the start of drv_struct?
-Or do I have that backwards?
-
-Does container_of() safely handle a NULL?  
-I'm staring at the definition and can't spot code to do that in 6.10
-
-> +		     drv_struct, member)
-> +
-
-
+Yup! That diff makes sense, thanks!
 
