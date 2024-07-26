@@ -1,189 +1,115 @@
-Return-Path: <netdev+bounces-113287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2982893D858
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:30:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF54293D85F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:31:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6DB21F21058
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 18:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11D41C233BA
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 18:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A144B3BBCB;
-	Fri, 26 Jul 2024 18:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B163BBC0;
+	Fri, 26 Jul 2024 18:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k7Io4BRC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Fn1U9iHB"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E64739879;
-	Fri, 26 Jul 2024 18:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FD63218B
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 18:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722018596; cv=none; b=Mp/IluttCpDvizQBCfId9wvFwTBuwdzBpbSVZTOex+8WzfMEmriRBBozuxpHZIX/TXkeVTy+H/9q/jLMRESCgW87vQXaK2IatMuPnQkvoAwZnMsHMkXFRh65dcC5uwvTzEtPjLVQgJEhbKFe3nDweanRt5CzIhlr/3DULCEGxU0=
+	t=1722018659; cv=none; b=ix9tT5yiTglJce8vQ+wHLZqCcXKIpkHrGh/Heko1s1oK/vEYUHT0j9736VQarrhM59azTITf3vQPYb7diU+LZAOD857+2opyKK4wmvCCl73KlZwsgM5ekewhsLnGj6Ws0NCVVwb5IZPsUsgWj22ZyHf9w6zBMffSjKX/jeQncpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722018596; c=relaxed/simple;
-	bh=PZyG589zZ1RF4v7wI64IEAe5dRLqrmXnoHxqLhuExaE=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=EHQq2PiCZqdcdtcGGX1qGOTWUJqq9g0GmD/Tb6VrXb46KLUywU/ewx5iIShddQtEhrl3e8s5uRVzNlfpDxSc7wYMwEnWaJ+IleXkx9KGSIhRLzELKwEx7WLxzlFVhIhatwYaA4oDgDi3OIfFtZAql5lJX9a+eKqQncQreI6rr2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=k7Io4BRC; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=BHfyk4lid0LBsgW6Qbi96iERQ2QA5oUayAU6ZwaA/x4=; b=k7Io4BRCAEY+B/E02cjwN2TFVm
-	+XHmCVyNg8Y/B/1ka63hMSeyuetois+YaavQDKjEOStsB/3GlrSkaLnkcLeud3Sda/9pPA3vMjuQ4
-	Fi/K0ZTyQip2ElONaLATr7HDwSfL905Y2MdZG5E0BS8HcRUSXQJhE4s0yXdFXCQ5Vb+aClxHP2P5v
-	3GImoefAgGKngWdw6A4bIhx1CO2ZBKanZZ+kWgZLi66ksDuxO3IeaRG8Ac0immDTdSA6ul8wY2Ofq
-	mrMv04ta0ABbpXgLBgqzgD6D0Kt+GE6htuFWvKmbGvfL8NDSXRUMWdT/Hn9Lxtc/K1sOAWS2Lewfu
-	RlWsRviA==;
-Received: from [2a00:23ee:1008:2bab:d45e:a5c6:d63:3c97] (helo=[IPv6:::1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sXPhG-00000004HMP-3wSJ;
-	Fri, 26 Jul 2024 18:29:43 +0000
-Date: Fri, 26 Jul 2024 19:28:28 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
- "Chashper, David" <chashper@amazon.com>,
- "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
- "Christopher S . Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20240726174958.00007d10@Huawei.com>
-References: <14d1626bc9ddae9d8ad19d3c508538d10f5a8e44.camel@infradead.org> <20240725012730-mutt-send-email-mst@kernel.org> <7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org> <20240725081502-mutt-send-email-mst@kernel.org> <f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org> <20240725082828-mutt-send-email-mst@kernel.org> <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org> <20240725083215-mutt-send-email-mst@kernel.org> <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org> <20240726174958.00007d10@Huawei.com>
-Message-ID: <811E8A25-3DBC-452D-B594-F9B7B0B61335@infradead.org>
+	s=arc-20240116; t=1722018659; c=relaxed/simple;
+	bh=j/KomTOcMyM/V6bDJdPxKUsTG92xGsRpdRN9eZeVWnQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=JC6W9mcoW2wDhMn8GMoZBlyXsbFQwV+we5kXRGmJU/+MeoNg+JkVXP63/3pGhBeVlJ6GSuwIdrP5Ol8IfXw/6jIm6Cr0qQ6Cm5M3E6sbeOlMq9vNjyZhQTafOYf8cn9jN0lmyiC4hKNoEf5Ze86NresmIowMpEw3UOE36UJ/dqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Fn1U9iHB; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c97e9ab2-dd71-4ce2-8a64-501309b39122@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722018654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h1O66myPDy+abPa0H7sgc/G3ypUdQwX+ppPK4jEw5fs=;
+	b=Fn1U9iHB147SlOZZThiBnzEks/09LpnsF0lbV957yUHG26Fa6A8me+QPjaN/s5/h5/UqrP
+	PkAxWANPsZsbOJBgWEHM+2HAOhBDY0O0cXmA0Yv26buDRrpOwZldLOENj5RgEgBwi3KlM3
+	Z2HljCJFOGLkS7C1CHjZpz+g47XGnk8=
+Date: Fri, 26 Jul 2024 11:30:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Subject: Re: [RFC PATCH v9 07/11] bpf: net_sched: Allow more optional
+ operators in Qdisc_ops
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn,
+ daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com,
+ martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
+ jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
+ xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+ <20240714175130.4051012-8-amery.hung@bytedance.com>
+ <f3bfe9a5-40e8-4a1c-a5e5-0f7f24b9e395@linux.dev>
+Content-Language: en-US
+In-Reply-To: <f3bfe9a5-40e8-4a1c-a5e5-0f7f24b9e395@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 26 July 2024 17:49:58 BST, Jonathan Cameron <Jonathan=2ECameron@Huawei=
-=2Ecom> wrote:
->On Thu, 25 Jul 2024 14:50:50 +0100
->David Woodhouse <dwmw2@infradead=2Eorg> wrote:
->
->> On Thu, 2024-07-25 at 08:33 -0400, Michael S=2E Tsirkin wrote:
->> > On Thu, Jul 25, 2024 at 01:31:19PM +0100, David Woodhouse wrote: =20
->> > > On Thu, 2024-07-25 at 08:29 -0400, Michael S=2E Tsirkin wrote: =20
->> > > > On Thu, Jul 25, 2024 at 01:27:49PM +0100, David Woodhouse wrote: =
-=20
->> > > > > On Thu, 2024-07-25 at 08:17 -0400, Michael S=2E Tsirkin wrote: =
-=20
->> > > > > > On Thu, Jul 25, 2024 at 10:56:05AM +0100, David Woodhouse wro=
-te: =20
->> > > > > > > > Do you want to just help complete virtio-rtc then? Would =
-be easier than
->> > > > > > > > trying to keep two specs in sync=2E =20
->> > > > > > >=20
->> > > > > > > The ACPI version is much more lightweight and doesn't take =
-up a
->> > > > > > > valuable PCI slot#=2E (I know, you can do virtio without PC=
-I but that's
->> > > > > > > complex in other ways)=2E
->> > > > > > >  =20
->> > > > > >=20
->> > > > > > Hmm, should we support virtio over ACPI? Just asking=2E =20
->> > > > >=20
->> > > > > Given that we support virtio DT bindings, and the ACPI "PRP0001=
-" device
->> > > > > exists with a DSM method which literally returns DT properties,
->> > > > > including such properties as "compatible=3Dvirtio,mmio" =2E=2E=
-=2E do we
->> > > > > already?
->> > > > >=20
->> > > > >  =20
->> > > >=20
->> > > > In a sense, but you are saying that is too complex?
->> > > > Can you elaborate? =20
->> > >=20
->> > > No, I think it's fine=2E I encourage the use of the PRP0001 device =
-to
->> > > expose DT devices through ACPI=2E I was just reminding you of its
->> > > existence=2E =20
->> >=20
->> > Confused=2E You said "I know, you can do virtio without PCI but that'=
-s
->> > complex in other ways" as the explanation why you are doing a custom
->> > protocol=2E =20
->>=20
->> Ah, apologies, I wasn't thinking that far back in the conversation=2E
->>=20
->> If we wanted to support virtio over ACPI, I think PRP0001 can be made
->> to work and isn't too complex (even though it probably doesn't yet work
->> out of the box)=2E
->>=20
->> But for the VMCLOCK thing, yes, the simple ACPI device is a lot simpler
->> than virtio-rtc and much more attractive=2E
->>=20
->> Even if the virtio-rtc specification were official today, and I was
->> able to expose it via PCI, I probably wouldn't do it that way=2E There'=
-s
->> just far more in virtio-rtc than we need; the simple shared memory
->> region is perfectly sufficient for most needs, and especially ours=2E
->>=20
->> I have reworked
->> https://git=2Einfradead=2Eorg/users/dwmw2/linux=2Egit/shortlog/refs/hea=
-ds/vmclock
->> to take your other feedback into account=2E
->>=20
->> It's now more flexible about the size handling, and explicitly checking
->> that specific fields are present before using them=2E=20
->>=20
->> I think I'm going to add a method on the ACPI device to enable the
->> precise clock information=2E I haven't done that in the driver yet; it
->> still just consumes the precise clock information if it happens to be
->> present already=2E The enable method can be added in a compatible fashi=
-on
->> (the failure mode is that guests which don't invoke this method when
->> the hypervisor needs them to will see only the disruption signal and
->> not precise time)=2E
->>=20
->> For the HID I'm going to use AMZNVCLK=2E I had used QEMUVCLK in the QEM=
-U
->> patches, but I'll change that to use AMZNVCLK too when I repost the
->> QEMU patch=2E
->
->That doesn't fit with ACPI _HID definitions=2E
->Second set 4 characters need to be hex digits as this is an
->ACPI style ID (which I assume this is given AMZN is a valid
->vendor ID=2E  6=2E1=2E5 in ACPI v6=2E5
->
->Maybe I'm missing something=2E=2E=2E
->
->J
->
->
+On 7/25/24 6:15 PM, Martin KaFai Lau wrote:
+>> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+>> index 5064b6d2d1ec..9fb9375e2793 100644
+>> --- a/net/sched/sch_api.c
+>> +++ b/net/sched/sch_api.c
+>> @@ -1352,6 +1352,13 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+>>           rcu_assign_pointer(sch->stab, stab);
+>>       }
+>> +#if defined(CONFIG_BPF_SYSCALL) && defined(CONFIG_BPF_JIT)
+>> +    if (sch->flags & TCQ_F_BPF) {
+> 
+> I can see the reason why this patch is needed. It is a few line changes and they 
+> are not in the fast path... still weakly not excited about them but I know it 
+> could be a personal preference.
+> 
+> I think at the very least, instead of adding a new TCQ_F_BPF, let see if the 
+> "owner == BPF_MODULE_OWNER" test can be reused like how it is done in the 
+> bpf_try_module_get().
+> 
+> 
+> A rough direction I am spinning...
+> 
+> The pre/post is mainly to initialize and cleanup the "struct bpf_sched_data" 
+> before/after calling the bpf prog.
+> 
+> For the pre (init), there is a ".gen_prologue(...., const struct bpf_prog 
+> *prog)" in the "bpf_verifier_ops". Take a look at the tc_cls_act_prologue().
+> It calls a BPF_FUNC_skb_pull_data helper. It potentially can call a kfunc 
+> bpf_qdisc_watchdog_cancel. However, the gen_prologue is invoked too late in the 
 
+typo. The kfunc should be s/qdisc_watchdog_cancel/qdisc_watchdog_init/ for the pre.
 
+> verifier for kfunc calling now. This will need some thoughts and works.
+> 
+> For the post (destroy,reset), there is no "gen_epilogue" now. If 
+> bpf_qdisc_watchdog_schedule() is not allowed to be called in the ".reset" and 
+> ".destroy" bpf prog. I think it can be changed to pre also? There is a ".filter" 
+> function in the "struct btf_kfunc_id_set" during the kfunc register.
+> 
+>> +        err = bpf_qdisc_init_pre_op(sch, tca[TCA_OPTIONS], extack);
+>> +        if (err != 0)
+>> +            goto err_out4;
+>> +    } 
 
-Hm, is the same not true for QEMUVGID and AMZNVGID, which I was using as a=
-n example?
-
-QEMU seemed to get to 0002, and AFAICT the VMGENID patches were initially =
-posted using QEMU0003, but what's actually in QEMU now is QEMUVGID=2E So I =
-presumed that was now the preferred option=2E
 
