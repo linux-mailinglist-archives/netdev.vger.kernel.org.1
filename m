@@ -1,129 +1,166 @@
-Return-Path: <netdev+bounces-113257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631F093D58B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:05:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F167B93D5C7
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:15:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C12E1F22D67
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:05:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A40CD283B2C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC8D1CD3D;
-	Fri, 26 Jul 2024 15:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcaZyWa+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C497617577;
+	Fri, 26 Jul 2024 15:15:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D93CBA53;
-	Fri, 26 Jul 2024 15:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CB317838B;
+	Fri, 26 Jul 2024 15:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722006307; cv=none; b=U5pSLkRvRZ6RyIQOCgZ/acx26OKgb0CMRzgueh5yCNWx+CUX1m0BBUy/AM25LXjBI/jJ0F5SDKFckAFi/uXxRKUH7XM1ZQMhIx8R0bTj8CDAXz2OQyReqROW4PxSFPm5aheVn8pFVql3Q4dsesPKyRxSW9kBovCoh7nd8oCdyco=
+	t=1722006910; cv=none; b=q2oGZTboFfLEA0uzC0yCyxx9N71u9SrgzXdJJ4xN/MmsTbaKfRwOpzzpcpdfuH9boaJU5gRiAKQrRzDZ5sjWJrGjP8OxqjG4rA/Ios2wWMFIqxZHM1N7yGeJzEsd3KrV1GhhyJ2V9BBjafSW03eoKUVHmjkziY/BZ/207NI9HJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722006307; c=relaxed/simple;
-	bh=KQ+QVKQ67JPyWmdy372+U0rPCho3OrSUr0D1G+qLUHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sdtotAka1GBrImuO22LZxcsjglRAZyxME5rkhzE8jCEXKI8vf2xY9bEyDL2nhi8wdmJWvRX9hBxr/3xlvu6m0hPqDLjtdJfVKkTINpf6S4KeuuIIkWSDm7NXhNs8+RlVlFHm6e5DaM+16A+I2I1qclameRQQfsiQiXtvnZlFm+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcaZyWa+; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-82c30468266so217705241.0;
-        Fri, 26 Jul 2024 08:05:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722006305; x=1722611105; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wvj1Ca5nVOPovMpEJijtfF3dALD2KklkmvzpDeQp7y8=;
-        b=hcaZyWa+73OKbULUZAG/HP34SqIOTfadMITneBU/lBPDGyhuBp6ialzxhA4STymT8s
-         Bx4k//BjfDj2EKiKWbGyvDQeqQt0buhp+QSiOz8xzL94fd3uUvriQhF3YYYCq52aXgNv
-         MO6OwooIfntLoR5FmvrQntk4fxbxL31UXw+jbO7eJqxGY+XHlp9BUPJLHWYtASk7c/aF
-         ScflG/Mu+dN076USAUZq0DNT2WVpA3hHsM9jt56ztP3FHSdosEik2eo+pQmiMaigJaQB
-         piqsnHiGxJDhUy3iNtvdEvxxuBoILnbaLbw98NkaRyul3WmT7hslvs+bJF+Ze6hq+b2I
-         h7Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722006305; x=1722611105;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wvj1Ca5nVOPovMpEJijtfF3dALD2KklkmvzpDeQp7y8=;
-        b=pkMGWaZr9M2Q6nnM7SOOAbiht4is+3pdW/Iu9bVjUs1MqsnMAJ9zkE2tAKgZC6kx9F
-         OrT5kroZprpEnvcgSQRETHvIgYM2NfxuKD3A5Evj0UEDfh95iMEyV+SFDNn2M2+HQKds
-         6QibVtAVUp+oyEh1cS+EzNJb/AIgUJhEJMNoei1LenH/t18Iewf1SGswqBkpZozTEYTH
-         xh+jcKgJe7+tnjaBHkiB1WqJRDgWpI8pmOAHdzENR5BMwTpBo5VhVVwAExotOE2OiiZT
-         IxT6i2+uaTNro5m8WdMGoTLtReFJI+HjL4bTrJmskfqrkYohcTslxBijvxDu4u6RqxLH
-         8u+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUxlCihz/fD70gzY8Nc71l5eCEJ8c6zySCVaSiZbIczREiCMQtLGiLzg9z8V1L3nrrxoU3oUeK6U6IEMRwC0r+AoWUexY83
-X-Gm-Message-State: AOJu0YzZA4PhhEvJCPzpEaEQbj88/7h/oZRlQ2MC2pm9nQ1x3C7zgl8o
-	r2FmJSN4xYBipV0NCLCCSJuQTzZQIh8Ha8XLzRV609Yh7oX1ctY1R4SA5A==
-X-Google-Smtp-Source: AGHT+IHPQZnid0m5X/U++vBLKieyuPShqbtLPr27CoSqUc8XaT1syY/6aI4EJGPZPdU4RqUrSynLyg==
-X-Received: by 2002:a05:6102:3b16:b0:492:99d6:e71a with SMTP id ada2fe7eead31-493d9ae0f89mr5367863137.18.1722006304881;
-        Fri, 26 Jul 2024 08:05:04 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-493d98afb56sm661051137.25.2024.07.26.08.05.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 08:05:04 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-07-26
-Date: Fri, 26 Jul 2024 11:05:02 -0400
-Message-ID: <20240726150502.3300832-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1722006910; c=relaxed/simple;
+	bh=GOS5OzmoM+mCYghAchIDjKEcmg9M9uoWCw0h6GVOPwk=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KM2ryyNrZe/yQwNYDxMS0Hgd+UFEQJkxBytUjX032rKRCCCJVrbbLQAvRq3DW15XEU/wTPDoRlBMaWwlM4q754+AISZr3mM2Hwzb/IVuladCBlg+N5eFDAdZggdt6kybiSCWlgC89xioyB6IY7k0UaIuDdFVXuxP5VvXCZZ0Sgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WVrpm2b2vz6K6Kl;
+	Fri, 26 Jul 2024 23:12:48 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id EA632140AB8;
+	Fri, 26 Jul 2024 23:15:04 +0800 (CST)
+Received: from localhost (10.203.174.77) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 26 Jul
+ 2024 16:15:04 +0100
+Date: Fri, 26 Jul 2024 16:15:03 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, Jakub
+ Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
+	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>, David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>, Leonid
+ Bloch <lbloch@nvidia.com>, "Leon Romanovsky" <leonro@nvidia.com>,
+	<linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
+Subject: Re: [PATCH v2 3/8] fwctl: FWCTL_INFO to return basic information
+ about the device
+Message-ID: <20240726161503.00001c85@Huawei.com>
+In-Reply-To: <3-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+	<3-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-The following changes since commit 225990c487c1023e7b3aa89beb6a68011fbc0461:
+On Mon, 24 Jun 2024 19:47:27 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-  net: phy: realtek: add support for RTL8366S Gigabit PHY (2024-07-26 14:29:06 +0100)
+> Userspace will need to know some details about the fwctl interface being
+> used to locate the correct userspace code to communicate with the
+> kernel. Provide a simple device_type enum indicating what the kernel
+> driver is.
 
-are available in the Git repository at:
+As below - maybe consider a UUID?
+Would let you decouple allocating those with upstreaming drivers.
+We'll just get annoying races on the enum otherwise as multiple
+drivers get upstreamed that use this.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-07-26
+> 
+> Allow the device to provide a device specific info struct that contains
+> any additional information that the driver may need to provide to
+> userspace.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/fwctl/main.c       | 53 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/fwctl.h      |  8 ++++++
+>  include/uapi/fwctl/fwctl.h | 29 +++++++++++++++++++++
+>  3 files changed, 90 insertions(+)
+> 
+> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
+> index 6872c01d5c62e8..f1dec0b590aee4 100644
+> --- a/drivers/fwctl/main.c
+> +++ b/drivers/fwctl/main.c
+> @@ -17,6 +17,8 @@ enum {
+>  static dev_t fwctl_dev;
+>  static DEFINE_IDA(fwctl_ida);
+>  
+> +DEFINE_FREE(kfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T));
 
-for you to fetch changes up to df3d6a3e01fd82cb74b6bb309f7be71e728a3448:
+Why need for a new one?  That's the same as the one in slab.h from
+6.9 onwards. Before that it was
+if (_T)
 
-  Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning (2024-07-26 10:57:09 -0400)
+I was going to suggest promoting this to slab.h and then found
+the normal implementation had been improved since I last checked.
 
-----------------------------------------------------------------
-bluetooth pull request for net:
 
- - btmtk: Fix kernel crash when entering btmtk_usb_suspend
- - btmtk: Fix btmtk.c undefined reference build error
- - btintel: Fail setup on error
- - hci_sync: Fix suspending with wrong filter policy
- - hci_event: Fix setting DISCOVERY_FINDING for passive scanning
+>  
+>  /**
+> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+> index 0bdce95b6d69d9..39db9f09f8068e 100644
+> --- a/include/uapi/fwctl/fwctl.h
+> +++ b/include/uapi/fwctl/fwctl.h
+> @@ -36,6 +36,35 @@
+>   */
+>  enum {
+>  	FWCTL_CMD_BASE = 0,
+> +	FWCTL_CMD_INFO = 0,
+> +	FWCTL_CMD_RPC = 1,
+>  };
+>  
+> +enum fwctl_device_type {
+> +	FWCTL_DEVICE_TYPE_ERROR = 0,
+> +};
+> +
+> +/**
+> + * struct fwctl_info - ioctl(FWCTL_INFO)
+> + * @size: sizeof(struct fwctl_info)
+> + * @flags: Must be 0
+> + * @out_device_type: Returns the type of the device from enum fwctl_device_type
 
-----------------------------------------------------------------
-Arnd Bergmann (2):
-      Bluetooth: btmtk: Fix btmtk.c undefined reference build error harder
-      Bluetooth: btmtk: remove #ifdef around declarations
+Maybe a UUID?  Avoid need to synchronize that list for ever.
 
-Chris Lu (2):
-      Bluetooth: btmtk: Fix kernel crash when entering btmtk_usb_suspend
-      Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+> + * @device_data_len: On input the length of the out_device_data memory. On
+> + *	output the size of the kernel's device_data which may be larger or
+> + *	smaller than the input. Maybe 0 on input.
+> + * @out_device_data: Pointer to a memory of device_data_len bytes. Kernel will
+> + *	fill the entire memory, zeroing as required.
 
-Kiran K (1):
-      Bluetooth: btintel: Fail setup on error
+Why do we need device in names of these two?
 
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_sync: Fix suspending with wrong filter policy
-      Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning
+> + *
+> + * Returns basic information about this fwctl instance, particularly what driver
+> + * is being used to define the device_data format.
+> + */
+> +struct fwctl_info {
+> +	__u32 size;
+> +	__u32 flags;
+> +	__u32 out_device_type;
+> +	__u32 device_data_len;
+> +	__aligned_u64 out_device_data;
+> +};
+> +#define FWCTL_INFO _IO(FWCTL_TYPE, FWCTL_CMD_INFO)
+> +
+>  #endif
 
- drivers/bluetooth/Kconfig   |  2 ++
- drivers/bluetooth/btintel.c |  3 +++
- drivers/bluetooth/btmtk.c   |  5 ++++-
- net/bluetooth/hci_core.c    |  7 -------
- net/bluetooth/hci_event.c   |  5 +++--
- net/bluetooth/hci_sync.c    | 21 +++++++++++++++++++++
- 6 files changed, 33 insertions(+), 10 deletions(-)
 
