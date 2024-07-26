@@ -1,55 +1,83 @@
-Return-Path: <netdev+bounces-113280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D24793D798
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:28:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 965AF93D7AF
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:33:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E9201C23162
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:28:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22134B20EC2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA4D17C9E1;
-	Fri, 26 Jul 2024 17:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4764817D342;
+	Fri, 26 Jul 2024 17:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwgILJXC"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="L/AxQ2X/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2B811C83
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F66817C7DF
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722014908; cv=none; b=It3ecwUz8soIWR8cSGCuDEojevQKifsjUVwSTTcSr9ZjBS97PUa0BKNfFf0FvXX0SPK0Asu/04bRGGkAWdJFY9UMtKf59RzpXJk/t+q3L0smAJ4DqfTShPlhf52VjyWyziVQD2gHqSxfPTuVbSFLlZTZJ6QhQt6VX4Tutg81/hg=
+	t=1722015220; cv=none; b=QKhcvKkpH0PG4hW7f06ZWTJl06vNP+3N7/aE1UkUHSp2odz+G+FbZLOkocXFk23iv62xhojAdgXpiBWqXLmPyXVmo+cO91rFOydVtH5aF28UXTvSG3/Grg4rQdGHyYyU6Oa5zXtQDXafDaa0yVuQwPbrmBcplNqUVEijv8KGeoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722014908; c=relaxed/simple;
-	bh=LWnLwuV8oe2vBX2TVbJ2qUu/Jv8nP26LMaZlcXzTRf0=;
+	s=arc-20240116; t=1722015220; c=relaxed/simple;
+	bh=e3N5bWu4r8Swl4BzWy7i9jr2amOi1C9JqeLg+IveS6I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SPm5NQK1qw7+ThGGBVKZGXb1xX3wK8WlpOb6JhjgdJLE3r9XZv9vw1S6ia/d/G3VH5sBDnEEUAspyAGPacXTjXno8UgYdwnLr5BNbAW66Cs/Prk/FT17r6DA9+rYUe0rzpY6CaXZn+ABEtZCCZo7Hs6YC1K4NL98Yzu8H8r3Sxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwgILJXC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A435C32782;
-	Fri, 26 Jul 2024 17:28:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722014907;
-	bh=LWnLwuV8oe2vBX2TVbJ2qUu/Jv8nP26LMaZlcXzTRf0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IwgILJXCbWuFD9NP18tPLnp5RjlTvAtCiR7IiyCPYvI5hdGqSyAPUMHM8o2wfy4ym
-	 4auXvHsIgdcBeJXR8yDzlgsN4eRsLc49uwDV0IO7ZTlcpBEKQtxpN/ZHQWZa9cbhH0
-	 sk89UpUp0M6GRKGUjHOBMWdgNoHYRHU/mLYnB2AnFV1NDxlRa9xAGcqg0L/OzfJQX+
-	 /shWJFeDi5Htq3qeTlzmqZXd7Fgow3Mvd5Ys0Yy+zYA5GevEtNbF8mup0l6G5ci3gr
-	 LkGRfb5txbLmwdVk9xL/mtTdC5U/uu1bU4CEPmcyv6EnTLxyU0SvQRSY05pDNZ+MZb
-	 vbnB9IJ2XogIw==
-Date: Fri, 26 Jul 2024 18:28:23 +0100
-From: Simon Horman <horms@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v4 iwl-next 0/4] ice: Implement PTP support for E830
- devices
-Message-ID: <20240726172823.GA1699125@kernel.org>
-References: <20240726113631.200083-6-karol.kolacinski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CB3JSCK97Qb2kkBTSFqXBFhvXQ1ZfT0gRfbW2k2yxHykoZA77/wfXGSz+jEaQJT6l+RguN/nEEVnGO2bIYko7bFBL/+RXWXx9J+1aayggSpc/GzPkNL873Lpmr1f3PiuKB76V3133JZezX67ytZ8kuDkZIuiNwpKJJVsv81X1kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=L/AxQ2X/; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3684b48d586so177067f8f.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1722015217; x=1722620017; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c/B7g0UHHGpKr5sLCW2cjeH3RTgEO1uT2YFJABG6Bsg=;
+        b=L/AxQ2X/vE1foV9AVQePKmFWvxkRMHronlqCPy6jXR/gyJELOmzyDLNeyI6VRBvaku
+         oQMl7tjz6k3zcRCvZN+wmSk3ZYyrga5l2odxYIe9VuIY/GDNigCm2+SWhBd8lZYRA5ZC
+         aaRsduoOGrqWQ6HqDTHLMI/YlcbG9KQAZnhFU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722015217; x=1722620017;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c/B7g0UHHGpKr5sLCW2cjeH3RTgEO1uT2YFJABG6Bsg=;
+        b=DvP4IzujyF+0n4LqRg3jOPuCWrNHenSh1g+jlb/0rbDS0fmB3pVcrFwIGoKiMhEhEV
+         y1wrz4cZe9QtYL3EnMCBYqzu32begeqEanfSDYlU7QXVgyONHGkQIPJ84kzyGIrjV2b1
+         FyhhcWC4KFyXjpVkj4prNFwRefNlT8yjGQJ5+hUa2AcGOcXx1/4VUZ430n8Aqt/rUp9T
+         MC1XbCwPs5FwvsoLFWuHwLxcrgCIeimM/b7BPBcxPAR9jTepLc4zje5m/6HWx6GlwcE+
+         DF+53MZVIIihGowBeR3kDZZfMk2Px0pp03BMKotDl15NMONTskhbspiX26li09U4CbiG
+         4Ktw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHDaa+cf7geIleVq2nYWuF73E48SigI0N/S7NrW9Xv1ZXYx7j1De6tY6/vj3LmQDyefbP9rxs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMkL/h0KhXi10cxjimZEdZEj4vDXQI/QDb1PWtJ0jXDP26VwNW
+	htXj0nPJRDGzyMhVA30c2IYnxmCdaxg+Z5Rk8QokBoh0/ilZuyaclA4tpo26Pbg=
+X-Google-Smtp-Source: AGHT+IG3ue2Wp3NAwG+80cC1hBEBaxqYkh1o6tYlzluNcJg5ps4z/XxOoMXpw4ib8InHKvN9IoLe0A==
+X-Received: by 2002:a5d:59a2:0:b0:367:95e3:e4c6 with SMTP id ffacd0b85a97d-36b34cec909mr2845449f8f.1.1722015216751;
+        Fri, 26 Jul 2024 10:33:36 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36858179sm5684617f8f.88.2024.07.26.10.33.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 10:33:36 -0700 (PDT)
+Date: Fri, 26 Jul 2024 19:33:34 +0200
+From: Daniel Vetter <daniel.vetter@ffwll.ch>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <ZqPd7i22_oyPB2UN@phenom.ffwll.local>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
+ <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com>
+ <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,50 +86,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240726113631.200083-6-karol.kolacinski@intel.com>
+In-Reply-To: <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+X-Operating-System: Linux phenom 6.9.7-amd64 
 
-On Fri, Jul 26, 2024 at 01:34:42PM +0200, Karol Kolacinski wrote:
-> Add specific functions and definitions for E830 devices to enable
-> PTP support.
-> Refactor processing of timestamping interrupt and cross timestamp
-> to avoid code redundancy.
+On Wed, Jul 24, 2024 at 04:37:21PM -0400, James Bottomley wrote:
+> On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
+> [...]
+> > What I get from the discussions I've followed or partcipated in over
+> > the years is that the main worry of free software communities is
+> > being forced to use closed-source userspace components, whether that
+> > would be to make the device usable at all, or to achieve decent level
+> > of performance or full feature set. We've been through years of
+> > mostly closed-source GPU support, of printer "windrivers", and quite
+> > a few other horrors. The good news is that we've so far overcome lots
+> > (most) of those challenges. Reverse engineering projects paid off,
+> > and so did working hand-in-hand with industry actors in multiple ways
+> > (both openly and behind the scenes). One could then legitimately ask
+> > why we're still scared.
 > 
-> Jacob Keller (1):
->   ice: combine cross timestamp functions for E82x and E830
+> I don't think I am.  We're mostly fully capable of expounding at length
+> on the business rationale for being open if the thing they're hiding
+> isn't much of a differentiator anyway (or they're simply hiding it to
+> try to retain some illusion of control), so we shouldn't have any fear
+> of being able to make our case in language business people understand.
 > 
-> Karol Kolacinski (2):
->   ice: Process TSYN IRQ in a separate function
->   ice: Add timestamp ready bitmap for E830 products
-> 
-> Michal Michalik (1):
->   ice: Implement PTP support for E830 devices
-> 
->  drivers/net/ethernet/intel/Kconfig            |  10 +-
->  drivers/net/ethernet/intel/ice/ice_common.c   |  17 +-
->  drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
->  .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 +
->  drivers/net/ethernet/intel/ice/ice_main.c     |  25 +-
->  drivers/net/ethernet/intel/ice/ice_osdep.h    |   3 +
->  drivers/net/ethernet/intel/ice/ice_ptp.c      | 356 ++++++++++++------
->  drivers/net/ethernet/intel/ice/ice_ptp.h      |   9 +-
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 208 +++++++++-
->  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  25 +-
->  drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
->  11 files changed, 508 insertions(+), 159 deletions(-)
-> 
-> V3 -> V4: Further kdoc fixes in "ice: Implement PTP support for
->           E830 devices"
-> V2 -> V3: Rebased and fixed kdoc in "ice: Implement PTP support for
->           E830 devices"
-> V1 -> V2: Fixed compilation issue in "ice: Implement PTP support for
->           E830 devices"
+> I also think this fear is partly a mindset problem on our part.  We
+> came out of the real fight for openness and we do embrace things like a
+> licence that forces open code (GPL) and symbols that discourage
+> proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
+> FSF coolaid that if we don't stand over manufacturers every second and
+> force them they'll slide back to their old proprietary ways.  However,
+> if you look at the entirely permissive ecosystem that grew up after we
+> did (openstack, docker, kubernetes, etc.) they don't have any such fear
+> and yet they still have large amounts of uncompelled openness and give
+> back.
 
-As the recent changes are about kdoc, please consider running
-kernel-doc -none -Wall and ensuring no new warnings are introduced:
-ice_is_e830 needs a short description.
+This matches my experience. Legal and technical roadblocks help a bit in
+the margins, but they don't matter. The open gpu stack is 90% MIT, and
+nvidia and all the others have demonstrated for years how easy it is to
+ignore the GPL'ed part.
 
-And, perhaps things crossed in flight.
-But please address the review by Jacob and Alexander of v3.
+What gets vendors involved is a successful project that drives revenue,
+where they have a clear need for a seat at the table to make sure the good
+times for them continue. Clear rules what it takes to get that seat is in
+my experience really the driving force for private discussions with
+vendors, and from that pov the most important thing I've ever done for the
+open gpu stack is this little documentation section:
 
-Thanks!
+https://dri.freedesktop.org/docs/drm/gpu/drm-uapi.html#open-source-userspace-requirements
+
+Unlike laws you can legalese around and code you can trick with hacks for
+an endless game of whack-a-mole the above doc was the real stick. And it
+absolutely needed the carrot of the successful project that financially
+matters to work.
+
+Cheers, Sima
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
