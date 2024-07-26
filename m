@@ -1,176 +1,147 @@
-Return-Path: <netdev+bounces-113305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29A3993D9ED
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 22:41:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC11E93D9F5
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 22:44:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB331C22147
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83F2A28265A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6683B149C41;
-	Fri, 26 Jul 2024 20:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98007149C45;
+	Fri, 26 Jul 2024 20:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SSFCuIhc"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NFt+XvOB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A071818641
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 20:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0A418641
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 20:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722026486; cv=none; b=bpRCvJfHotAVWtW8iVxeTQ3KMuk7492RT1CPW2/kmB8CDtrSW0+YQ9gg2ULsVTuWy5ccveTH5MdsCHXuRJ3qCnoussA0prcG/VgPPPKa1T7wfcnN1p/ImJR/grEwoZOyZyAvlxIbCaDOBHOiApy+Z/4JWKASVZF+dTEwHCnqntY=
+	t=1722026680; cv=none; b=DmVSSTI72bNCDcqFJwFSvfPkLyhbsznTraCEhWvi6tb+qWyU5m+gi/wf6mV2bFCP19X83DL30kwfTTvsmPYr+S4k3jEiFrZFpYh6QHWfgaMoiibOPqE3B0lA0hQdfmQJRQoBJLWMWjRLpYs2SJi+It2I61FlXBJfE7Nvsf1CTt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722026486; c=relaxed/simple;
-	bh=Xu8XGUMdaHDgeQaKtIvNfP+89TJiirX2byjvvfiXrZM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=txQOE3tJe4exPtQTlIbsdjlQERvAKDzLf5NPlnwjNPTYBl0/UgoB4DY/nBxuAfAloykzDqNnch+wZPO7JwF2QJQx6VHt5L89wq1dvCxRXAMf4DvlYjKyLeBrv3FwdzLyUTzNSIV3/wCQ/E/P806o+OwwsDQ2rbWf0LKD+6n8Y7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SSFCuIhc; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1722026680; c=relaxed/simple;
+	bh=yo5IJPIYdUzkxkWYr7kywSn3pZSlnPmArx0lgNP2t/A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OoplDdBIu4s00FlT1IMiWm972fFDucYk65wtXdKDpqnW64b4iuCNCxyVqXYbQHIWGTcBnXn5KxY7ZCdeBmuUFrTrMY3zuwmvOE2Ec/+vn4h3Lp+RW882jbN6SmRGybUhuWLHm0BON5zVsZRz7zlMsHH8VUqnkhxGzK2vShaCPJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NFt+XvOB; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46QBtkHB021699;
-	Fri, 26 Jul 2024 20:41:15 GMT
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46QBaWwl014138;
+	Fri, 26 Jul 2024 20:44:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=5B0ZsC6DzjD5EZvnG7aoqKzluxFOBZgrrV8
-	fTysh+O8=; b=SSFCuIhcXi/lWDTS6mzV+UNyznO6nmSlkhMoIehrCpSm1+jDDf4
-	d0p86x5yQaYv3OSRKDKki8pxX+RXkZUWB1a0vH4CQooKVXcsKujhne6s3Fg8Aoid
-	/TWXTo4z6GZnO3WkyiRqpfkXWKVMcL2BfCTC4UmVnUL6cppZHpqGmnuaHYvks+kQ
-	W9DSb26mzRxLq/nO4UU7oNn9MarfmO53DOAX2jkCOL14s5fBVCjAiLu7Ew3DpxqI
-	PKta4FJWF0ZJgU2D+ZbBlwQYh30uKGGCAv0r4Fdq0WgtsEjpeIIrijgttUNVx3s9
-	zLnyweP86z3yEO9izA6eI+4Jx+hGWhluQlA==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40m1sv2ewv-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	L8tARZs2c0FVJ1VgmiHYwfPTLAMgxsUgZ742SZHGH4o=; b=NFt+XvOBVXwAkCRH
+	QxQRjRQDGOW6Q/4ChKctFOcfdpLtg2nPojthAB1AADoEA7/etNkzk+ul3hWoqQ4X
+	tNJds8tNxC44q5B7lL9ZGtLFPyvA0Du84kkC+CeVQbhcgRXHs21Qvmb87Y4OIEDH
+	rC5qZuCaxWU8zOr890v9ecaObe9PEaMfYUIZfEmPKR1jFGxj4QNDCS0Fdvd0jIPK
+	OjPptLP2NEo5KTn5Ux+3BIFlVu4VRVL/X9yBMStFJAI09zdKH95gaoDH+JZsxw4X
+	j4SVXKuP0XACxMJj7APq3aAvkWc70tdIgYG1exvlYCcSBX4B49ylZuBjqsmwYSnM
+	8VoaWg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40m1vq2da8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 20:41:15 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA05.qualcomm.com [127.0.0.1])
-	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 46QKbVbG016816;
-	Fri, 26 Jul 2024 20:41:14 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA05.qualcomm.com (PPS) with ESMTPS id 40mdnqag3p-1
+	Fri, 26 Jul 2024 20:44:32 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46QKiWXw022609
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 20:41:14 +0000
-Received: from NALASPPMTA05.qualcomm.com (NALASPPMTA05.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 46QKbViB016807;
-	Fri, 26 Jul 2024 20:41:14 GMT
-Received: from hu-devc-lv-u22-c.qualcomm.com (hu-subashab-lv.qualcomm.com [10.81.24.15])
-	by NALASPPMTA05.qualcomm.com (PPS) with ESMTPS id 46QKfD43027970
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 20:41:14 +0000
-Received: by hu-devc-lv-u22-c.qualcomm.com (Postfix, from userid 212624)
-	id B463C64A; Fri, 26 Jul 2024 13:41:13 -0700 (PDT)
-From: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
-To: edumazet@google.com, soheil@google.com, ncardwell@google.com,
-        yyd@google.com, ycheng@google.com, davem@davemloft.net,
-        kuba@kernel.org, netdev@vger.kernel.org, dsahern@kernel.org,
-        pabeni@redhat.com
-Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>,
-        Sean Tranchetti <quic_stranche@quicinc.com>
-Subject: [PATCH net v2] tcp: Adjust clamping window for applications specifying SO_RCVBUF
-Date: Fri, 26 Jul 2024 13:41:05 -0700
-Message-Id: <20240726204105.1466841-1-quic_subashab@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	Fri, 26 Jul 2024 20:44:32 GMT
+Received: from [10.38.246.7] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 26 Jul
+ 2024 13:44:29 -0700
+Message-ID: <bba8b50d-d116-42c4-adde-a8045df36961@quicinc.com>
+Date: Fri, 26 Jul 2024 14:43:53 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: Adjust clamping window for applications
+ specifying SO_RCVBUF
+To: Eric Dumazet <edumazet@google.com>
+CC: <soheil@google.com>, <ncardwell@google.com>, <yyd@google.com>,
+        <ycheng@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+        <netdev@vger.kernel.org>, Sean Tranchetti <quic_stranche@quicinc.com>
+References: <20240725215542.894348-1-quic_subashab@quicinc.com>
+ <CANn89iJ5eGCGgF+_4VxXXV_oMv8Bi-Ugq+MG6=bs+74FR63GUQ@mail.gmail.com>
+Content-Language: en-US
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+In-Reply-To: <CANn89iJ5eGCGgF+_4VxXXV_oMv8Bi-Ugq+MG6=bs+74FR63GUQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 8pxACz_9E3G-T1sog6MpZjpdPo2nFyVs
-X-Proofpoint-GUID: 8pxACz_9E3G-T1sog6MpZjpdPo2nFyVs
+X-Proofpoint-GUID: N20cBhYTVZf5YXTl90t7aAvGyOvXXnxN
+X-Proofpoint-ORIG-GUID: N20cBhYTVZf5YXTl90t7aAvGyOvXXnxN
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-07-26_12,2024-07-26_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 suspectscore=0 impostorscore=0 bulkscore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- adultscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407260139
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0
+ priorityscore=1501 mlxlogscore=837 impostorscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2407110000 definitions=main-2407260139
 
-tp->scaling_ratio is not updated based on skb->len/skb->truesize once
-SO_RCVBUF is set leading to the maximum window scaling to be 25% of
-rcvbuf after
-commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-and 50% of rcvbuf after
-commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio").
-50% tries to emulate the behavior of older kernels using
-sysctl_tcp_adv_win_scale with default value.
 
-Systems which were using a different values of sysctl_tcp_adv_win_scale
-in older kernels ended up seeing reduced download speeds in certain
-cases as covered in https://lists.openwall.net/netdev/2024/05/15/13
-While the sysctl scheme is no longer acceptable, the value of 50% is
-a bit conservative when the skb->len/skb->truesize ratio is later
-determined to be ~0.66.
-
-Applications not specifying SO_RCVBUF update the window scaling and
-the receiver buffer every time data is copied to userspace. This
-computation is now used for applications setting SO_RCVBUF to update
-the maximum window scaling while ensuring that the receive buffer
-is within the application specified limit.
-
-Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-Signed-off-by: Sean Tranchetti <quic_stranche@quicinc.com>
-Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
----
-v1 -> v2
-  Update the condition for SO_RCVBUF window_clamp updates to always
-  monitor the current rcvbuf value as suggested by Eric.
-
- net/ipv4/tcp_input.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 454362e359da..e2b9583ed96a 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -754,8 +754,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
- 	 * <prev RTT . ><current RTT .. ><next RTT .... >
- 	 */
- 
--	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
--	    !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-+	if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf)) {
- 		u64 rcvwin, grow;
- 		int rcvbuf;
- 
-@@ -771,12 +770,22 @@ void tcp_rcv_space_adjust(struct sock *sk)
- 
- 		rcvbuf = min_t(u64, tcp_space_from_win(sk, rcvwin),
- 			       READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
--		if (rcvbuf > sk->sk_rcvbuf) {
--			WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
-+		if (!(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-+			if (rcvbuf > sk->sk_rcvbuf) {
-+				WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
- 
--			/* Make the window clamp follow along.  */
--			WRITE_ONCE(tp->window_clamp,
--				   tcp_win_from_space(sk, rcvbuf));
-+				/* Make the window clamp follow along.  */
-+				WRITE_ONCE(tp->window_clamp,
-+					   tcp_win_from_space(sk, rcvbuf));
-+			}
-+		} else {
-+			/* Make the window clamp follow along while being bounded
-+			 * by SO_RCVBUF.
-+			 */
-+			int clamp = tcp_win_from_space(sk, min(rcvbuf, sk->sk_rcvbuf));
-+
-+			if (clamp > tp->window_clamp)
-+				WRITE_ONCE(tp->window_clamp, clamp);
- 		}
- 	}
- 	tp->rcvq_space.space = copied;
--- 
-2.34.1
-
+On 7/26/2024 3:40 AM, Eric Dumazet wrote:
+> On Thu, Jul 25, 2024 at 11:55 PM Subash Abhinov Kasiviswanathan
+> <quic_subashab@quicinc.com> wrote:
+>>
+>>           */
+>>
+>> -       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
+>> -           !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
+>> +       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf)) {
+>>                  u64 rcvwin, grow;
+>>                  int rcvbuf;
+>>
+>> @@ -771,12 +770,24 @@ void tcp_rcv_space_adjust(struct sock *sk)
+>>
+>>                  rcvbuf = min_t(u64, tcp_space_from_win(sk, rcvwin),
+>>                                 READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
+>> -               if (rcvbuf > sk->sk_rcvbuf) {
+>> -                       WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
+>> +               if (!(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
+>> +                       if (rcvbuf > sk->sk_rcvbuf) {
+>> +                               WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
+>>
+>> -                       /* Make the window clamp follow along.  */
+>> -                       WRITE_ONCE(tp->window_clamp,
+>> -                                  tcp_win_from_space(sk, rcvbuf));
+>> +                               /* Make the window clamp follow along.  */
+>> +                               WRITE_ONCE(tp->window_clamp,
+>> +                                          tcp_win_from_space(sk, rcvbuf));
+>> +                       }
+>> +               } else {
+>> +                       /* Make the window clamp follow along while being bounded
+>> +                        * by SO_RCVBUF.
+>> +                        */
+>> +                       if (rcvbuf <= sk->sk_rcvbuf) {
+> 
+> I do not really understand this part.
+> I am guessing this test will often be false and your problem won't be fixed.
+> You do not handle all  sysctl_tcp_adv_win_scale values (positive and negative)
+> 
+> I would instead not use "if (rcvbuf <= sk->sk_rcvbuf) {"
+> 
+> and instead :
+> 
+> else {
+>        int clamp = tcp_win_from_space(sk, min(rcvbuf, sk->sk_rcvbuf));
+> 
+>        if (clamp > tp->window_clamp)
+>              WRITE_ONCE(tp->window_clamp, clamp);
+> }
+Thanks Eric, I've updated this in v2.
 
