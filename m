@@ -1,108 +1,125 @@
-Return-Path: <netdev+bounces-113138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F170B93CCD4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 05:04:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C1C93CCFA
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 05:27:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB6D32831FF
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:04:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 064811C20F10
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 03:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB487200DB;
-	Fri, 26 Jul 2024 03:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA4D224F6;
+	Fri, 26 Jul 2024 03:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SjvML9KI"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="jml3XhKW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5525F80B;
-	Fri, 26 Jul 2024 03:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76944D299;
+	Fri, 26 Jul 2024 03:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721963071; cv=none; b=U0Z/5H7PrmLxWLiKplEcKyopAKLcEyIGEJQ7huqo0KtjSEjqcJe829S5WeMCY5E2UIMJMZhwKjkb1WcAlvr5VKcAFytXcnV0J7s5Gcr4X9BjCUdBT7uhwWEfpkwQPSQNaDrkTvyjO6Pv54eF93Prs6nS1EgvXS8f8Gl3I1q/eg0=
+	t=1721964451; cv=none; b=qLafVAeCoMar7urUuP0ZcNkqhS9fR/fUpz25hcn6DQhfCu99x0dUOzG90sSQ605vO7et2jZliE59090hEwwe+0Ot6cUvl3tITNCpCjCR72ycXzPBhveo5V8mKzx3M1f8QSFU7uiy92QglJ5QiL4z9SNPD89Z6r+QItByLIPZ7fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721963071; c=relaxed/simple;
-	bh=awyum7uYEbOYA9xUJvq86opnRgKll/wMBwoEm3AIOCI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZpJh8tKUw+irhWPo0Qlomi/c1hitKeulvYCROc5mEeQ3jkZNwKyhMvMoE1Rnpwa8bU3yUYYExhHujFFzg6s0Bh0hbJspwzX5gw42Y4iUEPjKqp/VDqWHHW5cKNxq/X0N/ptdSZ0pjzGweFAiBZ0eCJgwYIFq4Ub/zeMkwflCVP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SjvML9KI; arc=none smtp.client-ip=209.85.222.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-8317511fd45so142926241.1;
-        Thu, 25 Jul 2024 20:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721963069; x=1722567869; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=awyum7uYEbOYA9xUJvq86opnRgKll/wMBwoEm3AIOCI=;
-        b=SjvML9KI29L+ZfeFYGgJYMhzEyZpiBuyRtj5OpB4pmlGGh8EALEQwM+JZlHRb6hjgX
-         QoiHppRBSLoyrh/MTyOdr8xAcs0sGdP48Ypg7RT0kSIj9zKGBlt/8R7BO0sbm1oIYeOH
-         yVfKIUZjmOLM2EOd1831RMgLXT7BBm1sp4LhDKWAfh4F8mWvbP2SzArtkpwph+238xU3
-         lI0YR/vrWOfmiKKagC5RPf9rfL319UXGJ9cRLKAHb8L+O6VsjecMbKI6BFANDxesVRrA
-         83uPEZn2ZlNPkZxxOUEgAMgLXudf4tdmu+UBKR3Woc1uF4SdktBTSrCCeBs8/cnOoHSP
-         YdEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721963069; x=1722567869;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=awyum7uYEbOYA9xUJvq86opnRgKll/wMBwoEm3AIOCI=;
-        b=gLSLMD3SErKvbUqSzZICHISXBBlDwRfvJq0OnwZoOROH+IWcSxbVNkd2Hd+s6Y2lrG
-         yCVxIoGyTxOLvadBjG+UchcTtkgjmlBN2faZPJO2jw+ymztsYmkFq4WYGsfqKhGbelnK
-         /i+0YuyTsJjJvE//dKd+z4mOMKPbDz6O+6bE3uMrLvMFVXxkipuu1m6yEL89+mRM+3B9
-         BuG2oNL9im0WJ5KgShzSrDlN5rUdYhqsUJOeVU1bSPXBIWrspJQz7TT3Igj8nfsrQA2Z
-         hSCFVZ8uUY0loFs+KAcl42/zLHya2XlMdW97ERKtMe18dv7+itJHTjp7KGc1M3/0fVNn
-         oLtA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7aJ3h9DkiRj6ghIuDTd360EY3I5Yo1RCTo1iUyUnGPEUe4HcP4KGzryJBK/FX82y65hpcEdpuCZn44iQ5P7LuNIbq3EZs/rYMPMTkHGoOMEsdq0wQtUCwi6sN8zUV3z7yeluvynkZH3Ci4avjAVcDmlN+R5lG+Z6D
-X-Gm-Message-State: AOJu0YyqyNyeWjWNKRi38mSCflksNajg93LrHv/pMV8g7fREUQ+rWD9f
-	NPxuomVtkxm6PxEW0d3EbN5/eDGikyhfJR5g1IYqIbjwy1rVc+8rd/Srp0KhW9yNyjpBvW+4Q6K
-	mZ+o3MDtfr5ARF0CcLe2wWWZLPaM=
-X-Google-Smtp-Source: AGHT+IFFhyXMjhrDnEO+19jgwrk1TFuAn/A0IXjXP28f/riODB+Y1WO91AloV+Vabda/xzpqMFfY7XTxrA6bN4XYvsk=
-X-Received: by 2002:a05:6102:5e8b:b0:492:76e9:961a with SMTP id
- ada2fe7eead31-493d629ca4bmr4489134137.1.1721963069028; Thu, 25 Jul 2024
- 20:04:29 -0700 (PDT)
+	s=arc-20240116; t=1721964451; c=relaxed/simple;
+	bh=87lvqZGx1ddg3kiAFcaM/B4GCaBLdsnwkTGBUe8+qaY=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DW00Zpafkq3l1bzKJfB30DHwrrsA1F/MNtt2K5nAKUlLspk22so0CD+evyTsMtNjtqkxukcR3JwX7ilw7xFW8xkOrZg5vAeuDEBYwcTe5mi74Le7sK54rAGwKeBetSmqT0/S1ZFkbLpmkajGDSURSK/Y/tKuqYzVnayZ53Gk+Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=jml3XhKW; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 46Q3QlNW2031537, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1721964407; bh=87lvqZGx1ddg3kiAFcaM/B4GCaBLdsnwkTGBUe8+qaY=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=jml3XhKWAxs+f7QgxoJpbe3EWUCuUsDocEmkds8tgi24m4XlZ8Rt8A9RUREyMcmiC
+	 GMLsUGmOfruh5UJZPXXY88uD3iGlxdhVRVLoGuUv5l7WtUzoA8X5XcM70RTShuuEI6
+	 XNL07urq/rRMpiMU0OV+loUIoqVM3wyQ58EfvuK+hjjviFpUJ2iWuKamlhUzBHmzM6
+	 DLAsuFZeQPEbkemcOAfvTd0WyJRwTNOGj6X1MPtCarLCJdGaJ4zO1SWkTW3WX6LekA
+	 itqp5xb/SLHJ+7Y0P7vcAjnw8F+fRG124+NuOqBRZsOw24TMxI16lM6Lyzs0LW50Wm
+	 XTu+28VA0Fajg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 46Q3QlNW2031537
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 26 Jul 2024 11:26:47 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 26 Jul 2024 11:26:48 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 26 Jul 2024 11:26:47 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Fri, 26 Jul 2024 11:26:47 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: syzbot <syzbot+8dd98a9e98ee28dc484a@syzkaller.appspotmail.com>,
+        "clang-built-linux@googlegroups.com" <clang-built-linux@googlegroups.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "johannes.berg@intel.com" <johannes.berg@intel.com>,
+        "johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>,
+        "nathan@kernel.org" <nathan@kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "syzkaller-bugs@googlegroups.com" <syzkaller-bugs@googlegroups.com>
+Subject: RE: [syzbot] [wireless?] WARNING in __rate_control_send_low (2)
+Thread-Topic: [syzbot] [wireless?] WARNING in __rate_control_send_low (2)
+Thread-Index: AQHa3CIb46s02EiOlEu+9T1Wemoj4rIIXHzg
+Date: Fri, 26 Jul 2024 03:26:47 +0000
+Message-ID: <c06f8308cc84412a93b81418aaa32fa8@realtek.com>
+References: <000000000000fdef8706191a3f7b@google.com>
+ <00000000000011de5f061dd387f0@google.com>
+In-Reply-To: <00000000000011de5f061dd387f0@google.com>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000009d1d0a061d91b803@google.com> <20240725214049.2439-1-aha310510@gmail.com>
- <CACGkMEv2DZhp71-QdckH+9ycerdNd7+F5vFyq3g=qquEsm9rHw@mail.gmail.com>
-In-Reply-To: <CACGkMEv2DZhp71-QdckH+9ycerdNd7+F5vFyq3g=qquEsm9rHw@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 25 Jul 2024 23:03:51 -0400
-Message-ID: <CAF=yD-LtR--NvYuELb2XGaPAoygyWtJOCM4+Pgr-Pg7TwSB5Sw@mail.gmail.com>
-Subject: Re: [PATCH net] tun: Add missing bpf_net_ctx_clear() in do_xdp_generic()
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jeongjun Park <aha310510@gmail.com>, 
-	syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	bigeasy@linutronix.de, bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 25, 2024 at 10:21=E2=80=AFPM Jason Wang <jasowang@redhat.com> w=
-rote:
->
-> On Fri, Jul 26, 2024 at 5:41=E2=80=AFAM Jeongjun Park <aha310510@gmail.co=
-m> wrote:
-> >
-> > There are cases where do_xdp_generic returns bpf_net_context without
-> > clearing it. This causes various memory corruptions, so the missing
-> > bpf_net_ctx_clear must be added.
-> >
-> > Reported-by: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com
-> > Fixes: fecef4cd42c6 ("tun: Assign missing bpf_net_context.")
-> > Signed-off-by: Jeongjun Park <aha310510@gmail.com>
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+PHN5emJvdCs4ZGQ5OGE5ZTk4ZWUyOGRjNDg0YUBzeXprYWxsZXIuYXBwc3BvdG1haWwuY29tPiB3
+cm90ZToNCj4gc3l6Ym90IGhhcyBiaXNlY3RlZCB0aGlzIGlzc3VlIHRvOg0KPiANCj4gY29tbWl0
+IDlkZjY2ZDViOWY0NWMzOWIzOTI1ZDE2ZTg5NDdjYzEwMDA5YjE4NmQNCj4gQXV0aG9yOiBQaW5n
+LUtlIFNoaWggPHBrc2hpaEByZWFsdGVrLmNvbT4NCj4gRGF0ZTogICBXZWQgSnVuIDkgMDc6NTk6
+NDQgMjAyMSArMDAwMA0KPiANCj4gICAgIGNmZzgwMjExOiBmaXggZGVmYXVsdCBIRSB0eCBiaXRy
+YXRlIG1hc2sgaW4gMkcgYmFuZA0KPiANCj4gYmlzZWN0aW9uIGxvZzogIGh0dHBzOi8vc3l6a2Fs
+bGVyLmFwcHNwb3QuY29tL3gvYmlzZWN0LnR4dD94PTEzZTIzM2ZkOTgwMDAwDQo+IHN0YXJ0IGNv
+bW1pdDogICA1MTgzNTk0OWRkYTMgTWVyZ2UgdGFnICduZXQtbmV4dC02LjExJyBvZiBnaXQ6Ly9n
+aXQua2VybmVsLi4NCj4gZ2l0IHRyZWU6ICAgICAgIG5ldC1uZXh0DQo+IGZpbmFsIG9vcHM6ICAg
+ICBodHRwczovL3N5emthbGxlci5hcHBzcG90LmNvbS94L3JlcG9ydC50eHQ/eD0xMDEyMzNmZDk4
+MDAwMA0KPiBjb25zb2xlIG91dHB1dDogaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20veC9s
+b2cudHh0P3g9MTdlMjMzZmQ5ODAwMDANCj4ga2VybmVsIGNvbmZpZzogIGh0dHBzOi8vc3l6a2Fs
+bGVyLmFwcHNwb3QuY29tL3gvLmNvbmZpZz94PWQzYmRkMDllYTIzNzFjODkNCj4gZGFzaGJvYXJk
+IGxpbms6IGh0dHBzOi8vc3l6a2FsbGVyLmFwcHNwb3QuY29tL2J1Zz9leHRpZD04ZGQ5OGE5ZTk4
+ZWUyOGRjNDg0YQ0KPiBzeXogcmVwcm86ICAgICAgaHR0cHM6Ly9zeXprYWxsZXIuYXBwc3BvdC5j
+b20veC9yZXByby5zeXo/eD0xNDYwODc0OTk4MDAwMA0KPiBDIHJlcHJvZHVjZXI6ICAgaHR0cHM6
+Ly9zeXprYWxsZXIuYXBwc3BvdC5jb20veC9yZXByby5jP3g9MTc4YjkxOTU5ODAwMDANCj4gDQo+
+IFJlcG9ydGVkLWJ5OiBzeXpib3QrOGRkOThhOWU5OGVlMjhkYzQ4NGFAc3l6a2FsbGVyLmFwcHNw
+b3RtYWlsLmNvbQ0KPiBGaXhlczogOWRmNjZkNWI5ZjQ1ICgiY2ZnODAyMTE6IGZpeCBkZWZhdWx0
+IEhFIHR4IGJpdHJhdGUgbWFzayBpbiAyRyBiYW5kIikNCj4gDQo+IEZvciBpbmZvcm1hdGlvbiBh
+Ym91dCBiaXNlY3Rpb24gcHJvY2VzcyBzZWU6IGh0dHBzOi8vZ29vLmdsL3Rwc21FSiNiaXNlY3Rp
+b24NCg0KSSBzZW50IGEgcGF0Y2ggWzFdIHRvIGF2b2lkIHRoZSB3YXJuaW5nIG9mDQoNCiAgIG5v
+IHN1cHBvcnRlZCByYXRlcyBmb3Igc3RhIChudWxsKSAoMHhmZmZmZmZmZiwgYmFuZCAwKSBpbiBy
+YXRlX21hc2sgMHgwIHdpdGggZmxhZ3MgMHgwDQoNClsxXSBodHRwczovL2xvcmUua2VybmVsLm9y
+Zy9saW51eC13aXJlbGVzcy8yMDI0MDcyNjAzMTUyMC43NjE2LTEtcGtzaGloQHJlYWx0ZWsuY29t
+L1QvI3UNCg0K
 
