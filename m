@@ -1,95 +1,141 @@
-Return-Path: <netdev+bounces-113179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18AC193D100
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:20:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 931BF93D110
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C88DF281695
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 10:20:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF5891C20FFB
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 10:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A36C178367;
-	Fri, 26 Jul 2024 10:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B885D178CEA;
+	Fri, 26 Jul 2024 10:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfMeHI7Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="koQ9ULRj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182922B9C4;
-	Fri, 26 Jul 2024 10:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E32178CE2
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721989230; cv=none; b=RC2bTICGquIYEi6yFoTxpbmaoC0KUjYiRhgynAHdiwjD/gxQ/PV20L76rvMK3FkG3ztE1Yv73oGtNd3UWhrjH9WpvBobslAHyRbtZ1qC1MQdqz9xBYc16ugsoUV61zmQzsRe+XP8ccuus1NWtsYWmKy+3Rjv7p753vVRm8VLBiQ=
+	t=1721989402; cv=none; b=FleTfFJJSKEBqXQM1wv9Y3lw0hJOI7Z4qCucbeS1T0+PuQRw9d1pyhHl2bQ2bKVxxzNqsLILB8kX7jV/+k2GYVieqCigogb88AtHVXWUZBPidIhmC8l+R/WiS7rv0xCkcGoJYjhwTOw79dLspSjFKPg5dCDyYge28FopmmNrJT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721989230; c=relaxed/simple;
-	bh=dYUL+jP7MFdCrpFd9aiIGMAeKUv3+T7KQF6M/T/RLPs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W7h/dUgi/fizE4s9uqmWJDi8K8VajSp6hE50c4uwrV9Uk2zXQkaIE7VgQrey3rTAazoE67xj5VDfLTh+f0azyVH7rbQnBxVRRvp20BRIwkt25rYX2gXIhQLRi99tBQinp3ApN516VvAqMpoTURdnmNe77O/IWY0b6e5jfjDSGss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfMeHI7Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 852E4C4AF07;
-	Fri, 26 Jul 2024 10:20:29 +0000 (UTC)
+	s=arc-20240116; t=1721989402; c=relaxed/simple;
+	bh=GvBUKN2Kc44vs0VravGlBXkmSRPHwCnI8FSCCwbR7QE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8oxxcMxyYqkOrs6BO64VI3LdpsUGF8gi1G+Ul/q0BosfHlUikOMoAj/TEJZJ8Th3aD686InxOfzI1HE5L38hNuTUP9wbq68LxOJZSbp/iXDCZ18GncEfOuhWHSYd0QBZIXzkZgiJqkrE0Qfb55ngD9XxZAW+oadrIXjlptnSy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=koQ9ULRj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC546C4AF09;
+	Fri, 26 Jul 2024 10:23:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721989229;
-	bh=dYUL+jP7MFdCrpFd9aiIGMAeKUv3+T7KQF6M/T/RLPs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sfMeHI7Z5ZVZYHRt9rTByIywy4Sn37Yk8cSWT13ExJMQCmpGPo3mc8waU/MekL3kW
-	 O/shYWfzbcnyPFIN35UoUDOAyLucmIGHK5LaGgJTizEqdi4dnTsoezkdMnqOA/Tvc7
-	 j+/cgpXUWmtzM/M7GFZWrfF3RYQzMqCOUTDqlaOTgs5+jUZU2L3Fgz4bn4OME3EQgt
-	 bQOUreTMmYzac1RhQRz2U0yXyBemfCT1Q0UqoVlzzr3mTKeGRzlkRZeFUI2exBi+G4
-	 Vegq8T+fSgRXTittBXFcMla7dgJxojMyz0Qja4+LD2XkJElTupLntdo3BMMmtmCVsS
-	 EE2LEmT3sRFgA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73D79C43443;
-	Fri, 26 Jul 2024 10:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1721989402;
+	bh=GvBUKN2Kc44vs0VravGlBXkmSRPHwCnI8FSCCwbR7QE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=koQ9ULRjxdCqE+SZHBerbTobc1gH80CkF7NONNDpp3yQaDMwEjBbKtOI6fDJsuCQ5
+	 8S/i4xgQ4cJ1lfU5GzSNeIM/UlSbAgPwQrpzWbELJtv/Zc9HMP1IFjZmZPfn1zbu1D
+	 D6P6bfLH5AY7mC8Gv4yUBtLqWIUJty9dirR8xzWQynyPkTfE3k/3zvDMPJKNsmw2YB
+	 eWfKoUKuDf+bAjCwKvGSrMPl7aAIQhJq+c5//jqaOUkbY41j3pfN74ycbO6JtBM/Ds
+	 NskzoZidswcXQasKxGOlXd5XHlvnuDWZFjQkuMRmH2QIr87rf4dxe4I/v/0xe2RU1W
+	 sfDgM8EDgvXAQ==
+Date: Fri, 26 Jul 2024 11:23:18 +0100
+From: Simon Horman <horms@kernel.org>
+To: Patrick Rohr <prohr@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Network Development Mailing List <netdev@vger.kernel.org>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>,
+	David Lamparter <equinox@opensourcerouting.org>
+Subject: Re: [PATCH net-next] Add support for PIO p flag
+Message-ID: <20240726102318.GN97837@kernel.org>
+References: <20240726010629.111077-1-prohr@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] net: usb: sr9700: fix uninitialized variable use in
- sr_mdio_read
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172198922946.6762.1014602508921624498.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Jul 2024 10:20:29 +0000
-References: <20240725022942.1720199-1-make24@iscas.ac.cn>
-In-Reply-To: <20240725022942.1720199-1-make24@iscas.ac.cn>
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, liujunliang_ljl@163.com, syoshida@redhat.com,
- andrew@lunn.ch, horms@kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+In-Reply-To: <20240726010629.111077-1-prohr@google.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 25 Jul 2024 10:29:42 +0800 you wrote:
-> It could lead to error happen because the variable res is not updated if
-> the call to sr_share_read_word returns an error. In this particular case
-> error code was returned and res stayed uninitialized. Same issue also
-> applies to sr_read_reg.
+On Thu, Jul 25, 2024 at 06:06:29PM -0700, Patrick Rohr wrote:
+> draft-ietf-6man-pio-pflag is adding a new flag to the Prefix Information
+> Option to signal the pd-per-device addressing mechanism.
 > 
-> This can be avoided by checking the return value of sr_share_read_word
-> and sr_read_reg, and propagating the error if the read operation failed.
+> When accept_pio_pflag is enabled, the presence of the p-flag will cause
+> an a flag in the same PIO to be ignored.
 > 
-> [...]
+> An automated test has been added in Android (r.android.com/3195335) to
+> go along with this change.
+> 
+> Cc: Maciej Żenczykowski <maze@google.com>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Cc: David Lamparter <equinox@opensourcerouting.org>
+> Signed-off-by: Patrick Rohr <prohr@google.com>
 
-Here is the summary with links:
-  - [net,v4] net: usb: sr9700: fix uninitialized variable use in sr_mdio_read
-    https://git.kernel.org/netdev/net/c/08f3a5c38087
+Hi Patrick,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This is not a full review, and as per the form letter below,
+net-next is closed, so you'd be best to repost.
+But I will offer some very minor review in the meantime.
 
+Firstly, please seed the CC list for Networking patches
+using get_maintainers.pl --git-min-percent 25 this.patch
 
+Secondly, as noted inline, there are two cases of
+mixed of tabs and spaces used for indenting in this patch.
+
+## Form letter - net-next-closed
+
+The merge window for v6.11 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
+
+Please repost when net-next reopens after 15th July
+
+RFC patches sent for review only are welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+--
+pw-bot: defer
+
+...
+
+> diff --git a/include/net/addrconf.h b/include/net/addrconf.h
+> index 62a407db1bf5..59496aa23012 100644
+> --- a/include/net/addrconf.h
+> +++ b/include/net/addrconf.h
+> @@ -38,9 +38,13 @@ struct prefix_info {
+>  #if defined(__BIG_ENDIAN_BITFIELD)
+>  			__u8	onlink : 1,
+>  			 	autoconf : 1,
+> -				reserved : 6;
+> +			 	routeraddr : 1,
+
+The line above puts a space before a tab in indentation.
+This is already the case on the autoconf line, but let's not add another
+instance.
+
+Flagged by checkpatch.
+
+> +				pdpreferred : 1,
+> +				reserved : 4;
+>  #elif defined(__LITTLE_ENDIAN_BITFIELD)
+> -			__u8	reserved : 6,
+> +			__u8	reserved : 4,
+> +				pdpreferred : 1,
+> +			 	routeraddr : 1,
+
+Here too.
+
+>  				autoconf : 1,
+>  				onlink : 1;
+>  #else
+
+...
 
