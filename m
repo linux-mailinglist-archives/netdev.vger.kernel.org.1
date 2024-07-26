@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-113209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDEE693D352
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:43:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A15F93D34A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E6632838C1
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:43:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDDAE1F24EEB
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3043A17C7A3;
-	Fri, 26 Jul 2024 12:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE87717B51D;
+	Fri, 26 Jul 2024 12:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HKFkJNlC"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="nkM2ajjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A3717BB04;
-	Fri, 26 Jul 2024 12:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2907017B51F;
+	Fri, 26 Jul 2024 12:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721997653; cv=none; b=hp3GjPnNLJxA5qDFpGjA1ZaBXOkZYrTf7VHTK3XF++nlO+e0ImlC2SWWEKU6waPlcNkJ9DpmSEEbsNdbzZ3KlPpCg2e12ESyGzh/d6MEOFZYBjG6S/OOIDBIDF1HwzvgEvbdRm25wuNgWuvRCQ7ZcFLfgFn0/wmAbVnAsigkp5c=
+	t=1721997640; cv=none; b=dj/Gm/7PqKlvqveQXKoQamc6HUFM5OXZCmpgFFJvL5znWqDMMdkt7NERJaUv8DU5m0yB3fz8xC7mcFT7nugG2oc5woW0Q5rszW0RwLj+iBCzblSyGyMmRbhSDcKyovOipDJDWfeAyOYAR7s4XUW0EZWplNBfbwEIQI44SAnYelo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721997653; c=relaxed/simple;
-	bh=J/H+OfYac7rZPrEbWYSlVfnoBGMH/C+OPNO83so3PVk=;
+	s=arc-20240116; t=1721997640; c=relaxed/simple;
+	bh=d8hN7FhrAmLYQbNJvBk4jBbQxO8vyKTK3ceczXAQKxs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lucj4Ee41Pu8Gk3MP2LTBuO8XlXyKRdECBnTVKqI1SHkRA5PZ3xLrd74ujA6fOZ9qOkA02cakpvuKB3m52nBCOXCgdKSvN5yEka76WW2WsfXgU/z2PIs/2EP6Lo/nqQHyp43KPvFffwKRoU/XS5NRJWFyXb9+qKUFCtNM3v3fGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HKFkJNlC; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=FsYMeBd5bEXNf/KIDzYwUDHGsABU13LrrN76cveHBqHwoeBYHDLYcgAoFIHYX+SZKMcZCMSdbxLVnqZ+VRLgdod0ivuGHH/iMK7TETkgJS6uqsoUGUXEYoxUYBcOl67jPVKIEDbf+NR53HaCpUXNcsBOG8yhpynS9vePcLJq8yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=nkM2ajjV; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1721997651; x=1753533651;
+  t=1721997639; x=1753533639;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=J/H+OfYac7rZPrEbWYSlVfnoBGMH/C+OPNO83so3PVk=;
-  b=HKFkJNlCJY2gk8QGfTiwMdj9FnCjEmxzAhMQqmygR+xsVojxwPtyoQwo
-   LtB+6ZmB55sxXP7Pua4Y4fExKoCb8+XP82kDQ3hbaGBeDLKsI4TNcFgG/
-   xbo4uOrMX2/SraQu1mnWv10Lv3va6Q47ggV6M70wB3EJLz4FnKVr69EJN
-   d+KYfKKg3O2EKu5ZFt6ixzjOyiOJe0LTLJkWsncYeiDqEKsP+eYNxTSyG
-   oMg7fAdpT2M8HXfz9bdGiXo9+C4PJtleze7q7m21RWf4C1i4F++e3GMsZ
-   A+l4GDN82O9iFVwoje5fegWZj94EC5L1rXJDXuBP8mzgekwyr8gP5fwSo
-   A==;
-X-CSE-ConnectionGUID: Pz8rc0X+RQWRNn1lO8SO4A==
-X-CSE-MsgGUID: Vekxy74JRwGtNfl6oib9KA==
+  bh=d8hN7FhrAmLYQbNJvBk4jBbQxO8vyKTK3ceczXAQKxs=;
+  b=nkM2ajjVEO6gDRoZ5vIhosx6wp+gYFd+GteVrSOtQEIhAr3A86Ao/70e
+   KsHQRM3rSYBSFxuWBYEKhR7MQqXzw8/m/myPQMZ9N7iDB8F/LyJNWlUrf
+   SUzKHkLcuPvK9k1BgoJMIKIUZYa6JLNdqR/9xDbU/OGA80exHKGe4EyXL
+   bVHaDZK4f6M7uMT+GHTOX9rhEJjODHWAHW239F1L44f3dMH2TpfsqfQie
+   7uVZ5nyLpeb1hxtJ+dkG5WeWYFhFU2kZIwJuW+W2TSzTPXE7Uqm70Atgi
+   mEw/AI1nQ9y2PC+hvl1/BxdD6Ds0XujnmqzQUowcaSKMMA0SnRQxZ2auB
+   w==;
+X-CSE-ConnectionGUID: fj5IC/ViS6C22EixpZCE2g==
+X-CSE-MsgGUID: 6MDcg4xVTj+8O1I0mLAuNg==
 X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="30386970"
+   d="scan'208";a="32523270"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jul 2024 05:40:50 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Jul 2024 05:40:38 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jul 2024 05:40:09 -0700
+ 15.1.2507.35; Fri, 26 Jul 2024 05:40:18 -0700
 Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Jul 2024 05:40:00 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 26 Jul 2024 05:40:10 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
@@ -73,9 +73,9 @@ CC: <UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
 	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
 	<linux@bigler.io>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v5 10/14] net: ethernet: oa_tc6: implement receive path to receive rx ethernet frames
-Date: Fri, 26 Jul 2024 18:09:03 +0530
-Message-ID: <20240726123907.566348-11-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v5 11/14] net: ethernet: oa_tc6: implement mac-phy interrupt
+Date: Fri, 26 Jul 2024 18:09:04 +0530
+Message-ID: <20240726123907.566348-12-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
 References: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
@@ -85,366 +85,127 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-SPI rx data buffer can contain one or more receive data chunks. A receive
-data chunk consists a 64 bytes receive data chunk payload followed a
-4 bytes data footer at the end. The data footer contains the information
-needed to determine the validity and location of the receive frame data
-within the receive data chunk payload and the host can use these
-information to generate ethernet frame. Initially the receive chunks
-available will be updated from the buffer status register and then it
-will be updated from the footer received on each spi data transfer. Tx
-data valid or empty chunks equal to the number receive chunks available
-will be transmitted in the MOSI to receive all the rx chunks.
-Additionally the receive data footer contains the below information as
-well. The received footer will be examined for the receive errors if any.
+The MAC-PHY interrupt is asserted when the following conditions are met.
 
+Receive chunks available - This interrupt is asserted when the previous
+data footer had no receive data chunks available and once the receive
+data chunks become available for reading. On reception of the first data
+header this interrupt will be deasserted.
+
+Transmit chunk credits available - This interrupt is asserted when the
+previous data footer indicated no transmit credits available and once the
+transmit credits become available for transmitting transmit data chunks.
+On reception of the first data header this interrupt will be deasserted.
+
+Extended status event - This interrupt is asserted when the previous data
+footer indicated no extended status and once the extended event become
+available. In this case the host should read status #0 register to know
+the corresponding error/event. On reception of the first data header this
+interrupt will be deasserted.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/ethernet/oa_tc6.c | 225 +++++++++++++++++++++++++++++++++-
- 1 file changed, 222 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/oa_tc6.c | 53 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 51 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
-index e710ceb6b19e..5cbb45735b26 100644
+index 5cbb45735b26..7f684b542bb1 100644
 --- a/drivers/net/ethernet/oa_tc6.c
 +++ b/drivers/net/ethernet/oa_tc6.c
-@@ -29,11 +29,13 @@
- #define STATUS0_RESETC				BIT(6)	/* Reset Complete */
- #define STATUS0_HEADER_ERROR			BIT(5)
- #define STATUS0_LOSS_OF_FRAME_ERROR		BIT(4)
-+#define STATUS0_RX_BUFFER_OVERFLOW_ERROR	BIT(3)
- #define STATUS0_TX_PROTOCOL_ERROR		BIT(0)
- 
- /* Buffer Status Register */
- #define OA_TC6_REG_BUFFER_STATUS		0x000B
- #define BUFFER_STATUS_TX_CREDITS_AVAILABLE	GENMASK(15, 8)
-+#define BUFFER_STATUS_RX_CHUNKS_AVAILABLE	GENMASK(7, 0)
- 
- /* Interrupt Mask Register #0 */
- #define OA_TC6_REG_INT_MASK0			0x000C
-@@ -67,6 +69,12 @@
- #define OA_TC6_DATA_FOOTER_EXTENDED_STS		BIT(31)
- #define OA_TC6_DATA_FOOTER_RXD_HEADER_BAD	BIT(30)
- #define OA_TC6_DATA_FOOTER_CONFIG_SYNC		BIT(29)
-+#define OA_TC6_DATA_FOOTER_RX_CHUNKS_AVAILABLE	GENMASK(28, 24)
-+#define OA_TC6_DATA_FOOTER_DATA_VALID		BIT(21)
-+#define OA_TC6_DATA_FOOTER_START_VALID		BIT(20)
-+#define OA_TC6_DATA_FOOTER_START_WORD_OFFSET	GENMASK(19, 16)
-+#define OA_TC6_DATA_FOOTER_END_VALID		BIT(14)
-+#define OA_TC6_DATA_FOOTER_END_BYTE_OFFSET	GENMASK(13, 8)
- #define OA_TC6_DATA_FOOTER_TX_CREDITS		GENMASK(5, 1)
- 
- /* PHY – Clause 45 registers memory map selector (MMS) as per table 6 in the
-@@ -111,11 +119,14 @@ struct oa_tc6 {
- 	void *spi_data_rx_buf;
- 	struct sk_buff_head tx_skb_q;
- 	struct sk_buff *tx_skb;
-+	struct sk_buff *rx_skb;
- 	struct task_struct *spi_thread;
- 	wait_queue_head_t spi_wq;
- 	u16 tx_skb_offset;
- 	u16 spi_data_tx_buf_offset;
+@@ -127,6 +127,7 @@ struct oa_tc6 {
  	u16 tx_credits;
-+	u8 rx_chunks_available;
-+	bool rx_buf_overflow;
+ 	u8 rx_chunks_available;
+ 	bool rx_buf_overflow;
++	bool int_flag;
  };
  
  enum oa_tc6_header_type {
-@@ -638,6 +649,15 @@ static int oa_tc6_enable_data_transfer(struct oa_tc6 *tc6)
- 	return oa_tc6_write_register(tc6, OA_TC6_REG_CONFIG0, value);
- }
+@@ -1052,6 +1053,14 @@ static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
+ 		if (tc6->rx_chunks_available)
+ 			spi_length = oa_tc6_prepare_spi_tx_buf_for_rx_chunks(tc6, spi_length);
  
-+static void oa_tc6_cleanup_ongoing_rx_skb(struct oa_tc6 *tc6)
-+{
-+	if (tc6->rx_skb) {
-+		tc6->netdev->stats.rx_dropped++;
-+		kfree_skb(tc6->rx_skb);
-+		tc6->rx_skb = NULL;
-+	}
-+}
-+
- static void oa_tc6_cleanup_ongoing_tx_skb(struct oa_tc6 *tc6)
- {
- 	if (tc6->tx_skb) {
-@@ -667,6 +687,13 @@ static int oa_tc6_process_extended_status(struct oa_tc6 *tc6)
- 		return ret;
- 	}
- 
-+	if (FIELD_GET(STATUS0_RX_BUFFER_OVERFLOW_ERROR, value)) {
-+		tc6->rx_buf_overflow = true;
-+		oa_tc6_cleanup_ongoing_rx_skb(tc6);
-+		net_err_ratelimited("%s: Receive buffer overflow error\n",
-+				    tc6->netdev->name);
-+		return -EAGAIN;
-+	}
- 	if (FIELD_GET(STATUS0_TX_PROTOCOL_ERROR, value)) {
- 		netdev_err(tc6->netdev, "Transmit protocol error\n");
- 		return -ENODEV;
-@@ -691,8 +718,11 @@ static int oa_tc6_process_rx_chunk_footer(struct oa_tc6 *tc6, u32 footer)
- 	/* Process rx chunk footer for the following,
- 	 * 1. tx credits
- 	 * 2. errors if any from MAC-PHY
-+	 * 3. receive chunks available
- 	 */
- 	tc6->tx_credits = FIELD_GET(OA_TC6_DATA_FOOTER_TX_CREDITS, footer);
-+	tc6->rx_chunks_available = FIELD_GET(OA_TC6_DATA_FOOTER_RX_CHUNKS_AVAILABLE,
-+					     footer);
- 
- 	if (FIELD_GET(OA_TC6_DATA_FOOTER_EXTENDED_STS, footer)) {
- 		int ret = oa_tc6_process_extended_status(tc6);
-@@ -718,6 +748,137 @@ static int oa_tc6_process_rx_chunk_footer(struct oa_tc6 *tc6, u32 footer)
- 	return 0;
- }
- 
-+static void oa_tc6_submit_rx_skb(struct oa_tc6 *tc6)
-+{
-+	tc6->rx_skb->protocol = eth_type_trans(tc6->rx_skb, tc6->netdev);
-+	tc6->netdev->stats.rx_packets++;
-+	tc6->netdev->stats.rx_bytes += tc6->rx_skb->len;
-+
-+	if (netif_rx(tc6->rx_skb) == NET_RX_DROP)
-+		tc6->netdev->stats.rx_dropped++;
-+
-+	tc6->rx_skb = NULL;
-+}
-+
-+static void oa_tc6_update_rx_skb(struct oa_tc6 *tc6, u8 *payload, u8 length)
-+{
-+	memcpy(skb_put(tc6->rx_skb, length), payload, length);
-+}
-+
-+static int oa_tc6_allocate_rx_skb(struct oa_tc6 *tc6)
-+{
-+	tc6->rx_skb = netdev_alloc_skb_ip_align(tc6->netdev, tc6->netdev->mtu +
-+						ETH_HLEN + ETH_FCS_LEN);
-+	if (!tc6->rx_skb) {
-+		tc6->netdev->stats.rx_dropped++;
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static int oa_tc6_prcs_complete_rx_frame(struct oa_tc6 *tc6, u8 *payload,
-+					 u16 size)
-+{
-+	int ret;
-+
-+	ret = oa_tc6_allocate_rx_skb(tc6);
-+	if (ret)
-+		return ret;
-+
-+	oa_tc6_update_rx_skb(tc6, payload, size);
-+
-+	oa_tc6_submit_rx_skb(tc6);
-+
-+	return 0;
-+}
-+
-+static int oa_tc6_prcs_rx_frame_start(struct oa_tc6 *tc6, u8 *payload, u16 size)
-+{
-+	int ret;
-+
-+	ret = oa_tc6_allocate_rx_skb(tc6);
-+	if (ret)
-+		return ret;
-+
-+	oa_tc6_update_rx_skb(tc6, payload, size);
-+
-+	return 0;
-+}
-+
-+static void oa_tc6_prcs_rx_frame_end(struct oa_tc6 *tc6, u8 *payload, u16 size)
-+{
-+	oa_tc6_update_rx_skb(tc6, payload, size);
-+
-+	oa_tc6_submit_rx_skb(tc6);
-+}
-+
-+static void oa_tc6_prcs_ongoing_rx_frame(struct oa_tc6 *tc6, u8 *payload,
-+					 u32 footer)
-+{
-+	oa_tc6_update_rx_skb(tc6, payload, OA_TC6_CHUNK_PAYLOAD_SIZE);
-+}
-+
-+static int oa_tc6_prcs_rx_chunk_payload(struct oa_tc6 *tc6, u8 *payload,
-+					u32 footer)
-+{
-+	u8 start_byte_offset = FIELD_GET(OA_TC6_DATA_FOOTER_START_WORD_OFFSET,
-+					 footer) * sizeof(u32);
-+	u8 end_byte_offset = FIELD_GET(OA_TC6_DATA_FOOTER_END_BYTE_OFFSET,
-+				       footer);
-+	bool start_valid = FIELD_GET(OA_TC6_DATA_FOOTER_START_VALID, footer);
-+	bool end_valid = FIELD_GET(OA_TC6_DATA_FOOTER_END_VALID, footer);
-+	u16 size;
-+
-+	/* Restart the new rx frame after receiving rx buffer overflow error */
-+	if (start_valid && tc6->rx_buf_overflow)
-+		tc6->rx_buf_overflow = false;
-+
-+	if (tc6->rx_buf_overflow)
-+		return 0;
-+
-+	/* Process the chunk with complete rx frame */
-+	if (start_valid && end_valid && start_byte_offset < end_byte_offset) {
-+		size = end_byte_offset + 1 - start_byte_offset;
-+		return oa_tc6_prcs_complete_rx_frame(tc6, &payload[start_byte_offset],
-+						     size);
-+	}
-+
-+	/* Process the chunk with only rx frame start */
-+	if (start_valid && !end_valid) {
-+		size = OA_TC6_CHUNK_PAYLOAD_SIZE - start_byte_offset;
-+		return oa_tc6_prcs_rx_frame_start(tc6, &payload[start_byte_offset],
-+						  size);
-+	}
-+
-+	/* Process the chunk with only rx frame end */
-+	if (end_valid && !start_valid) {
-+		size = end_byte_offset + 1;
-+		oa_tc6_prcs_rx_frame_end(tc6, payload, size);
-+		return 0;
-+	}
-+
-+	/* Process the chunk with previous rx frame end and next rx frame start */
-+	if (start_valid && end_valid && start_byte_offset > end_byte_offset) {
-+		/* After rx buffer overflow error received, there might be a
-+		 * possibility of getting an end valid of a previously
-+		 * incomplete rx frame along with the new rx frame start valid.
-+		 */
-+		if (tc6->rx_skb) {
-+			size = end_byte_offset + 1;
-+			oa_tc6_prcs_rx_frame_end(tc6, payload, size);
++		if (tc6->int_flag) {
++			tc6->int_flag = false;
++			if (spi_length == 0) {
++				oa_tc6_add_empty_chunks_to_spi_buf(tc6, 1);
++				spi_length = OA_TC6_CHUNK_SIZE;
++			}
 +		}
-+		size = OA_TC6_CHUNK_PAYLOAD_SIZE - start_byte_offset;
-+		return oa_tc6_prcs_rx_frame_start(tc6, &payload[start_byte_offset],
-+						  size);
-+	}
-+
-+	/* Process the chunk with ongoing rx frame data */
-+	oa_tc6_prcs_ongoing_rx_frame(tc6, payload, footer);
-+
-+	return 0;
-+}
-+
- static u32 oa_tc6_get_rx_chunk_footer(struct oa_tc6 *tc6, u16 footer_offset)
- {
- 	u8 *rx_buf = tc6->spi_data_rx_buf;
-@@ -743,6 +904,18 @@ static int oa_tc6_process_spi_data_rx_buf(struct oa_tc6 *tc6, u16 length)
- 		ret = oa_tc6_process_rx_chunk_footer(tc6, footer);
- 		if (ret)
- 			return ret;
-+
-+		/* If there is a data valid chunks then process it for the
-+		 * information needed to determine the validity and the location
-+		 * of the receive frame data.
-+		 */
-+		if (FIELD_GET(OA_TC6_DATA_FOOTER_DATA_VALID, footer)) {
-+			u8 *payload = tc6->spi_data_rx_buf + i * OA_TC6_CHUNK_SIZE;
-+
-+			ret = oa_tc6_prcs_rx_chunk_payload(tc6, payload, footer);
-+			if (ret)
-+				return ret;
-+		}
- 	}
- 
- 	return 0;
-@@ -828,6 +1001,42 @@ static u16 oa_tc6_prepare_spi_tx_buf_for_tx_skbs(struct oa_tc6 *tc6)
- 	return used_tx_credits * OA_TC6_CHUNK_SIZE;
- }
- 
-+static void oa_tc6_add_empty_chunks_to_spi_buf(struct oa_tc6 *tc6,
-+					       u16 needed_empty_chunks)
-+{
-+	__be32 header;
-+
-+	header = oa_tc6_prepare_data_header(OA_TC6_DATA_INVALID,
-+					    OA_TC6_DATA_START_INVALID,
-+					    OA_TC6_DATA_END_INVALID, 0);
-+
-+	while (needed_empty_chunks--) {
-+		__be32 *tx_buf = tc6->spi_data_tx_buf + tc6->spi_data_tx_buf_offset;
-+
-+		*tx_buf = header;
-+		tc6->spi_data_tx_buf_offset += OA_TC6_CHUNK_SIZE;
-+	}
-+}
-+
-+static u16 oa_tc6_prepare_spi_tx_buf_for_rx_chunks(struct oa_tc6 *tc6, u16 len)
-+{
-+	u16 tx_chunks = len / OA_TC6_CHUNK_SIZE;
-+	u16 needed_empty_chunks;
-+
-+	/* If there are more chunks to receive than to transmit, we need to add
-+	 * enough empty tx chunks to allow the reception of the excess rx
-+	 * chunks.
-+	 */
-+	if (tx_chunks >= tc6->rx_chunks_available)
-+		return len;
-+
-+	needed_empty_chunks = tc6->rx_chunks_available - tx_chunks;
-+
-+	oa_tc6_add_empty_chunks_to_spi_buf(tc6, needed_empty_chunks);
-+
-+	return needed_empty_chunks * OA_TC6_CHUNK_SIZE + len;
-+}
-+
- static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
- {
- 	int ret;
-@@ -840,6 +1049,9 @@ static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
- 		if (tc6->tx_skb || !skb_queue_empty(&tc6->tx_skb_q))
- 			spi_length = oa_tc6_prepare_spi_tx_buf_for_tx_skbs(tc6);
- 
-+		if (tc6->rx_chunks_available)
-+			spi_length = oa_tc6_prepare_spi_tx_buf_for_rx_chunks(tc6, spi_length);
 +
  		if (spi_length == 0)
  			break;
  
-@@ -852,7 +1064,11 @@ static int oa_tc6_try_spi_transfer(struct oa_tc6 *tc6)
- 
- 		ret = oa_tc6_process_spi_data_rx_buf(tc6, spi_length);
- 		if (ret) {
-+			if (ret == -EAGAIN)
-+				continue;
-+
- 			oa_tc6_cleanup_ongoing_tx_skb(tc6);
-+			oa_tc6_cleanup_ongoing_rx_skb(tc6);
- 			netdev_err(tc6->netdev, "Device error: %d\n", ret);
- 			return ret;
- 		}
-@@ -892,15 +1108,17 @@ static int oa_tc6_update_buffer_status_from_register(struct oa_tc6 *tc6)
- 	u32 value;
+@@ -1087,8 +1096,10 @@ static int oa_tc6_spi_thread_handler(void *data)
  	int ret;
  
--	/* Initially tx credits to be updated from the register as there is no
--	 * data transfer performed yet. Later it will be updated from the rx
--	 * footer.
-+	/* Initially tx credits and rx chunks available to be updated from the
-+	 * register as there is no data transfer performed yet. Later they will
-+	 * be updated from the rx footer.
- 	 */
- 	ret = oa_tc6_read_register(tc6, OA_TC6_REG_BUFFER_STATUS, &value);
- 	if (ret)
- 		return ret;
+ 	while (likely(!kthread_should_stop())) {
+-		/* This kthread will be waken up if there is a tx skb */
+-		wait_event_interruptible(tc6->spi_wq,
++		/* This kthread will be waken up if there is a tx skb or mac-phy
++		 * interrupt to perform spi transfer with tx chunks.
++		 */
++		wait_event_interruptible(tc6->spi_wq, tc6->int_flag ||
+ 					 !skb_queue_empty(&tc6->tx_skb_q) ||
+ 					 kthread_should_stop());
  
- 	tc6->tx_credits = FIELD_GET(BUFFER_STATUS_TX_CREDITS_AVAILABLE, value);
-+	tc6->rx_chunks_available = FIELD_GET(BUFFER_STATUS_RX_CHUNKS_AVAILABLE,
-+					     value);
- 
+@@ -1123,6 +1134,24 @@ static int oa_tc6_update_buffer_status_from_register(struct oa_tc6 *tc6)
  	return 0;
  }
-@@ -1046,6 +1264,7 @@ void oa_tc6_exit(struct oa_tc6 *tc6)
+ 
++static irqreturn_t oa_tc6_macphy_isr(int irq, void *data)
++{
++	struct oa_tc6 *tc6 = data;
++
++	/* MAC-PHY interrupt can occur for the following reasons.
++	 * - availability of tx credits if it was 0 before and not reported in
++	 *   the previous rx footer.
++	 * - availability of rx chunks if it was 0 before and not reported in
++	 *   the previous rx footer.
++	 * - extended status event not reported in the previous rx footer.
++	 */
++	tc6->int_flag = true;
++	/* Wake spi kthread to perform spi transfer */
++	wake_up_interruptible(&tc6->spi_wq);
++
++	return IRQ_HANDLED;
++}
++
+ /**
+  * oa_tc6_start_xmit - function for sending the tx skb which consists ethernet
+  * frame.
+@@ -1247,8 +1276,28 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
+ 
+ 	sched_set_fifo(tc6->spi_thread);
+ 
++	ret = devm_request_irq(&tc6->spi->dev, tc6->spi->irq, oa_tc6_macphy_isr,
++			       IRQF_TRIGGER_FALLING, dev_name(&tc6->spi->dev),
++			       tc6);
++	if (ret) {
++		dev_err(&tc6->spi->dev, "Failed to request macphy isr %d\n",
++			ret);
++		goto kthread_stop;
++	}
++
++	/* oa_tc6_sw_reset_macphy() function resets and clears the MAC-PHY reset
++	 * complete status. IRQ is also asserted on reset completion and it is
++	 * remain asserted until MAC-PHY receives a data chunk. So performing an
++	 * empty data chunk transmission will deassert the IRQ. Refer section
++	 * 7.7 and 9.2.8.8 in the OPEN Alliance specification for more details.
++	 */
++	tc6->int_flag = true;
++	wake_up_interruptible(&tc6->spi_wq);
++
+ 	return tc6;
+ 
++kthread_stop:
++	kthread_stop(tc6->spi_thread);
+ phy_exit:
  	oa_tc6_phy_exit(tc6);
- 	kthread_stop(tc6->spi_thread);
- 	dev_kfree_skb_any(tc6->tx_skb);
-+	dev_kfree_skb_any(tc6->rx_skb);
- 	skb_queue_purge(&tc6->tx_skb_q);
- }
- EXPORT_SYMBOL_GPL(oa_tc6_exit);
+ 	return NULL;
 -- 
 2.34.1
 
