@@ -1,98 +1,201 @@
-Return-Path: <netdev+bounces-113248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7975993D530
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:37:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B075B93D538
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:40:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 225F51F248F4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:37:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D370E1C21C9B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360E917583;
-	Fri, 26 Jul 2024 14:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E61917997;
+	Fri, 26 Jul 2024 14:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LV3tcX3Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JnzaC8Yo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1037D14A82;
-	Fri, 26 Jul 2024 14:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B481F182DF
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 14:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722004643; cv=none; b=gnx6UcWLEqVFaK74TRZTBXttOpXdbn4Y/QODzBzzQ69f+MP/8Ag44m+4ltpolnixeQLiblmUDVo3jXlGXo6BUI1DeewUZp+kJReHMOyJlNaXyROiN2Yw0QdtGBy/ovnxwPmX1QZS8+gs5RG+0L76m4sFq1oV7fCj1oNqQnzDeBs=
+	t=1722004813; cv=none; b=tJeM3yjKD5RK/FU2Aoej+6+onSmsWEfXiWaIQujQ9rmM7X+xSlem7jCFnqEOnxkc/Zmxy8ozdeq87oH5TR1frdjZ0AyIuNQOheKtitVQU98BbEIG7TtUue6btsljstJaP81KqCE1KNXT1sE3/u6Hix2UsdGaTYPivlmbnsI3ABM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722004643; c=relaxed/simple;
-	bh=K9n6/9ljGvN8OE9MvsVVA2kxnO51XIKmmlv7tH6PkhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gEUc6IDtIfn8xRu1FnJDveTBYgQu/Xk07JxWckKx/m0w/OufymX3vM+wf/jTZO6i71ZPsIJ425GraOkfz9q5xCU7n6DNiCWxuATTu3xagR4lIH6Oxt5bCuWsmtV4+EqFZRvmhZiY5ZdHyQMXOjreq2XID+0qWOwuNhS4M4G0CkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LV3tcX3Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04E65C32782;
-	Fri, 26 Jul 2024 14:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722004642;
-	bh=K9n6/9ljGvN8OE9MvsVVA2kxnO51XIKmmlv7tH6PkhM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LV3tcX3ZY5uxA5zaIQDO0D7AjIPDH5rfeirV+afOqWWDFsFnZsuI/Pq6TVvXMLpMW
-	 4zjjEAwTn0yTi8K1Je3k59W7l8RaPbCu+7LY/xnHpKSSgWHGEZ+bO7tX4OXPAGJY7/
-	 l3dmEeRfMHdjXB5bLoy0YJgrBDahG5VVP7e+KakYr4Sl5POlak1oT9hklBhzSFcpdF
-	 RIWaT5kflebpBQoe5MJpOGw8EADcHHu4TWP0/7idcNDcnHU2CmTgbE8ZlCasWb1oF2
-	 kp8E+Ot4hJQ4qfE1P6lH5v0lCccR5QZ3LGqFAjtgUVcbw9EAYfq1quNHV+fzFo0Jf8
-	 uDnxEKBjVG/rQ==
-Date: Fri, 26 Jul 2024 07:37:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
- <magnus.karlsson@intel.com>, <aleksander.lobakin@intel.com>,
- <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
- <john.fastabend@gmail.com>, <bpf@vger.kernel.org>, Shannon Nelson
- <shannon.nelson@amd.com>, Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: Re: [PATCH net 6/8] ice: improve updating ice_{t,
- r}x_ring::xsk_pool
-Message-ID: <20240726073721.042b4d88@kernel.org>
-In-Reply-To: <ZqOn+Lgr2DoEae6d@boxer>
-References: <20240708221416.625850-1-anthony.l.nguyen@intel.com>
-	<20240708221416.625850-7-anthony.l.nguyen@intel.com>
-	<20240709184524.232b9f57@kernel.org>
-	<ZqBAw0AEkieW+y4b@boxer>
-	<20240724075742.0e70de49@kernel.org>
-	<ZqEieHlPdMZcPGXI@boxer>
-	<20240725063858.65803c85@kernel.org>
-	<ZqKaAz8rNOx/Sz5E@boxer>
-	<20240725160700.449e5b5f@kernel.org>
-	<ZqOn+Lgr2DoEae6d@boxer>
+	s=arc-20240116; t=1722004813; c=relaxed/simple;
+	bh=ulwwnhc+mAkGKfWxF/MrC5J/i0p/2VPb4E/VhhmcdpQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Sdb+EMw3S0injwvrBs0WXOhCifCMcvsPfYZahUwAzzDhkHCc7tHY5hQhObB0KzApXhhp9Q0S+FzdQyzn8RAdl7/QhW6esSH1b864VXh989hEynH55ddSAfiYoMYbqRWsUErbJTZYtURrEFjh/8Cz/ox1UYAOf7sCSKzq7T8IgHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JnzaC8Yo; arc=none smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-81f01f88e8eso252963241.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 07:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722004810; x=1722609610; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tV65IQg54aPZMNaUSM01ngj5YogaBYHcYLA+LYcxGps=;
+        b=JnzaC8YopaWB7EYnNEtaDjsCbf4BIdOzFvsC2dczybBS3tEpfk5QDb9FIURDN0Wlm8
+         3pMZUXlzT0rl3l7YLYSZ4ekEXwP2QU1IROE7aTCttcl/vstDhU3wO5zNK9i5Nc3/4dGB
+         qJbIGHbfiCHZKOuQWSyb16BEX3yIytL9Ljs0FQBLgoHeYX3qWsQ0ky1lK12b2EoQipf+
+         3VpDZCxamMAHOknskEZIVFxqaaX5nAMG8loek2eU5ezI1YUCbmrxbAShwu7BPNv7h/Z8
+         ilvySLHwNCcHXxMpUOmzThEW6MU7E/9vnFkU9rnSvYcJYpGndMaKvI+tq2iEXcoayz7y
+         UiEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722004810; x=1722609610;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tV65IQg54aPZMNaUSM01ngj5YogaBYHcYLA+LYcxGps=;
+        b=SU3zIc81X5gK8c+NvKYjkuGD2dfqyJrp1BQrFLYvfOqju9t8dGS88WiT68sXBpk0zu
+         z0NxLXRVXIHPupF+/WYHh+/Y6iJYpC0LQ4ocvl58uUztxFeVD+g9ljBOJFsiKGFdsW0P
+         dqHWT2XejLOK3TVCHXT2eSkLwqtFrRHux2NZ/kb01vfJZWOeM5zBIDmR/2iimgxocc5I
+         uTZHM6EFAyPAo8iXl9K+29FrPD23XPFQMu1Xk1amnMI2MVADtwysdBhN6naGOnW7BII0
+         S8CPQLK+DBuLeUNve5ACRbwMmlwy/urGjG50KZk4gaHjZoVMU7d0vvneunNqQqkyXiPQ
+         H2Wg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFBskfoQbcLfIvnbNBSC/D+PbDcqUsMrQ+X5zToD8Nkp3oBFj94aqmKmued+te1yyv+FwIVuf++TuHLH6T0p5fr5C1sEWA
+X-Gm-Message-State: AOJu0YzyltUKFgLe05XM2GI195n92d5DO/nJEjibGwyj4Km9mrnp5trz
+	EbzIo7gqZ4dFYHNymEJXJs4jdjJIplWapWfaWAlAdodpSsysVri81h3x6kQixSgGMXm1nIn1OgV
+	TmE7+/rtaJnU8ZF7h6RFAWw7wiLoYP2LXGYXs
+X-Google-Smtp-Source: AGHT+IHNPh2FVgbB2r/p8bmQoYBQ59fCoxJ02nk4FCnb5rGKbLefzEPA9Uzesrxeg4pBgpeiiqkRiQzpb/qNkxIFni8=
+X-Received: by 2002:a05:6102:50aa:b0:493:badb:74ef with SMTP id
+ ada2fe7eead31-493d6527a1bmr7693288137.26.1722004810317; Fri, 26 Jul 2024
+ 07:40:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <202407251053.618edf56-oliver.sang@intel.com> <CANn89i+Bia9PdGhAVfRbbubYo37+g+ej68qp32JmU88tsLLuRQ@mail.gmail.com>
+In-Reply-To: <CANn89i+Bia9PdGhAVfRbbubYo37+g+ej68qp32JmU88tsLLuRQ@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 26 Jul 2024 10:39:51 -0400
+Message-ID: <CADVnQynLaT0rGcLDBB+T237x6aHx7K74kNPZz4hLFTK7U=CVwA@mail.gmail.com>
+Subject: Re: [linus:master] [tcp] 23e89e8ee7: packetdrill.packetdrill/gtests/net/tcp/fastopen/client/simultaneous-fast-open_ipv4-mapped-v6.fail
+To: Eric Dumazet <edumazet@google.com>
+Cc: kernel test robot <oliver.sang@intel.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, oe-lkp@lists.linux.dev, 
+	lkp@intel.com, linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	netdev@vger.kernel.org, Matthieu Baerts <matttbe@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 26 Jul 2024 15:43:20 +0200 Maciej Fijalkowski wrote:
-> > The _ONCE() helpers basically give you the ability to store the pointer
-> > to a variable on the stack, and that variable won't change behind your
-> > back. But the only reason to READ_ONCE(ptr->thing) something multiple
-> > times is to tell KCSAN that "I know what I'm doing", it just silences
-> > potential warnings :S  
-> 
-> I feel like you keep on referring to _ONCE (*) being used multiple times
-> which might be counter-intuitive whereas I was trying from the beginning
-> to explain my point that xsk pool from driver POV should get the very same
-> treatment as xdp prog has currently. So, either mark it as __rcu variable
-> and use rcu helpers or use _ONCE variants plus some sync.
-> 
-> (*) Ok, if you meant from the very beginning that two READ_ONCE against
-> pool per single critical section is suspicious then I didn't get that,
-> sorry. With diff below I would have single READ_ONCE and work on that
-> variable for rest of the napi. Patch was actually trying to limit xsk_pool
-> accesses from ring struct by working on stack variable.
-> 
-> Would you be okay with that?
+On Thu, Jul 25, 2024 at 4:07=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Jul 25, 2024 at 6:55=E2=80=AFAM kernel test robot <oliver.sang@in=
+tel.com> wrote:
+> >
+> >
+> >
+> > Hello,
+> >
+> > kernel test robot noticed "packetdrill.packetdrill/gtests/net/tcp/fasto=
+pen/client/simultaneous-fast-open_ipv4-mapped-v6.fail" on:
+> >
+> > commit: 23e89e8ee7be73e21200947885a6d3a109a2c58d ("tcp: Don't drop SYN+=
+ACK for simultaneous connect().")
+> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> >
+> > [test failed on linus/master      68b59730459e5d1fe4e0bbeb04ceb9df0f002=
+270]
+> > [test failed on linux-next/master 73399b58e5e5a1b28a04baf42e321cfcfc663=
+c2f]
+> >
+> > in testcase: packetdrill
+> > version: packetdrill-x86_64-31fbbb7-1_20240226
+> > with following parameters:
+> >
+> >
+> > compiler: gcc-13
+> > test machine: 16 threads 1 sockets Intel(R) Xeon(R) E-2278G CPU @ 3.40G=
+Hz (Coffee Lake) with 32G memory
+> >
+> > (please refer to attached dmesg/kmsg for entire log/backtrace)
+> >
+> >
+> > we also noticed other failed cases that can pass on parent.
+> >
+> >
+> > 42ffe242860c401c 23e89e8ee7be73e21200947885a
+> > ---------------- ---------------------------
+> >        fail:runs  %reproduction    fail:runs
+> >            |             |             |
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/client/simultaneous-fast-open_ipv4-mapped-v6.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/client/simultaneous-fast-open_ipv4.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/client/simultaneous-fast-open_ipv6.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/basic-cookie-not-reqd_ipv4-mapped-v6.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/basic-cookie-not-reqd_ipv4.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/basic-zero-payload_ipv4-mapped-v6.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/basic-zero-payload_ipv4.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/opt34/basic-cookie-not-reqd_ipv4-mapped-v6.fa=
+il
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/opt34/basic-cookie-not-reqd_ipv4.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/opt34/basic-zero-payload_ipv4-mapped-v6.fail
+> >            :9           67%           6:6     packetdrill.packetdrill/g=
+tests/net/tcp/fastopen/server/opt34/basic-zero-payload_ipv4.fail
+> >
+> >
+> >
+> > If you fix the issue in a separate patch/commit (i.e. not just a new ve=
+rsion of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <oliver.sang@intel.com>
+> > | Closes: https://lore.kernel.org/oe-lkp/202407251053.618edf56-oliver.s=
+ang@intel.com
+> >
+> >
+> >
+> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/fastopen/client/simult=
+aneous-fast-open.pkt (ipv6)]
+> >
+> > ...
+> >
+> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/fastopen/client/simult=
+aneous-fast-open.pkt (ipv4)]
+> >
+> > ...
+> >
+> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/fastopen/client/simult=
+aneous-fast-open.pkt (ipv4-mapped-v6)]
+> >
+> > ...
+> >
+> >
+> > The kernel config and materials to reproduce are available at:
+> > https://download.01.org/0day-ci/archive/20240725/202407251053.618edf56-=
+oliver.sang@intel.com
+> >
+> >
+> >
+> > --
+> > 0-DAY CI Kernel Test Service
+> > https://github.com/intel/lkp-tests/wiki
+> >
+>
+> This has been discussed recently in netdev mailing list, one ACK will
+> get more precise information.
 
-Yup! That diff makes sense, thanks!
+This should be fixed from this packetdrill test update from Matthieu
+Baerts that I just merged:
+  https://github.com/google/packetdrill/pull/87
+
+(For our internal versions of the tests, Eric provided an equivalent patch.=
+)
+
+neal
 
