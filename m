@@ -1,232 +1,107 @@
-Return-Path: <netdev+bounces-113279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C046593D793
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:27:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D24793D798
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:28:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B6AB283D95
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:27:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E9201C23162
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE0C17C7C9;
-	Fri, 26 Jul 2024 17:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA4D17C9E1;
+	Fri, 26 Jul 2024 17:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FdiAcVPy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwgILJXC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE27117C7D7
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2B811C83
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722014860; cv=none; b=p8eXjT4OMQjMDpCjWyfuigE9XlIxRHkhMwezYEANJDyruzB05oA7AhovuI3Gs7IafHsEsLhGxL8jHDQNApAL9ert8mDLHavIm7sXBMTLHRI5K0Soqqdu1ljIloc71mqSmbA7tNbQzppSYShR1R/3ZqmGXbKZPZVWSUcvBogi1P8=
+	t=1722014908; cv=none; b=It3ecwUz8soIWR8cSGCuDEojevQKifsjUVwSTTcSr9ZjBS97PUa0BKNfFf0FvXX0SPK0Asu/04bRGGkAWdJFY9UMtKf59RzpXJk/t+q3L0smAJ4DqfTShPlhf52VjyWyziVQD2gHqSxfPTuVbSFLlZTZJ6QhQt6VX4Tutg81/hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722014860; c=relaxed/simple;
-	bh=qFGlvMhteFMAaqJUl6N6Xqh/+JZvLGYqyFFAThGVfPw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZQ7K98hcAF9KinYcnl6imiEjzr/Tr0iMNbb7dSqZ3SS+tFhzfYw6A7EYzM/QDp63yvBcUz/1ieUyEsCag7Z32xAMtNbnHy3ljaUPn8hHzdmt6DVTfk04W7X4aZmAOxrvWBbkO92sB2zbzbID8/72VNvY/zSsuGuTmOCVDcKyyFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FdiAcVPy; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a7a8553db90so244976566b.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:27:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1722014856; x=1722619656; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8EyOtirsWmopDCe9GEITwcgKLVaDmjcC2IWcfFdj4as=;
-        b=FdiAcVPylSmsObz1AIiSgfOzBnHxjeMKeXdSNIe9ZHlGLLLgyDGOMVKUWqh/4EgRqn
-         3txQ28itDx7+JueNKIZY6k2RMY4NgNa5F+pkTHdjlD3X4KqgZP2s5WC89EAUuVrdxh3/
-         wF1t8nl/SEcEXrLgMhfTGS31BeKPUGHmno79mnb9bac6VlohruNv10JJUn/+IP96wyhN
-         WTkwRbROgz0QP1H/jDXfsHVLPsjQz5C/Sqagd63zmHxabLK8sHNT3y6tCJqYs5zqWV6T
-         gjuQ75o8DkzhOyOVqlAFkOwuS5ZeDKrqYwZ2syW1fnfSRiIN4f4gn3BVDQMQay+YRvlE
-         GcQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722014856; x=1722619656;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8EyOtirsWmopDCe9GEITwcgKLVaDmjcC2IWcfFdj4as=;
-        b=NTeo6cZbuVQ5Rc3rQk34OHAs46zEcyXJuPATRQ91gRkxvE/wIAJAZSa1LD3HmygV80
-         H5kNHNLUnRNKdWNgSDqWt+9ZvGuziabRnyTTxV1jWNz1eCFtdCMO5r+aRaL7bmMs/PGL
-         /WzH2ocYHZ6HMVapMKY8CA/x1yMJJhHLtml9Ug+cYYcb+gRkYMEwJMtZC2hmippy44qY
-         RumjGyZpjm0CKczW/jkRHxHGCLkIMyr+yrErNtuhLT0HUPR06jugQAPhvM/ZPTBzRjJ4
-         +t0bfnLjT94jJdvo4csRC/yHsddRmIYeh7FtBa7F2D4P1BHtwv8q1dBdYO7JQ0lFzPXu
-         svsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSVFAClakPi2pJrE+asVquEfJ4uaSBfGIIbcE3SKAHDRMRJmDJEw247TFTjh/hbg/1LJSO6KgPwNbutlbXvEvSuRsBHaP5
-X-Gm-Message-State: AOJu0YyvFZ4d3qq2WvZxsr2EowX0QRB38MYhN5QBKl/LrR/bON+HLFWn
-	9XD+kijqjpdEBStuSa4OIrzStr7Ru3xECZGUrkmmAbSw2C3oB4TbKJYGJ0CQ4j4=
-X-Google-Smtp-Source: AGHT+IHvx2x2riTEqoxuCBwrXZm2KqzJYh/bqylu0umjwLin316iEYSM6CBdYzfcsDW46OEMhID5rw==
-X-Received: by 2002:a17:907:7d86:b0:a72:5f9a:159a with SMTP id a640c23a62f3a-a7d3ff583a6mr16652066b.2.1722014856217;
-        Fri, 26 Jul 2024 10:27:36 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab50cbfsm197311866b.47.2024.07.26.10.27.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 10:27:35 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
- <eddyz87@gmail.com>,  Mykola Lysenko <mykolal@fb.com>,  Alexei Starovoitov
- <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Martin KaFai
- Lau <martin.lau@linux.dev>,  Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>,  John Fastabend <john.fastabend@gmail.com>,  KP
- Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
- Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
- <shuah@kernel.org>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf 6/6] selftest/bpf: Introduce
- __attribute__((cleanup)) in create_pair()
-In-Reply-To: <20240724-sockmap-selftest-fixes-v1-6-46165d224712@rbox.co>
-	(Michal Luczaj's message of "Wed, 24 Jul 2024 13:32:42 +0200")
-References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
-	<20240724-sockmap-selftest-fixes-v1-6-46165d224712@rbox.co>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Fri, 26 Jul 2024 19:27:34 +0200
-Message-ID: <878qxokqrd.fsf@cloudflare.com>
+	s=arc-20240116; t=1722014908; c=relaxed/simple;
+	bh=LWnLwuV8oe2vBX2TVbJ2qUu/Jv8nP26LMaZlcXzTRf0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SPm5NQK1qw7+ThGGBVKZGXb1xX3wK8WlpOb6JhjgdJLE3r9XZv9vw1S6ia/d/G3VH5sBDnEEUAspyAGPacXTjXno8UgYdwnLr5BNbAW66Cs/Prk/FT17r6DA9+rYUe0rzpY6CaXZn+ABEtZCCZo7Hs6YC1K4NL98Yzu8H8r3Sxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwgILJXC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A435C32782;
+	Fri, 26 Jul 2024 17:28:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722014907;
+	bh=LWnLwuV8oe2vBX2TVbJ2qUu/Jv8nP26LMaZlcXzTRf0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IwgILJXCbWuFD9NP18tPLnp5RjlTvAtCiR7IiyCPYvI5hdGqSyAPUMHM8o2wfy4ym
+	 4auXvHsIgdcBeJXR8yDzlgsN4eRsLc49uwDV0IO7ZTlcpBEKQtxpN/ZHQWZa9cbhH0
+	 sk89UpUp0M6GRKGUjHOBMWdgNoHYRHU/mLYnB2AnFV1NDxlRa9xAGcqg0L/OzfJQX+
+	 /shWJFeDi5Htq3qeTlzmqZXd7Fgow3Mvd5Ys0Yy+zYA5GevEtNbF8mup0l6G5ci3gr
+	 LkGRfb5txbLmwdVk9xL/mtTdC5U/uu1bU4CEPmcyv6EnTLxyU0SvQRSY05pDNZ+MZb
+	 vbnB9IJ2XogIw==
+Date: Fri, 26 Jul 2024 18:28:23 +0100
+From: Simon Horman <horms@kernel.org>
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH v4 iwl-next 0/4] ice: Implement PTP support for E830
+ devices
+Message-ID: <20240726172823.GA1699125@kernel.org>
+References: <20240726113631.200083-6-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240726113631.200083-6-karol.kolacinski@intel.com>
 
-On Wed, Jul 24, 2024 at 01:32 PM +02, Michal Luczaj wrote:
-> Rewrite function to have (unneeded) socket descriptors automatically
-> close()d when leaving the scope. Make sure the "ownership" of fds is
-> correctly passed via take_fd(); i.e. descriptor returned to caller will
-> remain valid.
->
-> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
->  .../selftests/bpf/prog_tests/sockmap_helpers.h     | 57 ++++++++++++----------
->  1 file changed, 32 insertions(+), 25 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> index ead8ea4fd0da..2e0f9fe459be 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> @@ -182,6 +182,21 @@
->  		__ret;                                                         \
->  	})
->  
-> +#define take_fd(fd)                                                            \
-> +	({                                                                     \
-> +		__auto_type __val = (fd);                                      \
-> +		fd = -EBADF;                                                   \
-> +		__val;                                                         \
-> +	})
+On Fri, Jul 26, 2024 at 01:34:42PM +0200, Karol Kolacinski wrote:
+> Add specific functions and definitions for E830 devices to enable
+> PTP support.
+> Refactor processing of timestamping interrupt and cross timestamp
+> to avoid code redundancy.
+> 
+> Jacob Keller (1):
+>   ice: combine cross timestamp functions for E82x and E830
+> 
+> Karol Kolacinski (2):
+>   ice: Process TSYN IRQ in a separate function
+>   ice: Add timestamp ready bitmap for E830 products
+> 
+> Michal Michalik (1):
+>   ice: Implement PTP support for E830 devices
+> 
+>  drivers/net/ethernet/intel/Kconfig            |  10 +-
+>  drivers/net/ethernet/intel/ice/ice_common.c   |  17 +-
+>  drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+>  .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 +
+>  drivers/net/ethernet/intel/ice/ice_main.c     |  25 +-
+>  drivers/net/ethernet/intel/ice/ice_osdep.h    |   3 +
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      | 356 ++++++++++++------
+>  drivers/net/ethernet/intel/ice/ice_ptp.h      |   9 +-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 208 +++++++++-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  25 +-
+>  drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+>  11 files changed, 508 insertions(+), 159 deletions(-)
+> 
+> V3 -> V4: Further kdoc fixes in "ice: Implement PTP support for
+>           E830 devices"
+> V2 -> V3: Rebased and fixed kdoc in "ice: Implement PTP support for
+>           E830 devices"
+> V1 -> V2: Fixed compilation issue in "ice: Implement PTP support for
+>           E830 devices"
 
-Probably should operate on a pointer to fd to avoid side effects, like
-__get_and_null macro in include/linux/cleanup.h. take_fd is effectively
-__get_and_null(fd, -EBADFD).
+As the recent changes are about kdoc, please consider running
+kernel-doc -none -Wall and ensuring no new warnings are introduced:
+ice_is_e830 needs a short description.
 
-> +
-> +static inline void close_fd(int *fd)
-> +{
-> +	if (*fd >= 0)
-> +		xclose(*fd);
-> +}
-> +
-> +#define __close_fd __attribute__((cleanup(close_fd)))
-> +
->  static inline int poll_connect(int fd, unsigned int timeout_sec)
->  {
->  	struct timeval timeout = { .tv_sec = timeout_sec };
-> @@ -369,9 +384,10 @@ static inline int socket_loopback(int family, int sotype)
->  
->  static inline int create_pair(int family, int sotype, int *p0, int *p1)
->  {
-> +	__close_fd int s, c = -1, p = -1;
->  	struct sockaddr_storage addr;
->  	socklen_t len = sizeof(addr);
-> -	int s, c, p, err;
-> +	int err;
->  
->  	s = socket_loopback(family, sotype);
->  	if (s < 0)
-> @@ -379,25 +395,23 @@ static inline int create_pair(int family, int sotype, int *p0, int *p1)
->  
->  	err = xgetsockname(s, sockaddr(&addr), &len);
->  	if (err)
-> -		goto close_s;
-> +		return err;
->  
->  	c = xsocket(family, sotype, 0);
-> -	if (c < 0) {
-> -		err = c;
-> -		goto close_s;
-> -	}
-> +	if (c < 0)
-> +		return c;
->  
->  	err = connect(c, sockaddr(&addr), len);
->  	if (err) {
->  		if (errno != EINPROGRESS) {
->  			FAIL_ERRNO("connect");
-> -			goto close_c;
-> +			return err;
->  		}
->  
->  		err = poll_connect(c, IO_TIMEOUT_SEC);
->  		if (err) {
->  			FAIL_ERRNO("poll_connect");
-> -			goto close_c;
-> +			return err;
->  		}
->  	}
->  
-> @@ -405,36 +419,29 @@ static inline int create_pair(int family, int sotype, int *p0, int *p1)
->  	case SOCK_DGRAM:
->  		err = xgetsockname(c, sockaddr(&addr), &len);
->  		if (err)
-> -			goto close_c;
-> +			return err;
->  
->  		err = xconnect(s, sockaddr(&addr), len);
-> -		if (!err) {
-> -			*p0 = s;
-> -			*p1 = c;
-> +		if (err)
->  			return err;
-> -		}
-> +
-> +		*p0 = take_fd(s);
->  		break;
->  	case SOCK_STREAM:
->  	case SOCK_SEQPACKET:
->  		p = xaccept_nonblock(s, NULL, NULL);
-> -		if (p >= 0) {
-> -			*p0 = p;
-> -			*p1 = c;
-> -			goto close_s;
-> -		}
-> +		if (p < 0)
-> +			return p;
->  
-> -		err = p;
-> +		*p0 = take_fd(p);
->  		break;
->  	default:
->  		FAIL("Unsupported socket type %#x", sotype);
-> -		err = -EOPNOTSUPP;
-> +		return -EOPNOTSUPP;
->  	}
->  
-> -close_c:
-> -	close(c);
-> -close_s:
-> -	close(s);
-> -	return err;
-> +	*p1 = take_fd(c);
-> +	return 0;
->  }
->  
->  static inline int create_socket_pairs(int family, int sotype, int *c0, int *c1,
+And, perhaps things crossed in flight.
+But please address the review by Jacob and Alexander of v3.
 
-This turned out nice and readable, IMHO.
+Thanks!
 
