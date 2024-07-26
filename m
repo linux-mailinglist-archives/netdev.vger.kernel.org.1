@@ -1,181 +1,129 @@
-Return-Path: <netdev+bounces-113293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562F993D933
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 21:41:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8742993D96A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 22:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D82E21F2125C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:41:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41DF5285C98
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 20:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BE944C76;
-	Fri, 26 Jul 2024 19:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0A5146A8A;
+	Fri, 26 Jul 2024 20:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="L6iU35Oa"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="DbZEPssY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AF54AEE9
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 19:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922CA1304A2
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 20:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722022910; cv=none; b=TH0OGxI51vd6s4ijm2TBZttlbIKi5AyxSYhmAJiO5coXd+tveXN3crvlrPDRU4hKMscazwBHpEAx2gmW9g+GOAQ52akrKgtyEMn8R0FBBNB/U6owJ4kz21fLSRD3hYexX/hvI47SMUPdCf7VXOnjSdp78qWTaaMOT//KsP8eU/o=
+	t=1722024003; cv=none; b=ZlbKAdBTxWmJ4o0m9oU/687St555rar+dJAsUlKwOUjsnm5M0/22Ut0MsOQ4hoe8VjomrpvtvMp9wdm/kfwUWLbJ8e67dLm92srSalCSSam6/b1+mk4Yj98GRMzdS5l05yuMYCd4yC5Y5+OloTmmm8gon7/XA+n9O9BJJewH3q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722022910; c=relaxed/simple;
-	bh=eV6Yy+/c65ODYtFWkt1GujLZCm0b2U+qafWEg50toGI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P5c8NSwE9BRCSgyKSi4/rbr2nFMCS7KNIn3z2o0ab8k+2/fuIZNUNGsdW2bgts8tgZy4HEQmAe1F8fYA+KdcU5+MtQptTGDz3phvUPsJMNSxK3K3kpD1w+gT0zgWKLbIQRe9Vz2Lw9V/m5QvYPTBDfvLIY8Sjn6jQCvrdSKWzdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=L6iU35Oa; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e05f913e382so37574276.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 12:41:48 -0700 (PDT)
+	s=arc-20240116; t=1722024003; c=relaxed/simple;
+	bh=2PQcgbWLbtXARhLwKAm+bgtTE2bCYz79iSNxQ2FSVhw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VuN+Qss3Ra12L+GiFhz2qHYhu2vVW5pcx/tnNG8eBbc2M93UgI8TkznHfATuEgMYKcSCAHZHlXEdsmAswyv+CwT9/FvKkOg//sDMA4AEL72l2f9xyzruY6Kv9Sgo1L0SE1v5twGDiYdQHpr6Su2K1jjyvP4i7wKsaw0Oe/UG07w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=DbZEPssY; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a1c49632deso2909125a12.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 13:00:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1722022908; x=1722627708; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HARFxWIFPEm9vWTWeOJWegog5BOk60egFlOmdNasrqk=;
-        b=L6iU35OajprD93F0DF48GWaFc4C0PcmmMrtY+KFxsAN7bmaCdiGVulqDRNqnwMXXDa
-         ntI0CXrHOxKtOE1MlLQdFhs81/0uxFlrJviQOVuq2CKBeIqibGerKAQf4xbXpXLx9mqe
-         mbTJ7B6CG1DZJvh7KGO4eSadRwc0pFW9V1ZRy7uMY/60qlGFpGvhqk+GknaGEBxk7w9r
-         RtL1GpNKQwbhlL5M0nqF0mgcFHM240y569gbET31gmMs5fzXRL0no6swn2tPaFKAodV/
-         CBOQ7+AOusevT/k+bd/MdOWqs2x3X1/pUw7XpxQYfxxJlft4Ko1r/4t+Sn1wzzxBc+Rr
-         8iXA==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1722023999; x=1722628799; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Bqzco2JjQhGyZ8/rxo6FZtwpdhib502jq1p6hVB5sM=;
+        b=DbZEPssYqauWYlHUsmjaxksLjrRqRxJMxA5lTeHityTM0MACb4kNM/ea5X6i+Pa+YE
+         ThAn067USIkIzIXvUWS+fR2YxxmzMhE0XJBxbVLary7DzjgmDguVt2FL+5xHtQfld54M
+         311JtQo4ve6xQkms0DRumdAU0nBGnrdvMvI4tQwlWUs6/O5qr8ao0LHKgy3xndWj/2/P
+         6YRIOfI+b3wdLE3kJeQJarS+gbpI1Dts9eChW8PY0mlt9dPyGbbXIzKgAujgNtjrCNSf
+         DCSr1T8fDOLNCO1TeB14HP1Yq3i/zTiCaqriW1S7LKp5XbS7+79QdRTgMVcd6lyo8Akt
+         nx1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722022908; x=1722627708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HARFxWIFPEm9vWTWeOJWegog5BOk60egFlOmdNasrqk=;
-        b=og+o3taEAelIoMaXP+ic4lJEzvjtnsU0Oj08crPkE84YzG3Kyjh6HbvkKx8No1pFlh
-         hAaJT5cHNt4A4G3G6CdZ9ng7jzMl9YM46nt8kNaUzKb6UT+yLq06ucNgZD6qqon1QDg6
-         hdb/BdzsU+Rrf9WufZzOWZ5ed5CilPzLqr0LwaimqEB6oAvvmmsnvI0i04lCasEDk6gs
-         rKwRq/I4Xn47aCXTyUppU41ap+RBVNgMeSPbMwU7G/mmjU1mKbj36sztPS5Me2b5T2FA
-         9lbUCrpTPCyiyj/PCXTaUoICNIUU5pqpafY35YdDqNI5aoRkSYh5rKSaZLF9/BmCMLzP
-         39nA==
-X-Gm-Message-State: AOJu0Yx/MllB90qLppuvW+p3Ad1v1oYSzyleEkfQikUNRQqMQl8V7/O6
-	QyUgpRmg7gN88WmbRWt8hxoD5aNAEj1cclh8YmxHvJpdHl8nGUAC72Xw8nFdguf09CsjqzhxED+
-	eRADSvkKa+wc+2Rb/Ko6qmUHLxDp78fZPMHpL
-X-Google-Smtp-Source: AGHT+IHT02FMlg0Pdb4O1dWACOWR5w+ot1eBVewHBOXgqkXnR8YtOLgmhvt0jxizos97VmglFufrpBqIct6MnrWAuUM=
-X-Received: by 2002:a25:c502:0:b0:e08:6bb2:ed3d with SMTP id
- 3f1490d57ef6-e0b54403a01mr868535276.12.1722022907866; Fri, 26 Jul 2024
- 12:41:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722023999; x=1722628799;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5Bqzco2JjQhGyZ8/rxo6FZtwpdhib502jq1p6hVB5sM=;
+        b=lTzIKCn4MLs66IZoh7bzudi7fq2NhaFpyi/V+ZwHFwlXQ8XIJmnXy72LykB77rDOb+
+         2HYCgWSDXe3YNhh8CbxUBF/vJVyDiCWjSS83KTfXhPFR/DWV/RYjBJyvXZf5iJDeQzFL
+         WjDWg4WM3ZAH7cN7oSdza4BFavMXs3Y5NZVVtIGFRXYsziew+PsDAk3tB9mx68ccQokD
+         DxyogXsP4IpmjDTmZS7COsvONTjqDOgrw/yUextBq5KpGadEUzbcy9RS8uc63E0OnzoL
+         n/iX7jpvGEAWG1iObOAHjW12qw1zd2NJbsJ01PjRpUoWcVzMjzwmKi3z/aj4DWzElD8x
+         HbVw==
+X-Forwarded-Encrypted: i=1; AJvYcCXQFAFKoWM/fx3/m3pO0XhHPGqh1okdD6TT1VqmaW5nLmGHMgbiCLzKbrNqfw+vfIw9U9uGwy2jjOahHeGW+3BMVD/fbKCj
+X-Gm-Message-State: AOJu0YyacnHL+MAscb9DCfiHFZpRF+w/PYyL8xx1GZIpB+oQFZfyzmcD
+	Y2puVkPfguHL9tFbgYWlXBZfxxiMSb04lBni51ESueZc5oYluPMS/qG/6MTEyxg=
+X-Google-Smtp-Source: AGHT+IElOd6Hbyj7HaimN+4QJo+h+BZ0vbB+q0ffTtcWjCu5PlF6st8XKrKRtSnxr7Yb4D2rmkfsog==
+X-Received: by 2002:a17:907:1b13:b0:a7a:a33e:47b6 with SMTP id a640c23a62f3a-a7d40188f75mr31627866b.60.1722023998808;
+        Fri, 26 Jul 2024 12:59:58 -0700 (PDT)
+Received: from blmsp.fritz.box ([2001:4091:a245:8609:c1c4:a4f8:94c8:31f2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad90e1esm209999166b.151.2024.07.26.12.59.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 12:59:58 -0700 (PDT)
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>,
+	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Tony Lindgren <tony@atomide.com>,
+	Judith Mendez <jm@ti.com>
+Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Linux regression tracking <regressions@leemhuis.info>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/7] can: m_can: Fix polling and other issues
+Date: Fri, 26 Jul 2024 21:59:37 +0200
+Message-ID: <20240726195944.2414812-1-msp@baylibre.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240607160753.1787105-1-omosnace@redhat.com> <171834962895.31068.8051988032320283876.git-patchwork-notify@kernel.org>
- <CAHC9VhSRUW5hQNmXUGt2zd8hQUFB0wuXh=yZqAzH7t+erzqRKQ@mail.gmail.com>
- <1902e638728.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
- <CAFqZXNsQQMxS=nVWmvUbepDL5NaXk679pNUTJqe8sKjB6yLyhg@mail.gmail.com>
- <CAHC9VhTwFyMhYK448gBpwO7M4bEBCOq-f=-ztn1vro9nQU9v0A@mail.gmail.com> <CAFqZXNuwruVUeLV8PKBbxBqa9ubbvE+NGVnOumzH+BCXcRNZBw@mail.gmail.com>
-In-Reply-To: <CAFqZXNuwruVUeLV8PKBbxBqa9ubbvE+NGVnOumzH+BCXcRNZBw@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 26 Jul 2024 15:41:36 -0400
-Message-ID: <CAHC9VhT4BSKfdgbYNnXsXkwrqxPAuEuJFf6tYYbMCPq4JxK+Jg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] cipso: make cipso_v4_skbuff_delattr() fully remove
- the CIPSO options
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	patchwork-bot+netdevbpf@kernel.org, selinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 26, 2024 at 8:44=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
-m> wrote:
-> On Thu, Jun 20, 2024 at 4:39=E2=80=AFPM Paul Moore <paul@paul-moore.com> =
-wrote:
-> > On Thu, Jun 20, 2024 at 6:03=E2=80=AFAM Ondrej Mosnacek <omosnace@redha=
-t.com> wrote:
-> > > On Wed, Jun 19, 2024 at 4:46=E2=80=AFAM Paul Moore <paul@paul-moore.c=
-om> wrote:
-> > > > On June 14, 2024 11:08:41 AM Paul Moore <paul@paul-moore.com> wrote=
-:
-> > > > > On Fri, Jun 14, 2024 at 3:20=E2=80=AFAM <patchwork-bot+netdevbpf@=
-kernel.org> wrote:
-> > > > >>
-> > > > >> Hello:
-> > > > >>
-> > > > >> This series was applied to netdev/net.git (main)
-> > > > >> by David S. Miller <davem@davemloft.net>:
-> > > > >
-> > > > > Welp, that was premature based on the testing requests in the oth=
-er
-> > > > > thread, but what's done is done.
-> > > > >
-> > > > > Ondrej, please accelerate the testing if possible as this patchse=
-t now
-> > > > > in the netdev tree and it would be good to know if it need a fix =
-or
-> > > > > reverting before the next merge window.
-> > > >
-> > > > Ondrej, can you confirm that you are currently working on testing t=
-his
-> > > > patchset as requested?
-> >
-> > [NOTE: adding SELinux list as a FYI for potential breakage in upcoming =
-kernels]
-> >
-> > > Not really... I tried some more to get cloud-init to work on FreeBSD,
-> > > but still no luck...
-> >
-> > As mentioned previously, if you aren't able to fit the testing into
-> > your automated framework, you'll need to do some manual testing to
-> > verify the patches.
->
-> Sigh... okay, I now did test the scenario with a FreeBSD system as B
-> and it passed.
+Hi everyone,
 
-Great, thank you.
+these are a number of fixes for m_can that fix polling mode and some
+other issues that I saw while working on the code.
 
-> I'm not saying the concern is not credible or that (in general)
-> testing this use case is not important. What I'm missing is some
-> explanation/reasoning that would make me think "Oh yeah, these patches
-> really could break this scenario" ...
+Any testing and review is appreciated.
 
-One of the challenges to network testing is that you don't always know
-how other network stack implementations are going to react when you
-start getting into corner cases or lesser implemented protocols.  You
-just need to test your patches to make sure nothing breaks.
+It is currently based on v6.10-rc1 + a patch from Martin, mainly for
+review purposes. Once next rc1 is out, I will rebase it, but it should
+also apply cleanly.
 
-> > > You see something there that I don't, and I'd like to see and
-> > > understand it, too. Let's turn it from *your* concern to *our* concer=
-n
-> > > (or lack of it) and then the cooperation will work better.
-> >
-> > It's not about you or I, it's about all of the users who rely on this
-> > functionality and not wanting to break things for them.
-> >
-> > Test your patches Ondrej, if you don't you'll find me increasingly
-> > reluctant to accept anything from you in any of the trees I look
-> > after.
->
-> Paul, I don't want to break the kernel, but that doesn't mean I will
-> do an excessive amount of work for someone else when there doesn't
-> seem to be a logical reason to do so. IMHO, just because someone
-> somewhere has a special hard-to-test use case that is very important
-> to them doesn't mean that it is your job as a community project
-> maintainer to force other contributors to do work to defend these
-> peoples' use cases.
+Best,
+Markus
 
-I have a responsibility to ensure that we provide a stable, secure,
-maintainable kernel that is as bug-free as we can possibly make it.
-If I see a patch that I believe warrants a certain type of test to
-help meet those goals I'm going to ask for that testing.  Of course
-like many things, even things we believe to be very clear, there is
-always going to be a chance that disagreements will happen around what
-testing is relevant or necessary.  How you handle that disagreement is
-a choice you will need to make for yourself, but I would encourage you
-to consider that more testing is usually a good thing, and aggravating
-those who review/ACK your patches is generally not a good long term
-strategy.
+Markus Schneider-Pargmann (7):
+  can: m_can: Reset coalescing during suspend/resume
+  can: m_can: Remove coalesing disable in isr during suspend
+  can: m_can: Remove m_can_rx_peripheral indirection
+  can: m_can: Do not cancel timer from within timer
+  can: m_can: disable_all_interrupts, not clear active_interrupts
+  can: m_can: Reset cached active_interrupts on start
+  can: m_can: Limit coalescing to peripheral instances
 
---=20
-paul-moore.com
+ drivers/net/can/m_can/m_can.c | 112 ++++++++++++++++++++--------------
+ 1 file changed, 67 insertions(+), 45 deletions(-)
+
+-- 
+2.45.2
+
 
