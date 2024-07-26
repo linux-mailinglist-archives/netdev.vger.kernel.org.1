@@ -1,220 +1,297 @@
-Return-Path: <netdev+bounces-113233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F4F93D420
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:23:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE7493D423
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:23:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C50B41F21323
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:23:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB161C236C6
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB7B17C7C5;
-	Fri, 26 Jul 2024 13:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDE917B511;
+	Fri, 26 Jul 2024 13:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="BLJe92O9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W22KXEnt"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C6617C227;
-	Fri, 26 Jul 2024 13:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722000164; cv=none; b=LBgat7JulFCabCsDGkA9JFiIEE3qVdpweHeiWGQJ38lo+uuWZUszmHJHz3mXKB56HTsv3E4sAmLop7sEjzuXIU0y1Wp5TSSvHQFPG9EJQnDQfTXTalF2udO3CDRldVuZIgv8pvdIsT4mbv+sPWjgiIxsVZd5kLlXmK2d8fcpuZk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722000164; c=relaxed/simple;
-	bh=kUSe+c2AZazugy9JtiEaOnVHrrpVwrlwFkF8YSYVgRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N9bX1KmWqINgFp/3P6/8ekVpj57UvO+k64W1UgZXfzohbwN6JqfvH3CCOdTloJgr6R9DbOOy+ocHY30qQRIXlBQImiuWw7EbRPdFd2EJkDEdyyPTwxzbLXYVXeYK8ZSKcS+qnDtd0AYBdqBAu9IoFiVG1F1rHOL1RLb7qh0a1hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=BLJe92O9; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 1BFF883F;
-	Fri, 26 Jul 2024 15:21:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1722000116;
-	bh=kUSe+c2AZazugy9JtiEaOnVHrrpVwrlwFkF8YSYVgRU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BLJe92O9dq1pWCnEDtNkuAiUriGnt591MAli5d16QtchjELf/qlqylOQ1gOizfbo/
-	 QmuYpS24/5r1rogqjCAqMO0ub7lPKTIJvTulfzthElYF+UeQ61pW4P480EpBJS+2aA
-	 1XakiNNkljjDStby4N+KYfY4lPZ43piBc4zH5iI4=
-Date: Fri, 26 Jul 2024 16:22:20 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240726132220.GE28621@pendragon.ideasonboard.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <nycvar.YFH.7.76.2407231320210.11380@cbobk.fhfr.pm>
- <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
- <20240724200012.GA23293@pendragon.ideasonboard.com>
- <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
- <20240725193125.GD14252@pendragon.ideasonboard.com>
- <CAPybu_3GkgcORm0Jbp8ze_rjfXDws8xWT_sQcs_39KY54zpnQg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B469E13C9CD
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 13:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722000187; cv=fail; b=si28JQZNTeFrYGgTEKtSEnuvpKILjC6OThU9lqJhKf2VZd8Y5dFRanUH9fN9+gk/kEt1tbtBKzr5CsFTcCF2uzTGvSw8mvol4dHc8gW6Je7dViozqscaUi1dWHI3azfE87G0VrzVaJofDpXLHwtjmS3Pz9n2VYovlOPkXBeYkEY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722000187; c=relaxed/simple;
+	bh=mQx3p5LHaC4N41EkX42x7gLDmcmRP7HcgO2kT8zztdc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=GwXsoyNUFprgeuVbTZr7HeeIOwDGJnO6S3ua7BviJ+lvsjPQXnK2mlyKPZ808PUCnC4Kg+8lUNtHr5XI49McJuS/5TkAud+mv/Ne7N1EYxSzqxTgPDL6vFJHkA+cOX0TnkZpkduQM2nAr2sIjn8bKQ9RlR2mN/jFLr7SyvR3g0I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W22KXEnt; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722000184; x=1753536184;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mQx3p5LHaC4N41EkX42x7gLDmcmRP7HcgO2kT8zztdc=;
+  b=W22KXEntZJnbJMVsMqThRVXEZuRisXxQ1W0XsMDJUAXaAisln2MqIDik
+   wfFHQGGeb7RdCi64cemn9OMZIA8AJi4gyqgDtYGzUczNfO8ws/WrTcXaQ
+   xkjl4m3suAxb/piMwK4BLC372waS4rImKuHaPNM2OTMjhS5FsQ5+uHPYo
+   8jgYMPNElgTNPhzvUFCxPH3vq43DGzoM5lLZEjX1vcwVWGjYXHR8A62nP
+   0W3MmgrHxfrbmz+EXpHAxAUY7XlCf9QuJIgEKmrkZHKWRkhGd16QnVPWt
+   eaLUEU55RSm2xYZNyrC2WT4pPb17HY+STTf3RreYxiXP8IOSrOs+aLeKs
+   w==;
+X-CSE-ConnectionGUID: TR4l9PSqRa6cADU/NjckwA==
+X-CSE-MsgGUID: aHuG/TUYSYu1QOyrVUvEBw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11144"; a="19591335"
+X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
+   d="scan'208";a="19591335"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 06:23:01 -0700
+X-CSE-ConnectionGUID: GZl2f/fxSuCV2LgCc+H0vQ==
+X-CSE-MsgGUID: 4EGzcs1eSMOugZ6JTjdK/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
+   d="scan'208";a="53284858"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Jul 2024 06:23:02 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 26 Jul 2024 06:23:01 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 26 Jul 2024 06:23:00 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 26 Jul 2024 06:23:00 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 26 Jul 2024 06:23:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XXySfUCiZkzW25F5i91iHDhDhDfhyzkcrxBFpdsB5fg0gmfO881Gb/Nxw4ksuZysV6co+97opyh+cQWKeLYFz5+iO7/xc/Lu72HQl0KsJmKm8J9RlTfEPlNRl/0GkglWf7l+iC/ljPDXq3D0Cac9IrZ2AV5s6GghUcfgaJPuMwjWGUnD7aecDSQqPEOW0MqU1IifAOO4XBbjI+VMfcz/SCJdZ+PTO0+3NuBeMZWGeeYzyjK2XaWm4sesz4X/LT8bJ7j3ICur7OD7QFsBKXK3w/C9jqy+dSyTz3bPbeFS8VBx0MHjECHTWcDUE6sKpBCUP/EIm+Gi+X9E/ZYnug39qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fwBatQ9uFznU2S+9nQunkJCTHXTGwVWTaXS1kiYmncs=;
+ b=qpeqqJA2pDQ+VfZnceVcozSv1QnFS5fobmMA9medNHVohWBjcIq7CJuJZxgAqlOZwfgHU49D1XuAJEjnj16sQxYKYZZvEH9hZHyBXXEfh2npYBcQqO6hp53RI+ZEQv3EOOFawKxkwDgCSjJjMpWWCnYYBdpYSdZJefFrd08ZTMzbSP+uOeptPWJ9zXNoDPpTrB1Y0vbqp6RQJ5eeUM4xR6i07XBVMU5Q9oBmp43sTXXFa7L8YN7UEShestO0hMqAkntX0WiJsJmuRB4V5spkyeUS9O+6hTWggAEN+qjNE8qo9IXuJGRDBsW6FVGoWH2gQY2l/7ENTzR/58LMSSH30Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by IA1PR11MB7917.namprd11.prod.outlook.com (2603:10b6:208:3fe::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Fri, 26 Jul
+ 2024 13:22:52 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7784.020; Fri, 26 Jul 2024
+ 13:22:52 +0000
+Message-ID: <d665834c-3989-4832-8f1c-bf127ce8a652@intel.com>
+Date: Fri, 26 Jul 2024 15:22:47 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v3 iwl-next 2/4] ice: Process TSYN IRQ
+ in a separate function
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>
+References: <20240725093932.54856-6-karol.kolacinski@intel.com>
+ <20240725093932.54856-8-karol.kolacinski@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240725093932.54856-8-karol.kolacinski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU7P250CA0009.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:10:54f::13) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPybu_3GkgcORm0Jbp8ze_rjfXDws8xWT_sQcs_39KY54zpnQg@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|IA1PR11MB7917:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ee85d7d-8039-4149-500b-08dcad760d65
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?VnFXbEt5Y01CTDRNVzFUWEFobFJ3Q1hsMHVBbHZkWFRFUTZMdnVodWY2K2Ro?=
+ =?utf-8?B?dWNPc2YzOGxBNkhYOEI3VnIxUzI4bzZWUGk2bE1NbjdJM3lRRDAxTEtsRHNj?=
+ =?utf-8?B?YkYzUENocFlUb2ZsNHA0bkVoNVJXUGExMHVvbnErV2tEU3hwSDJyK2crUVdO?=
+ =?utf-8?B?TkJDb252NGpYL0tZTms5NGZzUTcvOEJmbzIvaHpEK3ZWbE83YTBmTDFnSEdw?=
+ =?utf-8?B?NXN4dDVqZzNBMkhjdnhJQ2xhaGZPN2hJRnZzT05ueDdjTkRrSnc2cVpxVVdL?=
+ =?utf-8?B?YWM0Y3libWxuOGhpd1dyb0JRUzJ6Wkw0UW10K25yN3hEK1lUak5WaEV1TVFQ?=
+ =?utf-8?B?RTdob2o2VW1rbVVCM25iTFFHMTZHN0plUUJKbm54ZE5lWXU5VmJ0NXBXdHMw?=
+ =?utf-8?B?M2lnUk5mMjBjTTVvbW1YbFRsNFRGRWdYbkM0TWtqRTkxLzZxZkxMZ3ZpbHN6?=
+ =?utf-8?B?VjVZdGF4ckZTcG1WOE5UUkliRlJScGFaTURsb3kraTM1c2t4SytUelFWam8r?=
+ =?utf-8?B?RndWYU5TKy9Hc0QySS9YYW16Z0tSZWpKbDBza09hdHEzeXc2ckR1dGNtbFMz?=
+ =?utf-8?B?VmtBUzhuUVk2YjFMMmg5OFhUZlY5NW9nSWIvZ2JtRVJobENrbGtnM3NHYmh0?=
+ =?utf-8?B?aEZoNTROTUhyKzJKNFFjWkZ1Y1g3WkVPdWxQZU5zYkQ3Qit1a0xKQWNVaGh5?=
+ =?utf-8?B?QzBZaVhrUDRUci9pdTFLbm1abkxXREk3Vk5iZEVad0loN29SWTdMTzBiWFBZ?=
+ =?utf-8?B?VCtuYmp2b05hMDE2RG85RXVpVkU3d1h5aWpZTUZTbXpEWHB3QTFrZkxQMjlJ?=
+ =?utf-8?B?Q0luS0U3UUZ6Vzd3L0duMjEyQ0VWYXdZQlJJZXFjMEVMUk83WG9Ianh6RWpj?=
+ =?utf-8?B?dFVsb1kxaDVWL1Z4OEdxbUdnRjNuTURpMFB2OUlHWnAwcTB1MzM2WENjVytx?=
+ =?utf-8?B?R0lqZmNJSHpQNFd5V3ZiNnM5aTZwMUVmbFZNeEtwYnJUM2xpRVBzS3Z4Q01u?=
+ =?utf-8?B?Vml4d0ROTUhHV05hcHN1VzN4VnZIR0tqckFZb3NTbVplaFhMWDFEUDN4Z1Vw?=
+ =?utf-8?B?NlUwOVAwMUU3Tno4Yzhlb2FIYldXTEJ0ZlVBU2lOYVZwdElnUEJsWGJWQ2hD?=
+ =?utf-8?B?NlJjN0FWSEUwSWQ1b1hXR3c3R2pxaFlWcklrNmR4dzBzUHVsQ29Za2g0UlJS?=
+ =?utf-8?B?cjlEMzdNWnhodDNUZXk3dGZxb0RpUnBoTlVSZjdUcUpjbVpnT1poVUJrVDJj?=
+ =?utf-8?B?TE0rTllpUFZ6a1NZS0djSVQrYktWa0dSRU4wWXhrRjVPc3dGWU9TQmVKM1Jv?=
+ =?utf-8?B?eVBOTzdoaW9uQWlQblRZM2JZMTh6QjhQbXgwc1VaWEErOUpLbTc3ZVdNa20x?=
+ =?utf-8?B?Ky9qbVdXdHByallQdGs2cXNtMlpxTnlDbTlTWEltY0gvdUZpSW0yb0o3eHBT?=
+ =?utf-8?B?dWg1RGJKa0tuRzNaM0wxdVRYdHVGMVpSQVhWNW9ZYzhQOVc0alNON3dvcEtq?=
+ =?utf-8?B?eUpDT3I0Lzk5Z3FVYWx2S29SckNaclYrOTg2a0ozL0hEZ3haZTRESzFiWDVB?=
+ =?utf-8?B?MDRReTNYakFWZEQyMjBGTGtMOStDVjZobmxoVXczS2JQU3h6K3FMdENHbS9j?=
+ =?utf-8?B?ZTBVTkk3dGtMVTBUTWtuQnF5clZOS29TVG1IQWdHeGoxM2lZVEdKQ1IxY1BG?=
+ =?utf-8?B?bUI1dGs2NE9PWENvYlpMSHNjaFZZQVZDMjRYS0ZMRTBYTHFFQXN3K2RRUzFU?=
+ =?utf-8?B?OVVOY3ljaW14ekpCN01saTc2VzZlcUZWWXdIbnhxTjNia1hKMFlGY0JpbmNB?=
+ =?utf-8?B?WjNsbE5DeHFGNER2ZjlrQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QzRMekIyZDZzMktjVnBPOGY4WjVDSTBGcnZwMjR1QjV3TVpnVnA3MFFwTmdx?=
+ =?utf-8?B?MjJLTVpQL2ErcURkMktpQUlPMjAwM2Y4SFF1WS9iT3htdkovdUxWNVVqYVZV?=
+ =?utf-8?B?OGg4aXBDcHRIK1VsY0JiLzhKcnk3N1h6QzdjZUNFWGdOcmVtclhvNE9DeXda?=
+ =?utf-8?B?MEZqS1EyV2V1QVlCRmJoQ0dwMzNmR0c1TUYvVklwL0JEOGZzRmVIUXgrUlhS?=
+ =?utf-8?B?L3JDMXhBTnhlTXFwaGh2djZaMXJhbDBKRnM0NUR4OWMyOVlwTUUwMlExSjRw?=
+ =?utf-8?B?V1EvaFhqYi94Z3YxR3Qwekl6eWdmNVZNb3BTRjN0Y1lNM29SQ05YV1hFK3d2?=
+ =?utf-8?B?SnNqQXlrRldhb3lrWXBQRUZaNFRBSzZOTmk2NmxhaEJXckV2SUJYekViaVJD?=
+ =?utf-8?B?aXpCTS9MZkFyQlZvYmpGRktocnpvRFJGeXJTa3ozVWJqM01NZmNLaXpvaENv?=
+ =?utf-8?B?QWVWUnlPVkpnbEtHV09GOStBZGszQkhSWGRHLzhQNGJ0eExXSUlqMGZ5aVJ2?=
+ =?utf-8?B?dnJCc1hVODNLTEhXcTBuSW4vUW95MnMyNStwUkxqZlNTekJkUEk2VmRWYWpN?=
+ =?utf-8?B?QUF1U0h2MWZOQ0lzdVhBeEJKdXI2K2JrQnhabjhxbmZjb2h4MkV5TWVVeWpr?=
+ =?utf-8?B?V0JuQ3BRUlFzWHVueDB2eVUwd0NubDFLdkhaYXdkNHJZUW1PanVNRWZISHJK?=
+ =?utf-8?B?UXMwWjFwRnZCUXdrV2lKWkJHOXQwSGpIK3VqQ2xXc0JPdkU0cUtsWW9VZ3k1?=
+ =?utf-8?B?cG1pdFRHUzFVa29VOStiOXVKV0F2ckNjMnRpMFVpaFU4VlRmNXp5N2RuckJZ?=
+ =?utf-8?B?d0xZVWhZM2g5Nk1INm8yZGhKaU9FMDA3M3o4VGFFdytnbkV4SmVjTWdvTG1M?=
+ =?utf-8?B?cGQwTzViOWdud0c3ZXJKRTFPaEJ3dWFwNjJKUFE2MUIvUUtuSDU0WVIrZVUy?=
+ =?utf-8?B?ejBwTnZqRjY3SUd2cDV3SnR4RVVaQno2ZlQ4OUtUZm1OOVFuUGtuRFlQMkdT?=
+ =?utf-8?B?aUUxMWJ4dEViSE1JVnlxR01qVzR1UHVHOUZ2c2tkTnNPVnZtTkpsV29qRGZ4?=
+ =?utf-8?B?Rk9ndFB2UWpHU3VlNGxodEsrc0F0eHB5ekdVL1Q4YjA3VHNGTThuM1ZNdElZ?=
+ =?utf-8?B?Skx1SzRwbDhvRnhSYXB0dVQ1TzF4MFJJSDVlaFJCeG5RdGlyUldUTzhTVmxW?=
+ =?utf-8?B?YTN0MC9jRCtRYWI5bzkzT21kRnZQWnZGSFhleTBNZW9BSTVUNU9oM2ExOEhh?=
+ =?utf-8?B?Wjd4N1AwYXJoWkpSUk5yNnFRc1VINERuYkswMEZEaXh2dTF4SmxwaWZVQXhk?=
+ =?utf-8?B?c1o3MjcxenNmVnFOSmdPRmlsRDFYMVVsYVFPQ0JQemUwZ3ZFRWd6S1dLQmJx?=
+ =?utf-8?B?MklwbjhNakpDbkw4VGRUK25YbmhlOHlFS0pza216VHNQN0pIdjlSMzU2N2kv?=
+ =?utf-8?B?MWdxV2hSM2ZKMHJJZEdLYU4xdko2dTFtNElLRld0dDRPVEQ2a0FrU0p1ZjdV?=
+ =?utf-8?B?UE9PUmViUi8wSFJnQkNEMG9KRDZCK2NETGg1S2toZVdEMkZjOHRUaGNhaE1L?=
+ =?utf-8?B?RjB4djBxbXlmNm95Sk5STStjb25JVUpNOFltVlVubXhlVmZZTjVaYTA3NU1p?=
+ =?utf-8?B?Rjd1c1BDaGg0S2VZOE1uczFHcVZyYnRmWjNvZEtnN1UwY29qTEhaZ0s1RXVT?=
+ =?utf-8?B?V0pmRm84YzQ4cWpmU1hlb0RtOGt2UFB5c2gybzJlbHpOUUtTa083M3YyYjhh?=
+ =?utf-8?B?UkF3eXRQelFqQkxrQmlUQTZ4ODllajJDRjI3QmU4LzV6R3RDSW5SYUduOEJq?=
+ =?utf-8?B?MXoxenV3OXpRcWFXWDRuSVhCMEZwQ2U5M2JNYnM1ZGxpYkNKRXVLZDRRQmdY?=
+ =?utf-8?B?K2M5NkQzNWJMV25vNlpCSlBtWnVpZUZjeWtNZTNOL3N3K25KNDFTYlBlVG5D?=
+ =?utf-8?B?VmxUekZFT1dwRkVYZ1dhNWRYYUVwdURjY1lmZGhuZ29mK2VId1NyUk9XLzJ2?=
+ =?utf-8?B?NmM2dW85ZFgweERTKzNOVjg1Nm5NL2pFTnEwYjR1Qmd3TUtqVzVITFBZZ0ht?=
+ =?utf-8?B?b1FFa1E2NDBSNVhadW5WTzY2WnlqT2VwRE5td0tWTW0wUXV3L2Y4QkdXYWVF?=
+ =?utf-8?B?eFMzTlpic2dCYTRkRThFV1FMSjJQL1Yxei9iU0lvcEd1K1BJS0NWUEV5TVJG?=
+ =?utf-8?B?RkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ee85d7d-8039-4149-500b-08dcad760d65
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2024 13:22:52.4159
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KfErtfYTvknaIqVO04goSRZtzge8eEPQfGRyHv7x0Fa1x4V+dQfWCYOw24lv9OvC660EZ0um+YD19zTlgTq0Xx6pZJV4bh1pY3hplJACoxU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7917
+X-OriginatorOrg: intel.com
 
-On Fri, Jul 26, 2024 at 10:03:36AM +0200, Ricardo Ribalda Delgado wrote:
-> On Thu, Jul 25, 2024 at 9:32 PM Laurent Pinchart wrote:
-> > On Wed, Jul 24, 2024 at 04:37:21PM -0400, James Bottomley wrote:
-> > > On Wed, 2024-07-24 at 23:00 +0300, Laurent Pinchart wrote:
-> > > [...]
-> > > > What I get from the discussions I've followed or partcipated in over
-> > > > the years is that the main worry of free software communities is
-> > > > being forced to use closed-source userspace components, whether that
-> > > > would be to make the device usable at all, or to achieve decent level
-> > > > of performance or full feature set. We've been through years of
-> > > > mostly closed-source GPU support, of printer "windrivers", and quite
-> > > > a few other horrors. The good news is that we've so far overcome lots
-> > > > (most) of those challenges. Reverse engineering projects paid off,
-> > > > and so did working hand-in-hand with industry actors in multiple ways
-> > > > (both openly and behind the scenes). One could then legitimately ask
-> > > > why we're still scared.
-> > >
-> > > I don't think I am.  We're mostly fully capable of expounding at length
-> > > on the business rationale for being open if the thing they're hiding
-> > > isn't much of a differentiator anyway (or they're simply hiding it to
-> > > try to retain some illusion of control), so we shouldn't have any fear
-> > > of being able to make our case in language business people understand.
-> > >
-> > > I also think this fear is partly a mindset problem on our part.  We
-> > > came out of the real fight for openness and we do embrace things like a
-> > > licence that forces open code (GPL) and symbols that discourage
-> > > proprietary drivers (EXPORT_SYMBOL_GPL), so we've somewhat drunk the
-> > > FSF coolaid that if we don't stand over manufacturers every second and
-> > > force them they'll slide back to their old proprietary ways.  However,
-> > > if you look at the entirely permissive ecosystem that grew up after we
-> > > did (openstack, docker, kubernetes, etc.) they don't have any such fear
-> > > and yet they still have large amounts of uncompelled openness and give
-> > > back.
-> >
-> > I don't think those are necessarily relevant examples, as far as device
-> > pass-through goes. Vendors have many times reverted to proprietary ways,
-> > and they still do, at least in the areas of the kernel I'm most active
-> > in. I've seen first hand a large SoC vendor very close to opening a
-> > significant part of their camera stack and changing their mind at the
-> > last minute when they heard they could possibly merge their code through
-> > a different subsystem with a pass-through blank cheque.
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+Date: Thu, 25 Jul 2024 11:34:49 +0200
+
+> Simplify TSYN IRQ processing by moving it to a separate function and
+> having appropriate behavior per PHY model, instead of multiple
+> conditions not related to HW, but to specific timestamping modes.
 > 
-> Without knowing who that large SoC vendor is, and what they will be
-> willing to open, it is difficult to know what opportunity has been
-> lost.
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 
-I would also like to discuss this in more details, but I can't do so
-publicly :-( That's why I don't want to focus too much on this argument.
+[...]
 
-> I would argue that if they have cancelled their open plans based
-> on an hypothesis, their willingness to open was not that high.
+> +/**
+> + * ice_ptp_ts_irq - Process the PTP Tx timestamps in IRQ context
+> + * @pf: Board private structure
+> + *
+> + * Returns: IRQ_WAKE_THREAD if Tx timestamp read has to be handled in the bottom
 
-That's exactly what I previously described in this mail thread as areas
-where cooperation with vendors is in its infancy. Convincing large
-industry players is long term work, and it's very demotivating when you
-think there's finally light at the end of the tunel, and plans gets
-cancelled at the last minute. We're not giving up though.
+In the previous commit, you used 'Return:', here you have 'Returns:'.
+Perhaps you may want to keep the style consistent :)
 
-> It would be more healthy for the ecosystem, if those discussions were
-> done more openly, at least all the core maintainers should be
-> involved.
+> + * half of the interrupt and IRQ_HANDLED otherwise.
+> + */
+> +irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
+> +{
+> +	struct ice_hw *hw = &pf->hw;
+> +
+> +	switch (hw->ptp.phy_model) {
+> +	case ICE_PHY_E810:
+> +		/* E810 capable of low latency timestamping with interrupt can
+> +		 * request a single timestamp in the top half and wait for
+> +		 * a second LL TS interrupt from the FW when it's ready.
+> +		 */
+> +		if (hw->dev_caps.ts_dev_info.ts_ll_int_read) {
+> +			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
+> +			unsigned long flags;
+> +			u8 idx;
+> +
+> +			if (!ice_pf_state_is_nominal(pf))
+> +				return IRQ_HANDLED;
+> +
+> +			spin_lock_irqsave(&tx->lock, flags);
 
-Can you get all the camera vendors you work with to talk about all this
-openly ? :-) We all know it's a difficult and long process.
+It's top half, right? If so, you don't need _irqsave versions, just
+spin_lock/unlock().
+_irqsave/restore are only to be used in either BH or process context to
+temporarily disable interrupts to avoid concurrent access with TH (e.g.
+this block).
 
-> > I'm willing to believe it can be different in other areas, which may
-> > partly explain why different subsystems and different developers have
-> > different biases and have trouble understand each other's point of view.
-> 
-> It is not different in other areas, it is the same area. At the end of
-> the day it is the same chip manufacturers, with the same legal teams.
-> It is our attitude that is different.
+> +			idx = find_next_bit_wrap(tx->in_use, tx->len,
+> +						 tx->last_ll_ts_idx_read + 1);
+> +			if (idx != tx->len)
+> +				ice_ptp_req_tx_single_tstamp(tx, idx);
+> +			spin_unlock_irqrestore(&tx->lock, flags);
+> +
+> +			return IRQ_HANDLED;
+> +		}
+> +		fallthrough; /* non-LL_TS E810 */
+> +	case ICE_PHY_E82X:
+> +	case ICE_PHY_ETH56G:
+> +		/* All other devices process timestamps in the bottom half due
+> +		 * to sleeping or polling.
+> +		 */
+> +		if (!ice_ptp_pf_handles_tx_interrupt(pf))
+> +			return IRQ_HANDLED;
+> +
+> +		set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
+> +		return IRQ_WAKE_THREAD;
+> +	case ICE_PHY_E830:
+> +		/* E830 can read timestamps in the top half using rd32() */
+> +		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
+> +			/* Process outstanding Tx timestamps. If there
+> +			 * is more work, re-arm the interrupt to trigger again.
+> +			 */
+> +			wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
+> +			ice_flush(hw);
+> +		}
+> +		return IRQ_HANDLED;
+> +	default:
+> +		return IRQ_HANDLED;
+> +	}
+> +}
 
-I don't agree with that. Not only are there different manufacturers,
-there are also different teams, with different approaches. The world is
-not uniform.
+[...]
 
-> > > > I can't fully answer that question, but there are two points that I
-> > > > think are relevant. Note that due to my background and experience,
-> > > > this will be heavily biased towards consumer and embedded hardware,
-> > > > not data centre-grade devices. Some technologies from the latter
-> > > > however have a tendency to migrate to the former over time, so the
-> > > > distinction isn't necessarily as relevant as one may consider.
-> > > >
-> > > > The first point is that hardware gets more complicated over time, and
-> > > > in some markets there's also an increase in the number of vendors and
-> > > > devices. There's a perceived (whether true or not) danger that we
-> > > > won't be able to keep up with just reverse engineering and a
-> > > > development model relying on hobyists. Getting vendors involved is
-> > > > important if we want to scale.
-> > >
-> > > Yes, but there are lots of not very useful complex devices being
-> > > produced every day that fail to capture market share.  Not having
-> > > reverse engineered drivers for them is no real loss.  If a device does
-> > > gain market share, it gains a huge pool of users some of whom become
-> > > interested in reverse engineering, so I think market forces actually
-> > > work in our favour: we get reverse engineering mostly where the devices
-> > > are actually interesting and capture market share.  It's self scaling.
-> >
-> > I can't agree with that, sorry. Not only is the difficulty to
-> > reverse-engineer some classes of devices increasing, but saying that
-> > only devices that make it to the top of the market share chart are worth
-> > considering will leave many users on the side of the road.
-> 
-> Today we have left BILLIONS of users at the other side of the road.
-
-Because we're the only ones to be blamed, or more accuretely, the blame
-is solely on me. Vendors are all saints who want the best for the world.
-This argument doesn't hold. Please stop with this, I don't want to get
-to name calling.
-
-> > > > Second, I think there's a fear of regression. For some categories of
-> > > > devices, we have made slow but real progress to try and convince the
-> > > > industry to be more open. This sometimes took a decade of work,
-> > > > patiently building bridges and creating ecosystems brick by brick.
-> > > > Some of those ecosystems are sturdy, some not so. Giving pass-through
-> > > > a blank check will likely have very different effects in different
-> > > > areas. I don't personally believe it will shatter everything, but I'm
-> > > > convinced it carries risk in areas where cooperation with vendors is
-> > > > in its infancy or is fragile for any other reason.
-> > >
-> > > I also think we're on the rise in this space.  Since most cloud
-> > > workloads are on Linux, there's huge market pressure on most "found in
-> > > the cloud" devices (like accelerators and GPUs) to have an easy to
-> > > consume Linux story.  Nvidia is a case in point.  When it only cared
-> > > about fast games on some other OS, we get shafted with a proprietary
-> > > graphics drivers.  Now it's under pressure to be the number one AI
-> > > accelerator provider for the cloud it's suddenly wondering about open
-> > > source drivers to make adoption easier.
-> >
-> > I can't comment on Nvidia and their inference engines in particular. The
-> > server market may be in a better position that the consumer and embedded
-> > market, and if that's the case, I'm happy for the servers. That doesn't
-> > solve the issues in other markets though.
-> >
-> > > > Finally, let's not forget that pass-through APIs are not an all or
-> > > > nothing option. To cite that example only, DRM requires GPU drivers
-> > > > to have an open-source userspace implementation to merge the kernel
-> > > > driver, and the same subsystems strongly pushes for API
-> > > > standardization for display controllers. We can set different rules
-> > > > for different cases.
-> > >
-> > > I certainly think we can afford to experiment here, yes.
-
--- 
-Regards,
-
-Laurent Pinchart
+Thanks,
+Olek
 
