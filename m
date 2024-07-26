@@ -1,250 +1,303 @@
-Return-Path: <netdev+bounces-113315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EE3C93DB1E
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 01:16:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4453A93DB22
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 01:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B4F91C2316C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 23:16:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7460B21BC0
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 23:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35AC14A09F;
-	Fri, 26 Jul 2024 23:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D586614EC5D;
+	Fri, 26 Jul 2024 23:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fOEs8Axe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/nL+KNw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5581494DB
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 23:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722035793; cv=fail; b=JbMdnos5NBYO1vUgBhCRE7oA6QAFxfiDV77vgCEOQPu+UkfYtwWSUDXLRbnKrVbcQaJqlzX9U/FDz6kcBxZpal4YHf2iaY9ZT1YbvnJZhd/TCDbxyLr2FLBysjO6NlycEjnulBO0XQFn90UplzJm2IZjqKLGu8/ZXkc2aWBzIdk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722035793; c=relaxed/simple;
-	bh=zPkuCArKGguMPOPR8xFjsQ/h1ZiwHNXADx+EH1c+Cpc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hsH31Pvd8Z1BJtjo0koNUAY1uHrXSjwa4BWYDfKyyAPr/QgBzCOUWLHkFuNg+G2uGXhcA9WuemXHPkEUYdujiC8mzZuMVu7Sp3WP9MzlnfrCIkR9f9VAX+GMGXVbjlezP4yOmgsb/i37roRqFbEVrxrpecanlZc6C2Xuema4vUc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fOEs8Axe; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722035791; x=1753571791;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=zPkuCArKGguMPOPR8xFjsQ/h1ZiwHNXADx+EH1c+Cpc=;
-  b=fOEs8Axeljd16jKWSi/nQc5neCktTvHsYXSTrnU/OTFgl+8i1X9ZpY2v
-   yxd0cHkvvVZPYi4pU2Ie5FrIWLPE4vGQjwKIRgpTEp+IiTRq2DaNE8a9G
-   ynExysF42qC7aYk68ZpJKYYmGNfzqCrxWNilDT/1SMyDfjA1yBtRVzImZ
-   AcuFxQZ02wbsh8kkW6pC7LR/P9DLXkT3COpTZJrOqXmYj0k8/5aAoDXX8
-   umxEqYdrfH78LZ3ckDS3+dcLmQ1lHQTvqQVHcgagj6R4CPeleJqQignA0
-   /KyXNkBN/CZriVo9/reGm6wXvMVwRzKzKGgNpXFD9yTNbuL7zPaiKFJyV
-   g==;
-X-CSE-ConnectionGUID: KVQCSUTdSlKcVsYm8Yfk1w==
-X-CSE-MsgGUID: 6Uj2Zv2cQj6eiGiT0YKPOg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11145"; a="19989618"
-X-IronPort-AV: E=Sophos;i="6.09,239,1716274800"; 
-   d="scan'208";a="19989618"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 16:16:31 -0700
-X-CSE-ConnectionGUID: ixA3IfOUT4ybGN/PAPHBvQ==
-X-CSE-MsgGUID: lwkpJPyBRvitkHDO44BZ2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,239,1716274800"; 
-   d="scan'208";a="90859575"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Jul 2024 16:16:31 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 26 Jul 2024 16:16:30 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 26 Jul 2024 16:16:30 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 26 Jul 2024 16:16:30 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 26 Jul 2024 16:16:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=L6BQ924vVRaFfNX6QwHQA2+dxLsUDRI2voaUlVSUiDbe8s8WRo/WWbBMxQ54x4ZGmiM6cvu6esUhxIUHMo9pfO72/j2UKEUqy/YKK6O/W1tkkySkZHv/bnybhj/as9/txZl0iNRZWOd5YVSeFMcvTXRsJiySW1iLc/zxg2WKIH0FN3FP4kilqs1rqJeEo1Z9J2tOKLdyOL3kwBzAw68UF/2kcMGsSMxHxvzW+H5KkFIBY24fTSuvMRVBhn+JmgnoOsXt6MZEuNlDvCXPE2/TZGxvzKsXKuPNJcJv2vzgf2D9TDY2DDP6TEtVUQIwMbShH/FmK4pj5MGS7TS2atS4gw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wBA9VM3MVgLwP9tIdurktXfhDKlrejwQUYTh8Zs6vdM=;
- b=LRfnYKFdxD5Ggo/w+F825GD0jgBQIPVCrC+Uvut8WVKn1sN4g43iT/mgXPX/ms268ZhRBT9hFe5LFpgZdavtWxqmThF+rrlc1mpuXLdTZAVe5Pfsxwp6e66/7VWseE9zYhsR5ZIqIPi5SWLd6mixv4rb7Dv2j/7Ca0yjuDGULcCNnoFpHg0kZMBwTmtKxDBUEBlRROWNX0389rvB9nr7mImugbWdGm5tQ34Y4w64GqjLNzdq+ax//Qo09d5YxbpukTsu03ndptbF8bPmCyNL5HhZfbGKOb3Z33zAm2aVTyCnYp/mZYNk7gTmbpJllLDsf59lYF5K5wkKshH8berSdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SJ2PR11MB7545.namprd11.prod.outlook.com (2603:10b6:a03:4cc::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.29; Fri, 26 Jul
- 2024 23:16:23 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%2]) with mapi id 15.20.7784.020; Fri, 26 Jul 2024
- 23:16:23 +0000
-Message-ID: <68ddd3e9-e8de-48d8-9d32-7de6a18bf245@intel.com>
-Date: Fri, 26 Jul 2024 16:16:21 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v3 iwl-next 4/4] ice: combine cross
- timestamp functions for E82x and E830
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Karol Kolacinski
-	<karol.kolacinski@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>
-References: <20240725093932.54856-6-karol.kolacinski@intel.com>
- <20240725093932.54856-10-karol.kolacinski@intel.com>
- <ad94e165-ea7f-4216-b43d-b035c443a914@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <ad94e165-ea7f-4216-b43d-b035c443a914@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0162.namprd04.prod.outlook.com
- (2603:10b6:303:85::17) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B26314036F;
+	Fri, 26 Jul 2024 23:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722036149; cv=none; b=gd4pYc37WiKgyHwac254kwGoY6Wq2raxFKHh1z9QuGEME4BNpsu7OYAPLFagb0SVOTYkoVgkJYvzBSvnxmMA21ngHuYJmeBIMuTlLnJncg4QwrdbsS2LBXSpHhNoCxCZmKGaO8nxS0c+MGBTgSaLASD+VgPlH4VBeUJ0bOiUS2Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722036149; c=relaxed/simple;
+	bh=QTihwxKdNfbuodKGhHZUu2S0sWalLUNdFqu3G+fz6vs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zt1dby+YLE2W2uQWBjBsox9qqnuc7HOrgKVU/ZQ8/byubQxoYQH/blbwjbQL3RbGYnvrC0TJlLjfwrGjOp3WlwBPFbUCRu0BadM7SnayKHtMaQBLzVpflK7u+1iv7h5ZP0gbVm/5m5IUlb6JBPqds3SJyaaWh7McyyT1tGcxY88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/nL+KNw; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e05e4c3228bso211066276.0;
+        Fri, 26 Jul 2024 16:22:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722036147; x=1722640947; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2v48RWsL/8+kJWmWAAV3oUELstcaxL2EQr9QFsJ90o4=;
+        b=a/nL+KNw9ML5A2GdrNinB6CBn4ErDspZR2Z8JpFRBPpsV4ZGf0OS7pHKCFhbdwPIBo
+         GPNmgfDEDSroql4m+iTQud4F/s8l8hgnVBCwhnLpN/4vp7TlQ0EN3einUX7Gi1qbhzdA
+         lKXSfxXkjFfRCVwfCSWKyvz1zXsIVQf0CXpslhpRPHQpz9ExrO41t3vqoy2RMKqgU5yG
+         1DIqzkM52y8MHnfLWbTawG29gZrg1fgga5+cT+4JPE8ItwMPZ9c7Uwx7LB5IJexltqkZ
+         9COSLyGk3i0Aek4QQI86v09r8impkexxd2qOF9YZbI4e/SyinxORrRNQW+F0wqwOxY5T
+         5Y0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722036147; x=1722640947;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2v48RWsL/8+kJWmWAAV3oUELstcaxL2EQr9QFsJ90o4=;
+        b=DZjuKtJ7Fm57LwiyeATFl4L/F6FAG0+ZkjOKg2BhcqYJKgcVstYED4uXSTQliV91Va
+         e54xe4AlLRTv3LbWJgAuuPST6joRi2uEiAaYrTTO1+CUMbMDlgJCdpkB7DW42hYYx26L
+         50NnVV5P6E2tx20QoIlYN8aSiNUBN9Rql88YcwzVmmV+WEL9e0YL6onJRjjhO8o6/pNN
+         S58yoTNJHIHyIG8ml1zpNJ8ZqR+NGKW9zuV8YLOcGNdWj39Q0k7hwj1+bt56Mj3bs7Hh
+         uXdX/X/YV6Kucf/0tHAY2XVM8aFaG0YAjFOsUyCiNqjrfMHNOhSBhbEdXweRz4DWhUGQ
+         LHbw==
+X-Forwarded-Encrypted: i=1; AJvYcCUA0r5TyuSJ4SP33okGS0ghSy26pcaURA5CJuf5h6qVc7epLP4Kga0H4+9g9fnndjkhmsV9zNWvVCNS0QDYqFmp5PsxXxzcgE1zxzBge/n9mz1JWd9obAqZ5MP4lxhHDCIyMVlfAXh+1zVr9cCAiLs7dSWRrTCIagp7Z0vZgHuobtVZEawBYA9RWtb9wOgYfs8XdmB/fmUAcaA5MkcvU9l0NocEQ2hyQoh/zmSt
+X-Gm-Message-State: AOJu0Yy/PCmK8IYs2R+fUYCUnVKY8bUNZQ/QRGgrEqO1oT+OVqUwLYG0
+	A0VVJLDhehKLJExUaod9aFuV8D3T6+y4Wpt5gBUxFEpGtIvB8FPZv4p1j7BjcJWEZvbD1Alz+vZ
+	Q0M+UxlgCz5m3EqQsFCSgEr4yhYk=
+X-Google-Smtp-Source: AGHT+IE8eQ8lHv0aThBvkkelmXblMeJEqsMKM3GoNmG5ryHhqvDYjHXResG10v+ubvnoi/etG44LWQwWd+owOufroPA=
+X-Received: by 2002:a25:8907:0:b0:e08:5ee3:7a03 with SMTP id
+ 3f1490d57ef6-e0b5447b082mr1495365276.22.1722036147014; Fri, 26 Jul 2024
+ 16:22:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ2PR11MB7545:EE_
-X-MS-Office365-Filtering-Correlation-Id: e49f44c7-0018-4b3d-4222-08dcadc8f701
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?OTZIQmREazI0d3B5N3FOTzlnZHM5cXB5YmtEN05ZRVB4UEJtTWthQlNXY3hK?=
- =?utf-8?B?MTlDaEZBWUNSZWRmemVFM2JyeUQ2VHJ5a25uSFJaR0VKUzlzK1FlaFN1MFZJ?=
- =?utf-8?B?Ti9CUG5FblhCRk5Ed0xJRGp3RG8yWXd0RHVydjFVL2ZaZE9rK0l5aUJNT0Vv?=
- =?utf-8?B?TEZDdVpYU1VjUFhER0RWdlRmY0doNkt3VHgxL0drbHJ2R3lqSGRNTGRUUWVL?=
- =?utf-8?B?Qm9wKzh4eVkveEFwYUV4RU5vM2hkekpFKzc0anUxQUlCWjJJbUN4UDdwWERL?=
- =?utf-8?B?YkhxZjVLL1ZoRkZWRUY5WmhqMmd3Rk1PUTJtZEUybHVKK2ZlQi9qeFIzYzBF?=
- =?utf-8?B?bVduQWtUcTZwMEsvZ0ZoYUpQbVBYQnpkQVllRmYvdGRKNTNQN1dmVzhwTTZ4?=
- =?utf-8?B?eWRTektIbXRxTFcvbVNZNXF2WGJOaVpSOFlkTUpNUTVCOXMveUU0OXNvNytQ?=
- =?utf-8?B?RUJydjMzZENXZzlHaXlpTmxxK0ZtcVNKZFUvU1BxNml5L2Z1NnNkRnI0d01w?=
- =?utf-8?B?cWVjS0MyclljUWltTklpbFEyaFRYKzYwQTNRQTlzRXpVYm5COCtFU3lGd0FQ?=
- =?utf-8?B?Z2k2RVVZUmJiL0R0d0RLTXpiUnM2U3ZlNm1jQ01TZE5IQk9PS3h3cnlpanNN?=
- =?utf-8?B?RjI2Q2VtL3ZUT094RmQ4eDNYRUl0cDVUQVNhSjNyeHRMNms5MmZWTDVCV1JP?=
- =?utf-8?B?V3ZCZjdmOVAya2N5UTAvcVNxL0ZMWG9ZbnpIUkowTEFOTnVhakwxU2VLbWVv?=
- =?utf-8?B?NTJoYzlEdms0VnhheG5aMmdwZFluNWZITW1yd2FvWFNQc2VjL2dWZXRsSnho?=
- =?utf-8?B?ek9QblhkMTJVaUtSM3ZYMDhHdUVMTVAraThJandJREFIY29WUHljdEVPWlZ6?=
- =?utf-8?B?dVhPT2VQWFlaL2RWUUxWcFJqSUpzQ1BUazBoeXhFMlFLM2VGdDdZa0loTDl0?=
- =?utf-8?B?ZWxkRFAydEUzckhEb2NjQnkyeS9hK1UrejBCQ2tiVFNzVW52WXo5c2lPeVhO?=
- =?utf-8?B?dUFPaXZEWWkwdWJRd1pXdU9xUE9WNkhjUm5lbzVFSE9GUUNReHY3WlZqYzd5?=
- =?utf-8?B?djlpa0pHUEgycm1MYzk2UjdabDNLZUtvNGZidzZaSlBoRTdZNVltQURXZkZh?=
- =?utf-8?B?ZWUwdE5lb0hZN0tPL2VkUENhNDZGUE5QTEJVdndjMmVFbXJCYlFlRmwrWkZ3?=
- =?utf-8?B?dW9vRTBnNGZWQ0hqekQzaWJ2Q3RzZThUREdmWFppNUdIZS9LSTVsS1lpKzhO?=
- =?utf-8?B?U25XaW9abFovN0wwcCtSZHp0d3pxbEV2MEVWMWVKSkVxMTYvQk90WUQ3VUhO?=
- =?utf-8?B?RmIyVUtOQ2wvMGRRQUtFSzIvQzYxUWNkSmU2TVlmYitpM3kxdTRnT0tORnJJ?=
- =?utf-8?B?eStOL2tadmNzTHljT1M5aHpYQS9sOFN3THF5NW9pdWI1OW9mbWRmWnp3R2Vl?=
- =?utf-8?B?QlBWY1gzb1ZaSWFMbmQyblpDdWpVT09XUGxtRHd1cHdrK2RjMk5ZNFZ3dm5s?=
- =?utf-8?B?SHV4Z0YvNXVjMVdIbjdYaGJYM0k1NDRxcVkva2p2VW5sNkl2Mm1sQTBjTWRr?=
- =?utf-8?B?UUpjQ1lDNWUxcGNrSytmdzZsbVpIT2trTC9mTzVuZ1EwdG1XNUNHZ2ZoMzc4?=
- =?utf-8?B?R2NkdVlodXN1Wm5XMGNkcjNPczR5dllrdEtwSDc2V2J0bFloWmpabTBYdk01?=
- =?utf-8?B?YmtHSGxjR1pLelN5blhUNUovMnh6a2NwLzBaRThub1RtTU5SRHNCalArMGhi?=
- =?utf-8?B?SVJXaTA2bFprVmtWQXhKa3d2V3M2aEtkNkdRaWg4Z3lXbzUwTlZPOUo0dWxJ?=
- =?utf-8?B?R24zYk1XeFY0djYrL2tzUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QnlwV1FaM1JPeVVBMWVFcElqajlxcS9XUnVta1UwQjhIbmxJZ21rM01lbHo1?=
- =?utf-8?B?OXd3K2hwMXd3TnlNZ1d5YlhIblRiVWNDbzQ3UnlLM3JqVGZ6cFM2NGd2Z01J?=
- =?utf-8?B?VCtpeEU4WGRMbHlrbmJvbGY3dTFWQ1dhSndTUE4rY1VhcFQ2S1haSzRWSEpC?=
- =?utf-8?B?ZjdIMG5jR0p3dEZxOGxTbjVsSzhYbFJIS2JUV2pZbnVsQ0UwZFU5QXU4d25W?=
- =?utf-8?B?VjNIYmx4bWV5NDg1Qjd3SGRnOGMyUi9qZkhWOTdOMkJuSXRiVFdPN3c5OVZv?=
- =?utf-8?B?V2JYcENsdXRkdzI3Si9VOTF6MUFoRGRMWmRsWUFwdEF4dForUXRHRmNRMWZQ?=
- =?utf-8?B?dm9IdkJuMjBISzlUQjAydEdlK1ZwREVSUkNDMDNRQVZaNVVadmIyNzZKZmd3?=
- =?utf-8?B?NHZUYzZpeU5EM09HSUFBNlh4S0x1b0NaVXRNZDR4UENjV3U2UHhNU29wWjMv?=
- =?utf-8?B?VEJRYXo5QnRzQS90WEtCK2ljK2hZbXhiU0loWVV6UEh1L2FnbVQxNWRIVlcy?=
- =?utf-8?B?Y09JZnQ5S3l6WklrZS9iRnZKS1R4alRkVUpkdFlleWU2SHlVVVNkREZnWTZV?=
- =?utf-8?B?eEcxdlRyb2FTR3FDTUhGYWpyTGNkMjVYdHkvck9FK2U0bkhERzVwUnQ2MXkr?=
- =?utf-8?B?TWZ4Q21aR1NZWkY1UjFXd1RHY2tRSU0wZnNDY3B6dEJzTkJRNkswTVJnWlk0?=
- =?utf-8?B?a0EybXlrUFZUUU10TTVhMlRsUFk2ODlGblJjaU5PL3dsRnc3WkticFptajRU?=
- =?utf-8?B?S3JzUlpGZTNMYUhFNG9GWnlmam1JcklzMkNnWGxMTjF0M2xYWUlnVEpTdGFq?=
- =?utf-8?B?NDcrV0JoQ1ZIc2hlRTYyL3pIZGc1SXBNYVZNOTRUL2F1VCttSE1vUnlrTUFx?=
- =?utf-8?B?VHIrb3Y5c1ovcTNKVlZkaFJqMTgxM05oZ3pXR1RNS1htS0FWL3VkWTNQenhv?=
- =?utf-8?B?OUQ3T1QyZmE1ZkJYaTdZU0FUKzVhaVUzdmV3eFRGLzd0SXllNjVxQzdaZE9T?=
- =?utf-8?B?eVdUZjZsbGVkMmcxbjV6czVROGEzYXJEYXRocURwVzMwTExJS0ZjU3dQSVk4?=
- =?utf-8?B?ckZQZXRxUkpxVHVDcHBTTm5DU21JWlpZcGE1TmxSZUkzZ0xSY2srUjhGY0pm?=
- =?utf-8?B?NHMyM0hwZ2RsRWNxSjV3aDlSUlR0anAyOGNObkFwZGRSMDB6eEdqa05UdTZy?=
- =?utf-8?B?bDE1RDI0UDZXL21FMWxQKytOZjdoRFh2Mit0MnkrSlhBZVg4Y0hNc1BCY2NK?=
- =?utf-8?B?VEFUeHZzQ1pkQnhkNjdGMVpscnIzR0Q3U011YXhLWXVlYlFtWWFYVkVxV1dB?=
- =?utf-8?B?ZXFnbTJXcTV3d2ZGZlpCcSsyb0c1Qy9PcGpHZXRLNEFuQjROcHRRcmJwVGky?=
- =?utf-8?B?WUJQTG1zMGRlZCtJMzI4TFhkd2NsSnNqQXVuMm1FUVVkbmtZcXVPOU5vdUp4?=
- =?utf-8?B?MS9Sb2tmai92REVNYTFZUHlDanJKczZWOGh2U0JvVTRtMjRRVFRVZlBuaHR5?=
- =?utf-8?B?VVJmVVhHMTJSS2p6N1Bvc0NnMmYzYytEVzVBNmJkaURYRTJPczdVUjhaRkR3?=
- =?utf-8?B?amUrRUU5aTBGTXl2blZUNmE1Rkt6c0ZSZlJmMXdWd2djUStESU1HNVhJNFg0?=
- =?utf-8?B?ZGtYOTQ1UWUyb21WanZ4TTdxMjZuUGpCL0EyNGhIMGEycWk0dEplNVpOZ3FD?=
- =?utf-8?B?NmFqOTlSSVIxbmM0b2g5TUxIeEY5eldXWU5TSlRyZkZIOHpyOG9GUDg2ZGhx?=
- =?utf-8?B?eGtkUUwwVVRsaSsranZDbWhON3dlc3gyMnNDY1RObkYybGpGZTV5RmplbHhX?=
- =?utf-8?B?Y2Z6MHNDbmVXYmE5S2ZiVlNvVkl1RitrNzN3S3JlL1E5ZEJ4bmtkMW5MaUlF?=
- =?utf-8?B?STFrNVhmT3RFRHdJMVc1Rjh6enY1R2Jrd0RPUkRnMk13a0hkOTVLUFlUVzB3?=
- =?utf-8?B?d1NhVzZTUHBvT0Mra2szMkVtd0tpRm9uS2dsM213bmYrSk4vY0VlTWdQNzhi?=
- =?utf-8?B?TzM4RllCdFdpbC8vVThvRm1qdWxMb0lUR0tTSWFWTHo5OTdBZU9SanFuTnZL?=
- =?utf-8?B?aGlFRXZmVXhTTWw3RWpMV05NVE9XbDZBSnE0N215ai9RZThYY2t1SzBWNllS?=
- =?utf-8?B?SVdJNjRNdnRrS2ZsSm9SVDRLU0NBRUM5K2NEd3FwM2VSM2JwMVZRd2p2RTZo?=
- =?utf-8?B?MWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e49f44c7-0018-4b3d-4222-08dcadc8f701
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2024 23:16:23.0249
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: af3QAek+crK0QhS5d6G9T7YIxhI0BTVk1WFz/wBaascn+mpmiF9zzgS2IH0uWGLR7HsG3FjoeeBTVR/qgtkYheil3vyoNWlPPboCG5jA8HI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7545
-X-OriginatorOrg: intel.com
+References: <20240710212555.1617795-1-amery.hung@bytedance.com>
+ <20240710212555.1617795-8-amery.hung@bytedance.com> <bpb36dtlbs6osr5cudvwrbagt7bls3cllg35lsusrly5pxwe7o@kjphrbuc64ix>
+In-Reply-To: <bpb36dtlbs6osr5cudvwrbagt7bls3cllg35lsusrly5pxwe7o@kjphrbuc64ix>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 26 Jul 2024 16:22:16 -0700
+Message-ID: <CAMB2axPwUV9EusNPaemLVx5NN2_1wkq0ney4NazAj7P+WRo=NQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 07/14] virtio/vsock: add common datagram
+ send path
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, 
+	wei.liu@kernel.org, decui@microsoft.com, bryantan@vmware.com, 
+	vdasa@vmware.com, pv-drivers@vmware.com, dan.carpenter@linaro.org, 
+	simon.horman@corigine.com, oxffffaa@gmail.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jul 23, 2024 at 7:42=E2=80=AFAM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
+>
+> On Wed, Jul 10, 2024 at 09:25:48PM GMT, Amery Hung wrote:
+> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> >
+> >This commit implements the common function
+> >virtio_transport_dgram_enqueue for enqueueing datagrams. It does not add
+> >usage in either vhost or virtio yet.
+> >
+> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> >---
+> > include/linux/virtio_vsock.h            |  1 +
+> > include/net/af_vsock.h                  |  2 +
+> > net/vmw_vsock/af_vsock.c                |  2 +-
+> > net/vmw_vsock/virtio_transport_common.c | 87 ++++++++++++++++++++++++-
+> > 4 files changed, 90 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+> >index f749a066af46..4408749febd2 100644
+> >--- a/include/linux/virtio_vsock.h
+> >+++ b/include/linux/virtio_vsock.h
+> >@@ -152,6 +152,7 @@ struct virtio_vsock_pkt_info {
+> >       u16 op;
+> >       u32 flags;
+> >       bool reply;
+> >+      u8 remote_flags;
+> > };
+> >
+> > struct virtio_transport {
+> >diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> >index 44db8f2c507d..6e97d344ac75 100644
+> >--- a/include/net/af_vsock.h
+> >+++ b/include/net/af_vsock.h
+> >@@ -216,6 +216,8 @@ void vsock_for_each_connected_socket(struct vsock_tr=
+ansport *transport,
+> >                                    void (*fn)(struct sock *sk));
+> > int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *p=
+sk);
+> > bool vsock_find_cid(unsigned int cid);
+> >+const struct vsock_transport *vsock_dgram_lookup_transport(unsigned int=
+ cid,
+> >+                                                         __u8 flags);
+>
+> Why __u8 and not just u8?
+>
 
+Will change to u8.
 
-On 7/26/2024 6:37 AM, Alexander Lobakin wrote:
->> diff --git a/drivers/net/ethernet/intel/ice/ice_osdep.h b/drivers/net/ethernet/intel/ice/ice_osdep.h
->> index a2562f04267f..c03ab0207e0a 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_osdep.h
->> +++ b/drivers/net/ethernet/intel/ice/ice_osdep.h
->> @@ -23,6 +23,9 @@
->>  #define wr64(a, reg, value)	writeq((value), ((a)->hw_addr + (reg)))
->>  #define rd64(a, reg)		readq((a)->hw_addr + (reg))
->>  
->> +#define rd32_poll_timeout(a, addr, val, cond, delay_us, timeout_us) \
->> +	read_poll_timeout(rd32, val, cond, delay_us, timeout_us, false, a, addr)
->> +
->>  #define ice_flush(a)		rd32((a), GLGEN_STAT)
->>  #define ICE_M(m, s)		((m ## U) << (s))
->>  
->> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
->> index 9f0eff040a95..ac3944fec2d3 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
->> @@ -1,6 +1,7 @@
->>  // SPDX-License-Identifier: GPL-2.0
->>  /* Copyright (C) 2021, Intel Corporation. */
->>  
->> +#include <linux/iopoll.h>
-> 
-> read_poll_timeout() is used in osdep.h, but you include it here.
-> You should either define rd32_poll_timeout() here instead of the header
-> or move this include to osdep.h.
-> 
+>
+> >
+> > struct vsock_skb_cb {
+> >       unsigned int src_cid;
+> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> >index ab08cd81720e..f83b655fdbe9 100644
+> >--- a/net/vmw_vsock/af_vsock.c
+> >+++ b/net/vmw_vsock/af_vsock.c
+> >@@ -487,7 +487,7 @@ vsock_connectible_lookup_transport(unsigned int cid,=
+ __u8 flags)
+> >       return transport;
+> > }
+> >
+> >-static const struct vsock_transport *
+> >+const struct vsock_transport *
+> > vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
+> > {
+> >       const struct vsock_transport *transport;
+> >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/vir=
+tio_transport_common.c
+> >index a1c76836d798..46cd1807f8e3 100644
+> >--- a/net/vmw_vsock/virtio_transport_common.c
+> >+++ b/net/vmw_vsock/virtio_transport_common.c
+> >@@ -1040,13 +1040,98 @@ int virtio_transport_shutdown(struct vsock_sock =
+*vsk, int mode)
+> > }
+> > EXPORT_SYMBOL_GPL(virtio_transport_shutdown);
+> >
+> >+static int virtio_transport_dgram_send_pkt_info(struct vsock_sock *vsk,
+> >+                                              struct virtio_vsock_pkt_i=
+nfo *info)
+> >+{
+> >+      u32 src_cid, src_port, dst_cid, dst_port;
+> >+      const struct vsock_transport *transport;
+> >+      const struct virtio_transport *t_ops;
+> >+      struct sock *sk =3D sk_vsock(vsk);
+> >+      struct virtio_vsock_hdr *hdr;
+> >+      struct sk_buff *skb;
+> >+      void *payload;
+> >+      int noblock =3D 0;
+> >+      int err;
+> >+
+> >+      info->type =3D virtio_transport_get_type(sk_vsock(vsk));
+> >+
+> >+      if (info->pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+> >+              return -EMSGSIZE;
+> >+
+> >+      transport =3D vsock_dgram_lookup_transport(info->remote_cid, info=
+->remote_flags);
+>
+> Can `transport` be null?
+>
+> I don't understand why we are calling vsock_dgram_lookup_transport()
+> again. Didn't we already do that in vsock_dgram_sendmsg()?
+>
 
-Please move the include to ice_osdep.h, as there are some other places
-where we will want to use rd32_poll_timeout (such as in ice_controlq.c,
-and others).
+transport should be valid here since we null-checked it in
+vsock_dgram_sendmsg(). The reason vsock_dgram_lookup_transport() is
+called again here is we don't have the transport when we called into
+transport->dgram_enqueue(). I can also instead add transport to the
+argument of dgram_enqueue() to eliminate this redundant lookup.
 
-Thanks,
-Jake
+> Also should we add a comment mentioning that we can't use
+> virtio_transport_get_ops()? IIUC becuase the vsk can be not assigned
+> to a specific transport, right?
+>
+
+Correct. For virtio dgram socket, transport is not assigned unless
+vsock_dgram_connect() is called. I will add a comment here explaining
+this.
+
+> >+      t_ops =3D container_of(transport, struct virtio_transport, transp=
+ort);
+> >+      if (unlikely(!t_ops))
+> >+              return -EFAULT;
+> >+
+> >+      if (info->msg)
+> >+              noblock =3D info->msg->msg_flags & MSG_DONTWAIT;
+> >+
+> >+      /* Use sock_alloc_send_skb to throttle by sk_sndbuf. This helps a=
+void
+> >+       * triggering the OOM.
+> >+       */
+> >+      skb =3D sock_alloc_send_skb(sk, info->pkt_len + VIRTIO_VSOCK_SKB_=
+HEADROOM,
+> >+                                noblock, &err);
+> >+      if (!skb)
+> >+              return err;
+> >+
+> >+      skb_reserve(skb, VIRTIO_VSOCK_SKB_HEADROOM);
+> >+
+> >+      src_cid =3D t_ops->transport.get_local_cid();
+> >+      src_port =3D vsk->local_addr.svm_port;
+> >+      dst_cid =3D info->remote_cid;
+> >+      dst_port =3D info->remote_port;
+> >+
+> >+      hdr =3D virtio_vsock_hdr(skb);
+> >+      hdr->type       =3D cpu_to_le16(info->type);
+> >+      hdr->op         =3D cpu_to_le16(info->op);
+> >+      hdr->src_cid    =3D cpu_to_le64(src_cid);
+> >+      hdr->dst_cid    =3D cpu_to_le64(dst_cid);
+> >+      hdr->src_port   =3D cpu_to_le32(src_port);
+> >+      hdr->dst_port   =3D cpu_to_le32(dst_port);
+> >+      hdr->flags      =3D cpu_to_le32(info->flags);
+> >+      hdr->len        =3D cpu_to_le32(info->pkt_len);
+> >+
+> >+      if (info->msg && info->pkt_len > 0) {
+> >+              payload =3D skb_put(skb, info->pkt_len);
+> >+              err =3D memcpy_from_msg(payload, info->msg, info->pkt_len=
+);
+> >+              if (err)
+> >+                      goto out;
+> >+      }
+> >+
+> >+      trace_virtio_transport_alloc_pkt(src_cid, src_port,
+> >+                                       dst_cid, dst_port,
+> >+                                       info->pkt_len,
+> >+                                       info->type,
+> >+                                       info->op,
+> >+                                       info->flags,
+> >+                                       false);
+> >+
+> >+      return t_ops->send_pkt(skb);
+> >+out:
+> >+      kfree_skb(skb);
+> >+      return err;
+> >+}
+> >+
+> > int
+> > virtio_transport_dgram_enqueue(struct vsock_sock *vsk,
+> >                              struct sockaddr_vm *remote_addr,
+> >                              struct msghdr *msg,
+> >                              size_t dgram_len)
+> > {
+> >-      return -EOPNOTSUPP;
+> >+      /* Here we are only using the info struct to retain style uniform=
+ity
+> >+       * and to ease future refactoring and merging.
+> >+       */
+> >+      struct virtio_vsock_pkt_info info =3D {
+> >+              .op =3D VIRTIO_VSOCK_OP_RW,
+> >+              .remote_cid =3D remote_addr->svm_cid,
+> >+              .remote_port =3D remote_addr->svm_port,
+> >+              .remote_flags =3D remote_addr->svm_flags,
+> >+              .msg =3D msg,
+> >+              .vsk =3D vsk,
+> >+              .pkt_len =3D dgram_len,
+> >+      };
+> >+
+> >+      return virtio_transport_dgram_send_pkt_info(vsk, &info);
+> > }
+> > EXPORT_SYMBOL_GPL(virtio_transport_dgram_enqueue);
+> >
+> >--
+> >2.20.1
+> >
+>
 
