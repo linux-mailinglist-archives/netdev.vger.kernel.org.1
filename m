@@ -1,201 +1,84 @@
-Return-Path: <netdev+bounces-113249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B075B93D538
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:40:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E30E93D53A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 16:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D370E1C21C9B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:40:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE471B220EE
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 14:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E61917997;
-	Fri, 26 Jul 2024 14:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC11C18C3D;
+	Fri, 26 Jul 2024 14:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JnzaC8Yo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5UAz3Ii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B481F182DF
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 14:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEAF1859;
+	Fri, 26 Jul 2024 14:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722004813; cv=none; b=tJeM3yjKD5RK/FU2Aoej+6+onSmsWEfXiWaIQujQ9rmM7X+xSlem7jCFnqEOnxkc/Zmxy8ozdeq87oH5TR1frdjZ0AyIuNQOheKtitVQU98BbEIG7TtUue6btsljstJaP81KqCE1KNXT1sE3/u6Hix2UsdGaTYPivlmbnsI3ABM=
+	t=1722004864; cv=none; b=nW+Yhp+fLqzXNsgyGHAqQzHKbmyvY0ygoal5nOHPBqQ3m9wBDtLQ3HNX+oE3wRDSIRFOYN/bmrpmmIiBeW0aYtGGl64NMcxsrKTh+uiE5zYMjh6UqzMmbisFkymv673msp4ZcaA/u+efZj6pQiCJQVMesvL6PFm6d/EPWm9y6t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722004813; c=relaxed/simple;
-	bh=ulwwnhc+mAkGKfWxF/MrC5J/i0p/2VPb4E/VhhmcdpQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sdb+EMw3S0injwvrBs0WXOhCifCMcvsPfYZahUwAzzDhkHCc7tHY5hQhObB0KzApXhhp9Q0S+FzdQyzn8RAdl7/QhW6esSH1b864VXh989hEynH55ddSAfiYoMYbqRWsUErbJTZYtURrEFjh/8Cz/ox1UYAOf7sCSKzq7T8IgHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JnzaC8Yo; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-81f01f88e8eso252963241.0
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 07:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722004810; x=1722609610; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tV65IQg54aPZMNaUSM01ngj5YogaBYHcYLA+LYcxGps=;
-        b=JnzaC8YopaWB7EYnNEtaDjsCbf4BIdOzFvsC2dczybBS3tEpfk5QDb9FIURDN0Wlm8
-         3pMZUXlzT0rl3l7YLYSZ4ekEXwP2QU1IROE7aTCttcl/vstDhU3wO5zNK9i5Nc3/4dGB
-         qJbIGHbfiCHZKOuQWSyb16BEX3yIytL9Ljs0FQBLgoHeYX3qWsQ0ky1lK12b2EoQipf+
-         3VpDZCxamMAHOknskEZIVFxqaaX5nAMG8loek2eU5ezI1YUCbmrxbAShwu7BPNv7h/Z8
-         ilvySLHwNCcHXxMpUOmzThEW6MU7E/9vnFkU9rnSvYcJYpGndMaKvI+tq2iEXcoayz7y
-         UiEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722004810; x=1722609610;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tV65IQg54aPZMNaUSM01ngj5YogaBYHcYLA+LYcxGps=;
-        b=SU3zIc81X5gK8c+NvKYjkuGD2dfqyJrp1BQrFLYvfOqju9t8dGS88WiT68sXBpk0zu
-         z0NxLXRVXIHPupF+/WYHh+/Y6iJYpC0LQ4ocvl58uUztxFeVD+g9ljBOJFsiKGFdsW0P
-         dqHWT2XejLOK3TVCHXT2eSkLwqtFrRHux2NZ/kb01vfJZWOeM5zBIDmR/2iimgxocc5I
-         uTZHM6EFAyPAo8iXl9K+29FrPD23XPFQMu1Xk1amnMI2MVADtwysdBhN6naGOnW7BII0
-         S8CPQLK+DBuLeUNve5ACRbwMmlwy/urGjG50KZk4gaHjZoVMU7d0vvneunNqQqkyXiPQ
-         H2Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFBskfoQbcLfIvnbNBSC/D+PbDcqUsMrQ+X5zToD8Nkp3oBFj94aqmKmued+te1yyv+FwIVuf++TuHLH6T0p5fr5C1sEWA
-X-Gm-Message-State: AOJu0YzyltUKFgLe05XM2GI195n92d5DO/nJEjibGwyj4Km9mrnp5trz
-	EbzIo7gqZ4dFYHNymEJXJs4jdjJIplWapWfaWAlAdodpSsysVri81h3x6kQixSgGMXm1nIn1OgV
-	TmE7+/rtaJnU8ZF7h6RFAWw7wiLoYP2LXGYXs
-X-Google-Smtp-Source: AGHT+IHNPh2FVgbB2r/p8bmQoYBQ59fCoxJ02nk4FCnb5rGKbLefzEPA9Uzesrxeg4pBgpeiiqkRiQzpb/qNkxIFni8=
-X-Received: by 2002:a05:6102:50aa:b0:493:badb:74ef with SMTP id
- ada2fe7eead31-493d6527a1bmr7693288137.26.1722004810317; Fri, 26 Jul 2024
- 07:40:10 -0700 (PDT)
+	s=arc-20240116; t=1722004864; c=relaxed/simple;
+	bh=wwpUw/2DjqoEfa8i70NKaeksaB5/sTwx5uMVq+VuSnU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jghJmYde6FnpI2jWau3RXByYA6T9wpzySO0PEhV7YN9wA20ktMHQOCAMY/rVvcEp96P9V2H57lpiANio8tKDpRhBaDOURdmzIe+j7MEgoGG2mnZlVTv2aK5+RnKKDAIJvEblYthit6UdF+K9oouzXAQoYsPkz7eAnYfN1GwnkW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5UAz3Ii; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63F52C32782;
+	Fri, 26 Jul 2024 14:41:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722004864;
+	bh=wwpUw/2DjqoEfa8i70NKaeksaB5/sTwx5uMVq+VuSnU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m5UAz3Ii/fAvf/k/fx09HRkn/y/XuALnNem3ahjkw7SvCnI4lvvZdtquMfItBoLX2
+	 Z3l+hqAFOIeGg4rGYknxKacphzGMkj++G6OhiTeG5uI7hUsq4A6MR0p+CoJ6dmAytX
+	 LuINDaipTyhAR55LzYWErIwLsQyxb9icRwP7hsLqKSuHk/yPKkKqjpJYu+tgiFCv6N
+	 bJjfF36B+owPHPEHMNSL+er6uG7NIGyPLtrcLIbayH1WE39seojd9hGDoWpb0JfHLi
+	 EJerIJDQU5NZAjegSM8uY6a2tbvP0NLuLLCtu9myOYGz23QIanEsltjqiOK+9Yr1A/
+	 TK17ccuZrGsbA==
+Date: Fri, 26 Jul 2024 07:41:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, willemdebruijn.kernel@gmail.com,
+ jasowang@redhat.com, bigeasy@linutronix.de, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH net] tun: Add missing bpf_net_ctx_clear() in
+ do_xdp_generic()
+Message-ID: <20240726074102.74b42a9b@kernel.org>
+In-Reply-To: <20240725214049.2439-1-aha310510@gmail.com>
+References: <0000000000009d1d0a061d91b803@google.com>
+	<20240725214049.2439-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202407251053.618edf56-oliver.sang@intel.com> <CANn89i+Bia9PdGhAVfRbbubYo37+g+ej68qp32JmU88tsLLuRQ@mail.gmail.com>
-In-Reply-To: <CANn89i+Bia9PdGhAVfRbbubYo37+g+ej68qp32JmU88tsLLuRQ@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 26 Jul 2024 10:39:51 -0400
-Message-ID: <CADVnQynLaT0rGcLDBB+T237x6aHx7K74kNPZz4hLFTK7U=CVwA@mail.gmail.com>
-Subject: Re: [linus:master] [tcp] 23e89e8ee7: packetdrill.packetdrill/gtests/net/tcp/fastopen/client/simultaneous-fast-open_ipv4-mapped-v6.fail
-To: Eric Dumazet <edumazet@google.com>
-Cc: kernel test robot <oliver.sang@intel.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, oe-lkp@lists.linux.dev, 
-	lkp@intel.com, linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	netdev@vger.kernel.org, Matthieu Baerts <matttbe@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 25, 2024 at 4:07=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Jul 25, 2024 at 6:55=E2=80=AFAM kernel test robot <oliver.sang@in=
-tel.com> wrote:
-> >
-> >
-> >
-> > Hello,
-> >
-> > kernel test robot noticed "packetdrill.packetdrill/gtests/net/tcp/fasto=
-pen/client/simultaneous-fast-open_ipv4-mapped-v6.fail" on:
-> >
-> > commit: 23e89e8ee7be73e21200947885a6d3a109a2c58d ("tcp: Don't drop SYN+=
-ACK for simultaneous connect().")
-> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> >
-> > [test failed on linus/master      68b59730459e5d1fe4e0bbeb04ceb9df0f002=
-270]
-> > [test failed on linux-next/master 73399b58e5e5a1b28a04baf42e321cfcfc663=
-c2f]
-> >
-> > in testcase: packetdrill
-> > version: packetdrill-x86_64-31fbbb7-1_20240226
-> > with following parameters:
-> >
-> >
-> > compiler: gcc-13
-> > test machine: 16 threads 1 sockets Intel(R) Xeon(R) E-2278G CPU @ 3.40G=
-Hz (Coffee Lake) with 32G memory
-> >
-> > (please refer to attached dmesg/kmsg for entire log/backtrace)
-> >
-> >
-> > we also noticed other failed cases that can pass on parent.
-> >
-> >
-> > 42ffe242860c401c 23e89e8ee7be73e21200947885a
-> > ---------------- ---------------------------
-> >        fail:runs  %reproduction    fail:runs
-> >            |             |             |
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/client/simultaneous-fast-open_ipv4-mapped-v6.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/client/simultaneous-fast-open_ipv4.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/client/simultaneous-fast-open_ipv6.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/basic-cookie-not-reqd_ipv4-mapped-v6.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/basic-cookie-not-reqd_ipv4.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/basic-zero-payload_ipv4-mapped-v6.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/basic-zero-payload_ipv4.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/opt34/basic-cookie-not-reqd_ipv4-mapped-v6.fa=
-il
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/opt34/basic-cookie-not-reqd_ipv4.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/opt34/basic-zero-payload_ipv4-mapped-v6.fail
-> >            :9           67%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/fastopen/server/opt34/basic-zero-payload_ipv4.fail
-> >
-> >
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new ve=
-rsion of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <oliver.sang@intel.com>
-> > | Closes: https://lore.kernel.org/oe-lkp/202407251053.618edf56-oliver.s=
-ang@intel.com
-> >
-> >
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/fastopen/client/simult=
-aneous-fast-open.pkt (ipv6)]
-> >
-> > ...
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/fastopen/client/simult=
-aneous-fast-open.pkt (ipv4)]
-> >
-> > ...
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/fastopen/client/simult=
-aneous-fast-open.pkt (ipv4-mapped-v6)]
-> >
-> > ...
-> >
-> >
-> > The kernel config and materials to reproduce are available at:
-> > https://download.01.org/0day-ci/archive/20240725/202407251053.618edf56-=
-oliver.sang@intel.com
-> >
-> >
-> >
-> > --
-> > 0-DAY CI Kernel Test Service
-> > https://github.com/intel/lkp-tests/wiki
-> >
->
-> This has been discussed recently in netdev mailing list, one ACK will
-> get more precise information.
+On Fri, 26 Jul 2024 06:40:49 +0900 Jeongjun Park wrote:
+> There are cases where do_xdp_generic returns bpf_net_context without 
+> clearing it. This causes various memory corruptions, so the missing 
+> bpf_net_ctx_clear must be added.
+> 
+> Reported-by: syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com
+> Fixes: fecef4cd42c6 ("tun: Assign missing bpf_net_context.")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 
-This should be fixed from this packetdrill test update from Matthieu
-Baerts that I just merged:
-  https://github.com/google/packetdrill/pull/87
+Also likely:
 
-(For our internal versions of the tests, Eric provided an equivalent patch.=
-)
+Reported-by: syzbot+3c2b6d5d4bec3b904933@syzkaller.appspotmail.com
+Reported-by: syzbot+707d98c8649695eaf329@syzkaller.appspotmail.com
 
-neal
+Right?
 
