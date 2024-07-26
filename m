@@ -1,70 +1,401 @@
-Return-Path: <netdev+bounces-113237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D6193D431
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:32:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AF2393D43B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:38:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13D731C22B55
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:32:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84E8B1F218E6
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EEF17BB05;
-	Fri, 26 Jul 2024 13:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0264017BB3F;
+	Fri, 26 Jul 2024 13:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aBJe7o2b"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F292F1E4B0;
-	Fri, 26 Jul 2024 13:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722000775; cv=none; b=lM+ToYRxr1AJgm7VgDBH+KtosjBzNO2tyiQswOqzzTOFZgmOniq1a0HviQDo9IQO/XH96Om8HuWgvCKxlOg6TZVOnUbszV1UFlSvRC9Vp5/S1hw646SaVyKblwWdMmu45e3UAwc/SBVU6cCCdvk7B2SRhWnCG0L8MKqcSk+hyiM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722000775; c=relaxed/simple;
-	bh=ttdpt+jvQmXT0eJ7KYhCDK83FXS8fxW5pSifxEgr0HI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WWmF28yTDDMywWeFyDhcIVQ9t1fGAZc62FHeccRXWciFlPqLnaZLKAnTxF6WPzdBfOJFU/7ZRy/M7myToVIhyVlDSe4Mk4zl8fM5CzHB3dmQjjFaTjlk2Xgvbg/25UqE6Ib6W6v0yIWAnS9jpqKmNhnfLLby6EPf2eeM8xqk28Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sXL3w-0001aW-DT; Fri, 26 Jul 2024 15:32:48 +0200
-Date: Fri, 26 Jul 2024 15:32:48 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, dsahern@kernel.org, gnault@redhat.com,
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
-Subject: Re: [RFC PATCH net-next 2/3] netfilter: nft_fib: Mask upper DSCP
- bits before FIB lookup
-Message-ID: <20240726133248.GA5302@breakpoint.cc>
-References: <20240725131729.1729103-1-idosch@nvidia.com>
- <20240725131729.1729103-3-idosch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05154176AAE
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 13:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722001076; cv=fail; b=k2BIRpE2Bm9UaXUYeZ/cg3rJ9fIIB3j3EXus9l+9Ug6C0YkkOZIfifO0DF2btZniTkEDxkuDlT8FHGKMDUrVvReLd05w7ghttJmLdJDjxqAqNRYSLi7aZ35gFnRaWl7Q2UYUBmBBQ9E7y0h6lsCtXMgdWpZDKs2zx0cO20p7j58=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722001076; c=relaxed/simple;
+	bh=eVM02B5kV/BsR5li/Cn1m9N3fKhfWhhh2IVxtUL1EN0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=vGL8KHvPGcGvaP/mWc52FBJQkA0aDiXelScZm+nS7lPna/XKlLgEk0UXPsZ6jGl8D0g5OJq+vqelg1SpmKENVJkZNP8Csy1eoJSwIDym1L51zyOsXIKbrlW8J60O/NFmbp8lfRVn+NA33dD0r95+qs8TkqJVsQSj9z4/VwYrm2o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aBJe7o2b; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722001075; x=1753537075;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=eVM02B5kV/BsR5li/Cn1m9N3fKhfWhhh2IVxtUL1EN0=;
+  b=aBJe7o2bOUCy0daCUYgpsZidJEfAHuKyNMQvD7dssrI1bPH3VLwsxJiA
+   8GFSMVfspGP02RUqjkLQYS7mkj+rnoFNldLL0fXtaNGfwAVaOu9H3Usxt
+   wRAmutTJIOacshBTzQj1Czlq7MMo4RkH71YEjVkPweRR7NHazDcJHr+/7
+   vxLwlpCGbHpg6IjGEd7PC73spkdir4t9F9hsxNBxpo+oJvj5Wh3vh+0fF
+   lTqDAuD9GGP8jH90aEkJK78YNF0QUxm6XGRqbaKkgFh6ZSoLvmj8osQoq
+   PXgLAIIz6q1JpZpIVNFeMW3OirqITQXyO8OdVVG4lbXURMSn2f7lRxL4m
+   A==;
+X-CSE-ConnectionGUID: lajjJkx6RvWenPdVhX0Z0g==
+X-CSE-MsgGUID: tgObWGBTTnao5l3MXpPR+A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11144"; a="23592643"
+X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
+   d="scan'208";a="23592643"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 06:37:54 -0700
+X-CSE-ConnectionGUID: lvBxdu0GToS+P+dGQRQ84w==
+X-CSE-MsgGUID: 7Vs3BZS4TUis/bVHCb6zGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
+   d="scan'208";a="58377169"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Jul 2024 06:37:52 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 26 Jul 2024 06:37:50 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 26 Jul 2024 06:37:49 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 26 Jul 2024 06:37:49 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 26 Jul 2024 06:37:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pH19EhbG+dM23ZTw6kaI+YWOFQHpPU4nfDAb+8FWVh9lZ0lXK/zIq4Cmld+tAHewPuT2G0CAfvo8+F7BWr29RS5jvCiTIPhUtaN2REi9rRhuCDJhB2SIyczlGEzn9+flAC+9tPE0vFRNb2xlDFnISrjtvGTzKrXFW+vtFLP5a9bQ/HoKUvyTt9lXU3rCsUbua9qre8kf/qHFOGn9HKdUKecvnGLmxNeUBGfYArN7lhFufuCjveDMhW91jGHsLzHt85iPI/z7Sk0U6drGgTXYKjP61tQGVbcWFu7S2p4lO0qEtEpSnEmeeHzXySsEtu5Ml3WO4EG+Wus0iItddRp3Lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YIkaAsocWIOQvwIeEwdxb3TfOoZpWr4qt+rXIiQ/PVU=;
+ b=ahZ1sD31+YLq6icfGGub6qILT04eYwcYv2XhBW/yLT6Tqf7Kxh7kkZOKMQVBY5XWDM4HQvoyPEbouRpBa8p1vQIlrHIKRUOZVsBMswAI70iodVYsnw8OotsYzuPlDbDrc0U+fuzxn/d4LDmcZ3OpwRjReULcMJzrLvC6+8fAo+NYu0TIN7H0qdJ+ZtHGi+Z8OCbiVgcN42VtNoTL6YdHXIN4ggjUO4VVgksjt0EysfWEosj/vVbtyXHnmRX97YVNLRrQydFGQ/Dpt0jx/4hIWT383XtUehSA0+VVn6bMPxE+HhL2gblFUTVbAFWEGbJbOSX3xZ9UYA8yLxB1P2Fncg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CH0PR11MB8088.namprd11.prod.outlook.com (2603:10b6:610:184::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.32; Fri, 26 Jul
+ 2024 13:37:42 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7784.020; Fri, 26 Jul 2024
+ 13:37:42 +0000
+Message-ID: <ad94e165-ea7f-4216-b43d-b035c443a914@intel.com>
+Date: Fri, 26 Jul 2024 15:37:37 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v3 iwl-next 4/4] ice: combine cross
+ timestamp functions for E82x and E830
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, Jacob Keller
+	<jacob.e.keller@intel.com>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>
+References: <20240725093932.54856-6-karol.kolacinski@intel.com>
+ <20240725093932.54856-10-karol.kolacinski@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240725093932.54856-10-karol.kolacinski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU7PR01CA0019.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:50f::22) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240725131729.1729103-3-idosch@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH0PR11MB8088:EE_
+X-MS-Office365-Filtering-Correlation-Id: 956add01-81e6-4ee2-fee0-08dcad781fec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NVZxTG9wNlhnT0R1akorSCtSNW5WWnpVeEw4aFBEZE5QZzRYTTZDU2pzRzlJ?=
+ =?utf-8?B?QzhFRU9aNmllN3Q0UXFWUFVnUWtSaVZUNjUzV3VsTzRXVDdSK00zYmEvNk5y?=
+ =?utf-8?B?YzdVTkxYdlNrUjYrYzJVbWFuWlUzT1psWE5NWUl5b0x3bSt2MWNsSFRqTSts?=
+ =?utf-8?B?SXpXeXNoZkVHU2dpY283QmpCZHlaUWduSXJscFFBWWpFOXZJdEwyMHg0UGQx?=
+ =?utf-8?B?Q2VNM1ZoSGxoa0lCenpkVVVCbWVPMVppZ21Ia3djSEFEc3lpYnNkeXdaSC81?=
+ =?utf-8?B?aFpnR09ITjZiZG4zSkNNbVVBdTljZFFOcHhZUDlqVVlTcWtjZ2pHYU1lQjZQ?=
+ =?utf-8?B?VmVtUDlIc1lOWkQ2dmxzVGxhN0FSaUdrVmJwSWtrOFBEMjZad1ltSGFMTXpw?=
+ =?utf-8?B?c0tHMWtnbjJDcGlxcUdQcW5FdUZTVzEwZWN3N3VrWFZhUGxya2J1bUs5dnp1?=
+ =?utf-8?B?VHBscStOdzU0KzF3NmV5MUJML3MwRTV6UHBjWVdTdU1ybFhScm9xSlhvN1hl?=
+ =?utf-8?B?OStjS09KYndBMXdCaUFnNFBsY2xJQ2F5RDRPQm9UbWl3ZG5SME5lSDVPcnVw?=
+ =?utf-8?B?NnRmTmdWOTMrRlppMkRXcFZwODFhR1B1ZlBMRGdWU3ZFS1RMTlRhUlRZV1Rz?=
+ =?utf-8?B?Szgwd2lCK3RuUENqaHlBbmtyQ0ZZaC9EMW5WRFJDbStRT2V0cWdiUEdqd0ts?=
+ =?utf-8?B?M0FLSlN3bnZRb3lIOXgwQTVDd3VxMzR0eE5QQm5IMDJ4ZDlDYTA1THR2RnRw?=
+ =?utf-8?B?L3dIS0NmazFTRTBDV25vWjducDM1VmQrSHhiNDEyQ3IwZEVWZy8xM0lWbTA1?=
+ =?utf-8?B?SUNBNGFPVFhpNVhlM0tsRjJVb0k3cVNUdElkZk5CbitKR3QrcVFJMzBGOWk3?=
+ =?utf-8?B?aDYyWGswbmg1VWo2emJIOXJycEZ0bER1bklPdnBHb25CaVpZWTkwWUJ4VExJ?=
+ =?utf-8?B?R1pVRWlSYUxNd2VGbWRRakVORW1oTnhKTW5RaThCb1pZbnk5WDZibmtVRnJI?=
+ =?utf-8?B?aXd2RzdQaGJycWVYaGdYejlYVWtmbUx2cEtQVXJFcmF4S21JYS9UMDNSRElG?=
+ =?utf-8?B?RFQ2U0U0OTlvbFR6VTJNN1RCaEJkTWZKakF6elFTMGlWNFY4ZTRJZmtQOHdj?=
+ =?utf-8?B?WlVpRjFqS3YrTnVOZXY1dXRYekxLSldxa1k0Y1ArSUJCZ3A0dkxYRVprVXhx?=
+ =?utf-8?B?S24xRDZPcVk5MVY1THFwSUtKWnNxeGxJTk9CQUZHc3ZDVGxHVDl3eXdHYW5K?=
+ =?utf-8?B?My8rTjYzLzNlOFNvV1lNOGp2dGhtWFF5UG9KOW4xUEdVSThnTE9SMVlvUnZm?=
+ =?utf-8?B?V0ZkR2gyVTZvaTFrU1IzS2VMb1JYZnJQL0FtNXNoZW9ZSlVhY1F0RmVUQVU4?=
+ =?utf-8?B?TGV6NGV0ZGMvNkxVanFqVzJRUWtXOWxhbkhxemp2a2J1ZlVML01tL3BsU1hN?=
+ =?utf-8?B?dWYxYlN3NDk2ZGN5cHBvN21CY010NTc5Y2JzQVA3WVJvWUF1Tjk1SXpsWktB?=
+ =?utf-8?B?UWpTTkdjcmRQZ25XMzcyWjRid25vSHoyYStOYnRYcTFCYTdudTZKQWcrbjBM?=
+ =?utf-8?B?OUt6T015ME5MSTVZN1RXQ3BHbCtJUUNtRFBDeUdXc0VYK0dsLy9qUmRKcmlC?=
+ =?utf-8?B?L1gzV01DZ3ZtSUE0aExSalJUcXk5NzVoWm5aSzVZQjY5NUFDYy90YUJkclpj?=
+ =?utf-8?B?SVMxTjJCZmRpS3dWeEtFbk1YRC9GU2JWME1zeHpyRVpLeHdMbVpNR21MWGEr?=
+ =?utf-8?B?YnkxKzdFVC9yUnp3dGhraW9yOVhmS0pncEI0bENocmM2WitDL0VlTU5NeDRy?=
+ =?utf-8?B?eHc4SGNmV2dSZ24zTkh6dz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QnNLa2g4SkRVMEwyc0R2dkpyOHFzdWVRbFlzZ3ZoOFJ1RmpUbmtFek5rUkRi?=
+ =?utf-8?B?WFg3cUlTWmgwdGxHQXFGRTVybGIwS3pUU05BYUNRNUppT1FzSzBDWE42c3hs?=
+ =?utf-8?B?RVNrcTRmaE1YOGIvSnpjYTFhTnFiMkMxZDROQ0h3MVBxVDdsSkhabGx3d2hP?=
+ =?utf-8?B?QjVDNStocWZmeGtldDNsZUo0b1B2S0VuSFdnb2lHV2dTQUJBcm1TRk1mcG5w?=
+ =?utf-8?B?WnR6LzFCUUxpSjZYR3BHczFVektVbm9GYjBXOEtzamRlOHN3bHl3ZExnb1Nv?=
+ =?utf-8?B?WHhaN1U4dENmWkgweG9pOTB5T0MzbDBzZEs4YXhVUlVqbW1PQ0ViYjR2UTBT?=
+ =?utf-8?B?bkVmWjlWQ2VPMnF6cW0xSXpDL2NDOEJNUi8xUzRKUHNiMmRLeGpYS0lrTnZp?=
+ =?utf-8?B?ZWs4TUtGNWlSRmEvbmUwREU3cWJEMjdWZVlaSmJkcHMwR2kzTlI4dTJENklj?=
+ =?utf-8?B?aExVempQYWU1MUhtbWRJR0ZjRTJWZWdOcW9yQkhsbXhQWEFMV2JOMS9PYmtX?=
+ =?utf-8?B?djlUcERJdnh5ZE9KbzFqN3ZSR1dyc2ZJSDBkUWlWWDh5ckpBK2VoVm9vMnlT?=
+ =?utf-8?B?dHpqWThKTEZRZEFucDY4T0J3SThDZU5FR3cyTjNUWEx0Wm5HZ3o5bXJ2dWFG?=
+ =?utf-8?B?SGtMZjBVU2U5UVl6U0xoakNCcmZDbkNsbkVmQ241QWdDaDA0ZERiYjdGQ0NP?=
+ =?utf-8?B?cGs4SE83TmljRXhKUVoxdG00anhiT1RFTTlyUHkxM1o2bG1WdXZPd0FvSE1u?=
+ =?utf-8?B?VEhTTFVYQ0gyZEdkdEFEQXF5MjQ0UXoreFUrWnQyTzNxL3Vvdlh1Ui9DVDVI?=
+ =?utf-8?B?dWN2VXd5OVdBbDNYUlRKemNGNmwvWjlnOTdzQnV4Yzk2cDZCZUw1RFYwUW1r?=
+ =?utf-8?B?OXV2R3YwYTFyNWRiMnZnVHJWZk5ySUVPMHZReTUzdUdNYzhTb1ZLR1RQUEwz?=
+ =?utf-8?B?SldvdHdCVmsrNVBidVhEUU8renVwYVgwNDIrdzlVU0FhSXhodzVYQ0RLaC9v?=
+ =?utf-8?B?NHhkZTZKVFVFWE5YSHlmQ01FL0JXcG5NSHB6SUtSbHRXUTB3SjU3S29DOFNk?=
+ =?utf-8?B?cVVDZ2g0L1RWVXRINGxqK3YwT3dUWm9TWTVKRVpMUzdxOFlhd3RxdmMxa0VO?=
+ =?utf-8?B?V3NRNDk5NWdBUnloa0hLcEhVUHJ6VDAvdGNEUDNpRnM4YStKaDF5V1ZkelR1?=
+ =?utf-8?B?bnpabURCY21rbU1HQ1pMQ3NOUFdMUk9OelBuSzZ0aS9SblZIbUFrbW9VemFk?=
+ =?utf-8?B?anhoYnRzSzl6RUp0Q0dEdENGYVp4ZEpRTE42UzlaQlVBcmxka0hBN09qM0xw?=
+ =?utf-8?B?eXRsUHBQZ28xWnFMUXRsTGdUSkN6a0dDTyt3SFFGMy85QnlYUTl5cTRBK3g1?=
+ =?utf-8?B?TTFlZFI5Q0lqQ21aOGNYT3pJMU5ybGd2cm1zZmcxcXlETWNNWFF2ZUd4WTcw?=
+ =?utf-8?B?cWVaSWp2NXFZVU5penVsNWtkbVBoV2lmaU1IYm9YQWkvQ01odHJrejRvb3k3?=
+ =?utf-8?B?T3YwMWt0SFdlRkJRdWJlUUZQK3ZYTXkya1dzN2xpZU0wMUliTmNkdEpaajlo?=
+ =?utf-8?B?RFhuWFB4V2FEMU11L1FyNFZTelduRTBBNHJGU2tmRU5mS1NRZnBiMnpnNGkx?=
+ =?utf-8?B?SnZmRzU3eFJkVDF2aXZtdkMzczVTVFVzYjA5dVlsN1A4Q1RFejJ6a3I4Zmcw?=
+ =?utf-8?B?SU9tb1cxSm44bEpDRjhoM1JzT2pzMkp6Y0QrVXdmazBoa0tIZ3NxVjAzSU9h?=
+ =?utf-8?B?RS9JN2NLOWdpU1ROL0pRM0RrRSszbUFGUTJzcHpaWUZQM01lMjkyM0FjWUJh?=
+ =?utf-8?B?cndEYURwTnN6STN5Qll6ZW5ucGZ2eVJZbW0vS3dEem54QXVUSU5UUEVXZGhL?=
+ =?utf-8?B?QklvTThzMFBET01pY0VLbWwwSkY5REY3Zm1DRjZiaE9QWFlmeEhqd2pQNFhC?=
+ =?utf-8?B?dTgvOFFSekQzSFRqSUc3b2pQeHVxZldXMm5FY0NNTWwrM1lqOHVEMVR4RUlp?=
+ =?utf-8?B?QzFCM0plekp4OEVrUVdYRk9CNmFvMDZBdmZBZXRGRFVVbWVBUHZJLzhHcVhY?=
+ =?utf-8?B?WVg3TDlGOTdBVTFKdGdDQUo1VDFXQ3N6K2RDQU1KTkxybzRDK1FWZHhjbjU2?=
+ =?utf-8?B?NUg2ZmNJSjlrQ0FRUDlPeUJFRFZwWTBSS2lmZTFuZGN2QVVROVZFUG1qOHUv?=
+ =?utf-8?B?K3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 956add01-81e6-4ee2-fee0-08dcad781fec
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2024 13:37:42.4289
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oePTakdVqYle3NXnHoORKl3lWJQbNhIZTkA5f7vxOweMSZheMt4vC+r/8fMz9WYJebeooi2HEL8UClgIoP82XepabfletUE1PywU0XAYm78=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB8088
+X-OriginatorOrg: intel.com
 
-Ido Schimmel <idosch@nvidia.com> wrote:
-> @@ -110,7 +108,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct nft_regs *regs,
->  	if (priv->flags & NFTA_FIB_F_MARK)
->  		fl4.flowi4_mark = pkt->skb->mark;
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+Date: Thu, 25 Jul 2024 11:34:51 +0200
+
+> From: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> The E830 and E82x devices use essentially the same logic for performing
+> a crosstimestamp. The only difference is that E830 hardware has
+> different offsets. Instead of having two implementations, combine them
+> into a single ice_capture_crosststamp() function.
+> 
+> Also combine the wrapper functions which call
+> get_device_system_crosststamp() into a single ice_ptp_getcrosststamp()
+> function.
+> 
+> To support both hardware types, the ice_capture_crosststamp function
+> must be able to determine the appropriate registers to access. To handle
+> this, pass a custom context structure instead of the PF pointer. This
+> structure, ice_crosststamp_ctx, contains a pointer to the PF, and
+> a pointer to the device configuration structure. This new structure also
+> will make it easier to implement historic snapshot support in a future
+> commit.
+> 
+> The device configuration structure is a static const data which defines
+> the offsets and flags for the various registers. This includes the lock
+> register, the cross timestamp control register, the upper and lower ART
+> system time capture registers, and the upper and lower device time
+> capture registers for each timer index.
+> 
+> This does add extra data to the .text of the module (and thus kernel),
+> but it also removes 2 near duplicate functions for enabling E830
+> support.
+> 
+> Use the configuration structure to access all of the registers in
+> ice_capture_crosststamp(). Ensure that we don't over-run the device time
+> array by checking that the timer index is 0 or 1. Previously this was
+> simply assumed, and it would cause the device to read an incorrect and
+> likely garbage register.
+> 
+> It does feel like there should be a kernel interface for managing
+> register offsets like this, but the closest thing I saw was
+> <linux/regmap.h> which is interesting but not quite what we're looking
+> for...
+> 
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+
+[...]
+
+> diff --git a/drivers/net/ethernet/intel/ice/ice_osdep.h b/drivers/net/ethernet/intel/ice/ice_osdep.h
+> index a2562f04267f..c03ab0207e0a 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_osdep.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_osdep.h
+> @@ -23,6 +23,9 @@
+>  #define wr64(a, reg, value)	writeq((value), ((a)->hw_addr + (reg)))
+>  #define rd64(a, reg)		readq((a)->hw_addr + (reg))
 >  
-> -	fl4.flowi4_tos = iph->tos & DSCP_BITS;
-> +	fl4.flowi4_tos = iph->tos & IPTOS_RT_MASK;
+> +#define rd32_poll_timeout(a, addr, val, cond, delay_us, timeout_us) \
+> +	read_poll_timeout(rd32, val, cond, delay_us, timeout_us, false, a, addr)
+> +
+>  #define ice_flush(a)		rd32((a), GLGEN_STAT)
+>  #define ICE_M(m, s)		((m ## U) << (s))
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index 9f0eff040a95..ac3944fec2d3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -1,6 +1,7 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* Copyright (C) 2021, Intel Corporation. */
+>  
+> +#include <linux/iopoll.h>
 
-If this is supposed to get centralised, wouldn't it
-make more sense to not mask it, or will that happen later?
+read_poll_timeout() is used in osdep.h, but you include it here.
+You should either define rd32_poll_timeout() here instead of the header
+or move this include to osdep.h.
 
-I thought plan was to ditch RT_MASK...
+>  #include "ice.h"
+>  #include "ice_lib.h"
+>  #include "ice_trace.h"
+
+[...]
+
+> -static int
+> -ice_ptp_getcrosststamp_e82x(struct ptp_clock_info *info,
+> -			    struct system_device_crosststamp *cts)
+> +static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
+> +				  struct system_device_crosststamp *cts)
+>  {
+>  	struct ice_pf *pf = ptp_info_to_pf(info);
+> +	struct ice_crosststamp_ctx ctx = {};
+> +
+> +	ctx.pf = pf;
+
+	struct ice_crosststamp_ctx ctx = {
+		.pf	= pf,
+	};
+
+> +
+> +	switch (pf->hw.ptp.phy_model) {
+> +	case ICE_PHY_E82X:
+> +		ctx.cfg = &ice_crosststamp_cfg_e82x;
+> +		break;
+> +	case ICE_PHY_E830:
+> +		ctx.cfg = &ice_crosststamp_cfg_e830;
+> +		break;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+>  
+> -	return get_device_system_crosststamp(ice_ptp_get_syncdevicetime,
+> -					     pf, NULL, cts);
+> +	return get_device_system_crosststamp(ice_capture_crosststamp, &ctx,
+> +					     &ctx.snapshot, cts);
+>  }
+> -#endif /* CONFIG_ICE_HWTS */
+>  
+> +#endif /* CONFIG_ICE_HWTS */
+>  /**
+>   * ice_ptp_get_ts_config - ioctl interface to read the timestamping config
+>   * @pf: Board private structure
+> @@ -2523,7 +2599,7 @@ static void ice_ptp_set_funcs_e82x(struct ice_pf *pf)
+>  #ifdef CONFIG_ICE_HWTS
+>  	if (boot_cpu_has(X86_FEATURE_ART) &&
+>  	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
+> -		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp_e82x;
+> +		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
+>  
+>  #endif /* CONFIG_ICE_HWTS */
+>  	if (ice_is_e825c(&pf->hw)) {
+> @@ -2592,6 +2668,28 @@ static void ice_ptp_set_funcs_e810(struct ice_pf *pf)
+>  	}
+>  }
+>  
+> +/**
+> + * ice_ptp_set_funcs_e830 - Set specialized functions for E830 support
+> + * @pf: Board private structure
+> + *
+> + * Assign functions to the PTP capabiltiies structure for E830 devices.
+> + * Functions which operate across all device families should be set directly
+> + * in ice_ptp_set_caps. Only add functions here which are distinct for E830
+> + * devices.
+> + */
+> +static void ice_ptp_set_funcs_e830(struct ice_pf *pf)
+> +{
+> +#ifdef CONFIG_ICE_HWTS
+> +	if (pcie_ptm_enabled(pf->pdev) &&
+> +	    boot_cpu_has(X86_FEATURE_ART) &&
+> +	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
+> +		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
+> +#endif /* CONFIG_ICE_HWTS */
+
+I've seen this pattern in several drivers already. I really feel like it
+needs a generic wrapper.
+I mean, there should be something like
+
+arch/x86/include/asm/ptm.h (not sure about the name)
+
+where you put let's say
+
+static inline bool arch_has_ptm(struct pci_device *pdev)
+
+Same for
+
+include/asm-generic/ptm.h
+
+there it will be `return false`.
+
+In include/asm-generic/Kbuild, you add
+
+mandatory-y += ptm.h.
+
+Then, include/linux/ptm.h should include <asm/ptm.h> and in your driver
+sources, you include <linux/ptm.h> and check
+
+	if (arch_has_ptm(pdev))
+		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
+
+It's just a draft, adjust accordingly.
+
+Checking for x86 features in the driver doesn't look good. Especially
+when you add ARM64 or whatever support in future.
+
+> +
+> +	/* Rest of the config is the same as base E810 */
+> +	ice_ptp_set_funcs_e810(pf);
+> +}
+
+Thanks,
+Olek
 
