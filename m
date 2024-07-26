@@ -1,111 +1,110 @@
-Return-Path: <netdev+bounces-113224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15CAB93D3F0
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:15:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1C993D3F8
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 15:16:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5354287BD4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:15:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBC451C20CCD
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 13:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7081417B507;
-	Fri, 26 Jul 2024 13:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E19617B510;
+	Fri, 26 Jul 2024 13:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PlHXNVm7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UldgrY9h"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE63C17838C
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 13:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A661717838C
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 13:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721999718; cv=none; b=CvLFxTEXrff31m02h7IjYkS43t82uSuBnwqHspDAF4dOFfiEwN9iOuEx+7/uf4oiX0REugTYpEeEwmIm3+9wJx9QpeAidd3MATJpFmGZd6PLL7rEe4NhMg2mNpiOwnqrFgoMvLIu1rMm0r1PqgqylkeLf7b78JDppjpzzTW+K4M=
+	t=1721999786; cv=none; b=aWc20BWY3NR4k8wNNigNyR1iDRla9OD3nNdVfe9VW2RhfnoBO3ZWoc116pAn4l8i2wzY+8ADzpb4pa/75sNutshEsg175LXZ2aCtUh20pQT49YP+BeaHG8W439h9bHpxccCx3tHX7wzkf9E9x3w7QZuJ7IU4EwG+7lMuLDsVNbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721999718; c=relaxed/simple;
-	bh=LF0PKlCsDKYpv+HQFt2fCkqg6jtEYdv7eFCfliVOwPo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=is5fiFC+lZcofRLQAGVwErOM54eH8kOY7s14CGtk62EeKyl4kjFAr27BQoGgpSS6eUTSa7qqC3memOI9ytmY/oIL/Dc3wEal2mg/D4e/XZelOA3YcRmvbtvY7zCO77AQvlnTr4qZBC2ZhFMRS0NyQ5vOOedTiQnxUWCXvNPgQWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PlHXNVm7; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1721999786; c=relaxed/simple;
+	bh=xmKf9omwUxucT1oeRkAGbgWNHALpXShtwR2JSwaiBgg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=G8kjMJLZFFAQHRd0KESXgIjvtu6QSPwmkV1bQLUjbqu9CpuNanp2YVsDPqOVjG+TQYMrCxKTYn0TCgB1fCPUNxNU6LZO8Hdlf8t/T5NbjohNVG6H+rIVdVTKVAKT+nEcAicpsFU72cdI9gpVeDFJHYiog2tUW2UwWvJ1CGveynA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UldgrY9h; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721999715;
+	s=mimecast20190719; t=1721999783;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2EhpoWb0AurDY6o27/mIIhlnMNFRUh7l8fb/1FOa9EY=;
-	b=PlHXNVm7svdY3g8H46rm28z3ue5sa7UOOfCybj662trzEz9uQhNV+iW0as7L4+3MNZAMux
-	OquFV/0gFf+rnaoGrt25lMxMJ5HA5FXxwtR295ZQxiTxhnedjV9uMo0mUd2uwePlZ8mtvi
-	Qsld0uR183gLuIDUqtDbvFXktYEsbM8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=r+Xb2FoYdB0d76xIYmgmvNy/BmZ9+wOzI/YfNgYKqlo=;
+	b=UldgrY9h4raN3oKBJQ1WArLmBAH9YOgPrXETU15x6/S0SvEzStRrMT2zqxvR4xCzPwkyfb
+	WzDupIqjHXzhqr5oC0ZsLKl9lPspwVB0JFgtuTPHf4nMy8gckp7WLWZ/NENWZ652zT7jRz
+	bZxoqv8pd5aJl6NmE7q2dRJfjNCdBDs=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-WM3bAqzcPuKpb9YPn5Ax8Q-1; Fri, 26 Jul 2024 09:15:14 -0400
-X-MC-Unique: WM3bAqzcPuKpb9YPn5Ax8Q-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-36873ed688dso1135271f8f.1
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:15:14 -0700 (PDT)
+ us-mta-695-CXR08z37OjCmPQYyVPPSHg-1; Fri, 26 Jul 2024 09:16:22 -0400
+X-MC-Unique: CXR08z37OjCmPQYyVPPSHg-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef244cdd30so12967631fa.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 06:16:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721999713; x=1722604513;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2EhpoWb0AurDY6o27/mIIhlnMNFRUh7l8fb/1FOa9EY=;
-        b=uB15ErAEuJlj2n1a1xS2MXMAecmRAhrcLFsuS9OKIxwoRWCkBgCqSQpd5BxhKs38VF
-         UFby4TZGIdKG1nrLp1uKTD52SVJeU9Q21PnJbvCOIkkpUa57g3wz4tyR6sM8D4/m/4U/
-         mT30LVlIQsSa/XGG+qVHXlRdqAepbHasOT1HsjwUXJr8wu1W70Og23eXLvwZdlZXEcDJ
-         hZzO0sMiOoT+zt4f0nwtNNsWC4CKS6D945QKfA5gTbyVuRa1IR9vIjBcIuXuUb1WSdn5
-         w/gwKe20A88CogolTOr7o27MADC8hjNdwRsFUm8pjrWwQQGkHwhWa5lz49xgfeYHFAc7
-         jVKQ==
-X-Gm-Message-State: AOJu0Yxk4I/O5JKC/WRGAV9geSRnK/QGfYD49x5jSN/iRTK/DuAetMhV
-	SW1Am+Bx4uhCoKtwt5EWyNKOeVwhQMH4/37bKSVrwaUzcgnnXLRGk0isikibTBJp+63k59Yh8S+
-	/kAKMNvGZjCgg62wzEh2vfMrWFOgcx90k9hFaG+SUe3gN0oEJ30E+Gg==
-X-Received: by 2002:adf:e792:0:b0:367:96b5:784e with SMTP id ffacd0b85a97d-36b31a795fbmr3817597f8f.50.1721999713446;
-        Fri, 26 Jul 2024 06:15:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGAIVE6aRZFryUDPhlNqaJ4GXjinhwOOFRqyjWsrTiYldwpHCv9/AZ2LGJXXQtrl5tKP35uLg==
-X-Received: by 2002:adf:e792:0:b0:367:96b5:784e with SMTP id ffacd0b85a97d-36b31a795fbmr3817568f8f.50.1721999712852;
-        Fri, 26 Jul 2024 06:15:12 -0700 (PDT)
-Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427f93594b6sm121233975e9.5.2024.07.26.06.15.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 06:15:12 -0700 (PDT)
-Date: Fri, 26 Jul 2024 15:15:09 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, dsahern@kernel.org, pablo@netfilter.org,
-	kadlec@netfilter.org, fw@strlen.de
-Subject: Re: [RFC PATCH net-next 2/3] netfilter: nft_fib: Mask upper DSCP
- bits before FIB lookup
-Message-ID: <ZqOhXSYp6yHlcNmy@debian>
-References: <20240725131729.1729103-1-idosch@nvidia.com>
- <20240725131729.1729103-3-idosch@nvidia.com>
+        d=1e100.net; s=20230601; t=1721999781; x=1722604581;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r+Xb2FoYdB0d76xIYmgmvNy/BmZ9+wOzI/YfNgYKqlo=;
+        b=so1lIG6x7cPwmI7hZoZ0YRb0Mnbw3cV7f6sjRUptRX9vbL8xkMT+z2NeW3ashdUKnA
+         /nJTBtOoJma0k3dG/lckYoCNDAj/HCQRCXE7yckcvUdrxqKsPevcjRrC8GOeTORsiVEp
+         /Rr/PkF/mJsnbBlN97Fl3nZ0kC4vmmIRXxPb+Yk/wlon0rZX30/ZSvLZq+QUAN4LEjOj
+         UvKM0U6LEJSjJfOBPJxGKQt1X4EssSTLPBgZOpQchtqhfd+kVlWipAfgdqOPozvBTpBo
+         XzbmILj2cHHl+t0jVOZiPfHbuUUTBhozoXEbb2uyczCBkqWPWLXLC51BCT9nRUtuMvaF
+         a1YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVb+WERrnnlctVem6lpPgatXYHoc8J9EHiFWHfrpeCUbxRWO5RtPtOeWFrjqyZQ1eAs+B+2UcErIL3fISgFiPTvbVCDvfdr
+X-Gm-Message-State: AOJu0YzpwDkmNCYObZokCk8iuvxB0l82K41TmUX4yTrg2EdKcOnq2Lf9
+	ya0MZ3TPnQUrtT5/T3DQFBdcmDNQ704So11pIserwijRwMoE6oBaEAWA1+DH0lcRuZbeVREH+72
+	QG0NeTnBwEqMfK85blLw1p9G9vAOeM5ww/ewL3Z1Cd3c08/uCS/yrEimUzgDFBpcNtWWtENKf1x
+	37X2iHULsk/mWBp7yWTLUluF2Re9Tr
+X-Received: by 2002:a2e:8ec5:0:b0:2ef:22e6:233f with SMTP id 38308e7fff4ca-2f039c9862amr40567651fa.21.1721999780755;
+        Fri, 26 Jul 2024 06:16:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENkd152LdcVGYZFsu1bzI6uLueRTD0erDZebrYWI+gUvt514koc5pNhArM6ncFt9ikhIn1ddo0wjWm/mrfZK0=
+X-Received: by 2002:a2e:8ec5:0:b0:2ef:22e6:233f with SMTP id
+ 38308e7fff4ca-2f039c9862amr40567411fa.21.1721999780306; Fri, 26 Jul 2024
+ 06:16:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240725131729.1729103-3-idosch@nvidia.com>
+References: <20240725013217.1124704-1-lulu@redhat.com> <ZqKKaLdn3DBr7WrK@LQ3V64L9R2>
+In-Reply-To: <ZqKKaLdn3DBr7WrK@LQ3V64L9R2>
+From: Cindy Lu <lulu@redhat.com>
+Date: Fri, 26 Jul 2024 21:15:41 +0800
+Message-ID: <CACLfguUORsgxmya8v2shsS5mJ3iZpxu6zv-fGsw9ZS2uwFFPWw@mail.gmail.com>
+Subject: Re: [PATH v6 0/3] vdpa: support set mac address from vdpa tool
+To: Joe Damato <jdamato@fastly.com>, Cindy Lu <lulu@redhat.com>, dtatulea@nvidia.com, 
+	mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, sgarzare@redhat.com, 
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 25, 2024 at 04:17:28PM +0300, Ido Schimmel wrote:
-> As part of its functionality, the nftables FIB expression module
-> performs a FIB lookup, but unlike other users of the FIB lookup API, it
-> does so without masking the upper DSCP bits. In particular, this differs
-> from the equivalent iptables match ("rpfilter") that does mask the upper
-> DSCP bits before the FIB lookup.
-> 
-> Align the module to other users of the FIB lookup API and mask the upper
-> DSCP bits using IPTOS_RT_MASK before the lookup.
-
-If Florian and Pablo are okay with this change and the long term plan
-to allow full DSCP match, then I'm all for it.
-
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+On Fri, 26 Jul 2024 at 01:25, Joe Damato <jdamato@fastly.com> wrote:
+>
+> On Thu, Jul 25, 2024 at 09:31:01AM +0800, Cindy Lu wrote:
+> > Add support for setting the MAC address using the VDPA tool.
+> > This feature will allow setting the MAC address using the VDPA tool.
+> > For example, in vdpa_sim_net, the implementation sets the MAC address
+> > to the config space. However, for other drivers, they can implement their
+> > own function, not limited to the config space.
+>
+> [...]
+>
+> Nit: the subject line has misspelled PATCH as PATH
+>
+> I believe net-next is still closed so this code needs to be resent
+> when net-next is open again in a few days.
+>
+sure,will fix  this
+thanks
+cindy
 
 
