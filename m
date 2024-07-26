@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-113278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A363693D78B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:23:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C046593D793
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 19:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 594C3283C62
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:23:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B6AB283D95
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 17:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B44617C7C9;
-	Fri, 26 Jul 2024 17:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE0C17C7C9;
+	Fri, 26 Jul 2024 17:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="UAC4laxs"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FdiAcVPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5058624B26
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE27117C7D7
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 17:27:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722014627; cv=none; b=FQTSBKQ3NUgrQ0ohRR2wG/ElvUuxWYdQwATEc6nh77OAPsVckWr/ggFhneum5ZAGao60FFQdom5uZ+1FOMAOUNCdLkn0vLdzPPaKTwgZ33o0jAvKqh27Dm0PH2wOTaL/+hM/SOf3IsmNNNnxzrhXufOaV7TPPFqSBeZI2R3e48A=
+	t=1722014860; cv=none; b=p8eXjT4OMQjMDpCjWyfuigE9XlIxRHkhMwezYEANJDyruzB05oA7AhovuI3Gs7IafHsEsLhGxL8jHDQNApAL9ert8mDLHavIm7sXBMTLHRI5K0Soqqdu1ljIloc71mqSmbA7tNbQzppSYShR1R/3ZqmGXbKZPZVWSUcvBogi1P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722014627; c=relaxed/simple;
-	bh=yNoMRHgCaIt/EPnYiXLeowM8qa4hLJH246Wt3MYtiug=;
+	s=arc-20240116; t=1722014860; c=relaxed/simple;
+	bh=qFGlvMhteFMAaqJUl6N6Xqh/+JZvLGYqyFFAThGVfPw=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=sMlnGnomwsduaVLXja1/hjk8dTps5pIroGMyWfUUPtOuppZvfmclGTG2hZ6JTYmhKc4mpauPqL3TflNjpbx31s1+eCosDgpUbMBB63kzNbTIiHi8ltRaByWmEsVCP2BEwt6V5IcfH69vEyceXXmLv4JO/x8PBlchSlHaJMrQciw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=UAC4laxs; arc=none smtp.client-ip=209.85.208.52
+	 MIME-Version:Content-Type; b=ZQ7K98hcAF9KinYcnl6imiEjzr/Tr0iMNbb7dSqZ3SS+tFhzfYw6A7EYzM/QDp63yvBcUz/1ieUyEsCag7Z32xAMtNbnHy3ljaUPn8hHzdmt6DVTfk04W7X4aZmAOxrvWBbkO92sB2zbzbID8/72VNvY/zSsuGuTmOCVDcKyyFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FdiAcVPy; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5a167b9df7eso3198743a12.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:23:45 -0700 (PDT)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a7a8553db90so244976566b.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:27:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1722014624; x=1722619424; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1722014856; x=1722619656; darn=vger.kernel.org;
         h=mime-version:message-id:date:user-agent:references:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OxOBYHngxrM1ZbsYmdfqxhtP13mtEgZmWUe0F1gaX9Y=;
-        b=UAC4laxsA0W4xacOVrsrhzz+FiAWjg476g/45PR+R8PV1vfPMRanfBM0kFzB3Qzx0p
-         S2aLvodnnNmwNAG+lWNe6CQMyzGHCDmmFmdijVFsvJaX8lL/VT8Q55OfgNDI1T4Yee4M
-         8METe9feoUv7hYFlqTrgHFbUm0FJwHxWs8zIyHmo6I2Hpb/XFhAPDyEOeNm1mE0QvLHp
-         eqhv3DVmyED7xkrn30OF/3YjTp1RlsCMS6chp6y76uhxzDj4kOKTcqxQd1gjefPZbAS4
-         gc/fx8eT4XnJ6nMMI8PlqceX3j0TxWEALq5k2aAd0k9mybz8ltdzd1s68USO1Mt1PkSY
-         djhg==
+        bh=8EyOtirsWmopDCe9GEITwcgKLVaDmjcC2IWcfFdj4as=;
+        b=FdiAcVPylSmsObz1AIiSgfOzBnHxjeMKeXdSNIe9ZHlGLLLgyDGOMVKUWqh/4EgRqn
+         3txQ28itDx7+JueNKIZY6k2RMY4NgNa5F+pkTHdjlD3X4KqgZP2s5WC89EAUuVrdxh3/
+         wF1t8nl/SEcEXrLgMhfTGS31BeKPUGHmno79mnb9bac6VlohruNv10JJUn/+IP96wyhN
+         WTkwRbROgz0QP1H/jDXfsHVLPsjQz5C/Sqagd63zmHxabLK8sHNT3y6tCJqYs5zqWV6T
+         gjuQ75o8DkzhOyOVqlAFkOwuS5ZeDKrqYwZ2syW1fnfSRiIN4f4gn3BVDQMQay+YRvlE
+         GcQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722014624; x=1722619424;
+        d=1e100.net; s=20230601; t=1722014856; x=1722619656;
         h=mime-version:message-id:date:user-agent:references:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OxOBYHngxrM1ZbsYmdfqxhtP13mtEgZmWUe0F1gaX9Y=;
-        b=FYgFsaovIuE9Vmp4ie+QuukAF97EtDXL44tUiu1B6H92wV8EYBmX6/eipuchKIKbIc
-         MoggZO24GGYbguh8LtQMIrkpPBw5nsvYL1pwToy+lUF37n8xmwRRluB/YvrTd1zqbCxa
-         Yx72MqLir+L+XMPuHF9AitVd9Tu/SBeBaPY97/duG+HAOyPlnkbsoK3+Fdw0g6cbtNoz
-         CYYtgV1DidSXgmMddVpHh4IWeDKOspd55aEHrK+8zpRcrOCV+qR4j7C3iHe5yhYq1HS4
-         xQjpeuaUGdB7r9Sc7BI6Fs7Gx1HxpA6RZe/QVluwrb9XbOcDVWGNoiBz+cepZj9j6bmf
-         Sc/w==
-X-Forwarded-Encrypted: i=1; AJvYcCU+EFdYI0FokUG08OR0bFpT0czeXmcvSRKs7Gt45LbrJnUj3rX/FnF+wOh/0/aSyF08eFwBp/j+V8cgE9o/Hl+WrmPDFidL
-X-Gm-Message-State: AOJu0Yym+8yWt2I21+C4Es52OV+8bjcLobSh9ZnaB5nCYpqQV053/fdY
-	uywRSMuYxo6B8Igz3X09MJWQmgr+ZKOsDKC5on+iXxyfP3lM8h2NkW6BqVCHkL8=
-X-Google-Smtp-Source: AGHT+IFbWa9eIWzko0lQWbrKQtTdajN5NpJK99U98/lKkeBDPQm3oncCFUsQb9VEsp5efJYMM+tTMw==
-X-Received: by 2002:a17:907:72c1:b0:a77:e2e3:3554 with SMTP id a640c23a62f3a-a7d40086febmr13280566b.28.1722014623618;
-        Fri, 26 Jul 2024 10:23:43 -0700 (PDT)
+        bh=8EyOtirsWmopDCe9GEITwcgKLVaDmjcC2IWcfFdj4as=;
+        b=NTeo6cZbuVQ5Rc3rQk34OHAs46zEcyXJuPATRQ91gRkxvE/wIAJAZSa1LD3HmygV80
+         H5kNHNLUnRNKdWNgSDqWt+9ZvGuziabRnyTTxV1jWNz1eCFtdCMO5r+aRaL7bmMs/PGL
+         /WzH2ocYHZ6HMVapMKY8CA/x1yMJJhHLtml9Ug+cYYcb+gRkYMEwJMtZC2hmippy44qY
+         RumjGyZpjm0CKczW/jkRHxHGCLkIMyr+yrErNtuhLT0HUPR06jugQAPhvM/ZPTBzRjJ4
+         +t0bfnLjT94jJdvo4csRC/yHsddRmIYeh7FtBa7F2D4P1BHtwv8q1dBdYO7JQ0lFzPXu
+         svsw==
+X-Forwarded-Encrypted: i=1; AJvYcCVSVFAClakPi2pJrE+asVquEfJ4uaSBfGIIbcE3SKAHDRMRJmDJEw247TFTjh/hbg/1LJSO6KgPwNbutlbXvEvSuRsBHaP5
+X-Gm-Message-State: AOJu0YyvFZ4d3qq2WvZxsr2EowX0QRB38MYhN5QBKl/LrR/bON+HLFWn
+	9XD+kijqjpdEBStuSa4OIrzStr7Ru3xECZGUrkmmAbSw2C3oB4TbKJYGJ0CQ4j4=
+X-Google-Smtp-Source: AGHT+IHvx2x2riTEqoxuCBwrXZm2KqzJYh/bqylu0umjwLin316iEYSM6CBdYzfcsDW46OEMhID5rw==
+X-Received: by 2002:a17:907:7d86:b0:a72:5f9a:159a with SMTP id a640c23a62f3a-a7d3ff583a6mr16652066b.2.1722014856217;
+        Fri, 26 Jul 2024 10:27:36 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:4c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acac615c0sm199092066b.97.2024.07.26.10.23.42
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab50cbfsm197311866b.47.2024.07.26.10.27.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 10:23:43 -0700 (PDT)
+        Fri, 26 Jul 2024 10:27:35 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
@@ -77,15 +77,15 @@ Cc: Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
  Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
  <shuah@kernel.org>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
   linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf 1/6] selftest/bpf: Support more socket types in
- create_pair()
-In-Reply-To: <20240724-sockmap-selftest-fixes-v1-1-46165d224712@rbox.co>
-	(Michal Luczaj's message of "Wed, 24 Jul 2024 13:32:37 +0200")
+Subject: Re: [PATCH bpf 6/6] selftest/bpf: Introduce
+ __attribute__((cleanup)) in create_pair()
+In-Reply-To: <20240724-sockmap-selftest-fixes-v1-6-46165d224712@rbox.co>
+	(Michal Luczaj's message of "Wed, 24 Jul 2024 13:32:42 +0200")
 References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
-	<20240724-sockmap-selftest-fixes-v1-1-46165d224712@rbox.co>
+	<20240724-sockmap-selftest-fixes-v1-6-46165d224712@rbox.co>
 User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Fri, 26 Jul 2024 19:23:41 +0200
-Message-ID: <87cyn0kqxu.fsf@cloudflare.com>
+Date: Fri, 26 Jul 2024 19:27:34 +0200
+Message-ID: <878qxokqrd.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,149 +95,138 @@ MIME-Version: 1.0
 Content-Type: text/plain
 
 On Wed, Jul 24, 2024 at 01:32 PM +02, Michal Luczaj wrote:
-> Extend the function to allow creating socket pairs of SOCK_STREAM,
-> SOCK_DGRAM and SOCK_SEQPACKET.
->
-> Adapt direct callers and leave further cleanups for the following patch.
+> Rewrite function to have (unneeded) socket descriptors automatically
+> close()d when leaving the scope. Make sure the "ownership" of fds is
+> correctly passed via take_fd(); i.e. descriptor returned to caller will
+> remain valid.
 >
 > Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
 > Signed-off-by: Michal Luczaj <mhal@rbox.co>
 > ---
->  .../selftests/bpf/prog_tests/sockmap_basic.c       |  19 +--
->  .../selftests/bpf/prog_tests/sockmap_helpers.h     | 138 ++++++++++++++-------
->  2 files changed, 96 insertions(+), 61 deletions(-)
+>  .../selftests/bpf/prog_tests/sockmap_helpers.h     | 57 ++++++++++++----------
+>  1 file changed, 32 insertions(+), 25 deletions(-)
 >
-
-[...]
-
 > diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> index e880f97bc44d..77b73333f091 100644
+> index ead8ea4fd0da..2e0f9fe459be 100644
 > --- a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
 > +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
+> @@ -182,6 +182,21 @@
+>  		__ret;                                                         \
+>  	})
+>  
+> +#define take_fd(fd)                                                            \
+> +	({                                                                     \
+> +		__auto_type __val = (fd);                                      \
+> +		fd = -EBADF;                                                   \
+> +		__val;                                                         \
+> +	})
 
-[...]
+Probably should operate on a pointer to fd to avoid side effects, like
+__get_and_null macro in include/linux/cleanup.h. take_fd is effectively
+__get_and_null(fd, -EBADFD).
 
-> +static inline int create_pair(int family, int sotype, int *p0, int *p1)
+> +
+> +static inline void close_fd(int *fd)
 > +{
-> +	struct sockaddr_storage addr;
-> +	socklen_t len = sizeof(addr);
-> +	int s, c, p, err;
-> +
-> +	s = socket_loopback(family, sotype);
-> +	if (s < 0)
-> +		return s;
-> +
-> +	err = xgetsockname(s, sockaddr(&addr), &len);
-> +	if (err)
-> +		goto close_s;
-> +
-> +	c = xsocket(family, sotype, 0);
-> +	if (c < 0) {
-> +		err = c;
-> +		goto close_s;
-> +	}
-> +
-> +	err = connect(c, sockaddr(&addr), len);
-> +	if (err) {
-> +		if (errno != EINPROGRESS) {
-> +			FAIL_ERRNO("connect");
-> +			goto close_c;
-> +		}
-> +
-> +		err = poll_connect(c, IO_TIMEOUT_SEC);
-> +		if (err) {
-> +			FAIL_ERRNO("poll_connect");
-> +			goto close_c;
-> +		}
-> +	}
-> +
-> +	switch (sotype & SOCK_TYPE_MASK) {
-> +	case SOCK_DGRAM:
-> +		err = xgetsockname(c, sockaddr(&addr), &len);
-> +		if (err)
-> +			goto close_c;
-> +
-> +		err = xconnect(s, sockaddr(&addr), len);
-> +		if (!err) {
-> +			*p0 = s;
-> +			*p1 = c;
-> +			return err;
-> +		}
-> +		break;
-> +	case SOCK_STREAM:
-> +	case SOCK_SEQPACKET:
-> +		p = xaccept_nonblock(s, NULL, NULL);
-> +		if (p >= 0) {
-> +			*p0 = p;
-> +			*p1 = c;
-> +			goto close_s;
-> +		}
-> +
-> +		err = p;
-> +		break;
-> +	default:
-> +		FAIL("Unsupported socket type %#x", sotype);
-> +		err = -EOPNOTSUPP;
-> +	}
-> +
-> +close_c:
-> +	close(c);
-> +close_s:
-> +	close(s);
-> +	return err;
+> +	if (*fd >= 0)
+> +		xclose(*fd);
 > +}
+> +
+> +#define __close_fd __attribute__((cleanup(close_fd)))
+> +
+>  static inline int poll_connect(int fd, unsigned int timeout_sec)
+>  {
+>  	struct timeval timeout = { .tv_sec = timeout_sec };
+> @@ -369,9 +384,10 @@ static inline int socket_loopback(int family, int sotype)
+>  
+>  static inline int create_pair(int family, int sotype, int *p0, int *p1)
+>  {
+> +	__close_fd int s, c = -1, p = -1;
+>  	struct sockaddr_storage addr;
+>  	socklen_t len = sizeof(addr);
+> -	int s, c, p, err;
+> +	int err;
+>  
+>  	s = socket_loopback(family, sotype);
+>  	if (s < 0)
+> @@ -379,25 +395,23 @@ static inline int create_pair(int family, int sotype, int *p0, int *p1)
+>  
+>  	err = xgetsockname(s, sockaddr(&addr), &len);
+>  	if (err)
+> -		goto close_s;
+> +		return err;
+>  
+>  	c = xsocket(family, sotype, 0);
+> -	if (c < 0) {
+> -		err = c;
+> -		goto close_s;
+> -	}
+> +	if (c < 0)
+> +		return c;
+>  
+>  	err = connect(c, sockaddr(&addr), len);
+>  	if (err) {
+>  		if (errno != EINPROGRESS) {
+>  			FAIL_ERRNO("connect");
+> -			goto close_c;
+> +			return err;
+>  		}
+>  
+>  		err = poll_connect(c, IO_TIMEOUT_SEC);
+>  		if (err) {
+>  			FAIL_ERRNO("poll_connect");
+> -			goto close_c;
+> +			return err;
+>  		}
+>  	}
+>  
+> @@ -405,36 +419,29 @@ static inline int create_pair(int family, int sotype, int *p0, int *p1)
+>  	case SOCK_DGRAM:
+>  		err = xgetsockname(c, sockaddr(&addr), &len);
+>  		if (err)
+> -			goto close_c;
+> +			return err;
+>  
+>  		err = xconnect(s, sockaddr(&addr), len);
+> -		if (!err) {
+> -			*p0 = s;
+> -			*p1 = c;
+> +		if (err)
+>  			return err;
+> -		}
+> +
+> +		*p0 = take_fd(s);
+>  		break;
+>  	case SOCK_STREAM:
+>  	case SOCK_SEQPACKET:
+>  		p = xaccept_nonblock(s, NULL, NULL);
+> -		if (p >= 0) {
+> -			*p0 = p;
+> -			*p1 = c;
+> -			goto close_s;
+> -		}
+> +		if (p < 0)
+> +			return p;
+>  
+> -		err = p;
+> +		*p0 = take_fd(p);
+>  		break;
+>  	default:
+>  		FAIL("Unsupported socket type %#x", sotype);
+> -		err = -EOPNOTSUPP;
+> +		return -EOPNOTSUPP;
+>  	}
+>  
+> -close_c:
+> -	close(c);
+> -close_s:
+> -	close(s);
+> -	return err;
+> +	*p1 = take_fd(c);
+> +	return 0;
+>  }
+>  
+>  static inline int create_socket_pairs(int family, int sotype, int *c0, int *c1,
 
-I was going to suggest that a single return path for success is better
-than two (diff below), but I see that this is what you ended up with
-after patch 6.
-
-So I think we can leave it as is.
-
----
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-index 77b73333f091..ed266c6c0117 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-@@ -408,28 +408,31 @@ static inline int create_pair(int family, int sotype, int *p0, int *p1)
-                        goto close_c;
-
-                err = xconnect(s, sockaddr(&addr), len);
--               if (!err) {
--                       *p0 = s;
--                       *p1 = c;
--                       return err;
--               }
-+               if (err)
-+                       goto close_c;
-+
-+               p = s;
-                break;
-        case SOCK_STREAM:
-        case SOCK_SEQPACKET:
-                p = xaccept_nonblock(s, NULL, NULL);
--               if (p >= 0) {
--                       *p0 = p;
--                       *p1 = c;
--                       goto close_s;
-+               if (p < 0) {
-+                       err = p;
-+                       goto close_c;
-                }
-
--               err = p;
-+               xclose(s);
-                break;
-        default:
-                FAIL("Unsupported socket type %#x", sotype);
-                err = -EOPNOTSUPP;
-+               goto close_c;
-        }
-
-+       *p0 = p;
-+       *p1 = c;
-+       return 0;
-+
- close_c:
-        close(c);
- close_s:
+This turned out nice and readable, IMHO.
 
