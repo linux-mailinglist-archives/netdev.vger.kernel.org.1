@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-113174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1DBE93D0CE
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:04:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD41593D0D1
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 12:04:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21849B221CA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 10:04:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FAB61F21A2A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jul 2024 10:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3588179201;
-	Fri, 26 Jul 2024 10:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F30178CC3;
+	Fri, 26 Jul 2024 10:03:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A196178CE2
-	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0383179663
+	for <netdev@vger.kernel.org>; Fri, 26 Jul 2024 10:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721988223; cv=none; b=c+8mBnyhgcWOu6JBH7xTlEMQXhVF9Ru2Eils9HFqYkLTonlk8ZYOZWzHvdjz2D8xDZMDUD+bCbuEXbxSIhdshlWaqDqsxYfTIlZyNxVFDJ7U3DJ9k7H9EakPfHE5i8QEtfUJOL++JUCWy3fMf8oo41vI7PF3VtqcPTIRuCcE5Hg=
+	t=1721988231; cv=none; b=YK7OMiAxOTOfO78xXtwyvawabeYYxIlNxQAMlMsx6GvyH7MYY+GQKfNaWhb8RqV9mXrV6dAlCxKezDvfmv47jRfDLPZ0OcaEUajHAiMFntHosjV/HFgzqkCW2+rEG+nR5S7R8PGo8co5mfcstKyeTaVwzsUvpbOsgfrt2o12pTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721988223; c=relaxed/simple;
-	bh=Be4jhs6/NJHXOfMwC6gQ+zenPHrnAjjAQ1Zhq/k1sp0=;
+	s=arc-20240116; t=1721988231; c=relaxed/simple;
+	bh=0/oYikfuKK20djbAz28xrKtDpeB717aq+cK6lhEUOdI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=trTvxi2LKHUn7WWgzn+8812rOvH2sFlvO+L+nl71frdrWd4k9HbOfPbfJWRyoydDqIycrImUk2g0uirOc68KvriIx/WXhtGRjfGhKURZJ+3eWjDlCTIuipNnLwTAb1snSK93LyNlGYAET5MTufldIy/ZGOj7UkEZpNUx/GJFotA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.92.39.34
+	 MIME-Version; b=BpZYwRiPraR0+9DerNiBhwOhGg7Vgwjs9rDxoXfGvy3X9FG/tiki1i+tb//WVdVAF7+ZDoKbCk0XI/aEaAyIyDF8r14VrbMmMqF6jL/TzYKJrAxb7Nq/2BMIHggTiAaA+SRoMogFDI7NCZnwFssmmbS04ZUcRCUVqpuq5ToAEHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp81t1721988216th58f9z7
-X-QQ-Originating-IP: xMvyEGjQzsu6ac4mNcBBcQxA4A9abQ8R9Irr2RKGg3E=
+X-QQ-mid: bizesmtp81t1721988223t7jgz9xy
+X-QQ-Originating-IP: XnLlgt/j+JNTntotQ7vPTkUErVqGHwVleDb4wK8dcTo=
 Received: from localhost.localdomain ( [122.231.252.211])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 26 Jul 2024 18:03:34 +0800 (CST)
+	id ; Fri, 26 Jul 2024 18:03:41 +0800 (CST)
 X-QQ-SSF: 0001000000000000000000000000000
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 3932851911391721343
+X-BIZMAIL-ID: 1084126950472790650
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
 Cc: jiawenwu@net-swift.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [RFC PATCH net-next v5 07/10] net: libwx: allocate devlink for devlink port
-Date: Fri, 26 Jul 2024 18:02:58 +0800
-Message-ID: <576BCDCE2AE928D0+20240726100301.21416-8-mengyuanlou@net-swift.com>
+Subject: [RFC PATCH net-next v5 10/10] net: ngbe: add devlink and devlink port created
+Date: Fri, 26 Jul 2024 18:03:01 +0800
+Message-ID: <57F6E5845914FDC4+20240726100301.21416-11-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.43.2
 In-Reply-To: <20240726100301.21416-1-mengyuanlou@net-swift.com>
 References: <20240726100301.21416-1-mengyuanlou@net-swift.com>
@@ -57,377 +57,65 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-Make devlink allocation function generic to use it for PF and for VF.
-
-Add function for PF/VF devlink port creation. It will be used in
-wangxun NICs.
-
 Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 ---
- drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
- .../net/ethernet/wangxun/libwx/wx_devlink.c   | 208 ++++++++++++++++++
- .../net/ethernet/wangxun/libwx/wx_devlink.h   |  13 ++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c |  13 +-
- drivers/net/ethernet/wangxun/libwx/wx_sriov.h |   1 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  14 ++
- 6 files changed, 249 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_devlink.c
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_devlink.h
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
-index 5b996d973d29..643a5e947ba9 100644
---- a/drivers/net/ethernet/wangxun/libwx/Makefile
-+++ b/drivers/net/ethernet/wangxun/libwx/Makefile
-@@ -4,4 +4,4 @@
- 
- obj-$(CONFIG_LIBWX) += libwx.o
- 
--libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o wx_sriov.o
-+libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o wx_sriov.o wx_devlink.o
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_devlink.c b/drivers/net/ethernet/wangxun/libwx/wx_devlink.c
-new file mode 100644
-index 000000000000..b39da37c0842
---- /dev/null
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_devlink.c
-@@ -0,0 +1,208 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index a03a4b5f2766..784819f8fcd5 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -16,6 +16,7 @@
+ #include "../libwx/wx_lib.h"
+ #include "../libwx/wx_mbx.h"
+ #include "../libwx/wx_sriov.h"
++#include "../libwx/wx_devlink.h"
+ #include "ngbe_type.h"
+ #include "ngbe_mdio.h"
+ #include "ngbe_hw.h"
+@@ -616,6 +617,13 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 	wx = netdev_priv(netdev);
+ 	wx->netdev = netdev;
+ 	wx->pdev = pdev;
 +
-+#include <linux/vmalloc.h>
-+#include <linux/pci.h>
-+
-+#include "wx_type.h"
-+#include "wx_sriov.h"
-+#include "wx_devlink.h"
-+
-+static const struct devlink_ops wx_pf_devlink_ops = {
-+};
-+
-+static void wx_devlink_free(void *devlink_ptr)
-+{
-+	devlink_unregister((struct devlink *)devlink_ptr);
-+	devlink_free((struct devlink *)devlink_ptr);
-+}
-+
-+struct wx_dl_priv *wx_create_devlink(struct device *dev)
-+{
-+	struct devlink *devlink;
-+
-+	devlink = devlink_alloc(&wx_pf_devlink_ops, sizeof(devlink), dev);
-+	if (!devlink)
-+		return NULL;
-+
-+	/* Add an action to teardown the devlink when unwinding the driver */
-+	if (devm_add_action_or_reset(dev, wx_devlink_free, devlink))
-+		return NULL;
-+
-+	devlink_register(devlink);
-+
-+	return devlink_priv(devlink);
-+}
-+EXPORT_SYMBOL(wx_create_devlink);
-+
-+/**
-+ * wx_devlink_set_switch_id - Set unique switch id based on pci dsn
-+ * @wx: the PF to create a devlink port for
-+ * @ppid: struct with switch id information
-+ */
-+static void wx_devlink_set_switch_id(struct wx *wx,
-+				     struct netdev_phys_item_id *ppid)
-+{
-+	struct pci_dev *pdev = wx->pdev;
-+	u64 id;
-+
-+	id = pci_get_dsn(pdev);
-+
-+	ppid->id_len = sizeof(id);
-+	put_unaligned_be64(id, &ppid->id);
-+}
-+
-+/**
-+ * wx_devlink_create_pf_port - Create a devlink port for this PF
-+ * @wx: the PF to create a devlink port for
-+ *
-+ * Create and register a devlink_port for this PF.
-+ * This function has to be called under devl_lock.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+int wx_devlink_create_pf_port(struct wx *wx)
-+{
-+	struct devlink *devlink = priv_to_devlink(wx->dl_priv);
-+	struct devlink_port_attrs attrs = {};
-+	int err;
-+
-+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
-+	attrs.phys.port_number = wx->bus.func;
-+	wx_devlink_set_switch_id(wx, &attrs.switch_id);
-+	devlink_port_attrs_set(&wx->devlink_port, &attrs);
-+	err = devlink_port_register(devlink, &wx->devlink_port, 0);
-+	if (err) {
-+		wx_err(wx, "Failed to create devlink port for PF%d, error %d\n",
-+		       wx->bus.func, err);
-+		return err;
++	wx->dl_priv = wx_create_devlink(&pdev->dev);
++	if (!wx->dl_priv) {
++		err = -ENOMEM;
++		goto err_pci_release_regions;
 +	}
++	wx->dl_priv->priv_wx = wx;
+ 	wx->msg_enable = BIT(3) - 1;
+ 
+ 	wx->hw_addr = devm_ioremap(&pdev->dev,
+@@ -735,6 +743,10 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto err_clear_interrupt_scheme;
+ 
++	err = wx_devlink_create_pf_port(wx);
++	if (err)
++		goto err_devlink_create_pf_port;
 +
-+	return 0;
-+}
-+EXPORT_SYMBOL(wx_devlink_create_pf_port);
-+
-+/**
-+ * wx_devlink_destroy_pf_port - Destroy the devlink_port for this PF
-+ * @wx: the PF to cleanup
-+ *
-+ * Unregisters the devlink_port structure associated with this PF.
-+ * This function has to be called under devl_lock.
-+ */
-+void wx_devlink_destroy_pf_port(struct wx *wx)
-+{
+ 	err = register_netdev(netdev);
+ 	if (err)
+ 		goto err_register;
+@@ -744,6 +756,8 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 	return 0;
+ 
+ err_register:
 +	devl_port_unregister(&wx->devlink_port);
-+}
-+EXPORT_SYMBOL(wx_devlink_destroy_pf_port);
-+
-+/**
-+ * wx_devlink_port_get_vf_fn_mac - .port_fn_hw_addr_get devlink handler
-+ * @port: devlink port structure
-+ * @hw_addr: MAC address of the port
-+ * @hw_addr_len: length of MAC address
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .port_fn_hw_addr_get operation
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int wx_devlink_port_get_vf_fn_mac(struct devlink_port *port,
-+					 u8 *hw_addr, int *hw_addr_len,
-+					 struct netlink_ext_ack *extack)
-+{
-+	struct vf_data_storage *vfinfo = container_of(port,
-+						      struct vf_data_storage,
-+						      devlink_port);
-+	struct devlink_port_attrs *attrs = &port->attrs;
-+	struct devlink_port_pci_vf_attrs *pci_vf;
-+	struct wx *wx = vfinfo->vf_priv_wx;
-+	u16 vf_id;
-+
-+	pci_vf = &attrs->pci_vf;
-+	vf_id = pci_vf->vf;
-+
-+	ether_addr_copy(hw_addr, wx->vfinfo[vf_id].vf_mac_addr);
-+	*hw_addr_len = ETH_ALEN;
-+
-+	return 0;
-+}
-+
-+/**
-+ * wx_devlink_port_set_vf_fn_mac - .port_fn_hw_addr_set devlink handler
-+ * @port: devlink port structure
-+ * @hw_addr: MAC address of the port
-+ * @hw_addr_len: length of MAC address
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .port_fn_hw_addr_set operation
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int wx_devlink_port_set_vf_fn_mac(struct devlink_port *port,
-+					 const u8 *hw_addr,
-+					 int hw_addr_len,
-+					 struct netlink_ext_ack *extack)
-+
-+{
-+	struct vf_data_storage *vfinfo = container_of(port,
-+						      struct vf_data_storage,
-+						      devlink_port);
-+	struct devlink_port_attrs *attrs = &port->attrs;
-+	struct devlink_port_pci_vf_attrs *pci_vf;
-+	struct wx *wx = vfinfo->vf_priv_wx;
-+	int ret = 0;
-+	u16 vf_id;
-+
-+	pci_vf = &attrs->pci_vf;
-+	vf_id = pci_vf->vf;
-+
-+	if (!is_valid_ether_addr(hw_addr) || vf_id >= wx->num_vfs)
-+		return -EINVAL;
-+
-+	ret = wx_set_vf_mac(wx, vf_id, hw_addr);
-+	if (ret >= 0) {
-+		wx->vfinfo[vf_id].pf_set_mac = true;
-+		if (!netif_running(wx->netdev))
-+			wx_err(wx, "Bring the PF device up before use vfs\n");
-+	} else {
-+		wx_err(wx, "The VF MAC address was NOT set due to invalid\n");
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct devlink_port_ops wx_devlink_vf_port_ops = {
-+	.port_fn_hw_addr_get = wx_devlink_port_get_vf_fn_mac,
-+	.port_fn_hw_addr_set = wx_devlink_port_set_vf_fn_mac,
-+};
-+
-+int wx_devlink_create_vf_port(struct wx *wx, int vf_id)
-+{
-+	struct devlink *devlink = priv_to_devlink(wx->dl_priv);
-+	struct devlink_port_attrs attrs = {};
-+	struct devlink_port *devlink_port;
-+	int err;
-+
-+	devlink_port = &wx->vfinfo[vf_id].devlink_port;
-+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_VF;
-+	attrs.pci_vf.pf = wx->bus.func;
-+	attrs.pci_vf.vf = vf_id;
-+
-+	wx_devlink_set_switch_id(wx, &attrs.switch_id);
-+	devlink_port_attrs_set(devlink_port, &attrs);
-+	err = devl_port_register_with_ops(devlink, devlink_port, vf_id + 1,
-+					  &wx_devlink_vf_port_ops);
-+	if (err) {
-+		wx_err(wx, "Failed to create devlink port for VF %d, error %d\n",
-+		       vf_id, err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+void wx_devlink_destroy_vf_port(struct wx *wx)
-+{
-+	int i;
-+
-+	for (i = 0; i < wx->num_vfs; i++)
-+		devl_port_unregister(&wx->vfinfo[i].devlink_port);
-+}
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_devlink.h b/drivers/net/ethernet/wangxun/libwx/wx_devlink.h
-new file mode 100644
-index 000000000000..0754579ed304
---- /dev/null
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_devlink.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2015 - 2024 Beijing WangXun Technology Co., Ltd. */
-+
-+#ifndef _WX_DEVLINK_H_
-+#define _WX_DEVLINK_H_
-+
-+struct wx_dl_priv *wx_create_devlink(struct device *dev);
-+int wx_devlink_create_pf_port(struct wx *wx);
-+void wx_devlink_destroy_pf_port(struct wx *wx);
-+int wx_devlink_create_vf_port(struct wx *wx, int vf_id);
-+void wx_devlink_destroy_vf_port(struct wx *wx);
-+
-+#endif /* _WX_DEVLINK_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index 08738738d02e..88ef82f1a1a3 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -7,6 +7,7 @@
- #include "wx_type.h"
- #include "wx_hw.h"
- #include "wx_mbx.h"
-+#include "wx_devlink.h"
- #include "wx_sriov.h"
- 
- static void wx_vf_configuration(struct pci_dev *pdev, int event_mask)
-@@ -92,6 +93,7 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
- 	wr32m(wx, WX_PSR_CTL, WX_PSR_CTL_SW_EN, WX_PSR_CTL_SW_EN);
- 
- 	for (i = 0; i < num_vfs; i++) {
-+		wx->vfinfo[i].vf_priv_wx = wx;
- 		/* enable spoof checking for all VFs */
- 		wx->vfinfo[i].spoofchk_enabled = true;
- 		wx->vfinfo[i].link_enable = true;
-@@ -130,6 +132,7 @@ void wx_disable_sriov(struct wx *wx)
- 	else
- 		wx_err(wx, "Unloading driver while VFs are assigned.\n");
- 
-+	wx_devlink_destroy_vf_port(wx);
- 	/* clear flags and free allloced data */
- 	wx_sriov_clear_data(wx);
- }
-@@ -158,7 +161,15 @@ static int wx_pci_sriov_enable(struct pci_dev *dev,
- 		goto err_out;
- 	}
- 
-+	for (i = 0; i < wx->num_vfs; i++) {
-+		err = wx_devlink_create_vf_port(wx, i);
-+		if (err)
-+			goto err_dis_sriov;
-+	}
-+
- 	return num_vfs;
-+err_dis_sriov:
-+	pci_disable_sriov(dev);
- err_out:
- 	wx_sriov_clear_data(wx);
- 	return err;
-@@ -210,7 +221,7 @@ int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
- }
- EXPORT_SYMBOL(wx_pci_sriov_configure);
- 
--static int wx_set_vf_mac(struct wx *wx, u16 vf, const u8 *mac_addr)
-+int wx_set_vf_mac(struct wx *wx, u16 vf, const u8 *mac_addr)
- {
- 	u8 hw_addr[ETH_ALEN];
- 	int ret = 0;
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-index 2aa68947c0d3..e876cb03c2c9 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-@@ -6,6 +6,7 @@
- 
- void wx_disable_sriov(struct wx *wx);
- int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs);
-+int wx_set_vf_mac(struct wx *wx, u16 vf, const u8 *mac_addr);
- void wx_msg_task(struct wx *wx);
- void wx_disable_vf_rx_tx(struct wx *wx);
- void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index e50a75e7c58b..a8722f69cebb 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -8,6 +8,7 @@
- #include <linux/netdevice.h>
- #include <linux/if_vlan.h>
- #include <linux/phylink.h>
-+#include <net/devlink.h>
- #include <net/ip.h>
- 
- #define WX_NCSI_SUP                             0x8000
-@@ -1084,6 +1085,10 @@ enum wx_state {
- 
- struct vf_data_storage {
- 	struct pci_dev *vfdev;
-+	struct wx *vf_priv_wx;
-+	/* vf devlink port data */
-+	struct devlink_port devlink_port;
-+
- 	unsigned char vf_mac_addr[ETH_ALEN];
- 	bool spoofchk_enabled;
- 	bool link_enable;
-@@ -1119,6 +1124,10 @@ enum wx_pf_flags {
- 	WX_PF_FLAGS_NBITS               /* must be last */
- };
- 
-+struct wx_dl_priv {
-+	struct wx *priv_wx;
-+};
-+
- struct wx {
- 	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
- 	DECLARE_BITMAP(state, WX_STATE_NBITS);
-@@ -1128,6 +1137,11 @@ struct wx {
- 	u8 __iomem *hw_addr;
- 	struct pci_dev *pdev;
- 	struct net_device *netdev;
-+
-+	/* devlink port data */
-+	struct devlink_port devlink_port;
-+	struct wx_dl_priv *dl_priv;
-+
- 	struct wx_bus_info bus;
- 	struct wx_mbx_info mbx;
- 	struct wx_mac_info mac;
++err_devlink_create_pf_port:
+ 	phylink_destroy(wx->phylink);
+ 	wx_control_hw(wx, false);
+ err_clear_interrupt_scheme:
+@@ -775,6 +789,7 @@ static void ngbe_remove(struct pci_dev *pdev)
+ 	netdev = wx->netdev;
+ 	wx_disable_sriov(wx);
+ 	unregister_netdev(netdev);
++	devl_port_unregister(&wx->devlink_port);
+ 	phylink_destroy(wx->phylink);
+ 	pci_release_selected_regions(pdev,
+ 				     pci_select_bars(pdev, IORESOURCE_MEM));
 -- 
 2.43.2
 
