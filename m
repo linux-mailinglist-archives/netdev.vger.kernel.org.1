@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-113366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D4D93DEAF
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 12:12:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E91393DEB0
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 12:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D651F2261A
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 10:12:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F0831C213EE
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 10:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EB76CDCC;
-	Sat, 27 Jul 2024 10:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A855D6F2E5;
+	Sat, 27 Jul 2024 10:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dGdpCBBY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DwslFaZD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897721C2D;
-	Sat, 27 Jul 2024 10:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8153A537F5;
+	Sat, 27 Jul 2024 10:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722075148; cv=none; b=Lc/YLEq+3tJCI+Hi5VBD8UASEcZQyoFiKRtvdgn49e0PI+2uXRd4JiTTmQdMSz8cyMxc3Nln+empp51dZUmVMk2a7Gf0ILGjSPxNAd/a2c68AbHXWj5rXg3GyM+/g+LGFCsn3mQuEyF4S3JP0Hraxj7qynTrlYfxKKy42geYSeg=
+	t=1722075150; cv=none; b=kX58Fym2TSjE+gd9mI9k/4Va4qFc66oOxP0dpGz23scOm81Yc8Yf3HOlYibi6uf0FEwI0fgAsVS3ZmEwcp7R5p5l+zznuGnu9v9hQtjo/pLRH+xYZllVP93dUmldOFzrxQ6dLBP6lg0AaP/iqrnFW8FlzQFYKezLH/EFHbjlRno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722075148; c=relaxed/simple;
-	bh=DzynoOoC7+thgs+TYKlYcgcBgYWHSkzlGjhag0lPEks=;
+	s=arc-20240116; t=1722075150; c=relaxed/simple;
+	bh=cCLFaVdPcQbvfOFyb6WEE2nqQ88R0B1vxmSWl3J/yac=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OQ1ZtroSMvwk4yMgIXLvgWbY3OH+CeFuDAs+cwk4oBvKVUjBUFqs3zTIFrVHdhxJwPwZzzDyeMPmx4MFGRA1EL3sYBHduNsrbUugjFJru/Xei28rd1pcKgxGf7+3vkqV4fbxrBMgWIwH+8Tmhwp1GRz6wEw2OTDzkqEsm6ss28g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dGdpCBBY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C532C4AF10;
-	Sat, 27 Jul 2024 10:12:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=r47voU2dqYkobchw8bKeJR0dQWVR56z4zbi5jkncrKhIQGcbBawJsSFP3EAV23m+JZhJCVNsrO7IoUpmxp8G0afU1n1wG8rFGhEJGFmCh9kesCbMcVH1BN1Du/l+5u2gXtreTGh9BjaVN+gP6TVyj4j4IxZuijyuh8ZTk7p7KFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DwslFaZD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EC48C4AF09;
+	Sat, 27 Jul 2024 10:12:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722075148;
-	bh=DzynoOoC7+thgs+TYKlYcgcBgYWHSkzlGjhag0lPEks=;
+	s=k20201202; t=1722075150;
+	bh=cCLFaVdPcQbvfOFyb6WEE2nqQ88R0B1vxmSWl3J/yac=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=dGdpCBBY5dkw7CtZKjNmnZyAt2Hnv2vhFn/Je0Kyr7JimrwFXPYkc5/3AZp0Yfv1T
-	 9YwfbxDhGeBtEnCDdv+reWUwIuffxO4Mh+k7Bgg8OXbIvWMPA2lDS3+U5eGbQJREBL
-	 Y0d0Rz1+9Ow/NmrFeYpkmXjUJspIZ2aDWfuY2uqApsNf8eRvlg7G8AIgWA0Nqhwp9S
-	 kveS2O3gd9+Ds3bTCJdS7AWHSmM+aQIo4fKW95+GMTA/qCcDBCIZ33wHkVhOkWtqIt
-	 dsDqdmgOCjw6oCs5QFWLoQUZXTXtlYgJIUgkZBw3FqzdgcObArM31t0ZsC2nedvanw
-	 XvjY2H9BEldCw==
+	b=DwslFaZD38mcBaSsI2KY8l/52pdMuKd4utfHjTtjgEefdigFwDYjVooFBjI4zHyv3
+	 Do7/dWfRHhwTzX5ntvN17pH3Q0nKg//hXcC0EScu4R7DT5zIzgiYoqRPXB5Jp5nXqf
+	 k+pYuGK96KmFAu9YvzD3/eZvvpLPNh+w03SqmddaBvKvU8TQ0BwErQBERJzO2Xxw6i
+	 av+ABoXBSEHbyjgbWdqWBjkowLao3n6Ysxvce1gS9fyzP5rCpElC9t1NwwrhSRTScz
+	 cT8kUOjMvRXBSHA+c13h6HuZSFWP+Nz9+ivKSS/N45RIJajdgAaLS8K4ko1TgoAYV6
+	 cqSv+2UEVONDw==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Sat, 27 Jul 2024 12:10:34 +0200
-Subject: [PATCH iproute2-net 5/7] man: mptcp: 'fullmesh' has to be used
- with 'subflow'
+Date: Sat, 27 Jul 2024 12:10:35 +0200
+Subject: [PATCH iproute2-net 6/7] man: mptcp: clarify the 'ID' parameter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-5-c6398c2014ea@kernel.org>
+Message-Id: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-6-c6398c2014ea@kernel.org>
 References: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-0-c6398c2014ea@kernel.org>
 In-Reply-To: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-0-c6398c2014ea@kernel.org>
 To: Stephen Hemminger <stephen@networkplumber.org>
@@ -62,52 +61,53 @@ Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org,
  Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=980; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=DzynoOoC7+thgs+TYKlYcgcBgYWHSkzlGjhag0lPEks=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmpMgA1nOfSI8wBxFpB/DuDl6QbJgrVh1gn3Tj9
- 9aG4KYledaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZqTIAAAKCRD2t4JPQmmg
- c/PAEACjZo0TziZ8rgTRHqgeIf9vm4ITvFfkpylqoXO3jLwc6fuCjNr1jST1C0WCZZu/2WiSvSs
- KA/oFvqXGEtR5ZHwjTriz4tPJdGALgoovekJB0/+N6tIml5AVILk3TJ6KRuydD/eUpLlRNWJlk3
- 3IIQ8rkMZH3E38Jib6zNkY+QzQMJztBlvJJP8Ipf46/JuZM/Nq5Qf5IXAM/nBLsDasxBo8/25jW
- T4ibLYlDPhGtBVGZhQ3tz5MmMZACTqH7835ceFnIyPCMqrkL8cwQUb4ko2ElHzaDo1w0QsA8dm8
- GMsHl+Jwl7c05ldy4wLLn4Xsf8TBr9QLC8Tk2ZMMyC3CL5+NGQhjmSk3dK8Q/58kg5q0pU8LSUT
- jLxnJqYS7Z9VsIzEHGBTcVXkAvMcJWE/Juv/yEcArRL/1no0voV8g9FDwZUEW2ud1DmgCf2ebo7
- G3WTtBaQg2aMft0+JknM5TE6kQCXIK07uz8Dv2At3nKTmkFUuRLevKx6q4PUiDgYLE/c3wHE/Bf
- PflLUoqSXmAoEuMtwtn87VA34BvJ+R0d69P2O/aZoDgIvx7CPOBE6AGgxyyX0V5/L4H8TFLaBFa
- ktUl6cCI4CVcgWZ7GcJNRVokax/B+BrPrHP7+LgfVXAv95k9KXRZSqhtv5z3M7f7lGlLL+jWiEd
- CeBa6fwzCnU2YDQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1106; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=cCLFaVdPcQbvfOFyb6WEE2nqQ88R0B1vxmSWl3J/yac=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmpMgAzKelMinQhdZVzeDELlFRgzoiCxP5QsUdj
+ xF0HcuYU0qJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZqTIAAAKCRD2t4JPQmmg
+ c1qDEADT2096Z1+roQdEKI5MjBCqUMAtbql7EYuQFyWPvmNsTlb4dtKkxQUhUBv6plKx/YSJ3R0
+ TZJjFgb+0Go9XeoqrW2/m9FwVBN4ocQcPP/zH90ffMAvRSKH3/vcuOGKEpaUeKPVewHNsapphPj
+ yrODnxhj+SaV0TynWgIXwcBCxCpmQAX9ZvV+iPOLzkZvZr2+iZVnCzrCPm3pZ/62Ah+yoDssTdU
+ FcDfeMqLJlenbd8lNRHMScx5sURinNhtDeZ6s2mLIgVUzq5IVSxEMbIWOFa+ieOie6m7mnmpDE3
+ pRxhptH5N9yyHQ7q/BjwZnRCLUTsZ/KxL8Xipl6mi7X6AFDk1r1XjRsVpnc/NoA0GuQyyXQtDzq
+ tvuRgHAxg4HsM/wLa+ljNeLkd1zFJy2KOJ/gn4rFVExkGUYFQ5giX/3RNszuXtBmL90fiEbCq46
+ SmyOW/Ws5UlCu53CMQ4u89jhze+jOf7BJ40g9Ep5YC0JjplwwKU+vQ28w42oLG+Y0etbL5z8gqL
+ F9FPCSavj6npAYwEpc4cOffSQg4Qiw1T15xCM2y/nYEWfVIbYE4lEY/4iNxJlg+vy9los+IYBul
+ l0kkOhXCK+AOD+sZDvgVXfwGZd7pFZ/YsXKD7d5Uta8PgVWCM7SQZE8tYnYA0tSxn8lv6UN6NT2
+ 8qebVZxwIvPXPcA==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-'fullmesh' affects the subflow creation, it has to be used with the
-'subflow' flag. That's what is enforced on the kernel side.
+Explain the range (u8), and the special case for ID 0.
+
+The endpoints here are for all the connections, while the ID 0 is a
+special case per connection, depending on the source address used by the
+initial subflow. This ID 0 can then not be used for the global
+endpoints.
 
 Acked-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- man/man8/ip-mptcp.8 | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ man/man8/ip-mptcp.8 | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/man/man8/ip-mptcp.8 b/man/man8/ip-mptcp.8
-index f3d09bab..4c1161fe 100644
+index 4c1161fe..e4a55f6c 100644
 --- a/man/man8/ip-mptcp.8
 +++ b/man/man8/ip-mptcp.8
-@@ -190,7 +190,14 @@ this will behave the same as a plain
- .BR subflow
- endpoint. When the peer does announce addresses, each received ADD_ADDR
- sub-option will trigger creation of an additional subflow to generate a
--full mesh topology.
-+full mesh topology. This
-+.BR fullmesh
-+flag should always be used in combination with the
-+.BR subflow
-+one to be useful, except for the address used by the initial subflow,
-+where
-+.BR subflow
-+is then optional.
+@@ -148,7 +148,11 @@ expected behavior.
  
  .TP
- .BR implicit
+ .IR ID
+-is a unique numeric identifier for the given endpoint
++is a unique numeric identifier, between 0 and 255, for the given endpoint. It is
++not possible to add endpoints with ID 0, because this special ID is reserved for
++the initial subflow. For rules linked to the initial subflow, the path-manager
++will look at endpoints matching the same address, and port if set, ignoring the
++ID.
+ 
+ .TP
+ .BR signal
 
 -- 
 2.45.2
