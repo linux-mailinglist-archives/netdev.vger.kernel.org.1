@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-113321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A0393DCDE
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 03:10:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D79B93DCE7
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 03:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6CC4B228F6
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 01:10:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77D8D1C23493
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 01:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F8B1B86DE;
-	Sat, 27 Jul 2024 01:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E85394;
+	Sat, 27 Jul 2024 01:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npNccG7l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhUMHyi2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 559551FC4;
-	Sat, 27 Jul 2024 01:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 530B417E9
+	for <netdev@vger.kernel.org>; Sat, 27 Jul 2024 01:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722042622; cv=none; b=RpRerKvlIsUypxSsTaM4EtWRFwzNtmmreDtFTySi5TlgzOYhAthQRNse1kIWqxkAibaAGfeJNuNIR/T6KZKrG3ppvseMnczU/LanR3qX9Ol5jUG4Mi7qj1tjJJEJ3sevrEIc8XLbsETo6PG/qfk0SHPi72q85vd5Aicmfr6BgKI=
+	t=1722043280; cv=none; b=T09/xUIbqTtve0ktQdcVYwmnz2gjSdz+Jlx42+cIsgxQmfIgbPqDpWuy5coL9wtWwdw8uM3mx24Rnc6XL+snrPj+6wlUvEuozQ+lNSVcig2ymBSDac9/N7D8JptDeIZVF2A4pBfT+M3SVsUZfvQ0EAVarVjdOlPjrukShcOjufM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722042622; c=relaxed/simple;
-	bh=B8xcTQete29+yLOOOGHqCHxvBXsSXDnEQZ7UOKIo+zI=;
+	s=arc-20240116; t=1722043280; c=relaxed/simple;
+	bh=BH5/cfWgYbyCKGyii0H+kqAUGxaodJyrYwsr64hpNjM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oWrRMsEEB7a4iOfRufczwQ3Lsuh67E9m0ZXe7Y5576F/8kBvBXOR6FY19ga1YN0XqPwtTWDqmPZkRkx9cggis6nSzRMSTfP5ZlcVUI8h6VROOenb/cjgaflp+gso0YKzGWZ5IavsZNEwBACcUZtLNRRWskvE1KGrtdWAcYMe5tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npNccG7l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A752C32782;
-	Sat, 27 Jul 2024 01:10:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=brxl56CrGGJ1ex/z7BmCN7+nnMvZJ7edMR8nyhc64q6mQcyWXZeQob0Bv2TEc2rfoioiANkjG46f90Acrr9QhLh/+B5My+jHErWeY+s1FXrOp9uH+wbj/1c6Wlh8rBVvdZk85k58MNA5wlyb8zXot53lACTnbM7Y9CHjuQCtvhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhUMHyi2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B217C32782;
+	Sat, 27 Jul 2024 01:21:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722042621;
-	bh=B8xcTQete29+yLOOOGHqCHxvBXsSXDnEQZ7UOKIo+zI=;
+	s=k20201202; t=1722043279;
+	bh=BH5/cfWgYbyCKGyii0H+kqAUGxaodJyrYwsr64hpNjM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=npNccG7l/Z2vs6tew5cYKt73DRtpEdrVs0YVtzxlC9alm/cyElobMEpv/cDbtYQFf
-	 TeByFAqa7NfZEvYm3V8LNtfnqsYAwUFSyBrkBgXAZ0/5lPOX91NuCH3l7GYjgy1xmR
-	 fyXpGL8Inb1qVD5KZ5RwTv0NdE46d2z4pZybuhx5qxEYALgi157igkOsx/D5+/NFOX
-	 /oIOMOy87AvGhKqI72lHCfFYqm+N2vmdhEuUgv++j42QAL5x5ysjJBvYLHlN8w9p+1
-	 TFXxU9/UYlOWs1YPBVvBsoRypwdCQErJJpaOILgvr1Jc48Ojqbf08a1YSPE86gR4ri
-	 cYddRrfZc+WBw==
-Date: Fri, 26 Jul 2024 18:10:20 -0700
+	b=FhUMHyi2+HTZDtCuzrbVllhsQohqNBvQcFIrBKEc37ep2yeR9Wx3iYV710+7iVpXo
+	 NF8+TM2/r9vusONr47sZMGXL/Cspa2VB/rSVHmLBmurH1hV4vTKjYcg48n+ef6RiP9
+	 psk8Lfyjmj49BcZKN7zGwjS4td94fT65aZD2wG9cCWgVfmDJxRCrt7LWMZu8VJCLl3
+	 oVkT2lTbNB2LXLxN0JUyfxDQy12oijVZIOv07c/bjvqg5S+R0C+9x/7+QnBv3KZG/s
+	 t1h22Wmxv5iBfciJSj2vgqvxfydlSD6TSs8uCXBqBndeiBWt/QjXGyCk2SRzKXOeXC
+	 a2S2kklHqUeLw==
+Date: Fri, 26 Jul 2024 18:21:18 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org
-Subject: Re: [PATCH bpf] selftests/bpf: Filter out _GNU_SOURCE when
- compiling test_cpp
-Message-ID: <20240726181020.19bca47d@kernel.org>
-In-Reply-To: <CAEf4BzYonHCyFr7ivRDDUtsJY3MEgWRKwVZ=N0sWjpMrn1dR6A@mail.gmail.com>
-References: <20240725214029.1760809-1-sdf@fomichev.me>
-	<CAEf4BzYonHCyFr7ivRDDUtsJY3MEgWRKwVZ=N0sWjpMrn1dR6A@mail.gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
+ <jiri@resnulli.us>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH v1 net] rtnetlink: Don't ignore IFLA_TARGET_NETNSID when
+ ifname is specified in rtnl_dellink().
+Message-ID: <20240726182118.1674906e@kernel.org>
+In-Reply-To: <20240727001953.13704-1-kuniyu@amazon.com>
+References: <20240727001953.13704-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,20 +62,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Jul 2024 17:45:06 -0700 Andrii Nakryiko wrote:
-> or we could
+On Fri, 26 Jul 2024 17:19:53 -0700 Kuniyuki Iwashima wrote:
+> The cited commit accidentally replaced tgt_net with net in rtnl_dellink().
 > 
-> #ifndef _GNU_SOURCE
-> #define _GNU_SOURCE
-> #endif
+> As a result, IFLA_TARGET_NETNSID is ignored if the interface is specified
+> with IFLA_IFNAME or IFLA_ALT_IFNAME.
 > 
-> (though we have 61 places with that...) so as to not have to update
-> every target in Makefile.
+> Let's pass tgt_net to rtnl_dev_get().
+> 
+> Fixes: cc6090e985d7 ("net: rtnetlink: introduce helper to get net_device instance by ifname")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-AFAIU we have -D_GNU_SOURCE= twice _in the command line args_ :(
-One is from the Makefile which now always adds it to CFLAGS,
-the other is "built-in" in g++ for some weird reason.
-
-FWIW I have added this patch to the netdev "hack queue" so no
-preference any more where the patch lands :)
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
