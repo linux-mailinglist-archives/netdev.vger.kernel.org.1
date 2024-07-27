@@ -1,185 +1,197 @@
-Return-Path: <netdev+bounces-113375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E42193DF94
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 15:44:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2570A93DFDB
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 17:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7C41F21A54
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 13:44:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 854A2B21110
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 15:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A365B16E876;
-	Sat, 27 Jul 2024 13:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD7416E876;
+	Sat, 27 Jul 2024 15:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MSDp3HIj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="isxYUwtO"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE856F2E2;
-	Sat, 27 Jul 2024 13:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9781F1E521;
+	Sat, 27 Jul 2024 15:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722087882; cv=none; b=UJsCj4nvx5+oXvrZmTq6BZDn2iZLmMyjARtjxb/auFOYm3MSAhLoNL8+UQCrhh8i/kSYfLX+C5BLNYGarg+O405BzfIj7XLbRVICTDNvxo3Sfy8fOT++9YhRzvqv+dIkw3h5tH11M8ht088QiXdvWpc5etUbcV1CBEQBUPxIMbY=
+	t=1722092706; cv=none; b=Wjx/p2H+IxLzaAZF1bEjrwHBPU7QNsU+IXEX5FDsjf1Vj+Ld1ari06Z/Sqr3o2GN+Mp74+bAv+mk81/tHZLh7jW0Vwu/RvqUX4s/WB74IlJG3rN2Hp9C84x7OSpXu8JSBmy+YDxtcRsCk/cJAayY0kXhVUc5GsPG2BpMwZYHduk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722087882; c=relaxed/simple;
-	bh=wl5NAwzcxjFCy+OUk/uEwWiJLpbJLs3EK1hdWc9+KG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YLxebjiHbrgsRL/bRFO3bMBp111Q293SgiRgi1ULAuMK9Bhh3YDKXCPPKZ6Ndl8otbMtx4yZi6+5LuDbCSy4mSWsztXNxuhJbTGd30V/XVU+m4O1Pm0B3glc9S03vjDzCuqSE6JDs561THR/Dpzbo2/3WnUM5vJCdP5AZM6bTLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MSDp3HIj; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D0095E0003;
-	Sat, 27 Jul 2024 13:44:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1722087870;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KVGYpz4EMRqUqEfeUp3ItIDDmDoKY0516WwTXBxXGRM=;
-	b=MSDp3HIj+BuGqizb6wIE+kxDRNF89m1Avb9+dWW7HLFnWhfkL8/D6diHn5Q4vDJyZSwkUb
-	gzBhFsOMqIaQDr4S5QwDly05OcgAbnm0GO2Y/NGtOByWH679ZhjMyeAG+kD8YP8RIMVv31
-	zH+6oM/cAZ8Eh8av68cCn11mPf5DOw9mmy1sxEmc+ZpkPLZ+51w62Sy/u4GJMWEKyN86iS
-	i3my1siR1AmhNqEl2L8HHcCnXH/dW4O6N9tv+EBTWohCcATQ5Fpq291A6Bn41njv/U1ZJ3
-	nIP4/qd6bljB+Y1kSDr03ubyJxpQvugZvOHplJ2Z1iDjVVIr1ajnDcAg6DTwaA==
-Date: Sat, 27 Jul 2024 15:44:26 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, "Heiner Kallweit" <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
- Pirea <radu-nicolae.pirea@oss.nxp.com>, "Jay Vosburgh"
- <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- <UNGLinuxDriver@microchip.com>, "Simon Horman" <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, <donald.hunter@gmail.com>,
- <danieller@nvidia.com>, <ecree.xilinx@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Shannon Nelson
- <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v17 04/14] net: Change the API of PHY default
- timestamp to MAC
-Message-ID: <20240727154426.7ba30ed9@kmaincent-XPS-13-7390>
-In-Reply-To: <39c7fe45-fbee-4de5-ab43-bf042ed31504@intel.com>
-References: <20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com>
-	<20240709-feature_ptp_netnext-v17-4-b5317f50df2a@bootlin.com>
-	<39c7fe45-fbee-4de5-ab43-bf042ed31504@intel.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1722092706; c=relaxed/simple;
+	bh=nNa6BTq8O8JG2k5c3gmQiu/ILt3AIrrAAPmZg74Rj8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cLqRu8PTRSoThJeJW9vuWUKkjXThIHVUYPtUE/xQbEOGxXyLSb2Dfj37XqOScZyFZfkXJDSpqwa8XL4hbwLzJw+1+tHZC+jUqsBsrGkoxuidwglON/hant3qkZrwrYHnvY9+wNIJeBCw4kv4NpuqPzL32a51INmNz9l21jnmm6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=isxYUwtO; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1fc4fcbb131so14786895ad.3;
+        Sat, 27 Jul 2024 08:05:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722092704; x=1722697504; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cYZzXgIEVYkHhDTHJvjW3gQ6U+rgbeDnqycOVnisrpU=;
+        b=isxYUwtOpwzr4A4LoDXLc01z3LaTXXeRI7FQ9Ie0xoPFpN2CMHvP7PY2gIkz6X/LA1
+         WZrgDlOdPxRbslS2A9F2PD1NopOTv3Dks/gsu1CUBOQV2mOGQfrLzRe4mnBXToKKNIJx
+         uMbvXxvAzh0pVUdkaw+kzfmenDFGGFrvxAzb6dcB8vv3TX2o9y69wuvvTBMsryxtjHu4
+         2XMhrRh4floP+eHdIBB8Kv1PshUWKl7lUMix1nu/CHKXWvTbsJM83MGIYax0rXAPHthq
+         n8ZU+zIXD/gDYoM1I+XF3vexfaFEqTV/EdmbIaVluyXMk6br5UvHos6w9iXBoTfPGj5A
+         m9ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722092704; x=1722697504;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cYZzXgIEVYkHhDTHJvjW3gQ6U+rgbeDnqycOVnisrpU=;
+        b=L2kRv4TfW/YNHvCrdsAB3M846ZCs5UAdcbJSzgD2qgiMatD4V33Xo/Sx8RF6WbvxTb
+         5dgfGefkL0Jze+qXN4P+WauhXWaZOysbHqYw7psX7U187AF5kcH3+ynWCFQkOaQ7Bc3T
+         VPHCc1z7CeNBByY3V1MDJM+jxd2GDFPTbGNPCjl2T3AAVl4ZNrAR9lJqiGf2LxbGgl21
+         rryjAjTu3aLMfQDoBP7grZP7gph7ykjBjkhN6Wl/Ls9ICarh1dUCponydgcZn26q/vVm
+         ngvn0wUIYY7fYwjCH2vXo5QHYKXyobz6jf4H+/RkilfXMQ6GZKVjpG0ZQEaRLffPvWhw
+         B1pA==
+X-Forwarded-Encrypted: i=1; AJvYcCUsTGzkjojvbemO47ttn3F8fwRBjbwXNxQqc5AOkUa1JFhYn5dCSsu8SkGWKCt0b4MizqonjkCz4MWkOfMvyUCSNmhrg4HLuvrMA2aUBtlGWizKplUITuJlItQMZSArPi+xbby0
+X-Gm-Message-State: AOJu0Yy+Tb6sXzO+IZfrtUj5zgAlkL9WCCwJFBtDxLCrFnSNH/7Yj4h5
+	FNhR0c9o+d3kWqMSWztwT1mllGa8eihLCFTjjVCSpPLSjfBUWjd3
+X-Google-Smtp-Source: AGHT+IEMdRddBc1xu79J6BHHj7Yo9vFJse9k6Y4cNAXVFGWbCB+Au5lxX3h9CeYvAaB1OGR55+gzEA==
+X-Received: by 2002:a17:902:c947:b0:1fb:57e7:5bb4 with SMTP id d9443c01a7336-1ff04861659mr34446155ad.37.1722092703721;
+        Sat, 27 Jul 2024 08:05:03 -0700 (PDT)
+Received: from ?IPV6:2409:8a55:301b:e120:90c7:a2b7:864a:68f8? ([2409:8a55:301b:e120:90c7:a2b7:864a:68f8])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7edd902sm51940905ad.168.2024.07.27.08.05.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Jul 2024 08:05:03 -0700 (PDT)
+Message-ID: <ed24943d-5c3e-4f60-9e53-3c294c4237b5@gmail.com>
+Date: Sat, 27 Jul 2024 23:04:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v11 02/14] mm: move the page fragment allocator from
+ page_alloc into its own file
+To: Alexander Duyck <alexander.duyck@gmail.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ David Howells <dhowells@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+References: <20240719093338.55117-1-linyunsheng@huawei.com>
+ <20240719093338.55117-3-linyunsheng@huawei.com>
+ <CAKgT0UdHrEzXwceS-5m1Hc1dV9r_XiPjSSc=_vWCUu0C5pfE4w@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+In-Reply-To: <CAKgT0UdHrEzXwceS-5m1Hc1dV9r_XiPjSSc=_vWCUu0C5pfE4w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 15 Jul 2024 16:37:01 -0700
-Jacob Keller <jacob.e.keller@intel.com> wrote:
+On 7/22/2024 1:58 AM, Alexander Duyck wrote:
+> On Fri, Jul 19, 2024 at 2:37 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 
-> On 7/9/2024 6:53 AM, Kory Maincent wrote:
-> > Change the API to select MAC default time stamping instead of the PHY.
-> > Indeed the PHY is closer to the wire therefore theoretically it has less
-> > delay than the MAC timestamping but the reality is different. Due to lo=
-wer
-> > time stamping clock frequency, latency in the MDIO bus and no PHC hardw=
-are
-> > synchronization between different PHY, the PHY PTP is often less precise
-> > than the MAC. The exception is for PHY designed specially for PTP case =
-but
-> > these devices are not very widespread. For not breaking the compatibili=
-ty
-> > default_timestamp flag has been introduced in phy_device that is set by
-> > the phy driver to know we are using the old API behavior.
-> >  =20
->=20
-> This description feels like it is making a pretty broad generalization
-> about devices. The specifics of whether MAC or PHY timestamping is
-> better will be device dependent.
+...
 
-As explained, except for specific PTP specialized PHY, the MAC is better in
-term of PTP precision.
-This patch was a requisite from Russell, who wanted to add support for the =
-PTP
-in the marvell PHY. Doing so would select the PHY PTP by default which caus=
-e a
-regression as the PHY hardware timestamp is less precise than the MAC.
-https://lore.kernel.org/netdev/20200729105807.GZ1551@shell.armlinux.org.uk/
-https://lore.kernel.org/netdev/Y%2F4DZIDm1d74MuFJ@shell.armlinux.org.uk/
-There is also discussion on how to support it in older version of this seri=
-es.
-=20
-> It looks like you introduce a default_timestamp flag to ensure existing
-> devices default to PHY? I assume your goal here is to discourage this
-> and not allow setting it for new devices? Or do we want to let device
-> driver authors decide which is a better default?
+>> --- /dev/null
+>> +++ b/include/linux/page_frag_cache.h
+>> @@ -0,0 +1,32 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +
+>> +#ifndef _LINUX_PAGE_FRAG_CACHE_H
+>> +#define _LINUX_PAGE_FRAG_CACHE_H
+>> +
+>> +#include <linux/log2.h>
+>> +#include <linux/types.h>
+>> +#include <linux/mm_types_task.h>
+> 
+> You don't need to include mm_types_task.h here. You can just use
+> declare "struct page_frag_cache;" as we did before in gfp.h.
+> Technically this should be included in mm_types.h so any callers
+> making use of these functions would need to make sure to include that
+> like we did for gfp.h before anyway.
 
-Yes to not change the old behavior the current PHY with PTP support will st=
-ill
-behave as default PTP. The point is indeed to discourage future drivers to
-select the PHY as default PTP.
+The probe API is added as an inline helper in patch 11 according to
+discussion in [1], so the definition of "struct page_frag_cache" is
+needed, so I am not sure what is the point of using
+"struct page_frag_cache;" here and then remove it and include
+mm_types_task.h in patch 11.
 
-> > Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
->=20
-> Overall this makes sense, with a couple questions I had during review.
->=20
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->=20
-> > ---
-> > diff --git a/include/linux/phy.h b/include/linux/phy.h
-> > index bd68f9d8e74f..e7a38137211c 100644
-> > --- a/include/linux/phy.h
-> > +++ b/include/linux/phy.h
-> > @@ -616,6 +616,8 @@ struct macsec_ops;
-> >   *                 handling shall be postponed until PHY has resumed
-> >   * @irq_rerun: Flag indicating interrupts occurred while PHY was suspe=
-nded,
-> >   *             requiring a rerun of the interrupt handler after resume
-> > + * @default_timestamp: Flag indicating whether we are using the phy
-> > + *		       timestamp as the default one =20
->=20
-> This is clearly intended to ensure existing drivers maintain legacy
-> behavior. But what is our policy going forward for new devices? Do we
-> want to leave it up to PHY driver authors?
+1. 
+https://lore.kernel.org/all/cb541985-a06d-7a71-9e6d-38827ccdf875@huawei.com/
 
-Yes, new devices should not set this flag.
+> 
+>> +#include <asm/page.h>
+>> +
+> 
+> Not sure why this is included here either. From what I can tell there
+> isn't anything here using the contents of page.h. I suspect you should
+> only need it for the get_order call which would be used in other
+> files.
 
-> > diff --git a/net/core/timestamping.c b/net/core/timestamping.c
-> > index 04840697fe79..3717fb152ecc 100644
-> > --- a/net/core/timestamping.c
-> > +++ b/net/core/timestamping.c
-> > @@ -25,7 +25,8 @@ void skb_clone_tx_timestamp(struct sk_buff *skb)
-> >  	struct sk_buff *clone;
-> >  	unsigned int type;
-> > =20
-> > -	if (!skb->sk)
-> > +	if (!skb->sk || !skb->dev ||
-> > +	    !phy_is_default_hwtstamp(skb->dev->phydev)) =20
->=20
-> I don't follow why this check is added and its not calling something
-> like "phy_is_current_hwtstamp"? I guess because we don't yet have a way
-> to select between MAC/PHY at this point in the series? Ok.
+It seems unnecessay, will remove that.
 
-skb_clone_tx_timestamp is only used for PHY timestamping so we should do no=
-thing
-if the default PTP is the MAC.
+> 
+>> +void page_frag_cache_drain(struct page_frag_cache *nc);
+>> +void __page_frag_cache_drain(struct page *page, unsigned int count);
+>> +void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
+>> +                             gfp_t gfp_mask, unsigned int align_mask);
+>> +
+>> +static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
+>> +                                         unsigned int fragsz, gfp_t gfp_mask,
+>> +                                         unsigned int align)
+>> +{
+>> +       WARN_ON_ONCE(!is_power_of_2(align));
+>> +       return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
+>> +}
+>> +
+>> +static inline void *page_frag_alloc(struct page_frag_cache *nc,
+>> +                                   unsigned int fragsz, gfp_t gfp_mask)
+>> +{
+>> +       return __page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
+>> +}
+>> +
+>> +void page_frag_free(void *addr);
+>> +
+>> +#endif
+> 
+> ...
+> 
+>> diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
+>> index cf2691f60b67..b7a5affb92f2 100644
+>> --- a/mm/page_frag_test.c
+>> +++ b/mm/page_frag_test.c
+>> @@ -6,7 +6,6 @@
+>>    * Copyright: linyunsheng@huawei.com
+>>    */
+>>
+>> -#include <linux/mm.h>
+>>   #include <linux/module.h>
+>>   #include <linux/slab.h>
+>>   #include <linux/vmalloc.h>
+>> @@ -16,6 +15,7 @@
+>>   #include <linux/log2.h>
+>>   #include <linux/completion.h>
+>>   #include <linux/kthread.h>
+>> +#include <linux/page_frag_cache.h>
+>>
+>>   #define OBJPOOL_NR_OBJECT_MAX  BIT(24)
+> 
+> Rather than making users have to include page_frag_cache.h I think it
+> would be better for us to just maintain the code as being accessible
+> from mm.h. So it might be better to just add page_frag_cache.h to the
+> includes there.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+It would be better to list out why it is better that way as I am failing
+to see it that way yet as I think it is better to use the explicit
+header file instead the implicit header file.
+
+
+> 
+
 
