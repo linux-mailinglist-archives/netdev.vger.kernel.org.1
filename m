@@ -1,113 +1,91 @@
-Return-Path: <netdev+bounces-113368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB7593DEB1
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 12:13:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F95F93DF15
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 13:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F60283996
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 10:13:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F1151C20A7C
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 11:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C986F303;
-	Sat, 27 Jul 2024 10:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2C155893;
+	Sat, 27 Jul 2024 11:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CuksPL5+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="F3/KzAFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21209537F5;
-	Sat, 27 Jul 2024 10:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2B26F2EE;
+	Sat, 27 Jul 2024 11:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722075152; cv=none; b=iKZmw4SEHtJh5f7X2CyIVm6fKlAzCYEL4wMA7YpyGAE5aWWaQO5OJa3efUYCWrzZ1IO7UyKslfVAGNeUC+3Yg3yzmh9t8S9BdYKtbfBujty3qyWc/1enXVnvtwbDmqz7IO+xWaTIzo4UgYth4fFvqXdmxsQVCjjNA7+k8i3GDQo=
+	t=1722078449; cv=none; b=BUTHWjOhKQoYVQ8KB5UDjK0q8QBK0NV4t4BBdGTdgTNb0PEgfa0kAcjIeG2XRJNOxfUu0qP5Jjp7XufZwnIMCWO/uRO2ZI1Qqc3vGZOa/PeNkraucb9iVuD/S3wt+gFHY2rGalY8LIBKOqBjBS2txYYGhZeAraSd52N03i0OgeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722075152; c=relaxed/simple;
-	bh=siha0gETqKkpCOCou11om2FKnFkBx2msg5ODXag2Kms=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZI1QmJuSCo5NuNoUfiefEsuvKspe4j2/By+l+HYADu1rJfkFAsEkrisAxmqKXZR/0Rca3uePJI2rSk9gXrI8rAhv7Z8OYtv46y/bOaaSmbC4nl/u0ptMcNuqxYiAo34363B/j/Gkn9xh6FKbDivXPQsWnpWFxXsULRqsCpL4afo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CuksPL5+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81CC0C32781;
-	Sat, 27 Jul 2024 10:12:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722075152;
-	bh=siha0gETqKkpCOCou11om2FKnFkBx2msg5ODXag2Kms=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=CuksPL5+LT138DBvawSof00uLuOmI5g4+FM/OezHw95tgnoACfzQq2H0TWk20fiOP
-	 8X8nvkcSPslaUmyvQGbgjIfmWYO05XucMWP3DZ0CgqpX36762D1NRIduHrnTzpckgp
-	 m2fRDaQBEpbl8dXftViFI45k8P8W6LICPmIdurBDJ/1vcLXy8I2CwQlwvY+itHtRj4
-	 HTYxckdCaiC+pEUojgiQvqa0BhzuyTUAA5VcAeSQxac36vLWWMXq8wuYv26mccX0cp
-	 ArZmbqKMx0BWA1le742IWsln2tNxlmk6CIEa3gou0l+8dJYJp1hhv9ikPeHwQibJoq
-	 aF+aDTRX3RyCw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Sat, 27 Jul 2024 12:10:36 +0200
-Subject: [PATCH iproute2-net 7/7] ip: mptcp: 'id 0' is only for 'del'
+	s=arc-20240116; t=1722078449; c=relaxed/simple;
+	bh=rkrv4x/6SEw6h+sSPRyOXVXlzWGwVar6XHfLAnUXJKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EqUB8mQJ4kzewbe1/vXIix7YhzSbjlfLgmUNBqfdIdjciWXxChdLMQ4gc+QwE/ElwXvDtjQ3g8KL5uy/C2yuRIPu+SU/nKJCl1jFZGG3LF6LeyUkDaLfHc9JSh1IhO0v6u/YemIzlCCQ6/be4Qmq+FRjkpM4Q/re9sV79VtENRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=F3/KzAFq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=J83O2a+R4pUUul/fshVpSLu7T4K2ZSID2CCRNrWOt7g=; b=F3/KzAFqBptCN3MwIbELkGSesb
+	x09U9AM1bZGGMA78OLoRpoMDbSTTxSCMd99v+3ztJFbAv/b25QQWH6AnhMTQAFxRjCVQFwC0PHgwv
+	GSAKEcWrNO9s0xAkXG7tgkpHbl6I5V1xqqAeGnvrHhSuEAjKhQMWu1MP/FLs+5XmsISU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sXfGY-003LLm-Uf; Sat, 27 Jul 2024 13:07:10 +0200
+Date: Sat, 27 Jul 2024 13:07:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: "Frank.Sae" <Frank.Sae@motor-comm.com>, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
+	xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com,
+	jie.han@motor-comm.com
+Subject: Re: [PATCH 1/2] dt-bindings: net: motorcomm: Add chip mode cfg
+Message-ID: <830d0003-ac0b-427d-a793-8e42091c4ff2@lunn.ch>
+References: <20240727092009.1108640-1-Frank.Sae@motor-comm.com>
+ <ac84b12f-ae91-4a2f-a5f7-88febd13911c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-7-c6398c2014ea@kernel.org>
-References: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-0-c6398c2014ea@kernel.org>
-In-Reply-To: <20240727-upstream-iproute2-net-20240726-mptcp-man-user-feedback-v1-0-c6398c2014ea@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, 
- MPTCP Upstream <mptcp@lists.linux.dev>, 
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1070; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=siha0gETqKkpCOCou11om2FKnFkBx2msg5ODXag2Kms=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmpMgAAkXNwMnF2/o1lLBKtHNqd7mMVSPykdvM6
- 17GT5/FGWGJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZqTIAAAKCRD2t4JPQmmg
- c2GhD/9qhZF5vhSE/4HyTz3W/pxrb2JLC0E5NP8vOvgeGyJpDFOqfHXlKh9OXXFZp8Kqh1vuNwH
- KIf/BCDYNsnMsnq2P2btv0v91LQUvXttGKARFe/SbwbfbXQOvgTEnNtMcwGEL3Rpo/dpO9t0yt4
- /WbpExsdfp2IpK1/31XbvDodXUpdOtZIPCo74zHCbuW0roYJtotk8B9xariuwhYccptkHYYqxAn
- zu0j9ZH6EG652SzTibdiXcOdTBXmhWbB+fC1W+uNJcwHHAGd0Z1uk+n2Z9wAH0zBpiddLVP8IUa
- EiPXTCCbIX/c0bk0ZEhyR3rBppoaQGqG1NdHQPKszdplVL/KUV40QJRi51klIeJQATeivfJCnqH
- lZBZsRHCKTgE2h3f3hctoY3h0A+vYNkHfVDmUh2Sy49JDD4Vjq2O2x1P4zESWE4K8NrLqEYDfXD
- rb69s8wwQ/vRANDLDYpsL6tJRCMBJY8+ZSUDt1kykopdJxYpt66UMDymQUFpcK8D5fvARXEC5HV
- GtLvZukjnUJQGildLsbgOaWf/shTqLk/jEU0Q4o7EBsVfTBztL33Rf+gh9ULNGg5l2nTswNF+83
- 8ylDuWxTtx5UBUUSEysQh+lL1JZkQrYZ8pfSRobJQz/w/XZuyKhKVKOrUIBCPLVBqaLIopy078O
- vxs/TMDwtpCcIKA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ac84b12f-ae91-4a2f-a5f7-88febd13911c@kernel.org>
 
-Adding an endpoint with 'id 0' is not allowed. In this case, the kernel
-will ignore this 'id 0' and set another one.
+On Sat, Jul 27, 2024 at 11:25:25AM +0200, Krzysztof Kozlowski wrote:
+> On 27/07/2024 11:20, Frank.Sae wrote:
+> >  The motorcomm phy (yt8821) supports the ability to
+> >  config the chip mode of serdes.
+> >  The yt8821 serdes could be set to AUTO_BX2500_SGMII or
+> >  FORCE_BX2500.
+> >  In AUTO_BX2500_SGMII mode, SerDes
+> >  speed is determined by UTP, if UTP link up
+> >  at 2.5GBASE-T, SerDes will work as
+> >  2500BASE-X, if UTP link up at
+> >  1000BASE-T/100BASE-Tx/10BASE-T, SerDes will work
+> >  as SGMII.
+> >  In FORCE_BX2500, SerDes always works
+> >  as 2500BASE-X.
 
-Similarly, because there are no endpoints with this 'id 0', changing an
-attribute for such endpoint will not be possible.
+When the SERDES is forced to 2500BaseX, does it perform rate
+adaptation? e.g. does it insert pause frames to slow down the MAC?
 
-To avoid some confusions, it sounds better to clearly report an error
-that the ID cannot be 0 in these cases.
+Maybe look at air_en8811h.c.
 
-Acked-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- ip/ipmptcp.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/ip/ipmptcp.c b/ip/ipmptcp.c
-index 9847f95b..118bac4a 100644
---- a/ip/ipmptcp.c
-+++ b/ip/ipmptcp.c
-@@ -174,6 +174,8 @@ static int mptcp_parse_opt(int argc, char **argv, struct nlmsghdr *n, int cmd)
- 			invarg("invalid for non-zero id address\n", "ADDRESS");
- 		else if (!id && !addr_set)
- 			invarg("address is needed for deleting id 0 address\n", "ID");
-+	} else if (id_set && !deling && !id) {
-+		invarg("cannot be 0\n", "ID");
- 	}
- 
- 	if (adding && port && !(flags & MPTCP_PM_ADDR_FLAG_SIGNAL))
-
--- 
-2.45.2
-
+      Andrew
 
