@@ -1,199 +1,122 @@
-Return-Path: <netdev+bounces-113340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FB193DD82
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 08:29:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E2D93DDEF
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 11:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5AA11F220F8
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 06:29:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 453A21C216B5
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 09:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1D01CF8A;
-	Sat, 27 Jul 2024 06:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1FA40875;
+	Sat, 27 Jul 2024 09:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9uypvYp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/Sk8GaY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA881D6AA;
-	Sat, 27 Jul 2024 06:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D682E851;
+	Sat, 27 Jul 2024 09:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722061752; cv=none; b=nV/vHJ+szgH73ZJ56q2Kpmx5HytbgWGpFTXI6/y9rafkiVxuNq7sxmiWdZ483IXcjRJyB8Kz6+H1YbMP2w7v8H/Q3a1hbJSph4Msra3ZPrBMftz1NyjyzFtoVtQEhcDpCBnyarKdZoXYhvJwVPF4aqz62N6PKtdJPcMMfqWJhCA=
+	t=1722071070; cv=none; b=XrwsZg2l6yjY2GphT6EiJfedy6kc9imEzglnwBMql3CRS6rFcWlcJKbYkYeytLxbe6w96IrXdgzXRkfqp+0Ej3Sso0uzHRcEkiHmsI9SLS/n2vG5+rNSk4nt4oG+qC4aioIsYN8k58akY11j4Xc7MbNQirRWRxrGqKSuohdlSoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722061752; c=relaxed/simple;
-	bh=dHuNgoc9rCCaFNCfcmeMFW/cFrgGm9rsTMaxS2WMQyI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=sCDv6/DnrSKut9e0WlMHgg22gx70mpHWnSc5WIHe0diaJPcCjFE089IrkGTnHLHj7NqYYmbgdUCX/mSJJuBczrLaU0dL6SjgDJ6XokVWeqUmwCIdLdugySX8R+gXxUWd18Ug8pwJj7Yx2pnGChBIdf85EF69mXJdQghwb30h+lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9uypvYp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9072EC32781;
-	Sat, 27 Jul 2024 06:29:08 +0000 (UTC)
+	s=arc-20240116; t=1722071070; c=relaxed/simple;
+	bh=/WInVHz5/5nRA9OxCUOUNLKXu8jpoFq68RMMSbHKe5E=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=u5sBNPm2rIm3VsNpcPYGHS37WtoM4tcXTLUefusT7Q+ZIQ5cuzfB1LCN0olFR7EvkfjN/cY0KgY8O4Gro9wNc1HLV9FKDMPSUCC34ZQ64FDniL/uGaXYgYG3yNRLCZZ0s7rQwIi3WI885YBxPcDPkQxfjylTawE8WVEtUlA3eXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/Sk8GaY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F9AFC32781;
+	Sat, 27 Jul 2024 09:04:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722061752;
-	bh=dHuNgoc9rCCaFNCfcmeMFW/cFrgGm9rsTMaxS2WMQyI=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Z9uypvYph7phvnG/SQAz1zgQ9+mgbTA5QKrKiqB54p1eg/JFX0q2x83d75MttmJdN
-	 EFdrAVSXqzgsD3iwLJqD0agpznsckxJZlVQBB07pIEABc25NJMESVyB6ucCkrPIs4w
-	 WjAlPXArC+ilv9R6tqv8m1ZIXgX+yXl6ykw/DZlICGybuogeiMYKW9JYU0JkkbE8lk
-	 b+pmQgobLGl1zz7yjiEEOngASg0BDxEBlZkpbNpqb6pv2ISrmxkA2t6ZGLf06QiRiq
-	 JG928TrXKix16bXEu/Wn9d8MqmdXmOOFRbpn2d+uXef79d8SCimlPzXRkjGt6Fm2F7
-	 YgXAglTok3S1A==
-Message-ID: <78ba8419-8d4c-4bc0-9d76-77b1fa00be84@kernel.org>
-Date: Sat, 27 Jul 2024 09:29:05 +0300
+	s=k20201202; t=1722071070;
+	bh=/WInVHz5/5nRA9OxCUOUNLKXu8jpoFq68RMMSbHKe5E=;
+	h=From:Subject:Date:To:Cc:From;
+	b=i/Sk8GaYSHLmG6xaru9tAb1cXQ0Yhp6rlJxa+yZlVjkDJRdcPJTxuueQf9jqpAS1+
+	 bQfYYt7dA7f05m1yY6PfKiY7z9EOk8cza8texrdD0RUvYxPD5iqAmsQp6TnUyyGW2C
+	 nsWnjFtJNsioJE08dODQATkLd/CmBCbzj6fvN1wpVeaTjt86t4bbybOQVar5KoCiMH
+	 19ekswhA7fkFeVYwwl5hKOgcndVX5BDCu3jX/otlBz76ggBqChP1ubNfNJHmd6kJaG
+	 V5CKVPnyK74KBOXc61yXVTpfSy6p6vJZOlLkdVHKm/xcTUpL0oYqvP8uYYBvVCchXr
+	 hMD0hmqCdL0FA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/5] mptcp: fix signal endpoint readd
+Date: Sat, 27 Jul 2024 11:03:58 +0200
+Message-Id: <20240727-upstream-net-20240726-mptcp-fix-signal-readd-v1-0-1e7d25a23362@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/6] net: ethernet: ti: am65-cpsw: Introduce
- multi queue Rx
-To: Joe Damato <jdamato@fastly.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Julien Panis <jpanis@baylibre.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, srk@ti.com, vigneshr@ti.com,
- danishanwar@ti.com, pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org
-References: <20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org>
- <20240703-am65-cpsw-multi-rx-v3-1-f11cd860fd72@kernel.org>
- <Zp_kQX3dj3J1_u6o@LQ3V64L9R2>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <Zp_kQX3dj3J1_u6o@LQ3V64L9R2>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP63pGYC/z2NQQqDMBBFryKz7oBNpUKvUrpIJqMOaBoyUQTx7
+ h1cdPk+j/cPUC7CCq/mgMKbqHyTwf3WAE0+jYwSjcG1rmt798Q1ay3sF0xc8b8uuVLGQXZUGZO
+ f0ZQYcXhQ70KgQBzAkrmwOdfdGywAn/P8AZb+Ik2DAAAA
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
+ Liu Jing <liujing@cmss.chinamobile.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1574; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=/WInVHz5/5nRA9OxCUOUNLKXu8jpoFq68RMMSbHKe5E=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmpLgaBDm+3i6X4MsqXmUeEy7qTiBIm9QanpXIW
+ fP6uG6a68SJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZqS4GgAKCRD2t4JPQmmg
+ c9tkD/95oI0gsFL0AZCjhsBoaM4P0cWBz8nY8uTAVquxZyNe688ZZxp124XHZrFzRBhQzhDm6u0
+ ZR+zXx/gtbubfeDbmuSrYrLeD439KiZpfKsIwVq06u7ngI+UpfbgD5TN/zYCM3SiONV0Mnz8SSz
+ AaTl0qk87C4lCfpEU3OYOYYxonY82NrClJIG4GgW7Gegid4TfKUtxvk0inMMX3BcT23rdUFxGkX
+ hdM0jkq2g3R/4knwrK3+fIgFzAD5+3Bsy4NaZN4iwCIB8JOGOXcWbHXSKBDEck83U0DVJn5AE0m
+ GOMv+G/ozdBYpFdX9m546Yx/JMjdUTf92fsMwQx34SOwWlFCZZA9Kos1A5rt0sOV9Ny5m9Po9Ec
+ v5aUZIcrc4/BlWNjiRGNKIlO6atwNsgTPL/E9u8Dc0W0O9RoFm6kGV2nqqNUY/iO7rn5+Jesdxp
+ rGr/DG+LzwgoXEESD0JoqcoV3iRzkTKOA+W2AZ8d2fjC33SDZK1wGAcu2OiNPz/MKVUQRjDsdXg
+ DdXVTM4SBQPdK5VF1hw+NljhpgWweU/7l8lLVYqpJLQ6t0mWPkb/odiBhn1dn5OD2E1TOGdT/Sc
+ ldX8AbHZAOERl9V7vZs8EGq+GT7iDwmDL9Hn93oDJs9WOMEOsDlojaogwOVX4H0TBkbf2pV8GTs
+ +OYf6C1+hsfiOpA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
+Issue #501 [1] showed that the Netlink PM currently doesn't correctly
+support removal and re-add of signal endpoints.
 
+Patches 1 and 2 address the issue: the first one in the userspace path-
+manager, introduced in v5.19 ; and the second one in the in-kernel path-
+manager, introduced in v5.7.
 
-On 23/07/2024 20:11, Joe Damato wrote:
-> On Wed, Jul 03, 2024 at 04:51:32PM +0300, Roger Quadros wrote:
-> 
-> [...]
-> 
->> @@ -699,6 +727,14 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
->>  		goto fail_rx;
->>  	}
->>  
->> +	for (i = 0; i < common->rx_ch_num_flows ; i++) {
->> +		napi_enable(&common->rx_chns.flows[i].napi_rx);
->> +		if (common->rx_chns.flows[i].irq_disabled) {
->> +			common->rx_chns.flows[i].irq_disabled = false;
-> 
-> Just a minor nit (not a reason to hold this back): I've been
-> encouraging folks to use the new netdev-genl APIs in their drivers
-> to map NAPIs to queues and IRQs if possible because it allows for
-> more expressive and interesting userland applications.
-> 
-> You may consider in the future using something vaguely like (this is
-> untested psuedo-code I just typed out):
-> 
->    netif_napi_set_irq(&common->rx_chns.flows[i].napi_rx,
->                       common->rx_chns.flows[i].irq);
-> 
-> and 
-> 
->    netif_queue_set_napi(common->dev, i, NETDEV_QUEUE_TYPE_RX,
->                         &common->rx_chns.flows[i].napi_rx);
-> 
-> To link everything together (note that RTNL must be held while doing
-> this -- I haven't checked your code path to see if that is true here).
-> 
-> For an example, see 64b62146ba9e ("net/mlx4: link NAPI instances to
-> queues and IRQs). 
-> 
-> Doing this would allow userland to get data via netlink, which you
-> can examine yourself by using cli.py like this:
-> 
-> python3 tools/net/ynl/cli.py \
->   --spec Documentation/netlink/specs/netdev.yaml \
->   --dump queue-get
-> 
-> python3 tools/net/ynl/cli.py \
->   --spec Documentation/netlink/specs/netdev.yaml \
->   --dump napi-get
-> 
+Patch 3 introduces a related selftest. There is no 'Fixes' tag, because
+it might be hard to backport it automatically, as missing helpers in
+Bash will not be caught when compiling the kernel or the selftests.
 
-Thanks for the pionters. I will check and see if I can incorportate
-this in the next spin.
+The last two patches address two small issues in the MPTCP selftests,
+one introduced in v6.6., and the other one in v5.17.
 
->> +			enable_irq(common->rx_chns.flows[i].irq);
->> +		}
->> +	}
->> +
->>  	for (tx = 0; tx < common->tx_ch_num; tx++) {
->>  		ret = k3_udma_glue_enable_tx_chn(tx_chn[tx].tx_chn);
->>  		if (ret) {
->> @@ -710,12 +746,6 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
->>  		napi_enable(&tx_chn[tx].napi_tx);
->>  	}
->>  
->> -	napi_enable(&common->napi_rx);
->> -	if (common->rx_irq_disabled) {
->> -		common->rx_irq_disabled = false;
->> -		enable_irq(rx_chn->irq);
->> -	}
->> -
->>  	dev_dbg(common->dev, "cpsw_nuss started\n");
->>  	return 0;
->>  
->> @@ -726,11 +756,24 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
->>  		tx--;
->>  	}
->>  
->> +	for (flow_idx = 0; i < common->rx_ch_num_flows; flow_idx++) {
->> +		flow = &rx_chn->flows[flow_idx];
->> +		if (!flow->irq_disabled) {
->> +			disable_irq(flow->irq);
->> +			flow->irq_disabled = true;
->> +		}
->> +		napi_disable(&flow->napi_rx);
->> +	}
->> +
->>  	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
->>  
->>  fail_rx:
->> -	k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, 0, rx_chn,
->> -				  am65_cpsw_nuss_rx_cleanup, 0);
->> +	for (i = 0; i < common->rx_ch_num_flows; i--)
->> +		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
->> +					  am65_cpsw_nuss_rx_cleanup, !!i);
->> +
->> +	am65_cpsw_destroy_xdp_rxqs(common);
->> +
->>  	return ret;
->>  }
->>  
->> @@ -779,12 +822,12 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
->>  			dev_err(common->dev, "rx teardown timeout\n");
->>  	}
->>  
->> -	napi_disable(&common->napi_rx);
->> -	hrtimer_cancel(&common->rx_hrtimer);
->> -
->> -	for (i = 0; i < AM65_CPSW_MAX_RX_FLOWS; i++)
->> -		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
->> +	for (i = 0; i < common->rx_ch_num_flows; i++) {
->> +		napi_disable(&common->rx_chns.flows[i].napi_rx);
-> 
-> The inverse of the above is probably true somewhere around here;
-> again a small piece of psuedo code for illustrative purposes:
-> 
->    netif_queue_set_napi(common->dev, i, NETDEV_QUEUE_TYPE_RX, NULL);
-> 
->> +		hrtimer_cancel(&common->rx_chns.flows[i].rx_hrtimer);
->> +		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
->>  					  am65_cpsw_nuss_rx_cleanup, !!i);
->> +	}
->>  
->>  	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
->>  
+Link: https://github.com/multipath-tcp/mptcp_net-next/issues/501 [1]
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Liu Jing (1):
+      selftests: mptcp: always close input's FD if opened
 
+Paolo Abeni (4):
+      mptcp: fix user-space PM announced address accounting
+      mptcp: fix NL PM announced address accounting
+      selftests: mptcp: add explicit test case for remove/readd
+      selftests: mptcp: fix error path
+
+ net/mptcp/pm_netlink.c                            | 27 ++++++++++++++------
+ tools/testing/selftests/net/mptcp/mptcp_connect.c |  8 +++---
+ tools/testing/selftests/net/mptcp/mptcp_join.sh   | 31 ++++++++++++++++++++++-
+ 3 files changed, 53 insertions(+), 13 deletions(-)
+---
+base-commit: 301927d2d2eb8e541357ba850bc7a1a74dbbd670
+change-id: 20240726-upstream-net-20240726-mptcp-fix-signal-readd-f3c72bbcbceb
+
+Best regards,
 -- 
-cheers,
--roger
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
