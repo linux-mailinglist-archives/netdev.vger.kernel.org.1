@@ -1,101 +1,111 @@
-Return-Path: <netdev+bounces-113330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7E8193DD0F
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 04:38:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258E893DD1C
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 05:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64B22B22BBF
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 02:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04302847EF
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 03:32:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A42A186A;
-	Sat, 27 Jul 2024 02:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdtcpQCW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B34B17E9;
+	Sat, 27 Jul 2024 03:32:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F02517E9;
-	Sat, 27 Jul 2024 02:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F811C17;
+	Sat, 27 Jul 2024 03:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722047885; cv=none; b=MwWs+Xyi5X7L3DuEdakpsppBHo9Br29BcvDZNV97xXxVIed4a72f3wmJgQpvdcOMNfx+baUYMO+JVQu23VxOPo2fzal7qK9aH7Ni8ouYXqfKylVpaWZeFxrxrwKs9/r87kB2QCIIVHsZFXigVGSZJE9oo0/jV5rGscAXTJglHRE=
+	t=1722051170; cv=none; b=kDVVIlacy5qg25x/YLNW8xyivbkYnrNbnuc2V3eUWGxaB96GFMX+BK1EMgPn1BdrQOWSqjPpF9w4QyA0NIqUDWXgP/FtNlp+CJQ4YDz/5nc1BCUd7nYfvBmbhT5aGdb0kDEigi97Ksr37M//HeFxOw5vT5FN7UnIPqS8IREtpMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722047885; c=relaxed/simple;
-	bh=eovpOsg4Kr/mIT7zpUFC8+Q4yEFsMXjxDoGqBIQ1fps=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kawl1jRz5rWp4aAz7aA0BglXU+IuODgUpb481fqLMXj4wP0Hjbfv2MVErb42vxytzgImP+WLc+p1+S3vOJhSIHJyQ9x5AtQZYfcIN7PAjN9pYQ6lw+CY54XZvLFg0U9WjjObabJgjec9CPyZPskUr2CtSbTJ0py1JHT8L/j9HTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdtcpQCW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F807C32782;
-	Sat, 27 Jul 2024 02:38:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722047884;
-	bh=eovpOsg4Kr/mIT7zpUFC8+Q4yEFsMXjxDoGqBIQ1fps=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gdtcpQCWTkifX0Jp9dxA3GQfTXU/LvC4V/rCtRZdKIEHEuTY9EbHvBrzZDHzKrUoB
-	 68BnafkMYeTKDpH+pcA22WRfbMsLbXgu12TYQw383gk2J08q4uiRRoaWtYYu8xcayY
-	 i1H3MZtX20gADdPI3dgeGaw4zB1Bob/GA98Trb+ziUXQCLWswwlPakZzK7hn4Qt0LQ
-	 zcKPSgjUTD4qenjI63vZL2Ow0ARUPX3IAclGOZ4EP8uzUHifO7t6BLp5EIjZ5KzT5u
-	 KI6WkBAZ1xEhunT8A1BCKBtIi+cRoYMglGY67cjlre30Y/jzGSk/ADk2Zxpg8yHbgv
-	 uHOlswA5A0Y9w==
-Date: Fri, 26 Jul 2024 19:38:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: Wei Fang <wei.fang@nxp.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Clark
- Wang <xiaoning.wang@nxp.com>, imx@lists.linux.dev, netdev@vger.kernel.org,
- linux-imx@nxp.com
-Subject: Re: [PATCH v2 net-next] net: fec: Enable SOC specific rx-usecs
- coalescence default setting
-Message-ID: <20240726193803.20c36d7c@kernel.org>
-In-Reply-To: <20240726145312.297194-1-shenwei.wang@nxp.com>
-References: <20240726145312.297194-1-shenwei.wang@nxp.com>
+	s=arc-20240116; t=1722051170; c=relaxed/simple;
+	bh=ASyaYK8m2d9B9ZdOQvJ6ttX1dnaks6XW0TfhicGYgXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fgQ6wDpBA66qRbXAA3tpNjdIgVd/P37I6qnESIOaKsz1rNQPTM2SvIddtJktOmWGYppYSuOBPPEXqyKwLFL1YPBwDQsE4UuoY36gB56MsYJVJOIWFy0UzUXgEmgOPxK0dxfgZ9agy+xFzImaMXv/0bjlsYEqb8sEYOHKudWNwRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5c661e75ff6so1064821eaf.2;
+        Fri, 26 Jul 2024 20:32:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722051167; x=1722655967;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fN8Peex/xJksrEl/LSj/3b5dCwyPJOzO7qLp2AEnjJ4=;
+        b=QfhTBNljuHtoBCaoxGBEOjLJp/cIqwVAcKZTatmDps10A7VE2zPPEKc/YAfAViEXEP
+         xZbLrwnUe4q2EX83xmLrNINfmHyuByOl7qCMzU6c3ENlSl5wIeDXCGpkONwuDRMKnRIn
+         +P/mNWB/sLQweHrTYuiFeUDiZHbQtDv3/GC2Iut/c0Q1Uz1gokfeSXzgnSNmSEzRV/+M
+         e6EPCSBdRonOgoyMikYIsqBpcjG2lFrhv7TUcs2MZTbhVcITHVQ3V5vBcGlZBQAUqWNX
+         H3Q+LJ2CxQA/0KDdJU5jEwwnegySLcrceW8GFz/z5L5NS/zualHOrzQJd+Eu4hixcj7S
+         SbAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrBfk1YN0O4n/DbQHuJfHer0FHNpzJ1s0w1yThSL94JeuV3oISn6GtgnpagwFL9pMOW9Lrr9vtdi1r5P7xsS8StT8v3TJ53QvthfMv4MW1LaNwU8dkrrI0vF6t
+X-Gm-Message-State: AOJu0Yw7Q62RvPb3Ps4ndnxot6A5r5zzSOBdzEpFPsfm0Rcr2u1LXhBQ
+	z1UEU/D3ZDY7NBpNiZrR4E1NqdMehD8ChHKH10GLb1yqxLqBwFo=
+X-Google-Smtp-Source: AGHT+IHL9OHUHytNUACaqjerzWAomXUJOVoSTICk3S9JhwIasD/OWQhHVjzL5NZ5XsEsKTuRK6RCEQ==
+X-Received: by 2002:a05:6358:e4a9:b0:1ac:f08a:c701 with SMTP id e5c5f4694b2df-1ada1f23bc3mr200230455d.0.1722051167375;
+        Fri, 26 Jul 2024 20:32:47 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f9ec4280sm2980953a12.65.2024.07.26.20.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 20:32:46 -0700 (PDT)
+Date: Fri, 26 Jul 2024 20:32:45 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	haoluo@google.com, jolsa@kernel.org
+Subject: Re: [PATCH bpf] selftests/bpf: Filter out _GNU_SOURCE when compiling
+ test_cpp
+Message-ID: <ZqRqXYljLTSKaFwz@mini-arch>
+References: <20240725214029.1760809-1-sdf@fomichev.me>
+ <CAEf4BzYonHCyFr7ivRDDUtsJY3MEgWRKwVZ=N0sWjpMrn1dR6A@mail.gmail.com>
+ <20240726181020.19bca47d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240726181020.19bca47d@kernel.org>
 
-On Fri, 26 Jul 2024 09:53:12 -0500 Shenwei Wang wrote:
-> The current FEC driver uses a single default rx-usecs coalescence setting
-> across all SoCs. This approach leads to suboptimal latency on newer, high
-> performance SoCs such as i.MX8QM and i.MX8M.
+On 07/26, Jakub Kicinski wrote:
+> On Fri, 26 Jul 2024 17:45:06 -0700 Andrii Nakryiko wrote:
+> > or we could
+> > 
+> > #ifndef _GNU_SOURCE
+> > #define _GNU_SOURCE
+> > #endif
+> > 
+> > (though we have 61 places with that...) so as to not have to update
+> > every target in Makefile.
 > 
-> For example, the following are the ping result on a i.MX8QXP board:
+> AFAIU we have -D_GNU_SOURCE= twice _in the command line args_ :(
+> One is from the Makefile which now always adds it to CFLAGS,
+> the other is "built-in" in g++ for some weird reason.
 > 
-> $ ping 192.168.0.195
-> PING 192.168.0.195 (192.168.0.195) 56(84) bytes of data.
-> 64 bytes from 192.168.0.195: icmp_seq=1 ttl=64 time=1.32 ms
-> 64 bytes from 192.168.0.195: icmp_seq=2 ttl=64 time=1.31 ms
-> 64 bytes from 192.168.0.195: icmp_seq=3 ttl=64 time=1.33 ms
-> 64 bytes from 192.168.0.195: icmp_seq=4 ttl=64 time=1.33 ms
-> 
-> The current default rx-usecs value of 1000us was originally optimized for
-> CPU-bound systems like i.MX2x and i.MX6x. However, for i.MX8 and later
-> generations, CPU performance is no longer a limiting factor. Consequently,
-> the rx-usecs value should be reduced to enhance receive latency.
-> 
-> The following are the ping result with the 100us setting:
-> 
-> $ ping 192.168.0.195
-> PING 192.168.0.195 (192.168.0.195) 56(84) bytes of data.
-> 64 bytes from 192.168.0.195: icmp_seq=1 ttl=64 time=0.554 ms
-> 64 bytes from 192.168.0.195: icmp_seq=2 ttl=64 time=0.499 ms
-> 64 bytes from 192.168.0.195: icmp_seq=3 ttl=64 time=0.502 ms
-> 64 bytes from 192.168.0.195: icmp_seq=4 ttl=64 time=0.486 ms
-> 
-> Performance testing using iperf revealed no noticeable impact on
-> network throughput or CPU utilization.
+> FWIW I have added this patch to the netdev "hack queue" so no
+> preference any more where the patch lands :)
 
-Sounds like an optimization, net-next is still closed:
-https://netdev.bots.linux.dev/net-next.html
-Please repost after Monday.
--- 
-pw-bot: defer
+Yeah, it can't be fixed with an ifdef because the conflict happens a bit
+earlier:
+
+$ echo "int main(int argc, char *argv[]){return 0;}" > test.cpp
+$ clang++ -Wall -Werror -D_GNU_SOURCE= test.cpp
+In file included from <built-in>:454:
+<command line>:1:9: error: '_GNU_SOURCE' macro redefined [-Werror,-Wmacro-redefined]
+    1 | #define _GNU_SOURCE
+      |         ^
+<built-in>:445:9: note: previous definition is here
+  445 | #define _GNU_SOURCE 1
+      |         ^
+1 error generated.
 
