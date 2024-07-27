@@ -1,148 +1,89 @@
-Return-Path: <netdev+bounces-113381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9467993E091
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 20:39:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C476293E172
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBC5EB21446
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 18:39:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7715E281D33
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 23:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEDC186E3D;
-	Sat, 27 Jul 2024 18:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB8D548E0;
+	Sat, 27 Jul 2024 23:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="in74GW17"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KV+ZTvIq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C30288BD;
-	Sat, 27 Jul 2024 18:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0F839FD8;
+	Sat, 27 Jul 2024 23:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722105566; cv=none; b=pPuMcnOM7dn1t3084EIZYsUE5On3vB7x9TFo2HAOOFzt6RWEUjf4wnTRlBvGlk45MQqZYQRgSJaJ4MLlScXdae7AMsvYqROjYe9M9B+mZv/1SeqvelufLNnmWq4pwUYJRG0p000DP6h10Yr1IwE0wu3Br6fWi7boZQ4J7MdVO6U=
+	t=1722122977; cv=none; b=O7IO6pOcRBiM1Bz4OfR/CvR2I8lViXIC1SBBGLw4LNObr/02HScwBFIHFAvqAJX1o0JkKzJFsBLE+9JNVNYuqFwuzcnND8cI7HfvF57ibA2HGToU3Rj7N582JyI4UZ7NzFsP2ugqWPZzzwOD0zV4CJbfEEqXiO1GfRSS3S8f3p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722105566; c=relaxed/simple;
-	bh=mqqTbeT3cQxsVumINcr8inDBGKCLmYlO+jG2QvMYj74=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H7sy07HB4NM/x9nQ7ZdbG5ICFG31BlLGzd22jlUaoFB/6f7g6Aj0SxpZ211LB/96nYc0e2I31Zos1bqCaWINpxJG84WB4iWHXK0mAEw8DBrQGcVKnXCuENyvl4oZ3pnbh9QtbLrEya08GDvaSvatRU7Mib/P+VU5o6PG0k6/moM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=in74GW17; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fd69e44596so11907685ad.1;
-        Sat, 27 Jul 2024 11:39:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722105563; x=1722710363; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tb01SeeGpCzCq1LvvFZXXuhnamF3QgcshPskKwvVvF4=;
-        b=in74GW17K6oUtIdSAl87weIrbC8qEsPdm7QY8xi/ftacyT1yTYgpt8A5oZA14FbvS6
-         Uxsb/1cZTkZF/QJELQvinire/qgTfKX7sU8PHGO9+VZurLhFBsc8tN2ZfsJBelcZVfPe
-         IbAFgE6bg+3i4fsGdWtHFC/MaqCMxb65noUwsAZXp9YjoADjP25Q1nxOI1VOkiEnupWG
-         7qKGd5B110UWvF5/QOoL/RXgTtNcXUnXwsa2Zuj6xBQdP0JVzguUNYtn2vauvmpyRat9
-         RmsBxgMZ+je6qkDx9bZix0uMJn52TKpUZ50fLeiBus9Sp1T+Xi4IjgKVMaE36VB72BhV
-         fCQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722105563; x=1722710363;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tb01SeeGpCzCq1LvvFZXXuhnamF3QgcshPskKwvVvF4=;
-        b=P9jHodRQa4nqd3cOi40MSBs8HHNOTxGOw2mFRKg7+4/XPfRm/NSXsjKbHnCR9PnLy8
-         oaShIu/nK1TD4tlmWXmUhe2+QxpueaX5aq/S9ZgtF8GGnnAsQJCLSBWozLGYozGAH3Ee
-         CwlRy8iJj8sfqSEIgW9S+Z/9X8QR38BeqRDblA8kAcArZCOndnUkdFSBMGMmbGtYyD3J
-         LyQORsMDEdR2kSImBG2Hfmgx2AJwOuGOlTc1Xxnp9L+WVzGvrOfIP+diw0JJ0779pzNL
-         ijxjYKyfnjgYFczeir0JDMOTpDFE+WwttB+rcTAhPFbymPJ82lzoyn387Q7Xq5tL6kvX
-         N7vg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyA1PCDGJviTjkUa3GxXD70LKYWfWLjRYfHFZMLmUD1H4eKYyG8CJWCtmzpWQsVTnp+tVRCXoe0z8rdNBNyuWXDuTsyLahwtA7BRfPr/AkG+rz/Fy+BFgA22JtIXPwIqC4WP6nxkB4HqMheUZrkx03pcnRM4qex+diBP7l
-X-Gm-Message-State: AOJu0YwXk5+AzyiIOj2BKTUpM40G/PjFc0ikinAjPIdxQCr6yziaynK8
-	mFjGUH+2cely0ZSxYzGZiziN5M3Y9SV7icixErVxDoAF0KuCrTZJ
-X-Google-Smtp-Source: AGHT+IEJ4IRHhYPrzjr/OjD23R9bp2YPKOjIQBf1Lw3E5OFbAgholhIYZ4qqgS0clYvxTh+5y6ZLkQ==
-X-Received: by 2002:a17:902:d48a:b0:1fd:65ad:d8a1 with SMTP id d9443c01a7336-1ff04b01785mr52332705ad.21.1722105563425;
-        Sat, 27 Jul 2024 11:39:23 -0700 (PDT)
-Received: from [192.168.50.95] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7c7fbe1sm53831005ad.45.2024.07.27.11.39.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jul 2024 11:39:22 -0700 (PDT)
-Message-ID: <b2232e8d-275b-4e98-84fe-bbb33e3c6b7e@gmail.com>
-Date: Sun, 28 Jul 2024 03:39:18 +0900
+	s=arc-20240116; t=1722122977; c=relaxed/simple;
+	bh=dKHmD9TzO61V8LsScNepDdSQuLuFO3Ew+vfL4iPD3xY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f48TV4Nd1r9073cyo9ytSp6hjP7y/R/1PjaFYSpkqN2VFlQh5Rb1vll679g7EG+hLaJot7yTUld3a+rAN6VbfsqiP7QWgLmCTzvJLaopPj3oQ/9kYvSHneKffLZ5rj4iz57jNerA7VoE3AQLJTW3fTPPHbWako1Oq5wTeJCmdbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KV+ZTvIq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HaaAkZs/uXoGFjtpoKrvzxVCk50c7iJVjvXXtxRnZvg=; b=KV+ZTvIqOVoY7I4As9tQv8L1tn
+	819kw6gNFnL7wsEIITH63adMEz5Z+lDzxlnMIqs+OMJZ0ssoDi1PVNt6d0iSKQvwT3mMB/ZBKAbBo
+	OQRDYRZr5Lv23dV/Ztz5kkRkJcn1ubbuIaDHXsWznbC89pTb6oRhnDqKx4FlUoykyPIc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sXqqc-003Mmx-74; Sun, 28 Jul 2024 01:29:10 +0200
+Date: Sun, 28 Jul 2024 01:29:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dragan Simic <dsimic@manjaro.org>
+Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+	UNGLinuxDriver@microchip.com, davem@davemloft.net,
+	edumazet@google.com, f.fainelli@gmail.com,
+	gregkh@linuxfoundation.org, kuba@kernel.org,
+	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org, lucas.demarchi@intel.com,
+	masahiroy@kernel.org, mcgrof@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, woojung.huh@microchip.com
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
+ module
+Message-ID: <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
+References: <bcc81ea0-78e1-476e-928c-b873a064b479@lunn.ch>
+ <20240726121530.193547-1-jtornosm@redhat.com>
+ <b96d9801-d370-4ddd-97fd-5eac2a2656f4@lunn.ch>
+ <931b582808f237aa3746c5b0a96b3665@manjaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: hci_core: fix suspicious RCU usage in
- hci_conn_drop()
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yeoreum Yun <yeoreum.yun@arm.com>
-References: <20240725134741.27281-2-yskelg@gmail.com>
- <9dc0399a-573a-40c1-b342-a81410864cd9@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-From: Yunseong Kim <yskelg@gmail.com>
-In-Reply-To: <9dc0399a-573a-40c1-b342-a81410864cd9@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <931b582808f237aa3746c5b0a96b3665@manjaro.org>
 
-Hi Tetsuo,
+> Before going into explaining my viewpoint, could someone, please, clarify
+> which LAN78xx USB-to-Ethernet bridge does this apply to?  I already had
+> a look at a few LAN78xx datasheets, and I'm not sure how the external PHY
+> becomes exposed over the USB interface, so it needs a driver.
 
-> Excuse me, but I can't interpret why this patch solves the warning.
-> 
-> The warning says that list_for_each_entry_rcu() { } in
-> ieee80211_check_combinations() is called outside of rcu_read_lock() and
-> rcu_read_unlock() pair, doesn't it? How does that connected to
-> guarding hci_dev_test_flag() and queue_delayed_work() with rcu_read_lock()
-> and rcu_read_unlock() pair? Unless you guard list_for_each_entry_rcu() { }
-> in ieee80211_check_combinations() with rcu_read_lock() and rcu_read_unlock()
-> pair (or annotate that appropriate locks are already held), I can't expect
-> that the warning will be solved...
+https://elixir.bootlin.com/linux/v6.10/source/drivers/net/usb/lan78xx.c#L2049
 
-Thank you for the code review.
+This is creating an MDIO bus device. The MDIO bus will be scanned and
+PHYs on the bus found. There are then a few calls to phy_find_first()
+which will get the PHY.
 
-Sorry, I apologize for attaching the wrong kernel dump.
+The code itself looks pretty broken, it is directly accessing PHY
+registers, which a MAC driver should not do. That is a layering
+violation.
 
-> Also, what guarantees that drain_workqueue() won't be disturbed by
-> queue_work(disc_work) which will be called after "timeo" delay, for you are
-> not explicitly cancelling scheduled "disc_work" (unlike "cmd_timer" work
-> and "ncmd_timer" work shown below) before calling drain_workqueue() ?
-> 
-> 	/* Cancel these to avoid queueing non-chained pending work */
-> 	hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
-> 	/* Wait for
-> 	 *
-> 	 *    if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
-> 	 *        queue_delayed_work(&hdev->{cmd,ncmd}_timer)
-> 	 *
-> 	 * inside RCU section to see the flag or complete scheduling.
-> 	 */
-> 	synchronize_rcu();
-> 	/* Explicitly cancel works in case scheduled after setting the flag. */
-> 	cancel_delayed_work(&hdev->cmd_timer);
-> 	cancel_delayed_work(&hdev->ncmd_timer);
-> 
-> 	/* Avoid potential lockdep warnings from the *_flush() calls by
-> 	 * ensuring the workqueue is empty up front.
-> 	 */
-> 	drain_workqueue(hdev->workqueue);
-
-
-Please bear with me for a moment.
-
-I'll attach the correct kernel dump and resend the patch email.
-
-
-Warm regards,
-
-Yunseong Kim
+	Andrew
 
