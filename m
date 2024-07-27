@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-113329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8801B93DD0D
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 04:34:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E8193DD0F
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 04:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C04B3B2293D
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 02:34:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64B22B22BBF
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 02:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BD8110A;
-	Sat, 27 Jul 2024 02:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A42A186A;
+	Sat, 27 Jul 2024 02:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UUWkdn8s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdtcpQCW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC39186A;
-	Sat, 27 Jul 2024 02:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F02517E9;
+	Sat, 27 Jul 2024 02:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722047645; cv=none; b=luAg+7MtEes618/ohMiUNz9cKjUCs4hGnfphJSl5btrgh8mBtULZPeNABCSoUYcY40csYS9DXuhef72algdEdDUqCLkHFHXdvu14cVNOBchsmf+aUcq2eFwgRL4DCTE6EggBuRRUrp7VUCLasUsRPfBu/y2Xvf4+SsZlyQfm9L8=
+	t=1722047885; cv=none; b=MwWs+Xyi5X7L3DuEdakpsppBHo9Br29BcvDZNV97xXxVIed4a72f3wmJgQpvdcOMNfx+baUYMO+JVQu23VxOPo2fzal7qK9aH7Ni8ouYXqfKylVpaWZeFxrxrwKs9/r87kB2QCIIVHsZFXigVGSZJE9oo0/jV5rGscAXTJglHRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722047645; c=relaxed/simple;
-	bh=WUGzS0/4ok9IVp5S2mYYKhHHy6u8mJnjJT9e6i7ZlA8=;
+	s=arc-20240116; t=1722047885; c=relaxed/simple;
+	bh=eovpOsg4Kr/mIT7zpUFC8+Q4yEFsMXjxDoGqBIQ1fps=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B1CdWKhtELgb8sv+S6yFE9hk1GBs9ma6pM7NcGrZel6YpaHGyT7zi64eXV2LNh7IDFrdR58KBBe7fDMoJnkQhpDVqCjFkts29Q3I2GuwjrheclcxtZr/fpVIUXUvLEFCj4Mquns/qnkICtdkR/KuwMd3bUj/Uh7Ad1BaT7JhZZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UUWkdn8s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 371ECC32782;
-	Sat, 27 Jul 2024 02:34:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Kawl1jRz5rWp4aAz7aA0BglXU+IuODgUpb481fqLMXj4wP0Hjbfv2MVErb42vxytzgImP+WLc+p1+S3vOJhSIHJyQ9x5AtQZYfcIN7PAjN9pYQ6lw+CY54XZvLFg0U9WjjObabJgjec9CPyZPskUr2CtSbTJ0py1JHT8L/j9HTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdtcpQCW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F807C32782;
+	Sat, 27 Jul 2024 02:38:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722047644;
-	bh=WUGzS0/4ok9IVp5S2mYYKhHHy6u8mJnjJT9e6i7ZlA8=;
+	s=k20201202; t=1722047884;
+	bh=eovpOsg4Kr/mIT7zpUFC8+Q4yEFsMXjxDoGqBIQ1fps=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UUWkdn8sjE/jgmd7RlaORqpQw1noC/mQ9RNTFvGXz7+TFi0F1RtdAwGwX7T1tLPpO
-	 ATxVOKMx9NCadWsfY9RzDGLiZRaLNU8sGJbKheavpCvbokLok82jHY6/ueSEJAs+4y
-	 qqnEAjp9vOq1locqk1UMd+TjXOrhKuitSjuGKrEm0eBGRVv0s7BWn+RMXF39dOVbQi
-	 K9bDG3iQ//0t3lLeU5AkwawqzD/Va0LjX8sJUyNLtJ5qYqQN/LpfG18O+OmYkG4ms/
-	 qCzqp23yITv6JsjT2hT4gi21jmGYDl2tBmkVSLqtIAr8oV0dIZiMv9K3d3Q6B20x/1
-	 OU6J6uRnm1Rtw==
-Date: Fri, 26 Jul 2024 19:34:03 -0700
+	b=gdtcpQCWTkifX0Jp9dxA3GQfTXU/LvC4V/rCtRZdKIEHEuTY9EbHvBrzZDHzKrUoB
+	 68BnafkMYeTKDpH+pcA22WRfbMsLbXgu12TYQw383gk2J08q4uiRRoaWtYYu8xcayY
+	 i1H3MZtX20gADdPI3dgeGaw4zB1Bob/GA98Trb+ziUXQCLWswwlPakZzK7hn4Qt0LQ
+	 zcKPSgjUTD4qenjI63vZL2Ow0ARUPX3IAclGOZ4EP8uzUHifO7t6BLp5EIjZ5KzT5u
+	 KI6WkBAZ1xEhunT8A1BCKBtIi+cRoYMglGY67cjlre30Y/jzGSk/ADk2Zxpg8yHbgv
+	 uHOlswA5A0Y9w==
+Date: Fri, 26 Jul 2024 19:38:03 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Cc: 0x7f454c46@gmail.com, Eric Dumazet <edumazet@google.com>, "David S.
- Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@kernel.org
-Subject: Re: [PATCH net] net/tcp: Disable TCP-AO static key after RCU grace
- period
-Message-ID: <20240726193403.1b15a2af@kernel.org>
-In-Reply-To: <20240725-tcp-ao-static-branch-rcu-v1-1-021d009beebf@gmail.com>
-References: <20240725-tcp-ao-static-branch-rcu-v1-1-021d009beebf@gmail.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Wei Fang <wei.fang@nxp.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, imx@lists.linux.dev, netdev@vger.kernel.org,
+ linux-imx@nxp.com
+Subject: Re: [PATCH v2 net-next] net: fec: Enable SOC specific rx-usecs
+ coalescence default setting
+Message-ID: <20240726193803.20c36d7c@kernel.org>
+In-Reply-To: <20240726145312.297194-1-shenwei.wang@nxp.com>
+References: <20240726145312.297194-1-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +62,40 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 25 Jul 2024 06:00:02 +0100 Dmitry Safonov via B4 Relay wrote:
-> @@ -290,9 +298,7 @@ void tcp_ao_destroy_sock(struct sock *sk, bool twsk)
->  			atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_alloc);
->  		call_rcu(&key->rcu, tcp_ao_key_free_rcu);
->  	}
-> -
-> -	kfree_rcu(ao, rcu);
-> -	static_branch_slow_dec_deferred(&tcp_ao_needed);
-> +	call_rcu(&ao->rcu, tcp_ao_info_free_rcu);
+On Fri, 26 Jul 2024 09:53:12 -0500 Shenwei Wang wrote:
+> The current FEC driver uses a single default rx-usecs coalescence setting
+> across all SoCs. This approach leads to suboptimal latency on newer, high
+> performance SoCs such as i.MX8QM and i.MX8M.
+> 
+> For example, the following are the ping result on a i.MX8QXP board:
+> 
+> $ ping 192.168.0.195
+> PING 192.168.0.195 (192.168.0.195) 56(84) bytes of data.
+> 64 bytes from 192.168.0.195: icmp_seq=1 ttl=64 time=1.32 ms
+> 64 bytes from 192.168.0.195: icmp_seq=2 ttl=64 time=1.31 ms
+> 64 bytes from 192.168.0.195: icmp_seq=3 ttl=64 time=1.33 ms
+> 64 bytes from 192.168.0.195: icmp_seq=4 ttl=64 time=1.33 ms
+> 
+> The current default rx-usecs value of 1000us was originally optimized for
+> CPU-bound systems like i.MX2x and i.MX6x. However, for i.MX8 and later
+> generations, CPU performance is no longer a limiting factor. Consequently,
+> the rx-usecs value should be reduced to enhance receive latency.
+> 
+> The following are the ping result with the 100us setting:
+> 
+> $ ping 192.168.0.195
+> PING 192.168.0.195 (192.168.0.195) 56(84) bytes of data.
+> 64 bytes from 192.168.0.195: icmp_seq=1 ttl=64 time=0.554 ms
+> 64 bytes from 192.168.0.195: icmp_seq=2 ttl=64 time=0.499 ms
+> 64 bytes from 192.168.0.195: icmp_seq=3 ttl=64 time=0.502 ms
+> 64 bytes from 192.168.0.195: icmp_seq=4 ttl=64 time=0.486 ms
+> 
+> Performance testing using iperf revealed no noticeable impact on
+> network throughput or CPU utilization.
 
-Maybe free the keys inside tcp_ao_info_free_rcu, too?
-IIUC you're saying that new sock is still looking at this ao under RCU
-protection - messing with the key list feels a tiny bit odd since the
-object is technically "live" until the end of the RCU grace period.
+Sounds like an optimization, net-next is still closed:
+https://netdev.bots.linux.dev/net-next.html
+Please repost after Monday.
+-- 
+pw-bot: defer
 
