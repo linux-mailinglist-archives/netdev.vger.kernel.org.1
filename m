@@ -1,109 +1,170 @@
-Return-Path: <netdev+bounces-113318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA8F293DC7A
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 02:22:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B605093DC80
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 02:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1863A1C2365E
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 00:22:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71776280EB8
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 00:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980DE2868D;
-	Sat, 27 Jul 2024 00:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736C419F;
+	Sat, 27 Jul 2024 00:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cUgRSz7+"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="ZDCHeys5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from mr85p00im-hyfv06011401.me.com (mr85p00im-hyfv06011401.me.com [17.58.23.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D5A26AEA
-	for <netdev@vger.kernel.org>; Sat, 27 Jul 2024 00:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4E517C
+	for <netdev@vger.kernel.org>; Sat, 27 Jul 2024 00:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722039617; cv=none; b=AR4s8T+Rg1EMh0m5yTD/ljhLQ3f+TEYq5VcwtKzdwKSRTxYMBo9dhTrOPeomWlG0u+U3nlKYaG2tQ59Evlm4yVsKCtOm1Xm2UZ//yURLHSqlcrQthpF+AOQNa7UCNflTKs/8hda3f3Ke0uwPSB8Src0sx6oY0+KeGQEmxiiyh3I=
+	t=1722039825; cv=none; b=WnWVe5bCohqyBcJTBHB6I4l4Z07Tkc1bPdI28iH4iMctuJ8JOaqMBxZNPrk6fnBO0g6q66ePf5oXoOZrOEz/Vuv1/hAJ/Dn8vKnt1xto5jk8AG9QmVNSw/IMLGEmPCxfpgJQlLRb6nunc8N5YJWxiSPgYSMkVvRdcMubLAJly8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722039617; c=relaxed/simple;
-	bh=2w9XVf1I516UG2J2+Sg/VgRrRXU5lcq8GTWP5azJwWk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OSF4TYHJqvlsIAzmBEg+G1dFSZTJv2/m9tg575Vo+JwJJrqq/tb1hKXrqePVehSFmh3OejdpTog56raEMrhp4Gs7e0QdXotiRHMsoSOkOQ4UNTypSJ2Dwo372HbJN9AY2fUjCni5qpGih7Jfb2Uk/4GDAD6cdK3hASZcfmHQExw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cUgRSz7+; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722039613; x=1753575613;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=v076Nm3WJ05al8LtEdGymJpUZKLa5BWKjHC0xPoypvM=;
-  b=cUgRSz7+hc/ghEZOnmR6Lt4q0519hUbWVeZXrF8pIb3PlniKHWUFQtFf
-   rfUJE6f+XXZreQ/0JTmjnuDoCeLcCIBGkK8TaTtD9BUaYkTXw6tcIhuqm
-   OEnTK0cXYISjhgD9By2E8/Gau8/iOrjBpRhFbELUOjrNXhoMiWrbBuQEw
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.09,240,1716249600"; 
-   d="scan'208";a="423346220"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2024 00:20:10 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:60461]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.138:2525] with esmtp (Farcaster)
- id 8b93fc72-e9bf-4ec3-96c9-fa816fcf2947; Sat, 27 Jul 2024 00:20:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 8b93fc72-e9bf-4ec3-96c9-fa816fcf2947
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sat, 27 Jul 2024 00:20:07 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sat, 27 Jul 2024 00:20:04 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net] rtnetlink: Don't ignore IFLA_TARGET_NETNSID when ifname is specified in rtnl_dellink().
-Date: Fri, 26 Jul 2024 17:19:53 -0700
-Message-ID: <20240727001953.13704-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1722039825; c=relaxed/simple;
+	bh=cnPsn611UjJ02M558mWmVyCwR6qA++WjYS1aQhoNmkU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vu7kc5RSBpaCKjgg4RwGCxCp9s4jPmE3Lpw/X1FYBzGqFcjkd6eaVZtnNMQgyjCNyCdgDytYKbUaCa63dctigq/g0sB3NMTtgWRfc63B1bGyrI9pdt1NdvAdT0jUI9ueTSl9+hlwfb40SwTcKrGeZlwwlaKSlFAlT4kFE+onwp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=ZDCHeys5; arc=none smtp.client-ip=17.58.23.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1722039823;
+	bh=OF//PZdzhsZCrVIwn37lsY6lbpixHa5B2D3Ug9HdfCY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=ZDCHeys5+W4QQC0BTyKvSy4P/1nCb4GcXZBMDblyCu+9u9jFBSGd8uAFvEtW0EbCu
+	 MrJEmo4OyMXZVjRro0mt1zPU5CXYBltrq8XqdzHbmXlryfy72yM+t/5ebCeqSastgA
+	 541zfKMDZ3JYGmVJwkmIkh+U0TgL8LPAezFpn+SOhdW2XlanxKG619byAoRgIba8qw
+	 eF7GupEiBV3WmlIJJ6kLFnAN2JW5EYml1uGrHUsgEFdejt9B0DEqXGbQuFmahvN2bQ
+	 MXW4kqtfyqm9U46fldIa3JeBoVp50hRryOjqvziAWKb+Q9gzzAUXD98G7H9pA5gE/v
+	 F7OORGHhIpmUg==
+Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+	by mr85p00im-hyfv06011401.me.com (Postfix) with ESMTPSA id 5BE2D357AE22;
+	Sat, 27 Jul 2024 00:23:39 +0000 (UTC)
+Message-ID: <d1267639-c885-4a27-ac15-b4199e38ec99@icloud.com>
+Date: Sat, 27 Jul 2024 08:23:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: rfkill: Correct parameter type for
+ rfkill_set_hw_state_reason()
+To: Jeff Johnson <quic_jjohnson@quicinc.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20240715-rfkill_fix-v1-1-a9f2d56b4716@quicinc.com>
+ <dcd0d83a-af37-4ef5-8351-a435ab115ed0@quicinc.com>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <dcd0d83a-af37-4ef5-8351-a435ab115ed0@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: s-IoaBAszZJHQ0P83u8KIpUXIsGDRpc7
+X-Proofpoint-ORIG-GUID: s-IoaBAszZJHQ0P83u8KIpUXIsGDRpc7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-26_14,2024-07-26_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ clxscore=1011 phishscore=0 malwarescore=0 suspectscore=0 bulkscore=0
+ mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2407270001
 
-The cited commit accidentally replaced tgt_net with net in rtnl_dellink().
+On 2024/7/27 06:51, Jeff Johnson wrote:
+> On 7/15/2024 6:39 AM, Zijun Hu wrote:
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>
+>> Change type of parameter @reason to enum rfkill_hard_block_reasons for
+>> API rfkill_set_hw_state_reason() according to its comments.
+>>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> ---
+>>  include/linux/rfkill.h | 5 ++---
+>>  net/rfkill/core.c      | 7 +------
+>>  2 files changed, 3 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/include/linux/rfkill.h b/include/linux/rfkill.h
+>> index 373003ace639..4f7558267541 100644
+>> --- a/include/linux/rfkill.h
+>> +++ b/include/linux/rfkill.h
+>> @@ -147,7 +147,7 @@ void rfkill_destroy(struct rfkill *rfkill);
+>>   * Prefer to use rfkill_set_hw_state if you don't need any special reason.
+>>   */
+>>  bool rfkill_set_hw_state_reason(struct rfkill *rfkill,
+>> -				bool blocked, unsigned long reason);
+>> +		bool blocked, enum rfkill_hard_block_reasons reason);
+> 
+> function parameters should align on (
+> 
+will correct it for v2
+>>  /**
+>>   * rfkill_set_hw_state - Set the internal rfkill hardware block state
+>>   * @rfkill: pointer to the rfkill class to modify.
+>> @@ -279,8 +279,7 @@ static inline void rfkill_destroy(struct rfkill *rfkill)
+>>  }
+>>  
+>>  static inline bool rfkill_set_hw_state_reason(struct rfkill *rfkill,
+>> -					      bool blocked,
+>> -					      unsigned long reason)
+>> +		bool blocked, enum rfkill_hard_block_reasons reason)
+> 
+> function parameters should align on (
+> 
 
-As a result, IFLA_TARGET_NETNSID is ignored if the interface is specified
-with IFLA_IFNAME or IFLA_ALT_IFNAME.
-
-Let's pass tgt_net to rtnl_dev_get().
-
-Fixes: cc6090e985d7 ("net: rtnetlink: introduce helper to get net_device instance by ifname")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/core/rtnetlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 87e67194f240..73fd7f543fd0 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3288,7 +3288,7 @@ static int rtnl_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (ifm->ifi_index > 0)
- 		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
- 	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
--		dev = rtnl_dev_get(net, tb);
-+		dev = rtnl_dev_get(tgt_net, tb);
- 	else if (tb[IFLA_GROUP])
- 		err = rtnl_group_dellink(tgt_net, nla_get_u32(tb[IFLA_GROUP]));
- 	else
--- 
-2.30.2
+will correct it for v2
+>>  {
+>>  	return blocked;
+>>  }
+>> diff --git a/net/rfkill/core.c b/net/rfkill/core.c
+>> index 7a5367628c05..f8ed6431b2f5 100644
+>> --- a/net/rfkill/core.c
+>> +++ b/net/rfkill/core.c
+>> @@ -539,18 +539,13 @@ bool rfkill_get_global_sw_state(const enum rfkill_type type)
+>>  #endif
+>>  
+>>  bool rfkill_set_hw_state_reason(struct rfkill *rfkill,
+>> -				bool blocked, unsigned long reason)
+>> +		bool blocked, enum rfkill_hard_block_reasons reason)
+> 
+> function parameters should align on (
+> 
+will correct it for v2
+>>  {
+>>  	unsigned long flags;
+>>  	bool ret, prev;
+>>  
+>>  	BUG_ON(!rfkill);
+>>  
+>> -	if (WARN(reason & ~(RFKILL_HARD_BLOCK_SIGNAL |
+>> -			    RFKILL_HARD_BLOCK_NOT_OWNER),
+>> -		 "hw_state reason not supported: 0x%lx", reason))
+>> -		return rfkill_blocked(rfkill);
+>> -
+> 
+> did you validate that all callers are actually passing a valid enum?
+> that is something you should describe in your commit since this is a change
+> beyond just changing the prototype
+> 
+yes. actually, ALL callers within kernel tree only use enum for the API.
+will add that description within v2.
+thanks
+>>  	spin_lock_irqsave(&rfkill->lock, flags);
+>>  	prev = !!(rfkill->hard_block_reasons & reason);
+>>  	if (blocked) {
+>>
+>> ---
+>> base-commit: 338a93cf4a18c2036b567e9f613367f7a52f2511
+>> change-id: 20240715-rfkill_fix-335afa2e88ca
+>>
+>> Best regards,
+> 
 
 
