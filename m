@@ -1,194 +1,200 @@
-Return-Path: <netdev+bounces-113350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C42293DE24
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 11:25:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D8AE93DE2E
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 11:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3865282ED6
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 09:25:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0BCB1C20CE7
+	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 09:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663144AEF7;
-	Sat, 27 Jul 2024 09:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C9B47F4A;
+	Sat, 27 Jul 2024 09:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SHolPxWp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LOcg2so2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3694C487BF;
-	Sat, 27 Jul 2024 09:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5249405C9;
+	Sat, 27 Jul 2024 09:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722072334; cv=none; b=eA/zG2aLuGv6aIP6e4VsIg4hDhFo3u0BVoN92Ph+hajUIcoLGa4+eVX1admCEXWbFaIlcsQWs2epYp8E/zXremnYQQsJyyGv+89HTlxDidaT5TIos9ajOtfzEndrTr7HAXq589OIOv998bfqa/WuLexNVUfco/7N6C1U6lQDqag=
+	t=1722072810; cv=none; b=uDNw5FG/0rEyo+iOQoOfX1RfGk/SHvkl0CgHQbrJikzsB67Sj5ACL0uTKX0uXu/e85SisiHrQNLfLA3w8l94KvSC0VYF9qU8rZc9bTO4n/cweyu9rtfuKJ+8itsFXdP/hAf0A8REf/2FVefp1nRGOQ/hjeWCbUdODgMv4dwosLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722072334; c=relaxed/simple;
-	bh=FKWdEEfKwiHZEjR/g5jblQ0qk2xKb1tNXvjLXnAAvxE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XNN7rtWJ1AkRe5xZX7LSjXtt5mN4hmuDmfegVnfnTW5QrJrgwG8g+m5krDPTJwZaC42slQmy1BLGj+vJydYfbUcYORcWkQ/se+gI1JLzVq8K6LH4aOuW533EwXNb3MdtgCeb5HyJEJWrRyEqJ1kqQHMCclrHkv7HNwf5l+6PGuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SHolPxWp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0503DC32781;
-	Sat, 27 Jul 2024 09:25:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722072333;
-	bh=FKWdEEfKwiHZEjR/g5jblQ0qk2xKb1tNXvjLXnAAvxE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SHolPxWpFfdGBRgaFzCWl0NEKJCm1vmfY6RVdGBVTQRWrPu9cf3GlCsMQyGfCRbw8
-	 fHrD8pyx/qnvX+KK4Q1upcyvuigGDDMXTNSqOna8/DE630LfJwB0r+t7q/243/v20C
-	 N6/1siFd0TaN3SZLmFIdo0k6NJ/++ECX9Wew4I4zwmSlkJs2W+lT6Fusmet/GwSOuH
-	 04RuWElp176qrtXkImkNmAJLReStBggKLLcTufAzw7G3N3ev3wakixmuvN3Wf/mbQ+
-	 hHIDuMySzUplvKiPZ8rwbLJTK9Xl17IvSPOokebB/DRFUzKi+6KP6ENECfy64+kPo7
-	 64hZJcmBkKDdw==
-Message-ID: <ac84b12f-ae91-4a2f-a5f7-88febd13911c@kernel.org>
-Date: Sat, 27 Jul 2024 11:25:25 +0200
+	s=arc-20240116; t=1722072810; c=relaxed/simple;
+	bh=96QOIG/h1nLnig5TjvXXPOrhIEeMRrOBAX7BbjccgxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gm6AMH4fLrwWrCq0fKHfsfF63wO9COpEEOg/+o6W4uZxMIGLno2WtEi7u6dv1YJ/e66/YlRcKS3iUG57UwY0vr9UPPa7zj4OjzFtPGSPwu8vku1Q9q+/hoVfXslp8jKEYZ6XPswwwZUrdYY/xELD2l5j+d2CuocmU3YbvkcFSt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LOcg2so2; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722072808; x=1753608808;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=96QOIG/h1nLnig5TjvXXPOrhIEeMRrOBAX7BbjccgxY=;
+  b=LOcg2so2GtBM2bmRGc2elBkIErkIdedlyCVu8ikxygK3WL6t9ahFXzm7
+   iX7++6im8ga1hna5wh0VNWpwFJlnHpaioJLCWVRVVVdWfNVoVIsPFToT6
+   d7P12H/tn5cw1LnVbV304YXm14YnzxuX4Nghg9bIjB/zIsTv0dvdmoYFi
+   cCal4ZL7naKFul9grlk6k6dUct4jWb8MXfoySM0v2K0f0Gy+cBxfH25QU
+   qBs8PDBOaWHYk7m8wk+vb+AoLNsnXW6ufEJmRN2Bz1FBnMgqdPXWgyi9K
+   1MfdPAIxq8G38Zppci+PZUCmACFzeLt6lU/G2YkRUYD8coGDBbAAEksJN
+   A==;
+X-CSE-ConnectionGUID: H7ZtnrnMReix0w8b7bjTEg==
+X-CSE-MsgGUID: OG5IZX79TZyFr41IOdzkQQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11145"; a="23623102"
+X-IronPort-AV: E=Sophos;i="6.09,241,1716274800"; 
+   d="scan'208";a="23623102"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2024 02:33:27 -0700
+X-CSE-ConnectionGUID: 5BsX9X7rT/uE1OY406do8A==
+X-CSE-MsgGUID: H/UUFVt3SzWj6VvkW03j2Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,241,1716274800"; 
+   d="scan'208";a="54279932"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 27 Jul 2024 02:33:23 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sXdnk-000pou-0b;
+	Sat, 27 Jul 2024 09:33:20 +0000
+Date: Sat, 27 Jul 2024 17:32:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Martin =?iso-8859-1?Q?Hundeb=F8ll?= <martin@geanix.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Simon Horman <horms@kernel.org>, Tony Lindgren <tony@atomide.com>,
+	Judith Mendez <jm@ti.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Linux regression tracking <regressions@leemhuis.info>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/7] can: m_can: Do not cancel timer from within timer
+Message-ID: <202407271748.gsVE0Hih-lkp@intel.com>
+References: <20240726195944.2414812-5-msp@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: motorcomm: Add chip mode cfg
-To: "Frank.Sae" <Frank.Sae@motor-comm.com>, andrew@lunn.ch,
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, yuanlai.cui@motor-comm.com,
- hua.sun@motor-comm.com, xiaoyong.li@motor-comm.com,
- suting.hu@motor-comm.com, jie.han@motor-comm.com
-References: <20240727092009.1108640-1-Frank.Sae@motor-comm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240727092009.1108640-1-Frank.Sae@motor-comm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240726195944.2414812-5-msp@baylibre.com>
 
-On 27/07/2024 11:20, Frank.Sae wrote:
->  The motorcomm phy (yt8821) supports the ability to
->  config the chip mode of serdes.
->  The yt8821 serdes could be set to AUTO_BX2500_SGMII or
->  FORCE_BX2500.
->  In AUTO_BX2500_SGMII mode, SerDes
->  speed is determined by UTP, if UTP link up
->  at 2.5GBASE-T, SerDes will work as
->  2500BASE-X, if UTP link up at
->  1000BASE-T/100BASE-Tx/10BASE-T, SerDes will work
->  as SGMII.
->  In FORCE_BX2500, SerDes always works
->  as 2500BASE-X.
+Hi Markus,
 
-Very weird wrapping.
+kernel test robot noticed the following build warnings:
 
-Please wrap commit message according to Linux coding style / submission
-process (neither too early nor over the limit):
-https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
+[auto build test WARNING on mkl-can-next/testing]
+[also build test WARNING on linus/master v6.10 next-20240726]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> 
-> Signed-off-by: Frank.Sae <Frank.Sae@motor-comm.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Markus-Schneider-Pargmann/can-m_can-Reset-coalescing-during-suspend-resume/20240727-042714
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git testing
+patch link:    https://lore.kernel.org/r/20240726195944.2414812-5-msp%40baylibre.com
+patch subject: [PATCH 4/7] can: m_can: Do not cancel timer from within timer
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20240727/202407271748.gsVE0Hih-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240727/202407271748.gsVE0Hih-lkp@intel.com/reproduce)
 
-Didn't you copy user-name as you name?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407271748.gsVE0Hih-lkp@intel.com/
 
-> ---
->  .../bindings/net/motorcomm,yt8xxx.yaml          | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+All warnings (new ones prefixed by >>):
 
-Also, your threading is completely broken. Use git send-email or b4.
-
-> 
-> diff --git a/Documentation/devicetree/bindings/net/motorcomm,yt8xxx.yaml b/Documentation/devicetree/bindings/net/motorcomm,yt8xxx.yaml
-> index 26688e2302ea..ba34260f889d 100644
-> --- a/Documentation/devicetree/bindings/net/motorcomm,yt8xxx.yaml
-> +++ b/Documentation/devicetree/bindings/net/motorcomm,yt8xxx.yaml
-> @@ -110,6 +110,23 @@ properties:
->        Transmit PHY Clock delay train configuration when speed is 1000Mbps.
->      type: boolean
->  
-> +  motorcomm,chip-mode:
-> +    description: |
-> +      Only for yt8821 2.5G phy, it supports two chip working modes,
-
-Then allOf:if:then disallowing it for the other variant?
-
-> +      one is AUTO_BX2500_SGMII, the other is FORCE_BX2500.
-> +      If this property is not set in device tree node then driver
-> +      selects chip mode FORCE_BX2500 by default.
-
-Don't repeat constraints in free form text.
-
-> +      0: AUTO_BX2500_SGMII
-> +      1: FORCE_BX2500
-> +      In AUTO_BX2500_SGMII mode, serdes speed is determined by UTP,
-> +      if UTP link up at 2.5GBASE-T, serdes will work as 2500BASE-X,
-> +      if UTP link up at 1000BASE-T/100BASE-Tx/10BASE-T, serdes will
-> +      work as SGMII.
-> +      In FORCE_BX2500 mode, serdes always works as 2500BASE-X.
+>> drivers/net/can/m_can/m_can.c:1205: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+    * This interrupt handler is called either from the interrupt thread or a
 
 
-Explain why this is even needed and why "auto" is not correct in all
-cases. In commit msg or property description.
+vim +1205 drivers/net/can/m_can/m_can.c
 
-> +    $ref: /schemas/types.yaml#/definitions/uint8
+  1203	
+  1204	/**
+> 1205	 * This interrupt handler is called either from the interrupt thread or a
+  1206	 * hrtimer. This has implications like cancelling a timer won't be possible
+  1207	 * blocking.
+  1208	 */
+  1209	static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+  1210	{
+  1211		struct net_device *dev = cdev->net;
+  1212		u32 ir;
+  1213		int ret;
+  1214	
+  1215		if (pm_runtime_suspended(cdev->dev))
+  1216			return IRQ_NONE;
+  1217	
+  1218		ir = m_can_read(cdev, M_CAN_IR);
+  1219		m_can_coalescing_update(cdev, ir);
+  1220		if (!ir)
+  1221			return IRQ_NONE;
+  1222	
+  1223		/* ACK all irqs */
+  1224		m_can_write(cdev, M_CAN_IR, ir);
+  1225	
+  1226		if (cdev->ops->clear_interrupts)
+  1227			cdev->ops->clear_interrupts(cdev);
+  1228	
+  1229		/* schedule NAPI in case of
+  1230		 * - rx IRQ
+  1231		 * - state change IRQ
+  1232		 * - bus error IRQ and bus error reporting
+  1233		 */
+  1234		if (ir & (IR_RF0N | IR_RF0W | IR_ERR_ALL_30X)) {
+  1235			cdev->irqstatus = ir;
+  1236			if (!cdev->is_peripheral) {
+  1237				m_can_disable_all_interrupts(cdev);
+  1238				napi_schedule(&cdev->napi);
+  1239			} else {
+  1240				ret = m_can_rx_handler(dev, NAPI_POLL_WEIGHT, ir);
+  1241				if (ret < 0)
+  1242					return ret;
+  1243			}
+  1244		}
+  1245	
+  1246		if (cdev->version == 30) {
+  1247			if (ir & IR_TC) {
+  1248				/* Transmission Complete Interrupt*/
+  1249				u32 timestamp = 0;
+  1250				unsigned int frame_len;
+  1251	
+  1252				if (cdev->is_peripheral)
+  1253					timestamp = m_can_get_timestamp(cdev);
+  1254				frame_len = m_can_tx_update_stats(cdev, 0, timestamp);
+  1255				m_can_finish_tx(cdev, 1, frame_len);
+  1256			}
+  1257		} else  {
+  1258			if (ir & (IR_TEFN | IR_TEFW)) {
+  1259				/* New TX FIFO Element arrived */
+  1260				ret = m_can_echo_tx_event(dev);
+  1261				if (ret != 0)
+  1262					return ret;
+  1263			}
+  1264		}
+  1265	
+  1266		if (cdev->is_peripheral)
+  1267			can_rx_offload_threaded_irq_finish(&cdev->offload);
+  1268	
+  1269		return IRQ_HANDLED;
+  1270	}
+  1271	
 
-Make it a string, not uint8.
-
-
-> +    enum: [ 0, 1 ]
-> +    default: 1
-
-Why 1 not 0? Auto seems more logical?
-
-> +
->  unevaluatedProperties: false
->  
->  examples:
-
-Best regards,
-Krzysztof
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
