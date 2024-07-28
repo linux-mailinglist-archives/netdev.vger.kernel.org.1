@@ -1,70 +1,62 @@
-Return-Path: <netdev+bounces-113412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E8A93E2E7
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:19:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E3ED93E2F6
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:21:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D2681F21A81
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:19:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39326281EDF
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:21:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D187719B580;
-	Sun, 28 Jul 2024 00:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A4D140394;
+	Sun, 28 Jul 2024 00:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WGoLXoxI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JCBkipYw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FC519B3CC;
-	Sun, 28 Jul 2024 00:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB5413F441;
+	Sun, 28 Jul 2024 00:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128110; cv=none; b=pyDapV55bpzkm5XCZWw3gw/21pLJtcIozpMf+zn65OoIPvvu+MuA/x/6nXRD/xtspOM2Unc7SeP0hUCeFynIVViWPhh6RqZH96g4XOFuyvmc2pHqD098Hq+/JKJK14IYt96z25K1e4zJFOevBs4D7YvOQ82ueOOtCaxlQ3Kz2UY=
+	t=1722128126; cv=none; b=hKQRyoHHfJSiYiO4hSJnMUIORUPbd+twoz9BeTjVJvhC2Y/nopK7J1gHZNbVOD+zzuAqOUfuZ9dU7Q/CodB2wrXXopurUyeL3hxMjUQ526PpbJ+ijLCRJR8hNSptanJCsQEQMZn/mi4eeb1GVACCyzvCofcKCqDm6hBhuXQOFQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128110; c=relaxed/simple;
-	bh=lFNyJQ8s2ms9QVeZ4BLP0TUfAp/xvy6FewGjopPJvFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iPCiWOUFkRGa+pFGH8etzWH1J775xoReVruwnVmkHWoaIl8lRVfONG3pryhnNd7hjBkWC9TuNo1OL4rCt7QP7J67QLkqtozMO+RLz7THVjtKgrrLcPTxV2m/kCuXyGxZl5/L/c44mTa+TqgzZCuzd6U0503OpqSzUIklb2BxU1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WGoLXoxI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 491D6C4AF07;
-	Sun, 28 Jul 2024 00:55:08 +0000 (UTC)
+	s=arc-20240116; t=1722128126; c=relaxed/simple;
+	bh=kqV6iCppqkmKongtimN3/Grb4cO3fi2gMcCh4ULijZ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ijR4nJZ1Obvy/WiFCeQGrvot7o23kZY8kIXKmRf/1DuRVR6BvaFJganJgup6mP1pK1/7op7LWifPWI3tk+eUY8rOhuO0bLAnEDGJqKd5U/BndzQT6ezgR12+ytIEheTPGmNq7NAf1MMRFxMomtT+WeA+WrqvqcT7Zkvhhf6JOck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JCBkipYw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052D5C32781;
+	Sun, 28 Jul 2024 00:55:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128110;
-	bh=lFNyJQ8s2ms9QVeZ4BLP0TUfAp/xvy6FewGjopPJvFM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WGoLXoxIEheEuwwxf1akagePsT1VlhiQw/mwjxpU0LPSRe7MgMb4cfMc+Pn76cAQu
-	 4Hu4xGl6N2m3ZmFRhTQrIvQwVX04mHofmL4QEBcWH0H27T/avkj5yrXqHNTov8PwDY
-	 TaGDaXsm/KLNzbwjxdBZTuKjShoP2kbyLNkL7xd3Sp773ZWcSC7MH3ny4vZYsiEOgZ
-	 c8W2oUIOWvtXhx6c8If1Qfjdj9zqujkgLCXjtkcR9/BjmmD3ZzXx0b+uPHAWBs6LEb
-	 q80RigCKVx7KTmyZvvpu0NrPNYeX0ZqlOHXlJ346dbQYthvs30FiWVZk3TQHLUPKNk
-	 qBJfpq87n9+ag==
+	s=k20201202; t=1722128125;
+	bh=kqV6iCppqkmKongtimN3/Grb4cO3fi2gMcCh4ULijZ4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JCBkipYwLHjmJDM5O0ZDmnQnoD2nvu9a9t5IPy/l/hddoajhSRk40pEwWU7WOEV2W
+	 knRLhBFCM47C1DHOFfOiNEPfO6GWDk1K3ZM2KwEuqLXmhqzQ5p0l8dRjQNTLvN9IUc
+	 mbMa9Y/V9pysmFhoyOg5fcKa+WbaeWbIvn1iUsC9xseekHdVoIcqRrNeR26yEhRTAV
+	 P208kHnY9ESc8ltx5Ewqt6vuH9Qz1L2AmlsUKsw2/ydiEmi9uxaOHP92+pnGwULRNd
+	 LuO0X84bSbB3dJchGjU+3ZX9xtMvmGfBS0yYwOzweWVoAmW9l5bLYswhbOX0lJDDnW
+	 ML6ZHWBp6YlaQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com,
 	Sasha Levin <sashal@kernel.org>,
-	vkoul@kernel.org,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.6 12/15] net: stmmac: qcom-ethqos: enable SGMII loopback during DMA reset on sa8775p-ride-r3
-Date: Sat, 27 Jul 2024 20:54:33 -0400
-Message-ID: <20240728005442.1729384-12-sashal@kernel.org>
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 01/11] wifi: nl80211: disallow setting special AP channel widths
+Date: Sat, 27 Jul 2024 20:55:06 -0400
+Message-ID: <20240728005522.1731999-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240728005442.1729384-1-sashal@kernel.org>
-References: <20240728005442.1729384-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,120 +65,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.43
+X-stable-base: Linux 6.1.102
 Content-Transfer-Encoding: 8bit
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit 3c466d6537b99f801b3f68af3d8124d4312437a0 ]
+[ Upstream commit 23daf1b4c91db9b26f8425cc7039cf96d22ccbfe ]
 
-On sa8775p-ride-r3 the RX clocks from the AQR115C PHY are not available at
-the time of the DMA reset. We can however extract the RX clock from the
-internal SERDES block. Once the link is up, we can revert to the
-previous state.
+Setting the AP channel width is meant for use with the normal
+20/40/... MHz channel width progression, and switching around
+in S1G or narrow channels isn't supported. Disallow that.
 
-The AQR115C PHY doesn't support in-band signalling so we can count on
-getting the link up notification and safely reuse existing callbacks
-which are already used by another HW quirk workaround which enables the
-functional clock to avoid a DMA reset due to timeout.
-
-Only enable loopback on revision 3 of the board - check the phy_mode to
-make sure.
-
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://patch.msgid.link/20240703181500.28491-3-brgl@bgdev.pl
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reported-by: syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com
+Link: https://msgid.link/20240515141600.d4a9590bfe32.I19a32d60097e81b527eafe6b0924f6c5fbb2dc45@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 23 +++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ net/wireless/nl80211.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d5d2a4c776c1c..ded1bbda5266f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -21,6 +21,7 @@
- #define RGMII_IO_MACRO_CONFIG2		0x1C
- #define RGMII_IO_MACRO_DEBUG1		0x20
- #define EMAC_SYSTEM_LOW_POWER_DEBUG	0x28
-+#define EMAC_WRAPPER_SGMII_PHY_CNTRL1	0xf4
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index a00df7b89ca86..603fcd921bd22 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -3346,6 +3346,33 @@ static int __nl80211_set_channel(struct cfg80211_registered_device *rdev,
+ 			if (chandef.chan != cur_chan)
+ 				return -EBUSY;
  
- /* RGMII_IO_MACRO_CONFIG fields */
- #define RGMII_CONFIG_FUNC_CLK_EN		BIT(30)
-@@ -79,6 +80,9 @@
- #define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
- #define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
- 
-+/* EMAC_WRAPPER_SGMII_PHY_CNTRL1 bits */
-+#define SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN	BIT(3)
++			/* only allow this for regular channel widths */
++			switch (wdev->links[link_id].ap.chandef.width) {
++			case NL80211_CHAN_WIDTH_20_NOHT:
++			case NL80211_CHAN_WIDTH_20:
++			case NL80211_CHAN_WIDTH_40:
++			case NL80211_CHAN_WIDTH_80:
++			case NL80211_CHAN_WIDTH_80P80:
++			case NL80211_CHAN_WIDTH_160:
++			case NL80211_CHAN_WIDTH_320:
++				break;
++			default:
++				return -EINVAL;
++			}
 +
- #define SGMII_10M_RX_CLK_DVDR			0x31
- 
- struct ethqos_emac_por {
-@@ -95,6 +99,7 @@ struct ethqos_emac_driver_data {
- 	bool has_integrated_pcs;
- 	u32 dma_addr_width;
- 	struct dwmac4_addrs dwmac4_addrs;
-+	bool needs_sgmii_loopback;
- };
- 
- struct qcom_ethqos {
-@@ -113,6 +118,7 @@ struct qcom_ethqos {
- 	unsigned int num_por;
- 	bool rgmii_config_loopback_en;
- 	bool has_emac_ge_3;
-+	bool needs_sgmii_loopback;
- };
- 
- static int rgmii_readl(struct qcom_ethqos *ethqos, unsigned int offset)
-@@ -187,8 +193,22 @@ ethqos_update_link_clk(struct qcom_ethqos *ethqos, unsigned int speed)
- 	clk_set_rate(ethqos->link_clk, ethqos->link_clk_rate);
- }
- 
-+static void
-+qcom_ethqos_set_sgmii_loopback(struct qcom_ethqos *ethqos, bool enable)
-+{
-+	if (!ethqos->needs_sgmii_loopback ||
-+	    ethqos->phy_mode != PHY_INTERFACE_MODE_2500BASEX)
-+		return;
++			switch (chandef.width) {
++			case NL80211_CHAN_WIDTH_20_NOHT:
++			case NL80211_CHAN_WIDTH_20:
++			case NL80211_CHAN_WIDTH_40:
++			case NL80211_CHAN_WIDTH_80:
++			case NL80211_CHAN_WIDTH_80P80:
++			case NL80211_CHAN_WIDTH_160:
++			case NL80211_CHAN_WIDTH_320:
++				break;
++			default:
++				return -EINVAL;
++			}
 +
-+	rgmii_updatel(ethqos,
-+		      SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN,
-+		      enable ? SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN : 0,
-+		      EMAC_WRAPPER_SGMII_PHY_CNTRL1);
-+}
-+
- static void ethqos_set_func_clk_en(struct qcom_ethqos *ethqos)
- {
-+	qcom_ethqos_set_sgmii_loopback(ethqos, true);
- 	rgmii_updatel(ethqos, RGMII_CONFIG_FUNC_CLK_EN,
- 		      RGMII_CONFIG_FUNC_CLK_EN, RGMII_IO_MACRO_CONFIG);
- }
-@@ -273,6 +293,7 @@ static const struct ethqos_emac_driver_data emac_v4_0_0_data = {
- 	.has_emac_ge_3 = true,
- 	.link_clk_name = "phyaux",
- 	.has_integrated_pcs = true,
-+	.needs_sgmii_loopback = true,
- 	.dma_addr_width = 36,
- 	.dwmac4_addrs = {
- 		.dma_chan = 0x00008100,
-@@ -646,6 +667,7 @@ static void ethqos_fix_mac_speed(void *priv, unsigned int speed, unsigned int mo
- {
- 	struct qcom_ethqos *ethqos = priv;
- 
-+	qcom_ethqos_set_sgmii_loopback(ethqos, false);
- 	ethqos->speed = speed;
- 	ethqos_update_link_clk(ethqos, speed);
- 	ethqos_configure(ethqos);
-@@ -781,6 +803,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	ethqos->num_por = data->num_por;
- 	ethqos->rgmii_config_loopback_en = data->rgmii_config_loopback_en;
- 	ethqos->has_emac_ge_3 = data->has_emac_ge_3;
-+	ethqos->needs_sgmii_loopback = data->needs_sgmii_loopback;
- 
- 	ethqos->link_clk = devm_clk_get(dev, data->link_clk_name ?: "rgmii");
- 	if (IS_ERR(ethqos->link_clk))
+ 			result = rdev_set_ap_chanwidth(rdev, dev, link_id,
+ 						       &chandef);
+ 			if (result)
 -- 
 2.43.0
 
