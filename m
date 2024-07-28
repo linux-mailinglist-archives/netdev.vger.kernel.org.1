@@ -1,87 +1,135 @@
-Return-Path: <netdev+bounces-113463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE45193E91A
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 21:46:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0DF293E96A
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 22:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771E91F21681
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 19:46:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AE54B20FAB
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 20:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15ACE6EB7D;
-	Sun, 28 Jul 2024 19:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4213776046;
+	Sun, 28 Jul 2024 20:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KJAo/OxH"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="JrgBbp/J"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB911FB5;
-	Sun, 28 Jul 2024 19:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E8054BD4;
+	Sun, 28 Jul 2024 20:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722195959; cv=none; b=u3KSR3w2VbTBQzWZ9w+Gj94nPACDrtA3q3+aAcwS6kA1ztuJ4XAHMWKm5c+o6QPXyNC7KynvJEax3mfQFF4CV7xeAUp9kZLUeIS9IBUjRii7HeHTNHFa2x3YFWtWs1L9gwnWoO4/Sc3vHgK5+3CmveCHXXJOsVCbmPBUrXzKtuY=
+	t=1722199248; cv=none; b=sqwkjO5/SE3wBzzlp6vgBj0z/FcWu6rsvJB3SwbvJbeKeI9WrMKuEMGs4sV/hsA23/8gAnyOqFvWDLwWnUDWpDS7/3F5xtEJNEprhA3UupMTGH6UJe+Kmy0BxfEw5PbavQB6TyBM7cM8WN/Yk01tUufJH7G4eF4UGN2QWKJA3g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722195959; c=relaxed/simple;
-	bh=Hc99SEPp4bXPVJrCLa7vU2xFazG1kj6OYKnlcEeTmV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oeVKR2VP+81Wm6t8Q2zHpTtP68pImhfGE+qMwasxbYQ8Z5ze618ynqKbXMnapJY7PjvPsysMdd0sj03yRNySX6FEUXagcQWJZ9CQZVHy8bkPX6i1sU5VCKiZ0Pc8aEFLxQGYDbC/n+TbJMepNVXK6V4KU3q0GCSAz27043eZIxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KJAo/OxH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6f/X4Ep8VJBAxPd04fq3EkGY9O7GlIIEmWVVeK98dt8=; b=KJAo/OxHeFLm2/bM8V4AuZeFPD
-	bq1lvvQsQWZt3v0t3WPaH077+xLZhmI86aVGIZvUgoXoVQyHFL9jPwFYg+tqLnEoVdkeylVWo/wE2
-	y009IFVef6Z9s0av3XuBcRArguVlGXPyPv8T0e1FE5XuA/tHx396hlSrupEJ5xiA65HU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sY9pk-003PDN-VX; Sun, 28 Jul 2024 21:45:32 +0200
-Date: Sun, 28 Jul 2024 21:45:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	UNGLinuxDriver@microchip.com, davem@davemloft.net,
-	edumazet@google.com, f.fainelli@gmail.com,
-	gregkh@linuxfoundation.org, kuba@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, lucas.demarchi@intel.com,
-	masahiroy@kernel.org, mcgrof@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, woojung.huh@microchip.com
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
- module
-Message-ID: <3a3f49b5-45b2-4999-a364-60d035bbd11f@lunn.ch>
-References: <bcc81ea0-78e1-476e-928c-b873a064b479@lunn.ch>
- <20240726121530.193547-1-jtornosm@redhat.com>
- <b96d9801-d370-4ddd-97fd-5eac2a2656f4@lunn.ch>
- <931b582808f237aa3746c5b0a96b3665@manjaro.org>
- <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
- <a520ee4da331c8edb99f2c14d22a3531@manjaro.org>
+	s=arc-20240116; t=1722199248; c=relaxed/simple;
+	bh=fo9SxnRqHmWkZ+4Xi5y0iHSeCC+yY2XTdoLtLszvGhg=;
+	h=Message-ID:Date:MIME-Version:In-Reply-To:To:CC:From:Subject:
+	 Content-Type; b=rbgD9r/0+XjSzc1CZi5Bkseq8J17DZwqf6J/B9OqMdvj9Umum9LvcBIsmEQyR/DHMbpF7Kxpd52bd+YzdBcHmAzEpbceJKsQOHCZJ0SQogCjVjCv4nT5SX4DKTOmEMY0nKgAMiOwKym6XKGmxTspwmqrvS6nF+O74LL0wO4TeoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=JrgBbp/J; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id D762D100004;
+	Sun, 28 Jul 2024 23:40:34 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru D762D100004
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1722199234;
+	bh=qiJcQnSK+EjYjj6+LyL+4e28HtKf7NXcELPMPziM0TI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:From;
+	b=JrgBbp/J/gqP72xMqAgVWV2MYxHIBAZmJkmkosZdbhugqZPs5tP8Raer96lUThaGq
+	 BqVO7+48ve2oLt7uBklm1v4avi5H4YYSxgCRIGpjOclSgJS/PZxyhSM97wtCnprmb8
+	 Wfd7YjJxwPQ8V5eWAsAoJhtHjQnTXk3s0X/O/lxE+uyKXxRhMKkjiFkup/uytwiPh2
+	 RBHajb/uecZokN4tPxgSZHEwGSPDZsYspxJ1HGYnyp/tgUpkmZVwedtayeiggsCRjY
+	 B8pS18DFS6Q8q4nDt9vmZTkcWPAIAiKzrBU2IEdG8Qe2VaMmmBlX/OVVlDLIHTdBaW
+	 xtlQd8LnNUHCg==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Sun, 28 Jul 2024 23:40:34 +0300 (MSK)
+Received: from [192.168.1.103] (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jul 2024 23:40:33 +0300
+Message-ID: <ce580c81-36a1-8b3b-b73f-1d88c5ec72b6@salutedevices.com>
+Date: Sun, 28 Jul 2024 23:28:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a520ee4da331c8edb99f2c14d22a3531@manjaro.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+In-Reply-To: <20240710212555.1617795-4-amery.hung@bytedance.com>
+To: <stefanha@redhat.com>, <sgarzare@redhat.com>, <mst@redhat.com>,
+	<jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<kys@microsoft.com>, <haiyangz@microsoft.com>, <wei.liu@kernel.org>,
+	<decui@microsoft.com>, <bryantan@vmware.com>, <vdasa@vmware.com>,
+	<pv-drivers@vmware.com>
+CC: <dan.carpenter@linaro.org>, <simon.horman@corigine.com>,
+	<oxffffaa@gmail.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <bobby.eshleman@bytedance.com>,
+	<jiang.wang@bytedance.com>, <amery.hung@bytedance.com>,
+	<ameryhung@gmail.com>, <xiyou.wangcong@gmail.com>, <kernel@sberdevices.ru>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Subject: Re: [RFC PATCH net-next v6 03/14] af_vsock: support multi-transport
+ datagrams
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186756 [Jul 28 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 24 0.3.24 186c4d603b899ccfd4883d230c53f273b80e467f, {Tracking_from_domain_doesnt_match_to}, smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/07/28 19:39:00 #26171428
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-> Basically, the way I see it, weakdeps are the right solution for the
-> problem at hand, i.e. for the generation of the initial ramdisk with
-> all the possible PHY driver modules.
+Hi Amery
 
-Sorry, but i still don't see how this works.
+>  /* Transport features flags */
+>  /* Transport provides host->guest communication */
+> -#define VSOCK_TRANSPORT_F_H2G		0x00000001
+> +#define VSOCK_TRANSPORT_F_H2G			0x00000001
+>  /* Transport provides guest->host communication */
+> -#define VSOCK_TRANSPORT_F_G2H		0x00000002
+> -/* Transport provides DGRAM communication */
+> -#define VSOCK_TRANSPORT_F_DGRAM		0x00000004
+> +#define VSOCK_TRANSPORT_F_G2H			0x00000002
+> +/* Transport provides fallback for DGRAM communication */
+> +#define VSOCK_TRANSPORT_F_DGRAM_FALLBACK	0x00000004
+>  /* Transport provides local (loopback) communication */
+> -#define VSOCK_TRANSPORT_F_LOCAL		0x00000008
+> +#define VSOCK_TRANSPORT_F_LOCAL			0x00000008
 
-Say you get this one patch merged. What then? You throw all other PHY
-drivers which don't have a weakdep out of the initramfs? That
-potentially breaks around 200 MAC drivers who need those PHYs you have
-discarded.
+^^^ This is refactoring ?
 
-	Andrew
+
+> +		/* During vsock_create(), the transport cannot be decided yet if
+> +		 * using virtio. While for VMCI, it is transport_dgram_fallback.
+
+
+I'm not English speaker, but 'decided' -> 'detected'/'resolved' ?
+
+
+
+Thanks, Arseniy
 
