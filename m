@@ -1,100 +1,108 @@
-Return-Path: <netdev+bounces-113440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA82993E54D
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 15:07:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A542693E599
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 16:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FF9B1F214F6
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 13:07:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 332D51F212BE
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 14:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CF94A9B0;
-	Sun, 28 Jul 2024 13:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1090143144;
+	Sun, 28 Jul 2024 14:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="flT8Pjof"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="PA5jSMxN"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AFD1B86E5;
-	Sun, 28 Jul 2024 13:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8C734545;
+	Sun, 28 Jul 2024 14:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722172041; cv=none; b=oNYSKlNjHkwIafsyJYF8CYbnUIkVvBV72JbAjdDCR1BQJm3jdxVxCJIKnTelKGz9Ctu71y/7O5pmQZtaLw+lz52CSv9QhGrF56XN3aiEt5xW+TYdStJTosr3bNXjCVY+0Wnnv8ZmPivY+Y+Sjai80ei3DNClf62qBQJ+DY4K4is=
+	t=1722175863; cv=none; b=P5Nb2znSEX+OfS6GWe/AY9H3VxqDPjdWPYPqGGxIB/TgNa+qInH1nmtQcclstNxrFyPUp9IFIe0+7y2defbd/sNIaSsjBo+HkGgD6XQ6TIK+oP6d9MSoCKWtFzKwTpCFw4jshqp/bBb9Bdsaz1PAhjDW1ksYT0DVSkfZm5SwqN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722172041; c=relaxed/simple;
-	bh=FDZHoL0SYBD5C6coY9/igQ8KrkajIrhZ0dId7u51w5s=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Rjg7Or1nKg4r880EVThSL/dZnJQGmVznDlhSSbxavuOBupmIDUp0om9ZvzyU/EZzSC7ycLJdpYBEn+2sDnGPXwjo/WmiW8eg9pUZIpfHD1Zuxl5Oi+7hzhMUOLR+oxmQMGiOXyf4LyaMQkkdM6NtBfintVuyRolKClp2kHbLWSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=flT8Pjof; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=FDZHoL0SYBD5C6coY9/igQ8KrkajIrhZ0dId7u51w5s=; b=flT8PjofU7rvlmZR2KAxcTVcgP
-	1g/5ut9QnbzMunNfEATZz0IMzkliBkloPrrBvR3BGEVHuY1LayI7GgF7nXEFzG7aKYMIBGVhmHbMN
-	c5KQa6IrgPAdMz5acaJCV5NlVf7/A8Qg+cE1ePBPZ6MALimflCeXIp2C8SJ0Y9y2ouFedE6C2bODo
-	nloYEiHQk75OPKKogDsi54vrp/QSHnMjKxqpNm2b6F19DNFwvabKrGCAW9CeqoNohX2b0/KnxWVl1
-	c0idAJ4zTvu5CDwvR89bpQju7bkLceoJLPeTylfrxhIZNa+yFmCH8Y50jbtxK9bakx8KLhvj2AdT3
-	vq2EmdcQ==;
-Received: from [212.241.248.254] (helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sY3c7-00000004cYv-07UE;
-	Sun, 28 Jul 2024 13:07:03 +0000
-Date: Sun, 28 Jul 2024 14:07:01 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
- "Chashper, David" <chashper@amazon.com>,
- "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
- "Christopher S . Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20240728062521-mutt-send-email-mst@kernel.org>
-References: <20240725012730-mutt-send-email-mst@kernel.org> <7de7da1122e61f8c64bbaab04a35af93fafac454.camel@infradead.org> <20240725081502-mutt-send-email-mst@kernel.org> <f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org> <20240725082828-mutt-send-email-mst@kernel.org> <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org> <20240725083215-mutt-send-email-mst@kernel.org> <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org> <20240726174958.00007d10@Huawei.com> <811E8A25-3DBC-452D-B594-F9B7B0B61335@infradead.org> <20240728062521-mutt-send-email-mst@kernel.org>
-Message-ID: <9817300C-9280-4CC3-B9DB-37D24C8C20B5@infradead.org>
+	s=arc-20240116; t=1722175863; c=relaxed/simple;
+	bh=DqcVSN0XsTJA0Oi0MNZ0teOOtzntOY8OrbnnB6o8vjY=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=rnS+eOhLLN23TthwhE7zL8J7MFc4iy+wNWt9oAZd3I17zR63GW/xV7NDQiNwH199GsdMb2kXxsZuGpkJ1yRBUU74tOdQj+mEpQ3n4hIcwNyVHT7jmT86JlUQsq8WEWsHlcEgy02vICbU3z/WED2nAQXfTJFSeG6ACUMPfDDmEZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=PA5jSMxN; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1722175858;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=No/YIbGtEUuTgLlMt3RFQBfM5H9ZzhC0++FkOyap0EU=;
+	b=PA5jSMxNXzlUDrvvooYdg3ajy2QWXNbiQtvs2kbu8TaOVaPOPCW5LrOdkUpJvTUfBkP9t1
+	62F9H1t8ClWX/UoPfJ/cozJPlg/zOREkOb01dLfQxL1oTUzZSm4VopwOw1ne2hhtwdu0Vw
+	jOeweUtx03M9PukL4T6FiXuqKcqhd7ZuExd1e0sOGBEm2uA8B9KSVeZEdk4h76zboHY7Sh
+	52+y17P6PfluZSB9eBM3CGpJ6od0d/CwMVXqjfpDEo5L0LZSKwdV+bhVudao3MWS5CKy1/
+	heNUb4eNW5yfb437rCAIFpl2u5MS6dkT8BiAy9RkyhP46+YnAhFEVomR1iK5uA==
+Date: Sun, 28 Jul 2024 16:10:57 +0200
+From: Dragan Simic <dsimic@manjaro.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+ UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com,
+ f.fainelli@gmail.com, gregkh@linuxfoundation.org, kuba@kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, lucas.demarchi@intel.com, masahiroy@kernel.org,
+ mcgrof@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ woojung.huh@microchip.com
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
+ module
+In-Reply-To: <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
+References: <bcc81ea0-78e1-476e-928c-b873a064b479@lunn.ch>
+ <20240726121530.193547-1-jtornosm@redhat.com>
+ <b96d9801-d370-4ddd-97fd-5eac2a2656f4@lunn.ch>
+ <931b582808f237aa3746c5b0a96b3665@manjaro.org>
+ <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
+Message-ID: <a520ee4da331c8edb99f2c14d22a3531@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-On 28 July 2024 11:37:04 BST, "Michael S=2E Tsirkin" <mst@redhat=2Ecom> wro=
-te:
->Glad you asked :)
+Hello Andrew,
 
-Heh, I'm not sure I'm so glad=2E Did I mention I hate ACPI? Perhaps it's s=
-till not too late for me just to define a DT binding and use PRP0001 for it=
- :)
+On 2024-07-28 01:29, Andrew Lunn wrote:
+>> Before going into explaining my viewpoint, could someone, please, 
+>> clarify
+>> which LAN78xx USB-to-Ethernet bridge does this apply to?  I already 
+>> had
+>> a look at a few LAN78xx datasheets, and I'm not sure how the external 
+>> PHY
+>> becomes exposed over the USB interface, so it needs a driver.
+> 
+> https://elixir.bootlin.com/linux/v6.10/source/drivers/net/usb/lan78xx.c#L2049
+> 
+> This is creating an MDIO bus device. The MDIO bus will be scanned and
+> PHYs on the bus found. There are then a few calls to phy_find_first()
+> which will get the PHY.
+> 
+> The code itself looks pretty broken, it is directly accessing PHY
+> registers, which a MAC driver should not do. That is a layering
+> violation.
 
->Long story short, QEMUVGID is indeed out of spec, but it works
->both because of guest compatibility with ACPI 1=2E0, and because no one
->much uses it=2E
+Thanks for the clarification.
 
-
-I think it's reasonable enough to follow that example and use AMZNVCLK (or=
- QEMUVCLK, but there seems little point in both) then?
-
+Basically, the way I see it, weakdeps are the right solution for the
+problem at hand, i.e. for the generation of the initial ramdisk with
+all the possible PHY driver modules.  However, I don't think that some
+automagical generation of the associated MODULE_WEAKDEP() statements
+is the way to go.  Instead, all those statements should be added by
+hand to the lan78xx driver, making sure that each PHY is tested and
+validated beforehand.
 
