@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-113404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D7493E2A9
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:13:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAEF993E2C0
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:15:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C114B21DAB
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:13:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62A471F21C04
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEF6D192B91;
-	Sun, 28 Jul 2024 00:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C30112F5B1;
+	Sun, 28 Jul 2024 00:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNu6EcgK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aBmhmVeK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E5D192B8B;
-	Sun, 28 Jul 2024 00:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E7684D0F;
+	Sun, 28 Jul 2024 00:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128063; cv=none; b=a7RT+mWd4RIOqsDTqR0AbCrqL+Anl1lNu7isLLtDO0TG2ANoroxk7Gk1ZUOW146OmstSSmsx9SVE34NzX/EZsd1l1kIaQRdlJBQz4XGHI0gNv8B/pNde2u5nnH5GFhspauW3h+yflVm6WGfQIzG5IKNIhsluZ2zF6mD4rCXcbM8=
+	t=1722128085; cv=none; b=XMH7yxpPwuIxbiFD47yd2P0aoryhKu2s4BikfDagWUktZy6BnP1ZPCBr1jJl29B31KnCIThsi4GG9rUFgebbfN+/4DPNwKYbLZjrlLI10W8pd+GlxsuNShTIJT/fRoiK9ydt4IiofIfuvPViuqv5ussziNpErv11kEkdpncjbeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128063; c=relaxed/simple;
-	bh=4FIF7okYv/uUjF8tG+KxRZ13KnzZF5OxNpTQHjw7vWA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ft846s2Hq69IKlcQiTBwkiDF6J8n50e8PzKXuxteILwEY7hzLXmoM2j4Kc33bq0L6KrXMCbkR01ErQw7mI0JLtAO860DJq3WFt+vd8FHLlOmZa2LF1M+v/V8Q7Mfqb7NJZcA+5VmvEFPeOphMY+Uk63iLPtXPx770arGwdzS7A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNu6EcgK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7DFC32781;
-	Sun, 28 Jul 2024 00:54:21 +0000 (UTC)
+	s=arc-20240116; t=1722128085; c=relaxed/simple;
+	bh=nn3Yfax6uInX6pXIz+7wPnAw0wc2sIdXqFpMY30YWcU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d1YGOjEoJq+BRJ4wJbJVAfmbvsEGQ6BedqYACBr3sNORr7eGm3whRClUgnf7Bdw3MmbOJ7sJOrWfqVZhKA/V2F63yYA8kQBXgWPR3v/kYLH2CcN7AyaKvJWs9yBbghTflhBdqOhuxspl3LGL5Oe7M6XWdGq7qVHQJMhbfOJvQaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aBmhmVeK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47925C32781;
+	Sun, 28 Jul 2024 00:54:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128063;
-	bh=4FIF7okYv/uUjF8tG+KxRZ13KnzZF5OxNpTQHjw7vWA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YNu6EcgK2QEEY/B9sbKwJdVyA4hLOSdBhdLmOO85NlpVUVwAld9pF16TQtLC2Hmsd
-	 MefM7COcjJl3fpss+W4lTKYOkYwdAU0zZiFmOZPTrEnv3g8RQupMIUIRLZ/3kijVM5
-	 r/hQtBfOWEq4xeEqKKEEBKy2kk9Omucb20xNqtwJ6f2ZOla7r1ME2twgfCtac97ulB
-	 4TsggofFlEA94VxrgHniz9p2JoX65JuK68B2dJFNVGz0oXCuAFAz7FwAXWRNplf/31
-	 apGD8uTudRir5oj6B2o1yAkRCux9RBnMvOwVo0ur6HTF9AcKKUJDKiURbqndrI1yom
-	 44OOQpLorVU2Q==
+	s=k20201202; t=1722128085;
+	bh=nn3Yfax6uInX6pXIz+7wPnAw0wc2sIdXqFpMY30YWcU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aBmhmVeKBKSsWewYwjSST1pfJAoKIT3IBFgSrnEIQzBrzqAPgMkuoAc1G6iyAPjx9
+	 cCbZwv3m5ipKNJM15S2YC5B0Zyyz5muvJ0oiqkxXjYgpThaEo7IvtkUJqlJrn04lxM
+	 uZUt71Qt6H/J88w5ceCVs5iO4qY0YfNXis98R9OsAjJyYiOUlVTfPTQM0xwEdeUQ3/
+	 LogXEhjUzEnV4EqE4n/PvSFxYzW2Jm311as4fwJjrGMQU6xDtwZ4r/mpU90c9Es1NR
+	 Qs3PT+sBEJYJFxa1oWvKGK5oZNF2EGd4EDL+E4cTqgey+pzvUaSsosKJjsRIKm/Obp
+	 WXklKW3ZlRKNA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 20/27] mlxsw: pci: Lock configuration space of upstream bridge during reset
-Date: Sat, 27 Jul 2024 20:53:03 -0400
-Message-ID: <20240728005329.1723272-20-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 01/15] wifi: nl80211: disallow setting special AP channel widths
+Date: Sat, 27 Jul 2024 20:54:22 -0400
+Message-ID: <20240728005442.1729384-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240728005329.1723272-1-sashal@kernel.org>
-References: <20240728005329.1723272-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,71 +65,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.10.2
+X-stable-base: Linux 6.6.43
 Content-Transfer-Encoding: 8bit
 
-From: Ido Schimmel <idosch@nvidia.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit 0970836c348b6bc2ea77ce4348a136d6febfd440 ]
+[ Upstream commit 23daf1b4c91db9b26f8425cc7039cf96d22ccbfe ]
 
-The driver triggers a "Secondary Bus Reset" (SBR) by calling
-__pci_reset_function_locked() which asserts the SBR bit in the "Bridge
-Control Register" in the configuration space of the upstream bridge for
-2ms. This is done without locking the configuration space of the
-upstream bridge port, allowing user space to access it concurrently.
+Setting the AP channel width is meant for use with the normal
+20/40/... MHz channel width progression, and switching around
+in S1G or narrow channels isn't supported. Disallow that.
 
-Linux 6.11 will start warning about such unlocked resets [1][2]:
-
-pcieport 0000:00:01.0: unlocked secondary bus reset via: pci_reset_bus_function+0x51c/0x6a0
-
-Avoid the warning and the concurrent access by locking the configuration
-space of the upstream bridge prior to the reset and unlocking it
-afterwards.
-
-[1] https://lore.kernel.org/all/171711746953.1628941.4692125082286867825.stgit@dwillia2-xfh.jf.intel.com/
-[2] https://lore.kernel.org/all/20240531213150.GA610983@bhelgaas/
-
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Link: https://patch.msgid.link/9937b0afdb50f2f2825945393c94c093c04a5897.1720447210.git.petrm@nvidia.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reported-by: syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com
+Link: https://msgid.link/20240515141600.d4a9590bfe32.I19a32d60097e81b527eafe6b0924f6c5fbb2dc45@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlxsw/pci.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/wireless/nl80211.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-index c0ced4d315f3d..d92f640bae575 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-@@ -1599,6 +1599,7 @@ static int mlxsw_pci_reset_at_pci_disable(struct mlxsw_pci *mlxsw_pci,
- {
- 	struct pci_dev *pdev = mlxsw_pci->pdev;
- 	char mrsr_pl[MLXSW_REG_MRSR_LEN];
-+	struct pci_dev *bridge;
- 	int err;
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 8f8f077e6cd40..053258b4e28d2 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -3398,6 +3398,33 @@ static int __nl80211_set_channel(struct cfg80211_registered_device *rdev,
+ 			if (chandef.chan != cur_chan)
+ 				return -EBUSY;
  
- 	if (!pci_reset_sbr_supported) {
-@@ -1615,6 +1616,9 @@ static int mlxsw_pci_reset_at_pci_disable(struct mlxsw_pci *mlxsw_pci,
- sbr:
- 	device_lock_assert(&pdev->dev);
- 
-+	bridge = pci_upstream_bridge(pdev);
-+	if (bridge)
-+		pci_cfg_access_lock(bridge);
- 	pci_cfg_access_lock(pdev);
- 	pci_save_state(pdev);
- 
-@@ -1624,6 +1628,8 @@ static int mlxsw_pci_reset_at_pci_disable(struct mlxsw_pci *mlxsw_pci,
- 
- 	pci_restore_state(pdev);
- 	pci_cfg_access_unlock(pdev);
-+	if (bridge)
-+		pci_cfg_access_unlock(bridge);
- 
- 	return err;
- }
++			/* only allow this for regular channel widths */
++			switch (wdev->links[link_id].ap.chandef.width) {
++			case NL80211_CHAN_WIDTH_20_NOHT:
++			case NL80211_CHAN_WIDTH_20:
++			case NL80211_CHAN_WIDTH_40:
++			case NL80211_CHAN_WIDTH_80:
++			case NL80211_CHAN_WIDTH_80P80:
++			case NL80211_CHAN_WIDTH_160:
++			case NL80211_CHAN_WIDTH_320:
++				break;
++			default:
++				return -EINVAL;
++			}
++
++			switch (chandef.width) {
++			case NL80211_CHAN_WIDTH_20_NOHT:
++			case NL80211_CHAN_WIDTH_20:
++			case NL80211_CHAN_WIDTH_40:
++			case NL80211_CHAN_WIDTH_80:
++			case NL80211_CHAN_WIDTH_80P80:
++			case NL80211_CHAN_WIDTH_160:
++			case NL80211_CHAN_WIDTH_320:
++				break;
++			default:
++				return -EINVAL;
++			}
++
+ 			result = rdev_set_ap_chanwidth(rdev, dev, link_id,
+ 						       &chandef);
+ 			if (result)
 -- 
 2.43.0
 
