@@ -1,65 +1,60 @@
-Return-Path: <netdev+bounces-113421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D9593E327
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:26:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277FF93E32E
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4BD528206F
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:26:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 937561F21DB4
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB7D1A2553;
-	Sun, 28 Jul 2024 00:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7186B145A00;
+	Sun, 28 Jul 2024 00:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pw3VnC8M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G6YAG59h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CB01A254F;
-	Sun, 28 Jul 2024 00:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48AC41459F7;
+	Sun, 28 Jul 2024 00:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128161; cv=none; b=q0STCjEo3U8zKwka7EP6PhWo6cBVr9NE7LtI8gb9W5KIzRw6jrI4qljomCSEEmRV0ZvZRBdRJZpxyH+FGGxQltPndkslyK34ZFnmJk/BZKBx660BHwcoMMiI1PwO+6cpuW7CDXFZB5XxqVEEoSHDEb0w455DZXpEysDZiGYWgR4=
+	t=1722128169; cv=none; b=W+D/BYfEtsJaqYS2JlLVHIxSHKOi0BXMwws+RvYnuyWdcOSiCzx2cqNdo9hfVH561+Umfyw6b8VvBkMRbJrD4Oozs/KKRSJJ+pmU29q8PRkU8++BuQvpIfRArx0VgnEqzhnykoy43xNRRK7uAdzfPiXUGC2OnyqAW4CfgQoK+Mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128161; c=relaxed/simple;
-	bh=McGun3hKDWWG76yQinsdnDyfqiYmyzSUv0CHoagLixw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jnh1edrPQvydOYAUby8UuewPYmJ8mhOJ2JigdPIrWejgoukQ9jBRqc0kSfNyAlJ6Jxck0HmQvlmjGX49ENa1WPuS+f8xor0BUFoMqe0ThpIIT5Ji+sBOikK1c2hwGk6ukNbGi3ik9Or3VaFsXLoAWpKZsHILViqqKCPTjVBWZVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pw3VnC8M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA36C4AF09;
-	Sun, 28 Jul 2024 00:55:59 +0000 (UTC)
+	s=arc-20240116; t=1722128169; c=relaxed/simple;
+	bh=gy6QXuiiN10NZUo5qJCimcvef+4IP+hu4ho2/sIyk88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XKde2vJqAkGiq60KtKydnNu4MfWlZQlkE8+nd/nQwFrZo2IvKITAjSZYag6yX+adMIQM2XPNQRRz03V5H0aaZ4Bv2Nx9ej/7kHaykJ9qiwlJe/wgwTgn5/Q+qonFemL48KDuStiBguMFghoRWoOjY9cRC5ekq5j7rd6JCAatMzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G6YAG59h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0CA2C32781;
+	Sun, 28 Jul 2024 00:56:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128161;
-	bh=McGun3hKDWWG76yQinsdnDyfqiYmyzSUv0CHoagLixw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Pw3VnC8MpCW2tIuoDWN3ngYZQrjbPnTWMVBz0aU9V4FxjCKvmhVG5h6HzAeQv9gff
-	 2wBcNlOp/u95sQYfvHYClCQOitFhoQtGlhdtEgD1ipbHWXTO25yxk/Cd77U3MCkUMA
-	 h1+FW8Wp6ObCiyxynvipbJNSIaxRbZUmlbFI75nApM1itHHkMvUnKuDCZlFDHcaKfJ
-	 eQy2NHpHwPW5aDjh489QedvKis6sB84I2uDDHaNIGQDs2BfPi50GscY72eUneg6lBT
-	 8KTwvRrE59WcdPizIkBZwSjjKm9E4LlgP7+lH26gcCAYZ+SwdWyXGYYVfQ5REN6T9K
-	 F/s+3PNXDQ9/A==
+	s=k20201202; t=1722128169;
+	bh=gy6QXuiiN10NZUo5qJCimcvef+4IP+hu4ho2/sIyk88=;
+	h=From:To:Cc:Subject:Date:From;
+	b=G6YAG59hhNbr9MbPKStP7hGbXx7i37TuLkZTXdq5W446DziW+GuVcbA6LRWrnXecf
+	 rcANihc9ydUCnRmt61rbcefSZXbrwiVpm6unCnibTj6+KFiSwZ+WmGie+DpAqwogBk
+	 nJbRfUbTff0jmFfOKuYljfr4xeHbv4hoje7Qx56TuuZoUvrTqXZnayxue90oiR04Ai
+	 O3muesFq0VI5Qk28owBJCvgs8ho6D6dtvNMCTyfbDWS4XfPbQbGBuX0fHf5eqlfDxa
+	 rrXuCDurFIuWjSa/jhUzVa/W/Pto/cR+49bUg6PE4qulM5dqVCSU0STQwfScaAjQkb
+	 zZRgYZeoOr9zA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
+	nic_swsd@realtek.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 5/6] wifi: nl80211: don't give key data to userspace
-Date: Sat, 27 Jul 2024 20:55:46 -0400
-Message-ID: <20240728005549.1734443-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 1/6] r8169: remove detection of chip version 11 (early RTL8168b)
+Date: Sat, 27 Jul 2024 20:55:58 -0400
+Message-ID: <20240728005606.1735387-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240728005549.1734443-1-sashal@kernel.org>
-References: <20240728005549.1734443-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,56 +63,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.164
+X-stable-base: Linux 5.10.223
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
 
-[ Upstream commit a7e5793035792cc46a1a4b0a783655ffa897dfe9 ]
+[ Upstream commit 982300c115d229565d7af8e8b38aa1ee7bb1f5bd ]
 
-When a key is requested by userspace, there's really no need
-to include the key data, the sequence counter is really what
-userspace needs in this case. The fact that it's included is
-just a historic quirk.
+This early RTL8168b version was the first PCIe chip version, and it's
+quite quirky. Last sign of life is from more than 15 yrs ago.
+Let's remove detection of this chip version, we'll see whether anybody
+complains. If not, support for this chip version can be removed a few
+kernel versions later.
 
-Remove the key data.
-
-Reviewed-by: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://patch.msgid.link/20240627104411.b6a4f097e4ea.I7e6cc976cb9e8a80ef25a3351330f313373b4578@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Link: https://lore.kernel.org/r/875cdcf4-843c-420a-ad5d-417447b68572@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/nl80211.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index d758ec5655892..9ff4c8f1a1829 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -4137,10 +4137,7 @@ static void get_key_callback(void *c, struct key_params *params)
- 	struct nlattr *key;
- 	struct get_key_cookie *cookie = c;
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index d24eb5ee152a5..7d3443ad8e797 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -2018,7 +2018,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
+ 		/* 8168B family. */
+ 		{ 0x7cf, 0x380,	RTL_GIGA_MAC_VER_12 },
+ 		{ 0x7c8, 0x380,	RTL_GIGA_MAC_VER_17 },
+-		{ 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
++		/* This one is very old and rare, let's see if anybody complains.
++		 * { 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
++		 */
  
--	if ((params->key &&
--	     nla_put(cookie->msg, NL80211_ATTR_KEY_DATA,
--		     params->key_len, params->key)) ||
--	    (params->seq &&
-+	if ((params->seq &&
- 	     nla_put(cookie->msg, NL80211_ATTR_KEY_SEQ,
- 		     params->seq_len, params->seq)) ||
- 	    (params->cipher &&
-@@ -4152,10 +4149,7 @@ static void get_key_callback(void *c, struct key_params *params)
- 	if (!key)
- 		goto nla_put_failure;
- 
--	if ((params->key &&
--	     nla_put(cookie->msg, NL80211_KEY_DATA,
--		     params->key_len, params->key)) ||
--	    (params->seq &&
-+	if ((params->seq &&
- 	     nla_put(cookie->msg, NL80211_KEY_SEQ,
- 		     params->seq_len, params->seq)) ||
- 	    (params->cipher &&
+ 		/* 8101 family. */
+ 		{ 0x7c8, 0x448,	RTL_GIGA_MAC_VER_39 },
 -- 
 2.43.0
 
