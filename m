@@ -1,173 +1,128 @@
-Return-Path: <netdev+bounces-113392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABFD593E194
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 02:27:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5931F93E267
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67BE1281D0C
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 00:27:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA2FF1F218E1
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCEA517BA1;
-	Sun, 28 Jul 2024 00:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739B19475;
+	Sun, 28 Jul 2024 00:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ncN6SMDb"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC661E519;
-	Sun, 28 Jul 2024 00:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3C5B647;
+	Sun, 28 Jul 2024 00:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722126392; cv=none; b=sx8UEU2SUOjd2Ll8TlRHXDATthz+jcMIOMcKwaOL+2FvIZw8UMaW+8ZvV0rUgZVUmjtuNWLeFK7u4z6XD5z1H6PKR7Ymf1hVAvdarwes6t8vzJIiWfVxp8SYiKhcppEi8sUarrPvgi1A3uy9HtXgYSYg7+vuFVONpdPQS69cQjQ=
+	t=1722128013; cv=none; b=q7FXPUE0dhD37KjocrZWn8ZChGo51SssNqxBJtY22p+eLUQ5/0HQ9yPyUCQaAwjqytTGfwsw7k4CXugObPk2Eg/w+COvBaDisC9vTPJF9i0D1ACRe2/4WlriuTk54Sfe7RRrmpm3cAhvRiL8d/PJKZ7fmPQoEHlmdEzmNpng3jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722126392; c=relaxed/simple;
-	bh=rSiJD6CB325ZcboYhNJAZRZM+QHB/FdTNMAAaT83eAE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aH4HOGxsB8cTLNVa0mMiIT/t86bEDcvWZtNHRW26Q4pu3m7P5Zq56j549STVH2hb9yiULJ9YkZ8yRYTGK1JaxCfynZv2NhV/X+XZnJxR0PYEShR3gcq8pxLHfosgOcoGDuWGMCJ84swUE13F7yeP2u9Qp50254J4vPPwlCHJYQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WWj313BXCzxVXS;
-	Sun, 28 Jul 2024 08:26:21 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 856FB180064;
-	Sun, 28 Jul 2024 08:26:28 +0800 (CST)
-Received: from mscphis02103.huawei.com (10.123.65.215) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sun, 28 Jul 2024 08:26:26 +0800
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-To: <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-Subject: [RFC PATCH v1 9/9] samples/landlock: Support LANDLOCK_ACCESS_NET_LISTEN
-Date: Sun, 28 Jul 2024 08:26:02 +0800
-Message-ID: <20240728002602.3198398-10-ivanov.mikhail1@huawei-partners.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
-References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1722128013; c=relaxed/simple;
+	bh=c/ylGyDBTGC8cJxP38BzVvzNxAC5zQpdDkTVkqP6Uks=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pMFgXN63q/acTtf311lyD4WTNg96FMCpA+3LS2YBNjCUEV8K5bEz7LMFiEhzWO/iFFAJJRCxUjnAFOpGfRKyO0Og+haPwqWMyWS3+eZGO1dnJ5jXvFbVSLiiX10ggByYI7ymNqbzATurL9J959ENEa1NR8zT5hqahwb5lHKj/Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ncN6SMDb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EEE9C32781;
+	Sun, 28 Jul 2024 00:53:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722128012;
+	bh=c/ylGyDBTGC8cJxP38BzVvzNxAC5zQpdDkTVkqP6Uks=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ncN6SMDbizgOgj+WTIeqZntLf61iZp8ltGO43SAS0GtR6YqZtdSTZnK8x5lBVv/au
+	 X0c3CyzFe1U+fS0Fk2yA2mmtcAiVrXo86seEkYOarruWGw/JccUsHXdveZ8PTIDdjA
+	 vYN4CSHq+S+15fZ4gS0cxN7uC8/wlV4Q3G8nkOxJuLez8GvAEd2WmSGw9Fy/tSoP0j
+	 1iD/ETyADrcqpLIRuPcI01QRXj3I2eWBZ4hUNnTDa4w8di6SwZAKWeC0PKX1bUYrlM
+	 GHMaMI9wwpzr2ewciyDQ0DWTMYVCjI23E4+pwXvAFIW5BGUCFJj96LSeHJrsdkG27f
+	 A1DP9PuEdx8xQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 01/27] wifi: nl80211: disallow setting special AP channel widths
+Date: Sat, 27 Jul 2024 20:52:44 -0400
+Message-ID: <20240728005329.1723272-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.10.2
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100004.china.huawei.com (7.188.51.133) To
- dggpemm500020.china.huawei.com (7.185.36.49)
 
-Extend sample with TCP listen control logic.
+From: Johannes Berg <johannes.berg@intel.com>
 
-Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+[ Upstream commit 23daf1b4c91db9b26f8425cc7039cf96d22ccbfe ]
+
+Setting the AP channel width is meant for use with the normal
+20/40/... MHz channel width progression, and switching around
+in S1G or narrow channels isn't supported. Disallow that.
+
+Reported-by: syzbot+bc0f5b92cc7091f45fb6@syzkaller.appspotmail.com
+Link: https://msgid.link/20240515141600.d4a9590bfe32.I19a32d60097e81b527eafe6b0924f6c5fbb2dc45@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- samples/landlock/sandboxer.c | 31 ++++++++++++++++++++++++++-----
- 1 file changed, 26 insertions(+), 5 deletions(-)
+ net/wireless/nl80211.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-index e8223c3e781a..3f50cb3f8039 100644
---- a/samples/landlock/sandboxer.c
-+++ b/samples/landlock/sandboxer.c
-@@ -55,6 +55,7 @@ static inline int landlock_restrict_self(const int ruleset_fd,
- #define ENV_FS_RW_NAME "LL_FS_RW"
- #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
- #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
-+#define ENV_TCP_LISTEN_NAME "LL_TCP_LISTEN"
- #define ENV_DELIMITER ":"
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 72c7bf5585816..81d5bf186180f 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -3419,6 +3419,33 @@ static int __nl80211_set_channel(struct cfg80211_registered_device *rdev,
+ 			if (chandef.chan != cur_chan)
+ 				return -EBUSY;
  
- static int parse_path(char *env_path, const char ***const path_list)
-@@ -208,7 +209,7 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
- 
- /* clang-format on */
- 
--#define LANDLOCK_ABI_LAST 5
-+#define LANDLOCK_ABI_LAST 6
- 
- int main(const int argc, char *const argv[], char *const *const envp)
- {
-@@ -222,15 +223,16 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 	struct landlock_ruleset_attr ruleset_attr = {
- 		.handled_access_fs = access_fs_rw,
- 		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
--				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-+				      LANDLOCK_ACCESS_NET_CONNECT_TCP |
-+				      LANDLOCK_ACCESS_NET_LISTEN_TCP,
- 	};
- 
- 	if (argc < 2) {
- 		fprintf(stderr,
--			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
-+			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
- 			"<cmd> [args]...\n\n",
- 			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
--			ENV_TCP_CONNECT_NAME, argv[0]);
-+			ENV_TCP_CONNECT_NAME, ENV_TCP_LISTEN_NAME, argv[0]);
- 		fprintf(stderr,
- 			"Execute a command in a restricted environment.\n\n");
- 		fprintf(stderr,
-@@ -251,15 +253,19 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		fprintf(stderr,
- 			"* %s: list of ports allowed to connect (client).\n",
- 			ENV_TCP_CONNECT_NAME);
-+		fprintf(stderr,
-+			"* %s: list of ports allowed to listen (server).\n",
-+			ENV_TCP_LISTEN_NAME);
- 		fprintf(stderr,
- 			"\nexample:\n"
- 			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
- 			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
- 			"%s=\"9418\" "
- 			"%s=\"80:443\" "
-+			"%s=\"9418\" "
- 			"%s bash -i\n\n",
- 			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
--			ENV_TCP_CONNECT_NAME, argv[0]);
-+			ENV_TCP_CONNECT_NAME, ENV_TCP_LISTEN_NAME, argv[0]);
- 		fprintf(stderr,
- 			"This sandboxer can use Landlock features "
- 			"up to ABI version %d.\n",
-@@ -326,6 +332,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 	case 4:
- 		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
- 		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
-+		__attribute__((fallthrough));
-+	case 5:
-+		/* Removes LANDLOCK_ACCESS_NET_LISTEN support for ABI < 6 */
-+		ruleset_attr.handled_access_net &=
-+			~(LANDLOCK_ACCESS_NET_LISTEN_TCP);
- 
- 		fprintf(stderr,
- 			"Hint: You should update the running kernel "
-@@ -357,6 +368,12 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		ruleset_attr.handled_access_net &=
- 			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
- 	}
-+	/* Removes listen access attribute if not supported by a user. */
-+	env_port_name = getenv(ENV_TCP_LISTEN_NAME);
-+	if (!env_port_name) {
-+		ruleset_attr.handled_access_net &=
-+			~LANDLOCK_ACCESS_NET_LISTEN_TCP;
-+	}
- 
- 	ruleset_fd =
- 		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-@@ -380,6 +397,10 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 				 LANDLOCK_ACCESS_NET_CONNECT_TCP)) {
- 		goto err_close_ruleset;
- 	}
-+	if (populate_ruleset_net(ENV_TCP_LISTEN_NAME, ruleset_fd,
-+				 LANDLOCK_ACCESS_NET_LISTEN_TCP)) {
-+		goto err_close_ruleset;
-+	}
- 
- 	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
- 		perror("Failed to restrict privileges");
++			/* only allow this for regular channel widths */
++			switch (wdev->links[link_id].ap.chandef.width) {
++			case NL80211_CHAN_WIDTH_20_NOHT:
++			case NL80211_CHAN_WIDTH_20:
++			case NL80211_CHAN_WIDTH_40:
++			case NL80211_CHAN_WIDTH_80:
++			case NL80211_CHAN_WIDTH_80P80:
++			case NL80211_CHAN_WIDTH_160:
++			case NL80211_CHAN_WIDTH_320:
++				break;
++			default:
++				return -EINVAL;
++			}
++
++			switch (chandef.width) {
++			case NL80211_CHAN_WIDTH_20_NOHT:
++			case NL80211_CHAN_WIDTH_20:
++			case NL80211_CHAN_WIDTH_40:
++			case NL80211_CHAN_WIDTH_80:
++			case NL80211_CHAN_WIDTH_80P80:
++			case NL80211_CHAN_WIDTH_160:
++			case NL80211_CHAN_WIDTH_320:
++				break;
++			default:
++				return -EINVAL;
++			}
++
+ 			result = rdev_set_ap_chanwidth(rdev, dev, link_id,
+ 						       &chandef);
+ 			if (result)
 -- 
-2.34.1
+2.43.0
 
 
