@@ -1,142 +1,111 @@
-Return-Path: <netdev+bounces-113428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A2293E39A
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 06:27:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823B393E3E5
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 09:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82BB11F21A9E
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 04:27:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4A3AB21224
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 07:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF484A0F;
-	Sun, 28 Jul 2024 04:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41F48BEE;
+	Sun, 28 Jul 2024 07:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tcJVKpKQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LcpeouRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020F184D
-	for <netdev@vger.kernel.org>; Sun, 28 Jul 2024 04:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E118F77
+	for <netdev@vger.kernel.org>; Sun, 28 Jul 2024 07:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722140841; cv=none; b=BGh1vSvkBoL3SsF4pmTiNe51xa61g/9ikuZTRNnOfxYB4NiaHhFepvVprpK/ilki5B6wfcxxFV8GFJ1/KgFz0+a0RopZI/DAuH8+Tt9ul/Dkl+VWnjbtvXwEIx0evilintF6Z55A3hOiNvEBOvEOKWNMwvmZbYi7VQWU1hRlme8=
+	t=1722151073; cv=none; b=mI9DJyGM/+MTMQ0f52kl/nxYE6VFYcv13jGUZ4TDHdHN8o5KDKlU9iesELSZyEGlCsqUmydyICoXNvt+CSHvubX0qZg1+5L/w32b0Ohbr5tr2tHi1xJU2LVvXvZgRnzWXXMTGHeupMh89vEkLPDb/1U0VvSM709rHrW/1AhXLCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722140841; c=relaxed/simple;
-	bh=BOcM8tmyCAAculI+zJ+6c+V2gB7VcqR5BVAR3KEtv6c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FKKv5diH6bcY1AhmI018PTSsPObRoipR0/c8i5OhXhMRYpumobJN/b67zPX2Ix+EXklVfJG3j2T1rHjP28BRuvlH1s1zvL3XdYnJ4dhXJP3oQw5xwlVGeeMVfz9UD7viscDIzGzQU6imLuIzLxbvv7Tt5SP79f2hxIlqWe4Dido=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tcJVKpKQ; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <44d1a208-684a-4c68-a4a6-41d906e87585@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722140834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XeAy6C8eRQGE7CjcN7IRLLJ5CefJdaKGthvc1ioEWgY=;
-	b=tcJVKpKQW4pQuLdJ45hddRbJhmmZzep31UpRK+QLlS2/B58L1tsvaZ9bfQxgu98NMBhCxJ
-	oZeIl9B1LTv5HXjFfFZ77nlRjyyusHv4EbxLqW9/IBeieLzUxKplqwrM/CEi+30WxVvEWE
-	acejUboE2kEr7X8wIoYTCzY5hcDoneM=
-Date: Sat, 27 Jul 2024 21:27:02 -0700
+	s=arc-20240116; t=1722151073; c=relaxed/simple;
+	bh=L/vP++2fNxukTqTPfdVfAtZlBGmhZnx20GXKKd9M1nI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPi0ee8MtcqTOwHeBAlZ5uaY1m3Vad1LG1BrgfKhyaDcjh4tlrY7W1BlJ9PUjUHIkYlb820V4tZwRTf+d1d2asMVj2d+pBi2BfD4EGUbYBJ+9SgzvruDkj62TBonlV3br4oS4EntIlIJ/POMBDUdBGc6c7aOfwE2vSBpJU160H4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LcpeouRE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA72CC116B1;
+	Sun, 28 Jul 2024 07:17:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722151073;
+	bh=L/vP++2fNxukTqTPfdVfAtZlBGmhZnx20GXKKd9M1nI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LcpeouREalGwXicLKnZHXB+7RYX6bcWcqwzIOBYA/XSZQDc04sf2n/9VfQ/sF9WmI
+	 2tMtMj0E8bOMPUawyOAodBh5u9pMFw5Dl/u7cEePS6t8WrXB+PNj5/W7G58UoqxP4T
+	 MU78FkxXg7V2Pg/yWm8ZMXnWwSzINMK4tiuICWGrnIJwCncpKxtoT/sQClYrKogaWK
+	 a8qJbC03euAdA5yj64UtS4YuLh9kpQGVpoWYuBgiejF6o3Uvq760f1QqqptYOab2nE
+	 6U0Ani/eOsc01KTi0p8xFijNUma+/ah+Z5X9ygLhCHvnwE8+6tq/1NoDzsNtxdk5bN
+	 3rcb6tbe6lSOA==
+Date: Sun, 28 Jul 2024 08:17:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Patrick Rohr <prohr@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Linux Network Development Mailing List <netdev@vger.kernel.org>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>,
+	David Lamparter <equinox@opensourcerouting.org>
+Subject: Re: [PATCH net-next] Add support for PIO p flag
+Message-ID: <20240728071746.GB1625564@kernel.org>
+References: <20240726010629.111077-1-prohr@google.com>
+ <20240726102318.GN97837@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf] selftests/bpf: Filter out _GNU_SOURCE when compiling
- test_cpp
-To: Stanislav Fomichev <sdf@fomichev.me>, Jakub Kicinski <kuba@kernel.org>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org
-References: <20240725214029.1760809-1-sdf@fomichev.me>
- <CAEf4BzYonHCyFr7ivRDDUtsJY3MEgWRKwVZ=N0sWjpMrn1dR6A@mail.gmail.com>
- <20240726181020.19bca47d@kernel.org> <ZqRqXYljLTSKaFwz@mini-arch>
-Content-Language: en-GB
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <ZqRqXYljLTSKaFwz@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240726102318.GN97837@kernel.org>
 
+On Fri, Jul 26, 2024 at 11:23:18AM +0100, Simon Horman wrote:
+> On Thu, Jul 25, 2024 at 06:06:29PM -0700, Patrick Rohr wrote:
+> > draft-ietf-6man-pio-pflag is adding a new flag to the Prefix Information
+> > Option to signal the pd-per-device addressing mechanism.
+> > 
+> > When accept_pio_pflag is enabled, the presence of the p-flag will cause
+> > an a flag in the same PIO to be ignored.
+> > 
+> > An automated test has been added in Android (r.android.com/3195335) to
+> > go along with this change.
+> > 
+> > Cc: Maciej Żenczykowski <maze@google.com>
+> > Cc: Lorenzo Colitti <lorenzo@google.com>
+> > Cc: David Lamparter <equinox@opensourcerouting.org>
+> > Signed-off-by: Patrick Rohr <prohr@google.com>
+> 
+> Hi Patrick,
+> 
+> This is not a full review, and as per the form letter below,
+> net-next is closed, so you'd be best to repost.
+> But I will offer some very minor review in the meantime.
+> 
+> Firstly, please seed the CC list for Networking patches
+> using get_maintainers.pl --git-min-percent 25 this.patch
+> 
+> Secondly, as noted inline, there are two cases of
+> mixed of tabs and spaces used for indenting in this patch.
+> 
+> ## Form letter - net-next-closed
+> 
+> The merge window for v6.11 has begun and therefore net-next is closed
+> for new drivers, features, code refactoring and optimizations.
+> We are currently accepting bug fixes only.
+> 
+> Please repost when net-next reopens after 15th July
 
-On 7/26/24 8:32 PM, Stanislav Fomichev wrote:
-> On 07/26, Jakub Kicinski wrote:
->> On Fri, 26 Jul 2024 17:45:06 -0700 Andrii Nakryiko wrote:
->>> or we could
->>>
->>> #ifndef _GNU_SOURCE
->>> #define _GNU_SOURCE
->>> #endif
->>>
->>> (though we have 61 places with that...) so as to not have to update
->>> every target in Makefile.
->> AFAIU we have -D_GNU_SOURCE= twice _in the command line args_ :(
->> One is from the Makefile which now always adds it to CFLAGS,
->> the other is "built-in" in g++ for some weird reason.
->>
->> FWIW I have added this patch to the netdev "hack queue" so no
->> preference any more where the patch lands :)
-> Yeah, it can't be fixed with an ifdef because the conflict happens a bit
-> earlier:
->
-> $ echo "int main(int argc, char *argv[]){return 0;}" > test.cpp
-> $ clang++ -Wall -Werror -D_GNU_SOURCE= test.cpp
-> In file included from <built-in>:454:
-> <command line>:1:9: error: '_GNU_SOURCE' macro redefined [-Werror,-Wmacro-redefined]
->      1 | #define _GNU_SOURCE
->        |         ^
-> <built-in>:445:9: note: previous definition is here
->    445 | #define _GNU_SOURCE 1
->        |         ^
+Sorry, I'm not sure why I wrote the 15th, I meant the 29th.
 
-The above _GNU_SOURCE definition is defined by clang itself in the very beginning
-of compilation.
-See https://github.com/llvm/llvm-project/blob/main/clang/lib/Basic/Targets/OSTargets.h
+> 
+> RFC patches sent for review only are welcome at any time.
+> 
+> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 
-// Linux target
-template <typename Target>
-class LLVM_LIBRARY_VISIBILITY LinuxTargetInfo : public OSTargetInfo<Target> {
-protected:
-   void getOSDefines(const LangOptions &Opts, const llvm::Triple &Triple,
-                     MacroBuilder &Builder) const override {
-     // Linux defines; list based off of gcc output
-     DefineStd(Builder, "unix", Opts);
-     DefineStd(Builder, "linux", Opts);
-     if (Triple.isAndroid()) {
-       Builder.defineMacro("__ANDROID__", "1");
-       this->PlatformName = "android";
-       this->PlatformMinVersion = Triple.getEnvironmentVersion();
-       const unsigned Maj = this->PlatformMinVersion.getMajor();
-       if (Maj) {
-         Builder.defineMacro("__ANDROID_MIN_SDK_VERSION__", Twine(Maj));
-         // This historical but ambiguous name for the minSdkVersion macro. Keep
-         // defined for compatibility.
-         Builder.defineMacro("__ANDROID_API__", "__ANDROID_MIN_SDK_VERSION__");
-       }
-     } else {
-         Builder.defineMacro("__gnu_linux__");
-     }
-     if (Opts.POSIXThreads)
-       Builder.defineMacro("_REENTRANT");
-     if (Opts.CPlusPlus)
-       Builder.defineMacro("_GNU_SOURCE");
-     if (this->HasFloat128)
-       Builder.defineMacro("__FLOAT128__");
-   }
 ...
-
-This caused a conflict with -D_GNU_SOURCE= and hence compilation failure.
-
-> 1 error generated.
-
 
