@@ -1,134 +1,245 @@
-Return-Path: <netdev+bounces-113444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB1C093E5D4
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 17:24:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C6093E5D8
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 17:25:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5259CB21215
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 15:24:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EF971C20D47
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 15:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D2C54F87;
-	Sun, 28 Jul 2024 15:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1835579F;
+	Sun, 28 Jul 2024 15:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcT+0eM8"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="ARsgzPLb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28A451C4A
-	for <netdev@vger.kernel.org>; Sun, 28 Jul 2024 15:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F35651C4A;
+	Sun, 28 Jul 2024 15:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722180245; cv=none; b=lsnlzRYyllSLl0BTPXD5QyHGbIU9khap/RtBq+fmZY1LZ9K+L/MBfbLbfvNjoqJ0zjNckk1CXjKgS58fRAmDFxdeoKdoINa/j7U206cGlJqsGSaQRNGdJEBtIQ2oxSqDoeLdJWUZFzsFJRii4QBq/2Hpk1qvXtf5RviW2dmeEsM=
+	t=1722180332; cv=none; b=FQZFWP9qy9oyWBQkRm9xQ6IFbYlIgyWrhO2ww6MejWOSa+yobrBulcnGpUf0a/a6OuFJKrwtyhhBdbmV7kWECrTz44Z/nvbDbUw4KeHRij4VsAn2+VMMWvZZzPcNbf+88yCi7EzHEQMxXsPOOkHBdk0WSex6NJDUVy0GxbA7fVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722180245; c=relaxed/simple;
-	bh=IOwAsnqgHoluJc7mNb67jddHNZA6RYbBXNw2KHo1ji0=;
+	s=arc-20240116; t=1722180332; c=relaxed/simple;
+	bh=1lYBQGG8moxKN7/q76StXNUzjauAN7KnFu8eF9QNYrw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JS8jX7JSmf0lgz2QuulwXzNo4JnzBIfgL7pMu/qovvIuzyHOMvoEC1MA8LpXqkDflX7GlYBI1CHoPwGXjXW294MUe7ZWfIjaeEOA6UP0be/awncuXp6p0eIAuct35UPtGEFkkynbt65OrEP18M/N7hry6VZ9Qpo4RhIKhV+1owY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dcT+0eM8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722180242;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5bC7CjlZdsdHI4lvHiT2ExOZBWJ7XMhmuhfoptCNZqw=;
-	b=dcT+0eM8BW7APhf0SQlvSFgEGeGTGM2vi8sD/0ZaVLUCS96cyeSh5EAC6kCj6QYNaxx/WI
-	Afl6CtwiI08M/Tf1qwzRF1Pq9MnTpfkALAjRMU7knEbxZ2w1eWQBnxN9KIljmvF17lEMZ5
-	kixlI7Ox6S1Mzcht22PUMcTldXuNNXU=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-458-Wp9W9VZzPcu0lKDttQsw0g-1; Sun, 28 Jul 2024 11:24:00 -0400
-X-MC-Unique: Wp9W9VZzPcu0lKDttQsw0g-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ef31dbc770so26663631fa.1
-        for <netdev@vger.kernel.org>; Sun, 28 Jul 2024 08:24:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722180239; x=1722785039;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5bC7CjlZdsdHI4lvHiT2ExOZBWJ7XMhmuhfoptCNZqw=;
-        b=PkVAqACaIGn3Qs7WQtn6/siohONsL6s4JogaLMYKbKoMHqdBLySqmJ1A4JLwVE/dy9
-         KDc/L2+gHpgkd9MLylNQ+5yxaHSdJU4KiBCR5TUmo5WrvIUFhye2HZvBf74Xce8M4wZU
-         c7KmJT2skVAcGKYt60YMlstV5iLZpzxgHGMPN1E/sNYVlWKODTp0Z1jtWIcGHjhlj3aB
-         Lf0mlxibRb33njxFhlbDCLiVZbjSERCDlTKYy+k7CzfMrPnVoi26BwyZViCEcrkWi4mY
-         kc+rOsTVB//nPqO31hp8oI4tDa2Wo91XpumwWqNAFxFWZM6HmwucJcrwujbWAcdi61qK
-         TOaw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwruew/A+pfDyupUEhoJQ22oE2+dOY2D35nUgwo23Wt2V9Y297ZosuLobD927RuYvs+kvUiBtQmZIBpdcd6TeVbnXDlAyR
-X-Gm-Message-State: AOJu0Yz8wyw0h/s/1m0RUCkqwk2+l5wHWJaOAZR56Ham3IpnVWwCibCo
-	2/dw68YByNOoNftjFzbI2FzYoCfzRZhqLrC4QEgQTH635DjANOlQHAU6WuvTNL2OA+OmrqPoL1u
-	pDXv66zwqaLN7IA7buzKF8JSua4NnDE7WcP4iZRH8azlRGKUBkXOYAQ==
-X-Received: by 2002:a2e:be22:0:b0:2ef:1c0a:9b94 with SMTP id 38308e7fff4ca-2f12edfddc0mr34329431fa.16.1722180238924;
-        Sun, 28 Jul 2024 08:23:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEU13tBt+N37F7ob3Jx0ruuvo8+dsNp9muZtzaqjHOl31gS3qTrnO0jECcjoxvWesNrjNQyHQ==
-X-Received: by 2002:a2e:be22:0:b0:2ef:1c0a:9b94 with SMTP id 38308e7fff4ca-2f12edfddc0mr34329181fa.16.1722180238084;
-        Sun, 28 Jul 2024 08:23:58 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:55d:98c4:742e:26be:b52d:dd54])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428054b9196sm147521925e9.0.2024.07.28.08.23.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jul 2024 08:23:57 -0700 (PDT)
-Date: Sun, 28 Jul 2024 11:23:49 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Peter Hilber <peter.hilber@opensynergy.com>,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
-	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
-	"Luu, Ryan" <rluu@amazon.com>,
-	"Chashper, David" <chashper@amazon.com>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"Christopher S . Hall" <christopher.s.hall@intel.com>,
-	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
-	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-Message-ID: <20240728111746-mutt-send-email-mst@kernel.org>
-References: <20240725081502-mutt-send-email-mst@kernel.org>
- <f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org>
- <20240725082828-mutt-send-email-mst@kernel.org>
- <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org>
- <20240725083215-mutt-send-email-mst@kernel.org>
- <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org>
- <20240726174958.00007d10@Huawei.com>
- <811E8A25-3DBC-452D-B594-F9B7B0B61335@infradead.org>
- <20240728062521-mutt-send-email-mst@kernel.org>
- <9817300C-9280-4CC3-B9DB-37D24C8C20B5@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HCFZ2LEOu2cx9Hl3x+AMAYb4Umaj7IQgke3FtEZbAlat1t8AyzjbNVhlyTz41vP63ooR/3z96zqH6p5Q9d4uLRpjTz42uojvIOuFFdlmLVfpPEXmjf1CnySSRYehxNVLcu5Z6CV3+o6a7c+zoTGQBwjm3Yki0c7AZ7zk0XSevHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=ARsgzPLb; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id CE4EE63F;
+	Sun, 28 Jul 2024 17:24:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1722180283;
+	bh=1lYBQGG8moxKN7/q76StXNUzjauAN7KnFu8eF9QNYrw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ARsgzPLb0vixGR7M58ijBvuxpnal+fuoq91sod0Y0VmG4Cs7PNZ5wn73vAxFTE3r3
+	 dNWxCWK1f7aUE26a7J2MwZf4SpGh5VUA765foerEwahW1QPAdnpbjSSI6JFTlZ0DoJ
+	 ZkSv2+VZ2C2tLHMHpmbjmq1guBDKPbq+Wwl3fz8c=
+Date: Sun, 28 Jul 2024 18:25:09 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240728152509.GC30973@pendragon.ideasonboard.com>
+References: <20240724200012.GA23293@pendragon.ideasonboard.com>
+ <a75782218f34ae3cff725cbcfb321527f6aa2e14.camel@HansenPartnership.com>
+ <20240725193125.GD14252@pendragon.ideasonboard.com>
+ <20240725194314.GS3371438@nvidia.com>
+ <20240725200703.GG14252@pendragon.ideasonboard.com>
+ <CAPybu_0C44q+d33LN8yKGSyv6HKBMPNy0AG4LkCOqxc87w3WrQ@mail.gmail.com>
+ <20240726124949.GI32300@pendragon.ideasonboard.com>
+ <20240726131106.GW3371438@nvidia.com>
+ <20240726142217.GF28621@pendragon.ideasonboard.com>
+ <CAPybu_3+J-e-s2+3KV51Nc4Z1rys98xnN6p_0xXkdag-no09JQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9817300C-9280-4CC3-B9DB-37D24C8C20B5@infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPybu_3+J-e-s2+3KV51Nc4Z1rys98xnN6p_0xXkdag-no09JQ@mail.gmail.com>
 
-On Sun, Jul 28, 2024 at 02:07:01PM +0100, David Woodhouse wrote:
-> On 28 July 2024 11:37:04 BST, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >Glad you asked :)
+On Fri, Jul 26, 2024 at 05:43:21PM +0200, Ricardo Ribalda Delgado wrote:
+> On Fri, Jul 26, 2024 at 4:22 PM Laurent Pinchart wrote:
+> > On Fri, Jul 26, 2024 at 10:11:06AM -0300, Jason Gunthorpe wrote:
+> > > On Fri, Jul 26, 2024 at 03:49:49PM +0300, Laurent Pinchart wrote:
+> > >
+> > > > What is not an option exactly in my description above ? We have multiple
+> > > > V4L2 drivers for ISPs. They receive ISP parameters from userspace
+> > > > through a data buffer. It's not allowed to be opaque, but it doesn't
+> > > > prevent vendor closed-source userspace implementations with additional
+> > > > *camera* features, as long as the *hardware* features are available to
+> > > > everybody.
+> > >
+> > > How far do you take opaque?
+> > >
+> > > In mlx5 we pass command buffers from user to kernel to HW and the
+> > > kernel does only a little checking.
+> >
+> > I won't comment on the mlx5 case in particular, I don't have enough
+> > knowledge to do so.
+> >
+> > When it comes to validation of commands by the kernel, at the very least
+> > the kernel driver needs to be able to guarantee safety. For instance,
+> > that means that any command that can result in DMA operations need to be
+> > validated (e.g. verifying buffer addresses and sizes) and/or executed
+> > partly by the driver (e.g. mapping a buffer through an IOMMU), depending
+> > on hardware constraints.
+> >
+> > > There is a 12kloc file describing the layout of alot of commands:
+> > > include/linux/mlx5/mlx5_ifc.h
+> > >
+> > > There is an open PDF describing in detail some subset of this:
+> > > https://network.nvidia.com/files/doc-2020/ethernet-adapters-programming-manual.pdf
+> > >
+> > > There are in-kernel implementations driving most of those commands.
+> >
+> > For camera ISPs, most of the "commands" wouldn't be driven by the
+> > kernel. I don't have expectations when it comes to what commands the
+> > kernel exercises directly, I think that highly depends on the device
+> > type.
+> >
+> > > Other commands are only issued by userspace, and we have open source
+> > > DPDK, rdma-core and UCX implementations driving them.
+> > >
+> > > ie, this is really quite good as far as a device providing open source
+> > > solutions goes.
+> > >
+> > > However, no doubt there is more FW capability and commands than even
+> > > this vast amount documents - so lets guess that propritary code is
+> > > using this interface with unknown commands too.
+> > >
+> > > From a camera perspective would you be OK with that? Let's guess that
+> > > 90% of use cases are covered with fully open code. Do we also need to
+> > > forcefully close the door to an imagined 10% of proprietary cases just
+> > > to be sure open always wins?
+> >
+> > For command buffers interpreted by a firmware, it would be extremely
+> > difficult, if not impossible, to ensure that nothing undocumented is
+> > possible to access from userspace. I think we have two issues here, one
+> > of them is to define what we required to be openly accessible, and the
+> > other to avoid vendors cheating by claiming to be more open than they
+> > actually are.
+> >
+> > I believe the latter can't be solved technically. At the end of the day
+> > it's a matter of trust, and the only option I can see is to build that
+> > trust with the vendors, and to make it clear that breaches of trust will
+> > have consequences. A vendor that deliberately lies would end up on my
+> > personal backlist for as long as they don't implement structural
+> > solutions to be a better player in the ecosystem. What is acceptable as
+> > consequences is for the communities to decide. We have previously banned
+> > people or organizations from contributing to the kernel for certain
+> > periods of time (the University of Minnesota case comes to my mind for
+> > instance), and other options can be considered too.
+> >
+> > As for the first issue, I think it's a difficult one as it is very
+> > difficult to quantify the features covered by open implementations, as
+> > well as their importance. You could have a 99% open command set where
+> > the 1% would impact open implementations extremely negatively, the same
+> > way you could have a 50% open command set where the other 50% isn't of
+> > any use to anyone but the vendor (for instance used to debug the
+> > firmware implementation).
 > 
-> Heh, I'm not sure I'm so glad. Did I mention I hate ACPI? Perhaps it's still not too late for me just to define a DT binding and use PRP0001 for it :)
+> It is not that difficult. You just have to define what an acceptable
+> implementation is. Eg
 > 
-> >Long story short, QEMUVGID is indeed out of spec, but it works
-> >both because of guest compatibility with ACPI 1.0, and because no one
-> >much uses it.
-> 
-> 
-> I think it's reasonable enough to follow that example and use AMZNVCLK (or QEMUVCLK, but there seems little point in both) then?
+> - Sharpness at specific light.
+> - Time of convergence for the Auto algorithms
+> - Noise ratio
 
-I'd stick to spec. If you like puns, QEMUC10C maybe?
+Those may just be bad examples, but I think they showcase how little
+these discussions are based on technical expertise and facts. Just
+singling out one example, the convergence time is driven by the
+userspace implementation of the ISP control algorithms. That is *not*
+something we want to force vendors to disclose. It isn't related to the
+ISP parameters and the UAPI the driver exposes to userspace.
 
+> We could even use the SoftISP implementation as reference. Is this ISP
+> working better or worse than SoftISP?
+> 
+> > For cameras, the feature set can I believe be expressed in terms of ISP
+> > processing blocks that are usable by open implementations, as well as in
+> > terms of the type of usage of those features. For instance, is it
+> > acceptable that a vendor documents how to use 2D noise reduction but
+> > makes 3D (temporal) noise reduction available only to close-source
+> > userspace ? My personal answer is no. I want to aim for very close to
+> > 100% of the features, and certainly 100% of the "large" features. I can
+> > close my eyes on features that are very very niche, but what is niche
+> > today may not be tomorrow. For instance, if a camera ISP implements a
+> > feature used only for very specific camera sensors targetted at
+> > autonomous driving in a new generation of research prototypes that only
+> > one company has access to, I'll be inclined to ignore that. That
+> > technology may however become much more mainstream 5 years later.
+> 
+> We can update our requirements in 5 years. Nothing is written in stone.
+
+That at least we agree on :-)
+
+> Also it is much easier to reverse engineer an open driver, with an
+> open userspace and a closed userspace than a close driver with a
+> closed userspace.
+
+Closed kernel drivers are a GPL violation. Do you have any example, or
+do you mean out-of-tree drivers ? I don't think out-of-tree vs. mainline
+drivers would make much difference when it comes to reverse engineering,
+if the mainline driver is just a pass-through driver.
+
+> > The other aspect is the type of usage of the features. For camera ISPs
+> > again, some parameters will be computed through a tuning process, and
+> > will be fixed for the lifetime of the camera. I want those parameters to
+> > be documented, to enable users to tune cameras for their own use cases.
+> > This is less important in some market segments, such as laptops for
+> > instance, but is crucial for embedded devices. This is an area where
+> > I've previously been called unreasonable, and I don't think that's fair.
+> > The tuned-and-immutable parameters are not plentiful, as most of the
+> > tuning results in data that needs to be combined with runtime
+> > information to compute ISP parameters, so the "this is for tuning only"
+> > argument doesn't hold as much as one may think. For real immutable
+> > parameters, a large number of them are related to image processing steps
+> > that are very common and found in most ISPs, such as lens shading
+> > correction or geometric distorsion correction. I don't see why we should
+> > let vendors keep those closed.
+> 
+> We don't have enough leverage for that kind of requirement.
+
+I very much disagree with that.
+
+> To be fair, we do not ask touchscreen manufacturers to document their
+> calibration files. Nor any other calibration file in the kernel.
+> 
+> The calibration file for me is like a firmware blob.
+
+It may be for you, but I don't think it is an accurate description for
+the rest of the industry.
+
+> > I'm sorry that this discussion is turning into something very
+> > camera-centric, but that's the relevant area I know best. I hope that
+> > discussing problems related to device pass-through in different areas in
+> > the open will help build a wider shared understanding of the problems,
+> > and hopefully help designing solutions by better taking into account the
+> > various aspects of the issues.
+> >
+> > > Does closing the door have to come at the cost of a technically clean
+> > > solution? Doing validation in the kernel to enforce an ideological
+> > > position would severely degrade mlx5, and would probably never really
+> > > be robust.
+
+-- 
+Regards,
+
+Laurent Pinchart
 
