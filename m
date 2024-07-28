@@ -1,66 +1,61 @@
-Return-Path: <netdev+bounces-113430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2E393E3E8
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 09:18:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5593F93E3F0
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 09:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3B59B212AD
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 07:18:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B81911F21958
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 07:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B03AD51;
-	Sun, 28 Jul 2024 07:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2C4B665;
+	Sun, 28 Jul 2024 07:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpMnS7YG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ts2ZuPXp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E085B2570;
-	Sun, 28 Jul 2024 07:18:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C2E2F28;
+	Sun, 28 Jul 2024 07:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722151113; cv=none; b=RtomcmTGXKdGqDLS4zyD8wWjJNhTJeUMh1H1P357wLwJQgowT8yjeXyXxEs9oa60DFpPEqH61ym9szEsiSqSAxDsijvveYpbr/GhI4HF2BWd7+ZDiUuD2Iems7OCo/UZ09dHXtJIrUekTwEG8bSCEvBvin/nXWj/otiMabhUiek=
+	t=1722152170; cv=none; b=samLuKY07BmqyH5f5AZYOpyA/w/BoEiprdEJg85Fr/X45eWxwkHTWwGHbznpure7T7RPMlP5BrdgwFa4tOsg+JK432RE+ATwMAH5qqU7csjDHDojTXnK/rd52hRXwkxpE7Q7D06YX9dSAGNF7GDX66Eq7Bs1GaiTttCAWHeJ8kM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722151113; c=relaxed/simple;
-	bh=sowjuugZXaxlM/D0SnpRi0wuYt0TKl1lXVH9UI1bHd0=;
+	s=arc-20240116; t=1722152170; c=relaxed/simple;
+	bh=mezLq94yiIGydGI/R4ADQ45+zD7di9Kk9mVKoDn9tPI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L2Iv24FGsDjVIhGlqbDEvEVtEin+vjjAsKpRF3cM4aFJSR99wYRt5CiwvC2GJXzr3+jI2h2B9+nsawjH/XL4ST/HEWBSp4Sn75H0kYUo9/KKxGl1+EWy3hmkyBb4sOJTLXXqpXGMoLPfXFK23gfITaJNCehCMo8E0cr3+2DD6Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpMnS7YG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCDF6C116B1;
-	Sun, 28 Jul 2024 07:18:24 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=F58qDHnvEQfrJFv+UEh2iiipj4pi2uxK3AOO6EcyidogOMZ2UZHBHDuAYozE/wtQE9azP1gT8QxLvjOesOwWGvkLtVwAu9MXnPewmXnulYv4BmYA7VYcgOJs6/scushv6Ixu+2eofoZtFGOpvFN/m87OwsQ9cyjSJm/NclDeQ9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ts2ZuPXp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 924D1C116B1;
+	Sun, 28 Jul 2024 07:36:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722151112;
-	bh=sowjuugZXaxlM/D0SnpRi0wuYt0TKl1lXVH9UI1bHd0=;
+	s=k20201202; t=1722152169;
+	bh=mezLq94yiIGydGI/R4ADQ45+zD7di9Kk9mVKoDn9tPI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QpMnS7YGlAahC1hLNy52G+1r8C5lA3r2WZXSjrY/s4xXVmq3Ly7pRSSF+O/YwyelT
-	 a7xQByMbRoAzBeG0ef/mIOdCqzgXo9iRifQaXsylYdhnnDHlrul3geiU35CdyvxgUX
-	 FA6FNTBSgOkRfjAICaWfMjQT7GNTwojsaJq+GYPPmgzvybGieiAJzEO4WW6bGIlZVE
-	 68RFU2g6uon4+YUgefrsTtXTHBsbOOr03Z2u5RW0JgYsXjKeIQzgNKiefk/NJrtLSR
-	 vM1vgrFn699O6b4SraT6lwk/ZZoYDuwHziOrsY2unukCkMUo/SFfz28cu66ymJGYYA
-	 YQ9DQXfDjNP8w==
-Date: Sun, 28 Jul 2024 08:18:21 +0100
+	b=ts2ZuPXpqLTwm34zq+xkgNdk+eDJfR+NTo58ryYw/rAH87a5Xs63fK7uNYAuQ+f4l
+	 +EdBbuQmlLeNACcgLnP1sL0EwzYcAq0/fuzzQty+5RoKB7f4binVt1a0wKZpGGmw7w
+	 ur6/ipyO9xK9ckidNYrCtuaY+xieKDsHIYhgVeJpZZuHyj2v0mF0ihlSHEjqcEuKzF
+	 tQSYxkhLzmaSkxkieK4/gQMKUA5whJm6HaR1k0cLN6idXipj6PM9Y/nFKLHhUm5jm4
+	 eCusO3OFnu4OtSw9NgNVmAu7ro79kcTtDU+oHZM8y/SIhP9MmIVOw3dJku6dhIAdhj
+	 +fOGOGCwX0tUg==
+Date: Sun, 28 Jul 2024 08:36:01 +0100
 From: Simon Horman <horms@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	andrew@lunn.ch, corbet@lwn.net, linux-doc@vger.kernel.org,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, devicetree@vger.kernel.org,
-	horatiu.vultur@microchip.com, ruanjinjie@huawei.com,
-	steen.hegelund@microchip.com, vladimir.oltean@nxp.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
-	Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch,
-	linux@bigler.io
-Subject: Re: [PATCH net-next v5 00/14] Add support for OPEN Alliance
- 10BASE-T1x MACPHY Serial Interface
-Message-ID: <20240728071821.GC1625564@kernel.org>
-References: <20240726123907.566348-1-Parthiban.Veerasooran@microchip.com>
- <20240726162451.GR97837@kernel.org>
+To: "Frank.Sae" <Frank.Sae@motor-comm.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	linux@armlinux.org.uk, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
+	xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com,
+	jie.han@motor-comm.com
+Subject: Re: [PATCH 2/2] net: phy: Add driver for Motorcomm yt8821 2.5G
+ ethernet phy
+Message-ID: <20240728073601.GD1625564@kernel.org>
+References: <20240727092031.1108690-1-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,43 +64,170 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240726162451.GR97837@kernel.org>
+In-Reply-To: <20240727092031.1108690-1-Frank.Sae@motor-comm.com>
 
-On Fri, Jul 26, 2024 at 05:24:51PM +0100, Simon Horman wrote:
-> On Fri, Jul 26, 2024 at 06:08:53PM +0530, Parthiban Veerasooran wrote:
-> > This patch series contain the below updates,
-> > - Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
-> >   net/ethernet/oa_tc6.c.
-> >   Link to the spec:
-> >   -----------------
-> >   https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
-> > 
-> > - Adds driver support for Microchip LAN8650/1 Rev.B1 10BASE-T1S MACPHY
-> >   Ethernet driver in the net/ethernet/microchip/lan865x/lan865x.c.
-> >   Link to the product:
-> >   --------------------
-> >   https://www.microchip.com/en-us/product/lan8650
+On Sat, Jul 27, 2024 at 02:20:31AM -0700, Frank.Sae wrote:
+>  Add a driver for the motorcomm yt8821 2.5G ethernet phy.
+>  Verified the driver on
+>  BPI-R3(with MediaTek MT7986(Filogic 830) SoC) development board,
+>  which is developed by Guangdong Bipai Technology Co., Ltd..
+>  On the board, yt8821 2.5G ethernet phy works in
+>  AUTO_BX2500_SGMII or FORCE_BX2500 interface,
+>  supports 2.5G/1000M/100M/10M speeds, and wol(magic package).
+>  Since some functions of yt8821 are similar to YT8521
+>  so some functions for yt8821 can be reused.
 > 
-> ...
-> 
-> This is not a review of this patchset, but to set expectations:
-> 
-> ## Form letter - net-next-closed
-> 
-> (Adapted from text by Jakub)
-> 
-> The merge window for v6.11 has begun and therefore net-next is closed
-> for new drivers, features, code refactoring and optimizations.
-> We are currently accepting bug fixes only.
-> 
-> Please repost when net-next reopens after 15th July.
+> Signed-off-by: Frank.Sae <Frank.Sae@motor-comm.com>
 
-Sorry, I'm not sure why I wrote the 15th, I meant the 29th.
+Hi Frank,
 
-> RFC patches sent for review only are welcome at any time.
+This is not a full review. And setting up expectations,
+as per the form letter below, net-next is currently closed.
+But nonetheless I've provided some minor review below.
+
+## Form letter - net-next-closed
+
+(Adapted from text by Jakub)
+
+The merge window for v6.11 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
+
+Please repost when net-next reopens after 29th July.
+
+RFC patches sent for review only are welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+
+pw-bot: defer
+
+> ---
+>  drivers/net/phy/motorcomm.c | 639 +++++++++++++++++++++++++++++++++++-
+>  1 file changed, 636 insertions(+), 3 deletions(-)
 > 
-> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-> --
-> pw-bot: defer
-> 
+> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+
+...
+
+> +/**
+> + * yt8821_probe() - read dts to get chip mode
+> + * @phydev: a pointer to a &struct phy_device
+> + *
+> + * returns 0 or negative errno code
+> + */
+
+nit: please document return values using a "Return:" or "Returns:" section.
+
+Flagged by W=1 allmodconfig builds and ./scripts/kernel-doc -none -Warn
+
+...
+
+> +/**
+> + * yt8821_config_init() - phy initializatioin
+> + * @phydev: a pointer to a &struct phy_device
+> + *
+> + * returns 0 or negative errno code
+> + */
+> +static int yt8821_config_init(struct phy_device *phydev)
+> +{
+> +	struct yt8821_priv *priv = phydev->priv;
+> +	int ret, val;
+> +
+> +	phydev->irq = PHY_POLL;
+> +
+> +	val = ytphy_read_ext_with_lock(phydev, YT8521_CHIP_CONFIG_REG);
+
+val is set here but otherwise unused.
+Should val be checked for an error here?
+
+Flagged by W=1 builds.
+
+> +	if (priv->chip_mode == YT8821_CHIP_MODE_AUTO_BX2500_SGMII) {
+> +		ret = ytphy_modify_ext_with_lock(phydev,
+> +						 YT8521_CHIP_CONFIG_REG,
+> +						 YT8521_CCR_MODE_SEL_MASK,
+> +						 FIELD_PREP(YT8521_CCR_MODE_SEL_MASK, 0));
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		__assign_bit(PHY_INTERFACE_MODE_2500BASEX,
+> +			     phydev->possible_interfaces,
+> +			     true);
+> +		__assign_bit(PHY_INTERFACE_MODE_SGMII,
+> +			     phydev->possible_interfaces,
+> +			     true);
+> +
+> +		phydev->rate_matching = RATE_MATCH_NONE;
+> +	} else if (priv->chip_mode == YT8821_CHIP_MODE_FORCE_BX2500) {
+> +		ret = ytphy_modify_ext_with_lock(phydev,
+> +						 YT8521_CHIP_CONFIG_REG,
+> +						 YT8521_CCR_MODE_SEL_MASK,
+> +						 FIELD_PREP(YT8521_CCR_MODE_SEL_MASK, 1));
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		phydev->rate_matching = RATE_MATCH_PAUSE;
+> +	}
+> +
+> +	ret = yt8821gen_init(phydev);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* disable auto sleep */
+> +	ret = yt8821_auto_sleep_config(phydev, false);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* soft reset */
+> +	yt8821_soft_reset(phydev);
+> +
+> +	return ret;
+> +}
+> +
+> +/**
+> + * yt8821_adjust_status() - update speed and duplex to phydev
+> + * @phydev: a pointer to a &struct phy_device
+> + * @val: read from YTPHY_SPECIFIC_STATUS_REG
+> + */
+> +static void yt8821_adjust_status(struct phy_device *phydev, int val)
+> +{
+> +	int speed_mode, duplex;
+> +	int speed_mode_low, speed_mode_high;
+> +	int speed = SPEED_UNKNOWN;
+
+nit: Please consider arranging local variables in reverse xmas tree order -
+     longest line to shortest.
+
+     This can be helpful: https://github.com/ecree-solarflare/xmastree
+
+> +
+> +	duplex = FIELD_GET(YTPHY_SSR_DUPLEX, val);
+> +
+> +	speed_mode_low = FIELD_GET(GENMASK(15, 14), val);
+> +	speed_mode_high = FIELD_GET(BIT(9), val);
+> +	speed_mode = FIELD_PREP(BIT(2), speed_mode_high) |
+> +			FIELD_PREP(GENMASK(1, 0), speed_mode_low);
+> +	switch (speed_mode) {
+> +	case YTPHY_SSR_SPEED_10M:
+> +		speed = SPEED_10;
+> +		break;
+> +	case YTPHY_SSR_SPEED_100M:
+> +		speed = SPEED_100;
+> +		break;
+> +	case YTPHY_SSR_SPEED_1000M:
+> +		speed = SPEED_1000;
+> +		break;
+> +	case YT8821_SSR_SPEED_2500M:
+> +		speed = SPEED_2500;
+> +		break;
+> +	default:
+> +		speed = SPEED_UNKNOWN;
+> +		break;
+> +	}
+> +
+> +	phydev->speed = speed;
+> +	phydev->duplex = duplex;
+> +}
+
+...
 
