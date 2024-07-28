@@ -1,124 +1,85 @@
-Return-Path: <netdev+bounces-113426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C833F93E35B
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:31:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB0993E368
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 04:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 892232849ED
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221DC1C21016
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 02:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE5A1AD40C;
-	Sun, 28 Jul 2024 00:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojVQnoVl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126101B86D2;
+	Sun, 28 Jul 2024 02:30:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AEA1AD407;
-	Sun, 28 Jul 2024 00:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66C9A35;
+	Sun, 28 Jul 2024 02:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128204; cv=none; b=jVoviOrGnH/L8uIfd9bO+ogNPWUEgZusaUvFrVsy78h/2LzpyD7mU8G9nQuBe6xPA6U5LBMvTw+HIFs3ZKR2IcI0BVJnc1kn0NsF3K/XGK0rIOFeHau3rUZpan0239kZsiR6p3dshjKre03SQhHrgV91Ki7woaJeM7anZe6iwz8=
+	t=1722133853; cv=none; b=RiKVmLTCJeq3BhV+UZ29Vzz2IxVUfptBDubKxFz4qTkKU4Ekck0n2apfdzOE0n+w1Nj3Cz/PNWUHbKLz76HXvCDlkmPQNqbDtNGLkABQyBXCQzQi4OCRjg3RS1CQZCqNHSphDX9kCYfJ9yrxYI+JYpZKrqsWqQdO4hg6KJKHp/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128204; c=relaxed/simple;
-	bh=qzdVVb2oStn+HphjoGBguQm7zZ4R8M3Kn0CKRXboWHM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OEXSvi7VltY1vZ+7Mhdm8Sk3Yruu3f+ngdZEDLgFapJCQKvSIivjyvpMFERaG8OkvxtwyZDphwWXjqMfDhLFuJ/Z9nnkt7fePgX5FhHT2oEwNbEJqXDE/MYyMb3pmevPw4fs/MkpY/B/6XHkDbBJyAAmz5JyqEtyzZF8wRoRWks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojVQnoVl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1B2C4AF07;
-	Sun, 28 Jul 2024 00:56:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128204;
-	bh=qzdVVb2oStn+HphjoGBguQm7zZ4R8M3Kn0CKRXboWHM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ojVQnoVlqwYbvEHW1gAeknpwcwsMUsz5RruTT6sc9DZQ/0LBqr7xgoteVsjcNee/A
-	 8hf6UmN4gy5CyIoDy/w7F39rYu+rkI2EJJYsZ7uGuzFzYTidGKDpYAGJTyRSUETz5N
-	 KpbRu78YWw18vZIUTB9VxUXAkKyRWoJvxGf24WMyhZx1UwkEfWgnU8mstf010cg8pm
-	 wCfMld2Glob3ySNgVB8R0eMu5iq+16Wbuf2PGYJUym0JU/Ei6ErmKG+hxfeA4vSZ78
-	 zgTOdYvSmBEut09P5P5yfSjayVfQBY+aTCxQ+pgoL9ds2frqv9Hw4apCgEQwf9ZXpI
-	 dV8Cfqh6RFqvg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 3/4] wifi: nl80211: don't give key data to userspace
-Date: Sat, 27 Jul 2024 20:56:37 -0400
-Message-ID: <20240728005638.1737527-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240728005638.1737527-1-sashal@kernel.org>
-References: <20240728005638.1737527-1-sashal@kernel.org>
+	s=arc-20240116; t=1722133853; c=relaxed/simple;
+	bh=Vw64+sDaBjrL18hyEYdJh4B8xCQlPvZgkjM+2GzjsJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nj9OeadTasN7+PxP74ApuJda/YO4e7q7dKSAX0czXSkm66v6TP6VdIHDTvV/Yn4PKip605FAn8yzhQv6TiLUvbZMVK8CWjCVk6hVOqTGiofDfdy5i+E9PeRjWAv227iAiWsLeVJP+OkSmnevDpiSn0W27acXHNK/Cax4BSSBasI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sXtgG-0000TG-D4; Sun, 28 Jul 2024 04:30:40 +0200
+Date: Sun, 28 Jul 2024 04:30:40 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, gnault@redhat.com,
+	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
+Subject: Re: [RFC PATCH net-next 2/3] netfilter: nft_fib: Mask upper DSCP
+ bits before FIB lookup
+Message-ID: <20240728023040.GA996@breakpoint.cc>
+References: <20240725131729.1729103-1-idosch@nvidia.com>
+ <20240725131729.1729103-3-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.319
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240725131729.1729103-3-idosch@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-From: Johannes Berg <johannes.berg@intel.com>
+Ido Schimmel <idosch@nvidia.com> wrote:
+>  void nft_fib4_eval_type(const struct nft_expr *expr, struct nft_regs *regs,
+>  			const struct nft_pktinfo *pkt)
+>  {
+> @@ -110,7 +108,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct nft_regs *regs,
+>  	if (priv->flags & NFTA_FIB_F_MARK)
+>  		fl4.flowi4_mark = pkt->skb->mark;
+>  
+> -	fl4.flowi4_tos = iph->tos & DSCP_BITS;
+> +	fl4.flowi4_tos = iph->tos & IPTOS_RT_MASK;
 
-[ Upstream commit a7e5793035792cc46a1a4b0a783655ffa897dfe9 ]
+I was confused because cover letter talks about allowing both tos or dscp depending on
+new nlattr for ipv4, but then this patch makes that impossible because dscp bits get masked.
 
-When a key is requested by userspace, there's really no need
-to include the key data, the sequence counter is really what
-userspace needs in this case. The fact that it's included is
-just a historic quirk.
+patch 3 says:
+----
+A prerequisite for allowing FIB rules to match on DSCP is to adjust all
+the call sites to initialize the high order DSCP bits and remove their
+masking along the path to the core where the field is matched on.
+----
 
-Remove the key data.
+But nft_fib_ipv4.c already does that.
 
-Reviewed-by: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://patch.msgid.link/20240627104411.b6a4f097e4ea.I7e6cc976cb9e8a80ef25a3351330f313373b4578@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/wireless/nl80211.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+So I would suggest to just drop this patch and then get rid of '&
+DSCP_BITS' once everything is in place.
 
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 15f28203445cb..ebd8449f2fcf1 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -3383,10 +3383,7 @@ static void get_key_callback(void *c, struct key_params *params)
- 	struct nlattr *key;
- 	struct get_key_cookie *cookie = c;
- 
--	if ((params->key &&
--	     nla_put(cookie->msg, NL80211_ATTR_KEY_DATA,
--		     params->key_len, params->key)) ||
--	    (params->seq &&
-+	if ((params->seq &&
- 	     nla_put(cookie->msg, NL80211_ATTR_KEY_SEQ,
- 		     params->seq_len, params->seq)) ||
- 	    (params->cipher &&
-@@ -3398,10 +3395,7 @@ static void get_key_callback(void *c, struct key_params *params)
- 	if (!key)
- 		goto nla_put_failure;
- 
--	if ((params->key &&
--	     nla_put(cookie->msg, NL80211_KEY_DATA,
--		     params->key_len, params->key)) ||
--	    (params->seq &&
-+	if ((params->seq &&
- 	     nla_put(cookie->msg, NL80211_KEY_SEQ,
- 		     params->seq_len, params->seq)) ||
- 	    (params->cipher &&
--- 
-2.43.0
-
+But feel free to handle this as you prefer.
 
