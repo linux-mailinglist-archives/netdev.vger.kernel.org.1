@@ -1,89 +1,120 @@
-Return-Path: <netdev+bounces-113382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C476293E172
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:29:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CBDE93E17A
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 02:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7715E281D33
-	for <lists+netdev@lfdr.de>; Sat, 27 Jul 2024 23:29:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AC1D1F216D4
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 00:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB8D548E0;
-	Sat, 27 Jul 2024 23:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KV+ZTvIq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB63C15CB;
+	Sun, 28 Jul 2024 00:26:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0F839FD8;
-	Sat, 27 Jul 2024 23:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03341A35;
+	Sun, 28 Jul 2024 00:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722122977; cv=none; b=O7IO6pOcRBiM1Bz4OfR/CvR2I8lViXIC1SBBGLw4LNObr/02HScwBFIHFAvqAJX1o0JkKzJFsBLE+9JNVNYuqFwuzcnND8cI7HfvF57ibA2HGToU3Rj7N582JyI4UZ7NzFsP2ugqWPZzzwOD0zV4CJbfEEqXiO1GfRSS3S8f3p4=
+	t=1722126383; cv=none; b=NwTV1bNbZq0xnprlVzWoV4WkF6/cwKYt/eOENKpgZFrewbw5YE+1cH5KOcn7ZlrKD9eEI5vtw6JPapYzv5E6ecKpdhYFT0gI7pJ6f2u4dBKrHbZ03wrnpGVFu+icL8KgjrDvIN0hbetrRYcrdkiBDvYtuXDOWSKndARGAFMkZvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722122977; c=relaxed/simple;
-	bh=dKHmD9TzO61V8LsScNepDdSQuLuFO3Ew+vfL4iPD3xY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f48TV4Nd1r9073cyo9ytSp6hjP7y/R/1PjaFYSpkqN2VFlQh5Rb1vll679g7EG+hLaJot7yTUld3a+rAN6VbfsqiP7QWgLmCTzvJLaopPj3oQ/9kYvSHneKffLZ5rj4iz57jNerA7VoE3AQLJTW3fTPPHbWako1Oq5wTeJCmdbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KV+ZTvIq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HaaAkZs/uXoGFjtpoKrvzxVCk50c7iJVjvXXtxRnZvg=; b=KV+ZTvIqOVoY7I4As9tQv8L1tn
-	819kw6gNFnL7wsEIITH63adMEz5Z+lDzxlnMIqs+OMJZ0ssoDi1PVNt6d0iSKQvwT3mMB/ZBKAbBo
-	OQRDYRZr5Lv23dV/Ztz5kkRkJcn1ubbuIaDHXsWznbC89pTb6oRhnDqKx4FlUoykyPIc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sXqqc-003Mmx-74; Sun, 28 Jul 2024 01:29:10 +0200
-Date: Sun, 28 Jul 2024 01:29:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	UNGLinuxDriver@microchip.com, davem@davemloft.net,
-	edumazet@google.com, f.fainelli@gmail.com,
-	gregkh@linuxfoundation.org, kuba@kernel.org,
-	linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, lucas.demarchi@intel.com,
-	masahiroy@kernel.org, mcgrof@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, woojung.huh@microchip.com
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
- module
-Message-ID: <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
-References: <bcc81ea0-78e1-476e-928c-b873a064b479@lunn.ch>
- <20240726121530.193547-1-jtornosm@redhat.com>
- <b96d9801-d370-4ddd-97fd-5eac2a2656f4@lunn.ch>
- <931b582808f237aa3746c5b0a96b3665@manjaro.org>
+	s=arc-20240116; t=1722126383; c=relaxed/simple;
+	bh=ro4bdkgBTJxXixVQhErz0ISyv4OySIyBHEcBU6aJXSE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A+n3lbeLsrBWbEK31SsV17UptHPRlTSzC4fnuK1ZMJjuAf149JKAo+TaySLyLdhIhEhQ1g6zQS/PmpWYo7BeaiIO+eqGrV4d8jirHnQULzxSJhcRwiG8LP4kc5tILMlDmJ/OAGG+oM5QqZjeqp+LpOehyqIHQdhuZsIY9YZMu8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WWj2j6DvNz1L9BQ;
+	Sun, 28 Jul 2024 08:26:05 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id A80131800D0;
+	Sun, 28 Jul 2024 08:26:12 +0800 (CST)
+Received: from mscphis02103.huawei.com (10.123.65.215) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sun, 28 Jul 2024 08:26:11 +0800
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+Subject: [RFC PATCH v1 0/9] Support TCP listen access-control
+Date: Sun, 28 Jul 2024 08:25:53 +0800
+Message-ID: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <931b582808f237aa3746c5b0a96b3665@manjaro.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mscpeml100004.china.huawei.com (7.188.51.133) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-> Before going into explaining my viewpoint, could someone, please, clarify
-> which LAN78xx USB-to-Ethernet bridge does this apply to?  I already had
-> a look at a few LAN78xx datasheets, and I'm not sure how the external PHY
-> becomes exposed over the USB interface, so it needs a driver.
+Hello! This is v1 RFC patch dedicated to restriction of listening sockets.
 
-https://elixir.bootlin.com/linux/v6.10/source/drivers/net/usb/lan78xx.c#L2049
+It is based on the landlock's mic-next branch on top of v6.10 kernel
+version.
 
-This is creating an MDIO bus device. The MDIO bus will be scanned and
-PHYs on the bus found. There are then a few calls to phy_find_first()
-which will get the PHY.
+Description
+===========
+LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
+ports to forbid a malicious sandboxed process to impersonate a legitimate
+server process. However, bind(2) might be used by (TCP) clients to set the
+source port to a (legitimate) value. Controlling the ports that can be
+used for listening would allow (TCP) clients to explicitly bind to ports
+that are forbidden for listening.
 
-The code itself looks pretty broken, it is directly accessing PHY
-registers, which a MAC driver should not do. That is a layering
-violation.
+Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+access right that restricts listening on undesired ports with listen(2).
 
-	Andrew
+It's worth noticing that this access right doesn't affect changing 
+backlog value using listen(2) on already listening socket. For this case
+test ipv4_tcp.double_listen is provided.
+
+Closes: https://github.com/landlock-lsm/linux/issues/15
+
+Code coverage
+=============
+Code coverage(gcov) report with the launch of all the landlock selftests:
+* security/landlock:
+lines......: 93.4% (759 of 813 lines)
+functions..: 95.3% (101 of 106 functions)
+
+* security/landlock/net.c:
+lines......: 100% (77 of 77 lines)
+functions..: 100% (9 of 9 functions)
+
+Mikhail Ivanov (9):
+  landlock: Refactor current_check_access_socket() access right check
+  landlock: Support TCP listen access-control
+  selftests/landlock: Support LANDLOCK_ACCESS_NET_LISTEN_TCP
+  selftests/landlock: Test listening restriction
+  selftests/landlock: Test listen on connected socket
+  selftests/landlock: Test listening without explicit bind restriction
+  selftests/landlock: Test listen on ULP socket without clone method
+  selftests/landlock: Test changing socket backlog with listen(2)
+  samples/landlock: Support LANDLOCK_ACCESS_NET_LISTEN
+
+ include/uapi/linux/landlock.h                |  23 +-
+ samples/landlock/sandboxer.c                 |  31 +-
+ security/landlock/limits.h                   |   2 +-
+ security/landlock/net.c                      | 131 +++++-
+ security/landlock/syscalls.c                 |   2 +-
+ tools/testing/selftests/landlock/base_test.c |   2 +-
+ tools/testing/selftests/landlock/config      |   1 +
+ tools/testing/selftests/landlock/net_test.c  | 448 +++++++++++++++----
+ 8 files changed, 519 insertions(+), 121 deletions(-)
+
+-- 
+2.34.1
+
 
