@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-113395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D711F93E277
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:07:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D82893E27E
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67CE3B2352D
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:07:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C24241F20FC8
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C969874429;
-	Sun, 28 Jul 2024 00:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A34D78C75;
+	Sun, 28 Jul 2024 00:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fviJlMum"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pTeDtkhc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A88E7406F;
-	Sun, 28 Jul 2024 00:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C6BEAD2;
+	Sun, 28 Jul 2024 00:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128021; cv=none; b=iNGQrZoLCX+s8uOY23JVAVGolB7wdqWPvZq2pKZL6wJQ4oyn01LgyvxY+2rMBXgZQxED89EW6RxAM4bY6xyl/kvYHUPCkbFQL5yBM2uK39qYIoR8uGQ1I3yuvH4d4+9ZjcfdXhgxziMFbSflp9NbsLlu9JWpY75nMH6fONci+wI=
+	t=1722128030; cv=none; b=JFWGAJci4vkB6JFjuP06n6MRX+KfiWDjtICnnyFAt2ArWhsL+U/w/cf0c7hViXGIq9hTMiyMQOhJ61U1/dKtRn5CX8Rw3wmwZjuv4/t4iuDA9HCHq10Ok3BRChOqCYH2UaTZH2yeVMGhyNN29S4V0FOBlHhxksL7cSYlcdhBB5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128021; c=relaxed/simple;
-	bh=gCUdydaAj5yyKiGTZ3hoMjlwP9QJfPPtJ+FOFS9yk68=;
+	s=arc-20240116; t=1722128030; c=relaxed/simple;
+	bh=220QbrQmsHmdXgmCsAxaHI4BJouRP2PaaSJOV5ITXJY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nr0SB2weWArJHLJdD7c8njEfhLlSIu2A8URw9bdB+DlWzLXO3d2HMsTcydAnwUtM3MPi83otOmdlvqMk6YXKa9uQXmZq+Wk3GivX46PYazwa0NO0WeA1MB4zckM7jEUPnrZ86+T+pfIwANAf4Ik2+bbVgE39KlGthMeeYjDQfU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fviJlMum; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDAACC32781;
-	Sun, 28 Jul 2024 00:53:39 +0000 (UTC)
+	 MIME-Version; b=Te/VAMe3mYbC9ZkLztdcWPMtSHw9FlYTvI05HAF1pY5zH0/aJQM/vnXrucbYhZtHXL7BZSaQpNS9KRmKG1M6Zts+EsUsMXQ6LO3hbGMHNijpjlVApqeGShyWDSUFzg7zyyHaUqooYJLXoRp7dzqOn14xGcc4QOBBZ7r1B+nxJXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pTeDtkhc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5109CC32781;
+	Sun, 28 Jul 2024 00:53:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128021;
-	bh=gCUdydaAj5yyKiGTZ3hoMjlwP9QJfPPtJ+FOFS9yk68=;
+	s=k20201202; t=1722128030;
+	bh=220QbrQmsHmdXgmCsAxaHI4BJouRP2PaaSJOV5ITXJY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fviJlMum1ISDBCUVpX0ed5gqMwDnSwiwxXI5Gyi5tlnbeeyzQWDAng8EIWGTVkR2B
-	 YgqSTzlXjBZ7XxnsP4EhPLP1b2aoR5blzlf3etFmiCaIyl326HqDcRJGAIkbIxpG0p
-	 NkYX45xKf8Qj3FaFm0VT7UaTYDBZLidiELVwZ+kxzpWRzAjteB1eGqhiQRMWjPFtG3
-	 EvmUt8Ze3MdcYd/9nm0spr/8vgDhzcOMXIYTg32bpMG/ek/gwNkkF0sF7wHJs8DJ/4
-	 ok7IO0Ql0E7ALtafZ82wMC5RMfkIMpXTQhiegKsESTehD5PDeYxYcdOWSU17FgLu7/
-	 xHpNf/u6+wbyg==
+	b=pTeDtkhcRXt6YAfG7uWOh52EE11O3rcVGkjHMBu+F3N4/mmUUPEsqo4SZ/tS+oc7O
+	 P45kBVwJdwrdftQpJXWHPiBBI34LIImuhwC7sEuEt8TjSHmhpuaJw+NA7hlDePoyaW
+	 /EYgXmgNT+GaWdvZVbR4KNv/KcGp9iSX2riP1o933zNAaQvUD+iTj1SU+Mhn6Fv5iA
+	 yNy3uHGpN2xAxpzz6dBGAtokOKXBcrHMzDM5eTpYxPGZXK6imp3REKxPW5KvErDl38
+	 zIUtQgg7Dg5LQ4IeHkbKKrQrZcVE289qgs9zbbWmN5o78EwZS6G4w93PguzFZvZyMM
+	 jETex9CYPk+9g==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Dragos Tatulea <dtatulea@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
-	davem@davemloft.net,
-	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 06/27] net/mlx5e: SHAMPO, Fix invalid WQ linked list unlink
-Date: Sat, 27 Jul 2024 20:52:49 -0400
-Message-ID: <20240728005329.1723272-6-sashal@kernel.org>
+	idosch@nvidia.com,
+	jiri@resnulli.us,
+	amcohen@nvidia.com,
+	horms@kernel.org,
+	lirongqing@baidu.com,
+	juntong.deng@outlook.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 08/27] rtnetlink: move rtnl_lock handling out of af_netlink
+Date: Sat, 27 Jul 2024 20:52:51 -0400
+Message-ID: <20240728005329.1723272-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240728005329.1723272-1-sashal@kernel.org>
 References: <20240728005329.1723272-1-sashal@kernel.org>
@@ -71,42 +74,82 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.10.2
 Content-Transfer-Encoding: 8bit
 
-From: Dragos Tatulea <dtatulea@nvidia.com>
+From: Jakub Kicinski <kuba@kernel.org>
 
-[ Upstream commit fba8334721e266f92079632598e46e5f89082f30 ]
+[ Upstream commit 5380d64f8d766576ac5c0f627418b2d0e1d2641f ]
 
-When all the strides in a WQE have been consumed, the WQE is unlinked
-from the WQ linked list (mlx5_wq_ll_pop()). For SHAMPO, it is possible
-to receive CQEs with 0 consumed strides for the same WQE even after the
-WQE is fully consumed and unlinked. This triggers an additional unlink
-for the same wqe which corrupts the linked list.
+Now that we have an intermediate layer of code for handling
+rtnl-level netlink dump quirks, we can move the rtnl_lock
+taking there.
 
-Fix this scenario by accepting 0 sized consumed strides without
-unlinking the WQE again.
+For dump handlers with RTNL_FLAG_DUMP_SPLIT_NLM_DONE we can
+avoid taking rtnl_lock just to generate NLM_DONE, once again.
 
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://lore.kernel.org/r/20240603212219.1037656-4-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/core/rtnetlink.c     | 9 +++++++--
+ net/netlink/af_netlink.c | 2 --
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index b5333da20e8a7..cdc84a27a04ed 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -2374,6 +2374,9 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
- 	if (likely(wi->consumed_strides < rq->mpwqe.num_strides))
- 		return;
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 4668d67180407..eabfc8290f5e2 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -6486,6 +6486,7 @@ static int rtnl_mdb_del(struct sk_buff *skb, struct nlmsghdr *nlh,
  
-+	if (unlikely(!cstrides))
-+		return;
-+
- 	wq  = &rq->mpwqe.wq;
- 	wqe = mlx5_wq_ll_get_wqe(wq, wqe_id);
- 	mlx5_wq_ll_pop(wq, cqe->wqe_id, &wqe->next.next_wqe_index);
+ static int rtnl_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ {
++	const bool needs_lock = !(cb->flags & RTNL_FLAG_DUMP_UNLOCKED);
+ 	rtnl_dumpit_func dumpit = cb->data;
+ 	int err;
+ 
+@@ -6495,7 +6496,11 @@ static int rtnl_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 	if (!dumpit)
+ 		return 0;
+ 
++	if (needs_lock)
++		rtnl_lock();
+ 	err = dumpit(skb, cb);
++	if (needs_lock)
++		rtnl_unlock();
+ 
+ 	/* Old dump handlers used to send NLM_DONE as in a separate recvmsg().
+ 	 * Some applications which parse netlink manually depend on this.
+@@ -6515,7 +6520,8 @@ static int rtnetlink_dump_start(struct sock *ssk, struct sk_buff *skb,
+ 				const struct nlmsghdr *nlh,
+ 				struct netlink_dump_control *control)
+ {
+-	if (control->flags & RTNL_FLAG_DUMP_SPLIT_NLM_DONE) {
++	if (control->flags & RTNL_FLAG_DUMP_SPLIT_NLM_DONE ||
++	    !(control->flags & RTNL_FLAG_DUMP_UNLOCKED)) {
+ 		WARN_ON(control->data);
+ 		control->data = control->dump;
+ 		control->dump = rtnl_dumpit;
+@@ -6703,7 +6709,6 @@ static int __net_init rtnetlink_net_init(struct net *net)
+ 	struct netlink_kernel_cfg cfg = {
+ 		.groups		= RTNLGRP_MAX,
+ 		.input		= rtnetlink_rcv,
+-		.cb_mutex	= &rtnl_mutex,
+ 		.flags		= NL_CFG_F_NONROOT_RECV,
+ 		.bind		= rtnetlink_bind,
+ 	};
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index fa9c090cf629e..8bbbe75e75dbe 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -2330,8 +2330,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 
+ 		cb->extack = &extack;
+ 
+-		if (cb->flags & RTNL_FLAG_DUMP_UNLOCKED)
+-			extra_mutex = NULL;
+ 		if (extra_mutex)
+ 			mutex_lock(extra_mutex);
+ 		nlk->dump_done_errno = cb->dump(skb, cb);
 -- 
 2.43.0
 
