@@ -1,85 +1,142 @@
-Return-Path: <netdev+bounces-113427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEB0993E368
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 04:30:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3A2293E39A
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 06:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221DC1C21016
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 02:30:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82BB11F21A9E
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 04:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126101B86D2;
-	Sun, 28 Jul 2024 02:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF484A0F;
+	Sun, 28 Jul 2024 04:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tcJVKpKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66C9A35;
-	Sun, 28 Jul 2024 02:30:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020F184D
+	for <netdev@vger.kernel.org>; Sun, 28 Jul 2024 04:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722133853; cv=none; b=RiKVmLTCJeq3BhV+UZ29Vzz2IxVUfptBDubKxFz4qTkKU4Ekck0n2apfdzOE0n+w1Nj3Cz/PNWUHbKLz76HXvCDlkmPQNqbDtNGLkABQyBXCQzQi4OCRjg3RS1CQZCqNHSphDX9kCYfJ9yrxYI+JYpZKrqsWqQdO4hg6KJKHp/8=
+	t=1722140841; cv=none; b=BGh1vSvkBoL3SsF4pmTiNe51xa61g/9ikuZTRNnOfxYB4NiaHhFepvVprpK/ilki5B6wfcxxFV8GFJ1/KgFz0+a0RopZI/DAuH8+Tt9ul/Dkl+VWnjbtvXwEIx0evilintF6Z55A3hOiNvEBOvEOKWNMwvmZbYi7VQWU1hRlme8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722133853; c=relaxed/simple;
-	bh=Vw64+sDaBjrL18hyEYdJh4B8xCQlPvZgkjM+2GzjsJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nj9OeadTasN7+PxP74ApuJda/YO4e7q7dKSAX0czXSkm66v6TP6VdIHDTvV/Yn4PKip605FAn8yzhQv6TiLUvbZMVK8CWjCVk6hVOqTGiofDfdy5i+E9PeRjWAv227iAiWsLeVJP+OkSmnevDpiSn0W27acXHNK/Cax4BSSBasI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sXtgG-0000TG-D4; Sun, 28 Jul 2024 04:30:40 +0200
-Date: Sun, 28 Jul 2024 04:30:40 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, dsahern@kernel.org, gnault@redhat.com,
-	pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
-Subject: Re: [RFC PATCH net-next 2/3] netfilter: nft_fib: Mask upper DSCP
- bits before FIB lookup
-Message-ID: <20240728023040.GA996@breakpoint.cc>
-References: <20240725131729.1729103-1-idosch@nvidia.com>
- <20240725131729.1729103-3-idosch@nvidia.com>
+	s=arc-20240116; t=1722140841; c=relaxed/simple;
+	bh=BOcM8tmyCAAculI+zJ+6c+V2gB7VcqR5BVAR3KEtv6c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FKKv5diH6bcY1AhmI018PTSsPObRoipR0/c8i5OhXhMRYpumobJN/b67zPX2Ix+EXklVfJG3j2T1rHjP28BRuvlH1s1zvL3XdYnJ4dhXJP3oQw5xwlVGeeMVfz9UD7viscDIzGzQU6imLuIzLxbvv7Tt5SP79f2hxIlqWe4Dido=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tcJVKpKQ; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <44d1a208-684a-4c68-a4a6-41d906e87585@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722140834;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XeAy6C8eRQGE7CjcN7IRLLJ5CefJdaKGthvc1ioEWgY=;
+	b=tcJVKpKQW4pQuLdJ45hddRbJhmmZzep31UpRK+QLlS2/B58L1tsvaZ9bfQxgu98NMBhCxJ
+	oZeIl9B1LTv5HXjFfFZ77nlRjyyusHv4EbxLqW9/IBeieLzUxKplqwrM/CEi+30WxVvEWE
+	acejUboE2kEr7X8wIoYTCzY5hcDoneM=
+Date: Sat, 27 Jul 2024 21:27:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240725131729.1729103-3-idosch@nvidia.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Subject: Re: [PATCH bpf] selftests/bpf: Filter out _GNU_SOURCE when compiling
+ test_cpp
+To: Stanislav Fomichev <sdf@fomichev.me>, Jakub Kicinski <kuba@kernel.org>
+Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org
+References: <20240725214029.1760809-1-sdf@fomichev.me>
+ <CAEf4BzYonHCyFr7ivRDDUtsJY3MEgWRKwVZ=N0sWjpMrn1dR6A@mail.gmail.com>
+ <20240726181020.19bca47d@kernel.org> <ZqRqXYljLTSKaFwz@mini-arch>
+Content-Language: en-GB
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <ZqRqXYljLTSKaFwz@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Ido Schimmel <idosch@nvidia.com> wrote:
->  void nft_fib4_eval_type(const struct nft_expr *expr, struct nft_regs *regs,
->  			const struct nft_pktinfo *pkt)
->  {
-> @@ -110,7 +108,7 @@ void nft_fib4_eval(const struct nft_expr *expr, struct nft_regs *regs,
->  	if (priv->flags & NFTA_FIB_F_MARK)
->  		fl4.flowi4_mark = pkt->skb->mark;
->  
-> -	fl4.flowi4_tos = iph->tos & DSCP_BITS;
-> +	fl4.flowi4_tos = iph->tos & IPTOS_RT_MASK;
 
-I was confused because cover letter talks about allowing both tos or dscp depending on
-new nlattr for ipv4, but then this patch makes that impossible because dscp bits get masked.
+On 7/26/24 8:32 PM, Stanislav Fomichev wrote:
+> On 07/26, Jakub Kicinski wrote:
+>> On Fri, 26 Jul 2024 17:45:06 -0700 Andrii Nakryiko wrote:
+>>> or we could
+>>>
+>>> #ifndef _GNU_SOURCE
+>>> #define _GNU_SOURCE
+>>> #endif
+>>>
+>>> (though we have 61 places with that...) so as to not have to update
+>>> every target in Makefile.
+>> AFAIU we have -D_GNU_SOURCE= twice _in the command line args_ :(
+>> One is from the Makefile which now always adds it to CFLAGS,
+>> the other is "built-in" in g++ for some weird reason.
+>>
+>> FWIW I have added this patch to the netdev "hack queue" so no
+>> preference any more where the patch lands :)
+> Yeah, it can't be fixed with an ifdef because the conflict happens a bit
+> earlier:
+>
+> $ echo "int main(int argc, char *argv[]){return 0;}" > test.cpp
+> $ clang++ -Wall -Werror -D_GNU_SOURCE= test.cpp
+> In file included from <built-in>:454:
+> <command line>:1:9: error: '_GNU_SOURCE' macro redefined [-Werror,-Wmacro-redefined]
+>      1 | #define _GNU_SOURCE
+>        |         ^
+> <built-in>:445:9: note: previous definition is here
+>    445 | #define _GNU_SOURCE 1
+>        |         ^
 
-patch 3 says:
-----
-A prerequisite for allowing FIB rules to match on DSCP is to adjust all
-the call sites to initialize the high order DSCP bits and remove their
-masking along the path to the core where the field is matched on.
-----
+The above _GNU_SOURCE definition is defined by clang itself in the very beginning
+of compilation.
+See https://github.com/llvm/llvm-project/blob/main/clang/lib/Basic/Targets/OSTargets.h
 
-But nft_fib_ipv4.c already does that.
+// Linux target
+template <typename Target>
+class LLVM_LIBRARY_VISIBILITY LinuxTargetInfo : public OSTargetInfo<Target> {
+protected:
+   void getOSDefines(const LangOptions &Opts, const llvm::Triple &Triple,
+                     MacroBuilder &Builder) const override {
+     // Linux defines; list based off of gcc output
+     DefineStd(Builder, "unix", Opts);
+     DefineStd(Builder, "linux", Opts);
+     if (Triple.isAndroid()) {
+       Builder.defineMacro("__ANDROID__", "1");
+       this->PlatformName = "android";
+       this->PlatformMinVersion = Triple.getEnvironmentVersion();
+       const unsigned Maj = this->PlatformMinVersion.getMajor();
+       if (Maj) {
+         Builder.defineMacro("__ANDROID_MIN_SDK_VERSION__", Twine(Maj));
+         // This historical but ambiguous name for the minSdkVersion macro. Keep
+         // defined for compatibility.
+         Builder.defineMacro("__ANDROID_API__", "__ANDROID_MIN_SDK_VERSION__");
+       }
+     } else {
+         Builder.defineMacro("__gnu_linux__");
+     }
+     if (Opts.POSIXThreads)
+       Builder.defineMacro("_REENTRANT");
+     if (Opts.CPlusPlus)
+       Builder.defineMacro("_GNU_SOURCE");
+     if (this->HasFloat128)
+       Builder.defineMacro("__FLOAT128__");
+   }
+...
 
-So I would suggest to just drop this patch and then get rid of '&
-DSCP_BITS' once everything is in place.
+This caused a conflict with -D_GNU_SOURCE= and hence compilation failure.
 
-But feel free to handle this as you prefer.
+> 1 error generated.
+
 
