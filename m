@@ -1,125 +1,136 @@
-Return-Path: <netdev+bounces-113451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A177893E729
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 18:04:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B12793E716
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 18:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C72A281B93
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 16:04:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E57D1F23715
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 16:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA471586C9;
-	Sun, 28 Jul 2024 15:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F8F154C17;
+	Sun, 28 Jul 2024 15:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GM8RsSWc"
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WFk9FEsu";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WFk9FEsu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FAD157484;
-	Sun, 28 Jul 2024 15:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70ACF61FC4;
+	Sun, 28 Jul 2024 15:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722181800; cv=none; b=XNxK0D4fbRWZnThcOGPrzuI1Uk+O20C9ZLVRq1aNmCWGdAjSf4WSYP+Y/lMALM8OZmTK56LlIxLuYOatWePBCv9OPClIfSS5QLfOt1DrdJ2x9A8Frzwv5yBbeBg71ttNFYnEgY7iEH7eddy2xx18xFWb9ID6xsxQ4hraX0hDge0=
+	t=1722181790; cv=none; b=J5a0qKroBKGXP6uvh3RjqYNjXNWzN4oEOSWp3sP/LZr7wkuO5Xcl6MBT4PXXVaosP5QCm73eO7DlsrA+stMMA0TsmKPyVRnsmmfv+MtrKVyH5sZOI/lM1HhQp4sz9p0N1Yl9W0gTj6clR2E01YgH9sb7uY7J2LxmmLln9MyKjT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722181800; c=relaxed/simple;
-	bh=y6pIeYbB6+lpyvvtYVHUUVmb4tpbRuegA1GXDCj+U4Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cof03cHCL7cJObZRbKhh/xfAySL+Q+oF6tT4Ec0pTmyjAS+0Rlky535QjdK3dHelKjjidASfTnfHnYZnw/bB7XQUfUjmUmuCQkjn8D6WPXKga+DpM7MCfG3usru5vxpT7UMeft4qPYkvxJqWDKkHS3sPpT+k63iVqIp9ODfAQdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GM8RsSWc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D58C116B1;
-	Sun, 28 Jul 2024 15:49:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722181800;
-	bh=y6pIeYbB6+lpyvvtYVHUUVmb4tpbRuegA1GXDCj+U4Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GM8RsSWcoupxrwUndKjxEc22In4SUcOkhKmZBrkhVGbz50xsjJxcFAHmbE8j5/ZEd
-	 F/YGu466jxb6iHB802ytowAXeajLWh84LaQ2CZVv/Llu4vNpoFRiCmVJUu70+APX4A
-	 rBqGAlKOzpthoK5tPrNsaNYw/dEyJ1qFC4kP87bzTUHy/POBkuRK0Cgnf9zIdJ1ZOx
-	 krSzQUEHjSWOSD5mudNWNMNas2MbpIurB/VHdvHAThc5v/fQqLPTzaKqfPvmi/vtNt
-	 5oIerhUtQKzUPWDWZTlOwOFfai0O2Ff/JzHfS/VbAQqX0umdZyclqUESkkYMsHD0vS
-	 3UEoOkvDAypKg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Benjamin Coddington <bcodding@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Anna Schumaker <Anna.Schumaker@Netapp.com>,
-	Sasha Levin <sashal@kernel.org>,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 10/10] SUNRPC: Fix a race to wake a sync task
-Date: Sun, 28 Jul 2024 11:49:08 -0400
-Message-ID: <20240728154927.2050160-10-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240728154927.2050160-1-sashal@kernel.org>
-References: <20240728154927.2050160-1-sashal@kernel.org>
+	s=arc-20240116; t=1722181790; c=relaxed/simple;
+	bh=0qxRAYG9xkiFfGHAqlEygu7kTF5865d2ZzqhhwVeuSM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lh1pyaGPhaTrIvmmROURphsgYMPHOpEWU+s8EyK0FSRUOb3F9OXp+CKe19NY/GfCeCvHmeTk+SxG5adEZpTNwrtUa8fB9oLs2pUFlBy9d3pgokwBe8aahCZAs1ko5aqmigOxZs6fsCyLqB8wA6/yTClwrLsnXPvalxKnJbAavSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=WFk9FEsu; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=WFk9FEsu; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1722181787;
+	bh=0qxRAYG9xkiFfGHAqlEygu7kTF5865d2ZzqhhwVeuSM=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=WFk9FEsu41BIruNf5pnwR/+AXJZm23A4NmazTL2OX6mdKkV2tq5em1LHkcTp2Z/z5
+	 1W5wO5ZAovj5iPP3aSKWkM7sQwxzq2vzbXUgz9xtUp8v4dyovbn7fGVL4d6qbo4IQX
+	 iYA6kCFYaF3xyNo/slyhWN5u6q5VB8CAxhFF6v6c=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 865941281ECE;
+	Sun, 28 Jul 2024 11:49:47 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id 67CC0ZUaU8jf; Sun, 28 Jul 2024 11:49:47 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1722181787;
+	bh=0qxRAYG9xkiFfGHAqlEygu7kTF5865d2ZzqhhwVeuSM=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=WFk9FEsu41BIruNf5pnwR/+AXJZm23A4NmazTL2OX6mdKkV2tq5em1LHkcTp2Z/z5
+	 1W5wO5ZAovj5iPP3aSKWkM7sQwxzq2vzbXUgz9xtUp8v4dyovbn7fGVL4d6qbo4IQX
+	 iYA6kCFYaF3xyNo/slyhWN5u6q5VB8CAxhFF6v6c=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::db7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id A26541280FF2;
+	Sun, 28 Jul 2024 11:49:46 -0400 (EDT)
+Message-ID: <2b4f6ef3fc8e9babf3398ed4a301c2e4964b9e4a.camel@HansenPartnership.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Greg KH <gregkh@linuxfoundation.org>, Laurent Pinchart
+	 <laurent.pinchart@ideasonboard.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev, 
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org,  jgg@nvidia.com
+Date: Sun, 28 Jul 2024 11:49:44 -0400
+In-Reply-To: <2024072802-amendable-unwatched-e656@gregkh>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+	 <20240726142731.GG28621@pendragon.ideasonboard.com>
+	 <66a43c48cb6cc_200582942d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+	 <20240728111826.GA30973@pendragon.ideasonboard.com>
+	 <2024072802-amendable-unwatched-e656@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.164
 Content-Transfer-Encoding: 8bit
 
-From: Benjamin Coddington <bcodding@redhat.com>
+On Sun, 2024-07-28 at 17:16 +0200, Greg KH wrote:
+> On Sun, Jul 28, 2024 at 02:18:26PM +0300, Laurent Pinchart wrote:
+> > Hi Dan,
+> > 
+> > On Fri, Jul 26, 2024 at 05:16:08PM -0700, Dan Williams wrote:
+> > > Laurent Pinchart wrote:
+> > > > I know this is a topic proposed for the maintainers summit, but
+> > > > given the number of people who seem to have an opinion and be
+> > > > interested in dicussing it, would a session at LPC be a better
+> > > > candidate ? I don't expect the maintainer summit to invite all
+> > > > relevant experts from all subsystems, that would likely
+> > > > overflow the room.
+> > > > 
+> > > > The downside of an LPC session is that it could easily turn
+> > > > into a heated stage fight, and there are probably also quite a
+> > > > few arguments that can't really be made in the open :-S
+> > > 
+> > > A separate LPC session for a subsystem or set of subsystems to
+> > > explore local passthrough policy makes sense, but that is not the
+> > > primary motivation for also requesting a Maintainer Summit topic
+> > > slot. The primary motivation is discussing the provenance and
+> > > navigation of cross-subsystem NAKs especially in an environment
+> > > where the lines between net, mem, and storage are increasingly
+> > > blurry at the device level.
+> > 
+> > Would there be enough space at the maintainers' summit for all the
+> > relevant people to join the discussion ?
+> 
+> Who exactly would you consider the "relevant people" here?  It's been
+> a wide-ranging conversation/thread :)
 
-[ Upstream commit ed0172af5d6fc07d1b40ca82f5ca3979300369f7 ]
+This is a bit of a trick question, since there seem to be three
+separate but intertwined things here
 
-We've observed NFS clients with sync tasks sleeping in __rpc_execute
-waiting on RPC_TASK_QUEUED that have not responded to a wake-up from
-rpc_make_runnable().  I suspect this problem usually goes unnoticed,
-because on a busy client the task will eventually be re-awoken by another
-task completion or xprt event.  However, if the state manager is draining
-the slot table, a sync task missing a wake-up can result in a hung client.
+   1. What to do about cross subsystem NAKs (as in how far does one
+      subsystem have the ability to NAK something another does because
+      they fear it will impact them ... passthrough being only one
+      example).
+   2. Industry education to help manufacturers making bad decisions
+      about openness and APIs make better ones that actually benefit
+      their business in the long run.
+   3. Standards for open drivers (i.e. is passthrough always evil).
 
-We've been able to prove that the waker in rpc_make_runnable() successfully
-calls wake_up_bit() (ie- there's no race to tk_runstate), but the
-wake_up_bit() call fails to wake the waiter.  I suspect the waker is
-missing the load of the bit's wait_queue_head, so waitqueue_active() is
-false.  There are some very helpful comments about this problem above
-wake_up_bit(), prepare_to_wait(), and waitqueue_active().
+1. is definitely Maintainer Summit material. 2. was something the LF
+used to help us with but seems to have foundered of late (I think on
+the general assumption that CNCF gets it right, so we can stop pushing)
+and 3. is definitely where Plumbers could host a wide ranging debate.
 
-Fix this by inserting smp_mb__after_atomic() before the wake_up_bit(),
-which pairs with prepare_to_wait() calling set_current_state().
-
-Signed-off-by: Benjamin Coddington <bcodding@redhat.com>
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
-Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/sunrpc/sched.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/sunrpc/sched.c b/net/sunrpc/sched.c
-index a00890962e115..540220264b31e 100644
---- a/net/sunrpc/sched.c
-+++ b/net/sunrpc/sched.c
-@@ -348,8 +348,10 @@ static void rpc_make_runnable(struct workqueue_struct *wq,
- 	if (RPC_IS_ASYNC(task)) {
- 		INIT_WORK(&task->u.tk_work, rpc_async_schedule);
- 		queue_work(wq, &task->u.tk_work);
--	} else
-+	} else {
-+		smp_mb__after_atomic();
- 		wake_up_bit(&task->tk_runstate, RPC_TASK_QUEUED);
-+	}
- }
- 
- /*
--- 
-2.43.0
+James
 
 
