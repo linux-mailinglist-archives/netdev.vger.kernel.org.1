@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-113406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 897C893E2C5
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:16:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC0893E2CA
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 03:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1E82B241B0
-	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5023E1C211A6
+	for <lists+netdev@lfdr.de>; Sun, 28 Jul 2024 01:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A03194AE3;
-	Sun, 28 Jul 2024 00:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81777194C9A;
+	Sun, 28 Jul 2024 00:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nlacWLRF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HqMOX9KW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C244194ADE;
-	Sun, 28 Jul 2024 00:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55593194ADE;
+	Sun, 28 Jul 2024 00:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128087; cv=none; b=JImBNhjfrHuY5OWPUk3P+mu8/4k5ilUzNuTkkaIUoh2RskvUIRs/37bLsSPulbfoY0tjfQ3EK3LomIhxgouTXicCAP8NJwstr6x2onHX3mAj4PDN+pyeiO/wEAPQBYYdkrRZBVwX51R4P6+eS1x5oY9/HTvrS5sPRSID6f7DJyg=
+	t=1722128091; cv=none; b=En3o1ZmV4kneb3uxuEcSySRZmKnCXhvzFurcbD2/ajlmmX4ATQCiSK3o0EotpS8phct/P1vTFTa86nR7Dn5L7qYCfzvgUbXhN7DNBrDAmlYi4sycKXe3VTk9GH5yrOcL8bo60kuUWwJPW8iowf+tyEslAB22f4w2RNUh9bMAJHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128087; c=relaxed/simple;
-	bh=A1B1pETy9mu1bcOWk7QkxccDmQJheKKax2mhnK4pa4Q=;
+	s=arc-20240116; t=1722128091; c=relaxed/simple;
+	bh=Gd923LaDh7TxUFQuQq3G5OAX4Im5g0smbajmP5Z4ykk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GQZT6eSyvcvoFuU2p4pVB6Fm/qU14doj/pD8hWRl4wqj3xqAAIMUvZH67Miz3lNDH6lrcYomaLEaIZRfQ770FGINUZTi8Oo19W+ThW8I5qgpBsx6hJGG037cwvJQxeVMBICdyuhkVZqC4wEcOubWZ1ogptinuPf488jP8ojL9oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nlacWLRF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43667C32781;
-	Sun, 28 Jul 2024 00:54:46 +0000 (UTC)
+	 MIME-Version; b=u926lVdvrSr1YHFeosB9zjk0UC34Pe0N6BHPB93V8aqTFvfBkCaaob2oTWBL6VYkKYogNJR75XOkipdtIR1byTeT1XARuq7Wf2p01rWIZGRbeomSAw7MEvE11THxPog8TPYQ8rbxGxQ9snNFjRWwyZBjQyp1XQFDQ3TEInXMrsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqMOX9KW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD7B7C4AF09;
+	Sun, 28 Jul 2024 00:54:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128087;
-	bh=A1B1pETy9mu1bcOWk7QkxccDmQJheKKax2mhnK4pa4Q=;
+	s=k20201202; t=1722128091;
+	bh=Gd923LaDh7TxUFQuQq3G5OAX4Im5g0smbajmP5Z4ykk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nlacWLRF2mNRMoNFibB7pzqVR+0aeIEG7E4OznPqV7bw/K/iQl5fN3ibbLbzmWPGB
-	 Hem9BXMwMrpQBz4fxkyhaTBRJQv5ajF+K5j7drvRyX6dyVkRJ/gb3y8oG7QFLTBoh5
-	 P7d+u4Y1Lw+syA0X2pOcHYdtMarqcGdWKV9KXBV+FV1i3wz1jLbmhKaDFIDu8e69qc
-	 wnN6Xsi9uklot107Rlzgxc7A0MSJAc84BMvJ5vw9ELB1ICNXkrMBd69r4iyFpyeqxB
-	 D/WPJd6LMCdsyB5TQ7RsDssNw3dgTaZQj+qedf3W+7HAOUw/oOiCFhLqZOerGiWBoi
-	 otF9Ppo0yJhwA==
+	b=HqMOX9KW4rCimrGBjpNqIZOGSW0cYqfoKA1SB9dkQ9K8xTLF3rDkKzpqcR0ixVKe6
+	 TYQY8AIRVo/6ifmmq4TkuiSOjLvneT35h1YguBjkUSvqSVEIHWlmFxPOV4NNh/+cld
+	 MoPtM3qPi0oOFQSmeXO1ieYzhQF91vTAHUfL8GBIh6I0HAHbjAy30I08vtZ7CxprTH
+	 8bUuaAkcSbTO0YTZ4PG4HcKCM9q5P6CoMSFIElnDIoR3OaM1mZTnKnM0iEcORg/kg3
+	 OxqmvJbfzBxW8ABfRXbqrmPuO9hp4SCIOIMKX9ngsg4FxjvUTaY1+qrmXrEIvFjMP1
+	 /3oDkU8gkjNUg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+Cc: Dragos Tatulea <dtatulea@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	nic_swsd@realtek.com,
+	saeedm@nvidia.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 02/15] r8169: remove detection of chip version 11 (early RTL8168b)
-Date: Sat, 27 Jul 2024 20:54:23 -0400
-Message-ID: <20240728005442.1729384-2-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 04/15] net/mlx5e: SHAMPO, Fix invalid WQ linked list unlink
+Date: Sat, 27 Jul 2024 20:54:25 -0400
+Message-ID: <20240728005442.1729384-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240728005442.1729384-1-sashal@kernel.org>
 References: <20240728005442.1729384-1-sashal@kernel.org>
@@ -69,39 +71,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.43
 Content-Transfer-Encoding: 8bit
 
-From: Heiner Kallweit <hkallweit1@gmail.com>
+From: Dragos Tatulea <dtatulea@nvidia.com>
 
-[ Upstream commit 982300c115d229565d7af8e8b38aa1ee7bb1f5bd ]
+[ Upstream commit fba8334721e266f92079632598e46e5f89082f30 ]
 
-This early RTL8168b version was the first PCIe chip version, and it's
-quite quirky. Last sign of life is from more than 15 yrs ago.
-Let's remove detection of this chip version, we'll see whether anybody
-complains. If not, support for this chip version can be removed a few
-kernel versions later.
+When all the strides in a WQE have been consumed, the WQE is unlinked
+from the WQ linked list (mlx5_wq_ll_pop()). For SHAMPO, it is possible
+to receive CQEs with 0 consumed strides for the same WQE even after the
+WQE is fully consumed and unlinked. This triggers an additional unlink
+for the same wqe which corrupts the linked list.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-Link: https://lore.kernel.org/r/875cdcf4-843c-420a-ad5d-417447b68572@gmail.com
+Fix this scenario by accepting 0 sized consumed strides without
+unlinking the WQE again.
+
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://lore.kernel.org/r/20240603212219.1037656-4-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index d759f3373b175..dfd114845a3ed 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2135,7 +2135,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 8d9743a5e42c7..79ec6fcc9e259 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -2374,6 +2374,9 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ 	if (likely(wi->consumed_strides < rq->mpwqe.num_strides))
+ 		return;
  
- 		/* 8168B family. */
- 		{ 0x7c8, 0x380,	RTL_GIGA_MAC_VER_17 },
--		{ 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
-+		/* This one is very old and rare, let's see if anybody complains.
-+		 * { 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
-+		 */
- 
- 		/* 8101 family. */
- 		{ 0x7c8, 0x448,	RTL_GIGA_MAC_VER_39 },
++	if (unlikely(!cstrides))
++		return;
++
+ 	wq  = &rq->mpwqe.wq;
+ 	wqe = mlx5_wq_ll_get_wqe(wq, wqe_id);
+ 	mlx5_wq_ll_pop(wq, cqe->wqe_id, &wqe->next.next_wqe_index);
 -- 
 2.43.0
 
