@@ -1,220 +1,136 @@
-Return-Path: <netdev+bounces-113712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E63E93F9C2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:42:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AD293F9D0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 226351C21593
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:42:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD2E3B21EBB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAF61598EE;
-	Mon, 29 Jul 2024 15:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c+XhZblx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F4D147C79;
+	Mon, 29 Jul 2024 15:48:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2073.outbound.protection.outlook.com [40.107.236.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934FD13BC3F;
-	Mon, 29 Jul 2024 15:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722267730; cv=fail; b=GirhpVBzUN04ew9hBxQtKEibUNcTfxIuoWJubpr24payFHKF6rDwMgoYAjCwwS5lR0HrFszajEvwNUiFrMv2qEObhY2rWmRIji3y0HavkRp9NfF1+5KjIHSqpOnFgiNJszD6LJpaezQ09PCjI6emc3kN+G/I80q6tR2raNBLHmQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722267730; c=relaxed/simple;
-	bh=9K2Xy/do747evYimmfkm9wivvCRMTFqBym4gK6xYD0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LI1nRBI5DmcDmKKPx4bbR97e0eFsg9k8/If/oV7RV3818mju3RUS+QaFjuN80xcnd45/DNWiaVWg2VGQz6q0cAiHykJEqFQ4mQ6QO7pRzccxN6SBe5gCu7MpNBFMdMRyt4nU00w5RFwu0HNFRJhgM710jZOTc/96VOFFIzE5Eoo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c+XhZblx; arc=fail smtp.client-ip=40.107.236.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NZKf1ASEFErxZeWydIg6wiHY70smb1u6BxcKRJT3kDbzIuQPzLQcGSL/uwhOSwGb2utOHAWIaarI1vI0ZCD0/F/zWL8cmPkXpn83qxw8yghUViH4lr+O7Orc038miZGmVgYW8UlzROZRTXO2rUG2gFGoSbzLfbFGsWY6edZqeNqNlD8iawFUOvX2hItXbEsIORnKzedrrsE2ur76V4bkmQdy2bLXnTDJXP7s96sIP26yg+/xSIe8SMjC+2II4XW7LRWPtNswdc2D0b9dFmRFmI1ZHCJtEFGZRcSEuAgw3vamcVV3YR0uQIK9/MTV9KWOYy4irizVtX+ZayMY0HOreg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Se0Jo+Ov7xOU5ZmpT8P5MXqichTMePoHgvSK9S+cpzM=;
- b=e3fLMrEhYv7EUdjXEkS77xEN+OHX/qopKSdffmSntKrH8VLTa6b7epaeqDpwcveY7PnYhhg2rzUFqLmJWsj+jNVXLu+MRfEyhJijdMH3rBYfHXt+VB4YpbjNt6HkEV8BjEtEDo4XyvHHyasJYn1GU5dKiuDqXKZa2oHe6nvnvobBjN4ormWneICSxNn7S3qHymZi2U8HBNsrcZo/rUSMK8fv1WUsy1MW+N1V0nCKs5elYIqFRVktQ7CJyLiLFZHe7iElpTNLVwpCPcll9PKHi9QNXrLeF6nf7Uu2SvkMewMCyOGnTyBaghGlboaStchPNkbakwLHOrVj6MN9My8B3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Se0Jo+Ov7xOU5ZmpT8P5MXqichTMePoHgvSK9S+cpzM=;
- b=c+XhZblxXjWZV/5aJrSniG92r83lssHDluYe4HQaRQx/hRZDbtjfAuwMN3RP5yldOaLQ7gRzuItn6dQFCqdVXMOVmEOQiB+/GxE6izjB17PVJFM+/H8Onl0joVDM6qBXFuKdH3v47kMlzaars1REABE4SLF0VoFVrbF4sCW9dhb3GFKCY3oo3NdLrmbwE2aB1o/iA5aUg6LA5NESRQDQtjdU+PftINq0nzyLYmdk0WFVsO/OWUiiMCaNJLWt2mYddmZLA79kcjTgr5Gv6xZCFXX6pL8z7298nwUKC4F3eHnr9iKGteH7oZpXcOtEZgSTMVj1v4IWj61Qu2OmuJa4OA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by CH2PR12MB4215.namprd12.prod.outlook.com (2603:10b6:610:ab::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.27; Mon, 29 Jul
- 2024 15:42:05 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7807.026; Mon, 29 Jul 2024
- 15:42:04 +0000
-Date: Mon, 29 Jul 2024 12:42:03 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, shiju.jose@huawei.com,
-	Borislav Petkov <bp@alien8.de>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240729154203.GF3371438@nvidia.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <20240729134512.0000487f@Huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240729134512.0000487f@Huawei.com>
-X-ClientProxiedBy: BL1PR13CA0358.namprd13.prod.outlook.com
- (2603:10b6:208:2c6::33) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8928004F
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722268112; cv=none; b=BHN0i4hgkss3DN383JRh235liA6P/txSlYWT41Av1bqjiMTF5ynkDPbJDuyhlyn94k5jRsnoZxT8/OrO5N4Zvl1GxhON49cJa39UNAA5z/4yqhlJ3EhtZUHUAV+J58sDsPwQZz2jEL5CDAwsZbLCghf3Gz4sL11HFRjjM0UIAAM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722268112; c=relaxed/simple;
+	bh=rArEl4yIOqZ59InPwfhlc6msPLZe89qV0Yi2KY08dg8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=EoBJ/2IHO0ty4fLfkSabhQyAypuQHeBqQg3BtoR4YSwjelv7c7Fv98JfqsZ7skDixLbrZNsEjn5uVTLdvw7J86VYc+3/5dT4L02Sm++z9QegTNX9L9ew2d1txy3pCQb0Erk+LVoNr8bGtdNXRqlWFgujPCf3p/ni8OuUuvF53ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39ad7e6b4deso51945125ab.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:48:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722268110; x=1722872910;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jA8+++3yvb+eDXrAD85K2rueOWSInRZ1QvJmqWjrziA=;
+        b=UkUsq75DK0mQG9cZV1lruf4jOZ61GEc9CzqpAu287KsfjsVAdm6n2XGRKtOyKULmeC
+         +ioJ+u2mvBVS8bzOCiDTUS4fLefwPo83A45CivJG/wsv/iqfZEsSZbRkmrX9qP4AK03z
+         7eOM/j9uQYtlqczdvcljXkMGcjxbe1Dk2sKHxv/PSEzvKPmRLao58zi+WxkJtrjqJOQ8
+         dSZrcze65NCs23ulOlNmziUSCA06NUbYshC13pTeUYn0EwOenB61WfJn8pAPq9ETcHKF
+         unwGgMfJc5BoJDqkeT4pUoVKbOuEgIDkTtwI0IVX8JfGoFRso3NjueLd67f2VhizIfjb
+         lnVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBVBe7ahXwgJJajLO4O5qwv7RqkZOa4yCRvVnwDq87MbwTtnUYqsb0OumMJJoUdm+33TH2xVs7b8n0wMTysngkTUHZNj9g
+X-Gm-Message-State: AOJu0YycHKu8vvFkOYfJyltvo8DhH+68OgEo6K9Sy7zi62nBnokmXFmM
+	jxyzxwUJ3z4nY7ovn7i3ZL6yvFlHNiVSn5V1M8bVr7NhlQiaKgsR4HSavthhiR6msYZqim0tXkC
+	8UmwzE3prFZSfLc7G5Rb3f0WMy1GhpQCd/8vj8cy/4eXUetsIQweWbvo=
+X-Google-Smtp-Source: AGHT+IHSo09wEPx7at03BStfZ2VRmELGpqUvIeiTtyJ7I8yfxlluwu4vCJYFIp1cTivGqT3HGF2d7nhNOr3QXQdZ/XDZ2L3SbkNl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|CH2PR12MB4215:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2416e8d9-d071-4c06-3cd4-08dcafe4ff1a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?PVVt83/O4WbYSS+AM5Yxobd1hRQpWSjRAK0y78CUR6fEFNf8uEuLB2SQWKKo?=
- =?us-ascii?Q?bEUIYAizUkcikTqshz7RnJr9Jo1W8+OOqO/P2kRunseJe9d7ScgNT5EJuDyk?=
- =?us-ascii?Q?8359AyFERnCDqnG6iPkk2h6jgF2/DC5kyCWUnbYfbgLjVv/AfMkAxFF+9f98?=
- =?us-ascii?Q?bvNuqr+IKGNJRfWaX+zDQaB0qtqbvwC0WYsiic5/JsVllnjpuczzTGZnDSv1?=
- =?us-ascii?Q?uNSj/Jc4Z4vz09taGfRdoJIIfnQ2FlMXcFZl9bsSlxWBW3XDRhNahUjV1sbc?=
- =?us-ascii?Q?5e7sE28ik/l/KBkfcbNmS/kva3/YYSsfXtrpKMI9YHSIwCTOwor9IOw2uP/i?=
- =?us-ascii?Q?BtSoDIWbH02ixM5evuHf2R0ij/9p7Ird9pt1LMBQfSf8NzNwkRlSi8Fzwgkb?=
- =?us-ascii?Q?xaQr2oJAQRmR5SiK8BdivAnTDUAp20DbrSEjxyjjmnQ9QvG50BQchlwGZQux?=
- =?us-ascii?Q?CIRmBa7mAfQoay3ksy97PX4AuWBmAl/0Zp/ouH0CHi6PBgmQANh1YFMTolUq?=
- =?us-ascii?Q?pyERBSazz0glJ6UUgUcRWAWSeaMS9vbF77IDFWsAI7TqBGzxwwWKnkl/FV7b?=
- =?us-ascii?Q?EJ8RSBaK9quCjSr2TOX8567N9GEYtR4w4ARmWhirzAPW5Vgkx/BoVIkdS62U?=
- =?us-ascii?Q?Hk9OI/v+qOtjpX+3dCtpuE0BSgz8bsd0hU87AXxQQUoDCU8IXRKdJZUXU93j?=
- =?us-ascii?Q?h0wI9zF7wcZQOFHvxqxN9wlfZf16k3Et+CLsboeO3mKsRvWJfg0X3Gv8aifE?=
- =?us-ascii?Q?VzHBYcJdRF108iUm+pBJ2HNI+b9ln/44/j0tUQ41lfIDsHAKaZU1scNqea7W?=
- =?us-ascii?Q?i++1CSS9mFICwF4I6yybwYyR3pv8R1/lvJtaQmcSwB+ffiUuD0gTYnCaDsZ+?=
- =?us-ascii?Q?xrJ1AhAL40kXigKZIWWhRAFD2Y2NzJREBntv8Z7QnQxpRDxPFkPj9X+O7SA5?=
- =?us-ascii?Q?jvrfX86uOtg0Gsxg7rQeGu5lAYeEf5w9J6ITR9AG3rFldWfINfIKBUet9bof?=
- =?us-ascii?Q?gg9+oMCkB+vxlLxRrFbSMrREnLmj7qWXdzcfuBA77+oSMEimew7f0PTE7iBN?=
- =?us-ascii?Q?9uw6fVnN15BuZMNTSWn9IDaRLmzCqcTgXRDCIKuwFUY3k7kbs+3P+IHR5bG3?=
- =?us-ascii?Q?A3a9C3mvQdZPknMMsF6wWmO9UATcwFNbbyTKMqFqUwaxmciypHJHcMAOvv8h?=
- =?us-ascii?Q?4n6S30Snk4oVjgpEPD57sfnf96snIwBWlgE6TsJh0z46HN4ByQ4WqDvlx+T0?=
- =?us-ascii?Q?tq+PGFV+M6oYA7R0s72LjqmB++Hsf+M+vjJT54jpz3FIW7sk3gON4Q1nW3TX?=
- =?us-ascii?Q?czMEjtMYSTx4QHj7slLroTRnumw6zeQ7bXle8cf6/fF0wA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Oq8xwThVkRYOOSnN5hKZv7KSK5px/NVMbsdaIdPDs/nxyJFNEYw2mxObWqMX?=
- =?us-ascii?Q?NhDTRiIjQvUU5A/GHY3uMlSuoo/w6tiGWfS9aMxKJz/ui/0GERd/neqK6HxT?=
- =?us-ascii?Q?ktVr3YR7j1tvn/92fqpiWKP8D+HmcGdSsbVOxGndq9k+mae74a3bPPTr//yI?=
- =?us-ascii?Q?oF2CoW/HdBK/lbOsitl+wqJTIJ1fBWfAfLNleVcfY9iOqmWyL+4LxdYT6UcY?=
- =?us-ascii?Q?RYnfgJ25yk3rRm1TrSxO1skUXa8tnKb6g/FD01aDSJGe+JTSOBR87wFP+Yuf?=
- =?us-ascii?Q?UXRMiLIyMwxfE6jID0riZULIkZY7MY+MoWhb+H+C26t6E7G1YbgYeln7AiZg?=
- =?us-ascii?Q?IA4j1MWCN1gceCPhyYVrvhIoCUqNVX6e+3AsS5x0mzCGQ+EjdG1uQk2B1B92?=
- =?us-ascii?Q?PkmgLyb/Hv1FJ+OGw96UN65Fj4BKhHecbHwzwryMbHcs8quGO1txNmCVW0/Q?=
- =?us-ascii?Q?uSdTHBfpYinY23QzJ46PmxQmTyxHgLpXnCcFolEwT2v9k/EiTxEkaaoJxwmy?=
- =?us-ascii?Q?xDrw1EoOfBP9HHXOPeeoaJLkE6dLuDGGz7njJBwadmkeYujdm61Nv17iMTEb?=
- =?us-ascii?Q?JSo7X04w5u48hIA3AIT5Y3viCvD1txkD55jnNgb9rvxJDmmfMDj9E0tmIxkV?=
- =?us-ascii?Q?UjLwcs84VJWgmwFbV9+SSUo/JGWoHEpz4QHjmqQEbmJNTs/f+JzLx4sjnhUi?=
- =?us-ascii?Q?86hqt6/87gwQM9JYJeZiUbvVlziheXX7npRxDwskrAzhCv2CqiaZV/3NIJGt?=
- =?us-ascii?Q?XIq0am3AmxLYlcK7qpTtHojunvZDHnJq4pSr90irLAe8/LGsyaypgDOM2ffi?=
- =?us-ascii?Q?wzkcmoVz03swKxf/MB99us5TZtjU8D2vEeUo+fegnBoR4qVmtfCM4cdUcEyi?=
- =?us-ascii?Q?sVgBJsAv1PoygFY+ilS6KCYzz0p8kw1IhlkNp1JkDFCyOjUnkY4O62ssHlCs?=
- =?us-ascii?Q?MO1Q7y6TF7uLsM61B4/MWqXvJkB2N/qf6zM112jXQz872NadH/bTkLSckCcR?=
- =?us-ascii?Q?R8EiYN00WZBd+rin4onq0ZU+e6gevwuRJuvkE4E1Ou7BPP2SaECwNqTL4TZY?=
- =?us-ascii?Q?fgaPOTCcSlXFpE1uMk3U94Hbm3nuJ+FJx32jdM7wgTkQyL9OgfmG9Ui5U24s?=
- =?us-ascii?Q?8/JuyAxPqPkmw/fbxHNVHQ/VeiiG9G4B54h8OdxlUY9GAdkFDADqUXOXbZk4?=
- =?us-ascii?Q?AqC2lFEb3En0M1Y3k+TjtddF+QWgrgvZZUEfLIAvcQrwFi0sDGwg77R7sCJN?=
- =?us-ascii?Q?SGMiw6RpRthquvYnLRgmR1oHZkjuAQOXb/mkc6K+w41oKg/kLETfI3m6ovlr?=
- =?us-ascii?Q?vykOXryS/i6zykMOk3WtqKlF/dBZcVscrbit5DHnvcvjsOzsMmKeEvp8kxk3?=
- =?us-ascii?Q?1calq/zvdDFEbzX10tgrOAbGi/Zmezklvka+rBMzNY8ZkufkqezA2uosGX66?=
- =?us-ascii?Q?Lpw15rQ2fmm2Ka1x2vjg/MXy3u27VrIMo60ULvbjpnM1sUVxinZzHSMmqKGK?=
- =?us-ascii?Q?/fYoIRyriaqTLJw4TBsA1BpIvEQw33nuOc2WAUiDvcJyK3dP7/VdB18uvHHh?=
- =?us-ascii?Q?iuZUxDByQxeCeMJ7EejVuyl+W4oXYFW6ZIh3zBcP?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2416e8d9-d071-4c06-3cd4-08dcafe4ff1a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 15:42:04.9022
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MotPXMJdURPIVgBwgMYEFMzsNq0j+NBYGt2rw4EiiFXntO7keIyNGQDt0isxhxAV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4215
+X-Received: by 2002:a05:6e02:1d15:b0:39a:ea89:22e8 with SMTP id
+ e9e14a558f8ab-39aec2d773fmr5162965ab.2.1722268110131; Mon, 29 Jul 2024
+ 08:48:30 -0700 (PDT)
+Date: Mon, 29 Jul 2024 08:48:30 -0700
+In-Reply-To: <00000000000061c0a106183499ec@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e9a538061e64cae7@google.com>
+Subject: Re: [syzbot] [wireguard?] WARNING in kthread_unpark (2)
+From: syzbot <syzbot+943d34fa3cf2191e3068@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, davem@davemloft.net, edumazet@google.com, jason@zx2c4.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jul 29, 2024 at 01:45:12PM +0100, Jonathan Cameron wrote:
+syzbot has found a reproducer for the following issue on:
 
-> If we expose that particular Feature via Set Feature we may run into
-> future problems.  It is probably possible to make the driver stateless
-> so any interference from a userspace program using fwctl is not fatal
-> - in this case userspace code should probably be safe to state changes
-> anyway. We know about this clash today, so could easily block fwctl
-> from exposing this feature, but it is illustrative of a wider problem.
+HEAD commit:    dc1c8034e31b minmax: simplify min()/max()/clamp() implemen..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=100341c9980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2258b49cd9b339fa
+dashboard link: https://syzkaller.appspot.com/bug?extid=943d34fa3cf2191e3068
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1022b573980000
 
-> We will get some decisions about what should be exposed via fwctl wrong
-> in the long term, even if they are correct at time of initial decision.
-> So how do we cope with that?
-> 
-> 1) Make no guarantees on ABI for taint causing operations.
->    So we can block this FWCTL in a kernel if EDAC / ras control is in place
->    for the same feature.  I'm fine with this but it's not obviously
->    a correct thing to do!
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6699621c3baa/disk-dc1c8034.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/22380dec726f/vmlinux-dc1c8034.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/04c3f45e6e2d/bzImage-dc1c8034.xz
 
-Maybe, I think that is a bit suboptimal.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+943d34fa3cf2191e3068@syzkaller.appspotmail.com
 
-> 2) Allow the footgun. Keep the fwctl interface and harden the other kernel
->    support against state changes that result. If userspace code breaks,
->    then tough luck.  (Another form of ABI break, perhaps comprehended by
->    existing proposed FWCTL rules).
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 53 at kernel/kthread.c:525 __kthread_bind_mask kernel/kthread.c:525 [inline]
+WARNING: CPU: 0 PID: 53 at kernel/kthread.c:525 __kthread_bind kernel/kthread.c:538 [inline]
+WARNING: CPU: 0 PID: 53 at kernel/kthread.c:525 kthread_unpark+0x16b/0x210 kernel/kthread.c:631
+Modules linked in:
+CPU: 0 UID: 0 PID: 53 Comm: kworker/u8:3 Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Workqueue: netns cleanup_net
 
-This one is certainly closer to being in line with the fwctl doc as
-written, but I'd say fwctl should be unable to hijack a scrubber block
-from the kernel in the first place.
+RIP: 0010:__kthread_bind_mask kernel/kthread.c:525 [inline]
+RIP: 0010:__kthread_bind kernel/kthread.c:538 [inline]
+RIP: 0010:kthread_unpark+0x16b/0x210 kernel/kthread.c:631
+Code: 00 fc ff df 41 0f b6 04 06 84 c0 0f 85 93 00 00 00 41 80 4d 03 04 4c 89 e7 48 8b 34 24 e8 ad f7 56 0a eb 09 e8 06 a0 33 00 90 <0f> 0b 90 48 89 ef be 08 00 00 00 e8 c5 b5 97 00 f0 80 65 00 fb 4c
+RSP: 0018:ffffc90000bd7760 EFLAGS: 00010293
 
-> 3) We are stuck for ever with not supporting anything via other interfaces
->    that would break if fwctl was in use.  Ouch.
+RAX: ffffffff815fe27a RBX: 0000000000000000 RCX: ffff888015f90000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffff88801fcd8200 R08: ffffffff815fe207 R09: 1ffffffff269d71e
+R10: dffffc0000000000 R11: fffffbfff269d71f R12: 0000000000000001
+R13: ffff888029c75a2c R14: 1ffff1100538eb45 R15: ffff888029c75a00
+FS:  0000000000000000(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc23f437d60 CR3: 000000007e72a000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ kthread_stop+0x17a/0x630 kernel/kthread.c:707
+ destroy_workqueue+0x136/0xc40 kernel/workqueue.c:5793
+ wg_destruct+0x1e2/0x2e0 drivers/net/wireguard/device.c:257
+ netdev_run_todo+0xe1a/0x1000 net/core/dev.c:10753
+ default_device_exit_batch+0xa14/0xa90 net/core/dev.c:11889
+ ops_exit_list net/core/net_namespace.c:178 [inline]
+ cleanup_net+0x89d/0xcc0 net/core/net_namespace.c:640
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
-Definately not this option.
 
-> Note that I think this only matters for the Set path as Get side shouldn't
-> have side effects and is fine to expose without synchronization with
-> a clear statement that values read are a snapshot only.
-
-Yes, that makes sense.
-
-> We could say it can only be used for features we have 'opted' in +
-> vendor defined features, but I'm not sure that helps.  If a vendor
-> defines a feature for generation A, and does what we want them to by
-> proposing a spec addition they use in generation B, we would want a
-> path to single upstream interface for both generations.  So I don't
-> think restricting this to particular classes of command helps us.
-
-My expectation for fwctl was that it would own things that are
-reasonably sharable by the kernel and userspace.
-
-As an example, instead of a turning on a feature dynamically at run
-time, you'd want to instead tell the FW that on next reboot that
-feature will be forced on.
-
-Another take would be things that are clearly contained to fwctl
-multi-instance features where fwctl gets its own private thing that
-cannot disturb the kernel.
-
-I'm really not familiar with cxl to give any comment here - but
-dynamically control the single global scrubber unit seems like a poor
-fit to me.
-
-Jason
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
