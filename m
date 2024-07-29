@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-113856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F096D940181
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 01:07:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D282894018B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 01:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 994A11F23016
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 23:07:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EE18B21350
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 23:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B2618A940;
-	Mon, 29 Jul 2024 23:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F3F18A940;
+	Mon, 29 Jul 2024 23:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pN1IFQv/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2y9CtY/R"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7123D9E;
-	Mon, 29 Jul 2024 23:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAB63D9E;
+	Mon, 29 Jul 2024 23:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722294447; cv=none; b=uxGHbU0k688bnVoIyG3+nT60ggRCGBl4T9klC0GsRNXlfn9TOh4CxBZP0KflUIsiL45XgOzd/1+B31UogQPGRP19O+Qaiwx/pVivmQ9wH/397jg1GhBIlBhPMJqjBILmI/fmjhbrP2VOU4Ub3mcVFs4YsYUIaOiW5O/SlZ6WuNM=
+	t=1722294663; cv=none; b=WIZunGgnel69x91cM+1GG9oDgYgd1NudNMZGcw8MFp0EhShZ+S7ktNc27wCrB79hrEKL27D+Gjr3G1BeEXQtTRBj9HsdFeUHZ4u1I2lDlFW/SxFSyWfQOY3H7VsGv/gN0iHTfh91KtlCCJQhqooNPaX5szNuWhfnUBo41u8Tuhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722294447; c=relaxed/simple;
-	bh=wu+76dIXyDeWK9VV1oFB1QDq+zw5F419Q/W4teBOHyI=;
+	s=arc-20240116; t=1722294663; c=relaxed/simple;
+	bh=+KALGAYHWeDChsBu5x2X0e2rHdT9D4cUAoPmGHqeols=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YuphLahGG2VxkBzLbC//eXdUX7RbyTaqx0pyT1t25odSAx3AwMzGKiZroSL42Rt+3L9CPhqLwhMm38hw6fGvuz70exvzp+3aw827MtEzVtCE3Xrje/w9GFUx06/m/jm01tydx23D25mCce+iv6KpovJunxeYOVuuidozGtTtaHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pN1IFQv/; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=rG+spSQWXiCWTXO+iRYlvA0UFaTrQXhGVO6l9izPNYerM9cuqokU551/Zdw+x21O4lM4BtDHiURPMZ9f5/Xt/tyLl83l2gcF9oX5po0QvKl6NGQSfH/LhXzRlPMp6yj+Is9D4TzsllOycga4uXhEUJLi0xwZshRNLfTgpT6UIxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2y9CtY/R; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uvnDSeCoxZ/VdHvGtaR7kxUowgWr+OFf2PPbTw4dlaI=; b=pN1IFQv/DExrElxT9wTgStYUYk
-	CO/arUWdotT7JbZ6usdTuFHPLr7uUDj6+CoukqBL59CalRKL2mytqdRZ5BjHyK+V4EVmKbntu+ubw
-	ijPqMiPPCb2BdCQpmAEDAKMUAAYgchqFAkQKAyGMIisv9HTOOXjAiXJqu4VogIPsqN9U=;
+	bh=X8MrpDDV2qv6M49EbVatv4sbsj1Myyz/1ZHmypRWkRM=; b=2y9CtY/RZihdz5aJlH2OPy0+m/
+	OuOCQG5JUJkGYm6ApMEDUFWaRnvaH3VpMmegbwtuYWS97wodLMBlmvy+9Up4i4jNLdcCQdiSxA7CV
+	A4KS4pc6dSn9la8lftHnzojoO4q/6nL5L57vKVB+/K+8cyhlCl417L7No4/KTbaDEcIM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sYZSX-003W3h-73; Tue, 30 Jul 2024 01:07:17 +0200
-Date: Tue, 30 Jul 2024 01:07:17 +0200
+	id 1sYZW3-003W4g-Ae; Tue, 30 Jul 2024 01:10:55 +0200
+Date: Tue, 30 Jul 2024 01:10:55 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
@@ -52,14 +52,14 @@ Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
 	Linus Walleij <linus.walleij@linaro.org>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 5/9] net: dsa: vsc73xx: use mutex to mdio
- operations
-Message-ID: <bf450358-1286-453e-9601-17bb2077ee88@lunn.ch>
+Subject: Re: [PATCH net-next 6/9] net: dsa: vsc73xx: speed up mdio bus to max
+ allowed value
+Message-ID: <56335a76-7f71-4c70-9c4b-b7494009fa63@lunn.ch>
 References: <20240729210615.279952-1-paweldembicki@gmail.com>
- <20240729210615.279952-6-paweldembicki@gmail.com>
+ <20240729210615.279952-7-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,22 +68,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240729210615.279952-6-paweldembicki@gmail.com>
+In-Reply-To: <20240729210615.279952-7-paweldembicki@gmail.com>
 
-On Mon, Jul 29, 2024 at 11:06:11PM +0200, Pawel Dembicki wrote:
-> vsc73xx needs mutex during mdio bus access to avoid races. Without it,
-> phys are misconfigured and bus operations aren't work as expected.
+On Mon, Jul 29, 2024 at 11:06:12PM +0200, Pawel Dembicki wrote:
+> According the datasheet, vsc73xx family max internal mdio bus speed is
+> 20MHz. It also allow to disable preamble.
+> 
+> This commit sets mdio clock prescaler to minimal value and crop preamble
+> to speed up mdio operations.
 
-This is adding much more than a mutex.
+Just checking...
 
-The mdio core already has a mutex, so there should not be multiple
-parallel operations going on. So i don't think the mutex itself is the
-fix. It is more likely to be a change in the timing. Which in itself
-is not good. Maybe use your new vsc73xx_mdio_busy_check() with one of
-the helpers in include/linux/iopoll.h
+This has no effect on the external MDIO bus, correct. It has its own
+set of registers for the divider and to crop the preamble.
 
     Andrew
-
----
-pw-bot: cr
 
