@@ -1,138 +1,127 @@
-Return-Path: <netdev+bounces-113642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28CD193F5D7
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:48:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF1993F60F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 510431C22191
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:48:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 073CD1F221D5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF7A146D6D;
-	Mon, 29 Jul 2024 12:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70D21465BF;
+	Mon, 29 Jul 2024 13:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sssjVpFj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1GSkuUcM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFF1148304
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9691DFCF;
+	Mon, 29 Jul 2024 13:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722257288; cv=none; b=KQIZ8wjZhvrukLdkCq/QZsWaX30wkz6fq3LrVVtsyDQkKw/L1H36H0Vbj9xdwQHn+PIciuhZm/A2NkvNVo5c1kQ9n8b6fvvaf5+WRoe5O63uHt++W0nrQj/+cmNDrMkV35NPDWIxR+zUBQtMoRoJbihvIR2HL/uba1UcqvkZySg=
+	t=1722258095; cv=none; b=LGMeNvUqNnjRWDaMICGzivPB+kD60QQD2jCMZZ1UMS8d7C8EaK8D8Zw1VyiKg12Hy2nDAz+OOlX94do2Qm6swrRNAno1QqySj4dfwvbiG/KYVkwhDpbEUV97cHvbQB4tXX1hOuP7qUCHHKSlslCrmMU6NC7+PtXTyVn+JuPkv5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722257288; c=relaxed/simple;
-	bh=igE+HtJT8zZ0cFXeIrI6FitI2VfseQpKEFSgzHO3Sf4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RSice3lfXVCUJQAm2eg9TKT70pQozr9Wf7dVlF0hGZ6/25ZStoewlcfHOEaI7Y5E5n4Nj8mM20LM1npnPuYo1XEGXkqTAl8AnpHamy17SJtf//E2gxtPQHp3azs3BKhLVdvlvkro+Q2nsKdWZB2gTkbOL33ZHI4HZYGqOfFpUrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sssjVpFj; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722257277; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=+OBdQR7y6nQXG3Qmm9hHKCHP3uBvPQTWwwC7JEBJ6Uk=;
-	b=sssjVpFjEdeBLYD/z+CSu3fj3tNSrU/ulYDasKALWmVcyWM22L8dLJ9hSOSENFFftGxER1XAy3gFEkXe6AJMZQLQ66PxpxXRzEOQK//AYjQlEhjK7+RADtD3aCsSxZjo+63+ni85E2GoeX88n2RFXQyJPBTN8WUBe5AnOfV6lH8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBb8gbw_1722257275;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBb8gbw_1722257275)
-          by smtp.aliyun-inc.com;
-          Mon, 29 Jul 2024 20:47:56 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	s=arc-20240116; t=1722258095; c=relaxed/simple;
+	bh=lyMQxeeEfari71/LaXTaod34URVqznPpnYytJZ6gTr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bfAPWDRQpOVFW2mEdObYXU8jOpLkrhfN49Qrk/CmHpnL3GlMM434p1cdU6Zpz3YPjCP5jg62JMsO3rNHMk1kYuwXjdRkM0c9H76MyS71URzMacDAvXOPlSprLwRWflzfxAO6o/QCxp5uPKkIs/3BPTreUqR1bJ8+FTeQw3h+Q9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1GSkuUcM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dCor073xQJijp8I3RK3+ty7FjGp2GGPrVnPyb5mRIYg=; b=1GSkuUcMy+MnQlrUUZPZiL0Ly1
+	wOJOpFW9Dt0n42j9nsc0LVGkc3G+6GPbXxx+ZDe53eeqx673xKGuCnzOrTx4epdFvaYwzMsxkTSRR
+	gLtYX28JoCoPRJ87N0XRwsvLOCpF6My7Oj2j7wen56JhKivm+CKuH/au6IXd/PC6kmGAzWZRBSz5r
+	ozwMLyEdlI8UkrK5WHK8xSjQRp9/SQvCCUzUGatWht/0O3UNm5r29E2wr3+ccshTiNNn/Ec79Nrfl
+	iV9EgtQoX1Tj0DeCd/h9othUdgE6IGfc9O8kKzYQh4O/c4Kcvoqru5wAqHlb2WW2nGzbFeMChzKlR
+	f0BFD+Mw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46248)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sYPzP-0004Lu-1R;
+	Mon, 29 Jul 2024 14:00:35 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sYPzQ-0004L5-68; Mon, 29 Jul 2024 14:00:36 +0100
+Date: Mon, 29 Jul 2024 14:00:36 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
-Date: Mon, 29 Jul 2024 20:47:55 +0800
-Message-Id: <20240729124755.35719-1-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 6/6] net: mvpp2: use device_for_each_child_node() to
+ access device child nodes
+Message-ID: <ZqeSdMMOk+GbVzHj@shell.armlinux.org.uk>
+References: <20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com>
+ <20240706-device_for_each_child_node-available-v1-6-8a3f7615e41c@gmail.com>
+ <ZqdRgDkK1PzoI2Pf@shell.armlinux.org.uk>
+ <aa440f7c-0ccc-443c-8435-50c864edd1c2@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa440f7c-0ccc-443c-8435-50c864edd1c2@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From the virtio spec:
+On Mon, Jul 29, 2024 at 11:23:47AM +0200, Javier Carrasco wrote:
+> Apart from that, there is a suspicious check towards the end of the same
+> function:
+> 
+>  if (is_acpi_node(port_fwnode))
+> 		return;
+> 
+> At the point it is called in the current implementation, port_fwnode
+> could have been cleaned. And after removing the loop, it is simply
+> uninitialized. Was that meant to be pdev->dev->fwnode?
 
-	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
+If you're referring to the one before the clk_disable_unprepare() calls,
+it's only slightly suspicious:
 
-The driver must not send vq notification coalescing commands if
-VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
-applies to vq resize.
+These clocks are setup in a:
 
-Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+        if (dev_of_node(&pdev->dev)) {
+		...
+	}
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 0383a3e136d6..eb115e807882 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3708,6 +3708,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
- 	u32 rx_pending, tx_pending;
- 	struct receive_queue *rq;
- 	struct send_queue *sq;
-+	u32 pkts, usecs;
- 	int i, err;
- 
- 	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
-@@ -3740,11 +3741,13 @@ static int virtnet_set_ringparam(struct net_device *dev,
- 			 * through the VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver
- 			 * did not set any TX coalescing parameters, to 0.
- 			 */
--			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
--							       vi->intr_coal_tx.max_usecs,
--							       vi->intr_coal_tx.max_packets);
--			if (err)
--				return err;
-+			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+				usecs = vi->intr_coal_tx.max_usecs;
-+				pkts = vi->intr_coal_tx.max_packets;
-+				err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
-+				if (err)
-+					return err;
-+			}
- 		}
- 
- 		if (ring->rx_pending != rx_pending) {
-@@ -3753,13 +3756,15 @@ static int virtnet_set_ringparam(struct net_device *dev,
- 				return err;
- 
- 			/* The reason is same as the transmit virtqueue reset */
--			mutex_lock(&vi->rq[i].dim_lock);
--			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
--							       vi->intr_coal_rx.max_usecs,
--							       vi->intr_coal_rx.max_packets);
--			mutex_unlock(&vi->rq[i].dim_lock);
--			if (err)
--				return err;
-+			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+				usecs = vi->intr_coal_rx.max_usecs;
-+				pkts = vi->intr_coal_rx.max_packets;
-+				mutex_lock(&vi->rq[i].dim_lock);
-+				err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
-+				mutex_unlock(&vi->rq[i].dim_lock);
-+				if (err)
-+					return err;
-+			}
- 		}
- 	}
- 
+block, so they're only setup if we have device tree. So, avoiding it
+for ACPI is entirely reasonable. However, we also have software nodes
+as well, so the test should be:
+
+	if (!dev_of_node(&pdev->dev))
+		return;
+
+to match what the probe function is doing.
+
+Thanks.
+
 -- 
-2.32.0.3.g01195cf9f
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
