@@ -1,129 +1,75 @@
-Return-Path: <netdev+bounces-113767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7408893FD5E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:31:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E834D93FD6D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:36:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30A422817DA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:31:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2ED7282485
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D4C187850;
-	Mon, 29 Jul 2024 18:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A492D15F32E;
+	Mon, 29 Jul 2024 18:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d0KijAof"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X29C1Bfi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B498187845;
-	Mon, 29 Jul 2024 18:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AC81E86F;
+	Mon, 29 Jul 2024 18:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722277876; cv=none; b=KnOJhODsIfTdzO+y7yzelXennhZAQrWZNdAakSyRaJf08EvF2EIIAmXvuzL0MyB9UZDnG5wcqDhc1xqBjHhG6iCy8c7BwFG4dSORL8OboOb9zROJ4WYgGNsrHqjlbUWKaKS+73ya7Mzhdafac6g9IDzRWEScwEMh8lYAjsLTPX8=
+	t=1722278173; cv=none; b=sUDTJlbq4vvt7QUBxKk5pm4LDNl/3iJNi9mjxTtQ6YyadW4WqtTr+/PiXqZuj8MUIILOwwSUW6vhd0kibhlwddH/ciVru+SRSnQc0OGs0UGAuyqUZ+59ieUaBo2WEv4PIJJq+i6rJLdVB0WnjkknEQJgSsgfeXhQHYEdQ5Zy9Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722277876; c=relaxed/simple;
-	bh=4v1JcM+xNdFDbTS+smgec2vJCq8myoE780AU0iX465Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f8KiD34CvzIhhPaiDelibrtdMHOHl622xUHdec1gQKdKLazETd6s7X3EipXaherMQBj5p9nBCSXVi23ZqmYspcnJDUkeEVm3DWPzxG6tgefz17mshS5dvG2ZCcF7tpTnNn8rzYmVT5QrzXBbZ43Yuhz6f0Yy+8OYIRBLBTemQB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d0KijAof; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4281abc64dfso12714555e9.3;
-        Mon, 29 Jul 2024 11:31:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722277873; x=1722882673; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LIqKxSZyWTf/Z3V2HppYDKSRNXowgVnrZ6ay0XmhCCI=;
-        b=d0KijAofECoy8PkFV3WL9sT8HXRMLxL2OlrqYsNd8HeMrXTy4D7T41xmQdm7z2w+O4
-         kswQRLUlR+PwpnbDsYzWWyzl5SNMPMv+5ctQPssaXRpIjYZtAGHxpAYFrDYIJOvGXT1T
-         NU+Hrg9eeA1+zEsNB7akPNXzr3coQgqRfloAd4vm8xpmxZogcFtvv0QybcIYxKeFzpfA
-         Ll7ITwQey51N2jwk3Eb2iLTne0KKStaILUc4SgiR2vWOfRBjhvfduTmWgLqa4lNjHuak
-         6982voVRmTJpD5MevP3PnQbfVyeZqdEdd37QYzrm/0OfFwvF2/4U+MrKSCz9SM2e0/nK
-         BEcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722277873; x=1722882673;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LIqKxSZyWTf/Z3V2HppYDKSRNXowgVnrZ6ay0XmhCCI=;
-        b=uYvFfMBzj5uKO6N4kOkaMWpUVMXVrcBC8eXg5i+OsCF7GXB5dOFJPK3iMwpbNPqGhG
-         xoD1oS9ujRKVOYmnrUlVvBHQRb/H335GlgjWUJejSbImjn3iGkGfV9hNO/XPNz5+jrNr
-         p2Y+fySM8tH1dQL/g7UA7u/ayNwquEQ0Jtg8kpTH0I7usirA20NKHebAZVb6Wn/nluU5
-         +0uHQ6/SrN6q4peOV/pWzIK6/gJVerBiWEw6IE616wFYzEqJimq7Q+2gz9zNjlLpBf6d
-         VBJgASg4m7bvmQztZiID8iS3g7s0jIHrM2gNPJ0JtY3wybgnDBsNt0poJrGs93UxoqK8
-         5GlA==
-X-Forwarded-Encrypted: i=1; AJvYcCUouNuN8T1+eEH0ddcchIMWfpzT1K30Niz0l5Jmhk+3G9PiqbEV7L9BAaGf38AdrSFIouIU5YEj9bHXMH+XxBWguLI4WIMsn3ngu9TUiLlP1R5PtaeHjX9Vd7OqhPK6scdgqcrJ
-X-Gm-Message-State: AOJu0Yx6NOUJAywGjNLJtaNpYl5Kh89rdw3c0cGygdaA9JiJMm3rlgON
-	vdRTpSbeunzT2tXnmf8OjjV1XdJpE0uhqO2MGp8PlMCgyB8+wz8s
-X-Google-Smtp-Source: AGHT+IHUcB8/KDGDXgq3kOKIaEI3RytM/LjgWsO98GOv2rYjFJYGwyqRRrzVWn4eD9YGmY7tMl40pw==
-X-Received: by 2002:a05:6000:1542:b0:368:4e4f:cec5 with SMTP id ffacd0b85a97d-36b5cf25338mr7500104f8f.35.1722277873000;
-        Mon, 29 Jul 2024 11:31:13 -0700 (PDT)
-Received: from yifee.lan ([176.230.105.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367c0aa1sm12800165f8f.21.2024.07.29.11.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 11:31:12 -0700 (PDT)
-From: Elad Yifee <eladwf@gmail.com>
-To: Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: Elad Yifee <eladwf@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Joe Damato <jdamato@fastly.com>
-Subject: [PATCH net-next v2 2/2] net: ethernet: mtk_eth_soc: use PP exclusively for XDP programs
-Date: Mon, 29 Jul 2024 21:29:55 +0300
-Message-ID: <20240729183038.1959-3-eladwf@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240729183038.1959-1-eladwf@gmail.com>
-References: <20240729183038.1959-1-eladwf@gmail.com>
+	s=arc-20240116; t=1722278173; c=relaxed/simple;
+	bh=nxfkABl5BWTrLr60D2wn7BhoLnLf5ugY6VVCFxaA33o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=InOMulL1sJK8rSZkCftUUT7sELnIVN9KeHxvXw7zxqOsxE94YWcRxQu/8b66qhmkrl1gqWXFPO3XzUZV7tyQfiscIbyBPGvYPJSOF4y15BPVV80DpIWkfNhUtlD9YYKJIGjduPFbR/uB+wAkHGGjz6ssaWlGyRGuV3qxzL4I/Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X29C1Bfi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC42CC32786;
+	Mon, 29 Jul 2024 18:36:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722278173;
+	bh=nxfkABl5BWTrLr60D2wn7BhoLnLf5ugY6VVCFxaA33o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X29C1BfiMrCHeyQPDGYYWUZ1XEQ8FB6pMVLQEjr5mlCm5VV+uLXcMq1AndAh9BPVV
+	 NlS45YrKXkAHBWObeY0hK+RIUKdpRL54XSbnKgOkV7joo9ZYqjp519QYLMZvqPbSZ7
+	 Upd1ipbymqr9JJmp9XZcaWwE2tvgFreg+DNHV9dUwu8JlyM1T4NzaO7SwMfDi0iu48
+	 7r3lLXtjaHiFuChwTCiJq/5v2Kf3GHbQQ5rydzOxzajI+HandZzUfa/+Xi0qE4xzOH
+	 MOLeyiVvPsWvXoc6csRDHhmwasZONRGiQDVhuJBzMWxxD11YcA1LLeTr8abNd3V1VW
+	 npHc3Lw8hOcRA==
+Date: Mon, 29 Jul 2024 11:36:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ jiri@resnulli.us, syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: annotate data race around dev->flags in
+ __dev_change_flags
+Message-ID: <20240729113611.6433d447@kernel.org>
+In-Reply-To: <20240729163326.16386-1-aha310510@gmail.com>
+References: <20240729163326.16386-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-PP allocations and XDP code path traversal are unnecessary
-when no XDP program is loaded.
-Prevent that by simply not creating the pool.
-This change boosts driver performance for this use case,
-allowing the CPU to handle about 13% more packets/sec.
+On Tue, 30 Jul 2024 01:33:26 +0900 Jeongjun Park wrote:
+> According to KCSAN report, there is a read/write race between 
+> __dev_change_flags and netif_is_bond_master for dev->flags.
+> 
+> Thereforce, __dev_change_flags() needs protection.
 
-Signed-off-by: Elad Yifee <eladwf@gmail.com>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 4d0052dbe3f4..2d1a48287c73 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2644,7 +2644,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 	if (!ring->data)
- 		return -ENOMEM;
- 
--	if (mtk_page_pool_enabled(eth)) {
-+	if (mtk_page_pool_enabled(eth) && rcu_access_pointer(eth->prog)) {
- 		struct page_pool *pp;
- 
- 		pp = mtk_create_page_pool(eth, &ring->xdp_q, ring_no,
+I told you already that this just silences the warning, you need to
+provide real analysis and explanation of why this is right.
+https://lore.kernel.org/all/20240729074132.6edec347@kernel.org/
 -- 
-2.45.2
-
+pw-bot: reject
 
