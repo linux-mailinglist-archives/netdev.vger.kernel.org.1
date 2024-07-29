@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-113639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4427593F5C9
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:46:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8156693F5CD
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9C881F23EDE
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:46:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0DC1B20B36
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E227148848;
-	Mon, 29 Jul 2024 12:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B173914D29B;
+	Mon, 29 Jul 2024 12:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rc9P7Ly+"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EKn5edG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2084.outbound.protection.outlook.com [40.107.212.84])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2064.outbound.protection.outlook.com [40.107.93.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636BE146D6D
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81C1149E0E
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722257157; cv=fail; b=tavgnHgT1U7Vjis0dFLhS8kF4T2631oTFZy9IGUayZdmJ7lXuGs+MPwdmKRAPefsWyVP1c+HfWDCPKfNfq14mzbEcKXGRMrBMVrQAmiSN4Xnx02mtvx5r7ZrL93O+zBfZz9Gm55UX9TLrUcCcLVA6aSk1YCbagej+sVSAHiM1EI=
+	t=1722257161; cv=fail; b=I2GECXIdOpoJVw875dsNvX3ZX73ONNL+o7juJV7FlJuK7laDaoixfnmqK12xeoz2c/lKnKRe8zFRLs8ZBMeKWflNzeSx3MaHSq8P2sgfLF/YB3ODPFkHP2NJ/2tMkuPSBJRDKIZGA7QBzsXSeEPy9LBp9Vrp1AgaKLB4V0GKICY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722257157; c=relaxed/simple;
-	bh=leC1XJZVPdo0cVoilOITy1hjaFpd18fahP3k1OHecvY=;
+	s=arc-20240116; t=1722257161; c=relaxed/simple;
+	bh=g6dgiVZHpAlYLyqKoIYMl0CTllUOx9ECFFgBN1yzyCA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gvnc51xvjMwDSjcsyDm9EiHkG6Y3EcnKJg+LkQ5T2yboRwkGHbBGUOHwytzYFVji9xjfPdI18S3Ok2fwcCd7OmUY6rkTdPtcSVZJ6N5xIx4nQxzUhF9PepHRClfdO36hPjQulQkbltgMgQlpXkI5SyHitPPf8I4hm9UAJs5EqEc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rc9P7Ly+; arc=fail smtp.client-ip=40.107.212.84
+	 MIME-Version:Content-Type; b=pMUrF/w9Qi3zEwZ3MCwOE8I1I5Bz3uV30XiS0w9TRAcQJnsbdUSoonNpjpUxWMLtEEbqdKSKGlgeUaCJBYrQ0tKWoX0vcLt1dN2heHyRwHA6vGXB9SJ1DINc1zg3AhJC8lqs18H26TWeRnfsvN9+vTwFNnpuJ/BR0/J+zJkpz5o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EKn5edG+; arc=fail smtp.client-ip=40.107.93.64
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tNieJLBijaUmS/eptEAzcl2mW1og0yR+1+hy4q9XLgg/BTt5bPTDlcpwfwphQVo6zqFp3LqMXNCRf0uMF0bOGiFfuved8eMtafrKUxadJzh3leG3lVJ6dTGQfpc94/SYJvMaR9/5eJ8dPDO3nmiPflqzTUU5Lld8vQTCMyaPk4jWJ5vnp6YzaJCTZkqcFt2pPI9xw752gDAgfj+D1T5P7Ry/Sw+qdwOuH/Zc8mYzHTW/9CSQe3t8g3AYbCXD3qnhcFCGlcEk2a5IvBoNcuM/HkJEYK3XczMqLnTLCwD65UZ7yTg2S2cDpQZ4cUjiMtdBSgRqdwZ8cvkBiL180OKGZA==
+ b=lmDUD8fY50dCrYtynZ16OeY+Svf+/XbJ7zrZdGUpL/Clc+9O3EVdfeN15fmjz+ryOwfcQYp09ywbteSLZyXqQEDGJqNASsA+W/axNay+Jf1HYWrMZ07q0UVor61WDjPnKtsHboQnfPS5f4jwro9F7YJCsm+4Z+vmq+WzeyOtAJ4wvCddtZhUl5Bud0+KhkSqxfzxgOFYVBHMfiSlrPYc2urTzyO43Ws2o0Xar53S4XboUMklBhHUqY6zfCNGkH9es3KwbLhYDOdl7D1SlwQhRKyVGX84VJS4sTxl5+ppCyBDRhz63Oy75EcmxCOCHPyBleNWIvZ9KhHYTW08k7Rqtw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uGNds7oya0lHxMQcqk+74XviBd+fbe1EQ/rs3cKyYEo=;
- b=ty+fhPpovPj01hGJ8Bk038qMUGW9IBLsN7GM7+Ae7iWAfIT7t/UH+eGBuLReafSrYIbliFinNS7joftd+FIdhFZgehMbbMbMVfNBDVFoH2P+1C4AVTjIMl++2A+L1jXthiRE9zMJYPs33NkN5+aGV6zPUdmme8Rk3XP34sqwfjnTXknxhAYOBtLd7UStTKDmhHBJQoaPTeIzxmUVMPtqYJWiGQUOF+d37E149qYsAlB4ebMdSx6Y1fCGM5R/cOf5sbBVwDBLOS9VtZCJQNvJP8v5Fj9sRMp6CN6iDxoCcpTsi0ceQrGc8OhENkmhAvOe/Jh9I9HPYRy5p3AUj6E4zw==
+ bh=OaRC7om/2eEk+zaX1FZeFJKNBlMaohkCXqX9J3JEGWM=;
+ b=IBNgGaX9Nzr4pmjwbzcuVkAewxHsDHl4q5/IIzzeG0VCSbLvFzCLPMymBRIWHNeur/1hpYvKb55qW2vKGu043bbJQUdmm9MlMrTTDRGgH2iugDPkn7DowsK6+9EAPOHF+wtAky2kg6heAOXzl/K/RBITagUfxQR1JeqO/giQQRRCiiaAN35jb1G8kMQTI50hutew/iEfP/Qo3oilzZCvKn3rH1yjBIok9grMsiDiRbEUTN2GkEfpOVB564NIr63j4YIU1ZIk5fEy2lmwwA+WT0QDzWvoJMY5VcbCsYhrRkGkJydf6sM9iWCLqKd9cb18njZML8bgAJnD95VohSY2Gw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uGNds7oya0lHxMQcqk+74XviBd+fbe1EQ/rs3cKyYEo=;
- b=rc9P7Ly+3V10Nfh/KzxDrv219IOh7KBIMmJTbI1puQjy2kdlp/l7UXuQAg1LjhrtFfaUS65uraVn99J/7TYXFzMKk04rWYbFulvkbpQf7aEXIgQ2+XrNnl6elTk+nNWXiabzvHgdA8Z2yCgMt145PUBi/GbrjSFO8t4QrfOJo1Ahxpmh5/xcxldlCRuYzpoBsG25xQ0F2Acog32Gf51JJ4LcTU8yqQaNQQkAmMtKFRp6Y/CmIbMpTO1XSSmiJNgAvbX3dknIGqt+aoDco1njj3Rnp6CHUFh6w7ClmTGTq0hrZpPtcahXR20QzUQTY4XibwRCm1LlG/fXk3uI8U9zLA==
-Received: from SA9P223CA0020.NAMP223.PROD.OUTLOOK.COM (2603:10b6:806:26::25)
- by DS0PR12MB7608.namprd12.prod.outlook.com (2603:10b6:8:13b::11) with
- Microsoft SMTP Server (version=TLS1_2,
+ bh=OaRC7om/2eEk+zaX1FZeFJKNBlMaohkCXqX9J3JEGWM=;
+ b=EKn5edG+Ha2p5uC/NAsNQBS23rXKWBBp6MvEeA2DtqtVKicTWPuRqaPlyQDI9gYz54E4eBbTzN2f21kqub24foq8Ciot0wPJEViv3tNsHrbSndM/7QBN7nX4G57BelHeUZgSa+K7cCyUtTiBSQ0JbJ01rUPqMn+S+4Uo384nfnzK0h3NnhnKlCcO28sDbty+RgR/9ZsN5rEkDLd007FXLWubg+a41/kJ7jGdAy17iO3IM1IsBDV66tqlCKYoHj06fcCOl5838oC+Cuij3UOGXOozcHVhPSG1N4MgjBU5eCU02FkcliJLi7Ku3Iiwj2GOHC38Rsafjg3YyADamEuWSw==
+Received: from SN4PR0501CA0103.namprd05.prod.outlook.com
+ (2603:10b6:803:42::20) by SJ2PR12MB7944.namprd12.prod.outlook.com
+ (2603:10b6:a03:4c5::16) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.27; Mon, 29 Jul
- 2024 12:45:51 +0000
-Received: from SA2PEPF00003F61.namprd04.prod.outlook.com
- (2603:10b6:806:26:cafe::ed) by SA9P223CA0020.outlook.office365.com
- (2603:10b6:806:26::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.34 via Frontend
- Transport; Mon, 29 Jul 2024 12:45:51 +0000
+ 2024 12:45:55 +0000
+Received: from SA2PEPF00003F65.namprd04.prod.outlook.com
+ (2603:10b6:803:42:cafe::70) by SN4PR0501CA0103.outlook.office365.com
+ (2603:10b6:803:42::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.28 via Frontend
+ Transport; Mon, 29 Jul 2024 12:45:55 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,20 +64,20 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00003F61.mail.protection.outlook.com (10.167.248.36) with Microsoft
+ SA2PEPF00003F65.mail.protection.outlook.com (10.167.248.40) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7828.19 via Frontend Transport; Mon, 29 Jul 2024 12:45:51 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ 15.20.7784.11 via Frontend Transport; Mon, 29 Jul 2024 12:45:55 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 29 Jul
- 2024 05:45:37 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 05:45:41 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 29 Jul
- 2024 05:45:36 -0700
+ 2024 05:45:40 -0700
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
  with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Mon, 29 Jul
- 2024 05:45:33 -0700
+ 2024 05:45:37 -0700
 From: Tariq Toukan <tariqt@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Jay
@@ -86,9 +86,9 @@ CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
 	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jianbo Liu
 	<jianbol@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan
 	<tariqt@nvidia.com>
-Subject: [PATCH net 3/4] bonding: extract the use of real_device into local variable
-Date: Mon, 29 Jul 2024 15:44:04 +0300
-Message-ID: <20240729124406.1824592-4-tariqt@nvidia.com>
+Subject: [PATCH net 4/4] bonding: change ipsec_lock from spin lock to mutex
+Date: Mon, 29 Jul 2024 15:44:05 +0300
+Message-ID: <20240729124406.1824592-5-tariqt@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240729124406.1824592-1-tariqt@nvidia.com>
 References: <20240729124406.1824592-1-tariqt@nvidia.com>
@@ -103,212 +103,315 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F61:EE_|DS0PR12MB7608:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4fc4ea4d-6cd2-4284-2fdc-08dcafcc60fc
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003F65:EE_|SJ2PR12MB7944:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7911fb8d-3fda-44bc-b9d7-08dcafcc6345
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?309NqObb7VRCtdSdaGbePtj8Mdr8Ty7HIPZtiG08yLOEJoSZOJqTXYMn3scQ?=
- =?us-ascii?Q?WSmETL/gipAazlCTHY8nT0YyVJeiDQjqs8EAlO1DblhlPUjHuKj5Y9Ggj6zm?=
- =?us-ascii?Q?A1g7w1ySyds+t3wY7WNtU+LmKGoSpmTQbnYctre4RwQo9dY3kXiQVktkxPUo?=
- =?us-ascii?Q?UMfVxSHflDeW/PMHzoHxh4xVc3orMZsFTGZGwacrTQ/hQf84qS98ZD6NxMQn?=
- =?us-ascii?Q?WRoCscIQ7O0/BgJnRfnErY1a3W/Ipv+i8h6OdBShEu9ajECS9KZvxGRiK4Nd?=
- =?us-ascii?Q?p6SBIaZnplRlpAISW6kgnQIls7EF+E7sjDezC62fdFKYbHxVb5zuTSNdAjNK?=
- =?us-ascii?Q?yzAUo22CpSOr18YEc6LkZiCO/htH8pmkBQqMNHbqaphWNDVqpFDHTYBartzk?=
- =?us-ascii?Q?aC8HYgiprJpkTeWcGjdFF9Xx6SsycJSHkq/ldim55fAsJPJXwqU3Jajanl7z?=
- =?us-ascii?Q?DoHtKTk7v172WXLpM/VhXCs0BKTuFQraDxajPBvQ2dRdNg6uf9dj30XqL2aU?=
- =?us-ascii?Q?hq1097PZymn7nDm3xRHA1M++qLZpl136whs1vNkswpM/OxbcYZ9LyOE0pnlX?=
- =?us-ascii?Q?TmhR2Fk4Wg/Ul7gM/5wZmMf91YiGhtOMeXUFJOalyYeqvNgmdTbzBifSGCpr?=
- =?us-ascii?Q?hmW1Xw5p3EvnuTLlAoj4WnbN39GLinnIN0HZ+YOVsXYr0WduMl39+StTO++L?=
- =?us-ascii?Q?fw0tYBgEQk3JViZGrKajozS0We49W5lS0QHPrJfjeesVa44zm6qRg+1b/CJP?=
- =?us-ascii?Q?lcDYu3x/yxk7+lyTHn8kt5bDQ3wBLWYnTuIzvKMH3GubGBjwodO6Mp4uu9gK?=
- =?us-ascii?Q?RQowClL++GlTuvHnY6CCQVlKKP8ceFOjlE1p73ig3A1795lNMMwndpk93+1w?=
- =?us-ascii?Q?/SLNsz/PlPeXc09DgQ5RC4o74y4mXgUy7M4AjK+wDLdrYm69fCCAZsbRfG0t?=
- =?us-ascii?Q?gwnYVTgeto6A/zJ7glY1L7XIvaxpVvvOThBj22GE5orZFLFEZsPKJsnkGLsB?=
- =?us-ascii?Q?KABZSkTrN5ne0b43n3WH4NigvgngfJy2XtrDA9ObJG2zw+tjcKQl/dVYFkM9?=
- =?us-ascii?Q?rK0iHCHfbwEnOs7IBhFMY7QbEb5CnmZrIE12h5v5EwyDSScYh6EH/eMpaHpd?=
- =?us-ascii?Q?6en3AeJVYRUeXuCfcuCCcKDl3UozTgQI6j7nxmNVMqV+MdEeYlOpUJ34z4of?=
- =?us-ascii?Q?XiZFHP1mePODJ24+a4fzT2HMgQz/QEm+PXDF2hWavVWVu4ynzx2jROmy71xX?=
- =?us-ascii?Q?1owHTpR/fImfU3BrTE5dGRY2hTy6wijbY0qioH/9CJrqqhE0NDQa6xTCI7c7?=
- =?us-ascii?Q?4CeXL1UuYG9XvA+lrAhN4gBxTyuDxwKVCpuIgCkC+rluUDPxCvWfabTFM+ee?=
- =?us-ascii?Q?Cu32Xm6jIG6L92+1/ZXEwW+KMPFucwawd9gz5aqB6h2c2bdR88qE+bt7lD80?=
- =?us-ascii?Q?2YVks/4Whgf0sG60jTGDHIdreCZfveeY?=
+	=?us-ascii?Q?WRHTTlNwjE7e6dVu1sNjCK97tqQSMwJSuCH7N0nKuKJiPszlyLuJOSzzViJ9?=
+ =?us-ascii?Q?+bSnrb3U58fKslkkOAFPZ6YsRzG4r/mdNyTGax9DQin4NyB/QcsyGBzdG3dM?=
+ =?us-ascii?Q?xb878Am1R8/7S8Mgeaqb4dKW4yyddG4lTGc9Q+0uH18mUu8/C5p5lDN57rBK?=
+ =?us-ascii?Q?U7q3Rf0pslX0jZFoc13ygqj4Hgqq/Gn3ELTAgaDquPet+y41ouWKuH7wjt4g?=
+ =?us-ascii?Q?gjLo1zAHdqUCQqpegwk3S5sUCjnESk5NuaMbXlmNF+5d5MPY/4ra47XtyH+P?=
+ =?us-ascii?Q?p562L7Ptg9i7kTR5G/V9DmYYhuBWSmz71HkzjxnYTFPxXYkDHaSJhXcTjoIa?=
+ =?us-ascii?Q?TdnKIORaXH+BBgt23TuWa9tHlmdq7araP+mHD3TxeR7lWTpnSproxTkTd+xl?=
+ =?us-ascii?Q?22Scg944U89fhYOJrnV3TuYoeXMhoNBij0iuFlZY8XFJ+CnUQ947hsE5ffqi?=
+ =?us-ascii?Q?RJvZK5NfIDRujJv2Ug/72A0lPDO9KoQuX7As2b/w7w4C303U5ugBBDrhuUbg?=
+ =?us-ascii?Q?HYn6aQk4k2NZoNPfJ+PZKHin6uEW/2A0Q7ovc8CSSvhZl7dtWX3l21jkCXFn?=
+ =?us-ascii?Q?7iurT+9IDSCXRslu9RNU6+YbUK3BIUSJLw0tMCGujxpR5RCX18E/Ax6jIW2k?=
+ =?us-ascii?Q?OU8HVO+UN7CNVMc2lTN5zEn6qagkfUV9xkGSsrHfjZulGo7rMLunHv2nJWyH?=
+ =?us-ascii?Q?WmowciL5Vz4vIXzCBxiRwlgqQ9r/ljb3M+IDrdP94agsoZy3OISyyXPlAO7E?=
+ =?us-ascii?Q?MRsIIGLg2+qjkzJFxqMdQ2YMzlA+dUqEI8W8GHSv/2ZbH38vSd9nHCYNp7zZ?=
+ =?us-ascii?Q?j2T+kHT7DN9PzpEvqY+8t86M0Za+mS1n+p+twQAi8mlUpfZ0k5/NS4836Eo5?=
+ =?us-ascii?Q?/17A62KwUFCmHQ3UnOg/Jv7jj5eQ73CfMEqqugTdM3RmFu93zBiT469Sari9?=
+ =?us-ascii?Q?L87iKTICp7Pii17X6Yrwp+rrWgqOJqxQ8uVehM1aPqagags0dTR2w3vxU0Ll?=
+ =?us-ascii?Q?VUztaKprfJ9BoBEdvH1gbDhonpTQLkTKd++cx30yuyhMBHoTpEdV3EvM+/By?=
+ =?us-ascii?Q?gooPJKmR6oq4lCpNU6r/Q3c4wLoAArCf12N7o/PrKlvjMH7Ljhh0iNNNEKFs?=
+ =?us-ascii?Q?HDT9rOfvSKQlrM4pNuHs4Mbe7gm2cR2wbFOA/D2FVkpmh5YzheiUJqdWaNY4?=
+ =?us-ascii?Q?C0ByiO2mWAz5HBM9aD3twGJ086s02zP5C9alMMgJKmVqXc4o31Q0hQ2Ry9My?=
+ =?us-ascii?Q?fOnI0RSGlDbkgshE/E1iRA0xgkqPOF/E2aMHYayeL4+4V0PfPzwv5Sa9SW50?=
+ =?us-ascii?Q?jKqJwN6j2WpsGKg2z+pGdRao+NwYbUPT9bbzZ4oPLGWj412owVK53b1RxAX3?=
+ =?us-ascii?Q?uVw3HWf23qUYwEt5cYNwI2sXqSLdQFBj740PT4ZM9VHwiGIohYadJC+9i9OW?=
+ =?us-ascii?Q?9+Ozhz8sOX0IBGwSH2nV6pWZS7PmXlex?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 12:45:51.3690
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 12:45:55.2220
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4fc4ea4d-6cd2-4284-2fdc-08dcafcc60fc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7911fb8d-3fda-44bc-b9d7-08dcafcc6345
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F61.namprd04.prod.outlook.com
+	SA2PEPF00003F65.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7608
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7944
 
 From: Jianbo Liu <jianbol@nvidia.com>
 
-Add a local variable for slave->dev, to prepare for the lock change in
-the next patch. There is no functionality change.
+In the cited commit, bond->ipsec_lock is added to protect ipsec_list,
+hence xdo_dev_state_add and xdo_dev_state_delete are called inside
+this lock. As ipsec_lock is spin lock and such xfrmdev ops may sleep,
+"scheduling while atomic" will be triggered when changing bond's
+active slave.
+
+[  101.055189] BUG: scheduling while atomic: bash/902/0x00000200
+[  101.055726] Modules linked in:
+[  101.058211] CPU: 3 PID: 902 Comm: bash Not tainted 6.9.0-rc4+ #1
+[  101.058760] Hardware name:
+[  101.059434] Call Trace:
+[  101.059436]  <TASK>
+[  101.060873]  dump_stack_lvl+0x51/0x60
+[  101.061275]  __schedule_bug+0x4e/0x60
+[  101.061682]  __schedule+0x612/0x7c0
+[  101.062078]  ? __mod_timer+0x25c/0x370
+[  101.062486]  schedule+0x25/0xd0
+[  101.062845]  schedule_timeout+0x77/0xf0
+[  101.063265]  ? asm_common_interrupt+0x22/0x40
+[  101.063724]  ? __bpf_trace_itimer_state+0x10/0x10
+[  101.064215]  __wait_for_common+0x87/0x190
+[  101.064648]  ? usleep_range_state+0x90/0x90
+[  101.065091]  cmd_exec+0x437/0xb20 [mlx5_core]
+[  101.065569]  mlx5_cmd_do+0x1e/0x40 [mlx5_core]
+[  101.066051]  mlx5_cmd_exec+0x18/0x30 [mlx5_core]
+[  101.066552]  mlx5_crypto_create_dek_key+0xea/0x120 [mlx5_core]
+[  101.067163]  ? bonding_sysfs_store_option+0x4d/0x80 [bonding]
+[  101.067738]  ? kmalloc_trace+0x4d/0x350
+[  101.068156]  mlx5_ipsec_create_sa_ctx+0x33/0x100 [mlx5_core]
+[  101.068747]  mlx5e_xfrm_add_state+0x47b/0xaa0 [mlx5_core]
+[  101.069312]  bond_change_active_slave+0x392/0x900 [bonding]
+[  101.069868]  bond_option_active_slave_set+0x1c2/0x240 [bonding]
+[  101.070454]  __bond_opt_set+0xa6/0x430 [bonding]
+[  101.070935]  __bond_opt_set_notify+0x2f/0x90 [bonding]
+[  101.071453]  bond_opt_tryset_rtnl+0x72/0xb0 [bonding]
+[  101.071965]  bonding_sysfs_store_option+0x4d/0x80 [bonding]
+[  101.072567]  kernfs_fop_write_iter+0x10c/0x1a0
+[  101.073033]  vfs_write+0x2d8/0x400
+[  101.073416]  ? alloc_fd+0x48/0x180
+[  101.073798]  ksys_write+0x5f/0xe0
+[  101.074175]  do_syscall_64+0x52/0x110
+[  101.074576]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+
+As bond_ipsec_add_sa_all and bond_ipsec_del_sa_all are only called
+from bond_change_active_slave, which requires holding the RTNL lock.
+And bond_ipsec_add_sa and bond_ipsec_del_sa are xfrm state
+xdo_dev_state_add and xdo_dev_state_delete APIs, which are in user
+context. So ipsec_lock doesn't have to be spin lock, change it to
+mutex, and thus the above issue can be resolved.
 
 Fixes: 9a5605505d9c ("bonding: Add struct bond_ipesc to manage SA")
 Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
 Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- drivers/net/bonding/bond_main.c | 58 +++++++++++++++++++--------------
- 1 file changed, 33 insertions(+), 25 deletions(-)
+ drivers/net/bonding/bond_main.c | 73 ++++++++++++++++++---------------
+ include/net/bonding.h           |  2 +-
+ 2 files changed, 41 insertions(+), 34 deletions(-)
 
 diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 551cebfa3261..763d807be311 100644
+index 763d807be311..bced29813478 100644
 --- a/drivers/net/bonding/bond_main.c
 +++ b/drivers/net/bonding/bond_main.c
-@@ -427,6 +427,7 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
- 			     struct netlink_ext_ack *extack)
- {
- 	struct net_device *bond_dev = xs->xso.dev;
-+	struct net_device *real_dev;
- 	struct bond_ipsec *ipsec;
- 	struct bonding *bond;
- 	struct slave *slave;
-@@ -443,9 +444,10 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
+@@ -439,38 +439,33 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
+ 	rcu_read_lock();
+ 	bond = netdev_priv(bond_dev);
+ 	slave = rcu_dereference(bond->curr_active_slave);
+-	if (!slave) {
+-		rcu_read_unlock();
++	real_dev = slave ? slave->dev : NULL;
++	rcu_read_unlock();
++	if (!real_dev)
  		return -ENODEV;
- 	}
+-	}
  
--	if (!slave->dev->xfrmdev_ops ||
--	    !slave->dev->xfrmdev_ops->xdo_dev_state_add ||
--	    netif_is_bond_master(slave->dev)) {
-+	real_dev = slave->dev;
-+	if (!real_dev->xfrmdev_ops ||
-+	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
-+	    netif_is_bond_master(real_dev)) {
+-	real_dev = slave->dev;
+ 	if (!real_dev->xfrmdev_ops ||
+ 	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+ 	    netif_is_bond_master(real_dev)) {
  		NL_SET_ERR_MSG_MOD(extack, "Slave does not support ipsec offload");
- 		rcu_read_unlock();
+-		rcu_read_unlock();
  		return -EINVAL;
-@@ -456,9 +458,9 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
- 		rcu_read_unlock();
- 		return -ENOMEM;
  	}
--	xs->xso.real_dev = slave->dev;
  
--	err = slave->dev->xfrmdev_ops->xdo_dev_state_add(xs, extack);
-+	xs->xso.real_dev = real_dev;
-+	err = real_dev->xfrmdev_ops->xdo_dev_state_add(xs, extack);
+ 	ipsec = kmalloc(sizeof(*ipsec), GFP_ATOMIC);
+-	if (!ipsec) {
+-		rcu_read_unlock();
++	if (!ipsec)
+ 		return -ENOMEM;
+-	}
+ 
+ 	xs->xso.real_dev = real_dev;
+ 	err = real_dev->xfrmdev_ops->xdo_dev_state_add(xs, extack);
  	if (!err) {
  		ipsec->xs = xs;
  		INIT_LIST_HEAD(&ipsec->list);
-@@ -475,6 +477,7 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
- static void bond_ipsec_add_sa_all(struct bonding *bond)
- {
- 	struct net_device *bond_dev = bond->dev;
-+	struct net_device *real_dev;
- 	struct bond_ipsec *ipsec;
+-		spin_lock_bh(&bond->ipsec_lock);
++		mutex_lock(&bond->ipsec_lock);
+ 		list_add(&ipsec->list, &bond->ipsec_list);
+-		spin_unlock_bh(&bond->ipsec_lock);
++		mutex_unlock(&bond->ipsec_lock);
+ 	} else {
+ 		kfree(ipsec);
+ 	}
+-	rcu_read_unlock();
+ 	return err;
+ }
+ 
+@@ -482,34 +477,44 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
  	struct slave *slave;
  
-@@ -483,12 +486,13 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
- 	if (!slave)
- 		goto out;
+ 	rcu_read_lock();
+-	slave = rcu_dereference(bond->curr_active_slave);
+-	if (!slave)
+-		goto out;
++	slave = rtnl_dereference(bond->curr_active_slave);
++	real_dev = slave ? slave->dev : NULL;
++	rcu_read_unlock();
++	if (!real_dev)
++		return;
  
--	if (!slave->dev->xfrmdev_ops ||
--	    !slave->dev->xfrmdev_ops->xdo_dev_state_add ||
--	    netif_is_bond_master(slave->dev)) {
-+	real_dev = slave->dev;
-+	if (!real_dev->xfrmdev_ops ||
-+	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
-+	    netif_is_bond_master(real_dev)) {
- 		spin_lock_bh(&bond->ipsec_lock);
+-	real_dev = slave->dev;
++	mutex_lock(&bond->ipsec_lock);
+ 	if (!real_dev->xfrmdev_ops ||
+ 	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+ 	    netif_is_bond_master(real_dev)) {
+-		spin_lock_bh(&bond->ipsec_lock);
  		if (!list_empty(&bond->ipsec_list))
--			slave_warn(bond_dev, slave->dev,
-+			slave_warn(bond_dev, real_dev,
+ 			slave_warn(bond_dev, real_dev,
  				   "%s: no slave xdo_dev_state_add\n",
  				   __func__);
- 		spin_unlock_bh(&bond->ipsec_lock);
-@@ -497,9 +501,9 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+-		spin_unlock_bh(&bond->ipsec_lock);
+ 		goto out;
+ 	}
  
- 	spin_lock_bh(&bond->ipsec_lock);
+-	spin_lock_bh(&bond->ipsec_lock);
  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
--		ipsec->xs->xso.real_dev = slave->dev;
--		if (slave->dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
--			slave_warn(bond_dev, slave->dev, "%s: failed to add SA\n", __func__);
-+		ipsec->xs->xso.real_dev = real_dev;
-+		if (real_dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
-+			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
++		struct net_device *dev = ipsec->xs->xso.real_dev;
++
++		/* If new state is added before ipsec_lock acquired */
++		if (dev) {
++			if (dev == real_dev)
++				continue;
++
++			dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
++			if (dev->xfrmdev_ops->xdo_dev_state_free)
++				dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
++		}
++
+ 		ipsec->xs->xso.real_dev = real_dev;
+ 		if (real_dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
+ 			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
  			ipsec->xs->xso.real_dev = NULL;
  		}
  	}
-@@ -515,6 +519,7 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
- static void bond_ipsec_del_sa(struct xfrm_state *xs)
- {
- 	struct net_device *bond_dev = xs->xso.dev;
-+	struct net_device *real_dev;
- 	struct bond_ipsec *ipsec;
- 	struct bonding *bond;
- 	struct slave *slave;
-@@ -532,16 +537,17 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+-	spin_unlock_bh(&bond->ipsec_lock);
+ out:
+-	rcu_read_unlock();
++	mutex_unlock(&bond->ipsec_lock);
+ }
+ 
+ /**
+@@ -530,6 +535,8 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+ 	rcu_read_lock();
+ 	bond = netdev_priv(bond_dev);
+ 	slave = rcu_dereference(bond->curr_active_slave);
++	real_dev = slave ? slave->dev : NULL;
++	rcu_read_unlock();
+ 
+ 	if (!slave)
+ 		goto out;
+@@ -537,7 +544,6 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
  	if (!xs->xso.real_dev)
  		goto out;
  
--	WARN_ON(xs->xso.real_dev != slave->dev);
-+	real_dev = slave->dev;
-+	WARN_ON(xs->xso.real_dev != real_dev);
+-	real_dev = slave->dev;
+ 	WARN_ON(xs->xso.real_dev != real_dev);
  
--	if (!slave->dev->xfrmdev_ops ||
--	    !slave->dev->xfrmdev_ops->xdo_dev_state_delete ||
--	    netif_is_bond_master(slave->dev)) {
--		slave_warn(bond_dev, slave->dev, "%s: no slave xdo_dev_state_delete\n", __func__);
-+	if (!real_dev->xfrmdev_ops ||
-+	    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
-+	    netif_is_bond_master(real_dev)) {
-+		slave_warn(bond_dev, real_dev, "%s: no slave xdo_dev_state_delete\n", __func__);
- 		goto out;
- 	}
+ 	if (!real_dev->xfrmdev_ops ||
+@@ -549,7 +555,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
  
--	slave->dev->xfrmdev_ops->xdo_dev_state_delete(xs);
-+	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
+ 	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
  out:
- 	spin_lock_bh(&bond->ipsec_lock);
+-	spin_lock_bh(&bond->ipsec_lock);
++	mutex_lock(&bond->ipsec_lock);
  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-@@ -558,6 +564,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+ 		if (ipsec->xs == xs) {
+ 			list_del(&ipsec->list);
+@@ -557,8 +563,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+ 			break;
+ 		}
+ 	}
+-	spin_unlock_bh(&bond->ipsec_lock);
+-	rcu_read_unlock();
++	mutex_unlock(&bond->ipsec_lock);
+ }
+ 
  static void bond_ipsec_del_sa_all(struct bonding *bond)
- {
- 	struct net_device *bond_dev = bond->dev;
-+	struct net_device *real_dev;
- 	struct bond_ipsec *ipsec;
+@@ -569,14 +574,13 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
  	struct slave *slave;
  
-@@ -568,21 +575,22 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+ 	rcu_read_lock();
+-	slave = rcu_dereference(bond->curr_active_slave);
+-	if (!slave) {
+-		rcu_read_unlock();
++	slave = rtnl_dereference(bond->curr_active_slave);
++	real_dev = slave ? slave->dev : NULL;
++	rcu_read_unlock();
++	if (!real_dev)
  		return;
- 	}
+-	}
  
-+	real_dev = slave->dev;
- 	spin_lock_bh(&bond->ipsec_lock);
+-	real_dev = slave->dev;
+-	spin_lock_bh(&bond->ipsec_lock);
++	mutex_lock(&bond->ipsec_lock);
  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
  		if (!ipsec->xs->xso.real_dev)
  			continue;
- 
--		if (!slave->dev->xfrmdev_ops ||
--		    !slave->dev->xfrmdev_ops->xdo_dev_state_delete ||
--		    netif_is_bond_master(slave->dev)) {
--			slave_warn(bond_dev, slave->dev,
-+		if (!real_dev->xfrmdev_ops ||
-+		    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
-+		    netif_is_bond_master(real_dev)) {
-+			slave_warn(bond_dev, real_dev,
- 				   "%s: no slave xdo_dev_state_delete\n",
- 				   __func__);
- 		} else {
--			slave->dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
--			if (slave->dev->xfrmdev_ops->xdo_dev_state_free)
--				slave->dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
-+			real_dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
-+			if (real_dev->xfrmdev_ops->xdo_dev_state_free)
-+				real_dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
+@@ -594,8 +598,7 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
  		}
  		ipsec->xs->xso.real_dev = NULL;
  	}
+-	spin_unlock_bh(&bond->ipsec_lock);
+-	rcu_read_unlock();
++	mutex_unlock(&bond->ipsec_lock);
+ }
+ 
+ static void bond_ipsec_free_sa(struct xfrm_state *xs)
+@@ -5902,7 +5905,7 @@ void bond_setup(struct net_device *bond_dev)
+ 	/* set up xfrm device ops (only supported in active-backup right now) */
+ 	bond_dev->xfrmdev_ops = &bond_xfrmdev_ops;
+ 	INIT_LIST_HEAD(&bond->ipsec_list);
+-	spin_lock_init(&bond->ipsec_lock);
++	mutex_init(&bond->ipsec_lock);
+ #endif /* CONFIG_XFRM_OFFLOAD */
+ 
+ 	/* don't acquire bond device's netif_tx_lock when transmitting */
+@@ -5951,6 +5954,10 @@ static void bond_uninit(struct net_device *bond_dev)
+ 		__bond_release_one(bond_dev, slave->dev, true, true);
+ 	netdev_info(bond_dev, "Released all slaves\n");
+ 
++#ifdef CONFIG_XFRM_OFFLOAD
++	mutex_destroy(&bond->ipsec_lock);
++#endif /* CONFIG_XFRM_OFFLOAD */
++
+ 	bond_set_slave_arr(bond, NULL, NULL);
+ 
+ 	list_del_rcu(&bond->bond_list);
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index b61fb1aa3a56..8bb5f016969f 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -260,7 +260,7 @@ struct bonding {
+ #ifdef CONFIG_XFRM_OFFLOAD
+ 	struct list_head ipsec_list;
+ 	/* protecting ipsec_list */
+-	spinlock_t ipsec_lock;
++	struct mutex ipsec_lock;
+ #endif /* CONFIG_XFRM_OFFLOAD */
+ 	struct bpf_prog *xdp_prog;
+ };
 -- 
 2.44.0
 
