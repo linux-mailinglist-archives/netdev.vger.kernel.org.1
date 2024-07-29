@@ -1,176 +1,307 @@
-Return-Path: <netdev+bounces-113576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9372593F1F5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:58:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C31693F1F6
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:58:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EB83B247BA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 09:58:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E5621C21FD0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 09:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0704913FD84;
-	Mon, 29 Jul 2024 09:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD45B142E8D;
+	Mon, 29 Jul 2024 09:57:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="Mp3vupkC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCaH/RT1"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.7])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA9613F42F
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 09:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.7
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97511428FE;
+	Mon, 29 Jul 2024 09:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722247009; cv=none; b=Ix0IZQBVInLBjdfsJKwjlhSHMV9kDd0xXVOuD/Tz8lZ7CGNtoxF/5cFoNX0PR47csyo1IBM1inbz6BHyg6oxpq7OPyd1AQGQY3BJIbwDHlyGd/76VopjyuO+EhpvEQWH5CLv6Hl9s9AEaRfRsfeZQXRl4pm3roY0uXkC66JqSkc=
+	t=1722247025; cv=none; b=Ft+r4PuKEv1Fjr4IMrEMhjmmBXy3wkxyktVprT4aZAlahnlFJURFlo1mdc9wM5RWTf6XYtdx7TTlZfQVSX2Ruo79f9AFUW+KxVEaypm7iYTD8beSxh6uPMepjOl/I0MrdAMn2DpBIwY0boBkSLPg5HajqQzBg59qCGNfOzQddk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722247009; c=relaxed/simple;
-	bh=cp58baruv6kI99ttqSs0vwhfaJOPdiPkpMzJLLea2Xo=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=ni3eAyUKFC9CuXxmKxlVnKPEinARVUp1ARTLQyMvSmBSYJTVudyeTNjGI0C0mDRNai2twKLcG4m1HGswCXEe7MZp5opSSdbn3nZxgAVwPP6Uxjm6QPlM4LLMszlLvdqh3qaYwjQmjzaCpqA34J82f+TetMGmSe9eEQPG/zThyOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=Mp3vupkC; arc=none smtp.client-ip=220.197.31.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=From:Subject:Date:Message-Id; bh=XASwgVM5L7mw96K2bE
-	ahcEwN/Iy/NxjeOfPHGINvGDA=; b=Mp3vupkC2V/UlLEsBlf1a7iFJxoBIW7n3l
-	VKVJBfBcBJZSaGYIQBRTrOfPwydzMmM8+IfoFzgP24WVeoPMFct+qhW/FygK14CW
-	r/jBoAs3NTrJfl3IYIBhThIzQorAOIOhcTmSFbablv0yZsDAh0YmkEetmEf7NBtn
-	m5AC1LmnM=
-Received: from localhost.localdomain (unknown [111.48.58.12])
-	by gzga-smtp-mta-g1-2 (Coremail) with SMTP id _____wD3XyktZ6dmPojCAw--.39738S2;
-	Mon, 29 Jul 2024 17:55:58 +0800 (CST)
-From: xiaolinkui@126.com
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Linkui Xiao <xiaolinkui@kylinos.cn>
-Subject: [PATCH] tcp/dccp: Add another way to allocate local ports in connect()
-Date: Mon, 29 Jul 2024 17:55:54 +0800
-Message-Id: <20240729095554.28296-1-xiaolinkui@126.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:_____wD3XyktZ6dmPojCAw--.39738S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxuFy5Jr1UJr1UZw4fKF1rJFb_yoWrZrWDpF
-	yxKryIyFWDJF4UGFn7Zanrur4Sga18GF17Cw1I9r4Sywsrtry8tF4vkr1a9F17ArZ7tFyI
-	gFZrtFy3Aws8ZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jbF4iUUUUU=
-X-CM-SenderInfo: p0ld0z5lqn3xa6rslhhfrp/1tbiGBIr1mVLczNcZQAAsg
+	s=arc-20240116; t=1722247025; c=relaxed/simple;
+	bh=PAqXGJygzSTZidxpH9cDasJVvH3NY1n3b8QseUnmMuA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rTbcFsopwVWVRAMWNRWReQdw855l+PAYHDHfFz7QFHMyYJQLlemYZajeY5Mw+QAEoAwiQ3cA8vadyhaQCrmfkd+fu6NHjp8QT6mZlOwdRNU6+YBAt0fuD8txjNq0KLJDvWMTSD8LQdr4Rk4DoBOORg+h145QIOPaG4n7b5Diyl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCaH/RT1; arc=none smtp.client-ip=209.85.222.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-82e2eee5f5cso1616207241.0;
+        Mon, 29 Jul 2024 02:57:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722247022; x=1722851822; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PAqXGJygzSTZidxpH9cDasJVvH3NY1n3b8QseUnmMuA=;
+        b=KCaH/RT1+JHH+m2/s+r4NKXh0eDxRdSA5hETo+wFoe+bpHLVbllVh/EHV0AGy38JVD
+         yVY+LYXGmZ3k7ELX1ozccEdPFt/u+BqTe1GPVtEJnC6E7IR93a2W24eD3ZPPwQSIELQZ
+         fnOQJ4/vLroOM8nyXuAinOs3oWV6M7fvVNlN1CbzX97zoXkY+va0zqtV2JAL3bBvIE2p
+         rE3FIFYYlXXrxL5+R7EBkXKPHGxMjxTBb3bqx7z31QKIZyyrRIaRtAHgem/qyP3jQmCv
+         6O4ABvTa9aIgEwSq9nT0dV+fZzvD4bDKTNVvvn9CeqgJgyKlUqzRKQOT0dizWwG7byBW
+         rRzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722247022; x=1722851822;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PAqXGJygzSTZidxpH9cDasJVvH3NY1n3b8QseUnmMuA=;
+        b=KzsWbiii6kut47NsxPUVNxbK2mVQFqqXgFoFzH38qwiQMVrRA9COmMMhWgcNSPqglU
+         jDioZEt6fc2+cPP4NBqmTUxOh4nUm8pTaL5WCxjCupdcJFv3JkLTtG52ak/CA69AaK64
+         UJxbaCzoUul4S+2nTu7bIQKQDWVeF0kVQKf9FPYaxV7yX+aTZkZa/FbbbnhUkSAjsq9U
+         Tldx4n+x7xZFAJcOBHGUyO8xMi+szp6YsmJCVkzLNHPNWrE1UF36KeQYCwdXYWcBl7Fg
+         enJMot3RIVMDuToetiQFO9TlvjdakjPbGzi+rropesmq+HDyBVLGB9OxY/8sJBnd9gfv
+         3fkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGC/0RuE8w4t2b/ZVU7D3btZ8JVhAOJlktk1UZeFA03cFLq77k4Jb1EDBS3d9WrXBo4ESBC9H/K8/SG+i65M4T7SNFOPA6x9wPRVuDizC37NTVE7d3pByqVLFG/hnGwpdZ9rdgcaImc3e6RYKIiJnhAZZVdQjc9YHff4ufjA==
+X-Gm-Message-State: AOJu0YxoP44e4yR6DQA9cXQEh8P5TrKO6mfIJcZIk4pAuKzD3dOd3/8K
+	0QhP9m2ct1y2NBdHbuSXu/bhU8z0E3Oy6BF48RfoN1mZkbLmDoSKkW0K9aBnS6j8V/dng4kwJ4f
+	sqWVfS6HSXAwK5UNXwDYjeLP1ibaLioPXoms=
+X-Google-Smtp-Source: AGHT+IHfpEgdK6CsV+F3yazUkSk8QqXglhxHjEfu5TJN0ovzIavcWBVUOhONbVyIYLlhDjDkrM+qW9jYThqbl3gCAwE=
+X-Received: by 2002:a05:6102:509e:b0:493:b055:bf3b with SMTP id
+ ada2fe7eead31-493fafe37efmr2966777137.7.1722247022445; Mon, 29 Jul 2024
+ 02:57:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <1e82a5c97e915144e01dd65575929c15bc0db397.camel@HansenPartnership.com>
+ <20240724200012.GA23293@pendragon.ideasonboard.com> <CAPybu_0SN7m=m=+z5hu_4M+STGh2t0J-hFEmtDTgx6fYWKzk3A@mail.gmail.com>
+ <20240725122315.GE7022@unreal> <CAPybu_1XsNq=ExrO+8XLqnV_KvSaqooM=yNy5iuzcD=-k5CdGA@mail.gmail.com>
+ <20240725132035.GF7022@unreal> <20240725194202.GE14252@pendragon.ideasonboard.com>
+ <CAPybu_3T8JNkZxf3pgCo4E4VJ3AZvY7NzeXdd7w9Qqe8=eV=9A@mail.gmail.com>
+ <20240726131110.GD28621@pendragon.ideasonboard.com> <CAPybu_13+Axb2e_fVYeUv+S3UohbJXBYNF74Qd=pXz8_X3ic9g@mail.gmail.com>
+ <20240728112358.GB30973@pendragon.ideasonboard.com>
+In-Reply-To: <20240728112358.GB30973@pendragon.ideasonboard.com>
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Date: Mon, 29 Jul 2024 11:56:45 +0200
+Message-ID: <CAPybu_0vNbwO6NkWb_P7F+1TZtddmAAgC69X8c0WtZ5P2JoeBg@mail.gmail.com>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Leon Romanovsky <leon@kernel.org>, 
+	James Bottomley <James.Bottomley@hansenpartnership.com>, Jiri Kosina <jikos@kernel.org>, 
+	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev, 
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	jgg@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Linkui Xiao <xiaolinkui@kylinos.cn>
+On Sun, Jul 28, 2024 at 1:24=E2=80=AFPM Laurent Pinchart
+<laurent.pinchart@ideasonboard.com> wrote:
+>
+> On Fri, Jul 26, 2024 at 05:40:50PM +0200, Ricardo Ribalda Delgado wrote:
+> > On Fri, Jul 26, 2024 at 3:11=E2=80=AFPM Laurent Pinchart
+> > <laurent.pinchart@ideasonboard.com> wrote:
+> > >
+> > > On Fri, Jul 26, 2024 at 10:02:27AM +0200, Ricardo Ribalda Delgado wro=
+te:
+> > > > On Thu, Jul 25, 2024 at 9:44=E2=80=AFPM Laurent Pinchart wrote:
+> > > > > On Thu, Jul 25, 2024 at 04:20:35PM +0300, Leon Romanovsky wrote:
+> > > > > > On Thu, Jul 25, 2024 at 03:02:13PM +0200, Ricardo Ribalda Delga=
+do wrote:
+> > > > > > > On Thu, Jul 25, 2024 at 2:23=E2=80=AFPM Leon Romanovsky wrote=
+:
+> > > > > > > > On Thu, Jul 25, 2024 at 11:26:38AM +0200, Ricardo Ribalda D=
+elgado wrote:
+> > > > > > > > > On Wed, Jul 24, 2024 at 10:02=E2=80=AFPM Laurent Pinchart=
+ wrote:
+> > > > > > > >
+> > > > > > > > <...>
+> > > > > > > >
+> > > > > > > > > It would be great to define what are the free software co=
+mmunities
+> > > > > > > > > here. Distros and final users are also "free software com=
+munities" and
+> > > > > > > > > they do not care about niche use cases covered by proprie=
+tary
+> > > > > > > > > software.
+> > > > > > > >
+> > > > > > > > Are you certain about that?
+> > > > > > >
+> > > > > > > As a user, and as an open source Distro developer I have a sm=
+all hint.
+> > > > > > > But you could also ask users what they think about not being =
+able to
+> > > > > > > use their notebook's cameras. The last time that I could not =
+use some
+> > > > > > > basic hardware from a notebook with Linux was 20 years ago.
+> > > > > >
+> > > > > > Lucky you, I still have consumer hardware (speaker) that doesn'=
+t work
+> > > > > > with Linux, and even now, there is basic hardware in my current
+> > > > > > laptop (HP docking station) that doesn't work reliably in Linux=
+.
+> > > > > >
+> > > > > > > > > They only care (and should care) about normal workflows.
+> > > > > > > >
+> > > > > > > > What is a normal workflow?
+> > > > > > > > Does it mean that if user bought something very expensive h=
+e
+> > > > > > > > should not be able to use it with free software, because hi=
+s
+> > > > > > > > usage is different from yours?
+> > > > > > > >
+> > > > > > > > Thanks
+> > > > > > >
+> > > > > > > It means that we should not block the standard usage for 99% =
+of the
+> > > > > > > population just because 1% of the users cannot do something f=
+ancy with
+> > > > > > > their device.
+> > > > > >
+> > > > > > Right, the problem is that in some areas the statistics slightl=
+y different.
+> > > > > > 99% population is blocked because 1% of the users don't need it=
+ and
+> > > > > > don't think that it is "normal" flow.
+> > > > > >
+> > > > > > > Let me give you an example. When I buy a camera I want to be =
+able to
+> > > > > > > do Video Conferencing and take some static photos of document=
+s. I do
+> > > > > > > not care about: automatic makeup, AI generated background, un=
+icorn
+> > > > > > > filters, eyes recentering... But we need to give a way to ven=
+dors to
+> > > > > > > implement those things closely, without the marketing differe=
+ntiators,
+> > > > > > > vendors have zero incentive to invest in Linux, and that affe=
+cts all
+> > > > > > > the population.
+> > > > >
+> > > > > I've seen these kind of examples being repeatedly given in discus=
+sions
+> > > > > related to camera ISP support in Linux. They are very misleading.=
+ These
+> > > > > are not the kind of features that are relevant for the device
+> > > > > pass-through discussion these day. Those are high-level use cases
+> > > > > implemented in userspace, and vendors can ship any closed-source
+> > > > > binaries they want there. What I care about is the features expos=
+ed by
+> > > > > the kernel to userspace API.
+> > > >
+> > > > The ISPs are gradually becoming programmable devices and they indee=
+d
+> > > > help during all of those examples.
+> > >
+> > > I'd like to see more technical information to substantiate this claim=
+.
+> > > So far what I've sometimes seen is ISPs that include programmable
+> > > elements, but hiding those behind a firmware that exposes a fixed
+> > > (configurable) pipeline. I've also heard of attempts to expose some o=
+f
+> > > that programmability to the operating system, which were abandoned in
+> > > the end due to lack usefulness.
+> > >
+> > > > Userspace needs to send/receive information from the ISP, and that =
+is
+> > > > exactly what vendors want to keep in the close.
+> > >
+> > > But that's exactly what we need to implement an open userspace ecosys=
+tem
+> > > :-)
+> > >
+> > > > Describing how they implement those algorithms is a patent minefiel=
+d
+> > > > and their differentiating factor.
+> > >
+> > > Those are also arguments I've heard many times before. The
+> > > differentiating factor for cameras today is mostly in userspace ISP
+> > > control algorithms, and nobody is telling vendors they need to open a=
+ll
+> > > that.
+> >
+> > I disagree. The differentiating factor is what the ISP is capable of
+> > doing and how they do it. Otherwise we would not see new ISPs in the
+> > market.
+>
+> Hardware certainly evolves, but it's far from being the main
+> differentiating factor in the markets and use cases you're usually
+> referring to.
+>
+> > If you define the arguments passed to an ISP you are defining the
+> > algorithm, and that is a trade secret and/or a patent violation.
+>
+> Are you confusing ISP processing blocks, sometimes referred to as
+> algorithms, and ISP control algorithms ? There is absolutely no way to
+> do anything with an ISP, not even the bare minimum, if you don't know
+> what parameters to pass to it.
 
-Commit 07f4c90062f8 ("tcp/dccp: try to not exhaust ip_local_port_range
-in connect()") allocates even ports for connect() first while leaving
-odd ports for bind() and this works well in busy servers.
+Any ISP released in the last few years has *hundreds of thousands* of
+parameters.
 
-But this strategy causes severe performance degradation in busy clients.
-when a client has used more than half of the local ports setted in
-proc/sys/net/ipv4/ip_local_port_range, if this client try to connect
-to a server again, the connect time increases rapidly since it will
-traverse all the even ports though they are exhausted.
+We only modify hundreds of parameters during runtime. Those are the
+ones we need to be documented.
 
-So this path provides another strategy by introducing a system option:
-local_port_allocation. If it is a busy client, users should set it to 1
-to use sequential allocation while it should be set to 0 in other
-situations. Its default value is 0.
+If we enforce a "usable open camera stack", we will have the
+documentation and the code needed to use the ISP.
 
-In commit 207184853dbd ("tcp/dccp: change source port selection at
-connect() time"), tell users that they can access all odd and even ports
-by using IP_LOCAL_PORT_RANGE. But this requires users to modify the
-socket application. When even numbered ports are not sufficient, use the
-sysctl parameter to achieve the same effect:
-	sysctl -w net.ipv4.local_port_allocation=1
+Asking vendors to document *ALL* the parameters means describing how
+they have implemented the internals of the ISP camera algorithms.
 
-Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
----
- include/net/tcp.h          |  1 +
- net/ipv4/inet_hashtables.c | 12 ++++++++----
- net/ipv4/sysctl_net_ipv4.c |  8 ++++++++
- 3 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 2aac11e7e1cc..99969b8e5183 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -269,6 +269,7 @@ DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
- 
- extern struct percpu_counter tcp_sockets_allocated;
- extern unsigned long tcp_memory_pressure;
-+extern bool sysctl_local_port_allocation;
- 
- /* optimized version of sk_under_memory_pressure() for TCP sockets */
- static inline bool tcp_under_memory_pressure(const struct sock *sk)
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 48d0d494185b..e572f8b21b95 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1020,11 +1020,15 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	l3mdev = inet_sk_bound_l3mdev(sk);
- 
- 	local_ports = inet_sk_get_local_port_range(sk, &low, &high);
--	step = local_ports ? 1 : 2;
-+	/* local_port_allocation 0 means even and odd port allocation strategy
-+	 * will be applied, so step is 2; otherwise sequential allocation will
-+	 * be used and step is 1. Default value is 0.
-+	 */
-+	step = sysctl_local_port_allocation ? 1 : 2;
- 
- 	high++; /* [32768, 60999] -> [32768, 61000[ */
- 	remaining = high - low;
--	if (!local_ports && remaining > 1)
-+	if (!sysctl_local_port_allocation && remaining > 1)
- 		remaining &= ~1U;
- 
- 	get_random_sleepable_once(table_perturb,
-@@ -1037,7 +1041,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	/* In first pass we try ports of @low parity.
- 	 * inet_csk_get_port() does the opposite choice.
- 	 */
--	if (!local_ports)
-+	if (!sysctl_local_port_allocation)
- 		offset &= ~1U;
- other_parity_scan:
- 	port = low + offset;
-@@ -1081,7 +1085,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		cond_resched();
- 	}
- 
--	if (!local_ports) {
-+	if (!sysctl_local_port_allocation) {
- 		offset++;
- 		if ((offset & 1) && remaining > 1)
- 			goto other_parity_scan;
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 9140d20eb2d4..1f6bf3a73516 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -45,6 +45,7 @@ static unsigned int tcp_child_ehash_entries_max = 16 * 1024 * 1024;
- static unsigned int udp_child_hash_entries_max = UDP_HTABLE_SIZE_MAX;
- static int tcp_plb_max_rounds = 31;
- static int tcp_plb_max_cong_thresh = 256;
-+bool sysctl_local_port_allocation;
- 
- /* obsolete */
- static int sysctl_tcp_low_latency __read_mostly;
-@@ -632,6 +633,13 @@ static struct ctl_table ipv4_table[] = {
- 		.extra1		= &sysctl_fib_sync_mem_min,
- 		.extra2		= &sysctl_fib_sync_mem_max,
- 	},
-+	{
-+		.procname	= "local_port_allocation",
-+		.data		= &sysctl_local_port_allocation,
-+		.maxlen		= sizeof(sysctl_local_port_allocation),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dobool,
-+	},
- };
- 
- static struct ctl_table ipv4_net_table[] = {
--- 
-2.17.1
+>
+> > > When it comes to patents, we all know how software patents is a
+> > > minefield, and hardware is also affected. I can't have much sympathy =
+for
+> > > this argument though, those patents mostly benefit the largest player=
+s
+> > > in the market, and those are the ones who currently claim they can't
+> > > open anything due to patents.
+> >
+> > Big players do not usually sue each other. The big problem is patent
+> > trolls that "shoot at everything that moves".
+> >
+> > I dislike patents, but it is the world we have to live in. No vendor
+> > is going to take our approach if they risk a multi million dollar
+> > lawsuit.
+>
+> When was the last time anyone heard of big players pushing to reform the
+> patent system ? At best there are initiatives such as OIN, which some
+> large companies have supporting. It's still a workaround though.
+>
+> > > > > > > This challenge seems to be solved for GPUs. I am using my AMD=
+ GPU
+> > > > > > > freely and my nephew can install the amdgpu-pro proprietary u=
+ser space
+> > > > > > > driver to play duke nukem (or whatever kids play now) at 2000=
+ fps.
+> > > > > > >
+> > > > > > > There are other other subsystems that allow vendor passthroug=
+h and
+> > > > > > > their ecosystem has not collapsed.
+> > > > > >
+> > > > > > Yes, I completely agree with you on that.
+> > > > > >
+> > > > > > > Can we have some general guidance of what is acceptable? Can =
+we define
+> > > > > > > together the "normal workflow" and focus on a *full* open sou=
+rce
+> > > > > > > implementation of that?
+> > > > > >
+> > > > > > I don't think that is possible to define "normal workflow". Req=
+uirement
+> > > > > > to have open-source counterpart to everything exposed through U=
+API is a
+> > > > > > valid one. I'm all for that.
+> > > > >
+> > > > > That's my current opinion as well, as least when it comes to the =
+kernel
+> > > > > areas I mostly work with.
+>
+> --
+> Regards,
+>
+> Laurent Pinchart
 
+
+
+--=20
+Ricardo Ribalda
 
