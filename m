@@ -1,148 +1,226 @@
-Return-Path: <netdev+bounces-113610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCCA93F473
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:49:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0508693F4A7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:56:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE1CE1C21D91
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:49:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB76E280366
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930D3145FED;
-	Mon, 29 Jul 2024 11:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EBF146000;
+	Mon, 29 Jul 2024 11:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VlRVDaIi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7E31448DD
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 11:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99954146003
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 11:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722253791; cv=none; b=moc1I9zcIDzztHSIOHVPfes8aW1+dI4tghCVdLV+n58rDRzbFb+pqICVCYNB+awC72LtjIYsEydbvtcUcNDgkZ3hHQ6RfFjg/dDuEOccnJFMQy2sTPhAXC6guFCMfkIuzKhNoqFHDlJP6vnQgMpDMftIR/dxXkV1qKOetn7IADc=
+	t=1722254172; cv=none; b=QTdwvfpYpUFeOd9xAgF6xWWxjfR46uTq3vAOmqi7T0aYiyTJY+znXq/yymZvbrxFrLD7UdFEbuELmX9LLDITx5wMVL6Os/mMbSC3dJkdwQ1r8PEvdZDdgYGTi/uDt9XxHGzEL7ko2S0YeWNT7kjM4iLBnhlwcOiIBBMQiHHBdYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722253791; c=relaxed/simple;
-	bh=JLCY5qPvbYBcS+lsUKiVGZQ/CoHUs/uAtUUwHf/j4rA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=BhI7g0nqk59uTKoFen35wX9gpdPWTzVGbKMhBSYwmb6Q0HcKI+eX4Bo07cpUMYGlF8RULi45RZioaM2nRC3KdT7Ze8Tm4F+RxnG2vm/XVPd1lvJOlZZkf3XK+M+BQDvaLZbPsHHrIyq50APsFimxEQi31Ur1rH9JYXQR8O0dsjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39a17513a7eso65263905ab.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 04:49:49 -0700 (PDT)
+	s=arc-20240116; t=1722254172; c=relaxed/simple;
+	bh=i9I3/N05FbGwbs91KpB69t9soACd1NmRqKErtbYjxfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IoJexm9wn79p8eaH4eOd9S6NiwnWFUUUgQgsj/7NVGZMR8UKg2hY9ldQrXwdwp+alnXOAgOyPxjO/2couBi7DUqaVvB1MXpHpWoLhPMD8fWw524HhdcqbDAHiz+LHdXnvYB7F/TKWBom+7LW284pwQw3RYxXUoVVDNBayR8bGbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VlRVDaIi; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f0271b0ae9so43207061fa.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 04:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1722254169; x=1722858969; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6lqilmYMNLKW9grtztpOwsuGdNvh+NjmMFJBCfbrWzM=;
+        b=VlRVDaIidmvG9OURb/KvjjAUO1JQpyAogP87mz5A39PExXtoJLaS80MFW87AudAGDh
+         82HtdsxbcFvU1qamlNyf02qOXYtI5ccc6x2bfSMOvcp0h/w1p/EVgz59iQxvF/c9x59P
+         hcyAt7YpLrvckKtjHIzktQG6VxFbsOCl/VwVE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722253789; x=1722858589;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1722254169; x=1722858969;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q5Mu7mu3T+YW/XcQY0fzrTrBn7OZb3PrUgRiRmHWzIY=;
-        b=ZUFsbvSJqzYx53zmoFQENAas0bkLQ7hbHPN2uxUX/u2RC4+2wdkXEof1CB12d1iexF
-         sk8HUrQlhYSDaxnWNSv5z8fzcltVUACkAAKedJDw1p57nvH85lsCMotl8b8VUjVTJscN
-         3jrCxoODHgSE0HLkKSKzXALUh6b0/sm1m4OdC6POp0c4bxM7AYM7VhpnnwyKRg7jde96
-         yZ4IXWsOsoBKh4ApaTscSqt5pjuBTXqwOkPCUNlrlY7D6I+gRDsYR55ysP4Sytm+80ti
-         4ETCSsyX4W/WoIDKAAR8fw0+/P+iMgca3CI2kcJWhjaNDW1npI72jp3K7dAdORobCW3U
-         bppg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOuOQDzfFh1xYJQgHM0UmiXi2xhTTXGyX0u7WAb9fcBqU32rfnOJr8/X6AcfM6Kw8xTJYhvQwcLObyf4y2LwoJFQR5XkVV
-X-Gm-Message-State: AOJu0YzTa/qar7xs4oYdh8dTtOX79MmfZ8dE8OqYQmP0hPvURpaDYtNw
-	N1vp/ChZ1gBslFab2e5C8Oar1qzBfmk6gkkcdJAI1QhTeL4Zuy1fVz0SHjzqXBlPHZY68ITf3Pc
-	llmht+1UeGBNHC8EawdUtaUONZy9SHw9cHOzTdtPAhYiCsjJLwMQKmhw=
-X-Google-Smtp-Source: AGHT+IFGxT0upbKN5XWc4zf/MbDcatg0y0fagMYFUlu74SiZJHCJfGvuVLxr5RlXVc+Q0ttjdH6Irm3V4AKrIAuyIvHsAps4yROS
+        bh=6lqilmYMNLKW9grtztpOwsuGdNvh+NjmMFJBCfbrWzM=;
+        b=cp+ZzVZ5ntOrZGGw1g2k373isORpP542d3v1v8j9ycxYDKHJoinHdpl2YDSEtOHoCu
+         /rQ1xcb6HoJPFyO3kgEZFNnJ86YoYKPRT7npN4CO7sPDWbmlNCj69BOgJtWTAAkbCqd7
+         cqWzPR7PVgCzu3nR9tqziXqOeU570O6LpZJeTOckcdmOuTPTNQGVrIFIj2vKhncYj7wj
+         jVqJkPbKnkg/cfeKf6COxOwUJoj99VzAIHiOoNWg63Nw+TYgww5QVdTfEvmbwoPN+BPY
+         hsu1F3iRzkSK1faQS17W5AP1+C3BTe/EO2G1lxmZM+nAQEIsaMxauuIus2KeeDI7/kCB
+         9upQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWW1FKreipYntoWdpDqOGKzkBzx68vDUePKV0CWr/mI/dmhaxLcMq0OBVxiQnewFPJaP865AwxmCBQhe+n+/9CDKKhZXRJX
+X-Gm-Message-State: AOJu0Yy3RBPn33LXsDUHHJY4/Na5m5vt2709PS1AMnWz7/eVnbKYKCOF
+	KGNkBRZbR7KIi2WkBPkmfpldOj44BT3GarbLwYWSxIFMx+hN+IaNEGNTrmRKXok=
+X-Google-Smtp-Source: AGHT+IEJSwMOihyNplXaU0oXw+JPkRM618PqXZc6xYxwDAEuy3NmLkQA4X67+R5kP5xzh5UzltTrZw==
+X-Received: by 2002:a2e:a78d:0:b0:2ef:2dfe:f058 with SMTP id 38308e7fff4ca-2f12ee2eac5mr44883831fa.42.1722254168694;
+        Mon, 29 Jul 2024 04:56:08 -0700 (PDT)
+Received: from LQ3V64L9R2 ([80.208.222.2])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f03cf30aacsm12885391fa.48.2024.07.29.04.56.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 04:56:08 -0700 (PDT)
+Date: Mon, 29 Jul 2024 12:56:06 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"rkannoth@marvell.com" <rkannoth@marvell.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Larry Chiu <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next v25 08/13] rtase: Implement net_device_ops
+Message-ID: <ZqeDVl5rGXfEjv4m@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Justin Lai <justinlai0215@realtek.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"rkannoth@marvell.com" <rkannoth@marvell.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Larry Chiu <larry.chiu@realtek.com>
+References: <20240729062121.335080-1-justinlai0215@realtek.com>
+ <20240729062121.335080-9-justinlai0215@realtek.com>
+ <ZqdvAmRc3sBzDFYI@LQ3V64L9R2>
+ <f55076d3231f40dead386fe6d7de58c9@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d15:b0:39a:14c9:3f80 with SMTP id
- e9e14a558f8ab-39aec44de30mr5315645ab.5.1722253789121; Mon, 29 Jul 2024
- 04:49:49 -0700 (PDT)
-Date: Mon, 29 Jul 2024 04:49:49 -0700
-In-Reply-To: <6b40e022-369c-8083-07d4-3036de1d3e65@katalix.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005060f2061e6175b6@google.com>
-Subject: Re: [syzbot] [net?] BUG: unable to handle kernel paging request in net_generic
-From: syzbot <syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com>
-To: jchapman@katalix.com
-Cc: davem@davemloft.net, edumazet@google.com, jchapman@katalix.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f55076d3231f40dead386fe6d7de58c9@realtek.com>
 
-> On 26/07/2024 16:02, Jakub Kicinski wrote:
->> CC: James [L2TP]
->> 
->> On Thu, 25 Jul 2024 03:37:24 -0700 syzbot wrote:
->>> Hello,
->>>
->>> syzbot found the following issue on:
->>>
->>> HEAD commit:    c912bf709078 Merge remote-tracking branches 'origin/arm64-..
->>> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
->>> console output: https://syzkaller.appspot.com/x/log.txt?x=1625a15e980000
->>> kernel config:  https://syzkaller.appspot.com/x/.config?x=79a49b0b9ffd6585
->>> dashboard link: https://syzkaller.appspot.com/bug?extid=6acef9e0a4d1f46c83d4
->>> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->>> userspace arch: arm64
->>>
->>> Unfortunately, I don't have any reproducer for this issue yet.
->>>
->>> Downloadable assets:
->>> disk image: https://storage.googleapis.com/syzbot-assets/fea69a9d153c/disk-c912bf70.raw.xz
->>> vmlinux: https://storage.googleapis.com/syzbot-assets/be06762a72ef/vmlinux-c912bf70.xz
->>> kernel image: https://storage.googleapis.com/syzbot-assets/6c8e58b4215d/Image-c912bf70.gz.xz
->>>
->>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>> Reported-by: syzbot+6acef9e0a4d1f46c83d4@syzkaller.appspotmail.com
->>>
->>> Unable to handle kernel paging request at virtual address dfff800000000257
->>> KASAN: probably user-memory-access in range [0x00000000000012b8-0x00000000000012bf]
->  >> ...
->>> Call trace:
->>>  net_generic+0xd0/0x250 include/net/netns/generic.h:46
->>>  l2tp_pernet net/l2tp/l2tp_core.c:125 [inline]
->>>  l2tp_tunnel_get+0x90/0x464 net/l2tp/l2tp_core.c:207
->>>  l2tp_udp_recv_core net/l2tp/l2tp_core.c:852 [inline]
->>>  l2tp_udp_encap_recv+0x314/0xb3c net/l2tp/l2tp_core.c:933
->>>  udpv6_queue_rcv_one_skb+0x1870/0x1ad4 net/ipv6/udp.c:727
->>>  udpv6_queue_rcv_skb+0x3bc/0x574 net/ipv6/udp.c:789
->>>  udp6_unicast_rcv_skb+0x1cc/0x320 net/ipv6/udp.c:929
->>>  __udp6_lib_rcv+0xbcc/0x1330 net/ipv6/udp.c:1018
->>>  udpv6_rcv+0x88/0x9c net/ipv6/udp.c:1133
->>>  ip6_protocol_deliver_rcu+0x988/0x12a4 net/ipv6/ip6_input.c:438
->>>  ip6_input_finish+0x164/0x298 net/ipv6/ip6_input.c:483
->>> ...
->
-> This crash is the result of a call to net_generic() being unable to 
-> dereference net when handling a received l2tpv2 packet.
->
-> The stack frame indicates that l2tp_udp_recv_core finds that the 
-> packet's tunnel_id does not match the tunnel pointer derived from 
-> sk_user_data of the receiving socket. This can happen when more than one 
-> socket shares the same 5-tuple address. When a tunnel ID mismatch is 
-> detected, l2tp looks up the tunnel using the ID from the packet. It is 
-> this lookup which segfaults in net_generic() when l2tp tries to access 
-> its per-net tunnel list.
->
-> The code implicated by the crash, which added support for aliased 
-> sockets, is no longer in linux-net or net-next. l2tp no longer looks up 
-> tunnels in the datapath; instead it looks up sessions without finding 
-> the parent tunnel first. The commits are:
->
->   * support for aliased sockets was added in 628bc3e5a1be ("l2tp: 
-> Support several sockets with same IP/port quadruple") May 2024.
->
->   * l2tp's receive path was refactored in ff6a2ac23cb0 ("l2tp: refactor 
-> udp recv to lookup to not use sk_user_data") June 2024.
->
-> Is 628bc3e5a1be in any LTS or stable kernel? I didn't find it in 
-> linux-stable.git
->
-> A possible fix is attached.
->
-> #syz test: git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git 
+On Mon, Jul 29, 2024 at 11:39:03AM +0000, Justin Lai wrote:
+> > On Mon, Jul 29, 2024 at 02:21:16PM +0800, Justin Lai wrote:
+> > > 1. Implement .ndo_set_rx_mode so that the device can change address
+> > > list filtering.
+> > > 2. Implement .ndo_set_mac_address so that mac address can be changed.
+> > > 3. Implement .ndo_change_mtu so that mtu can be changed.
+> > > 4. Implement .ndo_tx_timeout to perform related processing when the
+> > > transmitter does not make any progress.
+> > > 5. Implement .ndo_get_stats64 to provide statistics that are called
+> > > when the user wants to get network device usage.
+> > > 6. Implement .ndo_vlan_rx_add_vid to register VLAN ID when the device
+> > > supports VLAN filtering.
+> > > 7. Implement .ndo_vlan_rx_kill_vid to unregister VLAN ID when the
+> > > device supports VLAN filtering.
+> > > 8. Implement the .ndo_setup_tc to enable setting any "tc" scheduler,
+> > > classifier or action on dev.
+> > > 9. Implement .ndo_fix_features enables adjusting requested feature
+> > > flags based on device-specific constraints.
+> > > 10. Implement .ndo_set_features enables updating device configuration
+> > > to new features.
+> > >
+> > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > > ---
+> > >  .../net/ethernet/realtek/rtase/rtase_main.c   | 235 ++++++++++++++++++
+> > >  1 file changed, 235 insertions(+)
+> > >
+> > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > index 8fd69d96219f..80673fa1e9a3 100644
+> > 
+> > [...]
+> > 
+> > > +static void rtase_dump_state(const struct net_device *dev) {
+> > 
+> > [...]
+> > 
+> > > +
+> > > +     netdev_err(dev, "tx_packets %lld\n",
+> > > +                le64_to_cpu(counters->tx_packets));
+> > > +     netdev_err(dev, "rx_packets %lld\n",
+> > > +                le64_to_cpu(counters->rx_packets));
+> > > +     netdev_err(dev, "tx_errors %lld\n",
+> > > +                le64_to_cpu(counters->tx_errors));
+> > > +     netdev_err(dev, "rx_errors %d\n",
+> > > +                le32_to_cpu(counters->rx_errors));
+> > > +     netdev_err(dev, "rx_missed %d\n",
+> > > +                le16_to_cpu(counters->rx_missed));
+> > > +     netdev_err(dev, "align_errors %d\n",
+> > > +                le16_to_cpu(counters->align_errors));
+> > > +     netdev_err(dev, "tx_one_collision %d\n",
+> > > +                le32_to_cpu(counters->tx_one_collision));
+> > > +     netdev_err(dev, "tx_multi_collision %d\n",
+> > > +                le32_to_cpu(counters->tx_multi_collision));
+> > > +     netdev_err(dev, "rx_unicast %lld\n",
+> > > +                le64_to_cpu(counters->rx_unicast));
+> > > +     netdev_err(dev, "rx_broadcast %lld\n",
+> > > +                le64_to_cpu(counters->rx_broadcast));
+> > > +     netdev_err(dev, "rx_multicast %d\n",
+> > > +                le32_to_cpu(counters->rx_multicast));
+> > > +     netdev_err(dev, "tx_aborted %d\n",
+> > > +                le16_to_cpu(counters->tx_aborted));
+> > > +     netdev_err(dev, "tx_underun %d\n",
+> > > +                le16_to_cpu(counters->tx_underun));
+> > 
+> > You use le64/32/16_to_cpu here for all stats, but below in rtase_get_stats64, it
+> > is only used for tx_errors.
+> > 
+> > The code should probably be consistent? Either you do or don't need to use
+> > them?
+> > 
+> > > +}
+> > > +
+> > [...]
+> > > +
+> > > +static void rtase_get_stats64(struct net_device *dev,
+> > > +                           struct rtnl_link_stats64 *stats) {
+> > > +     const struct rtase_private *tp = netdev_priv(dev);
+> > > +     const struct rtase_counters *counters;
+> > > +
+> > > +     counters = tp->tally_vaddr;
+> > > +
+> > > +     dev_fetch_sw_netstats(stats, dev->tstats);
+> > > +
+> > > +     /* fetch additional counter values missing in stats collected by driver
+> > > +      * from tally counter
+> > > +      */
+> > > +     rtase_dump_tally_counter(tp);
+> > > +     stats->rx_errors = tp->stats.rx_errors;
+> > > +     stats->tx_errors = le64_to_cpu(counters->tx_errors);
+> > > +     stats->rx_dropped = tp->stats.rx_dropped;
+> > > +     stats->tx_dropped = tp->stats.tx_dropped;
+> > > +     stats->multicast = tp->stats.multicast;
+> > > +     stats->rx_length_errors = tp->stats.rx_length_errors;
+> > 
+> > See above; le64_to_cpu for tx_errors, but not the rest of the stats. Why?
+> 
+> The rtase_dump_state() function is primarily used to dump certain hardware
+> information. Following discussions with Jakub, it was suggested that we
+> should design functions to accumulate the 16-bit and 32-bit counter values
+> to prevent potential overflow issues due to the limited size of the
+> counters. However, the final decision was to temporarily refrain from
+> reporting 16-bit and 32-bit counter information. Additionally, since
+> tx_packet and rx_packet data are already provided through tstat, we
+> ultimately opted to modify it to the current rtase_get_stats64() function.
 
-This crash does not have a reproducer. I cannot test it.
+Your response was a bit confusing, but after re-reading the code I
+think I understand now that I misread the code above.
 
-> for-kernelci
+The answer seems to be that tx_errors is accumulated in
+rtase_counters (which needs le*_to_cpu), but the other counters are
+accumulated in tp->stats which do not need le*_to_cpu because they
+are already being accounted in whatever endianness the CPU uses.
+
+OK.
 
