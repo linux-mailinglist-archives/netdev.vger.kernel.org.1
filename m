@@ -1,178 +1,183 @@
-Return-Path: <netdev+bounces-113550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E3F493F00F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:45:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AAA393F014
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29686B21ACD
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:45:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA7251F20944
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEABE6E2BE;
-	Mon, 29 Jul 2024 08:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D732374FF;
+	Mon, 29 Jul 2024 08:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AIXp6msm"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tAt7lgNE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03FA31EA91;
-	Mon, 29 Jul 2024 08:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E3D139568;
+	Mon, 29 Jul 2024 08:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722242720; cv=none; b=lwpHVRCaDsk781Nn0o9UVG6uDHGJ05EQMIOgs+2UADy+ROHaBjkOp++ImF49aPczejiHBVQYaX/IZ7GliIRYjXwphSCVLepEKYjfXvC2PuT3J4VGWEKTCu3FOb8TeApLh2kuGJoQ14YguI1qqe5BvarWTWzhUVOmfmGtN8vEo/M=
+	t=1722242768; cv=none; b=PQOPKqGYx4QXDFG+WTzS1gUJ639RDeHRLBVGwnO8Qj4EeuNn2B+8xrlhyl0tjhDDYM3RSi3tGSNS4dnspsiynFtX/lUAXkrzM4r04qN0Bh+7CtIvfNHChAngqs8OmVALp1xRtgs4xewod6E2WU6EmgME6bMz4TbAX59U2CrjY4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722242720; c=relaxed/simple;
-	bh=D2EAHfRt9qwXP2nz/hapa8cl5ZuSjrrA0RZIW3dZk6c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tX5e4eQKz2CZED4smeMTYMTH3KHBY4yIvxaPG7FOw3E0ZrJGO7v7rah+XQVPAFviyOoBjt5/lSN/abt3J8nr1dVRg9sC/JahlLCn9Y6D7NM+P1hWz/IFc2J6NX1AB2IsJjhQmi2qoczGkc5ogT7SFvP6FdjWPWtB7qn5lEdOGiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AIXp6msm; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5a2ffc3447fso4781076a12.1;
-        Mon, 29 Jul 2024 01:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722242717; x=1722847517; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xef+0qVtbo5Kd6IGTaNJI7UUdQxJlVioCywC7nYuO18=;
-        b=AIXp6msmd+R/c8XVfw+52xGBI8y7S9PKsQUG71TTIH8+YP092iL6T6Woozph7z+V06
-         kSnnWxvP6M2OuaEFQNHQ0+Uh+mZysO8z+qW6wH5+rHtih3AKiU4lzN6BUITuYFhvNIKt
-         d66pOdP29hrOv21WOVKyLC4m6ALZfBoVHgj1bsKAgapbIJh4JSRrk+cALbcJUt+2f32D
-         ebmSwgVeDSTi+ZGKeZCgz+Q3NkSETxGYSo9sSx/+M1ektBz1EW1L4EAkZcWHHI1a1GS6
-         /ocxMi7aXEG/OvjvD3Dohb0LfHS+C+mpwd6dBbtxUFGHLuA1g7BEEChfLDZWrqKamjdY
-         cu/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722242717; x=1722847517;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xef+0qVtbo5Kd6IGTaNJI7UUdQxJlVioCywC7nYuO18=;
-        b=uV+OhmTrpjJKaxzLV+BrNzxoBtSKkieyEMxdlgYlY0xbRkcnAVDYqsQ4Kn6WSa5F8v
-         1Y0dhBHJ2vmhKMULFjQTxPTazspIaTm5oiWt1x+bALfoAN26KV3cnm2fWblcRV7u4Flp
-         KYCL0pJHbwGJhqt9DFYeBXeP21F6kwpeUz4e6pjDZ+a5fPAhutGejoJmxfxSBZjhd2JX
-         zktaO4BtmLxefLUxeYiAXNP2Xgb/25zvlsNOMNMOVnk0eM/lm9aqviFOiA8Hu+1ZjUuA
-         fSG/RfVckmIEPkg88RdUNx31z2Ws50ueMZv+9IbpD0m/16gqrACXcSecMdoKh9Nwct1z
-         GDuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrS4BV3VQjH0rmXXvJzsUPrWXLIgHPhjtlxoerNT2fIqu39bVfz3btD2bqxRUH3ZFAN7x9fk1MCfo5j+yHN3dzXvTbVz5krj+AEeLt/Sk/4syg59+s470vNd+t8rU+A93SjJjYEbDQYZ3Od9sInZ4B+zSOAUbuVU8FD2VV
-X-Gm-Message-State: AOJu0Yze6kur6ir+9GmI6auKUIYw/29snxrGS82cQqVVpVGNUU5nwowb
-	FgHtKwLi+Fw1MwA/qQ0tMJRcH4sjofo6SlFZelz+KzFBSNtb3xjP
-X-Google-Smtp-Source: AGHT+IGzkt5+EOXcRanHeKXHGnEsewHbb7z+c2fzp+t3AakPi6zUAOdfs0iy1Vxx8Ru9XPejtlWCPQ==
-X-Received: by 2002:a17:907:1c85:b0:a7a:8cfb:656b with SMTP id a640c23a62f3a-a7d4012b27fmr362886866b.60.1722242715504;
-        Mon, 29 Jul 2024 01:45:15 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7233:9000:f5ea:7623:e535:b475? (dynamic-2a01-0c22-7233-9000-f5ea-7623-e535-b475.c22.pool.telefonica.de. [2a01:c22:7233:9000:f5ea:7623:e535:b475])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acad411d2sm478865166b.126.2024.07.29.01.45.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jul 2024 01:45:15 -0700 (PDT)
-Message-ID: <111ac84e-0d22-43cb-953e-fc5f029fe37c@gmail.com>
-Date: Mon, 29 Jul 2024 10:45:15 +0200
+	s=arc-20240116; t=1722242768; c=relaxed/simple;
+	bh=MLjcBaTxpO6P1IZvvVYQmBHkUvRhlAHA8XJ4Vucqct4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=EXNFly3udnnJSDLXKe6LcFzf+oSVzik2L7N/2EXHUVBGuAXZ+ZuZb+yX8pnLskMLd8T80PfkCkDHs4Q/qvRJCe+ApgpGc4hztNyEPLMpMqilxx7xgtyMMsSTWDQyIQv8pasCibdDLQFR3hZceS1kAD2SsPT9Glyz0VnCVYSHMzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tAt7lgNE; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46T8QgRn026379;
+	Mon, 29 Jul 2024 08:45:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:subject:to:cc:references:from:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	pdvuivoWd+HSKBiVuKHJSsk9TqqOkwtD+FXpwcq9EAI=; b=tAt7lgNE77Ua6mmr
+	cMpSU98dIvy4tHabH5wC7DdAL16h2odqFmVuPDrCGyXzJEFWU5QTvdbY2uHdc5Bk
+	WNqPAKmpGGjEo52jHKDwpPH6pdhRhPLFTbGcP/mSYMkB52aLRYTbVK8p236WF/cD
+	2bZduaprUErM4Hehhd3dbpRQDajIQI+jpIb39sAEJ73x2eH/juOH05qzzAkRRJNz
+	oIzkzEKhrfE7+CoHkSQGPWqVJgtSOm/1GPTw3OjtvesM5BHgtZ5s5B/qcemLPDFn
+	/9ZADMXKRcHH8kPy1wkrm3EAUq+ZzKWfpj/B7SSRmhdMsSbN0OjjVI3KkKycvr2Y
+	hBisCA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40n34euaka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jul 2024 08:45:54 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46T8hdH6020200;
+	Mon, 29 Jul 2024 08:45:54 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40n34euak3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jul 2024 08:45:53 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46T5pnOB007450;
+	Mon, 29 Jul 2024 08:45:52 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40nb7twx04-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 29 Jul 2024 08:45:52 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46T8joFs27984546
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Jul 2024 08:45:52 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1935A58059;
+	Mon, 29 Jul 2024 08:45:50 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 18BB858058;
+	Mon, 29 Jul 2024 08:45:48 +0000 (GMT)
+Received: from [9.179.15.240] (unknown [9.179.15.240])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 29 Jul 2024 08:45:47 +0000 (GMT)
+Message-ID: <f0a4be24-69a9-42a6-90f4-e1722b149549@linux.ibm.com>
+Date: Mon, 29 Jul 2024 10:45:47 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: prevent UAF in inet_create()
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1722224415-30999-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1722224415-30999-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kb-HwYZIfsQPMO5AulE2V5GbQ0MW7XWC
+X-Proofpoint-GUID: GXWjxH3SFmzH21GeFrBuTRafqynB7doY
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH AUTOSEL 6.10 03/27] r8169: remove detection of chip
- version 11 (early RTL8168b)
-To: Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, nic_swsd@realtek.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20240728005329.1723272-1-sashal@kernel.org>
- <20240728005329.1723272-3-sashal@kernel.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240728005329.1723272-3-sashal@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-29_06,2024-07-26_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ mlxscore=0 mlxlogscore=743 clxscore=1011 suspectscore=0 priorityscore=1501
+ phishscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2407290057
 
-On 28.07.2024 02:52, Sasha Levin wrote:
-> From: Heiner Kallweit <hkallweit1@gmail.com>
-> 
-> [ Upstream commit 982300c115d229565d7af8e8b38aa1ee7bb1f5bd ]
-> 
-> This early RTL8168b version was the first PCIe chip version, and it's
-> quite quirky. Last sign of life is from more than 15 yrs ago.
-> Let's remove detection of this chip version, we'll see whether anybody
-> complains. If not, support for this chip version can be removed a few
-> kernel versions later.
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> Link: https://lore.kernel.org/r/875cdcf4-843c-420a-ad5d-417447b68572@gmail.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 7b9e04884575e..d2d46fe17631a 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -2274,7 +2274,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
->  
->  		/* 8168B family. */
->  		{ 0x7c8, 0x380,	RTL_GIGA_MAC_VER_17 },
-> -		{ 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
-> +		/* This one is very old and rare, let's see if anybody complains.
-> +		 * { 0x7c8, 0x300,	RTL_GIGA_MAC_VER_11 },
-> +		 */
->  
->  		/* 8101 family. */
->  		{ 0x7c8, 0x448,	RTL_GIGA_MAC_VER_39 },
 
-It may be the case that there are still few users out there with this ancient hw.
-We will know better once 6.11 is out for a few month. In this case we would have to
-revert this change. 
-I don't think it's a change which should go to stable.
 
+On 29.07.24 05:40, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> Following syzbot repro crashes the kernel:
+> 
+> socketpair(0x2, 0x1, 0x100, &(0x7f0000000140)) (fail_nth: 13)
+> 
+> Fix this by not calling sk_common_release() from smc_create_clcsk().
+> 
+> Stack trace:
+> socket: no more sockets
+> ------------[ cut here ]------------
+> refcount_t: underflow; use-after-free.
+>   WARNING: CPU: 1 PID: 5092 at lib/refcount.c:28
+> refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
+> Modules linked in:
+> CPU: 1 PID: 5092 Comm: syz-executor424 Not tainted
+> 6.10.0-syzkaller-04483-g0be9ae5486cd #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 06/27/2024
+>   RIP: 0010:refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
+> Code: 80 f3 1f 8c e8 e7 69 a8 fc 90 0f 0b 90 90 eb 99 e8 cb 4f e6 fc c6
+> 05 8a 8d e8 0a 01 90 48 c7 c7 e0 f3 1f 8c e8 c7 69 a8 fc 90 <0f> 0b 90
+> 90 e9 76 ff ff ff e8 a8 4f e6 fc c6 05 64 8d e8 0a 01 90
+> RSP: 0018:ffffc900034cfcf0 EFLAGS: 00010246
+> RAX: 3b9fcde1c862f700 RBX: ffff888022918b80 RCX: ffff88807b39bc00
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: 0000000000000003 R08: ffffffff815878a2 R09: fffffbfff1c39d94
+> R10: dffffc0000000000 R11: fffffbfff1c39d94 R12: 00000000ffffffe9
+> R13: 1ffff11004523165 R14: ffff888022918b28 R15: ffff888022918b00
+> FS:  00005555870e7380(0000) GS:ffff8880b9500000(0000)
+> knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020000140 CR3: 000000007582e000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   inet_create+0xbaf/0xe70
+>    __sock_create+0x490/0x920 net/socket.c:1571
+>    sock_create net/socket.c:1622 [inline]
+>    __sys_socketpair+0x2ca/0x720 net/socket.c:1769
+>    __do_sys_socketpair net/socket.c:1822 [inline]
+>    __se_sys_socketpair net/socket.c:1819 [inline]
+>    __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
+>    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7fbcb9259669
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 a1 1a 00 00 90 48 89 f8 48 89
+> f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01
+> f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fffe931c6d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000035
+> RAX: ffffffffffffffda RBX: 00007fffe931c6f0 RCX: 00007fbcb9259669
+> RDX: 0000000000000100 RSI: 0000000000000001 RDI: 0000000000000002
+> RBP: 0000000000000002 R08: 00007fffe931c476 R09: 00000000000000a0
+> R10: 0000000020000140 R11: 0000000000000246 R12: 00007fffe931c6ec
+> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+>   </TASK>
+> 
+> Link: https://lore.kernel.org/r/20240723175809.537291-1-edumazet@google.com/
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+
+It looks good to me.
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+
+Thanks!
 
