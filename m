@@ -1,240 +1,128 @@
-Return-Path: <netdev+bounces-113695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038F093F984
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:33:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F3693F99F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87188283250
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:33:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54AD81C22100
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F213158DCA;
-	Mon, 29 Jul 2024 15:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4948B15B111;
+	Mon, 29 Jul 2024 15:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xftx+XWX"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="LZSKDu6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856C2157484
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6441823A9
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722267231; cv=none; b=iHYYKDTFb6QmVfG/nMgfQIlA4yNhYDOEyMPImRPgYDgcLLdE6IVoP2t2JWfJ6q5BOpvDfomZ7Wjk9wWQsmigFLch0gatJVirfYBCobdy5Dx+5C81FUzCAvqg3QBP++Ke1WtAtyLjOxACttX6EsucK3wwNX2/Z5g8KjH0cMQ+ddY=
+	t=1722267498; cv=none; b=g6jS3chiGk3dNM5XIA4VGgU04rc2qT/GFTw6iTZdZ+DyDNwb+eC18oonNkV2ERDfQwTCmfNLifRKkIPOEDM6xu+hHN4U3T3vZEuvqbo4GezKHW0HHdR+dvge3j+eRcVdW94qayaNWNX+Qekar5whJGsQp2wEroxzJn0MaHthi9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722267231; c=relaxed/simple;
-	bh=wqWUVlf7aP1OH80LKZ4ptLvsSw+/kbCzCArTFsf8Z2Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UXr52ssbDNXDCK7mw7INUBtY4DY6OcCpWMloMS8cK1e0kM+VIfGB9LXqHb2VjpIBS/+oQMvDs3giLN8SltYmrOec+dsrv8Yi7aArX3t15vhEfTBH42x8NO57YRStG1DESn9JUttuOkTcu0w2W/5ElPKSWs+6wkQLIgXEB3r9bdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xftx+XWX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722267228;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gOdxuhlC0hKorSyQVfDMKmXgVB7ow0l5OK4sY+cYrK0=;
-	b=Xftx+XWXDBAi/79OEYEQjV+nyIaKO+S2yUDbd059r7SQz/YrjuaUprsg7P9eAHbgu9c66a
-	FuuPE0MWThNGCChuPwd/rHeXJBrUuFFBAw9wTI/zcHAH9SgK1jAKdSZ1kfyAqcfvnp4x0A
-	+4+HSjli4iWbW8JYf4K3Ohm6oGvMt94=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-TXB0jcuBP42dYpJKiWSRYw-1; Mon, 29 Jul 2024 11:33:46 -0400
-X-MC-Unique: TXB0jcuBP42dYpJKiWSRYw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42820af1106so3722375e9.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:33:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722267225; x=1722872025;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gOdxuhlC0hKorSyQVfDMKmXgVB7ow0l5OK4sY+cYrK0=;
-        b=HHIGphEnNtkV8G6ex+T4Bf9u/3y/mamZrU+9N9PvVstBmGcqztx6MQ2cj+hKT/86pF
-         G0DMp2k8uY21xbjSsMyZgUVIzI3Y91N1OQjSp7ifuGd53eDBDAi2ovo5z7xHlJ+36X4f
-         QgdRQfVWYoqKE+DHaeByb3vD5/Vb6xOpy13fyNqu5s6GJ2YCprfYkWyu4TfRfSsGLwWR
-         W3OIs7JboLeq5dwT737SWhJgI2uplXgh/eC8AmbpGMYichuJk9YTXs96ck80fRTKqAGQ
-         GDNVPJcwsRMlCwMHXk34umGL7GnVU3Xifa3yB4aXGQfZXxNImqgQOjIRUuYFRg4uSWAW
-         CQ+w==
-X-Forwarded-Encrypted: i=1; AJvYcCX7yM3ISRyFly30pvxNfzRerIodwAJiQiYn+vkQrX82y1s8CggNyfs9WSw6QxIfdZrhyk7yXEcfNLM2SQULvd8NbSkXqHuf
-X-Gm-Message-State: AOJu0YyDawNAzz3XMpWpCuGULoE+lFbLZU2gETOY+VtOdaskqWX6LYZA
-	pSfsK/yPxG9lkBxb/sMOYxrof3QEgf7x6/+5FohisR+s71/W3/qsVibjiChoHqUXytSMdnyKNJW
-	9nYvMzcva4SEBH+QJVKBWU+vbEAZ77RwmNbjCkQdGIlqx3JP5BPE9yQ==
-X-Received: by 2002:a05:600c:3b99:b0:426:5269:9827 with SMTP id 5b1f17b1804b1-42811a94590mr60054315e9.0.1722267224668;
-        Mon, 29 Jul 2024 08:33:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH11CwyPhlrH2xJ/R5zuEwuK8l7eeYYGyXEbvzQ/zeQzSr5tEaXptiR7TnM3lG3ZWRGuUwuXg==
-X-Received: by 2002:a05:600c:3b99:b0:426:5269:9827 with SMTP id 5b1f17b1804b1-42811a94590mr60053985e9.0.1722267223937;
-        Mon, 29 Jul 2024 08:33:43 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:55d:98c4:742e:26be:b52d:dd54])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281fd617desm21464125e9.35.2024.07.29.08.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 08:33:43 -0700 (PDT)
-Date: Mon, 29 Jul 2024 11:33:36 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Peter Hilber <peter.hilber@opensynergy.com>,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
-	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
-	"Luu, Ryan" <rluu@amazon.com>,
-	"Chashper, David" <chashper@amazon.com>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"Christopher S . Hall" <christopher.s.hall@intel.com>,
-	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
-	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v3] ptp: Add vDSO-style vmclock support
-Message-ID: <20240729113320-mutt-send-email-mst@kernel.org>
-References: <e3164fc80e21336cbf13e24f98c9e5706afb77ab.camel@infradead.org>
+	s=arc-20240116; t=1722267498; c=relaxed/simple;
+	bh=oJjZh5GjagpbHn4iOY8xAaEfKzSzYKMP40wSi+8uNV0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OO2DacN4u1E7XJv4FcTVcqBl+7A2dUkSz3ZlVxVB6+BAPYAJGIS7x6rbc6DtxXUXYHXlDblQ+nfoTkDYzosf0UjzklBHDnkHV5CRCt2vHlDK6ud26+//ZN9TzAhyIAf4orESWBFbyZ2665w+vuOwkg79jEzBqF+f+LUdWyPhaJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=LZSKDu6M; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:6c24:bf58:f1fe:91c1])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id CB65E7DA37;
+	Mon, 29 Jul 2024 16:38:14 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1722267495; bh=oJjZh5GjagpbHn4iOY8xAaEfKzSzYKMP40wSi+8uNV0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
+	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
+	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
+	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
+	 hern@kernel.org,=0D=0A=09tparkin@katalix.com|Subject:=20[PATCH=20n
+	 et-next=2000/15]=20l2tp:=20simplify=20tunnel=20and=20session=20cle
+	 anup|Date:=20Mon,=2029=20Jul=202024=2016:37:59=20+0100|Message-Id:
+	 =20<cover.1722265212.git.jchapman@katalix.com>|MIME-Version:=201.0
+	 ;
+	b=LZSKDu6MRxLxxU/VezHXKRaPTG7VjceEwXig0WdamK9Umd2aHIQdUyJFPgWXpJTH7
+	 Vy2HGfregwMk1X481BgiHJWBApzXLzZKGgVCSp0oxoHnE5VTpAwCcaS/yJya472gra
+	 Gd/+dkG97U36G+rwaC82BtuJHiIMAWdETd9XGRcIJYvTm6XrStxUbQWXlERoJRU2Fz
+	 HxG8IXSVN16h5FZgXqMt0GIv8cUtVnoQBOuw3bgMf9kTinXSRcXjQW/yY4N8yEtGNK
+	 LgUEksIeEkuif7heR6ggJva3e27h2FtLSo5LzSQkyFG9j2YLT7PcNVdTK6UIcBhM7Z
+	 DmkabQKqpOY+A==
+From: James Chapman <jchapman@katalix.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	tparkin@katalix.com
+Subject: [PATCH net-next 00/15] l2tp: simplify tunnel and session cleanup
+Date: Mon, 29 Jul 2024 16:37:59 +0100
+Message-Id: <cover.1722265212.git.jchapman@katalix.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e3164fc80e21336cbf13e24f98c9e5706afb77ab.camel@infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 29, 2024 at 11:42:22AM +0100, David Woodhouse wrote:
-> +struct vmclock_abi {
-> +	/* CONSTANT FIELDS */
-> +	uint32_t magic;
-> +#define VMCLOCK_MAGIC	0x4b4c4356 /* "VCLK" */
-> +	uint32_t size;		/* Size of region containing this structure */
-> +	uint16_t version;	/* 1 */
-> +	uint8_t counter_id; /* Matches VIRTIO_RTC_COUNTER_xxx except INVALID */
-> +#define VMCLOCK_COUNTER_ARM_VCNT	0
-> +#define VMCLOCK_COUNTER_X86_TSC		1
-> +#define VMCLOCK_COUNTER_INVALID		0xff
-> +	uint8_t time_type; /* Matches VIRTIO_RTC_TYPE_xxx */
-> +#define VMCLOCK_TIME_UTC			0	/* Since 1970-01-01 00:00:00z */
-> +#define VMCLOCK_TIME_TAI			1	/* Since 1970-01-01 00:00:00z */
-> +#define VMCLOCK_TIME_MONOTONIC			2	/* Since undefined epoch */
-> +#define VMCLOCK_TIME_INVALID_SMEARED		3	/* Not supported */
-> +#define VMCLOCK_TIME_INVALID_MAYBE_SMEARED	4	/* Not supported */
-> +
-> +	/* NON-CONSTANT FIELDS PROTECTED BY SEQCOUNT LOCK */
-> +	uint32_t seq_count;	/* Low bit means an update is in progress */
-> +	/*
-> +	 * This field changes to another non-repeating value when the CPU
-> +	 * counter is disrupted, for example on live migration. This lets
-> +	 * the guest know that it should discard any calibration it has
-> +	 * performed of the counter against external sources (NTP/PTP/etc.).
-> +	 */
-> +	uint64_t disruption_marker;
-> +	uint64_t flags;
-> +	/* Indicates that the tai_offset_sec field is valid */
-> +#define VMCLOCK_FLAG_TAI_OFFSET_VALID		(1 << 0)
-> +	/*
-> +	 * Optionally used to notify guests of pending maintenance events.
-> +	 * A guest which provides latency-sensitive services may wish to
-> +	 * remove itself from service if an event is coming up. Two flags
-> +	 * indicate the approximate imminence of the event.
-> +	 */
-> +#define VMCLOCK_FLAG_DISRUPTION_SOON		(1 << 1) /* About a day */
-> +#define VMCLOCK_FLAG_DISRUPTION_IMMINENT	(1 << 2) /* About an hour */
-> +#define VMCLOCK_FLAG_PERIOD_ESTERROR_VALID	(1 << 3)
-> +#define VMCLOCK_FLAG_PERIOD_MAXERROR_VALID	(1 << 4)
-> +#define VMCLOCK_FLAG_TIME_ESTERROR_VALID	(1 << 5)
-> +#define VMCLOCK_FLAG_TIME_MAXERROR_VALID	(1 << 6)
-> +	/*
-> +	 * If the MONOTONIC flag is set then (other than leap seconds) it is
-> +	 * guaranteed that the time calculated according this structure at
-> +	 * any given moment shall never appear to be later than the time
-> +	 * calculated via the structure at any *later* moment.
-> +	 *
-> +	 * In particular, a timestamp based on a counter reading taken
-> +	 * immediately after setting the low bit of seq_count (and the
-> +	 * associated memory barrier), using the previously-valid time and
-> +	 * period fields, shall never be later than a timestamp based on
-> +	 * a counter reading taken immediately before *clearing* the low
-> +	 * bit again after the update, using the about-to-be-valid fields.
-> +	 */
-> +#define VMCLOCK_FLAG_TIME_MONOTONIC		(1 << 7)
-> +
-> +	uint8_t pad[2];
-> +	uint8_t clock_status;
-> +#define VMCLOCK_STATUS_UNKNOWN		0
-> +#define VMCLOCK_STATUS_INITIALIZING	1
-> +#define VMCLOCK_STATUS_SYNCHRONIZED	2
-> +#define VMCLOCK_STATUS_FREERUNNING	3
-> +#define VMCLOCK_STATUS_UNRELIABLE	4
-> +
-> +	/*
-> +	 * The time exposed through this device is never smeared. This field
-> +	 * corresponds to the 'subtype' field in virtio-rtc, which indicates
-> +	 * the smearing method. However in this case it provides a *hint* to
-> +	 * the guest operating system, such that *if* the guest OS wants to
-> +	 * provide its users with an alternative clock which does not follow
-> +	 * UTC, it may do so in a fashion consistent with the other systems
-> +	 * in the nearby environment.
-> +	 */
-> +	uint8_t leap_second_smearing_hint; /* Matches VIRTIO_RTC_SUBTYPE_xxx */
-> +#define VMCLOCK_SMEARING_STRICT		0
-> +#define VMCLOCK_SMEARING_NOON_LINEAR	1
-> +#define VMCLOCK_SMEARING_UTC_SLS	2
-> +	int16_t tai_offset_sec;
-> +	uint8_t leap_indicator;
-> +	/*
-> +	 * This field is based on the the VIRTIO_RTC_LEAP_xxx values as
-> +	 * defined in the current draft of virtio-rtc, but since smearing
-> +	 * cannot be used with the shared memory device, some values are
-> +	 * not used.
-> +	 *
-> +	 * The _POST_POS and _POST_NEG values allow the guest to perform
-> +	 * its own smearing during the day or so after a leap second when
-> +	 * such smearing may need to continue being applied for a leap
-> +	 * second which is now theoretically "historical".
-> +	 */
-> +#define VMCLOCK_LEAP_NONE	0x00	/* No known nearby leap second */
-> +#define VMCLOCK_LEAP_PRE_POS	0x01	/* Positive leap second at EOM */
-> +#define VMCLOCK_LEAP_PRE_NEG	0x02	/* Negative leap second at EOM */
-> +#define VMCLOCK_LEAP_POS	0x03	/* Set during 23:59:60 second */
-> +#define VMCLOCK_LEAP_POST_POS	0x04
-> +#define VMCLOCK_LEAP_POST_NEG	0x05
-> +
-> +	/* Bit shift for counter_period_frac_sec and its error rate */
-> +	uint8_t counter_period_shift;
-> +	/*
-> +	 * Paired values of counter and UTC at a given point in time.
-> +	 */
-> +	uint64_t counter_value;
-> +	/*
-> +	 * Counter period, and error margin of same. The unit of these
-> +	 * fields is 1/2^(64 + counter_period_shift) of a second.
-> +	 */
-> +	uint64_t counter_period_frac_sec;
-> +	uint64_t counter_period_esterror_rate_frac_sec;
-> +	uint64_t counter_period_maxerror_rate_frac_sec;
-> +
-> +	/*
-> +	 * Time according to time_type field above.
-> +	 */
-> +	uint64_t time_sec;		/* Seconds since time_type epoch */
-> +	uint64_t time_frac_sec;		/* Units of 1/2^64 of a second */
-> +	uint64_t time_esterror_nanosec;
-> +	uint64_t time_maxerror_nanosec;
-> +};
-> +
-> +#endif /*  __VMCLOCK_ABI_H__ */
-> -- 
-> 2.44.0
-> 
-> 
+This series simplifies and improves l2tp tunnel and session cleanup.
 
+ * refactor l2tp management code to not use the tunnel socket's
+   sk_user_data. This allows the tunnel and its socket to be closed
+   and freed without sequencing the two using the socket's sk_destruct
+   hook.
 
+ * export ip_flush_pending_frames and use it when closing l2tp_ip
+   sockets.
 
-you said you will use __le here?
+ * move the work of closing all sessions in the tunnel to the work
+   queue so that sessions are deleted using the same codepath whether
+   they are closed by user API request or their parent tunnel is
+   closing.
+
+ * refactor l2tp_ppp pppox socket / session relationship to have the
+   session keep the socket alive, not the other way around. Previously
+   the pppox socket held a ref on the session, which complicated
+   session delete by having to go through the pppox socket destructor.
+
+ * free sessions and pppox sockets by rcu.
+
+ * fix a possible tunnel refcount underflow.
+
+ * avoid using rcu_barrier in net exit handler.
+
+James Chapman (15):
+  l2tp: lookup tunnel from socket without using sk_user_data
+  ipv4: export ip_flush_pending_frames
+  l2tp: have l2tp_ip_destroy_sock use ip_flush_pending_frames
+  l2tp: don't use tunnel socket sk_user_data in ppp procfs output
+  l2tp: don't set sk_user_data in tunnel socket
+  l2tp: remove unused tunnel magic field
+  l2tp: simplify tunnel and socket cleanup
+  l2tp: delete sessions using work queue
+  l2tp: free sessions using rcu
+  l2tp: refactor ppp socket/session relationship
+  l2tp: prevent possible tunnel refcount underflow
+  l2tp: use rcu list add/del when updating lists
+  l2tp: add idr consistency check in session_register
+  l2tp: cleanup eth/ppp pseudowire setup code
+  l2tp: use pre_exit pernet hook to avoid rcu_barrier
+
+ net/ipv4/ip_output.c    |   1 +
+ net/l2tp/l2tp_core.c    | 199 ++++++++++++++++++++++------------------
+ net/l2tp/l2tp_core.h    |  14 +--
+ net/l2tp/l2tp_eth.c     |   2 +-
+ net/l2tp/l2tp_ip.c      |  13 ++-
+ net/l2tp/l2tp_ip6.c     |   7 +-
+ net/l2tp/l2tp_netlink.c |   4 +-
+ net/l2tp/l2tp_ppp.c     | 107 ++++++++++-----------
+ 8 files changed, 179 insertions(+), 168 deletions(-)
+
+-- 
+2.34.1
 
 
