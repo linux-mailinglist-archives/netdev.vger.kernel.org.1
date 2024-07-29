@@ -1,207 +1,188 @@
-Return-Path: <netdev+bounces-113756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3BA293FC93
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 19:46:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D22E93FCCB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 19:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D02DB21C3F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:46:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEE651C20DBE
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590B41586DB;
-	Mon, 29 Jul 2024 17:46:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A065C186E29;
+	Mon, 29 Jul 2024 17:50:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ba9xDLOn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxQSswtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856A978C76
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 17:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDF118308E;
+	Mon, 29 Jul 2024 17:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722275194; cv=none; b=u83ANf9DtMfJAdtqJfU/JkCLx/uPoPn0xCQlomhEPLySXtzBrrgl3ifzAFm07fKqardvTsb+04mUKOQSfbx3zKcaEFcw/xQV7ZfNz+fp9aQ5WNAEqeKO4jwyE3emWJ2UTp4lOh4dgiF7iAZOrbqX5aMjePdnPXBREA9wkENgsCs=
+	t=1722275415; cv=none; b=CPDJKvMhyNYI3lJVvwFOcHzaqXZo99WQR9wYAnFUtbdixaYma5PUF9Ug4HSEO69p+iXQAgpcgekJpguY7alUksY7WbaL6UFjZTSrVJ1ZCLmvHJoLElVbm723QFocnDKG+DaqFT/Z/8uot2RWbsRCrG0NG7u8HjE8qqLkkGLjyYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722275194; c=relaxed/simple;
-	bh=x54E6CsVNHB8nlMMNY3p9jMlRbphqBDzrlOcojJrB+w=;
+	s=arc-20240116; t=1722275415; c=relaxed/simple;
+	bh=4NxwcVBogzSik6xO69vdbwmpbYw9mw6vWuiVUdTVbZE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M5E6wtDm0A+zhrlBzvImxRHIt1hoa0bYWucsWNzdWe27GQ6DdHd6tUA61LMmi5md+22wW+8hMpOLQYLV9zLb8TQhZ8OFT3jgl+1SXnNENnyW/51QBcYDDxk5qFSjjD5cofx+E/68AKRmFa+VnFg7FNS+nqyM8R68TVewDaAXky4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ba9xDLOn; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so1297a12.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 10:46:32 -0700 (PDT)
+	 To:Cc:Content-Type; b=PS98ckFC1leDucd9V7FdumRMjnQXgPU95ixa04c16P2i+KieysQcXK/0UtyI3vrsvRbE/nrl2VmDI1cNbXHjZHXa7x5ZGSymForUvSyfD2KVDcyiL+y/wQxzc41GGWDlFFCMDITWqH957p/bZGaQw/z5LnTZdne9I4HTnMO4bJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JxQSswtp; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1fc47abc040so19718115ad.0;
+        Mon, 29 Jul 2024 10:50:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722275191; x=1722879991; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722275413; x=1722880213; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oH1DiYL4kdG8EVj9AsvFV25K/u74YDHNoemmf3irk7A=;
-        b=ba9xDLOnc6mGzgW+oWpD4qBuF+LiInUdeVcuYnR7oO3xZ1DThyRRXSmp2cPrYdhLjN
-         Vi8cVjhEcjgid1zIH8k0YhJ/lvJ3YLEXROxUNtc7YNesnX7MhoURl+7cbz2kaHcAPezM
-         zP5P8uBEpUWZrQHTgatpQtA4UdXSGkhvbNynks9sB05B4I+jnRDMLYxwn9nEwDyLa7pf
-         7qbTAS2ljgnljdhgFXL2Glfs+cR4i9a7zot+qcrxvysdydrnnOcOBjmhKOegoy42+cAO
-         05ISP08XmkvqqxSNMC54YGi20MHnzY+HNAKjR2n4cVKyWfZ7NYHsouWJED98xXIpSBAO
-         lylQ==
+        bh=kAoutELpgZ2/FASGl5RA7ci/ysqoxbX9zpw9T21SN8g=;
+        b=JxQSswtpIzzSZ/JcAlsVvL7kONtai10EDx/auO63g1NA8JcrM43tfh5KZyEp5Mb1+l
+         2WJmnBK/Jba2AJPCw/sF6twvkqI1Ir2qZT54BNLjr46mZjR14AkQ43OCTOzgrdjhKItu
+         gB5xoEGMJiA/YH9+AKIdk4NhWtOcIllVbbPuHPNd9jvNOjF44lqKBJQDonD6UYm/xVD+
+         +TSOZVv6fAwbZGwleF+8H614dA6WW+jEL7fsVLfvxMZlOYX3uSzTQv4hLTk4dNBtA1rd
+         Z28O/lUHtSK+kZljsst7aH+bZyGLNsnmNUmQ7vPiwZyzuDgwhyqiTtF0z3/a43bDvbDh
+         HySg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722275191; x=1722879991;
+        d=1e100.net; s=20230601; t=1722275413; x=1722880213;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oH1DiYL4kdG8EVj9AsvFV25K/u74YDHNoemmf3irk7A=;
-        b=VSL49WXmet2pXFyxTpl7VT8Q7yoppNAk29Nk8SH9kCv5XldbdA4xp5cnGzQ2xS3y/T
-         NRPO1AqTZ0DSGdWLebcmfTFPgl/CBNfPQ4fpStefNkN+K4/IAmpq1kXfk+Wra5X8ewNG
-         v875+4qHZdy+CSdRbAIh3uGymIxvtuLlalBy0Pj/6P6FInZjKJtQlIBJ/zrxW+wI5s1F
-         yZRtTPhDO4Lucfjx7RTZx5TI2BY0LH1cL7g76NTMSf4qsW7sLzn2vAHpFxeq1icKI3Os
-         NDNvDcXX2sCPbj1/HUTF5/R3eGJBv2VsH2WXzVGo2mYy8W2erNulvIz8tcHbmOXMB+wE
-         UyhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnj7b3CMAznIYcbIgSdJh7bmblXuKJBBapJSIIGFBMHOOhIf27ZbMxltlRf2lGx1eUFHAGaSuZZvrTH7IEzapGgI5jTtQz
-X-Gm-Message-State: AOJu0YwHByi7zwbkEHyGqNvmRP1vyIeIc6XMpug29R/Mpk1c4r+5Rh5u
-	48tgLYXPf6A2zZJNaTHHpNsfmxXVbP98MR3jq3CFugghwRA6v5K2W+fZOp61k6ZnqnDnE56czvw
-	EuvNTLsRpf9p6e1EJFAwZzgWBbhrY9+rJ+5cu
-X-Google-Smtp-Source: AGHT+IF8TSv1Ug1AIHMZ96AEE7sYh9pBStaEEW0UjSF63jl4lvS9Dm0d9y/JZ49L9hgFK+kwJqihL2kmCwpyXk2q3x8=
-X-Received: by 2002:a05:6402:51d0:b0:57d:32ff:73ef with SMTP id
- 4fb4d7f45d1cf-5b40d4a2ad8mr35907a12.6.1722275190338; Mon, 29 Jul 2024
- 10:46:30 -0700 (PDT)
+        bh=kAoutELpgZ2/FASGl5RA7ci/ysqoxbX9zpw9T21SN8g=;
+        b=jRoGHQg8NVjiKl+eqp2gIRczdoSTWZFinNWob98y9hlhEzHvRy73WTtgK1MKQ9PJjV
+         4xswjUjCd4yH2mKFcCuggdQ32tYht5R9VnoV0b+EwDLJTLidNvJclFyDHiTUYnoTZwqU
+         mJoWwKVnukcHK8omGDLmavjJq3U9ZcsWvDS1XBSDWc+gJdz6vYSjNGpTJ2YCThiS+g3d
+         4db3elOoFMN7zo2damKQ7x0+wVWfEVgQBeXPnFTE3hKeAL38Q67fuUcdkHJr6zjFBIKP
+         lORZZjlErmRiaR66Fa1R1/vQkEBIwAGYa3+gSQuTWlznw0jFrcTLdq63mr+Wt48m604x
+         Y/dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeirlNveTfxTQVLAl7TCWPWJcuuKI0syVrbkK2Jt/tV3b3CDXgxR8adf+3CBV3USrv8zavG6nyRMkY4d4TXu2iD2XKS5GYZuFrcL4+covka9G5yDUnuGOAnvGgygFxsjj66vQgPJ37
+X-Gm-Message-State: AOJu0YxTQ9afnVXcgIYsfqTO54kqZL4ZJ5w4ZBj9KabYHQGCurKDoOJT
+	QjIIoecVN3R+rMz2SruNldaqmNcrlFwvETlGbPetf4qosplEd9rkvVlHO64dWHlgiX3NBMQwRtZ
+	Vr9+68Tg9ah1dRMkpyFQZ2W+dqzQ=
+X-Google-Smtp-Source: AGHT+IGZqRO9NZIOCVBvZjihR0C8pKyNA/UI0jFzDvw6s5kRemVbmspr1aBwSYcQp8n8GJEgoZ360Bchze0f0yKTduc=
+X-Received: by 2002:a17:90a:c17:b0:2cf:c2da:771d with SMTP id
+ 98e67ed59e1d1-2cfc2da7f13mr1652785a91.25.1722275413218; Mon, 29 Jul 2024
+ 10:50:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729163326.16386-1-aha310510@gmail.com>
-In-Reply-To: <20240729163326.16386-1-aha310510@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 29 Jul 2024 19:46:15 +0200
-Message-ID: <CANn89i+SgDaA-vkTXxziA3OLZncgYUTViC-WaX6dGVx_0kLUww@mail.gmail.com>
-Subject: Re: [PATCH net] net: annotate data race around dev->flags in __dev_change_flags
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
-	syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <cover.1721903630.git.tony.ambardar@gmail.com> <472c94bd42cda20154a26ef384b73488abf026c0.1721903630.git.tony.ambardar@gmail.com>
+ <CAEf4Bza_y15T4gU=Kiu2d+RbWpxEzrLe6T71bCpK383xHD8JMg@mail.gmail.com> <ZqRt8jdbWj6oQHov@kodidev-ubuntu>
+In-Reply-To: <ZqRt8jdbWj6oQHov@kodidev-ubuntu>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 29 Jul 2024 10:50:01 -0700
+Message-ID: <CAEf4Bzaj-YZaXco2EAsMhneqinLgukDepeN63Xt8cC9GTbRVxg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v1 6/8] selftests/bpf: Fix compile if backtrace
+ support missing in libc
+To: Tony Ambardar <tony.ambardar@gmail.com>
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Yan Zhai <yan@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 6:34=E2=80=AFPM Jeongjun Park <aha310510@gmail.com>=
- wrote:
+On Fri, Jul 26, 2024 at 8:48=E2=80=AFPM Tony Ambardar <tony.ambardar@gmail.=
+com> wrote:
 >
-> According to KCSAN report, there is a read/write race between
-> __dev_change_flags and netif_is_bond_master for dev->flags.
+> On Thu, Jul 25, 2024 at 01:22:37PM -0700, Andrii Nakryiko wrote:
+> > On Thu, Jul 25, 2024 at 3:39=E2=80=AFAM Tony Ambardar <tony.ambardar@gm=
+ail.com> wrote:
+> > >
+> > > From: Tony Ambardar <tony.ambardar@gmail.com>
+> > >
+> > > Use backtrace functions only with glibc and otherwise provide stubs i=
+n
+> > > test_progs.c. This avoids compile errors (e.g. with musl libc) like:
+> > >
+> > >   test_progs.c:13:10: fatal error: execinfo.h: No such file or direct=
+ory
+> > >      13 | #include <execinfo.h> /* backtrace */
+> > >         |          ^~~~~~~~~~~~
+> > >   test_progs.c: In function 'crash_handler':
+> > >   test_progs.c:1034:14: error: implicit declaration of function 'back=
+trace' [-Werror=3Dimplicit-function-declaration]
+> > >    1034 |         sz =3D backtrace(bt, ARRAY_SIZE(bt));
+> > >         |              ^~~~~~~~~
+> > >   test_progs.c:1045:9: error: implicit declaration of function 'backt=
+race_symbols_fd' [-Werror=3Dimplicit-function-declaration]
+> > >    1045 |         backtrace_symbols_fd(bt, sz, STDERR_FILENO);
+> > >         |         ^~~~~~~~~~~~~~~~~~~~
+> > >
+> > > Fixes: 9fb156bb82a3 ("selftests/bpf: Print backtrace on SIGSEGV in te=
+st_progs")
+> > > Signed-off-by: Tony Ambardar <tony.ambardar@gmail.com>
+> > > ---
+> > >  tools/testing/selftests/bpf/test_progs.c | 9 ++++++++-
+> > >  1 file changed, 8 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/tools/testing/selftests/bpf/test_progs.c b/tools/testing=
+/selftests/bpf/test_progs.c
+> > > index 60c5ec0f6abf..f6cfc6a8e8f0 100644
+> > > --- a/tools/testing/selftests/bpf/test_progs.c
+> > > +++ b/tools/testing/selftests/bpf/test_progs.c
+> > > @@ -10,7 +10,6 @@
+> > >  #include <sched.h>
+> > >  #include <signal.h>
+> > >  #include <string.h>
+> > > -#include <execinfo.h> /* backtrace */
+> > >  #include <sys/sysinfo.h> /* get_nprocs */
+> > >  #include <netinet/in.h>
+> > >  #include <sys/select.h>
+> > > @@ -19,6 +18,14 @@
+> > >  #include <bpf/btf.h>
+> > >  #include "json_writer.h"
+> > >
+> > > +#ifdef __GLIBC__
+> > > +#include <execinfo.h> /* backtrace */
+> > > +#else
+> > > +#define backtrace(...) (0)
+> > > +#define backtrace_symbols_fd(bt, sz, fd) \
+> > > +       dprintf(fd, "<backtrace not supported>\n", bt, sz)
+> > > +#endif
+> >
+> > First, let's define backtrace() and backtrace_symbols_fd() as proper
+> > functions, not a macro?
+> >
+> > And second, what if we then make those functions __weak, so they
+> > provide default implementations if libc doesn't provide those
+> > functions?
+> >
+> > This parts seems unavoidable, though:
+> >
+> > #ifdef __GLIBC__
+> > #include <execinfo.h>
+> > #endif
+> >
 >
-> Thereforce, __dev_change_flags() needs protection.
->
-> <syzbot>
-> BUG: KCSAN: data-race in __dev_change_flags / is_upper_ndev_bond_master_f=
-ilter
->
-> read-write to 0xffff888112d970b0 of 4 bytes by task 4888 on cpu 0:
->  __dev_change_flags+0x9a/0x410 net/core/dev.c:8755
->  rtnl_configure_link net/core/rtnetlink.c:3321 [inline]
->  rtnl_newlink_create net/core/rtnetlink.c:3518 [inline]
->  __rtnl_newlink net/core/rtnetlink.c:3730 [inline]
->  rtnl_newlink+0x121e/0x1690 net/core/rtnetlink.c:3743
->  rtnetlink_rcv_msg+0x85e/0x910 net/core/rtnetlink.c:6635
->  netlink_rcv_skb+0x12c/0x230 net/netlink/af_netlink.c:2564
->  rtnetlink_rcv+0x1c/0x30 net/core/rtnetlink.c:6653
->  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
->  netlink_unicast+0x58d/0x660 net/netlink/af_netlink.c:1361
->  netlink_sendmsg+0x5ca/0x6e0 net/netlink/af_netlink.c:1905
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x140/0x180 net/socket.c:745
->  ____sys_sendmsg+0x312/0x410 net/socket.c:2585
->  ___sys_sendmsg net/socket.c:2639 [inline]
->  __sys_sendmsg+0x1e9/0x280 net/socket.c:2668
->  __do_sys_sendmsg net/socket.c:2677 [inline]
->  __se_sys_sendmsg net/socket.c:2675 [inline]
->  __x64_sys_sendmsg+0x46/0x50 net/socket.c:2675
->  x64_sys_call+0xb25/0x2d70 arch/x86/include/generated/asm/syscalls_64.h:4=
-7
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xc9/0x1c0 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> read to 0xffff888112d970b0 of 4 bytes by task 11 on cpu 1:
->  netif_is_bond_master include/linux/netdevice.h:5020 [inline]
->  is_upper_ndev_bond_master_filter+0x2b/0xb0 drivers/infiniband/core/roce_=
-gid_mgmt.c:275
->  ib_enum_roce_netdev+0x124/0x1d0 drivers/infiniband/core/device.c:2310
->  ib_enum_all_roce_netdevs+0x8a/0x100 drivers/infiniband/core/device.c:233=
-7
->  netdevice_event_work_handler+0x15b/0x3c0 drivers/infiniband/core/roce_gi=
-d_mgmt.c:626
->  process_one_work kernel/workqueue.c:3248 [inline]
->  process_scheduled_works+0x483/0x9a0 kernel/workqueue.c:3329
->  worker_thread+0x526/0x720 kernel/workqueue.c:3409
->  kthread+0x1d1/0x210 kernel/kthread.c:389
->  ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->
-> value changed: 0x00001002 -> 0x00000202
->
-> Reported-by: syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->  net/core/dev.c | 17 +++++++++--------
->  1 file changed, 9 insertions(+), 8 deletions(-)
->
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 6ea1d20676fb..3b9626cdfd9a 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -8799,7 +8799,7 @@ EXPORT_SYMBOL(dev_get_flags);
->  int __dev_change_flags(struct net_device *dev, unsigned int flags,
->                        struct netlink_ext_ack *extack)
->  {
-> -       unsigned int old_flags =3D dev->flags;
-> +       unsigned int old_flags =3D READ_ONCE(dev->flags);
->         int ret;
->
->         ASSERT_RTNL();
-> @@ -8808,12 +8808,13 @@ int __dev_change_flags(struct net_device *dev, un=
-signed int flags,
->          *      Set the flags on our device.
->          */
->
-> -       dev->flags =3D (flags & (IFF_DEBUG | IFF_NOTRAILERS | IFF_NOARP |
-> -                              IFF_DYNAMIC | IFF_MULTICAST | IFF_PORTSEL =
-|
-> -                              IFF_AUTOMEDIA)) |
-> -                    (dev->flags & (IFF_UP | IFF_VOLATILE | IFF_PROMISC |
-> -                                   IFF_ALLMULTI));
-> +       unsigned int new_flags =3D (flags & (IFF_DEBUG | IFF_NOTRAILERS |=
- IFF_NOARP |
-> +                                          IFF_DYNAMIC | IFF_MULTICAST | =
-IFF_PORTSEL |
-> +                                          IFF_AUTOMEDIA)) |
-> +                                (READ_ONCE(dev->flags) & (IFF_UP | IFF_V=
-OLATILE | IFF_PROMISC |
-> +                                               IFF_ALLMULTI));
->
-> +       WRITE_ONCE(dev->flags, new_flags);
->         /*
->          *      Load in the correct multicast list now the flags have cha=
-nged.
->          */
-> @@ -8839,12 +8840,12 @@ int __dev_change_flags(struct net_device *dev, un=
-signed int flags,
->
->         if ((flags ^ dev->gflags) & IFF_PROMISC) {
->                 int inc =3D (flags & IFF_PROMISC) ? 1 : -1;
-> -               unsigned int old_flags =3D dev->flags;
-> +               unsigned int old_flags =3D READ_ONCE(dev->flags);
->
->                 dev->gflags ^=3D IFF_PROMISC;
->
->                 if (__dev_set_promiscuity(dev, inc, false) >=3D 0)
-> -                       if (dev->flags !=3D old_flags)
-> +                       if (READ_ONCE(dev->flags) !=3D old_flags)
->                                 dev_set_rx_mode(dev);
->         }
+> I agree that would be cleaner, will work on a v2 with this.
 >
 
-These READ_ONCE() in RTNL protected regions are not necessary, because
-dev->flags can not be changed by another thread.
+v2 looks good, thanks
+
+> Out of curiosity, I saw that tools/build includes feature-detection code
+> (incl backtrace) and wondered if selftests/bpf ever used this facility?
+
+I don't remember, tbh, it might have at some point in the past.
+
+> >
+> > > +
+> > >  static bool verbose(void)
+> > >  {
+> > >         return env.verbosity > VERBOSE_NONE;
+> > > --
+> > > 2.34.1
+> > >
 
