@@ -1,175 +1,176 @@
-Return-Path: <netdev+bounces-113575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51EBA93F1F2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:58:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9372593F1F5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:58:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74F281C21F1C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 09:58:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EB83B247BA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 09:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A24145FEC;
-	Mon, 29 Jul 2024 09:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0704913FD84;
+	Mon, 29 Jul 2024 09:56:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Cw6SRvP/"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="Mp3vupkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BED2145B2D
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 09:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.7])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA9613F42F
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 09:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722246950; cv=none; b=lSu48ikWa751cMvhDBOp0wlQBDcWhLyKf3mGclzTQbXwXv3bRnk04wVlSE1oEGXr/eyWoIPB9zMx8ZphHUWMSfyYKqgPHctyvLWV2VUpf4hLjyLm6ZpmIZ+DCJurl6/stN9CsYUQKgWQTWzkvZjWcLzzRmV1qcQ1rrtNfVj4Qmk=
+	t=1722247009; cv=none; b=Ix0IZQBVInLBjdfsJKwjlhSHMV9kDd0xXVOuD/Tz8lZ7CGNtoxF/5cFoNX0PR47csyo1IBM1inbz6BHyg6oxpq7OPyd1AQGQY3BJIbwDHlyGd/76VopjyuO+EhpvEQWH5CLv6Hl9s9AEaRfRsfeZQXRl4pm3roY0uXkC66JqSkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722246950; c=relaxed/simple;
-	bh=lh5vuGpCeu/X20PtAv7AXszc01P4eyUuKMuJLgW/ZMs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ttTDDnyMcwBNRiR/dcOOOkAuWvn1Kphi4UveVHxfDiqzM6a3ZVRVZGofjLjX2XugmqYr8CU452bLbHb0jFYdm5Q9Jbfed6eWNzjDU0kCgldV45LELIMme1b2wHHaIPJupncORRLdE3IEz2JMvtWgSbQEKmQ3ucigSLCEDATGjw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Cw6SRvP/; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-709465248b7so1061224a34.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 02:55:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722246947; x=1722851747; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OKhJMM7FNWLEKxjLEZeLgWXuO555RaT5YZ8epEgnopU=;
-        b=Cw6SRvP/NgYXbEtCGKbTOb8W8Qc44NnkhH84ywYMIYHSUgcLsZP+AOk6WdIz8QV15X
-         61phCoG9BDZDOA2anIJkE/hYn4rU/YwQxBbDoDJDxAxYrBI3DRxYmJnd3zc/sBVLP/V/
-         ZGEU3m47NJOrBLG0URnUGGR5a79s9LsZlhnV8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722246947; x=1722851747;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OKhJMM7FNWLEKxjLEZeLgWXuO555RaT5YZ8epEgnopU=;
-        b=pZMd8vglCsUBQJ3tMPFgKqwLuKBM69VWjhn2NZqev76arGlwN+8XmVNG2DypEHTOyN
-         7vw/UxrgTOEhn4RKeMHVdfbFxsDLCatiWxYQ9i1B8aLbjPK97mgyijQ6xiNao4G3l9my
-         OIZ/+jn7M4mz8XRKLs+gU6DVeNWkBJtT5EkK+eM2t/10ox8Rc9JQ+FPpyCfohfdAQa8y
-         MGAEteW/KD3DPCNSWhBsLrWF3ZjXh9+E7A0ETc6mpN8lCuubitbaa03SUeHg9TIneLSw
-         oTYURd5c0s5iFuWc+MIHcVpQtLKHISpwVhaM4xhSGZOwzghcrfKBwEuGFlZMV2nhkgPd
-         ZLNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJJCZpkjBzuHMCPyKBPOrc2LibglT/wuvb0xpek3kUJRiJiMKjqsiwfWrZyExq+HiPtS2JETVU3aHsoTKUYaifLtNHS4YW
-X-Gm-Message-State: AOJu0YwqSBqFevdanP/OMvVxNZua74nwwyid1bybG2KS5z33qE2es0QZ
-	hmswrqqGnV3vUeUdn1Do2WeStvDfuB8ShY9e1fBlUaUuZ1vylJV32ErfuIAANg==
-X-Google-Smtp-Source: AGHT+IH2UMch3TByotNV8uYlvPnYAb0f4mHesS+wcxZXOZMlSBa7xaMy519lJoXqtij2Wzi5bYBp1Q==
-X-Received: by 2002:a05:6830:6205:b0:709:400a:5f88 with SMTP id 46e09a7af769-70940c0d2f2mr11662718a34.11.1722246947543;
-        Mon, 29 Jul 2024 02:55:47 -0700 (PDT)
-Received: from [10.176.68.61] ([192.19.176.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead715867sm6480567b3a.87.2024.07.29.02.55.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jul 2024 02:55:47 -0700 (PDT)
-Message-ID: <f21a111a-e4e1-45ee-b116-8e52c70777a8@broadcom.com>
-Date: Mon, 29 Jul 2024 11:55:39 +0200
+	s=arc-20240116; t=1722247009; c=relaxed/simple;
+	bh=cp58baruv6kI99ttqSs0vwhfaJOPdiPkpMzJLLea2Xo=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=ni3eAyUKFC9CuXxmKxlVnKPEinARVUp1ARTLQyMvSmBSYJTVudyeTNjGI0C0mDRNai2twKLcG4m1HGswCXEe7MZp5opSSdbn3nZxgAVwPP6Uxjm6QPlM4LLMszlLvdqh3qaYwjQmjzaCpqA34J82f+TetMGmSe9eEQPG/zThyOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=Mp3vupkC; arc=none smtp.client-ip=220.197.31.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=XASwgVM5L7mw96K2bE
+	ahcEwN/Iy/NxjeOfPHGINvGDA=; b=Mp3vupkC2V/UlLEsBlf1a7iFJxoBIW7n3l
+	VKVJBfBcBJZSaGYIQBRTrOfPwydzMmM8+IfoFzgP24WVeoPMFct+qhW/FygK14CW
+	r/jBoAs3NTrJfl3IYIBhThIzQorAOIOhcTmSFbablv0yZsDAh0YmkEetmEf7NBtn
+	m5AC1LmnM=
+Received: from localhost.localdomain (unknown [111.48.58.12])
+	by gzga-smtp-mta-g1-2 (Coremail) with SMTP id _____wD3XyktZ6dmPojCAw--.39738S2;
+	Mon, 29 Jul 2024 17:55:58 +0800 (CST)
+From: xiaolinkui@126.com
+To: edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Linkui Xiao <xiaolinkui@kylinos.cn>
+Subject: [PATCH] tcp/dccp: Add another way to allocate local ports in connect()
+Date: Mon, 29 Jul 2024 17:55:54 +0800
+Message-Id: <20240729095554.28296-1-xiaolinkui@126.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:_____wD3XyktZ6dmPojCAw--.39738S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxuFy5Jr1UJr1UZw4fKF1rJFb_yoWrZrWDpF
+	yxKryIyFWDJF4UGFn7Zanrur4Sga18GF17Cw1I9r4Sywsrtry8tF4vkr1a9F17ArZ7tFyI
+	gFZrtFy3Aws8ZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jbF4iUUUUU=
+X-CM-SenderInfo: p0ld0z5lqn3xa6rslhhfrp/1tbiGBIr1mVLczNcZQAAsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/5] wifi: brcmfmac: Add optional lpo clock enable
- support
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org,
- krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- conor+dt@kernel.org, efectn@protonmail.com, jagan@edgeble.ai,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- duoming@zju.edu.cn, bhelgaas@google.com, minipli@grsecurity.net,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- nick@khadas.com
-References: <20240729070102.3770318-1-jacobe.zang@wesion.com>
- <20240729070102.3770318-5-jacobe.zang@wesion.com>
- <d7068c96e102eaf6c35a77eb76cd067d@manjaro.org>
- <qetrwlvqekobedpwexeltaxqpnemenlfhky2t2razmcdtwlcv3@qdlesuiac2mr>
- <9f248b0e2645a29b83ee503701e04d57@manjaro.org>
-Content-Language: en-US
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <9f248b0e2645a29b83ee503701e04d57@manjaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-On 7/29/2024 11:12 AM, Dragan Simic wrote:
-> Hello Ondrej,
-> 
-> On 2024-07-29 10:44, Ondřej Jirman wrote:
->> On Mon, Jul 29, 2024 at 09:12:20AM GMT, Dragan Simic wrote:
->>> Hello Jacobe,
->>>
->>> [...]
->>>
->>> >
->>> > +    clk = devm_clk_get_optional_enabled(dev, "lpo");
->>> > +    if (IS_ERR(clk))
->>> > +    if (clk) {
->>>
->>> These two lines looks really confusing.  Shouldn't it be just a single
->>> "if (!IS_ERR(clk)) {" line instead?
->>
->> It should be `!IS_ERR(clk) && clk` otherwise the debug message will be
->> incorrect.
-> 
-> Ah, I see now, thanks.  There's also IS_ERR_OR_NULL, so the condition
-> can actually be "!IS_ERR_OR_NULL(clk)".
+From: Linkui Xiao <xiaolinkui@kylinos.cn>
 
-++ best suggestion
+Commit 07f4c90062f8 ("tcp/dccp: try to not exhaust ip_local_port_range
+in connect()") allocates even ports for connect() first while leaving
+odd ports for bind() and this works well in busy servers.
 
->>> > +        brcmf_dbg(INFO, "enabling 32kHz clock\n");
->>> > +        clk_set_rate(clk, 32768);
->>> > +    }
->>> > +
->>> >      if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac"))
->>> >          return;
+But this strategy causes severe performance degradation in busy clients.
+when a client has used more than half of the local ports setted in
+proc/sys/net/ipv4/ip_local_port_range, if this client try to connect
+to a server again, the connect time increases rapidly since it will
+traverse all the even ports though they are exhausted.
+
+So this path provides another strategy by introducing a system option:
+local_port_allocation. If it is a busy client, users should set it to 1
+to use sequential allocation while it should be set to 0 in other
+situations. Its default value is 0.
+
+In commit 207184853dbd ("tcp/dccp: change source port selection at
+connect() time"), tell users that they can access all odd and even ports
+by using IP_LOCAL_PORT_RANGE. But this requires users to modify the
+socket application. When even numbered ports are not sufficient, use the
+sysctl parameter to achieve the same effect:
+	sysctl -w net.ipv4.local_port_allocation=1
+
+Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+---
+ include/net/tcp.h          |  1 +
+ net/ipv4/inet_hashtables.c | 12 ++++++++----
+ net/ipv4/sysctl_net_ipv4.c |  8 ++++++++
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 2aac11e7e1cc..99969b8e5183 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -269,6 +269,7 @@ DECLARE_PER_CPU(int, tcp_memory_per_cpu_fw_alloc);
+ 
+ extern struct percpu_counter tcp_sockets_allocated;
+ extern unsigned long tcp_memory_pressure;
++extern bool sysctl_local_port_allocation;
+ 
+ /* optimized version of sk_under_memory_pressure() for TCP sockets */
+ static inline bool tcp_under_memory_pressure(const struct sock *sk)
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 48d0d494185b..e572f8b21b95 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -1020,11 +1020,15 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 	l3mdev = inet_sk_bound_l3mdev(sk);
+ 
+ 	local_ports = inet_sk_get_local_port_range(sk, &low, &high);
+-	step = local_ports ? 1 : 2;
++	/* local_port_allocation 0 means even and odd port allocation strategy
++	 * will be applied, so step is 2; otherwise sequential allocation will
++	 * be used and step is 1. Default value is 0.
++	 */
++	step = sysctl_local_port_allocation ? 1 : 2;
+ 
+ 	high++; /* [32768, 60999] -> [32768, 61000[ */
+ 	remaining = high - low;
+-	if (!local_ports && remaining > 1)
++	if (!sysctl_local_port_allocation && remaining > 1)
+ 		remaining &= ~1U;
+ 
+ 	get_random_sleepable_once(table_perturb,
+@@ -1037,7 +1041,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 	/* In first pass we try ports of @low parity.
+ 	 * inet_csk_get_port() does the opposite choice.
+ 	 */
+-	if (!local_ports)
++	if (!sysctl_local_port_allocation)
+ 		offset &= ~1U;
+ other_parity_scan:
+ 	port = low + offset;
+@@ -1081,7 +1085,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 		cond_resched();
+ 	}
+ 
+-	if (!local_ports) {
++	if (!sysctl_local_port_allocation) {
+ 		offset++;
+ 		if ((offset & 1) && remaining > 1)
+ 			goto other_parity_scan;
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 9140d20eb2d4..1f6bf3a73516 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -45,6 +45,7 @@ static unsigned int tcp_child_ehash_entries_max = 16 * 1024 * 1024;
+ static unsigned int udp_child_hash_entries_max = UDP_HTABLE_SIZE_MAX;
+ static int tcp_plb_max_rounds = 31;
+ static int tcp_plb_max_cong_thresh = 256;
++bool sysctl_local_port_allocation;
+ 
+ /* obsolete */
+ static int sysctl_tcp_low_latency __read_mostly;
+@@ -632,6 +633,13 @@ static struct ctl_table ipv4_table[] = {
+ 		.extra1		= &sysctl_fib_sync_mem_min,
+ 		.extra2		= &sysctl_fib_sync_mem_max,
+ 	},
++	{
++		.procname	= "local_port_allocation",
++		.data		= &sysctl_local_port_allocation,
++		.maxlen		= sizeof(sysctl_local_port_allocation),
++		.mode		= 0644,
++		.proc_handler	= proc_dobool,
++	},
+ };
+ 
+ static struct ctl_table ipv4_net_table[] = {
+-- 
+2.17.1
+
 
