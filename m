@@ -1,75 +1,63 @@
-Return-Path: <netdev+bounces-113780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827B793FE5F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 21:38:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24BE93FE74
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 21:42:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C6B1C226E7
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 19:38:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CB001F23DF3
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 19:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF36C187878;
-	Mon, 29 Jul 2024 19:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Nc7pAAjw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE34187878;
+	Mon, 29 Jul 2024 19:42:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B9F85947;
-	Mon, 29 Jul 2024 19:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5D214A0B7;
+	Mon, 29 Jul 2024 19:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722281897; cv=none; b=Z0wu4wk1tx824QSib2dHrLGVz1vdMfWLCaksLW0QO7E/zMnJT8mRhJ2dgh3CiUWvJZS2jTyBpB2tLoZDwJYBSjTqmaSdQ4np5eXVLKUY13M2YGfv5bfRMjIQ3TaPZJ9H3rTC8IS2LQ0YgfuEIRQHsMtmTZ6cSvEJ8MdwsgkunOg=
+	t=1722282171; cv=none; b=eubKGIqvhFVWMP8DLZCEGpQcC5ktmc7ZwXazfxGCIsPbn+UJKZFraygJhksFD3eQ0wHRKQ0aIT/pmHElQi1/m5iovZzpBNAUbiq2RKrPKfQuuZAZF9MHy07kOdaGec6oTlTLYuCnKjF+P/cxSLu/NbX5vQ0FOzsBeUAj8+WbcRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722281897; c=relaxed/simple;
-	bh=sZVi+2wk7bs9BELhyd1J9soxIby8FIm+O1C2MvOrn7s=;
+	s=arc-20240116; t=1722282171; c=relaxed/simple;
+	bh=zQrrcm10kCvHi/oNW5hQkCQZGwRU9jvj2iAUgOU+jWc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ik2cre8WLLkIym/9fAZeRgLhrUxgl1+WveTOvNju5HR+qvpFs/PyL4D7DhjpINDabMU8p7QTD20Va02rupGchIan6HheSZF8qCkAGdaVVtW6JkTmxd7Ub7vf4GROizjqtY1BhBiW4ubrItbTxF9um1WSWTwoyyFghFuGN0LpWcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Nc7pAAjw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aViOeWOAFrCQc+pd2oF31G+/p4LxlFN55RgNCh7Jk5c=; b=Nc7pAAjwiZSEtGfijJYK2n6kSW
-	a7mD6m7J/OH21Y7MP1yIpC3Qokf2FBxgcf2LbupjQd2VeWtDwIUfDoUhH9DBIGslCxTuNmLaMy4ii
-	LmSaA7eZMEovPkK1ppis1zatH+N3bEXQHdewidKOy/UFrVMQSawBfj5DRL0oEmfcYHSE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sYWBw-003V3O-KA; Mon, 29 Jul 2024 21:37:56 +0200
-Date: Mon, 29 Jul 2024 21:37:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Markus Schneider-Pargmann <msp@baylibre.com>,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=LiXCegapJcm0D3vueXtj1xKqKsaMCdzY6op8RtFVk0TgMd7tLf16eNx3F2qmJgEEWbDqXXrmE9Inq6SUL5aaZDei6faerLnwKNj7QT9cAYV6OonGbhI90OurZdjzrU0FHfFI1WruUglijV1phapkMjrXeEOX7YAOQddK4Dkf9qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sYWGQ-000000005b2-2xLz;
+	Mon, 29 Jul 2024 19:42:34 +0000
+Date: Mon, 29 Jul 2024 20:42:26 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Tero Kristo <kristo@kernel.org>,
-	Martin =?iso-8859-1?Q?Hundeb=F8ll?= <martin@geanix.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Vibhore Vardhan <vibhore@ti.com>,
-	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>,
-	Conor Dooley <conor@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 2/7] can: m_can: Map WoL to device_set_wakeup_enable
-Message-ID: <3d2a2b51-356f-4a9c-940e-df58be8d2cf3@lunn.ch>
-References: <20240729074135.3850634-1-msp@baylibre.com>
- <20240729074135.3850634-3-msp@baylibre.com>
- <15424d0f-9538-402f-bc5d-cdd630c7c5e9@lunn.ch>
- <20240729-blue-cockle-of-vigor-7d7670-mkl@pengutronix.de>
+	John Crispin <john@phrozen.org>, Felix Fietkau <nbd@nbd.name>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Sam Shih <Sam.Shih@mediatek.com>,
+	Weijie Gao <Weijie.Gao@mediatek.com>,
+	Steven Liu <steven.liu@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net-next] net: pcs: add helper module for standalone
+ drivers
+Message-ID: <ZqfwogNXxmAL1WB2@makrotopia.org>
+References: <ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org>
+ <Zqd8z+/TL22OJ1iu@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,28 +66,111 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240729-blue-cockle-of-vigor-7d7670-mkl@pengutronix.de>
+In-Reply-To: <Zqd8z+/TL22OJ1iu@shell.armlinux.org.uk>
 
-> > > +static void m_can_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
-> > > +{
-> > > +	struct m_can_classdev *cdev = netdev_priv(dev);
-> > > +
-> > > +	wol->supported = device_can_wakeup(cdev->dev) ? WAKE_PHY : 0;
-> > > +	wol->wolopts = device_may_wakeup(cdev->dev) ? WAKE_PHY : 0;
-> > > +}
-> > 
-> > It is nice to see Ethernet WoL mapped to CAN :-)
-> > 
-> > So will any activity on the CAN BUS wake the device? Or does it need
-> > to be addresses to this device?
+Hi Russell,
+
+thank you for commenting on this patch. Please help me understand which
+direction I should work towards to see support for the MT7988 SoC
+Ethernet in future kernels, see my questions below.
+
+On Mon, Jul 29, 2024 at 12:28:15PM +0100, Russell King (Oracle) wrote:
+> On Thu, Jul 25, 2024 at 01:44:49PM +0100, Daniel Golle wrote:
+> > +static void devm_pcs_provider_release(struct device *dev, void *res)
+> > +{
+> > +	struct pcs_standalone *pcssa = (struct pcs_standalone *)res;
+> > +
+> > +	mutex_lock(&pcs_mutex);
+> > +	list_del(&pcssa->list);
+> > +	mutex_unlock(&pcs_mutex);
 > 
-> Unless you have a special filtering transceiver, which is the CAN
-> equivalent of a PHY, CAN interfaces usually wake up on the first
-> message on the bus. That message is usually lost.
+> This needs to do notify phylink if the PCS has gone away, but the
+> locking for this would be somewhat difficult (because pcs->phylink
+> could change if the PCS changes.) That would need to be solved
+> somehow.
 
-Thanks for the info. WAKE_PHY does seem the most appropriate then.
+From my understanding the only way the PCS would "go away" is by
+rmmod, which is prevented by the usage counter if still in use by the
+Ethernet driver (removal of instances by using unbind in sysfs is
+prevented by .suppress_bind_attrs).
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+I understand that Ethernet MAC and PCS both being built-into the SoC may
+not be the only case we may want to support in the long run, but it is
+the case for the MT7988 SoC which I'd like to see supported in upstream
+Linux.
 
-    Andrew
+So imho this is something quite hypothetical which can be prevented by
+setting .suppress_bind_attrs and bumping the module usage counter, as
+those are not really dedicated devices on some kind of hotplug-able bus
+what-so-ever, but all just components built-into the SoC itself. They
+won't just go away. At least in case of the SoC I'm looking at.
+
+If you have other use-cases in mind which this infrastructure should be
+suitable for, it'd be helpful if you would spell them out.
+
+If your criticism was meant to be directed towards the whole idea of
+using standlone drivers for the PCS units of the SoC then the easiest
+would of course be to just not do that and instead keep handling the
+PCS as part of the Ethernet driver.
+
+The main reason why I like the idea of the PCS driver being separate is
+because it is not even needed on older platforms, and those are quite
+resource constraint so it would be a waste to carry all the USXGMII
+logic, let's say, on devices with MT7621 or even MT7628.
+
+However, there are of course other ways to achieve nearly the same, such
+as Kconfig symbols which select parts of the driver to be included or
+not.
+
+Hence my question: Do you think it is worth going down this road and
+introducing standalone PCS drivers, given that the infrastructure
+requirements include graceful removal of any PCS instance?
+
+Also note that the same situation (things which may "go away") applies
+to PHYs (as in: drivers/phy, not drivers/net/phy) as well, and I don't
+see this being addressed for any of the in-SoC Ethernet controllers
+supported by the kernel.
+
+I was hoping for clarification regarding this but never received a
+reply, see https://lkml.org/lkml/2024/2/7/101
+
+And what about used instances of drivers/pinctrl, drivers/reset,
+drivers/clk, ...? Should a SoC Ethernet driver be built in a way that
+all those may gracefully "go away" as well?
+
+I'm totally up to work on improving the overall situation there, but
+it'd be good to know which direction I should be aiming for.
+(as in: pre-removal call-back functions? just setting
+.suppress_bind_attrs for all drivers/phy/ and such by default? extending
+phylink itself to handle drivers/phy instances and their disappearance,
+as well as potentially more than one PCS instance per net_device? ...)
+
+> > [...]
+> > +	device_link_add(dev, pcssa->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
+> 
+> This is really not a nice solution when one has a network device that
+> has multiple interfaces. This will cause all interfaces on that device
+> to be purged from the system when a PCS for one of the interfaces
+> goes away. If the system is using NFS-root, that could result in the
+> rootfs being lost. We should handle this more gracefully.
+
+"DL_FLAG_AUTOREMOVE_CONSUMER causes the device link to be automatically
+purged when the consumer fails to probe or later unbinds."
+(from Documentation/driver-api/device_link.rst)
+
+The consumer is the Ethernet driver in this case. Hence the automatic
+purge is only applied in case the Ethernet device goes away, and meanwhile
+it would prevent the PCS driver from being rmmod'ed (which in my case is
+the only way for the PCS to "disappear").
+
+Also note that the same flag is used in pcs-rzn1-miic.c as well.
+
+
+Thank you for your patiente and helping me to understand how to proceed.
+
+
+Cheers
+
+
+Daniel
 
