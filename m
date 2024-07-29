@@ -1,164 +1,213 @@
-Return-Path: <netdev+bounces-113552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 704D493F020
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:48:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A70A093F068
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E25221F221A2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:48:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C581C21E89
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C98913D53F;
-	Mon, 29 Jul 2024 08:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF49213DDCC;
+	Mon, 29 Jul 2024 08:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrtgL5qf"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="pstNJFHe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE42112F375;
-	Mon, 29 Jul 2024 08:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ABD13D61D
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722242911; cv=none; b=IqfbCcQhTuqB6eO63f2OnX4B24IEsxVA9ZWPX2NlwgRPHb8hjMnMk1pdq9HuMHcsXmvirpd3Yvn8PFPeWqBTGAT9PcOOXI3VJoaQcQqP7HD7J38O3D2HhCmImvp38BrKxYQ/HqPeDc2o/U3vwX7Xt3qrkjX9EpTZ+kNP0AU5fOg=
+	t=1722243424; cv=none; b=oLquXtXWUnOGIL2DIzdS9/zyiC1ILuLmovWQdU8MzepatC0If2Wzh+pTYSSGp2z8E5OIO7XDggZ/+NVyfk1W31vnPC9uzeCZj/yAi2LsQ8wF2IER9wPer5EowX8hRO59Y3LCbkhdeHDujvdWazl9XZgfwWZ/JiQzjat5ViTLmMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722242911; c=relaxed/simple;
-	bh=HimJpWgYHlr50l9L5f8uYfgoa/FDDf9kVPtHcsbNQbA=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gs6oTna8bHJdnVbh3X79UC56AwAY6jeiECkUNFKNz9fgnKQ/DBpFVE267F6jEXKPSQDAxMAurCSs01UoXBKmWZ6OmSEm1xw4N9pl9TVA6OtFPZKJzodlo3wrTVebTEZDhUMfCq60Ciqz5QBYhUzmDPatWjUmOQdIZGJ2w0s1K/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrtgL5qf; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fc56fd4de1so16972335ad.0;
-        Mon, 29 Jul 2024 01:48:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722242909; x=1722847709; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+V9bttpZfhfaFB3d1IzxKloWUu2oJW+Czq5f8hfGCcs=;
-        b=GrtgL5qfLUtP5IeBRKcHjcPVByoY+ezqEuQpYmKLk++Eb09mIdoXcdkZh/DyE0ahgm
-         BE480/M2IKDM8F3KWIHe+frtLsOlrY5fowbo2iacrV/QrKUKEqML+e9vE3n5YaeJMqMq
-         fbHVU3c0QlxD2Nm1JKVvShzX85knULKOEtqfGvHFI5wEy/WCOaIHvWOmzL2Ksu4e9yvj
-         SemakfDHhxBnch/Ie7HdzJ9qmSJ0eMvsnMBxuDUMu1YILbZEArSs/5P18Q6BPj4Y14wS
-         OGE+xlZMGLdRuc9RE5hwMKyMlJd7W4OX1E8IuymHZj2BZQ+vUqvqdbKS9+289JrJ69mM
-         XIKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722242909; x=1722847709;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+V9bttpZfhfaFB3d1IzxKloWUu2oJW+Czq5f8hfGCcs=;
-        b=o8yqhjmILsPy8Vts3DC9zlj47+KEoD5qg/kvk41MK7+M8IO45K41SbZHqCvVFY5Zpp
-         ktXqVb+cza8DPe92+U7LKk/FFywCHTknFveuHpVXYxzljSITe/pJkrMk3dw09ET+K5Bd
-         eqVtb4u6VOVooi9IbugapCM79PNU/PFUJqJW26OyTaYNJbx9GJYzy2zq6kmMQp+sX0Kq
-         jF+4ZVsTmkhxBB6vFF8vttbucRzypUvAe9rSAezvwf+IGkMzitYgaAyra/S0NiVhLaie
-         NyU4jhNHaAAqyP1ZEheSJtTMI4sQNX27aHQXNeRHX3ixLutYAcL0SnkjBqbJinDpGp/u
-         iFoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVC5vuZUiqPOkN2UHjX2RzIkMvJH/fhPqeEiHuuqydXUEczIR9Yv2Iz6WpQLQ6GpIOS4gzwolS58oUJdEbp+1cYLbkKwnCa42qeBgjxJ+2KL85ku1+kxHt5MA9c8OzaOyUhTLlZRLmV
-X-Gm-Message-State: AOJu0YydAa3QBM/B5eOT1rsQkGj1DVL7e6uFjiA+I5/NIyKK5HBSpMie
-	dk8beWgMtXX3QV5Zq2Z77gJdT1UTukza1/xItDlsUs9l9ar2K+Bv
-X-Google-Smtp-Source: AGHT+IH2+XVsqFsmkc+t7Bnj96glbaxo8kfRP5fYWch6Yr1DlTjhbOGghhjfa28Z3j1/2sL6QGOgVw==
-X-Received: by 2002:a17:903:41c3:b0:1fb:80a3:5826 with SMTP id d9443c01a7336-1ff04a238bemr114033755ad.4.1722242908968;
-        Mon, 29 Jul 2024 01:48:28 -0700 (PDT)
-Received: from kodidev-ubuntu (69-172-146-21.cable.teksavvy.com. [69.172.146.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7fd6113sm77056665ad.283.2024.07.29.01.48.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 01:48:28 -0700 (PDT)
-From: Tony Ambardar <tony.ambardar@gmail.com>
-X-Google-Original-From: Tony Ambardar <Tony.Ambardar@gmail.com>
-Date: Mon, 29 Jul 2024 01:48:26 -0700
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [PATCH bpf-next v1 7/8] selftests/bpf: Fix using stdout, stderr
- as struct field names
-Message-ID: <ZqdXWswv1oGYV/mN@kodidev-ubuntu>
-References: <cover.1721903630.git.tony.ambardar@gmail.com>
- <847a5b798f24e81b9dec4e8d9eb3eb1e602a909e.1721903630.git.tony.ambardar@gmail.com>
- <CAEf4BzauQQgWfc8eKsWF+Fr-j--oY6tJAM2+ZfAPHP7JJqZ6Zg@mail.gmail.com>
- <ZqR2DuHdBXPX/yx8@kodidev-ubuntu>
+	s=arc-20240116; t=1722243424; c=relaxed/simple;
+	bh=MHUJy2iDGn0IiMg9T12Ezc7sB0tyL4nah/BfA0+ZEOE=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:Message-ID:MIME-Version:
+	 Content-Type:References; b=PoP9K9VH/WA8/f96ZC2WIX0OD5nZdL1odxsQY3yVMueO2g9C1BALDAM0HY06TIVT0tI53beeymhiqII7CRoYIsA9r/niKRJtT5yBwsbHA/VDq3HS4woq1D4LtRckiDDJKUNscfJvRpY9Gkd1qs7b7xPrNH10DZ1Yyw1UWlL4zGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=pstNJFHe; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20240729085700epoutp04e8ccbbdb9326124f2e0205e551f484ff~mo0QR6TFO2350723507epoutp046
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:57:00 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20240729085700epoutp04e8ccbbdb9326124f2e0205e551f484ff~mo0QR6TFO2350723507epoutp046
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1722243420;
+	bh=VC6IROFUphtKIM6XYQMIGHmaE7H45qK14RvAur7APrg=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=pstNJFHeD3tykh+nc1R8cw66koM/rjWHczvm12T6VNoe3ELWH+CHslzzkv7GbEkKB
+	 CdwOW3BBS7SQnT0qLkgj9319Ecmi6IMAbVEUUYPAv/Slf2+Y0H2ZX6wjk+rBEKTQU5
+	 BybWZIkGDAbr6a0kfUNnWxR6ChPAlh3CYioa3YD4=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+	20240729085659epcas5p1be156ab32a8be212f76776b114ed91f2~mo0Ppgem93011830118epcas5p13;
+	Mon, 29 Jul 2024 08:56:59 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4WXXKj6ZNWz4x9Pw; Mon, 29 Jul
+	2024 08:56:57 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	3C.A6.09743.95957A66; Mon, 29 Jul 2024 17:56:57 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20240729084934epcas5p4482029bc4c5e04d2c8fc452bc7df7cff~motw1zbYm1996719967epcas5p4j;
+	Mon, 29 Jul 2024 08:49:34 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240729084934epsmtrp1573e0111a3ab1a129d915904a2debc96~motw00QNJ2502525025epsmtrp1S;
+	Mon, 29 Jul 2024 08:49:34 +0000 (GMT)
+X-AuditID: b6c32a4a-3b1fa7000000260f-3e-66a759590530
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	3C.D7.07567.D9757A66; Mon, 29 Jul 2024 17:49:33 +0900 (KST)
+Received: from FDSFTE596 (unknown [107.122.82.131]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20240729084930epsmtip1a0d9761abb59a6b887e0f9b9e3b0bb02~motttV1PD1109011090epsmtip1P;
+	Mon, 29 Jul 2024 08:49:30 +0000 (GMT)
+From: "Swathi K S" <swathi.ks@samsung.com>
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<richardcochran@gmail.com>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>,
+	<alim.akhtar@samsung.com>, <linux-fsd@tesla.com>,
+	<pankaj.dubey@samsung.com>, <ravi.patel@samsung.com>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-samsung-soc@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, "'Jayati Sahu'"
+	<jayati.sahu@samsung.com>, "'Siddharth Vadapalli'" <s-vadapalli@ti.com>
+In-Reply-To: <14887409-4c5e-4589-b188-564df42924c8@lunn.ch>
+Subject: RE: [PATCH v3 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
+ Block of FSD SoC
+Date: Mon, 29 Jul 2024 14:19:29 +0530
+Message-ID: <003101dae194$3bd4c460$b37e4d20$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZqR2DuHdBXPX/yx8@kodidev-ubuntu>
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQG0kE2cByMDcfrFjxkR49X5VWx9JAKuNFnTAVxbNBUCeh7WUwI1H5iOAkPhIz+yAhoacA==
+Content-Language: en-in
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Ta1ATVxh1d7ObwDTOGki5QB9xkU7BARMMuKFQW6HtTuUHM2Id7WBMyZpQ
+	QpLJBuuDjhS1FdEoVShGCEhRWqwFA4Q3pZFH8UG0Cm0dYHgOLy0gLVMEpIkJLf/O933nfOee
+	e+dyEN4Ftg8nUa2ndWqZisDcWZabAQFBu3eX7BdWVAWR8+M5ENlvsmCkrdeKkD80dsJknu04
+	iyxo6UTJkbZBNtlyqxgm+4r+REnD2ABC3rMYUNI81I2SAxO7yAd1eRiZa2uCSdPSdZRsK3yZ
+	nLv9GCKLqv5ikwPTDXb5nTGEPNHYwiYbspuRd7yoyu//gKmRs1VsqtbYy6YKzSmUuTQDo3q6
+	GzCqovgoVVszC1NTTV0YZagshajKn2Yh6nl6Pptq/70apmbNr8Wu3ZMUoaRlclonoNUJGnmi
+	WhFJbN8hjZKGhglFQSIJuYUQqGXJdCQRHRMb9H6iyp6fEByQqVLsrVgZwxCb3o7QaVL0tECp
+	YfSRBK2Vq7RibTAjS2ZS1IpgNa0PFwmFIaF24r4k5XJGBabNxA+2D8+gadDfL52C3DgAF4Ov
+	xo6jpyB3Dg+vh8DMF12u4ikEsiy1rmIOAj1fd2ArkuVyE+YcNELA0HvDVYxBYLlvjuVgYXgg
+	KDI0sR3YE98ATPkXYAcJwbNRkLlQiToGbvhboGmix67mcDzwveCqKcbRZuH+oOWmBXJgLi4B
+	RRlnUCdeBzouDr/Yj+Cvg+oneYjzRAIwP3IVdXp9BIbTb8NOjhdonT+NOHwB3ukGvhs9xnZ4
+	ATwaPH9GOrUeYKK9ku3EPmD87JcuLAXXDF0sJ1aC3mdZrvRbQfPDPJZjDYIHgLK6Tc72qyD7
+	1o8u27XgzMIw7OxzQY1pBfuBpclu10pvYLkyxT4HEcZVyYyrkhlXJTD+71YIsUohb1rLJCto
+	JlQboqY/++/BEzTJZujF9wj8sAYa6J8OtkIwB7JCgIMQnlzpwyv7eVy57NBhWqeR6lJUNGOF
+	Qu3XnYX48BM09v+l1ktFYolQHBYWJpZsDhMRXtzJE/lyHq6Q6ekkmtbSuhUdzHHzSYPDh/p2
+	KaFt5fLJ6SXeeVXBu3Wjfr6tHVFwzOHytG/fsEbnPOEFB3wAeH384aHrccSC1VbmXbKvdHAn
+	YVT36RPT7ls+vpHq93Ovx8UNn3rV7l1XH/+JXH+ee/LS5o0LniVMdalp8YBYnKN4rzWvatnG
+	+BbcL/88aOrxuV9Kgu+m7nxUJ/KNSzn95ty9rU1HitPj0xf0cglfKPDPvlNUmPvPA7SstsUX
+	PbqGlXnZ8Otix92ojYfi+uu31PXHHjw5NCVZz1+Et11WuHOZkPDfxNuXR2uwbwzYjoKZdkn0
+	Hn+3XHV8quHao+7sS2v44m1HBrnV+W2GV2Kemo91jZsiLM18WwPBYpQyUSCiY2T/AgbAdUin
+	BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsWy7bCSnO688OVpBgdMLH6+nMZo8WDeNjaL
+	83cPMVus2XuOyWLO+RYWi/lHzrFaPD32iN3iyKklTBb3Fr1jteh78ZDZ4sK2PlaLTY+vsVo8
+	fBVucXnXHDaLGef3MVnM+7uW1eLYAjGLb6ffMFos2vqF3eLhhz1A7WdeMFu07j3CbrFn6gFm
+	B3GPLStvMnk87d/K7rFz1l12jwWbSj02repk87hzbQ+bx+Yl9R47d3xm8ni/7yqbR9+WVYwe
+	W/Z/ZvT41zSX3eP4je1MHp83yQXwRXHZpKTmZJalFunbJXBl/O/czFbQLVBx/MlH1gbGrzxd
+	jJwcEgImEv83zGPrYuTiEBLYzSjx7GUvC0RCUuJT81RWCFtYYuW/5+wQRc8YJR53rWUESbAJ
+	aEks6tvHDmKLCKhIzJs7hQmkiFlgNavEhv8rmCA6zjJJ/Hq8hhmkilPAWmLfqztsILawQIxE
+	z/8msEksAqoSRw5vA7N5BSwlFnX2skLYghInZz4BOokDaKqeRNtGsBJmAXmJ7W/nMENcpyDx
+	8+kyVogjwiSeNJ1mgqgRlzj6s4d5AqPwLCSTZiFMmoVk0iwkHQsYWVYxSqYWFOem5yYbFhjm
+	pZbrFSfmFpfmpesl5+duYgSnDy2NHYz35v/TO8TIxMF4iFGCg1lJhDf+ytI0Id6UxMqq1KL8
+	+KLSnNTiQ4zSHCxK4ryGM2anCAmkJ5akZqemFqQWwWSZODilGpie7WzK2WJpsrw29PyWPO8r
+	ET8X77kdf7LjdtaspfXf57ZJfNTw2HprmbpvvrNd9Kxj864tjO2NK3IR445TkYg+Mu8Il8m/
+	MIdJ60/LT1G1O5PIs1lUeHedNWfG2k9KTB/ddbRVT/f9WlYt/NZD4uAvM//js/2/ycxNu9F8
+	xbtiYUZ+1+MPFo7KxyVfWEs83Gd2IsNmS5bb8l+vdgskljp6ezRdWe1Y+uW6a+T8L8+qw87u
+	fVJ+W7DYdgH/Te77kY/WG1elHH/3sPIkT0fNDb2XZ25v79ircpojStLlnaxZavKM07EaqyME
+	jVQaNnYs0PzD+u9eeZmo1lbjIw+E26784WaZGabgv1WjZL72ufdKLMUZiYZazEXFiQDsU9va
+	jgMAAA==
+X-CMS-MailID: 20240729084934epcas5p4482029bc4c5e04d2c8fc452bc7df7cff
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20230814112617epcas5p1bc094e9cf29da5dd7d1706e3f509ac28
+References: <20230814112539.70453-1-sriranjani.p@samsung.com>
+	<CGME20230814112617epcas5p1bc094e9cf29da5dd7d1706e3f509ac28@epcas5p1.samsung.com>
+	<20230814112539.70453-4-sriranjani.p@samsung.com>
+	<323e6d03-f205-4078-a722-dd67c66e7805@lunn.ch>
+	<000001dab7f2$18a499a0$49edcce0$@samsung.com>
+	<14887409-4c5e-4589-b188-564df42924c8@lunn.ch>
 
-On Fri, Jul 26, 2024 at 09:22:38PM -0700, Tony Ambardar wrote:
-> On Thu, Jul 25, 2024 at 01:27:03PM -0700, Andrii Nakryiko wrote:
-> > On Thu, Jul 25, 2024 at 3:39 AM Tony Ambardar <tony.ambardar@gmail.com> wrote:
-> > >
-> > > From: Tony Ambardar <tony.ambardar@gmail.com>
-> > >
-> > > Typically stdin, stdout, stderr are treated as reserved identifiers under
-> > > ISO/ANSI C, and a libc implementation is free to define these as macros.
-> > 
-> > Ok, wow that. Do you have a pointer to where in the standard it is
-> > said that stdin/stdout/stderr is some sort of reserved identifier that
-> > can't be used as a field name?
-> > 
+
+
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: 06 June 2024 18:53
+> To: Swathi K S <swathi.ks@samsung.com>
+> Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
+> conor+dt@kernel.org; richardcochran@gmail.com;
+> alexandre.torgue@foss.st.com; joabreu@synopsys.com;
+> mcoquelin.stm32@gmail.com; alim.akhtar@samsung.com; linux-
+> fsd@tesla.com; pankaj.dubey@samsung.com; ravi.patel@samsung.com;
+> netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-samsung-soc@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org; 'Jayati Sahu' <jayati.sahu@samsung.com>;
+Siddharth
+> Vadapalli <s-vadapalli@ti.com>
+> Subject: Re: [PATCH v3 3/4] arm64: dts: fsd: Add Ethernet support for
+FSYS0
+> Block of FSD SoC
 > 
-> I'll need to dig around to share some references. The short answer IIRC
-> is there's enough potential variation in their definitions that their
-> use requires care (or better avoidance).
+> > > > +&ethernet_0 {
+> > > > +	status = "okay";
+> > > > +
+> > > > +	fixed-link {
+> > > > +		speed = <1000>;
+> > > > +		full-duplex;
+> > > > +	};
+> > > > +};
+> > >
+> > > A fixed link on its own is pretty unusual. Normally it is combined
+> > > with an Ethernet switch. What is the link peer here?
+> >
+> > It is a direct connection to the Ethernet switch managed by an
+> > external management unit.
 > 
+> Ah, interesting. This is the third example of this in about a month. Take
+a look at
+> the Realtek and TI work in this area.
+> 
+> So, i will ask the same questions i put to Realtek and TI. Does Linux know
+about
+> the switch in any way? Can it manage the switch, other than SNMP, HTTP
+from
+> user space? Does it know about the state of the ports, etc?
+> 
+> If you say this is just a colocated management switch, which Linux is not
+> managing in any way, that is O.K. If you have Linux involved in some way,
+please
+> join the discussion with TI about adding a new model for semi-autonomous
+> switches.
 
-Hi Andrii,
+Thanks for letting us know about the ongoing discussion.
+But in this case, the switch is not managed by Linux.
 
-Following up on your request for pointers, some excerpts from a quasi-draft
-C17 ISO doc located here:
-https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2310.pdf
+> 
+>    Andrew
 
+Thanks,
+Swathi
 
-7.1.2 Standard headers
-	(2) The standard headers are ... <stdio.h> ...
-	(5) Any definition of an object-like macro ... shall expand to
-	code that is fully protected by parentheses ...
-
-7.1.3 Reserved identifiers
-	(1) ... Each macro name in any of the following subclauses ...
-	is reserved for use as specified if any of its associated headers
-	is included ...
-
-7.21.1 Input/output <stdio.h>, Introduction
-	(1) The header <stdio.h> defines several macros ...
-	(3) The macros are ... stderr stdin stdout which are expressions
-	of type "pointer to FILE" ...
-
-7.21.5.4 The freopen function
-	(2) (Footnote 278) The primary use of the freopen function is to
-	change the file associated with a standard text stream (stderr,
-	stdin, or stdout), as those identifiers need not be modifiable
-	lvalues ...
-
-
-So we have reserved idents (IANALL so not sure of field names), macros,
-parentheses, and potentially unassignable stdout/stderr that might break
-the output redirection hack in test_progs.c. More than enough to tread
-carefully I think... 
-
-Cheers,
-Tony
 
