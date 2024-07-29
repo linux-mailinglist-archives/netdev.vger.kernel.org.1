@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-113799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E119693FFDB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:55:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF05D93FFDC
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D40301C222E3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:55:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35881C22199
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636E018A929;
-	Mon, 29 Jul 2024 20:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDE918C335;
+	Mon, 29 Jul 2024 20:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="g1kX8jsp"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="sB3qcinS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5995187340
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 20:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A924C1891DE
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 20:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722286505; cv=none; b=Nkcy5IVPukyQD7xfsoms7Euow8hU3mtWR13haongskz74FYGQ+MEWpXh6kQy205unlVHovaU5noMYK6IcjvJ6xlCXxEmhM3u7YgIyUqYGs40UVGdJR0gC6E4h8W3krJhtlQc572Ef8kEEXlM+RfXx+n/VZFRyWaOyMt6ntZqyLA=
+	t=1722286506; cv=none; b=CePKNXamhpWTuBSkH2M95Gyq2X67nnLAt0O//LNr6XTzdtgSqJ14JRkvTVk57Je35qe8+A+mwYtJS6rv9gsZSeAU1ihCUlrIJE8DoSX+c072IEyGUe/fifIdYBgArErffqhFXhH9uXeW5JMPA9VErVPe6tqxJiuQEdEjryJt+V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722286505; c=relaxed/simple;
-	bh=njAFNXJsfUYFaB+VBT6wnCyzH3fTeOuq1UsainPA5kY=;
+	s=arc-20240116; t=1722286506; c=relaxed/simple;
+	bh=FCi0ov896Gq6UxRxcVH2U6ITg7ZGTQ9dZPpfppkJFzY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jRXYCnCJK0zvuKEMWYf3ns7u1qyaGYP85xkuodNXPX8jy+NkwH19kzFwMyTHiym6TL6gjfpgAMGyDxsDKoXIVlRoRqbokBl5u+qhXPpQYMd6FXd5xcsmI78r4KzTq43FixXMT+tsKlHTgczaQckUoYeiUfcLRZ3fcHUADpe0XSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=g1kX8jsp; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=aNaeFTY5RcDPqvHrks20c7mr0Ew8ecygpZMPByY6i6WUtDZqv5sYvG9CQYs2QkJhn+11FQuV8GaDtGDF+Bco64wAJ9VP6NnPSpBTmiICqHaJKXozBCKCRNqD0yWFFew1PVVNKiIGUnvhzCVvpi7HeryBY4Vzx3+XtNmhjGP0eDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=sB3qcinS; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fc66fc35f2so22340535ad.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:55:03 -0700 (PDT)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fec34f94abso24436265ad.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:55:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1722286503; x=1722891303; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1722286504; x=1722891304; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jnk+SMTSXQ40ifu0bfZWKBaTUwAwdWcatWhxD6djG3I=;
-        b=g1kX8jspV1+lT4/y2su1gFwAeNzhqijyCmAypX2IvDITq2z3SV7j6S+bDTs7v6W3tb
-         E+1g9SKo1ZzS7xI2egpRTG497tmFbGN+vynrJLw96ewliqwdzf2sMLSDOFzql4UsjCAg
-         k012hl3LbIRpM5PXtbbExMGNpXZQo2E8I3HC/YTyaKqV8mbqNNhgCjTkBwR3wab+bSjZ
-         SZIfBOrb1qSelkqg7MecCBLGToPhvECplKtodE928BmAqqQu5rLNWdbqWBv87VHOrH17
-         HmkIb5X9kek75cVKtNdid9daWarNZfUEbK158Mg2BzshHjUqbqt+VdQ95lQekkOjwQ6M
-         IAYQ==
+        bh=JZo7mX1dOT2AZaScaQk0MSiUxisVz8yqlq1pvqUA8oM=;
+        b=sB3qcinSa4kjmN7yCBwbT2SqxFQeh4bky6F1/rBdO4bc/GF64+p+T/RyzQNt7xpmAh
+         drtl3azrNiqk8zsmQMZajHKo/Iwa+nONpJdbrJdIxdvspnCRiI6tTMteKPY5ic0mueyZ
+         RI6nUHXX0DlLtFA64/ybFV5oOyTJF/xEsC/kUMx8IN529z4xNaGLAgOehg7UHduDWrt0
+         c8vg4SsaWVl9/Kdz4cnISI6w3bIEA74ak4us0JuPHCpzOfxdEQXjAdJQgNn8s/xaAQVd
+         aJBPeuQxpJrHKHeYPj6BvIB5IFjf/kAYSwiuFZSkJLJ4DQWESlDx7pfgGUYQwaOJxbz6
+         mDDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722286503; x=1722891303;
+        d=1e100.net; s=20230601; t=1722286504; x=1722891304;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Jnk+SMTSXQ40ifu0bfZWKBaTUwAwdWcatWhxD6djG3I=;
-        b=EK+GbMHlw6M1lChngLh0oLN68rMFtgg/uHl4SSVgdXtc8ZYlCuP3AoVYhehwT35Quf
-         ghrZ3tJsuRSwwg9XdLgIkU5+ZlhE2BQ451abTa3eMBiKj8zkHhccvdO6ZPogAFd0N7FE
-         7QLm+6fBuTWN10qS+N95f0by8Y2GQcuZW7WGHM9vA6tWIKxJEBxQMeOqhrOYVjIyztIV
-         0y8PpaaXfHPUp2rwsrh61Wt9fRz46ErH6Uh64KzSf1KC0clr0KKjRdaRTkPdsKhQDM0g
-         jBjItcwyvSIcAU24p5R1dGLwOWUOZ9mrs+Z13OpuVFh4hHc6satVRcrbGWjSr3TicioY
-         pMvQ==
-X-Gm-Message-State: AOJu0YxuA8Qlv04KWdI/OkbAMENh669Es9huO5KIOPxd/tScMIaq0x2C
-	4cPSPcbuL5yLswyAYFszwEh6VuMnmX19aEUYdkPJcA3Qp4YJ/gGk3KdmQfkeC75kOQIcF99Oh13
-	fLkM=
-X-Google-Smtp-Source: AGHT+IF/tcZZp2PiooKEWoOlP5vRAmeTMY/bL0gv3+F4cSrQtJixxJbZ9QT+hZrD9au4tvOqXKjNZg==
-X-Received: by 2002:a17:903:2441:b0:1fd:70a6:ffbf with SMTP id d9443c01a7336-1ff04a23875mr141649295ad.2.1722286502753;
-        Mon, 29 Jul 2024 13:55:02 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-000.fbsv.net. [2a03:2880:ff::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7ee82bdsm87688195ad.141.2024.07.29.13.55.02
+        bh=JZo7mX1dOT2AZaScaQk0MSiUxisVz8yqlq1pvqUA8oM=;
+        b=tQyevL6aELKTA4l3ah4tSuf9gHvrxU0kxf4Jdl/KJXUx0nPspm8ocgcK/+5uxjhnVb
+         ANaMg9OTWPz35pNLBaT3xKTwNQmsT/Z4WqYyQ2uKyrtbqRbhploxfeh+GyrCe5LctnFN
+         2cYuc30RAgi28zc4nhmHQNm2y7vFQr2bJWYPL3B4RItkrsy03wgEQv4yKMhUDkZd1b+6
+         90Uxlr6fV++t/N6n4y5PkZOcvjfBeSqZ/KPTpbU2pDoNj74HdpdcZwRh+L0+4wci9/Uj
+         t/ziQXcgKABqGNCuLlpIKo3h172mq3B1IBQ/3BB6ZUOXvK9F4RxJacITxlawPWGyG64s
+         +v0g==
+X-Gm-Message-State: AOJu0YytKPhjSrrJbibk1dndcJ5bz2XW45rza2eSA+N5DpE11HBNXmHO
+	6afQZ7hPVPi8yrVovLmp8HVvcEOwHfMK6BB0XJSqaMVFWbDRHIrILABY/tk7V2b7lwMh+MeoV3b
+	TiIo=
+X-Google-Smtp-Source: AGHT+IG61jKm5nkrp5+NMH1a4+M8YdK85bY9Hszpk4QColXgXz69B98aE2He+KcI7BJ35QD2/6zHJw==
+X-Received: by 2002:a17:902:f792:b0:1fd:9420:104f with SMTP id d9443c01a7336-1ff0492d4e6mr79674275ad.53.1722286503765;
+        Mon, 29 Jul 2024 13:55:03 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-021.fbsv.net. [2a03:2880:ff:15::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7ee3f68sm87539345ad.171.2024.07.29.13.55.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 13:55:02 -0700 (PDT)
+        Mon, 29 Jul 2024 13:55:03 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -74,9 +74,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Michael Chan <michael.chan@broadcom.com>
-Subject: [PATCH net-next v1 1/3] bnxt_en: Add support to call FW to update a VNIC
-Date: Mon, 29 Jul 2024 13:54:57 -0700
-Message-ID: <20240729205459.2583533-2-dw@davidwei.uk>
+Subject: [PATCH net-next v1 2/3] bnxt_en: stop packet flow during bnxt_queue_stop/start
+Date: Mon, 29 Jul 2024 13:54:58 -0700
+Message-ID: <20240729205459.2583533-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240729205459.2583533-1-dw@davidwei.uk>
 References: <20240729205459.2583533-1-dw@davidwei.uk>
@@ -88,132 +88,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michael Chan <michael.chan@broadcom.com>
+Calling napi_stop/start during bnxt_queue_stop/start isn't enough. The
+current implementation when resetting a queue while packets are flowing
+puts the queue into an inconsistent state.
 
-Add the HWRM_VNIC_UPDATE message structures and the function to
-send the message to firmware.  This message can be used when
-disabling and enabling a receive ring within a VNIC.  The mru
-which is the maximum receive size of packets received by the
-VNIC can be updated.
+There needs to be some synchronisation with the FW. Add calls to
+bnxt_hwrm_vnic_update() to set the MRU for both the default and ntuple
+vnic during queue start/stop. When the MRU is set to 0, flow is stopped.
+Each Rx queue belongs to either the default or the ntuple vnic.
 
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Co-Developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 23 +++++++++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  3 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h | 37 +++++++++++++++++++
- 3 files changed, 62 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ffa74c26ee53..8822d7a17fbf 100644
+index 8822d7a17fbf..ce60c9322fe6 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6579,7 +6579,8 @@ int bnxt_hwrm_vnic_cfg(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- 	req->dflt_ring_grp = cpu_to_le16(bp->grp_info[grp_idx].fw_grp_id);
- 	req->lb_rule = cpu_to_le16(0xffff);
- vnic_mru:
--	req->mru = cpu_to_le16(bp->dev->mtu + ETH_HLEN + VLAN_HLEN);
-+	vnic->mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
-+	req->mru = cpu_to_le16(vnic->mru);
+@@ -15172,7 +15172,8 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	struct bnxt_rx_ring_info *rxr, *clone;
+ 	struct bnxt_cp_ring_info *cpr;
+-	int rc;
++	struct bnxt_vnic_info *vnic;
++	int i, rc;
  
- 	req->vnic_id = cpu_to_le16(vnic->fw_vnic_id);
- #ifdef CONFIG_BNXT_SRIOV
-@@ -10086,6 +10087,26 @@ static int __bnxt_setup_vnic(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- 	return rc;
- }
+ 	rxr = &bp->rx_ring[idx];
+ 	clone = qmem;
+@@ -15197,11 +15198,16 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+ 		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
  
-+int bnxt_hwrm_vnic_update(struct bnxt *bp, struct bnxt_vnic_info *vnic,
-+			  u8 valid)
-+{
-+	struct hwrm_vnic_update_input *req;
-+	int rc;
+-	napi_enable(&rxr->bnapi->napi);
+-
+ 	cpr = &rxr->bnapi->cp_ring;
+ 	cpr->sw_stats->rx.rx_resets++;
+ 
++	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
++		vnic = &bp->vnic_info[i];
++		vnic->mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
++		bnxt_hwrm_vnic_update(bp, vnic,
++				      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
++	}
 +
-+	rc = hwrm_req_init(bp, req, HWRM_VNIC_UPDATE);
-+	if (rc)
-+		return rc;
-+
-+	req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-+
-+	if (valid & VNIC_UPDATE_REQ_ENABLES_MRU_VALID)
-+		req->mru = cpu_to_le16(vnic->mru);
-+
-+	req->enables = cpu_to_le32(valid);
-+
-+	return hwrm_req_send(bp, req);
-+}
-+
- int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic)
+ 	return 0;
+ 
+ err_free_hwrm_rx_ring:
+@@ -15213,9 +15219,17 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
  {
- 	int rc;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 6bbdc718c3a7..5de67f718993 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1250,6 +1250,7 @@ struct bnxt_vnic_info {
- #define BNXT_MAX_CTX_PER_VNIC	8
- 	u16		fw_rss_cos_lb_ctx[BNXT_MAX_CTX_PER_VNIC];
- 	u16		fw_l2_ctx_id;
-+	u16		mru;
- #define BNXT_MAX_UC_ADDRS	4
- 	struct bnxt_l2_filter *l2_filters[BNXT_MAX_UC_ADDRS];
- 				/* index 0 always dev_addr */
-@@ -2838,6 +2839,8 @@ int bnxt_hwrm_free_wol_fltr(struct bnxt *bp);
- int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all);
- int bnxt_hwrm_func_qcaps(struct bnxt *bp);
- int bnxt_hwrm_fw_set_time(struct bnxt *);
-+int bnxt_hwrm_vnic_update(struct bnxt *bp, struct bnxt_vnic_info *vnic,
-+			  u8 valid);
- int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
- int __bnxt_setup_vnic_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
- void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-index f219709f9563..933f48a62586 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h
-@@ -6510,6 +6510,43 @@ struct hwrm_vnic_alloc_output {
- 	u8	valid;
- };
+ 	struct bnxt *bp = netdev_priv(dev);
+ 	struct bnxt_rx_ring_info *rxr;
++	struct bnxt_vnic_info *vnic;
++	int i;
++
++	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
++		vnic = &bp->vnic_info[i];
++		vnic->mru = 0;
++		bnxt_hwrm_vnic_update(bp, vnic,
++				      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
++	}
  
-+/* hwrm_vnic_update_input (size:256b/32B) */
-+struct hwrm_vnic_update_input {
-+	__le16	req_type;
-+	__le16	cmpl_ring;
-+	__le16	seq_id;
-+	__le16	target_id;
-+	__le64	resp_addr;
-+	__le32	vnic_id;
-+	__le32	enables;
-+	#define VNIC_UPDATE_REQ_ENABLES_VNIC_STATE_VALID               0x1UL
-+	#define VNIC_UPDATE_REQ_ENABLES_MRU_VALID                      0x2UL
-+	#define VNIC_UPDATE_REQ_ENABLES_METADATA_FORMAT_TYPE_VALID     0x4UL
-+	u8	vnic_state;
-+	#define VNIC_UPDATE_REQ_VNIC_STATE_NORMAL 0x0UL
-+	#define VNIC_UPDATE_REQ_VNIC_STATE_DROP   0x1UL
-+	#define VNIC_UPDATE_REQ_VNIC_STATE_LAST  VNIC_UPDATE_REQ_VNIC_STATE_DROP
-+	u8	metadata_format_type;
-+	#define VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_0 0x0UL
-+	#define VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_1 0x1UL
-+	#define VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_2 0x2UL
-+	#define VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_3 0x3UL
-+	#define VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_4 0x4UL
-+	#define VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_LAST VNIC_UPDATE_REQ_METADATA_FORMAT_TYPE_4
-+	__le16	mru;
-+	u8	unused_1[4];
-+};
-+
-+/* hwrm_vnic_update_output (size:128b/16B) */
-+struct hwrm_vnic_update_output {
-+	__le16	error_code;
-+	__le16	req_type;
-+	__le16	seq_id;
-+	__le16	resp_len;
-+	u8	unused_0[7];
-+	u8	valid;
-+};
-+
- /* hwrm_vnic_free_input (size:192b/24B) */
- struct hwrm_vnic_free_input {
- 	__le16	req_type;
+ 	rxr = &bp->rx_ring[idx];
+-	napi_disable(&rxr->bnapi->napi);
+ 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+ 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+ 	rxr->rx_next_cons = 0;
 -- 
 2.43.0
 
