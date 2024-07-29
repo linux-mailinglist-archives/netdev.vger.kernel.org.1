@@ -1,127 +1,95 @@
-Return-Path: <netdev+bounces-113644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF1993F60F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:01:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D85A93F609
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 073CD1F221D5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:01:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D79D8282289
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70D21465BF;
-	Mon, 29 Jul 2024 13:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82331E4AD;
+	Mon, 29 Jul 2024 13:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1GSkuUcM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y70Um/Ep"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9691DFCF;
-	Mon, 29 Jul 2024 13:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B561DFCF;
+	Mon, 29 Jul 2024 13:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722258095; cv=none; b=LGMeNvUqNnjRWDaMICGzivPB+kD60QQD2jCMZZ1UMS8d7C8EaK8D8Zw1VyiKg12Hy2nDAz+OOlX94do2Qm6swrRNAno1QqySj4dfwvbiG/KYVkwhDpbEUV97cHvbQB4tXX1hOuP7qUCHHKSlslCrmMU6NC7+PtXTyVn+JuPkv5M=
+	t=1722258047; cv=none; b=aVPFNt9gKEubNgnR1eZn5g9m1rjRKx4zpnhMzhHSzkWpcHp0Um5HsA1JkeePOULTykGXCSjvYiAxI85bSYxeqWuPWhCIh/zSDhqNQFJPo0Y1TOgUB2kpSRO7+VglqofSZmWAAHIkm3ubuqpDeTjED6CXOX7/iN9xKEtjMdeBP3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722258095; c=relaxed/simple;
-	bh=lyMQxeeEfari71/LaXTaod34URVqznPpnYytJZ6gTr0=;
+	s=arc-20240116; t=1722258047; c=relaxed/simple;
+	bh=r0HQ934cPkEcYgVY96ZcGAvReJeLe+hnzGSeso8AQug=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bfAPWDRQpOVFW2mEdObYXU8jOpLkrhfN49Qrk/CmHpnL3GlMM434p1cdU6Zpz3YPjCP5jg62JMsO3rNHMk1kYuwXjdRkM0c9H76MyS71URzMacDAvXOPlSprLwRWflzfxAO6o/QCxp5uPKkIs/3BPTreUqR1bJ8+FTeQw3h+Q9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1GSkuUcM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dCor073xQJijp8I3RK3+ty7FjGp2GGPrVnPyb5mRIYg=; b=1GSkuUcMy+MnQlrUUZPZiL0Ly1
-	wOJOpFW9Dt0n42j9nsc0LVGkc3G+6GPbXxx+ZDe53eeqx673xKGuCnzOrTx4epdFvaYwzMsxkTSRR
-	gLtYX28JoCoPRJ87N0XRwsvLOCpF6My7Oj2j7wen56JhKivm+CKuH/au6IXd/PC6kmGAzWZRBSz5r
-	ozwMLyEdlI8UkrK5WHK8xSjQRp9/SQvCCUzUGatWht/0O3UNm5r29E2wr3+ccshTiNNn/Ec79Nrfl
-	iV9EgtQoX1Tj0DeCd/h9othUdgE6IGfc9O8kKzYQh4O/c4Kcvoqru5wAqHlb2WW2nGzbFeMChzKlR
-	f0BFD+Mw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46248)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sYPzP-0004Lu-1R;
-	Mon, 29 Jul 2024 14:00:35 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sYPzQ-0004L5-68; Mon, 29 Jul 2024 14:00:36 +0100
-Date: Mon, 29 Jul 2024 14:00:36 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>,
-	Lee Jones <lee@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=hgFDYBYqisxslqwXT6CSq7lBndCbJZE/Hg2fvfZIO6etYaHLSXs9SDwoKKVs8gvoX1EpVqDGiiUUOBjZlWylSsnLjJDDZArAtPIqOGXpKY5ER59yPUaDkbZ6oHg5OssjpHDYfpeE0KvQQukxPzOiEdnaM0EcZQ1FISpnmCmBj9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y70Um/Ep; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ItI6BSwn2l+PK9p8abWyy/cwtXwTy4aLklVJ9mHKhrg=; b=Y7
+	0Um/EpzPKr7sUruIUHD/Z7IdZ++VDhUiEPYNUNOs/dlLurYjNL5w3R0PIR1lYfGE/1ikZgVs3PUrq
+	vSC6akpyf24oWY9pE2wyk3ns4XYADxncXAcTaWD/kBh1L0GL4UujtxbZGCnxvzIGHKHZ8ykq4LjCa
+	ykvaIXuiZ+ZynDQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sYPzV-003T2O-Bn; Mon, 29 Jul 2024 15:00:41 +0200
+Date: Mon, 29 Jul 2024 15:00:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Justin Lai <justinlai0215@realtek.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-leds@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 6/6] net: mvpp2: use device_for_each_child_node() to
- access device child nodes
-Message-ID: <ZqeSdMMOk+GbVzHj@shell.armlinux.org.uk>
-References: <20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com>
- <20240706-device_for_each_child_node-available-v1-6-8a3f7615e41c@gmail.com>
- <ZqdRgDkK1PzoI2Pf@shell.armlinux.org.uk>
- <aa440f7c-0ccc-443c-8435-50c864edd1c2@gmail.com>
+	Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>,
+	Joe Damato <jdamato@fastly.com>,
+	Larry Chiu <larry.chiu@realtek.com>,
+	Paolo Abeni <pabeni@redhat.com>, Ping-Ke Shih <pkshih@realtek.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v25 01/13] rtase: Add support for a pci table in
+ this module
+Message-ID: <7d85ae3a-28d3-4267-9182-6e799ba8ae0a@lunn.ch>
+References: <20240729062121.335080-2-justinlai0215@realtek.com>
+ <446be4e4-ea7e-47ec-9eba-9130ed662e2c@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aa440f7c-0ccc-443c-8435-50c864edd1c2@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <446be4e4-ea7e-47ec-9eba-9130ed662e2c@web.de>
 
-On Mon, Jul 29, 2024 at 11:23:47AM +0200, Javier Carrasco wrote:
-> Apart from that, there is a suspicious check towards the end of the same
-> function:
+On Mon, Jul 29, 2024 at 11:33:22AM +0200, Markus Elfring wrote:
+> …
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+> > @@ -0,0 +1,338 @@
+> …
+> > +#ifndef _RTASE_H_
+> > +#define _RTASE_H_
+> …
 > 
->  if (is_acpi_node(port_fwnode))
-> 		return;
-> 
-> At the point it is called in the current implementation, port_fwnode
-> could have been cleaned. And after removing the loop, it is simply
-> uninitialized. Was that meant to be pdev->dev->fwnode?
+> I suggest to omit leading underscores from such identifiers.
+> https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+define+a+reserved+identifier
 
-If you're referring to the one before the clk_disable_unprepare() calls,
-it's only slightly suspicious:
+Do you have a reference to a Linux kernel document which suggests not
+to do this?
 
-These clocks are setup in a:
+My grep foo is not great, but there appears to be around 20,000
+instances of #define _[A-Z] in the kernel. So i doubt adding a couple
+more is going to be an issue.
 
-        if (dev_of_node(&pdev->dev)) {
-		...
-	}
-
-block, so they're only setup if we have device tree. So, avoiding it
-for ACPI is entirely reasonable. However, we also have software nodes
-as well, so the test should be:
-
-	if (!dev_of_node(&pdev->dev))
-		return;
-
-to match what the probe function is doing.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Andrew
 
