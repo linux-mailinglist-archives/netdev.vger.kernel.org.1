@@ -1,95 +1,163 @@
-Return-Path: <netdev+bounces-113643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D85A93F609
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:00:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC9993F627
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:07:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D79D8282289
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:00:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67D84B209ED
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82331E4AD;
-	Mon, 29 Jul 2024 13:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y70Um/Ep"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7E914A0AE;
+	Mon, 29 Jul 2024 13:06:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B561DFCF;
-	Mon, 29 Jul 2024 13:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B991420D0
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722258047; cv=none; b=aVPFNt9gKEubNgnR1eZn5g9m1rjRKx4zpnhMzhHSzkWpcHp0Um5HsA1JkeePOULTykGXCSjvYiAxI85bSYxeqWuPWhCIh/zSDhqNQFJPo0Y1TOgUB2kpSRO7+VglqofSZmWAAHIkm3ubuqpDeTjED6CXOX7/iN9xKEtjMdeBP3Q=
+	t=1722258411; cv=none; b=Kkrzdfee2AWA2ZiqczwoeHHGp6pM5v1bFGnPCrOZfXXUhnJnU9RGGMOmdv5Ug08pdrisSddPVbUkquf2jptt3SngAw+YK597r6yQhIMXK3XpjQxUrGR6zmn56jYyatIv28LGUY1X1Utn1TR05yyHPIy2ZAILN4iRse/6luH7Nc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722258047; c=relaxed/simple;
-	bh=r0HQ934cPkEcYgVY96ZcGAvReJeLe+hnzGSeso8AQug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hgFDYBYqisxslqwXT6CSq7lBndCbJZE/Hg2fvfZIO6etYaHLSXs9SDwoKKVs8gvoX1EpVqDGiiUUOBjZlWylSsnLjJDDZArAtPIqOGXpKY5ER59yPUaDkbZ6oHg5OssjpHDYfpeE0KvQQukxPzOiEdnaM0EcZQ1FISpnmCmBj9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y70Um/Ep; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=ItI6BSwn2l+PK9p8abWyy/cwtXwTy4aLklVJ9mHKhrg=; b=Y7
-	0Um/EpzPKr7sUruIUHD/Z7IdZ++VDhUiEPYNUNOs/dlLurYjNL5w3R0PIR1lYfGE/1ikZgVs3PUrq
-	vSC6akpyf24oWY9pE2wyk3ns4XYADxncXAcTaWD/kBh1L0GL4UujtxbZGCnxvzIGHKHZ8ykq4LjCa
-	ykvaIXuiZ+ZynDQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sYPzV-003T2O-Bn; Mon, 29 Jul 2024 15:00:41 +0200
-Date: Mon, 29 Jul 2024 15:00:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Justin Lai <justinlai0215@realtek.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>,
-	Joe Damato <jdamato@fastly.com>,
-	Larry Chiu <larry.chiu@realtek.com>,
-	Paolo Abeni <pabeni@redhat.com>, Ping-Ke Shih <pkshih@realtek.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v25 01/13] rtase: Add support for a pci table in
- this module
-Message-ID: <7d85ae3a-28d3-4267-9182-6e799ba8ae0a@lunn.ch>
-References: <20240729062121.335080-2-justinlai0215@realtek.com>
- <446be4e4-ea7e-47ec-9eba-9130ed662e2c@web.de>
+	s=arc-20240116; t=1722258411; c=relaxed/simple;
+	bh=hlEGTdwY0x+K5Na55TZsk5mIJrFenASjMW0vF12hjuI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QWeOrJvawf/ecCnOTcljmM8zk2bCShwIjpZDOjB2hj7CMe+m//WdkqLY29dEIhP/K8YHh0IVbsT+TGHCyBN6HohC6uNDBoWqMUqJBFmYDP5rWF9zL112u0DumNOEevAUEwCxZR1OihKm70AX3qPt4RGIIitdG8upxMsLn8qSeps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sYQ5O-0008LN-Jh
+	for netdev@vger.kernel.org; Mon, 29 Jul 2024 15:06:46 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sYQ5O-0032uC-6U
+	for netdev@vger.kernel.org; Mon, 29 Jul 2024 15:06:46 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id D66A5310D6C
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:06:45 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 1313E310D4C;
+	Mon, 29 Jul 2024 13:06:33 +0000 (UTC)
+Received: from [172.20.34.65] (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 10482e65;
+	Mon, 29 Jul 2024 13:06:31 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH can-next 00/21] can: rockchip_canfd: add support for CAN-FD
+ IP core found on Rockchip RK3568
+Date: Mon, 29 Jul 2024 15:05:31 +0200
+Message-Id: <20240729-rockchip-canfd-v1-0-fa1250fd6be3@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <446be4e4-ea7e-47ec-9eba-9130ed662e2c@web.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJuTp2YC/x2MQQqAIBAAvxJ7bkEtivpKdJBtrSVQ0Qgh+nvSc
+ WBmHsichDPMzQOJb8kSfAXdNkCH9TujbJXBKNOr0UyYAp10SESy3m3Ym66jUTtFNECNYmIn5R8
+ uUBX0XC5Y3/cD9cpekWoAAAA=
+To: kernel@pengutronix.de, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, 
+ Elaine Zhang <zhangqing@rock-chips.com>, 
+ David Jander <david.jander@protonic.nl>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Marc Kleine-Budde <mkl@pengutronix.de>, David Jander <david@protonic.nl>
+X-Mailer: b4 0.15-dev-37811
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3079; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=hlEGTdwY0x+K5Na55TZsk5mIJrFenASjMW0vF12hjuI=;
+ b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBmp5Ozrs1zPlMaUXtRWewD09/Zeezcdp08WvMnE
+ Tnekw1F6UiJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZqeTswAKCRAoOKI+ei28
+ b708CACBi8YDC8rPjeTmlHKrwHiQCg5ojwJOGeHWUOPsaX1WhXrUOGMBVcNK3CxmbZBPpVjOI2B
+ yn/kgGxwtps7Q/KFUSx4oD6V4J+TWngs3ozPCjOxOFtnXzuxXmRbU0hf9pnDca4cLfil9afV3iL
+ jeBU5PdLQZ9A1hW07/6d3IHfx5DvOKVr4zIniqg4fhLxzumA/nKZjU3NXfu598YvEEmhaRVDxHU
+ xhnFciRbGpn19H/Vbjy3Z1K3Q+U3yDVWmY4Uid7upx7ZqXympEBNYcHfnmKcGjgTPiafGAJltH4
+ bRTwX0KV/udqRnUgL3p+BC9682GurEyCcJS0BmsfgfKe4RFk
+X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
+ fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Jul 29, 2024 at 11:33:22AM +0200, Markus Elfring wrote:
-> …
-> > +++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-> > @@ -0,0 +1,338 @@
-> …
-> > +#ifndef _RTASE_H_
-> > +#define _RTASE_H_
-> …
-> 
-> I suggest to omit leading underscores from such identifiers.
-> https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+define+a+reserved+identifier
+This series adds support for the CAN-FD IP core found on the Rockchip
+RK3568.
 
-Do you have a reference to a Linux kernel document which suggests not
-to do this?
+The IP core is a bit complicated and has several documented errata.
+The driver is added in several stages, first the base driver including
+the RX-path. Then several workarounds for errata and the TX-path, and
+finally features like hardware time stamping, loop-back mode and
+bus error reporting.
 
-My grep foo is not great, but there appears to be around 20,000
-instances of #define _[A-Z] in the kernel. So i doubt adding a couple
-more is going to be an issue.
+regards,
+Marc
 
-	Andrew
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+David Jander (2):
+      arm64: dts: rockchip: add CAN-FD controller nodes to rk3568
+      arm64: dts: rockchip: mecsbc: add CAN0 and CAN1 interfaces
+
+Marc Kleine-Budde (19):
+      dt-bindings: can: rockchip_canfd: add binding for rockchip CAN-FD controller
+      can: rockchip_canfd: add driver for Rockchip CAN-FD controller
+      can: rockchip_canfd: add quirks for errata workarounds
+      can: rockchip_canfd: add quirk for broken CAN-FD support
+      can: rockchip_canfd: add support for rk3568v3
+      can: rockchip_canfd: add notes about known issues
+      can: rockchip_canfd: rkcanfd_handle_rx_int_one(): implement workaround for erratum 5: check for empty FIFO
+      can: rockchip_canfd: rkcanfd_register_done(): add warning for erratum 5
+      can: rockchip_canfd: add functions to check if CAN-FD frames are equal
+      can: rockchip_canfd: add TX PATH
+      can: rockchip_canfd: implement workaround for erratum 6
+      can: rockchip_canfd: implement workaround for erratum 12
+      can: rockchip_canfd: rkcanfd_get_berr_counter_corrected(): work around broken {RX,TX}ERRORCNT register
+      can: rockchip_canfd: add stats support for errata workarounds
+      can: rockchip_canfd: prepare to use full TX-FIFO depth
+      can: rockchip_canfd: enable full TX-FIFO depth of 2
+      can: rockchip_canfd: add hardware timestamping support
+      can: rockchip_canfd: add support for CAN_CTRLMODE_LOOPBACK
+      can: rockchip_canfd: add support for CAN_CTRLMODE_BERR_REPORTING
+
+ .../bindings/net/can/rockchip,canfd.yaml           |  76 ++
+ MAINTAINERS                                        |   8 +
+ arch/arm64/boot/dts/rockchip/rk3568-mecsbc.dts     |  14 +
+ arch/arm64/boot/dts/rockchip/rk3568.dtsi           |  39 +
+ drivers/net/can/Kconfig                            |   1 +
+ drivers/net/can/Makefile                           |   1 +
+ drivers/net/can/rockchip/Kconfig                   |   9 +
+ drivers/net/can/rockchip/Makefile                  |  10 +
+ drivers/net/can/rockchip/rockchip_canfd-core.c     | 972 +++++++++++++++++++++
+ drivers/net/can/rockchip/rockchip_canfd-ethtool.c  |  73 ++
+ drivers/net/can/rockchip/rockchip_canfd-rx.c       | 299 +++++++
+ .../net/can/rockchip/rockchip_canfd-timestamp.c    | 105 +++
+ drivers/net/can/rockchip/rockchip_canfd-tx.c       | 167 ++++
+ drivers/net/can/rockchip/rockchip_canfd.h          | 551 ++++++++++++
+ 14 files changed, 2325 insertions(+)
+---
+base-commit: 1722389b0d863056d78287a120a1d6cadb8d4f7b
+change-id: 20240729-rockchip-canfd-4233c71f0cc6
+
+Best regards,
+-- 
+Marc Kleine-Budde <mkl@pengutronix.de>
+
+
 
