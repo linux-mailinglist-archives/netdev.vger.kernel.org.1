@@ -1,145 +1,102 @@
-Return-Path: <netdev+bounces-113631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D618693F574
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:33:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E177D93F59F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F57A282C86
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:33:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 667D0B20B72
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:40:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77E1146591;
-	Mon, 29 Jul 2024 12:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96211482FD;
+	Mon, 29 Jul 2024 12:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYKlgrDD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k8W7sDZM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA03145B06
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7F7145FE1;
+	Mon, 29 Jul 2024 12:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722256381; cv=none; b=b93wqF8+9ZsAsasSmRXLhp+gy70WKJTqaRX4+xUo4qJ3gXEDcbBEwcJHrvg8o+5ZQHxNJ8WJHWM2UmqpCDQdyrx+cP9Qki++LMoEa/sJtYRy6HA2jls87VCVBjJRI0p9a9ond976i5ehbtsJGHl2oUEVk0T/JDJI/dnIHEX2B0I=
+	t=1722256835; cv=none; b=frUwPXhsa97Mu8pl4yW2UaEM7jq6Gx23HcUOryXGaaQ9aZ1rno/unkpym+5LRpdFY9K8CnPXMpU83HNSem9XiesqomQNQ5J3VJFl6W4mNbSsa3YIIhtgYDqytqz1G4vYQlFd4mk1qc8QtSLuL/oMoXC/pbvufkhRbP35jEG0XZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722256381; c=relaxed/simple;
-	bh=OZ5jXVlwnFT9jWJUdVRr5iRq5783wksRo2iASegfAXs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KOsZMAQBwTd8p65vs+/hrng+I3wwIs97/uAde7j4rR9Nue5ddg2cxOK/VEOUwabpRSorWT1d9rYXF5OP0z0Z5CaJ4w3nTqFTZFPW2Gep5p/31oDdEWghL3ZLPzvAA1umboR6p2L3clXr0Fs9CoVW+4dDgGFYbp+Jdts/0yhD9AQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EYKlgrDD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722256379;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w0xks81TdKZTJ22FJnbrdp5glJu0PgYtd3j9EKuYo38=;
-	b=EYKlgrDDCBXXU9SAqObC9jPSnhbfHcfKkYCYdTgu7WWv1UaeGjtOVtICI2HIB91quy9HdB
-	ZleG8h+bwvKdCkW6jB6AiTuWZT0cWLOuUdGCIosz2zaAowY4UjfUeOhWPn2yq2oX51UNLm
-	2IUa5yd42ECB3ik/h1ZV/qAylbiIYMk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-49-86vu1Qi1ODmH9Ngj9XTfXw-1; Mon,
- 29 Jul 2024 08:32:56 -0400
-X-MC-Unique: 86vu1Qi1ODmH9Ngj9XTfXw-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8202919560AA;
-	Mon, 29 Jul 2024 12:32:53 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.136])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 45AAA1955D47;
-	Mon, 29 Jul 2024 12:32:46 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: dsimic@manjaro.org
-Cc: UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	f.fainelli@gmail.com,
-	gregkh@linuxfoundation.org,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	lucas.demarchi@intel.com,
-	masahiroy@kernel.org,
-	mcgrof@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy module
-Date: Mon, 29 Jul 2024 14:32:43 +0200
-Message-ID: <20240729123244.18780-1-jtornosm@redhat.com>
-In-Reply-To: <4db38805936d28fe1578c525a18f7849@manjaro.org>
-References: <4db38805936d28fe1578c525a18f7849@manjaro.org>
+	s=arc-20240116; t=1722256835; c=relaxed/simple;
+	bh=wHsh5WQSdcrSRUcV1G75PxkF61eDMM6o20gIC6vEWX8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Bf0ICUyH5pSxhg3Cn+VdQGPpnwXeSAktClyWbvn49pwsrjcFj33LpcSTFLKzhPVgRLtw0xyeyfdaU4tfl7y05RxlspLydLkrxmRs4+hKkxab5g5GTl9rTGotxbjKlU3dn5ESOxOBZ1+Oow957SwD35mB3PMnJM61MMTZBezlm9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k8W7sDZM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 29672C4AF0A;
+	Mon, 29 Jul 2024 12:40:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722256835;
+	bh=wHsh5WQSdcrSRUcV1G75PxkF61eDMM6o20gIC6vEWX8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k8W7sDZM60ZCVGHOLK4qBFnCXNn7y+ah5GB3OKiZNFyt7FYwfbgqO8ryokXlCc1WT
+	 MtpKs9n1RWBgtxLHfJbNIdQuK02OVq/94HBEb4A4HO62v9u2JcEWIJomcGMeh5OMDL
+	 TlAbt8R/3M+C6LitbJ1sYCiM78PYtHlh6Qyx5xeSBEGZ9LB1mxlh3+2dwN8Rzp7Nne
+	 qvDHCBbz78qmLyJ0ilKj9o5TcxIiybdShk0Vmb5RnuGXjuMii7GqUq6heqLEdZN7ha
+	 QJXgzOsB9pOc4gG5uMnbvTUQ/MIhiajStIm3eX5nhV/IteirVeYVeKxyQUak3tbtK1
+	 lLKE3y7XR/5HA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19C17C4332D;
+	Mon, 29 Jul 2024 12:40:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Subject: Re: [PATCH net 0/5] mptcp: fix signal endpoint readd
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172225683510.11158.15615122490002292811.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Jul 2024 12:40:35 +0000
+References: <20240727-upstream-net-20240726-mptcp-fix-signal-readd-v1-0-1e7d25a23362@kernel.org>
+In-Reply-To: <20240727-upstream-net-20240726-mptcp-fix-signal-readd-v1-0-1e7d25a23362@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org,
+ liujing@cmss.chinamobile.com
 
-Hello Dragan and others,
+Hello:
 
-> I see and agree, but please note that other people highly disagree about
-> that being an issue at all.  Thus, I'd suggest that you provide a 
-> detailed
-> explanation of why and how that presents an issue that weakdeps solve.
-I think that the problem that I am trying to fix related to initramfs
-generation is understood. At least what I tried to explain at the beginning
-of this thread with my messages and the help of Lucas. But maybe you are  
-right, so let me provide a more specific explanation.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-The only thing that I could repeat and/remark is that I am not modifying
-anything in the current kernel behavior, and specifically for this case 
-(lan78xx) with a network driver and related phy modules: I am just trying
-to add a flag (and nothing else) to complete the information of the
-necessary modules to be collected by the tools that build the initramfs.
+On Sat, 27 Jul 2024 11:03:58 +0200 you wrote:
+> Issue #501 [1] showed that the Netlink PM currently doesn't correctly
+> support removal and re-add of signal endpoints.
+> 
+> Patches 1 and 2 address the issue: the first one in the userspace path-
+> manager, introduced in v5.19 ; and the second one in the in-kernel path-
+> manager, introduced in v5.7.
+> 
+> [...]
 
-And if this information about the necessary modules is not correctly
-collected, the kernel is not going to work from initramfs, Especially if
-the network drivers are not working (because the phy module is not found),
-some initial and necessary resources could not be available before and
-after initramfs stage, because unless the network driver is unloaded and
-loaded again after initramfs stage (then the phy modules would be available
-from rootfs), it is going to be in the same situation, that is, not
-correctly initialized and not working.
+Here is the summary with links:
+  - [net,1/5] mptcp: fix user-space PM announced address accounting
+    https://git.kernel.org/netdev/net/c/167b93258d1e
+  - [net,2/5] mptcp: fix NL PM announced address accounting
+    https://git.kernel.org/netdev/net/c/4b317e0eb287
+  - [net,3/5] selftests: mptcp: add explicit test case for remove/readd
+    https://git.kernel.org/netdev/net/c/b5e2fb832f48
+  - [net,4/5] selftests: mptcp: fix error path
+    https://git.kernel.org/netdev/net/c/4a2f48992ddf
+  - [net,5/5] selftests: mptcp: always close input's FD if opened
+    https://git.kernel.org/netdev/net/c/7c70bcc2a84c
 
-Including in the initramfs all the phy modules is an option but I think it
-would be better to include only the necessary stuff (this is the default
-behavior for the tools that are used to build the initramfs). This is valid
-for embedded and not-embedded systems.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-If this patch, to only add the related flag of the network driver to inform
-about the possible phy modules, is rejected because a more general solution
-is preferred, I would like to dig into it, at least to know if it is possible
-to do better.
-Maybe Andrew in other part of the thread, after the interesting comments
-from Jakub, can help and provide some new (for me) inputs.
-
-> Regarding Lima and Panfrost, I agree that weakdeps are a better solution
-> than softdeps, but please see also harddeps. [1]  I'd appreciate if 
-> you'd provide your opinion about the proposed harddeps.
-> [1] 
-> https://lore.kernel.org/linux-modules/04e0676b0e77c5eb69df6972f41d77cdf061265a.1721906745.git.dsimic@manjaro.org/T/#u
-Ok, I will think more about it.
-After a quick first look I agree with Lucas, but let's go little by little
-(at least I don't have a lot of time before my holidays). 
-
-Thanks
-
-Best regards
-José Ignacio
 
 
