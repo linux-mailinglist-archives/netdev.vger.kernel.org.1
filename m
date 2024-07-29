@@ -1,108 +1,117 @@
-Return-Path: <netdev+bounces-113582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E65993F231
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:08:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0BC93F2A4
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FF4228429C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:08:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82A661C2188A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AC4143863;
-	Mon, 29 Jul 2024 10:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE347143C74;
+	Mon, 29 Jul 2024 10:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dGB5Lry4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m5rgXWsM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20B214373E
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 10:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA212143873;
+	Mon, 29 Jul 2024 10:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722247686; cv=none; b=WuHap6BY2BuWL506SulyrHdJfqj2R+M9FBanxTzsxiAcr9ZAQFdYlizzL9wvCgauHY6ff/srukWsnM5OVGeisNunZWWmjU6VCsrBKaXwJqn4WulUXSzLxHhhawowCA6nKuJdIvX2gqplNWLADw01v1X5ow7xa0b0kEiEfArkJCk=
+	t=1722248879; cv=none; b=kCeKt2ItW4qD1/hlodcbVjBYiW2GeU7NMlsb6JO5i40XbUG3V4FiCJ10cBaOHQ/zX6PjaxiI/7EdOZoMYNGp9YDAIdvCLWYB84QrZsuYseweT70x7ZtbKwgorrOphtieWBXHhfne16sqHxGt5DZ5V2Gh462unG06yNUsr1Wqfw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722247686; c=relaxed/simple;
-	bh=+gqGEuCq9nnoR1nUhYBaWx9iQzFgIyHsqyCrbEanieQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lmAeSFGiUv9QzkV3ormYglHn0g8N0qgCJ1zt2nExubqC/K1RMooHldIeojq77MaLLKOJ4atoI2zIYePoq4ldF8Mk83w2PuU/bi+T6LecSzwCNZcyAiEFtY8yBj8+x8kv23nOssw3KavApdzPpCK8r3uTgVU/8ghLvpM7IlrQV3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dGB5Lry4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 835CEC4AF0C;
-	Mon, 29 Jul 2024 10:08:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722247686;
-	bh=+gqGEuCq9nnoR1nUhYBaWx9iQzFgIyHsqyCrbEanieQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dGB5Lry4jQm8wZN0nTBVadwnHGUKUcreq/xI2Dq3VlrA3/fXV43Xp6QlGKMMysN5B
-	 ftSowwqLKtsdmUljZ89tl2ftcUfK2xelQ66BicjapH2eX/CgZ0EVPJBYEvMf8efQ1D
-	 SiCJoGvXNe1GlSFDSs6LmqZt73uca9eolqF3ivBBKHSRMOP05JnjfDKIjrWEUE0EFF
-	 leoKKigU7KM0YPxb/bTQPhK8jNzf7itgH8uCt7PFW1eGwf8uBscXWHQu2e63PXJlLY
-	 WoJ8cu0V8l1tdn4Y2kZeJGnzwV/h77a7wI4gFVlMv7t17psKxzjqXKvpEivZeMDnYt
-	 U5uCtvUTQfl4A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75834C43443;
-	Mon, 29 Jul 2024 10:08:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722248879; c=relaxed/simple;
+	bh=Bt99ge3UUZGPkVxOwjK0CeLHXnSXdbcs1gevqufOntg=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=ewr2AD7j6paN+I8bqNEoQmyZMdU7LvqZjImdhhpJWEJ7F5Oj+TkdmmvlBNnk10Ua3CrPd+Q2CU8SiMd+yj17urmISGPAeIeti7pEd87ArKXBRtn3B/KSlhEo0K7HbVmBZQuOHp/Y4wxU5herIlrzJ81zq6zurc0HzsY6sPNAAD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m5rgXWsM; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722248878; x=1753784878;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=Bt99ge3UUZGPkVxOwjK0CeLHXnSXdbcs1gevqufOntg=;
+  b=m5rgXWsMaVGy12/4ilQY1djYu9Q37+mvkuxorQppjNccBnxkRHF69VSv
+   KiGdSSeAEX/hU5SpG3MOEduL9QUY1Z1EgXjoww8z3uk/1C5i//BbHdJJd
+   t2oCR7v6M8qgemiJyhWAaBBPQ0j8w2IfubWtIkOPvM1ytK1iEt5pHv+9a
+   fXp1Y3qljI8FV3X2CnMh/7cEf8AUzJLzAwAzdVlGduFBSyrl4iICI0xW+
+   u4Haa/T6xRwBjOXYkfKSn4Jl6x/qcm5AIjrTDB8FG+6V018IVCAnTxiB1
+   WhoAZcl/Kb4OBf6+PjVAvrleACduwARVe+WwKJy8veHt/Ka6WNKcZdXJQ
+   A==;
+X-CSE-ConnectionGUID: TGJvmAnvS4aKhXpdVNx+lw==
+X-CSE-MsgGUID: cwTsFYcJSZW1RrFCwrXejg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11147"; a="37502565"
+X-IronPort-AV: E=Sophos;i="6.09,245,1716274800"; 
+   d="scan'208";a="37502565"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 03:27:57 -0700
+X-CSE-ConnectionGUID: Ynsp7EQmRje2W4uZXxa9yQ==
+X-CSE-MsgGUID: ZV+fiUwNQXmPYSqHZqNgKA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,245,1716274800"; 
+   d="scan'208";a="77171478"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.245.151])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 03:27:48 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Mon, 29 Jul 2024 13:27:44 +0300 (EEST)
+To: Matthew W Carlis <mattc@purestorage.com>
+cc: macro@orcam.me.uk, alex.williamson@redhat.com, bhelgaas@google.com, 
+    christophe.leroy@csgroup.eu, davem@davemloft.net, 
+    david.abdurachmanov@gmail.com, edumazet@google.com, kuba@kernel.org, 
+    leon@kernel.org, LKML <linux-kernel@vger.kernel.org>, 
+    linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, 
+    linuxppc-dev@lists.ozlabs.org, Lukas Wunner <lukas@wunner.de>, 
+    mahesh@linux.ibm.com, Mika Westerberg <mika.westerberg@linux.intel.com>, 
+    mpe@ellerman.id.au, Netdev <netdev@vger.kernel.org>, npiggin@gmail.com, 
+    oohall@gmail.com, pabeni@redhat.com, pali@kernel.org, saeedm@nvidia.com, 
+    sr@denx.de, wilson@tuliptree.org
+Subject: Re: PCI: Work around PCIe link training failures
+In-Reply-To: <20240726080446.12375-1-mattc@purestorage.com>
+Message-ID: <914b7d34-9ed5-cd99-cb76-f6f8eccb842e@linux.intel.com>
+References: <20240724191830.4807-1-mattc@purestorage.com> <20240726080446.12375-1-mattc@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] ethtool: more RSS fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172224768647.24246.8753503956784144711.git-patchwork-notify@kernel.org>
-Date: Mon, 29 Jul 2024 10:08:06 +0000
-References: <20240725222353.2993687-1-kuba@kernel.org>
-In-Reply-To: <20240725222353.2993687-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, michael.chan@broadcom.com, shuah@kernel.org,
- ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com,
- andrew@lunn.ch, willemb@google.com, pavan.chebbi@broadcom.com,
- petrm@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
 
-Hello:
+On Fri, 26 Jul 2024, Matthew W Carlis wrote:
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 25 Jul 2024 15:23:48 -0700 you wrote:
-> More fixes for RSS setting. First two patches fix my own bugs
-> in bnxt conversion to the new API. The third patch fixes
-> what seems to be a 10 year old issue (present since the Linux
-> RSS API was created). Fourth patch fixes an issue with
-> the XArray state being out of sync. And then a small test.
+> On Mon, 22 Jul 2024, Maciej W. Rozycki wrote:
 > 
-> Jakub Kicinski (5):
->   eth: bnxt: reject unsupported hash functions
->   eth: bnxt: populate defaults in the RSS context struct
->   ethtool: fix setting key and resetting indir at once
->   ethtool: fix the state of additional contexts with old API
->   selftests: drv-net: rss_ctx: check for all-zero keys
+> > The main reason is it is believed that it is the downstream device
+> > causing the issue, and obviously you can't fetch its ID if you can't
+> > negotiate link so as to talk to it in the first place.
 > 
-> [...]
+> Have had some more time to look into this issue. So, I think the problem
+> with this change is that it is quite strict in its assumptions about what
+> it means when a device fails to train, but in an environment where hot-plug
+> is exercised frequently you are essentially bound have something interrupt
+> the link training. In the first case where we caught this problem our test
+> automation was doing some power cycle tortures on our endpoints. If you catch
+> the right timing the link will be forced down to Gen1 forever without some other
+> automation to recover you unless your device is the one single device in the
+> allowlist which had the hardware bug in the first place.
+> 
+> I wonder if we can come up with some kind of alternative.
 
-Here is the summary with links:
-  - [net,1/5] eth: bnxt: reject unsupported hash functions
-    https://git.kernel.org/netdev/net/c/daefd348a593
-  - [net,2/5] eth: bnxt: populate defaults in the RSS context struct
-    https://git.kernel.org/netdev/net/c/9dbad38336a9
-  - [net,3/5] ethtool: fix setting key and resetting indir at once
-    https://git.kernel.org/netdev/net/c/7195f0ef7f5b
-  - [net,4/5] ethtool: fix the state of additional contexts with old API
-    https://git.kernel.org/netdev/net/c/dc9755370e1c
-  - [net,5/5] selftests: drv-net: rss_ctx: check for all-zero keys
-    https://git.kernel.org/netdev/net/c/0d6ccfe6b319
+The most obvious solution is to not leave the speed at Gen1 on failure in 
+Target Speed quirk but to restore the original Target Speed value. The 
+downside with that is if the current retraining interface (function) is 
+used, it adds delay. But the retraining functions could be reworked such 
+that the retraining is only triggered in case the Target Speed quirk 
+fails but we don't wait for its result (which will very likely fail 
+anyway).
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+ i.
 
 
