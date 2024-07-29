@@ -1,79 +1,117 @@
-Return-Path: <netdev+bounces-113794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DFDD93FEF3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:16:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E0693FFBF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 500911C21FFA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:16:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 939F72827BB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27F61741D9;
-	Mon, 29 Jul 2024 20:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B1F018A924;
+	Mon, 29 Jul 2024 20:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8noHZtj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipZQSDyi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C1537708;
-	Mon, 29 Jul 2024 20:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA2D1891DE
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 20:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722284183; cv=none; b=Gyy46tojhjaHKmfX4hheijGDENYeUaHIJXZZbs+pFK2wPWXG3QqZ7qXtq++kvw2TVOreb7DSOf3yF+bkzA7/mlbtTdqIjZVy4fg6DeYNlXN58ZVDya7UzluOvffODfW3JXjMckeBVD3YTdhQLGbRmiSHXG83p4A6OEskM4evf5g=
+	t=1722285939; cv=none; b=eoX5AUq2yetSwTiIGsk5/EXTr3m5vST/kSSRV27FS8q7LRX4en4B8KswCFWLvF4faY+Iv6FcYqpph0411y6QFOz7EYpuoBxves+27Bdq0uNYezW3JL2CZfcYHX/KmdDxU1CLJD1OJMxJo8XeRyDu0UAbDtWE9+zRh+AxgeprakM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722284183; c=relaxed/simple;
-	bh=W6KAHewPqBWvTYeXUfCgX1Srngxie2xftkjBbCQbEF4=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=d0YODogvOhoP1owPlwRr5fCfdxNTfcS8fHBu2LuzWU4fU2rFHhjKNV3n4XUIEF+iXkXI3RhuoadcXNw+qOrnou1/APnoNXAoKb2FeqYr+vIvbubnAKAXvy+nrSKh6gCsVxunmSIXNPtoXE9qywHXjq22xnpgOwoFm9iqhr1l6nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8noHZtj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 28276C32786;
-	Mon, 29 Jul 2024 20:16:23 +0000 (UTC)
+	s=arc-20240116; t=1722285939; c=relaxed/simple;
+	bh=s6pThrCZE3l3Le8tOo1JRPMJKmmXP1Dm4mjwxmcPwY0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rS/xY92rVXpu2bXFr+6qQFlBtbTDoezqqB+PepQgmqt2MhvK+BElkzr45ifmHKcwAowJIBEKbmNOCJiARTWBF7W+vA4nzvatcp1XpUFiYF54ElKva3r7AnxpFCK+6ZfWdrbBSkkOkrWVPweVZ/9HotjH5D7DsWQYSmN0ebjoBlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ipZQSDyi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E526C32786;
+	Mon, 29 Jul 2024 20:45:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722284183;
-	bh=W6KAHewPqBWvTYeXUfCgX1Srngxie2xftkjBbCQbEF4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=s8noHZtj4DzASuJ0hCImeSNqJ4oIYIvM0G9Ejy0llG7ik/UwAXt3mYcV5QHSt5SE8
-	 /Sd95zOMejXL5aT5L/L4iKdXapONFue2IW1ibFX+cmzNUISmHX/4X/JXXcYaox03zF
-	 UJyXyCied2UO7WSFKVmKqm7pb3OC3FXDrJCdjTLP6/7zxIqopmd8i79i/TTxPrBWU4
-	 S4if9oFBi1AI9NG+4POLOVsRh6gVF2Hn370ggtmmajmNM2AHmXAZcZgBYZvC+ul9Ka
-	 Bg3S537620AAIqWqocYyw2kXvgfGMkxlddleZiMcFSgqubG/yL7vNixdQXwHua8s+u
-	 LWkPVuU8soQbQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1AA73C43445;
-	Mon, 29 Jul 2024 20:16:23 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: fixes for rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240728191956-mutt-send-email-mst@kernel.org>
-References: <20240728191956-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240728191956-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 6d834691da474ed1c648753d3d3a3ef8379fa1c1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 10826505f52357c7c9e12358db97a3acbe82e958
-Message-Id: <172228418309.31709.8455898722757053480.pr-tracker-bot@kernel.org>
-Date: Mon, 29 Jul 2024 20:16:23 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dan.carpenter@linaro.org, jiri@nvidia.com, jiri@resnulli.us, mst@redhat.com, quic_jjohnson@quicinc.com
+	s=k20201202; t=1722285938;
+	bh=s6pThrCZE3l3Le8tOo1JRPMJKmmXP1Dm4mjwxmcPwY0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ipZQSDyisTBi9I2AJkbXkN3kh0lgh6Te5niFPfljwqNuT4752XBz7MC8F7aye7W5l
+	 eE34jRr4saWiZRcQl16pm350i0ePAzH+4qFnBGoD24qzlOxv8887P5JfiQFlkqiayE
+	 Iw97aNoH05MbtkEDirGbUkebHC/C1A6KKXd38Y5Lc7hKOZ+aSZA6WIXE+7Eb/l8GIl
+	 NZ/kUFQIjFtC/CttDscrbIPMtXgCMdTVUPSfnKE3b8M2AmKTMLt0ycoS4UZ9e7CJp/
+	 TMmg0C+Slto6ejOo0YDWCvpIPIdDdNzIPXaKzALCoMjRStMezI6FCaiRrhcYt+7Gsf
+	 jSUT64m7KRHZA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	petrm@nvidia.com
+Subject: [PATCH net-next] selftests: net: ksft: print more of the stack for checks
+Date: Mon, 29 Jul 2024 13:45:36 -0700
+Message-ID: <20240729204536.3637577-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Sun, 28 Jul 2024 19:19:56 -0400:
+Print more stack frames and the failing line when check fails.
+This helps when tests use helpers to do the checks.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Before:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/10826505f52357c7c9e12358db97a3acbe82e958
+  # At ./ksft/drivers/net/hw/rss_ctx.py line 92:
+  # Check failed 1037698 >= 396893.0 traffic on other queues:[344612, 462380, 233020, 449174, 342298]
+  not ok 8 rss_ctx.test_rss_context_queue_reconfigure
 
-Thank you!
+After:
 
+  # Check| At ./ksft/drivers/net/hw/rss_ctx.py, line 387, in test_rss_context_queue_reconfigure:
+  # Check|     test_rss_queue_reconfigure(cfg, main_ctx=False)
+  # Check| At ./ksft/drivers/net/hw/rss_ctx.py, line 230, in test_rss_queue_reconfigure:
+  # Check|     _send_traffic_check(cfg, port, ctx_ref, { 'target': (0, 3),
+  # Check| At ./ksft/drivers/net/hw/rss_ctx.py, line 92, in _send_traffic_check:
+  # Check|     ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
+  # Check failed 1045235 >= 405823.5 traffic on other queues (context 1)':[460068, 351995, 565970, 351579, 127270]
+  not ok 8 rss_ctx.test_rss_context_queue_reconfigure
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: petrm@nvidia.com
+---
+ tools/testing/selftests/net/lib/py/ksft.py | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+index f26c20df9db4..c2356e07c34c 100644
+--- a/tools/testing/selftests/net/lib/py/ksft.py
++++ b/tools/testing/selftests/net/lib/py/ksft.py
+@@ -32,8 +32,16 @@ KSFT_RESULT_ALL = True
+     global KSFT_RESULT
+     KSFT_RESULT = False
+ 
+-    frame = inspect.stack()[2]
+-    ksft_pr("At " + frame.filename + " line " + str(frame.lineno) + ":")
++    stack = inspect.stack()
++    started = False
++    for i in reversed(range(2, len(stack))):
++        frame = stack[i]
++        if not started:
++            started |= frame.function == 'ksft_run'
++            continue
++        ksft_pr("Check| At " + frame.filename + ", line " + str(frame.lineno) +
++                ", in " + frame.function + ":")
++        ksft_pr("Check|     " + frame.code_context[0].strip())
+     ksft_pr(*args)
+ 
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.45.2
+
 
