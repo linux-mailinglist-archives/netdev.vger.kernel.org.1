@@ -1,104 +1,105 @@
-Return-Path: <netdev+bounces-113549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3423093F003
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:38:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB7693F02B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366C51C21B0F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:38:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A50EAB21D60
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E4F13DDCC;
-	Mon, 29 Jul 2024 08:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7757D13C9CF;
+	Mon, 29 Jul 2024 08:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfQ+JcV5"
+	dkim=pass (1024-bit key) header.d=xff.cz header.i=@xff.cz header.b="155WS3aF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from vps.xff.cz (vps.xff.cz [195.181.215.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C5313D89D
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBA113210D;
+	Mon, 29 Jul 2024 08:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.181.215.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722242279; cv=none; b=hTEJk7iyKIJRWLxBQHrts8wpXaWY40sDZoKmcqa2uPQ2tktpJ5btAgrUuwL+DMyg/jlLhHszFEY4tDfJuz+bV89j2UIqR3Pw0jx2rJtwfMBy8vdkDIt6yeMhDf764fSxJ28OhfBDu41eiYoqso9zb7ZsXFZLpMfUpnc/kyFHqxg=
+	t=1722243099; cv=none; b=Pq9X6cq+QIfjBdcV/6edYGshU13rFYEeZjlFxmmOSvj1fGW+Q8Q5CkMRjV/33Im5+SPTvd4FwNV4i+6gCAKBog8r5tlVwiRqlWt7AhwGJZS0E3HMOiLWWwH394w+iz6nXFWZ3h+RlZsC0zScWUsG5tvPbOV5aLnrdc2G5VqXtQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722242279; c=relaxed/simple;
-	bh=GI3xTCo0pG2dP3L5UUNP9YcWsnxFUDpXFdZJ95t0k38=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MFA16nqPqEBdh4QWQ3xv6Pp10hKz4TcHBsGuAYzFItw6kfgT1GDaJXe+5XuUmxEbY1QM0k8EDPvBKU9My82eBzZTZ1+1/dvqGXgGSWkhGqLNhZD6FVc68hpU4vNCLF77l0lU/eQgxHk1I5A7BCnf4DmxNccCAq6XBkTqDtBdYK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dfQ+JcV5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722242276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EG8W45Ypb7DOiKwZMCGHslPdEIU08Mt9VFtOVJoxdWk=;
-	b=dfQ+JcV5LBVOyo+n1doWFZmFV9atoG3EfCXAnSpBkwoFoLebhtBR6iNUhKigMtZyEFWR/i
-	0pGKVasnj55T+SBy4D8xR5ZEtca3MlYGUVBaULZaOtG+lT4FrAq7/GDyGQYFfGkDn8CU72
-	E4qPSBcEts+tC9DBdku2P9IRidIQEqQ=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-483-PCCetDi_NwygAmM2KFHI6g-1; Mon,
- 29 Jul 2024 04:37:48 -0400
-X-MC-Unique: PCCetDi_NwygAmM2KFHI6g-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CF9FA19560A2;
-	Mon, 29 Jul 2024 08:37:46 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.136])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 63C241955D42;
-	Mon, 29 Jul 2024 08:37:41 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: andrew@lunn.ch
-Cc: UNGLinuxDriver@microchip.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	lucas.demarchi@intel.com,
-	mcgrof@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy module
-Date: Mon, 29 Jul 2024 10:37:38 +0200
-Message-ID: <20240729083739.11360-1-jtornosm@redhat.com>
-In-Reply-To: <fc40244c-b26f-421e-8387-98c7f9f0c8ca@lunn.ch>
-References: <fc40244c-b26f-421e-8387-98c7f9f0c8ca@lunn.ch>
+	s=arc-20240116; t=1722243099; c=relaxed/simple;
+	bh=J0bsix4Qoxdi1CXAtomePnZehGLX5EbMnGJ5fiPl1WI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E/DIpl1cFh5LawT9WevmLvLigac0F2eOMQmlxGaUFL+ohPo/UKsD0qxdgttSIjbcQT+0S/ByizwZcLCnngg+ggG5Hzb+4/qU9uuFyp3PTN/Zjr33mDwabss32kQto+1XES5AjbXu+AvX4EDHSKRQltstBxYkuw+lyTwXugljgO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xff.cz; spf=pass smtp.mailfrom=xff.cz; dkim=pass (1024-bit key) header.d=xff.cz header.i=@xff.cz header.b=155WS3aF; arc=none smtp.client-ip=195.181.215.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xff.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xff.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xff.cz; s=mail;
+	t=1722242658; bh=J0bsix4Qoxdi1CXAtomePnZehGLX5EbMnGJ5fiPl1WI=;
+	h=Date:From:To:Cc:Subject:X-My-GPG-KeyId:References:From;
+	b=155WS3aFv6TUpvsEiUAz/lHlTuEuHSFjqqhRPD6fF6uxXUb/HYszg3gCQXwOIwZuY
+	 ZRnNNfxRBQnRJN0EZg+A1Q9sZX+u/H234clES5Cq9XjLmR0YozbADzv9ASGUenWBbt
+	 QUwbXDDv52YuxsLnFoJV5DqEp/+9mOaW/im7UskI=
+Date: Mon, 29 Jul 2024 10:44:12 +0200
+From: =?utf-8?Q?Ond=C5=99ej?= Jirman <megi@xff.cz>
+To: Dragan Simic <dsimic@manjaro.org>
+Cc: Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org, 
+	krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org, 
+	arend.vanspriel@broadcom.com, efectn@protonmail.com, jagan@edgeble.ai, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, arend@broadcom.com, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, duoming@zju.edu.cn, bhelgaas@google.com, 
+	minipli@grsecurity.net, brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com, 
+	nick@khadas.com
+Subject: Re: [PATCH v4 4/5] wifi: brcmfmac: Add optional lpo clock enable
+ support
+Message-ID: <qetrwlvqekobedpwexeltaxqpnemenlfhky2t2razmcdtwlcv3@qdlesuiac2mr>
+Mail-Followup-To: =?utf-8?Q?Ond=C5=99ej?= Jirman <megi@xff.cz>, 
+	Dragan Simic <dsimic@manjaro.org>, Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org, 
+	krzk+dt@kernel.org, heiko@sntech.de, kvalo@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org, 
+	arend.vanspriel@broadcom.com, efectn@protonmail.com, jagan@edgeble.ai, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, arend@broadcom.com, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, duoming@zju.edu.cn, bhelgaas@google.com, 
+	minipli@grsecurity.net, brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com, 
+	nick@khadas.com
+X-My-GPG-KeyId: EBFBDDE11FB918D44D1F56C1F9F0A873BE9777ED
+ <https://xff.cz/key.txt>
+References: <20240729070102.3770318-1-jacobe.zang@wesion.com>
+ <20240729070102.3770318-5-jacobe.zang@wesion.com>
+ <d7068c96e102eaf6c35a77eb76cd067d@manjaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7068c96e102eaf6c35a77eb76cd067d@manjaro.org>
 
-Hello Andrew,
+On Mon, Jul 29, 2024 at 09:12:20AM GMT, Dragan Simic wrote:
+> Hello Jacobe,
+> 
+> [...]
+>
+> > 
+> > +	clk = devm_clk_get_optional_enabled(dev, "lpo");
+> > +	if (IS_ERR(clk))
+> > +	if (clk) {
+> 
+> These two lines looks really confusing.  Shouldn't it be just a single
+> "if (!IS_ERR(clk)) {" line instead?
 
-I like the idea from Jakub, reading the associated phy from the hardware
-in some way, although reading your last comments I don't know if it could
-be possible for all the cases.
-Let me ask you about this to understand better, if present,
-always reading /sys/bus/mdio_bus/devices/*/phy_id,
-could it be enough to get the possible related phy? 
-And after this get the related phy module?
+It should be `!IS_ERR(clk) && clk` otherwise the debug message will be
+incorrect.
 
-Thanks
+Kind regards,
+	o.
 
-Best regards
-José Ignacio
-
+> > +		brcmf_dbg(INFO, "enabling 32kHz clock\n");
+> > +		clk_set_rate(clk, 32768);
+> > +	}
+> > +
+> >  	if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac"))
+> >  		return;
 
