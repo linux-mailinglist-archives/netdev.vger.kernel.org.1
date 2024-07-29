@@ -1,214 +1,277 @@
-Return-Path: <netdev+bounces-113690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC7F93F940
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:19:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F92D93F947
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:23:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4151282391
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:19:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C619A282BED
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B615D14EC71;
-	Mon, 29 Jul 2024 15:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B9uj72RN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1C915665D;
+	Mon, 29 Jul 2024 15:23:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92E01E4A2
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B668415539A
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722266364; cv=none; b=aZme7vsP7PhcfUTjXLylhgt8/FStLS3ZyOxEsROGpAxIE6LVJcWeWrIJONqBiFQS2X8Zm2Vja7rCxKMDanhreOFE2t1efFLGrKNhmg9UJkX+nB1Te5LNyOwm3EulJNlWFdg0Dls2WfYwk7CEdXYVpq18Fqz34+1zUWpxTw3VZ5U=
+	t=1722266606; cv=none; b=NKADDe7fDBDcSY6VzCLeuPZ164uQNO5THdvjo1JZ+KvxIBc2u9BYk6/Uwo7uBC+YiJ/iOHNxAkluYx8/aKYipwUpWUzi1JRZBXwJy1JmUHVASwmsKkrlt9pYjw3CGsLL0Pi4wQxWqTj5G/c+WRR/2UPCwkYrXp3XA91at0WejBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722266364; c=relaxed/simple;
-	bh=WreofdgQRqIDOWch03mYUT/OG1Y7a5UUccAqKR3+1sg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vGvA/CjnvmW/4KoEsoHpPdHdsLgio0Wob/iSyrrIn3S4bsd8GyMCdOkzmP3VHNOw/SPFNcFzXT8ZlFyxUlCKA8FIsSBGi9f+bdvKxZlBc8oUOyBEXxonGTFQcUWFknF3tuFjgaR7xZddjgQUw59lP4wH5P5VCPr1PuXFNyHlCRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B9uj72RN; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5a1b073d7cdso14603a12.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:19:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722266361; x=1722871161; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fpTQO0qPhmqbgQDOxHTG7a76mLPeTFKZ7Kw6EpIExCU=;
-        b=B9uj72RN99AHwX38hfGhPKvWdXttFZAxaQwBTCK9/c0sMlJHuUrQuOLE96NQuT6Vus
-         eMSzKsbk6fhBykmQ1WBWJjZ/PMNR7zqZnhmGMcv8Nj5Otws7Dier+lD7ND4+wx92F+5J
-         nu3b74kckCk0XecnbCP2WLOY3h1gr1GZ5aYzfY+0X+R8RL7xSZmzDfpF/hYrRzrPn5bd
-         8yMUy+8mjLDd4YW325jIVYnVNyviGwycacWhhtwxncgFi3musBNe8B/XAqOyROfv8NmE
-         QDSDabSPkuQWMTALHDIZHpwV45tbAuWANhOFW9DLHcIJ01CCWrwej+er9dtXP6zZMKO6
-         fyHw==
+	s=arc-20240116; t=1722266606; c=relaxed/simple;
+	bh=qYomeXMkVFuXrgdGSB8/1iMUmIyedm6/4wkFQU+rvMM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MwZaJmTvC+51RN54ZW83dlN0v/TNz913lsUA98V2CttWvvZqkj44clQWhegYj/zZkFs9T0NoLzuHW4HDof+aa80oqKgMvYLVqPm1Nv4RExfgDCIspd+ipGf8cjZDwNt5DrCU+ufnmLSceHF72ldOtg3g+Ah/mO0zM8IsfdsGhAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81fa44764bbso239636339f.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:23:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722266361; x=1722871161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fpTQO0qPhmqbgQDOxHTG7a76mLPeTFKZ7Kw6EpIExCU=;
-        b=ZlHbPQ/PdngWz1kPKiJ8LHbm+MoM2+Pv30g4Ne+nRRHFDlCiEbw6vZSVvcJiX5pML9
-         oH+blzXmA/GNgxavf2PmT3D4vWLMqRFEAug0wg1s6WcYn7G1NzfCArBaL3eoW3CjfsDt
-         rx3o1iCRDmosbZkxUYLDfFUCCnP7UyCjeuoI1Og+ZseKZBeOy/ThzwP9sKQvfs57nRtS
-         dwxeZhb5Ig1jl5onmeHWMY/3HDPvjsaaqYpubgpx+unXq35m0dkHDVc3PAOrGn3rXkf5
-         RYAvY+fAZ1yy1ylDjjjcLQnTWFLn3TDZPCDpwXsPrs5CPNf9iLEHtaYeUfs4kNRmcJrT
-         mNWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWGfKaJrHjT3RSLGY9YQMcBaow8M/lTUjWOz8PUuU6+nMPhtYtyQq2AMrzKvqZIJxTT8fB+HOwQNnYyTrqLK+QFoMwmzHQV
-X-Gm-Message-State: AOJu0Yyw8uyi5KkaNZ/B1o3/bRR6I3zj01/YX89n4EYubW1tSl8O5QiJ
-	3aDwuqLtjUzUFCOn5MWSVp4W1o2fcGyuFWbrB4GNe3ewUkNyYTzBfCWkSQqmV1AIUHRVKXAzycp
-	j04UcLyCNslGsq2CXc2F4VpUyAoYcGBbb8Bb+0DGAfbNjurzoBsAi
-X-Google-Smtp-Source: AGHT+IHtJ/HVfkUyN4CUm0vlKREZt1xaFXOw3H63OjieDj84/bdoUvnTo2cMH8EUAfO/kkM4suYcLrlJa9Ak6YESm8s=
-X-Received: by 2002:a05:6402:51d0:b0:57d:32ff:73ef with SMTP id
- 4fb4d7f45d1cf-5b40d4a2ad8mr5950a12.6.1722266360729; Mon, 29 Jul 2024 08:19:20
- -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722266604; x=1722871404;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ug6pUn7w8BPfCU3F0BD0f8l6pYsg9PaPyBynog0myRk=;
+        b=UbJC1fS+6ouoMYTIY5pCiFhKtdIg5ghdtaLfBWP+2vQ06bDcXVnVs6Zspaaf6QJxoE
+         ee29SZ9oj3xMkTl1/dfJRtUcGyKVzdN0fFeisQFGifj8P7y7upXkqQVXpqOvvCH1wBGA
+         T9B70ZeyO2SOlQFUSR0im8TuOV+a4xyX8L4BH4zDssQ47TdwK32lU9b4UmJFLU7ctmhC
+         03Dkj6ksMs1Id2YTInFvDCbl5stXyMGzVpaquP16Je37NikS4oomTCfF7KNTVqBNr1fh
+         5HEvGhm1Eyf+DZ6jHNdA0cyoz1BEBNQfisvhMjK7pPSapaJesf+kn2mxFV+NH1JOk1Rr
+         T0ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkVUOz1FxbrebzQXaJ/+zLVA6U5qICuJcM1Qms+tVkSv4gIKY3SHApTf6xck9Sqs7mBG8aqJkhpDKngYANF5g95RaScXms
+X-Gm-Message-State: AOJu0YytK02HJYanFnSSaUyteYRI7lqipGIZ2VZ2T5qVniMhv96O799b
+	rEtkZPorXUnD/tZuGRGHSeoYrsql43niR0waYP2jC7yL2dF07KuUBRhUjeZzrUPSC+T1kdujTgU
+	nbMkXP5Vv7kskiI3obhRr34McbqhaEYL1Q8Yd1zknofhTK7SIz7GVh9c=
+X-Google-Smtp-Source: AGHT+IFrRIj/C3ns4WiWQ7hSHn7roIVoQmhlw74yzJcq7hLTEbmG5h/INNA8BTlF5kIDTscFN5JlrUDfbgpQS/9Uo57Ffbqn76qP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240726204105.1466841-1-quic_subashab@quicinc.com> <CADVnQynKT7QEhm1WksrNQv3BbYhTd=wWaxueybPBQDPtXbJu-A@mail.gmail.com>
-In-Reply-To: <CADVnQynKT7QEhm1WksrNQv3BbYhTd=wWaxueybPBQDPtXbJu-A@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 29 Jul 2024 17:19:08 +0200
-Message-ID: <CANn89i+eVKrGp2_xU=GsX5MDDg6FZsGS3u4wX2f1qA7NnHYJCg@mail.gmail.com>
-Subject: Re: [PATCH net v2] tcp: Adjust clamping window for applications
- specifying SO_RCVBUF
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>, soheil@google.com, yyd@google.com, 
-	ycheng@google.com, davem@davemloft.net, kuba@kernel.org, 
-	netdev@vger.kernel.org, dsahern@kernel.org, pabeni@redhat.com, 
-	Sean Tranchetti <quic_stranche@quicinc.com>
+X-Received: by 2002:a05:6638:264f:b0:4c2:8e08:f579 with SMTP id
+ 8926c6da1cb9f-4c63f1e9e23mr360973173.2.1722266603795; Mon, 29 Jul 2024
+ 08:23:23 -0700 (PDT)
+Date: Mon, 29 Jul 2024 08:23:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000020c8d0061e647124@google.com>
+Subject: [syzbot] [net?] INFO: task hung in addrconf_dad_work (5)
+From: syzbot <syzbot+82ccd564344eeaa5427d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 4:51=E2=80=AFPM Neal Cardwell <ncardwell@google.com=
-> wrote:
->
-> On Fri, Jul 26, 2024 at 4:41=E2=80=AFPM Subash Abhinov Kasiviswanathan
-> <quic_subashab@quicinc.com> wrote:
-> >
-> > tp->scaling_ratio is not updated based on skb->len/skb->truesize once
-> > SO_RCVBUF is set leading to the maximum window scaling to be 25% of
-> > rcvbuf after
-> > commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> > and 50% of rcvbuf after
-> > commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio").
-> > 50% tries to emulate the behavior of older kernels using
-> > sysctl_tcp_adv_win_scale with default value.
-> >
-> > Systems which were using a different values of sysctl_tcp_adv_win_scale
-> > in older kernels ended up seeing reduced download speeds in certain
-> > cases as covered in https://lists.openwall.net/netdev/2024/05/15/13
-> > While the sysctl scheme is no longer acceptable, the value of 50% is
-> > a bit conservative when the skb->len/skb->truesize ratio is later
-> > determined to be ~0.66.
-> >
-> > Applications not specifying SO_RCVBUF update the window scaling and
-> > the receiver buffer every time data is copied to userspace. This
-> > computation is now used for applications setting SO_RCVBUF to update
-> > the maximum window scaling while ensuring that the receive buffer
-> > is within the application specified limit.
-> >
-> > Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> > Signed-off-by: Sean Tranchetti <quic_stranche@quicinc.com>
-> > Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.co=
-m>
-> > ---
-> > v1 -> v2
-> >   Update the condition for SO_RCVBUF window_clamp updates to always
-> >   monitor the current rcvbuf value as suggested by Eric.
-> >
-> >  net/ipv4/tcp_input.c | 23 ++++++++++++++++-------
-> >  1 file changed, 16 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > index 454362e359da..e2b9583ed96a 100644
-> > --- a/net/ipv4/tcp_input.c
-> > +++ b/net/ipv4/tcp_input.c
-> > @@ -754,8 +754,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
-> >          * <prev RTT . ><current RTT .. ><next RTT .... >
-> >          */
-> >
-> > -       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) &&
-> > -           !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-> > +       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf)) {
-> >                 u64 rcvwin, grow;
-> >                 int rcvbuf;
-> >
-> > @@ -771,12 +770,22 @@ void tcp_rcv_space_adjust(struct sock *sk)
-> >
-> >                 rcvbuf =3D min_t(u64, tcp_space_from_win(sk, rcvwin),
-> >                                READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_=
-rmem[2]));
-> > -               if (rcvbuf > sk->sk_rcvbuf) {
-> > -                       WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
-> > +               if (!(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-> > +                       if (rcvbuf > sk->sk_rcvbuf) {
-> > +                               WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
-> >
-> > -                       /* Make the window clamp follow along.  */
-> > -                       WRITE_ONCE(tp->window_clamp,
-> > -                                  tcp_win_from_space(sk, rcvbuf));
-> > +                               /* Make the window clamp follow along. =
- */
-> > +                               WRITE_ONCE(tp->window_clamp,
-> > +                                          tcp_win_from_space(sk, rcvbu=
-f));
-> > +                       }
-> > +               } else {
-> > +                       /* Make the window clamp follow along while bei=
-ng bounded
-> > +                        * by SO_RCVBUF.
-> > +                        */
-> > +                       int clamp =3D tcp_win_from_space(sk, min(rcvbuf=
-, sk->sk_rcvbuf));
-> > +
-> > +                       if (clamp > tp->window_clamp)
-> > +                               WRITE_ONCE(tp->window_clamp, clamp);
-> >                 }
-> >         }
-> >         tp->rcvq_space.space =3D copied;
-> > --
->
-> Is this the correct place to put this new code to update
-> tp->window_clamp? AFAICT it's not the correct place.
->
-> If a system administrator has disabled receive buffer autotuning by
-> setting `sysctl net.ipv4.tcp_moderate_rcvbuf=3D0`, or if (copied <=3D
-> tp->rcvq_space.space), then TCP connections will not reach this new
-> code, and the window_clamp will not be adjusted, and the receive
-> window will still be too low.
->
-> Even if a system administrator has disabled receive buffer autotuning
-> by setting `sysctl net.ipv4.tcp_moderate_rcvbuf=3D0`, or even if (copied
-> <=3D tp->rcvq_space.space), AFAICT we still want the correct receive
-> window value for whatever sk->sk_rcvbuf we have, based on the correct
-> tp->scaling_ratio.
->
-> So AFAICT the correct place to put this kind of logic is in
-> tcp_measure_rcv_mss(). If we compute a new scaling_ratio and it's
-> different than tp->scaling_ratio, then it seems we should compute a
-> new window_clamp value using sk->sk_rcvbuf, and if the new
-> window_clamp value is different then we should WRITE_ONCE that value
-> into tp->window_clamp.
->
-> That way we can have the correct tp->window_clamp, no matter the value
-> of net.ipv4.tcp_moderate_rcvbuf, and even if (copied <=3D
-> tp->rcvq_space.space).
->
-> How does that sound?
+Hello,
 
-Can this be done without adding new code in the fast path ?
+syzbot found the following issue on:
 
-Otherwise, I feel that we send a wrong signal to 'administrators' :
-"We will maintain code to make sure that wrong sysctls settings were
-not so wrong."
+HEAD commit:    dc1c8034e31b minmax: simplify min()/max()/clamp() implemen..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=135baf03980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8b0cca2f3880513d
+dashboard link: https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Are you aware of anyone changing net.ipv4.tcp_moderate_rcvbuf for any
-valid reason ?
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/29a310f3ad21/disk-dc1c8034.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4d35d3afb396/vmlinux-dc1c8034.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ed329ce5166e/bzImage-dc1c8034.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+82ccd564344eeaa5427d@syzkaller.appspotmail.com
+
+INFO: task kworker/u8:2:35 blocked for more than 143 seconds.
+      Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/u8:2    state:D stack:20272 pid:35    tgid:35    ppid:2      flags:0x00004000
+Workqueue: ipv6_addrconf addrconf_dad_work
+
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5188 [inline]
+ __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
+ __schedule_loop kernel/sched/core.c:6606 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6621
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ addrconf_dad_work+0xd0/0x16f0 net/ipv6/addrconf.c:4194
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: task dhcpcd:4884 blocked for more than 144 seconds.
+      Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:dhcpcd          state:D stack:21632 pid:4884  tgid:4884  ppid:1      flags:0x00000002
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5188 [inline]
+ __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
+ __schedule_loop kernel/sched/core.c:6606 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6621
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ genl_lock net/netlink/genetlink.c:35 [inline]
+ genl_op_lock net/netlink/genetlink.c:60 [inline]
+ genl_rcv_msg+0x121/0xec0 net/netlink/genetlink.c:1209
+ netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f2/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x223/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
+ ___sys_sendmsg net/socket.c:2651 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fa250dd6a4b
+RSP: 002b:00007fff5e4c9d68 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00005616070a494f RCX: 00007fa250dd6a4b
+RDX: 0000000000000000 RSI: 00007fff5e4c9db0 RDI: 0000000000000010
+RBP: 00007fff5e4ce8a8 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000010
+R13: 00007fff5e4cde10 R14: 0000000000000000 R15: 0000561624964ba0
+ </TASK>
+INFO: task kworker/1:11:6096 blocked for more than 146 seconds.
+      Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/1:11    state:D
+ stack:19768 pid:6096  tgid:6096  ppid:2      flags:0x00004000
+Workqueue: events linkwatch_event
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5188 [inline]
+ __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
+ __schedule_loop kernel/sched/core.c:6606 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6621
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ linkwatch_event+0xe/0x60 net/core/link_watch.c:276
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: task kworker/1:0:9989 blocked for more than 148 seconds.
+      Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:kworker/1:0     state:D stack:21208 pid:9989  tgid:9989  ppid:2      flags:0x00004000
+Workqueue: events switchdev_deferred_process_work
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5188 [inline]
+ __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
+ __schedule_loop kernel/sched/core.c:6606 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6621
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ switchdev_deferred_process_work+0xe/0x20 net/switchdev/switchdev.c:104
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2e/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+INFO: task syz-executor:12923 blocked for more than 149 seconds.
+      Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D
+ stack:20992 pid:12923 tgid:12923 ppid:1      flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5188 [inline]
+ __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
+ __schedule_loop kernel/sched/core.c:6606 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6621
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ rtnl_lock net/core/rtnetlink.c:79 [inline]
+ rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6644
+ netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2550
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f2/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x223/0x270 net/socket.c:745
+ __sys_sendto+0x3a4/0x4f0 net/socket.c:2204
+ __do_sys_sendto net/socket.c:2216 [inline]
+ __se_sys_sendto net/socket.c:2212 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2212
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f365877902c
+RSP: 002b:00007ffd4ffb8c30 EFLAGS: 00000293
+ ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f3659434620 RCX: 00007f365877902c
+RDX: 0000000000000020 RSI: 00007f3659434670 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007ffd4ffb8c84 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
+R13: 0000000000000000 R14: 00007f3659434670 R15: 0000000000000000
+ </TASK>
+INFO: task syz-executor:13157 blocked for more than 151 seconds.
+      Not tainted 6.11.0-rc1-syzkaller-00004-gdc1c8034e31b #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D
+ stack:19152 pid:13157 tgid:13157 ppid:1      flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5188 [inline]
+ __schedule+0x1800/0x4a60 kernel/sched/core.c:6529
+ __schedule_loop kernel/sched/core.c:6606 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6621
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6678
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a4/0xd70 kernel/locking/mutex.c:752
+ wg_set_device+0x102/0x2160 drivers/net/wireguard/netlink.c:504
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb16/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f2/0x990 net/netlink/af_netlink.c:1357
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
