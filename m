@@ -1,87 +1,68 @@
-Return-Path: <netdev+bounces-113540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9B093EED2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 09:45:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE9793EF7D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DF532826F6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 07:45:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26ABC282CE7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA98712BF23;
-	Mon, 29 Jul 2024 07:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BF4137776;
+	Mon, 29 Jul 2024 08:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeLynTjq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w7/Ma9e2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA2712BF30
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 07:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7E2328B6;
+	Mon, 29 Jul 2024 08:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722239021; cv=none; b=bIquI3kMQHXo1OTaqU7b8+S2VhKWcUR6LCVffTfAWT+yKoycxrQM2ooJVTi/kiNpd3o1VKrSHHYZ+xyk9twWCXQxuWFrRaLzy8xRXYxBWW8Dtx2vTdXKx2fx/v4seD1YL9IrIp1b+s6YHv8EOOul6QXn+Di+iKmkwhUGYxCohLY=
+	t=1722240656; cv=none; b=qRgcwX9Dpf2XJF5P2oxFY0mt1MROJEMQa5lX+t2EHwx2Wq3gckbimElo+cwjxcJQoTnjPlK/3+Rk6fZ7RM1489s7qeH8bVaF8hg0hYkN84fndqiIRTHLr6AnH8E75FjITnV0kDzXHcp5C1iUTa5ocP77vuit0HgPsapnzsOq91Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722239021; c=relaxed/simple;
-	bh=Nc7Tir2M4E76sYAdq9eOQME2m1X4fk8R0qZhUBVzsFo=;
+	s=arc-20240116; t=1722240656; c=relaxed/simple;
+	bh=R63FGz1kBtLadER7X9II9B6WGjgDISpSFFA71Gvujao=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bWXWGBVrZIWj9yRzdoFiFiSXwFpEfN9YsBPuPa51WOaV8tAw5ATMoet305fO3l0mRPYBu1vMNEkFH1tsVV2gh5rEP4eeLSCHwCWble1zmHBpQPzsXzNKRQ2Su7KlyZWDsa8jlvrJgibzanexKziYp4IWdpWZyz0P9HSm555R6yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eeLynTjq; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7092fb4317dso2036247a34.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 00:43:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722239019; x=1722843819; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jfIWETwmMusUNn+SIzxCLsgyLJq3bGLMV71fuYjqIMg=;
-        b=eeLynTjq36AO6FcXRnOhxAVULVeUfXCEOxoYvHhUd7pQc2bwD7kzjsaWTlOWH/E4Hf
-         ks0ntxJAkHWrezkz+K4H+mhlojmgbm7AgnpZGASAavoa80oo1TsLTqTYDekHj6UVxN76
-         R9ipfgSLLgK2jHKZFHb3S7ATzMjph+OgZEukEOjZrNIo/FwAH55Q7yMhw6Ex+To7kR01
-         4zuB4hxJyU/NrnLpPh6n136HRAJ1HvNW2pxaEY6ZPHi0NrVaFoQvOdv6gFSe0i4p1lUm
-         V+MTJUwkdh56Zs/5ws/h0eczFjbklU/Pi70wZwdmpFEe17wCeLWuMJ0jo+plEih+8WIJ
-         YN7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722239019; x=1722843819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jfIWETwmMusUNn+SIzxCLsgyLJq3bGLMV71fuYjqIMg=;
-        b=kcpNj0ppxGSbzNmo/53b67l2mJyjcRNaxkIe/emEVo/ykzmr4PJDD9javrMcals6Hq
-         nIuCd0OvhPx6GqJDvNqgOZASHwL14cSRR6hOnBmzEIm9p0l3Cq9gdpZtsKPUhy2JbOC7
-         Ndx3WPFxSBagTPO843FU46VK2hS5zRe5A+1mCYFv9hEYOHkoFHWn5ACB/XHp/Z6Zshlc
-         z/0ezkoceXB+umnuoBTS/hHiRJBWA2ntjPUHT5SCaDylDW+4HlbwwcqB18wdNnLXstAC
-         6qU+ZFaiFDUA94ro2iUvp8qDNBSTJ2myHAZm1nzqSi9TzXjybsFqBKX4/6sBFJyTpgNn
-         CB0A==
-X-Gm-Message-State: AOJu0Yw81X+C9F8jnoDzSqffH897Xfs6GVFmLX0YYUoRPQ9NlQlRqWYw
-	xj/VmAY7aAXEhwbDuOi2P5Lvslhs5HpjjjfzR72YurIeJsAKj5s3bpCUHtoe
-X-Google-Smtp-Source: AGHT+IGxS81nHi9tcVAHFpIrOgAaPFp4g8GLxNz7Khl8d1Insgsn8XQ0z0eseC6btdgD0f8ekWQ8JQ==
-X-Received: by 2002:a05:6830:358e:b0:708:b40a:fecc with SMTP id 46e09a7af769-70940c04016mr6701139a34.1.1722239019266;
-        Mon, 29 Jul 2024 00:43:39 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:7827:1770:9c43:581a:1588:e579])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f817aebasm6740225a12.28.2024.07.29.00.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 00:43:38 -0700 (PDT)
-Date: Mon, 29 Jul 2024 15:43:31 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCHv3 net-next] bonding: 3ad: send ifinfo notify when mux
- state changed
-Message-ID: <ZqdIIy7H_57MimwE@Laptop-X1>
-References: <Zn1mXRRINDQDrIKw@Laptop-X1>
- <1467748.1719498250@famine>
- <Zn4po-wJoFat3CUd@Laptop-X1>
- <efd0bf80-7269-42fc-a466-7ec0a9fd5aeb@blackwall.org>
- <8e978679-4145-445c-88ad-f98ffec6facb@blackwall.org>
- <Zn6Ily5OnRnQvcNo@Laptop-X1>
- <1518279.1719617777@famine>
- <ZoOzge5Xn42QtG91@Laptop-X1>
- <Zo9NtDv8ULtbaJ_k@Laptop-X1>
- <ZpoLgQtZG5m8gU3L@Laptop-X1>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsKSe1xXcIRicimDShKJSyuf39rbE4TIhZvlGOCMUjFyvAl9D5etbDivWdO7v8kXbOMhAouKiPLQWzv9vRtik0jxZ/kdbg4uYlzcSa8z6zW5gjGSNPAxdXMcTC9V0u8v5YCozET4ihTXA521IhYFqDa+8raJtkj688nM9xbWwX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w7/Ma9e2; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gCxzdAMkj/8OkdO71mENFkZ1HghwlMtrsU5cRTlyXeY=; b=w7/Ma9e2mk8elAHKm9HZzrgVwj
+	QyZh7GBLYgZbPrkgCz8n6m4zW4ZGrE2b49n6GlkZ/W3EE+mAhU252WQ+EbsdeqY9IRizI1Tp/DAv6
+	uvWo+lgDSTQUSqcTSvqG3RaIBpHLG0l5rmSuaNTVTM2olOQi1fd7Kfa8196/KlRqgTitKY12pMPDy
+	uQspEGu4TDqlfqURhPHbwioucuWGOiXQSS+PtEVOMcoXlODdzxl0XK417YE2ZcNCZ/d8ChsyQ9gB5
+	d8awxUyADD+9bonDTOLhohZ3Z/WgcFhBkEWODR9n8700gyfBSY6xFanCT9d8gtZzcsxdHfwPJXCJH
+	I+ww4JGw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51930)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sYLLx-0003MA-1C;
+	Mon, 29 Jul 2024 09:03:33 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sYLLy-00049D-Fy; Mon, 29 Jul 2024 09:03:34 +0100
+Date: Mon, 29 Jul 2024 09:03:34 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Youwan Wang <youwan@nfschina.com>
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	hkallweit1@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [net-next,v2] net: phy: phy_device: fix PHY WOL enabled, PM
+ failed to suspend
+Message-ID: <ZqdM1rwbmIED/0WC@shell.armlinux.org.uk>
+References: <b61cae2b-6b94-465e-b4e4-6c220c6c66d9@lunn.ch>
+ <20240709113735.630583-1-youwan@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,25 +71,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZpoLgQtZG5m8gU3L@Laptop-X1>
+In-Reply-To: <20240709113735.630583-1-youwan@nfschina.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Jul 19, 2024 at 02:45:25PM +0800, Hangbin Liu wrote:
-> On Thu, Jul 11, 2024 at 11:12:58AM +0800, Hangbin Liu wrote:
-> > On Tue, Jul 02, 2024 at 04:00:06PM +0800, Hangbin Liu wrote:
-> > > > 	Looking at the current notifications in bonding, I wonder if it
-> > > > would be sufficient to add the desired information to what
-> > > > bond_lower_state_changed() sends, rather than trying to shoehorn in
-> > > > another rtnl_trylock() gizmo.
-> > > 
-> > > I'm not sure if the LACP state count for lower state. What do you think of
-> > > my previous draft patch[1] that replied to you.
-> > > 
-> > > [1] https://lore.kernel.org/netdev/Zn0iI3SPdRkmfnS1@Laptop-X1/
+On Tue, Jul 09, 2024 at 07:37:35PM +0800, Youwan Wang wrote:
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 2ce74593d6e4..0564decf701f 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -270,6 +270,7 @@ static DEFINE_MUTEX(phy_fixup_lock);
+>  
+>  static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+>  {
+> +	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+>  	struct device_driver *drv = phydev->mdio.dev.driver;
+>  	struct phy_driver *phydrv = to_phy_driver(drv);
+>  	struct net_device *netdev = phydev->attached_dev;
+> @@ -277,6 +278,15 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+>  	if (!drv || !phydrv->suspend)
+>  		return false;
+>  
+> +	/* If the PHY on the mido bus is not attached but has WOL enabled
+> +	 * we cannot suspend the PHY.
+> +	 */
+> +	phy_ethtool_get_wol(phydev, &wol);
+> +	phydev->wol_enabled = !!(wol.wolopts);
+> +	if (!netdev && phydev->wol_enabled &&
+> +	    !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
+> +		return false;
+> +
 
-Hi Jay,
+We now end up with two places that do this phy_ethtool_get_wol()
+dance. Rather than duplicating code, we should use a function to
+avoid the duplication:
 
-I hope I can get some of your comments.
+8<===
 
-Thanks
-Hangbin
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next] net: phy: add phy_drv_wol_enabled()
+
+Add a function that phylib can inquire of the driver whether WoL has
+been enabled at the PHY.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy_device.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 19f8ae113dd3..09f57181b8a6 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1433,6 +1433,15 @@ static bool phy_drv_supports_irq(const struct phy_driver *phydrv)
+ 	return phydrv->config_intr && phydrv->handle_interrupt;
+ }
+ 
++static bool phy_drv_wol_enabled(struct phy_device *phydev)
++{
++	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
++
++	phy_ethtool_get_wol(phydev, &wol);
++
++	return wol.wolopts != 0;
++}
++
+ /**
+  * phy_attach_direct - attach a network device to a given PHY device pointer
+  * @dev: network device to attach
+@@ -1975,7 +1984,6 @@ EXPORT_SYMBOL(phy_detach);
+ 
+ int phy_suspend(struct phy_device *phydev)
+ {
+-	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+ 	struct net_device *netdev = phydev->attached_dev;
+ 	const struct phy_driver *phydrv = phydev->drv;
+ 	int ret;
+@@ -1983,8 +1991,9 @@ int phy_suspend(struct phy_device *phydev)
+ 	if (phydev->suspended || !phydrv)
+ 		return 0;
+ 
+-	phy_ethtool_get_wol(phydev, &wol);
+-	phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
++	phydev->wol_enabled = phy_drv_wol_enabled(phydev) ||
++			      (netdev && netdev->wol_enabled);
++
+ 	/* If the device has WOL enabled, we cannot suspend the PHY */
+ 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
+ 		return -EBUSY;
+-- 
+2.30.2
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
