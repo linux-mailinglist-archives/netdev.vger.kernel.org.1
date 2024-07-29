@@ -1,488 +1,233 @@
-Return-Path: <netdev+bounces-113847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72EF940120
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 00:36:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A13D940134
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 00:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28D23B218E0
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:36:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E88D1C221E3
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBF418FDDF;
-	Mon, 29 Jul 2024 22:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2ED518E769;
+	Mon, 29 Jul 2024 22:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hiJ1xHd5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mxEvYNi1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B4D18FDB1
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 22:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722292491; cv=none; b=VwZsx5rhYacceZlRKAKZ5AmyvWQwwPLPt1Cmm+TkYpVaNGUioT1J9ZDRQ78g5O4WoUY+tCYGi6EO+uc8onAqs3jSjcq5qr0sizmChkvDXwBdmnAQUrPNc4KlVOXyxMTubTPIP8PgPfh76iMsviHFFXAPkbfLQZiPA4ec5Ve77bs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722292491; c=relaxed/simple;
-	bh=TH4BGObhxBOGUpT94UGGzkwpn+1TP9/jRTFJUD4ffFU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dXg5QfAGegrsLJEaxoCbbMdsJU2kBwI+NPwR5f/eQMBFGcXwFfKwBfvrc+GCrus73j3OhB+1NuufCPA8xqqoG2+5JHqrLeADNFA54b6zHVXmduuziLubcOmEt3XCTnFziVXCfC913tsiNLY178fSF3CINojV+s/cuz+CXBtv0Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hiJ1xHd5; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074E618FDC4;
+	Mon, 29 Jul 2024 22:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722292639; cv=fail; b=ZZCN9B0qZUOy44S6S0HIOC3jCUOLZj0LUp3HZf/YmHJ4OHkLTBZ0fTN3ut32aSOQk8AT67+vzK/zwc2s23vTQoahHBWGAbBXGhdO+4CWYvw8y1S/Pk4ztw/8s4p6l+CobV65qbXjaHz3WawdLkgTtfdQ44SXc4mjANsd+YRfZ1Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722292639; c=relaxed/simple;
+	bh=FsXQM/1sNJjXNQH2NGU4UAmYIcwP/NCLarnnykauye8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=H0D8CDil8vR/Be57tY/hf7FcdJX2u1Bas/nRkZkpMUneGYHLavSHd5bMS0cvewjDSGa8rTDKGY4zjH7+Q0H1kVvDqcSIjGbjsQXm9LUeaM/M1Y6JN3D1N2fwYtUhMCADZlHOGZui0SMXb59oDP0HQY9dBAQLoaFrhg2wOzIUPcA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mxEvYNi1; arc=fail smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722292489; x=1753828489;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TH4BGObhxBOGUpT94UGGzkwpn+1TP9/jRTFJUD4ffFU=;
-  b=hiJ1xHd5+3BXIOQ5IaPC3p8orCtx+cWZwK4fW2pbS98Amexe2YLDcMsc
-   9C0BcBDThntaxrkUlXaa2XmiH94MvDczX1AkNHEuJS2OmumTaUOEVANtw
-   qOTBC2TnZlh7mUCcJ3OCQuAqI19Fiz2Xfe7nigrPjErvs+nFzCAdqQtAV
-   W7LPwXBRW3dr7CyfCw5lOcXkivmp12kDoaTtw/Z8FeIDYOdRwCCvMzTJ4
-   wvIbk98n7rAeF7tWvvJAUWxl83CpKd0WeMG2CKRTjOS8VKET5TxlRRCn4
-   wRHqPQVD1RGLWqQUXKDRVE1/Cdcskfly5nRMSJthJkRAmcn9NeMYix0SM
+  t=1722292638; x=1753828638;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=FsXQM/1sNJjXNQH2NGU4UAmYIcwP/NCLarnnykauye8=;
+  b=mxEvYNi104ATTwilFfc1jUCnMeFSghxX7FNx8mS4Yq7oDlV0yGIAPpYS
+   +Vlx4upq7wNDmSX3NMFB7wofb6mQayO8MDcOJW54J7hGnw1tbG8Nt7vOo
+   /irB0sDXBbtWXanLFCmj/Qh5yiQks4dez41KvKwZ/hUAA65WhJz97XuRw
+   SP5LMmJqVChqGe8Vh1bh/Y5M1t4T4cgL7PxQsBmukCsADKBE2q110lrHU
+   hYgQLLL4yMpP3Hw2tEoWCYLHT0WSZ9saBpslD1cn1rPvNe5gEfLnnfHEg
+   OAjbUb6y/OS7Nl8VUebUYCNxwYQ+zfdlAoSGXw0lSjMU4osFriOLOBTt/
    g==;
-X-CSE-ConnectionGUID: +nqG9EAnQaup73OjjLajHw==
-X-CSE-MsgGUID: 0cNOg5MGRs2IrLXiUcZDlg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11148"; a="20216859"
+X-CSE-ConnectionGUID: ygWsFDEdS1OUKSXJwb3qTA==
+X-CSE-MsgGUID: SMmyKbxvQwS1RpcLfLQbng==
+X-IronPort-AV: E=McAfee;i="6700,10204,11148"; a="20206796"
 X-IronPort-AV: E=Sophos;i="6.09,247,1716274800"; 
-   d="scan'208";a="20216859"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 15:34:43 -0700
-X-CSE-ConnectionGUID: qapJzE9UQxOtQineOzDWAA==
-X-CSE-MsgGUID: qTYd8e/9SZmCHu4TumoxQw==
+   d="scan'208";a="20206796"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 15:37:18 -0700
+X-CSE-ConnectionGUID: 0vXWiET6SQynTCj88hIrGw==
+X-CSE-MsgGUID: DdCyr1sKRguHW2YvL9LMAQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,247,1716274800"; 
-   d="scan'208";a="77344609"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 29 Jul 2024 15:34:42 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Piotr Raczynski <piotr.raczynski@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <horms@kernel.org>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 15/15] ice: allow to activate and deactivate subfunction
-Date: Mon, 29 Jul 2024 15:34:30 -0700
-Message-ID: <20240729223431.681842-16-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240729223431.681842-1-anthony.l.nguyen@intel.com>
-References: <20240729223431.681842-1-anthony.l.nguyen@intel.com>
+   d="scan'208";a="54006802"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Jul 2024 15:37:17 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 29 Jul 2024 15:37:16 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 29 Jul 2024 15:37:16 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 29 Jul 2024 15:37:16 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 29 Jul 2024 15:37:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sdIs3AReN7uKOESr8hd2I8GJV/Axfb+2561ikMFnzurkxvTxskxc2Ajw0GgiMAejW4q0H2gkY7zICVThzSLsrpOtrj0EHkDqRHusoQJzAp+oIBlKA5qx8U4ZyUswiBoj5SXI3fzLXcW7VNf+CRGPkpVl4DIXArU3lXwFdamMrezJTUx2YUrp/8gw+B5FLG9NccWnyVu7ioGP5hK1N/M+ueSxR8CHGhUXKbIFueA0qPToqxR3j7EgAcYfULVfYte8eQ+WdRMhSt0gqi4glOs8qNDrQAEEsrcLidxtcsQVV8PpaQ9JKCp8ZaZZniRF8nRDSe33I5q48C1ATqR7/h+xHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Iq9gHLaFeFeBbHhht+GsDZNBrDe97cq5MS4qBvjBBa8=;
+ b=KkpH4wAdT6xgM6NvytqkezI85FiGgCwp6kD/DH2daqWWTWGQo8m/0NWdawrzlxia8RtteIaF3nSrB2jdXtcjHFGh3+0zHaDawaa0I9lOjInOorufKvsj/dhmhqcmbRGV9TdfkIP2TT7UkN00TJVLdneV33ATdEtroItDYaEPszkxXuqYz9okw6px4MYkp5+RtcooJmUh8gJ2bbuDIiuHNd00k7xTh6kp3ox0KFflZxMes4qOli/uSWTx5itWP+XR33o0WO41iQXcp+ChCCpKAzhGhvMQG8u/iZWSpudl7uuuOsQW/J7G7JC3L5cBb4ecoQyNQxKHx7g1fD3zI8wmMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by CO1PR11MB5169.namprd11.prod.outlook.com (2603:10b6:303:95::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Mon, 29 Jul
+ 2024 22:37:13 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.7807.009; Mon, 29 Jul 2024
+ 22:37:13 +0000
+Date: Mon, 29 Jul 2024 15:37:10 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Cameron
+	<Jonathan.Cameron@huawei.com>
+CC: Dan Williams <dan.j.williams@intel.com>, <ksummit@lists.linux.dev>,
+	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <shiju.jose@huawei.com>, Borislav Petkov
+	<bp@alien8.de>, Mauro Carvalho Chehab <mchehab@kernel.org>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <66a81996d4154_2142c29464@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240729134512.0000487f@Huawei.com>
+ <20240729154203.GF3371438@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240729154203.GF3371438@nvidia.com>
+X-ClientProxiedBy: MW4PR04CA0074.namprd04.prod.outlook.com
+ (2603:10b6:303:6b::19) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CO1PR11MB5169:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ded9be8-7b75-47de-ad6d-08dcb01efdd0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?oMNQhL4orPx73ct0kRm8XErXhslReLXpObmcW90pnHJNWMIXo5CGPv+EFnqY?=
+ =?us-ascii?Q?6OVytnD/vzVntQJR/rf3gmGu22H4ckCGmF+zVKeB8myKqOtlaDePtLdsq7Sb?=
+ =?us-ascii?Q?r6AA7TMJ0WYl+ygIQX/qWDCHJZ2DBYbWoK4S7oLlSVdjOYuqhAbBP37Xv/2W?=
+ =?us-ascii?Q?OwNaexYIFj6yZjCpvIuV/t6caAH65sFiUlgRGWexB48eIYA0wnhmGboa2pFh?=
+ =?us-ascii?Q?LGKSQnU8Kokvo5Lmg+dTynhS8svqK2xecs3HpkqTjqH1YVorD0xJrVjUidWV?=
+ =?us-ascii?Q?YHWAPg87av43fkXuzztpJeZDzSGi8uMSqB3l7bs4W6B1EdV9gEYQMrciKWgS?=
+ =?us-ascii?Q?IHKTmELgahXhiYuU2LcRH1TfblP5yXGEd58LKYo04JrocnUQmoXobmvjNz3u?=
+ =?us-ascii?Q?oLAX5tbOgEQ8M6p0oiULqMXjYQHm7ab25OEVmzFXmeS8xivK4oN64+y00i5j?=
+ =?us-ascii?Q?VL62duldKCaTFNhs73yTYBckD4UsBSbsuU8MLUvP0yjxrgD/RXBtTsfWVNsT?=
+ =?us-ascii?Q?837kNy2aEOebIOueIpExpNsA/gb62eojVp+jUpuACWVN/jbHUQuCwbZlQkga?=
+ =?us-ascii?Q?9v47Lb2qYUQ6IsvovMOUSB0DJPr+VI4SOHsXl7yBVuZ1vEu3g6EjnP3LKpp0?=
+ =?us-ascii?Q?O4I/l70Mm5t51WQvrJeCyEt4SgkWVA73vtzs18UG4W0+hNlsG8geYndm+9uz?=
+ =?us-ascii?Q?L5P7RqrpCyLpQ/4Y0Xy5QDY+IWybJirc8Jhpdey6YzQYhK7xe9D6lOMTFus2?=
+ =?us-ascii?Q?h+XB+GxNGyxHznYgE4wMxodTddBs9BBi4WdQxrC8qGmHPCvkMh6AP1fC2Z8G?=
+ =?us-ascii?Q?fwvQyC0zPn0XS0u8LPKXJFStkxPze2PhCgdhrPMRUXaHBK1r71qXlANzqUUr?=
+ =?us-ascii?Q?SKLYQ9EBvk//Qnyr8UjMy2xz7aLlcpimdRBYJyvUkemcvZ51AP7aF8AuavBG?=
+ =?us-ascii?Q?+Pdr0A89ILVZwnA9bxCYjLHdOhv8dRfeoCICD0XH6KGeQwqPldwNA4zajg0Z?=
+ =?us-ascii?Q?FyoqTIZ2lokfmDGgHe63CdeuTho427KmOlLa9ZYD9YmeVgnIL/9y1Do4cc/C?=
+ =?us-ascii?Q?0GyEPm15078huVskEi1AWwYmKKiRVgYt5Vf9UBxHuWLs6rSK4qylF5DsTVYF?=
+ =?us-ascii?Q?Mwmxe0B0iJwFwKx/+BaXOvN+sjOWHRS7YxIFeNCN/l1MicD/sgiRgKbAY9Lv?=
+ =?us-ascii?Q?ovABNmwHg1lDlK83PCc8fteNflbJurHfvy1kGtXNKop+N89xejilaDUVTog/?=
+ =?us-ascii?Q?LvSX94E/p2tzSdrxZ9eKtTWux+/niDtMW+pKN0ymMyhvqaPH0MKosZg8PnpZ?=
+ =?us-ascii?Q?eIqa3WovI3hNejWzHgBc4fa7VgFkNBp2ocUAU3e+yzufYg=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NKzPXXDgtLh1QBjCc5Y1Jwu5elREMAjzc1vIs9/hCu131LhuUzRh8vohiQIN?=
+ =?us-ascii?Q?zKuE/heB9fiyC7+MA8hxIdizx+3N3MN8ZXVx4Dm+z3IuV/W+U4EhJ00hu9eh?=
+ =?us-ascii?Q?M+qK2zZp4lg7pwMZZ3dW9CmZNNI5az32E6S6/BF9iwDCG2wSbAr5/SjyqgoM?=
+ =?us-ascii?Q?ZuF3+kbwX/DpAArPgb4hSOFr7ilKHVFlKXxlK8dc54+emkvvRmJJRhF5qzmK?=
+ =?us-ascii?Q?uT182krzB1qVNeFCooXnyrcUlbZeFwWyFlUcnSHVv5Njku2UoVCo/u1L3Oj5?=
+ =?us-ascii?Q?CjsTjTBNWLHg5oaYIgsme79BXPsEEUA9Zb0gLUZe0fZ+l88KntEIoMr699qU?=
+ =?us-ascii?Q?hEHMocbNAh0iSzk/KFUXup2dYAJx8DXttieAUywrXo2q/XRVqXizFhXAnKsD?=
+ =?us-ascii?Q?KMnF1MGIpUQOiazf5pozR6oI6+PapgeyQ8WfFECDToi7o7i+X5309m2Z8Dja?=
+ =?us-ascii?Q?d76vgQVEe7d4oJ4NhjinF5G4YTLzHDyKTbmTCnRIylHEycQ/h5UJSajLLOzr?=
+ =?us-ascii?Q?+4HulmDEqRpS0fUXyDzL+qQvtx7c5BfsKySuKF1fz2pomHTAe2A0rNhWJBrn?=
+ =?us-ascii?Q?6xhFWWsDXmilH/4O678ovAIiOOlpBv/0gRz+mGuQxgIagIMF3NPwT+6JpOJ9?=
+ =?us-ascii?Q?XZptoaXBQeciPjCkFMNJM6oTT0z3/T8lstqgUM3S+6vV9tl3KpRqjJB4M0nE?=
+ =?us-ascii?Q?ifhUFIr+4EYpSuZYYaGPuztaNqXZH/pnCTXnUVVKrE77BCAG65NYEsqzR/NI?=
+ =?us-ascii?Q?WKyiH7haHte29ivh9nLBHAwUeB4Lm2wrv2ifTfVoupp0DnSvQxMxD7t6lzjF?=
+ =?us-ascii?Q?yAUEJ22GNgxrUmhsnORC+ccmhxQXxDVWvZ/thlORON51Si1+/02EA8S1/7JO?=
+ =?us-ascii?Q?aPCC+bELl2A6d6LpxjyBrLganp7p8Sbem7mMrRq/aybX2eNP2kSHJWmAvuV8?=
+ =?us-ascii?Q?DQ+1hiXDFwjOBYwbNwDVW1yfFNZIyF25u+Vr9WNMSREWEvzn25DRVfEVxkHs?=
+ =?us-ascii?Q?IBl6gfNxSSg4egxsT5FgAGzDHu+G52QysQBkqtGT0a9T1iW/7GusIw/Vrcpz?=
+ =?us-ascii?Q?hERj+75VrlucesApXrR3b31OtLxLofy1slju0BJrD9v89GTcDmvQAF7YaY4i?=
+ =?us-ascii?Q?fFJiAyeEn0j/qzd712zx3in1/AQGYxgpj6XB2i75ZX5O+Da6gau/RlDc4h60?=
+ =?us-ascii?Q?EprIvhbcxo0wmUkR2xGfhX6rdfRew2W8xCQwJVJxuoC8LnckhCDQg0bbPuho?=
+ =?us-ascii?Q?57l/54BAfjtfMuvwIO3s5u8xfOnpa5esWK9/fOFd2AeR60OhKQm7Qt0R+s42?=
+ =?us-ascii?Q?YLNRlPqsnj6px7x2g935G1PA+EiqIf5pjs4RycThx7K3DWb+nJLWE6T1nebR?=
+ =?us-ascii?Q?HFg/euU4Q0Qk4e2Bk0e/h8K09V0nwh2yuYRknGw9mj1Aa/5sWZFhImOCnr9M?=
+ =?us-ascii?Q?o72vjBwoKjD6CteWU1sJC5dE7+FE3/rRfM72HDqk0VvSQyfMdHKMvh5o5CEY?=
+ =?us-ascii?Q?5kz8fsAtQPIh3bvYcqZUbMhDKoo0wAhxSuEi0X20S/7eQ8S4HIenqXraOMz/?=
+ =?us-ascii?Q?8FyzDH+g8hBxtNkYjuAa/L6rlWJ2KxO2fUmYSIDXZOArDPoQjBHbCD7d+4nr?=
+ =?us-ascii?Q?2g=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ded9be8-7b75-47de-ad6d-08dcb01efdd0
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 22:37:13.6170
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: u4z1hbhsZf9RyatyINAulQU2L1B9OfjDg4utrj6/EBdm2BAgL/AM6MzvEMRR4cF42ZSYUYeU9pDvQH+sIH2EkTGrAqFctT9keRtZgURTlic=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5169
+X-OriginatorOrg: intel.com
 
-From: Piotr Raczynski <piotr.raczynski@intel.com>
+Jason Gunthorpe wrote:
+[..]
+> > We could say it can only be used for features we have 'opted' in +
+> > vendor defined features, but I'm not sure that helps.  If a vendor
+> > defines a feature for generation A, and does what we want them to by
+> > proposing a spec addition they use in generation B, we would want a
+> > path to single upstream interface for both generations.  So I don't
+> > think restricting this to particular classes of command helps us.
+> 
+> My expectation for fwctl was that it would own things that are
+> reasonably sharable by the kernel and userspace.
+> 
+> As an example, instead of a turning on a feature dynamically at run
+> time, you'd want to instead tell the FW that on next reboot that
+> feature will be forced on.
+> 
+> Another take would be things that are clearly contained to fwctl
+> multi-instance features where fwctl gets its own private thing that
+> cannot disturb the kernel.
+> 
+> I'm really not familiar with cxl to give any comment here - but
+> dynamically control the single global scrubber unit seems like a poor
+> fit to me.
 
-Use previously implemented SF aux driver. It is probe during SF
-activation and remove after deactivation.
+Right, one of the mistakes from NVDIMM that was corrected for CXL was to
+explicitly remove the passthrough capability for global state machine
+controls like scrubbing.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- .../ethernet/intel/ice/devlink/devlink_port.c | 173 ++++++++++++++++++
- .../ethernet/intel/ice/devlink/devlink_port.h |   7 +
- drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 107 +++++++++++
- drivers/net/ethernet/intel/ice/ice_sf_eth.h   |   3 +
- 4 files changed, 290 insertions(+)
+Many of the "Immediate Configuration Change" CXL commands fall into this
+bucket of things that may want to have a kernel-managed global view
+rather than let userspace and the kernel get into fights about the
+configuration. So, I think it is reasonable to say that scrub has a
+kernel interface that goes through EDAC and not fwctl.
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-index 4cfd90581d92..4abdc40d345e 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-@@ -530,6 +530,42 @@ void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev)
- 	devl_port_unregister(&sf_dev->priv->devlink_port);
- }
- 
-+/**
-+ * ice_activate_dynamic_port - Activate a dynamic port
-+ * @dyn_port: dynamic port instance to activate
-+ * @extack: extack for reporting error messages
-+ *
-+ * Activate the dynamic port based on its flavour.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_activate_dynamic_port(struct ice_dynamic_port *dyn_port,
-+			  struct netlink_ext_ack *extack)
-+{
-+	int err;
-+
-+	err = ice_sf_eth_activate(dyn_port, extack);
-+	if (err)
-+		return err;
-+
-+	dyn_port->active = true;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_deactivate_dynamic_port - Deactivate a dynamic port
-+ * @dyn_port: dynamic port instance to deactivate
-+ *
-+ * Undo activation of a dynamic port.
-+ */
-+static void ice_deactivate_dynamic_port(struct ice_dynamic_port *dyn_port)
-+{
-+	ice_sf_eth_deactivate(dyn_port);
-+	dyn_port->active = false;
-+}
-+
- /**
-  * ice_dealloc_dynamic_port - Deallocate and remove a dynamic port
-  * @dyn_port: dynamic port instance to deallocate
-@@ -542,6 +578,9 @@ static void ice_dealloc_dynamic_port(struct ice_dynamic_port *dyn_port)
- 	struct devlink_port *devlink_port = &dyn_port->devlink_port;
- 	struct ice_pf *pf = dyn_port->pf;
- 
-+	if (dyn_port->active)
-+		ice_deactivate_dynamic_port(dyn_port);
-+
- 	xa_erase(&pf->sf_nums, devlink_port->attrs.pci_sf.sf);
- 	ice_eswitch_detach_sf(pf, dyn_port);
- 	ice_vsi_free(dyn_port->vsi);
-@@ -629,8 +668,142 @@ ice_devlink_port_del(struct devlink *devlink, struct devlink_port *port,
- 	return 0;
- }
- 
-+/**
-+ * ice_devlink_port_fn_hw_addr_set - devlink handler for mac address set
-+ * @port: pointer to devlink port
-+ * @hw_addr: hw address to set
-+ * @hw_addr_len: hw address length
-+ * @extack: extack for reporting error messages
-+ *
-+ * Sets mac address for the port, verifies arguments and copies address
-+ * to the subfunction structure.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_hw_addr_set(struct devlink_port *port, const u8 *hw_addr,
-+				int hw_addr_len,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	if (dyn_port->attached) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Ethernet address can be change only in detached state");
-+		return -EBUSY;
-+	}
-+
-+	if (hw_addr_len != ETH_ALEN || !is_valid_ether_addr(hw_addr)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid ethernet address");
-+		return -EADDRNOTAVAIL;
-+	}
-+
-+	ether_addr_copy(dyn_port->hw_addr, hw_addr);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_fn_hw_addr_get - devlink handler for mac address get
-+ * @port: pointer to devlink port
-+ * @hw_addr: hw address to set
-+ * @hw_addr_len: hw address length
-+ * @extack: extack for reporting error messages
-+ *
-+ * Returns mac address for the port.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_hw_addr_get(struct devlink_port *port, u8 *hw_addr,
-+				int *hw_addr_len,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	ether_addr_copy(hw_addr, dyn_port->hw_addr);
-+	*hw_addr_len = ETH_ALEN;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_fn_state_set - devlink handler for port state set
-+ * @port: pointer to devlink port
-+ * @state: state to set
-+ * @extack: extack for reporting error messages
-+ *
-+ * Activates or deactivates the port.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_state_set(struct devlink_port *port,
-+			      enum devlink_port_fn_state state,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	switch (state) {
-+	case DEVLINK_PORT_FN_STATE_ACTIVE:
-+		if (!dyn_port->active)
-+			return ice_activate_dynamic_port(dyn_port, extack);
-+		break;
-+	case DEVLINK_PORT_FN_STATE_INACTIVE:
-+		if (dyn_port->active)
-+			ice_deactivate_dynamic_port(dyn_port);
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_fn_state_get - devlink handler for port state get
-+ * @port: pointer to devlink port
-+ * @state: admin configured state of the port
-+ * @opstate: current port operational state
-+ * @extack: extack for reporting error messages
-+ *
-+ * Gets port state.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int
-+ice_devlink_port_fn_state_get(struct devlink_port *port,
-+			      enum devlink_port_fn_state *state,
-+			      enum devlink_port_fn_opstate *opstate,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct ice_dynamic_port *dyn_port;
-+
-+	dyn_port = ice_devlink_port_to_dyn(port);
-+
-+	if (dyn_port->active)
-+		*state = DEVLINK_PORT_FN_STATE_ACTIVE;
-+	else
-+		*state = DEVLINK_PORT_FN_STATE_INACTIVE;
-+
-+	if (dyn_port->attached)
-+		*opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
-+	else
-+		*opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
-+
-+	return 0;
-+}
-+
- static const struct devlink_port_ops ice_devlink_port_sf_ops = {
- 	.port_del = ice_devlink_port_del,
-+	.port_fn_hw_addr_get = ice_devlink_port_fn_hw_addr_get,
-+	.port_fn_hw_addr_set = ice_devlink_port_fn_hw_addr_set,
-+	.port_fn_state_get = ice_devlink_port_fn_state_get,
-+	.port_fn_state_set = ice_devlink_port_fn_state_set,
- };
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-index 479d2b976745..d60efc340945 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-@@ -11,22 +11,29 @@
-  * struct ice_dynamic_port - Track dynamically added devlink port instance
-  * @hw_addr: the HW address for this port
-  * @active: true if the port has been activated
-+ * @attached: true it the prot is attached
-  * @devlink_port: the associated devlink port structure
-  * @pf: pointer to the PF private structure
-  * @vsi: the VSI associated with this port
-  * @repr_id: the representor ID
-  * @sfnum: the subfunction ID
-+ * @sf_dev: pointer to the subfunction device
-  *
-  * An instance of a dynamically added devlink port. Each port flavour
-  */
- struct ice_dynamic_port {
- 	u8 hw_addr[ETH_ALEN];
- 	u8 active: 1;
-+	u8 attached: 1;
- 	struct devlink_port devlink_port;
- 	struct ice_pf *pf;
- 	struct ice_vsi *vsi;
- 	unsigned long repr_id;
- 	u32 sfnum;
-+	/* Flavour-specific implementation data */
-+	union {
-+		struct ice_sf_dev *sf_dev;
-+	};
- };
- 
- void ice_dealloc_all_dynamic_ports(struct ice_pf *pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index c901c07da1d4..abd74f30dabc 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -149,6 +149,7 @@ static int ice_sf_dev_probe(struct auxiliary_device *adev,
- 	devl_unlock(devlink);
- 
- 	devlink_register(devlink);
-+	dyn_port->attached = true;
- 
- 	return 0;
- 
-@@ -188,6 +189,8 @@ static void ice_sf_dev_remove(struct auxiliary_device *adev)
- 	devl_unlock(devlink);
- 	devlink_free(devlink);
- 	ice_vsi_decfg(vsi);
-+
-+	dyn_port->attached = false;
- }
- 
- static const struct auxiliary_device_id ice_sf_dev_id_table[] = {
-@@ -204,6 +207,8 @@ static struct auxiliary_driver ice_sf_driver = {
- 	.id_table = ice_sf_dev_id_table
- };
- 
-+static DEFINE_XARRAY_ALLOC1(ice_sf_aux_id);
-+
- /**
-  * ice_sf_driver_register - Register new auxiliary subfunction driver
-  *
-@@ -222,3 +227,105 @@ void ice_sf_driver_unregister(void)
- {
- 	auxiliary_driver_unregister(&ice_sf_driver);
- }
-+
-+/**
-+ * ice_sf_dev_release - Release device associated with auxiliary device
-+ * @device: pointer to the device
-+ *
-+ * Since most of the code for subfunction deactivation is handled in
-+ * the remove handler, here just free tracking resources.
-+ */
-+static void ice_sf_dev_release(struct device *device)
-+{
-+	struct auxiliary_device *adev = to_auxiliary_dev(device);
-+	struct ice_sf_dev *sf_dev = ice_adev_to_sf_dev(adev);
-+
-+	xa_erase(&ice_sf_aux_id, adev->id);
-+	kfree(sf_dev);
-+}
-+
-+/**
-+ * ice_sf_eth_activate - Activate Ethernet subfunction port
-+ * @dyn_port: the dynamic port instance for this subfunction
-+ * @extack: extack for reporting error messages
-+ *
-+ * Activate the dynamic port as an Ethernet subfunction. Setup the netdev
-+ * resources associated and initialize the auxiliary device.
-+ *
-+ * Return: zero on success or an error code on failure.
-+ */
-+int
-+ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
-+		    struct netlink_ext_ack *extack)
-+{
-+	struct ice_pf *pf = dyn_port->pf;
-+	struct ice_sf_dev *sf_dev;
-+	struct pci_dev *pdev;
-+	int err;
-+	u32 id;
-+
-+	err = xa_alloc(&ice_sf_aux_id, &id, NULL, xa_limit_32b,
-+		       GFP_KERNEL);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Could not allocate subfunction ID");
-+		return err;
-+	}
-+
-+	sf_dev = kzalloc(sizeof(*sf_dev), GFP_KERNEL);
-+	if (!sf_dev) {
-+		err = -ENOMEM;
-+		NL_SET_ERR_MSG_MOD(extack, "Could not allocate sf_dev memory");
-+		goto xa_erase;
-+	}
-+	pdev = pf->pdev;
-+
-+	sf_dev->dyn_port = dyn_port;
-+	sf_dev->adev.id = id;
-+	sf_dev->adev.name = "sf";
-+	sf_dev->adev.dev.release = ice_sf_dev_release;
-+	sf_dev->adev.dev.parent = &pdev->dev;
-+
-+	err = auxiliary_device_init(&sf_dev->adev);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to initialize auxiliary device");
-+		goto sf_dev_free;
-+	}
-+
-+	err = auxiliary_device_add(&sf_dev->adev);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to add SF aux device");
-+		goto aux_dev_uninit;
-+	}
-+
-+	dyn_port->sf_dev = sf_dev;
-+
-+	return 0;
-+
-+aux_dev_uninit:
-+	auxiliary_device_uninit(&sf_dev->adev);
-+sf_dev_free:
-+	kfree(sf_dev);
-+xa_erase:
-+	xa_erase(&ice_sf_aux_id, id);
-+
-+	return err;
-+}
-+
-+/**
-+ * ice_sf_eth_deactivate - Deactivate Ethernet subfunction port
-+ * @dyn_port: the dynamic port instance for this subfunction
-+ *
-+ * Deactivate the Ethernet subfunction, removing its auxiliary device and the
-+ * associated resources.
-+ */
-+void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port)
-+{
-+	struct ice_sf_dev *sf_dev = dyn_port->sf_dev;
-+
-+	if (sf_dev) {
-+		auxiliary_device_delete(&sf_dev->adev);
-+		auxiliary_device_uninit(&sf_dev->adev);
-+	}
-+
-+	dyn_port->sf_dev = NULL;
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-index e972c50f96c9..c558cad0a183 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-@@ -27,4 +27,7 @@ ice_sf_dev *ice_adev_to_sf_dev(struct auxiliary_device *adev)
- int ice_sf_driver_register(void);
- void ice_sf_driver_unregister(void);
- 
-+int ice_sf_eth_activate(struct ice_dynamic_port *dyn_port,
-+			struct netlink_ext_ack *extack);
-+void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port);
- #endif /* _ICE_SF_ETH_H_ */
--- 
-2.42.0
-
+For the "anonymous" "Features" that advertise an "Immediate
+Configuration Change" effect those need CAP_SYS_RAWIO at a minimum,
+possibly a kernel taint, and/or compile time option to block them. Maybe
+that encourages more "Configuration Change after Reset" Set Feature
+capabilities which carry less risk of confusing a running kernel.
 
