@@ -1,120 +1,138 @@
-Return-Path: <netdev+bounces-113641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BC193F5D5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:47:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28CD193F5D7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 118C4281D6C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:47:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 510431C22191
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC0814901B;
-	Mon, 29 Jul 2024 12:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF7A146D6D;
+	Mon, 29 Jul 2024 12:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AQ3TYA7U"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sssjVpFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF1D1465B4
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFF1148304
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722257220; cv=none; b=NUR/ir8ji1ij5X3RCFIMbJ/aKdtyRZqBUF0FCEHVjhkjD7jpvhdtpJdCLaC9TOU99Ome4vbHTbmC+7Jbu2KeDzvl0uUpVtI665/BHWIx/H9zcaMcQeAPVUhl7mLcaqJt/PUBhThlGHr1azTCkD3GGzARCwaXvSpwNYeOHtNeAUw=
+	t=1722257288; cv=none; b=KQIZ8wjZhvrukLdkCq/QZsWaX30wkz6fq3LrVVtsyDQkKw/L1H36H0Vbj9xdwQHn+PIciuhZm/A2NkvNVo5c1kQ9n8b6fvvaf5+WRoe5O63uHt++W0nrQj/+cmNDrMkV35NPDWIxR+zUBQtMoRoJbihvIR2HL/uba1UcqvkZySg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722257220; c=relaxed/simple;
-	bh=Em17AH/p42DHF2fSyDSbIKlzj5GnwamH4JLD+cvSG0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t6Zm4Alorrg53m6zlJImzOWJOo7VyD+AI9EYqkEx1BGRjKURmE3jLh9qtobjQli7usszWLkTaOWSwDi/qHa4FSwyv8NvTTPxIokV7nteIlq4TLkLNXmX1HxLh6I7orTyoEonunee9qynd51lFQnnQH330d0jg7+6FWRi2sVREPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AQ3TYA7U; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5a1b073d7cdso12074a12.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 05:46:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722257216; x=1722862016; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g1ft8bumXnUvS+hZHtMDMqF7eb19fV3Q5V8+d7TpDdA=;
-        b=AQ3TYA7U1ldaMMAMFrqd/YAU960dr1BTsQ+nPSVN/3KmRz7DgVIPu52P/kmrZ/AA3A
-         CiRo79n9cmqc/VEb2xTncI0R4wtlZD/5ZetG4pcVS3hBtvC75e0t16CKfWxxxaOAj+5f
-         SqTJUDnBRblBjjGKgGMXlA1LqrFKCuvq3JbSkciSeimM36WgYOq56jnPI8kS/8vQh7gP
-         s3P3PhthRryaN3XZcnHKWf3lHgk58cqOPYyLir49O/dXb0yc/vgqGQWuT2eK8qyH6Ujh
-         dJgNJZNnZFnpxXiFe2sI3G+sN0Yy9Xon42/hikWwORnRn2bfHvCYH0+h+XKREkGC3LEF
-         xKtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722257216; x=1722862016;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g1ft8bumXnUvS+hZHtMDMqF7eb19fV3Q5V8+d7TpDdA=;
-        b=DgYg3wODv9MAlI++9YX+Vkb+HQXBxZb9qMUu1ZcUQagNildz6owgG4PDmaWjY+LXa6
-         PdHDs7Z9tbB62P3HO0PonfAtVPAAU0jN3D58wveLG6lpCfuixO/xB04GYoW9I1pJz8p6
-         JWxAHcRvWp7xPwgxeoj1NOztwpDAx9AeAbtUmLneqBgmuJBsFRFhi4UAXLd92f/lTEPU
-         zjUDOzlIPyH6RJzMbN0ZQ+j0nmWZj2DlnMPaAXNDHq9Rry5MeLmldzu2sFQmjRoSfig5
-         c8us6sKMv9eq8BEQ+OMpG9jin+W2JRNrt3NYVCUPtyU9C9Wzh5Vul1HahPbOcJ4/qAXy
-         NyeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJpSyORaAyytD7DIe01M1lYJEoLBT/TP8ICOAuv7JWKYsC1JOmTWcnLS6QA5IxSyB0TcDBiR8Lz66jY5KIzyC/qUxOzfs5
-X-Gm-Message-State: AOJu0Yx80tXGj+2++V5DL4VIEPi1haien6ONl6ohyS5UB6Ou3uiuWN1+
-	3oyDrAuwL+R200ekPybUyeDj5mOGjXpmsp1Jd/OI/9yamlNnfJCKiOR7uG4fnclNb5iiFMRZaRF
-	5YDw8ym96F/lvipkh5tcZlWQP7hlN0GWcL7At
-X-Google-Smtp-Source: AGHT+IG0zwh6iwEcuHVBa8Uf4iHIUM4tytie0ynNSAYjmD2hYLjXE9KZf8DiiQhzvUMiBcZtfcywH66OhJhQ6KHwyQY=
-X-Received: by 2002:a05:6402:26c2:b0:57c:c5e2:2c37 with SMTP id
- 4fb4d7f45d1cf-5b033b8b8e1mr298020a12.3.1722257213066; Mon, 29 Jul 2024
- 05:46:53 -0700 (PDT)
+	s=arc-20240116; t=1722257288; c=relaxed/simple;
+	bh=igE+HtJT8zZ0cFXeIrI6FitI2VfseQpKEFSgzHO3Sf4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RSice3lfXVCUJQAm2eg9TKT70pQozr9Wf7dVlF0hGZ6/25ZStoewlcfHOEaI7Y5E5n4Nj8mM20LM1npnPuYo1XEGXkqTAl8AnpHamy17SJtf//E2gxtPQHp3azs3BKhLVdvlvkro+Q2nsKdWZB2gTkbOL33ZHI4HZYGqOfFpUrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sssjVpFj; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1722257277; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=+OBdQR7y6nQXG3Qmm9hHKCHP3uBvPQTWwwC7JEBJ6Uk=;
+	b=sssjVpFjEdeBLYD/z+CSu3fj3tNSrU/ulYDasKALWmVcyWM22L8dLJ9hSOSENFFftGxER1XAy3gFEkXe6AJMZQLQ66PxpxXRzEOQK//AYjQlEhjK7+RADtD3aCsSxZjo+63+ni85E2GoeX88n2RFXQyJPBTN8WUBe5AnOfV6lH8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBb8gbw_1722257275;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBb8gbw_1722257275)
+          by smtp.aliyun-inc.com;
+          Mon, 29 Jul 2024 20:47:56 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
+Date: Mon, 29 Jul 2024 20:47:55 +0800
+Message-Id: <20240729124755.35719-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729095554.28296-1-xiaolinkui@126.com>
-In-Reply-To: <20240729095554.28296-1-xiaolinkui@126.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 29 Jul 2024 14:46:38 +0200
-Message-ID: <CANn89iKxeYhqO-zNG5cTxw_o_3ORhcsXN7OJvFbhxPUEcoB3nA@mail.gmail.com>
-Subject: Re: [PATCH] tcp/dccp: Add another way to allocate local ports in connect()
-To: xiaolinkui@126.com
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, 
-	Linkui Xiao <xiaolinkui@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 29, 2024 at 11:56=E2=80=AFAM <xiaolinkui@126.com> wrote:
->
-> From: Linkui Xiao <xiaolinkui@kylinos.cn>
->
-> Commit 07f4c90062f8 ("tcp/dccp: try to not exhaust ip_local_port_range
-> in connect()") allocates even ports for connect() first while leaving
-> odd ports for bind() and this works well in busy servers.
->
-> But this strategy causes severe performance degradation in busy clients.
-> when a client has used more than half of the local ports setted in
-> proc/sys/net/ipv4/ip_local_port_range, if this client try to connect
-> to a server again, the connect time increases rapidly since it will
-> traverse all the even ports though they are exhausted.
->
-> So this path provides another strategy by introducing a system option:
-> local_port_allocation. If it is a busy client, users should set it to 1
-> to use sequential allocation while it should be set to 0 in other
-> situations. Its default value is 0.
->
-> In commit 207184853dbd ("tcp/dccp: change source port selection at
-> connect() time"), tell users that they can access all odd and even ports
-> by using IP_LOCAL_PORT_RANGE. But this requires users to modify the
-> socket application. When even numbered ports are not sufficient, use the
-> sysctl parameter to achieve the same effect:
->         sysctl -w net.ipv4.local_port_allocation=3D1
->
-> Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+From the virtio spec:
 
-Too many errors in this patch...
+	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
+	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
+	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
 
-Lack of READ_ONCE() when reading a sysctl.
-Lack or per-netns sysctl.
-No documentation.
+The driver must not send vq notification coalescing commands if
+VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
+applies to vq resize.
+
+Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
+Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+---
+ drivers/net/virtio_net.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 0383a3e136d6..eb115e807882 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3708,6 +3708,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
+ 	u32 rx_pending, tx_pending;
+ 	struct receive_queue *rq;
+ 	struct send_queue *sq;
++	u32 pkts, usecs;
+ 	int i, err;
+ 
+ 	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
+@@ -3740,11 +3741,13 @@ static int virtnet_set_ringparam(struct net_device *dev,
+ 			 * through the VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver
+ 			 * did not set any TX coalescing parameters, to 0.
+ 			 */
+-			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
+-							       vi->intr_coal_tx.max_usecs,
+-							       vi->intr_coal_tx.max_packets);
+-			if (err)
+-				return err;
++			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
++				usecs = vi->intr_coal_tx.max_usecs;
++				pkts = vi->intr_coal_tx.max_packets;
++				err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
++				if (err)
++					return err;
++			}
+ 		}
+ 
+ 		if (ring->rx_pending != rx_pending) {
+@@ -3753,13 +3756,15 @@ static int virtnet_set_ringparam(struct net_device *dev,
+ 				return err;
+ 
+ 			/* The reason is same as the transmit virtqueue reset */
+-			mutex_lock(&vi->rq[i].dim_lock);
+-			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
+-							       vi->intr_coal_rx.max_usecs,
+-							       vi->intr_coal_rx.max_packets);
+-			mutex_unlock(&vi->rq[i].dim_lock);
+-			if (err)
+-				return err;
++			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
++				usecs = vi->intr_coal_rx.max_usecs;
++				pkts = vi->intr_coal_rx.max_packets;
++				mutex_lock(&vi->rq[i].dim_lock);
++				err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
++				mutex_unlock(&vi->rq[i].dim_lock);
++				if (err)
++					return err;
++			}
+ 		}
+ 	}
+ 
+-- 
+2.32.0.3.g01195cf9f
+
 
