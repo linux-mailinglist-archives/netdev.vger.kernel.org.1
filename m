@@ -1,358 +1,207 @@
-Return-Path: <netdev+bounces-113755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 895E393FC71
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 19:30:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3BA293FC93
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 19:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91C4A1C223ED
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:30:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D02DB21C3F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22F516B73E;
-	Mon, 29 Jul 2024 17:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590B41586DB;
+	Mon, 29 Jul 2024 17:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="up+bEe9P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ba9xDLOn"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2040.outbound.protection.outlook.com [40.107.237.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2072180BFC;
-	Mon, 29 Jul 2024 17:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722274244; cv=fail; b=bC0bbVOTjBAXnMcIXu/sjXrWbIh5OzbrTW7QoMvP/Wczz3zsymgiVW22R+qFakWA9X+NCVctqi1WllYx3PWhXJBT5QfVpl1U/FE1SNg4w8P63nsbzUS4uR3AGwFJOsAD9s5bDVdPsccvdSB+UzgIkDw0YSBD0OgIbVPiM0UPnKY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722274244; c=relaxed/simple;
-	bh=W1bi6Ve0Pha/ER3j6//arr3PCNhlgKXh6T7tP0/tM7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=GjPNBEmgKML1Fc5Qwabra//U5INgbV59sYmAyw3YeLQKgPGbC337xftPht6Kgwy6mhIVxuJ62bdpx1WSJYeax6jp01FnVqf2JePfy3JaD751wmFFhsMZjSxP2n8BYXJ9SCqdmfWpgw/zgaiALe5Rvis5SUkyPGQWLXRO5kfdqwo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=up+bEe9P; arc=fail smtp.client-ip=40.107.237.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RJCTYp2CnwKYVwtgvqQ9WGQ480wvfvq7rDVg18Bjln7DV0LN3PpCVbHl7LSM70xeHi271dhporIiCJXvDBWLr2+xfnuSJuT74vWkL0yR7oFuXG5scT/La+zhI4GApcCBbzZQ1wbnXnMTDOsaeNxLEuWVCvjKduUjzc8b4BImXoIcqE+LwGUe+xike6lUMUdZeAJ7rbV/pwT+Yoqb4c88WP6Kr01OYgr5X6mbLyZI1H8DxA6BQxTQqZrB62zwotHQ8cEOViUqu+EM0ut3I5qf+ptf+bsCsHd14o88yb+28T7dSCYUCMN/qt1flTDVKgPuEqC8puIqvo89pIxpup47YQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bPEQSjUgbWAFUm9Uet6WXXYCVydzE8f7TX7UvNCTBsY=;
- b=v+m9IVWploe5j5OD1QzdUXkxwnlIAESyDJKAw0xANfv77x0TwYi/0qkmt+dUP5teHSIypZPoqvhgR50Vpsaw4AEnFepW9ydx0bKkyv/F3BWOF7QozUqXLnGNtuSfCQzLYdudCJ6QqUI3eKbNUgRIZYswvQucMLV9hXNu4GoZw5Z8WsUoqcjHcFj1sajTn4XiDq5ItEiMrZmeG9mAdfUSZXOe5iWiv6ktdCHwauLM3SdsRJqSZcFFAC1JJMgkkN34VVldXa+xGh6AFd/C+Lz1J+1dH3SoxEiuv2nvZjXQ/OpuXWfnXEuywTkEu2dnf8wTtKrGnBQ7qc9lnf37czFhSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bPEQSjUgbWAFUm9Uet6WXXYCVydzE8f7TX7UvNCTBsY=;
- b=up+bEe9P5WlCn64nbxpK4z+f8vHVNHFwwxh9lztZsEiHHQwiSKmw+CKq+bbnNfWnL9iz7fZ8stVE0pEL3cZ10Q/mczeSOHMG38i87rHkVghOUbKvmSTFrqPCxqv7+m1V0delK788rnacI6T6hetr7YV4Cl2c24H4ULOgdWDN2UJyo0JJmIYfiQR2jY9eJBG68QGFHCKITNazhdpieWbBlMupOPsQlJPtMfNJlKDcvcIQBgPk8qLzt2ou4V+SdkDuX07QeSgTmSNt/PUJLbx9GNx+KxzisCza+hLARuhgNl7UsIiaWCs3HUZt0d5DuoUohIsV+vnoKHpCqotVQCS55Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by IA1PR12MB8586.namprd12.prod.outlook.com (2603:10b6:208:44e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.27; Mon, 29 Jul
- 2024 17:30:39 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7807.026; Mon, 29 Jul 2024
- 17:30:39 +0000
-Date: Mon, 29 Jul 2024 14:30:38 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH v2 1/8] fwctl: Add basic structure for a class subsystem
- with a cdev
-Message-ID: <20240729173038.GF3625856@nvidia.com>
-References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <1-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <20240726153042.00002749@Huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240726153042.00002749@Huawei.com>
-X-ClientProxiedBy: BL1PR13CA0068.namprd13.prod.outlook.com
- (2603:10b6:208:2b8::13) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856A978C76
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 17:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722275194; cv=none; b=u83ANf9DtMfJAdtqJfU/JkCLx/uPoPn0xCQlomhEPLySXtzBrrgl3ifzAFm07fKqardvTsb+04mUKOQSfbx3zKcaEFcw/xQV7ZfNz+fp9aQ5WNAEqeKO4jwyE3emWJ2UTp4lOh4dgiF7iAZOrbqX5aMjePdnPXBREA9wkENgsCs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722275194; c=relaxed/simple;
+	bh=x54E6CsVNHB8nlMMNY3p9jMlRbphqBDzrlOcojJrB+w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M5E6wtDm0A+zhrlBzvImxRHIt1hoa0bYWucsWNzdWe27GQ6DdHd6tUA61LMmi5md+22wW+8hMpOLQYLV9zLb8TQhZ8OFT3jgl+1SXnNENnyW/51QBcYDDxk5qFSjjD5cofx+E/68AKRmFa+VnFg7FNS+nqyM8R68TVewDaAXky4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ba9xDLOn; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so1297a12.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 10:46:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722275191; x=1722879991; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oH1DiYL4kdG8EVj9AsvFV25K/u74YDHNoemmf3irk7A=;
+        b=ba9xDLOnc6mGzgW+oWpD4qBuF+LiInUdeVcuYnR7oO3xZ1DThyRRXSmp2cPrYdhLjN
+         Vi8cVjhEcjgid1zIH8k0YhJ/lvJ3YLEXROxUNtc7YNesnX7MhoURl+7cbz2kaHcAPezM
+         zP5P8uBEpUWZrQHTgatpQtA4UdXSGkhvbNynks9sB05B4I+jnRDMLYxwn9nEwDyLa7pf
+         7qbTAS2ljgnljdhgFXL2Glfs+cR4i9a7zot+qcrxvysdydrnnOcOBjmhKOegoy42+cAO
+         05ISP08XmkvqqxSNMC54YGi20MHnzY+HNAKjR2n4cVKyWfZ7NYHsouWJED98xXIpSBAO
+         lylQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722275191; x=1722879991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oH1DiYL4kdG8EVj9AsvFV25K/u74YDHNoemmf3irk7A=;
+        b=VSL49WXmet2pXFyxTpl7VT8Q7yoppNAk29Nk8SH9kCv5XldbdA4xp5cnGzQ2xS3y/T
+         NRPO1AqTZ0DSGdWLebcmfTFPgl/CBNfPQ4fpStefNkN+K4/IAmpq1kXfk+Wra5X8ewNG
+         v875+4qHZdy+CSdRbAIh3uGymIxvtuLlalBy0Pj/6P6FInZjKJtQlIBJ/zrxW+wI5s1F
+         yZRtTPhDO4Lucfjx7RTZx5TI2BY0LH1cL7g76NTMSf4qsW7sLzn2vAHpFxeq1icKI3Os
+         NDNvDcXX2sCPbj1/HUTF5/R3eGJBv2VsH2WXzVGo2mYy8W2erNulvIz8tcHbmOXMB+wE
+         UyhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnj7b3CMAznIYcbIgSdJh7bmblXuKJBBapJSIIGFBMHOOhIf27ZbMxltlRf2lGx1eUFHAGaSuZZvrTH7IEzapGgI5jTtQz
+X-Gm-Message-State: AOJu0YwHByi7zwbkEHyGqNvmRP1vyIeIc6XMpug29R/Mpk1c4r+5Rh5u
+	48tgLYXPf6A2zZJNaTHHpNsfmxXVbP98MR3jq3CFugghwRA6v5K2W+fZOp61k6ZnqnDnE56czvw
+	EuvNTLsRpf9p6e1EJFAwZzgWBbhrY9+rJ+5cu
+X-Google-Smtp-Source: AGHT+IF8TSv1Ug1AIHMZ96AEE7sYh9pBStaEEW0UjSF63jl4lvS9Dm0d9y/JZ49L9hgFK+kwJqihL2kmCwpyXk2q3x8=
+X-Received: by 2002:a05:6402:51d0:b0:57d:32ff:73ef with SMTP id
+ 4fb4d7f45d1cf-5b40d4a2ad8mr35907a12.6.1722275190338; Mon, 29 Jul 2024
+ 10:46:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|IA1PR12MB8586:EE_
-X-MS-Office365-Filtering-Correlation-Id: a7551b03-160d-4916-ab5a-08dcaff429f3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UgNeihnJ1eAhfXy53vyiTUAf+k3OgruF6oSK64uPmNvr1PCQdTfJ/INitrRn?=
- =?us-ascii?Q?LqEcVOioZVTrPdJusv7tme4JRMOCSjjC+Q1BKSHL0mYtGl7aOQbd6sp82qyl?=
- =?us-ascii?Q?Wq/U79pChHjgxnfKykd8S+vvLwRj6ZpftJmSh8qua+T4jD6bVoREyv4KF2Wn?=
- =?us-ascii?Q?riBeDW6fu1wlBJWOee+WfXHLMyqATenKtkCqafcBDmH/bpagDECDhT41Hnn7?=
- =?us-ascii?Q?gNn5Ul8MhO40BIWHXutPEjIXf+yVbJWbbaTI1bUUTqvbQPzYsWXrB+XXZn/q?=
- =?us-ascii?Q?exO7YtZoRtpuE0SNoOJelQRl4KOBxd/jB6mzpUqMgS3O0P4mvhAncM7OVc0a?=
- =?us-ascii?Q?L4M1VcleGWWopdz8Bo9DDp+moAh1cp5o+KBYbl9GkK2+c1V8QP16PCAc1UAJ?=
- =?us-ascii?Q?JYx9nqOgJChuKBzt2YA1ynWf2cZmPoJJXNjFia9ywb7VF435OtKdzUx0fW/k?=
- =?us-ascii?Q?nX1tGXPqteeYewbJ/RAAOk9CnKgGzFoAOjWuFk3skL/q2gxNq5yqtMKKIUov?=
- =?us-ascii?Q?SEwL5axofmjs3oeP2OdytN2lOeQ8UFgt8GPNWzZqATTb7W5UoXtsJSoCdLGX?=
- =?us-ascii?Q?/cpxGocd3ziXgJ4PgLAYPCNJMGH2Lq/MoeFIzudEFJFvl+/P4wECJFbK/Kx3?=
- =?us-ascii?Q?P6Uw2vGuy/Vleb7zkGGMPXiQPzp6tJ31BGWuxwYuEbInmZi1cR8ynm+lzhdJ?=
- =?us-ascii?Q?KR53sldR4X/4JZtXwQ5TLt2IOsMzJBnpKdWkd+5837IKokYfwl+Y0BJ2yNi8?=
- =?us-ascii?Q?ysvrbENFz2xQ02apZ/k8P4i+gwG1Ob+HDfEc8wHoRig6F8v/VIVCG8HQDbim?=
- =?us-ascii?Q?pSDGKhqPSr4edZMgRZuh499DQiHrh/tYA8DzDqQ7kyFDichTatYLDmyHLlDM?=
- =?us-ascii?Q?H3aNzhEAd0w9Gk8H4OXxxfcT+U6vBfXPAGyj+1tXf9CKd+rrfBlUXK2xxIEy?=
- =?us-ascii?Q?xLj/TwsMwCCgSvrqEoylPfzddRwYsc7xBm+fLqgl3QE1g2XsrrzfFCp/szSa?=
- =?us-ascii?Q?qsIZmIu219DQ/Uyfc1YlgW6dRpmHZ1sCBavR6YnXoB0X7UNiYB7g5FO4Hu4n?=
- =?us-ascii?Q?eFkd46HxkoaL+YUkxHAsSaFwItVXInHar+2t2aK/ItzWZDQYVe9BfDDP41TX?=
- =?us-ascii?Q?d94CImLOU08rLPBXB6ydVXZoFxXypKWArLjlmU3i8U/wfJSwolCaZxQ3ozVr?=
- =?us-ascii?Q?AumXcPp7E8NB6CijABXElSboOvaiR/srozPoLDVymjkNsyMTLd3a7gemHK0P?=
- =?us-ascii?Q?u06thg06UcON6EBflMGv8Vl19M4LQ0+xzguChhnlohmFW7/tsAkrTd1ZRdHi?=
- =?us-ascii?Q?o3x3a79bNncjCFXpgwUEbTL/TO+SW46fd6Rj4o1TpVeF9Q=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vvgCljCzizhd1fVC2ExHqjWZzp3PrxBq4idVXHqzojMw63XL1AIkNjYqVxTo?=
- =?us-ascii?Q?7G22MiR8EyjyFzGW8hjL0GI2COUNWx6UzOYC+XmK7T78yiDJHmAAZcF6oWqC?=
- =?us-ascii?Q?IklY5HhbJblkr67rmwLLCw9z12ynz43BFlXBJeln0S2zXg+whF5EF+Q3dk13?=
- =?us-ascii?Q?ZvcfpuprhM1hnrndLpCx7JlUYxVff0vuiYsBldYPK9a1LLCq0rbGcONfSm1T?=
- =?us-ascii?Q?yIafc3mTCwEFW7ydMcKu+AD+da9TVHyCHMr7VzXmtLHdUQnziO6Kp2aBba5L?=
- =?us-ascii?Q?VHf4C0ZOYSUjUqo/1bLUnElqsNLXq0ETOYXBxLhAtuaVlzESKEvsVGpZUZkU?=
- =?us-ascii?Q?1hO6faTMxNQHR3IwaIWC2a2IfLZ5oxLeNdwEPqg+oygd8puF/N2eN2Z5HgZE?=
- =?us-ascii?Q?o+g207t5vFpryMz2OKCG05ANv6yebOawXbrNQ5UUjchKdncUELKRGRe+gMxl?=
- =?us-ascii?Q?WrqVB9mznc5dIrs9s2JSjx5eOg52Bduw7FbP7ewmDAuVaGdc500lfYkp+hFn?=
- =?us-ascii?Q?P4pSn9+my0LlpVEOHDoPWoff1OlyN/yQRhp8T1zs6ZMF9rlAgK9F6m00QPX2?=
- =?us-ascii?Q?LOk6XqmNb8s0T3XBfCbFeWoBX62wuI5CGogtSvWy7E0dT4ZF1un44D2Ofrx4?=
- =?us-ascii?Q?wl6G9t79fAeFEWymX02w1XWZX973z3sTiWeHiL1K27ESvl6jdtc5z8hZe3dl?=
- =?us-ascii?Q?97Rlbj/bltQt8IYCW0RaDmWlKXZUiCVl6OJRvw9DIKivzYIvZPcIUzshKmWW?=
- =?us-ascii?Q?dt0eykmk+83K5Ld6IYPMcjEnXXsv3ajvWY1VJNJ0PURFxEPnn6pHbAp/a46z?=
- =?us-ascii?Q?/tSihln1iZgozmiE568GtaaRN8PFEM9+Zgsemj9H+Yo7VKEI4NzW4Cnf8PDM?=
- =?us-ascii?Q?MnVeiDNeRAkcHtu1rJu4ty1HZ2Jd3Sfz569rJJ1KVSw9c20wiTTIVNfclAnm?=
- =?us-ascii?Q?otgFAZvb8BrZVdx4YN4xIlfssSQifhQ5h64HazH5KST2A2/X0J8hXvPFCWHs?=
- =?us-ascii?Q?XVxxiKRBdaTBHBaYOmroTXn4w1bnOsy6ICYp5alle7IfE/6ksk1mG0NJIM5K?=
- =?us-ascii?Q?3mjDIc4ouPjmNNd1W0vLa4lPTgtex61aKl2PtPmho+LkOI0/6rvuM73gGrKn?=
- =?us-ascii?Q?FFMZj/AluhI33zlMM+mn8J2TRs5FCvXgVUIBrcpclr6A9DFwG6QoxPbfo1hw?=
- =?us-ascii?Q?F2M5hMHcDSkK4lv8dixXusomps1sVAJzYcEM3W8caUjBRG7AbWe0MNMEk6Ol?=
- =?us-ascii?Q?2yNPlizFx1m5VzbWU+ADua9+ioefU5LPlFl+huk6B9OWqyUG377PBkF22C6C?=
- =?us-ascii?Q?0Yli4oxAcFgb8fy/P8pj/nkCWDXZWq5HZlTA+VD08e/wNsvBb69yzOUFqjvu?=
- =?us-ascii?Q?uRg88NXrTO3A1TrZgEtwOy+OS1FQXevlbQ0qm/Fvg8vDyyrtDH4GTQGzPv6q?=
- =?us-ascii?Q?s/ldzIP8f13osCzXM7drRMFmfVb73JIBBPlYVeVn4jQV8tIQqq3X9foK2uj2?=
- =?us-ascii?Q?mQ3eSSTWnTmSAYldpGb4zqfO5c/xFCAd9EjyOkTTHN/EHHlc3XUICJIRupzK?=
- =?us-ascii?Q?rBjSestad217KaftzCDIzTmMUP/gCAy274FY8l/P?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7551b03-160d-4916-ab5a-08dcaff429f3
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 17:30:39.1729
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MBw/fk6AMDjyaY4DjmoZeBCxYjsvUuXqmXYQXIylxscXPeZDZQp9km2ZthgKuIt0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8586
+References: <20240729163326.16386-1-aha310510@gmail.com>
+In-Reply-To: <20240729163326.16386-1-aha310510@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 29 Jul 2024 19:46:15 +0200
+Message-ID: <CANn89i+SgDaA-vkTXxziA3OLZncgYUTViC-WaX6dGVx_0kLUww@mail.gmail.com>
+Subject: Re: [PATCH net] net: annotate data race around dev->flags in __dev_change_flags
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
+	syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 26, 2024 at 03:30:42PM +0100, Jonathan Cameron wrote:
+On Mon, Jul 29, 2024 at 6:34=E2=80=AFPM Jeongjun Park <aha310510@gmail.com>=
+ wrote:
+>
+> According to KCSAN report, there is a read/write race between
+> __dev_change_flags and netif_is_bond_master for dev->flags.
+>
+> Thereforce, __dev_change_flags() needs protection.
+>
+> <syzbot>
+> BUG: KCSAN: data-race in __dev_change_flags / is_upper_ndev_bond_master_f=
+ilter
+>
+> read-write to 0xffff888112d970b0 of 4 bytes by task 4888 on cpu 0:
+>  __dev_change_flags+0x9a/0x410 net/core/dev.c:8755
+>  rtnl_configure_link net/core/rtnetlink.c:3321 [inline]
+>  rtnl_newlink_create net/core/rtnetlink.c:3518 [inline]
+>  __rtnl_newlink net/core/rtnetlink.c:3730 [inline]
+>  rtnl_newlink+0x121e/0x1690 net/core/rtnetlink.c:3743
+>  rtnetlink_rcv_msg+0x85e/0x910 net/core/rtnetlink.c:6635
+>  netlink_rcv_skb+0x12c/0x230 net/netlink/af_netlink.c:2564
+>  rtnetlink_rcv+0x1c/0x30 net/core/rtnetlink.c:6653
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+>  netlink_unicast+0x58d/0x660 net/netlink/af_netlink.c:1361
+>  netlink_sendmsg+0x5ca/0x6e0 net/netlink/af_netlink.c:1905
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x140/0x180 net/socket.c:745
+>  ____sys_sendmsg+0x312/0x410 net/socket.c:2585
+>  ___sys_sendmsg net/socket.c:2639 [inline]
+>  __sys_sendmsg+0x1e9/0x280 net/socket.c:2668
+>  __do_sys_sendmsg net/socket.c:2677 [inline]
+>  __se_sys_sendmsg net/socket.c:2675 [inline]
+>  __x64_sys_sendmsg+0x46/0x50 net/socket.c:2675
+>  x64_sys_call+0xb25/0x2d70 arch/x86/include/generated/asm/syscalls_64.h:4=
+7
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xc9/0x1c0 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> read to 0xffff888112d970b0 of 4 bytes by task 11 on cpu 1:
+>  netif_is_bond_master include/linux/netdevice.h:5020 [inline]
+>  is_upper_ndev_bond_master_filter+0x2b/0xb0 drivers/infiniband/core/roce_=
+gid_mgmt.c:275
+>  ib_enum_roce_netdev+0x124/0x1d0 drivers/infiniband/core/device.c:2310
+>  ib_enum_all_roce_netdevs+0x8a/0x100 drivers/infiniband/core/device.c:233=
+7
+>  netdevice_event_work_handler+0x15b/0x3c0 drivers/infiniband/core/roce_gi=
+d_mgmt.c:626
+>  process_one_work kernel/workqueue.c:3248 [inline]
+>  process_scheduled_works+0x483/0x9a0 kernel/workqueue.c:3329
+>  worker_thread+0x526/0x720 kernel/workqueue.c:3409
+>  kthread+0x1d1/0x210 kernel/kthread.c:389
+>  ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>
+> value changed: 0x00001002 -> 0x00000202
+>
+> Reported-by: syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> ---
+>  net/core/dev.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 6ea1d20676fb..3b9626cdfd9a 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -8799,7 +8799,7 @@ EXPORT_SYMBOL(dev_get_flags);
+>  int __dev_change_flags(struct net_device *dev, unsigned int flags,
+>                        struct netlink_ext_ack *extack)
+>  {
+> -       unsigned int old_flags =3D dev->flags;
+> +       unsigned int old_flags =3D READ_ONCE(dev->flags);
+>         int ret;
+>
+>         ASSERT_RTNL();
+> @@ -8808,12 +8808,13 @@ int __dev_change_flags(struct net_device *dev, un=
+signed int flags,
+>          *      Set the flags on our device.
+>          */
+>
+> -       dev->flags =3D (flags & (IFF_DEBUG | IFF_NOTRAILERS | IFF_NOARP |
+> -                              IFF_DYNAMIC | IFF_MULTICAST | IFF_PORTSEL =
+|
+> -                              IFF_AUTOMEDIA)) |
+> -                    (dev->flags & (IFF_UP | IFF_VOLATILE | IFF_PROMISC |
+> -                                   IFF_ALLMULTI));
+> +       unsigned int new_flags =3D (flags & (IFF_DEBUG | IFF_NOTRAILERS |=
+ IFF_NOARP |
+> +                                          IFF_DYNAMIC | IFF_MULTICAST | =
+IFF_PORTSEL |
+> +                                          IFF_AUTOMEDIA)) |
+> +                                (READ_ONCE(dev->flags) & (IFF_UP | IFF_V=
+OLATILE | IFF_PROMISC |
+> +                                               IFF_ALLMULTI));
+>
+> +       WRITE_ONCE(dev->flags, new_flags);
+>         /*
+>          *      Load in the correct multicast list now the flags have cha=
+nged.
+>          */
+> @@ -8839,12 +8840,12 @@ int __dev_change_flags(struct net_device *dev, un=
+signed int flags,
+>
+>         if ((flags ^ dev->gflags) & IFF_PROMISC) {
+>                 int inc =3D (flags & IFF_PROMISC) ? 1 : -1;
+> -               unsigned int old_flags =3D dev->flags;
+> +               unsigned int old_flags =3D READ_ONCE(dev->flags);
+>
+>                 dev->gflags ^=3D IFF_PROMISC;
+>
+>                 if (__dev_set_promiscuity(dev, inc, false) >=3D 0)
+> -                       if (dev->flags !=3D old_flags)
+> +                       if (READ_ONCE(dev->flags) !=3D old_flags)
+>                                 dev_set_rx_mode(dev);
+>         }
+>
 
-> Mostly looking at this to get my head around what the details are,
-> but whilst I'm reading might as well offer some review comments.
-
-Thanks!
- 
-> I'm not a fan of too many mini patches as it makes it harder
-> to review rather than easier, but meh, I know others prefer
-> it this way.  If you are going to do it though, comments
-> need to be carefully tracking what they are talking about.
-
-Yeah, I don't like it so much either, but given the debate on this
-series I structured it so you can read the commit messages only and
-have a pretty good idea what is inside.
-
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> > + */
-> > +#define pr_fmt(fmt) "fwctl: " fmt
-> > +#include <linux/fwctl.h>
-> > +#include <linux/module.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/container_of.h>
-> > +#include <linux/fs.h>
-> 
-> Trivial: Pick an ordering scheme perhaps as then we know where you'd
-> like new headers to be added.
-
-Heh, I think it is random ordered :) But sure lets sort by name,
-though linux/fwctl.h does go first. Putting headers first in at least
-one c file is a neat trick to ensure they self-compile and don't miss
-their own #includess
-
-#define pr_fmt(fmt) "fwctl: " fmt
-#include <linux/fwctl.h>
-
-#include <linux/container_of.h>
-#include <linux/fs.h>
-#include <linux/module.h>
-#include <linux/slab.h>
-
-> > +static struct fwctl_device *
-> > +_alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
-> > +{
-> > +	struct fwctl_device *fwctl __free(kfree) = kzalloc(size, GFP_KERNEL);
-> > +	int devnum;
-> > +
-> > +	if (!fwctl)
-> > +		return NULL;
-> 
-> I'd put a blank line here.
-
-Done
-> > +/* Drivers use the fwctl_alloc_device() wrapper */
-> > +struct fwctl_device *_fwctl_alloc_device(struct device *parent,
-> > +					 const struct fwctl_ops *ops,
-> > +					 size_t size)
-> > +{
-> > +	struct fwctl_device *fwctl __free(fwctl) =
-> > +		_alloc_device(parent, ops, size);
-> > +
-> > +	if (!fwctl)
-> > +		return NULL;
-> > +
-> > +	cdev_init(&fwctl->cdev, &fwctl_fops);
-> > +	fwctl->cdev.owner = THIS_MODULE;
-> 
-> Owned by fwctl core, not the parent driver?  Perhaps a comment on why.
-> I guess related to the lifetime being independent of parent driver.
-
-Yes.
-
-	/*
-	 * The driver module is protected by fwctl_register/unregister(),
-	 * unregister won't complete until we are done with the driver's module. 
-	 */
-	fwctl->cdev.owner = THIS_MODULE;
-
-
-> > +int fwctl_register(struct fwctl_device *fwctl)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = cdev_device_add(&fwctl->cdev, &fwctl->dev);
-> > +	if (ret)
-> > +		return ret;
-> > +	return 0;
-> 
-> Doesn't look like this ever gets more complex so 
-> 
-> 	return cdev_device_add(...)
-> 
-> If you expect to see more here in near future maybe fair enough
-> to keep the handling as is.
-
-Sure, I was expecting more when I wrote it then it turned out there
-wasn't
-
-> > + * fwctl_unregister - Unregister a device from the subsystem
-> > + * @fwctl: Previously allocated and registered fwctl_device
-> > + *
-> > + * Undoes fwctl_register(). On return no driver ops will be called. The
-> > + * caller must still call fwctl_put() to free the fwctl.
-> > + *
-> > + * Unregister will return even if userspace still has file descriptors open.
-> > + * This will call ops->close_uctx() on any open FDs and after return no driver
-> > + * op will be called. The FDs remain open but all fops will return -ENODEV.
-> 
-> Perhaps bring the docs in with the support?  I got (briefly) confused
-> by the lack of a path to close_uctx() in here.
-
-Okay, that paragraph can be shifted
-
-> > + *
-> > + * The design of fwctl allows this sort of disassociation of the driver from the
-> > + * subsystem primarily by keeping memory allocations owned by the core subsytem.
-> > + * The fwctl_device and fwctl_uctx can both be freed without requiring a driver
-> > + * callback. This allows the module to remain unlocked while FDs are open.
-> > + */
-
-And this explains the above a 2nd way
-
-> > +void fwctl_unregister(struct fwctl_device *fwctl)
-> > +{
-> > +	cdev_device_del(&fwctl->cdev, &fwctl->dev);
-> > +
-> > +	/*
-> > +	 * The driver module may unload after this returns, the op pointer will
-> > +	 * not be valid.
-> > +	 */
-> > +	fwctl->ops = NULL;
-> I'd bring that in with the logic doing close_uctx() etc as then it will align
-> with the comments that I'd also suggest only adding there (patch 2 I think).
-
-Ok
-
-> > +/**
-> > + * fwctl_alloc_device - Allocate a fwctl
-> > + * @parent: Physical device that provides the FW interface
-> > + * @ops: Driver ops to register
-> > + * @drv_struct: 'struct driver_fwctl' that holds the struct fwctl_device
-> > + * @member: Name of the struct fwctl_device in @drv_struct
-> > + *
-> > + * This allocates and initializes the fwctl_device embedded in the drv_struct.
-> > + * Upon success the pointer must be freed via fwctl_put(). Returns NULL on
-> > + * failure. Returns a 'drv_struct *' on success, NULL on error.
-> > + */
-> > +#define fwctl_alloc_device(parent, ops, drv_struct, member)                  \
-> > +	container_of(_fwctl_alloc_device(                                    \
-> > +			     parent, ops,                                    \
-> > +			     sizeof(drv_struct) +                            \
-> > +				     BUILD_BUG_ON_ZERO(                      \
-> > +					     offsetof(drv_struct, member))), \
-> Doesn't that fire a build_bug when the member is at the start of drv_struct?
-> Or do I have that backwards?
-
-BUILD_BUG_ON(true) == failure, evaluates to void
-BUILD_BUG_ON_ZERO(true) == fails, evaluates to 0
-BUILD_BUG_ON_ZERO(false) == false, evaluates to 0
-
-It is a bit confusing name, it is not ON_ZERO it is BUG_ON return ZERO
-
-> Does container_of() safely handle a NULL?
-
-Generally no, nor does it handle ERR_PTR, but it does work for both if
-the offset is 0.
-
-The BUILD_BUG guarentees the 0 offset both so that the casting inside
-_fwctl_alloc_device() works and we can use safely use container_of()
-to enforce the type check.
-
-What do you think about writing it like this instead:
-
-#define fwctl_alloc_device(parent, ops, drv_struct, member)               \
-	({                                                                \
-		static_assert(__same_type(struct fwctl_device,            \
-					  ((drv_struct *)NULL)->member)); \
-		static_assert(offsetof(drv_struct, member) == 0);         \
-		(drv_struct *)_fwctl_alloc_device(parent, ops,            \
-						  sizeof(drv_struct));    \
-	})
-
-?
-
-In some ways I like it better..
-
-Thanks,
-Jason
+These READ_ONCE() in RTNL protected regions are not necessary, because
+dev->flags can not be changed by another thread.
 
