@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-113766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B354B93FD5C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:31:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7408893FD5E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60111C22052
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:31:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30A422817DA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF90E187336;
-	Mon, 29 Jul 2024 18:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D4C187850;
+	Mon, 29 Jul 2024 18:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNq+R43x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d0KijAof"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D947603A;
-	Mon, 29 Jul 2024 18:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B498187845;
+	Mon, 29 Jul 2024 18:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722277872; cv=none; b=u6tjNPkqfG8/CWvS039i5PjYQEklrm2tkynW587CwYzEAbWrlfHddm8ZqYLXOqlPPUpx5A5FW7yFfgEjtwcmtmUKMW4KhiaP3cf0zI2CFbMKjFQ/dgRmoN/tUEpabCFEHFcK/6kusShaTPV0+sdRBUdgaA+rVplHp7MfWnUNoLU=
+	t=1722277876; cv=none; b=KnOJhODsIfTdzO+y7yzelXennhZAQrWZNdAakSyRaJf08EvF2EIIAmXvuzL0MyB9UZDnG5wcqDhc1xqBjHhG6iCy8c7BwFG4dSORL8OboOb9zROJ4WYgGNsrHqjlbUWKaKS+73ya7Mzhdafac6g9IDzRWEScwEMh8lYAjsLTPX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722277872; c=relaxed/simple;
-	bh=zd+MCEbMO6JeXdw0qJmG2+Ky+bWx5/+j7mPhuUe1J7A=;
+	s=arc-20240116; t=1722277876; c=relaxed/simple;
+	bh=4v1JcM+xNdFDbTS+smgec2vJCq8myoE780AU0iX465Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B/r8PIukBkhDhJVt/7leNrYW/HcDoDsIYGM3vs6we+19bVrXCSssnDYWjZdjDUNidSTiKqiROfJmhee5oucKQRRNLjQnz5kQthENrPpYiZ4zo2E2+iIednD8nC/ri/4YqIxeR6cu+JtSsAm//Pca8bp+f3bHpdQ8VeaPI3flAuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FNq+R43x; arc=none smtp.client-ip=209.85.221.46
+	 MIME-Version; b=f8KiD34CvzIhhPaiDelibrtdMHOHl622xUHdec1gQKdKLazETd6s7X3EipXaherMQBj5p9nBCSXVi23ZqmYspcnJDUkeEVm3DWPzxG6tgefz17mshS5dvG2ZCcF7tpTnNn8rzYmVT5QrzXBbZ43Yuhz6f0Yy+8OYIRBLBTemQB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d0KijAof; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3685a564bafso1635038f8f.3;
-        Mon, 29 Jul 2024 11:31:10 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4281abc64dfso12714555e9.3;
+        Mon, 29 Jul 2024 11:31:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722277869; x=1722882669; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722277873; x=1722882673; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c3HZPjGWY4VRrAKXTzpvY38O5iWIBdVGuavEILhUuRQ=;
-        b=FNq+R43xfoz9flhyp1PcuTZV6m9fWnNoE5RE0kExN3NnLUUeBgMQ4ehL6EGkImIm2Z
-         6KkPPcOrCmHPgzoIk92+uAhu2SJanyHdY8w/SBdjKi/65KTWUxNycy/jZltP4t+87NQ7
-         Nq/T4yt8yLkxkWrJ+W/SWML0u6htW61VEAYPoUH53EZ2fZIj3b2hrMFRllvSj4Zu4tql
-         IifmCCAo7QWr1rcg1B56mZNr3klFIsB7UNPfuhBHipvlitFDMHSbI8RJ1XjMnhbrTeOV
-         i2Q/Y2eQj5H2o+B+/F7jnkwDabZfZrkWoTrn559gYO8gZC2cCFsM/jYAOrIh6qWrbDP3
-         Z7Lw==
+        bh=LIqKxSZyWTf/Z3V2HppYDKSRNXowgVnrZ6ay0XmhCCI=;
+        b=d0KijAofECoy8PkFV3WL9sT8HXRMLxL2OlrqYsNd8HeMrXTy4D7T41xmQdm7z2w+O4
+         kswQRLUlR+PwpnbDsYzWWyzl5SNMPMv+5ctQPssaXRpIjYZtAGHxpAYFrDYIJOvGXT1T
+         NU+Hrg9eeA1+zEsNB7akPNXzr3coQgqRfloAd4vm8xpmxZogcFtvv0QybcIYxKeFzpfA
+         Ll7ITwQey51N2jwk3Eb2iLTne0KKStaILUc4SgiR2vWOfRBjhvfduTmWgLqa4lNjHuak
+         6982voVRmTJpD5MevP3PnQbfVyeZqdEdd37QYzrm/0OfFwvF2/4U+MrKSCz9SM2e0/nK
+         BEcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722277869; x=1722882669;
+        d=1e100.net; s=20230601; t=1722277873; x=1722882673;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=c3HZPjGWY4VRrAKXTzpvY38O5iWIBdVGuavEILhUuRQ=;
-        b=TJjsK5N/EIoO73kUcFlPVYrTypZXxPulgxUggForftv7ZaDm3EOs89BYtGYjoubb6N
-         JKEziNzvEpAO4yzgTHSf3EuxhMiDvpMX1b8awqGaCiGSFECgJ4ELofUlbsbBzlJ4epYt
-         73syuHmWtzlEinQ3T7FnrduXBdPUPcEBOWBdVV+1CdNSRpf33tvEUiNnC6qvIlSjKf2X
-         /Ijs1O3SpgxRvQmnzRerjKy4nGOLvZKxoNju/Bx+Rpe59lGoonI5CtftDOxSX05WmOKx
-         itjah+KF/18oyzdJHNnDTDwOIx/UBC9zqNcBmKeK9RjUAsOPkblH8Gr4q4Fy0lPcnB1w
-         h1Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEzODbapoLah0qCOg5bobpbiSq/gn6/tJBHaAierV02z70FssEm/+SdnMEobBWLoi6VQvLqrCiwAVbxPTfnoTrZdn+BUbeWdSJ8k+E6cGTr5cCr3U98FaKmj2lbT6PE+guKXqm
-X-Gm-Message-State: AOJu0YzuXtghLkLZLeLbt7vkDg3BMomvMO3C10Jkt9q2PB728/9e7W5H
-	VKbmvI9/PjSF1gPrnSOYJAFHS86C2LB4AbcUvGJjGcM0HlXrpEr1
-X-Google-Smtp-Source: AGHT+IGqZxgSP4lsPbAxAppqsr2GefFixDAdbJfCPlCS9IEnJzJghfslCrcUrnOqBBH8tG5Kr1hq0g==
-X-Received: by 2002:adf:ec0f:0:b0:368:6620:20ec with SMTP id ffacd0b85a97d-36b5d08b948mr5667615f8f.43.1722277869212;
-        Mon, 29 Jul 2024 11:31:09 -0700 (PDT)
+        bh=LIqKxSZyWTf/Z3V2HppYDKSRNXowgVnrZ6ay0XmhCCI=;
+        b=uYvFfMBzj5uKO6N4kOkaMWpUVMXVrcBC8eXg5i+OsCF7GXB5dOFJPK3iMwpbNPqGhG
+         xoD1oS9ujRKVOYmnrUlVvBHQRb/H335GlgjWUJejSbImjn3iGkGfV9hNO/XPNz5+jrNr
+         p2Y+fySM8tH1dQL/g7UA7u/ayNwquEQ0Jtg8kpTH0I7usirA20NKHebAZVb6Wn/nluU5
+         +0uHQ6/SrN6q4peOV/pWzIK6/gJVerBiWEw6IE616wFYzEqJimq7Q+2gz9zNjlLpBf6d
+         VBJgASg4m7bvmQztZiID8iS3g7s0jIHrM2gNPJ0JtY3wybgnDBsNt0poJrGs93UxoqK8
+         5GlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUouNuN8T1+eEH0ddcchIMWfpzT1K30Niz0l5Jmhk+3G9PiqbEV7L9BAaGf38AdrSFIouIU5YEj9bHXMH+XxBWguLI4WIMsn3ngu9TUiLlP1R5PtaeHjX9Vd7OqhPK6scdgqcrJ
+X-Gm-Message-State: AOJu0Yx6NOUJAywGjNLJtaNpYl5Kh89rdw3c0cGygdaA9JiJMm3rlgON
+	vdRTpSbeunzT2tXnmf8OjjV1XdJpE0uhqO2MGp8PlMCgyB8+wz8s
+X-Google-Smtp-Source: AGHT+IHUcB8/KDGDXgq3kOKIaEI3RytM/LjgWsO98GOv2rYjFJYGwyqRRrzVWn4eD9YGmY7tMl40pw==
+X-Received: by 2002:a05:6000:1542:b0:368:4e4f:cec5 with SMTP id ffacd0b85a97d-36b5cf25338mr7500104f8f.35.1722277873000;
+        Mon, 29 Jul 2024 11:31:13 -0700 (PDT)
 Received: from yifee.lan ([176.230.105.233])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367c0aa1sm12800165f8f.21.2024.07.29.11.31.07
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367c0aa1sm12800165f8f.21.2024.07.29.11.31.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 11:31:09 -0700 (PDT)
+        Mon, 29 Jul 2024 11:31:12 -0700 (PDT)
 From: Elad Yifee <eladwf@gmail.com>
 To: Felix Fietkau <nbd@nbd.name>,
 	Sean Wang <sean.wang@mediatek.com>,
@@ -85,9 +85,9 @@ To: Felix Fietkau <nbd@nbd.name>,
 Cc: Elad Yifee <eladwf@gmail.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Joe Damato <jdamato@fastly.com>
-Subject: [PATCH net-next v2 1/2] net: ethernet: mtk_eth_soc: use prefetch methods
-Date: Mon, 29 Jul 2024 21:29:54 +0300
-Message-ID: <20240729183038.1959-2-eladwf@gmail.com>
+Subject: [PATCH net-next v2 2/2] net: ethernet: mtk_eth_soc: use PP exclusively for XDP programs
+Date: Mon, 29 Jul 2024 21:29:55 +0300
+Message-ID: <20240729183038.1959-3-eladwf@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240729183038.1959-1-eladwf@gmail.com>
 References: <20240729183038.1959-1-eladwf@gmail.com>
@@ -99,75 +99,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Utilize kernel prefetch methods for faster cache line access.
-This change boosts driver performance,
-allowing the CPU to handle about 5% more packets/sec.
+PP allocations and XDP code path traversal are unnecessary
+when no XDP program is loaded.
+Prevent that by simply not creating the pool.
+This change boosts driver performance for this use case,
+allowing the CPU to handle about 13% more packets/sec.
 
 Signed-off-by: Elad Yifee <eladwf@gmail.com>
 ---
-Changes in v2:
-	- use net_prefetchw as suggested by Joe Damato
-	- add (NET_SKB_PAD + eth->ip_align) offset to prefetched data
-	- use eth->ip_align instead of NET_IP_ALIGN as it could be 0,
-	depending on the platform 
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 16ca427cf4c3..4d0052dbe3f4 100644
+index 4d0052dbe3f4..2d1a48287c73 100644
 --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
 +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -1963,6 +1963,7 @@ static u32 mtk_xdp_run(struct mtk_eth *eth, struct mtk_rx_ring *ring,
- 	if (!prog)
- 		goto out;
+@@ -2644,7 +2644,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
+ 	if (!ring->data)
+ 		return -ENOMEM;
  
-+	net_prefetchw(xdp->data_hard_start);
- 	act = bpf_prog_run_xdp(prog, xdp);
- 	switch (act) {
- 	case XDP_PASS:
-@@ -2038,6 +2039,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
+-	if (mtk_page_pool_enabled(eth)) {
++	if (mtk_page_pool_enabled(eth) && rcu_access_pointer(eth->prog)) {
+ 		struct page_pool *pp;
  
- 		idx = NEXT_DESP_IDX(ring->calc_idx, ring->dma_size);
- 		rxd = ring->dma + idx * eth->soc->rx.desc_size;
-+		prefetch(rxd);
- 		data = ring->data[idx];
- 
- 		if (!mtk_rx_get_desc(eth, &trxd, rxd))
-@@ -2105,6 +2107,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 			if (ret != XDP_PASS)
- 				goto skip_rx;
- 
-+			net_prefetch(xdp.data_meta);
- 			skb = build_skb(data, PAGE_SIZE);
- 			if (unlikely(!skb)) {
- 				page_pool_put_full_page(ring->page_pool,
-@@ -2113,6 +2116,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 				goto skip_rx;
- 			}
- 
-+			net_prefetchw(skb->data);
- 			skb_reserve(skb, xdp.data - xdp.data_hard_start);
- 			skb_put(skb, xdp.data_end - xdp.data);
- 			skb_mark_for_recycle(skb);
-@@ -2143,6 +2147,7 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 			dma_unmap_single(eth->dma_dev, ((u64)trxd.rxd1 | addr64),
- 					 ring->buf_size, DMA_FROM_DEVICE);
- 
-+			net_prefetch(data + NET_SKB_PAD + eth->ip_align);
- 			skb = build_skb(data, ring->frag_size);
- 			if (unlikely(!skb)) {
- 				netdev->stats.rx_dropped++;
-@@ -2150,7 +2155,8 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 				goto skip_rx;
- 			}
- 
--			skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
-+			net_prefetchw(skb->data);
-+			skb_reserve(skb, NET_SKB_PAD + eth->ip_align);
- 			skb_put(skb, pktlen);
- 		}
- 
+ 		pp = mtk_create_page_pool(eth, &ring->xdp_q, ring_no,
 -- 
 2.45.2
 
