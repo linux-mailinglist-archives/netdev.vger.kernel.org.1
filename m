@@ -1,255 +1,109 @@
-Return-Path: <netdev+bounces-113596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF77493F403
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:28:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE87393F415
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 005252831BF
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:28:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F89EB2194B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:32:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A68C145330;
-	Mon, 29 Jul 2024 11:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E4B145B3E;
+	Mon, 29 Jul 2024 11:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Yu+S92ns"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="G97w9aGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6656613DDAA;
-	Mon, 29 Jul 2024 11:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFD8145B3B;
+	Mon, 29 Jul 2024 11:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722252531; cv=none; b=fDMoSa0uw78IskGCOscK6wim0UgaN/MbTEWUpmaFBDPU6xUalXJnaxaaUuaPWKvJfOhxAvt4WyEAJK7SCZ5FJKpNwOgizCcRufM8wlBMcTPL7WceW1OSl9o5CYUKlGhytVja/xDMszGeGQ1ev0Mnf2RtFEjfxo55fsPbw4ZIcME=
+	t=1722252752; cv=none; b=UNe+ShZPWzEda0K9JrW2G3HAgloY3auAa/DxyeRzko/S9NC3f0qAX4He0RnaapYTmpIZdzdJ+s1/QZ6RAnfVfZv3NjlkuNLQgFHjJ/lx5i3v16sjsCTnNaZ6cWSZ1AimtxqD5xznY4PsFf5TKPdEovhEXytu26qhwX9yHbxkOf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722252531; c=relaxed/simple;
-	bh=iQzz6hBr6rcaCUZ7xkErMmYRcca5NKRJdp4+ze/FMEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hISM3kmLr6Dz4vuml2gVVfnQaD+KWtd2FoTlmavV+VWtNBXq0ma9cSl5kEAY+HJhEcqn4fnqfMz7qy1+lmH/gAK8bswDd2WHZCWHSSECn6UyV1hzvN09Qag8iuOHKiH5mYr1CvXcXxHoO2UnFRVzBIiORFqPtXR6SyounmiawtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Yu+S92ns; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DNmwto5kp0C+1NJjEB8Kib+Ypx/Zw6110DGbri4A/Wg=; b=Yu+S92nsi+Wpg2nq8cZAfUAc37
-	NR810DTPvmTREKPDXgz1BQyVUn9e4etO9LX0L/AT3DJ+bmQU/dKfKlHj0pyw/T5DsXz6lzmbtRlto
-	xX/tmCiBWA4uW7vioAMz5gK4drsD6d8z7slfwiA7hhrf6tGbuqaU6laPzD35Yof+dqgcI2LBkU7Xd
-	gpBch9cpFg9Pv1PGky3sSsV8MpSs8iLTWG/kLn3L7p1duVHjzoRtbQ/upnjnnT241hRf4kqVv5Ri5
-	zXOGJK2dzL6IfXdWcvz+TLI3sO4Z1trqOheN90s3C3tZ5TupuMF/++eXj7ZsR1ik4nweQbsTAaOJq
-	HGFSVWGg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42180)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sYOY4-00043K-03;
-	Mon, 29 Jul 2024 12:28:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sYOY3-0004HJ-Vp; Mon, 29 Jul 2024 12:28:16 +0100
-Date: Mon, 29 Jul 2024 12:28:15 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Crispin <john@phrozen.org>, Felix Fietkau <nbd@nbd.name>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
-	Sam Shih <Sam.Shih@mediatek.com>,
-	Weijie Gao <Weijie.Gao@mediatek.com>,
-	Steven Liu <steven.liu@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next] net: pcs: add helper module for standalone
- drivers
-Message-ID: <Zqd8z+/TL22OJ1iu@shell.armlinux.org.uk>
-References: <ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1722252752; c=relaxed/simple;
+	bh=OIqYNP07lmUDbb+iEBCiVn0Q8zOlpBINYIEaSEre6wM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XqGeKg+Cr8qupJRewzgaREvF9L8sfZ+QuNisGIXn6IxSvzu6uaoOjW2sP5puAIBfpStHYADz0TCIR2y4Tus08RNP4F3Ta+unlBb90Pgxqe8Y64qNvTtbsFlaUSmxUFUjrixkp3haP4Amy8fLU7zCNEv7IXVsTPRzAvaES8XYqOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=G97w9aGI; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 46TBVrUfA3916887, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1722252713; bh=OIqYNP07lmUDbb+iEBCiVn0Q8zOlpBINYIEaSEre6wM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=G97w9aGI4KwdD+xT+dkKAusF++L0gUU4UXpyLSszkgmWHO5iETfLroM7N8VVuw7I7
+	 MmkngebihxWcDDp+G+34VmgZ+kwVR42DW7PyHyzRwt34CudfXTdgPY7fPMkIIitPfS
+	 nFVJuRpJPsBYn/qSfKFkGhcxtC9p94733Njiyd+QHCq5vycRqXSGzS2uQwfX+bnIBK
+	 hugtS8vAQEUdeC25WMwybMWicxAQRSx1M76XRG868FgVEABy+9SuwkvbuRMpRs1Bbz
+	 6Q3XkqLwEvqvTpSf7ioK2zP9hbES6rOALRZCiLYuTrad5NCAwaN8Rmd0J9RKkD0MbO
+	 pWn8+1XDSrxEg==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 46TBVrUfA3916887
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Jul 2024 19:31:53 +0800
+Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 29 Jul 2024 19:31:53 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 29 Jul 2024 19:31:52 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1a1:9ae3:e313:52e7%5]) with mapi id
+ 15.01.2507.035; Mon, 29 Jul 2024 19:31:52 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Markus Elfring <Markus.Elfring@web.de>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>
+CC: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, "Jiri
+ Pirko" <jiri@resnulli.us>,
+        Joe Damato <jdamato@fastly.com>, Larry Chiu
+	<larry.chiu@realtek.com>,
+        Paolo Abeni <pabeni@redhat.com>, Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Ratheesh Kannoth <rkannoth@marvell.com>,
+        Simon Horman
+	<horms@kernel.org>
+Subject: RE: [PATCH net-next v25 01/13] rtase: Add support for a pci table in this module
+Thread-Topic: [PATCH net-next v25 01/13] rtase: Add support for a pci table in
+ this module
+Thread-Index: AQHa4X+QuLAVVbX1HE21ZavZM+hY77IM65kAgACnJwA=
+Date: Mon, 29 Jul 2024 11:31:52 +0000
+Message-ID: <a00539c18c894f0192bea94b48fcfa69@realtek.com>
+References: <20240729062121.335080-2-justinlai0215@realtek.com>
+ <446be4e4-ea7e-47ec-9eba-9130ed662e2c@web.de>
+In-Reply-To: <446be4e4-ea7e-47ec-9eba-9130ed662e2c@web.de>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Thu, Jul 25, 2024 at 01:44:49PM +0100, Daniel Golle wrote:
-> Implement helper module for standalone PCS drivers which allows
-> standaline PCS drivers to register and users to get instances of
-> 'struct phylink_pcs' using device tree nodes.
-> 
-> At this point only a single instance for each device tree node is
-> supported, once we got devices providing more than one PCS we can
-> extend it and introduce an xlate function as well as '#pcs-cells',
-> similar to how this is done by the PHY framework.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> This is meant to provide the infrastructure suggested by
-> Russell King in an earlier review. It just took me a long while to
-> find the time to implement this.
-> Users are going to be the standalone PCS drivers for 8/10 LynxI as
-> well as 64/66 USXGMII PCS found on MediaTek MT7988 SoC.
-> See also https://patchwork.kernel.org/comment/25636726/
-> 
-> The full tree where this is being used can be found at
-> 
-> https://github.com/dangowrt/linux/commits/mt7988-for-next/
-> 
->  drivers/net/pcs/Kconfig            |  4 ++
->  drivers/net/pcs/Makefile           |  1 +
->  drivers/net/pcs/pcs-standalone.c   | 95 +++++++++++++++++++++++++++++
->  include/linux/pcs/pcs-standalone.h | 25 ++++++++
->  4 files changed, 129 insertions(+)
->  create mode 100644 drivers/net/pcs/pcs-standalone.c
->  create mode 100644 include/linux/pcs/pcs-standalone.h
-> 
-> diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-> index f6aa437473de..2b02b9351fa4 100644
-> --- a/drivers/net/pcs/Kconfig
-> +++ b/drivers/net/pcs/Kconfig
-> @@ -5,6 +5,10 @@
->  
->  menu "PCS device drivers"
->  
-> +config PCS_STANDALONE
-> +	tristate
-> +	select PHYLINK
-> +
->  config PCS_XPCS
->  	tristate "Synopsys DesignWare Ethernet XPCS"
->  	select PHYLINK
-> diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
-> index 4f7920618b90..0cb0057f2b8e 100644
-> --- a/drivers/net/pcs/Makefile
-> +++ b/drivers/net/pcs/Makefile
-> @@ -4,6 +4,7 @@
->  pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-plat.o \
->  				   pcs-xpcs-nxp.o pcs-xpcs-wx.o
->  
-> +obj-$(CONFIG_PCS_STANDALONE)	+= pcs-standalone.o
->  obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
->  obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
->  obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
-> diff --git a/drivers/net/pcs/pcs-standalone.c b/drivers/net/pcs/pcs-standalone.c
-> new file mode 100644
-> index 000000000000..1569793328a1
-> --- /dev/null
-> +++ b/drivers/net/pcs/pcs-standalone.c
-> @@ -0,0 +1,95 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Helpers for standalone PCS drivers
-> + *
-> + * Copyright (C) 2024 Daniel Golle <daniel@makrotopia.org>
-> + */
-> +
-> +#include <linux/pcs/pcs-standalone.h>
-> +#include <linux/phylink.h>
-> +
-> +static LIST_HEAD(pcs_list);
-> +static DEFINE_MUTEX(pcs_mutex);
-> +
-> +struct pcs_standalone {
-> +	struct device *dev;
-> +	struct phylink_pcs *pcs;
-> +	struct list_head list;
-> +};
-> +
-> +static void devm_pcs_provider_release(struct device *dev, void *res)
-> +{
-> +	struct pcs_standalone *pcssa = (struct pcs_standalone *)res;
-> +
-> +	mutex_lock(&pcs_mutex);
-> +	list_del(&pcssa->list);
-> +	mutex_unlock(&pcs_mutex);
-
-This needs to do notify phylink if the PCS has gone away, but the
-locking for this would be somewhat difficult (because pcs->phylink
-could change if the PCS changes.) That would need to be solved
-somehow.
-
-> +}
-> +
-> +int devm_pcs_register(struct device *dev, struct phylink_pcs *pcs)
-> +{
-> +	struct pcs_standalone *pcssa;
-> +
-> +	pcssa = devres_alloc(devm_pcs_provider_release, sizeof(*pcssa),
-> +			     GFP_KERNEL);
-> +	if (!pcssa)
-> +		return -ENOMEM;
-> +
-> +	devres_add(dev, pcssa);
-> +	pcssa->pcs = pcs;
-> +	pcssa->dev = dev;
-> +
-> +	mutex_lock(&pcs_mutex);
-> +	list_add_tail(&pcssa->list, &pcs_list);
-> +	mutex_unlock(&pcs_mutex);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(devm_pcs_register);
-> +
-> +static struct pcs_standalone *of_pcs_locate(const struct device_node *_np, u32 index)
-> +{
-> +	struct device_node *np;
-> +	struct pcs_standalone *iter, *pcssa = NULL;
-> +
-> +	if (!_np)
-> +		return NULL;
-> +
-> +	np = of_parse_phandle(_np, "pcs-handle", index);
-> +	if (!np)
-> +		return NULL;
-> +
-> +	mutex_lock(&pcs_mutex);
-> +	list_for_each_entry(iter, &pcs_list, list) {
-> +		if (iter->dev->of_node != np)
-> +			continue;
-> +
-> +		pcssa = iter;
-> +		break;
-> +	}
-> +	mutex_unlock(&pcs_mutex);
-> +
-> +	of_node_put(np);
-> +
-> +	return pcssa ?: ERR_PTR(-ENODEV);
-> +}
-> +
-> +struct phylink_pcs *devm_of_pcs_get(struct device *dev,
-> +				    const struct device_node *np,
-> +				    unsigned int index)
-> +{
-> +	struct pcs_standalone *pcssa;
-> +
-> +	pcssa = of_pcs_locate(np ?: dev->of_node, index);
-> +	if (IS_ERR_OR_NULL(pcssa))
-> +		return ERR_PTR(PTR_ERR(pcssa));
-> +
-> +	device_link_add(dev, pcssa->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
-
-This is really not a nice solution when one has a network device that
-has multiple interfaces. This will cause all interfaces on that device
-to be purged from the system when a PCS for one of the interfaces
-goes away. If the system is using NFS-root, that could result in the
-rootfs being lost. We should handle this more gracefully.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+PiA+ICsrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsvcnRhc2UvcnRhc2UuaA0KPiA+
+IEBAIC0wLDAgKzEsMzM4IEBADQo+IOKApg0KPiA+ICsjaWZuZGVmIF9SVEFTRV9IXw0KPiA+ICsj
+ZGVmaW5lIF9SVEFTRV9IXw0KPiDigKYNCj4gDQo+IEkgc3VnZ2VzdCB0byBvbWl0IGxlYWRpbmcg
+dW5kZXJzY29yZXMgZnJvbSBzdWNoIGlkZW50aWZpZXJzLg0KPiBodHRwczovL3dpa2kuc2VpLmNt
+dS5lZHUvY29uZmx1ZW5jZS9kaXNwbGF5L2MvRENMMzctQy4rRG8rbm90K2RlY2xhcmUrb3IrZA0K
+PiBlZmluZSthK3Jlc2VydmVkK2lkZW50aWZpZXINCj4gDQo+IFJlZ2FyZHMsDQo+IE1hcmt1cw0K
+DQpIaSBNYXJrdXMsDQoNClRoYW5rIHlvdSBmb3IgeW91ciByZXNwb25zZSwgSSB3aWxsIG1vZGlm
+eSBpdC4NCg0KSnVzdGluDQo=
 
