@@ -1,110 +1,141 @@
-Return-Path: <netdev+bounces-113516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B26293ED6F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:28:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E1D93ED76
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FA2B1F2274D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 06:28:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B6A1282C4D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 06:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C433884052;
-	Mon, 29 Jul 2024 06:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B19784039;
+	Mon, 29 Jul 2024 06:29:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="vxv7qqY5"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="E6FW32CY"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53590328B6;
-	Mon, 29 Jul 2024 06:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD704328B6;
+	Mon, 29 Jul 2024 06:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722234469; cv=none; b=eHlIhllug0fouiSK36m0wJCI2e5gQOBgh7shYLy5ky2YA75oIo9kQmRNY9pCHr9RrEk373A+gDeDnb2JUdWMkO4jUnzWvsE1Q89tMBZBaFAUGIyUKAczp8URKA2ZsYoRrqjbKp1LkEL/cwc5c1zBiWyStOAuGrOPe5LaNNsNLeM=
+	t=1722234560; cv=none; b=jqv6LphloLPE+/H5uRDx2Hsx/2DXJ3j2Wxv47fDd8dkMzjnBjWZjjAw+bcPUbpjsFkXUbnpZV3vuWHIJ44JbytgA2wR7L4lvQc9W5KPx9oIvz7PnOBe+OXk/pdY8qDMq9AYU6veAm3warT67fJ9ZHd/x6t1elk+AF6lc9j45MqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722234469; c=relaxed/simple;
-	bh=pol3fu6WOU1lCWe4vLKk0hT+mGmXKf8CX9PFa/RJa3Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FcKoic78iBNGKpax7YeJGL/JoP7xsXoaf6mwdRQMJw7cpjKiEwroZf8qmXJfAXmvF3uz2vI8cEUGt8HcJRf6EPFtsKRPTZIcBZlPxHHwPSNxgGs9cCBS9n6fHDSH9VDrqlj9H9boc/BgzpKay7QNw4FAqo77ofGhpXsLkFKF3Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=vxv7qqY5; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 46T6RQzD43601639, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1722234446; bh=pol3fu6WOU1lCWe4vLKk0hT+mGmXKf8CX9PFa/RJa3Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=vxv7qqY5c8Ri5hFSJSo26h5mFpjczwHO22yvlSembX0dP85ef0GYT9FxA3ieFoXmu
-	 fguO7SIdCVm9bfJfvRvKVDLLfDSiEJ6hSs7V0jckJ0t5abHc2I+rY5o5PcqcDhZSVe
-	 NsMA9PDyV+a2+6c5pInTXrQARo+KIUQF3sRRa2qyGh5uRisjDpe4QjWTDLPMmlL12a
-	 dt9ll/UplHKPM7h75F0yq6XXI7hAJsg2h+cibLe0OrKCJjYxdeDOlL0juIN3wcVL6F
-	 NRgTMNNfkqyddNQQnr0bihfyhpa6/5glzF0/sWFXVcPyy0oZJ4ZHcORgmsnbeGHpWY
-	 G8O7+tISV5amA==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 46T6RQzD43601639
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Jul 2024 14:27:26 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 29 Jul 2024 14:27:27 +0800
-Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 29 Jul
- 2024 14:27:25 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <andrew@lunn.ch>, <jiri@resnulli.us>, <horms@kernel.org>,
-        <rkannoth@marvell.com>, <jdamato@fastly.com>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, "Justin
- Lai" <justinlai0215@realtek.com>
-Subject: [PATCH net-next v25 13/13] MAINTAINERS: Add the rtase ethernet driver entry
-Date: Mon, 29 Jul 2024 14:21:21 +0800
-Message-ID: <20240729062121.335080-14-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240729062121.335080-1-justinlai0215@realtek.com>
-References: <20240729062121.335080-1-justinlai0215@realtek.com>
+	s=arc-20240116; t=1722234560; c=relaxed/simple;
+	bh=rKtXm5j9uGr85ju3QPUS0Y0jZZMtc/lRWL71qwrZ+aQ=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=bHga/UNdyYWiRsTwHPUA2mdvDlC+h7EzWrCoIUhZ7Fqls0aWFLtKzA/6cBnyFt23aUIEHJ8NFsuAkzmkbWVRPzyA8H0CcTtEsOsfWWpYvI8tHxIbX/KHE8RF2GR7pFe9Tzn6+isFr1cjH/2MOc5uRaHTJ9jFlQKBR1s5r3ZU7fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=E6FW32CY; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1722234554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zuLO0Hu9JrNxFAuTuQzFrX0yn6O99topF2F+vT4EkqA=;
+	b=E6FW32CYSeBOTn4pufFUmDh2PV0zA8RkoOvsbBbpPsmVaumq8tXY/hb0xRD6TcDxESw8n/
+	vvi3ixqcsX5ogQs7WNylIFZZXnA2kKCGRkOd+b2I30MdOTHK1CNYKXpCy+RTBAuMGSr9Bn
+	+gg8IJnwvKC+w0jU6ho30COFfqwzh2DXX4hv5czsU5cVXokx0BctpZRfNYyBNd40ht45if
+	/9HzH4QuhrZfxZ/IIkmDcLWir1EQY0cadPkFZUaazJSVjeU1Yv5JsvDnmjAmLwycLguBxF
+	zveA/w6JTDVwYcyhp68VZtyd4RBX6x+wiSFHvbqPjQhYFhoHy0DkvznIhehynw==
+Date: Mon, 29 Jul 2024 08:29:13 +0200
+From: Dragan Simic <dsimic@manjaro.org>
+To: Greg KH <gregkh@linuxfoundation.org>, mcgrof@kernel.org,
+ jtornosm@redhat.com
+Cc: Andrew Lunn <andrew@lunn.ch>, UNGLinuxDriver@microchip.com,
+ davem@davemloft.net, edumazet@google.com, f.fainelli@gmail.com,
+ kuba@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, lucas.demarchi@intel.com, masahiroy@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, woojung.huh@microchip.com
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
+ module
+In-Reply-To: <2024072923-galleria-gumdrop-5c56@gregkh>
+References: <bcc81ea0-78e1-476e-928c-b873a064b479@lunn.ch>
+ <20240726121530.193547-1-jtornosm@redhat.com>
+ <b96d9801-d370-4ddd-97fd-5eac2a2656f4@lunn.ch>
+ <931b582808f237aa3746c5b0a96b3665@manjaro.org>
+ <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
+ <a520ee4da331c8edb99f2c14d22a3531@manjaro.org>
+ <3a3f49b5-45b2-4999-a364-60d035bbd11f@lunn.ch>
+ <98d200777d62dc9b447557b2758613e5@manjaro.org>
+ <3a6ef66a-e98f-44df-9fef-3b26bede4c07@lunn.ch>
+ <36bfb8da08b90fb14108e99853f49d0f@manjaro.org>
+ <2024072923-galleria-gumdrop-5c56@gregkh>
+Message-ID: <b8a2831c4f2d49469d5af04c03bb1a5b@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-Add myself and Larry Chiu as the maintainer for the rtase ethernet driver.
+Hello Greg, Jose and Luis,
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+On 2024-07-29 08:13, Greg KH wrote:
+> On Mon, Jul 29, 2024 at 06:43:40AM +0200, Dragan Simic wrote:
+>> On 2024-07-28 22:57, Andrew Lunn wrote:
+>> > > In other words, this patch doesn't subtract anything.  Instead, it
+>> > > just
+>> > > adds a weakdep link between the lan78xx and micrel modules, so the
+>> > > kernel
+>> > > itself can report that dependency, which may actually result in one
+>> > > more
+>> > > PHY driver added to a generated initial ramdisk.
+>> >
+>> > So at the moment, does the initramfs contain all PHY modules? I guess
+>> > it does, because you have no knowledge which are actually needed. And
+>> > this does not help you in any way, as you said, it does not subtract
+>> > anything.
+>> 
+>> Basically, an initial ramdisk shouldn't contain any PHY modules that
+>> aren't automatically detected as needed on a particular system, for
+>> which the initial ramdisk is built.  That's how selecting modules
+>> while building the initial ramdisks works.  On the other hand, if it's
+>> some initial ramdisk built by a Linux distribution and intended to
+>> support multiple systems or boards, it may contain whatever the
+>> distribution sees fit.
+>> 
+>> Having weakdeps defined actually does help here.  For example, a Linux
+>> distribution mentioned above no longer needs to hand-craft the rules
+>> for initial ramdisk generation for the PHY modules that should be put
+>> into an initial ramdisk together with the lan78xx driver, if the Linux
+>> distribution chooses to include the lax78xx driver.  Having weakdep(s)
+>> defined makes the kernel do that instead.  Also, there's no point in
+>> including every single PHY driver module, because not all of them are
+>> needed for a particular selection of MAC drivers, which comes from the
+>> intended purpose of the initial ramdisk built by a Linux distribution,
+>> i.e. the target architecture, supported board category, etc.
+>> 
+>> Let's also keep in mind that including all PHY modules into an initial
+>> ramdisk inevitably makes it larger, which often isn't an option for
+>> resource-constrained embedded systems.
+> 
+> resource-constrained embedded systems know their dependancies and their
+> hardware configurations, so I don't see how the weak-deps help at all
+> here.
+> 
+> You are arguing two different things it seems, neither of which this
+> change helps out at all with, so I will provide a:
+> 
+>   Nacked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> 
+> here until it gets straightened out.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c0a3d9e93689..08f59737e69a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19842,6 +19842,13 @@ L:	linux-remoteproc@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/rpmsg_tty.c
- 
-+RTASE ETHERNET DRIVER
-+M:	Justin Lai <justinlai0215@realtek.com>
-+M:	Larry Chiu <larry.chiu@realtek.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/realtek/rtase/
-+
- RTL2830 MEDIA DRIVER
- L:	linux-media@vger.kernel.org
- S:	Orphan
--- 
-2.34.1
+Quite frankly, all this makes me wonder why weakdeps were merged into
+the mainline kernel [1] with no real consumers?  Perhaps this is good
+time for Jose and Luis to chime in.
 
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/include/linux/module.h?id=61842868de13aa7fd7391c626e889f4d6f1450bf
 
