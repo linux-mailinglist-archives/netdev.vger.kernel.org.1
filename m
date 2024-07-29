@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-113519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8DD93ED9C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:46:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DD693EDA9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23497281D87
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 06:46:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E9F51C214D2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 06:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05F082D91;
-	Mon, 29 Jul 2024 06:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1CA83A0E;
+	Mon, 29 Jul 2024 06:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Fxru4Y+t"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="W/VttwCg"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1F12119;
-	Mon, 29 Jul 2024 06:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397042119
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 06:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722235574; cv=none; b=G6ZSWRvNb4TUwWbKevNiY2qnR0s88mHU04S8uZvQUMjNM10hG13LEYTsHb82Y0TJzDPcUCA1kHVsK+aGsDxDLGjKPKJblpojnM6nQ1U5ZMCjiMUAgpHKrgUvfiO8HIaJXpcEHmHSbvuYDFY4Nt0dgR3KqKFuA3mEucpvBvzxni4=
+	t=1722235873; cv=none; b=RMAhKKrP0dBXVy4Dkcr/RgtYaARqZeBNIZccEeSd4onvUyfeWCJ/gn5qGWkDp5ypX5TVe+ssaphuLkh1UlqJLuYeAxrbcy7L+m+vhDmPEPaMlGbSLXJU3KmRJYuJq3d0Sq7MkcjhzYiQtrwQttQkXzjXOAxXqLcUW8WQgReOgdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722235574; c=relaxed/simple;
-	bh=R3wogILUarLMuOKLK0lDpfm3PIGb/vJu4lEvZa0OeBM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=UQ9JftTsImWvYkkVtsDpE66x1SDp3MLHtbiTr7g+RbimHe9JR7mNeZKg5/EGYqFA3LroCuBb5NGTsKkaAspkDfvJsPtNZPSdBugbecpMqzlzuyGv8fsjZLCu/muA8JiSgFH4VIMo0cr43VL5M04I7rRMrt1bVRv3xLzC0fXxF+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Fxru4Y+t; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=R3wogILUarLMuOKLK0lDpfm3PIGb/vJu4lEvZa0OeBM=; b=Fxru4Y+toyFmdCw6icmB/YNWlv
-	j9jVZ7bm1SbESqDXtPHmtxrXQAOQOE0H0oSCGedJ1I+Kc8/K3MyMnf2Pu4vsPR7LMk1BXMWKPUb01
-	TmuScp7QY9dxgDUhr0TOehkRw/RxA6kQqBZKWWoG+yAMXxloOiUiS3NkCZcI/oXAYfDzOaRk4n+r1
-	it7UJNTjsT6qv1P4Rh0fbB6HtCA9CHciNGmKxWIOvJWn6LAEitXfz1ga200CmJGS4uLQcKHRElUuM
-	kUFWYuhQFhY3qQnO/g99i0aAQLE5YuhJvXFdEdXwcjPDfkRGI6tVlRU45gi05n64a/SPKI24bCNFj
-	WWshRG+w==;
-Received: from dyn-224.woodhou.se ([90.155.92.224] helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sYK8s-00000004jfc-44xo;
-	Mon, 29 Jul 2024 06:45:59 +0000
-Date: Mon, 29 Jul 2024 07:45:59 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
- "Chashper, David" <chashper@amazon.com>,
- "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
- "Christopher S . Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH] ptp: Add vDSO-style vmclock support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20240728111746-mutt-send-email-mst@kernel.org>
-References: <20240725081502-mutt-send-email-mst@kernel.org> <f55e6dfc4242d69eed465f26d6ad7719193309dc.camel@infradead.org> <20240725082828-mutt-send-email-mst@kernel.org> <db786be69aed3800f1aca71e8c4c2a6930e3bb0b.camel@infradead.org> <20240725083215-mutt-send-email-mst@kernel.org> <98813a70f6d3377d3a9d502fd175be97334fcc87.camel@infradead.org> <20240726174958.00007d10@Huawei.com> <811E8A25-3DBC-452D-B594-F9B7B0B61335@infradead.org> <20240728062521-mutt-send-email-mst@kernel.org> <9817300C-9280-4CC3-B9DB-37D24C8C20B5@infradead.org> <20240728111746-mutt-send-email-mst@kernel.org>
-Message-ID: <92D47BE5-4D57-4C4A-A250-20B9C9EFD862@infradead.org>
+	s=arc-20240116; t=1722235873; c=relaxed/simple;
+	bh=79iaHNtGzI4j6ieUbQzbrAfGyLDbapCl/EG2Vo0//EU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m5XKwG9TgPHQMod+V2ggrmw8aG+49MI4GDSMEVU32ZmS1/BfHwko8j5P9JCgayxf3cGGeMzcSb361AUohCU+nR84F/O1H1s4MqNHv2xfWOO/gs+KlzEOOzJ4wUtNPROHjgPqZX9Da2NDWf+cxoeUFXvPlkFacKL2+dvfRUc8wR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=W/VttwCg; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-426526d30aaso14157335e9.0
+        for <netdev@vger.kernel.org>; Sun, 28 Jul 2024 23:51:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722235867; x=1722840667; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VAeqV68+syRSPxL0L9ZcxR7La0jmpQBLxORqfeO9f68=;
+        b=W/VttwCgZ0K6cHucLX3pvdM1exd0KXyyWXnzwCg2PRH2uhZJumiZpKcEUAw+69GbQ/
+         httX7oIq0OsjwpY99O5W3tgsqMRLbmPJRVaGHGIAKQTkWQiyMuTge/8MkbIOeXSvQFLp
+         nA3anxHYL8p0o5S+/QkNWRrzUCSElO2Scwye2kbNPwtjjbDdB9HTxkyF9akTx89LTwV/
+         /4PD3MrpPkmgtI+uCX34/shzwf9GGJWLBiNsOhgI84yykgaghoQRrl+AdZcXPqedOEwN
+         jL0hIU8tyjrqpb09rgdOoQwNpkH22ZNzg4e9hJeGrm9LKdRSxoKVymJFjlWNTRw37trj
+         wsqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722235867; x=1722840667;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VAeqV68+syRSPxL0L9ZcxR7La0jmpQBLxORqfeO9f68=;
+        b=bxkh7c2c1fC9InpttHgPFMWrfjBRVwIU505l3j7zROx2LYmVN0wRJXHYHwfZb5tY0y
+         RDYoyYH2gbXoVlLJXL0E6CEcFEznZqcDBDJb3d1Zrv8ML292Ykpwftc1Srb3+0apBPaB
+         Ey2SALWdRdA8tCZgciy4QAKDsbI3R+s6NuDBdJNKvprSxoX5h+lEUcBlXwcMk2qaEKwR
+         KnKKnQiqX1BRwhxZm2rd74v+T8wH8fN0W6smvbdyKrVXbucMSA2y+R0lAvF/OkGuSilM
+         cIeCVmNayIyqy22CLjSFuk4AmdgSDEXgrx2ymKhXEOPdG0u8lR3f8mgM1LSTKWzun60F
+         wByw==
+X-Gm-Message-State: AOJu0YyvtqqqgXWBzzkJOJ0p3bfbyEINMtBWhif3HB9lvXNN7TaCpvMv
+	GrEN2IeNgrf8xwUlbk5H6uf/8PKfGcRAaCTlwZTp6RRAIMbpXZqKPhHh18X4X2c=
+X-Google-Smtp-Source: AGHT+IF89LRy5yYijbVe9UvoIpeUrKbAZu37EZCSr3RNAbskw5XWu7SCcs4lLksOoXv5ncdLj61DIw==
+X-Received: by 2002:a05:600c:3c96:b0:426:6000:565a with SMTP id 5b1f17b1804b1-42811d9c562mr41715635e9.16.1722235867199;
+        Sun, 28 Jul 2024 23:51:07 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281e72c21esm13174405e9.40.2024.07.28.23.51.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jul 2024 23:51:06 -0700 (PDT)
+Date: Mon, 29 Jul 2024 08:51:03 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: [PATCH RFC net-next] bonding: Remove support for use_carrier
+Message-ID: <Zqc71wrJfSKwMuqZ@nanopsycho.orion>
+References: <2730097.1721581672@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2730097.1721581672@famine>
 
-On 28 July 2024 16:23:49 BST, "Michael S=2E Tsirkin" <mst@redhat=2Ecom> wro=
-te:
->On Sun, Jul 28, 2024 at 02:07:01PM +0100, David Woodhouse wrote:
->> On 28 July 2024 11:37:04 BST, "Michael S=2E Tsirkin" <mst@redhat=2Ecom>=
- wrote:
->> >Glad you asked :)
->>=20
->> Heh, I'm not sure I'm so glad=2E Did I mention I hate ACPI? Perhaps it'=
-s still not too late for me just to define a DT binding and use PRP0001 for=
- it :)
->>=20
->> >Long story short, QEMUVGID is indeed out of spec, but it works
->> >both because of guest compatibility with ACPI 1=2E0, and because no on=
-e
->> >much uses it=2E
-
-But why *did* it change from QEMU0003 which was in some of the patches tha=
-t got posted?
-
->> I think it's reasonable enough to follow that example and use AMZNVCLK =
-(or QEMUVCLK, but there seems little point in both) then?
+Sun, Jul 21, 2024 at 07:07:52PM CEST, jv@jvosburgh.net wrote:
+>	Remove the implementation of use_carrier, the link monitoring
+>method that utilizes ethtool or ioctl to determine the link state of an
+>interface in a bond.  The ability to set or query the use_carrier option
+>remains, but bonding now always behaves as if use_carrier=1, which
+>relies on netif_carrier_ok() to determine the link state of interfaces.
 >
->I'd stick to spec=2E If you like puns, QEMUC10C maybe?
+>	To avoid acquiring RTNL many times per second, bonding inspects
+>link state under RCU, but not under RTNL.  However, ethtool
+>implementations in drivers may sleep, and therefore this strategy is
+>unsuitable for use with calls into driver ethtool functions.
+>
+>	The use_carrier option was introduced in 2003, to provide
+>backwards compatibility for network device drivers that did not support
+>the then-new netif_carrier_ok/on/off system.  Device drivers are now
+>expected to support netif_carrier_*, and the use_carrier backwards
+>compatibility logic is no longer necessary.
+>
+>Link: https://lore.kernel.org/lkml/000000000000eb54bf061cfd666a@google.com/
+>Link: https://lore.kernel.org/netdev/20240718122017.d2e33aaac43a.I10ab9c9ded97163aef4e4de10985cd8f7de60d28@changeid/
+>Signed-off-by: Jay Vosburgh <jv@jvosburgh.net>
 
-Meh, might as well be sensible=2E I'll chase up which of my colleagues cur=
-ates the AMZN space (which will no doubt be me by the end of that thread), =
-and issue the next one from that=2E
-
+Looks great. This should have been done like 15 years ago :)
 
