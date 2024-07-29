@@ -1,119 +1,183 @@
-Return-Path: <netdev+bounces-113828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D75D39400DA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 00:07:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DD189400E9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 00:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 812FA1F2335B
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:07:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DFA61F22E8E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B805E18E74A;
-	Mon, 29 Jul 2024 22:07:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED70B18E75C;
+	Mon, 29 Jul 2024 22:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M0VKzxTW"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YxkHy1az"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6A118A933;
-	Mon, 29 Jul 2024 22:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B1F18757E
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 22:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722290872; cv=none; b=F8cW4uo8vfibPLeLuRY1ohTAX02hET0IbT8oXSHPQ1KycuQGKhaq5BGAz457RHfJ8zCENzTt4r/91LMUP+WrbDrBWszRzj52Zt0xjiz/nFVu7JaiO2ImOs8+paaTm1XIBn2bxbALh94Fg5Jm2yO1P2gpyc/CZP1FwltGn1ewjXg=
+	t=1722291037; cv=none; b=lB1h8J8XR6wg+SUy3luMnBPI+Zp6zdBkFiE5CaIagrFdQcKJCN73WcpTzyv09/HUBloGW1C9WEBvETyadoLPHuHR5I3kwZ8d4weHqRSGmzqQMKHKTJWxZYyh9BkoIUNhXbPoUz1vt2c5CQRvzMB8MMW8uZcS1sM43+bA0piumLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722290872; c=relaxed/simple;
-	bh=NbVzDVzFddQfjWchdlUZX+QeD4OBQGWyhqjyyMYw9/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QPsdAGoYhkK1BYJogz/ki7jIYQ3n0LrwTv4dr4cMIWQMJZ4mPN5kXiAcbIksF/LS5pMvPD/GTgfkFU2H/cOs8RqdMgMdeiPeEal6sWDPrFj6KVXrhvfFGu3n7vpHVo1Pf3CBgMS24YXWEej/nW3FW/MFLx8/P7GRlbhNqGWDrP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M0VKzxTW; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2cb4b7fef4aso2941462a91.0;
-        Mon, 29 Jul 2024 15:07:51 -0700 (PDT)
+	s=arc-20240116; t=1722291037; c=relaxed/simple;
+	bh=L4eyB9Mpq4i73EKwGnp3jn5W5V6+QABDHeV4aE9rIBE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ut3Mmn3AjHfNo4XAi5pxlnfZKj20/M690ptKN0oYdTDeCTbMZ9EE04gDNSNa3Fg7lB3fqynvuhoa7FxDY8T9Rm86WS99LyUQzXtNAU7Nf/dMfk27bkQuRVP6VZ9qJwH3Tedi9mzUmwq2G0ugcU136ZbRqlVcj6GMLExnTComhn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YxkHy1az; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7aa4ca9d72so515310366b.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:10:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722290870; x=1722895670; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=cloudflare.com; s=google09082023; t=1722291034; x=1722895834; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tz93iE/zRVko0K9iutmgk2llYMcTSMjlsp/nWk5tlVc=;
-        b=M0VKzxTWre0XunJ+P03ckGYLGTmqGakSyccQQd5jZWbCpwf4Y7Rd7/MeQtJRG2fOvV
-         m3dt+V8r7tvYVye0L6h708TljATF8jbvRsh6VxO97oXxOqSvznabbf8uwT3iLAr84Kjp
-         Sbf5P4ebCYtauo7iahk8OFaKgRUZmnUT81/GDs6y/0zPbw5jBhtgvPwi6ds6L779BB36
-         zYBKQAZt9pVXwQ276SQhzJfxVNXZ66H1gZq6lXW2RxSmCavg+HgQZ7RQdRKj4HLMWXe/
-         fcQukhxGRh+tTXKEqUDYVhDiIgc5LMMcEQwiEaF/MUfB+TW7PC5I1b67CwfFGxwc/eqc
-         ti9g==
+        bh=5AN7vpHTUuAncG8ovvSzomyesiZaO680b8/gZISUbo0=;
+        b=YxkHy1az2Br/W/ajIoXAfLPaa6sBoIjOLjyt/3TMc2flgnIznBI8QNucDyCdns9v25
+         Ldl+buRQxuGmi/VjNt5qIOrAnwJ6FfvNdaGQpyHqtkx/GtdWyxHi9LLtFOmvUIH0qFx8
+         RQWmdJBB82qEkbo6ouEXNMlqbM7641vPyOag8/ctBdURTq7luOqCj4f5Mp8k9w/SGGj9
+         mkA+dUmctW8NOTaHa1pnkUe+TXWTuERb1eqvEvWTmEwZYS0caR0k1WTGE2jNaQLjkDqN
+         avYrGalFktE7ct0XteV6vxGz3RmIPj/yGY4ZyjE6fstTxnLAMi8+yljoFVKJCdzez75u
+         L/Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722290870; x=1722895670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tz93iE/zRVko0K9iutmgk2llYMcTSMjlsp/nWk5tlVc=;
-        b=hZ1aLuNIzgM65uZbd3gxTpDaKhPpbSKDsHUC+kKnLiSsM4eqQDWTWMlj7Jo+gnPhXz
-         3NfoLQG0GBrtsrTwAZHABYzrkz6mNxnTdBywPucdKo7Z0UmtGQTRK8Jk0GYf/M5UF3If
-         0h9sm+p9K15xSx2uZ2XDgK//krLcVMm4Irw0vzKNysUdq2VrV30Az8yA7lS6NRp/SjnS
-         7MnR7rU6WMSMt1L8IUPYBfoC1PV5JOzSmrsVVaD1Q8ocPUj+61LeIzIOZpOooTP3e0WL
-         xLlhMmaTcyI12CkWyQDNmia4vSVyhg4p8WfcJzfP3GbiEHDgsVE2aSZbhglagnhUmMdE
-         /cAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQD6qXpMrSKwSja3PGwv0lXGg2fYpkoHqnABAY2zx4LB4w0mYYUejAAuOGCfiDf0b2qIdXjDUSL8JyS/HhSWbs0mfJbKj2zL6N5Qofl25j5eAlH6GMOuZTBXZ/Na/YKjC33BU8tZ3tkY1zIlQoJ+vItPNU29XGdLBYr2rei61n5wTJyTFXMTKGJOgxVuEZ49CVr8K9GA==
-X-Gm-Message-State: AOJu0YykLeb8xJ8/wtxrRrl61n0oByu/Xm/UcF/24lhVCca6o8+i0OBy
-	ivYN6CVfrLqfjj3vA6zLpKyswmZK842h/GHrY/AWAQw9zBKFqMP6VmkKaDfN4sJBS2HVYF4i7sF
-	i4Pb9nVENfHB1c0w8+62BfsnVB7A=
-X-Google-Smtp-Source: AGHT+IFrD5kiur07thzIpqITFCUYzE9vvaE5ExpJM64dGKdG7OWF6YwZ6IbJtFwqySy7Q5OZckFrtQ5i+F4VsFzCumo=
-X-Received: by 2002:a17:90b:388b:b0:2ca:ffa0:6cee with SMTP id
- 98e67ed59e1d1-2cf7e60bf70mr10843507a91.31.1722290870585; Mon, 29 Jul 2024
- 15:07:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722291034; x=1722895834;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=5AN7vpHTUuAncG8ovvSzomyesiZaO680b8/gZISUbo0=;
+        b=jLFNhnmKWyrO/x6T8UBIgE3snSbZjWJe1L5WSU7QJ+dJANCjU1WSzP745YLDCcjNFT
+         56azrGH8WL+dB9KP/mss4u3W3I4Woj03R3MR+VlS9hQZUm9A+S3hbuNiQaeXWdwFbYdo
+         b7qymaZvQI8DjiQAXaLQc5ts9kfmOefNbUbN34aLBOHE9qc9lHvsFZ/l6VOSL9fUkjnZ
+         kpvARVjF0Ja7KUdK0za43su2+V/NHJrYxRUMJxMx+hHRaJXEKnT2bQ94iQmQnb6Kx3Gk
+         UQfyVZd5UrEMoaCepX05PzBX9u4m9MqJbnYwOC1XjMnSq/04dshwDDGe2EvV3rRrhGno
+         7afA==
+X-Gm-Message-State: AOJu0YzSRSoPMuO71zmBF4kN0DYtL+3gkjq2qCtJLSZqpjEh5kCl2nF7
+	IO1S4VYXD/wnBaT4/IrD9XSX37B1RCnHKIsWOVHQZ8GgFZ5cY2UNgXxvkxCpEMc=
+X-Google-Smtp-Source: AGHT+IFuD/GdjYNlqNlcUh86h+1grc6tT21KgTi5sT7FCAvKDEq+J8uPhwSrcbcbAhIgIFGl5VNjyA==
+X-Received: by 2002:a17:907:94cb:b0:a77:cacf:58b5 with SMTP id a640c23a62f3a-a7d3ffc0597mr702427266b.1.1722291034401;
+        Mon, 29 Jul 2024 15:10:34 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab4de9fsm558188966b.68.2024.07.29.15.10.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 15:10:33 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Willem de Bruijn <willemb@google.com>,
+  kernel-team@cloudflare.com,
+  syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net 1/2] udp: Mark GSO packets as CHECKSUM_UNNECESSARY
+ early on on output
+In-Reply-To: <CAF=yD-JK+Jnjb5_r3rk+PMwV3cWHTHQHau8CQJ27aSaEQLZxQQ@mail.gmail.com>
+	(Willem de Bruijn's message of "Fri, 26 Jul 2024 09:58:38 -0400")
+References: <20240725-udp-gso-egress-from-tunnel-v1-0-5e5530ead524@cloudflare.com>
+	<20240725-udp-gso-egress-from-tunnel-v1-1-5e5530ead524@cloudflare.com>
+	<CAF=yD-LLPPg77MUhdXrHUVJj4o2+rnOC_qsHc_8tKurTsAGkYw@mail.gmail.com>
+	<87h6ccl7mm.fsf@cloudflare.com>
+	<CAF=yD-JK+Jnjb5_r3rk+PMwV3cWHTHQHau8CQJ27aSaEQLZxQQ@mail.gmail.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Tue, 30 Jul 2024 00:10:32 +0200
+Message-ID: <87r0bbzw6f.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730075047.3247884c@canb.auug.org.au>
-In-Reply-To: <20240730075047.3247884c@canb.auug.org.au>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 29 Jul 2024 15:07:38 -0700
-Message-ID: <CAEf4BzYhmauUjfj_peuT3ct9p=p6-Uc2F1LZvgT0+6hY+7Z7RQ@mail.gmail.com>
-Subject: Re: linux-next: Fixes tag needs some work in the bpf-next tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 2:50=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
+On Fri, Jul 26, 2024 at 09:58 AM -04, Willem de Bruijn wrote:
+> On Fri, Jul 26, 2024 at 7:23=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.=
+com> wrote:
+>>
+>> On Thu, Jul 25, 2024 at 10:21 AM -04, Willem de Bruijn wrote:
+>> > On Thu, Jul 25, 2024 at 5:56=E2=80=AFAM Jakub Sitnicki <jakub@cloudfla=
+re.com> wrote:
+>> >>
+>> >> In commit 10154dbded6d ("udp: Allow GSO transmit from devices with no
+>> >> checksum offload") we have added a tweak in the UDP GSO code to mark =
+GSO
+>> >> packets being sent out as CHECKSUM_UNNECESSARY when the egress device
+>> >> doesn't support checksum offload. This was done to satisfy the offload
+>> >> checks in the gso stack.
+>> >>
+>> >> However, when sending a UDP GSO packet from a tunnel device, we will =
+go
+>> >> through the TX path and the GSO offload twice. Once for the tunnel de=
+vice,
+>> >> which acts as a passthru for GSO packets, and once for the underlying
+>> >> egress device.
+>> >>
+>> >> Even though a tunnel device acts as a passthru for a UDP GSO packet, =
+GSO
+>> >> offload checks still happen on transmit from a tunnel device. So if t=
+he skb
+>> >> is not marked as CHECKSUM_UNNECESSARY or CHECKSUM_PARTIAL, we will ge=
+t a
+>> >> warning from the gso stack.
+>> >
+>> > I don't entirely understand. The check should not hit on pass through,
+>> > where segs =3D=3D skb:
+>> >
+>> >         if (segs !=3D skb && unlikely(skb_needs_check(skb, tx_path) &&
+>> > !IS_ERR(segs)))
+>> >                 skb_warn_bad_offload(skb);
+>> >
+>>
+>> That's something I should have explained better. Let me try to shed some
+>> light on it now. We're hitting the skb_warn_bad_offload warning because
+>> skb_mac_gso_segment doesn't return any segments (segs =3D=3D NULL).
+>>
+>> And that's because we bail out early out of __udp_gso_segment when we
+>> detect that the tunnel device is capable of tx-udp-segmentation
+>> (GSO_UDP_L4):
+>>
+>>         if (skb_gso_ok(gso_skb, features | NETIF_F_GSO_ROBUST)) {
+>>                 /* Packet is from an untrusted source, reset gso_segs. */
+>>                 skb_shinfo(gso_skb)->gso_segs =3D DIV_ROUND_UP(gso_skb->=
+len - sizeof(*uh),
+>>                                                              mss);
+>>                 return NULL;
+>>         }
 >
-> Hi all,
+> Oh I see. Thanks.
 >
-> In commit
+>> It has not occurred to me before, but in the spirit of commit
+>> 8d74e9f88d65 "net: avoid skb_warn_bad_offload on IS_ERR" [1], we could
+>> tighten the check to exclude cases when segs =3D=3D NULL. I'm thinking o=
+f:
+>>
+>>         if (segs !=3D skb && !IS_ERR_OR_NULL(segs) && unlikely(skb_needs=
+_check(skb, tx_path)))
+>>                 skb_warn_bad_offload(skb);
 >
->   76ea8f9e0003 ("selftests/bpf: Workaround strict bpf_lsm return value ch=
-eck.")
->
-> Fixes tag
->
->   Fixes: af980eb89f06 ("bpf, lsm: Add check for BPF LSM return value")
->
-> has these problem(s):
->
->   - Target SHA1 does not exist
->
-> Maybe you meant
->
-> Fixes: 5d99e198be27 ("bpf, lsm: Add check for BPF LSM return value")
+> That looks sensible to me. And nicer than the ip_summed conversion in
+> udp_send_skb.
 
-Yes, you are right, I missed updating the sha during bpf-next rebase.
-Thanks for the heads up, I just updated and force-pushed the
-bpf-next/for-next tag.
+I've audited all existing ->gso_segment callbacks. skb_mac_gso_segment()
+returns no segments, that is segs =3D=3D NULL, if the callback chain ends
+with either of these:
 
->
-> --
-> Cheers,
-> Stephen Rothwell
+=E2=80=A6 =E2=86=92 udp[46]_ufo_fragment =E2=86=92 __udp_gso_segment =E2=86=
+=92 skb_gso_ok =3D=3D true
+=E2=80=A6 =E2=86=92 tcp[46]_gso_segment =E2=86=92 tcp_gso_segment =E2=86=92=
+ skb_gso_ok =3D=3D true
+=E2=80=A6 =E2=86=92 sctp_gso_segment =E2=86=92 skb_gso_ok =3D=3D true
+
+IOW when the device advertises that it can handle the desired GSO kind
+(skb_gso_ok() returns true).
+
+Considering that a device offering HW GSO and no checksum offload at the
+same time makes no sense, I also think that tweaking the bad offload
+detection to exclude the !segs case doesn't deprive us of diagnostics.
+
+I will change to that in v2.
 
