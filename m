@@ -1,93 +1,76 @@
-Return-Path: <netdev+bounces-113674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D45C93F841
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 16:37:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091C393F871
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 16:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E94661F22B3A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF8132822E2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A34155A4E;
-	Mon, 29 Jul 2024 14:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E76153836;
+	Mon, 29 Jul 2024 14:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N29y3ieE"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4C9155751;
-	Mon, 29 Jul 2024 14:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48518823A9;
+	Mon, 29 Jul 2024 14:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722263389; cv=none; b=IQ7vIgePolfuXnYPlqbVnfBE7LXO0faiSdvs0HDE5PMWZQV8aAwEnzSn8ak3vLVxn3p+SXTRk125BUWjTgB2YGTJLMsHOyk841LBVLR4ePERV6/nUiRamEA/6zrqweEG9jCpEmEgXJuq7PFt8m/OhEKwlgGz3pXye7Ir8EjalG0=
+	t=1722264094; cv=none; b=iwiCu8U6+bs5zzEodxh+I8pfY1FEa1L0P0i/GB/8jYT5s2TjbzFZgWHa9f2UsWDLkP1bCnx0bFdRLkqQlaORzsDws7gGtiDNemzq0v5CYnrQXvh/0n2vMkNRwcF9TG7NvYqKypjKntLz7tyZoF71yB6Uf8HXHw5Jx+t+n9z9CHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722263389; c=relaxed/simple;
-	bh=uCvVv6yXucHR1Y2yaWt2UAblfSqvE+gWtsWYbiOx0H4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lSe/TPwvq0xU22AzAq9PFx7p3aeTX+sY2/gX/+3RljCPWSuGXOkKJ+a3GGLI6uqRQJoYAFE2AbGLzV09Oi+H5ggrSlk8K7DwVlS52qoe50F0MxLWscIeVvjGjYFKmPgEi+z/o2yeJFe7jr5+IDcvjCCkUd42ORQBDGDrEni1lec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WXgfn1CPNz6K9jB;
-	Mon, 29 Jul 2024 22:27:13 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id D6467140B30;
-	Mon, 29 Jul 2024 22:29:44 +0800 (CST)
-Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 29 Jul
- 2024 15:29:44 +0100
-Date: Mon, 29 Jul 2024 15:29:43 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Borislav Petkov <bp@alien8.de>
-CC: Dan Williams <dan.j.williams@intel.com>, <ksummit@lists.linux.dev>,
-	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <jgg@nvidia.com>, <shiju.jose@huawei.com>, "Mauro
- Carvalho Chehab" <mchehab@kernel.org>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240729152943.000009af@Huawei.com>
-In-Reply-To: <20240729133839.GDZqebX1LXB-Pt7_iO@fat_crate.local>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
-	<20240729134512.0000487f@Huawei.com>
-	<20240729133839.GDZqebX1LXB-Pt7_iO@fat_crate.local>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1722264094; c=relaxed/simple;
+	bh=LIEatXoPX3PPwa0B7g/+kO3jB0XVTSWzB7ZiFawj36A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eQFWFa2VRxtSi9wjfP1odFWsa2UNzcDmkXmTKEOF2xTVRHFKCbs6OjGOdVSheAOvkz7R+BBqhoAcKqOhCMZK2wvIyzUFwGFTYGwPRr6KVtIjOeNYuNPbTouGIVoSE7tnlwZ9YF3irB3dqn8B4lWKL9ujkPilcGzPvKZjGm6r908=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N29y3ieE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C7D0C4AF09;
+	Mon, 29 Jul 2024 14:41:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722264094;
+	bh=LIEatXoPX3PPwa0B7g/+kO3jB0XVTSWzB7ZiFawj36A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N29y3ieE47UcKCQJZ8+ef4Qs8TTtwQ0huJl60tRITQ16sfSJTYZRwBg6QjZhMXhp/
+	 N5dMtI5eKw83rbeVwC/yFi713cunhiPMvxVjiTrFzyiqZsjrVEU+V28Ge6yERgoSlc
+	 hgYPGh5E/58Q+lEk9UqwacIkKmxjXYNla9wIM+kSl9W301fy+z1i0JmRRopCcm/hQD
+	 3xzDUuZ/VWbcuAkb+pVjeWmi4/BnQXt14cI7t+FsTEEZ67QaHe67uS3/YNjhaqU9kv
+	 iRqJ8d7sclX5VlNp2dp9mqqStZniVieTzlOuI6j3uYR8WtH0VkwT/Ao1HtkwO64tE4
+	 KgEFIb/sHSCjA==
+Date: Mon, 29 Jul 2024 07:41:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ razor@blackwall.org, agospoda@redhat.com,
+ syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH net] net: Fix data race around dev->flags in
+ netif_is_bond_master
+Message-ID: <20240729074132.6edec347@kernel.org>
+In-Reply-To: <20240728105429.2223-1-aha310510@gmail.com>
+References: <000000000000e9f499061c6d4d7a@google.com>
+	<20240728105429.2223-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Mon, 29 Jul 2024 15:38:39 +0200
-Borislav Petkov <bp@alien8.de> wrote:
+On Sun, 28 Jul 2024 19:54:29 +0900 Jeongjun Park wrote:
+> According to KCSAN report, there is a read/write race between 
+> __dev_change_flags and netif_is_bond_master for dev->flags. Therefore, 
+> should change to use READ_ONCE() when reading dev->flags.
 
-> On Mon, Jul 29, 2024 at 01:45:12PM +0100, Jonathan Cameron wrote:
-> > One of the key bits of feedback we've had on that series is that it
-> > should be integrated with EDAC.  Part of the reason being need to get
-> > appropriate RAS expert review.  
-> 
-> If you mean me with that, my only question back then was: if you're going to
-> integrate it somewhere and instead of defining something completely new - you
-> can simply reuse what's there. That's why I suggested EDAC.
-
-Ah fair enough. I'd taken stronger meaning from what you said than
-you intended. Thanks for the clarification.
-
-> 
-> IOW, the question becomes, why should it be a completely new thing and not
-> part of EDAC?
-
-So that particular feedback perhaps doesn't apply here.
-
-I still have a concern with things ending up in fwctl that
-are later generalized and how that process can happen.
-
-Jonathan
+That will certainly silence the warning, but doesn't prove the change
+is correct.
+-- 
+pw-bot: cr
 
