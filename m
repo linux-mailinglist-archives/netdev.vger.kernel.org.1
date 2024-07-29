@@ -1,163 +1,103 @@
-Return-Path: <netdev+bounces-113666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5EE93F67A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:13:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6C493F6D5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73EDB281FD8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:13:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D7AA281487
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:39:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A4B189F39;
-	Mon, 29 Jul 2024 13:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C86148FF9;
+	Mon, 29 Jul 2024 13:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="AgVhJJET"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFFC153838
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837CA146A71;
+	Mon, 29 Jul 2024 13:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722258450; cv=none; b=jFdiE+cSXb7jK4zf7nCU10jZLru7s6EIeg31fkG6vA29zfmQFzKY/Im2ytiwOYCZ4mJNae7HEpZ5q0malPFiXxu7UC2abIiBl+eYxMSoOy/4OVBvcs69OmvdITYmt9mlMIXjQDE8w5f1w9KsYQ8NbyRFYWmWTfwrN2pGhmkPqlM=
+	t=1722260342; cv=none; b=Q2XoxFrzAlOI+zCJqKCJVlESOyMOUe+FVC6QQZHbpYT6MnFbqO3EX+wtz1OtBz38x7CYj40T4DFip3Q7i0XV7gKtYM/EWSK+adutVw9S1JWeuA5Wh1+idGgqD+pjfkW6rz0jQAxl9U5p3DU71/Pe/WYF0YiLJgm5z9sspjNw0a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722258450; c=relaxed/simple;
-	bh=O7o30P7hShu1XtTUvch+nVWHTD4AhV6r3e4zx/idkYk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kwVh8W/CRso0joqrqQy5eJDlgDiI2AYDR7DMgaT1exWOdhG6stMIuIF1CD+Hhn4cwtIruckQRtd8n6ScCZCUE+s7gUAx8TLUNA65FjtKOf8q4ZW792gksYTEvHYcsYLavdvhX2qbQ8I+vD9BmELv74gxLUlDt4WWF4Ct2RvdnY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sYQ63-0001CR-Lz
-	for netdev@vger.kernel.org; Mon, 29 Jul 2024 15:07:27 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sYQ63-0033PD-5q
-	for netdev@vger.kernel.org; Mon, 29 Jul 2024 15:07:27 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id D18F2310F62
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:07:26 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	s=arc-20240116; t=1722260342; c=relaxed/simple;
+	bh=oVZFc5CBw7YA4rLnsafZusMUpxS0moOS+oXkGV9rc2I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dHBUqd7HS+WXrqkKtXSxTjwqTlkHjKqHZhtRwyqGmOypb/PiTO6PXD3lAMZhoWWES/z9ItQm943gLwYBzIU0ZLtTz1FigxxeuXeB0jT3dRDik9bOK7hFe6Gg6vW4XTM77ss5FATGfG3ulQzeZ/E+23P0/ka8fu3kMflgvfb6eno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=AgVhJJET; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6C6A040E01BB;
+	Mon, 29 Jul 2024 13:38:58 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id noWZecipXnn2; Mon, 29 Jul 2024 13:38:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1722260335; bh=6M34f2ihb4+3H0wUmQ1u+7VEn4WqvtJH076NQAw2b7k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AgVhJJETHkOWA4oelX7sfHwA2DziVZ7hBTiK53QUNGO1S94qfBYEpMiOHL1NpgKFD
+	 PVHHDnq+ekVgm90DP64zl+TasYg9bzRJEwg/cASIM+/ONKuIEnLYxwtSMsOYzrfk7w
+	 pwHnbYSE4U1cnKqr+HAMNAJdXww2S1uhFAXUyz2rK8+ixvqeMqa6MYTcY3u5uiBReB
+	 +CA277WoEV7SQhfeeIKNz6OmheErotEVBTGQmeZNYLktll2N9b8nfGy9FEUFpbezn3
+	 50VP7NAx94q1T6A5kxEHwOBTrFj3pjlwWuYPsWmfmD7uSeDU48MOqUvcw2rfiX8qUS
+	 FBlYhK5AGW+o8w6fr9JA9N+/yayvOKhDO4oKoN+1Wnfao2AFiG5VQuOt8+703je6QG
+	 GKbTdURnPf/ZaK9PSGQr3C75EIvsPj6LdktgP9YnjeVpbh4HAQ3Rp1UaX3lDINJ67H
+	 1N/uh7DIy3V5ehdmj7tzHbEv6DE1ocaiOF/2hUPcRd6ngk9e91Q2E9U+w1w85/k51s
+	 o5qvqEFLdLkA344r7AJxTl3b+sBXAPzxb4gvGLsoPnqN7RD66Si9PjzCGvK9bO0Zz7
+	 mfJuXUTOwZsI+IZh8tz+wlYqXNDehGdGtQUg07YzQNklG1cktApc24DDk3PgwSCW+t
+	 vadOGg3X2rCMnUHOGzj86Z9U=
+Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id B22A5310EAB;
-	Mon, 29 Jul 2024 13:07:15 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 0ecf2821;
-	Mon, 29 Jul 2024 13:06:31 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Mon, 29 Jul 2024 15:05:52 +0200
-Subject: [PATCH can-next 21/21] can: rockchip_canfd: add support for
- CAN_CTRLMODE_BERR_REPORTING
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2D59140E01A8;
+	Mon, 29 Jul 2024 13:38:46 +0000 (UTC)
+Date: Mon, 29 Jul 2024 15:38:39 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, jgg@nvidia.com, shiju.jose@huawei.com,
+	Mauro Carvalho Chehab <mchehab@kernel.org>
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240729133839.GDZqebX1LXB-Pt7_iO@fat_crate.local>
+References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
+ <20240729134512.0000487f@Huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240729-rockchip-canfd-v1-21-fa1250fd6be3@pengutronix.de>
-References: <20240729-rockchip-canfd-v1-0-fa1250fd6be3@pengutronix.de>
-In-Reply-To: <20240729-rockchip-canfd-v1-0-fa1250fd6be3@pengutronix.de>
-To: kernel@pengutronix.de, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
- Philipp Zabel <p.zabel@pengutronix.de>, 
- Elaine Zhang <zhangqing@rock-chips.com>, 
- David Jander <david.jander@protonic.nl>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2351; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=O7o30P7hShu1XtTUvch+nVWHTD4AhV6r3e4zx/idkYk=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBmp5PV3sM8XXwISbRrCXTRd3/WF66LzSY+ThFzv
- 91v381LmIyJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZqeT1QAKCRAoOKI+ei28
- bz6kB/0e0fjGnXKDinEzWEnti0xrTb1g2WSP5u6CPX4kQo5ADTXqMBkBmFIEKKcOYS5J97xCNRP
- u2gZ3o8d0Q5+smqeLMe5FfOFyZFjZnaBAX665joolosCxTreNJNrXsOtgxLOhweEwspf+hdVyMW
- /kNHClCLseJu+tvUPGi8D986D1wjcLMwqAj8IC7pyBT9dwI0Zxsk4UXI3yC154VURUFgYcxwV0Q
- /2GD+6O4987GAdneE92aO7JPsVq1PnmweFbHiI5mw82PPDG0J+2dr5sttFr9xv1aXWywpqo8mpm
- FSE7ZD/l5S0V2w4F4y8Ddtu5PWJk06lf6xfsPU0vD9BzzBSE
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240729134512.0000487f@Huawei.com>
 
-Add support for Bus Error Reporting.
+On Mon, Jul 29, 2024 at 01:45:12PM +0100, Jonathan Cameron wrote:
+> One of the key bits of feedback we've had on that series is that it
+> should be integrated with EDAC.  Part of the reason being need to get
+> appropriate RAS expert review.
 
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/rockchip/rockchip_canfd-core.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+If you mean me with that, my only question back then was: if you're going to
+integrate it somewhere and instead of defining something completely new - you
+can simply reuse what's there. That's why I suggested EDAC.
 
-diff --git a/drivers/net/can/rockchip/rockchip_canfd-core.c b/drivers/net/can/rockchip/rockchip_canfd-core.c
-index 2d6eca8d23be..6daaee7dfe56 100644
---- a/drivers/net/can/rockchip/rockchip_canfd-core.c
-+++ b/drivers/net/can/rockchip/rockchip_canfd-core.c
-@@ -293,6 +293,12 @@ static void rkcanfd_chip_start(struct rkcanfd_priv *priv)
- 		RKCANFD_REG_INT_OVERLOAD_INT |
- 		RKCANFD_REG_INT_TX_FINISH_INT;
- 
-+	/* Do not mask the bus error interrupt if the bus error
-+	 * reporting is requested.
-+	 */
-+	if (!(priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING))
-+		priv->reg_int_mask_default |= RKCANFD_REG_INT_ERROR_INT;
-+
- 	memset(&priv->bec, 0x0, sizeof(priv->bec));
- 
- 	rkcanfd_chip_fifo_setup(priv);
-@@ -533,14 +539,16 @@ static int rkcanfd_handle_error_int(struct rkcanfd_priv *priv)
- 	if (!reg_ec)
- 		return 0;
- 
--	skb = rkcanfd_alloc_can_err_skb(priv, &cf, &timestamp);
--	if (cf) {
--		struct can_berr_counter bec;
-+	if (priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
-+		skb = rkcanfd_alloc_can_err_skb(priv, &cf, &timestamp);
-+		if (cf) {
-+			struct can_berr_counter bec;
- 
--		rkcanfd_get_berr_counter_corrected(priv, &bec);
--		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR | CAN_ERR_CNT;
--		cf->data[6] = bec.txerr;
--		cf->data[7] = bec.rxerr;
-+			rkcanfd_get_berr_counter_corrected(priv, &bec);
-+			cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR | CAN_ERR_CNT;
-+			cf->data[6] = bec.txerr;
-+			cf->data[7] = bec.rxerr;
-+		}
- 	}
- 
- 	rkcanfd_handle_error_int_reg_ec(priv, cf, reg_ec);
-@@ -902,7 +910,8 @@ static int rkcanfd_probe(struct platform_device *pdev)
- 	priv->can.clock.freq = clk_get_rate(priv->clks[0].clk);
- 	priv->can.bittiming_const = &rkcanfd_bittiming_const;
- 	priv->can.data_bittiming_const = &rkcanfd_data_bittiming_const;
--	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK;
-+	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
-+		CAN_CTRLMODE_BERR_REPORTING;
- 	if (!(priv->devtype_data.quirks & RKCANFD_QUIRK_CANFD_BROKEN))
- 		priv->can.ctrlmode_supported |= CAN_CTRLMODE_FD;
- 	priv->can.do_set_mode = rkcanfd_set_mode;
+IOW, the question becomes, why should it be a completely new thing and not
+part of EDAC?
+
+That's all.
 
 -- 
-2.43.0
+Regards/Gruss,
+    Boris.
 
-
+https://people.kernel.org/tglx/notes-about-netiquette
 
