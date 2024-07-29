@@ -1,95 +1,96 @@
-Return-Path: <netdev+bounces-113591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B862993F324
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:50:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD08D93F3F7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:25:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA00B282515
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:50:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AFC2B2229F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD604140E30;
-	Mon, 29 Jul 2024 10:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B447D145FF8;
+	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qdG7V54A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PP6GAM4D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811025F873;
-	Mon, 29 Jul 2024 10:50:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9091A14535E
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722250242; cv=none; b=EE2GXg4eYW3wgzShemalSa4B0dpKZXBxki7kf5bocMKgMZiK1sXVFnJm83YUtbprlD8K6tib1qVBNzjNuTe0Zlgg/nSSt8xSKRoQW0ktnu+60T4jhYT61pFuSz54/D+kof6lr56FPo9bswMRHf05eNTm0zvsPY9IuxBkaZ58W3g=
+	t=1722252244; cv=none; b=Hm+Zui3KS10dVBuA8DU2pgH7XNsiiK21M76aop2Qp1VcMpvWaqcrLirA/vp6wTUpwoulk+1XZoJ0qUoKhHC2z5UFUWC6/DeyzvXEsk4OE9wUMdol+Ve/MmaqAS8z5FNb2ccMBpp4RVEsakgQjmunywReQtA/f4XBJbbuIhsrMEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722250242; c=relaxed/simple;
-	bh=LnRwNbodf/bqj7+CHx905Rbrn2Ad1v38MIm4mDrcPxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WBpSV46pR1OyvmaXlQqWe4Nhyi70q4fBQ+9h5rDt7XXezDg/Hf8Ax7iwiaag9BDAmf3QeYS9U0cDbIvqI6O+5OpV6mjZ/M5UmA4OqICm7bSGNJW2+9Zo9LDpv7tNqsaRkLwlfj2ENizPjNNZIf8oC1hAIaaYyJcmaH/PPI7qZss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qdG7V54A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64DE1C32786;
-	Mon, 29 Jul 2024 10:50:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1722250242;
-	bh=LnRwNbodf/bqj7+CHx905Rbrn2Ad1v38MIm4mDrcPxs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qdG7V54A0NCu3D7ECvsW95BYaNil3nLn6yOVAz8JxRBPAilEeSk/LKgiDhXrjd/eH
-	 K7Q4Q29lbjpYmFBOhphTXjYnjlFjwBjwU5lD8bc0LvfJ8ynnYQoYZwZ+ClWUh9UXkU
-	 9rkbgnTjXEqOUijYWDxw6RQtprBqW3aoHvi1zlhU=
-Date: Mon, 29 Jul 2024 12:50:38 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Vincenzo Mezzela <vincenzo.mezzela@gmail.com>
-Cc: johannes@sipsolutions.net, sashal@kernel.org,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	javier.carrasco.cruz@gmail.com, skhan@linuxfoundation.org,
-	stable@vger.kernel.org, Johannes Berg <johannes.berg@intel.com>,
-	syzbot+19013115c9786bfd0c4e@syzkaller.appspotmail.com
-Subject: Re: [PATCH v5.15] wifi: mac80211: check basic rates validity
-Message-ID: <2024072903-chihuahua-contrite-c1a6@gregkh>
-References: <20240727125033.1774143-1-vincenzo.mezzela@gmail.com>
+	s=arc-20240116; t=1722252244; c=relaxed/simple;
+	bh=3HZg3NNi9MU6fcFJwNpTFRwnLZ5xwOD2qD8LBquuMTg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I3zVhRDX1Tlf7Nyx2y2uEZsA79A+QXUYewY/1ZkmNDQnHi4eXufAS/71Rka0PJc6iY9j6CMJ+NGNLrkuvYoE1OijFLOQzzeGFhCtMDZ4nT6KieVmFc1L7Snu4eSjnCRoCIXG75B/nJPkDmtTF122rRj1nvDJEscskpZEHYHFhVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PP6GAM4D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69F13C4AF07;
+	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722252244;
+	bh=3HZg3NNi9MU6fcFJwNpTFRwnLZ5xwOD2qD8LBquuMTg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PP6GAM4DbsaIoY11iolPCY7SRggT4TC93xczzDh032tJrtgAyBEiOOLAE236twqP3
+	 WzsdTrXRXYaKyrIq+O+37GRVV9xnjnJ7F9ohMHixRTpdXVRtiwoI1sQskWyMz3x7+V
+	 07d9zCDavnJWqpcFQvayUXaF6T9AfqwCZgReiwT9PQnvnvRuhZGw63+itc+pKkZc+Z
+	 rFBgtIrPBkNE+Vpuw7QKyes2LoEAAY7e6ngx3V4LDVikZAK1e5/OCkEyTPX0xVgbI8
+	 7fir+V1kQKx+4jdek/d83XQaUDJ582Gtm+rNNq2FIiWUWIciY4Fwp3wUiwvxbeInRy
+	 bpifOKay/au2g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56D5AC43443;
+	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240727125033.1774143-1-vincenzo.mezzela@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] tcp: Adjust clamping window for applications
+ specifying SO_RCVBUF
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172225224435.15294.3818067109385283098.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Jul 2024 11:24:04 +0000
+References: <20240726204105.1466841-1-quic_subashab@quicinc.com>
+In-Reply-To: <20240726204105.1466841-1-quic_subashab@quicinc.com>
+To: Subash Abhinov Kasiviswanathan (KS) <quic_subashab@quicinc.com>
+Cc: edumazet@google.com, soheil@google.com, ncardwell@google.com,
+ yyd@google.com, ycheng@google.com, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, dsahern@kernel.org, pabeni@redhat.com,
+ quic_stranche@quicinc.com
 
-On Sat, Jul 27, 2024 at 02:50:33PM +0200, Vincenzo Mezzela wrote:
-> From: Johannes Berg <johannes.berg@intel.com>
-> 
-> commit ce04abc3fcc62cd5640af981ebfd7c4dc3bded28 upstream.
-> 
-> When userspace sets basic rates, it might send us some rates
-> list that's empty or consists of invalid values only. We're
-> currently ignoring invalid values and then may end up with a
-> rates bitmap that's empty, which later results in a warning.
-> 
-> Reject the call if there were no valid rates.
-> 
-> [ Conflict resolution involved adjusting the patch to accommodate
-> changes in the function signature of ieee80211_parse_bitrates,
-> specifically the updated first parameter ]
-> 
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> Reported-by: syzbot+19013115c9786bfd0c4e@syzkaller.appspotmail.com
-> Tested-by: syzbot+19013115c9786bfd0c4e@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=19013115c9786bfd0c4e
-> Signed-off-by: Vincenzo Mezzela <vincenzo.mezzela@gmail.com>
-> ---
->  net/mac80211/cfg.c | 21 +++++++++++----------
->  1 file changed, 11 insertions(+), 10 deletions(-)
-> 
+Hello:
 
-We can't take a patch for 5.15 without it also being in 6.1.y for
-obvious reasons.  Please provide a working version for that branch
-first, and then resend this backport and we will be glad to queue it up.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-thanks,
+On Fri, 26 Jul 2024 13:41:05 -0700 you wrote:
+> tp->scaling_ratio is not updated based on skb->len/skb->truesize once
+> SO_RCVBUF is set leading to the maximum window scaling to be 25% of
+> rcvbuf after
+> commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+> and 50% of rcvbuf after
+> commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio").
+> 50% tries to emulate the behavior of older kernels using
+> sysctl_tcp_adv_win_scale with default value.
+> 
+> [...]
 
-greg k-h
+Here is the summary with links:
+  - [net,v2] tcp: Adjust clamping window for applications specifying SO_RCVBUF
+    https://git.kernel.org/netdev/net/c/05f76b2d634e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
