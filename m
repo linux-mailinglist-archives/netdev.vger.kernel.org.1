@@ -1,97 +1,118 @@
-Return-Path: <netdev+bounces-113491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC8C93EC3C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 06:01:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 560E693ECA8
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 06:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF9D61C218DC
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 04:01:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D00E1F2166B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 04:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4432513AD13;
-	Mon, 29 Jul 2024 03:58:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70998248C;
+	Mon, 29 Jul 2024 04:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGjnkw/S"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="aDaXiQjn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0505513AA42;
-	Mon, 29 Jul 2024 03:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8FE1B86D6;
+	Mon, 29 Jul 2024 04:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722225534; cv=none; b=mI663+mDfqfe3j9NCHach8qt8/tvxpuJn8Wb3Yeth81Bn7jqezNlqKKdWQpsYzl9nccwAY6C45YdzPJBA28fHijYMDnTZwZv3wYTej42k+7fLR2Hn3YZKfgvswP/L4mN59NE4v6M4We7ZhZKLndJN+Cy7+kpLofMVKWVIQPFp3s=
+	t=1722228227; cv=none; b=P5cobVN4rtHDhs5ZQ6IlmpC1bGhzfcMpqXTDORej33Z6kb+waah1yIQRRkCrTEcCTm4FJ0CRzy7QAEwWZQL1n2N92Pu/sOqnKR7bLFOSPOooICBeUm4Bm/zEe+2H0RVS+x0Hp4F0oyZXp312WctU6M01s788QGv4KN4k73H9Jkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722225534; c=relaxed/simple;
-	bh=OTJPkGkpde1iTM4/DKCFCr5P3BMKKGLJcgjquoJy3ho=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J/grXCca8+RgtRC4ugJpInYUoq39ZemKkw/0QihL9EfBAo1G9uZF8qmRDoGw0JU9kt5hEtlm64eD17pqzGxrH2TlOIYUm8ps6/F+9g5KhRQJCDiVMtYZAJ15umQVHiuUBDNPcqkF8Ii9GArV/W0WvEb/ItH3Sgj/S70yyxSQWE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGjnkw/S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A26BC32786;
-	Mon, 29 Jul 2024 03:58:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722225533;
-	bh=OTJPkGkpde1iTM4/DKCFCr5P3BMKKGLJcgjquoJy3ho=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DGjnkw/SwHaYz0anxSPQI6esforJZ3DJG9/e43+VFjeVFqPuJ0jwZwEW/5NgftaaJ
-	 mv+U+j2swUOjuFm841UpghBsM63o0Hq9WgI09OGEVLLDqlECKBPjFvvyoZ6EsrW64y
-	 K/CvzJEX3sczcOVjzrj4N1ucGlO1wWRuyp5GkcAYHnjqOEDWu/5IuY8HAjB3/A8QhY
-	 Gn0kXhVxS8qBINLGEkM6xzzdKeO/j7pRNfUZOP2tLJVKIOiD+uDeS41NS1I5bGdZio
-	 VRjPTN7gNbk/8Yx8TFMvnk4s9C+W1ZjrmNyeyGrrKtjfapQtg43SOzYNNSi3R8cA3N
-	 yIS86o3s4wVBw==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Kalle Valo <kvalo@kernel.org>,
-	Patrick Wildt <patrick@blueri.se>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Steev Klimaszewski <steev@kali.org>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: (subset) [PATCH 0/2] arm64: dts: qcom: x1e80100-yoga: add wifi calibration variant
-Date: Sun, 28 Jul 2024 22:58:19 -0500
-Message-ID: <172222551311.175430.13568156026564706830.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <ZpV6o8JUJWg9lZFE@windev.fritz.box>
-References: <ZpV6o8JUJWg9lZFE@windev.fritz.box>
+	s=arc-20240116; t=1722228227; c=relaxed/simple;
+	bh=Q5e8Uzrp5dxS8GorkeTBvz/wu5JObFOkFhTXsqePR7k=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=pP0zJx1wmJySOBSCc6rkc0WiaZP22XJwSzbfofg5y3p8MeNvBORHTLtIpeI0SZhmR9tZcqeyX2muwDo5JqrEWYNu5fNCLstZsMwiRznmf7dt76PaZr9NUnlDLeAQaj6JFqdKPMKuXmTbfMcYzBMTs6camLlVIAOqOWnCsfDDC9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=aDaXiQjn; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1722228221;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wGVbLMPx8Stje83aOheuLD1Nwba68LXvsDOLLEVn4dU=;
+	b=aDaXiQjnBSeYxvGTLqWjbY+QeXjp35finEMH57ZT7KqNkdvmgn4YrPnR/V+U6OLQ1EIu7z
+	DK/PWIw1zNEQnzgonIjQc2BNDU+JxX3BxkTzRd6lw1WcfspetjC/1fFS7rlS3k88olYWzC
+	yPh/hl0zi2gM/jhogfkSxNsn+5q41doi/or2xvOFXOaMwp1mycBjlQGMV75L4oKsz+nZ33
+	bjVdAwg85uxoBlbmH0K3v6jPDhlL7PBcuuRJ0Jhi4weivs2sGqt2/Pe/KECu56c0jhTA1n
+	2LmqRo/i42JugTDOhTSk4eZ1Xh1S72ipRkH9K6xBIyhHReRDbRgzpho8RiV4/Q==
+Date: Mon, 29 Jul 2024 06:43:40 +0200
+From: Dragan Simic <dsimic@manjaro.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+ UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com,
+ f.fainelli@gmail.com, gregkh@linuxfoundation.org, kuba@kernel.org,
+ linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, lucas.demarchi@intel.com, masahiroy@kernel.org,
+ mcgrof@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ woojung.huh@microchip.com
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy
+ module
+In-Reply-To: <3a6ef66a-e98f-44df-9fef-3b26bede4c07@lunn.ch>
+References: <bcc81ea0-78e1-476e-928c-b873a064b479@lunn.ch>
+ <20240726121530.193547-1-jtornosm@redhat.com>
+ <b96d9801-d370-4ddd-97fd-5eac2a2656f4@lunn.ch>
+ <931b582808f237aa3746c5b0a96b3665@manjaro.org>
+ <3e895811-ad23-4687-b440-5375ad2af2ff@lunn.ch>
+ <a520ee4da331c8edb99f2c14d22a3531@manjaro.org>
+ <3a3f49b5-45b2-4999-a364-60d035bbd11f@lunn.ch>
+ <98d200777d62dc9b447557b2758613e5@manjaro.org>
+ <3a6ef66a-e98f-44df-9fef-3b26bede4c07@lunn.ch>
+Message-ID: <36bfb8da08b90fb14108e99853f49d0f@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-
-On Mon, 15 Jul 2024 21:38:11 +0200, Patrick Wildt wrote:
-> This series adds the missing calibration variant devicetree property
-> which is needed to load the calibration data and use the ath12k wifi
-> on the Lenovo Yoga Slim 7x.
+On 2024-07-28 22:57, Andrew Lunn wrote:
+>> In other words, this patch doesn't subtract anything.  Instead, it 
+>> just
+>> adds a weakdep link between the lan78xx and micrel modules, so the 
+>> kernel
+>> itself can report that dependency, which may actually result in one 
+>> more
+>> PHY driver added to a generated initial ramdisk.
 > 
-> Patrick Wildt (2):
->   dt-bindings: net: wireless: add ath12k pcie bindings
->   arm64: dts: qcom: x1e80100-yoga: add wifi calibration variant
-> 
-> [...]
+> So at the moment, does the initramfs contain all PHY modules? I guess
+> it does, because you have no knowledge which are actually needed. And
+> this does not help you in any way, as you said, it does not subtract
+> anything.
 
-Applied, thanks!
+Basically, an initial ramdisk shouldn't contain any PHY modules that
+aren't automatically detected as needed on a particular system, for
+which the initial ramdisk is built.  That's how selecting modules
+while building the initial ramdisks works.  On the other hand, if it's
+some initial ramdisk built by a Linux distribution and intended to
+support multiple systems or boards, it may contain whatever the
+distribution sees fit.
 
-[2/2] arm64: dts: qcom: x1e80100-yoga: add wifi calibration variant
-      commit: 8bc7cb73df8644423758c79d4504d501c8ef3854
+Having weakdeps defined actually does help here.  For example, a Linux
+distribution mentioned above no longer needs to hand-craft the rules
+for initial ramdisk generation for the PHY modules that should be put
+into an initial ramdisk together with the lan78xx driver, if the Linux
+distribution chooses to include the lax78xx driver.  Having weakdep(s)
+defined makes the kernel do that instead.  Also, there's no point in
+including every single PHY driver module, because not all of them are
+needed for a particular selection of MAC drivers, which comes from the
+intended purpose of the initial ramdisk built by a Linux distribution,
+i.e. the target architecture, supported board category, etc.
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+Let's also keep in mind that including all PHY modules into an initial
+ramdisk inevitably makes it larger, which often isn't an option for
+resource-constrained embedded systems.
 
