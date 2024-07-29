@@ -1,99 +1,129 @@
-Return-Path: <netdev+bounces-113608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D76DE93F45D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:45:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFED493F466
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11FA91C21A5B
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:45:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D9ABB22649
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2BC14600D;
-	Mon, 29 Jul 2024 11:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A4C145B22;
+	Mon, 29 Jul 2024 11:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0rwxMVDP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsWE2au6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D3B1448FA;
-	Mon, 29 Jul 2024 11:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DBD817;
+	Mon, 29 Jul 2024 11:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722253491; cv=none; b=MmtXbmCXoU8XjQ2Qb43n8itgSRoD79Rxn3OqtPuojgyJNtqWY5iNL0X7j47gkOJRf0bS+GnGmvMkpv+ylwSdRC2H7EfL7oE6LOtgoYK07E2LlBQ5mtFue6sUalt2LfRy79BWzO+Y/4zDZf4vruU/Zsa+S+4oEd4YvKbNRCteuDQ=
+	t=1722253566; cv=none; b=OLDBGHsq1kuOkPMRqC5IiMkxu1l9kSx+LMdMALsoekBZHqt2wVqjJDFN47WStjWvedz8qmZuAME1Iq3Lp0DJmgVCyvl4cmKKDJsyZiF4hulny0TCiKOuPWOFOIMDbrBKMOjFZb4KZ+K3gdkWMDVvdkLKcgZS4Sw0N0R4JsrIH2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722253491; c=relaxed/simple;
-	bh=Ti06r/XMSH0sbGat8+mJUkakLg/McgmwIPMyZU2BdF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kFIxCfrMXBjJuUnUW4oQjp4HbtehZt9e/mCJn3cJWMOozjTa8BtemGlTK+2XcwySl3l0u7a6kbMzNh3TuTdcvFjvuXseDxm+Q70eCJ7+xt1OzAXlCi4giy8XA/mphlq/DXGjSBg8QQcShq8UJIHWc3qCQPm/MuO9e6JHdrV755c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0rwxMVDP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ha36RNBh+gI1N0zYIGKCjyTBYU6moV0YKmXSZ5w/dN8=; b=0rwxMVDPTECcTCLQSNraQAKBZy
-	ksUM4TsSq4C75xehqddQoOEi6Shjsa0vxZoRgSzvh4C5QrkFEZaep6K8qFnQTOimaj7NFLNXsrAYt
-	GTr7DbbvTxLWTWMZYKf5IHcQZOSQgpw/KvRRQYLaXJzXpOtS9SI0573BcZZWePp/E8uCZlZ7p7z+t
-	xfIS9NNuNgR2MTroKfE/T70LNX0i9UpeUARI2GiRKh39TM9DHX510mwHBYEdadpphasWcJu1M9jE1
-	T/b7UZ8WEFtc2PgH78s2DGoqDVAT0nGuV2hSN5RjwVqAVAG39CZEAIUzWxYuywjm5QmvHEcXSK7dd
-	Z5M8qSGw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40146)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sYOno-0004AW-1Q;
-	Mon, 29 Jul 2024 12:44:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sYOns-0004Ic-MN; Mon, 29 Jul 2024 12:44:36 +0100
-Date: Mon, 29 Jul 2024 12:44:36 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Frank.Sae" <Frank.Sae@motor-comm.com>, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
-	xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com,
-	jie.han@motor-comm.com
-Subject: Re: [PATCH 2/2] net: phy: Add driver for Motorcomm yt8821 2.5G
- ethernet phy
-Message-ID: <ZqeApCpnq0752ZG4@shell.armlinux.org.uk>
-References: <20240727092031.1108690-1-Frank.Sae@motor-comm.com>
- <fa2a7a4a-a5fc-4b05-b012-3818f65631c4@lunn.ch>
+	s=arc-20240116; t=1722253566; c=relaxed/simple;
+	bh=nkcVycGOmjZ53vAR9tu+gTOhYnSE5zhPRCcc2FArpjU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZNRxi/aJRz+n4mOIBqgrbT1R0bGBqpBFJZYXClFbqDtcL1si2O4MqeaLm9Uv0lY43MCM9Orz9eQ0g/rS0TXErZoZhXu6zjpbWfO3ZhrPF5R7DhiVREN1syzkAgDkqd0WX2zSGtDN/gAW2QmzvBYEmM7SGsJnoNcarvDOrd0IxVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bsWE2au6; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6b7aed340daso20293126d6.3;
+        Mon, 29 Jul 2024 04:46:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722253564; x=1722858364; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nkcVycGOmjZ53vAR9tu+gTOhYnSE5zhPRCcc2FArpjU=;
+        b=bsWE2au6C6+jukQE7t+bgHvw2VsGrSytNAxLuWy8WSTOc8Oy4gyrYJO0pxiORbGLzs
+         30Oy/JnLOSRIppu84wr9juFlxZca6fRky/BNRXZ4xlhqK299r8QvNohLF2n3ZR7QdCUU
+         QNb2RnfSBlu/ndkNHtXuzNsn+F7q39zg9TmwliHZwHRffLlMvAMoiO2tkHQPsi6dXnVA
+         oumA9sII4nqlzKy68971yjP62kCtileK4ZKRXpFRLSLVbvsbkq+IA7WqfcKRKom3+Yii
+         IHZN6g9BubIzXUWP5Y93NDfk6odrqY+Wz0vWxjaGQr94X0oK0+ciGpad1q5KoMST3v0b
+         hkMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722253564; x=1722858364;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nkcVycGOmjZ53vAR9tu+gTOhYnSE5zhPRCcc2FArpjU=;
+        b=d2zMhpIyzJIrLqPihSFHgtbQElaek8VNAnSfqjYl5vILv6yimZua6pqgIAN7oZwX7C
+         y/QShjqUF7HuhZWu4eWRaqNRL3knqM8xLDxvpIM9U6hEN/1dJSHf4rfXkv3/W33yUOA+
+         O4SQhTXXMb7io6V9aKadrLLt3f9J84MlLOWFRLWURtL7pnpwxVCRDnm3eh0WfNXNW+Az
+         b6G9VUAmxRQQE/AzslHxvCarAlhe1CrbnkLF6Gddh22TP1KICfNklTkhV++52CNnTEzO
+         y8vYkkRaPILv9hzDRGuhzmyUd4yDbcWRF4L738WuPJQv+vAo3LoUJamAF43g216IGhvI
+         C3Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFqwAF/TWLSSU8OHOQDT4dznTBUFJ1fupxh6EyTLcSfmBjU2FDMuZlTQOh2UM8laiWH02amMA4gdmiU1o3dW7XClLGx4QG8nnc2rV/PAoZTD+aoWRHC+5Hw7k5GnMLVOl+clj5UX9lFaVvEDeK+3y/7HlT59T7xE+GcYpmjxQK7SWcwY2oPi3W6FuATGHqvIyou7CsACdu/VYg7IXqtmvRLy0YJidZAGTJPV8CIpJYjqwwuC3XjiHRer5GMQTUn4XCBUPEt6UDe71H4mmiQflhodvbrRHmtkF0xr442rMT9HsZFfAgNkj9nE6YGX7QQjmyEdrg+Q==
+X-Gm-Message-State: AOJu0YzPsnvrpFXmZAt2AU1/l7hkdAPc+fe1+BOVhPyw27P90oup90UA
+	RcITrDhCj56FmEoPlrJ26RpqAzOZYmUm8NeMvmuJm7cCEXwJwlYqF7AzXK9y3UFDxG4Ze8v3mNL
+	wlOIoxfLp9OydATTIinb7qn8Yfks=
+X-Google-Smtp-Source: AGHT+IF5UmpKUFOnvoAK9lYxcwohmtfgqa1lFzGyA8Akl+YSskrOYOXqexc6VvI8Xmv0jJTGVagDPu5fB/SRGumTpvw=
+X-Received: by 2002:a05:6214:2425:b0:6b7:944f:3cef with SMTP id
+ 6a1803df08f44-6bb55aa2fc3mr125032596d6.44.1722253564270; Mon, 29 Jul 2024
+ 04:46:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fa2a7a4a-a5fc-4b05-b012-3818f65631c4@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20240729023719.1933-1-laoar.shao@gmail.com> <87bk2gzgu0.fsf@intel.com>
+In-Reply-To: <87bk2gzgu0.fsf@intel.com>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Mon, 29 Jul 2024 19:45:27 +0800
+Message-ID: <CALOAHbCAKEwkDQSmyUqRs-EjM9=aF-QcORr1g=_CnFLoVXsSVg@mail.gmail.com>
+Subject: Re: [PATCH resend v4 00/11] Improve the copy of task comm
+To: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
+	ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org, 
+	catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jul 27, 2024 at 01:36:25PM +0200, Andrew Lunn wrote:
-> The idea of this phydev->possible_interfaces is to allow the core to
-> figure out what mode is most appropriate. So i would drop the mode in
-> DT, default to auto, and let the core tell you it wants 2500 BaseX if
-> that is all the MAC can do.
+On Mon, Jul 29, 2024 at 5:29=E2=80=AFPM Jani Nikula <jani.nikula@linux.inte=
+l.com> wrote:
+>
+> On Mon, 29 Jul 2024, Yafang Shao <laoar.shao@gmail.com> wrote:
+> > Hello Andrew,
+> >
+> > Is it appropriate for you to apply this to the mm tree?
+> >
+> > Using {memcpy,strncpy,strcpy,kstrdup} to copy the task comm relies on t=
+he
+> > length of task comm. Changes in the task comm could result in a destina=
+tion
+> > string that is overflow. Therefore, we should explicitly ensure the des=
+tination
+> > string is always NUL-terminated, regardless of the task comm. This appr=
+oach
+> > will facilitate future extensions to the task comm.
+>
+> Why are we normalizing calling double-underscore prefixed functions all
+> over the place? i.e. __get_task_comm().
+>
+> get_task_comm() is widely used. At a glance, looks like it could be used
+> in many of the patches here too.
 
-phydev->possible_interfaces reports the bitmap of interfaces that the
-PHY _will_ switch between on its MAC facing side depending on the
-negotiated media-side link.
+There is a BUILD_BUG_ON() inside get_task_comm(), so when you use
+get_task_comm(), it implies that the BUILD_BUG_ON() is necessary.
+However, we don't want to impose this restriction on code where the
+length can be dynamically changed.
 
-It would be nice if this driver always filled in
-phydev->possible_interfaces, even if there is only one interface
-when it's using rate matching.
+One use case of get_task_comm() is in code that has already exposed
+the length to userspace. In such cases, we specifically add the
+BUILD_BUG_ON() to prevent developers from changing it. For more
+information, see commit 95af469c4f60 ("fs/binfmt_elf: replace
+open-coded string copy with get_task_comm").
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+Regards
+Yafang
 
