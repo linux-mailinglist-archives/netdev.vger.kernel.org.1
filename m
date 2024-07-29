@@ -1,129 +1,126 @@
-Return-Path: <netdev+bounces-113797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D616393FFD8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:54:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A1293FFDA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 22:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95BFD283E8D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:54:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC429283ED5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47FBC188CD7;
-	Mon, 29 Jul 2024 20:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5707D18786A;
+	Mon, 29 Jul 2024 20:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="iG0v1o6I"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="xT7zH1CU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F2783A19;
-	Mon, 29 Jul 2024 20:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68281891B2
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 20:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722286486; cv=none; b=dyo6jBDtOH+yjaGCDb6JtyYoaduwm1TnIsmjEZjs0MYFSls4t8bpeivyPHyJO0XnO3Pm3V5Ca87yT4zATRVQ7tNAbPcXh7BzCUmKBgnuu5I39Leyr+1nRd9EGEKlVn93L1hpx54IHgQ4v5TFPZDzpMxXd6aN+vt9EVCl+tV+AOo=
+	t=1722286504; cv=none; b=G5wmOUXzDHyh01++7cQdDhmlEbNLMfSo1ST1AqI4qf2pZN/urOBqp3+XV/DfxC5g3C2Gb8DUvQZSHr9uXcJ04Mn+NEjVRy0xPc2JYy0Q0KC6uROw7aEN105E7c4vvhnIEnZLm4Wcl1/O64S9G6e0yQlB258hK915kX+GwARbILM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722286486; c=relaxed/simple;
-	bh=vMSC5mSJwofNe+SDXEoDV476/CgeV7I1vGfJNeOR4tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nk3nqxwseA9V7yQafYo+pyQ+3Th6keGhimY1cPgN8gv3wtLWzHo6qOW7OEfPTB7x1QkT0ABiPP93fWkOjNY+6SCX4+/A4gl+47YwUxL2ADIHk/aVTlx9Roe+jimVIxQJzduC4pn3kp5FwnfjrHlbljMhxhMwL3uD4rKwxEicPCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=iG0v1o6I; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=NVCKukZsilXPQ2aJYNivXtgsqLnvhWzzpkUIDtz4BwE=; b=iG0v1o6IlSlw2y96
-	0zzRkx2bzLAtEeHuHVphd7BaFlzrv0bEa3pg1ecEqa9BHMZBC+sJpPxDDy0G2o+Cee58mao9Heo6V
-	atgjbAJre7ShJIivSxn48SoiGx7d5s6dryGPQK8aHqSUbQfyAxqQO2bccDkwzK6dDRZSJpSeZihYW
-	di7rnldApxpau8P9wABjHDnOZflwcHVm7ZbSU4+3yS5Pi0/whR5zBqRNqHYYhCY1gqaylvWD6hAmn
-	e9l27Viuux97w1aNQ4Ir73fTanLG3oFyBVdx7elMszhRlNP1Jh3nxxOIx3c5wAc6Ot9Zv7SliWxSG
-	KMRkrKjLF5XUmHMNxQ==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sYXOB-00DsMU-0B;
-	Mon, 29 Jul 2024 20:54:39 +0000
-Date: Mon, 29 Jul 2024 20:54:39 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, edumazet@google.com,
-	dsahern@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kennetkl@ifi.uio.no
-Subject: Re: [PATCH] net/tcp: Expand goo.gl link
-Message-ID: <ZqgBjxjxpclRhZ_T@gallifrey>
-References: <20240724172508.73466-1-linux@treblig.org>
- <20240724191215.GJ97837@kernel.org>
- <b399e0bf-07fd-4da6-9ab4-19cd1ceaa456@redhat.com>
- <ZqJeqWO7xVjA88Zd@gallifrey>
+	s=arc-20240116; t=1722286504; c=relaxed/simple;
+	bh=sJMLU7mEavdOfESZUHrVN8XodJcrv1KNhbdOA0KBKtY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kP/zEhp4wlCSiGWMJE97dUgxrIhYFheSfEbcX0v2QL/d1XWiSgzgOmgkEOiN2V46SSEiniUW/ZfA4gSl3j+wDetQLysw3GpMdkM8kLI5LakU936IYnZW6CcTM+bBYGsU4FRck9QHQVg0GURhjG9L0pzJ8PYyivY1OA1gN0/qkvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=xT7zH1CU; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-6c5bcb8e8edso2884831a12.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 13:55:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1722286502; x=1722891302; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ML5fp+yCvwv2SrKSbPgcg7ANXJSeySYvh3gJKc3nS9U=;
+        b=xT7zH1CUzna6dSYVQ973msTbaJWIeb6TSENzzN+i0PXV0C7Y7Kel7+Vn9nCI/cZjT9
+         SjQMXgXnLvFTuzmTG3wXTyQLHBhjWj1262ESeIqCZ+rPmFnKAdDNU/KDJTX85Dl+6UV7
+         Y2B76QvWBm0FgEohMBapYzFvAnaB1cWq4VGE0qIjLR7laX0VGBQotoZ94D6qok14x2HQ
+         66YcxmARexo/4F7GBUJn71EjZcKwvPRMtvFthh4RjeE3M89PbFaGknO16mPS/TQBrd53
+         5/1/EA2WUAB+6GCsQTgfoMCx4WSTEWzk1GpenzoDe4R1w5pv3ZtZWvRL73di3J1wMyUn
+         R0CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722286502; x=1722891302;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ML5fp+yCvwv2SrKSbPgcg7ANXJSeySYvh3gJKc3nS9U=;
+        b=M5NXbx1ZQVZbUPXCCNDPT9hPom2IOTqauyjzDwAxSXU50xPHPUvz5Nq5YzX/hhjCMa
+         7jUCfocQ3KgKKZJslXj1kRh+p3R8SmNg8vGLYNFUk1z3JNOND5MymCReWhEvbqEmYzi4
+         1kVvpWiU/E+kGxJsADaRZ2Icv5I5d8BKJ80hQuiVJATI3fEo+Glyna5+V5LQrNZqVG0F
+         zBHGoAdNfk2JDWjDILCJmVAq9I2dZBWc74osu0SQLDMiBrJki1kAlO2ram+jqpUEkawu
+         ZZeBGDJUrosWk/VVERwsS/krFFJrEhBLsrVxY7DrtOOA/9CFs4p1b8ZjyT7Bq4EdoAOO
+         5E+g==
+X-Gm-Message-State: AOJu0YxXDjAx6JY/UKc53uIPcLmF0eRAv/xsL9PAGMjX3ssTVtUw2HGL
+	jQlqdKgOGZU/Dtylc487z/ry5wrSCMxYZ9VNA07tYXDvouauvPPM8JQqmH5wtT1vWERnij4yC9q
+	zbX0=
+X-Google-Smtp-Source: AGHT+IHteE3LHSXPRstwY03n5vNFeT70FS3342kund+WzG+s9sPAx9yRaX8GqYCbt7Ko16mITdAy1Q==
+X-Received: by 2002:a05:6a21:1583:b0:1c1:92f8:d3c6 with SMTP id adf61e73a8af0-1c4a12d0051mr10413477637.27.1722286501741;
+        Mon, 29 Jul 2024 13:55:01 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-007.fbsv.net. [2a03:2880:ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead7120f6sm7255041b3a.50.2024.07.29.13.55.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 13:55:01 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michael Chan <michael.chan@broadcom.com>
+Subject: [PATCH net-next v1 0/3] fix bnxt_en queue reset when queue is active
+Date: Mon, 29 Jul 2024 13:54:56 -0700
+Message-ID: <20240729205459.2583533-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ZqJeqWO7xVjA88Zd@gallifrey>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 20:54:07 up 82 days,  8:08,  1 user,  load average: 0.00, 0.00, 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Content-Transfer-Encoding: 8bit
 
-* Dr. David Alan Gilbert (linux@treblig.org) wrote:
-> * Paolo Abeni (pabeni@redhat.com) wrote:
-> > 
-> > 
-> > On 7/24/24 21:12, Simon Horman wrote:
-> > > On Wed, Jul 24, 2024 at 06:25:08PM +0100, linux@treblig.org wrote:
-> > > > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> > > > 
-> > > > The goo.gl URL shortener is deprecated and is due to stop
-> > > > expanding existing links in 2025.
-> > > > 
-> > > > Expand the link in Kconfig.
-> > > > 
-> > > > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> > > 
-> > > Both the motivation and updated link look correct to me.
-> > > I also checked that there is no other usage of goo.gl in this file.
-> > > 
-> > > Not sure if this should be for net or net-next.
-> > 
-> > I also think this should go via net-next.
-> > 
-> > ## Form letter - net-next-closed
-> > 
-> > The merge window for v6.11 and therefore net-next is closed for new
-> > drivers, features, code refactoring and optimizations. We are currently
-> > accepting bug fixes only.
-> > 
-> > Please repost when net-next reopens after July 29th.
-> 
-> OK, I'll repost next week.
+The current bnxt_en queue API implementation is buggy when resetting a
+queue that has active traffic. The problem is that there is no FW
+involved to stop the flow of packets and relying on napi_disable() isn't
+enough.
 
-As requested, reposted as
-Message-id 20240729205337.48058-1-linux@treblig.org
+To fix this, call bnxt_hwrm_vnic_update() with MRU set to 0 for both the
+default and the ntuple vnic to stop the flow of packets. This works for
+any Rx queue and not only those that have ntuple rules since every Rx
+queue is either in the default or the ntuple vnic.
 
-Dave
+The first patch is from Michael Chan and adds the prerequisite vnic
+functions and definitions.
 
-> Dave
-> 
-> > RFC patches sent for review only are obviously welcome at any time.
-> > 
-> > See:
-> > https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-> > -- 
-> > pw-bot: defer
-> > 
-> -- 
->  -----Open up your eyes, open up your mind, open up your code -------   
-> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-> \        dave @ treblig.org |                               | In Hex /
->  \ _________________________|_____ http://www.treblig.org   |_______/
-> 
+Tested on BCM957504 while iperf3 is active:
+
+1. Reset a queue that has an ntuple rule steering flow into it
+2. Reset all queues in order, one at a time
+
+In both cases the flow is not interrupted.
+
+Sending this to net-next as there is no in-tree kernel consumer of queue
+API just yet, and there is a patch that changes when the queue_mgmt_ops
+is registered.
+
+David Wei (2):
+  bnxt_en: stop packet flow during bnxt_queue_stop/start
+  bnxt_en: only set dev->queue_mgmt_ops if BNXT_SUPPORTS_NTUPLE_VNIC
+
+Michael Chan (1):
+  bnxt_en: Add support to call FW to update a VNIC
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 50 ++++++++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  3 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h | 37 ++++++++++++++
+ 3 files changed, 83 insertions(+), 7 deletions(-)
+
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+2.43.0
+
 
