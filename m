@@ -1,238 +1,240 @@
-Return-Path: <netdev+bounces-113694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F0293F981
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:33:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 038F093F984
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 17:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A1E4282DB9
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:33:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87188283250
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 15:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32025155CB8;
-	Mon, 29 Jul 2024 15:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F213158DCA;
+	Mon, 29 Jul 2024 15:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HAjSQxZ1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xftx+XWX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E3513BC3F
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856C2157484
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 15:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722267183; cv=none; b=qDy+pZtLjOTKSTSyZ+0gpbgZQ7p0jJYR1PfrBmI8JO3hVKo6M+KIi71Ab9zoPIyWPT6QCfiGvayPA/5Z83p6qBmGryrfnuycMxa1YH7uZ5GbTTHoq6JyQxf7b0gQYciTaoxhnl/An7IrPjIsLOhFCnK+hThZLv00sVtHPk9lE5I=
+	t=1722267231; cv=none; b=iHYYKDTFb6QmVfG/nMgfQIlA4yNhYDOEyMPImRPgYDgcLLdE6IVoP2t2JWfJ6q5BOpvDfomZ7Wjk9wWQsmigFLch0gatJVirfYBCobdy5Dx+5C81FUzCAvqg3QBP++Ke1WtAtyLjOxACttX6EsucK3wwNX2/Z5g8KjH0cMQ+ddY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722267183; c=relaxed/simple;
-	bh=EatdYnrk9SJ0RzhQhszpMx76qS24gl6IteKnoIYpPYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SZ8shcOzsTdcOXhDVh4voCI4oGllbOzW0AC/Z84iIGnWv7rH4tzOUX5xnJxVmzLrq3xaxgwEnwJCDXw17uK28g5B64HR2vbTKR+EtibMQBtDAMC3169ohy8Zkd8J4KE8d2QBKcgbYhSqQUBi++xMFqZ6XDrodnp0UfW6nOsj1Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HAjSQxZ1; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3db35ec5688so685626b6e.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:33:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722267180; x=1722871980; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HSX2ccpIFReiDiByaCNe0zTPO5plfuQgyMpXUr7ZZR0=;
-        b=HAjSQxZ1fc9yPYkwYUdCp/xINXGGB6QVS9ezvmw9+qurwHdasWvQqRhSmTB8N6Wudp
-         MWs2mPnjNi/jBcftuqrk8B0xJh4GYe+62iDFk6HcuBMebC4R5yS5q3hQKrYGMCPupSOU
-         nNhi52PWz8gYgSf8jrFTDGPeHxss5iPfyAEV4k+mkOE5FTDxEp8ksPKEWoYZp1ukCvlK
-         E0qJZpJccot+ZVhMyrW63wiH04tBsUX2Srh9RHPb3wBJMqTSjv5tJSiUv/O9PkYBXUQ0
-         rAlXckxEuEunwHY4qaLLNL++U/khn9lzel+u+WpE1p4RvdAacyx2BG4TGF9loJbe7Jf+
-         hSuw==
+	s=arc-20240116; t=1722267231; c=relaxed/simple;
+	bh=wqWUVlf7aP1OH80LKZ4ptLvsSw+/kbCzCArTFsf8Z2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UXr52ssbDNXDCK7mw7INUBtY4DY6OcCpWMloMS8cK1e0kM+VIfGB9LXqHb2VjpIBS/+oQMvDs3giLN8SltYmrOec+dsrv8Yi7aArX3t15vhEfTBH42x8NO57YRStG1DESn9JUttuOkTcu0w2W/5ElPKSWs+6wkQLIgXEB3r9bdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xftx+XWX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722267228;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gOdxuhlC0hKorSyQVfDMKmXgVB7ow0l5OK4sY+cYrK0=;
+	b=Xftx+XWXDBAi/79OEYEQjV+nyIaKO+S2yUDbd059r7SQz/YrjuaUprsg7P9eAHbgu9c66a
+	FuuPE0MWThNGCChuPwd/rHeXJBrUuFFBAw9wTI/zcHAH9SgK1jAKdSZ1kfyAqcfvnp4x0A
+	+4+HSjli4iWbW8JYf4K3Ohm6oGvMt94=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-694-TXB0jcuBP42dYpJKiWSRYw-1; Mon, 29 Jul 2024 11:33:46 -0400
+X-MC-Unique: TXB0jcuBP42dYpJKiWSRYw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42820af1106so3722375e9.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:33:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722267180; x=1722871980;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HSX2ccpIFReiDiByaCNe0zTPO5plfuQgyMpXUr7ZZR0=;
-        b=dVNVAmo6aF7Pe8CEJZmYYDDkXRr4L8l6fCpaPUEdnxAmOxj+XfWlKh9NpJKlddadja
-         7MMF+cgkUwbpvzW/nN0HpQzEfHTSxv11FjcxtF4xiShIGzSVr9hmk+TEYApwv2Y3k5sa
-         aVESW2WmcfCtb6ClblZtLVDXITBoTkwc7LgNZ33hJHjIg3H8/ACxF296ObGAujFsuLjp
-         33V8uu60mNOWi56JEQnHspob+MXxlqEgImPZP6sKXDYYwln2uo7gOcIuP6G2eZ966VVD
-         F/hHHHR5r67AalDkp2/yJKZ5RfiX3bpImiRxV8ID0NM1nytPcbF5Ce96sran8fdLCN9Z
-         C3qw==
-X-Forwarded-Encrypted: i=1; AJvYcCXu3oOgI+3L168egTJyC6AwgUUjT11P67CXZA0jTKhSi/crLKCLTzBzb5KqDDg8/bOuFkHTHe7V/2uwPrX8vr9ay5tfOVm6
-X-Gm-Message-State: AOJu0YxbJ/6DenaZrhnaWZe3Xpd/q89na/doKUoFvYRejJ+TtmFVDSTZ
-	nezkp4T62LO7jcZO+tU1timkEsJ/hEPJx49rpOYKNxOu25FgxRT1YxAAfsw55moTTc3F+IUpVr+
-	/PmWV/Lc4fKU5Gtf8jstEOVqW2GKxIceJaHRY
-X-Google-Smtp-Source: AGHT+IGtj5JSoJqWQo6jp6/ue9T60eRHZryETKAuZX9+Cfi0DB+TayKvCGAyrO7CDAysl4iFeEBeLLSk1YQ1zx6BbOw=
-X-Received: by 2002:a05:6358:715:b0:1aa:bf62:67d2 with SMTP id
- e5c5f4694b2df-1adc06edfb9mr881746255d.25.1722267180166; Mon, 29 Jul 2024
- 08:33:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722267225; x=1722872025;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gOdxuhlC0hKorSyQVfDMKmXgVB7ow0l5OK4sY+cYrK0=;
+        b=HHIGphEnNtkV8G6ex+T4Bf9u/3y/mamZrU+9N9PvVstBmGcqztx6MQ2cj+hKT/86pF
+         G0DMp2k8uY21xbjSsMyZgUVIzI3Y91N1OQjSp7ifuGd53eDBDAi2ovo5z7xHlJ+36X4f
+         QgdRQfVWYoqKE+DHaeByb3vD5/Vb6xOpy13fyNqu5s6GJ2YCprfYkWyu4TfRfSsGLwWR
+         W3OIs7JboLeq5dwT737SWhJgI2uplXgh/eC8AmbpGMYichuJk9YTXs96ck80fRTKqAGQ
+         GDNVPJcwsRMlCwMHXk34umGL7GnVU3Xifa3yB4aXGQfZXxNImqgQOjIRUuYFRg4uSWAW
+         CQ+w==
+X-Forwarded-Encrypted: i=1; AJvYcCX7yM3ISRyFly30pvxNfzRerIodwAJiQiYn+vkQrX82y1s8CggNyfs9WSw6QxIfdZrhyk7yXEcfNLM2SQULvd8NbSkXqHuf
+X-Gm-Message-State: AOJu0YyDawNAzz3XMpWpCuGULoE+lFbLZU2gETOY+VtOdaskqWX6LYZA
+	pSfsK/yPxG9lkBxb/sMOYxrof3QEgf7x6/+5FohisR+s71/W3/qsVibjiChoHqUXytSMdnyKNJW
+	9nYvMzcva4SEBH+QJVKBWU+vbEAZ77RwmNbjCkQdGIlqx3JP5BPE9yQ==
+X-Received: by 2002:a05:600c:3b99:b0:426:5269:9827 with SMTP id 5b1f17b1804b1-42811a94590mr60054315e9.0.1722267224668;
+        Mon, 29 Jul 2024 08:33:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH11CwyPhlrH2xJ/R5zuEwuK8l7eeYYGyXEbvzQ/zeQzSr5tEaXptiR7TnM3lG3ZWRGuUwuXg==
+X-Received: by 2002:a05:600c:3b99:b0:426:5269:9827 with SMTP id 5b1f17b1804b1-42811a94590mr60053985e9.0.1722267223937;
+        Mon, 29 Jul 2024 08:33:43 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:55d:98c4:742e:26be:b52d:dd54])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281fd617desm21464125e9.35.2024.07.29.08.33.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 08:33:43 -0700 (PDT)
+Date: Mon, 29 Jul 2024 11:33:36 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Peter Hilber <peter.hilber@opensynergy.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
+	"Luu, Ryan" <rluu@amazon.com>,
+	"Chashper, David" <chashper@amazon.com>,
+	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
+	"Christopher S . Hall" <christopher.s.hall@intel.com>,
+	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+	netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v3] ptp: Add vDSO-style vmclock support
+Message-ID: <20240729113320-mutt-send-email-mst@kernel.org>
+References: <e3164fc80e21336cbf13e24f98c9e5706afb77ab.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240726204105.1466841-1-quic_subashab@quicinc.com>
- <CADVnQynKT7QEhm1WksrNQv3BbYhTd=wWaxueybPBQDPtXbJu-A@mail.gmail.com> <CANn89i+eVKrGp2_xU=GsX5MDDg6FZsGS3u4wX2f1qA7NnHYJCg@mail.gmail.com>
-In-Reply-To: <CANn89i+eVKrGp2_xU=GsX5MDDg6FZsGS3u4wX2f1qA7NnHYJCg@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Mon, 29 Jul 2024 11:32:40 -0400
-Message-ID: <CADVnQynUV+gqdH4gKhYKRqW_MpQ5gvMo5n=HHCa08uQ8wBbF_A@mail.gmail.com>
-Subject: Re: [PATCH net v2] tcp: Adjust clamping window for applications
- specifying SO_RCVBUF
-To: Eric Dumazet <edumazet@google.com>
-Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>, soheil@google.com, yyd@google.com, 
-	ycheng@google.com, davem@davemloft.net, kuba@kernel.org, 
-	netdev@vger.kernel.org, dsahern@kernel.org, pabeni@redhat.com, 
-	Sean Tranchetti <quic_stranche@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3164fc80e21336cbf13e24f98c9e5706afb77ab.camel@infradead.org>
 
-On Mon, Jul 29, 2024 at 11:19=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Mon, Jul 29, 2024 at 4:51=E2=80=AFPM Neal Cardwell <ncardwell@google.c=
-om> wrote:
-> >
-> > On Fri, Jul 26, 2024 at 4:41=E2=80=AFPM Subash Abhinov Kasiviswanathan
-> > <quic_subashab@quicinc.com> wrote:
-> > >
-> > > tp->scaling_ratio is not updated based on skb->len/skb->truesize once
-> > > SO_RCVBUF is set leading to the maximum window scaling to be 25% of
-> > > rcvbuf after
-> > > commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> > > and 50% of rcvbuf after
-> > > commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio").
-> > > 50% tries to emulate the behavior of older kernels using
-> > > sysctl_tcp_adv_win_scale with default value.
-> > >
-> > > Systems which were using a different values of sysctl_tcp_adv_win_sca=
-le
-> > > in older kernels ended up seeing reduced download speeds in certain
-> > > cases as covered in https://lists.openwall.net/netdev/2024/05/15/13
-> > > While the sysctl scheme is no longer acceptable, the value of 50% is
-> > > a bit conservative when the skb->len/skb->truesize ratio is later
-> > > determined to be ~0.66.
-> > >
-> > > Applications not specifying SO_RCVBUF update the window scaling and
-> > > the receiver buffer every time data is copied to userspace. This
-> > > computation is now used for applications setting SO_RCVBUF to update
-> > > the maximum window scaling while ensuring that the receive buffer
-> > > is within the application specified limit.
-> > >
-> > > Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> > > Signed-off-by: Sean Tranchetti <quic_stranche@quicinc.com>
-> > > Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.=
-com>
-> > > ---
-> > > v1 -> v2
-> > >   Update the condition for SO_RCVBUF window_clamp updates to always
-> > >   monitor the current rcvbuf value as suggested by Eric.
-> > >
-> > >  net/ipv4/tcp_input.c | 23 ++++++++++++++++-------
-> > >  1 file changed, 16 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> > > index 454362e359da..e2b9583ed96a 100644
-> > > --- a/net/ipv4/tcp_input.c
-> > > +++ b/net/ipv4/tcp_input.c
-> > > @@ -754,8 +754,7 @@ void tcp_rcv_space_adjust(struct sock *sk)
-> > >          * <prev RTT . ><current RTT .. ><next RTT .... >
-> > >          */
-> > >
-> > > -       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf) =
-&&
-> > > -           !(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-> > > +       if (READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_moderate_rcvbuf))=
- {
-> > >                 u64 rcvwin, grow;
-> > >                 int rcvbuf;
-> > >
-> > > @@ -771,12 +770,22 @@ void tcp_rcv_space_adjust(struct sock *sk)
-> > >
-> > >                 rcvbuf =3D min_t(u64, tcp_space_from_win(sk, rcvwin),
-> > >                                READ_ONCE(sock_net(sk)->ipv4.sysctl_tc=
-p_rmem[2]));
-> > > -               if (rcvbuf > sk->sk_rcvbuf) {
-> > > -                       WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
-> > > +               if (!(sk->sk_userlocks & SOCK_RCVBUF_LOCK)) {
-> > > +                       if (rcvbuf > sk->sk_rcvbuf) {
-> > > +                               WRITE_ONCE(sk->sk_rcvbuf, rcvbuf);
-> > >
-> > > -                       /* Make the window clamp follow along.  */
-> > > -                       WRITE_ONCE(tp->window_clamp,
-> > > -                                  tcp_win_from_space(sk, rcvbuf));
-> > > +                               /* Make the window clamp follow along=
-.  */
-> > > +                               WRITE_ONCE(tp->window_clamp,
-> > > +                                          tcp_win_from_space(sk, rcv=
-buf));
-> > > +                       }
-> > > +               } else {
-> > > +                       /* Make the window clamp follow along while b=
-eing bounded
-> > > +                        * by SO_RCVBUF.
-> > > +                        */
-> > > +                       int clamp =3D tcp_win_from_space(sk, min(rcvb=
-uf, sk->sk_rcvbuf));
-> > > +
-> > > +                       if (clamp > tp->window_clamp)
-> > > +                               WRITE_ONCE(tp->window_clamp, clamp);
-> > >                 }
-> > >         }
-> > >         tp->rcvq_space.space =3D copied;
-> > > --
-> >
-> > Is this the correct place to put this new code to update
-> > tp->window_clamp? AFAICT it's not the correct place.
-> >
-> > If a system administrator has disabled receive buffer autotuning by
-> > setting `sysctl net.ipv4.tcp_moderate_rcvbuf=3D0`, or if (copied <=3D
-> > tp->rcvq_space.space), then TCP connections will not reach this new
-> > code, and the window_clamp will not be adjusted, and the receive
-> > window will still be too low.
-> >
-> > Even if a system administrator has disabled receive buffer autotuning
-> > by setting `sysctl net.ipv4.tcp_moderate_rcvbuf=3D0`, or even if (copie=
-d
-> > <=3D tp->rcvq_space.space), AFAICT we still want the correct receive
-> > window value for whatever sk->sk_rcvbuf we have, based on the correct
-> > tp->scaling_ratio.
-> >
-> > So AFAICT the correct place to put this kind of logic is in
-> > tcp_measure_rcv_mss(). If we compute a new scaling_ratio and it's
-> > different than tp->scaling_ratio, then it seems we should compute a
-> > new window_clamp value using sk->sk_rcvbuf, and if the new
-> > window_clamp value is different then we should WRITE_ONCE that value
-> > into tp->window_clamp.
-> >
-> > That way we can have the correct tp->window_clamp, no matter the value
-> > of net.ipv4.tcp_moderate_rcvbuf, and even if (copied <=3D
-> > tp->rcvq_space.space).
-> >
-> > How does that sound?
->
-> Can this be done without adding new code in the fast path ?
+On Mon, Jul 29, 2024 at 11:42:22AM +0100, David Woodhouse wrote:
+> +struct vmclock_abi {
+> +	/* CONSTANT FIELDS */
+> +	uint32_t magic;
+> +#define VMCLOCK_MAGIC	0x4b4c4356 /* "VCLK" */
+> +	uint32_t size;		/* Size of region containing this structure */
+> +	uint16_t version;	/* 1 */
+> +	uint8_t counter_id; /* Matches VIRTIO_RTC_COUNTER_xxx except INVALID */
+> +#define VMCLOCK_COUNTER_ARM_VCNT	0
+> +#define VMCLOCK_COUNTER_X86_TSC		1
+> +#define VMCLOCK_COUNTER_INVALID		0xff
+> +	uint8_t time_type; /* Matches VIRTIO_RTC_TYPE_xxx */
+> +#define VMCLOCK_TIME_UTC			0	/* Since 1970-01-01 00:00:00z */
+> +#define VMCLOCK_TIME_TAI			1	/* Since 1970-01-01 00:00:00z */
+> +#define VMCLOCK_TIME_MONOTONIC			2	/* Since undefined epoch */
+> +#define VMCLOCK_TIME_INVALID_SMEARED		3	/* Not supported */
+> +#define VMCLOCK_TIME_INVALID_MAYBE_SMEARED	4	/* Not supported */
+> +
+> +	/* NON-CONSTANT FIELDS PROTECTED BY SEQCOUNT LOCK */
+> +	uint32_t seq_count;	/* Low bit means an update is in progress */
+> +	/*
+> +	 * This field changes to another non-repeating value when the CPU
+> +	 * counter is disrupted, for example on live migration. This lets
+> +	 * the guest know that it should discard any calibration it has
+> +	 * performed of the counter against external sources (NTP/PTP/etc.).
+> +	 */
+> +	uint64_t disruption_marker;
+> +	uint64_t flags;
+> +	/* Indicates that the tai_offset_sec field is valid */
+> +#define VMCLOCK_FLAG_TAI_OFFSET_VALID		(1 << 0)
+> +	/*
+> +	 * Optionally used to notify guests of pending maintenance events.
+> +	 * A guest which provides latency-sensitive services may wish to
+> +	 * remove itself from service if an event is coming up. Two flags
+> +	 * indicate the approximate imminence of the event.
+> +	 */
+> +#define VMCLOCK_FLAG_DISRUPTION_SOON		(1 << 1) /* About a day */
+> +#define VMCLOCK_FLAG_DISRUPTION_IMMINENT	(1 << 2) /* About an hour */
+> +#define VMCLOCK_FLAG_PERIOD_ESTERROR_VALID	(1 << 3)
+> +#define VMCLOCK_FLAG_PERIOD_MAXERROR_VALID	(1 << 4)
+> +#define VMCLOCK_FLAG_TIME_ESTERROR_VALID	(1 << 5)
+> +#define VMCLOCK_FLAG_TIME_MAXERROR_VALID	(1 << 6)
+> +	/*
+> +	 * If the MONOTONIC flag is set then (other than leap seconds) it is
+> +	 * guaranteed that the time calculated according this structure at
+> +	 * any given moment shall never appear to be later than the time
+> +	 * calculated via the structure at any *later* moment.
+> +	 *
+> +	 * In particular, a timestamp based on a counter reading taken
+> +	 * immediately after setting the low bit of seq_count (and the
+> +	 * associated memory barrier), using the previously-valid time and
+> +	 * period fields, shall never be later than a timestamp based on
+> +	 * a counter reading taken immediately before *clearing* the low
+> +	 * bit again after the update, using the about-to-be-valid fields.
+> +	 */
+> +#define VMCLOCK_FLAG_TIME_MONOTONIC		(1 << 7)
+> +
+> +	uint8_t pad[2];
+> +	uint8_t clock_status;
+> +#define VMCLOCK_STATUS_UNKNOWN		0
+> +#define VMCLOCK_STATUS_INITIALIZING	1
+> +#define VMCLOCK_STATUS_SYNCHRONIZED	2
+> +#define VMCLOCK_STATUS_FREERUNNING	3
+> +#define VMCLOCK_STATUS_UNRELIABLE	4
+> +
+> +	/*
+> +	 * The time exposed through this device is never smeared. This field
+> +	 * corresponds to the 'subtype' field in virtio-rtc, which indicates
+> +	 * the smearing method. However in this case it provides a *hint* to
+> +	 * the guest operating system, such that *if* the guest OS wants to
+> +	 * provide its users with an alternative clock which does not follow
+> +	 * UTC, it may do so in a fashion consistent with the other systems
+> +	 * in the nearby environment.
+> +	 */
+> +	uint8_t leap_second_smearing_hint; /* Matches VIRTIO_RTC_SUBTYPE_xxx */
+> +#define VMCLOCK_SMEARING_STRICT		0
+> +#define VMCLOCK_SMEARING_NOON_LINEAR	1
+> +#define VMCLOCK_SMEARING_UTC_SLS	2
+> +	int16_t tai_offset_sec;
+> +	uint8_t leap_indicator;
+> +	/*
+> +	 * This field is based on the the VIRTIO_RTC_LEAP_xxx values as
+> +	 * defined in the current draft of virtio-rtc, but since smearing
+> +	 * cannot be used with the shared memory device, some values are
+> +	 * not used.
+> +	 *
+> +	 * The _POST_POS and _POST_NEG values allow the guest to perform
+> +	 * its own smearing during the day or so after a leap second when
+> +	 * such smearing may need to continue being applied for a leap
+> +	 * second which is now theoretically "historical".
+> +	 */
+> +#define VMCLOCK_LEAP_NONE	0x00	/* No known nearby leap second */
+> +#define VMCLOCK_LEAP_PRE_POS	0x01	/* Positive leap second at EOM */
+> +#define VMCLOCK_LEAP_PRE_NEG	0x02	/* Negative leap second at EOM */
+> +#define VMCLOCK_LEAP_POS	0x03	/* Set during 23:59:60 second */
+> +#define VMCLOCK_LEAP_POST_POS	0x04
+> +#define VMCLOCK_LEAP_POST_NEG	0x05
+> +
+> +	/* Bit shift for counter_period_frac_sec and its error rate */
+> +	uint8_t counter_period_shift;
+> +	/*
+> +	 * Paired values of counter and UTC at a given point in time.
+> +	 */
+> +	uint64_t counter_value;
+> +	/*
+> +	 * Counter period, and error margin of same. The unit of these
+> +	 * fields is 1/2^(64 + counter_period_shift) of a second.
+> +	 */
+> +	uint64_t counter_period_frac_sec;
+> +	uint64_t counter_period_esterror_rate_frac_sec;
+> +	uint64_t counter_period_maxerror_rate_frac_sec;
+> +
+> +	/*
+> +	 * Time according to time_type field above.
+> +	 */
+> +	uint64_t time_sec;		/* Seconds since time_type epoch */
+> +	uint64_t time_frac_sec;		/* Units of 1/2^64 of a second */
+> +	uint64_t time_esterror_nanosec;
+> +	uint64_t time_maxerror_nanosec;
+> +};
+> +
+> +#endif /*  __VMCLOCK_ABI_H__ */
+> -- 
+> 2.44.0
+> 
+> 
 
-I was imagining that the code would not really be in the fast path,
-because it would move to the spot in tcp_measure_rcv_mss() where the
-segment length "len" is greater than icsk->icsk_ack.rcv_mss. I imagine
-that should be rare, and we are already doing a somewhat expensive
-do_div() call there, so I was imagining that the additional cost would
-be relatively rare and small?
 
-> Otherwise, I feel that we send a wrong signal to 'administrators' :
-> "We will maintain code to make sure that wrong sysctls settings were
-> not so wrong."
->
-> Are you aware of anyone changing net.ipv4.tcp_moderate_rcvbuf for any
-> valid reason ?
 
-No, I'm not aware of any valid reason to disable
-net.ipv4.tcp_moderate_rcvbuf. :-)
+you said you will use __le here?
 
-Even if tcp_moderate_rcvbuf is enabled, AFAICT there is still the
-issue that if (copied <=3D tp->rcvq_space.space) we will not get to this
-code...
-
-neal
 
