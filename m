@@ -1,226 +1,271 @@
-Return-Path: <netdev+bounces-113760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D7E93FCFD
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:01:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D2E93FD11
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED7A328322E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:01:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B541D1C219B9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8B416F0E7;
-	Mon, 29 Jul 2024 18:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D8B186298;
+	Mon, 29 Jul 2024 18:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rX15RmzZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fEP/AyfR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A62A83A09;
-	Mon, 29 Jul 2024 18:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722276110; cv=none; b=eLJ9Iw7WUV6qBlku2rUd81XUtWIgqW8kWjsXFFA+1SfZ1MzZgNpXWTCOnCctD5wRQJooOLJeLW6leCrhUWqWhoGhSlpNK8JQW4k/qf7av23BiRiwWAwoHnYQynF+U2yyvx9ix18vuMtpurtcgs5ZZXM1fJSOfgz3vbayRLJo95k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722276110; c=relaxed/simple;
-	bh=OlaJ4GQZRWxaFzdiAoNYSvxQh2Vi6hhvXcbPIHhuQSQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tXops7Ys568i6SkfbI/4K3WVZUC8bVaPH6Gz72HROEJGCbEH9pLtTixDw6XaXcwNcuS7LFYTj4M9aOfTeGNGHNNs2OWwjGix051h1T50QCWgJQMREgjThuwrlbVxc6ZI+QPa+hSYo/jMZlw9HA/X5uR9+Srkhedt0JK4GZSSkQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rX15RmzZ; arc=none smtp.client-ip=207.171.188.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722276109; x=1753812109;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=K4QN7NgX3jCkknAIQAa+PRo8C1a02teQl7Gn3pR18DA=;
-  b=rX15RmzZKxsW3EjbtQ6ic5/psA9y2sQouCR+TBmG7/5/eTb9UKRGBTt7
-   JPleFvsERhBGkxVCb3kQ3QBaRKmbWdfqb4/72mA5o/KB5uxbtbgqwe3qf
-   +ghqscuz2MVixJuAl5M4lw7Rt4z6fNnNKp5iOTMdq1/dzgRgFWRyicmub
-   c=;
-X-IronPort-AV: E=Sophos;i="6.09,246,1716249600"; 
-   d="scan'208";a="746140924"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 18:01:43 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:44390]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.228:2525] with esmtp (Farcaster)
- id bd754b9f-88c2-4965-9cf6-b1b464fb8991; Mon, 29 Jul 2024 18:01:42 +0000 (UTC)
-X-Farcaster-Flow-ID: bd754b9f-88c2-4965-9cf6-b1b464fb8991
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 29 Jul 2024 18:01:35 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.6) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 29 Jul 2024 18:01:32 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lucien.xin@gmail.com>,
-	<netdev@vger.kernel.org>, <nhorman@tuxdriver.com>, <pabeni@redhat.com>,
-	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
-Subject: Re: [syzbot] [net?] general protection fault in reuseport_add_sock (3)
-Date: Mon, 29 Jul 2024 11:01:22 -0700
-Message-ID: <20240729180122.87990-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <000000000000ed7445061e65591f@google.com>
-References: <000000000000ed7445061e65591f@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809961862B5;
+	Mon, 29 Jul 2024 18:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722276173; cv=fail; b=kIMpskhO5zobaNh685c4H9/sfFzUq7zp+7QZsdvWr8kCnP/XZ3A/EA2Ruc3DjTkiCaKmuPMhHnDth323/NRmAMl0b1EPQXn6kCLyVR8LigGZ6DXvrTaCZXjrcEJsg36HLq8XanWQWm5GMwPeGvAUImhFccLBibFaa1Ogso/peg4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722276173; c=relaxed/simple;
+	bh=10nVhgDeGqZegTf7iuKTeIaC6ObAeyple8ijH3Qqy/g=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Q7kEgU+4Ujsxh7yzqQnec+wzJ87zNU8CagKikbW0nczatJz1oBcxpKdFk3Ci//nu45eg1ZIDDVmtTs3dShHo0rb2jcJWjrVMiPumLohpOw0lEBkZOrM9M4NBzxODOQkVotr8CPSe/KlqXKYre1rurSvhexJqOa+AmpYVZkKbmKU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fEP/AyfR; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722276172; x=1753812172;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=10nVhgDeGqZegTf7iuKTeIaC6ObAeyple8ijH3Qqy/g=;
+  b=fEP/AyfRE3lidiCtbWv4Sp8Uix6MgmqmzIQQvg5R1wn16YUznJkUXVVd
+   zFxYSrRnSmaNojF7KzWlxTTjnHJ+c6Jim+/6Te7UUvoYIVrThPa7ldsSV
+   oFNZCVE9rzespW3dOtYkGQCzKRqfrr1Y9JF4Otr0kday/K/6VEPJeoZ79
+   z6Nrm2Z7VtHQ5I6JRVhnByIJDMKvuHoQ9S2/LTvh7EPvpALjlNfu/eXdh
+   +G0jDoX5AafRlfucXqexrG9JWCTC4wWNZbv3tsu7NOFazxhUZW0J2dF4b
+   xA9C6Ldkf9U51Zf0xN3Sc3la77DQuvm8iVHPwo73HFY8cw/DTTrVIwMCT
+   Q==;
+X-CSE-ConnectionGUID: j+fElBPFTZK/XeRQfG4x9A==
+X-CSE-MsgGUID: ZQO7kknzQKSOaKykkyOb5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11148"; a="12775575"
+X-IronPort-AV: E=Sophos;i="6.09,246,1716274800"; 
+   d="scan'208";a="12775575"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 11:02:51 -0700
+X-CSE-ConnectionGUID: jEHncqAnTtaN2U9NrIpu1A==
+X-CSE-MsgGUID: tQT705P2Q4KX36TX04SlGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,246,1716274800"; 
+   d="scan'208";a="53782422"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Jul 2024 11:02:49 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 29 Jul 2024 11:02:48 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 29 Jul 2024 11:02:48 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.45) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 29 Jul 2024 11:02:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tAbMskFYAowbfaFhCNCAfLutM2R1MUn2AJtjV6c/ZF3/TFjQzPAGnGc7D6xf/fCckixEuBDX7vchFZEtoJ4tzYRNDmBK9H7lfn5l8e+DKP71pHzT6T5wi9HUCjPrR5eFiEGa2KpOSvPBxj2ch6zEbGkDBnztXinXHF1T0aSl0ec5HM4OU/GLFL+7UTkkvcdQ838n/oPK2Wry23yy7xIvm/OgLswkJjmWwjcz4Un6hcZK2MMr2BrEOpgxcTUvU0NEx1FadObDx6cI8PGuiTQhTnh3bzskCl6SCPWFr9hC7lBhmW/GP+IGqCKzhbK9KgdNLWD1wnAZPpPh5j+r6SLCWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ll+UpNiq2vmR1nUrPE4Nmetd5uMwerXJwvq1sxd+cFg=;
+ b=gtSixBRxWqjq7a2ZaBPpJHue9SFiRgLQsIzyYZzLHm1D+oIOpKsPUI9mIh5JlhgWi6oKYwXwynWlF9BcKcWrbROnEyUh8l9jiQpgEC0/oJhV8TfK9E/s13QRWEDo1i/oK1HjZzqoaKhR2UjQqL7NJ/zwrqKliy+EuzdL5rO2AC85eD3evf9VUrB+EsWm67eFWVZ5CO2e6/FQOWD8wQX5gcXs93KvahMF18poSwIniWJmQr1yF/nrWLvXBWswVijYo3Tahc0Qhv2+cdo2pRzQKQfKKH2ho5unig3A/lrgrmjX2HvdXwB6srKrq2FdF9ycWXvkPSxyJlp9jayqCKWElQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS7PR11MB7905.namprd11.prod.outlook.com (2603:10b6:8:ed::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.29; Mon, 29 Jul
+ 2024 18:02:43 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%2]) with mapi id 15.20.7807.026; Mon, 29 Jul 2024
+ 18:02:43 +0000
+Message-ID: <5e97152d-c992-4056-a204-861035e35d60@intel.com>
+Date: Mon, 29 Jul 2024 11:02:41 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v17 13/14] net: ethtool: Add support for tsconfig
+ command to get/set hwtstamp config
+To: Kory Maincent <kory.maincent@bootlin.com>
+CC: Florian Fainelli <florian.fainelli@broadcom.com>, "Broadcom internal
+ kernel review list" <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu Pirea
+	<radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, "Andy
+ Gospodarek" <andy@greyhouse.net>, Nicolas Ferre
+	<nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+	<corbet@lwn.net>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, "Simon Horman" <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, <donald.hunter@gmail.com>,
+	<danieller@nvidia.com>, <ecree.xilinx@gmail.com>, Thomas Petazzoni
+	<thomas.petazzoni@bootlin.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Willem de Bruijn <willemb@google.com>, Shannon Nelson
+	<shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>
+References: <20240709-feature_ptp_netnext-v17-0-b5317f50df2a@bootlin.com>
+ <20240709-feature_ptp_netnext-v17-13-b5317f50df2a@bootlin.com>
+ <f16855bf-ae2a-4a0c-b3e9-d25f64478900@intel.com>
+ <20240727150009.66dcf0ae@kmaincent-XPS-13-7390>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240727150009.66dcf0ae@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0269.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::34) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB001.ant.amazon.com (10.13.138.123) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS7PR11MB7905:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5760d590-976b-48b1-f2d4-08dcaff8a4f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dVNlanF3UktnTU05ckpSWG1RdWZZVEg0RmdESnpDa1RCUFl2WkhteVk0N3Ux?=
+ =?utf-8?B?SmVTNFdWSVpLdE44UWxPTXFjb3FoTGJKaGc4eHB0ejl2cVhuUVp3UmlvUUxK?=
+ =?utf-8?B?ZUM5dEVFQzA0U3pjMDRldGJPMllpT0UvQTAva2c5WENJNE5TVVQ3NmpUSkVr?=
+ =?utf-8?B?a0dGR0gxZ294UDZoZnFaaFNxdEtyTXRZSGdqNlJaZUxiNlVYeW5VVGxYY1Ey?=
+ =?utf-8?B?dldhaXA2UFZxTEdyRi9sVVdPRjhqOHNtSjM1d2xYVkpmcHl0ODVweHBDRFly?=
+ =?utf-8?B?REpVRGxIdnRFOElINEU2Y3lxS0ExbU5ESVBMeFlkd0NCancxN1VDN0JuMlNo?=
+ =?utf-8?B?M3V5OFpZdFpRTzJWUnB4czNLRTRCemgvaWhHdkVxZkptSVQ1UGdrTHVCbmdC?=
+ =?utf-8?B?NmUydnFmN3hZN3NvVkxYYkFoeFJRRWtZT1lTK3Z6Z2ZOVDFuVFhydnU5WTN4?=
+ =?utf-8?B?bktvSDZDdE1XVU83ZGpMZGdiWU5YaHE2b0VxVE41d0ZaSVgyQjIveUlDSVdu?=
+ =?utf-8?B?Q0NiVTJHSHJQMzdyb3Y1YWFJZzJQRXdML2E3SUZPZXBLSXdQcUswemhEQ1Js?=
+ =?utf-8?B?RG4vR25WYTl3QkJ0cnk5NjlLSWpyN0hNTksvNk02UGpxNUYxbXBMb2ZoMGV5?=
+ =?utf-8?B?c29zRVZCdm00dnp4M1FWZ1ZCS0RMc3dDSGY1U3F6eFpET05CZjUwam9jdlR6?=
+ =?utf-8?B?dWk5Tjk4S1RLVEN3RlFGc2o1NXc3OEI5cWNQaStPRW9jcDJralYzNzNycGZJ?=
+ =?utf-8?B?Zlp5blVvNUNVWGdlL0dlMW42YVRhK3kvTHZOZHgxcGMvcENEbHpSWm5QTjdh?=
+ =?utf-8?B?cW9Sd0lDV1VFaEY4Mnl2WXh3L3ZLOUJTdzFqNHZwckJOaDg5NWUycHZGQkU0?=
+ =?utf-8?B?MHlGOURCbnlONEQ2anNWenZiYUl3SVkrVTJQd1R0ZzByN3Q5QTVFb1JpUzZX?=
+ =?utf-8?B?d3hNNXhyOGZYZnZxQUROWWNCbUpCVzVPZlhZWXBBbEhnWkF4UlF5dnJRRm4w?=
+ =?utf-8?B?c2VSeWxyK2xTOU04bDRvK2JKMUFhZmh6UjR3UEQ2bGNPOVhqNlFkZjlqR1FJ?=
+ =?utf-8?B?azFBajR5LzljQWtFREdQUG9xWlFxZGN2K1pVNi94N0Jtc0E4MWptR0VhMjZX?=
+ =?utf-8?B?T1FjeWRNd041Nmw0MHZHTmhIUzRxMHQzN21OZGp2Qk9HZS94TGRMYzJhVm5a?=
+ =?utf-8?B?TzVlUnEzODVMdXd5aFVtWXBFcXlCOTkzYUhoV2MyMkhUdUw2TGRwaDV3dk5s?=
+ =?utf-8?B?aUlJWUpRWTBmelp2aktaTmUvcC92YUZRUzl2OXVoVXFsS2djWlVOWHJxSHIy?=
+ =?utf-8?B?clM5OEpWSUw3WGxpcHErMWZScTYySXdpb0IxWkpSUTFjS255RVlvd1RTSzkv?=
+ =?utf-8?B?RzBoYnFEME5rUUkyVEx3K1MxQ0VXUGh6N1l2L3RxdDlmZnR4WkJJZXd3WkRV?=
+ =?utf-8?B?YXIrWUZrVzhsWTA1SnloYmJQaUFYaWpaVkdXMlpYaFVwaHEwVFRvcERYOVQr?=
+ =?utf-8?B?VUxkNTUyMy9SV1V5eXRCYWNpZTM3aGxTNGJtYUdkbnV2NUgvQVJlQXAxU3FZ?=
+ =?utf-8?B?M3JjR2JpY0F3QmVDa0dNazZ3azJRMnZwb25UbGNZcDJidFFjVjdaemVaK2hr?=
+ =?utf-8?B?YURxaTVKTHIzdWhtWDFVdk54OThWTkNLdHVoS1BCT2NpclpJMEZEdVViQSs0?=
+ =?utf-8?B?L3JESC9OYTdkOEhPWXZOZDUwSEgxbTNBQUNmTTl6WW5JNFFGa2o1UVhkaE5v?=
+ =?utf-8?Q?NGexfiBUUSIQ4bQ8MM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bU41YmZWTEZJNHN2YW1heVBzYXRxZzI0QWswVFN3U29XemF0TlVuMDZWY1JL?=
+ =?utf-8?B?cFE4aXJvaUtuYTlaTlprOHhtSldNSExDaWtVUFFlZHJ2bUxUZnFITUx0YmRz?=
+ =?utf-8?B?cGJva0VETWo5T25QdXNxa0F2YTg4bk1tVytJcjNJb0I2c1JKVDR0OEZDV3ZN?=
+ =?utf-8?B?WUZzMDIyN2dCNWFNMElRek5KbGdNVEk5a1FPYmlOaDlzS0NmU0Zyb3l4dVVm?=
+ =?utf-8?B?RmRaZHpNeGRLN1RrZncxb3MxajJQSEJhcm4xdEI5UjJLRVpnenBVemp6L0xM?=
+ =?utf-8?B?dU4wVVR6aXZseE1XZjgxOHA4U0M1RlhTQndKM2VrMU42ZkJCdHdET3U1V2lk?=
+ =?utf-8?B?eFVmbitaZ1U4STArbUJFVlpieE5CcWh6K3VNWVpmOENnYzRYZU9ic3lLUXVY?=
+ =?utf-8?B?bFV0QkdPNFlCRzZvQUpKcitzbGZZQlFGdEtvQWswNUJYdEF2bWxycjhjY1l4?=
+ =?utf-8?B?eVdXS3JJOUdGV1hPaGZlcXZiNDNqV1VzUFk5TklwbUVldFRvRVVwZndNYVpV?=
+ =?utf-8?B?MjZSL0dRWmdRUER2VCt3MkE3T1lxQ0pEUG00UUtsWU5ZcWdKR0x2VDcrSDlH?=
+ =?utf-8?B?Unl0SVNjQmlNd3NEOHZNanZVRDM0YnZ4aWc2Qnhzb3JvQ0tVaEo3UDloWU5S?=
+ =?utf-8?B?QUpydWt5bmF2czVCb0F5RlhjL3JLazIvT0hsYTN1MTZVTXQ0UFd4WkYxU1hF?=
+ =?utf-8?B?WDZUajJYa3JVVFRvQ2htbkFzRjZHKzRBbkhJVkY4QWxsSllHTUJid2xrQ3ZR?=
+ =?utf-8?B?dzZFSVFuaUk5VmFXbWZwbW9MOGxtNStYdjhyMmFGaXpNckpXNGthbGNtK3Bx?=
+ =?utf-8?B?Y3NadnZrSHlYNHgwQStnelN6L0UvTnEwZmQ4RWxzNzJYdDYvNGRJdy9TdVJL?=
+ =?utf-8?B?RHRzZEs0aWZyamFvVjVFNmVqbjdhdGZFTlJ0ejdoT3NZY3NCdGtFU1RYK3Rz?=
+ =?utf-8?B?VTdHSSs5ZGE2TEFHY0lGYXIwd3dSWWpOa2FpeFplVkJTWTNrOTREL3RHMjZT?=
+ =?utf-8?B?dWtXY3IrL0pVamV6WEJxU1k5VzhqelVyUEUrSWxLckgvR0YybHcwMUZGVmor?=
+ =?utf-8?B?bWlBVXhud1Boa0tsbHp3aSs1ZWpHaE1oYkhNQ2F6bWxKN0dMYzVYa3c3KzVN?=
+ =?utf-8?B?dCswL1graElFMS9mcGxNTS9sbEJYa1cwakd5UzRQbmNiWUMycStjL1JOejJ5?=
+ =?utf-8?B?U3BJc2tWM2c1dzlkb3RwMm9sNTRDWk5MQ01sbkdlT1l0aTJrZ1Qvc3ZzQlJP?=
+ =?utf-8?B?aDRQZSt6YmR4L3pDUnViaTFOY0ZZNWZBUnh0S3M5dVU5dWRhcE55QlhZTmxO?=
+ =?utf-8?B?Z21icGxmaWxFTzVIOEVrcHhRU2pCQnJwU3AwZTNNL2czSTdqdmppZW5Ia091?=
+ =?utf-8?B?UzRoRldEWnFKSnk3TE12T3dmMkZBNStZeXZMQTZsWENNNGtNbzRnSjZCL3VZ?=
+ =?utf-8?B?c21tcUI0c1NUS3NzTkVlZE1aRjM3ZGpEWTZWakpMY0lXWGhjSzJnVzlZRzJB?=
+ =?utf-8?B?cVZicmJnSUZnenpkN2gvWUd0b3N2dFZJMWd4OW94K0w4WkRDZ2VnL1daeXhF?=
+ =?utf-8?B?a0JoWG13WGtpQ0NIaUhrYlhpR0krSjV0UkZoaGR2VlhaWWNWOGZqK3dkTUc5?=
+ =?utf-8?B?Y3drVDNoUjROb1dxZXA0cTlvNitiRmpLNE0rMGorVVpiMWZ2TU15dUpYcWpr?=
+ =?utf-8?B?SUlCaGNYS2Evd1BHT0RKa3RDWlVxL0lEWnI2aE1NdUZrK1NrRHNpRzZLZE1m?=
+ =?utf-8?B?Tm0vTS9DM2FzQTY4QUFhYU9IT0lySm1QTTBwSTlmb1UvbkRsaUFjbE1ya2Qv?=
+ =?utf-8?B?QnhIMmZESnN5TGhFWWl1bzQ0bnpqbXZvQ2RZQ3BqSXNETEluSmZSL3RYejhU?=
+ =?utf-8?B?WTlUdjRVYlZRMU1hSVg5NE1XNzNIa0krWjR2WkVqbkZVV1BtUER6YlFSUmhU?=
+ =?utf-8?B?Ri81RkszSDBHY2xPNWc1NzJiZU0rN3pwNno0VUE0Rkk0enJiNWRQWENxb0lo?=
+ =?utf-8?B?cytMSi95enRIUHIwUHpqL080OXZlc2M2MnN1cVBqKzFuUWN0WThFd1F1OVJp?=
+ =?utf-8?B?bjBNTnZralEvN0IrSHQ4aVhEVE1IZzlkdnl2WUNNdkp3TUQrb0xjOVBNaWE3?=
+ =?utf-8?B?ZVFMOS9McGJhMGlZWVdGTGQ2c2l6em5obmo2S1l2MHVHRCtYcVdRbE5YaWtj?=
+ =?utf-8?B?b3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5760d590-976b-48b1-f2d4-08dcaff8a4f5
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 18:02:43.5062
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Taxs2GevATmghLVNqj6T+iEd6Wn3jVyujB94eHF8Q1hfENL+66OtVB0v6k6uMHyp/Gnb3zZOW9w7NO4QTNhz1AtKpVn7eV+bS8PMyOZySDE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7905
+X-OriginatorOrg: intel.com
 
-From: syzbot <syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
-Date: Mon, 29 Jul 2024 09:28:29 -0700
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    301927d2d2eb Merge tag 'for-net-2024-07-26' of git://git.k..
-> git tree:       net
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17332fad980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=968c4fa762577d3f
-> dashboard link: https://syzkaller.appspot.com/bug?extid=e6979a5d2f10ecb700e4
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d0a623980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1538ac55980000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/cb9ce2729d35/disk-301927d2.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/644eaaef61a5/vmlinux-301927d2.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/2f92322485c3/bzImage-301927d2.xz
-> 
-> The issue was bisected to:
-> 
-> commit 6ba84574026792ce33a40c7da721dea36d0f3973
-> Author: Xin Long <lucien.xin@gmail.com>
-> Date:   Mon Nov 12 10:27:17 2018 +0000
-> 
->     sctp: process sk_reuseport in sctp_get_port_local
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ad25bd980000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=16ad25bd980000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=12ad25bd980000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com
-> Fixes: 6ba845740267 ("sctp: process sk_reuseport in sctp_get_port_local")
-> 
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-> CPU: 1 UID: 0 PID: 10230 Comm: syz-executor119 Not tainted 6.10.0-syzkaller-12585-g301927d2d2eb #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-> RIP: 0010:reuseport_add_sock+0x27e/0x5e0 net/core/sock_reuseport.c:350
-> Code: 00 0f b7 5d 00 bf 01 00 00 00 89 de e8 1b a4 ff f7 83 fb 01 0f 85 a3 01 00 00 e8 6d a0 ff f7 49 8d 7e 12 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 4b 02 00 00 41 0f b7 5e 12 49 8d 7e 14
-> RSP: 0018:ffffc9000b947c98 EFLAGS: 00010202
-> RAX: 0000000000000002 RBX: ffff8880252ddf98 RCX: ffff888079478000
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000012
-> RBP: 0000000000000001 R08: ffffffff8993e18d R09: 1ffffffff1fef385
-> R10: dffffc0000000000 R11: fffffbfff1fef386 R12: ffff8880252ddac0
-> R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000000
-> FS:  00007f24e45b96c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ffcced5f7b8 CR3: 00000000241be000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  __sctp_hash_endpoint net/sctp/input.c:762 [inline]
-
-Here we need to protect the other sk in the hash table as we do so for
-TCP/UDP by taking the hash bucket lock.
 
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git 1722389b0d863056d78287a120a1d6cadb8d4f7b
+On 7/27/2024 6:00 AM, Kory Maincent wrote:
+> On Wed, 17 Jul 2024 10:43:05 -0700
+> Jacob Keller <jacob.e.keller@intel.com> wrote:
+>>>  A driver which supports hardware time stamping must support the
+>>> -SIOCSHWTSTAMP ioctl and update the supplied struct hwtstamp_config with
+>>> -the actual values as described in the section on SIOCSHWTSTAMP.  It
+>>> -should also support SIOCGHWTSTAMP.
+>>> +ndo_hwtstamp_set NDO or the legacy SIOCSHWTSTAMP ioctl and update the
+>>> +supplied struct hwtstamp_config with the actual values as described in
+>>> +the section on SIOCSHWTSTAMP. It should also support ndo_hwtstamp_get or
+>>> +the legacy SIOCGHWTSTAMP.  
+>>
+>> Can we simply drop the mention of implementing the legacy implementation
+>> on the kernel side? I guess not all existing drivers have converted yet...?
+> 
+> Yes indeed.>
+> In fact, Vlad has already worked on converting all the existing drivers:
+> https://github.com/vladimiroltean/linux/tree/ndo-hwtstamp-v9
+> I can't find any patch series sent to net next. Vlad what is the status on this?
+> 
 
-diff --git a/net/core/sock_reuseport.c b/net/core/sock_reuseport.c
-index 5a165286e4d8..b1614da1e41c 100644
---- a/net/core/sock_reuseport.c
-+++ b/net/core/sock_reuseport.c
-@@ -347,6 +347,8 @@ int reuseport_add_sock(struct sock *sk, struct sock *sk2, bool bind_inany)
- 		return -EBUSY;
- 	}
- 
-+	WARN_ON(!reuse);
-+
- 	if (reuse->num_socks + reuse->num_closed_socks == reuse->max_socks) {
- 		reuse = reuseport_grow(reuse);
- 		if (!reuse) {
-diff --git a/net/sctp/input.c b/net/sctp/input.c
-index 17fcaa9b0df9..a8a254a5008e 100644
---- a/net/sctp/input.c
-+++ b/net/sctp/input.c
-@@ -735,15 +735,19 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
- 	struct sock *sk = ep->base.sk;
- 	struct net *net = sock_net(sk);
- 	struct sctp_hashbucket *head;
-+	int err = 0;
- 
- 	ep->hashent = sctp_ep_hashfn(net, ep->base.bind_addr.port);
- 	head = &sctp_ep_hashtable[ep->hashent];
- 
-+	write_lock(&head->lock);
- 	if (sk->sk_reuseport) {
- 		bool any = sctp_is_ep_boundall(sk);
- 		struct sctp_endpoint *ep2;
- 		struct list_head *list;
--		int cnt = 0, err = 1;
-+		int cnt = 0;
-+
-+		err = 1;
- 
- 		list_for_each(list, &ep->base.bind_addr.address_list)
- 			cnt++;
-@@ -761,24 +765,24 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
- 			if (!err) {
- 				err = reuseport_add_sock(sk, sk2, any);
- 				if (err)
--					return err;
-+					goto out;
- 				break;
- 			} else if (err < 0) {
--				return err;
-+				goto out;
- 			}
- 		}
- 
- 		if (err) {
- 			err = reuseport_alloc(sk, any);
- 			if (err)
--				return err;
-+				goto out;
- 		}
- 	}
- 
--	write_lock(&head->lock);
- 	hlist_add_head(&ep->node, &head->chain);
-+out:
- 	write_unlock(&head->lock);
--	return 0;
-+	return err;
- }
- 
- /* Add an endpoint to the hash. Local BH-safe. */
-@@ -803,10 +807,9 @@ static void __sctp_unhash_endpoint(struct sctp_endpoint *ep)
- 
- 	head = &sctp_ep_hashtable[ep->hashent];
- 
-+	write_lock(&head->lock);
- 	if (rcu_access_pointer(sk->sk_reuseport_cb))
- 		reuseport_detach_sock(sk);
--
--	write_lock(&head->lock);
- 	hlist_del_init(&ep->node);
- 	write_unlock(&head->lock);
- }
+Great!
+
+>> I have a similar thought about the other legacy PTP hooks.. it is good
+>> to completely remove the legacy/deprecated implementations as it means
+>> drivers can't be published which don't update to new APIs. That
+>> ultimately just wastes reviewer/maintainer time to point out that it
+>> must be updated to new APIs.
+> 
+> Yes but on the userspace side linuxPTP is still using the IOCTLs uAPI that will
+> become legacy with this series. Maybe it is still a bit early to remove totally
+> their descriptions in the doc?
+> 
+
+Right, they would need to use the netlink implementation to get the new
+features, but the ioctls can at least be translated to the new kAPI
+thats in the drivers?
+
+Removing the old APIs from the uAPI doc is bad, but I think we can
+clarify the wording of the doc and update to make it clear where the
+separation is.
+
+I may take a pass at the doc to see if I think I can improve it.
+
+> Regards,
 
