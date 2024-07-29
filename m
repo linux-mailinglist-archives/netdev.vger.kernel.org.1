@@ -1,263 +1,226 @@
-Return-Path: <netdev+bounces-113759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C5D093FCF8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:01:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43D7E93FCFD
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 20:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBE261F22E58
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:01:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED7A328322E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79FA516F278;
-	Mon, 29 Jul 2024 18:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8B416F0E7;
+	Mon, 29 Jul 2024 18:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivyqcW5j"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rX15RmzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86EC80034
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 18:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A62A83A09;
+	Mon, 29 Jul 2024 18:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722276060; cv=none; b=ZHwTWgYO8M7/SBrAwGuw0fn3hMfXihgeR5Mm0X5rgBZRsixwDnAv3v2HXGyS9USvUcwmwrjbLdThDpGcXhGFqj7SfEl+bCkOTvbXYyhs+Bl5Mz8BSDUlN3jxPsB0xt1SeeO/LSRemZ0o/g4iqotZwpSntIW+OK99t8vjOujFtcY=
+	t=1722276110; cv=none; b=eLJ9Iw7WUV6qBlku2rUd81XUtWIgqW8kWjsXFFA+1SfZ1MzZgNpXWTCOnCctD5wRQJooOLJeLW6leCrhUWqWhoGhSlpNK8JQW4k/qf7av23BiRiwWAwoHnYQynF+U2yyvx9ix18vuMtpurtcgs5ZZXM1fJSOfgz3vbayRLJo95k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722276060; c=relaxed/simple;
-	bh=gTinpY4itf6BI/VzPeC5oJ0as7MsMETywDnoUpPbiqM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=doM5ydGS+VNcp+xgSCcWZf7pFWtOWZoGEefp2NDLPQoCDiADAjtse+bC7aHi6UY81zgbUkEXCPr1Ea0C5kbIaJPN+bwlxXVlwHWwHj2ryhCZz2IePDjEajNDWEzkx2hHzWkAzFEbfJ7/nsXTRXb6uuyptOrtVfs81WZqEc6PaJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ivyqcW5j; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722276057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1Yj0FL6bBk0S7TAJGcylnT51HTnsFv86PhBeh7shbs=;
-	b=ivyqcW5j05An97tfm8wDmgMOP9VNSO2FBTCual0W/jZleOuFni23hFkS5L5c1ylQeoF6oP
-	ZqvsS5wKHUAYTMqLzVcU8qi8goDqlCs5s22POx2CsE5d2RcJ55sGZpCblEfF1dMC5ACR6D
-	6h2mQwpeFvo4jMyvtgxgDIUNv7Oz11U=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-bM1wFbAPNTCpvP3398cthw-1; Mon, 29 Jul 2024 14:00:54 -0400
-X-MC-Unique: bM1wFbAPNTCpvP3398cthw-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b7a4c02488so52275926d6.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 11:00:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722276054; x=1722880854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z1Yj0FL6bBk0S7TAJGcylnT51HTnsFv86PhBeh7shbs=;
-        b=L0YM/zqbvPp0i9OT9pqcIx24SpEfhRGt5wpfc1KS6AtX+pjdK2vfQ1v/s6YdDI6R0H
-         cAaIlh9L4wj24f2G3mGvhGlolbv+6VX6rTWC/po/socB4w958enK30SLV6mUX+zM8niY
-         0synXCYCud9P8tItAC7CunbndepbryX3m2vO9DxaPp5+eD29UBnKFH2qaW0SCxANvkRf
-         JD6gW+b7B1esl8gnsQE1Ai7GrPQQNDyuSLszCWDxDihJra2ZettLpuOna9GwufQGjUCQ
-         5my+3JtTTmO/T7a6frUO6f1PbDxu7YOTxHlWvFBz8iZW/QUigAczXGEE5rhDNeFQ6uPm
-         nnqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+FAaVgSV5ERwPzhCAV7ffCesa9GnVhu4Ai1sQN3q+4hRBxDEHGL6Ucls7wGaLpn3Ir29ELUBXmmftqkDv0uizyalLSGCU
-X-Gm-Message-State: AOJu0YzZDvNVT3GaVZQLuWSiEAcf1+wa4g/m+tdQHlXsMIg3sE44wDsM
-	WA7bHLecjYVHzPiw9iqMmG/BxJJmaD4q+WE8WoYJl8Ir4AMwfA1YdXzDHtptCjBNFq32JIBPU7y
-	GVrCKTDRhlExZ+1OGFCDBHB26EgpA3FnjFhqj+5sgYbUiEW6b0KFP1VKvtyWtfBNj4cjcRPaATv
-	fWuzTEmx8C3AwEBazWfOjprZg2Ecpx
-X-Received: by 2002:ad4:5bc3:0:b0:6b7:9bdd:c5ac with SMTP id 6a1803df08f44-6bb55aec078mr112759806d6.54.1722276053778;
-        Mon, 29 Jul 2024 11:00:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1n2toFS2ZsCj0V29zabmrYz0QmGmC0Il9Ic/P2pdVWBsuD9rxQUVP1f4HDaKaP2uCJZOCF3hcREju/aoHH3c=
-X-Received: by 2002:ad4:5bc3:0:b0:6b7:9bdd:c5ac with SMTP id
- 6a1803df08f44-6bb55aec078mr112759506d6.54.1722276053388; Mon, 29 Jul 2024
- 11:00:53 -0700 (PDT)
+	s=arc-20240116; t=1722276110; c=relaxed/simple;
+	bh=OlaJ4GQZRWxaFzdiAoNYSvxQh2Vi6hhvXcbPIHhuQSQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tXops7Ys568i6SkfbI/4K3WVZUC8bVaPH6Gz72HROEJGCbEH9pLtTixDw6XaXcwNcuS7LFYTj4M9aOfTeGNGHNNs2OWwjGix051h1T50QCWgJQMREgjThuwrlbVxc6ZI+QPa+hSYo/jMZlw9HA/X5uR9+Srkhedt0JK4GZSSkQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rX15RmzZ; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1722276109; x=1753812109;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=K4QN7NgX3jCkknAIQAa+PRo8C1a02teQl7Gn3pR18DA=;
+  b=rX15RmzZKxsW3EjbtQ6ic5/psA9y2sQouCR+TBmG7/5/eTb9UKRGBTt7
+   JPleFvsERhBGkxVCb3kQ3QBaRKmbWdfqb4/72mA5o/KB5uxbtbgqwe3qf
+   +ghqscuz2MVixJuAl5M4lw7Rt4z6fNnNKp5iOTMdq1/dzgRgFWRyicmub
+   c=;
+X-IronPort-AV: E=Sophos;i="6.09,246,1716249600"; 
+   d="scan'208";a="746140924"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 18:01:43 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:44390]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.228:2525] with esmtp (Farcaster)
+ id bd754b9f-88c2-4965-9cf6-b1b464fb8991; Mon, 29 Jul 2024 18:01:42 +0000 (UTC)
+X-Farcaster-Flow-ID: bd754b9f-88c2-4965-9cf6-b1b464fb8991
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 29 Jul 2024 18:01:35 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.6) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 29 Jul 2024 18:01:32 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lucien.xin@gmail.com>,
+	<netdev@vger.kernel.org>, <nhorman@tuxdriver.com>, <pabeni@redhat.com>,
+	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [net?] general protection fault in reuseport_add_sock (3)
+Date: Mon, 29 Jul 2024 11:01:22 -0700
+Message-ID: <20240729180122.87990-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <000000000000ed7445061e65591f@google.com>
+References: <000000000000ed7445061e65591f@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
- <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk>
- <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net> <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
- <c97e0085-be67-415c-ae06-7ef38992fab1@nvidia.com> <2f8dfd0a25279f18f8f86867233f6d3ba0921f47.camel@nvidia.com>
- <b1148fab-ecf3-46c1-9039-597cc80f3d28@nvidia.com> <87v80uol97.fsf@toke.dk> <7aa360d4486155e811d045043704227276ab112c.camel@nvidia.com>
-In-Reply-To: <7aa360d4486155e811d045043704227276ab112c.camel@nvidia.com>
-From: Samuel Dobron <sdobron@redhat.com>
-Date: Mon, 29 Jul 2024 20:00:42 +0200
-Message-ID: <CA+h3auP4gn2T3ghpBjqC5xdYACEOmC5RCsq3ps6VWoLNhy5HNg@mail.gmail.com>
-Subject: Re: XDP Performance Regression in recent kernel versions
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "toke@redhat.com" <toke@redhat.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, Carolina Jubran <cjubran@nvidia.com>, 
-	"hawk@kernel.org" <hawk@kernel.org>, "mianosebastiano@gmail.com" <mianosebastiano@gmail.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, "edumazet@google.com" <edumazet@google.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB001.ant.amazon.com (10.13.138.123) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Ah, sorry.
-Yes, I was talking about 6.4 regression.
+From: syzbot <syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
+Date: Mon, 29 Jul 2024 09:28:29 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    301927d2d2eb Merge tag 'for-net-2024-07-26' of git://git.k..
+> git tree:       net
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17332fad980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=968c4fa762577d3f
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e6979a5d2f10ecb700e4
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d0a623980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1538ac55980000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/cb9ce2729d35/disk-301927d2.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/644eaaef61a5/vmlinux-301927d2.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/2f92322485c3/bzImage-301927d2.xz
+> 
+> The issue was bisected to:
+> 
+> commit 6ba84574026792ce33a40c7da721dea36d0f3973
+> Author: Xin Long <lucien.xin@gmail.com>
+> Date:   Mon Nov 12 10:27:17 2018 +0000
+> 
+>     sctp: process sk_reuseport in sctp_get_port_local
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ad25bd980000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=16ad25bd980000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=12ad25bd980000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com
+> Fixes: 6ba845740267 ("sctp: process sk_reuseport in sctp_get_port_local")
+> 
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN PTI
+> KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+> CPU: 1 UID: 0 PID: 10230 Comm: syz-executor119 Not tainted 6.10.0-syzkaller-12585-g301927d2d2eb #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+> RIP: 0010:reuseport_add_sock+0x27e/0x5e0 net/core/sock_reuseport.c:350
+> Code: 00 0f b7 5d 00 bf 01 00 00 00 89 de e8 1b a4 ff f7 83 fb 01 0f 85 a3 01 00 00 e8 6d a0 ff f7 49 8d 7e 12 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 4b 02 00 00 41 0f b7 5e 12 49 8d 7e 14
+> RSP: 0018:ffffc9000b947c98 EFLAGS: 00010202
+> RAX: 0000000000000002 RBX: ffff8880252ddf98 RCX: ffff888079478000
+> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000012
+> RBP: 0000000000000001 R08: ffffffff8993e18d R09: 1ffffffff1fef385
+> R10: dffffc0000000000 R11: fffffbfff1fef386 R12: ffff8880252ddac0
+> R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000000
+> FS:  00007f24e45b96c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffcced5f7b8 CR3: 00000000241be000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __sctp_hash_endpoint net/sctp/input.c:762 [inline]
 
-I double-checked that v5.15 regression and I don't see anything
-that significant as Sebastiano. I ran a couple of tests for:
-* kernel-5.10.0-0.rc6.90.eln105
-* kernel-5.14.0-60.eln112
-* kernel-5.15.0-0.rc7.53.eln113
-* kernel-5.16.0-60.eln114
-* kernel-6.11.0-0.rc0.20240724git786c8248dbd3.12.eln141
-
-The results of XDP_DROP on receiving side (the one, that is dropping
-packets) are more or less the same ~20.5Mpps (17.5Mpps on 6.11, but
-that's due to 6.4 regression). CPU is bottleneck, so 100% cpu utilization
-for all the kernels on both ends - generator and receiver. We use pktgen
-as a generator, both generator and receiver machines use mlx5 NIC.
-
-However, I noticed that between 5.10 and 5.14 there is 30Mpps->22Mpps
-regression BUT at the GENERATOR side, CPU util remains the same
-on both ends and amount of dropped packets on receiver side is
-the same as well (since it's CPU bottlenecked). Other drivers seems
-to be unaffected.
-
-That's probably something unrelated to Sebastiano's regression,
-but I believe it's worth to mention.
-
-And so, no idea where Sebastiano's regression comes from. I can see,
-he uses ConnectX-6, we don't have those, only ConnectX-5, cloud that
-be the problem?
-
-Thanks,
-Sam.
+Here we need to protect the other sk in the hash table as we do so for
+TCP/UDP by taking the hash bucket lock.
 
 
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git 1722389b0d863056d78287a120a1d6cadb8d4f7b
 
-
-On Fri, Jul 26, 2024 at 10:09=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
-m> wrote:
->
-> Hi,
->
-> On Wed, 2024-07-24 at 17:36 +0200, Toke H=C3=B8iland-J=C3=B8rgensen wrote=
-:
-> > Carolina Jubran <cjubran@nvidia.com> writes:
-> >
-> > > On 22/07/2024 12:26, Dragos Tatulea wrote:
-> > > > On Sun, 2024-06-30 at 14:43 +0300, Tariq Toukan wrote:
-> > > > >
-> > > > > On 21/06/2024 15:35, Samuel Dobron wrote:
-> > > > > > Hey all,
-> > > > > >
-> > > > > > Yeah, we do tests for ELN kernels [1] on a regular basis. Since
-> > > > > > ~January of this year.
-> > > > > >
-> > > > > > As already mentioned, mlx5 is the only driver affected by this =
-regression.
-> > > > > > Unfortunately, I think Jesper is actually hitting 2 regressions=
- we noticed,
-> > > > > > the one already mentioned by Toke, another one [0] has been rep=
-orted
-> > > > > > in early February.
-> > > > > > Btw. issue mentioned by Toke has been moved to Jira, see [5].
-> > > > > >
-> > > > > > Not sure all of you are able to see the content of [0], Jira sa=
-ys it's
-> > > > > > RH-confidental.
-> > > > > > So, I am not sure how much I can share without being fired :D. =
-Anyway,
-> > > > > > affected kernels have been released a while ago, so anyone can =
-find it
-> > > > > > on its own.
-> > > > > > Basically, we detected 5% regression on XDP_DROP+mlx5 (currentl=
-y, we
-> > > > > > don't have data for any other XDP mode) in kernel-5.14 compared=
- to
-> > > > > > previous builds.
-> > > > > >
-> > > > > >   From tests history, I can see (most likely) the same improvem=
-ent
-> > > > > > on 6.10rc2 (from 15Mpps to 17-18Mpps), so I'd say 20% drop has =
-been
-> > > > > > (partially) fixed?
-> > > > > >
-> > > > > > For earlier 6.10. kernels we don't have data due to [3] (there =
-is regression on
-> > > > > > XDP_DROP as well, but I believe it's turbo-boost issue, as I me=
-ntioned
-> > > > > > in issue).
-> > > > > > So if you want to run tests on 6.10. please see [3].
-> > > > > >
-> > > > > > Summary XDP_DROP+mlx5@25G:
-> > > > > > kernel       pps
-> > > > > > <5.14        20.5M        baseline
-> > > > > > > =3D5.14      19M           [0]
-> > > > > > <6.4          19-20M      baseline for ELN kernels
-> > > > > > > =3D6.4        15M           [4 and 5] (mentioned by Toke)
-> > > > >
-> > > > > + @Dragos
-> > > > >
-> > > > > That's about when we added several changes to the RX datapath.
-> > > > > Most relevant are:
-> > > > > - Fully removing the in-driver RX page-cache.
-> > > > > - Refactoring to support XDP multi-buffer.
-> > > > >
-> > > > > We tested XDP performance before submission, I don't recall we no=
-ticed
-> > > > > such a degradation.
-> > > >
-> > > > Adding Carolina to post her analysis on this.
-> > >
-> > > Hey everyone,
-> > >
-> > > After investigating the issue, it seems the performance degradation i=
-s
-> > > linked to the commit "x86/bugs: Report Intel retbleed vulnerability"
-> > > (6ad0ad2bf8a67).
-> >
-> > Hmm, that commit is from June 2022, [...]
-> >
-> The results from the very first mail in this thread from Sebastiano were
-> showing a 30Mpps -> 21.3Mpps XDP_DROP regression between 5.15 and 6.2. Th=
-is
-> is what Carolina was focused on. Furthermore, the results from Samuel don=
-'t show
-> this regression. Seems like the discussion is now focused on the 6.4 regr=
-ession?
->
-> > [...] and according to Samuel's tests,
-> > this issue was introduced sometime between commits b6dad5178cea and
-> > 40f71e7cd3c6 (both of which are dated in June 2023).
-> >
-> Thanks for the commit range (now I know how to decode ELN kernel versions=
- :)).
-> Strangely this range doesn't have anything suspicious. I would have expec=
-ted to
-> see the page_pool or the XDP multibuf changes would have shown up in this=
- range.
-> But they are already present in the working version... Anyway, we'll keep=
- on
-> looking.
->
-> >  Besides, if it was
-> > a retbleed mitigation issue, that would affect other drivers as well,
-> > no? Our testing only shows this regression on mlx5, not on the intel
-> > drivers.
-> >
-> >
-> > > > > I'll check with Dragos as he probably has these reports.
-> > > > >
-> > > > We only noticed a 6% degradation for XDP_XDROP.
-> > > >
-> > > > https://lore.kernel.org/netdev/b6fcfa8b-c2b3-8a92-fb6e-0760d5f6f5ff=
-@redhat.com/T/
-> >
-> > That message mentions that "This will be handled in a different patch
-> > series by adding support for multi-packet per page." - did that ever go
-> > in?
-> >
-> Nope, no XDP multi-packet per page yet.
->
-> Thanks,
-> Dragos
-
+diff --git a/net/core/sock_reuseport.c b/net/core/sock_reuseport.c
+index 5a165286e4d8..b1614da1e41c 100644
+--- a/net/core/sock_reuseport.c
++++ b/net/core/sock_reuseport.c
+@@ -347,6 +347,8 @@ int reuseport_add_sock(struct sock *sk, struct sock *sk2, bool bind_inany)
+ 		return -EBUSY;
+ 	}
+ 
++	WARN_ON(!reuse);
++
+ 	if (reuse->num_socks + reuse->num_closed_socks == reuse->max_socks) {
+ 		reuse = reuseport_grow(reuse);
+ 		if (!reuse) {
+diff --git a/net/sctp/input.c b/net/sctp/input.c
+index 17fcaa9b0df9..a8a254a5008e 100644
+--- a/net/sctp/input.c
++++ b/net/sctp/input.c
+@@ -735,15 +735,19 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
+ 	struct sock *sk = ep->base.sk;
+ 	struct net *net = sock_net(sk);
+ 	struct sctp_hashbucket *head;
++	int err = 0;
+ 
+ 	ep->hashent = sctp_ep_hashfn(net, ep->base.bind_addr.port);
+ 	head = &sctp_ep_hashtable[ep->hashent];
+ 
++	write_lock(&head->lock);
+ 	if (sk->sk_reuseport) {
+ 		bool any = sctp_is_ep_boundall(sk);
+ 		struct sctp_endpoint *ep2;
+ 		struct list_head *list;
+-		int cnt = 0, err = 1;
++		int cnt = 0;
++
++		err = 1;
+ 
+ 		list_for_each(list, &ep->base.bind_addr.address_list)
+ 			cnt++;
+@@ -761,24 +765,24 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
+ 			if (!err) {
+ 				err = reuseport_add_sock(sk, sk2, any);
+ 				if (err)
+-					return err;
++					goto out;
+ 				break;
+ 			} else if (err < 0) {
+-				return err;
++				goto out;
+ 			}
+ 		}
+ 
+ 		if (err) {
+ 			err = reuseport_alloc(sk, any);
+ 			if (err)
+-				return err;
++				goto out;
+ 		}
+ 	}
+ 
+-	write_lock(&head->lock);
+ 	hlist_add_head(&ep->node, &head->chain);
++out:
+ 	write_unlock(&head->lock);
+-	return 0;
++	return err;
+ }
+ 
+ /* Add an endpoint to the hash. Local BH-safe. */
+@@ -803,10 +807,9 @@ static void __sctp_unhash_endpoint(struct sctp_endpoint *ep)
+ 
+ 	head = &sctp_ep_hashtable[ep->hashent];
+ 
++	write_lock(&head->lock);
+ 	if (rcu_access_pointer(sk->sk_reuseport_cb))
+ 		reuseport_detach_sock(sk);
+-
+-	write_lock(&head->lock);
+ 	hlist_del_init(&ep->node);
+ 	write_unlock(&head->lock);
+ }
 
