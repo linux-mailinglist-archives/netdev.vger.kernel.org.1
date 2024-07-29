@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-113625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1D693F53D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:24:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A681B93F53E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01BE9B2025F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:24:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0253280EB2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800E91482F4;
-	Mon, 29 Jul 2024 12:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F9F147C9A;
+	Mon, 29 Jul 2024 12:24:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6652F147C98
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D77D14830F
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722255844; cv=none; b=pXjXjOG0H9ZeN03hB7eBeAzQm85njg8OY/ChpeGC4pg/zuiCd4RvE0FgIVfRBKP8blYK4cz3L1Zew60Ix4NR1jCaY5ei5UgVXyPQIyeOFgCHAhZZc3TsLQxJjBX5HNBnK3+fu0c79WmnFNB8FUjDehMg7ShLzRkGoB1HY5m5ACQ=
+	t=1722255845; cv=none; b=Q4pHVR67I4HL6xlZaMIeEmIfzn+I5YWPdFvew45T0qMb+J1YOUPgtwFiy/p3/6moiz/X6H9E/6UvDuacKl6DJEQKMtkorPJ8oqP3WeZfy5p9URWlx0GM+WpHkFqaIjIRtwV5S/jiQZQK20vnxWbOd4B1GwdipGQigPw+rDTMlEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722255844; c=relaxed/simple;
-	bh=vxv57H2+PtQDj7Ebt0IBow56iZURRhNNfsdvmnk03XU=;
+	s=arc-20240116; t=1722255845; c=relaxed/simple;
+	bh=GZT60vezh6bq+PwAwGnAXJusqV7yj2IBnuytp85s3Ek=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UAbcXMh49ybhwdzJATgzcE75UuompkMXed2mV+adKxrkzQR5RKScBGP5QIrLGF5NwWdZvJDeqAZsNBXYy52I2sN3SwSc9oQUSZaKUpNYmnU0KXuveYXsD95pmLQT4ixu+r5wmXn0MJuRHwhcG8DEkvjESS+XBXgZxYS24aiJFKQ=
+	 MIME-Version; b=dnURw7xHcWXuwwnSsWD3i9QidkVnhuvyH/sjba4ACG66PlGYhk1BEM9K1oYOIm5Vi4nb/FtquHe74TIHrFoZCPiz0vRz8lb1IlfENyHUKCld6VT3KjxY6fRqtjDos28XQ6V7+v9gWMPG8oJeifRG9jL6+lDdTI1540YXHf3LGVs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [223.64.68.124])
-	by gateway (Coremail) with SMTP id _____8AxnOrgiadmK50DAA--.12849S3;
-	Mon, 29 Jul 2024 20:24:00 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Dxi+riiadmNp0DAA--.12885S3;
+	Mon, 29 Jul 2024 20:24:02 +0800 (CST)
 Received: from localhost.localdomain (unknown [223.64.68.124])
-	by front1 (Coremail) with SMTP id qMiowMAxysXciadm+7QEAA--.22687S4;
-	Mon, 29 Jul 2024 20:23:59 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowMAxysXciadm+7QEAA--.22687S5;
+	Mon, 29 Jul 2024 20:24:01 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -50,9 +50,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	chris.chenfeiyang@gmail.com,
 	si.yanteng@linux.dev,
 	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH net-next v15 11/14] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
-Date: Mon, 29 Jul 2024 20:23:55 +0800
-Message-Id: <359b2c226e7b18d4af8bb827ca26a2e7869d5f85.1722253726.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next v15 12/14] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
+Date: Mon, 29 Jul 2024 20:23:56 +0800
+Message-Id: <9ff53ca4064774e389dd3d5f334fc82ed2443cf0.1722253726.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1722253726.git.siyanteng@loongson.cn>
 References: <cover.1722253726.git.siyanteng@loongson.cn>
@@ -63,287 +63,497 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMAxysXciadm+7QEAA--.22687S4
+X-CM-TRANSID:qMiowMAxysXciadm+7QEAA--.22687S5
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxuFWkZr4UtFW7AF4kXF15Jrc_yoW3Ar1kpr
-	WfCasIgrZ3KryIga1kZrWUZF1YkrWjv3yUKF42y3s3Ca90yr1aqF10qFWjyFyfAFZ5Cw13
-	Xr4UtF48uF4DGFbCm3ZEXasCq-sJn29KB7ZKAUJUUUUD529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUmIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6x
-	kI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v2
-	6Fy26r45twAv7VC2z280aVAFwI0_Gr1j6F4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2
-	IYc2Ij64vIr41lF7xvrVCFI7AF6II2Y40_Zr0_Gr1UMxkF7I0En4kS14v26r1q6r43MxAI
-	w28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI
-	8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
-	xVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26w1j6s0DMIIF0xvE2Ix0cI
-	8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
-	87Iv67AKxVW8Jr0_Cr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa
-	73UjIFyTuYvjxUgc_-DUUUU
+X-Coremail-Antispam: 1Uk129KBj9fXoW3Cr1DCF1kKrW5GFyrCr1DXFc_yoW8WrW3Go
+	ZxXFnavrWrKw18Wrs7Krn5JFWUXr1rXws0yFWfCr4DX39ava15WFWfGa1fJ3WSyr1rKF98
+	AryfJ3WkGFWSqrn5l-sFpf9Il3svdjkaLaAFLSUrUUUU5b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUOI7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x02
+	67AKxVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
+	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
+	xVW8Xw0E3s1lYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y4
+	8IcxkI7VAKI48JM4x0Y40E4IxF1VCIxcxG6Fyj6r4UJwCY1x0262kKe7AKxVWUtVW8ZwCF
+	04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWDJVCq3wCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Gr1j6F4UJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2Kf
+	nxnUUI43ZEXa7IUYhtxDUUUUU==
 
-The Loongson GMAC driver currently supports the network controllers
-installed on the LS2K1000 SoC and LS7A1000 chipset, for which the GMAC
-devices are required to be defined in the platform device tree source.
-But Loongson machines may have UEFI (implies ACPI) or PMON/UBOOT
-(implies FDT) as the system bootloaders. In order to have both system
-configurations support let's extend the driver functionality with the
-case of having the Loongson GMAC probed on the PCI bus with no device
-tree node defined for it. That requires to make the device DT-node
-optional, to rely on the IRQ line detected by the PCI core and to
-have the MDIO bus ID calculated using the PCIe Domain+BDF numbers.
+The Loongson DWMAC driver currently supports the Loongson GMAC
+devices (based on the DW GMAC v3.50a/v3.73a IP-core) installed to the
+LS2K1000 SoC and LS7A1000 chipset. But recently a new generation
+LS2K2000 SoC was released with the new version of the Loongson GMAC
+synthesized in. The new controller is based on the DW GMAC v3.73a
+IP-core with the AV-feature enabled, which implies the multi
+DMA-channels support. The multi DMA-channels feature has the next
+vendor-specific peculiarities:
 
-In order to have the device probe() and remove() methods less
-complicated let's move the DT- and ACPI-specific code to the
-respective sub-functions.
+1. Split up Tx and Rx DMA IRQ status/mask bits:
+       Name              Tx          Rx
+  DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
+  DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
+  DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
+  DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
+  DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
+2. Custom Synopsys ID hardwired into the GMAC_VERSION.SNPSVER register
+field. It's 0x10 while it should have been 0x37 in accordance with
+the actual DW GMAC IP-core version.
+3. There are eight DMA-channels available meanwhile the Synopsys DW
+GMAC IP-core supports up to three DMA-channels.
+4. It's possible to have each DMA-channel IRQ independently delivered.
+The MSI IRQs must be utilized for that.
+
+Thus in order to have the multi-channels Loongson GMAC controllers
+supported let's modify the Loongson DWMAC driver in accordance with
+all the peculiarities described above:
+
+1. Create the multi-channels Loongson GMAC-specific
+   stmmac_dma_ops::dma_interrupt()
+   stmmac_dma_ops::init_chan()
+   callbacks due to the non-standard DMA IRQ CSR flags layout.
+2. Create the Loongson DWMAC-specific platform setup() method
+which gets to initialize the DMA-ops with the dwmac1000_dma_ops
+instance and overrides the callbacks described in 1. The method also
+overrides the custom Synopsys ID with the real one in order to have
+the rest of the HW-specific callbacks correctly detected by the driver
+core.
+3. Make sure the platform setup() method enables the flow control and
+duplex modes supported by the controller.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 Acked-by: Huacai Chen <chenhuacai@loongson.cn>
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 ---
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 159 +++++++++++-------
- 1 file changed, 100 insertions(+), 59 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 328 +++++++++++++++++-
+ 2 files changed, 327 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index cd36ff4da68c..684489156dce 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -29,6 +29,7 @@
+ /* Synopsys Core versions */
+ #define	DWMAC_CORE_3_40		0x34
+ #define	DWMAC_CORE_3_50		0x35
++#define	DWMAC_CORE_3_70		0x37
+ #define	DWMAC_CORE_4_00		0x40
+ #define DWMAC_CORE_4_10		0x41
+ #define DWMAC_CORE_5_00		0x50
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 10b49bea8e3c..010821fb6474 100644
+index 010821fb6474..eea6a22b10ca 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -12,11 +12,15 @@
+@@ -8,8 +8,69 @@
+ #include <linux/device.h>
+ #include <linux/of_irq.h>
+ #include "stmmac.h"
++#include "dwmac_dma.h"
++#include "dwmac1000.h"
++
++/* Normal Loongson Tx Summary */
++#define DMA_INTR_ENA_NIE_TX_LOONGSON	0x00040000
++/* Normal Loongson Rx Summary */
++#define DMA_INTR_ENA_NIE_RX_LOONGSON	0x00020000
++
++#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
++					 DMA_INTR_ENA_NIE_RX_LOONGSON | \
++					 DMA_INTR_ENA_RIE | DMA_INTR_ENA_TIE)
++
++/* Abnormal Loongson Tx Summary */
++#define DMA_INTR_ENA_AIE_TX_LOONGSON	0x00010000
++/* Abnormal Loongson Rx Summary */
++#define DMA_INTR_ENA_AIE_RX_LOONGSON	0x00008000
++
++#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
++					 DMA_INTR_ENA_AIE_RX_LOONGSON | \
++					 DMA_INTR_ENA_FBE | DMA_INTR_ENA_UNE)
++
++#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | \
++					 DMA_INTR_ABNORMAL_LOONGSON)
++
++/* Normal Loongson Tx Interrupt Summary */
++#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000
++/* Normal Loongson Rx Interrupt Summary */
++#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000
++
++/* Abnormal Loongson Tx Interrupt Summary */
++#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000
++/* Abnormal Loongson Rx Interrupt Summary */
++#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000
++
++/* Fatal Loongson Tx Bus Error Interrupt */
++#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000
++/* Fatal Loongson Rx Bus Error Interrupt */
++#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000
++
++#define DMA_STATUS_MSK_COMMON_LOONGSON	(DMA_STATUS_NIS_TX_LOONGSON | \
++					 DMA_STATUS_NIS_RX_LOONGSON | \
++					 DMA_STATUS_AIS_TX_LOONGSON | \
++					 DMA_STATUS_AIS_RX_LOONGSON | \
++					 DMA_STATUS_FBI_TX_LOONGSON | \
++					 DMA_STATUS_FBI_RX_LOONGSON)
++
++#define DMA_STATUS_MSK_RX_LOONGSON	(DMA_STATUS_ERI | DMA_STATUS_RWT | \
++					 DMA_STATUS_RPS | DMA_STATUS_RU  | \
++					 DMA_STATUS_RI  | DMA_STATUS_OVF | \
++					 DMA_STATUS_MSK_COMMON_LOONGSON)
++
++#define DMA_STATUS_MSK_TX_LOONGSON	(DMA_STATUS_ETI | DMA_STATUS_UNF | \
++					 DMA_STATUS_TJT | DMA_STATUS_TU  | \
++					 DMA_STATUS_TPS | DMA_STATUS_TI  | \
++					 DMA_STATUS_MSK_COMMON_LOONGSON)
+ 
  #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
++#define DWMAC_CORE_LS_MULTICHAN	0x10	/* Loongson custom ID */
++#define CHANNEL_NUM			8
++
++struct loongson_data {
++	u32 loongson_id;
++};
  
  struct stmmac_pci_info {
--	int (*setup)(struct plat_stmmacenet_data *plat);
-+	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
- };
- 
--static void loongson_default_data(struct plat_stmmacenet_data *plat)
-+static void loongson_default_data(struct pci_dev *pdev,
-+				  struct plat_stmmacenet_data *plat)
+ 	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+@@ -56,10 +117,26 @@ static void loongson_default_data(struct pci_dev *pdev,
+ static int loongson_gmac_data(struct pci_dev *pdev,
+ 			      struct plat_stmmacenet_data *plat)
  {
-+	/* Get bus_id, this can be overwritten later */
-+	plat->bus_id = pci_dev_id(pdev);
++	struct loongson_data *ld;
++	int i;
 +
- 	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
- 	plat->has_gmac = 1;
- 	plat->force_sf_dma_mode = 1;
-@@ -49,9 +53,10 @@ static void loongson_default_data(struct plat_stmmacenet_data *plat)
- 	plat->dma_cfg->pblx8 = true;
- }
++	ld = plat->bsp_priv;
++
+ 	loongson_default_data(pdev, plat);
  
--static int loongson_gmac_data(struct plat_stmmacenet_data *plat)
-+static int loongson_gmac_data(struct pci_dev *pdev,
-+			      struct plat_stmmacenet_data *plat)
- {
--	loongson_default_data(plat);
-+	loongson_default_data(pdev, plat);
+-	plat->tx_queues_to_use = 1;
+-	plat->rx_queues_to_use = 1;
++	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN) {
++		plat->rx_queues_to_use = CHANNEL_NUM;
++		plat->tx_queues_to_use = CHANNEL_NUM;
++
++		/* Only channel 0 supports checksum,
++		 * so turn off checksum to enable multiple channels.
++		 */
++		for (i = 1; i < CHANNEL_NUM; i++)
++			plat->tx_queues_cfg[i].coe_unsupported = 1;
++	} else {
++		plat->tx_queues_to_use = 1;
++		plat->rx_queues_to_use = 1;
++	}
  
- 	plat->tx_queues_to_use = 1;
- 	plat->rx_queues_to_use = 1;
-@@ -65,20 +70,83 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+ 	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
+ 
+@@ -70,6 +147,233 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
  	.setup = loongson_gmac_data,
  };
  
-+static int loongson_dwmac_dt_config(struct pci_dev *pdev,
-+				    struct plat_stmmacenet_data *plat,
-+				    struct stmmac_resources *res)
++static void loongson_dwmac_dma_init_channel(struct stmmac_priv *priv,
++					    void __iomem *ioaddr,
++					    struct stmmac_dma_cfg *dma_cfg,
++					    u32 chan)
 +{
-+	struct device_node *np = dev_of_node(&pdev->dev);
-+	int ret;
++	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
++	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
++	u32 value;
 +
-+	plat->mdio_node = of_get_child_by_name(np, "mdio");
-+	if (plat->mdio_node) {
-+		dev_info(&pdev->dev, "Found MDIO subnode\n");
-+		plat->mdio_bus_data->needs_reset = true;
++	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
++
++	if (dma_cfg->pblx8)
++		value |= DMA_BUS_MODE_MAXPBL;
++
++	value |= DMA_BUS_MODE_USP;
++	value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
++	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
++	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
++
++	/* Set the Fixed burst mode */
++	if (dma_cfg->fixed_burst)
++		value |= DMA_BUS_MODE_FB;
++
++	/* Mixed Burst has no effect when fb is set */
++	if (dma_cfg->mixed_burst)
++		value |= DMA_BUS_MODE_MB;
++
++	if (dma_cfg->atds)
++		value |= DMA_BUS_MODE_ATDS;
++
++	if (dma_cfg->aal)
++		value |= DMA_BUS_MODE_AAL;
++
++	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
++
++	/* Mask interrupts by writing to CSR7 */
++	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr +
++	       DMA_CHAN_INTR_ENA(chan));
++}
++
++static int loongson_dwmac_dma_interrupt(struct stmmac_priv *priv,
++					void __iomem *ioaddr,
++					struct stmmac_extra_stats *x,
++					u32 chan, u32 dir)
++{
++	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
++	u32 abnor_intr_status;
++	u32 nor_intr_status;
++	u32 fb_intr_status;
++	u32 intr_status;
++	int ret = 0;
++
++	/* read the status register (CSR5) */
++	intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
++
++	if (dir == DMA_DIR_RX)
++		intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
++	else if (dir == DMA_DIR_TX)
++		intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
++
++	nor_intr_status = intr_status & (DMA_STATUS_NIS_TX_LOONGSON |
++		DMA_STATUS_NIS_RX_LOONGSON);
++	abnor_intr_status = intr_status & (DMA_STATUS_AIS_TX_LOONGSON |
++		DMA_STATUS_AIS_RX_LOONGSON);
++	fb_intr_status = intr_status & (DMA_STATUS_FBI_TX_LOONGSON |
++		DMA_STATUS_FBI_RX_LOONGSON);
++
++	/* ABNORMAL interrupts */
++	if (unlikely(abnor_intr_status)) {
++		if (unlikely(intr_status & DMA_STATUS_UNF)) {
++			ret = tx_hard_error_bump_tc;
++			x->tx_undeflow_irq++;
++		}
++		if (unlikely(intr_status & DMA_STATUS_TJT))
++			x->tx_jabber_irq++;
++		if (unlikely(intr_status & DMA_STATUS_OVF))
++			x->rx_overflow_irq++;
++		if (unlikely(intr_status & DMA_STATUS_RU))
++			x->rx_buf_unav_irq++;
++		if (unlikely(intr_status & DMA_STATUS_RPS))
++			x->rx_process_stopped_irq++;
++		if (unlikely(intr_status & DMA_STATUS_RWT))
++			x->rx_watchdog_irq++;
++		if (unlikely(intr_status & DMA_STATUS_ETI))
++			x->tx_early_irq++;
++		if (unlikely(intr_status & DMA_STATUS_TPS)) {
++			x->tx_process_stopped_irq++;
++			ret = tx_hard_error;
++		}
++		if (unlikely(fb_intr_status)) {
++			x->fatal_bus_error_irq++;
++			ret = tx_hard_error;
++		}
 +	}
-+
-+	ret = of_alias_get_id(np, "ethernet");
-+	if (ret >= 0)
-+		plat->bus_id = ret;
-+
-+	res->irq = of_irq_get_byname(np, "macirq");
-+	if (res->irq < 0) {
-+		dev_err(&pdev->dev, "IRQ macirq not found\n");
-+		ret = -ENODEV;
-+		goto err_put_node;
++	/* TX/RX NORMAL interrupts */
++	if (likely(nor_intr_status)) {
++		if (likely(intr_status & DMA_STATUS_RI)) {
++			u32 value = readl(ioaddr + DMA_INTR_ENA);
++			/* to schedule NAPI on real RIE event. */
++			if (likely(value & DMA_INTR_ENA_RIE)) {
++				u64_stats_update_begin(&stats->syncp);
++				u64_stats_inc(&stats->rx_normal_irq_n[chan]);
++				u64_stats_update_end(&stats->syncp);
++				ret |= handle_rx;
++			}
++		}
++		if (likely(intr_status & DMA_STATUS_TI)) {
++			u64_stats_update_begin(&stats->syncp);
++			u64_stats_inc(&stats->tx_normal_irq_n[chan]);
++			u64_stats_update_end(&stats->syncp);
++			ret |= handle_tx;
++		}
++		if (unlikely(intr_status & DMA_STATUS_ERI))
++			x->rx_early_irq++;
 +	}
++	/* Optional hardware blocks, interrupts should be disabled */
++	if (unlikely(intr_status &
++		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
++		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
 +
-+	res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
-+	if (res->wol_irq < 0) {
-+		dev_info(&pdev->dev,
-+			 "IRQ eth_wake_irq not found, using macirq\n");
-+		res->wol_irq = res->irq;
-+	}
-+
-+	res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
-+	if (res->lpi_irq < 0) {
-+		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
-+		ret = -ENODEV;
-+		goto err_put_node;
-+	}
-+
-+	ret = device_get_phy_mode(&pdev->dev);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "phy_mode not found\n");
-+		ret = -ENODEV;
-+		goto err_put_node;
-+	}
-+
-+	plat->phy_interface = ret;
-+
-+err_put_node:
-+	of_node_put(plat->mdio_node);
++	/* Clear the interrupt by writing a logic 1 to the CSR5[19-0] */
++	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
 +
 +	return ret;
 +}
 +
-+static void loongson_dwmac_dt_clear(struct pci_dev *pdev,
-+				    struct plat_stmmacenet_data *plat)
++static struct mac_device_info *loongson_dwmac_setup(void *apriv)
 +{
-+	of_node_put(plat->mdio_node);
++	struct stmmac_priv *priv = apriv;
++	struct mac_device_info *mac;
++	struct stmmac_dma_ops *dma;
++	struct loongson_data *ld;
++
++	ld = priv->plat->bsp_priv;
++
++	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
++	if (!mac)
++		return NULL;
++
++	dma = devm_kzalloc(priv->device, sizeof(*dma), GFP_KERNEL);
++	if (!dma)
++		return NULL;
++
++	/* The Loongson GMAC devices are based on the DW GMAC
++	 * v3.50a and v3.73a IP-cores. But the HW designers have changed the
++	 * GMAC_VERSION.SNPSVER field to the custom 0x10 value on the
++	 * network controllers with the multi-channels feature
++	 * available to emphasize the differences: multiple DMA-channels,
++	 * AV feature and GMAC_INT_STATUS CSR flags layout. Get back the
++	 * original value so the correct HW-interface would be selected.
++	 */
++	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN) {
++		priv->synopsys_id = DWMAC_CORE_3_70;
++		*dma = dwmac1000_dma_ops;
++		dma->init_chan = loongson_dwmac_dma_init_channel;
++		dma->dma_interrupt = loongson_dwmac_dma_interrupt;
++		mac->dma = dma;
++	}
++
++	priv->dev->priv_flags |= IFF_UNICAST_FLT;
++
++	/* Pre-initialize the respective "mac" fields as it's done in
++	 * dwmac1000_setup()
++	 */
++	mac->pcsr = priv->ioaddr;
++	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
++	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
++	mac->mcast_bits_log2 = 0;
++
++	if (mac->multicast_filter_bins)
++		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
++
++	/* Loongson GMAC doesn't support the flow control. */
++	mac->link.caps = MAC_10 | MAC_100 | MAC_1000;
++
++	mac->link.duplex = GMAC_CONTROL_DM;
++	mac->link.speed10 = GMAC_CONTROL_PS;
++	mac->link.speed100 = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
++	mac->link.speed1000 = 0;
++	mac->link.speed_mask = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
++	mac->mii.addr = GMAC_MII_ADDR;
++	mac->mii.data = GMAC_MII_DATA;
++	mac->mii.addr_shift = 11;
++	mac->mii.addr_mask = 0x0000F800;
++	mac->mii.reg_shift = 6;
++	mac->mii.reg_mask = 0x000007C0;
++	mac->mii.clk_csr_shift = 2;
++	mac->mii.clk_csr_mask = GENMASK(5, 2);
++
++	return mac;
 +}
 +
-+static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
-+				      struct plat_stmmacenet_data *plat,
-+				      struct stmmac_resources *res)
++static int loongson_dwmac_msi_config(struct pci_dev *pdev,
++				     struct plat_stmmacenet_data *plat,
++				     struct stmmac_resources *res)
 +{
-+	if (!pdev->irq)
-+		return -EINVAL;
++	int i, ret, vecs;
 +
-+	res->irq = pdev->irq;
++	vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
++	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
++	if (ret < 0) {
++		dev_warn(&pdev->dev, "Failed to allocate MSI IRQs\n");
++		return ret;
++	}
++
++	res->irq = pci_irq_vector(pdev, 0);
++
++	for (i = 0; i < plat->rx_queues_to_use; i++) {
++		res->rx_irq[CHANNEL_NUM - 1 - i] =
++			pci_irq_vector(pdev, 1 + i * 2);
++	}
++
++	for (i = 0; i < plat->tx_queues_to_use; i++) {
++		res->tx_irq[CHANNEL_NUM - 1 - i] =
++			pci_irq_vector(pdev, 2 + i * 2);
++	}
++
++	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
 +
 +	return 0;
 +}
 +
- static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
++static void loongson_dwmac_msi_clear(struct pci_dev *pdev)
++{
++	pci_free_irq_vectors(pdev);
++}
++
+ static int loongson_dwmac_dt_config(struct pci_dev *pdev,
+ 				    struct plat_stmmacenet_data *plat,
+ 				    struct stmmac_resources *res)
+@@ -146,6 +450,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
  	struct plat_stmmacenet_data *plat;
  	struct stmmac_pci_info *info;
  	struct stmmac_resources res;
--	struct device_node *np;
--	int ret, i, phy_mode;
--
--	np = dev_of_node(&pdev->dev);
--
--	if (!np) {
--		pr_info("dwmac_loongson_pci: No OF node\n");
--		return -ENODEV;
--	}
-+	int ret, i;
++	struct loongson_data *ld;
+ 	int ret, i;
  
  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
- 	if (!plat)
-@@ -90,17 +158,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 	if (!plat->mdio_bus_data)
+@@ -162,6 +467,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	if (!plat->dma_cfg)
  		return -ENOMEM;
  
--	plat->mdio_node = of_get_child_by_name(np, "mdio");
--	if (plat->mdio_node) {
--		dev_info(&pdev->dev, "Found MDIO subnode\n");
--		plat->mdio_bus_data->needs_reset = true;
--	}
--
- 	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
--	if (!plat->dma_cfg) {
--		ret = -ENOMEM;
--		goto err_put_node;
--	}
-+	if (!plat->dma_cfg)
++	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
++	if (!ld)
 +		return -ENOMEM;
- 
++
  	/* Enable pci device */
  	ret = pci_enable_device(pdev);
-@@ -109,6 +169,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 		goto err_put_node;
- 	}
- 
-+	pci_set_master(pdev);
-+
- 	/* Get the base address of device */
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
- 		if (pci_resource_len(pdev, i) == 0)
-@@ -119,57 +181,33 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 		break;
- 	}
- 
--	plat->bus_id = of_alias_get_id(np, "ethernet");
--	if (plat->bus_id < 0)
--		plat->bus_id = pci_dev_id(pdev);
--
--	phy_mode = device_get_phy_mode(&pdev->dev);
--	if (phy_mode < 0) {
--		dev_err(&pdev->dev, "phy_mode not found\n");
--		ret = phy_mode;
--		goto err_disable_device;
--	}
--
--	plat->phy_interface = phy_mode;
--
--	pci_set_master(pdev);
--
+ 	if (ret) {
+@@ -184,6 +493,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
  	memset(&res, 0, sizeof(res));
  	res.addr = pcim_iomap_table(pdev)[0];
  
++	plat->bsp_priv = ld;
++	plat->setup = loongson_dwmac_setup;
++	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
++
  	info = (struct stmmac_pci_info *)id->driver_data;
--	ret = info->setup(plat);
-+	ret = info->setup(pdev, plat);
+ 	ret = info->setup(pdev, plat);
+ 	if (ret)
+@@ -196,6 +509,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
  	if (ret)
  		goto err_disable_device;
  
--	res.irq = of_irq_get_byname(np, "macirq");
--	if (res.irq < 0) {
--		dev_err(&pdev->dev, "IRQ macirq not found\n");
--		ret = -ENODEV;
--		goto err_disable_device;
--	}
--
--	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
--	if (res.wol_irq < 0) {
--		dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
--		res.wol_irq = res.irq;
--	}
--
--	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
--	if (res.lpi_irq < 0) {
--		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
--		ret = -ENODEV;
-+	if (dev_of_node(&pdev->dev))
-+		ret = loongson_dwmac_dt_config(pdev, plat, &res);
-+	else
-+		ret = loongson_dwmac_acpi_config(pdev, plat, &res);
-+	if (ret)
- 		goto err_disable_device;
--	}
- 
++	/* Use the common MAC IRQ if per-channel MSIs allocation failed */
++	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
++		loongson_dwmac_msi_config(pdev, plat, &res);
++
  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
  	if (ret)
--		goto err_disable_device;
-+		goto err_plat_clear;
- 
--	return ret;
-+	return 0;
- 
-+err_plat_clear:
-+	if (dev_of_node(&pdev->dev))
-+		loongson_dwmac_dt_clear(pdev, plat);
+ 		goto err_plat_clear;
+@@ -205,6 +522,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ err_plat_clear:
+ 	if (dev_of_node(&pdev->dev))
+ 		loongson_dwmac_dt_clear(pdev, plat);
++	else if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
++		loongson_dwmac_msi_clear(pdev);
  err_disable_device:
  	pci_disable_device(pdev);
-+	return ret;
- err_put_node:
- 	of_node_put(plat->mdio_node);
  	return ret;
-@@ -184,6 +222,9 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+@@ -217,8 +536,10 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+ {
+ 	struct net_device *ndev = dev_get_drvdata(&pdev->dev);
+ 	struct stmmac_priv *priv = netdev_priv(ndev);
++	struct loongson_data *ld;
+ 	int i;
+ 
++	ld = priv->plat->bsp_priv;
  	of_node_put(priv->plat->mdio_node);
  	stmmac_dvr_remove(&pdev->dev);
  
-+	if (dev_of_node(&pdev->dev))
-+		loongson_dwmac_dt_clear(pdev, priv->plat);
+@@ -232,6 +553,9 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+ 		break;
+ 	}
+ 
++	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
++		loongson_dwmac_msi_clear(pdev);
 +
- 	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
- 		if (pci_resource_len(pdev, i) == 0)
- 			continue;
+ 	pci_disable_device(pdev);
+ }
+ 
 -- 
 2.31.4
 
