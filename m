@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-113594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD08D93F3F7
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:25:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738D993F3F5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 13:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AFC2B2229F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:25:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA2021C21B19
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 11:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B447D145FF8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF4F145B21;
 	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PP6GAM4D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sNscfaXk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9091A14535E
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B52144D01;
+	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722252244; cv=none; b=Hm+Zui3KS10dVBuA8DU2pgH7XNsiiK21M76aop2Qp1VcMpvWaqcrLirA/vp6wTUpwoulk+1XZoJ0qUoKhHC2z5UFUWC6/DeyzvXEsk4OE9wUMdol+Ve/MmaqAS8z5FNb2ccMBpp4RVEsakgQjmunywReQtA/f4XBJbbuIhsrMEo=
+	t=1722252244; cv=none; b=GuM97q8xsFTVMXB/8gwghWkFJhyjIEwV+uzIgGI2QNEQKBO82ysR6f/R7g95NhC7kUobyN3t/59FTmW6AUSAHtibJJ8vsSdrCI6kH3BucjOTj05ELWQKnJbzNp9YR7ZbvHpA/Sk6ggAlJpKB/8Kfq2l/Gt/IOEUZtlhMysb3kEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722252244; c=relaxed/simple;
-	bh=3HZg3NNi9MU6fcFJwNpTFRwnLZ5xwOD2qD8LBquuMTg=;
+	bh=5waAH00rUEegT+y5tOiOOjYIeQTGw6i7qeM1HGNnVDU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I3zVhRDX1Tlf7Nyx2y2uEZsA79A+QXUYewY/1ZkmNDQnHi4eXufAS/71Rka0PJc6iY9j6CMJ+NGNLrkuvYoE1OijFLOQzzeGFhCtMDZ4nT6KieVmFc1L7Snu4eSjnCRoCIXG75B/nJPkDmtTF122rRj1nvDJEscskpZEHYHFhVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PP6GAM4D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69F13C4AF07;
+	 In-Reply-To:To:Cc; b=Oc7IaBiGSXXha7+kWnGBUJh/24PG6T8s0MHYdImzVB6+LmRYEacHnvFV9aYcL7m5oqg3hYvsDbsrUFACpghg/Moaj9jy4CUZcR+M0jLuGojNi8x+iuz76m7XDL8EcQdtV+IrrsaJLv0dmwsWQGROocqiOHWHHKvTrY5zw2KVN7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sNscfaXk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 575CFC4AF0C;
 	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722252244;
-	bh=3HZg3NNi9MU6fcFJwNpTFRwnLZ5xwOD2qD8LBquuMTg=;
+	bh=5waAH00rUEegT+y5tOiOOjYIeQTGw6i7qeM1HGNnVDU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PP6GAM4DbsaIoY11iolPCY7SRggT4TC93xczzDh032tJrtgAyBEiOOLAE236twqP3
-	 WzsdTrXRXYaKyrIq+O+37GRVV9xnjnJ7F9ohMHixRTpdXVRtiwoI1sQskWyMz3x7+V
-	 07d9zCDavnJWqpcFQvayUXaF6T9AfqwCZgReiwT9PQnvnvRuhZGw63+itc+pKkZc+Z
-	 rFBgtIrPBkNE+Vpuw7QKyes2LoEAAY7e6ngx3V4LDVikZAK1e5/OCkEyTPX0xVgbI8
-	 7fir+V1kQKx+4jdek/d83XQaUDJ582Gtm+rNNq2FIiWUWIciY4Fwp3wUiwvxbeInRy
-	 bpifOKay/au2g==
+	b=sNscfaXklNnwpGUP3RBmVCwM/mb0DNgaZqBy7SvNjXit56eo+qpqHkGKzDHggeEIY
+	 YLTKL+IuTUo0hM8kCIWI8luZ/ayVfsqsalO3w9dJk1L5hdE9DEHHHCRqsfwUtq83Kh
+	 IwFWlTH1BVIql3JjfOCVErls/REZ7U+vnTQM22ahLI7/55oVaOpWSXPHwtmmY8vPnq
+	 Ob2NLxCySefZ9EpVFzQHfCvpR8KaQ4rtYNZHxJUs+rkqcbOTWfPtKCe6oei+EtFFAW
+	 Hx4U65yaXw7RK/GlYKPINcyXiGNamjlm+c35dT/jsoPx7knegQzNBH3L1RY8oCuPCN
+	 Mo/sJ/eY9Ch8g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56D5AC43443;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4CDF2C4332D;
 	Mon, 29 Jul 2024 11:24:04 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] tcp: Adjust clamping window for applications
- specifying SO_RCVBUF
+Subject: Re: [PATCH] net: axienet: start napi before enabling Rx/Tx
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172225224435.15294.3818067109385283098.git-patchwork-notify@kernel.org>
+ <172225224431.15294.4080149929042366779.git-patchwork-notify@kernel.org>
 Date: Mon, 29 Jul 2024 11:24:04 +0000
-References: <20240726204105.1466841-1-quic_subashab@quicinc.com>
-In-Reply-To: <20240726204105.1466841-1-quic_subashab@quicinc.com>
-To: Subash Abhinov Kasiviswanathan (KS) <quic_subashab@quicinc.com>
-Cc: edumazet@google.com, soheil@google.com, ncardwell@google.com,
- yyd@google.com, ycheng@google.com, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org, dsahern@kernel.org, pabeni@redhat.com,
- quic_stranche@quicinc.com
+References: <20240726-dev-andyc-net-fixes-v1-1-15a98b79afb4@sifive.com>
+In-Reply-To: <20240726-dev-andyc-net-fixes-v1-1-15a98b79afb4@sifive.com>
+To: Andy Chiu <andy.chiu@sifive.com>
+Cc: radhey.shyam.pandey@amd.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
+ robert.hancock@calian.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 26 Jul 2024 13:41:05 -0700 you wrote:
-> tp->scaling_ratio is not updated based on skb->len/skb->truesize once
-> SO_RCVBUF is set leading to the maximum window scaling to be 25% of
-> rcvbuf after
-> commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> and 50% of rcvbuf after
-> commit 697a6c8cec03 ("tcp: increase the default TCP scaling ratio").
-> 50% tries to emulate the behavior of older kernels using
-> sysctl_tcp_adv_win_scale with default value.
+On Fri, 26 Jul 2024 15:06:50 +0800 you wrote:
+> softirq may get lost if an Rx interrupt comes before we call
+> napi_enable. Move napi_enable in front of axienet_setoptions(), which
+> turns on the device, to address the issue.
+> 
+> Link: https://lists.gnu.org/archive/html/qemu-devel/2024-07/msg06160.html
+> Fixes: cc37610caaf8 ("net: axienet: implement NAPI and GRO receive")
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] tcp: Adjust clamping window for applications specifying SO_RCVBUF
-    https://git.kernel.org/netdev/net/c/05f76b2d634e
+  - net: axienet: start napi before enabling Rx/Tx
+    https://git.kernel.org/netdev/net/c/799a82950750
 
 You are awesome, thank you!
 -- 
