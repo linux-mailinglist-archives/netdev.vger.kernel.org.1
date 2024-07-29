@@ -1,203 +1,193 @@
-Return-Path: <netdev+bounces-113746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA7993FB4B
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:35:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C7C693FB58
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 18:36:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBB5D1F2219A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 16:35:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9183D1F2266B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 16:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B15186E59;
-	Mon, 29 Jul 2024 16:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECF115EFCD;
+	Mon, 29 Jul 2024 16:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W6WDZqiz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5607F15F301
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 16:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395AD147C79;
+	Mon, 29 Jul 2024 16:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722270512; cv=none; b=m/kJ2NCxHQTkBpxA550xDbwzDzN2G0TekhyNPMdESRhQ5X1MAf3Z09rzGMVQAWT4bf879T+0/2rREoQGjjFNYcqXMf00RxSocWYfjYb5E3u99rooZ7vyouja5mzBT8oH4dcucr9eLSIbKWRs8HUik9o1XtUfak2IKpQFTxqh0Rk=
+	t=1722270881; cv=none; b=ZaHFhN7orpt/nQS210sdemQwimrC4RC8ILokLkw1pzdT0VN2w7BLhrN8S8jHyyW3RLOCDbmpiLiJ5MLduqQlUrzMuo+K23YRSo3LtMPUDvm/VfQA4TkH12GVYVls1ouJ6g/O/SC4eY+sHtRH7Eqb29H9zOhE6gFG3E0DeibG/uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722270512; c=relaxed/simple;
-	bh=dTQNpHRVJ2ak1aFJg/YkRVnRIXwzYF4no6e2/nG1f3c=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Vd7TP+s1Mefpcc+IRdi1cV9KJpo9hZch6urKOMzoWpCiqLrebYmCxEJA3girELxAwqiXIEOux/hlbHDpXrrjuS1JWiYXxKK6Lho4Vx6Y9hSaaGjpDVI18+k5ZYZo4FbQTo6VwbZSVbbiLtyBposdkNJdHuVVdTN28pqdbl2wRgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81f8e43f0c1so516947539f.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 09:28:30 -0700 (PDT)
+	s=arc-20240116; t=1722270881; c=relaxed/simple;
+	bh=SPs/h4eDA0EqXISGqYB8Y4wvV05LZy9STRUwWyLtH4Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QyFDJHI/rpGkeSexWqY8UApJkpI7a0c7ullg5QChlw3NuRii1jGIwQ29fX6p/oPMGeWxGHvh73f9G1vLkol6qbrvxiJmDcRhIu3qZbTElfQI4z2Ch57LQVRLFYUMOpgRtJNH5u5UciSOju5jnKMV8BuD8tRMinuqHH9nFMDwftY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W6WDZqiz; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-70d19c525b5so2162748b3a.2;
+        Mon, 29 Jul 2024 09:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722270879; x=1722875679; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=S07/vuCHhHfjsPowJ43obkMU9EzXlqdaIB8+Pgcbn/I=;
+        b=W6WDZqizg8pNRdUDwz33/72hMYyxePhOV8Z96vDBtSMI5id+5Mv+1ekh6VOmifRf5Y
+         SM9QpYr4+hVw5cAh2KQDpm+54MPwayXzD4cUgfIZ4ogpj3JLi9LgZeoUeyL/3CP8pwft
+         qY+2hF5ZbiExyIgJpSyZ+FRWsSlIvjDwc6kSmnp3QCKSrjlY2vSYJmuf3j6FcCjJZU+n
+         3qhBidOCG0BxcnOS3G04KC6ZvUG4GkzxmS5XQmUh37Da+R6oqG1gMyicKGOjMxt4Lesg
+         NlySAF0di3FXPRfkbXre1UNXL+bd5f/Sa7DxX5OnwKaKkGpaglWMYwen83kuZRzQCq5R
+         vYtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722270509; x=1722875309;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oYwzfCLYVAPwKlCSey3OuTXhjgiWSRtY/wIJsDeAetE=;
-        b=EMLTBi20v7+p5q0evkS58/jAkuBOkR4gN7jviiPwofv9w49o4CLaQbYDDv690euKi4
-         gldGQJpx+LvT7BLWEBXbFUa7DPHEYCl+ZdZGOVNTW4mKwtVEYH7abZ4ozrbgltOlkfp+
-         daY9kRyWVyDMcfqKjEFAexJ42GS7ZdC2KYsQWspaDrfBTg6w4CBL7o8QCaKh4GbzUkcL
-         wb9wiu2qgjD87j/0HBPbpApo5sncNBPTF5ztISYG7tpJVzqUOd+tHmyus58EoviKAAP2
-         N3f3d3Q8oY+tBESC6Q0zdMemMLxihkhU4MC0f0yJfN8R6bheXKbT/N4rX7/C83e1D5MQ
-         w7Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjz1HswSS5f+UvPdjateXqk1lQpdf3jX48IpizrVLagpIfI8WjnoRNdOa7SOnqSEDSeyz2iNH3QhUw4dVdAE+UI+2SPsh0
-X-Gm-Message-State: AOJu0YwHoiJXHnxIvgcb6b0ojy4FL88yCrPpAYXAqhZHo8WPSsomqGSp
-	iWabhA6lV491+7q8qlA2+OLKPl+0/XxnpKBwNC5y+n6b8snW9LtG0cGFzPoucEjImhBLRYpL7Ug
-	qlo7zZ0JOn3pXMJmqfHzjh9OsSXqX/gk317ybfXXtb01EBimMGkU7b4o=
-X-Google-Smtp-Source: AGHT+IGkz7HJkvORJwdEHiYIsc4m6V544J3mwBg5oVA+RWwjmExtfaiu0edZbZ6+uLqajzcTqCbemq2u4ich5JJb50PaFhWLw6uH
+        d=1e100.net; s=20230601; t=1722270879; x=1722875679;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S07/vuCHhHfjsPowJ43obkMU9EzXlqdaIB8+Pgcbn/I=;
+        b=XXBW2zIM2rNMgxVfQdfIbRjuOxFgCkklHy/IaE6NJt+clrKeWggJmOj4T22W5d8Kat
+         yiRx9wTC55BuSqr1t/6/Qy+61+z4lv/HoqnmoV0U7HZ7jATUfONE9ecY2SsWDqZ88Vtl
+         O43f0W7vyu6pnFJmfUkqDWyhvW8FgDgo8fM2JO7jiYE08tmboEXhFawOIaGh1lfQKYIs
+         S4Ypn8LB/BZrM30kXX4QpCfI8PDueZ9RXUMnDV4o6dRatcDp95eEZaH/GE+bXtqQAwvD
+         k/o5L1QdQLtvBgXZLtmDdBj/yasdOYo2gUhNWWAKqkf8gbTVJ0RO81V6ywRnhXAzrpVo
+         RsEA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7R7LJaRUGQ2zNk/jUJ8qMZsi4ntHd63zO0maXTBNLlpTumpLMKgx5XujIzK2+jfzn+4VK25K6xo7U9FKA4VrCv008obMtN0DwfP8ea9eHD77QkeGBD1+BvaImg8DDm/Cm34x3
+X-Gm-Message-State: AOJu0Yy9rKw0aEcqd1vgjeMbFxs+ZPv1i0J7H3Fx0aLjoECZG4ZpmEfd
+	2PxUG/5Oeti3dfbmjQo79tkoLbRTnJwzjGPkQabIEdiKRj3E1xip
+X-Google-Smtp-Source: AGHT+IE5T5nz1QWQcuPThyUGTKSVkvdf/XAPrJNR6sUEIiHMKVbJBo3TT0s+7/45q5vio83o+BKZ7A==
+X-Received: by 2002:a05:6a00:9141:b0:70d:2583:7227 with SMTP id d2e1a72fcca58-70ece9eba1emr6185215b3a.6.1722270879131;
+        Mon, 29 Jul 2024 09:34:39 -0700 (PDT)
+Received: from localhost.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead874bf5sm6978055b3a.162.2024.07.29.09.34.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 09:34:38 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: jiri@resnulli.us,
+	syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH net] net: annotate data race around dev->flags in __dev_change_flags
+Date: Tue, 30 Jul 2024 01:33:26 +0900
+Message-Id: <20240729163326.16386-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:6415:b0:80f:81f5:b484 with SMTP id
- ca18e2360f4ac-81f95bca5cdmr45717739f.2.1722270509524; Mon, 29 Jul 2024
- 09:28:29 -0700 (PDT)
-Date: Mon, 29 Jul 2024 09:28:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ed7445061e65591f@google.com>
-Subject: [syzbot] [net?] general protection fault in reuseport_add_sock (3)
-From: syzbot <syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, lucien.xin@gmail.com, netdev@vger.kernel.org, 
-	nhorman@tuxdriver.com, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+According to KCSAN report, there is a read/write race between 
+__dev_change_flags and netif_is_bond_master for dev->flags.
 
-syzbot found the following issue on:
+Thereforce, __dev_change_flags() needs protection.
 
-HEAD commit:    301927d2d2eb Merge tag 'for-net-2024-07-26' of git://git.k..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=17332fad980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=968c4fa762577d3f
-dashboard link: https://syzkaller.appspot.com/bug?extid=e6979a5d2f10ecb700e4
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d0a623980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1538ac55980000
+<syzbot>
+BUG: KCSAN: data-race in __dev_change_flags / is_upper_ndev_bond_master_filter
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cb9ce2729d35/disk-301927d2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/644eaaef61a5/vmlinux-301927d2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2f92322485c3/bzImage-301927d2.xz
-
-The issue was bisected to:
-
-commit 6ba84574026792ce33a40c7da721dea36d0f3973
-Author: Xin Long <lucien.xin@gmail.com>
-Date:   Mon Nov 12 10:27:17 2018 +0000
-
-    sctp: process sk_reuseport in sctp_get_port_local
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ad25bd980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16ad25bd980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12ad25bd980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com
-Fixes: 6ba845740267 ("sctp: process sk_reuseport in sctp_get_port_local")
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 1 UID: 0 PID: 10230 Comm: syz-executor119 Not tainted 6.10.0-syzkaller-12585-g301927d2d2eb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:reuseport_add_sock+0x27e/0x5e0 net/core/sock_reuseport.c:350
-Code: 00 0f b7 5d 00 bf 01 00 00 00 89 de e8 1b a4 ff f7 83 fb 01 0f 85 a3 01 00 00 e8 6d a0 ff f7 49 8d 7e 12 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 4b 02 00 00 41 0f b7 5e 12 49 8d 7e 14
-RSP: 0018:ffffc9000b947c98 EFLAGS: 00010202
-RAX: 0000000000000002 RBX: ffff8880252ddf98 RCX: ffff888079478000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000012
-RBP: 0000000000000001 R08: ffffffff8993e18d R09: 1ffffffff1fef385
-R10: dffffc0000000000 R11: fffffbfff1fef386 R12: ffff8880252ddac0
-R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f24e45b96c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffcced5f7b8 CR3: 00000000241be000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __sctp_hash_endpoint net/sctp/input.c:762 [inline]
- sctp_hash_endpoint+0x52a/0x600 net/sctp/input.c:790
- sctp_listen_start net/sctp/socket.c:8570 [inline]
- sctp_inet_listen+0x767/0xa20 net/sctp/socket.c:8625
- __sys_listen_socket net/socket.c:1883 [inline]
- __sys_listen+0x1b7/0x230 net/socket.c:1894
- __do_sys_listen net/socket.c:1902 [inline]
- __se_sys_listen net/socket.c:1900 [inline]
- __x64_sys_listen+0x5a/0x70 net/socket.c:1900
+read-write to 0xffff888112d970b0 of 4 bytes by task 4888 on cpu 0:
+ __dev_change_flags+0x9a/0x410 net/core/dev.c:8755
+ rtnl_configure_link net/core/rtnetlink.c:3321 [inline]
+ rtnl_newlink_create net/core/rtnetlink.c:3518 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:3730 [inline]
+ rtnl_newlink+0x121e/0x1690 net/core/rtnetlink.c:3743
+ rtnetlink_rcv_msg+0x85e/0x910 net/core/rtnetlink.c:6635
+ netlink_rcv_skb+0x12c/0x230 net/netlink/af_netlink.c:2564
+ rtnetlink_rcv+0x1c/0x30 net/core/rtnetlink.c:6653
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x58d/0x660 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x5ca/0x6e0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x140/0x180 net/socket.c:745
+ ____sys_sendmsg+0x312/0x410 net/socket.c:2585
+ ___sys_sendmsg net/socket.c:2639 [inline]
+ __sys_sendmsg+0x1e9/0x280 net/socket.c:2668
+ __do_sys_sendmsg net/socket.c:2677 [inline]
+ __se_sys_sendmsg net/socket.c:2675 [inline]
+ __x64_sys_sendmsg+0x46/0x50 net/socket.c:2675
+ x64_sys_call+0xb25/0x2d70 arch/x86/include/generated/asm/syscalls_64.h:47
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ do_syscall_64+0xc9/0x1c0 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f24e46039b9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f24e45b9228 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
-RAX: ffffffffffffffda RBX: 00007f24e468e428 RCX: 00007f24e46039b9
-RDX: 00007f24e46039b9 RSI: 0000000000000003 RDI: 0000000000000004
-RBP: 00007f24e468e420 R08: 00007f24e45b96c0 R09: 00007f24e45b96c0
-R10: 00007f24e45b96c0 R11: 0000000000000246 R12: 00007f24e468e42c
-R13: 00007f24e465a5dc R14: 0020000000000001 R15: 00007ffcced5f7d8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:reuseport_add_sock+0x27e/0x5e0 net/core/sock_reuseport.c:350
-Code: 00 0f b7 5d 00 bf 01 00 00 00 89 de e8 1b a4 ff f7 83 fb 01 0f 85 a3 01 00 00 e8 6d a0 ff f7 49 8d 7e 12 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 4b 02 00 00 41 0f b7 5e 12 49 8d 7e 14
-RSP: 0018:ffffc9000b947c98 EFLAGS: 00010202
-RAX: 0000000000000002 RBX: ffff8880252ddf98 RCX: ffff888079478000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000012
-RBP: 0000000000000001 R08: ffffffff8993e18d R09: 1ffffffff1fef385
-R10: dffffc0000000000 R11: fffffbfff1fef386 R12: ffff8880252ddac0
-R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f24e45b96c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffcced5f7b8 CR3: 00000000241be000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	00 0f                	add    %cl,(%rdi)
-   2:	b7 5d                	mov    $0x5d,%bh
-   4:	00 bf 01 00 00 00    	add    %bh,0x1(%rdi)
-   a:	89 de                	mov    %ebx,%esi
-   c:	e8 1b a4 ff f7       	call   0xf7ffa42c
-  11:	83 fb 01             	cmp    $0x1,%ebx
-  14:	0f 85 a3 01 00 00    	jne    0x1bd
-  1a:	e8 6d a0 ff f7       	call   0xf7ffa08c
-  1f:	49 8d 7e 12          	lea    0x12(%r14),%rdi
-  23:	48 89 f8             	mov    %rdi,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 0f b6 04 28       	movzbl (%rax,%r13,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 4b 02 00 00    	jne    0x282
-  37:	41 0f b7 5e 12       	movzwl 0x12(%r14),%ebx
-  3c:	49 8d 7e 14          	lea    0x14(%r14),%rdi
 
+read to 0xffff888112d970b0 of 4 bytes by task 11 on cpu 1:
+ netif_is_bond_master include/linux/netdevice.h:5020 [inline]
+ is_upper_ndev_bond_master_filter+0x2b/0xb0 drivers/infiniband/core/roce_gid_mgmt.c:275
+ ib_enum_roce_netdev+0x124/0x1d0 drivers/infiniband/core/device.c:2310
+ ib_enum_all_roce_netdevs+0x8a/0x100 drivers/infiniband/core/device.c:2337
+ netdevice_event_work_handler+0x15b/0x3c0 drivers/infiniband/core/roce_gid_mgmt.c:626
+ process_one_work kernel/workqueue.c:3248 [inline]
+ process_scheduled_works+0x483/0x9a0 kernel/workqueue.c:3329
+ worker_thread+0x526/0x720 kernel/workqueue.c:3409
+ kthread+0x1d1/0x210 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
+value changed: 0x00001002 -> 0x00000202
+
+Reported-by: syzbot+113b65786d8662e21ff7@syzkaller.appspotmail.com
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/core/dev.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 6ea1d20676fb..3b9626cdfd9a 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -8799,7 +8799,7 @@ EXPORT_SYMBOL(dev_get_flags);
+ int __dev_change_flags(struct net_device *dev, unsigned int flags,
+ 		       struct netlink_ext_ack *extack)
+ {
+-	unsigned int old_flags = dev->flags;
++	unsigned int old_flags = READ_ONCE(dev->flags);
+ 	int ret;
+ 
+ 	ASSERT_RTNL();
+@@ -8808,12 +8808,13 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
+ 	 *	Set the flags on our device.
+ 	 */
+ 
+-	dev->flags = (flags & (IFF_DEBUG | IFF_NOTRAILERS | IFF_NOARP |
+-			       IFF_DYNAMIC | IFF_MULTICAST | IFF_PORTSEL |
+-			       IFF_AUTOMEDIA)) |
+-		     (dev->flags & (IFF_UP | IFF_VOLATILE | IFF_PROMISC |
+-				    IFF_ALLMULTI));
++	unsigned int new_flags = (flags & (IFF_DEBUG | IFF_NOTRAILERS | IFF_NOARP |
++			                   IFF_DYNAMIC | IFF_MULTICAST | IFF_PORTSEL |
++			                   IFF_AUTOMEDIA)) |
++		                 (READ_ONCE(dev->flags) & (IFF_UP | IFF_VOLATILE | IFF_PROMISC |
++				                IFF_ALLMULTI));
+ 
++	WRITE_ONCE(dev->flags, new_flags);
+ 	/*
+ 	 *	Load in the correct multicast list now the flags have changed.
+ 	 */
+@@ -8839,12 +8840,12 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
+ 
+ 	if ((flags ^ dev->gflags) & IFF_PROMISC) {
+ 		int inc = (flags & IFF_PROMISC) ? 1 : -1;
+-		unsigned int old_flags = dev->flags;
++		unsigned int old_flags = READ_ONCE(dev->flags);
+ 
+ 		dev->gflags ^= IFF_PROMISC;
+ 
+ 		if (__dev_set_promiscuity(dev, inc, false) >= 0)
+-			if (dev->flags != old_flags)
++			if (READ_ONCE(dev->flags) != old_flags)
+ 				dev_set_rx_mode(dev);
+ 	}
+ 
+--
 
