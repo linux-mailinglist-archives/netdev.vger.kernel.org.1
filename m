@@ -1,282 +1,425 @@
-Return-Path: <netdev+bounces-113613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABB9193F4D6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:05:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6FED93F50B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 14:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBE6E1C20963
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:05:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDE1F1C2177F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 12:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C491145FF4;
-	Mon, 29 Jul 2024 12:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IJju1SdE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2614147C6E;
+	Mon, 29 Jul 2024 12:19:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2940D143752
-	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722254720; cv=fail; b=t4P7Mi3PMX3UJ6Q3zQjo6VNIVSKBAan9JcvJn6GprCpsKflub1lng2AbeBGT+HGqtQ9yQ4ROFN7bBVm4BS6f4BU6E72PEPiCvV7VNUsf2CkpzpZ+o8/cVRQO6Z912NA1kHDjoFrxQ6OJzBlICRd2v86eybHx0mn1P5CBxGx6jZg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722254720; c=relaxed/simple;
-	bh=ROr5zZfQF4u68b1nK42mtXQFzWHPGZeG1+hzM0CO8pg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Qu20Nt8NMDWLv/DiGEiatdPjQr50g6ApmKKOEjW7OPvlq/F39OfBp5t0rCp5O+2d+w9K4Ws0sZb34Fq9TSz8MNibAt6wOs6kCLpJU7XWTDHpDlgy3spR2fYkim6xc9ZwJLriVW3l+3PhySE086wU50EDZAHyZtQ3iwu4O5M9Z5A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IJju1SdE; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722254719; x=1753790719;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ROr5zZfQF4u68b1nK42mtXQFzWHPGZeG1+hzM0CO8pg=;
-  b=IJju1SdEVnD7PkijTzpsuH64EI8lZMWALzy4rPSx+p6Z3ped1EW20xTh
-   sXdBcIzKnbX1lWSPTU5KeoXdT/sXiiDBRuH3qjPWdvjn8RIK4aRfRU+Mh
-   qtRB+aZZc4Y1TC2+RC/c+u1IvpRHsnIL7Gw+EDa4Xiz3sdu26OrpXb9Ur
-   dmi+yfxJ17I1tDBAA6MtA4ilt4L11GJlw/yr4FLIsVvJok6sN3Yj9r2MZ
-   u7+X+5jH8YPttgUF9qEohUQysvucrNeE9T/w9UcYEXpCnEC+2Pq+7DkIN
-   Mg/uyzMFhH2T6B0kc2DzbZfTVwDd28CnyGzLz38FfUgI01TbzPNuOwnOX
-   Q==;
-X-CSE-ConnectionGUID: pfxPT2waTZmrnM/ZQjJYmA==
-X-CSE-MsgGUID: Au6Ez0OEQjW/PC9zz0RLiw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11148"; a="20182014"
-X-IronPort-AV: E=Sophos;i="6.09,245,1716274800"; 
-   d="scan'208";a="20182014"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 05:05:18 -0700
-X-CSE-ConnectionGUID: UChIhtFGSq+wA5PRjY+LHg==
-X-CSE-MsgGUID: CB57k1AeTeaFh2V61ekEMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,245,1716274800"; 
-   d="scan'208";a="91445030"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Jul 2024 05:05:18 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 29 Jul 2024 05:05:17 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 29 Jul 2024 05:05:17 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 29 Jul 2024 05:05:17 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 29 Jul 2024 05:05:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mdS2RCUMpadYlrcJ/ofhKcbvWte7paNsIP2NpX9g9oECh5xKY8cI4FLU2IEFg2ap1sBNF/aRF4KnzfoqKLgbo/Meaegf2Gsk8eh7It1Eyeb4o4yLoFgR3I0x6k1uO3JFsNQz3jMdPwFQBfmPYkHsNIHsbpE6IsFRs0GoY+BrYrbdCrFG3fuwDjtcWMBj2PFAjPPyVWbz3OtfOpGhKPW9rfuJCCVwAFC5dVfYabLbuMF7GGfd0Ba+2f3PvO7A0aRSnfD6RQGF8CCnY3UD+78+YcCyNwt+Daex3GnXX9iFplPqRT33H4OwJ9tKN2CTSPtDXR2UiyZC0Gd31u/CYMFrsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8N9ua25Q9addV4xk1hVY6fstETwpo+bRDuQKMFvwkKE=;
- b=Cqv9/xQPxpNxkQBXlCHUPuQ8w10L2IUMsZo77xy1nJjO/L1sAH5E1yadizlfVTm8FR+fNuT86FdG3xLvYOCCDMU+iKDbW8qmFc6iL/nOJHxxf81/P/1MsyI/OfdaKw4Rldhz4FXvtx5iMllsRff+/yCHu/nTvqZSYqNsJyrGCSlBfqkEg3bTNsLwS5PY8madm3jt00tYf7owo6C1oaEz91WSpUSuRRUUskZ0nf3P3EsyiRB7IZNJuMXVZZz4wUdmMl6OY52LG1rRCWU+qLoBafJEP3p2V2rkNedipKBVUlFohHeOBVlS5VrwXF7QnwjNgS8Sjiy8a5hWJW1hGQusAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
- by CY8PR11MB7730.namprd11.prod.outlook.com (2603:10b6:930:74::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Mon, 29 Jul
- 2024 12:05:13 +0000
-Received: from CH0PR11MB8086.namprd11.prod.outlook.com
- ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
- ([fe80::984b:141d:2923:8ae3%6]) with mapi id 15.20.7807.026; Mon, 29 Jul 2024
- 12:05:13 +0000
-Message-ID: <844e2248-c842-40a0-b4f5-8e71f3d06c03@intel.com>
-Date: Mon, 29 Jul 2024 14:04:54 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] i40e: Add support for fw
- health report
-To: Kamal Heib <kheib@redhat.com>
-CC: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>,
-	<intel-wired-lan@lists.osuosl.org>
-References: <20240718181319.145884-1-kheib@redhat.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240718181319.145884-1-kheib@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE1P281CA0242.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8b::9) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8701474C8
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 12:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722255573; cv=none; b=gyeNGDJlpLl9HrVYnHMabjDSx8F0KJsKgMb/UJYXCc9438ZVWv9YkLxsMtMLVdv8x/bFrcwj5haWmAGS3ckLRHl3s7oEhMxeDoK0pZkjydb6PYNTlWicVtv6fZYqfA4ZtDqeN+s+7GdJxZEjByWhDf7sCso8U8/VlPnx4u3v/9k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722255573; c=relaxed/simple;
+	bh=uy3Wp3IiQymtT+jRZobpKjZ5fcPmRFrljOL4xMg+iiI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NPqu2ip5fn1CuxTeUcp6WjbS7qid0USD1lYDqn1q4gSjsYsllQUoCm11/gqDPuwljfbYsCsGFHzhvomVA+NFNz2/7hLTQyuYy28xfltRpCszK3e0GZsB9JEWgWN54E5zex27k8Gtk41MYGydUVNHtKUmVM4wx/95ngBsYtckHSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.124])
+	by gateway (Coremail) with SMTP id _____8Cxd+nMiKdmUJwDAA--.11205S3;
+	Mon, 29 Jul 2024 20:19:24 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.68.124])
+	by front1 (Coremail) with SMTP id qMiowMCxf8fHiKdmzbMEAA--.23083S2;
+	Mon, 29 Jul 2024 20:19:20 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	fancer.lancer@gmail.com,
+	diasyzhang@tencent.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@kernel.org,
+	linux@armlinux.org.uk,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com,
+	si.yanteng@linux.dev
+Subject: [PATCH net-next v15 00/14] stmmac: Add Loongson platform support
+Date: Mon, 29 Jul 2024 20:19:04 +0800
+Message-Id: <cover.1722253726.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|CY8PR11MB7730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a3301ec-ea08-484b-573f-08dcafc6ace6
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?SjU3ZkExaGNFZWZqWk10RjhZTDdrdUYzMEpzTnoxUnEzSy85UDBpNElJMXJY?=
- =?utf-8?B?aVZJS2FKU2lhb1haWEhSK2ZPMjdIR3hJeDFsMUVnSzR6bDdmZFhaU0IxV3E3?=
- =?utf-8?B?am1mVjBZNHdRYlE3SHJpTk5xSkJ3UFRqQW5vcWJlelhkZnhnUVdxUmlXVkla?=
- =?utf-8?B?ZGVsamRYNHJHS2F4VWM4MXpDRVlWb2ZwMmYxcEkxeS8wNy9maG53dUM4ZVFO?=
- =?utf-8?B?ZlBYOWV6TEZ6Sk5yRWk5ZWFWUitmVnNkSmNQMVI4aXhXbjN2VkVWb1NOYjRN?=
- =?utf-8?B?UUpxT3J3aEVTM3VvZ2ovUlJDaC8vSzJlb2JVL0lQbWp1VFJTNzlPTGZNOVd2?=
- =?utf-8?B?TDJLSmxQY2tqNWpHRm5TejVIM0ZFMDE1bTBuamhscmpWUUFJc2NOM0hxSWVE?=
- =?utf-8?B?OVF2NHYxK2UxQURrSmZFK25iRGwweFFWRWRLc20rQ1ZvSVM3RmpIeUxScFBz?=
- =?utf-8?B?OHlnbERLcnhLTkRVOXRqMkxOaktHUUY3d2UwemExUm5lUWN6dDRqSFdKaDRH?=
- =?utf-8?B?QmFMWWJhb3Vid1RmYkFkK2h4S3UvM01Ha3JUMVkxZ0pXeThZS2YvMllNYk10?=
- =?utf-8?B?aEdyUSt1MjA5aTBENTE2MTRxOFZqMmdKNVVjblhKYzVQVzBzR0RVZHNJeXd1?=
- =?utf-8?B?Y0tmd0MyNTN6R3VZbmVKRWRjZEM1MDZoMVJYQ0p3S2d4VEJnbWRQRXB6SW5j?=
- =?utf-8?B?RE9nWmZ5ajJUaDVlMVlmVUpSOXRhaTBPZGpYRnd1V25GU0ViOVZBYndFRm42?=
- =?utf-8?B?UFJXcjdVSWcrcFZQcGtsS0Ftd1BlR0lUR24xSEcvNjhlY1RTLzZ4THZISFU4?=
- =?utf-8?B?WGtQRTAzbStYanQ1a2hneHlLM04rTmtGVXlCQ2FiYXUzUG9ZSnZwNDFMelFL?=
- =?utf-8?B?Q01Gd3dTalRWQnBzOUp0RHNPbU8zRlUvaHJQZ3NEZjVzdWpvOElnVTNqNVJW?=
- =?utf-8?B?dUI0eGZ6c3g2dm8wc1Y5RktvaHZTV090NFpObXR2OVNKMEFibDZ5K3JnVldS?=
- =?utf-8?B?aDAzZHBUUVorRysrRUZCSlRFbzBIVE9Qb3BpQlZ4S2krTEk1dmR6QVFjMmRs?=
- =?utf-8?B?VUlpQU1CdVMwRnhXMEgvSjFhUldjNTdCaGJCVkJGK3hWaElxT3B5ci9pNFo0?=
- =?utf-8?B?NVhpSVhQWjNJVkxCL0VsMlc0THlpVjVIVURtd2NzNURSM3R4MXM2WElUUEVl?=
- =?utf-8?B?Nlh6QXAyOGttQkR6MDRRTDRRa2kxR2s0MkhxMjFSMFVwSnBtQS9NSnkrb0cv?=
- =?utf-8?B?RXcvSXVSWDJUR3dUQWJRVndZSWdmQ2RNK0ZNcnRjeGExeTI1bEdNMmU1WnlT?=
- =?utf-8?B?T09Lc0FwUVgzZHpwMkhLT0tnQndkTDlKeFFadlFRNnp6ZnF4RVlNTkU2VVgy?=
- =?utf-8?B?R2JBTHpmR25BS0N0ZmV3VEhEVXJjYnJSeWF1eXNuOFgwUkgwZDZnbDJtTkF3?=
- =?utf-8?B?bCtFQ1N6WW1Gd0ZERUtSS0FLZVZBYkZmQysyS1UxUmozQzBjVzhrQVJpdVZ5?=
- =?utf-8?B?UmpScUpnMW5WdHEwWUY2VWZLOXN3aksyc2RmU3JITUJNeTJQR3hFVTFoVmJ5?=
- =?utf-8?B?REFOZ0lIa09Fczk5QWF2dSsxR21FSCtPcWhMVXhDZ2JhMmhvZUhlUEVkU282?=
- =?utf-8?B?a0JPMU0wU1NtaW51ZjMydS9vdjRjRTBVc01MaUpoMDkxZEdkV09rNjQwRmVj?=
- =?utf-8?B?TTBxcFJYSjBwSnZOME5vTTM3aDJyRUo2Q2krb09RVWNXZFl6MmlES3dDVzg4?=
- =?utf-8?B?OWlCTjAxeldGQkxPcjVvdXZlemhqVTBMZ0tlenRZMjhTMmt6VDNNeG5LbUNE?=
- =?utf-8?B?MFVNVjgrQy8vdnE2VmUrdz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZlFRSnJiMU1iTDJPMEgxVElRLzI3bnZyd2NhQmVmR0tTMnZvUzU1ZVJKcUVh?=
- =?utf-8?B?eUVJdWRjVXRBQlUyUGpkck1jNTNKSk1KRStIQjBWQ1RWVENsQUN3Y2RMN1Z2?=
- =?utf-8?B?cFI0ZFVkOHFwM2tNZk9XQjRSNFNVMDdpcUk1bzhGUjNVc1EvWTRkYnNubjVU?=
- =?utf-8?B?dFNqczNTUmdnS1NZUzh3ajYxeSs1VWVQaWJKcEJPWFZCUTRrN0QrQXF3Qkg4?=
- =?utf-8?B?emQyZ0JMeWMzUXpVZTZFcHp0OHh1dXlwdFlLZytGeHJ6ZTBGYy9Jd3QwdEsr?=
- =?utf-8?B?bEtFb1dGamdHUWNBbWFuaHA4QTdJL2hOT0tGMVFKM3luY3pZSG51QVRFVWNm?=
- =?utf-8?B?MC9ZZC9RbVBMc1U4WUJNVXljQ3dmUUNVeVNZclN5ZFlZdytLQTRsS0xTdHAz?=
- =?utf-8?B?TEJ5SXE4ODEwRzdUejlvNUx3OFVzZGltL1B0UDJrS1NSYVdxVFdudHV4aXN0?=
- =?utf-8?B?TWtRSjdSUUh5UWF3U3ZZRStHaTh5Q0Vwckc4RlFINDlCYk5BTEQ4OHU2Tjcw?=
- =?utf-8?B?VHNRWWw0THJpc0U1cXpzWEFpZ0pyWEROaEZ6cldXZzY5QzN4M1NTbk1MbWlx?=
- =?utf-8?B?dW9PNlgxSWZiaGIxa2hDVjBCK3NESDNTcy9HQzBtOFFmNU9BQklXem56NFJu?=
- =?utf-8?B?bG12K2hlVWloaUZtRkYwVUF5elhrWWxnNDBJRjN3ZlVZNVRHY2N1MUZKTzlX?=
- =?utf-8?B?VEZaci9wcEdtWnpTa1lMQmhVV1R6RVFPUkt4Y0sxZ01lYVpvTGNENGJ5YVZl?=
- =?utf-8?B?NEZnTUd0Q3FhR0xxaFhMaHQ2OEZtM1hzOWUybmtscGFBOGNpcGZZOGp6ZjVp?=
- =?utf-8?B?N0plVWMvY2h5ZlMzOXlqN0dmL3NlcDE3NTBOejZpT21YMWRMRVBLWXF1d1Z0?=
- =?utf-8?B?V3pmOFRud3pZTk5CcERLdWp0WTBLRkRObE82T2NCdnRBaFdWVXE2VW01Vzhy?=
- =?utf-8?B?aVZHQUhkMElTd2ZxQXpUUC8yVkZxTm55bjlZaVhvMzg0eGhEdExOdTBOTUJr?=
- =?utf-8?B?N1ZSakE4YzFRdmNhSVdueUtzOVd6ZW1wNGNoQVF0NUNWYmQvRjBBd1hnSnhK?=
- =?utf-8?B?K3NoSWtjOXovaTFvSml1eUF2TWhKVnhoaUliWlp5YmZGcFpocGE2VHQ2d0p4?=
- =?utf-8?B?NE5ucnAvUjVWa2gwSGRWSGY0N2NnNUxOTEhtV3BEUkQrK1ZML0hjVVRrMDVK?=
- =?utf-8?B?aklONlgzU2wzbG1pSlFGaGc2MWlLNVFpSlhoNjcrVjF6cFNuRkI3dDU2Zm5O?=
- =?utf-8?B?YlVEZzBoWDY4dVFMcTQ0NHA5bFp2MTR5eFJXTUhVazZpOTNsOTQ4bVRYU1VU?=
- =?utf-8?B?dXdmUjlMWmVwRXVHSElzNzZtUFpzNnUxaVNIYXZkZ2M3clJlbjIrMm94Yzhu?=
- =?utf-8?B?Nng0L083bkp2NHRhdW8wK1o0bFBML1JWdThtVFpleXRYZVpXY2JWQnpERmJD?=
- =?utf-8?B?RVZ3SjVCRkZ0ZENSa3lucjV3UXJxUCs5Nm81NXBndGNId2dmQ1RPSkpxV1h1?=
- =?utf-8?B?NldudzlUQXRtdzcxaHdRTE9BSGF4aDkxYktKTU1yOXV1UjRjdzRpajBYYTZG?=
- =?utf-8?B?eXNZTy9mR3cvZ0t3clZmLzQrM1FQUFlaWEVuT0VNQVZkbXZSOXlBclRsZXlR?=
- =?utf-8?B?Z1ZxV0FvNUxRb2hqcVl1eko3N3ZiSXFKSVd5REszSTdzK054SFBoa0RLZ1R1?=
- =?utf-8?B?SmRDRTlBbWNlU25TcGIvS1lqRDhQWWhtdjdKWWlRUDlHaU43UmhSTUFOWmc3?=
- =?utf-8?B?M0R3aUpDOE9wLzJqNnZxckhidElJc1pKVW5wdW9LckRUVytZS095V3hKMDFM?=
- =?utf-8?B?TVZNRUZReU5VWkZvWWg3UTlQWVBoZjRSVmhpRU9PdUwxdmUxbjk5Zzc1V0R5?=
- =?utf-8?B?QWJ2NnJEVHpMUmN4Q3RIMVBGYlJWTmFyUm9VZUxEZkdlRTVUNjhPd0Y3YmFl?=
- =?utf-8?B?RXk1TzU2QXF3V09nR2V6K1ZyMjF1YzErZGFiak5NcmNObnNYYjQ3Z2NRTWZZ?=
- =?utf-8?B?bmVmaXQzdE00d3FaaFpRTkI1MWZNRG00QTNLV0Fwc2wwV08xVHp3c3lYVmt3?=
- =?utf-8?B?OUpxN2w4c0svY3hRRWJsKzJqUE1EbUltT2EraENhc2hHYzRRMkNSaFA4R2tZ?=
- =?utf-8?B?Z0tJY0ROdmxrRXJkQUlqYnBXTW94RzlFeDhvdWF3dFd3UHJHa3lsd2VzZ1Ja?=
- =?utf-8?B?WUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a3301ec-ea08-484b-573f-08dcafc6ace6
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2024 12:05:13.6117
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GfbnKDkdtM47Vd2qJUDRN0Ng1RJNQdGW3M5StAIPNLDxtZA8bUDwFd8cP72QRvJ5Gdz/1rurA6Mh8M+LCpeB6Pl66B3jmLi9Ojs+Scj2K20=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7730
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxf8fHiKdmzbMEAA--.23083S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3ZrWrur17WrW7Ar4ktr4xAFc_yoW8GFyxJo
+	WfuF1fZr4Yyw18uFs2gFyDJFy5XFy5X3Z5tFZ7Cw4YyanavFWDJ3s8G393Xa45AFyFgFy7
+	A34rG3y7KFWxtF4rl-sFpf9Il3svdjkaLaAFLSUrUUUU5b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYA7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Jw0_WrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
+	0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+	xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8TCJPUUUUU==
 
-On 7/18/24 20:13, Kamal Heib wrote:
-> Add support for reporting fw status via the devlink health report.
-> 
-> Example:
->   # devlink health show pci/0000:02:00.0 reporter fw
->   pci/0000:02:00.0:
->     reporter fw
->       state healthy error 0 recover 0
->   # devlink health diagnose pci/0000:02:00.0 reporter fw
->   Mode: normal
-> 
-> Signed-off-by: Kamal Heib <kheib@redhat.com>
-> ---
-> v2:
-> - Address comments from Jiri.
-> - Move the creation of the health report.
-> ---
->   drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
->   .../net/ethernet/intel/i40e/i40e_devlink.c    | 57 +++++++++++++++++++
->   .../net/ethernet/intel/i40e/i40e_devlink.h    |  2 +
->   drivers/net/ethernet/intel/i40e/i40e_main.c   | 14 +++++
->   4 files changed, 74 insertions(+)
-> 
+V15:
+* Drop return that will not be executed.
+* Move pdev from patch 12 to patch 13 to pass W=1 builds.
 
-[...]
+RFC v15:
+* As Serge's comments:
+   Extend the commit message.(patch 7 and patch 11)
+   Add fixes tag for patch 8.
+   Add loongson_dwmac_dt_clear() patch.
+   Modify loongson_dwmac_msi_config().
+   ...
+* Pick Huacai's Acked-by tag.
+* Pick Serge's Reviewed-by tag.
+* I have already contacted the author(ZhangQing) of the module,
+  so I copied her valid email: diasyzhang@tencent.com.
 
-> +int i40e_devlink_create_health_reporter(struct i40e_pf *pf)
-> +{
-> +	struct devlink *devlink = priv_to_devlink(pf);
-> +	struct device *dev = &pf->pdev->dev;
-> +	int rc = 0;
-> +
-> +	devl_lock(devlink);
+Note: 
+I replied to the comments on v14 last Sunday, but all of Loongson's
+email servers failed to deliver. The network administrator told me
+today that he has fixed the problem and re-delivered all the failed
+emails, but I did not see them on the mailing list. I hope they will
+not suddenly appear in everyone's mailbox one day. I apologize for
+this. (The email content mainly agrees with Serge's suggestion.)
 
-if you are going to have just one health reporter, you could just use
-devlink_health_reporter_create() and avoid lock+unlock calls here
+v14:
 
-> +	pf->fw_health_report =
-> +		devl_health_reporter_create(devlink, &i40e_fw_reporter_ops, 0, pf);
-> +	if (IS_ERR(pf->fw_health_report)) {
-> +		rc = PTR_ERR(pf->fw_health_report);
-> +		dev_err(dev, "Failed to create fw reporter, err = %d\n", rc);
+Because Loongson GMAC can be also found with the 8-channels AV feature
+enabled, we'll need to reconsider the patches logic and thus the
+commit logs too. As Serge's comments and Russell's comments:
+[PATCH net-next v14 01/15] net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+[PATCH net-next v14 02/15] net: stmmac: Add multi-channel support
+[PATCH net-next v14 03/15] net: stmmac: Export dwmac1000_dma_ops
+[PATCH net-next v14 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
+[PATCH net-next v14 05/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+[PATCH net-next v14 06/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
+[PATCH net-next v14 07/15] net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
++-> Init the plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
+    in the loongson_gmac_data() method.
+[PATCH net-next v14 08/15] net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+[PATCH net-next v14 09/15] net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+[PATCH net-next v14 10/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
++-> Make sure the setup() method is called after the pci_enable_device()
+    invocation.
+[PATCH net-next v14 11/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
++-> Introduce the loongson_dwmac_dt_config() method here instead of
+    doing that in a separate patch.
++-> Add loongson_dwmac_acpi_config() which would just get the IRQ from
+    the pdev->irq field and make sure it is valid.
+[PATCH net-next v14 12/15] net: stmmac: Fixed failure to set network speed to 1000.
++-> Drop the patch as Russell's comments, At the same time, he provided another
+    better repair suggestion, and I decided to send it separately after the
+    patch set was merged. See:
+    <https://lore.kernel.org/netdev/ZoW1fNqV3PxEobFx@shell.armlinux.org.uk/>
+[PATCH net-next v14 13/15] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
++-> This is former "net: stmmac: dwmac-loongson: Add Loongson GNET
+    support" patch, but which adds the support of the Loongson GMAC with the
+    8-channels AV-feature available.
++-> loongson_dwmac_intx_config() shall be dropped due to the
+    loongson_dwmac_acpi_config() method added in the PATCH 11/15.
++-> Make sure loongson_data::loongson_id is initialized before the
+    stmmac_pci_info::setup() is called.
++-> Move the rx_queues_to_use/tx_queues_to_use and coe_unsupported
+    fields initialization to the loongson_gmac_data() method.
++-> As before, call the loongson_dwmac_msi_config() method if the multi-channels
+    Loongson MAC has been detected.
++-> Move everything GNET-specific to the next patch.
+[PATCH net-next v14 14/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
++-> Everything Loonsgson GNET-specific is supposed to be added in the
+    framework of this patch:
+    + PCI_DEVICE_ID_LOONGSON_GNET macro
+    + loongson_gnet_fix_speed() method
+    + loongson_gnet_data() method
+    + loongson_gnet_pci_info data
+    + The GNET-specific part of the loongson_dwmac_setup() method.
+    + ...
+[PATCH net-next v14 15/15] net: stmmac: dwmac-loongson: Add loongson module author
 
-you are not zeroing pf->fw_health_report here, so ...
+Other's:
+Pick Serge's Reviewed-by tag.
 
-> +	}
-> +	devl_unlock(devlink);
-> +
-> +	return rc;
-> +}
+v13:
 
-[snip]
+* Sorry, we have clarified some things in the past 10 days. I did not
+ give you a clear reply to the following questions in v12, so I need
+ to reply again:
 
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -15370,6 +15370,9 @@ static bool i40e_check_recovery_mode(struct i40e_pf *pf)
->   		dev_crit(&pf->pdev->dev, "Firmware recovery mode detected. Limiting functionality.\n");
->   		dev_crit(&pf->pdev->dev, "Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware recovery mode.\n");
->   		set_bit(__I40E_RECOVERY_MODE, pf->state);
-> +		if (pf->fw_health_report)
-> +			devlink_health_report(pf->fw_health_report,
+ 1. The current LS2K2000 also have a GMAC(and two GNET) that supports 8
+    channels, so we have to reconsider the initialization of
+    tx/rx_queues_to_use into probe();
 
-... you could possibly call devlink_health_report() with ERR_PTR as
-the first argument
+ 2. In v12, we disagreed on the loongson_dwmac_msi_config method, but I changed
+    it based on Serge's comments(If I understand correctly):
+	if (dev_of_node(&pdev->dev)) {
+		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+	}
 
-> +					      "recovery mode detected", pf);
->   
->   		return true;
->   	}
+	if (ld->loongson_id == DWMAC_CORE_LS2K2000) {
+		ret = loongson_dwmac_msi_config(pdev, plat, &res);
+	} else {
+		ret = loongson_dwmac_intx_config(pdev, plat, &res);
+	}
+
+ 3. Our priv->dma_cap.pcs is false, so let's use PHY_INTERFACE_MODE_NA;
+
+ 4. Our GMAC does not support Delay, so let's use PHY_INTERFACE_MODE_RGMII_ID,
+    the current dts is wrong, a fix patch will be sent to the LoongArch list
+    later.
+
+Others:
+* Re-split a part of the patch (it seems we do this with every version);
+* Copied Serge's comments into the commit message of patch;
+* Fixed the stmmac_dma_operation_mode() method;
+* Changed some code comments.
+
+v12:
+* The biggest change is the re-splitting of patches.
+* Add a "gmac_version" in loongson_data, then we only
+  read it once in the _probe().
+* Drop Serge's patch.
+* Rebase to the latest code state.
+* Fixed the gnet commit message.
+
+v11:
+* Break loongson_phylink_get_caps(), fix bad logic.
+* Remove a unnecessary ";".
+* Remove some unnecessary "{}".
+* add a blank.
+* Move the code of fix _force_1000 to patch 6/6.
+
+The main changes occur in these two functions:
+loongson_dwmac_probe();
+loongson_dwmac_setup();
+
+v10:
+As Andrew's comment:
+* Add a #define for the 0x37.
+* Add a #define for Port Select.
+
+others:
+* Pick Serge's patch, This patch resulted from the process
+  of reviewing our patch set.
+* Based on Serge's patch, modify our loongson_phylink_get_caps().
+* Drop patch 3/6, we need mac_interface.
+* Adjusted the code layout of gnet patch.
+* Corrected several errata in commit message.
+* Move DISABLE_FORCE flag to loongson_gnet_data().
+
+v9:
+We have not provided a detailed list of equipment for a long time,
+and I apologize for this. During this period, I have collected some
+information and now present it to you, hoping to alleviate the pressure
+of review.
+
+1. IP core
+We now have two types of IP cores, one is 0x37, similar to dwmac1000;
+The other is 0x10.  Compared to 0x37, we split several DMA registers
+from one to two, and it is not worth adding a new entry for this.
+According to Serge's comment, we made these devices work by overwriting
+priv->synopsys_id = 0x37 and mac->dma = <LS_dma_ops>.
+
+1.1.  Some more detailed information
+The number of DMA channels for 0x37 is 1; The number of DMA channels
+for 0x10 is 8.  Except for channel 0, otherchannels do not support
+sending hardware checksums. Supported AV features are Qav, Qat, and Qas,
+and the rest are consistent with 3.73.
+
+2. DEVICE
+We have two types of devices,
+one is GMAC, which only has a MAC chip inside and needs an external PHY
+chip;
+the other is GNET, which integrates both MAC and PHY chips inside.
+
+2.1.  Some more detailed information
+GMAC device: LS7A1000, LS2K1000, these devices do not support any pause
+mode.
+gnet device: LS7A2000, LS2K2000, the chip connection between the mac and
+             phy of these devices is not normal and requires two rounds of
+             negotiation; LS7A2000 does not support half-duplex and
+multi-channel;
+             to enable multi-channel on LS2K2000, you need to turn off
+hardware checksum.
+**Note**: Only the LS2K2000's IP core is 0x10, while the IP cores of other
+devices are 0x37.
+
+3. TABLE
+
+device    type    pci_id    ip_core
+ls7a1000  gmac    7a03      0x35/0x37
+ls2k1000  gmac    7a03      0x35/0x37
+ls7a2000  gnet    7a13      0x37
+ls2k2000  gnet    7a13      0x10
+-----------------------------------------------
+Changes:
+
+* passed the CI
+  <https://github.com/linux-netdev/nipa/blob/main/tests/patch/checkpatch
+  /checkpatch.sh>
+* reverse xmas tree order.
+* Silence build warning.
+* Re-split the patch.
+* Add more detailed commit message.
+* Add more code comment.
+* Reduce modification of generic code.
+* using the GNET-specific prefix.
+* define a new macro for the GNET MAC.
+* Use an easier way to overwrite mac.
+* Removed some useless printk.
+
+
+v8:
+* The biggest change is according to Serge's comment in the previous
+  edition:
+   Seeing the patch in the current state would overcomplicate the generic
+   code and the only functions you need to update are
+   dwmac_dma_interrupt()
+   dwmac1000_dma_init_channel()
+   you can have these methods re-defined with all the Loongson GNET
+   specifics in the low-level platform driver (dwmac-loongson.c). After
+   that you can just override the mac_device_info.dma pointer with a
+   fixed stmmac_dma_ops descriptor. Here is what should be done for that:
+
+   1. Keep the Patch 4/9 with my comments fixed. First it will be partly
+   useful for your GNET device. Second in general it's a correct
+   implementation of the normal DW GMAC v3.x multi-channels feature and
+   will be useful for the DW GMACs with that feature enabled.
+
+   2. Create the Loongson GNET-specific
+   stmmac_dma_ops.dma_interrupt()
+   stmmac_dma_ops.init_chan()
+   methods in the dwmac-loongson.c driver. Don't forget to move all the
+   Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
+
+   3. Create a Loongson GNET-specific platform setup method with the next
+   semantics:
+      + allocate stmmac_dma_ops instance and initialize it with
+        dwmac1000_dma_ops.
+      + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+        the pointers to the methods defined in 2.
+      + allocate mac_device_info instance and initialize the
+        mac_device_info.dma field with a pointer to the new
+        stmmac_dma_ops instance.
+      + call dwmac1000_setup() or initialize mac_device_info in a way
+        it's done in dwmac1000_setup() (the later might be better so you
+        wouldn't need to export the dwmac1000_setup() function).
+      + override stmmac_priv.synopsys_id with a correct value.
+
+   4. Initialize plat_stmmacenet_data.setup() with the pointer to the
+   method created in 3.
+
+* Others:
+  Re-split the patch.
+  Passed checkpatch.pl test.
+
+v7:
+* Refer to andrew's suggestion:
+  - Add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX #define's, etc.
+
+* Others:
+  - Using --subject-prefix="PATCH net-next vN" to indicate that the
+    patches are for the networking tree.
+  - Rebase to the latest networking tree:
+    <git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git>
+
+
+v6:
+
+* Refer to Serge's suggestion:
+  - Add new platform feature flag:
+    include/linux/stmmac.h:
+    +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+
+  - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
+     drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
+     +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000      /* ...*/
+     #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+     ...
+
+  - Drop all of redundant changes that don't require the
+    prototypes being converted to accepting the stmmac_priv
+    pointer.
+
+* Refer to andrew's suggestion:
+  - Drop white space changes.
+  - break patch up into lots of smaller parts.
+     Some small patches have been put into another series as a preparation
+     see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
+     
+     *note* : This series of patches relies on the three small patches above.
+* others
+  - Drop irq_flags changes.
+  - Changed patch order.
+
+
+v4 -> v5:
+
+* Remove an ugly and useless patch (fix channel number).
+* Remove the non-standard dma64 driver code, and also remove
+  the HWIF entries, since the associated custom callbacks no
+  longer exist.
+* Refer to Serge's suggestion: Update the dwmac1000_dma.c to
+  support the multi-DMA-channels controller setup.
+
+See:
+v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
+v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
+v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
+v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+
+Yanteng Si (14):
+  net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+  net: stmmac: Add multi-channel support
+  net: stmmac: Export dwmac1000_dma_ops
+  net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size
+    init
+  net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+  net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device
+    identification
+  net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
+  net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+  net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+  net: stmmac: dwmac-loongson: Introduce PCI device info data
+  net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
+  net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
+  net: stmmac: dwmac-loongson: Add Loongson GNET support
+  net: stmmac: dwmac-loongson: Add loongson module author
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 591 ++++++++++++++++--
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   4 +-
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  35 +-
+ .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  27 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  30 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |   5 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  19 +-
+ include/linux/stmmac.h                        |   1 +
+ 12 files changed, 603 insertions(+), 116 deletions(-)
+
+-- 
+2.31.4
 
 
