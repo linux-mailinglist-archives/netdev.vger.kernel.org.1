@@ -1,97 +1,127 @@
-Return-Path: <netdev+bounces-113547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7802893EFEB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:31:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 665FF93EFF4
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 10:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 340C61C21B00
-	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:31:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D3421F22700
+	for <lists+netdev@lfdr.de>; Mon, 29 Jul 2024 08:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35AF132112;
-	Mon, 29 Jul 2024 08:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A39413C3C9;
+	Mon, 29 Jul 2024 08:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dnP59uev"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DJLvhI1U"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89FD5E091;
-	Mon, 29 Jul 2024 08:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F755E091
+	for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 08:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722241908; cv=none; b=li1cZjlJKyDiFAKWlKddLzhPvZsNayjS6WZOC+hH7RZaFxDBE/Lk4buBlESgaY/IWOsgqAdH2pfnTC1c1Bax8WzSju61MvIEHlq9I5OyA5OMec5YacaHfMKpTafi6WqdifilE07QfROoJiDWrqmIQvKtnKl9mi9S+lSkSXMzDtA=
+	t=1722242078; cv=none; b=OPV9Qduko1qFvww+JvD/kObPT/F61Z+eSxcALimhW8+HtVu8E3ySgJ+d6RxW4qU6xnSP9lOjmVFMpTpL9Kl01SbHKzuoNPhNQCXa5tKrinADInZk/CHGhiClu9SdGS1zU+okDnmE213tPfcAKSweX7Tgj5raeLw1/ximIyCapY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722241908; c=relaxed/simple;
-	bh=fuLLUCUblCSBaCEqp25yXN2NDm/N1CDBpjjBkzNFyTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oNtq8ExzDMWyBQkRl2++hW55LyCGniFqGU8ixguHb51fzlpuNik70gf8SrBoLwWmy0UjO/GDtLi55AcFcKmv44nuHj6unCV4CapaUUPuUPgn/7XK+narQTvXIufKQbGuWr1IWGjHXhIaDc7MYrK7z3GzsMAUhPbAhMeK1brXVkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dnP59uev; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZAyMzjM5XGP3Hv8hnWC7x1zDyhNA08sxloeYoYKnnnk=; b=dnP59uevQ3k+gMGFzSU57svGQJ
-	cdCVm8xdgtfeTThw6K61MJCh7LWZwKlx5JXVfcQwmHTx1QtC4k80ua7CE4Q0J3jnGo/pJ3Zou31Ox
-	FJtKBG5fF5/9F+Z5pwtMl4ghg2wYsvKyqo9RCjFFvyXzZN6nR6Cr5xZt9/FakAjDF757bT8H/w1a7
-	DF0t0W+VoFQOvZwOfZFb01iKo4tjNeNBPTQX9ghLNq25tu6ymDCwDBoQdrHiyB6RTzY7sTYtDXwJx
-	ZC2ixwImCbGryTfC9r8PFp4R50i0/3KkiUF7G7w3V3A8+105c0jNImKKqGwSpDyJKhMJs9khPAvQd
-	VoG7fTFQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59652)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sYLn0-0003PN-2Z;
-	Mon, 29 Jul 2024 09:31:30 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sYLn3-0004Af-Np; Mon, 29 Jul 2024 09:31:33 +0100
-Date: Mon, 29 Jul 2024 09:31:33 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kamil =?iso-8859-1?Q?Hor=E1k_=282N=29?= <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v11 1/4] net: phy: bcm54811: New link mode for
- BroadR-Reach
-Message-ID: <ZqdTZZ5dGGvQtEoV@shell.armlinux.org.uk>
-References: <20240708102716.1246571-1-kamilh@axis.com>
- <20240708102716.1246571-2-kamilh@axis.com>
+	s=arc-20240116; t=1722242078; c=relaxed/simple;
+	bh=nuG/4vNf+Xo0PuptBC7376G+xBvvSdFJWnxk+gys6MQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vsfl94jq0p3jzwd97x82wL8vUCOyU/Y5bnVywrxiNUYguJ1rHLfyzuvmybvDeyzUmzt6peE8EK1gR/ozy0/2U8GkNmOWjRqLSTD7IYECdZ3u3pW4OCAAdUvToL+c3WPk0XY1GrQc0cuTs1+5HZEJGWOvaFSqLP657Jz4wj7xkC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DJLvhI1U; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722242075;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iQiICJ5lL4LLRuRe82xJT7UDszv9VsNI9xZ/zp+jqc8=;
+	b=DJLvhI1UkMtUajtuvBUjCJnsbJLciFXLn3ueXgk6gFJYCxjz5bJTZeoS1kSeVkHKYOIMWj
+	WxnJMKLQL2vQAI+Q1X1GAqKyoDUfFztT+9KMzdWbczLOTwmCxdzMiQUGtOf/zObwxf+k/q
+	bkYCJSTUl82M05tH93plWZhSuvWQ2+8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-317-fp6fsfEAMraFMdT2FWJpgA-1; Mon,
+ 29 Jul 2024 04:34:33 -0400
+X-MC-Unique: fp6fsfEAMraFMdT2FWJpgA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46EC61955BED;
+	Mon, 29 Jul 2024 08:34:30 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.136])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 599B71955D48;
+	Mon, 29 Jul 2024 08:34:22 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: dsimic@manjaro.org
+Cc: UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	f.fainelli@gmail.com,
+	gregkh@linuxfoundation.org,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	linux-kbuild@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	lucas.demarchi@intel.com,
+	masahiroy@kernel.org,
+	mcgrof@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	woojung.huh@microchip.com
+Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy module
+Date: Mon, 29 Jul 2024 10:34:19 +0200
+Message-ID: <20240729083421.11203-1-jtornosm@redhat.com>
+In-Reply-To: <b8a2831c4f2d49469d5af04c03bb1a5b@manjaro.org>
+References: <b8a2831c4f2d49469d5af04c03bb1a5b@manjaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240708102716.1246571-2-kamilh@axis.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Mon, Jul 08, 2024 at 12:27:13PM +0200, Kamil Hor·k (2N) wrote:
-> Introduce a new link mode necessary for 10 MBit single-pair
-> connection in BroadR-Reach mode on bcm5481x PHY by Broadcom.
-> This new link mode, 10baseT1BRR, is known as 1BR10 in the Broadcom
-> terminology. Another link mode to be used is 1BR100 and it is already
-> present as 100baseT1, because Broadcom's 1BR100 became 100baseT1
-> (IEEE 802.3bw).
-> 
-> Signed-off-by: Kamil Hor·k (2N) <kamilh@axis.com>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Hello Dragan,
 
-Does phylink also need to be updated? E.g. phylink_caps_to_linkmodes()
+> Quite frankly, all this makes me wonder why weakdeps were merged into
+> the mainline kernel [1] with no real consumers?  Perhaps this is good
+> time for Jose and Luis to chime in.
+Well, I requested this commenting as an example the case of lan78xx and
+the possible phy modules,  becasue it is clearly failing when initramfs
+is generated due to the dynamic phy module loading process.
+In my opinion this example was enough good because I found it difficult get
+an automatic way to get this information in advance for all the cases and
+becasue I need to fix this initramfs issue.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+But with a first glance, I also found several examples (not phy related),
+in which it seems the suitable softdep was added to solve the initramfs
+missing module issue:
+80f4e62730a9 drm/panfrost: Mark simple_ondemand governor as softdep
+0c94f58cef31 drm/lima: Mark simple_ondemand governor as softdep
+2ebe16155dc8 scsi: ufs: core: Add soft dependency on governor_simpleondemand
+dfe085d8dcd0 crypto: xts - Add softdep on ecb
+...
+
+Therefore, I requested to provide this  kind of new dependency (weakdep)
+first in general, becasue I thought it could be useful for a lot of cases
+not only for the unkown (for initramfs) phy modules (i.e. lan78xx).
+That is, in spite of the initial usage has been rejected, I think it can
+still be considered by the other commented examples (or new ones).
+I would like to confirm some example(s) to have some usage, but this will
+need to be from September after my holidays.
+
+Thanks
+
+Best regards
+Jos√© Ignacio
+
 
