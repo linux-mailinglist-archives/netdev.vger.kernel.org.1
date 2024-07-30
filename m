@@ -1,101 +1,137 @@
-Return-Path: <netdev+bounces-114131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2D12941137
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:53:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C596E941196
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 14:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BA19B244A1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:53:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 986A3B2A03E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4B6195F22;
-	Tue, 30 Jul 2024 11:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D13319DFAC;
+	Tue, 30 Jul 2024 12:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ugf7IYCj"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="grlfVSz5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA81166316;
-	Tue, 30 Jul 2024 11:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D14119DF8E;
+	Tue, 30 Jul 2024 12:08:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722340381; cv=none; b=G2NQ53NDX4dt8ggdcaffQ/AOwD9Q7QpOLpf5S7SDvr6HpbAVO8N/KB14Loxg1TsYcuoQXwmvVDXD1Pcz6sGOssPR9U3/Fk4er0SZWgziZtF1AaVsJ6wlYfHzGeYxNXtCVmL11tWuRZrJWZZpoQNWjdIT2dtzxJvUvAKqhdT9j78=
+	t=1722341327; cv=none; b=RM3RQc/CMhZoy97DZCXIaPQyEURQ29qqh1FmysTbJrAelOpTzdFTL7KYPsrA6ZcelXQE/WJc2S7P8kpSNUCt3FVpyMCg+9PKLriw3Z/azlB4k20X4XapsRekezINHXD4QmU903cCPlPUKqjd6/7OXVQ8FvL1KgU/YIgD3/PMwLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722340381; c=relaxed/simple;
-	bh=3U2t4PjSm3nGE8tUHltVJ/FufrtRhfcNuKwP2zsJLvE=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=hmdCz+rOJcujNqNUJ3zSdO2fqvH7fSCR2rx81FsS2jHt3S6Ydrlyd7ozoP0TgLKF2MwAgq1GHX7DNnvHh0c4nr5aZ9fZpfx0qhwucqAsz3eVt29y7kEN1WEzuuuR7ovDXz2L98AHYGYz+zmh9Bv5TuFXGLNrrMbQu7FYZrad92w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ugf7IYCj; arc=none smtp.client-ip=203.205.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1722340374; bh=rfuhs/Z+9bw5iQ2Bo/tcqR1/U5bKvoVkGTLb5omlojc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ugf7IYCjSzDJh/zWUzxMmY5bqU1VFwUqNyY7c6MmXLQUindOXi3E8lzqMY6q2epqC
-	 gK73xVYHQNfriLyvFuKJ9Fya2+JP5Zvv+SUZUCAoQIlFerBTV27pdwfmGokxjYV1LO
-	 OncFn+YpgGEYd+HNkgIPZdvcg0rzxiATJdhBe6uY=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
-	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
-	id BB1A7E97; Tue, 30 Jul 2024 19:46:49 +0800
-X-QQ-mid: xmsmtpt1722340009t3xxspdre
-Message-ID: <tencent_48A8AECCEEC30C8EE7C8C6F692C2064D4906@qq.com>
-X-QQ-XMAILINFO: OOPJ7pYMv25ttYYXMSLL7LDhJwHo7h14cxc7k5mpeuZwgYP8Mgv1XHhcsz0T9b
-	 7TwKBMYlbE/WcyWEdhBLspwEWyduLVLQ9sL1c7Y8ktRrqr9ckpBOBZ9YhP/ctFYI9iVT0nI6s/uq
-	 0GE6DMKC+DECxAxzO4G3bp02TFcLFaeHQ5Qw9mmheAZyWH42X4gtztPQjPuu6JlP3OZ3WKqh37mn
-	 tN7gey74LGv+D+j7bnCI1DREyy+zsJPLoBXCVT9sCdJd2CIVjHIYFfcSG2ea7XrHZlCgGUYEJkPK
-	 Rta2CchhEQqgrBYl0htASiWroGERVje13kIS4xdhNCsNt7+QmmR23+p1pxacHQs+fosNYAkQuEvu
-	 8Zi37Euz6c+fADGzWMyBYHBF9ffeCr+UGJKkTrIxgq3nRfX11W5yZMnPxs/sWJK9ZrLS/dEk8MxB
-	 RWjjtrrucIwa1Q0MtSZImZnePJElsJdKQZe2wyiqfgVQ/MQvrAy+cUm7da+w1s94bbE6Z2ncpCsb
-	 4Y2CLfvG2leTzmbmYmW5Db9M6XZsX6002O16yjNZhVcCt4jvQ20vazRqerVo8KhEl4rD/JMBDkFX
-	 zogRkkzWGy4C1HVh0m/OrYTLwXyL0Vr1XMxW3/4dvFJsDJ3v394dvGQeAfoukTe8LK69bRuKZS3W
-	 UL/GCnFEF5X3skDiUO5HSu3jOHsmviKsp6boWxddLNbIjBg850ay1xlHWSosusVTKFiMRMtV0yu9
-	 vpVmhKQLP/2r4hbcq2h1BThb86vXp5waYKlHT05eq9XiZC9RzRm6f+C/xvm7KHJrOiUHs/8chpOY
-	 aP+rLt6AsiKtFMDSzMc8dd89vy95ahoKFs1ml+OvYfHPn/gUVvVE07cJzk/wI+JdVSK6EhZEHx4h
-	 yFDvxHN7Iwc3MdYWz+QGCemrDvqAr3MVnKTRTP6IIFv8DDg3EaLws5Lpmyudw1t4ufqlOpIqtaUW
-	 n7SfZN0ZQ=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-From: Edward Adam Davis <eadavis@qq.com>
-To: kvalo@kernel.org
-Cc: eadavis@qq.com,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	srini.raju@purelifi.com,
-	syzbot+51a42f7c2e399392ea82@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] wifi: plfxlc: remove assert for mac->lock
-Date: Tue, 30 Jul 2024 19:46:50 +0800
-X-OQ-MSGID: <20240730114649.498184-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <877cd39nhg.fsf@kernel.org>
-References: <877cd39nhg.fsf@kernel.org>
+	s=arc-20240116; t=1722341327; c=relaxed/simple;
+	bh=G59Nwd7Jc6ZEt5wUtpcbCBpDf2emnwJYpQzoa37E3FM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qsX9yL/mk3+rwPFy0lu9VkL92Ya91i84+ciOh7LyZ8gpkeZGMVS5wYhNnxTco8SP8rhQMqhf3RhRpj1QGrfXhlwytTme9qrJqpRAMLVkoj0+KwXHF8IUgHqI3/H26wbpnN1g+f8kyzIRbm5wUe+pu3NsJvGuyk9zlx4XIUeVJ1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=grlfVSz5; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 46UC8GmE067205;
+	Tue, 30 Jul 2024 07:08:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1722341296;
+	bh=/lXOg0L8dVXlkFZBdB+ojALd2ZihbFA/rRCnQXeEcRc=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=grlfVSz5AYT/ms0te+8Iytf5z+av8tHkfIdv4srmU3+Dug5Xuu4cuS0KDjBSLDsUD
+	 Hy4pCk8+03Q2I4s4FKHCQQRF39ZEgFEzNzPKd04vXec2J0P7Qav+Woi1S0XNBdUW7+
+	 G9puQgW5ihsefTCDnnKTLC5f0iLrealD3wEKHcy0=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 46UC8Gea028049
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 30 Jul 2024 07:08:16 -0500
+Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 30
+ Jul 2024 07:08:16 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 30 Jul 2024 07:08:16 -0500
+Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 46UC8GHe012926;
+	Tue, 30 Jul 2024 07:08:16 -0500
+Date: Tue, 30 Jul 2024 07:08:16 -0500
+From: Nishanth Menon <nm@ti.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+CC: Suman Anna <s-anna@ti.com>, Sai Krishna <saikrishnag@marvell.com>,
+        Jan
+ Kiszka <jan.kiszka@siemens.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Kory Maincent <kory.maincent@bootlin.com>,
+        Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Santosh
+ Shilimkar <ssantosh@kernel.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Roger
+ Quadros <rogerq@kernel.org>,
+        Tero Kristo <kristo@kernel.org>, <srk@ti.com>
+Subject: Re: [DO NOT MERGE][PATCH v4 6/6] arm64: dts: ti: k3-am64: Add
+ ti,pa-stats property
+Message-ID: <20240730120816.unujbfewvcfd3xov@geiger>
+References: <20240729113226.2905928-1-danishanwar@ti.com>
+ <20240729113226.2905928-7-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240729113226.2905928-7-danishanwar@ti.com>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Tue, 30 Jul 2024 13:35:07 +0300, Kalle Valo wrote:
-> > syzbot report WARNING in plfxlc_mac_release, according to the context,
-> > there is not need assert for mac->lock.
+On 17:02-20240729, MD Danish Anwar wrote:
+> Add ti,pa-stats phandles to k3-am64x-evm.dts. This is a phandle to
+> PA_STATS syscon regmap and will be used to dump IET related statistics
+> for ICSSG Driver
 > 
-> The commit message should explain _why_ the assert is not needed.
-> Otherwise it looks that you are randomly removing it to get rid of the
-> warning.
-mac->lock is used to protect mac data, but after calling plfxlc_mac_release(), 
-there are two functions:ieee80211_unregister_hw() and ieee80211_free_hw(),
-there is no action to operate on mac data in these two functions, so mac->lock
-is not required.
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> Reviewed-by: Roger Quadros <rogerq@kernel.org>
+> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+> ---
+>  arch/arm64/boot/dts/ti/k3-am642-evm.dts | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm.dts b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
+> index 6bb1ad2e56ec..dcb28d3e7379 100644
+> --- a/arch/arm64/boot/dts/ti/k3-am642-evm.dts
+> +++ b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
+> @@ -253,6 +253,7 @@ icssg1_eth: icssg1-eth {
+>  		ti,mii-g-rt = <&icssg1_mii_g_rt>;
+>  		ti,mii-rt = <&icssg1_mii_rt>;
+>  		ti,iep = <&icssg1_iep0>,  <&icssg1_iep1>;
+> +		ti,pa-stats = <&icssg1_pa_stats>;
 
-On the other hand, there is no holding action for mac->lock before calling plfxlc_mac_release.
+Follow:  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/dts-coding-style.rst#n117
+for ordering properties.
+>  		interrupt-parent = <&icssg1_intc>;
+>  		interrupts = <24 0 2>, <25 1 3>;
+>  		interrupt-names = "tx_ts0", "tx_ts1";
+> -- 
+> 2.34.1
+> 
 
---
-Edward
-
+-- 
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
