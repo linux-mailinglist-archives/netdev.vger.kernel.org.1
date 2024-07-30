@@ -1,91 +1,108 @@
-Return-Path: <netdev+bounces-114282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89AC94204B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 21:06:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F37F3942050
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 21:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D32951C23618
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:06:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D001F2417A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8FF18A6A3;
-	Tue, 30 Jul 2024 19:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A64818C910;
+	Tue, 30 Jul 2024 19:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PmvF/gXw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPhkCUOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8D91AA3C5;
-	Tue, 30 Jul 2024 19:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9205D1AA3C3;
+	Tue, 30 Jul 2024 19:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722366397; cv=none; b=Nkk8riUiGZW4XWW1QYKw0OhYkpR0V1ZxnNKvYfEm/X5DR57e2H/RRorDs2zK8it81n+8VNAWLyiudiyTti0maAWz2yS+AyoYBX4Qc/vpH4BwKEm7f8R76rcvhgvtAv865xWwzFPbx5lrFMzZB5xfXIe8D4bXEfOyNg12Q4gFOjo=
+	t=1722366490; cv=none; b=hTaZ6QftlwnV0AukdfjmLsFMm19wqtu66ffXnyO8ZNooTFpsReEcF7w6V82ogDZZuqJuiLF8/tiI8RLEULWKQdvoJ0rQwjtsen777xdAj7v/CrkJM6Ep17RBShfwWzx38gySgtLKa1z2Hs9XyEvIhf+8ggECEi+SoPY1JOUbpfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722366397; c=relaxed/simple;
-	bh=otPqEQYFLD8H3akyUR9O8rU5UGmkX1M2I3WCn5i/vic=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g1SrNz7UC6XLTzxjLRssJrGzy8yJFEqOe1tADx4yO+eQnj8HLe+CiJSj+c14aaL8uKc88YCE6qFbPOsy0F5coDAsJmcsyXUOQcZPs2fHR/nD78TB92gOIo1Mx4Fm9VlAfwqQ+MICBkfoH7203VL26qNjveFi90mOae+IUIpTQQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PmvF/gXw; arc=none smtp.client-ip=207.171.188.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1722366490; c=relaxed/simple;
+	bh=xWVqs2258UHmA+CoMjBHPne4eFNjGXP4z5/g3OSO1M0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KXZbOXMwbFetxiiSi1n0ATN8YXrf739nw0HRUV4hQKoefQZwWjDrVSuFDE1QCnSrZvn8CjJZkAPs5CrV/jS0vocbCphsYXHQyhxUWe/Clg9XiQTC5Fx5flFUWpIw4Kc1Sw+QMkwElnFPD61Bknkhe+GTJ3cCk3VE+mPMVYrYF3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPhkCUOf; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2cf213128a1so3053562a91.2;
+        Tue, 30 Jul 2024 12:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722366396; x=1753902396;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NVf6enMgAn0nRp15Rba4pCbZQnD5Nx0jm9+QNNSc7gI=;
-  b=PmvF/gXwcorseZIPLbDsbAyh/0mWe6zLcPkOrg1UwF8BnWyLIroAkYzW
-   87xMmQDeF7QQ9hX7C3j0m6UO2t4x4AygF5RZTPqHK8oPwIc6RTIu0h4wL
-   Iuqe2fIX/kwpngNRZwSU1Do4PgcYK6gSUsTeTDRYUiiHwqJZzY6EFh4u0
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.09,248,1716249600"; 
-   d="scan'208";a="746459685"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 19:06:30 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:20946]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.198:2525] with esmtp (Farcaster)
- id b863f0b2-9293-430f-a8eb-88decde807f3; Tue, 30 Jul 2024 19:06:29 +0000 (UTC)
-X-Farcaster-Flow-ID: b863f0b2-9293-430f-a8eb-88decde807f3
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 30 Jul 2024 19:06:29 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 30 Jul 2024 19:06:27 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <dmantipov@yandex.ru>
-CC: <kees@kernel.org>, <linux-hardening@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>
-Subject: Re: [PATCH] net: core: use __counted_by for trailing VLA of struct sock_reuseport
-Date: Tue, 30 Jul 2024 12:06:16 -0700
-Message-ID: <20240730190616.84555-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240730160449.368698-1-dmantipov@yandex.ru>
-References: <20240730160449.368698-1-dmantipov@yandex.ru>
+        d=gmail.com; s=20230601; t=1722366489; x=1722971289; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dTVDxAQZ2aQnOrMxigVSHmZFXtubAHIkEkuQJGMu5g=;
+        b=OPhkCUOfSBc7MEomf7HSM1CDP0AI0df5F/03vFSCLTKD07oX4DN9XEWWrMzXXcBV7U
+         BCva7wA/jUCJ3o2FmXG6osx9kGcc7Zz/objFpjOx0xv5kp5PJYS+pSAYo7CO3EH/wrf5
+         EXA+SueEVcE6fAwbliMxXPl1XprpQUiuE+9dNFqxamT7E+0sCfgHObt8Q+uavbq4ec9c
+         s1rJluPaSBdfNFxUp2kDn4S9OVQjPCPa3Yg3+vvnVjp5mCMss9Dn466UUPk3kfF9NzA4
+         hGqC62q85yOyf4TWC7euocuQeY1y8lm06r6VD3rvwqaNb/6THPs77gCavBG6vrNswSJu
+         C/1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722366489; x=1722971289;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3dTVDxAQZ2aQnOrMxigVSHmZFXtubAHIkEkuQJGMu5g=;
+        b=oqgZPOY3AQBg+LBzoZ0v18wgUZiVdcwRXvVJ8R6NEU0/HDThT3U56gfPB97sNpAxbS
+         2eEsnyXdsJ7Z9FFXs+2MJlcHQtrU7QOA3gzWlst6VJow7Z2DM7JEvrttm5f9woPrK+Ls
+         bh2YduLMLl7uAEvrUbRmA4C0PMXmG6HKrKP8GMKFmWSOU025Le7nB7SvQH44uTL/ZQHC
+         gXNFYwiGhc4/IQ+ExxgqU+5Vtrp+2ZHRIa8evcXi5KZs0WyS4mGdg8GsxKrug9LROixo
+         Gt9Fp1Nigo9ET/2Uo/dwZi44om96GO6zcmkWFbVxfFVLnCleyjTijSADesLxKrcuM00F
+         KxOA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+zpURbRKdUUC2jwPB/TchM5NwDsLLlwLXDnzFa+iaFe1J/iMTIhGcRKzMAup+TxGFowHa1L99X33O93xafNAWUHoVrsTdc/Q8aIkE2l3XVV8nNY7Kkg9VGc8fTuwbgLIyZt58/yGKiHdWBn2iYt4HMmOeXY9hGC6G20KqpVFX/270seT2
+X-Gm-Message-State: AOJu0YxuMJ+3ehnSSYHFVaie8kFR99OvyNFUpCgrQqUYe0ga0kFX+Erp
+	INbgljDlX+3RP4A7FpK7duhwHEExAoCvPNyGk4jl8Ah9HTlROEvAPx9YHv/jM+GN4YyY8vKcsSJ
+	j86DkVjGQekQDZxK48Em3R/uglNo=
+X-Google-Smtp-Source: AGHT+IGNJYK/Ium/WCNQzS+rP7PQrChYbiOyOCwmjvXXunxfEbdjCBMO21zU0d51BgrfNl6NbgST69vFnsNcR/rjtX4=
+X-Received: by 2002:a17:90a:fc98:b0:2cd:2f63:a429 with SMTP id
+ 98e67ed59e1d1-2cf7e726968mr10165297a91.35.1722366488760; Tue, 30 Jul 2024
+ 12:08:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com> <8c2835ed-9066-4adb-8f8b-f38416d97849@redhat.com>
+In-Reply-To: <8c2835ed-9066-4adb-8f8b-f38416d97849@redhat.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Tue, 30 Jul 2024 20:07:57 +0100
+Message-ID: <CAJwJo6bzq9qo6i0UjqO9Ma0jdTedFS2GQNtQQbPzLUCg1a49Bg@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/7] net/selftests: TCP-AO selftests updates
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Date: Tue, 30 Jul 2024 19:04:49 +0300
-> According to '__reuseport_alloc()', annotate trailing VLA 'sock' of
-> 'struct sock_reuseport' with '__counted_by()' and use convenient
-> 'struct_size()' to simplify the math used in 'kzalloc()'.
-> 
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+On Tue, 30 Jul 2024 at 11:51, Paolo Abeni <pabeni@redhat.com> wrote:
+[..]
+> It looks like this is not well digested by the CI, e.g.:
+>
+> https://netdev.bots.linux.dev/flakes.html?tn-needle=tcp-ao
+>
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/705502/8-restore-ipv4/stdout
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Thanks Paolo!
+I see the 2 issues there, going to fix them up and resend v2.
+I guess, I'll wait a day or two to be polite and less disruptive to
+netdev testing.
+
+> BTW wearing for a moment Cato the censor's shoes, I note that patch 1 &&
+> 2 commit messages are quite more informal and less informative than the
+> average;)
+
+Yeah, fair enough. They are pretty trivial, but I should improve the
+messages there.
+
+Thanks,
+             Dmitry
 
