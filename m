@@ -1,92 +1,116 @@
-Return-Path: <netdev+bounces-114233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FCEB9419E8
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:37:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED8A941B8B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D11061C23757
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:37:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F6C0B2969A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B801898EC;
-	Tue, 30 Jul 2024 16:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC3B18990C;
+	Tue, 30 Jul 2024 16:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYx05w+l"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="U+jckZV0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475C11A619B;
-	Tue, 30 Jul 2024 16:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D2418801C;
+	Tue, 30 Jul 2024 16:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722357456; cv=none; b=rDNEmQcWpe9CNKWmqoC1ijuv3MtmyQKQtgFXydnB0Dxf4ONfPxPY/DJg3a3AilnMpidrxx/abv1l/XnR9bOKQVFMNxo//6Fi4Xo14YXLopGwi4XyijTo3xmlTtsjbwqDtk7kaAuxYCBFSE56LWZPbOJKOEGK/NhivBAFrZSf8Xg=
+	t=1722358381; cv=none; b=Fi0Bqf1bgES+nP6O8JAqTDECsLkxkoDSm6Io99JVudAWkEHy+TRsVJ7yGeSKGLvkSVbdoLspIDPTtIuYFK7iPK8yXGxcbW7bf3MqM+NxLizmt0ze/E08EIg7ohevV7DtnL8eXgzjh++AHtUyb/LV9URG9HsD3vFtL4/SwAnm6RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722357456; c=relaxed/simple;
-	bh=IZnrgju2UE3ttoRGRDJsGzu6kxTRyR3poGUPLXgoINI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S2GBGzIF7rpSEj9ZAWZnXNLMMqxsifRRVqvG/z59/zxXA3NaZXeSkpmWXG6C+0nMK0hxOWYwsKCGZmwe/GsTyY13kncRVgFXh8/2QZDZa6h0m8IAgGnZX41xq4H+oge2MZsixOupxBCgMuncOXfF/rz5vVfG6PNo9XdmVg1LCOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYx05w+l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 403A6C32782;
-	Tue, 30 Jul 2024 16:37:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722357456;
-	bh=IZnrgju2UE3ttoRGRDJsGzu6kxTRyR3poGUPLXgoINI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DYx05w+lggKad+7kxiOgbr3aKEnJcYXVTcXpmJO1psJ0eXGxezWdzPfeQ7m7yfbnj
-	 Odo7L/ufXiILOqVGaWgqQL57V/HWqSWUA1vEbTzj9YpeQyPNshVNDfvayjAhGeCFsn
-	 ND2RFfavrtRypdFsjgj4KkbBGhryQi7ZXF2MpNVaAtoXXbkTubysnkO55Q0X6zAd+r
-	 8kkWTaz4YmZzEAf2dAjeLq6ZylejpAeUaWIktYWkceR5d3H/+4X4E2PpSLeEZS8dIS
-	 xrzwTH9EqndBn6IAMN+lH5U5+p+VF/ex0sngo2SoQ3nCrjkmjp8STkDkmWC9QwTwMR
-	 2RaO6Vn/jjc0Q==
-Date: Tue, 30 Jul 2024 17:37:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: kernel@pengutronix.de, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Elaine Zhang <zhangqing@rock-chips.com>,
-	David Jander <david.jander@protonic.nl>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH can-next 11/21] can: rockchip_canfd: add functions to
- check if CAN-FD frames are equal
-Message-ID: <20240730163730.GC1967603@kernel.org>
-References: <20240729-rockchip-canfd-v1-0-fa1250fd6be3@pengutronix.de>
- <20240729-rockchip-canfd-v1-11-fa1250fd6be3@pengutronix.de>
+	s=arc-20240116; t=1722358381; c=relaxed/simple;
+	bh=acYkmx7Yj8SYjPzp076P9isbfl8X0+qYp4Ms1MYvVR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=leLV/ELZZDuTjEbsKC8D/xIHgW3jghIbvNLSUJFhrxz7P7vsVIPlIwOCzouAWdA/VGOYdib4An9iOTRO3F+X0ye/fmvQksSYqs0VV4gSYzBb2L3/VpUN8sBYVlBmYVyCejDwfsrnYFfGYfKmkpArhJDa8s89lAZiy4YQVkbGZt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=U+jckZV0; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 76D6B120007;
+	Tue, 30 Jul 2024 19:52:53 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76D6B120007
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1722358373;
+	bh=KLiTVr2w5RM4rRcfqLd3HLJ6BUMlDc+UogIM6fL3jyA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=U+jckZV0lF6/nktaviqUpB9QWpKZ06bSA5nKna95gYkPvul1lkIBb2cFM8BYMmUcH
+	 TgH+M9jgyeT7zyZVwy23k+SWNWwrWT/lr5O+ZPTuT6JNkY9y2gcngS+k/BAQvbMs+y
+	 /djj49R67rVazN97GwFt83B4XsQb9bLhIZ2l6CVmPZsKcAgfXgqccb+h2Tzi0ZpMyx
+	 uHDc+OerhWlHH5A3R8UGaTuG0Dk8S8m5EASRDJpXjsvTukCYJfnEkmxrANpd6sovf2
+	 YmnPlxpV77UoHxh/tzMKAp22ZTomr05YVr5+EYvc1kP6yl/W+mr9CzBr3Syi4CdcOI
+	 c5jQ0wjbYV7lA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 30 Jul 2024 19:52:53 +0300 (MSK)
+Received: from [172.28.192.160] (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 30 Jul 2024 19:52:52 +0300
+Message-ID: <510e1114-abac-7ad3-c690-94b8b14ffe69@salutedevices.com>
+Date: Tue, 30 Jul 2024 19:40:32 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240729-rockchip-canfd-v1-11-fa1250fd6be3@pengutronix.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v1] MAINTAINERS: add me as reviewer of AF_VSOCK and
+ virtio-vsock
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20240728183325.1295283-1-avkrasnov@salutedevices.com>
+ <20240730084707.72ff802c@kernel.org>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20240730084707.72ff802c@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186794 [Jul 30 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 24 0.3.24 186c4d603b899ccfd4883d230c53f273b80e467f, {Tracking_arrow_text}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/07/30 15:23:00 #26184428
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Mon, Jul 29, 2024 at 03:05:42PM +0200, Marc Kleine-Budde wrote:
-> Add a pair new functions to check if 2 struct canfd_frame are equal.
-> The 1st checks if the header of the CAN frames are equal, the 2nd
-> checks if the data portion are equal:
+
+
+On 30.07.2024 18:47, Jakub Kicinski wrote:
+> On Sun, 28 Jul 2024 21:33:25 +0300 Arseniy Krasnov wrote:
+>> I'm working on AF_VSOCK and virtio-vsock.
 > 
-> - rkcanfd_can_frame_header_equal()
-> - rkcanfd_can_frame_data_equal()
+> If you want to review the code perhaps you can use lore+lei
+> and filter on the paths?
 > 
-> This functionality is needed in the next patch.
+> Adding people to MAINTAINERS is somewhat fraught.
 
-nit: I would squash this into the next patch as
-     rkcanfd_can_frame_header_equal() is defined but
-     unused in this patch, which is flagged by
-     allmodconfig W=1 builds.
+Ah ok, got it.
 
-...
+Thanks, Arseniy
 
