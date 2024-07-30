@@ -1,79 +1,126 @@
-Return-Path: <netdev+bounces-114110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFBF940FA7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:41:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBD5940FB9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:43:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61F2EB28D84
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:40:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D65B285990
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93834198A29;
-	Tue, 30 Jul 2024 10:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qbz+i/Cc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F2819E81D;
+	Tue, 30 Jul 2024 10:36:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A6518E771;
-	Tue, 30 Jul 2024 10:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0C319E812;
+	Tue, 30 Jul 2024 10:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722335711; cv=none; b=N/itRyVinH1VrD2zPyqVmLYgq70f80g5oy5Y2dwTeepC3viSLxrfm9Bire0qtA3Yzs/HOojJk7FukGpj2sxpSNopXO53fjZRNF3nhm/rc94ORwh/u7Cv2EHYdb68vnBYZVlWVC6OdfZxQDWZY6QwW16M9zBneXfyKR3zpm0vBFE=
+	t=1722335819; cv=none; b=qAL9nSt5JfhYjUFur92JHouzXevKMtSNudDbT5lrz/XEVLAVEpFAFHaZfc6U3SykaTuGjhnjrt9NFelxAFPzcqlLrO5l88Vt04wwx1jESnq9lCKNhEMf0EO6CAZLHTB0miqeLja81tg+b4nkc/ZS/jCMUZsvR39nd1DCnMLeLTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722335711; c=relaxed/simple;
-	bh=OqxNeHY/v/ofIyNQ5/aXLZvlFKdi959PW4sxej3ug0g=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=MSk6LFgFDcSWZRhRnpupppVLIRzIkxyvQEmgb7x27HAUG7HpJL227slnttkEkf9bQJ0CX25P0tvBfsJSLEiERqOKOvDawQUF5Jif3XDNhWFWWEZUCnqTlIxKpLNKEyqlLXvXuihlDe5RRDJL/PUTqPe6NrTqwjN7LaMKwk9ISEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qbz+i/Cc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FC1EC32782;
-	Tue, 30 Jul 2024 10:35:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722335711;
-	bh=OqxNeHY/v/ofIyNQ5/aXLZvlFKdi959PW4sxej3ug0g=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=Qbz+i/Cco0lnSDPNjQN+SaRbmxOshKdQC6MssEjqIU6ejREpmK2scACSon+eU76dg
-	 uYe69ibi8IJzSVqVr6vW7wUgyQ+/dY4vSQ1fT5X2mahlxnoruM8yo6Vki9v1RBpyXM
-	 tyhgbPaHcNhjnkWPiQoJ2cqOaZ6LKsWbw0Hoh79JzhlFVDlux2rIJotqegxuDVKsE2
-	 2CqnoHRtQ7Y5hwcGE5+uoj6u0AHG6RIKT077wAOsCcCFVC1BwSMwPuirOAVejpkbWo
-	 Hc26awOAqsbdxOZ6koziZZmWFOB2G0t+LSQLJ2IP17Y7hlfHGlmdc5aN5ArUqIv3lH
-	 kZ73tPfdGQbAA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: syzbot+51a42f7c2e399392ea82@syzkaller.appspotmail.com,
-  linux-kernel@vger.kernel.org,  linux-usb@vger.kernel.org,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  srini.raju@purelifi.com,  syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] wifi: plfxlc: remove assert for mac->lock
-References: <000000000000ac553b061e675573@google.com>
-	<tencent_03969636CA4BC874A7763F66D23D15366009@qq.com>
-Date: Tue, 30 Jul 2024 13:35:07 +0300
-In-Reply-To: <tencent_03969636CA4BC874A7763F66D23D15366009@qq.com> (Edward
-	Adam Davis's message of "Tue, 30 Jul 2024 12:28:42 +0800")
-Message-ID: <877cd39nhg.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1722335819; c=relaxed/simple;
+	bh=ETc4q9fG3Gz3Wa40kMG9naoXXXZm2HLJBKTB9l1Lh7E=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=TxIHqb0AovR7wATR0csE1CAQ/gMkP25/nPcPD669DY4YTDg4AhYm53S14ZVApBVCLuwGc+ngK0FkhffYWt4+p2MCC8fOPTHe2K4tGUIigCtiP5odlvdj9qZvGLQzqhfgCjbY8FvghkQFU3SM8VGw3nBQIybvywB87QsnIkwyJKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sYkDp-000000000le-27fR;
+	Tue, 30 Jul 2024 10:36:49 +0000
+Date: Tue, 30 Jul 2024 11:36:42 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next v3] net: ethernet: mtk_eth_soc: drop clocks unused
+ by Ethernet driver
+Message-ID: <b5faaf69b5c6e3e155c64af03706c3c423c6a1c9.1722335682.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Edward Adam Davis <eadavis@qq.com> writes:
+Clocks for SerDes and PHY are going to be handled by standalone drivers
+for each of those hardware components. Drop them from the Ethernet driver.
 
-> syzbot report WARNING in plfxlc_mac_release, according to the context,
-> there is not need assert for mac->lock.
+The clocks which are being removed for this patch are responsible for
+the for the SerDes PCS and PHYs used for the 2nd and 3rd MAC which are
+anyway not yet supported. Hence backwards compatibility is not an issue.
 
-The commit message should explain _why_ the assert is not needed.
-Otherwise it looks that you are randomly removing it to get rid of the
-warning.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+---
+The dt-bindings part has been taken care of already in commit
+cc349b0771dc dt-bindings: net: mediatek: remove wrongly added clocks and SerDes
 
+Changes since v2:
+Target net-next tree and drop Fixes: tag.
+
+Changes since v1:
+Improve commit message and explain why backward compatibility is not an issue,
+as requested by Andrew Lunn. Patch content remains unchanged.
+
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+index eb1708b43aa3e..0d5225f1d3eef 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+@@ -724,12 +724,8 @@ enum mtk_clks_map {
+ 	MTK_CLK_ETHWARP_WOCPU2,
+ 	MTK_CLK_ETHWARP_WOCPU1,
+ 	MTK_CLK_ETHWARP_WOCPU0,
+-	MTK_CLK_TOP_USXGMII_SBUS_0_SEL,
+-	MTK_CLK_TOP_USXGMII_SBUS_1_SEL,
+ 	MTK_CLK_TOP_SGM_0_SEL,
+ 	MTK_CLK_TOP_SGM_1_SEL,
+-	MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL,
+-	MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL,
+ 	MTK_CLK_TOP_ETH_GMII_SEL,
+ 	MTK_CLK_TOP_ETH_REFCK_50M_SEL,
+ 	MTK_CLK_TOP_ETH_SYS_200M_SEL,
+@@ -800,19 +796,9 @@ enum mtk_clks_map {
+ 				 BIT_ULL(MTK_CLK_GP3) | BIT_ULL(MTK_CLK_XGP1) | \
+ 				 BIT_ULL(MTK_CLK_XGP2) | BIT_ULL(MTK_CLK_XGP3) | \
+ 				 BIT_ULL(MTK_CLK_CRYPTO) | \
+-				 BIT_ULL(MTK_CLK_SGMII_TX_250M) | \
+-				 BIT_ULL(MTK_CLK_SGMII_RX_250M) | \
+-				 BIT_ULL(MTK_CLK_SGMII2_TX_250M) | \
+-				 BIT_ULL(MTK_CLK_SGMII2_RX_250M) | \
+ 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU2) | \
+ 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU1) | \
+ 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU0) | \
+-				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_0_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_1_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_SGM_0_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_SGM_1_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL) | \
+-				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL) | \
+ 				 BIT_ULL(MTK_CLK_TOP_ETH_GMII_SEL) | \
+ 				 BIT_ULL(MTK_CLK_TOP_ETH_REFCK_50M_SEL) | \
+ 				 BIT_ULL(MTK_CLK_TOP_ETH_SYS_200M_SEL) | \
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.45.2
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
