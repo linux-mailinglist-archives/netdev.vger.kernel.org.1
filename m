@@ -1,84 +1,50 @@
-Return-Path: <netdev+bounces-114040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F0A8940C24
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:47:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3FD940C56
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAE781F286FD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:47:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 312B81F2344E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA7619415C;
-	Tue, 30 Jul 2024 08:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4D6194A7E;
+	Tue, 30 Jul 2024 08:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUEn6ha8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="faJf7yM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9340193099;
-	Tue, 30 Jul 2024 08:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48C01940B3;
+	Tue, 30 Jul 2024 08:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722329202; cv=none; b=cfHACwksYN8vGEqA6WKH2DmC1k5gYG92k9O0bWyu8gayYBr34gTi80Pq8Bza6GMelAXoOoJXFYKRvbg9bW1qnfV6vQTUPmIcdNuKah/NLLbW+iHpL4kLw7GbuUIty2duFECtCcFchoVtUJXrq8IOu1tiJ2vy1QX62T8Y2jflM9o=
+	t=1722329438; cv=none; b=QnbzlM+os3jXf2jTzgrqF71+za+l6QZrGZ43Q6kp8l38W2CnCdCXHiqCgsX6fyMJKJXc3VN2bqanVAxkckWbnMVCHQ1aMZVp9m3RYtIoBFmSI9XwcwQkYxIkj4v7osvNWlqy0jrCl41O4ILi8+4Jcq2Eb64paiZOk9eqYRtvKwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722329202; c=relaxed/simple;
-	bh=b4LKj5n8JEGCAFCr0XTCE2Vt4PRZBGKVYg2iWYChsqc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f1tolCUxeBebT99Hc4Wux799uOTxvX1D2eHTwNWfpYs92mhuZW90FkSOynQ1QbVdLFOzQyK5KVO8FJlH4vnfQlKC6dNYSil98uqR/W8qbQRtOLL7knZTdKGTRpL/eS8iAw6RSDeTjHwlFiPlNnjYbj7NSJ8Qq1k1a2vAkFt7wO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUEn6ha8; arc=none smtp.client-ip=209.85.210.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-70d1c8d7d95so2606217b3a.2;
-        Tue, 30 Jul 2024 01:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722329200; x=1722934000; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+JfbO8SiiD7QjLOWye4GDcjfYdtq1pCx+OMdv4xqVP0=;
-        b=KUEn6ha8B/sz2xzW7SaJb3eC3ESgVk4ghaTiruM79QoWG2nXLGohAQUt3OukNpJtlC
-         PVbhyuiqVQVBxw2qnPzeA/CqXnd5N9PgjLHiMgccEwUjepo6lgOjjdIsoOg5nko+7/0s
-         DC5J0ZiCsR12HQOSSaYJvOcueimuwnmRZ038ryMqpkpXRUvWPpVXlzySpIZ6/18hAP3R
-         Wjk0yadSxbIkclATf5lIXRuF0bsJDu5nAFCrKr9tdgCejK2BjnKVki0I4nReYv8abSKR
-         kMhlSa4Gjt3MHH/YlXCrgXOQcHgXFkPItlbafKdNK7Q+/Vb01PbccPLXNYfKmGT7toI/
-         ZaWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722329200; x=1722934000;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+JfbO8SiiD7QjLOWye4GDcjfYdtq1pCx+OMdv4xqVP0=;
-        b=KZ4cOBFSUuW1BZ1YZaMSCw9XC6xVYZMyFBX6KVmVfnBIO0ZhYwrpk3aLW6bykx6qVo
-         FT9fi5RBwx9xF35EIid/HSOurZO++G0zLg2fFz1ULU35I+1NoFPUp5vrVWf4gwnubKik
-         bHY+UfbzBz79m+S9H4T8kQVM910Fhdnu5Y1nfRsynbO0+hkvFakOyqAUD7WMFP3pw2WS
-         nSrBa5gTpbqDkXiLNNX6qhdBVaFf4pPFrBCCW5mLmCOtr3mKBoqufZ2IgGN4/y3+OzEF
-         WdHXBZhinWWHNBjoVgcK7ZEnoOc5h4Ke3tYZRJJVPvRGNmS+9Uyb77zPKa9NN1UItfVc
-         LxdA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6tkcBHfpgtCj4Sfk4SxIm+WnKBheqyYcIvihfhwkjVoFWJjnKiwH3PwiL8V6ijvj9D7x+OkZedWVyhpG4/mcxcQgr/e4BarE5weAL
-X-Gm-Message-State: AOJu0YysDnrqkMnFQnOZagpQHU+UktLv2r6dkVZz4eIZ4Bi3EMFFtlSp
-	IkatsOzRhlmeOnhZsb/m7ne1CfE49ewhk1AGOPWg0i0YtDlmiE9/
-X-Google-Smtp-Source: AGHT+IFQuHjLUgaNkWjNiK7mJEi9/3hLzHn67EugJva8Qbb2ioG5mLhyCfZDiRuQR7NHgrAG7lHKwg==
-X-Received: by 2002:a05:6a20:9e4b:b0:1bd:1df4:bd43 with SMTP id adf61e73a8af0-1c4a14fdcd6mr8385337637.54.1722329199545;
-        Tue, 30 Jul 2024 01:46:39 -0700 (PDT)
-Received: from localhost (66.112.216.249.16clouds.com. [66.112.216.249])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb73efdf2sm11967837a91.29.2024.07.30.01.46.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 01:46:39 -0700 (PDT)
-From: John Wang <wangzq.jn@gmail.com>
-X-Google-Original-From: John Wang <wangzhiqiang02@ieisystem.com>
-To: Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2] net: mctp: Consistent peer address handling in ioctl tag allocation
-Date: Tue, 30 Jul 2024 16:46:35 +0800
-Message-Id: <20240730084636.184140-1-wangzhiqiang02@ieisystem.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1722329438; c=relaxed/simple;
+	bh=7xEjnu+XxywJICOBC6mbxvdShii78kN4dRkz0XvgP/4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fcmk6gxT+lQXyClvR23bXhZt9f4oToFk92VfmRAdQ0J5oiwXE6taDYwi66pZrlFfvCsGKo0r+B8EemBKlVsrR8KknXcSYSY8LJUEZ9TCeNgxe7yb0Yco9xlqVnkrBWVbcrWOLMK4xgw2YbIz8DQIIFwKI+nBZN60Ciggb/Ptqng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=faJf7yM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6148AC4AF0B;
+	Tue, 30 Jul 2024 08:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722329437;
+	bh=7xEjnu+XxywJICOBC6mbxvdShii78kN4dRkz0XvgP/4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=faJf7yM4pW/Z8oVEhOY0PK+6doI9ABS/OqbbgJ8IIBlA0uejeK9fyfJYCK2Y8uoIJ
+	 XeHWOozrBdwiqcjqM9/LPcCk+ac0aWyaz9jE+zHJXuktyX/zkAg8MEUxJnRIkHKOCx
+	 4g65iScziMyJM4vt7SbCyOcq/+7MBcvIp4eE6pX4wLTu4FEB3KTgNXi5a8eSwm4+px
+	 5qtTgBm3FTVRuLUkC5I5gm47Z0QJ+eNTJJh3HQKCTusaFwtbW+g4CiDjKUUjd/FoA+
+	 5Ve4ay9Ff4eQ9vTr42bD/1Al0YVRfvaeCP/knmx7ZIQhzBp3cGDJULprkEms7PCAJ4
+	 TrSFL++L889CQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 512B0C43619;
+	Tue, 30 Jul 2024 08:50:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,37 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/7] mptcp: fix inconsistent backup usage
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172232943732.24083.9277579847408417971.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Jul 2024 08:50:37 +0000
+References: <20240727-upstream-net-20240727-mptcp-backup-signal-v1-0-f50b31604cf1@kernel.org>
+In-Reply-To: <20240727-upstream-net-20240727-mptcp-backup-signal-v1-0-f50b31604cf1@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ fw@strlen.de, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ stable@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org
 
-When executing ioctl to allocate tags, if the peer address is 0,
-mctp_alloc_local_tag now replaces it with 0xff. However, during tag
-dropping, this replacement is not performed, potentially causing the key
-not to be dropped as expected.
+Hello:
 
-Signed-off-by: John Wang <wangzhiqiang02@ieisystem.com>
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
----
-v2:
-  - Change the subject from 'net' to 'net-next'
-  - remove the Change-Id tag
----
- net/mctp/af_mctp.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Sat, 27 Jul 2024 12:01:22 +0200 you wrote:
+> In all the MPTCP backup related tests, the backup flag was set on one
+> side, and the expected behaviour is to have both sides respecting this
+> decision. That's also the "natural" way, and what the users seem to
+> expect.
+> 
+> On the scheduler side, only the 'backup' field was checked, which is
+> supposed to be set only if the other peer flagged a subflow as backup.
+> But in various places, this flag was also set when the local host
+> flagged the subflow as backup, certainly to have the expected behaviour
+> mentioned above.
+> 
+> [...]
 
-diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
-index de52a9191da0..43288b408fde 100644
---- a/net/mctp/af_mctp.c
-+++ b/net/mctp/af_mctp.c
-@@ -486,6 +486,9 @@ static int mctp_ioctl_droptag(struct mctp_sock *msk, bool tagv2,
- 	tag = ctl.tag & MCTP_TAG_MASK;
- 	rc = -EINVAL;
- 
-+	if (ctl.peer_addr == MCTP_ADDR_NULL)
-+		ctl.peer_addr = MCTP_ADDR_ANY;
-+
- 	spin_lock_irqsave(&net->mctp.keys_lock, flags);
- 	hlist_for_each_entry_safe(key, tmp, &msk->keys, sklist) {
- 		/* we do an irqsave here, even though we know the irq state,
+Here is the summary with links:
+  - [net,1/7] mptcp: sched: check both directions for backup
+    https://git.kernel.org/netdev/net/c/b6a66e521a20
+  - [net,2/7] mptcp: distinguish rcv vs sent backup flag in requests
+    https://git.kernel.org/netdev/net/c/efd340bf3d77
+  - [net,3/7] mptcp: pm: only set request_bkup flag when sending MP_PRIO
+    https://git.kernel.org/netdev/net/c/4258b94831bb
+  - [net,4/7] mptcp: mib: count MPJ with backup flag
+    https://git.kernel.org/netdev/net/c/4dde0d72ccec
+  - [net,5/7] selftests: mptcp: join: validate backup in MPJ
+    https://git.kernel.org/netdev/net/c/935ff5bb8a1c
+  - [net,6/7] mptcp: pm: fix backup support in signal endpoints
+    https://git.kernel.org/netdev/net/c/6834097fc38c
+  - [net,7/7] selftests: mptcp: join: check backup support in signal endp
+    https://git.kernel.org/netdev/net/c/f833470c2783
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
