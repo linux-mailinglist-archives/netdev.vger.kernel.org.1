@@ -1,128 +1,138 @@
-Return-Path: <netdev+bounces-114106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04F0940F79
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:34:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB94F940F81
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:34:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F7211C22A79
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:34:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18E1F1C209AD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B2A1A01B7;
-	Tue, 30 Jul 2024 10:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D794B166300;
+	Tue, 30 Jul 2024 10:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LsQfo002"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PD9tY4PT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E151A01AF
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494A140BF2
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722335351; cv=none; b=VNCFuUUeQ3kE48QgG6oO5/PIgPwIh73UtNXJobiMASJwFYxYQS4u5wfJLPeJPJ3RZgirqtk5KGbDW/WgDcgmQTz1byn5GeOyqqwgqfPAfH9kCkh1RrE/YVTrGmMMV2Uutd8VWtFbTO45nmYPpVE6iiPlW/EVNo+a6gaLbS046sQ=
+	t=1722335412; cv=none; b=YAczcH1fzOfqKqaZZyDFlbNfZx/3BoQ/Aj1Mfxhd/wLn9JSKW2atXG7Rr0SnV4AoLXZyfu1Iyeb1bDAUVXeY9+xwyzha5eveJw8rcj0zlDBq7JjGx0gYflb8lu3zRUTPX/J80T+9OQPFVpBDR4xIJoJbqWR/yafveiezJQwZadc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722335351; c=relaxed/simple;
-	bh=+EXiI6Hi4bCwpc12uz2sKT7AB87QLqFQRMBMmdEGR+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qk9zoqC4IlnAC/N1FywODbY8GYynO4P9FGV3oQsc0hlmyPSYQ3H2OojaCuzPbURRK3YyphtOzercsCVs4t4Dfzh2O24kNPolxj1iwpJZBWy6F5EUMgq4DSOvsNz/1qXr5WZeEvPVxuVqUJrRIOP9qmwYuiIwP+9nBlb74vsLaw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsQfo002; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A3EC32782;
-	Tue, 30 Jul 2024 10:29:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722335351;
-	bh=+EXiI6Hi4bCwpc12uz2sKT7AB87QLqFQRMBMmdEGR+I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LsQfo002tyk4otb6TmwUkFBd/hQaIYNdPZ73pCpa//ZnAKeQf5TpZGDUBIfwcNtke
-	 txt5rjnGoiDm0m+YWJoCXeTgu6d0MnyjQgCI4Wz3Pq2EHSuWOLC84DAtqBb72W2pMy
-	 Pv6f5uafRXRxBkQ1mc1x8yv3xT5mcSa+j1CZ6pNy7bkWmqwqIHbutSaNybD3aTybNv
-	 aHo7P6X0OcOKTiuNp8MIWs5ipznnVXaxbElubXDsHONRsWsdVqkXH6eNMy85dR8qy4
-	 dJrDjwU3GDGI5R2+xACIK8WOspG6QP7jmEI6rFBEG1spx4CfSbsYTgmKnjdokqNBlE
-	 OFZtAwB6ljg9g==
-Date: Tue, 30 Jul 2024 11:29:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	hkelam@marvell.com, Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH iwl-next v5 13/13] iavf: add support for offloading tc
- U32 cls filters
-Message-ID: <20240730102907.GZ97837@kernel.org>
-References: <20240725220810.12748-1-ahmed.zaki@intel.com>
- <20240725220810.12748-14-ahmed.zaki@intel.com>
+	s=arc-20240116; t=1722335412; c=relaxed/simple;
+	bh=O9SbpH6gaHIzGnpq5yhKSvdFI//O+nZc1t9nY3SdA0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eO8HfRmvByLofz+pnTlL2tspPS9kUufHanR8uFsAGciWy38lvpqIjy9SSQRZLyJxek3URGAIL8kHwYPt/k0lugPgR3sFslZYq6P1dby66/ynw8LtDKIxIi8h5/D9URbawiaJSxCvfrENJJj/lpfzfAuaYwEH3uOXuZnCnEjEkOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PD9tY4PT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722335409;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=71oJ12BexAxBLwTBNsEMg163ErQlFG2G4IQL0JA3vsQ=;
+	b=PD9tY4PTVeaASgSiURSw0LbigeW2TvU6Xx7+7XEvAE+mYM1C7pZC7O9UsOspPA5QyMNIcp
+	30oxJeN8vHOMlzWbCNk6FQnH0g1qhy7smn8ic9/1IrYmpEHuHAzUojWpL/Kw+VQPL8jH1G
+	JlnIcTPR7GvDVdGfa/ETWQgsYVzq+YY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-439-zv-mnwr5Orqa_27JB6czKg-1; Tue, 30 Jul 2024 06:30:07 -0400
+X-MC-Unique: zv-mnwr5Orqa_27JB6czKg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42809bbece7so2185305e9.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 03:30:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722335406; x=1722940206;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=71oJ12BexAxBLwTBNsEMg163ErQlFG2G4IQL0JA3vsQ=;
+        b=EHts2MjPgQ0olTzFPgvHbIO654A1Pzau+qccY0Jzk9/5Lup1ahGfZ0AkAda+/61ZkZ
+         j1gk1kLI/acoXGbS/CijZWO+2U8Tav4z4htNslE92Unn4iPg4R8HhQVwgZogIgNj2jHf
+         CDAZUBBoQ/E2skfNz0xuopG7q1RTC/jIB5E6Rk06Fnp0oFhR7HRd/Qq8u1Ln1N5skcFl
+         pDwBZtfrEo+4RnTfVPHHsuxkR7ppUUwmwGn6ehPbbP3bcnR250rHZLElQcdtnHNDPUh/
+         RSQ0dNns4UmkeEyIO/DlwKzmdPZxEaZ80MhtzQ7Tp1OEd7jNdRqIR8BKnR9zCH8Smevw
+         5b9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWBtDYowMEmhT7oGMmzDDMIefYEfggBO2QWAaTq4XsNZXgQJ9MfbX2kBCtxe/qgoJsX3tIRQI9IP52hAJeVW9KnBAnM5qsS
+X-Gm-Message-State: AOJu0YwjMdozUcnG/CUBgz1+iYloTN6EVar8IdiSWHD0edveruCV1vYY
+	0RKOa5jGebEUVqMc4afr68Wp4dRhscAowHPa8U55NCpLdrZuU3biOlh/ATt+k/nEHYc836hY504
+	poYZEzFvSYVO5JwjuIvnGINtcUAlzZgmy6EUwJdduznNpUMcdMWGV9Q==
+X-Received: by 2002:a05:600c:5113:b0:428:18d9:4654 with SMTP id 5b1f17b1804b1-42818d94831mr34713975e9.6.1722335405984;
+        Tue, 30 Jul 2024 03:30:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE78IgR8WxTBbit7KcSMrv8J8w859v4JL3/v1Vk6XrSheVtSe3hh+vqkGPAcKITQxqhvXEW6A==
+X-Received: by 2002:a05:600c:5113:b0:428:18d9:4654 with SMTP id 5b1f17b1804b1-42818d94831mr34713765e9.6.1722335405555;
+        Tue, 30 Jul 2024 03:30:05 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1712:4410:9110:ce28:b1de:d919? ([2a0d:3344:1712:4410:9110:ce28:b1de:d919])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36857dc2sm14269596f8f.77.2024.07.30.03.30.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 03:30:05 -0700 (PDT)
+Message-ID: <37af317c-a40c-4af3-840a-5bbedad2e31b@redhat.com>
+Date: Tue, 30 Jul 2024 12:30:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240725220810.12748-14-ahmed.zaki@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: drop clocks unused by
+ Ethernet driver
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <5f7fc409ecae7794e4f09d90437db1dd9e4e7132.1722207277.git.daniel@makrotopia.org>
+ <20240729190634.33c50e2a@kernel.org>
+ <738f69e6-1e8d-4acc-adfa-9592505723fe@redhat.com>
+ <Zqi-zr32ZXl0AyzR@makrotopia.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <Zqi-zr32ZXl0AyzR@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 25, 2024 at 04:08:09PM -0600, Ahmed Zaki wrote:
-> Add support for offloading cls U32 filters. Only "skbedit queue_mapping"
-> and "drop" actions are supported. Also, only "ip" and "802_3" tc
-> protocols are allowed. The PF must advertise the VIRTCHNL_VF_OFFLOAD_TC_U32
-> capability flag.
-> 
-> Since the filters will be enabled via the FD stage at the PF, a new type
-> of FDIR filters is added and the existing list and state machine are used.
-> 
-> The new filters can be used to configure flow directors based on raw
-> (binary) pattern in the rx packet.
-> 
-> Examples:
-> 
-> 0. # tc qdisc add dev enp175s0v0  ingress
-> 
-> 1. Redirect UDP from src IP 192.168.2.1 to queue 12:
-> 
->     # tc filter add dev <dev> protocol ip ingress u32 \
-> 	match u32 0x45000000 0xff000000 at 0  \
-> 	match u32 0x00110000 0x00ff0000 at 8  \
-> 	match u32 0xC0A80201 0xffffffff at 12 \
-> 	match u32 0x00000000 0x00000000 at 24 \
-> 	action skbedit queue_mapping 12 skip_sw
-> 
-> 2. Drop all ICMP:
-> 
->     # tc filter add dev <dev> protocol ip ingress u32 \
-> 	match u32 0x45000000 0xff000000 at 0  \
-> 	match u32 0x00010000 0x00ff0000 at 8  \
-> 	match u32 0x00000000 0x00000000 at 24 \
-> 	action drop skip_sw
-> 
-> 3. Redirect ICMP traffic from MAC 3c:fd:fe:a5:47:e0 to queue 7
->    (note proto: 802_3):
-> 
->    # tc filter add dev <dev> protocol 802_3 ingress u32 \
-> 	match u32 0x00003CFD 0x0000ffff at 4   \
-> 	match u32 0xFEA547E0 0xffffffff at 8   \
-> 	match u32 0x08004500 0xffffff00 at 12  \
-> 	match u32 0x00000001 0x000000ff at 20  \
-> 	match u32 0x0000 0x0000 at 40          \
-> 	action skbedit queue_mapping 7 skip_sw
-> 
-> Notes on matches:
-> 1 - All intermediate fields that are needed to parse the correct PTYPE
->     must be provided (in e.g. 3: Ethernet Type 0x0800 in MAC, IP version
->     and IP length: 0x45 and protocol: 0x01 (ICMP)).
-> 2 - The last match must provide an offset that guarantees all required
->     headers are accounted for, even if the last header is not matched.
->     For example, in #2, the last match is 4 bytes at offset 24 starting
->     from IP header, so the total is 14 (MAC) + 24 + 4 = 42, which is the
->     sum of MAC+IP+ICMP headers.
-> 
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+
+On 7/30/24 12:22, Daniel Golle wrote:
+> On Tue, Jul 30, 2024 at 10:53:19AM +0200, Paolo Abeni wrote:
+>> On 7/30/24 04:06, Jakub Kicinski wrote:
+>>> On Mon, 29 Jul 2024 00:00:23 +0100 Daniel Golle wrote:
+>>>> Clocks for SerDes and PHY are going to be handled by standalone drivers
+>>>> for each of those hardware components. Drop them from the Ethernet driver.
+>>>>
+>>>> The clocks which are being removed for this patch are responsible for
+>>>> the for the SerDes PCS and PHYs used for the 2nd and 3rd MAC which are
+>>>> anyway not yet supported. Hence backwards compatibility is not an issue.
+>>>
+>>> What user visible issue is it fixing, then?
+>>
+>> Indeed this looks like more a cleanup than a fix. @Daniel why net-next
+>> without fixes tag is not a suitable target here?
+> 
+> There is no user visible issue. I didn't know that this would be the
+> condition for going into 'net'. I will resend the patch to net-next.
+
+See:
+
+https://elixir.bootlin.com/linux/v6.10.2/source/Documentation/process/maintainer-netdev.rst#L68
+
+The main point here is the patch looks more a cleanup than a fix.
+
+If so, please also drop the fixes tag when re-posting, thanks!
+
+Paolo
 
 
