@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-114330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A13199422A8
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD2039422A9
 	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01FEEB21BD6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:20:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7343A1F25105
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5854018DF91;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6C318FC7F;
 	Tue, 30 Jul 2024 22:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+4WiCF7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZL9R2I6t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28828157466;
-	Tue, 30 Jul 2024 22:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF3C18E030;
+	Tue, 30 Jul 2024 22:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722378032; cv=none; b=gZjL5ChhzQlMYbE10coCdFIlQXJwVnE7sIuCWBsqVPScX9RATlfI9NOo6R6v8p0tboVvaH9c5boOBUK7FrkOLUVzco3gLWXooptaIyCuNRCAfxQSlKeTJIRAxFGpZA+F4Oiki15x4oQ/IaRKuO4UVaWwDtTvgmuk882sF37b+vM=
+	t=1722378032; cv=none; b=tqnA+cEVX9BI2Wp/yhG3gt3m3uVxKp2R7gxMmbnjvc00tP/1TKMnmE68F8P2jC48C9DMtb8ZnnoBtWjEw0Du7SQZNDrz5GCD/xbZ4aqSaUpbTRn07Z7STCxGfiK54Ya3vCu7lWC0+QqsfPhPYSw3PCRw+8ypXS1lkpsvnUK5q48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722378032; c=relaxed/simple;
-	bh=UXmltjffsW5qC4eXcQNxo2kqtSaVud0hlfQkThU5K8I=;
+	bh=NC39ToIiYStV2URdg0RupoAPdagiRdTNILO7HSacAmY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=k+OaYPV4P/cLs/W/Wn1zbIVAml5ayppEUuTHxd0wuuWj5JRyy9+Bvv03A+Yr0B7QaTtn7zuQiA/kpT7y7hKoWHjZto3NY5zsJoLE4FUYEo8EiS9Dem+zHxToU3btIGoy/ZzieO1gpNgWuRl+FtgVz3WTqs27hyDKkU41qlFAcn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+4WiCF7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C799C4AF09;
+	 In-Reply-To:To:Cc; b=tq5qioJwuSdPIEG5WMtYnbprX3JvnYG+MSq6hkdenLraJvkAsSiot9CjjmHp/1nMKHNv0tX/C5rboNMHOpHm5KBZcWJgtF6HPCB+qC/tOXuRl1YM/ycJtWft4GibWP6UDAoLDGstdNf/L7DXH3RPcr5NJtNEwtjVmFXn+YhDPMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZL9R2I6t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CFE4CC4AF13;
 	Tue, 30 Jul 2024 22:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722378031;
-	bh=UXmltjffsW5qC4eXcQNxo2kqtSaVud0hlfQkThU5K8I=;
+	bh=NC39ToIiYStV2URdg0RupoAPdagiRdTNILO7HSacAmY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s+4WiCF76h95Vd1F0hJpfggXhN5aHSznskVIIdKn9RT0mC32P1CBURpzbfDTrMhXA
-	 ZeJboZId1l3U8ufZ67HVUDuqEtgfkG2Z/gWLDZJTuQZwyxCgssslhmhZCFIDXY9x18
-	 FyxZokAxiEltqHyZEVVY0Y1TV8htt5CkekvD49wcH9pcTaAq/X2gbzWH+oI7b+2OUB
-	 Lu+w8jx66yxfmLTZgDWkNY824zJDGcb4rgtxpIHux2FsngHXFLaoRE+zdAsrE62qkh
-	 YJcc998JN44AQ7j85JWYK3lsRjUB62f3UkSlujtNdIZwL4xSjE0uzTwHmQGllL6/ba
-	 IFG6LpAol2rww==
+	b=ZL9R2I6tTZdY24ihOhPuVMhJYRpquPlgGiA00fCFS0jlMQcqtsn+iacUB3SF0RiTE
+	 2kcGigYMUIr+/3mSKa7XFytxY75wQ+rTmwRhYfwPaiyXOzbWN3yqY8uuI2pDn3XDdO
+	 x3+tpvwVxtXx2QE4AaykTEGz3WGKxCV2LVp88AjW5XkuEkBTcpLUleiO8D+gKIx+DO
+	 exzsdMOgIjkumR6FCIJ6zh8JWXpQwwbMxoEqJKWNKkRsJVfPhpz861ZqSe8n0Nj/Ia
+	 yoZ2lhJV4etjn5VHVpAy2N2t//JL7IWOpJ5fOhgwjD523ISSW/TihWtOcZtke9pUeO
+	 bAHH/ESCt9VTA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8A5D0C43140;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1F3AC43140;
 	Tue, 30 Jul 2024 22:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,43 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next] xsk: Try to make xdp_umem_reg extension a bit more
- future-proof
+Subject: Re: [PATCH net V1] net: phy: micrel: Fix the KSZ9131 MDI-X status issue
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172237803156.26065.5548946293304661200.git-patchwork-notify@kernel.org>
+ <172237803179.26065.6593267198901302690.git-patchwork-notify@kernel.org>
 Date: Tue, 30 Jul 2024 22:20:31 +0000
-References: <20240726222048.1397869-1-sdf@fomichev.me>
-In-Reply-To: <20240726222048.1397869-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- haoluo@google.com, jolsa@kernel.org, mail@arctic-alpaca.de,
- magnus.karlsson@gmail.com, maciej.fijalkowski@intel.com
+References: <20240725071125.13960-1-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <20240725071125.13960-1-Raju.Lakkaraju@microchip.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ edumazet@google.com, pabeni@redhat.com, horatiu.vultur@microchip.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
 Hello:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 26 Jul 2024 15:20:48 -0700 you wrote:
-> We recently found out that extending xsk_umem_reg might be a bit
-> complicated due to not enforcing padding to be zero [0]. Add
-> a couple of things to make it less error-prone:
-> 1. Remove xdp_umem_reg_v2 since its sizeof is the same as xdp_umem_reg
-> 2. Add BUILD_BUG_ON that checks that the size of xdp_umem_reg_v1 is less
->    than xdp_umem_reg; presumably, when we get to v2, there is gonna
->    be a similar line to enforce that sizeof(v2) > sizeof(v1)
-> 3. Add BUILD_BUG_ON to make sure the last field plus its size matches
->    the overall struct size. The intent is to demonstrate that we don't
->    have any lingering padding.
+On Thu, 25 Jul 2024 12:41:25 +0530 you wrote:
+> The MDIX status is not accurately reflecting the current state after the link
+> partner has manually altered its MDIX configuration while operating in forced
+> mode.
+> 
+> Access information about Auto mdix completion and pair selection from the
+> KSZ9131's Auto/MDI/MDI-X status register
 > 
 > [...]
 
 Here is the summary with links:
-  - [bpf-next] xsk: Try to make xdp_umem_reg extension a bit more future-proof
-    https://git.kernel.org/bpf/bpf-next/c/32654bbd6313
+  - [net,V1] net: phy: micrel: Fix the KSZ9131 MDI-X status issue
+    https://git.kernel.org/netdev/net/c/84383b5ef4cd
 
 You are awesome, thank you!
 -- 
