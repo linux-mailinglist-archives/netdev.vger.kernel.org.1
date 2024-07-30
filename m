@@ -1,158 +1,158 @@
-Return-Path: <netdev+bounces-114078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A393940DEE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:39:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ECDF940DFE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DF3B1F2375D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:39:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3152281AB4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B041819599C;
-	Tue, 30 Jul 2024 09:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D869194C85;
+	Tue, 30 Jul 2024 09:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JC7w+CcX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="O32YBr3H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B227C194ACE
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 09:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A07F18EFE0;
+	Tue, 30 Jul 2024 09:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722332328; cv=none; b=cLNIrIWQn7TpFw4fdiKjJeZINd34h+QQ0AYZjGDhOldjvMAY3JZCfSUXiJgACzzxJdEMY1HJCYyUaWSkN/5/qE6az9G/1YbX2BtMtcbP8irj9G6l3awpRLyGPsl/iUsHt/wlYsB8TUUStGJZfP2gSgr8uFWW9o9TCkJFX5s6Zj0=
+	t=1722332492; cv=none; b=FpDLLeCsTAWCidKRMue6R8u3RtPKzG6Nu6w8f9LqiJdFjgqxh8UTel+ILMIfb1lsJvR24lVYycQnjBIani19ZKsAiErS/PzWqGfQ8YU1gqQjwSTR2xZ5ErmX/tNP7h7JXDkD9ppnbpLWx5/E1kScpDpVrQ3LyM+j+L3qvWSCslM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722332328; c=relaxed/simple;
-	bh=qL1kDyOGD1HYav/k1nxuKAfnluklrq97MHHt7d7K1fQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F8jSxWBfdluoXjm1cPESDAmazL/8m1u0nLjUVIxI+CqgOwqP2eAAp53Gp6eaP/9PkZirRxxkzUqNF5trL7N75YNl4Omz3GFTmdDsq6+hI1pP3Azy07nGbz1nNyZzbID2rEh6MEU2rJL0rqCibPO/035evyMhUTCgPJJOKOPpjgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JC7w+CcX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722332325;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=phDzjKwp80MM13n6avUktQX++fQYwsEM9HCzCsqBDFE=;
-	b=JC7w+CcXauyfHGck5B7USLvhkMQKTuetTdtiRRI3MuDajVuURXwLzl0ulZOJGZDye/R1T6
-	zzOENwNKwYLkNpjtCJwsMZ9wYUVrI3FRmmCFp9WMB/ifBxbekG+XSC3lHgPASO03GTMISn
-	0J5kPVdewghaMdlUZu0Fmyo3RX2JAWU=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-SAJS-AWNP0moG5sGY9oNaA-1; Tue, 30 Jul 2024 05:38:41 -0400
-X-MC-Unique: SAJS-AWNP0moG5sGY9oNaA-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef2b4482e5so9524261fa.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 02:38:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722332320; x=1722937120;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=phDzjKwp80MM13n6avUktQX++fQYwsEM9HCzCsqBDFE=;
-        b=uk4PM8jbSVTOgZxlzUfd5zKZIE6u9WoGKsFJTufzV8fP1VwNul2cSM8CCAXidL+6CQ
-         15+5VYWvgal5dc9vACIY8pUxq8P5EI5ak6WFNQctclOaYH3PwdBcnaNS5X0bPacMpQpE
-         eFGm1vSUlrFLXsaeOUbOWk4zsmdGNicTbQlNvbhaHs8y5eYNYddwzEvyHT2UpLoL4QQs
-         Qnt7X0S4eDKtQlS61J17veV5jirVOzqmEdVxa+n0vslTXkQnjzDjIGyVyHW1ZPR6alDd
-         V2HwixP6aLnfhlpHlIcLlYDocdWCDk9NmvgPIKiGj3W75F3rvDJcp8qFpZNCBACR1oyG
-         BORw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvT2XulwkOi6/MxCjv3GiiRbx3P9AE0MVtXjJRyWpNLsRPoux2nKPdRxZFWdbybdWjIAPZaCLxPG0RnVra/TrQOnmw2dNl
-X-Gm-Message-State: AOJu0YwNvwRU0eACRUfZ+0wFrM3bjGqXD9SKEXubie7SztwbGaS/xj9q
-	+65WH9zsO0zgLrF57H2Q8yssKE0cPV52T3bFsB0pvMcoREK8yKR++kkkkid1aq1f9ET3/aPedMr
-	OMTNqg7svq5z9x4p8+TFSXQF8Q9zTVsIbX2E4Vlg2lZ5umd4I4mQTcQ==
-X-Received: by 2002:a2e:2a01:0:b0:2ef:2e9b:c6ee with SMTP id 38308e7fff4ca-2f03c6fe714mr53276071fa.1.1722332320291;
-        Tue, 30 Jul 2024 02:38:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHGD7olFlSvG+Qr52zWtWC/ZDZv4AwGJ7lv8JG1gCZkEE5xqwlmhK+iKXwURU29ge5pfiarw==
-X-Received: by 2002:a2e:2a01:0:b0:2ef:2e9b:c6ee with SMTP id 38308e7fff4ca-2f03c6fe714mr53275941fa.1.1722332319861;
-        Tue, 30 Jul 2024 02:38:39 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1712:4410:9110:ce28:b1de:d919? ([2a0d:3344:1712:4410:9110:ce28:b1de:d919])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42805730c3dsm210213075e9.7.2024.07.30.02.38.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 02:38:39 -0700 (PDT)
-Message-ID: <e6b1f967-aaf4-47f4-be33-c981a7abc120@redhat.com>
-Date: Tue, 30 Jul 2024 11:38:38 +0200
+	s=arc-20240116; t=1722332492; c=relaxed/simple;
+	bh=s3ANVzZF+5NGbOWvSBqbujKj3AgCyyycZRtEQ8h7dkg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JBMxstHqgSQiuf5sRDaJ7PAYT3xEbPs+WKVme1MAVaUvCp3t7rgTpRtgZLLKRD4WMa/kgBWLmkvSR00AjhauiA9JgumY7CO673v93DjKtf1OttUVSRy5QNidtRfZNloHX09+X6cggPgjHn8GGhSIjtsNDiwflRVoFQRY6zDSxM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=O32YBr3H; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aNakhGI1s+LEKrlZKgYGYbobUN/9tk4gyC89XkEBTmY=; b=O32YBr3HiFm1qAFIN5qdLmqMSp
+	a2Noh31PYjr4IeVL0Vf16qk36LXujwMfJsJ7DiPddi9o60MJ1OCbV3tiZFEjUbXXT+rvFXQdecStF
+	Qq9rVFRoDsocmDZQlBy8eEj95C+YcaVkRX/ll3jeuHdbqH1+7D6iSLTUk/AaR8ml3q7++3i/6JDI5
+	FA/9EH1B5OJyuSOX3WJwKHOXYPN5ZEArb1KwY6UX/leeRIlat46rHpL2B6g5nkcSxqbRoR3sk9j0G
+	B9GlUg0/y3FRl61UygZfZxpU+etpMTeAMPBeX05BOumQRyLVPn7K9p/KuUttvVoHq06NTyg5pGWoU
+	PtbUR10Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55442)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sYjLz-0006DV-1O;
+	Tue, 30 Jul 2024 10:41:11 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sYjM3-0005B3-JW; Tue, 30 Jul 2024 10:41:15 +0100
+Date: Tue, 30 Jul 2024 10:41:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Revanth Kumar Uppala <ruppala@nvidia.com>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH 3/4] net: phy: aquantia: Poll for TX ready at PHY system
+ side
+Message-ID: <Zqi1O88vXK3Uonr1@shell.armlinux.org.uk>
+References: <20230628124326.55732-1-ruppala@nvidia.com>
+ <20230628124326.55732-3-ruppala@nvidia.com>
+ <ZJw2u6BIShe2ZGsw@shell.armlinux.org.uk>
+ <BL3PR12MB64504E3A40CD6D8EAB7FF0C8C302A@BL3PR12MB6450.namprd12.prod.outlook.com>
+ <ZL5nQxCyj8x+5lWk@shell.armlinux.org.uk>
+ <bb949d68-3229-45b8-964c-54ccf812f6f8@nvidia.com>
+ <ZqdzOxYJiRyft1Nh@shell.armlinux.org.uk>
+ <2aefce6d-5009-491b-b797-ca318e8bad4e@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: skbuff: Skip early return in skb_unref when
- debugging
-To: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: leit@meta.com, Chris Mason <clm@fb.com>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20240729104741.370327-1-leitao@debian.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240729104741.370327-1-leitao@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2aefce6d-5009-491b-b797-ca318e8bad4e@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 7/29/24 12:47, Breno Leitao wrote:
-> This patch modifies the skb_unref function to skip the early return
-> optimization when CONFIG_DEBUG_NET is enabled. The change ensures that
-> the reference count decrement always occurs in debug builds, allowing
-> for more thorough checking of SKB reference counting.
+On Tue, Jul 30, 2024 at 10:36:12AM +0100, Jon Hunter wrote:
 > 
-> Previously, when the SKB's reference count was 1 and CONFIG_DEBUG_NET
-> was not set, the function would return early after a memory barrier
-> (smp_rmb()) without decrementing the reference count. This optimization
-> assumes it's safe to proceed with freeing the SKB without the overhead
-> of an atomic decrement from 1 to 0.
+> On 29/07/2024 11:47, Russell King (Oracle) wrote:
 > 
-> With this change:
-> - In non-debug builds (CONFIG_DEBUG_NET not set), behavior remains
->    unchanged, preserving the performance optimization.
-> - In debug builds (CONFIG_DEBUG_NET set), the reference count is always
->    decremented, even when it's 1, allowing for consistent behavior and
->    potentially catching subtle SKB management bugs.
+> ...
 > 
-> This modification enhances debugging capabilities for networking code
-> without impacting performance in production kernels. It helps kernel
-> developers identify and diagnose issues related to SKB management and
-> reference counting in the network stack.
+> > > Apologies for not following up before on this and now that is has been a
+> > > year I am not sure if it is even appropriate to dig this up as opposed to
+> > > starting a new thread completely.
+> > > 
+> > > However, I want to resume this conversation because we have found that this
+> > > change does resolve a long-standing issue where we occasionally see our
+> > > ethernet controller fail to get an IP address.
+> > > 
+> > > I understand that your objection to the above change is that (per Revanth's
+> > > feedback) this change assumes interface has the link. However, looking at
+> > > the aqr107_read_status() function where this change is made the function has
+> > > the following ...
+> > > 
+> > > static int aqr107_read_status(struct phy_device *phydev)
+> > > {
+> > >          int val, ret;
+> > > 
+> > >          ret = aqr_read_status(phydev);
+> > >          if (ret)
+> > >                  return ret;
+> > > 
+> > >          if (!phydev->link || phydev->autoneg == AUTONEG_DISABLE)
+> > >                  return 0;
+> > > 
+> > > 
+> > > So my understanding is that if we don't have the link, then the above test
+> > > will return before we attempt to poll the TX ready status. If that is the
+> > > case, then would the change being proposed be OK?
+> > 
+> > Here, phydev->link will be the _media_ side link. This is fine - if the
+> > media link is down, there's no point doing anything further. However,
+> > if the link is up, then we need the PHY to update phydev->interface
+> > _and_ report that the link was up (phydev->link is true).
+> > 
+> > When that happens, the layers above (e.g. phylib, phylink, MAC driver)
+> > then know that the _media_ side interface has come up, and they also
+> > know the parameters that were negotiated. They also know what interface
+> > mode the PHY is wanting to use.
+> > 
+> > At that point, the MAC driver can then reconfigure its PHY facing
+> > interface according to what the PHY is using. Until that point, there
+> > is a very real chance that the PHY <--> MAC connection will remain
+> > _down_.
+> > 
+> > The patch adds up to a _two_ _second_ wait for the PHY <--> MAC
+> > connection to come up before aqr107_read_status() will return. This
+> > is total nonsense - because waiting here means that the MAC won't
+> > get the notification of which interface mode the PHY is expecting
+> > to use, therefore the MAC won't configure its PHY facing hardware
+> > for that interface mode, and therefore the PHY <--> MAC connection
+> > will _not_ _come_ _up_.
+> > 
+> > You can not wait for the PHY <--> MAC connection to come up in the
+> > phylib read_status method. Ever.
+> > 
+> > This is non-negotiable because it is just totally wrong to do this
+> > and leads to pointless two second delays.
 > 
-> Cc: Chris Mason <clm@fb.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->   include/linux/skbuff.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 29c3ea5b6e93..cf8f6ce06742 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -1225,7 +1225,7 @@ static inline bool skb_unref(struct sk_buff *skb)
->   {
->   	if (unlikely(!skb))
->   		return false;
-> -	if (likely(refcount_read(&skb->users) == 1))
-> +	if (!IS_ENABLED(CONFIG_DEBUG_NET) && likely(refcount_read(&skb->users) == 1))
->   		smp_rmb();
->   	else if (likely(!refcount_dec_and_test(&skb->users)))
->   		return false;
+> Thanks for the feedback! We will go away, review this and see if we can
+> figure out a good/correct way to resolve our ethernet issue.
 
-I think one assumption behind CONFIG_DEBUG_NET is that enabling such 
-config should not have any measurable impact on performances.
+Which ethernet driver is having a problem?
 
-I suspect the above could indeed cause some measurable impact, e.g. 
-under UDP flood, when the user-space receiver and the BH runs on 
-different cores, as this will increase pressure on the CPU cache. Could 
-you please benchmark such scenario before and after this patch?
-
-Thanks!
-
-Paolo
-
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
