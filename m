@@ -1,124 +1,164 @@
-Return-Path: <netdev+bounces-114127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8159494105D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:18:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DC794106B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B37191C22F59
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:18:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26711B2321A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DA619B3C4;
-	Tue, 30 Jul 2024 11:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8174719DFA4;
+	Tue, 30 Jul 2024 11:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bKVMqyYc"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992F318FC85
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 11:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF181993B0;
+	Tue, 30 Jul 2024 11:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722338303; cv=none; b=VLklvwULMHCx4dB8dVyyBPwtDVyFPPD2Pig7odMv8sFg4K0ZoJrPBMhtBT4urCh9EsbCdsiQN6PE0mFAENjuwOzYwzkTk1YJ6VFw2bCSPrzQSZO8zlDRC9BjxSium9N3J8GyNS99d/cYLXkWTQKsEN8/f++L5cmPlvAzFEKc6dQ=
+	t=1722338640; cv=none; b=NIjplMJoHCUF5lpFMEiJ8sinOoxUzesAqIdamhuQlX+zlt0uJj4X4bfSNraXhuRAhrYX/eU+rrhgpDEy9LbSN5Hr/g6T32rgI6stygfuTmzM2WEE9p+8maNMxGi88wJ+RdOID0cplc4d2GFvdMA/FRHpd6+MEFK0y8/cI0ph7XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722338303; c=relaxed/simple;
-	bh=V56haVpUFlrD9G+P/ApnsxfO7fu8PgDIiuBLOvFaqlI=;
+	s=arc-20240116; t=1722338640; c=relaxed/simple;
+	bh=pOA0+hxVfOzNZYEWL0amhMKDYvzHYLXnQpE9r0FHK8w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LjCKbJKpfPnG6B5YbYuvZVgWSoEL6oNrsZv29PualZXJwXkJ2G08xCy2PZtkH9mASL3AosP+5PbmGhgyEtZ4H3v20aI8xU3/sBd22XwAdeaDidxx+J1lvPXy7TUa2kGvA3aftzlf6B/cErvDPLn4OSxmZfu5bGdyz4fPJWWguIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sYkrX-0004Xm-8L; Tue, 30 Jul 2024 13:17:51 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sYkrV-003Gpk-Mw; Tue, 30 Jul 2024 13:17:49 +0200
-Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B9994311BB3;
-	Tue, 30 Jul 2024 11:17:48 +0000 (UTC)
-Date: Tue, 30 Jul 2024 13:17:47 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Simon Horman <horms@kernel.org>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vivek Yadav <vivek.2311@samsung.com>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC] can: m_can: Release irq on error in m_can_open
-Message-ID: <20240730-slick-ochre-saluki-13bd13-mkl@pengutronix.de>
-References: <20240730-mcan-irq-v1-1-f47cee5d725c@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pLddsRfHnYqoBnAOtM+jc12mmoXgHhBUsKPIFJk46n0CcC+auji9a49w61KkntoltuAN+ZP/BU0dKVdmBWtNJHJVWu9P63Ovw1ajRfnbNmzoaqi2fYn6XfCWNd236iWig//pR6SDlTjwx+mQPnF2ydfA3QFtiWiDVRWQypgfztw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bKVMqyYc; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/KjOC3r37EogMaWUzeIP1eZFMIvbYUyiLZJrxK8c0Kk=; b=bKVMqyYcjJ2Min/cT7k5ohWK5N
+	RjmDvjJdvdSWvLAZ8VG62e97C1MTtHeAu2HpP1tkbb7ldpbjObedkCgLPvvsLYkyMOWpsduRC8g3W
+	f8zt8EDcPH9+tg/86eq31UTscOG85zeEtpWGgUL2/oTo2M7Fz1mwumOCv2yireeRM54L/KJFdjHit
+	vUxG8jnWPk45FgOfsNAv/KhoZVEUO6Go2tNNRAAkLEs3UzuY9sl3dPLXA0NlHqpx+g0GPF7KSslUf
+	Uq5k/fEiLVAQoH9HYIE6lK3CEvU8Ihv/xFPRKW130dvkUKCG2S43SBvaBoDBhEQQ0N+WhoGUEyiXA
+	Mz5CUjOA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57712)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sYkxD-0006Yd-1d;
+	Tue, 30 Jul 2024 12:23:43 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sYkxF-0005E8-VO; Tue, 30 Jul 2024 12:23:46 +0100
+Date: Tue, 30 Jul 2024 12:23:45 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	Brad Griffis <bgriffis@nvidia.com>
+Subject: Re: [RESEND PATCH net-next v3 2/4] net: phy: aquantia: wait for FW
+ reset before checking the vendor ID
+Message-ID: <ZqjNQW5HhTUgCc5x@shell.armlinux.org.uk>
+References: <20240708075023.14893-3-brgl@bgdev.pl>
+ <8ac00a45-ac61-41b4-9f74-d18157b8b6bf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6j3hsfckprgnpgna"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240730-mcan-irq-v1-1-f47cee5d725c@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <8ac00a45-ac61-41b4-9f74-d18157b8b6bf@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Tue, Jul 30, 2024 at 10:59:59AM +0100, Jon Hunter wrote:
+> Hi Bartosz,
+> 
+> On 08/07/2024 08:50, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > 
+> > Checking the firmware register before it complete the boot process makes
+> > no sense, it will report 0 even if FW is available from internal memory.
+> > Always wait for FW to boot before continuing or we'll unnecessarily try
+> > to load it from nvmem/filesystem and fail.
+> > 
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > ---
+> >   drivers/net/phy/aquantia/aquantia_firmware.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
+> > index 0c9640ef153b..524627a36c6f 100644
+> > --- a/drivers/net/phy/aquantia/aquantia_firmware.c
+> > +++ b/drivers/net/phy/aquantia/aquantia_firmware.c
+> > @@ -353,6 +353,10 @@ int aqr_firmware_load(struct phy_device *phydev)
+> >   {
+> >   	int ret;
+> > +	ret = aqr_wait_reset_complete(phydev);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> >   	/* Check if the firmware is not already loaded by pooling
+> >   	 * the current version returned by the PHY. If 0 is returned,
+> >   	 * no firmware is loaded.
+> 
+> 
+> Although this fixed another issue we were seeing with this driver, we have
+> been reviewing this change and have a question about it.
+> 
+> According to the description for the function aqr_wait_reset_complete() this
+> function is intended to give the device time to load firmware and check
+> there is a valid firmware ID.
+> 
+> If a valid firmware ID (non-zero) is detected, then
+> aqr_wait_reset_complete() will return 0 (because phy_read_mmd_poll_timeout()
+> returns 0 on success and -ETIMEDOUT upon a timeout).
+> 
+> If it times out, then it would appear that with the above code we don't
+> attempt to load the firmware by any other means?
 
---6j3hsfckprgnpgna
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm also wondering about aqr_wait_reset_complete(). It uses
+phy_read_mmd_poll_timeout(), which prints an error message if it times
+out (which means no firmware has been loaded.) If we're then going on to
+attempt to load firmware, the error is not an error at all. So, I think
+while phy_read_poll_timeout() is nice and convenient, we need something
+like:
 
-On 30.07.2024 12:12:21, Simon Horman wrote:
-> It appears that the irq requested in m_can_open() may be leaked
-> if an error subsequently occurs: if m_can_start() fails.
->=20
-> Address this by calling free_irq in the unwind path for
-> such cases.
->=20
-> Flagged by Smatch.
-> Compile tested only.
->=20
-> Fixes: eaacfeaca7ad ("can: m_can: Call the RAM init directly from m_can_c=
-hip_config")
-> Signed-off-by: Simon Horman <horms@kernel.org>
+#define phy_read_poll_timeout_quiet(phydev, regnum, val, cond, sleep_us, \
+                                    timeout_us, sleep_before_read) \
+({ \
+        int __ret, __val; \
+        __ret = read_poll_timeout(__val = phy_read, val, \
+                                  __val < 0 || (cond), \
+                sleep_us, timeout_us, sleep_before_read, phydev, regnum); \
+        if (__val < 0) \
+                __ret = __val; \
+        __ret; \
+})
 
-Looks good to me!
+#define phy_read_poll_timeout(phydev, regnum, val, cond, sleep_us, \
+                                timeout_us, sleep_before_read) \
+({ \
+        int __ret = phy_read_poll_timeout_quiet(phydev, regnum, val, cond, \
+						sleep_us, timeout_us, \
+						sleep_before_read); \
+        if (__ret) \
+                phydev_err(phydev, "%s failed: %d\n", __func__, __ret); \
+        __ret; \
+})
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+and aqr_wait_reset_complete() needs to use phy_read_poll_timeout_quiet().
 
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---6j3hsfckprgnpgna
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaoy9gACgkQKDiiPnot
-vG9SRwf+JstLRjVK/HSfI6knM/Y4//wuo3mRdAg7NKsXt6W0QnJATIxKHZEDrjL1
-OFlbHKPEZajtCTwKC1BLGNXuoG8MBOEL3aYoIenHmRacMdEcfPnBNzlEHm5+5DN4
-v7Mx7tqGdHKfHvOgMX3GSxLpObOX/8hbDviG4C2gQawmoSf0ptyWXBwMfClkS4kQ
-8aK2j7oYExKkNzy2TsdJ62isaBM2cfEg0hi+y1GLUXUDBdUAYhsjdhyJVRPiD3cU
-dviDIIva5uzlS/mVT5Lk3L7VvgJV6me/+qY7MbI1XaqkOnDwr4SSwJE21VM9I6yO
-o0ZYqI6J0Mu6f6nm5hBFItSG6Q6pMg==
-=JR/c
------END PGP SIGNATURE-----
-
---6j3hsfckprgnpgna--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
