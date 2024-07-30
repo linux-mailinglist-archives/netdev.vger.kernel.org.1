@@ -1,313 +1,219 @@
-Return-Path: <netdev+bounces-113908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE6B940524
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:30:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53C139405DB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 05:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D9881F2427E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:30:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A17F9B21B4A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 03:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCB0190059;
-	Tue, 30 Jul 2024 02:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="THAh/aUD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A576EB5B;
+	Tue, 30 Jul 2024 03:31:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11020135.outbound.protection.outlook.com [52.101.128.135])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C3190471
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 02:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722306422; cv=none; b=nnlhJ/p/8YXzFBWbSBXR/mM05VCrzX1P/fx/ErL5UhZ912biUoxuZ/j7LNDi26gow6FzYVK1sHMP6hpG6+AdxL5EO56b+6syQ4IACjQxPol6sXbkZVorIrg7Lr1Q+VEnIgnbFRdnhg029/O+/yW8iPxP6jsq/7p8d1E6wMGhRIo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722306422; c=relaxed/simple;
-	bh=lWFZoXTllZzDQ5KVW7/ITGpCF1rpfZvNs38SGJyNKoI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GM1Q+ygfI1/7TADJRnJAQkTJ/htFs13NUEis9Iw47wcixP/6YiUtvdixWKZREY0+1WVBbVe6kMHYGDEgEjS9d1xEotqfyBP/bGttLz4OF1Jd6k4SQ3xxDH6nWYI2gOaOcvVeMzsAF0YXR3Pe7dgr9zOazdKiRung2v7ERI3mOr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=THAh/aUD; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-66b3b4415c7so80162067b3.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 19:26:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722306416; x=1722911216; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YpeL2jjjuQiDotVyStSYknocEdgkMBCGkLNpfXlLDrU=;
-        b=THAh/aUDClyx15DqWIoGLWSXzUOSV/VmWRa2IjEVmel+G6UnLKVMxZ0e6mgZmTuMDi
-         kdgL2Kq2CiD4iLBJuent3eWsAZRAHeEqjgsOWsgLWfE6Qakw0k4IhOrdjYp1n6YWPMjY
-         gOrxL3AELs505g+6/0EA36eeTrOjnckx21hW03w5VcdCyYC194ZD7wKgNcGe8Bb3zQ1n
-         BHYjOT4LHbttDrmFNYDHJNGXQMp9/iNq6zO5J7WDgr2uv+Ww/njP+FyddxBbyD2iBYgH
-         JZSRZBhjABWM2WzHjqlgvCUzyVWXGFK4KIPT9mEZP7yXnWARvmYg3D86mDFGMGjIOiW/
-         F/rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722306416; x=1722911216;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YpeL2jjjuQiDotVyStSYknocEdgkMBCGkLNpfXlLDrU=;
-        b=tIc/RALpbJ7/wqPBUF4Uv7b6ErCssdLcpgCeftAQvdTr32hY5CKwM8E7KrPQf5DzqR
-         Es5HjLBGNigJce/voTPl1ZK0+ZpQT3Yy/bgqDTTR5IR/6lRdxmT51JNrUG9MjncrzfWc
-         UpfcJmeUqRT2h2xMs4mF7gkhxA8JftcqeN0pr+8wA3YfkmvCNL36RL+7byt2X7rI+/jU
-         jg5oizqq4SE+368/ib2qpc1rUIZIDLtKuXfXp7h2Ic7c53EmFlr4SQqikVCOcnRlxHjC
-         tF/HJdMRTOJbDam6dKYO3evC51WcuJOZQasdj84ATKOYxzVkfyhOXCn56I4SvvWh+ApN
-         wntg==
-X-Gm-Message-State: AOJu0YyC1m7y3uL71gXeUwjrkgCAFgBHyL6ldqlLVmy+6+4o4Am0/jQT
-	jHLa21TW6pkC0rqUVwNdw5Wso6bz6jZvKIrhFClCQneUmpF6RF7GpEge9UKaMP1jwCvb/Jn3+FG
-	yhLvLmW/00TY8ISMRjIjFJsrBlh+XGINrihzv8kvoJGzOq52qo5b+qP/h9G3Y2VQUoqa7lKl/nU
-	zwlWsHJw7nJuzSLmbFfzF+p7GvBJqqI/6G6++kd2jNEQhf6lL5XAc3zeR5liE=
-X-Google-Smtp-Source: AGHT+IHC29ZYOcgw90qZqEqccd2UZ1WHTmKpe+12sX2SEVfmpnkgtaiJhRBXg0BZNAdwmD96v+mTgP75qI/xOgbFKg==
-X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:1029:b0:e0b:9b5:8647 with
- SMTP id 3f1490d57ef6-e0b544ec4ddmr18023276.8.1722306415855; Mon, 29 Jul 2024
- 19:26:55 -0700 (PDT)
-Date: Tue, 30 Jul 2024 02:26:18 +0000
-In-Reply-To: <20240730022623.98909-1-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7896033D5;
+	Tue, 30 Jul 2024 03:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.135
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722310272; cv=fail; b=ozaWC/F0A9aEaVmP7i9OXmcgzI/F6+3eyHe2pQkR1VJuK/1IJDU6FjaVz0v/3ljCm16OgKqb9LzOFUxDxyJ8by51Cmf4RfaRiKLK9TwtGozJ1GLI5CTVIXmT/PFt7EesdZ37Dbo+Zd1dcstx805veCEwX/Ysj9f5ls/VqcHVewg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722310272; c=relaxed/simple;
+	bh=TH2Wei174Mye75El9jfqsnvnc68OyxRzTuc71xnFv9g=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=puNqKVJG01HXYvnJDluTzywOyHTlhyqz1r3+FvrOy0icf2O8IfzmQ0zCp3y/gk7tMJUu7wcEsAQrDJcMjRtCV1xUzCYBWMfVGmGxBj9MyYRUOZrhpEs+7Y2rQU0HseYlXzIfy8NFgpZPARIJb/HUhf/ouXO+LmgnZT0Vj7OzZLQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com; spf=pass smtp.mailfrom=wesion.com; arc=fail smtp.client-ip=52.101.128.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wesion.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZnBfmB1iiIGdm05wgP1OwX1SonZo8f5qx/nLAP4HfNMph7uD23lEbbdJVzYJbB/1d7k5IBPTbY1Ga3LQYUqIAXVpkj+pH2Vwh8jOBLrQNO0lYZnOSUmt9RhkcvL3TrHRP4/UhI0fhyjvcQ/LOTvUWEezTdZBQ9j7jVgW/i8puZuFLzyJ4KRLIbYMXHR2yaAVMwYNvL4sxPFX1/55Q2zPNa0ppcF9Z4h5XJmAUawvUiMzPRNeFs6pDCSlzVTuS7EzNAY1wdEEJ32cYFN0KHhPVOOWMuzt7JGzvBDgV0fW9BGeKZV11AzyzOC+Z0SX7u+Ru6HLrXDEfx9ovXE7WGllZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6V4DN5Gmi43iofOZoWHCHiEA0sxKCJpIZ0khVH0f9xA=;
+ b=N9SvNZS3g7JXaZZ4VFvc39XZ9dh7lHYNf5/vkaAFiPF7g+xgKU+4hRyQAJVDDvqjQqCGL7jIWbiR8Mzx993pBLVyJd4yrppYqGmqDV/yyJiNb0/X17j3swKlV5RlAR46+aGRsMqxIclISKRUYmnSbrFD4WrNGKvLaX76kzR6dJMq12qRHw0K6wRtMxDylb11ts4QFYSMevU2WWzt5QEzX9RKqTSbUARIbS/d8fL1j5Ks7dgb2YP1JPAuRKGG6aMtZGzhH8UxKftNDZgU4iEW8VDwzJ3vABLKNH+IHfmApBBDCsETsqgGl5rttfiF1EtHMq9qmDYtBCW3BD+M8QyEVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wesion.com; dmarc=pass action=none header.from=wesion.com;
+ dkim=pass header.d=wesion.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wesion.com;
+Received: from TYZPR03MB7001.apcprd03.prod.outlook.com (2603:1096:400:26a::14)
+ by TYSPR03MB7705.apcprd03.prod.outlook.com (2603:1096:400:40e::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.27; Tue, 30 Jul
+ 2024 03:31:05 +0000
+Received: from TYZPR03MB7001.apcprd03.prod.outlook.com
+ ([fe80::78dd:5e68:1a9c:36c0]) by TYZPR03MB7001.apcprd03.prod.outlook.com
+ ([fe80::78dd:5e68:1a9c:36c0%6]) with mapi id 15.20.7784.020; Tue, 30 Jul 2024
+ 03:31:05 +0000
+From: Jacobe Zang <jacobe.zang@wesion.com>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	heiko@sntech.de,
+	kvalo@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	conor+dt@kernel.org
+Cc: efectn@protonmail.com,
+	dsimic@manjaro.org,
+	jagan@edgeble.ai,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	arend@broadcom.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	megi@xff.cz,
+	duoming@zju.edu.cn,
+	bhelgaas@google.com,
+	minipli@grsecurity.net,
+	brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com,
+	nick@khadas.com,
+	Jacobe Zang <jacobe.zang@wesion.com>
+Subject: [PATCH v5 0/5] Add AP6275P wireless support
+Date: Tue, 30 Jul 2024 11:30:48 +0800
+Message-Id: <20240730033053.4092132-1-jacobe.zang@wesion.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR03CA0122.apcprd03.prod.outlook.com
+ (2603:1096:4:91::26) To TYZPR03MB7001.apcprd03.prod.outlook.com
+ (2603:1096:400:26a::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240730022623.98909-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240730022623.98909-15-almasrymina@google.com>
-Subject: [PATCH net-next v17 14/14] netdev: add dmabuf introspection
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Bagas Sanjaya <bagasdotme@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR03MB7001:EE_|TYSPR03MB7705:EE_
+X-MS-Office365-Filtering-Correlation-Id: b08e1066-7c96-4669-8273-08dcb0480b24
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|7416014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?u4Jh+tVysRiFJ8OrvOhvkk3tvH3/PmekKLtNj4K8OS7rA0ygWwaH0CUhOSBv?=
+ =?us-ascii?Q?FeBrfXeB6xME09yIpNrTjgn1tqBGjD6+9tm4jC4r5xcGffC4gGIOMLo6B4jM?=
+ =?us-ascii?Q?ndQMSwNr6wV73ujyUxZbarUCu2BBCzR8QKrWU4EINZk6Bqu6qLsEndmHm6ie?=
+ =?us-ascii?Q?mX/gkD3N12jVVcNsClYqUsjKtsbwcWVdzc+BoISG6SLZjLP0BT/0BT5imWEV?=
+ =?us-ascii?Q?DXex+VY9PTExjPblGavCjudnzCRuovVd/WiwiBn6xAVB5pljGmZqe7FVzsj7?=
+ =?us-ascii?Q?3Tk0gdDGTYVfQzo9baqkYYcWHnaZRIAJa7TlCGUwLcj72cwanxBxF7fVVCzj?=
+ =?us-ascii?Q?PloGirkHjSesu+W3m6czLTyjLxjujnYibdl2+8HPh4MvPNQ84UaACEIiGEAb?=
+ =?us-ascii?Q?eBgIPThDOgdA0DyExUvS29JxDsPrHFI6dAh6dVo2q5HlpJ/krBluggRVS7Nb?=
+ =?us-ascii?Q?qLhTvLIzvZQryx4kcGONFWaUo76Fe88IQ/TDsGive3cT2Oe6s3smE8vFSQ2Z?=
+ =?us-ascii?Q?2U0ZNunrJ84NIzikADZe/dP5I7mMkiNCafJpfsnGsKCDkQrtdIoq34uaj1mw?=
+ =?us-ascii?Q?tgk6lw07ZthoeLzv4w8LfypdfV7RJ7ZcQ1kWSFBeD+sZredd0FgKGE81xg3B?=
+ =?us-ascii?Q?wH3fmcCdP//u39R/7ffktvCSJts0qrm+k/GT8FRKu7H9Ke0Px7ZKEjbZ8bVo?=
+ =?us-ascii?Q?yjYs8M7nuuGzpZ0wJge1u8rbPWog3mwdL04xX/XyQvn+JjiTGTAW4slbOIqk?=
+ =?us-ascii?Q?DBPpV07g14AEHeAYqcKshcM1aQ3w2vU1Us0vbYoBoCSVwQs6dJ1BWWHFzcx4?=
+ =?us-ascii?Q?wu1DrZzac2bajZPDNMuq+/UofxRfMLzc7FkcPWDdGtNv8WRCJND7DKtnbvQ7?=
+ =?us-ascii?Q?s6teax8dHHqADGitqAaYn/7z1KaWY5cOFk+OjoruAljVaz1n64KQroyG9YBj?=
+ =?us-ascii?Q?32bi68CYGt4EF5OWmNF14t3ubICxOypyVwZv8t5zaz/msJiLvJmMt8SIMtgl?=
+ =?us-ascii?Q?2Xbfu7osxhNFUPgaATHQZdbJBMMd21PVpSh5OrrsvtlOzckZDuiLOJEzMWIn?=
+ =?us-ascii?Q?oefePMp2UzTGUfB82owoPv4mBC+fOTMHloy8WHoPwiCJ25tU9rwy2EVNwWzt?=
+ =?us-ascii?Q?dIbWwvq3Mr8PP0Xai2NPpUQfAQ/O8CqCX+lZe53cSxZkvLpdCeGbMaPZenM/?=
+ =?us-ascii?Q?DbnIRQLIRTP82ti5Rcv7zohIaIMxcwGoqO+LPYNxXi1kJGcKjAianr1A9xcX?=
+ =?us-ascii?Q?DT1nOh5sNq+XWZIjOSSsNrvg0w0iJtMmQGb+lRzO/nsif/WVX+8/okfbSmXZ?=
+ =?us-ascii?Q?n83Z6EytfnGca8GZi+yuX95CZjwLI+FYXzl8o2yBkKJkpA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR03MB7001.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(7416014)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+xzJr+hLefhNpVdl9fa68znlCpFL8utCVCuRmg308a+wTlVBY2o6CZc9q0UR?=
+ =?us-ascii?Q?Y+XN2IxQXJ6LfcVumAtXUrYmCUqG7f28HLZkiOF23NoIOtVT6h2W6aiTSpQN?=
+ =?us-ascii?Q?zfKOa/eJ1bJQvNFNfzo22mpgDrufizCiYRu/RAMESciha+1fH1lasZsgkVNl?=
+ =?us-ascii?Q?YqRgrd7OfLnmed8wJ9vHUkN4fet+k6EDQ78NDBABfLskM/K014HhedkBExG5?=
+ =?us-ascii?Q?qHYeRtKA8Q9lQ4HMLVe6ZQQNXfytj4dj92bg15voGoTWaBi1KDdoWnDP/MNg?=
+ =?us-ascii?Q?taFhxYUKvnmoDeFCJrmoK8seNGQVDsHAwbMhi+qYe+UiUklwfGtGnUHW8dcE?=
+ =?us-ascii?Q?mgj9hr0mYU/lpcML+ADAhumON9Ud9h02IpvXruv/Zs3g48RnjqMs/9RNpX60?=
+ =?us-ascii?Q?DtAlzX4pd6rWmbhNQoWvBFHvuJAoz1nb/CDKuRcL1Bwppq3IsXqWAg1vVzLv?=
+ =?us-ascii?Q?2KR2Rk5sVz+Ij03gEd4SJmu0OW4P8NDeWhfbRzsnGwLHqk5AgIiUnI+ZiFy5?=
+ =?us-ascii?Q?N/IAJhwszCVELHlX0Eb6L8mM5lRCkyhtIwXadTMQ98+jJTvAmOy0DB1Ffpx9?=
+ =?us-ascii?Q?Y0P8sLp6DVWWo0aYucmQAk3qj7A9Nqol1lyHO9j+qEZ0XCwK5AHYRwwxGASE?=
+ =?us-ascii?Q?XuRuJi2a0rvRS4dMh8jQyjdw2k2PePtBwi2D4pFBNhERpQlFV/wySlSNxPXD?=
+ =?us-ascii?Q?/sw95Gz8258kSNLbbrnsrMnvLUjCDJkGcpd6aXuDx2bFzwm9wpnvkqiuPoNk?=
+ =?us-ascii?Q?sZt5Lon5/5YelwDvnukGMXK9TrvMocsUORII4w62agZPmVjpxdbuz2Zr/a/x?=
+ =?us-ascii?Q?evziHfDe7fR8VEmN/N8Tet0phDAig9sgbEEbVM7XnYNLRMpnUVwQyQSwMok3?=
+ =?us-ascii?Q?JDWFBnmRxYEXZYFZfYIaDzoI7vEo7UeKOBNK7P8rFoRbUTyaop3wBaAEZKSw?=
+ =?us-ascii?Q?+VkOy+BFQcuD2kxvHmEU/l0b+K2VV56X7088fqqznQ+82GV2SIQqWko9DRRn?=
+ =?us-ascii?Q?lZKQLqSL8ubzn26zQICxzYy97YexR52IvW7IGhfwOoE1QRXrw6Vi7dRU6iAO?=
+ =?us-ascii?Q?eF+3VC4Vhul0DVr/sbX5hn2PCKrtD59GyF80VUZkg2JzfG9qVXxQke03xl1y?=
+ =?us-ascii?Q?I1LpkJhKGuUKOX4aIr3qcOD19t3ffNGq3zgivsSISoJQP5WzlXw/TQCPEeBP?=
+ =?us-ascii?Q?5OQUL8CN1mbK3ESizOVw7aF5sVB9gMR2TabiKakF4OYL/rUlecuYLwV1GWkz?=
+ =?us-ascii?Q?ddLAaORP/8qMYNOHPJfmqL12q3nH0N3c6BLVKPWatnA8oIJERW6RyCEvKS6y?=
+ =?us-ascii?Q?/x+ZU5QV8VwjzSKjzyOanMEwWAJfpHtQ31AwMN6jcmnpQoJWQWa0X3aD5Zhd?=
+ =?us-ascii?Q?h2ceMKf/5BUeCjCdlsT97qmaSwhN78RLkrLPHa32nRBwvBbzlHzaoi65vfu+?=
+ =?us-ascii?Q?IQg6eqD+p545TbKdqtL57UrSt328XKgN9hI21qW+q5pRQsZ+b91n9w+PljOt?=
+ =?us-ascii?Q?OVNcMWSnCIW6T8Ki1aS9VvyD3wHJxmXy1MVmjh1UcD0lBbx56XKtd4tfLTnD?=
+ =?us-ascii?Q?aAWZUE2GEFB66FwWs8WS8jP/zSqFwevWZcPuSD2M?=
+X-OriginatorOrg: wesion.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b08e1066-7c96-4669-8273-08dcb0480b24
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR03MB7001.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2024 03:31:05.2636
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2dc3bd76-7ac2-4780-a5b7-6c6cc6b5af9b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1O7F+09R4q8lH0hNAW/3WJ9uNsWOesUHOopX6Rfzu8EweyxW7utWWoie7m1KD5v8C94W1bm3dIfwhdUNT8HoTw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR03MB7705
 
-Add dmabuf information to page_pool stats:
+These add AP6275P wireless support on Khadas Edge2. Enable 32k clock
+for Wi-Fi module and extend the hardware IDs table in the brcmfmac
+driver for it to attach.
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump page-pool-get
-...
- {'dmabuf': 10,
-  'id': 456,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 455,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 454,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 453,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 452,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 451,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 450,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 449,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
+Changes in v5:
+ - Add more commit message to the clock in bindings
+ - Use IS_ERR_OR_NULL as a judgment condition of clk
 
-And queue stats:
+ - Link to v4: https://lore.kernel.org/all/20240729070102.3770318-1-jacobe.zang@wesion.com/
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump queue-get
-...
-{'dmabuf': 10, 'id': 8, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 9, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 10, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 11, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 12, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 13, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 14, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 15, 'ifindex': 3, 'type': 'rx'},
+Changes in v4:
+ - Change clock description in dt-bindings
+ - Move enable clk from pcie.c to of.c
+ - Add compatible for wifi node in DTS
+ - Add random seed flag for firmware download
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+ - Link to v3: https://lore.kernel.org/all/20240630073605.2164346-1-jacobe.zang@wesion.com/
 
----
- Documentation/netlink/specs/netdev.yaml | 10 ++++++++++
- include/uapi/linux/netdev.h             |  2 ++
- net/core/netdev-genl.c                  | 10 ++++++++++
- net/core/page_pool_user.c               |  4 ++++
- tools/include/uapi/linux/netdev.h       |  2 ++
- 5 files changed, 28 insertions(+)
+Changes in v3:
+ - Dropped redundant parts in dt-bindings.
+ - Change driver patch title prefix as 'wifi: brcmfmac:'.
+ - Change DTS Wi-Fi node clock-name as 'lpo'.
+ 
+ - Link to v2: https://lore.kernel.org/all/20240624081906.1399447-1-jacobe.zang@wesion.com/
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 0c747530c275e..08412c279297b 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -167,6 +167,10 @@ attribute-sets:
-           "re-attached", they are just waiting to disappear.
-           Attribute is absent if Page Pool has not been detached, and
-           can still be used to allocate new memory.
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf this page-pool is attached to.
-+        type: u32
-   -
-     name: page-pool-info
-     subset-of: page-pool
-@@ -268,6 +272,10 @@ attribute-sets:
-         name: napi-id
-         doc: ID of the NAPI instance which services this queue.
-         type: u32
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf attached to this queue, if any.
-+        type: u32
- 
-   -
-     name: qstats
-@@ -543,6 +551,7 @@ operations:
-             - inflight
-             - inflight-mem
-             - detach-time
-+            - dmabuf
-       dump:
-         reply: *pp-reply
-       config-cond: page-pool
-@@ -607,6 +616,7 @@ operations:
-             - type
-             - napi-id
-             - ifindex
-+            - dmabuf
-       dump:
-         request:
-           attributes:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d9..7c308f04e7a06 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index bd54cf50b658a..e944fd56c6b8e 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -293,6 +293,7 @@ static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding;
- 	struct netdev_rx_queue *rxq;
- 	struct netdev_queue *txq;
- 	void *hdr;
-@@ -312,6 +313,15 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
- 					     rxq->napi->napi_id))
- 			goto nla_put_failure;
-+
-+		binding = (struct net_devmem_dmabuf_binding *)
-+				  rxq->mp_params.mp_priv;
-+		if (binding) {
-+			if (nla_put_u32(rsp, NETDEV_A_QUEUE_DMABUF,
-+					binding->id))
-+				goto nla_put_failure;
-+		}
-+
- 		break;
- 	case NETDEV_QUEUE_TYPE_TX:
- 		txq = netdev_get_tx_queue(netdev, q_idx);
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 3a3277ba167b1..ca13363aea343 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -212,6 +212,7 @@ static int
- page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 		  const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding = pool->mp_priv;
- 	size_t inflight, refsz;
- 	void *hdr;
- 
-@@ -241,6 +242,9 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 			 pool->user.detach_time))
- 		goto err_cancel;
- 
-+	if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
-+		goto err_cancel;
-+
- 	genlmsg_end(rsp, hdr);
- 
- 	return 0;
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d9..7c308f04e7a06 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
+Changes in v2:
+ - Add SoB tags for original developer.
+ - Add dt-bindings for pci14e4,449d and clocks.
+ - Replace dev_info to brcmf_dbg in pcie.c
+
+ - Link to v1: https://lore.kernel.org/all/20240620020015.4021696-1-jacobe.zang@wesion.com/
+
+Jacobe Zang (5):
+  dt-bindings: net: wireless: brcm4329-fmac: add pci14e4,449d
+  dt-bindings: net: wireless: brcm4329-fmac: add clock description for
+    AP6275P
+  arm64: dts: rockchip: Add AP6275P wireless support to Khadas Edge 2
+  wifi: brcmfmac: Add optional lpo clock enable support
+  wifi: brcmfmac: add flag for random seed during firmware download
+
+ .../net/wireless/brcm,bcm4329-fmac.yaml       |  9 ++++
+ .../dts/rockchip/rk3588s-khadas-edge2.dts     | 16 ++++++
+ .../wireless/broadcom/brcm80211/brcmfmac/of.c |  8 +++
+ .../broadcom/brcm80211/brcmfmac/pcie.c        | 52 ++++++++++++++++---
+ .../broadcom/brcm80211/include/brcm_hw_ids.h  |  2 +
+ 5 files changed, 79 insertions(+), 8 deletions(-)
+
 -- 
-2.46.0.rc1.232.g9752f9e123-goog
+2.34.1
 
 
