@@ -1,111 +1,122 @@
-Return-Path: <netdev+bounces-114041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3FD940C56
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:52:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E16AC940C60
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 312B81F2344E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51097B2878A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4D6194A7E;
-	Tue, 30 Jul 2024 08:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A0C19307F;
+	Tue, 30 Jul 2024 08:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="faJf7yM4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMR9MnSL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48C01940B3;
-	Tue, 30 Jul 2024 08:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC91612F5B3
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 08:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722329438; cv=none; b=QnbzlM+os3jXf2jTzgrqF71+za+l6QZrGZ43Q6kp8l38W2CnCdCXHiqCgsX6fyMJKJXc3VN2bqanVAxkckWbnMVCHQ1aMZVp9m3RYtIoBFmSI9XwcwQkYxIkj4v7osvNWlqy0jrCl41O4ILi8+4Jcq2Eb64paiZOk9eqYRtvKwg=
+	t=1722329609; cv=none; b=BhU7lFFysl37+jxgfvcjFznq4zNQDyve51NnMey1a7v/zVgRz46OCgplrFa50V879zDls2WRFnbrMneEO+YqaWUirOtT+nnfumf3irXGzYKmIAwcJpziTXscC8oy3ZdnAzbnvxmF2GSob6TykwXuSYijheVWp2TxEewhiTIJ7jY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722329438; c=relaxed/simple;
-	bh=7xEjnu+XxywJICOBC6mbxvdShii78kN4dRkz0XvgP/4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fcmk6gxT+lQXyClvR23bXhZt9f4oToFk92VfmRAdQ0J5oiwXE6taDYwi66pZrlFfvCsGKo0r+B8EemBKlVsrR8KknXcSYSY8LJUEZ9TCeNgxe7yb0Yco9xlqVnkrBWVbcrWOLMK4xgw2YbIz8DQIIFwKI+nBZN60Ciggb/Ptqng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=faJf7yM4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6148AC4AF0B;
-	Tue, 30 Jul 2024 08:50:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722329437;
-	bh=7xEjnu+XxywJICOBC6mbxvdShii78kN4dRkz0XvgP/4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=faJf7yM4pW/Z8oVEhOY0PK+6doI9ABS/OqbbgJ8IIBlA0uejeK9fyfJYCK2Y8uoIJ
-	 XeHWOozrBdwiqcjqM9/LPcCk+ac0aWyaz9jE+zHJXuktyX/zkAg8MEUxJnRIkHKOCx
-	 4g65iScziMyJM4vt7SbCyOcq/+7MBcvIp4eE6pX4wLTu4FEB3KTgNXi5a8eSwm4+px
-	 5qtTgBm3FTVRuLUkC5I5gm47Z0QJ+eNTJJh3HQKCTusaFwtbW+g4CiDjKUUjd/FoA+
-	 5Ve4ay9Ff4eQ9vTr42bD/1Al0YVRfvaeCP/knmx7ZIQhzBp3cGDJULprkEms7PCAJ4
-	 TrSFL++L889CQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 512B0C43619;
-	Tue, 30 Jul 2024 08:50:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722329609; c=relaxed/simple;
+	bh=+Qw8W9JXBVK2KYNrBUnkVpFmWeK8eGoS0fvOLwMjbCc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lmgMNAwd7T36melCBKLkr846+E8ApCvnMix/fBqu9ZlNL8+vlKiMiHSdH14EXlZD+IwcLhrwGHald245J6alDxo7CjZpzLIr4XdRHkvuueWSZcevfhA6Qqr2TG8SujXQVhoDwWwFsTw/GpW7bEi++KOCkUnZww5suIgj/+kCbIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HMR9MnSL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722329606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YnacwdNXQeiYAN/vyHCjqJ3Z55j/qGrBpNl88GFWc6Q=;
+	b=HMR9MnSL558lQthRx90HhO9FG1b42FIC1hmGhxXXWAPR5x6ybci2cqWTL19xge7g8cYxmw
+	myscL71aKdEAY87yYTG5P8+8s9X+b+E3bUn4CFRxzVZ2UMU6m6n+EdXXfjqT1ubgnrL1Dl
+	ouY83e5lcWdxbmYucxJnOW5Gf4YJ9ms=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-205-qnVo_YjkMAOyvnkzytIuEw-1; Tue, 30 Jul 2024 04:53:23 -0400
+X-MC-Unique: qnVo_YjkMAOyvnkzytIuEw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4280f31c668so6045865e9.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:53:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722329602; x=1722934402;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YnacwdNXQeiYAN/vyHCjqJ3Z55j/qGrBpNl88GFWc6Q=;
+        b=dLeBto9qqeqCIF5YzRSHg8UwCCRwTUOcj3PCADRClTmssdRg46fC7Uq6qC2NNw1p35
+         RwjJVgwZVcmacQCRdIoDJSZumuACjCy7CgomZUngyCVGDnVz97omNrIvwGSvbI70l2aA
+         zu/Q6WjgXh8eSvTppb5V0uF33vSBoq2F4hT0lS7QO7/y7ptG4zj4fe7TIbA3vx8hjHUZ
+         i1zfJapFbJXvzIA384x+IIK0nd+SLwUuBNwphTrniyaottwIaZyou3Xj9MfiRRFsp3AF
+         zjKf9y5xe2g+vKUXf5NHY86tqgn5Jm+kS25H25XEpTmUPUk+/onfCc+CoFAbsYYBpIOr
+         48+A==
+X-Forwarded-Encrypted: i=1; AJvYcCVRLuy26/V0/v/ZFzUO/7mM56+IYEAeWOBN8QYcpn/KjhnXsZ3T13ThMWwjGPCvSb+II3NSLF4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypOeTT+3Ui/fUIMoAJ2R5wawnu7FErPH0+roj/D7mD8a7ohwoq
+	/RmgskaJQf11duCIS9xg0j5gzhRnugFGKF1kZfdIini9epRSmLueXov5wp031FBz5AqvrxaNgiK
+	+0L3cc12tgoxq5lHeMW+G4qjGXQIOqNhAdJROGDPnn7WR302wMbwx2w==
+X-Received: by 2002:a05:600c:4fc2:b0:427:9f6c:e4bd with SMTP id 5b1f17b1804b1-42805713af0mr69580145e9.6.1722329601925;
+        Tue, 30 Jul 2024 01:53:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFe5skEumfC7OwYco+fwnLjIRX5mFiP+wG2g0HwUfV8HU5TLSTPaOIm8pjlpNbR0ZWFSuDj1w==
+X-Received: by 2002:a05:600c:4fc2:b0:427:9f6c:e4bd with SMTP id 5b1f17b1804b1-42805713af0mr69579945e9.6.1722329601387;
+        Tue, 30 Jul 2024 01:53:21 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1712:4410:9110:ce28:b1de:d919? ([2a0d:3344:1712:4410:9110:ce28:b1de:d919])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428089c28f0sm191284215e9.28.2024.07.30.01.53.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 01:53:20 -0700 (PDT)
+Message-ID: <738f69e6-1e8d-4acc-adfa-9592505723fe@redhat.com>
+Date: Tue, 30 Jul 2024 10:53:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/7] mptcp: fix inconsistent backup usage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172232943732.24083.9277579847408417971.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Jul 2024 08:50:37 +0000
-References: <20240727-upstream-net-20240727-mptcp-backup-signal-v1-0-f50b31604cf1@kernel.org>
-In-Reply-To: <20240727-upstream-net-20240727-mptcp-backup-signal-v1-0-f50b31604cf1@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- fw@strlen.de, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- stable@vger.kernel.org, rostedt@goodmis.org, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: drop clocks unused by
+ Ethernet driver
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+ Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <5f7fc409ecae7794e4f09d90437db1dd9e4e7132.1722207277.git.daniel@makrotopia.org>
+ <20240729190634.33c50e2a@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240729190634.33c50e2a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat, 27 Jul 2024 12:01:22 +0200 you wrote:
-> In all the MPTCP backup related tests, the backup flag was set on one
-> side, and the expected behaviour is to have both sides respecting this
-> decision. That's also the "natural" way, and what the users seem to
-> expect.
+On 7/30/24 04:06, Jakub Kicinski wrote:
+> On Mon, 29 Jul 2024 00:00:23 +0100 Daniel Golle wrote:
+>> Clocks for SerDes and PHY are going to be handled by standalone drivers
+>> for each of those hardware components. Drop them from the Ethernet driver.
+>>
+>> The clocks which are being removed for this patch are responsible for
+>> the for the SerDes PCS and PHYs used for the 2nd and 3rd MAC which are
+>> anyway not yet supported. Hence backwards compatibility is not an issue.
 > 
-> On the scheduler side, only the 'backup' field was checked, which is
-> supposed to be set only if the other peer flagged a subflow as backup.
-> But in various places, this flag was also set when the local host
-> flagged the subflow as backup, certainly to have the expected behaviour
-> mentioned above.
-> 
-> [...]
+> What user visible issue is it fixing, then?
 
-Here is the summary with links:
-  - [net,1/7] mptcp: sched: check both directions for backup
-    https://git.kernel.org/netdev/net/c/b6a66e521a20
-  - [net,2/7] mptcp: distinguish rcv vs sent backup flag in requests
-    https://git.kernel.org/netdev/net/c/efd340bf3d77
-  - [net,3/7] mptcp: pm: only set request_bkup flag when sending MP_PRIO
-    https://git.kernel.org/netdev/net/c/4258b94831bb
-  - [net,4/7] mptcp: mib: count MPJ with backup flag
-    https://git.kernel.org/netdev/net/c/4dde0d72ccec
-  - [net,5/7] selftests: mptcp: join: validate backup in MPJ
-    https://git.kernel.org/netdev/net/c/935ff5bb8a1c
-  - [net,6/7] mptcp: pm: fix backup support in signal endpoints
-    https://git.kernel.org/netdev/net/c/6834097fc38c
-  - [net,7/7] selftests: mptcp: join: check backup support in signal endp
-    https://git.kernel.org/netdev/net/c/f833470c2783
+Indeed this looks like more a cleanup than a fix. @Daniel why net-next 
+without fixes tag is not a suitable target here?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks!
 
+Paolo
 
 
