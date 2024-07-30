@@ -1,166 +1,113 @@
-Return-Path: <netdev+bounces-113861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 591F49401F1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:18:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F3339401FC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DC351F22861
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 00:18:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFA02282A19
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 00:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D89653;
-	Tue, 30 Jul 2024 00:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870E23D71;
+	Tue, 30 Jul 2024 00:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xu31KtL3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CIoBVdlJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27499184E
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 00:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D123C28
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 00:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722298676; cv=none; b=KLEv8ly762JMS558DWXSAm0Ms0ORCVBa5tAUP9Igpcci2zQb9QO/4/7JPF/gfhwdbucWPAPdQoQ1I8PNEsC2zx3UFq8PIIj9ryEi9KYqmYdz578FVyuSDgeTzwSTOX4mxWFIFSTfPTpU+aLWerSD5FHfDtQM41FT0eGpedwKsWE=
+	t=1722298817; cv=none; b=VPdr7gotBmB3O/6YSu7/IHhEj9oMMGYsW2CsHnGyZ1SAq3WNg8jT1R/msT2KV8VT9zg/innuzs7zLXzWmEwtpetSP7hcHfMnp5sNDGFyTmr3pK6yCY2Qxkv56mUloiXR3/HHGmH7Ud7sRCBd56+XerEuRT38kAUQ7jvjlDgJP+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722298676; c=relaxed/simple;
-	bh=foAQ3Oij8SSAt51s1SisNTGF9SALqs5oKZFRlgZO6xo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=T73XzPXexf17FgJUDApyYHPBLF3IIHE/uGXD1gVokN5JwcOXOo94ALjE/SRpAJzntVrizBjEzthzuvdF2fu2eD1dDqeCeiuH+wK8V4MWYvnrYP4HiK15+zVfm4N0vS7XmkMRvseVcLLQfOE8tY0qOHb2Q27uq7h/azz2AuxZmuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xu31KtL3; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66619cb2d3eso77698207b3.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 17:17:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722298674; x=1722903474; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yhxEE/2LRjEtYANtksHZnCV0xPKin7uj6LdLJ2eXHIE=;
-        b=Xu31KtL3XCvDqM9YMrk5et+LOOdZ58ZVs9bPvoaz8lhcXLx/mAMWQhWNQA/C3lWPgK
-         7OrJLP3dFUX8FmYCLhwZIqOjj2ioe/Q7MW4wcRtQM/8zsE6wMp6oCGEd6+dvKUW/Hm0t
-         OPAMJbywkcef6atQXnl2TXJfufGkh1DDvTC9unn6TMuA3rhy2SsICnkUw5Oc6UwVAfKK
-         y8jqLQOKKAOEyDFJBbe2R8nn4+DWRD8nFAAIfe3rIvcqPEIBEn/olpPnCuI/FouCw1Kr
-         0v9BBgj+IVOm1BMwL7wKB/VVem00Qrue/yA5KBbH9ST0iv4oNnDEJOGZDsdlL0EAJpm9
-         yayw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722298674; x=1722903474;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yhxEE/2LRjEtYANtksHZnCV0xPKin7uj6LdLJ2eXHIE=;
-        b=VrgIc7VubtPTm0gHuRrPbFBdpFsU+lRv+IxGvxmR4H/a/DLBbWsY9tPF9gHCB62zMV
-         IeBscCN/zY+2yx4cDpfgiP4O5g6m4JpkWZHUlnS+cKRGfo4kChlNkC4j+cqh+tqvyKlY
-         uwZax24z2ARSkS6bM2HqM4t54EOmtCoPo+lBooxa7QGkh8t4psoM8BOAUwDJugyObiLv
-         YcOIlB1LbUhSIM+6s9QlWama6hkj/Vq0VBv9UUc8zlwFxjm3MuBalTVBEPG2IksVfY+S
-         GGyqGo8hVNLk+VtGtOTlP0acbriXz+XOA4E4RnURo5FlaxkITdWdTdybz0QDfHvcT1pN
-         DX7Q==
-X-Gm-Message-State: AOJu0Yy3ICvJxe3Ji+8d+qAbNVnKniMz2+WuxRkLc5hv8MD3S26DUFsa
-	e0HnzIdCLc8Rgfzi7BAdjhOEbdP5Ysrxv3luxxRRJmB/7RJwyKXXZgSQw7fSZJtZ8YGTPA==
-X-Google-Smtp-Source: AGHT+IEsIQG9kr9HGlqL8oNSGEjtYL9nEP3GtpleujiAeTZHeLC/Gz0pTKLsFdMmMFcydX/UOm+usSZD
-X-Received: from varda.mtv.corp.google.com ([2620:15c:211:200:7a79:ef2f:3d24:7a95])
- (user=maze job=sendgmr) by 2002:a05:690c:ec9:b0:62c:ea0b:a447 with SMTP id
- 00721157ae682-67a051ecefemr814617b3.2.1722298674132; Mon, 29 Jul 2024
- 17:17:54 -0700 (PDT)
-Date: Mon, 29 Jul 2024 17:17:48 -0700
+	s=arc-20240116; t=1722298817; c=relaxed/simple;
+	bh=XC+x+d4hoRmAcpxmpCSeZUnCHsTeyvtfpT75aozl8Ns=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u9sTAja1mfWSBdvfaKnf+wIjOdsxPdVpRgdXgjdydot6CtFnqn7RMipJmqQ+Vj/VCnsfHQ0kgJ5FPJI98r9dNv/5iAqHVyzv+Ri1L7AUfrRB1rNrIhSCdbeaB7fq9graF77R0rQGojCVX1zlCjbY6KumvTix4IxWM+z6X/322/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CIoBVdlJ; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a5ffa6da-b58e-4b83-961e-23d730eb5f25@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722298812;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o0t4Am9sQ981nqeF0wgRdUH+gyyigUKFZMdXOPvNK98=;
+	b=CIoBVdlJkOuufV2uw8sfVl7pBRLtKKYfmPPNPkLkXyeyjN6QGWxSx0Li8B7jLtG5bVyXHB
+	eO+tP6xb4fCzTucNq8GlF0kmCGxRWAF03eJ5KzO+eTOWzJjY5Dk6B4EFDWsXeTQ8Su9/0r
+	2utguttf4DYBUa+j+F2miwsWefm6kpg=
+Date: Mon, 29 Jul 2024 17:20:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240730001748.147636-1-maze@google.com>
-Subject: [PATCH net v2] ipv6: fix ndisc_is_useropt() handling for PIO
-From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
-To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Jen Linkova <furry@google.com>, Lorenzo Colitti <lorenzo@google.com>, 
-	Patrick Rohr <prohr@google.com>, David Ahern <dsahern@kernel.org>, 
-	"=?UTF-8?q?YOSHIFUJI=20Hideaki=20/=20=E5=90=89=E8=97=A4=E8=8B=B1=E6=98=8E?=" <yoshfuji@linux-ipv6.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [RFC PATCH v9 07/11] bpf: net_sched: Allow more optional
+ operators in Qdisc_ops
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn,
+ daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com,
+ martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
+ jhs@mojatatu.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ yepeilin.cs@gmail.com, Stanislav Fomichev <sdf@fomichev.me>
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+ <20240714175130.4051012-8-amery.hung@bytedance.com>
+ <f3bfe9a5-40e8-4a1c-a5e5-0f7f24b9e395@linux.dev>
+ <CAMB2axNNmoGAE8DBULe8Pjd3jtc=Tt4xKCyamPwqtB8fT5j75A@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAMB2axNNmoGAE8DBULe8Pjd3jtc=Tt4xKCyamPwqtB8fT5j75A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-The current logic only works if the PIO is between two
-other ND user options.  This fixes it so that the PIO
-can also be either before or after other ND user options
-(for example the first or last option in the RA).
+On 7/26/24 3:30 PM, Amery Hung wrote:
+>> The pre/post is mainly to initialize and cleanup the "struct bpf_sched_data"
+>> before/after calling the bpf prog.
+>>
+>> For the pre (init), there is a ".gen_prologue(...., const struct bpf_prog
+>> *prog)" in the "bpf_verifier_ops". Take a look at the tc_cls_act_prologue().
+>> It calls a BPF_FUNC_skb_pull_data helper. It potentially can call a kfunc
+>> bpf_qdisc_watchdog_cancel. However, the gen_prologue is invoked too late in the
+>> verifier for kfunc calling now. This will need some thoughts and works.
+>>
+>> For the post (destroy,reset), there is no "gen_epilogue" now. If
+>> bpf_qdisc_watchdog_schedule() is not allowed to be called in the ".reset" and
+>> ".destroy" bpf prog. I think it can be changed to pre also? There is a ".filter"
+>> function in the "struct btf_kfunc_id_set" during the kfunc register.
+>>
+> I can see how that would work. The ability to add prologue, epilogue
+> to struct_ops operators is one thing on my wish list.
+> 
+> Meanwhile, I am not sure whether that should be written in the kernel
+> or rewritten by the verifier. An argument for keeping it in the kernel
+> is that the prologue or epilogue can get quite complex and involves
+> many kernel structures not exposed to the bpf program (pre-defined ops
+> in Qdisc_ops in v8).
 
-side note: there's actually Android tests verifying
-a portion of the old broken behaviour, so:
-  https://android-review.googlesource.com/c/kernel/tests/+/3196704
-fixes those up.
+Can the v8 pre-defined ops be called as a kfunc? The qdisc_watchdog_cancel/init 
+in v9 could be a kfunc and called by pro/epilogue.
 
-Cc: Jen Linkova <furry@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Cc: Patrick Rohr <prohr@google.com>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: YOSHIFUJI Hideaki / =E5=90=89=E8=97=A4=E8=8B=B1=E6=98=8E <yoshfuji@linu=
-x-ipv6.org>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
-Fixes: 048c796beb6e ("ipv6: adjust ndisc_is_useropt() to also return true f=
-or PIO")
----
- net/ipv6/ndisc.c | 34 ++++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
+For checking and/or resetting skb->dev, it should be simple enough without 
+kfunc. e.g. when reusing the skb->rbnode in the future followup effort.
 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 70a0b2ad6bd7..b8eec1b6cc2c 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -227,6 +227,7 @@ struct ndisc_options *ndisc_parse_options(const struct =
-net_device *dev,
- 		return NULL;
- 	memset(ndopts, 0, sizeof(*ndopts));
- 	while (opt_len) {
-+		bool unknown =3D false;
- 		int l;
- 		if (opt_len < sizeof(struct nd_opt_hdr))
- 			return NULL;
-@@ -262,22 +263,23 @@ struct ndisc_options *ndisc_parse_options(const struc=
-t net_device *dev,
- 			break;
- #endif
- 		default:
--			if (ndisc_is_useropt(dev, nd_opt)) {
--				ndopts->nd_useropts_end =3D nd_opt;
--				if (!ndopts->nd_useropts)
--					ndopts->nd_useropts =3D nd_opt;
--			} else {
--				/*
--				 * Unknown options must be silently ignored,
--				 * to accommodate future extension to the
--				 * protocol.
--				 */
--				ND_PRINTK(2, notice,
--					  "%s: ignored unsupported option; type=3D%d, len=3D%d\n",
--					  __func__,
--					  nd_opt->nd_opt_type,
--					  nd_opt->nd_opt_len);
--			}
-+			unknown =3D true;
-+		}
-+		if (ndisc_is_useropt(dev, nd_opt)) {
-+			ndopts->nd_useropts_end =3D nd_opt;
-+			if (!ndopts->nd_useropts)
-+				ndopts->nd_useropts =3D nd_opt;
-+		} else if (unknown) {
-+			/*
-+			 * Unknown options must be silently ignored,
-+			 * to accommodate future extension to the
-+			 * protocol.
-+			 */
-+			ND_PRINTK(2, notice,
-+				  "%s: ignored unsupported option; type=3D%d, len=3D%d\n",
-+				  __func__,
-+				  nd_opt->nd_opt_type,
-+				  nd_opt->nd_opt_len);
- 		}
- next_opt:
- 		opt_len -=3D l;
---=20
-2.46.0.rc1.232.g9752f9e123-goog
+[ Unrelated to qdisc. bpf_tcp_ca can also use help to ensure the cwnd is sane. ]
 
+> 
+> Maybe we can keep the current approach in the initial version as they
+> are not in the fast path, and then move to (gen_prologue,
+> gen_epilogue) once the plumbing is done?
+
+Sure. It can be improved when things are ready.
+
+I am trying some ideas on how to do gen_epilogue and will share when I get some 
+tests working.
 
