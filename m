@@ -1,83 +1,71 @@
-Return-Path: <netdev+bounces-114284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4329E942059
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 21:10:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B8B294205C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 21:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89D3EB21770
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:10:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A65E0B21CAA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87CD18C91A;
-	Tue, 30 Jul 2024 19:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4543318B494;
+	Tue, 30 Jul 2024 19:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="cskqiIVA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tymP8zIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CB31AA3C5
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 19:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E74718A6C8;
+	Tue, 30 Jul 2024 19:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722366630; cv=none; b=TdxJejv4i4FXF35zqigDOoGJT5nuAeueR2hMJn6hGMUEyXuBzGxHhBFp3zOISBENIH1dCWWuFMA3h9MMDkNojUsEcLf6D4hf/ZAVwFCqWzWd+7j6IT+SUSVuj4zQ4RMG13hFxtEOLar2fng2K4Sle3X55xjN/ZfudFVtYwQQG20=
+	t=1722366641; cv=none; b=Loh9E3bC9cCslPOrFyaqgE1SWpSZUL1pwv3gd/xspGPgQfbWtNSrRHOs2lv4+m0laR+gLpcLeif4NkqW7NQGv9uZwIOXWY0/oip+nkcaLgK0/47AfgYenOpbGPVW1/CFeYk3QxiSQhJ6/a63MVW6PZ52z/3+qBreTaHYXQgIje0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722366630; c=relaxed/simple;
-	bh=cprG9uguQ5xQAd65VG0OmI1dSJ/AIFZZf/rzJXIqOG0=;
+	s=arc-20240116; t=1722366641; c=relaxed/simple;
+	bh=ZA62L/1AWmpvq2gPcEA68cAp/TI3YINGoR9uR6ivx68=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k2jEEnNa2OozsIiDbZCc3Y1I9RW5I7xjhN73vyf2Oipx6q4ceycqKEYRhjeu1shSCJhdWMOI+BC/tx45hfj0GODYb0K1nXJ3SFW9F/jpLVDp4Z3rwBpqN0Glj9xhoAYmHt0ecOsBtvauuGHC9DNtpv+LFj+4a/+RtApnUO3PZIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=cskqiIVA; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-65f9e25fffaso37377757b3.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 12:10:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1722366627; x=1722971427; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6GUnz9l9Hov01YwHIE/X99jR0yCQ8jWPdAfQd5kTxAs=;
-        b=cskqiIVAToN8u5ifsNa0Ulq7laX0u7m8tS/Wl+D6PimGeNtq+U5Z0/BwHUtu4/JtCb
-         aW1LvkVXUqvQeVwsETU8Fo3LKdiWzlzXJx/mEumEGJduxRJIsXyiVENDoBZDHQb3cKx2
-         gNNvvVey/3/LdT17UM5DEqAyHhnzvdGno5iy1GaVFnRZF0CxCFpHAzsTI+wZcyhvEiJN
-         CrI+T4hxjE3hUA/dYsEmDhOS4O6DsihpgpKyqG8CDvqbTxMMWONvy75dv1yZOr9kj8ZY
-         oE0asvQyZ/OBGG321K2Bz18mjufhZpGO35gOC5Rgsvju5PhA+VxPOMcF5vGGK6SMk4ta
-         gnRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722366627; x=1722971427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6GUnz9l9Hov01YwHIE/X99jR0yCQ8jWPdAfQd5kTxAs=;
-        b=s9nki0bQKI0MLu1Z6TcyOJIvGEwyeywdeDpel5dUUUpIZxL06yfBFThUTKjwEAsUFx
-         gOnJMeN6rf/OUO+QEk5G6opX/Qgl6IryF2jF65Hj+sh8ImiNpDCYVRaXdfDPMPIgmLJK
-         gvJSmcQ3U9kEvHBUi3CRz3NSm3Gv4wEjALKut8ErIgInQ7LTXXrAVJfvgV7vHcGFlpOD
-         gSEIuOaDoY/dp1RXWi475fUL1bJu9CJGsOqB/xleY8G40mUTSx8VD0QjSzzD1WTzzfI/
-         hf2V3XscHj7ke7fbAqAU8QOpbUPWwENTfaypRDfFkm/aTc/rhy61ZfPsctN6wUlhX8VE
-         Cvfg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkJyz6H5i8JBxR6bzugx55qeR3CWssg2qg2vwlNSUlX6vZJPHTg+AzvXgR+IGYLvM5Dd7Fos2Q3wkJUB2B42P/UVSFZHp+
-X-Gm-Message-State: AOJu0YxUPOd7tXw0VKKquxKrwTWWMSyzn4ERByq5lqTJl0oYt5cMgwfJ
-	60yu0XYhYrlaECcnp53FtDEcCzwF826lYxqs05fPpRHBO7HYTiL8OEQjodAKSgQ=
-X-Google-Smtp-Source: AGHT+IFlD3BEKMaeWaD720WWKRAG4+pH3jrjmCrAEylXJ2sjoD6Kq8sCVxrr8pWB9p2fWNe43d139w==
-X-Received: by 2002:a0d:dac6:0:b0:618:95a3:70b9 with SMTP id 00721157ae682-67a09592d49mr116965087b3.36.1722366626922;
-        Tue, 30 Jul 2024 12:10:26 -0700 (PDT)
-Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6756c44ceb7sm26204097b3.140.2024.07.30.12.10.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 12:10:26 -0700 (PDT)
-Date: Tue, 30 Jul 2024 15:10:25 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: viro@kernel.org
-Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org,
-	brauner@kernel.org, cgroups@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, torvalds@linux-foundation.org
-Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
- CLASS(...)
-Message-ID: <20240730191025.GB3830393@perftesting>
-References: <20240730050927.GC5334@ZenIV>
- <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-8-viro@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZT7n8BzDbeEJMQ8FfF4K5PrWWsak2ngDJKhCMvMc/CwJLomLPbtqEy0cW9Be2ok2CRMiT0lZ5V9cXAwHsYQyvE2wGSNdEFpZXfUXzm8j1ZrlX5n7sYHrYEr5yFUO/lcR1H4wcDhKNiD//AM6KDM0Utma0EC4K0SiQTX9ZGN6jPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tymP8zIv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CB6AC32782;
+	Tue, 30 Jul 2024 19:10:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722366640;
+	bh=ZA62L/1AWmpvq2gPcEA68cAp/TI3YINGoR9uR6ivx68=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tymP8zIvoylkYnhSwX3x/jkHNeWAVLplfFzyEYfGvKgbRKe9H1/FJ8LysRKuhnCH2
+	 vSKeGmTqn33j48lbZAX5uCbqCkm0m2RGsAqy5v79dmEPGniCarzxhFvRZAaVZth/O6
+	 3v8HN7jgxcfk/MUuvRJzhRpbjkSkL/v4Xm3JzW7VyfmM6hwGNg/diyTXDmj+cAbpMb
+	 oQ/hzUYlrqAnGOtDy7ZutQIvctBcm23XOb1F5eBlQ4Qliow2kVpqu5Iat2cdr0yAXV
+	 UP59Vb/NaVQFYGwjyaAJFQxxz+Ws9xCQ7i6ny4nOv7DAn3IvuMqcYGEUTY7LJdgBV8
+	 tX/U15lpvN9Yg==
+Date: Tue, 30 Jul 2024 13:10:39 -0600
+From: Rob Herring <robh@kernel.org>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>,
+	Martin =?iso-8859-1?Q?Hundeb=F8ll?= <martin@geanix.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Vibhore Vardhan <vibhore@ti.com>,
+	Kevin Hilman <khilman@baylibre.com>, Dhruva Gole <d-gole@ti.com>,
+	Conor Dooley <conor@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/7] dt-bindings: can: m_can: Add wakeup properties
+Message-ID: <20240730191039.GA1959067-robh@kernel.org>
+References: <20240729074135.3850634-1-msp@baylibre.com>
+ <20240729074135.3850634-2-msp@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,120 +74,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240730051625.14349-8-viro@kernel.org>
+In-Reply-To: <20240729074135.3850634-2-msp@baylibre.com>
 
-On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
-> From: Al Viro <viro@zeniv.linux.org.uk>
+On Mon, Jul 29, 2024 at 09:41:29AM +0200, Markus Schneider-Pargmann wrote:
+> m_can can be a wakeup source on some devices. Especially on some of the
+> am62* SoCs pins, connected to m_can in the mcu, can be used to wakeup
+> the SoC.
 > 
-> There are four places where we end up adding an extra scope
-> covering just the range from constructor to destructor;
-> not sure if that's the best way to handle that.
+> The wakeup-source property defines on which devices m_can can be used
+> for wakeup.
 > 
-> The functions in question are ovl_write_iter(), ovl_splice_write(),
-> ovl_fadvise() and ovl_copyfile().
+> The pins associated with m_can have to have a special configuration to
+> be able to wakeup the SoC. This configuration is described in the wakeup
+> pinctrl state while the default state describes the default
+> configuration.
 > 
-> This is very likely *NOT* the final form of that thing - it
-> needs to be discussed.
-> 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
 > ---
->  fs/overlayfs/file.c | 72 ++++++++++++++++++---------------------------
->  1 file changed, 29 insertions(+), 43 deletions(-)
+>  .../bindings/net/can/bosch,m_can.yaml         | 20 +++++++++++++++++++
+>  1 file changed, 20 insertions(+)
 > 
-> diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
-> index 4b9e145bc7b8..a2911c632137 100644
-> --- a/fs/overlayfs/file.c
-> +++ b/fs/overlayfs/file.c
-> @@ -132,6 +132,8 @@ static struct fderr ovl_real_fdget(const struct file *file)
->  	return ovl_real_fdget_meta(file, false);
->  }
+> diff --git a/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml b/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
+> index c4887522e8fe..ef63f6b8455d 100644
+> --- a/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
+> +++ b/Documentation/devicetree/bindings/net/can/bosch,m_can.yaml
+> @@ -106,6 +106,22 @@ properties:
+>          maximum: 32
+>      minItems: 1
 >  
-> +DEFINE_CLASS(fd_real, struct fderr, fdput(_T), ovl_real_fdget(file), struct file *file)
+> +  pinctrl-0:
+> +    description: Default pinctrl state
 > +
->  static int ovl_open(struct inode *inode, struct file *file)
->  {
->  	struct dentry *dentry = file_dentry(file);
-> @@ -174,7 +176,6 @@ static int ovl_release(struct inode *inode, struct file *file)
->  static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
->  {
->  	struct inode *inode = file_inode(file);
-> -	struct fderr real;
->  	const struct cred *old_cred;
->  	loff_t ret;
+> +  pinctrl-1:
+> +    description: Wakeup pinctrl state
+> +
+> +  pinctrl-names:
+> +    description:
+> +      When present should contain at least "default" describing the default pin
+> +      states. The second state called "wakeup" describes the pins in their
+> +      wakeup configuration required to exit sleep states.
+> +    minItems: 1
+> +    items:
+> +      - const: default
+> +      - const: wakeup
+> +
+>    power-domains:
+>      description:
+>        Power domain provider node and an args specifier containing
+> @@ -122,6 +138,10 @@ properties:
+>      minItems: 1
+>      maxItems: 2
 >  
-> @@ -190,7 +191,7 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
->  			return vfs_setpos(file, 0, 0);
->  	}
->  
-> -	real = ovl_real_fdget(file);
-> +	CLASS(fd_real, real)(file);
->  	if (fd_empty(real))
->  		return fd_error(real);
->  
-> @@ -211,8 +212,6 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
->  	file->f_pos = fd_file(real)->f_pos;
->  	ovl_inode_unlock(inode);
->  
-> -	fdput(real);
-> -
->  	return ret;
->  }
->  
-> @@ -253,8 +252,6 @@ static void ovl_file_accessed(struct file *file)
->  static ssize_t ovl_read_iter(struct kiocb *iocb, struct iov_iter *iter)
->  {
->  	struct file *file = iocb->ki_filp;
-> -	struct fderr real;
-> -	ssize_t ret;
->  	struct backing_file_ctx ctx = {
->  		.cred = ovl_creds(file_inode(file)->i_sb),
->  		.user_file = file,
-> @@ -264,22 +261,18 @@ static ssize_t ovl_read_iter(struct kiocb *iocb, struct iov_iter *iter)
->  	if (!iov_iter_count(iter))
->  		return 0;
->  
-> -	real = ovl_real_fdget(file);
-> +	CLASS(fd_real, real)(file);
->  	if (fd_empty(real))
->  		return fd_error(real);
->  
-> -	ret = backing_file_read_iter(fd_file(real), iter, iocb, iocb->ki_flags,
-> -				     &ctx);
-> -	fdput(real);
-> -
-> -	return ret;
-> +	return backing_file_read_iter(fd_file(real), iter, iocb, iocb->ki_flags,
-> +				      &ctx);
->  }
->  
->  static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
->  {
->  	struct file *file = iocb->ki_filp;
->  	struct inode *inode = file_inode(file);
-> -	struct fderr real;
->  	ssize_t ret;
->  	int ifl = iocb->ki_flags;
->  	struct backing_file_ctx ctx = {
-> @@ -295,7 +288,9 @@ static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
->  	/* Update mode */
->  	ovl_copyattr(inode);
->  
-> -	real = ovl_real_fdget(file);
-> +	{
+> +  wakeup-source:
+> +    $ref: /schemas/types.yaml#/definitions/flag
 
-Is this what we want to do from a code cleanliness standpoint?  This feels
-pretty ugly to me, I feal like it would be better to have something like
+I thought we had a common schema defining the type, but we don't. I'm 
+going to add it now. So just need:
 
-scoped_class(fd_real, real) {
-	// code
-}
+wakeup-source: true
 
-rather than the {} at the same indent level as the underlying block.
-
-I don't feel super strongly about this, but I do feel like we need to either
-explicitly say "this is the way/an acceptable way to do this" from a code
-formatting standpoint, or we need to come up with a cleaner way of representing
-the scoped area.  Thanks,
-
-Josef
+> +    description: This device is capable to wakeup the SoC.
+> +
+>  required:
+>    - compatible
+>    - reg
+> -- 
+> 2.45.2
+> 
 
