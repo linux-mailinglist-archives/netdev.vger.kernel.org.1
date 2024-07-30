@@ -1,124 +1,104 @@
-Return-Path: <netdev+bounces-114304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F6794214E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:07:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A795A942160
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B6E1B203AA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:06:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6545A286A41
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36CC18C909;
-	Tue, 30 Jul 2024 20:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D1518DF60;
+	Tue, 30 Jul 2024 20:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HuaPJYsk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="C2H3gKII"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9DE18A6CB
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 20:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DED1667F1;
+	Tue, 30 Jul 2024 20:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722370015; cv=none; b=bUEp+Buslx4UT/k/8PFOEG37ewMf8IaMarTjiQw45BU9eto+cVBNeXHchhxP4z1FTJR/NgtVJDZ1+akYk/jGP64x0ZkiENDm6wgiKt6NTODtf96+BBxQh1b0b8k9ilObRKxnm5z/r8eMVPNoGkkpvDfz9U/Bi6j7xfSojgUDQp4=
+	t=1722370481; cv=none; b=OeMECoDDO2O5IyJgvqaG8RSFiDM3+lhNOeMfNI04WCEzUS8PHFxwymNU7jCjClxulxbZg8gY/hQJuQwgTGwh9Ocwvp43mNIt17aoYWxHtfEiotuwFImcNyBb2e5nq5RWLEoyNY8Fbr+Hp7v56/9r2sxxqs2lIL4xYY92FPHejHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722370015; c=relaxed/simple;
-	bh=djTNXWSXJ59SGch4xHKZXSPO+/1mb3fR+2F8X1y5czQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tVA4ST2yX4v4Z+QZTMujMA3W9QKlk2k/5Nt4y0Xk4p6uC9yhS9awQXbocN74ayd2qitZ/S4skKj/e/FzGCjSfKdb8sR726O8bpTlQy3gRYNCRNyhceReKJu+bm3ydlMc0CSShG3YScZlskonfzni4wE0Lz5aOOWIHGgqCf5dMuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HuaPJYsk; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722370014; x=1753906014;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=orbKmBP0eXSKgyb0kXEe4j3vXFdge5+/DamkMbNoT5Q=;
-  b=HuaPJYskw1ckXZMtrxUbD0rySmJE/5BcgJTFf7gdh91Vm91vAFsg/z0A
-   Loj1mBdEV9xhc+IsXtG1VU9Glfx2KhcszuitHUwrhcDSfWRH9AoBPA7GP
-   LTCSdCAoQAJ8JL2p6QcVr0nf1SxoP3SkEF/PUdWemX16JztpdZFJRkAKi
-   k=;
-X-IronPort-AV: E=Sophos;i="6.09,248,1716249600"; 
-   d="scan'208";a="359635005"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 20:06:46 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:21320]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.198:2525] with esmtp (Farcaster)
- id 3ebf5f9e-558d-4d60-8df2-54fda8d710de; Tue, 30 Jul 2024 20:06:45 +0000 (UTC)
-X-Farcaster-Flow-ID: 3ebf5f9e-558d-4d60-8df2-54fda8d710de
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 30 Jul 2024 20:06:45 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 30 Jul 2024 20:06:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kernelxing@tencent.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net-next 4/6] tcp: rstreason: introduce SK_RST_REASON_TCP_STATE for active reset
-Date: Tue, 30 Jul 2024 13:06:33 -0700
-Message-ID: <20240730200633.93761-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240730133513.99986-5-kerneljasonxing@gmail.com>
-References: <20240730133513.99986-5-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1722370481; c=relaxed/simple;
+	bh=9FSQ4rRw0IzGDwl2vOi2QSzdr2u/VER9L8rUJuaSq5Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=alq39LWaWdWfbOs3DM0eubBtgYcbAIBphhnEuXcGfrcXRA5GFbhK5jnQkEGCwNBnNGVdCiAJk0ZyeD2mr3g56y/QJ0LKNrsv4EiLiaY+VPFRIiqu8xrDIy5V4jEz4PIOugVSYX241wAX8Qq9VFsqIO8Jt7emCzp9/e5i/6TbkSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=C2H3gKII; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=v4CFd2TasPmU5GDteTVVRLuZB39ec134+LR0uaf3ydU=; b=C2H3gKIIUm+tU5C1HxkyyXLETb
+	PlZtDj4JkLFTu4kywGSODjI4ivgbmrIhmZvC1pSmlDF3UAWR0fxQ21aOZ/zSTXvmirEW9gg3bcvOm
+	IWoixsdzzX5pVPIZWZxFnXl8cXx+o+WAJWXWa4kfOHVB2oR9hNjQrTn+3VmGOGgw8bzU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sYtEk-003brc-7n; Tue, 30 Jul 2024 22:14:22 +0200
+Date: Tue, 30 Jul 2024 22:14:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk@kernel.org, robh@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	conor+dt@kernel.org, richardcochran@gmail.com,
+	mcoquelin.stm32@gmail.com, alim.akhtar@samsung.com,
+	linux-fsd@tesla.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, alexandre.torgue@foss.st.com,
+	peppe.cavallaro@st.com, joabreu@synopsys.com, rcsekar@samsung.com,
+	ssiddha@tesla.com, jayati.sahu@samsung.com,
+	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v4 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
+Message-ID: <18b83c34-c0e4-466c-aaa1-fff38c507e9a@lunn.ch>
+References: <20240730091648.72322-1-swathi.ks@samsung.com>
+ <CGME20240730092902epcas5p1520f9cac624dad29f74a92ed4c559b25@epcas5p1.samsung.com>
+ <20240730091648.72322-3-swathi.ks@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB002.ant.amazon.com (10.13.138.97) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730091648.72322-3-swathi.ks@samsung.com>
 
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 30 Jul 2024 21:35:11 +0800
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Introducing a new type TCP_STATE to handle some reset conditions
-> appearing in RFC 793 due to its socket state.
+> +static int dwc_eqos_rxmux_setup(void *priv, bool external)
+> +{
+> +	int i = 0;
+> +	struct fsd_eqos_plat_data *plat = priv;
+> +	struct clk *rx1 = NULL;
+> +	struct clk *rx2 = NULL;
+> +	struct clk *rx3 = NULL;
 
-Why not RFC 9293 ?
-Was there any discrepancy ?
+Reverse Christmas tree please.
 
+> @@ -264,6 +264,7 @@ struct plat_stmmacenet_data {
+>  	void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
+>  	int (*init)(struct platform_device *pdev, void *priv);
+>  	void (*exit)(struct platform_device *pdev, void *priv);
+> +	int (*rxmux_setup)(void *priv, bool external);
+>  	struct mac_device_info *(*setup)(void *priv);
+>  	int (*clks_config)(void *priv, bool enabled);
+>  	int (*crosststamp)(ktime_t *device, struct system_counterval_t *system,
 
-> 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  include/net/rstreason.h | 6 ++++++
->  net/ipv4/tcp.c          | 4 ++--
->  net/ipv4/tcp_timer.c    | 2 +-
->  3 files changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/rstreason.h b/include/net/rstreason.h
-> index eef658da8952..fecaa57f1634 100644
-> --- a/include/net/rstreason.h
-> +++ b/include/net/rstreason.h
-> @@ -20,6 +20,7 @@
->  	FN(TCP_ABORT_ON_CLOSE)		\
->  	FN(TCP_ABORT_ON_LINGER)		\
->  	FN(TCP_ABORT_ON_MEMORY)		\
-> +	FN(TCP_STATE)			\
->  	FN(MPTCP_RST_EUNSPEC)		\
->  	FN(MPTCP_RST_EMPTCP)		\
->  	FN(MPTCP_RST_ERESOURCE)		\
-> @@ -102,6 +103,11 @@ enum sk_rst_reason {
->  	 * corresponding to LINUX_MIB_TCPABORTONMEMORY
->  	 */
->  	SK_RST_REASON_TCP_ABORT_ON_MEMORY,
-> +	/**
-> +	 * @SK_RST_REASON_TCP_STATE: abort on tcp state
-> +	 * Please see RFC 793 for all possible reset conditions
-> +	 */
-> +	SK_RST_REASON_TCP_STATE,
+It would be good if one of the stmmas Maintainers looked at
+this. There are already a lot of function pointers here, we should not
+be added another one if one of the exiting ones could be used.
 
-Same here.
+    Andrew
+
+---
+pw-bot: cr
+
 
