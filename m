@@ -1,168 +1,154 @@
-Return-Path: <netdev+bounces-114332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2006F9422B9
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:24:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B69DA942306
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2930285F16
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:23:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4DC91C211F9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E108190051;
-	Tue, 30 Jul 2024 22:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LJ0i3kBM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73511917C9;
+	Tue, 30 Jul 2024 22:39:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B32157466;
-	Tue, 30 Jul 2024 22:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40CE18DF9D;
+	Tue, 30 Jul 2024 22:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722378234; cv=none; b=dpf0XdFm2q25Ob3i9NuaQPGNSoI8wWtNYq/wxtmIRX8NUX70L1cUWYdPj+w8ZyhGkAM0OBXBcEwci0NlMIGJPOTONDKW4kyULi6B8L6qW/07O6RsJjoRXJuHmRefoqjmomnuaRR9okEBKosWvf//JlubKhk6Ih5NGf/QIr3MaB8=
+	t=1722379176; cv=none; b=EVXLogLzIfTEvQtZHi3EoOqiRh/LfMe2nUGwoFrnI8MOMdFo+IbSOUlwo+qIzptvvLJs7P6AuB3mv9fj+0+iL3zkls/FIsQj/1wHZJUDJImgYxr/L2n/UtUf3pVJWdlS5cXb0XHu5xQlHMZtcci+c2ox+Sp17qKiK00g1ufPPmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722378234; c=relaxed/simple;
-	bh=fxqK6isVZYwjWROTSakPQHD1uYqeONWbVadqH001MSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rcuNn1zoFjH4UKJTPjyu/KRpZetlHFHpUFzstfU9ZCD+AM0FjL6/7cdCyS2RveXtxwg0ayiN6n6ls7sO3ktsp8ZTYdMfFFAmZumMmfEChnJr4YVNkFkTXP/Df70DNZNGYb4vbklPdz7CW1ZoaajCxLlMN1kJl/cd9jfpBCxzA5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LJ0i3kBM; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=P+25ADvoROh3ffi6FNyXx7pUdybk/3nfa31XZxVnXGU=; b=LJ0i3kBMZtOgfYX0X+jr54WU8/
-	W9xQIb84pCCea3gJlCjH4CUOTRsN58XNQQkw1cWWUVUVVmgRXXNlEIHeyL/z9d3Rdjsu/ftFIK2A+
-	3kUnKkYLcHRCPVzJwl8Di/BMkS4Z2Xwl/4uOGous4gtTb2lM78upQP3gmpQsfxhLuKMF5IhsviSjB
-	EPWVtOn4FotVQNh+VkMMMt34vncPV1seypghmuIvDESSHvGij99auSvphf97GDCbf4tTNSJx82Dum
-	Rqw56fcYvcgp6asoejhVC/CkEJ6Hmd/113iofRhS3veG4ojBhx2bLd4MwbWB+JP1Fn/D5F9oFrCCX
-	zcpAN3mw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36616)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sYvFI-0007jE-17;
-	Tue, 30 Jul 2024 23:23:04 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sYvFB-0005am-Gh; Tue, 30 Jul 2024 23:22:57 +0100
-Date: Tue, 30 Jul 2024 23:22:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Allen Pais <allen.lkml@gmail.com>, kuba@kernel.org,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Mirko Lindner <mlindner@marvell.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	jes@trained-monkey.org, kda@linux-powerpc.org,
-	cai.huoqing@linux.dev, dougmill@linux.ibm.com, npiggin@gmail.com,
-	christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
-	naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com,
-	tlfalcon@linux.ibm.com, cooldavid@cooldavid.org, nbd@nbd.name,
-	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	lorenzo@kernel.org, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com, borisp@nvidia.com,
-	bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
-	louis.peens@corigine.com, richardcochran@gmail.com,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-acenic@sunsite.dk, linux-net-drivers@amd.com,
-	netdev@vger.kernel.org
-Subject: Re: [net-next v3 14/15] net: marvell: Convert tasklet API to new
- bottom half workqueue mechanism
-Message-ID: <ZqlnwSDCvhrRe32K@shell.armlinux.org.uk>
-References: <20240730183403.4176544-1-allen.lkml@gmail.com>
- <20240730183403.4176544-15-allen.lkml@gmail.com>
- <fbb19744-cc77-4541-90b5-0760e0eeae22@lunn.ch>
+	s=arc-20240116; t=1722379176; c=relaxed/simple;
+	bh=vOIVhjatM4IfJSq1e4V0IbA96qyphn0Bgq0/WUrKY2Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=psTyc8oojDDDG0Lr14klaAgeto9NIK/ekGFehBboFERcVm6G/klxMtlEm00tgSJTNAvGZ/guLsTWNyljy661SKBbBD0PjvSf+1ANiHD8k2YEuVKa8efJOzsIzExxKpLQx/QEj52i6Ne8Fy+RS5m39i+HjOFtInJeDY87nLRkGuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-397052a7b63so22429335ab.1;
+        Tue, 30 Jul 2024 15:39:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722379173; x=1722983973;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T20/potiJ817xYau9AKmhVJz5e/mlBDHwVmIwp++kkY=;
+        b=hJZ7vkR3VxSVMcP/Dc8NUkpzK9Zbl1yWKhOonIUCxfEsjvHJt5YkcnR5ar6FaxkKrd
+         Z+LmL0LKYvE3cewxxKH4emy0HqxVlxqWqvpd3ywdWrt1ZbLKxjE7v1jBJkFyiUr3BgSw
+         9xBfJd7bsrG8JVySiQ3dIoqhcxLQ5nSrNQv1k6aXSkz/nFv4E+LRGC2obKzuNAIKZlZM
+         oiG/LVrvOrJ7hVwma6qUK01KiRGCiwYPZJuwk22s9kARpAni3NmhyCo0T7hILWdvkcIR
+         jsG5uFd+W9tgKmEcDQ3C+aRZ80xNmwYyeELKYIPkLPwaeMEqVDZ/YRnow0V6IsStrX9Q
+         /XPw==
+X-Forwarded-Encrypted: i=1; AJvYcCXAGIJBvyf80B92C/OR1dFuO3A8ITxqL4dL9PCULKYuTi7OO+8jmlI2H9wUVJV6kAUY7dz6fD52FJ21OulxuVueVRd1JQ+DLm0OgOgOeXso
+X-Gm-Message-State: AOJu0YydlHy7KrTpEVam2wFKqkszuqBSho2VXaYxy0xVe0e/VQx/zZJQ
+	VYmeCg/TlS0pwyPhcZ7LNdEZhOWSjAgotRJZKJNqTfs7YBFo89mav5niUl8=
+X-Google-Smtp-Source: AGHT+IG6uQ9oZ2I4ac8OfiMVTLbvyYWCFEV0JTQoOJsdmmdCtVZCR98yp1JFa7/BujIdZoHEES1+8g==
+X-Received: by 2002:a05:6e02:178d:b0:384:32f4:9e92 with SMTP id e9e14a558f8ab-39aec41a2cfmr167897945ab.26.1722379173419;
+        Tue, 30 Jul 2024 15:39:33 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f9fbd4b0sm8081299a12.72.2024.07.30.15.39.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 15:39:33 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Shuah Khan <shuah@kernel.org>,
+	Joe Damato <jdamato@fastly.com>,
+	Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v2 1/2] selftests: net-drv: exercise queue stats when the device is down
+Date: Tue, 30 Jul 2024 15:39:31 -0700
+Message-ID: <20240730223932.3432862-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fbb19744-cc77-4541-90b5-0760e0eeae22@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 30, 2024 at 10:39:51PM +0200, Andrew Lunn wrote:
-> > - * Called only from mvpp2_txq_done(), called from mvpp2_tx()
-> > - * (migration disabled) and from the TX completion tasklet (migration
-> > - * disabled) so using smp_processor_id() is OK.
-> > + * Called only from mvpp2_txq_done().
-> > + *
-> > + * Historically, this function was invoked directly from mvpp2_tx()
-> > + * (with migration disabled) and from the bottom half workqueue.
-> > + * Verify that the use of smp_processor_id() is still appropriate
-> > + * considering the current bottom half workqueue implementation.
-> 
-> What does this mean? You want somebody else to verify this? You are
-> potentially breaking this driver?
+Verify that total device stats don't decrease after it has been turned down.
+Also make sure the device doesn't crash when we access per-queue stats
+when it's down (in case it tries to access some pointers that are NULL).
 
-I don't see how, the only thing that's changing in mvpp2 seems to be
-an outdated comment that happens to mention a tasklet, but the
-driver doesn't use tasklets.
+  KTAP version 1
+  1..5
+  ok 1 stats.check_pause
+  ok 2 stats.check_fec
+  ok 3 stats.pkt_byte_sum
+  ok 4 stats.qstat_by_ifindex
+  ok 5 stats.check_down
+  # Totals: pass:5 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Let's look at the original comment which claims what the call sites
-are:
+v2:
+- KTAP output formatting (Jakub)
+- defer instead of try/finally (Jakub)
+- disappearing stats is an error (Jakub)
+- ksft_ge instead of open coding (Jakub)
 
-static void mvpp2_txq_done(struct mvpp2_port *port, struct mvpp2_tx_queue *txq,
-                           struct mvpp2_txq_pcpu *txq_pcpu)
-{
-...
-        tx_done = mvpp2_txq_sent_desc_proc(port, txq);
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+--
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Joe Damato <jdamato@fastly.com>
+Cc: Petr Machata <petrm@nvidia.com>
+Cc: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/drivers/net/stats.py | 25 +++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-and that is it. _This_ function is called from several places:
-
-mvpp2_tx_done()
-mvpp2_xdp_finish_tx()
-mvpp2_tx()
-
-So I suppose that the original comment was referring to the
-mvpp2_tx() -> mvpp2_txq_done() -> mvpp2_txq_sent_desc_proc() call path,
-and the others were added over time.
-
-mvpp2_tx_done() is called from mvpp2_hr_timer_cb(), and yes, back in
-the distant history there was a tasklet here - see:
-
-ecb9f80db23a net/mvpp2: Replace tasklet with softirq hrtimer
-
-So, the comment referring to a tasklet was left over from that commit
-and never fixed up.
-
-Given this, I don't think the new paragraph starting "Historically"
-is correct (or even relevant) as I think it misinterprets the original
-comment - and "this function" is ambiguous in it, but either way its
-still wrong.
-
-If we assume that "this function" refers to the one below the comment,
-then this has never been called directly from mvpp2_tx() nor the
-tasklet, and talking about a bottom half workqueue makes no sense
-because "historically" it's never been called from a bottom half
-workqueue.
-
-If we assume that "this function" refers to mvpp2_txq_done(), then
-it's not historical that this was called from mvpp2_tx(), because it
-still is today. And the bit about being called from a bottom half
-workqueue is still false.
-
-Given that bottom half workqueues have absolutely nothing to do with
-this code path, the sentence beginning with "Verify" seems totally
-irrelevant (at least to me.)
-
-So, I think I've comprehensively ripped the new comment to shreds.
-It would be far better to leave the driver alone and not change the
-comment despite it incorrectly referring to a tasklet that has
-already been eliminated (and at least was historically correct),
-rather than the new comment which just seems wrong.
-
+diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
+index 820b8e0a22c6..93f9204f51c4 100755
+--- a/tools/testing/selftests/drivers/net/stats.py
++++ b/tools/testing/selftests/drivers/net/stats.py
+@@ -5,6 +5,7 @@ from lib.py import ksft_run, ksft_exit, ksft_pr
+ from lib.py import ksft_ge, ksft_eq, ksft_in, ksft_true, ksft_raises, KsftSkipEx, KsftXfailEx
+ from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
+ from lib.py import NetDrvEnv
++from lib.py import ip, defer
+ 
+ ethnl = EthtoolFamily()
+ netfam = NetdevFamily()
+@@ -133,9 +134,31 @@ rtnl = RtnlFamily()
+     ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.ifindex')
+ 
+ 
++def check_down(cfg) -> None:
++    try:
++        qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)
++    except NlError as e:
++        if e.error == 95:
++            raise KsftSkipEx("qstats not supported by the device")
++        raise
++
++    ip(f"link set dev {cfg.dev['ifname']} down")
++    defer(ip, f"link set dev {cfg.dev['ifname']} up")
++
++    qstat = qstat[0]
++    qstat2 = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
++    for k, v in qstat.items():
++        ksft_ge(qstat2[k], qstat[k], comment=f"{k} went backwards on device down")
++
++    # exercise per-queue API to make sure that "device down" state
++    # is handled correctly and doesn't crash
++    netfam.qstats_get({"ifindex": cfg.ifindex, "scope": "queue"}, dump=True)
++
++
+ def main() -> None:
+     with NetDrvEnv(__file__) as cfg:
+-        ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex],
++        ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex,
++                  check_down],
+                  args=(cfg, ))
+     ksft_exit()
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.45.2
+
 
