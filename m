@@ -1,120 +1,94 @@
-Return-Path: <netdev+bounces-114216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EB4794184F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:21:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58FBF94185B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A236286060
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:21:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC543B2A592
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF61D1898E3;
-	Tue, 30 Jul 2024 16:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA4E18990C;
+	Tue, 30 Jul 2024 16:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAcg5fZ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3819189503;
-	Tue, 30 Jul 2024 16:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B138B1A6190;
+	Tue, 30 Jul 2024 16:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722356409; cv=none; b=FMBfq4Z7rQ1kUalERNAKAk2aKOxDGlQwy9NcYSRVHg/j2Bp9LAWsi7oG7ykkVZ014M/kdMQiVO5vukJFFDmuL+t5OjSOcyESlNFGXdiOw3inPKVytVsKpfNBbBiSLF/FCYJlx2feYgG5E8oRkMWxhkJlXYZXsCR55u6R54SYQiw=
+	t=1722356430; cv=none; b=hUriAUi+dqYBD+s7OPDyjPDmNY/62w+YAFp25tRDch1UGUlToqx/9q6+BhJfN0u8bfFUHZuY7aVEkljd+O1cY0w1vhjDRDYvISaEAmUvyBIpdmrtDUxUuxnr/8tQV7+CZWpSij9lT05G3XR39eEsJgEThlTo8cuUajTk6eBt8h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722356409; c=relaxed/simple;
-	bh=TY5iOr5tfwo4FDpYsZpKpOOmjcoiZSnJgzg7dklim0s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QzS/kBIrveRjreMv67I/TxUUpSUROf3xbTEls2URcAAe0Hz7Lt1YV852dtw1WJPxutrt10yd000zF4ygeB9qtxLYRxIjeMkdEPaDrIumOXIn9xnPeU1Be2rTi2hpdbDWY4HjJEcfG1hc4J6+4OFUyMwYbE5cZ488zkHoBrl+j9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7a1c7857a49so2985336a12.1;
-        Tue, 30 Jul 2024 09:20:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722356407; x=1722961207;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nEALnRPWK6uP6fkyvkVukOq/0JwVxe26FQ0nX7S8CUo=;
-        b=Y+eu2FgrNGaT1IS9AHb1BHQymmSCI9C6Oro/HmYgMWK+xkaR5qTlPXBigEm8qEng/M
-         JyS3l6RxG+KcfPwR94QHBwcrT5a0zrtRkXS/Pg3TDI6WdBAZfbHVub8oFcuucrBw2JJk
-         J+IUcVvBYGVgsFJ3O67BoazuxZJF4xl72M2hInXGNanN+3ttLlBNxBRf+jXjCVaG6xf/
-         kMuY/Sjw8LTXNo/xtWWwumYNTL1RYbJ1GZ4EqdMu0wVp5goOB6z/wvbJiC8Q0RmO4ysG
-         2CJBNVDlxNMemSyfC0hhZLjEaD9IZrUXSPULIp71RdlGTXNJ/iN9XXzOuG2H8VtNjW7a
-         DFjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdRMUVqaTOwY5DqbKkzM7DPhULP0o8FD9fEWmYDV7FzX6tEYf/FVgQY4yRyPlDbbN5Hm+fz/fkEB9lDvo6NU2SBs4Arr+q72oiYrfs6dTD
-X-Gm-Message-State: AOJu0Yx1cD8bQArGNo/vNG7K/UDPjfe2TY3Zr9aP1KQSsHnfpOm9BvAl
-	Jru8jBjHPz0f/ibDF1psAVQcs/n9FMr2rH9Z8imAV/sccxpR+Uo=
-X-Google-Smtp-Source: AGHT+IEq1aikRvq6hCXivmDQcj2a0BREWwj/jIUHVvE6+2Zu+63pQcpuKaAAm+jjW2OBDznoWxcsbw==
-X-Received: by 2002:a05:6a20:9184:b0:1c2:9095:7382 with SMTP id adf61e73a8af0-1c4a14fe5d4mr9498821637.52.1722356406680;
-        Tue, 30 Jul 2024 09:20:06 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70eca8af213sm6241125b3a.180.2024.07.30.09.20.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 09:20:06 -0700 (PDT)
-Date: Tue, 30 Jul 2024 09:20:05 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, Shuah Khan <shuah@kernel.org>,
-	Joe Damato <jdamato@fastly.com>, Petr Machata <petrm@nvidia.com>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] selftests: net: ksft: support marking tests
- as disruptive
-Message-ID: <ZqkStZ9UHfcYBG9L@mini-arch>
-References: <20240729221042.2700882-1-sdf@fomichev.me>
- <20240729221042.2700882-2-sdf@fomichev.me>
- <20240729190013.5b0743e7@kernel.org>
+	s=arc-20240116; t=1722356430; c=relaxed/simple;
+	bh=BUUyY1NTz3JrwklnZ/Mk1s3DehDybPuYkwhI5XkEtLg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TH3IxE55ZtTxYsaYK7CmiffMJ8spqLR4oJeHrn1Fj4shj1rmAy99VTMKDEjNaR0j1YNNlWAilZPNOAbBZNmcvMhBGhazcErsI+dqbHftwkvTY2DjSf5fIOHUJsLIPamG6BRL75JupdI6SPeYaT68SOEFVCSYpEq5OF9ZqajxxCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAcg5fZ1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 85926C4AF0C;
+	Tue, 30 Jul 2024 16:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722356430;
+	bh=BUUyY1NTz3JrwklnZ/Mk1s3DehDybPuYkwhI5XkEtLg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WAcg5fZ1skHq3iYqMc8IUfB/jA7JF4wcIzUJSb7VvWTkC3VWJ9cKGK6B/VoUaT9EM
+	 iEESRyZtsKQJpXDXeSpdk/tk/N2XVgJB4H10fKKY/C4cl1/d1mefL3hDmgbMDni52n
+	 OV5rO/OBi6OcEEP7X1trOUvQn//pUsrJBGSAIFU81u04QCz46/NfyYuk219b5PsCRR
+	 T97IbGQkEzwQDug5bzCN3zYpH2nLX1WyqbLefxuAC1MFcM2QJiOYvhfpn1HV/TwveW
+	 aYSOTuhn7jWLZuFafDSWDOLdU+ZBc3F7/L3kFnYbLU+z8Y6F88DmWCABtExJhokD7p
+	 y7aATP87ypOpA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73D1DC6E398;
+	Tue, 30 Jul 2024 16:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240729190013.5b0743e7@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: mvpp2: Don't re-use loop iterator
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172235643047.2398.10999820377012165647.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Jul 2024 16:20:30 +0000
+References: <eaa8f403-7779-4d81-973d-a9ecddc0bf6f@stanley.mountain>
+In-Reply-To: <eaa8f403-7779-4d81-973d-a9ecddc0bf6f@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: stefanc@marvell.com, marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
-On 07/29, Jakub Kicinski wrote:
-> On Mon, 29 Jul 2024 15:10:42 -0700 Stanislav Fomichev wrote:
-> > +    parser = argparse.ArgumentParser()
-> > +    parser.add_argument('--skip-disruptive', default=False, action='store_true', help='skip tests that might be disruptive (e.g. restart the interface)')
-> > +    global KSFT_ARGS
-> > +    KSFT_ARGS = parser.parse_args()
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 24 Jul 2024 11:06:56 -0500 you wrote:
+> This function has a nested loop.  The problem is that both the inside
+> and outside loop use the same variable as an iterator.  I found this
+> via static analysis so I'm not sure the impact.  It could be that it
+> loops forever or, more likely, the loop exits early.
 > 
-> We pass all other args via env exports, I think we should stick to
-> that, it's easier to integrate with external runners.
+> Fixes: 3a616b92a9d1 ("net: mvpp2: Add TX flow control support for jumbo frames")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
-> FWIW Mohsin is also adding VERBOSE=1 this way:
-> https://lore.kernel.org/all/20240715030723.1768360-1-mohsin.bashr@gmail.com/
+> [...]
 
-SG! The patch you reference is doing it in NetDrvEnv* but I'll probably
-try to keep most of the code in 'core' ksft. So far I'm thinking about
-adding some ksft_setup(env) to initialize that disruptive=yes/no state.
-LMK if you prefer me to keep everything in NetDrvEnv instead (or wait
-until I send out a v2 later today).
+Here is the summary with links:
+  - [net] net: mvpp2: Don't re-use loop iterator
+    https://git.kernel.org/netdev/net/c/0aa3ca956c46
 
-And thanks for the feedback on 1/2, will incorporate in the v2.
-
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index a5e800b8f103..2b2a216bf108 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -4,6 +4,7 @@ import os
- import time
- from pathlib import Path
- from lib.py import KsftSkipEx, KsftXfailEx
-+from lib.py import ksft_setup
- from lib.py import cmd, ethtool, ip
- from lib.py import NetNS, NetdevSimDev
- from .remote import Remote
-@@ -30,6 +31,7 @@ from .remote import Remote
-             if len(pair) != 2:
-                 raise Exception("Can't parse configuration line:", full_file)
-             env[pair[0]] = pair[1]
-+    ksft_setup(env)
-     return env
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
