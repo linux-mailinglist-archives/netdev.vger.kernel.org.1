@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-114321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 282769421C6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:42:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DF49421C7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:42:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEF751F2573D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:42:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 154102856EA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F72A18E053;
-	Tue, 30 Jul 2024 20:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C1318DF9C;
+	Tue, 30 Jul 2024 20:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dAtohRDB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OpJVpyTz"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034D218E042
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 20:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C06118DF97
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 20:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722372120; cv=none; b=m1dVFdW4sQb2R2A6fMM80A8y3fAYdako5Zfe6DSdqTbP5re278cFSbAK5TpbWJB5k6bemhJ1/A/ETvfJvYup9Xxmg4mh2CDtJpS/Dyd77snNafe/tXfITrHaYlyBXPlC9KYrCEw5kU/r/MxT7RnP0spqGadgq/guIBtIu0r0sMY=
+	t=1722372124; cv=none; b=tREQQM81Mk1ACweS76PP7U8+MA48hoK73ERM9MmmCvZF3p/SjGRJuD42DAeTt/c5ZizlC2o/MC1zJwK7NCPzzgOX2PHsM5RF9WtgllinB132lHAybHxobrV7AmJ2/eskRnAKhsip0j2DFo8RqtQwMBtoHawTAme38Mm4/gnFk3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722372120; c=relaxed/simple;
-	bh=jzeefmtm23gotVJUZtFmrljbLafDKNwPXTv1b1zb5As=;
+	s=arc-20240116; t=1722372124; c=relaxed/simple;
+	bh=zPmTcLsJ5toHTIc7mNFxRB+nQojckZKy5YazMlLARNw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a41E2ztrEV8X2/sMnc5NrqOtelfy1u5UEj07Zq7l6MwqxjIvO8BAQVdpSrop1aKUmfAcOTd6M0XSYMKkANHeJ+ROU/8zpTaLYSWkHu2hrwYSJyEdvDwqVFYmG2soNo9Kme6ek/3CsXzHjUBBzNBkv3z4zV8Au/b5FOGvtRTTINY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dAtohRDB; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=kNytNDkTGlnQ9OL8WBKiTZXEPC4/Sc2PWeV/dOo+qunOe+3/+MuoQ2+LKytZug2lZxDB4ebvFyAZeJb8fqg4cIz0P8h4bBmdKp2EPDs1zYiOVtp7ozodwZsSFW+CS+07STJXgwsDcifcLLDEoDsNepDTqSmbG2hT4x9rx9i1Mew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OpJVpyTz; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722372118;
+	s=mimecast20190719; t=1722372121;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HezWOAD1JEsnj8Pax13pDEaLOCwPRkeKpZDwJyFUDYE=;
-	b=dAtohRDBR/JzkBoLHrh4qLhUDhIMVhvSkVwFh0F9MsiP04ABF+JfY19tL4KQZFYAQSM0fX
-	Oy3VV3Z1f/CzOWlhYMQFxovlEail3DSRUxBGstTnwAwjzBaYnzYyAsE2f9QYwaKEvSDEPQ
-	J733kcMW9gL1xu6Kwb2rlvx2CGX4Xwo=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Cl0jBGfNv3ycVxpvQjxTnVRIZrCpRiuFMmQKoCeBQMs=;
+	b=OpJVpyTzr7Yawp7vbXr5KTgk8JpWQzo25ISiBRvkv1Q3pr0xOs4gZb3VKn3jGmaeO23pO+
+	Ftc89aLWK9asE1lDVht2fvgVhLBHUx1BjVqguidKWkrdJRBQNan0nn+HJkrewEjVhB3j8B
+	1MafOXCv3EjfiZNeitRP1F2uaBR8S2Q=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-509-5ba1sFy_MYGEHYt0FpM_MQ-1; Tue,
- 30 Jul 2024 16:41:54 -0400
-X-MC-Unique: 5ba1sFy_MYGEHYt0FpM_MQ-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-609-exU8v0O1OL-xwvrmM_A-FA-1; Tue,
+ 30 Jul 2024 16:41:58 -0400
+X-MC-Unique: exU8v0O1OL-xwvrmM_A-FA-1
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6241619560B4;
-	Tue, 30 Jul 2024 20:41:52 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 943AB19560B0;
+	Tue, 30 Jul 2024 20:41:56 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.30])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2D07D3000192;
-	Tue, 30 Jul 2024 20:41:47 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CA73D3000192;
+	Tue, 30 Jul 2024 20:41:52 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -66,9 +66,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
 	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH v3 09/12] virtchnl: support queue rate limit and quanta size configuration
-Date: Tue, 30 Jul 2024 22:39:52 +0200
-Message-ID: <9a9f14f852b34a1347ef67dfeb93c75cb52a28cf.1722357745.git.pabeni@redhat.com>
+Subject: [PATCH v3 10/12] ice: Support VF queue rate limit and quanta size configuration
+Date: Tue, 30 Jul 2024 22:39:53 +0200
+Message-ID: <d826de8d32a5045e5c1c6dd8fa40f3e1def131c3.1722357745.git.pabeni@redhat.com>
 In-Reply-To: <cover.1722357745.git.pabeni@redhat.com>
 References: <cover.1722357745.git.pabeni@redhat.com>
 Precedence: bulk
@@ -82,187 +82,587 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 From: Wenjun Wu <wenjun1.wu@intel.com>
 
-This patch adds new virtchnl opcodes and structures for rate limit
-and quanta size configuration, which include:
-1. VIRTCHNL_OP_CONFIG_QUEUE_BW, to configure max bandwidth for each
-VF per queue.
-2. VIRTCHNL_OP_CONFIG_QUANTA, to configure quanta size per queue.
-3. VIRTCHNL_OP_GET_QOS_CAPS, VF queries current QoS configuration, such
-as enabled TCs, arbiter type, up2tc and bandwidth of VSI node. The
-configuration is previously set by DCB and PF, and now is the potential
-QoS capability of VF. VF can take it as reference to configure queue TC
-mapping.
+Add support to configure VF queue rate limit and quanta size.
+
+For quanta size configuration, the quanta profiles are divided evenly
+by PF numbers. For each port, the first quanta profile is reserved for
+default. When VF is asked to set queue quanta size, PF will search for
+an available profile, change the fields and assigned this profile to the
+queue.
 
 Signed-off-by: Wenjun Wu <wenjun1.wu@intel.com>
 ---
- include/linux/avf/virtchnl.h | 119 +++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |   2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |  21 ++
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 333 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |  11 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |   6 +
+ 10 files changed, 393 insertions(+)
 
-diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
-index 8e177b67e82f..8ff31845f685 100644
---- a/include/linux/avf/virtchnl.h
-+++ b/include/linux/avf/virtchnl.h
-@@ -89,6 +89,9 @@ enum virtchnl_rx_hsplit {
- 	VIRTCHNL_RX_HSPLIT_SPLIT_SCTP    = 8,
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 99a75a59078e..ddb31ad284a4 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -659,6 +659,8 @@ struct ice_pf {
+ 	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
+ 	struct ice_dplls dplls;
+ 	struct device *hwmon_dev;
++
++	u8 num_quanta_prof_used;
  };
  
-+enum virtchnl_bw_limit_type {
-+	VIRTCHNL_BW_SHAPER = 0,
-+};
- /* END GENERIC DEFINES */
+ extern struct workqueue_struct *ice_lag_wq;
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 5d396c1a7731..54cd9fe27d77 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -349,6 +349,8 @@ ice_setup_tx_ctx(struct ice_tx_ring *ring, struct ice_tlan_ctx *tlan_ctx, u16 pf
+ 		break;
+ 	}
  
- /* Opcodes for VF-PF communication. These are placed in the v_opcode field
-@@ -151,6 +154,11 @@ enum virtchnl_ops {
- 	VIRTCHNL_OP_DISABLE_VLAN_STRIPPING_V2 = 55,
- 	VIRTCHNL_OP_ENABLE_VLAN_INSERTION_V2 = 56,
- 	VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2 = 57,
-+	/* opcode 57 - 65 are reserved */
-+	VIRTCHNL_OP_GET_QOS_CAPS = 66,
-+	/* opcode 68 through 111 are reserved */
-+	VIRTCHNL_OP_CONFIG_QUEUE_BW = 112,
-+	VIRTCHNL_OP_CONFIG_QUANTA = 113,
- 	VIRTCHNL_OP_MAX,
++	tlan_ctx->quanta_prof_idx = ring->quanta_prof_id;
++
+ 	tlan_ctx->tso_ena = ICE_TX_LEGACY;
+ 	tlan_ctx->tso_qnum = pf_q;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 009716a12a26..b22e71dc59d4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2436,6 +2436,25 @@ ice_parse_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
+ 	ice_recalc_port_limited_caps(hw, &func_p->common_cap);
+ }
+ 
++/**
++ * ice_func_id_to_logical_id - map from function id to logical pf id
++ * @active_function_bitmap: active function bitmap
++ * @pf_id: function number of device
++ *
++ * Return: logical PF ID.
++ */
++static int ice_func_id_to_logical_id(u32 active_function_bitmap, u8 pf_id)
++{
++	u8 logical_id = 0;
++	u8 i;
++
++	for (i = 0; i < pf_id; i++)
++		if (active_function_bitmap & BIT(i))
++			logical_id++;
++
++	return logical_id;
++}
++
+ /**
+  * ice_parse_valid_functions_cap - Parse ICE_AQC_CAPS_VALID_FUNCTIONS caps
+  * @hw: pointer to the HW struct
+@@ -2453,6 +2472,8 @@ ice_parse_valid_functions_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
+ 	dev_p->num_funcs = hweight32(number);
+ 	ice_debug(hw, ICE_DBG_INIT, "dev caps: num_funcs = %d\n",
+ 		  dev_p->num_funcs);
++
++	hw->logical_pf_id = ice_func_id_to_logical_id(number, hw->pf_id);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
+index 91cbae1eec89..af9302f0e376 100644
+--- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
++++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
+@@ -6,6 +6,14 @@
+ #ifndef _ICE_HW_AUTOGEN_H_
+ #define _ICE_HW_AUTOGEN_H_
+ 
++#define GLCOMM_QUANTA_PROF(_i)			(0x002D2D68 + ((_i) * 4))
++#define GLCOMM_QUANTA_PROF_MAX_INDEX		15
++#define GLCOMM_QUANTA_PROF_QUANTA_SIZE_S	0
++#define GLCOMM_QUANTA_PROF_QUANTA_SIZE_M	ICE_M(0x3FFF, 0)
++#define GLCOMM_QUANTA_PROF_MAX_CMD_S		16
++#define GLCOMM_QUANTA_PROF_MAX_CMD_M		ICE_M(0xFF, 16)
++#define GLCOMM_QUANTA_PROF_MAX_DESC_S		24
++#define GLCOMM_QUANTA_PROF_MAX_DESC_M		ICE_M(0x3F, 24)
+ #define QTX_COMM_DBELL(_DBQM)			(0x002C0000 + ((_DBQM) * 4))
+ #define QTX_COMM_HEAD(_DBQM)			(0x000E0000 + ((_DBQM) * 4))
+ #define QTX_COMM_HEAD_HEAD_S			0
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index feba314a3fe4..ea2fae9035b5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -406,6 +406,7 @@ struct ice_tx_ring {
+ #define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
+ 	u8 flags;
+ 	u8 dcb_tc;			/* Traffic class of ring */
++	u16 quanta_prof_id;
+ } ____cacheline_internodealigned_in_smp;
+ 
+ static inline bool ice_ring_uses_build_skb(struct ice_rx_ring *ring)
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 96037bef3e78..cad4d68b19dc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -903,6 +903,7 @@ struct ice_hw {
+ 	u8 revision_id;
+ 
+ 	u8 pf_id;		/* device profile info */
++	u8 logical_pf_id;
+ 
+ 	u16 max_burst_size;	/* driver sets this value */
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index fec16919ec19..becf5a009b4e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -52,6 +52,13 @@ struct ice_mdd_vf_events {
+ 	u16 last_printed;
  };
  
-@@ -260,6 +268,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(16, virtchnl_vsi_resource);
- #define VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC	BIT(26)
- #define VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF		BIT(27)
- #define VIRTCHNL_VF_OFFLOAD_FDIR_PF		BIT(28)
-+#define VIRTCHNL_VF_OFFLOAD_QOS			BIT(29)
- 
- #define VF_BASE_MODE_OFFLOADS (VIRTCHNL_VF_OFFLOAD_L2 | \
- 			       VIRTCHNL_VF_OFFLOAD_VLAN | \
-@@ -1405,6 +1414,85 @@ struct virtchnl_fdir_del {
- 
- VIRTCHNL_CHECK_STRUCT_LEN(12, virtchnl_fdir_del);
- 
-+struct virtchnl_shaper_bw {
-+	/* Unit is Kbps */
++struct ice_vf_qs_bw {
 +	u32 committed;
 +	u32 peak;
-+};
-+
-+VIRTCHNL_CHECK_STRUCT_LEN(8, virtchnl_shaper_bw);
-+
-+/* VIRTCHNL_OP_GET_QOS_CAPS
-+ * VF sends this message to get its QoS Caps, such as
-+ * TC number, Arbiter and Bandwidth.
-+ */
-+struct virtchnl_qos_cap_elem {
-+	u8 tc_num;
-+	u8 tc_prio;
-+#define VIRTCHNL_ABITER_STRICT      0
-+#define VIRTCHNL_ABITER_ETS         2
-+	u8 arbiter;
-+#define VIRTCHNL_STRICT_WEIGHT      1
-+	u8 weight;
-+	enum virtchnl_bw_limit_type type;
-+	union {
-+		struct virtchnl_shaper_bw shaper;
-+		u8 pad2[32];
-+	};
-+};
-+
-+VIRTCHNL_CHECK_STRUCT_LEN(40, virtchnl_qos_cap_elem);
-+
-+struct virtchnl_qos_cap_list {
-+	u16 vsi_id;
-+	u16 num_elem;
-+	struct virtchnl_qos_cap_elem cap[];
-+};
-+
-+VIRTCHNL_CHECK_STRUCT_LEN(4, virtchnl_qos_cap_list);
-+#define virtchnl_qos_cap_list_LEGACY_SIZEOF	44
-+
-+/* VIRTCHNL_OP_CONFIG_QUEUE_BW */
-+struct virtchnl_queue_bw {
 +	u16 queue_id;
 +	u8 tc;
-+	u8 pad;
-+	struct virtchnl_shaper_bw shaper;
 +};
 +
-+VIRTCHNL_CHECK_STRUCT_LEN(12, virtchnl_queue_bw);
-+
-+struct virtchnl_queues_bw_cfg {
-+	u16 vsi_id;
-+	u16 num_queues;
-+	struct virtchnl_queue_bw cfg[];
-+};
-+
-+VIRTCHNL_CHECK_STRUCT_LEN(4, virtchnl_queues_bw_cfg);
-+#define virtchnl_queues_bw_cfg_LEGACY_SIZEOF	16
-+
-+enum virtchnl_queue_type {
-+	VIRTCHNL_QUEUE_TYPE_TX			= 0,
-+	VIRTCHNL_QUEUE_TYPE_RX			= 1,
-+};
-+
-+/* structure to specify a chunk of contiguous queues */
-+struct virtchnl_queue_chunk {
-+	/* see enum virtchnl_queue_type */
-+	s32 type;
-+	u16 start_queue_id;
-+	u16 num_queues;
-+};
-+
-+VIRTCHNL_CHECK_STRUCT_LEN(8, virtchnl_queue_chunk);
-+
-+struct virtchnl_quanta_cfg {
-+	u16 quanta_size;
-+	struct virtchnl_queue_chunk queue_select;
-+};
-+
-+VIRTCHNL_CHECK_STRUCT_LEN(12, virtchnl_quanta_cfg);
-+
- #define __vss_byone(p, member, count, old)				      \
- 	(struct_size(p, member, count) + (old - 1 - struct_size(p, member, 0)))
+ /* VF operations */
+ struct ice_vf_ops {
+ 	enum ice_disq_rst_src reset_type;
+@@ -132,6 +139,7 @@ struct ice_vf {
+ 	struct devlink_port devlink_port;
  
-@@ -1427,6 +1515,8 @@ VIRTCHNL_CHECK_STRUCT_LEN(12, virtchnl_fdir_del);
- 		 __vss(virtchnl_vlan_filter_list_v2, __vss_byelem, p, m, c),  \
- 		 __vss(virtchnl_tc_info, __vss_byelem, p, m, c),	      \
- 		 __vss(virtchnl_rdma_qvlist_info, __vss_byelem, p, m, c),     \
-+		 __vss(virtchnl_qos_cap_list, __vss_byelem, p, m, c),	      \
-+		 __vss(virtchnl_queues_bw_cfg, __vss_byelem, p, m, c),	      \
- 		 __vss(virtchnl_rss_key, __vss_byone, p, m, c),		      \
- 		 __vss(virtchnl_rss_lut, __vss_byone, p, m, c))
+ 	u16 num_msix;			/* num of MSI-X configured on this VF */
++	struct ice_vf_qs_bw qs_bw[ICE_MAX_RSS_QS_PER_VF];
+ };
  
-@@ -1626,6 +1716,35 @@ virtchnl_vc_validate_vf_msg(struct virtchnl_version_info *ver, u32 v_opcode,
+ /* Flags for controlling behavior of ice_reset_vf */
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 1c6ce0c4ed4e..4f9dc67741a5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -491,6 +491,9 @@ static int ice_vc_get_vf_res_msg(struct ice_vf *vf, u8 *msg)
+ 	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_USO)
+ 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_USO;
+ 
++	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_QOS)
++		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_QOS;
++
+ 	vfres->num_vsis = 1;
+ 	/* Tx and Rx queue are equal for VF */
+ 	vfres->num_queue_pairs = vsi->num_txq;
+@@ -1030,6 +1033,191 @@ static int ice_vc_config_rss_hfunc(struct ice_vf *vf, u8 *msg)
+ 				     NULL, 0);
+ }
+ 
++/**
++ * ice_vc_get_qos_caps - Get current QoS caps from PF
++ * @vf: pointer to the VF info
++ *
++ * Get VF's QoS capabilities, such as TC number, arbiter and
++ * bandwidth from PF.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vc_get_qos_caps(struct ice_vf *vf)
++{
++	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
++	struct virtchnl_qos_cap_list *cap_list = NULL;
++	u8 tc_prio[ICE_MAX_TRAFFIC_CLASS] = { 0 };
++	struct virtchnl_qos_cap_elem *cfg = NULL;
++	struct ice_vsi_ctx *vsi_ctx;
++	struct ice_pf *pf = vf->pf;
++	struct ice_port_info *pi;
++	struct ice_vsi *vsi;
++	u8 numtc, tc;
++	u16 len = 0;
++	int ret, i;
++
++	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	pi = pf->hw.port_info;
++	numtc = vsi->tc_cfg.numtc;
++
++	vsi_ctx = ice_get_vsi_ctx(pi->hw, vf->lan_vsi_idx);
++	if (!vsi_ctx) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	len = struct_size(cap_list, cap, numtc);
++	cap_list = kzalloc(len, GFP_KERNEL);
++	if (!cap_list) {
++		v_ret = VIRTCHNL_STATUS_ERR_NO_MEMORY;
++		len = 0;
++		goto err;
++	}
++
++	cap_list->vsi_id = vsi->vsi_num;
++	cap_list->num_elem = numtc;
++
++	/* Store the UP2TC configuration from DCB to a user priority bitmap
++	 * of each TC. Each element of prio_of_tc represents one TC. Each
++	 * bitmap indicates the user priorities belong to this TC.
++	 */
++	for (i = 0; i < ICE_MAX_USER_PRIORITY; i++) {
++		tc = pi->qos_cfg.local_dcbx_cfg.etscfg.prio_table[i];
++		tc_prio[tc] |= BIT(i);
++	}
++
++	for (i = 0; i < numtc; i++) {
++		cfg = &cap_list->cap[i];
++		cfg->tc_num = i;
++		cfg->tc_prio = tc_prio[i];
++		cfg->arbiter = pi->qos_cfg.local_dcbx_cfg.etscfg.tsatable[i];
++		cfg->weight = VIRTCHNL_STRICT_WEIGHT;
++		cfg->type = VIRTCHNL_BW_SHAPER;
++		cfg->shaper.committed = vsi_ctx->sched.bw_t_info[i].cir_bw.bw;
++		cfg->shaper.peak = vsi_ctx->sched.bw_t_info[i].eir_bw.bw;
++	}
++
++err:
++	ret = ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_QOS_CAPS, v_ret,
++				    (u8 *)cap_list, len);
++	kfree(cap_list);
++	return ret;
++}
++
++/**
++ * ice_vf_cfg_qs_bw - Configure per queue bandwidth
++ * @vf: pointer to the VF info
++ * @num_queues: number of queues to be configured
++ *
++ * Configure per queue bandwidth.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vf_cfg_qs_bw(struct ice_vf *vf, u16 num_queues)
++{
++	struct ice_hw *hw = &vf->pf->hw;
++	struct ice_vsi *vsi;
++	int ret;
++	u16 i;
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi)
++		return -EINVAL;
++
++	for (i = 0; i < num_queues; i++) {
++		u32 p_rate, min_rate;
++		u8 tc;
++
++		p_rate = vf->qs_bw[i].peak;
++		min_rate = vf->qs_bw[i].committed;
++		tc = vf->qs_bw[i].tc;
++		if (p_rate)
++			ret = ice_cfg_q_bw_lmt(hw->port_info, vsi->idx, tc,
++					       vf->qs_bw[i].queue_id,
++					       ICE_MAX_BW, p_rate);
++		else
++			ret = ice_cfg_q_bw_dflt_lmt(hw->port_info, vsi->idx, tc,
++						    vf->qs_bw[i].queue_id,
++						    ICE_MAX_BW);
++		if (ret)
++			return ret;
++
++		if (min_rate)
++			ret = ice_cfg_q_bw_lmt(hw->port_info, vsi->idx, tc,
++					       vf->qs_bw[i].queue_id,
++					       ICE_MIN_BW, min_rate);
++		else
++			ret = ice_cfg_q_bw_dflt_lmt(hw->port_info, vsi->idx, tc,
++						    vf->qs_bw[i].queue_id,
++						    ICE_MIN_BW);
++
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++/**
++ * ice_vf_cfg_q_quanta_profile - Configure quanta profile
++ * @vf: pointer to the VF info
++ * @quanta_prof_idx: pointer to the quanta profile index
++ * @quanta_size: quanta size to be set
++ *
++ * This function chooses available quanta profile and configures the register.
++ * The quanta profile is evenly divided by the number of device ports, and then
++ * available to the specific PF and VFs. The first profile for each PF is a
++ * reserved default profile. Only quanta size of the rest unused profile can be
++ * modified.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vf_cfg_q_quanta_profile(struct ice_vf *vf, u16 quanta_size,
++				       u16 *quanta_prof_idx)
++{
++	const u16 n_desc = calc_quanta_desc(quanta_size);
++	struct ice_hw *hw = &vf->pf->hw;
++	const u16 n_cmd = 2 * n_desc;
++	struct ice_pf *pf = vf->pf;
++	u16 per_pf, begin_id;
++	u8 n_used;
++	u32 reg;
++
++	begin_id = (GLCOMM_QUANTA_PROF_MAX_INDEX + 1) / hw->dev_caps.num_funcs *
++		   hw->logical_pf_id;
++
++	if (quanta_size == ICE_DFLT_QUANTA) {
++		*quanta_prof_idx = begin_id;
++	} else {
++		per_pf = (GLCOMM_QUANTA_PROF_MAX_INDEX + 1) /
++			 hw->dev_caps.num_funcs;
++		n_used = pf->num_quanta_prof_used;
++		if (n_used < per_pf) {
++			*quanta_prof_idx = begin_id + 1 + n_used;
++			pf->num_quanta_prof_used++;
++		} else {
++			return -EINVAL;
++		}
++	}
++
++	reg = FIELD_PREP(GLCOMM_QUANTA_PROF_QUANTA_SIZE_M, quanta_size) |
++	      FIELD_PREP(GLCOMM_QUANTA_PROF_MAX_CMD_M, n_cmd) |
++	      FIELD_PREP(GLCOMM_QUANTA_PROF_MAX_DESC_M, n_desc);
++	wr32(hw, GLCOMM_QUANTA_PROF(*quanta_prof_idx), reg);
++
++	return 0;
++}
++
+ /**
+  * ice_vc_cfg_promiscuous_mode_msg
+  * @vf: pointer to the VF info
+@@ -1631,6 +1819,139 @@ static int ice_vc_cfg_irq_map_msg(struct ice_vf *vf, u8 *msg)
+ 				     NULL, 0);
+ }
+ 
++/**
++ * ice_vc_cfg_q_bw - Configure per queue bandwidth
++ * @vf: pointer to the VF info
++ * @msg: pointer to the msg buffer which holds the command descriptor
++ *
++ * Configure VF queues bandwidth.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vc_cfg_q_bw(struct ice_vf *vf, u8 *msg)
++{
++	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
++	struct virtchnl_queues_bw_cfg *qbw =
++		(struct virtchnl_queues_bw_cfg *)msg;
++	struct ice_vsi *vsi;
++	u16 i;
++
++	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states) ||
++	    !ice_vc_isvalid_vsi_id(vf, qbw->vsi_id)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	if (qbw->num_queues > ICE_MAX_RSS_QS_PER_VF ||
++	    qbw->num_queues > min_t(u16, vsi->alloc_txq, vsi->alloc_rxq)) {
++		dev_err(ice_pf_to_dev(vf->pf), "VF-%d trying to configure more than allocated number of queues: %d\n",
++			vf->vf_id, min_t(u16, vsi->alloc_txq, vsi->alloc_rxq));
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	for (i = 0; i < qbw->num_queues; i++) {
++		if (qbw->cfg[i].shaper.peak != 0 && vf->max_tx_rate != 0 &&
++		    qbw->cfg[i].shaper.peak > vf->max_tx_rate)
++			dev_warn(ice_pf_to_dev(vf->pf), "The maximum queue %d rate limit configuration may not take effect because the maximum TX rate for VF-%d is %d\n",
++				 qbw->cfg[i].queue_id, vf->vf_id, vf->max_tx_rate);
++		if (qbw->cfg[i].shaper.committed != 0 && vf->min_tx_rate != 0 &&
++		    qbw->cfg[i].shaper.committed < vf->min_tx_rate)
++			dev_warn(ice_pf_to_dev(vf->pf), "The minimum queue %d rate limit configuration may not take effect because the minimum TX rate for VF-%d is %d\n",
++				 qbw->cfg[i].queue_id, vf->vf_id, vf->max_tx_rate);
++	}
++
++	for (i = 0; i < qbw->num_queues; i++) {
++		vf->qs_bw[i].queue_id = qbw->cfg[i].queue_id;
++		vf->qs_bw[i].peak = qbw->cfg[i].shaper.peak;
++		vf->qs_bw[i].committed = qbw->cfg[i].shaper.committed;
++		vf->qs_bw[i].tc = qbw->cfg[i].tc;
++	}
++
++	if (ice_vf_cfg_qs_bw(vf, qbw->num_queues))
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++
++err:
++	/* send the response to the VF */
++	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_CONFIG_QUEUE_BW,
++				    v_ret, NULL, 0);
++}
++
++/**
++ * ice_vc_cfg_q_quanta - Configure per queue quanta
++ * @vf: pointer to the VF info
++ * @msg: pointer to the msg buffer which holds the command descriptor
++ *
++ * Configure VF queues quanta.
++ *
++ * Return: 0 on success or negative error value.
++ */
++static int ice_vc_cfg_q_quanta(struct ice_vf *vf, u8 *msg)
++{
++	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
++	u16 quanta_prof_id, quanta_size, start_qid, end_qid, i;
++	struct virtchnl_quanta_cfg *qquanta =
++		(struct virtchnl_quanta_cfg *)msg;
++	struct ice_vsi *vsi;
++	int ret;
++
++	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	vsi = ice_get_vf_vsi(vf);
++	if (!vsi) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	end_qid = qquanta->queue_select.start_queue_id +
++		  qquanta->queue_select.num_queues;
++	if (end_qid > ICE_MAX_RSS_QS_PER_VF ||
++	    end_qid > min_t(u16, vsi->alloc_txq, vsi->alloc_rxq)) {
++		dev_err(ice_pf_to_dev(vf->pf), "VF-%d trying to configure more than allocated number of queues: %d\n",
++			vf->vf_id, min_t(u16, vsi->alloc_txq, vsi->alloc_rxq));
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	quanta_size = qquanta->quanta_size;
++	if (quanta_size > ICE_MAX_QUANTA_SIZE ||
++	    quanta_size < ICE_MIN_QUANTA_SIZE) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	if (quanta_size % 64) {
++		dev_err(ice_pf_to_dev(vf->pf), "quanta size should be the product of 64\n");
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
++	ret = ice_vf_cfg_q_quanta_profile(vf, quanta_size,
++					  &quanta_prof_id);
++	if (ret) {
++		v_ret = VIRTCHNL_STATUS_ERR_NOT_SUPPORTED;
++		goto err;
++	}
++
++	start_qid = qquanta->queue_select.start_queue_id;
++	for (i = start_qid; i < end_qid; i++)
++		vsi->tx_rings[i]->quanta_prof_id = quanta_prof_id;
++
++err:
++	/* send the response to the VF */
++	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_CONFIG_QUANTA,
++				     v_ret, NULL, 0);
++}
++
+ /**
+  * ice_vc_cfg_qs_msg
+  * @vf: pointer to the VF info
+@@ -3817,6 +4138,9 @@ static const struct ice_virtchnl_ops ice_virtchnl_dflt_ops = {
+ 	.dis_vlan_stripping_v2_msg = ice_vc_dis_vlan_stripping_v2_msg,
+ 	.ena_vlan_insertion_v2_msg = ice_vc_ena_vlan_insertion_v2_msg,
+ 	.dis_vlan_insertion_v2_msg = ice_vc_dis_vlan_insertion_v2_msg,
++	.get_qos_caps = ice_vc_get_qos_caps,
++	.cfg_q_bw = ice_vc_cfg_q_bw,
++	.cfg_q_quanta = ice_vc_cfg_q_quanta,
+ };
+ 
+ /**
+@@ -4173,6 +4497,15 @@ void ice_vc_process_vf_msg(struct ice_pf *pf, struct ice_rq_event_info *event,
  	case VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2:
- 		valid_len = sizeof(struct virtchnl_vlan_setting);
+ 		err = ops->dis_vlan_insertion_v2_msg(vf, msg);
  		break;
 +	case VIRTCHNL_OP_GET_QOS_CAPS:
++		err = ops->get_qos_caps(vf);
 +		break;
 +	case VIRTCHNL_OP_CONFIG_QUEUE_BW:
-+		valid_len = virtchnl_queues_bw_cfg_LEGACY_SIZEOF;
-+		if (msglen >= valid_len) {
-+			struct virtchnl_queues_bw_cfg *q_bw =
-+				(struct virtchnl_queues_bw_cfg *)msg;
-+
-+			valid_len = virtchnl_struct_size(q_bw, cfg,
-+							 q_bw->num_queues);
-+			if (q_bw->num_queues == 0) {
-+				err_msg_format = true;
-+				break;
-+			}
-+		}
++		err = ops->cfg_q_bw(vf, msg);
 +		break;
 +	case VIRTCHNL_OP_CONFIG_QUANTA:
-+		valid_len = sizeof(struct virtchnl_quanta_cfg);
-+		if (msglen >= valid_len) {
-+			struct virtchnl_quanta_cfg *q_quanta =
-+				(struct virtchnl_quanta_cfg *)msg;
-+
-+			if (q_quanta->quanta_size == 0 ||
-+			    q_quanta->queue_select.num_queues == 0) {
-+				err_msg_format = true;
-+				break;
-+			}
-+		}
++		err = ops->cfg_q_quanta(vf, msg);
 +		break;
- 	/* These are always errors coming from the VF. */
- 	case VIRTCHNL_OP_EVENT:
  	case VIRTCHNL_OP_UNKNOWN:
+ 	default:
+ 		dev_err(dev, "Unsupported opcode %d from VF %d\n", v_opcode,
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.h b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+index 3a4115869153..0c629aef9baf 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.h
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.h
+@@ -13,6 +13,13 @@
+ /* Restrict number of MAC Addr and VLAN that non-trusted VF can programmed */
+ #define ICE_MAX_VLAN_PER_VF		8
+ 
++#define ICE_DFLT_QUANTA 1024
++#define ICE_MAX_QUANTA_SIZE 4096
++#define ICE_MIN_QUANTA_SIZE 256
++
++#define calc_quanta_desc(x)	\
++	max_t(u16, 12, min_t(u16, 63, (((x) + 66) / 132) * 2 + 4))
++
+ /* MAC filters: 1 is reserved for the VF's default/perm_addr/LAA MAC, 1 for
+  * broadcast, and 16 for additional unicast/multicast filters
+  */
+@@ -61,6 +68,10 @@ struct ice_virtchnl_ops {
+ 	int (*dis_vlan_stripping_v2_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*ena_vlan_insertion_v2_msg)(struct ice_vf *vf, u8 *msg);
+ 	int (*dis_vlan_insertion_v2_msg)(struct ice_vf *vf, u8 *msg);
++	int (*get_qos_caps)(struct ice_vf *vf);
++	int (*cfg_q_tc_map)(struct ice_vf *vf, u8 *msg);
++	int (*cfg_q_bw)(struct ice_vf *vf, u8 *msg);
++	int (*cfg_q_quanta)(struct ice_vf *vf, u8 *msg);
+ };
+ 
+ #ifdef CONFIG_PCI_IOV
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
+index d796dbd2a440..c105a82ee136 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_allowlist.c
+@@ -84,6 +84,11 @@ static const u32 fdir_pf_allowlist_opcodes[] = {
+ 	VIRTCHNL_OP_ADD_FDIR_FILTER, VIRTCHNL_OP_DEL_FDIR_FILTER,
+ };
+ 
++static const u32 tc_allowlist_opcodes[] = {
++	VIRTCHNL_OP_GET_QOS_CAPS, VIRTCHNL_OP_CONFIG_QUEUE_BW,
++	VIRTCHNL_OP_CONFIG_QUANTA,
++};
++
+ struct allowlist_opcode_info {
+ 	const u32 *opcodes;
+ 	size_t size;
+@@ -104,6 +109,7 @@ static const struct allowlist_opcode_info allowlist_opcodes[] = {
+ 	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF, adv_rss_pf_allowlist_opcodes),
+ 	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_FDIR_PF, fdir_pf_allowlist_opcodes),
+ 	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_VLAN_V2, vlan_v2_allowlist_opcodes),
++	ALLOW_ITEM(VIRTCHNL_VF_OFFLOAD_QOS, tc_allowlist_opcodes),
+ };
+ 
+ /**
 -- 
 2.45.2
 
