@@ -1,141 +1,101 @@
-Return-Path: <netdev+bounces-114130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB06494107B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:29:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D12941137
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91ADE1F25E4C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:29:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BA19B244A1
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0154D19DF7A;
-	Tue, 30 Jul 2024 11:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4B6195F22;
+	Tue, 30 Jul 2024 11:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WG4o4ScU"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ugf7IYCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454AB19DF8E;
-	Tue, 30 Jul 2024 11:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA81166316;
+	Tue, 30 Jul 2024 11:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722338977; cv=none; b=APS15u4KbrxbZvnK4grV6EG3/z1PI6FCHxlPrWmSlaOlj8fPyooc6SqdXoJBtVDZiM24V6hgdO+26bWUGxYhjbYEuQ+4upolTbJrK8CEIxtPk0AMyUP11CJLhOJbtG4kFEcFMrp5YTjOoohSlJ/ObZdyf4FaeOMfdIkhOT77ZTE=
+	t=1722340381; cv=none; b=G2NQ53NDX4dt8ggdcaffQ/AOwD9Q7QpOLpf5S7SDvr6HpbAVO8N/KB14Loxg1TsYcuoQXwmvVDXD1Pcz6sGOssPR9U3/Fk4er0SZWgziZtF1AaVsJ6wlYfHzGeYxNXtCVmL11tWuRZrJWZZpoQNWjdIT2dtzxJvUvAKqhdT9j78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722338977; c=relaxed/simple;
-	bh=/1pWOQ14ozSfFQK/tkD76Lfh3dTPGMLPwzHVYx5iXcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d3Ls+0jHmMxAslpsqNn4255Gm2BKVnxz2aI9/f0gviLoB7SKOZI+xfCQMBaHQ8jbJn267en7pOu/pu21jb6xm4jSrw3bEdqNvQqZbgha/KCNxh+yUVyPAJiIDUzzc1bMUKEF/14MDwPvvB2DcItyx4lcK66zkDGO4hnkJVuv6s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WG4o4ScU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ki2/TBdxrP8a5ktzFO1CppFcT6yCDwCNmjbPTgHYyOU=; b=WG4o4ScUMxSc7o8zseeiqpQR2R
-	A5QrjYcAfq5DmnxWbzcz+pmsorwKH6DTRKFGM+XxCU4pv73wLY5s/MNYX/6OTD0+LSTEUnbYqxuO/
-	+w1p80cOCofWLFSvNTVOvO+PstkZ5piTrHRQtW3zziwgsHRv4K1pgfQ/7yGHG+D0kBaG9XuvR4xjC
-	hfT7/fl+0mbNdihbOo66oSdQXXgZivTF94hhTuN4lmg87zxxaz7XSUXHsQ1AtsUhSuB0tUdXgpgpE
-	YV2dx/0JH5IPlJcVZDT+G+i5ypiuawUr34nwKWlZKHlvdCK1tNLHSa+6CbxCuWkuJltgxtjXpzOsw
-	t+9YcbIA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55588)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sYl2k-0006Zg-07;
-	Tue, 30 Jul 2024 12:29:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sYl2m-0005EG-Mh; Tue, 30 Jul 2024 12:29:28 +0100
-Date: Tue, 30 Jul 2024 12:29:28 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	andrew@lunn.ch, horms@kernel.org, hkallweit1@gmail.com,
-	richardcochran@gmail.com, rdunlap@infradead.org,
-	bryan.whitehead@microchip.com, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next V2 3/4] net: lan743x: Migrate phylib to phylink
-Message-ID: <ZqjOmOzNLE0+oYP2@shell.armlinux.org.uk>
-References: <20240716113349.25527-1-Raju.Lakkaraju@microchip.com>
- <20240716113349.25527-4-Raju.Lakkaraju@microchip.com>
- <Zqdd1mfSUDK9EifJ@shell.armlinux.org.uk>
- <ZqjE9A8laPxYP1ta@HYD-DK-UNGSW21.microchip.com>
+	s=arc-20240116; t=1722340381; c=relaxed/simple;
+	bh=3U2t4PjSm3nGE8tUHltVJ/FufrtRhfcNuKwP2zsJLvE=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=hmdCz+rOJcujNqNUJ3zSdO2fqvH7fSCR2rx81FsS2jHt3S6Ydrlyd7ozoP0TgLKF2MwAgq1GHX7DNnvHh0c4nr5aZ9fZpfx0qhwucqAsz3eVt29y7kEN1WEzuuuR7ovDXz2L98AHYGYz+zmh9Bv5TuFXGLNrrMbQu7FYZrad92w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ugf7IYCj; arc=none smtp.client-ip=203.205.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1722340374; bh=rfuhs/Z+9bw5iQ2Bo/tcqR1/U5bKvoVkGTLb5omlojc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ugf7IYCjSzDJh/zWUzxMmY5bqU1VFwUqNyY7c6MmXLQUindOXi3E8lzqMY6q2epqC
+	 gK73xVYHQNfriLyvFuKJ9Fya2+JP5Zvv+SUZUCAoQIlFerBTV27pdwfmGokxjYV1LO
+	 OncFn+YpgGEYd+HNkgIPZdvcg0rzxiATJdhBe6uY=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
+	id BB1A7E97; Tue, 30 Jul 2024 19:46:49 +0800
+X-QQ-mid: xmsmtpt1722340009t3xxspdre
+Message-ID: <tencent_48A8AECCEEC30C8EE7C8C6F692C2064D4906@qq.com>
+X-QQ-XMAILINFO: OOPJ7pYMv25ttYYXMSLL7LDhJwHo7h14cxc7k5mpeuZwgYP8Mgv1XHhcsz0T9b
+	 7TwKBMYlbE/WcyWEdhBLspwEWyduLVLQ9sL1c7Y8ktRrqr9ckpBOBZ9YhP/ctFYI9iVT0nI6s/uq
+	 0GE6DMKC+DECxAxzO4G3bp02TFcLFaeHQ5Qw9mmheAZyWH42X4gtztPQjPuu6JlP3OZ3WKqh37mn
+	 tN7gey74LGv+D+j7bnCI1DREyy+zsJPLoBXCVT9sCdJd2CIVjHIYFfcSG2ea7XrHZlCgGUYEJkPK
+	 Rta2CchhEQqgrBYl0htASiWroGERVje13kIS4xdhNCsNt7+QmmR23+p1pxacHQs+fosNYAkQuEvu
+	 8Zi37Euz6c+fADGzWMyBYHBF9ffeCr+UGJKkTrIxgq3nRfX11W5yZMnPxs/sWJK9ZrLS/dEk8MxB
+	 RWjjtrrucIwa1Q0MtSZImZnePJElsJdKQZe2wyiqfgVQ/MQvrAy+cUm7da+w1s94bbE6Z2ncpCsb
+	 4Y2CLfvG2leTzmbmYmW5Db9M6XZsX6002O16yjNZhVcCt4jvQ20vazRqerVo8KhEl4rD/JMBDkFX
+	 zogRkkzWGy4C1HVh0m/OrYTLwXyL0Vr1XMxW3/4dvFJsDJ3v394dvGQeAfoukTe8LK69bRuKZS3W
+	 UL/GCnFEF5X3skDiUO5HSu3jOHsmviKsp6boWxddLNbIjBg850ay1xlHWSosusVTKFiMRMtV0yu9
+	 vpVmhKQLP/2r4hbcq2h1BThb86vXp5waYKlHT05eq9XiZC9RzRm6f+C/xvm7KHJrOiUHs/8chpOY
+	 aP+rLt6AsiKtFMDSzMc8dd89vy95ahoKFs1ml+OvYfHPn/gUVvVE07cJzk/wI+JdVSK6EhZEHx4h
+	 yFDvxHN7Iwc3MdYWz+QGCemrDvqAr3MVnKTRTP6IIFv8DDg3EaLws5Lpmyudw1t4ufqlOpIqtaUW
+	 n7SfZN0ZQ=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+From: Edward Adam Davis <eadavis@qq.com>
+To: kvalo@kernel.org
+Cc: eadavis@qq.com,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	srini.raju@purelifi.com,
+	syzbot+51a42f7c2e399392ea82@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] wifi: plfxlc: remove assert for mac->lock
+Date: Tue, 30 Jul 2024 19:46:50 +0800
+X-OQ-MSGID: <20240730114649.498184-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <877cd39nhg.fsf@kernel.org>
+References: <877cd39nhg.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZqjE9A8laPxYP1ta@HYD-DK-UNGSW21.microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 30, 2024 at 04:18:20PM +0530, Raju Lakkaraju wrote:
-> Ok. 
-> After change, i ran the checkpatch script. it's giving follwoing warning
-> i.e.
-> "CHECK: Comparison to NULL could be written "dn"" 
+On Tue, 30 Jul 2024 13:35:07 +0300, Kalle Valo wrote:
+> > syzbot report WARNING in plfxlc_mac_release, according to the context,
+> > there is not need assert for mac->lock.
 > 
-> Is it OK ?
+> The commit message should explain _why_ the assert is not needed.
+> Otherwise it looks that you are randomly removing it to get rid of the
+> warning.
+mac->lock is used to protect mac data, but after calling plfxlc_mac_release(), 
+there are two functions:ieee80211_unregister_hw() and ieee80211_free_hw(),
+there is no action to operate on mac data in these two functions, so mac->lock
+is not required.
 
-Assuming its referring to:
+On the other hand, there is no holding action for mac->lock before calling plfxlc_mac_release.
 
-        return dn != NULL;
+--
+Edward
 
-in a function that returns a bool, I find that utterly perverse, and I
-suggest in this case ignoring checkpatch.
-
-> > > +static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
-> > > +{
-> > > +     struct device_node *dn = adapter->pdev->dev.of_node;
-> > > +     struct net_device *dev = adapter->netdev;
-> > > +     struct fixed_phy_status fphy_status = {
-> > > +             .link = 1,
-> > > +             .speed = SPEED_1000,
-> > > +             .duplex = DUPLEX_FULL,
-> > > +     };
-> > > +     struct phy_device *phydev;
-> > > +     int ret;
-> > > +
-> > > +     if (dn)
-> > > +             ret = phylink_of_phy_connect(adapter->phylink, dn, 0);
-> > > +
-> > > +     if (!dn || (ret && !lan743x_phy_handle_exists(dn))) {
-> > > +             phydev = phy_find_first(adapter->mdiobus);
-> > > +             if (!phydev) {
-> > > +                     if (((adapter->csr.id_rev & ID_REV_ID_MASK_) ==
-> > > +                           ID_REV_ID_LAN7431_) || adapter->is_pci11x1x) {
-> > > +                             phydev = fixed_phy_register(PHY_POLL,
-> > > +                                                         &fphy_status,
-> > > +                                                         NULL);
-> > > +                             if (IS_ERR(phydev)) {
-> > > +                                     netdev_err(dev, "No PHY/fixed_PHY found\n");
-> > > +                                     return PTR_ERR(phydev);
-> > > +                             }
-> > 
-> > Eww. Given that phylink has its own internal fixed-PHY support, can we
-> > not find some way to avoid the legacy fixed-PHY usage here?
-> 
-> Yes. I agree with you. This is very much valid suggestion.
-> Andrew also gave same suggestion.
-> 
-> Currently we don't have Device Tree support for LAN743X driver. 
-> For SFP support, I create the software-node an passing the paramters there.
-> 
-> I don't have fixed-PHY hardware setup currently.
-> I would like to take this as action item to fix it after SFP support commits.
-
-Note that SFP shouldn't be using a fixed-phy at all.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
