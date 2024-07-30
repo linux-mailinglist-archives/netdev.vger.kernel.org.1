@@ -1,116 +1,137 @@
-Return-Path: <netdev+bounces-114301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BCF5942142
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:03:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544D594214A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 22:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98EA3B2515A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:03:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06F8C286A01
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A9418CC0A;
-	Tue, 30 Jul 2024 20:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BuxualcN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE9E18C923;
+	Tue, 30 Jul 2024 20:05:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from cloud48395.mywhc.ca (cloud48395.mywhc.ca [173.209.37.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA1F91AA3C1;
-	Tue, 30 Jul 2024 20:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16433FE4;
+	Tue, 30 Jul 2024 20:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.209.37.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722369817; cv=none; b=V6MHWE2+J/pcbX6MGTkte+cVGf0/k4crpOP52hVxjmwzCTx3D6a5g7Aom+cluWxUX1v2DeF7WAZsO2Ph0pc9lpG9Gpl+I5aUR8ADoqWxhvFDiI483xLx212uRuAd1lZN2vUXqTXrSYjmieEz2ch9KVfe+3u4HwjfK+N1/JBaJoY=
+	t=1722369955; cv=none; b=D8YjHOTX9dVLz0rUgF2t+QOdRwrYhIII2i5U+TwRat/8RIz2hVizUku3xOrfAElDpwdhwLMxVsOn1g/sAoyvCkueyoXSICVcNWzsA4ZGKDn6RyLS1W0NyXrkb/hwKIX+4b+XahQiJQ1hBl8GxpcVv5NrD7Ea6tMQYeyJg/AUzn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722369817; c=relaxed/simple;
-	bh=ioCjriq9osqMbAs8+EODo48zUlg3xS+R9XDTxWKShkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOulZKqhc5dDtg7RTs2rlmFJyp/IxVWHj3SIK68sZRdLHOCQEReTLEE3k5GmsLLKy+hVjhpYf0F17HbR0tpQj1iuipvv9o0cksCudd1sQaPJVnWbYnaYQVscZH8Yufe6appaxqlO1WoeVcCahY0ptFaiVsg1heZ/rnjKcxxbkCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BuxualcN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07519C4AF0B;
-	Tue, 30 Jul 2024 20:03:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722369817;
-	bh=ioCjriq9osqMbAs8+EODo48zUlg3xS+R9XDTxWKShkE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BuxualcNOych3A4yWU5cC100YYKH0ZeP2O6ecJ6E7SdoTqmSAR4goUieQ4axHS4Sm
-	 25X41wCdbhg4c0vRdGG4MzgTwqQqXL/IA3FLE8DIFHXqoyUGu1cpgJMjIgJ8zMhmTV
-	 XBykMsqVmjGMn+evEkltJbJkdCHBPnRO31XXRRlftLgVQ132Y/3XCqZ44Mah2L5ePX
-	 AF7v/SRgM2uRQz1shDNW3BIazLQ28VJJvZSiCBpYI+ifgGdNFZrzI+d5pHw4OH6Iq4
-	 /0+mNUxDsvMP9Fehd426LT/8NV8zshFdNu1LhT16CaNG2y1CSfyWdW2A6qa0s6/hqS
-	 cl8ZWVHu7tWUw==
-Date: Tue, 30 Jul 2024 14:03:35 -0600
-From: Rob Herring <robh@kernel.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
-	andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, lorenzo.bianconi83@gmail.com,
-	krzk+dt@kernel.org, conor+dt@kernel.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: dsa: mediatek,mt7530: Add
- airoha,en7581-switch
-Message-ID: <20240730200335.GA2059838-robh@kernel.org>
-References: <cover.1722325265.git.lorenzo@kernel.org>
- <63f5d56a0d8c81d70f720c9ad2ca3861c7ce85e8.1722325265.git.lorenzo@kernel.org>
- <3d0e39a3-02e9-42b4-ad49-7c1778bfa874@arinc9.com>
+	s=arc-20240116; t=1722369955; c=relaxed/simple;
+	bh=08Y5t+/8N2aBquIamx/IrSUR1vWd4M2XUzBHr2851tk=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=Jy7r8m1dH+E4nEC2CY+d2fkrARQmMk2vahnWeukhxvv1S1ui4q8D3eSO03ug53PJLRpScnUtjSUGMsNW4VbJDp0GbHrb+uT3jyXyl8cAIRO7ftRhtfBL4iJgWFEyOk+lcZazf9Y+Tg5YVqfLbb0JTFAI37TjiQtbsHl8c9rFvw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com; spf=pass smtp.mailfrom=trillion01.com; arc=none smtp.client-ip=173.209.37.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trillion01.com
+Received: from [45.44.224.220] (port=53656 helo=[192.168.1.177])
+	by cloud48395.mywhc.ca with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <olivier@trillion01.com>)
+	id 1sYt6W-0000cG-2X;
+	Tue, 30 Jul 2024 16:05:52 -0400
+Message-ID: <b1ad0ab3a7e70b72aa73b0b7cab83273358b2e1d.camel@trillion01.com>
+Subject: io_uring NAPI busy poll RCU is causing 50 context switches/second
+ to my sqpoll thread
+From: Olivier Langlois <olivier@trillion01.com>
+To: io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Date: Tue, 30 Jul 2024 16:05:52 -0400
+Autocrypt: addr=olivier@trillion01.com; prefer-encrypt=mutual;
+ keydata=mQINBFYd0ycBEAC53xedP1NExPwtBnDkVuMZgRiLmWoQQ8U7vEwt6HVGSsMRHx9smD76i
+ 5rO/iCT6tDIpZoyJsTOh1h2NTn6ZkoFSn9lNOJksE77/n7HNaNxiBfvZHsuNuI53CkYFix9JhzP3t
+ g5nV/401re30kRfA8OPivpnj6mZhU/9RTwjbVPPb8dPlm2gFLXwGPeDITgSRs+KJ0mM37fW8EatJs
+ 0a8J1Nk8wBvT7ce+S2lOrxDItra9pW3ukze7LMirwvdMRC5bdlw2Lz03b5NrOUq+Wxv7szn5Xr9f/
+ HdaCH7baWNAO6H/O5LbJ3zndewokEmKk+oCIcXjaH0U6QK5gJoO+3Yt5dcTo92Vm3VMxzK2NPFXgp
+ La7lR9Ei0hzQ0zptyFFyftt9uV71kMHldaQaSfUTsu9dJbnS2kI/j+F2S1q6dgKi3DEm0ZRGvjsSG
+ rkgPJ5T16GI1cS2iQntawdr0A1vfXiB9xZ1SMGxL/l6js9BVlIx/CBGOJ4L190QmxJlcAZ2VnQzrl
+ ramRUv01xb00IPJ5TBft5IJ+SY0FnY9pIERIl6w9khwLt/oGuKNmUHmzJGYoJHYfh72Mm8RQ1R/JS
+ o6v85ULBGdEC3pQq1j//OPyH3egiXIwFq6BtULH5CvsxQkSqgj1MpjwfgVJ8VbjNwqwBXHjooEORj
+ vFQqWQki6By3QARAQABtDJPbGl2aWVyIExhbmdsb2lzIChNeSBrZXkpIDxvbGl2aWVyQHRyaWxsaW
+ 9uMDEuY29tPokCNwQTAQgAIQUCVh3TJwIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgAAKCRBlaka
+ GGsWHEI1AD/9sbj+vnFU29WemVqB4iW+9RrHIcbXI4Jg8WaffTQ8KvVeCJ4otzgVT2nHC2A82t4PF
+ 0tp21Ez17CKDNilMvOt8zq6ZHx36CPjoqUVjAdozOiBDpC4qB6ZKYn+gqSENO4hqmmaOW57wT9vII
+ v6mtHmnFvgpOEJl6wbs8ArHDt0BLSjc8QQfvBhoKoWs+ijQTyvFGlQl0oWxEbUkR1J3gdft9Oj9xQ
+ G4OFo73WaSEK/L9IalU2ulCBC+ucSP9McoDxy1i1u8HUDrV5wBY1zafc9zVBcMNH6+ZjxwQmZXqtz
+ ATzB3RbSFHAdmvxl8q6MeS2yx7Atk0CXgW9z5k2KeuZhz5rVV5A+D19SSGzW11uYXsibZx/Wjr9xB
+ KHB6U7qh5sRHaQS191NPonKcsXXAziR+vxwQTP7ZKfy+g5N/e6uivoUnQrl9uvUDDPXEpwVNSoVws
+ Vn4tNyrGEdN11pHDbH5fSGzdpbY8+yczUoxMmsEQe/fpVwRBZUqafRn2TVUhV0qqzsUuQcTNw1zIZ
+ JgvkqrHgd4ivd2b1bXBczmu/wMGpEnF6cWzSQDiwC1NF3i+gHCuD8IX1ujThWtzXsn0VtrMkrRCbn
+ ponVQ6HcbRYYXPuK0HRRjCSuAKo5porVONepiOSmu0FBrpGqBkpBtLrzKXoi1yt/7a/wGdMcVhYGg
+ vA==
+Organization: Trillion01 Inc
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3d0e39a3-02e9-42b4-ad49-7c1778bfa874@arinc9.com>
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cloud48395.mywhc.ca
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - trillion01.com
+X-Get-Message-Sender-Via: cloud48395.mywhc.ca: authenticated_id: olivier@trillion01.com
+X-Authenticated-Sender: cloud48395.mywhc.ca: olivier@trillion01.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Tue, Jul 30, 2024 at 11:57:36AM +0300, Arınç ÜNAL wrote:
-> On 30/07/2024 10:46, Lorenzo Bianconi wrote:
-> > Add documentation for the built-in switch which can be found in the
-> > Airoha EN7581 SoC.
-> > 
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >   .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml     | 9 ++++++++-
-> >   1 file changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> > index 7e405ad96eb2..aa89bc89eb45 100644
-> > --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> > +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> > @@ -92,6 +92,10 @@ properties:
-> >             Built-in switch of the MT7988 SoC
-> >           const: mediatek,mt7988-switch
-> > +      - description:
-> > +          Built-in switch of the Airoha EN7581 SoC
-> > +        const: airoha,en7581-switch
-> > +
-> >     reg:
-> >       maxItems: 1
-> > @@ -284,7 +288,10 @@ allOf:
-> >     - if:
-> >         properties:
-> >           compatible:
-> > -          const: mediatek,mt7988-switch
-> > +          contains:
-> > +            enum:
-> > +              - mediatek,mt7988-switch
-> > +              - airoha,en7581-switch
-> 
-> The compatible string won't be more than one item. So this would be a
-> better description:
-> 
-> compatible:
->   oneOf:
->     - const: mediatek,mt7988-switch
->     - const: airoha,en7581-switch
+if you are interested into all the details,
 
-enum, not oneOf+const
+they are all here:
+https://github.com/axboe/liburing/issues/1190
+
+it seems like I like to write a lot when I am investigating a problem.
+Pavel has been a great help in assisting me understanding what was
+happening.
+
+Next, I came to question where the integration of RCU came from and I
+have found this:
+https://lore.kernel.org/all/89ef84bf-48c2-594c-cc9c-f796adcab5e8@kernel.dk/
+
+I guess that in some use-case being able to dynamically manage hundreds
+of NAPI devices automatically that can suddenly all be swepted over
+during a device reconfiguration is something desirable to have for
+some...
+
+but in my case, this is an excessively a high price to pay for a
+flexibility that I do not need at all.
+
+I have a single NAPI device. Once I know what it is, it will pratically
+remain immutable until termination.
+
+For that reason, I am thinking that offering some sort of polymorphic
+NAPI device tracking strategy customization would be desirable.
+
+The current one, the RCU one, I would call it the
+
+dynamic_napi_tracking (rcu could be peppered in the name somewhere so
+people know what the strategy is up to)
+
+where as the new one that I am imagining would be called
+
+static_napi_tracking.
+
+NAPI devices would be added/removed by the user manually through an
+extended registration function.
+
+for the sake of conveniance, a clear_list operation could even be
+offered.
+
+The benefits of this new static tracking strategy would be numerous:
+- this removes the need to invoke the heavy duty RCU cavalry
+- no need to scan the list to remove stall devices
+- no need to search the list at each SQE submission to update the
+device timeout value
+
+So is this a good idea in your opinion?
+
 
