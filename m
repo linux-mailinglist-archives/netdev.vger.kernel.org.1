@@ -1,115 +1,143 @@
-Return-Path: <netdev+bounces-114242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35328941D22
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:14:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 263A0941D47
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E290828B18B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:14:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D138B1F24EEC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8F018A6BC;
-	Tue, 30 Jul 2024 17:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FNZMc9vF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B18518B49E;
+	Tue, 30 Jul 2024 17:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D8618A6B6
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 17:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEE018A6DD;
+	Tue, 30 Jul 2024 17:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722359603; cv=none; b=SMTKg/Z+o6TwIJq0KyjaIVZhvfENdFoo/EmolPlP3p5F+QHOvNyVRUwcI1p4+EMJsN1yNdaPlJ+9BvnXD4Ft2HV/8PZFluwBFIO9DKBaAqpt+/0/4oFiM2ulxQInlgripGHKk3wgP2bV7i+Wqe+2KOaadmkXhwzgHA9B8+GraMI=
+	t=1722359707; cv=none; b=uMNjC6bQOPZuZDa5+InYwu+vGGkw2UAeZ/TywAEe6Q++VUo5xJo/RF8WGW5tKQ4NSlWardiTYqJXZ8yBlNT7/9wOU9ZBlAlqjbDTqFvqkhzg90na7RRK5XPA8Q83M3+KPvNO+I4dFMxPzGM5lWez7MuM7xrtp1H44oafPmeAbfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722359603; c=relaxed/simple;
-	bh=GzimSGPp4Pj8GOfT5R+B7eU0TGFkgJ2E+BdZPdWVLYI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=i38uo2ZO3yhncFO82ygYHUfqjh7MYwL7MuB+FNv6/O8Sqar5nn6y8oHfaMXbch4ZfUTBaEqj2t9ozlroK1tjqDUz0kXlD45pMk5Tu8KQis0PSNjMHj3e3bmtCj8O6U2KwW15wG7WcJv+ggixL6T3Jc7bzuIA3NIMEjBis4k9mwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FNZMc9vF; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a7ab63a388bso379480466b.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:13:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1722359600; x=1722964400; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8m0nShPnuINbCdjeY7nEN4rJqDqmHY1w1WDR0g7gvAM=;
-        b=FNZMc9vFUzMnAm6m02CxzK5fiUopr368ph5r15TjjQcmEh9KQYLiGsl1+Iv4ddulJY
-         Yt5kPr4+sedfa9JwHQMkANRMjV1NrP/UGZlYvRyQldkXpyS21xWLFimTY/tssXdn6t65
-         W92k8ZDYOc+thywbBRfLXVxBiNUj1Xpn1xAHcSYmdGzi9LuOVBo2XxNWbP0beReVAPRR
-         pTeDMqeDMd/r9SIDXF1m4BSapXjnw0wbzqhcDFyPw0Lw0yaSo9cRaWG6at/OW0nmOUp+
-         tyT1R+aQ0KSMp2NLsqhPGGNSsU4axNSRxX9XKsEKy6NAVPi9fiBIk5Ba/jfvt53XgNeU
-         LMLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722359600; x=1722964400;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8m0nShPnuINbCdjeY7nEN4rJqDqmHY1w1WDR0g7gvAM=;
-        b=hcmcqUZhazhv10JU8ltOYaIa/gKOuK6RD7UYMYyi1SvPgCoduOU8glnEsScmi/Qdrd
-         SK40cEuaoMKuef7fzX6x2EE+Nv3nuZBXfkGGN2OJY3LTEFattURDSAoKwzMMUqGZJA3x
-         LiVoM8IFSxZiASl/O/IBZWrgB3SCQ9nHWT/Kpjm7ye8fDMfajBLHZKng9R60J6cEqnnw
-         d64l7MeJmyP+LEhsOybYmimMuYWE9i2+qR6qZGd9RfrpIXexBf7QHmNxLG1Z3N+bFviZ
-         FS7gEidpEfq5vafFWSL55rZXaQpUgDNdwTlzTdurm+SPl4CR39qVz7DGaxnFkoJxkzqQ
-         qPdw==
-X-Forwarded-Encrypted: i=1; AJvYcCXw8+5guNo80xvFFHFses+rF3P0zD/72gOOkyb6eSX4r+T6oZxmln9JtgfMsWMw7wlbfuwyK4t9N+wJw5RQDVysy16N3Vi1
-X-Gm-Message-State: AOJu0YyPn/kkB+pZkjSE08PLVz6s3647GnY4OkistG2BDx4O9w8dUQTW
-	bZxOrEc4XvpmY5oPzetHBrDMg0nEyry8M2tGBIcOOi+hJrGc0hCh+EqeInJsRhk=
-X-Google-Smtp-Source: AGHT+IGkt1E+D2BdP4URH/gGZVLCq5xWR4UWldftuqBSyxAPfGBZxzjaW//v+4HpwiJK/1dy4xQZgg==
-X-Received: by 2002:a05:6402:50c7:b0:5a0:f9f7:6565 with SMTP id 4fb4d7f45d1cf-5b021e1745dmr11214748a12.21.1722359600380;
-        Tue, 30 Jul 2024 10:13:20 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac631b03ccsm7466835a12.16.2024.07.30.10.13.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 10:13:19 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
- <eddyz87@gmail.com>,  Mykola Lysenko <mykolal@fb.com>,  Alexei Starovoitov
- <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Martin KaFai
- Lau <martin.lau@linux.dev>,  Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>,  John Fastabend <john.fastabend@gmail.com>,  KP
- Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
- Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
- <shuah@kernel.org>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf 1/6] selftest/bpf: Support more socket types in
- create_pair()
-In-Reply-To: <7ae7a77c-c5ce-4a09-8a6c-b3cd014220f3@rbox.co> (Michal Luczaj's
-	message of "Fri, 26 Jul 2024 22:29:39 +0200")
-References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
-	<20240724-sockmap-selftest-fixes-v1-1-46165d224712@rbox.co>
-	<87cyn0kqxu.fsf@cloudflare.com>
-	<7ae7a77c-c5ce-4a09-8a6c-b3cd014220f3@rbox.co>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Tue, 30 Jul 2024 19:13:18 +0200
-Message-ID: <87mslyztu9.fsf@cloudflare.com>
+	s=arc-20240116; t=1722359707; c=relaxed/simple;
+	bh=gBg5+KZL7H8xd5TqmtpjPdibVkxz0gSUgYQbeHeYzlc=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FU145bMB4LqScC6Mu9rfPRqB9bBweNXgS5mt9y/ThQjAHUXVfR8qWtKslTh5X1Y97JFoWjV7lF+Iai/27WlWRbc8X6XmGDN5XdxOdPYGZ/X+6kufPJTk5kZSat7KsAscysjYTkkZL/ylVBWGRn4NYIg7qmInyURK9NGBcDXJCGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WYMHj63Mwz6K9Ns;
+	Wed, 31 Jul 2024 01:13:05 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id A330F1408F9;
+	Wed, 31 Jul 2024 01:15:01 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 30 Jul
+ 2024 18:15:01 +0100
+Date: Tue, 30 Jul 2024 18:15:00 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>, Jakub
+ Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
+	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>, "David Ahern" <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, "Jiri Pirko" <jiri@nvidia.com>, Leonid
+ Bloch <lbloch@nvidia.com>, "Leon Romanovsky" <leonro@nvidia.com>,
+	<linux-cxl@vger.kernel.org>, <patches@lists.linux.dev>
+Subject: Re: [PATCH v2 1/8] fwctl: Add basic structure for a class subsystem
+ with a cdev
+Message-ID: <20240730181500.00004733@Huawei.com>
+In-Reply-To: <20240729173038.GF3625856@nvidia.com>
+References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+	<1-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+	<20240726153042.00002749@Huawei.com>
+	<20240729173038.GF3625856@nvidia.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Fri, Jul 26, 2024 at 10:29 PM +02, Michal Luczaj wrote:
-> On 7/26/24 19:23, Jakub Sitnicki wrote:
->> I was going to suggest that a single return path for success is better
->> than two (diff below), but I see that this is what you ended up with
->> after patch 6.
->> 
->> So I think we can leave it as is.
->> [...]
->
-> And speaking of which, would you rather have patch 1 and 6 squashed?
 
-Don't have a straight answer, sorry . Would have to see if the diff is
-clear enough after squashing it. Use your best judgement.
+> 
+> > > +/**
+> > > + * fwctl_alloc_device - Allocate a fwctl
+> > > + * @parent: Physical device that provides the FW interface
+> > > + * @ops: Driver ops to register
+> > > + * @drv_struct: 'struct driver_fwctl' that holds the struct fwctl_device
+> > > + * @member: Name of the struct fwctl_device in @drv_struct
+> > > + *
+> > > + * This allocates and initializes the fwctl_device embedded in the drv_struct.
+> > > + * Upon success the pointer must be freed via fwctl_put(). Returns NULL on
+> > > + * failure. Returns a 'drv_struct *' on success, NULL on error.
+> > > + */
+> > > +#define fwctl_alloc_device(parent, ops, drv_struct, member)                  \
+> > > +	container_of(_fwctl_alloc_device(                                    \
+> > > +			     parent, ops,                                    \
+> > > +			     sizeof(drv_struct) +                            \
+> > > +				     BUILD_BUG_ON_ZERO(                      \
+> > > +					     offsetof(drv_struct, member))), \  
+> > Doesn't that fire a build_bug when the member is at the start of drv_struct?
+> > Or do I have that backwards?  
+> 
+> BUILD_BUG_ON(true) == failure, evaluates to void
+> BUILD_BUG_ON_ZERO(true) == fails, evaluates to 0
+> BUILD_BUG_ON_ZERO(false) == false, evaluates to 0
+> 
+> It is a bit confusing name, it is not ON_ZERO it is BUG_ON return ZERO
 
-It's certainly fine with me to review the steps that were taken to
-massage the code.
+Ah.  That indeed got me.  ouch.
+
+
+> 
+> > Does container_of() safely handle a NULL?  
+> 
+> Generally no, nor does it handle ERR_PTR, but it does work for both if
+> the offset is 0.
+
+Ah.  Good point, I'd neglected the zero offset meaning it is really
+just a fancy pointer type cast.
+
+> 
+> The BUILD_BUG guarentees the 0 offset both so that the casting inside
+> _fwctl_alloc_device() works and we can use safely use container_of()
+> to enforce the type check.
+> 
+> What do you think about writing it like this instead:
+> 
+> #define fwctl_alloc_device(parent, ops, drv_struct, member)               \
+> 	({                                                                \
+> 		static_assert(__same_type(struct fwctl_device,            \
+> 					  ((drv_struct *)NULL)->member)); \
+> 		static_assert(offsetof(drv_struct, member) == 0);         \
+> 		(drv_struct *)_fwctl_alloc_device(parent, ops,            \
+> 						  sizeof(drv_struct));    \
+> 	})
+> 
+> ?
+> 
+> In some ways I like it better..
+Seems more readable to me and avoids entertaining corners of the previous approach.
+
+Jonathan
+
+> 
+> Thanks,
+> Jason
+
 
