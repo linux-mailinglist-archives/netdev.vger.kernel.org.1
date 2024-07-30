@@ -1,107 +1,383 @@
-Return-Path: <netdev+bounces-114146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 054A79412F6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 15:20:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34C989412FB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 15:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8605DB25EA5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:19:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A040B246EF
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C25E19F47A;
-	Tue, 30 Jul 2024 13:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53EB519EEB8;
+	Tue, 30 Jul 2024 13:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="f34Ys4YJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a+xp08ja"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F1C19F461;
-	Tue, 30 Jul 2024 13:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0B118FC6E;
+	Tue, 30 Jul 2024 13:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722345588; cv=none; b=p7h1ayIo0Uu+EyGvGN4PC+Zq4yU3YzRUDho1Hj7PW6Cyqwb/fl1nZVvgKu0hg7+/xvQDiBDLL/wx7moVz26xtceg7A40jHksjh6aB1AmIUY9K1eR54eVc9HlxZo1KY+7LqesnGo3NRq2jyS/1s00dFhsFEjJoEjg+E12R/eAWl4=
+	t=1722345614; cv=none; b=njtzooQ1HNC8E+8pWwB7zE2SNbyuO5Azelzs1WyFgbdzIcPRG+eQcbBkIQpJx0XS4ST93KRUzLNrzodxq+Vt2aGM13chavUCe0BXpwz1a3uhXYMqEfQj5pM16WBYnRKbRWTvOdSfXHXOTyZ3rVDS68F4M4qyatBbxcFWHJ59P3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722345588; c=relaxed/simple;
-	bh=shET7++dHCt9/Z8YVKh9qnbzU+cUXl9oYnQ7KccNs2Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GyMMatScEKJm1mT0yQe+E/skE9wKsNk8nNHOzjB6kIvy3YPXC9qaxNNJ5l0XGrkxqpBmvn/2NTOnMoSe3ks5tXht9I5U6mp0o25xU8h+noRUj4TYIZAYoA+F/sxnG0HmQuHhgdRhE+N50Re7qHFG19UxEKlDTB6hktOpK5uq9ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=f34Ys4YJ; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C541E40E0205;
-	Tue, 30 Jul 2024 13:19:44 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id fBqAozI4p1MH; Tue, 30 Jul 2024 13:19:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1722345580; bh=FlasjGTrAQM5tzrEQba/+nuqA8c0Yk58VBHRZXHafyI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=f34Ys4YJ2AXVe0yM93AS0d+NPUoX43ij4tSdBywbe0Pm2oD4PcmeI5CNPaOCAkX9I
-	 ofc23rY6rd6O6odqpefSN1iIK/VtRAxcPudDKoeL+CC11yDadaNvONUF/0UIlKN3nI
-	 AKRiC0XmlVYTpglIU+GeAGhkkTl4ggHKaY8f1cbAdvF77I6VyoXb8BYoVeZlQ96CC8
-	 +Q8VFzkcLjduJmt58a2lEGaoaUf4dJNt9/Gf7LmWtMCv69awSV7emBdXPwFLMjzXZy
-	 tMYb1d7d4creQOTCYArJjKbpb6bMZQydIBwCzDMR6P0FNUZtP53JtB1jFwiBdCk4rq
-	 K2hBDUtOEANqts2IlwfEk/Z2xmhjGwfzTvCvOGR931OKZ/WiLRMAh4ot6ZdxA73IyG
-	 baYFFDeO5EE2VHn4P0bOxexkF26WculZYWW5NpmT77OK/KTStGwkxxovwlZo5KZd/G
-	 wjK40+GViT28Cf6QicA0rlbwMmomDATbvP4Oc9syt1OhQR82/kXeGmCuw41Ll5EGFM
-	 aCg6t6+gLZbkTBlVRXdfXbRmXB9MtYXzenG9BApaKJrBalXlNxmh0CZczOvQFqjPPW
-	 p9Zz6Jehm4KTMjhb4/zN8eHsWG+hbcnsT7RGPCDjzuihDTr3+zz56zHxvYe7qerxBH
-	 Hz6zzDv0SfqLpdM9Ri0tq+6c=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 51F1440E019C;
-	Tue, 30 Jul 2024 13:19:31 +0000 (UTC)
-Date: Tue, 30 Jul 2024 15:19:30 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, shiju.jose@huawei.com,
-	Mauro Carvalho Chehab <mchehab@kernel.org>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240730131930.GCZqjoYm89oz7CXyJg@fat_crate.local>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <20240729134512.0000487f@Huawei.com>
- <20240729133839.GDZqebX1LXB-Pt7_iO@fat_crate.local>
- <20240729152943.000009af@Huawei.com>
- <20240729145850.GD3371438@nvidia.com>
+	s=arc-20240116; t=1722345614; c=relaxed/simple;
+	bh=4WoU61Vx3nzFnQurU5bcJ0jaUgAlCcaSHaueq7y7y3c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iTbuncW6lSJkMGb1u8B3qKWWg7NSBsU5+VmVmCvUD7tSYHH7hdvs7+wyVua8yM3ydo659zI/HnYz2O5XGoSEYr58UkBdn6WlD9SssL/+5xHaBFJAO1Y/jYi/pNN+9LdG93g2AR75/GMdCCy7/XXESo01CGHTZlGdfmLjMIN0Sbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a+xp08ja; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722345613; x=1753881613;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=4WoU61Vx3nzFnQurU5bcJ0jaUgAlCcaSHaueq7y7y3c=;
+  b=a+xp08jaaVdHjWv4dj25y9v1stn4R5niOewALIAfHSyohJPuMylz3E+G
+   a2dkIDwOo1NQ9KHzqIoSwvg0Al/p1k6NFdBng9A8vHGI1Htsll427E+Zp
+   kd42DgfsLzZQ36vN/YmM1R/YbnwnEDJWUUiMNa27qFKcp9vfJnFmFh2On
+   T4+LaiQa5R0mrwyWV/c2m1GdFshrFz3OVK5guM6kbnPaMM1le5P7AeI6J
+   e4bl+zVp1hFuwgSbI+1/Nhdu0VNlZEat3/aR2/ArTU/1NCx4Lupq7t60O
+   VzRyqIWo9Lm6ZMqnlYFztm+B2R9cG3hv/8iGWovwE16Vr6XxLXBwf97PE
+   A==;
+X-CSE-ConnectionGUID: gnFi0SqXTgeCjup60xrQmQ==
+X-CSE-MsgGUID: JD+Ww44FRKOpHhaOcQNo2A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11149"; a="31552997"
+X-IronPort-AV: E=Sophos;i="6.09,248,1716274800"; 
+   d="scan'208";a="31552997"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 06:20:12 -0700
+X-CSE-ConnectionGUID: AW9RkDl8QZKVLzkDaKeX8A==
+X-CSE-MsgGUID: Nc/WlqjXR6ehXpYeCd0ahA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,248,1716274800"; 
+   d="scan'208";a="85271327"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.245.99.83]) ([10.245.99.83])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 06:20:06 -0700
+Message-ID: <9216e5a5-c2aa-4f08-8c53-7622b95b92ca@linux.intel.com>
+Date: Tue, 30 Jul 2024 15:19:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240729145850.GD3371438@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next, v1 2/3] igc: Add default Rx
+ queue configuration via sysfs
+To: Song Yoong Siang <yoong.siang.song@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Shinas Rasheed <srasheed@marvell.com>, Kevin Tian <kevin.tian@intel.com>,
+ Brett Creeley <brett.creeley@amd.com>,
+ Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>,
+ Joshua Hay <joshua.a.hay@intel.com>, Sasha Neftin <sasha.neftin@intel.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20240730012312.775893-1-yoong.siang.song@intel.com>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20240730012312.775893-1-yoong.siang.song@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 29, 2024 at 11:58:50AM -0300, Jason Gunthorpe wrote:
-> Like continuous memory scrubbing and EDAC is not really fwctl since it
-> is part of the main mission of a memory device. However evaluating the
-> memory to measure current ECC error rate for data collection and
-> debugging would be appropriate for fwctl.
 
-fwctl?
 
-What's that? Something to do with "firmware"? If so, how does this thing have
-anything to do with RAS stuff?
+On 30.07.2024 03:23, Song Yoong Siang wrote:
+> From: Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>
+> 
+> This commit introduces the support to configure default Rx queue during
 
-We have rasdaemon for that where all the RAS controlling and evaluation goes
-into.
+Use imperative mood.
 
--- 
-Regards/Gruss,
-    Boris.
+> runtime. A new sysfs attribute "default_rx_queue" has been added, allowing
+> users to check and modify the default Rx queue.
+> 
+> 1. Command to check the currently configured default Rx queue:
+>    cat /sys/devices/pci0000:00/.../default_rx_queue
+> 
+> 2. Command to set the default Rx queue to a desired value, for example 3:
+>    echo 3 > /sys/devices/pci0000:00/.../default_rx_queue
+> 
+> Signed-off-by: Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> ---
+>  drivers/net/ethernet/intel/igc/Makefile    |   3 +-
+>  drivers/net/ethernet/intel/igc/igc_main.c  |   6 +
+>  drivers/net/ethernet/intel/igc/igc_regs.h  |   6 +
+>  drivers/net/ethernet/intel/igc/igc_sysfs.c | 156 +++++++++++++++++++++
+>  drivers/net/ethernet/intel/igc/igc_sysfs.h |  10 ++
+>  5 files changed, 180 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/intel/igc/igc_sysfs.c
+>  create mode 100644 drivers/net/ethernet/intel/igc/igc_sysfs.h
+> 
+> diff --git a/drivers/net/ethernet/intel/igc/Makefile b/drivers/net/ethernet/intel/igc/Makefile
+> index efc5e7983dad..c31bc18ede13 100644
+> --- a/drivers/net/ethernet/intel/igc/Makefile
+> +++ b/drivers/net/ethernet/intel/igc/Makefile
+> @@ -8,5 +8,6 @@
+>  obj-$(CONFIG_IGC) += igc.o
+>  
+>  igc-y := igc_main.o igc_mac.o igc_i225.o igc_base.o igc_nvm.o igc_phy.o \
+> -	 igc_diag.o igc_ethtool.o igc_ptp.o igc_dump.o igc_tsn.o igc_xdp.o
+> +	 igc_diag.o igc_ethtool.o igc_ptp.o igc_dump.o igc_tsn.o igc_xdp.o \
+> +	 igc_sysfs.o
+>  igc-$(CONFIG_IGC_LEDS) += igc_leds.o
+> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> index cb5c7b09e8a0..6a925615911a 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> @@ -18,6 +18,7 @@
+>  
+>  #include "igc.h"
+>  #include "igc_hw.h"
+> +#include "igc_sysfs.h"
+>  #include "igc_tsn.h"
+>  #include "igc_xdp.h"
+>  
+> @@ -7069,6 +7070,9 @@ static int igc_probe(struct pci_dev *pdev,
+>  			goto err_register;
+>  	}
+>  
+> +	if (igc_sysfs_init(adapter))
+> +		dev_err(&pdev->dev, "Failed to allocate sysfs resources\n");
+> +
+>  	return 0;
+>  
+>  err_register:
+> @@ -7124,6 +7128,8 @@ static void igc_remove(struct pci_dev *pdev)
+>  	if (IS_ENABLED(CONFIG_IGC_LEDS))
+>  		igc_led_free(adapter);
+>  
+> +	igc_sysfs_exit(adapter);
+> +
+>  	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
+>  	 * would have already happened in close and is redundant.
+>  	 */
+> diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
+> index e5b893fc5b66..df96800f6e3b 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_regs.h
+> +++ b/drivers/net/ethernet/intel/igc/igc_regs.h
+> @@ -63,6 +63,12 @@
+>  /* RSS registers */
+>  #define IGC_MRQC		0x05818 /* Multiple Receive Control - RW */
+>  
+> +/* MRQC register bit definitions */
+> +#define IGC_MRQC_ENABLE_MQ		0x00000000
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Just 0.
+
+> +#define IGC_MRQC_ENABLE_MASK		GENMASK(2, 0)
+> +#define IGC_MRQC_DEFAULT_QUEUE_MASK	GENMASK(5, 3)
+> +#define IGC_MRQC_DEFAULT_QUEUE_SHIFT	3
+> +
+>  /* Filtering Registers */
+>  #define IGC_ETQF(_n)		(0x05CB0 + (4 * (_n))) /* EType Queue Fltr */
+>  #define IGC_FHFT(_n)		(0x09000 + (256 * (_n))) /* Flexible Host Filter */
+> diff --git a/drivers/net/ethernet/intel/igc/igc_sysfs.c b/drivers/net/ethernet/intel/igc/igc_sysfs.c
+> new file mode 100644
+> index 000000000000..34d838e6a019
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/igc/igc_sysfs.c
+> @@ -0,0 +1,156 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2024 Intel Corporation */
+> +
+> +#include <linux/device.h>
+> +#include <linux/kobject.h>
+> +#include <linux/module.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/sysfs.h>
+> +#include <linux/types.h>
+> +
+> +#include "igc.h"
+> +#include "igc_regs.h"
+> +#include "igc_sysfs.h"
+> +
+> +/**
+> + * igc_is_default_queue_supported - Checks if default Rx queue can be configured
+> + * @mrqc: MRQC register content
+> + *
+> + * Checks if the current configuration of the device supports changing the
+> + * default Rx queue configuration.
+> + *
+> + * Return: true if the default Rx queue can be configured, false otherwise.
+> + */
+> +static bool igc_is_default_queue_supported(u32 mrqc)
+> +{
+> +	u32 mrqe = mrqc & IGC_MRQC_ENABLE_MASK;
+> +
+> +	/* The default Rx queue setting is applied only if Multiple Receive
+> +	 * Queues (MRQ) as defined by filters (2-tuple filters, L2 Ether-type
+> +	 * filters, SYN filter and flex filters) is enabled.
+> +	 */
+> +	if (mrqe != IGC_MRQC_ENABLE_MQ && mrqe != IGC_MRQC_ENABLE_RSS_MQ)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +/**
+> + * igc_get_default_rx_queue - Returns the index of default Rx queue
+> + * @adapter: address of board private structure
+> + *
+> + * Return: index of the default Rx queue.
+> + */
+> +static u32 igc_get_default_rx_queue(struct igc_adapter *adapter)
+> +{
+> +	struct igc_hw *hw = &adapter->hw;
+> +	u32 mrqc = rd32(IGC_MRQC);
+> +
+> +	if (!igc_is_default_queue_supported(mrqc)) {
+> +		netdev_warn(adapter->netdev,
+> +			    "MRQ disabled: default RxQ is ignored.\n");
+> +	}
+> +
+> +	return (mrqc & IGC_MRQC_DEFAULT_QUEUE_MASK) >>
+> +		IGC_MRQC_DEFAULT_QUEUE_SHIFT;
+> +}
+> +
+> +/**
+> + * igc_set_default_rx_queue - Sets the default Rx queue
+> + * @adapter: address of board private structure
+> + * @queue: index of the queue to be set as default Rx queue
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +static int igc_set_default_rx_queue(struct igc_adapter *adapter, u32 queue)
+> +{
+> +	struct igc_hw *hw = &adapter->hw;
+> +	u32 mrqc = rd32(IGC_MRQC);
+> +
+> +	if (!igc_is_default_queue_supported(mrqc)) {
+> +		netdev_err(adapter->netdev,
+> +			   "Default RxQ not supported. Please enable MRQ.\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (queue > adapter->rss_queues - 1) {
+
+if (queue >= adapter->rss_queues)
+
+> +		netdev_err(adapter->netdev,
+> +			   "Invalid default RxQ index %d. Valid range: 0-%u.\n",
+> +			   queue, adapter->rss_queues - 1);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Set the default Rx queue */
+> +	mrqc = rd32(IGC_MRQC);
+> +	mrqc &= ~IGC_MRQC_DEFAULT_QUEUE_MASK;
+> +	mrqc |= queue << IGC_MRQC_DEFAULT_QUEUE_SHIFT;
+> +	wr32(IGC_MRQC, mrqc);
+> +
+> +	return 0;
+> +}
+> +
+> +static ssize_t default_rx_queue_show(struct device *dev,
+> +				     struct device_attribute *attr,
+> +				     char *buf)
+
+Why no igc_ prefix (and function doc)?
+
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	struct net_device *netdev = pci_get_drvdata(pdev);
+> +	struct igc_adapter *adapter = netdev_priv(netdev);
+> +	u32 default_rx_queue = igc_get_default_rx_queue(adapter);
+> +
+> +	return sysfs_emit(buf, "%d\n", default_rx_queue);
+> +}
+> +
+> +static ssize_t default_rx_queue_store(struct device *dev,
+> +				      struct device_attribute *attr,
+> +				      const char *buf, size_t count)
+
+Ditto
+
+> +{
+> +	struct pci_dev *pdev = to_pci_dev(dev);
+> +	struct net_device *netdev = pci_get_drvdata(pdev);
+> +	struct igc_adapter *adapter = netdev_priv(netdev);
+> +	u32 default_rx_queue;
+> +	int err;
+> +
+> +	err = kstrtou32(buf, 10, &default_rx_queue);
+> +	if (err) {
+> +		netdev_err(adapter->netdev,
+> +			   "Invalid default RxQ index. Valid range: 0-%u.\n",
+> +			   adapter->rss_queues - 1);
+> +		return err;
+> +	}
+> +
+> +	err = igc_set_default_rx_queue(adapter, default_rx_queue);
+> +	if (err < 0)
+> +		return -EINVAL;
+
+Why discard return error here?
+
+> +
+> +	return count;
+> +}
+> +
+> +static DEVICE_ATTR_RW(default_rx_queue);
+> +
+> +static struct attribute *attrs[] = {
+> +	&dev_attr_default_rx_queue.attr,
+> +	NULL,
+> +};
+> +
+> +static struct attribute_group attr_group = {
+> +	.attrs = attrs,
+> +};
+> +
+> +int igc_sysfs_init(struct igc_adapter *adapter)
+> +{
+> +	int err;
+> +
+> +	err = sysfs_create_group(&adapter->pdev->dev.kobj, &attr_group);
+> +	if (err) {
+> +		netdev_err(adapter->netdev,
+> +			   "Failed to create sysfs attribute group.\n");
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +void igc_sysfs_exit(struct igc_adapter *adapter)
+> +{
+> +	sysfs_remove_group(&adapter->pdev->dev.kobj, &attr_group);
+> +}
+> diff --git a/drivers/net/ethernet/intel/igc/igc_sysfs.h b/drivers/net/ethernet/intel/igc/igc_sysfs.h
+> new file mode 100644
+> index 000000000000..b074ad4bc63a
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/igc/igc_sysfs.h
+> @@ -0,0 +1,10 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (c) 2024 Intel Corporation */
+> +
+> +#ifndef _IGC_SYSFS_H_
+> +#define _IGC_SYSFS_H_
+> +
+> +int igc_sysfs_init(struct igc_adapter *adapter);
+> +void igc_sysfs_exit(struct igc_adapter *adapter);
+> +
+> +#endif /* _IGC_SYSFS_H_ */
+
+Thanks,
+Marcin
 
