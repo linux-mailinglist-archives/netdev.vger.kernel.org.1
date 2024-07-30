@@ -1,140 +1,122 @@
-Return-Path: <netdev+bounces-114039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4461D940BD4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:39:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0A8940C24
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFA7A286504
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAE781F286FD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95A4192B69;
-	Tue, 30 Jul 2024 08:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA7619415C;
+	Tue, 30 Jul 2024 08:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="iBhmIlEu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUEn6ha8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f194.google.com (mail-pf1-f194.google.com [209.85.210.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3A8156C4B;
-	Tue, 30 Jul 2024 08:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9340193099;
+	Tue, 30 Jul 2024 08:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722328770; cv=none; b=RzAZJaqEENxI4qkLNIxlWPllEwuxudL8Kkmu9bTgzDr0awsWB6ndx3eSsV5LAor78AxQVGfVPkvjkVpxZvaC8aYFfl1yyIuuTztLX65ip3/1xv+GW8NdlAF8pXAH2IXNI/zUCKk/c3eDPOU4XSVYQFbnHffRgqJV5MFkypN47ew=
+	t=1722329202; cv=none; b=cfHACwksYN8vGEqA6WKH2DmC1k5gYG92k9O0bWyu8gayYBr34gTi80Pq8Bza6GMelAXoOoJXFYKRvbg9bW1qnfV6vQTUPmIcdNuKah/NLLbW+iHpL4kLw7GbuUIty2duFECtCcFchoVtUJXrq8IOu1tiJ2vy1QX62T8Y2jflM9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722328770; c=relaxed/simple;
-	bh=07fx0OcCY32v0SirWQHDNSZfPG7HMF4hAqbJnMhyg3s=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=doaUhOprRAe6U8YQwCTdBJQwJbWw9dLJU7RBmP68ZdyLXzzOzPNT9M1raD3mNIuv+cF7+d/BcMrV+1wq5T8hKILBNJ6KknE68eHe3LlFgU2Sxsf3blqqOB59WLoUA6hlwdVhuzZeHa1kXBePQxAvtH6MCw3VAMexAe3hKYpzT9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=iBhmIlEu; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1722328685; x=1722933485; i=markus.elfring@web.de;
-	bh=07fx0OcCY32v0SirWQHDNSZfPG7HMF4hAqbJnMhyg3s=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=iBhmIlEu1DTEhbIId4CW/iiPJylb+jiOQ9na/RS5h69bGT/imWvKAbYeaJ6pivjz
-	 JMnQXpy3cOlHf6p3bxFw2uqBaGPOuz17LrdoEApiGvMmHL9F2kIIYCb9ueGy62+tI
-	 Z412cOhJGP5xxEr98kCfPNdYFjVPufN30A6OcLhTRbHeOoqDpZ30cxm7YBR3nSSWl
-	 8w95ukxErNzkX2hWTvH3N3Q/O+9nRoQJ+CINjbJQKXo8kr7CjpakPcjmpI9mTGMkm
-	 t7htz1r1rdr1c1sSbkVKfGHWXeJSssKDwuuEu3A8VxxvqEIW9YncbE1WpCLHOz/i4
-	 zpVozzeWA1xcB3gjBw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MKMA1-1sq6tO21QF-00MgS1; Tue, 30
- Jul 2024 10:38:05 +0200
-Message-ID: <5d3c74da-7d44-4b88-8961-60f21f84f0ac@web.de>
-Date: Tue, 30 Jul 2024 10:37:56 +0200
+	s=arc-20240116; t=1722329202; c=relaxed/simple;
+	bh=b4LKj5n8JEGCAFCr0XTCE2Vt4PRZBGKVYg2iWYChsqc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f1tolCUxeBebT99Hc4Wux799uOTxvX1D2eHTwNWfpYs92mhuZW90FkSOynQ1QbVdLFOzQyK5KVO8FJlH4vnfQlKC6dNYSil98uqR/W8qbQRtOLL7knZTdKGTRpL/eS8iAw6RSDeTjHwlFiPlNnjYbj7NSJ8Qq1k1a2vAkFt7wO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUEn6ha8; arc=none smtp.client-ip=209.85.210.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f194.google.com with SMTP id d2e1a72fcca58-70d1c8d7d95so2606217b3a.2;
+        Tue, 30 Jul 2024 01:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722329200; x=1722934000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+JfbO8SiiD7QjLOWye4GDcjfYdtq1pCx+OMdv4xqVP0=;
+        b=KUEn6ha8B/sz2xzW7SaJb3eC3ESgVk4ghaTiruM79QoWG2nXLGohAQUt3OukNpJtlC
+         PVbhyuiqVQVBxw2qnPzeA/CqXnd5N9PgjLHiMgccEwUjepo6lgOjjdIsoOg5nko+7/0s
+         DC5J0ZiCsR12HQOSSaYJvOcueimuwnmRZ038ryMqpkpXRUvWPpVXlzySpIZ6/18hAP3R
+         Wjk0yadSxbIkclATf5lIXRuF0bsJDu5nAFCrKr9tdgCejK2BjnKVki0I4nReYv8abSKR
+         kMhlSa4Gjt3MHH/YlXCrgXOQcHgXFkPItlbafKdNK7Q+/Vb01PbccPLXNYfKmGT7toI/
+         ZaWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722329200; x=1722934000;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+JfbO8SiiD7QjLOWye4GDcjfYdtq1pCx+OMdv4xqVP0=;
+        b=KZ4cOBFSUuW1BZ1YZaMSCw9XC6xVYZMyFBX6KVmVfnBIO0ZhYwrpk3aLW6bykx6qVo
+         FT9fi5RBwx9xF35EIid/HSOurZO++G0zLg2fFz1ULU35I+1NoFPUp5vrVWf4gwnubKik
+         bHY+UfbzBz79m+S9H4T8kQVM910Fhdnu5Y1nfRsynbO0+hkvFakOyqAUD7WMFP3pw2WS
+         nSrBa5gTpbqDkXiLNNX6qhdBVaFf4pPFrBCCW5mLmCOtr3mKBoqufZ2IgGN4/y3+OzEF
+         WdHXBZhinWWHNBjoVgcK7ZEnoOc5h4Ke3tYZRJJVPvRGNmS+9Uyb77zPKa9NN1UItfVc
+         LxdA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6tkcBHfpgtCj4Sfk4SxIm+WnKBheqyYcIvihfhwkjVoFWJjnKiwH3PwiL8V6ijvj9D7x+OkZedWVyhpG4/mcxcQgr/e4BarE5weAL
+X-Gm-Message-State: AOJu0YysDnrqkMnFQnOZagpQHU+UktLv2r6dkVZz4eIZ4Bi3EMFFtlSp
+	IkatsOzRhlmeOnhZsb/m7ne1CfE49ewhk1AGOPWg0i0YtDlmiE9/
+X-Google-Smtp-Source: AGHT+IFQuHjLUgaNkWjNiK7mJEi9/3hLzHn67EugJva8Qbb2ioG5mLhyCfZDiRuQR7NHgrAG7lHKwg==
+X-Received: by 2002:a05:6a20:9e4b:b0:1bd:1df4:bd43 with SMTP id adf61e73a8af0-1c4a14fdcd6mr8385337637.54.1722329199545;
+        Tue, 30 Jul 2024 01:46:39 -0700 (PDT)
+Received: from localhost (66.112.216.249.16clouds.com. [66.112.216.249])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cdb73efdf2sm11967837a91.29.2024.07.30.01.46.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 01:46:39 -0700 (PDT)
+From: John Wang <wangzq.jn@gmail.com>
+X-Google-Original-From: John Wang <wangzhiqiang02@ieisystem.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: mctp: Consistent peer address handling in ioctl tag allocation
+Date: Tue, 30 Jul 2024 16:46:35 +0800
+Message-Id: <20240730084636.184140-1-wangzhiqiang02@ieisystem.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Daniel Vetter <daniel.vetter@ffwll.ch>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Mina Almasry <almasrymina@google.com>,
- Pavel Begunkov <asml.silence@gmail.com>,
- Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Andreas Larsson
- <andreas@gaisler.com>, Arnd Bergmann <arnd@arndb.de>,
- Bagas Sanjaya <bagasdotme@gmail.com>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Christoph Hellwig <hch@infradead.org>, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>,
- Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>, Helge Deller <deller@gmx.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Jakub Kicinski
- <kuba@kernel.org>,
- "James E. J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Jeroen de Borst <jeroendb@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Matt Turner <mattst88@gmail.com>, Nikolay Aleksandrov <razor@blackwall.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Shailend Chand <shailend@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Shuah Khan <shuah@kernel.org>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Steven Rostedt <rostedt@goodmis.org>, Sumit Semwal
- <sumit.semwal@linaro.org>, Taehee Yoo <ap420073@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Yunsheng Lin <linyunsheng@huawei.com>
-References: <20240730022623.98909-4-almasrymina@google.com>
-Subject: Re: [PATCH net-next v17 03/14] netdev: support binding dma-buf to
- netdevice
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240730022623.98909-4-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:3zASUQdt0WnRJJo2JsH8HgMCSLLJrSOm6wxlRg1HbHDrGJYPFAR
- 4UrI46t5fFnsIQP5D20a4Q4/ar+Qe149EAafa7XhskHQN56xyU9dWXWOdOe9cqX+BeVMF3I
- 8WFhpDkIxnYHJeZdnRHZDAN3teiQz55j6x07IL1LXqdRPVKwtTq1AIEwtRutuGvYx2Pn/lI
- 6wer7tct5AinmIXcBPXRw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:pHmLyOskFkY=;I7pCl1VILl5yztEF5uEKXmycDP5
- HNg30ml4ujtQp8hDTQ3k68nNJHnulVh43c1GvXrokXoDUhvvfoxNn12GmkZ+HgPxu8P5cN86n
- HjOpfP8/MmUIpzxPlAqq3wxO4BHOXC7nCoou7XGF6loLekm4A+xubNt9riTQyV1qFBcyB94i1
- 9nkx3l/0I3vtPPF6IXAuFeSgWGNbnMAc5yBzRdvhRx4NgMckDkjJvObOV+sApUE4abxW5IdYc
- buKUkVmNMowUtx9d8ohNyHP5l0MvM+BrMJ+U6i6NSpHCcHyN+Db4gk/km/Nfpyxzicq+cw9kM
- dbUuFQy20IeEzlt0JBmJTvh3npkouDOC8d+ppHNvGFDc2VX95QZiP8oAV1KqYVeet622rengR
- 3AtZYxLW2HL9cJRJdGCFiSSoh2Ma1PdedqtRTNQE8x65ul4oZ5zC5oC7GI0KrfC2lDBmt7U9H
- d3quaXmP5M08fs3HGNmDo2dJT4Mof8Rvu8b/1zeyNdFkx2ISKEqxruq9cgOvPVDOzWnM6q1hQ
- j/Oo//f3eoHLmD9gSZJlyPqNPXnEofdZIoAkzr1NHrrLlxHQQCxQg4K2Ctyi0eEOGrXaAGGMW
- U86dnhPzR1dN3MoSlZwMFv+d+ur6MNAU2LFwQiVgsiYO2r4PdA6g2/epD6XWGMZzsV3xD1bW9
- ezFK4C0vxtvaDH0C0PO+CEdfJXWpA6ElBZbDAsD0DefszWZDdZo0DdR8nfhg96M442XbukoWM
- HqCWkB1S51RK5OLQqCoLFxLM1/As4Y1LHCojxd9Oj8S237g0l+yUpVWT2ul1az/vHGJE2iOpx
- VrU7WYLZwjqQf3tDPMnChwHw==
+Content-Transfer-Encoding: 8bit
 
-=E2=80=A6
-> +++ b/include/net/devmem.h
-> @@ -0,0 +1,115 @@
-=E2=80=A6
-> +#ifndef _NET_DEVMEM_H
-> +#define _NET_DEVMEM_H
-=E2=80=A6
+When executing ioctl to allocate tags, if the peer address is 0,
+mctp_alloc_local_tag now replaces it with 0xff. However, during tag
+dropping, this replacement is not performed, potentially causing the key
+not to be dropped as expected.
 
-I suggest to omit leading underscores from such identifiers.
-https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+d=
-efine+a+reserved+identifier
+Signed-off-by: John Wang <wangzhiqiang02@ieisystem.com>
 
-Regards,
-Markus
+---
+v2:
+  - Change the subject from 'net' to 'net-next'
+  - remove the Change-Id tag
+---
+ net/mctp/af_mctp.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
+index de52a9191da0..43288b408fde 100644
+--- a/net/mctp/af_mctp.c
++++ b/net/mctp/af_mctp.c
+@@ -486,6 +486,9 @@ static int mctp_ioctl_droptag(struct mctp_sock *msk, bool tagv2,
+ 	tag = ctl.tag & MCTP_TAG_MASK;
+ 	rc = -EINVAL;
+ 
++	if (ctl.peer_addr == MCTP_ADDR_NULL)
++		ctl.peer_addr = MCTP_ADDR_ANY;
++
+ 	spin_lock_irqsave(&net->mctp.keys_lock, flags);
+ 	hlist_for_each_entry_safe(key, tmp, &msk->keys, sklist) {
+ 		/* we do an irqsave here, even though we know the irq state,
+-- 
+2.34.1
+
 
