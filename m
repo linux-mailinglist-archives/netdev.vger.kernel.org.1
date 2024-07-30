@@ -1,148 +1,287 @@
-Return-Path: <netdev+bounces-114140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 447609412B6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 14:59:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7609412B9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 14:59:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD0081F2479F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:59:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD4B41F23519
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A83619EEAA;
-	Tue, 30 Jul 2024 12:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB1C18EFE3;
+	Tue, 30 Jul 2024 12:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="go/1Zx3T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lqTvgGjg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DB3442C;
-	Tue, 30 Jul 2024 12:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722344352; cv=none; b=BqjgC8qk9d0bGhpRuos5a5XbEyb3+Z9bdAZOVc9BoBea7Nl5g73QQlt5z4poLkDxB4T9QtrzHxFT1pWmKDV3KavjBI24EVpwI2dVXQFlooeDVy4lf2tX8PW5BAUglFw/tyKpa3nPZcMJ3PFnf2ay8naXgamxB4gGr9JRcyxgzBs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722344352; c=relaxed/simple;
-	bh=eqXcPBYhZBDafuHBni2TZwrobW4eaMMgljUweKQ30xo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IP3wTEs3HKIfqom1o/I4Iiv22B36HvHv15RriwAkETffEL/kzRJ0jc6glpobwYa81KHRGlvTNTVuMhx8kWIWcK4x8jGfrM+bWyoytGUGCoczb0OLyW3HP30cVA2+o8PFpJCSyPvYEvxDO1z/omkQRD4q2c2pQ0fdK22ykP4VP2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=go/1Zx3T; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52f01993090so7118015e87.2;
-        Tue, 30 Jul 2024 05:59:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722344348; x=1722949148; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/nqx6Y1Pu/keDudNv6N0ITjqRriMkyri+n9sVB+9k5k=;
-        b=go/1Zx3TImHB3COHB74AuQ/Wjy55d1irY8jsYttfa5luugl9vMipq+Zvj02RDaD+VD
-         l+/vT839F+TX2NLiAZ1XS4mXMs4mgsS6p1j6/bfFtguqJ7AfT2vqpKuJmeNHwVlpERTM
-         AEa73jJPFQNdBlQpHmSkgySgbgdJ8+qPpnH3W7QJlIFeHrY7PoO2oUQyoXjKtg6LNQs8
-         gCE2BR+nxhPNXsI/DNSu3lmpdrIDlLM+AIRY5ikPPyxiJIG5ISs+N5kCOFANrz9YRWMJ
-         nhVPDwD8LmelMCFisPoyjvtu5/a0PJ8WeZlJyED/VqS33hq5+DEUtRgZu+MO40Doj7Zb
-         D4Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722344348; x=1722949148;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/nqx6Y1Pu/keDudNv6N0ITjqRriMkyri+n9sVB+9k5k=;
-        b=ZQSnQkSIbBbLR3posMa4j/wfZGX/LeAu99ppvzxPVeHnIgkEwmn8AWrukmlwcCC95f
-         l6b0f2uSjIsPEs0ffFHPEGTWDUlagA+kOfdkaMyVEX9PxKpZf53Ou4QvL7kq9C8s4WsF
-         ibJHYfkIM7gnRSW7GGzWhu9FNhlnIA2ahG7PtIu/2nm0Zpva4hFBXOzLMDm83Ab+aEqW
-         KPSrTSXD6QFXUa4L0lT0YSiPbD26oj3H38Ch1wl0oCzeMsietf5szJtdYo7gxrVfxJsN
-         biQgPQrbuj+F63JflhfDRK2K0Yg3Hu/Jp5AH0HGsEPAQTAM0uotE9qbe2fhHBamPBu/O
-         Cvpg==
-X-Forwarded-Encrypted: i=1; AJvYcCWEg5BKDkXL7D8Vw5Fbz4TL5mj8TDYw0vrLzglYnH2LmAMGbnJtsfFTJo8bSR2eskdnWaPlah1BZcrV5ZDxAWO4RnNjuvfSc4FvZOQW
-X-Gm-Message-State: AOJu0YyOWc/BiZrXun2IPxcu42ddPkFX7rydGyKil3S+G/UzZIOZDQjA
-	+kbLUlPEk1MuuZKjLLX1lPhum41Xq694/vjN29ku2T7UP4r1CVHrZZkaCw==
-X-Google-Smtp-Source: AGHT+IGZ+UjHZXid+MQwVVXxMKLUsxgcRy2pLmFUwyU4tteUjKrlEcbQ316/hXV2XIB3k+h2jjb4+w==
-X-Received: by 2002:a05:6512:3e15:b0:52c:e28f:4da6 with SMTP id 2adb3069b0e04-5309b2c54fbmr8564267e87.51.1722344348005;
-        Tue, 30 Jul 2024 05:59:08 -0700 (PDT)
-Received: from localhost.localdomain (93-103-32-68.dynamic.t-2.net. [93.103.32.68])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad418f1sm636286166b.135.2024.07.30.05.59.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 05:59:07 -0700 (PDT)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH] net/chelsio/libcxgb: Add __percpu annotations to libcxgb_ppm.c
-Date: Tue, 30 Jul 2024 14:58:19 +0200
-Message-ID: <20240730125856.7321-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCD9442C
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 12:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722344395; cv=fail; b=j49yWtD3l8mT7SD0Q4PHY2DcKXT9zQpLI0cnnppwlIvHWKjjjGMXO7joL+VKVzz4d9YrcSu7ODdVJbOJ3bFEAyWBgsVTGXei1VnOsltn6RDhmsN8Qwm9rw1rNRWX9NF04wcnx8QMpek0m0SD5EGKATiKSM36glf6iLJhMcrUOJg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722344395; c=relaxed/simple;
+	bh=wOKNADU3SAmk+pdQGakX/5+uCplkmpkyL7E1k0u0Scw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=NNgjDJnK2HgguiO1ODloQKXCxXgpNptW7OZ77p/qret8kn6HjNMMr3UxgoM/nO4sehqQarrHabGVd4fvm9JVaft0gYQ+JvnYUzdrF4ZxF8nAxL1Ngtr3Z41tFtx6STcbgZtZS6c4dmNLjL5t2Iwm+ckru/JZcbYP9bJll3c8JOc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lqTvgGjg; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722344393; x=1753880393;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=wOKNADU3SAmk+pdQGakX/5+uCplkmpkyL7E1k0u0Scw=;
+  b=lqTvgGjg/cB1NfTqol3snoR0IRqS04ucNSNxUvKo1kR3AyCporiprl30
+   dBta0Ju0v7S/ps/y9w1TORugQucOQcV1gaPR1dSa8AVvaFKg71ber6yUI
+   E2g2+je7zGDJI69UqhAjCxbMdtE4AEaXZZYW/YM+229MAcaQPnaAZ4/Dd
+   6ETxZZJjrVV4Bbv4snY73iMtMvF0cN45Y+9opbyfJzljibNw732quNvpr
+   /ALWJCG3IsEmjyxuVbN8C11DX/7VSsf51ZYdgeF963bUg2bOKNNMS6qnr
+   hrHVwEwWLcTuG+q8ZJCLfHWFaQRGgJ7JsOERfaqEqABqtk6xwa4cGyyWT
+   A==;
+X-CSE-ConnectionGUID: FYuhr5SIQj2KTdg+S17HbA==
+X-CSE-MsgGUID: rtUj286qT0altGHE0xB+tA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11149"; a="30823505"
+X-IronPort-AV: E=Sophos;i="6.09,248,1716274800"; 
+   d="scan'208";a="30823505"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 05:59:53 -0700
+X-CSE-ConnectionGUID: RN4EJgvJQl6BaC9F/I2mLw==
+X-CSE-MsgGUID: Gsuh+4bjSh6E61VaArdWjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,248,1716274800"; 
+   d="scan'208";a="54232217"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Jul 2024 05:59:52 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 30 Jul 2024 05:59:51 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 30 Jul 2024 05:59:51 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 30 Jul 2024 05:59:51 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 30 Jul 2024 05:59:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g1I8NrB301TGpa3CysL1SEWEfoDkqRYdt74+SSMw1bRhtXrGLzh9wois6/MwBLGF+HfAWaXpby3f5yEzVivABZ42rzHCXbEA2RqvkzWsERpmH80YKW9nyVsEEu+EKuLeg9XfUZfRD+feniBcre9b89SG67c3xhR87kuXzd7Z3kfNJZO5v98EnLiQ0NlAIygf5AOtrJ4PU6iYTSZUJ7b+r/eAsxPKqDz+++gG9qC7WgMacjwT971YR96tt5xB2yVlcYICl732oGEOj+tbs7ke/9nDTa31rvcVo3i9xHgQAUJanDni8lhGjoSVDjmKxqvMahkVJfj1wd8zBf89OPUEJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8uw9aDwLKVDWmz/I9bgwEk1qk+2zXcGyaLQzs6lAOUI=;
+ b=AIFi4tLx6wUPPTkyXryfgCXE2b6au0TqSYNrZCSxkbzpNWcEPFf3ppBKi+zgHaiMwIJK8eW7YKHZtCIvW4RC78V9c4KLQ2jwk4/mwrozM7pLFDKzWNHZr0IpYolYCyhuSxlPR01LIBIwglhh4XePFOuV/gcu7IVdDC1sz/jP5qKp56A7S1N/+yY/SQe2a9ZuQ6LqRhO76zZguHO0s7BweNac6zW2AZGvU3YKuqYpRThFhgQdLQd84XuVq+0/2EgbjrK7T3v6Q6DKOKxtyCn0qmVK7HSxuL2rP3uCu0+iLsHsc/Rv2twAfIG4NsbqNVTebMYHyrA0ooqmCwvzV/YfrA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CH3PR11MB8702.namprd11.prod.outlook.com (2603:10b6:610:1cb::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Tue, 30 Jul
+ 2024 12:59:47 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7807.026; Tue, 30 Jul 2024
+ 12:59:46 +0000
+Message-ID: <e6953dbe-2ac6-47c1-8cfc-0f161e6422bf@intel.com>
+Date: Tue, 30 Jul 2024 14:59:41 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v8 03/14] virtchnl: add
+ enumeration for the rxdid format
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Jacob Keller
+	<jacob.e.keller@intel.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Simon Horman <horms@kernel.org>
+References: <20240730091509.18846-1-mateusz.polchlopek@intel.com>
+ <20240730091509.18846-4-mateusz.polchlopek@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240730091509.18846-4-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0025.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::11) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CH3PR11MB8702:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4aba17bc-1e6e-4818-a360-08dcb0977d2e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RDBHNExvV0E4S25Fd1RId2xJUnBiYlBwbnpmZUlZbUtRZVQxNy9YbE55czNz?=
+ =?utf-8?B?T01HbmRSQmNRZHUwZnh0amoxQ3hneWJLZ1FVQmRFSUNvbEtqN3dQSnI4RTBD?=
+ =?utf-8?B?ZmdOcGdIK2NNRjZmeG1UVXlDZCtZTEhxRFp1Nm0wTTh0UUFpL1Y2MmpZcU5r?=
+ =?utf-8?B?RWhyZGJLakxEckY3UU1LV3l6YWxNTjlmN2l4M0JHVUpiUHFvcDJYaFd2Wnpo?=
+ =?utf-8?B?b0hyUUVxZ2lOSTZmanlrYzMzYkduR2N3UElrQWJ1UFJremh4SHVtZm1ZWlZU?=
+ =?utf-8?B?Q08xa3hUYmdDeFBqNDczSTZLUzR1U1RDdFM1ekNaamVpc1NtR014dmFoYnFl?=
+ =?utf-8?B?WXJqYTZSREhQK1VQUk1KQXQxeWVVUFE0RTh3ODlOTXh5S1BRQlR5NkcwY0JS?=
+ =?utf-8?B?Slp2Q2JwMjFjTnpXd291WjQzSWhmUWJVSUduTWlvU096VDVhQk01YjdadnRK?=
+ =?utf-8?B?VGprZm9TdDRyTXcyS2pEYXovck1wZ1VxMmZZQnpOMzkxUlJJMVZMLyt1Q2hB?=
+ =?utf-8?B?UUFtcHBmZHo1eGVoUUhTZ3ZTODRyQldpQXlXRmkyQ0lja3JLUllvUjRGQU4w?=
+ =?utf-8?B?azI5U3NDbkxCVFUrWWtTWUJ5VVp2U2g1YndON3c5N0sxQk5JamhLMlU1TlUr?=
+ =?utf-8?B?T3IrMkZBWTJpWnZRMG9uUm1pYXBDaStvdUs2eDVkNFNJR2FPSDNIMDNBbCt4?=
+ =?utf-8?B?ZXFSNXoxNXdzaVBjMUdyeGNnNVZKN1V5b0Y4MDRSSFFXRGJqT3dCSVJYZXpT?=
+ =?utf-8?B?MTdMcVZDRWlFQXZ6Kzk2NFhKakdiMk1WZE0vbGVXVDMrVXIxQ1plSFpOMVJp?=
+ =?utf-8?B?cVJabUJ6ODg2ZG9GbDRZQ3lvMWtDTng4eUJYSDdPVlpZanVGcEZpRVpwNXp6?=
+ =?utf-8?B?U2xmN3VIT0lFNG81TFIzUURkUXY1dW91ZlU0bURRUHJtWmFjK0JYSDltclpV?=
+ =?utf-8?B?UU5XMXFma1IxekhLYno0QUhiVndqTjE4WExWUVljRWk0ZWhJUGdqMGhodlND?=
+ =?utf-8?B?S3lqZHhGUk14OVVPQWRwenA1MHh6NUhyRHd1VjB0SGI4MGdBWkFQVmhsT1ZT?=
+ =?utf-8?B?OGQ5ZFA3M2h1NFhJNEJJNXpmNC95amJuNndXWjk3QXljZUNhZ05tOU14WEM5?=
+ =?utf-8?B?Tm9pUS9yUEZDUWxnSkwyVXRFaE44eG5CQjlTTUpZR2o2MW5OQzU2clEveGFn?=
+ =?utf-8?B?RlJMT2I4czNYRml6SEFaM2xTdGhaVHpYbW1CWHllRHJLbVQ1VlFiRmN0YnQ5?=
+ =?utf-8?B?aTNlODBLYzVLS2VUNnpEMGhFZTVMak1zL2JwTnVvYWtySUVFRFhCK3V5K1Fx?=
+ =?utf-8?B?Q0xuc2RWdW1rVUZEb2tsQzRkUGhXU1NmTEFrRk9lcmIzSEg3VlZHTk9Dek9R?=
+ =?utf-8?B?OUphS1R6bm9hWGF0K1BXWVZQY3YyL201UThOMk9XdjJCandqdFZJYy9MbldZ?=
+ =?utf-8?B?VkZKMkE4YkdNTVAyWEVocHFrbVFqQWF2bi9zZmpFcUI3aitNVExuamZnZGNV?=
+ =?utf-8?B?NjhEb0JBZVdsK0hwOENtTEZuUkRNN2k4cVM5c2pUWlZCVUdGNE9SZURRVWhK?=
+ =?utf-8?B?bGZJbnZTa3ZFcEFKeHdaMVRLUG40V010cFF5QUJPUHZPZE93WlB1eW9jUS9G?=
+ =?utf-8?B?cmZJZjg5cUszbW1udElsMkVmRzhoS3lxVmw0elk4VkFyYzFyRDdwQXBHejQ2?=
+ =?utf-8?B?a3dJblQwY3BOekJybVNsY2N2WnMzbC9HcE0wdkJkc0MzVzQ2aXhiTDRMTjdJ?=
+ =?utf-8?B?c0w0QllkcndqMXBrYTNVcllYV1V3Y2R6NnVOVGx1c2VONEhVQi9QclBBZW9I?=
+ =?utf-8?B?SFlhUWdFbWVVS1NRa0JFdz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z3ZoMnJaOW1IaWxRVm83VnluakZWZUFDNTdXSlNIc2RiVkErL3d6QkNERzBi?=
+ =?utf-8?B?SGFzb2NIVHlPMGJxOWpGMjRYSEowNkZxUzBkZVdrU3ZVTFpmdDMrdnVPdFRT?=
+ =?utf-8?B?SHJEQnhMSjlYOGthUHZtWTAvbW9oaU1LOW92QldyUnl0eExtYjFCdTZoYmk0?=
+ =?utf-8?B?cVo5SDY1NjhvQ3JRQzhONzlDS2MvdUR1UFo5THg0eWxOdnN6Tnl5K1JmbGFR?=
+ =?utf-8?B?UDdpbUc4RjVBT3NIaUMzaEdkaG5EMEFJZnZZTkd1dTh4SDFkYmRGMzVMbHdQ?=
+ =?utf-8?B?aFVLakE4VDUzbkJ5R0l6WlJPOGFveU1tQVFTV1RkU1dMZUJ3VWtpZko0UExo?=
+ =?utf-8?B?NFlqeWptSWRRbmtmZHI0RlU5Tm56L0pBUHprbmEwNWFacERaRGdGQ2ZwYVhh?=
+ =?utf-8?B?UUlGK1lvQkplUmZzbCtSV2Y4R1Q0R2VGdlRPQW1ITGZ3b3VVM0pTeUZ6Vmwy?=
+ =?utf-8?B?UVc0VXBzS2JrSEZ6TGFrWkY2Y2tTeFBibkI0MFAyZFVPSnJGR1lWMVl5c1VE?=
+ =?utf-8?B?aGF2QzJEcE5Vekk2cS9pQ085UnhudzNiMTVjS1BNbVZqM3UwK3NIZ2x0Mm1s?=
+ =?utf-8?B?eVlBYVZHR1QrcTc4SkN5S082TE5ZN01WQnY0R2JFT3gwSXg4aHpkYVJOenNT?=
+ =?utf-8?B?KzdMTlQ1NmhJZCt1cDV2OWdqYTYvcU5pcGxDWDZJU3RkRzV0MlRlYjdOaUU4?=
+ =?utf-8?B?aFQ5Qm5aSjNrQTVBYVhxSlZsTU1EYVdLWFY3Q29rSkFManhDaVg0NWlYa0dy?=
+ =?utf-8?B?RGw1ZjlFdHFNUlFJM054Smlhcm5YN2VibTNmbFRRZkF0bTJmWDVDMExFam15?=
+ =?utf-8?B?elc1U3kxa1M0SCsvdFlNbUFNaFBtMDBHVzdBd3MrQ1dyTjVlK29YMWZseUhH?=
+ =?utf-8?B?aFg2eDRpR3FheHpYK3FFaHB0RVJYTmk3a2o0UFJPd21URE83VE45WDk3Ujcw?=
+ =?utf-8?B?bDRKKytDaXBNVHMycDV6T1JkaUZ0S0NFNTJSU1hUOWhmRHg1UCtaQnZQUHVN?=
+ =?utf-8?B?SnU3SG4zNG1EM2Z2cnVkODRSMTBiWmF0M0RySHdIZm1sbHlTUjhtSHBnN1Zr?=
+ =?utf-8?B?UDZpQ29YTTJMamx4aWFMSFNjNHJyenVzVkRUdUdzVUVMMmtrczdVS2VMOGRD?=
+ =?utf-8?B?dnh6dkNZVFpjRU4zZUxYRC96Tk9KQXZOQWVXd3hDS3p1bUVmbTBTREhaMzFN?=
+ =?utf-8?B?UUdJak1lWmYzbTZFUFpRb0ZLV2dlbkVZeE5oMTFYbk55MnFiSnlYQkIrdWtP?=
+ =?utf-8?B?OVlHTzhvTklxdTl5ZjljUSt6aFFOWGJnSXV0eGwyV2hDRjFUOXVOVTBxSElX?=
+ =?utf-8?B?bkRESjdQOExsTjJ0dDQyZER5N1VsNjlVVFcyWkNpVVhmZk9OdGR2UXF0V2pv?=
+ =?utf-8?B?SFZncGNkdUU3aEQ3MTA2dHdoajBLdzVaUnVRMUtxdG5GWElUN3JvcllmR3ZV?=
+ =?utf-8?B?cG44U1FLb1RZZG5qRDhYa3ZKR0xIZ3Rvb3JoNWhZM2tYK20wUFdtK2tYNThv?=
+ =?utf-8?B?Y3o2a0RKMTd0OEFhNFBrSmVqUTEyYTRrcXEyeXY4cU95Q0NOVHVTNm9ZOXVK?=
+ =?utf-8?B?bnpHVmFOSjJQYzBTYWkrVXB1RmRyU0ZMVHhBOHhNVkJnQWZ4TmE2SWs5Y2Fi?=
+ =?utf-8?B?dFBoUFgyS2QzQUZ2SFY2UW1oZ0VBSTR2Q0c3WVVMdXcyWWJla0Q3aUlZZmtB?=
+ =?utf-8?B?cWQxVW1vVGx1djFLOG5wRTM2UGJid0ZNeHg4cWpPa2tkdTQzWGE1TTVHd1Zx?=
+ =?utf-8?B?R1BOZ1RlL0hIMWhWczV0QnRPWm5PRDM1YmsveW5GdmhpRHdHTGwzRHpTWEVN?=
+ =?utf-8?B?emtrWHB3b3RJRWhoRnZNQkE5TDFJeGpRT2d1S1IvL0RxSFdHNElMVFJIdFFr?=
+ =?utf-8?B?TnpralRBRkNFcFluQ2UvdGQvektIQm9FdldsbUdIYVdieGtmM2N2Vll0b00z?=
+ =?utf-8?B?SUJsbEZwdVJoanY5MzVIN0JRYkdPbWdiN09PSEgxdlM5eGkwYm5XcWxuNmhM?=
+ =?utf-8?B?OUxSdCtkdytaOGtRdFdOb2NRdG5zN1VreWNTcnE2MW9rSTFTZW5xUmpVKzFQ?=
+ =?utf-8?B?Z0VNMXQvZG10enJaakNraElROVNnczBwR09RL2NLUStGS0Y4ZS9XZXdIRXVL?=
+ =?utf-8?B?TGVFcDVETjIxWEoyc1dVTDNYd0UrRWU3V3V4dmV6WTBKUEl6SG5qQlNnQVVx?=
+ =?utf-8?B?U0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4aba17bc-1e6e-4818-a360-08dcb0977d2e
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2024 12:59:46.7679
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qTW/2cjhuNy5GnnCf5qWaKYhTho3sowrJDVyb+g6S2ePDOzbvkHx6ch8Tdk0LokgytBuESP9uAGB2yXsWWmlHfVIrNvVSckjzakmyY93afE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8702
+X-OriginatorOrg: intel.com
 
-Compiling libcxgb_ppm.c results in several sparse warnings:
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Date: Tue, 30 Jul 2024 05:14:58 -0400
 
-libcxgb_ppm.c:368:15: warning: incorrect type in assignment (different address spaces)
-libcxgb_ppm.c:368:15:    expected struct cxgbi_ppm_pool *pools
-libcxgb_ppm.c:368:15:    got void [noderef] __percpu *_res
-libcxgb_ppm.c:374:48: warning: incorrect type in initializer (different address spaces)
-libcxgb_ppm.c:374:48:    expected void const [noderef] __percpu *__vpp_verify
-libcxgb_ppm.c:374:48:    got struct cxgbi_ppm_pool *
-libcxgb_ppm.c:484:19: warning: incorrect type in assignment (different address spaces)
-libcxgb_ppm.c:484:19:    expected struct cxgbi_ppm_pool [noderef] __percpu *pool
-libcxgb_ppm.c:484:19:    got struct cxgbi_ppm_pool *[assigned] pool
-libcxgb_ppm.c:511:21: warning: incorrect type in argument 1 (different address spaces)
-libcxgb_ppm.c:511:21:    expected void [noderef] __percpu *__pdata
-libcxgb_ppm.c:511:21:    got struct cxgbi_ppm_pool *[assigned] pool
+> From: Jacob Keller <jacob.e.keller@intel.com>
+> 
+> Support for allowing VF to negotiate the descriptor format requires that
+> the VF specify which descriptor format to use when requesting Rx queues.
+> The VF is supposed to request the set of supported formats via the new
+> VIRTCHNL_OP_GET_SUPPORTED_RXDIDS, and then set one of the supported
+> formats in the rxdid field of the virtchnl_rxq_info structure.
 
-Add __percpu annotation to *pools and *pool percpu pointers and to
-ppm_alloc_cpu_pool() function that returns percpu pointer to fix
-these warnings.
+[...]
 
-Compile tested only, but there is no difference in the resulting object file.
+> +/* RX descriptor ID bitmasks */
+> +enum virtchnl_rx_desc_id_bitmasks {
+> +	VIRTCHNL_RXDID_0_16B_BASE_M		= BIT(VIRTCHNL_RXDID_0_16B_BASE),
+> +	VIRTCHNL_RXDID_1_32B_BASE_M		= BIT(VIRTCHNL_RXDID_1_32B_BASE),
+> +	VIRTCHNL_RXDID_2_FLEX_SQ_NIC_M		= BIT(VIRTCHNL_RXDID_2_FLEX_SQ_NIC),
+> +	VIRTCHNL_RXDID_3_FLEX_SQ_SW_M		= BIT(VIRTCHNL_RXDID_3_FLEX_SQ_SW),
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
----
- drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Macro compression? ^.^
 
-diff --git a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
-index 854d87e1125c..01d776113500 100644
---- a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
-+++ b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
-@@ -342,10 +342,10 @@ int cxgbi_ppm_release(struct cxgbi_ppm *ppm)
- }
- EXPORT_SYMBOL(cxgbi_ppm_release);
- 
--static struct cxgbi_ppm_pool *ppm_alloc_cpu_pool(unsigned int *total,
--						 unsigned int *pcpu_ppmax)
-+static struct cxgbi_ppm_pool __percpu *ppm_alloc_cpu_pool(unsigned int *total,
-+							  unsigned int *pcpu_ppmax)
- {
--	struct cxgbi_ppm_pool *pools;
-+	struct cxgbi_ppm_pool __percpu *pools;
- 	unsigned int ppmax = (*total) / num_possible_cpus();
- 	unsigned int max = (PCPU_MIN_UNIT_SIZE - sizeof(*pools)) << 3;
- 	unsigned int bmap;
-@@ -392,7 +392,7 @@ int cxgbi_ppm_init(void **ppm_pp, struct net_device *ndev,
- 		   unsigned int iscsi_edram_size)
- {
- 	struct cxgbi_ppm *ppm = (struct cxgbi_ppm *)(*ppm_pp);
--	struct cxgbi_ppm_pool *pool = NULL;
-+	struct cxgbi_ppm_pool __percpu *pool = NULL;
- 	unsigned int pool_index_max = 0;
- 	unsigned int ppmax_pool = 0;
- 	unsigned int ppod_bmap_size;
--- 
-2.45.2
+#define VIRTCHNL_RXDID_BIT(x)	BIT(VIRTCHNL_RXDID_##x)
 
+	VIRTCHNL_RXDID_0_16B_BASE_M		= VIRTCHNL_RXDID_BIT(0_16B_BASE),
+
+and so on...
+
+(optionally)
+
+> +	VIRTCHNL_RXDID_4_FLEX_SQ_NIC_VEB_M	= BIT(VIRTCHNL_RXDID_4_FLEX_SQ_NIC_VEB),
+> +	VIRTCHNL_RXDID_5_FLEX_SQ_NIC_ACL_M	= BIT(VIRTCHNL_RXDID_5_FLEX_SQ_NIC_ACL),
+> +	VIRTCHNL_RXDID_6_FLEX_SQ_NIC_2_M	= BIT(VIRTCHNL_RXDID_6_FLEX_SQ_NIC_2),
+> +	VIRTCHNL_RXDID_7_HW_RSVD_M		= BIT(VIRTCHNL_RXDID_7_HW_RSVD),
+> +	/* 8 through 15 are reserved */
+> +	VIRTCHNL_RXDID_16_COMMS_GENERIC_M	= BIT(VIRTCHNL_RXDID_16_COMMS_GENERIC),
+> +	VIRTCHNL_RXDID_17_COMMS_AUX_VLAN_M	= BIT(VIRTCHNL_RXDID_17_COMMS_AUX_VLAN),
+> +	VIRTCHNL_RXDID_18_COMMS_AUX_IPV4_M	= BIT(VIRTCHNL_RXDID_18_COMMS_AUX_IPV4),
+> +	VIRTCHNL_RXDID_19_COMMS_AUX_IPV6_M	= BIT(VIRTCHNL_RXDID_19_COMMS_AUX_IPV6),
+> +	VIRTCHNL_RXDID_20_COMMS_AUX_FLOW_M	= BIT(VIRTCHNL_RXDID_20_COMMS_AUX_FLOW),
+> +	VIRTCHNL_RXDID_21_COMMS_AUX_TCP_M	= BIT(VIRTCHNL_RXDID_21_COMMS_AUX_TCP),
+> +	/* 22 through 63 are reserved */
+> +};
+> +
+>  /* virtchnl_rxq_info_flags
+>   *
+>   * Definition of bits in the flags field of the virtchnl_rxq_info structure.
+> @@ -338,6 +378,11 @@ struct virtchnl_rxq_info {
+>  	u32 databuffer_size;
+>  	u32 max_pkt_size;
+>  	u8 crc_disable;
+> +	/* see enum virtchnl_rx_desc_ids;
+> +	 * only used when VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is supported. Note
+> +	 * that when the offload is not supported, the descriptor format aligns
+> +	 * with VIRTCHNL_RXDID_1_32B_BASE.
+> +	 */
+>  	u8 rxdid;
+
+Same as in the previous patch, this can be enum:8.
+
+>  	u8 flags; /* see virtchnl_rxq_info_flags */
+>  	u8 pad1;
+> @@ -1041,6 +1086,7 @@ struct virtchnl_filter {
+>  VIRTCHNL_CHECK_STRUCT_LEN(272, virtchnl_filter);
+>  
+>  struct virtchnl_supported_rxdids {
+> +	/* see enum virtchnl_rx_desc_id_bitmasks */
+>  	u64 supported_rxdids;
+
+If this is u64, then virtchnl_rx_desc_id_bitmasks should use BIT_ULL(),
+not BIT().
+
+>  };
+
+Thanks,
+Olek
 
