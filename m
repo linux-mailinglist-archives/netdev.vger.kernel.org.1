@@ -1,148 +1,196 @@
-Return-Path: <netdev+bounces-113932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94562940674
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 06:15:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F207940680
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 06:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B681C223B0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:15:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDB14283C82
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5DF148302;
-	Tue, 30 Jul 2024 04:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF50C157466;
+	Tue, 30 Jul 2024 04:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="V0cZh5nr"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="a49/ZVg3"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C00FC8C0;
-	Tue, 30 Jul 2024 04:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48B7146A73
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 04:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722312920; cv=none; b=VvIwjTiaxK5OmE0tOMYO19K5uZ910RPw0eKb49msoAd4QzfFgVdkZgP9N82G9tktAO7yEUndLAdGmhDya9a8+9FRlT8nD7TiyadT0FjaLeiKwcoY0eFImiqmp4YG3bA259knyvz+6xeFuaPYVj1eEiLWEdOojLkIEXhwCn0xHvw=
+	t=1722313573; cv=none; b=HifQmFia6W9e2h6NEzB80Pa2eRYeQb2SmbNeOA/gVidjIZVl+oUF26sV57zbhJLLvuTnDh/rKvHgCoHg5h/Mh4rxFH1cVxCZFmT20PwL6mZUsD+GeDBiP3sp3ff2NViTFRuxVvvkLA01i3+TSGpiMIKoC0uXhq6kWixAZulPpu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722312920; c=relaxed/simple;
-	bh=yKhGSofWwfAOF1j4MdDDoJDYbHpLaFaUDP3S/J1WTa0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kuIC8o9b6QeSuqkOSrdzK8znB57BoxJFbD0gYsa8tgrlEC08oq50TF+hrJsIEaotZRMI+9H1nxF3N0hPh3gz7cU1z1pk9sEkjeXsNEbCpCxbFkyrIWUPtr/OuxfqKAMPny1j7yMdjqhxX2NJVAdhKHkEofhUmPP4cYsLxfE46A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=V0cZh5nr; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=u46sMFvuuMaySXNfye9HUANEHV0JVAtOo8sz3Uimg0k=; b=V0cZh5nrMOrz4Q4Z2tq82wW05b
-	ZpWdT8ArO33FCsdebYq8iumnMIPDkfqDjswHRyUEfrPPbk6lcEx1PMiI33PcVbcS2CpR1Zk9IFJ4l
-	dDezZgdUgfnp+YEJ9TPmj17vfg9QUxZBoal7moFYmvnazTS/ayrELLoOY+4uUNpxbNVrPXN39zl04
-	bl/S7IX/TSsII5j+mxktOKW2RfaeC/HrVOesXF+UZzKrN33iJTaMP7b+GzNbg15mCx9TNFtZ8cJ5Q
-	juFLr2xvsRcY3wTaUAZF5luIqhMg8JPDvApQEH54ppBRYYj415YEEmbn14/5Q9XTrcOICa09+aRey
-	EbL4MdzA==;
-Received: from [50.53.4.147] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sYeGT-0000000DZOn-2JSl;
-	Tue, 30 Jul 2024 04:15:09 +0000
-Message-ID: <6750b19d-4af3-44c8-90a6-9cb70fcec385@infradead.org>
-Date: Mon, 29 Jul 2024 21:15:07 -0700
+	s=arc-20240116; t=1722313573; c=relaxed/simple;
+	bh=Mtx4KJpatA5SnjkdaCt02hU9bauaRYTl+LYPEglqc20=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HECKEwCABMcDSJovxX5zUdTxkH5Fkbg7GwRM2R57i1ieTsZrHh+svG7ph99jJMSETIm0R7uRRDYA7G1X8lvdlhlzdmVNndYxa1X9CMlBHzg3pa435o/avJHmO8qha5nRJysUYuF+ci7MGP4qN495vMlPMQtRAIbfLdST2tXvpdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=a49/ZVg3; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eeb1ba0468so64903981fa.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 21:26:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1722313570; x=1722918370; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pSPIujbLoqhDxPLFOPZcqJHOGNFwNiFGR8zNuzloOAs=;
+        b=a49/ZVg3/UaHr5BkW/HiznYG8xCB1+kQ6Utx1DT1nFUP4pUT2Bk2i0HzGqIEtKn2B7
+         Y8DvNmrYbzZ7oei5vcwHzYWC2w9KwcS3EgQzMicPqLPXON8v2LX3ETky5kFjuQ7nh0mD
+         tg25CgVTmFRK0zMoea5dTXLhPnHjGCY41uKCT7nUZJcyNt2IF3BIX+Qm5MPoT+YFPgsL
+         MLWziHiVcSITFzh7ANiHxqUeKRTNpQrD6Wx5fJIEMqM0jVL8cvrD+hjWuvJK4JEl+W8W
+         QGDx4uggyhoQGUg9TKeXNkblWqcD0I/9Bagd9R6ElEAtEFl+j9jw3RKDULQd/2COrUqA
+         660g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722313570; x=1722918370;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pSPIujbLoqhDxPLFOPZcqJHOGNFwNiFGR8zNuzloOAs=;
+        b=VRk1Bhlpd+dVF1hJ8arM6A85JX5O7Pg7zf0vJzqS0/KyVUCNJeVpYG3jfsDKcniMpI
+         iKBPvd/LzFVV5S+QZqczLjFdaTZkp3bidn8sIM85xdN8qZbE/Abdc3e+8+uEzOcXqa3s
+         ca5BpEKyjgLJV9Uov6aamsGGwn8lehOPFFMv6LpUFo3ATJswGKVxC8IEho4+OgffWLw+
+         CRDXbjg2XlUPU16+PJEIrrB1tf7SBMB5cZzwaqEpHgJAn5V/a0Vg/IYMLvbm5rC/DqMB
+         KoUtLUeRQsrJxUX2l1EVyc2LahoJvvDYEZ9LRbOSC5B+TxUV3DwxA/UzX5aIyOrFeJl/
+         HWBg==
+X-Forwarded-Encrypted: i=1; AJvYcCU95l4VlB+pwnnlvrEh3WlGV21tCGvrH2yUH+qGL0mVJmyjKvrThInivWmZp7dhXmLJ3UcTskBtva0LyCGN5lmKFh2AF9R7
+X-Gm-Message-State: AOJu0YwpmpXfczCKzcj6YkahZnPRh3f3fNAXUPGKNn4s/GLGWEWFT97h
+	HZB4pzbhOTXonwjDM+HkMJ5Z9DMw2Z+rvr3XJNaNqadwVolZqoNtgzonCj6Vtl0=
+X-Google-Smtp-Source: AGHT+IFXbsjffpZdi2unn4HNinuWObp/75AfGTnc0GCTUgc9kJLvpUafB7LyrhY+LA+uMgz8Wa7uMQ==
+X-Received: by 2002:a05:651c:a09:b0:2ef:2fc9:c8b2 with SMTP id 38308e7fff4ca-2f12ee422c3mr75754301fa.37.1722313569866;
+        Mon, 29 Jul 2024 21:26:09 -0700 (PDT)
+Received: from u94a (27-242-33-231.adsl.fetnet.net. [27.242.33.231])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39ae92434c8sm33256665ab.51.2024.07.29.21.26.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 21:26:09 -0700 (PDT)
+Date: Tue, 30 Jul 2024 12:25:46 +0800
+From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+To: Harishankar Vishwanathan <harishankar.vishwanathan@gmail.com>
+Cc: Xu Kuohai <xukuohai@huaweicloud.com>, 
+	Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Roberto Sassu <roberto.sassu@huawei.com>, Edward Cree <ecree.xilinx@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Santosh Nagarakatte <santosh.nagarakatte@rutgers.edu>, Srinivas Narayana <srinivas.narayana@rutgers.edu>, 
+	Matan Shachnai <m.shachnai@rutgers.edu>
+Subject: Re: [RFC bpf-next] bpf, verifier: improve signed ranges inference
+ for BPF_AND
+Message-ID: <xhc5uslwucbu4233iqszgsj3q4bsu2xtjtrh5qmosqlm72uq52@mhwul4hzgd3p>
+References: <20240711113828.3818398-1-xukuohai@huaweicloud.com>
+ <20240711113828.3818398-4-xukuohai@huaweicloud.com>
+ <phcqmyzeqrsfzy7sb4rwpluc37hxyz7rcajk2bqw6cjk2x7rt5@m2hl6enudv7d>
+ <4ff2c89e-0afc-4b17-a86b-7e4971e7df5b@huaweicloud.com>
+ <ykuhustu7vt2ilwhl32kj655xfdgdlm2xkl5rff6tw2ycksovp@ss2n4gpjysnw>
+ <CAM=Ch06Hps=xv4RmHdWESOjN1pSW2Eo8Xn=qQV+0T9TeNzuPHw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 13/14] microchip: lan865x: add driver support
- for Microchip's LAN865X MAC-PHY
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
- anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, andrew@lunn.ch, corbet@lwn.net,
- linux-doc@vger.kernel.org, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- devicetree@vger.kernel.org, horatiu.vultur@microchip.com,
- ruanjinjie@huawei.com, steen.hegelund@microchip.com, vladimir.oltean@nxp.com
-Cc: masahiroy@kernel.org, alexanderduyck@fb.com, krzk+dt@kernel.org,
- robh@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
- UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
- Pier.Beruto@onsemi.com, Selvamani.Rajagopal@onsemi.com,
- Nicolas.Ferre@microchip.com, benjamin.bigler@bernformulastudent.ch,
- linux@bigler.io
-References: <20240730040906.53779-1-Parthiban.Veerasooran@microchip.com>
- <20240730040906.53779-14-Parthiban.Veerasooran@microchip.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240730040906.53779-14-Parthiban.Veerasooran@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM=Ch06Hps=xv4RmHdWESOjN1pSW2Eo8Xn=qQV+0T9TeNzuPHw@mail.gmail.com>
 
+Hi Harishankar,
 
-
-On 7/29/24 9:09 PM, Parthiban Veerasooran wrote:
-> The LAN8650/1 is designed to conform to the OPEN Alliance 10BASE-T1x
-> MAC-PHY Serial Interface specification, Version 1.1. The IEEE Clause 4
-> MAC integration provides the low pin count standard SPI interface to any
-> microcontroller therefore providing Ethernet functionality without
-> requiring MAC integration within the microcontroller. The LAN8650/1
-> operates as an SPI client supporting SCLK clock rates up to a maximum of
-> 25 MHz. This SPI interface supports the transfer of both data (Ethernet
-> frames) and control (register access).
+On Sun, Jul 28, 2024 at 06:38:40PM GMT, Harishankar Vishwanathan wrote:
+> On Tue, Jul 16, 2024 at 10:52 AM Shung-Hsi Yu <shung-hsi.yu@suse.com> wrote:
+> > This commit teach the BPF verifier how to infer signed ranges directly
+> > from signed ranges of the operands to prevent verifier rejection, which
+> > is needed for the following BPF program's no-alu32 version, as shown by
+> > Xu Kuohai:
+[...]
+> Apologies for the late response and thank you for CCing us Shung-Hsi.
 > 
-> By default, the chunk data payload is 64 bytes in size. The Ethernet
-> Media Access Controller (MAC) module implements a 10 Mbps half duplex
-> Ethernet MAC, compatible with the IEEE 802.3 standard. 10BASE-T1S
-> physical layer transceiver integrated is into the LAN8650/1. The PHY and
-> MAC are connected via an internal Media Independent Interface (MII).
-> 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-> ---
->  MAINTAINERS                                   |   6 +
->  drivers/net/ethernet/microchip/Kconfig        |   1 +
->  drivers/net/ethernet/microchip/Makefile       |   1 +
->  .../net/ethernet/microchip/lan865x/Kconfig    |  19 +
->  .../net/ethernet/microchip/lan865x/Makefile   |   6 +
->  .../net/ethernet/microchip/lan865x/lan865x.c  | 391 ++++++++++++++++++
->  6 files changed, 424 insertions(+)
->  create mode 100644 drivers/net/ethernet/microchip/lan865x/Kconfig
->  create mode 100644 drivers/net/ethernet/microchip/lan865x/Makefile
->  create mode 100644 drivers/net/ethernet/microchip/lan865x/lan865x.c
-> 
+> The patch itself seems well thought out and looks correct. Great work!
 
-> diff --git a/drivers/net/ethernet/microchip/lan865x/Kconfig b/drivers/net/ethernet/microchip/lan865x/Kconfig
-> new file mode 100644
-> index 000000000000..f3d60d14e202
-> --- /dev/null
-> +++ b/drivers/net/ethernet/microchip/lan865x/Kconfig
-> @@ -0,0 +1,19 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +# Microchip LAN865x Driver Support
-> +#
-> +
-> +if NET_VENDOR_MICROCHIP
-> +
-> +config LAN865X
-> +	tristate "LAN865x support"
-> +	depends on SPI
-> +	depends on OA_TC6
+Thanks! :)
 
-Since OA_TC6 is described as a library, it would make sense to select OA_TC6 here instead
-of depending on it.
-OTOH, that might cause some Kconfig dependency issues... I haven't looked into that.
+> We quickly checked your patch using Agni [1], and were not able to find any
+> violations. That is, given well-formed register state inputs to
+> adjust_scalar_min_max_vals, the new algorithm always produces sound outputs
+> for the BPF_AND (both 32/64) instruction.
 
-> +	help
-> +	  Support for the Microchip LAN8650/1 Rev.B1 MACPHY Ethernet chip. It
-> +	  uses OPEN Alliance 10BASE-T1x Serial Interface specification.
-> +
-> +	  To compile this driver as a module, choose M here. The module will be
-> +	  called lan865x.
-> +
-> +endif # NET_VENDOR_MICROCHIP
+That is great to hear and really boost the level of confidence. Though I
+did made an update[1] to the patch such that implementation of
+negative_bit_floor() is change from
 
+	v &= v >> 1;
+	v &= v >> 2;
+	v &= v >> 4;
+	v &= v >> 8;
+	v &= v >> 16;
+	v &= v >> 32;
+	return v;
 
--- 
-~Randy
+to one that closer resembles tnum_range()
+
+	u8 bits = fls64(~v); /* find most-significant unset bit */
+	u64 delta;
+
+	/* special case, needed because 1ULL << 64 is undefined */
+	if (bits > 63)
+		return 0;
+
+	delta = (1ULL << bits) - 1;
+	return ~delta;
+
+My understanding is that the two implementations should return the same
+output for the same input, so overall the deduction remains the same.
+And my simpler test with Z3 does not find violation in the new
+implementation. But it would be much better if we can have Agni check
+the new implementation for violation as well.
+
+Speak of which, would you and others involved in checking this patch be
+comfortable with adding a formal acknowledgment[2] for the patch so this
+work can be credited in the git repo as well? (i.e. usually replying
+with an Acked-by, other alternatives are Reviewed-by and Tested-by)
+
+IMHO the work done here is in the realm of Reviewed-by, but that itself
+comes with other implications[3], which may or may not be wanted
+depending on individual's circumstances.
+
+I'll probably post the updated patch out next week, changing only the
+comments in [1].
+
+> It looks like you already performed tests with Z3, and Eduard performed a
+> brute force testing using 6-bit integers. Agni's result stands as an
+> additional stronger guarantee because Agni generates SMT formulas directly
+> from the C source code of the verifier and checks the correctness in Z3
+> without any external library functions, it uses full 64-bit size bitvectors
+> in the formulas generated and considers the correctness for 64-bit integer
+> inputs, and finally it considers the correctness of the *final* output
+> abstract values generated after running update_reg_bounds() and
+> reg_bounds_sync().
+
+I had some vague ideas that Agni provides better guarantee, but did not
+know exactly what they are. Thanks for the clear explanation on the
+additional guarantee Agni provides; its especially assuring to know that
+update_reg_bounds() and reg_bounds_sync() have been taken into account.
+
+> Using Agni's encodings we were also quickly able to check the precision of
+> the new algorithm. An algorithm is more precise if it produces tighter
+> range bounds, while being correct. We are happy to note that the new
+> algorithm produces outputs that are at least as precise or more precise
+> than the old algorithm, for all well-formed register state inputs.
+
+That is great to hear as well. I really should try Agni myself, hope I
+could find time in the near future.
+
+Cheers,
+Shung-Hsi
+
+1: https://lore.kernel.org/bpf/20240719081702.137173-1-shung-hsi.yu@suse.com/
+2: https://www.kernel.org/doc/html/v6.9/process/submitting-patches.html#when-to-use-acked-by-cc-and-co-developed-by
+3: https://www.kernel.org/doc/html/v6.9/process/submitting-patches.html#reviewer-s-statement-of-oversight
 
