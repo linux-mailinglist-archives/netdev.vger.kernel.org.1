@@ -1,61 +1,58 @@
-Return-Path: <netdev+bounces-114207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C199415A4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:47:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FC394161F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32C7C1C21094
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 15:47:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 163E51F22AD1
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 15:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F010F1B5832;
-	Tue, 30 Jul 2024 15:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88AA1BA860;
+	Tue, 30 Jul 2024 15:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DiaPHkjE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KjqtR9qv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36BD1B5808;
-	Tue, 30 Jul 2024 15:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D60F29A2;
+	Tue, 30 Jul 2024 15:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722354429; cv=none; b=B7GV+n3PfhnMYR1Cc0Dr60JSFhkc6v6rIZeyhjLZaYiYegNSdV2Kbeqb4gGkz/6LVO599hdeRHBL3zTZOjhaoChtQWbM30HBBOboC3vXbkfpg6yYdTejfpVCm9SESPOaNDJPtSxEs5ENK7ZL9bRmrQBRnEInidPSiTBCAjf7F70=
+	t=1722354994; cv=none; b=Fu9DrOw3nniJV7nO/e4sGIlpsspPC3viTcXLtguuXkcNsJ8YQjKdCEZhSvuehyVFeFima8ML03CT9nlnG5TjOrz64ZH2X8l24mpGJZ+nNXXUpnpQHpTpI022j9kCgAJO+lvH+2EX/eVkln+STMqKsdmDIxJy6NJyEAivNPvo1Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722354429; c=relaxed/simple;
-	bh=tZTmCW5GZ93dLZfDm1v8+9DRshuBQgUPfGjqVhe9ZhM=;
+	s=arc-20240116; t=1722354994; c=relaxed/simple;
+	bh=8CuFTMoQBnrtRBkUggxshUDoWUpQGu2HjJyh4gH80Mw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GExNrvBR8GblsvZByQBjJZRnWpFplZsyKNyqZ0U2g077GezuCT3EwZueu9t9bbRenYr/YLW7wSeI6TQUUVys2TDOANOlHoOzzS7FnFyVhpcHc3X/zlN3eMgPjlL48jKNj10vPBpPLWtvrUjAM2ZBJdqtOSQuDJlz1jpdBQds96M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DiaPHkjE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE5C0C32782;
-	Tue, 30 Jul 2024 15:47:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ghodh3vASlQwFzURXq8Rnxz9Ts4dpw/EfPH7K50evjxlSQ+Ki6oHVtp+brtHWHB2R9D+yWzyjOfM/T3wyIQeYFdjhV1A/fI8iu3coZQKRdg6uhdw06hA07tVapVkMajKOofL4M8CNyckuQZR5BExZppt0PoHsl44Uwjgu6H5go8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KjqtR9qv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C743BC32782;
+	Tue, 30 Jul 2024 15:56:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722354429;
-	bh=tZTmCW5GZ93dLZfDm1v8+9DRshuBQgUPfGjqVhe9ZhM=;
+	s=k20201202; t=1722354994;
+	bh=8CuFTMoQBnrtRBkUggxshUDoWUpQGu2HjJyh4gH80Mw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DiaPHkjErpIoh7tbTHA2BkSuyZEHOL2luROddx81dyCDgV/01X9oMpto6T6HMOuiW
-	 eufkPP1TytFgdz6OiWzOStPlVMJPLLM+woeYyq1qNZc6jz2u6LijjWnkx3EQ5vfn5i
-	 RwYmufBnLVyPFnfnCubsnk4XE0JfPj5EaYk3PIcLiPzgHACZcf0bvmEeSCAvBjNBhO
-	 2V9TRCEurUbvSJrhoEiZsYOYigVH5e91KIgEFU7UkLxp3TLGMOSou5fQvsC/BV9oAF
-	 +uXf06D8Js/wPCs4W8Tz+rKxQG+pbHZuFFdR8RRLUzDYE6OYt14MnFqOFuuS3+Dki8
-	 E4h74czh47JzA==
-Date: Tue, 30 Jul 2024 08:47:07 -0700
+	b=KjqtR9qv5UM8+ljLItAIdwvv9zglpbdEDAbUJFlBDhczu7WZ6DgjptPvtuSCpgSU2
+	 /79F3CwhyJjC7eZ8e0rFF0j8xBaHZ8ohimE0aFnU/btHPgphNjysHQICXPoEhV64zd
+	 ujX/Ei1qebabKrfxGHH3WdcfZhAl5aeLJgRuDr6cjEfS82sf3CGAXE0TYHRlMlighD
+	 KALwCyoZsZhNjRTdfLUP8ZpFA5HnvewhWvclubuMMaj8Dyv4Z4jXn3yWDq09X8ndXB
+	 vVc09H2fcqBuIJJylREg8qVt/GjGZk8My2f0PJ8Y7whd8z2CHmlBgyaFjUiD6fSTtz
+	 yRfvVsyVTwFUQ==
+Date: Tue, 30 Jul 2024 08:56:32 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
- <sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, <kvm@vger.kernel.org>,
- <virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>,
- <oxffffaa@gmail.com>
-Subject: Re: [PATCH v1] MAINTAINERS: add me as reviewer of AF_VSOCK and
- virtio-vsock
-Message-ID: <20240730084707.72ff802c@kernel.org>
-In-Reply-To: <20240728183325.1295283-1-avkrasnov@salutedevices.com>
-References: <20240728183325.1295283-1-avkrasnov@salutedevices.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>
+Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <horatiu.vultur@microchip.com>, <linux-kernel@vger.kernel.org>,
+ <stable@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net V1] net: phy: micrel: Fix the KSZ9131 MDI-X status
+ issue
+Message-ID: <20240730085632.1934ae5f@kernel.org>
+In-Reply-To: <20240725071125.13960-1-Raju.Lakkaraju@microchip.com>
+References: <20240725071125.13960-1-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,11 +62,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 28 Jul 2024 21:33:25 +0300 Arseniy Krasnov wrote:
-> I'm working on AF_VSOCK and virtio-vsock.
+On Thu, 25 Jul 2024 12:41:25 +0530 Raju Lakkaraju wrote:
+> The MDIX status is not accurately reflecting the current state after the link
+> partner has manually altered its MDIX configuration while operating in forced
+> mode.
+> 
+> Access information about Auto mdix completion and pair selection from the
+> KSZ9131's Auto/MDI/MDI-X status register
+> 
+> Fixes: b64e6a8794d9 ("net: phy: micrel: Add PHY Auto/MDI/MDI-X set driver for KSZ9131")
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 
-If you want to review the code perhaps you can use lore+lei
-and filter on the paths?
-
-Adding people to MAINTAINERS is somewhat fraught.
+LGTM, can we get an ack from PHY maintainers?
 
