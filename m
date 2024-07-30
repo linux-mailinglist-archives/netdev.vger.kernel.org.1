@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-113918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85DC9940638
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 06:09:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F244A94063C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 06:09:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1DCAB21F0F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:09:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 644581F22373
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58D816132B;
-	Tue, 30 Jul 2024 04:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAFA166316;
+	Tue, 30 Jul 2024 04:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="zgk3tZRZ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="eFMy7qd+"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB50C82C7E;
-	Tue, 30 Jul 2024 04:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEEC83A17;
+	Tue, 30 Jul 2024 04:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722312559; cv=none; b=j+d8Ev34l3oKVS/lIxhMMoSaONefq5vF+dtg6BOxhWlF43HTiH1y4tKJrWWlwkn1LtTMSP4BC3cOZ7e9x5WBJg548jG+bSIM8OvcwASvhMJC3rQwX3iQRBlIOvAykytz6kZpk3+cu2cY/I4J9GWdboZLQ+/8XZe8h4UPWZshnfk=
+	t=1722312560; cv=none; b=abOmWgmhWCKYxKYdL7vDVRpKIVRYxZJl1euh9nwXpMslKpFO/E9X/S+9u9QgRwGE9sO5dXZ8DiP1xNG+ktvlx6pB0vIN1QxH83/gB9rGvNgJffNpbNXUYzHgYxECZSwnqVqY4dq8y2U8RgfZap7Nu1oHVk0qL3xUzpTojDnWeYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722312559; c=relaxed/simple;
-	bh=ipUPIp6I5wGhCwNIcdawo+lrXpUS9uM5VQAAty2fODY=;
+	s=arc-20240116; t=1722312560; c=relaxed/simple;
+	bh=QSG36XoODdW1V4lB86T//0lX8+XiM0ybpthl0gDUMH8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sLuZBcGRwChS0cJ2sTBsMyypZMFaCXUw6HeIlRSTEUUobZrr/yRjcEcc4a8bXZ4JpduJJzVaHP5PDo5Q0kM5vuWOTVPqs2OalUG+kwOFDaXuYR2WqC911UruUXZX72g3XSHICG17HKnCcbs3woC4FtO411UhoUyZq5Pys9HXR1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=zgk3tZRZ; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=lItAfbFbr5AScjruqSkQrhBroB6Gya7XmUPHaPLApKE1dHENMnWZA0/foRS0+VLHdmOYfM+dF09TBywq0hDmHlLmtlietoy7O89pEstoawkTHayxNjRhh1rAwK77TjiIJGjVaHdZxkRFOlDRgn7doEUhSfFaMy4Dlq/SH88l4JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=eFMy7qd+; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1722312557; x=1753848557;
+  t=1722312558; x=1753848558;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ipUPIp6I5wGhCwNIcdawo+lrXpUS9uM5VQAAty2fODY=;
-  b=zgk3tZRZtm8D/H6WQAjQMR/pdtkGe1iaQPJZdSDu9PykE5ExhndWKK6I
-   uiFPZoGOjfrxaPY/kd8ovN9hVc8td7FjnN+tFH+wAUEKTXwBv+ywIZhzU
-   qLtFTZoEL1zDaYCWi7UM+sT6qUcexWXR8KxWMq69N6JcUYk1ylvQ2/IZ4
-   2uwh7qHQ5HvqOSE4BwzgOZ+280o/rvCCy2uTMMEtvp4wwxPAIpu7KZNBF
-   LZSjqlibLyb7wf6Pw9xn6Cn4iH7RvfrsOhYkioY5eIY+9BWvYB8mFpxzr
-   wX6toRg/l78EB1KRXyC9fvZg8yW/3lvgCNFRMOgl73a5wOmkEvIhZ8J2k
+  bh=QSG36XoODdW1V4lB86T//0lX8+XiM0ybpthl0gDUMH8=;
+  b=eFMy7qd+84OVr9/uktXpT+LlDux3FO1a1hQE1c9q/7OrJAaCDSh4hwDf
+   53VvqzVrZpg+fcM9pIrd6IEhaCCXylvrXDtGw3e5wXbO7MsUDmVjVcFGD
+   cC06d6Kp9lrIUCl50wGqM6uk04JzXdhRrJuC2v7wsd2fvZDCj1DmvwkBb
+   jTOYBuYmmnkDt+HBihPehY3wZx9NO0x3px7W+FUvc/I/6D38ef4wVY6m9
+   h1s9fXFAeU2j1zoYuKZbHxNZ9A1WPUoPe7+oYPQ3WHsN2zlm+OWRpqejp
+   VlWpJjXLfzhJlsUu3AW0MvKMadwnFRMsxRnZxu3fBVYbg0iZ2g7fKW4YV
    w==;
 X-CSE-ConnectionGUID: sgSIijH6SvqxubKE+Nr9Sg==
-X-CSE-MsgGUID: C9URpm4rQlq/n+BnUuiKgQ==
+X-CSE-MsgGUID: 7Jp53QwwSbKgCcNcRUEj8w==
 X-IronPort-AV: E=Sophos;i="6.09,247,1716274800"; 
-   d="scan'208";a="29844697"
+   d="scan'208";a="29844699"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jul 2024 21:09:15 -0700
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jul 2024 21:09:16 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 29 Jul 2024 21:08:43 -0700
+ 15.1.2507.35; Mon, 29 Jul 2024 21:08:54 -0700
 Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 29 Jul 2024 21:08:33 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 29 Jul 2024 21:08:44 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
@@ -76,9 +76,9 @@ CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
 	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
 	<linux@bigler.io>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v5 01/14] Documentation: networking: add OPEN Alliance 10BASE-T1x MAC-PHY serial interface
-Date: Tue, 30 Jul 2024 09:38:53 +0530
-Message-ID: <20240730040906.53779-2-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v5 02/14] net: ethernet: oa_tc6: implement register write operation
+Date: Tue, 30 Jul 2024 09:38:54 +0530
+Message-ID: <20240730040906.53779-3-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240730040906.53779-1-Parthiban.Veerasooran@microchip.com>
 References: <20240730040906.53779-1-Parthiban.Veerasooran@microchip.com>
@@ -91,571 +91,349 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 
-The IEEE 802.3cg project defines two 10 Mbit/s PHYs operating over a
-single pair of conductors. The 10BASE-T1L (Clause 146) is a long reach
-PHY supporting full duplex point-to-point operation over 1 km of single
-balanced pair of conductors. The 10BASE-T1S (Clause 147) is a short reach
-PHY supporting full / half duplex point-to-point operation over 15 m of
-single balanced pair of conductors, or half duplex multidrop bus
-operation over 25 m of single balanced pair of conductors.
+Implement register write operation according to the control communication
+specified in the OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+document. Control write commands are used by the SPI host to write
+registers within the MAC-PHY. Each control write commands are composed of
+a 32 bits control command header followed by register write data.
 
-Furthermore, the IEEE 802.3cg project defines the new Physical Layer
-Collision Avoidance (PLCA) Reconciliation Sublayer (Clause 148) meant to
-provide improved determinism to the CSMA/CD media access method. PLCA
-works in conjunction with the 10BASE-T1S PHY operating in multidrop mode.
+The MAC-PHY ignores the final 32 bits of data from the SPI host at the
+end of the control write command. The write command and data is also
+echoed from the MAC-PHY back to the SPI host to enable the SPI host to
+identify which register write failed in the case of any bus errors.
+Control write commands can write either a single register or multiple
+consecutive registers. When multiple consecutive registers are written,
+the address is automatically post-incremented by the MAC-PHY. Writing to
+any unimplemented or undefined registers shall be ignored and yield no
+effect.
 
-The aforementioned PHYs are intended to cover the low-speed / low-cost
-applications in industrial and automotive environment. The large number
-of pins (16) required by the MII interface, which is specified by the
-IEEE 802.3 in Clause 22, is one of the major cost factors that need to be
-addressed to fulfil this objective.
-
-The MAC-PHY solution integrates an IEEE Clause 4 MAC and a 10BASE-T1x PHY
-exposing a low pin count Serial Peripheral Interface (SPI) to the host
-microcontroller. This also enables the addition of Ethernet functionality
-to existing low-end microcontrollers which do not integrate a MAC
-controller.
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- Documentation/networking/index.rst            |   1 +
- Documentation/networking/oa-tc6-framework.rst | 497 ++++++++++++++++++
- MAINTAINERS                                   |   6 +
- 3 files changed, 504 insertions(+)
- create mode 100644 Documentation/networking/oa-tc6-framework.rst
+ MAINTAINERS                   |   2 +
+ drivers/net/ethernet/Kconfig  |  11 ++
+ drivers/net/ethernet/Makefile |   1 +
+ drivers/net/ethernet/oa_tc6.c | 242 ++++++++++++++++++++++++++++++++++
+ include/linux/oa_tc6.h        |  17 +++
+ 5 files changed, 273 insertions(+)
+ create mode 100644 drivers/net/ethernet/oa_tc6.c
+ create mode 100644 include/linux/oa_tc6.h
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index d1af04b952f8..d12c9244ebb8 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -87,6 +87,7 @@ Contents:
-    nexthop-group-resilient
-    nf_conntrack-sysctl
-    nf_flowtable
-+   oa-tc6-framework
-    openvswitch
-    operstates
-    packet_mmap
-diff --git a/Documentation/networking/oa-tc6-framework.rst b/Documentation/networking/oa-tc6-framework.rst
-new file mode 100644
-index 000000000000..fe2aabde923a
---- /dev/null
-+++ b/Documentation/networking/oa-tc6-framework.rst
-@@ -0,0 +1,497 @@
-+.. SPDX-License-Identifier: GPL-2.0+
-+
-+=========================================================================
-+OPEN Alliance 10BASE-T1x MAC-PHY Serial Interface (TC6) Framework Support
-+=========================================================================
-+
-+Introduction
-+------------
-+
-+The IEEE 802.3cg project defines two 10 Mbit/s PHYs operating over a
-+single pair of conductors. The 10BASE-T1L (Clause 146) is a long reach
-+PHY supporting full duplex point-to-point operation over 1 km of single
-+balanced pair of conductors. The 10BASE-T1S (Clause 147) is a short reach
-+PHY supporting full / half duplex point-to-point operation over 15 m of
-+single balanced pair of conductors, or half duplex multidrop bus
-+operation over 25 m of single balanced pair of conductors.
-+
-+Furthermore, the IEEE 802.3cg project defines the new Physical Layer
-+Collision Avoidance (PLCA) Reconciliation Sublayer (Clause 148) meant to
-+provide improved determinism to the CSMA/CD media access method. PLCA
-+works in conjunction with the 10BASE-T1S PHY operating in multidrop mode.
-+
-+The aforementioned PHYs are intended to cover the low-speed / low-cost
-+applications in industrial and automotive environment. The large number
-+of pins (16) required by the MII interface, which is specified by the
-+IEEE 802.3 in Clause 22, is one of the major cost factors that need to be
-+addressed to fulfil this objective.
-+
-+The MAC-PHY solution integrates an IEEE Clause 4 MAC and a 10BASE-T1x PHY
-+exposing a low pin count Serial Peripheral Interface (SPI) to the host
-+microcontroller. This also enables the addition of Ethernet functionality
-+to existing low-end microcontrollers which do not integrate a MAC
-+controller.
-+
-+Overview
-+--------
-+
-+The MAC-PHY is specified to carry both data (Ethernet frames) and control
-+(register access) transactions over a single full-duplex serial peripheral
-+interface.
-+
-+Protocol Overview
-+-----------------
-+
-+Two types of transactions are defined in the protocol: data transactions
-+for Ethernet frame transfers and control transactions for register
-+read/write transfers. A chunk is the basic element of data transactions
-+and is composed of 4 bytes of overhead plus 64 bytes of payload size for
-+each chunk. Ethernet frames are transferred over one or more data chunks.
-+Control transactions consist of one or more register read/write control
-+commands.
-+
-+SPI transactions are initiated by the SPI host with the assertion of CSn
-+low to the MAC-PHY and ends with the deassertion of CSn high. In between
-+each SPI transaction, the SPI host may need time for additional
-+processing and to setup the next SPI data or control transaction.
-+
-+SPI data transactions consist of an equal number of transmit (TX) and
-+receive (RX) chunks. Chunks in both transmit and receive directions may
-+or may not contain valid frame data independent from each other, allowing
-+for the simultaneous transmission and reception of different length
-+frames.
-+
-+Each transmit data chunk begins with a 32-bit data header followed by a
-+data chunk payload on MOSI. The data header indicates whether transmit
-+frame data is present and provides the information to determine which
-+bytes of the payload contain valid frame data.
-+
-+In parallel, receive data chunks are received on MISO. Each receive data
-+chunk consists of a data chunk payload ending with a 32-bit data footer.
-+The data footer indicates if there is receive frame data present within
-+the payload or not and provides the information to determine which bytes
-+of the payload contain valid frame data.
-+
-+Reference
-+---------
-+
-+10BASE-T1x MAC-PHY Serial Interface Specification,
-+
-+Link: https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
-+
-+Hardware Architecture
-+---------------------
-+
-+.. code-block:: none
-+
-+  +----------+      +-------------------------------------+
-+  |          |      |                MAC-PHY              |
-+  |          |<---->| +-----------+  +-------+  +-------+ |
-+  | SPI Host |      | | SPI Slave |  |  MAC  |  |  PHY  | |
-+  |          |      | +-----------+  +-------+  +-------+ |
-+  +----------+      +-------------------------------------+
-+
-+Software Architecture
-+---------------------
-+
-+.. code-block:: none
-+
-+  +----------------------------------------------------------+
-+  |                 Networking Subsystem                     |
-+  +----------------------------------------------------------+
-+            / \                             / \
-+             |                               |
-+             |                               |
-+            \ /                              |
-+  +----------------------+     +-----------------------------+
-+  |     MAC Driver       |<--->| OPEN Alliance TC6 Framework |
-+  +----------------------+     +-----------------------------+
-+            / \                             / \
-+             |                               |
-+             |                               |
-+             |                              \ /
-+  +----------------------------------------------------------+
-+  |                    SPI Subsystem                         |
-+  +----------------------------------------------------------+
-+                          / \
-+                           |
-+                           |
-+                          \ /
-+  +----------------------------------------------------------+
-+  |                10BASE-T1x MAC-PHY Device                 |
-+  +----------------------------------------------------------+
-+
-+Implementation
-+--------------
-+
-+MAC Driver
-+~~~~~~~~~~
-+
-+- Probed by SPI subsystem.
-+
-+- Initializes OA TC6 framework for the MAC-PHY.
-+
-+- Registers and configures the network device.
-+
-+- Sends the tx ethernet frames from n/w subsystem to OA TC6 framework.
-+
-+OPEN Alliance TC6 Framework
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+- Initializes PHYLIB interface.
-+
-+- Registers mac-phy interrupt.
-+
-+- Performs mac-phy register read/write operation using the control
-+  transaction protocol specified in the OPEN Alliance 10BASE-T1x MAC-PHY
-+  Serial Interface specification.
-+
-+- Performs Ethernet frames transaction using the data transaction protocol
-+  for Ethernet frames specified in the OPEN Alliance 10BASE-T1x MAC-PHY
-+  Serial Interface specification.
-+
-+- Forwards the received Ethernet frame from 10Base-T1x MAC-PHY to n/w
-+  subsystem.
-+
-+Data Transaction
-+~~~~~~~~~~~~~~~~
-+
-+The Ethernet frames that are typically transferred from the SPI host to
-+the MAC-PHY will be converted into multiple transmit data chunks. Each
-+transmit data chunk will have a 4 bytes header which contains the
-+information needed to determine the validity and the location of the
-+transmit frame data within the 64 bytes data chunk payload.
-+
-+.. code-block:: none
-+
-+  +---------------------------------------------------+
-+  |                     Tx Chunk                      |
-+  | +---------------------------+  +----------------+ |   MOSI
-+  | | 64 bytes chunk payload    |  | 4 bytes header | |------------>
-+  | +---------------------------+  +----------------+ |
-+  +---------------------------------------------------+
-+
-+4 bytes header contains the below fields,
-+
-+DNC (Bit 31) - Data-Not-Control flag. This flag specifies the type of SPI
-+               transaction. For TX data chunks, this bit shall be ’1’.
-+               0 - Control command
-+               1 - Data chunk
-+
-+SEQ (Bit 30) - Data Chunk Sequence. This bit is used to indicate an
-+               even/odd transmit data chunk sequence to the MAC-PHY.
-+
-+NORX (Bit 29) - No Receive flag. The SPI host may set this bit to prevent
-+                the MAC-PHY from conveying RX data on the MISO for the
-+                current chunk (DV = 0 in the footer), indicating that the
-+                host would not process it. Typically, the SPI host should
-+                set NORX = 0 indicating that it will accept and process
-+                any receive frame data within the current chunk.
-+
-+RSVD (Bit 28..24) - Reserved: All reserved bits shall be ‘0’.
-+
-+VS (Bit 23..22) - Vendor Specific. These bits are implementation specific.
-+                  If the MAC-PHY does not implement these bits, the host
-+                  shall set them to ‘0’.
-+
-+DV (Bit 21) - Data Valid flag. The SPI host uses this bit to indicate
-+              whether the current chunk contains valid transmit frame data
-+              (DV = 1) or not (DV = 0). When ‘0’, the MAC-PHY ignores the
-+              chunk payload. Note that the receive path is unaffected by
-+              the setting of the DV bit in the data header.
-+
-+SV (Bit 20) - Start Valid flag. The SPI host shall set this bit when the
-+              beginning of an Ethernet frame is present in the current
-+              transmit data chunk payload. Otherwise, this bit shall be
-+              zero. This bit is not to be confused with the Start-of-Frame
-+              Delimiter (SFD) byte described in IEEE 802.3 [2].
-+
-+SWO (Bit 19..16) - Start Word Offset. When SV = 1, this field shall
-+                   contain the 32-bit word offset into the transmit data
-+                   chunk payload that points to the start of a new
-+                   Ethernet frame to be transmitted. The host shall write
-+                   this field as zero when SV = 0.
-+
-+RSVD (Bit 15) - Reserved: All reserved bits shall be ‘0’.
-+
-+EV (Bit 14) - End Valid flag. The SPI host shall set this bit when the end
-+              of an Ethernet frame is present in the current transmit data
-+              chunk payload. Otherwise, this bit shall be zero.
-+
-+EBO (Bit 13..8) - End Byte Offset. When EV = 1, this field shall contain
-+                  the byte offset into the transmit data chunk payload
-+                  that points to the last byte of the Ethernet frame to
-+                  transmit. This field shall be zero when EV = 0.
-+
-+TSC (Bit 7..6) - Timestamp Capture. Request a timestamp capture when the
-+                 frame is transmitted onto the network.
-+                 00 - Do not capture a timestamp
-+                 01 - Capture timestamp into timestamp capture register A
-+                 10 - Capture timestamp into timestamp capture register B
-+                 11 - Capture timestamp into timestamp capture register C
-+
-+RSVD (Bit 5..1) - Reserved: All reserved bits shall be ‘0’.
-+
-+P (Bit 0) - Parity. Parity bit calculated over the transmit data header.
-+            Method used is odd parity.
-+
-+The number of buffers available in the MAC-PHY to store the incoming
-+transmit data chunk payloads is represented as transmit credits. The
-+available transmit credits in the MAC-PHY can be read either from the
-+Buffer Status Register or footer (Refer below for the footer info)
-+received from the MAC-PHY. The SPI host should not write more data chunks
-+than the available transmit credits as this will lead to transmit buffer
-+overflow error.
-+
-+In case the previous data footer had no transmit credits available and
-+once the transmit credits become available for transmitting transmit data
-+chunks, the MAC-PHY interrupt is asserted to SPI host. On reception of the
-+first data header this interrupt will be deasserted and the received
-+footer for the first data chunk will have the transmit credits available
-+information.
-+
-+The Ethernet frames that are typically transferred from MAC-PHY to SPI
-+host will be sent as multiple receive data chunks. Each receive data
-+chunk will have 64 bytes of data chunk payload followed by 4 bytes footer
-+which contains the information needed to determine the validity and the
-+location of the receive frame data within the 64 bytes data chunk payload.
-+
-+.. code-block:: none
-+
-+  +---------------------------------------------------+
-+  |                     Rx Chunk                      |
-+  | +----------------+  +---------------------------+ |   MISO
-+  | | 4 bytes footer |  | 64 bytes chunk payload    | |------------>
-+  | +----------------+  +---------------------------+ |
-+  +---------------------------------------------------+
-+
-+4 bytes footer contains the below fields,
-+
-+EXST (Bit 31) - Extended Status. This bit is set when any bit in the
-+                STATUS0 or STATUS1 registers are set and not masked.
-+
-+HDRB (Bit 30) - Received Header Bad. When set, indicates that the MAC-PHY
-+                received a control or data header with a parity error.
-+
-+SYNC (Bit 29) - Configuration Synchronized flag. This bit reflects the
-+                state of the SYNC bit in the CONFIG0 configuration
-+                register (see Table 12). A zero indicates that the MAC-PHY
-+                configuration may not be as expected by the SPI host.
-+                Following configuration, the SPI host sets the
-+                corresponding bitin the configuration register which is
-+                reflected in this field.
-+
-+RCA (Bit 28..24) - Receive Chunks Available. The RCA field indicates to
-+                   the SPI host the minimum number of additional receive
-+                   data chunks of frame data that are available for
-+                   reading beyond the current receive data chunk. This
-+                   field is zero when there is no receive frame data
-+                   pending in the MAC-PHY’s buffer for reading.
-+
-+VS (Bit 23..22) - Vendor Specific. These bits are implementation specific.
-+                  If not implemented, the MAC-PHY shall set these bits to
-+                  ‘0’.
-+
-+DV (Bit 21) - Data Valid flag. The MAC-PHY uses this bit to indicate
-+              whether the current receive data chunk contains valid
-+              receive frame data (DV = 1) or not (DV = 0). When ‘0’, the
-+              SPI host shall ignore the chunk payload.
-+
-+SV (Bit 20) - Start Valid flag. The MAC-PHY sets this bit when the current
-+              chunk payload contains the start of an Ethernet frame.
-+              Otherwise, this bit is zero. The SV bit is not to be
-+              confused with the Start-of-Frame Delimiter (SFD) byte
-+              described in IEEE 802.3 [2].
-+
-+SWO (Bit 19..16) - Start Word Offset. When SV = 1, this field contains the
-+                   32-bit word offset into the receive data chunk payload
-+                   containing the first byte of a new received Ethernet
-+                   frame. When a receive timestamp has been added to the
-+                   beginning of the received Ethernet frame (RTSA = 1)
-+                   then SWO points to the most significant byte of the
-+                   timestamp. This field will be zero when SV = 0.
-+
-+FD (Bit 15) - Frame Drop. When set, this bit indicates that the MAC has
-+              detected a condition for which the SPI host should drop the
-+              received Ethernet frame. This bit is only valid at the end
-+              of a received Ethernet frame (EV = 1) and shall be zero at
-+              all other times.
-+
-+EV (Bit 14) - End Valid flag. The MAC-PHY sets this bit when the end of a
-+              received Ethernet frame is present in this receive data
-+              chunk payload.
-+
-+EBO (Bit 13..8) - End Byte Offset: When EV = 1, this field contains the
-+                  byte offset into the receive data chunk payload that
-+                  locates the last byte of the received Ethernet frame.
-+                  This field is zero when EV = 0.
-+
-+RTSA (Bit 7) - Receive Timestamp Added. This bit is set when a 32-bit or
-+               64-bit timestamp has been added to the beginning of the
-+               received Ethernet frame. The MAC-PHY shall set this bit to
-+               zero when SV = 0.
-+
-+RTSP (Bit 6) - Receive Timestamp Parity. Parity bit calculated over the
-+               32-bit/64-bit timestamp added to the beginning of the
-+               received Ethernet frame. Method used is odd parity. The
-+               MAC-PHY shall set this bit to zero when RTSA = 0.
-+
-+TXC (Bit 5..1) - Transmit Credits. This field contains the minimum number
-+                 of transmit data chunks of frame data that the SPI host
-+                 can write in a single transaction without incurring a
-+                 transmit buffer overflow error.
-+
-+P (Bit 0) - Parity. Parity bit calculated over the receive data footer.
-+            Method used is odd parity.
-+
-+SPI host will initiate the data receive transaction based on the receive
-+chunks available in the MAC-PHY which is provided in the receive chunk
-+footer (RCA - Receive Chunks Available). SPI host will create data invalid
-+transmit data chunks (empty chunks) or data valid transmit data chunks in
-+case there are valid Ethernet frames to transmit to the MAC-PHY. The
-+receive chunks available in MAC-PHY can be read either from the Buffer
-+Status Register or footer.
-+
-+In case the previous data footer had no receive data chunks available and
-+once the receive data chunks become available again for reading, the
-+MAC-PHY interrupt is asserted to SPI host. On reception of the first data
-+header this interrupt will be deasserted and the received footer for the
-+first data chunk will have the receive chunks available information.
-+
-+MAC-PHY Interrupt
-+~~~~~~~~~~~~~~~~~
-+
-+The MAC-PHY interrupt is asserted when the following conditions are met.
-+
-+Receive chunks available - This interrupt is asserted when the previous
-+data footer had no receive data chunks available and once the receive
-+data chunks become available for reading. On reception of the first data
-+header this interrupt will be deasserted.
-+
-+Transmit chunk credits available - This interrupt is asserted when the
-+previous data footer indicated no transmit credits available and once the
-+transmit credits become available for transmitting transmit data chunks.
-+On reception of the first data header this interrupt will be deasserted.
-+
-+Extended status event - This interrupt is asserted when the previous data
-+footer indicated no extended status and once the extended event become
-+available. In this case the host should read status #0 register to know
-+the corresponding error/event. On reception of the first data header this
-+interrupt will be deasserted.
-+
-+Control Transaction
-+~~~~~~~~~~~~~~~~~~~
-+
-+4 bytes control header contains the below fields,
-+
-+DNC (Bit 31) - Data-Not-Control flag. This flag specifies the type of SPI
-+               transaction. For control commands, this bit shall be ‘0’.
-+               0 - Control command
-+               1 - Data chunk
-+
-+HDRB (Bit 30) - Received Header Bad. When set by the MAC-PHY, indicates
-+                that a header was received with a parity error. The SPI
-+                host should always clear this bit. The MAC-PHY ignores the
-+                HDRB value sent by the SPI host on MOSI.
-+
-+WNR (Bit 29) - Write-Not-Read. This bit indicates if data is to be written
-+               to registers (when set) or read from registers
-+               (when clear).
-+
-+AID (Bit 28) - Address Increment Disable. When clear, the address will be
-+               automatically post-incremented by one following each
-+               register read or write. When set, address auto increment is
-+               disabled allowing successive reads and writes to occur at
-+               the same register address.
-+
-+MMS (Bit 27..24) - Memory Map Selector. This field selects the specific
-+                   register memory map to access.
-+
-+ADDR (Bit 23..8) - Address. Address of the first register within the
-+                   selected memory map to access.
-+
-+LEN (Bit 7..1) - Length. Specifies the number of registers to read/write.
-+                 This field is interpreted as the number of registers
-+                 minus 1 allowing for up to 128 consecutive registers read
-+                 or written starting at the address specified in ADDR. A
-+                 length of zero shall read or write a single register.
-+
-+P (Bit 0) - Parity. Parity bit calculated over the control command header.
-+            Method used is odd parity.
-+
-+Control transactions consist of one or more control commands. Control
-+commands are used by the SPI host to read and write registers within the
-+MAC-PHY. Each control commands are composed of a 4 bytes control command
-+header followed by register write data in case of control write command.
-+
-+The MAC-PHY ignores the final 4 bytes of data from the SPI host at the end
-+of the control write command. The control write command is also echoed
-+from the MAC-PHY back to the SPI host to identify which register write
-+failed in case of any bus errors. The echoed Control write command will
-+have the first 4 bytes unused value to be ignored by the SPI host
-+followed by 4 bytes echoed control header followed by echoed register
-+write data. Control write commands can write either a single register or
-+multiple consecutive registers. When multiple consecutive registers are
-+written, the address is automatically post-incremented by the MAC-PHY.
-+Writing to any unimplemented or undefined registers shall be ignored and
-+yield no effect.
-+
-+The MAC-PHY ignores all data from the SPI host following the control
-+header for the remainder of the control read command. The control read
-+command is also echoed from the MAC-PHY back to the SPI host to identify
-+which register read is failed in case of any bus errors. The echoed
-+Control read command will have the first 4 bytes of unused value to be
-+ignored by the SPI host followed by 4 bytes echoed control header followed
-+by register read data. Control read commands can read either a single
-+register or multiple consecutive registers. When multiple consecutive
-+registers are read, the address is automatically post-incremented by the
-+MAC-PHY. Reading any unimplemented or undefined registers shall return
-+zero.
-+
-+Device drivers API
-+==================
-+
-+The include/linux/oa_tc6.h defines the following functions:
-+
-+.. c:function:: struct oa_tc6 *oa_tc6_init(struct spi_device *spi, \
-+                                           struct net_device *netdev)
-+
-+Initialize OA TC6 lib.
-+
-+.. c:function:: void oa_tc6_exit(struct oa_tc6 *tc6)
-+
-+Free allocated OA TC6 lib.
-+
-+.. c:function:: int oa_tc6_write_register(struct oa_tc6 *tc6, u32 address, \
-+                                          u32 value)
-+
-+Write a single register in the MAC-PHY.
-+
-+.. c:function:: int oa_tc6_write_registers(struct oa_tc6 *tc6, u32 address, \
-+                                           u32 value[], u8 length)
-+
-+Writing multiple consecutive registers starting from @address in the MAC-PHY.
-+Maximum of 128 consecutive registers can be written starting at @address.
-+
-+.. c:function:: int oa_tc6_read_register(struct oa_tc6 *tc6, u32 address, \
-+                                         u32 *value)
-+
-+Read a single register in the MAC-PHY.
-+
-+.. c:function:: int oa_tc6_read_registers(struct oa_tc6 *tc6, u32 address, \
-+                                          u32 value[], u8 length)
-+
-+Reading multiple consecutive registers starting from @address in the MAC-PHY.
-+Maximum of 128 consecutive registers can be read starting at @address.
-+
-+.. c:function:: netdev_tx_t oa_tc6_start_xmit(struct oa_tc6 *tc6, \
-+                                              struct sk_buff *skb);
-+
-+The transmit Ethernet frame in the skb is or going to be transmitted through
-+the MAC-PHY.
-+
-+.. c:function:: int oa_tc6_zero_align_receive_frame_enable(struct oa_tc6 *tc6);
-+
-+Zero align receive frame feature can be enabled to align all receive ethernet
-+frames data to start at the beginning of any receive data chunk payload with a
-+start word offset (SWO) of zero.
 diff --git a/MAINTAINERS b/MAINTAINERS
-index c0a3d9e93689..6cbd3c761d4b 100644
+index 6cbd3c761d4b..ee490b9e363c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -17059,6 +17059,12 @@ L:	linux-rdma@vger.kernel.org
- S:	Supported
- F:	drivers/infiniband/ulp/opa_vnic
+@@ -17064,6 +17064,8 @@ M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/networking/oa-tc6-framework.rst
++F:	drivers/include/linux/oa_tc6.h
++F:	drivers/net/ethernet/oa_tc6.c
  
-+OPEN ALLIANCE 10BASE-T1S MACPHY SERIAL INTERFACE FRAMEWORK
-+M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/networking/oa-tc6-framework.rst
-+
  OPEN FIRMWARE AND FLATTENED DEVICE TREE
  M:	Rob Herring <robh@kernel.org>
- M:	Saravana Kannan <saravanak@google.com>
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index 0baac25db4f8..9a542e3c9b05 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -158,6 +158,17 @@ config ETHOC
+ 	help
+ 	  Say Y here if you want to use the OpenCores 10/100 Mbps Ethernet MAC.
+ 
++config OA_TC6
++	tristate "OPEN Alliance TC6 10BASE-T1x MAC-PHY support"
++	depends on SPI
++	select PHYLIB
++	help
++	  This library implements OPEN Alliance TC6 10BASE-T1x MAC-PHY
++	  Serial Interface protocol for supporting 10BASE-T1x MAC-PHYs.
++
++	  To know the implementation details, refer documentation in
++	  <file:Documentation/networking/oa-tc6-framework.rst>.
++
+ source "drivers/net/ethernet/packetengines/Kconfig"
+ source "drivers/net/ethernet/pasemi/Kconfig"
+ source "drivers/net/ethernet/pensando/Kconfig"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index c03203439c0e..99fa180dedb8 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -105,3 +105,4 @@ obj-$(CONFIG_NET_VENDOR_XILINX) += xilinx/
+ obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
+ obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
+ obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
++obj-$(CONFIG_OA_TC6) += oa_tc6.o
+diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+new file mode 100644
+index 000000000000..24e9fd92d717
+--- /dev/null
++++ b/drivers/net/ethernet/oa_tc6.c
+@@ -0,0 +1,242 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * OPEN Alliance 10BASE‑T1x MAC‑PHY Serial Interface framework
++ *
++ * Author: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
++ */
++
++#include <linux/bitfield.h>
++#include <linux/oa_tc6.h>
++
++/* Control command header */
++#define OA_TC6_CTRL_HEADER_DATA_NOT_CTRL	BIT(31)
++#define OA_TC6_CTRL_HEADER_WRITE_NOT_READ	BIT(29)
++#define OA_TC6_CTRL_HEADER_MEM_MAP_SELECTOR	GENMASK(27, 24)
++#define OA_TC6_CTRL_HEADER_ADDR			GENMASK(23, 8)
++#define OA_TC6_CTRL_HEADER_LENGTH		GENMASK(7, 1)
++#define OA_TC6_CTRL_HEADER_PARITY		BIT(0)
++
++#define OA_TC6_CTRL_HEADER_SIZE			4
++#define OA_TC6_CTRL_REG_VALUE_SIZE		4
++#define OA_TC6_CTRL_IGNORED_SIZE		4
++#define OA_TC6_CTRL_MAX_REGISTERS		128
++#define OA_TC6_CTRL_SPI_BUF_SIZE		(OA_TC6_CTRL_HEADER_SIZE +\
++						(OA_TC6_CTRL_MAX_REGISTERS *\
++						OA_TC6_CTRL_REG_VALUE_SIZE) +\
++						OA_TC6_CTRL_IGNORED_SIZE)
++
++/* Internal structure for MAC-PHY drivers */
++struct oa_tc6 {
++	struct spi_device *spi;
++	struct mutex spi_ctrl_lock; /* Protects spi control transfer */
++	void *spi_ctrl_tx_buf;
++	void *spi_ctrl_rx_buf;
++};
++
++enum oa_tc6_header_type {
++	OA_TC6_CTRL_HEADER,
++};
++
++enum oa_tc6_register_op {
++	OA_TC6_CTRL_REG_WRITE = 1,
++};
++
++static int oa_tc6_spi_transfer(struct oa_tc6 *tc6,
++			       enum oa_tc6_header_type header_type, u16 length)
++{
++	struct spi_transfer xfer = { 0 };
++	struct spi_message msg;
++
++	xfer.tx_buf = tc6->spi_ctrl_tx_buf;
++	xfer.rx_buf = tc6->spi_ctrl_rx_buf;
++	xfer.len = length;
++
++	spi_message_init(&msg);
++	spi_message_add_tail(&xfer, &msg);
++
++	return spi_sync(tc6->spi, &msg);
++}
++
++static int oa_tc6_get_parity(u32 p)
++{
++	/* Public domain code snippet, lifted from
++	 * http://www-graphics.stanford.edu/~seander/bithacks.html
++	 */
++	p ^= p >> 1;
++	p ^= p >> 2;
++	p = (p & 0x11111111U) * 0x11111111U;
++
++	/* Odd parity is used here */
++	return !((p >> 28) & 1);
++}
++
++static __be32 oa_tc6_prepare_ctrl_header(u32 addr, u8 length,
++					 enum oa_tc6_register_op reg_op)
++{
++	u32 header;
++
++	header = FIELD_PREP(OA_TC6_CTRL_HEADER_DATA_NOT_CTRL,
++			    OA_TC6_CTRL_HEADER) |
++		 FIELD_PREP(OA_TC6_CTRL_HEADER_WRITE_NOT_READ, reg_op) |
++		 FIELD_PREP(OA_TC6_CTRL_HEADER_MEM_MAP_SELECTOR, addr >> 16) |
++		 FIELD_PREP(OA_TC6_CTRL_HEADER_ADDR, addr) |
++		 FIELD_PREP(OA_TC6_CTRL_HEADER_LENGTH, length - 1);
++	header |= FIELD_PREP(OA_TC6_CTRL_HEADER_PARITY,
++			     oa_tc6_get_parity(header));
++
++	return cpu_to_be32(header);
++}
++
++static void oa_tc6_update_ctrl_write_data(struct oa_tc6 *tc6, u32 value[],
++					  u8 length)
++{
++	__be32 *tx_buf = tc6->spi_ctrl_tx_buf + OA_TC6_CTRL_HEADER_SIZE;
++
++	for (int i = 0; i < length; i++)
++		*tx_buf++ = cpu_to_be32(value[i]);
++}
++
++static u16 oa_tc6_calculate_ctrl_buf_size(u8 length)
++{
++	/* Control command consists 4 bytes header + 4 bytes register value for
++	 * each register + 4 bytes ignored value.
++	 */
++	return OA_TC6_CTRL_HEADER_SIZE + OA_TC6_CTRL_REG_VALUE_SIZE * length +
++	       OA_TC6_CTRL_IGNORED_SIZE;
++}
++
++static void oa_tc6_prepare_ctrl_spi_buf(struct oa_tc6 *tc6, u32 address,
++					u32 value[], u8 length,
++					enum oa_tc6_register_op reg_op)
++{
++	__be32 *tx_buf = tc6->spi_ctrl_tx_buf;
++
++	*tx_buf = oa_tc6_prepare_ctrl_header(address, length, reg_op);
++
++	oa_tc6_update_ctrl_write_data(tc6, value, length);
++}
++
++static int oa_tc6_check_ctrl_write_reply(struct oa_tc6 *tc6, u8 size)
++{
++	u8 *tx_buf = tc6->spi_ctrl_tx_buf;
++	u8 *rx_buf = tc6->spi_ctrl_rx_buf;
++
++	rx_buf += OA_TC6_CTRL_IGNORED_SIZE;
++
++	/* The echoed control write must match with the one that was
++	 * transmitted.
++	 */
++	if (memcmp(tx_buf, rx_buf, size - OA_TC6_CTRL_IGNORED_SIZE))
++		return -EPROTO;
++
++	return 0;
++}
++
++static int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 address, u32 value[],
++			       u8 length, enum oa_tc6_register_op reg_op)
++{
++	u16 size;
++	int ret;
++
++	/* Prepare control command and copy to SPI control buffer */
++	oa_tc6_prepare_ctrl_spi_buf(tc6, address, value, length, reg_op);
++
++	size = oa_tc6_calculate_ctrl_buf_size(length);
++
++	/* Perform SPI transfer */
++	ret = oa_tc6_spi_transfer(tc6, OA_TC6_CTRL_HEADER, size);
++	if (ret) {
++		dev_err(&tc6->spi->dev, "SPI transfer failed for control: %d\n",
++			ret);
++		return ret;
++	}
++
++	/* Check echoed/received control write command reply for errors */
++	return oa_tc6_check_ctrl_write_reply(tc6, size);
++}
++
++/**
++ * oa_tc6_write_registers - function for writing multiple consecutive registers.
++ * @tc6: oa_tc6 struct.
++ * @address: address of the first register to be written in the MAC-PHY.
++ * @value: values to be written from the starting register address @address.
++ * @length: number of consecutive registers to be written from @address.
++ *
++ * Maximum of 128 consecutive registers can be written starting at @address.
++ *
++ * Return: 0 on success otherwise failed.
++ */
++int oa_tc6_write_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
++			   u8 length)
++{
++	int ret;
++
++	if (!length || length > OA_TC6_CTRL_MAX_REGISTERS) {
++		dev_err(&tc6->spi->dev, "Invalid register length parameter\n");
++		return -EINVAL;
++	}
++
++	mutex_lock(&tc6->spi_ctrl_lock);
++	ret = oa_tc6_perform_ctrl(tc6, address, value, length,
++				  OA_TC6_CTRL_REG_WRITE);
++	mutex_unlock(&tc6->spi_ctrl_lock);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(oa_tc6_write_registers);
++
++/**
++ * oa_tc6_write_register - function for writing a MAC-PHY register.
++ * @tc6: oa_tc6 struct.
++ * @address: register address of the MAC-PHY to be written.
++ * @value: value to be written in the @address register address of the MAC-PHY.
++ *
++ * Return: 0 on success otherwise failed.
++ */
++int oa_tc6_write_register(struct oa_tc6 *tc6, u32 address, u32 value)
++{
++	return oa_tc6_write_registers(tc6, address, &value, 1);
++}
++EXPORT_SYMBOL_GPL(oa_tc6_write_register);
++
++/**
++ * oa_tc6_init - allocates and initializes oa_tc6 structure.
++ * @spi: device with which data will be exchanged.
++ *
++ * Return: pointer reference to the oa_tc6 structure if the MAC-PHY
++ * initialization is successful otherwise NULL.
++ */
++struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
++{
++	struct oa_tc6 *tc6;
++
++	tc6 = devm_kzalloc(&spi->dev, sizeof(*tc6), GFP_KERNEL);
++	if (!tc6)
++		return NULL;
++
++	tc6->spi = spi;
++	mutex_init(&tc6->spi_ctrl_lock);
++
++	/* Set the SPI controller to pump at realtime priority */
++	tc6->spi->rt = true;
++	spi_setup(tc6->spi);
++
++	tc6->spi_ctrl_tx_buf = devm_kzalloc(&tc6->spi->dev,
++					    OA_TC6_CTRL_SPI_BUF_SIZE,
++					    GFP_KERNEL);
++	if (!tc6->spi_ctrl_tx_buf)
++		return NULL;
++
++	tc6->spi_ctrl_rx_buf = devm_kzalloc(&tc6->spi->dev,
++					    OA_TC6_CTRL_SPI_BUF_SIZE,
++					    GFP_KERNEL);
++	if (!tc6->spi_ctrl_rx_buf)
++		return NULL;
++
++	return tc6;
++}
++EXPORT_SYMBOL_GPL(oa_tc6_init);
++
++MODULE_DESCRIPTION("OPEN Alliance 10BASE‑T1x MAC‑PHY Serial Interface Lib");
++MODULE_AUTHOR("Parthiban Veerasooran <parthiban.veerasooran@microchip.com>");
++MODULE_LICENSE("GPL");
+diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
+new file mode 100644
+index 000000000000..99c490f1c8a8
+--- /dev/null
++++ b/include/linux/oa_tc6.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * OPEN Alliance 10BASE‑T1x MAC‑PHY Serial Interface framework
++ *
++ * Link: https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
++ *
++ * Author: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
++ */
++
++#include <linux/spi/spi.h>
++
++struct oa_tc6;
++
++struct oa_tc6 *oa_tc6_init(struct spi_device *spi);
++int oa_tc6_write_register(struct oa_tc6 *tc6, u32 address, u32 value);
++int oa_tc6_write_registers(struct oa_tc6 *tc6, u32 address, u32 value[],
++			   u8 length);
 -- 
 2.34.1
 
