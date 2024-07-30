@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-114223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85DA94189E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:24:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45ED39418A1
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77B532865B8
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:24:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778241C20A4F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8383A18455D;
-	Tue, 30 Jul 2024 16:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D26F18991E;
+	Tue, 30 Jul 2024 16:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ElRH25wa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQ7FAlHg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC841078F
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 16:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093BD189919
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 16:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722356606; cv=none; b=GyLS0LqgxQ56oUMBJixMv7SRS3joFXpQ/ZBR+pw1wT8PXbhyIfDfxQYYXFo8FBXszMoU+MX7PzErNB6Xs1Ul37u01PKQOuC8Zll8b/nSxXKJ4dO5h2CnmEgdwU67c8UNhEsWYfDeXq+Khf7drhQdn8XradLcaOkUI2pkNA5ywsg=
+	t=1722356610; cv=none; b=D3YLYmiKJ7p7c3oMlcG/H65kdHgSwMNAHpLrIADquue/cA33p8sWKfmtmTyKzwRtc1gPcsGHVrVL7taZrsxHiCJzuGaXjbOSEuSTt1hGPp7dosxE2e701VnqL0Ij1uggpB+px5Kx4LGb8b0EL+Tj/oPiTbx0skI2SbUDKfEOMbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722356606; c=relaxed/simple;
-	bh=goFYc4tszjB+5vMtiKcyp7Goi8HpUFHwYeiuijvPdNg=;
+	s=arc-20240116; t=1722356610; c=relaxed/simple;
+	bh=3oYoOwjKwwydDncnDQbsW1v26gFUfUI+am7zGLJZOxw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PknNticocZjajlmVdavEUc+z596bytk9k6GVFVOC9icUNJh+LMw/UXmNmgEfWSyh23X6J66Xh3AV7d5F269vkKC22LT8GVfScXAYLHgAGeBHNKz6EIhwTIRavAvCVrDbhm+DIyV4LkJPSOYELFgE15WlR/nqeQTjmgQhxFOcyJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ElRH25wa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D144CC4AF0C;
-	Tue, 30 Jul 2024 16:23:25 +0000 (UTC)
+	 MIME-Version; b=QhuJseU9pXyJ7qCXMLtcYljOvZuJ43xBW/fhE8pOEvqb+/dffiHsPK+7Y3Eo827bpVx+sh5cCUfI5LJrZJrrst8oFQp0HRjrPLXoGyTkZxLAooBk4OYShL75/ohid9TFgANwNv4T1lpEwX3OJ6Y9a/NFuLwhDWijYLcP5zcgNjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQ7FAlHg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B0BEC32782;
+	Tue, 30 Jul 2024 16:23:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722356606;
-	bh=goFYc4tszjB+5vMtiKcyp7Goi8HpUFHwYeiuijvPdNg=;
+	s=k20201202; t=1722356609;
+	bh=3oYoOwjKwwydDncnDQbsW1v26gFUfUI+am7zGLJZOxw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ElRH25wasGrkx9O/t6c6dZbQZNOhgZw+KQRz4BrhyUiKKA7Ev3MK1lRdz5TqUFYqh
-	 mZHNChLUSY7K8zZ7V3CAHwhpqDznzBgimy17V75S8uMPQL6YAuCUzLl8mxi0VyWVqg
-	 pZMSCn1E2wYmXn4qi+K1iZUaVHRxqb7XV8LzMWcVowBWwxfJa2YlmzLVh236az6eVc
-	 WjPdDnjmFexpw6XQ8p3KQaVBXG6EcCimRefjPDItRAYiOV77pEd3nbhelzeMeSsIco
-	 V4r1o+rlAsdNRar4yJ7LhsEMFr1tCv/1A89eu2TEXr8m72OBnrXNeE8jxEeMsHCYQG
-	 lFyzVtnNZBH6A==
+	b=QQ7FAlHgTmjcWbVbCubGIXQWCw7MECjGH1gdkZztmNDUfPqTsedoZn6LhCwb49UTI
+	 2gjHkAd2xvQZGu839DodPcA8kFEI/nNFetWmc6iYKI02Wft0UcVp1Awz8TllyeBp17
+	 g+D7xq6SH8C+ApNH08XRWk5zVEYSWYgX3PfbyKAdyz+7sMvefthBEbu0hAP/o+CmEm
+	 jvq7jeDqWJ5mZxQNYy6kfewZUhkk9SkkPyMi0hmtoTjyt8+7n3R9xxl6pXFRA5ZOF3
+	 0TK9noxmIgk1BcYWV/Wzfqa2nipF2KdXn0e+DYSQ2xBX5AgQp0xoFdcnRvqK335CT2
+	 LbfttYrdkIJNg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: nbd@nbd.name,
@@ -58,9 +58,9 @@ Cc: nbd@nbd.name,
 	andrew@lunn.ch,
 	arnd@arndb.de,
 	horms@kernel.org
-Subject: [PATCH net-next 5/9] net: airoha: Use qdma pointer as private structure in airoha_irq_handler routine
-Date: Tue, 30 Jul 2024 18:22:44 +0200
-Message-ID: <bc99a70ec713e9fdf7c60a6a685a546aa3073a75.1722356015.git.lorenzo@kernel.org>
+Subject: [PATCH net-next 6/9] net: airoha: Allow mapping IO region for multiple qdma controllers
+Date: Tue, 30 Jul 2024 18:22:45 +0200
+Message-ID: <6a56e76fa49b85b633cdb104e42ccf3bd6e7e3f8.1722356015.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1722356015.git.lorenzo@kernel.org>
 References: <cover.1722356015.git.lorenzo@kernel.org>
@@ -72,45 +72,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is a preliminary patch to support multi-QDMA controllers.
+Map MMIO regions of both qdma controllers available on EN7581 SoC.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/mediatek/airoha_eth.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mediatek/airoha_eth.c | 46 ++++++++++++----------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
 
 diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 763b8df73552..18a0c8889073 100644
+index 18a0c8889073..498c65b4e449 100644
 --- a/drivers/net/ethernet/mediatek/airoha_eth.c
 +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -1975,8 +1975,7 @@ static int airoha_qdma_hw_init(struct airoha_qdma *qdma)
+@@ -2025,15 +2025,26 @@ static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
+ }
  
- static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
+ static int airoha_qdma_init(struct platform_device *pdev,
+-			    struct airoha_eth *eth)
++			    struct airoha_eth *eth,
++			    struct airoha_qdma *qdma)
  {
--	struct airoha_eth *eth = dev_instance;
 -	struct airoha_qdma *qdma = &eth->qdma[0];
-+	struct airoha_qdma *qdma = dev_instance;
- 	u32 intr[ARRAY_SIZE(qdma->irqmask)];
- 	int i;
+-	int err;
++	int err, id = qdma - &eth->qdma[0];
++	const char *res;
  
-@@ -1986,7 +1985,7 @@ static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
- 		airoha_qdma_wr(qdma, REG_INT_STATUS(i), intr[i]);
- 	}
+ 	spin_lock_init(&qdma->irq_lock);
+ 	qdma->eth = eth;
  
--	if (!test_bit(DEV_STATE_INITIALIZED, &eth->state))
-+	if (!test_bit(DEV_STATE_INITIALIZED, &qdma->eth->state))
- 		return IRQ_NONE;
- 
- 	if (intr[1] & RX_DONE_INT_MASK) {
-@@ -2039,7 +2038,7 @@ static int airoha_qdma_init(struct platform_device *pdev,
+-	qdma->irq = platform_get_irq(pdev, 0);
++	res = devm_kasprintf(eth->dev, GFP_KERNEL, "qdma%d", id);
++	if (!res)
++		return -ENOMEM;
++
++	qdma->regs = devm_platform_ioremap_resource_byname(pdev, res);
++	if (IS_ERR(eth->qdma[id].regs))
++		return dev_err_probe(eth->dev,
++				     PTR_ERR(eth->qdma[id].regs),
++				     "failed to iomap qdma%d regs\n", id);
++
++	qdma->irq = platform_get_irq(pdev, 4 * id);
+ 	if (qdma->irq < 0)
  		return qdma->irq;
  
- 	err = devm_request_irq(eth->dev, qdma->irq, airoha_irq_handler,
--			       IRQF_SHARED, KBUILD_MODNAME, eth);
-+			       IRQF_SHARED, KBUILD_MODNAME, qdma);
+@@ -2054,19 +2065,13 @@ static int airoha_qdma_init(struct platform_device *pdev,
  	if (err)
  		return err;
  
+-	err = airoha_qdma_hw_init(qdma);
+-	if (err)
+-		return err;
+-
+-	set_bit(DEV_STATE_INITIALIZED, &eth->state);
+-
+-	return 0;
++	return airoha_qdma_hw_init(qdma);
+ }
+ 
+ static int airoha_hw_init(struct platform_device *pdev,
+ 			  struct airoha_eth *eth)
+ {
+-	int err;
++	int err, i;
+ 
+ 	/* disable xsi */
+ 	reset_control_bulk_assert(ARRAY_SIZE(eth->xsi_rsts), eth->xsi_rsts);
+@@ -2080,7 +2085,15 @@ static int airoha_hw_init(struct platform_device *pdev,
+ 	if (err)
+ 		return err;
+ 
+-	return airoha_qdma_init(pdev, eth);
++	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++) {
++		err = airoha_qdma_init(pdev, eth, &eth->qdma[i]);
++		if (err)
++			return err;
++	}
++
++	set_bit(DEV_STATE_INITIALIZED, &eth->state);
++
++	return 0;
+ }
+ 
+ static void airoha_hw_cleanup(struct airoha_eth *eth)
+@@ -2646,13 +2659,6 @@ static int airoha_probe(struct platform_device *pdev)
+ 		return dev_err_probe(eth->dev, PTR_ERR(eth->fe_regs),
+ 				     "failed to iomap fe regs\n");
+ 
+-	eth->qdma[0].regs = devm_platform_ioremap_resource_byname(pdev,
+-								  "qdma0");
+-	if (IS_ERR(eth->qdma[0].regs))
+-		return dev_err_probe(eth->dev,
+-				     PTR_ERR(eth->qdma[0].regs),
+-				     "failed to iomap qdma regs\n");
+-
+ 	eth->rsts[0].id = "fe";
+ 	eth->rsts[1].id = "pdma";
+ 	eth->rsts[2].id = "qdma";
 -- 
 2.45.2
 
