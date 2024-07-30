@@ -1,119 +1,138 @@
-Return-Path: <netdev+bounces-113878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEDA9403B1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 03:29:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C7B9403B6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 03:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0E60282308
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 01:28:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AD6C1C222BA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 01:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621E99479;
-	Tue, 30 Jul 2024 01:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240198827;
+	Tue, 30 Jul 2024 01:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GT/pXWaq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjbpV/ti"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBEA8821
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643B68C0B
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722302936; cv=none; b=t6HIOKb0HJehFqMQqzSJJ1amGtZ4D37Unb1/6GVOcmmRcPMSYM4nWMstiIARlBWf5N2R7DRFdUyNgSy2lpq9FfrlxSsU9I+sgB710sorr1wWukqT21lRDzyTi2+zm21LbWnz02qEzSXVpIJxEg/q3EQqBPPTiyqELdJKKPMJSCE=
+	t=1722302959; cv=none; b=umJGXbi5R2SI3zBEd0LK9xz+3TUS/ON9MGh7P1ClRNkIpwP8WCZI/GBXvPe7ZUpUBl9PjqmQj1gYdr0du4Zwqyn+3zyLg8LvuIOV/D5KzY0i2UyLfIbphGlOwVFJ0V7Y9axWY0hR4CRfa6hqwLi25QAhPBQDp24ZSIOsFV2hD4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722302936; c=relaxed/simple;
-	bh=1h6fzE7CDmV1O0t5HtGQutaiZcu3XDixPdfniPx64Ns=;
+	s=arc-20240116; t=1722302959; c=relaxed/simple;
+	bh=6V2Eg0+AV6C5wE2oxMFjIOKPbugqLyq7K0dfTJQYrkA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ICWL29E0MtKo0+MJBiYWFJn90MCEdwrz18j8FrLOk6c1O/5UJN2b0R1E3HF94r5a7J+Pc7EamCuxmbNUUWHlR7NOwAoTd8ylHZsOPpss4bQd5PH8a6YKrzcX+31wHCp01HjZ7LdGojxe+Nngi7K0QkIU2GyBAZTXfgMb5jbm0M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GT/pXWaq; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=NdDbQlNTynChddQ6GcVPDwmEnoWJPdh8sXbRrnfl9xbG/PNYpz/KW4sRtlWGZmrvQFPMOqMqt30BnA1Lff6/VItLwjo+J/F81+kzyoQbmSJRaFD5/5qQxEre9LeEyHSErzy99hh+S31Wo7nKFLsncP5wgkQyYenxH2S71SXC1bQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjbpV/ti; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722302933;
+	s=mimecast20190719; t=1722302956;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1rmIJ5vFT5Yjjbs7pVvMcPXGKtaSi+0yKhvgi7LK01Y=;
-	b=GT/pXWaqHLcCLc1Bne/AMP3mTy+uaKQtGtcQTmfBxR2X01LnUhmht71Hcd+RpHp9TlfaRl
-	L4j+U8tQx42VlZL7rqU3xySDQumitrtoYrpdhkfClsnruwejSSVMkGGYlrW3Uy4nC4U7xT
-	2lhh5d44LagcGU0kya3Te9FCVg/AvfA=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=O7worZc1WoS5CXw2Mg6pRcBJ9Od3yKPnwBVoMm0OgZU=;
+	b=cjbpV/tiZGvODTayr3j4CoXyfisOtLhAP72sMGUo6+kGpIwVwOc9SQ1TnPi28SaWdqh6qP
+	RKLg4V4YKyOG9CDt8v4sIG5mbwQQ64bdVrlhBpdTXjjqU/u4CKj3xQjzvtJI8ZVJGytuLB
+	CiudeAMWH9FwWwp3SR8vec/kj17foRY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-OG87ry4mMtyld3lTwFoHKw-1; Mon, 29 Jul 2024 21:28:50 -0400
-X-MC-Unique: OG87ry4mMtyld3lTwFoHKw-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef3133ca88so39077671fa.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 18:28:49 -0700 (PDT)
+ us-mta-637-eAoZaaQjOKir9ma00WPmGg-1; Mon, 29 Jul 2024 21:29:14 -0400
+X-MC-Unique: eAoZaaQjOKir9ma00WPmGg-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5af786d643aso2570368a12.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jul 2024 18:29:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722302927; x=1722907727;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1rmIJ5vFT5Yjjbs7pVvMcPXGKtaSi+0yKhvgi7LK01Y=;
-        b=P87i+ppW+ShsuvGvlu8X+U/puhD/Mv+uL+5HEMQu/RtqX3UdczergtfeVzx9He3c/t
-         NMoS0L9gt3xLW8GSat97uMTwfFnmSJ24HHAOtrWySmXJ4Ew5ifY+s3UvTXFM4Apj90Oa
-         5XDWC2QNRfXCVertlm8wSsT15Ymi8h/Ag/PATcio7HMzEpNig88g9Pj5934ftrTHUBEy
-         TBaYBMS8Lio16RGLH1nt8DCbLvjo+fN6WWVTnfiG1joEnzdy2d5McxsCcJAAP+h9JNZW
-         3+uXxfWJHLSTlFHCTKsHCoVwnQrBVzcYtNYs3xyk+7gjAkEHkuogx0TN1s9m5YK1SdBa
-         Lx5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVV5CDcugn9oopED7wV/GzSbTPf3a/3myb9oVCaZ3CWsA0tQ4QTIlcNpa/v1/pzDdwABBzUDG+swTlnLdwa5LDaqEYZpf7g
-X-Gm-Message-State: AOJu0YywJIVg69p1uoflBUcUyOOyknbS7o0VMKRIn/5zN+JWNLhFQYMF
-	EYlVZHzY8VTYo1Ay/Fd6hCuxIRQxTbfrsy5fhfTG/90pqxfuOx8tRvdVtG/a81QF8twkDxE4Iru
-	Tww6tipHao+LSYL+iIm2dqzsEP8v5p3cKi1TI4ZddPzqavN2ZkygqX4CruwmgB/DVzCkVH1fnJS
-	829+1ty9Yr9sSxlLo6QiEeJmRRigY4Ob/4WJsi
-X-Received: by 2002:a2e:8ed6:0:b0:2ef:208f:9ec0 with SMTP id 38308e7fff4ca-2f12ee05f83mr63094061fa.14.1722302927737;
-        Mon, 29 Jul 2024 18:28:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHtzdiCpJ9XgLdCKEY4EksF7k+lVK2MjMN+/4Tci3YtSJYsZZW4stODQlF5ADRUckTfa0JhEthcKDqHdk90vQk=
-X-Received: by 2002:a2e:8ed6:0:b0:2ef:208f:9ec0 with SMTP id
- 38308e7fff4ca-2f12ee05f83mr63093981fa.14.1722302927388; Mon, 29 Jul 2024
- 18:28:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722302954; x=1722907754;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O7worZc1WoS5CXw2Mg6pRcBJ9Od3yKPnwBVoMm0OgZU=;
+        b=e+Fb7ztBTNVhdpfsiJgMm4AkQXw5tTz95Id/cDfuLx+l/g5mzDkmibEmgJ7O49TU/h
+         URaAUOldB99YHBtuOhgzkZHPxCmSRxU7oJy+kRO2X1G7zBdky5tOYH3W9RcJOLScQOgy
+         /8GURXe7gBJdTSg2903llkWV/hyIEou6MH0dIFFBU4rUjXW8a3OpQ57h5GGdgwbxIXJ9
+         wU0djG/H2gBSLMHfl/qA5lkobDycg2U69DhvFl3rKe9avOxuL18NyS96SV1TJgqJ3cvc
+         hW5i5fcbKSehXX6THtjSHxYRAzlyCTa/2+FaH54+tGWM+o2iexrnKpneKeunPseO0rMz
+         Wnmw==
+X-Forwarded-Encrypted: i=1; AJvYcCVko27I+PzHy9aSDauM3hDzT2M5TcFZczT1AhX6kOTeuZoOJik7HgIojE0LWlAV2mnJ+6Bvy+CKKk8lEFz+1ur4zOevlYP5
+X-Gm-Message-State: AOJu0YwDZjVrKw4Yg+rDpsCuLjBEn9EavPL4hAm1B1Q5XeNcnPbVK+m7
+	tEiqUd/rE4CZ6MBZ9g+SVHGThPUY0e2fBYrqa9ON3N/H/4g2YcosTFP5aBTRllQ9ruSTWVeDFW8
+	scni07tcmwciKZfO5/ZPcLnuLWrOwVWysDjt2UQzj4OnloFK1Bo59rQ7qnARduCLcsiEHCkj5+O
+	zW0ILwqERQDJ0V8RDBmv9gRXYcKjg1
+X-Received: by 2002:a50:aadb:0:b0:5a3:3b44:ae00 with SMTP id 4fb4d7f45d1cf-5b020ea8945mr5859946a12.20.1722302953773;
+        Mon, 29 Jul 2024 18:29:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLuOO7m5Qr5P8MSrVRUXIug1lSaQ0AKlobOKhsrzfg5Qpeu0JjwO/i2NWbI/Rn9Tgkhkq9CAnEijp0eyxafS0=
+X-Received: by 2002:a50:aadb:0:b0:5a3:3b44:ae00 with SMTP id
+ 4fb4d7f45d1cf-5b020ea8945mr5859930a12.20.1722302953410; Mon, 29 Jul 2024
+ 18:29:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729052146.621924-1-lulu@redhat.com> <20240729052146.621924-3-lulu@redhat.com>
- <a5898ab7-a2ad-412a-85e6-9c7ad590704c@lunn.ch>
-In-Reply-To: <a5898ab7-a2ad-412a-85e6-9c7ad590704c@lunn.ch>
+References: <20240729052146.621924-1-lulu@redhat.com> <20240729052146.621924-4-lulu@redhat.com>
+ <aa0ffd28-bfb8-4b25-8730-a522861bca98@lunn.ch>
+In-Reply-To: <aa0ffd28-bfb8-4b25-8730-a522861bca98@lunn.ch>
 From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 30 Jul 2024 09:28:10 +0800
-Message-ID: <CACLfguUkEtB2cTBrsC_GaxxMdVk_kXjO-gokDUNdECSuCrsLoQ@mail.gmail.com>
-Subject: Re: [PATCH v7 2/3] vdpa_sim_net: Add the support of set mac address
+Date: Tue, 30 Jul 2024 09:28:36 +0800
+Message-ID: <CACLfguWt1Uw=tpKCViz9+Hv-s3EvuAc6YeHP3yWYtg6tnuC9Hg@mail.gmail.com>
+Subject: Re: [PATCH v7 3/3] vdpa/mlx5: Add the support of set mac address
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, 
 	sgarzare@redhat.com, netdev@vger.kernel.org, 
 	virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 30 Jul 2024 at 03:15, Andrew Lunn <andrew@lunn.ch> wrote:
+On Tue, 30 Jul 2024 at 03:16, Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> > +static int vdpasim_net_set_attr(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev,
-> > +                             const struct vdpa_dev_set_config *config)
+> > +static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev *v_mdev, struct vdp=
+a_device *dev,
+> > +                           const struct vdpa_dev_set_config *add_confi=
+g)
 > > +{
-> > +     struct vdpasim *vdpasim = container_of(dev, struct vdpasim, vdpa);
-> > +     struct virtio_net_config *vio_config = vdpasim->config;
-> > +
-> > +     mutex_lock(&vdpasim->mutex);
-> > +
-> > +     if (config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> > +             ether_addr_copy(vio_config->mac, config->net.mac);
-> > +             mutex_unlock(&vdpasim->mutex);
-> > +             return 0;
-> > +     }
-> > +
-> > +     mutex_unlock(&vdpasim->mutex);
-> > +     return -EINVAL;
+> > +     struct virtio_net_config *config;
+> > +     struct mlx5_core_dev *pfmdev;
+> > +     struct mlx5_vdpa_dev *mvdev;
+> > +     struct mlx5_vdpa_net *ndev;
+> > +     struct mlx5_core_dev *mdev;
+> > +     int err =3D -EINVAL;
 >
-> EOPNOTSUPP would be more appropriate.
+> I would say this should also be EOPNOTSUPP.
 >
->         Andrew
->
-will change this
+sure=EF=BC=8C will change this
 Thanks
 cindy
+> > +
+> > +     mvdev =3D to_mvdev(dev);
+> > +     ndev =3D to_mlx5_vdpa_ndev(mvdev);
+> > +     mdev =3D mvdev->mdev;
+> > +     config =3D &ndev->config;
+> > +
+> > +     down_write(&ndev->reslock);
+> > +     if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> > +             pfmdev =3D pci_get_drvdata(pci_physfn(mdev->pdev));
+> > +             err =3D mlx5_mpfs_add_mac(pfmdev, config->mac);
+> > +             if (!err)
+> > +                     ether_addr_copy(config->mac, add_config->net.mac)=
+;
+> > +     }
+> > +
+> > +     up_write(&ndev->reslock);
+> > +     return err;
+>
+>
+>     Andrew
+>
+> ---
+> pw-bot: cr
+>
 
 
