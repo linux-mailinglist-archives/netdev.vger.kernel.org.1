@@ -1,67 +1,57 @@
-Return-Path: <netdev+bounces-114235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDB3F941A7A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:44:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 562CB941AB7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 678BD1F25947
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:44:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11ACC280BDB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18B61898E4;
-	Tue, 30 Jul 2024 16:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447D218801A;
+	Tue, 30 Jul 2024 16:46:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLM52lno"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DHFnND48"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A2818801C;
-	Tue, 30 Jul 2024 16:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0901A6166;
+	Tue, 30 Jul 2024 16:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722357847; cv=none; b=EYIaTw88s4RP3iCAsUca0f3r/jBoAYRvW+nS5qr8jCgi6Z5sYlkGdMusBCuIrAzW+xccXsYM1b8zCHrL9QNKZSO0vcHMdz2JBDKX2bdZEINnOm2vmd4k7Y0gzHJHhDm+AxyA1dZ2GWs3kdbSnMxkIg+NSAv+WAv88mRppihnuNM=
+	t=1722357995; cv=none; b=kCb6A2ODJZc09cQGMx35RdwC5v2ztGcFKyxDjpjnji7k7OEAMiqx/rLCXpdHuq0F/Bm4e3mCc99bf5YaHtvMLOLDlLFL1S0uOYgFIa6nU0sX0XhbbPrrDZwkl2Rk4CTt+SyDen6KXl4CHlymLd/FpjJ2p/OXZka0tB1rrWt3muY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722357847; c=relaxed/simple;
-	bh=Rftd5SMFzgvkrqtKYeOg6P+2kJ52Nckqpi9+qfZgqvc=;
+	s=arc-20240116; t=1722357995; c=relaxed/simple;
+	bh=yKocv73H+egn5xniKK26t57F3q3tjDzVqN7vvpAbTsY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=efK/WS3/FmIEFOPH7RQNCuXEWF0mpnL+tHHX+AcLjnXJ06nTTM/LFltUklAqI/pA9GCd7qKzFGirN1zeWiH6dlNWd/oEaATVb565fK4jCpYLFOPxIbj2po9nvWHfI64TtoFteN55+LosaRA9Hqr3dZls7qEx6Ya56GJBT0QAIo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLM52lno; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEF2EC32782;
-	Tue, 30 Jul 2024 16:44:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ETi1bF1PgO5TnHyIOa8yHKPdES+UXplI0Uda4P8/3KrDtSvO1MhrgQeyi2/207OZy0BQMb1WG2CxG6e5afIyLpOAIluS/E72UQS/CL9vNoLtqxABVtndipTQUXVmXQ+YnRktQ7bT0wz8In9kMqqJ9DAT0SXlKJ95byhZSlDdJHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DHFnND48; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30E80C4AF11;
+	Tue, 30 Jul 2024 16:46:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722357847;
-	bh=Rftd5SMFzgvkrqtKYeOg6P+2kJ52Nckqpi9+qfZgqvc=;
+	s=k20201202; t=1722357994;
+	bh=yKocv73H+egn5xniKK26t57F3q3tjDzVqN7vvpAbTsY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CLM52lnozQsI4sXRr0KOts2j9HhXwa/TsStKURYBcCScyOTqEwo8mdBIAXfH6uP+A
-	 5lOv8LY9BPSu+BifTimHjr6LBDCDVtkMaSFDT3qDbk26yxtgvb5aadvp191B7qTRxX
-	 Bi6CW+eHp0OcxJHeKIvmL7ck2PaX3oefXgD3+1Z5QwscC4HXd/3LyH/3rhGLIZeka5
-	 5YB0ISkkCiSPR3WjApCOJ5GqCgPlphKBiYx/cwjwTfxoXAeiyNH12chjCkWylQCn0T
-	 8qMm1KxBlF9LN+RqaGbRfYibpVLWf5iPPnfh8G/JuHMPtJXb4fGzOg78zlVh9vugS8
-	 go6EvMm6NPVQQ==
-Date: Tue, 30 Jul 2024 17:44:01 +0100
+	b=DHFnND488rxxZJnzdmpMR00HFpiDrHPdXtEQmHAistn3OGYmVUyEUXAIM0en3BruP
+	 B/8iWUELTLa4bhS1YmkhWidHmq6kj084YU5KRPykIyjZlOe+lm7QAbLz9A+78LGqPA
+	 X29lO6MPcJLr11DDdxMmWsOQ5R1zZHgw/xTDjRINpjfZvWqeZNMYRaPEhq7ATbSqSl
+	 7yd+AUTwWK+fYkOppRRz3Qvr5mW9dwOtxgvRvhBBDPIautHjim1K4et9kh49Fqw+wq
+	 WtHrLeZl9uD5AuOWaC8228ddxfhhSz/00Dz4myIEOTvG0cuRCa7OPh+H3uanA0Eci1
+	 +0qyU8PyhywZQ==
+Date: Tue, 30 Jul 2024 17:46:31 +0100
 From: Simon Horman <horms@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: kernel@pengutronix.de, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Elaine Zhang <zhangqing@rock-chips.com>,
-	David Jander <david.jander@protonic.nl>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH can-next 12/21] can: rockchip_canfd: add TX PATH
-Message-ID: <20240730164401.GD1967603@kernel.org>
-References: <20240729-rockchip-canfd-v1-0-fa1250fd6be3@pengutronix.de>
- <20240729-rockchip-canfd-v1-12-fa1250fd6be3@pengutronix.de>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	kuba@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: Add skbuff.h to MAINTAINERS
+Message-ID: <20240730164631.GE1967603@kernel.org>
+References: <20240729141259.2868150-1-leitao@debian.org>
+ <20240730125700.GB1781874@kernel.org>
+ <ZqkQPeb8iNlqfSh9@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,44 +60,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240729-rockchip-canfd-v1-12-fa1250fd6be3@pengutronix.de>
+In-Reply-To: <ZqkQPeb8iNlqfSh9@gmail.com>
 
-On Mon, Jul 29, 2024 at 03:05:43PM +0200, Marc Kleine-Budde wrote:
-> The IP core has a TX event FIFO. In other IP cores, this type of FIFO
-> normally contains the event that a CAN frame has been successfully
-> sent. However, the IP core on the rk3568v2 the FIFO also holds events
-> of unsuccessful transmission attempts.
+On Tue, Jul 30, 2024 at 09:09:33AM -0700, Breno Leitao wrote:
+> Hello Simon,
 > 
-> It turned out that the best way to work around this problem is to set
-> the IP core to self-receive mode (RXSTX), filter out the self-received
-> frames and insert them into the complete TX path.
+> On Tue, Jul 30, 2024 at 01:57:00PM +0100, Simon Horman wrote:
+> > On Mon, Jul 29, 2024 at 07:12:58AM -0700, Breno Leitao wrote:
+> > > The network maintainers need to be copied if the skbuff.h is touched.
+> > > 
+> > > This also helps git-send-email to figure out the proper maintainers when
+> > > touching the file.
+> > > 
+> > > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > 
+> > I might have chosen the NETWORKING [GENERAL] rather than the
+> > NETWORKING DRIVERS section. But in any case I agree skbuff.h
+> > should be added to Maintainers.
 > 
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> I will move the same change to "NETWORKING [GENERAL]" then, and carry
+> you Reviewed-by if you don't mind.
 
-...
-
-> diff --git a/drivers/net/can/rockchip/rockchip_canfd-tx.c b/drivers/net/can/rockchip/rockchip_canfd-tx.c
-
-...
-
-> +void rkcanfd_handle_tx_done_one(struct rkcanfd_priv *priv, const u32 ts,
-> +				unsigned int *frame_len_p)
-> +{
-> +	struct net_device_stats *stats = &priv->ndev->stats;
-> +	unsigned int tx_tail;
-> +	struct sk_buff *skb;
-> +
-> +	tx_tail = rkcanfd_get_tx_tail(priv);
-> +	skb = priv->can.echo_skb[tx_tail];
-
-nit: skb is set but otherwise unused in this function.
-
-> +	stats->tx_bytes +=
-> +		can_rx_offload_get_echo_skb_queue_timestamp(&priv->offload,
-> +							    tx_tail, ts,
-> +							    frame_len_p);
-> +	stats->tx_packets++;
-> +}
-
-...
+Thanks, please feel free to do so.
 
