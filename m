@@ -1,120 +1,266 @@
-Return-Path: <netdev+bounces-114269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7469F941FD1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB13941FE0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11D6CB23748
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:40:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3017D1C236F8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B451AA3EA;
-	Tue, 30 Jul 2024 18:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6381AA3D8;
+	Tue, 30 Jul 2024 18:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSdHA+uj"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="hqt5oVgZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73AC1AA3E5;
-	Tue, 30 Jul 2024 18:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED491AA3DC
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 18:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722364523; cv=none; b=MG6QNK0BE3MTr0UMoSgmPVtufERyW2Itk+zru7n9O5FZrb4j0YT4xESx1UjXqtWxL9DH2YieWOxmpyAdKEN3qxGSDiJMDfVt8z45Z1bCGqDJZNCnHM7Tpw7fxbuLNOgXgWR+G5t3mq8B225CnjK0lSIOXurXYR+b9uWWnfIwv+U=
+	t=1722364908; cv=none; b=skjGIewHTiqM3yv55cxbdxGa1zzewgWc8CRa3JI308hzjOgT4w+EjDQ8LPqdIhT7wPxot/DCEvdTLfeJeiLiITKjb+j+tfNjwzGHKkVXVUrAS7Z2b4HnvWNn/6G+/Zua5ORnLz77ObooBdWN7BCU6RZv+8ZS4miFKPaxvKWTc5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722364523; c=relaxed/simple;
-	bh=a9zVeYZyd9wID53krBAydEjTEwQDpq7/DntshAZDSIs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CPyXPkgSbIGHZT+nfHcv3JtBr9vCSdaCNyj9PiESCJN+e1TqkXuMOyYUqk3/hD2J+CaW4RcTAnJsmx++t5gyKSBgiNCxCK9kVT1seQ/MPy6PgI4QzAa5tOJjmRJMZ5V2tRO7ffDLfuvGmB/JZHPJkzscWM+Lnu7JQBpuh+3/bbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dSdHA+uj; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3684407b2deso2375469f8f.1;
-        Tue, 30 Jul 2024 11:35:21 -0700 (PDT)
+	s=arc-20240116; t=1722364908; c=relaxed/simple;
+	bh=cQu6W4UI8ZhYAkUGkdwfn6ra/TVUApW7l9/Nhh1ufIg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ckyfi+0Sh8YLmYspR7+8NaYXH6XHYDD0+jckqT3FDtXMm0SZFwoGbrpDR0VOlQC7Dn2rayF5KvRWPgNcg2vTvQGvl67hjECaRq0OGnAT+fzI7LirfbD6ZSsIFEAyYmJ6wnCo/e94vb4M5shtU/6h8Ku38J9DAniXBnmyZKmvmM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=hqt5oVgZ; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b79c27dd01so27690076d6.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 11:41:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722364520; x=1722969320; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wrUl/QqE0nKjd66nMZZSf0qwwi0vmfglBhqvBDkOk1w=;
-        b=dSdHA+ujkGu7p/77M8J//D1ivf5y5hBUhE4POhfn6wL3ktiYfVaBQN4pjpqr0ep04y
-         jHYZ0pYhovL+uLy0g+WzjmAG8fJLyPWdia/D4jKNB+GaYVMwbI7MwtBGPvTjgTRXd+kv
-         vZ5/BDOlntx7SyfZn4dq+xHidU+PIAgIbe/3lcEzQBI7yC88W4xQsDUmRVNzNNRv1vHI
-         LzooPop3eRJ0t7rqvQrP0be3lII2W4G4GYR2fY7GtHP921K0kBBf+PLQqi36uSm0hADv
-         kR5MOXjyznt6zzW0W6m/T+iN026b/c/ilIx3iLCQbSLSucGU/r4MsabfM+z1ZGXsDLGF
-         XRGg==
+        d=bytedance.com; s=google; t=1722364905; x=1722969705; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FMSUZZptWgXq4XhSFPCYKksGJubsTg0zmMWwFlEEsGQ=;
+        b=hqt5oVgZQnnHbE06wGXWeJS8wM6HFns3kvimEE3wnKXeu9/OJCT/pI1awKdxWitTVG
+         50QJt3MF8dWJ9bKqsyby7DuUWZps8elty4FjCCU8coS9h1bal5jF9kMEzeLFmyUzyYVG
+         3WqAN0PvliWLxTDW1Mrt34ZFUzqH5GfhES0Flo7AHU/QvjiPZ+EJcM6ujVpAPkP4EDEF
+         V6pDALV+xN0ah4rmndjg/MdVvdWImgRrMVfIvfe3flckR36W4lRuGUxFwge6joGuQK9z
+         CuMtk2fp45zLn5F2Yaooy7Oxg1DEzi6a0g23pi28a0uqLJ71Oy5MVyba6elAP29iWSGd
+         v//A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722364520; x=1722969320;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wrUl/QqE0nKjd66nMZZSf0qwwi0vmfglBhqvBDkOk1w=;
-        b=XnKj6AdIHTmEcKVuFDjSe+8Gez2JTAGVg2ulsbhi1cSWIV0M3+Ew9Xpy9wmyqen+Km
-         F7ISeAyBzhvRY11c+IsUUkdTn5VJ/L/xNAymZLy14YspmQj5bl0UddE57m7VZaN1cJtA
-         xuxP7wX+7qPYdjmvDIfDs/ZA76dD2FPH8+TAGjheSHYPuSRpu2SM2Gj4zrCquwr8WUnv
-         zQ+QF9hsAgfMqIxAR6CLqiKVdlcjaCTKBHwHtuZztPzfqQ0FqDZM5T7gG2i+3rmE/kvZ
-         gCORWIuQU9OgQlKWw8rNnGnbxMF+pwty/7qfk22nDfzx3fezEW3s7lc5uwBveKWlvn17
-         eN9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUk5pBJZvQakTZ9bf6w8UfVfeFW8w1s7n2rpU9xkpQo32lHdQHSAvk7+3xTaoOG0uhmA1ljzrKr2hFdGQLAI97qXCgQ/OeaO6rqsu94ppxi04MTZpA29p0qLit0nuyIacGAL7Xa
-X-Gm-Message-State: AOJu0YwaGWYbGuV2HQFYXYItx+zUBRzuG0cjNd1WSW6QXfyl2Dmmlb0J
-	+dcIId18fXiJGOwPUcktIDs7lSNAg8zTaL4wfAIGfW0MCXUJK+cVvElGfJfR3rI7MtVgNZ9gruX
-	IBzWZRE7B0R4HzQqIgGn1tnYBMBI=
-X-Google-Smtp-Source: AGHT+IGUMs3KJS+FkWbup/9qo//aVW8oevFDm36CcNuXhST2ddPZ2LgWixjb4GV1XYV/LixtZssTKYD7kfUBQo+vK48=
-X-Received: by 2002:adf:fbcc:0:b0:369:f664:ff4a with SMTP id
- ffacd0b85a97d-36b5d073da8mr8311007f8f.38.1722364519826; Tue, 30 Jul 2024
- 11:35:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722364905; x=1722969705;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FMSUZZptWgXq4XhSFPCYKksGJubsTg0zmMWwFlEEsGQ=;
+        b=T5gjDShJAuiHX7ln/jfvq43/3trxHwIB0vHhQyXrqGwoqz/aTw3SUsH/iZyZZodKIV
+         I/HSChN5mLySe/03ClxiKz03vpfGRnPlt/b45osBCv4RM09GrSmPGS5redf1gceNguDd
+         qhuGB9lJ2K7WEGfQGnQ3uKh3yEpzFzGAR8ltj33jmpTtizCxk/yDdVH4xXXManqCIW1O
+         YXV4RnWuUKJ8TEmbCx4oGtIAItDhV6eE61wVzWaGiNXYZ0BcQ9cM6pXS7M6tAGOjId3R
+         KP6W/IwzDzIWFgSYQKROjyEE9t/ABs7N21RKTOW8kn5WbdoKmewK6O0bBu239bEyLeT0
+         5XZw==
+X-Gm-Message-State: AOJu0Yxb7thPQEzeyJwLgVIhZkcj3Y55k3+OBnX0rA/NMJ7Pl33AxUI3
+	Wt5u0KxSeGd9fud6epK6DTJf5mGGnks0IPXMPCa6LsJ4kwRusMTCrPKHlctK5zFNxEQGAM1YE+y
+	3
+X-Google-Smtp-Source: AGHT+IHu3QxO7K9JwS90h8vXZWn3FRmiyKLJ+Z/nFLdlnRlTlnwHODIKkZCGjGrSpVBvjE40338Udw==
+X-Received: by 2002:a05:6214:415:b0:6b5:7e0b:eafb with SMTP id 6a1803df08f44-6bb55a113f6mr161858606d6.24.1722364904780;
+        Tue, 30 Jul 2024 11:41:44 -0700 (PDT)
+Received: from n191-036-066.byted.org ([139.177.233.173])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3fb07bf7sm66132716d6.137.2024.07.30.11.41.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 11:41:43 -0700 (PDT)
+From: zijianzhang@bytedance.com
+To: netdev@vger.kernel.org
+Cc: linux-api@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	almasrymina@google.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	axboe@kernel.dk,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com,
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH net-next v8 0/3] net: A lightweight zero-copy notification mechanism for MSG_ZEROCOPY
+Date: Tue, 30 Jul 2024 18:41:17 +0000
+Message-Id: <20240730184120.4089835-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729183038.1959-1-eladwf@gmail.com> <20240729183038.1959-2-eladwf@gmail.com>
- <ZqirVSHTM42983Qr@LQ3V64L9R2>
-In-Reply-To: <ZqirVSHTM42983Qr@LQ3V64L9R2>
-From: Elad Yifee <eladwf@gmail.com>
-Date: Tue, 30 Jul 2024 21:35:08 +0300
-Message-ID: <CA+SN3soUmtYfM_qVQ7L1gHMSLYe2bDm=6U9UwFLvj35odT0Feg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] net: ethernet: mtk_eth_soc: use prefetch methods
-To: Joe Damato <jdamato@fastly.com>, Elad Yifee <eladwf@gmail.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>
-Cc: Stefan Roese <sr@denx.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 30, 2024 at 11:59=E2=80=AFAM Joe Damato <jdamato@fastly.com> wr=
-ote:
->
-> Based on the code in mtk_probe, I am guessing that only
-> MTK_SOC_MT7628 can DMA to unaligned addresses, because for
-> everything else eth->ip_align would be 0.
->
-> Is that right?
->
-> I am asking because the documentation in
-> Documentation/core-api/unaligned-memory-access.rst refers to the
-> case you mention, NET_IP_ALIGN =3D 0, suggesting that this is
-> intentional for performance reasons on powerpc:
->
->   One notable exception here is powerpc which defines NET_IP_ALIGN to
->   0 because DMA to unaligned addresses can be very expensive and dwarf
->   the cost of unaligned loads.
->
-> It goes on to explain that some devices cannot DMA to unaligned
-> addresses and I assume that for your driver that is everything which
-> is not MTK_SOC_MT7628 ?
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-I have no explanation for this partial use of 'eth->ip_align', it
-could be a mistake
-or maybe I'm missing something.
-Perhaps Stefan Roese, who wrote this part, has an explanation.
-(adding Stefan to CC)
+Original notification mechanism needs poll + recvmmsg which is not
+easy for applcations to accommodate. And, it also incurs unignorable
+overhead including extra system calls.
+
+While making maximum reuse of the existing MSG_ZEROCOPY related code,
+this patch set introduces a new zerocopy socket notification mechanism.
+Users of sendmsg pass a control message as a placeholder for the incoming
+notifications. Upon returning, kernel embeds notifications directly into
+user arguments passed in. By doing so, we can reduce the complexity and
+the overhead for managing notifications.
+
+We also have the logic related to copying cmsg to the userspace in sendmsg
+generic for any possible uses cases in the future. However, it introduces
+ABI change of sendmsg.
+
+Changelog:
+  v1 -> v2:
+    - Reuse errormsg queue in the new notification mechanism,
+      users can actually use these two mechanisms in hybrid way
+      if they want to do so.
+    - Update case SCM_ZC_NOTIFICATION in __sock_cmsg_send
+      1. Regardless of 32-bit, 64-bit program, we will always handle
+      u64 type user address.
+      2. The size of data to copy_to_user is precisely calculated
+      in case of kernel stack leak.
+    - fix (kbuild-bot)
+      1. Add SCM_ZC_NOTIFICATION to arch-specific header files.
+      2. header file types.h in include/uapi/linux/socket.h
+
+  v2 -> v3:
+    - 1. Users can now pass in the address of the zc_info_elem directly
+      with appropriate cmsg_len instead of the ugly user interface. Plus,
+      the handler is now compatible with MSG_CMSG_COMPAT and 32-bit
+      pointer.
+    - 2. Suggested by Willem, another strategy of getting zc info is
+      briefly taking the lock of sk_error_queue and move to a private
+      list, like net_rx_action. I thought sk_error_queue is protected by
+      sock_lock, so that it's impossible for the handling of zc info and
+      users recvmsg from the sk_error_queue at the same time.
+      However, sk_error_queue is protected by its own lock. I am afraid
+      that during the time it is handling the private list, users may
+      fail to get other error messages in the queue via recvmsg. Thus,
+      I don't implement the splice logic in this version. Any comments?
+
+  v3 -> v4:
+    - 1. Change SOCK_ZC_INFO_MAX to 64 to avoid large stack frame size.
+    - 2. Fix minor typos.
+    - 3. Change cfg_zerocopy from int to enum in msg_zerocopy.c
+
+  Initially, we expect users to pass the user address of the user array
+  as a data in cmsg, so that the kernel can copy_to_user to this address
+  directly.
+
+  As Willem commented,
+
+  > The main design issue with this series is this indirection, rather
+  > than passing the array of notifications as cmsg.
+
+  > This trick circumvents having to deal with compat issues and having to
+  > figure out copy_to_user in ____sys_sendmsg (as msg_control is an
+  > in-kernel copy).
+
+  > This is quite hacky, from an API design PoV.
+
+  > As is passing a pointer, but expecting msg_controllen to hold the
+  > length not of the pointer, but of the pointed to user buffer.
+
+  > I had also hoped for more significant savings. Especially with the
+  > higher syscall overhead due to meltdown and spectre mitigations vs
+  > when MSG_ZEROCOPY was introduced and I last tried this optimization.
+
+  We solve it by supporting put_cmsg to userspace in sendmsg path starting
+  from v5.
+
+  v4 -> v5:
+    - 1. Passing user address directly to kernel raises concerns about
+    ABI. In this version, we support put_cmsg to userspace in TX path
+    to solve this problem.
+
+  v5 -> v6:
+    - 1. Cleanly copy cmsg to user upon returning of ___sys_sendmsg
+
+  v6 -> v7:
+    - 1. Remove flag MSG_CMSG_COPY_TO_USER, use a member in msghdr instead
+    - 2. Pass msg to __sock_cmsg_send.
+    - 3. sendmsg_copy_cmsg_to_user should be put at the end of
+    ____sys_sendmsg to make sure msg_sys->msg_control is a valid pointer.
+    - 4. Add struct zc_info to contain the array of zc_info_elem, so that
+    the kernel can update the zc_info->size. Another possible solution is
+    updating the cmsg_len directly, but it will break for_each_cmsghdr.
+    - 5. Update selftest to make cfg_notification_limit have the same
+    semantics in both methods for better comparison.
+
+  v7 -> v8:
+    - 1. Add a static_branch in ____sys_sendmsg to avoid overhead in the
+    hot path.
+    - 2. Add ZC_NOTIFICATION_MAX to limit the max size of zc_info->arr.
+    - 3. Minimize the code in SCM_ZC_NOTIFICATION handler by adding a local
+    sk_buff_head.
+
+* Performance
+
+We update selftests/net/msg_zerocopy.c to accommodate the new mechanism,
+cfg_notification_limit has the same semantics for both methods. Test
+results are as follows, we update skb_orphan_frags_rx to the same as
+skb_orphan_frags to support zerocopy in the localhost test.
+
+cfg_notification_limit = 1, both method get notifications after 1 calling
+of sendmsg. In this case, the new method has around 17% cpu savings in TCP
+and 23% cpu savings in UDP.
++----------------------+---------+---------+---------+---------+
+| Test Type / Protocol | TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++----------------------+---------+---------+---------+---------+
+| ZCopy (MB)           | 7523    | 7706    | 7489    | 7304    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy (MB)       | 8834    | 8993    | 9053    | 9228    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy    | 117.42% | 116.70% | 120.88% | 126.34% |
++----------------------+---------+---------+---------+---------+
+
+cfg_notification_limit = 32, both get notifications after 32 calling of
+sendmsg, which means more chances to coalesce notifications, and less
+overhead of poll + recvmsg for the original method. In this case, the new
+method has around 7% cpu savings in TCP and slightly better cpu usage in
+UDP. In the env of selftest, notifications of TCP are more likely to be
+out of order than UDP, it's easier to coalesce more notifications in UDP.
+The original method can get one notification with range of 32 in a recvmsg
+most of the time. In TCP, most notifications' range is around 2, so the
+original method needs around 16 recvmsgs to get notified in one round.
+That's the reason for the "New ZCopy / ZCopy" diff in TCP and UDP here.
++----------------------+---------+---------+---------+---------+
+| Test Type / Protocol | TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++----------------------+---------+---------+---------+---------+
+| ZCopy (MB)           | 8842    | 8735    | 10072   | 9380    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy (MB)       | 9366    | 9477    | 10108   | 9385    |
++----------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy    | 106.00% | 108.28% | 100.31% | 100.01% |
++----------------------+---------+---------+---------+---------+
+
+In conclusion, when notification interval is small or notifications are
+hard to be coalesced, the new mechanism is highly recommended. Otherwise,
+the performance gain from the new mechanism is very limited.
+
+Zijian Zhang (3):
+  sock: support copying cmsgs to the user space in sendmsg
+  sock: add MSG_ZEROCOPY notification mechanism based on msg_control
+  selftests: add MSG_ZEROCOPY msg_control notification test
+
+ arch/alpha/include/uapi/asm/socket.h        |   2 +
+ arch/mips/include/uapi/asm/socket.h         |   2 +
+ arch/parisc/include/uapi/asm/socket.h       |   2 +
+ arch/sparc/include/uapi/asm/socket.h        |   2 +
+ include/linux/socket.h                      |   8 ++
+ include/net/sock.h                          |   2 +-
+ include/uapi/asm-generic/socket.h           |   2 +
+ include/uapi/linux/socket.h                 |  23 +++++
+ net/core/sock.c                             |  72 +++++++++++++-
+ net/ipv4/ip_sockglue.c                      |   2 +-
+ net/ipv6/datagram.c                         |   2 +-
+ net/socket.c                                |  63 +++++++++++-
+ tools/testing/selftests/net/msg_zerocopy.c  | 101 ++++++++++++++++++--
+ tools/testing/selftests/net/msg_zerocopy.sh |   1 +
+ 14 files changed, 265 insertions(+), 19 deletions(-)
+
+-- 
+2.20.1
+
 
