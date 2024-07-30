@@ -1,108 +1,205 @@
-Return-Path: <netdev+bounces-114283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37F3942050
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 21:08:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4329E942059
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 21:10:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D001F2417A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:08:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89D3EB21770
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A64818C910;
-	Tue, 30 Jul 2024 19:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87CD18C91A;
+	Tue, 30 Jul 2024 19:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPhkCUOf"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="cskqiIVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9205D1AA3C3;
-	Tue, 30 Jul 2024 19:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CB31AA3C5
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 19:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722366490; cv=none; b=hTaZ6QftlwnV0AukdfjmLsFMm19wqtu66ffXnyO8ZNooTFpsReEcF7w6V82ogDZZuqJuiLF8/tiI8RLEULWKQdvoJ0rQwjtsen777xdAj7v/CrkJM6Ep17RBShfwWzx38gySgtLKa1z2Hs9XyEvIhf+8ggECEi+SoPY1JOUbpfI=
+	t=1722366630; cv=none; b=TdxJejv4i4FXF35zqigDOoGJT5nuAeueR2hMJn6hGMUEyXuBzGxHhBFp3zOISBENIH1dCWWuFMA3h9MMDkNojUsEcLf6D4hf/ZAVwFCqWzWd+7j6IT+SUSVuj4zQ4RMG13hFxtEOLar2fng2K4Sle3X55xjN/ZfudFVtYwQQG20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722366490; c=relaxed/simple;
-	bh=xWVqs2258UHmA+CoMjBHPne4eFNjGXP4z5/g3OSO1M0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KXZbOXMwbFetxiiSi1n0ATN8YXrf739nw0HRUV4hQKoefQZwWjDrVSuFDE1QCnSrZvn8CjJZkAPs5CrV/jS0vocbCphsYXHQyhxUWe/Clg9XiQTC5Fx5flFUWpIw4Kc1Sw+QMkwElnFPD61Bknkhe+GTJ3cCk3VE+mPMVYrYF3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPhkCUOf; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2cf213128a1so3053562a91.2;
-        Tue, 30 Jul 2024 12:08:09 -0700 (PDT)
+	s=arc-20240116; t=1722366630; c=relaxed/simple;
+	bh=cprG9uguQ5xQAd65VG0OmI1dSJ/AIFZZf/rzJXIqOG0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k2jEEnNa2OozsIiDbZCc3Y1I9RW5I7xjhN73vyf2Oipx6q4ceycqKEYRhjeu1shSCJhdWMOI+BC/tx45hfj0GODYb0K1nXJ3SFW9F/jpLVDp4Z3rwBpqN0Glj9xhoAYmHt0ecOsBtvauuGHC9DNtpv+LFj+4a/+RtApnUO3PZIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=cskqiIVA; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-65f9e25fffaso37377757b3.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 12:10:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722366489; x=1722971289; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3dTVDxAQZ2aQnOrMxigVSHmZFXtubAHIkEkuQJGMu5g=;
-        b=OPhkCUOfSBc7MEomf7HSM1CDP0AI0df5F/03vFSCLTKD07oX4DN9XEWWrMzXXcBV7U
-         BCva7wA/jUCJ3o2FmXG6osx9kGcc7Zz/objFpjOx0xv5kp5PJYS+pSAYo7CO3EH/wrf5
-         EXA+SueEVcE6fAwbliMxXPl1XprpQUiuE+9dNFqxamT7E+0sCfgHObt8Q+uavbq4ec9c
-         s1rJluPaSBdfNFxUp2kDn4S9OVQjPCPa3Yg3+vvnVjp5mCMss9Dn466UUPk3kfF9NzA4
-         hGqC62q85yOyf4TWC7euocuQeY1y8lm06r6VD3rvwqaNb/6THPs77gCavBG6vrNswSJu
-         C/1w==
+        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1722366627; x=1722971427; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6GUnz9l9Hov01YwHIE/X99jR0yCQ8jWPdAfQd5kTxAs=;
+        b=cskqiIVAToN8u5ifsNa0Ulq7laX0u7m8tS/Wl+D6PimGeNtq+U5Z0/BwHUtu4/JtCb
+         aW1LvkVXUqvQeVwsETU8Fo3LKdiWzlzXJx/mEumEGJduxRJIsXyiVENDoBZDHQb3cKx2
+         gNNvvVey/3/LdT17UM5DEqAyHhnzvdGno5iy1GaVFnRZF0CxCFpHAzsTI+wZcyhvEiJN
+         CrI+T4hxjE3hUA/dYsEmDhOS4O6DsihpgpKyqG8CDvqbTxMMWONvy75dv1yZOr9kj8ZY
+         oE0asvQyZ/OBGG321K2Bz18mjufhZpGO35gOC5Rgsvju5PhA+VxPOMcF5vGGK6SMk4ta
+         gnRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722366489; x=1722971289;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3dTVDxAQZ2aQnOrMxigVSHmZFXtubAHIkEkuQJGMu5g=;
-        b=oqgZPOY3AQBg+LBzoZ0v18wgUZiVdcwRXvVJ8R6NEU0/HDThT3U56gfPB97sNpAxbS
-         2eEsnyXdsJ7Z9FFXs+2MJlcHQtrU7QOA3gzWlst6VJow7Z2DM7JEvrttm5f9woPrK+Ls
-         bh2YduLMLl7uAEvrUbRmA4C0PMXmG6HKrKP8GMKFmWSOU025Le7nB7SvQH44uTL/ZQHC
-         gXNFYwiGhc4/IQ+ExxgqU+5Vtrp+2ZHRIa8evcXi5KZs0WyS4mGdg8GsxKrug9LROixo
-         Gt9Fp1Nigo9ET/2Uo/dwZi44om96GO6zcmkWFbVxfFVLnCleyjTijSADesLxKrcuM00F
-         KxOA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+zpURbRKdUUC2jwPB/TchM5NwDsLLlwLXDnzFa+iaFe1J/iMTIhGcRKzMAup+TxGFowHa1L99X33O93xafNAWUHoVrsTdc/Q8aIkE2l3XVV8nNY7Kkg9VGc8fTuwbgLIyZt58/yGKiHdWBn2iYt4HMmOeXY9hGC6G20KqpVFX/270seT2
-X-Gm-Message-State: AOJu0YxuMJ+3ehnSSYHFVaie8kFR99OvyNFUpCgrQqUYe0ga0kFX+Erp
-	INbgljDlX+3RP4A7FpK7duhwHEExAoCvPNyGk4jl8Ah9HTlROEvAPx9YHv/jM+GN4YyY8vKcsSJ
-	j86DkVjGQekQDZxK48Em3R/uglNo=
-X-Google-Smtp-Source: AGHT+IGNJYK/Ium/WCNQzS+rP7PQrChYbiOyOCwmjvXXunxfEbdjCBMO21zU0d51BgrfNl6NbgST69vFnsNcR/rjtX4=
-X-Received: by 2002:a17:90a:fc98:b0:2cd:2f63:a429 with SMTP id
- 98e67ed59e1d1-2cf7e726968mr10165297a91.35.1722366488760; Tue, 30 Jul 2024
- 12:08:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722366627; x=1722971427;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6GUnz9l9Hov01YwHIE/X99jR0yCQ8jWPdAfQd5kTxAs=;
+        b=s9nki0bQKI0MLu1Z6TcyOJIvGEwyeywdeDpel5dUUUpIZxL06yfBFThUTKjwEAsUFx
+         gOnJMeN6rf/OUO+QEk5G6opX/Qgl6IryF2jF65Hj+sh8ImiNpDCYVRaXdfDPMPIgmLJK
+         gvJSmcQ3U9kEvHBUi3CRz3NSm3Gv4wEjALKut8ErIgInQ7LTXXrAVJfvgV7vHcGFlpOD
+         gSEIuOaDoY/dp1RXWi475fUL1bJu9CJGsOqB/xleY8G40mUTSx8VD0QjSzzD1WTzzfI/
+         hf2V3XscHj7ke7fbAqAU8QOpbUPWwENTfaypRDfFkm/aTc/rhy61ZfPsctN6wUlhX8VE
+         Cvfg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkJyz6H5i8JBxR6bzugx55qeR3CWssg2qg2vwlNSUlX6vZJPHTg+AzvXgR+IGYLvM5Dd7Fos2Q3wkJUB2B42P/UVSFZHp+
+X-Gm-Message-State: AOJu0YxUPOd7tXw0VKKquxKrwTWWMSyzn4ERByq5lqTJl0oYt5cMgwfJ
+	60yu0XYhYrlaECcnp53FtDEcCzwF826lYxqs05fPpRHBO7HYTiL8OEQjodAKSgQ=
+X-Google-Smtp-Source: AGHT+IFlD3BEKMaeWaD720WWKRAG4+pH3jrjmCrAEylXJ2sjoD6Kq8sCVxrr8pWB9p2fWNe43d139w==
+X-Received: by 2002:a0d:dac6:0:b0:618:95a3:70b9 with SMTP id 00721157ae682-67a09592d49mr116965087b3.36.1722366626922;
+        Tue, 30 Jul 2024 12:10:26 -0700 (PDT)
+Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6756c44ceb7sm26204097b3.140.2024.07.30.12.10.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 12:10:26 -0700 (PDT)
+Date: Tue, 30 Jul 2024 15:10:25 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: viro@kernel.org
+Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org,
+	brauner@kernel.org, cgroups@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, torvalds@linux-foundation.org
+Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
+ CLASS(...)
+Message-ID: <20240730191025.GB3830393@perftesting>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-8-viro@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com> <8c2835ed-9066-4adb-8f8b-f38416d97849@redhat.com>
-In-Reply-To: <8c2835ed-9066-4adb-8f8b-f38416d97849@redhat.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Tue, 30 Jul 2024 20:07:57 +0100
-Message-ID: <CAJwJo6bzq9qo6i0UjqO9Ma0jdTedFS2GQNtQQbPzLUCg1a49Bg@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/7] net/selftests: TCP-AO selftests updates
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730051625.14349-8-viro@kernel.org>
 
-On Tue, 30 Jul 2024 at 11:51, Paolo Abeni <pabeni@redhat.com> wrote:
-[..]
-> It looks like this is not well digested by the CI, e.g.:
->
-> https://netdev.bots.linux.dev/flakes.html?tn-needle=tcp-ao
->
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/705502/8-restore-ipv4/stdout
+On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
+> From: Al Viro <viro@zeniv.linux.org.uk>
+> 
+> There are four places where we end up adding an extra scope
+> covering just the range from constructor to destructor;
+> not sure if that's the best way to handle that.
+> 
+> The functions in question are ovl_write_iter(), ovl_splice_write(),
+> ovl_fadvise() and ovl_copyfile().
+> 
+> This is very likely *NOT* the final form of that thing - it
+> needs to be discussed.
+> 
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> ---
+>  fs/overlayfs/file.c | 72 ++++++++++++++++++---------------------------
+>  1 file changed, 29 insertions(+), 43 deletions(-)
+> 
+> diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
+> index 4b9e145bc7b8..a2911c632137 100644
+> --- a/fs/overlayfs/file.c
+> +++ b/fs/overlayfs/file.c
+> @@ -132,6 +132,8 @@ static struct fderr ovl_real_fdget(const struct file *file)
+>  	return ovl_real_fdget_meta(file, false);
+>  }
+>  
+> +DEFINE_CLASS(fd_real, struct fderr, fdput(_T), ovl_real_fdget(file), struct file *file)
+> +
+>  static int ovl_open(struct inode *inode, struct file *file)
+>  {
+>  	struct dentry *dentry = file_dentry(file);
+> @@ -174,7 +176,6 @@ static int ovl_release(struct inode *inode, struct file *file)
+>  static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
+>  {
+>  	struct inode *inode = file_inode(file);
+> -	struct fderr real;
+>  	const struct cred *old_cred;
+>  	loff_t ret;
+>  
+> @@ -190,7 +191,7 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
+>  			return vfs_setpos(file, 0, 0);
+>  	}
+>  
+> -	real = ovl_real_fdget(file);
+> +	CLASS(fd_real, real)(file);
+>  	if (fd_empty(real))
+>  		return fd_error(real);
+>  
+> @@ -211,8 +212,6 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
+>  	file->f_pos = fd_file(real)->f_pos;
+>  	ovl_inode_unlock(inode);
+>  
+> -	fdput(real);
+> -
+>  	return ret;
+>  }
+>  
+> @@ -253,8 +252,6 @@ static void ovl_file_accessed(struct file *file)
+>  static ssize_t ovl_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+>  {
+>  	struct file *file = iocb->ki_filp;
+> -	struct fderr real;
+> -	ssize_t ret;
+>  	struct backing_file_ctx ctx = {
+>  		.cred = ovl_creds(file_inode(file)->i_sb),
+>  		.user_file = file,
+> @@ -264,22 +261,18 @@ static ssize_t ovl_read_iter(struct kiocb *iocb, struct iov_iter *iter)
+>  	if (!iov_iter_count(iter))
+>  		return 0;
+>  
+> -	real = ovl_real_fdget(file);
+> +	CLASS(fd_real, real)(file);
+>  	if (fd_empty(real))
+>  		return fd_error(real);
+>  
+> -	ret = backing_file_read_iter(fd_file(real), iter, iocb, iocb->ki_flags,
+> -				     &ctx);
+> -	fdput(real);
+> -
+> -	return ret;
+> +	return backing_file_read_iter(fd_file(real), iter, iocb, iocb->ki_flags,
+> +				      &ctx);
+>  }
+>  
+>  static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
+>  {
+>  	struct file *file = iocb->ki_filp;
+>  	struct inode *inode = file_inode(file);
+> -	struct fderr real;
+>  	ssize_t ret;
+>  	int ifl = iocb->ki_flags;
+>  	struct backing_file_ctx ctx = {
+> @@ -295,7 +288,9 @@ static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
+>  	/* Update mode */
+>  	ovl_copyattr(inode);
+>  
+> -	real = ovl_real_fdget(file);
+> +	{
 
-Thanks Paolo!
-I see the 2 issues there, going to fix them up and resend v2.
-I guess, I'll wait a day or two to be polite and less disruptive to
-netdev testing.
+Is this what we want to do from a code cleanliness standpoint?  This feels
+pretty ugly to me, I feal like it would be better to have something like
 
-> BTW wearing for a moment Cato the censor's shoes, I note that patch 1 &&
-> 2 commit messages are quite more informal and less informative than the
-> average;)
+scoped_class(fd_real, real) {
+	// code
+}
 
-Yeah, fair enough. They are pretty trivial, but I should improve the
-messages there.
+rather than the {} at the same indent level as the underlying block.
 
-Thanks,
-             Dmitry
+I don't feel super strongly about this, but I do feel like we need to either
+explicitly say "this is the way/an acceptable way to do this" from a code
+formatting standpoint, or we need to come up with a cleaner way of representing
+the scoped area.  Thanks,
+
+Josef
 
