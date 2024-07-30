@@ -1,124 +1,120 @@
-Return-Path: <netdev+bounces-114215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2347F941830
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:20:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB4794184F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C22451F24C41
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:20:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A236286060
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722F018B46A;
-	Tue, 30 Jul 2024 16:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OV/dWEam"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF61D1898E3;
+	Tue, 30 Jul 2024 16:20:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E750189502
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 16:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3819189503;
+	Tue, 30 Jul 2024 16:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722356299; cv=none; b=EVOaqZCQe+/daidM6Ikem3r/uiDavKBbJ+krz7yJQS16Q2WRcL+icmdxPRaLhtMV2uXeQmx/1QcL/lQVE27rO8TFHFOOD/MJ61jY40WcR/hV9CJ8xmTbYJZnyOHsdLj70eqaDfM4+nZYeNop9rp+wSaA320hwNM1LQl7yFdzGNc=
+	t=1722356409; cv=none; b=FMBfq4Z7rQ1kUalERNAKAk2aKOxDGlQwy9NcYSRVHg/j2Bp9LAWsi7oG7ykkVZ014M/kdMQiVO5vukJFFDmuL+t5OjSOcyESlNFGXdiOw3inPKVytVsKpfNBbBiSLF/FCYJlx2feYgG5E8oRkMWxhkJlXYZXsCR55u6R54SYQiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722356299; c=relaxed/simple;
-	bh=GPiczYBJ3Z+pTVjQ8qSRIvCESPTDoFPmAj5IoCxFtEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V0hRv32QFpnS0Dp9gfRsXe+E+vazBCGOglBpL/JCphYtJ0BChDDue7iXJAMAVo7iT3FwQgGMh515ioxQXfifBL+CjEjvoQ8EruE+umb6uqPsWt+ZxkPX83gXjsXSjd7eGker/95zAwZfcspeJJUaMStWHbRx3hWQFWiuO058kOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OV/dWEam; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C2AE060005;
-	Tue, 30 Jul 2024 16:18:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1722356295;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AnQldXWFOHsFfVryyM8HJdri588IlmaG525O54nS2IA=;
-	b=OV/dWEamiGo0KWBw1DUNPpf/0kji/4Na3t0r53wYA27WAOiq/fUcQOuI79odQe08EMHZf4
-	B8mItXC9IjVMvMG0iVKQbOZIf1j4xUfKIfxOHVxY3PRIfK8a4vJ99F+VyF4BiLs8yGtJ6z
-	B155D0SnSwauNxoO/WtSM5TigT2wXAVlwcrUlAmDsifL3QXKlODdI+3zvuCtusV8sOgRho
-	JLU51sDPDiS8BRgiihCZbEZbUJCPiOEaFgI2Iu2mhCTCM06NGgV2E7QH/ZLWWRu86dtOdm
-	kxQpgt1CqqUiGv6am425/hX6Uk4Jk2HHqwJodcEDt57r60zWVU2ch2Fdy2BPEA==
-Date: Tue, 30 Jul 2024 18:18:12 +0200
-From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-To: Kyle Swenson <kyle.swenson@est.tech>
-Cc: "o.rempel@pengutronix.de" <o.rempel@pengutronix.de>,
- "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>, "kuba@kernel.org"
- <kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: pse-pd: tps23881: Fix the device ID check
-Message-ID: <20240730181812.5fc002fb@windsurf>
-In-Reply-To: <20240730161032.3616000-1-kyle.swenson@est.tech>
-References: <20240730161032.3616000-1-kyle.swenson@est.tech>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1722356409; c=relaxed/simple;
+	bh=TY5iOr5tfwo4FDpYsZpKpOOmjcoiZSnJgzg7dklim0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QzS/kBIrveRjreMv67I/TxUUpSUROf3xbTEls2URcAAe0Hz7Lt1YV852dtw1WJPxutrt10yd000zF4ygeB9qtxLYRxIjeMkdEPaDrIumOXIn9xnPeU1Be2rTi2hpdbDWY4HjJEcfG1hc4J6+4OFUyMwYbE5cZ488zkHoBrl+j9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7a1c7857a49so2985336a12.1;
+        Tue, 30 Jul 2024 09:20:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722356407; x=1722961207;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nEALnRPWK6uP6fkyvkVukOq/0JwVxe26FQ0nX7S8CUo=;
+        b=Y+eu2FgrNGaT1IS9AHb1BHQymmSCI9C6Oro/HmYgMWK+xkaR5qTlPXBigEm8qEng/M
+         JyS3l6RxG+KcfPwR94QHBwcrT5a0zrtRkXS/Pg3TDI6WdBAZfbHVub8oFcuucrBw2JJk
+         J+IUcVvBYGVgsFJ3O67BoazuxZJF4xl72M2hInXGNanN+3ttLlBNxBRf+jXjCVaG6xf/
+         kMuY/Sjw8LTXNo/xtWWwumYNTL1RYbJ1GZ4EqdMu0wVp5goOB6z/wvbJiC8Q0RmO4ysG
+         2CJBNVDlxNMemSyfC0hhZLjEaD9IZrUXSPULIp71RdlGTXNJ/iN9XXzOuG2H8VtNjW7a
+         DFjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdRMUVqaTOwY5DqbKkzM7DPhULP0o8FD9fEWmYDV7FzX6tEYf/FVgQY4yRyPlDbbN5Hm+fz/fkEB9lDvo6NU2SBs4Arr+q72oiYrfs6dTD
+X-Gm-Message-State: AOJu0Yx1cD8bQArGNo/vNG7K/UDPjfe2TY3Zr9aP1KQSsHnfpOm9BvAl
+	Jru8jBjHPz0f/ibDF1psAVQcs/n9FMr2rH9Z8imAV/sccxpR+Uo=
+X-Google-Smtp-Source: AGHT+IEq1aikRvq6hCXivmDQcj2a0BREWwj/jIUHVvE6+2Zu+63pQcpuKaAAm+jjW2OBDznoWxcsbw==
+X-Received: by 2002:a05:6a20:9184:b0:1c2:9095:7382 with SMTP id adf61e73a8af0-1c4a14fe5d4mr9498821637.52.1722356406680;
+        Tue, 30 Jul 2024 09:20:06 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70eca8af213sm6241125b3a.180.2024.07.30.09.20.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 09:20:06 -0700 (PDT)
+Date: Tue, 30 Jul 2024 09:20:05 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, Shuah Khan <shuah@kernel.org>,
+	Joe Damato <jdamato@fastly.com>, Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] selftests: net: ksft: support marking tests
+ as disruptive
+Message-ID: <ZqkStZ9UHfcYBG9L@mini-arch>
+References: <20240729221042.2700882-1-sdf@fomichev.me>
+ <20240729221042.2700882-2-sdf@fomichev.me>
+ <20240729190013.5b0743e7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: thomas.petazzoni@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240729190013.5b0743e7@kernel.org>
 
-Hello Kyle,
-
-On Tue, 30 Jul 2024 16:11:08 +0000
-Kyle Swenson <kyle.swenson@est.tech> wrote:
-
-> The DEVID register contains two pieces of information: the device ID in
-> the upper nibble, and the silicon revision number in the lower nibble.
-> The driver should work fine with any silicon revision, so let's mask
-> that out in the device ID check.
+On 07/29, Jakub Kicinski wrote:
+> On Mon, 29 Jul 2024 15:10:42 -0700 Stanislav Fomichev wrote:
+> > +    parser = argparse.ArgumentParser()
+> > +    parser.add_argument('--skip-disruptive', default=False, action='store_true', help='skip tests that might be disruptive (e.g. restart the interface)')
+> > +    global KSFT_ARGS
+> > +    KSFT_ARGS = parser.parse_args()
 > 
-> Fixes: 20e6d190ffe1 ("net: pse-pd: Add TI TPS23881 PSE controller driver")
-> Signed-off-by: Kyle Swenson <kyle.swenson@est.tech>
-> ---
->  drivers/net/pse-pd/tps23881.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> We pass all other args via env exports, I think we should stick to
+> that, it's easier to integrate with external runners.
 > 
-> diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-> index 61f6ad9c1934..bff8402fb382 100644
-> --- a/drivers/net/pse-pd/tps23881.c
-> +++ b/drivers/net/pse-pd/tps23881.c
-> @@ -748,11 +748,11 @@ static int tps23881_i2c_probe(struct i2c_client *client)
->  
->  	ret = i2c_smbus_read_byte_data(client, TPS23881_REG_DEVID);
->  	if (ret < 0)
->  		return ret;
->  
-> -	if (ret != 0x22) {
-> +	if ((ret & 0xF0) != 0x20) {
+> FWIW Mohsin is also adding VERBOSE=1 this way:
+> https://lore.kernel.org/all/20240715030723.1768360-1-mohsin.bashr@gmail.com/
 
-Thanks for the patch! I believe it would make sense to use defines
-here. At least for 0xF0, and perhaps for 0x20 as well.
+SG! The patch you reference is doing it in NetDrvEnv* but I'll probably
+try to keep most of the code in 'core' ksft. So far I'm thinking about
+adding some ksft_setup(env) to initialize that disruptive=yes/no state.
+LMK if you prefer me to keep everything in NetDrvEnv instead (or wait
+until I send out a v2 later today).
 
-Maybe:
+And thanks for the feedback on 1/2, will incorporate in the v2.
 
-#define TPS23881_REG_DEVID      		0x43
-#define TPS23881_REG_DEVID_DEVID_MASK		0xF0
-#define TPS23881_REG_DEVID_DEVID_VAL		0x2
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index a5e800b8f103..2b2a216bf108 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -4,6 +4,7 @@ import os
+ import time
+ from pathlib import Path
+ from lib.py import KsftSkipEx, KsftXfailEx
++from lib.py import ksft_setup
+ from lib.py import cmd, ethtool, ip
+ from lib.py import NetNS, NetdevSimDev
+ from .remote import Remote
+@@ -30,6 +31,7 @@ from .remote import Remote
+             if len(pair) != 2:
+                 raise Exception("Can't parse configuration line:", full_file)
+             env[pair[0]] = pair[1]
++    ksft_setup(env)
+     return env
 
-and then:
 
-	if (FIELD_GET(TPS23881_REG_DEVID_DEVID_MASK, ret) != 
-            TPS23881_REG_DEVID_DEVID_VAL)
-
-(totally untested, of course)
-
-Best regards,
-
-Thomas
--- 
-Thomas Petazzoni, co-owner and CEO, Bootlin
-Embedded Linux and Kernel engineering and training
-https://bootlin.com
 
