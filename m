@@ -1,116 +1,253 @@
-Return-Path: <netdev+bounces-114239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED8A941B8B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:56:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268B8941A77
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F6C0B2969A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8CC1C229A4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC3B18990C;
-	Tue, 30 Jul 2024 16:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125C118454A;
+	Tue, 30 Jul 2024 16:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="U+jckZV0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="APykGfmu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D2418801C;
-	Tue, 30 Jul 2024 16:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590EC14831F;
+	Tue, 30 Jul 2024 16:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722358381; cv=none; b=Fi0Bqf1bgES+nP6O8JAqTDECsLkxkoDSm6Io99JVudAWkEHy+TRsVJ7yGeSKGLvkSVbdoLspIDPTtIuYFK7iPK8yXGxcbW7bf3MqM+NxLizmt0ze/E08EIg7ohevV7DtnL8eXgzjh++AHtUyb/LV9URG9HsD3vFtL4/SwAnm6RE=
+	t=1722357847; cv=none; b=UusPATecJ96u8BTZ4kVYFKrq3T0ccFUa9SBeoiDIfz9SRwgForsuB8Y+l1cnOEJg9DONxX7sL5SuJQ2//rZrVzpanS40xQa0YNx9NOPK5JkAkhZEFRIjElvNZujjE/GFkkj7R/flCY6Opi89grvzDSkCe+cFtpgN/uOv16ehePs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722358381; c=relaxed/simple;
-	bh=acYkmx7Yj8SYjPzp076P9isbfl8X0+qYp4Ms1MYvVR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=leLV/ELZZDuTjEbsKC8D/xIHgW3jghIbvNLSUJFhrxz7P7vsVIPlIwOCzouAWdA/VGOYdib4An9iOTRO3F+X0ye/fmvQksSYqs0VV4gSYzBb2L3/VpUN8sBYVlBmYVyCejDwfsrnYFfGYfKmkpArhJDa8s89lAZiy4YQVkbGZt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=U+jckZV0; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 76D6B120007;
-	Tue, 30 Jul 2024 19:52:53 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76D6B120007
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1722358373;
-	bh=KLiTVr2w5RM4rRcfqLd3HLJ6BUMlDc+UogIM6fL3jyA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=U+jckZV0lF6/nktaviqUpB9QWpKZ06bSA5nKna95gYkPvul1lkIBb2cFM8BYMmUcH
-	 TgH+M9jgyeT7zyZVwy23k+SWNWwrWT/lr5O+ZPTuT6JNkY9y2gcngS+k/BAQvbMs+y
-	 /djj49R67rVazN97GwFt83B4XsQb9bLhIZ2l6CVmPZsKcAgfXgqccb+h2Tzi0ZpMyx
-	 uHDc+OerhWlHH5A3R8UGaTuG0Dk8S8m5EASRDJpXjsvTukCYJfnEkmxrANpd6sovf2
-	 YmnPlxpV77UoHxh/tzMKAp22ZTomr05YVr5+EYvc1kP6yl/W+mr9CzBr3Syi4CdcOI
-	 c5jQ0wjbYV7lA==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 30 Jul 2024 19:52:53 +0300 (MSK)
-Received: from [172.28.192.160] (100.64.160.123) by
- p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 30 Jul 2024 19:52:52 +0300
-Message-ID: <510e1114-abac-7ad3-c690-94b8b14ffe69@salutedevices.com>
-Date: Tue, 30 Jul 2024 19:40:32 +0300
+	s=arc-20240116; t=1722357847; c=relaxed/simple;
+	bh=3a6OvZo4Hj14qRFssrmzs6wWYxe5MMQzPlkSR22rbPo=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MiTZqJWxpChHn72Y14BsP/vfMEDLPto9UycskV0+FeRJMRiq2JEOVVDPfdKEDCGSMe53Pu4Gb7I3YqsZE4c1xpPu89jPcKjsGByPLKDCVKJgTk947PWR9331qYhuh51jWKEhj4l/hTK793eLoQix6JKzVVYxvOMUjiOt1DQV05U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=APykGfmu; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-65f9e25fffaso35804437b3.3;
+        Tue, 30 Jul 2024 09:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722357844; x=1722962644; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kp1ZetS0sXF1CjQKcb+ztjQ+Hp2ujG7Nc++ITl8dDtw=;
+        b=APykGfmuesax07hJMvBR1Ad6L4UriNJQc8HZaQKX6StNoSp/xQWohtAb5GSV9f5s+C
+         93nj4vm4v1y0XiOBbrTRQYOSNNtPE6G85ikqxk361ivmAQPQNfyJaZk30FLwkHaYPkE3
+         Xk5c01G+1nhLiQlT0xHu2GprfWLZ9+KG5K3VByjFWXE+7FiIlDMp8la5eX/7QPeO4rs7
+         LUCx5pfNOMV7y0BlQVOOsF7jPP7KOM2grdgUaXpSKZOlprf+OrUbzi3SN0WT6lwNW3jT
+         YFHHdWV3IseLoB6kmHP14y8Ip65FmetdOZjsGKSui6eEh9hwuhKQQry3Cb0VfZFqCk3A
+         026Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722357844; x=1722962644;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kp1ZetS0sXF1CjQKcb+ztjQ+Hp2ujG7Nc++ITl8dDtw=;
+        b=DDtFm0GXxwylRopFbgLMUcIKHP4wLkpTRws8cHRPOaCkqTIWqZb2tFU8+Cqi3K5YNU
+         vJTZocAkS0bNbzk64NYe4xvQfNSw2/wWPyFI2pKXfxWWuEG6emjCgYwgA+tBxJtS25C5
+         1Hd18gX/cIJSvhl/++cDqyRWEwTwzVWCxrnq9v8umUaK6Am/HLmeRWmZ0eeTvFpzX0Nv
+         UQYZtaAm9u1WQrZsaejLv8efXCd/wRZxUeJvGC7r0h76nad9fwRjzJbOsEfisJj3JBDD
+         KkcDyXpkjKp7MCidZew7KKOy1tQI/UxQxcNlHO4aMmkE4moE/Fn1Ujb3LUyGxsTMsNin
+         ikEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWRdN4OC9OJrbNwiuTEh0fHncP8ebyAxf6indhcPxu/JR2LP6tMjj6pKlOjHs6nwcJDBkxC27k65DbNvyTFOfq/ly94Yv1a
+X-Gm-Message-State: AOJu0YxMd2ojuj0y9aS0B7j7YFAJM0sITquqy68IQOmF5iuLxqsYSJ1R
+	Yxw4O4ZYJMFPW/mYCXyFSagkITHc1HR/mkAbakUwXPDdB37VuOou
+X-Google-Smtp-Source: AGHT+IFe5PZBuMhFo9qgsnjbZWUpKAIuKDWIOXlpCW214Z62FPN+hpZZUtGFamo1JesAs3jjMXpjaw==
+X-Received: by 2002:a81:c244:0:b0:64b:4a9f:540d with SMTP id 00721157ae682-67a0959294bmr128318997b3.31.1722357844146;
+        Tue, 30 Jul 2024 09:44:04 -0700 (PDT)
+Received: from debian ([50.205.20.42])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-67567869dfbsm26171317b3.35.2024.07.30.09.44.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 09:44:03 -0700 (PDT)
+From: Fan Ni <nifan.cxl@gmail.com>
+X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
+Date: Tue, 30 Jul 2024 09:43:49 -0700
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, richard.hughes@amd.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v2 08/15] cxl: indicate probe deferral
+Message-ID: <ZqkYRYsWm2kgtYUt@debian>
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-9-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v1] MAINTAINERS: add me as reviewer of AF_VSOCK and
- virtio-vsock
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20240728183325.1295283-1-avkrasnov@salutedevices.com>
- <20240730084707.72ff802c@kernel.org>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20240730084707.72ff802c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 186794 [Jul 30 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 24 0.3.24 186c4d603b899ccfd4883d230c53f273b80e467f, {Tracking_arrow_text}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/07/30 15:23:00 #26184428
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240715172835.24757-9-alejandro.lucero-palau@amd.com>
 
-
-
-On 30.07.2024 18:47, Jakub Kicinski wrote:
-> On Sun, 28 Jul 2024 21:33:25 +0300 Arseniy Krasnov wrote:
->> I'm working on AF_VSOCK and virtio-vsock.
+On Mon, Jul 15, 2024 at 06:28:28PM +0100, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> If you want to review the code perhaps you can use lore+lei
-> and filter on the paths?
+> The first stop for a CXL accelerator driver that wants to establish new
+> CXL.mem regions is to register a 'struct cxl_memdev. That kicks off
+> cxl_mem_probe() to enumerate all 'struct cxl_port' instances in the
+> topology up to the root.
 > 
-> Adding people to MAINTAINERS is somewhat fraught.
-
-Ah ok, got it.
-
-Thanks, Arseniy
+> If the root driver has not attached yet the expectation is that the
+> driver waits until that link is established. The common cxl_pci_driver
+> has reason to keep the 'struct cxl_memdev' device attached to the bus
+> until the root driver attaches. An accelerator may want to instead defer
+> probing until CXL resources can be acquired.
+> 
+> Use the @endpoint attribute of a 'struct cxl_memdev' to convey when
+> accelerator driver probing should be defferred vs failed. Provide that
+> indication via a new cxl_acquire_endpoint() API that can retrieve the
+> probe status of the memdev.
+> 
+> The first consumer of this API is a test driver that excercises the CXL
+> Type-2 flow.
+> 
+> Based on https://lore.kernel.org/linux-cxl/168592149709.1948938.8663425987110396027.stgit@dwillia2-xfh.jf.intel.com/T/#m18497367d2ae38f88e94c06369eaa83fa23e92b2
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+> ---
+>  drivers/cxl/core/memdev.c          | 41 ++++++++++++++++++++++++++++++
+>  drivers/cxl/core/port.c            |  2 +-
+>  drivers/cxl/mem.c                  |  7 +++--
+>  drivers/net/ethernet/sfc/efx_cxl.c | 10 +++++++-
+>  include/linux/cxl_accel_mem.h      |  3 +++
+>  5 files changed, 59 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index b902948b121f..d51c8bfb32e3 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -1137,6 +1137,47 @@ struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  }
+>  EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, CXL);
+>  
+> +/*
+> + * Try to get a locked reference on a memdev's CXL port topology
+> + * connection. Be careful to observe when cxl_mem_probe() has deposited
+> + * a probe deferral awaiting the arrival of the CXL root driver
+> +*/
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd)
+> +{
+> +	struct cxl_port *endpoint;
+> +	int rc = -ENXIO;
+> +
+> +	device_lock(&cxlmd->dev);
+> +	endpoint = cxlmd->endpoint;
+> +	if (!endpoint)
+> +		goto err;
+> +
+> +	if (IS_ERR(endpoint)) {
+> +		rc = PTR_ERR(endpoint);
+> +		goto err;
+> +	}
+> +
+> +	device_lock(&endpoint->dev);
+> +	if (!endpoint->dev.driver)
+> +		goto err_endpoint;
+> +
+> +	return endpoint;
+> +
+> +err_endpoint:
+> +	device_unlock(&endpoint->dev);
+> +err:
+> +	device_unlock(&cxlmd->dev);
+> +	return ERR_PTR(rc);
+> +}
+> +EXPORT_SYMBOL_NS(cxl_acquire_endpoint, CXL);
+> +
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint)
+> +{
+> +	device_unlock(&endpoint->dev);
+> +	device_unlock(&cxlmd->dev);
+> +}
+> +EXPORT_SYMBOL_NS(cxl_release_endpoint, CXL);
+> +
+>  static void sanitize_teardown_notifier(void *data)
+>  {
+>  	struct cxl_memdev_state *mds = data;
+> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
+> index d66c6349ed2d..3c6b896c5f65 100644
+> --- a/drivers/cxl/core/port.c
+> +++ b/drivers/cxl/core/port.c
+> @@ -1553,7 +1553,7 @@ static int add_port_attach_ep(struct cxl_memdev *cxlmd,
+>  		 */
+>  		dev_dbg(&cxlmd->dev, "%s is a root dport\n",
+>  			dev_name(dport_dev));
+> -		return -ENXIO;
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	parent_port = find_cxl_port(dparent, &parent_dport);
+> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+> index f76af75a87b7..383a6f4829d3 100644
+> --- a/drivers/cxl/mem.c
+> +++ b/drivers/cxl/mem.c
+> @@ -145,13 +145,16 @@ static int cxl_mem_probe(struct device *dev)
+>  		return rc;
+>  
+>  	rc = devm_cxl_enumerate_ports(cxlmd);
+> -	if (rc)
+> +	if (rc) {
+> +		cxlmd->endpoint = ERR_PTR(rc);
+>  		return rc;
+> +	}
+>  
+>  	parent_port = cxl_mem_find_port(cxlmd, &dport);
+>  	if (!parent_port) {
+>  		dev_err(dev, "CXL port topology not found\n");
+> -		return -ENXIO;
+> +		cxlmd->endpoint = ERR_PTR(-EPROBE_DEFER);
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	if (resource_size(&cxlds->pmem_res) && IS_ENABLED(CONFIG_CXL_PMEM)) {
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 0abe66490ef5..2cf4837ddfc1 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -65,8 +65,16 @@ void efx_cxl_init(struct efx_nic *efx)
+>  	}
+>  
+>  	cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
+> -	if (IS_ERR(cxl->cxlmd))
+> +	if (IS_ERR(cxl->cxlmd)) {
+>  		pci_info(pci_dev, "CXL accel memdev creation failed");
+pci_err()?
+> +		return;
+> +	}
+> +
+> +	cxl->endpoint = cxl_acquire_endpoint(cxl->cxlmd);
+> +	if (IS_ERR(cxl->endpoint))
+> +		pci_info(pci_dev, "CXL accel acquire endpoint failed");
+pci_err()?
+> +
+> +	cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
+>  }
+>  
+>  
+> diff --git a/include/linux/cxl_accel_mem.h b/include/linux/cxl_accel_mem.h
+> index 442ed9862292..701910021df8 100644
+> --- a/include/linux/cxl_accel_mem.h
+> +++ b/include/linux/cxl_accel_mem.h
+> @@ -29,4 +29,7 @@ int cxl_await_media_ready(struct cxl_dev_state *cxlds);
+>  
+>  struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  				       struct cxl_dev_state *cxlds);
+> +
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd);
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint);
+>  #endif
+> -- 
+> 2.17.1
+> 
 
