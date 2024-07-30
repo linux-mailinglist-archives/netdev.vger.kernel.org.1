@@ -1,117 +1,122 @@
-Return-Path: <netdev+bounces-114120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD2A941023
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:03:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73EDD94102A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4024C1F235B6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:03:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A45B31C20DEB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F062A19415E;
-	Tue, 30 Jul 2024 11:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CB61940A9;
+	Tue, 30 Jul 2024 11:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLO4SXu+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZshxtnv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A6013DDAE;
-	Tue, 30 Jul 2024 11:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09A140BF2
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 11:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722337409; cv=none; b=S1vYA4+mKKCCZz/h6kj4zQLQsShiAEIvo7JJ1mY2A6XF0fesfNPZWFk0aFaG1yusl2NJcIvCCRpSeSv8onpHnQlAhEXvPZ8RXegiWgJj55+HUNmhH8gFWUCOtZlOJsk/BV/Ug51XoaSV/Pgq9IRvBF0jAGwgt+xP7pfupX2BoQg=
+	t=1722337470; cv=none; b=HTSfpoylpnI6+92lPVpVG0jYV1ghcEUcA979nmnsEpnPUqoPuqhjSLXM/827ngNII93j7NKnf+r0M+8S85tZFCi6MH6RkuwJMwKKeaWEPZ6esmOA/CoQ9DgjzUf2AMNIcWd+u5ga9HWhd+TwjMuWkoH+Ocj4hC/NGaFoLQqvHwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722337409; c=relaxed/simple;
-	bh=CXkoGsg6csuPovdY1NpQLB+BXK7giXSuwsrflARY14U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FoTWQQMEH3LeXf/j6SGEjNE86HB0B3jdyMwig5rJytSzHKa4Vh+3E5gz6gX6bmw5FtAYSUdws+ipzppu4a21Yb4Bcg08VqCRyQm5vzl4y6O4xwpaJAaHpHjFaya3xZBoc5SyNbiyARWxIpaxen8bFwdnqzInyeRz58GbURDE8+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLO4SXu+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9157FC32782;
-	Tue, 30 Jul 2024 11:03:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722337409;
-	bh=CXkoGsg6csuPovdY1NpQLB+BXK7giXSuwsrflARY14U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mLO4SXu+NXYj5kFTql9ncVanh291Pk0zTWF7m91Ti2+VYyNB6GsWUQqxeqPpI5R97
-	 L3MT4tlWOsqc63ESriMBteo0sdNIupp5c/Y1qiA7CyvNu7w4TfwnOmh3fdQ6IQcLzw
-	 R9E7KFPOsKw4A+UvrXc3gdvLc+SXDDqwvSVF7gXi3TVy5teOxeUvk9oJ48B361BCaw
-	 /WbFnCa8TG35i6JFsi41i4ZWm3CR3XGJZNpN+0SwizPjdo4uLeQYW0O7qmC9K18AOa
-	 o6ncDE5dt06FVN20AivMHhB8aObwUkLPZFy8Xs6TXNdbZgc/Pm8DnZrHHg7B/a4i86
-	 GS/E3V8rVMp6w==
-Date: Tue, 30 Jul 2024 12:03:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH iwl-net 1/3] idpf: fix memory leaks and crashes while
- performing a soft reset
-Message-ID: <20240730110325.GA1781874@kernel.org>
-References: <20240724134024.2182959-1-aleksander.lobakin@intel.com>
- <20240724134024.2182959-2-aleksander.lobakin@intel.com>
- <20240726160954.GO97837@kernel.org>
- <870cd73e-0f87-41eb-95d1-c9fe27ed1230@intel.com>
+	s=arc-20240116; t=1722337470; c=relaxed/simple;
+	bh=Ek7LZA5Adjm3ym/z9e5JoSavsfcTgjsWk6/6JIJ7t3c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XXHJYx0x65isY8VqOr/o3+DC+GAXyJYn+pltv5tE1xZmawO7gXiwZsBtWUt7ibCPYQcmLJZyzaCccbihDHC2fYiNwXfd3CxQTio+OW0fzfrUZKP6gwpSq6OV+D1ZBG5lq2sXgVFbYW8hfHTZfqCIa/rhK2WUGTTOteKvqinnf5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BZshxtnv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722337467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ezFPTQ1WGSxucSjVp5951QXGyi8WZfLh5S7gZkt1lk4=;
+	b=BZshxtnvBjYRNuHXSEqr/Id/SHAyssSJAt4IDWdldbQiFCqBlsRGlPIZTQd0g0+DPRvgIP
+	eqA+IulplPHiYOmndar0VowPDxFT+eDQrWlMssWfqnc5SCzpA5KGiWfUEze6IcZaMoCZGG
+	cyxNtRZmLotjMfV3up0TRsXcfWf6XCc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-595-o_CaYYc3PXyaiFTJSgMEnw-1; Tue, 30 Jul 2024 07:04:26 -0400
+X-MC-Unique: o_CaYYc3PXyaiFTJSgMEnw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-428076fef5dso25754715e9.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 04:04:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722337465; x=1722942265;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ezFPTQ1WGSxucSjVp5951QXGyi8WZfLh5S7gZkt1lk4=;
+        b=lC9d3kNB/zBvyaBCeLyqK8nXw/n3dam35hPaTLX47db687EIOWAHzR3nPBezNy3Bw8
+         mKbaJHU50KUsItZYnINRf1KWK7IwFYw1r++BCYu1VMUz08bcj2I402TU9QN1RD1UeTPc
+         hfLOdmv2Np95dMuEfQcXLPeSA/rW9oYegHw+3MdGS7TfScNujxurnWxb2DrYjZThymQe
+         Gc+IStUjS/Qz72r62/gHqq382PmH8SSapvPVBTP8H9dy7qiZPIYXsRJWzy/7RqazIMt8
+         WwftxjXlPIA9qlQpybuja6BadBpSoKrTtdeMsfcpCmutVwjs+lTI4+9uXYGM4wZ/fPzY
+         AyTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtNwoVkBiiPQZr+CnekxInC8r7JhR1WHOKvxBAwwifPEk1MucrnpXgGW/VRZIvaGijCcI00FcvcZ/7n4rZrhf+MnHBFm9b
+X-Gm-Message-State: AOJu0YwNcGmhYAr0YIMdfBggANo1p4PfKDPO4tGp+oMQYlHZm09XWqLt
+	TDfXN5QxzpGJU4+A04DBONPivyeIlFMKPYMOxYmDsxfCSV2bFOqTonWeglVRRCEADQGTAryfNog
+	2/AAUrHEd+e6FomSDPYyCwrOTnYWgBN+8r0QFCnwq9TPVvPlhs7QBNw==
+X-Received: by 2002:a05:600c:3153:b0:426:5e91:391e with SMTP id 5b1f17b1804b1-42811dcd2e1mr67798165e9.26.1722337464875;
+        Tue, 30 Jul 2024 04:04:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE39v1pXN85w2qGztmjiUvkkGOPsZjbJmzMayqH+ReAnENY9kABuKyGJDrx7hXWY7gOyf34nA==
+X-Received: by 2002:a05:600c:3153:b0:426:5e91:391e with SMTP id 5b1f17b1804b1-42811dcd2e1mr67797975e9.26.1722337464436;
+        Tue, 30 Jul 2024 04:04:24 -0700 (PDT)
+Received: from [192.168.88.254] ([213.175.51.194])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280f8da2f7sm143824605e9.10.2024.07.30.04.04.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 04:04:24 -0700 (PDT)
+Message-ID: <03c24731-e56f-44b2-b0a3-6afd7f14f77b@redhat.com>
+Date: Tue, 30 Jul 2024 13:04:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <870cd73e-0f87-41eb-95d1-c9fe27ed1230@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: XDP Performance Regression in recent kernel versions
+To: Carolina Jubran <cjubran@nvidia.com>, Dragos Tatulea
+ <dtatulea@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ "daniel@iogearbox.net" <daniel@iogearbox.net>,
+ "hawk@kernel.org" <hawk@kernel.org>,
+ "mianosebastiano@gmail.com" <mianosebastiano@gmail.com>
+Cc: "toke@redhat.com" <toke@redhat.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, "bpf@vger.kernel.org"
+ <bpf@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>
+References: <CAMENy5pb8ea+piKLg5q5yRTMZacQqYWAoVLE1FE9WhQPq92E0g@mail.gmail.com>
+ <5b64c89f-4127-4e8f-b795-3cec8e7350b4@kernel.org> <87wmmkn3mq.fsf@toke.dk>
+ <ff571dcf-0375-6684-b188-5c1278cd50ce@iogearbox.net>
+ <CA+h3auMq5vnoyRLvJainG-AFA6f=ivRmu6RjKU4cBv_go975tw@mail.gmail.com>
+ <c97e0085-be67-415c-ae06-7ef38992fab1@nvidia.com>
+ <2f8dfd0a25279f18f8f86867233f6d3ba0921f47.camel@nvidia.com>
+ <b1148fab-ecf3-46c1-9039-597cc80f3d28@nvidia.com>
+Content-Language: en-US
+From: Samuel Dobron <sdobron@redhat.com>
+In-Reply-To: <b1148fab-ecf3-46c1-9039-597cc80f3d28@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 29, 2024 at 10:54:50AM +0200, Alexander Lobakin wrote:
-> From: Simon Horman <horms@kernel.org>
-> Date: Fri, 26 Jul 2024 17:09:54 +0100
-> 
-> > On Wed, Jul 24, 2024 at 03:40:22PM +0200, Alexander Lobakin wrote:
-> >> The second tagged commit introduced a UAF, as it removed restoring
-> >> q_vector->vport pointers after reinitializating the structures.
-> >> This is due to that all queue allocation functions are performed here
-> >> with the new temporary vport structure and those functions rewrite
-> >> the backpointers to the vport. Then, this new struct is freed and
-> >> the pointers start leading to nowhere.
-> 
-> [...]
-> 
-> >>  err_reset:
-> >> -	idpf_vport_queues_rel(new_vport);
-> >> +	idpf_send_add_queues_msg(vport, vport->num_txq, vport->num_complq,
-> >> +				 vport->num_rxq, vport->num_bufq);
-> >> +
-> >> +err_open:
-> >> +	if (current_state == __IDPF_VPORT_UP)
-> >> +		idpf_vport_open(vport);
-> > 
-> > Hi Alexander,
-> > 
-> > Can the system end up in an odd state if this call to idpf_vport_open(), or
-> > the one above, fails. Likewise if the above call to
-> > idpf_send_add_queues_msg() fails.
-> 
-> Adding the queues with the parameters that were before changing them
-> almost can't fail. But if any of these two fails, it really will be in
-> an odd state...
-> 
-> Perhaps we need to do a more powerful reset then? Can we somehow tell
-> the kernel that in fact our iface is down, so that the user could try
-> to enable it manually once again?
-> Anyway, feels like a separate series or patch to -next, what do you think?
-> 
-> > 
-> >> +
-> >>  free_vport:
-> >>  	kfree(new_vport);
-> 
-> Thanks,
-> Olek
-> 
+> Could you try adding the mentioned parameters to your kernel arguments
+> and check if you still see the degradation? 
+
+Hey,
+So i tried multiple kernels around v5.15 as well as couple of previous
+v6.xx and there is no difference with spectre v2 mitigations enabled
+or disabled.
+
+No difference on other drivers as well.
+
+
+Sam.
+
 
