@@ -1,125 +1,245 @@
-Return-Path: <netdev+bounces-114004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7168940A74
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:55:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4E9940AA2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93C19284764
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 07:55:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14B6E2814BF
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B995C191F98;
-	Tue, 30 Jul 2024 07:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB50194085;
+	Tue, 30 Jul 2024 08:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heURljBQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S47sM72U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF38191F8C
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 07:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F2B186E4F
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 08:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722326154; cv=none; b=QFKn0/OTsMW4N3LQ+4OTGskZuzrizjawx0nJa1Qar3WOFbJiGAOer6r+SkW1fNRKqgtrOcdEg6Bn2qqEX1z4cg2ECcGIn3oxlzo/K5YPv3CWfe0osLq3Eud8dqwowIgMhnyOMdjqB1bi5vgfnEkUFg3CMbmlFYGFJZS4VAmQIvc=
+	t=1722326438; cv=none; b=IMKejrlh7ddnkzBChkNsdoRltdbJbNYtdcqBa9aIn5Nn4gnA688i6Pi578Pr0ny6+o2C6rCQijEEyeYcvhpJc7yAOlDnK0d/2n02YEN1Anw2Xuf3TEChhMlW020STwLbznh9T1OyU89595fkKIhPgw4Tk/ao/JhbAKA/A9LoGjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722326154; c=relaxed/simple;
-	bh=pUneXqc1tawiKl8hOSNTSHjlMaasizdprX1F4ta/+GU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dYHFg8M0hFTIYuH2w7DlHZIiQUc0Vhm4Z6lyEBWEqh744oe5eNx2JWNaLIOjIVCEN1YCR8iJifLKGV4PsoAyt9yQFK55ptXUNscGL/j4/jhaowtl2cUN9aILZXEGwxAv8xDwhG+vsfCKIHtWSrlwCFpbL0Yf4EMKIe5oPy7PYsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=heURljBQ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1722326438; c=relaxed/simple;
+	bh=trwZ6o7rehpDaqVsUVCfcq0HbmYKcWR5iz0dYHW4Jrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vz21GcsJzrt843pR95pr1DYGLRW2k/Xg021NvX7nMKjFMxtyrLW1zpFpRQcLxbI8yeZTePFqGCIyrhRVYk/K0sLRCwRvGi8GL83cWR+U2n/QGZaNAYtlAAvoCwzNPuQ30OXYrgFJ+hlYewSO6CjsJNNq3pMh2mNNVgvDYdAt7Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S47sM72U; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722326152;
+	s=mimecast20190719; t=1722326435;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VeZf4S2zN1755hAgpbxKY28IpphydX1J+Zavqe1s4gs=;
-	b=heURljBQzJJtuTIReUb+snaWCEEV5kyTKS+Z1qKkvWf1AGJHpYsXpZ9z+K8B2EGJSPA54n
-	XbSa+AirhnQjFbSZTyJBcvpY+1pHT0/VSEWHBLSP+1JhaOPL+J3xAvkl1WlzpWLHzdD051
-	WZG/dt+UONpS182WmHU9ql85rWTbp/0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-322-sCGQKRjSPciPX4Akn3WraQ-1; Tue,
- 30 Jul 2024 03:55:41 -0400
-X-MC-Unique: sCGQKRjSPciPX4Akn3WraQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D82481955D45;
-	Tue, 30 Jul 2024 07:55:38 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.141])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 64D5119560AA;
-	Tue, 30 Jul 2024 07:55:31 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: andrew@lunn.ch
-Cc: UNGLinuxDriver@microchip.com,
-	davem@davemloft.net,
-	dsimic@manjaro.org,
-	edumazet@google.com,
-	f.fainelli@gmail.com,
-	gregkh@linuxfoundation.org,
-	jtornosm@redhat.com,
-	kuba@kernel.org,
-	linux-kbuild@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	lucas.demarchi@intel.com,
-	masahiroy@kernel.org,
-	mcgrof@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH] net: usb: lan78xx: add weak dependency with micrel phy module
-Date: Tue, 30 Jul 2024 09:55:28 +0200
-Message-ID: <20240730075529.8263-1-jtornosm@redhat.com>
-In-Reply-To: <c8450f9c-a7f8-4775-8d26-7a070aa68e4d@lunn.ch>
-References: <c8450f9c-a7f8-4775-8d26-7a070aa68e4d@lunn.ch>
+	bh=pxacbdL3FJeAXrV3TFbvw9W3EhUwqie1OGKtk+yVIvU=;
+	b=S47sM72UIlg9yO0YdG/U42nACtwvmaW12HbD87lMMbWSZFbwcaWcBxdKeAq1CcYLzNoryX
+	zXFcir9nnfpNHzrSJFQq8zdZqu395HwWqCVJ84NamkKmLZQnGuO3Ob3vGPSX6ONqDp1iZH
+	Uz+Bw5lfzdufkUp+0zZooIfQ2A4Yjco=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-RswmpwLBMKihWBWx0TD1GQ-1; Tue, 30 Jul 2024 04:00:31 -0400
+X-MC-Unique: RswmpwLBMKihWBWx0TD1GQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280291f739so24998045e9.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:00:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722326431; x=1722931231;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pxacbdL3FJeAXrV3TFbvw9W3EhUwqie1OGKtk+yVIvU=;
+        b=a7Mst22XckEhxZYGrhGOcfDAM+xFGNy3ytrSwsoGonnhtKlPDFVEHXeyk20HZHDlei
+         lzvY2Nbq1B1MPzWRsmofIYVPpzaUDp54fC5ZvGRnN9OhuigGH2/l9vAdmbO89uwJXlQM
+         LW5sem0UkgKrgHgHSe0+7wNfVnu/G6a29ZBi72o7cHjPzw1ktcK9tCH6yqyvUOnuc/1M
+         MsMl2t9KiIq3xyX2PHP/6o1/vu7IwuvgxAWDvKAn5FsWnFSBYbFyUKXCuWvL1PZDjqvg
+         diX4XRIU6Npxc6vX3bp89XyMa52S/oJ+pFwnG3GUaIq4QkJHZpTpw4DdBV87UCG/vQit
+         tr2A==
+X-Forwarded-Encrypted: i=1; AJvYcCU4lc3N6KzLfD6Ummvoy5r68CKLDdMChAFkJOsatukuDI/jKDmgBkmvf1UGesGHei+51qbYGf6C5pg+JQyA2rSK7PHUrwNt
+X-Gm-Message-State: AOJu0YweLMhHSFjop9Ot1Uyew3+1AGA0pSYfnAhpqOi1DXHU1Ay3RSlI
+	7BKXlCOrhYpSJMJFmqvaTerCsEdgg5DaeS0NDpuPhv+8LErkBN1YLpgEzd9Pe9jKvzD3YASAb0W
+	yi7bgPGZFNUGUCuHK4KLp+QOvoctT0x7V6lOxCPG1ggZLeYUHIE+trQ==
+X-Received: by 2002:a05:600c:1c83:b0:426:622d:9e6b with SMTP id 5b1f17b1804b1-42811dd79fbmr66276995e9.23.1722326430688;
+        Tue, 30 Jul 2024 01:00:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGOWCFqW/SaDwkVD/PGge9k+/l+vMiylzg43IopSMzOrTgQOVgmPKCvBcKQbTb1kZSxSstYJw==
+X-Received: by 2002:a05:600c:1c83:b0:426:622d:9e6b with SMTP id 5b1f17b1804b1-42811dd79fbmr66276385e9.23.1722326429913;
+        Tue, 30 Jul 2024 01:00:29 -0700 (PDT)
+Received: from sgarzare-redhat ([62.205.9.89])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36857e3bsm13973574f8f.81.2024.07.30.01.00.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 01:00:28 -0700 (PDT)
+Date: Tue, 30 Jul 2024 10:00:25 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
+	decui@microsoft.com, bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
+	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
+Subject: Re: [RFC PATCH net-next v6 04/14] af_vsock: generalize bind table
+ functions
+Message-ID: <ba2hivznnjcyeftr7ch7gvrwjvkimx5u2t2anv7wv7n7yb3j36@dbagnaylvu6o>
+References: <20240710212555.1617795-1-amery.hung@bytedance.com>
+ <20240710212555.1617795-5-amery.hung@bytedance.com>
+ <CAGxU2F7wCUR-KhDRBopK+0gv=bM0PCKeWM87j1vEYmbvhO8WHQ@mail.gmail.com>
+ <CAMB2axNUZa221WKTjLt0G5KNdtkAbm20ViDZRGBh6pL9y3wosg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <CAMB2axNUZa221WKTjLt0G5KNdtkAbm20ViDZRGBh6pL9y3wosg@mail.gmail.com>
 
-Hello Andrew,
+On Sun, Jul 28, 2024 at 11:52:54AM GMT, Amery Hung wrote:
+>On Tue, Jul 23, 2024 at 7:40 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Wed, Jul 10, 2024 at 09:25:45PM GMT, Amery Hung wrote:
+>> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> >
+>> >This commit makes the bind table management functions in vsock usable
+>> >for different bind tables. Future work will introduce a new table for
+>> >datagrams to avoid address collisions, and these functions will be used
+>> >there.
+>> >
+>> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> >---
+>> > net/vmw_vsock/af_vsock.c | 34 +++++++++++++++++++++++++++-------
+>> > 1 file changed, 27 insertions(+), 7 deletions(-)
+>> >
+>> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> >index acc15e11700c..d571be9cdbf0 100644
+>> >--- a/net/vmw_vsock/af_vsock.c
+>> >+++ b/net/vmw_vsock/af_vsock.c
+>> >@@ -232,11 +232,12 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
+>> >       sock_put(&vsk->sk);
+>> > }
+>> >
+>> >-static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+>> >+static struct sock *vsock_find_bound_socket_common(struct sockaddr_vm *addr,
+>> >+                                                 struct list_head *bind_table)
+>> > {
+>> >       struct vsock_sock *vsk;
+>> >
+>> >-      list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
+>> >+      list_for_each_entry(vsk, bind_table, bound_table) {
+>> >               if (vsock_addr_equals_addr(addr, &vsk->local_addr))
+>> >                       return sk_vsock(vsk);
+>> >
+>> >@@ -249,6 +250,11 @@ static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+>> >       return NULL;
+>> > }
+>> >
+>> >+static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+>> >+{
+>> >+      return vsock_find_bound_socket_common(addr, vsock_bound_sockets(addr));
+>> >+}
+>> >+
+>> > static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
+>> >                                                 struct sockaddr_vm *dst)
+>> > {
+>> >@@ -671,12 +677,18 @@ static void vsock_pending_work(struct work_struct *work)
+>> >
+>> > /**** SOCKET OPERATIONS ****/
+>> >
+>> >-static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>> >-                                  struct sockaddr_vm *addr)
+>> >+static int vsock_bind_common(struct vsock_sock *vsk,
+>> >+                           struct sockaddr_vm *addr,
+>> >+                           struct list_head *bind_table,
+>> >+                           size_t table_size)
+>> > {
+>> >       static u32 port;
+>> >       struct sockaddr_vm new_addr;
+>> >
+>> >+      if (WARN_ONCE(table_size < VSOCK_HASH_SIZE,
+>> >+                    "table size too small, may cause overflow"))
+>> >+              return -EINVAL;
+>> >+
+>>
+>> I'd add this in another commit.
+>>
+>> >       if (!port)
+>> >               port = get_random_u32_above(LAST_RESERVED_PORT);
+>> >
+>> >@@ -692,7 +704,8 @@ static int __vsock_bind_connectible(struct
+>> >vsock_sock *vsk,
+>> >
+>> >                       new_addr.svm_port = port++;
+>> >
+>> >-                      if (!__vsock_find_bound_socket(&new_addr)) {
+>> >+                      if (!vsock_find_bound_socket_common(&new_addr,
+>> >+                                                          &bind_table[VSOCK_HASH(addr)])) {
+>>
+>> Can we add a macro for `&bind_table[VSOCK_HASH(addr)])` ?
+>>
+>
+>Definitely. I will add the following macro:
+>
+>#define vsock_bound_sockets_in_table(bind_table, addr) \
+>        (&bind_table[VSOCK_HASH(addr)])
 
-> So are you saying current initramfs are broken, because they don't
-> include the needed PHY modules?
-I am just saying that the default initramfs including the current lan78xx
-driver is broken because in this case there is no information to collect
-the possible phy modules. And as I commented, after the complete boot, the
-only solution is to unload and load lan78xx to get the phy module from
-rootfs.
- 
-> You can fix one example of the lan78xx
-> USB dongle, but are going to leave everything else broken?
-My intention was to fix the case for lan78xx because it is the one that I
-have detected that does not work. Others are already working, for example
-r8169, by means of a softdep with realtek phy. And my idea was to do the
-same for the other detected/needed, if any (I am not aware of other similar
-reported issues).
-I see that you prefer to fix all the cases and always including all the phy
-modules would solve the problem for lan78xx and for other possible ones.
-But take into account that we should also try to avoid creating large
-initramfs if not necessary, at least, if there is anyway to solve this.  
-Indeed, if I am not wrong, only some phy modules are possible for
-a driver and these are known.
-Anyway, as it was suggested, we can explore some automatic procedure to
-identify the hardware and with that, select the phy module or at least,
-reduce the number of phy modules to introduce.
+yeah.
 
-Thanks
+>
+>> >                               found = true;
+>> >                               break;
+>> >                       }
+>> >@@ -709,7 +722,8 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>> >                       return -EACCES;
+>> >               }
+>> >
+>> >-              if (__vsock_find_bound_socket(&new_addr))
+>> >+              if (vsock_find_bound_socket_common(&new_addr,
+>> >+                                                 &bind_table[VSOCK_HASH(addr)]))
+>> >                       return -EADDRINUSE;
+>> >       }
+>> >
+>> >@@ -721,11 +735,17 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>> >        * by AF_UNIX.
+>> >        */
+>> >       __vsock_remove_bound(vsk);
+>> >-      __vsock_insert_bound(vsock_bound_sockets(&vsk->local_addr), vsk);
+>> >+      __vsock_insert_bound(&bind_table[VSOCK_HASH(&vsk->local_addr)], vsk);
+>> >
+>> >       return 0;
+>> > }
+>> >
+>> >+static int __vsock_bind_connectible(struct vsock_sock *vsk,
+>> >+                                  struct sockaddr_vm *addr)
+>> >+{
+>> >+      return vsock_bind_common(vsk, addr, vsock_bind_table, VSOCK_HASH_SIZE + 1);
+>>
+>> What about using ARRAY_SIZE(x) ?
+>>
+>> BTW we are using that size just to check it, but all the arrays we use
+>> are statically allocated, so what about a compile time check like
+>> BUILD_BUG_ON()?
+>>
+>
+>I will remove the table_size check you mentioned earlier and the
+>argument here as the arrays are allocated statically like you
+>mentioned.
+>
+>If you think this check may be a good addition, I can add a
+>BUILD_BUG_ON() in the new vsock_bound_sockets_in_table() macro.
 
-Best regards
-José Ignacio
+If you want to add it, we need to do it in a separate commit. But since 
+we already have so many changes and both arrays are statically allocated 
+in the same file, IMHO we can avoid the check.
+
+Stefano
 
 
