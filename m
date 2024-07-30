@@ -1,163 +1,124 @@
-Return-Path: <netdev+bounces-114126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56FFB941056
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:17:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8159494105D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 13:18:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC44DB215E0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:17:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B37191C22F59
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EC119D88E;
-	Tue, 30 Jul 2024 11:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Nd+EfQ+w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DA619B3C4;
+	Tue, 30 Jul 2024 11:18:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50AD1993B0
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 11:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992F318FC85
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 11:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722338229; cv=none; b=lGG9gOiVF8GlhbNkJ3B17oEJZ29ZfOcpe8twbF2gjaCFysA+DqYzSWNSOC5O6XJaXQ1DxkSuzl3F5nOCZkoSxhvuNfrpLSEm3xhdIo6dB4vJ4GNtV82rwpyHYJcVR24aPtNSRArZF86y8pAz7iNEsvbML24sSqBxdMbROIx1WvY=
+	t=1722338303; cv=none; b=VLklvwULMHCx4dB8dVyyBPwtDVyFPPD2Pig7odMv8sFg4K0ZoJrPBMhtBT4urCh9EsbCdsiQN6PE0mFAENjuwOzYwzkTk1YJ6VFw2bCSPrzQSZO8zlDRC9BjxSium9N3J8GyNS99d/cYLXkWTQKsEN8/f++L5cmPlvAzFEKc6dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722338229; c=relaxed/simple;
-	bh=0c0bFjkp6lOGtIuddq5kJa8o0xZsFNb6mXA9glrX6aU=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=ptqvrfy5Fu/opi0N+nqB3d5pspYhETfAwvYqCA5pPy+Yd4G2hJywuYRbpvpVu8NfXCqoanNch1YeIVe1O/Q1H7JZi5uy6PtHCHH+6i5dqoQAgl8UeZEcD6TmjjR9n5mQVu78aRfuGIg6qUuHdrveTOd79c+NY4MDwgwxH62/4IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Nd+EfQ+w; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-70d18112b60so3117518b3a.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 04:17:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722338227; x=1722943027; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zMjbsaf9Qg0PIMOUCDvNeB4fJscDIysusSNb+GlHnFs=;
-        b=Nd+EfQ+wIj9qw10KlWIT2v8R7MM1vJIS5xk08TZMHj2pkl0eLoEl0US5hFI9orFTta
-         ZKMaaevAYeNzsm500qLWn8xShKGVzHYwsBBYXLfVyc9dRMhL7HO7BzlAlWESqeivzsVl
-         3pRVfp1L1arNye74db56Fk4hFLzHr/yhjpf5s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722338227; x=1722943027;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zMjbsaf9Qg0PIMOUCDvNeB4fJscDIysusSNb+GlHnFs=;
-        b=TQUcgSpbmzPMFWKR8ptnH0GtkXaXgqamq8Fd+ylaJOGbXNnqnbU3UbpGIPFkmSObci
-         mFBCmHsRA3Vz9BYHDj84hqnuMNmKFe+KR3mxcBu7VrRGygK7Z3ojx3+fjgmPwz/rZMRc
-         AKXKcP19pZCAHYooxe/Ku+8SUA08vGnh8bAUvCQP04dJ0A+DtpsNmF1/Hsx1PRDB8MiG
-         b0/0i/o3XIn0E2clGJtd7dHNJBq84cfkxr5ivDKyTMCTJv2ppeuEAVz0WjbDXVJ6Wu9f
-         26RIRNk7qwEiR8m/E8Gj6DC/g7V7JWNNfBO6dD3b4dx0FUuFTyKwRB9TIlxRlmNz/rlS
-         hFKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJzEM/d8yj+dscAMvzdzRdgZsJOo57fjguaMXJQbVF9EWHEGQ0DQvRWhMS5IHWrQo3/fDLK75sxPUWnImD6v/a99amatNe
-X-Gm-Message-State: AOJu0Yx7iIIiXAlIQlHzLugx/j8l/qDDUYMZptdUfUKWyQx9eNNnVD6O
-	uXnOuw/50C5zmjjjGJ9KRZOMJD+YBiCzmIg9CHCqxrAnExxwJupcgig2yleJMA==
-X-Google-Smtp-Source: AGHT+IH4GPuLW4JZ70pCnepe2Vow6yWK71i6a+LS+KmDte3yg0ALlYZIjJj1WsTlusgr/MqCrENMNw==
-X-Received: by 2002:a05:6a20:7346:b0:1be:c41d:b6b7 with SMTP id adf61e73a8af0-1c4e47fb70fmr3042955637.19.1722338226714;
-        Tue, 30 Jul 2024 04:17:06 -0700 (PDT)
-Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead81272esm8462046b3a.97.2024.07.30.04.16.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2024 04:17:06 -0700 (PDT)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Jacobe Zang <jacobe.zang@wesion.com>, <robh@kernel.org>, <krzk+dt@kernel.org>, <heiko@sntech.de>, <kvalo@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>, <conor+dt@kernel.org>, Linus Walleij <linus.walleij@linaro.org>
-CC: <efectn@protonmail.com>, <dsimic@manjaro.org>, <jagan@edgeble.ai>, <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>, <arend@broadcom.com>, <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <megi@xff.cz>, <duoming@zju.edu.cn>, <bhelgaas@google.com>, <minipli@grsecurity.net>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>
-Date: Tue, 30 Jul 2024 13:16:57 +0200
-Message-ID: <191035b8c28.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <3d3b8e0a-7492-4db1-bd73-c30a488edaa7@kernel.org>
-References: <20240730033053.4092132-1-jacobe.zang@wesion.com>
- <20240730033053.4092132-3-jacobe.zang@wesion.com>
- <191025b5268.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <f45c1fa7-f321-4a1f-b65c-6ed326a18268@kernel.org>
- <191030eac78.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <3d3b8e0a-7492-4db1-bd73-c30a488edaa7@kernel.org>
-User-Agent: AquaMail/1.51.5 (build: 105105504)
-Subject: Re: [PATCH v5 2/5] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
+	s=arc-20240116; t=1722338303; c=relaxed/simple;
+	bh=V56haVpUFlrD9G+P/ApnsxfO7fu8PgDIiuBLOvFaqlI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LjCKbJKpfPnG6B5YbYuvZVgWSoEL6oNrsZv29PualZXJwXkJ2G08xCy2PZtkH9mASL3AosP+5PbmGhgyEtZ4H3v20aI8xU3/sBd22XwAdeaDidxx+J1lvPXy7TUa2kGvA3aftzlf6B/cErvDPLn4OSxmZfu5bGdyz4fPJWWguIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sYkrX-0004Xm-8L; Tue, 30 Jul 2024 13:17:51 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sYkrV-003Gpk-Mw; Tue, 30 Jul 2024 13:17:49 +0200
+Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id B9994311BB3;
+	Tue, 30 Jul 2024 11:17:48 +0000 (UTC)
+Date: Tue, 30 Jul 2024 13:17:47 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Simon Horman <horms@kernel.org>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Vivek Yadav <vivek.2311@samsung.com>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC] can: m_can: Release irq on error in m_can_open
+Message-ID: <20240730-slick-ochre-saluki-13bd13-mkl@pengutronix.de>
+References: <20240730-mcan-irq-v1-1-f47cee5d725c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
-
-On July 30, 2024 12:18:20 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
-
-> On 30/07/2024 11:52, Arend Van Spriel wrote:
->> On July 30, 2024 11:01:43 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>
->>> On 30/07/2024 08:37, Arend Van Spriel wrote:
->>>> + Linus W
->>>>
->>>> On July 30, 2024 5:31:15 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
->>>>
->>>>> Not only AP6275P Wi-Fi device but also all Broadcom wireless devices allow
->>>>> external low power clock input. In DTS the clock as an optional choice in
->>>>> the absence of an internal clock.
->>>>>
->>>>> Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
->>>>> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
->>>>> ---
->>>>> .../bindings/net/wireless/brcm,bcm4329-fmac.yaml          | 8 ++++++++
->>>>> 1 file changed, 8 insertions(+)
->>>>>
->>>>> diff --git
->>>>> a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>> b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>> index 2c2093c77ec9a..a3607d55ef367 100644
->>>>> --- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>> +++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>> @@ -122,6 +122,14 @@ properties:
->>>>> NVRAM. This would normally be filled in by the bootloader from platform
->>>>> configuration data.
->>>>>
->>>>> +  clocks:
->>>>> +    items:
->>>>> +      - description: External Low Power Clock input (32.768KHz)
->>>>> +
->>>>> +  clock-names:
->>>>> +    items:
->>>>> +      - const: lpo
->>>>> +
->>>>
->>>> We still have an issue that this clock input is also present in the
->>>> bindings specification broadcom-bluetooth.yaml (not in bluetooth
->>>> subfolder). This clock is actually a chip resource. What happens if both
->>>> are defined and both wifi and bt drivers try to enable this clock? Can this
->>>> be expressed in yaml or can we only put a textual warning in the property
->>>> descriptions?
->>>
->>> Just like all clocks, what would happen? It will be enabled.
->>
->> Oh, wow! Cool stuff. But seriously is it not a problem to have two entities
->> controlling one and the same clock? Is this use-case taken into account by
->> the clock framework?
->
-> Yes, it is handled correctly. That's a basic use-case, handled by CCF
-> since some years (~12?). Anyway, whatever OS is doing (or not doing)
-> with the clocks is independent of the bindings here. The question is
-
-Agree. Probably the bindings would not be the place to document this if it 
-would be an issue.
-
-> about hardware - does this node, which represents PCI interface of the
-> chip, has/uses the clocks.
-
-The schematics I found for the wifi module and the khadas edge platform 
-show these are indeed wired to the chip.
-
-Regards,
-Arend
-
-> Best regards,
-> Krzysztof
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6j3hsfckprgnpgna"
+Content-Disposition: inline
+In-Reply-To: <20240730-mcan-irq-v1-1-f47cee5d725c@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--6j3hsfckprgnpgna
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 30.07.2024 12:12:21, Simon Horman wrote:
+> It appears that the irq requested in m_can_open() may be leaked
+> if an error subsequently occurs: if m_can_start() fails.
+>=20
+> Address this by calling free_irq in the unwind path for
+> such cases.
+>=20
+> Flagged by Smatch.
+> Compile tested only.
+>=20
+> Fixes: eaacfeaca7ad ("can: m_can: Call the RAM init directly from m_can_c=
+hip_config")
+> Signed-off-by: Simon Horman <horms@kernel.org>
+
+Looks good to me!
+
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--6j3hsfckprgnpgna
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaoy9gACgkQKDiiPnot
+vG9SRwf+JstLRjVK/HSfI6knM/Y4//wuo3mRdAg7NKsXt6W0QnJATIxKHZEDrjL1
+OFlbHKPEZajtCTwKC1BLGNXuoG8MBOEL3aYoIenHmRacMdEcfPnBNzlEHm5+5DN4
+v7Mx7tqGdHKfHvOgMX3GSxLpObOX/8hbDviG4C2gQawmoSf0ptyWXBwMfClkS4kQ
+8aK2j7oYExKkNzy2TsdJ62isaBM2cfEg0hi+y1GLUXUDBdUAYhsjdhyJVRPiD3cU
+dviDIIva5uzlS/mVT5Lk3L7VvgJV6me/+qY7MbI1XaqkOnDwr4SSwJE21VM9I6yO
+o0ZYqI6J0Mu6f6nm5hBFItSG6Q6pMg==
+=JR/c
+-----END PGP SIGNATURE-----
+
+--6j3hsfckprgnpgna--
 
