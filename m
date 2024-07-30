@@ -1,114 +1,77 @@
-Return-Path: <netdev+bounces-114276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B13E942028
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:56:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB36C94202E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 20:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAD5B1C22C4E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:56:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55E98B2418C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796E718A6C6;
-	Tue, 30 Jul 2024 18:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4819F18CC03;
+	Tue, 30 Jul 2024 18:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TmQAVrwq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AKj5JSDX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13801AA3C6;
-	Tue, 30 Jul 2024 18:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5F618CBFB;
+	Tue, 30 Jul 2024 18:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722365724; cv=none; b=l0tGMhyvPy+l1CASTYdjaIbt6nnd7QBnj3cos1ja/09FlWE7TiXB0erh6Er1ChgELgB3jpY15omZsKbUzI0RQmZyzjz58LyGy6qrBz3OPMV0/IqGULjjferSvfcdggNcmYyeKzryv1sJAQA3pWEmh14s9FSbNlimS2uZbX2f1Q0=
+	t=1722365756; cv=none; b=H4JuIAwdnSXC1r9mNYdsXwAfvRmzwtbP9/ek4ngtKdtCUqQgzRpvtBIM/auwnQU4PlI56Q5hctOB05b6lUa2gxX2SdfwqchjuLrT3u54G5iJssvatQUrgg7DwnyIlo8sXPM2gdtfiM1Qk6QXe9tr0MoEzbIcBGWQcupyhD5adLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722365724; c=relaxed/simple;
-	bh=2dCsYnwkPXSeLC4b0QubMn/+6f2i/bESS5WxH91G0x0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HjOl4WlzpD5FhWdR11uoIGzxijk0KWd68f9+ognKAHJjRWGFAs5Wp1DgO5+ifCTTfQtrtimPAQIQgy8Kc/UA0lqQOkOM5qFH3OLLJfxzL21ptlFT1ZqOOUOrp+X6pzwVvHpnvMPP811g0woNjp1PKs73CHd1kXjPAs1uNqzTVhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TmQAVrwq; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dff1ccdc17bso3551361276.0;
-        Tue, 30 Jul 2024 11:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722365722; x=1722970522; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2dCsYnwkPXSeLC4b0QubMn/+6f2i/bESS5WxH91G0x0=;
-        b=TmQAVrwqq5pXFsYEKafx0cPUpMCh2Nkvew5AjSwa5F89YDg1VPhi6WApOBJxIqBotf
-         +or0A2k0XZ5oVsg6PeregZwb67/qoKuR5/O+7luhh0JTzAgUEz8xZV2c4GhEgx0H3DAp
-         89AzkoUVOmWiD3PrGtBOrOxWdLxVY/dS5WF9JKh4r2TUZBfRVDjeOyARlk7PtpI0qF+D
-         9WakrXGRTYkflllLC0W4YiD2gDnKN1TWepRmpsUWr8QWoOKh9A3fhMAniM771cvrs/24
-         pd24SwklKvIaq80O9OPIzZZgyEWV4FHfsF3hc7Y1mqtbaP0CX5APbmFhXORy4QsfDZKr
-         jSiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722365722; x=1722970522;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2dCsYnwkPXSeLC4b0QubMn/+6f2i/bESS5WxH91G0x0=;
-        b=ue6uY9yVIkeqiCSaVMagEZeHcGYkTEJS6nBGZeHJK8UzTnemKVk9jxePEXYkwLGhyl
-         cOld22p1SZeApeBUR1sOW7mq6vBCVtehRQJS0FwAJtS2yUpD7KqOs+eEQ8+h/gRUwTXW
-         emlc1iSMzlEvcoP7nnUYAsoVKPdE9TtYMGS5emTW9/aFwg8j/Q7DpnLcMHukOaoGufOn
-         FZqoAIIiu0VEMXcry1+ZhdeEcnn9h5SIZ3OFMPOxhEDctQM5az5VnT8OMsUAdEEbckAW
-         OIJpZuRZ45ufal/oaQulAsjEvmBFRi+jer4MXtTvbFFK1Cszf4no6r4pO+5LJMeO0cAs
-         RnRA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5evpyVPyH62GxOVZW5PFgr5FRqaSCdZephoJSfYtton2D9GCr1p5iCl448yKXmjtW38iE/43sCl9JqUTaIjv7BCsc6WLTzYu5s8N0
-X-Gm-Message-State: AOJu0Yy923NvEx11zdYuKom3DcPHQRTPw9gp3uCxQh8mmxZoFP4q9SDW
-	AGs5l9VIlvghP4exWJOtBlBIPbzVsR3GrjszoerJjGP1O80fja+Nz+1pyvSNHjS8g28HdgNo+74
-	PTZ0sFayS5yoSHPKqDPE03Ok0p3k=
-X-Google-Smtp-Source: AGHT+IGvA3MAl7nGobKWT1GG47gu2pKSHB96B4iZ1KpXmJ8bZ3AIHUGP8s5tylGtCTrHVZ+wkXScmdB7CN+JfY59L1w=
-X-Received: by 2002:a05:6902:1445:b0:e0b:a7c1:9dcc with SMTP id
- 3f1490d57ef6-e0ba7c1a1a3mr2041732276.20.1722365721796; Tue, 30 Jul 2024
- 11:55:21 -0700 (PDT)
+	s=arc-20240116; t=1722365756; c=relaxed/simple;
+	bh=iMPC0uOGY/qCEBWGZUG8FOeMmwxGLbSnq8PUmLDtKxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jfbM4D47BV84Ga9I76vW4FuZuQmCdVEKsty4pxAPB5cpYT4Q1KaUhLTLtLPVe+EKTf7nW81l0C9cKvoaiVyHpUVuHVrITgQUmpLOzZPfAPSm2NuY0pVJfIWIHDVqXb9+hjXP55egvv7c0RZGvodjPbq8vjtxvTcWyN0gugJX4LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AKj5JSDX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03D6DC32782;
+	Tue, 30 Jul 2024 18:55:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722365755;
+	bh=iMPC0uOGY/qCEBWGZUG8FOeMmwxGLbSnq8PUmLDtKxE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AKj5JSDX4j+nJJGmrOorBwhIYn6wrx5pLq0E9PBq5qXHz7+Q4E2D2aeOMOfBqjq9C
+	 2ZxpSABp67D1RyZmruVa5gcz6UvPoMjj0dc5Y4Dk4wtH0G9aIHM5mpnvya8/Gy5+Nu
+	 ge/i2Ydh2dcq3PeG3BDVoZ6eDk81aNsWr31ftTAFvplxCCPk105ZSQ9lvGfxyfPXTh
+	 0hEqwkElYMCQh3Kj+MCcDbAVo7+Xg/rwjBpa8iJAGd6G72C7wsp/BCYRV3m3LB87Fu
+	 XT2GVTbXVn97c9yBwcRdMg+aVuS5qGjRBhT3JMYTU10T3DCxEXthEnoNH9L7E0Cafq
+	 VembjpMyHazMA==
+Date: Tue, 30 Jul 2024 19:55:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net-next 1/4] net/smc: remove unreferenced header in
+ smc_loopback.h file
+Message-ID: <20240730185550.GG1967603@kernel.org>
+References: <20240730012506.3317978-1-shaozhengchao@huawei.com>
+ <20240730012506.3317978-2-shaozhengchao@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729210615.279952-1-paweldembicki@gmail.com>
- <20240729210615.279952-7-paweldembicki@gmail.com> <56335a76-7f71-4c70-9c4b-b7494009fa63@lunn.ch>
-In-Reply-To: <56335a76-7f71-4c70-9c4b-b7494009fa63@lunn.ch>
-From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
-Date: Tue, 30 Jul 2024 20:55:10 +0200
-Message-ID: <CAJN1KkzJrMV8uDU+Z5xdLSd56uUwLtX+wo1w-8YbNgg-w8GiPA@mail.gmail.com>
-Subject: Re: [PATCH net-next 6/9] net: dsa: vsc73xx: speed up mdio bus to max
- allowed value
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Linus Walleij <linus.walleij@linaro.org>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730012506.3317978-2-shaozhengchao@huawei.com>
 
-wt., 30 lip 2024 o 01:10 Andrew Lunn <andrew@lunn.ch> napisa=C5=82(a):
->
-> On Mon, Jul 29, 2024 at 11:06:12PM +0200, Pawel Dembicki wrote:
-> > According the datasheet, vsc73xx family max internal mdio bus speed is
-> > 20MHz. It also allow to disable preamble.
-> >
-> > This commit sets mdio clock prescaler to minimal value and crop preambl=
-e
-> > to speed up mdio operations.
->
-> Just checking...
->
-> This has no effect on the external MDIO bus, correct. It has its own
-> set of registers for the divider and to crop the preamble.
+On Tue, Jul 30, 2024 at 09:25:03AM +0800, Zhengchao Shao wrote:
+> Because linux/err.h is unreferenced in smc_loopback.h file, so
+> remove it.
+> 
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 
-Yes. It's configured in a completely different subblock. Internal and
-external mdio buses have symmetrical register set. It can be
-configured separately.
+Thanks, I agree that noting provided by err.h appears
+to be used either by smc_loopback.h or files that include it.
 
---=20
-Best regards,
-Pawel Dembicki
+Reviewed-by: Simon Horman <horms@kernel.org>
 
