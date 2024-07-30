@@ -1,170 +1,330 @@
-Return-Path: <netdev+bounces-114034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 733F1940B84
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:28:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F6F7940BBB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:36:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27C6C2867F8
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:28:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 832E51C23DE9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853D619939B;
-	Tue, 30 Jul 2024 08:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9F0198A03;
+	Tue, 30 Jul 2024 08:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="qNiCW+mr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAuxvj+c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC9D192B87;
-	Tue, 30 Jul 2024 08:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4325119885F
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 08:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722327902; cv=none; b=em+deapnYx/s8cqyZMoNImvQRIOGeAXgBbPuJG9h7MQ9QQkH+eVxPuL8FOoqsNp2var1BjZv9i4wsw1cdnQPUqL8SGiUXONTzS76gn9wMRKfL2MvwpISLcunPwGTqFeMg+HubvFEvo4nLcf8j71MYezBGxkRAH4Z7cV4rKpGG10=
+	t=1722328375; cv=none; b=t5LjCeF1wDE9iiqDqHDEvbKq5RIep76IJAgG3+qrotKxXBPCoip26kh6kkiaTAyNFsIgi1f8sSlQLZkx4vonC4Ci3dMNgZKOvaW8TbndwgtjONM0m4FUVbSgpMC5xJB3L37u1vqnCtEDwfMF5OyfdPJVRcj6RwwT2KPnUJjxML0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722327902; c=relaxed/simple;
-	bh=Z5PpKmUt6ndVpX6eH/PPsQpUJ7qGgb6oyllXrZBd/P4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jC0sx07Owx0wBpA3tL03VKBHEiaybILh5oLTdOyxE1wzI73RkY+cV7sE7s7Gj9d+cM7q+p0JdeP2cE6KSz1TYuXYbaiqPmYK5Ux1PhmUr+KwzqYck2v4ZJGGohZTgOhRLRf0l38XJgH7AvOvPlZpx8lPfqti0WxgdASTJOAJDg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=qNiCW+mr; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 330f6ba24e4d11efb5b96b43b535fdb4-20240730
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=CcJzTAL9IFu4/nhUMP2RjTp8+dJQAQi4jXS1e0DRnFY=;
-	b=qNiCW+mrbTHqMq3Ivje8mGgJ4ZQKBFLQEC2qveMZ0lC4L7aAUe/GnTBZh1UgRbJzgCt6H+9KhJQGMxHbIOg5/wmTnyD86y0MrqBZ+e6159qIp/L0LM23xbtGXYFOx2ZOTPrLhi2lKQboD4VsRrE7+EzYN41tHKSWL3mv8KNTPKk=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:bc0159b6-2371-4ec5-8d8b-ef1790efd4a1,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-50
-X-CID-META: VersionHash:6dc6a47,CLOUDID:1e23e245-a117-4f46-a956-71ffeac67bfa,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:1,IP:nil,UR
-	L:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
-	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 330f6ba24e4d11efb5b96b43b535fdb4-20240730
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-	(envelope-from <liju-clr.chen@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1299080935; Tue, 30 Jul 2024 16:24:54 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 30 Jul 2024 01:24:40 -0700
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Tue, 30 Jul 2024 16:24:40 +0800
-From: Liju-clr Chen <liju-clr.chen@mediatek.com>
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Catalin
- Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Richard Cochran
-	<richardcochran@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Liju-clr Chen <Liju-clr.Chen@mediatek.com>, Yingshiuan Pan
-	<Yingshiuan.Pan@mediatek.com>, Ze-yu Wang <Ze-yu.Wang@mediatek.com>
-CC: <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-mediatek@lists.infradead.org>, Shawn Hsiao <shawn.hsiao@mediatek.com>,
-	PeiLun Suei <PeiLun.Suei@mediatek.com>, Chi-shen Yeh
-	<Chi-shen.Yeh@mediatek.com>, Kevenny Hsieh <Kevenny.Hsieh@mediatek.com>
-Subject: [PATCH v12 24/24] virt: geniezone: Emulate IPI for guest VM
-Date: Tue, 30 Jul 2024 16:24:36 +0800
-Message-ID: <20240730082436.9151-25-liju-clr.chen@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20240730082436.9151-1-liju-clr.chen@mediatek.com>
-References: <20240730082436.9151-1-liju-clr.chen@mediatek.com>
+	s=arc-20240116; t=1722328375; c=relaxed/simple;
+	bh=E6gmvD0Q7zeWVOo4lEzOWRmLUPeP28JDg0QFfxt2s8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cokhgs7GatslRXELbk9TE1f3JGop/bVy7AaZ8aJuRHW9jBBqIjiUKw5sJTPluf0aj0Mup42cwyGLjiaG80nGnzqpmslydxpRzl4wmULFQRgO15jD0QMoSTSYriov7jS63gfOFkv1Gdu8/1gEw2bJZl9dFV3PLsa1+CROuikeGuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fAuxvj+c; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722328372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KUu9DqweMZplPZPw8zixj088PoW8Kyk6wuUBLwD2TsA=;
+	b=fAuxvj+c0qdBTW7wacpG4iAB7rP8dJSAe5V1vkRRLYFbV0Zyw9pKZFCSH13iAN7AZt1Xiw
+	+aZn5WEqX72lNBnLGy53korGSd4wjYnH56QiR5T0lUOj43F4GSh/maLgn8SF0kCmyfPxrP
+	7IC8YiTmQBn2aBBT/hTKuUkQ9y4ybUg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-16-gl_y_ZH0OwyOU27bnLxIGw-1; Tue, 30 Jul 2024 04:32:50 -0400
+X-MC-Unique: gl_y_ZH0OwyOU27bnLxIGw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280d8e685eso25303605e9.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:32:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722328369; x=1722933169;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KUu9DqweMZplPZPw8zixj088PoW8Kyk6wuUBLwD2TsA=;
+        b=NVfq+OwgXxwInxdIOgfRO5NxZ1epRLdj0Ela8hp5PH6z5oEG/cgi1kPRbaPH1nWnfi
+         N84jZzjj/OQOpT3+Y2tEATcisish8nwfavM0ma1NfobWbo4pbRnxaRBhiEwm3Kt60z/q
+         kY0d7cirqcaaAQbyt0eljbjqp6Bss46n/cthSdWojIOYYYNe9O0AIhVQmyzP8gOZ+5nE
+         FFihlHXo1aixIqZr2myWuyZ0uEHxtq8bmFct3Gza11CT/Zu2c+1g/05jlx25wJCuk9N4
+         ukdAFE/0Pna/w/JOm5EGMrJWuLIUAE+iZHd3JBOHF64ykJj9tzssVxskaygtwmSr66Uv
+         fPAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMSWbXC/MOBptWF6DaqcXFWoV/oHsoF5gNm1tye1WjvcoIlDy+26RcQ0IbS5TDBdp0qhlvBROun/ZMYRo11VnK9BLTN73a
+X-Gm-Message-State: AOJu0YxmwQLx3Ce9MR9JHKdXSHPVJT7rTVbLKVpmuTK+/GfTlTkqf3Cd
+	iTRFS/qul7HZQ0pCv/NuBv6ejnJNdfI2isBrIPCMQXQttmbPh8AKs0evcR+0KmRm55BzfFEqbkT
+	4fGHcqoZXncA8Xhiha6gWaV2offbrgfVQZYBfmSzGlc2ekEVUWMO1dg==
+X-Received: by 2002:a05:600c:2d53:b0:426:59fc:cdec with SMTP id 5b1f17b1804b1-42811da1b88mr71529895e9.21.1722328369119;
+        Tue, 30 Jul 2024 01:32:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFIZbaDTrEZBCLXIF/bnAzy6Ax7DEDAW4LkM0HdYou7XpcwkGyKPBEX2idkqwXBZnxwkKn71A==
+X-Received: by 2002:a05:600c:2d53:b0:426:59fc:cdec with SMTP id 5b1f17b1804b1-42811da1b88mr71529585e9.21.1722328368349;
+        Tue, 30 Jul 2024 01:32:48 -0700 (PDT)
+Received: from sgarzare-redhat ([62.205.9.89])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280574b2c2sm203448165e9.28.2024.07.30.01.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 01:32:47 -0700 (PDT)
+Date: Tue, 30 Jul 2024 10:32:44 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
+	decui@microsoft.com, bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
+	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
+Subject: Re: [RFC PATCH net-next v6 09/14] virtio/vsock: add common datagram
+ recv path
+Message-ID: <yx5phoynacbxobystxaa3zca5ehzbupzzwz3ayptb7wu5d74mc@ic3lvpjnvkkr>
+References: <20240710212555.1617795-1-amery.hung@bytedance.com>
+ <20240710212555.1617795-10-amery.hung@bytedance.com>
+ <ldyfzp5k2qmhlydflu7biz6bcrekothacitzgbmw2k264zwuxh@hmgoku5kgghp>
+ <CAMB2axNx=nCh-B-=XLtto2nEsKsV0p+b7yzXRX9OKSgUbRzzWA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK: N
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMB2axNx=nCh-B-=XLtto2nEsKsV0p+b7yzXRX9OKSgUbRzzWA@mail.gmail.com>
 
-From: Kevenny Hsieh <kevenny.hsieh@mediatek.com>
+On Mon, Jul 29, 2024 at 05:35:01PM GMT, Amery Hung wrote:
+>On Tue, Jul 23, 2024 at 7:42 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Wed, Jul 10, 2024 at 09:25:50PM GMT, Amery Hung wrote:
+>> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> >
+>> >This commit adds the common datagram receive functionality for virtio
+>> >transports. It does not add the vhost/virtio users of that
+>> >functionality.
+>> >
+>> >This functionality includes:
+>> >- changes to the virtio_transport_recv_pkt() path for finding the
+>> >  bound socket receiver for incoming packets
+>> >- virtio_transport_recv_pkt() saves the source cid and port to the
+>> >  control buffer for recvmsg() to initialize sockaddr_vm structure
+>> >  when using datagram
+>> >
+>> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+>> >---
+>> > net/vmw_vsock/virtio_transport_common.c | 79 +++++++++++++++++++++----
+>> > 1 file changed, 66 insertions(+), 13 deletions(-)
+>> >
+>> >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> >index 46cd1807f8e3..a571b575fde9 100644
+>> >--- a/net/vmw_vsock/virtio_transport_common.c
+>> >+++ b/net/vmw_vsock/virtio_transport_common.c
+>> >@@ -235,7 +235,9 @@ EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
+>> >
+>> > static u16 virtio_transport_get_type(struct sock *sk)
+>> > {
+>> >-      if (sk->sk_type == SOCK_STREAM)
+>> >+      if (sk->sk_type == SOCK_DGRAM)
+>> >+              return VIRTIO_VSOCK_TYPE_DGRAM;
+>> >+      else if (sk->sk_type == SOCK_STREAM)
+>> >               return VIRTIO_VSOCK_TYPE_STREAM;
+>> >       else
+>> >               return VIRTIO_VSOCK_TYPE_SEQPACKET;
+>> >@@ -1422,6 +1424,33 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
+>> >               kfree_skb(skb);
+>> > }
+>> >
+>> >+static void
+>> >+virtio_transport_dgram_kfree_skb(struct sk_buff *skb, int err)
+>> >+{
+>> >+      if (err == -ENOMEM)
+>> >+              kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_RCVBUFF);
+>> >+      else if (err == -ENOBUFS)
+>> >+              kfree_skb_reason(skb, SKB_DROP_REASON_PROTO_MEM);
+>> >+      else
+>> >+              kfree_skb(skb);
+>> >+}
+>> >+
+>> >+/* This function takes ownership of the skb.
+>> >+ *
+>> >+ * It either places the skb on the sk_receive_queue or frees it.
+>> >+ */
+>> >+static void
+>> >+virtio_transport_recv_dgram(struct sock *sk, struct sk_buff *skb)
+>> >+{
+>> >+      int err;
+>> >+
+>> >+      err = sock_queue_rcv_skb(sk, skb);
+>> >+      if (err) {
+>> >+              virtio_transport_dgram_kfree_skb(skb, err);
+>> >+              return;
+>> >+      }
+>> >+}
+>> >+
+>> > static int
+>> > virtio_transport_recv_connected(struct sock *sk,
+>> >                               struct sk_buff *skb)
+>> >@@ -1591,7 +1620,8 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+>> > static bool virtio_transport_valid_type(u16 type)
+>> > {
+>> >       return (type == VIRTIO_VSOCK_TYPE_STREAM) ||
+>> >-             (type == VIRTIO_VSOCK_TYPE_SEQPACKET);
+>> >+             (type == VIRTIO_VSOCK_TYPE_SEQPACKET) ||
+>> >+             (type == VIRTIO_VSOCK_TYPE_DGRAM);
+>> > }
+>> >
+>> > /* We are under the virtio-vsock's vsock->rx_lock or vhost-vsock's vq->mutex
+>> >@@ -1601,44 +1631,57 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+>> >                              struct sk_buff *skb)
+>> > {
+>> >       struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+>> >+      struct vsock_skb_cb *vsock_cb;
+>>
+>> This can be defined in the block where it's used.
+>>
+>
+>Got it.
+>
+>> >       struct sockaddr_vm src, dst;
+>> >       struct vsock_sock *vsk;
+>> >       struct sock *sk;
+>> >       bool space_available;
+>> >+      u16 type;
+>> >
+>> >       vsock_addr_init(&src, le64_to_cpu(hdr->src_cid),
+>> >                       le32_to_cpu(hdr->src_port));
+>> >       vsock_addr_init(&dst, le64_to_cpu(hdr->dst_cid),
+>> >                       le32_to_cpu(hdr->dst_port));
+>> >
+>> >+      type = le16_to_cpu(hdr->type);
+>> >+
+>> >       trace_virtio_transport_recv_pkt(src.svm_cid, src.svm_port,
+>> >                                       dst.svm_cid, dst.svm_port,
+>> >                                       le32_to_cpu(hdr->len),
+>> >-                                      le16_to_cpu(hdr->type),
+>> >+                                      type,
+>> >                                       le16_to_cpu(hdr->op),
+>> >                                       le32_to_cpu(hdr->flags),
+>> >                                       le32_to_cpu(hdr->buf_alloc),
+>> >                                       le32_to_cpu(hdr->fwd_cnt));
+>> >
+>> >-      if (!virtio_transport_valid_type(le16_to_cpu(hdr->type))) {
+>> >+      if (!virtio_transport_valid_type(type)) {
+>> >               (void)virtio_transport_reset_no_sock(t, skb);
+>> >               goto free_pkt;
+>> >       }
+>> >
+>> >-      /* The socket must be in connected or bound table
+>> >-       * otherwise send reset back
+>> >+      /* For stream/seqpacket, the socket must be in connected or bound table
+>> >+       * otherwise send reset back.
+>> >+       *
+>> >+       * For datagrams, no reset is sent back.
+>> >        */
+>> >       sk = vsock_find_connected_socket(&src, &dst);
+>> >       if (!sk) {
+>> >-              sk = vsock_find_bound_socket(&dst);
+>> >-              if (!sk) {
+>> >-                      (void)virtio_transport_reset_no_sock(t, skb);
+>> >-                      goto free_pkt;
+>> >+              if (type == VIRTIO_VSOCK_TYPE_DGRAM) {
+>> >+                      sk = vsock_find_bound_dgram_socket(&dst);
+>> >+                      if (!sk)
+>> >+                              goto free_pkt;
+>> >+              } else {
+>> >+                      sk = vsock_find_bound_socket(&dst);
+>> >+                      if (!sk) {
+>> >+                              (void)virtio_transport_reset_no_sock(t, skb);
+>> >+                              goto free_pkt;
+>> >+                      }
+>> >               }
+>> >       }
+>> >
+>> >-      if (virtio_transport_get_type(sk) != le16_to_cpu(hdr->type)) {
+>> >-              (void)virtio_transport_reset_no_sock(t, skb);
+>> >+      if (virtio_transport_get_type(sk) != type) {
+>> >+              if (type != VIRTIO_VSOCK_TYPE_DGRAM)
+>> >+                      (void)virtio_transport_reset_no_sock(t, skb);
+>> >               sock_put(sk);
+>> >               goto free_pkt;
+>> >       }
+>> >@@ -1654,12 +1697,21 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+>> >
+>> >       /* Check if sk has been closed before lock_sock */
+>> >       if (sock_flag(sk, SOCK_DONE)) {
+>> >-              (void)virtio_transport_reset_no_sock(t, skb);
+>> >+              if (type != VIRTIO_VSOCK_TYPE_DGRAM)
+>> >+                      (void)virtio_transport_reset_no_sock(t, skb);
+>> >               release_sock(sk);
+>> >               sock_put(sk);
+>> >               goto free_pkt;
+>> >       }
+>> >
+>> >+      if (sk->sk_type == SOCK_DGRAM) {
+>> >+              vsock_cb = vsock_skb_cb(skb);
+>> >+              vsock_cb->src_cid = src.svm_cid;
+>> >+              vsock_cb->src_port = src.svm_port;
+>> >+              virtio_transport_recv_dgram(sk, skb);
+>>
+>>
+>> What about adding an API that transports can use to hide this?
+>>
+>> I mean something that hide vsock_cb creation and queue packet in the
+>> socket receive queue. I'd also not expose vsock_skb_cb in an header, but
+>> I'd handle it internally in af_vsock.c. So I'd just expose API to
+>> queue/dequeue them.
+>>
+>
+>Got it. I will move vsock_skb_cb to af_vsock.c and create an API:
+>
+>vsock_dgram_skb_save_src_addr(struct sk_buff *skb, u32 cid, u32 port)
 
-Emulate Inter-Processor Interrupts (IPI) handling for guest VMs.
-Ensure that when a vCPU thread enters an idle state and relinquishes
-CPU control to the host, it can be woken up by IPIs issued by other
-vCPUs through the gzvm driver.
+This is okay, but I would try to go further by directly adding an API to 
+queue dgrams in af_vsock.c (if it's feasible).
 
-Add a new wake-up mechanism, `GZVM_EXIT_IPI`, to handle IPIs. Ensure
-that idle vCPUs can be woken up not only by virtual timer (vtimer) and
-virtio interrupts but also by IPIs issued by other vCPUs.
+>
+>Different dgram implementations will call this API instead of the code
+>block above to save the source address information into the control
+>buffer.
+>
+>A side note on why this is a vsock API instead of a member )unction in
+>transport: As we move to support multi-transport dgram, different
+>transport implementations can place skb into the sk->sk_receive_queue.
+>Therefore, we cannot call transport-specific function in
+>vsock_dgram_recvmsg() to initialize struct sockaddr_vm. Hence, the
+>receiving paths of different transports need to call this API to save
+>source address.
 
-Ensure proper handling of IPIs, allowing idle vCPUs to be woken up and
-respond to interrupts, thereby maintaining correct and efficient
-inter-processor communication within the guest VM.
+What I meant is, why virtio_transport_recv_dgram() can't be exposed by 
+af_vsock.c as vsock_recv_dgram() and handle all internally, like 
+populate vsock_cb, call sock_queue_rcv_skb(), etc.
 
-Signed-off-by: Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
----
- drivers/virt/geniezone/gzvm_exception.c | 5 +++++
- drivers/virt/geniezone/gzvm_vcpu.c      | 3 +++
- include/linux/soc/mediatek/gzvm_drv.h   | 1 +
- include/uapi/linux/gzvm.h               | 1 +
- 4 files changed, 10 insertions(+)
+>
+>> Also why VMCI is using sk_receive_skb(), while we are using
+>> sock_queue_rcv_skb()?
+>>
+>
+>I _think_ originally we referred to UDP and UDS when designing virtio
+>dgram, and ended up with placing skb into sk_receive_queue directly. I
+>will look into this to provide better justification.
 
-diff --git a/drivers/virt/geniezone/gzvm_exception.c b/drivers/virt/geniezone/gzvm_exception.c
-index 391168a3f737..7a4e3d76aa7a 100644
---- a/drivers/virt/geniezone/gzvm_exception.c
-+++ b/drivers/virt/geniezone/gzvm_exception.c
-@@ -105,3 +105,8 @@ int gzvm_handle_guest_idle(struct gzvm_vcpu *vcpu)
- 
- 	return ret;
- }
-+
-+void gzvm_handle_guest_ipi(struct gzvm_vcpu *vcpu)
-+{
-+	gzvm_vcpu_wakeup_all(vcpu->gzvm);
-+}
-diff --git a/drivers/virt/geniezone/gzvm_vcpu.c b/drivers/virt/geniezone/gzvm_vcpu.c
-index 247848ee126c..5cdd6ccbe76d 100644
---- a/drivers/virt/geniezone/gzvm_vcpu.c
-+++ b/drivers/virt/geniezone/gzvm_vcpu.c
-@@ -184,6 +184,9 @@ static long gzvm_vcpu_run(struct gzvm_vcpu *vcpu, void __user *argp)
- 		case GZVM_EXIT_IDLE:
- 			gzvm_handle_guest_idle(vcpu);
- 			break;
-+		case GZVM_EXIT_IPI:
-+			gzvm_handle_guest_ipi(vcpu);
-+			break;
- 		case GZVM_EXIT_UNKNOWN:
- 			fallthrough;
- 		default:
-diff --git a/include/linux/soc/mediatek/gzvm_drv.h b/include/linux/soc/mediatek/gzvm_drv.h
-index 61f3ae4ee793..0302890ed69e 100644
---- a/include/linux/soc/mediatek/gzvm_drv.h
-+++ b/include/linux/soc/mediatek/gzvm_drv.h
-@@ -241,6 +241,7 @@ int gzvm_handle_relinquish(struct gzvm_vcpu *vcpu, phys_addr_t ipa);
- bool gzvm_handle_guest_hvc(struct gzvm_vcpu *vcpu);
- bool gzvm_arch_handle_guest_hvc(struct gzvm_vcpu *vcpu);
- int gzvm_handle_guest_idle(struct gzvm_vcpu *vcpu);
-+void gzvm_handle_guest_ipi(struct gzvm_vcpu *vcpu);
- void gzvm_vcpu_wakeup_all(struct gzvm *gzvm);
- 
- int gzvm_arch_create_device(u16 vm_id, struct gzvm_create_device *gzvm_dev);
-diff --git a/include/uapi/linux/gzvm.h b/include/uapi/linux/gzvm.h
-index 1fe483ef2ed5..bcbc4d62a70f 100644
---- a/include/uapi/linux/gzvm.h
-+++ b/include/uapi/linux/gzvm.h
-@@ -189,6 +189,7 @@ enum {
- 	GZVM_EXIT_SHUTDOWN = 0x92920009,
- 	GZVM_EXIT_GZ = 0x9292000a,
- 	GZVM_EXIT_IDLE = 0x9292000b,
-+	GZVM_EXIT_IPI = 0x9292000d,
- };
- 
- /* exception definitions of GZVM_EXIT_EXCEPTION */
--- 
-2.18.0
+Great, thanks.
+
+Maybe we can also ping VMCI maintainers to understand if they can switch 
+to sock_queue_rcv_skb(). But we should understand better the difference.
+
+Thanks,
+Stefano
 
 
