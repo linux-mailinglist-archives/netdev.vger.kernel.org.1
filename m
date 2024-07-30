@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-114099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2158F940EE9
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:23:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 337E3940EEB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:23:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4BD91F20984
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:23:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 645AA1C20FD8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B60D195997;
-	Tue, 30 Jul 2024 10:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CDA195997;
+	Tue, 30 Jul 2024 10:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fktfH51W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NBw7NgVm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E5F1957E7
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFB2208DA
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722334994; cv=none; b=i6/JUyKB5WPzZQrMit4D+zzo/lNH0yk9iskU/yiQtuY2CkqIzg/zWLsAbdEMTLGuzI2L0wSdzIyuQ+MD1ArLcHfTULyw3uzdsz6J/wxB14njtYs2LrIgvTa4BveE9iUIFqseZ8B+WNw+gzNolq2gHs9/Ng3r8B503+Mo6thrCEY=
+	t=1722335008; cv=none; b=Kmc3IZ+YUvt+1Kh+Wp70j2V500nOv+Qk9SlsBuFtZKckCDHGzEDOrVmC6i/2HudFdvf21LNvjZSZWliL94pZJggj/uMZZAzCfer6TUORgdFMtPiBdUMX0h8VGzuxRptWrPH3YZHXMSP6O6bbdDSZM+wUBHOCGhBzl+qmLADLC0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722334994; c=relaxed/simple;
-	bh=pT4+ay8DDR3nEJS/rR28xaqLvwI5HQMmBzAJq6x0P/k=;
+	s=arc-20240116; t=1722335008; c=relaxed/simple;
+	bh=67OMBK5OtSZOYrk1GahfzAECnxtvjYjzquPXPhvYx9A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dps8Z08NcM6cOBTOUu1wpB2SRISXNVu0CfrOAoW3ERSQDbk8ImsEbk/k8UrytZ0YYfj84LFIX3nNw+c+eHkixd7onYfBR9LFUCMCKgB4AY9+KB7sWszXK9eqMoQjXhdxJzBv7h0ItbB/+Rk5uWA0ZaLm4JENh/8/Ot+ckR7c1Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fktfH51W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C1FCC4AF0B;
-	Tue, 30 Jul 2024 10:23:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOJu6lcDBEnBe3ExiaHkfq1ZArL0p2tR1dJxQaMuuHEFRCH9TtLIROWE0cw72Nf2hlfNqju5dd3VJEXah0mCvz5S4+U45TSEp5oQ889ZOzc7qnsSYBGoYIuX1S+RBjLf+a+lahlNKbv/Z22MGbWU8UyyFOH1U3qnnpm3GqwHfwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NBw7NgVm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A49C32782;
+	Tue, 30 Jul 2024 10:23:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722334993;
-	bh=pT4+ay8DDR3nEJS/rR28xaqLvwI5HQMmBzAJq6x0P/k=;
+	s=k20201202; t=1722335008;
+	bh=67OMBK5OtSZOYrk1GahfzAECnxtvjYjzquPXPhvYx9A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fktfH51WjzVxXOBHOw7WTdoaO8w/oJH8nQ309C+x2go71v6SfsR1Zsbq0VUuhZjEU
-	 JY2mqB/m5vXYtGG4mEC0+RL1GdTK6729SOJWF5uRd9oq+db92/rRY9Ptr46JjAcwEA
-	 E7cWI96cr7Z7Ncedg/LNa4eNkEMk5nSVD1MY3Z0fSHroq0FoZ6rbwA6pZ3Nm8jZ2VE
-	 V4uU6U/66uo7MTHJ/LxqzD9cOTCyMtzc47+XY2Cjs5B1aaD4uOozcs6UTlq26CPnwe
-	 nBpLTTjRKb+WRLvmyReoJmmaq+WeNDUVQco64elvflLsdYnB/f/stKhOP6f8K2il4S
-	 opZteaYHyGckg==
-Date: Tue, 30 Jul 2024 11:23:10 +0100
+	b=NBw7NgVmfbyzy5zeYfkUEIHrmYKXj+cPWZDO3n8zT06utrQ679WotbNysX4ER7o1K
+	 CB92qVxh+bd2xajwTHXBiqwpGmSgDLN04ASir7niP7SEoFII+L6gXxBxAbJ0275Je/
+	 AKuA4WDKMKpxAWRHpZmrgnwXlsEn8m9X0qEPxgyIaOs22x/FLSKCkJBWxI+1mc0Tgd
+	 7V55sHcb2NiuOXJ5CZgQz4Hs5SSFNYVnCQsJMy49ETqRMlUKmWGufHzPH3CqC1pamu
+	 CxavP4ikuGZyIGnf8wT7jKVByfknfMekW+3u1t3nECbbyVZLg8Z7VWLRKmmGYMmznR
+	 6hB85f7ZCkm+A==
+Date: Tue, 30 Jul 2024 11:23:24 +0100
 From: Simon Horman <horms@kernel.org>
 To: Ahmed Zaki <ahmed.zaki@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
@@ -49,11 +49,11 @@ Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	hkelam@marvell.com, Junfeng Guo <junfeng.guo@intel.com>,
 	Marcin Szycik <marcin.szycik@linux.intel.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: Re: [PATCH iwl-next v5 06/13] ice: support turning on/off the
- parser's double vlan mode
-Message-ID: <20240730102310.GU97837@kernel.org>
+Subject: Re: [PATCH iwl-next v5 08/13] ice: add API for parser profile
+ initialization
+Message-ID: <20240730102324.GV97837@kernel.org>
 References: <20240725220810.12748-1-ahmed.zaki@intel.com>
- <20240725220810.12748-7-ahmed.zaki@intel.com>
+ <20240725220810.12748-9-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +62,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240725220810.12748-7-ahmed.zaki@intel.com>
+In-Reply-To: <20240725220810.12748-9-ahmed.zaki@intel.com>
 
-On Thu, Jul 25, 2024 at 04:08:02PM -0600, Ahmed Zaki wrote:
+On Thu, Jul 25, 2024 at 04:08:04PM -0600, Ahmed Zaki wrote:
 > From: Junfeng Guo <junfeng.guo@intel.com>
 > 
-> Add API ice_parser_dvm_set() to support turning on/off the parser's double
-> vlan mode.
+> Add API ice_parser_profile_init() to init a parser profile based on
+> a parser result and a mask buffer. The ice_parser_profile struct is used
+> by the low level FXP engine to create HW profile/field vectors.
 > 
 > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 > Signed-off-by: Qi Zhang <qi.z.zhang@intel.com>
 > Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
-> Co-developed-by: Ahmed Zaki <ahmed.zaki@intel.com>
 > Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 > Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
