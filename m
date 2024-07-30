@@ -1,141 +1,265 @@
-Return-Path: <netdev+bounces-114084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA98940E54
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:54:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2F06940E71
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 11:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96432B21350
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E5C12820D1
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92183197A75;
-	Tue, 30 Jul 2024 09:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438E1197A92;
+	Tue, 30 Jul 2024 09:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="V2w9peLG"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uR0sgPqO";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="k4Js5UuQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4413A194158
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 09:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC9E195FE5;
+	Tue, 30 Jul 2024 09:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722333186; cv=none; b=H+YrDkokxcP2kjwZ5QLQWk0bSIANhaNw/caXJwOPPzIkd+uUWCfzOaPD8LKQrkiCvhxxk4d8nxDh13sDxIuFQzqAxwaQc0+vO8/D4cyv06iKt4/kk9Qx3HsALIKXSa7kn63LS5P13++yPCfPmn3BnRVLBb5tpbbiEKEGowzvuZ8=
+	t=1722333521; cv=none; b=iFWG4p8s+Oqug/dF6gBww+xJsoB34wOjCEKNbv/Znqr069SH/gpb/2oz23wpjDe0W44HYThC2YUrtQYhthMekRzdEkOtsEWcaqp4Y7rx+bLoecJeNiqIvEIXMneFsNDFxcYOxaxkt640+Z6ojqMJvUUd30AUO0Pzq3Qz86I/Fv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722333186; c=relaxed/simple;
-	bh=yyO3hcRLNuqAV2Gf157yrnXtadAYEe17pUI/1dgy2Ho=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=peBXqVe1q/oRxftn+h41w2mtrPyMzo3wUDfcvgmxqEytB5jlMJVpvd1ykYhzPh5+pn53x43Dk54jMuv1rMeaalLzl6PuAiaaa/utIRXzEH28HlGZzcN7dyeKvSH5esfkRCAyG1VG3Dqhlw5QW2ota57IeOeAaz6MBtTuOkNR1GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=V2w9peLG; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52f04b3cb33so9807666e87.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 02:53:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722333181; x=1722937981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RA46jBL+SPUUXOwt3hGVdpN7JmCGwJMtQwXehgaQlLY=;
-        b=V2w9peLGXrcmmgqenpSNQmrmZwyV1BOPyeC1QfYu+bB0jh7NrhsXoyFOdYxFN4fquq
-         qDfRVUznX9nw1ZPIt6GGGdUB+EIrt/ufNS2WLGX/A2FUVABWAXfNdWzPlV2ymvUWz/xx
-         DM/08NOouP9eggvHspF/K9x/y0WgSC28lW3ww=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722333181; x=1722937981;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RA46jBL+SPUUXOwt3hGVdpN7JmCGwJMtQwXehgaQlLY=;
-        b=Ol1eaYmpmYOo5d4V18hNxS3n5Eg9KmBH/EvtHURTt8Yb3+ivb6/zgBZ7jrtzDOMaJr
-         CFD+QI72/W6acPS15oWC+Rt4tJLK+UzIQohL7gerwCkG1ocshimp5bc1Zp6SW3jnTfTA
-         u+cNsNXnaFaQ6ijG+N8atBs0TdkSwjkojomcZIy1cC28MvAyy1M/hyGRQvixX5qotVlq
-         yLjZULsoCMWXLukqemjbS6bjWAd45IDcMLX4+MzhkzGdMEE2eO9Am3aRcGN+QHvHO64O
-         Xgs1yrdqxUHW1NBmqaDro9ItNejpmgG07zqh/GXCgVNp+iD9NaTJXdAwk6Pa9R3pbG1p
-         Q0qw==
-X-Forwarded-Encrypted: i=1; AJvYcCXUMXOaYRVZRNIJRivR8dXI+Azj6/hiJJ7BNdYfItr4+4axx7Kj4S4cbZx1hW31gDym/DmL8dLeLEM8Dedere71oRTlvbig
-X-Gm-Message-State: AOJu0YztbgsNAJ9NPGy6q/2GzsBA4N6Hvilpztdrbv11OXjjol3CQzYl
-	ajGXvSrTNwZ9OF3WMv/IBHzu9NfNKL9v2gqgFsrk9MIzOb7f96E7rURsQfslcw==
-X-Google-Smtp-Source: AGHT+IHlCt/1eobcVjTAVX4BrkBS2kd5LjzvzW4U/MFQXgveeXv+o8QcHY9jzRml82ZRhYYMl0R/EQ==
-X-Received: by 2002:a05:6512:2c0d:b0:529:b718:8d00 with SMTP id 2adb3069b0e04-5309b2694e5mr8676169e87.8.1722333181165;
-        Tue, 30 Jul 2024 02:53:01 -0700 (PDT)
-Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad41961sm624701966b.131.2024.07.30.02.52.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jul 2024 02:53:00 -0700 (PDT)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Jacobe Zang <jacobe.zang@wesion.com>, <robh@kernel.org>, <krzk+dt@kernel.org>, <heiko@sntech.de>, <kvalo@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>, <conor+dt@kernel.org>, Linus Walleij <linus.walleij@linaro.org>
-CC: <efectn@protonmail.com>, <dsimic@manjaro.org>, <jagan@edgeble.ai>, <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>, <arend@broadcom.com>, <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <megi@xff.cz>, <duoming@zju.edu.cn>, <bhelgaas@google.com>, <minipli@grsecurity.net>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>
-Date: Tue, 30 Jul 2024 11:52:59 +0200
-Message-ID: <191030eac78.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <f45c1fa7-f321-4a1f-b65c-6ed326a18268@kernel.org>
-References: <20240730033053.4092132-1-jacobe.zang@wesion.com>
- <20240730033053.4092132-3-jacobe.zang@wesion.com>
- <191025b5268.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <f45c1fa7-f321-4a1f-b65c-6ed326a18268@kernel.org>
-User-Agent: AquaMail/1.51.5 (build: 105105504)
-Subject: Re: [PATCH v5 2/5] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
+	s=arc-20240116; t=1722333521; c=relaxed/simple;
+	bh=pBW1iXUgUWPqF8BiZCdFB4ILrvn3db6+hfo+Ctdyk48=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=q5Nd90TKyL4H2AHmvzD7CCga67+0tTzlmxXXCl9lLgTSap8D7+p4XDz6zLN3M7shEqgrSarU15EywuMVfbZyHwuDKG21byfPB6aCpk6ahWmUGsuE0y+G8Qnp6sIbMtiSf+MJEEz/wxdczR4OMf0bofi+DMfNSMsb7G9bPcedYyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uR0sgPqO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=k4Js5UuQ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1722333516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RGoEM2sBI9H+4jdzkqFA7zQ20wEq+y0hpMq3862q89o=;
+	b=uR0sgPqO4CkZIXC3qLkB1+lOBK+9HOm16MLEx8B+FIaE4W5QuWyc44hBBJ++xHLjrdjDTm
+	R5IuH5iW7j70XU2Q3HgFoNYtJ8nskjskL5fdMD3sGiZijIYqoZ8pS6o9b6XHYx+N/nKbRE
+	V+Y6HThiQMlnVbmJzm65d0qxzVOQosw5QZ/I1q3eUXDCth2hW8r460bc1bfbNVcnOPGd/A
+	iskkM3RRSKYFcGbZAjlqmg7oOCWVEad/ILxPfDdcVTBvNXbavf2Y1sMKcHo26hV8a+huNq
+	9fMzm2JZAKYTsS3crhhOi1N5FBINQBSJGdPM0n/PzyEpyZ4cG9oEiEe3+hVKyQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1722333516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RGoEM2sBI9H+4jdzkqFA7zQ20wEq+y0hpMq3862q89o=;
+	b=k4Js5UuQd4uIH5icrNshrFG5sJwDCLMzqjPnnBx9lE40D/UgblZ5kjap+oBRnQj9eCYa2i
+	KXp+/I9hlX78TwBg==
+To: Song Yoong Siang <yoong.siang.song@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, Jonathan Corbet <corbet@lwn.net>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>, Shinas Rasheed
+ <srasheed@marvell.com>, Kevin Tian <kevin.tian@intel.com>, Brett Creeley
+ <brett.creeley@amd.com>, Blanco Alcaine Hector
+ <hector.blanco.alcaine@intel.com>, Joshua Hay <joshua.a.hay@intel.com>,
+ Sasha Neftin <sasha.neftin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH iwl-next,v1 2/3] igc: Add default Rx queue configuration
+ via sysfs
+In-Reply-To: <20240730012312.775893-1-yoong.siang.song@intel.com>
+References: <20240730012312.775893-1-yoong.siang.song@intel.com>
+Date: Tue, 30 Jul 2024 11:58:34 +0200
+Message-ID: <87plqvjj5h.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On July 30, 2024 11:01:43 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> On 30/07/2024 08:37, Arend Van Spriel wrote:
->> + Linus W
->>
->> On July 30, 2024 5:31:15 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
->>
->>> Not only AP6275P Wi-Fi device but also all Broadcom wireless devices allow
->>> external low power clock input. In DTS the clock as an optional choice in
->>> the absence of an internal clock.
->>>
->>> Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
->>> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
->>> ---
->>> .../bindings/net/wireless/brcm,bcm4329-fmac.yaml          | 8 ++++++++
->>> 1 file changed, 8 insertions(+)
->>>
->>> diff --git
->>> a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>> b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>> index 2c2093c77ec9a..a3607d55ef367 100644
->>> --- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>> +++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>> @@ -122,6 +122,14 @@ properties:
->>> NVRAM. This would normally be filled in by the bootloader from platform
->>> configuration data.
->>>
->>> +  clocks:
->>> +    items:
->>> +      - description: External Low Power Clock input (32.768KHz)
->>> +
->>> +  clock-names:
->>> +    items:
->>> +      - const: lpo
->>> +
->>
->> We still have an issue that this clock input is also present in the
->> bindings specification broadcom-bluetooth.yaml (not in bluetooth
->> subfolder). This clock is actually a chip resource. What happens if both
->> are defined and both wifi and bt drivers try to enable this clock? Can this
->> be expressed in yaml or can we only put a textual warning in the property
->> descriptions?
+On Tue Jul 30 2024, Song Yoong Siang wrote:
+> From: Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>
 >
-> Just like all clocks, what would happen? It will be enabled.
+> This commit introduces the support to configure default Rx queue during
+> runtime. A new sysfs attribute "default_rx_queue" has been added, allowing
+> users to check and modify the default Rx queue.
+>
+> 1. Command to check the currently configured default Rx queue:
+>    cat /sys/devices/pci0000:00/.../default_rx_queue
+>
+> 2. Command to set the default Rx queue to a desired value, for example 3:
+>    echo 3 > /sys/devices/pci0000:00/.../default_rx_queue
+>
+> Signed-off-by: Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 
-Oh, wow! Cool stuff. But seriously is it not a problem to have two entities 
-controlling one and the same clock? Is this use-case taken into account by 
-the clock framework?
+[...]
 
-Regards,
-Arend
+> index e5b893fc5b66..df96800f6e3b 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_regs.h
+> +++ b/drivers/net/ethernet/intel/igc/igc_regs.h
+> @@ -63,6 +63,12 @@
+>  /* RSS registers */
+>  #define IGC_MRQC		0x05818 /* Multiple Receive Control - RW */
+>=20=20
+> +/* MRQC register bit definitions */
 
+Nit: Now, the MRQC register definitions are scattered over two files:
+igc_regs.h and igc.h. igc.h has
 
+#define IGC_MRQC_ENABLE_RSS_MQ		0x00000002
+#define IGC_MRQC_RSS_FIELD_IPV4_UDP	0x00400000
+#define IGC_MRQC_RSS_FIELD_IPV6_UDP	0x00800000
+
+Maybe combine them into a single location?
+
+> +#define IGC_MRQC_ENABLE_MQ		0x00000000
+> +#define IGC_MRQC_ENABLE_MASK		GENMASK(2, 0)
+> +#define IGC_MRQC_DEFAULT_QUEUE_MASK	GENMASK(5, 3)
+> +#define IGC_MRQC_DEFAULT_QUEUE_SHIFT	3
+
+Nit: FIELD_GET() and FIELD_PREP() can help to get rid of the manual
+shifting. See below.=20
+
+> +
+>  /* Filtering Registers */
+>  #define IGC_ETQF(_n)		(0x05CB0 + (4 * (_n))) /* EType Queue Fltr */
+>  #define IGC_FHFT(_n)		(0x09000 + (256 * (_n))) /* Flexible Host Filter */
+> diff --git a/drivers/net/ethernet/intel/igc/igc_sysfs.c b/drivers/net/eth=
+ernet/intel/igc/igc_sysfs.c
+> new file mode 100644
+> index 000000000000..34d838e6a019
+> --- /dev/null
+> +++ b/drivers/net/ethernet/intel/igc/igc_sysfs.c
+> @@ -0,0 +1,156 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2024 Intel Corporation */
+> +
+> +#include <linux/device.h>
+> +#include <linux/kobject.h>
+> +#include <linux/module.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/sysfs.h>
+> +#include <linux/types.h>
+> +
+> +#include "igc.h"
+> +#include "igc_regs.h"
+> +#include "igc_sysfs.h"
+> +
+> +/**
+> + * igc_is_default_queue_supported - Checks if default Rx queue can be co=
+nfigured
+> + * @mrqc: MRQC register content
+> + *
+> + * Checks if the current configuration of the device supports changing t=
+he
+> + * default Rx queue configuration.
+> + *
+> + * Return: true if the default Rx queue can be configured, false otherwi=
+se.
+> + */
+> +static bool igc_is_default_queue_supported(u32 mrqc)
+> +{
+> +	u32 mrqe =3D mrqc & IGC_MRQC_ENABLE_MASK;
+> +
+> +	/* The default Rx queue setting is applied only if Multiple Receive
+> +	 * Queues (MRQ) as defined by filters (2-tuple filters, L2 Ether-type
+> +	 * filters, SYN filter and flex filters) is enabled.
+> +	 */
+> +	if (mrqe !=3D IGC_MRQC_ENABLE_MQ && mrqe !=3D IGC_MRQC_ENABLE_RSS_MQ)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +/**
+> + * igc_get_default_rx_queue - Returns the index of default Rx queue
+> + * @adapter: address of board private structure
+> + *
+> + * Return: index of the default Rx queue.
+> + */
+> +static u32 igc_get_default_rx_queue(struct igc_adapter *adapter)
+> +{
+> +	struct igc_hw *hw =3D &adapter->hw;
+> +	u32 mrqc =3D rd32(IGC_MRQC);
+> +
+> +	if (!igc_is_default_queue_supported(mrqc)) {
+> +		netdev_warn(adapter->netdev,
+> +			    "MRQ disabled: default RxQ is ignored.\n");
+> +	}
+> +
+> +	return (mrqc & IGC_MRQC_DEFAULT_QUEUE_MASK) >>
+> +		IGC_MRQC_DEFAULT_QUEUE_SHIFT;
+
+Nit: return FIELD_GET(IGC_MRQC_DEFAULT_QUEUE_MASK, mrqc);
+
+> +}
+> +
+> +/**
+> + * igc_set_default_rx_queue - Sets the default Rx queue
+> + * @adapter: address of board private structure
+> + * @queue: index of the queue to be set as default Rx queue
+> + *
+> + * Return: 0 on success, negative error code on failure.
+> + */
+> +static int igc_set_default_rx_queue(struct igc_adapter *adapter, u32 que=
+ue)
+> +{
+> +	struct igc_hw *hw =3D &adapter->hw;
+> +	u32 mrqc =3D rd32(IGC_MRQC);
+> +
+> +	if (!igc_is_default_queue_supported(mrqc)) {
+> +		netdev_err(adapter->netdev,
+> +			   "Default RxQ not supported. Please enable MRQ.\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (queue > adapter->rss_queues - 1) {
+> +		netdev_err(adapter->netdev,
+> +			   "Invalid default RxQ index %d. Valid range: 0-%u.\n",
+> +			   queue, adapter->rss_queues - 1);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Set the default Rx queue */
+> +	mrqc =3D rd32(IGC_MRQC);
+> +	mrqc &=3D ~IGC_MRQC_DEFAULT_QUEUE_MASK;
+> +	mrqc |=3D queue << IGC_MRQC_DEFAULT_QUEUE_SHIFT;
+
+Nit: mrqc |=3D FIELD_PREP(IGC_MRQC_DEFAULT_QUEUE_MASK, queue);
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmaouUoTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgtBQEACSIf0aYuaOphs8JPYmE2MJMfO+x270
+iNE9MGJpBgiso4SlT3dNT05mFcKNDVQW/azmtJDRlgMSf3xBlbdexN2Gag/PK4Ah
+lJATYGUABykY3ThNAAhMUV4YbzcAa0r0C34oorr3s+mIGh4k0xeRbAaAF12tTezN
+asnXQ5tFLlCMfi3uKK7y+YW4SENhnDMbw4QEPzN8xqoU1gfVSVSZHdlE2E7aGx2r
+GTIdo3gNiYwplUZo4zPQfC9v02XGzM73bYNs7mNBlktnxn9Tn5GH+TmNxFbDgroI
+kQaw2ytg9X+b+9TSGkCCvCzFv2fH4DmRPMshOetPnrHhKm9VYTkGhbvdr4k9jZUi
+EG72L1w+8YBy8UG+bo63bjhFRnIP+7N7YVYVZBrUBmBFtdHyWIE8vG2IppUWUw+r
+8UChtvhhmRjmyTTbKE4YvdFOu2u4EF9a3ex0s/4sMN86pjegqZFm8qBlWbjIh+B1
+O6iyzKkWHBtrUJZYHto8xM+1nwkz1+Ny5muGhqZh6AHKZItDsrbwwWJYeLd/ovmX
+oiGRoQ5XSDBlZaV9PE6LmZnfE616UgbSuLfIfF4yQxrbCa4BGe9SaawBX4aiB/kG
+qL+xJUKR98cjwmCKSYQvGOHyAno4HWv3tgCP8oz0LZyUs6/hxs461S/biL87c58R
+yCkNyHwZ0+2zWg==
+=vGQh
+-----END PGP SIGNATURE-----
+--=-=-=--
 
