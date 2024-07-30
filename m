@@ -1,330 +1,140 @@
-Return-Path: <netdev+bounces-114038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6F7940BBB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:36:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4461D940BD4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 832E51C23DE9
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:36:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFA7A286504
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 08:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9F0198A03;
-	Tue, 30 Jul 2024 08:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95A4192B69;
+	Tue, 30 Jul 2024 08:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAuxvj+c"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="iBhmIlEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.web.de (mout.web.de [217.72.192.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4325119885F
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 08:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3A8156C4B;
+	Tue, 30 Jul 2024 08:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722328375; cv=none; b=t5LjCeF1wDE9iiqDqHDEvbKq5RIep76IJAgG3+qrotKxXBPCoip26kh6kkiaTAyNFsIgi1f8sSlQLZkx4vonC4Ci3dMNgZKOvaW8TbndwgtjONM0m4FUVbSgpMC5xJB3L37u1vqnCtEDwfMF5OyfdPJVRcj6RwwT2KPnUJjxML0=
+	t=1722328770; cv=none; b=RzAZJaqEENxI4qkLNIxlWPllEwuxudL8Kkmu9bTgzDr0awsWB6ndx3eSsV5LAor78AxQVGfVPkvjkVpxZvaC8aYFfl1yyIuuTztLX65ip3/1xv+GW8NdlAF8pXAH2IXNI/zUCKk/c3eDPOU4XSVYQFbnHffRgqJV5MFkypN47ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722328375; c=relaxed/simple;
-	bh=E6gmvD0Q7zeWVOo4lEzOWRmLUPeP28JDg0QFfxt2s8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cokhgs7GatslRXELbk9TE1f3JGop/bVy7AaZ8aJuRHW9jBBqIjiUKw5sJTPluf0aj0Mup42cwyGLjiaG80nGnzqpmslydxpRzl4wmULFQRgO15jD0QMoSTSYriov7jS63gfOFkv1Gdu8/1gEw2bJZl9dFV3PLsa1+CROuikeGuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fAuxvj+c; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722328372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KUu9DqweMZplPZPw8zixj088PoW8Kyk6wuUBLwD2TsA=;
-	b=fAuxvj+c0qdBTW7wacpG4iAB7rP8dJSAe5V1vkRRLYFbV0Zyw9pKZFCSH13iAN7AZt1Xiw
-	+aZn5WEqX72lNBnLGy53korGSd4wjYnH56QiR5T0lUOj43F4GSh/maLgn8SF0kCmyfPxrP
-	7IC8YiTmQBn2aBBT/hTKuUkQ9y4ybUg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-16-gl_y_ZH0OwyOU27bnLxIGw-1; Tue, 30 Jul 2024 04:32:50 -0400
-X-MC-Unique: gl_y_ZH0OwyOU27bnLxIGw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280d8e685eso25303605e9.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:32:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722328369; x=1722933169;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KUu9DqweMZplPZPw8zixj088PoW8Kyk6wuUBLwD2TsA=;
-        b=NVfq+OwgXxwInxdIOgfRO5NxZ1epRLdj0Ela8hp5PH6z5oEG/cgi1kPRbaPH1nWnfi
-         N84jZzjj/OQOpT3+Y2tEATcisish8nwfavM0ma1NfobWbo4pbRnxaRBhiEwm3Kt60z/q
-         kY0d7cirqcaaAQbyt0eljbjqp6Bss46n/cthSdWojIOYYYNe9O0AIhVQmyzP8gOZ+5nE
-         FFihlHXo1aixIqZr2myWuyZ0uEHxtq8bmFct3Gza11CT/Zu2c+1g/05jlx25wJCuk9N4
-         ukdAFE/0Pna/w/JOm5EGMrJWuLIUAE+iZHd3JBOHF64ykJj9tzssVxskaygtwmSr66Uv
-         fPAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMSWbXC/MOBptWF6DaqcXFWoV/oHsoF5gNm1tye1WjvcoIlDy+26RcQ0IbS5TDBdp0qhlvBROun/ZMYRo11VnK9BLTN73a
-X-Gm-Message-State: AOJu0YxmwQLx3Ce9MR9JHKdXSHPVJT7rTVbLKVpmuTK+/GfTlTkqf3Cd
-	iTRFS/qul7HZQ0pCv/NuBv6ejnJNdfI2isBrIPCMQXQttmbPh8AKs0evcR+0KmRm55BzfFEqbkT
-	4fGHcqoZXncA8Xhiha6gWaV2offbrgfVQZYBfmSzGlc2ekEVUWMO1dg==
-X-Received: by 2002:a05:600c:2d53:b0:426:59fc:cdec with SMTP id 5b1f17b1804b1-42811da1b88mr71529895e9.21.1722328369119;
-        Tue, 30 Jul 2024 01:32:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFIZbaDTrEZBCLXIF/bnAzy6Ax7DEDAW4LkM0HdYou7XpcwkGyKPBEX2idkqwXBZnxwkKn71A==
-X-Received: by 2002:a05:600c:2d53:b0:426:59fc:cdec with SMTP id 5b1f17b1804b1-42811da1b88mr71529585e9.21.1722328368349;
-        Tue, 30 Jul 2024 01:32:48 -0700 (PDT)
-Received: from sgarzare-redhat ([62.205.9.89])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280574b2c2sm203448165e9.28.2024.07.30.01.32.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 01:32:47 -0700 (PDT)
-Date: Tue, 30 Jul 2024 10:32:44 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
-	decui@microsoft.com, bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
-	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
-Subject: Re: [RFC PATCH net-next v6 09/14] virtio/vsock: add common datagram
- recv path
-Message-ID: <yx5phoynacbxobystxaa3zca5ehzbupzzwz3ayptb7wu5d74mc@ic3lvpjnvkkr>
-References: <20240710212555.1617795-1-amery.hung@bytedance.com>
- <20240710212555.1617795-10-amery.hung@bytedance.com>
- <ldyfzp5k2qmhlydflu7biz6bcrekothacitzgbmw2k264zwuxh@hmgoku5kgghp>
- <CAMB2axNx=nCh-B-=XLtto2nEsKsV0p+b7yzXRX9OKSgUbRzzWA@mail.gmail.com>
+	s=arc-20240116; t=1722328770; c=relaxed/simple;
+	bh=07fx0OcCY32v0SirWQHDNSZfPG7HMF4hAqbJnMhyg3s=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=doaUhOprRAe6U8YQwCTdBJQwJbWw9dLJU7RBmP68ZdyLXzzOzPNT9M1raD3mNIuv+cF7+d/BcMrV+1wq5T8hKILBNJ6KknE68eHe3LlFgU2Sxsf3blqqOB59WLoUA6hlwdVhuzZeHa1kXBePQxAvtH6MCw3VAMexAe3hKYpzT9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=iBhmIlEu; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1722328685; x=1722933485; i=markus.elfring@web.de;
+	bh=07fx0OcCY32v0SirWQHDNSZfPG7HMF4hAqbJnMhyg3s=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=iBhmIlEu1DTEhbIId4CW/iiPJylb+jiOQ9na/RS5h69bGT/imWvKAbYeaJ6pivjz
+	 JMnQXpy3cOlHf6p3bxFw2uqBaGPOuz17LrdoEApiGvMmHL9F2kIIYCb9ueGy62+tI
+	 Z412cOhJGP5xxEr98kCfPNdYFjVPufN30A6OcLhTRbHeOoqDpZ30cxm7YBR3nSSWl
+	 8w95ukxErNzkX2hWTvH3N3Q/O+9nRoQJ+CINjbJQKXo8kr7CjpakPcjmpI9mTGMkm
+	 t7htz1r1rdr1c1sSbkVKfGHWXeJSssKDwuuEu3A8VxxvqEIW9YncbE1WpCLHOz/i4
+	 zpVozzeWA1xcB3gjBw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MKMA1-1sq6tO21QF-00MgS1; Tue, 30
+ Jul 2024 10:38:05 +0200
+Message-ID: <5d3c74da-7d44-4b88-8961-60f21f84f0ac@web.de>
+Date: Tue, 30 Jul 2024 10:37:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMB2axNx=nCh-B-=XLtto2nEsKsV0p+b7yzXRX9OKSgUbRzzWA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+To: Daniel Vetter <daniel.vetter@ffwll.ch>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Mina Almasry <almasrymina@google.com>,
+ Pavel Begunkov <asml.silence@gmail.com>,
+ Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Andreas Larsson
+ <andreas@gaisler.com>, Arnd Bergmann <arnd@arndb.de>,
+ Bagas Sanjaya <bagasdotme@gmail.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Christoph Hellwig <hch@infradead.org>, David Ahern <dsahern@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>,
+ Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Helge Deller <deller@gmx.de>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Jakub Kicinski
+ <kuba@kernel.org>,
+ "James E. J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jeroen de Borst <jeroendb@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Matt Turner <mattst88@gmail.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Shailend Chand <shailend@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Shuah Khan <shuah@kernel.org>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Sumit Semwal
+ <sumit.semwal@linaro.org>, Taehee Yoo <ap420073@gmail.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>
+References: <20240730022623.98909-4-almasrymina@google.com>
+Subject: Re: [PATCH net-next v17 03/14] netdev: support binding dma-buf to
+ netdevice
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240730022623.98909-4-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:3zASUQdt0WnRJJo2JsH8HgMCSLLJrSOm6wxlRg1HbHDrGJYPFAR
+ 4UrI46t5fFnsIQP5D20a4Q4/ar+Qe149EAafa7XhskHQN56xyU9dWXWOdOe9cqX+BeVMF3I
+ 8WFhpDkIxnYHJeZdnRHZDAN3teiQz55j6x07IL1LXqdRPVKwtTq1AIEwtRutuGvYx2Pn/lI
+ 6wer7tct5AinmIXcBPXRw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:pHmLyOskFkY=;I7pCl1VILl5yztEF5uEKXmycDP5
+ HNg30ml4ujtQp8hDTQ3k68nNJHnulVh43c1GvXrokXoDUhvvfoxNn12GmkZ+HgPxu8P5cN86n
+ HjOpfP8/MmUIpzxPlAqq3wxO4BHOXC7nCoou7XGF6loLekm4A+xubNt9riTQyV1qFBcyB94i1
+ 9nkx3l/0I3vtPPF6IXAuFeSgWGNbnMAc5yBzRdvhRx4NgMckDkjJvObOV+sApUE4abxW5IdYc
+ buKUkVmNMowUtx9d8ohNyHP5l0MvM+BrMJ+U6i6NSpHCcHyN+Db4gk/km/Nfpyxzicq+cw9kM
+ dbUuFQy20IeEzlt0JBmJTvh3npkouDOC8d+ppHNvGFDc2VX95QZiP8oAV1KqYVeet622rengR
+ 3AtZYxLW2HL9cJRJdGCFiSSoh2Ma1PdedqtRTNQE8x65ul4oZ5zC5oC7GI0KrfC2lDBmt7U9H
+ d3quaXmP5M08fs3HGNmDo2dJT4Mof8Rvu8b/1zeyNdFkx2ISKEqxruq9cgOvPVDOzWnM6q1hQ
+ j/Oo//f3eoHLmD9gSZJlyPqNPXnEofdZIoAkzr1NHrrLlxHQQCxQg4K2Ctyi0eEOGrXaAGGMW
+ U86dnhPzR1dN3MoSlZwMFv+d+ur6MNAU2LFwQiVgsiYO2r4PdA6g2/epD6XWGMZzsV3xD1bW9
+ ezFK4C0vxtvaDH0C0PO+CEdfJXWpA6ElBZbDAsD0DefszWZDdZo0DdR8nfhg96M442XbukoWM
+ HqCWkB1S51RK5OLQqCoLFxLM1/As4Y1LHCojxd9Oj8S237g0l+yUpVWT2ul1az/vHGJE2iOpx
+ VrU7WYLZwjqQf3tDPMnChwHw==
 
-On Mon, Jul 29, 2024 at 05:35:01PM GMT, Amery Hung wrote:
->On Tue, Jul 23, 2024 at 7:42 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> On Wed, Jul 10, 2024 at 09:25:50PM GMT, Amery Hung wrote:
->> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
->> >
->> >This commit adds the common datagram receive functionality for virtio
->> >transports. It does not add the vhost/virtio users of that
->> >functionality.
->> >
->> >This functionality includes:
->> >- changes to the virtio_transport_recv_pkt() path for finding the
->> >  bound socket receiver for incoming packets
->> >- virtio_transport_recv_pkt() saves the source cid and port to the
->> >  control buffer for recvmsg() to initialize sockaddr_vm structure
->> >  when using datagram
->> >
->> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
->> >---
->> > net/vmw_vsock/virtio_transport_common.c | 79 +++++++++++++++++++++----
->> > 1 file changed, 66 insertions(+), 13 deletions(-)
->> >
->> >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->> >index 46cd1807f8e3..a571b575fde9 100644
->> >--- a/net/vmw_vsock/virtio_transport_common.c
->> >+++ b/net/vmw_vsock/virtio_transport_common.c
->> >@@ -235,7 +235,9 @@ EXPORT_SYMBOL_GPL(virtio_transport_deliver_tap_pkt);
->> >
->> > static u16 virtio_transport_get_type(struct sock *sk)
->> > {
->> >-      if (sk->sk_type == SOCK_STREAM)
->> >+      if (sk->sk_type == SOCK_DGRAM)
->> >+              return VIRTIO_VSOCK_TYPE_DGRAM;
->> >+      else if (sk->sk_type == SOCK_STREAM)
->> >               return VIRTIO_VSOCK_TYPE_STREAM;
->> >       else
->> >               return VIRTIO_VSOCK_TYPE_SEQPACKET;
->> >@@ -1422,6 +1424,33 @@ virtio_transport_recv_enqueue(struct vsock_sock *vsk,
->> >               kfree_skb(skb);
->> > }
->> >
->> >+static void
->> >+virtio_transport_dgram_kfree_skb(struct sk_buff *skb, int err)
->> >+{
->> >+      if (err == -ENOMEM)
->> >+              kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_RCVBUFF);
->> >+      else if (err == -ENOBUFS)
->> >+              kfree_skb_reason(skb, SKB_DROP_REASON_PROTO_MEM);
->> >+      else
->> >+              kfree_skb(skb);
->> >+}
->> >+
->> >+/* This function takes ownership of the skb.
->> >+ *
->> >+ * It either places the skb on the sk_receive_queue or frees it.
->> >+ */
->> >+static void
->> >+virtio_transport_recv_dgram(struct sock *sk, struct sk_buff *skb)
->> >+{
->> >+      int err;
->> >+
->> >+      err = sock_queue_rcv_skb(sk, skb);
->> >+      if (err) {
->> >+              virtio_transport_dgram_kfree_skb(skb, err);
->> >+              return;
->> >+      }
->> >+}
->> >+
->> > static int
->> > virtio_transport_recv_connected(struct sock *sk,
->> >                               struct sk_buff *skb)
->> >@@ -1591,7 +1620,8 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
->> > static bool virtio_transport_valid_type(u16 type)
->> > {
->> >       return (type == VIRTIO_VSOCK_TYPE_STREAM) ||
->> >-             (type == VIRTIO_VSOCK_TYPE_SEQPACKET);
->> >+             (type == VIRTIO_VSOCK_TYPE_SEQPACKET) ||
->> >+             (type == VIRTIO_VSOCK_TYPE_DGRAM);
->> > }
->> >
->> > /* We are under the virtio-vsock's vsock->rx_lock or vhost-vsock's vq->mutex
->> >@@ -1601,44 +1631,57 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->> >                              struct sk_buff *skb)
->> > {
->> >       struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
->> >+      struct vsock_skb_cb *vsock_cb;
->>
->> This can be defined in the block where it's used.
->>
->
->Got it.
->
->> >       struct sockaddr_vm src, dst;
->> >       struct vsock_sock *vsk;
->> >       struct sock *sk;
->> >       bool space_available;
->> >+      u16 type;
->> >
->> >       vsock_addr_init(&src, le64_to_cpu(hdr->src_cid),
->> >                       le32_to_cpu(hdr->src_port));
->> >       vsock_addr_init(&dst, le64_to_cpu(hdr->dst_cid),
->> >                       le32_to_cpu(hdr->dst_port));
->> >
->> >+      type = le16_to_cpu(hdr->type);
->> >+
->> >       trace_virtio_transport_recv_pkt(src.svm_cid, src.svm_port,
->> >                                       dst.svm_cid, dst.svm_port,
->> >                                       le32_to_cpu(hdr->len),
->> >-                                      le16_to_cpu(hdr->type),
->> >+                                      type,
->> >                                       le16_to_cpu(hdr->op),
->> >                                       le32_to_cpu(hdr->flags),
->> >                                       le32_to_cpu(hdr->buf_alloc),
->> >                                       le32_to_cpu(hdr->fwd_cnt));
->> >
->> >-      if (!virtio_transport_valid_type(le16_to_cpu(hdr->type))) {
->> >+      if (!virtio_transport_valid_type(type)) {
->> >               (void)virtio_transport_reset_no_sock(t, skb);
->> >               goto free_pkt;
->> >       }
->> >
->> >-      /* The socket must be in connected or bound table
->> >-       * otherwise send reset back
->> >+      /* For stream/seqpacket, the socket must be in connected or bound table
->> >+       * otherwise send reset back.
->> >+       *
->> >+       * For datagrams, no reset is sent back.
->> >        */
->> >       sk = vsock_find_connected_socket(&src, &dst);
->> >       if (!sk) {
->> >-              sk = vsock_find_bound_socket(&dst);
->> >-              if (!sk) {
->> >-                      (void)virtio_transport_reset_no_sock(t, skb);
->> >-                      goto free_pkt;
->> >+              if (type == VIRTIO_VSOCK_TYPE_DGRAM) {
->> >+                      sk = vsock_find_bound_dgram_socket(&dst);
->> >+                      if (!sk)
->> >+                              goto free_pkt;
->> >+              } else {
->> >+                      sk = vsock_find_bound_socket(&dst);
->> >+                      if (!sk) {
->> >+                              (void)virtio_transport_reset_no_sock(t, skb);
->> >+                              goto free_pkt;
->> >+                      }
->> >               }
->> >       }
->> >
->> >-      if (virtio_transport_get_type(sk) != le16_to_cpu(hdr->type)) {
->> >-              (void)virtio_transport_reset_no_sock(t, skb);
->> >+      if (virtio_transport_get_type(sk) != type) {
->> >+              if (type != VIRTIO_VSOCK_TYPE_DGRAM)
->> >+                      (void)virtio_transport_reset_no_sock(t, skb);
->> >               sock_put(sk);
->> >               goto free_pkt;
->> >       }
->> >@@ -1654,12 +1697,21 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
->> >
->> >       /* Check if sk has been closed before lock_sock */
->> >       if (sock_flag(sk, SOCK_DONE)) {
->> >-              (void)virtio_transport_reset_no_sock(t, skb);
->> >+              if (type != VIRTIO_VSOCK_TYPE_DGRAM)
->> >+                      (void)virtio_transport_reset_no_sock(t, skb);
->> >               release_sock(sk);
->> >               sock_put(sk);
->> >               goto free_pkt;
->> >       }
->> >
->> >+      if (sk->sk_type == SOCK_DGRAM) {
->> >+              vsock_cb = vsock_skb_cb(skb);
->> >+              vsock_cb->src_cid = src.svm_cid;
->> >+              vsock_cb->src_port = src.svm_port;
->> >+              virtio_transport_recv_dgram(sk, skb);
->>
->>
->> What about adding an API that transports can use to hide this?
->>
->> I mean something that hide vsock_cb creation and queue packet in the
->> socket receive queue. I'd also not expose vsock_skb_cb in an header, but
->> I'd handle it internally in af_vsock.c. So I'd just expose API to
->> queue/dequeue them.
->>
->
->Got it. I will move vsock_skb_cb to af_vsock.c and create an API:
->
->vsock_dgram_skb_save_src_addr(struct sk_buff *skb, u32 cid, u32 port)
+=E2=80=A6
+> +++ b/include/net/devmem.h
+> @@ -0,0 +1,115 @@
+=E2=80=A6
+> +#ifndef _NET_DEVMEM_H
+> +#define _NET_DEVMEM_H
+=E2=80=A6
 
-This is okay, but I would try to go further by directly adding an API to 
-queue dgrams in af_vsock.c (if it's feasible).
+I suggest to omit leading underscores from such identifiers.
+https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+d=
+efine+a+reserved+identifier
 
->
->Different dgram implementations will call this API instead of the code
->block above to save the source address information into the control
->buffer.
->
->A side note on why this is a vsock API instead of a member )unction in
->transport: As we move to support multi-transport dgram, different
->transport implementations can place skb into the sk->sk_receive_queue.
->Therefore, we cannot call transport-specific function in
->vsock_dgram_recvmsg() to initialize struct sockaddr_vm. Hence, the
->receiving paths of different transports need to call this API to save
->source address.
-
-What I meant is, why virtio_transport_recv_dgram() can't be exposed by 
-af_vsock.c as vsock_recv_dgram() and handle all internally, like 
-populate vsock_cb, call sock_queue_rcv_skb(), etc.
-
->
->> Also why VMCI is using sk_receive_skb(), while we are using
->> sock_queue_rcv_skb()?
->>
->
->I _think_ originally we referred to UDP and UDS when designing virtio
->dgram, and ended up with placing skb into sk_receive_queue directly. I
->will look into this to provide better justification.
-
-Great, thanks.
-
-Maybe we can also ping VMCI maintainers to understand if they can switch 
-to sock_queue_rcv_skb(). But we should understand better the difference.
-
-Thanks,
-Stefano
-
+Regards,
+Markus
 
