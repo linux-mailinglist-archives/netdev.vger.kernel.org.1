@@ -1,164 +1,115 @@
-Return-Path: <netdev+bounces-114241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6727941CB2
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:11:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35328941D22
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 423221F23CA7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E290828B18B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4744B1A76DA;
-	Tue, 30 Jul 2024 17:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8F018A6BC;
+	Tue, 30 Jul 2024 17:13:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="t59KwHv/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FNZMc9vF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A701A76C5;
-	Tue, 30 Jul 2024 17:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D8618A6B6
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 17:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722359227; cv=none; b=W99Tn2MV/015vrasBgLHcGZhFxceiFNFw+4MUmkUmKQau5WZZFPjop0c3JET9R7lVNF2Drt1KQD9/4DSRjy/gTohfK/r0ieiNinz0BT72Eu/kUwMPO6zMU995I2QTgpxgvBvSYLrfDEZQuAv9ZiEfPI9KgKVWCWejo3sbRnN800=
+	t=1722359603; cv=none; b=SMTKg/Z+o6TwIJq0KyjaIVZhvfENdFoo/EmolPlP3p5F+QHOvNyVRUwcI1p4+EMJsN1yNdaPlJ+9BvnXD4Ft2HV/8PZFluwBFIO9DKBaAqpt+/0/4oFiM2ulxQInlgripGHKk3wgP2bV7i+Wqe+2KOaadmkXhwzgHA9B8+GraMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722359227; c=relaxed/simple;
-	bh=BwPhz46Pv/9n8O4OUErFxxem5iKGGRE9ZwIWiglNi9U=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZiGmPpvcZm89pMPGJLb2f/lCbqk3BdIWh744G0VY6Q1EtwfPTqPkFm2MwwWmfeOTlvl+4aX9EyEwbdf4kp/1yrvD/gb41EP5Phds7TQS2v1uEQMGwd9DdOVvtvgASSINGgkA7Gh+fM33u7mYPGiZEdk27LM9aVDNu6gz/2EGfrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=t59KwHv/; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1722359603; c=relaxed/simple;
+	bh=GzimSGPp4Pj8GOfT5R+B7eU0TGFkgJ2E+BdZPdWVLYI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=i38uo2ZO3yhncFO82ygYHUfqjh7MYwL7MuB+FNv6/O8Sqar5nn6y8oHfaMXbch4ZfUTBaEqj2t9ozlroK1tjqDUz0kXlD45pMk5Tu8KQis0PSNjMHj3e3bmtCj8O6U2KwW15wG7WcJv+ggixL6T3Jc7bzuIA3NIMEjBis4k9mwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=FNZMc9vF; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a7ab63a388bso379480466b.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:13:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722359226; x=1753895226;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PVEEMgnEGtmq8qDlsu0ATVdq0/zoYEoE6s3iFr3FO40=;
-  b=t59KwHv/gOlcI/h8p3V+ZGh3Sxe5sMpIW3NC2wjdbhsPUyrAtviIfcdl
-   cxMCUY8XOAKgjnn0LsaQ9dkfxiTNNtNAvM0TLf0PtIrsnw2+9aS/Q+CrL
-   XKB1USBLR64Bhj1QclgNsgzvSwl27V/trOgjWNOlxaKjQNjSZBEzXxTjF
-   A=;
-X-IronPort-AV: E=Sophos;i="6.09,248,1716249600"; 
-   d="scan'208";a="439533385"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 17:07:00 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:40907]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.1:2525] with esmtp (Farcaster)
- id 64da0d9d-a7e3-42c5-889f-ea875c6e43ab; Tue, 30 Jul 2024 17:06:59 +0000 (UTC)
-X-Farcaster-Flow-ID: 64da0d9d-a7e3-42c5-889f-ea875c6e43ab
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 30 Jul 2024 17:06:59 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 30 Jul 2024 17:06:55 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <dmantipov@yandex.ru>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <linux-sctp@vger.kernel.org>,
-	<lucien.xin@gmail.com>, <marcelo.leitner@gmail.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
-Subject: Re: [PATCH v1 net] sctp: Fix null-ptr-deref in reuseport_add_sock().
-Date: Tue, 30 Jul 2024 10:06:46 -0700
-Message-ID: <20240730170646.62951-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240730134605.297494-1-dmantipov@yandex.ru>
-References: <20240730134605.297494-1-dmantipov@yandex.ru>
+        d=cloudflare.com; s=google09082023; t=1722359600; x=1722964400; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8m0nShPnuINbCdjeY7nEN4rJqDqmHY1w1WDR0g7gvAM=;
+        b=FNZMc9vFUzMnAm6m02CxzK5fiUopr368ph5r15TjjQcmEh9KQYLiGsl1+Iv4ddulJY
+         Yt5kPr4+sedfa9JwHQMkANRMjV1NrP/UGZlYvRyQldkXpyS21xWLFimTY/tssXdn6t65
+         W92k8ZDYOc+thywbBRfLXVxBiNUj1Xpn1xAHcSYmdGzi9LuOVBo2XxNWbP0beReVAPRR
+         pTeDMqeDMd/r9SIDXF1m4BSapXjnw0wbzqhcDFyPw0Lw0yaSo9cRaWG6at/OW0nmOUp+
+         tyT1R+aQ0KSMp2NLsqhPGGNSsU4axNSRxX9XKsEKy6NAVPi9fiBIk5Ba/jfvt53XgNeU
+         LMLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722359600; x=1722964400;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8m0nShPnuINbCdjeY7nEN4rJqDqmHY1w1WDR0g7gvAM=;
+        b=hcmcqUZhazhv10JU8ltOYaIa/gKOuK6RD7UYMYyi1SvPgCoduOU8glnEsScmi/Qdrd
+         SK40cEuaoMKuef7fzX6x2EE+Nv3nuZBXfkGGN2OJY3LTEFattURDSAoKwzMMUqGZJA3x
+         LiVoM8IFSxZiASl/O/IBZWrgB3SCQ9nHWT/Kpjm7ye8fDMfajBLHZKng9R60J6cEqnnw
+         d64l7MeJmyP+LEhsOybYmimMuYWE9i2+qR6qZGd9RfrpIXexBf7QHmNxLG1Z3N+bFviZ
+         FS7gEidpEfq5vafFWSL55rZXaQpUgDNdwTlzTdurm+SPl4CR39qVz7DGaxnFkoJxkzqQ
+         qPdw==
+X-Forwarded-Encrypted: i=1; AJvYcCXw8+5guNo80xvFFHFses+rF3P0zD/72gOOkyb6eSX4r+T6oZxmln9JtgfMsWMw7wlbfuwyK4t9N+wJw5RQDVysy16N3Vi1
+X-Gm-Message-State: AOJu0YyPn/kkB+pZkjSE08PLVz6s3647GnY4OkistG2BDx4O9w8dUQTW
+	bZxOrEc4XvpmY5oPzetHBrDMg0nEyry8M2tGBIcOOi+hJrGc0hCh+EqeInJsRhk=
+X-Google-Smtp-Source: AGHT+IGkt1E+D2BdP4URH/gGZVLCq5xWR4UWldftuqBSyxAPfGBZxzjaW//v+4HpwiJK/1dy4xQZgg==
+X-Received: by 2002:a05:6402:50c7:b0:5a0:f9f7:6565 with SMTP id 4fb4d7f45d1cf-5b021e1745dmr11214748a12.21.1722359600380;
+        Tue, 30 Jul 2024 10:13:20 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac631b03ccsm7466835a12.16.2024.07.30.10.13.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 10:13:19 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Andrii Nakryiko <andrii@kernel.org>,  Eduard Zingerman
+ <eddyz87@gmail.com>,  Mykola Lysenko <mykolal@fb.com>,  Alexei Starovoitov
+ <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  Martin KaFai
+ Lau <martin.lau@linux.dev>,  Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>,  John Fastabend <john.fastabend@gmail.com>,  KP
+ Singh <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao
+ Luo <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Shuah Khan
+ <shuah@kernel.org>,  bpf@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf 1/6] selftest/bpf: Support more socket types in
+ create_pair()
+In-Reply-To: <7ae7a77c-c5ce-4a09-8a6c-b3cd014220f3@rbox.co> (Michal Luczaj's
+	message of "Fri, 26 Jul 2024 22:29:39 +0200")
+References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
+	<20240724-sockmap-selftest-fixes-v1-1-46165d224712@rbox.co>
+	<87cyn0kqxu.fsf@cloudflare.com>
+	<7ae7a77c-c5ce-4a09-8a6c-b3cd014220f3@rbox.co>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Tue, 30 Jul 2024 19:13:18 +0200
+Message-ID: <87mslyztu9.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA001.ant.amazon.com (10.13.139.45) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Date: Tue, 30 Jul 2024 16:46:05 +0300
-> Hm. Note both 'reuseport_add_sock()' and 'reuseport_detach_sock()' uses
-> global 'reuseport_lock' internally. So what about using read lock to protect
-> 'sctp_for_each_entry()' loop and upgrade to write lock only if hash bucket
-> should be actually updated? E.g.:
-> 
-> diff --git a/net/sctp/input.c b/net/sctp/input.c
-> index 17fcaa9b0df9..4fbff388b1b4 100644
-> --- a/net/sctp/input.c
-> +++ b/net/sctp/input.c
-> @@ -735,6 +735,7 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
->  	struct sock *sk = ep->base.sk;
->  	struct net *net = sock_net(sk);
->  	struct sctp_hashbucket *head;
-> +	int err = 0;
->  
->  	ep->hashent = sctp_ep_hashfn(net, ep->base.bind_addr.port);
->  	head = &sctp_ep_hashtable[ep->hashent];
-> @@ -743,11 +744,14 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
->  		bool any = sctp_is_ep_boundall(sk);
->  		struct sctp_endpoint *ep2;
->  		struct list_head *list;
-> -		int cnt = 0, err = 1;
-> +		int cnt = 0;
-> +
-> +		err = 1;
->  
->  		list_for_each(list, &ep->base.bind_addr.address_list)
->  			cnt++;
->  
-> +		read_lock(&head->lock);
->  		sctp_for_each_hentry(ep2, &head->chain) {
->  			struct sock *sk2 = ep2->base.sk;
->  
-> @@ -760,25 +764,30 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
->  						    sctp_sk(sk), cnt);
->  			if (!err) {
->  				err = reuseport_add_sock(sk, sk2, any);
-> -				if (err)
-> -					return err;
-> +				if (err) {
-> +					read_unlock(&head->lock);
-> +					goto out;
-> +				}
->  				break;
->  			} else if (err < 0) {
-> -				return err;
-> +				read_unlock(&head->lock);
-> +				goto out;
->  			}
->  		}
-> +		read_unlock(&head->lock);
->  
->  		if (err) {
->  			err = reuseport_alloc(sk, any);
+On Fri, Jul 26, 2024 at 10:29 PM +02, Michal Luczaj wrote:
+> On 7/26/24 19:23, Jakub Sitnicki wrote:
+>> I was going to suggest that a single return path for success is better
+>> than two (diff below), but I see that this is what you ended up with
+>> after patch 6.
+>> 
+>> So I think we can leave it as is.
+>> [...]
+>
+> And speaking of which, would you rather have patch 1 and 6 squashed?
 
-What happens if two sockets matching each other reach here ?
+Don't have a straight answer, sorry . Would have to see if the diff is
+clear enough after squashing it. Use your best judgement.
 
-There would be no error but the first hashed socket will be silently
-dead as lookup stops at the 2nd sk ?
-
-
->  			if (err)
-> -				return err;
-> +				goto out;
->  		}
->  	}
->  
->  	write_lock(&head->lock);
->  	hlist_add_head(&ep->node, &head->chain);
->  	write_unlock(&head->lock);
-> -	return 0;
-> +out:
-> +	return err;
->  }
->  
->  /* Add an endpoint to the hash. Local BH-safe. */
-> 
-> Dmitry
+It's certainly fine with me to review the steps that were taken to
+massage the code.
 
