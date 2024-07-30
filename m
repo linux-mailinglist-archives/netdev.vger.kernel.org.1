@@ -1,171 +1,296 @@
-Return-Path: <netdev+bounces-114238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC7A941B2E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 18:51:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27F52941BFD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 19:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EDB21C20BBD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 16:51:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B2761C203DC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 17:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9391898F3;
-	Tue, 30 Jul 2024 16:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8AE189B89;
+	Tue, 30 Jul 2024 17:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c73hOhee"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gGewjpFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2030D188013
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 16:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3B61FBA;
+	Tue, 30 Jul 2024 17:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722358309; cv=none; b=epgV4K12zAtBAGnNICB2C/jBgbq22VfqxBVOZftggBItfg/mfnjHhqN+nx/9yJaI4lXPQR2RYRvtce9L551dhL71P20fGdiI1262VEEJay9sU7fGurIwxpwRVwuYB0r+nbaAvbUDjg6MLn36pObyZM7ylfAXmElF4pqv7+5Hh8A=
+	t=1722358905; cv=none; b=nCYamo2T9ACm/S014EgX0EhrXl6XH/QzwF7fq+Yb9xOH3jrsoAkZeqQpP6oW4eq+wNucBwhiPa/MyhUd3KKDIufLZxuST+2GRdKVEDg0RGA9YhZ/7MtFj6/tjvimmNktHzqo6JMwpqeMjutCXY+8eJ2LAmME0D1TrYDtBpBK6JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722358309; c=relaxed/simple;
-	bh=ADfE1Lt8qM+0qpABUkaU86u8l63sEqNFydbXrQ73Nl8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MoZN1t0fvthxfAhbBt15odhkTUlQ+3VFaO62seEUoRhqb0W36kuqgh5RQhT4SRBLM+DfMUl3FiKd1jh3TXfkgsNyO0Vx4ks+/WZd0JoZTX9ggyOTkv4t+PDmSE0uRIaYeHKAagWj1BFqTbR4qDUrUxuIOUunXNa+PCBkRwLGu6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=c73hOhee; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a7a8a4f21aeso629820566b.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 09:51:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722358306; x=1722963106; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6fRrBntY5SNNpSQn2/H4DTQBpZkc856gUEuyCgFnvMM=;
-        b=c73hOheeJyZyJak1PFjRsAs2b3eQ5Pv73H5/wd6zBBSzVg8LuLS3kUTIRffEuSlGJV
-         Ro8v8L7SKr16kaRvBsXl7yAL5IirBJUPMvbaDNSmal/4p/irfA22VwqOmk9tS330aMdM
-         J0R1P1aI0Zl/iuX/LQabdKN5/k5UxnRMJvZe6rdcfOmlHBvBvmHW9GyxgnJ8AK45kDuS
-         ZR+hG8Zck8S1gc/KMD7s2COU76tSRoIHxgHNJXt/l+F4WOsJYwEdR5Y69VN2Ii7fWGGb
-         paDu9LRRlQC4MY/md97SXw6fULtJAJnFQbmz8r2fxieHvNyvi7v9NRKwWcVO3LsxBe+V
-         BCeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722358306; x=1722963106;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6fRrBntY5SNNpSQn2/H4DTQBpZkc856gUEuyCgFnvMM=;
-        b=wF0DHAmm6T4BeAc7stTv/tp0HHynK0ViwVU0cZDZ1Ggi6Xj5bV1vM5xuvlH69Rpv3m
-         SrrlxLRPGUL0TkWLQ0K35qyiIMeUoHXltHmy1kYwpHPe/nIXgxh0KOZeCvhv+xIYNkzC
-         YPePuhherrgzkX3wszDMGwbeNzq+IA6BPtLhrs5DPae1XpdDTtRjBLg77jOKM+CsHnVT
-         dfQ+njsbNIEbtgCRhKuORYqeOzOMA10bm4Z/mn9OTCLHyptQhX9jfKPNGGYHDxSn8lyQ
-         w3I5sezAsWB6a/gezZquGnqA4DVOlYLQw7zM/bcr2fUO3fCTKeaens3qi9KwgtwUU8mC
-         ynRg==
-X-Forwarded-Encrypted: i=1; AJvYcCULGeN0mrYufC1g9rpu8kHowBOHulPaeVzuuoNwlYXHRwO20monhVzcTXwQ+n70uv3H/K/JTQztmqQrPThPu8RDisROlvVh
-X-Gm-Message-State: AOJu0YyYud821XrgfRKZzhzHyVsoGuqvwDvB9Hbt4AFfvUup/6FLCBkk
-	FyWplla+A4a4Odgk/r7bSLU6xx9hDCCa0KDkgXamRi2C+Bk9ZHwIi2XcssNRG+s=
-X-Google-Smtp-Source: AGHT+IE1CcDwww1PAFxjIjMv7j4rspGX2aveqObzQA76O3inZ5lhikMfHoED/vjvBpKYwPGyVZyhng==
-X-Received: by 2002:a17:907:3d8a:b0:a7a:a30b:7b94 with SMTP id a640c23a62f3a-a7d4000b1dbmr881925666b.28.1722358306362;
-        Tue, 30 Jul 2024 09:51:46 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadb98dbsm664965666b.216.2024.07.30.09.51.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 09:51:45 -0700 (PDT)
-Message-ID: <75e70f72-6a5a-4478-86ba-0d24a62b0d4c@linaro.org>
-Date: Tue, 30 Jul 2024 18:51:44 +0200
+	s=arc-20240116; t=1722358905; c=relaxed/simple;
+	bh=4KNYO/LkRl1nTWRQ7DygrxXgDTJ60HivC3wPrtCfxaQ=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=eMbjuV+FVJPxJX6Xw6jyrfE4wmUPA0r/2tY1yP6mqO+68mJlohAKL1wfcTKwGPWJr6Jj0bNyfho20uch1jGSTGbcI6vmWnvYRgxiegQVeRWSpetsBcBkj+RAdnqqUOgjBXe+BzJ3B8sz2KG0M/f+bY+DI6pYrzT+X5WcCVYJGDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gGewjpFn; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 268F620B7165; Tue, 30 Jul 2024 10:01:37 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 268F620B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1722358897;
+	bh=uThGGTifZtsapDvCDXWSI39lKEc1fXkcmZhpPtkqAug=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gGewjpFn+1SvTqBU96yqFjFI9JOnSqjwi3v8vI3i0qEZAbin9lpcvikSjlqehNYSN
+	 urqBL7A311yQcE/aV0B6BvsCoNLQO14dt0lvPcJkVZBoIbiLfzVDiUPF9N1QeWKCC/
+	 bkSHUY91+PaCR9t6B5gT/k47yixrAEWeI2kj39Mw=
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Colin Ian King <colin.i.king@gmail.com>
+Subject: [PATCH net-next v2] net: mana: Implement get_ringparam/set_ringparam for mana
+Date: Tue, 30 Jul 2024 10:01:35 -0700
+Message-Id: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: MAINTAINERS: Demote Qualcomm IPA to
- "maintained"
-To: Alex Elder <elder@ieee.org>, Alex Elder <elder@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240730104016.22103-1-krzysztof.kozlowski@linaro.org>
- <31f49da0-403c-40af-b61b-8e05f5b343e8@ieee.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <31f49da0-403c-40af-b61b-8e05f5b343e8@ieee.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 30/07/2024 18:29, Alex Elder wrote:
-> On 7/30/24 5:40 AM, Krzysztof Kozlowski wrote:
->> To the best of my knowledge, Alex Elder is not being paid to support
->> Qualcomm IPA networking drivers, so drop the status from "supported" to
->> "maintained".
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> I hadn't thought much about the distinction, and it might not
-> make a lot of difference right now.  But it's true I'm not
-> being *paid* to maintain the IPA driver (but will continue).
+Currently the values of WQs for RX and TX queues for MANA devices
+are hardcoded to default sizes.
+Allow configuring these values for MANA devices as ringparam
+configuration(get/set) through ethtool_ops.
 
-It does, existing:
-https://www.kernel.org/doc/html/latest/maintainer/feature-and-driver-maintainers.html#bug-reports
+Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Long Li <longli@microsoft.com>
+---
+ Changes in v2:
+ * Removed unnecessary validations in mana_set_ringparam()
+ * Fixed codespell error
+ * Improved error message to indicate issue with the parameter
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 20 +++---
+ .../ethernet/microsoft/mana/mana_ethtool.c    | 66 +++++++++++++++++++
+ include/net/mana/mana.h                       | 21 +++++-
+ 3 files changed, 96 insertions(+), 11 deletions(-)
 
-and something which will have much, much bigger impact:
-
-https://lore.kernel.org/all/20240425114200.3effe773@kernel.org/#r
-e.g.:
-"1. Require all netdev Ethernet drivers listed as Supported in
-MAINTAINERS to periodically run netdev CI tests."
-and some more
-
-
-> 
-> Acked-by: Alex Elder <elder@kernel.org>
-
-Thanks.
-
-Best regards,
-Krzysztof
-
-
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index d2f07e179e86..598ac62be47d 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -618,7 +618,7 @@ static int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu)
+ 
+ 	dev = mpc->ac->gdma_dev->gdma_context->dev;
+ 
+-	num_rxb = mpc->num_queues * RX_BUFFERS_PER_QUEUE;
++	num_rxb = mpc->num_queues * mpc->rx_queue_size;
+ 
+ 	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
+ 	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
+@@ -1899,14 +1899,15 @@ static int mana_create_txq(struct mana_port_context *apc,
+ 		return -ENOMEM;
+ 
+ 	/*  The minimum size of the WQE is 32 bytes, hence
+-	 *  MAX_SEND_BUFFERS_PER_QUEUE represents the maximum number of WQEs
++	 *  apc->tx_queue_size represents the maximum number of WQEs
+ 	 *  the SQ can store. This value is then used to size other queues
+ 	 *  to prevent overflow.
++	 *  Also note that the txq_size is always going to be MANA_PAGE_ALIGNED,
++	 *  as tx_queue_size is always a power of 2.
+ 	 */
+-	txq_size = MAX_SEND_BUFFERS_PER_QUEUE * 32;
+-	BUILD_BUG_ON(!MANA_PAGE_ALIGNED(txq_size));
++	txq_size = apc->tx_queue_size * 32;
+ 
+-	cq_size = MAX_SEND_BUFFERS_PER_QUEUE * COMP_ENTRY_SIZE;
++	cq_size = apc->tx_queue_size * COMP_ENTRY_SIZE;
+ 	cq_size = MANA_PAGE_ALIGN(cq_size);
+ 
+ 	gc = gd->gdma_context;
+@@ -2145,10 +2146,11 @@ static int mana_push_wqe(struct mana_rxq *rxq)
+ 
+ static int mana_create_page_pool(struct mana_rxq *rxq, struct gdma_context *gc)
+ {
++	struct mana_port_context *mpc = netdev_priv(rxq->ndev);
+ 	struct page_pool_params pprm = {};
+ 	int ret;
+ 
+-	pprm.pool_size = RX_BUFFERS_PER_QUEUE;
++	pprm.pool_size = mpc->rx_queue_size;
+ 	pprm.nid = gc->numa_node;
+ 	pprm.napi = &rxq->rx_cq.napi;
+ 	pprm.netdev = rxq->ndev;
+@@ -2180,13 +2182,13 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
+ 
+ 	gc = gd->gdma_context;
+ 
+-	rxq = kzalloc(struct_size(rxq, rx_oobs, RX_BUFFERS_PER_QUEUE),
++	rxq = kzalloc(struct_size(rxq, rx_oobs, apc->rx_queue_size),
+ 		      GFP_KERNEL);
+ 	if (!rxq)
+ 		return NULL;
+ 
+ 	rxq->ndev = ndev;
+-	rxq->num_rx_buf = RX_BUFFERS_PER_QUEUE;
++	rxq->num_rx_buf = apc->rx_queue_size;
+ 	rxq->rxq_idx = rxq_idx;
+ 	rxq->rxobj = INVALID_MANA_HANDLE;
+ 
+@@ -2734,6 +2736,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	apc->ndev = ndev;
+ 	apc->max_queues = gc->max_num_queues;
+ 	apc->num_queues = gc->max_num_queues;
++	apc->tx_queue_size = DEF_TX_BUFFERS_PER_QUEUE;
++	apc->rx_queue_size = DEF_RX_BUFFERS_PER_QUEUE;
+ 	apc->port_handle = INVALID_MANA_HANDLE;
+ 	apc->pf_filter_handle = INVALID_MANA_HANDLE;
+ 	apc->port_idx = port_idx;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+index 146d5db1792f..34707da6ff68 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+@@ -369,6 +369,70 @@ static int mana_set_channels(struct net_device *ndev,
+ 	return err;
+ }
+ 
++static void mana_get_ringparam(struct net_device *ndev,
++			       struct ethtool_ringparam *ring,
++			       struct kernel_ethtool_ringparam *kernel_ring,
++			       struct netlink_ext_ack *extack)
++{
++	struct mana_port_context *apc = netdev_priv(ndev);
++
++	ring->rx_pending = apc->rx_queue_size;
++	ring->tx_pending = apc->tx_queue_size;
++	ring->rx_max_pending = MAX_RX_BUFFERS_PER_QUEUE;
++	ring->tx_max_pending = MAX_TX_BUFFERS_PER_QUEUE;
++}
++
++static int mana_set_ringparam(struct net_device *ndev,
++			      struct ethtool_ringparam *ring,
++			      struct kernel_ethtool_ringparam *kernel_ring,
++			      struct netlink_ext_ack *extack)
++{
++	struct mana_port_context *apc = netdev_priv(ndev);
++	u32 new_tx, new_rx;
++	u32 old_tx, old_rx;
++	int err1, err2;
++
++	old_tx = apc->tx_queue_size;
++	old_rx = apc->rx_queue_size;
++	new_tx = clamp_t(u32, ring->tx_pending, MIN_TX_BUFFERS_PER_QUEUE, MAX_TX_BUFFERS_PER_QUEUE);
++	new_rx = clamp_t(u32, ring->rx_pending, MIN_RX_BUFFERS_PER_QUEUE, MAX_RX_BUFFERS_PER_QUEUE);
++
++	if (!is_power_of_2(new_tx)) {
++		netdev_err(ndev, "%s:Tx:%d not supported. Needs to be a power of 2\n",
++			   __func__, new_tx);
++		return -EINVAL;
++	}
++
++	if (!is_power_of_2(new_rx)) {
++		netdev_err(ndev, "%s:Rx:%d not supported. Needs to be a power of 2\n",
++			   __func__, new_rx);
++		return -EINVAL;
++	}
++
++	err1 = mana_detach(ndev, false);
++	if (err1) {
++		netdev_err(ndev, "mana_detach failed: %d\n", err1);
++		return err1;
++	}
++
++	apc->tx_queue_size = new_tx;
++	apc->rx_queue_size = new_rx;
++	err1 = mana_attach(ndev);
++	if (!err1)
++		return 0;
++
++	netdev_err(ndev, "mana_attach failed: %d\n", err1);
++
++	/* Try rolling back to the older values */
++	apc->tx_queue_size = old_tx;
++	apc->rx_queue_size = old_rx;
++	err2 = mana_attach(ndev);
++	if (err2)
++		netdev_err(ndev, "mana_reattach failed: %d\n", err2);
++
++	return err1;
++}
++
+ const struct ethtool_ops mana_ethtool_ops = {
+ 	.get_ethtool_stats	= mana_get_ethtool_stats,
+ 	.get_sset_count		= mana_get_sset_count,
+@@ -380,4 +444,6 @@ const struct ethtool_ops mana_ethtool_ops = {
+ 	.set_rxfh		= mana_set_rxfh,
+ 	.get_channels		= mana_get_channels,
+ 	.set_channels		= mana_set_channels,
++	.get_ringparam          = mana_get_ringparam,
++	.set_ringparam          = mana_set_ringparam,
+ };
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 6439fd8b437b..8f922b389883 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -38,9 +38,21 @@ enum TRI_STATE {
+ 
+ #define COMP_ENTRY_SIZE 64
+ 
+-#define RX_BUFFERS_PER_QUEUE 512
++/* This Max value for RX buffers is derived from __alloc_page()'s max page
++ * allocation calculation. It allows maximum 2^(MAX_ORDER -1) pages. RX buffer
++ * size beyond this value gets rejected by __alloc_page() call.
++ */
++#define MAX_RX_BUFFERS_PER_QUEUE 8192
++#define DEF_RX_BUFFERS_PER_QUEUE 512
++#define MIN_RX_BUFFERS_PER_QUEUE 128
+ 
+-#define MAX_SEND_BUFFERS_PER_QUEUE 256
++/* This max value for TX buffers is derived as the maximum allocatable
++ * pages supported on host per guest through testing. TX buffer size beyond
++ * this value is rejected by the hardware.
++ */
++#define MAX_TX_BUFFERS_PER_QUEUE 16384
++#define DEF_TX_BUFFERS_PER_QUEUE 256
++#define MIN_TX_BUFFERS_PER_QUEUE 128
+ 
+ #define EQ_SIZE (8 * MANA_PAGE_SIZE)
+ 
+@@ -285,7 +297,7 @@ struct mana_recv_buf_oob {
+ 	void *buf_va;
+ 	bool from_pool; /* allocated from a page pool */
+ 
+-	/* SGL of the buffer going to be sent has part of the work request. */
++	/* SGL of the buffer going to be sent as part of the work request. */
+ 	u32 num_sge;
+ 	struct gdma_sge sgl[MAX_RX_WQE_SGL_ENTRIES];
+ 
+@@ -437,6 +449,9 @@ struct mana_port_context {
+ 	unsigned int max_queues;
+ 	unsigned int num_queues;
+ 
++	unsigned int rx_queue_size;
++	unsigned int tx_queue_size;
++
+ 	mana_handle_t port_handle;
+ 	mana_handle_t pf_filter_handle;
+ 
+-- 
+2.34.1
 
 
