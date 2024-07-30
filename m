@@ -1,201 +1,160 @@
-Return-Path: <netdev+bounces-114119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 360D4941002
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:54:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF40940FF3
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:51:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DABA5281A88
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:54:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D1CD1C22718
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA16199230;
-	Tue, 30 Jul 2024 10:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC891940B9;
+	Tue, 30 Jul 2024 10:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YiuQVd1Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zki5zI4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84796198856
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A2518A929
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 10:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722336839; cv=none; b=tW+d9S5wLCigRH+s2wdIt1vCR7GxBevciLXpnI3HmLjjL8v8LRxdCJ3WY3h5QMeE7lqq508ULbzBgl5sX/KLXCEqvbxMlh6W1AtjmMlftv07lIlKy9ajfGjfSYrASdeAAIXVSrZ4WBPBdnDXpA6EhJEA7wEorZFy4O6e3CfbTHg=
+	t=1722336708; cv=none; b=ggX4IsALx5wlXn2DMF1MwWT0duG8SKa7J/bX9Ekl5SaRqcPwly9xzrEdxmfGusqdBZp1JIDrsDPxedbLEv2WNOq9KWai+MtpyinQjucbZO0CwWSeLSiDEOBCHyh7Ujdw4eovt3RXaOVjp5QPd1hm6jkYi5ZXbuQQ4S6TwGBE8BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722336839; c=relaxed/simple;
-	bh=DVoHzPv9R/nXXO4kDVtIzZteJNPXteOZzO4wmWbPsO8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=peKhBBNoZN0Kp70RCspLv07DBD5GBbjfouTuUcvG5/K9CkTKSj0RZPLLk6j+o5Qo8GLwHqUCVWoexHiEWD1NqkRBP1+/74puSDTt1c5jO6ESuNk9PygWgTXaXC0LXs2Go8X3FgyKx2bFs5LbSKLirxF0dRHtRkKL/hp6tcqRRgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YiuQVd1Z; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722336837; x=1753872837;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=DVoHzPv9R/nXXO4kDVtIzZteJNPXteOZzO4wmWbPsO8=;
-  b=YiuQVd1ZymJ+fk3PJAcTR/E4usIuymTlelQr7eKgyERgC5D4JG5fldYN
-   /1oVd3rYGRfLy2s/PX1CD+GdzcEbDoF5UuCc6JZOBu5Dbt7KqtsDudaci
-   sWxjvuV3kkJt2x+Ww0zeM62JMLrQkqJ286CYlJ1y9Y8I6CprAuyZRr8Vg
-   i8yPq116uaEnP1UYekPU59lDDHfPSRX98moWVz7msEv4SpoVzlvMpiXx4
-   eWlkz0hLaZupvgbgLaa/RkLVACEWt2oxPGq/PVjEDEnHjnawa1qM+wLwQ
-   DGkJZBh2m3p/vd60dKqKpiM+isMTPRqyPqc+LAeYbavbjU1MLDAikbDPn
-   g==;
-X-CSE-ConnectionGUID: Mpur3vudT0qFDWxoOYIN4w==
-X-CSE-MsgGUID: tREh6PJVRhOAsFzTY9pluQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11148"; a="24008880"
-X-IronPort-AV: E=Sophos;i="6.09,248,1716274800"; 
-   d="scan'208";a="24008880"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jul 2024 03:53:56 -0700
-X-CSE-ConnectionGUID: U+YjfOn3TZWfD4vHXFMS+w==
-X-CSE-MsgGUID: 8pifwwIhSkmz5t0grano6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,248,1716274800"; 
-   d="scan'208";a="84945670"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa002.jf.intel.com with ESMTP; 30 Jul 2024 03:53:54 -0700
-Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id C5EB828779;
-	Tue, 30 Jul 2024 11:53:52 +0100 (IST)
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	simon.horman@corigine.com,
-	anthony.l.nguyen@intel.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH iwl-next] ice: Implement ethtool reset support
-Date: Tue, 30 Jul 2024 12:51:21 +0200
-Message-Id: <20240730105121.78985-1-wojciech.drewek@intel.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1722336708; c=relaxed/simple;
+	bh=NVy6RN9UJ7x5SUNJVs+jH2G33Zl5cTJuJ6ZUmdQRBlM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UCmABGE+T7tn7Gq9YGSp0oOUvPYGPBIAKqOiIXoUHPfTIiifQVZnNjH5e7sq3IcccVHHv5zBMj334iJLw2bpQUu0Mf+bPWm9eZCfFFlryrjjONJBYhh0mmnpMMH2H5815UY/3Ekmzm2HuzPP7ylmFnlO3sWg3RnooId03Y+LCbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zki5zI4s; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722336705;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+hB8Q6mu68koU2jQoQEu66GSXIlhsKY8wiFrY5lywKE=;
+	b=Zki5zI4snH/j2v7pUZSaksnKZ1BCwwtbxXe/pNCPU9WQP+b0vB6AASEDohwSGqcvdTLZJe
+	wSvSB63Jm4XGuDPxoqfDoFWmVKppRnAYHRM25Bi6kKT+iuHBZHZtAZveTWrHE30NBCtjxZ
+	zftqHJNhxCtUibQ/1mem1lxz39khMhg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-b7KBbRWrM1CWrW03OTwdPQ-1; Tue, 30 Jul 2024 06:51:43 -0400
+X-MC-Unique: b7KBbRWrM1CWrW03OTwdPQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3684e48b8c4so120102f8f.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 03:51:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722336703; x=1722941503;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+hB8Q6mu68koU2jQoQEu66GSXIlhsKY8wiFrY5lywKE=;
+        b=igrd9YikdAznPnpchwInjR2xgu+2Rx7lmRybjoRmc+IOtkMPrZdbmxjdXKX/ds/Z0X
+         4aA7Gaj6IaCX08ZQiJ5jnbJHyYF4HvPmQwUWGfisZpvqTg3cFnO4ZHZYPEPLpPxwrQhi
+         3+AX+aKj9HzyD5hwhUPS9ANcFcO4NQuUjI8zp2UBPkElhp4IjM9baIb5gB1ICUhoB+xl
+         oKUULA89bDjizptl6j1qeChk40tPc+H0HTBTtWRUSmaStqMbLU5UUC6GTWejqUwlTJL5
+         vUHsJKNDTkDGtsEKWvcC9YQ2Fh/DNVpmb61PHsEz5q03fZuwHfbh8MHUYdh21VM2y2h1
+         MDOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWf2hOR3VRGVirQfBLMwbw15DW/XAfF8p4MA4xk+nu2JEq4AEydELc6CHgk1rAPZBmV3Ivv7hvFd3zT8sPHt1VTZYJzkKv2
+X-Gm-Message-State: AOJu0YyMA8p/X6b0bURBiXnwO5Dqn9bAOCeJD7GWn2FozI3gg0GwJJuh
+	gr6ZJ/RJFp0CANA5aK98zbXEk+HKTFjneHot445rwf5E9mVVLJFS0kysnfF1gRmqMhR/dJrZYSD
+	WOgyr/VcP2NgQbhXAyM8/RLhpCHgOhNutOqBxTWTHx93KRBoNCmiBlA==
+X-Received: by 2002:a05:600c:1c2a:b0:426:67e0:3aa with SMTP id 5b1f17b1804b1-4280542e12bmr73159235e9.1.1722336702741;
+        Tue, 30 Jul 2024 03:51:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEZaoR6bpS2N4mm+HmZ4X2wXHynNhoxBj3SH6BYXqnLt+gsQ3kywAuClBogEKuCnft44Z7HAg==
+X-Received: by 2002:a05:600c:1c2a:b0:426:67e0:3aa with SMTP id 5b1f17b1804b1-4280542e12bmr73159135e9.1.1722336702196;
+        Tue, 30 Jul 2024 03:51:42 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1712:4410:9110:ce28:b1de:d919? ([2a0d:3344:1712:4410:9110:ce28:b1de:d919])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281fd617desm49917915e9.35.2024.07.30.03.51.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 03:51:41 -0700 (PDT)
+Message-ID: <8c2835ed-9066-4adb-8f8b-f38416d97849@redhat.com>
+Date: Tue, 30 Jul 2024 12:51:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/7] net/selftests: TCP-AO selftests updates
+To: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
+Cc: Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Enable ethtool reset support. Each ethtool reset
-type is mapped to the CVL reset type:
-ETH_RESET_MAC - ICE_RESET_CORER
-ETH_RESET_ALL - ICE_RESET_GLOBR
-ETH_RESET_DEDICATED - ICE_RESET_PFR
+On 7/30/24 04:12, Dmitry Safonov wrote:
+> First 4 patches are more-or-less cleanups/preparations.
+> 
+> Patch 5 was sent to me/contributed off-list by Mohammad, who wants 32-bit
+> kernels to run TCP-AO.
+> 
+> Patch 6 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+> the issue, but I hope it will fix netdev flakes for connect-deny-*
+> tests.
+> 
+> And the biggest change is adding TCP-AO tracepoints to selftests.
+> I think it's a good addition by the following reasons:
+> - The related tracepoints are now tested;
+> - It allows tcp-ao selftests to raise expectations on the kernel
+>    behavior - up from the syscalls exit statuses + net counters.
+> - Provides tracepoints usage samples.
+> 
+> As tracepoints are not a stable ABI, any kernel changes done to them
+> will be reflected to the selftests, which also will allow users
+> to see how to change their code. It's quite better than parsing dmesg
+> (what BGP was doing pre-tracepoints, ugh).
+> 
+> Somewhat arguably, the code parses trace_pipe, rather than uses
+> libtraceevent (which any sane user should do). The reason behind that is
+> the same as for rt-netlink macros instead of libmnl: I'm trying
+> to minimize the library dependencies of the selftests. And the
+> performance of formatting text in kernel and parsing it again in a test
+> is not critical.
+> 
+> Current output sample:
+>> ok 73 Trace events matched expectations: 13 tcp_hash_md5_required[2] tcp_hash_md5_unexpected[4] tcp_hash_ao_required[3] tcp_ao_key_not_found[4]
+> 
+> Previously, tracepoints selftests were part of kernel tcp tracepoints
+> submission [1], but since then the code was quite changed:
+> - Now generic tracing setup is in lib/ftrace.c, separate from
+>    lib/ftrace-tcp.c which utilizes TCP trace points. This separation
+>    allows future selftests to trace non-TCP events, i.e. to find out
+>    an skb's drop reason, which was useful in the creation of TCP-CLOSE
+>    stress-test (not in this patch set, but used in attempt to reproduce
+>    the issue from [2]).
+> - Another change is that in the previous submission the trace events
+>    where used only to detect unexpected TCP-AO/TCP-MD5 events. In this
+>    version the selftests will fail if an expected trace event didn't
+>    appear.
+>    Let's see how reliable this is on the netdev bot - it obviously passes
+>    on my testing, but potentially may require a temporary XFAIL patch
+>    if it misbehaves on a slow VM.
 
-Multiple reset flags are not supported.
-Calling any reset type on port representor triggers VF reset.
+It looks like this is not well digested by the CI, e.g.:
 
-Command example:
-GLOBR:
-$ ethtool --reset enp1s0f0np0 all
-CORER:
-$ ethtool --reset enp1s0f0np0 mac
-PFR:
-$ ethtool --reset enp1s0f0np0 dedicated
-VF reset:
-$ ethtool --reset $port_representor mac
+https://netdev.bots.linux.dev/flakes.html?tn-needle=tcp-ao
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 64 ++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/705502/8-restore-ipv4/stdout
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 39d2652c3ee1..00b8ac3f1dff 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -4794,6 +4794,68 @@ static void ice_get_ts_stats(struct net_device *netdev,
- 	ts_stats->lost = ptp->tx_hwtstamp_timeouts;
- }
- 
-+/**
-+ * ice_ethtool_reset - triggers a given type of reset
-+ * @dev: network interface device structure
-+ * @flags: set of reset flags
-+ *
-+ * Note that multiple reset flags are not supported
-+ */
-+static int ice_ethtool_reset(struct net_device *dev, u32 *flags)
-+{
-+	struct ice_netdev_priv *np = netdev_priv(dev);
-+	struct ice_pf *pf = np->vsi->back;
-+	enum ice_reset_req reset;
-+
-+	switch (*flags) {
-+	case ETH_RESET_MAC:
-+		*flags &= ~ETH_RESET_MAC;
-+		reset = ICE_RESET_CORER;
-+		break;
-+	case ETH_RESET_ALL:
-+		*flags &= ~ETH_RESET_ALL;
-+		reset = ICE_RESET_GLOBR;
-+		break;
-+	case ETH_RESET_DEDICATED:
-+		*flags &= ~ETH_RESET_DEDICATED;
-+		reset = ICE_RESET_PFR;
-+		break;
-+	default:
-+		netdev_info(dev, "Unsupported set of ethtool flags, multiple flags are not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ice_schedule_reset(pf, reset);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_repr_ethtool_reset - triggers a VF reset
-+ * @dev: network interface device structure
-+ * @flags: set of reset flags
-+ *
-+ * VF associated with the given port representor will be reset
-+ * Any type of reset will trigger VF reset
-+ */
-+static int ice_repr_ethtool_reset(struct net_device *dev, u32 *flags)
-+{
-+	struct ice_repr *repr = ice_netdev_to_repr(dev);
-+	struct ice_vf *vf;
-+
-+	if (repr->type != ICE_REPR_TYPE_VF)
-+		return -EOPNOTSUPP;
-+
-+	vf = repr->vf;
-+
-+	if (ice_check_vf_ready_for_cfg(vf))
-+		return -EBUSY;
-+
-+	*flags = 0;
-+
-+	return ice_reset_vf(vf, ICE_VF_RESET_VFLR | ICE_VF_RESET_LOCK);
-+}
-+
- static const struct ethtool_ops ice_ethtool_ops = {
- 	.cap_rss_ctx_supported  = true,
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
-@@ -4829,6 +4891,7 @@ static const struct ethtool_ops ice_ethtool_ops = {
- 	.nway_reset		= ice_nway_reset,
- 	.get_pauseparam		= ice_get_pauseparam,
- 	.set_pauseparam		= ice_set_pauseparam,
-+	.reset			= ice_ethtool_reset,
- 	.get_rxfh_key_size	= ice_get_rxfh_key_size,
- 	.get_rxfh_indir_size	= ice_get_rxfh_indir_size,
- 	.get_rxfh		= ice_get_rxfh,
-@@ -4885,6 +4948,7 @@ static const struct ethtool_ops ice_ethtool_repr_ops = {
- 	.get_strings		= ice_repr_get_strings,
- 	.get_ethtool_stats      = ice_repr_get_ethtool_stats,
- 	.get_sset_count		= ice_repr_get_sset_count,
-+	.reset			= ice_repr_ethtool_reset,
- };
- 
- /**
--- 
-2.40.1
+BTW wearing for a moment Cato the censor's shoes, I note that patch 1 && 
+2 commit messages are quite more informal and less informative than the 
+average;)
+
+Thanks,
+
+Paolo
 
 
