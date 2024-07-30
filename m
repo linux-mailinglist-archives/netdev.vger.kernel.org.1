@@ -1,141 +1,190 @@
-Return-Path: <netdev+bounces-113867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE55B94032F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 03:11:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92242940370
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 03:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B6121C212F0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 01:11:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B561B1C2104F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 01:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5D110E3;
-	Tue, 30 Jul 2024 01:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AF36FB0;
+	Tue, 30 Jul 2024 01:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XZeQI4Hg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iuJm+X4U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E7D8BF0
-	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 01:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF72D8821;
+	Tue, 30 Jul 2024 01:23:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722301896; cv=none; b=ba0Um2YzoINmIhKyTVucbkQegQSfbTKz/Lcp8M2s3yXUcUY+fdmxTUXahdgfsvXlAWMTfp14hQLllU9wsUbRtcD9WtzU9L9qCjxw8duCZ2bNW/9DODLx64zSOpJA+g6fnrFN0v3j/2Dr7sCNQOR/XJ8FPHBoE9jBZSxWwCqgcAc=
+	t=1722302587; cv=none; b=mcEAyL0DgfF6NTe8IQt/X3JrKlUpp76M6JX5OR2I8zMTmD8SsaUZjKxQy5lotxK08LWeq5y3tNg37On6DDQOzGOQJ2UbPPjjfuNlLQYPo2Hdwx/0vEx2ux8u+xBfuseZdveMF7BYLI+4fyq2VBDxYqJc8lRrJkAoz47OaS/Bzh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722301896; c=relaxed/simple;
-	bh=mDbX44iHFAur30ptnsNO/rYztiZYmHy6rFTH9+fEUaE=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=H80ppI6YVqZQtiRTXBu3eqJh1p1eOlENWSgyJ97TxNomUeTRAee129/kbVOWI4NPsk5I4ljqFFJkhjnvwW0hSoWBy2eqGCKXK3kvyA+Bs8p0Fu2cR73MMV+eesKrR/pKAfjKeWn8FHAGTMhug3Q5/F6yWebdtorvKyJLeyM9ONI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XZeQI4Hg; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722301891; h=Message-ID:Subject:Date:From:To;
-	bh=NurZJnjIPPIG2Wgu5pBlZBRDBNoK5/FjLiE+OAyWfI4=;
-	b=XZeQI4HgX23wucBhti1sLrdrtu1Upbk0JUzv6+mYYZfpB5ypTqzreW8Upe/DaDG09HZ/GymaqEL2oPwSTwhldE+2/zdrYsme9izerjEOzV7Spxx9GegQYn3pbjVTMHoZbC6DksT/3TG2fz6BZN8HhObKF2HGWqkggQTMhqJhfHE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032019045;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBdYe0X_1722301889;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WBdYe0X_1722301889)
-          by smtp.aliyun-inc.com;
-          Tue, 30 Jul 2024 09:11:30 +0800
-Message-ID: <1722301882.5491223-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
-Date: Tue, 30 Jul 2024 09:11:22 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>
-References: <20240729124755.35719-1-hengqi@linux.alibaba.com>
-In-Reply-To: <20240729124755.35719-1-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1722302587; c=relaxed/simple;
+	bh=mb631k4kfETjEK1XHoh+eCWwPDdm+0gqMj8RFvnugw4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JSOTnoLpUnoG1C5P4hLfPxxLvDT9Bur5fLcooEh27eDqUUvKTU06PLyVn4x1cxiVMbaCyfXlkNL36QIxXKAjSs6n3mWHny+7fYbx1eDo5I1qgdHGh7yWX9zkiLClCp0d23KpimG3l/FBjGnQOpp4HEy5F5+B7qxobfwoI3Y81oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iuJm+X4U; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722302584; x=1753838584;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mb631k4kfETjEK1XHoh+eCWwPDdm+0gqMj8RFvnugw4=;
+  b=iuJm+X4UryW6hBG2Zw9J+o5NOprPDmFfnLnTsidSrq96NcxdfF6vG3Fo
+   9hUnW/5SI3tbEiIeIofiHFvkPVWeKCHuYb3oNdvgY7Mw4Tgnali+xW3tD
+   uuyVK3LycyoUTv1e0xWSU6F+2MXZC+4vZD2PCSWVoJ5YVB3mqzh1UUQEi
+   SqW9w33veucOGDYO4x236TgENaD5ULz2Wxy7raDgYB0VTNwiP27fLT2hb
+   6MChGawgvOPfkhm2JTFiPVoXi0b44Pz7akTxyoUz1Wz5/RQLcOo4WgGZ1
+   q1/vrdE+Sah9vNAzKmA5vn5aKL+X7NkRwuixAUWJF3huGk4dfz3uwzTdq
+   w==;
+X-CSE-ConnectionGUID: 0eqk+x7LSnqn9sc1d27D6Q==
+X-CSE-MsgGUID: P5DfSweRQpSFKt6SiESjvA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11148"; a="20242191"
+X-IronPort-AV: E=Sophos;i="6.09,247,1716274800"; 
+   d="scan'208";a="20242191"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 18:23:03 -0700
+X-CSE-ConnectionGUID: rHulb508S/qhLPcwNOHwVA==
+X-CSE-MsgGUID: SjJyrrYHSca9cyPX/legFQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,247,1716274800"; 
+   d="scan'208";a="54079212"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.28])
+  by orviesa010.jf.intel.com with ESMTP; 29 Jul 2024 18:22:58 -0700
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Shinas Rasheed <srasheed@marvell.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Sasha Neftin <sasha.neftin@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH iwl-next,v1 0/3] Add Default Rx Queue Setting for igc driver
+Date: Tue, 30 Jul 2024 09:22:12 +0800
+Message-Id: <20240730012212.775814-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 29 Jul 2024 20:47:55 +0800, Heng Qi <hengqi@linux.alibaba.com> wrote:
-> From the virtio spec:
->
-> 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-> 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-> 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
->
-> The driver must not send vq notification coalescing commands if
-> VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
-> applies to vq resize.
->
-> Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+This patch set introduces the support to configure default Rx queue during runtime.
+A new sysfs attribute "default_rx_queue" has been added, allowing users to check
+and modify the default Rx queue.
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+This patch set is tested on two back-to-back connected i226 on Intel ADL-S systems.
 
-> ---
->  drivers/net/virtio_net.c | 29 +++++++++++++++++------------
->  1 file changed, 17 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 0383a3e136d6..eb115e807882 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3708,6 +3708,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
->  	u32 rx_pending, tx_pending;
->  	struct receive_queue *rq;
->  	struct send_queue *sq;
-> +	u32 pkts, usecs;
->  	int i, err;
->
->  	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
-> @@ -3740,11 +3741,13 @@ static int virtnet_set_ringparam(struct net_device *dev,
->  			 * through the VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver
->  			 * did not set any TX coalescing parameters, to 0.
->  			 */
-> -			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
-> -							       vi->intr_coal_tx.max_usecs,
-> -							       vi->intr_coal_tx.max_packets);
-> -			if (err)
-> -				return err;
-> +			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> +				usecs = vi->intr_coal_tx.max_usecs;
-> +				pkts = vi->intr_coal_tx.max_packets;
-> +				err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
-> +				if (err)
-> +					return err;
-> +			}
->  		}
->
->  		if (ring->rx_pending != rx_pending) {
-> @@ -3753,13 +3756,15 @@ static int virtnet_set_ringparam(struct net_device *dev,
->  				return err;
->
->  			/* The reason is same as the transmit virtqueue reset */
-> -			mutex_lock(&vi->rq[i].dim_lock);
-> -			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
-> -							       vi->intr_coal_rx.max_usecs,
-> -							       vi->intr_coal_rx.max_packets);
-> -			mutex_unlock(&vi->rq[i].dim_lock);
-> -			if (err)
-> -				return err;
-> +			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> +				usecs = vi->intr_coal_rx.max_usecs;
-> +				pkts = vi->intr_coal_rx.max_packets;
-> +				mutex_lock(&vi->rq[i].dim_lock);
-> +				err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
-> +				mutex_unlock(&vi->rq[i].dim_lock);
-> +				if (err)
-> +					return err;
-> +			}
->  		}
->  	}
->
-> --
-> 2.32.0.3.g01195cf9f
->
+Test Steps and expected results:
+1. Check default_rx_queue index:
+   @DUT: $ cat /sys/devices/pci0000:00/0000:00:1c.0/0000:02:00.0/default_rx_queue
+         0
+
+2. Check statistic of Rx packets:
+   @DUT: $ ethtool -S enp2s0 | grep rx.*packets
+         rx_packets: 0
+         rx_queue_0_packets: 0
+         rx_queue_1_packets: 0
+         rx_queue_2_packets: 0
+         rx_queue_3_packets: 0
+
+3. Send 10 ARP packets:
+   @LinkPartner: $ arping -c 10 -I enp170s0 169.254.1.10
+                 ARPING 169.254.1.10 from 169.254.1.2 enp170s0
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.725ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.649ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.577ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.611ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.706ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.644ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.648ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.601ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.628ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.641ms
+                 Sent 10 probes (1 broadcast(s))
+                 Received 10 response(s)
+
+4. Check statistic of Rx packets to make sure packets is received by default queue (RxQ0):
+   @DUT: $ ethtool -S enp2s0 | grep rx.*packets
+         rx_packets: 10
+         rx_queue_0_packets: 10
+         rx_queue_1_packets: 0
+         rx_queue_2_packets: 0
+         rx_queue_3_packets: 0
+
+5. Change default_rx_queue index to Queue 3:
+   @DUT: $ echo 3 | sudo tee /sys/devices/pci0000:00/0000:00:1c.0/0000:02:00.0/default_rx_queue
+         3
+   @DUT: $ cat /sys/devices/pci0000:00/0000:00:1c.0/0000:02:00.0/default_rx_queue
+         3
+
+6. Send 10 ARP packets:
+   @LinkPartner: $ arping -c 10 -I enp170s0 169.254.1.10
+                 ARPING 169.254.1.10 from 169.254.1.2 enp170s0
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.653ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.652ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.653ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.649ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.600ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.698ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.694ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.678ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.609ms
+                 Unicast reply from 169.254.1.10 [00:A0:C9:00:00:00]  0.634ms
+                 Sent 10 probes (1 broadcast(s))
+                 Received 10 response(s)
+
+7. Check statistic of Rx packets to make sure packets is received by new default queue (RxQ3):
+   @DUT: $ ethtool -S enp2s0 | grep rx.*packets
+         rx_packets: 20
+         rx_queue_0_packets: 10
+         rx_queue_1_packets: 0
+         rx_queue_2_packets: 0
+         rx_queue_3_packets: 10
+
+Blanco Alcaine Hector (3):
+  igc: Add documentation
+  igc: Add default Rx queue configuration via sysfs
+  igc: Add default Rx Queue into documentation
+
+ .../device_drivers/ethernet/index.rst         |   1 +
+ .../device_drivers/ethernet/intel/igc.rst     | 103 ++++++++++++
+ drivers/net/ethernet/intel/igc/Makefile       |   3 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     |   6 +
+ drivers/net/ethernet/intel/igc/igc_regs.h     |   6 +
+ drivers/net/ethernet/intel/igc/igc_sysfs.c    | 156 ++++++++++++++++++
+ drivers/net/ethernet/intel/igc/igc_sysfs.h    |  10 ++
+ 7 files changed, 284 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/intel/igc.rst
+ create mode 100644 drivers/net/ethernet/intel/igc/igc_sysfs.c
+ create mode 100644 drivers/net/ethernet/intel/igc/igc_sysfs.h
+
+-- 
+2.34.1
+
 
