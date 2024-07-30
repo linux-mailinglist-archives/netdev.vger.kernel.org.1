@@ -1,171 +1,173 @@
-Return-Path: <netdev+bounces-113884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB270940424
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:08:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6BD940433
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:13:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 541F11F216DC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:08:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4EABB20B68
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C157CA6B;
-	Tue, 30 Jul 2024 02:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B706ADDBC;
+	Tue, 30 Jul 2024 02:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EANiDsCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 726D429CE7;
-	Tue, 30 Jul 2024 02:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F782A1C7;
+	Tue, 30 Jul 2024 02:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722305333; cv=none; b=tV9PduYQKy3G6msKcBROfOuRrZKagW/V9+d9JkZ88L7e1c/hXdHT6YOlEdAGmQD/Q5DwQxz7nTtu763mr12Lm+CHrSvQ5LaCFGBuDa/AWUHEDsQjNRY6WJXu+jB6Ef+E1urBQedrv+KDzEXV+sEZZNmX+gQp73r0IeM00NXzyYY=
+	t=1722305609; cv=none; b=GTpjjKZHt0aqINPRBCcvbssrSgHupqgvAzCwivRLiscgbTDadOShP+fXdmDGGe92MGDAyov2GDFi88f7RdHH9k01B7AU33RoLZDv3Naw9xCrrCTmAi10f+5hON0ncgVzZNrd45iYh0e4SG3Fu3BU2+58X01OBjTdIbpxaB+Dfe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722305333; c=relaxed/simple;
-	bh=OGoaHfFu1F1RbEuq1dYgdxktXaHsVoK5PHFP+qY3hdk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version; b=fGgN6xQUpm/S2XhX1GMLYPN9B6tQzWw8s3HsYWI7t1KEqjvGt6HCI6KXlxpmPRG8OTII5JtUZUF+/7xuiLuJjAxFd3GS12h3ox2vlvc8ppP0Ak6CyIao08VDTfa9WKR4uNRFTFgB/c0h7Q4pdLlmxgda+aLRe8Zc7eFfOFUTE/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from localhost.localdomain (unknown [103.163.180.3])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPA id C24CA60108572;
-	Tue, 30 Jul 2024 08:48:33 +0800 (CST)
-X-MD-Sfrom: youwan@nfschina.com
-X-MD-SrcIP: 103.163.180.3
-From: Youwan Wang <youwan@nfschina.com>
-To: rmk+kernel@armlinux.org.uk
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Youwan Wang <youwan@nfschina.com>
-Subject: [net-next,v3] net: phy: phy_device: fix PHY WOL enabled, PM failed to suspend
-Date: Tue, 30 Jul 2024 08:48:24 +0800
-Message-Id: <20240730004824.660520-1-youwan@nfschina.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240709113735.630583-1-youwan@nfschina.com>
+	s=arc-20240116; t=1722305609; c=relaxed/simple;
+	bh=eT7i2g1f0cqiBayr0fps7NZWteEXD2+sswiVQeadjT0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hY9mMoj7dFanpm71Q+ndxqcxlu63Y4XH//3y6J4m8j8amfvjmRtax0ZGqnl0HenXm7dvibvzYE3si3tGS19ClVKXQpjlThmQUmnCLPdeWR+PEDi5e7sL1rj+68unCJokN+hPp/rfqKq2wRz/YQpeZB2RK+LwdKheR436rXtY50g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EANiDsCK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 644B1C32786;
+	Tue, 30 Jul 2024 02:13:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722305609;
+	bh=eT7i2g1f0cqiBayr0fps7NZWteEXD2+sswiVQeadjT0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=EANiDsCKCwN1BcfKnnPKFzk+A4oASxkcYKAW7mzo0rcnO7fDKg3rX6+j8Ssk7PAJn
+	 jt695q6tVpueSXIkti40bvOJvDqqnZlPHKP7T2hY0D3yLVmnFJBMkqlmK5ttfv77KE
+	 5oPmrOYHorl9B3xGzr1/7g+NMA2F+ZEOYxX9wTNmT3yUdbKJgGos3Zk9kMbGPevo/f
+	 pefASRurRmrbcCV9I1wlhy2Wn1mwGyqWpgK/COaze44pBaxCa9awUHtbOW6zPlFeEp
+	 E3Umy4PeNh5mMmfuyvlp360uvuEhAVW/fy8lMRGrfcp9S0KfRYF/bdh4w5JcEAnVc5
+	 /853aQw/Of0Sw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFF4C3DA61;
+	Tue, 30 Jul 2024 02:13:29 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Subject: [PATCH net-next 0/7] net/selftests: TCP-AO selftests updates
+Date: Tue, 30 Jul 2024 03:12:14 +0100
+Message-Id: <20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP5LqGYC/zWMQQrCMBAAv1L27GKaRAt+RTykycYu6LZkoxRK/
+ 24UPA7DzAZKhUnh0m1Q6M3KszToDx3EKcidkFNjsMZ6MziDNS4YZlR65EpaFV9LwjP2Fn1ydHJ
+ h8NllaP1SKPP6e19BqKLQWuHWzBiUcCxB4vR9/93xGVhg3z+pIXEblQAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.14.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722305607; l=4552;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=eT7i2g1f0cqiBayr0fps7NZWteEXD2+sswiVQeadjT0=;
+ b=W8S01ZXd8hQdRgKdXK/TejkLDTeSThgq+hIMh9IPKnziRno0w9cYPY4pY4U4byFp3tRMz9+us
+ vbc/rEvyDRaCZt6zP49ico7JsdOU5n5ZD0C3GxLy4wd5EmP+04PnIIo
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
- Add a function that phylib can inquire of the driver whether WoL
- has been enabled at the PHY.
+First 4 patches are more-or-less cleanups/preparations.
 
- If the PHY of the mido bus is enabled with Wake-on-LAN (WOL),
- we cannot suspend the PHY. Although the WOL status has been
- checked in phy_suspend(), returning -EBUSY(-16) would cause
- the Power Management (PM) to fail to suspend. Since
- phy_suspend() is an exported symbol (EXPORT_SYMBOL),
- timely error reporting is needed. Therefore, an additional
- check is performed here. If the PHY of the mido bus is enabled
- with WOL, we skip calling phy_suspend() to avoid PM failure.
+Patch 5 was sent to me/contributed off-list by Mohammad, who wants 32-bit
+kernels to run TCP-AO.
 
- Why is phydev->attached_dev NULL? Was a MAC never attached to the PHY?
- Has the MAC disconnected the PHY as part of the suspend? It would be
- odd that a device being used for WoL would disconnect the PHY.
+Patch 6 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+the issue, but I hope it will fix netdev flakes for connect-deny-*
+tests.
 
- it has been observed that the phydev->attached_dev is NULL, phydev is
- "stmmac-0:01", it not attached, but it will affect suspend and resume.
- The actually attached "stmmac-0:00" will not dpm_run_callback():
- mdio_bus_phy_suspend().
+And the biggest change is adding TCP-AO tracepoints to selftests.
+I think it's a good addition by the following reasons:
+- The related tracepoints are now tested;
+- It allows tcp-ao selftests to raise expectations on the kernel
+  behavior - up from the syscalls exit statuses + net counters.
+- Provides tracepoints usage samples.
 
- log:
- [    5.932502] YT8521 Gigabit Ethernet stmmac-0:00: attached PHY driver
- (mii_bus:phy_addr=stmmac-0:00, irq=POLL)
- [    5.932512] YT8521 Gigabit Ethernet stmmac-0:01: attached PHY driver
- (mii_bus:phy_addr=stmmac-0:01, irq=POLL)
- [   24.566289] YT8521 Gigabit Ethernet stmmac-0:00: yt8521_read_status,
- link down, media: UTP
+As tracepoints are not a stable ABI, any kernel changes done to them
+will be reflected to the selftests, which also will allow users
+to see how to change their code. It's quite better than parsing dmesg
+(what BGP was doing pre-tracepoints, ugh).
 
- log:
- [  322.631362] OOM killer disabled.
- [  322.631364] Freezing remaining freezable tasks
- [  322.632536] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
- [  322.632540] printk: Suspending console(s) (use no_console_suspend to debug)
- [  322.633052] YT8521 Gigabit Ethernet stmmac-0:01:
- PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x110 [libphy] returns -16
- [  322.633071] YT8521 Gigabit Ethernet stmmac-0:01:
- PM: failed to suspend: error -16
- [  322.669699] PM: Some devices failed to suspend, or early wake event detected
- [  322.669949] OOM killer enabled.
- [  322.669951] Restarting tasks ... done.
- [  322.671008] random: crng reseeded on system resumption
- [  322.671014] PM: suspend exit
+Somewhat arguably, the code parses trace_pipe, rather than uses
+libtraceevent (which any sane user should do). The reason behind that is
+the same as for rt-netlink macros instead of libmnl: I'm trying
+to minimize the library dependencies of the selftests. And the
+performance of formatting text in kernel and parsing it again in a test
+is not critical.
 
- If the YT8521 driver adds phydrv->flags, ask the YT8521 driver to process
- WOL at suspend and resume time, the phydev->suspended_by_mdio_bus=1
- flag would cause the resume failure.
+Current output sample:
+> ok 73 Trace events matched expectations: 13 tcp_hash_md5_required[2] tcp_hash_md5_unexpected[4] tcp_hash_ao_required[3] tcp_ao_key_not_found[4]
 
- log:
- [  260.814763] YT8521 Gigabit Ethernet stmmac-0:01:
- PM: dpm_run_callback():mdio_bus_phy_resume+0x0/0x160 [libphy] returns -95
- [  260.814782] YT8521 Gigabit Ethernet stmmac-0:01:
- PM: failed to resume: error -95
+Previously, tracepoints selftests were part of kernel tcp tracepoints
+submission [1], but since then the code was quite changed:
+- Now generic tracing setup is in lib/ftrace.c, separate from
+  lib/ftrace-tcp.c which utilizes TCP trace points. This separation
+  allows future selftests to trace non-TCP events, i.e. to find out
+  an skb's drop reason, which was useful in the creation of TCP-CLOSE
+  stress-test (not in this patch set, but used in attempt to reproduce
+  the issue from [2]).
+- Another change is that in the previous submission the trace events
+  where used only to detect unexpected TCP-AO/TCP-MD5 events. In this
+  version the selftests will fail if an expected trace event didn't
+  appear.
+  Let's see how reliable this is on the netdev bot - it obviously passes
+  on my testing, but potentially may require a temporary XFAIL patch
+  if it misbehaves on a slow VM.
 
- -95 is EOPNOTSUPP. Where is that coming from?
+[1] https://lore.kernel.org/lkml/20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=33700a0c9b56
 
- yt8511_config_init() -> ret = -EOPNOTSUPP;
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Signed-off-by: Youwan Wang <youwan@nfschina.com>
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
 ---
- drivers/net/phy/phy_device.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+Dmitry Safonov (6):
+      selftests/net: Clean-up double assignment
+      selftests/net: Provide test_snprintf() helper
+      selftests/net: Be consistent in kconfig checks
+      selftests/net: Don't forget to close nsfd after switch_save_ns()
+      selftests/net: Synchronize client/server before counters checks
+      selftests/net: Add trace events matching to tcp_ao
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 2ce74593d6e4..c3ad6f6791ff 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -268,6 +268,15 @@ static struct phy_driver genphy_driver;
- static LIST_HEAD(phy_fixup_list);
- static DEFINE_MUTEX(phy_fixup_lock);
- 
-+static bool phy_drv_wol_enabled(struct phy_device *phydev)
-+{
-+	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
-+
-+	phy_ethtool_get_wol(phydev, &wol);
-+
-+	return wol.wolopts != 0;
-+}
-+
- static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- {
- 	struct device_driver *drv = phydev->mdio.dev.driver;
-@@ -277,6 +286,13 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
- 	if (!drv || !phydrv->suspend)
- 		return false;
- 
-+	/* If the PHY on the mido bus is not attached but has WOL enabled
-+	 * we cannot suspend the PHY.
-+	 */
-+	if (!netdev && phy_drv_wol_enabled(phydev) &&
-+	    !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
-+		return false;
-+
- 	/* PHY not attached? May suspend if the PHY has not already been
- 	 * suspended as part of a prior call to phy_disconnect() ->
- 	 * phy_detach() -> phy_suspend() because the parent netdev might be the
-@@ -1850,7 +1866,6 @@ EXPORT_SYMBOL(phy_detach);
- 
- int phy_suspend(struct phy_device *phydev)
- {
--	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
- 	struct net_device *netdev = phydev->attached_dev;
- 	struct phy_driver *phydrv = phydev->drv;
- 	int ret;
-@@ -1858,8 +1873,7 @@ int phy_suspend(struct phy_device *phydev)
- 	if (phydev->suspended)
- 		return 0;
- 
--	phy_ethtool_get_wol(phydev, &wol);
--	phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
-+	phydev->wol_enabled = phy_drv_wol_enabled(phydev) || (netdev && netdev->wol_enabled);
- 	/* If the device has WOL enabled, we cannot suspend the PHY */
- 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
- 		return -EBUSY;
+Mohammad Nassiri (1):
+      selftests/tcp_ao: Fix printing format for uint64_t
+
+ tools/testing/selftests/net/tcp_ao/Makefile        |   3 +-
+ tools/testing/selftests/net/tcp_ao/bench-lookups.c |   2 +-
+ tools/testing/selftests/net/tcp_ao/config          |   1 +
+ tools/testing/selftests/net/tcp_ao/connect-deny.c  |  25 +-
+ tools/testing/selftests/net/tcp_ao/connect.c       |   6 +-
+ tools/testing/selftests/net/tcp_ao/icmps-discard.c |   2 +-
+ .../testing/selftests/net/tcp_ao/key-management.c  |  18 +-
+ tools/testing/selftests/net/tcp_ao/lib/aolib.h     | 173 ++++++-
+ .../testing/selftests/net/tcp_ao/lib/ftrace-tcp.c  | 549 +++++++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/ftrace.c    | 466 +++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/kconfig.c   |  31 +-
+ tools/testing/selftests/net/tcp_ao/lib/setup.c     |  15 +-
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      |   1 -
+ tools/testing/selftests/net/tcp_ao/lib/utils.c     |  26 +
+ tools/testing/selftests/net/tcp_ao/restore.c       |  30 +-
+ tools/testing/selftests/net/tcp_ao/rst.c           |   2 +-
+ tools/testing/selftests/net/tcp_ao/self-connect.c  |  19 +-
+ tools/testing/selftests/net/tcp_ao/seq-ext.c       |  28 +-
+ .../selftests/net/tcp_ao/setsockopt-closed.c       |   6 +-
+ tools/testing/selftests/net/tcp_ao/unsigned-md5.c  |  35 +-
+ 20 files changed, 1374 insertions(+), 64 deletions(-)
+---
+base-commit: 1722389b0d863056d78287a120a1d6cadb8d4f7b
+change-id: 20240730-tcp-ao-selftests-upd-6-12-4d3e53a74f3f
+
+Best regards,
 -- 
-2.25.1
+Dmitry Safonov <0x7f454c46@gmail.com>
+
 
 
