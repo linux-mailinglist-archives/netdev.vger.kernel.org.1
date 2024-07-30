@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-114001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75BFD940A29
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:46:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E54940A2B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A76E91C21198
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 07:46:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E59252844A6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 07:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430D519046B;
-	Tue, 30 Jul 2024 07:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDEC18D4DC;
+	Tue, 30 Jul 2024 07:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1aqt+UN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXKCgQVU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBBD150994;
-	Tue, 30 Jul 2024 07:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61C2150994;
+	Tue, 30 Jul 2024 07:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722325601; cv=none; b=QdqjdKt8Ku/d7jROZ5qUvOoKbfBJofc+7PmKsmVAFTkJTZCSQb2Vnerhaq01TBMNBYy30PJZl7iDgkMjWr13UtcxrvpTNYnaAVA/0Ze5kwZCU4vgVN5IRRs/lgSsZKUBiCdX1c3CzU+e/XcNNFFjuQIt24s4MDaqPzPuAwSXuBE=
+	t=1722325603; cv=none; b=joqulQJzh9rGWNxUrzVvdW04JsuMrL58CIfhjaWBsstv7rA+bP6NuqjsjKhRYbYaLUyDrgMdoGzcmYv03Mz3eeOoAk9x1noYiC62tag36s8dXTSkPuLeVdMZZzAkQt9yfMB5HkvgvSf5ExEjRyjEt4YgS1Nu6odUGhvin5k66nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722325601; c=relaxed/simple;
-	bh=nDicdgSbC0TQTXrWxg5z3pQYKzM9enTJkO+htwH+xSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kiZSpWVg0CQXB1ci7YxysNL8PkMUwC0lz5BfGM86NbWSYthKBKoQG79vryAgql48NJ8kedF3m5/7frFH30NlrzrxeOrFRudLDDfwsrzbeytEQdzuZE8TU+C7QDAd3+pIYLkp7ZJEqhrvyslI2jH2ZW0Zjiu8nL66eHJrw7v1b0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1aqt+UN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BB59C4AF09;
-	Tue, 30 Jul 2024 07:46:38 +0000 (UTC)
+	s=arc-20240116; t=1722325603; c=relaxed/simple;
+	bh=/1UyRDxDBbUGDXPzIHV51t98DfSsIxNOuwNCDXhMy8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XrKWAbmL1EITQE6YfjMUrIPeH8rlZGTbmcfAL4sMLCxlwu04k4HQeA/VV8wSF+HOtQCLpiyqnwaik2C3A3SWJde7BgYsOW5q0JKmfbiyT40LE8yVn4TT3eGNq7JAqCQj6bFJqqWRgkAQZtRcEQXpXwDg7cQx8EvWea28U/LsfiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXKCgQVU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10014C32782;
+	Tue, 30 Jul 2024 07:46:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722325599;
-	bh=nDicdgSbC0TQTXrWxg5z3pQYKzM9enTJkO+htwH+xSs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=L1aqt+UN3W87SncD+wV6yppB8O62mdYsv7JoPokK1hdmOhgkKbu2+lykxCgGlctLj
-	 wSKJ0pDCbnp5jC/2hdBsRKWbzJ0H5pXEN1LVuzbApLcxwfMb38fOclMZ93Xirh4coC
-	 3FqdjVLXItkikL3A7MdpjAF7W5aIFBhgAI+vvAZI9oj0GOvhQbGRVhZgZ+FG/SvUgp
-	 J9/wjRUBUndz2l05+5uSkQdTKhJnqKjpgm/Pft+GHvlOVLNSuaoBfmoh4yVd228sHv
-	 flKt3le4C1Yj7UOdmkznbjfUTFMlPGgjwPWJiuk6zObVmlXNuE1jFLH9ZvP5H8yQ2V
-	 dzKM1Vrk5EZ9w==
+	s=k20201202; t=1722325603;
+	bh=/1UyRDxDBbUGDXPzIHV51t98DfSsIxNOuwNCDXhMy8Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hXKCgQVUgiMD5DnjrQb/DEV0shSrPRhqhFWAtn5UXtlH2T3H/uPDfIdnLZRJUf7wl
+	 bahgfr4dJTU7ghCKtPujgbllaURpJgo2MW4pewmQhrEf6MnuKRPe4NSBVAfYxiCjCr
+	 apLGIfQ9+9AWyM4TCg2LysicG+oulsMtA4JQwhNvAnBTrM56J9SvY3vWwOBnl2S3g1
+	 WtEnebNB2r6NvFfgHwWV95wagZfho/z4Zzdo9G42QQYF5NBbR5MYJ6RBDR+zOBberx
+	 1qBH2UbgDoxBqc0yLxyvTs6JX7gpcdqru2ZmwlMrx/X90dkfw7H33Hs1lb/vcEyzsB
+	 TSMVt7IQVl5uw==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: arinc.unal@arinc9.com,
@@ -63,10 +64,12 @@ Cc: arinc.unal@arinc9.com,
 	conor+dt@kernel.org,
 	devicetree@vger.kernel.org,
 	upstream@airoha.com
-Subject: [PATCH net-next 0/2] Add support for EN7581 to mt7530 driver
-Date: Tue, 30 Jul 2024 09:46:31 +0200
-Message-ID: <cover.1722325265.git.lorenzo@kernel.org>
+Subject: [PATCH net-next 1/2] dt-bindings: net: dsa: mediatek,mt7530: Add airoha,en7581-switch
+Date: Tue, 30 Jul 2024 09:46:32 +0200
+Message-ID: <63f5d56a0d8c81d70f720c9ad2ca3861c7ce85e8.1722325265.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <cover.1722325265.git.lorenzo@kernel.org>
+References: <cover.1722325265.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,18 +78,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add EN7581 support to MT7530 DSA driver.
+Add documentation for the built-in switch which can be found in the
+Airoha EN7581 SoC.
 
-Lorenzo Bianconi (2):
-  dt-bindings: net: dsa: mediatek,mt7530: Add airoha,en7581-switch
-  net: dsa: mt7530: Add EN7581 support
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ .../devicetree/bindings/net/dsa/mediatek,mt7530.yaml     | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
- .../bindings/net/dsa/mediatek,mt7530.yaml     |  9 ++++-
- drivers/net/dsa/mt7530-mmio.c                 |  1 +
- drivers/net/dsa/mt7530.c                      | 38 +++++++++++++++++--
- drivers/net/dsa/mt7530.h                      | 16 +++++---
- 4 files changed, 54 insertions(+), 10 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+index 7e405ad96eb2..aa89bc89eb45 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+@@ -92,6 +92,10 @@ properties:
+           Built-in switch of the MT7988 SoC
+         const: mediatek,mt7988-switch
+ 
++      - description:
++          Built-in switch of the Airoha EN7581 SoC
++        const: airoha,en7581-switch
++
+   reg:
+     maxItems: 1
+ 
+@@ -284,7 +288,10 @@ allOf:
+   - if:
+       properties:
+         compatible:
+-          const: mediatek,mt7988-switch
++          contains:
++            enum:
++              - mediatek,mt7988-switch
++              - airoha,en7581-switch
+     then:
+       $ref: "#/$defs/mt7530-dsa-port"
+       properties:
 -- 
 2.45.2
 
