@@ -1,126 +1,109 @@
-Return-Path: <netdev+bounces-114111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BBD5940FB9
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:43:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD02940FBC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 12:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D65B285990
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:43:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEAF41F24C93
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 10:43:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F2819E81D;
-	Tue, 30 Jul 2024 10:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CD719EED8;
+	Tue, 30 Jul 2024 10:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N9qFpIo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0C319E812;
-	Tue, 30 Jul 2024 10:36:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9C919EED3;
+	Tue, 30 Jul 2024 10:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722335819; cv=none; b=qAL9nSt5JfhYjUFur92JHouzXevKMtSNudDbT5lrz/XEVLAVEpFAFHaZfc6U3SykaTuGjhnjrt9NFelxAFPzcqlLrO5l88Vt04wwx1jESnq9lCKNhEMf0EO6CAZLHTB0miqeLja81tg+b4nkc/ZS/jCMUZsvR39nd1DCnMLeLTM=
+	t=1722335833; cv=none; b=FLJZJ+ngMITkPFQCyeqlBM9u6zv1zGlXtQeXr+rJwj9NcVCd6LvigNi4M0gvDMcpLdjx3vZCtNA6vjCip3v6euW4PhA7XhpXLtLWNlLPa/lH+vR7zdynOU5iHoUH2QDl4dyib1+d0OOxuKWgvf1ImgfuW+BaSBilQBLkmF/yUPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722335819; c=relaxed/simple;
-	bh=ETc4q9fG3Gz3Wa40kMG9naoXXXZm2HLJBKTB9l1Lh7E=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=TxIHqb0AovR7wATR0csE1CAQ/gMkP25/nPcPD669DY4YTDg4AhYm53S14ZVApBVCLuwGc+ngK0FkhffYWt4+p2MCC8fOPTHe2K4tGUIigCtiP5odlvdj9qZvGLQzqhfgCjbY8FvghkQFU3SM8VGw3nBQIybvywB87QsnIkwyJKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sYkDp-000000000le-27fR;
-	Tue, 30 Jul 2024 10:36:49 +0000
-Date: Tue, 30 Jul 2024 11:36:42 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v3] net: ethernet: mtk_eth_soc: drop clocks unused
- by Ethernet driver
-Message-ID: <b5faaf69b5c6e3e155c64af03706c3c423c6a1c9.1722335682.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1722335833; c=relaxed/simple;
+	bh=M4eg2RA2dVioVZclF6JHvBR8dH2//m8JYd+0R0imYZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oS4hArUrx6Prr7CfWwKMfARlYg2SgGEowgRNKc8G/IaU0+Ek/SWet4JPz1Amuc+VJ8asIALEFWKUv8+HRgypCEEYvEqySjIv4Mtc6ACfdTp+12yC4uyukGBnJ/DXpnhjbpxm/Aa64HrZUV18RdhceKCUPjTatH9jViqlNv2EBtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N9qFpIo0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF37C4AF09;
+	Tue, 30 Jul 2024 10:37:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722335832;
+	bh=M4eg2RA2dVioVZclF6JHvBR8dH2//m8JYd+0R0imYZA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=N9qFpIo0XG2+as2sCBNP421gFXLGXitO22buNn5D+6stzkGoS9HaPxRMQqxX3xjf9
+	 5e0x5+W/0YeRenNHJORfGa8KySj2GvC6/qYC74VKf3edqHJZtBdtU5wUEgxTiZIys7
+	 dtAHSf71IblUjBJwJH68PfzO3Oy280ihPuDRIAMonzaoO+YKFYnoMFsAqUi1uDtKS/
+	 ThKrqUheO+S2RtVhc0ZR4X0gXngw7CFN4oA0Dkj1d8hCBRHiH9HWcB81smZLZRrvxd
+	 nLBYxt6mb/TF5Zv0aaFYjMjJ9kKYa+4zqrmAkyowfILhIoIbYwVRdRFZFEBp1JM1j5
+	 LqOnkS4Ymt4sw==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gao Xiang <xiang@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: (subset) [PATCH 00/24] netfs: Read/write improvements
+Date: Tue, 30 Jul 2024 12:36:50 +0200
+Message-ID: <20240730-kaschieren-glitten-89d803c5d4ae@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240729162002.3436763-1-dhowells@redhat.com>
+References: <20240729162002.3436763-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=961; i=brauner@kernel.org; h=from:subject:message-id; bh=M4eg2RA2dVioVZclF6JHvBR8dH2//m8JYd+0R0imYZA=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaStOOQfILK00PPW9Etftt1+ufrx1Tc7OsPuXM7c9UVy9 72fTsfXtXaUsjCIcTHIiimyOLSbhMst56nYbJSpATOHlQlkCAMXpwBM5PF/RobHbwN1fQ3vrlPe zSXvY39gUXmtoiHrhCNck4/oH0uNlIph+MO777/y1U2XvSv+ZVQlPeSt+/k3J6znVvq6zOVlMw5 vUuYBAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-Clocks for SerDes and PHY are going to be handled by standalone drivers
-for each of those hardware components. Drop them from the Ethernet driver.
+On Mon, 29 Jul 2024 17:19:29 +0100, David Howells wrote:
+> This set of patches includes one fscache fix and one cachefiles fix
+> 
+>  (1) Fix a cookie access race in fscache.
+> [...]
 
-The clocks which are being removed for this patch are responsible for
-the for the SerDes PCS and PHYs used for the 2nd and 3rd MAC which are
-anyway not yet supported. Hence backwards compatibility is not an issue.
+Applied to the vfs.fixes branch of the vfs/vfs.git tree.
+Patches in the vfs.fixes branch should appear in linux-next soon.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
----
-The dt-bindings part has been taken care of already in commit
-cc349b0771dc dt-bindings: net: mediatek: remove wrongly added clocks and SerDes
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Changes since v2:
-Target net-next tree and drop Fixes: tag.
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-Changes since v1:
-Improve commit message and explain why backward compatibility is not an issue,
-as requested by Andrew Lunn. Patch content remains unchanged.
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
- drivers/net/ethernet/mediatek/mtk_eth_soc.h | 14 --------------
- 1 file changed, 14 deletions(-)
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.fixes
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index eb1708b43aa3e..0d5225f1d3eef 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -724,12 +724,8 @@ enum mtk_clks_map {
- 	MTK_CLK_ETHWARP_WOCPU2,
- 	MTK_CLK_ETHWARP_WOCPU1,
- 	MTK_CLK_ETHWARP_WOCPU0,
--	MTK_CLK_TOP_USXGMII_SBUS_0_SEL,
--	MTK_CLK_TOP_USXGMII_SBUS_1_SEL,
- 	MTK_CLK_TOP_SGM_0_SEL,
- 	MTK_CLK_TOP_SGM_1_SEL,
--	MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL,
--	MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL,
- 	MTK_CLK_TOP_ETH_GMII_SEL,
- 	MTK_CLK_TOP_ETH_REFCK_50M_SEL,
- 	MTK_CLK_TOP_ETH_SYS_200M_SEL,
-@@ -800,19 +796,9 @@ enum mtk_clks_map {
- 				 BIT_ULL(MTK_CLK_GP3) | BIT_ULL(MTK_CLK_XGP1) | \
- 				 BIT_ULL(MTK_CLK_XGP2) | BIT_ULL(MTK_CLK_XGP3) | \
- 				 BIT_ULL(MTK_CLK_CRYPTO) | \
--				 BIT_ULL(MTK_CLK_SGMII_TX_250M) | \
--				 BIT_ULL(MTK_CLK_SGMII_RX_250M) | \
--				 BIT_ULL(MTK_CLK_SGMII2_TX_250M) | \
--				 BIT_ULL(MTK_CLK_SGMII2_RX_250M) | \
- 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU2) | \
- 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU1) | \
- 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU0) | \
--				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_0_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_1_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_SGM_0_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_SGM_1_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL) | \
- 				 BIT_ULL(MTK_CLK_TOP_ETH_GMII_SEL) | \
- 				 BIT_ULL(MTK_CLK_TOP_ETH_REFCK_50M_SEL) | \
- 				 BIT_ULL(MTK_CLK_TOP_ETH_SYS_200M_SEL) | \
--- 
-2.45.2
-
+[01/24] fs/netfs/fscache_cookie: add missing "n_accesses" check
+        https://git.kernel.org/vfs/vfs/c/965a561e4026
 
