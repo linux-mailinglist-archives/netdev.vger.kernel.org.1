@@ -1,183 +1,125 @@
-Return-Path: <netdev+bounces-113999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C469409FC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:37:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAD4D940A0B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 09:38:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB4561F23DA6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 07:37:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB60A1C231D6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 07:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CDB18F2CA;
-	Tue, 30 Jul 2024 07:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DCB190497;
+	Tue, 30 Jul 2024 07:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UBDYZ/G2"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="FckfHNSC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06BC13B780;
-	Tue, 30 Jul 2024 07:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CEF19048F
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 07:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722325017; cv=none; b=nqjBNVSLf2WcTXGDIIBHsijFtNs1xdkvzMgcJ3v3OXHGvO/dQIcfX9BO0/KOdtnYmInat2QXmVR4X7NAtKU491R2jqShpZok/VHxsxwT4rN0rwcw86hVquy9sRXUeXZHVm+98BFaXEjZbHeoQlgTqvuOfjdIFbWZWFGV/LBxclY=
+	t=1722325084; cv=none; b=WBdga53wdIHsrJ1T89TQkFAL+Ah/N8/eSoVPekZTexRjpswa07eJUhE9kZ5Yg5TnIfSGYaVKl/KRSlNfqT8tC5LparpqaXMc+9qyE00avnii0usqQ06b9lSIS/qHtpMF9rXdHL+ds0SLHjjs3MJW2RlBr9N1v9zupcxLS+Eon6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722325017; c=relaxed/simple;
-	bh=oa+Afng6R5K3QmPktSUjt9b3d3Diz8j19/vzUfAKm6k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R/MNXI8AOqor8DXgajs48qLfCCIdJX19+U7WHDBs2tRAuUMNpKbmJ8okXQnB0mit3f3ynmbsFwFrEPJcwUhE0iAZTMacOe1W4ZHIMiCL9tMEZdp2DaIfA+WksNOkfZ7GywfGqyhmEze7Y/7ZVNajnfMWKerqSGo+9R9lDYBLRxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UBDYZ/G2; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46TKtV14022219;
-	Tue, 30 Jul 2024 07:36:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type
-	:content-transfer-encoding; s=corp-2023-11-20; bh=vRACKsqsmtS90X
-	/En0V7eGmEXSmI+PyodfcrJK7YG7k=; b=UBDYZ/G2P3SyvjmGHqjQqFn81gocgH
-	B4/34mmMeS4hlggvcPpdRGYp0O4bKt56/T35zEw4DOJe7Dc7wVmsJT4nOC0zy95g
-	tTJCB4RpqH6kIRfH2lVGa+5O8L/y+bMVxCCMBJSHB2w4k1jHaZMO6ceH5zVIVsPb
-	7dkPY2rUZYJy2+t3KyJepZwZ/RfBLjQ/IEjcmvx7aX87WId4NEfJJYm1oLJM4Fnm
-	g35wSAk/O57541KSXZ4RZbyzoyMA4rUKKkfjkSO6Zp26f2BTFYUvM5j/5g2bFQf/
-	S/AdyS4Dpikyy9/7kMFAX2rlmoi1QEfQSdYN65S4zzVtR9CqyZV382jg==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 40mrgs4c6t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Jul 2024 07:36:43 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 46U7UH36037991;
-	Tue, 30 Jul 2024 07:36:42 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 40pm82vv6g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Jul 2024 07:36:42 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 46U7agg4020312;
-	Tue, 30 Jul 2024 07:36:42 GMT
-Received: from aakhoje-ol.in.oracle.com (dhcp-10-191-235-170.vpn.oracle.com [10.191.235.170])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 40pm82vv4k-1;
-	Tue, 30 Jul 2024 07:36:41 +0000
-From: Anand Khoje <anand.a.khoje@oracle.com>
-To: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc: saeedm@mellanox.com, leon@kernel.org, tariqt@nvidia.com,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        davem@davemloft.net, rama.nichanamatlu@oracle.com,
-        manjunath.b.patil@oracle.com
-Subject: [PATCH net-next v7] net/mlx5: Reclaim max 50K pages at once
-Date: Tue, 30 Jul 2024 13:06:33 +0530
-Message-ID: <20240730073634.114407-1-anand.a.khoje@oracle.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1722325084; c=relaxed/simple;
+	bh=dgwe3Zyf00HyU/NKALavOpwc3sH9BkDEgEGdq/ffgNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hgs2NN98icmAJnVIU3eLsHNjPA0q1BgrvqWSjattHW/gH4mO4lhVcu3MObuu4y90Y4bcwcO7gtbgAOSOvAL6RYwM3tuC6ZsUJEdl5veX5Mg4gxI6y72jremhjZT0R1pG3dOhslNgjhWzQa/f06Si1gT82ygxKm1U7dEQGSgAGLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=FckfHNSC; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4281faefea9so11722255e9.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 00:38:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1722325081; x=1722929881; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aP2T6OTy5D0ymvCgcFvi8Du2T0HtVXhOqCElsmNwVHg=;
+        b=FckfHNSC9yfxTkr6hOcL4rletzJXSp3ZARs9t37bIiaIpZ2izleRu31m9zbx7zlpJX
+         Ar2rTBJAo+2D5ID5QYYblNtPwvTQe9FwLnqYHOkhaQwYvg9KXS45digxcoQjbYPTHWMm
+         0nJohk1mvo9/qqmxjlfzw6nzoUYgy9LW+EIHND6tuxgH5cexzFai3RnDJeKxZVRTVo2o
+         FYzKVzomRaYKnPTRCYx4qhkpr2AMBILxRn9MOabomwXmC7nZdZ7PsZlbcS1ePWoQIn8C
+         ZzQsCbEZbYfzAUsE4nbo5YJq4QtRbVzV/rRvHfe+3tREFnwbsj8tMuV7iwo5Zh9oUmWG
+         M2nA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722325081; x=1722929881;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aP2T6OTy5D0ymvCgcFvi8Du2T0HtVXhOqCElsmNwVHg=;
+        b=hUnMkph0PgP1u9TxCaBJWgD22rYDsFf6McfSxsQ9060/5aEPe8QlwadS4moCWL/Urc
+         TaLWmFU+IibI65785QEFjkV2A6Q6U5tU3BgrBCBLt6NWgjY/CCzWlltmS5JnCsRedNl5
+         bptrSjbx3kVow3jHhiOc+V9CCBMQkKUQjcrAtGejKw8pivzVdKED6ff8Mxm05rgwxZIn
+         P4MaDXaV3C9UvQQjSIpfICTEeUImcFpccFLN0Eg32RZx2UiPmZapdIV7SujWuGE3oNx6
+         PysoltjPm+A0/8A9TuykMLABPBQ0CVWyJDmlzm7uvqbbeBsst0eGV0w1JJKh+1b8ckuw
+         n0Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCVycT1dptlETpcs0amDnRY3C9Q1Lo2eVbaHiN+4UEOL2LBJghVPkZTZ4jPWIhbyd7TZ2gzvmPavp/+2fc2RDYWNMa3p2ktk
+X-Gm-Message-State: AOJu0YwvHCgWetZUBdbaI6pNARlsOE8ogPEhQqnPrl7GhAutwL4wasbH
+	CnmrPv1E7F0KlHGOb8gp6YmP9bLnbPJDcC6f/RbNQdkKUp4TbjZzv4VbTtUrFTE=
+X-Google-Smtp-Source: AGHT+IH35TevswwfKpLXXCRG09T8r9dFas3oFIYyAXN49wr/nzgTnrGSBHThgxAdFiTCtbeYuvSODg==
+X-Received: by 2002:a05:600c:1d08:b0:426:5f0b:a49b with SMTP id 5b1f17b1804b1-42811e12ce3mr64355815e9.23.1722325080971;
+        Tue, 30 Jul 2024 00:38:00 -0700 (PDT)
+Received: from localhost (109-81-83-231.rct.o2.cz. [109.81.83.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428057a6307sm203883405e9.36.2024.07.30.00.38.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 00:38:00 -0700 (PDT)
+Date: Tue, 30 Jul 2024 09:37:59 +0200
+From: Michal Hocko <mhocko@suse.com>
+To: Al Viro <viro@zeniv.linux.org.uk>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com,
+	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 01/39] memcg_write_event_control(): fix a
+ user-triggerable oops
+Message-ID: <ZqiYV8ra3LKqbwTy@tiehlicka>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
+ <ZqiSohxwLunBPnjT@tiehlicka>
+ <20240730071851.GE5334@ZenIV>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-30_07,2024-07-26_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
- suspectscore=0 phishscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2407110000
- definitions=main-2407300055
-X-Proofpoint-GUID: GIS15TYoOrrSxeI6sVq7U0GqUhcuXbYh
-X-Proofpoint-ORIG-GUID: GIS15TYoOrrSxeI6sVq7U0GqUhcuXbYh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730071851.GE5334@ZenIV>
 
-In non FLR context, at times CX-5 requests release of ~8 million FW pages.
-This needs humongous number of cmd mailboxes, which to be released once
-the pages are reclaimed. Release of humongous number of cmd mailboxes is
-consuming cpu time running into many seconds. Which with non preemptible
-kernels is leading to critical process starving on that cpu’s RQ.
-On top of it, the FW does not use all the mailbox messages as it has a
-limit of releasing 50K pages at once per MLX5_CMD_OP_MANAGE_PAGES +
-MLX5_PAGES_TAKE device command. Hence, the allocation of these many
-mailboxes is extra and adds unnecessary overhead.
-To alleviate this, this change restricts the total number of pages
-a worker will try to reclaim to maximum 50K pages in one go.
+I think it can go through Andrew as well. The patch is 
+https://lore.kernel.org/all/20240730051625.14349-1-viro@kernel.org/T/#u
 
-Our tests have shown significant benefit of this change in terms of
-time consumed by dma_pool_free().
-During a test where an event was raised by HCA
-to release 1.3 Million pages, following observations were made:
+On Tue 30-07-24 08:18:51, Al Viro wrote:
+> On Tue, Jul 30, 2024 at 09:13:38AM +0200, Michal Hocko wrote:
+> > On Tue 30-07-24 01:15:47, viro@kernel.org wrote:
+> > > From: Al Viro <viro@zeniv.linux.org.uk>
+> > > 
+> > > we are *not* guaranteed that anything past the terminating NUL
+> > > is mapped (let alone initialized with anything sane).
+> > > 
+> > > [the sucker got moved in mainline]
+> > > 
+> > 
+> > You could have preserved
+> > Fixes: 0dea116876ee ("cgroup: implement eventfd-based generic API for notifications")
+> > Cc: stable
+> > 
+> > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > 
+> > and
+> > Acked-by: Michal Hocko <mhocko@suse.com>
+> 
+> Will do; FWIW, I think it would be better off going via the
+> cgroup tree - it's completely orthogonal to the rest of the
+> series, the only relation being "got caught during the same
+> audit"...
 
-- Without this change:
-Number of mailbox messages allocated was around 20K, to accommodate
-the DMA addresses of 1.3 million pages.
-The average time spent by dma_pool_free() to free the DMA pool is between
-16 usec to 32 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@                                        287
-            1024 |@@@                                      1332
-            2048 |@                                        656
-            4096 |@@@@@                                    2599
-            8192 |@@@@@@@@@@                               4755
-           16384 |@@@@@@@@@@@@@@@                          7545
-           32768 |@@@@@                                    2501
-           65536 |                                         0
-
-- With this change:
-Number of mailbox messages allocated was around 800; this was to
-accommodate DMA addresses of only 50K pages.
-The average time spent by dma_pool_free() to free the DMA pool in this case
-lies between 1 usec to 2 usec.
-           value  ------------- Distribution ------------- count
-             256 |                                         0
-             512 |@@@@@@@@@@@@@@@@@@                       346
-            1024 |@@@@@@@@@@@@@@@@@@@@@@                   435
-            2048 |                                         0
-            4096 |                                         0
-            8192 |                                         1
-           16384 |                                         0
-
-Signed-off-by: Anand Khoje <anand.a.khoje@oracle.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-Acked-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-index d894a88..972e8e9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
-@@ -608,6 +608,11 @@ enum {
- 	RELEASE_ALL_PAGES_MASK = 0x4000,
- };
- 
-+/* This limit is based on the capability of the firmware as it cannot release
-+ * more than 50000 back to the host in one go.
-+ */
-+#define MAX_RECLAIM_NPAGES (-50000)
-+
- static int req_pages_handler(struct notifier_block *nb,
- 			     unsigned long type, void *data)
- {
-@@ -639,7 +644,16 @@ static int req_pages_handler(struct notifier_block *nb,
- 
- 	req->dev = dev;
- 	req->func_id = func_id;
--	req->npages = npages;
-+
-+	/* npages > 0 means HCA asking host to allocate/give pages,
-+	 * npages < 0 means HCA asking host to reclaim back the pages allocated.
-+	 * Here we are restricting the maximum number of pages that can be
-+	 * reclaimed to be MAX_RECLAIM_NPAGES. Note that MAX_RECLAIM_NPAGES is
-+	 * a negative value.
-+	 * Since MAX_RECLAIM is negative, we are using max() to restrict
-+	 * req->npages (and not min ()).
-+	 */
-+	req->npages = max_t(s32, npages, MAX_RECLAIM_NPAGES);
- 	req->ec_function = ec_function;
- 	req->release_all = release_all;
- 	INIT_WORK(&req->work, pages_work_handler);
 -- 
-1.8.3.1
-
+Michal Hocko
+SUSE Labs
 
