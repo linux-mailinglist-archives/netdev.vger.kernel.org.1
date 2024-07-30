@@ -1,77 +1,91 @@
-Return-Path: <netdev+bounces-113881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-113882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64869940404
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:00:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D36940410
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 04:04:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92F791C20D27
-	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:00:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266001F21873
+	for <lists+netdev@lfdr.de>; Tue, 30 Jul 2024 02:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23867C2F2;
-	Tue, 30 Jul 2024 02:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14FA9450;
+	Tue, 30 Jul 2024 02:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mw3sCkjU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5Bus02t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAFFBE4A;
-	Tue, 30 Jul 2024 02:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DABA10E9
+	for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 02:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722304815; cv=none; b=DSc2HOJ0KZMtV5xmpQnboO6DgCAhYh/U6d//YkBqatdY0s2l+iTm364t5ELMhEPx3Ne3TOXcXLkMTStuycYjTZrG1o7CveC5V0vBbQU7eY6lbtUkO/9IDDWDcGkg2VTcR3LWZfhyKzqOtiQ5pZ2QPXm7n60mYLRb1eDRBRsqJYA=
+	t=1722305075; cv=none; b=BzdjGd8L/Bvw3JJYqUjsTUO+OPJ+akYger1alBo1P9jBET5c66G3DKQoiK2lHwD4PuzNeV29mhfEJo+N+Y/Y3tTwoNuSEqZ5jSgeGkoFCV8B/3RXkWDjgq1fQvybYeg9YF0D7s08NtMYLoQtRKwzK/YbSa1WkfOxOi3zaWo9j08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722304815; c=relaxed/simple;
-	bh=qhq3xgNSW+dTwt9dpz+IYEbTuxWD8IdvUz6Qq6PX20k=;
+	s=arc-20240116; t=1722305075; c=relaxed/simple;
+	bh=X9kNr9GNZUj4JqOuiUzBhyyb8fTQwT3fV7SI34y4JSA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JBOWXY+CcwWIsMfCraqftNzNvP/9EsdsgRacYd/7qbINxGndORY/GREG2iwoA5iPXa+tSpeccLjNNVwYX5NTgvyEa1cp7RgNU2JC5FSZvaIs+Xd7xN9nnXxIK3bCa1Rwjpc6lqwlBovYOFqcNfA2zlt0jJ2tyurvF0VnbGBe5Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mw3sCkjU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2824EC32786;
-	Tue, 30 Jul 2024 02:00:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LG6IZsb87IIqEFG5CGEGaR/SBOzJhg6j49DzgXLTD8/RUPDvhlzvQVNVryIwQCg3y2I29ak6YicBpqTnH3hv4dVRwuPHQHdTgW/+PieZzZnHHFM6uaBNPw3a1Lq4sUPdb6J/aoH1iYJQh4Jr+Ad3ahvInYEOs05qwZRX61ZZiqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5Bus02t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC91AC32786;
+	Tue, 30 Jul 2024 02:04:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722304814;
-	bh=qhq3xgNSW+dTwt9dpz+IYEbTuxWD8IdvUz6Qq6PX20k=;
+	s=k20201202; t=1722305075;
+	bh=X9kNr9GNZUj4JqOuiUzBhyyb8fTQwT3fV7SI34y4JSA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mw3sCkjUnrQgE8E8dFBwn3OPzAvNIhV7oV5WHCcULcIpOfc2qGha/Zsv2A7RXVCom
-	 nsRE12Thhqq8wdVvwv35VZF/+a1VXyAEhbPF9BJQHFSc/CcCRRRvwxtuLFFT6FuhQg
-	 gfHEKPZaFp7FNTUSNZqtLKMaXOnzmvAybDWaFMRVjRI02VDTt6aYNEhJ3eHjxyyior
-	 L/BCnZ6kk0RqlUZCawwoHh0aISLnV7qV7t1gO2Op7S/YbosxZcxVHDuWDQZn/SrRL3
-	 uXLwrvAMGLdevehH8C/U2T6O5+e5vNIgu+AHx+u1uQ35RuF5U2VEpc6xTCtMXki2oR
-	 1rnJdnlBBWRuA==
-Date: Mon, 29 Jul 2024 19:00:13 -0700
+	b=t5Bus02tiCXZa7j1RDkMxPD7FqIXlQCislkU4Xra/fIfuWqOlYbT2gQ6RrYZ03mOD
+	 uJ8qkPu6Ac+8FJI57hM/NJJ3MHNnutxYozKhpQYCYq7xH9EgzrcBJLItBitpWicZFL
+	 Up/BWfhSQ6C7+o7ZJxplM5dInZANWTccmhpt6cY0je9Cm3vbTli6EptLceoFfVenbI
+	 r1iiyqYLa7VoSLBWl1qomedGbdQ15RgISlrFidm1gYBPyR2zfIElfb0je4GOaUofnB
+	 fUVirfIdHXDnNrICc7s5QFlkSgdWqBzGt6/s/k8prwR39U5BwRWB9Vtfy6NWqGqGEE
+	 a/W/QeBUpUQDQ==
+Date: Mon, 29 Jul 2024 19:04:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, Shuah Khan <shuah@kernel.org>, Joe Damato
- <jdamato@fastly.com>, Petr Machata <petrm@nvidia.com>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] selftests: net: ksft: support marking
- tests as disruptive
-Message-ID: <20240729190013.5b0743e7@kernel.org>
-In-Reply-To: <20240729221042.2700882-2-sdf@fomichev.me>
-References: <20240729221042.2700882-1-sdf@fomichev.me>
-	<20240729221042.2700882-2-sdf@fomichev.me>
+To: =?UTF-8?B?67Cx6rSR66Gd?= <zester926@gmail.com>
+Cc: netdev@vger.kernel.org, mkubecek@suse.cz, ahmed.zaki@intel.com,
+ ecree@solarflare.com
+Subject: Re: [PATCH net] ethtool: fix argument check in do_srxfh function to
+ prevent segmentation fault
+Message-ID: <20240729190433.06e1bb9f@kernel.org>
+In-Reply-To: <CAHcxVNNRRCMtT0AyNk4OTcqBn6wWTk37SJw9eWChKhxGRCjUCQ@mail.gmail.com>
+References: <CAHcxVNNRRCMtT0AyNk4OTcqBn6wWTk37SJw9eWChKhxGRCjUCQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 29 Jul 2024 15:10:42 -0700 Stanislav Fomichev wrote:
-> +    parser = argparse.ArgumentParser()
-> +    parser.add_argument('--skip-disruptive', default=False, action='store_true', help='skip tests that might be disruptive (e.g. restart the interface)')
-> +    global KSFT_ARGS
-> +    KSFT_ARGS = parser.parse_args()
+On Sat, 27 Jul 2024 22:39:46 +0900 =EB=B0=B1=EA=B4=91=EB=A1=9D wrote:
+> Subject: [PATCH net] ethtool: fix argument check in do_srxfh function to =
+ prevent segmentation fault
 
-We pass all other args via env exports, I think we should stick to
-that, it's easier to integrate with external runners.
+Patch makes sense, but two nit picks:
 
-FWIW Mohsin is also adding VERBOSE=1 this way:
-https://lore.kernel.org/all/20240715030723.1768360-1-mohsin.bashr@gmail.com/
+ 1) please repost with subject:
+
+    [PATCH ethtool v2] ethtool: fix argument check in do_srxfh function to =
+prevent segmentation fault
+
+   this is a user space CLI patch, not a kernel patch hence ethtool not
+   net in the brackets.
+
+> Ensure that do_srxfh function in ethtool.c checks for the presence of
+> additional arguments when context or xfrm parameter is provided before
+> performing strcmp. This prevents segmentation faults caused by missing
+> arguments.
+>=20
+> Without this patch, running 'ethtool -X DEVNAME [ context | xfrm ]' witho=
+ut
+> additional arguments results in a segmentation fault due to an invalid
+> strcmp operation.
+>=20
+> Fixes: f5d55b967e0c ("ethtool: add support for extra RSS contexts and
+> RSS steering filters")
+
+ 2) Please prevent line wrapping of Fixes tags
 
