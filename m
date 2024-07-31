@@ -1,182 +1,90 @@
-Return-Path: <netdev+bounces-114524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64054942D23
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:20:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B2C942D32
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:24:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 078002878CD
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:20:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B5141F215A8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1CC1AC436;
-	Wed, 31 Jul 2024 11:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F7C1AC439;
+	Wed, 31 Jul 2024 11:23:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n9b/Zi6K"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dwBoUTxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from out199-8.us.a.mail.aliyun.com (out199-8.us.a.mail.aliyun.com [47.90.199.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFFE200CD;
-	Wed, 31 Jul 2024 11:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26B31A4B2D
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 11:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722424811; cv=none; b=mPwsZsgSXQOaTVCaTHatQtuVwYv+jQ/mGPrgmTJgYQxCWqZprGe+TOYiVV0lWiSqkLfUsNoNjJuYXnPLjLQ+tYmEukEarfSIsmoBAYdxE34l8x2OdFWxytR4596H1Qinu1m5JWwOnuNNasmCQo+Dxcn/oWgDuNYEm046+mvWkDw=
+	t=1722425039; cv=none; b=mUB3Kt0+aNQzUxL8AXixuTHKIAazuKKgui36w8vjzExlw/yf5apXx87RQxSqk5ePyzpFvOO+wqfpElBwV4EisRJbF87n1iv0pDS2DVccGyOKX3LqBdSp2mQSCA370ALUMKBKZpuNjjzsuYtfbtPDCv2JBlXhDLHAT6vqssMZXSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722424811; c=relaxed/simple;
-	bh=s9xMpfXpLGnBk7GaLD5jMyZMIUsZdL6zWseyyaUXlv8=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Trsk0ueI36vNip2LVfQAaC5G3FWoeenyPw61pmJWDeZPmYjTDoVj62PhpiL6DoQLDLh0ZRFhMS4PeEMYepnRM5cde1DJ8Vz+dvfgCG2wNvC35703Tzf1IO44bqNGpQSn7YQnw0tK2QXeHTzrp3bV1XvC2jDDRAf+WyRZkcSmUMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=n9b/Zi6K; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46V38g0E017606;
-	Wed, 31 Jul 2024 11:20:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:date:from:message-id:subject:to; s=qcppdkim1; bh=Kk97qkhcIxJx
-	nzA2qwQDsXu+UvBUjj9QbJg4EA7FNDE=; b=n9b/Zi6KjmWHau/ymAl5jCAMsIOO
-	hnww+7JiVdt2xEtX77HHJcbzO/nfMN8rfawLZXVFpzqXabkWogLvB8UXZbWO3iyp
-	Vehvk3LAyUEy/Dj35ReTIO9GgOAsVYXWDHS8iDHX/kirMJOT+Hy0eEEfQU9ofTW/
-	+/D3BRH6tON36j1rU2/8pv3i7lA+9AGJkQLzDoQ/j8rFMflyH6CYzPmKH0zjC7Db
-	y9SoP2HmaCcpQCkiR/UtMcfEBbGYw7v3d1KHBU3O+Umyh/nEaesCL7ejlk9Lq4Sx
-	XmeAatg70NbznUMlikA/d9FhOVMZ3pzSs3r59yUrMVWjuvvfrLZuXffbug==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40mp8n3cdg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 31 Jul 2024 11:20:00 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 46VBJu9c020502;
-	Wed, 31 Jul 2024 11:19:56 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 40msyma5yh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 31 Jul 2024 11:19:56 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 46VBJuaD020496;
-	Wed, 31 Jul 2024 11:19:56 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-anshar-hyd.qualcomm.com [10.213.110.5])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 46VBJtrr020479;
-	Wed, 31 Jul 2024 11:19:56 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 4089000)
-	id 5F4815001A7; Wed, 31 Jul 2024 16:49:53 +0530 (+0530)
-From: Ankit Sharma <quic_anshar@quicinc.com>
-To: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        conor+dt@kernel.org, richardcochran@gmail.com
-Cc: Ankit Sharma <quic_anshar@quicinc.com>, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH V1] arm64: dts: qcom: sa8775p: Add capacity and DPC properties
-Date: Wed, 31 Jul 2024 16:49:51 +0530
-Message-Id: <20240731111951.6999-1-quic_anshar@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: FtHajuGrjlxghVEF9OI9QusRYLOO8a3q
-X-Proofpoint-ORIG-GUID: FtHajuGrjlxghVEF9OI9QusRYLOO8a3q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-31_08,2024-07-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- impostorscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
- bulkscore=0 malwarescore=0 mlxscore=0 clxscore=1011 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407310083
+	s=arc-20240116; t=1722425039; c=relaxed/simple;
+	bh=HATaWdQZWZIzAvM9h+SZ6bUQcK7RXstln/FD6gO0xe8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=ClmO+5Pw0OIVA2WdjPmz6PmnSLzNe5g8xjQodwYBiHmBElC26mTTyiQ+ctwrr10vSG3QD95aMYWnhZY4QMfStJDDjRxHzK8z5PaYO6c93iJ2Cf9JTexmq9GhM3DOQHBgYenOOWxvOG+VLl77jlmbXAlM+2dchxHz6uYve3XHklU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dwBoUTxR; arc=none smtp.client-ip=47.90.199.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1722425019; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=HATaWdQZWZIzAvM9h+SZ6bUQcK7RXstln/FD6gO0xe8=;
+	b=dwBoUTxRNOSwcbTQbEu6KN7Wq5XARomarnpFG/AFPq7CAeqqC81FVOCx48eGiPBqg8V2kEigWqPt9jh6NBNwel+zRy6yH0chmzpxlTxXVbtgk4QFZuxEK0MU0tPisqoBACsEkioQgZVcud2+M0IWUGw87TU07hS24LpHi3Tvx74=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R861e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBjLas6_1722425017;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBjLas6_1722425017)
+          by smtp.aliyun-inc.com;
+          Wed, 31 Jul 2024 19:23:38 +0800
+Message-ID: <1722424933.7532778-1-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
+Date: Wed, 31 Jul 2024 19:22:13 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ virtualization@lists.linux.dev,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Jakub Kicinski <kuba@kernel.org>
+References: <20240729124755.35719-1-hengqi@linux.alibaba.com>
+ <20240730182020.75639070@kernel.org>
+ <CACGkMEuxvLVLuKCLNi2eBy5ipzNn+ZGM+RSRBXk-UA0bJCKgZg@mail.gmail.com>
+In-Reply-To: <CACGkMEuxvLVLuKCLNi2eBy5ipzNn+ZGM+RSRBXk-UA0bJCKgZg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-The "capacity-dmips-mhz" and "dynamic-power-coefficient" are
-used to build Energy Model which in turn is used by EAS to take
-placement decisions.
+On Wed, 31 Jul 2024 11:13:03 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Wed, Jul 31, 2024 at 9:20=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Mon, 29 Jul 2024 20:47:55 +0800 Heng Qi wrote:
+> > > Subject: [PATCH net] virtio_net: Avoid sending unnecessary vq coalesc=
+ing commands
+> >
+> > subject currently reads like this is an optimization, could you
+> > rephrase?
+>=20
+> It might be "virtio-net: unbreak vq resizing when coalescing is not
+> negotiated" ?
 
-Signed-off-by: Ankit Sharma <quic_anshar@quicinc.com>
----
- arch/arm64/boot/dts/qcom/sa8775p.dtsi | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+It's great.
 
-diff --git a/arch/arm64/boot/dts/qcom/sa8775p.dtsi b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-index 3bb609c9d2ec..ab15556e0647 100644
---- a/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-@@ -68,6 +68,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 0>;
- 			next-level-cache = <&L2_0>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_0: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -88,6 +90,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 0>;
- 			next-level-cache = <&L2_1>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_1: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -103,6 +107,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 0>;
- 			next-level-cache = <&L2_2>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_2: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -118,6 +124,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 0>;
- 			next-level-cache = <&L2_3>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_3: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -133,6 +141,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 1>;
- 			next-level-cache = <&L2_4>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_4: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -154,6 +164,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 1>;
- 			next-level-cache = <&L2_5>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_5: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -169,6 +181,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 1>;
- 			next-level-cache = <&L2_6>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_6: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
-@@ -184,6 +198,8 @@
- 			enable-method = "psci";
- 			qcom,freq-domain = <&cpufreq_hw 1>;
- 			next-level-cache = <&L2_7>;
-+			capacity-dmips-mhz = <1024>;
-+			dynamic-power-coefficient = <100>;
- 			L2_7: l2-cache {
- 				compatible = "cache";
- 				cache-level = <2>;
--- 
-2.17.1
+Thanks.
 
+>=20
+> Thanks
+>=20
 
