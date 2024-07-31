@@ -1,96 +1,50 @@
-Return-Path: <netdev+bounces-114512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F7C2942C4A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:45:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC845942C94
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDC60281C13
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:45:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55CEEB245DB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779A81AD3FD;
-	Wed, 31 Jul 2024 10:44:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCBB1A7F79;
+	Wed, 31 Jul 2024 10:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNJRSQIp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nswf++b4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFD91AD413;
-	Wed, 31 Jul 2024 10:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B50190473;
+	Wed, 31 Jul 2024 10:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722422680; cv=none; b=RRD5VdIl1c5thPO7bNMc9g8OuQKNl0OIh6/Y4Fohpgq4N+GlcpxFkOB9Iw2FpwKgyEqQ23+VRTP4EoKtqzcXDHd2txIA9U4WKd++/+19VtXaATscpCoy7avOY/vPdVObchVYobY92LxWcGhPZrLkGexjqy+HCpql/oce3AZXsbY=
+	t=1722423038; cv=none; b=pN5uu2HuK3cGz94c1azAoucikO7ied2ropGu/PRdmIAPUdRLWnmW3luRMyxUw0QaHvmyTsP+p1m+OFgAcUoOv80EbctYe/A/jIsXCylOaXZRWvCNAQSZtbIV5nLBCJ5POaoY7u4AjAgATUnzqOulyMnb6qWVPsr2AIZ36fxxcLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722422680; c=relaxed/simple;
-	bh=DCREtrJVG7yWVGe5DWmw9oaJV0MdvmZNjnV9p+LXy/c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=up2K/tHX5bSBFb8zAiBUyWwmI9YMEzATVa9VKkUM5VrWG8AuY7ut61Yu9v8Jyp4B+RnujDFdg8RHDtpndV7O5RsNDRguU0eePXRitAJSi5mFz2b5zxLDy6HKwxbe7EjOs8hfdz3MscLh9y6Ll3JqAqv3Hy8iZ3QiEX04pn33aVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RNJRSQIp; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-260f1664fdfso3078928fac.1;
-        Wed, 31 Jul 2024 03:44:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722422678; x=1723027478; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fu1ouNnrG9bF+uAnA7GwZya1Ys3715c6hhI6EtcZ2RA=;
-        b=RNJRSQIp7K+XF7C7OuNDXnV6TI0O1/8yAm8dfb0wqm8lkczj/SXibT9RjxF3VZ5aMs
-         ds4IUMSW/xfdZ7MlpbPJ0545J8qzz1HvgxyswrQQBa+VrNUNRu7LSprYSO6JppswWeMr
-         B8pymbZcpBJYbdQ+8v/1mv6opRSMv5wb52O8QKpXMmpVlYVoHF081GsyKKWQpspR2QWV
-         +V/A/4Jus1KeYpO+XppBt6oi1N99aDS8yqBwfBNmQwtCfQxsbcHbCfFFYkP7imojnTq4
-         efBRjpDq1y8BTZcQ1Msthebr6L1LJchjO1Ojt5uwnN/hR4FsThGCuvNqjopOFuHDZ2IF
-         3Zxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722422678; x=1723027478;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fu1ouNnrG9bF+uAnA7GwZya1Ys3715c6hhI6EtcZ2RA=;
-        b=YbqB8AsfJolHEo+m40GX/kps+PsjoOKrmZckPqAUtNfd4+gttxowVis6zjzfC9i5Mv
-         pUe9aAfqHoR+NiPTAjDuS++haZ65CIIUjH/qRNLaxBMDx+xrfWPO0fQ5Y+n5kllCf/cn
-         MsTGySxkQ/vbw+wZid8kl+oCVNowrCfYj1QLeu/xeINOMYBUMBdF7QQKze9mH+TPnAS7
-         uW08qYhKiZsgHWy6fjZTgElmvCHvQyY01JjAX3HU2sivk0fdt3OUDRwV/mQTEGWX/n6G
-         RY8tqaQY37p1Kc8Mp1/q65weZg9IirDD31W+1n3l519vKaBRevDbIrt/sXLhmsUQtNaq
-         j4LA==
-X-Forwarded-Encrypted: i=1; AJvYcCUchPB3Z9tnp7FZDOjnNasiBErkEJRP6nuWr+V/4CmLh07SSvH6aAyn7hw2nSiK5aFbkOABkC7bJoXr28TeKOz/913BD7kYygHLRuTX
-X-Gm-Message-State: AOJu0YwV8McGnxU2Q/33v+spLU3EKLyFEsFxG++kVR2RQMvfbF+mouuw
-	GmEucdwFIcA4pQ2/GhOO+Etr0gRk1s+MunVYsXAs7mP5rzkUQ2Qh
-X-Google-Smtp-Source: AGHT+IEvFA1K3zu3i0XikbrUbT49e6jRM+kXTRxXXH210S3QRwo16GCTK94T7ErsdT4YoniWaIZ6jg==
-X-Received: by 2002:a05:6870:e244:b0:25e:7a9:b603 with SMTP id 586e51a60fabf-267d4ccf5a4mr14061153fac.5.1722422677818;
-        Wed, 31 Jul 2024 03:44:37 -0700 (PDT)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-7a9f816da59sm8791375a12.29.2024.07.31.03.44.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 03:44:37 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	xfr@outlook.com,
-	rock.xu@nio.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1 5/5] net: stmmac: silence FPE kernel logs
-Date: Wed, 31 Jul 2024 18:43:16 +0800
-Message-Id: <370d89a46a15856856c601e1c8036cbb4bc7bb4e.1722421644.git.0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1722421644.git.0x1207@gmail.com>
-References: <cover.1722421644.git.0x1207@gmail.com>
+	s=arc-20240116; t=1722423038; c=relaxed/simple;
+	bh=YJm1ep1g8ELz+nBh8v01EWIR6uWcQIfa4UGaHdAFFs0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DFP0Hltn7109kC1Cc9wlydPFzVtcAi2n6+SxTDUCAfu+lJrXcVxvL7Eq/gsu60wk5tNEMiX6GKF7XfH/xyUBIv9ulIlVr9M790QUl5ZlEnFtqvI38OY/0AgkKpeFYhXg1SEOZIutxxzPWE5gIJoIo57KZ/Cjq1Wj9wzNkmq8HJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nswf++b4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 515CEC4AF09;
+	Wed, 31 Jul 2024 10:50:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722423038;
+	bh=YJm1ep1g8ELz+nBh8v01EWIR6uWcQIfa4UGaHdAFFs0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nswf++b4MdJ/loZYmZKBd3aOQ81Akut+KW0XKAKpXyYKEt5qynMJT9Tc5BduqgUfp
+	 Gc2zmEMYd+ddiuzckDtPbNqHZdZ80aL3D/YMdTjbomRSiEHoH2+Zx6iLbe9nJKqRRO
+	 /GRpCicXPvyJbawlzNNQa/uA7Vio0UbCmZgMhYWBJU4AAQElkQf5KGiZAURTLKZEw5
+	 3MB2S4XqqtQ5XHTjELb72j0x5ocZHPWpxgaIP4jIC4W3ieHeC5GcahLJU/AKrKFWb0
+	 2uLqpw8YhbSdK7kNe/Z2N2rHuwoZLKAph7bvMw70/ye8hNxT0mSfH0B4tO3vANW1tq
+	 JwBDAi3tQYU0A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 432C2C6E396;
+	Wed, 31 Jul 2024 10:50:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,76 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/4] net/smc: do some cleanups in smc module
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172242303827.15523.13029075934728153529.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jul 2024 10:50:38 +0000
+References: <20240730012506.3317978-1-shaozhengchao@huawei.com>
+In-Reply-To: <20240730012506.3317978-1-shaozhengchao@huawei.com>
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, weiyongjun1@huawei.com,
+ yuehaibing@huawei.com
 
-ethtool --show-mm can get real-time state of FPE.
-Those kernel logs should keep quiet.
+Hello:
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac5.c      | 8 ++++----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 ++++----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-index 068859284691..3abacd863fe4 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-@@ -605,22 +605,22 @@ int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
- 
- 	if (value & TRSP) {
- 		status |= FPE_EVENT_TRSP;
--		netdev_info(dev, "FPE: Respond mPacket is transmitted\n");
-+		netdev_dbg(dev, "FPE: Respond mPacket is transmitted\n");
- 	}
- 
- 	if (value & TVER) {
- 		status |= FPE_EVENT_TVER;
--		netdev_info(dev, "FPE: Verify mPacket is transmitted\n");
-+		netdev_dbg(dev, "FPE: Verify mPacket is transmitted\n");
- 	}
- 
- 	if (value & RRSP) {
- 		status |= FPE_EVENT_RRSP;
--		netdev_info(dev, "FPE: Respond mPacket is received\n");
-+		netdev_dbg(dev, "FPE: Respond mPacket is received\n");
- 	}
- 
- 	if (value & RVER) {
- 		status |= FPE_EVENT_RVER;
--		netdev_info(dev, "FPE: Verify mPacket is received\n");
-+		netdev_dbg(dev, "FPE: Verify mPacket is received\n");
- 	}
- 
- 	return status;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index fba44bd1990a..5531c26cba34 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7392,19 +7392,19 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
- 		if (*lo_state == FPE_STATE_ENTERING_ON &&
- 		    *lp_state == FPE_STATE_ENTERING_ON) {
- 
--			netdev_info(priv->dev, "configured FPE\n");
-+			netdev_dbg(priv->dev, "configured FPE\n");
- 
- 			*lo_state = FPE_STATE_ON;
- 			*lp_state = FPE_STATE_ON;
--			netdev_info(priv->dev, "!!! BOTH FPE stations ON\n");
-+			netdev_dbg(priv->dev, "!!! BOTH FPE stations ON\n");
- 			break;
- 		}
- 
- 		if ((*lo_state == FPE_STATE_CAPABLE ||
- 		     *lo_state == FPE_STATE_ENTERING_ON) &&
- 		     *lp_state != FPE_STATE_ON) {
--			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
--				    *lo_state, *lp_state);
-+			netdev_dbg(priv->dev, SEND_VERIFY_MPAKCET_FMT,
-+				   *lo_state, *lp_state);
- 			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
- 						fpe_cfg,
- 						MPACKET_VERIFY);
+On Tue, 30 Jul 2024 09:25:02 +0800 you wrote:
+> Do some cleanups in smc module.
+> 
+> Zhengchao Shao (4):
+>   net/smc: remove unreferenced header in smc_loopback.h file
+>   net/smc: remove the fallback in __smc_connect
+>   net/smc: remove redundant code in smc_connect_check_aclc
+>   net/smc: remove unused input parameters in smcr_new_buf_create
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/4] net/smc: remove unreferenced header in smc_loopback.h file
+    https://git.kernel.org/netdev/net-next/c/1018825a9539
+  - [net-next,2/4] net/smc: remove the fallback in __smc_connect
+    https://git.kernel.org/netdev/net-next/c/5a7957571126
+  - [net-next,3/4] net/smc: remove redundant code in smc_connect_check_aclc
+    https://git.kernel.org/netdev/net-next/c/d37307eaac13
+  - [net-next,4/4] net/smc: remove unused input parameters in smcr_new_buf_create
+    https://git.kernel.org/netdev/net-next/c/0908503ade5f
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
