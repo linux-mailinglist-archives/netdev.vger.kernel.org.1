@@ -1,74 +1,120 @@
-Return-Path: <netdev+bounces-114344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C76A19423EA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:43:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F309423F5
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DA731F24662
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:43:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FA121F24EF0
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0BB611E;
-	Wed, 31 Jul 2024 00:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD85C4C76;
+	Wed, 31 Jul 2024 00:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="KXQpUCxQ"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="E/WFrzu2"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4024A31;
-	Wed, 31 Jul 2024 00:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6EB79DC
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 00:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722386589; cv=none; b=KH71xYPzsBIxzgmwNSCXmvSpw2dZO8hgrLK46A/RseSsRZgX+NS0X2ybQSbN2/Dm+ZWlD9AV3/7a/ng0S7zJ+WIDBdbqN77GfZOPfH8/8sxkx0XW8tSBaLnFx/rz/kP2WNHB5Yw4GiCCZKoxG+Y2usTAuKWDKvkV2Np8q8dvcak=
+	t=1722387017; cv=none; b=q100so7oo+LOYftcYOjHx656iygVxldZ0WBFlfm8Lx7XewfPLF3mfB6kYkD1MJwg3t7SMVriSEFRCTHmIGI41HBnAeIaowQGT8t6G597NhobMv7jQ5epbTf4bCrVHRpqLaQrkVLO6V/OARM7I5t/CFBf7hBufiyCuKoBwLjJN1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722386589; c=relaxed/simple;
-	bh=0Ucwoq06RuZunJH9ZTsuF1H8BZYdv3fYzTqpVSxm0js=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tr3wDB45+kCW/LjW9qqdoD/qPa/0RDLrvGk12bVhzBBKuFd9IE/IQHDT5A2C1Pw7JzTMKV/m3YZl5BJv1pm2uJpK652FRk1G+hQWTOLR+4O3g+dBXHtLh71+SPg9ThHfY91Kr5JtT8kanP2D2GqpqYb+YdgSeBxJGe+mLyQYAY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=KXQpUCxQ; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=PbApO/TIp5V0FKdRkfodevei4EDfm4ALsJAsgQBECAQ=; b=KXQpUCxQeQh/BBdWhJy+KlHr5X
-	2IU0R8zcgoaWX3U0jChl1zzFm2lPJR/vOavGb8a17TqNlUNF2v4V6kOlhxpJk5Ae6+6MBmUqbQ7av
-	VJqNnvD+nW9sHB7/jiEaX99/vLNCJS63npVjqClID8z5O/y6ND4e42Tj/VXWRMhg1N4GRoBBRvLDd
-	nXo6TXpFdyh6N0bRI1QsEi4+83HAahArycPqeVdST4adY47escnKNq15X4wcN1Q92oEij7Q13dHOA
-	RR5FmIm9pDH6nbWu+VdWnw2h7312jzj/HZAi45Srj8sUmIicEImgy6naSj9l4ZuFDQC/rKRVGCmt0
-	owD4J1/w==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sYxQm-00000000MLz-0Nq3;
-	Wed, 31 Jul 2024 00:43:04 +0000
-Date: Wed, 31 Jul 2024 01:43:04 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: linux-fsdevel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>, bpf@vger.kernel.org,
-	Amir Goldstein <amir73il@gmail.com>, kvm@vger.kernel.org,
-	cgroups@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCHSET][RFC] struct fd and memory safety
-Message-ID: <20240731004304.GI5334@ZenIV>
-References: <20240730050927.GC5334@ZenIV>
+	s=arc-20240116; t=1722387017; c=relaxed/simple;
+	bh=sjfd9Rz7CjuW74yJY8qocEFznmq70Foz8DU8bv/LOrI=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=jVf1LTIj0Hcvh19vO8T2GKK73VGuXWv5TZBJlXSHQ6a77S7odRpdsLOH7iHRds4Hm4DX8MFsOwCm1BSSbvcDm9joRrMWXWK8zRawb/b9xG1gYRmNpiIxgWKL0J7HdqvFZMXAjxj/69Yr3fAcbq6PxvD1hjY36t0oD4MYLSdIbwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=E/WFrzu2; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 46V0nae5014329
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 31 Jul 2024 02:49:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1722386981; bh=2RrtXHJyIhqeMAnkrsYqmckVvuDncb2i8T+RVfNBZv4=;
+	h=Date:From:To:Subject;
+	b=E/WFrzu26tEYxlPfE1d7YVkJ/ryMGLJwC42pMJvoIVg+esHj5qVOXH+ibJfD9Gx84
+	 cxg9CLfgRCxEESCeU8z5wYZ4N4IltMjhWF9kqIk9mzjZ+ba31/GzH/dE9rkuMmAN6Y
+	 o+sAeWqas6jCsrLNpZYhGSjtu6hwIQgNthDY/x64=
+Message-ID: <0d2504d1-e150-40bf-8e30-bf6414d42b60@ans.pl>
+Date: Tue, 30 Jul 2024 17:49:33 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730050927.GC5334@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+To: Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
+        Michal Kubecek <mkubecek@suse.cz>, Moshe Shemesh <moshe@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>, tariqt@nvidia.com,
+        Dan Merillat <git@dan.merillat.org>
+Subject: [PATCH v2 ethtool] qsfp: Better handling of Page 03h netlink read
+ failure
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 30, 2024 at 06:09:27AM +0100, Al Viro wrote:
+When dumping the EEPROM contents of a QSFP transceiver module, ethtool
+will only ask the kernel to retrieve Upper Page 03h if the module
+advertised it as supported.
 
-> 	10a.  All calls of fdput_pos() that return a non-empty
-	                   fdget_pos(), that is.
+However, some kernel drivers like mlx4 are currently unable to provide
+the page, resulting in the kernel returning an error. Since Upper Page
+03h is optional, do not treat the error as fatal. Instead, print an
+error message and allow ethtool to continue and parse / print the
+contents of the other pages.
 
-> value are followed by exactly one call of fdput_pos().
+Also, clarify potentially cryptic "netlink error: Invalid argument" message.
+
+Before:
+ # ethtool -m eth3
+ netlink error: Invalid argument
+
+After:
+ # ethtool -m eth3
+ netlink error: Invalid argument
+ Failed to read Upper Page 03h, driver error?
+         Identifier                                : 0x0d (QSFP+)
+         Extended identifier                       : 0x00
+ (...)
+
+Fixes: 25b64c66f58d ("ethtool: Add netlink handler for getmodule (-m)")
+
+Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
+---
+ qsfp.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/qsfp.c b/qsfp.c
+index a2921fb..a3a919d 100644
+--- a/qsfp.c
++++ b/qsfp.c
+@@ -1038,8 +1038,15 @@ sff8636_memory_map_init_pages(struct cmd_context *ctx,
+ 
+ 	sff8636_request_init(&request, 0x3, SFF8636_PAGE_SIZE);
+ 	ret = nl_get_eeprom_page(ctx, &request);
+-	if (ret < 0)
+-		return ret;
++	if (ret < 0) {
++		/* Page 03h is not available due to a bug in the driver.
++		 * This is a non-fatal error and sff8636_dom_parse()
++		 * handles this correctly.
++		 */
++		fprintf(stderr, "Failed to read Upper Page 03h, driver error?\n");
++		return 0;
++	}
++
+ 	map->page_03h = request.data - SFF8636_PAGE_SIZE;
+ 
+ 	return 0;
+-- 
+2.45.2
 
