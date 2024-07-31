@@ -1,120 +1,169 @@
-Return-Path: <netdev+bounces-114612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D63189431AF
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 16:08:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81BEE9431C2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 16:12:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 938152833AE
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:08:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 361A5284243
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8111B374E;
-	Wed, 31 Jul 2024 14:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2EA1B372E;
+	Wed, 31 Jul 2024 14:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="BSMn+6VP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4s3NZml"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927A01B14FF
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 14:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57DF16D4CB;
+	Wed, 31 Jul 2024 14:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722434915; cv=none; b=RJ7tz9IwWNJREY9Wn62/g8W9zqOOy3/7ER1/kxRopuzyawUQkIR7pUpo4Ns7Dp49c4GUz8WbU03UoNZsjWrO4R+69l1/HH0r18eTC6Pw3EFD5eKYTMsQ4JnH94Z9SPZTSj5O+ONWCu7NRsXxduSFTQr8LNXonm+1motPgdxA5ME=
+	t=1722435139; cv=none; b=PH2PrCATXKaflyBPFhT+5O/rfjeX7oIskVRyl9EGP4WHkeM7fm+AY88rQ9X9O0F27vRtc1UHD/WRjeMjBXlk425iqKzk6MW73TWRzzE5PdEEBOQDPqPqPG+Vqs1RA5bZSWBRgHeFUEs/cVIy4FnDWpAO3ThbcuaB2W6J5y2cndk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722434915; c=relaxed/simple;
-	bh=J5SiSatowZDOZhueocm/4JGajxjW30Ltk8zkSkH1Szo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ir+uE3QGZnjgWPU9ULZwTA8HJjXnDdoRYUMXdMekyxaFOV7UFgQUh7aVCKmb7NFhuOKY+Cz8Ep4kcinf9hPQylyga5gVL9b2A9I9AiCWc28qJ7JWXHU0NuHklKcJJwB6DvH9XELhHJIyrz1d6Pyerk+v4RKNdF1q3rTwHkDFn0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=pass smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=BSMn+6VP; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=g.harvard.edu
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a1e31bc1efso344803385a.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 07:08:33 -0700 (PDT)
+	s=arc-20240116; t=1722435139; c=relaxed/simple;
+	bh=qg6tbCM603pKIl6ex6aZn+8/1RFcZtNjy8ZF1q0qAcc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IQHzzb/jIT4mTIP2g4g0x3uFqCrB9lmvFqzn4rczLiQH1HUhVEkBl6dUAuCBct/tXO4R6+aAuyzKA+25VLnptQDtFgySFiylwnX+GCUiJxFTH+rzIJnzictHmh6bZkDax51WOK4kubedRabtRoLZ1Ywvtzd4zx2m3NlZG2JrBus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4s3NZml; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6ad86f3cc34so32035776d6.1;
+        Wed, 31 Jul 2024 07:12:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rowland.harvard.edu; s=google; t=1722434912; x=1723039712; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OmbqZ+SwBt9pWBiENqDvPp5IsdPjBdZOSucm6Q9PEz0=;
-        b=BSMn+6VPwgDy5AwT+veSi9Krms5LvEOIwGgXWXEjTzx6caXE+SFLCXJx25YhtYTAPu
-         KcP9Eydf8FME5M3LYu6kOTCd6zDwa+sKdRUyGGDnwoHLTAFuf/nn0hMhahG6hWL45Eub
-         7+JQwHyrdMFTyISQVjF25JTRcE9whjyOrs8hjM/LLYcVDONGL59so6bqi44m+Poh61Gs
-         jd2P1iA+BrHgqg0NHGbxGvURL0nFwGZtOJADqkQbmcJhTvpfiWnq9DdPkwRgrZMewKOm
-         ht5rjF9Jp0zTt03AqVchuD8vswK9M0zDbMU7uiFIe09d1/e/XB4RiR/DFTpeO9dksOUy
-         LL8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722434912; x=1723039712;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1722435136; x=1723039936; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OmbqZ+SwBt9pWBiENqDvPp5IsdPjBdZOSucm6Q9PEz0=;
-        b=sAttoybC8w99kwMCXbfG06+MjD2RQ3Pp020k1KPOqNk5hT90rSQM/0bcMNEoGbK/CR
-         IN51mNHrSR701znbBfpgfyZ7VXqwMYvIT028CzXUecQpH0J+DnR8qyBfHfU9iARfdm8m
-         TuT98Hl54iazj8zFeIicAYV5kWlcoADFblB2go6QeiSyY0xxZQ0lGl5L7f112t9lWQnR
-         XPCDlLRmPi/AaOeGBblRg8C8Ig4/4MYJ30/Dc7lTaST5ZOIa8oqJxjslmzuMZCK8/712
-         I1tzXSyeXvq/Owo0MxabbyIg/tNsRqxm3bCSPdLbtGZjozi4bIIca4rNq7mGkg2biGDa
-         jVPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWv+BfxfsMqCp76M7gjoV6vdqGYh+/ify05FsGXU11KNNS4mPU0dCAY+lIl7jmAVLoZjVMY3XYURrPBJmY87MjjrFpBQeMm
-X-Gm-Message-State: AOJu0Yz/z3a2oM90IJWSA2PJUE13jx4m0Cn56SzrShbGWBhq2RLVMLAg
-	L2zhjD0s17qMuFZSrtNqeGKEaV9gqMLVlzeqep9+45UBghzDcmqNajMmrxLyNg==
-X-Google-Smtp-Source: AGHT+IE6kPGJyplTmL+CdLHYVHoAqc9Zp1sYnDW3Lj3rFha6QTxDYm53FQkQABVQPDmkoe6eOIvPbg==
-X-Received: by 2002:a05:620a:4143:b0:79f:10e6:2ee with SMTP id af79cd13be357-7a1e5260140mr1740167585a.41.1722434912481;
-        Wed, 31 Jul 2024 07:08:32 -0700 (PDT)
-Received: from rowland.harvard.edu (iolanthe.rowland.org. [192.131.102.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1fdd2f90csm210796285a.24.2024.07.31.07.08.31
+        bh=DtrFwP4YBskKGvaa39EM8j7npXHQl9OMFtlElqqRPIE=;
+        b=A4s3NZmlUAAIS5yRVKwOHoR4gNxV3Gmf207/jxvphF40ATPlBoPBsHcbUVHReydxnB
+         1s8eHZ/mov6vNbcnJUSocYiDtLSeY3VtmCC39nRZkZh4Fkr7GU8ayjwmWwILWG8Inh4I
+         1H46cJepnesJCxSgpysPltWWMh/EeGUo39SJ4uSLVIepeskW+1QuH1UeqC0QBS2pXsGI
+         CKEjN2rLOmghdJ0jlHq1tqtPpsiMKuwgqblulhEw6nTQ1hitV1MKabPFy49jv3QpiPCU
+         iCw0NbM3Eo+r3YSiWaLvheEXndWHHR7kIYua6gwATM854hDDgSou+xea63KN9gnoJYmS
+         jfvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722435136; x=1723039936;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=DtrFwP4YBskKGvaa39EM8j7npXHQl9OMFtlElqqRPIE=;
+        b=jJEXZi8dht5HKVGjcixdBaOJ7lE+5J/j+c0ob4w0qt0c9O4cbvWbYUDS+ye3Fi7SyY
+         P6lkrgZunZp7Mx0F0PvlMnG0VEE1ofuA9afvi+YypldIWLviUFU2EXcIlWRV/SupLAJB
+         f1aCWHEbw/fFntpGI0xKY8iHS6qEdQtR2DXg1VATPr6U/RqErvquixwlrd38WwGpRAql
+         Oz6Ir5y0d8y/mHFI3u2NCSGB5GILJK3bwSqh3MliJ8yYCciaip1bwC3iB6YMQ32s3CgM
+         ExxhRFEUNPOEf8wMY5/Ne+7EaIeqGgAZY3i2/bokoHp9DKd8lAYQhsLBjxwL3drqYuhe
+         kWog==
+X-Forwarded-Encrypted: i=1; AJvYcCWC/AKHXZbCY0TQlnNA9fpeifJCr/gtPck5IppO01pg+BYaQ5EI7UDbKBqLd0lMow2ULzSuRGhO+gLeAff/bRV7syEWidl4ivzI+PYO0r0iaM0q67gu8s9yT1JDLXcGTCAIKZrg
+X-Gm-Message-State: AOJu0YxpAvhgzxcZzcyz3Y6/bFfYrZQ81H1bza5Zjo1A+nDwuQr1uF3L
+	lJev0tYUqbeO54LH5WMADWpTD9q9SI2Xjs/Xc4UzCYjbKM5CsA93
+X-Google-Smtp-Source: AGHT+IE7d3WnrSysqBvvhYPRx4PE924CxpUJ3JXOeM/hbNryFShECa0EMfanfNTyb0eQsogUuZ81Ug==
+X-Received: by 2002:a05:6214:413:b0:6b0:7a5c:e12c with SMTP id 6a1803df08f44-6bb55a0cb39mr190984426d6.29.1722435136449;
+        Wed, 31 Jul 2024 07:12:16 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3fb0c4dfsm73490266d6.140.2024.07.31.07.12.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 07:08:32 -0700 (PDT)
-Date: Wed, 31 Jul 2024 10:08:29 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: syzbot <syzbot+1acbadd9f48eeeacda29@syzkaller.appspotmail.com>
-Cc: akpm@linux-foundation.org, brauner@kernel.org, davem@davemloft.net,
-	dvyukov@google.com, elver@google.com, glider@google.com,
-	gregkh@linuxfoundation.org, hdanton@sina.com, jhs@mojatatu.com,
-	kasan-dev@googlegroups.com, keescook@chromium.org, kuba@kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, linux-usb@vger.kernel.org, luyun@kylinos.cn,
-	netdev@vger.kernel.org, pctammela@mojatatu.com, rafael@kernel.org,
-	syzkaller-bugs@googlegroups.com, victor@mojatatu.com,
-	vinicius.gomes@intel.com, viro@zeniv.linux.org.uk,
-	vladimir.oltean@nxp.com
-Subject: Re: [syzbot] [usb?] INFO: rcu detected stall in __run_timer_base
-Message-ID: <3eb71b17-33c3-42fa-86e6-459c3bfdbf29@rowland.harvard.edu>
-References: <00000000000022a23c061604edb3@google.com>
- <000000000000d61bb8061e89caa5@google.com>
+        Wed, 31 Jul 2024 07:12:15 -0700 (PDT)
+Date: Wed, 31 Jul 2024 10:12:14 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Randy Li <ayaka@soulik.info>, 
+ netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ linux-kernel@vger.kernel.org, 
+ Randy Li <ayaka@soulik.info>
+Message-ID: <66aa463e6bcdf_20b4e4294ea@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240731111940.8383-1-ayaka@soulik.info>
+References: <20240731111940.8383-1-ayaka@soulik.info>
+Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue
+ index
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000d61bb8061e89caa5@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 31, 2024 at 04:57:02AM -0700, syzbot wrote:
-> syzbot suspects this issue was fixed by commit:
+Randy Li wrote:
+> We need the queue index in qdisc mapping rule. There is no way to
+> fetch that.
+
+In which command exactly?
+
+> Signed-off-by: Randy Li <ayaka@soulik.info>
+> ---
+>  drivers/net/tap.c           | 9 +++++++++
+>  drivers/net/tun.c           | 4 ++++
+>  include/uapi/linux/if_tun.h | 1 +
+>  3 files changed, 14 insertions(+)
 > 
-> commit 22f00812862564b314784167a89f27b444f82a46
-> Author: Alan Stern <stern@rowland.harvard.edu>
-> Date:   Fri Jun 14 01:30:43 2024 +0000
-> 
->     USB: class: cdc-wdm: Fix CPU lockup caused by excessive log messages
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14f906bd980000
-> start commit:   89be4025b0db Merge tag '6.10-rc1-smb3-client-fixes' of git..
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=b9016f104992d69c
-> dashboard link: https://syzkaller.appspot.com/bug?extid=1acbadd9f48eeeacda29
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=145ed3fc980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11c1541c980000
-> 
-> If the result looks correct, please mark the issue as fixed by replying with:
+> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> index 77574f7a3bd4..6099f27a0a1f 100644
+> --- a/drivers/net/tap.c
+> +++ b/drivers/net/tap.c
+> @@ -1120,6 +1120,15 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
+>  		rtnl_unlock();
+>  		return ret;
+>  
+> +	case TUNGETQUEUEINDEX:
+> +		rtnl_lock();
+> +		if (!q->enabled)
+> +			ret = -EINVAL;
+> +
+
+Below will just overwrite the above ret
+
+> +		ret = put_user(q->queue_index, up);
+> +		rtnl_unlock();
+> +		return ret;
+> +
+>  	case SIOCGIFHWADDR:
+>  		rtnl_lock();
+>  		tap = tap_get_tap_dev(q);
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 1d06c560c5e6..5473a0fca2e1 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -3115,6 +3115,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+>  		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
+>  			return -EPERM;
+>  		return open_related_ns(&net->ns, get_net_ns);
+> +	} else if (cmd == TUNGETQUEUEINDEX) {
+> +		if (tfile->detached)
+> +			return -EINVAL;
+> +		return put_user(tfile->queue_index, (unsigned int __user*)argp);
+
+Unless you're certain that these fields can be read without RTNL, move
+below rtnl_lock() statement.
+
+>  	}
+>  
+>  	rtnl_lock();
+> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+> index 287cdc81c939..2668ca3b06a5 100644
+> --- a/include/uapi/linux/if_tun.h
+> +++ b/include/uapi/linux/if_tun.h
+> @@ -61,6 +61,7 @@
+>  #define TUNSETFILTEREBPF _IOR('T', 225, int)
+>  #define TUNSETCARRIER _IOW('T', 226, int)
+>  #define TUNGETDEVNETNS _IO('T', 227)
+> +#define TUNGETQUEUEINDEX _IOR('T', 228, unsigned int)
+>  
+>  /* TUNSETIFF ifr flags */
+>  #define IFF_TUN		0x0001
+> -- 
+> 2.45.2
 > 
 
-#syz fix: USB: class: cdc-wdm: Fix CPU lockup caused by excessive log messages
 
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
