@@ -1,221 +1,285 @@
-Return-Path: <netdev+bounces-114647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39AB09434F5
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 19:25:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691A494352B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 19:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 711CAB2242B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:24:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CCBF1C21731
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18A31BE864;
-	Wed, 31 Jul 2024 17:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722C038FA6;
+	Wed, 31 Jul 2024 17:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="UfWM2NpS"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="4kZycYuV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207F81BD4E3
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 17:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2D445007;
+	Wed, 31 Jul 2024 17:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722446649; cv=none; b=Vi0cBB5T/1gqRn+tGfZRB6tYDVzjdkBIgVSahHlt/1JW4bm/WEg3+V541mXUJQD5+FIIiXj9QPq0diUgXZ9lhfQQq2s4wmZj4j8g+/q7rGzMbaiWRi+2EdnFgcciMvr6Zm6Y3ib+Nzl9RDpDh1WkNmXbNg6DLIOjgLzZ6CumhHI=
+	t=1722448222; cv=none; b=NBD2wJWISSe0PufVru10hEXip34Y12SXALxCqxkbR9ZyKu6Jl4Cc5kxE3kMgIFlIlzvy53lseZ9WFh2MVxhz2uuH5duxzSuUuE3GA5UAhWyy6lvLExt5M1sxCEmVyrNIArmkQsRkAEy0PgW55ng43mn2FGX7NFOSQW3Wgg3qzAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722446649; c=relaxed/simple;
-	bh=Uaz0+6BevwyEXT/uG3eV6RgaEzEZq57aPBCVyG9WuNE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M6ebgX8xoxVFRJlKihmXf74Sq4ndkBgydsWhoQ3f5/ZJzmcz+Z96J/3+sMeVZ5RJ5zqn8S9vMZHlA8lMiUkzpOKfqtSu0NQYVFx3WvhwJBfMiNuk4sTrEUiORfI7XxDTqpwdIhihCuflWojQ9BrJUaeAPKb2mBVjgNeT77rbChg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=UfWM2NpS; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-710439ad77dso1572228b3a.2
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 10:24:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1722446647; x=1723051447; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FTJAEyJOqHchmjcd+P/9wLzF9JPDrStciBj2jppQ1sU=;
-        b=UfWM2NpShUE+jzgJm8cuqHLmK5ZD14TX21ZLUrAi/MQyPlkiMN1/w92rhFkCUaudkk
-         Dz1zcHy+e4eCO4udeE6WMGjYMz3jTxDA7XWGNfB2T5qcbT7KyYH84ZQgPeR1EhQnRwuu
-         s8UatHcvv2HBkP0eo18DXgXCEW2AnyA7eXwC8v41rSAaZDAatLqpX3a2ef7kWnatYn5g
-         PTew06gXla2giUMo3W+fRrPDaKHl0mHUtIRU4srWP/WchEOJuujpsW2W2e7qFvGrZ+g9
-         U26TJZctqV0mhYPNIOQKteRpodAspkFTsBJMBz3S/cAlSHCObbk84RwhOekP22rjMxOH
-         +VvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722446647; x=1723051447;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FTJAEyJOqHchmjcd+P/9wLzF9JPDrStciBj2jppQ1sU=;
-        b=CDJAH2k8uYvh75aEH8yWDVI+TYST9N1LMdbotot5vynI68YC7c+w4mG+hkcTZkpApx
-         2fZ8cZax2SsiNHed3vsZ9W2dvkRWj4olx5YemIKbFFk/VygyUX+lAlokYda3huJhJL9B
-         Npr51Q3/aS3+KXtkYKaFXvcS+JI5VpATpN6vL26lA88Z9pC9XZw0Jyaft4smIWXGnP+3
-         GDnsJuyrTiRf6qoCCi9Nxx5530780dn03jcIX3L1wnDMZGjPD/HBJBEQ6MSexFagDFwa
-         3ohh3QY+xiPlWIckwdW54FOZZzGac169eOVOP15sb6dVpAjuBx5H1HKCx2Bd3AVksGPO
-         psxA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdVKNpdHmjE3QuCkgw0/qoAflWtBd5hK5jVxUrvLePAuLkZtcZVxkuSR5RilTZDfWHuWY8H3WzbsEwIG7drcuPVDJOz29z
-X-Gm-Message-State: AOJu0YwOmczJbNW2pd8APEcGZhXVV1dkeOKvlu1jbSSvP8Z5Zd61ah8F
-	spO5jmwy3iP9/zj14LKcLQQkpna8UQ09zR8mQ+xgggn+jIXUzq5IYy/urH8Qyg==
-X-Google-Smtp-Source: AGHT+IEiKUQazBv53K2DGK3kpSwuO9lOEkL2727kNBNa81juQ8UzfIPmwo1cYq8f/5QIdYEuULMBNQ==
-X-Received: by 2002:a05:6a20:4309:b0:1c4:9e32:b26f with SMTP id adf61e73a8af0-1c68cef30c3mr102133637.8.1722446647480;
-        Wed, 31 Jul 2024 10:24:07 -0700 (PDT)
-Received: from TomsPC.home ([2601:646:8300:55f0:be07:e41f:5184:de2f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead72ab97sm10487203b3a.92.2024.07.31.10.24.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 10:24:07 -0700 (PDT)
-From: Tom Herbert <tom@herbertland.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	felipe@sipanda.io
-Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH 12/12] flow_dissector: Parse gtp in UDP
-Date: Wed, 31 Jul 2024 10:23:32 -0700
-Message-Id: <20240731172332.683815-13-tom@herbertland.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240731172332.683815-1-tom@herbertland.com>
-References: <20240731172332.683815-1-tom@herbertland.com>
+	s=arc-20240116; t=1722448222; c=relaxed/simple;
+	bh=SUbvt4YQ/Ri8ijmIeyQW1LP0iNmjh7l+SdztU2CMSK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uv1BT4D8tvwjDHiWTImdle9Es8SSHPXoxeA2cP05d8BH+RJpyTuNAnpJdjsaiyJYH//DPagRGU1Ba7rsxLwp/rCoOuEv31G8DIXbB7VcO3k/4PZ73V/uKdiCo5gB1XWG8oT/wupbsuT+6iJWglcNWs23ohn+fLvG2WKgK4+jvAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=4kZycYuV; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1722448218;
+	bh=SUbvt4YQ/Ri8ijmIeyQW1LP0iNmjh7l+SdztU2CMSK0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=4kZycYuV7rNgk7MiZhkpjl4EucXIPgirUN25IkczKeVsWf+15NwbJgmL7FnZf0Iur
+	 qw8GHuzCnO6tgfbiIFh/5peplsfE1E3D2xM2eu4L2dxdZ7xGDPcDvy3DjQpYEFdEf2
+	 wiKbpoEzmbEZvYt6LCvZlssx1UzfkrTlU1AKKefjV85WokbvHb/tuo0sBsKTYF26Ub
+	 nbJ/2vNhxt9f/YkkozjXB1px0JuPFgZ2HrEvC86dCvS8dn5yHcmNYrtaMFT7lXc0F7
+	 nVxwtQv/otUZX+QNT4RIJVBzCtxmQX4MvxG8cQfFbOlPftdXn79iNbfxY0G89qYD4O
+	 wmmMUVbMZcc4A==
+Received: from mercury (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sre)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5484437804C8;
+	Wed, 31 Jul 2024 17:50:18 +0000 (UTC)
+Received: by mercury (Postfix, from userid 1000)
+	id F37A110609BB; Wed, 31 Jul 2024 19:50:17 +0200 (CEST)
+Date: Wed, 31 Jul 2024 19:50:17 +0200
+From: Sebastian Reichel <sebastian.reichel@collabora.com>
+To: Arend Van Spriel <arend.vanspriel@broadcom.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, 
+	Jacobe Zang <jacobe.zang@wesion.com>, robh@kernel.org, krzk+dt@kernel.org, heiko@sntech.de, 
+	kvalo@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, conor+dt@kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
+	efectn@protonmail.com, dsimic@manjaro.org, jagan@edgeble.ai, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	arend@broadcom.com, linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	megi@xff.cz, duoming@zju.edu.cn, bhelgaas@google.com, minipli@grsecurity.net, 
+	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com, nick@khadas.com, 
+	Andy Green <andy@warmcat.com>
+Subject: Re: [PATCH v5 2/5] dt-bindings: net: wireless: brcm4329-fmac: add
+ clock description for AP6275P
+Message-ID: <cn4vykgbj6mhiikyco5uvyfa424njoun67hsoof4lbwvscwoc2@5xfl4q5mvooy>
+References: <20240730033053.4092132-3-jacobe.zang@wesion.com>
+ <191025b5268.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <f45c1fa7-f321-4a1f-b65c-6ed326a18268@kernel.org>
+ <191030eac78.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <3d3b8e0a-7492-4db1-bd73-c30a488edaa7@kernel.org>
+ <191035b8c28.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <k3dhdsa5bjzad2ha5e2uurg2azzs773ier5thkot4w2qcvnv54@yuf52eluqsae>
+ <dd381dc1-454f-4ecd-adb7-55de2e15d592@broadcom.com>
+ <sgfd5ccltsi7mjbybmdbs3fmsfcp3vqtpitdac7exzgxav53kk@6lwogbq4fhks>
+ <1910959c1f8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="my2grf6ekzwdybt6"
+Content-Disposition: inline
+In-Reply-To: <1910959c1f8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
 
-Parse both version 0 and 1. Call __skb_direct_ip_dissect to determine
-IP version of the encapsulated packet
 
-Signed-off-by: Tom Herbert <tom@herbertland.com>
----
- net/core/flow_dissector.c | 87 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+--my2grf6ekzwdybt6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 7f0bf737c3db..af197ed560b8 100644
---- a/net/core/flow_dissector.c
-+++ b/net/core/flow_dissector.c
-@@ -9,6 +9,7 @@
- #include <net/dsa.h>
- #include <net/dst_metadata.h>
- #include <net/fou.h>
-+#include <net/gtp.h>
- #include <net/ip.h>
- #include <net/ipv6.h>
- #include <net/geneve.h>
-@@ -35,6 +36,7 @@
- #include <net/pkt_cls.h>
- #include <scsi/fc/fc_fcoe.h>
- #include <uapi/linux/batadv_packet.h>
-+#include <uapi/linux/gtp.h>
- #include <linux/bpf.h>
- #if IS_ENABLED(CONFIG_NF_CONNTRACK)
- #include <net/netfilter/nf_conntrack_core.h>
-@@ -887,6 +889,81 @@ __skb_flow_dissect_gue(const struct sk_buff *skb,
- 	return FLOW_DISSECT_RET_IPPROTO_AGAIN;
- }
- 
-+static enum flow_dissect_ret
-+__skb_flow_dissect_gtp0(const struct sk_buff *skb,
-+			struct flow_dissector *flow_dissector,
-+			void *target_container, const void *data,
-+			__u8 *p_ip_proto, int *p_nhoff, int hlen,
-+			unsigned int flags)
-+{
-+	__u8 *ip_version, _ip_version, proto;
-+	struct gtp0_header *hdr, _hdr;
-+
-+	hdr = __skb_header_pointer(skb, *p_nhoff, sizeof(_hdr), data, hlen,
-+				   &_hdr);
-+	if (!hdr)
-+		return FLOW_DISSECT_RET_OUT_BAD;
-+
-+	if ((hdr->flags >> 5) != GTP_V0)
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+	ip_version = skb_header_pointer(skb, *p_nhoff + sizeof(_hdr),
-+					sizeof(*ip_version),
-+					&_ip_version);
-+	if (!ip_version)
-+		return FLOW_DISSECT_RET_OUT_BAD;
-+
-+	proto = __skb_direct_ip_dissect(ip_version);
-+	if (!proto)
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+	*p_ip_proto = proto;
-+	*p_nhoff += sizeof(struct gtp0_header);
-+
-+	return FLOW_DISSECT_RET_IPPROTO_AGAIN;
-+}
-+
-+static enum flow_dissect_ret
-+__skb_flow_dissect_gtp1u(const struct sk_buff *skb,
-+			 struct flow_dissector *flow_dissector,
-+			 void *target_container, const void *data,
-+			 __u8 *p_ip_proto, int *p_nhoff, int hlen,
-+			 unsigned int flags)
-+{
-+	__u8 *ip_version, _ip_version, proto;
-+	struct gtp1_header *hdr, _hdr;
-+	int hdrlen = sizeof(_hdr);
-+
-+	hdr = __skb_header_pointer(skb, *p_nhoff, sizeof(_hdr), data, hlen,
-+				   &_hdr);
-+	if (!hdr)
-+		return FLOW_DISSECT_RET_OUT_BAD;
-+
-+	if ((hdr->flags >> 5) != GTP_V1)
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+	if (hdr->type != GTP_TPDU)
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+	if (hdr->flags & GTP1_F_MASK)
-+		hdrlen += 4;
-+
-+	ip_version = skb_header_pointer(skb, *p_nhoff + hdrlen,
-+					sizeof(*ip_version),
-+					&_ip_version);
-+	if (!ip_version)
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+	proto = __skb_direct_ip_dissect(ip_version);
-+	if (!proto)
-+		return FLOW_DISSECT_RET_OUT_GOOD;
-+
-+	*p_ip_proto = proto;
-+	*p_nhoff += hdrlen;
-+
-+	return FLOW_DISSECT_RET_IPPROTO_AGAIN;
-+}
-+
- /**
-  * __skb_flow_dissect_batadv() - dissect batman-adv header
-  * @skb: sk_buff to with the batman-adv header
-@@ -1039,6 +1116,16 @@ __skb_flow_dissect_udp(const struct sk_buff *skb, struct net *net,
- 		*p_ip_proto = IPPROTO_L2TP;
- 		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
- 		break;
-+	case UDP_ENCAP_GTP0:
-+		ret = __skb_flow_dissect_gtp0(skb, flow_dissector,
-+					      target_container, data,
-+					      p_ip_proto, &nhoff, hlen, flags);
-+		break;
-+	case UDP_ENCAP_GTP1U:
-+		ret = __skb_flow_dissect_gtp1u(skb, flow_dissector,
-+					       target_container, data,
-+					       p_ip_proto, &nhoff, hlen, flags);
-+		break;
- 	case UDP_ENCAP_FOU:
- 		*p_ip_proto = fou_protocol;
- 		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
--- 
-2.34.1
+Hi,
 
+On Wed, Jul 31, 2024 at 05:12:43PM GMT, Arend Van Spriel wrote:
+> On July 31, 2024 3:54:52 PM Sebastian Reichel
+> <sebastian.reichel@collabora.com> wrote:
+> > On Wed, Jul 31, 2024 at 02:57:37PM GMT, Arend van Spriel wrote:
+> > > On 7/30/2024 7:38 PM, Sebastian Reichel wrote:
+> > > > On Tue, Jul 30, 2024 at 01:16:57PM GMT, Arend Van Spriel wrote:
+> > > > > On July 30, 2024 12:18:20 PM Krzysztof Kozlowski <krzk@kernel.org=
+> wrote:
+> > > > >=20
+> > > > > > On 30/07/2024 11:52, Arend Van Spriel wrote:
+> > > > > > > On July 30, 2024 11:01:43 AM Krzysztof Kozlowski <krzk@kernel=
+=2Eorg> wrote:
+> > > > > > >=20
+> > > > > > > > On 30/07/2024 08:37, Arend Van Spriel wrote:
+> > > > > > > > > + Linus W
+> > > > > > > > >
+> > > > > > > > > On July 30, 2024 5:31:15 AM Jacobe Zang <jacobe.zang@wesi=
+on.com> wrote:
+> > > > > > > > >
+> > > > > > > > > > Not only AP6275P Wi-Fi device but also all Broadcom wir=
+eless devices allow
+> > > > > > > > > > external low power clock input. In DTS the clock as an =
+optional choice in
+> > > > > > > > > > the absence of an internal clock.
+> > > > > > > > > >
+> > > > > > > > > > Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom=
+=2Ecom>
+> > > > > > > > > > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+> > > > > > > > > > ---
+> > > > > > > > > > .../bindings/net/wireless/brcm,bcm4329-fmac.yaml       =
+   | 8 ++++++++
+> > > > > > > > > > 1 file changed, 8 insertions(+)
+> > > > > > > > > >
+> > > > > > > > > > diff --git
+> > > > > > > > > > a/Documentation/devicetree/bindings/net/wireless/brcm,b=
+cm4329-fmac.yaml
+> > > > > > > > > > b/Documentation/devicetree/bindings/net/wireless/brcm,b=
+cm4329-fmac.yaml
+> > > > > > > > > > index 2c2093c77ec9a..a3607d55ef367 100644
+> > > > > > > > > > --- a/Documentation/devicetree/bindings/net/wireless/br=
+cm,bcm4329-fmac.yaml
+> > > > > > > > > > +++ b/Documentation/devicetree/bindings/net/wireless/br=
+cm,bcm4329-fmac.yaml
+> > > > > > > > > > @@ -122,6 +122,14 @@ properties:
+> > > > > > > > > > NVRAM. This would normally be filled in by the bootload=
+er from platform
+> > > > > > > > > > configuration data.
+> > > > > > > > > >
+> > > > > > > > > > +  clocks:
+> > > > > > > > > > +    items:
+> > > > > > > > > > +      - description: External Low Power Clock input (3=
+2.768KHz)
+> > > > > > > > > > +
+> > > > > > > > > > +  clock-names:
+> > > > > > > > > > +    items:
+> > > > > > > > > > +      - const: lpo
+> > > > > > > > > > +
+> > > > > > > > >
+> > > > > > > > > We still have an issue that this clock input is also pres=
+ent in the
+> > > > > > > > > bindings specification broadcom-bluetooth.yaml (not in bl=
+uetooth
+> > > > > > > > > subfolder). This clock is actually a chip resource. What =
+happens if both
+> > > > > > > > > are defined and both wifi and bt drivers try to enable th=
+is clock? Can this
+> > > > > > > > > be expressed in yaml or can we only put a textual warning=
+ in the property
+> > > > > > > > > descriptions?
+> > > > > > > >=20
+> > > > > > > > Just like all clocks, what would happen? It will be enabled.
+> > > > > > >=20
+> > > > > > > Oh, wow! Cool stuff. But seriously is it not a problem to hav=
+e two entities
+> > > > > > > controlling one and the same clock? Is this use-case taken in=
+to account by
+> > > > > > > the clock framework?
+> > > > > >=20
+> > > > > > Yes, it is handled correctly. That's a basic use-case, handled =
+by CCF
+> > > > > > since some years (~12?). Anyway, whatever OS is doing (or not d=
+oing)
+> > > > > > with the clocks is independent of the bindings here. The questi=
+on is
+> > > > >=20
+> > > > > Agree. Probably the bindings would not be the place to document t=
+his if it
+> > > > > would be an issue.
+> > > > >=20
+> > > > > > about hardware - does this node, which represents PCI interface=
+ of the
+> > > > > > chip, has/uses the clocks.
+> > > > >=20
+> > > > > The schematics I found for the wifi module and the khadas edge pl=
+atform show
+> > > > > these are indeed wired to the chip.
+> > > >=20
+> > > > I have a Rockchip RK3588 Evaluation Board on my desk, which uses the
+> > > > same WLAN AP6275P module. I think I already commented on a prior
+> > > > version of this series: The LPO clock is needed to make the PCIe
+> > > > device visible on the bus. That means this series only works if the
+> > > > clock has already been running. Otherwise the PCIe driver will never
+> > > > be probed. To become visible the devices requires:
+> > > >=20
+> > > > 1. The LPO clock to be enabled
+> > > > 2. Power to be applied
+> > > > 3. The WL_EN gpio to be configured correctly
+> > > >=20
+> > > > If one of the above is not met, the device will not even appear in
+> > > > 'lspci'. I believe the binding needs to take into consideration, th=
+at
+> > > > pwrseq is needed for the PCIe side. Fortuantely the heavy lifting of
+> > > > creating the proper infrastructure for this has already been done by
+> > > > Bartosz Golaszewski for Qualcomm WLAN chips. What is missing is a
+> > > > pwrseq driver for the Broadcom chip (or this specific module?).
+> > >=20
+> > > That does not really make sense. There is no relation between the LPO=
+ clock
+> > > and the PCIe clocks so 1) being a requirement for probing the device =
+looks
+> > > odd. It also does not match past experience when I assisted Andy Gree=
+n in
+> > > getting this module up and running almost two years ago.
+> >=20
+> > Well, first of all I can easily reproduce this on my RK3588 EVB1. I
+> > intentionally ignore any bluetooth bits to avoid cross-effects from
+> > bluetooth enabling any clocks / regulators / GPIOs and make sure the
+> > RTC output clock is disabled at boot time (i.e. boot once without
+> > any reference to the RTC clock and without 'clk_ignore_unused'
+> > kernel argument). When booting up like this the WLAN device is not
+> > visible in 'lspci' despite the WL_REG_ON GPIO being hogged. If I
+> > additionally hack the RTC output clock to be enabled the WLAN device
+> > becomes visible in 'lspci'.
+> >=20
+> > The datasheet fully explains this:
+> >=20
+> > https://www.lcsc.com/datasheet/lcsc_datasheet_2203281730_AMPAK-Tech-AP6=
+275P_C2984107.pdf
+> >=20
+> > PDF Page 23/24 (20/21 in the footer) has the Host Interface Timing
+> > Diagram. WL_REG_ON should only be enabled after 2 cycles from LPO.
+> > That means with LPO being disabled WL_REG_ON cannot be enabled. I'm
+> > pretty sure WL_REG_ON means WLAN_REGULATOR_ON, so the logic is not
+> > powered. On page 27 (24 in the footer) there is also a PCIe Power-On
+> > Timing diagram, which shows that WL_REG_ON must be enabled before
+> > the PCIe refclk is enabled.
+> >=20
+> > So there is a specific power up sequence, which must be followed.
+>=20
+> The chip also has an (less accurate) internal LPO so the 32khz sleep clock
+> in the diagram does not have to be an external clock. Maybe Ampak
+> bootstrapped the chip to disable the internal clock. Dunno.
+>=20
+> What Andy needed back then to get firmware running was a change in the nv=
+ram
+> file to force using the internal LPO, but the device was already visible =
+on
+> the PCIe bus.
+
+mh, I just tested again and I can no longer reproduce the LPO
+requirement for PCIe detection. Maybe it was something else all
+along (I did most of my tests quite some time ago).
+Sorry for the noise.
+
+-- Sebastian
+
+--my2grf6ekzwdybt6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmaqeUsACgkQ2O7X88g7
++pp84w/+KBmheZfpb0fRtyqgN36WgVqY9s5Gox0tnnz/NiXMcnTlgKuFpzHgWkPF
+c+6p/y8tcZnKqx4cUzOUERWdqLKhv4Eg79XECqCfryltPVF5Ws1/Q3SKOH/mfIQM
+392BAuZhrk0tu5OGir02czB0Am6yWsbsWNgmCqgK0HEPOdAOG635B0bgXe9Mao+c
+b5MRSoDcMVIkm0N1I5HECk6fAojJfENfWHvHsT83Ehg8Jrkbbm/d9ddcbfw+Bd/J
+ydUzMu+FZMLWQk6jr2ToB6Vtgjkoa5uTh4zjdIvsDP5gijQ31rQSQBEhCph1UONs
+Ug9v3YVpQVZJ8zKXZYL3lelPVyUd3izhCB0pApRDXottaMSjzW7TjVT7YdDeu1mX
+qjQlW5U/tiexec2NUsoKrCjXdpd2nh2rMbF08qCgjQLTqVaKThxILtN8I67DPn8E
+ikV4rwXSLsnq6KKYLycJmSBRHVsMJTfwXF0OyNXi8ISNsdT1WTlUpYED/nLfyFxB
+S6mkYaOFFHO+FqQ+uXWveskh235zEJLqq9XJdlpZlFfySI6D5TxaBbnfanCnrJsH
+fUQD9szb1KuJ8RnvIIvYLX7Izl5IpHYo1lEeTIfLRCmDwtrCLEmcj06Q2cfOcaWz
+FyEBLa7DmERYhwIvtWCzA8NTXM7j+gYmcNEM0Mia8d0MYIhYjFw=
+=Uz9w
+-----END PGP SIGNATURE-----
+
+--my2grf6ekzwdybt6--
 
