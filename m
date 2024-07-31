@@ -1,71 +1,170 @@
-Return-Path: <netdev+bounces-114349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96849942402
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:59:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 133019423FE
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:59:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FA461F24A17
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:59:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8057A1F24FFF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C09947A;
-	Wed, 31 Jul 2024 00:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2AD748F;
+	Wed, 31 Jul 2024 00:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="yOaRG6xQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LB2ZiEu8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E68C8BEA;
-	Wed, 31 Jul 2024 00:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F371746B5;
+	Wed, 31 Jul 2024 00:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722387584; cv=none; b=teNlGGkw+JMhvQf9I+yWXzw9VhKHqWf2sOmtSG8bszWmYG2kvOCxyQ+zjAGTS0kiztiilNYxu492EjepRgdT0fosZcxQFN121m5gufeucg+vV02aoLVtkUvRoQotZhNU0QwukDHFwGNL5SZJ8SBvTXw8gnNUVHjzuuwhDkXkzKw=
+	t=1722387583; cv=none; b=nYCSoTpcVBKywsvOFQj8K8zwaHSq1gmjROPeNWm6O1n0l3OSSlxKQDOY686uxfuXxTjd/0FimogyFRGGDueJKGKnw9sbtl7XoqR4J+6y4KpVci8AeMiiyCUmrc2iruY57+CEF3uTU2HHJTaBm3uXOKYW7D5S3vCC2x76kiFH55k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722387584; c=relaxed/simple;
-	bh=i55BjG4Az1uMgUYMNpiUqocgXqxkBYbCX/reUu941+c=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=asl+Z1mQ0m/GrcMrg7qAqh+GyZz4dUr/YyxxJbVFsuL9Wad1rfrv6+gfcX9/hGOj+4GYrZHI0ga6XpHYDUG8ig6noTxWJlDg8chMD6q1oDBY1VmUUUsfPMpA4nRrW6SiHn5Z+oT+FoUeXs58Hk+PGoHXQ6MW1B06z2HEw7Co/Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=yOaRG6xQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26C1AC32782;
-	Wed, 31 Jul 2024 00:59:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1722387583;
-	bh=i55BjG4Az1uMgUYMNpiUqocgXqxkBYbCX/reUu941+c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=yOaRG6xQyEFQANhk5kmfHuS8MU5QddMfdLCoZb7Fn3Dn1jftyjHTx1ybi8jCeft8n
-	 6h764jvhO3CQ0c5o+TVnmS20iygHQc9sgKpPD36OTPvk2zso5q2it+qi/r+Kaaa/QE
-	 ytAyGSH7qM171MciKceHCDOOZDW+rPYccVVdYelg=
-Date: Tue, 30 Jul 2024 17:59:27 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: torvalds@linux-foundation.org, ebiederm@xmission.com,
- alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com,
- penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org,
- linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- audit@vger.kernel.org, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH resend v4 00/11] Improve the copy of task comm
-Message-Id: <20240730175927.673754c361a70351ad8a3ff9@linux-foundation.org>
-In-Reply-To: <20240729023719.1933-1-laoar.shao@gmail.com>
-References: <20240729023719.1933-1-laoar.shao@gmail.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1722387583; c=relaxed/simple;
+	bh=+y5QEE3AMSBTEkdNVukqfIgmOEgEwSQCiOTZeiQt4AA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=tHIJtqG8KJ4IR0N4bMXDaUDDQZUvQlBbHsy2CLK72hLgW6/it69C33wwJK0kUGuya/ohYWpIV+PGr3W6gfNS4ZZbTYWxDdkD6TMW4iVwDZX6QQM3Gj2ZChJoosYKcHNu45h8Q0HevF8yIrYq9shDkXJ6bJO7LbBb0matRu6Aw4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LB2ZiEu8; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42803bbf842so41877785e9.1;
+        Tue, 30 Jul 2024 17:59:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722387580; x=1722992380; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OKr49gkwSZ1Bv1kgxbL5t2qWAvBYKzC4SKLSAp2ANC8=;
+        b=LB2ZiEu8GHRcAsfzeLJ7nldqSgsCOg4DEEhdToxapFqGtEP0zrePj2gfKeT971t+7B
+         ec0n5u/zTAdXVBetry6SSlayT5Gu+b568lZvOKGVoSh2GJvT6v4afmzm4pYPzBM+43im
+         2B/e8UNkkH/7Z1xnrNDE+Wjv13+uOiaqz3cqPuK1DPuU9txQrsVZzsDl9JlCpA8LP2bT
+         wGca+io3P/nJDNqKUajIW8YoXC7xdTloLt2NZilCfunShaHuFUWtgRT40W/FCZD1mwoO
+         TOMJT1GS6qeGVqOPXhfY/ECSQ+lntjLexQL2ZKHAzwEERDoSmYy4P/2kyFMH6jAIoED3
+         u2GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722387580; x=1722992380;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OKr49gkwSZ1Bv1kgxbL5t2qWAvBYKzC4SKLSAp2ANC8=;
+        b=N7CKorc9HpeX9QfXQNMFHMfqE7PmdYsnfyaf0BqHZ6dJ+UXLOVQV5t8uC0QFWrsQEI
+         58C/JnioIyj4R6gPLR+GEuOh9ku+ZGkwirTvikpHaLQ0Jr7qkrUr+h3hKkubh3iTNEn6
+         h2yJycrWvyuUTDFLQGqpCRiUT0QISZ9SQmMUHbAwGFhRHlMNlhaLFiWSm5CwXrKT8TLG
+         vk/skS8rfJxT6ZNxBSvZM/UGyHRZY23+3IxdwgccleUBBC8VE1GdqXvE+jps2Kfsi4ZA
+         ndF1l160RdidKRMOuw9MDG9rIpzN01n4y6vj7Qx2f3dCLO41k7+KNbB6e+I46iQM4csh
+         e5rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwlSIx+/PmgkZhB6nytxltiDbByemvlxCJFecPsa7GVTIes+QQ31xyyjUESfWBwIJSiQst8o4T2ABqD3iJPUfMD0UCMqxvD8Y=
+X-Gm-Message-State: AOJu0Yy6qb0dKv4IHKix18+VIAcqixiSuFcUpF+r5mQ+WbCp1ZGY1i0t
+	xzHQGCE7q5onVZlKsje3KTZannBw/0iSD8TKKP+oo90G2UjC7QSxB6a1wQ==
+X-Google-Smtp-Source: AGHT+IFGzLiH0ilYlz67NfCKQr6/lFBJtDoyqYVJRk2FHMuquNQNBvY/EC0p9pAkjsZbVrkBIrGoug==
+X-Received: by 2002:a05:600c:310e:b0:428:15b0:c8dd with SMTP id 5b1f17b1804b1-42815b0cb56mr101921525e9.20.1722387580100;
+        Tue, 30 Jul 2024 17:59:40 -0700 (PDT)
+Received: from [192.168.8.113] ([85.255.235.94])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89aa93sm1098955e9.10.2024.07.30.17.59.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 17:59:39 -0700 (PDT)
+Message-ID: <66f7bc8a-e4a9-4912-9ea7-c88dbb6fb999@gmail.com>
+Date: Wed, 31 Jul 2024 02:00:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: io_uring NAPI busy poll RCU is causing 50 context switches/second
+ to my sqpoll thread
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Olivier Langlois <olivier@trillion01.com>, io-uring@vger.kernel.org
+Cc: netdev@vger.kernel.org
+References: <b1ad0ab3a7e70b72aa73b0b7cab83273358b2e1d.camel@trillion01.com>
+ <00918946-253e-43c9-a635-c91d870407b7@gmail.com>
+ <bcd3b198697e16059ec69566251ad23c4c78e7a7.camel@trillion01.com>
+ <43c27aa1-d955-4375-8d96-cd4201aecf50@gmail.com>
+Content-Language: en-US
+In-Reply-To: <43c27aa1-d955-4375-8d96-cd4201aecf50@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon, 29 Jul 2024 10:37:08 +0800 Yafang Shao <laoar.shao@gmail.com> wrote:
+On 7/31/24 01:33, Pavel Begunkov wrote:
+> On 7/31/24 00:14, Olivier Langlois wrote:
+>> On Tue, 2024-07-30 at 21:25 +0100, Pavel Begunkov wrote:
+>>>
+>>> Removing an entry or two once every minute is definitely not
+>>> going to take 50% CPU, RCU machinery is running in background
+>>> regardless of whether io_uring uses it or not, and it's pretty
+>>> cheap considering ammortisation.
+>>>
+>>> If anything it more sounds from your explanation like the
+>>> scheduler makes a wrong decision and schedules out the sqpoll
+>>> thread even though it could continue to run, but that's need
+>>> a confirmation. Does the CPU your SQPOLL is pinned to stays
+>>> 100% utilised?
+>>
+>> Here are the facts as they are documented in the github issue.
+>>
+>> 1. despite thinking that I was doing NAPI busy polling, I was not
+>> because my ring was not receiving any sqe after its initial setup.
+>>
+>> This is what the patch developped with your input
+>> https://lore.kernel.org/io-uring/382791dc97d208d88ee31e5ebb5b661a0453fb79.1722374371.git.olivier@trillion01.com/T/#u
+>>
+>> is addressing
+>>
+>> (BTW, I should check if there is such a thing, but I would love to know
+>> if the net code is exposing a tracepoint when napi_busy_poll is called
+>> because it is very tricky to know if it is done for real or not)
+>>
+>> 2. the moment a second ring has been attached to the sqpoll thread that
+>> was receving a lot of sqe, the NAPI busy loop started to be made for
+>> real and the sqpoll cpu usage unexplicably dropped from 99% to 55%
+>>
+>> 3. here is my kernel cmdline:
+>> hugepages=72 isolcpus=0,1,2 nohz_full=0,1,2 rcu_nocbs=0,1,2
+>> rcu_nocb_poll irqaffinity=3 idle=nomwait processor.max_cstate=1
+>> intel_idle.max_cstate=1 nmi_watchdog=0
+>>
+>> there is absolutely nothing else on CPU0 where the sqpoll thread
+>> affinity is set to run.
+>>
+>> 4. I got the idea of doing this:
+>> echo common_pid == sqpoll_pid > /sys/kernel/tracing/events/sched/filter
+>> echo 1 > /sys/kernel/tracing/events/sched/sched_switch/enable
+>>
+>> and I have recorded over 1,000 context switches in 23 seconds with RCU
+>> related kernel threads.
+>>
+>> 5. just for the fun of checking out, I have disabled NAPI polling on my
+>> io_uring rings and the sqpoll thread magically returned to 99% CPU
+>> usage from 55%...
+>>
+>> I am open to other explanations for what I have observed but my current
+>> conclusion is based on what I am able to see... the evidence appears
+>> very convincing to me...
+> 
+> You're seeing something that doesn't make much sense to me, and we need
+> to understand what that is. There might be a bug _somewhere_, that's
+> always a possibility, but before saying that let's get a bit more data.
+> 
+> While the app is working, can you grab a profile and run mpstat for the
+> CPU on which you have the SQPOLL task?
+> 
+> perf record -g -C <CPU number> --all-kernel &
+> mpstat -u -P <CPU number> 5 10 &
+> 
+> And then as usual, time it so that you have some activity going on,
+> mpstat interval may need adjustments, and perf report it as before
 
-> Is it appropriate for you to apply this to the mm tree?
+I forgot to add, ~50 switches/second for relatively brief RCU handling
+is not much, not enough to take 50% of a CPU. I wonder if sqpoll was
+still running but napi busy polling time got accounted to softirq
+because of disabled bh and you didn't include it, hence asking CPU
+stats. Do you see any latency problems for that configuration?
 
-There are a couple of minor conflicts against current 6.11-rc1 which
-you'd best check.  So please redo this against current mainline?
+-- 
+Pavel Begunkov
 
