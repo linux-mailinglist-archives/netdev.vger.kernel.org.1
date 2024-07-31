@@ -1,169 +1,173 @@
-Return-Path: <netdev+bounces-114613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81BEE9431C2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 16:12:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0FB794320D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 16:32:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 361A5284243
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:12:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF2BFB24FA3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2EA1B372E;
-	Wed, 31 Jul 2024 14:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21CC1BBBC5;
+	Wed, 31 Jul 2024 14:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4s3NZml"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcU1/CDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57DF16D4CB;
-	Wed, 31 Jul 2024 14:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E571BBBC1;
+	Wed, 31 Jul 2024 14:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722435139; cv=none; b=PH2PrCATXKaflyBPFhT+5O/rfjeX7oIskVRyl9EGP4WHkeM7fm+AY88rQ9X9O0F27vRtc1UHD/WRjeMjBXlk425iqKzk6MW73TWRzzE5PdEEBOQDPqPqPG+Vqs1RA5bZSWBRgHeFUEs/cVIy4FnDWpAO3ThbcuaB2W6J5y2cndk=
+	t=1722436342; cv=none; b=ViODdupOZPA+MCXkolcHFa0/jpwmQk2ArdaFa+IFEQY/nywj/w76bBaYlF1Upt56eb1At5ik+0VhXH2Y+m6Xqkrd+OWi2C10E4/r2L4g7ruwJ2lZW1V4myBv+Jas2JbRmyhOLG4tJkpD9Bryrd6zUZ/iOyGc+hT/Z/8L1yoLYIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722435139; c=relaxed/simple;
-	bh=qg6tbCM603pKIl6ex6aZn+8/1RFcZtNjy8ZF1q0qAcc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=IQHzzb/jIT4mTIP2g4g0x3uFqCrB9lmvFqzn4rczLiQH1HUhVEkBl6dUAuCBct/tXO4R6+aAuyzKA+25VLnptQDtFgySFiylwnX+GCUiJxFTH+rzIJnzictHmh6bZkDax51WOK4kubedRabtRoLZ1Ywvtzd4zx2m3NlZG2JrBus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A4s3NZml; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6ad86f3cc34so32035776d6.1;
-        Wed, 31 Jul 2024 07:12:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722435136; x=1723039936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DtrFwP4YBskKGvaa39EM8j7npXHQl9OMFtlElqqRPIE=;
-        b=A4s3NZmlUAAIS5yRVKwOHoR4gNxV3Gmf207/jxvphF40ATPlBoPBsHcbUVHReydxnB
-         1s8eHZ/mov6vNbcnJUSocYiDtLSeY3VtmCC39nRZkZh4Fkr7GU8ayjwmWwILWG8Inh4I
-         1H46cJepnesJCxSgpysPltWWMh/EeGUo39SJ4uSLVIepeskW+1QuH1UeqC0QBS2pXsGI
-         CKEjN2rLOmghdJ0jlHq1tqtPpsiMKuwgqblulhEw6nTQ1hitV1MKabPFy49jv3QpiPCU
-         iCw0NbM3Eo+r3YSiWaLvheEXndWHHR7kIYua6gwATM854hDDgSou+xea63KN9gnoJYmS
-         jfvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722435136; x=1723039936;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DtrFwP4YBskKGvaa39EM8j7npXHQl9OMFtlElqqRPIE=;
-        b=jJEXZi8dht5HKVGjcixdBaOJ7lE+5J/j+c0ob4w0qt0c9O4cbvWbYUDS+ye3Fi7SyY
-         P6lkrgZunZp7Mx0F0PvlMnG0VEE1ofuA9afvi+YypldIWLviUFU2EXcIlWRV/SupLAJB
-         f1aCWHEbw/fFntpGI0xKY8iHS6qEdQtR2DXg1VATPr6U/RqErvquixwlrd38WwGpRAql
-         Oz6Ir5y0d8y/mHFI3u2NCSGB5GILJK3bwSqh3MliJ8yYCciaip1bwC3iB6YMQ32s3CgM
-         ExxhRFEUNPOEf8wMY5/Ne+7EaIeqGgAZY3i2/bokoHp9DKd8lAYQhsLBjxwL3drqYuhe
-         kWog==
-X-Forwarded-Encrypted: i=1; AJvYcCWC/AKHXZbCY0TQlnNA9fpeifJCr/gtPck5IppO01pg+BYaQ5EI7UDbKBqLd0lMow2ULzSuRGhO+gLeAff/bRV7syEWidl4ivzI+PYO0r0iaM0q67gu8s9yT1JDLXcGTCAIKZrg
-X-Gm-Message-State: AOJu0YxpAvhgzxcZzcyz3Y6/bFfYrZQ81H1bza5Zjo1A+nDwuQr1uF3L
-	lJev0tYUqbeO54LH5WMADWpTD9q9SI2Xjs/Xc4UzCYjbKM5CsA93
-X-Google-Smtp-Source: AGHT+IE7d3WnrSysqBvvhYPRx4PE924CxpUJ3JXOeM/hbNryFShECa0EMfanfNTyb0eQsogUuZ81Ug==
-X-Received: by 2002:a05:6214:413:b0:6b0:7a5c:e12c with SMTP id 6a1803df08f44-6bb55a0cb39mr190984426d6.29.1722435136449;
-        Wed, 31 Jul 2024 07:12:16 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3fb0c4dfsm73490266d6.140.2024.07.31.07.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 07:12:15 -0700 (PDT)
-Date: Wed, 31 Jul 2024 10:12:14 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Randy Li <ayaka@soulik.info>, 
- netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, 
- jasowang@redhat.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- linux-kernel@vger.kernel.org, 
- Randy Li <ayaka@soulik.info>
-Message-ID: <66aa463e6bcdf_20b4e4294ea@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240731111940.8383-1-ayaka@soulik.info>
-References: <20240731111940.8383-1-ayaka@soulik.info>
-Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue
- index
+	s=arc-20240116; t=1722436342; c=relaxed/simple;
+	bh=KgJyeoelKhXsq6qgvciyvzOwPuIVE24oAsXBYIEN8NY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hPrCYNn99HW+XXHl0fR98hvZ2F9y2aerY2jJKZuZg9OsfD1zFGZIRHTFzB17N2e7XFwbR2Dps+1qIPk7TRMlBQOPjJ9Sy9mA4Hqk/qpFJMCF3nQ/0n6tuGAx+c9OZG/JaESCzx7UXUwqgeaYzRaNL8jW89J+FZfLRa1j60QRYrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcU1/CDC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CE08C116B1;
+	Wed, 31 Jul 2024 14:32:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722436342;
+	bh=KgJyeoelKhXsq6qgvciyvzOwPuIVE24oAsXBYIEN8NY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fcU1/CDCm+CKPqKOSkNtK5LtgyNUVHjwmVRWYky5MoQ7wkvXbVgwwLAcmDDmWKvrE
+	 Kdy9NNIG0cRYwAY37Pwhxp6KvUPxZlCtwV+hPZNn5TpFacn8nQV11S4hVOvDtPSRIq
+	 8hBhHdQQ/3UVk9r6XWpjkT+5sJSiHAsE/GhA/Ynhdjt9W3ODgdA/v1OoA5BY1q3woN
+	 3Z8zv5tlH+Gu4OMelvsWJz4xiP2GOePgaZizE/nmmyzDdNdHMG5b0AIaw04h+PUPPJ
+	 mIULf4KuwJJx+HLv52sIOAuxD4vWQefb2i00s0Ol/pj/WZoSnevjLz1BgqZWe7+8kD
+	 C6N8PpoQvCyMg==
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5d5bafd2c42so468589eaf.2;
+        Wed, 31 Jul 2024 07:32:22 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU1hs8TM8Zd8XVfT//jAaTAZlrIDSlZVXEMMmuycFqBbSM+/x0y8qlvrGbFqzcA+7rmgo67Vgh0umOmn19n45oVZ1HMa8S4i0fWyH0DIbVWIQvwWb79vhYOQhzSZaOOxdgGRqLQxUmDbwFQkfak7h+kyZ22aTqPkwPpylON59kLd4Dftvj3fszZkWgYwvAuT6wFlsrydkvWaa4h
+X-Gm-Message-State: AOJu0Yx48kA+z0cibBZ7JVjCPW8jIaPBlKy+VzO2aFlHMfsmZh0uA/G/
+	IpvJYmWfhCrTxbGmMWqQvf8tJNt/NOoSy0iNMh1AywBV8ke2yb8+WUiRoP4ElNyuHClWpM29EB0
+	l1jTNVmaWKIS1bycULg3G+cXOhGE=
+X-Google-Smtp-Source: AGHT+IGC79vQI8gKkKMLbf5Z2nk0fsL4RPtGcqnkOCJHg3r38IP5gYjvd0iMmESMbIzUUvEYjYDElbTrm8FgZCsWIMY=
+X-Received: by 2002:a05:687c:2c19:b0:259:f03c:4e90 with SMTP id
+ 586e51a60fabf-264a35d1c79mr12193987fac.4.1722436341440; Wed, 31 Jul 2024
+ 07:32:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <1922131.tdWV9SEqCh@rjwysocki.net> <9002154.VV5PYv0bhD@rjwysocki.net>
+ <ZqoxXdQRxhfr5cHY@shredder.mtl.com> <CAJZ5v0h7T27fcL5-Wp5cjxi7mqKVh3_jk-8KwXPGWRbO31sm7Q@mail.gmail.com>
+In-Reply-To: <CAJZ5v0h7T27fcL5-Wp5cjxi7mqKVh3_jk-8KwXPGWRbO31sm7Q@mail.gmail.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 31 Jul 2024 16:32:10 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0hX+HyNB5Xqwr6Q44rgAThNLqp5PUQXN-uTC+cDqdjpqA@mail.gmail.com>
+Message-ID: <CAJZ5v0hX+HyNB5Xqwr6Q44rgAThNLqp5PUQXN-uTC+cDqdjpqA@mail.gmail.com>
+Subject: Re: [PATCH v1 13/17] mlxsw: core_thermal: Use the .should_bind()
+ thermal zone callback
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux PM <linux-pm@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, 
+	Daniel Lezcano <daniel.lezcano@linaro.org>, Lukasz Luba <lukasz.luba@arm.com>, 
+	Zhang Rui <rui.zhang@intel.com>, Petr Machata <petrm@nvidia.com>, netdev@vger.kernel.org
+Content-Type: multipart/mixed; boundary="00000000000047dd61061e8bf630"
 
-Randy Li wrote:
-> We need the queue index in qdisc mapping rule. There is no way to
-> fetch that.
+--00000000000047dd61061e8bf630
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In which command exactly?
+On Wed, Jul 31, 2024 at 3:01=E2=80=AFPM Rafael J. Wysocki <rafael@kernel.or=
+g> wrote:
+>
+> On Wed, Jul 31, 2024 at 2:43=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> =
+wrote:
+> >
+> > On Tue, Jul 30, 2024 at 08:34:45PM +0200, Rafael J. Wysocki wrote:
+> > > From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> > >
+> > > Make the mlxsw core_thermal driver use the .should_bind() thermal zon=
+e
+> > > callback to provide the thermal core with the information on whether =
+or
+> > > not to bind the given cooling device to the given trip point in the
+> > > given thermal zone.  If it returns 'true', the thermal core will bind
+> > > the cooling device to the trip and the corresponding unbinding will b=
+e
+> > > taken care of automatically by the core on the removal of the involve=
+d
+> > > thermal zone or cooling device.
+> > >
+> > > It replaces the .bind() and .unbind() thermal zone callbacks (in 3
+> > > places) which assumed the same trip points ordering in the driver
+> > > and in the thermal core (that may not be true any more in the
+> > > future).  The .bind() callbacks used loops over trip point indices
+> > > to call thermal_zone_bind_cooling_device() for the same cdev (once
+> > > it had been verified) and all of the trip points, but they passed
+> > > different 'upper' and 'lower' values to it for each trip.
+> > >
+> > > To retain the original functionality, the .should_bind() callbacks
+> > > need to use the same 'upper' and 'lower' values that would be used
+> > > by the corresponding .bind() callbacks when they are about about to
+> >
+> > Nit: s/about about/about/
+>
+> Yes, thanks!
+>
+> > > return 'true'.  To that end, the 'priv' field of each trip is set
+> > > during the thermal zone initialization to point to the corresponding
+> > > 'state' object containing the maximum and minimum cooling states of
+> > > the cooling device.
+> > >
+> > > Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> >
+> > Please see more comments below, but this patch is going to conflict wit=
+h
+> > the series at [1] which is currently under review. How do you want to
+> > handle that?
+> >
+> > https://lore.kernel.org/netdev/cover.1722345311.git.petrm@nvidia.com/
+>
+> I may be missing something, but I don't see conflicts between this
+> patch and the series above that would be hard to resolve at merge
+> time.
+>
+> Anyway, I'll try to apply the above series locally and merge it with
+> this patch, thanks for the heads up!
 
-> Signed-off-by: Randy Li <ayaka@soulik.info>
-> ---
->  drivers/net/tap.c           | 9 +++++++++
->  drivers/net/tun.c           | 4 ++++
->  include/uapi/linux/if_tun.h | 1 +
->  3 files changed, 14 insertions(+)
-> 
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index 77574f7a3bd4..6099f27a0a1f 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -1120,6 +1120,15 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
->  		rtnl_unlock();
->  		return ret;
->  
-> +	case TUNGETQUEUEINDEX:
-> +		rtnl_lock();
-> +		if (!q->enabled)
-> +			ret = -EINVAL;
-> +
+So there is only one merge conflict that's straightforward to resolve
+(as far as I'm concerned).  My resolution of it is attached, FWIW.
 
-Below will just overwrite the above ret
+In my view the changes in the series above and this patch are mostly
+independent of each other.
 
-> +		ret = put_user(q->queue_index, up);
-> +		rtnl_unlock();
-> +		return ret;
-> +
->  	case SIOCGIFHWADDR:
->  		rtnl_lock();
->  		tap = tap_get_tap_dev(q);
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 1d06c560c5e6..5473a0fca2e1 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -3115,6 +3115,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
->  		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
->  			return -EPERM;
->  		return open_related_ns(&net->ns, get_net_ns);
-> +	} else if (cmd == TUNGETQUEUEINDEX) {
-> +		if (tfile->detached)
-> +			return -EINVAL;
-> +		return put_user(tfile->queue_index, (unsigned int __user*)argp);
+Thanks!
 
-Unless you're certain that these fields can be read without RTNL, move
-below rtnl_lock() statement.
+--00000000000047dd61061e8bf630
+Content-Type: text/x-patch; charset="US-ASCII"; name="merge.patch"
+Content-Disposition: attachment; filename="merge.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lz9y1cmo0>
+X-Attachment-Id: f_lz9y1cmo0
 
->  	}
->  
->  	rtnl_lock();
-> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
-> index 287cdc81c939..2668ca3b06a5 100644
-> --- a/include/uapi/linux/if_tun.h
-> +++ b/include/uapi/linux/if_tun.h
-> @@ -61,6 +61,7 @@
->  #define TUNSETFILTEREBPF _IOR('T', 225, int)
->  #define TUNSETCARRIER _IOW('T', 226, int)
->  #define TUNGETDEVNETNS _IO('T', 227)
-> +#define TUNGETQUEUEINDEX _IOR('T', 228, unsigned int)
->  
->  /* TUNSETIFF ifr flags */
->  #define IFF_TUN		0x0001
-> -- 
-> 2.45.2
-> 
-
-
+ZGlmZiAtLWNjIGRyaXZlcnMvbmV0L2V0aGVybmV0L21lbGxhbm94L21seHN3L2NvcmVfdGhlcm1h
+bC5jCmluZGV4IDMwM2QyY2U0ZGMxZSwwYzUwYTBjYzMxNmQuLmU3NDZjZDljNjhlZAotLS0gYS9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHhzdy9jb3JlX3RoZXJtYWwuYworKysgYi9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHhzdy9jb3JlX3RoZXJtYWwuYwpAQEAgLTQ1
+MCw4IC0zODksMTIgKzM4OCw5IEBAQCBtbHhzd190aGVybWFsX21vZHVsZV9pbml0KHN0cnVjdCBt
+bHhzd18KICAJCQkgIHN0cnVjdCBtbHhzd190aGVybWFsX2FyZWEgKmFyZWEsIHU4IG1vZHVsZSkK
+ICB7CiAgCXN0cnVjdCBtbHhzd190aGVybWFsX21vZHVsZSAqbW9kdWxlX3R6OworIAlpbnQgaTsK
+ICAKICAJbW9kdWxlX3R6ID0gJmFyZWEtPnR6X21vZHVsZV9hcnJbbW9kdWxlXTsKIC0JLyogU2tp
+cCBpZiBwYXJlbnQgaXMgYWxyZWFkeSBzZXQgKGNhc2Ugb2YgcG9ydCBzcGxpdCkuICovCiAtCWlm
+IChtb2R1bGVfdHotPnBhcmVudCkKIC0JCXJldHVybjsKICAJbW9kdWxlX3R6LT5tb2R1bGUgPSBt
+b2R1bGU7CiAgCW1vZHVsZV90ei0+c2xvdF9pbmRleCA9IGFyZWEtPnNsb3RfaW5kZXg7CiAgCW1v
+ZHVsZV90ei0+cGFyZW50ID0gdGhlcm1hbDsKQEBAIC00NjEsOCAtNDA0LDggKzQwMCwxMCBAQEAK
+ICAJICAgICAgIHNpemVvZih0aGVybWFsLT50cmlwcykpOwogIAltZW1jcHkobW9kdWxlX3R6LT5j
+b29saW5nX3N0YXRlcywgZGVmYXVsdF9jb29saW5nX3N0YXRlcywKICAJICAgICAgIHNpemVvZih0
+aGVybWFsLT5jb29saW5nX3N0YXRlcykpOworIAlmb3IgKGkgPSAwOyBpIDwgTUxYU1dfVEhFUk1B
+TF9OVU1fVFJJUFM7IGkrKykKKyAJCW1vZHVsZV90ei0+dHJpcHNbaV0ucHJpdiA9ICZtb2R1bGVf
+dHotPmNvb2xpbmdfc3RhdGVzW2ldOwogKwogKwlyZXR1cm4gbWx4c3dfdGhlcm1hbF9tb2R1bGVf
+dHpfaW5pdChtb2R1bGVfdHopOwogIH0KICAKICBzdGF0aWMgdm9pZCBtbHhzd190aGVybWFsX21v
+ZHVsZV9maW5pKHN0cnVjdCBtbHhzd190aGVybWFsX21vZHVsZSAqbW9kdWxlX3R6KQo=
+--00000000000047dd61061e8bf630--
 
