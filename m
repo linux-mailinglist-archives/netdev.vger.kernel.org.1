@@ -1,133 +1,261 @@
-Return-Path: <netdev+bounces-114383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B036894251F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 05:36:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03FBC94253D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 06:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8F171C2037F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 03:36:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47D18B23631
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 04:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A710517BA9;
-	Wed, 31 Jul 2024 03:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584AE18637;
+	Wed, 31 Jul 2024 04:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/0JWWDb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hc8QhXxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E6818030
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 03:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6A217C77;
+	Wed, 31 Jul 2024 04:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722397015; cv=none; b=f259le4DqaqPM8QQ6xM4Hr6gWnZhR2pb5DaG4hty7S3aThY1nwistb/mQff1vAwPYwMyvCDp0azODJVZq+zBy2NQYKds/5vMQj85Zcy9pJWIfZ48rF+F/sWoFdbbFRDkWY9YYjnloEroz8zfRGJUQq9S1eYr5WLiYU3IMiXiYBI=
+	t=1722398940; cv=none; b=BAJQXu110/UHzqLLLDu809H6ma6r8J2PG/NYxbdQcSKHdhg9mzNCYeSoLf5xv0uP+6njsGQaFMsvMgqsaFneLRw6UjlC4sSE0LC5XbZ6F9LIIoRl4/24uouH7f8n9gJx7hICfH6BM4JZN6V7OZb0ddmToYoITgIpFXQa42MN5Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722397015; c=relaxed/simple;
-	bh=6KEnruK2RfNqPpI+6NZkg9uOvsBX2pxU/xo+NXD90dE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G4LZhblkpAuPAJMDiBBl6E7pis22XJ3g6yE7ss0WEwxOoZ80R9MXopxY98pgz8kYavcfQhQi5jfbqT9+ucvcrybMVkEIKaFjUu5uJshyHNhjnwRfbHV9cnapeH4p6V//cGdGVoV2hrX0HTVnnqAamhu3j3IvR2JZjBFnOwTarl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F/0JWWDb; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1722398940; c=relaxed/simple;
+	bh=KMAOpm5U0m4hl5C4y/b8ehaGRf4H3NJ3EHY5zZny3h4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EiV9LymQSWBshfq/0xeMp3cEN+AuURx0aYgoy6/0bdVAaKYbZmdz5imUmkHWEYmRtEThuVhNoDOb9fjsJLQSNvA4ZTrYeHhGkXKpjTqwD3FxDovVNSIlM5zcZ5VJFwkT2UrwEdImq+f/wlRAo7JahXzu8i/L3ORprEoSfNM13LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hc8QhXxi; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1fd6ed7688cso39327695ad.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 20:36:54 -0700 (PDT)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-66526e430e0so40748077b3.2;
+        Tue, 30 Jul 2024 21:08:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722397013; x=1723001813; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hlgWSaW8Er6VRSfc7sweYIrBix9aW+PndMWKYqczAog=;
-        b=F/0JWWDbjZPWJe8RR60HXz2wLx8H9CgFUDmf7pCuikjk0BtjAh71zp6Hr2I+Xp2IOH
-         gRk2QwqVOTh4Nx/aoAw9w3pFUOqrObFjqJp3VOX3q/+m5ZpjxK5qKuIizY0FZQHh0lKx
-         bdW1JEFS1LCsfacmgM5UD5KiifDGRFBBnyBmOYPomesuRyqpFEtmR0MCNOv+DiDCD4Qo
-         8KfM+0pw8GovMdLtpxWhWlNrgtGueXs//AiYmnp5O9t0Hg+fw6LDAzyfyFgGjylfBxIy
-         6KC/ZvrIeboIKOgC5u6lHiZKSZyGbcbwnjrkGPngDz38xkfos2vekd40aBLdQVqPavmu
-         Cmow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722397013; x=1723001813;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1722398937; x=1723003737; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hlgWSaW8Er6VRSfc7sweYIrBix9aW+PndMWKYqczAog=;
-        b=khk538WOIexcRg/yVH7RaHIx/Q2s7O1263thqGjYbnCCDyHeV85Jg38emNoxsDo3Ig
-         clIJLymbhAJvfzFC+zSQn4euTbH5HtbFbUF5HYsvVb/mm5RP4+d0kZAwMw93cAHanPYA
-         0ZvpWA6rAzfyVPJQXrFYKiHWf3dQrMDgHww0nkjt8kLXahNUyU980HxqvSnMk+X6tZvk
-         xETLVh0o4aD7NE2s0ZT87BCFMGzlpFwLoDH8znMxOjzw83U42bV1EM26aRcTW0KRyo72
-         OlpbSN41k5NH57n1A0dyjUwijfIsu8OC3h0jVhTW8ofzI4XTgeSJ2IbKzvd2rWOqxEvZ
-         5A3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVIthcZo3o8vaRY3L6YbQ/PEVs+xbf/pRIpGBzybJw5uu4f2L6JQKv5iAtVDLO7OqlBGuwcMtftWKUhF24VL4HHVkva2C95
-X-Gm-Message-State: AOJu0Yx2V+b5eB7fFUkC+ovGUDVwurNC3rBhlOLkfkOfTwcKJYhhJ4Z4
-	d5ieqT3fyvg4qo66LBHnAGS6EtjPoeocLAEGZjO3bIIyWgRHn6SV
-X-Google-Smtp-Source: AGHT+IGOxzhmN73CXcIIln0qSRzs7VS0nZfiA4kJV90VsGSTpWKQ1PzE9A0pMUVjQdGhlApmyqKwCw==
-X-Received: by 2002:a17:902:ecd1:b0:1fc:2e38:d3de with SMTP id d9443c01a7336-1ff04805b9fmr139262815ad.7.1722397013485;
-        Tue, 30 Jul 2024 20:36:53 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:782c:bea0:2ba1:46ac:dba6:9de4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7edd813sm109712115ad.170.2024.07.30.20.36.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 20:36:53 -0700 (PDT)
-Date: Wed, 31 Jul 2024 11:36:48 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net 2/4] bonding: call xfrm state xdo_dev_state_free
- after deletion
-Message-ID: <ZqmxUD29yIVHTaQb@Laptop-X1>
-References: <20240729124406.1824592-1-tariqt@nvidia.com>
- <20240729124406.1824592-3-tariqt@nvidia.com>
+        bh=+XT2u7pA/HlId5gFgJjU2gH/LOR1UKAsDl58MCOCyr0=;
+        b=Hc8QhXxiyefrrLlpt/PB/rW9qwp8rIg3MPEkyP66YTgt8CBqGNw7LkQ4vCUSTQvQ/H
+         lMmm+OcnF71TcFTaLuqvvK9GSkkSbJcssbu2ZOhwdKicv5OWiz32XcsvBj7sBM3J929O
+         slBFA4dB1/2bAXSI+aJAKOcA4ZE/5yAvwdISGVq/2lOXLz7xZbtS2ewdiheI93tqG/9I
+         Ucu0uPRdMPkLUcbrQ6XeHvboIgTOeINoDYN8loHFX/2MytSdMi2BgI+ietdwv/dLdX77
+         34RCryDUiKLpFoHDct5tEqa5bVtVzQGW0D3DeQxfw9E6mTNLD0vae2o0THo8ymFfdmH1
+         jEcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722398937; x=1723003737;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+XT2u7pA/HlId5gFgJjU2gH/LOR1UKAsDl58MCOCyr0=;
+        b=Wbl/KG+tXoYIoNBXzUHSpQ9D0iz7VOwPDAQRj8W4cDEOje4daIltupcIrRAqdcmsaa
+         0euViH8mLesijL2KUHoe8VZ9TkvdYLZ8MDBHJtbZf3irbmQ8vlu/UCVON/NQ3xml6SF6
+         KPyJwZnpehMkcuvI2jfziljglTgNgREtnzeJMd1BP9RL/ZJqB7II9RKTx98okmyRtrJ2
+         AQUheSoi5QaqSo1bJwenwfjE/p9E+yTIpH5yeeRPZmypg9B7UBdzirHXH/uUaiDe2UpS
+         UO8kc5e0AA/K+GrB1EOrUWZ2TsDg5paZthWou8YZdrLW6kTd5aOp23f/XRj/chBilOFg
+         TuLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXeplIA6IEvmr6tWIg/cVP7Mzbpa+SB6Uzrw7HJSewQasAWQHkhWF7bki5/AsvMEGA2M3oxoKMpQmCg24BmSO0BSXYi3kIT
+X-Gm-Message-State: AOJu0YxG1OdZIoFgFWF7cA2Yz94hQNi/pQ4D46Q18xVH3f9mD1Fpu0DF
+	7cHmkNC/HstF444BIBMNH7CW1BZ8gZ9jJotIAMw/jK+FT9PNdRtXVlLQbl4OSEb6KeENE5KYCTz
+	e3sgpnPmvfgEmmCuUuiRNaIxtJQ6UKQ==
+X-Google-Smtp-Source: AGHT+IEL/9gXqa8QJopq9kDvxzVEANoVV0CXzc8HY5lQ+gD5z0bwBaHsJOxASBL1MH9BSrk+rU4zd4cnQdvqxe9WtCg=
+X-Received: by 2002:a05:6902:c12:b0:e0b:4dce:98 with SMTP id
+ 3f1490d57ef6-e0b5447b08emr13274326276.20.1722398937543; Tue, 30 Jul 2024
+ 21:08:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240729124406.1824592-3-tariqt@nvidia.com>
+References: <20240714175130.4051012-1-amery.hung@bytedance.com>
+ <20240714175130.4051012-7-amery.hung@bytedance.com> <47a1dae1-7196-4991-b008-b50fb92fd5c3@linux.dev>
+In-Reply-To: <47a1dae1-7196-4991-b008-b50fb92fd5c3@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 30 Jul 2024 21:08:46 -0700
+Message-ID: <CAMB2axMi6eGyQP94DXkC_EOY3nHOt=9mLTYkqae-JDPV9PmcLw@mail.gmail.com>
+Subject: Re: [RFC PATCH v9 06/11] bpf: net_sched: Add bpf qdisc kfuncs
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	daniel@iogearbox.net, andrii@kernel.org, alexei.starovoitov@gmail.com, 
+	martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 03:44:03PM +0300, Tariq Toukan wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
-> 
-> Need to call xdo_dev_state_free API to avoid hardware resource leakage
-> when deleting all SAs from old active real interface.
-> 
-> Fixes: 9a5605505d9c ("bonding: Add struct bond_ipesc to manage SA")
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/net/bonding/bond_main.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 3b880ff2b82a..551cebfa3261 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -581,6 +581,8 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
->  				   __func__);
->  		} else {
->  			slave->dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
-> +			if (slave->dev->xfrmdev_ops->xdo_dev_state_free)
-> +				slave->dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
+On Thu, Jul 25, 2024 at 3:39=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 7/14/24 10:51 AM, Amery Hung wrote:
+> > Add kfuncs for working on skb in qdisc.
+> >
+> > Both bpf_qdisc_skb_drop() and bpf_skb_release() can be used to release
+> > a reference to an skb. However, bpf_qdisc_skb_drop() can only be called
+> > in .enqueue where a to_free skb list is available from kernel to defer
+>
+> Enforcing the bpf_qdisc_skb_drop() kfunc only available to the ".enqueue"=
+ is
+> achieved by the  "struct bpf_sk_buff_ptr" pointer type only available to =
+the
+> ".enqueue" ops ?
 
-OH, you do it here. 
+Yes. I assume it will be better to make this availability check
+explicit using the .filter you mentioned.
 
->  		}
->  		ipsec->xs->xso.real_dev = NULL;
+>
+> > the release. Otherwise, bpf_skb_release() should be used elsewhere. It
+> > is also used in bpf_obj_free_fields() when cleaning up skb in maps and
+> > collections.
+> >
+> > bpf_qdisc_schedule() can be used to schedule the execution of the qdisc=
+.
+> > An example use case is to throttle a qdisc if the time to dequeue the
+> > next packet is known.
+> >
+> > bpf_skb_get_hash() returns the flow hash of an skb, which can be used
+> > to build flow-based queueing algorithms.
+> >
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+> >   net/sched/bpf_qdisc.c | 74 ++++++++++++++++++++++++++++++++++++++++++=
+-
+> >   1 file changed, 73 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
+> > index a68fc115d8f8..eff7559aa346 100644
+> > --- a/net/sched/bpf_qdisc.c
+> > +++ b/net/sched/bpf_qdisc.c
+> > @@ -148,6 +148,64 @@ static int bpf_qdisc_btf_struct_access(struct bpf_=
+verifier_log *log,
+> >       return 0;
+> >   }
+> >
+> > +__bpf_kfunc_start_defs();
+> > +
+> > +/* bpf_skb_get_hash - Get the flow hash of an skb.
+> > + * @skb: The skb to get the flow hash from.
+> > + */
+> > +__bpf_kfunc u32 bpf_skb_get_hash(struct sk_buff *skb)
+> > +{
+> > +     return skb_get_hash(skb);
+> > +}
+> > +
+> > +/* bpf_skb_release - Release an skb reference acquired on an skb immed=
+iately.
+> > + * @skb: The skb on which a reference is being released.
+> > + */
+> > +__bpf_kfunc void bpf_skb_release(struct sk_buff *skb)
+> > +{
+> > +     consume_skb(skb);
+>
+> snippet from the comment of consume_skb():
+>
+>   *      Functions identically to kfree_skb, but kfree_skb assumes that t=
+he frame
+>   *      is being dropped after a failure and notes that
+>
+> consume_skb() has a different tracepoint from the kfree_skb also. It is b=
+etter
+> not to confuse the tracing.
+>
+> I think at least the Qdisc_ops.reset and the btf_id_dtor_kfunc don't fall=
+ into
+> the consume_skb(). May be useful to add the kfree_skb[_reason?]() kfunc a=
+lso?
+>
 
-I'm not sure if we should make xdo_dev_state_free() rely on
-xdo_dev_state_delete(). In xfrm_state_find() the xfrm_dev_state_free()
-is called whatever xfrm_dev_state_delete() is support or not. Although
-usually the NIC driver will support the _delete() if the _free() supported.
+I see. I will change bpf_skb_release() from using consume_skb() to
+kfree_skb() (existing qdiscs are not using skb_drop_reason). The skb
+cleanup mechanism when .reset is called can use rtnl_kfree_skbs().
 
-BTW, For me this patch should merge with Patch 1/4
+> > +}
+> > +
+> > +/* bpf_qdisc_skb_drop - Add an skb to be dropped later to a list.
+> > + * @skb: The skb on which a reference is being released and dropped.
+> > + * @to_free_list: The list of skbs to be dropped.
+> > + */
+> > +__bpf_kfunc void bpf_qdisc_skb_drop(struct sk_buff *skb,
+> > +                                 struct bpf_sk_buff_ptr *to_free_list)
+> > +{
+> > +     __qdisc_drop(skb, (struct sk_buff **)to_free_list);
+> > +}
+> > +
+> > +/* bpf_qdisc_watchdog_schedule - Schedule a qdisc to a later time usin=
+g a timer.
+> > + * @sch: The qdisc to be scheduled.
+> > + * @expire: The expiry time of the timer.
+> > + * @delta_ns: The slack range of the timer.
+> > + */
+> > +__bpf_kfunc void bpf_qdisc_watchdog_schedule(struct Qdisc *sch, u64 ex=
+pire, u64 delta_ns)
+> > +{
+> > +     struct bpf_sched_data *q =3D qdisc_priv(sch);
+> > +
+> > +     qdisc_watchdog_schedule_range_ns(&q->watchdog, expire, delta_ns);
+> > +}
+> > +
+> > +__bpf_kfunc_end_defs();
+> > +
+> > +BTF_KFUNCS_START(bpf_qdisc_kfunc_ids)
+> > +BTF_ID_FLAGS(func, bpf_skb_get_hash)
+>
+> Add KF_TRUSTED_ARGS. Avoid cases like getting a skb from walking the skb-=
+>next
+> for now.
 
-Thanks
-Hangbin
+Good point. Will do.
+
+
+
+
+>
+> > +BTF_ID_FLAGS(func, bpf_skb_release, KF_RELEASE)
+> > +BTF_ID_FLAGS(func, bpf_qdisc_skb_drop, KF_RELEASE)
+> > +BTF_ID_FLAGS(func, bpf_qdisc_watchdog_schedule)
+>
+> Also add KF_TRUSTED_ARGS here.
+>
+> > +BTF_KFUNCS_END(bpf_qdisc_kfunc_ids)
+> > +
+> > +static const struct btf_kfunc_id_set bpf_qdisc_kfunc_set =3D {
+> > +     .owner =3D THIS_MODULE,
+> > +     .set   =3D &bpf_qdisc_kfunc_ids,
+> > +};
+> > +
+> > +BTF_ID_LIST(skb_kfunc_dtor_ids)
+> > +BTF_ID(struct, sk_buff)
+> > +BTF_ID_FLAGS(func, bpf_skb_release, KF_RELEASE)
+> > +
+> >   static const struct bpf_verifier_ops bpf_qdisc_verifier_ops =3D {
+> >       .get_func_proto         =3D bpf_qdisc_get_func_proto,
+> >       .is_valid_access        =3D bpf_qdisc_is_valid_access,
+> > @@ -347,6 +405,20 @@ static struct bpf_struct_ops bpf_Qdisc_ops =3D {
+> >
+> >   static int __init bpf_qdisc_kfunc_init(void)
+> >   {
+> > -     return register_bpf_struct_ops(&bpf_Qdisc_ops, Qdisc_ops);
+> > +     int ret;
+> > +     const struct btf_id_dtor_kfunc skb_kfunc_dtors[] =3D {
+> > +             {
+> > +                     .btf_id       =3D skb_kfunc_dtor_ids[0],
+> > +                     .kfunc_btf_id =3D skb_kfunc_dtor_ids[1]
+> > +             },
+> > +     };
+> > +
+> > +     ret =3D register_btf_kfunc_id_set(BPF_PROG_TYPE_STRUCT_OPS, &bpf_=
+qdisc_kfunc_set);
+> > +     ret =3D ret ?: register_btf_id_dtor_kfuncs(skb_kfunc_dtors,
+> > +                                              ARRAY_SIZE(skb_kfunc_dto=
+rs),
+> > +                                              THIS_MODULE);
+> > +     ret =3D ret ?: register_bpf_struct_ops(&bpf_Qdisc_ops, Qdisc_ops)=
+;
+> > +
+> > +     return ret;
+> >   }
+> >   late_initcall(bpf_qdisc_kfunc_init);
+>
 
