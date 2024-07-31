@@ -1,196 +1,239 @@
-Return-Path: <netdev+bounces-114567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FAE942EE8
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:47:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12685942F03
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:48:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C18F41C2129E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:47:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 363FF1C21C9A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DD21AED3D;
-	Wed, 31 Jul 2024 12:46:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D851D1B29CA;
+	Wed, 31 Jul 2024 12:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="et2RB3eS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Omr9uNuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568301AE85F
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 12:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722430019; cv=none; b=Bav/f8NppoRApATpl3i5M3YFqP+uVIJsBePYF9CZOR6YM8IBHX+jWsieY1lpl012hdOifzQH/gt4c8eMe+De2ukxA308Z+d2dbXRaKdqtl8XOvWdpEcYEHTzJtHAjJty5yYmshGjVbjTzR/9nZ4fo3jWLYd6UeslMwZz+X6Xxe4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722430019; c=relaxed/simple;
-	bh=9UPvDjZj7omKIq+R/WkcdYc4X8qFyrkL1Uld0g/QkDU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MAZuqUJxSokBd9Jio93HB82riE+VZdvVwgvuJgUWxd0eQrOyaWdPvQJzNChTI3hVoXc5c8x9VUg/qn4nHQlIHMxmt/Fq/ZR29F/ezYeH7GjzwWtyvKrm0as2vLoXbFO4Jxw26b9w4AKroR1bdIB9X+YX7qVtjfQbEV8Hf+teeFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=et2RB3eS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722430016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NWAg3XJ7lRmViz7eWm0AuiImDEV7Paz7qFAo+DxnEWw=;
-	b=et2RB3eSb3hatQruiQfSNijjcKJ8McVx5XHpjCOIVA3pkCsMlXWLGY+lZhBB12ZAxScIWk
-	2g+Tr8lVel1Gtj2eSH6fIZF+EBpZdun19Jq6KD+CuvRcb3k2kq6fiycvZ6Jgfm1TjgSAT7
-	Keo7Wq85HpGqsp5TsQQOvs7H3hEyp5c=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-379-yhXpVd0YMo-tgqVn7B1NCA-1; Wed, 31 Jul 2024 08:46:54 -0400
-X-MC-Unique: yhXpVd0YMo-tgqVn7B1NCA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a7aa7e86b5eso518253666b.2
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 05:46:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722430013; x=1723034813;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NWAg3XJ7lRmViz7eWm0AuiImDEV7Paz7qFAo+DxnEWw=;
-        b=jpaJwb+kgesz09ctJ0FxeMsHCzd0fJkuPtnGcfCoBn8DMovLseo8gQnBzq8iFKQWI7
-         4x1QX+R3kfuNp/vhembjcWVZ+ghJi4A/dTHaE+TzcDzAZ1fQo/5FN4VgBxnr5XX/cfIO
-         H0/sYSbgmRcspouXb3vA+v2dGNMeECSxSDTt9aw7aWw2048Ou2MUsg4+pFMM9yWui9F8
-         zX9VDcGQz3zS5KklxCsG1Z6DdT1JawK0ytgEf/uCfqSxlRNCZVubLISAPb9+sBdTBfcS
-         iWfuBV4DZ+f52I19YPGemz2cdjT+IFlq++BLS6WiOHkBM1JfTaL3MQjYCAQhVgPN9mR2
-         lAeQ==
-X-Gm-Message-State: AOJu0YyjnWS+WHgNkqU0iOXSnz+d+OGMC24yfjDcEirAf/psohYQRh9v
-	jIzlRsQDVCHMFS3dkvalzmfzMLrAXdMIZ5lH29O3PZ0o5o8ZT/9nIIonR1aHFAXHvflqRdl0F4t
-	mJQFEg7/f/pYK+HYCMWgUtjN5qovmOi+GLamNrLZ7Z4DpVc60poVGmQ==
-X-Received: by 2002:a17:907:801:b0:a77:e55a:9e87 with SMTP id a640c23a62f3a-a7d40116a40mr909915666b.48.1722430013096;
-        Wed, 31 Jul 2024 05:46:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGViNLur3vjF6ZbGgoVg8yVsxu213V+7vQF63GW+BvUWRfICnkA4QVWqssZQovjshHinyRmyg==
-X-Received: by 2002:a17:907:801:b0:a77:e55a:9e87 with SMTP id a640c23a62f3a-a7d40116a40mr909913466b.48.1722430012291;
-        Wed, 31 Jul 2024 05:46:52 -0700 (PDT)
-Received: from redhat.com ([2.55.14.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab580b4sm761021266b.58.2024.07.31.05.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 05:46:50 -0700 (PDT)
-Date: Wed, 31 Jul 2024 08:46:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev,
-	=?iso-8859-1?Q?EugenioP=E9rez?= <eperezma@redhat.com>
-Subject: Re: [PATCH net v2] virtio-net: unbreak vq resizing when coalescing
- is not negotiated
-Message-ID: <20240731084632-mutt-send-email-mst@kernel.org>
-References: <20240731120717.49955-1-hengqi@linux.alibaba.com>
- <20240731081409-mutt-send-email-mst@kernel.org>
- <1722428723.505313-1-hengqi@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B1C1B1427;
+	Wed, 31 Jul 2024 12:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722430067; cv=fail; b=d1H/92vCu8Zl5FrlvQb1XkTn2+khyuRSLPfRqGaC5Lzbb7wwSO5iFJAnvxXBNZPk8c4cPvxcwwFI09mx0t3TkzN1vAWvC2jOGKyv+qmF6cUzLgWqzIlXtAHUwy9XS4wbGHKw2G9/NcU+xOv+VfFmTnBAA6EvfRS7KpURgBP6nzs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722430067; c=relaxed/simple;
+	bh=/a94/tLcTq0F2MKbH4YHNZNKNsVer5CYElZSgdDmCYM=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hdaWtQoeTGWfqEGSxdHj91Ugqfu/Ra6FKxxFHhJVWp74/itbZjupt7sHpwd+t99aTYgRLzq6XxCfteMnRb/AvOWOvMZAZ5KzaPdmTMyJjoRGi9Or5/cMZuKeELF//hbjkaFzjrDm6zbhgR2SSJVPaz1xscFyM21HOG5HH0YwwRM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Omr9uNuc; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722430066; x=1753966066;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/a94/tLcTq0F2MKbH4YHNZNKNsVer5CYElZSgdDmCYM=;
+  b=Omr9uNucWmhH2Gi+t+7JBw48+8gA+YSg0d0AJ7Dz5/n2YtBKCRttHtcQ
+   vFW8ykq6/qRJWB1Zv86xC3t/4ib0ABjNdFDR88zzln5qJ4TvVP25Ux8KO
+   JT1dBPiEt7M0dAnpXZL5z6Sacj+DB6Ddspi8rTgAlQYi3AKE5sFVXqkvT
+   JsdvlURsf7uHggwTF2lyzQd4KpWYktkx6FpXaOPa/9SWti4ST3HR9shiz
+   a5G8ZoU0ns7AbG8uQW5vKojKFN8bcaFr1RuvNPmdn2DsYvP1Qyn/EAKKd
+   ZUbtcwj6am3WtbrnYgUIeWbaF1mNZUiWvjfGKAQSdpRCHhQjXcfue1AzA
+   g==;
+X-CSE-ConnectionGUID: DCKKXuyuTPKjnXKylqzbjQ==
+X-CSE-MsgGUID: /fLZyZmiQsyRV6dQebxtNA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11149"; a="20253145"
+X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
+   d="scan'208";a="20253145"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2024 05:47:45 -0700
+X-CSE-ConnectionGUID: sleV773UTfurEnvjzKycSA==
+X-CSE-MsgGUID: U46S+vTPSCqSXDJWeF0nIA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
+   d="scan'208";a="54922003"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jul 2024 05:47:45 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 31 Jul 2024 05:47:43 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 31 Jul 2024 05:47:43 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 31 Jul 2024 05:47:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qi6scNO22eaYJZGGCvTGBEp5Y9a5o2tEhbV/1hr+UGPKjkTci8b7Zd/1Y0GNe9abaVzapXdZFIqxRaWE4tInaod47U9oKDucYvxyIwrUqwxITlF9RHgcGHrumKRw6Fhr55GbWnQX5Z457w35/M+gkHjpeoy+jOvPTebEJcejDsLXjmO1b00PyNYHszg2t1HuMN/5WIKpbfyITf93gnlKrARquSnxhR20+4xYZR3b4QSuVtUnLKLlPVpJebQ3lWpBf1b4ipW62yxzUO5Pe89zg/RgXfQ7HHU8LrMk7SHUzA8WokYYAIEtval9G+LMIfwe3D4H0D2Q6S1J00v11sGRCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/hKBxsrbs2OxWbOmaLwx2aAeJonhSQ1O+aHHjnozs3w=;
+ b=y16M65cM68O3mZ+oR7B218woFGm0w7A/6gu8zDtA8CGka/yd4OvXoZ4maKCXV0zOozRZlwGCv4QG99LN063UirtppPXeMa353pACEmlzlMF8044Bg6rnNaIzEGAWAZjga52bythJYwTM2t9wbwriUx2JBQD7j1QtsGeOIJcCAcgWoGuCOmf18xRo3x97MX9R7RWBPFV5FdyWfHmcKMAXQJq1KBDlju3uWIzOhjPSxCD6aq2xhwXCVoJ4a9dJxklC10J4rs2bHOS5MYCKAUMctAC782A701RSjrjqhg/l6LpZq2lnxFBAl9SCczTMKghd0duvBgGo+q11S9KH5wp6tA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by DM4PR11MB8227.namprd11.prod.outlook.com (2603:10b6:8:184::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.19; Wed, 31 Jul
+ 2024 12:47:41 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7807.026; Wed, 31 Jul 2024
+ 12:47:40 +0000
+Message-ID: <ead1f11f-c4af-421a-8e41-6a107ecbccbc@intel.com>
+Date: Wed, 31 Jul 2024 14:47:30 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V3 1/3] net/mlx5: Add support for MTPTM and MTCTR
+ registers
+To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Eric
+ Dumazet" <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, John Stultz
+	<jstultz@google.com>, Thomas Gleixner <tglx@linutronix.de>, "Anna-Maria
+ Behnsen" <anna-maria@linutronix.de>, Frederic Weisbecker
+	<frederic@kernel.org>, <linux-kernel@vger.kernel.org>, Bjorn Helgaas
+	<bhelgaas@google.com>, <linux-pci@vger.kernel.org>, Ingo Molnar
+	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, Carolina Jubran
+	<cjubran@nvidia.com>, Bar Shapira <bshapira@nvidia.com>, Rahul Rameshbabu
+	<rrameshbabu@nvidia.com>
+References: <20240730134055.1835261-1-tariqt@nvidia.com>
+ <20240730134055.1835261-2-tariqt@nvidia.com>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20240730134055.1835261-2-tariqt@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE1P281CA0084.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:78::11) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1722428723.505313-1-hengqi@linux.alibaba.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DM4PR11MB8227:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7634f2ca-03cb-4df8-dd0f-08dcb15ef6d6
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UFdyUndYU3ozakFlSW5qVjFvL0JoRG9JL1A3YmNqWTZlVkVlZEZ2ODFKMExD?=
+ =?utf-8?B?d3ROYkkralB1akFGUko3OU9IQjdMMWRZRDd4dXV5THd2eUFJSmF4UW1tVnNt?=
+ =?utf-8?B?V1NsdGppbnI2YjlhaGx3NGIzUlVMRFRUMGZVbjE4ZlRibzJDdHBOYWFad1Bq?=
+ =?utf-8?B?Q1hFdmVvNk14MHBvbHh3dnJ2S2ZkcFRZLzZWYW9MZGx6L1lwSnZ2SDZnL0l6?=
+ =?utf-8?B?WU0ySFdUQjR4N2FoUnR6djZhdjFpV0UwV3BYVGxSSC9BcmV0RVloeE1sYXVi?=
+ =?utf-8?B?YnlFYWdQY0NnRW1YaCs3YjIyRm55RHBuUVNYR2tVdktLajdVQ2gyckNTRlE0?=
+ =?utf-8?B?V1QyeVBVU2JwMnZ1NXRrRE9SbE5nbHhId2R4c3RrL2hvRjRwVWhiaHVRa3pW?=
+ =?utf-8?B?ckIzZDFYeENhOWF3NDE3WllWc0xTYnBMdUpsZ0h4ZFAwTWxuWFFqck9POFBm?=
+ =?utf-8?B?Z1lTbTBJVHc3SmhYRXVGRkNOdmIvRmJpeEU5aHpEZmsvclNsT3hTNE5tRS9n?=
+ =?utf-8?B?UWpJMWREMzA2REFTaWdpSWU2enRwVlBsZittWnhJcHNxRG5qWU5YQWtRWHNB?=
+ =?utf-8?B?Mzg2OUVJS20vV2xpN1FOd0hhUFJsaVJ3NGJnUWJrSk1hRzhuUHhZd1k4d3Uy?=
+ =?utf-8?B?UjNmVElJK2puN3dNZUJrYy9TOVR0UjN6QS8vWHlsMWdpekF1R0h4am1NOGlL?=
+ =?utf-8?B?TWl5UTlqVlpXV2tERHhrQ0NYc2JiQVF0VWZ0aTk2K2NTSVNxdFFjcTZzVGZF?=
+ =?utf-8?B?QnZMZ1F0QzljNldRdG5TcjFBSUY0bEdzYnZCK2pnWTZXUXNuVEpBTWRYTHM3?=
+ =?utf-8?B?ckJRUEMxUlB3MTNtb3NMU3phc2xnMGxJVEJ2elVGOGVJWUN2bSsyUnY1eXZL?=
+ =?utf-8?B?UU13WjNqUmdFcEJMejB2V0hjZTNoQlEya3VtM0w1Q2NyTkwvRUlyYjlKZXJX?=
+ =?utf-8?B?b2hZTDVsL2pLYjNBeTBOZGJWTWVSbVVVaG5DYUF5R1pCNXlVb2FmTjJEcTFI?=
+ =?utf-8?B?azJRTlhkZDUyek1HSVpTWUtSY1JHMjFrV3k4aU8zaFUrTjkrM2lmOTZQbjhZ?=
+ =?utf-8?B?KzN4NFh0dmRtK1lKc0NtaEpWZ0toVllMLzJmbktNWmRjdmxiRXFZSktxc2hF?=
+ =?utf-8?B?c3laSVBZL0d0ei81UjFIc2pmaFZuTFFVR01xSldnWWVLS2JYWWJ4L2FtaTVY?=
+ =?utf-8?B?bUlONXJKcU5KY1FmRnVzeXJEdnlLT2tXT1FKRW5XaGdyYUE0cCtlRUJLbWJs?=
+ =?utf-8?B?LzQ2cis4M3U3RzBkTTFBRzNKTWNxV2QyK0g0Yis3T3lVL3Z1RWltVWhEd0JO?=
+ =?utf-8?B?dWU0cFZsUFRvY1JIalR0UzIrclowNzlYcmdIYW54Tk1VMkxuUXY5bDhtRnE5?=
+ =?utf-8?B?RTdDeldPb3FSNFgxcWNjZUJtMTVubWY3MVRFd1ArTVpRWDI0N2RMVXBFVmhY?=
+ =?utf-8?B?UDNDWFYrVUlUWmlkMitEb1dQV2NrdzZHbzNOeVphVjduL3d4RjlIZ05FSGFD?=
+ =?utf-8?B?YzIyeFRZankyRFV2Mk5yc0RqVnpjQ2s0dGNuR1VTYzA2U0FvL3IybjNPKzlh?=
+ =?utf-8?B?RThHd1dCQnUzTWN5aEFkMG85b0VSak5rQ211QzlWRmROdWRWYlAza0pxQ0RX?=
+ =?utf-8?B?akt6QmxsZmVnSEJkaWhIRFUrUGpvWld1Smp5ZVliZEhScjltQ3lOV2QwNkZG?=
+ =?utf-8?B?cXdIMkxMN3NHNWpGdnQ5Nys1QU1kcTlhUDM0TTNYWFNWckRwL1EwSUt4WWo0?=
+ =?utf-8?B?T1FKWnZKeFB6Qzh5ZW5ENnVKb204cldtUmJ5b09KOUd1RGVZQmo1c3BoWmFB?=
+ =?utf-8?B?RkRlbkkxZU5GNmFNckR0UT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WWRIYVhRN1Z2OWM1QmlYb3NrR0NHUlJQclZBSkowWklpcjRXMTQ0V01YN29u?=
+ =?utf-8?B?aUF0WTN4TFU4NkU5eFVSRjlqSTdBd0tIYTMzekFpYzZBQ1Jmakh3S29GWUNx?=
+ =?utf-8?B?SjlDT05xL0dVM0xmVzJtdUtnVjdPanZNTjgwS0U4K2FRUzFZOERFTjlIVFBQ?=
+ =?utf-8?B?YldTbUlUaDVNZnUwdmJtRWRDN2hGQ1ZSeHQ3b3dONWlCbUdUZzBMd21ycUlr?=
+ =?utf-8?B?d0lmdFJuOXFiblh2di9JanE4c0FoSkZCWXVodHhxY3JSeVlMZVRFVzhlOXJi?=
+ =?utf-8?B?MW4zYWxmNkY5S2lwQ2JtWGhQVmY3WStpa2NtNnpvYThSZUhIUi96anVBakhq?=
+ =?utf-8?B?c1lEclRzSnVIVmlDZ3N1Rms3b3ZqRmFlZTJsdis2dm9ONWNXS1N4bTFyOEY3?=
+ =?utf-8?B?djRDWlhHYmlvOTEyMCtmYTZ1ZU1Rb1hFRW4vaXZlNW1TQyt5M0I5R1NFKzFS?=
+ =?utf-8?B?ZHJoNi9QOXE1a25HZ0pFa1paOHVvRS9OY2FjcU1adFJGTGJkZVNBREo5L1Ex?=
+ =?utf-8?B?cjlJOEMzQ1NudGdCNms3UXBtNXpubERUd1VYTFEwcjRlbXkxbHRaanQwT0hJ?=
+ =?utf-8?B?UDc4bWRHOEVmSDdYK1kvdy94VTRmUHJNNU1SZFdqZGR1Z2VnV1BiN0lxS2k3?=
+ =?utf-8?B?RjF0cjZFS0RnVjNQN3BRQjgyQk1OV3VBQkl0RGpuR0hhRS9QREtZUk4zTGxi?=
+ =?utf-8?B?dmhnRzZrNGorRmNxZnpoWlRWeHRyNlI5TWZ2bWVwa21QU0tjWTRCWVZOT0Z1?=
+ =?utf-8?B?aHpOeDhrK3N4Q3lyekppbitDSi9INUVkMlpnSEl4VVpuMmMwSVFSMGFQSUtV?=
+ =?utf-8?B?OER2ZERycHA5TW5VcG5veFM4VG11RytiWUVwUndRbVRwZlorTjE0WWYyZitZ?=
+ =?utf-8?B?MzVxaUh2bTR6cks0SE1BbVdHcVNhcE5EMGxUZWdEcVp6VHRPYVhJVk13R2N0?=
+ =?utf-8?B?QmhVQVFIeWpzV0VaUWFVZXk5Ui8vWWxCc1o0Z1l6RXdBMnpxZVZTR2xlWlB3?=
+ =?utf-8?B?djZUdkRsY2ZLTWUzWHlNSkt0b1IvN0ZFMGNZVnZ4VkQ5RGVhYWhHV2o2L1Iv?=
+ =?utf-8?B?aHVEaURRMGoyc3RPQ2lsR2hmZno1eDZRc1EvS09zczdnU3lmWVdHaHM3VFMv?=
+ =?utf-8?B?NExRZXVsRiszQ1J0RC9lWXRzK1dCMGNiR1lPNDlkUEhuVm9NV09YVFd6eWgz?=
+ =?utf-8?B?Z0R3Z21CdHQ4eTBTeFozTkE3REF0ZlVOQU1VWHhyUVY4S1JTRkR0NVV5UVR0?=
+ =?utf-8?B?dlNQVG1SM3JWenFTYURnMmV3MGV3dkU3MHhwYzZzWTk1akRGQmZOSWcwWjZh?=
+ =?utf-8?B?b2NlMDBBSmVPWFlNUHQrQnNpWEhxM0w1Vkp0SHhBc1JhQWxrcEg5OWVMQVVH?=
+ =?utf-8?B?Q0JUWXBiYjdqeGhBWk4xQmhaV0cySjRqYTBOUnZ1UTlzL3lCeVAxV1RBM1BM?=
+ =?utf-8?B?TVFucXRlOC9tU1I0TTZnbGRnUDM5Y2VodmdCMldpYW9pUWd2RklUU2wxdmcv?=
+ =?utf-8?B?czlWbEhlZStRR2kyc2hHUkFnMTA3TGszNjZBRjBMcGJUSFRPZmkvT2RGT1cw?=
+ =?utf-8?B?dys5NVVyYnMwUWdIM3hscHBtT29KQWFXSDU3YkNoNG9BZ1RzUkhialZsTWVG?=
+ =?utf-8?B?Q2pjUExlK3RQSHZWd1lOUmZqQVBMcTJnMTRIdkRQUUpMZmVEWXFmMUdvaUNv?=
+ =?utf-8?B?N1p3YjhNM3ZkSU10eG1QSEQ5N2hrcmNWWXBvUzFDTFNKWXByT0FNeHBVTmg3?=
+ =?utf-8?B?My9ncGFSVWFKcE1kbjVGcHQ4TTE2OVRQWlpYRXpYdmx3R0VYK0I4Ui9pZ3pl?=
+ =?utf-8?B?d3NUR1JobDBudS9NRWJkQStsT0FzekRKdDBCK09JNW9QcFJzUWNNQnpsRXF3?=
+ =?utf-8?B?c2JlNmZEZXdvcnJab0M2ZEh3dVNYWFlBeWlGeWlseEFhbnMxTnNPeFkzNStC?=
+ =?utf-8?B?TWdHc3d0bDlzVGJwM0ZMSE9Kek9Fa3Y4TWZMbFZ0M3F5d3FvT0d3MFFYMWVw?=
+ =?utf-8?B?L3VDVlZHVzdPVjdPVDJiM21WNUVVbWxXZ0lzUUhDMExmMHEwRUlxN3dkdS9r?=
+ =?utf-8?B?YTg3NU9TRlhya1FPNExzSitsTzR0elp5T2lGcVFQNnlNR09yeVA4dFBBRVZu?=
+ =?utf-8?B?VDNodXhySmp6dEF0d2pJQnpBWUZCanZSbjAyZTFhZEtrZ1RuUTkwZXlDSlNE?=
+ =?utf-8?B?NVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7634f2ca-03cb-4df8-dd0f-08dcb15ef6d6
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 12:47:40.8851
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UDfToYBH8jp4GZouCOjviTc0fmPmwApvEKNkk04xsuUZSjUGYCDNlH1GrEfpDbVy7wNFuUsJGV8r8frRS6Fvy4xdnuXn1i2UdP3At68jsjw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8227
+X-OriginatorOrg: intel.com
 
-On Wed, Jul 31, 2024 at 08:25:23PM +0800, Heng Qi wrote:
-> On Wed, 31 Jul 2024 08:14:43 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Wed, Jul 31, 2024 at 08:07:17PM +0800, Heng Qi wrote:
-> > > >From the virtio spec:
-> > > 
-> > > 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-> > > 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-> > > 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
-> > > 
-> > > The driver must not send vq notification coalescing commands if
-> > > VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
-> > > applies to vq resize.
-> > > 
-> > > Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
-> > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> > > Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > Acked-by: Eugenio Pé rez <eperezma@redhat.com>
-> > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > ---
-> > > v1->v2:
-> > >  - Rephrase the subject.
-> > >  - Put the feature check inside the virtnet_send_{r,t}x_ctrl_coal_vq_cmd().
-> > > 
-> > >  drivers/net/virtio_net.c | 10 ++++++++--
-> > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index 0383a3e136d6..2b566d893ea3 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -3658,6 +3658,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
-> > >  {
-> > >  	int err;
-> > >  
-> > > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> > > +		return -EOPNOTSUPP;
-> > > +
-> > >  	err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
-> > >  					    max_usecs, max_packets);
-> > >  	if (err)
-> > > @@ -3675,6 +3678,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
-> > >  {
-> > >  	int err;
-> > >  
-> > > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> > > +		return -EOPNOTSUPP;
-> > > +
-> > >  	err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
-> > >  					    max_usecs, max_packets);
-> > >  	if (err)
-> > > @@ -3743,7 +3749,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
-> > >  			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
-> > >  							       vi->intr_coal_tx.max_usecs,
-> > >  							       vi->intr_coal_tx.max_packets);
-> > > -			if (err)
-> > > +			if (err && err != -EOPNOTSUPP)
-> > >  				return err;
-> > >  		}
-> > >
-> > 
-> > 
-> > So far so good.
-> >   
-> > > @@ -3758,7 +3764,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
-> > >  							       vi->intr_coal_rx.max_usecs,
-> > >  							       vi->intr_coal_rx.max_packets);
-> > >  			mutex_unlock(&vi->rq[i].dim_lock);
-> > > -			if (err)
-> > > +			if (err && err != -EOPNOTSUPP)
-> > >  				return err;
-> > >  		}
-> > >  	}
-> > 
-> > I don't get this one. If resize is not supported,
+
+
+On 30.07.2024 15:40, Tariq Toukan wrote:
+> From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 > 
-> Here means that the *dim feature* is not supported, not the *resize* feature.
+> Make Management Precision Time Measurement (MTPTM) register and Management
+> Cross Timestamp (MTCTR) register usable in mlx5 driver.
 > 
-> > we pretend it was successful? Why?
+> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+
+>  drivers/net/ethernet/mellanox/mlx5/core/fw.c |  1 +
+>  include/linux/mlx5/device.h                  |  7 +++-
+>  include/linux/mlx5/driver.h                  |  2 +
+>  include/linux/mlx5/mlx5_ifc.h                | 43 ++++++++++++++++++++
+>  4 files changed, 52 insertions(+), 1 deletion(-)
 > 
-> During a resize, if the dim feature is not supported, the driver does not
-> need to try to recover any coalescing values, since the device does not have
-> these parameters.
-> Therefore, the resize should continue without interruption.
-> 
-> Thanks.
 
-
-you mean it's a separate bugfix?
-
-> > 
-> > > -- 
-> > > 2.32.0.3.g01195cf9f
-> > 
-
+<...>
 
