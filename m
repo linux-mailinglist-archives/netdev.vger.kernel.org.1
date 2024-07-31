@@ -1,99 +1,126 @@
-Return-Path: <netdev+bounces-114537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54F5942D98
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73404942D9C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E90EB23E0C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:57:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE071B24F71
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33231AE871;
-	Wed, 31 Jul 2024 11:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647D11AE843;
+	Wed, 31 Jul 2024 11:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="G1Lt/utK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823E21AE86A
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 11:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F9B1AD9FE;
+	Wed, 31 Jul 2024 11:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722427024; cv=none; b=F1h0JC2wdT3mPSGRiG/tSOJw/NhueihlrcqmMfZs119VLrNrg4/wcwg/vA+AjCKgJydoG0AXv7npiQisUka2xH4XQQrgNdHr8/2k35DlPjQkKw9aW56uFkC8aGTPMm/aqYxmGQctQwVEfw0gHdVfIVI7vEpMXrdONEBqqt7gbjw=
+	t=1722427039; cv=none; b=CnZI7t2ECux/pdOTI2aX5MAgLHvqKB3dKQPBTniQkOHlOWv4O8wLtcM3A4S76rkyJYu5V8IT85YaEoTwYAgNCn1aZyzktKsYvEwQgfXKkVh2McvzgSWyjv6sDVzTc8ms/jIC4Sxh1BSrWsdcuRZX/7EdcqpcxJAp/jQMHO3rY7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722427024; c=relaxed/simple;
-	bh=hQUoUT6P370vSdku525I9ZyIqVpjyDqZTAwNNZoSxuo=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ronZmex5t1svpYx6xQHyvQycMRwQW60A0+bhDti2c7fqWmM44mp1pqj3hlvNCPYiDgYOFplPM34zXDs+vYt5US8136Qj58hm6P0ehOjqPDgHFfCBlAQq4ikSaLDqjj9qQ7FLm3TULPVM2+A18MKdjA4NPkA+9BB/gDkyITOQTxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-39b15a6bb6dso957995ab.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 04:57:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722427022; x=1723031822;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xSrgeN+yuzirQre8G4sG5Sw6kVPo4mH3hIOR53sJbwQ=;
-        b=aWBE6Xig2ifAGDn5qKQFNEn9NMwg4Syyu9nbtWYL/WTVMHshSlgLDVBEdE37yCkNrU
-         fDK5eLiYb30NUjj88FM4kNsA9lP0CgQPTC1ZzW9tcXzfi7F/azQmziSnSiXbehrEtH03
-         OgZE/aOvnaPGnT3P+CEcC+bIfexK0YgGAChlxidHt2FqKIA7DZVJ8hazU+tULdXFC96L
-         XLdsbJRy9SJIQyohkrTfZEhXXqv3oZIsCLiOZGMfFc8iYz2wUWbQiQiVLer3gdCxJUxP
-         rOg8XSg2ZqkMWgs8wIZaJu3ZiywLxZS/j1hvSYE+TVnw4TeNbqFMKQf6yFz4ws20Oh3Q
-         /WbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXONb0tq5QXlY7ze80z5DQ/i6eKxIyBo4cnds8EDMRe4wREN3SYYzCekOzgQoSgJ/gQe/WoFgnjWyMolTB8+Mw60uJz1hmD
-X-Gm-Message-State: AOJu0YzePUAPRAbCmhITJwAozMaj1JpE1YXoyiiD7DpehMwnXfmJXJXP
-	NNuONfmsRGutt5IftO0J07h9sPCOZ2VjBTVl2Z07xbZynHLhzDAaGG/noiDPeW0If6jjrSxRdmo
-	fHwOXkpBbuG0431ZP7Z+WmgA4sdcYSn4Y1bkBEfT6sOkOKxXiKglPMV8=
-X-Google-Smtp-Source: AGHT+IG6yJHm71PfnjSzpzV2tajfrhXIQF3DZ9LmFmTF0gSF9zc7EprT5Loy3CMpp2Oq1hqsKdRV7a+B3kc8FcJHdRu9wenzlL2s
+	s=arc-20240116; t=1722427039; c=relaxed/simple;
+	bh=avyJzW8MxcO5PnzXK6Ore+dV935Uwlyob7bkoSanf2M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OzrbVLbNHqZv5Ko3Q87U1GDARX9kglCjuFR0t9eGpEMfoQAKd9liVFJd8IEk8STcgI5zrJvmLzYkamDMF2qDxyJcXycrLtPWsXGvc3KkMkEruSnrIyMxYLHI5fnAgY88FHaaZFxBQSmgJsQ00mqnSr1dfLdh3xR3/dowDwK10Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=G1Lt/utK; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=XLQCORnhhFbuAzj/kW08+Pd+TGYLYPcaApMF1xGDZzA=; b=G1Lt/utKMvdmJJzxBVRhCyzHUu
+	MTfaPdkCgH/U2AZFVFM3Vr8mHS+mSo1eGzzJi/rqnMG2sG3S9bVqQ1q1VoyNq/kvnAcEg3DLBWk35
+	XJBLYmOTy6sz1P5Vg8OzQxJTfsW0rkiUU25kaJSAlwFQiTwwHAm+M8cFUKr9OpYBixIT8PjOzEDv+
+	giVZS0PqhfePKQDrzBmllleJDRWB9nqry1/oGCAJPbTpTPS9D+mS4c/fi4XPap6UTY2tSRfyZNVrb
+	DR5oP4ITiJ41ZAH3d+ejlcU6wsvbiEEUszB68RIEJ2Iz+iXriCzJYSwIVVfyM7tG2dILDld34dwUs
+	hszDpDAA==;
+Received: from 22.249.197.178.dynamic.cust.swisscom.net ([178.197.249.22] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sZ7x5-0003sj-84; Wed, 31 Jul 2024 13:57:07 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-07-31
+Date: Wed, 31 Jul 2024 13:57:06 +0200
+Message-Id: <20240731115706.19677-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aa2:b0:381:37d6:e590 with SMTP id
- e9e14a558f8ab-39b06af47damr3064295ab.2.1722427022641; Wed, 31 Jul 2024
- 04:57:02 -0700 (PDT)
-Date: Wed, 31 Jul 2024 04:57:02 -0700
-In-Reply-To: <00000000000022a23c061604edb3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d61bb8061e89caa5@google.com>
-Subject: Re: [syzbot] [usb?] INFO: rcu detected stall in __run_timer_base
-From: syzbot <syzbot+1acbadd9f48eeeacda29@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, brauner@kernel.org, davem@davemloft.net, 
-	dvyukov@google.com, elver@google.com, glider@google.com, 
-	gregkh@linuxfoundation.org, hdanton@sina.com, jhs@mojatatu.com, 
-	kasan-dev@googlegroups.com, keescook@chromium.org, kuba@kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, linux-usb@vger.kernel.org, luyun@kylinos.cn, 
-	netdev@vger.kernel.org, pctammela@mojatatu.com, rafael@kernel.org, 
-	stern@rowland.harvard.edu, syzkaller-bugs@googlegroups.com, 
-	victor@mojatatu.com, vinicius.gomes@intel.com, viro@zeniv.linux.org.uk, 
-	vladimir.oltean@nxp.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27353/Wed Jul 31 10:27:25 2024)
 
-syzbot suspects this issue was fixed by commit:
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-commit 22f00812862564b314784167a89f27b444f82a46
-Author: Alan Stern <stern@rowland.harvard.edu>
-Date:   Fri Jun 14 01:30:43 2024 +0000
+The following pull-request contains BPF updates for your *net* tree.
 
-    USB: class: cdc-wdm: Fix CPU lockup caused by excessive log messages
+We've added 2 non-merge commits during the last 2 day(s) which contain
+a total of 2 files changed, 2 insertions(+), 2 deletions(-).
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14f906bd980000
-start commit:   89be4025b0db Merge tag '6.10-rc1-smb3-client-fixes' of git..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b9016f104992d69c
-dashboard link: https://syzkaller.appspot.com/bug?extid=1acbadd9f48eeeacda29
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=145ed3fc980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11c1541c980000
+The main changes are:
 
-If the result looks correct, please mark the issue as fixed by replying with:
+1) Fix BPF selftest build after tree sync with regards to a _GNU_SOURCE
+   macro redefined compilation error, from Stanislav Fomichev.
 
-#syz fix: USB: class: cdc-wdm: Fix CPU lockup caused by excessive log messages
+2) Fix a wrong test in the ASSERT_OK() check in uprobe_syscall BPF selftest,
+   from Jiri Olsa.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Jiri Olsa, Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit 039564d2fd37b122ec0d268e2ee6334e7169e225:
+
+  Merge branch 'mptcp-endpoint-readd-fixes' into main (2024-07-29 13:31:28 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 7764b9622db4382b2797b54a70f292c8da6ef417:
+
+  bpf/selftests: Fix ASSERT_OK condition check in uprobe_syscall test (2024-07-30 13:42:24 -0700)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Jiri Olsa (1):
+      bpf/selftests: Fix ASSERT_OK condition check in uprobe_syscall test
+
+Stanislav Fomichev (1):
+      selftests/bpf: Filter out _GNU_SOURCE when compiling test_cpp
+
+ tools/testing/selftests/bpf/Makefile                    | 2 +-
+ tools/testing/selftests/bpf/prog_tests/uprobe_syscall.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
