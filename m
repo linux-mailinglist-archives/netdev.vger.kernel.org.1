@@ -1,126 +1,326 @@
-Return-Path: <netdev+bounces-114653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEA8E9435A4
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:30:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00779435A7
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F79F285067
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 18:30:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8D31C21F6A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 18:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08E245C14;
-	Wed, 31 Jul 2024 18:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0933145C14;
+	Wed, 31 Jul 2024 18:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AQdFSpcn"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="pcwV+rIM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [45.157.188.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392E93AC2B;
-	Wed, 31 Jul 2024 18:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155FD629E4
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 18:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722450613; cv=none; b=S8JdQv1/B6KY0/XNJ1EEl0Dbpod2iKiv8l+PGa6ey3LLRNdnWnQUcUOjoxelOkTY5GZVsvrq8qw78xz6D7yKKBhOb0JghPTOtmNx659xVs9V/yNqJMia3cgi6z8bJE4vy3IVZazJ6LIGNadb6hEQl3zZqprQH+YkcoqZa+PIQvc=
+	t=1722450622; cv=none; b=PZT+0IMKBgYXxrTIpX6tMKTiw1gEzSZRSm8TFTeQhMvg4IAr8hm0ubaxoZaD3h6zwSulM7m80RwEAOOzC6XdusQCtHLvwj6AziuhdMjc8iCdWVmGY/mCQLlscjxlN22Gp30/fxK52txtBEH0khgrDRQz6f7O892h0TewRc/UuPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722450613; c=relaxed/simple;
-	bh=xzFKhRbjcnKDzmXujqezge+NtoXFykA/WIDmhHuWCIs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uflTafZFlLkxHse2RQe4CXIJq+8YL6NOxI9PK2PXzytuf784zfSNSsQUQSNy1IGn2kv6S/sxFCUfSGm6JtVcGXqqErT7tCoTBmxk+JDfp1pItGx4zPKZ5+/cylrgtgpOtp0Gkpj4iZKyJ8sOdycWn1U7qQeULDzxXlcl9QfkLwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AQdFSpcn; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-367ab76d5e1so2322645f8f.3;
-        Wed, 31 Jul 2024 11:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722450610; x=1723055410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xzFKhRbjcnKDzmXujqezge+NtoXFykA/WIDmhHuWCIs=;
-        b=AQdFSpcneG5czLwTsupGpDzFheGWgRp1C6AL9ngReyQgZwNpdQiJJt3/Wl8VkSmLce
-         0bXBsD+VyRnTXCs2nd5mM/qPQ8LEeSZHV2+M80sPuAMJu4mKzc1yIJgoJwNoGhOwBgXp
-         NUoyduQMxuCliHPtRkbyiFDT3TWp9i1J8XvQ0nFaFatoOj5OnDF+oYikJMEQbfLxTfvL
-         t73eNQ+AhKH0rl7dgzErD6eiiamXgqBlFT6YR9wQ20fCAjFtIXPtYjnYw8RgN5TKtrz6
-         IOnVJT5wXrFxftgEwLVQ6/zqIkJsoX0uCy2oZmqtcAGLDR7vdoc5xMaJv4JxQejswDRl
-         oz7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722450610; x=1723055410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xzFKhRbjcnKDzmXujqezge+NtoXFykA/WIDmhHuWCIs=;
-        b=pt0t7VZ8cX5G3Lufw4jIu1UHlvVhIbsb8kXA7wWD84C+vo7f3jpCpOlMJ2wbxXkKMJ
-         Gqhfs/5Edc3/4K54ZaXflu8+fabqOBtZCnDf1C5ugLaSBEgYosEZFLyQL0fGqOQZpYue
-         sSgz7NbVrLVO2KUpakUz2Zx4VX1viFr+I94dnRslcwOBfx5qea4bfyh7ban8dvChCpxD
-         hQOER2chGhojcmTHRoiVorlrxtsP8HrVcI9t69KBh/Vk5mRf2I1nm/FQwA2j+n5qHP9x
-         rqaXxYQkDfmNesALuaafXlAtRqFpNUiGmFZ2XEkc61ULdsXeLQ30HkUV3QnczEHvk+6S
-         INYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTTSWnR+tkiG5E05Kln7v+/B8KoZt4V80GMMonQBXfqzNjxzxO6mkJqxiUiEbdm5kRXvKKeGJZYJeWK3o=@vger.kernel.org, AJvYcCUueQwmEV+oYV0tLHVkMqtdQx9sTdpCwSujN0ACe6c0Wk6XWw0os+QgE5S4SpoS2HmN6X+E1qkB@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+6FB8nR8sEjDcr+MwRPLbLiAvuv72hmvnErAUXz0/JdrjL5M3
-	pRsZpVQdG7ErtDkiOEdwIAFU2QdkTf3K7VFEMPx7uxVN6HdZJ6fpZQS5QqidlnaaagQ7Ln/ojTT
-	7ZNeCee4p78i0wsRtsq6dhoOiIm1fyA==
-X-Google-Smtp-Source: AGHT+IH+al8QxOSqxSgNhgRT8STt0ekdoEAUUJ1Wlbp5jr9AL/AtJiPkqmwH128b1nAkyeI5YJI1pCz+mf1pT0GrpO4=
-X-Received: by 2002:a5d:6a09:0:b0:368:7fbc:4062 with SMTP id
- ffacd0b85a97d-36baadee061mr96135f8f.33.1722450610095; Wed, 31 Jul 2024
- 11:30:10 -0700 (PDT)
+	s=arc-20240116; t=1722450622; c=relaxed/simple;
+	bh=10myUJ0Hi7LQEO1QGw12rmOF+3lDr5C+MI6fj7DtXMk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jxi6Zrm41BgaUqUMxKUmNjgcrrmPg0Pqqe9ie+dUD8j7JNAv7rZF4VcOG6AS1QyoP0nima5GEYGasj7epk5kwKNbedpFIa29R8I22FUBfb/9JH6FBeC8Rc71q8B4K4c/umBAmpB08AFEhcLWFznQCD8suzqBsDWH0vW8p9vNnhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=pcwV+rIM; arc=none smtp.client-ip=45.157.188.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZ0y56rlxz2j7;
+	Wed, 31 Jul 2024 20:30:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1722450605;
+	bh=i1+Ki1MfWXMSk46RtSHlGipVgnMYlmokoAygYW7KYoY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pcwV+rIMfR4HXW0+vjB0kAp6rBNEz3Zo45Q8+IKAKVDxxEWwXDiBfv8dBENM5kZNl
+	 h8jSDcpFZ6YqBQlS6ql1n7M7JNS2EzfjvdDasLga6NTj0DIX/ZgadRhMo9/qJBVJK3
+	 k8qXEVJ92AXOy+EoYdLuhrdM/qABYhJdU6jqdkbw=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZ0y539M3zVcY;
+	Wed, 31 Jul 2024 20:30:05 +0200 (CEST)
+Date: Wed, 31 Jul 2024 20:30:01 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
+Message-ID: <20240731.AFooxaeR5mie@digikod.net>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731124505.2903877-1-linyunsheng@huawei.com> <20240731124505.2903877-2-linyunsheng@huawei.com>
-In-Reply-To: <20240731124505.2903877-2-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 31 Jul 2024 11:29:33 -0700
-Message-ID: <CAKgT0Udj5Jskjvvba345DFkySuZeg927OHQya0rCcynMtmGg8g@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 01/14] mm: page_frag: add a test module for page_frag
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-On Wed, Jul 31, 2024 at 5:50=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> Basing on the lib/objpool.c, change it to something like a
-> ptrpool, so that we can utilize that to test the correctness
-> and performance of the page_frag.
->
-> The testing is done by ensuring that the fragment allocated
-> from a frag_frag_cache instance is pushed into a ptrpool
-> instance in a kthread binded to a specified cpu, and a kthread
-> binded to a specified cpu will pop the fragment from the
-> ptrpool and free the fragment.
->
-> We may refactor out the common part between objpool and ptrpool
-> if this ptrpool thing turns out to be helpful for other place.
+On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
+> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
+> ports to forbid a malicious sandboxed process to impersonate a legitimate
+> server process. However, bind(2) might be used by (TCP) clients to set the
+> source port to a (legitimate) value. Controlling the ports that can be
+> used for listening would allow (TCP) clients to explicitly bind to ports
+> that are forbidden for listening.
+> 
+> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+> access right that restricts listening on undesired ports with listen(2).
+> 
+> It's worth noticing that this access right doesn't affect changing
+> backlog value using listen(2) on already listening socket.
+> 
+> * Create new LANDLOCK_ACCESS_NET_LISTEN_TCP flag.
+> * Add hook to socket_listen(), which checks whether the socket is allowed
+>   to listen on a binded local port.
+> * Add check_tcp_socket_can_listen() helper, which validates socket
+>   attributes before the actual access right check.
+> * Update `struct landlock_net_port_attr` documentation with control of
+>   binding to ephemeral port with listen(2) description.
+> * Change ABI version to 6.
+> 
+> Closes: https://github.com/landlock-lsm/linux/issues/15
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
 
-This isn't a patch where you should be introducing stuff you hope to
-refactor out and reuse later. Your objpoo/ptrpool stuff is just going
-to add bloat and overhead as you are going to have to do pointer
-changes to get them in and out of memory and you are having to scan
-per-cpu lists. You would be better served using a simple array as your
-threads should be stick to a consistent CPU anyway in terms of
-testing.
+Thanks for this series!
 
-I would suggest keeping this much more simple. Trying to pattern this
-after something like the dmapool_test code would be a better way to go
-for this. We don't need all this extra objpool overhead getting in the
-way of testing the code you should be focused on. Just allocate your
-array on one specific CPU and start placing and removing your pages
-from there instead of messing with the push/pop semantics.
+I cannot apply this patch series though, could you please provide the
+base commit?  BTW, this can be automatically put in the cover letter
+with the git format-patch's --base argument.
 
-Lastly something that is a module only tester that always fails to
-probe doesn't sound like it really makes sense as a standard kernel
-module. I still think it would make more sense to move it to the
-selftests tree and just have it build there as a module instead of
-trying to force it into the mm tree. The example of dmapool_test makes
-sense as it could be run at early boot to run the test and then it
-just goes quiet. This module won't load and will always just return
--EAGAIN which doesn't sound like a valid kernel module to me.
+> ---
+>  include/uapi/linux/landlock.h                | 23 +++--
+>  security/landlock/limits.h                   |  2 +-
+>  security/landlock/net.c                      | 90 ++++++++++++++++++++
+>  security/landlock/syscalls.c                 |  2 +-
+>  tools/testing/selftests/landlock/base_test.c |  2 +-
+>  5 files changed, 108 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> index 68625e728f43..6b8df3293eee 100644
+> --- a/include/uapi/linux/landlock.h
+> +++ b/include/uapi/linux/landlock.h
+> @@ -104,13 +104,16 @@ struct landlock_net_port_attr {
+>  	/**
+>  	 * @port: Network port in host endianness.
+>  	 *
+> -	 * It should be noted that port 0 passed to :manpage:`bind(2)` will
+> -	 * bind to an available port from a specific port range. This can be
+> -	 * configured thanks to the ``/proc/sys/net/ipv4/ip_local_port_range``
+> -	 * sysctl (also used for IPv6). A Landlock rule with port 0 and the
+> -	 * ``LANDLOCK_ACCESS_NET_BIND_TCP`` right means that requesting to bind
+> -	 * on port 0 is allowed and it will automatically translate to binding
+> -	 * on the related port range.
+> +	 * It should be noted that some operations cause binding socket to a random
+> +	 * available port from a specific port range. This can be configured thanks
+> +	 * to the ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl (also used for
+> +	 * IPv6). Following operation requests are automatically translate to
+> +	 * binding on the related port range:
+> +	 *
+> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_BIND_TCP``
+> +	 *   right means that binding on port 0 is allowed.
+> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_LISTEN_TCP``
+> +	 *   right means listening without an explicit binding is allowed.
+>  	 */
+>  	__u64 port;
+>  };
+> @@ -251,7 +254,7 @@ struct landlock_net_port_attr {
+>   * DOC: net_access
+>   *
+>   * Network flags
+> - * ~~~~~~~~~~~~~~~~
+> + * ~~~~~~~~~~~~~
+>   *
+>   * These flags enable to restrict a sandboxed process to a set of network
+>   * actions. This is supported since the Landlock ABI version 4.
+> @@ -261,9 +264,13 @@ struct landlock_net_port_attr {
+>   * - %LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
+>   * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to
+>   *   a remote port.
+> + * - %LANDLOCK_ACCESS_NET_LISTEN_TCP: Listen for TCP socket connections on
+> + *   a local port. This access right is available since the sixth version
+> + *   of the Landlock ABI.
+>   */
+>  /* clang-format off */
+>  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+>  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+> +#define LANDLOCK_ACCESS_NET_LISTEN_TCP			(1ULL << 2)
+>  /* clang-format on */
+>  #endif /* _UAPI_LINUX_LANDLOCK_H */
+> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+> index 4eb643077a2a..2ef147389474 100644
+> --- a/security/landlock/limits.h
+> +++ b/security/landlock/limits.h
+> @@ -22,7 +22,7 @@
+>  #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
+>  #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
+>  
+> -#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
+> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_LISTEN_TCP
+>  #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+>  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
+>  
+> diff --git a/security/landlock/net.c b/security/landlock/net.c
+> index 669ba260342f..a29cb27c3f14 100644
+> --- a/security/landlock/net.c
+> +++ b/security/landlock/net.c
+> @@ -6,10 +6,12 @@
+>   * Copyright © 2022-2023 Microsoft Corporation
+>   */
+>  
+> +#include "net/sock.h"
+
+These should not be quotes.
+
+>  #include <linux/in.h>
+>  #include <linux/net.h>
+>  #include <linux/socket.h>
+>  #include <net/ipv6.h>
+> +#include <net/tcp.h>
+>  
+>  #include "common.h"
+>  #include "cred.h"
+> @@ -194,9 +196,97 @@ static int hook_socket_connect(struct socket *const sock,
+>  					   LANDLOCK_ACCESS_NET_CONNECT_TCP);
+>  }
+>  
+> +/*
+> + * Checks that socket state and attributes are correct for listen.
+> + * It is required to not wrongfully return -EACCES instead of -EINVAL.
+> + *
+> + * This checker requires sock->sk to be locked.
+> + */
+> +static int check_tcp_socket_can_listen(struct socket *const sock)
+
+Is this function still useful with the listen LSM hook?
+
+> +{
+> +	struct sock *sk = sock->sk;
+> +	unsigned char cur_sk_state = sk->sk_state;
+> +	const struct tcp_ulp_ops *icsk_ulp_ops;
+> +
+> +	/* Allows only unconnected TCP socket to listen (cf. inet_listen). */
+> +	if (sock->state != SS_UNCONNECTED)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * Checks sock state. This is needed to ensure consistency with inet stack
+> +	 * error handling (cf. __inet_listen_sk).
+> +	 */
+> +	if (WARN_ON_ONCE(!((1 << cur_sk_state) & (TCPF_CLOSE | TCPF_LISTEN))))
+> +		return -EINVAL;
+> +
+> +	icsk_ulp_ops = inet_csk(sk)->icsk_ulp_ops;
+> +
+> +	/*
+> +	 * ULP (Upper Layer Protocol) stands for protocols which are higher than
+> +	 * transport protocol in OSI model. Linux has an infrastructure that
+> +	 * allows TCP sockets to support logic of some ULP (e.g. TLS ULP).
+> +	 *
+> +	 * Sockets can listen only if ULP control hook has clone method.
+> +	 */
+> +	if (icsk_ulp_ops && !icsk_ulp_ops->clone)
+> +		return -EINVAL;
+> +	return 0;
+> +}
+> +
+> +static int hook_socket_listen(struct socket *const sock, const int backlog)
+> +{
+
+Why can't we just call current_check_access_socket()?
+
+> +	int err = 0;
+> +	int family;
+> +	__be16 port;
+> +	struct sock *sk;
+> +	const struct landlock_ruleset *const dom = get_current_net_domain();
+> +
+> +	if (!dom)
+> +		return 0;
+> +	if (WARN_ON_ONCE(dom->num_layers < 1))
+> +		return -EACCES;
+> +
+> +	/* Checks if it's a (potential) TCP socket. */
+> +	if (sock->type != SOCK_STREAM)
+> +		return 0;
+> +
+> +	sk = sock->sk;
+> +	family = sk->__sk_common.skc_family;
+> +	/*
+> +	 * Socket cannot be assigned AF_UNSPEC because this type is used only
+> +	 * in the context of addresses.
+> +	 *
+> +	 * Doesn't restrict listening for non-TCP sockets.
+> +	 */
+> +	if (family != AF_INET && family != AF_INET6)
+> +		return 0;
+> +
+> +	lock_sock(sk);
+> +	/*
+> +	 * Calling listen(2) for a listening socket does nothing with its state and
+> +	 * only changes backlog value (cf. __inet_listen_sk). Checking of listen
+> +	 * access right is not required.
+> +	 */
+> +	if (sk->sk_state == TCP_LISTEN)
+> +		goto release_nocheck;
+> +
+> +	err = check_tcp_socket_can_listen(sock);
+> +	if (unlikely(err))
+> +		goto release_nocheck;
+> +
+> +	port = htons(inet_sk(sk)->inet_num);
+> +	release_sock(sk);
+> +	return check_access_socket(dom, port, LANDLOCK_ACCESS_NET_LISTEN_TCP);
+> +
+> +release_nocheck:
+> +	release_sock(sk);
+> +	return err;
+> +}
+> +
+>  static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>  	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
+>  	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
+> +	LSM_HOOK_INIT(socket_listen, hook_socket_listen),
+>  };
+>  
+>  __init void landlock_add_net_hooks(void)
+> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
+> index 03b470f5a85a..3752bcc033d4 100644
+> --- a/security/landlock/syscalls.c
+> +++ b/security/landlock/syscalls.c
+> @@ -149,7 +149,7 @@ static const struct file_operations ruleset_fops = {
+>  	.write = fop_dummy_write,
+>  };
+>  
+> -#define LANDLOCK_ABI_VERSION 5
+> +#define LANDLOCK_ABI_VERSION 6
+>  
+>  /**
+>   * sys_landlock_create_ruleset - Create a new ruleset
+> diff --git a/tools/testing/selftests/landlock/base_test.c b/tools/testing/selftests/landlock/base_test.c
+> index 3c1e9f35b531..52b00472a487 100644
+> --- a/tools/testing/selftests/landlock/base_test.c
+> +++ b/tools/testing/selftests/landlock/base_test.c
+> @@ -75,7 +75,7 @@ TEST(abi_version)
+>  	const struct landlock_ruleset_attr ruleset_attr = {
+>  		.handled_access_fs = LANDLOCK_ACCESS_FS_READ_FILE,
+>  	};
+> -	ASSERT_EQ(5, landlock_create_ruleset(NULL, 0,
+> +	ASSERT_EQ(6, landlock_create_ruleset(NULL, 0,
+>  					     LANDLOCK_CREATE_RULESET_VERSION));
+>  
+>  	ASSERT_EQ(-1, landlock_create_ruleset(&ruleset_attr, 0,
+> -- 
+> 2.34.1
+> 
+> 
 
