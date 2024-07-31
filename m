@@ -1,293 +1,232 @@
-Return-Path: <netdev+bounces-114529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B373942D49
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:32:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AD6942D72
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:44:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E388E282A04
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:32:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0F01F23CFB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDAF71A71ED;
-	Wed, 31 Jul 2024 11:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E161AD9CF;
+	Wed, 31 Jul 2024 11:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b+MpzAOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DE58BFF;
-	Wed, 31 Jul 2024 11:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722425553; cv=none; b=epZDI5VgvR9R/8q2MBWk+iEWjYx59Eso1puV+XkNEAK8iCC1p1wFvI4B6h/ELBo3gkkIVlEh1fUAUCBPlh/fYeJdkUXhtvdu7spA1XPmNpYLoehomwaHK+pI9OQUmtcy+hkNeQtZmy5ZJzdOCwV+iA2JoH1RCT1L3/YbRZ/yCZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722425553; c=relaxed/simple;
-	bh=BK9g67oj0eZOy/rprUE/b5DsS2f8P5OTMAAd5393VvI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hsaXGrg/KTvWmat+HxWX/aB9dULD3rDxhGNr1q2D+pXlj7JQbjKJw3V/z4MsgM4QwQDpX/jpPlisCuexwm8hRJ1DOHu4FfoZn308FuhUDHS+br25WNALcG+KLdAwOdPpaAxBTwvRhHqyIA9HWWQM8kLNW6hCkOUMoR8HTV5tF+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WYqh02892zxTSD;
-	Wed, 31 Jul 2024 19:32:16 +0800 (CST)
-Received: from kwepemf200007.china.huawei.com (unknown [7.202.181.233])
-	by mail.maildlp.com (Postfix) with ESMTPS id E4475180105;
-	Wed, 31 Jul 2024 19:32:27 +0800 (CST)
-Received: from [10.67.121.184] (10.67.121.184) by
- kwepemf200007.china.huawei.com (7.202.181.233) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 31 Jul 2024 19:32:27 +0800
-Message-ID: <d385bdba-65a0-4776-b950-9e62392f5115@huawei.com>
-Date: Wed, 31 Jul 2024 19:32:26 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C01A8BEF;
+	Wed, 31 Jul 2024 11:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722426258; cv=fail; b=GG4tq7zNtZvsCTMN/Y0Yqhrx8C0nLnRpiuJVUl5jvHkAOxNmeniGseECA6TZMvLjgYnQLmdIP0QjZMSXK2rIfqsyGxCBNXzqkV9gBmaykjGK3yFz4r5aFIyAmpNMIGtVo7NILVDVlgkOvtptoyDweqD2Ndt5+eX86HZHFb9Cenk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722426258; c=relaxed/simple;
+	bh=xUGA+N4gYnaRLYU4kSBqB1P0agoFBpfGyRm3XPwQ7EE=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=JvaoZIkoPkPVUwyVFMSBUjsJb4GsZtCB+nFt9eFQggL50Jx1IhoNMyIFrzkFGpdK3c4b7Tn7Q8pYcTZZwpsn9kuRy1bxbRoGsGDHWnmR2FEr7RaoTjxYyya2I8Sngp1/CPPtWIr5JL+zMHw/RubEoy2IDfeLanHrJkOaqiWL5u8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=b+MpzAOa; arc=fail smtp.client-ip=40.107.237.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xDI+MMrcaw4m6QRbGElCrWyDGhadbhFlU9v71OKMltUtUp5uPyvIdU2ufkWdR0nA6cmsTD0du5ZC+bQUA3JLXqy7DUaO/bbsbdzY9IxyhlzcO1qyrJJcsSWNd0e+cJrZfJ9vQVYZTB/1YTZHZHkeZdMpcXHcJFsFxMnfFxnAfo9pv/CjrAetuXSqMcueWyjXlGKImxX0XgHd/7eeR0i+CAzavETDbx45TBWtrEF3iZe5Yhr/6On23AViLfMjg9TkemU74bEaSGI1Bfwp8ijpTIRhFiTz/6ar/EqsoxIC/Xn1hSAl0C1wXGCaKMcEihBHJO04OV1QwP9eQQ1swgstMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W4zBiJJFwzeBuse6dtW6SPobXdfICQo2rVCpuHc95ew=;
+ b=zLKFBeFbaAsE7mydXCsIK0XEfyDUqbo84DNUsoInlp/KnVXcDu8/E6MmgrXJfJyCJ+mZkzPfQ4pPpp3+oTYCamBMf7t4bqtlmu6F02a4spvQHPnlPPx5vMvbSUU71LvLdQh1bGumf3sF4eRTUKqRx2EgEeQlIUv2hCeyMeN2LhiHI2nCVnHufcaJUO8x8z7e1CsoMDCmqKemH4wZ/o58k+H6qPAL7otTXFSYnT2g58Tb1O2eaYsjYpt+y3GZEXSeqUnVwtvJY905WA2ifCRSl2AA31Jv6iiH7LZ6rgvC8c9wGw5/hxryAzzc7PKwdhLp8ZuUKFzER3pDkfxcR8bvyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W4zBiJJFwzeBuse6dtW6SPobXdfICQo2rVCpuHc95ew=;
+ b=b+MpzAOa4ahbKdF9U028HRuc+jakUvK25XlIPOXV9rSxlvztaTJCrKymDZzIQZkW+N3z5DkCOlVT/Q+Eq24CnFQHSnVjKA7xmE6sVGikrUB4C9208gKKNYNCGZM8SoK7/g4rq6tyo0mkjFxnb95ysSegUXTelAmn5sbVeWhapN2aZsxzvDktiBeNjptfT/bl/wrkPJvvHiFtHbnGijhkJfhn6bsC3+acw4quhRIp3L/ojEZso2VNLdZDB9u/+NLudE8W3OtVeGnp8PLkDwW5st+rAJSWzig8O1noxOY6hX8gVo8VsUZGRXnA22+3UvETRqJaHUUWXiuu8g0Kpt6e4w==
+Received: from BYAPR02CA0044.namprd02.prod.outlook.com (2603:10b6:a03:54::21)
+ by SJ0PR12MB8167.namprd12.prod.outlook.com (2603:10b6:a03:4e6::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.19; Wed, 31 Jul
+ 2024 11:44:13 +0000
+Received: from CO1PEPF000066E7.namprd05.prod.outlook.com
+ (2603:10b6:a03:54:cafe::66) by BYAPR02CA0044.outlook.office365.com
+ (2603:10b6:a03:54::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.34 via Frontend
+ Transport; Wed, 31 Jul 2024 11:44:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000066E7.mail.protection.outlook.com (10.167.249.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7828.19 via Frontend Transport; Wed, 31 Jul 2024 11:44:12 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 31 Jul
+ 2024 04:44:02 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 31 Jul
+ 2024 04:43:57 -0700
+References: <20240730223932.3432862-1-sdf@fomichev.me>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, "Joe
+ Damato" <jdamato@fastly.com>, Petr Machata <petrm@nvidia.com>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/2] selftests: net-drv: exercise queue
+ stats when the device is down
+Date: Wed, 31 Jul 2024 13:34:58 +0200
+In-Reply-To: <20240730223932.3432862-1-sdf@fomichev.me>
+Message-ID: <87cymt7pmu.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG REPORT]net: page_pool: kernel crash at
- iommu_get_dma_domain+0xc/0x20
-Content-Language: en-US
-To: Somnath Kotur <somnath.kotur@broadcom.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<pabeni@redhat.com>, <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>, linyunsheng <linyunsheng@huawei.com>,
-	"shenjian (K)" <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>
-References: <0e54954b-0880-4ebc-8ef0-13b3ac0a6838@huawei.com>
- <8743264a-9700-4227-a556-5f931c720211@huawei.com>
- <e980d20f-ea8a-43e3-8d3f-179a269b5956@kernel.org>
- <CAOBf=musxZcjYNHjdD+MGp0y6epnNO5ryC6JgeAJbP6YQ+sVUA@mail.gmail.com>
-From: Yonglong Liu <liuyonglong@huawei.com>
-In-Reply-To: <CAOBf=musxZcjYNHjdD+MGp0y6epnNO5ryC6JgeAJbP6YQ+sVUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemf200007.china.huawei.com (7.202.181.233)
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000066E7:EE_|SJ0PR12MB8167:EE_
+X-MS-Office365-Filtering-Correlation-Id: 084c063a-f7d7-4422-ad48-08dcb156193c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kYUoTNv3NDsd6jsjYqiDARHmKHmU1bNhwhk9a8cyMaI5Ytq/XmHi/ekl8Lc9?=
+ =?us-ascii?Q?ukWmigjlBzeuEyzakgzdJV+X5TEXcq/JKYUxI819wyR8pgVkBmy14UCR51sl?=
+ =?us-ascii?Q?ZWabn+uGA7QZOJHByl6oeEJ6ic2X1rHiWlZ3aHhiSzEzhUwg4DLK3hDw7CD2?=
+ =?us-ascii?Q?f15s+1cwhJLUl5nlRHtzK2l0FOkfeob+I6nwBQtZKatsLZbdTGw7fxzELqu0?=
+ =?us-ascii?Q?M+f3PZ3soFa8FZhy2s7QmOHBgYnMBdE7Fy8VZzKRs03EYALznrkG9y5YnNE/?=
+ =?us-ascii?Q?GMRJ6fBsb6AVJ56u3MqAYlaTKzWrEFw//176LkwME1TO270vLDxw/Ic68VMd?=
+ =?us-ascii?Q?HceASTGP6lbVtB5NUWYcM7PZoyQUVRZZmaOSObCEHcQoFX++y1UNqqZlRJaC?=
+ =?us-ascii?Q?IbxoDFgh7SXncvnb6OB60IOITEF1qTlZxeu2QPOUI66+cabs29t6zH+J8gSx?=
+ =?us-ascii?Q?bGefVsQZdQLWHKRk+fvy+TMsPgmBBo+dqGptORZGtKzOUtAsUQxrMNLc6TAU?=
+ =?us-ascii?Q?I4gksD/BFMRajW4XIDpGTxH+u0dHxdXZzveFKB6XmdqsK/V/7pXqJuQPY311?=
+ =?us-ascii?Q?K10qQKKTW5uxcnIK/VH8+Vgd8+S6W/I91sS9mBGIJNgOB3aIfi2GMiICvocP?=
+ =?us-ascii?Q?WGr/DZyGPHcgJ8qFbLFwKerHTLvJfM/ZvB62LworOoa+ymvA03p2NdBhkHzC?=
+ =?us-ascii?Q?UV/Out0Q9Bg3/oLTFBLxi+GIhNcASZwDSAp/t5uDGwqf7XWs2HHw7QibERtq?=
+ =?us-ascii?Q?buEI2Xoc5qLC2b4fISpWlmS2D5GNIu+3PIOgPtmbemzlYu2F9iBX2/O6ndyz?=
+ =?us-ascii?Q?KK5skLfDPpmqcirX9V3cODtDkQEpK6cnP69DEeqIJVjtjK/8w2bQiQrKNOI5?=
+ =?us-ascii?Q?A72po1wSxqtRQXCKzMXgbgIk+CapOPRaHlOS97NRNIft1lPKUYvqFUgbxRvM?=
+ =?us-ascii?Q?uGN6TZPi2pasOP0iicp1tcdDYXoWdKlExquGInVNcPRn321zGKRpafPjkuJF?=
+ =?us-ascii?Q?9i7401OP+yb+rO/0VhRzjQiDehZ/zJQC+pNo07eyrWcG/T4Et8aYh15Vu4sB?=
+ =?us-ascii?Q?PPXlvscUuP7c+kwv9x6960BkjTHMUba53ErmXUKzyva6rPgp+UhwPZkswgpe?=
+ =?us-ascii?Q?C0tyzv+772KnisGVeRAwOgQGUTB0y50b4C6Fc72ibumexKzWCvDJ8igNPPyS?=
+ =?us-ascii?Q?lqvh95xLbOx2nlHiasxxJfIQzS8Rm7Qp+L19VhONJFTNasFIAXchMyrqfJPJ?=
+ =?us-ascii?Q?D4Hvqhbmsj8L+7RGbcKU4DulLrkPf/V9GT/HMk1hk6mFaw3nn2aVFZBkNNCd?=
+ =?us-ascii?Q?Vqk00TVx3v7+kVJfmVDEVH9wTHhZo/IiCNuuCTe4g4HF0IDdIBAQgRqIbIvB?=
+ =?us-ascii?Q?7dPwRqZtbl9agEgiea1fnwj4Fpjo64amo8GpSMTylOZcDPbow4PsPBdT59Jy?=
+ =?us-ascii?Q?BQbcH4d5XuCvtoJNWPVmaDZAqQBsKfW1?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 11:44:12.7072
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 084c063a-f7d7-4422-ad48-08dcb156193c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000066E7.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8167
 
 
-On 2024/7/31 16:42, Somnath Kotur wrote:
-> On Tue, Jul 30, 2024 at 10:51 PM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>
->>
->> On 30/07/2024 15.08, Yonglong Liu wrote:
->>> I found a bug when running hns3 driver with page pool enabled, the log
->>> as below:
->>>
->>> [ 4406.956606] Unable to handle kernel NULL pointer dereference at
->>> virtual address 00000000000000a8
->> struct iommu_domain *iommu_get_dma_domain(struct device *dev)
->> {
->>          return dev->iommu_group->default_domain;
->> }
->>
->> $ pahole -C iommu_group --hex | grep default_domain
->>          struct iommu_domain *      default_domain;   /*  0xa8   0x8 */
->>
->> Looks like iommu_group is a NULL pointer (that when deref member
->> 'default_domain' cause this fault).
->>
->>
->>> [ 4406.965379] Mem abort info:
->>> [ 4406.968160]   ESR = 0x0000000096000004
->>> [ 4406.971906]   EC = 0x25: DABT (current EL), IL = 32 bits
->>> [ 4406.977218]   SET = 0, FnV = 0
->>> [ 4406.980258]   EA = 0, S1PTW = 0
->>> [ 4406.983404]   FSC = 0x04: level 0 translation fault
->>> [ 4406.988273] Data abort info:
->>> [ 4406.991154]   ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
->>> [ 4406.996632]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
->>> [ 4407.001681]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
->>> [ 4407.006985] user pgtable: 4k pages, 48-bit VAs, pgdp=0000202828326000
->>> [ 4407.013430] [00000000000000a8] pgd=0000000000000000,
->>> p4d=0000000000000000
->>> [ 4407.020212] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
->>> [ 4407.026454] Modules linked in: hclgevf xt_CHECKSUM ipt_REJECT
->>> nf_reject_ipv4 ip6table_mangle ip6table_nat iptable_mangle
->>> ip6table_filter ip6_tables hns_roce_hw_v2 hns3 hclge hnae3 xt_addrtype
->>> iptable_filter xt_conntrack overlay arm_spe_pmu arm_smmuv3_pmu
->>> hisi_uncore_hha_pmu hisi_uncore_ddrc_pmu hisi_uncore_l3c_pmu
->>> hisi_uncore_pmu fuse rpcrdma ib_isert iscsi_target_mod ib_iser libiscsi
->>> scsi_transport_iscsi crct10dif_ce hisi_sec2 hisi_hpre hisi_zip
->>> hisi_sas_v3_hw xhci_pci sbsa_gwdt hisi_qm hisi_sas_main hisi_dma
->>> xhci_pci_renesas uacce libsas [last unloaded: hnae3]
->>> [ 4407.076027] CPU: 48 PID: 610 Comm: kworker/48:1
->>> [ 4407.093343] Workqueue: events page_pool_release_retry
->>> [ 4407.098384] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS
->>> BTYPE=--)
->>> [ 4407.105316] pc : iommu_get_dma_domain+0xc/0x20
->>> [ 4407.109744] lr : iommu_dma_unmap_page+0x38/0xe8
->>> [ 4407.114255] sp : ffff80008bacbc80
->>> [ 4407.117554] x29: ffff80008bacbc80 x28: 0000000000000000 x27:
->>> ffffc31806be7000
->>> [ 4407.124659] x26: ffff2020002b6ac0 x25: 0000000000000000 x24:
->>> 0000000000000002
->>> [ 4407.131762] x23: 0000000000000022 x22: 0000000000001000 x21:
->>> 00000000fcd7c000
->>> [ 4407.138865] x20: ffff0020c9882800 x19: ffff0020856f60c8 x18:
->>> ffff8000d3503c58
->>> [ 4407.145968] x17: 0000000000000000 x16: 1fffe00419521061 x15:
->>> 0000000000000001
->>> [ 4407.153073] x14: 0000000000000003 x13: 00000401850ae012 x12:
->>> 000006b10004e7fb
->>> [ 4407.160177] x11: 0000000000000067 x10: 0000000000000c70 x9 :
->>> ffffc3180405cd20
->>> [ 4407.167280] x8 : fefefefefefefeff x7 : 0000000000000001 x6 :
->>> 0000000000000010
->>> [ 4407.174382] x5 : ffffc3180405cce8 x4 : 0000000000000022 x3 :
->>> 0000000000000002
->>> [ 4407.181485] x2 : 0000000000001000 x1 : 00000000fcd7c000 x0 :
->>> 0000000000000000
->>> [ 4407.188589] Call trace:
->>> [ 4407.191027]  iommu_get_dma_domain+0xc/0x20
->>> [ 4407.195105]  dma_unmap_page_attrs+0x38/0x1d0
->>> [ 4407.199361]  page_pool_return_page+0x48/0x180
->>> [ 4407.203699]  page_pool_release+0xd4/0x1f0
->>> [ 4407.207692]  page_pool_release_retry+0x28/0xe8
->> I suspect that the DMA IOMMU part was deallocated and freed by the
->> driver even-though page_pool still have inflight packets.
-> When you say driver, which 'driver' do you mean?
-> I suspect this could be because of the VF instance going away with
-> this cmd - disable the vf: echo 0 >
-> /sys/class/net/eno1/device/sriov_numvfs, what do you think?
+Stanislav Fomichev <sdf@fomichev.me> writes:
 
-I found that this happen when the vf enabled and running some packets, 
-below is more infomation:
+> Verify that total device stats don't decrease after it has been turned down.
+> Also make sure the device doesn't crash when we access per-queue stats
+> when it's down (in case it tries to access some pointers that are NULL).
+>
+>   KTAP version 1
+>   1..5
+>   ok 1 stats.check_pause
+>   ok 2 stats.check_fec
+>   ok 3 stats.pkt_byte_sum
+>   ok 4 stats.qstat_by_ifindex
+>   ok 5 stats.check_down
+>   # Totals: pass:5 fail:0 xfail:0 xpass:0 skip:0 error:0
+>
+> v2:
+> - KTAP output formatting (Jakub)
+> - defer instead of try/finally (Jakub)
+> - disappearing stats is an error (Jakub)
+> - ksft_ge instead of open coding (Jakub)
+>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> --
+> Cc: Shuah Khan <shuah@kernel.org>
+> Cc: Joe Damato <jdamato@fastly.com>
+> Cc: Petr Machata <petrm@nvidia.com>
+> Cc: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/drivers/net/stats.py | 25 +++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
+> index 820b8e0a22c6..93f9204f51c4 100755
+> --- a/tools/testing/selftests/drivers/net/stats.py
+> +++ b/tools/testing/selftests/drivers/net/stats.py
+> @@ -5,6 +5,7 @@ from lib.py import ksft_run, ksft_exit, ksft_pr
+>  from lib.py import ksft_ge, ksft_eq, ksft_in, ksft_true, ksft_raises, KsftSkipEx, KsftXfailEx
+>  from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
+>  from lib.py import NetDrvEnv
+> +from lib.py import ip, defer
+>  
+>  ethnl = EthtoolFamily()
+>  netfam = NetdevFamily()
+> @@ -133,9 +134,31 @@ rtnl = RtnlFamily()
+>      ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.ifindex')
+>  
+>  
+> +def check_down(cfg) -> None:
+> +    try:
+> +        qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)
+> +    except NlError as e:
+> +        if e.error == 95:
 
+Could you do this as if e.error == errno.ENOTSUP?
 
-[ 4391.596558] pci 0000:7d:01.0: page_pool_release_retry() stalled pool 
-shutdown: id 1145, 33 inflight 906 sec
-[ 4397.111484] hns3 0000:bd:00.0: SRIOV setting: 0
-[ 4397.118155] hns3 0000:bd:01.0 enp189s0f0v0: link down
-[ 4397.416623] hns3 0000:bd:01.0: finished uninitializing hclgevf driver
-[ 4397.480572] pci 0000:7d:01.0: page_pool_release_retry() stalled pool 
-shutdown: id 1279, 98 inflight 362 sec
-[ 4400.948362] hns3 0000:7d:00.0: SRIOV setting: 1
-[ 4401.060569] pci 0000:7d:01.0: [19e5:a22f] type 00 class 0x020000 PCIe 
-Endpoint
-[ 4401.067795] pci 0000:7d:01.0: enabling Extended Tags
-[ 4401.073090] hns3 0000:7d:01.0: Adding to iommu group 48
-[ 4401.078494] hns3 0000:7d:01.0: enabling device (0000 -> 0002)
-[ 4401.084348] hns3 0000:7d:01.0: The firmware version is 1.20.0.17
-[ 4401.102911] hns3 0000:7d:01.0: finished initializing hclgevf driver
-[ 4401.111212] hns3 0000:7d:01.0: using random MAC address da:**:**:**:a3:47
-[ 4401.138375] hns3 0000:7d:01.0 eno1v0: renamed from eth0
-[ 4403.939449] hns3 0000:7d:01.0 eno1v0: link up
-[ 4403.940237] 8021q: adding VLAN 0 to HW filter on device eno1v0
-[ 4406.956606] Unable to handle kernel NULL pointer dereference at 
-virtual address 00000000000000a8
+> +            raise KsftSkipEx("qstats not supported by the device")
+> +        raise
+> +
+> +    ip(f"link set dev {cfg.dev['ifname']} down")
+> +    defer(ip, f"link set dev {cfg.dev['ifname']} up")
+> +
+> +    qstat = qstat[0]
 
+Consider moving the [0] inside the try to make the two qstats_get
+statements obviously the same.
 
-another log:
+> +    qstat2 = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
+> +    for k, v in qstat.items():
+> +        ksft_ge(qstat2[k], qstat[k], comment=f"{k} went backwards on device down")
+> +
+> +    # exercise per-queue API to make sure that "device down" state
+> +    # is handled correctly and doesn't crash
+> +    netfam.qstats_get({"ifindex": cfg.ifindex, "scope": "queue"}, dump=True)
+> +
+> +
+>  def main() -> None:
+>      with NetDrvEnv(__file__) as cfg:
+> -        ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex],
+> +        ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex,
+> +                  check_down],
+>                   args=(cfg, ))
+>      ksft_exit()
 
-[11550.197002] hns3 0000:bd:01.0 enp189s0f0v0: link up
-[11550.197034] hns3 0000:bd:01.0 enp189s0f0v0: net open
-[11550.206910] 8021q: adding VLAN 0 to HW filter on device enp189s0f0v0
-[11564.872929] page_pool_release_retry() stalled pool shutdown: id 2330, 
-99 inflight 60 sec
-[11568.353723] hns3 0000:bd:01.0 enp189s0f0v0: net stop
-[11568.360723] hns3 0000:bd:01.0 enp189s0f0v0: link down
-[11568.519899] hns3 0000:bd:01.0 enp189s0f0v0: link up
-[11568.519935] hns3 0000:bd:01.0 enp189s0f0v0: net open
-[11568.529840] 8021q: adding VLAN 0 to HW filter on device enp189s0f0v0
-[11589.640930] page_pool_release_retry() stalled pool shutdown: id 1996, 
-50 inflight 2054 sec
-[11592.554875] hns3 0000:bd:01.0 enp189s0f0v0: net stop
-[11592.560930] hns3 0000:bd:01.0 enp189s0f0v0: link down
-[11596.684935] pci 0000:7d:01.0: [19e5:a22f] type 00 class 0x020000 PCIe 
-Endpoint
-[11596.692140] pci 0000:7d:01.0: enabling Extended Tags
-[11596.697324] hns3 0000:7d:01.0: Adding to iommu group 48
-[11596.702988] hns3 0000:7d:01.0: enabling device (0000 -> 0002)
-[11596.708808] hns3 0000:7d:01.0: The firmware version is 1.20.0.17
-[11596.727263] hns3 0000:7d:01.0: finished initializing hclgevf driver
-[11596.735561] hns3 0000:7d:01.0: using random MAC address 72:**:**:**:55:d7
-[11596.760621] hns3 0000:7d:01.0 eno1v0: renamed from eth0
-[11599.545341] hns3 0000:7d:01.0 eno1v0: link up
-[11599.545409] hns3 0000:7d:01.0 eno1v0: net open
-[11599.554858] 8021q: adding VLAN 0 to HW filter on device eno1v0
-[11608.908922] Unable to handle kernel NULL pointer dereference at 
-virtual address 00000000000000a8
-
-
->> The page_pool bumps refcnt via get_device() + put_device() on the DMA
->> 'struct device', to avoid it going away, but I guess there is also some
->> IOMMU code that we need to make sure doesn't go away (until all inflight
->> pages are returned) ???
->>
->>
->>> [ 4407.212119]  process_one_work+0x164/0x3e0
->>> [ 4407.216116]  worker_thread+0x310/0x420
->>> [ 4407.219851]  kthread+0x120/0x130
->>> [ 4407.223066]  ret_from_fork+0x10/0x20
->>> [ 4407.226630] Code: ffffc318 aa1e03e9 d503201f f9416c00 (f9405400)
->>> [ 4407.232697] ---[ end trace 0000000000000000 ]---
->>>
->>>
->>> The hns3 driver use page pool like this, just call once when the driver
->>> initialize:
->>>
->>> static void hns3_alloc_page_pool(struct hns3_enet_ring *ring)
->>> {
->>>       struct page_pool_params pp_params = {
->>>           .flags = PP_FLAG_DMA_MAP | PP_FLAG_PAGE_FRAG |
->>>                   PP_FLAG_DMA_SYNC_DEV,
->>>           .order = hns3_page_order(ring),
->>>           .pool_size = ring->desc_num * hns3_buf_size(ring) /
->>>                   (PAGE_SIZE << hns3_page_order(ring)),
->>>           .nid = dev_to_node(ring_to_dev(ring)),
->>>           .dev = ring_to_dev(ring),
->>>           .dma_dir = DMA_FROM_DEVICE,
->>>           .offset = 0,
->>>           .max_len = PAGE_SIZE << hns3_page_order(ring),
->>>       };
->>>
->>>       ring->page_pool = page_pool_create(&pp_params);
->>>       if (IS_ERR(ring->page_pool)) {
->>>           dev_warn(ring_to_dev(ring), "page pool creation failed: %ld\n",
->>>                PTR_ERR(ring->page_pool));
->>>           ring->page_pool = NULL;
->>>       }
->>> }
->>>
->>> And call page_pool_destroy(ring->page_pool)  when the driver uninitialized.
->>>
->>>
->>> We use two devices, the net port connect directory, and the step of the
->>> test case like below:
->>>
->>> 1. enable a vf of '7d:00.0':  echo 1 >
->>> /sys/class/net/eno1/device/sriov_numvfs
->>>
->>> 2. use iperf to produce some flows(the problem happens to the side which
->>> runs 'iperf -s')
->>>
->>> 3. use ifconfig down/up to the vf
->>>
->>> 4. kill iperf
->>>
->>> 5. disable the vf: echo 0 > /sys/class/net/eno1/device/sriov_numvfs
->>>
->>> 6. run 1~5 with another port bd:00.0
->>>
->>> 7. repeat 1~6
->>>
->>>
->>> And when running this test case, we can found another related message (I
->>> replaced pr_warn() to dev_warn()):
->>>
->>> pci 0000:7d:01.0: page_pool_release_retry() stalled pool shutdown: id
->>> 949, 98 inflight 1449 sec
->>>
->>>
->>> Even when stop the traffic, stop the test case, disable the vf, this
->>> message is still being printed.
->>>
->>> We must run the test case for about two hours to reproduce the problem.
->>> Is there some advise to solve or debug the problem?
->>>
 
