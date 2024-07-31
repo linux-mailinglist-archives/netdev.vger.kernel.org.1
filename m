@@ -1,258 +1,251 @@
-Return-Path: <netdev+bounces-114589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155F2942F95
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:02:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00619942F9A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFDCF283BD1
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:02:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247D21C23FE2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55781B151A;
-	Wed, 31 Jul 2024 13:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326921B1406;
+	Wed, 31 Jul 2024 13:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RJcgqOwK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzcDc3U0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F107F19408C;
-	Wed, 31 Jul 2024 13:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722430802; cv=fail; b=KEZKy2cKv6D5JdNtiOH8ohAfXhc6xoAgDvfONTsNUQkgVwhVkATH/ZkXXQ7j60W48933Es0V/6OmOyOcpQMZzNiSUeh/JvkvqtGgpbQej0uhWIHsy68cBzPQDzyCEoj7UvdlgSJdek2kmM5Crx1Scnl1Xyl03TA6jKeW0wLEiLw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722430802; c=relaxed/simple;
-	bh=jj2TbI6V9j9WFvvTkkdt4Gbc8JoSZgvLARdZ6bwO3Y8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CqgdXSwv2mIuCn59tzJR7f+D07uKC8PLkx3EmyKIhC46Rc5gtaCTQDFWvngP2qNo3BeE3JQgJe53Sa9zowmzSXUVhb5Bl2ElZRtAXMDVlZk+10vZfDuXh811AdyQk5Vi+kiLxfwRDEW0O2DHd4kGHACOf4tQuf6xZXE11Qn5GEs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RJcgqOwK; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722430802; x=1753966802;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jj2TbI6V9j9WFvvTkkdt4Gbc8JoSZgvLARdZ6bwO3Y8=;
-  b=RJcgqOwK3rYdgvN8FedoAYZmc/Y44IgytelGXA/05KuxJm4YuxV2atQb
-   jt2kqEAqrtFPLu2Y7DSzUMEVCpxAnaqKGN2qf7ijn/Nna7/civaKSj++i
-   gou3QCJVibM2U6S9Nf+eiL+E9fQ3a4tAmIHsuaK2f1ceWVOm3KplhFb07
-   yfGMaq/7d0yu+uX94qzTQKPUEyKYIqhaYLhOeyN4lz0+TMuEddab+uNjY
-   VU6RsIZHLeF+XGxo+sgondOtdb2neej7fbEg/u89x5qj7HFs3IG71vwDZ
-   cwRVwXbulXfAWVcZ3P/Uok3t753PRoB75txUj9MixCkNh5iwmeIYORrL0
-   A==;
-X-CSE-ConnectionGUID: 8hkvh/N9TySwkErLnabeyQ==
-X-CSE-MsgGUID: wJD1s8rPSZOFMAN3A5D6Yg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11150"; a="24068821"
-X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
-   d="scan'208";a="24068821"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2024 06:00:01 -0700
-X-CSE-ConnectionGUID: 2Qum0YqNTuKN6T+bjn3IUQ==
-X-CSE-MsgGUID: RBRo5WurSYaO7MY8CLQriA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
-   d="scan'208";a="59737725"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jul 2024 06:00:00 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 31 Jul 2024 05:59:59 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 31 Jul 2024 05:59:59 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 31 Jul 2024 05:59:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pucL/GywRYc9S88WH2HylKd657rRNZfCIZDYSd/LBSjUoUvgmyK8O4XRBgLruLeNvSHRtstnLZlY4RELi1BderKcM5XkMgScesxSaWlq7y1hoi7tTQI5rR6+G5YsgQHMezkUd+AhBTGJv10DNeprlaQ9GjJo2IwKlLFdP7h06lhkeubyDnK8HDk6U9j71vp1TFckaV7AOgmuHn78H23KdtVMXL6YIwxpMemmMcJxxnx0x2X9mHKUSsirnN2klt0PDnpIdDF93VHoJlQzPp11tYTjHAHk85unQU8RyJqLFTAkfrRdpETYj22g2jNudsuhXUtwEGK8ui0+RECSlwaCSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MVRNwiIvINgZzuFIi+4uXeeiqAaJJFJSdfEdGx06SpU=;
- b=ug3OKW3QWMckVysHHjvgOevFd4FfqAmP6uHkLQT0Ek6InrAvlCr+4vzNZU0IGl/Ndov+TZOGfVjf0tnrDGqPcZJZio2Oz65Zy4FjmCaEthk8lYw200SEFSNPjzgQnyRWA2TeAw37qdFSLpxqLJ1DaKjUX11/IUYra09Yzr6X2Xo5gCFPYfdi/ekancKeY1B4eewXvSV14HU1ZxnL47VQfOvBW/ILC8q9QAY8/VSc2Ie1AdTgPHzdTcoLvN/2JpUVCDonoT0VmeI0DLrFz4ue99sNSfimJNeCNSph/AtyYueobWpiCBxZJxDfUhCR4BxaSGYaie2ovD972abfOIT6UA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by DM4PR11MB6479.namprd11.prod.outlook.com (2603:10b6:8:8c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.20; Wed, 31 Jul
- 2024 12:59:55 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7807.026; Wed, 31 Jul 2024
- 12:59:55 +0000
-Message-ID: <79151d6b-1f42-4140-847a-5247c86eddcc@intel.com>
-Date: Wed, 31 Jul 2024 14:59:46 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V3 3/3] net/mlx5: Implement PTM cross
- timestamping support
-To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Eric
- Dumazet" <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, John Stultz
-	<jstultz@google.com>, Thomas Gleixner <tglx@linutronix.de>, "Anna-Maria
- Behnsen" <anna-maria@linutronix.de>, Frederic Weisbecker
-	<frederic@kernel.org>, <linux-kernel@vger.kernel.org>, Bjorn Helgaas
-	<bhelgaas@google.com>, <linux-pci@vger.kernel.org>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, Carolina Jubran
-	<cjubran@nvidia.com>, Bar Shapira <bshapira@nvidia.com>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>
-References: <20240730134055.1835261-1-tariqt@nvidia.com>
- <20240730134055.1835261-4-tariqt@nvidia.com>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <20240730134055.1835261-4-tariqt@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0073.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:52::16) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B7D1AC43E;
+	Wed, 31 Jul 2024 13:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722430887; cv=none; b=g/d1VJ6zC0wAcfEJSOUb92M7yAj3RIzd69q+Rwc82aCFMND75fTL/Mq/ai0NG5S935dl9ZfrY9VRGDukS2PSqAip0b+N32t9FNj6gwBnNcnw9TLFRvrE1IcxwSKxFM9SBcwdGMrB6mHtuPfWgA3G0cc62rxv0GIX009pFkH+pzo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722430887; c=relaxed/simple;
+	bh=FOc4xL6cnBZKwU0x9lOVB7wH6Wc39+KLGPTn8baEj/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F8+FlIxpkMoQH5zYrnTetoyAEn7HcBCOqFsOk0jnnxNc3nBM4PGT6FBKgdYX8VNPEwroE7F4T8u2eAtStNQfrJXWreH+AwO6v/ioXKlOaqLZPMQxPZHg8ErZnC3GjhPea1fE8HcQkhLStsJ4DqjWos+5SdBm8KrRbbLTLlTI8t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzcDc3U0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FC24C4AF0C;
+	Wed, 31 Jul 2024 13:01:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722430886;
+	bh=FOc4xL6cnBZKwU0x9lOVB7wH6Wc39+KLGPTn8baEj/g=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=OzcDc3U09RWMQOUwMgxccj1jmTf8CVPmpN6QlzMqPndDDuzOT+V00yOwRv/8VCC+C
+	 xwWFOs+ytJ9CWmc6Mp30fEzzBdPTAYQDPBZtltVy0l1tLMu7TzMbkCgbliN+zuQCIs
+	 7jXvFyO+RipEZgx7g9UPH84Z7xh/MCjFUJh1JQIYM2nw4D9vjHIfjf0BegNbwXEyuB
+	 jliJBcnqnL23sfjuDtEZXu0onWDAScTwvYqQw2V3Lm2ygpVTKYAk/G/sMKlJa9q7Cv
+	 Cm+zT4sTqa2Rf0+H30xqwRUO+O+MqUeuDfyfS42GFkorx0xOZ9tOOPFbEDnRvRIMx3
+	 jawUBB+7KeaFw==
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-70937ddca68so369972a34.1;
+        Wed, 31 Jul 2024 06:01:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXk1TOH8y+K7HTb62R1f9cAXYK+DX+0YF//Twdupnb9VaR6uLa+W9OZRqtqeP1zHAJaOMoqcUa/5Ji/M4knz6nKpyfuPXGKTZBNxvtBnf15bBT32z5TBdZLMNiUkezKhvk5OzxCLyfwgwVsQ0gt/6OSlaTm+KAcOG5qyKCIhzxn3PKr1fPkvjY/G6qFa5oFPE5wDRRuupjphON1
+X-Gm-Message-State: AOJu0YyaI6mwQW0jx3t/Djjpldr9QQd/BoO+WAV0L7/OvYPtbfCln1Ch
+	Gy86PMQp95hMARnEdIwPW/PNJrt73uDNO2vfxXyPjrDKYPBoVkzyvZ6lUIHWlv5m+22le0mUOug
+	BS6lWlQhWv1WIzT0AehdyeEkE1jw=
+X-Google-Smtp-Source: AGHT+IHR7XEcFHPLksjQmwAtEeWHPpKDjYfRSPpiwZBjHMhkVK9+8QlLG6b+zqiWDqo4DwOtnaRCEolaJ1S/c+wwanM=
+X-Received: by 2002:a05:6871:e2d0:b0:261:934:873d with SMTP id
+ 586e51a60fabf-264be1e0f03mr11838413fac.5.1722430885754; Wed, 31 Jul 2024
+ 06:01:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DM4PR11MB6479:EE_
-X-MS-Office365-Filtering-Correlation-Id: cb11514c-2aff-4e02-41cf-08dcb160acdd
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?V1A2OW1EU1ZaNGROeVhKVjQ4MDVrU3pHS01BL09HT2J5U1BqbUdRQ0pHenhi?=
- =?utf-8?B?YlBFUWxXNUljTWZWWmdBck5xbExQNUV0MHhPem9xVU13TjBLcXpEeEE5ZHdz?=
- =?utf-8?B?WFJlU09zZTJtbGxJbWJOOXoyTVlEQWdqMjh1VzJxRnlkQ1NDcmRBYXFveVFj?=
- =?utf-8?B?Sm03dmhMMzVMV0tucDhVVDdsQlZBQzVTdDZkNHQvWjBUVEh5K1BiTmIwR2la?=
- =?utf-8?B?Tzd4a0hGS0swZ1YwUmh0Ukk0MzE1R0dCUkhReTJjcytxU29qell2eWZISXhv?=
- =?utf-8?B?MDVsL1FDMDd6TGxZNWI0QUpzbGtTelRKZnJUWDJQZUZWeElISTJJWXUrelht?=
- =?utf-8?B?Z3pZMkd1NGNGVGZDcDlpYXEzMWQ3SjBTSC9DcDdlUEt4OVY1RlFmZ1R6WFJ6?=
- =?utf-8?B?YkRuVTN4Tk1PaE5ZejdlOUY5cEVBUnNNSWxsNGxZdE1nbStVTHkva0t4WDla?=
- =?utf-8?B?ZDVucXBaT3NNWTF0azA0dk1FZEtQMFUydFdOVzVPbGNjNG1nZ0JjcnRwYWIx?=
- =?utf-8?B?TU1oZ2ZDcW51Qk1VTjQ3UW5UNXRlUjVZS2c4Q3RiOC80OVo2cDJCMk5pc0Ri?=
- =?utf-8?B?eVMxd3Q0ZkpNaUZQS1lKZ3VWK0FrNzhTUWdWdUpsZDYrTldvWjl4Mmp2amZ1?=
- =?utf-8?B?NmxCcTFDeWpCaUxOVGRxdXk2N29ZNi8vVHZSTTBxQnFsMVIzWUZEM2VkOXRo?=
- =?utf-8?B?Nm1JRTRpQW00dm1ibDVRdEZrcjNydnl5ZUYxOFJ3RFF2VVRzU2ZieEFFdzYv?=
- =?utf-8?B?R2o0T0VWSm56NFVHazRKUjNKbmVlNHBSZEdCMFgzaXoxNlltc3d2bHZOZmxW?=
- =?utf-8?B?UmlDWjNidjdKSlh1dGg5UnJsb3cyelBUeXNkNVJDVkt4Q08zbXVFaHVSaDFZ?=
- =?utf-8?B?TWpJSzkydE5VR0N4bGt6R1RVZFBEODMzSXkxWWFvSW5QTUUwUDgwQzhYbmlM?=
- =?utf-8?B?YVRVTGQyOTh2cmxpY3oyWGJRNTR0L3ZEYWI4dzI1elZKYmRXLzFYZTFHSW50?=
- =?utf-8?B?bWNkUTQ2eXVzbXpGYnY3VnIyeHZrQUV3QUtyc09KVmxDSTJMRXNXVGltaUR0?=
- =?utf-8?B?UTViMkxpY0Y5THNRYnJwMElyaHN2a1AxYzF2MkJuRXRHLzI5M3NwYzFxRENm?=
- =?utf-8?B?enpmZU4xN0ZPcUVzNzhiTGV6Nkw4Y0tmWUN1QWkrMDlPa1pwSzQrSjhOb0M2?=
- =?utf-8?B?M1FaWkNmOTBaUlJ6SUdNUHFkMUlVT05oRm0yTUc2QjdhNXVzeWl5ZGkvQ0l2?=
- =?utf-8?B?cVQ3VWczYmlGTmRCU0FFTnZ0S1V0UjNyTTMya29oWUlSTzlCbUY1OWV3Vk1Z?=
- =?utf-8?B?cEk3Z1pvSmd5RWk1eUxGNDE0ZThRd0NHWFozL2JsQUpBSVJ5Mmh3SWRqSUF1?=
- =?utf-8?B?anlZWC83YmxKS1FablpKMmFpNmhFSCtEaENlUjlEcDY1UTVEd0hkRVE0d2FM?=
- =?utf-8?B?ZHZtZXZxZVhmaTlCejdpcmJMY0VNZm9kcVprTFI3eWFibWNkb0s1NzVqTm13?=
- =?utf-8?B?YmFqb3N2Nk9aWmlWNEhsTFRKemJsOHhmMWsySDljS2F5THhaUjUvOXlnWFRU?=
- =?utf-8?B?NFJ0VlpZcUkrZXcrMW9Id0FQY2RaMEdVOE1Dd3ZQaUxUUXBJVURiS1hBbnJE?=
- =?utf-8?B?VFlDT1VkM3ptbHBoazdDZ2ZrRGZSaUp0MmJvY0xKM1lnVitnRVRIOEVQeDRl?=
- =?utf-8?B?SFpxVjlYOFlWZFhGWEZaRUxRZTVmWHRhc0x5SlJ1RzhtNDZqYWFvc2FIa2hN?=
- =?utf-8?B?MUZQb0pYUTZWMDVobjl6QXdjSDc4ajdBcnJ1UjJiaGRsRkpWT2hFMHcvcDBO?=
- =?utf-8?B?TWNqVzRjZU1nZGhCVFdTZz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L0YrdlhtK2ZMaVUyVk9DQkhTbTB1U1E5NFFJbVpyM1c1OUVWN2E0V3I3Rzh6?=
- =?utf-8?B?MzlNK1hyZVo1OVphcDZXOUlTRll2QWxkTks1TnNCRjgzdmxLSG9YN2xyS0g1?=
- =?utf-8?B?cnpIOE5PT3VCMllyc3ZWNWJOenJESlQxUS9FRjI3SUV6L09kWElWOGVSTWlv?=
- =?utf-8?B?MXdISjZ5WGdrN3dPMVhaSGx2Q3o5V0JxNmdabjhZbkxMTUpXN3o5WWZHOExs?=
- =?utf-8?B?bjY0QXhLZElxejV5cGU2amtxanlCL1hOdUJLRHhrTWsrRWo1QW1SM3pWaGc4?=
- =?utf-8?B?aHd6RXliUXpYakxvS0dBOVhoQnpaMGpvb20wWVdhUGRkZTNnR0YyNm5hQ2xx?=
- =?utf-8?B?aGM5dk04QklwR2psaDkxTFhCYU92c1pzdlVKczZRS0didVJDaElVeWhadC9Y?=
- =?utf-8?B?dmdIa2c4Q3JHMVR1MEY1VnlmQS83Q3NtUkhreTNJQmt5YjNBMUVLT2JaTkEw?=
- =?utf-8?B?RGRzaEpPSVM3RytPZmZGMTg5cmpXRkVJeVJjWHpBWFRxRTVtTm5WYWliYlNm?=
- =?utf-8?B?QTA1Rm11WFViWkVoei92elh3eUFvdTVmaGlPWk1kQTI1U3YvbVBwQWtIYVNM?=
- =?utf-8?B?dHFGNHpycDQ3dndHME4wWFR3b21vNmRnV1dVV1Bhd2ZXNGlPR0RaWnI0UFlh?=
- =?utf-8?B?WnRxT3ZBQk5BMURoNWFDdThWbFY2cERiZllPcGU3MkZIR2FXdFNzaWVqUFU0?=
- =?utf-8?B?REtjT1VMbTlqYWdVRW03WERxaG1FZVVZYjVOeVBnaFRZbGltZUtuN0ZQaUIr?=
- =?utf-8?B?UGFvemgxWThURWVBODY4N0djNGVFZC9OemxXSDB3a294L0syVVlha0xYSElB?=
- =?utf-8?B?UVFCVjJVTWtPR3RZdGRvWi9leFdTSnNHUkl5NDVQRkV3VmZNOVBzWXVNOUdW?=
- =?utf-8?B?TkFqdVR4TXV2RFllZXhHemNtcTVUR2h4eGhlRmZrMHBwVEZub1NUYnM5NnRl?=
- =?utf-8?B?Y3M2UnYxakFEb2FjUFpWcFFkUjJzbkU1RWJRU2V2OVF3b01pYTk5clRSU1dx?=
- =?utf-8?B?d0RyNjNwZ0tKTHdwS3FBNFVyb1JKYTdXZS9xYmJMSSt4WlpzTy9KR1p5U1VU?=
- =?utf-8?B?RjVkK0ZPNlRGakUzejZGck85Y3ZpWTIrb3VoRG9jMmdpSkNJc3cyVTFwa1BG?=
- =?utf-8?B?RUR5SWdpTXZsaVFEZlMzQzdFWnM2N1FWY2ZOM3NXYkNQbW1Vdlg0Y256amhQ?=
- =?utf-8?B?SVczWjB1OHRHemRpajZVWHFKWE5VUk1IU1FmMEZiYlFqZ09DeHpPaEtMNnlW?=
- =?utf-8?B?WWMyMlVLVVlHaUg3RE16ZEsvMzlxQ0hQTTZMZVdQMUx1SkdLaFl3ZmdyOTM4?=
- =?utf-8?B?UENKdEFpSmFONGpnSXlrVXlwb3lyZjZaNjRTWUV3RFJVMmc2VnpFVDZ4VGIy?=
- =?utf-8?B?VFlkb3pONjdBVW5QSDdLdTZzWURWZlNSa1E5Mk9HaHl3cVo3L0xRRXpqc1Bw?=
- =?utf-8?B?cFNKbTFJUHV2S1JzVFMrcFZtVmNDSzBSV0tKeW0xZE8zVDFlMUxSRnhsRnNu?=
- =?utf-8?B?dTBoWStXM1RJaGdrb1lTZE1PQU04ektnd0hWSEpBby85dU9GRjdDemtWZDFn?=
- =?utf-8?B?UkY1NGs0MEFYc2pOMk5CMDR2SVR0N0xnV29tczZ0RmE1dW1yOTNoeXQxSkF2?=
- =?utf-8?B?LzZuZ2toaHAxTTBmeW9pQis0QjJkT2FNS3Jsa1E0dy94Vkx3RTVGNVloQjAx?=
- =?utf-8?B?S2Y3SGF6MWNiQURzNWhJSHFUVjdIYnd6UXJPMms5dEwwRTVOVUU0TTNYdUVX?=
- =?utf-8?B?K2h5anlSblVaczl2d0VyUW1nczdjaU5Zc2xuZVUrMEY3a0kwd2lEbDRXZm9Q?=
- =?utf-8?B?U24rNHpXRTRhdjh2NE1WeUttb0s1RzNLUmszZWJKdWJJdGE4ME8zelFMVHFm?=
- =?utf-8?B?MzA3RHpHSm43cWFhZWUxSG1XT3prQlZRTzVuRWl2VkZVNDRTUC9UQlRQYjVO?=
- =?utf-8?B?ek9POFFhdnRGcnY1emxGV3NTczhEcFdiVVEyUkxncFF3UW1tdG5MYkRYTnBa?=
- =?utf-8?B?Y1Rja2RRdzYxV3dMTTdzeHFDMFVoL3V5TlFyS1pOSThva25ZL0F6WW1OQnlm?=
- =?utf-8?B?ZnlBbm5CSklvZ3d4cklsTFhEb294QURhTFdqMm9abFB3Q3dTT1ZZUW0zWklq?=
- =?utf-8?B?WEVURFExVDArcXlaRWhCRVlPMDFlZ0V5YXY1QW5heUEvVXpPU0REZEMvNG9K?=
- =?utf-8?B?aUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb11514c-2aff-4e02-41cf-08dcb160acdd
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 12:59:55.7312
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: thyBW4Lc/WKydiJO2EleIk+KdjHaFTrdFVJuoDEZSI+hjU3phvZuXVPTBKqPWKyGBcqh5jYPsO9tjIJtUS4+UQ9bxZXZqBQX2DipLlDD9nI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6479
-X-OriginatorOrg: intel.com
+References: <1922131.tdWV9SEqCh@rjwysocki.net> <9002154.VV5PYv0bhD@rjwysocki.net>
+ <ZqoxXdQRxhfr5cHY@shredder.mtl.com>
+In-Reply-To: <ZqoxXdQRxhfr5cHY@shredder.mtl.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 31 Jul 2024 15:01:14 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0h7T27fcL5-Wp5cjxi7mqKVh3_jk-8KwXPGWRbO31sm7Q@mail.gmail.com>
+Message-ID: <CAJZ5v0h7T27fcL5-Wp5cjxi7mqKVh3_jk-8KwXPGWRbO31sm7Q@mail.gmail.com>
+Subject: Re: [PATCH v1 13/17] mlxsw: core_thermal: Use the .should_bind()
+ thermal zone callback
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>, Linux PM <linux-pm@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Linux ACPI <linux-acpi@vger.kernel.org>, 
+	Daniel Lezcano <daniel.lezcano@linaro.org>, Lukasz Luba <lukasz.luba@arm.com>, 
+	Zhang Rui <rui.zhang@intel.com>, Petr Machata <petrm@nvidia.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 31, 2024 at 2:43=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> On Tue, Jul 30, 2024 at 08:34:45PM +0200, Rafael J. Wysocki wrote:
+> > From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+> >
+> > Make the mlxsw core_thermal driver use the .should_bind() thermal zone
+> > callback to provide the thermal core with the information on whether or
+> > not to bind the given cooling device to the given trip point in the
+> > given thermal zone.  If it returns 'true', the thermal core will bind
+> > the cooling device to the trip and the corresponding unbinding will be
+> > taken care of automatically by the core on the removal of the involved
+> > thermal zone or cooling device.
+> >
+> > It replaces the .bind() and .unbind() thermal zone callbacks (in 3
+> > places) which assumed the same trip points ordering in the driver
+> > and in the thermal core (that may not be true any more in the
+> > future).  The .bind() callbacks used loops over trip point indices
+> > to call thermal_zone_bind_cooling_device() for the same cdev (once
+> > it had been verified) and all of the trip points, but they passed
+> > different 'upper' and 'lower' values to it for each trip.
+> >
+> > To retain the original functionality, the .should_bind() callbacks
+> > need to use the same 'upper' and 'lower' values that would be used
+> > by the corresponding .bind() callbacks when they are about about to
+>
+> Nit: s/about about/about/
 
+Yes, thanks!
 
-On 30.07.2024 15:40, Tariq Toukan wrote:
-> From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> 
-> Expose Precision Time Measurement support through related PTP ioctl.
-> 
-> The performance of PTM on ConnectX-7 was evaluated using both real-time
-> (RTC) and free-running (FRC) clocks under traffic and no traffic
-> conditions. Tests with phc2sys measured the maximum offset values at a 50Hz
-> rate, with and without PTM. 
-> 
-> Results:
-> 
-> 1. No traffic
-> +-----+--------+--------+
-> |     | No-PTM | PTM    |
-> +-----+--------+--------+
-> | FRC | 125 ns | <29 ns |
-> +-----+--------+--------+
-> | RTC | 248 ns | <34 ns |
-> +-----+--------+--------+
-> 
-> 2. With traffic
-> +-----+--------+--------+
-> |     | No-PTM | PTM    |
-> +-----+--------+--------+
-> | FRC | 254 ns | <40 ns |
-> +-----+--------+--------+
-> | RTC | 255 ns | <45 ns |
-> +-----+--------+--------+
-> 
-> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Co-developed-by: Carolina Jubran <cjubran@nvidia.com>
-> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
+> > return 'true'.  To that end, the 'priv' field of each trip is set
+> > during the thermal zone initialization to point to the corresponding
+> > 'state' object containing the maximum and minimum cooling states of
+> > the cooling device.
+> >
+> > Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+>
+> Please see more comments below, but this patch is going to conflict with
+> the series at [1] which is currently under review. How do you want to
+> handle that?
+>
+> https://lore.kernel.org/netdev/cover.1722345311.git.petrm@nvidia.com/
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+I may be missing something, but I don't see conflicts between this
+patch and the series above that would be hard to resolve at merge
+time.
 
-<...>
+Anyway, I'll try to apply the above series locally and merge it with
+this patch, thanks for the heads up!
+
+> > ---
+> >
+> > This patch only depends on patch [09/17].
+> >
+> > ---
+> >  drivers/net/ethernet/mellanox/mlxsw/core_thermal.c |  121 +++++-------=
+---------
+> >  1 file changed, 34 insertions(+), 87 deletions(-)
+> >
+> > Index: linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > --- linux-pm.orig/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+> > +++ linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+> > @@ -165,52 +165,22 @@ static int mlxsw_get_cooling_device_idx(
+> >       return -ENODEV;
+> >  }
+> >
+> > -static int mlxsw_thermal_bind(struct thermal_zone_device *tzdev,
+> > -                           struct thermal_cooling_device *cdev)
+> > +static bool mlxsw_thermal_should_bind(struct thermal_zone_device *tzde=
+v,
+> > +                                   const struct thermal_trip *trip,
+> > +                                   struct thermal_cooling_device *cdev=
+,
+> > +                                   struct cooling_spec *c)
+> >  {
+> >       struct mlxsw_thermal *thermal =3D thermal_zone_device_priv(tzdev)=
+;
+> > -     struct device *dev =3D thermal->bus_info->dev;
+> > -     int i, err;
+> > +     const struct mlxsw_cooling_states *state =3D trip->priv;
+> >
+> >       /* If the cooling device is one of ours bind it */
+> >       if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
+> > -             return 0;
+> > +             return false;
+> >
+> > -     for (i =3D 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
+> > -             const struct mlxsw_cooling_states *state =3D &thermal->co=
+oling_states[i];
+> > +     c->upper =3D state->max_state;
+> > +     c->lower =3D state->min_state;
+> >
+> > -             err =3D thermal_zone_bind_cooling_device(tzdev, i, cdev,
+> > -                                                    state->max_state,
+> > -                                                    state->min_state,
+> > -                                                    THERMAL_WEIGHT_DEF=
+AULT);
+> > -             if (err < 0) {
+> > -                     dev_err(dev, "Failed to bind cooling device to tr=
+ip %d\n", i);
+> > -                     return err;
+> > -             }
+> > -     }
+> > -     return 0;
+> > -}
+> > -
+> > -static int mlxsw_thermal_unbind(struct thermal_zone_device *tzdev,
+> > -                             struct thermal_cooling_device *cdev)
+> > -{
+> > -     struct mlxsw_thermal *thermal =3D thermal_zone_device_priv(tzdev)=
+;
+> > -     struct device *dev =3D thermal->bus_info->dev;
+> > -     int i;
+> > -     int err;
+> > -
+> > -     /* If the cooling device is our one unbind it */
+> > -     if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
+> > -             return 0;
+> > -
+> > -     for (i =3D 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
+> > -             err =3D thermal_zone_unbind_cooling_device(tzdev, i, cdev=
+);
+> > -             if (err < 0) {
+> > -                     dev_err(dev, "Failed to unbind cooling device\n")=
+;
+> > -                     return err;
+> > -             }
+> > -     }
+> > -     return 0;
+> > +     return true;
+> >  }
+> >
+> >  static int mlxsw_thermal_get_temp(struct thermal_zone_device *tzdev,
+> > @@ -239,59 +209,29 @@ static struct thermal_zone_params mlxsw_
+> >       .no_hwmon =3D true,
+> >  };
+> >
+> > -static struct thermal_zone_device_ops mlxsw_thermal_ops =3D {
+> > -     .bind =3D mlxsw_thermal_bind,
+> > -     .unbind =3D mlxsw_thermal_unbind,
+> > -     .get_temp =3D mlxsw_thermal_get_temp,
+> > -};
+>
+> Is there a reason to move 'mlxsw_thermal_ops' below?
+
+Not really, it can stay here.
+
+> > -
+> > -static int mlxsw_thermal_module_bind(struct thermal_zone_device *tzdev=
+,
+> > -                                  struct thermal_cooling_device *cdev)
+> > +static bool mlxsw_thermal_module_should_bind(struct thermal_zone_devic=
+e *tzdev,
+> > +                                          const struct thermal_trip *t=
+rip,
+> > +                                          struct thermal_cooling_devic=
+e *cdev,
+> > +                                          struct cooling_spec *c)
+> >  {
+> >       struct mlxsw_thermal_module *tz =3D thermal_zone_device_priv(tzde=
+v);
+> >       struct mlxsw_thermal *thermal =3D tz->parent;
+> > -     int i, j, err;
+> > +     const struct mlxsw_cooling_states *state =3D trip->priv;
+>
+> Please place it between 'tz' and 'thermal'. Networking code tries to
+> maintain reverse xmas tree ordering for local variables.
+
+I will.
+
+Thanks for the comments!
 
