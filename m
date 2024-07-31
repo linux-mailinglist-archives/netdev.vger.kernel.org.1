@@ -1,421 +1,358 @@
-Return-Path: <netdev+bounces-114565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABDB8942EDB
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:43:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66773942F25
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AB00B21255
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:43:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A4A928CCE9
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3459B1AED53;
-	Wed, 31 Jul 2024 12:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KkZnLKGK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139341B150F;
+	Wed, 31 Jul 2024 12:50:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3831AD410;
-	Wed, 31 Jul 2024 12:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722429807; cv=fail; b=CWM1+reUIs7R7OY6xMpMmZCVLQR2d25cQKQBFPr8ElfsZXmKwcPlJxfAzLjM8++iBJR3KxgYLisCVmM+MRznuiYVv2A4Es2Cu39mAGKd1hc/BMo1P0YQcUCTeoimxSKAXtKSt3RTqbD9cyzvddnMxXcLVJNpSFt1QDY05RKFhkY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722429807; c=relaxed/simple;
-	bh=yq86WrrST53zF8HRFZExqneJn58+Pima0WJGVc2Axq4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AulTTabpjTD0UjY+0fj0pL+nxmwBVxxgbzd7tIA/8ZZuuzWm82uZFWzIQezr5YXXI6gfFxEw/czkMm5XZ27rWzWbqhdp/ow7Sv/3HgNhcf/IDpvmib6RS+/0IwN6BL9bCF572qZGi2eXojg2/1md/Vkggy/0dnk5IZqpDtzoTkM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KkZnLKGK; arc=fail smtp.client-ip=40.107.223.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=n5EE6Xcux0SDfnVYcZIm7c5AbtlI3q4xVrVbagJJImRFBGtcr6QXiGspPdJRxt1zlXEvfO8iFaup0z4NMJFVZVvtimeOmqx5c7Sk+jvWvW8KZ05wmv4hv+KCm1y0FDWXXgNOsVQr0p4OXt94G6+qg74Zp4H5Ec40Y9mYo5/P5kbsZBptfvpd6dc5VOjb3B3AUs3hvXsOX0wAq3lauEi4R4RlunDBlB6vSCaZikIt7/Fj8noec02LYmUFYP+BmfsEkKN3kgF2wryymptAMfcDaFNrkKLuJiAsyUErO9YYjA2PL3eIfwkNDFMBEKWKXjPKYH8ki8OjP3XsbS4xmwGPSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h6ryd+DGr0FoL65Dl3cJdwvkkNF5AHTtTkJ3ohHE5TQ=;
- b=aL1DP2cp21cyf8NZAWrGzQ4R309cqwjT9F624+97zQHGY0a8tudfZh8c3s1IMhnNSy+F9jcb7+F1nflaUFTjbJXHAcIQ3SgJKGaU6IgZQ9uY5yZ1MRDtQvRcWf6Gk4h+JIDKc24QeR3Qf2PuTmOuzuR3EGqrOg25dOjtFkPkfjfS7hK+URwupVoCgnrrvra8W1dwtw1rdb3fabrmyGuolDacsf7RuxSOXp/5CWIHm8mpsKNvtSw0QvgqHcK0eOvqKtX4NhnYHUHyNea9Qo154Xvf9n2cBYEn0fIAEdAaX++RMOgK2BLkVbojFrHJmUKCK4faob/nyjavgD6KHWCJpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h6ryd+DGr0FoL65Dl3cJdwvkkNF5AHTtTkJ3ohHE5TQ=;
- b=KkZnLKGKBzW73oPX+yTC7vBqYCQDt5RdyxnZHY81Wgz+eQjX3Eg0r1FgEqgZx7fLXGn2p8csBZuri9OTXgKKH56yyWGadAbvv3gqUxx+zB1DqJ4PYuvsBWcttrtb7trVjJoB2pHYdTVUKWNshsCJ7Dda0H6y8afY/rZQLsdoLtzhGgJ63J3OCQowr7rH/ounro/CuH3/v8i0sYwMdbFg3elIG/v9vAqyMti2XmcRjbUvVMZh5Gxcyr6HTBuPHPUJMOAIhAZpCCFr1E0umo4oxKXMLnEI/JvEIbjsXV4a9x060TTfztxy2Hqkm2KiaEPoefwK5oSlVxZ5et5uorch1g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by LV3PR12MB9165.namprd12.prod.outlook.com (2603:10b6:408:19f::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.32; Wed, 31 Jul
- 2024 12:43:20 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::9ec8:2099:689a:b41f]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::9ec8:2099:689a:b41f%5]) with mapi id 15.20.7807.026; Wed, 31 Jul 2024
- 12:43:20 +0000
-Date: Wed, 31 Jul 2024 15:43:09 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Linux PM <linux-pm@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Linux ACPI <linux-acpi@vger.kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Lukasz Luba <lukasz.luba@arm.com>, Zhang Rui <rui.zhang@intel.com>,
-	Petr Machata <petrm@nvidia.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 13/17] mlxsw: core_thermal:  Use the .should_bind()
- thermal zone callback
-Message-ID: <ZqoxXdQRxhfr5cHY@shredder.mtl.com>
-References: <1922131.tdWV9SEqCh@rjwysocki.net>
- <9002154.VV5PYv0bhD@rjwysocki.net>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9002154.VV5PYv0bhD@rjwysocki.net>
-X-ClientProxiedBy: TL0P290CA0010.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::14) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103061B14E9;
+	Wed, 31 Jul 2024 12:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722430248; cv=none; b=X5CbwsJchRIysKvLNvko37jS2L5B0+bcMpXVFduaRrPDbwSVRyyz+3Rf+yqT6CqHCt07ihZcQBNJ14P3cwy7GOanoPf3fnCu0youSDSkUuzkWW0PacgRtltMDG3IUeJnNoEzwJ5D8tbH+k2IU5EhnRf2KDC95USk+nRrKbmshQI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722430248; c=relaxed/simple;
+	bh=AXjwLbO3I2d0HyvAYaLipbQ7GteHzlhH7kz5BJgfFWk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kTupZVQTQdY0cH/6W5B0pBP78tramagjMLE84BfVnow9byw0NQOmh5d9VqeVWsHIAaTnvs/TmRVLnlJ5XaPorF9dL4+3yokeN4FERGLvDC+AlXm/xV/Gt6rZfkhsOyiEuz9wAFgla70n/i/w1s8xPVh+nTQJfuaGVygzPzU+2+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WYsK50cWFz2Clf0;
+	Wed, 31 Jul 2024 20:46:01 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2A5D0180043;
+	Wed, 31 Jul 2024 20:50:35 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 31 Jul 2024 20:50:34 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <bpf@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+Subject: [PATCH net-next v12 00/14] Replace page_frag with page_frag_cache for sk_page_frag()
+Date: Wed, 31 Jul 2024 20:44:50 +0800
+Message-ID: <20240731124505.2903877-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|LV3PR12MB9165:EE_
-X-MS-Office365-Filtering-Correlation-Id: 15299b61-69f7-434f-51bc-08dcb15e5bd3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vEzUOQi4/MFYJAsNefiYMmcNDrbqhZgFrpOd9vFJ0ctb2f0YtqrmtvUQr2Vx?=
- =?us-ascii?Q?i9tReKELyqs5PxpNIWVCcgaw1ilYpIFwxPxYgopyGP3buKgsUVb2tFzeFee+?=
- =?us-ascii?Q?UqiTPU63AXOBWYDM+Z9keArPt36fcUBLNrvcOAgtoN7sBTYaLKg7HATpqh9E?=
- =?us-ascii?Q?UmTsqLhocrzn0XrCACjkIEZ4srMPS7WG0JCuaCfdECeYIhLi7/QofTA5PtTl?=
- =?us-ascii?Q?LyKYVxWvwiGyuHlQsSpL9o4bMxtmKlLBdaDpOw5V4gfHpweXft+Uh5E2G/5B?=
- =?us-ascii?Q?8wRsl0TJ6F52EX7JosrMEjVRk1QIeKg2k/H1Rb36H2Jjga3R8Ofrf9dv3yta?=
- =?us-ascii?Q?fOG3T/xYkudNhudarpKkFsxXSaL6uw011Lp7+RlXSRwf6zX9hDX0qgonlAf1?=
- =?us-ascii?Q?FfLjjNSOyP2zADJPwbF4c1CvBy4/5o1Xf1AKe65XBji6qbzdSDjOEB6QHAaJ?=
- =?us-ascii?Q?5rZE/dyhu1GTFflaAbzwvXPV3bIUMUgiQOaHZFbpOGomNYx3T7Gk18f3s9j8?=
- =?us-ascii?Q?PLhOZp47P0sEi7c/YrlYZvxzS4tQGyzYwY7HcVSIzpbMWpM+hUDDI09lg4ZP?=
- =?us-ascii?Q?zeXRGaWqgOXswe59f2XsJLquyHmaAUOTlNgfs7LoSbrJoU3OzVm4va/f+3rj?=
- =?us-ascii?Q?bhGbXADK2A1J3QVNRMuCVsb2sexsW6lP4aBY9+3Az26HQvxiKOIfVh3PvFO7?=
- =?us-ascii?Q?vJwnMZsTGIFsVM8lqb1wYuIJ22T0dRyWzq2A6hTZtXSw90wP/m0RF/Ftrfva?=
- =?us-ascii?Q?f7QHmYQfBwkC1cOZCXdbVnpUfezxOY3tzuk8y4RX4ItysSBBQiE0AFsbynou?=
- =?us-ascii?Q?iNAnsYHDjwy0oe5+bHYbV474W6qJRiKtwYb8NZVETvIg6GrXPcg5nXmxAuqn?=
- =?us-ascii?Q?UOTBG3taFQSzY881OeKngP3X0Z4C/PTQ2eSMPRrUSm0NJ4SPpXpdURZq9TSr?=
- =?us-ascii?Q?zAhzfmO9zjnkv662HSIuXH+oCfTWapc/KaXt8PQ7a/zYAeimHyl9Fpo19GrV?=
- =?us-ascii?Q?M9qUMjJwd5tLEIF8820u97WRvL/WZtGce01TjtX2Qydaf9VMG17LzJaTOGnZ?=
- =?us-ascii?Q?bwPD4NM89k5xdHR5zn2JDD7Jf7j1tRVgvJBBG8ypzQPwp2rez6nVITpxmH7I?=
- =?us-ascii?Q?IrZkRDgCMXxJexzevEQ1x4mo96uxhLG/PzqJ9ceml0zaWr8GVkdaGLeTFUb1?=
- =?us-ascii?Q?2FkEqrsgcoJQfcoxX2m2SxkBrDjol9OEh+rQNWj47CSgIqOd/keObbK3a874?=
- =?us-ascii?Q?OQsakWDF0xM99gMBWD0uomJwrIT1y3MCorBYK+M+yQiL/W3rSi5EdX+O1+V3?=
- =?us-ascii?Q?uLMY2gKS/SSiHkC6FkB0dm99CtmLmfKNIkr2lvCuWQLVQAdzOAOHBsdxGzhl?=
- =?us-ascii?Q?njo4Wfc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?qTt7A65mLyEVyYD5l2Q/cnHggsdF8CygKnyM13fStG0EMWTx19Fx5R4Q2M1p?=
- =?us-ascii?Q?AKJseNqUKwthKJTms2QoGELSRMxIcLaSxpZXQpv5ylkwdVXHtXBj3CIPagXP?=
- =?us-ascii?Q?kkGRkoOFzB2TRfdnsI14Kpuddc4beFK6i+UlXDd+WCeXmQNcRH15OfyYpOqm?=
- =?us-ascii?Q?I9q3VMUYnHcD6dH2FJv9ulbjmKwhbRwebxZjp00ZZo95wmZmgwNndE+A/ArW?=
- =?us-ascii?Q?9tyC/+zuX7Dyp+gYJ3y+kw8IKW8+EwL7GUS5u4ekVl53qLAx35M3ddqFjJfz?=
- =?us-ascii?Q?+z81ss2iNuetT+0xtEsYFlBEmtMyX65r2Ko38i3TW1O078iO2Bcu6HxgVTSG?=
- =?us-ascii?Q?coFaqMz92EoAnvKXAuAfDP0FdQ2FNedYKXsjTEOe/0CinpHX7ShM968FKh9W?=
- =?us-ascii?Q?Ih8NUnGzeXjrGvUdZT2sT4cKTEhmKqnqYQC9N74uAqFy3Mud+2ikUubFjijp?=
- =?us-ascii?Q?JMzsO4FkEFQOYUef86G1YlpmUYQLAavPfeFXj5jJB3aWy+55285SGEPD4fg7?=
- =?us-ascii?Q?db4p43T3X5MjjkbS87AtUBCpgDI89MRPxBLb9OOGHkMdnWPJxHgzbzwNHg1M?=
- =?us-ascii?Q?tA5ctj7Ol1FcqVIiii2NHSp44ZAh43KH6KKvXJmtq9z5aAEhl+VA7b3pokGi?=
- =?us-ascii?Q?vEwnGnI9Ep2fpF5BG+83svxtfrZrR0raKKxWeNftr1gElNfoNcQCcG+tebz+?=
- =?us-ascii?Q?2ZmseXx32aMGn+m9q8vkG+AiPWHAJzJKtJnAM2VCrdwiXI8+ShPKCL/621CO?=
- =?us-ascii?Q?dA005RMd2dJy4miZVEM/tYFmE+PgFShwptPkmzG/wCUkozOuCzS/zxnTYOco?=
- =?us-ascii?Q?zPFHLfVgktk1LMuZ1lsKtpkFWEBvm72hvcp8RdRNACp0rFS2s3g/0t24NQhq?=
- =?us-ascii?Q?sf5G3PX09wlqN8nTM9xqzxSPdTgYVWWwTw3es6q7pVeElndewR078GqbBSln?=
- =?us-ascii?Q?vrcy2bFTd7raMhLET1Y80+brHSWSYR0I544paLwd1iGG90M7l90HyFomnmnS?=
- =?us-ascii?Q?KrmkXk8M34pzXluMBIPPq1yAo7cgCVxwt+K+eHI1oAO9zxPjtjGrVbt3QWOh?=
- =?us-ascii?Q?ihNAzxCJZzspYFOZW7Eq09h9fmJv7SgoYsqVzO9P4oFQMi6OgTLz8hp6Mh0t?=
- =?us-ascii?Q?IUudbEq12HB9pzd41LRWuT7zo+raQGeNb9YTbNaufOck/OT4jB2kKNdKJk/5?=
- =?us-ascii?Q?86lx67ZhrMDb0zx2jhEf58PULXdN+w7fzowRL61vxeiVzQX3dDW7z2qEOqq9?=
- =?us-ascii?Q?PM5pmrFLaDiUmcIyRtHeUJLLpA3BIr/IJty8gx0zKI0tp//knM+XEhGnxg2L?=
- =?us-ascii?Q?JAA/LCZNHmuDnNN0fdk0hwwNML6ABMO3ksrX/Aqk/5Q34qJy3GtKoGUJeJIN?=
- =?us-ascii?Q?8jrGoNl/nJP7b/BQQCcfylNPG8VDhrqo7KwuVOcF0JJ+GlR1/ZZ8xnDTogc8?=
- =?us-ascii?Q?Fc0mLmARApy2DS6JjYIBx3ehWco+HQ/gBzpOa6t2hwov7rWRnUOxCmNuTccS?=
- =?us-ascii?Q?XX2rPXZDBUDCgDLlqYr1eVqIVrfVJGP2IUK5oC3qACW89oMdjx5Mr5Sow4Vh?=
- =?us-ascii?Q?oyO0zhwPh0mfolN13Rxuj8eMfty7mzv3C/KIgFuH?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15299b61-69f7-434f-51bc-08dcb15e5bd3
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 12:43:20.7276
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xw+KSp1+YJmZvfYVdUoTgbfQaJW3aE3lq+mR8TNpDnpvPFaW01mCFvmvkAlxljl0VQ390HKLV3NlVhxbqQI8UQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9165
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Tue, Jul 30, 2024 at 08:34:45PM +0200, Rafael J. Wysocki wrote:
-> From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> 
-> Make the mlxsw core_thermal driver use the .should_bind() thermal zone
-> callback to provide the thermal core with the information on whether or
-> not to bind the given cooling device to the given trip point in the
-> given thermal zone.  If it returns 'true', the thermal core will bind
-> the cooling device to the trip and the corresponding unbinding will be
-> taken care of automatically by the core on the removal of the involved
-> thermal zone or cooling device.
-> 
-> It replaces the .bind() and .unbind() thermal zone callbacks (in 3
-> places) which assumed the same trip points ordering in the driver
-> and in the thermal core (that may not be true any more in the
-> future).  The .bind() callbacks used loops over trip point indices
-> to call thermal_zone_bind_cooling_device() for the same cdev (once
-> it had been verified) and all of the trip points, but they passed
-> different 'upper' and 'lower' values to it for each trip.
-> 
-> To retain the original functionality, the .should_bind() callbacks
-> need to use the same 'upper' and 'lower' values that would be used
-> by the corresponding .bind() callbacks when they are about about to
+After [1], there are still two implementations for page frag:
 
-Nit: s/about about/about/
+1. mm/page_alloc.c: net stack seems to be using it in the
+   rx part with 'struct page_frag_cache' and the main API
+   being page_frag_alloc_align().
+2. net/core/sock.c: net stack seems to be using it in the
+   tx part with 'struct page_frag' and the main API being
+   skb_page_frag_refill().
 
-> return 'true'.  To that end, the 'priv' field of each trip is set
-> during the thermal zone initialization to point to the corresponding
-> 'state' object containing the maximum and minimum cooling states of
-> the cooling device.
-> 
-> Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+This patchset tries to unfiy the page frag implementation
+by replacing page_frag with page_frag_cache for sk_page_frag()
+first. net_high_order_alloc_disable_key for the implementation
+in net/core/sock.c doesn't seems matter that much now as pcp
+is also supported for high-order pages:
+commit 44042b449872 ("mm/page_alloc: allow high-order pages to
+be stored on the per-cpu lists")
 
-Please see more comments below, but this patch is going to conflict with
-the series at [1] which is currently under review. How do you want to
-handle that?
+As the related change is mostly related to networking, so
+targeting the net-next. And will try to replace the rest
+of page_frag in the follow patchset.
 
-https://lore.kernel.org/netdev/cover.1722345311.git.petrm@nvidia.com/
+After this patchset:
+1. Unify the page frag implementation by taking the best out of
+   two the existing implementations: we are able to save some space
+   for the 'page_frag_cache' API user, and avoid 'get_page()' for
+   the old 'page_frag' API user.
+2. Future bugfix and performance can be done in one place, hence
+   improving maintainability of page_frag's implementation.
 
-> ---
-> 
-> This patch only depends on patch [09/17].
-> 
-> ---
->  drivers/net/ethernet/mellanox/mlxsw/core_thermal.c |  121 +++++----------------
->  1 file changed, 34 insertions(+), 87 deletions(-)
-> 
-> Index: linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
-> ===================================================================
-> --- linux-pm.orig/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
-> +++ linux-pm/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
-> @@ -165,52 +165,22 @@ static int mlxsw_get_cooling_device_idx(
->  	return -ENODEV;
->  }
->  
-> -static int mlxsw_thermal_bind(struct thermal_zone_device *tzdev,
-> -			      struct thermal_cooling_device *cdev)
-> +static bool mlxsw_thermal_should_bind(struct thermal_zone_device *tzdev,
-> +				      const struct thermal_trip *trip,
-> +				      struct thermal_cooling_device *cdev,
-> +				      struct cooling_spec *c)
->  {
->  	struct mlxsw_thermal *thermal = thermal_zone_device_priv(tzdev);
-> -	struct device *dev = thermal->bus_info->dev;
-> -	int i, err;
-> +	const struct mlxsw_cooling_states *state = trip->priv;
->  
->  	/* If the cooling device is one of ours bind it */
->  	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
-> -		return 0;
-> +		return false;
->  
-> -	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
-> -		const struct mlxsw_cooling_states *state = &thermal->cooling_states[i];
-> +	c->upper = state->max_state;
-> +	c->lower = state->min_state;
->  
-> -		err = thermal_zone_bind_cooling_device(tzdev, i, cdev,
-> -						       state->max_state,
-> -						       state->min_state,
-> -						       THERMAL_WEIGHT_DEFAULT);
-> -		if (err < 0) {
-> -			dev_err(dev, "Failed to bind cooling device to trip %d\n", i);
-> -			return err;
-> -		}
-> -	}
-> -	return 0;
-> -}
-> -
-> -static int mlxsw_thermal_unbind(struct thermal_zone_device *tzdev,
-> -				struct thermal_cooling_device *cdev)
-> -{
-> -	struct mlxsw_thermal *thermal = thermal_zone_device_priv(tzdev);
-> -	struct device *dev = thermal->bus_info->dev;
-> -	int i;
-> -	int err;
-> -
-> -	/* If the cooling device is our one unbind it */
-> -	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
-> -		return 0;
-> -
-> -	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
-> -		err = thermal_zone_unbind_cooling_device(tzdev, i, cdev);
-> -		if (err < 0) {
-> -			dev_err(dev, "Failed to unbind cooling device\n");
-> -			return err;
-> -		}
-> -	}
-> -	return 0;
-> +	return true;
->  }
->  
->  static int mlxsw_thermal_get_temp(struct thermal_zone_device *tzdev,
-> @@ -239,59 +209,29 @@ static struct thermal_zone_params mlxsw_
->  	.no_hwmon = true,
->  };
->  
-> -static struct thermal_zone_device_ops mlxsw_thermal_ops = {
-> -	.bind = mlxsw_thermal_bind,
-> -	.unbind = mlxsw_thermal_unbind,
-> -	.get_temp = mlxsw_thermal_get_temp,
-> -};
+Kernel Image changing:
+    Linux Kernel   total |      text      data        bss
+    ------------------------------------------------------
+    after     45250307 |   27274279   17209996     766032
+    before    45254134 |   27278118   17209984     766032
+    delta        -3827 |      -3839        +12         +0
 
-Is there a reason to move 'mlxsw_thermal_ops' below?
+Performance validation:
+1. Using micro-benchmark ko added in patch 1 to test aligned and
+   non-aligned API performance impact for the existing users, there
+   is no notiable performance degradation. Instead we seems to some
+   minor performance boot for both aligned and non-aligned API after
+   this patchset as below.
 
-> -
-> -static int mlxsw_thermal_module_bind(struct thermal_zone_device *tzdev,
-> -				     struct thermal_cooling_device *cdev)
-> +static bool mlxsw_thermal_module_should_bind(struct thermal_zone_device *tzdev,
-> +					     const struct thermal_trip *trip,
-> +					     struct thermal_cooling_device *cdev,
-> +					     struct cooling_spec *c)
->  {
->  	struct mlxsw_thermal_module *tz = thermal_zone_device_priv(tzdev);
->  	struct mlxsw_thermal *thermal = tz->parent;
-> -	int i, j, err;
-> +	const struct mlxsw_cooling_states *state = trip->priv;
+2. Use the below netcat test case, we also have some minor
+   performance boot for replacing 'page_frag' with 'page_frag_cache'
+   after this patchset.
+   server: taskset -c 32 nc -l -k 1234 > /dev/null
+   client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
 
-Please place it between 'tz' and 'thermal'. Networking code tries to
-maintain reverse xmas tree ordering for local variables.
+In order to avoid performance noise as much as possible, the testing
+is done in system without any other load and have enough iterations to
+prove the data is stable enough, complete log for testing is below:
 
->  
->  	/* If the cooling device is one of ours bind it */
->  	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
-> -		return 0;
-> +		return false;
->  
-> -	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
-> -		const struct mlxsw_cooling_states *state = &tz->cooling_states[i];
-> +	c->upper = state->max_state;
-> +	c->lower = state->min_state;
->  
-> -		err = thermal_zone_bind_cooling_device(tzdev, i, cdev,
-> -						       state->max_state,
-> -						       state->min_state,
-> -						       THERMAL_WEIGHT_DEFAULT);
-> -		if (err < 0)
-> -			goto err_thermal_zone_bind_cooling_device;
-> -	}
-> -	return 0;
-> -
-> -err_thermal_zone_bind_cooling_device:
-> -	for (j = i - 1; j >= 0; j--)
-> -		thermal_zone_unbind_cooling_device(tzdev, j, cdev);
-> -	return err;
-> +	return true;
->  }
->  
-> -static int mlxsw_thermal_module_unbind(struct thermal_zone_device *tzdev,
-> -				       struct thermal_cooling_device *cdev)
-> -{
-> -	struct mlxsw_thermal_module *tz = thermal_zone_device_priv(tzdev);
-> -	struct mlxsw_thermal *thermal = tz->parent;
-> -	int i;
-> -	int err;
-> -
-> -	/* If the cooling device is one of ours unbind it */
-> -	if (mlxsw_get_cooling_device_idx(thermal, cdev) < 0)
-> -		return 0;
-> -
-> -	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++) {
-> -		err = thermal_zone_unbind_cooling_device(tzdev, i, cdev);
-> -		WARN_ON(err);
-> -	}
-> -	return err;
-> -}
-> +static struct thermal_zone_device_ops mlxsw_thermal_ops = {
-> +	.should_bind = mlxsw_thermal_should_bind,
-> +	.get_temp = mlxsw_thermal_get_temp,
-> +};
->  
->  static int mlxsw_thermal_module_temp_get(struct thermal_zone_device *tzdev,
->  					 int *p_temp)
-> @@ -313,8 +253,7 @@ static int mlxsw_thermal_module_temp_get
->  }
->  
->  static struct thermal_zone_device_ops mlxsw_thermal_module_ops = {
-> -	.bind		= mlxsw_thermal_module_bind,
-> -	.unbind		= mlxsw_thermal_module_unbind,
-> +	.should_bind	= mlxsw_thermal_module_should_bind,
->  	.get_temp	= mlxsw_thermal_module_temp_get,
->  };
->  
-> @@ -342,8 +281,7 @@ static int mlxsw_thermal_gearbox_temp_ge
->  }
->  
->  static struct thermal_zone_device_ops mlxsw_thermal_gearbox_ops = {
-> -	.bind		= mlxsw_thermal_module_bind,
-> -	.unbind		= mlxsw_thermal_module_unbind,
-> +	.should_bind	= mlxsw_thermal_module_should_bind,
->  	.get_temp	= mlxsw_thermal_gearbox_temp_get,
->  };
->  
-> @@ -451,6 +389,7 @@ mlxsw_thermal_module_init(struct device
->  			  struct mlxsw_thermal_area *area, u8 module)
->  {
->  	struct mlxsw_thermal_module *module_tz;
-> +	int i;
->  
->  	module_tz = &area->tz_module_arr[module];
->  	/* Skip if parent is already set (case of port split). */
-> @@ -465,6 +404,8 @@ mlxsw_thermal_module_init(struct device
->  	       sizeof(thermal->trips));
->  	memcpy(module_tz->cooling_states, default_cooling_states,
->  	       sizeof(thermal->cooling_states));
-> +	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++)
-> +		module_tz->trips[i].priv = &module_tz->cooling_states[i];
->  }
->  
->  static void mlxsw_thermal_module_fini(struct mlxsw_thermal_module *module_tz)
-> @@ -579,7 +520,7 @@ mlxsw_thermal_gearboxes_init(struct devi
->  	struct mlxsw_thermal_module *gearbox_tz;
->  	char mgpir_pl[MLXSW_REG_MGPIR_LEN];
->  	u8 gbox_num;
-> -	int i;
-> +	int i, j;
->  	int err;
->  
->  	mlxsw_reg_mgpir_pack(mgpir_pl, area->slot_index);
-> @@ -606,6 +547,9 @@ mlxsw_thermal_gearboxes_init(struct devi
->  		       sizeof(thermal->trips));
->  		memcpy(gearbox_tz->cooling_states, default_cooling_states,
->  		       sizeof(thermal->cooling_states));
-> +		for (j = 0; j < MLXSW_THERMAL_NUM_TRIPS; j++)
-> +			gearbox_tz->trips[j].priv = &gearbox_tz->cooling_states[j];
-> +
->  		gearbox_tz->module = i;
->  		gearbox_tz->parent = thermal;
->  		gearbox_tz->slot_index = area->slot_index;
-> @@ -722,6 +666,9 @@ int mlxsw_thermal_init(struct mlxsw_core
->  	thermal->bus_info = bus_info;
->  	memcpy(thermal->trips, default_thermal_trips, sizeof(thermal->trips));
->  	memcpy(thermal->cooling_states, default_cooling_states, sizeof(thermal->cooling_states));
-> +	for (i = 0; i < MLXSW_THERMAL_NUM_TRIPS; i++)
-> +		thermal->trips[i].priv = &thermal->cooling_states[i];
-> +
->  	thermal->line_cards[0].slot_index = 0;
->  
->  	err = mlxsw_reg_query(thermal->core, MLXSW_REG(mfcr), mfcr_pl);
-> 
-> 
-> 
+taskset -c 32 nc -l -k 1234 > /dev/null
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_align=1
+perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
+
+*After* this patchset:
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17' (200 runs):
+
+         17.829030      task-clock (msec)         #    0.001 CPUs utilized            ( +-  0.30% )
+                 7      context-switches          #    0.386 K/sec                    ( +-  0.35% )
+                 0      cpu-migrations            #    0.003 K/sec                    ( +- 28.06% )
+                83      page-faults               #    0.005 M/sec                    ( +-  0.10% )
+          46303585      cycles                    #    2.597 GHz                      ( +-  0.30% )
+          61119216      instructions              #    1.32  insn per cycle           ( +-  0.01% )
+          14811318      branches                  #  830.742 M/sec                    ( +-  0.01% )
+             21046      branch-misses             #    0.14% of all branches          ( +-  0.09% )
+
+      23.856064365 seconds time elapsed                                          ( +-  0.08% )
+
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_align=1' (200 runs):
+
+         17.628569      task-clock (msec)         #    0.001 CPUs utilized            ( +-  0.01% )
+                 7      context-switches          #    0.397 K/sec                    ( +-  0.12% )
+                 0      cpu-migrations            #    0.000 K/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                83      page-faults               #    0.005 M/sec                    ( +-  0.10% )
+          45785943      cycles                    #    2.597 GHz                      ( +-  0.01% )
+          60043610      instructions              #    1.31  insn per cycle           ( +-  0.01% )
+          14550182      branches                  #  825.375 M/sec                    ( +-  0.01% )
+             21492      branch-misses             #    0.15% of all branches          ( +-  0.08% )
+
+      23.443927103 seconds time elapsed                                          ( +-  0.05% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      16626.042731      task-clock (msec)         #    0.607 CPUs utilized            ( +-  0.03% )
+           3291020      context-switches          #    0.198 M/sec                    ( +-  0.05% )
+                 1      cpu-migrations            #    0.000 K/sec                    ( +-  0.50% )
+                85      page-faults               #    0.005 K/sec                    ( +-  0.16% )
+       30581044838      cycles                    #    1.839 GHz                      ( +-  0.05% )
+       34962744631      instructions              #    1.14  insn per cycle           ( +-  0.01% )
+        6483883671      branches                  #  389.984 M/sec                    ( +-  0.02% )
+          99624551      branch-misses             #    1.54% of all branches          ( +-  0.17% )
+
+      27.370305077 seconds time elapsed                                          ( +-  0.01% )
+
+
+*Before* this patchset:
+
+Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17' (200 runs):
+
+         18.143552      task-clock (msec)         #    0.001 CPUs utilized            ( +-  0.28% )
+                 7      context-switches          #    0.382 K/sec                    ( +-  0.28% )
+                 1      cpu-migrations            #    0.056 K/sec                    ( +-  0.97% )
+                83      page-faults               #    0.005 M/sec                    ( +-  0.10% )
+          47105569      cycles                    #    2.596 GHz                      ( +-  0.28% )
+          60628757      instructions              #    1.29  insn per cycle           ( +-  0.04% )
+          14686743      branches                  #  809.475 M/sec                    ( +-  0.04% )
+             21826      branch-misses             #    0.15% of all branches          ( +-  0.12% )
+
+      23.918006193 seconds time elapsed                                          ( +-  0.10% )
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_align=1' (200 runs):
+
+         21.726393      task-clock (msec)         #    0.001 CPUs utilized            ( +-  0.72% )
+                 7      context-switches          #    0.321 K/sec                    ( +-  0.24% )
+                 1      cpu-migrations            #    0.047 K/sec                    ( +-  0.85% )
+                83      page-faults               #    0.004 M/sec                    ( +-  0.10% )
+          56422898      cycles                    #    2.597 GHz                      ( +-  0.72% )
+          61271860      instructions              #    1.09  insn per cycle           ( +-  0.05% )
+          14837500      branches                  #  682.925 M/sec                    ( +-  0.05% )
+             21484      branch-misses             #    0.14% of all branches          ( +-  0.10% )
+
+      23.876306259 seconds time elapsed                                          ( +-  0.13% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      17364.040855      task-clock (msec)         #    0.624 CPUs utilized            ( +-  0.02% )
+           3340375      context-switches          #    0.192 M/sec                    ( +-  0.06% )
+                 1      cpu-migrations            #    0.000 K/sec
+                85      page-faults               #    0.005 K/sec                    ( +-  0.15% )
+       32077623335      cycles                    #    1.847 GHz                      ( +-  0.03% )
+       35121047596      instructions              #    1.09  insn per cycle           ( +-  0.01% )
+        6519872824      branches                  #  375.481 M/sec                    ( +-  0.02% )
+         101877022      branch-misses             #    1.56% of all branches          ( +-  0.14% )
+
+      27.842745343 seconds time elapsed                                          ( +-  0.02% )
+
+
+Note, ipv4-udp, ipv6-tcp and ipv6-udp is also tested with the below script:
+nc -u -l -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -N -u 127.0.0.1 1234
+
+nc -l6 -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -N ::1 1234
+
+nc -l6 -k -u 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -u -N ::1 1234
+
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+
+1. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei.com/
+
+Change log:
+V12:
+   1. Do not treat page_frag_test ko as DEBUG feature.
+   2. Make some improvement for the refactoring in patch 8.
+   3. Some other minor improvement as Alexander's comment.
+
+RFC v11:
+   1. Fold 'page_frag_cache' moving change into patch 2.
+   2. Optimizate patch 3 according to discussion in v9.
+
+V10:
+   1. Change Subject to "Replace page_frag with page_frag_cache for sk_page_frag()".
+   2. Move 'struct page_frag_cache' to sched.h as suggested by Alexander.
+   3. Rename skb_copy_to_page_nocache().
+   4. Adjust change between patches to make it more reviewable as Alexander's comment.
+   5. Use 'aligned_remaining' variable to generate virtual address as Alexander's
+      comment.
+   6. Some included header and typo fix as Alexander's comment.
+   7. Add back the get_order() opt patch for xtensa arch
+
+V9:
+   1. Add check for test_alloc_len and change perm of module_param()
+      to 0 as Wang Wei' comment.
+   2. Rebased on latest net-next.
+
+V8: Remove patch 2 & 3 in V7, as free_unref_page() is changed to call
+    pcp_allowed_order() and used in page_frag API recently in:
+    commit 5b8d75913a0e ("mm: combine free_the_page() and free_unref_page()")
+
+V7: Fix doc build warning and error.
+
+V6:
+   1. Fix some typo and compiler error for x86 pointed out by Jakub and
+      Simon.
+   2. Add two refactoring and optimization patches.
+
+V5:
+   1. Add page_frag_alloc_pg() API for tls_device.c case and refactor
+      some implementation, update kernel bin size changing as bin size
+      is increased after that.
+   2. Add ack from Mat.
+
+RFC v4:
+   1. Update doc according to Randy and Mat's suggestion.
+   2. Change probe API to "probe" for a specific amount of available space,
+      rather than "nonzero" space according to Mat's suggestion.
+   3. Retest and update the test result.
+
+v3:
+   1. Use new layout for 'struct page_frag_cache' as the discussion
+      with Alexander and other sugeestions from Alexander.
+   2. Add probe API to address Mat' comment about mptcp use case.
+   3. Some doc updating according to Bagas' suggestion.
+
+v2:
+   1. reorder test module to patch 1.
+   2. split doc and maintainer updating to two patches.
+   3. refactor the page_frag before moving.
+   4. fix a type and 'static' warning in test module.
+   5. add a patch for xtensa arch to enable using get_order() in
+      BUILD_BUG_ON().
+   6. Add test case and performance data for the socket code.
+
+Yunsheng Lin (14):
+  mm: page_frag: add a test module for page_frag
+  mm: move the page fragment allocator from page_alloc into its own file
+  mm: page_frag: use initial zero offset for page_frag_alloc_align()
+  mm: page_frag: add '_va' suffix to page_frag API
+  mm: page_frag: avoid caller accessing 'page_frag_cache' directly
+  xtensa: remove the get_order() implementation
+  mm: page_frag: reuse existing space for 'size' and 'pfmemalloc'
+  mm: page_frag: some minor refactoring before adding new API
+  mm: page_frag: use __alloc_pages() to replace alloc_pages_node()
+  net: rename skb_copy_to_page_nocache() helper
+  mm: page_frag: introduce prepare/probe/commit API
+  net: replace page_frag with page_frag_cache
+  mm: page_frag: update documentation for page_frag
+  mm: page_frag: add an entry in MAINTAINERS for page_frag
+
+ Documentation/mm/page_frags.rst               | 169 +++++++-
+ MAINTAINERS                                   |  11 +
+ arch/xtensa/include/asm/page.h                |  18 -
+ .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
+ .../chelsio/inline_crypto/chtls/chtls_io.c    | 100 ++---
+ .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
+ drivers/net/ethernet/google/gve/gve_rx.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |   2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c |   2 +-
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |   4 +-
+ .../marvell/octeontx2/nic/otx2_common.c       |   2 +-
+ drivers/net/ethernet/mediatek/mtk_wed_wo.c    |   4 +-
+ drivers/net/tun.c                             |  48 +--
+ drivers/nvme/host/tcp.c                       |   8 +-
+ drivers/nvme/target/tcp.c                     |  22 +-
+ drivers/vhost/net.c                           |   8 +-
+ include/linux/gfp.h                           |  22 -
+ include/linux/mm_types.h                      |  18 -
+ include/linux/mm_types_task.h                 |  18 +
+ include/linux/page_frag_cache.h               | 272 ++++++++++++
+ include/linux/sched.h                         |   2 +-
+ include/linux/skbuff.h                        |   3 +-
+ include/net/sock.h                            |  23 +-
+ kernel/bpf/cpumap.c                           |   2 +-
+ kernel/exit.c                                 |   3 +-
+ kernel/fork.c                                 |   3 +-
+ mm/Kconfig                                    |   8 +
+ mm/Makefile                                   |   2 +
+ mm/page_alloc.c                               | 136 ------
+ mm/page_frag_cache.c                          | 367 ++++++++++++++++
+ mm/page_frag_test.c                           | 396 ++++++++++++++++++
+ net/core/skbuff.c                             |  79 ++--
+ net/core/skmsg.c                              |  22 +-
+ net/core/sock.c                               |  46 +-
+ net/core/xdp.c                                |   2 +-
+ net/ipv4/ip_output.c                          |  33 +-
+ net/ipv4/tcp.c                                |  35 +-
+ net/ipv4/tcp_output.c                         |  28 +-
+ net/ipv6/ip6_output.c                         |  33 +-
+ net/kcm/kcmsock.c                             |  30 +-
+ net/mptcp/protocol.c                          |  67 +--
+ net/rxrpc/conn_object.c                       |   4 +-
+ net/rxrpc/local_object.c                      |   4 +-
+ net/rxrpc/txbuf.c                             |  15 +-
+ net/sched/em_meta.c                           |   2 +-
+ net/sunrpc/svcsock.c                          |  12 +-
+ net/tls/tls_device.c                          | 137 +++---
+ 48 files changed, 1652 insertions(+), 582 deletions(-)
+ create mode 100644 include/linux/page_frag_cache.h
+ create mode 100644 mm/page_frag_cache.c
+ create mode 100644 mm/page_frag_test.c
+
+-- 
+2.33.0
+
 
