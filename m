@@ -1,170 +1,121 @@
-Return-Path: <netdev+bounces-114348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133019423FE
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:59:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 624E6942420
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 03:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8057A1F24FFF
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 00:59:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A37F9284B50
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 01:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2AD748F;
-	Wed, 31 Jul 2024 00:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7941E8BFC;
+	Wed, 31 Jul 2024 01:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LB2ZiEu8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUKOqtf7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F371746B5;
-	Wed, 31 Jul 2024 00:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF0A4C80;
+	Wed, 31 Jul 2024 01:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722387583; cv=none; b=nYCSoTpcVBKywsvOFQj8K8zwaHSq1gmjROPeNWm6O1n0l3OSSlxKQDOY686uxfuXxTjd/0FimogyFRGGDueJKGKnw9sbtl7XoqR4J+6y4KpVci8AeMiiyCUmrc2iruY57+CEF3uTU2HHJTaBm3uXOKYW7D5S3vCC2x76kiFH55k=
+	t=1722388822; cv=none; b=ux06CJQ16JHbI8vxFDJlgkenKqKq+AUTNVm/yvzWfShBdQZxPUpyXcwY+6/FC/T3rYYR8qqn7yJOLF/efHc0AaBnyB63bxsm3LNOaiMDMzYr1Syj6RNhOOVeuK19cBvYsRAhXrxd5YYNdTThrCN7i/q7gt9wZTh73P0D8Ww+Lh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722387583; c=relaxed/simple;
-	bh=+y5QEE3AMSBTEkdNVukqfIgmOEgEwSQCiOTZeiQt4AA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tHIJtqG8KJ4IR0N4bMXDaUDDQZUvQlBbHsy2CLK72hLgW6/it69C33wwJK0kUGuya/ohYWpIV+PGr3W6gfNS4ZZbTYWxDdkD6TMW4iVwDZX6QQM3Gj2ZChJoosYKcHNu45h8Q0HevF8yIrYq9shDkXJ6bJO7LbBb0matRu6Aw4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LB2ZiEu8; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42803bbf842so41877785e9.1;
-        Tue, 30 Jul 2024 17:59:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722387580; x=1722992380; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OKr49gkwSZ1Bv1kgxbL5t2qWAvBYKzC4SKLSAp2ANC8=;
-        b=LB2ZiEu8GHRcAsfzeLJ7nldqSgsCOg4DEEhdToxapFqGtEP0zrePj2gfKeT971t+7B
-         ec0n5u/zTAdXVBetry6SSlayT5Gu+b568lZvOKGVoSh2GJvT6v4afmzm4pYPzBM+43im
-         2B/e8UNkkH/7Z1xnrNDE+Wjv13+uOiaqz3cqPuK1DPuU9txQrsVZzsDl9JlCpA8LP2bT
-         wGca+io3P/nJDNqKUajIW8YoXC7xdTloLt2NZilCfunShaHuFUWtgRT40W/FCZD1mwoO
-         TOMJT1GS6qeGVqOPXhfY/ECSQ+lntjLexQL2ZKHAzwEERDoSmYy4P/2kyFMH6jAIoED3
-         u2GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722387580; x=1722992380;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OKr49gkwSZ1Bv1kgxbL5t2qWAvBYKzC4SKLSAp2ANC8=;
-        b=N7CKorc9HpeX9QfXQNMFHMfqE7PmdYsnfyaf0BqHZ6dJ+UXLOVQV5t8uC0QFWrsQEI
-         58C/JnioIyj4R6gPLR+GEuOh9ku+ZGkwirTvikpHaLQ0Jr7qkrUr+h3hKkubh3iTNEn6
-         h2yJycrWvyuUTDFLQGqpCRiUT0QISZ9SQmMUHbAwGFhRHlMNlhaLFiWSm5CwXrKT8TLG
-         vk/skS8rfJxT6ZNxBSvZM/UGyHRZY23+3IxdwgccleUBBC8VE1GdqXvE+jps2Kfsi4ZA
-         ndF1l160RdidKRMOuw9MDG9rIpzN01n4y6vj7Qx2f3dCLO41k7+KNbB6e+I46iQM4csh
-         e5rg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwlSIx+/PmgkZhB6nytxltiDbByemvlxCJFecPsa7GVTIes+QQ31xyyjUESfWBwIJSiQst8o4T2ABqD3iJPUfMD0UCMqxvD8Y=
-X-Gm-Message-State: AOJu0Yy6qb0dKv4IHKix18+VIAcqixiSuFcUpF+r5mQ+WbCp1ZGY1i0t
-	xzHQGCE7q5onVZlKsje3KTZannBw/0iSD8TKKP+oo90G2UjC7QSxB6a1wQ==
-X-Google-Smtp-Source: AGHT+IFGzLiH0ilYlz67NfCKQr6/lFBJtDoyqYVJRk2FHMuquNQNBvY/EC0p9pAkjsZbVrkBIrGoug==
-X-Received: by 2002:a05:600c:310e:b0:428:15b0:c8dd with SMTP id 5b1f17b1804b1-42815b0cb56mr101921525e9.20.1722387580100;
-        Tue, 30 Jul 2024 17:59:40 -0700 (PDT)
-Received: from [192.168.8.113] ([85.255.235.94])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89aa93sm1098955e9.10.2024.07.30.17.59.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 17:59:39 -0700 (PDT)
-Message-ID: <66f7bc8a-e4a9-4912-9ea7-c88dbb6fb999@gmail.com>
-Date: Wed, 31 Jul 2024 02:00:11 +0100
+	s=arc-20240116; t=1722388822; c=relaxed/simple;
+	bh=k2MWMZVN+gSbg1lYV39k//TGqnZsbiq2ed/o3H2/EjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LjuPLnSQ+udCSBT5GoaxYb9eWN3tGRVR9Vsr9pZguzNMuVX4MsJEWGp1RPyTCRiN3hhZXCWTwzVka7PPuT1UkP7hA5uvc26yPdoh1evUuIKCzir6es1X0PTx9LD05xVXMplHmngti1LoAb8UPh+lqto4UH/aQOBCA021NGw/Vlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUKOqtf7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79054C32782;
+	Wed, 31 Jul 2024 01:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722388822;
+	bh=k2MWMZVN+gSbg1lYV39k//TGqnZsbiq2ed/o3H2/EjA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NUKOqtf7goZs+vFsigZdVk/KOtpCmnV7CgeYE+GO9kWcnovpwHku2GTlc8PUkePBC
+	 Po/e8OPxT45lGxZt6/gThSwu8ovuFTmc5JcR/UkTsVL+rI61HW03OvbLmsGpLU/Dl7
+	 VyeJe5a7+PJRavc9im0HqKllveC+axFcANyNZ7HXRjNaSs87o342cLGtMtW/SZUokY
+	 TxpD+7Z/5UUJ6BsXCPGYAPMJzzIJkyCLBfallPQwiUrGVuhfoHbing+AZLlvdffNVd
+	 2MXhBe45wh/+4t3oWMZQpIUiYhydzcWiEmbCdcTAgZ7Ema9ZAzF3L7Oxk6yXP1Gnb2
+	 9WbsKl1GG94bg==
+Date: Tue, 30 Jul 2024 18:20:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, virtualization@lists.linux.dev, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing
+ commands
+Message-ID: <20240730182020.75639070@kernel.org>
+In-Reply-To: <20240729124755.35719-1-hengqi@linux.alibaba.com>
+References: <20240729124755.35719-1-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: io_uring NAPI busy poll RCU is causing 50 context switches/second
- to my sqpoll thread
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: Olivier Langlois <olivier@trillion01.com>, io-uring@vger.kernel.org
-Cc: netdev@vger.kernel.org
-References: <b1ad0ab3a7e70b72aa73b0b7cab83273358b2e1d.camel@trillion01.com>
- <00918946-253e-43c9-a635-c91d870407b7@gmail.com>
- <bcd3b198697e16059ec69566251ad23c4c78e7a7.camel@trillion01.com>
- <43c27aa1-d955-4375-8d96-cd4201aecf50@gmail.com>
-Content-Language: en-US
-In-Reply-To: <43c27aa1-d955-4375-8d96-cd4201aecf50@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 7/31/24 01:33, Pavel Begunkov wrote:
-> On 7/31/24 00:14, Olivier Langlois wrote:
->> On Tue, 2024-07-30 at 21:25 +0100, Pavel Begunkov wrote:
->>>
->>> Removing an entry or two once every minute is definitely not
->>> going to take 50% CPU, RCU machinery is running in background
->>> regardless of whether io_uring uses it or not, and it's pretty
->>> cheap considering ammortisation.
->>>
->>> If anything it more sounds from your explanation like the
->>> scheduler makes a wrong decision and schedules out the sqpoll
->>> thread even though it could continue to run, but that's need
->>> a confirmation. Does the CPU your SQPOLL is pinned to stays
->>> 100% utilised?
->>
->> Here are the facts as they are documented in the github issue.
->>
->> 1. despite thinking that I was doing NAPI busy polling, I was not
->> because my ring was not receiving any sqe after its initial setup.
->>
->> This is what the patch developped with your input
->> https://lore.kernel.org/io-uring/382791dc97d208d88ee31e5ebb5b661a0453fb79.1722374371.git.olivier@trillion01.com/T/#u
->>
->> is addressing
->>
->> (BTW, I should check if there is such a thing, but I would love to know
->> if the net code is exposing a tracepoint when napi_busy_poll is called
->> because it is very tricky to know if it is done for real or not)
->>
->> 2. the moment a second ring has been attached to the sqpoll thread that
->> was receving a lot of sqe, the NAPI busy loop started to be made for
->> real and the sqpoll cpu usage unexplicably dropped from 99% to 55%
->>
->> 3. here is my kernel cmdline:
->> hugepages=72 isolcpus=0,1,2 nohz_full=0,1,2 rcu_nocbs=0,1,2
->> rcu_nocb_poll irqaffinity=3 idle=nomwait processor.max_cstate=1
->> intel_idle.max_cstate=1 nmi_watchdog=0
->>
->> there is absolutely nothing else on CPU0 where the sqpoll thread
->> affinity is set to run.
->>
->> 4. I got the idea of doing this:
->> echo common_pid == sqpoll_pid > /sys/kernel/tracing/events/sched/filter
->> echo 1 > /sys/kernel/tracing/events/sched/sched_switch/enable
->>
->> and I have recorded over 1,000 context switches in 23 seconds with RCU
->> related kernel threads.
->>
->> 5. just for the fun of checking out, I have disabled NAPI polling on my
->> io_uring rings and the sqpoll thread magically returned to 99% CPU
->> usage from 55%...
->>
->> I am open to other explanations for what I have observed but my current
->> conclusion is based on what I am able to see... the evidence appears
->> very convincing to me...
-> 
-> You're seeing something that doesn't make much sense to me, and we need
-> to understand what that is. There might be a bug _somewhere_, that's
-> always a possibility, but before saying that let's get a bit more data.
-> 
-> While the app is working, can you grab a profile and run mpstat for the
-> CPU on which you have the SQPOLL task?
-> 
-> perf record -g -C <CPU number> --all-kernel &
-> mpstat -u -P <CPU number> 5 10 &
-> 
-> And then as usual, time it so that you have some activity going on,
-> mpstat interval may need adjustments, and perf report it as before
+On Mon, 29 Jul 2024 20:47:55 +0800 Heng Qi wrote:
+> Subject: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
 
-I forgot to add, ~50 switches/second for relatively brief RCU handling
-is not much, not enough to take 50% of a CPU. I wonder if sqpoll was
-still running but napi busy polling time got accounted to softirq
-because of disabled bh and you didn't include it, hence asking CPU
-stats. Do you see any latency problems for that configuration?
+subject currently reads like this is an optimization, could you
+rephrase?
 
+> From the virtio spec:
+> 
+> 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
+> 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
+> 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
+> 
+> The driver must not send vq notification coalescing commands if
+> VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
+> applies to vq resize.
+> 
+> Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 29 +++++++++++++++++------------
+>  1 file changed, 17 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 0383a3e136d6..eb115e807882 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3708,6 +3708,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
+>  	u32 rx_pending, tx_pending;
+>  	struct receive_queue *rq;
+>  	struct send_queue *sq;
+> +	u32 pkts, usecs;
+>  	int i, err;
+>  
+>  	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
+> @@ -3740,11 +3741,13 @@ static int virtnet_set_ringparam(struct net_device *dev,
+>  			 * through the VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver
+>  			 * did not set any TX coalescing parameters, to 0.
+>  			 */
+> -			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
+> -							       vi->intr_coal_tx.max_usecs,
+> -							       vi->intr_coal_tx.max_packets);
+> -			if (err)
+> -				return err;
+> +			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
+> +				usecs = vi->intr_coal_tx.max_usecs;
+> +				pkts = vi->intr_coal_tx.max_packets;
+> +				err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
+> +				if (err)
+> +					return err;
+
+Can you check the feature inside the
+virtnet_send_.x_ctrl_coal_vq_cmd() helpers?
+5 levels of indentation is a bit much
 -- 
-Pavel Begunkov
+pw-bot: cr
 
