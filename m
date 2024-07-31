@@ -1,125 +1,182 @@
-Return-Path: <netdev+bounces-114527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A51B942D42
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:29:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64054942D23
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9331C225CE
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:29:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 078002878CD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067C61AD40E;
-	Wed, 31 Jul 2024 11:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1CC1AC436;
+	Wed, 31 Jul 2024 11:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b="lkAMj6F2"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n9b/Zi6K"
 X-Original-To: netdev@vger.kernel.org
-Received: from kozue.soulik.info (kozue.soulik.info [108.61.200.231])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC2B145FEF;
-	Wed, 31 Jul 2024 11:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.61.200.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFFE200CD;
+	Wed, 31 Jul 2024 11:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722425365; cv=none; b=o1RBKioH8BToU53ytf/FIf02nSjXLFRqW7WEMM2Ip+1WwYBvFeEzMjj4Pho3yL8nxIM6bDBYJCwobl664swBDSNO+c/YQBZiTDfLgGsvSZfoehL3ibkSIevKr0yCLuKJ2APfyz9Qona9r7hAb15UOartaFrAZzbK5QSq3el4zN0=
+	t=1722424811; cv=none; b=mPwsZsgSXQOaTVCaTHatQtuVwYv+jQ/mGPrgmTJgYQxCWqZprGe+TOYiVV0lWiSqkLfUsNoNjJuYXnPLjLQ+tYmEukEarfSIsmoBAYdxE34l8x2OdFWxytR4596H1Qinu1m5JWwOnuNNasmCQo+Dxcn/oWgDuNYEm046+mvWkDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722425365; c=relaxed/simple;
-	bh=cvYcCNPyHR43Mieu10aU4cHyG0KjJGlFvBgtRmmYfag=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yt3SeQqHz8UttM/2q3jQBlhC+iI4/4NOYlimTh9yULdVH763oMCujR3js993PXOB+ciGnTJ18uJ2uETEG+wdWc9Az+9j0wKYDKhA8/ddSnFdOjkjmGKwHrAesU6ALI6L6eFTpUdXZjlu0tD5zqctcpVsfxmsR7pnzjRfynB2q/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info; spf=pass smtp.mailfrom=soulik.info; dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b=lkAMj6F2; arc=none smtp.client-ip=108.61.200.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soulik.info
-Received: from ritsuko.sh.sumomo.pri (unknown [10.0.12.132])
-	by kozue.soulik.info (Postfix) with ESMTPSA id B73D02FDA00;
-	Wed, 31 Jul 2024 20:20:17 +0900 (JST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 kozue.soulik.info B73D02FDA00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soulik.info; s=mail;
-	t=1722424819; bh=hCUjMQaMhFJAPCSczpu0OcSyTOQ67dI8mk5P2p4URU0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=lkAMj6F2mSX6fvi2Q6uJc6bp7S+Rzxd2Gfi4ianoGnuY42xTITlAJtex7RCjiECIV
-	 6TqUb1GvIVqPldiG6dRWrprEJoeR3P9qW9yNjMW1jtt9KlVCjZaYXQeQS5N3w1PIek
-	 +i/9y8G0RnqQ3EhUgd58a7vIRtGo9k1kMvgjRs/0=
-From: Randy Li <ayaka@soulik.info>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	Randy Li <ayaka@soulik.info>
-Subject: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue index
-Date: Wed, 31 Jul 2024 19:19:37 +0800
-Message-ID: <20240731111940.8383-1-ayaka@soulik.info>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1722424811; c=relaxed/simple;
+	bh=s9xMpfXpLGnBk7GaLD5jMyZMIUsZdL6zWseyyaUXlv8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Trsk0ueI36vNip2LVfQAaC5G3FWoeenyPw61pmJWDeZPmYjTDoVj62PhpiL6DoQLDLh0ZRFhMS4PeEMYepnRM5cde1DJ8Vz+dvfgCG2wNvC35703Tzf1IO44bqNGpQSn7YQnw0tK2QXeHTzrp3bV1XvC2jDDRAf+WyRZkcSmUMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=n9b/Zi6K; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46V38g0E017606;
+	Wed, 31 Jul 2024 11:20:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:date:from:message-id:subject:to; s=qcppdkim1; bh=Kk97qkhcIxJx
+	nzA2qwQDsXu+UvBUjj9QbJg4EA7FNDE=; b=n9b/Zi6KjmWHau/ymAl5jCAMsIOO
+	hnww+7JiVdt2xEtX77HHJcbzO/nfMN8rfawLZXVFpzqXabkWogLvB8UXZbWO3iyp
+	Vehvk3LAyUEy/Dj35ReTIO9GgOAsVYXWDHS8iDHX/kirMJOT+Hy0eEEfQU9ofTW/
+	+/D3BRH6tON36j1rU2/8pv3i7lA+9AGJkQLzDoQ/j8rFMflyH6CYzPmKH0zjC7Db
+	y9SoP2HmaCcpQCkiR/UtMcfEBbGYw7v3d1KHBU3O+Umyh/nEaesCL7ejlk9Lq4Sx
+	XmeAatg70NbznUMlikA/d9FhOVMZ3pzSs3r59yUrMVWjuvvfrLZuXffbug==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40mp8n3cdg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 11:20:00 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 46VBJu9c020502;
+	Wed, 31 Jul 2024 11:19:56 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 40msyma5yh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Wed, 31 Jul 2024 11:19:56 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 46VBJuaD020496;
+	Wed, 31 Jul 2024 11:19:56 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-anshar-hyd.qualcomm.com [10.213.110.5])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 46VBJtrr020479;
+	Wed, 31 Jul 2024 11:19:56 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 4089000)
+	id 5F4815001A7; Wed, 31 Jul 2024 16:49:53 +0530 (+0530)
+From: Ankit Sharma <quic_anshar@quicinc.com>
+To: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        conor+dt@kernel.org, richardcochran@gmail.com
+Cc: Ankit Sharma <quic_anshar@quicinc.com>, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH V1] arm64: dts: qcom: sa8775p: Add capacity and DPC properties
+Date: Wed, 31 Jul 2024 16:49:51 +0530
+Message-Id: <20240731111951.6999-1-quic_anshar@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: FtHajuGrjlxghVEF9OI9QusRYLOO8a3q
+X-Proofpoint-ORIG-GUID: FtHajuGrjlxghVEF9OI9QusRYLOO8a3q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-31_08,2024-07-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 malwarescore=0 mlxscore=0 clxscore=1011 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407310083
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-We need the queue index in qdisc mapping rule. There is no way to
-fetch that.
+The "capacity-dmips-mhz" and "dynamic-power-coefficient" are
+used to build Energy Model which in turn is used by EAS to take
+placement decisions.
 
-Signed-off-by: Randy Li <ayaka@soulik.info>
+Signed-off-by: Ankit Sharma <quic_anshar@quicinc.com>
 ---
- drivers/net/tap.c           | 9 +++++++++
- drivers/net/tun.c           | 4 ++++
- include/uapi/linux/if_tun.h | 1 +
- 3 files changed, 14 insertions(+)
+ arch/arm64/boot/dts/qcom/sa8775p.dtsi | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 77574f7a3bd4..6099f27a0a1f 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1120,6 +1120,15 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
- 		rtnl_unlock();
- 		return ret;
- 
-+	case TUNGETQUEUEINDEX:
-+		rtnl_lock();
-+		if (!q->enabled)
-+			ret = -EINVAL;
-+
-+		ret = put_user(q->queue_index, up);
-+		rtnl_unlock();
-+		return ret;
-+
- 	case SIOCGIFHWADDR:
- 		rtnl_lock();
- 		tap = tap_get_tap_dev(q);
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 1d06c560c5e6..5473a0fca2e1 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -3115,6 +3115,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 		if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
- 			return -EPERM;
- 		return open_related_ns(&net->ns, get_net_ns);
-+	} else if (cmd == TUNGETQUEUEINDEX) {
-+		if (tfile->detached)
-+			return -EINVAL;
-+		return put_user(tfile->queue_index, (unsigned int __user*)argp);
- 	}
- 
- 	rtnl_lock();
-diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
-index 287cdc81c939..2668ca3b06a5 100644
---- a/include/uapi/linux/if_tun.h
-+++ b/include/uapi/linux/if_tun.h
-@@ -61,6 +61,7 @@
- #define TUNSETFILTEREBPF _IOR('T', 225, int)
- #define TUNSETCARRIER _IOW('T', 226, int)
- #define TUNGETDEVNETNS _IO('T', 227)
-+#define TUNGETQUEUEINDEX _IOR('T', 228, unsigned int)
- 
- /* TUNSETIFF ifr flags */
- #define IFF_TUN		0x0001
+diff --git a/arch/arm64/boot/dts/qcom/sa8775p.dtsi b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
+index 3bb609c9d2ec..ab15556e0647 100644
+--- a/arch/arm64/boot/dts/qcom/sa8775p.dtsi
++++ b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
+@@ -68,6 +68,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 0>;
+ 			next-level-cache = <&L2_0>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_0: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -88,6 +90,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 0>;
+ 			next-level-cache = <&L2_1>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_1: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -103,6 +107,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 0>;
+ 			next-level-cache = <&L2_2>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_2: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -118,6 +124,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 0>;
+ 			next-level-cache = <&L2_3>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_3: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -133,6 +141,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 1>;
+ 			next-level-cache = <&L2_4>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_4: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -154,6 +164,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 1>;
+ 			next-level-cache = <&L2_5>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_5: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -169,6 +181,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 1>;
+ 			next-level-cache = <&L2_6>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_6: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
+@@ -184,6 +198,8 @@
+ 			enable-method = "psci";
+ 			qcom,freq-domain = <&cpufreq_hw 1>;
+ 			next-level-cache = <&L2_7>;
++			capacity-dmips-mhz = <1024>;
++			dynamic-power-coefficient = <100>;
+ 			L2_7: l2-cache {
+ 				compatible = "cache";
+ 				cache-level = <2>;
 -- 
-2.45.2
+2.17.1
 
 
