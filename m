@@ -1,126 +1,181 @@
-Return-Path: <netdev+bounces-114458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D8B5942AA6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:36:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9430942AAF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B02A01C2084A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:36:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 689051F23A28
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADB31AAE3F;
-	Wed, 31 Jul 2024 09:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YyHUQIK1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CBD1AB50E;
+	Wed, 31 Jul 2024 09:37:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334C41AAE35;
-	Wed, 31 Jul 2024 09:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774BA1AAE17
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 09:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722418520; cv=none; b=fE0Cygv2gbTqV0x2p9giTdiEuybqLVNBlEtJar8VYEalG1mCeh9yoSjTZOEfnvkIqMKyJaRho3dBMdVqHXPi8wFZB3FNSOVjqCFj9vcGrxpxEUiWrfqyRtX3FbwFQZFzkoxIMis9RQ0/6G/XEsgi8e1Q2vKtFhg0RpUcEgJxxjw=
+	t=1722418674; cv=none; b=qUm3f/w18f+iCAt8qpHeZfi3VN+DEZMlUtzreqmPORhXx4xYAUR62hHGmmPhyHStyr5O94yoLcXqvw2mOHgpP/oxGvxOt27e3ZpcN07KfmAWktqRo6L1Yezp4NdGE4NiiWazHSK8f9VWkQoenL7T/1k9jviL9Pk81eoB+y59X7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722418520; c=relaxed/simple;
-	bh=AmtVfHZDmiR2ybPvRkkSY/6FCf1yF5PpCzn/kf8sqeU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GZJfZrG4tB/Q+xXpwfAMPSRYqis6n1zs+ElNjmj+211VEN9XTcucSv4T4o77gJZkv92uymxWBjVRMwytittqceKpESwIMSxpBYgtrjGIGeAQ5wDo+G1cITxe/HXynOUKhZGJ2Ib5RMMP1Udzurk7QoYQMZ1wcw77cSnZdM75wV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YyHUQIK1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54537C116B1;
-	Wed, 31 Jul 2024 09:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722418519;
-	bh=AmtVfHZDmiR2ybPvRkkSY/6FCf1yF5PpCzn/kf8sqeU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YyHUQIK1Yr48049aXPDTDS7BwDk/UOsDxYUGSnwrKUSP1sqiFvYewVN7cD9SlvvHe
-	 1Nz3ccDbmnFIEPS4CIUSumweNZ9UuN4k3CuGIDTwhlMLUSZKib7g/4OHBdWrOAGxFr
-	 j6sFVfiru/nWUbYtWHjhVBTQ9bAXFXD5abX/XNjT6Oo7gf6WEm9povBLt29Ap9hMJb
-	 wmFOgXwYFVl+r2ZzZGSqAnZUxeu/w5vDa8WHt6embjHC1tdfCZWxgOp9VrL+zgGW2R
-	 2y11HQturAAieDC+3QqgWVIf+jfQ4blek3IQ3Fj6kE37fbDfmzbAotlOWpalk9F69T
-	 XPP/N0TX64fkA==
-Date: Wed, 31 Jul 2024 10:35:16 +0100
-From: Simon Horman <horms@kernel.org>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net/chelsio/libcxgb: Add __percpu annotations to
- libcxgb_ppm.c
-Message-ID: <20240731093516.GR1967603@kernel.org>
-References: <20240730125856.7321-1-ubizjak@gmail.com>
+	s=arc-20240116; t=1722418674; c=relaxed/simple;
+	bh=GO59upStYuX6KDK7/B4Tl+IdeOZBkFxd5/MzaQiLUek=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=a/p00G5iuQMo265dHpZhBGkP04rY8HtvPBT2j+hQ6gm4AsDUpJTAMSriOaDpeIiV4nLku1CVcRmFyohZJFC4eS/VWFhdBW9pZqJGyNHiCOUCuru4+Sq81HcaQrpmQ2V1WKIGObKlZOb6C5De9HM3+19fiQOxtNoW0/CZdrp7XCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sZ5mI-0005QM-Jk
+	for netdev@vger.kernel.org; Wed, 31 Jul 2024 11:37:50 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sZ5mH-003UeN-TD
+	for netdev@vger.kernel.org; Wed, 31 Jul 2024 11:37:49 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 8F0E73127E8
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 09:37:49 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 348723127B5;
+	Wed, 31 Jul 2024 09:37:43 +0000 (UTC)
+Received: from [172.20.34.65] (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id b4adc51c;
+	Wed, 31 Jul 2024 09:37:42 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH can-next v2 00/20] an: rockchip_canfd: add support for
+ CAN-FD IP core found on Rockchip RK3568
+Date: Wed, 31 Jul 2024 11:37:02 +0200
+Message-Id: <20240731-rockchip-canfd-v2-0-d9604c5b4be8@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730125856.7321-1-ubizjak@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAL8FqmYC/3WNwQqDMBBEf0X23C1JtEp78j+KB7vZ6FJIJEnFI
+ v57g/cehzfzZofEUTjBo9oh8ipJgi/BXCqgefQTo9iSwSjTqM7cMQZ60ywL0uidxcbUNXXaKaI
+ WymiJ7GQ7hU8oFfS8ZRgKmSXlEL/n06pP/k+6alToRm1uytn2xXW/sJ8+OQYv29UyDMdx/AAM9
+ a6puwAAAA==
+To: kernel@pengutronix.de, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
+ Philipp Zabel <p.zabel@pengutronix.de>, 
+ Elaine Zhang <zhangqing@rock-chips.com>, 
+ David Jander <david.jander@protonic.nl>
+Cc: Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, 
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, 
+ David Jander <david@protonic.nl>
+X-Mailer: b4 0.15-dev-37811
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3819; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=GO59upStYuX6KDK7/B4Tl+IdeOZBkFxd5/MzaQiLUek=;
+ b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBmqgXEP5iAQFsodcibHwYKUukXtw/a3cNK8Kzh9
+ RCpVgiy+GuJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZqoFxAAKCRAoOKI+ei28
+ b206CACHikVqA+GW1UJ7oNs7+JlNvNkHAddEvCZuQ6aPmfOFivPx4W9H67xDNwhvQuEPZTQ9nZ5
+ KEO3dxLCw9tyHXkIqVoXFDl72Rh/+sMmcg/1HWOD/7PPu3TFbC69u3aKEs6bln6mNXcQiZ1nT+S
+ uaClVyRUVNNLPzHYFbRM11o5+iWQh7UvEXOflrMga5GBpwwkP2jKGsz2Zx88qg42dzygqElZ5+q
+ 8wYrXzuFpvO5BGhOiHVk/NNxhFCvsLxl034bl2Dz0WkmsHmr1H1NljxFuhGmzfnhJLtvXQ6j3sn
+ IWmvAVlD0apAs9q4UGrEv+4PmSJNDMCaxDGjWTJF39JqLIcd
+X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
+ fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Jul 30, 2024 at 02:58:19PM +0200, Uros Bizjak wrote:
-> Compiling libcxgb_ppm.c results in several sparse warnings:
-> 
-> libcxgb_ppm.c:368:15: warning: incorrect type in assignment (different address spaces)
-> libcxgb_ppm.c:368:15:    expected struct cxgbi_ppm_pool *pools
-> libcxgb_ppm.c:368:15:    got void [noderef] __percpu *_res
-> libcxgb_ppm.c:374:48: warning: incorrect type in initializer (different address spaces)
-> libcxgb_ppm.c:374:48:    expected void const [noderef] __percpu *__vpp_verify
-> libcxgb_ppm.c:374:48:    got struct cxgbi_ppm_pool *
-> libcxgb_ppm.c:484:19: warning: incorrect type in assignment (different address spaces)
-> libcxgb_ppm.c:484:19:    expected struct cxgbi_ppm_pool [noderef] __percpu *pool
-> libcxgb_ppm.c:484:19:    got struct cxgbi_ppm_pool *[assigned] pool
-> libcxgb_ppm.c:511:21: warning: incorrect type in argument 1 (different address spaces)
-> libcxgb_ppm.c:511:21:    expected void [noderef] __percpu *__pdata
-> libcxgb_ppm.c:511:21:    got struct cxgbi_ppm_pool *[assigned] pool
-> 
-> Add __percpu annotation to *pools and *pool percpu pointers and to
-> ppm_alloc_cpu_pool() function that returns percpu pointer to fix
-> these warnings.
-> 
-> Compile tested only, but there is no difference in the resulting object file.
-> 
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> ---
->  drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
-> index 854d87e1125c..01d776113500 100644
-> --- a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
-> +++ b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
-> @@ -342,10 +342,10 @@ int cxgbi_ppm_release(struct cxgbi_ppm *ppm)
->  }
->  EXPORT_SYMBOL(cxgbi_ppm_release);
->  
-> -static struct cxgbi_ppm_pool *ppm_alloc_cpu_pool(unsigned int *total,
-> -						 unsigned int *pcpu_ppmax)
-> +static struct cxgbi_ppm_pool __percpu *ppm_alloc_cpu_pool(unsigned int *total,
-> +							  unsigned int *pcpu_ppmax)
+This series adds support for the CAN-FD IP core found on the Rockchip
+RK3568.
 
-Let's keep to less than 80 columns wide, as is still preferred for
-Networking code. Perhaps in this case:
+The IP core is a bit complicated and has several documented errata.
+The driver is added in several stages, first the base driver including
+the RX-path. Then several workarounds for errata and the TX-path, and
+finally features like hardware time stamping, loop-back mode and
+bus error reporting.
 
-static struct cxgbi_ppm_pool __percpu *
-ppm_alloc_cpu_pool(unsigned int *total, unsigned int *pcpu_ppmax)
+regards,
+Marc
 
-Also, I do observe that this is an old driver, so the value
-of cleaning it is perhaps limited.
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+Changes in v2:
+- dt-bindings: remove redundant words from subject and patch
+  description (thanks Rob)
+- dt-bindings: clean up clock- and reset-names (thanks Rob)
+- base driver: add missing bitfield.h header
+- base driver: rkcanfd_handle_rx_int_one(): initialize header to avoid
+  uninitialzied variable warning on m68k
+- base driver: rkcanfd_get_berr_counter_raw(): don't add assigned only
+  variable (bec_raw), move to 14/20 (thanks Simon)
+- CAN-FD frame equal check + TX-path: squash, to avoid unused
+  functions (thanks Simon)
+- TX-path: rkcanfd_handle_tx_done_one(): don't add assigned only
+  variable (skb), move to 18/20 (thanks Simon)
+- HW-timetamping: add missing timecounter.h header (thanks Simon)
+- Link to v1: https://lore.kernel.org/all/20240729-rockchip-canfd-v1-0-fa1250fd6be3@pengutronix.de
 
-But the above aside, this looks good to me.
+---
+David Jander (2):
+      arm64: dts: rockchip: add CAN-FD controller nodes to rk3568
+      arm64: dts: rockchip: mecsbc: add CAN0 and CAN1 interfaces
 
->  {
-> -	struct cxgbi_ppm_pool *pools;
-> +	struct cxgbi_ppm_pool __percpu *pools;
->  	unsigned int ppmax = (*total) / num_possible_cpus();
->  	unsigned int max = (PCPU_MIN_UNIT_SIZE - sizeof(*pools)) << 3;
->  	unsigned int bmap;
+Marc Kleine-Budde (18):
+      dt-bindings: can: rockchip_canfd: add rockchip CAN-FD controller
+      can: rockchip_canfd: add driver for Rockchip CAN-FD controller
+      can: rockchip_canfd: add quirks for errata workarounds
+      can: rockchip_canfd: add quirk for broken CAN-FD support
+      can: rockchip_canfd: add support for rk3568v3
+      can: rockchip_canfd: add notes about known issues
+      can: rockchip_canfd: rkcanfd_handle_rx_int_one(): implement workaround for erratum 5: check for empty FIFO
+      can: rockchip_canfd: rkcanfd_register_done(): add warning for erratum 5
+      can: rockchip_canfd: add TX PATH
+      can: rockchip_canfd: implement workaround for erratum 6
+      can: rockchip_canfd: implement workaround for erratum 12
+      can: rockchip_canfd: rkcanfd_get_berr_counter_corrected(): work around broken {RX,TX}ERRORCNT register
+      can: rockchip_canfd: add stats support for errata workarounds
+      can: rockchip_canfd: prepare to use full TX-FIFO depth
+      can: rockchip_canfd: enable full TX-FIFO depth of 2
+      can: rockchip_canfd: add hardware timestamping support
+      can: rockchip_canfd: add support for CAN_CTRLMODE_LOOPBACK
+      can: rockchip_canfd: add support for CAN_CTRLMODE_BERR_REPORTING
+
+ .../bindings/net/can/rockchip,canfd.yaml           |  76 ++
+ MAINTAINERS                                        |   8 +
+ arch/arm64/boot/dts/rockchip/rk3568-mecsbc.dts     |  14 +
+ arch/arm64/boot/dts/rockchip/rk3568.dtsi           |  39 +
+ drivers/net/can/Kconfig                            |   1 +
+ drivers/net/can/Makefile                           |   1 +
+ drivers/net/can/rockchip/Kconfig                   |   9 +
+ drivers/net/can/rockchip/Makefile                  |  10 +
+ drivers/net/can/rockchip/rockchip_canfd-core.c     | 972 +++++++++++++++++++++
+ drivers/net/can/rockchip/rockchip_canfd-ethtool.c  |  73 ++
+ drivers/net/can/rockchip/rockchip_canfd-rx.c       | 299 +++++++
+ .../net/can/rockchip/rockchip_canfd-timestamp.c    | 105 +++
+ drivers/net/can/rockchip/rockchip_canfd-tx.c       | 167 ++++
+ drivers/net/can/rockchip/rockchip_canfd.h          | 553 ++++++++++++
+ 14 files changed, 2327 insertions(+)
+---
+base-commit: 1722389b0d863056d78287a120a1d6cadb8d4f7b
+change-id: 20240729-rockchip-canfd-4233c71f0cc6
+
+Best regards,
+-- 
+Marc Kleine-Budde <mkl@pengutronix.de>
+
+
 
