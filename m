@@ -1,326 +1,254 @@
-Return-Path: <netdev+bounces-114654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00779435A7
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:30:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9ED19435A8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:31:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8D31C21F6A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 18:30:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 669A31F274A8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 18:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0933145C14;
-	Wed, 31 Jul 2024 18:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9093AC2B;
+	Wed, 31 Jul 2024 18:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="pcwV+rIM"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TQzom4OS";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="r8MGwP7l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [45.157.188.10])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155FD629E4
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 18:30:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722450622; cv=none; b=PZT+0IMKBgYXxrTIpX6tMKTiw1gEzSZRSm8TFTeQhMvg4IAr8hm0ubaxoZaD3h6zwSulM7m80RwEAOOzC6XdusQCtHLvwj6AziuhdMjc8iCdWVmGY/mCQLlscjxlN22Gp30/fxK52txtBEH0khgrDRQz6f7O892h0TewRc/UuPw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722450622; c=relaxed/simple;
-	bh=10myUJ0Hi7LQEO1QGw12rmOF+3lDr5C+MI6fj7DtXMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jxi6Zrm41BgaUqUMxKUmNjgcrrmPg0Pqqe9ie+dUD8j7JNAv7rZF4VcOG6AS1QyoP0nima5GEYGasj7epk5kwKNbedpFIa29R8I22FUBfb/9JH6FBeC8Rc71q8B4K4c/umBAmpB08AFEhcLWFznQCD8suzqBsDWH0vW8p9vNnhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=pcwV+rIM; arc=none smtp.client-ip=45.157.188.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZ0y56rlxz2j7;
-	Wed, 31 Jul 2024 20:30:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1722450605;
-	bh=i1+Ki1MfWXMSk46RtSHlGipVgnMYlmokoAygYW7KYoY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pcwV+rIMfR4HXW0+vjB0kAp6rBNEz3Zo45Q8+IKAKVDxxEWwXDiBfv8dBENM5kZNl
-	 h8jSDcpFZ6YqBQlS6ql1n7M7JNS2EzfjvdDasLga6NTj0DIX/ZgadRhMo9/qJBVJK3
-	 k8qXEVJ92AXOy+EoYdLuhrdM/qABYhJdU6jqdkbw=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZ0y539M3zVcY;
-	Wed, 31 Jul 2024 20:30:05 +0200 (CEST)
-Date: Wed, 31 Jul 2024 20:30:01 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
-Message-ID: <20240731.AFooxaeR5mie@digikod.net>
-References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
- <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E2DD512;
+	Wed, 31 Jul 2024 18:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722450702; cv=fail; b=LpJqLqq5roJ5+nY4aCjyy+GD1LN4hK13U46SF6p9P9yxnr3YBZnTSGAyhIRMpnx2Q0PrwYTci8S+yJPsJ6gMf7avlqZ6ZZ5iUtLL4zGCGCFWwGvr2LuuoBFBAxLJnTomM8go35WLZoSth13JCbvSusAC85/wpyjm+HjfsSZgvlI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722450702; c=relaxed/simple;
+	bh=fBC3Z3NGtMnw85gG+0Ioy204HYauCsmKBC4nFw2wjPA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hg6t51xbC/4a9+Qt3PGoAQ7RpXAVBKRnO9m8onlEuhaS/nI4jV0mieAoRBPigRWd9ygrAlc0JnVYnvyduSllM6s4/et3aTF63ri+zmTGuR38PZ2loIgjvQauBxvXzxSad5b8nwRak/1EGDgkRrjtNxj9NehCcPY27sKbfmKzjAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TQzom4OS; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=r8MGwP7l; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46VHtSJe029206;
+	Wed, 31 Jul 2024 18:31:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	from:to:cc:subject:date:message-id:references:in-reply-to
+	:content-type:content-id:content-transfer-encoding:mime-version;
+	 s=corp-2023-11-20; bh=fBC3Z3NGtMnw85gG+0Ioy204HYauCsmKBC4nFw2wj
+	PA=; b=TQzom4OS7RL4sm5j9foKeZVIIyy96QNiOQS7dgZoDQA3O/gK1pehIWgjc
+	OSSBc8GAULxpOqxEO1M4kn0Beu6OlYVgcHcxX0Z7L8FM0+Gs3b4DSr0zfRS5fzxP
+	RR6zYeVRPjxEFTDiBwtdNpE0VfwCEBi1kHeIMymMgrwb0mOvzcMzSq/KWE8Ql2E7
+	GTKKcYYqG7SwIUYpxepwryIk96WHNDK3no4X5YgGPidpKOMmgH836cV/6pD9kHUH
+	17NanGfCeNzTH00fm0+QUMje2zb6qFwy12SnJZGXr3yVt/MXRitV1h/aHxp/wrcq
+	Lrpi6ye1sAggUu3U9kKtmZdDGqGJA==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 40mqp204eb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 Jul 2024 18:31:29 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 46VIJTEf028906;
+	Wed, 31 Jul 2024 18:31:28 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2101.outbound.protection.outlook.com [104.47.58.101])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 40qmps04mf-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 Jul 2024 18:31:28 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cKwFCZGYyrbZ8OoEUiKvbLr9YlXajK6Cuq5ZBoKfqnzlcqqsLmKveq9z40ZQHEp3oIDKiw4Kv8cFjo+2CBHYUZxzmdVliVQijaVIyYMFLNxjRjM3XSXwWqjQNXLy8+TGJlXzbsP/dOw8OZGGsf9zD2UMSQ9repvxu1mb8EQGRa5C2yQgDatgA8LasA9za0jwoL6CSoU12jiO57ihdSRdxmt8ThYGxQwfCZim0Sk4TnH4PTh6n6Wd9ek/RnEDseUYQkLSxz+ctXNSLW7REBViZtSHzl8DFYx09XDxvpIAwx7eXEMv6MX6Et2CAhATLHPvWbTG1A6Wjd+Z1jkoBGcnJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fBC3Z3NGtMnw85gG+0Ioy204HYauCsmKBC4nFw2wjPA=;
+ b=R+hAqklkscHTCPSo5qdCU7IggJ2ZKqNEELd+lvBCJC4mbmuF/glZPBHiaP+Jn68+j5/ABYoDArd4UfuyWpnZeMDfCWnpIXFaGkwZzwl4RHQC9N6y434L3DFO6eigludyGSDjy4tHHJlEEDkeZG9/Wngl8lPpd2t/Te0GaTO+wn56RurrEXv5MamWHw5xKGigX05Nm9GiB4F4LcUxbTSuk7kHacULXgj8RbY8p5dntoOr+z139kRYIqIgBXsB0LnKCnSOZqAU6PTdfcoXcUugrPj8utG9Fir4L5Y0yzn2uGPva+HECNaPxdmvlhAkUaAFTzMWOFniObRjbDLAagOm3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fBC3Z3NGtMnw85gG+0Ioy204HYauCsmKBC4nFw2wjPA=;
+ b=r8MGwP7lk+PEqsDFq7vSEHbGB8KAnXWbVPUL5P0RPKvB5LqLAjy+r6Fq2pO8ncdE3dVEBd5LvjR0DqpYlmaN4YDxSZy3sejrbObQunctPqX7Zh7QU4fY0O+6WKNObjBlvAtSXtgPVq59V7IZ84cPkbAfg1HN5rLSldiLw+9JHiU=
+Received: from BY5PR10MB4306.namprd10.prod.outlook.com (2603:10b6:a03:211::7)
+ by PH7PR10MB6333.namprd10.prod.outlook.com (2603:10b6:510:1b0::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Wed, 31 Jul
+ 2024 18:31:25 +0000
+Received: from BY5PR10MB4306.namprd10.prod.outlook.com
+ ([fe80::b78:9645:2435:cf1b]) by BY5PR10MB4306.namprd10.prod.outlook.com
+ ([fe80::b78:9645:2435:cf1b%5]) with mapi id 15.20.7807.026; Wed, 31 Jul 2024
+ 18:31:25 +0000
+From: Allison Henderson <allison.henderson@oracle.com>
+To: "yuehaibing@huawei.com" <yuehaibing@huawei.com>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] RDS: IB: Remove unused declarations
+Thread-Topic: [PATCH net-next] RDS: IB: Remove unused declarations
+Thread-Index: AQHa4xRjdFiWlsb6/0+GKD8/EYDrRbIRKYgA
+Date: Wed, 31 Jul 2024 18:31:25 +0000
+Message-ID: <40988b083db40968700c79a752590fe78b640a02.camel@oracle.com>
+References: <20240731063630.3592046-1-yuehaibing@huawei.com>
+In-Reply-To: <20240731063630.3592046-1-yuehaibing@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.44.4-0ubuntu2 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR10MB4306:EE_|PH7PR10MB6333:EE_
+x-ms-office365-filtering-correlation-id: bc6670d6-6ac0-4075-9cb0-08dcb18efc6d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?dUYvQm1qOWt6aGw5RXFXRG5tWnp1aVdScXczWXRMNlFGRHVITkErZTFRRUdu?=
+ =?utf-8?B?YVpzZmlIVG9TWENXTWlvQ0ZDaUU4QVRHemZLRFZCQlZSMWlyUUJRWjlVWmov?=
+ =?utf-8?B?MzBiYXhFcUFqSW5aMElaUFFyWjZxdHVHQnQ3dlowYkd3NXIvZGdQdXJCWURj?=
+ =?utf-8?B?YnV1aDQzVk9FSDYrTnp6ekM4ajgyekhqNnhiRHpRNzNQY0lOb21VeGFZeU5z?=
+ =?utf-8?B?MHlnK3JwQmhHZEdwVkozVkNDWGpGTUVGWkpaM3h1OWdaQmNzenVLRFRSU0Jq?=
+ =?utf-8?B?cldPV0NSY1h5UFJMUmVCall3L2tkWGE2OEQ2SmtmUzVOWXNrTEpid0grYnpR?=
+ =?utf-8?B?ajFFWHB0MklxZUNad1BTVlpUODU2cEc1QkJlQyswOWFad1FOdkhXV3NKTHBw?=
+ =?utf-8?B?UzE1K0lSQTNGRjlxVUNoeUhRb2JwQ1gvOTY1cDVzc3RVRkl2REtiRXdPWi9M?=
+ =?utf-8?B?SnF2UHBOTEgzMUR5YTVQa2ZwNVlpb2IwR3NsNGhicnRhOE4yTDU4WDhySHJm?=
+ =?utf-8?B?QnMvcmNVVlNLbE1ZNytkeXhURTcveEhNMHVmMm1LSmhjNllmR3pSL0F2T1Jt?=
+ =?utf-8?B?QXFNbGd3MHVadTIrdDZ0MmVJdWgxZWt6MmRDajZIVHNNQ0RQWFpKUGdsT0N1?=
+ =?utf-8?B?RWZKMVFSOTZXdGk1Ym1ZU2JwbXZBWUhKSHdpQW5IWkhmZDJRYlVsSk9qSHNn?=
+ =?utf-8?B?SHkzTWJlbmplSTh3UGxqTVNqc000Q3NWdUp1UG9MbVBoZ3BRZk1BV0lNMEZi?=
+ =?utf-8?B?M0pCTExqRXk3ejQ4clhzWjRMbnpPN01qSXBMYnF1N3pLZ0xieTBueVpnMi9v?=
+ =?utf-8?B?Zld2Z0lHOElXemtlQ1VxckNrdkIxeWpINExjTnJxRVVOenAyQXlXZXNPb0d2?=
+ =?utf-8?B?N3hrdVFqR3ppeTNEWjU5OEJuYjJ3MldUUDE1VTlpRitPdjRscDFyNEtNN0xs?=
+ =?utf-8?B?TjVsYmllbmk2YUxWTVdGWlZBNUhRSXhRQkk4M3R5UFZtdVMwcStocENMSFdM?=
+ =?utf-8?B?OHVrVjNGK0hOdThUMllWRlN2bFdXOFNTNDlsYVNnblZvVXFyaUJZWlR6N3dz?=
+ =?utf-8?B?QjMrM2xnckpwc3dudzdCb1dPUEdDVjF0YkJTQmphUnJicGdkU1ZmSUhpL1lN?=
+ =?utf-8?B?VFo1b1hyNkp4bHhEQk5KUk9NUHNrVDdlQkdEa0l5SzRnN0ttKzlPM1BGakN4?=
+ =?utf-8?B?M2tnWWlKSk95eHFXcXpqR2hWcjd6bnNBUldzc0xSQVVLMXF0eXIvMDJNblNY?=
+ =?utf-8?B?ZFFpcG5TWmpreUUvOXhsRDlEWlUzTHZpelBnSkVTUi8xZ3hYZVVMSjliSEtr?=
+ =?utf-8?B?VHJ3M2dpRmJha3NPYlUvazhlRHJPMlJueGZEVFM1MFQ0U09YbmlGVUoxUEpG?=
+ =?utf-8?B?RzJnZEpPUHV2aUFKNXh3aHNpcTlMZVFnMmpTNUJQcW5sUi9EdXYxYzlYR3BC?=
+ =?utf-8?B?anFMOGlHMmloNDRQRHhLNk9KNFB1N1hBdHh2ZE1kL3V4Z2kxRlJqQ1JveTRm?=
+ =?utf-8?B?UkNtYmdKVzQ1OEd4OWsvSzZlV3prQ3B3Y01kQnBkZ2dmNE1NYjRyRGFwMFpG?=
+ =?utf-8?B?RGk5RjNlTWgxY09lbExTUjdad1VINXBxWXB0WE9HZ0xRTVA4eElzQjNoeWp5?=
+ =?utf-8?B?ZlVNWGE2SUQ5Wm9zbE1WME1ISDN0TmpudzZiNTZEWlFQYUFqalQ3Q1hXK1R2?=
+ =?utf-8?B?eE5EWmMySGpUNkl6VU9TMmRGWldxVXV5c3Y4UGY1dEVvUGl3QmhvRUNYWTFG?=
+ =?utf-8?B?MzluS1dJL21BakZISE5MZHh1M1htZjJDMGR1WGhaMUhTM0dQTDJjUUEzZU1k?=
+ =?utf-8?B?M2JoWFZGRXVNemk5SWpxZGdyZjFJaG1VMEYrbmtSV0c4Sm1TODl2WnNqWU1Y?=
+ =?utf-8?B?MTZMWUF4czlpNCsyS01vMElqbm9SdHRGRFk2OW9WaE5aUVE9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4306.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bHBOUWZLSU5rWlFJYzhIT0VPWkNwd092L09uSFRFK3Vad3dTTy9DemZCY0NI?=
+ =?utf-8?B?OG8vdm9LdEpNL3hkTzk1NUNDU1JmeWlidFI4NXp3QVl2YW1hN2VCQTJXWTVH?=
+ =?utf-8?B?SXp3Vm9QQkNqNnk4bUJXQjdPcTJiOGZHb2tUNjBoeWh1OHpTZXRYYUJtNEtV?=
+ =?utf-8?B?aEVOSUdkbFRsVFZNSUZCYzUySHdXZ0U4ejV5L0dlZmEwc0hNTzQyNTcwZTN2?=
+ =?utf-8?B?TWV4WkxuYzZmUWRBamZSSWdmT0ljandpM1R2YU5VblJMVG4rMFNCb3pZLy91?=
+ =?utf-8?B?dkU2cEtLODVaYUNGeU9QaG1zdXVFTytWekFKMGlKanpZblQ4QWlCeTNrd1Jt?=
+ =?utf-8?B?eUIyd2xOcVkrRzl0aDBEbkVkcHVheGFOekp0QldKYXpvbEJsckYwSkFBN3FW?=
+ =?utf-8?B?U0o5T25WMDJmM1RFRUVhV1FZSlIrKzNTZTVTZmUwMlV3MnJ1TGkrK0M5UnA5?=
+ =?utf-8?B?NjR2b2NVaUZiUTRuSnpRK3QyTmx3bHFzL1BiblRwZE1TRHN0VkFsa25oNFhy?=
+ =?utf-8?B?b1I2MWxacThqNHhYSEVPNDc2OFl3cG4zWjZ0aTZMZjRzVi8zRmdBNGJicFhh?=
+ =?utf-8?B?RDNncFh2L1l1Nzgwb1k0bmhCU0NwMG5aVGJqRm9hTWVXaXdjTVhra1dueFlq?=
+ =?utf-8?B?OER1ZS82MzY3eVJRL1NrRnJVRktkaU9xUzdMNURQQ0JlblFSdWtyZTFnaDI1?=
+ =?utf-8?B?VmV3WmJ1OWRaMFljOS9hampTRGE4d1BxSmxBZDJCRmFFM25RRDhsQ0J5bkNB?=
+ =?utf-8?B?bmZOTjFVeC9zWnN5U2VPUnp3dzJ6bWx3MHFoMmpuU1RRSDJoTWVxOGJpNEdw?=
+ =?utf-8?B?bzluUG1oT2xReEY0ZFlnczJNSWdldE1veWl4dUlvSStETTEzSXI0cUt5RFF0?=
+ =?utf-8?B?UmVvTm5LWVRVQWhnRW83SWUvRjk2WnI1NEpyUm04TkNLc1F2SnlBaVlFVk9B?=
+ =?utf-8?B?WXl4OXRMUzZLVVdVTStEWnRWOWFLZ05FTTljMGFjclBBaE4xV2U4a1dNUHF1?=
+ =?utf-8?B?UEVidllZc1pEYmpHbnF0WVZOZWhTSE9kUHNSbFh5WTNHblZRb1E3Q3FCTnNj?=
+ =?utf-8?B?TVhVOEV5aDBWOW9lUml0OTFwTVRCNE9vVkdlTWNPeWk3cUQ4VTc4SEp0RGY1?=
+ =?utf-8?B?c2I4eGpab0F4bm1OZnZYMWM3WG41UjZiVm1Fa0t1Tlc5dnA2VnNnRHo0bHRM?=
+ =?utf-8?B?L1Q3bFMyNk9hV09ib1FGMlVKT2lpMUFSaDNTTUF3V0pQdWNobG4vY24vYjIy?=
+ =?utf-8?B?V2xZMVB1NDdtL28vUkdBbTM3VytHbEVGMnQwTUw0eldVdzB3NjY4Mi9WQlQw?=
+ =?utf-8?B?SjZtTCt1VXFaaUk0cUtqV0Y3dU5TRnV4QldzeE9BdElJa0F5QzFDd05lVzFn?=
+ =?utf-8?B?SUZOc3NSYjJMVlAxR0hHaTl5b3Q5QmJ5anN4cG8zUWNjaVYwSENTaFlTeldk?=
+ =?utf-8?B?U3J0VDVFdW9oNXhFanphdEI4cVpSbDlaNURGWDNaR1grYTlraEVlc2tQQUR2?=
+ =?utf-8?B?a2FlcTUxT28yeEhCbzRLaW9DdzlhWkF3bkxSWk5nL1hzRzhPbmdLU010MFZ5?=
+ =?utf-8?B?WnJFd0t6VEd5bUlpY2piTzBCYXhyalNCT2VtWFZGV1pacXBoL3VzejdnRlMz?=
+ =?utf-8?B?QzByODJOYWlyZ3MrRENWc3Brb1V5VFN5SWE3Q3M4bWk1V0djMlVmTWh1TkNs?=
+ =?utf-8?B?Z1g4SG1HTmMxSGNRUkhPek8rZDd6M0VFS1FDZ0lPU1NGczRZV3ViaDdnWFJm?=
+ =?utf-8?B?Tk4yWmNqdzE4TWhySFBQb2Y3VmFEVk5ZMmFaZm50UGxEeHF5b0FvOC9OcUsx?=
+ =?utf-8?B?bVg0V2hNUFBKWktkMGpNeDYwQkhtTFp0eE0ySFpIckNCdnZkWmZtTkZ4dnFU?=
+ =?utf-8?B?Q1dDRjFETDU1RVE1cnJxcmY5eXNIREtVRHBBM3JmemlTOVRhT0k0UkV2VVVR?=
+ =?utf-8?B?U0lQTWpDc1VoSXhBdmpEUXppc3B6K1FvWGpOWjFxdXRtT0FwQjU0b1RVcFND?=
+ =?utf-8?B?SWRBRFFtdlFlR0lsdkdFVnA1MVZTeXJUcXR4T3k5b09rL3JwMU9VcVZxSDBX?=
+ =?utf-8?B?Y1lrUjVLdW8vSWdoc2VVQ3RJZWNMazlscHdHVmYzNlJveU44U0J6T1pGKytM?=
+ =?utf-8?B?UjcxTE9hcytsd3JKMVYxcEVXUTdVNlFWQ3NXdlFpMU1RaWJKcDNsM2VJdnVp?=
+ =?utf-8?B?Q2c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4357E4EB96A05B45AB6B1221735EFD2B@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	cgN4TVNYVQ0rm3XKoDFUG7+kLiZ4wEYFgp03uTFJc2qCHScSCz+q8bVUnTOUzMbEM2KSZ5XrPFW7trs5I8Me/6SlO9C2oZOdy57j9GzikdpgsScwhy+rVqxSPzC7+y6MJ85Xa5cIkgUcIzi4UwRFisGiKA1+Thb5WZLhhfbURaAIkLYzAla7XNADHiX0VJzXDpz7t+IPrFdkAxfXVdSBpjxlD5fmRA9QfX5qjiUJ3LS8cQBUh63N+wT0iBNORfSvx6VxM6GnbHHMIm/bxiDdvg1Kyaw5TkoqDlDAlu4MaJxZCBVUnTapUZwDNh8pvN1+uNrtVage7LO5/AMoCLv/yAQilN+tJiXWuNC41WGH4n3Yx9egnjR/dmumPBJksiut1g0NXr5JJSlsNtCDFC7jfwcel+RrgSIw/BkD9wmrt+MbGtc7D6X7iE4izspdypVPNoDiNN13yq2xtcKInrhc51T9D3AZOH4r+PoY1jQGFlWQiULBRGCMQghpPqBaxCWy5Yg1Fy4TsdibyrLAIHmfi3MhqX/MEaFF9dm3JkEzRLJduWJjU2Ogo3Q0mYH4WUwFHSq8pTbA17jRAUUKM39xa7lzYt906OxtXhi2rBJRO5c=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4306.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc6670d6-6ac0-4075-9cb0-08dcb18efc6d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2024 18:31:25.8057
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Cb3/lSIdnD1bQW0gS6lx2Ml7Iv8ATVp9YPqz7rU0R0/WujJDCFlGYlYBXF/dE13umy8NrVmruHIQbVdq6Zx2grpGQo/aZgyNhyyQfLgFw7c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6333
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-31_10,2024-07-31_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 suspectscore=0 phishscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2407110000
+ definitions=main-2407310128
+X-Proofpoint-ORIG-GUID: WTXzhG4EVCqyq4fKbMXGY4Dm35glzu2B
+X-Proofpoint-GUID: WTXzhG4EVCqyq4fKbMXGY4Dm35glzu2B
 
-On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
-> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
-> ports to forbid a malicious sandboxed process to impersonate a legitimate
-> server process. However, bind(2) might be used by (TCP) clients to set the
-> source port to a (legitimate) value. Controlling the ports that can be
-> used for listening would allow (TCP) clients to explicitly bind to ports
-> that are forbidden for listening.
-> 
-> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
-> access right that restricts listening on undesired ports with listen(2).
-> 
-> It's worth noticing that this access right doesn't affect changing
-> backlog value using listen(2) on already listening socket.
-> 
-> * Create new LANDLOCK_ACCESS_NET_LISTEN_TCP flag.
-> * Add hook to socket_listen(), which checks whether the socket is allowed
->   to listen on a binded local port.
-> * Add check_tcp_socket_can_listen() helper, which validates socket
->   attributes before the actual access right check.
-> * Update `struct landlock_net_port_attr` documentation with control of
->   binding to ephemeral port with listen(2) description.
-> * Change ABI version to 6.
-> 
-> Closes: https://github.com/landlock-lsm/linux/issues/15
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-
-Thanks for this series!
-
-I cannot apply this patch series though, could you please provide the
-base commit?  BTW, this can be automatically put in the cover letter
-with the git format-patch's --base argument.
-
-> ---
->  include/uapi/linux/landlock.h                | 23 +++--
->  security/landlock/limits.h                   |  2 +-
->  security/landlock/net.c                      | 90 ++++++++++++++++++++
->  security/landlock/syscalls.c                 |  2 +-
->  tools/testing/selftests/landlock/base_test.c |  2 +-
->  5 files changed, 108 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-> index 68625e728f43..6b8df3293eee 100644
-> --- a/include/uapi/linux/landlock.h
-> +++ b/include/uapi/linux/landlock.h
-> @@ -104,13 +104,16 @@ struct landlock_net_port_attr {
->  	/**
->  	 * @port: Network port in host endianness.
->  	 *
-> -	 * It should be noted that port 0 passed to :manpage:`bind(2)` will
-> -	 * bind to an available port from a specific port range. This can be
-> -	 * configured thanks to the ``/proc/sys/net/ipv4/ip_local_port_range``
-> -	 * sysctl (also used for IPv6). A Landlock rule with port 0 and the
-> -	 * ``LANDLOCK_ACCESS_NET_BIND_TCP`` right means that requesting to bind
-> -	 * on port 0 is allowed and it will automatically translate to binding
-> -	 * on the related port range.
-> +	 * It should be noted that some operations cause binding socket to a random
-> +	 * available port from a specific port range. This can be configured thanks
-> +	 * to the ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl (also used for
-> +	 * IPv6). Following operation requests are automatically translate to
-> +	 * binding on the related port range:
-> +	 *
-> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_BIND_TCP``
-> +	 *   right means that binding on port 0 is allowed.
-> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_LISTEN_TCP``
-> +	 *   right means listening without an explicit binding is allowed.
->  	 */
->  	__u64 port;
->  };
-> @@ -251,7 +254,7 @@ struct landlock_net_port_attr {
->   * DOC: net_access
->   *
->   * Network flags
-> - * ~~~~~~~~~~~~~~~~
-> + * ~~~~~~~~~~~~~
->   *
->   * These flags enable to restrict a sandboxed process to a set of network
->   * actions. This is supported since the Landlock ABI version 4.
-> @@ -261,9 +264,13 @@ struct landlock_net_port_attr {
->   * - %LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
->   * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to
->   *   a remote port.
-> + * - %LANDLOCK_ACCESS_NET_LISTEN_TCP: Listen for TCP socket connections on
-> + *   a local port. This access right is available since the sixth version
-> + *   of the Landlock ABI.
->   */
->  /* clang-format off */
->  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
->  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
-> +#define LANDLOCK_ACCESS_NET_LISTEN_TCP			(1ULL << 2)
->  /* clang-format on */
->  #endif /* _UAPI_LINUX_LANDLOCK_H */
-> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-> index 4eb643077a2a..2ef147389474 100644
-> --- a/security/landlock/limits.h
-> +++ b/security/landlock/limits.h
-> @@ -22,7 +22,7 @@
->  #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
->  #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
->  
-> -#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
-> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_LISTEN_TCP
->  #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
->  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
->  
-> diff --git a/security/landlock/net.c b/security/landlock/net.c
-> index 669ba260342f..a29cb27c3f14 100644
-> --- a/security/landlock/net.c
-> +++ b/security/landlock/net.c
-> @@ -6,10 +6,12 @@
->   * Copyright © 2022-2023 Microsoft Corporation
->   */
->  
-> +#include "net/sock.h"
-
-These should not be quotes.
-
->  #include <linux/in.h>
->  #include <linux/net.h>
->  #include <linux/socket.h>
->  #include <net/ipv6.h>
-> +#include <net/tcp.h>
->  
->  #include "common.h"
->  #include "cred.h"
-> @@ -194,9 +196,97 @@ static int hook_socket_connect(struct socket *const sock,
->  					   LANDLOCK_ACCESS_NET_CONNECT_TCP);
->  }
->  
-> +/*
-> + * Checks that socket state and attributes are correct for listen.
-> + * It is required to not wrongfully return -EACCES instead of -EINVAL.
-> + *
-> + * This checker requires sock->sk to be locked.
-> + */
-> +static int check_tcp_socket_can_listen(struct socket *const sock)
-
-Is this function still useful with the listen LSM hook?
-
-> +{
-> +	struct sock *sk = sock->sk;
-> +	unsigned char cur_sk_state = sk->sk_state;
-> +	const struct tcp_ulp_ops *icsk_ulp_ops;
-> +
-> +	/* Allows only unconnected TCP socket to listen (cf. inet_listen). */
-> +	if (sock->state != SS_UNCONNECTED)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Checks sock state. This is needed to ensure consistency with inet stack
-> +	 * error handling (cf. __inet_listen_sk).
-> +	 */
-> +	if (WARN_ON_ONCE(!((1 << cur_sk_state) & (TCPF_CLOSE | TCPF_LISTEN))))
-> +		return -EINVAL;
-> +
-> +	icsk_ulp_ops = inet_csk(sk)->icsk_ulp_ops;
-> +
-> +	/*
-> +	 * ULP (Upper Layer Protocol) stands for protocols which are higher than
-> +	 * transport protocol in OSI model. Linux has an infrastructure that
-> +	 * allows TCP sockets to support logic of some ULP (e.g. TLS ULP).
-> +	 *
-> +	 * Sockets can listen only if ULP control hook has clone method.
-> +	 */
-> +	if (icsk_ulp_ops && !icsk_ulp_ops->clone)
-> +		return -EINVAL;
-> +	return 0;
-> +}
-> +
-> +static int hook_socket_listen(struct socket *const sock, const int backlog)
-> +{
-
-Why can't we just call current_check_access_socket()?
-
-> +	int err = 0;
-> +	int family;
-> +	__be16 port;
-> +	struct sock *sk;
-> +	const struct landlock_ruleset *const dom = get_current_net_domain();
-> +
-> +	if (!dom)
-> +		return 0;
-> +	if (WARN_ON_ONCE(dom->num_layers < 1))
-> +		return -EACCES;
-> +
-> +	/* Checks if it's a (potential) TCP socket. */
-> +	if (sock->type != SOCK_STREAM)
-> +		return 0;
-> +
-> +	sk = sock->sk;
-> +	family = sk->__sk_common.skc_family;
-> +	/*
-> +	 * Socket cannot be assigned AF_UNSPEC because this type is used only
-> +	 * in the context of addresses.
-> +	 *
-> +	 * Doesn't restrict listening for non-TCP sockets.
-> +	 */
-> +	if (family != AF_INET && family != AF_INET6)
-> +		return 0;
-> +
-> +	lock_sock(sk);
-> +	/*
-> +	 * Calling listen(2) for a listening socket does nothing with its state and
-> +	 * only changes backlog value (cf. __inet_listen_sk). Checking of listen
-> +	 * access right is not required.
-> +	 */
-> +	if (sk->sk_state == TCP_LISTEN)
-> +		goto release_nocheck;
-> +
-> +	err = check_tcp_socket_can_listen(sock);
-> +	if (unlikely(err))
-> +		goto release_nocheck;
-> +
-> +	port = htons(inet_sk(sk)->inet_num);
-> +	release_sock(sk);
-> +	return check_access_socket(dom, port, LANDLOCK_ACCESS_NET_LISTEN_TCP);
-> +
-> +release_nocheck:
-> +	release_sock(sk);
-> +	return err;
-> +}
-> +
->  static struct security_hook_list landlock_hooks[] __ro_after_init = {
->  	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
->  	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
-> +	LSM_HOOK_INIT(socket_listen, hook_socket_listen),
->  };
->  
->  __init void landlock_add_net_hooks(void)
-> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
-> index 03b470f5a85a..3752bcc033d4 100644
-> --- a/security/landlock/syscalls.c
-> +++ b/security/landlock/syscalls.c
-> @@ -149,7 +149,7 @@ static const struct file_operations ruleset_fops = {
->  	.write = fop_dummy_write,
->  };
->  
-> -#define LANDLOCK_ABI_VERSION 5
-> +#define LANDLOCK_ABI_VERSION 6
->  
->  /**
->   * sys_landlock_create_ruleset - Create a new ruleset
-> diff --git a/tools/testing/selftests/landlock/base_test.c b/tools/testing/selftests/landlock/base_test.c
-> index 3c1e9f35b531..52b00472a487 100644
-> --- a/tools/testing/selftests/landlock/base_test.c
-> +++ b/tools/testing/selftests/landlock/base_test.c
-> @@ -75,7 +75,7 @@ TEST(abi_version)
->  	const struct landlock_ruleset_attr ruleset_attr = {
->  		.handled_access_fs = LANDLOCK_ACCESS_FS_READ_FILE,
->  	};
-> -	ASSERT_EQ(5, landlock_create_ruleset(NULL, 0,
-> +	ASSERT_EQ(6, landlock_create_ruleset(NULL, 0,
->  					     LANDLOCK_CREATE_RULESET_VERSION));
->  
->  	ASSERT_EQ(-1, landlock_create_ruleset(&ruleset_attr, 0,
-> -- 
-> 2.34.1
-> 
-> 
+T24gV2VkLCAyMDI0LTA3LTMxIGF0IDE0OjM2ICswODAwLCBZdWUgSGFpYmluZyB3cm90ZToNCj4g
+Q29tbWl0IGY0Zjk0M2M5NThhMiAoIlJEUzogSUI6IGFjayBtb3JlIHJlY2VpdmUgY29tcGxldGlv
+bnMgdG8NCj4gaW1wcm92ZSBwZXJmb3JtYW5jZSIpDQo+IHJlbW92ZWQgcmRzX2liX3JlY3ZfdGFz
+a2xldF9mbigpIGltcGxlbWVudGF0aW9uIGJ1dCBub3QgdGhlDQo+IGRlY2xhcmF0aW9uLg0KPiBB
+bmQgY29tbWl0IGVjMTYyMjdlMTQxNCAoIlJEUy9JQjogSW5maW5pYmFuZCB0cmFuc3BvcnQiKSBk
+ZWNsYXJlZCBidXQNCj4gbmV2ZXIgaW1wbGVtZW50ZWQNCj4gb3RoZXIgZnVuY3Rpb25zLg0KPiAN
+Cj4gU2lnbmVkLW9mZi1ieTogWXVlIEhhaWJpbmcgPHl1ZWhhaWJpbmdAaHVhd2VpLmNvbT4NCj4g
+UmV2aWV3ZWQtYnk6IFNpbW9uIEhvcm1hbiA8aG9ybXNAa2VybmVsLm9yZz4NCg0KSGVsbG8gWXVl
+LA0KDQpUaGFua3MgZm9yIGZpbmRpbmcgdGhlc2UuICBUaGUgZGVjbGFyYXRpb25zIGRvIGFwcGVh
+ciB1bnVzZWQsIHNvIEkNCnRoaW5rIGl0IGlzIGZpbmUgdG8gcmVtb3ZlIHRoZW0uICBUaGFua3Mg
+Zm9yIHRoZSBjbGVhbiB1cC4NCg0KUmV2aWV3ZWQtYnk6IEFsbGlzb24gSGVuZGVyc29uIDxhbGxp
+c29uLmhlbmRlcnNvbkBvcmFjbGUuY29tPg0KDQo+IC0tLQ0KPiDCoG5ldC9yZHMvaWIuaCB8IDQg
+LS0tLQ0KPiDCoDEgZmlsZSBjaGFuZ2VkLCA0IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdp
+dCBhL25ldC9yZHMvaWIuaCBiL25ldC9yZHMvaWIuaA0KPiBpbmRleCAyYmE3MTEwMmIxZjEuLjhl
+ZjMxNzhlZDRkNiAxMDA2NDQNCj4gLS0tIGEvbmV0L3Jkcy9pYi5oDQo+ICsrKyBiL25ldC9yZHMv
+aWIuaA0KPiBAQCAtMzY5LDkgKzM2OSw2IEBAIGludCByZHNfaWJfY29ubl9hbGxvYyhzdHJ1Y3Qg
+cmRzX2Nvbm5lY3Rpb24NCj4gKmNvbm4sIGdmcF90IGdmcCk7DQo+IMKgdm9pZCByZHNfaWJfY29u
+bl9mcmVlKHZvaWQgKmFyZyk7DQo+IMKgaW50IHJkc19pYl9jb25uX3BhdGhfY29ubmVjdChzdHJ1
+Y3QgcmRzX2Nvbm5fcGF0aCAqY3ApOw0KPiDCoHZvaWQgcmRzX2liX2Nvbm5fcGF0aF9zaHV0ZG93
+bihzdHJ1Y3QgcmRzX2Nvbm5fcGF0aCAqY3ApOw0KPiAtdm9pZCByZHNfaWJfc3RhdGVfY2hhbmdl
+KHN0cnVjdCBzb2NrICpzayk7DQo+IC1pbnQgcmRzX2liX2xpc3Rlbl9pbml0KHZvaWQpOw0KPiAt
+dm9pZCByZHNfaWJfbGlzdGVuX3N0b3Aodm9pZCk7DQo+IMKgX19wcmludGYoMiwgMykNCj4gwqB2
+b2lkIF9fcmRzX2liX2Nvbm5fZXJyb3Ioc3RydWN0IHJkc19jb25uZWN0aW9uICpjb25uLCBjb25z
+dCBjaGFyICosDQo+IC4uLik7DQo+IMKgaW50IHJkc19pYl9jbV9oYW5kbGVfY29ubmVjdChzdHJ1
+Y3QgcmRtYV9jbV9pZCAqY21faWQsDQo+IEBAIC00MDIsNyArMzk5LDYgQEAgdm9pZCByZHNfaWJf
+aW5jX2ZyZWUoc3RydWN0IHJkc19pbmNvbWluZyAqaW5jKTsNCj4gwqBpbnQgcmRzX2liX2luY19j
+b3B5X3RvX3VzZXIoc3RydWN0IHJkc19pbmNvbWluZyAqaW5jLCBzdHJ1Y3QNCj4gaW92X2l0ZXIg
+KnRvKTsNCj4gwqB2b2lkIHJkc19pYl9yZWN2X2NxZV9oYW5kbGVyKHN0cnVjdCByZHNfaWJfY29u
+bmVjdGlvbiAqaWMsIHN0cnVjdA0KPiBpYl93YyAqd2MsDQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCByZHNfaWJfYWNrX3N0
+YXRlICpzdGF0ZSk7DQo+IC12b2lkIHJkc19pYl9yZWN2X3Rhc2tsZXRfZm4odW5zaWduZWQgbG9u
+ZyBkYXRhKTsNCj4gwqB2b2lkIHJkc19pYl9yZWN2X2luaXRfcmluZyhzdHJ1Y3QgcmRzX2liX2Nv
+bm5lY3Rpb24gKmljKTsNCj4gwqB2b2lkIHJkc19pYl9yZWN2X2NsZWFyX3Jpbmcoc3RydWN0IHJk
+c19pYl9jb25uZWN0aW9uICppYyk7DQo+IMKgdm9pZCByZHNfaWJfcmVjdl9pbml0X2FjayhzdHJ1
+Y3QgcmRzX2liX2Nvbm5lY3Rpb24gKmljKTsNCg0K
 
