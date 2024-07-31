@@ -1,343 +1,119 @@
-Return-Path: <netdev+bounces-114429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3243942914
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:23:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389EA942932
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D97321C20C73
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:23:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA2C92836A3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6371A7F8B;
-	Wed, 31 Jul 2024 08:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465581A8C00;
+	Wed, 31 Jul 2024 08:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VLhUStV6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0AZig4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519161A71F7
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722414184; cv=fail; b=TeBzApAJHPLbXY3+JC4oIPx8vtkvwFBw6SPg5yVPjBkso4ylj5CmQgDqXZmERT3aWeWe60b+KtnlHmzNdI2PvhS4Qv2p/TB9SGUa50U54Smr0YtZA3wumTVd0x6dW+8gBwcJvjzvmR8b2P121NfcRI/GtxB8NHusDu5or4Rlkkg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722414184; c=relaxed/simple;
-	bh=ue46GMa+DOAfuRS5dd3HGeDXfi3pjJyd9tACsVpm6jY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MgqekOsi6sShB0za6GNYlQYVZjxTCVgjBVTNMSiAGpr/Ec4TrFQWmkttffIjsF7YS+99nnYmJePf2jRXjX5quv++1QS6uIYZ5W6I6jG6eXYpPb7JYnZGCID6HEOj5w6lYhQDDYsgjNA5kojlBumX2wKZhiY45s3CyYZJC6YvBsI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VLhUStV6; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722414182; x=1753950182;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ue46GMa+DOAfuRS5dd3HGeDXfi3pjJyd9tACsVpm6jY=;
-  b=VLhUStV6fvDSpFRYykWZ9aF0yyjOK5oqDD6XK5PDwhRK0O+uaGUK0uuS
-   LPjF+69VPzYEzIb/LNP6r3l3JSjpnxC3Q4D64tbHEZL3/S7yGmiD5yMpt
-   OE77vkmU9abfIdCgRfdSPz1ifLXCnlKC5M4P4y8mYw6YwYGHgrkcqWF8+
-   r1BPoiCrtwriUrLyxMVIU/XzAYOU/kfJlZ0XnseABl10w7Gj6LcGEsPsq
-   LSMH6Wxg+gjfzDpA1dE7xXceewUmMVt9gMj4g7/Fx24xDpUSH3GLGoUMp
-   w9U9XWbf/1A1LLv7NTVNyWqmazB1HflAiE8uOZQdFYnxv4gDErGisZsfd
-   Q==;
-X-CSE-ConnectionGUID: ebuyuACOSlGzGT5GY+fAGQ==
-X-CSE-MsgGUID: z3AxwmaET7q2wcJPEIuLCg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11149"; a="30900841"
-X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
-   d="scan'208";a="30900841"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2024 01:23:01 -0700
-X-CSE-ConnectionGUID: RQ5TAjN7Ry24BKFxHcpl1g==
-X-CSE-MsgGUID: PziwBqaNQhWA1Y1Q6GlRBg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
-   d="scan'208";a="59402329"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jul 2024 01:23:01 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 31 Jul 2024 01:23:00 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 31 Jul 2024 01:23:00 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 31 Jul 2024 01:23:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q8BC7SQwj5ZgF8GCtB286ybAA/jenr3hb4Jf2rdojPOshlN2lkAoYPeF1GANakM/oxDm25nLfaP+2nkEDy28Sl+6J8MoUE+KM7HejzEWler9ACP++QjgAODgXcMZsgdu5xDBCzsU7/b9BW/3PleO/8xvp+el6bm3BHE/eymm5wZ9zZAxybgUc1UB92mfyyLsiSB+BJ5JZpF+DPX2ODt4Fl736S+ctnTByXsE7j1HcMlsXcmXLRZk+dtpCDXcdmhQvexXtCSyvbuQ3mQ9+HvogiJi87uGMuBhpogj2CxdI7jGkWyiZNfT1bqU38Jnk5mFpNf5sqGDsYiSu5pyt5di3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lFGL+4WH9zRrCrwttLvvK0Xn8ibIMh8g9FVOySCcJA8=;
- b=LnwrqcmCka9NY5AcMwKosCAUBVQwsNRPzXQeH+BP5TAsgHv2z+ZWw5RGeCEP8wby3de4Y8noXgcTUwAWg3INWtV+8+KJjb0ZVsJSgD25hyRnHuel+/PfGS/ul/xQ6fo+Nm2ddu8VD+Zb53jR23i2ESQAnhY6vOl5R76ODEsVu1N+oIdabOXqKOLo9Rpo/bAe5OxIWgESeiw6UsSLe3aT3iEgq0ILxKcdCZjq5pxPGAMHHzdKRtsuCavoeh1spwAJYBwOyPKKt9MNXhYmE+8u5EbYIhOcjmI/h6/pF75uSwzepvZkceMTs/4JbKhelFh4h4aHRU9DBTOhfbyEJmCGMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by IA1PR11MB7245.namprd11.prod.outlook.com (2603:10b6:208:42f::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 31 Jul
- 2024 08:22:58 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7807.026; Wed, 31 Jul 2024
- 08:22:58 +0000
-Message-ID: <a3682c39-054e-44f7-80c9-b181264c2413@intel.com>
-Date: Wed, 31 Jul 2024 10:22:53 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: Implement ethtool reset
- support
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-CC: <simon.horman@corigine.com>, <edumazet@google.com>,
-	<anthony.l.nguyen@intel.com>, <kuba@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>
-References: <20240730105121.78985-1-wojciech.drewek@intel.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240730105121.78985-1-wojciech.drewek@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0089.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:22::22) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D6D1A8BFE
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722414640; cv=none; b=gQ0whUxqunhDPBd3tXm0rSfVRPQxRRhKzYbF/DcgCOh8PqhIqD23JgepJurimqqnPYqItx+efKNUfD3+fJu+KRi5IZpt3cCrifvnTFsnigawFcuG5RGr2KsFS7ZPj8YrORP3UE+2AWnpl2kb1r4F1ai4N+4mtO+RthY4ZNB+er4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722414640; c=relaxed/simple;
+	bh=qHydxGcYR2MiJe196F5q7cR5YEgzY6/L1S1fzNaA2+w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dQcfij8ntwoMOFzEjnVG+L1b1xSNGwBb/WG/SAwh8xRjYu8XLdm6nh32cy3XRAluaUy7Kw+6VODtFXao2lXxRm+2iqb/OCeV3WrKzw2lc4P6eSZ2A/EEGxMKnLUIu2EOvvw31BnZeUxyeeSIWuyW4qhI8lnnQYY8p4MvqFR6sF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0AZig4y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7D0D3C4AF14;
+	Wed, 31 Jul 2024 08:30:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722414639;
+	bh=qHydxGcYR2MiJe196F5q7cR5YEgzY6/L1S1fzNaA2+w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=J0AZig4yW6kUm9wcrKwPy6Lwo+hIU6qwO+5PouAoOzi2vK5t5K4WdSG43MP0R1lGW
+	 Uy0jYBudpHgN6XT5HLIEhvMyNJjt6H2h3xzbeS4WHYSmByOxmTPepgx0+HRg0XPc+s
+	 doKp02ro/F15hATYJ5N97w5L4onKiL0Ie/mpXFUGV0xkd87btPgJ3FG643Qd9fBYwF
+	 MKIjIPJivMunnxEGjiT2xRUjDf12ITlA1CtuatCqW3vASgbYQbJsuH6AoghjdZ3gfE
+	 U9Qc+SOdZ+LBOrLpDjzuXhZwnxr4uBpgENgCMoBcUcBC1PXENa+9m3OsxgZ5x2b0Yu
+	 JL/+qTHPEGiUg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C694C6E396;
+	Wed, 31 Jul 2024 08:30:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA1PR11MB7245:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6932ee50-54a7-4546-4b84-08dcb139fc6c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Snc2NEthL2d0aW5kNExiQXFzODhwN05JWVg3akhFZkoyRk0rbUY4eWtoNEdx?=
- =?utf-8?B?ODROU0FsckNER3BKR3RjaHk1aEMvZWVjL1QyaWw4U2U2bWwxVi9JSitpYXdB?=
- =?utf-8?B?V0dnaDRxOXVrRWpQYmtSMGJmM0gvVmF0NkJtdkdnb2laMm1xQXRCQ1N6UHpp?=
- =?utf-8?B?a3JXRkptaVpVTXd4MDNYUGZVRGtVdGxSRXd5VTloWUlPVWhKTnhNb21jbG9T?=
- =?utf-8?B?eUFTVlFrL0g5OXlRUkc0OG1adTBMaFptWFlyZVovUzdxWFNYaFNNWS9vcDZW?=
- =?utf-8?B?OVlmcmlUeTl2RDdCMmlnQXIzUlNzbmRJL0FaQ2c4d3lGR1NXb2hSRzRLdXhO?=
- =?utf-8?B?TXF6Q0ZNS2NEWlBjSGxjZkdIVXhrRUcvai9ybzVtOGszSk0zQUZRZnJqYlV6?=
- =?utf-8?B?NE1NM2VUcjZTdnorVzc1dTVVeWVrRXh0ZDMrU3ZHdlRvM2RoNE5uVEhvRUUv?=
- =?utf-8?B?Uzc5ZmI3T0dXOCt2R0xBWjEvbkQ1cVhCZ3hlbUVmZWczQkE5bjM1NHBMSGdS?=
- =?utf-8?B?OGxIdlN1cXhDdHlZeVhQeHlHckZpaUZVN25xejk1RWNvSjNhdzlWUCtsZHhq?=
- =?utf-8?B?allraEVUcnBCbXgreEtKUDBoUmtNL0dYaWlOTlh6ZmpsZVpTYTljd2Y3aGhm?=
- =?utf-8?B?eEdLeC8vMUpLT1ErNkRiYmxnMzQxV29MNFRhcGhSM0tNOWRMZjAvZWp6dGhM?=
- =?utf-8?B?b2dqTUtXT0lmWVZudXcrbXV2NFhteGFUS0tpZXJ0QmsyVmRWNDQ1TWtUWHZP?=
- =?utf-8?B?SjFEU2Z4OHhQamVVWXBvV09oTnBaUXBxdHE0NDA2cjNCZWIzVk11MFFEQ2tF?=
- =?utf-8?B?SVdqT3RQckxEZVF5ZXVMa3NVOVlPZFR0Yk0yaFU3Vlk4Y04yNVpwcEQ3bXR2?=
- =?utf-8?B?bHdydVJpWkNsQWE5RCtPY25CUzNvZmtET01lYmRGTDRQbWdSb1kzcGxFemZp?=
- =?utf-8?B?RW9oZTgvcWQwSEZmNjdJRXFBdVp2TWIyeGcremJvVzRMQ1R1aGQzRzhDMm5r?=
- =?utf-8?B?RHlPRmtaRm52b3ZYSnp2R1FHUFAxSlRzTkRSdmNKN2xsZHdMbWlxVC9qa2FI?=
- =?utf-8?B?bVI1TXp6VTFpQVlTN2x2anBjSGVhOXQ3clNmSHduTnF1MkE0VmZIU1ArRW9Y?=
- =?utf-8?B?QnFWTklOOTFyRXpiYmZuMmpTZUxxNzhJSm5ZTElvSlBuVy9FOU5JaVhYSkNK?=
- =?utf-8?B?QkpKSTQyd2FFbkhNNE5aUmJMNVpUUmRZc001V2NQblJ5V1grZGlIaitOeDQy?=
- =?utf-8?B?UWJhZng0RjFraTVkbnBzR1VOL2tHUnp6alJZZGEwaEpMRytpcmFqS1E3bGNv?=
- =?utf-8?B?S3Niam9MTFRjUG4yMWNlZUlTcTBmOWR1UzRzbno2QWZ2UW5wbXk2SDZtWUt3?=
- =?utf-8?B?YitrS2R1b0RGWWFXM2ZXYnNESnBFVjN5K2lnTklIUDMyUWE2LzJ5R1JBSlB3?=
- =?utf-8?B?ZFByZzJOYmUvT3FFK3hpTDZQbGJUYmwxQzlrUjdSQUpEZHFzc1gxUzV6M2Vx?=
- =?utf-8?B?VjYxRlBScC83dDFWa1lLVURmRDk5UFlSVjhZaHdnT3JKUDBCWXlCWnF4eXFJ?=
- =?utf-8?B?cnpJclYzdnNTZ0FSTUlmSVpGTDFmWkhnWERobStOMnp4SU5sZGZxWWorcENZ?=
- =?utf-8?B?MDFXZFl0cG9UbXl3bHQvbytVYVlsMjh5TnoyZEtaQTBhaWtIM0R2VEE5OUQ5?=
- =?utf-8?B?dXd4eWdlNzlqTWVrR2pxWjZhTnJNVzg4eFNlRjlHbGIxSEtJRUFOenlLdjRK?=
- =?utf-8?B?dmNXSnVwcXlqRmJYZ1NGZ3lsMStHMk9MbzJNY2NleTgyb1FTOWdySnRnaVN0?=
- =?utf-8?B?bmRjSkNhcExUL3MvT3lZUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZjhJa24rRGF6eXY1OVlqNWNLcFJhWXIwdDVvYkhCb1lIYVgveUVFTDU2WFNw?=
- =?utf-8?B?enE4S3dVNUo2Z2MvVThaNkRXUmZYUGtBL2dHMzFZWG1wTGZkR3B4QTVYVUpq?=
- =?utf-8?B?T2lJOVZZZFNoNDdiV3N5RGl3Q0w3MkltUkovbHBZYXhLR1pRemRaZUM1UEUw?=
- =?utf-8?B?QnFSSUxSTWQ0dUlFNzRqTzBiZFdCSEJxY2w2ZzJWNWd1NFFlYm1tc3hETDFy?=
- =?utf-8?B?Qi8wMUdGRjdFV1RIejZzMm9oQ3J0b0d4bEtCSFJ2YlJmM1d6c2s2UTZ2RE15?=
- =?utf-8?B?ekpObFNsOVlNTFFLeFdPZGRrT08vME5aYXdHdllMNFYxT0ZCOWtuKzR3R0dZ?=
- =?utf-8?B?cXEzNEhaVXEyQ3lBSWhyWmJib1RqclE2M2pGbVVzcDk2TWRZU002UmROQ09T?=
- =?utf-8?B?QmlkNTZ4YVh3VGtrVndrWW1EQUkzTzQwODFTZ3g2ZDBKVHc4NWRxUkl5NmVn?=
- =?utf-8?B?L1A1bzZmVGpsaGNZcklXYW5vOXI2bnVRZ1BCR21wT29RcUVEWTFNQ25Wb1lC?=
- =?utf-8?B?SHE1ZWRJSGFjTlZBYTRUYVJHeXQ3SnpRejVneGRIVDZhYmVWRGhGRGx3akdY?=
- =?utf-8?B?eEZHMGduZHFSMTdKU3huVnc0RXFrbEdvY0MxSmxJNmtBcDRVQzBSc1cyZFQz?=
- =?utf-8?B?ZkxLMDFGWURZMW9EYzd3NWlPRWs5Unl6SHI4VFJ6YjBkUkRrREdacTVsamdU?=
- =?utf-8?B?NjQ4R1JzRzdPeEg5YmY4NWpyaXdRZHpTeXFuWUJsYTl3MG5GeUdiZHpqYzNk?=
- =?utf-8?B?NEZ6cUN3ajhxVnlFYUUxR3F2T1RzZEp4WjIxMVZYZzlnZUJqaW5PdXFOdEcz?=
- =?utf-8?B?ck1uRDBuazRlajdDS1ZJdlByMlc5V205Z0hKakk5QXFtTjlpRTZpdjJ3TWU3?=
- =?utf-8?B?dmdFU2ZvbjhyYUViWFJGZEVvdUQ3amc4endFMEFyYSszRzhxdE5hdnkvYWRp?=
- =?utf-8?B?K1RYckplUjNRRUVCRXZ6YUxlVWxOV1NGeGNHQlI2cG0vSTZ3bFBQMmZ0R1FU?=
- =?utf-8?B?SEY5TnpaSXQvcDhUOFJKOTdVWjArTFBxeVlhdExEbG1YNHJQWGxLLzE1SmJv?=
- =?utf-8?B?enhoNWYvNG0vZHkyZUxMRktUTy9YMVpzSUtLaFZ5bjhLV04vYjdBdW5yK2Fy?=
- =?utf-8?B?bjhIRlQ3V1kxaUtWS3IrQ0dtT2FkdTlvd0U1bTdNWWs0VnpJbVVIeitDaFpy?=
- =?utf-8?B?UDZFemUyU2pnMzlzYnk5eXJRQ2l6c1dEZFkyRUpxTHFGdlhNSkdydDZoZm9P?=
- =?utf-8?B?U3A5MVV1a2ljV244R2N6VmgxdlRDcGlsYmlXM0h5RWprZkFRRWR3L29ZbkFE?=
- =?utf-8?B?dGJXOVorbk9DNTNTKzJpR3g0ZHZINmRKbDNGQk9welVPSzZjam40Z1dwaTZI?=
- =?utf-8?B?TnFyN1JZTG9SMEdUN05oemxLa0VzNVFvWFRkcHRUMTNQSGlXMUZLSU8vTDB3?=
- =?utf-8?B?ejhhWDNiV1JzLytkK2JkR3ZZVXZXRUx6dm8wVWxDeUZKb3ZlWnV0NEM2Q3BG?=
- =?utf-8?B?UGpnTzFQd3c1Ymp6b1VXeUNlYVBrcTB0RnJJUkZwNW1jRnRpdXRyMVc3TU5B?=
- =?utf-8?B?Z0UrQVNiMFBCWkJuNWkzMUtZRTNIaHpKNEU0ODR0TXhNNmc3elVST3R1Ym1i?=
- =?utf-8?B?dk9wNVJuUThTcHVzbUU4blVUa1RyVSt5Y09lR3JScUMwUXdmTEdzbGR2NHlP?=
- =?utf-8?B?YSt6NjR3NHhOSE42UElkdE4wWUs4NE1TMGlaSnVzbVcrNVNFMk5JMlNIVm9a?=
- =?utf-8?B?TGNqc3lVbWpiWUJPY05ESSsvMW9EUk1wcmQzaW1LRUhrSlAwMmhid2JoTHNE?=
- =?utf-8?B?Z0YrRWt3WWF5SFhuTkgvYkwvWXlGRHY4VHhWOUwyS1ZIek53RFptQnNieU52?=
- =?utf-8?B?N2JqZ2xmQXJ0QzhES2RYU3lBdjdQVmVIZGd2L3JVT1k0Tm1YNWdTWlBySzBJ?=
- =?utf-8?B?WEpnRzJ0U1RvWTY3Zld5WXFOSWlTVVpVY1dSSTRyN1FxdVdXbTJGUUh1Z2ti?=
- =?utf-8?B?ei85YkprcS9Wdlg2YUhUMTN5L2JHVERVbXQ3QnBPRHEzYUNpcmltbmM2M1pY?=
- =?utf-8?B?MXloK204TjErZzZMZWRFMVZZRTBjUGt6U3puOWdYMUdGYmYwK0FhNzZpR0hS?=
- =?utf-8?B?Q0JrOVlrUzNwZlovSGxDTGdZZ2xHY0EyeVdQeVYzVGg1VHpicTZ4SEt0Mm5x?=
- =?utf-8?B?eHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6932ee50-54a7-4546-4b84-08dcb139fc6c
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 08:22:58.6936
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7cqLbdXpW2IKaQvUHW03RgQNt4CsFWM2exVEySg7mkpEhpxnATrq2+VqObL12xQqjtOTmRs72fIcmrvN3gterR93t9nY/tPsNVOs7z3zBQg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7245
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/15] l2tp: simplify tunnel and session cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172241463944.6677.8796621930261622899.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jul 2024 08:30:39 +0000
+References: <cover.1722265212.git.jchapman@katalix.com>
+In-Reply-To: <cover.1722265212.git.jchapman@katalix.com>
+To: James Chapman <jchapman@katalix.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com
 
-On 7/30/24 12:51, Wojciech Drewek wrote:
-> Enable ethtool reset support. Each ethtool reset
-> type is mapped to the CVL reset type:
+Hello:
 
-not CVL, perhaps "device" or "E810"
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> ETH_RESET_MAC - ICE_RESET_CORER
-> ETH_RESET_ALL - ICE_RESET_GLOBR
-> ETH_RESET_DEDICATED - ICE_RESET_PFR
+On Mon, 29 Jul 2024 16:37:59 +0100 you wrote:
+> This series simplifies and improves l2tp tunnel and session cleanup.
 > 
-> Multiple reset flags are not supported.
-> Calling any reset type on port representor triggers VF reset.
+>  * refactor l2tp management code to not use the tunnel socket's
+>    sk_user_data. This allows the tunnel and its socket to be closed
+>    and freed without sequencing the two using the socket's sk_destruct
+>    hook.
 > 
-> Command example:
-> GLOBR:
-> $ ethtool --reset enp1s0f0np0 all
-> CORER:
-> $ ethtool --reset enp1s0f0np0 mac
-> PFR:
-> $ ethtool --reset enp1s0f0np0 dedicated
-> VF reset:
-> $ ethtool --reset $port_representor mac
-> 
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice_ethtool.c | 64 ++++++++++++++++++++
->   1 file changed, 64 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index 39d2652c3ee1..00b8ac3f1dff 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -4794,6 +4794,68 @@ static void ice_get_ts_stats(struct net_device *netdev,
->   	ts_stats->lost = ptp->tx_hwtstamp_timeouts;
->   }
->   
-> +/**
-> + * ice_ethtool_reset - triggers a given type of reset
-> + * @dev: network interface device structure
-> + * @flags: set of reset flags
-> + *
-> + * Note that multiple reset flags are not supported
-> + */
-> +static int ice_ethtool_reset(struct net_device *dev, u32 *flags)
-> +{
-> +	struct ice_netdev_priv *np = netdev_priv(dev);
-> +	struct ice_pf *pf = np->vsi->back;
-> +	enum ice_reset_req reset;
-> +
-> +	switch (*flags) {
-> +	case ETH_RESET_MAC:
-> +		*flags &= ~ETH_RESET_MAC;
+> [...]
 
-this line is equivalent to:
-*flags = 0;
+Here is the summary with links:
+  - [net-next,01/15] l2tp: lookup tunnel from socket without using sk_user_data
+    https://git.kernel.org/netdev/net-next/c/2e7a280692bf
+  - [net-next,02/15] ipv4: export ip_flush_pending_frames
+    https://git.kernel.org/netdev/net-next/c/4ff8863419cd
+  - [net-next,03/15] l2tp: have l2tp_ip_destroy_sock use ip_flush_pending_frames
+    https://git.kernel.org/netdev/net-next/c/ed8ebee6def7
+  - [net-next,04/15] l2tp: don't use tunnel socket sk_user_data in ppp procfs output
+    https://git.kernel.org/netdev/net-next/c/eeb11209e000
+  - [net-next,05/15] l2tp: don't set sk_user_data in tunnel socket
+    https://git.kernel.org/netdev/net-next/c/4a4cd70369f1
+  - [net-next,06/15] l2tp: remove unused tunnel magic field
+    https://git.kernel.org/netdev/net-next/c/0fa51a7c6f54
+  - [net-next,07/15] l2tp: simplify tunnel and socket cleanup
+    https://git.kernel.org/netdev/net-next/c/29717a4fb7fc
+  - [net-next,08/15] l2tp: delete sessions using work queue
+    https://git.kernel.org/netdev/net-next/c/fc7ec7f554d7
+  - [net-next,09/15] l2tp: free sessions using rcu
+    https://git.kernel.org/netdev/net-next/c/d17e89999574
+  - [net-next,10/15] l2tp: refactor ppp socket/session relationship
+    https://git.kernel.org/netdev/net-next/c/c5cbaef992d6
+  - [net-next,11/15] l2tp: prevent possible tunnel refcount underflow
+    https://git.kernel.org/netdev/net-next/c/24256415d186
+  - [net-next,12/15] l2tp: use rcu list add/del when updating lists
+    https://git.kernel.org/netdev/net-next/c/89b768ec2dfe
+  - [net-next,13/15] l2tp: add idr consistency check in session_register
+    https://git.kernel.org/netdev/net-next/c/0aa45570c324
+  - [net-next,14/15] l2tp: cleanup eth/ppp pseudowire setup code
+    https://git.kernel.org/netdev/net-next/c/d93b8a63f011
+  - [net-next,15/15] l2tp: use pre_exit pernet hook to avoid rcu_barrier
+    https://git.kernel.org/netdev/net-next/c/5dfa598b249c
 
-> +		reset = ICE_RESET_CORER;
-> +		break;
-> +	case ETH_RESET_ALL:
-> +		*flags &= ~ETH_RESET_ALL;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-ditto
-
-> +		reset = ICE_RESET_GLOBR;
-> +		break;
-> +	case ETH_RESET_DEDICATED:
-> +		*flags &= ~ETH_RESET_DEDICATED;
-
-ditto
-you could just move *flags = 0; after the switch statement
-
-> +		reset = ICE_RESET_PFR;
-> +		break;
-> +	default:
-> +		netdev_info(dev, "Unsupported set of ethtool flags, multiple flags are not supported");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	ice_schedule_reset(pf, reset);
-> +
-> +	return 0;
-> +}
-> +
-> +/**
-> + * ice_repr_ethtool_reset - triggers a VF reset
-> + * @dev: network interface device structure
-> + * @flags: set of reset flags
-> + *
-> + * VF associated with the given port representor will be reset
-> + * Any type of reset will trigger VF reset
-
-why not to support just one type of reset here?
-(that would left us with future option of different behavior on
-different reset type requested)
-
-> + */
-> +static int ice_repr_ethtool_reset(struct net_device *dev, u32 *flags)
-> +{
-> +	struct ice_repr *repr = ice_netdev_to_repr(dev);
-> +	struct ice_vf *vf;
-> +
-> +	if (repr->type != ICE_REPR_TYPE_VF)
-> +		return -EOPNOTSUPP;
-> +
-> +	vf = repr->vf;
-> +
-> +	if (ice_check_vf_ready_for_cfg(vf))
-> +		return -EBUSY;
-> +
-> +	*flags = 0;
-> +
-> +	return ice_reset_vf(vf, ICE_VF_RESET_VFLR | ICE_VF_RESET_LOCK);
-> +}
-> +
->   static const struct ethtool_ops ice_ethtool_ops = {
->   	.cap_rss_ctx_supported  = true,
->   	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
-> @@ -4829,6 +4891,7 @@ static const struct ethtool_ops ice_ethtool_ops = {
->   	.nway_reset		= ice_nway_reset,
->   	.get_pauseparam		= ice_get_pauseparam,
->   	.set_pauseparam		= ice_set_pauseparam,
-> +	.reset			= ice_ethtool_reset,
->   	.get_rxfh_key_size	= ice_get_rxfh_key_size,
->   	.get_rxfh_indir_size	= ice_get_rxfh_indir_size,
->   	.get_rxfh		= ice_get_rxfh,
-> @@ -4885,6 +4948,7 @@ static const struct ethtool_ops ice_ethtool_repr_ops = {
->   	.get_strings		= ice_repr_get_strings,
->   	.get_ethtool_stats      = ice_repr_get_ethtool_stats,
->   	.get_sset_count		= ice_repr_get_sset_count,
-> +	.reset			= ice_repr_ethtool_reset,
->   };
->   
->   /**
 
 
