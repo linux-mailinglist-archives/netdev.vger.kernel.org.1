@@ -1,232 +1,176 @@
-Return-Path: <netdev+bounces-114532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AD6942D72
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:44:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F8E7942D4D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0F01F23CFB
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:44:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 337211C21609
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E161AD9CF;
-	Wed, 31 Jul 2024 11:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1141A8C0C;
+	Wed, 31 Jul 2024 11:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b+MpzAOa"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="LHkz8Rdt"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C01A8BEF;
-	Wed, 31 Jul 2024 11:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722426258; cv=fail; b=GG4tq7zNtZvsCTMN/Y0Yqhrx8C0nLnRpiuJVUl5jvHkAOxNmeniGseECA6TZMvLjgYnQLmdIP0QjZMSXK2rIfqsyGxCBNXzqkV9gBmaykjGK3yFz4r5aFIyAmpNMIGtVo7NILVDVlgkOvtptoyDweqD2Ndt5+eX86HZHFb9Cenk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722426258; c=relaxed/simple;
-	bh=xUGA+N4gYnaRLYU4kSBqB1P0agoFBpfGyRm3XPwQ7EE=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=JvaoZIkoPkPVUwyVFMSBUjsJb4GsZtCB+nFt9eFQggL50Jx1IhoNMyIFrzkFGpdK3c4b7Tn7Q8pYcTZZwpsn9kuRy1bxbRoGsGDHWnmR2FEr7RaoTjxYyya2I8Sngp1/CPPtWIr5JL+zMHw/RubEoy2IDfeLanHrJkOaqiWL5u8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=b+MpzAOa; arc=fail smtp.client-ip=40.107.237.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xDI+MMrcaw4m6QRbGElCrWyDGhadbhFlU9v71OKMltUtUp5uPyvIdU2ufkWdR0nA6cmsTD0du5ZC+bQUA3JLXqy7DUaO/bbsbdzY9IxyhlzcO1qyrJJcsSWNd0e+cJrZfJ9vQVYZTB/1YTZHZHkeZdMpcXHcJFsFxMnfFxnAfo9pv/CjrAetuXSqMcueWyjXlGKImxX0XgHd/7eeR0i+CAzavETDbx45TBWtrEF3iZe5Yhr/6On23AViLfMjg9TkemU74bEaSGI1Bfwp8ijpTIRhFiTz/6ar/EqsoxIC/Xn1hSAl0C1wXGCaKMcEihBHJO04OV1QwP9eQQ1swgstMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W4zBiJJFwzeBuse6dtW6SPobXdfICQo2rVCpuHc95ew=;
- b=zLKFBeFbaAsE7mydXCsIK0XEfyDUqbo84DNUsoInlp/KnVXcDu8/E6MmgrXJfJyCJ+mZkzPfQ4pPpp3+oTYCamBMf7t4bqtlmu6F02a4spvQHPnlPPx5vMvbSUU71LvLdQh1bGumf3sF4eRTUKqRx2EgEeQlIUv2hCeyMeN2LhiHI2nCVnHufcaJUO8x8z7e1CsoMDCmqKemH4wZ/o58k+H6qPAL7otTXFSYnT2g58Tb1O2eaYsjYpt+y3GZEXSeqUnVwtvJY905WA2ifCRSl2AA31Jv6iiH7LZ6rgvC8c9wGw5/hxryAzzc7PKwdhLp8ZuUKFzER3pDkfxcR8bvyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W4zBiJJFwzeBuse6dtW6SPobXdfICQo2rVCpuHc95ew=;
- b=b+MpzAOa4ahbKdF9U028HRuc+jakUvK25XlIPOXV9rSxlvztaTJCrKymDZzIQZkW+N3z5DkCOlVT/Q+Eq24CnFQHSnVjKA7xmE6sVGikrUB4C9208gKKNYNCGZM8SoK7/g4rq6tyo0mkjFxnb95ysSegUXTelAmn5sbVeWhapN2aZsxzvDktiBeNjptfT/bl/wrkPJvvHiFtHbnGijhkJfhn6bsC3+acw4quhRIp3L/ojEZso2VNLdZDB9u/+NLudE8W3OtVeGnp8PLkDwW5st+rAJSWzig8O1noxOY6hX8gVo8VsUZGRXnA22+3UvETRqJaHUUWXiuu8g0Kpt6e4w==
-Received: from BYAPR02CA0044.namprd02.prod.outlook.com (2603:10b6:a03:54::21)
- by SJ0PR12MB8167.namprd12.prod.outlook.com (2603:10b6:a03:4e6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.19; Wed, 31 Jul
- 2024 11:44:13 +0000
-Received: from CO1PEPF000066E7.namprd05.prod.outlook.com
- (2603:10b6:a03:54:cafe::66) by BYAPR02CA0044.outlook.office365.com
- (2603:10b6:a03:54::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.34 via Frontend
- Transport; Wed, 31 Jul 2024 11:44:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000066E7.mail.protection.outlook.com (10.167.249.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7828.19 via Frontend Transport; Wed, 31 Jul 2024 11:44:12 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 31 Jul
- 2024 04:44:02 -0700
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 31 Jul
- 2024 04:43:57 -0700
-References: <20240730223932.3432862-1-sdf@fomichev.me>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Stanislav Fomichev <sdf@fomichev.me>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, "Joe
- Damato" <jdamato@fastly.com>, Petr Machata <petrm@nvidia.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/2] selftests: net-drv: exercise queue
- stats when the device is down
-Date: Wed, 31 Jul 2024 13:34:58 +0200
-In-Reply-To: <20240730223932.3432862-1-sdf@fomichev.me>
-Message-ID: <87cymt7pmu.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F5B34CDE
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 11:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722425716; cv=none; b=Olf4gtHhMruXY65y1gacwzsDmmgq+gZNBAfHJXRForHr7EE4w1lnY+43ZbW3Wh5sH7OglTM5GvK2COl2OUddZfOjE+XbHpvdCTr8vSISVWmh7h4pVvA2d/4+UBVSmS76GlHFbaMOkiVHTFeJk8QqbxLZeG93HKa6iTHt8QxllVQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722425716; c=relaxed/simple;
+	bh=2KLlYSv2pqCjLyymLPqt9+aVQWowB7gktb1jU/vjTs8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sT+PayLv5IX9U5cC7xdur95ePa+ohzNUrMLccMAGk6LCJa5/BAqyxcpoiRUmTf2RFf66zg0K1DP3LeJBJ/6NWfwuzJrFnWg2I/mFmazFFh6oo996e3TffPmXoQd5n1NaPishEWnQ13d33jiMZzGXgZBQb4TlgYW7dA75a4/nPj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=LHkz8Rdt; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7a843bef98so590799666b.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 04:35:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1722425713; x=1723030513; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=boFYO0r1hfN8XIImPghehk1SbXzMdtypod7bR6Zqvts=;
+        b=LHkz8RdtBDFJNSPPJdR4ZXAtvgRjf/NYOYCUf0/Eh71WPlQ/PY9h/FMqdoyXk5ZeB6
+         Ik+xl7iyhaArnG1jq+AoP8uXRsptEQ2f2fVC6za73qCJszi9n/8rXYzjrhtDfHI8xNMs
+         Vbxv4EoTluuc48cYgd+iNtFyMyDtX+m59XBOrQff/EBxGN+rhsEBfYEglpm6RrS+xe66
+         pGicdiMFu7gaSyuTtILRhz5gsBxvWEjRazyma6UFjsQWtnsuuw+B+mBA93fZd6cURiF6
+         mWeogAM5Up8v2MplKfSV4y5HJJFbKuiZWgm13MbsCt88TWy2JfKpQZgcvU7zXP+qMYOv
+         tgxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722425713; x=1723030513;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=boFYO0r1hfN8XIImPghehk1SbXzMdtypod7bR6Zqvts=;
+        b=Hf/PNTrd4Fqil7ds/dMdhu4PoExQhNjMwnLxsooVfAE/x1tiBZgUo5Ru8czUmn5wsR
+         eMjR+Vv8LcDy15EPBo26jPUyKs7vMCKMVGXq9VUcFecQ42hiOfFTQci7wfQ6Os5Nu6iK
+         iNyUHreOczkrxhG6gLviVxLBhxXrw1ip7DxjKthWcT9uRy8DrRfRT5vMfW4C5Sh/6t6a
+         KNk0i3vdZdmObcYEl6lIyH+hRAbxOkM7V/AnBh+V+mDMsjcxYZgpFItuQsqwHkYh3eGU
+         12hdoiV1H2JLgEO88/7++teHTh8QPL8xQBcx0yuDWQMo4DwKjiCzQHQ9dW0haEvrXfXd
+         K30Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUSuzM1yI2uACOpv9qbrM84bd5MjWRFApInZ2co7U+Gcsnb6YxDeDnlNY7KwLMOlpQn/wKeqdMC4WMNW0jntxNbjo3DFoWd
+X-Gm-Message-State: AOJu0YxY0wzyqsvr7A6uiLBQm3SLyXsXq32h+IxwRDCfqruwznFf0CWn
+	J4ug34MvWqe9V8kzHIPKctCRPRzLzlQLrHY7baifiFCfVGiDNRtSr8xkfWuYxhk=
+X-Google-Smtp-Source: AGHT+IEvJOEARdvbqpGR9nmQAAhomQBNUEx+q+w3HuTQ2f1O0Lujw8IC/OmYSg9E2m9M2T3RRVdS4w==
+X-Received: by 2002:a17:907:7d86:b0:a7a:929f:c0cf with SMTP id a640c23a62f3a-a7d400461ccmr948857166b.21.1722425712416;
+        Wed, 31 Jul 2024 04:35:12 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1126:4:82d:3bb6:71fa:929f? ([2620:10d:c092:500::4:457])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadb82d5sm754695366b.199.2024.07.31.04.35.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jul 2024 04:35:11 -0700 (PDT)
+Message-ID: <6a6b3aff-c00c-481b-9a83-7dfc324d6b02@davidwei.uk>
+Date: Wed, 31 Jul 2024 12:35:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000066E7:EE_|SJ0PR12MB8167:EE_
-X-MS-Office365-Filtering-Correlation-Id: 084c063a-f7d7-4422-ad48-08dcb156193c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kYUoTNv3NDsd6jsjYqiDARHmKHmU1bNhwhk9a8cyMaI5Ytq/XmHi/ekl8Lc9?=
- =?us-ascii?Q?ukWmigjlBzeuEyzakgzdJV+X5TEXcq/JKYUxI819wyR8pgVkBmy14UCR51sl?=
- =?us-ascii?Q?ZWabn+uGA7QZOJHByl6oeEJ6ic2X1rHiWlZ3aHhiSzEzhUwg4DLK3hDw7CD2?=
- =?us-ascii?Q?f15s+1cwhJLUl5nlRHtzK2l0FOkfeob+I6nwBQtZKatsLZbdTGw7fxzELqu0?=
- =?us-ascii?Q?M+f3PZ3soFa8FZhy2s7QmOHBgYnMBdE7Fy8VZzKRs03EYALznrkG9y5YnNE/?=
- =?us-ascii?Q?GMRJ6fBsb6AVJ56u3MqAYlaTKzWrEFw//176LkwME1TO270vLDxw/Ic68VMd?=
- =?us-ascii?Q?HceASTGP6lbVtB5NUWYcM7PZoyQUVRZZmaOSObCEHcQoFX++y1UNqqZlRJaC?=
- =?us-ascii?Q?IbxoDFgh7SXncvnb6OB60IOITEF1qTlZxeu2QPOUI66+cabs29t6zH+J8gSx?=
- =?us-ascii?Q?bGefVsQZdQLWHKRk+fvy+TMsPgmBBo+dqGptORZGtKzOUtAsUQxrMNLc6TAU?=
- =?us-ascii?Q?I4gksD/BFMRajW4XIDpGTxH+u0dHxdXZzveFKB6XmdqsK/V/7pXqJuQPY311?=
- =?us-ascii?Q?K10qQKKTW5uxcnIK/VH8+Vgd8+S6W/I91sS9mBGIJNgOB3aIfi2GMiICvocP?=
- =?us-ascii?Q?WGr/DZyGPHcgJ8qFbLFwKerHTLvJfM/ZvB62LworOoa+ymvA03p2NdBhkHzC?=
- =?us-ascii?Q?UV/Out0Q9Bg3/oLTFBLxi+GIhNcASZwDSAp/t5uDGwqf7XWs2HHw7QibERtq?=
- =?us-ascii?Q?buEI2Xoc5qLC2b4fISpWlmS2D5GNIu+3PIOgPtmbemzlYu2F9iBX2/O6ndyz?=
- =?us-ascii?Q?KK5skLfDPpmqcirX9V3cODtDkQEpK6cnP69DEeqIJVjtjK/8w2bQiQrKNOI5?=
- =?us-ascii?Q?A72po1wSxqtRQXCKzMXgbgIk+CapOPRaHlOS97NRNIft1lPKUYvqFUgbxRvM?=
- =?us-ascii?Q?uGN6TZPi2pasOP0iicp1tcdDYXoWdKlExquGInVNcPRn321zGKRpafPjkuJF?=
- =?us-ascii?Q?9i7401OP+yb+rO/0VhRzjQiDehZ/zJQC+pNo07eyrWcG/T4Et8aYh15Vu4sB?=
- =?us-ascii?Q?PPXlvscUuP7c+kwv9x6960BkjTHMUba53ErmXUKzyva6rPgp+UhwPZkswgpe?=
- =?us-ascii?Q?C0tyzv+772KnisGVeRAwOgQGUTB0y50b4C6Fc72ibumexKzWCvDJ8igNPPyS?=
- =?us-ascii?Q?lqvh95xLbOx2nlHiasxxJfIQzS8Rm7Qp+L19VhONJFTNasFIAXchMyrqfJPJ?=
- =?us-ascii?Q?D4Hvqhbmsj8L+7RGbcKU4DulLrkPf/V9GT/HMk1hk6mFaw3nn2aVFZBkNNCd?=
- =?us-ascii?Q?Vqk00TVx3v7+kVJfmVDEVH9wTHhZo/IiCNuuCTe4g4HF0IDdIBAQgRqIbIvB?=
- =?us-ascii?Q?7dPwRqZtbl9agEgiea1fnwj4Fpjo64amo8GpSMTylOZcDPbow4PsPBdT59Jy?=
- =?us-ascii?Q?BQbcH4d5XuCvtoJNWPVmaDZAqQBsKfW1?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 11:44:12.7072
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 084c063a-f7d7-4422-ad48-08dcb156193c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000066E7.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8167
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 2/3] bnxt_en: stop packet flow during
+ bnxt_queue_stop/start
+Content-Language: en-GB
+To: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Michael Chan <michael.chan@broadcom.com>
+References: <20240729205459.2583533-1-dw@davidwei.uk>
+ <20240729205459.2583533-3-dw@davidwei.uk>
+ <7b27e95e-85a7-43da-a06c-4ab56eccf5b6@intel.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <7b27e95e-85a7-43da-a06c-4ab56eccf5b6@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 2024-07-30 11:31, Wojciech Drewek wrote:
+> 
+> 
+> On 29.07.2024 22:54, David Wei wrote:
+>> Calling napi_stop/start during bnxt_queue_stop/start isn't enough. The
+>> current implementation when resetting a queue while packets are flowing
+>> puts the queue into an inconsistent state.
+>>
+>> There needs to be some synchronisation with the FW. Add calls to
+>> bnxt_hwrm_vnic_update() to set the MRU for both the default and ntuple
+>> vnic during queue start/stop. When the MRU is set to 0, flow is stopped.
+>> Each Rx queue belongs to either the default or the ntuple vnic.
+>>
+>> Co-Developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+>> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+>> Signed-off-by: David Wei <dw@davidwei.uk>
+>> ---
+>>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 22 ++++++++++++++++++----
+>>  1 file changed, 18 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> index 8822d7a17fbf..ce60c9322fe6 100644
+>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+>> @@ -15172,7 +15172,8 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>>  	struct bnxt *bp = netdev_priv(dev);
+>>  	struct bnxt_rx_ring_info *rxr, *clone;
+>>  	struct bnxt_cp_ring_info *cpr;
+>> -	int rc;
+>> +	struct bnxt_vnic_info *vnic;
+>> +	int i, rc;
+>>  
+>>  	rxr = &bp->rx_ring[idx];
+>>  	clone = qmem;
+>> @@ -15197,11 +15198,16 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>>  	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+>>  		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
+>>  
+>> -	napi_enable(&rxr->bnapi->napi);
+> 
+> I get it that napi_{enable|enable} isn't enough but why removing it?
+> Without it, RX will not work, the poll method won't be called or am I missing something?
 
-Stanislav Fomichev <sdf@fomichev.me> writes:
+From my testing removing napi_enable/disable() is needed for reset to
+work on a queue that has traffic flowing.
 
-> Verify that total device stats don't decrease after it has been turned down.
-> Also make sure the device doesn't crash when we access per-queue stats
-> when it's down (in case it tries to access some pointers that are NULL).
->
->   KTAP version 1
->   1..5
->   ok 1 stats.check_pause
->   ok 2 stats.check_fec
->   ok 3 stats.pkt_byte_sum
->   ok 4 stats.qstat_by_ifindex
->   ok 5 stats.check_down
->   # Totals: pass:5 fail:0 xfail:0 xpass:0 skip:0 error:0
->
-> v2:
-> - KTAP output formatting (Jakub)
-> - defer instead of try/finally (Jakub)
-> - disappearing stats is an error (Jakub)
-> - ksft_ge instead of open coding (Jakub)
->
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> --
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: Joe Damato <jdamato@fastly.com>
-> Cc: Petr Machata <petrm@nvidia.com>
-> Cc: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/drivers/net/stats.py | 25 +++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/drivers/net/stats.py b/tools/testing/selftests/drivers/net/stats.py
-> index 820b8e0a22c6..93f9204f51c4 100755
-> --- a/tools/testing/selftests/drivers/net/stats.py
-> +++ b/tools/testing/selftests/drivers/net/stats.py
-> @@ -5,6 +5,7 @@ from lib.py import ksft_run, ksft_exit, ksft_pr
->  from lib.py import ksft_ge, ksft_eq, ksft_in, ksft_true, ksft_raises, KsftSkipEx, KsftXfailEx
->  from lib.py import EthtoolFamily, NetdevFamily, RtnlFamily, NlError
->  from lib.py import NetDrvEnv
-> +from lib.py import ip, defer
->  
->  ethnl = EthtoolFamily()
->  netfam = NetdevFamily()
-> @@ -133,9 +134,31 @@ rtnl = RtnlFamily()
->      ksft_eq(cm.exception.nl_msg.extack['bad-attr'], '.ifindex')
->  
->  
-> +def check_down(cfg) -> None:
-> +    try:
-> +        qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)
-> +    except NlError as e:
-> +        if e.error == 95:
+Let me edit the commit message to make this bit clearer. Thanks.
 
-Could you do this as if e.error == errno.ENOTSUP?
-
-> +            raise KsftSkipEx("qstats not supported by the device")
-> +        raise
-> +
-> +    ip(f"link set dev {cfg.dev['ifname']} down")
-> +    defer(ip, f"link set dev {cfg.dev['ifname']} up")
-> +
-> +    qstat = qstat[0]
-
-Consider moving the [0] inside the try to make the two qstats_get
-statements obviously the same.
-
-> +    qstat2 = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)[0]
-> +    for k, v in qstat.items():
-> +        ksft_ge(qstat2[k], qstat[k], comment=f"{k} went backwards on device down")
-> +
-> +    # exercise per-queue API to make sure that "device down" state
-> +    # is handled correctly and doesn't crash
-> +    netfam.qstats_get({"ifindex": cfg.ifindex, "scope": "queue"}, dump=True)
-> +
-> +
->  def main() -> None:
->      with NetDrvEnv(__file__) as cfg:
-> -        ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex],
-> +        ksft_run([check_pause, check_fec, pkt_byte_sum, qstat_by_ifindex,
-> +                  check_down],
->                   args=(cfg, ))
->      ksft_exit()
-
+> 
+>> -
+>>  	cpr = &rxr->bnapi->cp_ring;
+>>  	cpr->sw_stats->rx.rx_resets++;
+>>  
+>> +	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
+>> +		vnic = &bp->vnic_info[i];
+>> +		vnic->mru = bp->dev->mtu + ETH_HLEN + VLAN_HLEN;
+>> +		bnxt_hwrm_vnic_update(bp, vnic,
+>> +				      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
+>> +	}
+>> +
+>>  	return 0;
+>>  
+>>  err_free_hwrm_rx_ring:
+>> @@ -15213,9 +15219,17 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+>>  {
+>>  	struct bnxt *bp = netdev_priv(dev);
+>>  	struct bnxt_rx_ring_info *rxr;
+>> +	struct bnxt_vnic_info *vnic;
+>> +	int i;
+>> +
+>> +	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
+>> +		vnic = &bp->vnic_info[i];
+>> +		vnic->mru = 0;
+>> +		bnxt_hwrm_vnic_update(bp, vnic,
+>> +				      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
+>> +	}
+>>  
+>>  	rxr = &bp->rx_ring[idx];
+>> -	napi_disable(&rxr->bnapi->napi);
+>>  	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+>>  	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+>>  	rxr->rx_next_cons = 0;
 
