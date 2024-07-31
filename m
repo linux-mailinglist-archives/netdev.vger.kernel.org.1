@@ -1,59 +1,73 @@
-Return-Path: <netdev+bounces-114441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2AD9429B2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:54:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC6929429CA
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17B781F21F37
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:54:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4531C216F5
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF04F1A8BF6;
-	Wed, 31 Jul 2024 08:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72391AAE2D;
+	Wed, 31 Jul 2024 08:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WQol9oX3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgcv9F/j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94AD1A7F87
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8338E1AAE08;
+	Wed, 31 Jul 2024 08:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722416086; cv=none; b=W6+6Ug/MAnD1CjgtYZQjG2V8p7CJfLw6CHPY4ojwOfi6qllgxnIjRMMiETTgwkI/3pXMQLfiSizbamvwOK+XqeROfuEF68WQy+XGjs032xLPWAWLmolXBXFM6pE05beM3X8m87+q+kcjLNwL2BbrMgUXGPuAY7qgITErHd9lo2k=
+	t=1722416266; cv=none; b=MCE/fWqmoX+7kR0dpxr01aEAWJJ4for3F8ryHgNyPw+mkfVC9nqcadqerspQlcyoiH/xBCB5D8wg+xc7BJ4cHmmUL6GvxnIcxQvSJ2rLWn1NDzOpYjtgAdPeXs8cPj6sIvWmO9fHCjNWurQ3FdqLPSQl3352FWJtVw8Nz/0m4Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722416086; c=relaxed/simple;
-	bh=qmbJvr1Uuy1tS5AnKk7/a4dNC6RsQBMVIpnBMNp6TJI=;
+	s=arc-20240116; t=1722416266; c=relaxed/simple;
+	bh=hopejYkFDlRXosQSrN9FNvd2qXYNt97CgMPgExHWjLE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WIu2K3xfHq2koshjApuutxyDn+QyzqH4GBijcGBwEjOHRecTAh+2PvZct0HIuyw/ggZDWwUpBc+R6J2UbWWUv31HIAp7NnjYueNM+MTwnnslLTFE3RraFcey3Q9S3z8CLIdLX8mT5vSFI3eb5dvTNlydV8JwDsFBCFwPmil+CxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WQol9oX3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9769C116B1;
-	Wed, 31 Jul 2024 08:54:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHLfRSG799wYTA1w7RzRq4ubcbDxl3X8xNrRmqS6L2dIsm/thJsaliPBKVkz6zKI/onlR/GfZH/IjaX7COzhchX6f0e7D4JwiDJHdm8zPXVHhElMvF+MEqrZsopUkBSb/gf3w6nPHW5lJlalFsqO+TVO+/g/0mc1ce+6HWift9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgcv9F/j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DC84C116B1;
+	Wed, 31 Jul 2024 08:57:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722416086;
-	bh=qmbJvr1Uuy1tS5AnKk7/a4dNC6RsQBMVIpnBMNp6TJI=;
+	s=k20201202; t=1722416266;
+	bh=hopejYkFDlRXosQSrN9FNvd2qXYNt97CgMPgExHWjLE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WQol9oX3QO1yPMil8dpygVEjJx/zbPmkgQB+uGOgfYzaTfPxs+q7YvBaonwj55y0c
-	 ArQClHRNK8XCjrjaHCiMWvxjWSNbdmnoNsif8KSk3AosVtY8fXeEXBYYi2VsggGSeZ
-	 Ds5rN32IW6ix3luj2lD9fnPrbbbUcEC8Si5wh+B0OTUxK0+rV/1VPG6EWYu1c13pV5
-	 kFIlbRcbIpX8ZvwK0rQVMRQKKbuboSyTI3K7QFhnNCve2B+HnY9j+IQxKckiFmgYxM
-	 RCa9f3WDYiEx45uzxFSTu0ebMc7t9iB7EcBAunQa4gBNLk2ua8UJtdGgoJgSl8shyj
-	 JBDifU2bZuRwA==
-Date: Wed, 31 Jul 2024 09:54:42 +0100
+	b=kgcv9F/j4hbv4sY33GK6d58MNdprg7Tk6x7Afte7Yvm+pO9ukFm6JSZHFhVrQctV8
+	 HCJvnQ2SmAqj0sAQJBgaQF2tt0TOI5PcJu9v2fmRxV2XUWaFGKRqLMu52qnFc79kh9
+	 OZIH/2SJJc8An60ZA3qB06AemJlpRn3qE0hIldQMIveR5FOpyQA8u8NtVxm3+jHQKb
+	 ZIR6/5PDzOSoOQ9rfNdotTn6qFvjblvNuBAip+B091FmD2fG07ijLMGLRyGcJCwF7M
+	 F0eioAeNeRBymaNwU7QnKVLzgg6Jy9Kkg6kC/bxm0G3R6V0OdCYTZd0D5ASDSWuS9d
+	 gv5IYS+rqKdFw==
+Date: Wed, 31 Jul 2024 09:57:39 +0100
 From: Simon Horman <horms@kernel.org>
-To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
-	Ariane Keller <ariane.keller@tik.ee.ethz.ch>,
-	"Simek, Michal" <michal.simek@amd.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"Katakam, Harini" <harini.katakam@amd.com>
-Subject: Re: net: xilinx: axienet: Query about checksum partial implementation
-Message-ID: <20240731085442.GN1967603@kernel.org>
-References: <20240726120700.GA1694627@kernel.org>
- <MN0PR12MB59534F7030FB73002F1223F4B7B02@MN0PR12MB5953.namprd12.prod.outlook.com>
+To: Liju-clr Chen <liju-clr.chen@mediatek.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Yingshiuan Pan <Yingshiuan.Pan@mediatek.com>,
+	Ze-yu Wang <Ze-yu.Wang@mediatek.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Shawn Hsiao <shawn.hsiao@mediatek.com>,
+	PeiLun Suei <PeiLun.Suei@mediatek.com>,
+	Chi-shen Yeh <Chi-shen.Yeh@mediatek.com>,
+	Kevenny Hsieh <Kevenny.Hsieh@mediatek.com>
+Subject: Re: [PATCH v12 11/24] virt: geniezone: Add ioeventfd support
+Message-ID: <20240731085739.GO1967603@kernel.org>
+References: <20240730082436.9151-1-liju-clr.chen@mediatek.com>
+ <20240730082436.9151-12-liju-clr.chen@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,67 +76,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MN0PR12MB59534F7030FB73002F1223F4B7B02@MN0PR12MB5953.namprd12.prod.outlook.com>
+In-Reply-To: <20240730082436.9151-12-liju-clr.chen@mediatek.com>
 
-On Tue, Jul 30, 2024 at 07:15:13PM +0000, Pandey, Radhey Shyam wrote:
-> > -----Original Message-----
-> > From: Simon Horman <horms@kernel.org>
-> > Sent: Friday, July 26, 2024 5:37 PM
-> > To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>
-> > Cc: Daniel Borkmann <daniel@iogearbox.net>; Ariane Keller
-> > <ariane.keller@tik.ee.ethz.ch>; Simek, Michal <michal.simek@amd.com>;
-> > netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org
-> > Subject: net: xilinx: axienet: Query about checksum partial implementation
-> > 
-> > Hi Radhey, all,
-> > 
-> > I am wondering if you could shed some light on the following checksum
-> > partial handling in the axienet_rx_poll():
-> > 
-> >                         /* if we're doing Rx csum offload, set it up */
-> >                         if (lp->features & XAE_FEATURE_FULL_RX_CSUM) {
-> > 				...
-> >                         } else if ((lp->features & XAE_FEATURE_PARTIAL_RX_CSUM) != 0
-> > &&
-> >                                    skb->protocol == htons(ETH_P_IP) &&
-> >                                    skb->len > 64) {
-> >                                 skb->csum = be32_to_cpu(cur_p->app3 & 0xFFFF);
-> >                                 ...
-> >                         }
-> > 
-> > In particluar the "skb->csum =" line.
-> > 
-> > The type of cur_p->app3 is u32, and 0xFFFF is also host byte order.
-> > So far so good. But after the bitwise operation it is treated as a big-endian
-> > value by passing it to be32_to_cpu.
-> > 
-> > Perhaps I am missing something obvious, but my question is how does that
-> > work?
-> > 
-> > * Was it only tested on big endian sysgtems where be32_to_cpu() is a no-op
-> > 
-> > * Was it only tested on little endian systems where be32_to_cpu()
-> >   is a byteswap and somehow that works (how?).
-> > 
-> > * Is the code unecessised because the XAE_FEATURE_FULL_RX_CSUM branch
-> > is
-> >   always taken?
-> > 
-> >   A grep of dts files shows up arch/microblaze/boot/dts/system.dts which
-> >   sets sets xlnx,rxcsum to 0, which corresponds to XAE_NO_CSUM_OFFLOAD.
+On Tue, Jul 30, 2024 at 04:24:23PM +0800, Liju-clr Chen wrote:
+> From: Yingshiuan Pan <yingshiuan.pan@mediatek.com>
 > 
-> + Harini
+> Ioeventfd leverages eventfd to provide asynchronous notification
+> mechanism for VMM. VMM can register a mmio address and bind with an
+> eventfd. Once a mmio trap occurs on this registered region, its
+> corresponding eventfd will be notified.
 > 
-> Yes, IIRC default AXI Ethernet IP RX checksum is set to "No checksum offload"
-> so, it is default case and being set in most designs. Have added Harini to this
-> thread to confirm on partial checksum verification results.
-> 
-> Assuming partial implementation is functional then likely DMA IP updates
-> application field in big endian format and that is the reason we have this
-> be32 to CPU conversion in place. will dig a bit more and get back on it.
+> Signed-off-by: Yingshiuan Pan <yingshiuan.pan@mediatek.com>
+> Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
+> Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
 
-Thanks, much appreciated.
+...
 
-FWIIW, I do agree that the scenario you describe would mostly explain
-things, although the mask with 0xFFFF still seems off.
+> diff --git a/drivers/virt/geniezone/gzvm_ioeventfd.c b/drivers/virt/geniezone/gzvm_ioeventfd.c
+
+...
+
+> +/**
+> + * ioeventfd_check_collision() - Check collison assumes gzvm->ioevent_lock held.
+
+nit: collision
+
+     Likewise elsewhere in this patch.
+
+     Flagged by checkpatch.pl --codespell
+
+> + * @gzvm: Pointer to gzvm.
+> + * @p: Pointer to gzvm_ioevent.
+> + *
+> + * Return:
+> + * * true			- collison found
+> + * * false			- no collison
+> + */
+
+...
 
