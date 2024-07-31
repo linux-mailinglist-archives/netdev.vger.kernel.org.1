@@ -1,108 +1,164 @@
-Return-Path: <netdev+bounces-114492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A831942B95
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:06:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC69E942B98
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:06:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3C5C1F21574
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:06:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EED7F1C20BDB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595B31A7F70;
-	Wed, 31 Jul 2024 10:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826621A8C14;
+	Wed, 31 Jul 2024 10:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="KXib8HK7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jaU/SYwQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6D43CF73;
-	Wed, 31 Jul 2024 10:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE1E18DF88;
+	Wed, 31 Jul 2024 10:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722420361; cv=none; b=a/Xt31l460jEiW8VfiCpPVvNTVimJTDc6BdglcE4lSElitkMrNeX6JKUeo7l7tOcKsqHu7W370jY84rCDPk6vUMZP8fINGiA59Nazd6KRNvyDcpCgqnWZIZIzW7lwp3Bn1ENenaur4a6+8X+nq4SPZjaScwQ1MWbHzV28n7TefM=
+	t=1722420395; cv=none; b=WwGHC373G6O/mxiSgugvB1pZe0RImd411AeozCJuIfMyX+czUDbrwgqLUI0YddspWb8bLfxc9e2h9DARbglHcsRm/mEAv/6Y+GKFbsbsSio3SdYOBG31IdCdOOZVM4Iau1YOUVoR7susetOVHBlgw5T5N64w0/smRrG7FaYbun0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722420361; c=relaxed/simple;
-	bh=srmQMSPvjmzX6YVnb4EoadT8BWjHWmgLWmalAmQCuf8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YI7S9jxfy6YmIbWCaCkFKOgMRNSiWrXB76+zyeUNxK2J3zs/+eth0ltN082G20/ybvj89DKWGQOCC7Vk2Ekxux5CU+0hBUyzgeW9yR3IfMj1Nc/8tmgOwlPTQ6x8Cyj7uucHRoRrGEOZ2R4qnYQ8ZAHNY6lk8Mms2hawJJg5tmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=KXib8HK7; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sZ6DS-009FnH-49; Wed, 31 Jul 2024 12:05:54 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=7WS5w3a6OnGgEbNmijkTxVC2Csv3HLG/InjtySuGe5k=; b=KXib8HK7QGxqR3+4N85jlCWmeH
-	ryBS3iHyrX2boZvL3pHMvmSC605z13qL/Cg9dDJ36VB2vZYlUpfiYcu/+pAeoFVDJtPQsNDsSs4Rw
-	LXih0vizz96kIAzoMWCvu7Sb7S1wezRhlC96wZorPCFO9TUIBKe3uGhCg0ACGzV6SfWaCUyAcx5Iq
-	/iGtIDUaVCy6mc4uiEqSGhwLB/wrUaogdwOL6N+hll263e6P1w+6DEehZThTQ7/w5hX6XxQTNWWTf
-	ggJgmfEQIOpoO3H8ymIGAV6fqkQ7YPefVhRYQ2ONkMPk2U69MsLMi6MELAMTLCnx6gkYQq39sUdl+
-	lqS656jg==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sZ6DR-0005LZ-H5; Wed, 31 Jul 2024 12:05:53 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sZ6DB-003PbE-PN; Wed, 31 Jul 2024 12:05:37 +0200
-Message-ID: <04c91b4c-8863-4306-81a2-4cf917e9de23@rbox.co>
-Date: Wed, 31 Jul 2024 12:05:36 +0200
+	s=arc-20240116; t=1722420395; c=relaxed/simple;
+	bh=2aP4oXKRSb1MJfT9SOjWQtkkP0myhMnarRsFUG+F0Ag=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oE197l8HEwhW4opgaK9NBTcwHOVCf6xk28hg/unxKiIKLFiY+cNyHUDopjjL2UKZ+dAxS6Sy3csEg074BHPXFesvfpwWjw4OLX5Zy64w0E6UXCcciG633Fo1kKgICpqmVOBU/SHujQhwo9T0QPAP9wsCgROWCvW7sqkVWBtM4Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jaU/SYwQ; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ef2c56d9dcso72242631fa.2;
+        Wed, 31 Jul 2024 03:06:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722420391; x=1723025191; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yEN4u/tG/J9UeLM5/XA8rih5Bz4G8k8tK8+kNzb5VJw=;
+        b=jaU/SYwQa8Tl7H/6Ejko7FpnVUvG3+/G2sc2kzedWjdgAXfGHGBL9b9j+1xS+/lmvN
+         tygeJxAqBgDoyxhvIapq3NcKtWVFmiylYlJsjOOI+GtZirzVmGS8b1lHel2e9p2MWERB
+         6yYlWadmPH8nOMMEHu5GFdPgaqDHBT5u8F/e79C8kPPPetTIncLUGakM7v7L44ZD4g0O
+         gfUN5FxAad/5QE647hPPRcQp5JHE8XyDDC3Wl67QVCFhEtxwd5RZoXW32rqyLej4dQV5
+         9hDTpiZanN9x+yuJ0EcPQXbbjxcQH/p91FLyOxvIgNUiFl4gFVlOdap4Gf+vyiDfFJ2d
+         64mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722420391; x=1723025191;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yEN4u/tG/J9UeLM5/XA8rih5Bz4G8k8tK8+kNzb5VJw=;
+        b=DJtaydM0vmhUH5MAi87THnQvUihwhounsByL6bGV34CDeghkYo6Lr0R8IBi13vMyxN
+         KxSYFD7b9kOQV8UosE9XGDCAk342r8z7cultZ/neyVe/3rdnBx0SIWg+UwIuay0ka1/t
+         2IbmHRDOsoXV1yKdh362O2CQmQqrBQhmHfr6MrUZ4lvqDziLefP/w5pLB2xta+X+GtC/
+         CoXBces6vPcC4bd4nqePNEw3Jx7PY8WfrC+u0YsHvX/vQOMRY/2JJY0L8K/tUTOfmm3F
+         3c8bDcRMBFaqO3Yu/M4qe0Kf2rGQ44tFhfR8lMTlWKdzrhX4oor0S15QGrokMJFaAotu
+         UFgA==
+X-Forwarded-Encrypted: i=1; AJvYcCVtQuNkVchfn0T29XTuR/2hyp7tXJgV+orSBd/gxX9Z44mYEmGIHvrWDJe92Kk8kAk9DjHRGzF8yadXfKDG24+iDA7IK6CWPQXwpZ78
+X-Gm-Message-State: AOJu0YzHNvYSvnZJ1ifMAoloNSoc13RvPzIMiv9cGRXDPLICWWX2vNP5
+	2LKR2z/CDrulhKLTl/6mtf1XhMD/iiWZad6+DwTxLZR38Heq16PMK4AJEIBEPKPfyC4rN8he610
+	nq3+oOFnOK1sHscjWtK/kCA+tSBc=
+X-Google-Smtp-Source: AGHT+IFZQRojJ0JPS68j3Im1vIhiOEmnvTfRefcVEMIHivBnyXs78fRkjUxc5nPb/dc6vE63XeQ3IfA1oyx3Tx8ODXQ=
+X-Received: by 2002:a2e:3c0a:0:b0:2ee:87e9:319d with SMTP id
+ 38308e7fff4ca-2f12ee2ffb6mr101960371fa.48.1722420390293; Wed, 31 Jul 2024
+ 03:06:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf 1/6] selftest/bpf: Support more socket types in
- create_pair()
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
- <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
- <20240724-sockmap-selftest-fixes-v1-1-46165d224712@rbox.co>
- <87cyn0kqxu.fsf@cloudflare.com>
- <7ae7a77c-c5ce-4a09-8a6c-b3cd014220f3@rbox.co>
- <87mslyztu9.fsf@cloudflare.com>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <87mslyztu9.fsf@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240730125856.7321-1-ubizjak@gmail.com> <20240731093516.GR1967603@kernel.org>
+In-Reply-To: <20240731093516.GR1967603@kernel.org>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Wed, 31 Jul 2024 12:06:18 +0200
+Message-ID: <CAFULd4aye+mGTV1CJp5Coq0Qr2DvwOezpd5-hxWbF4-xR5aj_Q@mail.gmail.com>
+Subject: Re: [PATCH] net/chelsio/libcxgb: Add __percpu annotations to libcxgb_ppm.c
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/30/24 19:13, Jakub Sitnicki wrote:
-> On Fri, Jul 26, 2024 at 10:29 PM +02, Michal Luczaj wrote:
->> On 7/26/24 19:23, Jakub Sitnicki wrote:
->>> I was going to suggest that a single return path for success is better
->>> than two (diff below), but I see that this is what you ended up with
->>> after patch 6.
->>>
->>> So I think we can leave it as is.
->>> [...]
->>
->> And speaking of which, would you rather have patch 1 and 6 squashed?
-> 
-> Don't have a straight answer, sorry . Would have to see if the diff is
-> clear enough after squashing it. Use your best judgement.
-> 
-> It's certainly fine with me to review the steps that were taken to
-> massage the code.
+On Wed, Jul 31, 2024 at 11:35=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Tue, Jul 30, 2024 at 02:58:19PM +0200, Uros Bizjak wrote:
+> > Compiling libcxgb_ppm.c results in several sparse warnings:
+> >
+> > libcxgb_ppm.c:368:15: warning: incorrect type in assignment (different =
+address spaces)
+> > libcxgb_ppm.c:368:15:    expected struct cxgbi_ppm_pool *pools
+> > libcxgb_ppm.c:368:15:    got void [noderef] __percpu *_res
+> > libcxgb_ppm.c:374:48: warning: incorrect type in initializer (different=
+ address spaces)
+> > libcxgb_ppm.c:374:48:    expected void const [noderef] __percpu *__vpp_=
+verify
+> > libcxgb_ppm.c:374:48:    got struct cxgbi_ppm_pool *
+> > libcxgb_ppm.c:484:19: warning: incorrect type in assignment (different =
+address spaces)
+> > libcxgb_ppm.c:484:19:    expected struct cxgbi_ppm_pool [noderef] __per=
+cpu *pool
+> > libcxgb_ppm.c:484:19:    got struct cxgbi_ppm_pool *[assigned] pool
+> > libcxgb_ppm.c:511:21: warning: incorrect type in argument 1 (different =
+address spaces)
+> > libcxgb_ppm.c:511:21:    expected void [noderef] __percpu *__pdata
+> > libcxgb_ppm.c:511:21:    got struct cxgbi_ppm_pool *[assigned] pool
+> >
+> > Add __percpu annotation to *pools and *pool percpu pointers and to
+> > ppm_alloc_cpu_pool() function that returns percpu pointer to fix
+> > these warnings.
+> >
+> > Compile tested only, but there is no difference in the resulting object=
+ file.
+> >
+> > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > ---
+> >  drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c b/drive=
+rs/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
+> > index 854d87e1125c..01d776113500 100644
+> > --- a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
+> > +++ b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
+> > @@ -342,10 +342,10 @@ int cxgbi_ppm_release(struct cxgbi_ppm *ppm)
+> >  }
+> >  EXPORT_SYMBOL(cxgbi_ppm_release);
+> >
+> > -static struct cxgbi_ppm_pool *ppm_alloc_cpu_pool(unsigned int *total,
+> > -                                              unsigned int *pcpu_ppmax=
+)
+> > +static struct cxgbi_ppm_pool __percpu *ppm_alloc_cpu_pool(unsigned int=
+ *total,
+> > +                                                       unsigned int *p=
+cpu_ppmax)
+>
+> Let's keep to less than 80 columns wide, as is still preferred for
+> Networking code. Perhaps in this case:
+>
+> static struct cxgbi_ppm_pool __percpu *
+> ppm_alloc_cpu_pool(unsigned int *total, unsigned int *pcpu_ppmax)
 
-That's what I've assumed, thanks. So here's the bpf-next based respin:
-https://lore.kernel.org/bpf/20240731-selftest-sockmap-fixes-v2-0-08a0c73abed2@rbox.co
+Hm, the original is exactly what sparse dumped, IMO code dumps should
+be left as they were dumped.
 
+> Also, I do observe that this is an old driver, so the value
+> of cleaning it is perhaps limited.
+
+It broke my strict percpu checker with allyesconfig. Fixing it was
+trivial and resulted in no object code changes.
+
+> But the above aside, this looks good to me.
+
+Thanks,
+Uros.
 
