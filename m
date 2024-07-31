@@ -1,89 +1,104 @@
-Return-Path: <netdev+bounces-114679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5045F9436E2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:10:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0C849436FF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEC951F21339
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:10:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92D8A28452D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893E9154C14;
-	Wed, 31 Jul 2024 20:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149C91607B6;
+	Wed, 31 Jul 2024 20:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nsuJyxHL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cx2j4/Bi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A22381AD;
-	Wed, 31 Jul 2024 20:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4FA155CB3;
+	Wed, 31 Jul 2024 20:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722456643; cv=none; b=knXtQ3wrYfBNVQnWkxlj1MVxir6IwmPRrQm8sPlTwII9cuqb3k5+q/4OumciKCsJsu/DkRl3hin2BIcvjvsSWhZcmjuvrw2NgXyIsYG/g3QxQ6kChPjLknHqCYjkYWKXwP1UfRunKGBmtsMkB4KubAoEegeAHsrgB0vDg34yyPk=
+	t=1722456938; cv=none; b=rfXXyjbBJDEDo/JbzFl7SWN2CnlJZW8OCfWPClypNZwlR5TUriYPcCWpfo8g2vv88aHanIxxK1XhquILgmE7DuDBMbh6UDX+M14jLn6tYaW9s9mtR9mazNJr0k8EDW2Qz5WvmS+ku1DQOsI0OMotjaqQcK3NLRWThscF8V2Gv9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722456643; c=relaxed/simple;
-	bh=pqrXLePcqScmQ+5G42RA/IZo2oSMz4qVDmXGP/r+5lU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=knyeNEyH/QfD64GB0OoQVmeNhxBbueqtYa9mkSAMZUSYlGzpslCcUJYaFJfYXvE1oeD7GRq8+oTEU96lOlTNqE2ztvXYxsmnWc1Q1zGZJKt768oMtz6NHnc1NyVmSLPgGWBjndVEH4DH/GN6Mv4B6BtkwlmEzzanjAsrrqD3cWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nsuJyxHL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 449E1C116B1;
-	Wed, 31 Jul 2024 20:10:41 +0000 (UTC)
+	s=arc-20240116; t=1722456938; c=relaxed/simple;
+	bh=OYc0eqnvCS57Vh46JZhj/LGq/WMkCP5RJW2wrFRMGMY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=avKCJROJosgpF+9tdQTLoJeDVyR3wENWN9jWw/AFGsJb3cLWljuXSJbDCm6B2tdjwMciHMHtgFBzvZuTsocKhGA/k2Utk5ChXv45T0wkZVfniw5coeo1b3EUdgs43KEAj24bO80ttDEzagkC+k3veNdR+svvlLjRB/uofcWbcNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cx2j4/Bi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27949C116B1;
+	Wed, 31 Jul 2024 20:15:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722456642;
-	bh=pqrXLePcqScmQ+5G42RA/IZo2oSMz4qVDmXGP/r+5lU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nsuJyxHLxShd7MGhJKhtWBjt0PMjX2DDyca0RCGWYVY+bK0NUQkbDPL+OMtadEVPk
-	 ptkgfNOYg4EQv+sQHpYoUbBI+Mhtl4w2qWQGzSxcR5OPB3+2XvP6re6VNe128qW4dN
-	 5X7zpxdpg60ibWqcqS7X7s7/Bs6bekj9gW0i4bhZ4q26/TyIoIQbK5HVQnpnVfaGq+
-	 kcs8ojl6zu7tDLyEKIGpV069s5xQib6SGY8ioWtR/7B/NnGQCW2JHZ/nDHluiREX4g
-	 FyWaSFIAnKid4MTRsCmHTgKYdmNAMRMFvxQwK0Ez/destkUu67rhQzbHI2kH+2dYzs
-	 jDkUMHjT537tA==
-Date: Wed, 31 Jul 2024 21:10:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: vtpieter@gmail.com
-Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	o.rempel@pengutronix.de,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Subject: Re: [PATCH net-next v2 2/5] net: dsa: microchip: move KSZ9477 WoL
- functions to ksz_common
-Message-ID: <20240731201038.GT1967603@kernel.org>
-References: <20240731103403.407818-1-vtpieter@gmail.com>
- <20240731103403.407818-3-vtpieter@gmail.com>
+	s=k20201202; t=1722456937;
+	bh=OYc0eqnvCS57Vh46JZhj/LGq/WMkCP5RJW2wrFRMGMY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cx2j4/BieCcl37yPXillkjdBsnCLcDzsRb3aexsfzim2vLt2O+oiAUG4wzFbxM+Dn
+	 AqQOcxrmUt5YnQUs6kSCO63i/vHhTU7lqbR/57BOMpkLMjf5nizZhGw9XMlANQMjlb
+	 /mi1p7GM2YYz2q6RDH2JP8K0uFey4OsZo1CDGUYCOUTPk6WMxB+nyr2uACJfHNqK5m
+	 9uWSSXD2EM5Iy2LHZOlTT7JuBdAy9LSSGNggBvRveZA6f2Ux7GyMTuH9Z8g9S0evqJ
+	 Lv5EusMjNC+qCPKO6HVTxfM2gOc7os35pbg/4JYKZCCEBwodmAALXsYJUw+A6yzaMj
+	 CPyc7SPVnVdxQ==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: mdio: Use of_property_count_u32_elems() to get property length
+Date: Wed, 31 Jul 2024 14:15:15 -0600
+Message-ID: <20240731201514.1839974-2-robh@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731103403.407818-3-vtpieter@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 31, 2024 at 12:34:00PM +0200, vtpieter@gmail.com wrote:
-> From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
-> 
-> Move KSZ9477 WoL functions to ksz_common, in preparation for adding
-> KSZ87xx family support.
-> 
-> Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Replace of_get_property() with the type specific
+of_property_count_u32_elems() to get the property length.
 
-Hi Pieter,
+This is part of a larger effort to remove callers of of_get_property()
+and similar functions. of_get_property() leaks the DT property data
+pointer which is a problem for dynamically allocated nodes which may
+be freed.
 
-This is not a full review, and I suggest waiting for feedback from others.
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ drivers/net/mdio/of_mdio.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-However, I think this patch-set needs to be re-arranged a little,
-perhaps by bringing forward some of the header file changes
-in the following patch forward, either into this patch
-or a new patch before it.
-
-In any case, the driver does not compile with this patch applied,
-f.e. W=1 build using allmodconfig on x86_64. While it does
-compile just fine when the following patch is applied.
-
+diff --git a/drivers/net/mdio/of_mdio.c b/drivers/net/mdio/of_mdio.c
+index 08e607f62e10..2f4fc664d2e1 100644
+--- a/drivers/net/mdio/of_mdio.c
++++ b/drivers/net/mdio/of_mdio.c
+@@ -390,7 +390,7 @@ EXPORT_SYMBOL(of_phy_get_and_connect);
+ bool of_phy_is_fixed_link(struct device_node *np)
+ {
+ 	struct device_node *dn;
+-	int len, err;
++	int err;
+ 	const char *managed;
+ 
+ 	/* New binding */
+@@ -405,8 +405,7 @@ bool of_phy_is_fixed_link(struct device_node *np)
+ 		return true;
+ 
+ 	/* Old binding */
+-	if (of_get_property(np, "fixed-link", &len) &&
+-	    len == (5 * sizeof(__be32)))
++	if (of_property_count_u32_elems(np, "fixed-link") == 5)
+ 		return true;
+ 
+ 	return false;
 -- 
-pw-bot: changes-requested
+2.43.0
+
 
