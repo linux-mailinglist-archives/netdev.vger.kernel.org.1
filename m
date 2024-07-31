@@ -1,117 +1,109 @@
-Return-Path: <netdev+bounces-114426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955499428DA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:08:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4592F9428EB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:12:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50B61284B9E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:08:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB991C20A5A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51AF1A7F64;
-	Wed, 31 Jul 2024 08:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F201A7F73;
+	Wed, 31 Jul 2024 08:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GRzbZWUc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kWlLsGaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245CA1A7F77
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4EC1A4F1C
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722413316; cv=none; b=DlKJL5G+4AQGO6RvwtF0XJvpOlEbu95o+urH38aryDuz72+8mHZjdSFDFHBT5wHI1s3rDE9gY9gGAOu40DbvUp7ODCS6bEJqrFTnyDyKVKH0SuBV/fk5RX/C0R7lUkzvcFJyUKqj9iySaPuCy9TGmTe+NvJWxMXdUWsF2bFfXY0=
+	t=1722413526; cv=none; b=OUXKT01/ZbI3aMRkq/SBGQUf7uzdtXqbNHNU1wN6G0XGb6PfuLywsRUzOC/QRFabJW2uDgWicLEnRnz8mFjkfsG0J1cYWsPgs+APlMgit2FUofk4oNEyDLimf8VJjBnzrxxdNO3sgj63l/bbRcbuJ26f+nUoKTGUUeqJFtitd9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722413316; c=relaxed/simple;
-	bh=LqAFlpQG7DL/VCz4nVGCpA2ZAvLWGEtA8R1EfT1NeCI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PWL/5VazcEbSB3cD+AohcxJkgqQbx4hic5MwooruG0WnI5E8Oou0l/ff9MHS/FJ10hHVjIaKAVnYPK4AndHWIgg/TvN+sRyDz0MdD01BUy3go3AQ4BLc3wlxEyCxS/hHjySNjyUHAQAINFOwCZclWdv6RdEcXrD1VvM2vps+jWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GRzbZWUc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722413313;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J2feCtBp2GCT6MSRAzg85wuI83od8RB1k66cPoECLx0=;
-	b=GRzbZWUcUofCbnj5AJVnIYVxCin4KtaIztMZPVl6aFZ5huDbkNIvKREB9I9277XKkD7dib
-	846CDOt52+yDpIbTheORaNfGF4lkBU5iUp+cmmY4kiwPocHgeBBqP+tbxN7h1QU4nGMqbc
-	L5KrpeEMaM2q4ipxV9Tfy6GXzrHJr6Q=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-eixdqmzJPzuF2ttfmJOPuA-1; Wed, 31 Jul 2024 04:08:32 -0400
-X-MC-Unique: eixdqmzJPzuF2ttfmJOPuA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4267378f538so6620685e9.1
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 01:08:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722413311; x=1723018111;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J2feCtBp2GCT6MSRAzg85wuI83od8RB1k66cPoECLx0=;
-        b=JruWs+d2NJY6ziTSAyNnk4yGfzWcW6sdwGxedaz/9p0V/QgxfynB456rvDXcKfNzhU
-         4TsUHRWlFESpH+GVm2n9CPMYNEmeGnpBbqvG1nm6ACv/fLI+XJJt15zFKx57J9rrO37b
-         rYmAkt6O0hoYh3filN02pb2zGHkL4u7LUIUI8VaEQ7j377O5ctC5yxwnmmbrhCPZ7obL
-         VNQQnONVvaiqd3/N5WUIlEBLNzsaPXt8KKwQhU0J1LUUZN/KQ2wOnRMShKxFhvoKRb38
-         3P0mcIbdDEWQ6n5aluZovtbpPvBOaYE7GM6mbxFNAC5VaUD9DQxBTq9Tq5AVhRAu/P17
-         vPNg==
-X-Forwarded-Encrypted: i=1; AJvYcCURIamyBTtporgiBjcP7Eu8fLv38P5x/J//ipMhL6o6wgJ6yJG1Oj7YM7MkdQhDRGbWI6XafvXxWcqNypWQ1rVAZFWdXY09
-X-Gm-Message-State: AOJu0Yzm1aa3i9L6+i7SWkgcHBsH9VGunN1jlHdS7zYB0hxE0Tzgo58E
-	DqtXyE/Jsdbzd0SwQ3YKWHVA+Uw/V09qTCUR7w0japE5RzvIkl2D3hv/BT5ITJKzckGW9CazC4C
-	qrQm1P6jqhysBEJ6ooQgd8DL5D5AIMjL/myRoF6L3YBIwVXMaDg2vmVcX55+Di8zf
-X-Received: by 2002:a05:600c:3c89:b0:426:6ea6:383d with SMTP id 5b1f17b1804b1-4280543f1c8mr84004135e9.2.1722413310650;
-        Wed, 31 Jul 2024 01:08:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpynrGr6tOV/A0mJmKdN/VwO7HVYMRhKkjI2I2x5a/C+kwYohsjmux379UjO8SRTYMIyeTkQ==
-X-Received: by 2002:a05:600c:3c89:b0:426:6ea6:383d with SMTP id 5b1f17b1804b1-4280543f1c8mr84003945e9.2.1722413310064;
-        Wed, 31 Jul 2024 01:08:30 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1712:4410::f71? ([2a0d:3344:1712:4410::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282babaab3sm11854615e9.28.2024.07.31.01.08.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jul 2024 01:08:29 -0700 (PDT)
-Message-ID: <61cb1468-d1e1-4a47-9c04-71d00d0c59f5@redhat.com>
-Date: Wed, 31 Jul 2024 10:08:28 +0200
+	s=arc-20240116; t=1722413526; c=relaxed/simple;
+	bh=58+cNfwaVUwDZC9vezPCvGDwpK09WuR8+9veH97y1jg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Q28jo+YYM/VhML5lLq3nQaAtPMff93rsXLlVGo79yPpNKc/vXU3lodvVEkVWNWITCw0uRJu6gohVskC6HlvQv78mwMh3qF+X/p63EvmSxqABJukf7JlBn+lzCxiugK8eZf1wtkCCoOo/hzUHdhngl2XVTDRICaKG++xPHpipjAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kWlLsGaH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CA87C116B1;
+	Wed, 31 Jul 2024 08:12:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722413525;
+	bh=58+cNfwaVUwDZC9vezPCvGDwpK09WuR8+9veH97y1jg=;
+	h=From:Date:Subject:To:Cc:From;
+	b=kWlLsGaHW9wBFqb648AyAB+bbfeHKmuBeUzJcia//4/SkSrPZXlspKZXs++Am+Vq7
+	 CLHEkaLOq+gUrtp2B4RDBowXWfZb5hqgNvZJqVX7wZpLJLrzTXGDBtB2P4OuW3Azxj
+	 aVrny7l4wgmTChbW0iSofZfeb/TNTkheEIoULRGZagWQZSPtn42Imk+l2N2gIBFBy2
+	 252nytOUt8wF3vTil7QRMDsF0u+c6B9IqdDz948+A3beVmBTcI+kkdUDMh19AD8cbu
+	 iwmeNWiYZVJXPefEv2388mynzQcj5jJODAPZyP9Z57VGmHc8DibnQhKDOI6INivjMo
+	 6nWeKuaNdAMVQ==
+From: Simon Horman <horms@kernel.org>
+Date: Wed, 31 Jul 2024 09:11:50 +0100
+Subject: [PATCH net-next] tipic: guard against buffer overrun in
+ bearer_name_validate()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: IPv6 max_addresses?
-To: Kyle Rose <krose@krose.org>, netdev@vger.kernel.org
-References: <CAJU8_nUFQShNSeT52nkdKmMDx6hodgFBSN3rCVXTQ_VgqugE8w@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAJU8_nUFQShNSeT52nkdKmMDx6hodgFBSN3rCVXTQ_VgqugE8w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20240731-tipic-overrun-v1-1-32ce5098c3e9@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMXxqWYC/x2MSQqAMAwAvyI5G2jdin5FPEiNmkuUtIog/bvF4
+ wzMvBBImQIMxQtKNwc+JIMtC/D7LBshL5mhMlVjXG0x8skej5tUL0HXty5727jOQ25OpZWf/ze
+ CUEShJ8KU0gec9ebfaQAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, 
+ Per Liden <per.liden@nospam.ericsson.com>, netdev@vger.kernel.org, 
+ tipc-discussion@lists.sourceforge.net
+X-Mailer: b4 0.14.0
 
-On 7/31/24 02:05, Kyle Rose wrote:
-> max_addresses, how does it work?
-> 
-> $ ip -6 addr show scope global temporary dev sfp0 | grep inet6 | wc -l
-> 21
-> $ sysctl -ar 'sfp0.*max_add'
-> net.ipv6.conf.sfp0.max_addresses = 16
-> 
-> They seem to be growing without bound. What's supposed to be happening here?
+Smatch reports that copying media_name and if_name to name_parts may
+overwrite the destination.
 
- From the related sysctl documentation:
+ .../bearer.c:166 bearer_name_validate() error: strcpy() 'media_name' too large for 'name_parts->media_name' (32 vs 16)
+ .../bearer.c:167 bearer_name_validate() error: strcpy() 'if_name' too large for 'name_parts->if_name' (1010102 vs 16)
 
-max_addresses - INTEGER
-         Maximum number of autoconfigured addresses per interface.
+This does seem to be the case so guard against this possibility by using
+strscpy() and failing if truncation occurs.
 
+Introduced by commit b97bf3fd8f6a ("[TIPC] Initial merge")
 
-'max_address' only applies to the ipv6 assigned via prefix delegation, 
-not to address explicitly assigned from the user-space via the `ip` tool.
+Compile tested only.
 
-Cheers,
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+I am not marking this as a fix for net as I am not aware of this
+actually breaking anything in practice. Thus, at this point I consider
+it more of a clean-up than a bug fix.
+---
+ net/tipc/bearer.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Paolo
+diff --git a/net/tipc/bearer.c b/net/tipc/bearer.c
+index 5a526ebafeb4..3c9e25f6a1d2 100644
+--- a/net/tipc/bearer.c
++++ b/net/tipc/bearer.c
+@@ -163,8 +163,12 @@ static int bearer_name_validate(const char *name,
+ 
+ 	/* return bearer name components, if necessary */
+ 	if (name_parts) {
+-		strcpy(name_parts->media_name, media_name);
+-		strcpy(name_parts->if_name, if_name);
++		if (strscpy(name_parts->media_name, media_name,
++			    TIPC_MAX_MEDIA_NAME) < 0)
++			return 0;
++		if (strscpy(name_parts->if_name, if_name,
++			    TIPC_MAX_IF_NAME) < 0)
++			return 0;
+ 	}
+ 	return 1;
+ }
 
 
