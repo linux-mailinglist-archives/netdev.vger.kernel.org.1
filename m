@@ -1,410 +1,156 @@
-Return-Path: <netdev+bounces-114688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D7A294379C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 23:14:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E52689437AC
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 23:19:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ED99B23CDC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 21:14:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97848284E3F
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 21:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D261494A9;
-	Wed, 31 Jul 2024 21:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2415816C849;
+	Wed, 31 Jul 2024 21:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOslInfa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G5AOJVde"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534E429CE1
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 21:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E39C1607B0
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 21:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722460458; cv=none; b=FzKVUqQUXkdkpvVS+Xv9xtf2YpbFtl+Eosz3aOAhceU8GePXcB68lU+CgMV0mtkBRASPFA6qX06PyBB7l4K67v9OwYi/fbJjZGnrSIWnWvaZEGk6ORA/FW50EQVyeMAhDR5E/9BjAIU7gXnB7C6wodIary068yqsM3aXu//P3P0=
+	t=1722460771; cv=none; b=cX959dPXHbj17/JsFt2OD4H4oGV5T0lDys8WWqs8utZ0VgU63GI2DeTiEz+dSit6udgaDVtCDnnR0UetZqHfQWOsjPHLuyOt4N44myTCy0equh1VCzi167sEWOzvaA14AHUs4QSXs/pxK0h/lneXzMtf/FFJvPa69wh8hGszc50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722460458; c=relaxed/simple;
-	bh=DEL3KsgkiuwE45K2aXLK8gQ/3PUHiRbJm7PQWukK+Jk=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=ukJF5pLutGtU2A4WEc1utNia7+kuuqcBEW4nT6q/RkMYcOTKMFzJPIzbaf/R18zk+qq5+f0RApuSDUia1+jhCu6dVOGVJUnSWXhZ6J6KqgWVjmTHJoz9GjK/H7pwFb169P8V9Dk1aVo71e61YQt3QtZa4W8jneOOJU2d5dX0pkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nOslInfa; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4266f3e0df8so38841445e9.2
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 14:14:16 -0700 (PDT)
+	s=arc-20240116; t=1722460771; c=relaxed/simple;
+	bh=dEiu0hhQh0Jy26qjQV9Cqq27juU/IGB072cpo+oEEG0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TcZSaEc9UM2xcMA/++96tx1hptj/VYy+nHzWGjwY/iTJs9zxx10dvqxlPG8/UoFoe0sukaWVY0ee8IOaIjQRFhKTqtQwhxcPGrHlEMXv0CLwG534rcATK/HJcufEH++R8EljS6j8Rxz5JJZ4i9PH9vjiyoYr1jC8EcpaCpxFTpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G5AOJVde; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-368712acb8dso2874149f8f.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 14:19:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722460455; x=1723065255; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nu/8KazI9qiAlJn5lg+bWcqE+MRa4SboTAO1sP/pXfY=;
-        b=nOslInfa8T5uuXlvTdrIQQfZCMkodZ7cGk9JSLOrEdmlyolMlu1hvq6FbJbXPTsAFL
-         l86ROgLSqLCpYm+SGtzziok948Q2e7eqbNmhzi1tDKA36hPUpUYahwIBS6tK1ueyqezJ
-         /SCW6ERQsp8L1ahzTs1s8kJ4Wf+tMEwRmzWOpmoWMZ4eFJRXXgfN/AfSYF1kieYfHZAI
-         eGOoO9XCELz5ilNVsAqlIIwchagR6/4JJbddB+bsm8cXdAWN0/VJtgvnivaCT9dZW+lr
-         hleLw6EOFwwGiSxgkijnCSg/G9dPKRsdHhDI3YwsIl4wxdpbzFTO6LrnMwolvSGqlCjr
-         LZKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722460455; x=1723065255;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1722460767; x=1723065567; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nu/8KazI9qiAlJn5lg+bWcqE+MRa4SboTAO1sP/pXfY=;
-        b=XLB6WrTrcyAJtatDwTnjXUNcqXlAQKQPJVO8MjhJdrpvzItF/fXE5lG6+8fuQ7V78f
-         Bm+BJFDEqNBHE934P7NLbYHQi0zqBlbERL8FHdoy4mmbHzW30SQ6wDLuG7JZfy38L45Z
-         +yZEp2TiIvXHPuQEHmw+ZrRbZSXdjJwMd/i9DMwp1/anGQcJnMk9y1RcYzG59eynurle
-         VRraLQ4HDC7IaF49YFRjUJ7I/M20Z7eY5qIu70ZgHaNqn+tEfLpQjDJrBFdoAfwZCUdd
-         KEKRTViFbKLCo7ifKmzZDAaMhoL9mfgwuMxl23fNOFvf2Yf6yJw3B4PCZ8cOGS9HJYPx
-         tsXw==
-X-Gm-Message-State: AOJu0YzwjmjiYAFgGjvKocqT48xAgjiYW+PZB3TwvC4srWytaHIkmNoI
-	gat6KgI57GAPxkWRJ7o53yvqCjXuySzOs3S1ESdZONkDI5mo/GPU
-X-Google-Smtp-Source: AGHT+IHnwiCvb2buCrm0E3uipuBN70XFGNCHUiHQ+HAiDIdWD8nGE6HIAveTJQ3+2RO+5/32ug63RA==
-X-Received: by 2002:a05:600c:1f95:b0:428:f79:1836 with SMTP id 5b1f17b1804b1-428b030c455mr3963235e9.26.1722460454206;
-        Wed, 31 Jul 2024 14:14:14 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:605a:f0fa:53fc:dd3c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8a2593sm34552355e9.4.2024.07.31.14.14.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 14:14:13 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Jiri Pirko
- <jiri@resnulli.us>,  Madhu Chittim <madhu.chittim@intel.com>,  Sridhar
- Samudrala <sridhar.samudrala@intel.com>,  Simon Horman <horms@kernel.org>,
-  John Fastabend <john.fastabend@gmail.com>,  Sunil Kovvuri Goutham
- <sgoutham@marvell.com>,  Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-In-Reply-To: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
-	(Paolo Abeni's message of "Tue, 30 Jul 2024 22:39:45 +0200")
-Date: Wed, 31 Jul 2024 22:13:22 +0100
-Message-ID: <m25xslp8nh.fsf@gmail.com>
-References: <cover.1722357745.git.pabeni@redhat.com>
-	<13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        bh=dEiu0hhQh0Jy26qjQV9Cqq27juU/IGB072cpo+oEEG0=;
+        b=G5AOJVdeww95s7Qb7CjW1AIB44U8JoB3hsMVjtKEas3JXf1vwCfGamISn0W9Aq/kdy
+         yNL1Zqv/cr4RhFQKyRJmPJ6INVWA7HaLN4BA3TPWJOgIpZunPibJa8lDt4dea35PXJMa
+         WJnXVfFa8qRDUEOjUhndXkLLFeV3WIfifKMKBtqyAQTnivbTT+brnZBgFMNZdAo8vEjt
+         AHpE8w7Pa18w2XjTHFuKm63OtcCWPoxDqHBhXedIrvxFQBDm2ZqArJ12gP+H0TWV+pTi
+         hMTXlVceo15PAg4VK22DsRHYu0TuNLhY74kcM8C3XJhIyn3vkFywG3eHmMbwTKrnO4Hh
+         vx9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722460767; x=1723065567;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dEiu0hhQh0Jy26qjQV9Cqq27juU/IGB072cpo+oEEG0=;
+        b=unqqYwSKS+c8lLA6knkjtQf1rbXHCXrmizrWAReWWkOpIl3CeRBk7/anOOPsZBppYz
+         e45zlhamZJAUUY5aFSB4/tznYpATmv2xDRfodoXZLWjzj1TyuJyj03RLXAFWUf814Ryn
+         /XTGiLQ3qCh2u9lGtoMIXynAN/FRPQNqSfFlLPH0L+wG84wPubhF7ZBkzHGtaxeOeVXh
+         EUy3JzLquhrOh1kSSTYi5SfosWyF6MnIhQLsyk2K0RKcEBau7VGIlVfW3vxRN69QdWz0
+         JD9bKAw61p9XQWTIXSBy+L5aEQFpG/908/dqlayYV0r2mbU2MrlbMHGY/JYT3+g603SU
+         5vLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqACHwGW/XAqMpJjVSedbl2txrdOxiB0OSgIUwXKAeSDauMbZL0XgwTemcJ/ZQJ2Bfa0uG8RTZL6958M45X/7TMuOzeVhA
+X-Gm-Message-State: AOJu0YzYwZ08TuhueS5stXdxK9TI3gcGkX0JKnbAT7jIknCUaoFQSz2f
+	OJHU/DUUJYCiIdVD7w5vsSnYMue/vHszaV0ctLmmzd/dBpx1AQNCYX9innJCwJW6xgG8gcf3+sS
+	T9cGdRTXpU4Z6dUuyQlwFXhclGXIxdEk4MYxI
+X-Google-Smtp-Source: AGHT+IGCGvp/48H8qaH6fLYg7SPbNiiWFxJtKT/J7GEsXh7PoxMKp+lvuqPbXyBiSW9seEuLTTgslLee6nJ92gY4vjU=
+X-Received: by 2002:a5d:4483:0:b0:368:6d75:1bde with SMTP id
+ ffacd0b85a97d-36baacdd8aamr351815f8f.15.1722460767120; Wed, 31 Jul 2024
+ 14:19:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240730022623.98909-1-almasrymina@google.com>
+ <20240730022623.98909-2-almasrymina@google.com> <1722327259.5659568-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1722327259.5659568-1-xuanzhuo@linux.alibaba.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 31 Jul 2024 17:19:11 -0400
+Message-ID: <CAHS8izMZQLsBWPXWiqPwaQHfupKc5VAuxW+6kpWmzi-vw8JEWQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v17 01/14] netdev: add netdev_rx_queue_restart()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo Abeni <pabeni@redhat.com> writes:
+On Tue, Jul 30, 2024 at 4:17=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Tue, 30 Jul 2024 02:26:05 +0000, Mina Almasry <almasrymina@google.com>=
+ wrote:
+> > Add netdev_rx_queue_restart() function to netdev_rx_queue.h
+>
+>
+> Can you say more? As far as I understand, we just release the buffer
+> submitted to the rx ring and get a new page pool.
+>
 
-> diff --git a/Documentation/netlink/specs/shaper.yaml b/Documentation/netlink/specs/shaper.yaml
-> new file mode 100644
-> index 000000000000..7327f5596fdb
-> --- /dev/null
-> +++ b/Documentation/netlink/specs/shaper.yaml
+Yes, I just noticed that this commit message is underwritten. I'll add
+more color. Maybe something like;
 
-It's probably more user-friendly to use the same filename as the spec
-name, so net-shaper.yaml
+=3D=3D=3D=3D
+Add netdev_rx_queue_restart(), which resets an rx queue using the
+queue API recently merged[1].
 
-> @@ -0,0 +1,262 @@
-> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-> +
-> +name: net-shaper
-> +
-> +doc: Network device HW Rate Limiting offload
-> +
-> +definitions:
-> +  -
-> +    type: enum
-> +    name: scope
-> +    doc: the different scopes where a shaper can be attached
+The queue API was merged to enable the core net stack reset individual
+rx queues to actuate changes in the rx queue's configuration. In later
+patches in this series, we will use netdev_rx_queue_restart() to reset
+rx queues after binding or unbinding dmabuf configuration, which will
+cause reallocation of the page_pool to repopulate its memory using the
+new configuration.
 
-Nit: upper case 'The' to be consistent with rest of docs.
+[1] https://lore.kernel.org/netdev/20240430231420.699177-1-shailend@google.=
+com/T/
+=3D=3D=3D=3D
 
-> +    render-max: true
-> +    entries:
-> +      - name: unspec
-> +        doc: The scope is not specified
+> But I personally feel that the interface here is a bit too complicated. I=
+n
+> particular, we also need to copy the rx struct memory, which means it is =
+a
+> dangerous operation for many pointers.
+>
 
-What are the semantics of 'unspec' ? When can it be used?
+Understood, but the complication is necessary based on previous
+discussions. Jakub requests that we must allocate memory for a new rx
+queues before bringing down the existing queue, to guard against the
+interface remaining down on ENOMEM error.
 
-> +      -
-> +        name: port
-> +        doc: The root for the whole H/W
-> +      -
-> +        name: netdev
-> +        doc: The main shaper for the given network device.
-
-What are the semantic differences between netdev and port?
-
-> +      -
-> +        name: queue
-> +        doc: The shaper is attached to the given device queue.
-> +      -
-> +        name: detached
-> +        doc: |
-> +             The shaper is not attached to any user-visible network
-> +             device component and allows nesting and grouping of
-> +             queues or others detached shapers.
-
-I assume that shapers are always owned by the netdev regardless of
-attach status?
-
-> +  -
-> +    type: enum
-> +    name: metric
-> +    doc: different metric each shaper can support
-
-Nit: upper case here as well.
-
-> +    entries:
-> +      -
-> +        name: bps
-> +        doc: Shaper operates on a bits per second basis
-> +      -
-> +        name: pps
-> +        doc: Shaper operates on a packets per second basis
-> +
-> +attribute-sets:
-> +  -
-> +    name: net-shaper
-> +    attributes:
-> +      -
-> +        name: ifindex
-> +        type: u32
-> +        doc: Interface index owing the specified shaper[s]
-
-Typo: this should be 'owning' ?
-
-> +      -
-> +        name: handle
-> +        type: nest
-> +        nested-attributes: handle
-> +        doc: Unique identifier for the given shaper
-> +      -
-> +        name: metric
-> +        type: u32
-> +        enum: metric
-> +        doc: Metric used by the given shaper for bw-min, bw-max and burst
-> +      -
-> +        name: bw-min
-> +        type: uint
-> +        doc: Minimum guaranteed B/W for the given shaper
-> +      -
-> +        name: bw-max
-> +        type: uint
-> +        doc: Shaping B/W for the given shaper or 0 when unlimited
-> +      -
-> +        name: burst
-> +        type: uint
-> +        doc: Maximum burst-size for bw-min and bw-max
-> +      -
-> +        name: priority
-> +        type: u32
-> +        doc: Scheduling priority for the given shaper
-> +      -
-> +        name: weight
-> +        type: u32
-> +        doc: |
-> +          Weighted round robin weight for given shaper.
-> +          The scheduling is applied to all the sibling
-> +          shapers with the same priority
-> +      -
-> +        name: scope
-> +        type: u32
-> +        enum: scope
-> +        doc: The given handle scope
-> +      -
-> +        name: id
-> +        type: u32
-> +        doc: |
-> +          The given handle id. The id semantic depends on the actual
-> +          scope, e.g. for 'queue' scope it's the queue id, for
-> +          'detached' scope it's the shaper group identifier.
-
-If scope and id are only ever used as attributes of a handle then they
-would be better specified as a separate attribute-set, instead of
-mixing them in here and using a subset.
-
-You use 'quoted' references here and @refs elsewhere. It would be good
-to be consistent. See note below about @ in htmldocs.
-
-> +      -
-> +        name: parent
-> +        type: nest
-> +        nested-attributes: handle
-> +        doc: |
-> +          Identifier for the parent of the affected shaper,
-> +          The parent handle value is implied by the shaper handle itself,
-> +          except for the output shaper in the 'group' operation.
-
-Nit: quoted ref again here
-
-> +      -
-> +        name: inputs
-> +        type: nest
-> +        multi-attr: true
-> +        nested-attributes: ns-info
-> +        doc: |
-> +           Describes a set of inputs shapers for a @group operation
-
-The @group renders exactly as-is in the generated htmldocs. There may be
-a more .rst friendly markup you can use that will render better.
-
-> +      -
-> +        name: output
-> +        type: nest
-> +        nested-attributes: ns-output-info
-> +        doc: |
-> +           Describes the output shaper for a @group operation
-> +           Differently from @inputs and @shaper allow specifying
-> +           the shaper parent handle, too.
-> +
-
-Nit: remove the extra blank line here
-
-> +      -
-> +        name: shaper
-> +        type: nest
-> +        nested-attributes: ns-info
-> +        doc: |
-> +           Describes a single shaper for a @set operation
-> +  -
-> +    name: handle
-> +    subset-of: net-shaper
-> +    attributes:
-> +      -
-> +        name: scope
-> +      -
-> +        name: id
-> +  -
-> +    name: ns-info
-> +    subset-of: net-shaper
-> +    attributes:
-> +      -
-> +        name: handle
-> +      -
-> +        name: metric
-> +      -
-> +        name: bw-min
-> +      -
-> +        name: bw-max
-> +      -
-> +        name: burst
-> +      -
-> +        name: priority
-> +      -
-> +        name: weight
-> +  -
-> +    name: ns-output-info
-> +    subset-of: net-shaper
-> +    attributes:
-> +      -
-> +        name: parent
-> +      -
-> +        name: handle
-> +      -
-> +        name: metric
-> +      -
-> +        name: bw-min
-> +      -
-> +        name: bw-max
-> +      -
-> +        name: burst
-> +      -
-> +        name: priority
-> +      -
-> +        name: weight
-> +
-> +operations:
-> +  list:
-> +    -
-> +      name: get
-> +      doc: |
-> +        Get / Dump information about a/all the shaper for a given device
-> +      attribute-set: net-shaper
-> +
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - handle
-> +        reply:
-> +          attributes: &ns-attrs
-> +            - parent
-> +            - handle
-> +            - metric
-> +            - bw-min
-> +            - bw-max
-> +            - burst
-> +            - priority
-> +            - weight
-> +
-> +      dump:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +        reply:
-> +          attributes: *ns-attrs
-> +    -
-> +      name: set
-> +      doc: |
-> +        Create or configures the specified shaper.
-> +        On failures the extack is set accordingly.
-> +        Can't create @detached scope shaper, use
-> +        the @group operation instead.
-> +      attribute-set: net-shaper
-> +      flags: [ admin-perm ]
-> +
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - shaper
-> +
-> +    -
-> +      name: delete
-> +      doc: |
-> +        Clear (remove) the specified shaper. If after the removal
-> +        the parent shaper has no more children and the parent
-> +        shaper scope is @detached, even the parent is deleted,
-> +        recursively.
-> +        On failures the extack is set accordingly.
-> +      attribute-set: net-shaper
-> +      flags: [ admin-perm ]
-> +
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - handle
-> +
-> +    -
-> +      name: group
-> +      doc: |
-> +        Group the specified input shapers under the specified
-> +        output shaper, eventually creating the latter, if needed.
-> +        Input shapers scope must be either @queue or @detached.
-
-It says above that you cannot create a detached shaper, so how do you
-create one to use as an input shaper here? Is this group op more like a
-multi-create op?
-
-> +        Output shaper scope must be either @detached or @netdev.
-> +        When using an output @detached scope shaper, if the
-> +        @handle @id is not specified, a new shaper of such scope
-> +        is created and, otherwise the specified output shaper
-> +        must be already existing.
-> +        The operation is atomic, on failures the extack is set
-> +        accordingly and no change is applied to the device
-> +        shaping configuration, otherwise the output shaper
-> +        handle is provided as reply.
-> +      attribute-set: net-shaper
-> +      flags: [ admin-perm ]
-
-Does there need to be a reciprocal 'ungroup' operation? Without it,
-create / group / delete seems like they will have ambiguous semantics.
-
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - inputs
-> +            - output
-> +        reply:
-> +          attributes:
-> +            - handle
+Btw, I notice the series was marked as changes requested; the only
+feedback I got was this one and the incorrect netmem_priv.h header.
+I'll fix and repost. It's just slightly weird because both v16 and v17
+are marked as changes requested in patchwork.
 
