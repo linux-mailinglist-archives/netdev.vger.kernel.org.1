@@ -1,229 +1,150 @@
-Return-Path: <netdev+bounces-114619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110929432FC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:19:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 604F9943309
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB329281634
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:19:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ADD42848A5
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964C41BF304;
-	Wed, 31 Jul 2024 15:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1F41BC097;
+	Wed, 31 Jul 2024 15:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PMbyMSPG"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Tfo3HSHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BA21BE861
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 15:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7151BBBF3;
+	Wed, 31 Jul 2024 15:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722438776; cv=none; b=itL6spUKBuhTr/STES5VfXjBMgCZYoBs/GXLbHQfxA8nwTqfo7uvGtnl4IBK1DcoLTOox1xSAd+mXi29X6TJNHMcYDGkj4hJlXdfrJOYY5lx4QTcKLNo55x20kFTMckI0gfZR9RCATbon3Oy8O34rWViL6l3IXQvvruz4zfzAbQ=
+	t=1722438968; cv=none; b=jNPgU7v/iNlHpNatx5WsTRBDtD37JHr96Jpll0Od0ojopqDeVrj+edW1eakWZbDEzLpbECZvXF6VYSIaTHndQ6DByP1G5vlc6fqs+NHJvPcxkOKbHeelg0CsXTTs8MBFZFhxqfYV1ZHuLKlMvt/FJ6RuO0DFfHj1rAytelJAzGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722438776; c=relaxed/simple;
-	bh=8zhTVavCJJ8/IwBvdz+QEBE4EZM9UV2ssOh2BpQ6TwQ=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=t2KotW7fi3H84YgQOVtToZ/43NP7kRhSQPrLUTskWHZJzg5tOZeP+jGfS2Itg9Iz+fkQth24Fsgcqipazm0n3YGjMD+v7z31Z+WYVEBINQ4pK/4XPFAZW1MvrZ5Ef/KmrwDZDhpKPyOymRRQ08j+hfDe6y1zEvF+W0M/DUaC8Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PMbyMSPG; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70d23caf8ddso5118865b3a.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722438773; x=1723043573; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ydsvrBXtt6nU238Px/qRdSbaJLxYYF7XQP8F6wgRzZA=;
-        b=PMbyMSPG6VFpJRl+SkLQ7Fdp0QvPOJ64/wtjwEqihqEkMlJ+6aiXqAq8g74BE98vuM
-         wMKpLnpXCShB84N/Ggo2RDeCAGUB9hRtL3/z1pV3G+fpBbinB/j/2YVWT2+kDfgK5nv8
-         3QEjvawnzCgUUsO0Rm4mZov5VSoEyvRL9YA/o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722438773; x=1723043573;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ydsvrBXtt6nU238Px/qRdSbaJLxYYF7XQP8F6wgRzZA=;
-        b=Yjbe/BmkXSsTzfHdNlXfsVAYheE9mjMGRsmEowo2unr8sq5E0yZNqv9Pd5GKfZeFWh
-         uRCiwvUy+AFsEj/q0MbkFsxShXatZAUA4j1mXZZf9BM2QIpBAKwDyXfD/ev8nXQhBqfx
-         wiWFf3AWK/8i1EsNZFXYNuX4sZunF3ZYew7Fmu6Saa0SQec/8Hf/Wh0Px/b4xFJl+7NP
-         +T2l3hHQxskDzxfR0x0USXi3kuJzPnDovPUxG9spP3PezLDDwh5AV1MPvvvxskCNEBbK
-         78+WtBcRQHdy8hm7vwo5JrIgA3erKMqDyj36MyTe+EXmbuUPve2yJdojxC4eKfHbYtXW
-         sANg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIdZXwKeOzHJf7BRIT6JCUXKJ0+0CTrebFWBE3FV5Pn6Pumefs5qg9JDbvRjeAnH8PNm7Egw/6AyxCZTYhS0Np4hiMx3aP
-X-Gm-Message-State: AOJu0YxDtcg/U6GLu0AqZgB70WpXtHX5q+UKYJRbLT+m8BLrvjdKbu5q
-	gPkLctVf0LbETi6pTAxjTEljXvJEZbtOUUncwnksoSK3YrJC4wEdvsiCmKujLbKB82EeFzSVSbY
-	7fv25
-X-Google-Smtp-Source: AGHT+IHEl06Nm3dVBLJpGj1Uk+cVGvjdXmv2CgeM4NvVMJyMb/tbEYSvWNiGXEabI5NOqoQNRCIVqA==
-X-Received: by 2002:a05:6a00:8592:b0:706:31d9:9c99 with SMTP id d2e1a72fcca58-70ece928cf5mr17384197b3a.0.1722438773104;
-        Wed, 31 Jul 2024 08:12:53 -0700 (PDT)
-Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead7156c8sm10059508b3a.83.2024.07.31.08.12.45
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2024 08:12:52 -0700 (PDT)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: Sebastian Reichel <sebastian.reichel@collabora.com>
-CC: Krzysztof Kozlowski <krzk@kernel.org>, Jacobe Zang <jacobe.zang@wesion.com>, <robh@kernel.org>, <krzk+dt@kernel.org>, <heiko@sntech.de>, <kvalo@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>, <conor+dt@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, <efectn@protonmail.com>, <dsimic@manjaro.org>, <jagan@edgeble.ai>, <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>, <arend@broadcom.com>, <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <megi@xff.cz>, <duoming@zju.edu.cn>, <bhelgaas@google.com>, <minipli@grsecurity.net>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>, Andy Green <andy@warmcat.com>
-Date: Wed, 31 Jul 2024 17:12:43 +0200
-Message-ID: <1910959c1f8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <sgfd5ccltsi7mjbybmdbs3fmsfcp3vqtpitdac7exzgxav53kk@6lwogbq4fhks>
-References: <20240730033053.4092132-1-jacobe.zang@wesion.com>
- <20240730033053.4092132-3-jacobe.zang@wesion.com>
- <191025b5268.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <f45c1fa7-f321-4a1f-b65c-6ed326a18268@kernel.org>
- <191030eac78.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <3d3b8e0a-7492-4db1-bd73-c30a488edaa7@kernel.org>
- <191035b8c28.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <k3dhdsa5bjzad2ha5e2uurg2azzs773ier5thkot4w2qcvnv54@yuf52eluqsae>
- <dd381dc1-454f-4ecd-adb7-55de2e15d592@broadcom.com>
- <sgfd5ccltsi7mjbybmdbs3fmsfcp3vqtpitdac7exzgxav53kk@6lwogbq4fhks>
-User-Agent: AquaMail/1.51.5 (build: 105105504)
-Subject: Re: [PATCH v5 2/5] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
+	s=arc-20240116; t=1722438968; c=relaxed/simple;
+	bh=jolx9BGDYLP9A+4+aqGoLnq4/sxcncVL02wpEp+6Tqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OLYkmT1rVehWXwicP9DMzqq4DlQJWNedFDKr657zZUqb4c0qySftdBY2tWa5/gwCEVt2gP7H5MCuCDbBJnXbtwyS43Zg8bsOlcvUkxgQM+ef8uyYUd3xDQiq9zN5Rv6fN7/FaUGmj205LAPf8NE6Mq9oxkGVjGqFH6TwrsYCKFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Tfo3HSHp; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46VCwGiE030529;
+	Wed, 31 Jul 2024 15:15:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=s
+	hciHTYQxY4vJQpKHVCVTxCvhqqvg3jNSW5K02Yr4kI=; b=Tfo3HSHpsEeo5PMX8
+	7Zguna/2XsnAKWiBv8P4EqPX3D63EKSNfbPONHfdFhJ69MsqKMpqT/ry5xseGrUU
+	7S1aQzN6AojB88n6F7Sa3gOXL2JJ/Df8TeO6fFNurdFV5fikXUKAT0DSPvAyOToH
+	PzMj+bVADXZoI2AJ04AQTlsPf4DHD4H6FDjm/4Dd2eyXTvovNzqQEXJNYkYzZJwP
+	zV+B28kclb9MC1u0nsMLU73SUsF/ZobUJtSdCgZN6zsu6r8pvYNh84DHz4wgyku+
+	0eAXztWD19/Q43gpVSUMm4J28WyK9XlANw4HmHGGzsflkhhJREu9X7MRYAP6Elzc
+	k/kUw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qnr7rfqh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 15:15:54 +0000 (GMT)
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46VFFril021992;
+	Wed, 31 Jul 2024 15:15:53 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qnr7rfqb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 15:15:53 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46VF0wIZ018811;
+	Wed, 31 Jul 2024 15:15:51 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nc7pvacv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 15:15:51 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46VFFnPk16253560
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 Jul 2024 15:15:51 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47A5858063;
+	Wed, 31 Jul 2024 15:15:49 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5EF635806A;
+	Wed, 31 Jul 2024 15:15:47 +0000 (GMT)
+Received: from [9.171.16.65] (unknown [9.171.16.65])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 31 Jul 2024 15:15:47 +0000 (GMT)
+Message-ID: <4232f3fb-4088-41e0-91f7-7813d3bb99e5@linux.ibm.com>
+Date: Wed, 31 Jul 2024 17:15:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
-
-On July 31, 2024 3:54:52 PM Sebastian Reichel 
-<sebastian.reichel@collabora.com> wrote:
-
-> Hi,
->
-> On Wed, Jul 31, 2024 at 02:57:37PM GMT, Arend van Spriel wrote:
->> On 7/30/2024 7:38 PM, Sebastian Reichel wrote:
->>> Hi,
->>>
->>> On Tue, Jul 30, 2024 at 01:16:57PM GMT, Arend Van Spriel wrote:
->>>> On July 30, 2024 12:18:20 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>>>
->>>>> On 30/07/2024 11:52, Arend Van Spriel wrote:
->>>>>> On July 30, 2024 11:01:43 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>>>>>
->>>>>>> On 30/07/2024 08:37, Arend Van Spriel wrote:
->>>>>>> > + Linus W
->>>>>>> >
->>>>>>> > On July 30, 2024 5:31:15 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
->>>>>>> >
->>>>>>> > > Not only AP6275P Wi-Fi device but also all Broadcom wireless devices allow
->>>>>>> > > external low power clock input. In DTS the clock as an optional choice in
->>>>>>> > > the absence of an internal clock.
->>>>>>> > >
->>>>>>> > > Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
->>>>>>> > > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
->>>>>>> > > ---
->>>>>>> > > .../bindings/net/wireless/brcm,bcm4329-fmac.yaml          | 8 ++++++++
->>>>>>> > > 1 file changed, 8 insertions(+)
->>>>>>> > >
->>>>>>> > > diff --git
->>>>>>> > > a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>>>> > > b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>>>> > > index 2c2093c77ec9a..a3607d55ef367 100644
->>>>>>> > > --- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>>>> > > +++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
->>>>>>> > > @@ -122,6 +122,14 @@ properties:
->>>>>>> > > NVRAM. This would normally be filled in by the bootloader from platform
->>>>>>> > > configuration data.
->>>>>>> > >
->>>>>>> > > +  clocks:
->>>>>>> > > +    items:
->>>>>>> > > +      - description: External Low Power Clock input (32.768KHz)
->>>>>>> > > +
->>>>>>> > > +  clock-names:
->>>>>>> > > +    items:
->>>>>>> > > +      - const: lpo
->>>>>>> > > +
->>>>>>> >
->>>>>>> > We still have an issue that this clock input is also present in the
->>>>>>> > bindings specification broadcom-bluetooth.yaml (not in bluetooth
->>>>>>> > subfolder). This clock is actually a chip resource. What happens if both
->>>>>>> > are defined and both wifi and bt drivers try to enable this clock? Can this
->>>>>>> > be expressed in yaml or can we only put a textual warning in the property
->>>>>>> > descriptions?
->>>>>>>
->>>>>>> Just like all clocks, what would happen? It will be enabled.
->>>>>>
->>>>>> Oh, wow! Cool stuff. But seriously is it not a problem to have two entities
->>>>>> controlling one and the same clock? Is this use-case taken into account by
->>>>>> the clock framework?
->>>>>
->>>>> Yes, it is handled correctly. That's a basic use-case, handled by CCF
->>>>> since some years (~12?). Anyway, whatever OS is doing (or not doing)
->>>>> with the clocks is independent of the bindings here. The question is
->>>>
->>>> Agree. Probably the bindings would not be the place to document this if it
->>>> would be an issue.
->>>>
->>>>> about hardware - does this node, which represents PCI interface of the
->>>>> chip, has/uses the clocks.
->>>>
->>>> The schematics I found for the wifi module and the khadas edge platform show
->>>> these are indeed wired to the chip.
->>>
->>> I have a Rockchip RK3588 Evaluation Board on my desk, which uses the
->>> same WLAN AP6275P module. I think I already commented on a prior
->>> version of this series: The LPO clock is needed to make the PCIe
->>> device visible on the bus. That means this series only works if the
->>> clock has already been running. Otherwise the PCIe driver will never
->>> be probed. To become visible the devices requires:
->>>
->>> 1. The LPO clock to be enabled
->>> 2. Power to be applied
->>> 3. The WL_EN gpio to be configured correctly
->>>
->>> If one of the above is not met, the device will not even appear in
->>> 'lspci'. I believe the binding needs to take into consideration, that
->>> pwrseq is needed for the PCIe side. Fortuantely the heavy lifting of
->>> creating the proper infrastructure for this has already been done by
->>> Bartosz Golaszewski for Qualcomm WLAN chips. What is missing is a
->>> pwrseq driver for the Broadcom chip (or this specific module?).
->>
->> That does not really make sense. There is no relation between the LPO clock
->> and the PCIe clocks so 1) being a requirement for probing the device looks
->> odd. It also does not match past experience when I assisted Andy Green in
->> getting this module up and running almost two years ago.
->
-> Well, first of all I can easily reproduce this on my RK3588 EVB1. I
-> intentionally ignore any bluetooth bits to avoid cross-effects from
-> bluetooth enabling any clocks / regulators / GPIOs and make sure the
-> RTC output clock is disabled at boot time (i.e. boot once without
-> any reference to the RTC clock and without 'clk_ignore_unused'
-> kernel argument). When booting up like this the WLAN device is not
-> visible in 'lspci' despite the WL_REG_ON GPIO being hogged. If I
-> additionally hack the RTC output clock to be enabled the WLAN device
-> becomes visible in 'lspci'.
->
-> The datasheet fully explains this:
->
-> https://www.lcsc.com/datasheet/lcsc_datasheet_2203281730_AMPAK-Tech-AP6275P_C2984107.pdf
->
-> PDF Page 23/24 (20/21 in the footer) has the Host Interface Timing
-> Diagram. WL_REG_ON should only be enabled after 2 cycles from LPO.
-> That means with LPO being disabled WL_REG_ON cannot be enabled. I'm
-> pretty sure WL_REG_ON means WLAN_REGULATOR_ON, so the logic is not
-> powered. On page 27 (24 in the footer) there is also a PCIe Power-On
-> Timing diagram, which shows that WL_REG_ON must be enabled before
-> the PCIe refclk is enabled.
->
-> So there is a specific power up sequence, which must be followed.
-
-The chip also has an (less accurate) internal LPO so the 32khz sleep clock 
-in the diagram does not have to be an external clock. Maybe Ampak 
-bootstrapped the chip to disable the internal clock. Dunno.
-
-What Andy needed back then to get firmware running was a change in the 
-nvram file to force using the internal LPO, but the device was already 
-visible on the PCIe bus.
-
-Regards,
-Arend
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] net/smc: remove the fallback in
+ __smc_connect
+To: Zhengchao Shao <shaozhengchao@huawei.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com
+Cc: jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, weiyongjun1@huawei.com, yuehaibing@huawei.com
+References: <20240730012506.3317978-1-shaozhengchao@huawei.com>
+ <20240730012506.3317978-3-shaozhengchao@huawei.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20240730012506.3317978-3-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: e7BE8TNEEYsWgHAGCr98P5zusW4xsdds
+X-Proofpoint-GUID: 15y9bYQaYffqyTMYumONZmytPYgPDG7c
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-31_09,2024-07-31_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 impostorscore=0 clxscore=1011 priorityscore=1501
+ malwarescore=0 mlxscore=0 mlxlogscore=958 bulkscore=0 suspectscore=0
+ phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407310105
 
 
+
+On 30.07.24 03:25, Zhengchao Shao wrote:
+> When the SMC client begins to connect to server, smcd_version is set
+> to SMC_V1 + SMC_V2. If fail to get VLAN ID, only SMC_V2 information
+> is left in smcd_version. And smcd_version will not be changed to 0.
+> Therefore, remove the fallback caused by the failure to get VLAN ID.
+> 
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> ---
+>   net/smc/af_smc.c | 4 ----
+>   1 file changed, 4 deletions(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 73a875573e7a..83f5a1849971 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -1523,10 +1523,6 @@ static int __smc_connect(struct smc_sock *smc)
+>   		ini->smcd_version &= ~SMC_V1;
+>   		ini->smcr_version = 0;
+>   		ini->smc_type_v1 = SMC_TYPE_N;
+> -		if (!ini->smcd_version) {
+> -			rc = SMC_CLC_DECL_GETVLANERR;
+> -			goto fallback;
+> -		}
+>   	}
+>   
+>   	rc = smc_find_proposal_devices(smc, ini);
+
+Though you're right that here smcd_version never gets 0, it actually is 
+a bug from ("42042dbbc2eb net/smc: prepare for SMC-Rv2 connection"). The 
+purpose of the check here was to fallback at a early phase before 
+calling smc_find_proposal_devices(). However, this change is not wrong, 
+just I personally like adding a check for smc_ism_is_v2_capable() more.
+
+Thanks,
+Wenjia
 
