@@ -1,134 +1,230 @@
-Return-Path: <netdev+bounces-114545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB3A8942DC1
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:07:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D91F942DCE
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C17BB226AC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F65286A7D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363401AD9FC;
-	Wed, 31 Jul 2024 12:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E291AED49;
+	Wed, 31 Jul 2024 12:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KBi9/TIl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HZ43I67r"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BDA1AC42E
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 12:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722427643; cv=none; b=AJloaxrPnALkdLEQs1R9nuBFwmsvPYY/O3AoVctltyUjPOmH7dHT9sAfXvPXSzWiwDGjIRGxq7qLwHbM7IY/y0cFiVhOhgFZDk9WLDumm0f6KIZgP3gBrghhL+QR/Xpm24nZxEa8jjyuc++CkyVBVgeVV/8e2fazD3YxT/q/J8M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722427643; c=relaxed/simple;
-	bh=IG0sLTr1ygsrZ9QQNYZ3NvorpUUrl5P7khwkpOdDsEk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=I7jEcEZk3bV27Rxgtm4iYmwETgARbeYdtzx2wQGBUUN0syFDYN9m2sAU7SXcD/a6GoRyp+ezhKBprX88w9wWOKQOGGzMGOYK6BWKWfmaYSxGedXBsqK071boQuGUNCajcFVOOwPeJVIn8xnZ0e567A8q8uAqilmV50cyYYcLKac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KBi9/TIl; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722427639; h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	bh=3/4aoQPbG1Pa9Rn1w9hMYyTZ8VepBocG16uKLmvBsoA=;
-	b=KBi9/TIlPvJxRqwHvC2DvCQJ5vxRCT8XIS518rk21BRHhQgedz4IWkyc7iU8B7tnpkKQcNH5DaXeoj+tRs+SME0F0dO3QaSgyvBgsOVLTnHNv8RxgKJ/1quJx8KnYh78sGQEX8gnb9OCSHu05e+wUhPSVwZSQbjUPLszDw1xowo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBjL5TJ_1722427637;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBjL5TJ_1722427637)
-          by smtp.aliyun-inc.com;
-          Wed, 31 Jul 2024 20:07:18 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev,
-	=?UTF-8?q?EugenioP=C3=A9rez?= <eperezma@redhat.com>
-Subject: [PATCH net v2] virtio-net: unbreak vq resizing when coalescing is not negotiated
-Date: Wed, 31 Jul 2024 20:07:17 +0800
-Message-Id: <20240731120717.49955-1-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96E31AED23
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 12:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722427712; cv=fail; b=WN8O1yFT8FFgfhrYmAEmzp3RXEeaxGu+VThl4aeahsbbCEXYiyj97gmM+AfqH2gGm7tWCsdP3hlEGxXMDYfzDgn0b9sVt/rx1e3hJznw6Ir+J5p++ou9hsiFsR3AjiCMZp0vbUunZkMKuNb/7Z80Z8gvd6XmtxkvhEATSgJQNrw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722427712; c=relaxed/simple;
+	bh=WCo371Ejbdc/aetSMyTMMiA+Xt30NR5HgU1V7VWTNI8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KxXjg2eDN0yK5Yiwz7ht2J5a+TEtSN55w0gEYt+dMeBbbzmHJd45aphs/vvMptBCWXde042x7Wsc7AGJXdLxQ8iqZ+dCGjXTPP10B6GMpBTpZyxEKBRqIUReMD2oMx0fs68Sy118vT/fARMO90M4Qf8vQ3ZHc85PlLUYXsZjiso=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HZ43I67r; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722427711; x=1753963711;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WCo371Ejbdc/aetSMyTMMiA+Xt30NR5HgU1V7VWTNI8=;
+  b=HZ43I67rMpvV3hMxAVpTzQIBSAO3Jzwfrq1wsUD2wpSJCxNZwqstZHvW
+   0jJslEiR/fCbhoSVPAGkXCHMr2lS0pAZZxf0IPp0KT/Sr6yb0YoDNy1G6
+   jxp4k1QPPDTc7GJahS9xDjRXHt77K7e+EIyMPt4jBFO5XOcCjdFyKCGZj
+   kJ/VoAPRXYYpkX8Zu/wJTU+05eQ1NCiiMPPcHI1ScyD1/SlG3NEaLslL4
+   IXlk7F3qdtSH+XZLkOB7ZziEtutLIXNMHEs5JKmPQSENfpSGunKNGZIbZ
+   EsEySfggqnMMu+CaxUhpIfczj2Ww9MBBjbcbOkuLNqtw2Mht/3MCVPBDY
+   A==;
+X-CSE-ConnectionGUID: wvsxltihRWmutiEQu9KYRA==
+X-CSE-MsgGUID: flE/j2LXQf2jcH0KF76yVw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11149"; a="20248597"
+X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
+   d="scan'208";a="20248597"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2024 05:08:30 -0700
+X-CSE-ConnectionGUID: 83aj7RUsSjKDRc8sIqdBjw==
+X-CSE-MsgGUID: v5Dv3yLIS2G2o/q57SsqoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
+   d="scan'208";a="54661227"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jul 2024 05:08:30 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 31 Jul 2024 05:08:28 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 31 Jul 2024 05:08:28 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 31 Jul 2024 05:08:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=zCFQnIxiTulb7cNNVfRdXTcXE8vKgV26zfwsGXi10dlOK6kfqvt5ek/3Zyt3hGFl8d3ttX/RgWpBn9yu1xUinHQtjPxYYAmIAke9b2Ccx9X+8iJ6R5R+xdUweCYyxrBnU/txYkD/XhoBy0Damu31F3MKehZcoI1sszDH0yxvXHV8vtikBBQ3hR08sb7laP+zVFFhr/oV7AcopvuQYDVFRw+CDzOdXItyr1IMabo8bbTD0Jsliug7Ld0S7TsCg+T/fUCNlyqwc6wqI/kaK77wXFhwhK/izgt5CHpiu+qr5uK/WC9V5D5j3iNxcFWSuO0q8fKL9QXJy2rBsXOhZcBslQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0NDMwss5apRqGHSOLF3EQaCXKbv7J8JBQQcmvLwxvlE=;
+ b=VikBbN7d0xtt/p+MuetlKRoSvHdccGDXIp2W2V0p0akUM/WIsn4SZpXsYmVJ/00v7dgP0t6kT8/BSci5DZczSNrKBeqqbgShQh/B73mZhb4c9FFr8kWWWfPTmGx4DAaD5tgf6RdqLjsUoVyLnl1lYPImzyM97WIfVgbNZ6pejTjIKhCB6rLY4rDgfVyQiCyfh+K1F8hBTw5vG0oIbTtMI6H64Q2wHTaFdBMOsoQXtEnVzp06F3y7viwdBQVSrKkV+gpjcRl7DJVEQcIXwO5/V2Z/XHAYx5GE9O1K1N3xjRSJ9ZK42CA5AVXxB2vyxKWZ+cXVSEtNtE1TwXV3QiTSyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by MW6PR11MB8389.namprd11.prod.outlook.com (2603:10b6:303:23d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.27; Wed, 31 Jul
+ 2024 12:08:27 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7807.026; Wed, 31 Jul 2024
+ 12:08:27 +0000
+Message-ID: <21ed191b-2814-49bb-8722-413f62fbc938@intel.com>
+Date: Wed, 31 Jul 2024 14:08:20 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next] ice: Implement ethtool reset support
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"simon.horman@corigine.com" <simon.horman@corigine.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+References: <20240730105121.78985-1-wojciech.drewek@intel.com>
+ <20240730065835.191bd1de@kernel.org>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20240730065835.191bd1de@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZRAP278CA0016.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::26) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|MW6PR11MB8389:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32dc687e-0887-41d3-d9e1-08dcb1597bc4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?ajBjTzc0b1N2VTRlbWNXQlhlbWltZUR0MVovdzNzSnhuVUtxcnZ0d3Biai9W?=
+ =?utf-8?B?ZWsydlFRYzcySktrUlArZ3pBaFNMVGhiSVpvZ2daYTEraHdCRjJicTNvZG9R?=
+ =?utf-8?B?V2M1QjgxQnJESXgwUThidkppZ0xGMFJzaDBwOWdKcGV4TzVjekZ1SWV1aVVQ?=
+ =?utf-8?B?Qm5lMmt3a2xMSVBoclNYYUhBSDBPY0thN2EybGlxY3BHZTk3TjR3QTd6akgr?=
+ =?utf-8?B?dUo2a3M2Zm9oLytFSjNQaVN0SlUzcFFKbGIwcTZTRFV1ZDkrSUUvbWE0bzYr?=
+ =?utf-8?B?SVdxNEVMMTRSdGxSMmNPckNvaHBIdEExU3E2VXZDZnBqVGF5U1drRjdUSVo1?=
+ =?utf-8?B?cGZLelZIcmllTDJCMjJGaHdkWHd1TnRkQ0hHV0ZvZk83SitCUlZOUFA2bkZ0?=
+ =?utf-8?B?NVFyeGtsZ05HTXZRQU81ZnFlUGh2K05pRGdBV2poSUNjNS8rTzlNajBuZnNv?=
+ =?utf-8?B?ZVVCVHBUaFdWdzJ5UnkxZVB5TXhTNUwzOGpDdG9uVGVyc1FiM3E3dFN6M1hj?=
+ =?utf-8?B?MlZ3VUUraHJHMFdMTXo3Q0UvcHVQUDFjNy9uNS9oVHE2TUVsRktPdjlIR0l3?=
+ =?utf-8?B?WFB2QjZiQXIvamRUcXZyUlhDS0lJUGkzWTViZXVoVG56R3B3QjR4STh0MXc2?=
+ =?utf-8?B?Q05mY2NaNHY1ZGJHdEVIRk81V21JU0RYcWl3OUwzL25weWN2L3E3a2lkVHI4?=
+ =?utf-8?B?c1YyYyswd2xWMzlLN2lwNEpPaHhldUpjMUcvRHp6ZEhacWtwd3FMSjB1TjBI?=
+ =?utf-8?B?N3QyQ3NueGQ0dXBZTEJtRDNmek9kclNGSjkvWDI4c2hvb1Vzb0k4U21EVk52?=
+ =?utf-8?B?eWt0S3BVditKUWJNY3YwZjk5MGgxVmtSY1lPc1hxZlkrS2NJNTFrZzFWNzNo?=
+ =?utf-8?B?OU9Mc2NLUXlKUnJZZjNNeXNLWUxwSVRPaThieFNHdlIwQ1NhN2IyeHpsaFhJ?=
+ =?utf-8?B?QjdwNTY2bWRLb080K09lejdLeHI1QW1wZCtjVTlBYkx3YmplTmpuc3FFK3N3?=
+ =?utf-8?B?QmFVZVRJT055U3Q5dUtiN2dVTjVsRStBVk0vQjI2Rnk0UkkrRGthYVR0QVZQ?=
+ =?utf-8?B?UVFTQmxmUWF2Q0V0RXhhcXdNTVl1VzZHeDhmRTlvYWF3TlpBMWhCSzJidU1J?=
+ =?utf-8?B?QzFlYWl0NXB1VnhHcHZ2SXdEbW9PaUtzbDFqY0dpS0VLZyt6OEhPSnNTTG9w?=
+ =?utf-8?B?dkl0NkdJRERzQ2l2NDRUYXVOYUhHYlIwUkF0TUo3L3pPZ3R6bnN4K0t2UXZH?=
+ =?utf-8?B?b1ZNcFFxWmR5Lzdnci82ZkRWZHNvd2hsWFZPWmNsNUwyenBnWkdKa0hPSFZz?=
+ =?utf-8?B?cjltcUpyWnpQTnNrSERZODJ0VmRiSW1rR3FROUczdm5UKzNqbUtaOXAzbTho?=
+ =?utf-8?B?eW8rdUNqRDhVUlFtRXJQN3pGZXdjTXRqNy9SSzNnYXp3KzVXdEpyT0VMWnN3?=
+ =?utf-8?B?bU9tNzQyamtmYStiZDB2bEc4ZjFjWWtFYjJIRndQNFE1cHJDdDYzelRZWEFC?=
+ =?utf-8?B?dWZxTUVHY2NHT1NBZWFRZUNrdVpwRTNiTnlDdXZCRFN4WnRSbzNFUkNCVmZI?=
+ =?utf-8?B?cDMzblZPREc2UGJ1RW01bithR1U3NkFCbEozajl6OEJEa0VnMFY3aFdKekV6?=
+ =?utf-8?B?dFl5WHRtWVdVUzk5NzM2eDdKVlJKSGlpdlpmUGx2Znl4Y0dyVDZhbFdsL3hj?=
+ =?utf-8?B?RVV1UmlRbkw4SzgvUmgwZ21VaXBSV090bVBxME91VDRFNVpnTEJkMjBBaUJ4?=
+ =?utf-8?B?bzNwSWZqdkdVOUNmeVMwY2NWd2dXWmpXcHFaQ1B1eFNhREVnaExiSlFlclJ5?=
+ =?utf-8?B?QzUzZXJGaG1ic09UUUIyZz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dzNNRk50NGE1WjFTN1BKV04wRDdkODBCZm5Wd2xacklsSnoxQ21GVlIrM0kw?=
+ =?utf-8?B?QXhVNklkenNWbGtPT3dxOVJSMGduZ3Q0LzFSejJPZGNoWk44WjdtcXNUOEVM?=
+ =?utf-8?B?Z3F0MjFiNFZhSm4zN2xZK1AzZ05mS3lRRzRvd0JlUmkxNGJnVEkxcW5sak9L?=
+ =?utf-8?B?cXBpNHlYekhMTlBVU0ZEaDhZRlpKZ21HWnR3WFJteEdySmpaQzk3YkJXaDhG?=
+ =?utf-8?B?bk01NUthL0hERlNOblZ6RDZUK1R3YVhNSGJSOUVmNHlzaVd1T2ZyUUtXMC9E?=
+ =?utf-8?B?eVdpQlduWHpmQWVqcmcraURuSGd4T0dYT2NVdlFiTElFYktsSFVpTFo1amRv?=
+ =?utf-8?B?WGJlUmpPZUJQbUFReU1CWjNOYXllRnVXUWJ3WXpQaTFKMHlGcnZSbTJYa2NX?=
+ =?utf-8?B?amZtUXFPWmNweGJZZENacW1vRFpyT09SQVdPdU5tZ2VwRzNrNFhBaXdGL29O?=
+ =?utf-8?B?b1lMV1RqRlBPeW9XOFo2TXpYbythVjJ2Z0hHWGVOMkdMOVhFWDVsQ0p5MnRR?=
+ =?utf-8?B?ejIwQzdCWjZzNGc4STFsdk9hajN6TURJZkpCRkJOdTBoWXJvSC9oVmVJVlM1?=
+ =?utf-8?B?UXJnU0lBRkQxb3REeTR1aWNwWGhsL0wwWXdHMVNMQ0dyY3JyT2FsVTFGK2ZR?=
+ =?utf-8?B?dmcyOERLcVNMaG1BODBJU01PaGlZTXBjU3dHNmZSd3JjdEU2YzhlS1RmSDFN?=
+ =?utf-8?B?L3ZDNklmYjZlNURZUVNrNys1UjF0OWJ4Uy9uZ2pFUklHQmxvdUp6b2xuWVRS?=
+ =?utf-8?B?VTBCODlRZmtNSkMwckNGOTFZNEVRZVcvN1h2Y3lvRFZuTjgvc1lDU2ZvZlZL?=
+ =?utf-8?B?cVNyQVNsbkRoYzI5N3hLb3BaV2VlcUFFcUNnWWh1S3J4LzlNeFg5L21LRjBL?=
+ =?utf-8?B?Rm5NLzd4WWlBWEpCbU1KaDlBbFovdU41RGxoaytDTVZmZ1c5OHVudVFZYy9r?=
+ =?utf-8?B?czNEZk1SaU9SNXdwbi9qTlZzSVJEVzdWaEp2d0V0cmJwUkVPTDZmZkYzSXU3?=
+ =?utf-8?B?TG5OeGNvcTQ0UncyUi92cUlXQWhZTEdYNjN4V1NsT1hCbVgwd0RkWGdTVFZE?=
+ =?utf-8?B?cXRJRktFMzNGN0tUTjdKbG9iMlhyeHg2NXBER0phR000WmN2NGV2d0RnSThK?=
+ =?utf-8?B?ajF1NHVhNWoxRHBrY3M2MmxIWitSREVYVTZSdGdvNkx0RlI4MFpReVptS0JT?=
+ =?utf-8?B?Wnl6eGpNMjl4VkVSSFdKOVVscG5qclpCdkpLQXhGek1GbGJJZEJ3QnN1eEpN?=
+ =?utf-8?B?U0t5SnJKeUxYWkU3VUVjTHNMNk8rcWU4U2p5Mzh4RHBobngxcUlDbW1vRGN4?=
+ =?utf-8?B?Y2NSV2lzWlZWdDVKS05tREltWVgyY290Y1ZyU3dIcWptRVlvZ2h3clBjL2NQ?=
+ =?utf-8?B?RTY2M2h6OWMvcmZGNFZyN0hONVEzMEE4WU5VQmFyT3Q1TkFaeWdzVU1vV20r?=
+ =?utf-8?B?bG5XeXFBUjJ4RzdLNVpEcVEvZWlSbzVZMEx0S1R4ejhuYkw5ZzhNZXo2Lytx?=
+ =?utf-8?B?UFJvNm53TlNpeDB6NmxaZWhCS0NmMlVmRG5idmNTZUw3c3cxb2Z6RXUzajlw?=
+ =?utf-8?B?NGZ1M01TZ0pobzUybGhQMlcrZFVKTmNRQmV0MzQ3WTF4SGdnVk5vYkN5WEwz?=
+ =?utf-8?B?MFd5TmY4dk5IVDhEQ0RoTTBBWVZVbmxZS0xCN1VDYWpWaXFEYm53dzVJU2Q1?=
+ =?utf-8?B?Tm80RGFsb0lmeWVvVm9oMm40RlRFRFRScmhrc2hEOXl3U1lLcjFZejVaMTFk?=
+ =?utf-8?B?UTYzU2ZKV016TkxLSFZOQ1g4MC9IYnNwZGtOdllHenlERFpEVVRNbXdXdC9y?=
+ =?utf-8?B?UVRPcXB5VjBMaFFhVGpTenJKb0UxQ1MyOEVpRlFxeG5MUTlQRUF3S1ZoK0xm?=
+ =?utf-8?B?dTE1WnI3MjU3eWVkNENFNzdJTUo1aTJqMXd5RXZnOUdmQUwybHQvcHVmV3Fr?=
+ =?utf-8?B?Zk1YSDl4Q2NNMXdXVDM1SkRJZVJuMUJwWnNCb0oxaDVMTERqUE5vR01QcDZn?=
+ =?utf-8?B?dWxDemZIZ1NBS1NTbXNYNWNpZjJ1MHB1WE52cHZKL0YxcGZ6c3M0ZHMreERP?=
+ =?utf-8?B?YUdSN01JTjhQSFFWYmZWaWJEekg3SFRIVXlHTnhwUWY0MDc1RitaQWM4L3k0?=
+ =?utf-8?B?eHl3VVdIVi9BSkVQYzN5QkZaemV5eTdCNXJlTEtJMEptMUxWNERIZy92eXov?=
+ =?utf-8?B?Qmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32dc687e-0887-41d3-d9e1-08dcb1597bc4
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 12:08:26.9179
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vUo32JYHLs1DKD+Ps5e/UgK+XfHZK3t318pEpmjSR/w8YjiJm8Z6zAvyXaKek6wh9vUnDQ/4+4nadvCjYogz0wfnx9uWCWT14aCU8yneLbs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8389
+X-OriginatorOrg: intel.com
 
-From the virtio spec:
 
-	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
 
-The driver must not send vq notification coalescing commands if
-VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
-applies to vq resize.
+On 30.07.2024 15:58, Jakub Kicinski wrote:
+> On Tue, 30 Jul 2024 12:51:21 +0200 Wojciech Drewek wrote:
+>> ETH_RESET_MAC - ICE_RESET_CORER
+> 
+> Core doesn't really sound like MAC, what is it?
+> And does PF reset reset mostly PCIe side or more?
+> My knee jerk mapping would be to map Core to dedicated
+> and PF to DMA.
+> 
 
-Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Acked-by: Eugenio Pé rez <eperezma@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
-v1->v2:
- - Rephrase the subject.
- - Put the feature check inside the virtnet_send_{r,t}x_ctrl_coal_vq_cmd().
+Quick summary our reset types:
+PF reset reinitialize the resources/data path for PF and its VFs.
+It has no impact on other PF/VFs.
+Core Reset reinitialize all functions and shared parts of the
+device except PHY/MAC units, EMP and PCI Interface.
+Global Reset is Core Reset + PHY/MAC units reset (including External PHY)
+Because Global Reset is a extended Core it makes sense to map it to all.
+PF reset mapping makes sense to me since it is dedicated to a single physical function.
 
- drivers/net/virtio_net.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 0383a3e136d6..2b566d893ea3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3658,6 +3658,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
- {
- 	int err;
- 
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return -EOPNOTSUPP;
-+
- 	err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
- 					    max_usecs, max_packets);
- 	if (err)
-@@ -3675,6 +3678,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
- {
- 	int err;
- 
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return -EOPNOTSUPP;
-+
- 	err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
- 					    max_usecs, max_packets);
- 	if (err)
-@@ -3743,7 +3749,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
- 			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
- 							       vi->intr_coal_tx.max_usecs,
- 							       vi->intr_coal_tx.max_packets);
--			if (err)
-+			if (err && err != -EOPNOTSUPP)
- 				return err;
- 		}
- 
-@@ -3758,7 +3764,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
- 							       vi->intr_coal_rx.max_usecs,
- 							       vi->intr_coal_rx.max_packets);
- 			mutex_unlock(&vi->rq[i].dim_lock);
--			if (err)
-+			if (err && err != -EOPNOTSUPP)
- 				return err;
- 		}
- 	}
--- 
-2.32.0.3.g01195cf9f
 
 
