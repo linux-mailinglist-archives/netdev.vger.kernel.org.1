@@ -1,95 +1,181 @@
-Return-Path: <netdev+bounces-114696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8027943898
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:07:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72C4194389D
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0486F1C216E5
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:07:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CDF01C216CC
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC58D16D316;
-	Wed, 31 Jul 2024 22:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2179A16D30F;
+	Wed, 31 Jul 2024 22:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="YbHWtVbP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ejHxXGy8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1D716CD0E
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 22:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C155F101EE
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 22:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722463666; cv=none; b=HRKFhq2Baxa4q8RVOxmi50XrDf/e/Q25wCoDUpRJ12rsFN36lVzdZnhZfqGmqyWVWYRUSkPZsBLwINusFX8jlbGw5FQ/KSbtTDYKAaKjVtZjINGoPlXkUzpA8ED7J+WJRPJWnrO+cYRgzXIkl2kHJmGgmk5pPGQvHiOkZxrzAec=
+	t=1722463848; cv=none; b=DeSU2rybcHZNDfGfxSx6d4E7s8zXH8nOSZz2lMppWDwvGLZxs2By3H5XAvSjHAM0tZkn5XWtsE0vIEdRkrCSmqIbc6T0VddKF1wORnSXn/APfHt/9bjpOMHtRJzxPZf0fJxDLaBKOqGZODT2wob6CEsDHEiHedSibrqWQH6DYXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722463666; c=relaxed/simple;
-	bh=5/FzbCoYCYVormMglWnKjh4aEoJ7A7JLI2hhC5fYIWk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=LUes+Jd3pqaml1B9PdVTHN/RHXJpHiJ4qtGKoHSuIKtiSCuKvR3Pb7ORR8MORHZP4Nb1+9NJszJ7A9YVtWSDxYgtT1hycZ7usg2Tn0KUQwFOclBhACIUCOlaWKMaI93hDZ5JitcBmNjuNo0uXgtGHbqAj3uDJ/KAjE0HqympuvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=YbHWtVbP; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3db15b4243dso3854790b6e.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 15:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1722463664; x=1723068464; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=So/9QSkze1y4ejM3Y8FPZR3gEKL0InNlYUt0gbOuwac=;
-        b=YbHWtVbPJntuKon+IbTPT/vDhjoV2ASN+gJWbIgXucbyWee0Xw1lOim0oVvQgvr/nf
-         1qNLXmCEJXTwqPgLgN8NB5PYdbYAdRMRsyjhSjuAg0FQVo4Uloo/+IuqF3AkSDM5hwu8
-         xTTpVB4VAC7KRVJNV7ei0yC3QIZ20perSlWxYsvTxlDTNz4yX/eET5tnBTAZWTWxMrSe
-         UF+0agmGuEv0yo8/JrXKy8oS6u616NUxMcFJZo0rBK5DKa1ifcG5Rm1TcGaR+HbLMjUr
-         t5h6DlHGtcsHKGYYSUjgCKiPf5sK4VGiBxiQCycAwNSWBGj3uOSpbX6b1zRkG2aX3Ity
-         Yo7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722463664; x=1723068464;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=So/9QSkze1y4ejM3Y8FPZR3gEKL0InNlYUt0gbOuwac=;
-        b=WTi9UtXdqfNDX6unO7ZbMYlPg3n0vjqgcSrHYDrR3mHtS1Qfa8+okf03CswHexvn1S
-         MZU/YaTzROIW0Ccebh0EnoyxWyQp6L0ApKqZNFjB5zztqCArzzSRE5V/V+Duv7SeolAt
-         1dd/tAgIL0GFYrHZPtdpdDemMZ7UCtFluKHQujh/wlUEvekJdPminOT257cmV2Xm98xV
-         7067mJcv/0+RYh+fradvq18/m1o4m2iuxHS0HblRsx/DgjiB5dr2RbnZzGXC5WZBSvgj
-         EPXnqPx5/bhwRCpSs35fl6vsII+GIRHn+babV3ne/6LPbZ62DrlemGIEzO63/lamjo4L
-         Z6mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWgDk7vP5woDc3Cvd56hhpr7oOs9Ov1byx3mmWH2of02AfgBS0zeVOmv3gQK1zJTi3l8gztYcQvJ/oyE6ciL2vqo35vWvTY
-X-Gm-Message-State: AOJu0YyTA4xJxI2eYHC2fyiGdGyMOtFS/bJVKO6eZlsGTvazEkz+RKOk
-	bi4CjbzflrVCkjSQiZFPZtzRni8IznvnPzRj5M6KZvYGQyHSibRjOxaoNMn2ixeWSoAgwLn+D73
-	Jr/781aIISoZQEU6AEDsUrHGAh/0hbTAYp7QP
-X-Google-Smtp-Source: AGHT+IHf/6+JdBOy0saPPGO8DOj4tULdpYpCthc5pvwq0MEaub636v66UIYgIZZHSDY3XUfadWNVZBHASBEOO9hzpPc=
-X-Received: by 2002:a05:6870:63ac:b0:261:164d:685e with SMTP id
- 586e51a60fabf-2687a756a41mr494529fac.43.1722463664294; Wed, 31 Jul 2024
- 15:07:44 -0700 (PDT)
+	s=arc-20240116; t=1722463848; c=relaxed/simple;
+	bh=ohLz7UzPgyciRwIfam3IbldYdM6MBWNXl9g8BWLHnA8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WW+pMDFHksV/KuwDzFTN65r2klcUrmywCPvuZzuGZBYjmFu1tNPv7hD+/R5ePnV1LuOnVW4OCvTOQ3s/WbssGnndqNTi6N7HApJU4yCi3elrlj850/Oh2wCBuoHPWijKAbknsD1g9Vx3iFdZrBJoCQwy1Jk/W/K8tl7dAplGdlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ejHxXGy8; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722463846; x=1753999846;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ohLz7UzPgyciRwIfam3IbldYdM6MBWNXl9g8BWLHnA8=;
+  b=ejHxXGy8wZe4GUw18/KdSCeEzZrznXqK+VETpCaLjnUO8p9t1D/I/FRk
+   tcVUpzwpdgP3N4v4qt+H/D1+FEdaH7hvWVExQPZuwXTA3SVhZNkcqiMyg
+   vExwWs8ZWk5xjMtSuxi9I97h2Js3ZVb+tgCabjuyUIAecU+y/MMnArPGY
+   tj4Xq0NPx08aBVQwMzpM+T/v+2x9Gzp9EH1wVrakLdh4SU0t1ywve4Zyv
+   /JSsWXR3TxVn22FOVEe0n8cecabS9qLSt5h3EfOjLRcGtwx6LT5z2JDGj
+   bSGObiEnqREp2hJqUdhlf31LeLt6gnyhuoWOMsZZVXg6fPFKcPbz3SwnV
+   g==;
+X-CSE-ConnectionGUID: SWP5wp5bSFuEFBSZy5vTpw==
+X-CSE-MsgGUID: NO0vW6ZZT2O/WpRqf3PMmA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11150"; a="31765467"
+X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
+   d="scan'208";a="31765467"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2024 15:10:45 -0700
+X-CSE-ConnectionGUID: KnYR7fUpQjmcgk6PCHo9NQ==
+X-CSE-MsgGUID: vpDK00v7Rd+Wxk3AR2nueA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,251,1716274800"; 
+   d="scan'208";a="54734118"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa010.jf.intel.com with ESMTP; 31 Jul 2024 15:10:45 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	michal.swiatkowski@linux.intel.com,
+	jiri@nvidia.com,
+	shayd@nvidia.com,
+	wojciech.drewek@intel.com,
+	horms@kernel.org,
+	sridhar.samudrala@intel.com,
+	mateusz.polchlopek@intel.com,
+	kalesh-anakkur.purayil@broadcom.com,
+	michal.kubiak@intel.com,
+	pio.raczynski@gmail.com,
+	przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com,
+	maciej.fijalkowski@intel.com
+Subject: [PATCH net-next v2 00/15][pull request] ice: support devlink subfunction
+Date: Wed, 31 Jul 2024 15:10:11 -0700
+Message-ID: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Wed, 31 Jul 2024 19:07:33 -0300
-Message-ID: <CA+NMeC-s6_aZYTMaLn=zsu4fhjVXQeMorPTXABJn41aS4G26qg@mail.gmail.com>
-Subject: Re: [PATCH] selftests: tc-testing: Fixed Typo error
-To: Karan Sanghavi <karansanghvi98@gmail.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On 31/07/2024 15:07, Karan Sanghavi wrote:
-> Corrected the typographical of the word  "different"
-> in the "name" field of the JSON object with ID "4319".
->
-> Signed-off-by: Karan Sanghavi <karansanghvi98@gmail.com>
+Michal Swiatkowski says:
 
-Thank you for the patch.
-I'd suggest you transform this patch and the other one you sent, which
-has the same subject, into a patch series.
-Also please change the subject to target net-next and to specify which
-test files your patches are touching.
+Currently ice driver does not allow creating more than one networking
+device per physical function. The only way to have more hardware backed
+netdev is to use SR-IOV.
 
-cheers,
-Victor
+Following patchset adds support for devlink port API. For each new
+pcisf type port, driver allocates new VSI, configures all resources
+needed, including dynamically MSIX vectors, program rules and registers
+new netdev.
+
+This series supports only one Tx/Rx queue pair per subfunction.
+
+Example commands:
+devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
+devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
+devlink port function set pci/0000:31:00.1/1 state active
+devlink port function del pci/0000:31:00.1/1
+
+Make the port representor and eswitch code generic to support
+subfunction representor type.
+
+VSI configuration is slightly different between VF and SF. It needs to
+be reflected in the code.
+---
+v2:
+- Add more recipients
+
+v1: https://lore.kernel.org/netdev/20240729223431.681842-1-anthony.l.nguyen@intel.com/
+
+The following are changes since commit 990c304930138dcd7a49763417e6e5313b81293e:
+  Add support for PIO p flag
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Michal Swiatkowski (8):
+  ice: treat subfunction VSI the same as PF VSI
+  ice: make representor code generic
+  ice: create port representor for SF
+  ice: don't set target VSI for subfunction
+  ice: check if SF is ready in ethtool ops
+  ice: implement netdevice ops for SF representor
+  ice: support subfunction devlink Tx topology
+  ice: basic support for VLAN in subfunctions
+
+Piotr Raczynski (7):
+  ice: add new VSI type for subfunctions
+  ice: export ice ndo_ops functions
+  ice: add basic devlink subfunctions support
+  ice: allocate devlink for subfunction
+  ice: base subfunction aux driver
+  ice: implement netdev for subfunction
+  ice: allow to activate and deactivate subfunction
+
+ drivers/net/ethernet/intel/ice/Makefile       |   2 +
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  47 ++
+ .../net/ethernet/intel/ice/devlink/devlink.h  |   1 +
+ .../ethernet/intel/ice/devlink/devlink_port.c | 503 ++++++++++++++++++
+ .../ethernet/intel/ice/devlink/devlink_port.h |  46 ++
+ drivers/net/ethernet/intel/ice/ice.h          |  19 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     |   5 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   1 +
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  | 111 +++-
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   7 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  52 +-
+ drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |  66 ++-
+ drivers/net/ethernet/intel/ice/ice_repr.c     | 211 ++++++--
+ drivers/net/ethernet/intel/ice/ice_repr.h     |  22 +-
+ drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 331 ++++++++++++
+ drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  33 ++
+ .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.c  |  21 +
+ .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.h  |  13 +
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
+ .../net/ethernet/intel/ice/ice_vsi_vlan_ops.c |   4 +
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
+ 26 files changed, 1396 insertions(+), 137 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.h
+
+-- 
+2.42.0
+
 
