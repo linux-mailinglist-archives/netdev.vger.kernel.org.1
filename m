@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-114360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1118894245C
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 690CD94245D
 	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 04:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C017A285E40
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24532285E8C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 02:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C3CDDD2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F91DF44;
 	Wed, 31 Jul 2024 02:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbJ81ch0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6kc7rf0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A5AD51C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A8DDDA8;
 	Wed, 31 Jul 2024 02:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722391235; cv=none; b=gH3AAmVyXEfEUPbro6rMLG3VYluUaQQAt0ylCO6mLjp6FDbZcRv6TN574wIQUiAwmlpnucMkZ24g+GMTlCLVfycrPDokp8MyBEyujpV9hryWxSD7c/JuCEvUFtj5iP7Ch5sJRnOYx72iZD3oAEcmdODY4ZXmjC86F8YrbCg6SiE=
+	t=1722391235; cv=none; b=Nhh9uh7GBoTgmok7DTZ9okkUEjQuz18ygcBi6yAOQVhtCABE6aVoSfm7/Zwdvbk4aCpGLZBqv2Gr712qAvsnhpJkYVfBz0Ucokr8Cq6p6fklPnzCWcX/TYT33Gg0XZ9yWKuRLjMQiLOeC8VssLziJuKXHlpRKbkKSxVSDttqTcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722391235; c=relaxed/simple;
-	bh=hQKNLk6pVfLklWvXYUMjvHWyp7rpxfzzw9u84Pp9LrM=;
+	bh=djAntoi5ZZ/GmzgZtzM4nYNpkZA9StSwwLmpc9+Gfm4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UMPo0/tuTB1iCQdv0fkOfUv58Clj1VWkg9AsXCfGjXpgivpMXKhqHyIX3To3FMf2tCxSSB0ZLX3RylKESQeD14kFcc0T3KO2yQ+BGxCpLOEtVKJom5NBDaPg9zkZvRifZuY8LGmI78Uxbn83WJ8PcViQwTt0uBM0n0utIxjy2Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbJ81ch0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9DC90C4AF0F;
+	 In-Reply-To:To:Cc; b=MrQmw+RSrP4n6Qec8FxypJqqyA1hG9rWKtyLzyfce+KZKaMp5RRt4Zps8Q18EiMwS5f7P/Uv0jYdXVvoQv6peY66zf29e714HZrHMTeeQN4/dXYsojZKxhfIHzsAYX/sIc3+pr67w8kmi5nTZBOykMrXHU2ngCnSsFhIfqppI0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6kc7rf0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95B15C4AF0E;
 	Wed, 31 Jul 2024 02:00:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722391234;
-	bh=hQKNLk6pVfLklWvXYUMjvHWyp7rpxfzzw9u84Pp9LrM=;
+	bh=djAntoi5ZZ/GmzgZtzM4nYNpkZA9StSwwLmpc9+Gfm4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sbJ81ch04jC1ajQ1ita2WQoMUd5eZ5K2bp+ab8cWdbGddYkt0U1KN3ETU3KtVPZPa
-	 0xkEmk1O7tTl2RAoU7VAexKnyGuptN4iRXLo2bExc0mf+rI9kohTgwZrhV1OEyHauq
-	 cSHxkkqU1HZT25OHw0dtGNo7WVH8+7RfT5c9V5D81IF4hqxTaTiSY+WJB+qnMHlG/x
-	 oXKYFrfG2ia/H5FlSZvzRs7egr65BlHWgmg45cT6vgmb1mmYGf13UncAzCRFPp6g8c
-	 h1iV8l6YIitlq2ugimmjbTHSADqXaIei3tomms5+RGeVHkhaUB3zXIhl8lMOXVh4u6
-	 h3JyfsfAdcB5w==
+	b=q6kc7rf0AlL0jk4G8dPYAurZ4BI0XBlL3CSXEIakJqN5xf5zxoQEVJLrMKulr67Vy
+	 isHUwyUrTLPbH/xQe4PyV5w7Bfo/b+DHcdM32P5fkk5ZgY4VbGy5Fi0AmBlCpcMzn6
+	 dTapoLXK+B3xMT4Jc3LeFar5mq9IIXPoCkZrf40x093cmnH8BhEoUsxKmaBYNabjhH
+	 7C1ddEc82cN73yssVMsLR+t0nQVSSAT+usQuYSgD0I7cuYPiGvIDeQh2vgiGDb+LsB
+	 VtO8TVg1cEKGw/rEFpW9kTm4XjTO0Rtr8spL0M1A+PMyHNSYncbtjMcTSuQPK8MqpM
+	 tWNrBOUCdvlYg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8D926C8E8F0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8606BC6E39C;
 	Wed, 31 Jul 2024 02:00:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: phy: aquantia: only poll GLOBAL_CFG regs on
- aqr113, aqr113c and aqr115c
+Subject: Re: [PATCH net v2] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172239123457.15322.12268200524389526952.git-patchwork-notify@kernel.org>
+ <172239123454.15322.14803499177982622377.git-patchwork-notify@kernel.org>
 Date: Wed, 31 Jul 2024 02:00:34 +0000
-References: <20240729150315.65798-1-brgl@bgdev.pl>
-In-Reply-To: <20240729150315.65798-1-brgl@bgdev.pl>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- atenart@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bartosz.golaszewski@linaro.org, jonathanh@nvidia.com
+References: <20240729201108.1615114-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20240729201108.1615114-1-willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com,
+ arefev@swemel.ru, alexander.duyck@gmail.com, willemb@google.com,
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Jul 2024 17:03:14 +0200 you wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Mon, 29 Jul 2024 16:10:12 -0400 you wrote:
+> From: Willem de Bruijn <willemb@google.com>
 > 
-> Commit 708405f3e56e ("net: phy: aquantia: wait for the GLOBAL_CFG to
-> start returning real values") introduced a workaround for an issue
-> observed on aqr115c. However there were never any reports of it
-> happening on other models and the workaround has been reported to cause
-> and issue on aqr113c (and it may cause the same on any other model not
-> supporting 10M mode).
+> Tighten csum_start and csum_offset checks in virtio_net_hdr_to_skb
+> for GSO packets.
+> 
+> The function already checks that a checksum requested with
+> VIRTIO_NET_HDR_F_NEEDS_CSUM is in skb linear. But for GSO packets
+> this might not hold for segs after segmentation.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: phy: aquantia: only poll GLOBAL_CFG regs on aqr113, aqr113c and aqr115c
-    https://git.kernel.org/netdev/net/c/a7f3abcf6357
+  - [net,v2] net: drop bad gso csum_start and offset in virtio_net_hdr
+    https://git.kernel.org/netdev/net/c/89add40066f9
 
 You are awesome, thank you!
 -- 
