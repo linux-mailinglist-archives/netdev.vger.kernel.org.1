@@ -1,165 +1,142 @@
-Return-Path: <netdev+bounces-114559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B12C942E66
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:27:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D127942E6F
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38C401C20EE3
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:27:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08FA728AFD0
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97671AB53D;
-	Wed, 31 Jul 2024 12:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C981AC43E;
+	Wed, 31 Jul 2024 12:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="h3tudPy/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ht6psynZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30A4E18CC1C
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 12:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723221A7F7F
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 12:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722428875; cv=none; b=Nag2m/ZX/fuQO6w7O16Za33T3r8wMZ4VfxP9vhOT/fYtiGlXKqqDNvYwgiDqeqJGBfPX+CuNXi+5o0OHGP5j/0+C4NCRYMV7IfumwFSzwKSC1kk8+3PRIK6Mmt5bSyICSkPkenr7TqpCAgMqLmTNa7rCQIg4NNR8vRuNSHjf3pc=
+	t=1722429040; cv=none; b=Z79ifFVVFA6WXRVhRM6aFCeBwoSgO/R5NV0LFfSONyYi6wygIScYJTL1BMXPei/66UfiPgEO7Gd39Be5PA54z4S78VvadmK7wm73b4lnW3WUmMqFAr7P9w+UQDROZKX8j8fa39eJ2DFE7uaN6+Nd1M8hQcbS3woRfx69DrJ0Pu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722428875; c=relaxed/simple;
-	bh=fajAfikRY1y2xE+kOjO4/iMBkjjseJ3cIk/5GvGz/Xo=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=Mo5DZUi/j1Leqb4lL8wHfq+ywHWOXZQLk0h7DO3YbEcGkl1aS5rFr+1L0BQ0l6fuQ0Ozd0xKzVcXNvQ1ESbXE8iWiSc6CLDGZwnFgIrdIr4q2Hbc69hpO6HSDRXI1nEX5M7vpTqauCf/ibzMpMdbIUicGuRsaMPsVrOYLd9SWx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=h3tudPy/; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722428871; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=KQwUHS49W8FGAMhB3LMyYCt7byoJBo8piZ3zIL1qnY8=;
-	b=h3tudPy/65MdgTmMzbNF0ZipXvapnhNtVyIE4nZOnF/gTy4u0VLLPn6pnoB7ABdrlVIWRBegVtU8+rmRtVfuakF+HhQmngQ17Gc5unOVfOtyY/4IwXc3a09TQYfzlE+C02nyVI4U036ODfZgaC3N7/tmy3sF/ygmroNWONNavdI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R291e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067113;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBjMdTA_1722428869;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBjMdTA_1722428869)
-          by smtp.aliyun-inc.com;
-          Wed, 31 Jul 2024 20:27:50 +0800
-Message-ID: <1722428723.505313-1-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net v2] virtio-net: unbreak vq resizing when coalescing is not negotiated
-Date: Wed, 31 Jul 2024 20:25:23 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- =?utf-8?q?EugenioP=C3=A9rez?= <eperezma@redhat.com>
-References: <20240731120717.49955-1-hengqi@linux.alibaba.com>
- <20240731081409-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240731081409-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1722429040; c=relaxed/simple;
+	bh=0GgrZWHinxvvMoGWFnmB+thda/1qbiKhQ6cZ1ZfHbZc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LK7Om1JksxjMZsiT2nruOxVbRmJq3ISX/UQmLLsiZFABRR8km0ENzzZz66nZtL8aHtPQjtHokgrLEizoW8OuLSY0Ki2G9451eu9wE8GwKIZEnXpMq9LhUCHJv8rXIf6qXHhAEzRhkzeHQxrn3fR1M/J8YMZrHGi3UT+fJ88vAWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ht6psynZ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-367963ea053so3502254f8f.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 05:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722429037; x=1723033837; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zg+iaWLKXy+7i0/Z5ruNxOtrMiwweM8XLHk8AS+UR+A=;
+        b=Ht6psynZPYcRYURu4MWBWN2lgzrqeu3/vSNQZ/cE/rFjr5H1Na0sBbqIX/WzmxnMFe
+         Xx2GCHs3nANPBTPjFqQFZzVbYcGJAakcFHsFjsR2kTUKtwel4Fe0fV2fuHOhjT1drmWK
+         Q3MCp+/afbZbOX8PxyAx9q4xSkiDlCsSXralUP6REI5omIO/XS9e1WvDphfE/joW+wLI
+         hfAEng6H9Yao61wNos57jO+i2DV1OCs69Gse+UbFUZPpgzUfOwTJxBN0ggQiQAkPDys4
+         mG7CoqQCHow84Wfh5f/MJi0dOLz2DzlXZJKJKf5ll7mRZE+5iNcCiMA1jZ8OfEcqAogk
+         a+4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722429037; x=1723033837;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zg+iaWLKXy+7i0/Z5ruNxOtrMiwweM8XLHk8AS+UR+A=;
+        b=Z64vZb56Ctj95mcnJb4lr7TT8tbj3ZCXoD2N2Vbh71zltYo1M5AM/YyalTGbvZ6q8q
+         eehPMjmReicrBZNXMEftRngv4/nH1/R6SNwKH+a7Z92eN5XAHhg5eEJdKRa4bYGAw0Oy
+         D658ds2xaeWsYu0I5wnkbCGa/SFxXw9t++/dFT7xyUnU4Xs3uwz6pU1S9wN/lt4Xy+tr
+         tm/sDpqW6LKJ5ZJ4b6Tev6KiffSdagjW6RBfUJCIu+lSY8ABG2MLez8omVHImBMwuvcz
+         HNpdAd1Cz1pTnkTLrKgLN2ptFyZ0qsId5Ot3Xn++cT1v3acesWz0IlmZox8ZtCmuHezY
+         Ljhg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxOFVWfH/l4yd0JKayAY0cHNWYsq9mDa/IgeQdhC2jvN3JEeYsoqLGomi2mieaXUUjOXiJ1j3kRdKZxrWVvYJ2zg2yynws
+X-Gm-Message-State: AOJu0YzcTGQYMJf94lakWOZ5VLK24XntJKcxWb2sifM0KYWDLW4CuvTR
+	+y3g4bivCXOWmY/BB/JHn+GzlecwGM4JGAsz9jH3DfurYa6ZrTQ0NxXqmJcGnrEuOlUxjQVJC5Q
+	25PxXWE+x30pFNXrlG7bomQJQfLRQ7sO/cSVvKvqmh2CTA4sgBg==
+X-Google-Smtp-Source: AGHT+IHRaCMcyu+XeRk0MTgMnend7w+x774/tlOFA6HabiDQT2g8cWiepzILJJARIdOoSfYXjDPRoJjVmOlBDrRNIEM=
+X-Received: by 2002:a05:6000:1203:b0:368:6564:751b with SMTP id
+ ffacd0b85a97d-36b5d07bec5mr10703106f8f.32.1722429036248; Wed, 31 Jul 2024
+ 05:30:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240731042136.201327-1-fujita.tomonori@gmail.com>
+ <20240731042136.201327-2-fujita.tomonori@gmail.com> <6749fc34-c4e0-4971-8ab8-7d39260fc9bb@lunn.ch>
+In-Reply-To: <6749fc34-c4e0-4971-8ab8-7d39260fc9bb@lunn.ch>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Wed, 31 Jul 2024 14:30:23 +0200
+Message-ID: <CAH5fLgiGAqMTL9mRA_3RXZULV06KF+FJRxYMHC5xsE_=od3Azg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/6] rust: sizes: add commonly used constants
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 31 Jul 2024 08:14:43 -0400, "Michael S. Tsirkin" <mst@redhat.com> w=
-rote:
-> On Wed, Jul 31, 2024 at 08:07:17PM +0800, Heng Qi wrote:
-> > >From the virtio spec:
-> >=20
-> > 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-> > 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-> > 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
-> >=20
-> > The driver must not send vq notification coalescing commands if
-> > VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
-> > applies to vq resize.
-> >=20
-> > Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq =
-resize")
-> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> > Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > Acked-by: Eugenio P=C3=A9 rez <eperezma@redhat.com>
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > ---
-> > v1->v2:
-> >  - Rephrase the subject.
-> >  - Put the feature check inside the virtnet_send_{r,t}x_ctrl_coal_vq_cm=
-d().
-> >=20
-> >  drivers/net/virtio_net.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 0383a3e136d6..2b566d893ea3 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -3658,6 +3658,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(struc=
-t virtnet_info *vi,
-> >  {
-> >  	int err;
-> > =20
-> > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> > +		return -EOPNOTSUPP;
-> > +
-> >  	err =3D virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
-> >  					    max_usecs, max_packets);
-> >  	if (err)
-> > @@ -3675,6 +3678,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(struc=
-t virtnet_info *vi,
-> >  {
-> >  	int err;
-> > =20
-> > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> > +		return -EOPNOTSUPP;
-> > +
-> >  	err =3D virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
-> >  					    max_usecs, max_packets);
-> >  	if (err)
-> > @@ -3743,7 +3749,7 @@ static int virtnet_set_ringparam(struct net_devic=
-e *dev,
-> >  			err =3D virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
-> >  							       vi->intr_coal_tx.max_usecs,
-> >  							       vi->intr_coal_tx.max_packets);
-> > -			if (err)
-> > +			if (err && err !=3D -EOPNOTSUPP)
-> >  				return err;
-> >  		}
+On Wed, Jul 31, 2024 at 2:17=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, Jul 31, 2024 at 01:21:31PM +0900, FUJITA Tomonori wrote:
+> > Add rust equivalent to include/linux/sizes.h, makes code more
+> > readable. This adds only SZ_*K, which mostly used.
 > >
->=20
->=20
-> So far so good.
->  =20
-> > @@ -3758,7 +3764,7 @@ static int virtnet_set_ringparam(struct net_devic=
-e *dev,
-> >  							       vi->intr_coal_rx.max_usecs,
-> >  							       vi->intr_coal_rx.max_packets);
-> >  			mutex_unlock(&vi->rq[i].dim_lock);
-> > -			if (err)
-> > +			if (err && err !=3D -EOPNOTSUPP)
-> >  				return err;
-> >  		}
-> >  	}
->=20
-> I don't get this one. If resize is not supported,
+> > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> > ---
+> >  rust/kernel/lib.rs   |  1 +
+> >  rust/kernel/sizes.rs | 26 ++++++++++++++++++++++++++
+> >  2 files changed, 27 insertions(+)
+> >  create mode 100644 rust/kernel/sizes.rs
+> >
+> > diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> > index e6b7d3a80bbc..ba2ba996678d 100644
+> > --- a/rust/kernel/lib.rs
+> > +++ b/rust/kernel/lib.rs
+> > @@ -42,6 +42,7 @@
+> >  pub mod net;
+> >  pub mod prelude;
+> >  pub mod print;
+> > +pub mod sizes;
+> >  mod static_assert;
+> >  #[doc(hidden)]
+> >  pub mod std_vendor;
+> > diff --git a/rust/kernel/sizes.rs b/rust/kernel/sizes.rs
+> > new file mode 100644
+> > index 000000000000..834c343e4170
+> > --- /dev/null
+> > +++ b/rust/kernel/sizes.rs
+> > @@ -0,0 +1,26 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +
+> > +//! Commonly used sizes.
+> > +//!
+> > +//! C headers: [`include/linux/sizes.h`](srctree/include/linux/sizes.h=
+).
+> > +
+> > +/// 0x00000400
+> > +pub const SZ_1K: usize =3D bindings::SZ_1K as usize;
+>
+> 1K is 1K, independent of it being C 1K or Rust 1K. In this case, does
+> it makes sense to actually use the C header? I don't know? But the
+> Rust people seems to think this is O.K.
 
-Here means that the *dim feature* is not supported, not the *resize* featur=
-e.
+Shrug. I don't think it really matters.
 
-> we pretend it was successful? Why?
+If using the C header required adding constants in
+rust/bindings/bindings_helper.h to actually make the constants usable
+from Rust, then I would say we should just set the constants from the
+Rust side. But in this case using the C header just works so I don't
+think it's an issue.
 
-During a resize, if the dim feature is not supported, the driver does not
-need to try to recover any coalescing values, since the device does not have
-these parameters.
-Therefore, the resize should continue without interruption.
-
-Thanks.
-
->=20
-> > --=20
-> > 2.32.0.3.g01195cf9f
->=20
+Alice
 
