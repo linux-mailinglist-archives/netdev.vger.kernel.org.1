@@ -1,141 +1,200 @@
-Return-Path: <netdev+bounces-114521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B15D1942CDE
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:08:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7174D942D4C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:33:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3A851C2165B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:08:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6F001F226C1
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:33:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B6A1B29C1;
-	Wed, 31 Jul 2024 11:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985861AAE23;
+	Wed, 31 Jul 2024 11:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkTlhcE8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WHgD+NLL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2065.outbound.protection.outlook.com [40.107.93.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32DF1B29B5;
-	Wed, 31 Jul 2024 11:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722423995; cv=none; b=dEjSyXNjYd69nYSqM4DCdsvW6P5cVGqnbzf9rr99V+ByFXezKIYTEu9PcTGN75rsvN0iVprKuvX23BVHB/layRYwIn3kPcnVpl06/aAF7FM79LFAl9vqQOipEZ7yrlK8eMWLQWCcPZ69+AgFIwOYiL4VLULDdyT271tya9ZiifQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722423995; c=relaxed/simple;
-	bh=857ubTu1shYtmLjo2dTYUYNkByMNASD2Yszupp1zLtI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OWN3qfmThDHMvEP06vlcKaD8o7/x50JQifBA2NHfE91LOcGywm0X3l8Aph908wkSupqc3UvgtiErLKYvKgznPSZsUf3VYreytZI/qqDhfAoVPB/nUWUhVfbir9YXReoga30pu8hyme0wXqFoTdmeVEETQI81930uc/lKar1bNMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkTlhcE8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFDE1C4AF10;
-	Wed, 31 Jul 2024 11:06:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722423995;
-	bh=857ubTu1shYtmLjo2dTYUYNkByMNASD2Yszupp1zLtI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=SkTlhcE8fKoAOLEqqIdu/AH9Gkw1KFIPo2QV3RrFyoBrwiVztTtIF6kkF/UlGw+vk
-	 K7yYw4C7N7x38HPi2/xliQnLCyNb1f2lXJiCJfIXTGc34LwlGSgn005O/v1EdbEzQ5
-	 Hnoch1dpcfRXE9sbQwcU7rQv5JicFOzhugNCuWqCYV/lMRESnRmh6AnRgsacAj/gfx
-	 S82tdH+cYpROSOinIoIIEmESsMwIz7LY4163WhecPaYd8VBDQjgM9JZ+m1106AH48J
-	 jUNYmB9stmE/q1svzoVssRrs/L7i99yvVip0t1iRLuafS/G7r2oVmgDQYZeHQNM2+B
-	 uy4KcAdw5pazg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Wed, 31 Jul 2024 13:05:59 +0200
-Subject: [PATCH net 7/7] selftests: mptcp: join: test both signal & subflow
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AAA1A71ED
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 11:33:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722425628; cv=fail; b=qRsVtDJvxJu7wmHzz0u26MFMXtCBikSyi1NKq6aevVBbOwZe4T1TfoU5F4LmjjLTAFt9/18xjKtj8zn2RHNRdg5zkcY/hQ3kV93CNQxNFpG8wmgzLLOSizxQ/L/XY+Y2eogCkP2eEkR3+owTKTDRUQ+bkwtQYpxjapZ4jyFu0B8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722425628; c=relaxed/simple;
+	bh=6dRTrx2tfvYkm5w2ZYbPqmLeipjvdLN5U/uNohRlg5c=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=GH7TUJ7HENIKU2A1qv3i5uOBN7oojUYT3rSNiJ44/Y3qVp1x1NTb7uTS7mgOezKQZ19F6qxcCfYo63FI2Cf0dpqH5tDgBUVTMlTM9UfRdIuhR7eBWhcOWGdKGWg3kHxuYCfyOrQx1e6P5zDXINEAtT4jDXu6g7py7HVLnXPHRL8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WHgD+NLL; arc=fail smtp.client-ip=40.107.93.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Dth4+yitk55AmR7Jhg8eHPjquIe0MoaLOyWby1BrU2MYiP3Nu593gqj29L2dkRkTXqqQ7Q5yLk0w4qfNP9lkp/1P2W1Yz8YKvoCfAflAv7cOX/P0mnF+sXOggfLK20fHrdWmK8rXobeYXPoDHx3FaWjL82MM7Xor+C0WkFgGSDqWSQcT6gniMWUJhgkZRlPUyLN+K56hXnibYqerrGb7oLH67F/Ky5jof2RZfK0/Zt+21Sz7hN8GMcoCAmeix26TKPPtEUgkt/35kCfkvzVVapooBasxPN5me1Qi4+dsJ1MbW4/BSamP0ugug4eTAFOj+s49sAsvQ0TX0I7JtHSnag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=47+rdd+kKEaNPTN7N5qHeHC5qyemTrvcNp5DRpzlkvQ=;
+ b=XU97CZwN4fCLMPO16Khh+sUsX1uEsFjy0TRy2KbG9o/ocgKKbEt0tvmFPcclkijy2+prFS1wYNijnCk1Am/fi9qphvrjaFvuVI2E3J3W3uEVqZEosXB8gltGFr5hFF0xTRr9zIgCTMqTUAjtEqcR1mDgAeoV5FuzFvF+whOd5Jwkn1gZQmvwwAHccN+L7mzqN78YTEkkiO/9+0bNLZnyAgi5vcAD4NEj+PPTFbNZPaIMd4Kj/lEreV6YBEXdSG+cbQbHbOnNVGc6YnGwQI/bOLu3MTAQOtopb387BdUPh8wIvOaFmKYero2MXtpXL/UgoiYQzQBeJaKy5cqrlwbD1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=47+rdd+kKEaNPTN7N5qHeHC5qyemTrvcNp5DRpzlkvQ=;
+ b=WHgD+NLLlvnAfySGQmuSwM5xOGdMIo0OZ1nAvFGlsIdG6zw35PZPWXpaJh7eg0k5HWeT10CoRx/QXWNXoPyZUZFLaAiBNA/Xvp9UXobwaZK2bTtVCNsS/GJLOhBuWPw0WPykKErGSY1l7PqzBRURee5EJwOlc4oDP+n/MLDu1+gW3v+0b02ZeUXc81c2vExClhrZy0spZG6vTQCB0iOtH0ARDoVxIlbgapv+2uDMke8I+jK6cWFFJUbbEO/8mHfT/590Eu17GL2AsmYpjZpEyI2CaL6WU76fgAzlMXu/o62VoBrLlY+oOsJ3oOzhO6eUFbUn5zQLO1KSSJoFFNyQNw==
+Received: from MW4PR03CA0295.namprd03.prod.outlook.com (2603:10b6:303:b5::30)
+ by MN2PR12MB4238.namprd12.prod.outlook.com (2603:10b6:208:199::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 31 Jul
+ 2024 11:33:43 +0000
+Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
+ (2603:10b6:303:b5:cafe::4e) by MW4PR03CA0295.outlook.office365.com
+ (2603:10b6:303:b5::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.34 via Frontend
+ Transport; Wed, 31 Jul 2024 11:33:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.0 via Frontend Transport; Wed, 31 Jul 2024 11:33:43 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 31 Jul
+ 2024 04:33:34 -0700
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 31 Jul
+ 2024 04:33:29 -0700
+References: <20240731013344.4102038-1-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <sdf@fomichev.me>, <shuah@kernel.org>,
+	<petrm@nvidia.com>
+Subject: Re: [PATCH net-next v2] selftests: net: ksft: print more of the
+ stack for checks
+Date: Wed, 31 Jul 2024 13:07:26 +0200
+In-Reply-To: <20240731013344.4102038-1-kuba@kernel.org>
+Message-ID: <87h6c57q4b.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-7-c8a9b036493b@kernel.org>
-References: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-0-c8a9b036493b@kernel.org>
-In-Reply-To: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-0-c8a9b036493b@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2447; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=857ubTu1shYtmLjo2dTYUYNkByMNASD2Yszupp1zLtI=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBmqhqixPXnJibSbhI8FfcWQqKkInBror+Nt4EPo
- SmDkR4qqw+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZqoaogAKCRD2t4JPQmmg
- c8D9D/0ZDdboR90bcV5gh2Otr9rWdMbBX45B3y8vyw4qj3jTX7PhgRlw7nsuPHfN7gh1J0oRoGH
- EqMV2vFKkD9KKfRMspQnVvngda9O3CQHLMT9auMgRDc46bN+m1ZFjudj78glhUgAzlCMhRdCMC0
- May+5GnrhsWwDZDOUhuuDnVrxu31//yQNJ7OfNQtKZvbm8CO3hSV6/CT0ZD/xZ2StiWPS1jK41k
- V4dBqTycQdh06UtUJydzXQSztfigAeblzhElpCtIrslahTrQfWCvMpeU9HodZQOcVsp+aexb+iZ
- /BTgAOrlKwCibf3labEwnXzuW1EynNrCsYTN+wSWN0EXiXAdTj/eue4IE7NNrilxYn1c5CoLDXF
- pOvMSuADvo1gb+yBj+AQ1DiG48DjWW86I7fUygOi11HOMz+exc8MISKQvwk7xmacYpeS4jGy5uL
- YMk+bFuigKSe1Jj4I1/bbVJQqVOIUtMRSw7TP5Jy5qJ/ixJ+0Q1UjTQdpQtDw9sdtjch277xC1b
- XtK/5UsZCeuIriq/zBWnLqP0anPERG0a/0ltQlGmULkXSPsrCvhRxybqdfBKM9g3Vv5buJOXRHK
- pcYO2+MJrQgVdu6lkyq2B7fDPeQUKHkwHKJ/GNq/5cCZjx8guzSXeIreDVq2EpdEI1zz0m9gIXI
- 8Y/wgkHLfXyi41g==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|MN2PR12MB4238:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5908fabb-6d7f-4e95-c600-08dcb154a1fc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?h/cHERFtHWVZrFOISZyEVgIBAQeJPLgdOmeTgbLH84ldVfWhdFXjY/fwdUgw?=
+ =?us-ascii?Q?RjA3tWd4sqpWMmmb0WXb6u/DUvKoGKrbuvOsnwO5hIcedbRC0IsKqagnm2bE?=
+ =?us-ascii?Q?cJWpjrXumDoQzOPRXlKou6Mb1iq59dPNsG4CmrjzJUyPbuNqGnY/IOQ6coRc?=
+ =?us-ascii?Q?H/H+Mm3sPXJfQ77+Rsn2qtD1zG8fE6GGUTbDGSK6HvW/8YDrIif1LgIkVhsU?=
+ =?us-ascii?Q?2tbwhpBfs3mM9WPRfsIp0GVEDu+PHzfRcPqpdwzUqHrX3KlDQRzFkTD/kX8w?=
+ =?us-ascii?Q?OwUbmAJxLUS9aO9VMjzQoOOqCF43zbsXYAL4oCckc0lcIJN+1/xvPS76tEtx?=
+ =?us-ascii?Q?MfsL6UKvATRJ2IrS8hIu/9lse3IthSasUGe+9orZVaxpaPszyGoO87E9Fgh1?=
+ =?us-ascii?Q?RoJoYtlCgYYRgywSPF/QKv2CrONulFLxUMl2LZvaOHBkyu6KMww0qloXnV0k?=
+ =?us-ascii?Q?AnUbRr8FRM04Gz3yZyJYTBdMeRaTwYFF3xYzw3cIOSdZcKpF4akq0mFo7al1?=
+ =?us-ascii?Q?BpUPeBX+2y+8gqDfDS4bvkqz+HTux+AqS4OT2oIHZKaEuWa9i43Sm3Lq09dC?=
+ =?us-ascii?Q?gq3SWI+P2H6AUydAcNmsqf3MFtN5v7a+Pps9IU/rWorIa2rFHdxAdQnCCklh?=
+ =?us-ascii?Q?Gi69j9p0DzquGfNZrUhwJj/kSwKZR/ja2fFmLsi3xmyD5zM/x+HKyZtWzZ4N?=
+ =?us-ascii?Q?qR4gS+43AUYhiIHnX2RQlV/7/wPPS4CLzxhzyL9qbP1qMLk19Q992oJwSbZN?=
+ =?us-ascii?Q?3OA/2REF2lACXzssmBAvgcyMf8WjdOe4oJ6pgzcqI+DaXhHH/0bkNFkVhfGT?=
+ =?us-ascii?Q?PDgyDjNlTnmUZsD2hJf8evL46XQ8t+1NsGwSeVsR6sTz9Jweqr7bWhZdUKkL?=
+ =?us-ascii?Q?N9vBDH5QAu8rXx2OykQAl7LHureSYh59xhXuL0W6XMg3pQwqcgU/iPkYXoIk?=
+ =?us-ascii?Q?0xHqCDi2J0T0rW6dm6qtke9zdBifjYI9hanRwZgP2+8SvEi5lKP+cu0Huld0?=
+ =?us-ascii?Q?3KWt3L2Y7QxB79i6ZbCUkeZLMW4Kg8+BDruAC+33X5ti4Lnn0r/yljXX2Bxg?=
+ =?us-ascii?Q?P4oUp1L84IoPCZXetl+8+9XV4KRQvC9zl+DZqMB5HEMJHbAVJwHwOHBJXK74?=
+ =?us-ascii?Q?Jg54ishw9V0WeuGrQv/pwMfzcgyzI7l8yNFICXElxyM8kFOBnbiBxnJSf+W8?=
+ =?us-ascii?Q?l/mCxkRCmByXs1ADInGblvxADZ4rQ3gft8mFNQKOMXKNvKyqAgykvZT5oJae?=
+ =?us-ascii?Q?pdxY/e8EXWs8FxisxDos7upwLcFmvPOGfykJ0jNaRK/pk2gwmvMofkaYnrQh?=
+ =?us-ascii?Q?+fTjdqMymU0vuXe+g8P2je981/MhmXgQlFfKAs7UodeZ02m3z+X0kFaR575w?=
+ =?us-ascii?Q?K4/IxIMFCaxwFFuriBq+FTHBiWuLlfpOs6Dd3AdwhIr8bx6bwmtziKmi5e+K?=
+ =?us-ascii?Q?stjDdmMp/CnyDWaJd5ckFxDTadIsRGTg?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 11:33:43.1897
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5908fabb-6d7f-4e95-c600-08dcb154a1fc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F8.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4238
 
-It should be quite uncommon to set both the subflow and the signal
-flags: the initiator of the connection is typically the one creating new
-subflows, not the other peer, then no need to announce additional local
-addresses, and use it to create subflows.
 
-But some people might be confused about the flags, and set both "just to
-be sure at least the right one is set". To verify the previous fix, and
-avoid future regressions, this specific case is now validated: the
-client announces a new address, and initiates a new subflow from the
-same address.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-While working on this, another bug has been noticed, where the client
-reset the new subflow because an ADD_ADDR echo got received as the 3rd
-ACK: this new test also explicitly checks that no RST have been sent by
-the client and server.
+> Print more stack frames and the failing line when check fails.
+> This helps when tests use helpers to do the checks.
+>
+> Before:
+>
+>   # At ./ksft/drivers/net/hw/rss_ctx.py line 92:
+>   # Check failed 1037698 >= 396893.0 traffic on other queues:[344612, 462380, 233020, 449174, 342298]
+>   not ok 8 rss_ctx.test_rss_context_queue_reconfigure
+>
+> After:
+>
+>   # Check| At ./ksft/drivers/net/hw/rss_ctx.py, line 387, in test_rss_context_queue_reconfigure:
+>   # Check|     test_rss_queue_reconfigure(cfg, main_ctx=False)
+>   # Check| At ./ksft/drivers/net/hw/rss_ctx.py, line 230, in test_rss_queue_reconfigure:
+>   # Check|     _send_traffic_check(cfg, port, ctx_ref, { 'target': (0, 3),
+>   # Check| At ./ksft/drivers/net/hw/rss_ctx.py, line 92, in _send_traffic_check:
+>   # Check|     ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
+>   # Check failed 1045235 >= 405823.5 traffic on other queues (context 1)':[460068, 351995, 565970, 351579, 127270]
+>   not ok 8 rss_ctx.test_rss_context_queue_reconfigure
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-The 'Fixes' tag here below is the same as the one from the previous
-commit: this patch here is not fixing anything wrong in the selftests,
-but it validates the previous fix for an issue introduced by this commit
-ID.
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-Fixes: 86e39e04482b ("mptcp: keep track of local endpoint still available for each msk")
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+> index f26c20df9db4..707e0dfc7b9d 100644
+> --- a/tools/testing/selftests/net/lib/py/ksft.py
+> +++ b/tools/testing/selftests/net/lib/py/ksft.py
+> @@ -32,8 +32,15 @@ KSFT_RESULT_ALL = True
+>      global KSFT_RESULT
+>      KSFT_RESULT = False
+>  
+> -    frame = inspect.stack()[2]
+> -    ksft_pr("At " + frame.filename + " line " + str(frame.lineno) + ":")
+> +    stack = inspect.stack()
+> +    started = False
+> +    for frame in reversed(stack[2:]):
+> +        if not started:
+> +            started |= frame.function == 'ksft_run'
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 52a25ac43d10..9ea6d698e9d3 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -1989,6 +1989,21 @@ signal_address_tests()
- 		chk_add_nr 1 1
- 	fi
- 
-+	# uncommon: subflow and signal flags on the same endpoint
-+	# or because the user wrongly picked both, but still expects the client
-+	# to create additional subflows
-+	if reset "subflow and signal together"; then
-+		pm_nl_set_limits $ns1 0 2
-+		pm_nl_set_limits $ns2 0 2
-+		pm_nl_add_endpoint $ns2 10.0.3.2 flags signal,subflow
-+		run_tests $ns1 $ns2 10.0.1.1
-+		chk_join_nr 1 1 1
-+		chk_add_nr 1 1 0 invert  # only initiated by ns2
-+		chk_add_nr 0 0 0         # none initiated by ns1
-+		chk_rst_nr 0 0 invert    # no RST sent by the client
-+		chk_rst_nr 0 0           # no RST sent by the server
-+	fi
-+
- 	# accept and use add_addr with additional subflows
- 	if reset "multiple subflows and signal"; then
- 		pm_nl_set_limits $ns1 0 3
+Hmm, using bitwise operations on booleans is somewhat unusual in Python
+I think, especially if here the short-circuiting of "or" wouldn't be a
+problem. But it doesn't degrade to integers so I guess it's well-defined.
 
--- 
-2.45.2
+> +            continue
+> +        ksft_pr("Check| At " + frame.filename + ", line " + str(frame.lineno) +
+> +                ", in " + frame.function + ":")
+> +        ksft_pr("Check|     " + frame.code_context[0].strip())
+>      ksft_pr(*args)
 
 
