@@ -1,109 +1,129 @@
-Return-Path: <netdev+bounces-114526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42B97942D33
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:24:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2827D942D47
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF311B2193C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:24:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C73AB1F212A8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841FA1AC443;
-	Wed, 31 Jul 2024 11:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A42191F8C;
+	Wed, 31 Jul 2024 11:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LRhbC/PL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99441A4B2D;
-	Wed, 31 Jul 2024 11:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798358BFF
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 11:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722425088; cv=none; b=n0eN17Nx5xb2emLXEJG4wJfAy34nQm6fVk28pNEYm9AQrsK35gDnLXI4AFYDyG/RnvZvAyf8tJRzq5ZDINv2JdAmJEH23kC66fdFhuwgI3kvCtv9ucptr/LGWMIXozd8Jh8gTLKx1EOp/tmSDRfROFz3NHqtTjQi2b7E3GL/wdM=
+	t=1722425481; cv=none; b=EzseIWk2IuO3o7rCdgtyKOywc9NGjAEaNuI9t760CJe20Eaw065RNTEYnRpAg4xwnne9fpA6qbsKtQIJE8A/fgepXB2QvWNlP4krgXGQPE5Zik3HNhBAT9itWaSh6+HKJx4XDqG84X+7ZlDKDQluiUlNdxjdpxnipM5cE+FeXFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722425088; c=relaxed/simple;
-	bh=mJeBt7a2/UvxDMfOzH5vWTzOUni3HatomRBIdB9wi/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTND4mzXepX+jdnorRqR0TMDBKUpEA6DIBPNJPxUQgXoAJzNM8DTdQUKGJ8Tnvq+rvynUgqQdiL/2oI5QvzHmhOF8Qng+MxybpT61vTyAYvLLMw8errU9cEyjivL5fvTkI70y1Oipx2rmluqupK06BeIRDPBBl9ah2iiXaPLfZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5af326eddb2so1481801a12.1;
-        Wed, 31 Jul 2024 04:24:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722425085; x=1723029885;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wLdtT+A3n0Xb4QYNnqCYFUNPpLz6lnqGJh0VurtI6SM=;
-        b=BcAOmxZq+coCFx5i/hvfbIXZr2o3YxQsByGELqynM8Cxc3Ub/6jeRaVXXrHJ5Llh7f
-         XMrMchqDn75aMyUis8YnxRX1z9cue0afA1XGvJsLweoc0rps305PWy3hr/gmVWFabG4G
-         cIYSg4YUWpX7eIa/NboDNIVHiGKW1GnddI+CCHvrmtDNvtOshkG2coPAve/ob2rk64EJ
-         k3sM3ALWdHx6m5AihdVHJZ0ZJnpbbe3qQCvQ//W9CR1CisyXdtqMKQAVO0OwBfL85HUG
-         wDjIEynklJfsR0IzOh5HvZxRjxsX1gfM9lAFTSvfHt6IruvkSDV8OskpqzULgzOG+jzw
-         +PGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyTx4HRcVP+ErblKnL01VeGpvzazFaTUJAtPUJk+1fTVS/baMvrM6igbtsmSCSEQhDWH+MJPlWqtmGfhuf1sPBzsgf7he85wxxHs82XStigibhQiNbaSq660Ptl3+ct0Wlgpul
-X-Gm-Message-State: AOJu0YyzShN1MaexciXMsAaaClZSrmhGgr4i4ssA9WDzjoc3ATL/VdAc
-	MBu2Vl9BaoL/fklfFjZ5vIO0SkKLnKYsQTiBSeeNl52aO+8n8KLf
-X-Google-Smtp-Source: AGHT+IH8stSlR43duWYMCsiONtPTHYotrqj64a7NDgAzkABfZJYf9VO4vyD185qYfInpZPNjMkgNUg==
-X-Received: by 2002:a17:907:1c28:b0:a77:c7d8:7b4c with SMTP id a640c23a62f3a-a7d859161a8mr603669966b.11.1722425084849;
-        Wed, 31 Jul 2024 04:24:44 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadb9f60sm753040666b.223.2024.07.31.04.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 04:24:44 -0700 (PDT)
-Date: Wed, 31 Jul 2024 04:24:39 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, leit@meta.com,
-	Chris Mason <clm@fb.com>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: skbuff: Skip early return in skb_unref
- when debugging
-Message-ID: <Zqoe9/TiETNQmb7z@gmail.com>
-References: <20240729104741.370327-1-leitao@debian.org>
- <e6b1f967-aaf4-47f4-be33-c981a7abc120@redhat.com>
+	s=arc-20240116; t=1722425481; c=relaxed/simple;
+	bh=vwrjvpashV7Ts6cGhVvQN/od+tR6TyWff2zbZvPakr8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=bTAKCGmfX9ZDYVzzEkqrYBoxmgoAYoHtp05tw1DQs4azA52GpWQ5S/65VJTtdCAAcv72+R7jX4r0B7TlTnWQp3UomyUx6kL4SZ2xPnX23+mSdt54csxGCUGcfxJSqmkYR36fQHc2LBCelwN3l+AiXhgURKlWx/GX/RVOM+xJf40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LRhbC/PL; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1722425471; h=Message-ID:Subject:Date:From:To;
+	bh=GhCYCnb3PTVULPeLefA/NMyDoPeg4ruRf4uoK4eeqJE=;
+	b=LRhbC/PLnotNVAu7lNR6oQNkmppyA0yppN//FuS1dvI/UkX23TLWscbkoxZE7ih0CKQj8TiTD/ka5ft7faw7K3wKFwlGR1jE1r1p3SHfrzpQZen349mfhU0S4aIYi8jveBvhZIVwRxidBGbQ+8lE0GF97Drqx6VCFfI3EO9I7d8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBjLH2Y_1722425469;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBjLH2Y_1722425469)
+          by smtp.aliyun-inc.com;
+          Wed, 31 Jul 2024 19:31:10 +0800
+Message-ID: <1722425431.2357254-1-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
+Date: Wed, 31 Jul 2024 19:30:31 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ virtualization@lists.linux.dev,
+ =?utf-8?q?EugenioP=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <20240729124755.35719-1-hengqi@linux.alibaba.com>
+ <20240730182020.75639070@kernel.org>
+In-Reply-To: <20240730182020.75639070@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e6b1f967-aaf4-47f4-be33-c981a7abc120@redhat.com>
 
-Hello Paolo,
+On Tue, 30 Jul 2024 18:20:20 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Mon, 29 Jul 2024 20:47:55 +0800 Heng Qi wrote:
+> > Subject: [PATCH net] virtio_net: Avoid sending unnecessary vq coalescing commands
+> 
+> subject currently reads like this is an optimization, could you
+> rephrase?
 
-On Tue, Jul 30, 2024 at 11:38:38AM +0200, Paolo Abeni wrote:
-> Could you please benchmark such scenario before and after this patch?
+Jason's rephrase will be used.
 
-I've tested it on a 18-core Xeon D-2191A host, and I haven't found any
-different in either TX/RX in TCP or UDP. At the same time, I must admit
-that I have very low confidence in my tests.
+> 
+> > From the virtio spec:
+> > 
+> > 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
+> > 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
+> > 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
+> > 
+> > The driver must not send vq notification coalescing commands if
+> > VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
+> > applies to vq resize.
+> > 
+> > Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
+> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio_net.c | 29 +++++++++++++++++------------
+> >  1 file changed, 17 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 0383a3e136d6..eb115e807882 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -3708,6 +3708,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
+> >  	u32 rx_pending, tx_pending;
+> >  	struct receive_queue *rq;
+> >  	struct send_queue *sq;
+> > +	u32 pkts, usecs;
+> >  	int i, err;
+> >  
+> >  	if (ring->rx_mini_pending || ring->rx_jumbo_pending)
+> > @@ -3740,11 +3741,13 @@ static int virtnet_set_ringparam(struct net_device *dev,
+> >  			 * through the VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver
+> >  			 * did not set any TX coalescing parameters, to 0.
+> >  			 */
+> > -			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
+> > -							       vi->intr_coal_tx.max_usecs,
+> > -							       vi->intr_coal_tx.max_packets);
+> > -			if (err)
+> > -				return err;
+> > +			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
+> > +				usecs = vi->intr_coal_tx.max_usecs;
+> > +				pkts = vi->intr_coal_tx.max_packets;
+> > +				err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i, usecs, pkts);
+> > +				if (err)
+> > +					return err;
+> 
+> Can you check the feature inside the
+> virtnet_send_.x_ctrl_coal_vq_cmd() helpers?
+> 5 levels of indentation is a bit much
 
-I run the following tests for 10x on the same machine, just changing my
-patch, and I getting the simple average of these 10 iterations. This is
-what I am doing for TCP and UDP:
+Makes sense. Will update in the next version.
 
-TCP:
-	# iperf -s &
-	# iperf -u -c localhost
+Thanks.
 
-	Output: 16.5 Gbits/sec
-
-UDP:
-	# iperf -s -u &
-	# iperf -u -c localhost
-
-	Output: 1.05 Mbits/sec
-
-I don't know how to explain why UDP numbers are so low. I am happy to
-run different tests, if you have any other recommendation.
-
---breno
+> -- 
+> pw-bot: cr
 
