@@ -1,119 +1,161 @@
-Return-Path: <netdev+bounces-114446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8066A942A04
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:15:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF85942A0A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2A101C210E0
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:15:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0198CB236FD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503AD1A8BE2;
-	Wed, 31 Jul 2024 09:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lOHjiF+r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C3B1AAE3E;
+	Wed, 31 Jul 2024 09:16:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8811A4B47
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 09:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 1B8C618B04;
+	Wed, 31 Jul 2024 09:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722417333; cv=none; b=Y+CGLjg7+ZOMuQEN5uvjs5gRnaOVoWj6RRDQwfz45I68CAi4EaHCLlEcqrlu0BDCL+wQHfb6fIhJeI0MB10odXWLXDo/8Pk+BeeQfBzJWbvhFWgqa6E/HWHImN7HQ6UHhuj96wsq0oT5E0i1+lErrIySFb6/zDFSjqkFOD8u+dY=
+	t=1722417368; cv=none; b=Sd4uIiKYi2cF++8jY2u13wb917PprSv3rZB/+sRhmhj/EKD+8A85DxDwUUnwxIhoby/L2mAWLnHo+3azBsj3bd2DhSSb4oI42tWtOLnwOZYIqrEzBPhMMEpi96LkdZWGrgyqP+ElS5/MSioR+1GIe6u0CQePOM1INymn9Uq5W/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722417333; c=relaxed/simple;
-	bh=5dRH/gyWHuT7tv0mLIAqVK9bHuWlEWqJEFR+ZyD78HM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PdjhVj8n4tdLG9Nl3M8f6kHkTGCKLQjkTt/UU9spcIrgmdCOfTils4paMoaU/VwcPrBTw3FCKN0JAAG23DhGergkVgCK7x0u7VCxNlUAuh3CpTF9EjlFtBaB6rbUXJGJgXcK1VZILmhSGZYk+I5k6/pVITemIvRq7nUfOWP6uVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lOHjiF+r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B7E4C116B1;
-	Wed, 31 Jul 2024 09:15:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722417332;
-	bh=5dRH/gyWHuT7tv0mLIAqVK9bHuWlEWqJEFR+ZyD78HM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=lOHjiF+rWYQig3/4nV+bP2yFAMpgKIobLHqyDOP4pv+7LiDiXiNohE+PhAYr+DqGs
-	 qFz6W4FWua9Pw4Mk5Z0HvMePT/h9SDOxA93peNGkDiF+DCK95wN1piSaz9ZHeR7+bL
-	 A872Zvj9E4enM8/iR9G3Y7Q5TQNfVfF0/15Ifk9lnQAtcrDv84akcedvrdgCkYFZ9w
-	 EPTSpraCqDZGxPJZdxjdEat3LG6EYvYqa+bJShWWMtfA6+xhZxF/CLkssCuJohlEGo
-	 cK/35mv31yKaJ7LuETyW+V6nrsKAb409AdfmDOomC9ymMlpbTfuBrU3OdhBTBTbgFx
-	 nvLJeW/9Ka0Uw==
-From: Simon Horman <horms@kernel.org>
-Date: Wed, 31 Jul 2024 10:15:28 +0100
-Subject: [PATCH net-next] ethtool: Don't check for NULL info in
- prepare_data callbacks
+	s=arc-20240116; t=1722417368; c=relaxed/simple;
+	bh=XlHX40UfltCi30+lIask3v2Ve30eJqGeq0QdnxbKbPU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version; b=qln6voaLg3ONO3hE0HfDlv3jvWcpsxvXGJCvv9cUXEHCEViMWs3DN+cLTdoETND3jCjYHhEs296ZpKtkK6k7XX2K3mJfzYELCMXYmzXIN/ZmjK3fyA9hjHzwtdHTJTEt/XipXJsAZLylWfZyjeBKSzNjVhPzUmLShsJdL5c24Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
+Received: from localhost.localdomain (unknown [103.163.180.2])
+	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPA id 0012F6022F61E;
+	Wed, 31 Jul 2024 17:15:45 +0800 (CST)
+X-MD-Sfrom: youwan@nfschina.com
+X-MD-SrcIP: 103.163.180.2
+From: Youwan Wang <youwan@nfschina.com>
+To: linux@armlinux.org.uk
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	youwan@nfschina.com,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: [net-next,v4] net: phy: phy_device: fix PHY WOL enabled, PM failed to suspend
+Date: Wed, 31 Jul 2024 17:15:37 +0800
+Message-Id: <20240731091537.771391-1-youwan@nfschina.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <ZqdM1rwbmIED/0WC@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240731-prepare_data-null-check-v1-1-627f2320678f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAK8AqmYC/x2MUQqDMBAFryL73YUkLSpepRRJk9e6KFtJ0iKId
- 2/wc2BmdspIgkxDs1PCT7J8tIK9NBQmr2+wxMrkjLuZ7mp5TVh9whh98azfZeEwIcxsrO1iG3r
- TuyfVunov2c7znRSFFVuhx3H8AeFb8gZzAAAA
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- netdev@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Transfer-Encoding: 8bit
 
-Since commit f946270d05c2 ("ethtool: netlink: always pass genl_info to
-.prepare_data") the info argument of prepare_data callbacks is never
-NULL. Remove checks present in callback implementations.
+If the PHY of the mido bus is enabled with Wake-on-LAN (WOL),
+we cannot suspend the PHY. Although the WOL status has been
+checked in phy_suspend(), returning -EBUSY(-16) would cause
+the Power Management (PM) to fail to suspend. Since
+phy_suspend() is an exported symbol (EXPORT_SYMBOL),
+timely error reporting is needed. Therefore, an additional
+check is performed here. If the PHY of the mido bus is enabled
+with WOL, we skip calling phy_suspend() to avoid PM failure.
 
-Link: https://lore.kernel.org/netdev/20240703121237.3f8b9125@kernel.org/
-Signed-off-by: Simon Horman <horms@kernel.org>
+From the following logs, it has been observed that the phydev->attached_dev
+is NULL, phydev is "stmmac-0:01", it not attached, but it will affect suspend
+and resume.The actually attached "stmmac-0:00" will not dpm_run_callback():
+mdio_bus_phy_suspend().
+
+init log:
+[    5.932502] YT8521 Gigabit Ethernet stmmac-0:00: attached PHY driver
+(mii_bus:phy_addr=stmmac-0:00, irq=POLL)
+[    5.932512] YT8521 Gigabit Ethernet stmmac-0:01: attached PHY driver
+(mii_bus:phy_addr=stmmac-0:01, irq=POLL)
+[   24.566289] YT8521 Gigabit Ethernet stmmac-0:00: yt8521_read_status,
+link down, media: UTP
+
+suspend log:
+[  322.631362] OOM killer disabled.
+[  322.631364] Freezing remaining freezable tasks
+[  322.632536] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+[  322.632540] printk: Suspending console(s) (use no_console_suspend to debug)
+[  322.633052] YT8521 Gigabit Ethernet stmmac-0:01:
+PM: dpm_run_callback(): mdio_bus_phy_suspend+0x0/0x110 [libphy] returns -16
+[  322.633071] YT8521 Gigabit Ethernet stmmac-0:01:
+PM: failed to suspend: error -16
+[  322.669699] PM: Some devices failed to suspend, or early wake event detected
+[  322.669949] OOM killer enabled.
+[  322.669951] Restarting tasks ... done.
+[  322.671008] random: crng reseeded on system resumption
+[  322.671014] PM: suspend exit
+
+Add a function that phylib can inquire of the driver whether WoL
+has been enabled at the PHY.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Youwan Wang <youwan@nfschina.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 ---
- net/ethtool/linkinfo.c  | 2 +-
- net/ethtool/linkmodes.c | 2 +-
- net/ethtool/strset.c    | 3 +--
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ drivers/net/phy/phy_device.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/net/ethtool/linkinfo.c b/net/ethtool/linkinfo.c
-index 5c317d23787b..30b8ce275159 100644
---- a/net/ethtool/linkinfo.c
-+++ b/net/ethtool/linkinfo.c
-@@ -35,7 +35,7 @@ static int linkinfo_prepare_data(const struct ethnl_req_info *req_base,
- 	if (ret < 0)
- 		return ret;
- 	ret = __ethtool_get_link_ksettings(dev, &data->ksettings);
--	if (ret < 0 && info)
-+	if (ret < 0)
- 		GENL_SET_ERR_MSG(info, "failed to retrieve link settings");
- 	ethnl_ops_complete(dev);
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 7752e9386b40..34752a87f98f 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -279,6 +279,15 @@ static struct phy_driver genphy_driver;
+ static LIST_HEAD(phy_fixup_list);
+ static DEFINE_MUTEX(phy_fixup_lock);
  
-diff --git a/net/ethtool/linkmodes.c b/net/ethtool/linkmodes.c
-index b2591db49f7d..259cd9ef1f2a 100644
---- a/net/ethtool/linkmodes.c
-+++ b/net/ethtool/linkmodes.c
-@@ -40,7 +40,7 @@ static int linkmodes_prepare_data(const struct ethnl_req_info *req_base,
- 		return ret;
++static bool phy_drv_wol_enabled(struct phy_device *phydev)
++{
++	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
++
++	phy_ethtool_get_wol(phydev, &wol);
++
++	return wol.wolopts != 0;
++}
++
+ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+ {
+ 	struct device_driver *drv = phydev->mdio.dev.driver;
+@@ -288,6 +297,12 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+ 	if (!drv || !phydrv->suspend)
+ 		return false;
  
- 	ret = __ethtool_get_link_ksettings(dev, &data->ksettings);
--	if (ret < 0 && info) {
-+	if (ret < 0) {
- 		GENL_SET_ERR_MSG(info, "failed to retrieve link settings");
- 		goto out;
- 	}
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index c678b484a079..56b99606f00b 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -289,8 +289,7 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
- 		for (i = 0; i < ETH_SS_COUNT; i++) {
- 			if ((req_info->req_ids & (1U << i)) &&
- 			    data->sets[i].per_dev) {
--				if (info)
--					GENL_SET_ERR_MSG(info, "requested per device strings without dev");
-+				GENL_SET_ERR_MSG(info, "requested per device strings without dev");
- 				return -EINVAL;
- 			}
- 		}
++	/* If the PHY on the mido bus is not attached but has WOL enabled
++	 * we cannot suspend the PHY.
++	 */
++	if (!netdev && phy_drv_wol_enabled(phydev))
++		return false;
++
+ 	/* PHY not attached? May suspend if the PHY has not already been
+ 	 * suspended as part of a prior call to phy_disconnect() ->
+ 	 * phy_detach() -> phy_suspend() because the parent netdev might be the
+@@ -1975,7 +1990,6 @@ EXPORT_SYMBOL(phy_detach);
+ 
+ int phy_suspend(struct phy_device *phydev)
+ {
+-	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+ 	struct net_device *netdev = phydev->attached_dev;
+ 	const struct phy_driver *phydrv = phydev->drv;
+ 	int ret;
+@@ -1983,8 +1997,7 @@ int phy_suspend(struct phy_device *phydev)
+ 	if (phydev->suspended || !phydrv)
+ 		return 0;
+ 
+-	phy_ethtool_get_wol(phydev, &wol);
+-	phydev->wol_enabled = wol.wolopts ||
++	phydev->wol_enabled = phy_drv_wol_enabled(phydev) ||
+ 			      (netdev && netdev->ethtool->wol_enabled);
+ 	/* If the device has WOL enabled, we cannot suspend the PHY */
+ 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
+-- 
+2.25.1
 
 
