@@ -1,110 +1,128 @@
-Return-Path: <netdev+bounces-114440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A97F94298A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:49:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F2AD9429B2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:54:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA72284DF0
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:49:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17B781F21F37
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 08:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A377B1A8BEF;
-	Wed, 31 Jul 2024 08:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF04F1A8BF6;
+	Wed, 31 Jul 2024 08:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="MZPw1gAC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WQol9oX3"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391A718CBED;
-	Wed, 31 Jul 2024 08:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94AD1A7F87
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722415785; cv=none; b=NElvX5v5hMXc9wdOQJ3+VE0RV7dNG5baSGZJHwuEzhz4IBdBjngUuyCrodv7AipXpeqClc8lri8NiVQZif6eym6/1UHbe/4TI64bHRL58dT73IP6C/W6AwMIaJhbeAgD0z7SyUm7G6IcLdMzyA3meQvivnc+8rIrmVcBgKi/vYA=
+	t=1722416086; cv=none; b=W6+6Ug/MAnD1CjgtYZQjG2V8p7CJfLw6CHPY4ojwOfi6qllgxnIjRMMiETTgwkI/3pXMQLfiSizbamvwOK+XqeROfuEF68WQy+XGjs032xLPWAWLmolXBXFM6pE05beM3X8m87+q+kcjLNwL2BbrMgUXGPuAY7qgITErHd9lo2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722415785; c=relaxed/simple;
-	bh=zcTY/GqUfYE3yguTn78cETVE64YCw8EsY/LDEWceEGU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oaZ6ISh2ll32x5F9aF4NAqb1ArWQQX4Mktk53f95QQNDpo4eGAcl98/P8cM+OLpKdP6HoLC+Zmh3ylKvN5To+qM19H18kafvw1OoxxeD0J6GmvAV9aSEW+jRHzb9jELuiVsWFbRDcYIHVWRHJTfrEtcn6z/WClctNZdkUEDo/+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=MZPw1gAC; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [100.79.192.202] (unknown [4.194.122.170])
-	by linux.microsoft.com (Postfix) with ESMTPSA id A9A4C20B7165;
-	Wed, 31 Jul 2024 01:49:36 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A9A4C20B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1722415781;
-	bh=RDk+WVHxBeUm3xVFN39EW1/JZAEiQ71Gmv+Q/rbsnL4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MZPw1gACS8IkH89ctCMI5myecTJmMMcsK4MTAYUmAysGgVORi25CgqwXS45wxqvuS
-	 hfNy9DrWgSCIz2Wdh3uEMS80Foo6phzbkBrL4fP3qs6T4CA83aLFUyzweEZfaLq5iV
-	 pms0fjhLBpZT7waSSOnPZJ+muOhaE6PuPwX/hZIE=
-Message-ID: <f9dfaf0e-2f72-4917-be75-78856fb27712@linux.microsoft.com>
-Date: Wed, 31 Jul 2024 14:19:34 +0530
+	s=arc-20240116; t=1722416086; c=relaxed/simple;
+	bh=qmbJvr1Uuy1tS5AnKk7/a4dNC6RsQBMVIpnBMNp6TJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WIu2K3xfHq2koshjApuutxyDn+QyzqH4GBijcGBwEjOHRecTAh+2PvZct0HIuyw/ggZDWwUpBc+R6J2UbWWUv31HIAp7NnjYueNM+MTwnnslLTFE3RraFcey3Q9S3z8CLIdLX8mT5vSFI3eb5dvTNlydV8JwDsFBCFwPmil+CxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WQol9oX3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9769C116B1;
+	Wed, 31 Jul 2024 08:54:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722416086;
+	bh=qmbJvr1Uuy1tS5AnKk7/a4dNC6RsQBMVIpnBMNp6TJI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WQol9oX3QO1yPMil8dpygVEjJx/zbPmkgQB+uGOgfYzaTfPxs+q7YvBaonwj55y0c
+	 ArQClHRNK8XCjrjaHCiMWvxjWSNbdmnoNsif8KSk3AosVtY8fXeEXBYYi2VsggGSeZ
+	 Ds5rN32IW6ix3luj2lD9fnPrbbbUcEC8Si5wh+B0OTUxK0+rV/1VPG6EWYu1c13pV5
+	 kFIlbRcbIpX8ZvwK0rQVMRQKKbuboSyTI3K7QFhnNCve2B+HnY9j+IQxKckiFmgYxM
+	 RCa9f3WDYiEx45uzxFSTu0ebMc7t9iB7EcBAunQa4gBNLk2ua8UJtdGgoJgSl8shyj
+	 JBDifU2bZuRwA==
+Date: Wed, 31 Jul 2024 09:54:42 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+	Ariane Keller <ariane.keller@tik.ee.ethz.ch>,
+	"Simek, Michal" <michal.simek@amd.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"Katakam, Harini" <harini.katakam@amd.com>
+Subject: Re: net: xilinx: axienet: Query about checksum partial implementation
+Message-ID: <20240731085442.GN1967603@kernel.org>
+References: <20240726120700.GA1694627@kernel.org>
+ <MN0PR12MB59534F7030FB73002F1223F4B7B02@MN0PR12MB5953.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: mana: Implement
- get_ringparam/set_ringparam for mana
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
- Ajay Sharma <sharmaajay@microsoft.com>, Simon Horman <horms@kernel.org>,
- Konstantin Taranov <kotaranov@microsoft.com>,
- Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
- Erick Archer <erick.archer@outlook.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Colin Ian King <colin.i.king@gmail.com>
-References: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
-Content-Language: en-US
-From: Naman Jain <namjain@linux.microsoft.com>
-In-Reply-To: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN0PR12MB59534F7030FB73002F1223F4B7B02@MN0PR12MB5953.namprd12.prod.outlook.com>
 
-
-
-On 7/30/2024 10:31 PM, Shradha Gupta wrote:
-> Currently the values of WQs for RX and TX queues for MANA devices
-> are hardcoded to default sizes.
-> Allow configuring these values for MANA devices as ringparam
-> configuration(get/set) through ethtool_ops.
+On Tue, Jul 30, 2024 at 07:15:13PM +0000, Pandey, Radhey Shyam wrote:
+> > -----Original Message-----
+> > From: Simon Horman <horms@kernel.org>
+> > Sent: Friday, July 26, 2024 5:37 PM
+> > To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>
+> > Cc: Daniel Borkmann <daniel@iogearbox.net>; Ariane Keller
+> > <ariane.keller@tik.ee.ethz.ch>; Simek, Michal <michal.simek@amd.com>;
+> > netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org
+> > Subject: net: xilinx: axienet: Query about checksum partial implementation
+> > 
+> > Hi Radhey, all,
+> > 
+> > I am wondering if you could shed some light on the following checksum
+> > partial handling in the axienet_rx_poll():
+> > 
+> >                         /* if we're doing Rx csum offload, set it up */
+> >                         if (lp->features & XAE_FEATURE_FULL_RX_CSUM) {
+> > 				...
+> >                         } else if ((lp->features & XAE_FEATURE_PARTIAL_RX_CSUM) != 0
+> > &&
+> >                                    skb->protocol == htons(ETH_P_IP) &&
+> >                                    skb->len > 64) {
+> >                                 skb->csum = be32_to_cpu(cur_p->app3 & 0xFFFF);
+> >                                 ...
+> >                         }
+> > 
+> > In particluar the "skb->csum =" line.
+> > 
+> > The type of cur_p->app3 is u32, and 0xFFFF is also host byte order.
+> > So far so good. But after the bitwise operation it is treated as a big-endian
+> > value by passing it to be32_to_cpu.
+> > 
+> > Perhaps I am missing something obvious, but my question is how does that
+> > work?
+> > 
+> > * Was it only tested on big endian sysgtems where be32_to_cpu() is a no-op
+> > 
+> > * Was it only tested on little endian systems where be32_to_cpu()
+> >   is a byteswap and somehow that works (how?).
+> > 
+> > * Is the code unecessised because the XAE_FEATURE_FULL_RX_CSUM branch
+> > is
+> >   always taken?
+> > 
+> >   A grep of dts files shows up arch/microblaze/boot/dts/system.dts which
+> >   sets sets xlnx,rxcsum to 0, which corresponds to XAE_NO_CSUM_OFFLOAD.
 > 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Long Li <longli@microsoft.com>
-> ---
->   Changes in v2:
->   * Removed unnecessary validations in mana_set_ringparam()
->   * Fixed codespell error
->   * Improved error message to indicate issue with the parameter
-> ---
->   drivers/net/ethernet/microsoft/mana/mana_en.c | 20 +++---
->   .../ethernet/microsoft/mana/mana_ethtool.c    | 66 +++++++++++++++++++
->   include/net/mana/mana.h                       | 21 +++++-
->   3 files changed, 96 insertions(+), 11 deletions(-)
+> + Harini
 > 
+> Yes, IIRC default AXI Ethernet IP RX checksum is set to "No checksum offload"
+> so, it is default case and being set in most designs. Have added Harini to this
+> thread to confirm on partial checksum verification results.
+> 
+> Assuming partial implementation is functional then likely DMA IP updates
+> application field in big endian format and that is the reason we have this
+> be32 to CPU conversion in place. will dig a bit more and get back on it.
 
- From what I understand, we are adding support for "ethtool -G --set-
-ring"  command.
-Please correct me if I am wrong.
+Thanks, much appreciated.
 
-Maybe it would be good to capture the benefit/purpose of this patch in
-the commit msg, as in which use-cases/scenarios we are now trying to
-support that previously were not supported. The "why?" part basically.
-
-
-
-Regards,
-Naman Jain
+FWIIW, I do agree that the scenario you describe would mostly explain
+things, although the mask with 0xFFFF still seems off.
 
