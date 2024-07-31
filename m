@@ -1,179 +1,101 @@
-Return-Path: <netdev+bounces-114685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4865A94375E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:48:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9B3943773
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35F8CB22648
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:47:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B8701C21EDD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772DA16C689;
-	Wed, 31 Jul 2024 20:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDF916087B;
+	Wed, 31 Jul 2024 20:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WjH26Lyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F94B166302;
-	Wed, 31 Jul 2024 20:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD9A482CA;
+	Wed, 31 Jul 2024 20:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722458869; cv=none; b=tXyi5C3XZ1MCWGvMBIuTItVNoqsrqG/4G4i8BZDDndIsKpga/xu42i63eipArf3ECldMXszrLJ9PoTASgRyL+KKWoExLhxZw9i7Lew5E3ZMd3X8OLWHN6FPDhDEph5uvBimAVqOJ8ghZWEC4+THz9iBo2DXBv3qTvGoNYbpJufI=
+	t=1722459426; cv=none; b=rnZrFdboSmnAhMfz6p7MHVvvt/KwOqdXzWiqkM5NSww1TA4XjT6khRQCa25+FSWGTIV3vOH7tNKSfcBj5isgu8uvTSLNh4vKPDqMYLY3488E8Gi1eOowyqV2+ggQqTmdwuJ1Q6rHNn47r0AkjUn/DB0RUBqq9pYZ5p0Knz/n07s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722458869; c=relaxed/simple;
-	bh=wvwzBvVYGlnPkZwpUgnXDs/VKolXcK8kB6VaNsLt8cM=;
+	s=arc-20240116; t=1722459426; c=relaxed/simple;
+	bh=S6cIvGR5mOk2G7VAoRfOCaXFBOwMiNuDrGBl4qDM7wY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IZZaSdVrTZ0CGCOKa0WUZqe3NYTDF5KeRl2TwDkbJvOBwNKlMLlZOqeeT+JmY2OJ0Pkrjr8bHGWqtQl8HMGHWvQxrHHd8TYSEbuAunOUveG/vM/4EJKO2tbE5pE7+WmYCFdqlnvYSPxxFOZYKexm6ShBl+ksBuecRSqRLmDLIvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1ff4568676eso9319495ad.0;
-        Wed, 31 Jul 2024 13:47:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722458866; x=1723063666;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7OVE8lD+bcDnTawhtJUlCaaG770gkL35RjxhQ3R4n5Y=;
-        b=qpPPWh+2S0kXnzFfrsYlxe04ceBGpbx3Suv5Sjwahwlset3YB7tyzTJBt0IXGYlrKD
-         75IeGN1MZWLuLlve82VX22vH+2ykTGjtgWjR5zdkna0EjUnoocwOn4cffHxi5XizhUOJ
-         PjlQRIJJT8AV+68p11qlQXYkUnOgB1Dy6Hcy5i8kPVbDGJyGhQME/0E3WMy4x8/sRAgf
-         +3W5FEAtqFd6XZk7aa+Z2vKIJMJrmERm2ff0Pz/G+wbvRBDH5Y6ia14DuOpjzw6IBF3G
-         cBDz7RMw2zSjSbkuemjh9jQ2ZW48uDkLEW7UiR0/QXeWETB2wZUWs99LK3RBLOvZpex2
-         tkQA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2536lv8pbqV/ztz/KgptzNeSK9B+fB33OGnkD4jPn5p5CGpdCMAfUokCsjgao8qRDIvRLuamY26K8v8fMh6TVJvXtCAx7qaIkxc1b7rSg
-X-Gm-Message-State: AOJu0YziiNXscJbT1vCyT4EBfO8Va6Ut4DpqNb1qga0O6fxJ1MyBZpt7
-	lOLwj9bUaRE5wMaCzwGxoJNlCLsUvAEj9DQoXKzV8zojjeoOxsklmiqs5iM=
-X-Google-Smtp-Source: AGHT+IFSgpmn53WE4TxsX/0XyZnKp/h2eyZI0b57n7EPQLZb4aJ06yfVfFzeepPcU8jkjgRUArmIIA==
-X-Received: by 2002:a17:902:c94d:b0:1fb:a1cb:cb25 with SMTP id d9443c01a7336-1ff4d2363ebmr6551645ad.40.1722458865498;
-        Wed, 31 Jul 2024 13:47:45 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7fb2d12sm125038845ad.259.2024.07.31.13.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 13:47:45 -0700 (PDT)
-Date: Wed, 31 Jul 2024 13:47:44 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Shuah Khan <shuah@kernel.org>,
-	Joe Damato <jdamato@fastly.com>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] selftests: net: ksft: support marking
- tests as disruptive
-Message-ID: <Zqqi8LhvSn1MXu9B@mini-arch>
-References: <20240730223932.3432862-1-sdf@fomichev.me>
- <20240730223932.3432862-2-sdf@fomichev.me>
- <878qxh7mf4.fsf@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PQQe8XeZMF/l7tu5viHBaDHgqW7jDS0lVf1UenZmazyx9cVuCgQ5Yt93MUVBizaIglUaI3GsDi/244Sb+SfCQ8o3NrHkXzH/9HsxDb1ebvRtjB8o2u4bV9kfkk04bHe/3hH99y4aVbx+VRjOlndqhvDvv80DcT6y9f4/MoWzAFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WjH26Lyz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Z2w+dNclAsqk4wZhdlz04USVS7DM8QutvGTc2QRMkiw=; b=WjH26LyzdkyLNZWCd6RZ6aFCa5
+	5uVtFij44MxI+Fersgih1A9CSC7it3xJj1wKYMgZFyByhKZUgBfqWAM/MeHchlwq+z2V6aLnNAZQL
+	tq09tyt0GHaSku3sY0nkri9o0XLxAZ0vHw9ZBlbqPvWJn5VmUECVtLShBL2vYgLUDVyw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sZGNY-003iAy-5R; Wed, 31 Jul 2024 22:57:00 +0200
+Date: Wed, 31 Jul 2024 22:57:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me
+Subject: Re: [PATCH net-next v2 2/6] rust: net::phy support probe callback
+Message-ID: <5055051e-b058-400f-861d-e7438bebb017@lunn.ch>
+References: <20240731042136.201327-1-fujita.tomonori@gmail.com>
+ <20240731042136.201327-3-fujita.tomonori@gmail.com>
+ <5525a61c-01b7-4032-97ee-4997b19979ad@lunn.ch>
+ <CAH5fLggyhvEhQL_VWdd38QyFuegPY5mXY_J-jZrh9w8=WPb2Vg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <878qxh7mf4.fsf@nvidia.com>
+In-Reply-To: <CAH5fLggyhvEhQL_VWdd38QyFuegPY5mXY_J-jZrh9w8=WPb2Vg@mail.gmail.com>
 
-On 07/31, Petr Machata wrote:
-> 
-> Stanislav Fomichev <sdf@fomichev.me> writes:
-> 
-> > Add new @ksft_disruptive decorator to mark the tests that might
-> > be disruptive to the system. Depending on how well the previous
-> > test works in the CI we might want to disable disruptive tests
-> > by default and only let the developers run them manually.
+> > > +    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+> > > +    unsafe extern "C" fn probe_callback(phydev: *mut bindings::phy_device) -> core::ffi::c_int {
+> > > +        from_result(|| {
+> > > +            // SAFETY: This callback is called only in contexts
+> > > +            // where we can exclusively access to `phy_device`, so the accessors on
+> > > +            // `Device` are okay to call.
 > >
-> > KSFT framework runs disruptive tests by default. DISRUPTIVE=False
-> > environment (or config file) can be used to disable these tests.
-> > ksft_setup should be called by the test cases that want to use
-> > new decorator (ksft_setup is only called via NetDrvEnv/NetDrvEpEnv for now).
+> > This one is slightly different to other callbacks. probe is called
+> > without the mutex. Instead, probe is called before the device is
+> > published. So the comment is correct, but given how important Rust
+> > people take these SAFETY comments, maybe it should indicate it is
+> > different to others?
 > 
-> Is that something that tests would want to genuinely do, manage this
-> stuff by hand? I don't really mind having the helper globally
-> accessible, but default I'd keep it inside env.py and expect others to
-> inherit appropriately.
+> Interesting. Given that we don't hold the mutex, does that mean that
+> some of the methods on Device are not safe to call in this context? Or
+> is there something else that makes it okay to call them despite not
+> holding the mutex?
 
-Hard to say how well it's gonna work tbh. But at least from
-what I've seen, large code bases (outside of kernel) usually
-have some way to attach metadata to the testcase to indicate
-various things. For example, this is how the timeout
-can be controlled:
+probe is always the first method called on a device driver to match it
+to a device. Traditionally, if probe fails, the device is destroyed,
+since there is no driver to drive it. probe needs to complete
+successfully before the phy_device structure is published so a MAC
+driver can reference it. If it is not published, nothing can have
+access to it, so you don't need to worry about parallel activities on
+it.
 
-https://bazel.build/reference/test-encyclopedia#role-test-runner
+And a PHY driver does not need a probe function. Historically, probe
+was all about, can this driver drive this hardware. However, since we
+have ID registers in the hardware, we already know the driver can
+drive the hardware. So probe is now about setting up whatever needs
+setting up. For PHY drivers, there is often nothing, no local state
+needed, etc. So the probe is optional.
 
-So I'd imagine we can eventually have @kstf_short/@ksft_long to
-control that using similar techniques.
-
-Regarding keeping it inside env.py: can you expand more on what
-you mean by having the default in env.py?
-
-> > @@ -127,6 +129,36 @@ KSFT_RESULT_ALL = True
-> >              KSFT_RESULT = False
-> >  
-> >  
-> > +def ksft_disruptive(func):
-> > +    """
-> > +    Decorator that marks the test as disruptive (e.g. the test
-> > +    that can down the interface). Disruptive tests can be skipped
-> > +    by passing DISRUPTIVE=False environment variable.
-> > +    """
-> > +
-> > +    @functools.wraps(func)
-> > +    def wrapper(*args, **kwargs):
-> > +        if not KSFT_DISRUPTIVE:
-> > +            raise KsftSkipEx(f"marked as disruptive")
-> 
-> Since this is a skip, it will fail the overall run. But that happened
-> because the user themselves set DISRUPTIVE=0 to avoid, um, disruption to
-> the system. I think it should either be xfail, or something else
-> dedicated that conveys the idea that we didn't run the test, but that's
-> fine.
-> 
-> Using xfail for this somehow doesn't seem correct, nothing failed. Maybe
-> we need KsftOmitEx, which would basically be an xfail with a more
-> appropriate name?
-
-Are you sure skip will fail the overall run? At least looking at
-tools/testing/selftests/net/lib/py/ksft.py, both skip and xfail are
-considered KSFT_RESULT=True. Or am I looking at the wrong place?
-
-> > +def ksft_setup(env):
-> > +    """
-> > +    Setup test framework global state from the environment.
-> > +    """
-> > +
-> > +    def get_bool(env, name):
-> > +        return env.get(name, "").lower() in ["true", "1"]
-> 
-> "yes" should alse be considered, for compatibility with the bash
-> selftests.
-> 
-> It's also odd that 0 is false, 1 is true, but 2 is false again. How
-> about something like this?
-> 
->     def get_bool(env, name):
->         value = env.get(name, "").lower()
->         if value in ["yes", "true"]:
->             return True
->         if value in ["no", "false"]:
->             return False
-> 
->         try:
->             return bool(int(value))
->         except:
->             raise something something invalid value
-> 
-> So that people at least know if they set it to nonsense that it's
-> nonsense?
-> 
-> Dunno. The bash selftests just take "yes" and don't care about being
-> very user friendly in that regard at all. _load_env_file() likewise
-> looks like it just takes strings and doesn't care about the semantics.
-> So I don't feel too strongly about this at all. Besides the "yes" bit,
-> that should be recognized.
-
-Sure, will do!
-
-(will also apply your suggestions for 1/2 so want reply separately)
+	Andrew
 
