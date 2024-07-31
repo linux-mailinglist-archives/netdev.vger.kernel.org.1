@@ -1,203 +1,134 @@
-Return-Path: <netdev+bounces-114594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 028ED942FDA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:14:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0C6942FE1
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 267A41C21EF6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:14:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9684B1F2B7B8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 13:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABABC1B0136;
-	Wed, 31 Jul 2024 13:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171EA19F49A;
+	Wed, 31 Jul 2024 13:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="wajVT+5T"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="UAQWzipR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1903F1A7F73
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 13:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F9D1EB3E
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 13:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722431646; cv=none; b=ilQ0yBaqWMDmLekhyHkZR8a+mKYFzfdrJcMv4LbnQ9GqWkMDWSZI6uaVhVUNjeIPw7G1Eov4kZndPbUpMWFSqL4T0SWwi4H026jA/gVcbQoPPJ7K68Wi3B/0qm1Mr9ZnHavV75Papt+4ZeN3pLugbXru+i6WiNr1MhPDNeA56gw=
+	t=1722431749; cv=none; b=mQecWx6DnIcmZhKl2V10bgVtKifW+R5KwK/Hr35vd1erbOj6TWKjV4OS1N6xj6HIIdqMaqi7v1upHoCPRssSyA+XfG/LPlfWEeVCPEFFk6DVUwTuPevlduZE28dCUHbTV1Ll/25V6rBGDn4lDwjATA3a1jHVhNRAGNQOM5Fixgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722431646; c=relaxed/simple;
-	bh=dRUl5uO2/1w2AkZ6UsxlBKx5HK2elVKj2ZXm6+VDf4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RPgW2mWUGZOEsVcUgFMha87cEsP0abQKldaLv9gphsXAErE3enGpdWLVFZrHzPtAD4InKIM5O/EdN2eZPpGVnihbwXhn0yOGIEnxbRSZ93m9qgnJSOIlipkSNeZnlarFWzjeeoGhAbvR+wTvmyMwpQXeb+lSty4zMvARGIZZKmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=wajVT+5T; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4266dc7591fso34704135e9.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 06:14:03 -0700 (PDT)
+	s=arc-20240116; t=1722431749; c=relaxed/simple;
+	bh=t35pw5QbAc7zE4aVjQu0odFgWmIf85MJqJY5k29MalA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r2QFCeBsM6E9fGlRQjs3leM6FbHfcgpxDI2nzXzC4KMHL70M4Kp8lcKzRALy9U0WDJJIT+/69e54YvK4RwXWtmvjqrQbA2L8RQz8JyOsx9EV+W/2791JoVVNwXhXF6idQ3thwVOXmAycPpCUT7ji0S4T2UlLPs7TKn/LAXxvhSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=UAQWzipR; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-70d1fb6c108so4135812b3a.3
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 06:15:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1722431642; x=1723036442; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zj5Jtjusxp7Zt+Ae/Nq1thR0rw87CuLNCK2IcHdr3Uo=;
-        b=wajVT+5TXV0E7emE5d59vtD5Rhl6FReKntrFjykdVUePrHb/s1UqvIgaM2fKPqVO8E
-         PTlJnnsfBXVRPxJFJjigmrta0CmaIXD5WdL69Y/VDAccY1WxeV8NFBJqr+g63OswXP8v
-         hNhVjs1mE2UQLAnmRO0bmwZR/sUaCYoQXCi3E=
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1722431746; x=1723036546; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3SVrM3JzGDqZmr/ukQvjrjCLXejSov7aNR7jzT5VsVU=;
+        b=UAQWzipRxSZ48DZeZf2jLUqdAFETkhwZR4LEXFmxsLd9jGRBl2OLhXdfFEVqR7xc6J
+         VEHxADDl0aSiGyLCNwh/AsQTEiwApY4N80LtcrhyQI0HT+NKe35CSo7kewNRHyMDNBF3
+         qzlQFzr58ps1wgBojvyJk3TIAXhAkCRA5aDlHTBEnqIeiXVJcnDcGpASBueApGDYQtgS
+         mQxeheUD8utby1mCP58WoV+WS8y3xzqiZwkMY4PUfRPTzyd9mcOz2tItflQ+k+XcwQ+O
+         3h1iONwnGtCM3HH8rb37INcUNt3mID9POWdIIDOfuRfVhaidacono7eqdea2mORn8N35
+         JOdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722431642; x=1723036442;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zj5Jtjusxp7Zt+Ae/Nq1thR0rw87CuLNCK2IcHdr3Uo=;
-        b=eGzpOJMD+k7UduadQ6WJDPL9KsM+E8Z8hWpD9/zsIAohp8gLOoWetIRJ+2A3SqbwAA
-         aDQGuBmXtx318bhG6OhBxhE6mAdhNaFD09aIuijE1qdO6/EOOZygBA74Eaa3WpkCR8qE
-         /Ew9wcCjhxYbg7zq9l6ssykSENGzokmjylRctZF1tVrpcnO6bwL7RmL9zqpIHf40suWT
-         +YOWFyerK2shfZv3gh7BF/wgEzndsQYkGm9iM+C5VIRtDKZ5zoaG9W12SiC9Os4LX18m
-         fdHab+XmR7KE5duqfed0GmQQOeCiVuDWnALQDoLjHU+Ea44VmosJbvZOizMw4iIdS49l
-         5Z5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVv1G3K1xKdvjTuBWiVrx2P1/eJvfdjXG9GhOQuMD47gG147gYRO6tz4MqUzVx5Uz2WROD4M+FIof7ZgaettBxmc3i40wcK
-X-Gm-Message-State: AOJu0YzV3LJWCEGtlAlDkf+Lyj07hlAc5npM5GOVsDjx6tQVwzbYn0kU
-	l0k5+f/Ypa2Oo0pmjuEhnmFUB9fFZptLrY9aqly4L06rPyl6mBcN29uZI8TXmnc=
-X-Google-Smtp-Source: AGHT+IGQC6tx/MC7EYcFI4vcnmNoGD0rWPlisuiwk0XIMVJTZY/hSMJAQaLCHm1jOPqmt73OCmxsSw==
-X-Received: by 2002:a05:600c:4f0f:b0:426:54c9:dfe5 with SMTP id 5b1f17b1804b1-42811d8c567mr100069335e9.10.1722431642409;
-        Wed, 31 Jul 2024 06:14:02 -0700 (PDT)
-Received: from LQ3V64L9R2 ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36862516sm16960019f8f.104.2024.07.31.06.14.01
+        d=1e100.net; s=20230601; t=1722431746; x=1723036546;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3SVrM3JzGDqZmr/ukQvjrjCLXejSov7aNR7jzT5VsVU=;
+        b=LFpGqsVRauggqExfqiz4N7vtFQ9iia3Bn4Yx+wbZ37ic2tPSImDOY1CbF9i2bM5ae6
+         QabRVqj5PcNDcU+Tz9nux5wbk4TW1uJ6FOVHN6c1YLQgpvMYxnoSkASleyZKIwH8znuv
+         G1BkoGkNlr+2lmlHsoYewj1zbV4xEcIhRKd2hVn9GS7wb6pNRmXegJ5adoYqaPh9L/VC
+         oGy28m842Se+MwJpbElWyv2MARhXShM8wMUQ7n4RJFqhZ5EIdG6JIriVsPhlz8i0653s
+         aiqE42ca1LxoE5bRtdw0tw3BGoUUqNl9D2Hd6cbjLBJcj2yjCBkiI9as3GK1wcqOMdi0
+         EtCQ==
+X-Gm-Message-State: AOJu0YxLKJtaINULnqTlpQuWGsrtpUrFZOq/0kO8hwFj8ZWzUV/XsrlF
+	APjm6NlB0Qx+i4r3/g+uXJ4TCCrRPHcoT64TqQmwNcN3oC7JaEMtpCLZKpGWqjsnOgijIy3lTpc
+	27Mk=
+X-Google-Smtp-Source: AGHT+IFXlXjJKkynIQXL2rqayGvDXTMn9UzLmogLg9m5jIfw9c3kNQ2GF8TmG6Hjx6BuCQUqQhIgzg==
+X-Received: by 2002:a05:6a21:339f:b0:1c4:985a:acc4 with SMTP id adf61e73a8af0-1c4a14d9739mr14639687637.46.1722431746511;
+        Wed, 31 Jul 2024 06:15:46 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-012.fbsv.net. [2a03:2880:ff:c::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead8751d3sm9959058b3a.168.2024.07.31.06.15.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 06:14:02 -0700 (PDT)
-Date: Wed, 31 Jul 2024 14:14:00 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, sudongming1@huawei.com,
-	xujunsheng@huawei.com, shiyongbang@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next 04/10] net: hibmcge: Add interrupt supported
- in this module
-Message-ID: <Zqo4mGq88BajjLk_@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jijie Shao <shaojijie@huawei.com>, yisen.zhuang@huawei.com,
-	salil.mehta@huawei.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, sudongming1@huawei.com,
-	xujunsheng@huawei.com, shiyongbang@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240731094245.1967834-1-shaojijie@huawei.com>
- <20240731094245.1967834-5-shaojijie@huawei.com>
+        Wed, 31 Jul 2024 06:15:46 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	David Wei <dw@davidwei.uk>
+Subject: [PATCH net-next v2 0/3] fix bnxt_en queue reset when queue is active
+Date: Wed, 31 Jul 2024 06:15:38 -0700
+Message-ID: <20240731131542.3359733-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731094245.1967834-5-shaojijie@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 31, 2024 at 05:42:39PM +0800, Jijie Shao wrote:
-> The driver supports four interrupts: TX interrupt, RX interrupt,
-> mdio interrupt, and error interrupt.
-> 
-> Actually, the driver does not use the mdio interrupt.
-> Therefore, the driver does not request the mdio interrupt.
+The current bnxt_en queue API implementation is buggy when resetting a
+queue that has active traffic. The problem is that there is no FW
+involved to stop the flow of packets and relying on napi_disable() isn't
+enough.
 
-I might be reading this wrong, but the commit message seems a bit
-confusing? If it's not used then why allocate it?
+To fix this, call bnxt_hwrm_vnic_update() with MRU set to 0 for both the
+default and the ntuple vnic to stop the flow of packets. This works for
+any Rx queue and not only those that have ntuple rules since every Rx
+queue is either in the default or the ntuple vnic.
 
-[...]
+The first patch is from Michael Chan and adds the prerequisite vnic
+functions and definitions.
 
-> ---
->  .../ethernet/hisilicon/hibmcge/hbg_common.h   |  20 ++
->  .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  59 ++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   8 +
->  .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  | 189 ++++++++++++++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_irq.h  |  13 ++
->  .../net/ethernet/hisilicon/hibmcge/hbg_main.c |   9 +
->  .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  34 ++++
->  .../hisilicon/hibmcge/hbg_reg_union.h         |  60 ++++++
->  8 files changed, 392 insertions(+)
->  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
->  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.h
- 
-[...]
+Tested on BCM957504 while iperf3 is active:
 
-> +
-> +static const char *irq_names_map[HBG_VECTOR_NUM] = { "tx", "rx", "err", "mdio" };
-> +
-> +int hbg_irq_init(struct hbg_priv *priv)
-> +{
-> +	struct hbg_vector *vectors = &priv->vectors;
-> +	struct hbg_irq *irq;
-> +	int ret;
-> +	int i;
-> +
-> +	ret = pci_alloc_irq_vectors(priv->pdev, HBG_VECTOR_NUM, HBG_VECTOR_NUM,
-> +				    PCI_IRQ_MSI);
+1. Reset a queue that has an ntuple rule steering flow into it
+2. Reset all queues in order, one at a time
 
-No MSI-X ?
+In both cases the flow is not interrupted.
 
-This seems to request HBG_VECTOR_NUM (4) IRQs and errors out if ret
-!= HBG_VECTOR_NUM, but ...
+Sending this to net-next as there is no in-tree kernel consumer of queue
+API just yet, and there is a patch that changes when the queue_mgmt_ops
+is registered.
 
-> +	if (ret < 0) {
-> +		dev_err(&priv->pdev->dev,
-> +			"failed to allocate MSI vectors, vectors = %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	if (ret != HBG_VECTOR_NUM) {
-> +		dev_err(&priv->pdev->dev,
-> +			"requested %u MSI, but allocated %d MSI\n",
-> +			HBG_VECTOR_NUM, ret);
-> +		ret = -EINVAL;
-> +		goto free_vectors;
-> +	}
-> +
-> +	vectors->irqs = devm_kcalloc(&priv->pdev->dev, HBG_VECTOR_NUM,
-> +				     sizeof(struct hbg_irq), GFP_KERNEL);
-> +	if (!vectors->irqs) {
-> +		ret = -ENOMEM;
-> +		goto free_vectors;
-> +	}
-> +
-> +	/* mdio irq not request */
-> +	vectors->irq_count = HBG_VECTOR_NUM - 1;
+---
+v2:
+ - split setting vnic->mru into a separate patch (Wojciech)
+ - clarify why napi_enable()/disable() is removed
 
-Here the comment says mdio is not requested? But it does seem like
-the IRQ is allocated above, it's just unused?
+David Wei (3):
+  bnxt_en: set vnic->mru in bnxt_hwrm_vnic_cfg()
+  bnxt_en: stop packet flow during bnxt_queue_stop/start
+  bnxt_en: only set dev->queue_mgmt_ops if BNXT_SUPPORTS_NTUPLE_VNIC
 
-Maybe above you should remove mdio completely if its not in use?
+Michael Chan (1):
+  bnxt_en: Add support to call FW to update a VNIC
 
-Or is it used later in some other patch or something?
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 50 ++++++++++++++++---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  3 ++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hsi.h | 37 ++++++++++++++
+ 3 files changed, 83 insertions(+), 7 deletions(-)
 
-> +	for (i = 0; i < vectors->irq_count; i++) {
-> +		irq = &vectors->irqs[i];
-> +		snprintf(irq->name, sizeof(irq->name) - 1, "%s-%s-%s",
-> +			 HBG_DEV_NAME, pci_name(priv->pdev), irq_names_map[i]);
-> +
-> +		irq->id = pci_irq_vector(priv->pdev, i);
-> +		irq_set_status_flags(irq->id, IRQ_NOAUTOEN);
-> +		ret = request_irq(irq->id, hbg_irq_handle,
-> +				  0, irq->name, priv);
-> +		if (ret) {
-> +			dev_err(&priv->pdev->dev,
-> +				"failed to requset irq(%d), ret = %d\n",
-> +				irq->id, ret);
-> +			goto free_vectors;
-> +		}
-> +	}
-> +
-> +	vectors->info_array = hbg_irqs;
-> +	vectors->info_array_len = ARRAY_SIZE(hbg_irqs);
-> +	return 0;
-> +
-> +free_vectors:
-> +	hbg_irq_uninit(priv);
-> +	return ret;
-> +}
-
-[...]
+-- 
+2.43.0
 
 
