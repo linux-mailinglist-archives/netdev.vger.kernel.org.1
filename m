@@ -1,59 +1,86 @@
-Return-Path: <netdev+bounces-114686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A9B3943773
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 22:57:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DADE6943792
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 23:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B8701C21EDD
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 20:57:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37A78B214A1
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 21:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDF916087B;
-	Wed, 31 Jul 2024 20:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB68D16C6BA;
+	Wed, 31 Jul 2024 21:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WjH26Lyz"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="o/Tz0jue"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD9A482CA;
-	Wed, 31 Jul 2024 20:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E0816938C
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 21:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722459426; cv=none; b=rnZrFdboSmnAhMfz6p7MHVvvt/KwOqdXzWiqkM5NSww1TA4XjT6khRQCa25+FSWGTIV3vOH7tNKSfcBj5isgu8uvTSLNh4vKPDqMYLY3488E8Gi1eOowyqV2+ggQqTmdwuJ1Q6rHNn47r0AkjUn/DB0RUBqq9pYZ5p0Knz/n07s=
+	t=1722460317; cv=none; b=YBiBnliiyE8ueLFzeEnHBHlYXWdKyUcyNK67zCynEHsL4jsYPEmWFhm4oR+UubHqzL8t5NgDQp0acWtMwzZ3V7ylgemKrnksJ1Zfj7aULHpRs+aFd4MeDfH4kA5f3XNZE/s/alCqnOEYd9wGMKARky1tYXTKEgG+e+QjlE4snsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722459426; c=relaxed/simple;
-	bh=S6cIvGR5mOk2G7VAoRfOCaXFBOwMiNuDrGBl4qDM7wY=;
+	s=arc-20240116; t=1722460317; c=relaxed/simple;
+	bh=EZqrkOuzvZ52XOMTxZgs+Cr/oGYo9OlHNt4FT39kZOM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PQQe8XeZMF/l7tu5viHBaDHgqW7jDS0lVf1UenZmazyx9cVuCgQ5Yt93MUVBizaIglUaI3GsDi/244Sb+SfCQ8o3NrHkXzH/9HsxDb1ebvRtjB8o2u4bV9kfkk04bHe/3hH99y4aVbx+VRjOlndqhvDvv80DcT6y9f4/MoWzAFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WjH26Lyz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Z2w+dNclAsqk4wZhdlz04USVS7DM8QutvGTc2QRMkiw=; b=WjH26LyzdkyLNZWCd6RZ6aFCa5
-	5uVtFij44MxI+Fersgih1A9CSC7it3xJj1wKYMgZFyByhKZUgBfqWAM/MeHchlwq+z2V6aLnNAZQL
-	tq09tyt0GHaSku3sY0nkri9o0XLxAZ0vHw9ZBlbqPvWJn5VmUECVtLShBL2vYgLUDVyw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sZGNY-003iAy-5R; Wed, 31 Jul 2024 22:57:00 +0200
-Date: Wed, 31 Jul 2024 22:57:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me
-Subject: Re: [PATCH net-next v2 2/6] rust: net::phy support probe callback
-Message-ID: <5055051e-b058-400f-861d-e7438bebb017@lunn.ch>
-References: <20240731042136.201327-1-fujita.tomonori@gmail.com>
- <20240731042136.201327-3-fujita.tomonori@gmail.com>
- <5525a61c-01b7-4032-97ee-4997b19979ad@lunn.ch>
- <CAH5fLggyhvEhQL_VWdd38QyFuegPY5mXY_J-jZrh9w8=WPb2Vg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GcpWySkY/BXFyinb1nERHd5D8ZeUBSdsjWEq3pRVi51Mu3+Uy6Qq5c2iZzyyvdDhSGRe5/sZxMT9T8aeJ7xti5CIHlCSd+IIi9C7QSW3r0ANfKhBD5cNDm81hbPQSbNOsqekDOq5HMALGbB9q/OGgxMUb28xFnIz4rrWLSSVlx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=o/Tz0jue; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-70941cb73e9so2278367a34.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 14:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1722460315; x=1723065115; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZvLSXSFJMkLNlj/PaF0YPjUuieX1ria5CS3CzpzN5U=;
+        b=o/Tz0jueoXnJLP3/zDWGdTeVOz+pK88O+rYLrgv+astNn9nyc+Gsh7nNMvpHag8j6R
+         dyLiUreNWIh9u2CfyayqW2LkneyZcxLKuf822ORS/JcnrH5Sw40jivLodKvQgKIqEAbN
+         tIROT/P3HTWbFaFRsANix/TcWzOLUO7Jz5zajmeRxxRkkyzVddWGjCCSm1e1UZ+mNMzv
+         FYBkR7pdZnHBvn2Yn2HPdwCVdFH58TMx07f6qH3jtjgMokn4EiNmdz9uPYjQ0Jp6jHXP
+         27XR90fe/W0l9EoOo+fTmiHvhfw5bjLaddySWOx4xicQUC6GYHBMBsn6Fdc2pCGIKzQt
+         AcaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722460315; x=1723065115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/ZvLSXSFJMkLNlj/PaF0YPjUuieX1ria5CS3CzpzN5U=;
+        b=bNNttLg9zT63Wv8/B6+5P2rB0sRxjrMpH50QdBiWoXYWgSmn5KqbR5r/gOLRZY+7T9
+         Wm8SrxzcRHmueIF8slGXBHVSxfYYEAuM/LEBJWXHvqOyuydurKbFWjiXHt/ybZ/Ir55b
+         QsEXxfVZmSHtxECZmWN4gnm68s0N9DuRUFpJs6CE+kJbXTMwy75uGzsryMqGuoxMEtc+
+         ARyImAIYaQv5uAE5CCF2nXGC58qg9tjZDnAXuIcCDAT2GHCwPOWgObj6z4aWnBGApJSK
+         ATwr7jkQfQePG59MKXZTioiRXtEhLTY96FFk9Xyse8UBnxOqOKM85c1Ov/JRhc418sCq
+         9+BA==
+X-Forwarded-Encrypted: i=1; AJvYcCU62LYieNbcN5B5s9HQqWA21g9hhtMvADoeMPJPq/DRIghyenObZCkUZzQ1MOOlneNjsW7oKID3/wKwqMArCE/pSnex8Bgm
+X-Gm-Message-State: AOJu0Yxsd4hGxalTGWaCysgQWRG4Iu1sEmpyvcqrAii0gDM0ybsmOpDT
+	2hoGOLgvqe24XbGuWKnH43YglcleBoVOlzUOFp2Yss5glQa8YSujjccFcGg1bo4=
+X-Google-Smtp-Source: AGHT+IEdPF4xP7dgcasA1jodltKHHpm66OEBCOUHqXVM+e0xNPzRPKTZfGITIWaB4wlFOb3gt6ptYA==
+X-Received: by 2002:a05:6830:610d:b0:708:f8c1:b901 with SMTP id 46e09a7af769-7096b84b7b3mr493240a34.18.1722460315099;
+        Wed, 31 Jul 2024 14:11:55 -0700 (PDT)
+Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d73ea990sm779020385a.55.2024.07.31.14.11.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 14:11:54 -0700 (PDT)
+Date: Wed, 31 Jul 2024 17:11:53 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com,
+	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
+ CLASS(...)
+Message-ID: <20240731211153.GD3908975@perftesting>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-8-viro@kernel.org>
+ <20240730191025.GB3830393@perftesting>
+ <20240730211225.GH5334@ZenIV>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,40 +89,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAH5fLggyhvEhQL_VWdd38QyFuegPY5mXY_J-jZrh9w8=WPb2Vg@mail.gmail.com>
+In-Reply-To: <20240730211225.GH5334@ZenIV>
 
-> > > +    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
-> > > +    unsafe extern "C" fn probe_callback(phydev: *mut bindings::phy_device) -> core::ffi::c_int {
-> > > +        from_result(|| {
-> > > +            // SAFETY: This callback is called only in contexts
-> > > +            // where we can exclusively access to `phy_device`, so the accessors on
-> > > +            // `Device` are okay to call.
-> >
-> > This one is slightly different to other callbacks. probe is called
-> > without the mutex. Instead, probe is called before the device is
-> > published. So the comment is correct, but given how important Rust
-> > people take these SAFETY comments, maybe it should indicate it is
-> > different to others?
+On Tue, Jul 30, 2024 at 10:12:25PM +0100, Al Viro wrote:
+> On Tue, Jul 30, 2024 at 03:10:25PM -0400, Josef Bacik wrote:
+> > On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
+> > > From: Al Viro <viro@zeniv.linux.org.uk>
+> > > 
+> > > There are four places where we end up adding an extra scope
+> > > covering just the range from constructor to destructor;
+> > > not sure if that's the best way to handle that.
+> > > 
+> > > The functions in question are ovl_write_iter(), ovl_splice_write(),
+> > > ovl_fadvise() and ovl_copyfile().
+> > > 
+> > > This is very likely *NOT* the final form of that thing - it
+>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > > needs to be discussed.
 > 
-> Interesting. Given that we don't hold the mutex, does that mean that
-> some of the methods on Device are not safe to call in this context? Or
-> is there something else that makes it okay to call them despite not
-> holding the mutex?
 
-probe is always the first method called on a device driver to match it
-to a device. Traditionally, if probe fails, the device is destroyed,
-since there is no driver to drive it. probe needs to complete
-successfully before the phy_device structure is published so a MAC
-driver can reference it. If it is not published, nothing can have
-access to it, so you don't need to worry about parallel activities on
-it.
+Fair, I think I misunderstood what you were unhappy with in that code.
 
-And a PHY driver does not need a probe function. Historically, probe
-was all about, can this driver drive this hardware. However, since we
-have ID registers in the hardware, we already know the driver can
-drive the hardware. So probe is now about setting up whatever needs
-setting up. For PHY drivers, there is often nothing, no local state
-needed, etc. So the probe is optional.
+> > Is this what we want to do from a code cleanliness standpoint?  This feels
+> > pretty ugly to me, I feal like it would be better to have something like
+> > 
+> > scoped_class(fd_real, real) {
+> > 	// code
+> > }
+> > 
+> > rather than the {} at the same indent level as the underlying block.
+> > 
+> > I don't feel super strongly about this, but I do feel like we need to either
+> > explicitly say "this is the way/an acceptable way to do this" from a code
+> > formatting standpoint, or we need to come up with a cleaner way of representing
+> > the scoped area.
+> 
+> That's a bit painful in these cases - sure, we can do something like
+> 	scoped_class(fd_real, real)(file) {
+> 		if (fd_empty(fd_real)) {
+> 			ret = fd_error(real);
+> 			break;
+> 		}
+> 		old_cred = ovl_override_creds(file_inode(file)->i_sb);
+> 		ret = vfs_fallocate(fd_file(real), mode, offset, len);
+> 		revert_creds(old_cred);
+> 
+> 		/* Update size */
+> 		ovl_file_modified(file);  
+> 	}
+> but that use of break would need to be documented.  And IMO anything like
+>         scoped_cond_guard (mutex_intr, return -ERESTARTNOINTR,
+> 			   &task->signal->cred_guard_mutex) {
+> is just distasteful ;-/  Control flow should _not_ be hidden that way;
+> it's hard on casual reader.
+> 
+> The variant I'd put in there is obviously not suitable for merge - we need
+> something else, the question is what that something should be...
 
-	Andrew
+I went and looked at our c++ codebase to see what they do here, and it appears
+that this is the accepted norm for this style of scoped variables
+
+{
+	CLASS(fd_real, real_out)(file_out);
+	// blah blah
+}
+
+Looking at our code guidelines this appears to be the widely accepted norm, and
+I don't hate it.  I feel like this is more readable than the scoped_class()
+idea, and is honestly the cleanest solution.  Thanks,
+
+Josef
 
