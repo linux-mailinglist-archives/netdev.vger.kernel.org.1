@@ -1,123 +1,129 @@
-Return-Path: <netdev+bounces-114632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12369434A5
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 19:02:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0939434D3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 19:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88A931F22B45
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:02:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C681B2428B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15AD11B3725;
-	Wed, 31 Jul 2024 17:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJ4Yh1Yq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080D01BD4FE;
+	Wed, 31 Jul 2024 17:12:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0311B5AA;
-	Wed, 31 Jul 2024 17:02:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8281BC065
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 17:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722445347; cv=none; b=Kp1JxSX5H9cEt59i54A1oD/xr9qw9rvFbhjpT6dff4sxmBnmWVh6PiMihuz0u3fRUFqF+nDqM0j7Yp2q3miaDEpXADXw0DAbXkj0vhZ6w3VUjZtyEC3r/10fJKSnOnz0pe7kxuOhWbDDvkUW4NmMTglvyfaJObzPtonDOQ4U/l4=
+	t=1722445924; cv=none; b=SBHMtl3KMfksuasBxuLEiEbWUO1L3xcmUWnCWQXwuyCfjDX4q4ipe2B6o7Kyqn9cr5kIbPh9sRNWI6n1U3LwxWWuvomCSUlrcUlbe6jCUxlIbZQtYq+ILDuwW8lGCHK4A+rnlXCM+nIFbjMJk9XVsgHYwkkqNUY3iuEMcOxJJJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722445347; c=relaxed/simple;
-	bh=UcuAkjox5f+Y5LAxI8d5DF4qEAr+TdeGJw7UaZE65XY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lpi+KZBxZ2gv2nZK8hwRybaHV7oIQjApv0TUUtRCjGBajU3K29DoX3Ux79PXy2pxiv7g/wPJ/AQPyPpyM269pOXMxeNR6X+9W6+lW36wbd8wkD5uSaW/O37o+w3xH5EjCpBbcj74eyWI3z8IbXzVp9g936+h4fJVrmIYCQAciEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJ4Yh1Yq; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fc5239faebso40987315ad.1;
-        Wed, 31 Jul 2024 10:02:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722445345; x=1723050145; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jAoEvkuZG4+kzD+YT87MDOQ0qmMyoRLhyfAymy4pQbE=;
-        b=AJ4Yh1Yqua5+VOZ7w9QvmfEa4mY5j3pT4n6SWYcTk1PWCRGH3dVPq5VAcvkZ4g+UVr
-         xT1CuXeJrkkXDmEuf/T5Kvty83+0krJLDxQTIsfQ6tixiN7l0ItbldKoLVEnYyywcxNd
-         4RMbf2+sf/2nZJex9ttm0Ahu3ztuedUQRF8kCIuskhxO6zUZ4bhdYmuJxZCK1eGSFU3U
-         kwhV7w425i3zJsVsCxU+EcjzBYEJ3fICxCPe4ehtbAK9YfJ+w5uY4A7YvEtmPo1dT0tO
-         fShScfAUmrlCd0PQ8t59NhqQyKtZge2wyJzvfGXsaibDLhYO/6eBFoTnrZnlFLrSQsHQ
-         ClhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722445345; x=1723050145;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jAoEvkuZG4+kzD+YT87MDOQ0qmMyoRLhyfAymy4pQbE=;
-        b=H0oJz3tbkAIjXAu3xQcqYwCgrL70nlHt3rFOnsC6NnPszRhrxqv59RZHCvmMbiButB
-         nOPnrLu+wtiUPO1PM/h5TGwguOdBdD3b65JPSaH/XKJAcpvvh6OSi16ZjsCCh3ynBEY0
-         99phNWXWmHBBpjOjWos9hX+Did9B6S9Xy8cYbgP8XCFZ15yKsaAR7DQczKnajwic7CY1
-         ifhN2korKgLMFTxgiwkgbXNTmtMVszwgBVH7B6XiAhVZM1H8CUMmIdcLKy63i1NwGAW+
-         7JsuTPEqlhvgDgm+y8PbQuE6fK6zNS5snPY53c1X/D/Q2sCPoqL479YWf0aOvbQpRpTQ
-         eqTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVk7W13IoMXvELJP4TNhlSDQQyxrWLDpFq7sUU+tzqikcWN4djfMbrjrI8cz4uRvag50IBb7kCub7ndwg/YdN+JbyOW0PEgx9/ntyeh4AyrlqLoDUCwkbyQb1ZxIZZKB8SblGGE
-X-Gm-Message-State: AOJu0Yw//wYI19BTL7sMpv+QaDK0yXzXcTMrlm9XNMTqhqlP+/qsrXC2
-	PGw9D4DBMNE97sbcU28GSgTHmLVaocHO/GdUhT7rpNvnFAhFVj+P
-X-Google-Smtp-Source: AGHT+IFFcLqqePg2bMWIlPkd2w8X8QZRPbGJVHmNSPx/OuNAr2StIs7w4ehoZagQk/owfIyCWBZT1A==
-X-Received: by 2002:a17:903:32c5:b0:1f9:f906:9088 with SMTP id d9443c01a7336-1ff0481d1d2mr127728445ad.22.1722445344251;
-        Wed, 31 Jul 2024 10:02:24 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1fed7f1cb56sm122592975ad.201.2024.07.31.10.02.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 10:02:23 -0700 (PDT)
-Message-ID: <17ae2088c08d34a17db8eeb1fa2821d686198a5b.camel@gmail.com>
-Subject: Re: [RFC v11 08/14] mm: page_frag: some minor refactoring before
- adding new API
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
-	 <akpm@linux-foundation.org>, linux-mm@kvack.org
-Date: Wed, 31 Jul 2024 10:02:22 -0700
-In-Reply-To: <e532356e-3153-4132-9d20-940bc3b84ef3@huawei.com>
-References: <20240719093338.55117-1-linyunsheng@huawei.com>
-	 <20240719093338.55117-9-linyunsheng@huawei.com>
-	 <dbf876b000158aed8380d6ac3a3f6e8dd40ace7b.camel@gmail.com>
-	 <fdc778be-907a-49bd-bf10-086f45716181@huawei.com>
-	 <CAKgT0UeQ9gwYo7qttak0UgXC9+kunO2gedm_yjtPiMk4VJp9yQ@mail.gmail.com>
-	 <5a0e12c1-0e98-426a-ab4d-50de2b09f36f@huawei.com>
-	 <af06fc13-ae3f-41ca-9723-af1c8d9d051d@huawei.com>
-	 <ad691cb4a744cbdc7da283c5c068331801482b36.camel@gmail.com>
-	 <e532356e-3153-4132-9d20-940bc3b84ef3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1722445924; c=relaxed/simple;
+	bh=C+IfCW7zU1DmYobnFVqdAzVw94QfgfE22ecn9Qjmzqo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=EpGHaLjrP2XFf+VZVO+77jHjrvZHEmJdAtufD5XZIds263HjYdkrxgz4zbMBANsjLyLrgLV8Sx3TkBmH099Ff49whMe2qcNvi9q9DGmwc5DOMx0Q7MSMyxO1yMLee+umQDswuioxFe8VCXIeahQYH9lWnugm8AyIhCDsldQ6gVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-656-ZM_ZAE1jOqqMVVa6i-34Yw-1; Wed,
+ 31 Jul 2024 13:10:39 -0400
+X-MC-Unique: ZM_ZAE1jOqqMVVa6i-34Yw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76E481956088;
+	Wed, 31 Jul 2024 17:10:37 +0000 (UTC)
+Received: from hog (unknown [10.39.192.3])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 18D3719560AE;
+	Wed, 31 Jul 2024 17:10:33 +0000 (UTC)
+Date: Wed, 31 Jul 2024 19:10:31 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v5 06/17] xfrm: add mode_cbs module
+ functionality
+Message-ID: <ZqpwB-kDLXt9N8vT@hog>
+References: <20240714202246.1573817-1-chopps@chopps.org>
+ <20240714202246.1573817-7-chopps@chopps.org>
+ <ZqJT4llwpzag1TUr@hog>
+ <m28qxhapkr.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <m28qxhapkr.fsf@ja.int.chopps.org>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2024-07-31 at 20:35 +0800, Yunsheng Lin wrote:
-> On 2024/7/30 23:12, Alexander H Duyck wrote:
+2024-07-30, 17:29:06 -0400, Christian Hopps wrote:
 >=20
-> ...
+> Sabrina Dubroca <sd@queasysnail.net> writes:
 >=20
-> > >         }
-> > >=20
-> > >         nc->pagecnt_bias--;
-> > >         nc->remaining =3D remaining - fragsz;
-> > >=20
-> > >         return encoded_page_address(encoded_va) +
-> > >                 (page_frag_cache_page_size(encoded_va) - remaining);
+> > 2024-07-14, 16:22:34 -0400, Christian Hopps wrote:
+> > > +struct xfrm_mode_cbs {
 > >=20
-> > Parenthesis here shouldn't be needed, addition and subtractions
-> > operations can happen in any order with the result coming out the same.
+> > It would be nice to add kdoc for the whole thing.
 >=20
-> I am playing safe to avoid overflow here, as I am not sure if the allocat=
-or
-> will give us the last page. For example, '0xfffffffffffff000 + 0x1000' wi=
-ll
-> have a overflow.
+> Ok, I'll move the inline comments to a kdoc. FWIW, all the other structs =
+in this header, including the main `xfrm_state` struct use the same inline =
+comment documentation style I copied.
 
-So what if it does though? When you subtract remaining it will
-underflow and go back to the correct value shouldn't it?
+Sure, but I don't think we should model new code on old habits.
+
+> > > diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+> > > index 7cee9c0a2cdc..6ff05604f973 100644
+> > > --- a/net/xfrm/xfrm_input.c
+> > > +++ b/net/xfrm/xfrm_input.c
+> > > @@ -494,6 +497,10 @@ int xfrm_input(struct sk_buff *skb, int nexthdr,=
+ __be32 spi, int encap_type)
+> > >=20
+> > >  =09=09family =3D x->props.family;
+> > >=20
+> > > +=09=09/* An encap_type of -3 indicates reconstructed inner packet */
+> >=20
+> > And I think it's time to document all the encap_types above the
+> > function (and in particular, how xfrm_inner_mode_input/encap_type=3D-3
+> > pair together), and/or define some constants. Also, is -2 used
+> > anywhere (I only see -1 and -3)? If not, then why -3?
+>=20
+> At the time this was added ISTR that there was some belief that -2
+> was used perhaps in an upcoming patch, so I picked -3. I can't find
+> a -2 use case though so I will switch to -2 instead.
+>=20
+> Re documentation: I think the inline comments where encap_type is
+> used is sufficient documentation for the 2 negative values.
+
+I don't think it is. Inline comments are good to explain the internal
+behavior, but that's more external behavior.
+
+> There's
+> a lot going on in this function and someone wishing to change (or
+> understand) something is going to have to walk the code and use
+> cases regardless of a bit of extra verbiage on the encap_value
+> beyond what's already there. Fully documenting how xfrm_input works
+> (in all it's use cases) seems beyond the scope of this patch to me.
+
+Sure, and that's really not what I'm asking for here. Something like
+"encap_type=3D-3 makes xfrm_input jump right back to where it stopped
+when xfrm_inner_mode_input returned -EINPROGRESS" is useful without
+having to dive into the mess that is xfrm_input.
+
+--=20
+Sabrina
+
 
