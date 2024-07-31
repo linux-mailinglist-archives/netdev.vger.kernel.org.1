@@ -1,104 +1,135 @@
-Return-Path: <netdev+bounces-114378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF60B9424FE
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 05:22:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A84E7942500
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 05:22:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 742071F24BC9
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 03:22:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 622A9280983
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 03:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E318030;
-	Wed, 31 Jul 2024 03:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00431B5AA;
+	Wed, 31 Jul 2024 03:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fh/l95cv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+L5IZGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9901918044
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 03:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590D918AF9
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 03:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722396043; cv=none; b=F4YDPqAj4LpCt8PgMTAIBmZnOflyaadnmVGR5ne/P56/4tPcQbHqRLOZo0hNrfRLbnxaWXHGhDhPONMgYetqsAroDD+SCQc3ntTwf8thule6KXrmCBG8LCSOZgtYDXkaUfjYkkai/uO5nrCk0gF0M708vIsGXOlqTVMXBEI1PKc=
+	t=1722396056; cv=none; b=pce0xBIRXTKo114fbYzNK50LQZ9PU/8SYgd7Q9YGXO5Ady+M6LSynZWIHYsXbsA9vRI0JNpwu4awkHOOuhHH4UUgGFk4C2N56gts5XO/E6IlsAxg+EKakWDduzt0IGjmkowLoBUvLHuELkBJRkOqDy/K5E/gOPQ75YxQsdSZqd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722396043; c=relaxed/simple;
-	bh=j3F+BN7cjGvPwSF5Rrv+boPv9WVpsKkibLGw44BsfZE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DNaU+EZYMMHjQCK3a7jjzHq5+DI1WcgDCiHJb1SsMog/S/SPs9V1tuiqkPe2xAHEwRIr22UDe68t/K5Qn4sAqQqYc0A63aTY5HHB4HjZ0tH8HhXSfRlRgw7e1wcc9rjgU/+AzRVUUOWZjK6kgDvJegJ+aFp81ZiJm3UoNg2LS9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fh/l95cv; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7163489149eso3777088a12.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 20:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722396042; x=1723000842; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T5bIrqAN3ON/3JLQuyXLvuWNW93UTx8afURKC2yU8hE=;
-        b=fh/l95cvrzxDJSv0cGYbQETJSB1xIBNFSWVtksoOFumnJRrGmAeaTa1JBuG89I4Zn0
-         4rlHTG/fGA2fdBYvSwt06ClVtuUpue5uDDUuts5Y8rEAgdERT9l2BOIcvoThsENeeKsq
-         wGSqAJeD1WXBa6chsNRGcay0dxcQxNw05RHWanb75bDrNUUE+oppnDkXAhgHtDyp0RPd
-         uqSlt2iPB7qFQfjHVfdzKqExf65fO73jmcxZklBpKL7YgxY4nRv8NdBGWvvyLVJX5Xy1
-         u9iNspdmIOtJNB2SjpbDqCB0UvlajAdU8rBThVsWwgmY9/iNLexNc8xrG6LKQ/evMNI9
-         nA2A==
+	s=arc-20240116; t=1722396056; c=relaxed/simple;
+	bh=2pK8gm6ZVpEeA1ly3iczVmymWCxm8XAdJ3C8puJvIlw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bQkC+CvNwZbrvbtx9GDW3PZvSVlEXcFQOqom6weA9o7EQt8ryfevP/m7wdJzzZiiy7HPMwrPjnsvu3VqJKZZ2c3hvQOPNdkTuc68ryjweB+lq8iHzCueuEEPeVkkZq8aDenGkKnSL87FveeJTwIxaiA+RPJGJ1RhrKXZsRs1W38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f+L5IZGt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722396053;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rU6UZtmb7nqWjCNh35gVT9eXpDgbdzROuHvxgQjoBAA=;
+	b=f+L5IZGtZvHaOv5BqDIFHLIWxxRVZ546G5FPanSCsxuChzCQ0x+hD8PYOp8s9cyPrKg2xG
+	UQPS80fNeClfSFcwc0uIVUay8HjL/EknHWIyJjm5qBxeUux/PgYOFwh0PU3iPIbB2B9/oX
+	J2dU28tca8/yDLvOGFpfUgoB/N0gFEI=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-619-dHZIvqSsPBmYyQUUSqKy-w-1; Tue, 30 Jul 2024 23:20:51 -0400
+X-MC-Unique: dHZIvqSsPBmYyQUUSqKy-w-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-7a2a04c79b6so506886a12.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jul 2024 20:20:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722396042; x=1723000842;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T5bIrqAN3ON/3JLQuyXLvuWNW93UTx8afURKC2yU8hE=;
-        b=JCzNaFPvVrgbTQYJ0TTnZRGyWym9f6BIzFOMhHl3t8XTIhPZ9TZGLjKlAq+RWEa3d4
-         1fMQPwwflU5BTL1PPYXWAAsmuqcnBreV1wzocGLRJJGGbV8aCpRFPRYIg1eXhP4xph0T
-         1RQ21dT+cZmGsokZ0Hdr4nK2yT1vuxi9tSPtCfVplJP2h6ZN10FWFJlpstQ8kxYMWxFF
-         i2qgibV3VcmlgPZPilpT+6EsRdydv4vWtJqDYkUtdDzIvAoPJhMxa7a2sTrYQzO+11oA
-         RA+Gi6aZs22IkGR2qdwFZkklJgJZjWaxKwH1xAxSuZXIluWenf3/zbp9jlOxfvImFPeR
-         Ai6g==
-X-Forwarded-Encrypted: i=1; AJvYcCW+Wn04GjsTr/VhzUsO8SEqfm++PU8JRkYEHp3iFRiT7qhClSZMXekHTdshSd6tnet0VesL5Mb6ayArBYzM+lAqA+r60f6S
-X-Gm-Message-State: AOJu0YynOjWjR7ggrLz72L7LO6uaHP4IMCDa44+wdq1pAEKLMRim7LCU
-	H7oy3mSwEkZBDRPynggO3SQW9d9fGBNnn1vRgKwmypyhPV+JcDhqLGR+oLtl7HE=
-X-Google-Smtp-Source: AGHT+IGCfMkctG5HJYTIH62gLJb32C/0nBsWDlhG66SERiPBhu1q9fhabHJ0sNL1fJAGigIb28aXYw==
-X-Received: by 2002:a05:6a20:cf8b:b0:1c3:b61c:57cb with SMTP id adf61e73a8af0-1c4a151124dmr15864992637.53.1722396041772;
-        Tue, 30 Jul 2024 20:20:41 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:782c:bea0:2ba1:46ac:dba6:9de4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead8a2bddsm9115238b3a.206.2024.07.30.20.20.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 20:20:41 -0700 (PDT)
-Date: Wed, 31 Jul 2024 11:20:36 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: Re: [PATCH net 0/4] Fixes for IPsec over bonding
-Message-ID: <ZqmthLxup5mYi6f2@Laptop-X1>
-References: <20240729124406.1824592-1-tariqt@nvidia.com>
+        d=1e100.net; s=20230601; t=1722396050; x=1723000850;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rU6UZtmb7nqWjCNh35gVT9eXpDgbdzROuHvxgQjoBAA=;
+        b=Rd+/8j4rK3kvGXqpUBy25NImbtfiJynSNB+Csu2saBNalmR3qymXVHKPrEDGNGHXdR
+         4LNIrjOB8HidMOflCG95+/IdOOU8ZIf5B1fCx4/aEaFhoL96zNtnCqC3A8nCka6yGLi9
+         /LMJUgpou/iplKqJc9oNu/YSmQrivOgY74u808SoIzQEASeanKZV6U0qzLPO5L3RGpbB
+         /F3lWm24UowEnGh+WdFXeCoTRiyx7yjKnj0Kk2wFOSkgjfpUXCovBkNxtVdhrDjHo2Ks
+         /LmKm822nhtuvY+AYvsueTsWnAuxSQ5/5eoealzEu3k1wCJQyEmuWgbq5Pahsk3iRyak
+         LJ/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXzmZTSfuBsWNTkPZoMzb5F6YEcFvPiY4ezuhofQrOIJ78jRjvNEo5qfP+QZAaiUPgGtdr/dEAWjQsB11QJzRpKVjLZZqsS
+X-Gm-Message-State: AOJu0YzHR4Wadstz7KhWZ2ECVWFETcLWPaMo23jnjBRK1HoW2bcw/ztk
+	4WDPzTCi5YwFbpNw/+A/MOGTpbleIFE7tlYTcQFfD173qyjL1UebX1IlbTxaHhXBdWWwvqgNHD+
+	7b009bUpA+4aOGEs5zJvjkiQHM/bXNYXlic7TQTePBiDboGeHvt30rli/ykSpa3qsVaBoT0zeVc
+	8LLTkIPHG24AzDomqUPkW1D1Octp/V
+X-Received: by 2002:a17:90a:558b:b0:2c7:d24b:57f with SMTP id 98e67ed59e1d1-2cfcabb4428mr6355878a91.19.1722396050569;
+        Tue, 30 Jul 2024 20:20:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGdikMPaOaei1HHj0OApex9jIV+xfMGVWj4qGTkYxBDHCya8v0ooI5txmdfclcFYjj3oMf8dl8KVIItDPVvzbI=
+X-Received: by 2002:a17:90a:558b:b0:2c7:d24b:57f with SMTP id
+ 98e67ed59e1d1-2cfcabb4428mr6355848a91.19.1722396050017; Tue, 30 Jul 2024
+ 20:20:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240729124406.1824592-1-tariqt@nvidia.com>
+References: <20240731031653.1047692-1-lulu@redhat.com> <20240731031653.1047692-2-lulu@redhat.com>
+In-Reply-To: <20240731031653.1047692-2-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 31 Jul 2024 11:20:38 +0800
+Message-ID: <CACGkMEs+bpWtpFp2hT+GrRUOJQq4h=2LgKWj+U4tM9a9wMQpDg@mail.gmail.com>
+Subject: Re: [PATCH v8 1/3] vdpa: support set mac address from vdpa tool
+To: Cindy Lu <lulu@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, parav@nvidia.com, sgarzare@redhat.com, 
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 03:44:01PM +0300, Tariq Toukan wrote:
-> Hi,
-> 
-> This patchset by Jianbo provides bug fixes for IPsec over bonding
-> driver.
-> 
-> It adds the missing xdo_dev_state_free API, and fixes "scheduling while
-> atomic" by using mutex lock instead.
+On Wed, Jul 31, 2024 at 11:17=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
+>
+> Add new UAPI to support the mac address from vdpa tool
+> Function vdpa_nl_cmd_dev_attr_set_doit() will get the
+> new MAC address from the vdpa tool and then set it to the device.
+>
+> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
+>
+> Here is example:
+> root@L1# vdpa -jp dev config show vdpa0
+> {
+>     "config": {
+>         "vdpa0": {
+>             "mac": "82:4d:e9:5d:d7:e6",
+>             "link ": "up",
+>             "link_announce ": false,
+>             "mtu": 1500
+>         }
+>     }
+> }
+>
+> root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
+>
+> root@L1# vdpa -jp dev config show vdpa0
+> {
+>     "config": {
+>         "vdpa0": {
+>             "mac": "00:11:22:33:44:55",
+>             "link ": "up",
+>             "link_announce ": false,
+>             "mtu": 1500
+>         }
+>     }
+> }
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
 
-Good, I'm also working on the bonding IPsec offload issues recently. This save
-some of my works :)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Hangbin
+Thanks
+
 
