@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-114644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D989434F2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 19:24:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A881A9434F3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 19:24:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D446128BD71
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:24:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04C86B2266E
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F291BE841;
-	Wed, 31 Jul 2024 17:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A72A1BE24B;
+	Wed, 31 Jul 2024 17:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="hC84F03a"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="KIY4ZiIq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518721BE24B
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 17:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F61BE258
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 17:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722446645; cv=none; b=dnbb+U0iR7hnhdcsSV+Gh6/Ek1Jgaez3g0er1QIiLnMUoemHcIJ2iG7ziqqg82vck0W77dMWoUOs6DESru/hHsGu+/rx+tDMMMZ6B4DQFrQWMFYpx3OknDWxTRhl0wFNYJF7Ppvc+heGoJu2THGTE9b0nMxyopO69nC/ZhYF5OY=
+	t=1722446647; cv=none; b=NpbuVaw2ArhADqbG5rfOkFU9sRFGcdmtVfJo+v6BIzt2uZHiCBFmuYxTYPE/Xo1tlD+pRkpx08H67PJJXdHwB1ikVCoXby+aYM+BJ5uZcQS/AYGqlJYdOM8gtmtSs4A3ZmMeYVue1HcYniVHI9CHlpWBKyyarxlkyvw4iL9trkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722446645; c=relaxed/simple;
-	bh=296isLAADgrxQrxtxkq4pUsuyUhJiENDHC0DxsFqIBI=;
+	s=arc-20240116; t=1722446647; c=relaxed/simple;
+	bh=WqE54iqgsL7Gq5r/FGZzatFq3v1Ubfb/TsjD/HB0MWo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bnmR7gxoVG+422EuCLJFMDNGljz+LjwnReHBmnz16PgldZ6+IAI788FMA94CZkrM0jUZnCnP+RZtNeOvNwuLLGLfCp4paqBjv5kAhTHrlds4D6aV8wLXNLPUNquVWHWmTVapc1q08LbfIdmklLxzRu2mX0/q30etficFfInGK5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=hC84F03a; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=iJ7kH80MfjbRRjvHLGSka0Io0811aIlEy6XgKAA/+FJvCuiQB5/1MZ7A6UbWTqKIN83WzBiIgfY1hwJgxnrQUBJe8dBxojGXeAg+2HMRocmAAQX24mHvSxa0GZGWFis1oN3IozWCVP2VkagLV+a2NI9X/w42TifAXELg68Z5CJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=KIY4ZiIq; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-70d333d57cdso4299287b3a.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 10:24:04 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70cec4aa1e4so4120089b3a.1
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 10:24:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1722446643; x=1723051443; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1722446645; x=1723051445; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WvQhfDiwAzUjEhxoZFVKQ1onbUQ2OV+Y2W79oOVwrwk=;
-        b=hC84F03au82rcC60RVoJ4BirbwYHp53EpNa5LtRyImRw5I6gaDp9UmjdjFVuV3dcaW
-         Vs0hGCdkLmWFrE5GqtWHnIO994pS7YzQvEvSHctUFFADIwyz56obZm7DIsaDlXbEAE/E
-         /kHHpBzmQNJnYkFvdgwS2LSyaWFWNolilBksn2LVGB1Z/l3P9oz5Tu1SKFsQmOoPuZYj
-         TPCswSgcclJHocp4iXxgB+Z/wStgChVIH/NJwC3irT78yf5+5wabVLi6RIfM7tcNRdk4
-         yMVExAzVGk64J1dal+omA6MuH6xKkJXV4e4L2vqseBpYOaFWdZs+Gh4PQctwvmQoFTZJ
-         F1gA==
+        bh=wMX0tr1XqQIXXYv8t8puiyUaD8WbuWDFc/Hh6oAxUxs=;
+        b=KIY4ZiIqgFO3UD9N1n98ar2uZTVuV16lUydIcejn4wJO7n0V82oM0rKwGBQkg9VuGW
+         o+Hi57S/Xh9eGXadx1DRn1kKZI6Aw6c2cKhvQQZsTUw6Q8gpQw0NjVBTAuFUiNlWUJ55
+         n15Ois+pw4EVZwcyje3ykuVsx+BZs2OgST9a9h5kZb8amwhy7ZEdE1PMFjeMW1zq5WnW
+         cwRZodFHQef+cZ1iSTMW2phd1+49CDGxNxOBR/+hkIuRdSSL18tG5vmfKWZyhbahFwIS
+         PNkG43ob5liy94vQQCewJ1BuWhvuBbqiBG19goBiky/S1YWhzh1ADpbnwEiX251uvJhe
+         VizQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722446643; x=1723051443;
+        d=1e100.net; s=20230601; t=1722446645; x=1723051445;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WvQhfDiwAzUjEhxoZFVKQ1onbUQ2OV+Y2W79oOVwrwk=;
-        b=Eib10zvYHThEHCdIdjeBTpN/N6WMFh/L/XmM7kpVErcHo/F7SoKQbc3QF2HMQvGszN
-         k8QO3mXr6lEHOjxgTZlvidZ1MWnOMXa200IoIK0q7bHH/+u4ybcwDdbd5JBMJXjasMAY
-         ppTaCMI1ajWDC8249GuV/LujlYaF1Ht6Z44jV/sllDFE9FGWimcN62fxUny5N2irJqwR
-         vTlbiG6aCENwhOnaxhM7IYQ4MkT4ZJneTl78kUzhdUCkduvOEJigi/BsrsX5wAp45R/2
-         WEXLbZUZuReazmLvSFNLrImZURdDR0Skrt/gP1+ZGooKVxVb8WBvYzSyTOW6alxnFLD0
-         4CQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWb3e8Wxqq2HKFoD0hIK5pDD1uQb1/q7epGseC/MyUFKW9gv8WTSvU9SglTI46S6CkGil027rqV9bObb+fj7WRgeVAtNCGw
-X-Gm-Message-State: AOJu0YzdQiFSqLIIU2g+i0EbT1QqUSFlnvFnS7YfLHY/zc0UJiCsy3ic
-	JM2oIm1nmnkfVG+xb4Ih1AxL15iIvET0oNDnupM97Y1fsbEXVMQvlHFqtMIXBw==
-X-Google-Smtp-Source: AGHT+IHhTCBtjF5lXf+QshaFRGe8EGUEplT/BmYOb/uv71kOHuIHex4ULAjafDirSVgtgULWxoSP+g==
-X-Received: by 2002:a05:6a20:4303:b0:1c4:c305:121d with SMTP id adf61e73a8af0-1c68d2607cdmr98249637.39.1722446643516;
-        Wed, 31 Jul 2024 10:24:03 -0700 (PDT)
+        bh=wMX0tr1XqQIXXYv8t8puiyUaD8WbuWDFc/Hh6oAxUxs=;
+        b=Ehl9GT93G9ejJLrHpL1yaGtDQtWTEpSgRywg3SqoSMh0VLirVQqDfX9S9MOLzOmS3x
+         j6f34KvPqV3XbvkvCtyamIuOMWWII0RtjYEJupprh37c9ijSSkkYraUA8gQLQUqgbieK
+         f5843aLIFdhzIMNxcKk0t4yHNmlcQsPVxNKGrELuBTJMSUQKLpbiEdGrMqhvVfQ3F9oK
+         XX1/4cpHrHL+R9RAxj2Rmy5ZMakjkivWiUkcnq+z8V7+itGQtciBYvDjRbHdoT9nsW8P
+         RDUu6MROwxIzZ47K8Ls4VeK49HlxAsdOANyG8m/BW7OTvNdDnPgbXCJgxFpXrEDkX0fK
+         iAbg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0ERSplkaVCVO5u+Oacub6tXGAq6sBkFooj+mYDUP/9lfMYTvcZXk/rsGC3t29GCCqb3nJb9M43TBo7s4v1tUNbRTh0JOc
+X-Gm-Message-State: AOJu0Yx/sv4b/+pyRs3VeJxWzRSMUWZOegt/pdyadi9ttnQgFminU16t
+	tXgN1LUvT/jazyf2tQ3BgCoQSOQFTgaa4XUIX1eSHJ9tZNahrC8iBSCD0MikkaGWBcJiYO6FDDq
+	lwg==
+X-Google-Smtp-Source: AGHT+IE/wgjjpDpaouCZpQnlB9N9HP12Y0QRdbb5N2mjjfhMMS5fNqgmYVEXLId2Cv4kDNe/8lohEw==
+X-Received: by 2002:a05:6a00:178e:b0:706:8a67:c395 with SMTP id d2e1a72fcca58-70ece9ebb3amr18997465b3a.6.1722446644859;
+        Wed, 31 Jul 2024 10:24:04 -0700 (PDT)
 Received: from TomsPC.home ([2601:646:8300:55f0:be07:e41f:5184:de2f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead72ab97sm10487203b3a.92.2024.07.31.10.24.02
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead72ab97sm10487203b3a.92.2024.07.31.10.24.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 10:24:03 -0700 (PDT)
+        Wed, 31 Jul 2024 10:24:04 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -74,9 +75,9 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	felipe@sipanda.io
 Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH 09/12] flow_dissector: Parse ESP, L2TP, and SCTP in UDP
-Date: Wed, 31 Jul 2024 10:23:29 -0700
-Message-Id: <20240731172332.683815-10-tom@herbertland.com>
+Subject: [PATCH 10/12] flow_dissector: Parse Geneve in UDP
+Date: Wed, 31 Jul 2024 10:23:30 -0700
+Message-Id: <20240731172332.683815-11-tom@herbertland.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240731172332.683815-1-tom@herbertland.com>
 References: <20240731172332.683815-1-tom@herbertland.com>
@@ -88,42 +89,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These don't have an encapsulation header so it's fairly easy to
-support them
+Parse Geneve in a UDP encapsulation
 
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- net/core/flow_dissector.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ net/core/flow_dissector.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-index 68906c4bb474..3766dc4d5b23 100644
+index 3766dc4d5b23..4fff60233992 100644
 --- a/net/core/flow_dissector.c
 +++ b/net/core/flow_dissector.c
-@@ -951,10 +951,23 @@ __skb_flow_dissect_udp(const struct sk_buff *skb, struct net *net,
- 	ret = FLOW_DISSECT_RET_OUT_GOOD;
+@@ -11,6 +11,7 @@
+ #include <net/fou.h>
+ #include <net/ip.h>
+ #include <net/ipv6.h>
++#include <net/geneve.h>
+ #include <net/gre.h>
+ #include <net/pptp.h>
+ #include <net/tipc.h>
+@@ -808,6 +809,29 @@ __skb_flow_dissect_vxlan(const struct sk_buff *skb,
+ 	return FLOW_DISSECT_RET_PROTO_AGAIN;
+ }
  
- 	switch (encap_type) {
-+	case UDP_ENCAP_ESPINUDP_NON_IKE:
-+	case UDP_ENCAP_ESPINUDP:
-+		*p_ip_proto = IPPROTO_ESP;
-+		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
-+		break;
-+	case UDP_ENCAP_L2TPINUDP:
-+		*p_ip_proto = IPPROTO_L2TP;
-+		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
-+		break;
- 	case UDP_ENCAP_FOU:
- 		*p_ip_proto = fou_protocol;
- 		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
++static enum flow_dissect_ret
++__skb_flow_dissect_geneve(const struct sk_buff *skb,
++			  struct flow_dissector *flow_dissector,
++			  void *target_container, const void *data,
++			  __be16 *p_proto, int *p_nhoff, int hlen,
++			  unsigned int flags)
++{
++	struct genevehdr *hdr, _hdr;
++
++	hdr = __skb_header_pointer(skb, *p_nhoff, sizeof(_hdr), data, hlen,
++				   &_hdr);
++	if (!hdr)
++		return FLOW_DISSECT_RET_OUT_BAD;
++
++	if (hdr->ver != 0)
++		return FLOW_DISSECT_RET_OUT_GOOD;
++
++	*p_proto = hdr->proto_type;
++	*p_nhoff += sizeof(struct genevehdr) + (hdr->opt_len * 4);
++
++	return FLOW_DISSECT_RET_PROTO_AGAIN;
++}
++
+ /**
+  * __skb_flow_dissect_batadv() - dissect batman-adv header
+  * @skb: sk_buff to with the batman-adv header
+@@ -974,6 +998,11 @@ __skb_flow_dissect_udp(const struct sk_buff *skb, struct net *net,
+ 					       target_container, data,
+ 					       p_proto, &nhoff, hlen, flags);
  		break;
-+	case UDP_ENCAP_SCTP:
-+		*p_ip_proto = IPPROTO_SCTP;
-+		ret = FLOW_DISSECT_RET_IPPROTO_AGAIN;
++	case UDP_ENCAP_GENEVE:
++		ret = __skb_flow_dissect_geneve(skb, flow_dissector,
++						target_container, data,
++						p_proto, &nhoff, hlen, flags);
 +		break;
- 	case UDP_ENCAP_VXLAN:
- 	case UDP_ENCAP_VXLAN_GPE:
- 		ret = __skb_flow_dissect_vxlan(skb, flow_dissector,
+ 	default:
+ 		break;
+ 	}
 -- 
 2.34.1
 
