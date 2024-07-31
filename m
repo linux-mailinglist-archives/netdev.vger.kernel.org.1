@@ -1,244 +1,125 @@
-Return-Path: <netdev+bounces-114715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D5AE943978
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:47:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B0194397B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C67CB20E2A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 23:47:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C0811C219D4
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 23:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E92A16DC21;
-	Wed, 31 Jul 2024 23:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929D614B097;
+	Wed, 31 Jul 2024 23:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UZBmnDPQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XDqZut6W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58470D512;
-	Wed, 31 Jul 2024 23:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C57F16D9D9
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 23:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722469612; cv=none; b=kVrZq5TnuB9gmU0AsgS6NmLwOadVOnhzA4OkHduAzNZqcTx9u9wTvRSyOvPiIqVTAG4maqk91WlHgDHpYar4s/P+1PgVoti2prU6KJvjU22Pj+kizBzw4DYbqiI0BEBVgDwsZA7uyksY+CpYgbjotbF+A9mCoKHYjAjSBjDv49o=
+	t=1722469638; cv=none; b=pw5e9yi2+dP21vaheGqM4iOTlAJ3A2xCDbYRHSH9P4QQhVrsb0YGjQbSktbt+rZlhUcDQfF71TZGxuGqNh0cJoUnS4WyrYxqqN8xJXxJpAEwG8w5clcfJm3Cmh0CKzOghUBnKKuJgRu02zs/LHttfklOovusToG3ecZ0ha32/8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722469612; c=relaxed/simple;
-	bh=+mLeA9emfDki/JmeNiu+//DvfAxZjqr9MnC3Y0FYIu8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BQuo9DypyYEDejHyTESQ5gkAy6DU+x4hM9FZGVif8gjFP5mp8kDB4g52xddbApO+ukeZgGSaADVhXwz7JUFVcOGwXnDxPKw5sJG+ZJ+F5jtuf1Tb/B0bFCody3cnyY7ECUx/wB9ta6tYVZbFfgJnBK1ya8yipJSqHomhCF+wfT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UZBmnDPQ; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722469610; x=1754005610;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=7+oY3ji4qbY/ZQG07OAgWWYrr0I0zNLIp/dkcP4lBFk=;
-  b=UZBmnDPQD0DsQ/dWYaMvHGtnYbVIPJPGz4+w3QCxmvg/Lj+RCt3SZ3Uq
-   fES+E8NCqe0f42FscgzDf3Qvoj3DQg+zCeGR3OrRZpPyliKqJ0VdxnboO
-   +WsrxLXENYPPozMbKKRZ2Z2nR2yXXs9fcj4ytDl2c7gy3L5X373jsx4l5
-   w=;
-X-IronPort-AV: E=Sophos;i="6.09,251,1716249600"; 
-   d="scan'208";a="359878135"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2024 23:46:43 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:58374]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.26.194:2525] with esmtp (Farcaster)
- id abe43e74-0e30-49f5-9bb4-3d9d7a928aa8; Wed, 31 Jul 2024 23:46:42 +0000 (UTC)
-X-Farcaster-Flow-ID: abe43e74-0e30-49f5-9bb4-3d9d7a928aa8
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 31 Jul 2024 23:46:38 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 31 Jul 2024 23:46:35 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long
-	<lucien.xin@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com>
-Subject: [PATCH v2 net] sctp: Fix null-ptr-deref in reuseport_add_sock().
-Date: Wed, 31 Jul 2024 16:46:24 -0700
-Message-ID: <20240731234624.94055-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1722469638; c=relaxed/simple;
+	bh=wOo7tBxu6FaBLoulBbGXaFqyq47V+UBc1sue2gyl0hQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nx6SKSKQBqtB07w6cE3jM+njHszrjlCttFTL9krlo50YtdH2ThNEH1ARXQEzeBCotAiPW6Eqep3sGi5irG2+xQnajZBkuB5YQEXEZf05j5VO8YGu9RqHem3qWNVd3TnZFnE7UHVeRejJaqR4v9Qe3G1pI2Wb8NflUARAPNuEkBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XDqZut6W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6E4DC116B1;
+	Wed, 31 Jul 2024 23:47:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722469638;
+	bh=wOo7tBxu6FaBLoulBbGXaFqyq47V+UBc1sue2gyl0hQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XDqZut6W0ZLReuvOzEexNagIs2nsj4J8AP0IU87PDU330gME5gqU86LGNYx6mrGWK
+	 Ajr6vQGvZXqeaJLoOsCsSyIfxOR2tJ49gehCvgBS3uu4QG5aFBTPN1ov5RfrLuVWgT
+	 ORQLX4ytgpiX1xfVNZJHcCVBGEzdC6JMrp/gE+LQGxoPzVdhymrTQ5spNnYK8vviT+
+	 s2wYfZK9fa6cLGyWBzKChfPUUUxQXGxWA2AJ3CYFhJhQo3ioOPl7+eV89VPfuk2wso
+	 jBrY3SKqcAHtCdooDs3yLMtnD/shpAMoDZLRhiFC6/JJjdhycse+mX2tVbBqLWXTah
+	 hhmJvMElq6t7Q==
+Date: Wed, 31 Jul 2024 16:47:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>, Wojciech Drewek
+ <wojciech.drewek@intel.com>
+Cc: <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <anthony.l.nguyen@intel.com>, <simon.horman@corigine.com>,
+ <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: Implement ethtool reset
+ support
+Message-ID: <20240731164716.63f3b5b7@kernel.org>
+In-Reply-To: <c0213cae-5e63-4fd7-81e7-37803806bde4@intel.com>
+References: <20240730105121.78985-1-wojciech.drewek@intel.com>
+	<20240730065835.191bd1de@kernel.org>
+	<c0213cae-5e63-4fd7-81e7-37803806bde4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB001.ant.amazon.com (10.13.139.132) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot reported a null-ptr-deref while accessing sk2->sk_reuseport_cb in
-reuseport_add_sock(). [0]
+On Wed, 31 Jul 2024 14:08:20 +0200 Wojciech Drewek wrote:
+> Quick summary our reset types:
+> PF reset reinitialize the resources/data path for PF and its VFs.
+> It has no impact on other PF/VFs.
+> Core Reset reinitialize all functions and shared parts of the
+> device except PHY/MAC units, EMP and PCI Interface.
+> Global Reset is Core Reset + PHY/MAC units reset (including External PHY)
+> Because Global Reset is a extended Core it makes sense to map it to all.
+> PF reset mapping makes sense to me since it is dedicated to a single physical function.
 
-The repro first creates a listener with SO_REUSEPORT.  Then, it creates
-another listener on the same port and concurrently closes the first
-listener.
+On Wed, 31 Jul 2024 09:48:07 -0700 Jacob Keller wrote:
+> PF reset only affects the single PCI function, and does not affect the
+> whole adapter. I don't know how it relates to PCIe resets precisely.
+> 
+> CORE reset affects the whole adapter, and the other functions are
+> notified of the impending reset via their miscellaneous interrupt vector
+> in combination with some hardware registers.
+> 
+> GLOBAL reset is similar to the CORE reset, (in that it affects the
+> entire device), but it is more invasive in the hardware. I cannot
+> remember offhand the differences between CORE and GLOBAL.
+> 
+> There is also an EMP reset, which is the only reset that completely
+> reloads the EMP firmware. It is currently used by the device flash
+> update logic, via devlink reload and is only available if the new
+> firmware image can be reloaded without issue. (Reloading when the new
+> firmware could impact PCIe config space is likely to produce undesirable
+> behavior because the PCIe config space is not reloaded except by power
+> cycling, so you end up with some weird mismatches.)
 
-The second listen() calls reuseport_add_sock() with the first listener as
-sk2, where sk2->sk_reuseport_cb is not expected to be cleared concurrently,
-but the close() does clear it by reuseport_detach_sock().
+Note that the reset is controlled using individual bits which can be
+combined:
 
-The problem is SCTP does not properly synchronise reuseport_alloc(),
-reuseport_add_sock(), and reuseport_detach_sock().
+	ETH_RESET_MGMT		= 1 << 0,	/* Management processor */
+	ETH_RESET_IRQ		= 1 << 1,	/* Interrupt requester */
+	ETH_RESET_DMA		= 1 << 2,	/* DMA engine */
+	ETH_RESET_FILTER	= 1 << 3,	/* Filtering/flow direction */
+	ETH_RESET_OFFLOAD	= 1 << 4,	/* Protocol offload */
+	ETH_RESET_MAC		= 1 << 5,	/* Media access controller */
+	ETH_RESET_PHY		= 1 << 6,	/* Transceiver/PHY */
+	ETH_RESET_RAM		= 1 << 7,	/* RAM shared between
+						 * multiple components */
+	ETH_RESET_AP		= 1 << 8,	/* Application processor */
 
-The caller of reuseport_alloc() and reuseport_{add,detach}_sock() must
-provide synchronisation for sockets that are classified into the same
-reuseport group.
+	ETH_RESET_DEDICATED	= 0x0000ffff,	/* All components dedicated to
+						 * this interface */
+	ETH_RESET_ALL		= 0xffffffff,	/* All components used by this
+						 * interface, even if shared */
 
-Otherwise, such sockets form multiple identical reuseport groups, and
-all groups except one would be silently dead.
+Note that ethtool CLI defines "shared" version of all bits as bits
+shifted up by 16. And it is forward compatible (accepts raw "flags")
+if we need to define new bits.
 
-  1. Two sockets call listen() concurrently
-  2. No socket in the same group found in sctp_ep_hashtable[]
-  3. Two sockets call reuseport_alloc() and form two reuseport groups
-  4. Only one group hit first in __sctp_rcv_lookup_endpoint() receives
-      incoming packets
+I guess in your case EMP == MGMT? So if these resets don't reset EMP
+I presume we shouldn't use any option that includes MGMT..
 
-Also, the reported null-ptr-deref could occur.
-
-TCP/UDP guarantees that would not happen by holding the hash bucket lock.
-
-Let's apply the locking strategy to __sctp_hash_endpoint() and
-__sctp_unhash_endpoint().
-
-[0]:
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 1 UID: 0 PID: 10230 Comm: syz-executor119 Not tainted 6.10.0-syzkaller-12585-g301927d2d2eb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:reuseport_add_sock+0x27e/0x5e0 net/core/sock_reuseport.c:350
-Code: 00 0f b7 5d 00 bf 01 00 00 00 89 de e8 1b a4 ff f7 83 fb 01 0f 85 a3 01 00 00 e8 6d a0 ff f7 49 8d 7e 12 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 4b 02 00 00 41 0f b7 5e 12 49 8d 7e 14
-RSP: 0018:ffffc9000b947c98 EFLAGS: 00010202
-RAX: 0000000000000002 RBX: ffff8880252ddf98 RCX: ffff888079478000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000012
-RBP: 0000000000000001 R08: ffffffff8993e18d R09: 1ffffffff1fef385
-R10: dffffc0000000000 R11: fffffbfff1fef386 R12: ffff8880252ddac0
-R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f24e45b96c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffcced5f7b8 CR3: 00000000241be000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __sctp_hash_endpoint net/sctp/input.c:762 [inline]
- sctp_hash_endpoint+0x52a/0x600 net/sctp/input.c:790
- sctp_listen_start net/sctp/socket.c:8570 [inline]
- sctp_inet_listen+0x767/0xa20 net/sctp/socket.c:8625
- __sys_listen_socket net/socket.c:1883 [inline]
- __sys_listen+0x1b7/0x230 net/socket.c:1894
- __do_sys_listen net/socket.c:1902 [inline]
- __se_sys_listen net/socket.c:1900 [inline]
- __x64_sys_listen+0x5a/0x70 net/socket.c:1900
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f24e46039b9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 91 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f24e45b9228 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
-RAX: ffffffffffffffda RBX: 00007f24e468e428 RCX: 00007f24e46039b9
-RDX: 00007f24e46039b9 RSI: 0000000000000003 RDI: 0000000000000004
-RBP: 00007f24e468e420 R08: 00007f24e45b96c0 R09: 00007f24e45b96c0
-R10: 00007f24e45b96c0 R11: 0000000000000246 R12: 00007f24e468e42c
-R13: 00007f24e465a5dc R14: 0020000000000001 R15: 00007ffcced5f7d8
- </TASK>
-Modules linked in:
-
-Fixes: 6ba845740267 ("sctp: process sk_reuseport in sctp_get_port_local")
-Reported-by: syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e6979a5d2f10ecb700e4
-Tested-by: syzbot+e6979a5d2f10ecb700e4@syzkaller.appspotmail.com
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-v2:
-  * Update changelog to clarify that also reuseport_alloc() must be
-    synchronised.
-
-v1: https://lore.kernel.org/netdev/20240729192601.97316-1-kuniyu@amazon.com/
----
- net/sctp/input.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/net/sctp/input.c b/net/sctp/input.c
-index 17fcaa9b0df9..a8a254a5008e 100644
---- a/net/sctp/input.c
-+++ b/net/sctp/input.c
-@@ -735,15 +735,19 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
- 	struct sock *sk = ep->base.sk;
- 	struct net *net = sock_net(sk);
- 	struct sctp_hashbucket *head;
-+	int err = 0;
- 
- 	ep->hashent = sctp_ep_hashfn(net, ep->base.bind_addr.port);
- 	head = &sctp_ep_hashtable[ep->hashent];
- 
-+	write_lock(&head->lock);
- 	if (sk->sk_reuseport) {
- 		bool any = sctp_is_ep_boundall(sk);
- 		struct sctp_endpoint *ep2;
- 		struct list_head *list;
--		int cnt = 0, err = 1;
-+		int cnt = 0;
-+
-+		err = 1;
- 
- 		list_for_each(list, &ep->base.bind_addr.address_list)
- 			cnt++;
-@@ -761,24 +765,24 @@ static int __sctp_hash_endpoint(struct sctp_endpoint *ep)
- 			if (!err) {
- 				err = reuseport_add_sock(sk, sk2, any);
- 				if (err)
--					return err;
-+					goto out;
- 				break;
- 			} else if (err < 0) {
--				return err;
-+				goto out;
- 			}
- 		}
- 
- 		if (err) {
- 			err = reuseport_alloc(sk, any);
- 			if (err)
--				return err;
-+				goto out;
- 		}
- 	}
- 
--	write_lock(&head->lock);
- 	hlist_add_head(&ep->node, &head->chain);
-+out:
- 	write_unlock(&head->lock);
--	return 0;
-+	return err;
- }
- 
- /* Add an endpoint to the hash. Local BH-safe. */
-@@ -803,10 +807,9 @@ static void __sctp_unhash_endpoint(struct sctp_endpoint *ep)
- 
- 	head = &sctp_ep_hashtable[ep->hashent];
- 
-+	write_lock(&head->lock);
- 	if (rcu_access_pointer(sk->sk_reuseport_cb))
- 		reuseport_detach_sock(sk);
--
--	write_lock(&head->lock);
- 	hlist_del_init(&ep->node);
- 	write_unlock(&head->lock);
- }
--- 
-2.30.2
-
+Could you express your resets in the correct combination of these bits
+instead of picking a single one?
 
