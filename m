@@ -1,80 +1,59 @@
-Return-Path: <netdev+bounces-114491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD69942B5B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:59:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A831942B95
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BC41C21C15
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:59:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3C5C1F21574
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 10:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00231AC441;
-	Wed, 31 Jul 2024 09:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595B31A7F70;
+	Wed, 31 Jul 2024 10:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F5fOdaPT"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="KXib8HK7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72771AB520
-	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 09:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6D43CF73;
+	Wed, 31 Jul 2024 10:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722419965; cv=none; b=NAEOFspXVTloZa1/dcjd9mY8HP54iOkHJuPZaRhnUuUO7wiRHJItBB9VIkuHeo22c/zd0wWuLj0v/XVPCwMPO4aOog5Ku6QLiI/TN4TiVauPywt3j7YlxJPE9akBoaJrh0p+t9g87d+tBK+WpanNSBuXR/fMMhPFJwcz+Ux7j0M=
+	t=1722420361; cv=none; b=a/Xt31l460jEiW8VfiCpPVvNTVimJTDc6BdglcE4lSElitkMrNeX6JKUeo7l7tOcKsqHu7W370jY84rCDPk6vUMZP8fINGiA59Nazd6KRNvyDcpCgqnWZIZIzW7lwp3Bn1ENenaur4a6+8X+nq4SPZjaScwQ1MWbHzV28n7TefM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722419965; c=relaxed/simple;
-	bh=4R4xX4AJXVbL/lVltFFMgiURfppUNJpanFd+OFoaQnE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GJbObJMr3UXd6kQU4Dzkdt4BADscH3ezdyI7FCXxB0lOBp7q7Qj1jWdbUJxjGULAcUAjsuGDYuOKRvo8KR2tb3bwfRVQIijBx9kAZ/HiTTDrJLYLzXf0VcG1Zk0g9Da5DtccoArLyRvGiudf3/ry96NhTbMxDcjcnohj9MWz4/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F5fOdaPT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722419962;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fK1g098iq4JAFSZ1OwoLqHTRasnFeG8nDHsMGLN1u3s=;
-	b=F5fOdaPTeRERIKvAhmEcXQqPtk4OKBLCgJQVu6wR4IB9tPP2nHk49Oq1uGyjTmHm9+d+1m
-	1XOr3QUYPPe4xCcVEhsmpqAPeJQHHof2rGhl7ycFbT8+8RPj/YRHR4jP9Wz/8Or5t57sJy
-	2Vqaf8ech4Vsh5qiM+r5+YkKAoqm0LA=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-VHOhOAxqN5KmeMCQpFErDw-1; Wed, 31 Jul 2024 05:59:18 -0400
-X-MC-Unique: VHOhOAxqN5KmeMCQpFErDw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ef1c0f5966so3268681fa.1
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 02:59:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722419956; x=1723024756;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fK1g098iq4JAFSZ1OwoLqHTRasnFeG8nDHsMGLN1u3s=;
-        b=myUgnRQq/DwcRSsS7ANkvOukXyDeM1xwSwBxll+rka+4eKPdlnOWVqp1xueRTuXrkq
-         GHJbIqVAScdrYIPDWC6yYeNZFd94wl7ugv8jMkwnW1AnDwZpu3opxmshSiNGClZoTWGd
-         qsY0PMgaAs/F685CsYOA9du88AZh5vVeaoGQ4Ul6P9/uSBbo4ahvD7bQVaH1Virfib3V
-         I3l8LXJEi6QwK5I4jYaNGY5s8lcA8nG3Soq1eVVfUuUj3zdqLLaGtteoWNfvomq9hgm7
-         sJRrDoRBOolisW0ZZZLuJuu5G74DSV3woov261NdNNkaAHEqhBBSEfuYDCYUKVRN08Yv
-         EJIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWjJCc1MI8YaNfD+CgW/MDSx1jsFFcJHm1+rmZ8D0wgbzWbfezTEvqZykwduswm2KCEinCGkBU0padH6YscybyH3aWZmI2Y
-X-Gm-Message-State: AOJu0YzkwfrZuYvoIsqvuM9WuzPvhHWwDrD8yZet6/YJ2pZaYZYQKnV6
-	JCl3eXjEmBjAllD6ziOxzA3lx6DnoCCmKRVvaevvRRFKzP07GZNQr+DLqRlLr7ec6mrs2DkF8Cw
-	7TMgSOYjUa/WFuI5YYqcmXxc5clL3QA2qjbstHgDOTJYiaV+o0lqJZrWhKvv5G6Kl
-X-Received: by 2002:a2e:7d0c:0:b0:2ef:80:a68c with SMTP id 38308e7fff4ca-2f03c7dc6b7mr69798401fa.8.1722419956324;
-        Wed, 31 Jul 2024 02:59:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF17aCAzJBAn3plIADOp9HDwljSF8JNrYjS9kMfR+jYggbEfORU+MY3qApdGsfOXL1i/8ZbFw==
-X-Received: by 2002:a2e:7d0c:0:b0:2ef:80:a68c with SMTP id 38308e7fff4ca-2f03c7dc6b7mr69798301fa.8.1722419955717;
-        Wed, 31 Jul 2024 02:59:15 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1712:4410::f71? ([2a0d:3344:1712:4410::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367e49bdsm16719478f8f.44.2024.07.31.02.59.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jul 2024 02:59:15 -0700 (PDT)
-Message-ID: <b1c0717f-2eff-4e97-a84f-3f25a697e48d@redhat.com>
-Date: Wed, 31 Jul 2024 11:59:13 +0200
+	s=arc-20240116; t=1722420361; c=relaxed/simple;
+	bh=srmQMSPvjmzX6YVnb4EoadT8BWjHWmgLWmalAmQCuf8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YI7S9jxfy6YmIbWCaCkFKOgMRNSiWrXB76+zyeUNxK2J3zs/+eth0ltN082G20/ybvj89DKWGQOCC7Vk2Ekxux5CU+0hBUyzgeW9yR3IfMj1Nc/8tmgOwlPTQ6x8Cyj7uucHRoRrGEOZ2R4qnYQ8ZAHNY6lk8Mms2hawJJg5tmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=KXib8HK7; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sZ6DS-009FnH-49; Wed, 31 Jul 2024 12:05:54 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=7WS5w3a6OnGgEbNmijkTxVC2Csv3HLG/InjtySuGe5k=; b=KXib8HK7QGxqR3+4N85jlCWmeH
+	ryBS3iHyrX2boZvL3pHMvmSC605z13qL/Cg9dDJ36VB2vZYlUpfiYcu/+pAeoFVDJtPQsNDsSs4Rw
+	LXih0vizz96kIAzoMWCvu7Sb7S1wezRhlC96wZorPCFO9TUIBKe3uGhCg0ACGzV6SfWaCUyAcx5Iq
+	/iGtIDUaVCy6mc4uiEqSGhwLB/wrUaogdwOL6N+hll263e6P1w+6DEehZThTQ7/w5hX6XxQTNWWTf
+	ggJgmfEQIOpoO3H8ymIGAV6fqkQ7YPefVhRYQ2ONkMPk2U69MsLMi6MELAMTLCnx6gkYQq39sUdl+
+	lqS656jg==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sZ6DR-0005LZ-H5; Wed, 31 Jul 2024 12:05:53 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sZ6DB-003PbE-PN; Wed, 31 Jul 2024 12:05:37 +0200
+Message-ID: <04c91b4c-8863-4306-81a2-4cf917e9de23@rbox.co>
+Date: Wed, 31 Jul 2024 12:05:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,47 +61,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [mptcp?] WARNING in __mptcp_clean_una
-To: syzbot <syzbot+5b3e7c7a0b77f0c03b0d@syzkaller.appspotmail.com>,
- cpaasch@apple.com, davem@davemloft.net, edumazet@google.com,
- geliang.tang@linux.dev, geliang@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org,
- mptcp@lists.linux.dev, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <000000000000dce735061e8173dc@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <000000000000dce735061e8173dc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH bpf 1/6] selftest/bpf: Support more socket types in
+ create_pair()
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240724-sockmap-selftest-fixes-v1-0-46165d224712@rbox.co>
+ <20240724-sockmap-selftest-fixes-v1-1-46165d224712@rbox.co>
+ <87cyn0kqxu.fsf@cloudflare.com>
+ <7ae7a77c-c5ce-4a09-8a6c-b3cd014220f3@rbox.co>
+ <87mslyztu9.fsf@cloudflare.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <87mslyztu9.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 7/31/24 04:00, syzbot wrote:
-> syzbot suspects this issue was fixed by commit:
+On 7/30/24 19:13, Jakub Sitnicki wrote:
+> On Fri, Jul 26, 2024 at 10:29 PM +02, Michal Luczaj wrote:
+>> On 7/26/24 19:23, Jakub Sitnicki wrote:
+>>> I was going to suggest that a single return path for success is better
+>>> than two (diff below), but I see that this is what you ended up with
+>>> after patch 6.
+>>>
+>>> So I think we can leave it as is.
+>>> [...]
+>>
+>> And speaking of which, would you rather have patch 1 and 6 squashed?
 > 
-> commit fb7a0d334894206ae35f023a82cad5a290fd7386
-> Author: Paolo Abeni <pabeni@redhat.com>
-> Date:   Mon Apr 29 18:00:31 2024 +0000
+> Don't have a straight answer, sorry . Would have to see if the diff is
+> clear enough after squashing it. Use your best judgement.
 > 
->      mptcp: ensure snd_nxt is properly initialized on connect
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12c8bdbd980000
-> start commit:   4f5e5092fdbf Merge tag 'net-6.8-rc5' of git://git.kernel.o..
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1d7c92dd8d5c7a1e
-> dashboard link: https://syzkaller.appspot.com/bug?extid=5b3e7c7a0b77f0c03b0d
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14fc9c8a180000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17d0cc1c180000
-> 
-> If the result looks correct, please mark the issue as fixed by replying with:
-> 
-> #syz fix: mptcp: ensure snd_nxt is properly initialized on connect
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> It's certainly fine with me to review the steps that were taken to
+> massage the code.
 
-#syz fix: mptcp: ensure snd_nxt is properly initialized on connect
-
-oops, I forgot to do the required communication/accounting here, sorry!
-
-Paolo
+That's what I've assumed, thanks. So here's the bpf-next based respin:
+https://lore.kernel.org/bpf/20240731-selftest-sockmap-fixes-v2-0-08a0c73abed2@rbox.co
 
 
