@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-114543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 835F9942DBA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:06:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548A2942DBD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 14:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DE331F2471E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:06:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5A0BB213AA
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 12:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7341AE843;
-	Wed, 31 Jul 2024 12:06:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A4E1AE85B;
+	Wed, 31 Jul 2024 12:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="297NJZde"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gGHe2T9n"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62171AD416;
-	Wed, 31 Jul 2024 12:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AF31AD416;
+	Wed, 31 Jul 2024 12:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722427595; cv=none; b=u2uzu4JJYoeS7LTCIqwWW4JjKgSIgfteVgniuvOf5khUa8dqBfMXB38zZDXzDNP+qxs75CYzwLM5OgS3kFXPQ1ZCtRQc56D7f+fzHj072S53PEnJhhEdsiqLqMH8zbft3Dfmc3M2lZkEIJxSC0RWRwjjyJHl/cYgnz2oEcppBNQ=
+	t=1722427624; cv=none; b=tjesQgWtsLH4AqPsVYuMQuFBLxHSibrIj4BzZnrURTk2hioyFpXiuacnnyb4fnbcCYv0TJ/YTko/HjjwHWdADnzEMMhyF3T06ToIr5xxgK8j07Ddr8ZMpt4FwJpBgc46dD9W0K1G5D7ewFz8F7Xb0egwX8MECGd7CmrGol/+X9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722427595; c=relaxed/simple;
-	bh=xQ5uFdveBYSrZZtYB25LvEIRd4lVKGB/h6NBGVynsAk=;
+	s=arc-20240116; t=1722427624; c=relaxed/simple;
+	bh=8ZwwicN0f1utYiHwu9duh66IA9U3WSjNKvKYBLjXBYM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qQNHt0OcvtJSC/E5+wBkBfixqWabJEVizGoi/2/BRImP/GHdI8JM/om5U71FkDkF5f019YFqYGsZnjLGgCvgDIy3aj8vEAQ7RJJ0/62swNkSZEh0bzq0tnPBmbi5RSjSYPx3zIo6W95RlHz4Pru2w7R/a+sOka7YnmKPIIiTWUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=297NJZde; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=QlyunJZXS5WUZ45r/9gi6aEaTqN6ZsPosSEsJ3V420tCL/ZKHSPEi5VFcI50ciS5CvvoLfajtU/RDiuL+eHq+qr+dhztZCEzM5ZUgRDbE1hxD+sEzmzZ6sKo3AOmQUnLu+u37wLRNJEhhYBQyfmH0a1XE6BF+7OAzclGx3x+h5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gGHe2T9n; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/Lp1GA2p+njuqBP0rkVADaxa0iAs1ALcPIoI3TenDyA=; b=297NJZdesXFWqfqgcPKsGKIaXn
-	Xdzoh0GLtMkrWqtdK7gOwLC64kNPkvpMTx69xhOZlQLmVTTX7pjSDB5Cp4uwXstPINW+SuXD1Jfd6
-	gHjkeAEQhq/ghGtYKDIU0Moza4bRDh+wRfhuQ7oiD7fXWMD6AieyLECcBaTMEX4yUEW8=;
+	bh=3c+TGYxN3nHuViQsTaOkw7Vvw2f0tV0QCp+u/9EpqjE=; b=gGHe2T9nxQIWeqyFSZoJ7rYuv0
+	20Q9bH6tYKSHF3NMUoh5kqhmm/lTRqVpfMIPb1YKXSYQyXmdc/r08ESgUY/K+djKAfY4wwqwH8Y1J
+	YwDMmHqBVA4FoDtE+gr4RtEuYlMsxiBf1xOpdGYdetzmx0EQLF0GEaOUEMdNY+B29J2s=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sZ865-003faz-W7; Wed, 31 Jul 2024 14:06:26 +0200
-Date: Wed, 31 Jul 2024 14:06:25 +0200
+	id 1sZ86Z-003fbn-Gr; Wed, 31 Jul 2024 14:06:55 +0200
+Date: Wed, 31 Jul 2024 14:06:55 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, michal.simek@amd.com, netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	git@amd.com
-Subject: Re: [PATCH net-next v2 3/4] net: axienet: remove unnecessary
- ftrace-like logging
-Message-ID: <ac4c3f0e-1d1e-464e-9243-efa08e4b047b@lunn.ch>
+Subject: Re: [PATCH net-next v2 4/4] net: axienet: remove unnecessary
+ parentheses
+Message-ID: <d73ee99f-db14-4d93-a96a-75ecc8068014@lunn.ch>
 References: <1722417367-4113948-1-git-send-email-radhey.shyam.pandey@amd.com>
- <1722417367-4113948-4-git-send-email-radhey.shyam.pandey@amd.com>
+ <1722417367-4113948-5-git-send-email-radhey.shyam.pandey@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,14 +62,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1722417367-4113948-4-git-send-email-radhey.shyam.pandey@amd.com>
+In-Reply-To: <1722417367-4113948-5-git-send-email-radhey.shyam.pandey@amd.com>
 
-On Wed, Jul 31, 2024 at 02:46:06PM +0530, Radhey Shyam Pandey wrote:
-> remove unnecessary ftrace-like logging. Also fixes below
-> checkpatch WARNING.
+On Wed, Jul 31, 2024 at 02:46:07PM +0530, Radhey Shyam Pandey wrote:
+> Remove unnecessary parentheses around 'ndev->mtu
+> <= XAE_JUMBO_MTU' and 'ndev->mtu > XAE_MTU'. Reported
+> by checkpatch.
 > 
-> WARNING: Unnecessary ftrace-like logging - prefer using ftrace
-> +       dev_dbg(&ndev->dev, "%s\n", __func__);
+> CHECK: Unnecessary parentheses around 'ndev->mtu > XAE_MTU'
+> +       if ((ndev->mtu > XAE_MTU) &&
+> +           (ndev->mtu <= XAE_JUMBO_MTU)) {
+> 
+> CHECK: Unnecessary parentheses around 'ndev->mtu <= XAE_JUMBO_MTU'
+> +       if ((ndev->mtu > XAE_MTU) &&
+> +           (ndev->mtu <= XAE_JUMBO_MTU)) {
 > 
 > Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
 
