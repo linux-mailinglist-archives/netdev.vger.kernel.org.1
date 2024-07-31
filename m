@@ -1,39 +1,40 @@
-Return-Path: <netdev+bounces-114480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F272942B24
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:48:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C282C942B26
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 11:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16CFA1F2172D
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:48:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77BC6284F58
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 09:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E3D1A8C17;
-	Wed, 31 Jul 2024 09:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A671AB505;
+	Wed, 31 Jul 2024 09:48:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8CF2E62B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B80616B395;
 	Wed, 31 Jul 2024 09:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722419305; cv=none; b=uctpPTO9C0XkqosptLX1iQd4yv/OHllv0EkcCOWjYoOhcGCBRU/VOpmebj6kWmW1a2Pkf12FFX/AlfohDMm7FzBWBwX5AujcJC/M8/6lOf7FQVYookg4W70wD2qoc0lDRG/IMngUlSn3Qc1iFydxkm7aTSCOH6nYIcAeh67bTSI=
+	t=1722419306; cv=none; b=YpaQsLhg0QkjMLqN9MHj//gyn4AOqRcup4BLlc+1XNVRrqe5O50Yz/AUbhbdJdUiFqOIV1BVXGWXqWu/5LImvaa7zGodO4kzB7o9yDB0ZivEnbWkUqBUoKwUTqSNDNBD2kpwFquspG0N+NN96YxQ4NjO4Mv5B74+JLaSWD3eEWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722419305; c=relaxed/simple;
-	bh=iigdZH/jmo5WiWyxX6sqwboFWbK322vv9UOY8VwbH+M=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JZFMnH+cyEKtaUM53M5nT1goGBHWIM/00eGcUeGv2zrclVuLnGV9a9P9sWgEz+Ops7hRJEF8BXP1xbhRBcsZtJmbkBZlI0mMPP8gUUldIYIPkxwDNqj6I0p1a1HcLrIrrmwLKxMcb/a1cYwpDrwvqYfyb/d/YpuIS2qrHVizYgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	s=arc-20240116; t=1722419306; c=relaxed/simple;
+	bh=3aDx/Y7LxrwtcqaM5UnEaPSGvKwNWMBHgsCYFTL5FpI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CaQ9Mm8Q8J2HZpAIoc3BPSMOw0YkkZnXl5cgLbWCVzkxGPWCDAoaOT8kdXM7pFYEj1Ke5g7dUqLJxYykuzmS4geFInYDMqqBfLjOaKcUKD2JeUutvBxU0d+KJh2e26Ow81ZIecR2sC6AtgJWrbyhh1Z7aR9K+Gm0sMxo3AUCMyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WYnGp1XpGz1j6ML;
-	Wed, 31 Jul 2024 17:43:46 +0800 (CST)
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WYnL32XRjz17MyP;
+	Wed, 31 Jul 2024 17:46:35 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id E705F1A0188;
-	Wed, 31 Jul 2024 17:48:19 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 79C511A0188;
+	Wed, 31 Jul 2024 17:48:20 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -46,79 +47,195 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <sudongming1@huawei.com>,
 	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH net-next 00/10] Add support of HIBMCGE Ethernet Driver
-Date: Wed, 31 Jul 2024 17:42:35 +0800
-Message-ID: <20240731094245.1967834-1-shaojijie@huawei.com>
+Subject: [RFC PATCH net-next 01/10] net: hibmcge: Add pci table supported in this module
+Date: Wed, 31 Jul 2024 17:42:36 +0800
+Message-ID: <20240731094245.1967834-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20240731094245.1967834-1-shaojijie@huawei.com>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-This patch set adds the support of Hisilicon BMC Gigabit Ethernet Driver.
+Add pci table supported in this module, and implement pci_driver function
+to initialize this driver.
 
-This patch set includes basic Rx/Tx functionality. It also includes
-the registration and interrupt codes.
+hibmcge is a passthrough network device. Its software runs
+on the host side, and the MAC hardware runs on the BMC side
+to reduce the host CPU area. The software interacts with the
+MAC hardware through the PCIe.
 
-This work provides the initial support to the HIBMCGE and
-would incrementally add features or enhancements.
+  ┌─────────────────────────┐
+  │ HOST CPU network device │
+  │    ┌──────────────┐     │
+  │    │hibmcge driver│     │
+  │    └─────┬─┬──────┘     │
+  │          │ │            │
+  │HOST  ┌───┴─┴───┐        │
+  │      │ PCIE RC │        │
+  └──────┴───┬─┬───┴────────┘
+             │ │
+            PCIE
+             │ │
+  ┌──────┬───┴─┴───┬────────┐
+  │      │ PCIE EP │        │
+  │BMC   └───┬─┬───┘        │
+  │          │ │            │
+  │ ┌────────┴─┴──────────┐ │
+  │ │        GE           │ │
+  │ │ ┌─────┐    ┌─────┐  │ │
+  │ │ │ MAC │    │ MAC │  │ │
+  └─┴─┼─────┼────┼─────┼──┴─┘
+      │ PHY │    │ PHY │
+      └─────┘    └─────┘
 
-Jijie Shao (10):
-  net: hibmcge: Add pci table supported in this module
-  net: hibmcge: Add read/write registers supported through the bar space
-  net: hibmcge: Add mdio and hardware configuration supported in this
-    module
-  net: hibmcge: Add interrupt supported in this module
-  net: hibmcge: Implement some .ndo functions
-  net: hibmcge: Implement .ndo_start_xmit function
-  net: hibmcge: Implement rx_poll function to receive packets
-  net: hibmcge: Implement workqueue and some ethtool_ops functions
-  net: hibmcge: Add a Makefile and update Kconfig for hibmcge
-  net: hibmcge: Add maintainer for hibmcge
-
- MAINTAINERS                                   |   7 +
- drivers/net/ethernet/hisilicon/Kconfig        |  17 +-
- drivers/net/ethernet/hisilicon/Makefile       |   1 +
- .../net/ethernet/hisilicon/hibmcge/Makefile   |  10 +
- .../ethernet/hisilicon/hibmcge/hbg_common.h   | 152 +++++++
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  |  56 +++
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.h  |  11 +
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 369 ++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  78 ++++
- .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  | 205 +++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_irq.h  |  13 +
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 362 ++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_main.h |  14 +
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c | 276 ++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h |  13 +
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 115 +++++
- .../hisilicon/hibmcge/hbg_reg_union.h         | 266 ++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 410 ++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_txrx.h |  37 ++
- 19 files changed, 2411 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   | 16 ++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 83 +++++++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.h | 13 +++
+ 3 files changed, 112 insertions(+)
  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.h
  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_main.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_reg_union.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
 
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+new file mode 100644
+index 000000000000..e08e28f25f3c
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (c) 2024 Hisilicon Limited. */
++
++#ifndef __HBG_COMMON_H
++#define __HBG_COMMON_H
++
++#include <linux/etherdevice.h>
++#include <linux/pci.h>
++
++struct hbg_priv {
++	struct net_device *netdev;
++	struct pci_dev *pdev;
++	u8 __iomem *io_base;
++};
++
++#endif
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+new file mode 100644
+index 000000000000..30cc19e71c54
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0+
++// Copyright (c) 2024 Hisilicon Limited.
++
++#include <linux/etherdevice.h>
++#include <linux/netdevice.h>
++#include <linux/pci.h>
++#include "hbg_common.h"
++#include "hbg_main.h"
++
++static int hbg_pci_init(struct pci_dev *pdev)
++{
++	struct net_device *netdev = pci_get_drvdata(pdev);
++	struct hbg_priv *priv = netdev_priv(netdev);
++	int ret;
++
++	ret = pcim_enable_device(pdev);
++	if (ret)
++		return dev_err_probe(&pdev->dev, ret,
++				     "failed to enable PCI device\n");
++
++	ret = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
++	if (ret)
++		return dev_err_probe(&pdev->dev, ret,
++				     "failed to set consistent PCI DMA\n");
++
++	ret = pcim_iomap_regions(pdev, BIT(HBG_MEM_BAR), HBG_DEV_NAME);
++	if (ret)
++		return dev_err_probe(&pdev->dev, ret,
++				     "failed to map PCI bar space");
++
++	priv->io_base = pcim_iomap_table(pdev)[HBG_MEM_BAR];
++	pci_set_master(pdev);
++	return 0;
++}
++
++static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++{
++	struct net_device *netdev;
++	struct hbg_priv *priv;
++	int ret;
++
++	netdev = devm_alloc_etherdev_mqs(&pdev->dev,
++					 sizeof(struct hbg_priv), 1, 1);
++	if (!netdev)
++		return -ENOMEM;
++
++	pci_set_drvdata(pdev, netdev);
++
++	SET_NETDEV_DEV(netdev, &pdev->dev);
++
++	priv = netdev_priv(netdev);
++	priv->netdev = netdev;
++	priv->pdev = pdev;
++
++	ret = hbg_pci_init(pdev);
++	if (ret)
++		return ret;
++
++	ret = devm_register_netdev(&pdev->dev, netdev);
++	if (ret)
++		return dev_err_probe(&pdev->dev, ret,
++				     "failed to register netdev\n");
++
++	return 0;
++}
++
++static const struct pci_device_id hbg_pci_tbl[] = {
++	{PCI_VDEVICE(HUAWEI, 0x3730), 0},
++	{ }
++};
++MODULE_DEVICE_TABLE(pci, hbg_pci_tbl);
++
++static struct pci_driver hbg_driver = {
++	.name		= HBG_DEV_NAME,
++	.id_table	= hbg_pci_tbl,
++	.probe		= hbg_probe,
++};
++module_pci_driver(hbg_driver);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
++MODULE_DESCRIPTION("hibmcge driver");
++MODULE_VERSION(HBG_MOD_VERSION);
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.h
+new file mode 100644
+index 000000000000..f9652e5c06b2
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (c) 2024 Hisilicon Limited. */
++
++#ifndef __HBG_MAIN_H
++#define __HBG_MAIN_H
++
++#include <linux/io.h>
++
++#define HBG_DEV_NAME	"hibmcge"
++#define HBG_MEM_BAR	0
++#define HBG_MOD_VERSION	"1.0"
++
++#endif
 -- 
 2.33.0
 
