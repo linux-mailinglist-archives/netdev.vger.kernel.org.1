@@ -1,212 +1,229 @@
-Return-Path: <netdev+bounces-114618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C81BB9432F4
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110929432FC
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 17:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E951AB2B099
-	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:17:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB329281634
+	for <lists+netdev@lfdr.de>; Wed, 31 Jul 2024 15:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C36A1BD4ED;
-	Wed, 31 Jul 2024 15:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964C41BF304;
+	Wed, 31 Jul 2024 15:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSnG2aTi"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PMbyMSPG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D5717552;
-	Wed, 31 Jul 2024 15:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BA21BE861
+	for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 15:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722438654; cv=none; b=qD3+b9QSzZVfsV8VUTeYni9hu8VuIFCKhZGXEblFQL0GJMyYWMF/TnvjechL/eCICaRCLCnwu27j3CPKEXkQ6ceWbLwKX6jAbGOFrq5VFph3huApIqTsjmqUQPC9BmORzimi3abjoqC1YHZwHbodesSWQhPpptozTk29zgT2ypg=
+	t=1722438776; cv=none; b=itL6spUKBuhTr/STES5VfXjBMgCZYoBs/GXLbHQfxA8nwTqfo7uvGtnl4IBK1DcoLTOox1xSAd+mXi29X6TJNHMcYDGkj4hJlXdfrJOYY5lx4QTcKLNo55x20kFTMckI0gfZR9RCATbon3Oy8O34rWViL6l3IXQvvruz4zfzAbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722438654; c=relaxed/simple;
-	bh=Xt+mb5hIBYa4aoADZVAEEXbmVtyCi1kCj04mH9kCKPk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f8EeIOU/r9jxwvECR8v0HEQV67Tog6y0ebobad3mmgNAS5Pp+7AqXDqfskVC5E5GuPxnUwmbv754kVmzzfxAcHg4hTkNMnXPPBzoemyvxEJ6C9yuD31GyNKbrdZ8XBfm9fU2mhRhlhewB4qMQME5xoxv4/XhBNdXt/saUw1MWVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CSnG2aTi; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1fd90c2fc68so45291375ad.1;
-        Wed, 31 Jul 2024 08:10:52 -0700 (PDT)
+	s=arc-20240116; t=1722438776; c=relaxed/simple;
+	bh=8zhTVavCJJ8/IwBvdz+QEBE4EZM9UV2ssOh2BpQ6TwQ=;
+	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=t2KotW7fi3H84YgQOVtToZ/43NP7kRhSQPrLUTskWHZJzg5tOZeP+jGfS2Itg9Iz+fkQth24Fsgcqipazm0n3YGjMD+v7z31Z+WYVEBINQ4pK/4XPFAZW1MvrZ5Ef/KmrwDZDhpKPyOymRRQ08j+hfDe6y1zEvF+W0M/DUaC8Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PMbyMSPG; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70d23caf8ddso5118865b3a.0
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 08:12:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722438652; x=1723043452; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FAMngMCa2HAFboRJYmZVtugYfv6PWexcdwffsm2pQ28=;
-        b=CSnG2aTiNkufkAp54gyfQY+8jsH+iTWaWDUJWRtqbF5U4H3N3rYEsgkw1cC/PAKNLs
-         XJF5hLRfMYyFbmUXzvMLZjpiKFkAmg7JspeQ5Pq78ODOCU0AAyq4cf6xPQHza29JRNoZ
-         KzvOZ29hCyfjQgTj2onEPVGLM/685y4S8Wfn3iTWWhZVe6iLfYDzE40ZZ3TMAxmSlw4k
-         tW8wNImPdErWWKGjJ2cOCXUk/FdeVW/BrjSs0GMVm4bxwRj+SmVWU6RPa4IudFk88q6v
-         RVevB0vNt86fKfYhUoCqG2+NMkZ+owIH56fehV+Y3XQOKtP2IUoKd7AqJPxGhLW2+6yc
-         J2uA==
+        d=broadcom.com; s=google; t=1722438773; x=1723043573; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ydsvrBXtt6nU238Px/qRdSbaJLxYYF7XQP8F6wgRzZA=;
+        b=PMbyMSPG6VFpJRl+SkLQ7Fdp0QvPOJ64/wtjwEqihqEkMlJ+6aiXqAq8g74BE98vuM
+         wMKpLnpXCShB84N/Ggo2RDeCAGUB9hRtL3/z1pV3G+fpBbinB/j/2YVWT2+kDfgK5nv8
+         3QEjvawnzCgUUsO0Rm4mZov5VSoEyvRL9YA/o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722438652; x=1723043452;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FAMngMCa2HAFboRJYmZVtugYfv6PWexcdwffsm2pQ28=;
-        b=Zzs1IxioPtcVvykCc+oIJyO7vQh/vJeXY//YGLeWOq1A6Dnxk2RFRpY9ZqgfExONo2
-         7pFdiux21i18xyYFGqV4xq8TlV3/MDatKRZ91QiUWqY5iSkd6ITOUK1ZZ51IyVI2aXHP
-         4I+/6uhS7Vp0NNmz5TlNxGm3o5bfa4MvG2k6u9LZ11UQ62kT9KtuiX0iygxUBr+21t9O
-         TsXm53ZDOcijHGJgFpjbBNyHpDgTQl+czySW2a7dpNbUOIs7FK++++OTWPkfJk0DeDjS
-         Z3BZFDFEwvabQaNJqoITbxpmZ7fmqbm49fCl+1I/HSyJ7tS+2tC2xWbDxUkogCn+R1lX
-         sMRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJby0LywN0i1ucxvodqIuF438/7fPkCcdeUgQYv/b6i5DLkHjOJTq3tFmwiBiuWy01tkToEWkiua+bDWkAbS4Nlr1Se5zYag5WgFe0BQHb4acj2cXo8qytX7g8CAa2ROHcJQGX
-X-Gm-Message-State: AOJu0YzxilCSIfDfnxdJC2SuFb+VfZnM/ybZG2muRoSapk1wV4PaF9L2
-	CI5imWmIcJhh8PXgYRdKzD2jlNCyRyu4/QSp3hQzJ+DiynIorI8WGeGE0nQzY48=
-X-Google-Smtp-Source: AGHT+IGn3zRosNfD+5PBLu5X9lqbDgN8DXQmPHfrvofJJ9jXYr5NhRn4fzYFkefxSMaUoros5PDI4g==
-X-Received: by 2002:a17:903:1387:b0:1fd:aa8d:ad00 with SMTP id d9443c01a7336-1ff0482ba5cmr107135245ad.18.1722438651745;
-        Wed, 31 Jul 2024 08:10:51 -0700 (PDT)
-Received: from localhost.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7c7fbe1sm121377195ad.45.2024.07.31.08.10.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 08:10:51 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: jiri@resnulli.us
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	nicolas.dichtel@6wind.com,
-	liuhangbin@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com,
-	syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net,v2] rtnetlink: fix possible deadlock in team_port_change_check
-Date: Thu,  1 Aug 2024 00:09:40 +0900
-Message-Id: <20240731150940.14106-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1722438773; x=1723043573;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ydsvrBXtt6nU238Px/qRdSbaJLxYYF7XQP8F6wgRzZA=;
+        b=Yjbe/BmkXSsTzfHdNlXfsVAYheE9mjMGRsmEowo2unr8sq5E0yZNqv9Pd5GKfZeFWh
+         uRCiwvUy+AFsEj/q0MbkFsxShXatZAUA4j1mXZZf9BM2QIpBAKwDyXfD/ev8nXQhBqfx
+         wiWFf3AWK/8i1EsNZFXYNuX4sZunF3ZYew7Fmu6Saa0SQec/8Hf/Wh0Px/b4xFJl+7NP
+         +T2l3hHQxskDzxfR0x0USXi3kuJzPnDovPUxG9spP3PezLDDwh5AV1MPvvvxskCNEBbK
+         78+WtBcRQHdy8hm7vwo5JrIgA3erKMqDyj36MyTe+EXmbuUPve2yJdojxC4eKfHbYtXW
+         sANg==
+X-Forwarded-Encrypted: i=1; AJvYcCVIdZXwKeOzHJf7BRIT6JCUXKJ0+0CTrebFWBE3FV5Pn6Pumefs5qg9JDbvRjeAnH8PNm7Egw/6AyxCZTYhS0Np4hiMx3aP
+X-Gm-Message-State: AOJu0YxDtcg/U6GLu0AqZgB70WpXtHX5q+UKYJRbLT+m8BLrvjdKbu5q
+	gPkLctVf0LbETi6pTAxjTEljXvJEZbtOUUncwnksoSK3YrJC4wEdvsiCmKujLbKB82EeFzSVSbY
+	7fv25
+X-Google-Smtp-Source: AGHT+IHEl06Nm3dVBLJpGj1Uk+cVGvjdXmv2CgeM4NvVMJyMb/tbEYSvWNiGXEabI5NOqoQNRCIVqA==
+X-Received: by 2002:a05:6a00:8592:b0:706:31d9:9c99 with SMTP id d2e1a72fcca58-70ece928cf5mr17384197b3a.0.1722438773104;
+        Wed, 31 Jul 2024 08:12:53 -0700 (PDT)
+Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead7156c8sm10059508b3a.83.2024.07.31.08.12.45
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 31 Jul 2024 08:12:52 -0700 (PDT)
+From: Arend Van Spriel <arend.vanspriel@broadcom.com>
+To: Sebastian Reichel <sebastian.reichel@collabora.com>
+CC: Krzysztof Kozlowski <krzk@kernel.org>, Jacobe Zang <jacobe.zang@wesion.com>, <robh@kernel.org>, <krzk+dt@kernel.org>, <heiko@sntech.de>, <kvalo@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>, <conor+dt@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, <efectn@protonmail.com>, <dsimic@manjaro.org>, <jagan@edgeble.ai>, <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>, <arend@broadcom.com>, <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <megi@xff.cz>, <duoming@zju.edu.cn>, <bhelgaas@google.com>, <minipli@grsecurity.net>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>, Andy Green <andy@warmcat.com>
+Date: Wed, 31 Jul 2024 17:12:43 +0200
+Message-ID: <1910959c1f8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <sgfd5ccltsi7mjbybmdbs3fmsfcp3vqtpitdac7exzgxav53kk@6lwogbq4fhks>
+References: <20240730033053.4092132-1-jacobe.zang@wesion.com>
+ <20240730033053.4092132-3-jacobe.zang@wesion.com>
+ <191025b5268.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <f45c1fa7-f321-4a1f-b65c-6ed326a18268@kernel.org>
+ <191030eac78.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <3d3b8e0a-7492-4db1-bd73-c30a488edaa7@kernel.org>
+ <191035b8c28.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <k3dhdsa5bjzad2ha5e2uurg2azzs773ier5thkot4w2qcvnv54@yuf52eluqsae>
+ <dd381dc1-454f-4ecd-adb7-55de2e15d592@broadcom.com>
+ <sgfd5ccltsi7mjbybmdbs3fmsfcp3vqtpitdac7exzgxav53kk@6lwogbq4fhks>
+User-Agent: AquaMail/1.51.5 (build: 105105504)
+Subject: Re: [PATCH v5 2/5] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
-In do_setlink() , do_set_master() is called when dev->flags does not have
-the IFF_UP flag set, so 'team->lock' is acquired and dev_open() is called,
-which generates the NETDEV_UP event. This causes a deadlock as it tries to
-acquire 'team->lock' again.
+On July 31, 2024 3:54:52 PM Sebastian Reichel 
+<sebastian.reichel@collabora.com> wrote:
 
-To solve this, we need to unlock 'team->lock' before calling dev_open()
-in team_port_add() and then reacquire the lock when dev_open() returns.
-Since the implementation acquires the lock in advance when the team
-structure is used inside dev_open(), data races will not occur even if it
-is briefly unlocked.
+> Hi,
+>
+> On Wed, Jul 31, 2024 at 02:57:37PM GMT, Arend van Spriel wrote:
+>> On 7/30/2024 7:38 PM, Sebastian Reichel wrote:
+>>> Hi,
+>>>
+>>> On Tue, Jul 30, 2024 at 01:16:57PM GMT, Arend Van Spriel wrote:
+>>>> On July 30, 2024 12:18:20 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>>>
+>>>>> On 30/07/2024 11:52, Arend Van Spriel wrote:
+>>>>>> On July 30, 2024 11:01:43 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>>>>>
+>>>>>>> On 30/07/2024 08:37, Arend Van Spriel wrote:
+>>>>>>> > + Linus W
+>>>>>>> >
+>>>>>>> > On July 30, 2024 5:31:15 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
+>>>>>>> >
+>>>>>>> > > Not only AP6275P Wi-Fi device but also all Broadcom wireless devices allow
+>>>>>>> > > external low power clock input. In DTS the clock as an optional choice in
+>>>>>>> > > the absence of an internal clock.
+>>>>>>> > >
+>>>>>>> > > Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>>>>>>> > > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+>>>>>>> > > ---
+>>>>>>> > > .../bindings/net/wireless/brcm,bcm4329-fmac.yaml          | 8 ++++++++
+>>>>>>> > > 1 file changed, 8 insertions(+)
+>>>>>>> > >
+>>>>>>> > > diff --git
+>>>>>>> > > a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+>>>>>>> > > b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+>>>>>>> > > index 2c2093c77ec9a..a3607d55ef367 100644
+>>>>>>> > > --- a/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+>>>>>>> > > +++ b/Documentation/devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml
+>>>>>>> > > @@ -122,6 +122,14 @@ properties:
+>>>>>>> > > NVRAM. This would normally be filled in by the bootloader from platform
+>>>>>>> > > configuration data.
+>>>>>>> > >
+>>>>>>> > > +  clocks:
+>>>>>>> > > +    items:
+>>>>>>> > > +      - description: External Low Power Clock input (32.768KHz)
+>>>>>>> > > +
+>>>>>>> > > +  clock-names:
+>>>>>>> > > +    items:
+>>>>>>> > > +      - const: lpo
+>>>>>>> > > +
+>>>>>>> >
+>>>>>>> > We still have an issue that this clock input is also present in the
+>>>>>>> > bindings specification broadcom-bluetooth.yaml (not in bluetooth
+>>>>>>> > subfolder). This clock is actually a chip resource. What happens if both
+>>>>>>> > are defined and both wifi and bt drivers try to enable this clock? Can this
+>>>>>>> > be expressed in yaml or can we only put a textual warning in the property
+>>>>>>> > descriptions?
+>>>>>>>
+>>>>>>> Just like all clocks, what would happen? It will be enabled.
+>>>>>>
+>>>>>> Oh, wow! Cool stuff. But seriously is it not a problem to have two entities
+>>>>>> controlling one and the same clock? Is this use-case taken into account by
+>>>>>> the clock framework?
+>>>>>
+>>>>> Yes, it is handled correctly. That's a basic use-case, handled by CCF
+>>>>> since some years (~12?). Anyway, whatever OS is doing (or not doing)
+>>>>> with the clocks is independent of the bindings here. The question is
+>>>>
+>>>> Agree. Probably the bindings would not be the place to document this if it
+>>>> would be an issue.
+>>>>
+>>>>> about hardware - does this node, which represents PCI interface of the
+>>>>> chip, has/uses the clocks.
+>>>>
+>>>> The schematics I found for the wifi module and the khadas edge platform show
+>>>> these are indeed wired to the chip.
+>>>
+>>> I have a Rockchip RK3588 Evaluation Board on my desk, which uses the
+>>> same WLAN AP6275P module. I think I already commented on a prior
+>>> version of this series: The LPO clock is needed to make the PCIe
+>>> device visible on the bus. That means this series only works if the
+>>> clock has already been running. Otherwise the PCIe driver will never
+>>> be probed. To become visible the devices requires:
+>>>
+>>> 1. The LPO clock to be enabled
+>>> 2. Power to be applied
+>>> 3. The WL_EN gpio to be configured correctly
+>>>
+>>> If one of the above is not met, the device will not even appear in
+>>> 'lspci'. I believe the binding needs to take into consideration, that
+>>> pwrseq is needed for the PCIe side. Fortuantely the heavy lifting of
+>>> creating the proper infrastructure for this has already been done by
+>>> Bartosz Golaszewski for Qualcomm WLAN chips. What is missing is a
+>>> pwrseq driver for the Broadcom chip (or this specific module?).
+>>
+>> That does not really make sense. There is no relation between the LPO clock
+>> and the PCIe clocks so 1) being a requirement for probing the device looks
+>> odd. It also does not match past experience when I assisted Andy Green in
+>> getting this module up and running almost two years ago.
+>
+> Well, first of all I can easily reproduce this on my RK3588 EVB1. I
+> intentionally ignore any bluetooth bits to avoid cross-effects from
+> bluetooth enabling any clocks / regulators / GPIOs and make sure the
+> RTC output clock is disabled at boot time (i.e. boot once without
+> any reference to the RTC clock and without 'clk_ignore_unused'
+> kernel argument). When booting up like this the WLAN device is not
+> visible in 'lspci' despite the WL_REG_ON GPIO being hogged. If I
+> additionally hack the RTC output clock to be enabled the WLAN device
+> becomes visible in 'lspci'.
+>
+> The datasheet fully explains this:
+>
+> https://www.lcsc.com/datasheet/lcsc_datasheet_2203281730_AMPAK-Tech-AP6275P_C2984107.pdf
+>
+> PDF Page 23/24 (20/21 in the footer) has the Host Interface Timing
+> Diagram. WL_REG_ON should only be enabled after 2 cycles from LPO.
+> That means with LPO being disabled WL_REG_ON cannot be enabled. I'm
+> pretty sure WL_REG_ON means WLAN_REGULATOR_ON, so the logic is not
+> powered. On page 27 (24 in the footer) there is also a PCIe Power-On
+> Timing diagram, which shows that WL_REG_ON must be enabled before
+> the PCIe refclk is enabled.
+>
+> So there is a specific power up sequence, which must be followed.
 
-============================================
-WARNING: possible recursive locking detected
-6.11.0-rc1-syzkaller-ge4fc196f5ba3-dirty #0 Not tainted
---------------------------------------------
-syz.0.15/5889 is trying to acquire lock:
-ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_port_change_check drivers/net/team/team_core.c:2950 [inline]
-ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_device_event+0x2c7/0x770 drivers/net/team/team_core.c:2973
+The chip also has an (less accurate) internal LPO so the 32khz sleep clock 
+in the diagram does not have to be an external clock. Maybe Ampak 
+bootstrapped the chip to disable the internal clock. Dunno.
 
-but task is already holding lock:
-ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_add_slave+0x9c/0x20e0 drivers/net/team/team_core.c:1975
+What Andy needed back then to get firmware running was a change in the 
+nvram file to force using the internal LPO, but the device was already 
+visible on the PCIe bus.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+Regards,
+Arend
 
-       CPU0
-       ----
-  lock(team->team_lock_key#2);
-  lock(team->team_lock_key#2);
 
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by syz.0.15/5889:
- #0: ffffffff8fa1f4e8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #0: ffffffff8fa1f4e8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x372/0xea0 net/core/rtnetlink.c:6644
- #1: ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_add_slave+0x9c/0x20e0 drivers/net/team/team_core.c:1975
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5889 Comm: syz.0.15 Not tainted 6.11.0-rc1-syzkaller-ge4fc196f5ba3-dirty #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:119
- check_deadlock kernel/locking/lockdep.c:3061 [inline]
- validate_chain kernel/locking/lockdep.c:3855 [inline]
- __lock_acquire+0x2167/0x3cb0 kernel/locking/lockdep.c:5142
- lock_acquire kernel/locking/lockdep.c:5759 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
- team_port_change_check drivers/net/team/team_core.c:2950 [inline]
- team_device_event+0x2c7/0x770 drivers/net/team/team_core.c:2973
- notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
- call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
- call_netdevice_notifiers net/core/dev.c:2046 [inline]
- __dev_notify_flags+0x12d/0x2e0 net/core/dev.c:8876
- dev_change_flags+0x10c/0x160 net/core/dev.c:8914
- vlan_device_event+0xdfc/0x2120 net/8021q/vlan.c:468
- notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
- call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
- call_netdevice_notifiers net/core/dev.c:2046 [inline]
- dev_open net/core/dev.c:1515 [inline]
- dev_open+0x144/0x160 net/core/dev.c:1503
- team_port_add drivers/net/team/team_core.c:1216 [inline]
- team_add_slave+0xacd/0x20e0 drivers/net/team/team_core.c:1976
- do_set_master+0x1bc/0x230 net/core/rtnetlink.c:2701
- do_setlink+0x306d/0x4060 net/core/rtnetlink.c:2907
- __rtnl_newlink+0xc35/0x1960 net/core/rtnetlink.c:3696
- rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3743
- rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6647
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x544/0x830 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0xab5/0xc90 net/socket.c:2597
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2651
- __sys_sendmsg+0x117/0x1f0 net/socket.c:2680
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc07ed77299
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fc07fb7f048 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fc07ef05f80 RCX: 00007fc07ed77299
-RDX: 0000000000000000 RSI: 0000000020000600 RDI: 0000000000000012
-RBP: 00007fc07ede48e6 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fc07ef05f80 R15: 00007ffeb5c0d528
-
-Reported-by: syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
-Fixes: ec4ffd100ffb ("Revert "net: rtnetlink: Enslave device before bringing it up"")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
- drivers/net/team/team_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index ab1935a4aa2c..ee595c3c6624 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -1212,8 +1212,9 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
- 			   portname);
- 		goto err_port_enter;
- 	}
--
-+	mutex_unlock(&team->lock);
- 	err = dev_open(port_dev, extack);
-+	mutex_lock(&team->lock);
- 	if (err) {
- 		netdev_dbg(dev, "Device %s opening failed\n",
- 			   portname);
---
 
