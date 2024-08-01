@@ -1,174 +1,104 @@
-Return-Path: <netdev+bounces-114948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B66944C95
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:09:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55F7944CC2
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89A3C1F2670B
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:09:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37479B25D1B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9C41BC09D;
-	Thu,  1 Aug 2024 13:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FA91A99D2;
+	Thu,  1 Aug 2024 13:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ruqq/X+W"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88641BC08B
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 13:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831271A99C0;
+	Thu,  1 Aug 2024 13:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722517287; cv=none; b=F65F8cAw5yCvCc3AfIaIwbNDaIbx1UFltEIqBnrl191E8PPrjpEF8E3ierFIMtaYryyP770tVIQwQ76Wmt5MYlS85Id7+PIXPgcInNjKThyjQ1WwBfca2rK5kD4AdogKPBhah8bt0gh0e7scnJzbo2vFcw/r1qmRFyRVDqUidCY=
+	t=1722517442; cv=none; b=hlhhtfOOn/BFaMQ416zW2ZH9osyD73frv+X0LXfOETFY1MmZ2zLsKe/z7XRf7Jglrh1fjOqn/Ki+g4el2Akr40Hep9YfrCb4KFB923yHGFkATrrwKWgXgwp42YS2AWS4U4aX/mvbmWBq66xRcjUWVEs7YssOCVyI3geuMUXOIdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722517287; c=relaxed/simple;
-	bh=GkaiSM13/qrTUC0ROStPflXea/cNRgCiSONvV34+KIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FgDCDkegpS9MDash4MOsXueNAKq3jqenxYul3jLFcd1FB80kDzYdKzaHfpEzWLN8Iy4Uh2O5fvf4E98KQqiOtWgUUvhSSBhrrSOD52FHSh496mTbhhv5JPTFTkh7vBW1EIrloQ7CWpFsGM2tUf4ZsbrpUfqJrdhp+L6J1DSvoXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WZTVb0fBDzyPFW
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 20:56:23 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 996A7140109;
-	Thu,  1 Aug 2024 21:01:22 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 1 Aug 2024 21:01:22 +0800
-Message-ID: <22fda86c-d688-42e7-99e8-e2f8fcf1a5ba@huawei.com>
-Date: Thu, 1 Aug 2024 21:01:21 +0800
+	s=arc-20240116; t=1722517442; c=relaxed/simple;
+	bh=kSCoKSw5DnZETEk8lly0c/wVEP/LzQmG+z9f0B9Xet8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p7HL53B4mXyu9SpyKS18SNSE5TXNwJKLaYvNjmPOOhKmAOUA+OgNv94Q9LU8zcuZFnmMGmF3bOpMsUOkKQdWOT5Qp2jdOzWxiCoNxUg9WvfnP6v0Vj58iAn9Qn3aNmTIPYHdS+7wsTl7+NDgk0tQJaC4qb+kY13FfBT1tg3PPXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ruqq/X+W; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UmKFNRw0LjtNfCc16BZfWf6WWKpUZoBiL2KbRjpT4Q4=; b=ruqq/X+WVqVxsCOGRsQzOraUVk
+	/XDER8dHu9VOD6sOKYdGVLNwNfrs6MOlvtq6pRoFW/91H4g5AkDa17x5cZKzYRajpltx3ANqnQFXF
+	miZ0xXQmy5jny2DthO4ZLMiz5wklJEPg0o+rmPuSK1OQPhQpKnMez5og9/JIGMHlrvcA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sZVTH-003mE2-J0; Thu, 01 Aug 2024 15:03:55 +0200
+Date: Thu, 1 Aug 2024 15:03:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lee Jones <lee@kernel.org>
+Cc: Marek Vasut <marex@denx.de>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, Rob Herring <robh@kernel.org>,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2] dt-bindings: leds: Document "netdev" trigger
+Message-ID: <62cc3d64-c5e4-4af3-90ce-273ece6e8e57@lunn.ch>
+References: <20240708114653.18566-1-marex@denx.de>
+ <20240725085042.GC501857@google.com>
+ <3c8bf807-8a8e-4704-a90a-d77ad3293b57@lunn.ch>
+ <20240801125309.GE6756@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
-	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil
- Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>
-References: <20240731124505.2903877-1-linyunsheng@huawei.com>
- <20240731124505.2903877-5-linyunsheng@huawei.com>
- <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240801125309.GE6756@google.com>
 
-On 2024/8/1 2:13, Alexander Duyck wrote:
-> On Wed, Jul 31, 2024 at 5:50 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> Currently the page_frag API is returning 'virtual address'
->> or 'va' when allocing and expecting 'virtual address' or
->> 'va' as input when freeing.
->>
->> As we are about to support new use cases that the caller
->> need to deal with 'struct page' or need to deal with both
->> 'va' and 'struct page'. In order to differentiate the API
->> handling between 'va' and 'struct page', add '_va' suffix
->> to the corresponding API mirroring the page_pool_alloc_va()
->> API of the page_pool. So that callers expecting to deal with
->> va, page or both va and page may call page_frag_alloc_va*,
->> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
->>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+On Thu, Aug 01, 2024 at 01:53:09PM +0100, Lee Jones wrote:
+> On Thu, 25 Jul 2024, Andrew Lunn wrote:
 > 
-> I am naking this patch. It is a pointless rename that is just going to
-> obfuscate the git history for these callers.
-
-I responded to your above similar comment in v2, and then responded more
-detailedly in v11, both got not direct responding, it would be good to
-have more concrete feedback here instead of abstract argument.
-
-https://lore.kernel.org/all/74e7259a-c462-e3c1-73ac-8e3f49fb80b8@huawei.com/
-https://lore.kernel.org/all/11187fe4-9419-4341-97b5-6dad7583b5b6@huawei.com/
-
+> > > > diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
+> > > > index 8a3c2398b10ce..bf9a101e4d420 100644
+> > > > --- a/Documentation/devicetree/bindings/leds/common.yaml
+> > > > +++ b/Documentation/devicetree/bindings/leds/common.yaml
+> > > > @@ -113,6 +113,8 @@ properties:
+> > > >              # LED indicates NAND memory activity (deprecated),
+> > > >              # in new implementations use "mtd"
+> > > >            - nand-disk
+> > > > +            # LED indicates network activity
+> > > > +          - netdev
+> > > 
+> > > netdev is the description of the network development ML/repo, right?
+> > > 
+> > > Seems like an odd name for an OS agnostic property?
+> > 
+> > I agree that one meaning is the network development community within
+> > Linux.
+> > 
+> > But it also means a network device, which is OS agnostic. I don't
+> > really see it be any different to a memory technology device, mtd.
 > 
-> As I believe I said before I would prefer to see this work more like
-> the handling of __get_free_pages and __free_pages in terms of the use
+> MTD is an acronym.
+> 
+> The only dodgy one I see in there is 'kbd-capslock'.
+> 
+> How about, now go with me here: 'network'?
 
-I am not even sure why are you bringing up  __get_free_pages() and
-__free_pages() here, as the declaration of them is something like below:
+We could do, but we have to keep netdev around for backwards
+compatibility. There are DT blobs using it which we cannot break.
 
-unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order);
-void __free_pages(struct page *page, unsigned int order);
-
-And I add another related one for completeness here:
-extern void free_pages(unsigned long addr, unsigned int order);
-
-I am failing to see there is any pattern or rule for the above API
-naming. If there is some pattern for the above existing APIs, please
-describe them in detail so that we have common understanding.
-
-After the renaming, the declaration for both new and old APIs is
-below, please be more specific about what exactly is the confusion
-about them, what is the better naming for the below APIs in your
-mind:
-struct page *page_frag_alloc_pg(struct page_frag_cache *nc,
-                               unsigned int *offset, unsigned int fragsz,
-                               gfp_t gfp);
-void *page_frag_alloc_va(struct page_frag_cache *nc,
-                         unsigned int fragsz, gfp_t gfp_mask);
-struct page *page_frag_alloc(struct page_frag_cache *nc,
-                             unsigned int *offset,
-                             unsigned int fragsz,
-                             void **va, gfp_t gfp);
-
-> of pages versus pointers and/or longs. Pushing this API aside because
-> you want to reuse the name for something different isn't a valid
-> reason to rename an existing API and will just lead to confusion.
-
-Before this patchset, all the page_frag API renamed with a '_va' suffix
-in this patch are dealing with virtual address, it would be better to be
-more specific about what exactly is the confusion here by adding a explicit
-'va' suffix for them in this patch?
-
-I would argue that the renaming may avoid some confusion about whether
-page_frag_alloc() returning a 'struct page' or returning a virtual address
-instead of leading to confusion.
-
-Anyway, naming is always hard, any better naming is welcome. But don't deny
-any existing API renaming when we have not really started doing detailed
-comparison between different API naming options yet.
+	Andrew
 
