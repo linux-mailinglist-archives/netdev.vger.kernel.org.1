@@ -1,224 +1,134 @@
-Return-Path: <netdev+bounces-114892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F0D944941
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 986E3944943
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 066321F22ED1
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:24:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E0161F230F1
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1805170A2C;
-	Thu,  1 Aug 2024 10:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF9C170A34;
+	Thu,  1 Aug 2024 10:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bVU4Nyju"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYyTNlaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE2216F0C6
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 10:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9F3446A1
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 10:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722507881; cv=none; b=Jqf4c1QZXAVWIPb6f+EWB7k4E9E2RBHZQOrjtprsDU+S92TMGIVvQP5N8PuxoKk9IJ8T82Wc0vd3U1c7f/f8+mCAKa02kGy0BeBjcKuF5IRe+O1lGnma0+1KeXPInUmaNOZDL+TUKdXbdO4QrEG7o1LZjEXncJmHJfd5B8NqUyg=
+	t=1722507949; cv=none; b=Senu93BABlGEjedYMY/2SdX3scDKAtUVpkCyORZVTp+DxNrtJ4gIXBlFU/gwLy+OIjfVYNuU6zNsvA4C3w8HvGVla713j6j2hOQyJI89gugGS/YBidZogEyEqNXt3i4mQ3RF1fR0aJO86v//HJgg+wbRDrMXQ8MAgLqxWchnA0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722507881; c=relaxed/simple;
-	bh=eoczUhjvKaebHrhTOzNxLQHK7+yF/DYV+WF54o+LF1U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Oh0pJm3SmcFexCnm/Eh2M4WV2zIaG1LySldkGgsg7HIDKo3iU01mLEqU8PDBXCFqggHPLz2bnNNR1JvoSZOkBeYVIlA33rXNUUeABZbRnj8qIZFh5pq2MQ1hgwaviFX3u4Ad9MGYDCmn+xXhJuikBznMtBPy+dNipGLN0y6GNw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bVU4Nyju; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5b7b6a30454so312207a12.2
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 03:24:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722507878; x=1723112678; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D4s+e3Vln63+Feo3Cd8w3f1WuBICejnKkcOl/8lFuL8=;
-        b=bVU4Nyju4A1BiDum+/AUvj0mNCuGCmCnC1YcQsL+xLw7s4sWxLQDa/45o96dRVuqqt
-         V1jW5Dr/Xj++HugfRAksf/FUUyaYXt4n3TUEeFor3Nh0Q70hcLtcS2hnYAkVPCHbCkHe
-         WTbFNamr5pqfdHueTBcpe7/VGc6bZdTgejy1ntc6c/ODU17dz/N99vc0JxrePZX9I6xB
-         pPiyS040dk4R7DO45iSui+vDqdUDjdEUMzYYJ+FSzf9GLhN8iSYkNzmb4DxZR+vR9QGv
-         26UmO4nJTC/ZFE3Ceh0FGNZhCYMN3IlNR5OgN18EWpwVEfpu6o92lAXPqtgUXOL6ABcW
-         +CFw==
+	s=arc-20240116; t=1722507949; c=relaxed/simple;
+	bh=iZClEU3Bl4WzVHBFC518QWMQW5wfXlFiHdPhgAH8iQo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DF19VEXiH8lXZqZgLQHPxyWt0BO+pO074Wz79Q65seJNfyZl8c2BLh57Jo/tLbxY0aO27B4urFpCxOawOizWX9lImbU84ctYRXhSX/+wUKm4eOht2I991hdxVIn1FrsSk31Mr35LzrstumFRdo/GDlxPsNIrAn/I0OGg9dACC3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYyTNlaB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722507944;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mQkkrAPQwecwOQ18uDWPmVdaGmQ67evbO7cOUB5GUDo=;
+	b=aYyTNlaBfjBcOb2+qxHZnQVtgq5luk/s9H9Ey9Y5U2DZ0p+TQSzoYmFLRI5IBQihedaWCg
+	ctIYplTpnxvHC6+derJZ5OA1rH/tW9fzZuWqSzkebOZeq6K0L5x0TrHT/ositUecC4Eer9
+	1r5WxBKbQoeEOgXgJ6kROSffwh4lKZg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-101-vVvw_QkRM5-0rcaY0tQ6Pw-1; Thu, 01 Aug 2024 06:25:43 -0400
+X-MC-Unique: vVvw_QkRM5-0rcaY0tQ6Pw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4210e98f8d7so8997035e9.3
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 03:25:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722507878; x=1723112678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D4s+e3Vln63+Feo3Cd8w3f1WuBICejnKkcOl/8lFuL8=;
-        b=GYIx2fb8Nwn0Q5igZzQonJ7nrl1bAnJ9DeHWdZdNosBoPwQ91QjtGINy7sEuEIM3hf
-         4FYYUqSqTOxkfJy2CazWnsieoS6KncAD7kAipxaWfnPe7dteInPd5sAh4ROEMpc3wEzw
-         v+Qwm3B5MaAhV+3sD6CP7Ei63a4g4kxJ0cY2EqNsf9GCwgXR0nrERDW+WwUY53+v70tS
-         QEoA5Bg9IondWS5zENjaWpl4U4toQ4Ikvf72Ix4JGpgrg4pt2RF9voYY/yYx+jfLqlxF
-         U+RKmUlZXFUXtuVRioLYJ8H9/dR6vPYsxpczrWV6fUMAVtpy6MCkMhhbhxj5NAmwfm63
-         l4bg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5T03dOMOZ662ZpGptX+MtcGeB1LkOyDwYu0nYK9d2vx5PTOnK8EifIhsPfPpnqa3Dt9VdggGSYBILCUCDanTMgQ+Fcd3z
-X-Gm-Message-State: AOJu0YxVgtRkNTKRz/2IANrIFuB4e9sjJhS9/ffvOoRn99MU8XgyFGxF
-	AIGqujZRwlwy2bvsPEivKLpRQxbBdcW1e92kf8LayujsfWV6xqIZkL+AxBZUMR6lppZoXO0GkOV
-	ODuuD4FZyI/C95FQozoc9C4hFRm8=
-X-Google-Smtp-Source: AGHT+IGnI12gHtQV0/7MoC47U94008Pg5Xxa1bDhXLH/1RjsgUWk6qi/Q5BfEM2Zt8u2hn2XgAeob0Nvc1sNcztNBvU=
-X-Received: by 2002:a50:ed95:0:b0:5a2:2fa5:f146 with SMTP id
- 4fb4d7f45d1cf-5b7003d20d9mr1057733a12.28.1722507878024; Thu, 01 Aug 2024
- 03:24:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722507942; x=1723112742;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mQkkrAPQwecwOQ18uDWPmVdaGmQ67evbO7cOUB5GUDo=;
+        b=LoeRQyDlGfeL1UAcSDq1fQQHVeg4bP9sUFgm3h7cMtJR8jZbd4W2VvVZ+AthBWM2yI
+         5V+qBO2lruCY8GS9lsfdho/eqYOLnRa1IHWXEpUmMf7nQU8zxIfci6Kum75SLEK3Ecq3
+         IJHjGq+MlZUfFP6Ok/kZ4zqhatmNlZePOwG6dt7I0OpL7qQETSHyTgtFW6QucY+iVcZq
+         WlyCtgpNzuBcG5fCzkboq4+gu1xoxSVypZY+vhlRrsfcDrtYHuFlEr4w9xmo3Wkl+FLd
+         b8LmRlsNXtHUKNc1+jtVo1uYZI3wWEiEg0fGYwd5nMCYqy00d01N/4zFNWLv8vVA4a0Y
+         E7cQ==
+X-Gm-Message-State: AOJu0YyDXJNPz8yJqYkyLviO8f72FZAxcbt1DmzPlZZ6EKbLl/26wE4M
+	MeuDGHn+wyoVwFFr56nZzayhUrzBfy1k4/nJIriEuVt7TTd9CILCqJj+0wf2VWIfh0tVBoYvAxM
+	WQyi3rGuKbB6z3++jv4rADEuZVGhhhR6VOvun0zWppLl5Q2s0WOtVsA==
+X-Received: by 2002:a5d:6d83:0:b0:368:4c5:af3 with SMTP id ffacd0b85a97d-36baaf9f521mr883922f8f.8.1722507942111;
+        Thu, 01 Aug 2024 03:25:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHEtSclpr/Y80G4Oip8Taqi5hTXWiVLwJRu1yc7hHV2l4citaf760Mm1ZYZVZ0C78iEsrUtYg==
+X-Received: by 2002:a5d:6d83:0:b0:368:4c5:af3 with SMTP id ffacd0b85a97d-36baaf9f521mr883909f8f.8.1722507941562;
+        Thu, 01 Aug 2024 03:25:41 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1712:4410:9110:ce28:b1de:d919? ([2a0d:3344:1712:4410:9110:ce28:b1de:d919])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367fc6adsm18995045f8f.51.2024.08.01.03.25.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Aug 2024 03:25:41 -0700 (PDT)
+Message-ID: <f150dec8-7187-417a-a700-4ea7ce44f721@redhat.com>
+Date: Thu, 1 Aug 2024 12:25:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731120955.23542-1-kerneljasonxing@gmail.com>
- <20240731120955.23542-5-kerneljasonxing@gmail.com> <CANn89iJGco0f2RLBm4bW3QpRHwscwZhc287RX+mWA0Q_=hfTYA@mail.gmail.com>
- <CAL+tcoD5OK6usHhJUGLn0WogBxVDJV8HF209ZBkd=xNLP34SfQ@mail.gmail.com> <CANn89i+wO+g=2UReRv1uFuQNBSKJBgjMEKAV8z2=7SipKsyEkw@mail.gmail.com>
-In-Reply-To: <CANn89i+wO+g=2UReRv1uFuQNBSKJBgjMEKAV8z2=7SipKsyEkw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 1 Aug 2024 18:24:00 +0800
-Message-ID: <CAL+tcoAaQtNdD_9=CSqRPbEPBZ7jB47BPOm66skjF28Rh_ZrAA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/6] tcp: rstreason: introduce
- SK_RST_REASON_TCP_STATE for active reset
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net V2 3/3] bonding: change ipsec_lock from spin lock to
+ mutex
+To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jay Vosburgh <jv@jvosburgh.net>,
+ Andy Gospodarek <andy@greyhouse.net>
+Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ Hangbin Liu <liuhangbin@gmail.com>, Jianbo Liu <jianbol@nvidia.com>
+References: <20240801094914.1928768-1-tariqt@nvidia.com>
+ <20240801094914.1928768-4-tariqt@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240801094914.1928768-4-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Eric,
+On 8/1/24 11:49, Tariq Toukan wrote:
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index e6514ef7ad89..0f8d1b29dc7f 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -436,41 +436,34 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
+>   	if (!bond_dev)
+>   		return -EINVAL;
+>   
+> -	rcu_read_lock();
+>   	bond = netdev_priv(bond_dev);
+>   	slave = rcu_dereference(bond->curr_active_slave);
+> -	if (!slave) {
+> -		rcu_read_unlock();
 
-On Thu, Aug 1, 2024 at 6:06=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Thu, Aug 1, 2024 at 11:51=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > Hello Eric,
-> >
-> > On Thu, Aug 1, 2024 at 2:56=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > On Wed, Jul 31, 2024 at 2:10=E2=80=AFPM Jason Xing <kerneljasonxing@g=
-mail.com> wrote:
-> > > >
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Introducing a new type TCP_STATE to handle some reset conditions
-> > > > appearing in RFC 793 due to its socket state. Actually, we can look
-> > > > into RFC 9293 which has no discrepancy about this part.
-> > > >
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > > V2
-> > > > Link: https://lore.kernel.org/all/20240730200633.93761-1-kuniyu@ama=
-zon.com/
-> > > > 1. use RFC 9293 instead of RFC 793 which is too old (Kuniyuki)
-> > > > ---
-> > > >  include/net/rstreason.h | 6 ++++++
-> > > >  net/ipv4/tcp.c          | 4 ++--
-> > > >  net/ipv4/tcp_timer.c    | 2 +-
-> > > >  3 files changed, 9 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/include/net/rstreason.h b/include/net/rstreason.h
-> > > > index eef658da8952..bbf20d0bbde7 100644
-> > > > --- a/include/net/rstreason.h
-> > > > +++ b/include/net/rstreason.h
-> > > > @@ -20,6 +20,7 @@
-> > > >         FN(TCP_ABORT_ON_CLOSE)          \
-> > > >         FN(TCP_ABORT_ON_LINGER)         \
-> > > >         FN(TCP_ABORT_ON_MEMORY)         \
-> > > > +       FN(TCP_STATE)                   \
-> > > >         FN(MPTCP_RST_EUNSPEC)           \
-> > > >         FN(MPTCP_RST_EMPTCP)            \
-> > > >         FN(MPTCP_RST_ERESOURCE)         \
-> > > > @@ -102,6 +103,11 @@ enum sk_rst_reason {
-> > > >          * corresponding to LINUX_MIB_TCPABORTONMEMORY
-> > > >          */
-> > > >         SK_RST_REASON_TCP_ABORT_ON_MEMORY,
-> > > > +       /**
-> > > > +        * @SK_RST_REASON_TCP_STATE: abort on tcp state
-> > > > +        * Please see RFC 9293 for all possible reset conditions
-> > > > +        */
-> > > > +       SK_RST_REASON_TCP_STATE,
-> > > >
-> > > >         /* Copy from include/uapi/linux/mptcp.h.
-> > > >          * These reset fields will not be changed since they adhere=
- to
-> > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > > index fd928c447ce8..64a49cb714e1 100644
-> > > > --- a/net/ipv4/tcp.c
-> > > > +++ b/net/ipv4/tcp.c
-> > > > @@ -3031,7 +3031,7 @@ int tcp_disconnect(struct sock *sk, int flags=
-)
-> > > >                 /* The last check adjusts for discrepancy of Linux =
-wrt. RFC
-> > > >                  * states
-> > > >                  */
-> > > > -               tcp_send_active_reset(sk, gfp_any(), SK_RST_REASON_=
-NOT_SPECIFIED);
-> > > > +               tcp_send_active_reset(sk, gfp_any(), SK_RST_REASON_=
-TCP_STATE);
-> > >
-> > > I disagree with this. tcp_disconnect() is initiated by the user.
-> > >
-> > > You are conflating two possible conditions :
-> > >
-> > > 1) tcp_need_reset(old_state)
-> >
-> > For this one, I can keep the TCP_STATE reason, right?
->
-> What does it mean ?
+I'm sorry, I probably was not clear with my question on the previous 
+revision.
 
-I mean I wonder if I can use the TCP_STATE reason in tcp_abort() and
-tcp_disconnect() when tcp_need_reset() returns true?
+I asked if this code is under RTNL lock already, if so we could replace 
+rcu_dereference with rtnl_dereference() and drop the rcu lock.
 
->
-> >
-> > > 2) (tp->snd_nxt !=3D tp->write_seq && (1 << old_state) & (TCPF_CLOSIN=
-G |
-> > > TCPF_LAST_ACK)))
-> > >
-> >
-> > For this one, I wonder if I need to separate this condition with
-> > 'tcp_need_reset()' and put it into another 'else-if' branch?
-> > I decided to name it as 'CLOSE_WITH_DATA' because it can reflect that
-> > the write queue of the socket is not empty (at this time the user may
-> > think he has more data to send) but it stays in the active close
-> > state.
-> > How about it?
->
-> This is not CLOSE_WITH_DATA, but a disconnect() operation, initiated
-> by user space.
-> If we add RST reasons, can we please be careful about the chosen names ?
+You stated this block is not under the RTNL lock, so we still need the 
+rcu lock around rcu_dereference().
 
-Yes, I know, but like old days, I'm struggling with the English name. Sorry=
-.
+Same thing in bond_ipsec_del_sa().
 
->
-> man connect
->
-> <quote>
->        Some  protocol  sockets  (e.g., TCP sockets as well as datagram
-> sockets in the UNIX and Internet domains) may dissolve the association
-> by connecting to an address with the sa_family member of sockaddr set
-> to AF_UNSPEC; thereafter, the socket can be connected to another ad=E2=80=
-=90
->        dress.  (AF_UNSPEC is supported since Linux 2.2.)
-> </quote>
->
-> Very different from close()...
+Please have a run with CONFIG_PROVE_RCU, it should splat on such 
+dereference.
 
-Oh, I see. What I was talking about 'CLOSE' is the socket state, but
-you are right: the name will finally be displayed to users, which must
-clearly reflect the real meaning of the underlying behavior.
+Thanks,
 
-I will use "TCP_DISCONNECT_WITH_DATA" instead under this condition.
-And then, I will put it into a new patch since it's a different reason
-name.
+Paolo
 
-Thanks for your help!
-
-Jason
 
