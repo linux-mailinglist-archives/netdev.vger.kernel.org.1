@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-115125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B76AD945408
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 23:12:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E98F2945407
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 23:12:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D95E01C2337E
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 21:12:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758381F2488E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 21:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1CF14AD25;
-	Thu,  1 Aug 2024 21:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50EB14B09F;
+	Thu,  1 Aug 2024 21:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MCPBV+Mi"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ll8unhKt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E95014B94B
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 21:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1990114AD3E
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 21:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722546763; cv=none; b=APtBM9x8XSsdZXY/0dMV6C11pCA64LN2i8gtLkCfO5zJ3fKBxB9EdD4Ra8orA0sHGU94pqL+W+eKV2YNuzdLoXulISP7L6mertxLXANvxrrFeg63bOBKPTyUZDNYBjqhc/VlOurm/Z26Ak6KOgE3D4tIE8VjArUjEu9VJOIX87g=
+	t=1722546760; cv=none; b=QDhIMQ22PDN0NhNKc4zz24gVLtE7yimrO6c40rAES/p7R0breeR2jD4dFWIbfFG3meR9WKJNPi7c5q8W+mh3SJASbWgakK08wA1LgidqFklfE/hyzxWIK77O/4RwDmFsPgDZU5yjYKn7iwLAVvrB3qiw+e9h29nBM2wGBFaGcvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722546763; c=relaxed/simple;
-	bh=PXhqYm/use9phwM+IUkaPxAFCWcpBkAupltcEmT5V/8=;
+	s=arc-20240116; t=1722546760; c=relaxed/simple;
+	bh=7fFHnYQ2dlI0G474qj0UNhjMnTk3sPkD0DJyw4aB+xk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=giY+xBj70h/BDqSZp3n2xrSopjUJjzzlvKifFVr4UfJJqoyD9LgATtP2nSONbO4769AnDd9yRFxvvqtIzm4C17hAh7rutajywt7Hyr3OZqDsm/zLtxTlvGYmTPUCcPPziau2SC0wKLfK4pTMXbYj6GuzQvm8NeKsH9e17m+IRiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MCPBV+Mi; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=IJQtZum9a4LCv/PnDoPncy5RBeGb7Tr2F9H6HJm8xLMzqGTngJtQ8sovXNg+sySFbiKTIT3c1kvIp27ScnKJtd5MJ4rkiY0HrhJNtkI0NoGq4dFj/Imd9jxsvk7CEQ+HGta3zslKbfBQndmmW2iGDs3s2G4y5bJeBFY8BVm79xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ll8unhKt; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471KSXpo015677
-	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:12:35 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471Ivw9c030816
+	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:12:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=sOwNFuIkHRvxm
-	Q4C0GAoS5Kyc5vKLC5OIph+8MkdRp0=; b=MCPBV+Mi0lpHJzV4+c0d3GIVNAB8p
-	7xDRiX423MZlWocRoLU6b3uAe1C6ayGdxfdTHVL57RT/pqCxM4KZ9cywXbLmKZQU
-	UapP8bpyGxPZFrXFcH07df7FQDwpwK5tGpvEHaKL4qWCT2JVvkUoTPvYR5Uq3Y9C
-	xPl9BheZQA8iGnc1PflTuKHN+HgxL3i906PxwkBWbdTcN0gIsmqmie7H4X6PoS38
-	OWVH+DpqTiBL9Hy0MFJC1f8uqWSksnEbSl7B6ZMpYR+jJkzd7GRU5LIZf7lCE3JA
-	jTHjYIT6eBUj1P5mo2b6wkegwoVeskyA6vSS7trYnQ/kE9racRX+6c+JA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40rhe4g35w-1
+	:mime-version:content-transfer-encoding; s=pp1; bh=z0cQ9LwyTrz6t
+	0/D8o7pfxdb1FSfurg4XHmODIlQdFo=; b=Ll8unhKt3LoxTfbcDxOygiDscDmo2
+	YrDj5e7+NYR2ufp4MO77w2CfoE8mI00U5FGqEPN99PfJ4aU2lqVJf4P9NvcNr+b2
+	p/wkVQFdwdGk07W1yE9eewWSXQiSWNiyelBwBlGcu1betzE8yQwUI4XSPqhBLeNN
+	PPXj0nf1p9mfbRxcsHL9m55kEJb475klrT2JjZf736sOWJNguGtXOIaVz3kn4oDA
+	kuJNryECSm+KLHGNgRwm+i8FpBwrxwfwQ3ZnyF1U4jqyMyx4KMwqfmkgylnbobOO
+	aDCEs8+8dbWIukbsJk374lhy/CQH4opHCrkXvP8qKb5LwhP8iGLG5Yrlg==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40rebqgfe9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 21:12:34 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 471JmTbk003773
-	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:12:33 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40ndemup10-1
+	for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 21:12:36 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 471JelRH009211
+	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:12:36 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 40ndx3bkwj-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 21:12:33 +0000
+	for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 21:12:35 +0000
 Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 471LCSbB43516498
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 471LCUSu2491076
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Aug 2024 21:12:31 GMT
+	Thu, 1 Aug 2024 21:12:32 GMT
 Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D1DFC58068;
-	Thu,  1 Aug 2024 21:12:28 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 764655804B;
+	Thu,  1 Aug 2024 21:12:30 +0000 (GMT)
 Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 83FB55804B;
-	Thu,  1 Aug 2024 21:12:28 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 229FF58059;
+	Thu,  1 Aug 2024 21:12:30 +0000 (GMT)
 Received: from tinkpad.ibmuc.com (unknown [9.61.139.48])
 	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 Aug 2024 21:12:28 +0000 (GMT)
+	Thu,  1 Aug 2024 21:12:30 +0000 (GMT)
 From: Nick Child <nnac123@linux.ibm.com>
 To: netdev@vger.kernel.org
 Cc: bjking1@linux.ibm.com, haren@linux.ibm.com, ricklind@us.ibm.com,
         Nick Child <nnac123@linux.ibm.com>
-Subject: [PATCH net-next 1/2] ibmveth: Optimize poll rescheduling process
-Date: Thu,  1 Aug 2024 16:12:14 -0500
-Message-ID: <20240801211215.128101-2-nnac123@linux.ibm.com>
+Subject: [PATCH net-next 2/2] ibmveth: Recycle buffers during replenish phase
+Date: Thu,  1 Aug 2024 16:12:15 -0500
+Message-ID: <20240801211215.128101-3-nnac123@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240801211215.128101-1-nnac123@linux.ibm.com>
 References: <20240801211215.128101-1-nnac123@linux.ibm.com>
@@ -85,91 +85,278 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1ZpqGXJRkPYCUvaK-7wBVPBgKjuEd59Z
-X-Proofpoint-GUID: 1ZpqGXJRkPYCUvaK-7wBVPBgKjuEd59Z
+X-Proofpoint-GUID: dCTc7HmEeA9rRXz1fQW-zQ9oZwcMY6D4
+X-Proofpoint-ORIG-GUID: dCTc7HmEeA9rRXz1fQW-zQ9oZwcMY6D4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-01_18,2024-08-01_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 suspectscore=0 mlxlogscore=855 phishscore=0
- clxscore=1015 impostorscore=0 malwarescore=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408010135
+ definitions=2024-08-01_19,2024-08-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ clxscore=1015 lowpriorityscore=0 spamscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=778
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408010139
 
-When the ibmveth driver processes less than the budget, it must call
-napi_complete_done() to release the instance. This function will
-return false if the driver should avoid rearming interrupts.
-Previously, the driver was ignoring the return code of
-napi_complete_done(). As a result, there were unnecessary calls to
-enable the veth irq.
-Therefore, use the return code napi_complete_done() to determine if
-irq rearm is necessary.
+When the length of a packet is under the rx_copybreak threshold, the
+buffer is copied into a new skb and sent up the stack. This allows the
+dma mapped memory to be recycled back to FW.
 
-Additionally, in the event that new data is received immediately after
-rearming interrupts, rather than just rescheduling napi, also jump
-back to the poll processing loop since we are already in the poll
-function (and know that we did not expense all of budget).
+Previously, the reuse of the DMA space was handled immediately.
+This means that further packet processing has to wait until
+h_add_logical_lan finishes for this packet.
 
-This slight tweak results in a 15% increase in TCP_RR transaction rate
-(320k to 370k txns). We can see the ftrace data supports this:
-PREV: ibmveth_poll = 8818014.0 us / 182802.0 hits = AVG 48.24
-NEW:  ibmveth_poll = 8082398.0 us / 191413.0 hits = AVG 42.22
+Therefore, when reusing a packet, offload the hcall to the replenish
+function. As a result, much of the shared logic between the recycle and
+replenish functions can be removed.
+
+This change increases TCP_RR packet rate by another 15% (370k to 430k
+txns). We can see the ftrace data supports this:
+PREV: ibmveth_poll = 8078553.0 us / 190999.0 hits = AVG 42.3 us
+NEW:  ibmveth_poll = 7632787.0 us / 224060.0 hits = AVG 34.07 us
 
 Signed-off-by: Nick Child <nnac123@linux.ibm.com>
 ---
- drivers/net/ethernet/ibm/ibmveth.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ drivers/net/ethernet/ibm/ibmveth.c | 144 ++++++++++++-----------------
+ 1 file changed, 60 insertions(+), 84 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 4c9d9badd698..e6eb594f0751 100644
+index e6eb594f0751..b619a3ec245b 100644
 --- a/drivers/net/ethernet/ibm/ibmveth.c
 +++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -1337,6 +1337,7 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
- 	unsigned long lpar_rc;
- 	u16 mss = 0;
+@@ -39,7 +39,8 @@
+ #include "ibmveth.h"
  
-+restart_poll:
- 	while (frames_processed < budget) {
- 		if (!ibmveth_rxq_pending_buffer(adapter))
+ static irqreturn_t ibmveth_interrupt(int irq, void *dev_instance);
+-static void ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter);
++static void ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
++				       bool reuse);
+ static unsigned long ibmveth_get_desired_dma(struct vio_dev *vdev);
+ 
+ static struct kobj_type ktype_veth_pool;
+@@ -226,6 +227,16 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
+ 	for (i = 0; i < count; ++i) {
+ 		union ibmveth_buf_desc desc;
+ 
++		free_index = pool->consumer_index;
++		index = pool->free_map[free_index];
++		skb = NULL;
++
++		BUG_ON(index == IBM_VETH_INVALID_MAP);
++
++		/* are we allocating a new buffer or recycling an old one */
++		if (pool->skbuff[index])
++			goto reuse;
++
+ 		skb = netdev_alloc_skb(adapter->netdev, pool->buff_size);
+ 
+ 		if (!skb) {
+@@ -235,46 +246,46 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
  			break;
-@@ -1420,24 +1421,25 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
+ 		}
  
- 	ibmveth_replenish_task(adapter);
+-		free_index = pool->consumer_index;
+-		pool->consumer_index++;
+-		if (pool->consumer_index >= pool->size)
+-			pool->consumer_index = 0;
+-		index = pool->free_map[free_index];
+-
+-		BUG_ON(index == IBM_VETH_INVALID_MAP);
+-		BUG_ON(pool->skbuff[index] != NULL);
+-
+ 		dma_addr = dma_map_single(&adapter->vdev->dev, skb->data,
+ 				pool->buff_size, DMA_FROM_DEVICE);
  
--	if (frames_processed < budget) {
--		napi_complete_done(napi, frames_processed);
-+	if (frames_processed == budget)
-+		goto out;
+ 		if (dma_mapping_error(&adapter->vdev->dev, dma_addr))
+ 			goto failure;
  
--		/* We think we are done - reenable interrupts,
--		 * then check once more to make sure we are done.
--		 */
--		lpar_rc = h_vio_signal(adapter->vdev->unit_address,
--				       VIO_IRQ_ENABLE);
-+	if (!napi_complete_done(napi, frames_processed))
-+		goto out;
+-		pool->free_map[free_index] = IBM_VETH_INVALID_MAP;
+ 		pool->dma_addr[index] = dma_addr;
+ 		pool->skbuff[index] = skb;
  
--		BUG_ON(lpar_rc != H_SUCCESS);
-+	/* We think we are done - reenable interrupts,
-+	 * then check once more to make sure we are done.
-+	 */
-+	lpar_rc = h_vio_signal(adapter->vdev->unit_address, VIO_IRQ_ENABLE);
-+	BUG_ON(lpar_rc != H_SUCCESS);
+-		correlator = ((u64)pool->index << 32) | index;
+-		*(u64 *)skb->data = correlator;
+-
+-		desc.fields.flags_len = IBMVETH_BUF_VALID | pool->buff_size;
+-		desc.fields.address = dma_addr;
+-
+ 		if (rx_flush) {
+ 			unsigned int len = min(pool->buff_size,
+-						adapter->netdev->mtu +
+-						IBMVETH_BUFF_OH);
++					       adapter->netdev->mtu +
++					       IBMVETH_BUFF_OH);
+ 			ibmveth_flush_buffer(skb->data, len);
+ 		}
++reuse:
++		dma_addr = pool->dma_addr[index];
++		desc.fields.flags_len = IBMVETH_BUF_VALID | pool->buff_size;
++		desc.fields.address = dma_addr;
++
++		correlator = ((u64)pool->index << 32) | index;
++		*(u64 *)pool->skbuff[index]->data = correlator;
++
+ 		lpar_rc = h_add_logical_lan_buffer(adapter->vdev->unit_address,
+ 						   desc.desc);
  
--		if (ibmveth_rxq_pending_buffer(adapter) &&
--		    napi_schedule(napi)) {
--			lpar_rc = h_vio_signal(adapter->vdev->unit_address,
--					       VIO_IRQ_DISABLE);
--		}
-+	if (ibmveth_rxq_pending_buffer(adapter) && napi_schedule(napi)) {
-+		lpar_rc = h_vio_signal(adapter->vdev->unit_address,
-+				       VIO_IRQ_DISABLE);
-+		goto restart_poll;
+ 		if (lpar_rc != H_SUCCESS) {
++			netdev_warn(adapter->netdev,
++				    "%sadd_logical_lan failed %lu\n",
++				    skb ? "" : "When recycling: ", lpar_rc);
+ 			goto failure;
+-		} else {
+-			buffers_added++;
+-			adapter->replenish_add_buff_success++;
+ 		}
++
++		pool->free_map[free_index] = IBM_VETH_INVALID_MAP;
++		pool->consumer_index++;
++		if (pool->consumer_index >= pool->size)
++			pool->consumer_index = 0;
++
++		buffers_added++;
++		adapter->replenish_add_buff_success++;
  	}
  
-+out:
- 	return frames_processed;
+ 	mb();
+@@ -282,17 +293,13 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
+ 	return;
+ 
+ failure:
+-	pool->free_map[free_index] = index;
+-	pool->skbuff[index] = NULL;
+-	if (pool->consumer_index == 0)
+-		pool->consumer_index = pool->size - 1;
+-	else
+-		pool->consumer_index--;
+-	if (!dma_mapping_error(&adapter->vdev->dev, dma_addr))
++
++	if (dma_addr && !dma_mapping_error(&adapter->vdev->dev, dma_addr))
+ 		dma_unmap_single(&adapter->vdev->dev,
+ 		                 pool->dma_addr[index], pool->buff_size,
+ 		                 DMA_FROM_DEVICE);
+-	dev_kfree_skb_any(skb);
++	dev_kfree_skb_any(pool->skbuff[index]);
++	pool->skbuff[index] = NULL;
+ 	adapter->replenish_add_buff_failure++;
+ 
+ 	mb();
+@@ -365,7 +372,7 @@ static void ibmveth_free_buffer_pool(struct ibmveth_adapter *adapter,
+ 
+ /* remove a buffer from a pool */
+ static void ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
+-					    u64 correlator)
++					    u64 correlator, bool reuse)
+ {
+ 	unsigned int pool  = correlator >> 32;
+ 	unsigned int index = correlator & 0xffffffffUL;
+@@ -376,15 +383,23 @@ static void ibmveth_remove_buffer_from_pool(struct ibmveth_adapter *adapter,
+ 	BUG_ON(index >= adapter->rx_buff_pool[pool].size);
+ 
+ 	skb = adapter->rx_buff_pool[pool].skbuff[index];
+-
+ 	BUG_ON(skb == NULL);
+ 
+-	adapter->rx_buff_pool[pool].skbuff[index] = NULL;
++	/* if we are going to reuse the buffer then keep the pointers around
++	 * but mark index as available. replenish will see the skb pointer and
++	 * assume it is to be recycled.
++	 */
++	if (!reuse) {
++		/* remove the skb pointer to mark free. actual freeing is done
++		 * by upper level networking after gro_recieve
++		 */
++		adapter->rx_buff_pool[pool].skbuff[index] = NULL;
+ 
+-	dma_unmap_single(&adapter->vdev->dev,
+-			 adapter->rx_buff_pool[pool].dma_addr[index],
+-			 adapter->rx_buff_pool[pool].buff_size,
+-			 DMA_FROM_DEVICE);
++		dma_unmap_single(&adapter->vdev->dev,
++				 adapter->rx_buff_pool[pool].dma_addr[index],
++				 adapter->rx_buff_pool[pool].buff_size,
++				 DMA_FROM_DEVICE);
++	}
+ 
+ 	free_index = adapter->rx_buff_pool[pool].producer_index;
+ 	adapter->rx_buff_pool[pool].producer_index++;
+@@ -411,51 +426,13 @@ static inline struct sk_buff *ibmveth_rxq_get_buffer(struct ibmveth_adapter *ada
+ 	return adapter->rx_buff_pool[pool].skbuff[index];
  }
+ 
+-/* recycle the current buffer on the rx queue */
+-static int ibmveth_rxq_recycle_buffer(struct ibmveth_adapter *adapter)
++static void ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
++				       bool reuse)
+ {
+-	u32 q_index = adapter->rx_queue.index;
+-	u64 correlator = adapter->rx_queue.queue_addr[q_index].correlator;
+-	unsigned int pool = correlator >> 32;
+-	unsigned int index = correlator & 0xffffffffUL;
+-	union ibmveth_buf_desc desc;
+-	unsigned long lpar_rc;
+-	int ret = 1;
+-
+-	BUG_ON(pool >= IBMVETH_NUM_BUFF_POOLS);
+-	BUG_ON(index >= adapter->rx_buff_pool[pool].size);
++	u64 cor;
+ 
+-	if (!adapter->rx_buff_pool[pool].active) {
+-		ibmveth_rxq_harvest_buffer(adapter);
+-		ibmveth_free_buffer_pool(adapter, &adapter->rx_buff_pool[pool]);
+-		goto out;
+-	}
+-
+-	desc.fields.flags_len = IBMVETH_BUF_VALID |
+-		adapter->rx_buff_pool[pool].buff_size;
+-	desc.fields.address = adapter->rx_buff_pool[pool].dma_addr[index];
+-
+-	lpar_rc = h_add_logical_lan_buffer(adapter->vdev->unit_address, desc.desc);
+-
+-	if (lpar_rc != H_SUCCESS) {
+-		netdev_dbg(adapter->netdev, "h_add_logical_lan_buffer failed "
+-			   "during recycle rc=%ld", lpar_rc);
+-		ibmveth_remove_buffer_from_pool(adapter, adapter->rx_queue.queue_addr[adapter->rx_queue.index].correlator);
+-		ret = 0;
+-	}
+-
+-	if (++adapter->rx_queue.index == adapter->rx_queue.num_slots) {
+-		adapter->rx_queue.index = 0;
+-		adapter->rx_queue.toggle = !adapter->rx_queue.toggle;
+-	}
+-
+-out:
+-	return ret;
+-}
+-
+-static void ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter)
+-{
+-	ibmveth_remove_buffer_from_pool(adapter, adapter->rx_queue.queue_addr[adapter->rx_queue.index].correlator);
++	cor = adapter->rx_queue.queue_addr[adapter->rx_queue.index].correlator;
++	ibmveth_remove_buffer_from_pool(adapter, cor, reuse);
+ 
+ 	if (++adapter->rx_queue.index == adapter->rx_queue.num_slots) {
+ 		adapter->rx_queue.index = 0;
+@@ -1347,7 +1324,7 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
+ 			wmb(); /* suggested by larson1 */
+ 			adapter->rx_invalid_buffer++;
+ 			netdev_dbg(netdev, "recycling invalid buffer\n");
+-			ibmveth_rxq_recycle_buffer(adapter);
++			ibmveth_rxq_harvest_buffer(adapter, true);
+ 		} else {
+ 			struct sk_buff *skb, *new_skb;
+ 			int length = ibmveth_rxq_frame_length(adapter);
+@@ -1380,11 +1357,10 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
+ 				if (rx_flush)
+ 					ibmveth_flush_buffer(skb->data,
+ 						length + offset);
+-				if (!ibmveth_rxq_recycle_buffer(adapter))
+-					kfree_skb(skb);
++				ibmveth_rxq_harvest_buffer(adapter, true);
+ 				skb = new_skb;
+ 			} else {
+-				ibmveth_rxq_harvest_buffer(adapter);
++				ibmveth_rxq_harvest_buffer(adapter, false);
+ 				skb_reserve(skb, offset);
+ 			}
  
 -- 
 2.43.0
