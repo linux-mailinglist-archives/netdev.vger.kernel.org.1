@@ -1,160 +1,110 @@
-Return-Path: <netdev+bounces-115033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B46944EC4
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:08:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 132A0944EC8
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0114E284377
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1650B1C22AF8
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90FD13B2B4;
-	Thu,  1 Aug 2024 15:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5465513BC0C;
+	Thu,  1 Aug 2024 15:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MWbSPhKz"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ECZk6S3s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [83.166.143.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED4F130A47;
-	Thu,  1 Aug 2024 15:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FD6130A47
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 15:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722524881; cv=none; b=gQt4EiEkdhkO/1nVB0fk6cbnm+lUoUe8zQ6XryA3GJedPRcDingjR4pYk7r1rlCfg7X5DT5MGPh/mXUarhjVRTb6oBIcmZhniZuT5v9MTxr7X1IwNZ0sy5X4BQ2QRJ7vPnOm/fFJ876ZuIkP2bAYtPfbzlO3rnx5FVqCKI+reTI=
+	t=1722524944; cv=none; b=NSrxw8T9QI5quNinMV4+f6JsnIoIFvxmyQIeDv0dxKdvbN44yw5YM5m4vzJYvjNQXkhNri4OEQEr8ekZ1WjsjKVVXsYh+FCSM+v2ucGPbEYWLyvJJI8feHdEXdmVCxTX1IVO+QwN2sNDFWnVUUeb3EyRfDO0l9jDes07V5YtCdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722524881; c=relaxed/simple;
-	bh=iubcbZDOWuaOtrwRjZEqiG4hMbLkd3IFWhnJGzWd94k=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=tR57CyBC38Th0svtNw1TyBt+4TnarzxYUmee9+Q0rGqQlpYSdC8nIXqqB80HmZw7i5I4KLIsrHJhzqKuCu0txl/sI5n7EX7UOqJc9JLANVXGpHAZZHvFkseq/jU9BOgLUVu+bwLvaudLHZNE9PSGXulHvS+wPK5nh/4bbf/t4W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MWbSPhKz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30BFCC32786;
-	Thu,  1 Aug 2024 15:08:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722524881;
-	bh=iubcbZDOWuaOtrwRjZEqiG4hMbLkd3IFWhnJGzWd94k=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=MWbSPhKzRZAkCp1R/fruWbJiyTLqgerwsWIXcJgsJRJDvqGQpiHleO4xv89zMGUwi
-	 2LrkVKvaxIHL6NsR27bW/2vu9iRO4LUp/ycuzEnLjMwLmHOP2P5p9r9CHguY1RTjcD
-	 8/g7zUxyfzLrw+HvP27shxLqClrnWPBNmzC2eCkcrIFb1icKoKi/TQE9vv5hCVadxs
-	 Na0yo3HThSWcwJJcIl7KbLiUJe76+vJofkfqaRXvRfDnEHE2Hvj8Qp80QfwbZGaDeX
-	 w8mougg74N3wHtAAt+P0BefMszbuoC3kqBq92F126lO6Gb1m6GwxESRUuXHqoKEZoX
-	 3y1zgQjyO1c2A==
-From: Kalle Valo <kvalo@kernel.org>
-To: Baochen Qiang <quic_bqiang@quicinc.com>
-Cc: <ath12k@lists.infradead.org>,  <linux-wireless@vger.kernel.org>,
-  <kernel@quicinc.com>,  <netdev@vger.kernel.org>
-Subject: Re: [PATCH] wifi: ath12k: use 128 bytes aligned iova in transmit
- path for WCN7850
-References: <20240715023814.20242-1-quic_bqiang@quicinc.com>
-Date: Thu, 01 Aug 2024 18:07:58 +0300
-In-Reply-To: <20240715023814.20242-1-quic_bqiang@quicinc.com> (Baochen Qiang's
-	message of "Mon, 15 Jul 2024 10:38:14 +0800")
-Message-ID: <87ed788enl.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1722524944; c=relaxed/simple;
+	bh=oH9F7811kynHG5V9RNK8QM1PF490b0/8UQiv8AJT1NQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xd5He7ewsuCASwaHL7NfWlLjS0X+Vq8hWVeHMUcxa5Lekx8mEVnE4Y/wutK+34DKJbFAqybQi5VfzrQkaorG/+Y5vX+hke6cpqCVHAn5bUh+Pcb/uDfoulPy6uWUi1jMn/MxGRsNpvijrd6a+GDechC7qDS/x1YDkFdoMmbUmFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ECZk6S3s; arc=none smtp.client-ip=83.166.143.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZXRZ39WjzcLC;
+	Thu,  1 Aug 2024 17:08:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1722524938;
+	bh=nrkwXktwDxdS+v/5ZsT0xw/qBigeLGpoe9FswOOXb2w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ECZk6S3s/pxPL2NNhCD17FdQq2m/8kM/eIJs1XKUCkvP2U3k3dKk/exr4UAs3xjv1
+	 JB4JXoRqlRznXLD2rs8E+3oytzgz52wfepnVTaBaa9tq1Po49QkgqZXblixkSadD2H
+	 635/VzKee9CVCF9CK4XawEsNlD9bS/V0f0e9Rjcs=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZXRY4f2fzBB9;
+	Thu,  1 Aug 2024 17:08:57 +0200 (CEST)
+Date: Thu, 1 Aug 2024 17:08:53 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [RFC PATCH v1 7/9] selftests/landlock: Test listen on ULP socket
+ without clone method
+Message-ID: <20240801.rae2can8ooT9@digikod.net>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-Baochen Qiang <quic_bqiang@quicinc.com> writes:
+On Sun, Jul 28, 2024 at 08:26:00AM +0800, Mikhail Ivanov wrote:
+> Test checks that listen(2) doesn't wrongfully return -EACCES instead of
+> -EINVAL when trying to listen on a socket which is set to ULP that doesn't
+> have clone method in inet_csk(sk)->icsk_ulp_ops (espintcp).
+> 
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+>  tools/testing/selftests/landlock/config     |  1 +
+>  tools/testing/selftests/landlock/net_test.c | 38 +++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
+> index 0086efaa7b68..014401fe6114 100644
+> --- a/tools/testing/selftests/landlock/config
+> +++ b/tools/testing/selftests/landlock/config
+> @@ -12,3 +12,4 @@ CONFIG_SHMEM=y
+>  CONFIG_SYSFS=y
+>  CONFIG_TMPFS=y
+>  CONFIG_TMPFS_XATTR=y
+> +CONFIG_INET_ESPINTCP=y
+> \ No newline at end of file
 
-> In transmit path, it is likely that the iova is not aligned to PCIe TLP
-> max payload size, which is 128 for WCN7850. Normally in such cases hardware
-> is expected to split the packet into several parts in a manner such that
-> they, other than the first one, have aligned iova. However due to hardware
-> limitations, WCN7850 does not behave like that properly with some specific
-> unaligned iova in transmit path. This easily results in target hang in a
-> KPI transmit test: packet send/receive failure, WMI command send timeout
-> etc. Also fatal error seen in PCIe level:
->
-> 	...
-> 	Capabilities: ...
-> 		...
-> 		DevSta: ... FatalErr+ ...
-> 		...
-> 	...
->
-> Work around this by manually moving/reallocating payload buffer such that
-> we can map it to a 128 bytes aligned iova. The moving requires sufficient
-> head room or tail room in skb: for the former we can do ourselves a favor
-> by asking some extra bytes when registering with mac80211, while for the
-> latter we can do nothing.
->
-> Moving/reallocating buffer consumes additional CPU cycles, but the good news
-> is that an aligned iova increases PCIe efficiency. In my tests on some X86
-> platforms the KPI results are almost consistent.
->
-> Since this is seen only with WCN7850, add a new hardware parameter to
-> differentiate from others.
->
-> Tested-on: WCN7850 hw2.0 PCI WLAN.HMT.1.0.c5-00481-QCAHMTSWPL_V1.0_V2.0_SILICONZ-3
->
-> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+There are missing dependencies, and also please sort entries. I think it should
+be:
 
-[...]
+ CONFIG_CGROUPS=y
+ CONFIG_CGROUP_SCHED=y
+ CONFIG_INET=y
++CONFIG_INET_ESPINTCP=y
++CONFIG_INET_ESP=y
+ CONFIG_IPV6=y
++CONFIG_IPV6_ESP=y
++CONFIG_INET6_ESPINTCP=y
+ CONFIG_NET=y
+ CONFIG_NET_NS=y
+ CONFIG_OVERLAY_FS=y
 
-> --- a/drivers/net/wireless/ath/ath12k/dp_tx.c
-> +++ b/drivers/net/wireless/ath/ath12k/dp_tx.c
-> @@ -162,6 +162,60 @@ static int ath12k_dp_prepare_htt_metadata(struct sk_buff *skb)
->  	return 0;
->  }
->  
-> +static void ath12k_dp_tx_move_payload(struct sk_buff *skb,
-> +				      unsigned long delta,
-> +				      bool head)
-> +{
-> +	unsigned long len = skb->len;
-> +
-> +	if (head) {
-> +		skb_push(skb, delta);
-> +		memmove(skb->data, skb->data + delta, len);
-> +		skb_trim(skb, len);
-> +	} else {
-> +		skb_put(skb, delta);
-> +		memmove(skb->data + delta, skb->data, len);
-> +		skb_pull(skb, delta);
-> +	}
-> +}
+This works with check-linux.sh from
+https://github.com/landlock-lsm/landlock-test-tools
 
-I'm nitpicking, but usually booleans like the head variable here don't
-help with readability. Having two separate functions would be easier to
-read, but this is fine as it's so small.
-
-> @@ -279,6 +334,23 @@ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
->  		goto fail_remove_tx_buf;
->  	}
->  
-> +	if (iova_mask &&
-> +	    (unsigned long)skb->data & iova_mask) {
-> +		ret = ath12k_dp_tx_align_payload(ab, &skb);
-> +		if (ret) {
-> +			dev_warn_once(ab->dev, "failed to align TX buffer %d\n", ret);
-
-Why dev_warn_once()? I changed it to ath12k_warn() in the pending
-branch.
-
-> --- a/drivers/net/wireless/ath/ath12k/hw.h
-> +++ b/drivers/net/wireless/ath/ath12k/hw.h
-> @@ -96,6 +96,8 @@
->  #define ATH12K_M3_FILE			"m3.bin"
->  #define ATH12K_REGDB_FILE_NAME		"regdb.bin"
->  
-> +#define PCIE_MAX_PAYLOAD_SIZE		128
-
-PCIE prefix implies that this is in PCI subsystem. I renamed it to
-ATH12K_PCIE_MAX_PAYLOAD_SIZE.
-
-Please check my changes:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/ath/ath.git/commit/?h=pending&id=b603c1e0d94fb1eb0576ef48ebe37c8c1ce86328
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+IPv6 is currently not tested, which should be the case (with the "protocol"
+variants).
 
