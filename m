@@ -1,184 +1,177 @@
-Return-Path: <netdev+bounces-114803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5578D94433C
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:10:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 914049443A1
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:14:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 875591C21F2E
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 06:10:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 009DFB24DBA
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 06:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535CD157A48;
-	Thu,  1 Aug 2024 06:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="enQ6FSGE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F162B171089;
+	Thu,  1 Aug 2024 06:11:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9D415749F
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 06:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AC715853F
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 06:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722492585; cv=none; b=sLSCcilSi9i8W4mjUy0lTjX5MUoQcEW2aUYAc3W8ccS3MiWwJJw6WZ+YUdF37p2jvrSJFwtYVVKgmridPk6WdQbtF2CsVZf8yGqLeDcM/fKwH/4rPNwpsfy6dMXvjml0rsefedghk5OsqD+4BkTtLOAkbKJS+U3c657lworIWJA=
+	t=1722492686; cv=none; b=Yp6F30X+pXirpOSRlz/bF9dzqnKETkmHHrF6r/gdhiGsbMyWtUW9bH8b4WmG+3faqbfJLhMpbB9kpbcbmXB1I/kD63BYV2e7sKQ4RINWyeVPyKrLJm6dImgztapSjUx6AZ9UpF35UHpaPrZND9kH/K7LYZ+LzD/5L7VvcDl4ELw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722492585; c=relaxed/simple;
-	bh=k9T9EYRAowwp1dNZKg6r/9QvFhaJ1+1cYLS1xDNixUM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=IVQAd9l7jISswWRIUtHEKgwnRg6Y3wvD7xfpq4+Ob+DGpTfeO/6a/eosAZlrOqyydJK7lDUiW26Wul4bRCqpIukqTaSPXVHJcStmn+N9aItxZ5RzamKNMGsqJN1o3FyFRjyZdFyp5S+Nc03cIzZbde+LwCUUgZil3WWuLdmaFRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=enQ6FSGE; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722492580; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=WsSIOlFcoYYt4baJ34rOD3K8h8fOuLuNR7VQFEhP1uQ=;
-	b=enQ6FSGEvdoE5U8K4mz3vmiB5CoarkBkkco2VHZzpFiOJIM/9lrtuZFPk0sCf+u/XxoZ/7ejCc/Kew+Ha4sAHP4lNH/t/bVHMik4sExbX6KZDMOpoxV3fyW7W4vds62EV1PogB43NnZNDchP/Y9snDILV/F9BwI2SXyNoHJlZkM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R771e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067110;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBoT2kL_1722492578;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBoT2kL_1722492578)
-          by smtp.aliyun-inc.com;
-          Thu, 01 Aug 2024 14:09:39 +0800
-Message-ID: <1722492463.6573224-1-hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net v2] virtio-net: unbreak vq resizing when coalescing is not negotiated
-Date: Thu, 1 Aug 2024 14:07:43 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- =?utf-8?q?EugenioP=C3=A9rez?= <eperezma@redhat.com>
-References: <20240731120717.49955-1-hengqi@linux.alibaba.com>
- <20240731081409-mutt-send-email-mst@kernel.org>
- <1722428723.505313-1-hengqi@linux.alibaba.com>
- <20240731084632-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240731084632-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1722492686; c=relaxed/simple;
+	bh=TmVbMhXiLmTeoD9N4OuEuRD9H7Rc5Vut8F90dAAd9jM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cRe8+PVbES5yKbh0ETQfh9N+LVdhGPpd24DQvSRurFMuy2T5Itfqcoi8HLQXlGIa/NXb2FyCET6QpaGW9Jy0ibsxZiLJ2bqjwcBf2uS7pUHNUyoufnCEUQ9cJNepz4/3mgtOLHbVwpnv4UYjED1nTYFbJumDKnqKVPeE1tZDVWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81f890b6fa6so1108499739f.0
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 23:11:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722492684; x=1723097484;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KTp/HXLZJNQkU65Etniqvk0Blau2IcJzy01HL1UhCpg=;
+        b=lmclctGVKjTf7F1140uzPF3Y5xP7ruopmF9xeFF+RnuMMnxqtZCiO2G4uFD/wd045D
+         LI/NP0qCkaUvXDO8rJbpB5AIJylmy599xP/fj3dYE03mRsNMnsD6c0KAN0sXUAcQbswp
+         oaXkudlMenwaCzWccRG3JrWuBCBseeLpSUFDZpokKb1E4Sssabig564brVu7uWNVsylv
+         1RkHKFTKKVW8VLQlogY/m4+Fm4KG8AmHmXq+IxJwmOaK/T8JfQzrPdAxH83VOcH0/mfZ
+         uLpSF5KHiL/p5UShU3bWe+L5x+VABPznpPoiG3NSuRzHhbBid21v54iPYlulOV1LatYh
+         XjWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUA1Y6uwnAudevlVpBwEZoMsKXsxlkeQWLCEvoCeaccWTu9zE/rjj6tHmBiGxY5H2tn9dV/GRt/r6WntsHv/5vOjFFNCVrN
+X-Gm-Message-State: AOJu0YwJle6Nayauaq/B1UZ6gRbR3uLbojzsieUKNSLGyIHClCE3D+Qp
+	Jq2IaJwmNkQE5sC9p+Yzlufk78i2AQolvLydO6z/cnDvFM5stysALC+4K0ac+8rLznXW4f3+vvO
+	85NnhSM+ARah63ZKsHbCJSJPUJvXizwcdkTN+CyiHW4t5vvUAOL9v2CA=
+X-Google-Smtp-Source: AGHT+IG/kojLvRQfNSDwZVbWTcmC2tSP+HbH5brmjUDLobYoZ81nj0mzgSPuHvtF8Eehq08YzMy/43bnIV1Dn5x2dONb1kqM/sZM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6638:2115:b0:4c0:a8a5:81cc with SMTP id
+ 8926c6da1cb9f-4c8c9c6bb20mr91477173.3.1722492684523; Wed, 31 Jul 2024
+ 23:11:24 -0700 (PDT)
+Date: Wed, 31 Jul 2024 23:11:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000096ee8f061e991433@google.com>
+Subject: [syzbot] [wireless?] [usb?] WARNING in ath6kl_bmi_get_target_info (2)
+From: syzbot <syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com>
+To: kvalo@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 31 Jul 2024 08:46:42 -0400, "Michael S. Tsirkin" <mst@redhat.com> w=
-rote:
-> On Wed, Jul 31, 2024 at 08:25:23PM +0800, Heng Qi wrote:
-> > On Wed, 31 Jul 2024 08:14:43 -0400, "Michael S. Tsirkin" <mst@redhat.co=
-m> wrote:
-> > > On Wed, Jul 31, 2024 at 08:07:17PM +0800, Heng Qi wrote:
-> > > > >From the virtio spec:
-> > > >=20
-> > > > 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
-> > > > 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
-> > > > 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
-> > > >=20
-> > > > The driver must not send vq notification coalescing commands if
-> > > > VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of cou=
-rse
-> > > > applies to vq resize.
-> > > >=20
-> > > > Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for=
- vq resize")
-> > > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> > > > Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > Acked-by: Eugenio P=C3=A9 rez <eperezma@redhat.com>
-> > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > ---
-> > > > v1->v2:
-> > > >  - Rephrase the subject.
-> > > >  - Put the feature check inside the virtnet_send_{r,t}x_ctrl_coal_v=
-q_cmd().
-> > > >=20
-> > > >  drivers/net/virtio_net.c | 10 ++++++++--
-> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index 0383a3e136d6..2b566d893ea3 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -3658,6 +3658,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(s=
-truct virtnet_info *vi,
-> > > >  {
-> > > >  	int err;
-> > > > =20
-> > > > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> > > > +		return -EOPNOTSUPP;
-> > > > +
-> > > >  	err =3D virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
-> > > >  					    max_usecs, max_packets);
-> > > >  	if (err)
-> > > > @@ -3675,6 +3678,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(s=
-truct virtnet_info *vi,
-> > > >  {
-> > > >  	int err;
-> > > > =20
-> > > > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-> > > > +		return -EOPNOTSUPP;
-> > > > +
-> > > >  	err =3D virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
-> > > >  					    max_usecs, max_packets);
-> > > >  	if (err)
-> > > > @@ -3743,7 +3749,7 @@ static int virtnet_set_ringparam(struct net_d=
-evice *dev,
-> > > >  			err =3D virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
-> > > >  							       vi->intr_coal_tx.max_usecs,
-> > > >  							       vi->intr_coal_tx.max_packets);
-> > > > -			if (err)
-> > > > +			if (err && err !=3D -EOPNOTSUPP)
-> > > >  				return err;
-> > > >  		}
-> > > >
-> > >=20
-> > >=20
-> > > So far so good.
-> > >  =20
-> > > > @@ -3758,7 +3764,7 @@ static int virtnet_set_ringparam(struct net_d=
-evice *dev,
-> > > >  							       vi->intr_coal_rx.max_usecs,
-> > > >  							       vi->intr_coal_rx.max_packets);
-> > > >  			mutex_unlock(&vi->rq[i].dim_lock);
-> > > > -			if (err)
-> > > > +			if (err && err !=3D -EOPNOTSUPP)
-> > > >  				return err;
-> > > >  		}
-> > > >  	}
-> > >=20
-> > > I don't get this one. If resize is not supported,
-> >=20
-> > Here means that the *dim feature* is not supported, not the *resize* fe=
-ature.
-> >=20
-> > > we pretend it was successful? Why?
-> >=20
-> > During a resize, if the dim feature is not supported, the driver does n=
-ot
-> > need to try to recover any coalescing values, since the device does not=
- have
-> > these parameters.
-> > Therefore, the resize should continue without interruption.
-> >=20
-> > Thanks.
->=20
->=20
-> you mean it's a separate bugfix?
+Hello,
 
-Right.
+syzbot found the following issue on:
 
-Don't break resize when coalescing is not negotiated.
+HEAD commit:    1722389b0d86 Merge tag 'net-6.11-rc1' of git://git.kernel...
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
+console output: https://syzkaller.appspot.com/x/log.txt?x=1467299d980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e3044dca4d5f6dbe
+dashboard link: https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=166a0275980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13552c6d980000
 
-Thanks.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/78a5695ed7e2/disk-1722389b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1507b4c5000d/vmlinux-1722389b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/449aa9e94d6b/bzImage-1722389b.xz
 
->=20
-> > >=20
-> > > > --=20
-> > > > 2.32.0.3.g01195cf9f
-> > >=20
->=20
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+
+usb 1-1: new high-speed USB device number 2 using dummy_hcd
+usb 1-1: New USB device found, idVendor=0cf3, idProduct=9375, bcdDevice=1a.9e
+usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+usb 1-1: config 0 descriptor??
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 2343 at drivers/net/wireless/ath/ath6kl/bmi.c:90 ath6kl_bmi_get_target_info+0x4f5/0x5b0 drivers/net/wireless/ath/ath6kl/bmi.c:90
+Modules linked in:
+CPU: 0 UID: 0 PID: 2343 Comm: kworker/0:2 Not tainted 6.10.0-syzkaller-g1722389b0d86 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:ath6kl_bmi_get_target_info+0x4f5/0x5b0 drivers/net/wireless/ath/ath6kl/bmi.c:90
+Code: 77 fc ff ff e8 4c fa b1 fd be 08 00 00 00 bd f3 ff ff ff 48 c7 c7 20 db 7f 87 e8 26 42 fe ff e9 5c fd ff ff e8 2c fa b1 fd 90 <0f> 0b 90 bd ea ff ff ff e9 49 fd ff ff e8 79 ec 06 fe e9 e7 fb ff
+RSP: 0018:ffffc900042eef48 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff8881135c0e20 RCX: ffffffff83a15e8a
+RDX: ffff88811394d700 RSI: ffffffff83a16014 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000005 R09: 000000000000000c
+R10: 0000000000000000 R11: ffffffff81004e0a R12: ffffc900042ef058
+R13: 1ffff9200085ddeb R14: ffff8881135c0e50 R15: ffffc900042ef05c
+FS:  0000000000000000(0000) GS:ffff8881f6200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055ea8cfc1b18 CR3: 0000000115c00000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ath6kl_core_init+0x1a0/0x11a0 drivers/net/wireless/ath/ath6kl/core.c:101
+ ath6kl_usb_probe+0xcd2/0x1450 drivers/net/wireless/ath/ath6kl/usb.c:1168
+ usb_probe_interface+0x309/0x9d0 drivers/usb/core/driver.c:399
+ call_driver_probe drivers/base/dd.c:578 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:657
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:799
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:829
+ __device_attach_driver+0x1df/0x310 drivers/base/dd.c:957
+ bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:457
+ __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1029
+ bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:532
+ device_add+0x114b/0x1a70 drivers/base/core.c:3679
+ usb_set_configuration+0x10cb/0x1c50 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0xb1/0x110 drivers/usb/core/generic.c:254
+ usb_probe_device+0xec/0x3e0 drivers/usb/core/driver.c:294
+ call_driver_probe drivers/base/dd.c:578 [inline]
+ really_probe+0x23e/0xa90 drivers/base/dd.c:657
+ __driver_probe_device+0x1de/0x440 drivers/base/dd.c:799
+ driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:829
+ __device_attach_driver+0x1df/0x310 drivers/base/dd.c:957
+ bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:457
+ __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1029
+ bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:532
+ device_add+0x114b/0x1a70 drivers/base/core.c:3679
+ usb_new_device+0xd90/0x1a10 drivers/usb/core/hub.c:2651
+ hub_port_connect drivers/usb/core/hub.c:5521 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x2e66/0x4f50 drivers/usb/core/hub.c:5903
+ process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xf20 kernel/workqueue.c:3390
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
