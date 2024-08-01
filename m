@@ -1,187 +1,157 @@
-Return-Path: <netdev+bounces-114945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75409944C12
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:01:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B42D944C1B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:01:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02E071F23315
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:01:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54CCF1C25E6E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172A01A57E4;
-	Thu,  1 Aug 2024 12:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MkOiqaoa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05BD01A38E9;
+	Thu,  1 Aug 2024 12:58:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6543B1A38E3;
-	Thu,  1 Aug 2024 12:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722517117; cv=fail; b=rBGQW1ah3u11Cuu0nayekfaibhNp4lbhXkUvkyGNzpeR4By9UXcL1JZsGuYVA9xXtYQty1ht8TsQPCPuzbBYJ/g6lll3zx5TlnwQynHhtrM+itByqBXXMIq7dzFV1PFmVpJ44AKqaKLWfYK+ORkhJKjFpCWlFOC22qk1GSlZX+M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722517117; c=relaxed/simple;
-	bh=TEhoxw8IIsCeFZMS7ZXaifQovBedkIQcaLyLvdMfZMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=B0WtO3exf60IwWo5qgK3iozqAn1pwtPZMK3yGxWFiOb+E7DrrHlXXEpbb0lUeY1XangGCAWQRJv6eh6jZkcfqEHMWrzoDU5wzvGWjxQFsj4Gr8+/iF7gACF3FukeDn6cc57jvG+uQPttZr3YR/gfyRTNBZpjDKT1HjZeIFw0xz4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MkOiqaoa; arc=fail smtp.client-ip=40.107.94.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QUV3YbeqIlWqI9ox9D7WZtESVXEVWdiTaNl35D+vxw7MmOyWRn1h8aY++kz9n0gxOei1fgSeZjdG08G/nswvjoh+bXL79fyJIQk6ZeDEn3XplNPYHDI8mJt4AltWYLoive9mcM/dnJQYDNXzJBdfxkG8RPRziY5QSfp33GyGcmJSVvSzweMNEK+qj6rkq/RJWVrQEsO+VXM/I6D+hc8YF7Tq2nbH/mAy+v4O19d8yKrQQd+YEZWwkWXGRK4MPcZIOHN0Sy9ro3EGS1lVskfIAf5jVyoTwQANnF+lgt3Buf6ZZ4AXlDjrFVw3SwPA3RcEu3IRoeCQhLRjC4y644T8Lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Zqq1TwCJ+IQo3FbHlAqgmKiVErWuvxtZN66wJWQxmsI=;
- b=MdL9IxEmAdyw83/KyaB9pGd7RKnFyjSVYBGwZeoIHtQsas5olmtP5DfhRoZeE85CqlGemQkBH+8m3f/DNQ0zq5hbi5dQpVO5wEzuiFOMhdstJpzRug5v35lMQaomcCcKBfJRWQTnBI74U/ekEUtIZW2KpITGe3pnphZBTgkMxYcfhxNRjzNIbtNjzb6wh9AzE9WWoUiOUEm1U5jgPPEk4JtXPmPmajxb3b0JkUytRbjkqvQeXRIneH9Wsfn2yZcIPhM/Ozea1Rgk8sIM3aBSHVkxxb/dIHn9VpyOIhVQAW4i0+U63LFw+hiKQdlrPB5LScopVm6KuuegfpZzemLfOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Zqq1TwCJ+IQo3FbHlAqgmKiVErWuvxtZN66wJWQxmsI=;
- b=MkOiqaoa6pL1W6u8zLM6LWY7tz++3eBxOyWntl4yiJYgDTQU3tOdaCkZUAdPksWBTK8QqkN5arOZyKCeRxSFBAb+3g9VdNRUsAvuKxsQAfVuyVDRD7eqLzrsmTax8vlvupV5Ce49t2zPBoTaTkTr61MXmtA2EkkeZb+bXZVzBhSvWYit5D/96Lj9rhqRa9rannESJGK9fCZeLt+LT13rSgB16bJsXD/HfSVTyZPX+QmQ+A21VnZKoDA1zUusJfLN2OYQp8GeND4YTFlwiGZqMAR4XI+0dub5iDrOjEC1KzjpYoOMuZTSj/1j4BX3XpNeqvO/HiNEFlhauxoB9AlZeQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by CH3PR12MB8259.namprd12.prod.outlook.com (2603:10b6:610:124::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Thu, 1 Aug
- 2024 12:58:30 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%4]) with mapi id 15.20.7828.016; Thu, 1 Aug 2024
- 12:58:30 +0000
-Date: Thu, 1 Aug 2024 09:58:29 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-doc@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH v2 5/8] fwctl: FWCTL_RPC to execute a Remote Procedure
- Call to device firmware
-Message-ID: <20240801125829.GA2809814@nvidia.com>
-References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <5-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <20240730080038.GA4209@unreal>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730080038.GA4209@unreal>
-X-ClientProxiedBy: MN2PR03CA0022.namprd03.prod.outlook.com
- (2603:10b6:208:23a::27) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FBF1A71E1;
+	Thu,  1 Aug 2024 12:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722517127; cv=none; b=XWs/FzamQCJFXPQ3Rk9M9/5D5gKSCzU7UBQaZIh6wXXXZ+7iUOyQBsqBQP3vYmd/9P4fCrOM+lgp13IWFD379bwdK0l+REsjEof2WW3TlPdFu3JU4cjQMoArVN1EQbjTgxLLKR7fareYH5KF3RFYCmfn+w/Lo9gsUmvGW3Hf0fk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722517127; c=relaxed/simple;
+	bh=gSmc0vpIM4s9a1iCGZSOkfBK2zTfoXZQKvrDXUHTtnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=uBCz4+1opqCNhwLtMiH9Utk7ruOE1BkAy63TxuP8KRyZjSko7MLdUVjVNaUvpgHYhYDWu3zwlE9R5l1M436aqdtPgBHY9Gh+tYnhRsY78VVurYIWDJf3QiIjmtCeGDv3EXk9Us+aYWOvnKe5iGBVFhko7mXKmrIWZNkOtjE2McU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WZTXw370TzxVws;
+	Thu,  1 Aug 2024 20:58:24 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 75F81180AE6;
+	Thu,  1 Aug 2024 20:58:37 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 1 Aug 2024 20:58:37 +0800
+Message-ID: <03c555c5-a25d-434a-aed4-0f2f7aa65adf@huawei.com>
+Date: Thu, 1 Aug 2024 20:58:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|CH3PR12MB8259:EE_
-X-MS-Office365-Filtering-Correlation-Id: 56265f5a-2c59-431f-863b-08dcb229a49c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9w7Dq9dcOmqUmy1IP7gSh4KvU3LF0UMIP9Zguf2Q7rgjVZmUZQQiPELe4OGB?=
- =?us-ascii?Q?Nxnq71BmbnVomXCsfls+l6mCdJDDIFGEdWh46a2aWFLxVOEpqed8kp5RHEN1?=
- =?us-ascii?Q?HMkPun2aXIgu27vC7/lChidx/O6/8hUPu5zIz9RvHHqvjtbgW+lC5dmiPPU7?=
- =?us-ascii?Q?MWuNzOZ/Tzx266r/0lRFY3O4ggTiT+9HKw4kqoB6atHnQ8Wlfgdur8QnDng/?=
- =?us-ascii?Q?k1yUfMVpyGCJQQSPe7AS79lDcGNu/aKvrJOqP3h+kISTwdM6OI14k/LuSOvU?=
- =?us-ascii?Q?q//6z7rbojuf1JKSDP3cIkTLORk0jsFn0AHZw8AbohfMQVejXWX5/XZai7QB?=
- =?us-ascii?Q?oUtFpTcHrsIspaWriOewd/IWa+7dqf+4XNDckFtOCST9LqJwy7hmfMfLGhYH?=
- =?us-ascii?Q?P0zuaz5YNdRb5koS+XkSxWgYXrvrcLgZqHo5tLtqDcOZATqC3zERjBsTSB1M?=
- =?us-ascii?Q?iE5+PAiW35LxJtKhl83VAX/qgh+c6TKQWcVkLQ4mYIBMyszFylui+14E88ZI?=
- =?us-ascii?Q?VFrr2RuSsCO10q/mXYqHU51WouMPrquZ65uB47+tU+ck67SGWUWXGT712CyR?=
- =?us-ascii?Q?ko3h12cSkYYtNw48jJezUEcgtbpORkXDi1U1XRmRR8PjwMICYCxhx0MMTqKp?=
- =?us-ascii?Q?/YClgNXZelP6CIQOajAP1RkCBHHfKTAmpPkkd4S/3MMYpClja2iuB7TuB+3g?=
- =?us-ascii?Q?w8kRw63Q6YQdmwnSzwL7WuFtypB6LNzKgkTg43n2G4n8IIqapilpaDur7OL5?=
- =?us-ascii?Q?vzGF4LOH57KqOiJAMjvcdDNHdobhu7cPLaLnATuxrRlmj6E2I/szq8TdqrBt?=
- =?us-ascii?Q?zjO7FPrVEPXw5Gh53PmeMTi3A8r8+bTE/hlPSSJSsZktaqt3Ey+vcq9JKulE?=
- =?us-ascii?Q?V013V5pU70c8N2Dd+JuCENwRe9NXHlFOhY4O3rqZkZkseBZxaXU5/+ovPQ+E?=
- =?us-ascii?Q?GB8UF6ywXPpekJgy0LaAMP6OQz0wHRCO4jOaYIDLUIZPpE3jmEnkeqN+lPnj?=
- =?us-ascii?Q?n25zru8fxflzukVXRfcxGSbO9tyAC9aVn4Xj/YRyXAonnkrT5cE+/YZUzVPM?=
- =?us-ascii?Q?iwn68rMtxFN352ZdiKIJoKTH2XsWTTS47sMH4U5kmj3o63Lt1IFcbQLObZrR?=
- =?us-ascii?Q?P0tjgWCuRAnWaoOAL5qRc1neNtMfKq39AhTf63htSvFiXmEpPlywoZx4AeEq?=
- =?us-ascii?Q?3HiWdmWUAI6Zt/BG0j/nT5r1ZzbEjGvbrS9zSdpCtxAEdzwKzFNGJ05IGpbb?=
- =?us-ascii?Q?rpnh0HNubiz7zO9oPqq21LY3Sra4dPdWJn66QKWxpTf91CSlwSoAPtkabQLX?=
- =?us-ascii?Q?oxirbHRSJOKMxr2CGXlmp6kon5VHZfFljlueCtmef9VVHw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?gccwsDWb3Oka8MRSEo+yS9yg6T3eWoympFxaVF3YGVGjZXmeEHNTvZmoXiIp?=
- =?us-ascii?Q?3/6OKDesEkEkt9ecIbiRYTo6HlAvC0mhNMPMHN1WZ9b7o4ZNCBJMoElLTMEB?=
- =?us-ascii?Q?VX/sDi4VDIkFpqOG7VoPMXwj1MpaNLGUtkI5aBvCniqiP8lfDcCzbEdcYBWN?=
- =?us-ascii?Q?g/kkl4VRCf/w7HwaTt/ueuuQUQzqG8+jBkRjdFVBZ26L5qWvIcHFYNI5nRbc?=
- =?us-ascii?Q?QWlxgk5rZT0/NcvT3TPQ7g1mwhqxwF02qtpANOINVMqH2iOODmsRbv+f8+ZS?=
- =?us-ascii?Q?2tmiqH4b9hxZzGiQGQ4OAL6SO1xtj8Z1HtA0RNUpKVA+gW9MmMiZQ7fbt9vA?=
- =?us-ascii?Q?LupDsoB6yubbkQdQKums6j7SCFPceEO+VTN8a2FhYKqHh+pIBxhCD+xlIdNw?=
- =?us-ascii?Q?E+BS5EufBiNGR3weCKkg1mhXirYStHERoFRuibFVOS+P9NZdMP4LWcbO53P7?=
- =?us-ascii?Q?vz2F4GgUpPWEaoleEkKnkCk4k6iFHEgX3Jd2sUwQrGhQlVTAFbsFzx0dAtdN?=
- =?us-ascii?Q?aNQHO4nifqbznqjycQ2V6IS5FnBfvNED6CSfpXPIiuioG1K3oabwORDT8gI7?=
- =?us-ascii?Q?zCDfmoGOvbh2Vrg0R981z+o8agGb4edOGlKqN9z8ZEJZn+oEOACz0iV+lRuj?=
- =?us-ascii?Q?upWzuuXjNqw1krZ3sFPluhCJSysCVtD4eI4VbAG8jFD0KSDpjxRT8Ba8HcWF?=
- =?us-ascii?Q?4rfDyiGeVpwTw7whCEqfesgafd5FWA5JnGvvKUK7J3onTYSMyXwSIIYrhc2A?=
- =?us-ascii?Q?15gVtAEg0nnuU01MEjep8+ccDD0zQ4exIGwNoAzj6kZBWWTc7ES8iMrXNFKk?=
- =?us-ascii?Q?vU2NAVr65Y77phAwLLQDrNUCKuGrt4W67OiKBCups/oKPMbB8hcA7IittzQ9?=
- =?us-ascii?Q?fiGdrqeX7pNtkxfqLz6qMtsGSJML6KOZAd2pDh6F5/8RG1BqrhyaBTAV/nKz?=
- =?us-ascii?Q?vtajfLRmKI/dse2iN76Rj6UAsIseumQHpfsB/bjnRRBJYbDb0oD5QoF7tzH2?=
- =?us-ascii?Q?yFAxcK58LIy0cJDII39rmFYlusKCJLKVS2aF3bvclU04dgDJ8DjsIgNvwQxy?=
- =?us-ascii?Q?kRoOlcNG72oibKE9tFxYKroK2HS/MfI19s+PXZ1WfUCEa5h3CiUy4FHzwULr?=
- =?us-ascii?Q?Dw+eBQ9dT3/gqMarV5hgeRnqh51ZCuBtBipadfyvUo1mswH2s+N6Z1Ko+l8u?=
- =?us-ascii?Q?xUwtkJ4wtK2mpXmmoUfQ++oqAL3LXUJFgDKlTdC1aypH+yIY9okBrv+DDQx2?=
- =?us-ascii?Q?WkGPZdIuFwRX4srhHtwk4hnLg7ZX2TfEuOGB+/ivlnXUJtbdjZTwnkeaqv6e?=
- =?us-ascii?Q?qcolCCGDpbBKckkpkKS2SX8EVLOxXbIixFSb0BFaQ7rsubgRgwpowRbGFalz?=
- =?us-ascii?Q?6i9anj/uZqRJsPzSMftyIrTSSZZySAJ1zqCpJNOt4GDoAb0Rzw3h12kjWtfz?=
- =?us-ascii?Q?UVcmYKEDPmTsFjVm43bbSx72H2mFmZD3VROJV0zEo8y5CXtrjtZWgxC2eWN3?=
- =?us-ascii?Q?b1SmK+/0SgbwCskKbELTmsNlZ2us7vCstRRv79bQcqnjTEufesObUGH6t8+4?=
- =?us-ascii?Q?z6UqdKEQkHkgAvb9jcNuGU03yz67X71hTjK6EmCX?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56265f5a-2c59-431f-863b-08dcb229a49c
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 12:58:30.7121
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6d5KIZQlHcnKfWR2SaZS/mWMARDHaAopUV8GXz3EUfzuxrkfTd8JzH/YKXDriPA2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8259
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 01/14] mm: page_frag: add a test module for
+ page_frag
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
+References: <20240731124505.2903877-1-linyunsheng@huawei.com>
+ <20240731124505.2903877-2-linyunsheng@huawei.com>
+ <CAKgT0Udj5Jskjvvba345DFkySuZeg927OHQya0rCcynMtmGg8g@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAKgT0Udj5Jskjvvba345DFkySuZeg927OHQya0rCcynMtmGg8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Tue, Jul 30, 2024 at 11:00:38AM +0300, Leon Romanovsky wrote:
-> > +
-> > +	void *inbuf __free(kvfree) =
-> > +		kvzalloc(cmd->in_len, GFP_KERNEL | GFP_KERNEL_ACCOUNT);
+On 2024/8/1 2:29, Alexander Duyck wrote:
+> On Wed, Jul 31, 2024 at 5:50 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> Basing on the lib/objpool.c, change it to something like a
+>> ptrpool, so that we can utilize that to test the correctness
+>> and performance of the page_frag.
+>>
+>> The testing is done by ensuring that the fragment allocated
+>> from a frag_frag_cache instance is pushed into a ptrpool
+>> instance in a kthread binded to a specified cpu, and a kthread
+>> binded to a specified cpu will pop the fragment from the
+>> ptrpool and free the fragment.
+>>
+>> We may refactor out the common part between objpool and ptrpool
+>> if this ptrpool thing turns out to be helpful for other place.
 > 
+> This isn't a patch where you should be introducing stuff you hope to
+> refactor out and reuse later. Your objpoo/ptrpool stuff is just going
+> to add bloat and overhead as you are going to have to do pointer
+> changes to get them in and out of memory and you are having to scan
+> per-cpu lists. You would be better served using a simple array as your
+> threads should be stick to a consistent CPU anyway in terms of
+> testing.
 > 
-> <...>
-> 
-> > +	out_len = cmd->out_len;
-> > +	void *outbuf __free(kvfree_errptr) = fwctl->ops->fw_rpc(
-> > +		ucmd->uctx, cmd->scope, inbuf, cmd->in_len, &out_len);
-> 
-> I was under impression that declaration of variables in C should be at the beginning
-> of block. Was it changed for the kernel?
+> I would suggest keeping this much more simple. Trying to pattern this
+> after something like the dmapool_test code would be a better way to go
+> for this. We don't need all this extra objpool overhead getting in the
+> way of testing the code you should be focused on. Just allocate your
+> array on one specific CPU and start placing and removing your pages
+> from there instead of messing with the push/pop semantics.
 
-Yes, the compiler check blocking variables in the body was disabled to
-allow cleanup.h
+I am not sure if I understand what you meant here, do you meant something
+like dmapool_test_alloc() does as something like below?
 
-Jonathan said this is the agreed coding style to use for this
+static int page_frag_test_alloc(void **p, int blocks)
+{
+	int i;
 
-Jason
+	for (i = 0; i < blocks; i++) {
+		p[i] = page_frag_alloc(&test_frag, test_alloc_len, GFP_KERNEL);
+
+		if (!p[i])
+			goto pool_fail;
+	}
+
+	for (i = 0; i < blocks; i++)
+		page_frag_free(p[i]);
+
+	....
+}
+
+The above was my initial thinking too, I went to the ptrpool thing using
+at least two CPUs as the below reason:
+1. Test the concurrent calling between allocing and freeing more throughly,
+   for example, page->_refcount concurrent handling, cache draining and
+   cache reusing code path will be tested more throughly.
+2. Test the performance impact of cache bouncing between different CPUs.
+
+I am not sure if there is a more lightweight implementation than ptrpool
+to do the above testing more throughly.
+
+> 
+> Lastly something that is a module only tester that always fails to
+> probe doesn't sound like it really makes sense as a standard kernel
+
+I had the same feeling as you, but when doing testing, it seems
+convenient enough to do a 'insmod xxx.ko' for testing without a
+'rmmod xxx.ko'
+
+> module. I still think it would make more sense to move it to the
+> selftests tree and just have it build there as a module instead of
+
+I failed to find one example of test kernel module that is in the
+selftests tree yet. If it does make sense, please provide an example
+here, and I am willing to follow the pattern if there is one.
+
+> trying to force it into the mm tree. The example of dmapool_test makes
+> sense as it could be run at early boot to run the test and then it
+
+I suppose you meant dmapool is built-in to the kernel and run at early
+boot? I am not sure what is the point of built-in for dmapool, as it
+only do one-time testing, and built-in for dmapool only waste some
+memory when testing is done.
+
+> just goes quiet. This module won't load and will always just return
+> -EAGAIN which doesn't sound like a valid kernel module to me.
+
+As above, it seems convenient enough to do a 'insmod xxx.ko' for testing
+without a 'rmmod xxx.ko'.
 
