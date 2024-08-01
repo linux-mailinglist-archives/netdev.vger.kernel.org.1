@@ -1,174 +1,122 @@
-Return-Path: <netdev+bounces-114983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8582E944D80
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:53:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76D4944D82
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41839281F12
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:53:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C111C24105
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53131A38E7;
-	Thu,  1 Aug 2024 13:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D481E1A3BC2;
+	Thu,  1 Aug 2024 13:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="HAa5+eCv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dh7WS+Oo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139241A38C1
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 13:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FE6184549
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 13:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722520410; cv=none; b=QdedMhMlvn6BJmL6a/gGHRbAcvx2WnAFrAsWeOUtsbrgeCNApuWejpd6EsJ7fwQkROMD5/WavkKfhJ5Fk+paZAoYwRwvtB+/bvxcQa9+BzCzqPiPOa1V46CvQKFSi0Iq/FIT/s6L8G7D3WZQqowzCDlZmtpaxMYLP52U/8X7zdk=
+	t=1722520490; cv=none; b=C1eLEAFUnj2cbQj40Xopypg3EweIYsC4dysZXD+X9f3G27qhxI4OCkcMWzbNdRUDucCDbHxtVkVu3OUcf4eBxR41CaJ7hRRowBhn0xWflx2oqlApBbG/JOUqIboGuqIWgRgyKXaIQzzNvSl8dYLqvn001l7N6SPlX1ZyM9bf0j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722520410; c=relaxed/simple;
-	bh=gWWdO5xBWX5tU7fXTnRIHBQdQkp9TESMBHiNigorEHA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rfuUSBMV81hfJr2qxrsP2i+VR+L/MuZPTUfVOkOfKZ8ALcpu9KHUhpxxnN3ZapEU5Sm2NzAvbSWJTaD83yX2QXf8L91BD5lHjWDMkTke2gIKfhOkCCU1X8cifg0JkZfROhfamchQighcfdAlN/SPRN9rB5iXK8QJ3o7KwJdN0jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=HAa5+eCv; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5a10835480bso10183039a12.2
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 06:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1722520407; x=1723125207; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=W7D0AJSGl0P0jq0Bi/L5OZ1HP+papERMI7L86hsLZjQ=;
-        b=HAa5+eCvOLgUVnJvfbhwqz8Z1l5tLrPhMh7H/BDp1RItVc1KvcNlX6/Fw6VZ9oDyaB
-         TLLoPiTRbC4otJSbrZa15mR/hDfp2e6QjH49GMuAETR1a/Qu280iFTJrVPph0+VDRHet
-         +RnINa+cFILPWM6uR6eG5ixevATCuOtUceQ4fe5w688f46arm94mDNVNNup4TNZZ1oXI
-         bEVtmuwhhjWDc4cwW9wlybUrpnHMGgF+1RtvCxKDLuN7J+azQJm5c9UeoXJwRY2nonaX
-         oLbUC4LRDkLhzlClGVuFRPcmPlGiBpT4E6q0vefB1CxLC9vRWH9+DR8MM4JhNuHXOL/C
-         91TQ==
+	s=arc-20240116; t=1722520490; c=relaxed/simple;
+	bh=IPqMQmrx1o4+5JAej12udIXwU9ZskyAekdwuNHiC5xk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cKw7glxPjQizBwbBq4p90wYt7WjJmvUIzPlMzN3DYVeQ3pHEnHlFizEmbz2SNqGZqYskCUctUt4UU7qMLKVsqz8lexKzbo8c/KN5PZPZfmVGlc+tTMGDxWcFgKe4wt/ieNxE1uXnFKRA69/qAjQDpPj+yyI0e2z2k+Y2O7hRomw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dh7WS+Oo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722520488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZURuYWxniX4LIaWq38giCOp7/XoDP7loQAsH838DezA=;
+	b=Dh7WS+OoDOFmcbB9+tlvA1zv4MoGplQ9cEFrGaHhyiOLYzSc4/4bKcfS1gRDFBtPEC2Kl7
+	S54dZAWyKl+WdFfrmJ56lNZFAvtHgY3O/foHsQc9Ps9ozjaE7hzFyNKZkc2WVg1B8sqSzQ
+	LFgjw5zFnaiUNSQUYufJ8BECvsY1yB0=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-551-mRhqPas3NnGxJ2IY0LFliA-1; Thu, 01 Aug 2024 09:54:47 -0400
+X-MC-Unique: mRhqPas3NnGxJ2IY0LFliA-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ef298e35e1so5022541fa.0
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 06:54:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722520407; x=1723125207;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W7D0AJSGl0P0jq0Bi/L5OZ1HP+papERMI7L86hsLZjQ=;
-        b=M0aNgJXyGVzdG1JSOZb85qp2ney01bRCWL5Ky4nnn0PYIk/B94OHE2afQuyCMcjaWS
-         OQOcQZP1NT/ilgRufMQlWdaRjBePfNY79+cWEU3VlrJotWC2UiI2MNFt6rVBVKHjSSKA
-         RLkNvgLFTH7YSVs4FKW4He+2A7NLoOOk5QyUcgMcYZGjgN0bei5dkrvq5NZSzjjitsjD
-         c87q35Pm9OFydnNEJ0ANtbl/ewaKQoR20uHs8zxKLN+fUS24RMljkVOhJ7emS+dc6+qr
-         prDNsRHTnpfodVpctKdbnM28YUbLrvbTvHC8al7+ykiqxODNflR7waL1XnH19HuT/VsO
-         WDrA==
-X-Gm-Message-State: AOJu0YwvyrUwP26OReHTzf1UwrlBVMWqPPR3P+LEgfDzr2HTDgtdjv7K
-	8MyGAn58Og2uPtLVm4fySNdNhSomW37N+sk/ClVmNy7OZSF0RQeOTYU2AEWT+rQ=
-X-Google-Smtp-Source: AGHT+IH+yacwyAUQPqgzg0lVvZIIxA7JqngOa1jL/lnwNp2hFFya9gzj9Z8wbfNvyhXdzxbnLX6PJw==
-X-Received: by 2002:aa7:d357:0:b0:5a3:2af5:c722 with SMTP id 4fb4d7f45d1cf-5b7f38ebb2dmr279070a12.13.1722520400691;
-        Thu, 01 Aug 2024 06:53:20 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac63593a8esm10198000a12.30.2024.08.01.06.53.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 06:53:20 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Thu, 01 Aug 2024 15:52:54 +0200
-Subject: [PATCH net v2 2/2] selftests/net: Add coverage for UDP GSO with
- IPv6 extension headers
+        d=1e100.net; s=20230601; t=1722520485; x=1723125285;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZURuYWxniX4LIaWq38giCOp7/XoDP7loQAsH838DezA=;
+        b=RiB2S1645lurnph+4hMperaNz5HPFa8Jv0+r6hXzBd1yGjehTWw7VM7sfLDBtLu7Py
+         FNd1QvprhCZgu9uCmzuwM2t24rjoqxbep9FICZtoHA5oHjGwYAbewAJvAYY2UCOhpRmi
+         e9xmuAcpJnvu5QDC0+X1G+tPZGp5T2FqlWM+uj/fB/QTa3NEQEOWjM2vpAhHOITlbDpB
+         CxRpAhP4wdvdwU2Fxv/EcLmWsPNEgpcZWvFDoOsfPEyoSQKD97F29u1YLnsiwxYTWZAM
+         lGzDicVtkRR0Qmdn2U/4F/hTNRBBrDdU4J21O1uhert9Chi9RgtIGGKMrDQnp0IwXwAQ
+         Nuyw==
+X-Gm-Message-State: AOJu0YwIgYnxMuIMWC0oDOd/LR/RYRPmFB4XICCIfBpM0K5mAdoZWft8
+	DdZQhAA6b9v3BSNCh6gxfT4uJCNTpykjAUeRVnVJK4EPzXdhNFBItUMt0e2xoy058TTJnTdb4P6
+	H1uG9i1n2u8eQb16lt9j0ei2D7GLbmJI9Dd7WbyPjUBuU1IS/Ps4HMw==
+X-Received: by 2002:a05:651c:104a:b0:2f0:198e:cf8b with SMTP id 38308e7fff4ca-2f15aafbcf0mr1567261fa.4.1722520485302;
+        Thu, 01 Aug 2024 06:54:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQSjeSndcAwinsbF3OMmg2hwmlAVK5gF10xPBSFfaovksq4NG528fJ37qQL3IXgEIpcxW46g==
+X-Received: by 2002:a05:651c:104a:b0:2f0:198e:cf8b with SMTP id 38308e7fff4ca-2f15aafbcf0mr1567101fa.4.1722520484717;
+        Thu, 01 Aug 2024 06:54:44 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1712:4410::f71? ([2a0d:3344:1712:4410::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b5fbb25sm59563075e9.0.2024.08.01.06.54.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Aug 2024 06:54:44 -0700 (PDT)
+Message-ID: <62ae3755-f51d-4953-928f-ff2faf7cea72@redhat.com>
+Date: Thu, 1 Aug 2024 15:54:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240801-udp-gso-egress-from-tunnel-v2-2-9a2af2f15d8d@cloudflare.com>
-References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
-In-Reply-To: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
- kernel-team@cloudflare.com
-X-Mailer: b4 0.14.1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ipv6: eliminate ndisc_ops_is_useropt()
+To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
+ =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Ahern <dsahern@kernel.org>,
+ =?UTF-8?B?WU9TSElGVUpJIEhpZGVha2kgLyDlkInol6Toi7HmmI4=?=
+ <yoshfuji@linux-ipv6.org>
+References: <20240730003010.156977-1-maze@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240730003010.156977-1-maze@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-After enabling UDP GSO for devices not offering checksum offload, we have
-hit a regression where a bad offload warning can be triggered when sending
-a datagram with IPv6 extension headers.
+On 7/30/24 02:30, Maciej Żenczykowski wrote:
+> as it doesn't seem to offer anything of value.
+> 
+> There's only 1 trivial user:
+>    int lowpan_ndisc_is_useropt(u8 nd_opt_type) {
+>      return nd_opt_type == ND_OPT_6CO;
+>    }
+> 
+> but there's no harm to always treating that as
+> a useropt...
 
-Extend the UDP GSO IPv6 tests to cover this scenario.
+AFAICS there will be an user-visible difference, as the user-space could 
+start receiving "unexpected" notification for such opt even when the 
+kernel is built with CONFIG_6LOWPAN=n.
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
- tools/testing/selftests/net/udpgso.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+The user-space should ignore unknown/unexpected notification,so it 
+should be safe, but I'm a bit unsettled by the many 'should' ;)
 
-diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-index 3e74cfa1a2bf..3f2fca02fec5 100644
---- a/tools/testing/selftests/net/udpgso.c
-+++ b/tools/testing/selftests/net/udpgso.c
-@@ -67,6 +67,7 @@ struct testcase {
- 	int gso_len;		/* mss after applying gso */
- 	int r_num_mss;		/* recv(): number of calls of full mss */
- 	int r_len_last;		/* recv(): size of last non-mss dgram, if any */
-+	bool v6_ext_hdr;	/* send() dgrams with IPv6 extension headers */
- };
- 
- const struct in6_addr addr6 = {
-@@ -77,6 +78,8 @@ const struct in_addr addr4 = {
- 	__constant_htonl(0x0a000001), /* 10.0.0.1 */
- };
- 
-+static const char ipv6_hopopts_pad1[8] = { 0 };
-+
- struct testcase testcases_v4[] = {
- 	{
- 		/* no GSO: send a single byte */
-@@ -255,6 +258,13 @@ struct testcase testcases_v6[] = {
- 		.gso_len = 1,
- 		.r_num_mss = 2,
- 	},
-+	{
-+		/* send 2 1B segments with extension headers */
-+		.tlen = 2,
-+		.gso_len = 1,
-+		.r_num_mss = 2,
-+		.v6_ext_hdr = true,
-+	},
- 	{
- 		/* send 2B + 2B + 1B segments */
- 		.tlen = 5,
-@@ -396,11 +406,18 @@ static void run_one(struct testcase *test, int fdt, int fdr,
- 	int i, ret, val, mss;
- 	bool sent;
- 
--	fprintf(stderr, "ipv%d tx:%d gso:%d %s\n",
-+	fprintf(stderr, "ipv%d tx:%d gso:%d %s%s\n",
- 			addr->sa_family == AF_INET ? 4 : 6,
- 			test->tlen, test->gso_len,
-+			test->v6_ext_hdr ? "ext-hdr " : "",
- 			test->tfail ? "(fail)" : "");
- 
-+	if (test->v6_ext_hdr) {
-+		if (setsockopt(fdt, IPPROTO_IPV6, IPV6_HOPOPTS,
-+			       ipv6_hopopts_pad1, sizeof(ipv6_hopopts_pad1)))
-+			error(1, errno, "setsockopt ipv6 hopopts");
-+	}
-+
- 	val = test->gso_len;
- 	if (cfg_do_setsockopt) {
- 		if (setsockopt(fdt, SOL_UDP, UDP_SEGMENT, &val, sizeof(val)))
-@@ -412,6 +429,12 @@ static void run_one(struct testcase *test, int fdt, int fdr,
- 		error(1, 0, "send succeeded while expecting failure");
- 	if (!sent && !test->tfail)
- 		error(1, 0, "send failed while expecting success");
-+
-+	if (test->v6_ext_hdr) {
-+		if (setsockopt(fdt, IPPROTO_IPV6, IPV6_HOPOPTS, NULL, 0))
-+			error(1, errno, "setsockopt ipv6 hopopts clear");
-+	}
-+
- 	if (!sent)
- 		return;
- 
+Cheers,
 
--- 
-2.40.1
+Paolo
 
 
