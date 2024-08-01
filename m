@@ -1,259 +1,189 @@
-Return-Path: <netdev+bounces-114900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EF3944A18
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:09:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4BD944A21
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF3421F29CA6
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:09:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C388282910
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1645418452D;
-	Thu,  1 Aug 2024 11:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="NSJ/FhQ6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3C518952D;
+	Thu,  1 Aug 2024 11:10:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1969E16DC03;
-	Thu,  1 Aug 2024 11:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D33189510;
+	Thu,  1 Aug 2024 11:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722510543; cv=none; b=GLUDesLlCOwgWdJUcyzegQkH/ToDHqH/n0n73iS8omYrSKMH8wQpvn+AebXNoGtgWhiqjOFOiWlG8qxfpImmkNre1Rw1jZRQJA+PD9Ns1OtcFqwOYST6Dk5JKGpHj+eC6TYJF5pdKoAoBR6W9N3MSCdtmf2NQh+PGtnrG8Kx+hs=
+	t=1722510651; cv=none; b=jAVvH4DCfLk7r6T9mWeeKOJO2ouEfZD3IG9xRaONbLWnJtsphvzsN2IedDRk/X7FJxAquATRk1WOKznEbWqmOaPlLFeUL7j7XVEtpi0BmRllJROzekCldgnaDcPOMDyhrFsOBhaALyIjU9RaoXDdTfQlSI/uYpcasqL9lAgfKCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722510543; c=relaxed/simple;
-	bh=jYHJ3jULPzzri0UFSQOLI1ksRW5bEfCe/jyKBeSnOag=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C0rFze925HCvtjiqnjeXZsgcIKdYx215mqmvva4p8817Eyq1Yw7/0cKaSGv75TPRhlrjER9GxbK0wWrT7buI+YJ+flWtmaIZ8u10+PGsXKB7pZ49fH0nwgHbf6HSICvHs7/Y+gr4nPyEFE3pHTdk+BM+LBlBU7iLIR3Jro+xg8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=NSJ/FhQ6; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1722510541; x=1754046541;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jYHJ3jULPzzri0UFSQOLI1ksRW5bEfCe/jyKBeSnOag=;
-  b=NSJ/FhQ6z6yMO5cqPzJGSI9nh71CNTyZH/3c2fPo0Ks1BkkqQYTY4UXJ
-   3IQWvOFKsLn7h2obh9WfyylMv3fb86lc5NmUkk/ijGKSpZ4mGBniHNVyh
-   4p2pPboMX5P8x5qp28oX6HqY4wmu3Lpzibx8Cn1otR6QACGe+Ff3m3DbD
-   QPTZyvUKtkn5zyVjBC22PhapEJxk5hoCsUch3+wTQKQLBSLGPuNqvbMzs
-   dAbnNCAaJF39PiUAF2skmPvTByJeZM348MLUANHGbavlP6M5vTtEiN7Wm
-   NvtM4EPxBA0Jt3THAlFmF4Z4YbDfFAxH/iF4u3nqyeqMl0PGz0aFLguMu
-   A==;
-X-CSE-ConnectionGUID: R187luJxSuSsG9JWis5GFw==
-X-CSE-MsgGUID: wG0Rg6+8SjqqEXaVQi29MA==
-X-IronPort-AV: E=Sophos;i="6.09,254,1716274800"; 
-   d="scan'208";a="30631067"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Aug 2024 04:08:59 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 1 Aug 2024 04:08:49 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 1 Aug 2024 04:08:48 -0700
-Date: Thu, 1 Aug 2024 16:35:33 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <andrew@lunn.ch>,
-	<horms@kernel.org>, <hkallweit1@gmail.com>, <richardcochran@gmail.com>,
-	<rdunlap@infradead.org>, <Bryan.Whitehead@microchip.com>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next V3 4/4] net: lan743x: Add support to ethtool
- phylink get and set settings
-Message-ID: <Zqtr/ezTMkButA8j@HYD-DK-UNGSW21.microchip.com>
-References: <20240730140619.80650-1-Raju.Lakkaraju@microchip.com>
- <20240730140619.80650-5-Raju.Lakkaraju@microchip.com>
- <ZqkCj9gENW5ILWED@shell.armlinux.org.uk>
+	s=arc-20240116; t=1722510651; c=relaxed/simple;
+	bh=N4s5LWv8nGjaVIohlEd3UbboA9+ABScP84cvlHk2MgI=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=RbkfHNW/IIZwOxFB/o3xCvc1YSXTSmq576CDCWpynZwxtYTnJOzTgwWwf9CDt1iJHvLsRi58Mjc7bzCiNSMhVkRM5iCt/L2gUTj1u4hYyrcoBaWdINi0T5+Y4WDU05sy1CVr0VcqYK0vrG0FMIwzfmPJlm7lYQK7159h9OovIoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WZR8S6v9mz1L9Kv;
+	Thu,  1 Aug 2024 19:10:32 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 955041402CD;
+	Thu,  1 Aug 2024 19:10:45 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 19:10:44 +0800
+Message-ID: <c44a5759-855a-4a8c-a4d3-d37e16fdebdc@huawei.com>
+Date: Thu, 1 Aug 2024 19:10:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <ZqkCj9gENW5ILWED@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH net-next 08/10] net: hibmcge: Implement workqueue and
+ some ethtool_ops functions
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-9-shaojijie@huawei.com>
+ <b20b5d68-2dab-403c-b37b-084218e001bc@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <b20b5d68-2dab-403c-b37b-084218e001bc@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-Hi Russell King,
 
-The 07/30/2024 16:11, Russell King (Oracle) wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> 
-> On Tue, Jul 30, 2024 at 07:36:19PM +0530, Raju Lakkaraju wrote:
-> > diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-> > index 3a63ec091413..a649ea7442a4 100644
-> > --- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-> > +++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-> > @@ -1058,61 +1058,48 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
-> >                                  struct ethtool_keee *eee)
-> >  {
-> >       struct lan743x_adapter *adapter = netdev_priv(netdev);
-> > -     struct phy_device *phydev = netdev->phydev;
-> > -     u32 buf;
-> > -     int ret;
-> > -
-> > -     if (!phydev)
-> > -             return -EIO;
-> > -     if (!phydev->drv) {
-> > -             netif_err(adapter, drv, adapter->netdev,
-> > -                       "Missing PHY Driver\n");
-> > -             return -EIO;
-> > -     }
-> >
-> > -     ret = phy_ethtool_get_eee(phydev, eee);
-> > -     if (ret < 0)
-> > -             return ret;
-> > -
-> > -     buf = lan743x_csr_read(adapter, MAC_CR);
-> > -     if (buf & MAC_CR_EEE_EN_) {
-> > -             /* EEE_TX_LPI_REQ_DLY & tx_lpi_timer are same uSec unit */
-> > -             buf = lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
-> > -             eee->tx_lpi_timer = buf;
-> > -     } else {
-> > -             eee->tx_lpi_timer = 0;
-> > -     }
-> > +     eee->tx_lpi_timer = lan743x_csr_read(adapter,
-> > +                                          MAC_EEE_TX_LPI_REQ_DLY_CNT);
-> > +     eee->eee_enabled = adapter->eee_enabled;
-> > +     eee->eee_active = adapter->eee_active;
-> > +     eee->tx_lpi_enabled = adapter->tx_lpi_enabled;
-> 
-> You really need to start paying attention to the commits other people
-> make as a result of development to other parts of the kernel.
-> 
-> First, see:
-> 
-> commit ef460a8986fa0dae1cdcb158a06127f7af27c92d
-> Author: Andrew Lunn <andrew@lunn.ch>
-> Date:   Sat Apr 6 15:16:00 2024 -0500
-> 
->     net: lan743x: Fixup EEE
-> 
-> and note that the assignment of eee->eee_enabled, eee->eee_active, and
-> eee->tx_lpi_enabled were all removed.
-> 
+on 2024/8/1 9:10, Andrew Lunn wrote:
+>> +static void hbg_ethtool_get_drvinfo(struct net_device *netdev,
+>> +				    struct ethtool_drvinfo *drvinfo)
+>> +{
+>> +	strscpy(drvinfo->version, HBG_MOD_VERSION, sizeof(drvinfo->version));
+>> +	drvinfo->version[sizeof(drvinfo->version) - 1] = '\0';
+> A version is pointless, it tells you nothing useful. If you don't
+> touch version, the core will fill it with the uname, so you know
+> exactly what kernel this is, which is useful.
+>
+>> +static u32 hbg_ethtool_get_link(struct net_device *netdev)
+>> +{
+>> +	struct hbg_priv *priv = netdev_priv(netdev);
+>> +
+>> +	return priv->mac.link_status;
+>> +}
+>> +
+>> +static int hbg_ethtool_get_ksettings(struct net_device *netdev,
+>> +				     struct ethtool_link_ksettings *ksettings)
+>> +{
+>> +	struct hbg_priv *priv = netdev_priv(netdev);
+>> +
+>> +	phy_ethtool_ksettings_get(priv->mac.phydev, ksettings);
+> You can avoid this wrapper since phy_attach_direct sets netdev->phydev
+> to phydev. You can then call phy_ethtool_get_link_ksettings() etc.
 
-Accepted. I will fix
+Yes, It`s ok
 
-> Next...
-> 
-> >
-> > -     return 0;
-> > +     return phylink_ethtool_get_eee(adapter->phylink, eee);
-> 
-> phylink_ethtool_get_eee() will call phy_ethtool_get_eee(), which
-> in turn calls genphy_c45_ethtool_get_eee() and eeecfg_to_eee().
-> 
-> genphy_c45_ethtool_get_eee() will do this:
-> 
->         data->eee_enabled = is_enabled;
->         data->eee_active = ret;
-> 
-> thus overwriting your assignment to eee->eee_enabled and
-> eee->eee_active.
-> 
-> eeecfg_to_eee() will overwrite eee->tx_lpi_enabled and
-> eee->eee_enabled.
-> 
-> Thus, writing to these fields and then calling
-> phylink_ethtool_get_eee() results in these fields being overwritten.
-> 
+>
+>> +static int hbg_ethtool_set_ksettings(struct net_device *netdev,
+>> +				     const struct ethtool_link_ksettings *cmd)
+>> +{
+>> +	struct hbg_priv *priv = netdev_priv(netdev);
+>> +
+>> +	if (cmd->base.speed == SPEED_1000 && cmd->base.duplex == DUPLEX_HALF)
+>> +		return -EINVAL;
+> So long as you have told phylib about not supporting 1000Base/Half,
+> phy_ethtool_set_link_ksettings() will return an error for you.
 
-Ok. I will fix.
+okay,
 
-> >  static int lan743x_ethtool_set_eee(struct net_device *netdev,
-> >                                  struct ethtool_keee *eee)
-> >  {
-> > -     struct lan743x_adapter *adapter;
-> > -     struct phy_device *phydev;
-> > -     u32 buf = 0;
-> > +     struct lan743x_adapter *adapter = netdev_priv(netdev);
-> >
-> > -     if (!netdev)
-> > -             return -EINVAL;
-> > -     adapter = netdev_priv(netdev);
-> > -     if (!adapter)
-> > -             return -EINVAL;
-> > -     phydev = netdev->phydev;
-> > -     if (!phydev)
-> > -             return -EIO;
-> > -     if (!phydev->drv) {
-> > -             netif_err(adapter, drv, adapter->netdev,
-> > -                       "Missing PHY Driver\n");
-> > -             return -EIO;
-> > -     }
-> > +     if (eee->tx_lpi_enabled)
-> > +             lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT,
-> > +                               eee->tx_lpi_timer);
-> > +     else
-> > +             lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, 0);
-> >
-> > -     if (eee->eee_enabled) {
-> > -             buf = (u32)eee->tx_lpi_timer;
-> > -             lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, buf);
-> > -     }
-> > +     adapter->eee_enabled = eee->eee_enabled;
-> > +     adapter->tx_lpi_enabled = eee->tx_lpi_enabled;
-> 
-> Given that phylib stores these and overwrites your copies in the get_eee
-> method above, do you need to store these?
-> 
+>
+>> +static const struct ethtool_ops hbg_ethtool_ops = {
+>> +	.get_drvinfo		= hbg_ethtool_get_drvinfo,
+>> +	.get_link		= hbg_ethtool_get_link,
+> Why not ethtool_op_get_link() ?
 
-OK
+It`s a good idea
 
-> > @@ -3013,7 +3025,12 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
-> >                                         unsigned int link_an_mode,
-> >                                         phy_interface_t interface)
-> >  {
-> > +     struct net_device *netdev = to_net_dev(config->dev);
-> > +     struct lan743x_adapter *adapter = netdev_priv(netdev);
-> > +
-> >       netif_tx_stop_all_queues(to_net_dev(config->dev));
-> > +     adapter->eee_active = false;
-> 
-> phylib tracks this for you.
-> 
+>
+>> +	.get_link_ksettings	= hbg_ethtool_get_ksettings,
+>> +	.set_link_ksettings	= hbg_ethtool_set_ksettings,
+>> +};
+>> +static void hbg_update_link_status(struct hbg_priv *priv)
+>> +{
+>> +	u32 link;
+>> +
+>> +	link = hbg_get_link_status(priv);
+>> +	if (link == priv->mac.link_status)
+>> +		return;
+>> +
+>> +	priv->mac.link_status = link;
+>> +	if (link == HBG_LINK_DOWN) {
+>> +		netif_carrier_off(priv->netdev);
+>> +		netif_tx_stop_all_queues(priv->netdev);
+>> +		dev_info(&priv->pdev->dev, "link down!");
+>> +	} else {
+>> +		netif_tx_wake_all_queues(priv->netdev);
+>> +		netif_carrier_on(priv->netdev);
+>> +		dev_info(&priv->pdev->dev, "link up!");
+>> +	}
+>> +}
+> Why do you need this? phylib will poll the PHY once per second and
+> call the adjust_link callback whenever the link changes state.
 
-Ok
+However, we hope that the network port can be linked only when
+the PHY and MAC are linked.
+The adjust_link callback can ensure that the PHY status is normal,
+but cannot ensure that the MAC address is linked.
 
-> > +     lan743x_set_eee(adapter, false);
-> >  }
-> >
-> >  static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-> > @@ -3055,6 +3072,14 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-> >                                         cap & FLOW_CTRL_TX,
-> >                                         cap & FLOW_CTRL_RX);
-> >
-> > +     if (phydev && adapter->eee_enabled) {
-> > +             bool enable;
-> > +
-> > +             adapter->eee_active = phy_init_eee(phydev, false) >= 0;
-> > +             enable = adapter->eee_active && adapter->tx_lpi_enabled;
-> 
-> No need. Your enable should be conditional on phydev->enable_tx_lpi
-> here. See Andrew's commit and understand his changes, rather than
-> just ignoring Andrew's work and continuing with your old pattern of
-> EEE support. Things have moved forward.
+so, in hbg_get_link_status:
++/* include phy link and mac link */
++u32 hbg_get_link_status(struct hbg_priv *priv)
++{
++	struct phy_device *phydev = priv->mac.phydev;
++	int ret;
++
++	if (!phydev)
++		return HBG_LINK_DOWN;
++
++	phy_read_status(phydev);
++	if ((phydev->state != PHY_UP && phydev->state != PHY_RUNNING) ||
++	    !phydev->link)
++		return HBG_LINK_DOWN;
++
++	ret = hbg_hw_sgmii_autoneg(priv);
++	if (ret)
++		return HBG_LINK_DOWN;
++
++	return HBG_LINK_UP;
++}
 
-Ok. I will fix
+>
+>> @@ -177,12 +226,17 @@ static int hbg_init(struct net_device *netdev)
+>>   	ret = hbg_irq_init(priv);
+>>   	if (ret)
+>>   		return ret;
+>> -
+>>   	ret = devm_add_action_or_reset(&priv->pdev->dev, hbg_irq_uninit, priv);
+> This white space change does not belong here.
 
-> 
-> Thanks.
-> 
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Yes, I'll fix that in V2
 
--- 
-Thanks,                                                                         
-Raju
+Thanks again,
+
+Jijie Shao
+
+
 
