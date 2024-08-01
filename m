@@ -1,79 +1,74 @@
-Return-Path: <netdev+bounces-115087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D0EB945117
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:51:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77413945120
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:53:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD59A28815F
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:51:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F3FF1F2442E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B67C1B32AA;
-	Thu,  1 Aug 2024 16:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158CB1B3F31;
+	Thu,  1 Aug 2024 16:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iA6zWTom"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uHmueRdv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E851AED45;
-	Thu,  1 Aug 2024 16:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19131B374E;
+	Thu,  1 Aug 2024 16:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722531109; cv=none; b=LWtPOR0L48e7FHCRyrNOPEuLaIRKLsp2CHqqCgzxplD/fCu+bluAQuJTa06f0/tJtP+Xq15CYacEIF29PHNP4GH9LfD+qgNQUHkn5Q59Slj5MKdHkMN7GyVxYPyC0226YVRyRvEY0RI3f6IOVBzo/yPztqSCqwMGqcFdzSlhUkw=
+	t=1722531204; cv=none; b=LkwutekOLcQpX/pgydly9Y2alYvw7iRb0rZ6j87yVDs+JNGwwFkkS3sdUsQ/I5QqqpfkCNjT613UPOgv/8dM2deHMhYNvHkdqF9SF+fed+cb8EDSqad83Mz4chNAARI2oLdbNxKU/kWHEZvCCB+8yChnMk4qzieRwTvoSFYC+OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722531109; c=relaxed/simple;
-	bh=N08uFIg8IJ5XUPcOAI/3cQ9YR4LdtJX1tOqnKsc7ig8=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Bi3ql+/SCgGEOei/uljCGmASGQ9qd3a9nJr/leP4hS9IR+kuFREHXgENIqMAsqQ8WEg8eJHgjaCfBw8Oid1lftLWeLexKhW4gPH738fo/PpeIfvEPu9TkvCop0941ng60yM5AKD7tLitRWOV3O7iRSZW8zkeYVgTb0JiMLe+gU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iA6zWTom; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C2376C32786;
-	Thu,  1 Aug 2024 16:51:48 +0000 (UTC)
+	s=arc-20240116; t=1722531204; c=relaxed/simple;
+	bh=1ss2wVjTFPPXETnvk+EhTKM7LAhw3I+hKkedtEmd0nc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mruOdpesX3sbVP4Qs3LKJQRLj2ZuqUxXbCYGqSmkprYUu2y6NLAQjKkKm/A0rX/stCwYtf17hYkvhBcn5fJSotU+xP+lXIMJArE3W1bjUXFfxbqaTxg+e1NOwqFdo8wL1C5yuF2jHN0Qa7Pt8x5MVEbM/OvgoTnJEiMXYBUmZBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uHmueRdv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28692C32786;
+	Thu,  1 Aug 2024 16:53:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722531108;
-	bh=N08uFIg8IJ5XUPcOAI/3cQ9YR4LdtJX1tOqnKsc7ig8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=iA6zWTomCc6lCY+A/5DoCHQL+bugrGRV/tbVIGN0AeIVKHzlyMCdIYInOpup+IcG/
-	 8EFPLLn6zxrBVclxl2rGDE3YBCjzp/O2pGCsw67QaKOw7ifv3ZEYV+UHMa8CDz7+LD
-	 TLVlW6YDhLeBVTCrL+xVz829ly4qMMfbrpMvWoIkjvMyJlqxuz84vxC30yjJR5k3aO
-	 PrIvK30X1BEWu2lj0sJwU1S9bV9TPiUxDTf9S+XD6Y2cDiCGsU4kB1yKzeymtn+pl9
-	 9NPQG/NjEr5lD5IAJ2uT3H1zJhMz6uzyoZbXKTxyeRMYRAcNRS891UeCRwe5zU61qP
-	 Jb60nWlVEzKyQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B7E45C3274E;
-	Thu,  1 Aug 2024 16:51:48 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.11-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240801131917.34494-1-pabeni@redhat.com>
-References: <20240801131917.34494-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240801131917.34494-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.11-rc2
-X-PR-Tracked-Commit-Id: 25010bfdf8bbedc64c5c04d18f846412f5367d26
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 183d46ff422ef9f3d755b6808ef3faa6d009ba3a
-Message-Id: <172253110874.24083.10454676813839813262.pr-tracker-bot@kernel.org>
-Date: Thu, 01 Aug 2024 16:51:48 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=k20201202; t=1722531203;
+	bh=1ss2wVjTFPPXETnvk+EhTKM7LAhw3I+hKkedtEmd0nc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uHmueRdv6Dj6D6c5n+5OxpgIs2mQjqFDXIUaKANRQ2XSP5GePJVutgQDBuS19C90y
+	 1DZcIB5RHOTR6p7ZpOMUMc6H6UuBul2G0uxV6fYhwwD5NhA45vWCAk/cXSvX/+b45X
+	 STOAcdYkCqdRfOjP4wsKHiaGH83MM+s/8qv8z6V2yMISWbDfDtyHb9MsO2bF7KHKHr
+	 wGqQdrVUvn2Tfvi/Nv760KQkpebwvXOe2NR2lzbDRgvvaSPVZCRJmmLF/UJO51vnb2
+	 rY1rTGX0tQ8wbkCdeC0uc/jkoNzNOOA5EfqFWqlsrkfHos7hDOl9Luo82QZvDlxG66
+	 njNBOUII+/L+Q==
+Date: Thu, 1 Aug 2024 09:53:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, Shuah Khan
+ <shuah@kernel.org>, thevlad@fb.com, thepacketgeek@gmail.com,
+ riel@surriel.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, paulmck@kernel.org, davej@codemonkey.org.uk,
+ linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
+Subject: Re: [PATCH net-next 1/6] net: netconsole: selftests: Create a new
+ netconsole selftest
+Message-ID: <20240801095322.6d9dec9c@kernel.org>
+In-Reply-To: <20240801161213.2707132-2-leitao@debian.org>
+References: <20240801161213.2707132-1-leitao@debian.org>
+	<20240801161213.2707132-2-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu,  1 Aug 2024 15:19:17 +0200:
+On Thu,  1 Aug 2024 09:11:58 -0700 Breno Leitao wrote:
+>  .../net/netconsole/basic_integration_test.sh  | 153 ++++++++++++++++++
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.11-rc2
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/183d46ff422ef9f3d755b6808ef3faa6d009ba3a
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+It needs to be included in a Makefile
+If we only have one script I'd put it directly in .../net/, 
+or drivers/netdevsim/? each target should technically have
+a Kconfig, Makefile, settings, no point for a single script.
 
