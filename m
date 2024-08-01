@@ -1,242 +1,123 @@
-Return-Path: <netdev+bounces-115043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF56944F28
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:27:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD26944F61
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6AA2284132
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:27:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E84A01C237AF
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8C41A99C4;
-	Thu,  1 Aug 2024 15:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="g4z0XSoj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC6913D240;
+	Thu,  1 Aug 2024 15:34:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE011A71E1
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 15:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C449E1EB4AF;
+	Thu,  1 Aug 2024 15:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722526028; cv=none; b=O75K3NvxXU4SqNOHUn40ApSTtrChLS/LXDdBDRX2XhRfrXsX8L5DM+ZTKLHfi7velOEg1/exYR6dYOfzrQkCyboOLdbPlYC3OYQrKe6ljfsfv6Tnd1OFdkvnfQkJRTxlVQzXaZU3zLbAj+W4xa5hVLJC+jN31r3nJL8HT8FoYo0=
+	t=1722526469; cv=none; b=dx/d5w0+Y83Zx2JEUfMKpNBXVS3gvie3ZmUaEdSqXdjTXczOb8N3Mnj1Wp5xVmOQoA4pOEI8WikeI62YE1KZKirMcMDYXiNIuySMwr6UA/xLNnS8Wc5L2r+wSWXiL15IHLXu7cAbSLRh5ge5YuLXwgiAA8y8iLBQ6JtaZxFrxhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722526028; c=relaxed/simple;
-	bh=4h0Y6LtuSzhJHCsb2ZCCiML34iodb18YUPVtFffsGYk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SkV7ibYD65W01AkAcBah8aAtJWHdZzkMekZ+BSMJbXQA3HRgjfTiQExMWUmPxbmQCACnoe9q1mP23paTdV1L4x5iNwrkI6ApnbGiicoWWr1d8rG8e4JfNlO+3V4GA8ukEGnHDx5RZXbseNQ6LFMfclAWt7eMWAqs1W4yuyE3vNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=g4z0XSoj; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:22f7:64f5:261f:da0e])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 55BC37D9F3;
-	Thu,  1 Aug 2024 16:27:04 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1722526024; bh=4h0Y6LtuSzhJHCsb2ZCCiML34iodb18YUPVtFffsGYk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
-	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
-	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
-	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
-	 hern@kernel.org,=0D=0A=09jakub@cloudflare.com,=0D=0A=09tparkin@kat
-	 alix.com|Subject:=20RFC:=20l2tp:=20how=20to=20fix=20nested=20socke
-	 t=20lockdep=20splat|Date:=20Thu,=20=201=20Aug=202024=2016:27:04=20
-	 +0100|Message-Id:=20<20240801152704.24279-1-jchapman@katalix.com>|
-	 MIME-Version:=201.0;
-	b=g4z0XSojsr1DEI7u52986JW74bWRgdFOQA+TrLTOka4f3g4U3t6+289CVgfuw+Tfl
-	 cioSnNWmj57UYorYr1ew/mS2u3Z7yirSqiJ9r4jn3Td8xNz0skVNIvGdBEr0pg2ypb
-	 aldYi5qdkpeLH23I/YKFGf13QHa3mDfuuRJE09R54nk3IDaUXyVmrugddeLAGCILlz
-	 2Xs/yGZBDWdyOL2TPi0AP8JnGxYU5e75kkOwaaI41rXDqKvvD5c/X3HByV8j4+EQ76
-	 Z0UPqOGnV+Ab5hkCVIqAw32sVaxsZBJ7x6diNVTDUHpd1y7n4l29S19TvJgsDS03Ep
-	 h96104q/HMdTA==
-From: James Chapman <jchapman@katalix.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	jakub@cloudflare.com,
-	tparkin@katalix.com
-Subject: RFC: l2tp: how to fix nested socket lockdep splat
-Date: Thu,  1 Aug 2024 16:27:04 +0100
-Message-Id: <20240801152704.24279-1-jchapman@katalix.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1722526469; c=relaxed/simple;
+	bh=6MKLmmYVKdaOSZPWEDcIi8A0DBxOqJA4vYZgX+kUWlc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RDZbbKKnmM2+zMIPoZfwibWKwXRSwNy5GDd2mA3bkL3RyE3Myg8x2xi1HvAK/rY+BxKTV2sUnixgqFscYyff1scQ0dn5h93ltcUTMrheNnXSOi3W0bKvn4vfIze2oH8haRNrQKU4uL75wMcxe+K4YWR10zJCoe8Llkkl39YTKqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2cb5b783c15so5287394a91.2;
+        Thu, 01 Aug 2024 08:34:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722526466; x=1723131266;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RxpG3AHPFVMcF3PqJ45iqq1QdFozgYdQNVG3X/IOzeg=;
+        b=wh5KEsTc7cHLDX5QAvC+jsnNNIwkuO1AqdOqwQ0stkqYCItH+dfhnjNtC8/CILDU5u
+         VsP2nvRw1fLzsmGAP/F6phElJ9WEx1BkVWRT6dFI42n2ya2iXuep5ix6h7+lNAUx7Nn0
+         ZA6CO185viBcY/KrcvNGnwcxeTccJ00K/6KCAQpry2ijMvOB6/AnmnxHAFdbY1lhrFFt
+         Bq7cVbpraqP+NmEN0iHqpExT4H0M7+wyaAgDnN69KAuAIPABTt9L2aGY38cuUVzi/vx3
+         CFT0VceJZ+VNQazCQ33mMwQZc5V8gXKIPubSYN9okCnjsKHeSKXQS3Ew73s9q4FWVqfj
+         tElQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXcljCGkEr5IZoiJpQUor60XKq/FsUPuHkXx5iAK9/EqihQJ1TAkmo2JWIxKfkTDugooyfuqcjasDTuLpXMJSjjPS0kpa/DycMktzlWyJbVy5INrX9y/mYzl8H+TAYDMYToK9f/ZJ33
+X-Gm-Message-State: AOJu0YyOJlKVC/wYqHRGi1mw7nu9+Dp5jyM0FONVWdA9y6HIIg+Nq3gE
+	NfHknbw5ugV7pRFyOGQO47akfFnJXdn03Q4/BmwagnqcorhPVHY=
+X-Google-Smtp-Source: AGHT+IG8MVTkOa52o1H1RaXqsy/UeZHgA4CRSjSAcuhFaLkcVcnEic7JvxOi4kZb1kKyTEwrFAx85g==
+X-Received: by 2002:a17:90b:3711:b0:2c9:80cd:86b4 with SMTP id 98e67ed59e1d1-2cff9421160mr695069a91.11.1722526465935;
+        Thu, 01 Aug 2024 08:34:25 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cffb091a99sm47346a91.21.2024.08.01.08.34.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 08:34:25 -0700 (PDT)
+Date: Thu, 1 Aug 2024 08:34:24 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Petr Machata <petrm@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	Shuah Khan <shuah@kernel.org>, Joe Damato <jdamato@fastly.com>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] selftests: net-drv: exercise queue stats
+ when the device is down
+Message-ID: <ZqurACK6FdrxiISt@mini-arch>
+References: <20240730223932.3432862-1-sdf@fomichev.me>
+ <87cymt7pmu.fsf@nvidia.com>
+ <20240731173245.2968988d@kernel.org>
+ <ZqrjqpKJRgMhlvr2@mini-arch>
+ <874j847hfy.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <874j847hfy.fsf@nvidia.com>
 
-When l2tp tunnels use a socket provided by userspace, we can hit lockdep splats like the below when data is transmitted through another (unrelated) userspace socket which then gets routed over l2tp.
+On 08/01, Petr Machata wrote:
+> 
+> Stanislav Fomichev <sdf@fomichev.me> writes:
+> 
+> > On 07/31, Jakub Kicinski wrote:
+> >> On Wed, 31 Jul 2024 13:34:58 +0200 Petr Machata wrote:
+> >> > > +        qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)
+> >> > > +    except NlError as e:
+> >> > > +        if e.error == 95:  
+> >> > 
+> >> > Could you do this as if e.error == errno.ENOTSUP?
+> >> 
+> >> just to be clear EOPNOTSUPP ..
+> >
+> > That might be the reason it's coded explicitly as 95? :-D
+> 
+> Both exist, I just didn't notice the latter.
+> 
+> >>> import errno
+> >>> errno.ENOTSUP
+> 95
+> >>> errno.EOPNOTSUPP
+> 95
 
-This issue was previously discussed here: https://lore.kernel.org/netdev/87sfialu2n.fsf@cloudflare.com/
+I believe Jakub was talking about kernel's ENOTSUPP (524) vs EOPNOTSUPP (95):
 
-Is it reasonable to disable lockdep tracking of l2tp userspace tunnel sockets? Is there a better solution?
+$ grep ENOTSUPP include/linux/errno.h
+#define ENOTSUPP        524     /* Operation is not supported */
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index e22e2a45c925..ab7be05da7d4 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1736,6 +1736,16 @@ int l2tp_tunnel_register(struct l2tp_tunnel *tunnel, struct net *net,
- 	}
- 
- 	sk->sk_allocation = GFP_ATOMIC;
-+
-+	/* If the tunnel socket is a userspace socket, disable lockdep
-+	 * validation on the tunnel socket to avoid lockdep splats caused by
-+	 * nested socket calls on the same lockdep socket class. This can
-+	 * happen when data from a user socket is routed over l2tp, which uses
-+	 * another userspace socket.
-+	 */
-+	if (tunnel->fd >= 0)
-+		lockdep_set_novalidate_class(&sk->sk_lock.slock);
-+
- 	release_sock(sk);
- 
- 	sock_hold(sk);
+$ grep EOPNOTSUPP include/uapi/asm-generic/errno.h
+#define EOPNOTSUPP      95      /* Operation not supported on transport endpoint */
 
+These two are frequently confused.
 
-Here is the lockdep splat:
+OTOH, ENOTSUP looks like a userspace/libc invention:
 
-  ============================================
-  WARNING: possible recursive locking detected
-  6.10.0+ #34 Not tainted
-  --------------------------------------------
-  iperf3/771 is trying to acquire lock:
-  ffff8881027601d8 (slock-AF_INET/1){+.-.}-{2:2}, at: l2tp_xmit_skb+0x243/0x9d0
-  
-  but task is already holding lock:
-  ffff888102650d98 (slock-AF_INET/1){+.-.}-{2:2}, at: tcp_v4_rcv+0x1848/0x1e10
-  
-  other info that might help us debug this:
-   Possible unsafe locking scenario:
-  
-         CPU0
-         ----
-    lock(slock-AF_INET/1);
-    lock(slock-AF_INET/1);
-  
-   *** DEADLOCK ***
-  
-   May be due to missing lock nesting notation
-  
-  10 locks held by iperf3/771:
-   #0: ffff888102650258 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_sendmsg+0x1a/0x40
-   #1: ffffffff822ac220 (rcu_read_lock){....}-{1:2}, at: __ip_queue_xmit+0x4b/0xbc0
-   #2: ffffffff822ac220 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x17a/0x1130
-   #3: ffffffff822ac220 (rcu_read_lock){....}-{1:2}, at: process_backlog+0x28b/0x9f0
-   #4: ffffffff822ac220 (rcu_read_lock){....}-{1:2}, at: ip_local_deliver_finish+0xf9/0x260
-   #5: ffff888102650d98 (slock-AF_INET/1){+.-.}-{2:2}, at: tcp_v4_rcv+0x1848/0x1e10
-   #6: ffffffff822ac220 (rcu_read_lock){....}-{1:2}, at: __ip_queue_xmit+0x4b/0xbc0
-   #7: ffffffff822ac220 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x17a/0x1130
-   #8: ffffffff822ac1e0 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0xcc/0x1450
-   #9: ffff888101f33258 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2){+...}-{2:2}, at: __dev_queue_xmit+0x513/0x1450
-  
-  stack backtrace:
-  CPU: 2 UID: 0 PID: 771 Comm: iperf3 Not tainted 6.10.0+ #34
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-  Call Trace:
-   <IRQ>
-   dump_stack_lvl+0x69/0xa0
-   dump_stack+0xc/0x20
-   __lock_acquire+0x135d/0x2600
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   lock_acquire+0xc4/0x2a0
-   ? l2tp_xmit_skb+0x243/0x9d0
-   ? __skb_checksum+0xa3/0x540
-   _raw_spin_lock_nested+0x35/0x50
-   ? l2tp_xmit_skb+0x243/0x9d0
-   l2tp_xmit_skb+0x243/0x9d0
-   l2tp_eth_dev_xmit+0x3c/0xc0
-   dev_hard_start_xmit+0x11e/0x420
-   sch_direct_xmit+0xc3/0x640
-   __dev_queue_xmit+0x61c/0x1450
-   ? ip_finish_output2+0xf4c/0x1130
-   ip_finish_output2+0x6b6/0x1130
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? __ip_finish_output+0x217/0x380
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   __ip_finish_output+0x217/0x380
-   ip_output+0x99/0x120
-   __ip_queue_xmit+0xae4/0xbc0
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? tcp_options_write.constprop.0+0xcb/0x3e0
-   ip_queue_xmit+0x34/0x40
-   __tcp_transmit_skb+0x1625/0x1890
-   __tcp_send_ack+0x1b8/0x340
-   tcp_send_ack+0x23/0x30
-   __tcp_ack_snd_check+0xa8/0x530
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   tcp_rcv_established+0x412/0xd70
-   tcp_v4_do_rcv+0x299/0x420
-   tcp_v4_rcv+0x1991/0x1e10
-   ip_protocol_deliver_rcu+0x50/0x220
-   ip_local_deliver_finish+0x158/0x260
-   ip_local_deliver+0xc8/0xe0
-   ip_rcv+0xe5/0x1d0
-   ? __pfx_ip_rcv+0x10/0x10
-   __netif_receive_skb_one_core+0xce/0xe0
-   ? process_backlog+0x28b/0x9f0
-   __netif_receive_skb+0x34/0xd0
-   ? process_backlog+0x28b/0x9f0
-   process_backlog+0x2cb/0x9f0
-   __napi_poll.constprop.0+0x61/0x280
-   net_rx_action+0x332/0x670
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? find_held_lock+0x2b/0x80
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   handle_softirqs+0xda/0x480
-   ? __dev_queue_xmit+0xa2c/0x1450
-   do_softirq+0xa1/0xd0
-   </IRQ>
-   <TASK>
-   __local_bh_enable_ip+0xc8/0xe0
-   ? __dev_queue_xmit+0xa2c/0x1450
-   __dev_queue_xmit+0xa48/0x1450
-   ? ip_finish_output2+0xf4c/0x1130
-   ip_finish_output2+0x6b6/0x1130
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? __ip_finish_output+0x217/0x380
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   __ip_finish_output+0x217/0x380
-   ip_output+0x99/0x120
-   __ip_queue_xmit+0xae4/0xbc0
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? tcp_options_write.constprop.0+0xcb/0x3e0
-   ip_queue_xmit+0x34/0x40
-   __tcp_transmit_skb+0x1625/0x1890
-   tcp_write_xmit+0x766/0x2fb0
-   ? __entry_text_end+0x102ba9/0x102bad
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   ? __might_fault+0x74/0xc0
-   ? srso_alias_return_thunk+0x5/0xfbef5
-   __tcp_push_pending_frames+0x56/0x190
-   tcp_push+0x117/0x310
-   tcp_sendmsg_locked+0x14c1/0x1740
-   tcp_sendmsg+0x28/0x40
-   inet_sendmsg+0x5d/0x90
-   sock_write_iter+0x242/0x2b0
-   vfs_write+0x68d/0x800
-   ? __pfx_sock_write_iter+0x10/0x10
-   ksys_write+0xc8/0xf0
-   __x64_sys_write+0x3d/0x50
-   x64_sys_call+0xfaf/0x1f50
-   do_syscall_64+0x6d/0x140
-   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-  RIP: 0033:0x7f4d143af992
-  Code: c3 8b 07 85 c0 75 24 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> e9 01 cc ff ff 41 54 b8 02 00 00 0
-  RSP: 002b:00007ffd65032058 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-  RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f4d143af992
-  RDX: 0000000000000025 RSI: 00007f4d143f3bcc RDI: 0000000000000005
-  RBP: 00007f4d143f2b28 R08: 0000000000000000 R09: 0000000000000000
-  R10: 0000000000000000 R11: 0000000000000246 R12: 00007f4d143f3bcc
-  R13: 0000000000000005 R14: 0000000000000000 R15: 00007ffd650323f0
-   </TASK>
-  
+$ grep -w ENOTSUP /usr/include/bits/errno.h
+# ifndef ENOTSUP
+#  define ENOTSUP               EOPNOTSUPP
+
+I'm gonna stick to kernel's EOPNOTSUPP to make it look similar to what
+we have on the kernel side.
 
