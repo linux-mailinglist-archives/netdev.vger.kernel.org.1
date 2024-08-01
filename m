@@ -1,343 +1,182 @@
-Return-Path: <netdev+bounces-115110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0BE945320
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 21:10:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583C8945328
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 21:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AACE28386B
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 19:10:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A91A4B237DD
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 19:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29D11494B3;
-	Thu,  1 Aug 2024 19:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F40914A0AB;
+	Thu,  1 Aug 2024 19:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+gXH4/Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z06/jntR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5F813C832;
-	Thu,  1 Aug 2024 19:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91AE114A0A3
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 19:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722539403; cv=none; b=j9UudOakhb6T1jlB0A9WF6eiu0QDb+YFjXlPqZCVU/YZCSLqHH9mWOIzX+cN6Ur5edDA1EuBM8ZqO/C0VHx8gNko/20vlabWPp+FVoN6CUGph3rLlZIuEujfhgCOkG7sHXRwQc+yGdPN/12V1Iz0UDE+dPs68csVS3tG8DpmPNU=
+	t=1722539671; cv=none; b=UtGw59wrl8mPaSSrYamzRQ6K1QUiOZxyWVW2AwxU3nmLr24Xg0f1fpnI2DSYAuaNozqj/BbV8I6ZQF9Nw+fkQ+uJPUv+BAQBmXHL9cAF5QDEcgK/obNTXsf3nwxkbzCyRZ4W2vYYhuhA2T8NDizw6NMUUQe3D/mcR6E32z1DU7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722539403; c=relaxed/simple;
-	bh=gz2+lTfOSWB7hDYr6gqcTp/Ptge7wjwTerWt2YS43Hg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ctu6GDDjdKbSj1Wiu4CZDXYjY0pJmJj0e8VdeE9YqU9la8C2xYVw8ByxquFAILEGAifgJkE0SThQhAWkKoF9+XnFrgP/beBQIFy9SHqYJvIMzJoUfAUaTgjQwBiyfkDPcO/9R/9G0SmAANGoh1K6n741QaQUJ092xWohY+WoFQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B+gXH4/Q; arc=none smtp.client-ip=209.85.208.181
+	s=arc-20240116; t=1722539671; c=relaxed/simple;
+	bh=LO7YLV4jD7NJmmBvyb88qQM27tc0HkxP74MqQ38IT4Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gDiN02CWy7JaH/tG9wRriwP3ooGGMdrlDcseExIynGMHdZsDZYNZc0xqR19dcIMMNWPx6VSNXt2xMPAtEC2+78/Xg3Cbb780enBNRf+hn+NobN2CsqsISmKa/qsFAisFqZ6vhDijrrDUA9gQ2ECF50O2u5mssZQ/yejpwUGZzW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z06/jntR; arc=none smtp.client-ip=209.85.219.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ef2d7d8854so86383811fa.0;
-        Thu, 01 Aug 2024 12:10:01 -0700 (PDT)
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e0875f1e9edso5508306276.1
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 12:14:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722539400; x=1723144200; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qpZHoO/6hsX+nCMxJXNHxn39l7ARmddReK6PQZfmBS4=;
-        b=B+gXH4/Qp+mJDXj/11XsCVxWNi1EOkdgwq7fQ3l2fEXma3X9FfytRBeLqh8iAdBJKP
-         /kr2e4Lyr1SyDlHwnr2eYkeex3bpyL7dIb6qTA1YD8Qbhy9c1hoqiCPl/qIbFi1L+2GN
-         1Ne6X6Xjulf8zHxKKnirmPI+Tx8q2NAvlqL8oLA4ZklaMtv9yXIoAQe3J3NKLeh4BW5t
-         K6tfsh+zpEvJlXrhC7f7B71PZzkwXgULGKufyzTcs1i3MlzrNnzJ8LuSJ8NJQu/Z+7u+
-         4fBYYrYxhCC/6fYXlnMnhdUykCxc7q43uPfyc/HPKm7bxqeMHMLv6W1e85H1Edz1VxhA
-         C6Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722539400; x=1723144200;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1722539668; x=1723144468; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qpZHoO/6hsX+nCMxJXNHxn39l7ARmddReK6PQZfmBS4=;
-        b=PL3vRfqEERsjqu3Dz2nGdGm9hj7Ew09FBmdkzSkonnmwY9qMP224GGcavtFnv4cWwz
-         impKGVwMzA/+uy560P2xvN+q3AfSFAj2PqWFNyPoT/kE9+oyBNxAjDzWbR9unqp+ayrQ
-         paRvE3fyur+SiTjts77ZAk4DBFf9VpJH7uEm5RuY+ChZKiCgVLdYBaSSzMNB93I93u1l
-         YsQdbqxaRbz5AuKrwIkNEyW5eQ65cvsZ6vGKAtlCa68mRLnypu03YJXlAiYUos9tFIE+
-         b/loH+eRFAeJ6Vnh/CVIX6bWvFd+xx88Xoxol8CB3nNO/RHGIm0lpKup8nCgfsNnQ2N5
-         RzOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwb6tNVoXPAtm31S3sE2V4YPLprFoDTqMsL/z5mZzuUq4dr9VX7DyH0O/Ll+mTTbwJvFRzWAWT6QlpSRisY3OnkBiqWKaYmjt4iabPlJe+Ru+F32Nn0IRzosUr5A2YKJsryDTL/nviaSoY8yWRJldA+i5pmLPtUumG4XayrsTgkPMXLyotP22Zr7BZLAoKGTiavmjz6xHMHXOHNh1+q4Ytd0EF
-X-Gm-Message-State: AOJu0YwouNEaJCqNdW5D0poFqvILP3pB4CB2QHQqt8o+ZfDN+fe8sBvc
-	6oGK5c8X9xx/ubBWJEQg7EaP8qFp4OX0OGNkfFFl8OPQxsVpgKXy
-X-Google-Smtp-Source: AGHT+IHz23/0To/xP7PlNyRQ9bo8QpCLAnluXSSXqk43xJIqm7tExXUDfCkMhLZBWEYcH+OqqUb3+w==
-X-Received: by 2002:a2e:8096:0:b0:2ef:3250:d0d4 with SMTP id 38308e7fff4ca-2f15ab5c7c8mr7600511fa.48.1722539399214;
-        Thu, 01 Aug 2024 12:09:59 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f15c1de3easm298551fa.33.2024.08.01.12.09.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 12:09:58 -0700 (PDT)
-Date: Thu, 1 Aug 2024 22:09:55 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Swathi K S <swathi.ks@samsung.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: krzk@kernel.org, robh@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org, 
-	richardcochran@gmail.com, mcoquelin.stm32@gmail.com, alim.akhtar@samsung.com, 
-	linux-fsd@tesla.com, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org, alexandre.torgue@foss.st.com, 
-	peppe.cavallaro@st.com, joabreu@synopsys.com, rcsekar@samsung.com, ssiddha@tesla.com, 
-	jayati.sahu@samsung.com, pankaj.dubey@samsung.com, ravi.patel@samsung.com, 
-	gost.dev@samsung.com
-Subject: Re: [PATCH v4 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
-Message-ID: <yqih2sck5ayuhk5wcvgwahcndc4xb3gxthcjxgt4yqg33zfii5@ub25raxykxdp>
-References: <20240730091648.72322-1-swathi.ks@samsung.com>
- <CGME20240730092902epcas5p1520f9cac624dad29f74a92ed4c559b25@epcas5p1.samsung.com>
- <20240730091648.72322-3-swathi.ks@samsung.com>
+        bh=Dmz6bLpOZ7W2fV9BbxB0qLCoBVySX7iAGWKS7t034iA=;
+        b=Z06/jntRTCBrmmNtbTpHVkQYbvcqYLDrcu9umlIUdMdEtPZ6khAkZ+ZSdGso4gwdfX
+         vC6Fp1JpriJtRRL4noe6h5IVdzSsFlrST5kV4/Yy8ETiXGEsX8LCljqE/Qljl9jyJaMw
+         i1hHxhl7NQTV+RwgP1ywr5810jBEGBkQyEkC+fjQu+Si64NnJixuhMvnmzzQ0DqW+eX0
+         BfW74UetURxAetTr27cnVGu5F2b7CDRhU9nJQp5u05l0LR7WK8OgDuqPWGVTY87YMVWu
+         jDxvylZAVFqUS04Uq566lXCiYfyEbuTo4RxehKQpssn4iUOs+KTCy5DkeeHa2g620YSK
+         Yu1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722539668; x=1723144468;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dmz6bLpOZ7W2fV9BbxB0qLCoBVySX7iAGWKS7t034iA=;
+        b=Pu3YNAW9ektOfXPZsvgduUntpkt+1lcBFFwbtYFyNOgZA3p7MftcLr+R0VQYg2HEpQ
+         Z9dYsK5uCJr2MpeaJAfBl+szpy8tl9sNSHBEqa6ucjYmycJeYQNuswkc2dX9ze7mONGR
+         jXPkCcI33ehdcNGLk+N09oEoSBoeT4Mns0hOmVINhySIhdo5d9dc7UbIgWVZFl34QVVI
+         twGlvi5WFkQX843IdkQObFProhcomm/LU9aMOt9D/B58AZ3r8AG/cnJLXXqYHSP71ajW
+         Do85S5fUDEQq+9AIvMjizrDStJYrLv/LiKyGaDLe/gIFy/n0WA+FMqVzNFiuyAHqSb2u
+         hgLA==
+X-Gm-Message-State: AOJu0YxhNaJeXzaSBCxsL4YPxKziNWqAIy0YCbamF6+NMmKT4yoV3Xxs
+	vDep9/OdzqXjzEiY1OkVUllS8o9UgFCg2UX+uXS9v+4xPcB1s0wJsHZu0+B4DXLa9KFSVi1+jN7
+	3aWs3Bwx86ZkW1UzEnWgEjynGewg=
+X-Google-Smtp-Source: AGHT+IE1YIKUQJDP6+mH1nMyf8hwRuHJRJtnk9SBmHM9J/otYju8XfQurVWcYBbaMS0S1radKFgKcMAJD3mf3tzq1BQ=
+X-Received: by 2002:a05:6902:2b0f:b0:e0b:d018:c4d0 with SMTP id
+ 3f1490d57ef6-e0bde2f1864mr1454398276.17.1722539668294; Thu, 01 Aug 2024
+ 12:14:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730091648.72322-3-swathi.ks@samsung.com>
+References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
+ <20240801-udp-gso-egress-from-tunnel-v2-1-9a2af2f15d8d@cloudflare.com>
+In-Reply-To: <20240801-udp-gso-egress-from-tunnel-v2-1-9a2af2f15d8d@cloudflare.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 1 Aug 2024 15:13:51 -0400
+Message-ID: <CAF=yD-JaeHASZacOPk=k2gzpfY7OzMwDPr99FMfthMS0w9S7bA@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/2] gso: Skip bad offload detection when device
+ supports requested GSO
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, kernel-team@cloudflare.com, 
+	syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Swathi, Andrew
+On Thu, Aug 1, 2024 at 10:09=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.co=
+m> wrote:
+>
+> In commit 10154dbded6d ("udp: Allow GSO transmit from devices with no
+> checksum offload") we have intentionally allowed UDP GSO packets marked
+> CHECKSUM_NONE to pass to the GSO stack, so that they can be segmented and
+> checksummed by a software fallback when the egress device lacks these
+> features.
+>
+> What was not taken into consideration is that a CHECKSUM_NONE skb can be
+> handed over to the GSO stack also when the egress device advertises the
+> tx-udp-segmentation / NETIF_F_GSO_UDP_L4 feature.
+>
+> This can happen in two situations, which we detect in __ip_append_data()
+> and __ip6_append_data():
+>
+> 1) when there are IPv6 extension headers present, or
+> 2) when the tunnel device does not advertise checksum offload.
+>
+> Note that in the latter case we have a nonsensical device configuration.
+> Device support for UDP segmentation offload requires checksum offload in
+> hardware as well.
+>
+> Syzbot has discovered the first case, producing a warning as below:
+>
+>   ip6tnl0: caps=3D(0x00000006401d7869, 0x00000006401d7869)
+>   WARNING: CPU: 0 PID: 5112 at net/core/dev.c:3293 skb_warn_bad_offload+0=
+x166/0x1a0 net/core/dev.c:3291
+>   Modules linked in:
+>   CPU: 0 PID: 5112 Comm: syz-executor391 Not tainted 6.10.0-rc7-syzkaller=
+-01603-g80ab5445da62 #0
+>   Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
+ Google 06/07/2024
+>   RIP: 0010:skb_warn_bad_offload+0x166/0x1a0 net/core/dev.c:3291
+>   [...]
+>   Call Trace:
+>    <TASK>
+>    __skb_gso_segment+0x3be/0x4c0 net/core/gso.c:127
+>    skb_gso_segment include/net/gso.h:83 [inline]
+>    validate_xmit_skb+0x585/0x1120 net/core/dev.c:3661
+>    __dev_queue_xmit+0x17a4/0x3e90 net/core/dev.c:4415
+>    neigh_output include/net/neighbour.h:542 [inline]
+>    ip6_finish_output2+0xffa/0x1680 net/ipv6/ip6_output.c:137
+>    ip6_finish_output+0x41e/0x810 net/ipv6/ip6_output.c:222
+>    ip6_send_skb+0x112/0x230 net/ipv6/ip6_output.c:1958
+>    udp_v6_send_skb+0xbf5/0x1870 net/ipv6/udp.c:1292
+>    udpv6_sendmsg+0x23b3/0x3270 net/ipv6/udp.c:1588
+>    sock_sendmsg_nosec net/socket.c:730 [inline]
+>    __sock_sendmsg+0xef/0x270 net/socket.c:745
+>    ____sys_sendmsg+0x525/0x7d0 net/socket.c:2585
+>    ___sys_sendmsg net/socket.c:2639 [inline]
+>    __sys_sendmmsg+0x3b2/0x740 net/socket.c:2725
+>    __do_sys_sendmmsg net/socket.c:2754 [inline]
+>    __se_sys_sendmmsg net/socket.c:2751 [inline]
+>    __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2751
+>    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>    [...]
+>    </TASK>
+>
+> We are hitting the bad offload warning because when an egress device is
+> capable of handling segmentation offload requested by
+> skb_shinfo(skb)->gso_type, the chain of gso_segment callbacks won't produ=
+ce
+> any segment skbs and return NULL. See the skb_gso_ok() branch in
+> {__udp,tcp,sctp}_gso_segment helpers.
+>
+> To fix it, skip bad offload detection when gso_segment has returned
+> nothing. We know that in such case the egress device supports the desired
+> GSO offload, which implies that it can fill in L4 checksums. Hence we don=
+'t
+> need to check the skb->ip_summed value, which reflects the egress device
+> checksum capabilities.
+>
+> Fixes: 10154dbded6d ("udp: Allow GSO transmit from devices with no checks=
+um offload")
+> Reported-by: syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/000000000000e1609a061d5330ce@google.c=
+om/
+> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 
-On Tue, Jul 30, 2024 at 02:46:46PM +0530, Swathi K S wrote:
-> The FSD SoC contains two instance of the Synopsys DWC ethernet QOS IP core.
-> The binding that it uses is slightly different from existing ones because
-> of the integration (clocks, resets).
-> 
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-> For FSD SoC, a mux switch is needed between internal and external clocks.
-> By default after reset internal clock is used but for receiving packets
-> properly, external clock is needed. Mux switch to external clock happens
-> only when the external clock is present.
-> 
-> Signed-off-by: Chandrasekar R <rcsekar@samsung.com>
-> Signed-off-by: Suresh Siddha <ssiddha@tesla.com>
-> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
-> ---
->  .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 90 +++++++++++++++++++
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 28 +++++-
->  include/linux/stmmac.h                        |  1 +
->  3 files changed, 117 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-> index ec924c6c76c6..bc97b3b573b7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-> @@ -20,6 +20,7 @@
->  #include <linux/platform_device.h>
->  #include <linux/reset.h>
->  #include <linux/stmmac.h>
-> +#include <linux/regmap.h>
->  
->  #include "stmmac_platform.h"
->  #include "dwmac4.h"
-> @@ -37,6 +38,13 @@ struct tegra_eqos {
->  	struct gpio_desc *reset;
->  };
->  
-> +struct fsd_eqos_plat_data {
-> +	const struct fsd_eqos_variant *fsd_eqos_inst_var;
-> +	struct clk_bulk_data *clks;
-> +	int num_clks;
-> +	struct device *dev;
-> +};
-> +
->  static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
->  				   struct plat_stmmacenet_data *plat_dat)
->  {
-> @@ -265,6 +273,82 @@ static int tegra_eqos_init(struct platform_device *pdev, void *priv)
->  	return 0;
->  }
->  
-> +static int dwc_eqos_rxmux_setup(void *priv, bool external)
-> +{
-> +	int i = 0;
-> +	struct fsd_eqos_plat_data *plat = priv;
-> +	struct clk *rx1 = NULL;
-> +	struct clk *rx2 = NULL;
-> +	struct clk *rx3 = NULL;
-> +
-> +	for (i = 0; i < plat->num_clks; i++) {
-> +		if (strcmp(plat->clks[i].id, "eqos_rxclk_mux") == 0)
-> +			rx1 = plat->clks[i].clk;
-> +		else if (strcmp(plat->clks[i].id, "eqos_phyrxclk") == 0)
-> +			rx2 = plat->clks[i].clk;
-> +		else if (strcmp(plat->clks[i].id, "dout_peric_rgmii_clk") == 0)
-> +			rx3 = plat->clks[i].clk;
-> +	}
-> +
-> +	/* doesn't support RX clock mux */
-> +	if (!rx1)
-> +		return 0;
-> +
-> +	if (external)
-> +		return clk_set_parent(rx1, rx2);
-> +	else
-> +		return clk_set_parent(rx1, rx3);
-> +}
+It's a bit odd, in that the ip_summed =3D=3D CHECKSUM_NONE ends up just
+being ignored and devices are trusted to always be able to checksum
+offload when they can segment offload -- even when the device does not
+advertise checksum offload.
 
-Andrew is right asking about this implementation. It does seem
-questionable:
-
-1. AFAIR RGMII Rx clock is supposed to be retrieved the PHY. So the
-eqos_phyrxclk and dout_peric_rgmii_clk are the PHY clocks. Do you have
-a PHY integrated in the SoC? If so you should have defined it as a
-separate DT-node and moved the clocks definition in there.
-
-2. Do you really need to perform the "eqos_rxclk_mux" clock
-re-parenting on each interface open/close? Based on the commit log you
-don't. So the re-parenting can be done in the glue driver or even in
-the device tree by means of the "assigned-clock-parents" property.
-
--Serge(y)
-
-> +
-> +static int fsd_clks_endisable(void *priv, bool enabled)
-> +{
-> +	struct fsd_eqos_plat_data *plat = priv;
-> +
-> +	if (enabled) {
-> +		return clk_bulk_prepare_enable(plat->num_clks, plat->clks);
-> +	} else {
-> +		clk_bulk_disable_unprepare(plat->num_clks, plat->clks);
-> +		return 0;
-> +	}
-> +}
-> +
-> +static int fsd_eqos_probe(struct platform_device *pdev,
-> +			  struct plat_stmmacenet_data *data,
-> +			  struct stmmac_resources *res)
-> +{
-> +	struct fsd_eqos_plat_data *priv_plat;
-> +	int ret = 0;
-> +
-> +	priv_plat = devm_kzalloc(&pdev->dev, sizeof(*priv_plat), GFP_KERNEL);
-> +	if (!priv_plat)
-> +		return -ENOMEM;
-> +
-> +	priv_plat->dev = &pdev->dev;
-> +
-> +	ret = devm_clk_bulk_get_all(&pdev->dev, &priv_plat->clks);
-> +	if (ret < 0)
-> +		return dev_err_probe(&pdev->dev, ret, "No clocks available\n");
-> +
-> +	priv_plat->num_clks = ret;
-> +
-> +	data->bsp_priv = priv_plat;
-> +	data->clks_config = fsd_clks_endisable;
-> +	data->rxmux_setup = dwc_eqos_rxmux_setup;
-> +
-> +	ret = fsd_clks_endisable(priv_plat, true);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "Unable to enable fsd clock\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static void fsd_eqos_remove(struct platform_device *pdev)
-> +{
-> +	struct fsd_eqos_plat_data *priv_plat = get_stmmac_bsp_priv(&pdev->dev);
-> +
-> +	fsd_clks_endisable(priv_plat, false);
-> +}
-> +
->  static int tegra_eqos_probe(struct platform_device *pdev,
->  			    struct plat_stmmacenet_data *data,
->  			    struct stmmac_resources *res)
-> @@ -411,6 +495,11 @@ static const struct dwc_eth_dwmac_data tegra_eqos_data = {
->  	.remove = tegra_eqos_remove,
->  };
->  
-> +static const struct dwc_eth_dwmac_data fsd_eqos_data = {
-> +	.probe = fsd_eqos_probe,
-> +	.remove = fsd_eqos_remove,
-> +};
-> +
->  static int dwc_eth_dwmac_probe(struct platform_device *pdev)
->  {
->  	const struct dwc_eth_dwmac_data *data;
-> @@ -473,6 +562,7 @@ static void dwc_eth_dwmac_remove(struct platform_device *pdev)
->  static const struct of_device_id dwc_eth_dwmac_match[] = {
->  	{ .compatible = "snps,dwc-qos-ethernet-4.10", .data = &dwc_qos_data },
->  	{ .compatible = "nvidia,tegra186-eqos", .data = &tegra_eqos_data },
-> +	{ .compatible = "tesla,fsd-ethqos", .data = &fsd_eqos_data },
->  	{ }
->  };
->  MODULE_DEVICE_TABLE(of, dwc_eth_dwmac_match);
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 12689774d755..2ef82edec522 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4001,6 +4001,12 @@ static int __stmmac_open(struct net_device *dev,
->  	netif_tx_start_all_queues(priv->dev);
->  	stmmac_enable_all_dma_irq(priv);
->  
-> +	if (priv->plat->rxmux_setup) {
-> +		ret = priv->plat->rxmux_setup(priv->plat->bsp_priv, true);
-> +		if (ret)
-> +			netdev_err(priv->dev, "Rxmux setup failed\n");
-> +	}
-> +
->  	return 0;
->  
->  irq_error:
-> @@ -4056,7 +4062,13 @@ static void stmmac_fpe_stop_wq(struct stmmac_priv *priv)
->  static int stmmac_release(struct net_device *dev)
->  {
->  	struct stmmac_priv *priv = netdev_priv(dev);
-> -	u32 chan;
-> +	u32 chan, ret;
-> +
-> +	if (priv->plat->rxmux_setup) {
-> +		ret = priv->plat->rxmux_setup(priv->plat->bsp_priv, false);
-> +		if (ret)
-> +			netdev_err(priv->dev, "Rxmux setup failed\n");
-> +	}
->  
->  	if (device_may_wakeup(priv->device))
->  		phylink_speed_down(priv->phylink, false);
-> @@ -7848,11 +7860,17 @@ int stmmac_suspend(struct device *dev)
->  {
->  	struct net_device *ndev = dev_get_drvdata(dev);
->  	struct stmmac_priv *priv = netdev_priv(ndev);
-> -	u32 chan;
-> +	u32 chan, ret;
->  
->  	if (!ndev || !netif_running(ndev))
->  		return 0;
->  
-> +	if (priv->plat->rxmux_setup) {
-> +		ret = priv->plat->rxmux_setup(priv->plat->bsp_priv, false);
-> +		if (ret)
-> +			netdev_err(priv->dev, "Rxmux setup failed\n");
-> +	}
-> +
->  	mutex_lock(&priv->lock);
->  
->  	netif_device_detach(ndev);
-> @@ -8018,6 +8036,12 @@ int stmmac_resume(struct device *dev)
->  	mutex_unlock(&priv->lock);
->  	rtnl_unlock();
->  
-> +	if (priv->plat->rxmux_setup) {
-> +		ret = priv->plat->rxmux_setup(priv->plat->bsp_priv, true);
-> +		if (ret)
-> +			netdev_err(priv->dev, "Rxmux setup failed\n");
-> +	}
-> +
->  	netif_device_attach(ndev);
->  
->  	return 0;
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index 84e13bd5df28..f017b818d421 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -264,6 +264,7 @@ struct plat_stmmacenet_data {
->  	void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
->  	int (*init)(struct platform_device *pdev, void *priv);
->  	void (*exit)(struct platform_device *pdev, void *priv);
-> +	int (*rxmux_setup)(void *priv, bool external);
->  	struct mac_device_info *(*setup)(void *priv);
->  	int (*clks_config)(void *priv, bool enabled);
->  	int (*crosststamp)(ktime_t *device, struct system_counterval_t *system,
-> -- 
-> 2.17.1
-> 
-> 
+I think we should have a follow-on that makes advertising
+NETIF_F_GSO_UDP_L4 dependent on having at least one of the
+NETIF_F_*_CSUM bits set (handwaving over what happens when only
+advertising NETIF_F_IP_CSUM or NETIF_F_IPV6_CSUM).
 
