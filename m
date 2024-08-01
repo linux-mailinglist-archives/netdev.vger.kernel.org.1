@@ -1,102 +1,109 @@
-Return-Path: <netdev+bounces-114824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EADF94454E
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:19:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D923E94452E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6353B20CEF
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:19:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AD25283381
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F06C1581F0;
-	Thu,  1 Aug 2024 07:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671831581E9;
+	Thu,  1 Aug 2024 07:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HIzUN4PQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-u-204.mailbox.org (mout-u-204.mailbox.org [80.241.59.204])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586F614264A;
-	Thu,  1 Aug 2024 07:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.59.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A1318E0E;
+	Thu,  1 Aug 2024 07:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722496783; cv=none; b=uB674EFQ617ZMz5IqVMsY0KHQO3TL76MDFYlWkL2laKsKkSAbj2T2ueBwUgHvqWe3eoI9H0ODoQI2iFkIThTjk3VLzzGCfhyHPur8fFdNRlC9+QyJTjf8XfmCJBHEuof2qtXx0ViRvqsojxvd/HYkY1axOoojayvnCBNCXGAGqQ=
+	t=1722496217; cv=none; b=Hx5d5yEsl38qggpG9EnNsVz6mJvXsHEnI6Cm6+PlJ3q50X0P740JHL5dfKqzcxAxlQ7y763IyFDWFy+aWOPooJNtD5WYFIvd1QcS38MkSpZcG/jG8zVFSGs5m9JIgMQV11vJ4jLC9CPInBXa1HO9tIaPhktQwWkXG9c7vekix0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722496783; c=relaxed/simple;
-	bh=/2gJDhm9jZu4Ci0H9owy318v6GlC5uHyDuRZvjOljxU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=feCTQ6hdl3HKQ+QseTStyt3nWsZwapkddgx/q7BSTi7Wd43S2X4MK31Vf2O8UUffrqPrKSg+g7ynWyj06zR1X33BFNcAYoJLRdPepdf3gUi3/dgfdSGh/E46kLhRi83bM0mymCKsm/mSy96GVw3mjR43gJRQfR4pu9rc4ikNUpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=denx.de; spf=fail smtp.mailfrom=denx.de; arc=none smtp.client-ip=80.241.59.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=denx.de
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-u-204.mailbox.org (Postfix) with ESMTPS id 4WZKpM35cdz9shY;
-	Thu,  1 Aug 2024 09:09:31 +0200 (CEST)
-Message-ID: <17deb48c-6148-4e3d-aa0b-6c840f55302d@denx.de>
-Date: Thu, 1 Aug 2024 09:09:27 +0200
+	s=arc-20240116; t=1722496217; c=relaxed/simple;
+	bh=EqByN6qCkhiy9eydAEw/kNfM2HmA0wKFkMpmPQzBOHI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OhKjP/tq4Y8YcCkkPfc39p0tJzv6Wb3UxqFhipflPWDfnZ4vUfWSPh5Lgxv6tjeKWNldc9SJKKsraXDEr5coFIzZVniIkhBOqwPMovRw5o1xntvBvEuzzg7Tn3InAoeUtjlM6fnzBwLSiVDA0tjWbTWxKCnzpvDJlfeM9aVF02Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HIzUN4PQ; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47179vav054261;
+	Thu, 1 Aug 2024 02:09:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1722496197;
+	bh=E4vu66DMs+gbUx27j2GWJkHnjdcHGXqRKM7N6f2Q11U=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=HIzUN4PQk2j8hYzjU4HsZ8cqPS8XuVUVuiVJul9D5ZZyg3NOq2egIFyRticrlwTmD
+	 0jw583PNDRLyz4THZdYTQ3fYmee8sowP7iCXfndVZJvzFBvn86x6nBDvtvFt0CjgeX
+	 XnveNL2RWQH1zEEQc+piPjMEd6A7peQZ+dq2eX4Q=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47179vwm044138
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 1 Aug 2024 02:09:57 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 1
+ Aug 2024 02:09:56 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 1 Aug 2024 02:09:56 -0500
+Received: from [10.249.135.225] ([10.249.135.225])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47179qCl061988;
+	Thu, 1 Aug 2024 02:09:53 -0500
+Message-ID: <bcf0cbee-a001-4922-b0d5-c2f88b8c9724@ti.com>
+Date: Thu, 1 Aug 2024 12:39:51 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 1/2] net: ethernet: mtk_eth_soc: use prefetch
- methods
-To: Elad Yifee <eladwf@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Daniel Golle <daniel@makrotopia.org>
-References: <20240729183038.1959-1-eladwf@gmail.com>
- <20240729183038.1959-2-eladwf@gmail.com> <ZqirVSHTM42983Qr@LQ3V64L9R2>
- <CA+SN3soUmtYfM_qVQ7L1gHMSLYe2bDm=6U9UwFLvj35odT0Feg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: Use of_property_read_bool()
+To: "Rob Herring (Arm)" <robh@kernel.org>,
+        Madalin Bucur
+	<madalin.bucur@nxp.com>,
+        Sean Anderson <sean.anderson@seco.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar
+	<danishanwar@ti.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        Radhey Shyam Pandey
+	<radhey.shyam.pandey@amd.com>,
+        Michal Simek <michal.simek@amd.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20240731191601.1714639-2-robh@kernel.org>
 Content-Language: en-US
-From: Stefan Roese <sr@denx.de>
-In-Reply-To: <CA+SN3soUmtYfM_qVQ7L1gHMSLYe2bDm=6U9UwFLvj35odT0Feg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <20240731191601.1714639-2-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 7/30/24 20:35, Elad Yifee wrote:
-> On Tue, Jul 30, 2024 at 11:59 AM Joe Damato <jdamato@fastly.com> wrote:
->>
->> Based on the code in mtk_probe, I am guessing that only
->> MTK_SOC_MT7628 can DMA to unaligned addresses, because for
->> everything else eth->ip_align would be 0.
->>
->> Is that right?
->>
->> I am asking because the documentation in
->> Documentation/core-api/unaligned-memory-access.rst refers to the
->> case you mention, NET_IP_ALIGN = 0, suggesting that this is
->> intentional for performance reasons on powerpc:
->>
->>    One notable exception here is powerpc which defines NET_IP_ALIGN to
->>    0 because DMA to unaligned addresses can be very expensive and dwarf
->>    the cost of unaligned loads.
->>
->> It goes on to explain that some devices cannot DMA to unaligned
->> addresses and I assume that for your driver that is everything which
->> is not MTK_SOC_MT7628 ?
+
+
+On 8/1/2024 12:46 AM, Rob Herring (Arm) wrote:
+> Use of_property_read_bool() to read boolean properties rather than
+> of_find_property(). This is part of a larger effort to remove callers
+> of of_find_property() and similar functions. of_find_property() leaks
+> the DT struct property and data pointers which is a problem for
+> dynamically allocated nodes which may be freed.
 > 
-> I have no explanation for this partial use of 'eth->ip_align', it
-> could be a mistake
-> or maybe I'm missing something.
-> Perhaps Stefan Roese, who wrote this part, has an explanation.
-> (adding Stefan to CC)
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 
-Sorry, I can't answer this w/o digging deeper into this driver and
-SoC again. And I didn't use it for a few years now. It might be a
-mistake.
+Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 
-Thanks,
-Stefan
-
+-- 
+Thanks and Regards,
+Md Danish Anwar
 
