@@ -1,106 +1,167 @@
-Return-Path: <netdev+bounces-115055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B924944FDA
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:02:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19241945015
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB90A1F26605
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:02:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3B9B1F25008
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC8013C9AF;
-	Thu,  1 Aug 2024 16:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTjEQH3o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEFB1B9B45;
+	Thu,  1 Aug 2024 16:05:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4231384BF;
-	Thu,  1 Aug 2024 16:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA8C1B3F26;
+	Thu,  1 Aug 2024 16:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722528151; cv=none; b=i8W/3M/1Oi58YZu2xXALd0I2xDTDWUs0q+t55F7AFqqZMBab48r2Vjzg4Xr/RgidC4nbNmAli5gGtVWDPhmszCH67BJT0xH/QToa4fYIrRkkkUQtiZ5yVEQCa4VztiuoNhKy4ntqs6EURQUFZCcHBnmhovFL4fvqsMrAYfkrGF4=
+	t=1722528342; cv=none; b=KHSvVi/fJ8JnDzTQzrnDUP8RJLtZV31MzVqTjcHOzeJ811a1Bl89NjLAZq+ipRH1H0rf4PTQZaq/G/Ii53sVq0z9pTbA6ugz3TeuQ8PxAjujrqMXEUdq0Anx2mY9lEAFDzqkqotu0cWQ+mJs94cw3duZ0R1Kh7uIZ1K03usKFSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722528151; c=relaxed/simple;
-	bh=JbM0mobM8XPHWJlV+GkhV0iKaT4Ass7pcwi0VX4eFCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B1ghO1wuFQlQ25zxgWsIVI0jlAzoM7S3wSPGc8YFetq4EICoGgHIYDyRygwKUVZ/Jo3jXdIVSUwp7nnost4KwOH/LgU+0+zZfuyBtufoq42zGPtxzkpc8hFZjCvPyGydAlRN49e/7UfLKCSOcSY5bw1tN9Nitp2Df9qm6dWmD9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTjEQH3o; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-428119da952so45712415e9.0;
-        Thu, 01 Aug 2024 09:02:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722528148; x=1723132948; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JbM0mobM8XPHWJlV+GkhV0iKaT4Ass7pcwi0VX4eFCk=;
-        b=TTjEQH3oP5Ofohgx2AAiEcGfxH/TscCMGbQuTiHVNA6g+N6r3GHeeaLnHQolfNA/lf
-         IRd7S5UuDRNnGrBXEE3ADyRlU4IhD2hyOSUHVH0ENNaYBlpWWYUmAXV7XzYNvUqoSHPz
-         KKiCCX2KWjLrG3zD5jVPbSVzXfSdbIZeI7oHVfwRK+WpJBfAArH35XehgARGmAICGD9G
-         qsS2Knjgo8ugeKsaEUETTXd6b+6DRkbfuMv1jDYDtNKgCmQfbRI+TcDz0AAho7YU6+BH
-         rQYKZm9W+Fr0aevJ15ZWzWcY216vRRQ5Ggq/0HadTvj2LAwfFr6BkYxc56H4TBsTX1dT
-         bXQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722528148; x=1723132948;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JbM0mobM8XPHWJlV+GkhV0iKaT4Ass7pcwi0VX4eFCk=;
-        b=IjRZMBAMKlzTsIykUTxeGpIzHFTRgFjtDrp6+YictZOEwnXl/11up2DbwBACvyq5dt
-         2CsM+/3K5Fi+aasjsM0bPLQP+n4QcC81g3Ah/QiP1W2gX7F3pToAQRp590I8wHbM0+xj
-         Z6KfFLMaGKDv39Nc4+F2D3cZy83ynE0hXLGYpgmjTw/b6l6b6X17nsF502k7ebQFUn5N
-         UWS+Ne5pFL0MW222deHBe26CQHLkDfO2+FvbkxmvyOaL/liuwtB/8bbSRS6dfJzvZUfH
-         evyFjZg5KCtIk+bE7J7LoEQyZ4btkwIGvSOskrN9V3jbyxyabKl7O4uPYrkn+ZU4SXV3
-         6FTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX+aeoykduDv24N8PSFQPdShXKIa7PNXUpAjtsWvMdJ47DAOyYNPj+ietXD6+3K9Ngg3GPdwLdbpw6OXK/P+wWFqMx6BHjk4pjO5hMdBHI9SQ1bmgq/7JITVntLgFmJe2wILcGG
-X-Gm-Message-State: AOJu0YxfQnevL5+TOoGyXcibCBpmrh9es2hHNruziizOG8rsU+sms4WH
-	ruBXDb6f7NT0Xvg7cXqbpPCf5LtFbNo1qWazjt724a3hezUMCk4W
-X-Google-Smtp-Source: AGHT+IEWV66ZYrus0W1ET1gIeNLur6+QGxyXdCNjV0dIiQyEy2PYiogbwno7MlX6tYQEIb9prjLr2w==
-X-Received: by 2002:a05:600c:4e8e:b0:426:654e:16d0 with SMTP id 5b1f17b1804b1-428e6a60397mr3059625e9.0.1722528147540;
-        Thu, 01 Aug 2024 09:02:27 -0700 (PDT)
-Received: from skbuf ([188.25.135.70])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36800cdasm20140304f8f.64.2024.08.01.09.02.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 09:02:26 -0700 (PDT)
-Date: Thu, 1 Aug 2024 19:02:24 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net-next v1 0/5] net: stmmac: FPE via ethtool + tc
-Message-ID: <20240801160224.4f54tanxs5dz5hwq@skbuf>
-References: <cover.1722421644.git.0x1207@gmail.com>
+	s=arc-20240116; t=1722528342; c=relaxed/simple;
+	bh=pSHG9lsWqj8+0KA9KuNPYXaQrCHLdJR48JyOFONYADQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HVKFMk7Vcl59FB8Y/O20stqr1Zj0pot792iVUQAOZWwWVgcn7flYIVKdwBA1cr1xLGI/9E0Q62E7o2Hw218GsrQTXQ9PRo2N7WcMOyqenWuJaJ84zfrIyGxC29hU2v9pP1mY1+ga9iS+iKagC9vJzejndM2MxVoFjGOnthyb95Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WZYZb4GdJzyPVB;
+	Fri,  2 Aug 2024 00:00:07 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4952318005F;
+	Fri,  2 Aug 2024 00:05:07 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 2 Aug 2024 00:05:03 +0800
+Message-ID: <2030c426-f351-480c-7bf5-a44ed0344495@huawei-partners.com>
+Date: Thu, 1 Aug 2024 19:04:59 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1722421644.git.0x1207@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+ <20240801.Euhith6ukah2@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240801.Euhith6ukah2@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-Hi Furong,
+8/1/2024 5:45 PM, Mickaël Salaün wrote:
+> On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
+>> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
+>> ports to forbid a malicious sandboxed process to impersonate a legitimate
+>> server process. However, bind(2) might be used by (TCP) clients to set the
+>> source port to a (legitimate) value. Controlling the ports that can be
+>> used for listening would allow (TCP) clients to explicitly bind to ports
+>> that are forbidden for listening.
+>>
+>> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+>> access right that restricts listening on undesired ports with listen(2).
+>>
+>> It's worth noticing that this access right doesn't affect changing
+>> backlog value using listen(2) on already listening socket.
+>>
+>> * Create new LANDLOCK_ACCESS_NET_LISTEN_TCP flag.
+>> * Add hook to socket_listen(), which checks whether the socket is allowed
+>>    to listen on a binded local port.
+>> * Add check_tcp_socket_can_listen() helper, which validates socket
+>>    attributes before the actual access right check.
+>> * Update `struct landlock_net_port_attr` documentation with control of
+>>    binding to ephemeral port with listen(2) description.
+>> * Change ABI version to 6.
+>>
+>> Closes: https://github.com/landlock-lsm/linux/issues/15
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   include/uapi/linux/landlock.h                | 23 +++--
+>>   security/landlock/limits.h                   |  2 +-
+>>   security/landlock/net.c                      | 90 ++++++++++++++++++++
+>>   security/landlock/syscalls.c                 |  2 +-
+>>   tools/testing/selftests/landlock/base_test.c |  2 +-
+>>   5 files changed, 108 insertions(+), 11 deletions(-)
+> 
+>> diff --git a/security/landlock/net.c b/security/landlock/net.c
+>> index 669ba260342f..a29cb27c3f14 100644
+>> --- a/security/landlock/net.c
+>> +++ b/security/landlock/net.c
+>> @@ -6,10 +6,12 @@
+>>    * Copyright © 2022-2023 Microsoft Corporation
+>>    */
+>>   
+>> +#include "net/sock.h"
+>>   #include <linux/in.h>
+>>   #include <linux/net.h>
+>>   #include <linux/socket.h>
+>>   #include <net/ipv6.h>
+>> +#include <net/tcp.h>
+>>   
+>>   #include "common.h"
+>>   #include "cred.h"
+>> @@ -194,9 +196,97 @@ static int hook_socket_connect(struct socket *const sock,
+>>   					   LANDLOCK_ACCESS_NET_CONNECT_TCP);
+>>   }
+>>   
+>> +/*
+>> + * Checks that socket state and attributes are correct for listen.
+>> + * It is required to not wrongfully return -EACCES instead of -EINVAL.
+>> + *
+>> + * This checker requires sock->sk to be locked.
+>> + */
+>> +static int check_tcp_socket_can_listen(struct socket *const sock)
+>> +{
+>> +	struct sock *sk = sock->sk;
+>> +	unsigned char cur_sk_state = sk->sk_state;
+>> +	const struct tcp_ulp_ops *icsk_ulp_ops;
+>> +
+> 
+> I think we can add this assert:
+> lockdep_assert_held(&sk->sk_lock.slock);
 
-On Wed, Jul 31, 2024 at 06:43:11PM +0800, Furong Xu wrote:
-> Move the Frame Preemption(FPE) over to the new standard API which uses
-> ethtool-mm/tc-mqprio/tc-taprio.
+Ok, let's add it. I just haven't seen this being a common practice in
+the network stack.
 
-Thanks for working on this! I will review it soon.
-
-On the DWMAC 5.10a that you've tested, were other patches also necessary?
-What is the status of the kselftest? Does it pass? Can you post its
-output as part of the cover letter?
+> 
+>> +	/* Allows only unconnected TCP socket to listen (cf. inet_listen). */
+>> +	if (sock->state != SS_UNCONNECTED)
+>> +		return -EINVAL;
+>> +
+>> +	/*
+>> +	 * Checks sock state. This is needed to ensure consistency with inet stack
+>> +	 * error handling (cf. __inet_listen_sk).
+>> +	 */
+>> +	if (WARN_ON_ONCE(!((1 << cur_sk_state) & (TCPF_CLOSE | TCPF_LISTEN))))
+>> +		return -EINVAL;
+>> +
+>> +	icsk_ulp_ops = inet_csk(sk)->icsk_ulp_ops;
+>> +
+>> +	/*
+>> +	 * ULP (Upper Layer Protocol) stands for protocols which are higher than
+>> +	 * transport protocol in OSI model. Linux has an infrastructure that
+>> +	 * allows TCP sockets to support logic of some ULP (e.g. TLS ULP).
+>> +	 *
+>> +	 * Sockets can listen only if ULP control hook has clone method.
+>> +	 */
+>> +	if (icsk_ulp_ops && !icsk_ulp_ops->clone)
+>> +		return -EINVAL;
+>> +	return 0;
+>> +}
 
