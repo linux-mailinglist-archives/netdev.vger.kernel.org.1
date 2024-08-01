@@ -1,131 +1,113 @@
-Return-Path: <netdev+bounces-114868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0163E94477A
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:08:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D462A9447F8
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:19:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84C801F26676
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:08:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B97DB26CBC
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF51B16E89C;
-	Thu,  1 Aug 2024 09:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zyNAr03o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C8C1A2564;
+	Thu,  1 Aug 2024 09:13:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A20C163A9B
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 09:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3001A0B12;
+	Thu,  1 Aug 2024 09:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722503287; cv=none; b=rcM43Wv8GR7IjeSzmdy4bacNs2iKb47CCPXooMNriZsepJWUbEARnw7Ex8wYuCfDferqmtRxzVZp9c6rSpoIvNcx1Yx+SarUH/reityjmQ4t1AIhnecn/05tDWCwuMgkDuccJxCdjC8+dNyO7iAjjYoYeDhq59/4AXhNDlL/G0g=
+	t=1722503619; cv=none; b=FgyYqb7jT3fQF0GQ6lMfANzO75qvCdzR2jhLUiZzN+HFmAtpPksnPfwFJRTdpWlnP1MYRDUpPx2yf7ZReiJZDSdQR6tsX/2bc78j93T0O3S0GM/tQ7njTX2Jv1onbyhIvJcifTQIMJcJoYZNiYCYzTGSyJXMhqfDjb70Eo/6mLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722503287; c=relaxed/simple;
-	bh=4cgHRUWZuN5GT6hqCoW/w0mG65NgGwTSE5vOByclFdE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YpDrO/7n4Mq7pAEcx0GDnByNq5IfkpziaTG4mDk+Ilmxt13iOjjEkWYAEr8wcZVWtsUAB2JisQ3f31eH6FC6DfetGEuQVDfSrG7Kf/GhBs7k0PZgh9FOrvzOCFJdIrMYNxZkwaRK0izimcSE445PDV8C6nSbKWYY0OHUwtA/5dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zyNAr03o; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3684e8220f9so1003682f8f.1
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 02:08:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722503284; x=1723108084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ToW3KI8roAC4Do61VeULBMC1otWP2s+jWIh8BYgS1x4=;
-        b=zyNAr03oTwrQqqzYI3JeOfCdiIr91tRFJTjHUcW8+IvLtXaTZjRytIG4qdW0QknrV/
-         t6r8Ug5OH2X2pVeK93iQTdqAYo8DUZuVT6UP/4FvxH1Iv15/WSIUgJywPDSMZYMkC80z
-         GXb8lcans/LqaubexI5oWfaIYQHsSWH6YA/qKDuGX7IxS9RlqSvSh/WqmVhdv3y0Ub4E
-         9sqhHciVG5Gxx7/OudRlILfdVU4AdU+wSADkIbcj93faWmAQlPWkSsHiAZCNYrxVg1EN
-         JDCAGRefYOxQc74D2YCzJh8ehRHUKEaDZyqqejPXZRgxWq30LEbx52PQ4fbpV5V7o2Fv
-         4flA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722503284; x=1723108084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ToW3KI8roAC4Do61VeULBMC1otWP2s+jWIh8BYgS1x4=;
-        b=GUHdemaVSPHh1KrQVGq3tHPYwwsyOIaaaYSfh/DK0vVJ2+3CMQSePvQet1Go3OaltL
-         hBBUrMhFMLq6oqt+Mak/qS5XuFLzlk1jZ1U5q5ZUmzarlNQCcE3AhhLaZmpsUR5CIpdi
-         Ivsctge6uTfwbfzERlu+zgV3tn5tne7Yl8PL7JK2pi3IiZbwu1ATVzGKWwmKK1s/GJob
-         /ecO/jGP74LqjM3usvmIQi5akFVB4MLu6trdgiR7xqhYhQlvVXda6x2UyiW4lxw/kAlN
-         m+A5DmtCfJcUVA73/wa+TMYHMBo+e5PrdiqW6EgFERiBDuePR3ww0gOospIeC1aE1m6c
-         o2yA==
-X-Forwarded-Encrypted: i=1; AJvYcCXOmisuSMEQnGu1OXf1eaVYa1a4NBWXMfxaZC9uaoU7ouA7qjppFZ7JZ0mQtBpASOXSffWMxFPEgX5g8lAiWafhAfou9NnN
-X-Gm-Message-State: AOJu0YzkkqZ+yZBFy9Ubqlm8vXikaluqRp2HEdja/JmOrkoVxVmidNJU
-	vxgPm0AyMeneQQlGX1/kuiiGXtNPuiSAF2o6aL6uVIYN1Iai2iqxK9ShKaP3rm6KIulpNmsBeMQ
-	ZXyJWeVbunBGit75aF0kuCBAIL31q4sIQ/mHj/dBYIXS0D6B8ok4E
-X-Google-Smtp-Source: AGHT+IE4PrCeF4zEPR4QJhUj7r4nyMLXvSSgU8B5o78X0bqSZ7xJZrnWJkHxFn4cN8KAQMbCISIm+aYfv6cH83GhURU=
-X-Received: by 2002:a5d:4844:0:b0:36b:b08f:64b3 with SMTP id
- ffacd0b85a97d-36bb35d2828mr621605f8f.20.1722503284256; Thu, 01 Aug 2024
- 02:08:04 -0700 (PDT)
+	s=arc-20240116; t=1722503619; c=relaxed/simple;
+	bh=tPidg2/aE3kkju9l04+4SSW5PlwDWDWtQnh4jZnd8Zc=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rSQZ/qrFgt/G7zpPQ1ZXem6Gnk5WgBJMHQOA848IjyoK8U5IURH2EIc3/FP/PVxp2k9lG/Hvh2iyncyAf8/IOsXz8VSLSD5Gem5F70x3TXRzHlRKcklSrNao11+3OmsVZDk3xFVkymQgQBZ9QoRwAIE7YOdHeuoArVxr4HbJEJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WZNRl15wNzyPSb;
+	Thu,  1 Aug 2024 17:08:35 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8216D140336;
+	Thu,  1 Aug 2024 17:13:34 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 17:13:33 +0800
+Message-ID: <e8a56b1f-f3f3-4081-8c0d-4b829e659780@huawei.com>
+Date: Thu, 1 Aug 2024 17:13:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731042136.201327-1-fujita.tomonori@gmail.com>
- <20240731042136.201327-3-fujita.tomonori@gmail.com> <5525a61c-01b7-4032-97ee-4997b19979ad@lunn.ch>
- <CAH5fLggyhvEhQL_VWdd38QyFuegPY5mXY_J-jZrh9w8=WPb2Vg@mail.gmail.com> <5055051e-b058-400f-861d-e7438bebb017@lunn.ch>
-In-Reply-To: <5055051e-b058-400f-861d-e7438bebb017@lunn.ch>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Thu, 1 Aug 2024 11:07:52 +0200
-Message-ID: <CAH5fLghBvd3phRWBzayTVQWyKqBYLNw9dsYKPmMHYZ1_jaWL7g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/6] rust: net::phy support probe callback
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH net-next 05/10] net: hibmcge: Implement some .ndo
+ functions
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
-	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-6-shaojijie@huawei.com>
+ <0e497b6f-7ab0-4a43-afc6-c5ad205aa624@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <0e497b6f-7ab0-4a43-afc6-c5ad205aa624@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-On Wed, Jul 31, 2024 at 10:57=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> > > > +    /// `phydev` must be passed by the corresponding callback in `=
-phy_driver`.
-> > > > +    unsafe extern "C" fn probe_callback(phydev: *mut bindings::phy=
-_device) -> core::ffi::c_int {
-> > > > +        from_result(|| {
-> > > > +            // SAFETY: This callback is called only in contexts
-> > > > +            // where we can exclusively access to `phy_device`, so=
- the accessors on
-> > > > +            // `Device` are okay to call.
-> > >
-> > > This one is slightly different to other callbacks. probe is called
-> > > without the mutex. Instead, probe is called before the device is
-> > > published. So the comment is correct, but given how important Rust
-> > > people take these SAFETY comments, maybe it should indicate it is
-> > > different to others?
-> >
-> > Interesting. Given that we don't hold the mutex, does that mean that
-> > some of the methods on Device are not safe to call in this context? Or
-> > is there something else that makes it okay to call them despite not
-> > holding the mutex?
->
-> probe is always the first method called on a device driver to match it
-> to a device. Traditionally, if probe fails, the device is destroyed,
-> since there is no driver to drive it. probe needs to complete
-> successfully before the phy_device structure is published so a MAC
-> driver can reference it. If it is not published, nothing can have
-> access to it, so you don't need to worry about parallel activities on
-> it.
->
-> And a PHY driver does not need a probe function. Historically, probe
-> was all about, can this driver drive this hardware. However, since we
-> have ID registers in the hardware, we already know the driver can
-> drive the hardware. So probe is now about setting up whatever needs
-> setting up. For PHY drivers, there is often nothing, no local state
-> needed, etc. So the probe is optional.
 
-Makes sense. Thanks for the explanation!
+on 2024/8/1 8:51, Andrew Lunn wrote:
+>> +static int hbg_net_set_mac_address(struct net_device *dev, void *addr)
+>> +{
+>> +	struct hbg_priv *priv = netdev_priv(dev);
+>> +	u8 *mac_addr;
+>> +
+>> +	mac_addr = ((struct sockaddr *)addr)->sa_data;
+>> +	if (ether_addr_equal(dev->dev_addr, mac_addr))
+>> +		return 0;
+>> +
+>> +	if (!is_valid_ether_addr(mac_addr))
+>> +		return -EADDRNOTAVAIL;
+> How does the core pass you an invalid MAC address?
 
-Alice
+According to my test,
+in the 6.4 rc4 kernel version, invalid mac address is allowed to be configured.
+An error is reported only when ifconfig ethx up.
+
+>
+>> +static int hbg_net_change_mtu(struct net_device *dev, int new_mtu)
+>> +{
+>> +	struct hbg_priv *priv = netdev_priv(dev);
+>> +	bool is_opened = hbg_nic_is_open(priv);
+>> +	u32 frame_len;
+>> +
+>> +	if (new_mtu == dev->mtu)
+>> +		return 0;
+>> +
+>> +	if (new_mtu < priv->dev_specs.min_mtu || new_mtu > priv->dev_specs.max_mtu)
+>> +		return -EINVAL;
+> You just need to set dev->min_mtu and dev->max_mtu, and the core will
+> do this validation for you.
+
+Thanks, I'll test it，and if it works I'll remove the judgement
+
+>
+>> +	dev_info(&priv->pdev->dev,
+>> +		 "change mtu from %u to %u\n", dev->mtu, new_mtu);
+> dev_dbg() Don't spam the log for normal operations.
+
+okay, Thanks!
+
 
