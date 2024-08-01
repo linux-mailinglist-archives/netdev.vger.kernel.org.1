@@ -1,129 +1,90 @@
-Return-Path: <netdev+bounces-114774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA04E9440D3
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:19:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57AE094409F
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEDE7B2C763
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:11:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 887E31C223D5
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A9D13A249;
-	Thu,  1 Aug 2024 01:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BAA14AD23;
+	Thu,  1 Aug 2024 01:23:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF0F14A4D2;
-	Thu,  1 Aug 2024 01:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161AC14A615;
+	Thu,  1 Aug 2024 01:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722475359; cv=none; b=jqjac3ovyrRwX4vhpNmwfEYPPsHVxTfHZTtwTDDh3GCwOwQr1epykDASHDh19+ZMvu4bcr1ahb7LzPP5fIFkeqdxg0fSpRgxcANl28w1AquLlUS9bSj9VfH9WY8Uku0J6RkKEDdx/i7uehuAKgzSPCPnxNS2bRGWPzZknHAFX1c=
+	t=1722475438; cv=none; b=ggX2XcMtVeKoVwuAH4HHDSeW9Z33cKwdrxagXkJxcCsuJGOzvz3c6V9QaCO3TTPmEhSTrxfc7IGcCUKt7SqIXVde5/nCwK0r4zuaWPJTQ9mk16K8q3bGBwp+4Yd2HmiLtnFPFuIxahoTa3mrQ2QmuKtT81XK+SXIEQK/yDgJAkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722475359; c=relaxed/simple;
-	bh=+DMds7fVaPDjKCj7lGJ2/9hrgLIkk0Z5eLRcjA5ikBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=E7Oqr87QqNcAfFVt8vvMsPxkfYkjzMjjd70Y/l3nbgs7l58/rAIpqmSacbxSZE+rGTwIujTJWyy3OfDTeju8syYxaqIx4XoFQ29+wCyATbmFkvVASQU0ovR54AELgGAMa2xKHt8QhqG4Um5ULvmWzk640R+kt4B4kG2fQrrg9j8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WZB5m2crtz1L9KR;
-	Thu,  1 Aug 2024 09:22:20 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6E54A180AE6;
-	Thu,  1 Aug 2024 09:22:32 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 1 Aug 2024 09:22:31 +0800
-Message-ID: <70dea024-dfbe-1679-854f-8477e65bc0f8@huawei.com>
-Date: Thu, 1 Aug 2024 09:22:31 +0800
+	s=arc-20240116; t=1722475438; c=relaxed/simple;
+	bh=7gKNExuJaLbKHqudrhoMB30SU3z2Hfw0CoP3Fh1sNpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r0qXmXTScSLnfQW+tNFHp/jzsxXpbb2mhgV2FF9clg3UuRm9VtzKMH++Ls9ut7KWhA7s/DoK8Oga0E+UsWz70dQp7qwbaU4uF94Q93YDLKE4wKe6HlGb5INgXeaMA00j/9tw/vM3U+BNzQu8164ALnoufrZQTZD3vWt2H2p4c6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70d1cbbeeaeso4719572b3a.0;
+        Wed, 31 Jul 2024 18:23:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722475435; x=1723080235;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/8i9GP7nhcFbKM690bSVhwjZ922fix8UAoNWE6DVUwo=;
+        b=sQ/pWnoHXwLT1/pSXVvGKRZeO7G0Y7GtU0j5HEULcAyF3zmgYmimw76rJI2/yLC9Gh
+         Gfgl2fU3L+tbleKmc5bHosomMOdRvM6BfxXrQ+UJsdiL19UbrasF+u5JgJVmCvj6WkJH
+         DSC8CU2Nb2n0UDQbkjF5FDBVvJYfiEXntUlf8Z8LgGxLAMDQtgV1wZTH+EaiMD+/K8Mj
+         iJIzwrZn7skBfEGKHl8wMUpB7zWwg8OVNXHUtfiwv+TEWd0nG2SdsCXei3Brzmmje2xj
+         p2vJ97X6SWnOXOXPp1108S6ayQMYghxbj9Ms+nSJAJCGZQogqkHcT9TMDb2fGm6xN5jY
+         RcZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgmDrw5eVZwQvBakHPUaoulegQaNID0Ex0qldiNfTcycMNMq4yODWLvzBXNe+c6KTpDMI/uDgdM9L7dk8T0G/IgLijPzybabMPr1SDLzNwVdQMUHfxlp9xZ6ppMMrnBUjqlz4xVvL2
+X-Gm-Message-State: AOJu0Yyf62uMs9kX7NsjyAJgMMYuFAATTaIKq0lcQjKSNqmy5fIus79h
+	n+mIjBAAtuRtR5Bk7jHV6jxtWUsOv8HvgHHLtlVUHsE+IwOdB20=
+X-Google-Smtp-Source: AGHT+IEcXnLHBRC17MZ5D9MdnU0NytnyFeyo6X87DLLoWtY+0waRql4ttVvJfAZenZEYXie0ivaFiQ==
+X-Received: by 2002:a05:6a00:188d:b0:70d:311b:8569 with SMTP id d2e1a72fcca58-7105d7da884mr1309849b3a.26.1722475435318;
+        Wed, 31 Jul 2024 18:23:55 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead81234dsm10540631b3a.115.2024.07.31.18.23.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 18:23:54 -0700 (PDT)
+Date: Wed, 31 Jul 2024 18:23:54 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Petr Machata <petrm@nvidia.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	Shuah Khan <shuah@kernel.org>, Joe Damato <jdamato@fastly.com>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] selftests: net-drv: exercise queue stats
+ when the device is down
+Message-ID: <ZqrjqpKJRgMhlvr2@mini-arch>
+References: <20240730223932.3432862-1-sdf@fomichev.me>
+ <87cymt7pmu.fsf@nvidia.com>
+ <20240731173245.2968988d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net-next 2/4] net/smc: remove the fallback in
- __smc_connect
-To: Wenjia Zhang <wenjia@linux.ibm.com>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
-	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
-References: <20240730012506.3317978-1-shaozhengchao@huawei.com>
- <20240730012506.3317978-3-shaozhengchao@huawei.com>
- <4232f3fb-4088-41e0-91f7-7813d3bb99e5@linux.ibm.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <4232f3fb-4088-41e0-91f7-7813d3bb99e5@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240731173245.2968988d@kernel.org>
 
-Hi Wenjia Zhang:
-    Looks like the logic you're saying is okay. Do I need another patch
-to perfect it? As below:
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 73a875573e7a..b23d15506afc 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -1523,7 +1523,7 @@ static int __smc_connect(struct smc_sock *smc)
-                 ini->smcd_version &= ~SMC_V1;
-                 ini->smcr_version = 0;
-                 ini->smc_type_v1 = SMC_TYPE_N;
--               if (!ini->smcd_version) {
-+               if (!smc_ism_is_v2_capable()) {
-                         rc = SMC_CLC_DECL_GETVLANERR;
-                         goto fallback;
-                 }
-
-
-Thank you
-
-Zhengchao Shao
-
-On 2024/7/31 23:15, Wenjia Zhang wrote:
+On 07/31, Jakub Kicinski wrote:
+> On Wed, 31 Jul 2024 13:34:58 +0200 Petr Machata wrote:
+> > > +        qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)
+> > > +    except NlError as e:
+> > > +        if e.error == 95:  
+> > 
+> > Could you do this as if e.error == errno.ENOTSUP?
 > 
-> 
-> On 30.07.24 03:25, Zhengchao Shao wrote:
->> When the SMC client begins to connect to server, smcd_version is set
->> to SMC_V1 + SMC_V2. If fail to get VLAN ID, only SMC_V2 information
->> is left in smcd_version. And smcd_version will not be changed to 0.
->> Therefore, remove the fallback caused by the failure to get VLAN ID.
->>
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->> ---
->>   net/smc/af_smc.c | 4 ----
->>   1 file changed, 4 deletions(-)
->>
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index 73a875573e7a..83f5a1849971 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -1523,10 +1523,6 @@ static int __smc_connect(struct smc_sock *smc)
->>           ini->smcd_version &= ~SMC_V1;
->>           ini->smcr_version = 0;
->>           ini->smc_type_v1 = SMC_TYPE_N;
->> -        if (!ini->smcd_version) {
->> -            rc = SMC_CLC_DECL_GETVLANERR;
->> -            goto fallback;
->> -        }
->>       }
->>       rc = smc_find_proposal_devices(smc, ini);
-> 
-> Though you're right that here smcd_version never gets 0, it actually is 
-> a bug from ("42042dbbc2eb net/smc: prepare for SMC-Rv2 connection"). The 
-> purpose of the check here was to fallback at a early phase before 
-> calling smc_find_proposal_devices(). However, this change is not wrong, 
-> just I personally like adding a check for smc_ism_is_v2_capable() more.
-> 
-> Thanks,
-> Wenjia
+> just to be clear EOPNOTSUPP ..
+
+That might be the reason it's coded explicitly as 95? :-D
 
