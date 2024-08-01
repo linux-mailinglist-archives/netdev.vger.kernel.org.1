@@ -1,121 +1,108 @@
-Return-Path: <netdev+bounces-115083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5CF9450D2
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:38:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC619450D6
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1E4FB29588
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:38:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB70BB29719
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83521BB68E;
-	Thu,  1 Aug 2024 16:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935391BBBC4;
+	Thu,  1 Aug 2024 16:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJQERPfX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUylvfyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A4525760
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 16:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5A113C9A3;
+	Thu,  1 Aug 2024 16:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722530043; cv=none; b=VwiGRilvoBLeuMzF9DhwGv7sNVdJ8ITqBXtG5E9vKJVxkOdO3D4k9EMTEb/NLXhUENA9o8IjoouSGrfggQhpSo9V3SHWbt6bPgARajIRTbQmZz/N4dkKtsEukZyhCzpoiBOHoITp6C2YpIUC+yQixNj2Q0tiBNRRlyGRQvWF2UA=
+	t=1722530120; cv=none; b=aEqWwZf1rwKtOIBZWYO1PcR6PteCUBEm5jlY+g6HoZh0G5fTaGOTvjN8LqBUlEd/IfwvrMSN1dx3y8TTk51NwY6xp7PIa435EN+l0vv+bKhJukJ4DiUlCcTSBf9q0MJ1oco+lbYb5gV4r0cPPbMbiZmy2BiJB4MrU2gO2ppL2hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722530043; c=relaxed/simple;
-	bh=3ciQu7WWltiFa4GFgVLnzzxvlDoyDdi47Ktr2b5oogk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FNlxxvLPzcyXqLbOSDxS9S62Cs5AD6giekDRGurMqKXPFad5ECqWGNV1/dgZrgrSUP9JsDSIvMK9WSfYhSk03WtM1bHqaNAkxv89ADguVsAXYdiRsPJoKr89O1Dp+jgEXFtEbuWXC1iRPRqHgUb8btt8kK2lcGaFeWPrQG585BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJQERPfX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10BB8C32786;
-	Thu,  1 Aug 2024 16:34:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722530043;
-	bh=3ciQu7WWltiFa4GFgVLnzzxvlDoyDdi47Ktr2b5oogk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tJQERPfXnK1LGNgrsBq8z5YW80wAHOQy9HIzPBWpn9f4J6gWqO68tU/d8XZukLQ0x
-	 ML8wjJEMvh59N58Vuqe59WSIlSaIQUhe0pMdJgBhWmK5jl8TyaIdKLbOVClXZqlMLz
-	 lHjg2AzOF0vuzPhrlrtsf60vB9DGIDeLNrUtSEuFdz632WUssjem9l6hDl2KIOZjES
-	 5rVGtqZsv5bQY9QIuNzKw4VGCCBEy7bBLekbQqlKvRE+gs1rXbhLBq5XCU2xwjycyX
-	 5D1UKEHE2zyBkboMjtwHsIpp7T1fKsvCQ6K5Ow6RfIw/Vx8rLI5AFkvCh94C5fJuyH
-	 pmZZlhpi0niNA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] net: remove IFF_* re-definition
-Date: Thu,  1 Aug 2024 09:34:01 -0700
-Message-ID: <20240801163401.378723-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1722530120; c=relaxed/simple;
+	bh=epQcZml1KFHD/cAYF1EPI6sbtGZHn6QCLdxUDPlEPdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RkcGwLMgSnNdHM5lkd4kdhadZhPSykXyvFQQNrgP+oZWe77t7Iy17akndFpQIa0svLwwG55imZj4WXgEuzlNnn5b8ofE93WjQ71xY7tNqhPLQ2YxWTOUKL9B7jFNWydfq1mrx3tR95+b5J2mcOpx80i1h+EvWOCm6Er9pvdiRbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUylvfyb; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2cb55ff1007so4798843a91.0;
+        Thu, 01 Aug 2024 09:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722530118; x=1723134918; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J/T4t3jzF+nFkAWEOEP+qO2FrWc+IPdqT2e1MH6ST1k=;
+        b=QUylvfyb8XAnyKXaEd2MIERZ62ltDf7QeKrzVfo4nroX8iAM5+W/dRkzk9x4blEfH/
+         V+yw5LJPUrQ9eMTu3Xjf73tgwOzI95OLLZRJD6Tq9ImiL4wcSvUUVeekkSvCteVA8dFd
+         Zxdicn/90qCGGo82d1zIayIjnc234ZTTxAP+TTSKqNM8OE/ZVUGJsTLGsnUTWmirRuAN
+         azsmHIWEbx+5YqTuGQh8yElfFKA5LYtWZGbANlgLiave7dFfTvUcLxp3Q/svuYH2e95j
+         9tc69xI7gxRifciW+RelXSa+aUYeM3joduoX2HDwp20fcDGJ8F35IxgpIVx1e1SSsWKA
+         ZB1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722530118; x=1723134918;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J/T4t3jzF+nFkAWEOEP+qO2FrWc+IPdqT2e1MH6ST1k=;
+        b=kf+arfJSWHSauaZ7Eff4UfCd9qbGWOf/EwUecAVofmXOx+PMDFYku2iiQMMgsF7HBd
+         HVG50qQXlN8NcUZRyYgC3u0Yi7S+oQnw2gFwc5No/wNfE1piEgjdGIzR81kZwgdIDdoY
+         /bywOGGS+g/WvWHKZDJ5AAY2dbLx1+PxW4JpvQgNgHKiBZn5Ht3hcceBbGm+XLdR4DE8
+         ydQRhzpHb7Rqc3x0MNXegljzMD4wC/NjnSkHUnhia6EteOG19Sj+GVvfd2saUwlrNFkV
+         JYBfjGOb6e5HDv2u0yeoC1YrVxN9E9ERvi7jja0MWeQZsLNsByn0QhNUrEHI85H0s5Y5
+         jIRA==
+X-Forwarded-Encrypted: i=1; AJvYcCWOfUADt4SHN8UpCjMy2ERu7bZJepkuBJrvq4MeEWERyV0nnUP+CBe376FCUbSJs9oYwYXd3ESVlJI/JBtZ5pXZDSpl3YwfMDgM2Y/NLuEA9LXUYgOLEnUPsEEgbe5wXsjAKAOgScOzjguVHX9L+0edMUAzhq0USK5L
+X-Gm-Message-State: AOJu0YwOqf9ld+XCiEg0RA9x+Z++Yq1K8lOwr/3R+yEeENa/4cLWPtVF
+	caKCOcMzutxlwzN6Soxt+7wriCg7xz40oXMnryh9AUgsVQ0nxltQ
+X-Google-Smtp-Source: AGHT+IFPzIKAAGtrIboS0JIgBIcn/RCGQZX+i6sR6dJvOvCnViybU/zZEgesDQpsFrg3VVwYreSuHA==
+X-Received: by 2002:a17:90a:d34c:b0:2c9:80fd:a111 with SMTP id 98e67ed59e1d1-2cff941b716mr996111a91.18.1722530118409;
+        Thu, 01 Aug 2024 09:35:18 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:dc43:fce:b051:e6e8])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cfdc42f9d3sm3599577a91.18.2024.08.01.09.35.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 09:35:17 -0700 (PDT)
+Date: Thu, 1 Aug 2024 09:35:16 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: luigi.leonardi@outlook.com
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net-next v4 0/3] ioctl support for AF_VSOCK and
+ virtio-based transports
+Message-ID: <Zqu5RHO2x+1uLmeD@pop-os.localdomain>
+References: <20240730-ioctl-v4-0-16d89286a8f0@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730-ioctl-v4-0-16d89286a8f0@outlook.com>
 
-We re-define values of enum netdev_priv_flags as preprocessor
-macros with the same name. I guess this was done to avoid breaking
-out of tree modules which may use #ifdef X for kernel compatibility?
-Commit 7aa98047df95 ("net: move net_device priv_flags out from UAPI")
-which added the enum doesn't say. In any case, the flags with defines
-are quite old now, and defines for new flags don't get added.
-OOT drivers have to resort to code greps for compat detection, anyway.
-Let's delete these defines, save LoC, help LXR link to the right place.
+On Tue, Jul 30, 2024 at 09:43:05PM +0200, Luigi Leonardi via B4 Relay wrote:
+> This patch series introduce the support for ioctl(s) in AF_VSOCK.
+> The only ioctl currently available is SIOCOUTQ, which returns
+> the number of unsent or unacked packets. It is available for
+> SOCK_STREAM, SOCK_SEQPACKET and SOCK_DGRAM.
+> 
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- include/linux/netdevice.h | 32 --------------------------------
- 1 file changed, 32 deletions(-)
+Why not using sock diag to dump it? Like ->idiag_wqueue for TCP.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 607009150b5f..0ef3eaa23f4b 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1689,38 +1689,6 @@ enum netdev_priv_flags {
- 	IFF_SEE_ALL_HWTSTAMP_REQUESTS	= BIT_ULL(33),
- };
- 
--#define IFF_802_1Q_VLAN			IFF_802_1Q_VLAN
--#define IFF_EBRIDGE			IFF_EBRIDGE
--#define IFF_BONDING			IFF_BONDING
--#define IFF_ISATAP			IFF_ISATAP
--#define IFF_WAN_HDLC			IFF_WAN_HDLC
--#define IFF_XMIT_DST_RELEASE		IFF_XMIT_DST_RELEASE
--#define IFF_DONT_BRIDGE			IFF_DONT_BRIDGE
--#define IFF_DISABLE_NETPOLL		IFF_DISABLE_NETPOLL
--#define IFF_MACVLAN_PORT		IFF_MACVLAN_PORT
--#define IFF_BRIDGE_PORT			IFF_BRIDGE_PORT
--#define IFF_OVS_DATAPATH		IFF_OVS_DATAPATH
--#define IFF_TX_SKB_SHARING		IFF_TX_SKB_SHARING
--#define IFF_UNICAST_FLT			IFF_UNICAST_FLT
--#define IFF_TEAM_PORT			IFF_TEAM_PORT
--#define IFF_SUPP_NOFCS			IFF_SUPP_NOFCS
--#define IFF_LIVE_ADDR_CHANGE		IFF_LIVE_ADDR_CHANGE
--#define IFF_MACVLAN			IFF_MACVLAN
--#define IFF_XMIT_DST_RELEASE_PERM	IFF_XMIT_DST_RELEASE_PERM
--#define IFF_L3MDEV_MASTER		IFF_L3MDEV_MASTER
--#define IFF_NO_QUEUE			IFF_NO_QUEUE
--#define IFF_OPENVSWITCH			IFF_OPENVSWITCH
--#define IFF_L3MDEV_SLAVE		IFF_L3MDEV_SLAVE
--#define IFF_TEAM			IFF_TEAM
--#define IFF_RXFH_CONFIGURED		IFF_RXFH_CONFIGURED
--#define IFF_PHONY_HEADROOM		IFF_PHONY_HEADROOM
--#define IFF_MACSEC			IFF_MACSEC
--#define IFF_NO_RX_HANDLER		IFF_NO_RX_HANDLER
--#define IFF_FAILOVER			IFF_FAILOVER
--#define IFF_FAILOVER_SLAVE		IFF_FAILOVER_SLAVE
--#define IFF_L3MDEV_RX_HANDLER		IFF_L3MDEV_RX_HANDLER
--#define IFF_TX_SKB_NO_LINEAR		IFF_TX_SKB_NO_LINEAR
--
- /* Specifies the type of the struct net_device::ml_priv pointer */
- enum netdev_ml_priv_type {
- 	ML_PRIV_NONE,
--- 
-2.45.2
-
+Thanks.
 
