@@ -1,108 +1,184 @@
-Return-Path: <netdev+bounces-114909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97AF8944A8C
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:43:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343CB944A93
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:45:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D9CB22981
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:43:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5840C1C24063
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E601518E02F;
-	Thu,  1 Aug 2024 11:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54EA194139;
+	Thu,  1 Aug 2024 11:45:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F51189B95;
-	Thu,  1 Aug 2024 11:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE49213E02D;
+	Thu,  1 Aug 2024 11:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722512588; cv=none; b=eee8LPQ+ttN1hcTVVScVdVYuQSXwM1kLtxZY7/NvWiEb144InMvXj7tGTBnq2gyHOPm2zQhpxaULpx3ZSQnmECoKZfLKgNaRk0GogSJ4CF4mFmlu78wn23p9U1P0/JaDq1h93aB+cgYVxbnpJrbAWHxFCf1zYtlN2D6ZO5CSQBI=
+	t=1722512719; cv=none; b=DQvH+ZmBgGjpJXELg8g5MypiqCK+S5roBMTvGFR25ISYtCbzWLyXqW4niNOFoH2HBP7RUyKeTnRDRY0sSvgxNxeNQldBegThfW+HSkNPS7amftWNhKSGZO7uqz4SDeM2Ua7x4yBl+mxRw6yQMl1zDKcCYSptg5zCUsQy3zZZY6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722512588; c=relaxed/simple;
-	bh=Y1Qa+XJrdmc4zMG+gQhaBZOIJ+0ogotagu3QPj36hVg=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tMANIUh5WPvV1wf9IGLLNUWqgG1UmmVOkwuaIyeNEa1U9DxU72uaDjA1iLvUDRDAyd+VTtr00rPOZDzYt/eGOyBUBsPxRUSxdJ8wZvkdxJl7z7djkyRHYm/XcVMTVS/ww+0mtDu4PfiaiqmHqF40/wgqtym8lEmJnPQNFPxTcDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WZRq030LGz6K9rl;
-	Thu,  1 Aug 2024 19:40:28 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5CC54140CB1;
-	Thu,  1 Aug 2024 19:43:04 +0800 (CST)
-Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 1 Aug
- 2024 12:43:03 +0100
-Date: Thu, 1 Aug 2024 12:43:03 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: <admiyo@os.amperecomputing.com>
-CC: Robert Moore <robert.moore@intel.com>, "Rafael J. Wysocki"
-	<rafael.j.wysocki@intel.com>, Len Brown <lenb@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jeremy Kerr
-	<jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>, "David
- S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Sudeep Holla
-	<sudeep.holla@arm.com>, Huisong Li <lihuisong@huawei.com>
-Subject: Re: [PATCH v5 2/3] mctp pcc: Allow PCC Data Type in MCTP resource.
-Message-ID: <20240801124303.000040ce@Huawei.com>
-In-Reply-To: <20240712023626.1010559-3-admiyo@os.amperecomputing.com>
-References: <20240712023626.1010559-1-admiyo@os.amperecomputing.com>
-	<20240712023626.1010559-3-admiyo@os.amperecomputing.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1722512719; c=relaxed/simple;
+	bh=ZFMoUzY5E8lLLv4LL/iZum5Y0YaLE+OHzfNurcyxX5E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MDwGtFFojETHwncPOj2+6zDd9wNSsBqDYxbWPTgRrkXK3tRnFB9VjBwgCjgoYcVKt5poPM1Q+lFLlFuT+OoAm3RJ5ZZn10bF1QQTu3Ws+1xctuADUKf1xDRyYKl5dpqtpld/tnsgCWcCga5Dxl74WmqDS1Jm/+GKBwDWu+Riu0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WZRwD3JGVz1L9Ff;
+	Thu,  1 Aug 2024 19:45:00 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 23491180AE5;
+	Thu,  1 Aug 2024 19:45:13 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 19:45:09 +0800
+Message-ID: <51b6b614-66d7-1acc-a676-b7302537e1fb@huawei-partners.com>
+Date: Thu, 1 Aug 2024 14:45:04 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>, <alx@kernel.org>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+ <ZqijJPrnCnGnVGkq@google.com>
+ <0a3b8596-f3f3-f617-c40d-de54e8ff05f0@huawei-partners.com>
+ <ZqtlJZMHVf-otlOq@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZqtlJZMHVf-otlOq@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Thu, 11 Jul 2024 22:36:25 -0400
-admiyo@os.amperecomputing.com wrote:
-
-> From: Adam Young <admiyo@os.amperecomputing.com>
+8/1/2024 1:36 PM, Günther Noack wrote:
+> On Wed, Jul 31, 2024 at 08:20:41PM +0300, Mikhail Ivanov wrote:
+>> 7/30/2024 11:24 AM, Günther Noack wrote:
+>>> On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
+>>>> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
+>>>> ports to forbid a malicious sandboxed process to impersonate a legitimate
+>>>> server process. However, bind(2) might be used by (TCP) clients to set the
+>>>> source port to a (legitimate) value. Controlling the ports that can be
+>>>> used for listening would allow (TCP) clients to explicitly bind to ports
+>>>> that are forbidden for listening.
+>>>>
+>>>> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+>>>> access right that restricts listening on undesired ports with listen(2).
+>>>
+>>> Nit: I would turn around the first two commit message paragraphs and describe
+>>> your changes first, before explaining the problems in the bind(2) support.  I
+>>> was initially a bit confused that the description started talking about
+>>> LANDLOCK_ACCESS_NET_BIND_TCP.
+>>>
+>>> General recommendations at:
+>>> https://www.kernel.org/doc/html/v6.10/process/submitting-patches.html#describe-your-changes
+>>
+>> I consider the first paragraph as a problem statement for this patch.
+>> According to linux recommendations problem should be established before
+>> the description of changes. Do you think that the changes part should
+>> stand before the problem anyway?
 > 
-> Note that this patch is for code that will be merged
-> in via ACPICA changes.  The corresponding patch in ACPCA
-Typo in ACPICA
+> Up to you. To be fair, I'm sold on the approach in this patchset anyway :)
 
-Add a link to the patch in the acpica tree as then
-its easier to identify exactly what needs pulling in before
-this merges.
+Nice :)
 
-> has already merged. Thus, no changes can be made to this patch.
 > 
-> Signed-off-by: Adam Young <admiyo@os.amperecomputing.com>
-> ---
->  drivers/acpi/acpica/rsaddr.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/acpi/acpica/rsaddr.c b/drivers/acpi/acpica/rsaddr.c
-> index fff48001d7ef..9f8cfdc51637 100644
-> --- a/drivers/acpi/acpica/rsaddr.c
-> +++ b/drivers/acpi/acpica/rsaddr.c
-> @@ -282,9 +282,10 @@ acpi_rs_get_address_common(struct acpi_resource *resource,
->  
->  	/* Validate the Resource Type */
->  
-> -	if ((address.resource_type > 2) && (address.resource_type < 0xC0)) {
-> +	if (address.resource_type > 2 &&
-> +	    address.resource_type < 0xC0 &&
-> +	    address.resource_type != 0x0A)
->  		return (FALSE);
-> -	}
->  
->  	/* Get the Resource Type and General Flags */
->  
+>>> When we have the documentation wording finalized,
+>>> please send an update to the man pages as well,
+>>> for this and other documentation updates.
+>>
+>> Should I send it after this patchset would be accepted?
+> 
+> Yes, that would be the normal process which we have been following so far.
+> 
+> (I don't like the process much either, because it decouples feature development
+> so far from documentation writing, but it's what we have for now.)
+> 
+> An example patch which does that for the network bind(2) and connect(2) features
+> (and where I would still like a review from Konstantin) is:
+> https://lore.kernel.org/all/20240723101917.90918-1-gnoack@google.com/
 
+got it
+
+> 
+> 
+>>> Small remarks on what I've done here:
+>>>
+>>> * I am avoiding the word "binding" when referring to the automatic assignment to
+>>>     an ephemeral port - IMHO, this is potentially confusing, since bind(2) is not
+>>>     explicitly called.
+>>> * I am also dropping the "It should be noted" / "Note that" phrase, which is
+>>>     frowned upon in man pages.
+>>
+>> Didn't know that, thanks
+> 
+> Regarding "note that", see
+> https://lore.kernel.org/all/0aafcdd6-4ac7-8501-c607-9a24a98597d7@gmail.com/
+> https://lore.kernel.org/linux-man/20210729223535.qvyomfqvvahzmu5w@localhost.localdomain/
+> https://lore.kernel.org/linux-man/20230105225235.6cjtz6orjzxzvo6v@illithid/
+> (The "Kemper notectomy")
+> 
+> This came up in man page reviews, but we'll have an easier time keeping the
+> kernel and man page documentation in sync if we adhere to man page style
+> directly.  (The man page style is documented in man-pages(7) and contains some
+> groff-independent wording advice as well.)
+
+Ok, such phrases should be really avoided in kernel as well.
+
+> 
+> 
+>>> If I understand correctly, these are cases where we use TCP on top of protocols
+>>> that are not IP (or have an additional layer in the middle, like TLS?).  This
+>>> can not be recognized through the socket family or type?
+>>
+>> ULP can be used in the context of TCP protocols as an additional layer
+>> (currently supported only by IP and MPTCP), so it cannot be recognized
+>> with family or type. You can check this test [1] in which TCP IP socket
+>> is created with ULP control hook.
+>>
+>> [1] https://lore.kernel.org/all/20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com/
+> 
+> Thanks, this is helpful.
+> 
+> For reference, it seems that ULP were introduced in
+> https://lore.kernel.org/all/20170614183714.GA80310@davejwatson-mba.dhcp.thefacebook.com/
+> 
+> 
+>>> Do we have cases where we can run TCP on top of something else than plain IPv4
+>>> or IPv6, where the clone method exists?
+>>
+>> Yeah, MPTCP protocol for example (see net/mptcp/subflow.c). ULP control
+>> hook is supported only by IP and MPTCP, and in both cases
+>> clone method is checked during listen(2) execution.
+> 
+> 
+>>> Aren't the socket type and family checks duplicated with existing logic that we
+>>> have for the connect(2) and bind(2) support?  Should it be deduplicated, or is
+>>> that too messy?
+>>
+>> bind(2) and connect(2) hooks also support AF_UNSPEC family, so I think
+>> such helper is gonna complicate code a little bit. Also it can
+>> complicate switch in current_check_access_socket().
+> 
+> OK, sounds good. 👍
+> 
+> —Günther
 
