@@ -1,177 +1,239 @@
-Return-Path: <netdev+bounces-114804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 914049443A1
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:14:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ACE2944422
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 009DFB24DBA
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 06:14:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBA611F20419
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 06:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F162B171089;
-	Thu,  1 Aug 2024 06:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753A7170A13;
+	Thu,  1 Aug 2024 06:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbTOcpOp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AC715853F
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 06:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C68170A02
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 06:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722492686; cv=none; b=Yp6F30X+pXirpOSRlz/bF9dzqnKETkmHHrF6r/gdhiGsbMyWtUW9bH8b4WmG+3faqbfJLhMpbB9kpbcbmXB1I/kD63BYV2e7sKQ4RINWyeVPyKrLJm6dImgztapSjUx6AZ9UpF35UHpaPrZND9kH/K7LYZ+LzD/5L7VvcDl4ELw=
+	t=1722492816; cv=none; b=LcoEGbzgsBsPZ4ihus7nwwEQ+FTdiDg00tTYczBhkd3ScNiPiEIr99bW/f9sOXQimls6FBZjcdNUo5ORcLLl5NhEHzG1Lj2eLLLuvM3yGYt9yz/zJ+IcPLYmBg4CFlwd+lUf9KiMcPaEw7lJkAPJEVr+n+ZDGrxuILdsU/RqFpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722492686; c=relaxed/simple;
-	bh=TmVbMhXiLmTeoD9N4OuEuRD9H7Rc5Vut8F90dAAd9jM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cRe8+PVbES5yKbh0ETQfh9N+LVdhGPpd24DQvSRurFMuy2T5Itfqcoi8HLQXlGIa/NXb2FyCET6QpaGW9Jy0ibsxZiLJ2bqjwcBf2uS7pUHNUyoufnCEUQ9cJNepz4/3mgtOLHbVwpnv4UYjED1nTYFbJumDKnqKVPeE1tZDVWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81f890b6fa6so1108499739f.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 23:11:25 -0700 (PDT)
+	s=arc-20240116; t=1722492816; c=relaxed/simple;
+	bh=xKmXPWxcWyaUd8tDKHhbzOC9Wt5MRRHYTUlepiECDRE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f/nI8633+Qh/GBTjNLfM/yzudNHYjSw29fwAOmA/S/zpcQxIqypx5QQIl4AO58G/3jwp9aqAFNoxCEJ7bSY21fYSrZaRMO2TSW8NErzF5/no47O5CrlEoSghtDpsMNpTmkz+J0VS/JEzujxVgyt8tc1w2WHOOT9x5HjeIxdz3/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gbTOcpOp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722492813;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LIY7FTpGT9UjcMy+x0teV1zr33WWvG/GjniOJ5Es5Xo=;
+	b=gbTOcpOpLossvULXUCvgjop7Yw28Ohz9GR4uH1tPPRyGjsuK/kLo7b5Ln8p4NdmFxXNKHm
+	5MdZ4QGOFdKjTAaoB3aUQHzIR/YbsMqVeYXn7HoQwXxb8RbfFHBTtdD0OsVIVn9zeN31rN
+	JRxEnggM2UmFUN65Eu9C2NekCBv5imA=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-184-sOber0e-P_-RFJ6vlcC1zQ-1; Thu, 01 Aug 2024 02:13:32 -0400
+X-MC-Unique: sOber0e-P_-RFJ6vlcC1zQ-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-7a28217cfecso6825428a12.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 23:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722492684; x=1723097484;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KTp/HXLZJNQkU65Etniqvk0Blau2IcJzy01HL1UhCpg=;
-        b=lmclctGVKjTf7F1140uzPF3Y5xP7ruopmF9xeFF+RnuMMnxqtZCiO2G4uFD/wd045D
-         LI/NP0qCkaUvXDO8rJbpB5AIJylmy599xP/fj3dYE03mRsNMnsD6c0KAN0sXUAcQbswp
-         oaXkudlMenwaCzWccRG3JrWuBCBseeLpSUFDZpokKb1E4Sssabig564brVu7uWNVsylv
-         1RkHKFTKKVW8VLQlogY/m4+Fm4KG8AmHmXq+IxJwmOaK/T8JfQzrPdAxH83VOcH0/mfZ
-         uLpSF5KHiL/p5UShU3bWe+L5x+VABPznpPoiG3NSuRzHhbBid21v54iPYlulOV1LatYh
-         XjWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUA1Y6uwnAudevlVpBwEZoMsKXsxlkeQWLCEvoCeaccWTu9zE/rjj6tHmBiGxY5H2tn9dV/GRt/r6WntsHv/5vOjFFNCVrN
-X-Gm-Message-State: AOJu0YwJle6Nayauaq/B1UZ6gRbR3uLbojzsieUKNSLGyIHClCE3D+Qp
-	Jq2IaJwmNkQE5sC9p+Yzlufk78i2AQolvLydO6z/cnDvFM5stysALC+4K0ac+8rLznXW4f3+vvO
-	85NnhSM+ARah63ZKsHbCJSJPUJvXizwcdkTN+CyiHW4t5vvUAOL9v2CA=
-X-Google-Smtp-Source: AGHT+IG/kojLvRQfNSDwZVbWTcmC2tSP+HbH5brmjUDLobYoZ81nj0mzgSPuHvtF8Eehq08YzMy/43bnIV1Dn5x2dONb1kqM/sZM
+        d=1e100.net; s=20230601; t=1722492811; x=1723097611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LIY7FTpGT9UjcMy+x0teV1zr33WWvG/GjniOJ5Es5Xo=;
+        b=H5kDHCugV6ytNSNOur+oNoRfr3VNsfdJrgbwPcMSrsPRv0O3gcileXut2LADYkc3eB
+         d9NoL2sDg32oSx30oWjZseFMMOdWrXQ9wvsHxwjvZJfUDQh04vk+/8pEbb3nZiCDsdhk
+         STt/9w6a66efAUx4idxauP/JlF6Vcqv7I5MvnK7USu/FlCTVbcVoePLxvliVBcmFsTmY
+         S9zgt+MAuNUmydybVGFwy/5ykwuWHBD8G7y6YtfEzt44/di38HSWxl8Qf4kLlB0c7gZc
+         sEjxP4OLLT+4oUXoQ1dHrhfNiWvF+n6CjKagIWnvYz+ibqxBLIOFJsSff+58XLvwEQ6+
+         PKbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVw0e3oMfeKkQX03UDjq0jXq7mNYdxtgVEI8Yxixoz/JINfVUq7Q9vmQtJop9tSymCzB4XfPeUAIIAUPGfCa1esJL4+rrB9
+X-Gm-Message-State: AOJu0YyI42j4HxTPb9kajq9+Dq/QYXoW99GKkuJZSFy4FEcXb/GGeBU9
+	iTFioH9DVlhipf8BbAclopzC24ACQApvVa+5ZOvmB1bsCV2bDR52uemXV3+cNbpIJjEDtS+V7Qi
+	lcrljarGGGyy3xZu7JYW0Z6uBw7BxdLoVSknLNXN8xjqDLdpLkxMxnHpM+7lm8aiVqLZHH483o0
+	grKeb205wMBs7PmKvenLJgJFrp8gsh
+X-Received: by 2002:a05:6a20:914f:b0:1be:c929:e269 with SMTP id adf61e73a8af0-1c68d0270f3mr2374338637.34.1722492811267;
+        Wed, 31 Jul 2024 23:13:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGY0U3r9f0bMsnnjn/d48QqLtBqSaMitlZrQfZm2ufPzt3F6BQUQlPgO/udGS4JKPAiLQhLgZE5LdZidATH6a8=
+X-Received: by 2002:a05:6a20:914f:b0:1be:c929:e269 with SMTP id
+ adf61e73a8af0-1c68d0270f3mr2374308637.34.1722492810630; Wed, 31 Jul 2024
+ 23:13:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2115:b0:4c0:a8a5:81cc with SMTP id
- 8926c6da1cb9f-4c8c9c6bb20mr91477173.3.1722492684523; Wed, 31 Jul 2024
- 23:11:24 -0700 (PDT)
-Date: Wed, 31 Jul 2024 23:11:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000096ee8f061e991433@google.com>
-Subject: [syzbot] [wireless?] [usb?] WARNING in ath6kl_bmi_get_target_info (2)
-From: syzbot <syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com>
-To: kvalo@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20240731025947.23157-1-jasowang@redhat.com> <20240731025947.23157-4-jasowang@redhat.com>
+ <20240731172020-mutt-send-email-mst@kernel.org> <CACGkMEvXfZJbCs0Fyi3EdYja37+D-o+79csXJYsBo0s+j2e5iA@mail.gmail.com>
+ <20240801015344-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240801015344-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 1 Aug 2024 14:13:18 +0800
+Message-ID: <CACGkMEstXNPWqhxBXiU3_VnXgQrwHgJKPONRTisbG9mRMkosuA@mail.gmail.com>
+Subject: Re: [PATCH V4 net-next 3/3] virtio-net: synchronize operstate with
+ admin state on up/down
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>, 
+	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Aug 1, 2024 at 1:58=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Thu, Aug 01, 2024 at 10:16:00AM +0800, Jason Wang wrote:
+> > > > @@ -2885,6 +2886,25 @@ static void virtnet_cancel_dim(struct virtne=
+t_info *vi, struct dim *dim)
+> > > >       net_dim_work_cancel(dim);
+> > > >  }
+> > > >
+> > > > +static void virtnet_update_settings(struct virtnet_info *vi)
+> > > > +{
+> > > > +     u32 speed;
+> > > > +     u8 duplex;
+> > > > +
+> > > > +     if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_SPEED_DUPLEX))
+> > > > +             return;
+> > > > +
+> > > > +     virtio_cread_le(vi->vdev, struct virtio_net_config, speed, &s=
+peed);
+> > > > +
+> > > > +     if (ethtool_validate_speed(speed))
+> > > > +             vi->speed =3D speed;
+> > > > +
+> > > > +     virtio_cread_le(vi->vdev, struct virtio_net_config, duplex, &=
+duplex);
+> > > > +
+> > > > +     if (ethtool_validate_duplex(duplex))
+> > > > +             vi->duplex =3D duplex;
+> > > > +}
+> > > > +
+> > >
+> > > I already commented on this approach.  This is now invoked on each op=
+en,
+> > > lots of extra VM exits. No bueno, people are working hard to keep set=
+up
+> > > overhead under control. Handle this in the config change interrupt -
+> > > your new infrastructure is perfect for this.
+> >
+> > No, in this version it doesn't. Config space read only happens if
+> > there's a pending config interrupt during ndo_open:
+> >
+> > +       if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+> > +               if (vi->status & VIRTIO_NET_S_LINK_UP)
+> > +                       netif_carrier_on(vi->dev);
+> > +               virtio_config_driver_enable(vi->vdev);
+> > +       } else {
+> > +               vi->status =3D VIRTIO_NET_S_LINK_UP;
+> > +               netif_carrier_on(dev);
+> > +               virtnet_update_settings(vi);
+> > +       }
+>
+> Sorry for being unclear, I was referring to !VIRTIO_NET_F_STATUS.
+> I do not see why do we need to bother re-reading settings in this case at=
+ all,
+> status is not there, nothing much changes.
 
-syzbot found the following issue on:
+Ok, let me remove it from the next version.
 
-HEAD commit:    1722389b0d86 Merge tag 'net-6.11-rc1' of git://git.kernel...
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=1467299d980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e3044dca4d5f6dbe
-dashboard link: https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=166a0275980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13552c6d980000
+>
+>
+> > >
+> > >
+> > > >  static int virtnet_open(struct net_device *dev)
+> > > >  {
+> > > >       struct virtnet_info *vi =3D netdev_priv(dev);
+> > > > @@ -2903,6 +2923,16 @@ static int virtnet_open(struct net_device *d=
+ev)
+> > > >                       goto err_enable_qp;
+> > > >       }
+> > > >
+> > > > +     if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+> > > > +             if (vi->status & VIRTIO_NET_S_LINK_UP)
+> > > > +                     netif_carrier_on(vi->dev);
+> > > > +             virtio_config_driver_enable(vi->vdev);
+> > > > +     } else {
+> > > > +             vi->status =3D VIRTIO_NET_S_LINK_UP;
+> > > > +             netif_carrier_on(dev);
+> > > > +             virtnet_update_settings(vi);
+> > > > +     }
+> > > > +
+> > > >       return 0;
+> > > >
+> > > >  err_enable_qp:
+> > > > @@ -3381,12 +3411,18 @@ static int virtnet_close(struct net_device =
+*dev)
+> > > >       disable_delayed_refill(vi);
+> > > >       /* Make sure refill_work doesn't re-enable napi! */
+> > > >       cancel_delayed_work_sync(&vi->refill);
+> > > > +     /* Make sure config notification doesn't schedule config work=
+ */
+> > >
+> > > it's clear what this does even without a comment.
+> > > what you should comment on, and do not, is *why*.
+> >
+> > Well, it just follows the existing style, for example the above said
+> >
+> > "/* Make sure refill_work doesn't re-enable napi! */"
+>
+> only at the grammar level.
+> you don't see the difference?
+>
+>         /* Make sure refill_work doesn't re-enable napi! */
+>         cancel_delayed_work_sync(&vi->refill);
+>
+> it explains why we cancel: to avoid re-enabling napi.
+>
+> why do you cancel config callback and work?
+> comment should say that.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/78a5695ed7e2/disk-1722389b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1507b4c5000d/vmlinux-1722389b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/449aa9e94d6b/bzImage-1722389b.xz
+Something like "Prevent the config change callback from changing
+carrier after close"?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+>
+>
+>
+> > >
+> > > > +     virtio_config_driver_disable(vi->vdev);
+> > > > +     /* Make sure status updating is cancelled */
+> > >
+> > > same
+> > >
+> > > also what "status updating"? confuses more than this clarifies.
+> >
+> > Does "Make sure the config changed work is cancelled" sounds better?
+>
+> no, this just repeats what code does.
+> explain why you cancel it.
 
-usb 1-1: new high-speed USB device number 2 using dummy_hcd
-usb 1-1: New USB device found, idVendor=0cf3, idProduct=9375, bcdDevice=1a.9e
-usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-usb 1-1: config 0 descriptor??
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 2343 at drivers/net/wireless/ath/ath6kl/bmi.c:90 ath6kl_bmi_get_target_info+0x4f5/0x5b0 drivers/net/wireless/ath/ath6kl/bmi.c:90
-Modules linked in:
-CPU: 0 UID: 0 PID: 2343 Comm: kworker/0:2 Not tainted 6.10.0-syzkaller-g1722389b0d86 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-Workqueue: usb_hub_wq hub_event
-RIP: 0010:ath6kl_bmi_get_target_info+0x4f5/0x5b0 drivers/net/wireless/ath/ath6kl/bmi.c:90
-Code: 77 fc ff ff e8 4c fa b1 fd be 08 00 00 00 bd f3 ff ff ff 48 c7 c7 20 db 7f 87 e8 26 42 fe ff e9 5c fd ff ff e8 2c fa b1 fd 90 <0f> 0b 90 bd ea ff ff ff e9 49 fd ff ff e8 79 ec 06 fe e9 e7 fb ff
-RSP: 0018:ffffc900042eef48 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff8881135c0e20 RCX: ffffffff83a15e8a
-RDX: ffff88811394d700 RSI: ffffffff83a16014 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000005 R09: 000000000000000c
-R10: 0000000000000000 R11: ffffffff81004e0a R12: ffffc900042ef058
-R13: 1ffff9200085ddeb R14: ffff8881135c0e50 R15: ffffc900042ef05c
-FS:  0000000000000000(0000) GS:ffff8881f6200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055ea8cfc1b18 CR3: 0000000115c00000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ath6kl_core_init+0x1a0/0x11a0 drivers/net/wireless/ath/ath6kl/core.c:101
- ath6kl_usb_probe+0xcd2/0x1450 drivers/net/wireless/ath/ath6kl/usb.c:1168
- usb_probe_interface+0x309/0x9d0 drivers/usb/core/driver.c:399
- call_driver_probe drivers/base/dd.c:578 [inline]
- really_probe+0x23e/0xa90 drivers/base/dd.c:657
- __driver_probe_device+0x1de/0x440 drivers/base/dd.c:799
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:829
- __device_attach_driver+0x1df/0x310 drivers/base/dd.c:957
- bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:457
- __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1029
- bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:532
- device_add+0x114b/0x1a70 drivers/base/core.c:3679
- usb_set_configuration+0x10cb/0x1c50 drivers/usb/core/message.c:2210
- usb_generic_driver_probe+0xb1/0x110 drivers/usb/core/generic.c:254
- usb_probe_device+0xec/0x3e0 drivers/usb/core/driver.c:294
- call_driver_probe drivers/base/dd.c:578 [inline]
- really_probe+0x23e/0xa90 drivers/base/dd.c:657
- __driver_probe_device+0x1de/0x440 drivers/base/dd.c:799
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:829
- __device_attach_driver+0x1df/0x310 drivers/base/dd.c:957
- bus_for_each_drv+0x157/0x1e0 drivers/base/bus.c:457
- __device_attach+0x1e8/0x4b0 drivers/base/dd.c:1029
- bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:532
- device_add+0x114b/0x1a70 drivers/base/core.c:3679
- usb_new_device+0xd90/0x1a10 drivers/usb/core/hub.c:2651
- hub_port_connect drivers/usb/core/hub.c:5521 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
- port_event drivers/usb/core/hub.c:5821 [inline]
- hub_event+0x2e66/0x4f50 drivers/usb/core/hub.c:5903
- process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x6c8/0xf20 kernel/workqueue.c:3390
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+Does something like "Make sure carrier changes have been done by the
+config change callback" works?
 
+Thanks
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+>
+>
+> --
+> MST
+>
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
