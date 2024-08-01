@@ -1,74 +1,131 @@
-Return-Path: <netdev+bounces-114753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90229943E48
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:20:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC1D943F35
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:35:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EA4D1F2283A
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:20:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF0D0280C8B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F7B14A0BC;
-	Thu,  1 Aug 2024 00:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3D21BF327;
+	Thu,  1 Aug 2024 00:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVtBm2O7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JN7YwjgT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E785132116;
-	Thu,  1 Aug 2024 00:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5141BE87C;
+	Thu,  1 Aug 2024 00:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722472367; cv=none; b=odi7oeBLhEOXIHizv10uCt/rnJf107pDHlVDpvSschE0QVEV1dUBrph9KDzedlip1zAcxBfSrL4T3PQwE19goFo6n/60AxumuAmw2N/EvuzohLBKsQo/Vysfz6MIsTTerBt8gA63NFaEt11EjH7jMMbx33+ILj2GeeKvCa2+0Oo=
+	t=1722472684; cv=none; b=jHfFqdfRdKF2s5cfX3sDwLVdyTZCBzK0AHImIrtxvi8J5woX8bL33PAbgH3Mq9fiCLXZGTbEpUu7iDp6pctDJglzcYF4gM1ARaky+FYAV6Rje62HEyylJ03KUIFiCOBWbsm5ku1nAaUX897TQG/8Hau/iNoZ2n3HgnG8sGpfbI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722472367; c=relaxed/simple;
-	bh=i4E4vUbJdf2hJ7IZEv4pboAln3L4qmN9XL36u9p/qqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HRoL3RO4qg6WGcaAzlp0+1dhz/dcwGTR1mSZDNEiYlFlke97UxSYspl5P23Wy9SHQuVd2hTwJxKdPOVevZp30ANlZ+zGVcw0jGss578mTPMaEfwsO1z8aHNoSC2mOdRnMU3DjS7SQ+5uECjlhUzgskUqI4we/xjbE3vZy0dzBvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVtBm2O7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794B2C116B1;
-	Thu,  1 Aug 2024 00:32:46 +0000 (UTC)
+	s=arc-20240116; t=1722472684; c=relaxed/simple;
+	bh=AD63yG5vTEoEuFTqe9zrz6n1nLcYLbIIyUjYULAzZjs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OT+BqT9Xk0sayWvIQercm8uV+DxCshjzqaZ9cI6P5JDs1i4qjyniSB5zptcrgbJ/gm3YM7ONpXMht4r9QcIBYuDD0x8KHn9VqlSV8EnHmmKVOR908O1ADlQaoHYQ7VdUv8gi65Yn+tTdhm/DRW0UPz1PrK3Q+XLKvjA0wFtpggo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JN7YwjgT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92381C4AF0E;
+	Thu,  1 Aug 2024 00:38:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722472366;
-	bh=i4E4vUbJdf2hJ7IZEv4pboAln3L4qmN9XL36u9p/qqk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UVtBm2O7jnIn06XbAIbUQnFDBseutZna17W46JKTXvqIyl6riAMnBEphZCP3WEPRW
-	 4Xtvz856s0VW5LLa8QPjA20iw3i+7Klb4E5EoOB1wXuN/+VpPBq1zeLU2Av0STtIH0
-	 RPLDwsYSZvEC2x2v/2X1st/GT8n37NnkF7yinXGK0NSF3IWNQLx6pOYpt7Gs+SnflQ
-	 GkC41hEuI8hQnCv7O+RIkmb57ylU6KNxW01+oYS0QiwZfN/wBEIQMDFYxvIy0GTt1l
-	 87vWn4EVzXWIvhvz5sbHap8sSHmaw611qohx6WO79Tm5XnkooF5r7eO4Bm+FbDKbCE
-	 R8d60HvzAqryA==
-Date: Wed, 31 Jul 2024 17:32:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, <netdev@vger.kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>, Shuah
- Khan <shuah@kernel.org>, "Joe Damato" <jdamato@fastly.com>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 1/2] selftests: net-drv: exercise queue
- stats when the device is down
-Message-ID: <20240731173245.2968988d@kernel.org>
-In-Reply-To: <87cymt7pmu.fsf@nvidia.com>
-References: <20240730223932.3432862-1-sdf@fomichev.me>
-	<87cymt7pmu.fsf@nvidia.com>
+	s=k20201202; t=1722472684;
+	bh=AD63yG5vTEoEuFTqe9zrz6n1nLcYLbIIyUjYULAzZjs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JN7YwjgTD5M8kHWo+m8elTcuwoUdmB6mOdMMMWksSDu67Bne3N9aXZR/Uwy4CCGeZ
+	 Te2kHjT9dlZ+Qdxl3ORuGT3v/wIvP0PeYTA59jEVKLpOWHP5rFuyScyLiHUsLBFWSp
+	 Oor1IQoRj1zy8FRdJdkr8jzFe3lhc+fLYMwgqRfdEc2GkqqDPqoBB7du7GKU5v9n+E
+	 39gHZLAG9PM90VthjbS4a197uiCngdeHsemtPFHGiO4a/uHaGDyIOL8/ZyIKja/i2m
+	 31VtNq96oh4RlBPg21asMXlzi1mPPC3uuzsQPyQty43LSAFkCKuqh+iwo31Liyd7oO
+	 lQZ+wMb0uul+w==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: yunshui <jiangyunshui@kylinos.cn>,
+	syzbot <syzkaller@googlegroups.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Sasha Levin <sashal@kernel.org>,
+	martin.lau@linux.dev,
+	ast@kernel.org,
+	andrii@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 18/38] bpf, net: Use DEV_STAT_INC()
+Date: Wed, 31 Jul 2024 20:35:24 -0400
+Message-ID: <20240801003643.3938534-18-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240801003643.3938534-1-sashal@kernel.org>
+References: <20240801003643.3938534-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.10.223
+Content-Transfer-Encoding: 8bit
 
-On Wed, 31 Jul 2024 13:34:58 +0200 Petr Machata wrote:
-> > +        qstat = netfam.qstats_get({"ifindex": cfg.ifindex}, dump=True)
-> > +    except NlError as e:
-> > +        if e.error == 95:  
-> 
-> Could you do this as if e.error == errno.ENOTSUP?
+From: yunshui <jiangyunshui@kylinos.cn>
 
-just to be clear EOPNOTSUPP ..
+[ Upstream commit d9cbd8343b010016fcaabc361c37720dcafddcbe ]
+
+syzbot/KCSAN reported that races happen when multiple CPUs updating
+dev->stats.tx_error concurrently. Adopt SMP safe DEV_STATS_INC() to
+update the dev->stats fields.
+
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: yunshui <jiangyunshui@kylinos.cn>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Link: https://lore.kernel.org/bpf/20240523033520.4029314-1-jiangyunshui@kylinos.cn
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/filter.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index a3101cdfd47b9..001da7ccb7089 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2266,12 +2266,12 @@ static int __bpf_redirect_neigh_v6(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = bpf_out_neigh_v6(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		dev->stats.tx_errors++;
++		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	dev->stats.tx_errors++;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+@@ -2379,12 +2379,12 @@ static int __bpf_redirect_neigh_v4(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = bpf_out_neigh_v4(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		dev->stats.tx_errors++;
++		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	dev->stats.tx_errors++;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+-- 
+2.43.0
+
 
