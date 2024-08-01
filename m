@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-114767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79900943FDC
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:54:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E88943FDA
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5B21C229A4
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:54:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CCB61F214B7
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49A61411E7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C961B140E38;
 	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a8ulwXHo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxNywN8t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3ED140E22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B5913FD97
 	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722474637; cv=none; b=N9ir/D6SRSHjjgqMMT7ik5+WkT6IteyAqupYxCtoKKLiw/f/xZYZ5bAQ7DfyaJUJzZQoEEpIJeeFOb2AgmLmUjvLbrZnM5vvV5Ug4sQkCERAve2Vmxpnz89uTr0h+tR6PpnUktVKG1+K09GfYpQXGgnBetNecUt8FjBPmbpUw80=
+	t=1722474637; cv=none; b=Rgz4m2cLwAX6RlUVFFgVzUzV5FVKheAyeMsDaQfyFjLrb3HxkWUI5UWJIk4Uh9p15fVSe8l/hyEYHNgeQqKSzL4eClYyIEJR916OPYr+XsweNqp1mTsLlvWhKYEv9qgYyMp+8ap1mT5gdDekG99oOwW2BF5XhonSefUMsma2LF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722474637; c=relaxed/simple;
-	bh=R9tBx7ulIFoHU9TFRCFhG35DM+pO26fqQLqkm7P8bCI=;
+	bh=oTUQyDl2Ur5Qw6PzBT5LE7TUE+kJUnFcPG/aR2n1gzs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=i8Shx9gLjQTJGfvtTsHdqcqslxVhfWT0YN53L922pc8X+LLhmPnpG1OvdB5+RE8C/yOXo/b1tAp3AjZ64QX/jA8kSdtAVDOBVL4xXUiRdVIqTGRa4/Gbu6qIns687MGiXpeIV7dGS4l4rOIlevxaWatQj1mCfmrWo7gu6o/m7bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a8ulwXHo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 58C9BC4AF11;
+	 In-Reply-To:To:Cc; b=QqNkgdIJc+aP+mxaZIaZt2dmJH94aYmV5PLdUEjIGU7U+LKRHJjgFu3ELPgQrzDqQ2mAwZLPn0c0Pa2eINV6HOkaNdrJGG6OelFxMyTMMtjbrdcYdXY6YQsT1ptiR39oBKAeRaPP8ImQxcYz9yFty+uALdlDYbBHydgiQPH2ddA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxNywN8t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 49D4BC4AF0E;
 	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722474637;
-	bh=R9tBx7ulIFoHU9TFRCFhG35DM+pO26fqQLqkm7P8bCI=;
+	bh=oTUQyDl2Ur5Qw6PzBT5LE7TUE+kJUnFcPG/aR2n1gzs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=a8ulwXHofTDorPDTLaCiDPWhq8uBtKB08tHnF0hwR4G5GVd/MuFBNNkNys9yh8PwR
-	 M1EmjpSrC6OZeu90CdXjngw20iZakbMyZE4mbeaL/PqDTg4UhJ5p6WnQOOUwWpLmFM
-	 BD9w/N+5aiY38or95HlvCDPGVG6ttzjG2U6hjiI90SdDZcjLn0LpXI8308+YiZmr/E
-	 ggvB/TAVtp3/6s8q6aeQcSjjg+E3ncoK0xsbKi0sdx4ryQrhezGAiRQE/BRg3lXMJL
-	 eDV3I/I0GqgqI/UXHmY4/TM6zsDpTN+ZKnv5e3EFsvdY31l2QmlOZhwT/XQU4FlkYX
-	 zVNgFewJ7kCbQ==
+	b=lxNywN8t98Lo1O0Ga84/VwrMxhsz3z5y4BOm4Mhp3JYvQjaVD2ySX46BPUN33FALU
+	 IOgnwKxZlyeehq1J/1pDlInD2F8Xu6IT7ZwPJOYHpFK5YWM+NYgqxE6hxdqOMapOfJ
+	 9s9zp8gbalFvcj429kryCPzHGbyZ0OqN0q9hkYDe8L/XoYI2tzCpCX3e9MEyESe9iH
+	 W4veOa0RYnwtENATxgsi5RvPE/DLW8VE1edCFlkKQ4NixcVHqhohofw7FsO1nImT97
+	 IsmyVB7Zv1tm+p17HVrJCKXKX83s+bzO7gNbHa1S1US2g/MlHW7Jx2PSVhxtmEdZLs
+	 0dKmzRU03UEiw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 498FBC6E398;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37449C43140;
 	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] r8169: don't increment tx_dropped in case of
- NETDEV_TX_BUSY
+Subject: Re: [PATCH net 0/8] mlx5 misc fixes 2024-07-30
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172247463729.20901.9214004192278008480.git-patchwork-notify@kernel.org>
+ <172247463722.20901.3075314276833555628.git-patchwork-notify@kernel.org>
 Date: Thu, 01 Aug 2024 01:10:37 +0000
-References: <bbba9c48-8bac-4932-9aa1-d2ed63bc9433@gmail.com>
-In-Reply-To: <bbba9c48-8bac-4932-9aa1-d2ed63bc9433@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, pabeni@redhat.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
+References: <20240730061638.1831002-1-tariqt@nvidia.com>
+In-Reply-To: <20240730061638.1831002-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Jul 2024 21:51:52 +0200 you wrote:
-> The skb isn't consumed in case of NETDEV_TX_BUSY, therefore don't
-> increment the tx_dropped counter.
+On Tue, 30 Jul 2024 09:16:29 +0300 you wrote:
+> Hi,
 > 
-> Fixes: 188f4af04618 ("r8169: use NETDEV_TX_{BUSY/OK}")
-> Cc: stable@vger.kernel.org
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> This patchset provides misc bug fixes from the team to the mlx5 core and
+> Eth drivers.
+> 
+> Series generated against:
+> commit 301927d2d2eb ("Merge tag 'for-net-2024-07-26' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth")
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] r8169: don't increment tx_dropped in case of NETDEV_TX_BUSY
-    https://git.kernel.org/netdev/net/c/d516b187a9cc
+  - [net,1/8] net/mlx5: Always drain health in shutdown callback
+    https://git.kernel.org/netdev/net/c/1b75da22ed1e
+  - [net,2/8] net/mlx5: Fix error handling in irq_pool_request_irq
+    https://git.kernel.org/netdev/net/c/a4557b0b57c4
+  - [net,3/8] net/mlx5: DR, Fix 'stack guard page was hit' error in dr_rule
+    https://git.kernel.org/netdev/net/c/94a3ad6c0813
+  - [net,4/8] net/mlx5: Lag, don't use the hardcoded value of the first port
+    https://git.kernel.org/netdev/net/c/3fda84dc0903
+  - [net,5/8] net/mlx5: Fix missing lock on sync reset reload
+    https://git.kernel.org/netdev/net/c/572f9caa9e72
+  - [net,6/8] net/mlx5e: Require mlx5 tc classifier action support for IPsec prio capability
+    https://git.kernel.org/netdev/net/c/06827e27fdcd
+  - [net,7/8] net/mlx5e: Fix CT entry update leaks of modify header context
+    https://git.kernel.org/netdev/net/c/025f2b85a5e5
+  - [net,8/8] net/mlx5e: Add a check for the return value from mlx5_port_set_eth_ptys
+    https://git.kernel.org/netdev/net/c/3f8e82a020a5
 
 You are awesome, thank you!
 -- 
