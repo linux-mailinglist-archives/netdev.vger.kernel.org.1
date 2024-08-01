@@ -1,130 +1,135 @@
-Return-Path: <netdev+bounces-114937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A93944B60
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:33:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6BD944B66
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3FEF1C24525
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:33:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F388B22347
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1B61953B0;
-	Thu,  1 Aug 2024 12:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hLPkfTes"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862361A0720;
+	Thu,  1 Aug 2024 12:33:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B506549641;
-	Thu,  1 Aug 2024 12:33:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220B21A2C14;
+	Thu,  1 Aug 2024 12:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722515605; cv=none; b=tOrjS/1cjm/4LjU3iZ8lmRluvSXMjnaD+bm0ve2wcoyNiz3XRZ5imhAmau1qpJF0fTcJP7Pxn5MFRLLieJ9EncAxnFeFJ/bDn5V2PWo6JqVfGgOzf5FiUm7WrhzG1QDFl1rIx6An1PBbOBCXC6rw3nmeiLGANlxyEAc40cLTzkc=
+	t=1722515626; cv=none; b=Elrz4rkNcN9Z1QDy7bSXue0108yW2eqqji2C/pGksX42UBXZ0iMTpBThgs8+QBdVpmRFf+P3ZoxDuhmxEA8dqH+uXImFdnoXy0kg7/jak5r7mtwihMIQ6Q8dsn+RsIVEd13WFxVB56Kj/yCURTumpAOCWsWvHevrI8LahccHXpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722515605; c=relaxed/simple;
-	bh=ISfTAzbWUkV7/dEVJLW1JPTgrCRjPLNkivoDFJ7g9Qo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sa0AiX6HuJoW1c92Kq75jOtn4meEvX2LddixG4wNuE/cvmtLUmII+w0jYNsdS8P12T6B8tGCOln1ohCt5qiRKIoxQBiplsEA5IdnDqobcHJ5tv/mgnje/z1MgGbrPGB6o+gGOgY38xOoJAwHk4IXr8kgfFtQoc+jc+hWV680o6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hLPkfTes; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=kOJVYxF+5aHy0xm8sHyQfUFrcqHBhYqf0L3Q4EjM3HA=; b=hL
-	PkfTesPsel61q+lmzHyIHBSPAIrn1N0ETU+l4113Ef0lUe4A5IWIIw/JrKWqT+p6nfezqvosGT3Vd
-	rlrx6u3SwLwXVLUcFEIQ5FPjgZteEqrJGdFB7m+CjHkK3hEstMT7hg9oip+c5AyJ7P0LJZtQCYZXP
-	yS0z/LovpI2Oz3o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sZUzc-003m2R-Oh; Thu, 01 Aug 2024 14:33:16 +0200
-Date: Thu, 1 Aug 2024 14:33:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, sudongming1@huawei.com,
-	xujunsheng@huawei.com, shiyongbang@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next 09/10] net: hibmcge: Add a Makefile and
- update Kconfig for hibmcge
-Message-ID: <adc486e6-2f09-4438-a86e-f9ec42c88e77@lunn.ch>
-References: <20240731094245.1967834-1-shaojijie@huawei.com>
- <20240731094245.1967834-10-shaojijie@huawei.com>
- <49d41bc0-7a9e-4d2a-93c7-4e2bcb6d6987@lunn.ch>
- <0fe6e62f-a6cf-4a9d-9ccc-004570c3c46e@huawei.com>
+	s=arc-20240116; t=1722515626; c=relaxed/simple;
+	bh=oK5VaTjSO4mG0bsKvJPQ7P/12LWBIbxTN80yhfTWCcg=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=pWpVTWAWuIF93dAjvPzS73Hj7HuVtnEK2XyiqFO3rjBHHEE+BOEXy0u0A1q0jUnIhKGtLW+X6KFMbEhg/zIg4VZVioDs+Cm2T0CNTL6kHbqkvskYlDSmyUiz7bI7zi/ZNd9n25oLM35xKOMleOxBJC7RVe3wjE0/AUh5L5yO8D8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WZSyF3NfQzfZGH;
+	Thu,  1 Aug 2024 20:31:49 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 791F21800A0;
+	Thu,  1 Aug 2024 20:33:40 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 20:33:39 +0800
+Message-ID: <d5e9f50a-c3bd-4071-9de8-cc22cd0f5cfc@huawei.com>
+Date: Thu, 1 Aug 2024 20:33:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0fe6e62f-a6cf-4a9d-9ccc-004570c3c46e@huawei.com>
-
-On Thu, Aug 01, 2024 at 08:15:43PM +0800, Jijie Shao wrote:
-> 
-> on 2024/8/1 9:13, Andrew Lunn wrote:
-> > On Wed, Jul 31, 2024 at 05:42:44PM +0800, Jijie Shao wrote:
-> > > Add a Makefile and update Kconfig to build hibmcge driver.
-> > > 
-> > > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> > > ---
-> > >   drivers/net/ethernet/hisilicon/Kconfig          | 17 ++++++++++++++++-
-> > >   drivers/net/ethernet/hisilicon/Makefile         |  1 +
-> > >   drivers/net/ethernet/hisilicon/hibmcge/Makefile | 10 ++++++++++
-> > >   3 files changed, 27 insertions(+), 1 deletion(-)
-> > >   create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
-> > > 
-> > > diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
-> > > index 3312e1d93c3b..372854d15481 100644
-> > > --- a/drivers/net/ethernet/hisilicon/Kconfig
-> > > +++ b/drivers/net/ethernet/hisilicon/Kconfig
-> > > @@ -7,7 +7,7 @@ config NET_VENDOR_HISILICON
-> > >   	bool "Hisilicon devices"
-> > >   	default y
-> > >   	depends on OF || ACPI
-> > > -	depends on ARM || ARM64 || COMPILE_TEST
-> > > +	depends on ARM || ARM64 || COMPILE_TEST || X86_64
-> > It is normal to have COMPILE_TEST last.
-> 
-> ok，
-> 
-> > 
-> > Any reason this won't work on S390, PowerPC etc?
-> 
-> I have only compiled and tested on arm or x86.
-> I can't ensure that compile or work ok on other platforms.
-
-It is a sign of quality if it compiles on other platforms. The kernel
-APIs should hide away all the differences, if you are using them
-correctly. So i would take away all the platform depends at this
-level. Toolchains are easy to install apt-get
-c-compiler-s390x-linux-gnu etc. And 0-day will build it for you after
-a while on various platforms.
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH net-next 05/10] net: hibmcge: Implement some .ndo
+ functions
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-6-shaojijie@huawei.com>
+ <0e497b6f-7ab0-4a43-afc6-c5ad205aa624@lunn.ch>
+ <e8a56b1f-f3f3-4081-8c0d-4b829e659780@huawei.com>
+ <ffd2d708-60fb-4049-8c1b-fcfe43a78d57@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <ffd2d708-60fb-4049-8c1b-fcfe43a78d57@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
 
-> 
-> > 
-> > > +if ARM || ARM64 || COMPILE_TEST
-> > > +
-> > You would normally express this with a depends on.
-> 
-> Sorry, I can't understand how to convert if to depends on?
+on 2024/8/1 20:18, Andrew Lunn wrote:
+> On Thu, Aug 01, 2024 at 05:13:33PM +0800, Jijie Shao wrote:
+>> on 2024/8/1 8:51, Andrew Lunn wrote:
+>>>> +static int hbg_net_set_mac_address(struct net_device *dev, void *addr)
+>>>> +{
+>>>> +	struct hbg_priv *priv = netdev_priv(dev);
+>>>> +	u8 *mac_addr;
+>>>> +
+>>>> +	mac_addr = ((struct sockaddr *)addr)->sa_data;
+>>>> +	if (ether_addr_equal(dev->dev_addr, mac_addr))
+>>>> +		return 0;
+>>>> +
+>>>> +	if (!is_valid_ether_addr(mac_addr))
+>>>> +		return -EADDRNOTAVAIL;
+>>> How does the core pass you an invalid MAC address?
+>> According to my test,
+>> in the 6.4 rc4 kernel version, invalid mac address is allowed to be configured.
+>> An error is reported only when ifconfig ethx up.
+> Ah, interesting.
+>
+> I see a test in __dev_open(), which is what you are saying here. But i
+> would also expect a test in rtnetlink, or maybe dev_set_mac_address().
+> We don't want every driver having to repeat this test in their
+> .ndo_set_mac_address, when it could be done once in the core.
+>
+> 	Andrew
 
-Kconfig is not my speciality, but cannot you using
+Hi:
+I did the following test on my device:
 
-	depends on ARM || ARM64 || COMPILE_TEST
+insmod hibmcge.ko
+hibmcge: no symbol version for module_layout
+hibmcge: loading out-of-tree module taints kernel.
+hibmcge: module verification failed: signature and/or required key missing - tainting kernel
+hibmcge 0000:83:00.1: enabling device (0140 -> 0142)
+Generic PHY mii-0000:83:00.1:02: attached PHY driver (mii_bus:phy_addr=mii-0000:83:00.1:02, irq=POLL)
+hibmcge 0000:83:00.1 enp131s0f1: renamed from eth0
+IPv6: ADDRCONF(NETDEV_CHANGE): enp131s0f1: link becomes ready
+hibmcge 0000:83:00.1: link up!
 
-inside the symbol?
+ifconfig enp131s0f1 hw ether FF:FF:FF:FF:FF:FF
 
-	Andrew
+ip a
+6: enp131s0f1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+     link/ether ff:ff:ff:ff:ff:ff brd ff:ff:ff:ff:ff:ff permaddr 08:02:00:00:08:08
+     
+ifconfig enp131s0f1 up
+ifconfig enp131s0f1 down up
+SIOCSIFFLAGS: Cannot assign requested address
+hibmcge 0000:83:00.1: link down!
+
+uname -a
+Linux localhost.localdomain 6.4.0+ #1 SMP Fri Mar 15 14:44:20 CST 2024 aarch64 aarch64 aarch64 GNU/Linux
+
+
+
+So I'm not sure what's wrong. I also implemented ndo_validate_addr by eth_validate_addr.
+
+Thanks
+
+Jijie Shao
+
 
