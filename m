@@ -1,101 +1,115 @@
-Return-Path: <netdev+bounces-114770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB9B943FEF
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:56:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E23239440DB
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DF691C21FE9
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:56:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EB19B282B6
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE415338D;
-	Thu,  1 Aug 2024 01:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3B0130A54;
+	Thu,  1 Aug 2024 01:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qhpd+P5f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UGdx3keZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25B71514DC;
-	Thu,  1 Aug 2024 01:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17684208A0;
+	Thu,  1 Aug 2024 01:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722474823; cv=none; b=HzST3KEVyIoIkRyOXX149pofXOneNYIQF0aSrsaTsrk3OXlmMjhs7IHwMQCHBH2iavgJDi3FJ0ou7HJKZaoPMUDM+BHAufxeMWk96oU0+rBSbVpmKbPdQQAasOa1begbBD0w1+9NS/D+/OZFpWKvR71ynoqrISG5iz3THKFp56M=
+	t=1722474238; cv=none; b=OLTcKjiVpOognXD4577v8wk7FxojCcSUbAzuqLTwcLzRRyC2sd5lzidn5wi4lnmSOzS85flqGVEqJ06f4/wZFQbYpfhD9izQZpnmmwBjLkwTi45wJuHO29h/W5vH/Wzz/aw4U6B/C4qLyYuilPTrYLxD1BFNlDu2tt7Oyosycp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722474823; c=relaxed/simple;
-	bh=Sc2L9FmvJUOj/vSm51/hIH353apQq4db3uUU3zSvBoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I4jpmx03KZOioLDwR2BcGjpxb4/rDJy1oVINZktbMNcX5NiymobIHB/CtCV8bZV8DSXzoNfxhGM1QoKhIO4eBTifP/Oxvs0NmeZ+9jW0xXT82YBJmJ8Pe4AEIuaOqD50KCycvP45h9yIQq/DIVTr2tzKYcaX+WYRxxXeq5lYcC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qhpd+P5f; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ARbD44MpDD7+Kxfy/q9fBBwtFNS3dL+GrbSVVXS2AZk=; b=Qhpd+P5fQcY31LHSHXYzaW91Uc
-	m9Mv05nw4KQWw2Zyg9LTsURDIfPcWgqg6Yx5vAIt8IW3TaR+Idp/T6ABgFC1ffrmMZPloZ5ni3wic
-	cQTdU8Yaj/+hSEfweQNKGSJ7RQb8rLLk3WIQNZFJ8oB27eWQfKQc88VJe16KxwcEMI1E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sZKNn-003j4O-QP; Thu, 01 Aug 2024 03:13:31 +0200
-Date: Thu, 1 Aug 2024 03:13:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, sudongming1@huawei.com,
-	xujunsheng@huawei.com, shiyongbang@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next 09/10] net: hibmcge: Add a Makefile and
- update Kconfig for hibmcge
-Message-ID: <49d41bc0-7a9e-4d2a-93c7-4e2bcb6d6987@lunn.ch>
-References: <20240731094245.1967834-1-shaojijie@huawei.com>
- <20240731094245.1967834-10-shaojijie@huawei.com>
+	s=arc-20240116; t=1722474238; c=relaxed/simple;
+	bh=+0D9izMov2fVjggCqOiId4Eyo/YCtxQRrNJ1CrxscBg=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=q+Y47d730qjBizKRuOP/FF2EywC1N72+211naqfiYSP1l5KVlkMl/r2zlpbpTDUp+FgHz+Os8v9Sn0a6D3oQnlQynwZNK9HgZw5SrRvc3T2uVUQ1DjN/Ja9bSMMvjWhV2krekXWNt+1/Q26s/TEaaKF807Eqi/j4hC7iiubrCug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UGdx3keZ; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2cb67992a5cso1147920a91.1;
+        Wed, 31 Jul 2024 18:03:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722474236; x=1723079036; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2GjmuONFUv2485xz0hzBb/3WjCu0sZQyc5Cvo3OSjjM=;
+        b=UGdx3keZHfxRRTXkI2ejwRj942P5TgMLqxqxnS54ytvvGYis5CxMKahG/+4f/ehYnL
+         AzqyFH0v8zRceECuety9yDBRwBTMu/4gebkQ/PqKcFW/w2eDKyJS71jnpauQUUMja68A
+         jy+zW8aibSMG9EnFqeX6SlGA4vttMZ9Vkf5eJqtGbltj4EwJGtHwi7T+3PDIBW/VfCkq
+         pBsRS+ZQSz0Q+G66s/ikz3Ksjxv8kzfhkR9UmjXKf8iz2sDtSpNQHMNgj4I91TDBJ0fQ
+         Svn8DGSbIoIseSTM2zxhldW4TAb5bNOdUvdAr5T3nzAMLCyi1vkXxlPIQgppIm1vCuQa
+         NT3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722474236; x=1723079036;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2GjmuONFUv2485xz0hzBb/3WjCu0sZQyc5Cvo3OSjjM=;
+        b=vTer++LYz5KXtp9ByzlSwnBO8QKFeaUddYb6YCgHcNGakxOTCYtVNcD7MDXhvZ6Uil
+         LbzKtdMUWU2gIfnPOfZ6qN5txpFyXNaY8IZKVi0LNgQmPhcL0JIZcfli2jpYhqWVCFY8
+         XAIpLEmOVgC2Q9DwBRjVH9dCNt7P/s9UHnorg0smHTN5KdrLaxKpIzu3sS7Pj0LaxDqx
+         k/lT4XS19MizxZ0ixQqh+dIXZHOWtcSNJWHvOGZObP8kFVy/c6JIRdh5juInW/n/pdki
+         xic1kmBXBgaZ+Wv1v2N1dTQcTMjoh0IQhFGx79ZOHYQeghi+zTZEjiA0lVwfd9LAoqyg
+         rOBA==
+X-Forwarded-Encrypted: i=1; AJvYcCXBFeVOjsxSlvpe+bZQxErUWxlbEaCn+od9Jfz1YjPmCBo3KJKtrkNRrYD0vv5eM0xZdWlW+tgHOs2W036O9yOqjdQLP553rO8rkrvxvcRsVGc5EGcRfO1X8oWUzQfTEcFhplgf7Gw=
+X-Gm-Message-State: AOJu0YxjRn31CNOt31ldm9K8QWqyJhmwRy/XCAzIoQAqcuvsGfMyZvaO
+	irOF6m0W03RM2JlT2C0NSTik+bZYNX0iuwx7y8o2mfKxIhdJkZ2F
+X-Google-Smtp-Source: AGHT+IHntwW5d4kvmhU2rn2k+Rm7Mj6aWY9bHjMZUpKAe7D/fwL9ukBVKd2or10Pkzlv1U6BK8wZ8Q==
+X-Received: by 2002:a17:902:d488:b0:1fd:6d4c:24cf with SMTP id d9443c01a7336-1ff4d24464emr7649285ad.5.1722474236297;
+        Wed, 31 Jul 2024 18:03:56 -0700 (PDT)
+Received: from localhost (p4456016-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.172.16])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7ee1343sm127111835ad.173.2024.07.31.18.03.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 18:03:56 -0700 (PDT)
+Date: Thu, 01 Aug 2024 10:03:42 +0900 (JST)
+Message-Id: <20240801.100342.2177122481364088518.fujita.tomonori@gmail.com>
+To: aliceryhl@google.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
+ miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me
+Subject: Re: [PATCH net-next v2 3/6] rust: net::phy implement
+ AsRef<kernel::device::Device> trait
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CAH5fLggMWrDU2U81e4Cs5dV82VFdWC8+02sR8RTZisQGnFgNow@mail.gmail.com>
+References: <20240731042136.201327-1-fujita.tomonori@gmail.com>
+	<20240731042136.201327-4-fujita.tomonori@gmail.com>
+	<CAH5fLggMWrDU2U81e4Cs5dV82VFdWC8+02sR8RTZisQGnFgNow@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731094245.1967834-10-shaojijie@huawei.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 31, 2024 at 05:42:44PM +0800, Jijie Shao wrote:
-> Add a Makefile and update Kconfig to build hibmcge driver.
+On Wed, 31 Jul 2024 10:38:11 +0200
+Alice Ryhl <aliceryhl@google.com> wrote:
+
+>> +impl AsRef<kernel::device::Device> for Device {
+>> +    fn as_ref(&self) -> &kernel::device::Device {
+>> +        let phydev = self.0.get();
+>> +        // SAFETY: The struct invariant ensures that we may access
+>> +        // this field without additional synchronization.
+>> +        unsafe { kernel::device::Device::as_ref(&mut (*phydev).mdio.dev) }
 > 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
->  drivers/net/ethernet/hisilicon/Kconfig          | 17 ++++++++++++++++-
->  drivers/net/ethernet/hisilicon/Makefile         |  1 +
->  drivers/net/ethernet/hisilicon/hibmcge/Makefile | 10 ++++++++++
->  3 files changed, 27 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+> This is a case where I would recommend use of the `addr_of_mut!`
+> macro. The type of the mutable reference will be `&mut
+> bindings::device` without a `Opaque` wrapper around the referent, and
+> the lack of `Opaque` raises questions about uniqueness guarantees.
+> Using `addr_of_mut!` sidesteps those questions.
 > 
-> diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
-> index 3312e1d93c3b..372854d15481 100644
-> --- a/drivers/net/ethernet/hisilicon/Kconfig
-> +++ b/drivers/net/ethernet/hisilicon/Kconfig
-> @@ -7,7 +7,7 @@ config NET_VENDOR_HISILICON
->  	bool "Hisilicon devices"
->  	default y
->  	depends on OF || ACPI
-> -	depends on ARM || ARM64 || COMPILE_TEST
-> +	depends on ARM || ARM64 || COMPILE_TEST || X86_64
+> With `addr_of_mut!` and no intermediate mutable reference you may add:
+> 
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
-It is normal to have COMPILE_TEST last.
+Understood. I will use addr_of_mut! in v3.
 
-Any reason this won't work on S390, PowerPC etc?
-
-> +if ARM || ARM64 || COMPILE_TEST
-> +
-
-You would normally express this with a depends on.
-
-	Andrew
+Thanks a lot!
 
