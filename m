@@ -1,263 +1,264 @@
-Return-Path: <netdev+bounces-114832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98E2944590
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:36:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B07A944599
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:36:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D9C1F22525
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:36:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10C3A2840D5
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2246158A23;
-	Thu,  1 Aug 2024 07:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D961607B2;
+	Thu,  1 Aug 2024 07:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ff77x9Nc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hS3QBUtf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F0B158529;
-	Thu,  1 Aug 2024 07:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722497758; cv=none; b=gnPU3oiANImP/MbLfgF1Vu/ILVtNPruKwRD/LxPiM8bNbs9Xiat7J8wk+w1z3+AkW92iCAssHUvtwOP7xtRZH9eF6vPawToes/Rz0jh9s3t4D3jtIt2kK1Pcneu/SSRy+KjhZGloYXDgP4LBgybcMpWwIe/H4vwNFp4wQ/7p3/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722497758; c=relaxed/simple;
-	bh=Ixx3joQYC3lhvFnExE7BL15Sl0aw+YixmvqTIPU0tDk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nhYxctX/j0M2TGCKAyXVC8jxiFySAqk9zLD6/1IlLthA6lLhrJUXenHDX8ylD19uY0AGgtP2UpML9Eg4yQLzqgsP1iqJluwtv/Vh6fbzpqrySygE4J58BBJd/ku/pczYSN0ycgiX/91F6AClSIE6LkKqRA3IsfKHhAs4IzOBR9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ff77x9Nc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0CF3C4AF09;
-	Thu,  1 Aug 2024 07:35:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722497758;
-	bh=Ixx3joQYC3lhvFnExE7BL15Sl0aw+YixmvqTIPU0tDk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ff77x9Ncjci5AAbU7kaUgdIDqoeDc4nFtslpfnc2b5q9GF3LaPctzbmzu8sSP7+dq
-	 uyblwFYBF7E1WrA+aRzpsFqjFa0oaZtsjXo8g6xLc2VDY7EKeG/Aco54uvuR5QYFPd
-	 cVRZmucdWfk3r5hHAF2WBBukwqgnuoplg5SBRZejW2G8cgitf8NOPk5o6Liav1hAIq
-	 jaSZ5qRZsd18UUEFEUnnYy1MzGrY89JcaY+vRvl7+ISt4fTDZuT9ajthPSx5mtpv+i
-	 q4ZwE3JJepWSuLUyX2MDWhTwfTK6C9I4ZKOeOa5eZGBqg/Bw5pMIA8FXesSc6iBAa4
-	 +8+isCsehUEkw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: arinc.unal@arinc9.com,
-	daniel@makrotopia.org,
-	dqfext@gmail.com,
-	sean.wang@mediatek.com,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	lorenzo.bianconi83@gmail.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: [PATCH v2 net-next 2/2] net: dsa: mt7530: Add EN7581 support
-Date: Thu,  1 Aug 2024 09:35:12 +0200
-Message-ID: <a34c8e7f58927ac09f08d781e23edc06380a63a2.1722496682.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1722496682.git.lorenzo@kernel.org>
-References: <cover.1722496682.git.lorenzo@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5E2158A23;
+	Thu,  1 Aug 2024 07:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722497793; cv=fail; b=pPbj21V/Au8mHJ7sGVQQVLYdMA7o4HARa14T27NT95J2s4ezNeyGxFJV6c55ZzjbqQz1I1CBf+OazmNOgANuIe4sssrP6Mee6XE5xmBifgzt4Cs7fnHXNgg6phyxx08B+iDpSuL46GqWXRMcO/2c09WefLWWbyWiIPG8DiphtY8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722497793; c=relaxed/simple;
+	bh=CceiHC55ec7fZmdJQHB9E1GoL6UKAK94LLrp/C5euRM=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=og1sIWrlpHdHa6OYjo7NpA9f31NBEjiLeUxfgAEfF6a6SleDbqqAGfusiVeSAh2AFPDe0Igm8fhPNClb1CI9WLBxh4clrDkrggk7v+sNadO06K0Hfdzs89Kld/1xyN/YAr38IK0uLSJy/tpji/bN1Rop9fJ1ibEvwPlLwJKPvnM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hS3QBUtf; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722497792; x=1754033792;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CceiHC55ec7fZmdJQHB9E1GoL6UKAK94LLrp/C5euRM=;
+  b=hS3QBUtfzjH7cnMrpyPBxeNbpuXbBiYgnCDdUEKwnalrF2Ga6S0OAUk9
+   owWuBIoio0i4Mz4lqlNpHWeEG8bWqkwzZcMMZFjmj+jHf9iWf4bbK3Iek
+   1uZ0e5wN7NYKJUwuh/vf03t0OpwV/gmIg5u2PsoYs6OjQAGW10uLa/1Zv
+   Y+uBAnDwYcpd17Dbn4AC82XFa1gwSX+xS9HKv/dYOtORwfbKxu2gNnnxG
+   YiDJKqVdce3njka3McyIk3IPR/DLSH1U5b5trtyyeMFtVhDgu4Baj5ofH
+   Q0gZIsR2K+dpEUHTLOhnUhlaHzAgmcZXqzjxcAUrRPO1kZ++yT8HPJLKm
+   g==;
+X-CSE-ConnectionGUID: AsVUkNVUR165mZMQPNkMug==
+X-CSE-MsgGUID: EOUSRM7lRPe1zGHznHn0kg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11150"; a="45844755"
+X-IronPort-AV: E=Sophos;i="6.09,253,1716274800"; 
+   d="scan'208";a="45844755"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2024 00:36:31 -0700
+X-CSE-ConnectionGUID: uZHTnHFzRJG/vGAiUaymeg==
+X-CSE-MsgGUID: DNC5JSMVTSesRDJnWsppjA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,253,1716274800"; 
+   d="scan'208";a="59072297"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Aug 2024 00:36:31 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 1 Aug 2024 00:36:30 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 1 Aug 2024 00:36:30 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 1 Aug 2024 00:36:30 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 00:36:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qIZaCQdBYdPbaRXc+YRg21Mbvm9SOqixydmvPXVWBG31yAX/FjD1s3erKV+Y1l816AgxA5fcQqOI7f66vG16kllyXAMWlkhJgNrx2G5hJ4BMKh9KXfv9SZNiB9o0He674d1n72Dg3BGiBSUs1srfm0gso88OWosCB+niq0cOUkoFeiuhPBLcj9BoUaZTwM8EPaAIzejXN7WZw/xpUbK7yJLRiamgQC/ENPLkNyM5C/eqjVGhBO80ooAmpVKSYbwcWFvlKHT6bUks2oeeKsxsg4xckbWXjo2qaM2dgjacmpt0FZwTreII19OKGMUdPgmBoaxGjMVF9gWUmJLSLfBH1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=20Tvt8j0frXFaS0I4bT2O6GhbTYZb+SGyVaBZfw2lJA=;
+ b=apVPegI2XwQuY8cuPSmo9nCxwhwEHAnT1vMhobbp5hjRbjF49lYVk6XDbwHcLtuheI9bWTgZ7Bu2lnGABjOtv0gRQPKy83ZJMXEPgLqjsJqeN7DS3BNqop0gdVQSs2rpWK9nVCC2SJJH/b69Pc6ihNZrdDurKljD1Yk8YLJJXOKfF1prOhHaK5VJUmI3zqbq3GZTBbLv8J7iyzIJNHWCf4PlZNUBNYl93anRnYtIOCgx+lXjMn1KKMMUHlCbFBiwCeoMtswrOFkuan8I1bgALYFULjKrojKh5tvJsGxJXpDY89S+u92DeBm59B8PQCKJWrd4YV5BtWMpCljTFX354w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SA1PR11MB5803.namprd11.prod.outlook.com (2603:10b6:806:23e::8)
+ by LV8PR11MB8700.namprd11.prod.outlook.com (2603:10b6:408:201::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Thu, 1 Aug
+ 2024 07:36:22 +0000
+Received: from SA1PR11MB5803.namprd11.prod.outlook.com
+ ([fe80::e976:5d63:d66e:7f9a]) by SA1PR11MB5803.namprd11.prod.outlook.com
+ ([fe80::e976:5d63:d66e:7f9a%4]) with mapi id 15.20.7828.016; Thu, 1 Aug 2024
+ 07:36:22 +0000
+Message-ID: <51c7fa4a-26e5-49e4-baa6-b72d51098ced@intel.com>
+Date: Thu, 1 Aug 2024 10:36:15 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2 2/3] igc: Fix reset adapter
+ logics when tx mode change
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg
+	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Simon Horman
+	<horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>, Paul Menzel
+	<pmenzel@molgen.mpg.de>, Sasha Neftin <sasha.neftin@intel.com>
+CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
+References: <20240707125318.3425097-1-faizal.abdul.rahim@linux.intel.com>
+ <20240707125318.3425097-3-faizal.abdul.rahim@linux.intel.com>
+Content-Language: en-US
+From: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+In-Reply-To: <20240707125318.3425097-3-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0030.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::16) To SA1PR11MB5803.namprd11.prod.outlook.com
+ (2603:10b6:806:23e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR11MB5803:EE_|LV8PR11MB8700:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7c106317-1410-4dcd-37c4-08dcb1fca455
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Z3dqSHVWOWtVdHJPTFFHbkNFV2pINDh1alJNQk5FM0NWY1k2Qk1HY1VmUXBu?=
+ =?utf-8?B?Q0dUM0hZckVtRHp2bmxEa1NYVjRxWDV1MTRCYm9TS0loWVZScmlxZkpsV3Jv?=
+ =?utf-8?B?SzBHRzlTelMvc0xkOVZuV3pML3UwWThValhHWm1nS1FldkdraG1vcGFHTk8v?=
+ =?utf-8?B?U0ttM3UvNC9MYTM3YTkyUlF2NkdpNmpZZE9nanRCZFhlZHFVRklrNkhMcnJW?=
+ =?utf-8?B?dER6KzhpUmJSbi9vNFBEZ0VDOUVHdGtEWWRsVGtFNzl3d2hZaDZ6Q0tueFAv?=
+ =?utf-8?B?M3FsTUxZYnlTbTh3OHArR0lLbzFBY2JaMkJTNGx6blhQdDdUYnpYQmlrck1L?=
+ =?utf-8?B?NG9HU1dBUi9FMTVlZG9tTzY5NHVna2IrcGxsSHlDbzh4QUIyVHlreTVodGR4?=
+ =?utf-8?B?aUsvTy9jZmNoaXFIbWZQUFRSc2xyV2lqQUZPbmVGamJiVC9VZnVJbHo1dXU0?=
+ =?utf-8?B?WHVySW1HUVVZTHhMTkc0R3ZrbWtiVEEzK0FXb0VjNEdkUW01WUlvMWpCWEUx?=
+ =?utf-8?B?QWpIWjhsTDVWT2I3MUErQ0l6ZWJqc1hCQVM5bTRVTTVBNTR3MlJRZjVuRnJT?=
+ =?utf-8?B?allDcDhFOVdJaWg2RS9hQjA2YnJKR09TTXNmMldzbVR6S0pGQzZCUW4reGVu?=
+ =?utf-8?B?OVl1d1ZreWxUeU1uRHZoUHlTNTREZW51Y2l4UFg0NXZuWmt5WU1RT2tvMTlM?=
+ =?utf-8?B?dWZISHorbGEzWnBsOVlPQnJkWFFrT0FsWVVwMXBMNXR2VnFUSVFnZTZyWVRz?=
+ =?utf-8?B?VllDUERQSHoyUzRVQ3RRUmlRd3dqWElzSms2MFN3TGRndkVFbVFJejgrL2xp?=
+ =?utf-8?B?bGp5WjRwbUNLclA2eVc4b1U1eFVZejZ1MHAyZnN3T0NBUkgyckVGdDRRZTVa?=
+ =?utf-8?B?M0V5UFBVS3JpZU4zZGdNd1lqL3QwcVNzb1N2V1pkRnp3N0NtUWl2VThLTHdC?=
+ =?utf-8?B?UzhMVXcxY0c3MjIvYS9wQlVpYXVBelcwMG1KTVh0T1hDT00vdUpWT1lqZGlU?=
+ =?utf-8?B?OC9jbDBiS1l1WVhSL2RuT1RsVDZJQ3kzcEN2UDNBU2RKc1A4ZERrYmxuYkpG?=
+ =?utf-8?B?dGN0ZVMzMm80d2JpaUZzVC9ob0pkZU9Ld1FuV3FtblFYTzh0NEl6YTIyYVZX?=
+ =?utf-8?B?Y0s1NmpBZlBKdXBScDJFMlcrazFyLzBSb0NpT1RoMWtYcHJnMitEZUR6NXBE?=
+ =?utf-8?B?YjVXdlFVaFlZVC8xQWs2MWFVRVkrNGtxeU43NFV6S0ZpNWN5eldua0xFeEQx?=
+ =?utf-8?B?VTY4RFFRbzU2T1dGbGlucGwzYTNFNEw3a2Z6QkJUSXNKdkMxS05rZzBieXFU?=
+ =?utf-8?B?SVFOajYvejNDS2pNekNiVkRMbldSYnM2VThEQnpGekY5MjVuYkljNXBTNjJQ?=
+ =?utf-8?B?YUF0NjdveHA2Vm85UEM1RDhaVjg4K1JzRE5sdTdLSytEMjFnaFMrdU9YZHVr?=
+ =?utf-8?B?MUN4YVRsM3d6T3NCak9nNEZEcGdsYXBDUWRaUzNBOVN3NnBZZjZNYVRHdDB2?=
+ =?utf-8?B?akVXMndGbXZXRzNkUDJYcnJvKzZKMzJ3T3lmUXZObTJUdVRhR0RMWFRxa1Np?=
+ =?utf-8?B?dFBnem9jQUtKdStIYnRXYTk4OU95WnkyOEpjczkxLy9kbEYxYmhYMVhZbkJJ?=
+ =?utf-8?B?VmxENC9JOFVCM1N1ZEI3N1dnclhXR3lNaXNqOU1xYWdQT2huTjFTaTJ5clJp?=
+ =?utf-8?B?a0gzbjdKU3hxUG9lY0kwdHAwREwxMWxUSWw1VzVQTFNyVEJIRVBmZkdRN05j?=
+ =?utf-8?B?MEFWOG0yVitDR1gyeElZTktwSWxXUXlZdjFEQnJYdzFwZEFOMjNxcU4xcmtB?=
+ =?utf-8?B?b0ZLWUtkZG9tZDVWQVRhcHVSTlN5WC84TXp4YmZPUFh6eDlnZ0Rxc3RiWXVN?=
+ =?utf-8?Q?MRTh9HhlDjI4J?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB5803.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d3VKNlpBUU5vYy9LYXFPMkdFTXZBZ0tsMnhYSjhmNGZqbEVhWnNwL2FodDA3?=
+ =?utf-8?B?emR4aW0wT3AxSEF1R1hMRHRZYzNUWHBKdXVOeXlQWjM2RzNQcTVpbXhmR01E?=
+ =?utf-8?B?dHhzeE1DQktzOG1CODBGbG9hSGtlMnRMeDJyZlB5TUdZQlNJUUVzYkF6YUo4?=
+ =?utf-8?B?K056Z0VkR1FjV1dnTzRXWkFxU2xCb1k4WnpXbFcycVErMDFUdk9uN3I5SHJ3?=
+ =?utf-8?B?YVRJeFR5V0JBSERzaW02bUhGeEhFMy9ZZUVTYlpoR3RHc2YxQUYrb01oVFdK?=
+ =?utf-8?B?VnRZWFJvSGdDL3VqWHFCYnZKSW9vdVFueXl4a3dCZmlZei85TEp2NC90QlRR?=
+ =?utf-8?B?MFd0dWsySGJZT1hIVVc5aFN5NHZWcGVhWk82NjBYT1dvR1l1UW4rM3o3MVRj?=
+ =?utf-8?B?dGlldk9weWZHK0RaZW9sc0FQRGgxQllxU013am94dTExd252enI2eExtNGtl?=
+ =?utf-8?B?bFhubmVQOENIeHdWdHJwL041bDVkWXljWHZDNkRYc0crb1grVG0zZUtVaWRJ?=
+ =?utf-8?B?MWN2VnVVMk5HNzI4Mlo1WVhEWndHWDl6QW1lbDZTSWd5WVV1WVNXck02aVZ6?=
+ =?utf-8?B?eUllK3I4Wk9xZFhaeGI4UTNnZkRNQTBnUnJOL1J1aWdqcGJzWmFMeHJCS2VC?=
+ =?utf-8?B?alo2V3dWdGxJRzBaMVNYdzdYVzM1alcyTE5BaFZ6OE5mb2lZUnFvQlc0dEdk?=
+ =?utf-8?B?U1FRdUdOK1ErOUtmVkZwSVVoa0wva2VZWUtndGR1TVBIbGJzSnZoYzZWcGIv?=
+ =?utf-8?B?MTI3dm5qa3RaVEFTSEhlR2h2Tk1RK0tQd1RGNjVDa3RXTlZKdUp6MW5ERVlu?=
+ =?utf-8?B?alQzdjAyQkRYZWllaVV6ck9ldUlOdzl3UWNQMlFwOVlUZ3JkYXdYTURDTnI1?=
+ =?utf-8?B?QXpidjBEdlhoemVIUkJ3STlGTjRsUDRIYTlvTVU5ZmNTUHlzbCtoR0hwMzRG?=
+ =?utf-8?B?TERPWEc1dkhnMHh3MXdrZWJZVlMzWnFSUzIrZzhYd0ZlMVk2Q0xGdkpUSnJC?=
+ =?utf-8?B?UGszbWIrVEJlcFpGZkxOa2FiNjdyTHMvZUlXQUhiQnByRHE1L0tiWTFyajhF?=
+ =?utf-8?B?OU4yV2p4eStzNEtjdklCNFFVa0pjN3V3ZUdIZVRkempmdE9DbTVOWlJrVEJy?=
+ =?utf-8?B?K0NSUG9DOFcvQ0x1aW1VcENMVDdlVCtQTDBzMks3SjF3blpsblZwdXNiZ1JC?=
+ =?utf-8?B?WEN6NExoaVhwZkRPREVsTStSa1VXYlRybC9BckJLTnpZRkNDNExjb0k4OWwx?=
+ =?utf-8?B?SXlYejdkZm9wcXVHMnVSaWowQUlaczk2ejV0YVVvd3c0T3NOM3dwNFY4b1Vy?=
+ =?utf-8?B?UkU2NmlpTW1NR2FyYTRJYlBTdzVWWTJxYll0WWN4Q2dHT2hNYmlLNEZwelNL?=
+ =?utf-8?B?UnlxdCtkTFJYQXBXdTZ3Umo3bktLdTFNWFR6ZVlaQk1MU2NKVFYrRE1XeThi?=
+ =?utf-8?B?ckQ5R1M5a3JCZ29wM3k3bGN0M1BTZ3ZJSHVSbFoyQ3hDZHF1UVpscWEwV0xa?=
+ =?utf-8?B?M0NsNkk0cStYbW1BQUdFWTNUaDlLVHBqK1Q2T3BPTG0xbE03UzNJemZCNE01?=
+ =?utf-8?B?amxXeTJaQVJ2T3dRaUhhNDFCWVdocHJmYVhRVHNYSitGTUpvck5GNmlwbXpz?=
+ =?utf-8?B?Z0thL3A2SG83b0FKbFZnbjNDRkswWmUyUGducGthMGZkM2h6eUtyUVE5SEg4?=
+ =?utf-8?B?RVRLa05UZ1dlMm1OWnVha0pVbmRuUmo0MDd2SXZVMkUyQTFhZ096S1JIZ2Vv?=
+ =?utf-8?B?OXBwbWdKQldYdXVXMVFkTmZPMTl5djgzdVY2ZFovcUJiQVFmY3lxU1ZBaHEw?=
+ =?utf-8?B?dlJ4WDZrY2N5NXR0RWxYdzQ5dkd6dTJpZnZDZXR5WGl0RXcvRGJPYVRXK3Qr?=
+ =?utf-8?B?algxS2VzMk5TRTBQanBVZnpvRUJ1UTFZMmdWZkxndGxjZzlqUk5BZXhvWms3?=
+ =?utf-8?B?ZVlTTVhVWFdOM25oZmd6VG5TRDFrYWtoZ0JpeVpFYjRaelkxWUhpNTZ6dXAr?=
+ =?utf-8?B?NXc3Uk9KTUlYNVZkdU9UNld5VXlaUU5EeVorMzVNLzIxSnhwd2dNMmRCblZ5?=
+ =?utf-8?B?eUI4NThHdXFKQlBqTmlDQzNrZ1IxYkpwSGNsMG0rU0VLRVNEQ0V6cjlDNlRK?=
+ =?utf-8?B?cGE0YzIrYTlmclVNWjZKZlRpN1RtTlhUY2xoQWV5OTkzWkM3UWRxV09wUHBj?=
+ =?utf-8?B?Qnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c106317-1410-4dcd-37c4-08dcb1fca455
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB5803.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 07:36:22.9075
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ntrJ/Y7jJmWdX1sYL/tYauFvJd3QTDiNofH320OgIHpZB9lyv7A1u6Sl1dpubE79O04jSzpjyeWZSvslss12Vem4EHLwL0WuYLBnJ0Gfl5k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8700
+X-OriginatorOrg: intel.com
 
-Introduce support for the DSA built-in switch available on the EN7581
-development board. EN7581 support is similar to MT7988 one except
-it requires to set MT7530_FORCE_MODE bit in MT753X_PMCR_P register
-for on cpu port.
-
-Tested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/dsa/mt7530-mmio.c |  1 +
- drivers/net/dsa/mt7530.c      | 49 ++++++++++++++++++++++++++++++-----
- drivers/net/dsa/mt7530.h      | 20 ++++++++++----
- 3 files changed, 59 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530-mmio.c b/drivers/net/dsa/mt7530-mmio.c
-index b74a230a3f13..10dc49961f15 100644
---- a/drivers/net/dsa/mt7530-mmio.c
-+++ b/drivers/net/dsa/mt7530-mmio.c
-@@ -11,6 +11,7 @@
- #include "mt7530.h"
- 
- static const struct of_device_id mt7988_of_match[] = {
-+	{ .compatible = "airoha,en7581-switch", .data = &mt753x_table[ID_EN7581], },
- 	{ .compatible = "mediatek,mt7988-switch", .data = &mt753x_table[ID_MT7988], },
- 	{ /* sentinel */ },
- };
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index ec18e68bf3a8..d84ee1b419a6 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -1152,7 +1152,8 @@ mt753x_cpu_port_enable(struct dsa_switch *ds, int port)
- 	 * the MT7988 SoC. Trapped frames will be forwarded to the CPU port that
- 	 * is affine to the inbound user port.
- 	 */
--	if (priv->id == ID_MT7531 || priv->id == ID_MT7988)
-+	if (priv->id == ID_MT7531 || priv->id == ID_MT7988 ||
-+	    priv->id == ID_EN7581)
- 		mt7530_set(priv, MT7531_CFC, MT7531_CPU_PMAP(BIT(port)));
- 
- 	/* CPU port gets connected to all user ports of
-@@ -2207,7 +2208,7 @@ mt7530_setup_irq(struct mt7530_priv *priv)
- 		return priv->irq ? : -EINVAL;
- 	}
- 
--	if (priv->id == ID_MT7988)
-+	if (priv->id == ID_MT7988 || priv->id == ID_EN7581)
- 		priv->irq_domain = irq_domain_add_linear(np, MT7530_NUM_PHYS,
- 							 &mt7988_irq_domain_ops,
- 							 priv);
-@@ -2438,8 +2439,10 @@ mt7530_setup(struct dsa_switch *ds)
- 		/* Clear link settings and enable force mode to force link down
- 		 * on all ports until they're enabled later.
- 		 */
--		mt7530_rmw(priv, MT753X_PMCR_P(i), PMCR_LINK_SETTINGS_MASK |
--			   MT7530_FORCE_MODE, MT7530_FORCE_MODE);
-+		mt7530_rmw(priv, MT753X_PMCR_P(i),
-+			   PMCR_LINK_SETTINGS_MASK |
-+			   MT753X_FORCE_MODE(priv->id),
-+			   MT753X_FORCE_MODE(priv->id));
- 
- 		/* Disable forwarding by default on all ports */
- 		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
-@@ -2550,8 +2553,10 @@ mt7531_setup_common(struct dsa_switch *ds)
- 		/* Clear link settings and enable force mode to force link down
- 		 * on all ports until they're enabled later.
- 		 */
--		mt7530_rmw(priv, MT753X_PMCR_P(i), PMCR_LINK_SETTINGS_MASK |
--			   MT7531_FORCE_MODE_MASK, MT7531_FORCE_MODE_MASK);
-+		mt7530_rmw(priv, MT753X_PMCR_P(i),
-+			   PMCR_LINK_SETTINGS_MASK |
-+			   MT753X_FORCE_MODE(priv->id),
-+			   MT753X_FORCE_MODE(priv->id));
- 
- 		/* Disable forwarding by default on all ports */
- 		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
-@@ -2783,6 +2788,28 @@ static void mt7988_mac_port_get_caps(struct dsa_switch *ds, int port,
- 	}
- }
- 
-+static void en7581_mac_port_get_caps(struct dsa_switch *ds, int port,
-+				     struct phylink_config *config)
-+{
-+	switch (port) {
-+	/* Ports which are connected to switch PHYs. There is no MII pinout. */
-+	case 0 ... 4:
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  config->supported_interfaces);
-+
-+		config->mac_capabilities |= MAC_10 | MAC_100 | MAC_1000FD;
-+		break;
-+
-+	/* Port 6 is connected to SoC's XGMII MAC. There is no MII pinout. */
-+	case 6:
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  config->supported_interfaces);
-+
-+		config->mac_capabilities |= MAC_10000FD;
-+		break;
-+	}
-+}
-+
- static void
- mt7530_mac_config(struct dsa_switch *ds, int port, unsigned int mode,
- 		  phy_interface_t interface)
-@@ -3220,6 +3247,16 @@ const struct mt753x_info mt753x_table[] = {
- 		.phy_write_c45 = mt7531_ind_c45_phy_write,
- 		.mac_port_get_caps = mt7988_mac_port_get_caps,
- 	},
-+	[ID_EN7581] = {
-+		.id = ID_EN7581,
-+		.pcs_ops = &mt7530_pcs_ops,
-+		.sw_setup = mt7988_setup,
-+		.phy_read_c22 = mt7531_ind_c22_phy_read,
-+		.phy_write_c22 = mt7531_ind_c22_phy_write,
-+		.phy_read_c45 = mt7531_ind_c45_phy_read,
-+		.phy_write_c45 = mt7531_ind_c45_phy_write,
-+		.mac_port_get_caps = en7581_mac_port_get_caps,
-+	},
- };
- EXPORT_SYMBOL_GPL(mt753x_table);
- 
-diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-index 28592123070b..6ad33a9f6b1d 100644
---- a/drivers/net/dsa/mt7530.h
-+++ b/drivers/net/dsa/mt7530.h
-@@ -19,6 +19,7 @@ enum mt753x_id {
- 	ID_MT7621 = 1,
- 	ID_MT7531 = 2,
- 	ID_MT7988 = 3,
-+	ID_EN7581 = 4,
- };
- 
- #define	NUM_TRGMII_CTRL			5
-@@ -64,25 +65,30 @@ enum mt753x_id {
- #define  MT7531_CPU_PMAP(x)		FIELD_PREP(MT7531_CPU_PMAP_MASK, x)
- 
- #define MT753X_MIRROR_REG(id)		((id == ID_MT7531 || \
--					  id == ID_MT7988) ? \
-+					  id == ID_MT7988 || \
-+					  id == ID_EN7581) ? \
- 					 MT7531_CFC : MT753X_MFC)
- 
- #define MT753X_MIRROR_EN(id)		((id == ID_MT7531 || \
--					  id == ID_MT7988) ? \
-+					  id == ID_MT7988 || \
-+					  id == ID_EN7581) ? \
- 					 MT7531_MIRROR_EN : MT7530_MIRROR_EN)
- 
- #define MT753X_MIRROR_PORT_MASK(id)	((id == ID_MT7531 || \
--					  id == ID_MT7988) ? \
-+					  id == ID_MT7988 || \
-+					  id == ID_EN7581) ? \
- 					 MT7531_MIRROR_PORT_MASK : \
- 					 MT7530_MIRROR_PORT_MASK)
- 
- #define MT753X_MIRROR_PORT_GET(id, val)	((id == ID_MT7531 || \
--					  id == ID_MT7988) ? \
-+					  id == ID_MT7988 || \
-+					  id == ID_EN7581) ? \
- 					 MT7531_MIRROR_PORT_GET(val) : \
- 					 MT7530_MIRROR_PORT_GET(val))
- 
- #define MT753X_MIRROR_PORT_SET(id, val)	((id == ID_MT7531 || \
--					  id == ID_MT7988) ? \
-+					  id == ID_MT7988 || \
-+					  id == ID_EN7581) ? \
- 					 MT7531_MIRROR_PORT_SET(val) : \
- 					 MT7530_MIRROR_PORT_SET(val))
- 
-@@ -355,6 +361,10 @@ enum mt7530_vlan_port_acc_frm {
- 					 MT7531_FORCE_MODE_TX_FC | \
- 					 MT7531_FORCE_MODE_EEE100 | \
- 					 MT7531_FORCE_MODE_EEE1G)
-+#define  MT753X_FORCE_MODE(id)		((id == ID_MT7531 || \
-+					  id == ID_MT7988) ? \
-+					 MT7531_FORCE_MODE_MASK : \
-+					 MT7530_FORCE_MODE)
- #define  PMCR_LINK_SETTINGS_MASK	(PMCR_MAC_TX_EN | PMCR_MAC_RX_EN | \
- 					 PMCR_FORCE_EEE1G | \
- 					 PMCR_FORCE_EEE100 | \
--- 
-2.45.2
-
+On 07/07/2024 15:53, Faizal Rahim wrote:
+> Following the "igc: Fix TX Hang issue when QBV Gate is close" changes,
+> remaining issues with the reset adapter logic in igc_tsn_offload_apply()
+> have been observed:
+> 
+> 1. The reset adapter logics for i225 and i226 differ, although they should
+>     be the same according to the guidelines in I225/6 HW Design Section
+>     7.5.2.1 on software initialization during tx mode changes.
+> 2. The i225 resets adapter every time, even though tx mode doesn't change.
+>     This occurs solely based on the condition  igc_is_device_id_i225() when
+>     calling schedule_work().
+> 3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It only
+>     resets adapter for legacy->tsn tx mode transitions.
+> 4. qbv_count introduced in the patch is actually not needed; in this
+>     context, a non-zero value of qbv_count is used to indicate if tx mode
+>     was unconditionally set to tsn in igc_tsn_enable_offload(). This could
+>     be replaced by checking the existing register
+>     IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
+> 
+> This patch resolves all issues and enters schedule_work() to reset the
+> adapter only when changing tx mode. It also removes reliance on qbv_count.
+> 
+> qbv_count field will be removed in a future patch.
+> 
+> Test ran:
+> 
+> 1. Verify reset adapter behaviour in i225/6:
+>     a) Enrol a new GCL
+>        Reset adapter observed (tx mode change legacy->tsn)
+>     b) Enrol a new GCL without deleting qdisc
+>        No reset adapter observed (tx mode remain tsn->tsn)
+>     c) Delete qdisc
+>        Reset adapter observed (tx mode change tsn->legacy)
+> 
+> 2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is closed"
+>     to confirm it remains resolved.
+> 
+> Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is closed")
+> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc_tsn.c | 23 ++++++++++++++++++++---
+>   1 file changed, 20 insertions(+), 3 deletions(-)
+> 
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 
