@@ -1,225 +1,157 @@
-Return-Path: <netdev+bounces-115047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13967944F71
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:38:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B56944F6F
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 668DEB21017
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:38:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 002541F2153B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801C41B0125;
-	Thu,  1 Aug 2024 15:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832101AED45;
+	Thu,  1 Aug 2024 15:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="s2idSab8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKKYsQk/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2058.outbound.protection.outlook.com [40.107.236.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBC81EB4AF;
-	Thu,  1 Aug 2024 15:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722526700; cv=fail; b=Ha+6uvYdjPaDE1SJMpylXYtdHIechR1+6nIm0Ur+SHsQ/294GXiWc4mBWEsPt/oUQNojLZIz6q7cMCpWO9w+JjyZHF17Ybk5ZItvieOBEerTndQHpo8ndFXBju/Q0GY5rHrY77icp+W7iHAvO2HoAXBtH6f0vKRlM4getJJFKi0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722526700; c=relaxed/simple;
-	bh=7HSixOMUq0HFsQlt6+Mx4ZGAji5Wa2qe1rbSTD9Vz8Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A1Q+1cCAGMbsrJeipPEI6nmsvwdEljChiI1o05jVmIcKE6TxRZ8EqXk57geEpjZ39rLvkbY9IiU/5WELqiiPaTUUI1PoJLPZZesFkjjpTuxlT32yoPu3iowqC2X6C6WK54mPkmI2LHz/o4vMTaLSNeRP8N8AH3LY/NA9Wweu918=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=s2idSab8; arc=fail smtp.client-ip=40.107.236.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SfRbm8PxNYUU3vnv2VCVZcWTMzz8y3kxvGZWmFzzFoqnUbx9+TGvDRc+N0aiZ4wD+ntI7y3a7ABjzvhne1wDs6bfjGiF21KE7o3OvRWzKXBJYO10cCksh1zZ/d151CxTJ54rc4i+kMExXkz/pR7Bp6BKGlMPww9aKai6Un/UBNeexIKD0csu/CgvcuB+0miyK3n6ftg3FaEwDBOITYxE3QbrgncIjFV7lIc7siyTAADlKMHGPBdHA//D7w8enWxx4LWKHiWs6d1UE/Jx27AWttUQ2vMHYOsMTWa3dL6kfC322nFeUuJkVsqrtjKcOPesAs42Di5S3p5YgdmqTlv1xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QUPH8YQZqhNqhb390PAn6d6Niy7HRnJK8goUEgp+j5s=;
- b=qvYxwRe+QeE5IsHG2Q1s3sDETj51aUz1ka4JfdX6hOV1T4ux/0JERGPcjbtD6VPsVM1ZyKoeoeMTB4G2Zca2XNBBt1Anpee4KnCOJM0OE+6T+Ox3mmGXfcfezzmx1/L1iHel3qqBaOLvPyQkHLTJ/2WpnIsMUrnYyy/tcLlZL/rk5YbP16l/HItKAEv3Ypig0UbxfEqNeEORbaFlOT6GelyTkQL55ewrFv5hbVjUQ0lXy/HSSGZNYBP5BrS4k0E7QijICWQhDJXsPv1+WrBEECgw+HedB3wc+awzyf5aR9xeRrxBJ7HIrm+TxtzJGk9j4a5uyjwO7CyTskYIVcm1/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QUPH8YQZqhNqhb390PAn6d6Niy7HRnJK8goUEgp+j5s=;
- b=s2idSab8H+Z+Na0jEdsmmrc6xvmdr17UMgfAtk8ZbCYud/MMPgm5LjqtDbA9bDkr0bTfMnPH1q/Rt4nNxzyBI6ScD/2mTvIbQFG1KYYwzyG5bPnlRPc9UIgcA6Ru85s+dLOvRMCmWoKPTb+74k6YQY3KdyPpzt2ICQb5ylBxsKSV78TIsqdVNFHAkUkq988geJHmEXn0k51zDEPxW5gj8d+6QqQtP8GANC/aQsqGo+R0FTb8YwvN2qUpCEGbBcusbOKFDJ/e2yeW25jXdwwJqwBK/zsJYY5/f8lBmwF4dIGkDAzWo09di+3eT9mYqoac2zRO5TvAWKr1vC+DuFB/0A==
-Received: from CH5P222CA0018.NAMP222.PROD.OUTLOOK.COM (2603:10b6:610:1ee::29)
- by DS7PR12MB6047.namprd12.prod.outlook.com (2603:10b6:8:84::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Thu, 1 Aug
- 2024 15:38:11 +0000
-Received: from CH3PEPF00000013.namprd21.prod.outlook.com
- (2603:10b6:610:1ee:cafe::f4) by CH5P222CA0018.outlook.office365.com
- (2603:10b6:610:1ee::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.23 via Frontend
- Transport; Thu, 1 Aug 2024 15:38:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CH3PEPF00000013.mail.protection.outlook.com (10.167.244.118) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7849.0 via Frontend Transport; Thu, 1 Aug 2024 15:38:11 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 1 Aug 2024
- 08:37:54 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 1 Aug 2024 08:37:54 -0700
-Received: from dev-l-177.mtl.labs.mlnx (10.127.8.11) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 1 Aug 2024 08:37:52 -0700
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
-CC: Dragos Tatulea <dtatulea@nvidia.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [RFC PATCH vhost] vhost-vdpa: Fix invalid irq bypass unregister
-Date: Thu, 1 Aug 2024 18:37:22 +0300
-Message-ID: <20240801153722.191797-2-dtatulea@nvidia.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0821B0106;
+	Thu,  1 Aug 2024 15:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722526679; cv=none; b=L0Rm3lJ3Krm+J8WMtN5hIrDBDQbrKNxuIicdn1S32QiWt1a4Ca5fpFPvIZrgY1/QW5Y1QYOu9IC5iJQuBx9/MUjLqRUy5QOW/QSxJy4Rq0orV56FKjCQ4jobEGSphUUDygC8UmYlKzeI0Wnki35iycZKAH8+iUW7Swuui8djeGU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722526679; c=relaxed/simple;
+	bh=HVyiZbaild1Wid4X45Oeo7GhfGPWtHFwhd8iGEXYwsI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OvhdjZi2miLETKZnVBjkhL1syQJB5A5v8pfNet56yDwmdqhui6XFX61cNMO9zLmJknqzq35eS8Vs6KjAcjdK1hlEPLCWIxMmtxORLUwkFK8yr4CBDqKgsfDAtQhoMHFFXwBzVVhzPvlcmyXrWaRLiEbQUEt2pXxS7nZ17/zJCUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AKKYsQk/; arc=none smtp.client-ip=209.85.160.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2681941eae0so2437521fac.0;
+        Thu, 01 Aug 2024 08:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722526677; x=1723131477; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DxaMOzeZ/iAXtwUr1eOqIcyS5wuAZVA6dKRpqc08aRg=;
+        b=AKKYsQk/p2+1Q4onaTNHyyuXuz++e4y6o8jp0dMKtXTdEy3P9XBTHHDuN3YNVsH6xR
+         Z1r0eZ68IDranSf5i+i76pT5t/FO13u8qmCJiryiiYoi3TwGhmoBlaGuoRn7mVW3E7sx
+         04lR60FI13l5ER2ZvYezlbyQ8Z5/qQa2smUMx7dh3VvJS9H24yK/umj2xsW89O7wlsPW
+         5MZ5CB4c65bQsvSvrBUccOIom/MaCBRKD540RXrO5A5mLrEbvNlbWa086HeR8E5m+jsF
+         F/SFfyuZv9Mqs1jigp9YNmdaj9ffFGpnbVgi+Fr3/j9rEvOHmU77lJv3S1Jgs9ROYA2E
+         oF6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722526677; x=1723131477;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DxaMOzeZ/iAXtwUr1eOqIcyS5wuAZVA6dKRpqc08aRg=;
+        b=EaytWSZ60au1esiS/L1t/gaX83EPPdUkA04FT/DAxF58HBKiBT6mQyGl71uydA3iPc
+         /mbZEqB//g1H4wbWV8iN4YAFNWaaD/dqb8iwz5wFY6wXKnV16c/MRy7NIQMRNpr/Je/k
+         bgEwM0hgmwvlFOfE0clsPxkPPwtjjT/5kU9Nz9bC2jyuanGlgkqTDlQBAR0Bk+JqNj98
+         nMmG4PB60idM4o55s0QOtJXqWcDBPiKYjnL4ny9LYSP+h/S6tsaNbd7gsrNdiDE7Qpus
+         GhooPXxTDWCvnZ2wh2zKNk9OdbpuP+TtmRq+8Q5YxN4ul15RhlxB1u9zDFZJ340nLS8Q
+         x7ZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUvEYRht495vV1rsqE02hQV/6wiiUYqqFP3NkPb2/aIufa7GzL0PdXDQhhB6kGDDXzlAfTKGmt26VTv6lKw77ULj2UfF9M5
+X-Gm-Message-State: AOJu0YxQREUHCYbmJ50dHvx9emE+diHgoOGQGbTvqkMw6KOf6URraqG4
+	FIIDR0D7Lp72xmVGBlTSJEMwynoHR1vItVQxChtHU8u5PzOmqpnjlpgeXs55llyAVUIwYPj7rLg
+	TsxE3mj3RfpFWt4agVCkjmLz2oU0=
+X-Google-Smtp-Source: AGHT+IHO4jiFCkzlp591vNX4hal9iztJ4TzKiL6h8EmN+j5rY0sXgMrfbCwiysgViRP0hJ9psYzbnyLboPjxapGGaiw=
+X-Received: by 2002:a05:6871:113:b0:261:575:5384 with SMTP id
+ 586e51a60fabf-26891aecef4mr577840fac.16.1722526676667; Thu, 01 Aug 2024
+ 08:37:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000013:EE_|DS7PR12MB6047:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74904c2e-cb39-47c0-d0d8-08dcb23ff37d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?F8g9b0FQsKonG7E8E5cm246c3+A1THMzzoSlwMPoQU3VBe8A4mNAmVIVuRAE?=
- =?us-ascii?Q?/LZRcd1Xg+ONv7xQ8oAEP2ywJW69wD1GVkxSSfBkbhtA8j5twx5IzXWJX2Uu?=
- =?us-ascii?Q?f6Zbck8PPJxkcJ4bCs9fzYKbKSUvi3R/gjSHJbwKFdERSBOB3eMSR0tFDHvj?=
- =?us-ascii?Q?OZ+jjvsDTM3VbQZzcBInaIICiusceLYnyaqFN1uhajw0JjHuH51HV0ktxbrx?=
- =?us-ascii?Q?NCHIWWQGeXba6zekRVIo/Z3cHZrWck13t+//SQaE10hp4EuXgEOJgqe6AHtW?=
- =?us-ascii?Q?rVzQ5tDQfigytzMo8OrCYsrhvhWvOes76bmYcgLnKNc4MGqLZQKb5GIeTxHT?=
- =?us-ascii?Q?Cy5XDdVb25JUWivv5B4y+kBoUzjmImPx1LdWhu45utixP0t1EMNa597f4/xG?=
- =?us-ascii?Q?vjnufECEQE2qDtaf+jNXk7y7lRkI339hYn2Ng5ETEAvcgjYjVxXO6Ss73/b/?=
- =?us-ascii?Q?KjeWLHzs14Xe9pYInFnWB89ojJz8OVC2pbGuE/dLA6Pi7zZ+Sk96XT/9btx0?=
- =?us-ascii?Q?fzE44bS+pqYqcfPmoD0gfaUmc4YwxGdtk7PFsxLti/0HsBAOwCTkCTjYVlyV?=
- =?us-ascii?Q?Q36X586X9To4ZXh2oMRUyHkxRCIaKkgWKxU83t6WqdlCfQeWJZR4PMSXvTcZ?=
- =?us-ascii?Q?P6I2vw+8W03tP6QIy1FTBpP52Ls1/AYZnHO0sDzQ0EQF6yUYRysa2GhGwBqN?=
- =?us-ascii?Q?MIE8pqXRFZNvP4nO3OwNQIsPkKb9fEr7XzpyjZq2EIK0RY/heD9PIt7Buh1D?=
- =?us-ascii?Q?vwnTqKFkVUxs4gFeow8edNLaECFC5UJp7BYaYiDkIZ24epUYjRmfZI7Fwh76?=
- =?us-ascii?Q?CeBc0UwVUxR+M1xZmUPQpmwQ6vkvzGx4ZJq0sX19YG2z6ctl6A354WDicM6G?=
- =?us-ascii?Q?puR/9N+abgaC5cwM1bY3Zl9+asCMgEOfdcDQqa4r2SQNHZHzVTIzO7fMWPi3?=
- =?us-ascii?Q?T5/rnxB7WYoe/JCqb/XPFunr7xWziLr/Rsv1mJiIjqPtDoz9NjAkEo7mpPro?=
- =?us-ascii?Q?z8RMRbXV+WpuN2WahyzYY03+YgsjES/ad37jZ771uyP9Kz1R0ef2tOXeT5OZ?=
- =?us-ascii?Q?CT6NC0T4DOsSUKlDPYI28ojnjDIQl8mL3R2pdVoYXad7t+FtYZx/fJCWF9vI?=
- =?us-ascii?Q?bqS+HXCEZzxUjsfqLBc5nhxX04AU9o8PTXOAQD6JG5CNqHWK6N91DEcPGbAi?=
- =?us-ascii?Q?HQqA4jb/PKw5oC+huQQfDPvyqnkqj3Tn+Zlwxi1VLJCwBvcPx3dBIxJofGC1?=
- =?us-ascii?Q?Q3AjQDrXAAnMuIrsPzi9+GcaGx0jOIi/ADE2MAwGukf0YEkVi8l5Sho9d/2a?=
- =?us-ascii?Q?cmcjUKYQnZYzShQB4X7oSF/6Xbk5AD2v6ZArjlQLcaZtFlmQE14yo2XsspjA?=
- =?us-ascii?Q?JV63gQc+ERsZ/wzc4r5CFwcHBADYj5g0lOcOKPHuy+E+BHO6j7omSaKwQb/e?=
- =?us-ascii?Q?Km0OTYEXoECDHNeTWG+DZUJV5jvh7alh?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 15:38:11.6154
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74904c2e-cb39-47c0-d0d8-08dcb23ff37d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000013.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6047
+References: <20240801123143.622037-1-vtpieter@gmail.com> <20240801134401.h24ikzuoiakwg4i4@skbuf>
+In-Reply-To: <20240801134401.h24ikzuoiakwg4i4@skbuf>
+From: Pieter <vtpieter@gmail.com>
+Date: Thu, 1 Aug 2024 17:37:43 +0200
+Message-ID: <CAHvy4ArS2vgsu0XLE3heUeVrk_mzRjfPszdCg22_xJnuKuKr-A@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] implement microchip,no-tag-protocol flag
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: devicetree@vger.kernel.org, woojung.huh@microchip.com, 
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
 
-The following workflow triggers the crash referenced below:
+On Thu, Aug 01, 2024 at 15:44, Vladimir Oltean <olteanv@gmail.com> wrote:
+>
+> Hi Pieter,
+>
+> On Thu, Aug 01, 2024 at 02:31:41PM +0200, vtpieter@gmail.com wrote:
+> > From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+> >
+> > Add and implement microchip,no-tag-protocol flag to allow disabling
+> > the switch' tagging protocol. For cases where the CPU MAC does not
+> > support MTU size > 1500 such as the Zynq GEM.
+> >
+> > This code was tested with a KSZ8794 chip.
+> >
+> > Pieter Van Trappen (2):
+> >   dt-bindings: net: dsa: microchip: add microchip,no-tag-protocol flag
+> >   net: dsa: microchip: implement microchip,no-tag-protocol flag
+> >
+> >  .../devicetree/bindings/net/dsa/microchip,ksz.yaml    |  5 +++++
+> >  drivers/net/dsa/microchip/ksz8795.c                   |  2 +-
+> >  drivers/net/dsa/microchip/ksz9477.c                   |  2 +-
+> >  drivers/net/dsa/microchip/ksz_common.c                | 11 ++++++++---
+> >  drivers/net/dsa/microchip/ksz_common.h                |  1 +
+> >  drivers/net/dsa/microchip/lan937x_main.c              |  2 +-
+> >  6 files changed, 17 insertions(+), 6 deletions(-)
+> >
+> >
+> > base-commit: 0a658d088cc63745528cf0ec8a2c2df0f37742d9
+> > --
+> > 2.43.0
+>
+> Please use ./scripts/get_maintainer.pl when generating the To: and Cc: fields.
+>
+> Not to say that they don't exist, but I have never seen a NIC where MTU=1500
+> is the absolute hard upper limit. How seriously did you study this before
+> determining that it is impossible to raise that? We're talking about one
+> byte for the tail tag, FWIW.
+>
+> There are also alternative paths to explore, like reducing the DSA user ports
+> MTU to 1499. This is currently not done when dev_set_mtu() fails on the conduit,
+> because Andrew said in the past it's likelier that the conduit is coded
+> to accept up to 1500 but will still work for small oversized packets.
+>
+> Disabling DSA tagging is a very heavy hammer, because it cuts off a whole lot
+> of functionality (the driver should no longer accept PTP hwtimestamping ioctls,
+> etc), so the patch set gets this tag from me currently, due to very shallow
+> justification:
+>
+> Nacked-by: Vladimir Oltean <olteanv@gmail.com>
+>
+> Please carry it forward if you choose to resubmit.
 
-1) vhost_vdpa_unsetup_vq_irq() unregisters the irq bypass producer
-   but the producer->token is still valid.
-2) vq context gets released and reassigned to another vq.
-3) That other vq registers it's producer with the same vq context
-   pointer as token in vhost_vdpa_setup_vq_irq().
-4) The original vq tries to unregister it's producer which it has
-   already unlinked in step 1. irq_bypass_unregister_producer() will go
-   ahead and unlink the producer once again. That happens because:
-      a) The producer has a token.
-      b) An element with that token is found. But that element comes
-         from step 3.
+Hi Vladimir,
 
-I see 3 ways to fix this:
-1) Fix the vhost-vdpa part. What this patch does. vfio has a different
-   workflow.
-2) Set the token to NULL directly in irq_bypass_unregister_producer()
-   after unlinking the producer. But that makes the API asymmetrical.
-3) Make irq_bypass_unregister_producer() also compare the pointer
-   elements not just the tokens and do the unlink only on match.
+I do understand your reservation for this path, it defeats most of the
+advantages
+of DSA but I still do need the driver to handle the PHYs over SPI and for the
+WoL functionality; using the switch in a bridge configuration. My reason for
+mainlining is that I though there might be more people like me in a
+similar situation.
 
-Any thoughts?
+This is actually an older issue and solution of mine so inspired by your comment
+I revisited the documentation and indeed hardware-wise I can't find back the
+MTU limitation. I see now that it's actually a limitation of the macb driver [1]
+so I will try to rework this one instead. Or implement `dsa-tag-protocol` as you
+propose. Or event better, both!
 
-Oops: general protection fault, probably for non-canonical address 0xdead000000000108: 0000 [#1] SMP
-CPU: 8 PID: 5190 Comm: qemu-system-x86 Not tainted 6.10.0-rc7+ #6
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-RIP: 0010:irq_bypass_unregister_producer+0xa5/0xd0
-RSP: 0018:ffffc900034d7e50 EFLAGS: 00010246
-RAX: dead000000000122 RBX: ffff888353d12718 RCX: ffff88810336a000
-RDX: dead000000000100 RSI: ffffffff829243a0 RDI: 0000000000000000
-RBP: ffff888353c42000 R08: ffff888104882738 R09: ffff88810336a000
-R10: ffff888448ab2050 R11: 0000000000000000 R12: ffff888353d126a0
-R13: 0000000000000004 R14: 0000000000000055 R15: 0000000000000004
-FS:  00007f9df9403c80(0000) GS:ffff88852cc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000562dffc6b568 CR3: 000000012efbb006 CR4: 0000000000772ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? die_addr+0x36/0x90
- ? exc_general_protection+0x1a8/0x390
- ? asm_exc_general_protection+0x26/0x30
- ? irq_bypass_unregister_producer+0xa5/0xd0
- vhost_vdpa_setup_vq_irq+0x5a/0xc0 [vhost_vdpa]
- vhost_vdpa_unlocked_ioctl+0xdcd/0xe00 [vhost_vdpa]
- ? vhost_vdpa_config_cb+0x30/0x30 [vhost_vdpa]
- __x64_sys_ioctl+0x90/0xc0
- do_syscall_64+0x4f/0x110
- entry_SYSCALL_64_after_hwframe+0x4b/0x53
-RIP: 0033:0x7f9df930774f
-RSP: 002b:00007ffc55013080 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000562dfe134d20 RCX: 00007f9df930774f
-RDX: 00007ffc55013200 RSI: 000000004008af21 RDI: 0000000000000011
-RBP: 00007ffc55013200 R08: 0000000000000002 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000562dfe134360
-R13: 0000562dfe134d20 R14: 0000000000000000 R15: 00007f9df801e190
+Patch can be thus be cancelled, sorry for the spam.
 
-Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
----
- drivers/vhost/vdpa.c | 1 +
- 1 file changed, 1 insertion(+)
+Cheers, Pieter
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 478cd46a49ed..d4a7a3918d86 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -226,6 +226,7 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
- 	struct vhost_virtqueue *vq = &v->vqs[qid];
- 
- 	irq_bypass_unregister_producer(&vq->call_ctx.producer);
-+	vq->call_ctx.producer.token = NULL;
- }
- 
- static int _compat_vdpa_reset(struct vhost_vdpa *v)
--- 
-2.45.2
-
+[1]: https://elixir.bootlin.com/linux/v6.11-rc1/source/drivers/net/ethernet/cadence/macb_main.c#L5127
 
