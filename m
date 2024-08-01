@@ -1,130 +1,211 @@
-Return-Path: <netdev+bounces-114911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 709CB944A9A
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:48:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA5D944AAB
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:58:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E7C11F25759
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:48:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FDDBB24647
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90154184557;
-	Thu,  1 Aug 2024 11:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GAeOkRNk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25891946C1;
+	Thu,  1 Aug 2024 11:58:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7EDA158A2C
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 11:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB00158A2C;
+	Thu,  1 Aug 2024 11:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722512909; cv=none; b=S/+wtk7sW5SuUor0kfQK3CgDeSTXT2P5hacn2u9GSKAWGkpovqvyvN0VdwYjthvQykVaSHzd6jl8TAHaKnchuXucBUz+0SVRFGbEe3u9jBW+IFW60QJPnQeutinYyxwGCYEsbfZg6MjnBbqANlTHYB5znpRM0gVVbX69yItqpz8=
+	t=1722513523; cv=none; b=ftyVAu0EMk5wlYdwvixCgZwpN5ue8gbUNfyV7njWDLZ9FLR8AHLx92ZphAZTfNbv18CXOoDojKhYQ68I4QoZIvFscsli7yZkQ08bEMQ+5bYleFV1huz434mkz884Lf9Hv8lB/uEyHh5N4Ld5YKD7BLUbaGRHddigkmUb61BVRnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722512909; c=relaxed/simple;
-	bh=jjpCS6aSDcHuKnK77g8cc0yF6CnJozBYU7xCv1NANl8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oqQwBe/9oci8IkrIfSsydHo2ii/jfEfpNj8aN9ZCs/2hfY/J2h3e4KTCcmwVPzLv/qb4iWKd0nz4aTM74YBAcW4PWeV9MHLx2WSzDFEBkLr5sBm+qRbd6P8rtcIf23VvdDOwwFsFFxOQmGdLCMkLKNSFSn73CFybmYRMfFNlJMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GAeOkRNk; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52efabf5d7bso8130758e87.1
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 04:48:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722512906; x=1723117706; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bOxa2QyoGKL3fyeu8EvJ+iBbxOKEL9lUgVxh4jS+U/o=;
-        b=GAeOkRNknuf2Gmxx5HDk+H+GQ7f871bpaKnzLl0gZUvTRSAWsDhCYJotFCOMjsgZKt
-         nJSkDsauVtxv1alJcPZ7UWGBdEdJeBnC2hoRL6ypLdTnAN8DaedF+tsk1Uuhedn+RUiU
-         fOXvTLGoK8MlQ5bURwxHwTzMvBxbxYu+AwkQE3cDEKd17wnesptdnCzudyS/xGsuZt65
-         IToaojnbYnAKil3H7tRfSnyc3NUMZdSDHs4g0jeJ7r0Ip5eP/szvIHwm9ek3A0ACl4/6
-         /DiL4TArO9SbwLYCm388iCvoV9oFh+JPOIl3KCfrc36GNyjh3q9jGKRc/yLroKx5bBlK
-         7+Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722512906; x=1723117706;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bOxa2QyoGKL3fyeu8EvJ+iBbxOKEL9lUgVxh4jS+U/o=;
-        b=ZIJHUJGzwg7BHYpX5MLSrCPyYnHH07bCktSWgnDrAQKwARmtGSSSpDiKqTB7QFs1D8
-         H8+xNa1T64tKtRsFBijzNjmEcTAlCN9jBWJgbuC87NZtnUNPdwCRmRNDARR7fmIZPxmj
-         YMun20NowDGwTKoAzmv6QGSsRbQuR/a7I29tJD7YIUVBrClRcHcTvPvHmkMs8z4Y8V+F
-         qCa5BxSgCQEHpA9gcQvhpkesNC/zvj9L6a/P2Dmy/+QKWdBv6pnM0b1EvIxJItu2odxo
-         KOFz4Jo+VhN3ANJ1Y+6ENinTW+i99xRKBRv0ILfD6+ji2lrpERfrhDW/+47rG0Et6n1F
-         iLaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGN1K1eCO0GpaE7N4jx3HoICH0wyu0EVoYLRMjuIqOLWm1rlB9F9x9d5cHKZGQfJgahrKsHGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxnw75P2df9KU5k/lqTe0mjVspe7fDv5w3kfXekZPIZW9+wY9kI
-	nheqQE8DSG5sOmIiyTA4zbFV7RGS/IE/3yT+ZbCkIsL7TNoSiOoW
-X-Google-Smtp-Source: AGHT+IGlBW3Zt/fWtUuXfQmxpAZIUi3zChYgsWnHvnvUQ7h9kvnNj+eMd9aSqWS9A/59b3oU+ZQ/XQ==
-X-Received: by 2002:a05:6512:2c08:b0:52f:cbce:b9b7 with SMTP id 2adb3069b0e04-530b6152954mr1340297e87.0.1722512905475;
-        Thu, 01 Aug 2024 04:48:25 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52fd5c1eec2sm2522060e87.233.2024.08.01.04.48.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 04:48:24 -0700 (PDT)
-Date: Thu, 1 Aug 2024 14:48:17 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Yanteng Si <siyanteng@loongson.cn>, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, si.yanteng@linux.dev, 
-	Huacai Chen <chenhuacai@loongson.cn>, peppe.cavallaro@st.com, andrew@lunn.ch, hkallweit1@gmail.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, diasyzhang@tencent.com
-Subject: Re: [PATCH net-next v15 11/14] net: stmmac: dwmac-loongson: Add
- DT-less GMAC PCI-device support
-Message-ID: <3d67tp6notufq7c35fdlel74xjqdiwlviiadwcfmfveg5smkgr@cvoosjros3bz>
-References: <cover.1722253726.git.siyanteng@loongson.cn>
- <359b2c226e7b18d4af8bb827ca26a2e7869d5f85.1722253726.git.siyanteng@loongson.cn>
- <eb3ad0da-9ed3-42e3-9a96-7be81841fc93@redhat.com>
+	s=arc-20240116; t=1722513523; c=relaxed/simple;
+	bh=VeLo6DLo4sUwfbYapDDwOFqJypLiBvQt/vlWjIJHQVA=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rA5dv9MoweBJN+ktELefAlEYMKiamt7i/YLFiSchKC0hk92i8BNjy1rkSP5e00uTWCQMUQ9jgNwIeGr5Ls2P6KgIVXCFGOiKNQVYs/Sv1Y4sQjjU/LbWxxHbq18tj2u+92oCdpgo0WcSMgYeCK7LAQKeqhepKsKN8FiQ1NxN0qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WZSCj136Fz1L9MN;
+	Thu,  1 Aug 2024 19:58:25 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id CCD93180102;
+	Thu,  1 Aug 2024 19:58:37 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 19:58:36 +0800
+Message-ID: <ff75f342-4894-4c06-922c-377701c461df@huawei.com>
+Date: Thu, 1 Aug 2024 19:58:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb3ad0da-9ed3-42e3-9a96-7be81841fc93@redhat.com>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, "yisen.zhuang@huawei.com"
+	<yisen.zhuang@huawei.com>, "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "shenjian15@huawei.com"
+	<shenjian15@huawei.com>, "wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>,
+	"liuyonglong@huawei.com" <liuyonglong@huawei.com>, "sudongming (A)"
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, "shiyongbang (A)"
+	<shiyongbang@huawei.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH net-next 07/10] net: hibmcge: Implement rx_poll
+ function to receive packets
+To: Joe Damato <jdamato@fastly.com>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-8-shaojijie@huawei.com> <Zqo66ZPaD2GtLZwg@LQ3V64L9R2>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <Zqo66ZPaD2GtLZwg@LQ3V64L9R2>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-Hi Paolo
 
-On Thu, Aug 01, 2024 at 01:32:56PM +0200, Paolo Abeni wrote:
-> On 7/29/24 14:23, Yanteng Si wrote:
-> > The Loongson GMAC driver currently supports the network controllers
-> > installed on the LS2K1000 SoC and LS7A1000 chipset, for which the GMAC
-> > devices are required to be defined in the platform device tree source.
-> > But Loongson machines may have UEFI (implies ACPI) or PMON/UBOOT
-> > (implies FDT) as the system bootloaders. In order to have both system
-> > configurations support let's extend the driver functionality with the
-> > case of having the Loongson GMAC probed on the PCI bus with no device
-> > tree node defined for it. That requires to make the device DT-node
-> > optional, to rely on the IRQ line detected by the PCI core and to
-> > have the MDIO bus ID calculated using the PCIe Domain+BDF numbers.
-> > 
-> > In order to have the device probe() and remove() methods less
-> > complicated let's move the DT- and ACPI-specific code to the
-> > respective sub-functions.
-> > 
-> > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > Acked-by: Huacai Chen <chenhuacai@loongson.cn>
-> > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> 
-> @Serge: I think this addresses your comment on the previous iteration, but
-> it would be great if you could have a look!
+on 2024/7/31 21:23, Joe Damato wrote:
+> On Wed, Jul 31, 2024 at 05:42:42PM +0800, Jijie Shao wrote:
+>> Implement rx_poll function to read the rx descriptor after
+>> receiving the rx interrupt. Adjust the skb based on the
+>> descriptor to complete the reception of the packet.
+>>
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>> ---
+>>   .../ethernet/hisilicon/hibmcge/hbg_common.h   |   5 +
+>>   .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  10 ++
+>>   .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   1 +
+>>   .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  |   9 +-
+>>   .../net/ethernet/hisilicon/hibmcge/hbg_main.c |   2 +
+>>   .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |   2 +
+>>   .../hisilicon/hibmcge/hbg_reg_union.h         |  65 ++++++++
+>>   .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 157 +++++++++++++++++-
+>>   8 files changed, 248 insertions(+), 3 deletions(-)
+>   
+>> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+>> index 8efeea9b0c26..bb5f8321da8a 100644
+>> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+>> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+>> @@ -36,6 +36,7 @@ static int hbg_net_open(struct net_device *dev)
+>>   		return 0;
+>>   
+>>   	netif_carrier_off(dev);
+>> +	napi_enable(&priv->rx_ring.napi);
+>>   	napi_enable(&priv->tx_ring.napi);
+>>   	hbg_enable_intr(priv, true);
+>>   	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
+> In the future, it might be good to consider using:
+>     - netif_napi_set_irq
+>     - netif_queue_set_napi
+>   
+> to link NAPIs with IRQs and queues.
+>
+Sounds good, but I can't find these two functions in 6.4 kernel?
 
-Thanks for reaching me out. I'll have a look at the series later
-today.
+>
+>> +static int hbg_rx_fill_buffers(struct hbg_priv *priv)
+>> +{
+>> +	struct hbg_ring *ring = &priv->rx_ring;
+>> +	int ret;
+>> +
+>> +	while (!(hbg_fifo_is_full(priv, ring->dir) ||
+>> +		 hbg_queue_is_full(ring->ntc, ring->ntu, ring))) {
+>> +		ret = hbg_rx_fill_one_buffer(priv);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static bool hbg_sync_data_from_hw(struct hbg_priv *priv,
+>> +				  struct hbg_buffer *buffer)
+>> +{
+>> +	struct hbg_rx_desc *rx_desc;
+>> +
+>> +	/* make sure HW write desc complete */
+>> +	dma_rmb();
+>> +
+>> +	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->skb_dma,
+>> +				buffer->skb_len, DMA_FROM_DEVICE);
+>> +
+>> +	rx_desc = (struct hbg_rx_desc *)buffer->skb->data;
+>> +	return rx_desc->len != 0;
+>> +}
+> Have you looked into using the page pool to simplify some of the
+> logic above?
 
--Serge(y)
+Thanks, but I probably won't use it at the moment.
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
+>
+>> +static int hbg_napi_rx_poll(struct napi_struct *napi, int budget)
+>> +{
+>> +	struct hbg_ring *ring = container_of(napi, struct hbg_ring, napi);
+>> +	struct hbg_priv *priv = ring->priv;
+>> +	struct hbg_rx_desc *rx_desc;
+>> +	struct hbg_buffer *buffer;
+>> +	u32 packet_done = 0;
+>> +
+>> +	if (unlikely(!hbg_nic_is_open(priv))) {
+>> +		napi_complete(napi);
+>> +		return 0;
+>> +	}
+>> +
+>> +	while (packet_done < budget) {
+>> +		if (unlikely(hbg_queue_is_empty(ring->ntc, ring->ntu)))
+>> +			break;
+>> +
+>> +		buffer = &ring->queue[ring->ntc];
+>> +		if (unlikely(!buffer->skb))
+>> +			goto next_buffer;
+>> +
+>> +		if (unlikely(!hbg_sync_data_from_hw(priv, buffer)))
+>> +			break;
+>> +
+>> +		hbg_dma_unmap(buffer);
+>> +
+>> +		rx_desc = (struct hbg_rx_desc *)buffer->skb->data;
+>> +		skb_reserve(buffer->skb, HBG_PACKET_HEAD_SIZE + NET_IP_ALIGN);
+>> +		skb_put(buffer->skb, rx_desc->len);
+>> +		buffer->skb->protocol = eth_type_trans(buffer->skb, priv->netdev);
+>> +
+>> +		priv->netdev->stats.rx_bytes += rx_desc->len;
+>> +		priv->netdev->stats.rx_packets++;
+>> +		netif_receive_skb(buffer->skb);
+> Any reason why not napi_gro_receive ?
+
+Is it OK if the MAC does not support gro?
+
+>
+>> +		buffer->skb = NULL;
+>> +		hbg_rx_fill_one_buffer(priv);
+>> +
+>> +next_buffer:
+>> +		hbg_queue_move_next(ntc, ring);
+>> +		packet_done++;
+>> +	}
+>> +
+>> +	hbg_rx_fill_buffers(priv);
+>> +	if (packet_done >= budget)
+>> +		return packet_done;
+>> +
+>> +	napi_complete(napi);
+> Maybe:
+>
+>     if (napi_complete_done(napi))
+>       hbg_irq_enable(priv, HBG_IRQ_RX, true);
+
+okay, I will fix it in v2
+
+Thanks again,
+
+Jijie Shao
+
 
