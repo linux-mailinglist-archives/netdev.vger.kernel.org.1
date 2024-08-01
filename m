@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-114760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF39943FCA
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:51:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CDDF944027
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A3B280C16
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:51:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 776C6B2EE4F
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E200738DD9;
-	Thu,  1 Aug 2024 00:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A5313A403;
+	Thu,  1 Aug 2024 00:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBsdbE7y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3OBgiFW3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53982D7A8;
-	Thu,  1 Aug 2024 00:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF8241C62;
+	Thu,  1 Aug 2024 00:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722473432; cv=none; b=pImAK2dPvJ4tFVsLjcr6+PHoFInKY21LTFcLJOdRyrTPy1dqNRQIXjNLl2lfp/5BG8VTYq6WREpoofU4os+kdQZ2Du6IOviypmx38htejdhPknC1XyqFVqDcq79k3Iol3HoCzZ0jmemNqeXzdlsCjRicMaFxt3eQPr9n+IlUfbU=
+	t=1722473494; cv=none; b=JhXTmPVTLKnkBWAq5hKFayzAjvzlN92470L3PAqkhVHJ9jE0GhRJBu8JTDUkDP8X0vGx77Ggykbfv7TTwpkBUPLqsGEQdczK4ySVtNgjwLrHaIlSddHNPRvY0Z3LjuLmoZfdkLZFrKGbJtfup8NFpwyHwPs7+DcD953Xm5ZHP70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722473432; c=relaxed/simple;
-	bh=hUCmHDHln5FmaSza9s94M/ZS+65Tu8W5FdeKsl+HQz0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=f7WPlDdX7KwyDTXxE8VtUGQA6B80iX9KAJSla+XuL0GdXN0R/KIUpnebk+LBpvqm3WrXkUtenv9SX1WDgVrUBGS6/38t1oux2/QxUtUBi3kIMtNDzNCUJ1kKnY9Rr0h4gaiJI/lngyvphQYBUThSbo01Gh8V2nnF5bxEA3LA4L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBsdbE7y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20CF5C4AF0E;
-	Thu,  1 Aug 2024 00:50:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722473432;
-	bh=hUCmHDHln5FmaSza9s94M/ZS+65Tu8W5FdeKsl+HQz0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lBsdbE7y7mrRhPW5L0fbqw6Fig2qBQhotlYhhAK20+NQ53yLevmgRHZb0l21JbDGZ
-	 r9TvhMR8cQfJsilZMXk0QFPS0H4vaLLeKfwe51w4z6+HVlGeVcFXT2FO+iYXool/qo
-	 NmnBQA5uT+ALL+gkLj71Cbdy3gAKEtzxmd8ZLMtwNw7AfXM1fZ1uTx2ruP1fqj8/+x
-	 PL+oVzla7OG6N3hVji5bgSC6uFM0Sf+DjMC+XJhkEeUNRLpBxzGKQ6aYYdDGK4noqD
-	 SUjC9qohu1QOTvM7cBfZM/WsMcC4IIdaKIYkKc4qXG8xBNweqLCUJf2ypuyn/nbY9G
-	 +bOT7Hmu8mgcw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 11F0EC4332F;
-	Thu,  1 Aug 2024 00:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722473494; c=relaxed/simple;
+	bh=Tob5RJ8TVTfLxnflDB3RbJP2xKlu9U4itI/sQ1ANdQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DKWeA0hSuKJy4jCDgKwwPOSW5SlTqweLZKdsCFGhL82UGvV63gQEpANa+g+YoeCFr0L4oKSWE6lpMcQ0EVSxCNQXbCbigG4bZc+3JCK7woa1GiZirWBXulsKH76gxC2o3z4Ae18Xa19E+tbapEriKbvrX47TKZMB/UYrAPFxy6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3OBgiFW3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RWocHcypdVDpKFFDvUYKJ1X6d7KbrOKhop1PRWCze7k=; b=3OBgiFW3zRYKBVWyDo8Gi0dVUy
+	89mApb6Bd7IRlzAK2aliFLblGHdxQZFOFlupzswxZ0AzDKA4a9XwhopemY1tME4H3s9KzzZOOfCdl
+	jKVDWKBOpvPBrkjr+xqY+K4FZx29fAqSbhRHGyvzHXtUQlZvfUx4VI/JbTSfqwWTJRlY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sZK2O-003j1D-7z; Thu, 01 Aug 2024 02:51:24 +0200
+Date: Thu, 1 Aug 2024 02:51:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 05/10] net: hibmcge: Implement some .ndo
+ functions
+Message-ID: <0e497b6f-7ab0-4a43-afc6-c5ad205aa624@lunn.ch>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-6-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2024-07-31
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172247343207.10818.7355552776863243243.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Aug 2024 00:50:32 +0000
-References: <20240731115706.19677-1-daniel@iogearbox.net>
-In-Reply-To: <20240731115706.19677-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240731094245.1967834-6-shaojijie@huawei.com>
 
-Hello:
+> +static int hbg_net_set_mac_address(struct net_device *dev, void *addr)
+> +{
+> +	struct hbg_priv *priv = netdev_priv(dev);
+> +	u8 *mac_addr;
+> +
+> +	mac_addr = ((struct sockaddr *)addr)->sa_data;
+> +	if (ether_addr_equal(dev->dev_addr, mac_addr))
+> +		return 0;
+> +
+> +	if (!is_valid_ether_addr(mac_addr))
+> +		return -EADDRNOTAVAIL;
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+How does the core pass you an invalid MAC address?
 
-On Wed, 31 Jul 2024 13:57:06 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 2 non-merge commits during the last 2 day(s) which contain
-> a total of 2 files changed, 2 insertions(+), 2 deletions(-).
-> 
-> [...]
+> +static int hbg_net_change_mtu(struct net_device *dev, int new_mtu)
+> +{
+> +	struct hbg_priv *priv = netdev_priv(dev);
+> +	bool is_opened = hbg_nic_is_open(priv);
+> +	u32 frame_len;
+> +
+> +	if (new_mtu == dev->mtu)
+> +		return 0;
+> +
+> +	if (new_mtu < priv->dev_specs.min_mtu || new_mtu > priv->dev_specs.max_mtu)
+> +		return -EINVAL;
 
-Here is the summary with links:
-  - pull-request: bpf 2024-07-31
-    https://git.kernel.org/netdev/net/c/601df205896d
+You just need to set dev->min_mtu and dev->max_mtu, and the core will
+do this validation for you.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> +	dev_info(&priv->pdev->dev,
+> +		 "change mtu from %u to %u\n", dev->mtu, new_mtu);
 
+dev_dbg() Don't spam the log for normal operations.
 
+	Andrew
 
