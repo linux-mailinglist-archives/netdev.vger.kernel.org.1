@@ -1,445 +1,288 @@
-Return-Path: <netdev+bounces-114896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5917B9449DE
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:58:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F7D9449FB
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAE231F23521
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:58:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FA9F288750
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B617188016;
-	Thu,  1 Aug 2024 10:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F6E187FF3;
+	Thu,  1 Aug 2024 11:02:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infogain-com.20230601.gappssmtp.com header.i=@infogain-com.20230601.gappssmtp.com header.b="xnSXWQVT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oIm4LbWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71730187FE5
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 10:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722509915; cv=none; b=uGoD0T2LP/rdDCzSHsPBicBKaL/dRUFUP56Mgzijynwe7QWb/a2OjA/qjIGlmfg6OzNHgIGyaVNfBzrjwVZgDGwxf4WbH5gvpq4za7vDFiH9qeylfUngzQVhMq3iuGYCC6oAydTpOgWjG4CXEsi3CXePoRTXYSuuWsvPUzDQQa4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722509915; c=relaxed/simple;
-	bh=d6O/vDMuzNKaTopgE2ZOD/6qCo4XxgOI6o9iAjPxGRo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZegCBgPbDBofZ5kXlcI6oyqHe8oBgl66of7IpdqpOXLssdBO+oReaV2b9hk2RHC4yJFzsGb413iFd1qHKvWAxHt7wz9Z05DgfyNks/T3/u51aEAiYFkHZkkc0pkIhNag3zvP/TCoX1CGe+Rvg2xaz//+/TogKm/MwwcMD5SqZ4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=infogain.com; spf=fail smtp.mailfrom=infogain.com; dkim=pass (2048-bit key) header.d=infogain-com.20230601.gappssmtp.com header.i=@infogain-com.20230601.gappssmtp.com header.b=xnSXWQVT; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=infogain.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=infogain.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-428e1915e18so3800355e9.1
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 03:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=infogain-com.20230601.gappssmtp.com; s=20230601; t=1722509911; x=1723114711; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kVrtk1m5zgFdtHnwDb+mrV04TZqiuqA+XJN3Mt0Abio=;
-        b=xnSXWQVTc17s6oGdnhCjHfnTkg1GluBiKOTjo7AWaLkIMkwxQ4yo86gJized/WzAdj
-         WWEQhRfMdld0bTTV2fp1L/5YcIgESu/zpgl90gYU9ZPCbbDGXIiN1qIUL/x+HGiYDXmq
-         wZDrRPb48CWrISclbmeIxPH3mymkF1j1BPUtsfBkMbPAsVYgeS6d0VM6QDtslOa9vDA2
-         HbaGP2J0ctfTnNd0v/IDiod8YSZpIRMZuyhUVrA8lhVONajjpfIy/Vy26Enr9/sMYZnt
-         mHSVE/pVrDtSbLW7vCE7X84m5HJbhpXSOU2IIoJdvZa/IJp5lU/cu7FA///jOjikdHaW
-         G8+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722509911; x=1723114711;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kVrtk1m5zgFdtHnwDb+mrV04TZqiuqA+XJN3Mt0Abio=;
-        b=A3DfzoY6ZEhXxx12VbX0aU7QN4wWp7iny6HYf1P1E4DMsPlvqy1tODyOZOU1zOMT/T
-         WqELpjffph1fkn6UjuKQK/fxwkrBRFTyvgA/A7MhYtxV1oQHQHnHgfwsklrfiB4oGFEN
-         a0ypEfDP8MjkVVeO9DtDTGOXyletyYJLqXLxUDaTSwGooXf/RwcBhgNRhXfkjvfItYat
-         pJbcDV3w9HpaOc08wb8+yGaaHHZ9GpGB+6GcLbKT3Hx+UhDAKcWr0vYYkEMyRm/DujwL
-         d1kSXevzqLInpKcx27tpbXvyHGCzcvu1CICOOaNcby0/Gn1/il4/T7dt4KbITzJP55dt
-         Stuw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLPDoQ31A2ZQ7Rk3leRihBgLie2Xr31UkUhkmg/OcVsmiA5bbwksg2eAmX8ASSYDE6HvtjQwuEgwr3nvxZiKHj7K9cD0KR
-X-Gm-Message-State: AOJu0Yz7WH9/NHcQR+BAgxhbRPn13Qpq7gv5zSdetfd93yzZaCQHmqpr
-	KlEkgzp4qGEWF5nqzH1OC/jg9LIIslhpissUk2XivOETEV0nXRB0EVgzaZFu1nA=
-X-Google-Smtp-Source: AGHT+IG7Mtd6BUWrGEZm919JuKDJtWA+bv/kCh1P/ohmijr2X71oJRpSFqS1TX0vV0dVl0ZhfSemXg==
-X-Received: by 2002:a05:600c:358c:b0:426:5416:67d7 with SMTP id 5b1f17b1804b1-428b030cca0mr14005695e9.27.1722509909833;
-        Thu, 01 Aug 2024 03:58:29 -0700 (PDT)
-Received: from localhost.localdomain (apn-31-0-3-137.dynamic.gprs.plus.pl. [31.0.3.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36861b29sm19068960f8f.93.2024.08.01.03.58.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 03:58:29 -0700 (PDT)
-From: =?UTF-8?q?Wojciech=20G=C5=82adysz?= <wojciech.gladysz@infogain.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Wojciech=20G=C5=82adysz?= <wojciech.gladysz@infogain.com>
-Subject: [PATCH] kernel/net: missused TCQ_F_NOLOCK flag
-Date: Thu,  1 Aug 2024 12:57:07 +0200
-Message-Id: <20240801105707.30021-1-wojciech.gladysz@infogain.com>
-X-Mailer: git-send-email 2.35.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E624184529
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 11:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722510126; cv=fail; b=fDudemSAwlbinNW+7/5nt0Hsal21/K6dGmIBg16wQd5na8+CdbtpUYlT3sgWTnwrvTeimCuL7NJ6T7aQtfnSRO84hHRS4eZx47VKWorzUz0E7f0Ez+pePKMYt4SRR7ZNEvgYreJ1EuhoAMm/ybsCOGFzHSRt9bf4ufFsxoeS+sk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722510126; c=relaxed/simple;
+	bh=8BWo9gl45AaCHhueR+udn9TwUrdILgCVEGLfw8tm77c=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=a0CwcWagh5sKMtpj4vzCb83K4y8Oqa2SyuBs+Cr/GDWbTgyaGbpCz09vh1toBsS+hKttEHxawDZkLUneo/qVWXllWgneVX7PMzlKmEdVryewAtclC5bQba1u8DItt4jf3A8yQmJ1n/TnyXhkGNkQTaH5GxxNjcfcXC+DJju3iNU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oIm4LbWp; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722510125; x=1754046125;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=8BWo9gl45AaCHhueR+udn9TwUrdILgCVEGLfw8tm77c=;
+  b=oIm4LbWp11pUSKvG02Qg+qcQOQkmW1C+BL+kq4Y/q9PR1MvYcAHuUDS4
+   iXaIH2DeH4YpRk/0JrUOM1XzfkjuuFQxGaU1V2qMrCJMyygwipfTo2su6
+   TDbGBgO44cIdI0lRHtHTVPtV8FqwkOchw9sJUtFQHOPd29GfjjAW396Jl
+   mLMicQbHP1tlpK62k0kXeDAwP7A5nWlzH0h+IJOqEEt1hFtpvW+vm9sTL
+   kOaMEgvKMg6craPVZuGRByfck3J4lB+cDTBr2isFthDPjpsZLhWIV4XAy
+   fm5yUjRZFJfPQ3qajM9lzi8Mi6w90j/Tl77kB8HpfFfP1A+8M97xk2wQU
+   A==;
+X-CSE-ConnectionGUID: YUBmGTW4RRixPPkOq9jOcQ==
+X-CSE-MsgGUID: GUZhShZ1RlWTOkFkNPgBEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11150"; a="20342850"
+X-IronPort-AV: E=Sophos;i="6.09,254,1716274800"; 
+   d="scan'208";a="20342850"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2024 04:02:04 -0700
+X-CSE-ConnectionGUID: sPuEXqImScytkAS7j6TRcA==
+X-CSE-MsgGUID: fOWYrYbGToKO2MN/6pjCKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,254,1716274800"; 
+   d="scan'208";a="59813272"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Aug 2024 04:02:03 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 1 Aug 2024 04:02:02 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 1 Aug 2024 04:02:02 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.43) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 04:02:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IJrV8qxgl6gpJVNuF+AjXX/egpY+VqWVt/XOYTIVxMMqHGeOJeJD7mM0JnAar09cHR57hWSOa2LLNhwhcWmGZsRnhmKGJwVKXXqzU8iwj+Gn/7Hv+4Mui2TktkTG9NAYMvPDiGVCWVPawV8B7BBAUMXFlQO+7szSf0iXg/rK94+eyHXO3yzP3aGsBe6dxOeRgXlLaegkZq7651Uq9L37uUE2YaYCejlVvJv0FGJNAaX7WVpFk1Hasf6fyEnfyA+XkdYih9WMoEybL+F3VtuvtKsePfoQHzqvzx9z6Gn23GWDIb0R6bE5ROZJvDGjldPEB5q1DAQURNnflPw2/qzq4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A8saUt7PB/Y0ToVZZk2+yvGgE5CgydNDuKqRF8pWB8A=;
+ b=aRgYyl8Z3l2lS4pg75HMCjHotvDYpAdBGSb9SDda5v3D9hATESJFHvUbVi9ankxzbgG4ZUWenl5Yb8h+a7PY6hw0H4RkcYRPVHIoCWM7G7BOuIKnF48gN229xhXX0pw0jmzGv4kAJMrt5L53Jqw8hT79y8ZHmsMaRlKSOGxZ12DrdxQ2cekmcbUn2VrCBGSdWSk4quStNmhPvbMFTOzLw0ZRWxfeYCK+xEjoNsbepqI5YFWnYfOC3r+1eK8F0jPRlQ9hXj+JGvf/HNhnpCwjnXMZOfEHSNmAzQL/45cN2u3InjMwAykeXtUlqytNPgM515D802LRY+hshIUcqkaUGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by SA2PR11MB4859.namprd11.prod.outlook.com (2603:10b6:806:f8::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Thu, 1 Aug
+ 2024 11:02:00 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7807.026; Thu, 1 Aug 2024
+ 11:02:00 +0000
+Message-ID: <616bd069-51a0-4b05-96af-2d419961e0e5@intel.com>
+Date: Thu, 1 Aug 2024 13:01:52 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: Implement ethtool reset
+ support
+To: Jakub Kicinski <kuba@kernel.org>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"simon.horman@corigine.com" <simon.horman@corigine.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+References: <20240730105121.78985-1-wojciech.drewek@intel.com>
+ <20240730065835.191bd1de@kernel.org>
+ <c0213cae-5e63-4fd7-81e7-37803806bde4@intel.com>
+ <20240731164716.63f3b5b7@kernel.org>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20240731164716.63f3b5b7@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZRAP278CA0010.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::20) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SA2PR11MB4859:EE_
+X-MS-Office365-Filtering-Correlation-Id: 23dd7765-7720-49b6-ac8e-08dcb2195dca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NU5md2ZGeEl6S01WU2hiU09UN0xYeTNvQ2ZGL0VCczFtVFlnRk9RbUlTTXFv?=
+ =?utf-8?B?bUpIcFQrekxnMEtBdHVUdmVnNTE4bE14Zmx3VVVaMHN5YlRLNFBkQVU2cG5P?=
+ =?utf-8?B?RE5UUjNOcW1VUU9aR3d6SWVNN25rS3BsMzdhMnFmZ29ONTRVM1Nkai8za01u?=
+ =?utf-8?B?YkpLVmVkOXo2TmpBaE9xSndVZ1lhZ3plTmc3QUw2UzFqWUV1cTRKM24zb05S?=
+ =?utf-8?B?ZUsvMWtJTERDNEdQdkFpVHBXVVNsc0tHQUx0bUhJdi9MU1F1VVN1ejBiTmNZ?=
+ =?utf-8?B?QzJRVXd4cm83VjZEcmQzMXNXbVdmNEZtUi81NE5jQVU5aTdaT09UM3ExbktS?=
+ =?utf-8?B?cnZDWXQ1SkFBbEFWVUQ1VmlkMzJFUzFOVnZtTkRVcjIwVm1sWVlEakdjQ25I?=
+ =?utf-8?B?OGxMVmpmZUI5M2FyUnJXZmtUY2F3Tmx5alRVRGkvTTZXVFQ4OXkvckVSYWg1?=
+ =?utf-8?B?VFpqMEs0ci9rVjFxY3UzTm9OUW9ZU2lDNzVVektoSGx1K0t0OHp4T2xLMmZs?=
+ =?utf-8?B?QVp5SHJFSHduU2dEUGFXRFoyNVF2c3djR2UvMWhzalc1eEdFQVBJTWlhRkdp?=
+ =?utf-8?B?YlVGSTdpTU5adUZ3cHlnMiszMHBuUzlaV2loVGNCNGxwcStPVFpTNnl6YkM3?=
+ =?utf-8?B?dm1WRng4WHZ3VXFJamhtRU5FbXNnOXcwWTN4TDVoR0htdEhGTXdNMWtqVVhO?=
+ =?utf-8?B?MUxIREs2cExDYlpucVM5OU5obE5jVFdVV1BWbHVKbll4VytHUWllZUtIbjNa?=
+ =?utf-8?B?Y29aRTdwRVZtUnNTWHEwcFFrSTdaZy9pWGx6bW1leTR2akxCa3pmUGdXN0FY?=
+ =?utf-8?B?OGdZUHVlR0lMTVRBek5rUElUc0tIeG52c20vUU5zSkIxcHplWUh1WnltTHUr?=
+ =?utf-8?B?SlRBSk9rNWRXbmxEMmkzTWl5UFo0Z1JYZEphZTVaaEdEUkZ6L0ZUcE93Wmlk?=
+ =?utf-8?B?NFArMmxFSXJlSGxMKzJzZjlTZzUzSkQ5RFB6dittTFhZc01lM0ZiM29SY0RJ?=
+ =?utf-8?B?VU5OdDlmbzkxb0o5eWl0NG9PQXVyRmxyUlZYS0k5NHlSWEN5dmtpYWI0MFhM?=
+ =?utf-8?B?NXBLaWNYcTJ1M0lKZmpGUTRRalcveThwNzIzdWFRNFA5bzV6WHpQMGZpNnR3?=
+ =?utf-8?B?Tm0wRituQzZjd0xHSG1uLys5SWlxL3RyRVJGdWdSQ1psa2ZlakpkcURGbnow?=
+ =?utf-8?B?c0pRdmNpR1h0dVZuMkNnbEVNTE5jaEZuSTcwQWZsd3dJSzNDaDFjeGdTQjZN?=
+ =?utf-8?B?VG9vdm5JUmwvOFl5RWxOeU5rYTMxOWxQMVJOWE1SNGdRZlhNTnhJZXhZajFh?=
+ =?utf-8?B?L3ZCMU5oa0wzR1ZKNVRyY2lJVXJJTE1aclkrWm02WXBLL0VYeGhPc0ZaMmRi?=
+ =?utf-8?B?MWV4bXBjNS9YU0NLNERiL0FhUGdXN1dOck85VC9sT045RjZmK0RjTEUwUkRz?=
+ =?utf-8?B?dmZsNVBVbkxSN1BCUlBjYUtrZGNadmppVUkvMGZRRFBHS1hWNmpKakJ1V2JX?=
+ =?utf-8?B?NFhpWnlJZHdWallMY3IzTFlsaVVJU2hXaTM0L2FnUnNOaU5BVUpwOUg1d3Bm?=
+ =?utf-8?B?QXo1WjFGcTloY2NtNDJqMDF4SldPcE52b1dVOC9XZGMrOUYwUkdOUDdmcTh2?=
+ =?utf-8?B?OG5GcW02cGVmWFlOV1pWYkptcnZ3ZUwrbjB6Wk9PZWdWeVUybTR1UndwNzdV?=
+ =?utf-8?B?Rm9yWVUycUR5UEh3UC9lWDExTDJMcW05Y1h3TkZZbVpNTERYMERuT2RtRTMw?=
+ =?utf-8?B?WXU0eTR2OWIycE9Ick1QY0dieVpTVHMvNm1YZ0FlWENjdENOdSszUHNnUndi?=
+ =?utf-8?B?cTJDRGVvdUprdnQrZEdKdz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QXBkSUNwWEVqTjN3dmx0RjZuc1p5NlBKMFJ6UW8zS0s0bEpob1hGUzF6MWhv?=
+ =?utf-8?B?czRPR25qTEU1eVA5SjNnZnA1Y0hiZWFZTUh6UUh5M1lBdExSMXpDRnlzeDYr?=
+ =?utf-8?B?Z056VngxOS8xN3l6dk0xMFgvSUdmbGp6azcreVAzL3lIUlhzVGhzUmhPVmdw?=
+ =?utf-8?B?eUFWVHBveDk0c284VG5DMHZzMGtFVXFxNjFUQXJPbG15WkcyMU1qU2c5QStt?=
+ =?utf-8?B?bThvN1lJWjlIZWxRNVViQ1hzU1BzYStZTnhvdW9jRVgvTzhseEtra1c5MG1L?=
+ =?utf-8?B?ZW9DUS9VanpXWmIzanMrRTI2YjFpRXdMNm8reHdCRXh3OTBzRVFuMzZKdWt2?=
+ =?utf-8?B?VFdKMlFCMUUxUEd0QVZKK2ZLMnQyc2FwM2pLNEtoS3lhbjFhaDZycUxtSjhF?=
+ =?utf-8?B?ZUM2M2pzV2J6U01FRWdpay9aSFVTdk00Tzlpek4yNitObkF4bmR2UVJ0cHd0?=
+ =?utf-8?B?Q0VjeThBaEYxYjQ2L3dhdTg1YUg1VU40ZmVaQnlydDB2a1RPUnlPTTlEeHJG?=
+ =?utf-8?B?bWE0UE1tOFB1eUdxVS9FcTJFbFpDUWFxZXZPODVITDE4M0Y4VXdGSGVWdUho?=
+ =?utf-8?B?Qm1qU1NtalFucFNQWmcxOXhxZ0MvSWFjL3NjRkJMd2xKM1M3YndHMFpJSEpt?=
+ =?utf-8?B?VUszek8xNHpuYkpJQXZiUkdFc0lFM2dsaDVFYlJ6aVRUL01pVFN0a0wzdlZB?=
+ =?utf-8?B?Q0V2WDNSNjVzV1NnMGd0RjBBaklRV0haQlBIazdDd2JVVE9CdGlRSHpkdXVo?=
+ =?utf-8?B?ZmxWcnVPR0pMN3hrc1o0MytQNFJNZmZNcU9EbC82WHczS3gremdnUUkxMjZR?=
+ =?utf-8?B?aDhjVUtsSnVWN1EzYUIwUXgyYzFrRVlhWkhCa1hzY0c5Rkgwc2ZlQ2IwaW4r?=
+ =?utf-8?B?ZE5mVDFtcHErWGp6NERCWGs5LzNsMlgxc0pMUHJJZVRkcXpMT081NHg3REJx?=
+ =?utf-8?B?djVPc3Y4UCszN0pJcnhFZzFBZmRzeFpaYjNXUUtxeVpTTGVXQVk5MUFScHF5?=
+ =?utf-8?B?eVVFem4yNE10WkJaak52Rmh2YnFqV0ZMN2RnOXBXSDJKNnZ4RWRQUXNxaWEy?=
+ =?utf-8?B?OFVSTHQ3djVhR21YODZvSWJmSkxWSzE4L2x6WURDWXpmNE9MOWt6am1rZzR6?=
+ =?utf-8?B?dFB1YWhGNDVpaS9ENnF0WXk2T0JudVhYdDVjNmsrMEJFNVltS0lFV256NHQy?=
+ =?utf-8?B?S3VWMk9MMGJya3FKZkY3Vi90M05ndHpldlJCQ3l6anp3Y2R0dnI2MysxMExG?=
+ =?utf-8?B?VFZhZkEwbmZSbEREL3d4djl6UVdiUmhtajVWK3R3M28zelJhYUQ2MXNTU1Bz?=
+ =?utf-8?B?bTN5K3F2dVNNUlZyeEdxNndCR3pTbG9sNjBFOWs5SkR6TjM2T2Mwamw5TEo5?=
+ =?utf-8?B?Z3BURWdYeXgvZ3F6Y3M2UFJvSEk2NHFRMGd0R0sxVExhTlFXbXkzbXZhSDVX?=
+ =?utf-8?B?RndUWEdKQ0w2MGtXM3l3UEtzNDdwS1o5NDdoaFNrTGFjdE5RRE5nYUlzUXd3?=
+ =?utf-8?B?VnluR1BmYmJjUDVsNTZyUXN4MVY2WGE1VzVodkZCMkV4M3VTZVNlOUx5KzZ2?=
+ =?utf-8?B?U2tDTmI4bzQzd21aSlduK080a09LbzNWcTdGUFlhY3NIZlh6Nk43TGRzMXFl?=
+ =?utf-8?B?Z3gvS0ZhQmhpVCtjemliWnFOZ0VZTVNkQko5NTJKWVlnYjdOaXUxaFBwZkgx?=
+ =?utf-8?B?Z0VFaHhweENIZ0FBblllZzVocEV4Q1QwWG5SeGVCaWpzSmFHdEYxQXBmR2J2?=
+ =?utf-8?B?QURrZVUrbFczWWJZdXR0U0xVRzBuSVgvY2M4NzRMNzdEK0s2YTBIbjEwcjRt?=
+ =?utf-8?B?S3FxRXh3a3RkN1NqZmRHazIxM3hQOEg2YVVrSlh5OTY5RnRnSlJKWW9DRFpV?=
+ =?utf-8?B?RkEzQ3B4TW5OblZQc2QxY3hibkZwR1RVbVJPWmFxUU9UT0NTTnpVcTZ2bjVR?=
+ =?utf-8?B?aVZPK0Q3VXBvTG16WjhQeEtuTEtIK053dkNOeXZBSUtQdW1KYW1lQkU5ZWRN?=
+ =?utf-8?B?M2oyajA1eTBTTGR6TkxrdXJ2NUM5WXlrcCtNS0RpanZ2MjBWUVBrWnVGaWNo?=
+ =?utf-8?B?ZmVNSHBhR2lkTFhDOURFTXV6WklFcjZnNWNRZTEyVnVnOE1DekRuRkdWeDds?=
+ =?utf-8?B?L2pqMkZEeGJEUTN0TlFCODZERGtMcmhTajBZMk92aWgxZk04Y3h0UlRVZ0s0?=
+ =?utf-8?B?Y3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23dd7765-7720-49b6-ac8e-08dcb2195dca
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 11:01:59.9733
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LN+u90Jbh1lLBy+kw2BnKBYzvaSU+V43mMXW8wYPjUnTQWJz5RL/kwUTLGtbJRrU/xqLZpuFVS9CEpu2jKp5Gp79JvDHu8WdEjRJtaQKhOQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4859
+X-OriginatorOrg: intel.com
 
-TCQ_F_NOLOCK yields no locking option for a qdisc. At some places in the
-code the testing for the flag seems logically reverted. The change fixes
-the following lockdep issue.
 
-======================================================
-WARNING: possible circular locking dependency detected
-5.10.0-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor372/2662 is trying to acquire lock:
-ffff888028151218 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2){+...}-{2:2}, at: spin_lock include/linux/spinlock.h:357 [inline]
-ffff888028151218 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2){+...}-{2:2}, at: __dev_xmit_skb net/core/dev.c:3689 [inline]
-ffff888028151218 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2){+...}-{2:2}, at: __dev_queue_xmit+0x1e02/0x32b0 net/core/dev.c:4053
 
-but task is already holding lock:
-ffff88801016d0d8 (&qdisc_xmit_lock_key){+...}-{2:2}, at: spin_lock include/linux/spinlock.h:357 [inline]
-ffff88801016d0d8 (&qdisc_xmit_lock_key){+...}-{2:2}, at: __netif_tx_lock include/linux/netdevice.h:4077 [inline]
-ffff88801016d0d8 (&qdisc_xmit_lock_key){+...}-{2:2}, at: sch_direct_xmit+0x19c/0x9c0 net/sched/sch_generic.c:341
+On 01.08.2024 01:47, Jakub Kicinski wrote:
+> On Wed, 31 Jul 2024 14:08:20 +0200 Wojciech Drewek wrote:
+>> Quick summary our reset types:
+>> PF reset reinitialize the resources/data path for PF and its VFs.
+>> It has no impact on other PF/VFs.
+>> Core Reset reinitialize all functions and shared parts of the
+>> device except PHY/MAC units, EMP and PCI Interface.
+>> Global Reset is Core Reset + PHY/MAC units reset (including External PHY)
+>> Because Global Reset is a extended Core it makes sense to map it to all.
+>> PF reset mapping makes sense to me since it is dedicated to a single physical function.
+> 
+> On Wed, 31 Jul 2024 09:48:07 -0700 Jacob Keller wrote:
+>> PF reset only affects the single PCI function, and does not affect the
+>> whole adapter. I don't know how it relates to PCIe resets precisely.
+>>
+>> CORE reset affects the whole adapter, and the other functions are
+>> notified of the impending reset via their miscellaneous interrupt vector
+>> in combination with some hardware registers.
+>>
+>> GLOBAL reset is similar to the CORE reset, (in that it affects the
+>> entire device), but it is more invasive in the hardware. I cannot
+>> remember offhand the differences between CORE and GLOBAL.
+>>
+>> There is also an EMP reset, which is the only reset that completely
+>> reloads the EMP firmware. It is currently used by the device flash
+>> update logic, via devlink reload and is only available if the new
+>> firmware image can be reloaded without issue. (Reloading when the new
+>> firmware could impact PCIe config space is likely to produce undesirable
+>> behavior because the PCIe config space is not reloaded except by power
+>> cycling, so you end up with some weird mismatches.)
+> 
+> Note that the reset is controlled using individual bits which can be
+> combined:
+> 
+> 	ETH_RESET_MGMT		= 1 << 0,	/* Management processor */
+> 	ETH_RESET_IRQ		= 1 << 1,	/* Interrupt requester */
+> 	ETH_RESET_DMA		= 1 << 2,	/* DMA engine */
+> 	ETH_RESET_FILTER	= 1 << 3,	/* Filtering/flow direction */
+> 	ETH_RESET_OFFLOAD	= 1 << 4,	/* Protocol offload */
+> 	ETH_RESET_MAC		= 1 << 5,	/* Media access controller */
+> 	ETH_RESET_PHY		= 1 << 6,	/* Transceiver/PHY */
+> 	ETH_RESET_RAM		= 1 << 7,	/* RAM shared between
+> 						 * multiple components */
+> 	ETH_RESET_AP		= 1 << 8,	/* Application processor */
+> 
+> 	ETH_RESET_DEDICATED	= 0x0000ffff,	/* All components dedicated to
+> 						 * this interface */
+> 	ETH_RESET_ALL		= 0xffffffff,	/* All components used by this
+> 						 * interface, even if shared */
+> 
+> Note that ethtool CLI defines "shared" version of all bits as bits
+> shifted up by 16. And it is forward compatible (accepts raw "flags")
+> if we need to define new bits.
+> 
+> I guess in your case EMP == MGMT? So if these resets don't reset EMP
+> I presume we shouldn't use any option that includes MGMT..
+> 
+> Could you express your resets in the correct combination of these bits
+> instead of picking a single one?
+> 
 
-which lock already depends on the new lock.
+We've came up with below mapping:
 
-the existing dependency chain (in reverse order) is:
+PF reset:
+ethtool --reset eth0 irq dma filter offload
+(we reset all those components but only for the given PF)
 
--> #1 (&qdisc_xmit_lock_key){+...}-{2:2}:
-       lock_acquire+0x197/0x480 kernel/locking/lockdep.c:5566
-       __raw_spin_lock include/linux/spinlock_api_smp.h:144 [inline]
-       _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-       spin_lock include/linux/spinlock.h:357 [inline]
-       __netif_tx_lock include/linux/netdevice.h:4077 [inline]
-       sch_direct_xmit+0x19c/0x9c0 net/sched/sch_generic.c:341
-       __dev_xmit_skb net/core/dev.c:3663 [inline]
-       __dev_queue_xmit+0x158e/0x32b0 net/core/dev.c:4053
-       dev_queue_xmit+0x17/0x20 net/core/dev.c:4121
-       neigh_resolve_output+0x644/0x750 net/core/neighbour.c:1508
-       neigh_output include/net/neighbour.h:528 [inline]
-       ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
-       __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
-       ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
-       NF_HOOK_COND include/linux/netfilter.h:298 [inline]
-       ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
-       dst_output include/net/dst.h:444 [inline]
-       NF_HOOK+0x166/0x550 include/linux/netfilter.h:309
-       mld_sendpack+0x823/0xd90 net/ipv6/mcast.c:1817
-       mld_send_cr net/ipv6/mcast.c:2118 [inline]
-       mld_ifc_work+0x814/0xcc0 net/ipv6/mcast.c:2649
-       process_one_work+0x857/0xfd0 kernel/workqueue.c:2282
-       worker_thread+0xafa/0x1550 kernel/workqueue.c:2428
-       kthread+0x374/0x3f0 kernel/kthread.c:349
-       ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:306
+CORE reset:
+ethtool --reset eth0 irq-shared dma-shared filter-shared offload-shared ram-shared
+(whole adapter is affected so we use shared versions + ram)
 
--> #0 (dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2){+...}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:2988 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3113 [inline]
-       validate_chain+0x1695/0x58f0 kernel/locking/lockdep.c:3729
-       __lock_acquire+0x12fd/0x20d0 kernel/locking/lockdep.c:4955
-       lock_acquire+0x197/0x480 kernel/locking/lockdep.c:5566
-       __raw_spin_lock include/linux/spinlock_api_smp.h:144 [inline]
-       _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
-       spin_lock include/linux/spinlock.h:357 [inline]
-       __dev_xmit_skb net/core/dev.c:3689 [inline]
-       __dev_queue_xmit+0x1e02/0x32b0 net/core/dev.c:4053
-       dev_queue_xmit+0x17/0x20 net/core/dev.c:4121
-       neigh_resolve_output+0x644/0x750 net/core/neighbour.c:1508
-       neigh_output include/net/neighbour.h:528 [inline]
-       ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
-       __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
-       ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
-       NF_HOOK_COND include/linux/netfilter.h:298 [inline]
-       ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
-       dst_output include/net/dst.h:444 [inline]
-       NF_HOOK include/linux/netfilter.h:309 [inline]
-       ndisc_send_skb+0xaaa/0x1370 net/ipv6/ndisc.c:508
-       ndisc_solicit+0x3ea/0x660 net/ipv6/ndisc.c:666
-       neigh_probe net/core/neighbour.c:1021 [inline]
-       __neigh_event_send+0xec0/0x1460 net/core/neighbour.c:1182
-       neigh_event_send include/net/neighbour.h:457 [inline]
-       neigh_resolve_output+0x1cf/0x750 net/core/neighbour.c:1492
-       neigh_output include/net/neighbour.h:528 [inline]
-       ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
-       __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
-       ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
-       NF_HOOK_COND include/linux/netfilter.h:298 [inline]
-       ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
-       dst_output include/net/dst.h:444 [inline]
-       ip6_local_out+0x10f/0x140 net/ipv6/output_core.c:161
-       ip6_send_skb+0x127/0x220 net/ipv6/ip6_output.c:2015
-       ip6_push_pending_frames+0xb4/0xe0 net/ipv6/ip6_output.c:2035
-       icmpv6_push_pending_frames+0x2f4/0x4b0 net/ipv6/icmp.c:304
-       icmp6_send+0x160c/0x20d0 net/ipv6/icmp.c:627
-       __icmpv6_send include/linux/icmpv6.h:28 [inline]
-       icmpv6_send include/linux/icmpv6.h:49 [inline]
-       ip6_link_failure+0x3b/0x4c0 net/ipv6/route.c:2801
-       dst_link_failure include/net/dst.h:423 [inline]
-       ip_tunnel_xmit+0x1b76/0x2b40 net/ipv4/ip_tunnel.c:856
-       __gre_xmit net/ipv4/ip_gre.c:471 [inline]
-       erspan_xmit+0xb22/0x1380 net/ipv4/ip_gre.c:728
-       __netdev_start_xmit include/linux/netdevice.h:4657 [inline]
-       netdev_start_xmit include/linux/netdevice.h:4671 [inline]
-       xmit_one net/core/dev.c:3455 [inline]
-       dev_hard_start_xmit+0x36a/0x880 net/core/dev.c:3471
-       sch_direct_xmit+0x2a0/0x9c0 net/sched/sch_generic.c:343
-       qdisc_restart net/sched/sch_generic.c:408 [inline]
-       __qdisc_run+0xae6/0x1cb0 net/sched/sch_generic.c:416
-       __dev_xmit_skb net/core/dev.c:3722 [inline]
-       __dev_queue_xmit+0xdd5/0x32b0 net/core/dev.c:4053
-       dev_queue_xmit+0x17/0x20 net/core/dev.c:4121
-       neigh_resolve_output+0x644/0x750 net/core/neighbour.c:1508
-       neigh_output include/net/neighbour.h:528 [inline]
-       ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
-       __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
-       ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
-       NF_HOOK_COND include/linux/netfilter.h:298 [inline]
-       ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
-       dst_output include/net/dst.h:444 [inline]
-       NF_HOOK include/linux/netfilter.h:309 [inline]
-       rawv6_send_hdrinc+0xd16/0x1930 net/ipv6/raw.c:669
-       rawv6_sendmsg+0x15e5/0x2100 net/ipv6/raw.c:929
-       inet_sendmsg+0x149/0x310 net/ipv4/af_inet.c:854
-       sock_sendmsg_nosec net/socket.c:702 [inline]
-       __sock_sendmsg net/socket.c:714 [inline]
-       sock_write_iter+0x3a0/0x520 net/socket.c:1088
-       call_write_iter include/linux/fs.h:1986 [inline]
-       new_sync_write fs/read_write.c:518 [inline]
-       vfs_write+0x9c0/0xc30 fs/read_write.c:605
-       ksys_write+0x17e/0x2a0 fs/read_write.c:658
-       __do_sys_write fs/read_write.c:670 [inline]
-       __se_sys_write fs/read_write.c:667 [inline]
-       __x64_sys_write+0x7b/0x90 fs/read_write.c:667
-       do_syscall_64+0x6d/0xa0 arch/x86/entry/common.c:62
-       entry_SYSCALL_64_after_hwframe+0x61/0xcb
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&qdisc_xmit_lock_key);
-                               lock(dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2);
-                               lock(&qdisc_xmit_lock_key);
-  lock(dev->qdisc_tx_busylock ?: &qdisc_tx_busylock#2);
-
- *** DEADLOCK ***
-
-11 locks held by syz-executor372/2662:
- #0: ffffffff8806ed80 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x9/0x40 include/linux/rcupdate.h:272
- #1: ffffffff8806ed80 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x9/0x40 include/linux/rcupdate.h:272
- #2: ffffffff8806ede0 (rcu_read_lock_bh){....}-{1:2}, at: rcu_lock_acquire+0xd/0x40 include/linux/rcupdate.h:273
- #3: ffff888028151148 (dev->qdisc_running_key ?: &qdisc_running_key){+...}-{0:0}, at: dev_queue_xmit+0x17/0x20 net/core/dev.c:4121
- #4: ffff88801016d0d8 (&qdisc_xmit_lock_key){+...}-{2:2}, at: spin_lock include/linux/spinlock.h:357 [inline]
- #4: ffff88801016d0d8 (&qdisc_xmit_lock_key){+...}-{2:2}, at: __netif_tx_lock include/linux/netdevice.h:4077 [inline]
- #4: ffff88801016d0d8 (&qdisc_xmit_lock_key){+...}-{2:2}, at: sch_direct_xmit+0x19c/0x9c0 net/sched/sch_generic.c:341
- #5: ffff88801691a218 (k-slock-AF_INET6){+...}-{2:2}, at: spin_trylock include/linux/spinlock.h:367 [inline]
- #5: ffff88801691a218 (k-slock-AF_INET6){+...}-{2:2}, at: icmpv6_xmit_lock net/ipv6/icmp.c:109 [inline]
- #5: ffff88801691a218 (k-slock-AF_INET6){+...}-{2:2}, at: icmp6_send+0xa79/0x20d0 net/ipv6/icmp.c:545
- #6: ffffffff8806ed80 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x9/0x40 include/linux/rcupdate.h:272
- #7: ffffffff8806ed80 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x9/0x40 include/linux/rcupdate.h:272
- #8: ffffffff8806ed80 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x9/0x40 include/linux/rcupdate.h:272
- #9: ffffffff8806ed80 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x9/0x40 include/linux/rcupdate.h:272
- #10: ffffffff8806ede0 (rcu_read_lock_bh){....}-{1:2}, at: rcu_lock_acquire+0xd/0x40 include/linux/rcupdate.h:273
-
-stack backtrace:
-CPU: 1 PID: 2662 Comm: syz-executor372 Not tainted 5.10.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x177/0x211 lib/dump_stack.c:118
- print_circular_bug+0x146/0x1b0 kernel/locking/lockdep.c:2002
- check_noncircular+0x2cc/0x390 kernel/locking/lockdep.c:2123
- check_prev_add kernel/locking/lockdep.c:2988 [inline]
- check_prevs_add kernel/locking/lockdep.c:3113 [inline]
- validate_chain+0x1695/0x58f0 kernel/locking/lockdep.c:3729
- __lock_acquire+0x12fd/0x20d0 kernel/locking/lockdep.c:4955
- lock_acquire+0x197/0x480 kernel/locking/lockdep.c:5566
- __raw_spin_lock include/linux/spinlock_api_smp.h:144 [inline]
- _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:151
- spin_lock include/linux/spinlock.h:357 [inline]
- __dev_xmit_skb net/core/dev.c:3689 [inline]
- __dev_queue_xmit+0x1e02/0x32b0 net/core/dev.c:4053
- dev_queue_xmit+0x17/0x20 net/core/dev.c:4121
- neigh_resolve_output+0x644/0x750 net/core/neighbour.c:1508
- neigh_output include/net/neighbour.h:528 [inline]
- ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
- __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
- ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
- NF_HOOK_COND include/linux/netfilter.h:298 [inline]
- ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
- dst_output include/net/dst.h:444 [inline]
- NF_HOOK include/linux/netfilter.h:309 [inline]
- ndisc_send_skb+0xaaa/0x1370 net/ipv6/ndisc.c:508
- ndisc_solicit+0x3ea/0x660 net/ipv6/ndisc.c:666
- neigh_probe net/core/neighbour.c:1021 [inline]
- __neigh_event_send+0xec0/0x1460 net/core/neighbour.c:1182
- neigh_event_send include/net/neighbour.h:457 [inline]
- neigh_resolve_output+0x1cf/0x750 net/core/neighbour.c:1492
- neigh_output include/net/neighbour.h:528 [inline]
- ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
- __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
- ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
- NF_HOOK_COND include/linux/netfilter.h:298 [inline]
- ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
- dst_output include/net/dst.h:444 [inline]
- ip6_local_out+0x10f/0x140 net/ipv6/output_core.c:161
- ip6_send_skb+0x127/0x220 net/ipv6/ip6_output.c:2015
- ip6_push_pending_frames+0xb4/0xe0 net/ipv6/ip6_output.c:2035
- icmpv6_push_pending_frames+0x2f4/0x4b0 net/ipv6/icmp.c:304
- icmp6_send+0x160c/0x20d0 net/ipv6/icmp.c:627
- __icmpv6_send include/linux/icmpv6.h:28 [inline]
- icmpv6_send include/linux/icmpv6.h:49 [inline]
- ip6_link_failure+0x3b/0x4c0 net/ipv6/route.c:2801
- dst_link_failure include/net/dst.h:423 [inline]
- ip_tunnel_xmit+0x1b76/0x2b40 net/ipv4/ip_tunnel.c:856
- __gre_xmit net/ipv4/ip_gre.c:471 [inline]
- erspan_xmit+0xb22/0x1380 net/ipv4/ip_gre.c:728
- __netdev_start_xmit include/linux/netdevice.h:4657 [inline]
- netdev_start_xmit include/linux/netdevice.h:4671 [inline]
- xmit_one net/core/dev.c:3455 [inline]
- dev_hard_start_xmit+0x36a/0x880 net/core/dev.c:3471
- sch_direct_xmit+0x2a0/0x9c0 net/sched/sch_generic.c:343
- qdisc_restart net/sched/sch_generic.c:408 [inline]
- __qdisc_run+0xae6/0x1cb0 net/sched/sch_generic.c:416
- __dev_xmit_skb net/core/dev.c:3722 [inline]
- __dev_queue_xmit+0xdd5/0x32b0 net/core/dev.c:4053
- dev_queue_xmit+0x17/0x20 net/core/dev.c:4121
- neigh_resolve_output+0x644/0x750 net/core/neighbour.c:1508
- neigh_output include/net/neighbour.h:528 [inline]
- ip6_finish_output2+0x150b/0x1ea0 net/ipv6/ip6_output.c:151
- __ip6_finish_output+0x4b6/0x620 net/ipv6/ip6_output.c:224
- ip6_finish_output+0x34/0x280 net/ipv6/ip6_output.c:234
- NF_HOOK_COND include/linux/netfilter.h:298 [inline]
- ip6_output+0x2c4/0x3d0 net/ipv6/ip6_output.c:257
- dst_output include/net/dst.h:444 [inline]
- NF_HOOK include/linux/netfilter.h:309 [inline]
- rawv6_send_hdrinc+0xd16/0x1930 net/ipv6/raw.c:669
- rawv6_sendmsg+0x15e5/0x2100 net/ipv6/raw.c:929
- inet_sendmsg+0x149/0x310 net/ipv4/af_inet.c:854
- sock_sendmsg_nosec net/socket.c:702 [inline]
- __sock_sendmsg net/socket.c:714 [inline]
- sock_write_iter+0x3a0/0x520 net/socket.c:1088
- call_write_iter include/linux/fs.h:1986 [inline]
- new_sync_write fs/read_write.c:518 [inline]
- vfs_write+0x9c0/0xc30 fs/read_write.c:605
- ksys_write+0x17e/0x2a0 fs/read_write.c:658
- __do_sys_write fs/read_write.c:670 [inline]
- __se_sys_write fs/read_write.c:667 [inline]
- __x64_sys_write+0x7b/0x90 fs/read_write.c:667
- do_syscall_64+0x6d/0xa0 arch/x86/entry/common.c:62
- entry_SYSCALL_64_after_hwframe+0x61/0xcb
-RIP: 0033:0x7fd7b2201c69
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe960e0cb8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fd7b2201c69
-RDX: 0000000000000028 RSI: 0000000020000140 RDI: 0000000000000006
-RBP: 00000000000f4240 R08: 0000000100000000 R09: 0000000100000000
-R10: 0000000100000000 R11: 0000000000000246 R12: 00007ffe960e0d10
-R13: 0000000000000001 R14: 00007ffe960e0d10 R15: 0000000000000003
-
-Signed-off-by: Wojciech Gładysz <wojciech.gladysz@infogain.com>
----
- include/net/sch_generic.h |  6 +++---
- net/sched/sch_generic.c   | 12 ++++++------
- 2 files changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 79edd5b5e3c9..35a747e3c00a 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -166,7 +166,7 @@ static inline struct Qdisc *qdisc_refcount_inc_nz(struct Qdisc *qdisc)
-  */
- static inline bool qdisc_is_running(struct Qdisc *qdisc)
- {
--	if (qdisc->flags & TCQ_F_NOLOCK)
-+	if (!(qdisc->flags & TCQ_F_NOLOCK))
- 		return spin_is_locked(&qdisc->seqlock);
- 	return test_bit(__QDISC_STATE2_RUNNING, &qdisc->state2);
- }
-@@ -193,7 +193,7 @@ static inline bool qdisc_is_empty(const struct Qdisc *qdisc)
-  */
- static inline bool qdisc_run_begin(struct Qdisc *qdisc)
- {
--	if (qdisc->flags & TCQ_F_NOLOCK) {
-+	if (!(qdisc->flags & TCQ_F_NOLOCK)) {
- 		if (spin_trylock(&qdisc->seqlock))
- 			return true;
- 
-@@ -216,7 +216,7 @@ static inline bool qdisc_run_begin(struct Qdisc *qdisc)
- 
- static inline void qdisc_run_end(struct Qdisc *qdisc)
- {
--	if (qdisc->flags & TCQ_F_NOLOCK) {
-+	if (!(qdisc->flags & TCQ_F_NOLOCK)) {
- 		spin_unlock(&qdisc->seqlock);
- 
- 		/* spin_unlock() only has store-release semantic. The unlock
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index e22ff003d52e..db24f477e310 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -76,7 +76,7 @@ static inline struct sk_buff *__skb_dequeue_bad_txq(struct Qdisc *q)
- 	spinlock_t *lock = NULL;
- 	struct sk_buff *skb;
- 
--	if (q->flags & TCQ_F_NOLOCK) {
-+	if (!(q->flags & TCQ_F_NOLOCK)) {
- 		lock = qdisc_lock(q);
- 		spin_lock(lock);
- 	}
-@@ -121,7 +121,7 @@ static inline void qdisc_enqueue_skb_bad_txq(struct Qdisc *q,
- {
- 	spinlock_t *lock = NULL;
- 
--	if (q->flags & TCQ_F_NOLOCK) {
-+	if (!(q->flags & TCQ_F_NOLOCK)) {
- 		lock = qdisc_lock(q);
- 		spin_lock(lock);
- 	}
-@@ -144,7 +144,7 @@ static inline void dev_requeue_skb(struct sk_buff *skb, struct Qdisc *q)
- {
- 	spinlock_t *lock = NULL;
- 
--	if (q->flags & TCQ_F_NOLOCK) {
-+	if (!(q->flags & TCQ_F_NOLOCK)) {
- 		lock = qdisc_lock(q);
- 		spin_lock(lock);
- 	}
-@@ -236,7 +236,7 @@ static struct sk_buff *dequeue_skb(struct Qdisc *q, bool *validate,
- 	if (unlikely(!skb_queue_empty(&q->gso_skb))) {
- 		spinlock_t *lock = NULL;
- 
--		if (q->flags & TCQ_F_NOLOCK) {
-+		if (!(q->flags & TCQ_F_NOLOCK)) {
- 			lock = qdisc_lock(q);
- 			spin_lock(lock);
- 		}
-@@ -1300,14 +1300,14 @@ static void dev_reset_queue(struct net_device *dev,
- 
- 	nolock = qdisc->flags & TCQ_F_NOLOCK;
- 
--	if (nolock)
-+	if (!nolock)
- 		spin_lock_bh(&qdisc->seqlock);
- 	spin_lock_bh(qdisc_lock(qdisc));
- 
- 	qdisc_reset(qdisc);
- 
- 	spin_unlock_bh(qdisc_lock(qdisc));
--	if (nolock) {
-+	if (!nolock) {
- 		clear_bit(__QDISC_STATE_MISSED, &qdisc->state);
- 		clear_bit(__QDISC_STATE_DRAINING, &qdisc->state);
- 		spin_unlock_bh(&qdisc->seqlock);
--- 
-2.35.3
-
+GLOBAL reset:
+ethtool --reset eth0 irq-shared dma-shared filter-shared offload-shared mac-shared phy-shared ram-shared
+(GLOBALR is CORER plus mac and phy components are also reinitialized)
 
