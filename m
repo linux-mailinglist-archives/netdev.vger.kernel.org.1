@@ -1,260 +1,273 @@
-Return-Path: <netdev+bounces-115141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB269454C0
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:07:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0DE9454C1
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:07:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 860501C21121
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 23:07:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3CF81C230BE
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 23:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416B714B95B;
-	Thu,  1 Aug 2024 23:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7832014D44F;
+	Thu,  1 Aug 2024 23:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UTjmMlo7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MK696Q+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2061.outbound.protection.outlook.com [40.107.236.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC3FD2F5
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 23:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722553654; cv=fail; b=s4kyk1NC3hn43uZeJ0s0wap+G6jBAJelCt/jA73JabW71UPv/kMVlWynx7WAa6T/6KmXeoN//CfoRM9vdxS1iBo88k3GicDaj5m4uo9JclE5o7eQ2iOMojeBYjHx89YpRKun6mvv+WXC10B55wdSKsA1Vr/B1nqNzE5A8vor+CA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722553654; c=relaxed/simple;
-	bh=uuGx9whS6TlL2ehzmK35vCdhzJEOmQOnltQP0amHkZQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OxKiuombxjsbQBkJzJbRUvrPiPHKDPmLyPKsaxbJvP9Xp8HB2vP8+vIAradP984TqzwCQ6zti9r5L9KUE1OI7Ca+wZTFEP2rsRcyPhkOPJr5W79/FHptHVA67ZZISHEBoIqRJrg2vWOjv0o96Di4TOkEoPUmtRj6Pj2Cd9oWpsM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UTjmMlo7; arc=fail smtp.client-ip=40.107.236.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lDcMhcMp4SeytvKxej7IZOtwE2PTuyjWOgBnhZ7BnVYko8IeInFtGo6QTrKHxrlDjJxUMWY/IDGMwAfLl0fzygfh3P9SaLaRb0xqShiKyZ5FkdCa4e6pEFzC4ZLYrkwAjDWvFnkLClCec/SIh/j2txnxrifaBw0TOtP27L42IAacMaxdoal/DEf2/kakrnKc7OZzh3ZdQnW8JDS9Qd7fE0QK2fsOzzPgBWgTM4YDGQTrSGw8ntJaCwKWwgFr5DGu8PiyWW3dlQ+O+jNyK4mKD9nwm/7v6KPXe9ykDMlmQjSyPf+BtTXzNg6puqecHAnNYOJ/n0CPj5nncRWbechjbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=te8/XjjkxpTL8Ma9jASg3QhskxvlfIdHUTKgz7Zs+yI=;
- b=gZVP+1fgFTQl9dLqgMDhOYMNs8/DBRVU5X4Ez4FXEmNhSwDzOdvOhZM36AMy4HbtJGD3Zgo/OaL3jQ0WwmqAoG/BJG9CPF6z6BZjyYJG8VizLbzyc5urZ3cvNijBc3dleflFDGbNadRKp5z4l7cIAUAN35iR4IMMsoUFbbKmteLlLWefUefj8VHqiS9MKBOes3vNnftUoItPG6GVbRxuL+OBmQTaqXdFmty/2cK1SE41OL0+TF3EHe2txoJd3ZmG0jD0yPB6b90/i9sNCRaowIl0++jlbmkuf5NPYkBnnK29QSzI7k5pNwiwYO/XaTnTYROlAodl32dstTaqhNSfQg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=te8/XjjkxpTL8Ma9jASg3QhskxvlfIdHUTKgz7Zs+yI=;
- b=UTjmMlo7FqRaVvBKhqLYflI/6MqfYBRwqg/EbvpINXFapDgfW2Z4CcMyYsjkKe93pDOoT8K2XJGuE6hUFNaZseVLtcQP5IRVXTycsFQjyxeHTO/o0Mebj6fEn+ox/tueCvZ3v6YL0qahGlDA5B+HKlajDkoSxT7nN/2UZVvz0/A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- BL1PR12MB5971.namprd12.prod.outlook.com (2603:10b6:208:39a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.27; Thu, 1 Aug
- 2024 23:07:26 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%4]) with mapi id 15.20.7807.009; Thu, 1 Aug 2024
- 23:07:26 +0000
-Message-ID: <3feda087-400b-428c-8604-7b993e5662bf@amd.com>
-Date: Thu, 1 Aug 2024 16:07:23 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] ibmveth: Optimize poll rescheduling process
-To: Nick Child <nnac123@linux.ibm.com>, netdev@vger.kernel.org
-Cc: bjking1@linux.ibm.com, haren@linux.ibm.com, ricklind@us.ibm.com
-References: <20240801211215.128101-1-nnac123@linux.ibm.com>
- <20240801211215.128101-2-nnac123@linux.ibm.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20240801211215.128101-2-nnac123@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR05CA0027.namprd05.prod.outlook.com
- (2603:10b6:a03:c0::40) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08B81482E2;
+	Thu,  1 Aug 2024 23:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722553658; cv=none; b=oZxdzp9QWV6F09LRr7sqs1spwWvLQKW37aB/UzMzXzBSpqDgvmFQtW256V1u0keBtznB8pPMZSLMpjjd3++WeMjonHBo3+6wkAn95n5rPIb3NeYjVy9fHqXICNw0vTkPI3/aEAYGI9iBV0bHuAUlte8zhvA71YxHy5syW66RZHk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722553658; c=relaxed/simple;
+	bh=PtIa2QtTSywr4ng8EMKGCX2UJ1Jj3D83kU099Jn6C/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fepwmcIIdT0flXZEbQnFkaoqT1RxZx3QG9zlibts+nfguonE8ZhdwneMxU29+rZ2QKBOoMxuP66PlxvlFFVLJZpWu0CzKARLZaWpoHLnBywZOQtXX277IG9R5vRz4N8TRPM91UPPMAwP7hMgEcH2y4sMvhE8WHa3x8pdPkcwgO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MK696Q+o; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a156556fb4so11012699a12.3;
+        Thu, 01 Aug 2024 16:07:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722553649; x=1723158449; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cTzwkxXMjCnXxGPm8SS63wasgARHwPjwYcFLo4i11LY=;
+        b=MK696Q+oH+Gg86qGd8cJwuY1I3b58ttOhKmMGUtXP8wnceDU/An4Pj35q8S+FN6rmZ
+         oWXZ89MARGPSuhRm2BKCKEZio6HyAVUu3g3gy0Vsz9FSNIbU6MvIHd8OXTDpp+uwV38r
+         fVLeJf3nWnlTKToKuMs4j8nR+oCY8o5D0bOJiwchENHO8lDklIbj24+BvLUZTSRCN8CF
+         V3jU4vIDWWnumsx3BOrB1AYSdfJpv9og3RYKINCjNypa19NxX2rfwiOdtxfxqtYZgpxv
+         jmq+uBT8shtGg1xW6T2e90e3wTrEs7sDQgbSnO5uGSvZSJdrq9KuIYNKdjcZKzUdkdRx
+         UFwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722553649; x=1723158449;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cTzwkxXMjCnXxGPm8SS63wasgARHwPjwYcFLo4i11LY=;
+        b=DbXsvyWxcFv4jC99DkRQdjZZN9kzQXcA9isFEAkdzP+QS+qe1k/Oetgker47GFPBtR
+         mlPEXTsCUSzmcjKquIuPNMQRCpG6uNjFNJ/oP7Y0YUNZZpChX/bOz7g0toROM047QUV+
+         ncLF13/vd+Wp27Vv2zb4vZGqb2ZkIMw/atpNXIiLdW8snPU8Xvggu+ONk/+72PSAhtMC
+         h/8jjH78ziZoitA12QZaIBhoaYHlU/vpDwvAHN/9ZiQX0AEe0fLqacltGvy5UNfQtRas
+         NgOD8gUWMLTYRHiV75uieLVRFIzFFAImqNTICF0EeIB6hxBjm/pVSQe5dfcnoBaseqpK
+         l6yw==
+X-Forwarded-Encrypted: i=1; AJvYcCW98mElQB9DZbDMKWL2wFag1h1YFZGRupSPo/l/oBBCb5iwnfeObLKI5ccJd6gd0/GCxGVW3llvqht1KkTSQepsilkjv6BAXwJ6Ia/6rQ8yWSm64ydFbFDbErfS8KtWVy44pvTs
+X-Gm-Message-State: AOJu0Yws+2lkM6Kjy7lD454Ve7pBOFxHO+9Dyj8h253fm0SzdLfyYt0E
+	g31IXU6YvnFoiKkeBQiW+Y1eDLV7q2rTy9fSoe7r890CsMwrrqfcMW8rBmrQ
+X-Google-Smtp-Source: AGHT+IFv2aAGzMN11Iigqz0ZSdZXSz3c8So7Yv+NTGX6LRfrYtmGi031rLkNH9XJUmYnnVE03dMx+g==
+X-Received: by 2002:a17:906:7956:b0:a7a:b8f1:fd69 with SMTP id a640c23a62f3a-a7dc4e4ae17mr140198966b.18.1722553648600;
+        Thu, 01 Aug 2024 16:07:28 -0700 (PDT)
+Received: from skbuf ([188.25.135.70])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c0b6besm30094266b.52.2024.08.01.16.07.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 16:07:27 -0700 (PDT)
+Date: Fri, 2 Aug 2024 02:07:25 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v1 2/5] net: stmmac: support fp parameter of
+ tc-mqprio
+Message-ID: <20240801230725.nllk7n3veqwplfpo@skbuf>
+References: <cover.1722421644.git.0x1207@gmail.com>
+ <cover.1722421644.git.0x1207@gmail.com>
+ <df005cc6b2f97e7ea373dcc356fb6a693f33263a.1722421644.git.0x1207@gmail.com>
+ <df005cc6b2f97e7ea373dcc356fb6a693f33263a.1722421644.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|BL1PR12MB5971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12595a3c-7c68-4d73-f77f-08dcb27eb56a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NmtjVGkxd210L1lXQXViakMvMHk0VlZoVkc1SEdXOUZyUVZzQjZOUHB3Mjlj?=
- =?utf-8?B?cVFMSzdHNVJycVJJRHJsRVNnSks0UmpYdUxuR3dYK3BqMWRIK2c5bnpjNlhz?=
- =?utf-8?B?Z1hyVjkzN04wMzV3QXp3NzBZdVJEUGtTTTNFY20xWEluYm9LMlozRG9Zcnlv?=
- =?utf-8?B?Z2JVYVRLcnQyeXo1cmVHeXcvR2xKWERCa2RhcnBxbUMxNEJoMzZ4cjY3TTRl?=
- =?utf-8?B?N1ZlUGJnWldvOC82WFVyOVJsZFZHMXFLTjM3bkpCL1psNHpyOHpDbXA0QzRM?=
- =?utf-8?B?YzlBVEVkcER5akpYWU1Mb2Y0b3V3YmhraDV3dTYzVnFQLzFhUk1PZTRuWGpU?=
- =?utf-8?B?VCtTdmRPMVhTZFAxdWx1aDVQNUdjREd2Q3VYdFk1NmdPMzcrZE9mR3N2STR1?=
- =?utf-8?B?S2VFQmxsdG9TcmhnRVozMHVqZkRhZ2picGs0NWI0NnI4bjJTWEhoa0pkdFkr?=
- =?utf-8?B?eTdHcG0xRXl6dVVhd3JRTXpFM1FTaDU5Z1BIYzZRczd4OVErZG9DNnBHVVNM?=
- =?utf-8?B?SjlQWGdvNTR4Z3YxSEhEcnNsanpQQTlOTmhrTzNvUEdwNDJvRCtPZUtNa0N0?=
- =?utf-8?B?ZjY0QUVOeWNrYW9KcWNFb3NUWXFZaFc3TmphOTkzV0N3NmphK1NNTTBabms4?=
- =?utf-8?B?SFc3NTdRbE1YQmlYbDRlRXVQTjY3aldyUkIxbVRXR2tiVGc3alZ3djIrSmZO?=
- =?utf-8?B?QWF3TGVSSkhaOHVqd1g4OCt4VmIxdFhnZlVtYURGdVFPZnlBdlF1TXYxU24w?=
- =?utf-8?B?M2J0NWxQbU5HWWorYytCNDdVNWJYVHkwK3dyL1R2K3k4OWNGaEs1aUdVdzdj?=
- =?utf-8?B?TWdsR05vV0c2bGtJNmFDdE12TUVmQlB1MEtTNXpKNDhWa0x0VjREYXYvWWJZ?=
- =?utf-8?B?dll6LytUYU1VZUJkNGtMSnZQT0hCUlFoYWFId1lkWGRqZ0JUeFBkeStMVXp6?=
- =?utf-8?B?czhjRzViMFFQaVptRnBDVXJaRWFmRnNQOW9HREZOQXhPQmJYVTZJdWpVdjRu?=
- =?utf-8?B?MjJvRTVucmpkNEZBdGRML2FSM2Fzb2EyV2VjVnNDUEFobitYT1VMK3hFS3pp?=
- =?utf-8?B?UHMvTXRKUmQrUnpWQ1VTRXlkSHJOc2tGcGorc1lIbDVMQW1wOXlFMzFvbmlN?=
- =?utf-8?B?SUltdjhoQ25saEtvVVJjSFJUYXJONTVZZS94ZFpGRFRUTzFUZjJaSmR0djVZ?=
- =?utf-8?B?ZDhFWXhlK2psa2QxallwQ1lKWm5aMzNaMlFQNnpCamdoVk93bGxvK1ZMQ2hE?=
- =?utf-8?B?R05qQWxWVkNVWXlWdGZGUG1uV1lkMGpVSDVUbVNhaHFYUnZpdGFpTDJLVWNu?=
- =?utf-8?B?NmVDL1F3RHhEMldiNU5DTTlKS29lL3F4bHpITmZQem1NZGQ2Z1Z6QXhmVzAw?=
- =?utf-8?B?akh0SHZhMzFNcUs4L0p1ZnM1NGI3WUhpaCtUa2tpd2FjamdHZVo3aVBDSlNK?=
- =?utf-8?B?bXkrc3UvQ25paU5JUFozdDVKaEZKVDU0YnhUQzZJTjZxcW1GNlRxY2FwQXJ2?=
- =?utf-8?B?RjVnYmNTTEJuMThjQ1hlcm1KMWNlR3lkWVZpVjlCZUNVNmxWcko1Y1g4WjZr?=
- =?utf-8?B?N25LWUFsanVsV21pS2pSb2xJbFJ4NTRlSEJSa1V1Unowb1JtMDQvbWE5MUxr?=
- =?utf-8?B?dWFSZTN4SUQvVUwweTlXNWNWZjlLNzhZazF2VXZsSGdNWEljb2krOXVwL2Vx?=
- =?utf-8?B?RkJucWRuK1l0TTc5c1N5ZFB5Q2tVdTJXZWx5d1cyMnAvSG95OTA5OFoxRXhR?=
- =?utf-8?B?cWhzRit5N0hzd3hUNWlUODVhM2c2Mzh3bVdDNkVMNmloYXZyQ2c0NGRYVGk4?=
- =?utf-8?B?MkFxOFBsbHFvdnRHUzhQdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SW03bktmUnZmaG93Q2t2YmZmNHUxd0Q2MjRUZkFMZks2Yi9ZMmY2Qi84N2xE?=
- =?utf-8?B?Q0E5amp4V2VQYUR2L0JkRGtzTExNc3R2L2VGaUg2ZERDMXc5YlVtTVNMeHdo?=
- =?utf-8?B?NXdYelNIUmZ5dmdMZnkvZkh1K0xYSGE5OS9PV1RmaGRoejRTWVNNeHJES1VP?=
- =?utf-8?B?azZxZnl6ckE1QUdwVU8wTU5VOVUvbkU2VS9EUTBzUnpIQlJXSzhRVE9pT0JN?=
- =?utf-8?B?MFgycnFOMWR6anM5aTI3WktEMXp0RTVzNUN3QTZGb0lzZ3AzN2tRNnF3dy9Y?=
- =?utf-8?B?SjBseTRoSmVRT1E4TENFN0ZxUlVBVno2TDZNd21SUGVXUUhQTWE5dEJSL3Mz?=
- =?utf-8?B?NkxGakMwV1d6RmR5VUkwY2JXZU5pbjZWMmdycG90RFhtTks1QlY2UTV2SEd6?=
- =?utf-8?B?dEpLUGNBSjRWTkNtc2FHV0Uxc3JTQ0pnVy8yb1VhNDgrVXhZell0cjRWa2dR?=
- =?utf-8?B?OHRHcit6Ti9pMjhUbENqLzdPNUQzY1BmYlRXYlh5S1g1QWIzdjZmRWxFY054?=
- =?utf-8?B?cE11U0w5MjhqVDhBY1lBY2VaUlVIcDMyQ3hNY2NCdFRGa0lwVEd3ckJKb3pa?=
- =?utf-8?B?b1lCaWhZbFRWS1dHaFBWUXF6cnFPbmNYZkRtcnc5dWxBVDhGRXp3TzliSUVX?=
- =?utf-8?B?bXoyNzgwVVdqdW9SaC9pWEt3WERZdkFtV2hzQWlrU1kvYkM3NzRtQTkybjFY?=
- =?utf-8?B?cU9CZiswU3lnVmZMNzIxbExBa3FlRVJpSXE4Yy8wVDRpQk9va21CNVRsZlpz?=
- =?utf-8?B?aW5KRmphaGJFTnFTa3V0UmZOeFdlUytxSWphVXkwRmJ3b1JiRDlHMDBzd1ha?=
- =?utf-8?B?K1lFWEkydExnaHhjTklDWjNIbU1ZK1hiZGJSVm5lOGEwVkNTUForUWF6V2dV?=
- =?utf-8?B?OVpOenRaSlhEczQrUEl0WmpVUDQ3ZXBRWWNPaFA4V200eURlTFdIV1pxc082?=
- =?utf-8?B?Ym9namhzdnJXZ1VJK1E3c0oxQVRqUmIrV0JESU1KNzZCOTFHZHRtQVA5Y25l?=
- =?utf-8?B?NnIxeVd4K2h3MzI5bVdDVzh3TTFCbHR1R1Z4V2ZxblYrWXoyTXBLOWlrTW9v?=
- =?utf-8?B?NXBxT1NrWm1wVEhVNTVsR3NYeGdmZXpmTGdBdkhBQWMyeGdJK3hDRGM3VEZD?=
- =?utf-8?B?NmoxUVVkdjJTaUlWMWcwOFoxZ2NyTk0rQktpek9WbGhMZU4wRTBDQmlzYzlC?=
- =?utf-8?B?OVVoN1VxWjlaNmhBNmt0czNmN2lQZERpdmRBajZvSUtYMVJHV3dTS25CM3Bx?=
- =?utf-8?B?d2VIc05ndDNueXI2TlFSa3JmMDJxdGtmcGJhNHowdS8ySDJNWmRHWUN5RFUx?=
- =?utf-8?B?OG9pNHc1WUcrekN4eDgvbUpRU3hPVm9jdzhCNVB1dUh4dU9lbkZ4T0dROTdJ?=
- =?utf-8?B?WUFHRFlPbGtBTHJBQlJDd1RnNFZNdHhpNkloUGRFOWNoQmUrbEpBdVVjUFYy?=
- =?utf-8?B?Wm1yUTR2ZjZaK2tWUGI4d2RrMWlrYmw1Z09uLzdJd3RoRHRQa3gxdGdlRGJ3?=
- =?utf-8?B?b2tlZi9UZElJbk5kOURTWUZNNTNmcFlzcy9ZTEZUL3NlMTN2bWVrWU4yYk8r?=
- =?utf-8?B?UEtlOHYzVncwdHJHVkJPUEo3cXltWXpUeUdGNHVVRldOV3hZTkJpVHl5ZnJZ?=
- =?utf-8?B?Q1RaOUlFN01UQlJXRlZyOXFTbjdDNzdiVzJ6bGdWZm9qZEFLeUNIRi9wSFVq?=
- =?utf-8?B?TmpoYVdtdU9LcFpWdWlCZHYzaDBXV3BvK0FnVmxLRStMZ0JrNitBN2NHM2Vl?=
- =?utf-8?B?aDdWYzc5VWZXOEVzY3JEaENNZnlqYktIOStySTdlWVdDczRkOEgyWC9MRCtu?=
- =?utf-8?B?UWVnYmF3VktISk5MSzZ0d3VZc1NUcC83QWRBY3RGc2Q0a2l4YSt6bDJjc0hm?=
- =?utf-8?B?MjFiNnhYZmEzbmJrQlY2ejcvWmJpMnRuaE4xZTU3eUFzcEM3cEx0amgyeFQ5?=
- =?utf-8?B?M3VwbkM3SjlFeWF2azJCdE0zbWZRU0xrMEZhQlByaW9JNS94OUVhM2xsOU1V?=
- =?utf-8?B?Z3RFRmFvZGpxQnRIVmVvc2xoRmZ0UVJ0OFlyZWxVZVZ2d1pJdWM4U2VKdWFN?=
- =?utf-8?B?ZXdKb1I1MW9lY0lZZ1Y3aElxNFR4RXM0K3V4RDVPeVc3eFBXNFFNRUlZR0dY?=
- =?utf-8?Q?xI8qEJTKMg9PPuHT7XNJSOl+R?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12595a3c-7c68-4d73-f77f-08dcb27eb56a
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 23:07:26.0373
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MtfGG3e1UyPM3pJPnsx3tJIjRSeTIQEz5BshkENZxcXNV34cko9EUuIsrQBtWB9Jk4N8w+WQGsfLHpV4c1ZomA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5971
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df005cc6b2f97e7ea373dcc356fb6a693f33263a.1722421644.git.0x1207@gmail.com>
+ <df005cc6b2f97e7ea373dcc356fb6a693f33263a.1722421644.git.0x1207@gmail.com>
 
-On 8/1/2024 2:12 PM, Nick Child wrote:
+On Wed, Jul 31, 2024 at 06:43:13PM +0800, Furong Xu wrote:
+> tc-mqprio can select whether traffic classes are express or preemptible.
 > 
-> When the ibmveth driver processes less than the budget, it must call
-> napi_complete_done() to release the instance. This function will
-> return false if the driver should avoid rearming interrupts.
-> Previously, the driver was ignoring the return code of
-> napi_complete_done(). As a result, there were unnecessary calls to
-> enable the veth irq.
-> Therefore, use the return code napi_complete_done() to determine if
-> irq rearm is necessary.
+> Tested on DWMAC CORE 5.10a
 > 
-> Additionally, in the event that new data is received immediately after
-> rearming interrupts, rather than just rescheduling napi, also jump
-> back to the poll processing loop since we are already in the poll
-> function (and know that we did not expense all of budget).
-> 
-> This slight tweak results in a 15% increase in TCP_RR transaction rate
-> (320k to 370k txns). We can see the ftrace data supports this:
-> PREV: ibmveth_poll = 8818014.0 us / 182802.0 hits = AVG 48.24
-> NEW:  ibmveth_poll = 8082398.0 us / 191413.0 hits = AVG 42.22
-> 
-> Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
 > ---
->   drivers/net/ethernet/ibm/ibmveth.c | 28 +++++++++++++++-------------
->   1 file changed, 15 insertions(+), 13 deletions(-)
+>  .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  2 +
+>  drivers/net/ethernet/stmicro/stmmac/dwmac5.c  | 12 ++++
+>  drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  2 +
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  8 +++
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +
+>  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 61 +++++++++++++++++++
+>  6 files changed, 87 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-> index 4c9d9badd698..e6eb594f0751 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.c
-> +++ b/drivers/net/ethernet/ibm/ibmveth.c
-> @@ -1337,6 +1337,7 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
->          unsigned long lpar_rc;
->          u16 mss = 0;
-> 
-> +restart_poll:
->          while (frames_processed < budget) {
->                  if (!ibmveth_rxq_pending_buffer(adapter))
->                          break;
-> @@ -1420,24 +1421,25 @@ static int ibmveth_poll(struct napi_struct *napi, int budget)
-> 
->          ibmveth_replenish_task(adapter);
-> 
-> -       if (frames_processed < budget) {
-> -               napi_complete_done(napi, frames_processed);
-> +       if (frames_processed == budget)
-> +               goto out;
-> 
-> -               /* We think we are done - reenable interrupts,
-> -                * then check once more to make sure we are done.
-> -                */
-> -               lpar_rc = h_vio_signal(adapter->vdev->unit_address,
-> -                                      VIO_IRQ_ENABLE);
-> +       if (!napi_complete_done(napi, frames_processed))
-> +               goto out;
-> 
-> -               BUG_ON(lpar_rc != H_SUCCESS);
-> +       /* We think we are done - reenable interrupts,
-> +        * then check once more to make sure we are done.
-> +        */
-> +       lpar_rc = h_vio_signal(adapter->vdev->unit_address, VIO_IRQ_ENABLE);
-> +       BUG_ON(lpar_rc != H_SUCCESS);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> index 5d132bada3fe..068859284691 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> @@ -655,3 +655,15 @@ void dwmac5_fpe_set_add_frag_size(void __iomem *ioaddr, u32 add_frag_size)
+>  
+>  	writel(value, ioaddr + MTL_FPE_CTRL_STS);
+>  }
+> +
+> +void dwmac5_fpe_set_preemptible_tcs(void __iomem *ioaddr, unsigned long tcs)
+> +{
+> +	u32 value;
+> +
+> +	value = readl(ioaddr + MTL_FPE_CTRL_STS);
+> +
+> +	value &= ~PEC;
+> +	value |= FIELD_PREP(PEC, tcs);
+> +
+> +	writel(value, ioaddr + MTL_FPE_CTRL_STS);
+> +}
 
-I know you're just moving this around, but maybe this is a good time to 
-get rid of the deprecated BUG_ON?
+Watch out here. I think the MTL_FPE_CTRL_STS[PEC] field is per TXQ, but
+input from user space is per TC. There's a difference between the 2, that I'll
+try to clarify below. But even ignoring the case of multiple TXQs per TC,
+there's also the case of reverse TC:TXQ mappings: "num_tc 4 map 0 1 2 3
+queues 1@3 1@2 1@1 1@0". When the user then says he wants TC 0 to be
+preemptible, he really means TXQ 3. That's how this should be treated.
 
-Otherwise this looks reasonable.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 9b1cf81c50ea..a5e3316bc410 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6256,6 +6256,8 @@ static int stmmac_setup_tc(struct net_device *ndev, enum tc_setup_type type,
+>  	switch (type) {
+>  	case TC_QUERY_CAPS:
+>  		return stmmac_tc_query_caps(priv, priv, type_data);
+> +	case TC_SETUP_QDISC_MQPRIO:
+> +		return stmmac_tc_setup_mqprio(priv, priv, type_data);
+>  	case TC_SETUP_BLOCK:
+>  		return flow_block_cb_setup_simple(type_data,
+>  						  &stmmac_block_cb_list,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> index 996f2bcd07a2..494fe2f68300 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+> @@ -1198,6 +1198,13 @@ static int tc_query_caps(struct stmmac_priv *priv,
+>  			 struct tc_query_caps_base *base)
+>  {
+>  	switch (base->type) {
+> +	case TC_SETUP_QDISC_MQPRIO: {
+> +		struct tc_mqprio_caps *caps = base->caps;
+> +
+> +		caps->validate_queue_counts = true;
+> +
+> +		return 0;
+> +	}
+>  	case TC_SETUP_QDISC_TAPRIO: {
+>  		struct tc_taprio_caps *caps = base->caps;
+>  
+> @@ -1214,6 +1221,59 @@ static int tc_query_caps(struct stmmac_priv *priv,
+>  	}
+>  }
+>  
+> +static void stmmac_reset_tc_mqprio(struct net_device *ndev)
+> +{
+> +	struct stmmac_priv *priv = netdev_priv(ndev);
+> +
+> +	netdev_reset_tc(ndev);
+> +	netif_set_real_num_tx_queues(ndev, priv->plat->tx_queues_to_use);
+> +
+> +	stmmac_fpe_set_preemptible_tcs(priv, priv->ioaddr, 0);
+> +}
+> +
+> +static int tc_setup_mqprio(struct stmmac_priv *priv,
+> +			   struct tc_mqprio_qopt_offload *mqprio)
+> +{
+> +	struct tc_mqprio_qopt *qopt = &mqprio->qopt;
+> +	struct net_device *ndev = priv->dev;
+> +	int num_stack_tx_queues = 0;
+> +	int num_tc = qopt->num_tc;
+> +	int offset, count;
+> +	int tc, err;
+> +
+> +	if (!num_tc) {
+> +		stmmac_reset_tc_mqprio(ndev);
+> +		return 0;
+> +	}
+> +
+> +	err = netdev_set_num_tc(ndev, num_tc);
+> +	if (err)
+> +		return err;
+> +
+> +	for (tc = 0; tc < num_tc; tc++) {
+> +		offset = qopt->offset[tc];
+> +		count = qopt->count[tc];
+> +		num_stack_tx_queues += count;
+> +
+> +		err = netdev_set_tc_queue(ndev, tc, count, offset);
+> +		if (err)
+> +			goto err_reset_tc;
+> +	}
 
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+We might have a problem here, and I don't know if I'm well enough
+equipped with DWMAC knowledge to help you solve it.
 
-> 
-> -               if (ibmveth_rxq_pending_buffer(adapter) &&
-> -                   napi_schedule(napi)) {
-> -                       lpar_rc = h_vio_signal(adapter->vdev->unit_address,
-> -                                              VIO_IRQ_DISABLE);
-> -               }
-> +       if (ibmveth_rxq_pending_buffer(adapter) && napi_schedule(napi)) {
-> +               lpar_rc = h_vio_signal(adapter->vdev->unit_address,
-> +                                      VIO_IRQ_DISABLE);
-> +               goto restart_poll;
->          }
-> 
-> +out:
->          return frames_processed;
->   }
-> 
-> --
-> 2.43.0
-> 
-> 
+The way I understand mqprio is that it groups TX queues into traffic
+classes. All traffic classes are in strict priority relative to each
+other (TC 0 having the smallest priority). If multiple TX queues go to
+the same traffic class, it is expected that the NIC performs round robin
+dequeuing out of them. Then there's a prio_tc_map[], which maps
+skb->priority values to traffic classes. On xmit, netdev_pick_tx()
+chooses a random TX queue out of those assigned to the computed traffic
+class for the packet. This skb_tx_hash() is the software enqueue
+counterpart to what the NIC is expected to do in terms of scheduling.
+Much of this is said in newer versions of "man tc-mqprio".
+https://man7.org/linux/man-pages/man8/tc-mqprio.8.html
+
+Where I was trying to get is that you aren't programming the TC to TXQ
+mapping to hardware in any way, and you are accepting any mapping that
+the user requests. This isn't okay.
+
+I believe that the DWMAC TX scheduling algorithm is strict priority by
+default, with plat->tx_sched_algorithm being configurable through device
+tree properties to other values. Then, individual TX queues have the
+"snps,priority" device tree property for configuring their scheduling
+priority. All of that can go out of sync with what the user thinks he
+configures through tc-mqprio, and badly.
+
+Consider "num_tc 2 queues 3@0 2@3". The stack will think that TXQs 0, 1, 2
+have one priority, and TXQs 3 and 4 another. But in reality, each TXQ
+(say by default) has a priority equal to its index. netdev_pick_tx()
+will think it's okay, for a packet belonging to TC0, to select a TXQ
+based on hashing between indices 0, 1, 2. But in hardware, the packets
+will get sent through TXQs with different priorities, based on nothing
+more than pure chance. That is a disaster, and especially noticeable
+when the mqprio mapping is applied through taprio, and there is a Qbv
+schedule on the port. Some packets will be scheduled on the right time
+slots, and some won't.
+
+So the idea here is that you'll either have to experiment with
+reprogramming the scheduling algorithm and TXQ priorities on mqprio
+offload, or refuse offloading anything that doesn't match what the
+hardware was pre-programmed with (through device tree, likely).
+
+> +
+> +	err = netif_set_real_num_tx_queues(ndev, num_stack_tx_queues);
+> +	if (err)
+> +		goto err_reset_tc;
+> +
+> +	stmmac_fpe_set_preemptible_tcs(priv, priv->ioaddr, mqprio->preemptible_tcs);
+> +
+> +	return 0;
+> +
+> +err_reset_tc:
+> +	stmmac_reset_tc_mqprio(ndev);
+> +
+> +	return err;
+> +}
 
