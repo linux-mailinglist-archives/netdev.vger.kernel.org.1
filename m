@@ -1,301 +1,127 @@
-Return-Path: <netdev+bounces-114838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4F09445F8
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:58:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E866944612
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC39F1F22DDA
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:57:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A7F4B21486
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0745116D4DC;
-	Thu,  1 Aug 2024 07:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4D31662F1;
+	Thu,  1 Aug 2024 08:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/o6HCT6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xyw+iU1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3504719478;
-	Thu,  1 Aug 2024 07:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F85158A1E;
+	Thu,  1 Aug 2024 08:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722499065; cv=none; b=r7HxCePPKIe1a0aGOthq7p6Ck/PjaWaWbOyI6jPKRb53tjtmRh5xika66uq1YszLn3sbsiNO8r38u1/gR1+VMwkZ1RbyxZb9zZbVoVxRjSy4mkjffg+hCYoqSHMz5DfToNqQ9l2wz2enCyMem9taaZhEynNwKADdfm40+FO28U0=
+	t=1722499316; cv=none; b=kB4j3oWWYJ3W+STTU/3FaWSWGWaJlMA48h7WYGFZNJmC8oAAMV6JkZSDjl4cRwIJpz3stfcLkOIMGR/BxbduFJCE3jqCqah6QFQZ60pbpGQg8+vdQ+Sxhir7wbTb8iRogvPB07qdzi4ayEebbW2nexfsa68OMDyouWCP/Pl9IOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722499065; c=relaxed/simple;
-	bh=WjopyENnVZGG8BoRkf9D6WdWGKDMbJZhOejX6u3vaig=;
+	s=arc-20240116; t=1722499316; c=relaxed/simple;
+	bh=pss0ZUVkQ9llcafFVFt33upaXuS98JMtSIUAnIUxRGo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GqtQz+dHnB3FKumxhQJ+g9ct7peo947nJ2nfJcvijiUG6LMg4FRXoSNO6yCvNcZQ8KkapXaU5Pj7x8b9rgdl4NNSq5ZbQIEd8CEfMP84yFdC8JtY0p1x+MpO8P0nSkL7ccdG8VQHgyVhO6AJoVn6FfaHNqzFLwVCnO/I01bdx7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/o6HCT6; arc=none smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=fzak+eMLUCwrIme+Z0lkXHwxn0d5zgUgS2+FkmC9fHnw+e9ViIw/tZlucqt3ocpcVnsAKi2oJs34xh4n6LyQ+K80irug57diFHCOUzYigtELVoRyJwsmticiVBfzpJczjKBlgzbaMMeHhTHBZBoZYAKno1IW3r2Evxy1XYh3ess=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xyw+iU1C; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-44fdde0c8dcso37245681cf.0;
-        Thu, 01 Aug 2024 00:57:44 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-36865a516f1so4649785f8f.0;
+        Thu, 01 Aug 2024 01:01:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722499063; x=1723103863; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722499313; x=1723104113; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NH9ilRYLYFpvV4bBytWkKj2NHM9xGHTKENKnDvjIGns=;
-        b=a/o6HCT68OF+t2teK5Cz3lq9xWq85hAsdl6J+KGs7+VQ2SJNxZFQgTQlf5JhInV8mY
-         6bYyR1Llsrh87D43BRTw+G422g4hCqK19tXSXjU1i+H0WvW8eVB/nnqWxwPtjsRYCpWI
-         X4Q2B4x9xHXbpdMhKRSdM86OLjym/JPaocrROhvq1uocf3xEcwB35K5fq9oweKpF+fxC
-         MibUzj0I1LSjALXsCOIIImGkOVa2OPwQASV2g6kK0mAtq0FDbT036tAh/BnNXrZZG+3j
-         NVZLSbcZ04aSNu0hmnTpFRZGeRSrhfNPgpyTFr3dHah/0D4aNeLhRrGBJ5WR3vMeeFMZ
-         Qdrg==
+        bh=pss0ZUVkQ9llcafFVFt33upaXuS98JMtSIUAnIUxRGo=;
+        b=Xyw+iU1Cc6vLwAbhv79zPd6zC3RDBw5J77ynq4xnGfmtDFWxHqkK3FVmKGMRA7SpIa
+         T9J4bTA3ewNrC7gecehliAtBUKajizaSDe1Ja65pYWh1TttPzqe5cvVmqCmbb3JW/yzx
+         VjJyJ/PAcIx3BzJePFleOmtnKCCzv+SUuf9tk7o9gTR0/VtgP3iUixaxjC/j28cqR1Xt
+         RDeuz6E1HJg4mQYJb6QnemxHN28fKp2T+SkFnnNCSwAKFMsnpBPdIh/mXik/nUcX2P4s
+         HhNDzMfg3/gjvgKxKjnFCYqTXThkna8kRn1iJ8vd2elcEqUR6LBrwhvh5XJyhfaanIlj
+         55kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722499063; x=1723103863;
+        d=1e100.net; s=20230601; t=1722499313; x=1723104113;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NH9ilRYLYFpvV4bBytWkKj2NHM9xGHTKENKnDvjIGns=;
-        b=DqQaAc6RikrgHkxFJyPLSYfxD1KQesyc7ha/FeDjOzXKX0KKvov4kA8dk3+RXsQ3uo
-         WWrEX1Hlm0ub8bOVEFonfrc0o10wPqvFbrbdfymU8ZLv1erHNiMusJBzTlp9lnU4Blti
-         pzbUr16jfWCzn+If13COJvr4EBqnQ+kf61FaSHpcZmMbVBIYZuHWkYYmJgwVrYhRe1k2
-         +Bj7h93cuxOwrEgTblvaWUp/HxL46BZ9buAKbJ/+DSYuTr18ayrVu85a210s5dhjeRfJ
-         Leu4oPew0w2pI9ND3oyV9LQ2Y6J6o19Vp0OPbsIg22yASD5f2vGX30nslvfXULyoCI6h
-         Tn8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUTIxMP6s9t7BAWUh7ukBiUjqYBzUOK50fWf79CyV5szH0KE00irpfNaefynP/t0u/1n7WtVTHClX8nbW2vLcmN+dC0JvOnTDrWFAy1bLTX7VjAYwFVAs5r7e5VENcM+oGUTxN6lye27vqeY8rIdCtiY2gWi+CIDVypN41AsfzL0ato9gHo1nS05vFWcN3rcXgfdg4EtTitYjmdsDAMeiU5
-X-Gm-Message-State: AOJu0YzCOIVw+MriBEl3fyKqTCqmoA8u0W9BXH2eUR5JgN8n4vFgmnCH
-	a1bF3d2EmasDzRmrUGsvBKED9OA3nvverXttLQPCPECJ/o9G65tAJrzU4lewy4xpe/sjbl6gfnz
-	bequhfX8thgnOlfj8hl2YWVzS9yA=
-X-Google-Smtp-Source: AGHT+IH9Nqcz96fXlR6qBIfn9oQsygGJT+Br+pnt3kTFU6l5J618DOIfg76qe0W8eUEc1gOKhsxpS78Zox8XqTejuMo=
-X-Received: by 2002:a05:622a:206:b0:446:5787:875f with SMTP id
- d75a77b69052e-451567b4292mr18705541cf.38.1722499062896; Thu, 01 Aug 2024
- 00:57:42 -0700 (PDT)
+        bh=pss0ZUVkQ9llcafFVFt33upaXuS98JMtSIUAnIUxRGo=;
+        b=IX5Jms0ZulY4Pe/TRjuYI6/fzfasHtXW43bYzVeIffQJVyVhefSJob2fScJGHvUe5u
+         X8/66kDtA23O1L1jEM/mQc1iru5n48RS+r7Re2jy/ilIXPk4MU3JrUm4Fw/POf7vfRr1
+         MiMSlo3KJACCOlUAmvnl3h+JSI6DoJt2as+JsVVuLJv0LjO9SrXf7kSmRyLrXyNwWELH
+         tjdHdt3E9c2Zcgi/rTnwXNBLhYq2+qfos7WdrD77WdqwtAnbxAv+gqxd0IxWYw8G60Ep
+         j3t05cXl/99pOEcGUlfaPB2JFZneXa0fdo9NxIyw8TJy6VKxYeihAyTGV7/OZyJLOsv6
+         HQ5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU0P6JqoKengu/3VanK58sunVTjWzllDA9jLd0g3dv8YbXayCV1rLZOwL5QXCkMO2ibIZn270hN@vger.kernel.org, AJvYcCXeWmpdfYn1ZEgOWMi3nrddOyzd2+63hc7bNohLfso51yPXnym0ErqCTu/2cAQC9cidjlZzpWJ+Rk8yhh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVbNksA7KdGoB/JhqSOVCZrqwOtDJ+TT5etbgJDZamPpgYKgge
+	5cZwvIjmMjCWJDPgz7XThTCmrczB2hf+H+Xe3cHDmpYcP6S37FP9SeWD3XMdfZdo+ASMvLzZvHN
+	kSsJwSp6WW1uYRUUjS5R90MUY3FM=
+X-Google-Smtp-Source: AGHT+IGzDGxYPAK57oqfHSlsGd9K7iuasFxGLFx2h2cYTdeTQgCLNXKoUee/un1WO6hbM0z6aFcsf6cq/8chOwD4G2I=
+X-Received: by 2002:adf:ffd0:0:b0:368:4910:8f43 with SMTP id
+ ffacd0b85a97d-36baacbcfcamr1417384f8f.3.1722499312787; Thu, 01 Aug 2024
+ 01:01:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731061132.703368-1-jacobe.zang@wesion.com>
- <20240731061132.703368-5-jacobe.zang@wesion.com> <0a78a0fb-0a5e-424f-a801-4a63b9ee1a49@gmail.com>
- <3ded8aea-ee11-43da-9dd7-1259cf931747@broadcom.com> <CABjd4YxiSY0A0iVHGHw9RDey+avxmzUapoLLLyf=80MzVX0yWA@mail.gmail.com>
- <6e34c814-a6dc-4a96-9e46-ca25af67f4f6@broadcom.com> <CABjd4YxdCh7EceYOfcFxKtV0H7Von0oZAMWD=69sM6y4-CoAQw@mail.gmail.com>
- <TYZPR03MB7001889335D58561F86978A780B22@TYZPR03MB7001.apcprd03.prod.outlook.com>
-In-Reply-To: <TYZPR03MB7001889335D58561F86978A780B22@TYZPR03MB7001.apcprd03.prod.outlook.com>
-From: Alexey Charkov <alchark@gmail.com>
-Date: Thu, 1 Aug 2024 10:57:31 +0300
-Message-ID: <CABjd4YwCFpPerXRaR=6zd-61wDE6nH7_s0C6jMRhA4x0L6guLg@mail.gmail.com>
-Subject: Re: [PATCH v6 4/5] wifi: brcmfmac: Add optional lpo clock enable support
-To: Jacobe Zang <jacobe.zang@wesion.com>
-Cc: Arend van Spriel <arend.vanspriel@broadcom.com>, "robh@kernel.org" <robh@kernel.org>, 
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "heiko@sntech.de" <heiko@sntech.de>, 
-	"kvalo@kernel.org" <kvalo@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "conor+dt@kernel.org" <conor+dt@kernel.org>, 
-	"efectn@protonmail.com" <efectn@protonmail.com>, "dsimic@manjaro.org" <dsimic@manjaro.org>, 
-	"jagan@edgeble.ai" <jagan@edgeble.ai>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-rockchip@lists.infradead.org" <linux-rockchip@lists.infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "arend@broadcom.com" <arend@broadcom.com>, 
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "megi@xff.cz" <megi@xff.cz>, 
-	"duoming@zju.edu.cn" <duoming@zju.edu.cn>, "bhelgaas@google.com" <bhelgaas@google.com>, 
-	"minipli@grsecurity.net" <minipli@grsecurity.net>, 
-	"brcm80211@lists.linux.dev" <brcm80211@lists.linux.dev>, 
-	"brcm80211-dev-list.pdl@broadcom.com" <brcm80211-dev-list.pdl@broadcom.com>, Nick Xie <nick@khadas.com>
+References: <20240729183038.1959-1-eladwf@gmail.com> <ZqfpGVhBe3zt0x-K@lore-desk>
+ <CA+SN3soFwyPs2YhvY+x33B6WsHHahu6hbKM-0TpdkquJwzD7Gw@mail.gmail.com>
+ <20240731183718.1278048e@kernel.org> <CA+SN3srMPLcmQ4h_iNst71OkQPFcCYxBRL0Q9hR=7LjJ86TFFA@mail.gmail.com>
+ <Zqs5hcFMx1g42Zrd@lore-desk>
+In-Reply-To: <Zqs5hcFMx1g42Zrd@lore-desk>
+From: Elad Yifee <eladwf@gmail.com>
+Date: Thu, 1 Aug 2024 11:01:43 +0300
+Message-ID: <CA+SN3spwT1hrXQRmk8TkDOfBwp66WWqEAczvNCS7QaTe_eM=Vg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/2] net: ethernet: mtk_eth_soc: improve RX performance
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
+	Mark Lee <Mark-MC.Lee@mediatek.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>, 
+	Joe Damato <jdamato@fastly.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 1, 2024 at 6:53=E2=80=AFAM Jacobe Zang <jacobe.zang@wesion.com>=
- wrote:
+On Thu, Aug 1, 2024 at 10:30=E2=80=AFAM Lorenzo Bianconi <lorenzo@kernel.or=
+g> wrote:
 >
-> >>On 7/31/2024 2:01 PM, Alexey Charkov wrote:
-> >>> On Wed, Jul 31, 2024 at 2:15=E2=80=AFPM Arend van Spriel
-> >>> <arend.vanspriel@broadcom.com> wrote:
-> >>>>
-> >>>> On 7/31/2024 12:16 PM, Alexey Charkov wrote:
-> >>>>> Hi Jacobe,
-> >>>>>
-> >>>>>
-> >>>>> On 31/07/2024 9:11 am, Jacobe Zang wrote:
-> >>>>>   > WiFi modules often require 32kHz clock to function. Add support=
- to
-> >>>>>   > enable the clock to PCIe driver and move "brcm,bcm4329-fmac" ch=
-eck
-> >>>>>   > to the top of brcmf_of_probe
-> >>>>>   >
-> >>>>>   > Co-developed-by: Ondrej Jirman <megi@xff.cz>
-> >>>>>   > Signed-off-by: Ondrej Jirman <megi@xff.cz>
-> >>>>>   > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> >>>>>   > ---
-> >>>>>   >  .../net/wireless/broadcom/brcm80211/brcmfmac/of.c    | 12 ++++=
-+++++++-
-> >>>>>   >  1 file changed, 11 insertions(+), 1 deletion(-)
-> >>>>>   >
-> >>>>>   > diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/o=
-f.c
-> >>>>> b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> >>>>>   > index e406e11481a62..7e0a2ad5c7c8a 100644
-> >>>>>   > --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> >>>>>   > +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-> >>>>>   > @@ -6,6 +6,7 @@
-> >>>>>   >  #include <linux/of.h>
-> >>>>>   >  #include <linux/of_irq.h>
-> >>>>>   >  #include <linux/of_net.h>
-> >>>>>   > +#include <linux/clk.h>
-> >>>>>   >
-> >>>>>   >  #include <defs.h>
-> >>>>>   >  #include "debug.h"
-> >>>>>   > @@ -70,12 +71,16 @@ void brcmf_of_probe(struct device *dev, enu=
-m
-> >>>>> brcmf_bus_type bus_type,
-> >>>>>   >  {
-> >>>>>   >      struct brcmfmac_sdio_pd *sdio =3D &settings->bus.sdio;
-> >>>>>   >      struct device_node *root, *np =3D dev->of_node;
-> >>>>>   > +    struct clk *clk;
-> >>>>>   >      const char *prop;
-> >>>>>   >      int irq;
-> >>>>>   >      int err;
-> >>>>>   >      u32 irqf;
-> >>>>>   >      u32 val;
-> >>>>>   >
-> >>>>>   > +    if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac=
-"))
-> >>>>>   > +        return;
-> >>>>>
-> >>>>> Did you test this? The DTS patch you sent as part of this series do=
-esn't
-> >>>>> list "brcm,bcm4329-fmac" in the compatible, so this will probably r=
-eturn
-> >>>>> right here, skipping over the rest of your patch.
-> >>>>>
-> >>>>> Please test before resending, both with and without the driver for =
-the
-> >>>>> Bluetooth part of the chip (since it also touches clocks).
-> >>>>>
-> >>>>> You are also changing the behavior for other systems by putting thi=
-s
-> >>>>> check further up the probe path, which might break things for no re=
-ason.
-> >>>>> Better put your clk-related addition below where this check was
-> >>>>> originally, rather than reorder stuff you don't have to reorder.
-> >>>>
-> >>>> That was upon my suggestion. That check was originally at the top of=
- the
-> >>>> function, but people added stuff before that. I agree that makes the
-> >>>> compatible "brcm,brcm4329-fmac" required which is what the textual
-> >>>> binding stated before the switch to YAML was made:
-> >>>>
-> >>>> """
-> >>>> Broadcom BCM43xx Fullmac wireless SDIO devices
-> >>>>
-> >>>> This node provides properties for controlling the Broadcom wireless
-> >>>> device. The
-> >>>> node is expected to be specified as a child node to the SDIO control=
-ler that
-> >>>> connects the device to the system.
-> >>>>
-> >>>> Required properties:
-> >>>>
-> >>>>    - compatible : Should be "brcm,bcm4329-fmac".
-> >>>> """
-> >>>>
-> >>>> Not sure whether this is still true for YAML version (poor YAML read=
-ing
-> >>>> skills ;-) ), but it should as the switch from textual to YAML shoul=
-d
-> >>>> not have changed the bindings specification.
-> >>>>
-> >>>>>   > +
-> >>>>>   >      /* Apple ARM64 platforms have their own idea of board type=
-,
-> >>>>> passed in
-> >>>>>   >       * via the device tree. They also have an antenna SKU para=
-meter
-> >>>>>   >       */
-> >>>>>   > @@ -113,8 +118,13 @@ void brcmf_of_probe(struct device *dev, en=
-um
-> >>>>> brcmf_bus_type bus_type,
-> >>>>>   >          of_node_put(root);
-> >>>>>   >      }
-> >>>>>   >
-> >>>>>   > -    if (!np || !of_device_is_compatible(np, "brcm,bcm4329-fmac=
-"))
-> >>>>>   > +    clk =3D devm_clk_get_optional_enabled(dev, "lpo");
-> >>>>>   > +    if (!IS_ERR_OR_NULL(clk)) {
-> >>>>>   > +        brcmf_dbg(INFO, "enabling 32kHz clock\n");
-> >>>>>   > +        clk_set_rate(clk, 32768);
-> >>>>>   > +    } else {
-> >>>>>   >          return;
-> >>>>>
-> >>>>> Why return here? If the clock is optional, a lot of systems will no=
-t
-> >>>>> have it - that shouldn't prevent the driver from probing. And you a=
-re
-> >>>>> still not handling the -EPROBE_DEFER case which was mentioned on yo=
-ur
-> >>>>> previous submission.
-> >>>>
-> >>>> Right. The else statement above could/should be:
-> >>>>
-> >>>> } else if (clk && PTR_ERR(clk) =3D=3D -EPROBE_DEFER) {
-> >>>>           return PTR_ERR(clk);
-> >>>> }
-> >>>
-> >>> ... plus change the function prototype to return int and propagate
-> >>> that error code through brcmf_get_module_param to brcmf_pcie_probe's
-> >>> return value. I guess checking clk for NULL is also redundant in this
-> >>> case?
-> >>
-> >>Only wanted to give the suggestion to get started. Propagating the
-> >>return value seemed obvious to me, but you are absolutely right.
-> >>PTR_ERR(NULL) will probably be something else than -EPROBE_DEFER but it
-> >>seems odd to me. Maybe PTR_ERR_OR_ZERO(clk) is a better option here.
-> >
-> > Indeed. Perhaps something along the lines of:
-> >
-> >        clk =3D devm_clk_get_optional_enabled(dev, "lpo");
-> >        if (!IS_ERR_OR_NULL(clk)) {
-> >                brcmf_dbg(INFO, "enabling 32kHz clock\n");
-> >                return clk_set_rate(clk, 32768);
-> >        } else {
-> >                return PTR_ERR_OR_ZERO(clk);
-> >        }
-> >
-> > ... which should then go at the very end of brcmf_of_probe. And all of
->
-> But before end of brcmf_of_probe is to set interrupt configuration which
-> wifi chip connect via sdio. Like this:
-> ```
->         if (bus_type !=3D BRCMF_BUSTYPE_SDIO)
->                 return;
->
->         if (of_property_read_u32(np, "brcm,drive-strength", &val) =3D=3D =
-0)
->                 sdio->drive_strength =3D val;
->
->         /* make sure there are interrupts defined in the node */
->         if (!of_property_present(np, "interrupts"))
->                 return;
->
->         irq =3D irq_of_parse_and_map(np, 0);
->         if (!irq) {
->                 brcmf_err("interrupt could not be mapped\n");
->                 return;
->         }
->         irqf =3D irqd_get_trigger_type(irq_get_irq_data(irq));
->
->         sdio->oob_irq_supported =3D true;
->         sdio->oob_irq_nr =3D irq;
->         sdio->oob_irq_flags =3D irqf;
-> ```
-> So I think the interrupt should be set in the if statement while
-> bus_type=3D=3DBRCMF_BUSTYPE_SDIO, and add else statement
-> to enable clock(or simply put it at the end as Alexey said). And
-> can also use else-if statement to deal with
-> bus_type =3D=3D BRCMF_BUSTYPE_USB or PCIE in the future.
+> nope, I added page_pool support even for non-XDP mode for hw that does
+> not support HW-LRO. I guess mtk folks can correct me if I am wrong but
+> IIRC there were some hw limirations on mt7986/mt7988 for HW-LRO, so I am
+> not sure if it can be supported.
+I know, but if we want to add support for HWLRO alongside XDP on NETSYS2/3,
+we need to prevent the PP use (for HWLRO allocations) and enable it
+only when there's
+an XDP program.
+I've been told HWLRO works on the MTK SDK version.
 
-SDIO devices might also want to enable a clock, so I think wrapping
-the drive strength and interrupts handling into an if statement and
-putting the clock-related stuff right after it (but not in the else
-block) is better.
-
-Best regards,
-Alexey
+> > Other than that, for HWLRO we need contiguous pages of different order
+> > than the PP, so the creation of PP
+> > basically prevents the use of HWLRO.
+> > So we solve this LRO problem and get a performance boost with this
+> > simple change.
+> >
+> > Lorenzo's suggestion would probably improve the performance of the XDP
+> > path and we should try that nonetheless.
+>
+> nope, I mean to improve peformances even for non-XDP case with page_pool =
+frag
+> APIs.
+>
+> Regards,
+> Lorenzo
+Yes of course it would improve it for non-XDP case if we still use PP
+for non-XDP,
+but my point is we shouldn't, mainly because of HWLRO, but also the
+extra unnecessary code.
 
