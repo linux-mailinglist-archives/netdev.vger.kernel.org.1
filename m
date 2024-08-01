@@ -1,192 +1,100 @@
-Return-Path: <netdev+bounces-114920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2223944AE9
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:07:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F265944AF6
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4108F283D47
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:07:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFECA1C21702
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA8F19FA99;
-	Thu,  1 Aug 2024 12:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B9119F487;
+	Thu,  1 Aug 2024 12:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8jiYAD+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FZOQHXRS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3060189B90;
-	Thu,  1 Aug 2024 12:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18AE519F467;
+	Thu,  1 Aug 2024 12:07:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722513959; cv=none; b=CfBXt7EVCuX6ZYBMgKMY2XyyJ+4OKE6gvIo/fWk2HQsi/ZnrWUZf75b6nfw6gsGy2ol/jdmERF49bQUqOwOgO0x43fZS+4veC7vurRfA8JXTtUmkd4aM/XmcI+AiU/aA0x731Do7dU1z1iVBwuPgmchEnb+PXAvKeqACpwcTMUY=
+	t=1722514074; cv=none; b=Z6Z1/l6Q8LgRsra2+avNtgTiXy35VeV2qzhdiPiLujsfaBSvqqmDSVHcdEv+2QUlw/Y34cvqrnuvrAnz5OdmNT6EeZzcBtTz/WOhas9ORp7LmHu1vYx++PVF6XULpqXs6XmrkDpYmWNrlDoXx/TbBES6TYyKfG1vu7wHFl9PzQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722513959; c=relaxed/simple;
-	bh=Vz6K0CseR2CvsnyMziB3zHBkOhk2OUVB/Qm9uhyU7F4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eJTQjDrkoC6EQOB2LgXDpXTxrWiHCqWXmY0mWGm+0x60OGh6btcRrwOutKc6PGUdOW+opVWmQMDcJo2v/PT70S77Y5aeuJBUqnKvnMXvXcGRxLg6IFOUDBZfHjx7OWBYaB3seGsCoE2yGX2XLzkOkdWeB2lKrVBYWcYSKoewEYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8jiYAD+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B57CAC4AF0A;
-	Thu,  1 Aug 2024 12:05:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722513959;
-	bh=Vz6K0CseR2CvsnyMziB3zHBkOhk2OUVB/Qm9uhyU7F4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F8jiYAD+/8dE1YMWeRzW41azT2Hb3buByI2zt4jSSEsUYzeYaKnzbzOdoMwLYX09i
-	 bV9wu6XZQIvCUyvVvpms63V5cBYtisC11FpT/G+LU2psIw724ofxKru6pj44P4A4Xi
-	 HWLwg3w3bCW6T7ScasgQxzL2f3A3bGihpysPMt4TioDA2gT9g7lSW4wEpopUEDp93m
-	 lsZIzOOw04cTwVr8WJ+qkF2SWcnHL0XnfQwXDjOptvnIT3uG140de3bFQT5ll3YjPP
-	 vwnB7qBqneAWK6h6KjWlvKHgURnZsh76LCF4KRvAhzRFbPKAHsi0+NCswmZE5ou/jU
-	 Xfpc08G1A0tag==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org,
-	linux-media@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Michael Margolin <mrgolin@amazon.com>,
-	Mustafa Ismail <mustafa.ismail@intel.com>,
-	netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Selvin Xavier <selvin.xavier@broadcom.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tatyana Nikolova <tatyana.e.nikolova@intel.com>
-Subject: [PATCH rdma-next 8/8] RDMA/mlx5: Introduce GET_DATA_DIRECT_SYSFS_PATH ioctl
-Date: Thu,  1 Aug 2024 15:05:17 +0300
-Message-ID: <403745463e0ef52adbef681ff09aa6a29a756352.1722512548.git.leon@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1722512548.git.leon@kernel.org>
-References: <cover.1722512548.git.leon@kernel.org>
+	s=arc-20240116; t=1722514074; c=relaxed/simple;
+	bh=gy0tw4NvdfoKfvQRoKSVw6iHZihKpKijFl217piJHwY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZGaMJ9YQyqgGXyWKL5fEaX9BZvAq8khd0HA0zamK1T7iXL8lHjoufOzPh3cSx1/SeoZXeKAYsMIUFeD/8D8FsVo0nt1pYb0l/PBinWLM/eyOb/HKJiYtWuNgAL/fLjmUPFaa9cy6JN6uEh1mSVqI7tc+S6TNZesTsSoHTHCy5VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FZOQHXRS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ssa17zqpv+KmMGK+HJxhChAbr5hH2QaoI2AfEE2Oms4=; b=FZOQHXRS/qgQeRrgGsQsMOTySO
+	PhG9ypjkgW68z6iX9Xfct1eGROCFIDLNYB9TefufznhlaEg2mnKuzWJoa5FOsEKzmma9fUV+payn4
+	Aui1bGlwEIx2Ze+Da6W5h6jzKAHiOVOmg9Tsg4Hf9Uupg6QLJNw/EYpA+ltggaXHtBg4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sZUal-003ltH-7V; Thu, 01 Aug 2024 14:07:35 +0200
+Date: Thu, 1 Aug 2024 14:07:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 03/10] net: hibmcge: Add mdio and hardware
+ configuration supported in this module
+Message-ID: <db012bd7-0d97-4040-bbca-e8f8b1093aad@lunn.ch>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-4-shaojijie@huawei.com>
+ <ba5b8b48-64b7-417d-a000-2e82e242c399@lunn.ch>
+ <746dfc27-f880-4bbe-b9bd-c8bb82303ffe@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <746dfc27-f880-4bbe-b9bd-c8bb82303ffe@huawei.com>
 
-From: Yishai Hadas <yishaih@nvidia.com>
+> > > +/* include phy link and mac link */
+> > > +u32 hbg_get_link_status(struct hbg_priv *priv)
+> > > +{
+> > > +	struct phy_device *phydev = priv->mac.phydev;
+> > > +	int ret;
+> > > +
+> > > +	if (!phydev)
+> > > +		return HBG_LINK_DOWN;
+> > > +
+> > > +	phy_read_status(phydev);
+> > > +	if ((phydev->state != PHY_UP && phydev->state != PHY_RUNNING) ||
+> > > +	    !phydev->link)
+> > > +		return HBG_LINK_DOWN;
+> > > +
+> > > +	ret = hbg_hw_sgmii_autoneg(priv);
+> > > +	if (ret)
+> > > +		return HBG_LINK_DOWN;
+> > > +
+> > > +	return HBG_LINK_UP;
+> > > +}
+> > There should not be any need for this. So why do you have it?
+> 
+> I'll move this to another patch where it's more appropriate.
 
-Introduce the 'GET_DATA_DIRECT_SYSFS_PATH' ioctl to return the sysfs
-path of the affiliated 'data direct' device for a given device.
+That does not explain why it is needed. Generally, phylib tells you if
+the link is up, as part of the adjust_link callback. Why do you need
+to do something which no other driver does?
 
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/infiniband/hw/mlx5/std_types.c   | 55 +++++++++++++++++++++++-
- include/uapi/rdma/mlx5_user_ioctl_cmds.h |  5 +++
- 2 files changed, 59 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/infiniband/hw/mlx5/std_types.c b/drivers/infiniband/hw/mlx5/std_types.c
-index bbfcce3bdc84..ffeb1e1a1538 100644
---- a/drivers/infiniband/hw/mlx5/std_types.c
-+++ b/drivers/infiniband/hw/mlx5/std_types.c
-@@ -10,6 +10,7 @@
- #include <linux/mlx5/eswitch.h>
- #include <linux/mlx5/vport.h>
- #include "mlx5_ib.h"
-+#include "data_direct.h"
- 
- #define UVERBS_MODULE_NAME mlx5_ib
- #include <rdma/uverbs_named_ioctl.h>
-@@ -183,6 +184,50 @@ static int UVERBS_HANDLER(MLX5_IB_METHOD_QUERY_PORT)(
- 					     sizeof(info));
- }
- 
-+static int UVERBS_HANDLER(MLX5_IB_METHOD_GET_DATA_DIRECT_SYSFS_PATH)(
-+	struct uverbs_attr_bundle *attrs)
-+{
-+	struct mlx5_data_direct_dev *data_direct_dev;
-+	struct mlx5_ib_ucontext *c;
-+	struct mlx5_ib_dev *dev;
-+	int out_len = uverbs_attr_get_len(attrs,
-+			MLX5_IB_ATTR_GET_DATA_DIRECT_SYSFS_PATH);
-+	u32 dev_path_len;
-+	char *dev_path;
-+	int ret;
-+
-+	c = to_mucontext(ib_uverbs_get_ucontext(attrs));
-+	if (IS_ERR(c))
-+		return PTR_ERR(c);
-+	dev = to_mdev(c->ibucontext.device);
-+	mutex_lock(&dev->data_direct_lock);
-+	data_direct_dev = dev->data_direct_dev;
-+	if (!data_direct_dev) {
-+		ret = -ENODEV;
-+		goto end;
-+	}
-+
-+	dev_path = kobject_get_path(&data_direct_dev->device->kobj, GFP_KERNEL);
-+	if (!dev_path) {
-+		ret = -ENOMEM;
-+		goto end;
-+	}
-+
-+	dev_path_len = strlen(dev_path) + 1;
-+	if (dev_path_len > out_len) {
-+		ret = -ENOSPC;
-+		goto end;
-+	}
-+
-+	ret = uverbs_copy_to(attrs, MLX5_IB_ATTR_GET_DATA_DIRECT_SYSFS_PATH, dev_path,
-+			     dev_path_len);
-+	kfree(dev_path);
-+
-+end:
-+	mutex_unlock(&dev->data_direct_lock);
-+	return ret;
-+}
-+
- DECLARE_UVERBS_NAMED_METHOD(
- 	MLX5_IB_METHOD_QUERY_PORT,
- 	UVERBS_ATTR_PTR_IN(MLX5_IB_ATTR_QUERY_PORT_PORT_NUM,
-@@ -193,9 +238,17 @@ DECLARE_UVERBS_NAMED_METHOD(
- 				   reg_c0),
- 		UA_MANDATORY));
- 
-+DECLARE_UVERBS_NAMED_METHOD(
-+	MLX5_IB_METHOD_GET_DATA_DIRECT_SYSFS_PATH,
-+	UVERBS_ATTR_PTR_OUT(
-+		MLX5_IB_ATTR_GET_DATA_DIRECT_SYSFS_PATH,
-+		UVERBS_ATTR_MIN_SIZE(0),
-+		UA_MANDATORY));
-+
- ADD_UVERBS_METHODS(mlx5_ib_device,
- 		   UVERBS_OBJECT_DEVICE,
--		   &UVERBS_METHOD(MLX5_IB_METHOD_QUERY_PORT));
-+		   &UVERBS_METHOD(MLX5_IB_METHOD_QUERY_PORT),
-+		   &UVERBS_METHOD(MLX5_IB_METHOD_GET_DATA_DIRECT_SYSFS_PATH));
- 
- DECLARE_UVERBS_NAMED_METHOD(
- 	MLX5_IB_METHOD_PD_QUERY,
-diff --git a/include/uapi/rdma/mlx5_user_ioctl_cmds.h b/include/uapi/rdma/mlx5_user_ioctl_cmds.h
-index 106276a4cce7..fd2e4a3a56b3 100644
---- a/include/uapi/rdma/mlx5_user_ioctl_cmds.h
-+++ b/include/uapi/rdma/mlx5_user_ioctl_cmds.h
-@@ -348,6 +348,7 @@ enum mlx5_ib_pd_methods {
- 
- enum mlx5_ib_device_methods {
- 	MLX5_IB_METHOD_QUERY_PORT = (1U << UVERBS_ID_NS_SHIFT),
-+	MLX5_IB_METHOD_GET_DATA_DIRECT_SYSFS_PATH,
- };
- 
- enum mlx5_ib_query_port_attrs {
-@@ -355,4 +356,8 @@ enum mlx5_ib_query_port_attrs {
- 	MLX5_IB_ATTR_QUERY_PORT,
- };
- 
-+enum mlx5_ib_get_data_direct_sysfs_path_attrs {
-+	MLX5_IB_ATTR_GET_DATA_DIRECT_SYSFS_PATH = (1U << UVERBS_ID_NS_SHIFT),
-+};
-+
- #endif
--- 
-2.45.2
-
+	Andrew
 
