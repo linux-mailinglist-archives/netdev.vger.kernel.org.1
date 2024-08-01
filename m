@@ -1,110 +1,159 @@
-Return-Path: <netdev+bounces-115035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 132A0944EC8
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:09:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0D7B944EC6
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1650B1C22AF8
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:09:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50AEBB25797
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5465513BC0C;
-	Thu,  1 Aug 2024 15:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6025313B590;
+	Thu,  1 Aug 2024 15:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ECZk6S3s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0eaF3wA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [83.166.143.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FD6130A47
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 15:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B42313B287
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 15:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722524944; cv=none; b=NSrxw8T9QI5quNinMV4+f6JsnIoIFvxmyQIeDv0dxKdvbN44yw5YM5m4vzJYvjNQXkhNri4OEQEr8ekZ1WjsjKVVXsYh+FCSM+v2ucGPbEYWLyvJJI8feHdEXdmVCxTX1IVO+QwN2sNDFWnVUUeb3EyRfDO0l9jDes07V5YtCdo=
+	t=1722524943; cv=none; b=BzPOn7XE/ACrO/s9Mbfxw8FVk8jPBjhNGEcHEdMDV7EPMS9YUOWV5nPaAXpDL+c48L+4O9958sb37U22aPPj46j4xVXJlbVrjtT5PazOjPFYQUKRg2rIEuFqvFFe5eCa2PjTbkVfrKVkz6/Bf7gVmlJi4Zd6sapcw/rFqctkfaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722524944; c=relaxed/simple;
-	bh=oH9F7811kynHG5V9RNK8QM1PF490b0/8UQiv8AJT1NQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xd5He7ewsuCASwaHL7NfWlLjS0X+Vq8hWVeHMUcxa5Lekx8mEVnE4Y/wutK+34DKJbFAqybQi5VfzrQkaorG/+Y5vX+hke6cpqCVHAn5bUh+Pcb/uDfoulPy6uWUi1jMn/MxGRsNpvijrd6a+GDechC7qDS/x1YDkFdoMmbUmFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ECZk6S3s; arc=none smtp.client-ip=83.166.143.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZXRZ39WjzcLC;
-	Thu,  1 Aug 2024 17:08:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1722524938;
-	bh=nrkwXktwDxdS+v/5ZsT0xw/qBigeLGpoe9FswOOXb2w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ECZk6S3s/pxPL2NNhCD17FdQq2m/8kM/eIJs1XKUCkvP2U3k3dKk/exr4UAs3xjv1
-	 JB4JXoRqlRznXLD2rs8E+3oytzgz52wfepnVTaBaa9tq1Po49QkgqZXblixkSadD2H
-	 635/VzKee9CVCF9CK4XawEsNlD9bS/V0f0e9Rjcs=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZXRY4f2fzBB9;
-	Thu,  1 Aug 2024 17:08:57 +0200 (CEST)
-Date: Thu, 1 Aug 2024 17:08:53 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v1 7/9] selftests/landlock: Test listen on ULP socket
- without clone method
-Message-ID: <20240801.rae2can8ooT9@digikod.net>
-References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
- <20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1722524943; c=relaxed/simple;
+	bh=uMhGNyT4i+2H1pGr9DTjkq4tyyq1R4iFujQ8meOBnjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sADGjCR7YDGQx/yvi5PRhfqneiVlkrIJCaHDma4gfzDCn7UAocVjrTmakKUW00Nto0Q9/JgUHo/xPXqez5BoY/Ffqi2n4MGiG7/snt8fuqLoUucYM5qvgLou1HH1kSRefWnluIxSKu3FV3/e6mHCV6ZXuCMUmMdkQaEpARl2lBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0eaF3wA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50501C32786;
+	Thu,  1 Aug 2024 15:09:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722524942;
+	bh=uMhGNyT4i+2H1pGr9DTjkq4tyyq1R4iFujQ8meOBnjc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H0eaF3wAHGa0OTFrRrf2vvg5g6BrSe5NpuainCl9dSQjna/vb0LFljfNDfj7KvgXH
+	 mkJs9Hj1lsIi200zIG+QbI2gs0mMxqT7b11eW504MI8FHaFV85fE2AAcU10nBgI3cb
+	 QiRUIDOI7S8jxGFoYxX597xpr3MqIsMkHC++BWa4D4NFrcVwPpqdjGgfVAjua2g+Eo
+	 2HfzbgoDg2UPtKSveva18zM2UT1XMNz2k0adoHVY25hmG4tKSxuUVMq7O83L4j5uoK
+	 M82KFp1AnA/etN1qbau71JOGFxf8JUrYe0N4Mm2THW7cu3mndgA7FaqkxhTtqFejVg
+	 /Sa1pYrkuc0yQ==
+Date: Thu, 1 Aug 2024 08:09:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
+Message-ID: <20240801080901.4c4aa004@kernel.org>
+In-Reply-To: <7ed5d9b312ccda58c3400c7ba78bca8e5f8ea853.1722357745.git.pabeni@redhat.com>
+References: <cover.1722357745.git.pabeni@redhat.com>
+	<7ed5d9b312ccda58c3400c7ba78bca8e5f8ea853.1722357745.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jul 28, 2024 at 08:26:00AM +0800, Mikhail Ivanov wrote:
-> Test checks that listen(2) doesn't wrongfully return -EACCES instead of
-> -EINVAL when trying to listen on a socket which is set to ULP that doesn't
-> have clone method in inet_csk(sk)->icsk_ulp_ops (espintcp).
-> 
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
->  tools/testing/selftests/landlock/config     |  1 +
->  tools/testing/selftests/landlock/net_test.c | 38 +++++++++++++++++++++
->  2 files changed, 39 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
-> index 0086efaa7b68..014401fe6114 100644
-> --- a/tools/testing/selftests/landlock/config
-> +++ b/tools/testing/selftests/landlock/config
-> @@ -12,3 +12,4 @@ CONFIG_SHMEM=y
->  CONFIG_SYSFS=y
->  CONFIG_TMPFS=y
->  CONFIG_TMPFS_XATTR=y
-> +CONFIG_INET_ESPINTCP=y
-> \ No newline at end of file
+On Tue, 30 Jul 2024 22:39:46 +0200 Paolo Abeni wrote:
+> +#include <linux/types.h>
+> +#include <linux/bits.h>
+> +#include <linux/bitfield.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/netlink.h>
 
-There are missing dependencies, and also please sort entries. I think it should
-be:
+most of these could be replaced by forward declaration of types
 
- CONFIG_CGROUPS=y
- CONFIG_CGROUP_SCHED=y
- CONFIG_INET=y
-+CONFIG_INET_ESPINTCP=y
-+CONFIG_INET_ESP=y
- CONFIG_IPV6=y
-+CONFIG_IPV6_ESP=y
-+CONFIG_INET6_ESPINTCP=y
- CONFIG_NET=y
- CONFIG_NET_NS=y
- CONFIG_OVERLAY_FS=y
+> +#include <uapi/linux/net_shaper.h>
+> +
+> +/**
+> + * struct net_shaper_info - represents a shaping node on the NIC H/W
+> + * zeroed field are considered not set.
+> + * @handle: Unique identifier for the shaper, see @net_shaper_make_handle
+> + * @parent: Unique identifier for the shaper parent, usually implied. Only
+> + *   NET_SHAPER_SCOPE_QUEUE, NET_SHAPER_SCOPE_NETDEV and NET_SHAPER_SCOPE_DETACHED
+> + *   can have the parent handle explicitly set, placing such shaper under
+> + *   the specified parent.
+> + * @metric: Specify if the bw limits refers to PPS or BPS
+> + * @bw_min: Minimum guaranteed rate for this shaper
+> + * @bw_max: Maximum peak bw allowed for this shaper
+> + * @burst: Maximum burst for the peek rate of this shaper
+> + * @priority: Scheduling priority for this shaper
+> + * @weight: Scheduling weight for this shaper
+> + * @children: Number of nested shapers, accounted only for DETACHED scope
+> + */
+> +struct net_shaper_info {
+> +	u32 handle;
+> +	u32 parent;
+> +	enum net_shaper_metric metric;
+> +	u64 bw_min;
+> +	u64 bw_max;
+> +	u64 burst;
+> +	u32 priority;
+> +	u32 weight;
+> +	u32 children;
+> +};
+> +
+> +/**
+> + * define NET_SHAPER_SCOPE_VF - Shaper scope
+> + *
+> + * This shaper scope is not exposed to user-space; the shaper is attached to
+> + * the given virtual function.
+> + */
+> +#define NET_SHAPER_SCOPE_VF __NET_SHAPER_SCOPE_MAX
+> +
+> +/**
+> + * struct net_shaper_ops - Operations on device H/W shapers
+> + *
+> + * The initial shaping configuration ad device initialization is empty/
+> + * a no-op/does not constraint the b/w in any way.
+> + * The network core keeps track of the applied user-configuration in
+> + * per device storage.
+> + *
+> + * Each shaper is uniquely identified within the device with an 'handle',
+> + * dependent on the shaper scope and other data, see @shaper_make_handle()
 
-This works with check-linux.sh from
-https://github.com/landlock-lsm/landlock-test-tools
+we need to document locking, seems like the locking is.. missing?
+Or at least I don't see what prevents two deletes from racing.
 
-IPv6 is currently not tested, which should be the case (with the "protocol"
-variants).
+> + */
+> +struct net_shaper_ops {
+> +	/**
+> +	 * @group: create the specified shapers group
+> +	 *
+> +	 * Nest the specified @inputs shapers under the given @output shaper
+> +	 * on the network device @dev. The @input shaper array size is specified
+> +	 * by @nr_input.
+> +	 * Create either the @inputs and the @output shaper as needed,
+> +	 * otherwise move them as needed. Can't create @inputs shapers with
+> +	 * NET_SHAPER_SCOPE_DETACHED scope, a separate @group call with such
+> +	 * shaper as @output is needed.
+> +	 *
+> +	 * Returns 0 on group successfully created, otherwise an negative
+> +	 * error value and set @extack to describe the failure's reason.
+> +	 */
+> +	int (*group)(struct net_device *dev, int nr_input,
+> +		     const struct net_shaper_info *inputs,
+> +		     const struct net_shaper_info *output,
+> +		     struct netlink_ext_ack *extack);
+> +
+
+> +	/* the default id for detached scope shapers is an invalid one
+> +	 * to help the 'group' operation discriminate between new
+> +	 * detached shaper creation (ID_UNSPEC) and reuse of existing
+> +	 * shaper (any other value)
+> +	 */
+> +	id_attr = tb[NET_SHAPER_A_ID];
+> +	if (id_attr)
+> +		id =  nla_get_u32(id_attr);
+
+double space
 
