@@ -1,251 +1,352 @@
-Return-Path: <netdev+bounces-114835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC3A59445BF
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:45:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C98689445E5
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48DD9B2359E
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:45:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27781B20FA9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 07:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B1F313D60B;
-	Thu,  1 Aug 2024 07:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lm7wdm2w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB248157A5C;
+	Thu,  1 Aug 2024 07:52:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EA8285956;
-	Thu,  1 Aug 2024 07:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722498343; cv=fail; b=uCcKJ/GNXq1EgdPUN/C/q4E65hd87phlIqr4rmkIS2ANkYsfy79xkSsDdj1ffq/FjwtPdCxAHgiav7F92acYNZLQ7C5EiNZASIe2MMePYaWPkDTUicRSJh7Ce11VnKNBuQn8Xd7G2vABeyas5+6PqR7qbDlbWz+59hUWm4p+lO4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722498343; c=relaxed/simple;
-	bh=mKvEK102HPMjk6CZIOxK5j+YDHCMBL+db7v6fvi7rBM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hcpHF8pIw6NMrBQL75JCy9XmIt2tZeJYXk8I1swgQZH8CgpWuUWMvaJk5F0OR90CB8EpI9YDVz1gN+oArDakBionbbtjgO64YV3hSIqTNTHabpBJeQRjpb6MytV/zsfflwPC20pbMgQAdsBZAJOJlfplXkumfryUge3iWNCzRms=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lm7wdm2w; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722498342; x=1754034342;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mKvEK102HPMjk6CZIOxK5j+YDHCMBL+db7v6fvi7rBM=;
-  b=lm7wdm2wR+BAqOyicSvITut02S2qqeAKu0+2471lf3BPdX+j2WXdwkJR
-   OjT3Qc6Z7bvyvLkV5p1feSPsKGaMydf9k+98aq+tCeg8LpnwVRTe6PeYB
-   Np6HhM23TLnzdeq+KyDXfV/p+TfLrmrjqWRZZ0Qq8eXkv7VO72L0PszCA
-   ozCdXkHQatdqrn1AFML2mZFDQ7Btkb7rhvKm64ENT15LVL9DVDfrx46UJ
-   tbcXkdHengnSCWJMm/OdeVMu6T03kuB+N7ItRzot5NZbjiSnkS7LQWACc
-   8jlavR2OMg09cVXgJB4tBPsVp/JhUO4CsH2wsrVg/oL6WebOqUNQAmac2
-   g==;
-X-CSE-ConnectionGUID: PmO90BjJRE+0z1gS8IYUpg==
-X-CSE-MsgGUID: J6yDbjz5THaXzWfEZPeG2g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11150"; a="20592754"
-X-IronPort-AV: E=Sophos;i="6.09,253,1716274800"; 
-   d="scan'208";a="20592754"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2024 00:45:41 -0700
-X-CSE-ConnectionGUID: MAybUQ/zTe23PD/hnvB0fQ==
-X-CSE-MsgGUID: FGFpauYNTMWJo2D4cfznfw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,253,1716274800"; 
-   d="scan'208";a="59601972"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Aug 2024 00:45:40 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 1 Aug 2024 00:45:39 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 1 Aug 2024 00:45:39 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446411EB4A6;
+	Thu,  1 Aug 2024 07:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722498760; cv=none; b=M+UiN5iWhiFXVXbFjQwR0z4HbyF6vxk4G4q7jTyhAr9I0ENqIP3e3MZKGxK9PyKlu0sVfEln52/SvO29Ace1WSEYB45xwa0t4L3p/cDOxM4bnqMMonV65CpCJvexr0m8unLqJ9Xv+2ArQAZDRdfeZWdjDTXUeF9uBIHii90YCyk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722498760; c=relaxed/simple;
+	bh=I9u/ZgrYWBv+08q1V6Xku5BdlFnvDhaJYSor+AsmEBY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qSyxsZSLMjrZ+mrvm/HaevUaAYjdSo0taDtp6AZQILorHtLuQkBtbt1d10B08diNKHc58PEvA5Ry4p4Kf8RpzqTWkGJ2pk4vCkKJ7La6magG8WS3Fzuo5eaYXSGa5R0eaAgWxqd6hUDbTIzPL2FGDOvTypq3/ERKqLRabNGwL8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WZLhl1TqRz1HFnq;
+	Thu,  1 Aug 2024 15:49:43 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 22F3A1A016C;
+	Thu,  1 Aug 2024 15:52:33 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 1 Aug 2024 00:45:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uY3Bg+wAZCBywskNeWwCITaBXGr5WFJpSuRhGTwL6625loy/XMOLgPCpPVSWxr1srkQWaPRLZJTiLo8xonYZq3zJlTnQo2J29dPEpcEc3EtjMLOyS2ufS62+kYT7+fHXcF1XJf2TsBg7wP1n1+akExRa/D3/Ur/f6eYCseXfYih1KKD98yeRhGdDKMz5n7dMoxqM4QqhZpikN9p0taDt2M82i1H7MGN6R5H5ytQJaFwnNwGEWKoYBa/ijjOSyfKpCYwGyeAu+vC8J2Lo6uJnuj78bzWs1Qi9copNV9A2kYVNcu/LBry3etb7gb+NnEJaIGS/6vu3QfeMPcWPqWfimg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mKvEK102HPMjk6CZIOxK5j+YDHCMBL+db7v6fvi7rBM=;
- b=Gmx22REtAf4wWYMMaQQ3g8Sqxaf5cTCmq9AZ+35UPC1wOCeojmQoxJLZa7VOdZCCAKZ0fB2f2EYyWMBh26W8Y/LCswTXXkW1E4d3blg51HlMib1D4cJMKAPKvV2x88fGBG/P+pvKjZGO+qWuY5F49NzeUFcDUKwyTuIG5VFwY2wmIU/DrjT5940sPlIdBHKVNLTOjlGAlayInTtPOwjqTcUC6J1qbVu3hdfKRHq2yHSG4NfXb80E9/VrD4GS7zPD2DUM2HM0b377q4SZI8ZYzX0UYCqptnVGCltfqCltnARGCkiHouMg8v2jkzxQbfSNFQMH78MlmSNtchcIF19h6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5830.namprd11.prod.outlook.com (2603:10b6:510:129::20)
- by PH0PR11MB4808.namprd11.prod.outlook.com (2603:10b6:510:39::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Thu, 1 Aug
- 2024 07:45:37 +0000
-Received: from PH0PR11MB5830.namprd11.prod.outlook.com
- ([fe80::c80d:3b17:3f40:10d6]) by PH0PR11MB5830.namprd11.prod.outlook.com
- ([fe80::c80d:3b17:3f40:10d6%3]) with mapi id 15.20.7828.016; Thu, 1 Aug 2024
- 07:45:37 +0000
-From: "Song, Yoong Siang" <yoong.siang.song@intel.com>
-To: "Drewek, Wojciech" <wojciech.drewek@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "David S . Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>, Jonathan Corbet
-	<corbet@lwn.net>, "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	Shinas Rasheed <srasheed@marvell.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	Brett Creeley <brett.creeley@amd.com>, "Blanco Alcaine, Hector"
-	<hector.blanco.alcaine@intel.com>, "Hay, Joshua A" <joshua.a.hay@intel.com>,
-	"Neftin, Sasha" <sasha.neftin@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>
-Subject: RE: [PATCH iwl-next,v1 2/3] igc: Add default Rx queue configuration
- via sysfs
-Thread-Topic: [PATCH iwl-next,v1 2/3] igc: Add default Rx queue configuration
- via sysfs
-Thread-Index: AQHa4h84HPiCRxyxF0yMxQmh+zwEy7IPDJ4AgAL1wOA=
-Date: Thu, 1 Aug 2024 07:45:36 +0000
-Message-ID: <PH0PR11MB5830008CD236D81B7224A05FD8B22@PH0PR11MB5830.namprd11.prod.outlook.com>
-References: <20240730012312.775893-1-yoong.siang.song@intel.com>
- <171a20b4-0e52-4ddd-a5a5-6f3f3f1d32b0@intel.com>
-In-Reply-To: <171a20b4-0e52-4ddd-a5a5-6f3f3f1d32b0@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5830:EE_|PH0PR11MB4808:EE_
-x-ms-office365-filtering-correlation-id: be802663-33a2-4946-9bc0-08dcb1fdeeba
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016|38070700018|921020;
-x-microsoft-antispam-message-info: =?utf-8?B?MzNmYklSdmZUS2hXWDZpcDV5TGtCbHpiM2MxYjVZQ3ZLTmFQSDdTL0lxaTBU?=
- =?utf-8?B?SG9EbHVvTFRLeTVjckJZQlhPdzJJYzc5bkFiazNuVEE2bStpYktVMXZGeFlo?=
- =?utf-8?B?Y0lReWVCb0ZCNUJZWnVKQ3g3OUJtSGc3cHZYaTdlMFVsQTd3a3dQVm9nanRv?=
- =?utf-8?B?Tm11VjBKaUFjSVhCdnFtd0NZV1cyN1pVRmI3UUUvcmNrQ2hGeFcyYnVvc3Vy?=
- =?utf-8?B?Y1h3KzVya3Fyb1RRelIxeVRiVDQxditwNWloZGVoR24wUVNOblEyTFlpR0JQ?=
- =?utf-8?B?eEFOeUdJV3hPQWVhNGVPSGMrbWdFTHIrdC9NRGJ4citPSzZZYXhGR29xODVu?=
- =?utf-8?B?dkJMTktiblpNZnBpclBGd1dWSmxGVGsxQmQ2TjBEeW1VZHBNZXo2dnBSL25T?=
- =?utf-8?B?K3JpLzI3YVFGWHZpSSt5TGFuVyszVTliQzdSV2ViblVXbjNDNTF0b1czZk5m?=
- =?utf-8?B?SWNxWTR5V20wVFRieEhZRTNMbEtGM1ljWDkzR0JqUnZ1dnc2QkIrS0xZOTFP?=
- =?utf-8?B?TzFtRGFFTlJLb3ROdy92OWtOUUhzOG0xRm1GS2J3NHV5WGpORm1LK2lxb0d1?=
- =?utf-8?B?Tnp3M3dOdU9nR0NtTlpBWkJUczNXeGZySytBS0tIL3AzRnFocHJwM1ZtaFJ2?=
- =?utf-8?B?cERITmxqSEFaOUxqVFJEdWFrTGdqTlBLeDhTZVdleTd1S3lHc3A4c2d6TlRI?=
- =?utf-8?B?TTNaK01mY2R0anc3QWN4S00yQm9QWm5ndFdFNTBORUJaSndQbnpVY1FiSnpj?=
- =?utf-8?B?cW5wbVFSWFRGYmlhOU1xaTNRNEx6SDJBTno5YXlsREZUS0NCWTVxT3psSW1v?=
- =?utf-8?B?K1dqSWYzT0ZKTnZ1VjZLRjVQUFhpbGg5eXUyYUpoc0IybHJ4bi9jUUdDWFFs?=
- =?utf-8?B?dmUrcWk2OFc4Q3pCMG9UREdSYmY5eWEyMVhWU21jZlNJVzNLS05KeFl3blR5?=
- =?utf-8?B?dVVySko2RnkyOVhpeEhCVmVEdS9RY0RxUk1VYkVxbUZwVWNYYWdwMHphSUxn?=
- =?utf-8?B?Zi9WRktlc1orRXRPZVBtQThXUlU2THVGczlzL1N4MHhsaUlRcGJVcFVqOXNi?=
- =?utf-8?B?cUZDcWN3d0FLczBtOVI3NWFRU3hUOXJTM29hWTBhcGRoL3JjR2dGeldHeFcv?=
- =?utf-8?B?dTdoaW1oNlpsQXRndEFOanVzOHFhZklvZGVJYnUrWk95ZGdVWnlvMDIxb00r?=
- =?utf-8?B?TVV4NkhsV2ZEcVF3SG5MNEpzUDR4RG5rZ0ZpRDZPWXpLQU13N00wdHRnQk5j?=
- =?utf-8?B?SVBoeGY2eGdoWmhQTzZ4cGJJT1BhNUE2UFhWZVZPVnEzajdEY1FOKzhiM1BM?=
- =?utf-8?B?dURNdm9va3Q0cWdtTEkyalNjNGlIY3phak1VVzhnaXlwS3BYWHhrQWJSSDBi?=
- =?utf-8?B?MVcvMXNRaFFHcWRvOURaWDVEME9JQnBQZndTUDd2elhhQmJ0WGpITVlCUG1G?=
- =?utf-8?B?anc3ZHczOGY3d1VqVzNJTkFRUHFEUHZRL3ZqcTlOcjhKNHNXMDJxVnp6cEtv?=
- =?utf-8?B?NnhDcjExZHpYL2pXQ1JMelFOSFd6Y3RVVm56aTBnYnZwdEdZNVRuQUJZNWtI?=
- =?utf-8?B?TGZIREtPeTVDVFpia2Qyb1VPRHV2SEoyMC84Mmw5UXpGaUtzSmR2MnFKUDlU?=
- =?utf-8?B?WXhNajRCWHdIR2FPeEc5SGt5REFCSnNWNUV3eDZDRlM4N3hKT3d0ZFZ0Ykpw?=
- =?utf-8?B?MU1hNitkUXhndE1jd0JUVVF1SDdYQkFTeXRlY3VZREZmWTZTN3cvNVVvUzBK?=
- =?utf-8?B?bk1jczdNU2F1SDR0QmdJYnV2YlkxbERoaXl0N2wzY2U0QlNYK2wvOHZOVVp5?=
- =?utf-8?B?WS9DVStnVFRSNndUdkV6b2JsOENHTG1HZFhRa3Q4TTZscjRBODE4U1hsOGhl?=
- =?utf-8?B?andSV3g0OG1NUWJCNTlLaU9XaE5NM1NWM1FxL0F5Um1Bd0RYQ25TVzFsbjdy?=
- =?utf-8?Q?1wSlsN0aiBk=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5830.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(38070700018)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Q3dEVTVEZDQ2SXlwNURQU0hwM1ZGbEZsM0pidVdXRmhPMHRYaklvL3huWlds?=
- =?utf-8?B?c1JKdnRvYUVOOE5pM1BKeEpUQjlkRXFZeUxHcy9mL2pBOEVUaGxEYnU0dXdO?=
- =?utf-8?B?TEFKSXhMT1RZZUFlZ1c4aFN6S1VMckl5cWxFNE5uN0hJWmQva0ZwN0RMU21J?=
- =?utf-8?B?TGhpcHJLenBjbGQ2c0Y5ZW1NZzY4b3hMeTdCWnpZcXpXNURTSW80bWIxVUV1?=
- =?utf-8?B?Zlk3bmFXc2VvSUdRNjJCeUMvNWRTbU15OGFlcnZHWWtqMXNNRm5GMWRrbVk5?=
- =?utf-8?B?dHBJZVVBUjFEanIwcWduNm5UUzNMSk0waEtHMVFqeEtzQnRvSlk4VkpBK1Zp?=
- =?utf-8?B?eEdJSmZreFhhN2JNc2QxTUdPM1hBV3dLYTg5VmRCMXFVQTF0aVh2UjgrbHNG?=
- =?utf-8?B?NDN4ejdRVkhZQUhGaVpBUy9wSUpNdXk1MjlCSmIya1RaL0dJc0lpMWFtbk9W?=
- =?utf-8?B?U0ozbHpXMlVKSkpQY1k2RFBqWUNBbWJPa1pOR0h0b3dvUDJjd1dIY3Y5ZG1i?=
- =?utf-8?B?cWdIZ3lacVJ0a3Exc3RLd0Y2SzgwMEZCZCtEMzBzMyttZUM2WFE3VTh1V21M?=
- =?utf-8?B?d1RGUG5OWnRaYnlvbU9BYmlqUkYzdWNnL2tNU1RpTldnTTBER1VjeEtubFBi?=
- =?utf-8?B?aklKK0tWRGdpdk5JOWd0VmVVN05ZaXRNeDk4TUMrQTkrYU9LMHIyMGRRZnVn?=
- =?utf-8?B?bVg5dS8ySjg5RVNGTEZ1SnBTMVowU01ZbG5GVksrT1FHZDkwam55ZmVNVHJP?=
- =?utf-8?B?T1l1aXhaYlpRN3JvUHF2YVNSbGIzRkdTUkhmbmhuWnMrK0RwZ0xtZG1uczJq?=
- =?utf-8?B?SHFPcHR3VmtOS3QrbFhFakJpbHIzYzY0SjlZWVBBVmdrWE5TQU1SZ3QzVzA3?=
- =?utf-8?B?M05lOVNaMlpTNXlnWU01NkFCTFNoRzFTajYrQkhMby9GbFJ2MGJiRHVYTWpa?=
- =?utf-8?B?TXE1bkxpSndDVEFLdkNpZ01XbHFpci9PeUJIS3oxZmpJb0srVS9MMXNXNENT?=
- =?utf-8?B?RDg2ckhZQVBHK2o2UXVUenUxeDR4NitjZXBYNStZR0s3Zjkvc0lhNDVjNWdh?=
- =?utf-8?B?emV1bXZpR0RVOVRYeEV1NzRFOGticzVWaXB1MjBFeDNDMTJidkZzYWw2eGVI?=
- =?utf-8?B?SlU2Y0hkSk5uSjZudVk3bUVWMjM5elBZemRCU0dqZXBsM3pmbGxwei9Ua3Vy?=
- =?utf-8?B?YkdEa25GOXB0Mys1a2g4N2JCUFBRV3FaVk9CamcwVUlBUUZaeGh0SmQrd1pX?=
- =?utf-8?B?YWZDZTU5ZU4vVjBpemt3NFpGUzFMVjdQTFBRaW9SVHVpSjNsN0p4OWZiSE43?=
- =?utf-8?B?Zjhtb1FBbWFGenFVaE5vUXpFQ244WHAreWpOdElBei9LVWIvdkdncHBmdE9s?=
- =?utf-8?B?TG95cks0L3JKUjVBRVlBdXV5clMvVGQ1cUY0ZUdSM3ZKWFg3QjEvODgxam0w?=
- =?utf-8?B?RndNUXNNSldhN3RqY2xTOW16SFY4NWVFSzdHeUM2MjR5ZVV4dld5NUVXYVFY?=
- =?utf-8?B?bytEaG4wQXBvaWNRL1pNY2gxNXBjaUJ4bEx0aHprclMreVBtYnVWU1BaTFRs?=
- =?utf-8?B?YVlNNUlwMWcyMml3NGxHemV0RzB6YS9Lc2MzcGVhRjBGT3lVcTV5NUo3eVcy?=
- =?utf-8?B?bzcrR2F5UEFtYWtRL0pkdjMzTXU3Z1ZsYktrTG9Cc3N4ZnMwekt5YUhRZEcr?=
- =?utf-8?B?K2xNQXlVbC9xK1lXeXh6UGNsR3RONDRKY211M0RkY09wTkdLT1J5SVU3ejBp?=
- =?utf-8?B?Q29xYkF0ZHVQUnBLWXVYSTVRL29oMXQ1S25oTHJISGJDcUo4Y2txM1k3U24x?=
- =?utf-8?B?L3Y2T1ZQWElOL015QlgzMnZhelphKzdWUzdXSTNQZVBuUzRuMWtXYVI2WXZq?=
- =?utf-8?B?Qm8rNDVjTHlzenovRm1NNFEvdzBwKzYxc1dOeVR4ZlNkWmFrMWFORmg2elBJ?=
- =?utf-8?B?VVROTE4yNldLdjVQcWJlTVdsVFRxanhXMmRpYXkwVHY3OHA2TE1YOGM1RUdJ?=
- =?utf-8?B?Z2Y5SEJVdGk5TmZMWkcwRlBlUDRpUHYydDFVRjJoaEJYNGovdEYvQnhsNmVU?=
- =?utf-8?B?Y1BnaE9NVFdjUXd3Q2FINXNoUTByR1BPS3RKMmpXMHRGSWI3RjFnTkFheFo1?=
- =?utf-8?B?bVNSVjVkdXVUVENhTEVxdnBKekRPajVaMnlOYzJPai9qakpad1VCYkliZ01M?=
- =?utf-8?B?VVE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.1.2507.39; Thu, 1 Aug 2024 15:52:29 +0800
+Message-ID: <68568a44-2079-33ac-592d-c2677acf50dd@huawei-partners.com>
+Date: Thu, 1 Aug 2024 10:52:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5830.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be802663-33a2-4946-9bc0-08dcb1fdeeba
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2024 07:45:36.9703
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tbjKYTmDS8o08O2KVt9LzRLpTW5AXhN2n1mQZCnCrpqF9JSGiz8/uWxSiiE4kktNuOiDJ7iCV03iYXyvdQI4eoELzpZrmdAYS0oYFc0Mv2w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4808
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+ <20240731.AFooxaeR5mie@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240731.AFooxaeR5mie@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-T24gVHVlc2RheSwgSnVseSAzMCwgMjAyNCA2OjA5IFBNLCBEcmV3ZWssIFdvamNpZWNoIDx3b2pj
-aWVjaC5kcmV3ZWtAaW50ZWwuY29tPiB3cm90ZToNCg0KWy4uLl0NCg0KPj4gKwlpZiAobXJxZSAh
-PSBJR0NfTVJRQ19FTkFCTEVfTVEgJiYgbXJxZSAhPQ0KPklHQ19NUlFDX0VOQUJMRV9SU1NfTVEp
-DQo+PiArCQlyZXR1cm4gZmFsc2U7DQo+DQo+anVzdDoNCj5yZXR1cm4gbXJxZSAhPSBJR0NfTVJR
-Q19FTkFCTEVfTVEgJiYgbXJxZSAhPSBJR0NfTVJRQ19FTkFCTEVfUlNTX01RDQo+DQoNCkhpIERy
-ZXdlayBXb2pjaWVjaCwNClRoYW5rcyBmb3IgeW91ciByZXZpZXcgY29tbWVudHMuDQpJIHdpbGwg
-aW1wcm92ZSB0aGUgY29kZSBhY2NvcmRpbmdseSBpbiB2Mi4NClsuLi5dDQoNCj4+ICsJaWYgKCFp
-Z2NfaXNfZGVmYXVsdF9xdWV1ZV9zdXBwb3J0ZWQobXJxYykpIHsNCj4+ICsJCW5ldGRldl93YXJu
-KGFkYXB0ZXItPm5ldGRldiwNCj4+ICsJCQkgICAgIk1SUSBkaXNhYmxlZDogZGVmYXVsdCBSeFEg
-aXMgaWdub3JlZC5cbiIpOw0KPg0KPlNob3VsZCB3ZSByZXR1cm4gYW4gZXJyb3IgaGVyZT8NCg0K
-WWVzLCB3ZSBzaG91bGQuIEkgcGxhbiB0byByZWZhY3RvciB0aGlzIHBhdGNoIHRvIHVzZQ0KZXRo
-dG9vbCBudHVwbGUgbWV0aG9kLCBpbnN0ZWFkIG9mIHN5c2ZzLg0KSSB3aWxsIGNvbnNpZGVyIHlv
-dXIgc3VnZ2VzdGlvbiBpbiB2Mi4NCg0KPj4gKwl9DQo+PiArDQo+PiArCXJldHVybiAobXJxYyAm
-IElHQ19NUlFDX0RFRkFVTFRfUVVFVUVfTUFTSykgPj4NCj4+ICsJCUlHQ19NUlFDX0RFRkFVTFRf
-UVVFVUVfU0hJRlQ7DQo+DQo+dXNlIEZJRUxEX0dFVCBoZXJlDQo+DQoNCk5vdGVkLg0KWy4uLl0N
-Cg0KPj4gKwlzdHJ1Y3QgcGNpX2RldiAqcGRldiA9IHRvX3BjaV9kZXYoZGV2KTsNCj4+ICsJc3Ry
-dWN0IG5ldF9kZXZpY2UgKm5ldGRldiA9IHBjaV9nZXRfZHJ2ZGF0YShwZGV2KTsNCj4+ICsJc3Ry
-dWN0IGlnY19hZGFwdGVyICphZGFwdGVyID0gbmV0ZGV2X3ByaXYobmV0ZGV2KTsNCj4+ICsJdTMy
-IGRlZmF1bHRfcnhfcXVldWUgPSBpZ2NfZ2V0X2RlZmF1bHRfcnhfcXVldWUoYWRhcHRlcik7DQo+
-DQo+VXNlIFJDVCBydWxlDQo+DQoNCk5vdGVkLg0KWy4uLl0NCg0KPj4gKwlzdHJ1Y3QgcGNpX2Rl
-diAqcGRldiA9IHRvX3BjaV9kZXYoZGV2KTsNCj4+ICsJc3RydWN0IG5ldF9kZXZpY2UgKm5ldGRl
-diA9IHBjaV9nZXRfZHJ2ZGF0YShwZGV2KTsNCj4+ICsJc3RydWN0IGlnY19hZGFwdGVyICphZGFw
-dGVyID0gbmV0ZGV2X3ByaXYobmV0ZGV2KTsNCj4+ICsJdTMyIGRlZmF1bHRfcnhfcXVldWU7DQo+
-PiArCWludCBlcnI7DQo+DQo+UkNUDQo+DQoNCk5vdGVkLg0KWy4uLl0NCg0KPj4gKwllcnIgPSBz
-eXNmc19jcmVhdGVfZ3JvdXAoJmFkYXB0ZXItPnBkZXYtPmRldi5rb2JqLCAmYXR0cl9ncm91cCk7
-DQo+PiArCWlmIChlcnIpIHsNCj4NCj5ubyBuZWVkIGZvciBicmFja2V0cw0KPg0KDQpOb3RlZC4N
-ClsuLi5dDQoNClRoYW5rcyAmIFJlZ2FyZHMNClNpYW5nDQo=
+7/31/2024 9:30 PM, Mickaël Salaün wrote:
+> On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
+>> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
+>> ports to forbid a malicious sandboxed process to impersonate a legitimate
+>> server process. However, bind(2) might be used by (TCP) clients to set the
+>> source port to a (legitimate) value. Controlling the ports that can be
+>> used for listening would allow (TCP) clients to explicitly bind to ports
+>> that are forbidden for listening.
+>>
+>> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+>> access right that restricts listening on undesired ports with listen(2).
+>>
+>> It's worth noticing that this access right doesn't affect changing
+>> backlog value using listen(2) on already listening socket.
+>>
+>> * Create new LANDLOCK_ACCESS_NET_LISTEN_TCP flag.
+>> * Add hook to socket_listen(), which checks whether the socket is allowed
+>>    to listen on a binded local port.
+>> * Add check_tcp_socket_can_listen() helper, which validates socket
+>>    attributes before the actual access right check.
+>> * Update `struct landlock_net_port_attr` documentation with control of
+>>    binding to ephemeral port with listen(2) description.
+>> * Change ABI version to 6.
+>>
+>> Closes: https://github.com/landlock-lsm/linux/issues/15
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> 
+> Thanks for this series!
+> 
+> I cannot apply this patch series though, could you please provide the
+> base commit?  BTW, this can be automatically put in the cover letter
+> with the git format-patch's --base argument.
+
+base-commit: 591561c2b47b7e7225e229e844f5de75ce0c09ec
+
+Günther said that I should rebase to the latest commits, so I'll do
+it in the next version of this patchset.
+
+> 
+>> ---
+>>   include/uapi/linux/landlock.h                | 23 +++--
+>>   security/landlock/limits.h                   |  2 +-
+>>   security/landlock/net.c                      | 90 ++++++++++++++++++++
+>>   security/landlock/syscalls.c                 |  2 +-
+>>   tools/testing/selftests/landlock/base_test.c |  2 +-
+>>   5 files changed, 108 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+>> index 68625e728f43..6b8df3293eee 100644
+>> --- a/include/uapi/linux/landlock.h
+>> +++ b/include/uapi/linux/landlock.h
+>> @@ -104,13 +104,16 @@ struct landlock_net_port_attr {
+>>   	/**
+>>   	 * @port: Network port in host endianness.
+>>   	 *
+>> -	 * It should be noted that port 0 passed to :manpage:`bind(2)` will
+>> -	 * bind to an available port from a specific port range. This can be
+>> -	 * configured thanks to the ``/proc/sys/net/ipv4/ip_local_port_range``
+>> -	 * sysctl (also used for IPv6). A Landlock rule with port 0 and the
+>> -	 * ``LANDLOCK_ACCESS_NET_BIND_TCP`` right means that requesting to bind
+>> -	 * on port 0 is allowed and it will automatically translate to binding
+>> -	 * on the related port range.
+>> +	 * It should be noted that some operations cause binding socket to a random
+>> +	 * available port from a specific port range. This can be configured thanks
+>> +	 * to the ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl (also used for
+>> +	 * IPv6). Following operation requests are automatically translate to
+>> +	 * binding on the related port range:
+>> +	 *
+>> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_BIND_TCP``
+>> +	 *   right means that binding on port 0 is allowed.
+>> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_LISTEN_TCP``
+>> +	 *   right means listening without an explicit binding is allowed.
+>>   	 */
+>>   	__u64 port;
+>>   };
+>> @@ -251,7 +254,7 @@ struct landlock_net_port_attr {
+>>    * DOC: net_access
+>>    *
+>>    * Network flags
+>> - * ~~~~~~~~~~~~~~~~
+>> + * ~~~~~~~~~~~~~
+>>    *
+>>    * These flags enable to restrict a sandboxed process to a set of network
+>>    * actions. This is supported since the Landlock ABI version 4.
+>> @@ -261,9 +264,13 @@ struct landlock_net_port_attr {
+>>    * - %LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
+>>    * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to
+>>    *   a remote port.
+>> + * - %LANDLOCK_ACCESS_NET_LISTEN_TCP: Listen for TCP socket connections on
+>> + *   a local port. This access right is available since the sixth version
+>> + *   of the Landlock ABI.
+>>    */
+>>   /* clang-format off */
+>>   #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+>>   #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+>> +#define LANDLOCK_ACCESS_NET_LISTEN_TCP			(1ULL << 2)
+>>   /* clang-format on */
+>>   #endif /* _UAPI_LINUX_LANDLOCK_H */
+>> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+>> index 4eb643077a2a..2ef147389474 100644
+>> --- a/security/landlock/limits.h
+>> +++ b/security/landlock/limits.h
+>> @@ -22,7 +22,7 @@
+>>   #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
+>>   #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
+>>   
+>> -#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_LISTEN_TCP
+>>   #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+>>   #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
+>>   
+>> diff --git a/security/landlock/net.c b/security/landlock/net.c
+>> index 669ba260342f..a29cb27c3f14 100644
+>> --- a/security/landlock/net.c
+>> +++ b/security/landlock/net.c
+>> @@ -6,10 +6,12 @@
+>>    * Copyright © 2022-2023 Microsoft Corporation
+>>    */
+>>   
+>> +#include "net/sock.h"
+> 
+> These should not be quotes.
+
+will be fixed, thanks
+
+> 
+>>   #include <linux/in.h>
+>>   #include <linux/net.h>
+>>   #include <linux/socket.h>
+>>   #include <net/ipv6.h>
+>> +#include <net/tcp.h>
+>>   
+>>   #include "common.h"
+>>   #include "cred.h"
+>> @@ -194,9 +196,97 @@ static int hook_socket_connect(struct socket *const sock,
+>>   					   LANDLOCK_ACCESS_NET_CONNECT_TCP);
+>>   }
+>>   
+>> +/*
+>> + * Checks that socket state and attributes are correct for listen.
+>> + * It is required to not wrongfully return -EACCES instead of -EINVAL.
+>> + *
+>> + * This checker requires sock->sk to be locked.
+>> + */
+>> +static int check_tcp_socket_can_listen(struct socket *const sock)
+> 
+> Is this function still useful with the listen LSM hook?
+
+Yeap, we need to validate socket structure before checking the access
+right. You can see [1] and [2] where the behavior of this function is
+tested.
+
+[1] 
+https://lore.kernel.org/all/20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com/
+[2] 
+https://lore.kernel.org/all/20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com/
+
+> 
+>> +{
+>> +	struct sock *sk = sock->sk;
+>> +	unsigned char cur_sk_state = sk->sk_state;
+>> +	const struct tcp_ulp_ops *icsk_ulp_ops;
+>> +
+>> +	/* Allows only unconnected TCP socket to listen (cf. inet_listen). */
+>> +	if (sock->state != SS_UNCONNECTED)
+>> +		return -EINVAL;
+>> +
+>> +	/*
+>> +	 * Checks sock state. This is needed to ensure consistency with inet stack
+>> +	 * error handling (cf. __inet_listen_sk).
+>> +	 */
+>> +	if (WARN_ON_ONCE(!((1 << cur_sk_state) & (TCPF_CLOSE | TCPF_LISTEN))))
+>> +		return -EINVAL;
+>> +
+>> +	icsk_ulp_ops = inet_csk(sk)->icsk_ulp_ops;
+>> +
+>> +	/*
+>> +	 * ULP (Upper Layer Protocol) stands for protocols which are higher than
+>> +	 * transport protocol in OSI model. Linux has an infrastructure that
+>> +	 * allows TCP sockets to support logic of some ULP (e.g. TLS ULP).
+>> +	 *
+>> +	 * Sockets can listen only if ULP control hook has clone method.
+>> +	 */
+>> +	if (icsk_ulp_ops && !icsk_ulp_ops->clone)
+>> +		return -EINVAL;
+>> +	return 0;
+>> +}
+>> +
+>> +static int hook_socket_listen(struct socket *const sock, const int backlog)
+>> +{
+> 
+> Why can't we just call current_check_access_socket()?
+
+I've mentioned in the message of the previous commit that this method
+has address checks for bind(2) and connect(2). In the case of listen(2)
+port is extracted from the socket structure, so calling
+current_check_access_socket() would be pointless.
+
+> 
+>> +	int err = 0;
+>> +	int family;
+>> +	__be16 port;
+>> +	struct sock *sk;
+>> +	const struct landlock_ruleset *const dom = get_current_net_domain();
+>> +
+>> +	if (!dom)
+>> +		return 0;
+>> +	if (WARN_ON_ONCE(dom->num_layers < 1))
+>> +		return -EACCES;
+>> +
+>> +	/* Checks if it's a (potential) TCP socket. */
+>> +	if (sock->type != SOCK_STREAM)
+>> +		return 0;
+>> +
+>> +	sk = sock->sk;
+>> +	family = sk->__sk_common.skc_family;
+>> +	/*
+>> +	 * Socket cannot be assigned AF_UNSPEC because this type is used only
+>> +	 * in the context of addresses.
+>> +	 *
+>> +	 * Doesn't restrict listening for non-TCP sockets.
+>> +	 */
+>> +	if (family != AF_INET && family != AF_INET6)
+>> +		return 0;
+>> +
+>> +	lock_sock(sk);
+>> +	/*
+>> +	 * Calling listen(2) for a listening socket does nothing with its state and
+>> +	 * only changes backlog value (cf. __inet_listen_sk). Checking of listen
+>> +	 * access right is not required.
+>> +	 */
+>> +	if (sk->sk_state == TCP_LISTEN)
+>> +		goto release_nocheck;
+>> +
+>> +	err = check_tcp_socket_can_listen(sock);
+>> +	if (unlikely(err))
+>> +		goto release_nocheck;
+>> +
+>> +	port = htons(inet_sk(sk)->inet_num);
+>> +	release_sock(sk);
+>> +	return check_access_socket(dom, port, LANDLOCK_ACCESS_NET_LISTEN_TCP);
+>> +
+>> +release_nocheck:
+>> +	release_sock(sk);
+>> +	return err;
+>> +}
+>> +
+>>   static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>>   	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
+>>   	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
+>> +	LSM_HOOK_INIT(socket_listen, hook_socket_listen),
+>>   };
+>>   
+>>   __init void landlock_add_net_hooks(void)
+>> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
+>> index 03b470f5a85a..3752bcc033d4 100644
+>> --- a/security/landlock/syscalls.c
+>> +++ b/security/landlock/syscalls.c
+>> @@ -149,7 +149,7 @@ static const struct file_operations ruleset_fops = {
+>>   	.write = fop_dummy_write,
+>>   };
+>>   
+>> -#define LANDLOCK_ABI_VERSION 5
+>> +#define LANDLOCK_ABI_VERSION 6
+>>   
+>>   /**
+>>    * sys_landlock_create_ruleset - Create a new ruleset
+>> diff --git a/tools/testing/selftests/landlock/base_test.c b/tools/testing/selftests/landlock/base_test.c
+>> index 3c1e9f35b531..52b00472a487 100644
+>> --- a/tools/testing/selftests/landlock/base_test.c
+>> +++ b/tools/testing/selftests/landlock/base_test.c
+>> @@ -75,7 +75,7 @@ TEST(abi_version)
+>>   	const struct landlock_ruleset_attr ruleset_attr = {
+>>   		.handled_access_fs = LANDLOCK_ACCESS_FS_READ_FILE,
+>>   	};
+>> -	ASSERT_EQ(5, landlock_create_ruleset(NULL, 0,
+>> +	ASSERT_EQ(6, landlock_create_ruleset(NULL, 0,
+>>   					     LANDLOCK_CREATE_RULESET_VERSION));
+>>   
+>>   	ASSERT_EQ(-1, landlock_create_ruleset(&ruleset_attr, 0,
+>> -- 
+>> 2.34.1
+>>
+>>
 
