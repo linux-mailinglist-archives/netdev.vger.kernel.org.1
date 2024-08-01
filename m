@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-114992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2D1944DA9
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:07:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1D9F944DB9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:13:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABCF21C24D1C
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:07:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A0DAB20E03
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773471A4898;
-	Thu,  1 Aug 2024 14:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DB11A4862;
+	Thu,  1 Aug 2024 14:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QkIeY0Ge"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFgG1SCi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3E61A488A;
-	Thu,  1 Aug 2024 14:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E2228F3
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722521262; cv=none; b=aPpVIrSakQgfBWB5Rz0zXkJRuOjy3Mnhf7sChb5HpJA9m2ptR9/Hm5Xw/JsWsyqqLKNNYUrr4VneOd0E136nzVn3qu8F4ayU1R7P6eSEy2KKg9DmEOETmKB+r+mVftWkIKH/W463LpP/7nGfK17H8XPzolb87NHiyZz4faPPD08=
+	t=1722521613; cv=none; b=hHF0cwg9FgmE587NqXctBn4rX4wKsDqlBziUaX7dS8KyTETTsPa9Yx+fP9/ze2OLeQLh/N0hi2OKXUfl8PAMT8HU73eLfMPuAkrHVtGK+6WA0uQmjafIzjtK9AYP1MDlUL88Coxb18HqduvvitlfkbIivhNfI612T71IAkmslW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722521262; c=relaxed/simple;
-	bh=YX0KgtYQVa5YzigsQeAAQyteVvcaWRSiNqCBfz5+BPY=;
+	s=arc-20240116; t=1722521613; c=relaxed/simple;
+	bh=Eq/aNHDxaOY+V8tE16TNUHJ1VjAhDc5Cbsz9tdj07LI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iQvrd0RWhtGJEO4r6+u/w4jUkB+R56byEf6NbHFPXvgj6xtICeijDI6FkwyybrcffcVhF88P/emAceSddQ0UNGejqHqwZuB+TlDw4k1d7Vf3D7JaP5GwgfzioBF8qLuTFsc/UGH7Zt0Gj+kbiVyormhlUq7nOIMS58AtYI2sL/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QkIeY0Ge; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EEE5C32786;
-	Thu,  1 Aug 2024 14:07:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ONzjWxCBZBTmGhLDgAuqiAh7b658rph/a41ckBWYNSTe4aEylpwm0jLeOeK5EOIx2CNqGypoVyJ5f9CUdTYEq04ZWls5fJFeM0BvWPzjgyqM7jmzcqps2UfnAn4ogDabZQw+QMx8qBq3YPwubDjlTvBZMa7raSrDj3xVZvJ9n6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFgG1SCi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B2E6C32786;
+	Thu,  1 Aug 2024 14:13:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722521261;
-	bh=YX0KgtYQVa5YzigsQeAAQyteVvcaWRSiNqCBfz5+BPY=;
+	s=k20201202; t=1722521612;
+	bh=Eq/aNHDxaOY+V8tE16TNUHJ1VjAhDc5Cbsz9tdj07LI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QkIeY0Ge6mBJtUYLXFLSGLvbad8OPzCfNFb+WTpe26AIxANxKgcC468Dli1myUbxq
-	 rkac/cGcdFGrvOs+Bzaf6HK/jbRaHtNXyZysRmWo6DxbXaI1QAYbv89Wdf5KdJ414o
-	 KSMjLpFPiQxGzXV4zfL3HgCRGliPaxK1caI0/iGPb3QHim5iLgsHyzCOo+iN9FePSh
-	 VXLZByBgET9fld/mboN8MhMrBaLPeLzVrNZqFThaWLWKrkVUfS45mzmtp08uVgr+32
-	 cEmRSK917S5uniuytQDn/4wvUHLiG6Ji3pXLX1EM+RBxDS8xTUrB31WUxR0leHXLLc
-	 eD37J2yHo1+DQ==
-Date: Thu, 1 Aug 2024 07:07:40 -0700
+	b=EFgG1SCivUy5ObYkMX4OJCtMA+1JmXglJyJodcsoZq2KDbr+TZfWPqOD0rCDu5gbu
+	 KjrZkrUJtIdpPIyBpbnzi/HYbT2gFy14S28F2E/JMJpH34ZZLtIqB5+DyvBvxoHVC4
+	 m90a9fk7qNH8gOJV0zU2ynsLuHELTJVd9dCtrxg5ZEIkxiVjMyKhSfxLRXPQViQfxT
+	 tFk03E8lpWN3EckbB2KBeoxhYvr2ztpDwTXlVI+cleUFbEXohNjnaV9DTgxWaUH+w4
+	 VfmM7bx6gwWeYa4E2D228l7PR3/GaIe7d6ufEU0/uEHUSR/y4P7P/NbxhRHzlwdQBX
+	 2IWD2MJtKsaqQ==
+Date: Thu, 1 Aug 2024 07:13:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, <netdev@vger.kernel.org>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>, Shuah
- Khan <shuah@kernel.org>, Joe Damato <jdamato@fastly.com>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] selftests: net: ksft: support marking
- tests as disruptive
-Message-ID: <20240801070740.4ae582df@kernel.org>
-In-Reply-To: <87zfpw62hi.fsf@nvidia.com>
-References: <20240730223932.3432862-1-sdf@fomichev.me>
-	<20240730223932.3432862-2-sdf@fomichev.me>
-	<878qxh7mf4.fsf@nvidia.com>
-	<Zqqi8LhvSn1MXu9B@mini-arch>
-	<87zfpw62hi.fsf@nvidia.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: "Keller, Jacob E" <jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "simon.horman@corigine.com" <simon.horman@corigine.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: Implement ethtool reset
+ support
+Message-ID: <20240801071331.086a0864@kernel.org>
+In-Reply-To: <616bd069-51a0-4b05-96af-2d419961e0e5@intel.com>
+References: <20240730105121.78985-1-wojciech.drewek@intel.com>
+	<20240730065835.191bd1de@kernel.org>
+	<c0213cae-5e63-4fd7-81e7-37803806bde4@intel.com>
+	<20240731164716.63f3b5b7@kernel.org>
+	<616bd069-51a0-4b05-96af-2d419961e0e5@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,26 +68,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 1 Aug 2024 10:36:18 +0200 Petr Machata wrote:
-> You seem to be right about the exit code. This was discussed some time
-> ago, that SKIP is considered a sort of a failure. As the person running
-> the test you would want to go in and fix whatever configuration issue is
-> preventing the test from running. I'm not sure how it works in practice,
-> whether people look for skips in the test log explicitly or rely on exit
-> codes.
+On Thu, 1 Aug 2024 13:01:52 +0200 Wojciech Drewek wrote:
+> We've came up with below mapping:
 > 
-> Maybe Jakub can chime in, since he's the one that cajoled me into
-> handling this whole SKIP / XFAIL business properly in bash selftests.
+> PF reset:
+> ethtool --reset eth0 irq dma filter offload
+> (we reset all those components but only for the given PF)
+> 
+> CORE reset:
+> ethtool --reset eth0 irq-shared dma-shared filter-shared offload-shared ram-shared
+> (whole adapter is affected so we use shared versions + ram)
+> 
+> GLOBAL reset:
+> ethtool --reset eth0 irq-shared dma-shared filter-shared offload-shared mac-shared phy-shared ram-shared
+> (GLOBALR is CORER plus mac and phy components are also reinitialized)
 
-For HW testing there is a lot more variables than just "is there some
-tool missing in the VM image". Not sure how well we can do in detecting
-HW capabilities and XFAILing without making the tests super long.
-And this case itself is not very clear cut. On one hand, you expect 
-the test not to run if it's disruptive and executor can't deal with
-disruptive - IOW it's an eXpected FAIL. But it is an executor
-limitation, the device/driver could have been tested if it wasn't
-for the executor, so not entirely dissimilar to a tool missing.
-
-Either way - no strong opinion as of yet, we need someone to actually
-continuously run these to get experience :(
+SG!
 
