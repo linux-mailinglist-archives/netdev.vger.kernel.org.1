@@ -1,63 +1,68 @@
-Return-Path: <netdev+bounces-114750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9ECB943D6F
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:58:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE24B943DEC
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA453B267A8
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:58:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A4F828410D
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB3C16EB57;
-	Thu,  1 Aug 2024 00:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF461D0DF2;
+	Thu,  1 Aug 2024 00:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q/yBui5c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qaOq+d97"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E6616EB4F;
-	Thu,  1 Aug 2024 00:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6E81D0DDB;
+	Thu,  1 Aug 2024 00:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722471905; cv=none; b=KYhit5yBRmK7x2fiAQJW3FX7V6DK8JJJgTLy6AiPQBXeDSabLHPq/KbiUZNy1YgJFvwbd0eOU4IRIA02CAaeSlolJuAKY1/CmIA7CouxTKv5dKaFYzCTzH3/PMup+N7yDiyGneUrbMVLIEumV2yAprchYUZ1it5zzN223BYW20M=
+	t=1722472213; cv=none; b=dJDppkbLmK8OMIvVA1CmAZUSablsiMccC9QJufiYL1TBJcNOYYhyRtnyxqF0KYrb96sHE4O/CEUGn8DOvdt/ZcA+20u6Ve3WICqyAeuLpxfoWxFdBHkuUQHV1OklvoncjTlGuTXwwQta0Ay8WvySUJrDLlbJjXmn5d0UOuHfPKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722471905; c=relaxed/simple;
-	bh=+QpAmqjnYOgWFxa6jUpWMMf8hr+bwACzF5SP7F0f/fQ=;
+	s=arc-20240116; t=1722472213; c=relaxed/simple;
+	bh=YovlZDi/qfoqS2ninbdrhCuSzu1IwnHIWgUV8hhf4EA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZO/9ZzyzhcMQRZK+T+bHFwvCMwSeIBEk3Qh5LeXvnSuHlaHGt2YBOq0ed/durw46NhQywxJGvD/7NxqKmVxegJq89JFzIPDlfeWZlKHfRiowKaeY7a+qvhuaeUAHFvRK8oWS/9m0dRrBGoZgT8+dyfPz6M41ylS/G2r7d/x29SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q/yBui5c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFFC9C4AF0C;
-	Thu,  1 Aug 2024 00:25:03 +0000 (UTC)
+	 MIME-Version; b=n+mvsbo9Y49rdg6YONoYTcLE8ZQpcghO9/tWjr3foG/kWH4kFjRefTjhZ/scMLAyqa5yNKqid+wrXv9itQgbIomPFpO5/IETR5fFA9POfP1UqxQTx+xtlUZ4uaCSi2BroN+/F2sOQkoAWZwxL7w61QJ0SzR7m43QU5paoSTRGtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qaOq+d97; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D413C32786;
+	Thu,  1 Aug 2024 00:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722471905;
-	bh=+QpAmqjnYOgWFxa6jUpWMMf8hr+bwACzF5SP7F0f/fQ=;
+	s=k20201202; t=1722472213;
+	bh=YovlZDi/qfoqS2ninbdrhCuSzu1IwnHIWgUV8hhf4EA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q/yBui5cLNS5dnR523UYBoHbybcWN+6eK9qQmrEfnBO/gmG5ixZSDwtUJpbyk7+wW
-	 iVH584bAMoT8NeL0PQRZ7oi2FVRTFEUQlYUF35D8Q3vGWn7Y/pGFmJ7GSsI6NvbEXe
-	 i4qkZJlziSxk2WW37o+t83qU2o4zD+ZxakvSJE8/JXvUHpjpwturqTwkq13QiO6aXg
-	 jpKw7KvLbg267lLAKaAEZ9i60BxiAQpm2LmbkicC76YY+IIiz8afM4BXUymdSGbfQ8
-	 b6EMcBeQKtGWU5j7IcnBxtK729jZcH6jCsklHfjIvoc9fH172EFr5xp/DoVkMtvqjl
-	 vvpBCWIPIZChQ==
+	b=qaOq+d97LF1wAnFS7FFFZUbNkH8kiBgGrNsdI4gEFt3cpuldLrmr2uqxRi9zHqtRq
+	 DB5JkbRIWyDt+2575odvVlnXAmfvclKREnZFnmICbP35/NMeDDZsERzqPdK2UKXcNq
+	 wsNDcuhuAReqVSRZFuokTW4AQujh5PO5Z66zIaLv70+XSCDwWtLojvWcaubE76dQT5
+	 Bxefw4kuGXj5i3z7ROcO8RkoSx7PDk9qFAwUrNkp/6S6D5KV4p+lZzcEbpQbgeYpyC
+	 F0uwJZMrhVJtK8uOuzdNS8UKpn4GV4Rpsf0wyyNAzBa8paUo0BVkfANi0/DZW+m+XR
+	 IkAzXUpLelQpQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Willem de Bruijn <willemb@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: yunshui <jiangyunshui@kylinos.cn>,
+	syzbot <syzkaller@googlegroups.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	Sasha Levin <sashal@kernel.org>,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
 	davem@davemloft.net,
-	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	bpf@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 56/83] fou: remove warn in gue_gro_receive on unsupported protocol
-Date: Wed, 31 Jul 2024 20:18:11 -0400
-Message-ID: <20240801002107.3934037-56-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 29/61] bpf, net: Use DEV_STAT_INC()
+Date: Wed, 31 Jul 2024 20:25:47 -0400
+Message-ID: <20240801002803.3935985-29-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240801002107.3934037-1-sashal@kernel.org>
-References: <20240801002107.3934037-1-sashal@kernel.org>
+In-Reply-To: <20240801002803.3935985-1-sashal@kernel.org>
+References: <20240801002803.3935985-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,47 +71,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.43
+X-stable-base: Linux 6.1.102
 Content-Transfer-Encoding: 8bit
 
-From: Willem de Bruijn <willemb@google.com>
+From: yunshui <jiangyunshui@kylinos.cn>
 
-[ Upstream commit dd89a81d850fa9a65f67b4527c0e420d15bf836c ]
+[ Upstream commit d9cbd8343b010016fcaabc361c37720dcafddcbe ]
 
-Drop the WARN_ON_ONCE inn gue_gro_receive if the encapsulated type is
-not known or does not have a GRO handler.
+syzbot/KCSAN reported that races happen when multiple CPUs updating
+dev->stats.tx_error concurrently. Adopt SMP safe DEV_STATS_INC() to
+update the dev->stats fields.
 
-Such a packet is easily constructed. Syzbot generates them and sets
-off this warning.
-
-Remove the warning as it is expected and not actionable.
-
-The warning was previously reduced from WARN_ON to WARN_ON_ONCE in
-commit 270136613bf7 ("fou: Do WARN_ON_ONCE in gue_gro_receive for bad
-proto callbacks").
-
-Signed-off-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://lore.kernel.org/r/20240614122552.1649044-1-willemdebruijn.kernel@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: yunshui <jiangyunshui@kylinos.cn>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Link: https://lore.kernel.org/bpf/20240523033520.4029314-1-jiangyunshui@kylinos.cn
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/fou_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/core/filter.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
-index 0c41076e31eda..b38b82ae903de 100644
---- a/net/ipv4/fou_core.c
-+++ b/net/ipv4/fou_core.c
-@@ -433,7 +433,7 @@ static struct sk_buff *gue_gro_receive(struct sock *sk,
+diff --git a/net/core/filter.c b/net/core/filter.c
+index dc89c34247187..6a04ea9199328 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2264,12 +2264,12 @@ static int __bpf_redirect_neigh_v6(struct sk_buff *skb, struct net_device *dev,
  
- 	offloads = NAPI_GRO_CB(skb)->is_ipv6 ? inet6_offloads : inet_offloads;
- 	ops = rcu_dereference(offloads[proto]);
--	if (WARN_ON_ONCE(!ops || !ops->callbacks.gro_receive))
-+	if (!ops || !ops->callbacks.gro_receive)
- 		goto out;
+ 	err = bpf_out_neigh_v6(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		dev->stats.tx_errors++;
++		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	dev->stats.tx_errors++;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+@@ -2371,12 +2371,12 @@ static int __bpf_redirect_neigh_v4(struct sk_buff *skb, struct net_device *dev,
  
- 	pp = call_gro_receive(ops->callbacks.gro_receive, head, skb);
+ 	err = bpf_out_neigh_v4(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		dev->stats.tx_errors++;
++		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	dev->stats.tx_errors++;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
 -- 
 2.43.0
 
