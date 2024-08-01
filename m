@@ -1,115 +1,135 @@
-Return-Path: <netdev+bounces-115095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1672A9451A4
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 19:42:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D6F4945248
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 19:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9660282EF3
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:42:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 240121F2AE17
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FE21B9B28;
-	Thu,  1 Aug 2024 17:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060D31B8EA6;
+	Thu,  1 Aug 2024 17:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SnH4tzec"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3B5182D8;
-	Thu,  1 Aug 2024 17:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5081B4C2A
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 17:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722534152; cv=none; b=MfbK1n2pme4qt1dSMUrsV07c/b5M2ixiuudslq779N4IIIiG7Bjl9LMWSGUAJX0ENF5sE9tvPahTMiwnYmSR2RcQhF89IbRUJCOxyiCi0cRg77LgZOImp9lU6rxUqiC0seJ9IFUg0kbsv4F9g7nE28vyi3XC3LOhuZk2A7EUeQ4=
+	t=1722534763; cv=none; b=OwTEP9y1sybcPF6DGO/iYlUIVLA8qzoJRMJLsPi3SY1vtLluNHNHbtH/DrjQnetZwb/ArnX/OUZX9ErsFjjKRRs281J8wtUO3NFb9oaB+XnGdmJdlyDbKsM7Rq9vOa7nPNFeAdUHUIjjk/CxBbC/lvHOMkiFuvx79SLEh6qAFsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722534152; c=relaxed/simple;
-	bh=cmfIGnKINzdZlBL5hIS52WEXlNaTuy02vwjO0xUPTfs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LwJ+4zQhEEhFlRAz2T0Q0ePq2pj9PaZE5NLrHvzI3oPF/RAl/MWZ7gso0Q1W5JJ6I4plNfSNj0IqbuzM/miTP0ofTd14kgR0+2tWljOB5/cIoqRE+RaFEnUI8NZLKY0Xg42FIUc2mAuG3tz72WEpjZBT2UnTozvfW/L4x83L6fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WZbqS4hJnznctB;
-	Fri,  2 Aug 2024 01:41:24 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 161531800A0;
-	Fri,  2 Aug 2024 01:42:26 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 2 Aug 2024 01:42:22 +0800
-Message-ID: <cc50cc99-a89b-9a02-e1a7-23fd5ef1093a@huawei-partners.com>
-Date: Thu, 1 Aug 2024 20:42:18 +0300
+	s=arc-20240116; t=1722534763; c=relaxed/simple;
+	bh=M6InQaB0T4wGw9r+y0hXi5/zJ5LG2nNysefOOnv+iAE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hk+OV7kP0fZryrnrbouWd7cLgVYUTgNE/alGGGgb0+LljJXj8p34xhmetQRcxsihMD09kazB9QIy9RZeRDzERKEtk4HAXWoabQ8sbgOiBWkK7IagNguUYUeGzo+pUfmrvBrhARnwCXIkgIQB5T6E6LMjxlJtPC2I8Jrny8h+Fl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SnH4tzec; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a1b073d7cdso46358a12.0
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 10:52:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722534760; x=1723139560; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8qly8JbOiDlnwa/iIbG3/fk35NDbFwt36/SaFwD82+4=;
+        b=SnH4tzecDrlXkBbAcaxl6O8zZ9PBNLWq+CpnGQqkLQSRY4HHtXxV5oMljMv7J9E+tn
+         r0Ln/A6XxDg9oUqe3eIjQrPJjpfT1dBmDLSORdGOW+Rdewz1Fh9nDwg/lfzbsl8lEo/s
+         otKCGZIgefaogjqJL7AJ+nUizKbuImYCuwG/WAjq7fiX55bx8iUxhBYKyNuU0KBcvojg
+         U9yKO8rip9WoT6+okQ5dGxooU0wUHavd0AQ5uec67dEkJZ9eGPXTxvXy+amGsBiDuq87
+         n1CM/T9DNuAb/cB8aS0KWgghf4KszatqvWk/QSacjsa9sL2N0A3fBYvcXH//H2RFWENX
+         RirQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722534760; x=1723139560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8qly8JbOiDlnwa/iIbG3/fk35NDbFwt36/SaFwD82+4=;
+        b=bqtp2r46xElI1Plle/9fJJGNdyvyyMNzDkHU511Ippjaw6LElGccnbotxWdm4sdkjk
+         UlY7H+bvEFW5uMCAVLjoXMG5dWLbUsMlM9h4Vrsr26YZI3+HnzX1EqUSpNYb3qrIHWLY
+         X4LCHyBGcWVJLxcYoCb/lP4ehvDM2yyvhqNtP9o8nFvYKEk+CiHtUfcuwdaQ6CcoJM3J
+         1yHbjBwp9APO/bl6wr9mHwWtosaG9c12DDCKKLMlB9mpERIbDZkGgjrDlvazxpPIZtWa
+         /1e6XEtJiDLYAYnPiT+dw6WZr6OfLKhW8w358K19slKt+xTww5qlhNvj+L60K8CQbiFA
+         zYYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVrWAAmwrcORVE1THbhbU+kYX1szmB61k7HQFBnk1jvp7kTcfJM7mZNf5dbpnqrgoA+aE1nS7WZWa5AM1wlHrYl3Q5rw320
+X-Gm-Message-State: AOJu0YzAzG10v+QsGAvv7LknRfo1CePUM6SIvwlfsolii/paWQgP2vvi
+	MtCpgeoDmgCV9oVhrpZEoLwfaakGk2J3jSVrhd+f/JCvDh4W9/mJipFan46HONa7i2WBas/3ltS
+	JPd2t8/elTChQod2DLevL8Fau3BZV84nIBfnh
+X-Google-Smtp-Source: AGHT+IHB5CJxc6Tc3CjWDacX26l9/cA+t+kvTF1TdZijWQEEpgYdyhxFzFFAkvLyaqV8sqPcAn0lgEDa7UlZziEV+W4=
+X-Received: by 2002:a05:6402:2689:b0:58b:15e4:d786 with SMTP id
+ 4fb4d7f45d1cf-5b844f86d28mr690a12.5.1722534760180; Thu, 01 Aug 2024 10:52:40
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 7/9] selftests/landlock: Test listen on ULP socket
- without clone method
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
- <20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com>
- <20240801.rae2can8ooT9@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20240801.rae2can8ooT9@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+References: <20240801-upstream-net-next-20240801-tcp-limit-wake-up-x-syn-v1-1-3a87f977ad5f@kernel.org>
+In-Reply-To: <20240801-upstream-net-next-20240801-tcp-limit-wake-up-x-syn-v1-1-3a87f977ad5f@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 1 Aug 2024 19:52:26 +0200
+Message-ID: <CANn89iK6PxVuPu_nwTBiHy8JLuX+RTvnNGC3m64nBN7j1eENxQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: limit wake-up for crossed SYN cases with SYN-ACK
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-8/1/2024 6:08 PM, Mickaël Salaün wrote:
-> On Sun, Jul 28, 2024 at 08:26:00AM +0800, Mikhail Ivanov wrote:
->> Test checks that listen(2) doesn't wrongfully return -EACCES instead of
->> -EINVAL when trying to listen on a socket which is set to ULP that doesn't
->> have clone method in inet_csk(sk)->icsk_ulp_ops (espintcp).
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   tools/testing/selftests/landlock/config     |  1 +
->>   tools/testing/selftests/landlock/net_test.c | 38 +++++++++++++++++++++
->>   2 files changed, 39 insertions(+)
->>
->> diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
->> index 0086efaa7b68..014401fe6114 100644
->> --- a/tools/testing/selftests/landlock/config
->> +++ b/tools/testing/selftests/landlock/config
->> @@ -12,3 +12,4 @@ CONFIG_SHMEM=y
->>   CONFIG_SYSFS=y
->>   CONFIG_TMPFS=y
->>   CONFIG_TMPFS_XATTR=y
->> +CONFIG_INET_ESPINTCP=y
->> \ No newline at end of file
-> 
-> There are missing dependencies, and also please sort entries. I think it should
-> be:
-> 
->   CONFIG_CGROUPS=y
->   CONFIG_CGROUP_SCHED=y
->   CONFIG_INET=y
-> +CONFIG_INET_ESPINTCP=y
-> +CONFIG_INET_ESP=y
->   CONFIG_IPV6=y
-> +CONFIG_IPV6_ESP=y
-> +CONFIG_INET6_ESPINTCP=y
->   CONFIG_NET=y
->   CONFIG_NET_NS=y
->   CONFIG_OVERLAY_FS=y
-> 
-> This works with check-linux.sh from
-> https://github.com/landlock-lsm/landlock-test-tools
+On Thu, Aug 1, 2024 at 6:39=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> In TCP_SYN_RECV states, sk->sk_socket will be assigned in case of
+> marginal crossed SYN, but also in other cases, e.g.
+>
+>  - With TCP Fast Open, if the connection got accept()'ed before
+>    receiving the 3rd ACK ;
+>
+>  - With MPTCP, when accepting additional subflows to an existing MPTCP
+>    connection.
+>
+> In these cases, the switch to TCP_ESTABLISHED is done when receiving the
+> 3rd ACK, without the SYN flag then.
+>
+> To properly restrict the wake-up to crossed SYN cases as expected there,
+> it is then required to also limit the check to packets containing the
+> SYN-ACK flags.
+>
+> Without this modification, it looks like the wake-up was not causing any
+> visible issue with TFO and MPTCP, apart from not being needed. That's
+> why this patch doesn't contain a Cc to stable, and a Fixes tag.
+>
+> While at it, the attached comment has also been updated: sk->sk_sleep
+> has been removed in 2010, and replaced by sk->sk_wq in commit
+> 43815482370c ("net: sock_def_readable() and friends RCU conversion").
+>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> ---
+> Notes:
+>   - This is the same patch as the one suggested earlier in -net as part
+>     of another series, but targeting net-next (Eric), and with an
+>     updated commit message. The previous version was visible there:
+>     https://lore.kernel.org/20240718-upstream-net-next-20240716-tcp-3rd-a=
+ck-consume-sk_socket-v2-2-d653f85639f6@kernel.org/
+> ---
 
-Thanks, I'll fix this.
+Note: I am not aware of any tests using FASYNC
 
-> 
-> IPv6 is currently not tested, which should be the case (with the "protocol"
-> variants).
+sock_wake_async() / kill_fasync() are sending signals, not traditional wake=
+ups.
+
+Do we really want to potentially break some applications still using
+pre-multi-thread era async io ?
+
+Not that I really care, but I wonder why you care :)
 
