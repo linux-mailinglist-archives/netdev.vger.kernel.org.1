@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-114762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22605943FD6
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:53:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D76943FDB
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC0761F21E80
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:53:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68DE11F223F9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACAE13D510;
-	Thu,  1 Aug 2024 01:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CE51411E3;
+	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwbrO6wH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSpq9c+7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D488B42049;
-	Thu,  1 Aug 2024 01:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B1B13DDC6;
+	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722474032; cv=none; b=U9U/imgG/xDA9YmGFyVS+B+b/TFJqz6ew8scYkvwJ1mlDcOYSFkZHK8j8MJg6L4bSIIW7HiEpuQjJjEJxJT4kC/kflAAQSFIzcLcsHl2A/LDPxJeiSiIIDb/QUh+klM/ibj1XRzxY4Fa84HnJgRKHLbYWWWEDqmyebSv8fBfoFA=
+	t=1722474637; cv=none; b=sInsHPsFtAl/qAxQ2VHsLxXc/9NKH9Q1gHvZ/7KVlptGF5Fn7DS8m5Qmj3NWJqwj7bytwHUQ8spk3ORjHs9K525ksJRvO4t6MgH7AbpTMHuQXDfpqxssOIEPmqOaUOu2fGysttVRSOrTWnmJ9BlP7sIo8DIWjvAPXsRpqfHTxu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722474032; c=relaxed/simple;
-	bh=Ulsuwo6JX0StKa/83XS6uMQHzHubaYa4OFec5QRrMbE=;
+	s=arc-20240116; t=1722474637; c=relaxed/simple;
+	bh=iJtqiAXqX0LwxAhBTKTJEZ3kteVZpRMr4hNaCqlp3Z0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xe4TPelgqNhBzjP4yTPZNdmcZlcRuFejG/CMDNWDKQFYMNf1rNPaEoIOFMRzAajKxa1SKKNmbSvSqUFvLPKXBWnNMPYH0waARDV3dLgsJ1wdDjsSXf/iFjDVVepO0wN+YECB983Qq/TX41D7IYs6WJ3oE6/YPQHbXkwW7v27g38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwbrO6wH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C006C32786;
-	Thu,  1 Aug 2024 01:00:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PKazESFVwcPWXJAzza418/Mw1dcoVlk1yhPrvOCsWIpYb73yeCutbCdnK/s2K6MTskEzrpFktajGqhNvHeAZAdUWY8P2UkKabpnVHZJcMaSCWktN1/O1pAD/JSOvYuLH2tIKc2YsfYwLUXlIgQ3wDmoUAtYAcx1SH+JvxhRjOmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSpq9c+7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44D88C4AF0C;
+	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722474032;
-	bh=Ulsuwo6JX0StKa/83XS6uMQHzHubaYa4OFec5QRrMbE=;
+	s=k20201202; t=1722474637;
+	bh=iJtqiAXqX0LwxAhBTKTJEZ3kteVZpRMr4hNaCqlp3Z0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cwbrO6wHvo24iUE8YxlJ3o4t892hTX7zcnOoZ/j8X2Yu7yFmqMnQlVhsbNeGTB8sr
-	 SXBGup8cfyVnW15CuqNME3p4+SM5Q1UePKTGyVLbN0OBfEa4UPYDKp+7lebXiUkYoX
-	 Sb/GzlhNHYjvM+ZBn2TgIVHryPXRwEveFvAq4yNDgxgGgyuHRRji2LmUm0mAz9QAl1
-	 kXhtbbkJF8XjHuhiIVjF88YTTXSA7Er6U6na5zcPC2KqRAqPBMNTvoxxLdqsZnuPct
-	 i08GJkFbupAhDjseQ/+y3XeFuz8DBOImuHy5GsCH23sDwmG6n+3cDQo3c5iU+Xu0M6
-	 P5WLX6eHrGxmA==
+	b=hSpq9c+7ucTqqSamea53A4yOmCM0BtaeXgsKY7gCYPqzUCBIJ9xLMyUO+15GxxKf1
+	 2D2Ovvzj5jTWMTuVqRZqjOsTnFjhnSAxE38s2mHeYjDsvVWBhKSLiWs0LvaAPo1//w
+	 G9XWDUDl8aCqLMmKpJEbZymEEtBsk0gLMPvshv5OUhNYE08UEwIvrZZbP6TQOhUKtS
+	 UlToWm1qXqQF6vCapVJp51OlMFndXIXwxDcgZ2m+7nXXKeFzO3LZiV0hnlCN5LjN1W
+	 uzP7m3usl/fnk3CvIzbj8DBd5BESdeXW8ymDR5mVGVKM90kAyoKW6zk2r/PlQwACX5
+	 q8eqW9dwoPqjQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 589A9C4332F;
-	Thu,  1 Aug 2024 01:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2E43AC6E396;
+	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] net/mlx4: Add support for EEPROM high pages query
- for QSFP/QSFP+/QSFP28
+Subject: Re: [PATCH net v1] net: wan: fsl_qmc_hdlc: Convert carrier_lock spinlock
+ to a mutex
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172247403235.15978.16457678129878308101.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Aug 2024 01:00:32 +0000
-References: <b17c5336-6dc3-41f2-afa6-f9e79231f224@ans.pl>
-In-Reply-To: <b17c5336-6dc3-41f2-afa6-f9e79231f224@ans.pl>
-To: =?utf-8?q?Krzysztof_Ol=C4=99dzki_=3Cole=40ans=2Epl=3E?=@codeaurora.org
-Cc: tariqt@nvidia.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, git@dan.merillat.org, moshe@nvidia.com,
- mkubecek@suse.cz, andrew@lunn.ch, idosch@nvidia.com
+ <172247463718.20901.3118468784661815872.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Aug 2024 01:10:37 +0000
+References: <20240730063104.179553-1-herve.codina@bootlin.com>
+In-Reply-To: <20240730063104.179553-1-herve.codina@bootlin.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andriy.shevchenko@linux.intel.com,
+ christophe.leroy@csgroup.eu, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, stable@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Jul 2024 17:49:53 -0700 you wrote:
-> Enable reading additional EEPROM information from high pages such as
-> thresholds and alarms on QSFP/QSFP+/QSFP28 modules.
+On Tue, 30 Jul 2024 08:31:04 +0200 you wrote:
+> The carrier_lock spinlock protects the carrier detection. While it is
+> hold, framer_get_status() is called witch in turn takes a mutex.
+> This is not correct and can lead to a deadlock.
 > 
-> "This is similar to commit a708fb7b1f8d ("net/mlx5e: ethtool, Add
-> support for EEPROM high pages query") but given all the required logic
-> already exists in mlx4_qsfp_eeprom_params_set() only s/_LEN/MAX_LEN/ is
-> needed.
+> A run with PROVE_LOCKING enabled detected the issue:
+>   [ BUG: Invalid wait context ]
+>   ...
+>   c204ddbc (&framer->mutex){+.+.}-{3:3}, at: framer_get_status+0x40/0x78
+>   other info that might help us debug this:
+>   context-{4:4}
+>   2 locks held by ifconfig/146:
+>   #0: c0926a38 (rtnl_mutex){+.+.}-{3:3}, at: devinet_ioctl+0x12c/0x664
+>   #1: c2006a40 (&qmc_hdlc->carrier_lock){....}-{2:2}, at: qmc_hdlc_framer_set_carrier+0x30/0x98
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next] net/mlx4: Add support for EEPROM high pages query for QSFP/QSFP+/QSFP28
-    https://git.kernel.org/netdev/net-next/c/9c26a1d0a01c
+  - [net,v1] net: wan: fsl_qmc_hdlc: Convert carrier_lock spinlock to a mutex
+    https://git.kernel.org/netdev/net/c/c4d6a347ba7b
 
 You are awesome, thank you!
 -- 
