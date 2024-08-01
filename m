@@ -1,80 +1,101 @@
-Return-Path: <netdev+bounces-114769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC4A944068
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:05:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB9B943FEF
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:56:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B054B2C803
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:55:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DF691C21FE9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1FE514EC4A;
-	Thu,  1 Aug 2024 01:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE415338D;
+	Thu,  1 Aug 2024 01:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ab3Xuhdk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qhpd+P5f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADDF148FFC;
-	Thu,  1 Aug 2024 01:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25B71514DC;
+	Thu,  1 Aug 2024 01:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722474716; cv=none; b=moFm+O8kPe7WpPbFZiv0fT+ZMzh5i9tX++QoAHd/qjbPCoGMdU5qbYdyckef2acwnklhL5Y8w5GUprDsLdD78nEYJ9A4E4qA9Z50q5WBattqSjxB6cfYwdlKgWT6xVgq/GNFN9ncWxcSr25vQxwc7d8cQxdlZL6bXuONMCAz0+4=
+	t=1722474823; cv=none; b=HzST3KEVyIoIkRyOXX149pofXOneNYIQF0aSrsaTsrk3OXlmMjhs7IHwMQCHBH2iavgJDi3FJ0ou7HJKZaoPMUDM+BHAufxeMWk96oU0+rBSbVpmKbPdQQAasOa1begbBD0w1+9NS/D+/OZFpWKvR71ynoqrISG5iz3THKFp56M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722474716; c=relaxed/simple;
-	bh=mlu0yphlmkGbrtNaAOSv3nheyhJhHXu8hHcxo4Qccgc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DrVgUJ4FLPxQk4E0ccvS1MF/+fjO52EgFN6BOd6ZOSUkTdZMfuINafqknJ9Z5hVY7/gX3vtYPIh/AWDjKDT5kknyG0uN81bdd3XRBHdBmfCJuUpDsLgmwWaxjYufrA+E1LLlh+0JrHrCKceQB/5mp6f6jvc0u4PH/7Y+aLNXSCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ab3Xuhdk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1A66C116B1;
-	Thu,  1 Aug 2024 01:11:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722474716;
-	bh=mlu0yphlmkGbrtNaAOSv3nheyhJhHXu8hHcxo4Qccgc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ab3XuhdkTvvo8pyKJnbVpFvY7OQ0BCIh4ildp4o8SQDK4RL1f+iYg9PCqMn0G5blJ
-	 HRwD3f9bQhzURosytwTo8Kr2RVAjxJXL5MBw7n9BINV4wFXZh6Hoz5Ua1OZA6Q0FkV
-	 kcl/7p8ighxOF00FaA9YXsRewNUT+5viCCdlLBfIOfcDYCu3JCZj+MM7BmxPsVzJB4
-	 5LqPlR5prr0f2zH6IakhqfrAg0f0bRlGyWI5eTZ3Vb6oXlffOMzKd2nUzaEM7J3N1n
-	 nU6/+2DYLhlKWvbm+51o/xYdsgPvchJfG3NSsHilv+hjyZXL23V5zDlyppmw+JMX5Y
-	 pAnl0hSHfnfPg==
-Date: Wed, 31 Jul 2024 18:11:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net/chelsio/libcxgb: Add __percpu annotations to
- libcxgb_ppm.c
-Message-ID: <20240731181155.78219465@kernel.org>
-In-Reply-To: <CAFULd4aye+mGTV1CJp5Coq0Qr2DvwOezpd5-hxWbF4-xR5aj_Q@mail.gmail.com>
-References: <20240730125856.7321-1-ubizjak@gmail.com>
-	<20240731093516.GR1967603@kernel.org>
-	<CAFULd4aye+mGTV1CJp5Coq0Qr2DvwOezpd5-hxWbF4-xR5aj_Q@mail.gmail.com>
+	s=arc-20240116; t=1722474823; c=relaxed/simple;
+	bh=Sc2L9FmvJUOj/vSm51/hIH353apQq4db3uUU3zSvBoM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I4jpmx03KZOioLDwR2BcGjpxb4/rDJy1oVINZktbMNcX5NiymobIHB/CtCV8bZV8DSXzoNfxhGM1QoKhIO4eBTifP/Oxvs0NmeZ+9jW0xXT82YBJmJ8Pe4AEIuaOqD50KCycvP45h9yIQq/DIVTr2tzKYcaX+WYRxxXeq5lYcC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qhpd+P5f; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ARbD44MpDD7+Kxfy/q9fBBwtFNS3dL+GrbSVVXS2AZk=; b=Qhpd+P5fQcY31LHSHXYzaW91Uc
+	m9Mv05nw4KQWw2Zyg9LTsURDIfPcWgqg6Yx5vAIt8IW3TaR+Idp/T6ABgFC1ffrmMZPloZ5ni3wic
+	cQTdU8Yaj/+hSEfweQNKGSJ7RQb8rLLk3WIQNZFJ8oB27eWQfKQc88VJe16KxwcEMI1E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sZKNn-003j4O-QP; Thu, 01 Aug 2024 03:13:31 +0200
+Date: Thu, 1 Aug 2024 03:13:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 09/10] net: hibmcge: Add a Makefile and
+ update Kconfig for hibmcge
+Message-ID: <49d41bc0-7a9e-4d2a-93c7-4e2bcb6d6987@lunn.ch>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-10-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240731094245.1967834-10-shaojijie@huawei.com>
 
-On Wed, 31 Jul 2024 12:06:18 +0200 Uros Bizjak wrote:
-> > Let's keep to less than 80 columns wide, as is still preferred for
-> > Networking code. Perhaps in this case:
-> >
-> > static struct cxgbi_ppm_pool __percpu *
-> > ppm_alloc_cpu_pool(unsigned int *total, unsigned int *pcpu_ppmax)  
+On Wed, Jul 31, 2024 at 05:42:44PM +0800, Jijie Shao wrote:
+> Add a Makefile and update Kconfig to build hibmcge driver.
 > 
-> Hm, the original is exactly what sparse dumped, IMO code dumps should
-> be left as they were dumped.
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>  drivers/net/ethernet/hisilicon/Kconfig          | 17 ++++++++++++++++-
+>  drivers/net/ethernet/hisilicon/Makefile         |  1 +
+>  drivers/net/ethernet/hisilicon/hibmcge/Makefile | 10 ++++++++++
+>  3 files changed, 27 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
+> index 3312e1d93c3b..372854d15481 100644
+> --- a/drivers/net/ethernet/hisilicon/Kconfig
+> +++ b/drivers/net/ethernet/hisilicon/Kconfig
+> @@ -7,7 +7,7 @@ config NET_VENDOR_HISILICON
+>  	bool "Hisilicon devices"
+>  	default y
+>  	depends on OF || ACPI
+> -	depends on ARM || ARM64 || COMPILE_TEST
+> +	depends on ARM || ARM64 || COMPILE_TEST || X86_64
 
-Unclear to me what you mean by "dumped" here.
-Please follow Simon's advice.
--- 
-pw-bot: cr
+It is normal to have COMPILE_TEST last.
+
+Any reason this won't work on S390, PowerPC etc?
+
+> +if ARM || ARM64 || COMPILE_TEST
+> +
+
+You would normally express this with a depends on.
+
+	Andrew
 
