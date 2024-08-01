@@ -1,122 +1,112 @@
-Return-Path: <netdev+bounces-114984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76D4944D82
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:54:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E378F944D8F
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3C111C24105
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:54:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AE0F1C22F50
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D481E1A3BC2;
-	Thu,  1 Aug 2024 13:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2621A38E3;
+	Thu,  1 Aug 2024 14:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dh7WS+Oo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvCGCirj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FE6184549
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 13:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3C516F267;
+	Thu,  1 Aug 2024 14:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722520490; cv=none; b=C1eLEAFUnj2cbQj40Xopypg3EweIYsC4dysZXD+X9f3G27qhxI4OCkcMWzbNdRUDucCDbHxtVkVu3OUcf4eBxR41CaJ7hRRowBhn0xWflx2oqlApBbG/JOUqIboGuqIWgRgyKXaIQzzNvSl8dYLqvn001l7N6SPlX1ZyM9bf0j0=
+	t=1722520898; cv=none; b=qpJeeNpZqn/BS+wRjfxwlxaUBHj3ndMpo8NwL5dFL9SLLgUXxAQ1D3jclFWlw3iXfocL3xWt+Ahmw1gr5ZWkuPT6pBWWaFsoVUOCk2B4U6Dh3TcjtVZO6oDG1vwtSXcpFWvwaIr2E2HGjPErp8Q6Y5TzS8+ooN0RzROeElPZoJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722520490; c=relaxed/simple;
-	bh=IPqMQmrx1o4+5JAej12udIXwU9ZskyAekdwuNHiC5xk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cKw7glxPjQizBwbBq4p90wYt7WjJmvUIzPlMzN3DYVeQ3pHEnHlFizEmbz2SNqGZqYskCUctUt4UU7qMLKVsqz8lexKzbo8c/KN5PZPZfmVGlc+tTMGDxWcFgKe4wt/ieNxE1uXnFKRA69/qAjQDpPj+yyI0e2z2k+Y2O7hRomw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dh7WS+Oo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722520488;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZURuYWxniX4LIaWq38giCOp7/XoDP7loQAsH838DezA=;
-	b=Dh7WS+OoDOFmcbB9+tlvA1zv4MoGplQ9cEFrGaHhyiOLYzSc4/4bKcfS1gRDFBtPEC2Kl7
-	S54dZAWyKl+WdFfrmJ56lNZFAvtHgY3O/foHsQc9Ps9ozjaE7hzFyNKZkc2WVg1B8sqSzQ
-	LFgjw5zFnaiUNSQUYufJ8BECvsY1yB0=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-551-mRhqPas3NnGxJ2IY0LFliA-1; Thu, 01 Aug 2024 09:54:47 -0400
-X-MC-Unique: mRhqPas3NnGxJ2IY0LFliA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ef298e35e1so5022541fa.0
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 06:54:46 -0700 (PDT)
+	s=arc-20240116; t=1722520898; c=relaxed/simple;
+	bh=zc3fmwf7uam/V7MXE/k9UtioS2NVM6p9a5PBtxHgZ2k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TG/zABroKGAlhg9YVnycp3zf0fRiwRG3/rA18pASaxGG0CNOsGuBPpwfWpUDI/suKf305SMaogwMRjwk9qLz7ktVClY4Cve8rh19IoixvfMU8rwTOsoDPOLdgEN4b7SSOt+cYUsjMfJaRAWgZvabRLurCZaMj1UEPo+v2XiPHyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UvCGCirj; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7a8caef11fso817463966b.0;
+        Thu, 01 Aug 2024 07:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722520895; x=1723125695; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=H10mZqEzOx4R7FeQ2dtZavYhrnIDzbwG4r7Wgi27o4w=;
+        b=UvCGCirj1awxbRW8lBwp37O16QOJ7QWBUBMkk9cOUlTpyJknXuYrBTZuQbw7kksJ7a
+         WWGvrJdCFwZ1oY5P/ZWGXocCav7LkO0QaGBL+IqPEij7phWWqchCSmUoRTilaPo7NNwX
+         l90PPajKAWEKdhCbh5jqec4LoYqHXnyOHbMJJSBQfq36ZteDxWqCRgQLjog2r56cPBV+
+         s/Vvq2uMHuDCbCiboXCLR32pKoU5mto+/5RLyEfnobJoGBGTq+RLBFOHiqgqEFKLL2M7
+         TE4f1XM8FCnfF1dHD+YENFTX3Io9yUMtz2mrX5TXKU7lFyL/tdDCOeSk+Z/++pe58WwA
+         r4Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722520485; x=1723125285;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZURuYWxniX4LIaWq38giCOp7/XoDP7loQAsH838DezA=;
-        b=RiB2S1645lurnph+4hMperaNz5HPFa8Jv0+r6hXzBd1yGjehTWw7VM7sfLDBtLu7Py
-         FNd1QvprhCZgu9uCmzuwM2t24rjoqxbep9FICZtoHA5oHjGwYAbewAJvAYY2UCOhpRmi
-         e9xmuAcpJnvu5QDC0+X1G+tPZGp5T2FqlWM+uj/fB/QTa3NEQEOWjM2vpAhHOITlbDpB
-         CxRpAhP4wdvdwU2Fxv/EcLmWsPNEgpcZWvFDoOsfPEyoSQKD97F29u1YLnsiwxYTWZAM
-         lGzDicVtkRR0Qmdn2U/4F/hTNRBBrDdU4J21O1uhert9Chi9RgtIGGKMrDQnp0IwXwAQ
-         Nuyw==
-X-Gm-Message-State: AOJu0YwIgYnxMuIMWC0oDOd/LR/RYRPmFB4XICCIfBpM0K5mAdoZWft8
-	DdZQhAA6b9v3BSNCh6gxfT4uJCNTpykjAUeRVnVJK4EPzXdhNFBItUMt0e2xoy058TTJnTdb4P6
-	H1uG9i1n2u8eQb16lt9j0ei2D7GLbmJI9Dd7WbyPjUBuU1IS/Ps4HMw==
-X-Received: by 2002:a05:651c:104a:b0:2f0:198e:cf8b with SMTP id 38308e7fff4ca-2f15aafbcf0mr1567261fa.4.1722520485302;
-        Thu, 01 Aug 2024 06:54:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQSjeSndcAwinsbF3OMmg2hwmlAVK5gF10xPBSFfaovksq4NG528fJ37qQL3IXgEIpcxW46g==
-X-Received: by 2002:a05:651c:104a:b0:2f0:198e:cf8b with SMTP id 38308e7fff4ca-2f15aafbcf0mr1567101fa.4.1722520484717;
-        Thu, 01 Aug 2024 06:54:44 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1712:4410::f71? ([2a0d:3344:1712:4410::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b5fbb25sm59563075e9.0.2024.08.01.06.54.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Aug 2024 06:54:44 -0700 (PDT)
-Message-ID: <62ae3755-f51d-4953-928f-ff2faf7cea72@redhat.com>
-Date: Thu, 1 Aug 2024 15:54:42 +0200
+        d=1e100.net; s=20230601; t=1722520895; x=1723125695;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H10mZqEzOx4R7FeQ2dtZavYhrnIDzbwG4r7Wgi27o4w=;
+        b=YwkttZNhaew4qT3RRjzXNKgZsVNgOTIlYR3peEODQd0fpWBnawGUCEqFI/JHoHJjAa
+         CqHGJGqV2Mgjy+NuH4d0F3ruoxPCQ6O+X2e1mydEGQrCUuHXlQ+18tW/DFUgPLHtOdyN
+         BXlboweKY6oP03rJDGIytPRBSUhDP8PJW8HRu55jvYD+zcZvAgVTQV/4KJdrl0L0Mdpq
+         khQstmlGNomcyf6iW37el2buPjqU+VJYfvi587aZMUvcE/FaFsk8a3wACVUevFHvo8nP
+         l5QnCNszLqX1TI0SulUAsemDJaSvbD4Hds+R4pbOQOPv4tju8unqyOojcwaIBSDGKIgi
+         fvmA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvZcHXgcGADi1/uCMPTixPCQ74hQbiHqDBOImifxc9Z4SorVTamsorBLn6C24naC63s35vrsz4LuWMNZ/YV3GqXK2l+3ETmBE3
+X-Gm-Message-State: AOJu0YyUGQODKuoYq9TVsHTkXksrXh9ccSEGmoW1w8HYMWliF+OlxfBk
+	r2fwnNYS/Vy0Hj3okeCfqLOJAPPXgYZw6WHHiRnuwXXzx80bDWCDSVsd47wg
+X-Google-Smtp-Source: AGHT+IEoD2t9DB48Tvfk36MbHboQ5U4hDU2tMQr1NDZWvHmJWBHkumulozDgfkSYtOMGmnPhjlQSxA==
+X-Received: by 2002:a17:906:fe4b:b0:a77:db34:42ca with SMTP id a640c23a62f3a-a7dc50a3777mr17724766b.49.1722520894273;
+        Thu, 01 Aug 2024 07:01:34 -0700 (PDT)
+Received: from ThinkStation-P340.tmt.telital.com ([2a01:7d0:4800:7:5620:85dc:e603:93e5])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab4de47sm905748366b.67.2024.08.01.07.01.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 07:01:34 -0700 (PDT)
+From: Daniele Palmas <dnlplm@gmail.com>
+To: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	Daniele Palmas <dnlplm@gmail.com>
+Subject: [PATCH net 1/1] net: usb: qmi_wwan: fix memory leak for not ip packets
+Date: Thu,  1 Aug 2024 15:55:12 +0200
+Message-Id: <20240801135512.296897-1-dnlplm@gmail.com>
+X-Mailer: git-send-email 2.37.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: eliminate ndisc_ops_is_useropt()
-To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
- =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- David Ahern <dsahern@kernel.org>,
- =?UTF-8?B?WU9TSElGVUpJIEhpZGVha2kgLyDlkInol6Toi7HmmI4=?=
- <yoshfuji@linux-ipv6.org>
-References: <20240730003010.156977-1-maze@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240730003010.156977-1-maze@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 7/30/24 02:30, Maciej Żenczykowski wrote:
-> as it doesn't seem to offer anything of value.
-> 
-> There's only 1 trivial user:
->    int lowpan_ndisc_is_useropt(u8 nd_opt_type) {
->      return nd_opt_type == ND_OPT_6CO;
->    }
-> 
-> but there's no harm to always treating that as
-> a useropt...
+Free the unused skb when not ip packets arrive.
 
-AFAICS there will be an user-visible difference, as the user-space could 
-start receiving "unexpected" notification for such opt even when the 
-kernel is built with CONFIG_6LOWPAN=n.
+Fixes: c6adf77953bc ("net: usb: qmi_wwan: add qmap mux protocol support")
+Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
+---
+ drivers/net/usb/qmi_wwan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-The user-space should ignore unknown/unexpected notification,so it 
-should be safe, but I'm a bit unsettled by the many 'should' ;)
-
-Cheers,
-
-Paolo
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 386d62769ded..cfda32047cff 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -201,6 +201,7 @@ static int qmimux_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+ 			break;
+ 		default:
+ 			/* not ip - do not know what to do */
++			kfree_skb(skbn);
+ 			goto skip;
+ 		}
+ 
+-- 
+2.37.1
 
 
