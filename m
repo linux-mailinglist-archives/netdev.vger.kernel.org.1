@@ -1,103 +1,131 @@
-Return-Path: <netdev+bounces-114747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD16943CB9
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:41:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64D2E943D3B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DFF5B28073
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:41:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FBCA2862CE
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C94D1CB30B;
-	Thu,  1 Aug 2024 00:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDE11C37AB;
+	Thu,  1 Aug 2024 00:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b3H4//d9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oSxL6Xsf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05ADE1C9EB9;
-	Thu,  1 Aug 2024 00:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298F91C37A1;
+	Thu,  1 Aug 2024 00:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722471487; cv=none; b=kCCx4GYDIpB1e4jGrdeMm+PbEutOj2B/0AHqSS0QI62IYcQl2I3FXFddKIqZVYE8UsrE98D1Kr87z3Iibqj7NIDOtKvzuVTCmsXE0ey/kymmYEZ7VYGeFklOfNy0Wr6KJQiNv85qmzvwdK8ufU2OkgIJnlFdlz9t9/awLcFprzI=
+	t=1722471855; cv=none; b=DjllQifuj9nPg1hMNpU7Z1L12udj50eGcCqGmLUKVGW6h276Ougkr4Osm/6zh7Wkpt0681L1vy8TTghcFspBWz9TXBYhQJnEwr60ITQo1jlV3btqEqYfj7z4x4x11cnOXzrcznqrkm0r9t4pHT3AB7Md9Qb+8+SFlg6fJFmaHXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722471487; c=relaxed/simple;
-	bh=EzrHojQbHayY1rc4Q/zx5hfkqvcJ3zN/wIqGJ5/06xU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NqAl1btv7obiIlVsdKJ5JXUbA93KKIKnrDT6eSmgYeQBNJjt8AYYR5ujV/+LDKZYBu0npLfZn8dPRHeLqF3p+TxWpjdLrwfTuRylf1nHUNwxDYJE1VWHwko0JYTFFlTvsRz+TIRBXizF7kmTZ8EflRrQD2MOW5hUNYRKDz0vxOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b3H4//d9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AuM3/GrAXMsIi+A6go0Z7DzaZf+OKFjJLl1R8WuyiaQ=; b=b3H4//d9d9Sj9u8/iuUX6VS8hJ
-	itlx2ImLOk1GIbcKJysTVZN8bH/N5E8cd0RMt/WLQ0iJ9tjJfuuWT5yAJPd7kIdFGKJajB0vQeOaG
-	LYN5nVREqSuvMjHn4Y5qidUDtq4bnAAilU8lsPp8kHwn18fk3gOrVAV6B7whjF1BYodo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sZJVq-003isF-Os; Thu, 01 Aug 2024 02:17:46 +0200
-Date: Thu, 1 Aug 2024 02:17:46 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Swathi K S <swathi.ks@samsung.com>
-Cc: krzk@kernel.org, robh@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	conor+dt@kernel.org, richardcochran@gmail.com,
-	mcoquelin.stm32@gmail.com, alim.akhtar@samsung.com,
-	linux-fsd@tesla.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, alexandre.torgue@foss.st.com,
-	peppe.cavallaro@st.com, joabreu@synopsys.com, rcsekar@samsung.com,
-	ssiddha@tesla.com, jayati.sahu@samsung.com,
-	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
-	gost.dev@samsung.com
-Subject: Re: [PATCH v4 3/4] arm64: dts: fsd: Add Ethernet support for FSYS0
- Block of FSD SoC
-Message-ID: <62872c29-0032-4ad8-b771-d57469950c75@lunn.ch>
-References: <20240730091648.72322-1-swathi.ks@samsung.com>
- <CGME20240730092907epcas5p1b81eaf13a57535e32e11709602aeee06@epcas5p1.samsung.com>
- <20240730091648.72322-4-swathi.ks@samsung.com>
- <1090d2c2-196f-4635-90a0-c73ded00cead@lunn.ch>
- <00b301dae303$d065caf0$713160d0$@samsung.com>
+	s=arc-20240116; t=1722471855; c=relaxed/simple;
+	bh=EX/ZEti9WyGQseeolRjW5OUiCOr5mK7TgYaQeLPsqw4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LIzoc5Qb81+fDmboEOIebyPzxK9aTvxwqyCneUCBoO/TLOU5PPVaCI7JlIdbIYCZD+Kiv2zSyAumO9ZwyJEVqT9awWmHDORJbnEaogSLjCLpUrRcMUKWJ7M7uKIXH+mjDifruLBU2s8zBYtXtM9SggQjHwtDq6K+NtNPCrmpEKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oSxL6Xsf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E31A0C116B1;
+	Thu,  1 Aug 2024 00:24:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722471854;
+	bh=EX/ZEti9WyGQseeolRjW5OUiCOr5mK7TgYaQeLPsqw4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oSxL6XsfzQE/m7jC2Z5jMmBq3GeX2zEzUMVx0Sw5DO30bZmy3mYtbzuolHG+0eVQ+
+	 uJtJplbZ2WW20Us9D9gfjXcidntAiGujpnWAvLc5bL/TUFlTOCszHqsmR5zDIbbnMO
+	 QUVrF8O3ySqLX0+g0sowNk0Hx7gRPajZG7PYrdeOEQuPfBz10iNCrEe27rGs9aIy3d
+	 TFE+FkXcPKO0V3IJaQB2UBU3gMd/Ug/cmO19UyST3+3kbdUC4Mp4bXqAc7mcJJnskY
+	 /30qNp6mzV2zTduYV6FeLNDRWWf8g1lPbUXOeIDKnFDvca6B7e6BIQZzrnsGv05vwx
+	 FXVqWTwYEHkeA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: yunshui <jiangyunshui@kylinos.cn>,
+	syzbot <syzkaller@googlegroups.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Sasha Levin <sashal@kernel.org>,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 38/83] bpf, net: Use DEV_STAT_INC()
+Date: Wed, 31 Jul 2024 20:17:53 -0400
+Message-ID: <20240801002107.3934037-38-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240801002107.3934037-1-sashal@kernel.org>
+References: <20240801002107.3934037-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00b301dae303$d065caf0$713160d0$@samsung.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.43
+Content-Transfer-Encoding: 8bit
 
-> > What is the interface connected to? A switch?
-> 
-> Hi Andrew, 
-> Thanks for the quick review. AFAIK, this has been discussed earlier. I am
-> providing the links to the same here for quick reference. 
-> 
-> [1] https://lkml.org/lkml/2024/7/29/419
-> [2] https://lkml.org/lkml/2024/6/6/817
-> [3] https://lkml.org/lkml/2024/6/6/507
-> [4] https://lkml.org/lkml/2023/8/14/1341
-> 
-> Please let us know if you have any further queries on this.
+From: yunshui <jiangyunshui@kylinos.cn>
 
-Ah, O.K.
+[ Upstream commit d9cbd8343b010016fcaabc361c37720dcafddcbe ]
 
-It would make sense to add to the commit message something like:
+syzbot/KCSAN reported that races happen when multiple CPUs updating
+dev->stats.tx_error concurrently. Adopt SMP safe DEV_STATS_INC() to
+update the dev->stats fields.
 
-The Ethernet interface is connected to a switch, which Linux is not
-managing.
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: yunshui <jiangyunshui@kylinos.cn>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Link: https://lore.kernel.org/bpf/20240523033520.4029314-1-jiangyunshui@kylinos.cn
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/filter.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Part of the purpose of the commit message is to answer questions
-reviewers might have. This is one such question.
+diff --git a/net/core/filter.c b/net/core/filter.c
+index afe38b8dee024..86aac8ccd855e 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2271,12 +2271,12 @@ static int __bpf_redirect_neigh_v6(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = bpf_out_neigh_v6(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		dev->stats.tx_errors++;
++		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	dev->stats.tx_errors++;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+@@ -2378,12 +2378,12 @@ static int __bpf_redirect_neigh_v4(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = bpf_out_neigh_v4(net, skb, dev, nh);
+ 	if (unlikely(net_xmit_eval(err)))
+-		dev->stats.tx_errors++;
++		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+ 	goto out_xmit;
+ out_drop:
+-	dev->stats.tx_errors++;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ out_xmit:
+ 	return ret;
+-- 
+2.43.0
 
-	  Andrew
 
