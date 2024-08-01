@@ -1,181 +1,320 @@
-Return-Path: <netdev+bounces-115017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDC9E944E3B
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:42:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E45D1944E3D
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A5B1C2202D
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:42:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 148D11C2307B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4E91A57DA;
-	Thu,  1 Aug 2024 14:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8909F1A57F3;
+	Thu,  1 Aug 2024 14:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="YtTMhPnr"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="GWN3WTsr"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2040.outbound.protection.outlook.com [40.107.244.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1E216F0DF;
-	Thu,  1 Aug 2024 14:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722523317; cv=fail; b=UW5ssc7vWvXQUC9imYSzoYNUma/VB1257WGv/wRgFmKQ9xU6zuNAGCoJLP87dvnklbdiwxPkdvARosxp9DZWdr9CbWfqI07yZQQe1nuMu4yetl4e9En6fv0nqCDCFh4HOc/zWTahXWzY4jxykpcKaws30U30n5Cgmxzd1lXZdRM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722523317; c=relaxed/simple;
-	bh=uxC429EKd5Gt/z3hgD0XwruWvhsSVGPRiDqbqlY96TA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=S+uCSrEsMBIz61YfOzmCy/zjEPn41Zu3+LYHozr3GGjYALZT7jL0YlY1Fx0VsrwlSOrprbdJ+KsGEwl5G//Eb4IvUbMEc1ucJW+6jBmi1RA2Dwj09KvjFxRoI66w+5s60CvkGwYrKiNbGIuNOboo9Un2JCgmUCzsvZ+TqEXeqec=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=YtTMhPnr; arc=fail smtp.client-ip=40.107.244.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NTGuVRjhrZWA6IQASyB58ZmhS2rlsh1e57fKsDcUekRBOZETp5wMW0Lxmm+kn0V5lS26XDkOIqTtCTV++khWizKqZAagSfjQd9i5WXO0QnuE7YPP+TMjQEW5iutuEpZnWpG4lYll0ma3BF/8r+veZnfvgYa+R64aI8BzGLqoY2d3xs4rFLRzHd2KzuV3zE7hjQY6CzrnZfeAlmsIuVy7tGXuZhTYP5m7gT89vYz8nidsDHvpldDkq4d6OFTrUaFEnRaGiaLQSJlgOuiFWm5DyWoOJYgS/dLaM2JjA+ACd6jaexRozu7oiWtUWwkgQWYXnqaBcB+RqXxQ+K/v8FlFwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uxC429EKd5Gt/z3hgD0XwruWvhsSVGPRiDqbqlY96TA=;
- b=r2i+Dsc+MGTsyA/eMsAH5JlXe7grOMj2Be7v3iJ0Nkz4XrN/7x34rV9oewzkXXPfXGcWv1xicC/HRKLiBRn9gqvfqpbqN04YXAduRwDlO6gpJ2Jp/sowICjHUvffw75ECvL3ozb0g9BQpgniTT9mZUEorYYwj0BwezlYvzuWdUoW9UkinMWXJjNEWF2HDmlx5ENhDj81cO30qjT+s7PqObEEEVsR8ulil4xPToJDOXMm0PcKcY/nfPSXisGTlx6uB7WF7JMkR0gTLemUATYrgsOefqWq2OI7xzzSEkEPL2m2qR1PV/bm3x4XS3QvHOPX2VRIZn/NjxlxKQvkj3fFLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uxC429EKd5Gt/z3hgD0XwruWvhsSVGPRiDqbqlY96TA=;
- b=YtTMhPnrZsPG7gniYGf5zpfJlurDx9LqiEZWYuflOPAJo4NITXPs+uBGMdCJuYHsAbrdoQpeLgMeStDd2FsH1lv8WtKiy20oQMtbduDqnjOesx+eBWsM6BOLJh4UkBwY+8HhsrnpwqHTMVkbNTt3wq/Pjz2kaogxiAOAZlVi6BeoXMpDKGLh4sec87fVbuNV3I8VFYcvOstXcHR4fIrAVQ8rl8sOKcAe8XhjDmoAsaWZSKPSRNkpQynS2V06i/saMrjvj4WGRPQSLKz3m7TSeg/Wa2hXikqwnkwH/gfuDRTOm00J4Lg/MtV1MAFcZ1nmDchZ6rb4NNp4km5Qns1Bxg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by SA1PR12MB8096.namprd12.prod.outlook.com (2603:10b6:806:326::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Thu, 1 Aug
- 2024 14:41:51 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%4]) with mapi id 15.20.7828.016; Thu, 1 Aug 2024
- 14:41:50 +0000
-Date: Thu, 1 Aug 2024 11:41:49 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	Dan Williams <dan.j.williams@intel.com>, ksummit@lists.linux.dev,
-	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240801144149.GO3371438@nvidia.com>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <20240726142731.GG28621@pendragon.ideasonboard.com>
- <66a43c48cb6cc_200582942d@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <20240728111826.GA30973@pendragon.ideasonboard.com>
- <2024072802-amendable-unwatched-e656@gregkh>
- <2b4f6ef3fc8e9babf3398ed4a301c2e4964b9e4a.camel@HansenPartnership.com>
- <2024072909-stopwatch-quartet-b65c@gregkh>
- <206bf94bb2eb7ca701ffff0d9d45e27a8b8caed3.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <206bf94bb2eb7ca701ffff0d9d45e27a8b8caed3.camel@HansenPartnership.com>
-X-ClientProxiedBy: MN2PR15CA0054.namprd15.prod.outlook.com
- (2603:10b6:208:237::23) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3CD1A4F36
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722523318; cv=none; b=AEcf+8nuD/mXJPfewZcT17YfQfNZP+/262H1Yl0ETZm8BMN215oLWWwS6rFGe9PeMYM/WqqfsaQNGLuNQZv71ZXF/3Js/T78rCwlcsVz11VHgsi1CsVDzO+PxYEh1L4aeYtlsSdCGEMGwfFftZ58syt1HvJR4RXZOPRMHL1I11I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722523318; c=relaxed/simple;
+	bh=16/GAeSuuN2JwBo96jFZyxV8qVrmNNpFhYMA3aWjr5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LPvcAXxcZ2dUgri5sXoUBDlbS+jxhN5xsFM3TfLrE+m9AfRWUJHzPDU+aff/kvy6o6ETRbMlhWy7Bfx37whZaT/7zMYH2shF01Gr5F5lhgeinxOnn5KBphiMk8MYVbbs8HOxtVmWpH8P7g2MiZ5knB1CEbQqZdkcyzm4FGVCigs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=GWN3WTsr; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso44241795e9.1
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 07:41:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722523314; x=1723128114; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FLc/ul0ohkpPmbZ7IgGZ3QwAaHdSid25TPEsSWtGbPI=;
+        b=GWN3WTsr9orRqpZwBrTtO8QfymJ8+2u5ToQADabafDylc7vEpS/zPwm50m5qPPuJ+B
+         3ufiuxhnkbJ55F9uIWPsmxFdVrtshQl74CaqCk8wZynAshabBg1JctPYjnBbx+YRoSZn
+         8GYtDjUQyHFpHyO+oKVUlKpYlBf+v1vJaaNn66jzkhmtOJKoc2V9SsaTI/S+HevxeZM5
+         WjD615mMtXQQiUcHKRnpkm3F1QFTVOmM1hdaB0VlIvIpDEdQWFGWFo4SGFgXC5bd8wKE
+         KSW73LRz/CSVr5ag8ReP15HPJiyf/JTal5G0GmVx3p0Np+70oyq89jLDlDjmVbSKbPq8
+         hEOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722523314; x=1723128114;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FLc/ul0ohkpPmbZ7IgGZ3QwAaHdSid25TPEsSWtGbPI=;
+        b=IYrKWCwx0CrBI5ccWgjgZi6+PfiByhUY+nMo0UBej9EHYig4icgDGbeKfVbM4DX67W
+         CZ6x4athxy0sBROwztKOoMOiMcqVNLk1x7d2REdFH0fkhs0E0s392+DtverX9T2zVJRx
+         YwR6uJzfZpIs5goTj++rzyMZs3/eJziJiSCU+grRLn90kmPr5HDdl6JRm0qVaJnk6gZB
+         EFMSNelEoyRGP0UtsKSKT3fondN1Yf1bgZRJvVRx/7eq3E5VMOUx/YLX0s1i7F3QRrvS
+         p72wpshAt4eYUsv9fKzrOevLbntheTxRvHhtGqPlPbhNdGKqBWxriWwZXKv+fe6TnJ5e
+         K5Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5gEPOP+MoMKQ2az05uEO9ciD1ZiU6vZvkP8bhBAesSYe9ZKeWN9Q4zdp9UQhkLEXcV3+vj5iqDNr5zQTyDIWTrs3ky4Th
+X-Gm-Message-State: AOJu0YyQhgP8p3Dzsh/mD77z2T4VkN0xcGdRfMhEES4AzDmIxyRwrA2S
+	XRHj/RiKWHeZJ7T8Q024KmEm4mRlmuLzoJYB9O7Sb+U1L9cu1qbAkfDnYavyh35hdFAyGXO39NV
+	kSNU=
+X-Google-Smtp-Source: AGHT+IHuOEuhQ6I6aae11ToywUEGk6ZFV0K9HF7ssJx2yqLYV005fRkgulUqLtWnli03toYbDJ9nNw==
+X-Received: by 2002:a05:600c:4ec6:b0:426:6960:34b0 with SMTP id 5b1f17b1804b1-428e6afea7fmr826165e9.14.1722523314296;
+        Thu, 01 Aug 2024 07:41:54 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367c0344sm19724153f8f.2.2024.08.01.07.41.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 07:41:53 -0700 (PDT)
+Date: Thu, 1 Aug 2024 16:41:51 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Piotr Raczynski <piotr.raczynski@intel.com>,
+	michal.swiatkowski@linux.intel.com, jiri@nvidia.com,
+	shayd@nvidia.com, wojciech.drewek@intel.com, horms@kernel.org,
+	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
+	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
+	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: Re: [PATCH net-next v2 05/15] ice: allocate devlink for subfunction
+Message-ID: <Zquer9HA1ErveURV@nanopsycho.orion>
+References: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
+ <20240731221028.965449-6-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|SA1PR12MB8096:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b38317f-6c67-4805-4820-08dcb2381428
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eUKF4C6bdRDQI0Oma2j4yM4Mrl+2QsD1abqIND1s/yfMRoIRFzmqwuGiwmsO?=
- =?us-ascii?Q?2c6H++EUT/BPpS7t5Y/X6RZaVEm9TRo07LC+Q5ctL7dECQOLjO0vZbFlzerJ?=
- =?us-ascii?Q?RQ+mKaHFrhOIfBfT7vzPfk1J47AVQyvCRHZTMYFP8GHnXGpVf2IoO1qTGf6D?=
- =?us-ascii?Q?eZcS3hZL6rduqhm4vtrbJG37kFB39nFuFpGw1cr3P5V8cKxWOH6P0elQky0C?=
- =?us-ascii?Q?qEfSoosteKeLbBB4wIHXOPNE0Z/4TmR1PMymrxIucuI8IExgxE7SUqL+OYU+?=
- =?us-ascii?Q?50afzrVzgdQKfKrnAm+mQ0xTB3khlyDjUGtiBX0lFIvd8oTjll58YRxbFdEf?=
- =?us-ascii?Q?S5KEHL1IVUxfpC6JcH+P2cXsnZ5f2ITNQ/0ZCXo32oh5u2AKRgOXkAXZwVtx?=
- =?us-ascii?Q?CDJNjGc6Fg0PgYdPnyOpEKck1KISxPeIx4GYbegbFw/hxLlGx1JjI/SVmKbC?=
- =?us-ascii?Q?PMaTc1FFo8PW6EOssrynGLy+tbOJxfRy0WjXuJN0ot03yF8LQmYGXwcxLm6k?=
- =?us-ascii?Q?WXp+Pe5WJ5byJqiQ56mV9rAUb7SGE6j2Z1ZF+HqKvkgZ0sYqcw7eBVOBvL1t?=
- =?us-ascii?Q?i7WYUQTqoOzdPc03NRlZ93TJSz6eVpZ4+ae2US2XwcB6kuSbylHxdXRhbIsA?=
- =?us-ascii?Q?qv9bd4LrCYx+G6L1EW4KcN4lTEzyk/9lGBKHcsNZMmRWmXWrS6Oq88xgP7Rb?=
- =?us-ascii?Q?SIUJRB51NdqG3R1r0BMyPnE2nQn57Ul9KccnY7c+UTj8FkqCAxKKXpP+dB3X?=
- =?us-ascii?Q?te7i8IZajSu2URY/pwEin0/6rjGh/ukrqmbNHoIXG6p1vUBjmaF1LRNTrKEv?=
- =?us-ascii?Q?ZXw9C7ULYMbQy0R5jX+jXvYwLWN06vcHQw5O3qEbE+YcLZT8ivW2ctqaWDr5?=
- =?us-ascii?Q?inlSr0RQJLwC8ASz7Fu67x3ym9HOdWIM5V89bXnX+NWk8+EGb8VMfZFcTcb3?=
- =?us-ascii?Q?SiI6dUlbqvNEdAfDmdRS79QNo9y2hGsIXVKC2W8i4urlyCKioPuaDvhF/hdi?=
- =?us-ascii?Q?MEDHCNWnQZqI3v2ukQnoh25veBQLXIDLroMFNavDf57If3/HCsdsZWrspEIu?=
- =?us-ascii?Q?2uaCYDCb4IE59tx/3sk/vuNp4AA+3u0WveLfjh5A6HcTwdtSd+xeRZVNQH7S?=
- =?us-ascii?Q?O2IJcRrl2SbOhTXa+EPA2rdCJwk238ZRjmclV/GODsgaQHLjphqEqqQUe/SS?=
- =?us-ascii?Q?ObdLzwE/rnR4QRQlEPdnpAgEjYp1Z03MGoNq1ubHw1d8Wb8/nbT9LSXDblk0?=
- =?us-ascii?Q?DwuaojV5ID3S/4JLzkaIP61s4CwrHvvZA/JCS/AxQo+55SnlGznL412nBtcF?=
- =?us-ascii?Q?zDKDJeDZdoZzIBe60lTzU/sy40mYd3907g79n4Y3nrryMg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?HkdxrOAuexbRBHeOaM6pfPwii9aOnWWRCwIIdJuexFYtguuQyLoClVGhtWOc?=
- =?us-ascii?Q?0CAvksaJCohkYSweZhyV0wyUbe9zEDyaT6ULUyUpnfJpNRRyxX59Xnw2Kf/u?=
- =?us-ascii?Q?zLe+DeaGnLN6wJ0zYN0GmSCtStSQ3eFOF02OqIZoq5O4qZaXMdCRu4LtJVjV?=
- =?us-ascii?Q?DKagUaLnLc53oYYJgPq/7kBC9hxrTKXb5qeXdMIIzTQo10TZLd7sLS9v1Pt9?=
- =?us-ascii?Q?MpxEVqRYwYDku4Vg0y0VOdSCKLiU3vJRag2RXPnq3ssZ39uTOxa3E+0jZBQk?=
- =?us-ascii?Q?Pj5mPcFUeNE0CnidPKYkVIwgXlI8QX5kn+6GASM5mtNLKD1oYLfbFtpvpCY8?=
- =?us-ascii?Q?RcQpnfAhj42IXdAMZnfWaaIhiPZe7PO5OzdmPopwDNP4lH8qTB0l/0STJhjy?=
- =?us-ascii?Q?jeKmbKhuRLkmaKowzC+BN2KW+SX5yq/5gPhOm0zuErKbievDzgoO3jU1ViiJ?=
- =?us-ascii?Q?DlRiaMHuzy/hR8wGla7+BpQRn2755WHxn5hWp4Rdk17lij4FqObPpt6kU6KJ?=
- =?us-ascii?Q?w8xbhXe9e1GkCuMg4MXdUZhbshn949i/lXnJBHALWTOM+rsyX7lJw2/0GdDw?=
- =?us-ascii?Q?d8b5PCRJA/iNPkM7pu7xBZBV/Nfi/AzsLFRywAUxdczLw3CmEmXYaPrupQCt?=
- =?us-ascii?Q?CMSD5o1L1XOH6Q4iomvySlH1GYS6nTz821j9tWaW58SXB+zJ4n9604FZVGfD?=
- =?us-ascii?Q?+E1CmRKY7d0iqV6r4w8KMUMrxeOCjSKJn9DJyLfXw1K9Tz6FTQtcUtxqjyXO?=
- =?us-ascii?Q?C9X594nXpQpYG/y1R44yuMA7ZRbdH4bKm5nSinl1IKyMhVvqrou9K2UC2cGB?=
- =?us-ascii?Q?e8LEsJoLwjHmkWgH/ImUgcUixrOSpWcZajkSDRui4PLpcPCRhZYuAv9spb+s?=
- =?us-ascii?Q?Wrv38Pgrl8mlQ6VOEiO1MnLrzQkjmwJ4csMQFiy9bMSpgUF6ra2m5GP/sF3g?=
- =?us-ascii?Q?6F9oxRF3RlWKpdwBVXDOMrRbM98Qenp6Mxc6EfGsRQkaZ83VF95fZ0ac1OtQ?=
- =?us-ascii?Q?Utvf8UFFkOt4Jk7eGQCTjSAaQXx8zkUvBMLH3CpFIN7v9VeyTCcTbb7ednq6?=
- =?us-ascii?Q?IQuhIreizN8SD90iT79WVVm0P83otqyQTPUjC1caMiLwlJL+crh2DvqQGXm6?=
- =?us-ascii?Q?aQaXBlt5O3628AEDFuPhhNFUtI7lA1nGSG3mcQHWD1EghfLOT5Qx+FhVYMor?=
- =?us-ascii?Q?fATEtNye1dWASVwKppyT5rfb999zWtrrdM+iIK25N1dxyxod0dqvbwf0W9aR?=
- =?us-ascii?Q?RKhclV8vqears7xuILh7+e4nPZGXMzW7nfbQhhFA/FyN/hDbBDBBip+2PZCf?=
- =?us-ascii?Q?4gIODGd+dxKLzlDWn2kUJUEigYxoDqMGIFXw13X4vogI9gBpOouD7a7Thb7I?=
- =?us-ascii?Q?XcsG2Jo7RizzAX35dpMwppx3f5pJEBG0fxUnktwy6JfUY5i0MggatTTmduHM?=
- =?us-ascii?Q?wYtlmtzG5zrVaVw3aN7bX8Z9duzipttAwofTOsKfwgnmeLrqNH7gB1bK0Ept?=
- =?us-ascii?Q?YVgBdTnzuMIuD9XsHHcrCqWZExplyHbdltyxzDKecPJftynwFQ1J9LPyubaF?=
- =?us-ascii?Q?49+Cyf7v0br+n2CYxn6FHOvU8IQlZ4e31wi2p0d5?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b38317f-6c67-4805-4820-08dcb2381428
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 14:41:50.7046
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BPEc8S9TGYWHyu8V5oI9K8v4SkEoARDOkjpqyfrPC08b62cZTwwM7q5n4DZvDcFg
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8096
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240731221028.965449-6-anthony.l.nguyen@intel.com>
 
-On Wed, Jul 31, 2024 at 08:33:36AM -0400, James Bottomley wrote:
+Thu, Aug 01, 2024 at 12:10:16AM CEST, anthony.l.nguyen@intel.com wrote:
+>From: Piotr Raczynski <piotr.raczynski@intel.com>
+>
+>Make devlink allocation function generic to use it for PF and for SF.
 
-> For the specific issue of discussing fwctl, the Plumbers session would
-> be better because it can likely gather all interested parties.
+Where is this "generic allocation function". I see only
+ice_allocate_sf() which doesn't look like one...
 
-Keep in mind fwctl is already at the end of a long journey of
-conference discussions and talks spanning 3 years back now. It now
-represents the generalized consensus between multiple driver
-maintainers for at least one side of the debate.
 
-There was also a fwctl presentation at netdev conf a few weeks ago.
+>
+>Add function for SF devlink port creation. It will be used in next
+>patch.
 
-In as far as the cross-subsystem NAK, I don't expect more discussion
-to result in any change to people's opinions. RDMA side will continue
-to want access to the shared device FW, and netdev side will continue
-to want to deny access to the shared device FW.
+Second patch, unrelated to the first part. Please split.
 
-Jason
+
+Btw, why you don't have the functions added in the same patch where they
+are used? Why to need to add them in a separate patch?
+
+
+>
+>Create header file for subfunction device. Define subfunction device
+>structure there as it is needed for devlink allocation and port
+>creation.
+>
+>Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
+>Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>Reviewed-by: Simon Horman <horms@kernel.org>
+>Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+>Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+>---
+> .../net/ethernet/intel/ice/devlink/devlink.c  | 32 +++++++++++++++
+> .../net/ethernet/intel/ice/devlink/devlink.h  |  1 +
+> .../ethernet/intel/ice/devlink/devlink_port.c | 41 +++++++++++++++++++
+> .../ethernet/intel/ice/devlink/devlink_port.h |  3 ++
+> drivers/net/ethernet/intel/ice/ice_sf_eth.h   | 21 ++++++++++
+> 5 files changed, 98 insertions(+)
+> create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>index b7eb1b56f2c6..4bd7baebeb92 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+>@@ -10,6 +10,7 @@
+> #include "ice_eswitch.h"
+> #include "ice_fw_update.h"
+> #include "ice_dcb_lib.h"
+>+#include "ice_sf_eth.h"
+> 
+> /* context for devlink info version reporting */
+> struct ice_info_ctx {
+>@@ -1282,6 +1283,8 @@ static const struct devlink_ops ice_devlink_ops = {
+> 	.port_new = ice_devlink_port_new,
+> };
+> 
+>+static const struct devlink_ops ice_sf_devlink_ops;
+>+
+> static int
+> ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
+> 			    struct devlink_param_gset_ctx *ctx)
+>@@ -1548,6 +1551,7 @@ static void ice_devlink_free(void *devlink_ptr)
+>  * Allocate a devlink instance for this device and return the private area as
+>  * the PF structure. The devlink memory is kept track of through devres by
+>  * adding an action to remove it when unwinding.
+>+ *
+
+Leftover?
+
+>  */
+> struct ice_pf *ice_allocate_pf(struct device *dev)
+> {
+>@@ -1564,6 +1568,34 @@ struct ice_pf *ice_allocate_pf(struct device *dev)
+> 	return devlink_priv(devlink);
+> }
+> 
+>+/**
+>+ * ice_allocate_sf - Allocate devlink and return SF structure pointer
+>+ * @dev: the device to allocate for
+>+ * @pf: pointer to the PF structure
+>+ *
+>+ * Allocate a devlink instance for SF.
+>+ *
+>+ * Return: ice_sf_priv pointer to allocated memory or ERR_PTR in case of error
+>+ */
+>+struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf)
+>+{
+>+	struct devlink *devlink;
+>+	int err;
+>+
+>+	devlink = devlink_alloc(&ice_sf_devlink_ops, sizeof(struct ice_sf_priv),
+>+				dev);
+>+	if (!devlink)
+>+		return ERR_PTR(-ENOMEM);
+>+
+>+	err = devl_nested_devlink_set(priv_to_devlink(pf), devlink);
+>+	if (err) {
+>+		devlink_free(devlink);
+>+		return ERR_PTR(err);
+>+	}
+>+
+>+	return devlink_priv(devlink);
+>+}
+>+
+> /**
+>  * ice_devlink_register - Register devlink interface for this PF
+>  * @pf: the PF to register the devlink for.
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.h b/drivers/net/ethernet/intel/ice/devlink/devlink.h
+>index d291c0e2e17b..1af3b0763fbb 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/devlink.h
+>+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.h
+>@@ -5,6 +5,7 @@
+> #define _ICE_DEVLINK_H_
+> 
+> struct ice_pf *ice_allocate_pf(struct device *dev);
+>+struct ice_sf_priv *ice_allocate_sf(struct device *dev, struct ice_pf *pf);
+> 
+> void ice_devlink_register(struct ice_pf *pf);
+> void ice_devlink_unregister(struct ice_pf *pf);
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+>index 5d1fe08e4bab..f06baabd0112 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+>+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
+>@@ -489,6 +489,47 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
+> 	devl_port_unregister(&vf->devlink_port);
+> }
+> 
+>+/**
+>+ * ice_devlink_create_sf_dev_port - Register virtual port for a subfunction
+>+ * @sf_dev: the subfunction device to create a devlink port for
+>+ *
+>+ * Register virtual flavour devlink port for the subfunction auxiliary device
+>+ * created after activating a dynamically added devlink port.
+>+ *
+>+ * Return: zero on success or an error code on failure.
+>+ */
+>+int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev)
+>+{
+>+	struct devlink_port_attrs attrs = {};
+>+	struct ice_dynamic_port *dyn_port;
+>+	struct devlink_port *devlink_port;
+>+	struct devlink *devlink;
+>+	struct ice_vsi *vsi;
+>+
+>+	dyn_port = sf_dev->dyn_port;
+>+	vsi = dyn_port->vsi;
+>+
+>+	devlink_port = &sf_dev->priv->devlink_port;
+>+
+>+	attrs.flavour = DEVLINK_PORT_FLAVOUR_VIRTUAL;
+>+
+>+	devlink_port_attrs_set(devlink_port, &attrs);
+>+	devlink = priv_to_devlink(sf_dev->priv);
+>+
+>+	return devl_port_register(devlink, devlink_port, vsi->idx);
+>+}
+>+
+>+/**
+>+ * ice_devlink_destroy_sf_dev_port - Destroy virtual port for a subfunction
+>+ * @sf_dev: the subfunction device to create a devlink port for
+>+ *
+>+ * Unregisters the virtual port associated with this subfunction.
+>+ */
+>+void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev)
+>+{
+>+	devl_port_unregister(&sf_dev->priv->devlink_port);
+>+}
+>+
+> /**
+>  * ice_dealloc_dynamic_port - Deallocate and remove a dynamic port
+>  * @dyn_port: dynamic port instance to deallocate
+>diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+>index 08ebf56664a5..97b21b58c300 100644
+>--- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+>+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
+>@@ -5,6 +5,7 @@
+> #define _DEVLINK_PORT_H_
+> 
+> #include "../ice.h"
+>+#include "../ice_sf_eth.h"
+> 
+> /**
+>  * struct ice_dynamic_port - Track dynamically added devlink port instance
+>@@ -34,6 +35,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf);
+> void ice_devlink_destroy_vf_port(struct ice_vf *vf);
+> int ice_devlink_create_sf_port(struct ice_dynamic_port *dyn_port);
+> void ice_devlink_destroy_sf_port(struct ice_dynamic_port *dyn_port);
+>+int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev);
+>+void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev);
+> 
+> #define ice_devlink_port_to_dyn(port) \
+> 	container_of(port, struct ice_dynamic_port, devlink_port)
+>diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>new file mode 100644
+>index 000000000000..a08f8b2bceef
+>--- /dev/null
+>+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>@@ -0,0 +1,21 @@
+>+/* SPDX-License-Identifier: GPL-2.0 */
+>+/* Copyright (c) 2024, Intel Corporation. */
+>+
+>+#ifndef _ICE_SF_ETH_H_
+>+#define _ICE_SF_ETH_H_
+>+
+>+#include <linux/auxiliary_bus.h>
+>+#include "ice.h"
+>+
+>+struct ice_sf_dev {
+>+	struct auxiliary_device adev;
+>+	struct ice_dynamic_port *dyn_port;
+>+	struct ice_sf_priv *priv;
+>+};
+>+
+>+struct ice_sf_priv {
+>+	struct ice_sf_dev *dev;
+>+	struct devlink_port devlink_port;
+>+};
+>+
+>+#endif /* _ICE_SF_ETH_H_ */
+>-- 
+>2.42.0
+>
+>
 
