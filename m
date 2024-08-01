@@ -1,113 +1,187 @@
-Return-Path: <netdev+bounces-115048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC86E944F76
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:39:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9433B944F9F
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7A302881CE
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:39:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B951C21E3C
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA721B011B;
-	Thu,  1 Aug 2024 15:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsPw0tTr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952863EA7B;
+	Thu,  1 Aug 2024 15:48:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C4F42049
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 15:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D81719478;
+	Thu,  1 Aug 2024 15:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722526766; cv=none; b=CNcbMmE9wb4x3rAv5uMdwPRdt9caHrRObSj3koB8k64bU8GHsS/9TJJZq29NLM6oemnjOt5I/7QyqPsfHcA1UW+BTXw5ReTRXAzAGXjObAPf7RTeSf1fcSjoOyle4EYT7v5HQylG4uOYqQxGxlfITGpH7Lc2lGZI8/B/SlT1/i4=
+	t=1722527291; cv=none; b=Nr/vZWiTH9983Ip7+X5jXfdy2O+8nf8b+YMl6hOFs5gWoxdrAszRiPwNpJ3QI5HopghbVbXew864yIZuqSOuEX023qft+zvwOfEAbKM7ARIgL02dmXr5JxOXs3gBlo1o6/+DJNlew48jtlWn10VJDH8mnFF0oqISxc/YcKg4tmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722526766; c=relaxed/simple;
-	bh=L/wpsnAwKN7PTZCTYmONMORUMXaXj4L2ZsaC36+CGhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nmbXDTvPmmLs/R74Ng9gIVOeQXe7NQ1FBXbceWbRrwmHOQDUamR4a7lNH1jE0T9DhQV/K9NagM1UUqdz4Lk+hZnZkp/WT1ZI6EISKkt7SR2NaXJGRy8b9pycyTASbFbL+zBHoj3XBt16B1agc+JxwF2rC4JhjMMRxcWEnEeibvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsPw0tTr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7B4EC32786;
-	Thu,  1 Aug 2024 15:39:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722526766;
-	bh=L/wpsnAwKN7PTZCTYmONMORUMXaXj4L2ZsaC36+CGhg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MsPw0tTraUsUSufggt37ouEGGaGrGcsehyymKzhU267qGg59StYpXSeCM4W6oQ6GV
-	 s/rOIaIjrd6B4eFn6KJ4S8J4OqJhhx2tTN94jGgszwHeIcVLF25gyxP5BDV2NvCvC0
-	 CIyEYAzWI+PWhmkYZHImxe5Ob2c7DBQMafiWA9+iqoGNACUJs5C9QPeHgK3TGxNeux
-	 mKu6MhJxhZGgLJXjTz83wheE2UQ232IMahpF5nq8rmKuH8SIx3C4H0uCGzEzJkh3NW
-	 ooyZUZ8NXXoVYPAe9SLRAh9mLIm/LbZaTne2MptzT8CAiXt9JmsDTqRVdFLIaOQn2/
-	 4GR3qsGzsAuLg==
-Date: Thu, 1 Aug 2024 08:39:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 04/12] net-shapers: implement NL set and delete
- operations
-Message-ID: <20240801083924.708c00be@kernel.org>
-In-Reply-To: <144865d1-d1ea-48b7-b4d6-18c4d30603a8@redhat.com>
-References: <cover.1722357745.git.pabeni@redhat.com>
-	<e79b8d955a854772b11b84997c4627794ad160ee.1722357745.git.pabeni@redhat.com>
-	<20240801080012.3bf4a71c@kernel.org>
-	<144865d1-d1ea-48b7-b4d6-18c4d30603a8@redhat.com>
+	s=arc-20240116; t=1722527291; c=relaxed/simple;
+	bh=3b3teYOeMnKN/5gEkex+1dr1uybGX1tQ7lYOcPUoa4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ap3WwKas3hvR6F/w0I6sq38u6fkE7HWrFWyYXMVjBMGHnKHlyhsuJmHDjGhE9ZXbUI1bGatlkIMRJKyhS4H1fsJjx625WUhb0tGo+gswWyxrf/35pr74YN9VFz6sCp788iVgXmUDMv3QeZ2Kai/qt7WEUIXtRKKfy4KhF+uofds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WZYGX1zszzfZ2f;
+	Thu,  1 Aug 2024 23:46:12 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5BED11402CD;
+	Thu,  1 Aug 2024 23:48:03 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 1 Aug 2024 23:47:59 +0800
+Message-ID: <af585335-9844-c9c1-5320-7751e0f3a97c@huawei-partners.com>
+Date: Thu, 1 Aug 2024 18:47:55 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 5/9] selftests/landlock: Test listen on connected
+ socket
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com>
+ <20240801.Ee3Cai7eeD1g@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240801.Ee3Cai7eeD1g@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Thu, 1 Aug 2024 17:25:50 +0200 Paolo Abeni wrote:
-> When deleting a queue-level shaper, the orchestrator is "returning" the 
-> ownership of the queue from the container to the host. If the container 
-> wants to move the queue around e.g. from:
+8/1/2024 5:46 PM, Mickaël Salaün wrote:
+> On Sun, Jul 28, 2024 at 08:25:58AM +0800, Mikhail Ivanov wrote:
+>> Test checks that listen(2) doesn't wrongfully return -EACCES instead
+>> of -EINVAL when trying to listen for an incorrect socket state.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
 > 
-> q1 ----- \
-> q2 - \SP1/ RR1
-> q3 - /        \
->      q4 - \ RR2 -> RR(root)
->      q5 - /    /
->      q6 - \ RR3
->      q7 - /
+> Good to have this test!
 > 
-> to:
+>> ---
+>>   tools/testing/selftests/landlock/net_test.c | 65 +++++++++++++++++++++
+>>   1 file changed, 65 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>> index b6fe9bde205f..a8385f1373f6 100644
+>> --- a/tools/testing/selftests/landlock/net_test.c
+>> +++ b/tools/testing/selftests/landlock/net_test.c
+>> @@ -1644,6 +1644,71 @@ TEST_F(ipv4_tcp, with_fs)
+>>   	EXPECT_EQ(-EACCES, bind_variant(bind_fd, &self->srv1));
+>>   }
+>>   
+>> +TEST_F(ipv4_tcp, listen_on_connected)
 > 
-> q1 ----- \
-> q2 ----- RR1
-> q3 ---- /   \
->      q4 - \ RR2 -> RR(root)
->      q5 - /    /
->      q6 - \ RR3
->      q7 - /
+> We should use the "protocol" fixture and its variants instead to test
+> with different protocols and also without sandboxing (which is crutial).
 > 
-> It can do it with a group() operation:
+> I guess espintcp_listen should use "protocol" too.
 > 
-> group(inputs:[q2,q3],output:[RR1])
+> ipv4_tcp is to run tests that only make sense on an IPv4 socket, but
+> when we test EINVAL, we should make sure Landlock doesn't introduce
+> inconsistencies for other/unsupported protocols.
 
-Isn't that a bit odd? The container was not supposed to know / care
-about RR1's existence. We achieve this with group() by implicitly
-inheriting the egress node if all grouped entities shared one.
+Makes sense, let's use "protocol".
 
-Delete IMO should act here like a "ungroup" operation, meaning that:
- 1) we're deleting SP1, not q1, q2
- 2) inputs go "downstream" instead getting ejected into global level
+> 
+>> +{
+>> +	const struct landlock_ruleset_attr ruleset_attr = {
+>> +		.handled_access_net = ACCESS_ALL,
+>> +	};
+>> +	const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+>> +		.allowed_access = ACCESS_ALL,
+>> +		.port = self->srv0.port,
+>> +	};
+>> +	const struct landlock_net_port_attr tcp_denied_listen_p1 = {
+>> +		.allowed_access = ACCESS_ALL & ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>> +		.port = self->srv1.port,
+>> +	};
+>> +	int ruleset_fd;
+>> +	int bind_fd, status;
+>> +	pid_t child;
+>> +
+>> +	ruleset_fd =
+>> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>> +	ASSERT_LE(0, ruleset_fd);
+>> +
+>> +	/* Allows all actions for the first port. */
+>> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> +				       &tcp_not_restricted_p0, 0));
+>> +
+>> +	/* Deny listen for the second port. */
+> 
+> nit: Denies listening
 
-Also, in the first example from the cover letter we "set" a shaper on
-the queue, it feels a little ambiguous whether "delete queue" is
-purely clearing such per-queue shaping, or also has implications 
-for the hierarchy.
+will be fixed
 
-Coincidentally, others may disagree, but I'd point to tests in patch 
-8 for examples of how the thing works, instead the cover letter samples.
+> 
+>> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>> +				       &tcp_denied_listen_p1, 0));
+>> +
+>> +	enforce_ruleset(_metadata, ruleset_fd);
+>> +	EXPECT_EQ(0, close(ruleset_fd));
+>> +
+>> +	/* Init listening socket. */
+> 
+> nit: Initializes
 
-> That will implicitly also delete SP1.
+will be fixed
+
+> 
+>> +	bind_fd = socket_variant(&self->srv0);
+>> +	ASSERT_LE(0, bind_fd);
+>> +	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+>> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
+>> +
+>> +	child = fork();
+>> +	ASSERT_LE(0, child);
+>> +	if (child == 0) {
+>> +		int connect_fd;
+>> +
+>> +		/* Closes listening socket for the child. */
+>> +		EXPECT_EQ(0, close(bind_fd));
+>> +
+>> +		connect_fd = socket_variant(&self->srv1);
+>> +		ASSERT_LE(0, connect_fd);
+>> +		EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
+>> +
+>> +		/* Tries to listen on connected socket. */
+>> +		EXPECT_EQ(-EINVAL, listen_variant(connect_fd, backlog));
+>> +
+>> +		EXPECT_EQ(0, close(connect_fd));
+>> +		_exit(_metadata->exit_code);
+>> +		return;
+>> +	}
+>> +
+>> +	EXPECT_EQ(child, waitpid(child, &status, 0));
+>> +	EXPECT_EQ(1, WIFEXITED(status));
+>> +	EXPECT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
+>> +
+>> +	EXPECT_EQ(0, close(bind_fd));
+>> +}
+>> +
+>>   FIXTURE(port_specific)
+>>   {
+>>   	struct service_fixture srv0;
+>> -- 
+>> 2.34.1
+>>
+>>
 
