@@ -1,163 +1,121 @@
-Return-Path: <netdev+bounces-115137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F3C945467
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:02:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC6D9454AB
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508461C21C8A
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 22:02:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C529E1C22C88
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 22:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF52514A4DE;
-	Thu,  1 Aug 2024 22:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2616014BFBF;
+	Thu,  1 Aug 2024 22:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/QYKaR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloud48395.mywhc.ca (cloud48395.mywhc.ca [173.209.37.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBE914AA9;
-	Thu,  1 Aug 2024 22:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.209.37.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42171D696;
+	Thu,  1 Aug 2024 22:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722549773; cv=none; b=YUDqTlcfZZ8KbF9UY1iF4aFDr3xCRBI0TDvDvYrDCb3NrSdjx4L9H08xLgwP+B4AUn2p2fKWqis75twfMKOGPgL5EXIa/prGHge4JZlQeLY65byc3ZgVI4o0bIcb2yFKvY+zeEUbYY8GWFg4U4lNdLQmkC7260xRdkx+B1dvthg=
+	t=1722552693; cv=none; b=vAY5dV8j69KCouDFYLwKAqxF9YH6pqo47u5DH3k2vVNHHM+Xc89wmXeFEW7XWh3sFNk4LDNJqamHvgHf2o10xhxB5dIgwT6mCDAopJRYSaLWf8UkcVUEQZwvAjzBVijpIeXFjYGc7glRhQ0icQmDfj6LPS61YK8491m3EW2dV7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722549773; c=relaxed/simple;
-	bh=l3ySH+k8H2oB483V9c0B34KU0g3LpC/pefj6/z+V7bo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=c8KAqnlmqBCcpY9+clQJ6ujoBn6YRFS6vc5aUL5tynC4yJHwhlEgqV+n1vQYokwVDwKLftd+D/yHIizxCquxTfKV3Czuu1SI9NXng+PkdYOEdkN2auNzh1olkjNJsE6F/mxnzQuL0TV9Ton6OMd9cf+2RsGGR13816KmcM5hYvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com; spf=pass smtp.mailfrom=trillion01.com; arc=none smtp.client-ip=173.209.37.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trillion01.com
-Received: from [45.44.224.220] (port=48282 helo=[192.168.1.177])
-	by cloud48395.mywhc.ca with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <olivier@trillion01.com>)
-	id 1sZdso-0001tj-1R;
-	Thu, 01 Aug 2024 18:02:50 -0400
-Message-ID: <4dbbd36aa7ecd1ce7a6289600b5655563e4a5a74.camel@trillion01.com>
-Subject: Re: io_uring NAPI busy poll RCU is causing 50 context
- switches/second to my sqpoll thread
-From: Olivier Langlois <olivier@trillion01.com>
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Date: Thu, 01 Aug 2024 18:02:49 -0400
-In-Reply-To: <43c27aa1-d955-4375-8d96-cd4201aecf50@gmail.com>
-References: <b1ad0ab3a7e70b72aa73b0b7cab83273358b2e1d.camel@trillion01.com>
-	 <00918946-253e-43c9-a635-c91d870407b7@gmail.com>
-	 <bcd3b198697e16059ec69566251ad23c4c78e7a7.camel@trillion01.com>
-	 <43c27aa1-d955-4375-8d96-cd4201aecf50@gmail.com>
-Autocrypt: addr=olivier@trillion01.com; prefer-encrypt=mutual;
- keydata=mQINBFYd0ycBEAC53xedP1NExPwtBnDkVuMZgRiLmWoQQ8U7vEwt6HVGSsMRHx9smD76i
- 5rO/iCT6tDIpZoyJsTOh1h2NTn6ZkoFSn9lNOJksE77/n7HNaNxiBfvZHsuNuI53CkYFix9JhzP3t
- g5nV/401re30kRfA8OPivpnj6mZhU/9RTwjbVPPb8dPlm2gFLXwGPeDITgSRs+KJ0mM37fW8EatJs
- 0a8J1Nk8wBvT7ce+S2lOrxDItra9pW3ukze7LMirwvdMRC5bdlw2Lz03b5NrOUq+Wxv7szn5Xr9f/
- HdaCH7baWNAO6H/O5LbJ3zndewokEmKk+oCIcXjaH0U6QK5gJoO+3Yt5dcTo92Vm3VMxzK2NPFXgp
- La7lR9Ei0hzQ0zptyFFyftt9uV71kMHldaQaSfUTsu9dJbnS2kI/j+F2S1q6dgKi3DEm0ZRGvjsSG
- rkgPJ5T16GI1cS2iQntawdr0A1vfXiB9xZ1SMGxL/l6js9BVlIx/CBGOJ4L190QmxJlcAZ2VnQzrl
- ramRUv01xb00IPJ5TBft5IJ+SY0FnY9pIERIl6w9khwLt/oGuKNmUHmzJGYoJHYfh72Mm8RQ1R/JS
- o6v85ULBGdEC3pQq1j//OPyH3egiXIwFq6BtULH5CvsxQkSqgj1MpjwfgVJ8VbjNwqwBXHjooEORj
- vFQqWQki6By3QARAQABtDJPbGl2aWVyIExhbmdsb2lzIChNeSBrZXkpIDxvbGl2aWVyQHRyaWxsaW
- 9uMDEuY29tPokCNwQTAQgAIQUCVh3TJwIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgAAKCRBlaka
- GGsWHEI1AD/9sbj+vnFU29WemVqB4iW+9RrHIcbXI4Jg8WaffTQ8KvVeCJ4otzgVT2nHC2A82t4PF
- 0tp21Ez17CKDNilMvOt8zq6ZHx36CPjoqUVjAdozOiBDpC4qB6ZKYn+gqSENO4hqmmaOW57wT9vII
- v6mtHmnFvgpOEJl6wbs8ArHDt0BLSjc8QQfvBhoKoWs+ijQTyvFGlQl0oWxEbUkR1J3gdft9Oj9xQ
- G4OFo73WaSEK/L9IalU2ulCBC+ucSP9McoDxy1i1u8HUDrV5wBY1zafc9zVBcMNH6+ZjxwQmZXqtz
- ATzB3RbSFHAdmvxl8q6MeS2yx7Atk0CXgW9z5k2KeuZhz5rVV5A+D19SSGzW11uYXsibZx/Wjr9xB
- KHB6U7qh5sRHaQS191NPonKcsXXAziR+vxwQTP7ZKfy+g5N/e6uivoUnQrl9uvUDDPXEpwVNSoVws
- Vn4tNyrGEdN11pHDbH5fSGzdpbY8+yczUoxMmsEQe/fpVwRBZUqafRn2TVUhV0qqzsUuQcTNw1zIZ
- JgvkqrHgd4ivd2b1bXBczmu/wMGpEnF6cWzSQDiwC1NF3i+gHCuD8IX1ujThWtzXsn0VtrMkrRCbn
- ponVQ6HcbRYYXPuK0HRRjCSuAKo5porVONepiOSmu0FBrpGqBkpBtLrzKXoi1yt/7a/wGdMcVhYGg
- vA==
-Organization: Trillion01 Inc
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 
+	s=arc-20240116; t=1722552693; c=relaxed/simple;
+	bh=naBe7n9SWJKcD3/+j3xRwKxcVyO8dX0yhYhJsoGkREM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=URBP9pCC9LVyRKTGcnA3jTfGX/IdGqen7u2Tkam1jgepSZLZu19zytfbx0Lyf7INuxSri2E0UMPAyUkbfy4iM6KL8FS/jYURoz+yNxdvuxNo1n1ibk+GaKIDVS5OjPDaNjMhGJLN9dSI48Mlj4C5AK9MclxdWhHHD0qJOn7VDBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d/QYKaR1; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2cb5e0b020eso5768656a91.2;
+        Thu, 01 Aug 2024 15:51:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722552691; x=1723157491; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=e19UYp+ljud6ZcskAvvX1iEQ4cPZmGuXxIiRolrtGhQ=;
+        b=d/QYKaR1xrcj0jS3LU9mCoyBSwGYVmIdX0YJ245RLFmPjzNKMlTgLKOUlYpMIoZTU8
+         fQ9IFvqF4YYmbEWJKRF+VvUIc/iMPUaVjSUlZtl//aHIFQ8zkTzwjZ9huabdB9H93TyN
+         NiCIVFouygxcaHXOi6tgOb10E3nLnM8hEzIlA3zWdH4ZlvgYSCUbsqYh+2rc2zvtBpPV
+         4eHym8a/OmrfNzbppcPsEh7N06wmxTEgqm7ZBL7yQmq1my5PDwTbPrG8OztwebaiBlNd
+         1reZJDeoMoIlAIUVgq2cIGKosze4GNg71NI5B8w+nSKJC4jO7gGtCr/pizJuA05enAJZ
+         yc2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722552691; x=1723157491;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e19UYp+ljud6ZcskAvvX1iEQ4cPZmGuXxIiRolrtGhQ=;
+        b=I/QKfB+4zpbcxbWUU0QCJoswOxemWYPbei1eJZfLVyeKTECEFnkTPFinv0jDcAkGp/
+         CzpNMxCg4THME2GxFPefoAhe5wQzKKN43VIve7hKMeLYLTPqTC/irjeaQzyoleKfu+UK
+         /UEQyjruxTL2Sbno2yOA0T/nzao794RwgZ26m4kCoPTKPhl7yR/hriKIIK93wsZW8azr
+         KgfybjqlCOU30G3zEBHTKhjU6klBLBW6Y1WYM8jVwxkb5hjxg83LBqOip2OiqmCkV1yb
+         Xuw+uueS3L9aOjz+lsk5jx1A8KA9T+OBGThhzU7hB4ARgYK+4oBa4MC/9IF/JJgAN3Ku
+         SBwg==
+X-Forwarded-Encrypted: i=1; AJvYcCWzmzbyc9qVGAtJzrxLE/LJVFtBiVNqIsEiayx38GD4l0zt1USnDQKcCYZIO9oTQqdmKQQl7ILztDZLlDeq/yJ6zq+E65NibdFydvkPA57z6NarCpOQisBatYrfZvbx2FY0xooe
+X-Gm-Message-State: AOJu0Yz2h0mX0GhKIgqP2Offl9GmfU3nNfH9c5ZHsbI9T7F7wgHYRZqW
+	Yehx82HRxKA3qeEuLx4lfJDvQ9YyzLSrZ3zZsvzLe5Ynz6UfprTNxcYTi2iYLhMWbxIT8iG8ihf
+	VmXaeno2+7YomULMXyRvT0E5KgoM=
+X-Google-Smtp-Source: AGHT+IHj+u6/jrC8H8jYf5x0OWqnjFHLFuNJN2Tbq5H4mnsv8oxnqHcVitBFze1pwXVeMgljA8ptmmrXdabe+KfrNZs=
+X-Received: by 2002:a17:90b:4a08:b0:2c9:9fcd:aa51 with SMTP id
+ 98e67ed59e1d1-2cff9419a1fmr2105089a91.5.1722552690859; Thu, 01 Aug 2024
+ 15:51:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cloud48395.mywhc.ca
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - trillion01.com
-X-Get-Message-Sender-Via: cloud48395.mywhc.ca: authenticated_id: olivier@trillion01.com
-X-Authenticated-Sender: cloud48395.mywhc.ca: olivier@trillion01.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+References: <20240801111842.50031-1-aha310510@gmail.com> <20240801072842.69b0cc57@kernel.org>
+In-Reply-To: <20240801072842.69b0cc57@kernel.org>
+From: Jeongjun Park <aha310510@gmail.com>
+Date: Fri, 2 Aug 2024 07:51:19 +0900
+Message-ID: <CAO9qdTHJKMzOTRJB_N1VPjh2=Z=qLkpzu8eL5mcAr6hnFfiHXQ@mail.gmail.com>
+Subject: Re: [PATCH net] team: fix possible deadlock in team_port_change_check
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 2024-07-31 at 01:33 +0100, Pavel Begunkov wrote:
->=20
-> You're seeing something that doesn't make much sense to me, and we
-> need
-> to understand what that is. There might be a bug _somewhere_, that's
-> always a possibility, but before saying that let's get a bit more
-> data.
->=20
-> While the app is working, can you grab a profile and run mpstat for
-> the
-> CPU on which you have the SQPOLL task?
->=20
-> perf record -g -C <CPU number> --all-kernel &
-> mpstat -u -P <CPU number> 5 10 &
->=20
-> And then as usual, time it so that you have some activity going on,
-> mpstat interval may need adjustments, and perf report it as before.
->=20
-First thing first.
+Jakub Kicinski wrote:
+>
+> On Thu,  1 Aug 2024 20:18:42 +0900 Jeongjun Park wrote:
+> >       struct team *team = port->team;
+> > +     bool flag = true;
+> >
+> > -     mutex_lock(&team->lock);
+> > +     if (mutex_is_locked(&team->lock)){
+> > +             unsigned long owner, curr = (unsigned long)current;
+> > +             owner = atomic_long_read(&team->lock.owner);
+> > +             if (owner != curr)
+> > +                     mutex_lock(&team->lock);
+> > +             else
+> > +                     flag = false;
+> > +     }
+> > +     else{
+> > +             mutex_lock(&team->lock);
+> > +     }
+> >       __team_port_change_check(port, linkup);
+> > -     mutex_unlock(&team->lock);
+> > +     if (flag)
+> > +             mutex_unlock(&team->lock);
+>
+> You didn't even run this thru checkpatch, let alone the fact that its
+> reimplementing nested locks (or trying to) :(
+>
+> Some of the syzbot reports are not fixed because they are either hard
+> or because there is a long standing disagreement on how to solve them.
+> Please keep that in mind.
 
-The other day, I did put my foot in my mouth by saying the NAPI busy
-poll was adding 50 context switches/second.
+Okay, but I have a question. Is it true that team devices can also be
+protected through rtnl? As far as I know, rtnl only protects net_device,
+so I didn't think about removing the lock for team->lock.
 
-I was responsible for that behavior with the rcu_nocb_poll boot kernel
-param. I have removed the option and the context switches went away...
-
-I am clearly outside my comfort zone with this project, I am trying
-things without fully understand what I am doing and I am making errors
-and stuff that is incorrect.
-
-On top of that, before mentioning io_uring RCU usage, I did not realize
-that net/core was already massively using RCU, including in
-napi_busy_poll, therefore, that io_uring is using rcu before calling
-napi_busy_poll, the point does seem very moot.
-
-this is what I did the other day and I wanted to apologize to have said
-something incorrect.
-
-that being said, it does not remove the possible merit of what I did
-propose.
-
-I really think that the current io_uring implemention of the napi
-device tracking strategy is overkill for a lot of scenarios...
-
-if some sort of abstract interface like a mini struct net_device_ops
-with 3-4 function pointers where the user could select between the
-standard dynamic tracking or a manual lightweight tracking was present,
-that would be very cool... so cool...
-
-I am definitely interested in running the profiler tools that you are
-proposing... Most of my problems are resolved...
-
-- I got rid of 99.9% if the NET_RX_SOFTIRQ
-- I have reduced significantly the number of NET_TX_SOFTIRQ
-  https://github.com/amzn/amzn-drivers/issues/316
-- No more rcu context switches
-- CPU2 is now nohz_full all the time
-- CPU1 local timer interrupt is raised once every 2-3 seconds for an
-unknown origin. Paul E. McKenney did offer me his assistance on this
-issue
-https://lore.kernel.org/rcu/367dc07b740637f2ce0298c8f19f8aec0bdec123.camel@=
-trillion01.com/t/#u
-
-I am going to give perf record a second chance... but just keep in
-mind, that it is not because it is not recording much, it is not
-because nothing is happening. if perf relies on interrupts to properly
-operate, there is close to 0 on my nohz_full CPU...
-
-thx a lot for your help Pavel!
-
+Regards,
+Jeongjun Park
 
