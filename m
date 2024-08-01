@@ -1,82 +1,58 @@
-Return-Path: <netdev+bounces-114978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3915944D67
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:47:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C71FB944D70
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:49:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F94A282CAC
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:47:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FE8AB24BF5
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F824194AE6;
-	Thu,  1 Aug 2024 13:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F078A1A255A;
+	Thu,  1 Aug 2024 13:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jeNigTw8"
+	dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b="l761aTSQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from kozue.soulik.info (kozue.soulik.info [108.61.200.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EDA1A0711;
-	Thu,  1 Aug 2024 13:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CEB189B98;
+	Thu,  1 Aug 2024 13:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.61.200.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722520061; cv=none; b=F7Oga23v3Bf/7G4nM/1U36QaQcHXnChmAWG805zjZZZzOhczGxlbekDEFkQDa8Xvhsrkh+2CyGcOIJmUKPhFtZ3ZPbOqnfONXeDEsUCZAMvS4+0Rxdl1BhjVwh1TjVAsl7HTIbr2xbgjq4lVWJDc1CrJFltLQOVF3fPCcSzrpT4=
+	t=1722520189; cv=none; b=j3HqKJVt6v49bS6VgxfnVZydkoqmZFcb9OtVHAwi0Q3ZziZ3hUSl9z5uzSxt+tCq7sQJMeSZdbiMEJZFidYPKOadaSfADnZvcKprTteu35E4Wn0QkIUpSiFvxx43sd3Eu+sg7+VBs6M5ouCWTRag09KevCl2pAAt6CPoVE9Cezw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722520061; c=relaxed/simple;
-	bh=vjGy2uwfzEZ97a+3aof+3SKng4NXWemh1/vsxGXJlzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GM2XMW37S6gswVLdwK8jilMvLjGrioKJkTYs/hfEobmOwa/UtJiy1yjIaeqPpq4J+M48M1fv7m3TJztmyfGz9mzCxPKqSFpMaY4kzKLyC+X9oVeHQthoKBEoKvLbC4rS/V7iDb1SiQXnfGfrcVmXHCERjZ3EIKcYvp5J1ZQDSa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jeNigTw8; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fec34f94abso54591965ad.2;
-        Thu, 01 Aug 2024 06:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722520059; x=1723124859; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6oyUrXiQ5KRnBrLzW15m3SL4jVMTbgLQ6TAxlm3G9Hc=;
-        b=jeNigTw8W2C/hBosgxV7JWLMspnKat8okY3ZseaD/QyxTTXuyrX7JmIBT3PjIbPsES
-         4AnANsgIbA5+mXk7i6f+chQKUlBwAUYPkQq1jb/SEx0LUF5ho7D53GE3STVP1WRIwSNN
-         lPB8jElp9EHNZe0j9viD5m9FihDrva3JeO9rghTrfSDKv4I8+8t7VZm8bzmEzFVT6MV+
-         mzqPpSdCj0TxgIscQu71LhvmTjwU5/hwX5ca8xBXpaO6H9p+v7ronqkOZTynEAW5Shmq
-         iCx+UoXif/a09IeKhyagN2jC09IWW/GvljX+XJaojQw7zrvdwBIKIaKZLvoeTpJhelyv
-         DJzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722520059; x=1723124859;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6oyUrXiQ5KRnBrLzW15m3SL4jVMTbgLQ6TAxlm3G9Hc=;
-        b=mtGZb2bX/Aah1I2+snErGpcLB1kLhR5tBhgUpDog+VtJiw7BD80hqRC6Bvy0dyXP6h
-         RCpm0Byeo99tYFnWjQlZrmHQBTFzx+LQAVJeo49qYYyvaXdArkHNBBSu3Zjw/FK+HzgH
-         BCdfUu62Tmb0fipqcpmQlc1jYG7Eo3MHDRT2C/ujcWidrKNoZGmWJZWsBUucHIquYfGR
-         LuFlC+bRfH9czFwcJfVyCMy/hfE3VTYvHy1mX/7gZ61ZcWtkfd/CT0Ev4Ynnj4DLJqvt
-         c5etlrjoCRXGeBGQ8KYpDrszolZMgYZKZ7CeicnDgz9+8IZZ9Xd16vApJmEPEHxaRZgf
-         QQGg==
-X-Forwarded-Encrypted: i=1; AJvYcCV90A+Dl5og9QXPFtjFjmgxAQwj8xUuoWRw3QpeTIOPVqpfLU02kpZ2ajIDeMc0HESqcZa3IXfwoqvYgToQG8htnBJivpzFGIUePk8p
-X-Gm-Message-State: AOJu0YzIbGf2vJzNc3Ms5gUsjLIeHJ50GReDja4LSWOEdFAr3NW3WIfC
-	UhOTetpzhfoiO8a8Pf9Eq5us8f+FCLTk4QWvBiG0v/ZhzH8+Ndg/
-X-Google-Smtp-Source: AGHT+IFfeAhrEmDM6jOnfL5ofrZr5WaVDCLtKFEqLNQlj0uawfZtGGNywhT+ed6VYVqPvDXKX6TqSQ==
-X-Received: by 2002:a17:90a:8d18:b0:2c9:6278:27c9 with SMTP id 98e67ed59e1d1-2cff95405a9mr245888a91.38.1722520059292;
-        Thu, 01 Aug 2024 06:47:39 -0700 (PDT)
-Received: from mythos-cloud.. ([211.46.174.173])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cfdc4aa0c2sm3302534a91.46.2024.08.01.06.47.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 06:47:38 -0700 (PDT)
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: davem@davemloft.net,
+	s=arc-20240116; t=1722520189; c=relaxed/simple;
+	bh=GsoCn77fV7d9tlKa+WgxxiX5PGRunJ1LESJ7+Epwvbo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a4ZuVGFLdo8nh7FU8sKoezIocXcfUMCJeZkxBxXkoq3JZRqRHAE+4uhIGAmFpd4RXQo/+oiq+/klyRkuGFdf28J0KKh7GnE9fuQ1VGUkp/93xP566zBSatz46rly8Jl31FJtJ+cXmWrBTb1gSHrPthPr5LJ4UEVKrCx/R9UK5ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info; spf=pass smtp.mailfrom=soulik.info; dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b=l761aTSQ; arc=none smtp.client-ip=108.61.200.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soulik.info
+Received: from ritsuko.sh.sumomo.pri (unknown [10.0.12.132])
+	by kozue.soulik.info (Postfix) with ESMTPSA id 6A0912FE3AC;
+	Thu,  1 Aug 2024 22:50:12 +0900 (JST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 kozue.soulik.info 6A0912FE3AC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soulik.info; s=mail;
+	t=1722520212; bh=lmDvIp8wVJ+pUhzHi6TDXIwavE0pwN92FStcwMmAvKw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=l761aTSQV1X3Ej/aDWEAykeF/3xunoHEBX8bizYUBgLoXlpRlwtUcK0CL9yvzH+QH
+	 TAp9B/qNDHJ0OEkypTJc3A0VcxOHWJBhPks4R6vNuhwmsD74rRxArleCxWACJQCYTN
+	 cwu2GXSL3zQYV3yd6tK6H403hY+kD1koc/9iYHts=
+From: Randy Li <ayaka@soulik.info>
+To: netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
+	pabeni@redhat.com,
 	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	Moon Yeounsu <yyyynoom@gmail.com>
-Subject: [PATCH] e1000e: use ip_hdrlen() instead of bit shift
-Date: Thu,  1 Aug 2024 22:47:10 +0900
-Message-ID: <20240801134709.1737190-2-yyyynoom@gmail.com>
+	Randy Li <ayaka@soulik.info>
+Subject: [PATCH net-next v2] net: tuntap: add ioctl() TUNGETQUEUEINDEX to fetch queue index
+Date: Thu,  1 Aug 2024 21:49:21 +0800
+Message-ID: <20240801134929.206678-1-ayaka@soulik.info>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,27 +62,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There's no reason to use bit shift to find the UDP header.
-It's not intuitive and it reinvents well-defined functions.
+We need the queue index in qdisc mapping rule. There is no way to
+fetch that.
 
-Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+Changelog:
+v2:
+Fixes the flow when the queue is disabled in the tap type device.
+Put this ioctl() under the lock protection for the tun device.
+
+Signed-off-by: Randy Li <ayaka@soulik.info>
 ---
- drivers/net/ethernet/intel/e1000e/netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/tap.c           | 10 ++++++++++
+ drivers/net/tun.c           | 13 +++++++++++++
+ include/uapi/linux/if_tun.h |  1 +
+ 3 files changed, 24 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 360ee26557f7..07c4cf84bdf3 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -5731,7 +5731,7 @@ static int e1000_transfer_dhcp_info(struct e1000_adapter *adapter,
- 		if (ip->protocol != IPPROTO_UDP)
- 			return 0;
+diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+index 77574f7a3bd4..bbd717cf78a5 100644
+--- a/drivers/net/tap.c
++++ b/drivers/net/tap.c
+@@ -1120,6 +1120,16 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
+ 		rtnl_unlock();
+ 		return ret;
  
--		udp = (struct udphdr *)((u8 *)ip + (ip->ihl << 2));
-+		udp = (struct udphdr *)((u8 *)ip + ip_hdrlen(skb));
- 		if (ntohs(udp->dest) != 67)
- 			return 0;
++	case TUNGETQUEUEINDEX:
++		rtnl_lock();
++		if (!q->enabled)
++			ret = -EINVAL;
++		else
++			ret = put_user(q->queue_index, up);
++
++		rtnl_unlock();
++		return ret;
++
+ 	case SIOCGIFHWADDR:
+ 		rtnl_lock();
+ 		tap = tap_get_tap_dev(q);
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 1d06c560c5e6..05fa9727721e 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -3151,6 +3151,19 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 		tfile->ifindex = ifindex;
+ 		goto unlock;
+ 	}
++	if (cmd == TUNGETQUEUEINDEX) {
++		ret = -EINVAL;
++		if (tfile->detached)
++			goto unlock;
++
++		ret = -EFAULT;
++		if(put_user(tfile->queue_index, (unsigned int __user*)argp))
++			goto unlock;
++
++		ret = 0;
++		goto unlock;
++	}
++
  
+ 	ret = -EBADFD;
+ 	if (!tun)
+diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+index 287cdc81c939..2668ca3b06a5 100644
+--- a/include/uapi/linux/if_tun.h
++++ b/include/uapi/linux/if_tun.h
+@@ -61,6 +61,7 @@
+ #define TUNSETFILTEREBPF _IOR('T', 225, int)
+ #define TUNSETCARRIER _IOW('T', 226, int)
+ #define TUNGETDEVNETNS _IO('T', 227)
++#define TUNGETQUEUEINDEX _IOR('T', 228, unsigned int)
+ 
+ /* TUNSETIFF ifr flags */
+ #define IFF_TUN		0x0001
 -- 
 2.45.2
 
