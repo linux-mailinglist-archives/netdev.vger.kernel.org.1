@@ -1,106 +1,100 @@
-Return-Path: <netdev+bounces-114953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A71A944CD0
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:13:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00211944CFC
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:17:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C3941C25DA0
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:13:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3122A1C22953
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FEE1A38C5;
-	Thu,  1 Aug 2024 13:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167071A4F12;
+	Thu,  1 Aug 2024 13:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="wpw4JzMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from forward204b.mail.yandex.net (forward204b.mail.yandex.net [178.154.239.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D0A19F487;
-	Thu,  1 Aug 2024 13:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F141A4F07
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 13:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722517576; cv=none; b=fDoRKOsVRwSFPh4x7cTY1//uTcUxbc7nIBxEEMW3CAprPqz9kTkznI3XrP60ePaV4WbyD1ey6CRidxqdY1nntYYUKxzaxeVdyMa51DGeUlA5wAA8XgxT5kZMxDp/tGLtT5bvSIxnlmkKCbXy+pyoYnYICCn/3f5zn7Lj0e9EI4k=
+	t=1722518149; cv=none; b=e20bGpyD5vUeKYZqnNfVt3RbZNRsOwZDlrv9J5t5EEoNNsmOyN/81VLFOaF2h2d5Oeu9ATbnSZqselE9A3mM90GraxfZV9a787jYxCZjLQ57mS3sVLj0cz4ydxdjl/eL1CljfKBa4CHNo3niGdgG1l4/ZTx7Iwfr0Z57/jvMEfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722517576; c=relaxed/simple;
-	bh=SH7rwzo4ZFJASqSKifqUGkj+ROVLOCz9teszX56+Tto=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=sIedd8IHUB0qVFslmbvlAsyKShSBoZAy2osuqNmQ06gDG4xHXKIScGgW3NHRd+V/gtYoYHdli2wZ12CDAUJBVJYpHqkxwP0bgFRNZ88nVIIWwl5HtQbB6oluetMZXnmOhXPxcPKh4QdHodisgS4LyxfC2yLUkt9w++kYucCmhg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WZTc85ymDzyPTd;
-	Thu,  1 Aug 2024 21:01:12 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5E90918009B;
-	Thu,  1 Aug 2024 21:06:12 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 1 Aug 2024 21:06:11 +0800
-Message-ID: <199c085b-a2ed-4d76-bdc6-0f8dde80036d@huawei.com>
-Date: Thu, 1 Aug 2024 21:06:10 +0800
+	s=arc-20240116; t=1722518149; c=relaxed/simple;
+	bh=jInI+s31H3/r2Hs1MBedgn+hhit41r4WOMqlxC9b/nQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dUPy+uBovfgy/CAvzJaq2vwzUb7CFNhItoIW+NLQiPazUjD3xNUhmFeGQBd8FS3gQamse6ybpWcQqKdszHK1vePvpES0eut+QrJUgDCvOWxFyKsZUThg9UgicE1bKbbjq1wAO5M8K9EDxyCs9oNKQigU+dEbq03cBciP+dmbr/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=wpw4JzMD; arc=none smtp.client-ip=178.154.239.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d102])
+	by forward204b.mail.yandex.net (Yandex) with ESMTPS id 0221167769
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 16:09:15 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-19.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-19.sas.yp-c.yandex.net [IPv6:2a02:6b8:c24:3b2:0:640:ff71:0])
+	by forward102b.mail.yandex.net (Yandex) with ESMTPS id 64B4460BA4;
+	Thu,  1 Aug 2024 16:09:06 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-19.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 49XVvx4h5mI0-7kfw8ghU;
+	Thu, 01 Aug 2024 16:09:05 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1722517745; bh=Erl7nRFuugq5apBZgvurtc7uTu2D7wcJ95SgsVFsVbw=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=wpw4JzMD0IaI65k8fohlHaC3MT+sT2Ao2MZ0Dpj7BptVsCmMqdWwX9fCTtAMaxdSO
+	 WVCsT41WYdvFO+xmIzs9d3Vsfz7jtiX3B0Lke/b3Gd9+M2nRo3hgYe7KLd4zG3Awgz
+	 KG7jfkYynBmb4KU+RDr4TepVkocsYgHWyziODRjM=
+Authentication-Results: mail-nwsmtp-smtp-production-main-19.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Tom Herbert <tom@herbertland.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+Subject: [PATCH] net: kcm: use previously opened message only once
+Date: Thu,  1 Aug 2024 16:08:33 +0300
+Message-ID: <20240801130833.680962-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH net-next 08/10] net: hibmcge: Implement workqueue and
- some ethtool_ops functions
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20240731094245.1967834-1-shaojijie@huawei.com>
- <20240731094245.1967834-9-shaojijie@huawei.com>
- <b20b5d68-2dab-403c-b37b-084218e001bc@lunn.ch>
- <c44a5759-855a-4a8c-a4d3-d37e16fdebdc@huawei.com>
- <f54fcc51-3a38-49b6-be14-24a7cdcfdada@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <f54fcc51-3a38-49b6-be14-24a7cdcfdada@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Transfer-Encoding: 8bit
 
+When syzkaller reproducer injects 'alloc_skb()' failure at line
+817, 'kcm_sendmsg()' may return with partial message saved at
+'kcm->seq_skb'. Next call of this function will try to build the
+next message starting from the saved one, but should do it only
+once. Otherwise a complete mess in skb management causes an
+undefined behavior of any kind, including UAFs reported by KASAN.
 
-on 2024/8/1 20:26, Andrew Lunn wrote:
->>> Why do you need this? phylib will poll the PHY once per second and
->>> call the adjust_link callback whenever the link changes state.
->> However, we hope that the network port can be linked only when
->> the PHY and MAC are linked.
->> The adjust_link callback can ensure that the PHY status is normal,
->> but cannot ensure that the MAC address is linked.
-> So why would the SGMII link be down? My experience with SGMII is that
-> the link comes up as soon as both ends have power. You are also not
-> using in-band signalling, you configure the MAC based on the
-> adjust_link callback.
->
-> Basically, whenever you do something which no other driver does, you
-> need to explain why. Do you see any other MAC driver using SGMII doing
-> this?
->
-> 	Andrew
+Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
+Reported-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ net/kcm/kcmsock.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Yes, it was my mistake, I should explain why.
-
-
-If the network port is linked, but the link fails between the SGMII and PHY,
-is there any method to find out the cause?
-
-I've had a problem with phy link but SGMII no link due to poor contact.
-In this case, the network port no link. Therefore, we can quickly find and analyze the cause.
-
-Or maybe we shouldn't think about the case. because the link is up but packets cannot be received or sent.
-
-Thanks
-
-Jijie Shao
+diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+index 2f191e50d4fc..fa5ce5c88045 100644
+--- a/net/kcm/kcmsock.c
++++ b/net/kcm/kcmsock.c
+@@ -766,6 +766,8 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 	if (kcm->seq_skb) {
+ 		/* Previously opened message */
+ 		head = kcm->seq_skb;
++		/* ...should be used only once */
++		kcm->seq_skb = NULL;
+ 		skb = kcm_tx_msg(head)->last_skb;
+ 		goto start;
+ 	}
+-- 
+2.45.2
 
 
