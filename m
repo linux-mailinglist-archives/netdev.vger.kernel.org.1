@@ -1,211 +1,187 @@
-Return-Path: <netdev+bounces-114912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABA5D944AAB
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 13:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A25944AC6
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:05:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FDDBB24647
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:58:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5636BB21B9E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25891946C1;
-	Thu,  1 Aug 2024 11:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFE1194AFE;
+	Thu,  1 Aug 2024 12:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTvg8+OZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB00158A2C;
-	Thu,  1 Aug 2024 11:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5F016DC20;
+	Thu,  1 Aug 2024 12:05:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722513523; cv=none; b=ftyVAu0EMk5wlYdwvixCgZwpN5ue8gbUNfyV7njWDLZ9FLR8AHLx92ZphAZTfNbv18CXOoDojKhYQ68I4QoZIvFscsli7yZkQ08bEMQ+5bYleFV1huz434mkz884Lf9Hv8lB/uEyHh5N4Ld5YKD7BLUbaGRHddigkmUb61BVRnQ=
+	t=1722513931; cv=none; b=FXoJTSpsog+xMizrr2aVRRVlfrG5VWMKcoM50isCbvRTTPTAD/TPmFOfMYxg20VrE+GoLwsOxeYypa7KV4DUu2qwFhpTPIGOaNvvPrF+90k5O9aHfJQr8rjcPHOCyLTeV2Du7t823I5vYhlpQmR82ALX2qNMK0sdwRC/8NETJZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722513523; c=relaxed/simple;
-	bh=VeLo6DLo4sUwfbYapDDwOFqJypLiBvQt/vlWjIJHQVA=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=rA5dv9MoweBJN+ktELefAlEYMKiamt7i/YLFiSchKC0hk92i8BNjy1rkSP5e00uTWCQMUQ9jgNwIeGr5Ls2P6KgIVXCFGOiKNQVYs/Sv1Y4sQjjU/LbWxxHbq18tj2u+92oCdpgo0WcSMgYeCK7LAQKeqhepKsKN8FiQ1NxN0qI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WZSCj136Fz1L9MN;
-	Thu,  1 Aug 2024 19:58:25 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id CCD93180102;
-	Thu,  1 Aug 2024 19:58:37 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 1 Aug 2024 19:58:36 +0800
-Message-ID: <ff75f342-4894-4c06-922c-377701c461df@huawei.com>
-Date: Thu, 1 Aug 2024 19:58:36 +0800
+	s=arc-20240116; t=1722513931; c=relaxed/simple;
+	bh=xrmm8vq48Turuhl+MYV5VwfRqiYgHDIYm72LgCbH1lU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X1wbyJQUqfFC6ihu1BMS/+HpP4R4nkCYvTHLd3Hsp5iyVmbFszTPTV6q8z7oK2tfOe6XOKjOv8iE25SWJND9zfrmPD8Lr643zGx4tKp0URzpcYuQSVDZKNi9Cce09aawpGgusKXhF3CbGHiwJLAwriWMSzdGBsyYH+5Jhmhgmbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTvg8+OZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23627C32786;
+	Thu,  1 Aug 2024 12:05:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722513930;
+	bh=xrmm8vq48Turuhl+MYV5VwfRqiYgHDIYm72LgCbH1lU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bTvg8+OZJV69EIq4IxRBqp9dfc6y/u9kWm+xw9EFbJQjCtGm/UcFRMTsSiul0eqRA
+	 G1uDAZfhZ9TUmV4dy8tbbbxXhLFGDT9lrOc+bymDfNJGT+beG7sHBHtBQk0rOJW3zH
+	 yQTqXwxCvOn8I43hDhUDD2l+9gOqREEUYMHgZ2c7tkTViB+iu6RePr0NnnB27Annav
+	 +eP333ZCtfBXqo8qAegZ9RYVEm7YKemBWXwieFxVdf/xYmF2vWuSCSzvjkyvd6A+SY
+	 tIjsSrZg5VceoSgba2wOLQsmlPbHo1+s8lGZ6WajKsWqmWfHgl8Dp88597sOWlI8lk
+	 vC2KwTjZBx2lg==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Michael Margolin <mrgolin@amazon.com>,
+	Mustafa Ismail <mustafa.ismail@intel.com>,
+	netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Selvin Xavier <selvin.xavier@broadcom.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
+	Yishai Hadas <yishaih@nvidia.com>
+Subject: [PATCH rdma-next 0/8] Introducing Multi-Path DMA Support for mlx5 RDMA Driver
+Date: Thu,  1 Aug 2024 15:05:09 +0300
+Message-ID: <cover.1722512548.git.leon@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, "yisen.zhuang@huawei.com"
-	<yisen.zhuang@huawei.com>, "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "shenjian15@huawei.com"
-	<shenjian15@huawei.com>, "wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>,
-	"liuyonglong@huawei.com" <liuyonglong@huawei.com>, "sudongming (A)"
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, "shiyongbang (A)"
-	<shiyongbang@huawei.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH net-next 07/10] net: hibmcge: Implement rx_poll
- function to receive packets
-To: Joe Damato <jdamato@fastly.com>
-References: <20240731094245.1967834-1-shaojijie@huawei.com>
- <20240731094245.1967834-8-shaojijie@huawei.com> <Zqo66ZPaD2GtLZwg@LQ3V64L9R2>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <Zqo66ZPaD2GtLZwg@LQ3V64L9R2>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Transfer-Encoding: 8bit
 
+From: Leon Romanovsky <leonro@nvidia.com>
 
-on 2024/7/31 21:23, Joe Damato wrote:
-> On Wed, Jul 31, 2024 at 05:42:42PM +0800, Jijie Shao wrote:
->> Implement rx_poll function to read the rx descriptor after
->> receiving the rx interrupt. Adjust the skb based on the
->> descriptor to complete the reception of the packet.
->>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->>   .../ethernet/hisilicon/hibmcge/hbg_common.h   |   5 +
->>   .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  10 ++
->>   .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   1 +
->>   .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  |   9 +-
->>   .../net/ethernet/hisilicon/hibmcge/hbg_main.c |   2 +
->>   .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |   2 +
->>   .../hisilicon/hibmcge/hbg_reg_union.h         |  65 ++++++++
->>   .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 157 +++++++++++++++++-
->>   8 files changed, 248 insertions(+), 3 deletions(-)
->   
->> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> index 8efeea9b0c26..bb5f8321da8a 100644
->> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
->> @@ -36,6 +36,7 @@ static int hbg_net_open(struct net_device *dev)
->>   		return 0;
->>   
->>   	netif_carrier_off(dev);
->> +	napi_enable(&priv->rx_ring.napi);
->>   	napi_enable(&priv->tx_ring.napi);
->>   	hbg_enable_intr(priv, true);
->>   	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
-> In the future, it might be good to consider using:
->     - netif_napi_set_irq
->     - netif_queue_set_napi
->   
-> to link NAPIs with IRQs and queues.
->
-Sounds good, but I can't find these two functions in 6.4 kernel?
+From Yishai,
 
->
->> +static int hbg_rx_fill_buffers(struct hbg_priv *priv)
->> +{
->> +	struct hbg_ring *ring = &priv->rx_ring;
->> +	int ret;
->> +
->> +	while (!(hbg_fifo_is_full(priv, ring->dir) ||
->> +		 hbg_queue_is_full(ring->ntc, ring->ntu, ring))) {
->> +		ret = hbg_rx_fill_one_buffer(priv);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static bool hbg_sync_data_from_hw(struct hbg_priv *priv,
->> +				  struct hbg_buffer *buffer)
->> +{
->> +	struct hbg_rx_desc *rx_desc;
->> +
->> +	/* make sure HW write desc complete */
->> +	dma_rmb();
->> +
->> +	dma_sync_single_for_cpu(&priv->pdev->dev, buffer->skb_dma,
->> +				buffer->skb_len, DMA_FROM_DEVICE);
->> +
->> +	rx_desc = (struct hbg_rx_desc *)buffer->skb->data;
->> +	return rx_desc->len != 0;
->> +}
-> Have you looked into using the page pool to simplify some of the
-> logic above?
+Overview
+--------
+This patch series aims to enable multi-path DMA support, allowing an
+mlx5 RDMA device to issue DMA commands through multiple paths. This
+feature is critical for improving performance and reaching line rate
+in certain environments where issuing PCI transactions over one path
+may be significantly faster than over another. These differences can
+arise from various PCI generations in the system or the specific system
+topology.
 
-Thanks, but I probably won't use it at the moment.
+To achieve this functionality, we introduced a data direct DMA device
+that can serve the RDMA device by issuing DMA transactions on its behalf.
 
->
->> +static int hbg_napi_rx_poll(struct napi_struct *napi, int budget)
->> +{
->> +	struct hbg_ring *ring = container_of(napi, struct hbg_ring, napi);
->> +	struct hbg_priv *priv = ring->priv;
->> +	struct hbg_rx_desc *rx_desc;
->> +	struct hbg_buffer *buffer;
->> +	u32 packet_done = 0;
->> +
->> +	if (unlikely(!hbg_nic_is_open(priv))) {
->> +		napi_complete(napi);
->> +		return 0;
->> +	}
->> +
->> +	while (packet_done < budget) {
->> +		if (unlikely(hbg_queue_is_empty(ring->ntc, ring->ntu)))
->> +			break;
->> +
->> +		buffer = &ring->queue[ring->ntc];
->> +		if (unlikely(!buffer->skb))
->> +			goto next_buffer;
->> +
->> +		if (unlikely(!hbg_sync_data_from_hw(priv, buffer)))
->> +			break;
->> +
->> +		hbg_dma_unmap(buffer);
->> +
->> +		rx_desc = (struct hbg_rx_desc *)buffer->skb->data;
->> +		skb_reserve(buffer->skb, HBG_PACKET_HEAD_SIZE + NET_IP_ALIGN);
->> +		skb_put(buffer->skb, rx_desc->len);
->> +		buffer->skb->protocol = eth_type_trans(buffer->skb, priv->netdev);
->> +
->> +		priv->netdev->stats.rx_bytes += rx_desc->len;
->> +		priv->netdev->stats.rx_packets++;
->> +		netif_receive_skb(buffer->skb);
-> Any reason why not napi_gro_receive ?
+The main key features and changes are described below.
 
-Is it OK if the MAC does not support gro?
+Multi-Path Discovery
+--------------------
+API Implementation:
+ * Introduced an API to discover multiple paths for a given mlx5 RDMA device.
+IOCTL Command: 
+ * Added a new IOCTL command, MLX5_IB_METHOD_GET_DATA_DIRECT_SYSFS_PATH, to
+   the DEVICE object. When an affiliated Data-Direct/DMA device is present,
+   its sysfs path is returned.
 
->
->> +		buffer->skb = NULL;
->> +		hbg_rx_fill_one_buffer(priv);
->> +
->> +next_buffer:
->> +		hbg_queue_move_next(ntc, ring);
->> +		packet_done++;
->> +	}
->> +
->> +	hbg_rx_fill_buffers(priv);
->> +	if (packet_done >= budget)
->> +		return packet_done;
->> +
->> +	napi_complete(napi);
-> Maybe:
->
->     if (napi_complete_done(napi))
->       hbg_irq_enable(priv, HBG_IRQ_RX, true);
+Feature Activation by mlx5 RDMA Application
+-------------------------------------------
+UVERBS Extension:
+ * Extended UVERBS_METHOD_REG_DMABUF_MR over UVERBS_OBJECT_MR to include
+   mlx5 extended flags.
+Access Flag: 
+ * Introduced the MLX5_IB_UAPI_REG_DMABUF_ACCESS_DATA_DIRECT flag, allowing
+   applications to request the use of the affiliated DMA device for DMABUF
+   registration.
 
-okay, I will fix it in v2
+Data-Direct/DMA Device
+----------------------
+New Driver:
+ * Introduced a new driver to manage the new DMA PF device ID (0x2100).
+   Its registration/un-registration is handled as part of the mlx5_ib init/exit
+   flows, with mlx5 IB devices as its clients.
+Functionality: 
+ * The driver does not interface directly with the firmware (no command interface,
+   no caps, etc.) but works over PCI to activate its DMA functionality. It serves
+   as the DMA device for efficiently accessing other PCI devices (e.g., GPU PF) and
+   reads its VUID over PCI to handle NICs registrations with the same VUID.
 
-Thanks again,
+mlx5 IB RDMA Device
+---------------------------
+VUID Query: 
+ * Reads its affiliated DMA PF VUID via the QUERY_VUID command with the data_direct
+   bit set.
+Driver Registration:
+ * Registers with the DMA PF driver to be notified upon bind/unbind.
+Application Request Handling: 
+ * Uses the DMA PF device upon application request as described above.
 
-Jijie Shao
+DMABUF over Umem
+----------------
+Introduced an option to obtain a DMABUF UMEM using a different DMA
+device instead of the IB device, allowing the device to register over
+IOMMU with the expected DMA device for a given buffer registration.
+
+Further details are provided in the commit logs of the patches in this
+series.
+
+Thanks
+
+Yishai Hadas (8):
+  net/mlx5: Add IFC related stuff for data direct
+  RDMA/mlx5: Introduce the 'data direct' driver
+  RDMA/mlx5: Add the initialization flow to utilize the 'data direct'
+    device
+  RDMA/umem: Add support for creating pinned DMABUF umem with a given
+    dma device
+  RDMA/umem: Introduce an option to revoke DMABUF umem
+  RDMA: Pass uverbs_attr_bundle as part of '.reg_user_mr_dmabuf' API
+  RDMA/mlx5: Add support for DMABUF MR registrations with Data-direct
+  RDMA/mlx5: Introduce GET_DATA_DIRECT_SYSFS_PATH ioctl
+
+ drivers/infiniband/core/umem_dmabuf.c         |  66 +++-
+ drivers/infiniband/core/uverbs_std_types_mr.c |   2 +-
+ drivers/infiniband/hw/bnxt_re/ib_verbs.c      |   3 +-
+ drivers/infiniband/hw/bnxt_re/ib_verbs.h      |   2 +-
+ drivers/infiniband/hw/efa/efa.h               |   2 +-
+ drivers/infiniband/hw/efa/efa_verbs.c         |   4 +-
+ drivers/infiniband/hw/irdma/verbs.c           |   2 +-
+ drivers/infiniband/hw/mlx5/Makefile           |   1 +
+ drivers/infiniband/hw/mlx5/cmd.c              |  21 ++
+ drivers/infiniband/hw/mlx5/cmd.h              |   2 +
+ drivers/infiniband/hw/mlx5/data_direct.c      | 227 +++++++++++++
+ drivers/infiniband/hw/mlx5/data_direct.h      |  23 ++
+ drivers/infiniband/hw/mlx5/main.c             | 125 +++++++
+ drivers/infiniband/hw/mlx5/mlx5_ib.h          |  22 +-
+ drivers/infiniband/hw/mlx5/mr.c               | 304 +++++++++++++++---
+ drivers/infiniband/hw/mlx5/odp.c              |   5 +-
+ drivers/infiniband/hw/mlx5/std_types.c        |  55 +++-
+ drivers/infiniband/hw/mlx5/umr.c              |  93 ++++--
+ drivers/infiniband/hw/mlx5/umr.h              |   1 +
+ include/linux/mlx5/mlx5_ifc.h                 |  51 ++-
+ include/rdma/ib_umem.h                        |  18 ++
+ include/rdma/ib_verbs.h                       |   2 +-
+ include/uapi/rdma/mlx5_user_ioctl_cmds.h      |   9 +
+ include/uapi/rdma/mlx5_user_ioctl_verbs.h     |   4 +
+ 24 files changed, 944 insertions(+), 100 deletions(-)
+ create mode 100644 drivers/infiniband/hw/mlx5/data_direct.c
+ create mode 100644 drivers/infiniband/hw/mlx5/data_direct.h
+
+-- 
+2.45.2
 
 
