@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-115064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF545945049
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:14:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0EB194504B
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 18:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8340E283A08
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:14:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AB81B29951
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779BE1B3F37;
-	Thu,  1 Aug 2024 16:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8596A1B3748;
+	Thu,  1 Aug 2024 16:14:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900A61B372C;
-	Thu,  1 Aug 2024 16:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231E01B4C23;
+	Thu,  1 Aug 2024 16:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722528835; cv=none; b=ix5dwsQWtouYddg1wPKQuJFWocoyuMgjLpA1r6VoQnm/Osi5krZ082uiXudXm3MKocZborqrHBCT+xWN9ge8CXmNSzyt4NrjCjch1FJZA+mQYJHassAndiVDyp/PVMXHGQsCNy79LU9XlAy3/fY8C5uVMqTdsAa2SSKgiWV7QVs=
+	t=1722528842; cv=none; b=bUNGektzgYYmAdhQ3uJ1kb2CJAltVnYmS7cUo0pPG0TdlnVl3ZdeA7lnhAM6y42OecHIYz8rbGZiOcrMIUyWTYHGKdv0PakBiRfjV/WlcAbYpcZ/PmzT3Xh4WMCfrgOFEThlGmcaX9jBdRs/VtvKOG4D+5auoRhtj1rU9NxT17Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722528835; c=relaxed/simple;
-	bh=zS9pPlHOmO0BZ7xmcFWzDSiTDOZYmnzfdggcHye1Fn4=;
+	s=arc-20240116; t=1722528842; c=relaxed/simple;
+	bh=uC2BmUxRWsf0KsVLb+yZ2Q6rogj5W1+emqWqRBzGCbI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GluhVOYcbwSktBzmsiFu97kWmviX3M9iOVWPgB7eA/xTsavYN0qDysEdmRlSY3hJBKwwMs4pZ74m2UTAO+/rA2QrYrA3d6jzii1hc1ge3Io9qxca81bvyDGyEGDSIN42JLKJcQiIW+S1gsS9+qCMjqHJDWO5i2tRnK7ATwxRV30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+	 MIME-Version; b=pPcilvnnWCkm0dX4Z5hgIMjqZlgoXiVZjDZSyQ6IDP6S9H3Cib09Zn1bo3t1KC1tdEIKUTI1hpS7le/Cg4+P3XUwnSXoHPBr3H5A7nNChf7/Elh4PtGThx55YcCHAM7PAVhHktcb9rKiWga+nznroXQkcfmKVYKt53rbtZ5mcgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a7ab5fc975dso651863266b.1;
-        Thu, 01 Aug 2024 09:13:53 -0700 (PDT)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7ad02501c3so24674366b.2;
+        Thu, 01 Aug 2024 09:13:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722528832; x=1723133632;
+        d=1e100.net; s=20230601; t=1722528837; x=1723133637;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5/RdmcqVIP5R/Ggm/1sHWuedrazo6kwvVFmS0MKY894=;
-        b=De0rtEmbDYvER43Ki+HOQJbPU6Bm1tvYUGJbZI/n6fXwyg9+I4EY01gdhHZ/tKc5Xl
-         wECfRysMdWzBy0VbGgxicdZ5FFX0+NEulxa9syzQvbXd1rtcx+64FMy+A5BIGWAnTRPy
-         tDAlwGF5fJkDwHrRJFyumSe9KV8wnt50iMg6siBqesZ3q89qk2lYOI+LHj9qHcrLbMpP
-         VAjP8GFyFevUQakfpKiZ5t6wTEO23X3DiVOOwikk1Sk2ZHztbOS9eqOu5kKB/IQ7b4Ym
-         IUHlVmhJaVWKwNmO/ttAPUS8lCufs7bE3EKATn9hZTIuVuU/Fp8/0UIKrnSFHjA2x12K
-         N8lA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZj4d/ZYswejlLIdt7k4wYIJJ9Fjfea47ukSZPNLs61UWEcBVSXJAkiIuLUzgV522X09QTWIzAPIY7CCcC73PsYWaovJdciYeFWk6oerf1NTQyTG8rIaUM+NwmPDjIRjeTSehKrEvReSul2FrAsKzMoFMVTqX+kTO/6wiHQUgWszl8Ix1f
-X-Gm-Message-State: AOJu0Yz/zw4oh1sdAoHNRwujC2Ir3oB23xwd3X7ohecRkt0rHkRuJy0I
-	oGgXCG41ewPgfMZiivsoxi03Abg6OuOyfzew0WgEoSpdOHUxTRhw
-X-Google-Smtp-Source: AGHT+IG/AFrPnvzzN/amAsAUv4ipt+ECA8EtiB7HwaDCZ+4l9+dJ1jQQevf/LknK3BxjRYbQ7q3D+A==
-X-Received: by 2002:a17:907:934a:b0:a7a:a5ed:43d0 with SMTP id a640c23a62f3a-a7dc5071046mr55940666b.47.1722528831525;
-        Thu, 01 Aug 2024 09:13:51 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acac61218sm923403266b.94.2024.08.01.09.13.50
+        bh=HjhvO/EBhB/Q0GYaqqTWtDrqTWX0pPfpEEQqm+7VbP8=;
+        b=sTsl/yFS3Qo0gI7uSEAdjnD8IV9rqcrIlX2mkG2bavTD61SJA+1OLYqqZZrAzKbuwm
+         +jwB+A6Tjv+ZDiMU839nJJBT3IpSoKzLQnLQ8s5zDx6PtSMw84HpqHpkc+y5Y2LPJKua
+         ekENzlXawJwoosSGTU4QAFT2vgpcKHwM4rubutkN8FcRZF0OyC5oxotWwLGER3zbwAUG
+         EFNFt9Mwts8jmjuSwYn7S0MEONPY/d7q+kuqrlk+6T9/lFOGe+nr3ZphQ78Nigv5hSGQ
+         AHRCByLuRbK8b0QNKq7nUn004wAgDNcYoDy5O+SxgBgon05Lvr9DPnShVJcAy4XcWBgQ
+         UmQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGm2v8J5XZD/MQd2ZYN5yhc1JUl3DPRDJUH+H2+QevKz8p5NwJqHqlvzDUoECaTccKwIVAFyFvjWppdLf/euNADvNbEJYTIg60DFSdcl121MH6agZhuZADzaB6CGsrLu81+NOc
+X-Gm-Message-State: AOJu0Yy6ZHG3Rmik8pDOkFJDJ+qiifNzDgE0b539WFPsAo2+lz+09dKm
+	fPhLhFcnrvd68k2a9QlZ0fb87oJCy2lOGSdjJWu93OEClbnvFqCv
+X-Google-Smtp-Source: AGHT+IHayzcwog/gmPGLzBe0jVWIZGeY2SV8QM4SSOAok68Ua4v9QWwxo6FmbcadS72hKK5/M8z6ig==
+X-Received: by 2002:a17:907:9689:b0:a7a:b839:8583 with SMTP id a640c23a62f3a-a7dc51c26e5mr45068366b.66.1722528836923;
+        Thu, 01 Aug 2024 09:13:56 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acab4de90sm913734866b.62.2024.08.01.09.13.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 09:13:51 -0700 (PDT)
+        Thu, 01 Aug 2024 09:13:56 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	Shuah Khan <shuah@kernel.org>
+	pabeni@redhat.com
 Cc: thevlad@fb.com,
 	thepacketgeek@gmail.com,
 	riel@surriel.com,
@@ -66,11 +65,10 @@ Cc: thevlad@fb.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	paulmck@kernel.org,
-	davej@codemonkey.org.uk,
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
-Subject: [PATCH net-next 1/6] net: netconsole: selftests: Create a new netconsole selftest
-Date: Thu,  1 Aug 2024 09:11:58 -0700
-Message-ID: <20240801161213.2707132-2-leitao@debian.org>
+	davej@codemonkey.org.uk
+Subject: [PATCH net-next 2/6] net: netpoll: extract core of netpoll_cleanup
+Date: Thu,  1 Aug 2024 09:11:59 -0700
+Message-ID: <20240801161213.2707132-3-leitao@debian.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240801161213.2707132-1-leitao@debian.org>
 References: <20240801161213.2707132-1-leitao@debian.org>
@@ -82,193 +80,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Adds a selftest that creates two virtual interfaces, assigns one to a
-new namespace, and assigns IP addresses to both.
+Extract the core part of netpoll_cleanup(), so, it could be called from
+a caller that has the rtnl lock already.
 
-It listens on the destination interface using netcat and configures a
-dynamic target on netconsole, pointing to the destination IP address.
+Netconsole uses this in a weird way right now:
 
-The test then checks if the message was received properly on the
-destination interface.
+	__netpoll_cleanup(&nt->np);
+	spin_lock_irqsave(&target_list_lock, flags);
+	netdev_put(nt->np.dev, &nt->np.dev_tracker);
+	nt->np.dev = NULL;
+	nt->enabled = false;
+
+This will be replaced by do_netpoll_cleanup() as the locking situation
+is overhauled.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Rik van Riel <riel@surriel.com>
 ---
- MAINTAINERS                                   |   1 +
- .../net/netconsole/basic_integration_test.sh  | 153 ++++++++++++++++++
- 2 files changed, 154 insertions(+)
- create mode 100755 tools/testing/selftests/net/netconsole/basic_integration_test.sh
+ include/linux/netpoll.h |  1 +
+ net/core/netpoll.c      | 12 +++++++++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c0a3d9e93689..59207365c9f5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15768,6 +15768,7 @@ M:	Breno Leitao <leitao@debian.org>
- S:	Maintained
- F:	Documentation/networking/netconsole.rst
- F:	drivers/net/netconsole.c
-+F:	tools/testing/selftests/net/netconsole/
+diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
+index bd19c4b91e31..cd4e28db0cbd 100644
+--- a/include/linux/netpoll.h
++++ b/include/linux/netpoll.h
+@@ -64,6 +64,7 @@ int netpoll_setup(struct netpoll *np);
+ void __netpoll_cleanup(struct netpoll *np);
+ void __netpoll_free(struct netpoll *np);
+ void netpoll_cleanup(struct netpoll *np);
++void do_netpoll_cleanup(struct netpoll *np);
+ netdev_tx_t netpoll_send_skb(struct netpoll *np, struct sk_buff *skb);
  
- NETDEVSIM
- M:	Jakub Kicinski <kuba@kernel.org>
-diff --git a/tools/testing/selftests/net/netconsole/basic_integration_test.sh b/tools/testing/selftests/net/netconsole/basic_integration_test.sh
-new file mode 100755
-index 000000000000..fbabbc633451
---- /dev/null
-+++ b/tools/testing/selftests/net/netconsole/basic_integration_test.sh
-@@ -0,0 +1,153 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This test creates two virtual interfaces, assigns one of them (the "destination
-+# interface") to a new namespace, and assigns IP addresses to both interfaces.
-+#
-+# It listens on the destination interface using netcat (nc) and configures a
-+# dynamic target on netconsole, pointing to the destination IP address.
-+#
-+# Finally, it checks whether the message was received properly on the
-+# destination interface.  Note that this test may pollute the kernel log buffer
-+# (dmesg) and relies on dynamic configuration and namespaces being configured."
-+#
-+# Author: Breno Leitao <leitao@debian.org>
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+# Simple script to test dynamic targets in netconsole
-+SRCIF="veth0"
-+SRCIP=192.168.1.1
-+
-+DSTIF="veth1"
-+DSTIP=192.168.1.2
-+
-+PORT="6666"
-+MSG="netconsole selftest"
-+TARGET=$(mktemp -u netcons_XXXXX)
-+NETCONS_CONFIGFS="/sys/kernel/config/netconsole"
-+FULLPATH="${NETCONS_CONFIGFS}"/"${TARGET}"
-+# This will be have some tmp values appened to it in set_network()
-+NAMESPACE="netconsns"
-+
-+# Used to create and delete namespaces
-+source "${SCRIPTDIR}"/../lib.sh
-+
-+function set_network() {
-+	# this is coming from lib.sh
-+	setup_ns "${NAMESPACE}"
-+	NAMESPACE=${NS_LIST[0]}
-+	ip link add "${SRCIF}" type veth peer name "${DSTIF}"
-+
-+	# "${DSTIF}"
-+	ip link set "${DSTIF}" netns "${NAMESPACE}"
-+	ip netns exec "${NAMESPACE}" ip addr add "${DSTIP}"/24 dev "${DSTIF}"
-+	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" up
-+
-+	# later, configure "${SRCIF}"
-+	ip addr add "${SRCIP}"/24 dev "${SRCIF}"
-+	ip link set "${SRCIF}" up
+ #ifdef CONFIG_NETPOLL
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 55bcacf67df3..a58ea724790c 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -853,14 +853,20 @@ void __netpoll_free(struct netpoll *np)
+ }
+ EXPORT_SYMBOL_GPL(__netpoll_free);
+ 
++void do_netpoll_cleanup(struct netpoll *np)
++{
++	__netpoll_cleanup(np);
++	netdev_put(np->dev, &np->dev_tracker);
++	np->dev = NULL;
 +}
++EXPORT_SYMBOL(do_netpoll_cleanup);
 +
-+function create_dynamic_target() {
-+	DSTMAC=$(ip netns exec "${NAMESPACE}" ip link show "${DSTIF}" | awk '/ether/ {print $2}')
-+
-+	# Create a dynamic target
-+	mkdir ${FULLPATH}
-+
-+	echo ${DSTIP} > ${FULLPATH}/remote_ip
-+	echo ${SRCIP} > ${FULLPATH}/local_ip
-+	echo ${DSTMAC} > ${FULLPATH}/remote_mac
-+	echo "${SRCIF}" > ${FULLPATH}/dev_name
-+
-+	echo 1 > ${FULLPATH}/enabled
-+}
-+
-+function cleanup() {
-+	echo 0 > "${FULLPATH}"/enabled
-+	rmdir "${FULLPATH}"
-+	# This will delete DSTIF also
-+	ip link del "${SRCIF}"
-+	# this is coming from lib.sh
-+	cleanup_all_ns
-+}
-+
-+function listen_port() {
-+	OUTPUT=${1}
-+	echo "Saving content in ${OUTPUT}"
-+	timeout 2 ip netns exec "${NAMESPACE}" nc -u -l "${PORT}" | sed '/^$/q' > ${OUTPUT}
-+}
-+
-+function validate_result() {
-+	TMPFILENAME=/tmp/"${TARGET}"
-+
-+	# sleep until the file isc reated
-+	sleep 1
-+	# Check if the file exists
-+	if [ ! -f "$TMPFILENAME" ]; then
-+	    echo "FAIL: File was not generate." >&2
-+	    return ${ksft_fail}
-+	fi
-+
-+	if ! grep -q "${MSG}" "${TMPFILENAME}"; then
-+	    echo "FAIL: ${MSG} not found in ${TMPFILENAME}" >&2
-+	    cat ${TMPFILENAME} >&2
-+	    return ${ksft_fail}
-+	fi
-+
-+	rm ${TMPFILENAME}
-+	return ${ksft_pass}
-+}
-+
-+function check_for_dependencies() {
-+	if [ "$(id -u)" -ne 0 ]; then
-+		echo "This script must be run as root" >&2
-+		exit 1
-+	fi
-+
-+	if ! which nc > /dev/null ; then
-+		echo "SKIP: nc(1) is not available" >&2
-+		exit ${ksft_skip}
-+	fi
-+
-+	if ! which ip > /dev/null ; then
-+		echo "SKIP: ip(1) is not available" >&2
-+		exit ${ksft_skip}
-+	fi
-+
-+	if [ ! -d "${NETCONS_CONFIGFS}" ]; then
-+		echo "SKIP: directory ${NETCONS_CONFIGFS} does not exist. Check if NETCONSOLE_DYNAMIC is enabled" >&2
-+		exit ${ksft_skip}
-+	fi
-+
-+	if ip link show veth0 2> /dev/null; then
-+		echo "SKIP: interface veth0 exists in the system. Not overwriting it."
-+		exit ${ksft_skip}
-+	fi
-+}
-+
-+# ========== #
-+# Start here #
-+# ========== #
-+
-+# Check for basic system dependency and exit if not found
-+check_for_dependencies
-+# Create one namespace and two interfaces
-+set_network
-+# Create a dynamic target for netconsole
-+create_dynamic_target
-+# Listed for netconsole port inside the namespace and destination interface
-+listen_port /tmp/"${TARGET}" &
-+# Wait for nc to start and listen to the port.
-+sleep 1
-+
-+# Send the message
-+echo "${MSG}: ${TARGET}" > /dev/kmsg
-+
-+# Make sure the message was received in the dst part
-+validate_result
-+ret=$?
-+# Remove the namespace, interfaces and netconsole target
-+cleanup
-+
-+exit ${ret}
+ void netpoll_cleanup(struct netpoll *np)
+ {
+ 	rtnl_lock();
+ 	if (!np->dev)
+ 		goto out;
+-	__netpoll_cleanup(np);
+-	netdev_put(np->dev, &np->dev_tracker);
+-	np->dev = NULL;
++	do_netpoll_cleanup(np);
+ out:
+ 	rtnl_unlock();
+ }
 -- 
 2.43.0
 
