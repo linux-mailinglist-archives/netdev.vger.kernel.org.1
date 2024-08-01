@@ -1,143 +1,75 @@
-Return-Path: <netdev+bounces-115050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3384944FA3
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:49:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D55944FA8
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:51:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EDF4B23E83
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:49:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D27B2858A9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4FA13D2AF;
-	Thu,  1 Aug 2024 15:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32CAF19E7E3;
+	Thu,  1 Aug 2024 15:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PArTGbI/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feXFF6z4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6B719478;
-	Thu,  1 Aug 2024 15:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077BD19478;
+	Thu,  1 Aug 2024 15:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722527349; cv=none; b=W/wMH+Pzu3PXxa1lIkolbgd/f9hCWNSjVU1zayGjmYGyiDaEDQhYNq6YQPfxgi4wKims6r7e3xdn/AiUGMngjr55mbmn7mAoBBAyTiuqCCMqfIhcGSGc6Ds0MvsI/XZTe2Nv9/J+X5LIO6fVrddCBsV8cK8iMT1yc2XetPSpcpE=
+	t=1722527485; cv=none; b=SCvk0lEyEIqwyTvNfLmVeiNlMgj9Zs7v36EVrjKc0ZACOPathpQ16YA99FTMesHZVFX9Ty/HscIn3kQi2RCDfYYQphbUQU6VPRLbwdyo2VomOHrzoYXbACvmMg4KI1gjp2Heztr/6Mcf47h6U3h5kQepGiOnWis06SKpbORCy30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722527349; c=relaxed/simple;
-	bh=nKlAaSFE+fmPAfHTs1O+o85Jcq+2pHAXogZG4LGZs7Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mj6ze1/m2zWQAi2BzUihiv3mz8gC5HG5zkDY00eNBJc03+g81dt7me9PIDUxKqArRNi1ucSEV8q6kJAFyPonHYCjScSYoBzmgu87tORbg2QWf629YZ8yfj5QvnrJaxbfEQC+kKoKyeGbQP3kMxZQ+azNugNmy/luUDXFQWfeLDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PArTGbI/; arc=none smtp.client-ip=209.85.160.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-260f863108fso4254091fac.1;
-        Thu, 01 Aug 2024 08:49:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722527346; x=1723132146; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vrM3I08KeD9LyJzc0AY/Lrr8WEZiRdSbJCEvBssBw/Q=;
-        b=PArTGbI/ArcfczSXegzfdra6jPx/u/pHWfqldh5+YV51hkFbuRiSa1arFjYN7rYkFw
-         XG06ROZaZUhl2ld5YMG0ZJTJZzVyn3CjXN7Fb9zxaDStXlCT4CX1hg2pQcMCZRXQoOnB
-         DzaP7OyLMV5BS9W4maeCE+axxph6030noYfgQ3a0HXQjoZz1XCVDB0zxLw1m8eiEU1Cu
-         wdXoE7TlH23XGPULS8XbtjS8iZ/TIn7RU8QLJSL6w+sv8GUsiDevlubAE+3aG/so8QGD
-         DQQ7ByT/2uNpBR1/BFibSv6v3HKjTNkmROuhC4vvCBRL2uiDPO6Zi435m88WFJJ2aBB1
-         /TBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722527346; x=1723132146;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vrM3I08KeD9LyJzc0AY/Lrr8WEZiRdSbJCEvBssBw/Q=;
-        b=Ygt1rA41PvtEel/R4ubkQU93mdh6vlkJjyzUvRDTVFEsOxwXWBwQGPs1hEvkcRjkKx
-         abkNmEhC96m0Ij1tOoFWJDV1K1+Hk3FoQN6dSmziOJU341oDQkkMEsIKDCESLmJsP5+w
-         fPQlBqqrhHhV1twBrMjkHnSRbsq16LVIDmr/QtdAs9r3j8VHoGi0FQHnyygMkd5fjj7h
-         ru9XmRRERq1v5Yv6ES4BePhGuyxBkokgXkWq7uOi9lkwl4TUuqDdNNofVHfhOuZ4VBlu
-         4T21tsTENveAY1qUoZ9sJDoJmEfKP3m3ELaymloN+KoVfe8E/dzKpzbvfW5+lJYTnplr
-         H0pw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVga1nQbo6LwX4zsRW9DHcx7VVlHgFBOygZbNniJyaXJnv+DD4meGvT1f3q/lhyfmakkKqSJ12bJCuCQnFbwXsPAIXt9EM
-X-Gm-Message-State: AOJu0YzEfKqip2nHAe1RInCAsYRXUNPWKKMtj1fqI0XowCGTkxBqLrt2
-	S54xazZv5sLeq+/mUGGlKG2vpV3D4Fqt1quTEMyEX2Rxz7RXVAwlz2YvhJzprhe09rws/LJ7fqv
-	yLnXZmM8Yr/WZzzXbrWr2LexrfPI=
-X-Google-Smtp-Source: AGHT+IE4a/ab2ipgCtKLDQdF1uoLyP1fr48PFJM601wjm1wNf9gdc1LSocrjfhcAQXO7Dyx+GIaFmFQOjGKx9HHflQE=
-X-Received: by 2002:a05:6870:a54a:b0:24f:dd11:4486 with SMTP id
- 586e51a60fabf-26891e92ab4mr587892fac.36.1722527346628; Thu, 01 Aug 2024
- 08:49:06 -0700 (PDT)
+	s=arc-20240116; t=1722527485; c=relaxed/simple;
+	bh=t0HGpBuMRz0nLaqeeIb8Mp+3aCtDMUJ3ClS8fVtXzA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rMPSZ54C8mecHOloMmsEcJoTJCPPb+Mu0b0wPlkEFnJJrdYDTHfEKfKClwJOEtEAahliSUBFwpxuC1BUk5jTLsz4vIV8YE0XBhzmMJGWJTyNtxwQP4ttiZOJpawX21BgdwACi8JhsfgN8yRKSwOaLqY94UV4kl7pebWaJwk5r18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feXFF6z4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1302AC32786;
+	Thu,  1 Aug 2024 15:51:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722527484;
+	bh=t0HGpBuMRz0nLaqeeIb8Mp+3aCtDMUJ3ClS8fVtXzA4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=feXFF6z4zEDtq1yQBFpLr5sqSIqlBVB5cj933qZPHpoAp8Pz67MVIg6lfKPoZQMkX
+	 4dd0yFF6RsLFHBPWFUAL5FKiTmjSL7kVoknbgnct20xompdIFAh18UXj0rMuYJb83v
+	 e68m1o2sxkch4WdjmdP4A5JehG//0IB1m3xTixRwrX63v/0MZ+T3awZqCbp8o/qM/M
+	 N9DyUb6yqfRNaSELCt57NIQo9210eI7XX89kojfYOZLIjMfdvo++kYSDHezDOxnIPp
+	 yjPy0HWMd7HG1fSBLFwqBe/1vnQMe8Q9JWt+alYNY8bDCT9nOUDDjcjN99v6fa7nWX
+	 DjQjstBD4Y3/g==
+Date: Thu, 1 Aug 2024 08:51:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Youwan Wang <youwan@nfschina.com>
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, hkallweit1@gmail.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, Russell King
+ <rmk+kernel@armlinux.org.uk>, Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: Re: [net-next,v4] net: phy: phy_device: fix PHY WOL enabled, PM
+ failed to suspend
+Message-ID: <20240801085123.6757d4c3@kernel.org>
+In-Reply-To: <20240731091537.771391-1-youwan@nfschina.com>
+References: <ZqdM1rwbmIED/0WC@shell.armlinux.org.uk>
+	<20240731091537.771391-1-youwan@nfschina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731103403.407818-1-vtpieter@gmail.com> <20240731103403.407818-4-vtpieter@gmail.com>
- <925034c0e0714fce5859d829fdb0ad6cd82f71d7.camel@microchip.com>
-In-Reply-To: <925034c0e0714fce5859d829fdb0ad6cd82f71d7.camel@microchip.com>
-From: Pieter <vtpieter@gmail.com>
-Date: Thu, 1 Aug 2024 17:48:55 +0200
-Message-ID: <CAHvy4AqyHUvm-0oAt88uxPazbpKvKO36goqpW2kyDoeyicxOjw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/5] net: dsa: microchip: generalize KSZ9477
- WoL functions at ksz_common
-To: Arun.Ramadoss@microchip.com
-Cc: devicetree@vger.kernel.org, Woojung.Huh@microchip.com, 
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
-	pieter.van.trappen@cern.ch
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Arun,
+On Wed, 31 Jul 2024 17:15:37 +0800 Youwan Wang wrote:
+> +	/* If the PHY on the mido bus is not attached but has WOL enabled
+> +	 * we cannot suspend the PHY.
+> +	 */
+> +	if (!netdev && phy_drv_wol_enabled(phydev))
+> +		return false;
 
-> > @@ -1051,12 +1052,12 @@ void ksz9477_port_setup(struct ksz_device
-> > *dev, int port, bool cpu_port)
-> >         ksz9477_port_acl_init(dev, port);
-> >
-> >         /* clear pending wake flags */
-> > -       ksz9477_handle_wake_reason(dev, port);
-> > +       ksz_handle_wake_reason(dev, port);
-> >
-> >         /* Disable all WoL options by default. Otherwise
-> >          * ksz_switch_macaddr_get/put logic will not work properly.
-> >          */
-> > -       ksz_pwrite8(dev, port, REG_PORT_PME_CTRL, 0);
-> > +       ksz_pwrite8(dev, port, regs[REG_PORT_PME_CTRL], 0);
->
-> check the return value.
-
-Thanks but since it's a void function, I cannot pass a non-zero return value
-so is there a point checking it?
-
->
-> >  }
-> >
-> >  void ksz9477_config_cpu_port(struct dsa_switch *ds)
-> > @@ -1153,6 +1154,7 @@ int ksz9477_enable_stp_addr(struct ksz_device
-> > *dev)
-> >  int ksz9477_setup(struct dsa_switch *ds)
-> >  {
-> >         struct ksz_device *dev = ds->priv;
-> > +       const u16 *regs = dev->info->regs;
-> >         int ret = 0;
-> >
-> >         ds->mtu_enforcement_ingress = true;
-> > @@ -1183,11 +1185,11 @@ int ksz9477_setup(struct dsa_switch *ds)
-> >         /* enable global MIB counter freeze function */
-> >         ksz_cfg(dev, REG_SW_MAC_CTRL_6, SW_MIB_COUNTER_FREEZE, true);
-> >
-> > -       /* Make sure PME (WoL) is not enabled. If requested, it will
-> > be
-> > -        * enabled by ksz9477_wol_pre_shutdown(). Otherwise, some
-> > PMICs do not
-> > -        * like PME events changes before shutdown.
-> > +       /* Make sure PME (WoL) is not enabled. If requested, it will
-> > +        * be enabled by ksz_wol_pre_shutdown(). Otherwise, some
-> > PMICs
-> > +        * do not like PME events changes before shutdown.
-> >          */
-> > -       ksz_write8(dev, REG_SW_PME_CTRL, 0);
-> > +       ksz_write8(dev, regs[REG_SW_PME_CTRL], 0);
->
-> here also.
-
-Thanks will do.
-
-Cheers, Pieter
+Not sure why you stopped setting phydev->wol_enabled between v2 and v3
+but let's hear from phy maintainers..
 
