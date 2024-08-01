@@ -1,78 +1,91 @@
-Return-Path: <netdev+bounces-114991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF48944D9F
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:06:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2D1944DA9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FD131F23A3C
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:06:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABCF21C24D1C
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD251A3BDC;
-	Thu,  1 Aug 2024 14:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773471A4898;
+	Thu,  1 Aug 2024 14:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QkIeY0Ge"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111E361FF2;
-	Thu,  1 Aug 2024 14:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3E61A488A;
+	Thu,  1 Aug 2024 14:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722521210; cv=none; b=bSisHixGbukIhqD3U1x7i1TdwRREgcMLZ5cOlHPIFf1uWnmPyPhx5D1+sFnAwUHOcPGxe1CFsVB1JClGXZMUrgRlLKE4GyTrDQD2G6d3BIpIQNFFJGcOeCil8hKSTzKXD14ELNqprKDO1/YZ6GNtbz8O3AybW23HlFFGCsR2GBo=
+	t=1722521262; cv=none; b=aPpVIrSakQgfBWB5Rz0zXkJRuOjy3Mnhf7sChb5HpJA9m2ptR9/Hm5Xw/JsWsyqqLKNNYUrr4VneOd0E136nzVn3qu8F4ayU1R7P6eSEy2KKg9DmEOETmKB+r+mVftWkIKH/W463LpP/7nGfK17H8XPzolb87NHiyZz4faPPD08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722521210; c=relaxed/simple;
-	bh=2SY/g90szcAY8OrYEbdVRqsEVF5Yq8RbvesWbQ7ob3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ih0CC+8PORKXJMGEEf4yDY7u+Y0xKZr3PYbGbHpB/Px1L1vVboZ4bUMrR69sEcHM0WoAv68yDxb3J+NN6fGJ4vRV7COUlTdjchJfU/veQRcd32jNAdHEWEcmeTnmQpWeRJyrELhcQ1t8ri8Hzz8rjHROxtXNMOyGbmQMc0MO3w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sZWRt-0000qM-5i; Thu, 01 Aug 2024 16:06:33 +0200
-Date: Thu, 1 Aug 2024 16:06:33 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH] e1000e: use ip_hdrlen() instead of bit shift
-Message-ID: <20240801140633.GA2680@breakpoint.cc>
-References: <20240801134709.1737190-2-yyyynoom@gmail.com>
+	s=arc-20240116; t=1722521262; c=relaxed/simple;
+	bh=YX0KgtYQVa5YzigsQeAAQyteVvcaWRSiNqCBfz5+BPY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iQvrd0RWhtGJEO4r6+u/w4jUkB+R56byEf6NbHFPXvgj6xtICeijDI6FkwyybrcffcVhF88P/emAceSddQ0UNGejqHqwZuB+TlDw4k1d7Vf3D7JaP5GwgfzioBF8qLuTFsc/UGH7Zt0Gj+kbiVyormhlUq7nOIMS58AtYI2sL/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QkIeY0Ge; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EEE5C32786;
+	Thu,  1 Aug 2024 14:07:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722521261;
+	bh=YX0KgtYQVa5YzigsQeAAQyteVvcaWRSiNqCBfz5+BPY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QkIeY0Ge6mBJtUYLXFLSGLvbad8OPzCfNFb+WTpe26AIxANxKgcC468Dli1myUbxq
+	 rkac/cGcdFGrvOs+Bzaf6HK/jbRaHtNXyZysRmWo6DxbXaI1QAYbv89Wdf5KdJ414o
+	 KSMjLpFPiQxGzXV4zfL3HgCRGliPaxK1caI0/iGPb3QHim5iLgsHyzCOo+iN9FePSh
+	 VXLZByBgET9fld/mboN8MhMrBaLPeLzVrNZqFThaWLWKrkVUfS45mzmtp08uVgr+32
+	 cEmRSK917S5uniuytQDn/4wvUHLiG6Ji3pXLX1EM+RBxDS8xTUrB31WUxR0leHXLLc
+	 eD37J2yHo1+DQ==
+Date: Thu, 1 Aug 2024 07:07:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, <netdev@vger.kernel.org>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>, Shuah
+ Khan <shuah@kernel.org>, Joe Damato <jdamato@fastly.com>,
+ <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] selftests: net: ksft: support marking
+ tests as disruptive
+Message-ID: <20240801070740.4ae582df@kernel.org>
+In-Reply-To: <87zfpw62hi.fsf@nvidia.com>
+References: <20240730223932.3432862-1-sdf@fomichev.me>
+	<20240730223932.3432862-2-sdf@fomichev.me>
+	<878qxh7mf4.fsf@nvidia.com>
+	<Zqqi8LhvSn1MXu9B@mini-arch>
+	<87zfpw62hi.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801134709.1737190-2-yyyynoom@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Moon Yeounsu <yyyynoom@gmail.com> wrote:
-> There's no reason to use bit shift to find the UDP header.
-> It's not intuitive and it reinvents well-defined functions.
+On Thu, 1 Aug 2024 10:36:18 +0200 Petr Machata wrote:
+> You seem to be right about the exit code. This was discussed some time
+> ago, that SKIP is considered a sort of a failure. As the person running
+> the test you would want to go in and fix whatever configuration issue is
+> preventing the test from running. I'm not sure how it works in practice,
+> whether people look for skips in the test log explicitly or rely on exit
+> codes.
 > 
-> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
-> ---
->  drivers/net/ethernet/intel/e1000e/netdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-> index 360ee26557f7..07c4cf84bdf3 100644
-> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
-> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-> @@ -5731,7 +5731,7 @@ static int e1000_transfer_dhcp_info(struct e1000_adapter *adapter,
->  		if (ip->protocol != IPPROTO_UDP)
->  			return 0;
->  
-> -		udp = (struct udphdr *)((u8 *)ip + (ip->ihl << 2));
-> +		udp = (struct udphdr *)((u8 *)ip + ip_hdrlen(skb));
+> Maybe Jakub can chime in, since he's the one that cajoled me into
+> handling this whole SKIP / XFAIL business properly in bash selftests.
 
-This helper needs skb_network_header being set up correctly, are you
-sure thats the case here?  ip pointer is fetched via data + 14 right
-above, so it doesn't look like this would work.
+For HW testing there is a lot more variables than just "is there some
+tool missing in the VM image". Not sure how well we can do in detecting
+HW capabilities and XFAILing without making the tests super long.
+And this case itself is not very clear cut. On one hand, you expect 
+the test not to run if it's disruptive and executor can't deal with
+disruptive - IOW it's an eXpected FAIL. But it is an executor
+limitation, the device/driver could have been tested if it wasn't
+for the executor, so not entirely dissimilar to a tool missing.
+
+Either way - no strong opinion as of yet, we need someone to actually
+continuously run these to get experience :(
 
