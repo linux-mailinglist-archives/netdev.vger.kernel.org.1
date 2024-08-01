@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-115129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110BD945417
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 23:24:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4CA945415
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 23:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F341F23997
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 21:24:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E03211C22A06
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 21:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C183814B96B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4053314B940;
 	Thu,  1 Aug 2024 21:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="T89Byikc"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HmhWJHCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A7314A0A4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A647B1494DD
 	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 21:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722547435; cv=none; b=nz0yy1k2J74gYUbPIkNyvZ4t60fWp3Rue55yh4Y+EATom2mnkhJbP2sTt0kUW1k3PQmPk/C0tgog3ymgf+eHbA+xZCc2SlFNIna4XRNHkERaYIBcKDwyyd8gLz9PEHnlBKPqKwDyyGBakDkB5mHcuzCc0BmprPHRXfQJufeGrnw=
+	t=1722547435; cv=none; b=N9S5HKHnK+Isp7D6+ZTuz4Icfr8fEZXv8K+jEP2SmCb8/dsTgps2rNTK0iv+GHMTZcAWGsiqm5vzFjIddol5HlJDqqIlW9TyZsvy4P64TzNaPxQItI3kSECxu2psdeJWSur88SOZ6yo8jzLnBlJEhZVJGIprdaljsInj5fX4MPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722547435; c=relaxed/simple;
-	bh=t/1BK2+tpAaAfFQB+q8K22HzLFSh7Meh2ZHVRJ/qz7Y=;
+	bh=/5IPclrHsaUvM7TADbV9D1+E/F7dEp3ehWQF8As5Enw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jOCVh9GnHyRRYZlpVYNTCWIkEw3BJcz3b/lZW+28Iu0BaQ7plXPLZaprEuUKpsM7ZFozhbnFN/btHacv1JxNME72joh9NvXKUrvgeiBNzZ2LhZWUaip+1Priv09irPLfBkd9KuJkxBW9trTHG0/Oae1JTgbRNC6rOLEnDabCwCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=T89Byikc; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=GGdKnycJyOHIzPcihjNx6qUsFvXpx2vlSc1PRUHUvgYqTeXf5/jZkjiLqt9rk26hNbRapPq4L9X/f5ss4PXaH/yYnU+W2t0CF/TQnIOsblqjLxRoHBxhvgA1R0Xo0qyNKWX6GWAoj/feLnIx0nD6y/1XeOJF54VbXC/0K8ABPCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HmhWJHCj; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471L14oM013771
-	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:23:52 GMT
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471L006B017788
+	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:23:53 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=j7s1Ev9EV0hKr
-	e5G+8Ibj5+DunSsTusQJb1T8kvtq6E=; b=T89ByikcATM2qhNXh/LWsxUT8ujDD
-	bvVeni8mPR8c5OK/gB12Qy2eSCa+JVpvh6em0e6ZGhjrEjtzWxuUbkoh1JmKCZup
-	BPVtdAAD0W5dKPx9BGmCn44GQty+Qvu0aE8yNNbrUn4R+ZG7Q2LbX9x8gxA8q7rn
-	El7Uis4B9NN+2M61cXPDhKnAffyDL/U0p7M5/xXR2+Whl6Ht8wGOsuy9JRv0RlRB
-	1lc2skXXT+0QAHdwvwZnxNKzG9RiIkdQTD3XKyLf3pPirAJU+mzAOrqpMrAHkLix
-	pDbvkHnABW0FgxeEaW8uqYFnsSISM50XG7S24tbyRe0c97VLe2YulyrNQ==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40rdyhrkdd-1
+	:mime-version:content-transfer-encoding; s=pp1; bh=iJIbUQsGqOirv
+	r18RJKQF+mcN6j/MBiSCm4tDcnBBBk=; b=HmhWJHCjwatx9sWK7mrqPHB5cZOwm
+	2S6e9umsqfVkgZQkBzIeRaI2w507uaXyEOhgam2YIpsAzSOIGC/QP4dLKr41mm2c
+	p8mPckDt92le4geaHnW+9fttnz8rI9/PBO8ydEOpBlWqqNfZHkGXiyXW2FDFeoJY
+	aYHlh9aX7QST0CbdpuBkpx0MtnmBv0vRj7YDMENxuRF4oZKNvgmLCQxP9LXedn3s
+	qUAkDgx9I/Jympges5TabtIZyunxQpd2LV0HP11St5wLbG6z7hJQ10BoWgwftHnY
+	AxVoBLCiaMxkgFb0EAZQw5S156euG9i9DLwViKXFoJEYyTA5PpV1goEug==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40rhvm01kh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 21:23:52 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 471IJ95k029118
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 471LDCAM007479
 	for <netdev@vger.kernel.org>; Thu, 1 Aug 2024 21:23:51 GMT
 Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nbm1449r-1
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40nb7um7a1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
 	for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 21:23:51 +0000
 Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 471LNkcc23331458
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 471LNkKl18547446
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Aug 2024 21:23:48 GMT
+	Thu, 1 Aug 2024 21:23:49 GMT
 Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3214F5805B;
+	by IMSVA (Postfix) with ESMTP id 9FE3E5806A;
 	Thu,  1 Aug 2024 21:23:46 +0000 (GMT)
 Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CDDA35805C;
-	Thu,  1 Aug 2024 21:23:45 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 45CE65805C;
+	Thu,  1 Aug 2024 21:23:46 +0000 (GMT)
 Received: from tinkpad.ibmuc.com (unknown [9.61.139.48])
 	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 Aug 2024 21:23:45 +0000 (GMT)
+	Thu,  1 Aug 2024 21:23:46 +0000 (GMT)
 From: Nick Child <nnac123@linux.ibm.com>
 To: netdev@vger.kernel.org
 Cc: bjking1@linux.ibm.com, haren@linux.ibm.com, ricklind@us.ibm.com,
         Nick Child <nnac123@linux.ibm.com>
-Subject: [PATCH net-next 5/7] ibmvnic: Introduce send sub-crq direct
-Date: Thu,  1 Aug 2024 16:23:38 -0500
-Message-ID: <20240801212340.132607-6-nnac123@linux.ibm.com>
+Subject: [PATCH net-next 6/7] ibmvnic: Only record tx completed bytes once per handler
+Date: Thu,  1 Aug 2024 16:23:39 -0500
+Message-ID: <20240801212340.132607-7-nnac123@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240801212340.132607-1-nnac123@linux.ibm.com>
 References: <20240801212340.132607-1-nnac123@linux.ibm.com>
@@ -85,171 +85,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: eVd9TfiJYffCRTgFgZ_1aMhD73YYnxAF
-X-Proofpoint-ORIG-GUID: eVd9TfiJYffCRTgFgZ_1aMhD73YYnxAF
+X-Proofpoint-ORIG-GUID: 8KPuvrnHDV9q_4yEIe9Uv6z0JqCfT-3o
+X-Proofpoint-GUID: 8KPuvrnHDV9q_4yEIe9Uv6z0JqCfT-3o
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-08-01_19,2024-08-01_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
- spamscore=0 mlxlogscore=739 mlxscore=0 adultscore=0 clxscore=1015
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ spamscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0
+ impostorscore=0 clxscore=1015 bulkscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2407110000 definitions=main-2408010142
 
-Firmware supports two hcalls to send a sub-crq request:
-H_SEND_SUB_CRQ_INDIRECT and H_SEND_SUB_CRQ. The indirect hcall allows
-for submission of batched messages while the other hcall is limited to
-only one message. This protocol is defined in PAPR section 17.2.3.3.
+Byte Queue Limits depends on dql_completed being called once per tx
+completion round in order to adjust its algorithm appropriately. The
+dql->limit value is an approximation of the amount of bytes that the NIC
+can consume per irq interval. If this approximation is too high then the
+NIC will become over-saturated. Too low and the NIC will starve.
 
-Previously, the ibmvnic xmit function only used the indirect hcall. This
-allowed the driver to batch it's skbs. A single skb can occupy a few
-entries per hcall depending on if FW requires skb header information or
-not. The FW only needs header information if the packet is segmented.
+The dql->limit depends on dql->prev-* stats to calculate an optimal
+value. If dql_completed() is called more than once per irq handler then
+those prev-* values become unreliable (because they are not an accurate
+representation of the previous state of the NIC) resulting in a
+sub-optimal limit value.
 
-By this logic, if an skb is not GSO then it can fit in one sub-crq
-message and therefore is a candidate for H_SEND_SUB_CRQ.
-Batching skb transmission is only useful when there are more packets
-coming down the line (ie netdev_xmit_more is true).
+Therefore, move the call to netdev_tx_completed_queue() to the end of
+ibmvnic_complete_tx().
 
-As it turns out, H_SEND_SUB_CRQ induces less latency than
-H_SEND_SUB_CRQ_INDIRECT. Therefore, use H_SEND_SUB_CRQ where
-appropriate.
+When performing 150 sessions of TCP rr (request-response 1 byte packets)
+workloads, one could observe:
+  PREVIOUSLY: - limit and inflight values hovering around 130
+              - transaction rate of around 750k pps.
 
-Small latency gains seen when doing TCP_RR_150 (request/response
-workload). Ftrace results (graph-time=1):
-  Previous:
-     ibmvnic_xmit = 29618270.83 us / 8860058.0 hits = AVG 3.34
-     ibmvnic_tx_scrq_flush = 21972231.02 us / 6553972.0 hits = AVG 3.35
-  Now:
-     ibmvnic_xmit = 22153350.96 us / 8438942.0 hits = AVG 2.63
-     ibmvnic_tx_scrq_flush = 15858922.4 us / 6244076.0 hits = AVG 2.54
+  NOW:        - limit rises and falls in response to inflight (130-900)
+              - transaction rate of around 1M pps (33% improvement)
 
 Signed-off-by: Nick Child <nnac123@linux.ibm.com>
 ---
- drivers/net/ethernet/ibm/ibmvnic.c | 52 ++++++++++++++++++++++++++----
- 1 file changed, 46 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/ibm/ibmvnic.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 533e79a0c6ac..c9aa276507bb 100644
+index c9aa276507bb..05c0d68c3efa 100644
 --- a/drivers/net/ethernet/ibm/ibmvnic.c
 +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -117,6 +117,7 @@ static void free_long_term_buff(struct ibmvnic_adapter *adapter,
- 				struct ibmvnic_long_term_buff *ltb);
- static void ibmvnic_disable_irqs(struct ibmvnic_adapter *adapter);
- static void flush_reset_queue(struct ibmvnic_adapter *adapter);
-+static void print_subcrq_error(struct device *dev, int rc, const char *func);
+@@ -4186,20 +4186,17 @@ static int ibmvnic_complete_tx(struct ibmvnic_adapter *adapter,
+ 			       struct ibmvnic_sub_crq_queue *scrq)
+ {
+ 	struct device *dev = &adapter->vdev->dev;
++	int num_packets = 0, total_bytes = 0;
+ 	struct ibmvnic_tx_pool *tx_pool;
+ 	struct ibmvnic_tx_buff *txbuff;
+ 	struct netdev_queue *txq;
+ 	union sub_crq *next;
+-	int index;
+-	int i;
++	int index, i;
  
- struct ibmvnic_stat {
- 	char name[ETH_GSTRING_LEN];
-@@ -2331,8 +2332,29 @@ static void ibmvnic_tx_scrq_clean_buffer(struct ibmvnic_adapter *adapter,
+ restart_loop:
+ 	while (pending_scrq(adapter, scrq)) {
+ 		unsigned int pool = scrq->pool_index;
+ 		int num_entries = 0;
+-		int total_bytes = 0;
+-		int num_packets = 0;
+-
+ 		next = ibmvnic_next_scrq(adapter, scrq);
+ 		for (i = 0; i < next->tx_comp.num_comps; i++) {
+ 			index = be32_to_cpu(next->tx_comp.correlators[i]);
+@@ -4235,8 +4232,6 @@ static int ibmvnic_complete_tx(struct ibmvnic_adapter *adapter,
+ 		/* remove tx_comp scrq*/
+ 		next->tx_comp.first = 0;
+ 
+-		txq = netdev_get_tx_queue(adapter->netdev, scrq->pool_index);
+-		netdev_tx_completed_queue(txq, num_packets, total_bytes);
+ 
+ 		if (atomic_sub_return(num_entries, &scrq->used) <=
+ 		    (adapter->req_tx_entries_per_subcrq / 2) &&
+@@ -4261,6 +4256,9 @@ static int ibmvnic_complete_tx(struct ibmvnic_adapter *adapter,
+ 		goto restart_loop;
  	}
+ 
++	txq = netdev_get_tx_queue(adapter->netdev, scrq->pool_index);
++	netdev_tx_completed_queue(txq, num_packets, total_bytes);
++
+ 	return 0;
  }
  
-+static int send_subcrq_direct(struct ibmvnic_adapter *adapter,
-+			      u64 remote_handle, u64 *entry)
-+{
-+	unsigned int ua = adapter->vdev->unit_address;
-+	struct device *dev = &adapter->vdev->dev;
-+	int rc;
-+
-+	/* Make sure the hypervisor sees the complete request */
-+	dma_wmb();
-+	rc = plpar_hcall_norets(H_SEND_SUB_CRQ, ua,
-+				cpu_to_be64(remote_handle),
-+				cpu_to_be64(entry[0]), cpu_to_be64(entry[1]),
-+				cpu_to_be64(entry[2]), cpu_to_be64(entry[3]));
-+
-+	if (rc)
-+		print_subcrq_error(dev, rc, __func__);
-+
-+	return rc;
-+}
-+
- static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
--				 struct ibmvnic_sub_crq_queue *tx_scrq)
-+				 struct ibmvnic_sub_crq_queue *tx_scrq,
-+				 bool indirect)
- {
- 	struct ibmvnic_ind_xmit_queue *ind_bufp;
- 	u64 dma_addr;
-@@ -2347,7 +2369,13 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
- 
- 	if (!entries)
- 		return 0;
--	rc = send_subcrq_indirect(adapter, handle, dma_addr, entries);
-+
-+	if (indirect)
-+		rc = send_subcrq_indirect(adapter, handle, dma_addr, entries);
-+	else
-+		rc = send_subcrq_direct(adapter, handle,
-+					(u64 *)ind_bufp->indir_arr);
-+
- 	if (rc)
- 		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
- 	else
-@@ -2405,7 +2433,7 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 		tx_dropped++;
- 		tx_send_failed++;
- 		ret = NETDEV_TX_OK;
--		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq);
-+		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, true);
- 		if (lpar_rc != H_SUCCESS)
- 			goto tx_err;
- 		goto out;
-@@ -2423,7 +2451,7 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 		tx_send_failed++;
- 		tx_dropped++;
- 		ret = NETDEV_TX_OK;
--		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq);
-+		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, true);
- 		if (lpar_rc != H_SUCCESS)
- 			goto tx_err;
- 		goto out;
-@@ -2518,6 +2546,16 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 		tx_crq.v1.flags1 |= IBMVNIC_TX_LSO;
- 		tx_crq.v1.mss = cpu_to_be16(skb_shinfo(skb)->gso_size);
- 		hdrs += 2;
-+	} else if (!ind_bufp->index && !netdev_xmit_more()) {
-+		ind_bufp->indir_arr[0] = tx_crq;
-+		ind_bufp->index = 1;
-+		tx_buff->num_entries = 1;
-+		netdev_tx_sent_queue(txq, skb->len);
-+		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, false);
-+		if (lpar_rc != H_SUCCESS)
-+			goto tx_err;
-+
-+		goto early_exit;
- 	}
- 
- 	if ((*hdrs >> 7) & 1)
-@@ -2527,7 +2565,7 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	tx_buff->num_entries = num_entries;
- 	/* flush buffer if current entry can not fit */
- 	if (num_entries + ind_bufp->index > IBMVNIC_MAX_IND_DESCS) {
--		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq);
-+		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, true);
- 		if (lpar_rc != H_SUCCESS)
- 			goto tx_flush_err;
- 	}
-@@ -2535,15 +2573,17 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	indir_arr[0] = tx_crq;
- 	memcpy(&ind_bufp->indir_arr[ind_bufp->index], &indir_arr[0],
- 	       num_entries * sizeof(struct ibmvnic_generic_scrq));
-+
- 	ind_bufp->index += num_entries;
- 	if (__netdev_tx_sent_queue(txq, skb->len,
- 				   netdev_xmit_more() &&
- 				   ind_bufp->index < IBMVNIC_MAX_IND_DESCS)) {
--		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq);
-+		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq, true);
- 		if (lpar_rc != H_SUCCESS)
- 			goto tx_err;
- 	}
- 
-+early_exit:
- 	if (atomic_add_return(num_entries, &tx_scrq->used)
- 					>= adapter->req_tx_entries_per_subcrq) {
- 		netdev_dbg(netdev, "Stopping queue %d\n", queue_num);
 -- 
 2.43.0
 
