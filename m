@@ -1,199 +1,179 @@
-Return-Path: <netdev+bounces-114758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4104943F84
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:43:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016BB943FC6
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:51:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80585280CEF
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:43:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94B151F21D17
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745051E675B;
-	Thu,  1 Aug 2024 00:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BA413958F;
+	Thu,  1 Aug 2024 00:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RSe698KP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u4VV1ZfU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CCE1E6756;
-	Thu,  1 Aug 2024 00:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F101EB48E;
+	Thu,  1 Aug 2024 00:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722472795; cv=none; b=RjJxPpB/PIg68Fv3S65TvDfhA19grfqWQhomQXdfYdM3tUH34kwyGbK3CtrFlzZpQRVtGPEBC5tOPvaouL9UO7n3hpCQinKl4yfnLhc3L2QEcFracOxfuBA7BQ31G0JFQpGYF61peR3PvCOrRaFMbmrVumn79co4izNAN1i137s=
+	t=1722472968; cv=none; b=bEC11+uCNErBmWn5ytNRrXKUmYUg9Rv4A9T973zwRZfL25fh9Q1WLGy0y5QXCf3GFI5xxVa0moODygWIj4PBsLystvmOKkScycNR2oePkUuyFBAGudx+G9oqz3a9T/ZS1frr5nS7qxYbx65QhKYsDPBJB/pMaRvQ8T4pifC6vkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722472795; c=relaxed/simple;
-	bh=4BXR4JcvO9vGctGO2IBOSUS0T0Yfa+JJK3OZfM9KkmA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hH3OA2faJHlhSJNRb7X88qlMxBz1OuBeccnpf4oIy79DnRJPfNfNoGnuDiRvJeET53lBHwANVnKEIMqoPWCHICDAq04ywmtpYlnRFanVXbCG1ngtdKnKW9R/RTUhunbQaoOZq48I5TqPh2HrktvPR6JmiO2fEMbIiZfz2oIjisc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RSe698KP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 540A7C4AF12;
-	Thu,  1 Aug 2024 00:39:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722472794;
-	bh=4BXR4JcvO9vGctGO2IBOSUS0T0Yfa+JJK3OZfM9KkmA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RSe698KPxHPVN2XDwm3Yn5jFM0sIIa8c9wREf3QlFnn+4IyoSeWaARWPEM3Nx7a9w
-	 vkx487/AXE+NDChMEDfdIzGBFNZfAR5lNlE6tcRHPyFPRGfDvjhqfgAwDrSWRP8FH9
-	 a1bs2ADg8W20maYCaGoX3pvWKDqJ0GqRQdEtC6OPa3RHBBdupeGcz9Aq6pxXuRd6Xi
-	 XTnFpdrQq/oZkpjQcl+vVpDwJq/lxglEjzKcx67+WpQC8vWwYSwc3J0dFM12HQqqyz
-	 HFJ4zwbvaU+BqzBP80xHKny1XFh2Vejri/pGHT+1QWKcV08cEk2TVbzfSz6h4u8VDN
-	 W+/HMvwKNUIig==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 10/22] wifi: cfg80211: make hash table duplicates more survivable
-Date: Wed, 31 Jul 2024 20:38:39 -0400
-Message-ID: <20240801003918.3939431-10-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240801003918.3939431-1-sashal@kernel.org>
-References: <20240801003918.3939431-1-sashal@kernel.org>
+	s=arc-20240116; t=1722472968; c=relaxed/simple;
+	bh=g9JH59jqe6ZJ/Q0Ob3lp9iRrD2iq1QlW1S3e/H2/u/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fre6j36+95q1qbY/5w7XYGxbcM+k3GlWh2Zz9vjrHOZR69UGl/t1kskm66tKJGu54k2Pi22PPubR7nOdxM5tmTeywLd94s6Flt9cI/R03QE21fckGUOgeC25CCYUlF7f7nRB3+IJVt4cAgAfxwSbbRXV51ltkj6NQuc8143amm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u4VV1ZfU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/jd3KZlGOhhh3/tY9fl99zgakKDa85hqjwlNTtlP8KE=; b=u4VV1ZfUx0p9ZjbZ4Tv3Q73j+U
+	f4W+CBsFse71lcLp7p6rPvJHdgenlk3OcL/QR5MaTV0MSLwAydYX5ZufgScyQYbjFObF2QD0AR3Fk
+	e0zl5nqQ5gC2idemngPsPuFKiN9IyvP2/O3jusD4F4JLWP+7/BeAZK748HhgRFeJmp1Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sZJtt-003izk-6P; Thu, 01 Aug 2024 02:42:37 +0200
+Date: Thu, 1 Aug 2024 02:42:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 03/10] net: hibmcge: Add mdio and hardware
+ configuration supported in this module
+Message-ID: <ba5b8b48-64b7-417d-a000-2e82e242c399@lunn.ch>
+References: <20240731094245.1967834-1-shaojijie@huawei.com>
+ <20240731094245.1967834-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.281
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240731094245.1967834-4-shaojijie@huawei.com>
 
-From: Johannes Berg <johannes.berg@intel.com>
+> +int hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
+> +{
+> +	if (speed != HBG_PORT_MODE_SGMII_10M &&
+> +	    speed != HBG_PORT_MODE_SGMII_100M &&
+> +	    speed != HBG_PORT_MODE_SGMII_1000M)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (duplex != DUPLEX_FULL && duplex != DUPLEX_HALF)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (speed == HBG_PORT_MODE_SGMII_1000M && duplex == DUPLEX_HALF)
+> +		return -EOPNOTSUPP;
 
-[ Upstream commit 7f12e26a194d0043441f870708093d9c2c3bad7d ]
+If you tell phylib you don't support 1G/Half, this will not happen.
 
-Jiazi Li reported that they occasionally see hash table duplicates
-as evidenced by the WARN_ON() in rb_insert_bss() in this code.  It
-isn't clear how that happens, nor have I been able to reproduce it,
-but if it does happen, the kernel crashes later, when it tries to
-unhash the entry that's now not hashed.
+> +/* sgmii autoneg always enable */
+> +int hbg_hw_sgmii_autoneg(struct hbg_priv *priv)
+> +{
 
-Try to make this situation more survivable by removing the BSS from
-the list(s) as well, that way it's fully leaked here (as had been
-the intent in the hash insert error path), and no longer reachable
-through the list(s) so it shouldn't be unhashed again later.
+> +	wait_time = 0;
+> +	do {
+> +		msleep(HBG_HW_AUTONEG_TIMEOUT_STEP);
+> +		wait_time += HBG_HW_AUTONEG_TIMEOUT_STEP;
+> +
+> +		an_state.bits = hbg_reg_read(priv, HBG_REG_AN_NEG_STATE_ADDR);
+> +		if (an_state.an_done)
+> +			break;
+> +	} while (wait_time < HBG_HW_AUTONEG_TIMEOUT_MS);
 
-Link: https://lore.kernel.org/r/20231026013528.GA24122@Jiazi.Li
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Link: https://msgid.link/20240607181726.36835-2-johannes@sipsolutions.net
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/wireless/scan.c | 46 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 34 insertions(+), 12 deletions(-)
+include/linux/iopoll.h
 
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index c74882e3c3096..b28e652514e80 100644
---- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -1003,7 +1003,7 @@ struct cfg80211_bss *cfg80211_get_bss(struct wiphy *wiphy,
- }
- EXPORT_SYMBOL(cfg80211_get_bss);
- 
--static void rb_insert_bss(struct cfg80211_registered_device *rdev,
-+static bool rb_insert_bss(struct cfg80211_registered_device *rdev,
- 			  struct cfg80211_internal_bss *bss)
- {
- 	struct rb_node **p = &rdev->bss_tree.rb_node;
-@@ -1019,7 +1019,7 @@ static void rb_insert_bss(struct cfg80211_registered_device *rdev,
- 
- 		if (WARN_ON(!cmp)) {
- 			/* will sort of leak this BSS */
--			return;
-+			return false;
- 		}
- 
- 		if (cmp < 0)
-@@ -1030,6 +1030,7 @@ static void rb_insert_bss(struct cfg80211_registered_device *rdev,
- 
- 	rb_link_node(&bss->rbn, parent, p);
- 	rb_insert_color(&bss->rbn, &rdev->bss_tree);
-+	return true;
- }
- 
- static struct cfg80211_internal_bss *
-@@ -1056,6 +1057,34 @@ rb_find_bss(struct cfg80211_registered_device *rdev,
- 	return NULL;
- }
- 
-+static void cfg80211_insert_bss(struct cfg80211_registered_device *rdev,
-+				struct cfg80211_internal_bss *bss)
-+{
-+	lockdep_assert_held(&rdev->bss_lock);
-+
-+	if (!rb_insert_bss(rdev, bss))
-+		return;
-+	list_add_tail(&bss->list, &rdev->bss_list);
-+	rdev->bss_entries++;
-+}
-+
-+static void cfg80211_rehash_bss(struct cfg80211_registered_device *rdev,
-+                                struct cfg80211_internal_bss *bss)
-+{
-+	lockdep_assert_held(&rdev->bss_lock);
-+
-+	rb_erase(&bss->rbn, &rdev->bss_tree);
-+	if (!rb_insert_bss(rdev, bss)) {
-+		list_del(&bss->list);
-+		if (!list_empty(&bss->hidden_list))
-+			list_del_init(&bss->hidden_list);
-+		if (!list_empty(&bss->pub.nontrans_list))
-+			list_del_init(&bss->pub.nontrans_list);
-+		rdev->bss_entries--;
-+	}
-+	rdev->bss_generation++;
-+}
-+
- static bool cfg80211_combine_bsses(struct cfg80211_registered_device *rdev,
- 				   struct cfg80211_internal_bss *new)
- {
-@@ -1331,9 +1360,7 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
- 			bss_ref_get(rdev, pbss);
- 		}
- 
--		list_add_tail(&new->list, &rdev->bss_list);
--		rdev->bss_entries++;
--		rb_insert_bss(rdev, new);
-+		cfg80211_insert_bss(rdev, new);
- 		found = new;
- 	}
- 
-@@ -2142,10 +2169,7 @@ void cfg80211_update_assoc_bss_entry(struct wireless_dev *wdev,
- 		if (!WARN_ON(!__cfg80211_unlink_bss(rdev, new)))
- 			rdev->bss_generation++;
- 	}
--
--	rb_erase(&cbss->rbn, &rdev->bss_tree);
--	rb_insert_bss(rdev, cbss);
--	rdev->bss_generation++;
-+	cfg80211_rehash_bss(rdev, cbss);
- 
- 	list_for_each_entry_safe(nontrans_bss, tmp,
- 				 &cbss->pub.nontrans_list,
-@@ -2153,9 +2177,7 @@ void cfg80211_update_assoc_bss_entry(struct wireless_dev *wdev,
- 		bss = container_of(nontrans_bss,
- 				   struct cfg80211_internal_bss, pub);
- 		bss->pub.channel = chan;
--		rb_erase(&bss->rbn, &rdev->bss_tree);
--		rb_insert_bss(rdev, bss);
--		rdev->bss_generation++;
-+		cfg80211_rehash_bss(rdev, bss);
- 	}
- 
- done:
--- 
-2.43.0
+> +static const u32 hbg_mode_ability[] = {
+> +	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> +	ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+> +	ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+> +	ETHTOOL_LINK_MODE_10baseT_Half_BIT,
+> +	ETHTOOL_LINK_MODE_Autoneg_BIT,
+> +	ETHTOOL_LINK_MODE_TP_BIT,
+> +};
+> +
+> +static int hbg_mac_init(struct hbg_priv *priv)
+> +{
+> +	struct hbg_mac *mac = &priv->mac;
+> +	u32 i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(hbg_mode_ability); i++)
+> +		linkmode_set_bit(hbg_mode_ability[i], mac->supported);
 
+Humm, odd. Where is this leading...
+
+> +#define HBG_MDIO_FREQUENCE_2_5M		0x1
+
+I assume it supports other frequencies. You might want to implement
+the DT property 'clock-frequency'. Many modern PHY will work faster
+than 2.5Mhz.
+
+> +static int hbg_phy_connect(struct hbg_priv *priv)
+> +{
+> +	struct phy_device *phydev = priv->mac.phydev;
+> +	struct hbg_mac *mac = &priv->mac;
+> +	int ret;
+> +
+> +	linkmode_copy(phydev->supported, mac->supported);
+> +	linkmode_copy(phydev->advertising, mac->supported);
+
+And here it is. Why? Do you see any other MAC driver doing this?
+
+What you probably want is:
+
+phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+
+which is what other MAC drivers do.
+
+> +
+> +	phy_connect_direct(priv->netdev, mac->phydev, hbg_phy_adjust_link,
+> +			   PHY_INTERFACE_MODE_SGMII);
+> +	ret = devm_add_action_or_reset(&priv->pdev->dev,
+> +				       hbg_phy_disconnect, mac->phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	phy_attached_info(phydev);
+> +	return 0;
+> +}
+> +
+> +/* include phy link and mac link */
+> +u32 hbg_get_link_status(struct hbg_priv *priv)
+> +{
+> +	struct phy_device *phydev = priv->mac.phydev;
+> +	int ret;
+> +
+> +	if (!phydev)
+> +		return HBG_LINK_DOWN;
+> +
+> +	phy_read_status(phydev);
+> +	if ((phydev->state != PHY_UP && phydev->state != PHY_RUNNING) ||
+> +	    !phydev->link)
+> +		return HBG_LINK_DOWN;
+> +
+> +	ret = hbg_hw_sgmii_autoneg(priv);
+> +	if (ret)
+> +		return HBG_LINK_DOWN;
+> +
+> +	return HBG_LINK_UP;
+> +}
+
+There should not be any need for this. So why do you have it?
+
+	Andrew
 
