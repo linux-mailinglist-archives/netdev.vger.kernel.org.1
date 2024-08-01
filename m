@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-114890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F52C94491B
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:10:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556CA944933
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D8D4B26EAF
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 028F1282F2D
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556CD183CA9;
-	Thu,  1 Aug 2024 10:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE3916D4E2;
+	Thu,  1 Aug 2024 10:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vk91k9eL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dvNhcydO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B8B16D33D
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 10:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DA1446A1;
+	Thu,  1 Aug 2024 10:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722507033; cv=none; b=LrnnROMn+9khElFY6YLaz28zkjyKebS8ncOpcWm47gkJk0P2E2Nm1cvDgYsD5FpHJZ8R42yjj+xv83i7vffBBiLe2op7Y7e5ahK5W2h4U1jHxydzqaA1rUw7DWyADy04tuOudgvKpIHs5j3CFPvC6ty0jRUxc9UUgcxuoURhRSY=
+	t=1722507632; cv=none; b=lS5h1yDq0tiBz5YcbbvCbpiVmx4JWxFH1ZL/kyBuRlVbYvr6TU2St3M39tBHPWf8NVt8pdVAIWHuyqTiittq1XajzEGCIpr9hXQAZ20i5tm637qEJSzU1VYSheVO0LvXE5vaIa+k4GQrvuI69qHKHjBFSU9gOeLOMFBvA9wDzVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722507033; c=relaxed/simple;
-	bh=1McIGP/+e5bL+o1LsHui08pyH/6H0zGABdTnBey5QIE=;
+	s=arc-20240116; t=1722507632; c=relaxed/simple;
+	bh=yuY62z9Ku//bmBc4AvZQ6FsYTlrjf3h2pnOjtcjlIVI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=d4FkqQIfwBaPFMQrdPlh5TMOXVt5dgIpHhTx8udlj9qR4JKNwqEQg9mQlYDdP/47RxQVsqPKtP7uTgviO+4KOHcUMOBcEWF1wldRhbFq7PN3Og5PXhSgsrAdhK6D6Aqm5qUYAdOognvUEX0GP6t34oW6kTombdtdZSAuxlB6z30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vk91k9eL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BCA13C4AF11;
-	Thu,  1 Aug 2024 10:10:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=j5QA31uUMj0zix5sFhQ7Lln/90Dl8LxgeDMmhS+hIs8UQzTP77huigRjuKA/PC3b3Us1YwBNI03ph8k/CzpInfJ9eA78OEBuwvmBnY5GpJBZZCkU2XUOB/0Z1RPUOp14OAehCLjaNbewKt+9uj2w6DiCfLOaaMh80i6nm/shNl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dvNhcydO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 627E8C4AF0A;
+	Thu,  1 Aug 2024 10:20:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722507032;
-	bh=1McIGP/+e5bL+o1LsHui08pyH/6H0zGABdTnBey5QIE=;
+	s=k20201202; t=1722507632;
+	bh=yuY62z9Ku//bmBc4AvZQ6FsYTlrjf3h2pnOjtcjlIVI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Vk91k9eLHdLeUrI3xOozgvptIrxGQHIOElUbPl/Sldhp3nSlk/vahLR0s9igOcfIP
-	 OkYz2aEgAnAmcxrEFU+KyuDtZZrbdlVuQd8+KaN1beO0tB0zKWOsoSx5kZE0l4ePoI
-	 LvrNEAnbaLg2geQkXWBGdA/JvtoX045k/7NTBWJe2sJF5CqOi5T6ZVkTJ35zs8pzjW
-	 vqSKR++yT4NiUcMvSlZ/uSjRMQLe3rdpPZBzzC1nctj12gS9iglJFP/3ZND/shq6iw
-	 te2VER/KfFP9rrAhRhdcyCpkSfz9hvSaWZBw18GLzlYh12cXuW80G5qx0KsRFqDZ8I
-	 +y80nNrXwUTHw==
+	b=dvNhcydO2PZNUbH4VA9fBCs4l7VqiScsXIUPbCcUj3ldhRfWtzngHLu5wOWUira44
+	 7v/H9w38lDOQDk5E5kpwbUuevd5bqisl35+CCpYTNmMrHbvckwISO97iP3S9dwNjiC
+	 pJJC6I/NjZdw8HfQxvtf88mYQB7UMNCyciqwFD1QjKSix/F2Qd34ayE/gjFqybPrNT
+	 97lbmmPW5iaFJbccTlGg0af9LD7kXPqIf05fnvXZFaKKSPnDwtii+P82WIkP6s1J62
+	 dJbmCE0bTAiRvWaFF/wkl98ZEcRWJM0GFqkxawE7eFKxFimubzWECPVHmCG/ZwFnlk
+	 y1dBAYvDq+GoA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA3C2C43443;
-	Thu,  1 Aug 2024 10:10:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 52FDCC43443;
+	Thu,  1 Aug 2024 10:20:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipv6: fix ndisc_is_useropt() handling for PIO
+Subject: Re: [PATCH net 1/2] netfilter: iptables: Fix null-ptr-deref in
+ iptable_nat_table_init().
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172250703269.567.4628237760105837009.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Aug 2024 10:10:32 +0000
-References: <20240730001748.147636-1-maze@google.com>
-In-Reply-To: <20240730001748.147636-1-maze@google.com>
-To: =?utf-8?q?Maciej_=C5=BBenczykowski_=3Cmaze=40google=2Ecom=3E?=@codeaurora.org
-Cc: zenczykowski@gmail.com, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, furry@google.com,
- lorenzo@google.com, prohr@google.com, dsahern@kernel.org,
- yoshfuji@linux-ipv6.org
+ <172250763233.8894.11448540825840373569.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Aug 2024 10:20:32 +0000
+References: <20240731213046.6194-2-pablo@netfilter.org>
+In-Reply-To: <20240731213046.6194-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-On Mon, 29 Jul 2024 17:17:48 -0700 you wrote:
-> The current logic only works if the PIO is between two
-> other ND user options.  This fixes it so that the PIO
-> can also be either before or after other ND user options
-> (for example the first or last option in the RA).
+On Wed, 31 Jul 2024 23:30:45 +0200 you wrote:
+> From: Kuniyuki Iwashima <kuniyu@amazon.com>
 > 
-> side note: there's actually Android tests verifying
-> a portion of the old broken behaviour, so:
->   https://android-review.googlesource.com/c/kernel/tests/+/3196704
-> fixes those up.
+> We had a report that iptables-restore sometimes triggered null-ptr-deref
+> at boot time. [0]
+> 
+> The problem is that iptable_nat_table_init() is exposed to user space
+> before the kernel fully initialises netns.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ipv6: fix ndisc_is_useropt() handling for PIO
-    https://git.kernel.org/netdev/net/c/a46c68debf3b
+  - [net,1/2] netfilter: iptables: Fix null-ptr-deref in iptable_nat_table_init().
+    https://git.kernel.org/netdev/net/c/5830aa863981
+  - [net,2/2] netfilter: iptables: Fix potential null-ptr-deref in ip6table_nat_table_init().
+    https://git.kernel.org/netdev/net/c/c22921df777d
 
 You are awesome, thank you!
 -- 
