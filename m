@@ -1,155 +1,170 @@
-Return-Path: <netdev+bounces-114871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BEEF944800
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:20:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C0D94486A
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 11:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B812E1F21539
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:20:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F8CB1C23A7C
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 09:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5AE16F910;
-	Thu,  1 Aug 2024 09:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8149D176AA4;
+	Thu,  1 Aug 2024 09:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b="YTbprTLY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+oDWmwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from kozue.soulik.info (kozue.soulik.info [108.61.200.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B424594D;
-	Thu,  1 Aug 2024 09:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.61.200.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B663F183CA6
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 09:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722503731; cv=none; b=JaPpeXsbnWcqSnhRqAD2GLjLwFwbvzpLaD6quVTzQsQ3fxZBUDSiLog4d5tkZWAsfQ/9XRjO4xzIhxZuOQ//q1nLF4n7mxJpkps40ETj0QQyO/4yOHWv+KUoThJ2+bR89caQL8ehIorXzmXXolCJxTa0yaba8QWMAlCJkrldqSg=
+	t=1722504655; cv=none; b=iObEYBvlTPQ+2A+kXBKpB74o7IMh4HgrleyIs9x7BpigOofrlM23itt0iAis2lbywlgZwkId74UTr0gelEUDoZ8hCRkmaahgEDnewS43qvHEzRuHKIq8kO4OXeoJfsEX3TdeuGnriUGG9nMKAI0GOjP2JtYu8BpZATLE1G/pXTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722503731; c=relaxed/simple;
-	bh=cbzefxrzQ80Dfzy2Ho2K90TDriu/T8sdcVwC9iQMHyo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gLSHTaRVRfWjlKTxoYNavnsCnh2WqFJ73QesstrZRA59xTDIPSABtbQC+GEoKSYVtrgUkrox+GqATGAXeiuz7eLb1u+H57pX47b4ldIWILh1NhuPkcxA4UVV95AC6ZlK5YgrgWVgyFaCPn1AOITr2/lSH8p0ktlBHop3i0FFckY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info; spf=pass smtp.mailfrom=soulik.info; dkim=pass (1024-bit key) header.d=soulik.info header.i=@soulik.info header.b=YTbprTLY; arc=none smtp.client-ip=108.61.200.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=soulik.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=soulik.info
-Received: from [192.168.10.7] (unknown [10.0.12.132])
-	by kozue.soulik.info (Postfix) with ESMTPSA id D09172FE3D7;
-	Thu,  1 Aug 2024 18:15:52 +0900 (JST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 kozue.soulik.info D09172FE3D7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=soulik.info; s=mail;
-	t=1722503753; bh=6QQd4dc8kiPVSmwmqkksH22s5o2u6z3WEqgTrQlwiyE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YTbprTLY4i35TB6ksB4wXO/HTlmeRSisYB180z9eAlrorWx4Ro70KP6ftoojNr1O6
-	 4ftUUsSkg3s9w1hVlFTVaBMdli9jlvBFBbVVy4QvPCxdNUEKYFnBvPJxoZ32/ObzCs
-	 ZXckQT6F05XPKzWjVGWX9eLQJYMpfa5jqauGl75E=
-Message-ID: <3d8b1691-6be5-4fe5-aa3f-58fd3cfda80a@soulik.info>
-Date: Thu, 1 Aug 2024 17:15:26 +0800
+	s=arc-20240116; t=1722504655; c=relaxed/simple;
+	bh=9k27yUTHR/1Y7t9sH2UfBxyzPXRcM9dV1q+lecVPP/w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u7O1f494GsMiAe9NPZRcJjVrjqCC/rnkVdS9UA2uaCLO1xKXGV06JUuEiq46Fw8weRbtZ4Dls5DIxneYaDm2whFP36Qbo+lSzd2503ZlXLeiA7BWkI2Z4g2r5rMZRMPHGkuI8lXNFwWlyomOYl2k4b/HXUFOF8W4Yc28OwlURtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+oDWmwV; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5b01af9b0c9so5787303a12.3
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 02:30:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722504652; x=1723109452; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8aGvTvKW7iy/o3QOmEbWWCsDZ0LvX5p+spHDDTQeU1Y=;
+        b=D+oDWmwV+Onz9MosBNHuhW3j3yalFUN2CbxzrfytZB4XN2v135mIYRVHfVlx2oPrDA
+         /nEDJVpXpLVR1jZclT3i+ruAvmagPb22ClZ/G9OeyjrgCGysV4c3dFuVTwYeoyZREGBj
+         MtS33ndjpWRdrdIz/IvH6ZaBrGSfnGLGBK6T6Pv6HrLrAKnuttK6RTiH6WQAPnrAxkv8
+         AIqAACOXHfhofKoXM+CiGZJdkApEvt0qFTYZ6vDMWrPLANm4fKuFrN/xBPjO6uuYaQs1
+         THI/S//g9sS+uf/ud8D/a/m+MOz7kjaCZ9zNflT1mBvAJxGATFt/b+fJTXLkCKLigyDM
+         8DGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722504652; x=1723109452;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8aGvTvKW7iy/o3QOmEbWWCsDZ0LvX5p+spHDDTQeU1Y=;
+        b=rbpK2PfWiysBU4LdBJ54R9cN4lBxBNEVS1mg+oHQaEP+rJ6kVjFaEblEbG6hQxiaYi
+         6LwkUym+qjgWGtoHtnyjw+LerLc0jLvgl4qXWa3NBKtJuPaGTRPywI89bFy2311TYc5V
+         dUiAlA+YP7YqCPDo3Vbm83T0yYaOIfuVrYKwcuKvnxsB0IkDXpv7C4RR1nOAkM0h6IVF
+         vvYIw3mwzEzGeEbhOgPr+Vhj4oHHNKiTr4SB5saLcV8Ja83WzGxH7KkNmtd4M8HYn+mj
+         5kwhSEOuepKXbylUOMDzXJz1bSd0tUtJL913f+f9EZ9B6VrMCdUyv7ShZC/GQWxpAPN3
+         ubYw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXYCrBOhkzBfVYro4yF21iudZlFiI0c9Iq4Nj+1RO24ST5G0rKtd9Rty6RTp+LHguU7fWqDyKAfPTwHIrkETyiAD8pKSJv
+X-Gm-Message-State: AOJu0YyRdCgM63j5D0XqmV5Cn3OK5bhzbzX6/DOW098/QN8OyzTsOiF+
+	XbAWpnlEg0Fzb6HcsjjZv75s3SBTDMTqCLxqppzE2TUrSWu1RNH8a0m/sA/GjsSA7j5Y0/iALZo
+	8Mb3FNbWnivtuWNy39l70sj6wm/rlXw==
+X-Google-Smtp-Source: AGHT+IG3e5CYN4upz6jGLNYh30tMURJ8gO1Im8gHkn8cN/fkTO/S6LbwizimQ8KCeScK+dqTxZHue6wZvOdqMaFx0RI=
+X-Received: by 2002:aa7:c50e:0:b0:5af:758a:6934 with SMTP id
+ 4fb4d7f45d1cf-5b6fbac96a4mr1216908a12.0.1722504651559; Thu, 01 Aug 2024
+ 02:30:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: tuntap: add ioctl() TUNGETQUEUEINDX to fetch queue
- index
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, jasowang@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
-References: <20240731111940.8383-1-ayaka@soulik.info>
- <66aa463e6bcdf_20b4e4294ea@willemb.c.googlers.com.notmuch>
- <bd69202f-c0da-4f46-9a6c-2375d82a2579@soulik.info>
- <66aab3614bbab_21c08c29492@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Randy Li <ayaka@soulik.info>
-In-Reply-To: <66aab3614bbab_21c08c29492@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240731120955.23542-1-kerneljasonxing@gmail.com>
+ <20240731120955.23542-6-kerneljasonxing@gmail.com> <CANn89iJasXPw-k_xHRAc3uFBtbovCd0QkVBPERCzKDOTk0cM3w@mail.gmail.com>
+In-Reply-To: <CANn89iJasXPw-k_xHRAc3uFBtbovCd0QkVBPERCzKDOTk0cM3w@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 1 Aug 2024 17:30:14 +0800
+Message-ID: <CAL+tcoAopVMG8ddjjASA6s1=6zJ6Wps3Lv5xDq+7LeCRMzGFVA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/6] tcp: rstreason: introduce
+ SK_RST_REASON_TCP_TIMEOUT for active reset
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hello Eric,
 
-On 2024/8/1 05:57, Willem de Bruijn wrote:
-> nits:
+On Thu, Aug 1, 2024 at 2:58=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
-> - INDX->INDEX. It's correct in the code
-> - prefix networking patches with the target tree: PATCH net-next
-I see.
+> On Wed, Jul 31, 2024 at 2:10=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Whether user sets TCP_USER_TIMEOUT option or not, when we find there
+> > is no left chance to proceed, we will send an RST to the other side.
+> >
 >
-> Randy Li wrote:
->> On 2024/7/31 22:12, Willem de Bruijn wrote:
->>> Randy Li wrote:
->>>> We need the queue index in qdisc mapping rule. There is no way to
->>>> fetch that.
->>> In which command exactly?
->> That is for sch_multiq, here is an example
->>
->> tc qdisc add dev  tun0 root handle 1: multiq
->>
->> tc filter add dev tun0 parent 1: protocol ip prio 1 u32 match ip dst
->> 172.16.10.1 action skbedit queue_mapping 0
->> tc filter add dev tun0 parent 1: protocol ip prio 1 u32 match ip dst
->> 172.16.10.20 action skbedit queue_mapping 1
->>
->> tc filter add dev tun0 parent 1: protocol ip prio 1 u32 match ip dst
->> 172.16.10.10 action skbedit queue_mapping 2
-> If using an IFF_MULTI_QUEUE tun device, packets are automatically
-> load balanced across the multiple queues, in tun_select_queue.
+> Not sure why you mention TCP_USER_TIMEOUT here.
 >
-> If you want more explicit queue selection than by rxhash, tun
-> supports TUNSETSTEERINGEBPF.
-
-I know this eBPF thing. But I am newbie to eBPF as well I didn't figure 
-out how to config eBPF dynamically.
-
-Besides, I think I still need to know which queue is the target in eBPF.
-
->> The purpose here is taking advantage of the multiple threads. For the
->> the server side(gateway of the tunnel's subnet), usually a different
->> peer would invoked a different encryption/decryption key pair, it would
->> be better to handle each in its own thread. Or the application would
->> need to implement a dispatcher here.
-> A thread in which context? Or do you mean queue?
-The thread in the userspace. Each thread responds for a queue.
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> > v2
+> > Link: https://lore.kernel.org/all/CAL+tcoB-12pUS0adK8M_=3DC97aXewYYmDA6=
+rJKLXvAXEHvEsWjA@mail.gmail.com/
+> > 1. correct the comment and changelog
+> > ---
+> >  include/net/rstreason.h | 8 ++++++++
+> >  net/ipv4/tcp_timer.c    | 2 +-
+> >  2 files changed, 9 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/net/rstreason.h b/include/net/rstreason.h
+> > index bbf20d0bbde7..739ad1db4212 100644
+> > --- a/include/net/rstreason.h
+> > +++ b/include/net/rstreason.h
+> > @@ -21,6 +21,7 @@
+> >         FN(TCP_ABORT_ON_LINGER)         \
+> >         FN(TCP_ABORT_ON_MEMORY)         \
+> >         FN(TCP_STATE)                   \
+> > +       FN(TCP_TIMEOUT)                 \
+> >         FN(MPTCP_RST_EUNSPEC)           \
+> >         FN(MPTCP_RST_EMPTCP)            \
+> >         FN(MPTCP_RST_ERESOURCE)         \
+> > @@ -108,6 +109,13 @@ enum sk_rst_reason {
+> >          * Please see RFC 9293 for all possible reset conditions
+> >          */
+> >         SK_RST_REASON_TCP_STATE,
+> > +       /**
+> > +        * @SK_RST_REASON_TCP_TIMEOUT: time to timeout
+> > +        * Whether user sets TCP_USER_TIMEOUT options or not, when we
+> > +        * have already run out of all the chances, we have to reset th=
+e
+> > +        * connection
+> > +        */
+> > +       SK_RST_REASON_TCP_TIMEOUT,
+> >
+> >         /* Copy from include/uapi/linux/mptcp.h.
+> >          * These reset fields will not be changed since they adhere to
+> > diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> > index 3910f6d8614e..bd403300e4c4 100644
+> > --- a/net/ipv4/tcp_timer.c
+> > +++ b/net/ipv4/tcp_timer.c
+> > @@ -807,7 +807,7 @@ static void tcp_keepalive_timer (struct timer_list =
+*t)
+> >                     (user_timeout =3D=3D 0 &&
+> >                     icsk->icsk_probes_out >=3D keepalive_probes(tp))) {
+> >                         tcp_send_active_reset(sk, GFP_ATOMIC,
+> > -                                             SK_RST_REASON_NOT_SPECIFI=
+ED);
+> > +                                             SK_RST_REASON_TCP_TIMEOUT=
+);
+> >                         tcp_write_err(sk);
+> >                         goto out;
+> >                 }
+> > --
+> > 2.37.3
+> >
 >
->> I am newbie to the tc(8), I verified the command above with a tun type
->> multiple threads demo. But I don't know how to drop the unwanted ingress
->> filter here, the queue 0 may be a little broken.
-> Not opposed to exposing the queue index if there is a need. Not sure
-> yet that there is.
->
-> Also, since for an IFF_MULTI_QUEUE the queue_id is just assigned
-> iteratively, it can also be inferred without an explicit call.
+> This is more about keepalive really. You should use a better name
+> reflecting that it is a keepalive timeout.
 
-I don't think there would be sequence lock in creating multiple queue. 
-Unless application uses an explicitly lock itself.
+I think you're right. Let me use 'TCP_KEEPALIVE_TIMEOUT' then.
 
-While that did makes a problem when a queue would be disabled. It would 
-swap the last queue index with that queue, leading to fetch the queue 
-index calling again, also it would request an update for the qdisc flow 
-rule.
-
-Could I submit a ***new*** PATCH which would peak a hole, also it 
-applies for re-enabling the queue.
-
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 1d06c560c5e6..5473a0fca2e1 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -3115,6 +3115,10 @@ static long __tun_chr_ioctl(struct file *file, 
-> unsigned int cmd,
->           if (!ns_capable(net->user_ns, CAP_NET_ADMIN))
->               return -EPERM;
->           return open_related_ns(&net->ns, get_net_ns);
-> +    } else if (cmd == TUNGETQUEUEINDEX) {
-> +        if (tfile->detached)
-> +            return -EINVAL;
-> +        return put_user(tfile->queue_index, (unsigned int __user*)argp);
-> Unless you're certain that these fields can be read without RTNL, move
-> below rtnl_lock() statement.
-> Would fix in v2. 
-I was trying to not hold the global lock or long period, that is why I 
-didn't made v2 yesterday.
-
-When I wrote this,  I saw ioctl() TUNSETQUEUE->tun_attach() above. Is 
-the rtnl_lock() scope the lighting lock here?
-
+Thanks,
+Jason
 
