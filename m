@@ -1,239 +1,210 @@
-Return-Path: <netdev+bounces-114807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07355944473
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:28:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE502944497
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 08:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85C461F21D51
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 06:28:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E012F1C21EF9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 06:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B71115852A;
-	Thu,  1 Aug 2024 06:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AC51581E5;
+	Thu,  1 Aug 2024 06:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MBmy231d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GI6K81Br"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E69158523
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 06:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2A0157A55
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 06:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722493715; cv=none; b=cuBV76n7/sHKMQZSr/9nl3lL2H2JgPDyJwX0um9wlQ1MpMl3+exg5ocFZiDQy84CxNuMnYCkWvF0G475v2DRCcJkwKfMm4ELOgOYM0C/uVQgmqi3DV6imxK9tcbOHafuI+4KMLm8m0HmsaewRABVVuLkSXKefG5II1gBUvYM/3c=
+	t=1722494398; cv=none; b=tIjjn4W4gTEtFAttsR4K0OKAFvZBXXtRfoDhRlwEWMJLFMGBvSxiDKjAZhIePUbGbjV4MeI/xwwjn3/dEDdbY6PyBrHwyCGjxq0Z8Z/8+JL+F0q19KX6EfiejN8Ib+nU4ed/CPUqwkcan1B7WQTs2g0yfDJSKQvqaCxYgrgtCQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722493715; c=relaxed/simple;
-	bh=CX0OvbedDWrepXq5Ff+fVTBJovH97z9Wq3vfLFVXQ3o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WDXd6klCWvuXT/j84HCDfSlaBcsqFrjPwJwq/MGpl7aw9E5vLL7Fu4mkV6cDlygIlCFp6Abi1/IYkEU6/ug9quNpxzs3r9hkPwmJJqO4KiVn9Umpzi9BpYPigzw+HRvAr0bWmAQyJLEjhAWFP4ZdrIHwbcqPXBfFoE21GDscIHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MBmy231d; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a869e3e9dfso28810a12.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 23:28:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722493712; x=1723098512; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QYXNdhUYAatsrfG4+QxkF3cxgEI8kD4jOZrGXfLxMPg=;
-        b=MBmy231d2iFxGqTOBOiKgtFfrUXqqfeLG8qD26yszCIOaZVweUcmkWdtUerINfUI4q
-         TFXpu3lgZ8yy1JGhPW7TFlGH9X5U5KA0lhGHwmdGxkQGMRfeC+jOx/XM4vN3WoHxJKWq
-         0Xlh/0eddEU2Xlulke1PPQj75fvvFBFZ2XwUhXE6Wqmgb5pRNZk6ZuB6PcES4HuAjD8c
-         KhETl68CI2lb/ypp9+yCvQQ6QG4FxB2dp148yYJqKynCz1Mz8K61ZDM6NMPiNSa7CCbj
-         cS0OqBBLu3njc5sVIhEFpdnKwoCCW9rEMSTJWhdf1nd2Vd3zm3lmlM6FFOzRJXiz1gra
-         YCzw==
+	s=arc-20240116; t=1722494398; c=relaxed/simple;
+	bh=MIkzmT0B6N/JUks0v7q4Co0amtR6DS8jN6AGVw7mpts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tOYyP6LzXzqfPvANOTYBCtySXMcDXVA8K88zzqWC/qGTdlLUGFATCEPSYzvJUbGNZUzcZT32FGYsr0Y+fP5zl5n9MdcwUB4SclPQk/vKIdKeptYKLKBF8S5ZqDc99cDuB2qt/EKyrCe0ALlluS+yzYtBu9W1uwOFw6DCMeF+vdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GI6K81Br; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722494396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yq5EurKQ9dkFyWq2vXbjFmrLWzUsKJD5wRCzk1mhzco=;
+	b=GI6K81Br2ohlkEIDqrYllGEymeXDePUVi2DDRgEWHsMsCEyA5/aEYnARanOxhREZHCqlS0
+	cMX7CXDyAg8LP05A+EIq0V8s4zbFAHGt8PQK4s5diEGyGXe9V40LblJ8Hb8LpeWx7Q+gRQ
+	7/rSdcHMfI92RQfhPH9J6MoloCu0MVc=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-301-8c8MwmZaPpW8ywhj0KQUJQ-1; Thu, 01 Aug 2024 02:39:53 -0400
+X-MC-Unique: 8c8MwmZaPpW8ywhj0KQUJQ-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ef2907e21bso56474221fa.3
+        for <netdev@vger.kernel.org>; Wed, 31 Jul 2024 23:39:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722493712; x=1723098512;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QYXNdhUYAatsrfG4+QxkF3cxgEI8kD4jOZrGXfLxMPg=;
-        b=pFLZQ2Sif0GaTLdmvn7U/gifeBxfomach9XZZA/c7eyvGGLEv+vj3haL4sw8O96GFl
-         LTV1nKcQEdQuVgIC1UuYH2m6uVdYp2nfRuE8e12JC7aAZH9ew0UXxf0Mes7BNQJpq8dE
-         +qmjFrH0Ol/wOOtPDhTKSFE2MnY1E64aH/gMVkvQixiWdZuJqFr0i+0t9K2SRRfJKOtJ
-         O4K4dxUtzeQYBQYm6fA4SM/CdhiNoc3fjFSCYh1fhmM+2sQmL2dMuU0njXtkVE80Uvi6
-         9E6tJ8tt4KeBv99X2gN5HfCrAjNBegbiXzUspZyk8YFC0ckRqQlBWcoZ76WM25ylqGS7
-         v7gA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBZe0JBa3AR3j3ZCcfl8Trbqng8y35emt7mn1Qdq27TprM/R2YLEb9tTZVd3xZYV7bF0lP4o8KNrqJw6Q1S7cZirFV7oYR
-X-Gm-Message-State: AOJu0YxEb1SxCVtSaIQRdjsDEyWw/8nAlguOWO1t/O/5bQiv1yWZ1W3k
-	zRw7jR0/IfafKFoUz0Nm8DFIA+XASob60GuTzm2Nj/FpSyUdmyyV672q/KcOgpTMTyER30QBlgw
-	lttVQ1ap/3KpccJp5PSRfmHwsqN1pXXMxDeT0
-X-Google-Smtp-Source: AGHT+IGeek4iZJETeidEv6O9lsAf47eIgvMdLrc9dZm6w3qTHSWzn95bdAV5OmXcUnhZU3W7t+DmM0qV4hBHYAh5Gos=
-X-Received: by 2002:a05:6402:40c4:b0:57c:b712:47b5 with SMTP id
- 4fb4d7f45d1cf-5b71bbd2aacmr79959a12.4.1722493711462; Wed, 31 Jul 2024
- 23:28:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722494392; x=1723099192;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yq5EurKQ9dkFyWq2vXbjFmrLWzUsKJD5wRCzk1mhzco=;
+        b=DFbVHMnTOLAukVEMsxrbT9Ig4OT4s+OoA+5OkkvLhrEMCbRDiomMUhRRcHfK5Om9JF
+         2/iMo+Byd9odQrQ7aMpfXUkna69tQuLTU0tra6CypEFzhya36zY9wIdD9GKVl/pNok30
+         x3Odx+OxMD6roO5aWCMn8vJbpH+b5E4DsNikD28Jc1lIEA2DNc7pwGuDUg/w10DXmwq1
+         pRIGLGk0lqjBGL3MfhQtOXOaEMtGixZb5V/Eb8H6yIFNVN5ZtYNmi1HKu1Wq/lwybhBI
+         qP3WaEiuwwhQoeVtF2tqFUV3MCipauSDFPITkf7pAraHaKvgSm3DMiY6z3/D+t5O5Mq3
+         /BKg==
+X-Gm-Message-State: AOJu0Yz1DH/q1nKDY2zsjW4Rmrw7537qkJuNMrf+0yYOneTnXqSLY0Pm
+	Y8m13mT18U7nJrt/J6Q51XKAphJbTLm1cB+2EpHswFlTyvUFbdK+vd7+PRddgIKCu2A+w0SukIZ
+	4HC6cy/WEzUUEABrNiF3cQ4ZHTXVJETFvcJoBpJTbY9nFFmfpuapYOw==
+X-Received: by 2002:a19:6454:0:b0:52f:6f49:3593 with SMTP id 2adb3069b0e04-530b61b8b85mr618129e87.34.1722494391984;
+        Wed, 31 Jul 2024 23:39:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHtTZmhDej7qpKommz5X1HfdiMkUv1JV/TjGkcQDXZidi7Gs3IMwM++A5Mx1g5YLF4QS8xxMw==
+X-Received: by 2002:a19:6454:0:b0:52f:6f49:3593 with SMTP id 2adb3069b0e04-530b61b8b85mr618112e87.34.1722494391134;
+        Wed, 31 Jul 2024 23:39:51 -0700 (PDT)
+Received: from redhat.com ([2.55.14.19])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b2d0b878b2sm5143274a12.85.2024.07.31.23.39.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 23:39:50 -0700 (PDT)
+Date: Thu, 1 Aug 2024 02:39:45 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev,
+	=?iso-8859-1?Q?EugenioP=E9rez?= <eperezma@redhat.com>
+Subject: Re: [PATCH net v2] virtio-net: unbreak vq resizing when coalescing
+ is not negotiated
+Message-ID: <20240801023927-mutt-send-email-mst@kernel.org>
+References: <20240731120717.49955-1-hengqi@linux.alibaba.com>
+ <20240731081409-mutt-send-email-mst@kernel.org>
+ <1722428723.505313-1-hengqi@linux.alibaba.com>
+ <20240731084632-mutt-send-email-mst@kernel.org>
+ <1722492463.6573224-1-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731150940.14106-1-aha310510@gmail.com>
-In-Reply-To: <20240731150940.14106-1-aha310510@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 1 Aug 2024 08:28:20 +0200
-Message-ID: <CANn89iJn8XT86yyvqD6ZZvjV7eAxBjUd6rddL6NNaXVRimOXhg@mail.gmail.com>
-Subject: Re: [PATCH net,v2] rtnetlink: fix possible deadlock in team_port_change_check
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	nicolas.dichtel@6wind.com, liuhangbin@gmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+44623300f057a28baf1e@syzkaller.appspotmail.com, 
-	syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1722492463.6573224-1-hengqi@linux.alibaba.com>
 
-On Wed, Jul 31, 2024 at 5:10=E2=80=AFPM Jeongjun Park <aha310510@gmail.com>=
- wrote:
->
-> In do_setlink() , do_set_master() is called when dev->flags does not have
-> the IFF_UP flag set, so 'team->lock' is acquired and dev_open() is called=
-,
-> which generates the NETDEV_UP event. This causes a deadlock as it tries t=
-o
-> acquire 'team->lock' again.
->
-> To solve this, we need to unlock 'team->lock' before calling dev_open()
-> in team_port_add() and then reacquire the lock when dev_open() returns.
-> Since the implementation acquires the lock in advance when the team
-> structure is used inside dev_open(), data races will not occur even if it
-> is briefly unlocked.
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> WARNING: possible recursive locking detected
-> 6.11.0-rc1-syzkaller-ge4fc196f5ba3-dirty #0 Not tainted
-> --------------------------------------------
-> syz.0.15/5889 is trying to acquire lock:
-> ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_port_chang=
-e_check drivers/net/team/team_core.c:2950 [inline]
-> ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_device_eve=
-nt+0x2c7/0x770 drivers/net/team/team_core.c:2973
->
-> but task is already holding lock:
-> ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_add_slave+=
-0x9c/0x20e0 drivers/net/team/team_core.c:1975
->
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
->
->        CPU0
->        ----
->   lock(team->team_lock_key#2);
->   lock(team->team_lock_key#2);
->
->  *** DEADLOCK ***
->
->  May be due to missing lock nesting notation
->
-> 2 locks held by syz.0.15/5889:
->  #0: ffffffff8fa1f4e8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rt=
-netlink.c:79 [inline]
->  #0: ffffffff8fa1f4e8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x3=
-72/0xea0 net/core/rtnetlink.c:6644
->  #1: ffff8880231e4d40 (team->team_lock_key#2){+.+.}-{3:3}, at: team_add_s=
-lave+0x9c/0x20e0 drivers/net/team/team_core.c:1975
->
-> stack backtrace:
-> CPU: 1 UID: 0 PID: 5889 Comm: syz.0.15 Not tainted 6.11.0-rc1-syzkaller-g=
-e4fc196f5ba3-dirty #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.=
-16.3-2~bpo12+1 04/01/2014
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:93 [inline]
->  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:119
->  check_deadlock kernel/locking/lockdep.c:3061 [inline]
->  validate_chain kernel/locking/lockdep.c:3855 [inline]
->  __lock_acquire+0x2167/0x3cb0 kernel/locking/lockdep.c:5142
->  lock_acquire kernel/locking/lockdep.c:5759 [inline]
->  lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
->  __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->  __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
->  team_port_change_check drivers/net/team/team_core.c:2950 [inline]
->  team_device_event+0x2c7/0x770 drivers/net/team/team_core.c:2973
->  notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
->  call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
->  call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
->  call_netdevice_notifiers net/core/dev.c:2046 [inline]
->  __dev_notify_flags+0x12d/0x2e0 net/core/dev.c:8876
->  dev_change_flags+0x10c/0x160 net/core/dev.c:8914
->  vlan_device_event+0xdfc/0x2120 net/8021q/vlan.c:468
->  notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
->  call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
->  call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
->  call_netdevice_notifiers net/core/dev.c:2046 [inline]
->  dev_open net/core/dev.c:1515 [inline]
->  dev_open+0x144/0x160 net/core/dev.c:1503
->  team_port_add drivers/net/team/team_core.c:1216 [inline]
->  team_add_slave+0xacd/0x20e0 drivers/net/team/team_core.c:1976
->  do_set_master+0x1bc/0x230 net/core/rtnetlink.c:2701
->  do_setlink+0x306d/0x4060 net/core/rtnetlink.c:2907
->  __rtnl_newlink+0xc35/0x1960 net/core/rtnetlink.c:3696
->  rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3743
->  rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6647
->  netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2550
->  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->  netlink_unicast+0x544/0x830 net/netlink/af_netlink.c:1357
->  netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg net/socket.c:745 [inline]
->  ____sys_sendmsg+0xab5/0xc90 net/socket.c:2597
->  ___sys_sendmsg+0x135/0x1e0 net/socket.c:2651
->  __sys_sendmsg+0x117/0x1f0 net/socket.c:2680
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fc07ed77299
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f=
-7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
- ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fc07fb7f048 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007fc07ef05f80 RCX: 00007fc07ed77299
-> RDX: 0000000000000000 RSI: 0000000020000600 RDI: 0000000000000012
-> RBP: 00007fc07ede48e6 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000000000000000b R14: 00007fc07ef05f80 R15: 00007ffeb5c0d528
->
-> Reported-by: syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
-> Fixes: ec4ffd100ffb ("Revert "net: rtnetlink: Enslave device before bring=
-ing it up"")
-> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
-> ---
->  drivers/net/team/team_core.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-> index ab1935a4aa2c..ee595c3c6624 100644
-> --- a/drivers/net/team/team_core.c
-> +++ b/drivers/net/team/team_core.c
-> @@ -1212,8 +1212,9 @@ static int team_port_add(struct team *team, struct =
-net_device *port_dev,
->                            portname);
->                 goto err_port_enter;
->         }
-> -
-> +       mutex_unlock(&team->lock);
+On Thu, Aug 01, 2024 at 02:07:43PM +0800, Heng Qi wrote:
+> On Wed, 31 Jul 2024 08:46:42 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Wed, Jul 31, 2024 at 08:25:23PM +0800, Heng Qi wrote:
+> > > On Wed, 31 Jul 2024 08:14:43 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > On Wed, Jul 31, 2024 at 08:07:17PM +0800, Heng Qi wrote:
+> > > > > >From the virtio spec:
+> > > > > 
+> > > > > 	The driver MUST have negotiated the VIRTIO_NET_F_VQ_NOTF_COAL
+> > > > > 	feature when issuing commands VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET
+> > > > > 	and VIRTIO_NET_CTRL_NOTF_COAL_VQ_GET.
+> > > > > 
+> > > > > The driver must not send vq notification coalescing commands if
+> > > > > VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated. This limitation of course
+> > > > > applies to vq resize.
+> > > > > 
+> > > > > Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq resize")
+> > > > > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > > > > Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > Acked-by: Eugenio Pé rez <eperezma@redhat.com>
+> > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > ---
+> > > > > v1->v2:
+> > > > >  - Rephrase the subject.
+> > > > >  - Put the feature check inside the virtnet_send_{r,t}x_ctrl_coal_vq_cmd().
+> > > > > 
+> > > > >  drivers/net/virtio_net.c | 10 ++++++++--
+> > > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > index 0383a3e136d6..2b566d893ea3 100644
+> > > > > --- a/drivers/net/virtio_net.c
+> > > > > +++ b/drivers/net/virtio_net.c
+> > > > > @@ -3658,6 +3658,9 @@ static int virtnet_send_rx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
+> > > > >  {
+> > > > >  	int err;
+> > > > >  
+> > > > > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+> > > > > +		return -EOPNOTSUPP;
+> > > > > +
+> > > > >  	err = virtnet_send_ctrl_coal_vq_cmd(vi, rxq2vq(queue),
+> > > > >  					    max_usecs, max_packets);
+> > > > >  	if (err)
+> > > > > @@ -3675,6 +3678,9 @@ static int virtnet_send_tx_ctrl_coal_vq_cmd(struct virtnet_info *vi,
+> > > > >  {
+> > > > >  	int err;
+> > > > >  
+> > > > > +	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+> > > > > +		return -EOPNOTSUPP;
+> > > > > +
+> > > > >  	err = virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(queue),
+> > > > >  					    max_usecs, max_packets);
+> > > > >  	if (err)
+> > > > > @@ -3743,7 +3749,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
+> > > > >  			err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
+> > > > >  							       vi->intr_coal_tx.max_usecs,
+> > > > >  							       vi->intr_coal_tx.max_packets);
+> > > > > -			if (err)
+> > > > > +			if (err && err != -EOPNOTSUPP)
+> > > > >  				return err;
+> > > > >  		}
+> > > > >
+> > > > 
+> > > > 
+> > > > So far so good.
+> > > >   
+> > > > > @@ -3758,7 +3764,7 @@ static int virtnet_set_ringparam(struct net_device *dev,
+> > > > >  							       vi->intr_coal_rx.max_usecs,
+> > > > >  							       vi->intr_coal_rx.max_packets);
+> > > > >  			mutex_unlock(&vi->rq[i].dim_lock);
+> > > > > -			if (err)
+> > > > > +			if (err && err != -EOPNOTSUPP)
+> > > > >  				return err;
+> > > > >  		}
+> > > > >  	}
+> > > > 
+> > > > I don't get this one. If resize is not supported,
+> > > 
+> > > Here means that the *dim feature* is not supported, not the *resize* feature.
+> > > 
+> > > > we pretend it was successful? Why?
+> > > 
+> > > During a resize, if the dim feature is not supported, the driver does not
+> > > need to try to recover any coalescing values, since the device does not have
+> > > these parameters.
+> > > Therefore, the resize should continue without interruption.
+> > > 
+> > > Thanks.
+> > 
+> > 
+> > you mean it's a separate bugfix?
+> 
+> Right.
+> 
+> Don't break resize when coalescing is not negotiated.
+> 
+> Thanks.
 
-Why would this be safe ?
+Let's make this a separate patch then, please.
 
-All checks done in team_port_add() before this point would need to be
-redone after mutex_lock() ?
+> > 
+> > > > 
+> > > > > -- 
+> > > > > 2.32.0.3.g01195cf9f
+> > > > 
+> > 
 
-If another mutex (rtnl ?) is already protecting this path, this would
-suggest team->lock should be removed,
-and RTNL should be used in all needed paths.
-
->         err =3D dev_open(port_dev, extack);
-> +       mutex_lock(&team->lock);
-
-
-
->         if (err) {
->                 netdev_dbg(dev, "Device %s opening failed\n",
->                            portname);
-> --
 
