@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-115022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44101944E81
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:52:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F4E944E5F
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:47:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5948E1C211B4
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:52:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1E51C20809
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27721A76A1;
-	Thu,  1 Aug 2024 14:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48061A6181;
+	Thu,  1 Aug 2024 14:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="q2sgE8gx"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="jHKhb5BM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fac.mail.infomaniak.ch (smtp-8fac.mail.infomaniak.ch [83.166.143.172])
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53C71A4887
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD6A1A6178
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722523935; cv=none; b=r0DmwKTPWE5NLjxmHXxmEXUemSm5O9fEJ/iuO8oXfTC2FncC/vpxZTUphp/I7ql1Ar3E5p/ag5rc2JsFIKAdlnew2S4hwBIvp8mYNPuhz5h6NGKWB524dDP8ekk7l5a8+qqRJJ9AMTNNRbKCeBMu1p8rTNYaTo9fYhuKQv1uzfE=
+	t=1722523631; cv=none; b=O8vKEK2ppTlyTLXjHmbqLUmPaT3V7gWQyxA1p01ov2QT4acf0z/B4VeoyIqvNrrGjQsm8/Xt0uf7I03dQEsFV8VgR1TeQGZpdheFGaWC5v+3v+wdoiBp4dthoy8LPk7nmzq82IEz+skxIs3r/ui8Wu4dpsZb/RJH9ApuvtlNEg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722523935; c=relaxed/simple;
-	bh=+KdHK0b3XxdW4O5hbDWzgXpW8h0tMLuS+cuVoM22y+Q=;
+	s=arc-20240116; t=1722523631; c=relaxed/simple;
+	bh=ccAfHXjlpcxJd+RNPtZFU7WL4Ujx9L4oH+JZadgvssY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sAMftS3/L/F8o0EyJfL+0rVSWT2aWnwEPjPnsG0IaHLBPQFa1Z85vJn85Po1AKXHwfGL/Ck3ujhHgjK/B50AtjdGWEHLJN6fy4Fgi4SlN9J5G7CsM49cSrVz+ar9Yy0hkO71vLZucnpP8mpdAWmGhcdfpTrsqm5M1ZwnbZw55bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=q2sgE8gx; arc=none smtp.client-ip=83.166.143.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=KoBI2hM3BWZLkEDJKqkEQhDJKJRL5hRQmvRGdJt1QumnNSDh/vnanl0DJDrxy99gCkvXnIw+kTribCiFztM+LJ8MJCeyP5cWx1lxCEiXK6TQR2ke8aiMSqWS7yIF8whwHxotsELwGCnGex/1AD+EdBvsieFH2pnyl1/wAzfQ1X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=jHKhb5BM; arc=none smtp.client-ip=84.16.66.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZWwS0XSwzw4l;
-	Thu,  1 Aug 2024 16:45:28 +0200 (CEST)
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZWyF2bxwzHTT;
+	Thu,  1 Aug 2024 16:47:01 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1722523527;
-	bh=x//Dp0shY6tzNnupZLePovHHLUCCNyFiszDQ/rMk7R0=;
+	s=20191114; t=1722523621;
+	bh=U7ym2UVwNdA0ykceU4yRjRUwU9WZGnk7Uy9wId/ABIg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q2sgE8gxeRPIvhixfGdhSjwDQhJ2iJ7uE3mNGs/PSaNKI9QaefT4zgKOs6yrkFLK1
-	 39nIgvfv41S9mMQD9mt7966Jg0eXNiZhRagrDwoiFbkfU+l78DF5Wa7PvmKGVx5sq/
-	 FeseOLTbubHOa7+i6b+ooCziu2plgQ9QTeSacdig=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZWwR41X3zRlc;
-	Thu,  1 Aug 2024 16:45:27 +0200 (CEST)
-Date: Thu, 1 Aug 2024 16:45:23 +0200
+	b=jHKhb5BM8ygsXvff3QsCr/HojLPrrK43NBNDkFe6jZ3BRkIB8slxhqWoHS+Ge1Znr
+	 W0t4hUSuH0/PZgxtPjbDqANxpEhfwjwQe78tCugX1yZu8pp/3OeOBhqGD5RhALp+wM
+	 SEyEP4R4RWMtcuBSDoET0FhI16o+m1GI87eLfHzw=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZWyD6jgPz2FF;
+	Thu,  1 Aug 2024 16:47:00 +0200 (CEST)
+Date: Thu, 1 Aug 2024 16:46:56 +0200
 From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
 To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
 Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
 	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
 	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
-Message-ID: <20240801.Euhith6ukah2@digikod.net>
+Subject: Re: [RFC PATCH v1 5/9] selftests/landlock: Test listen on connected
+ socket
+Message-ID: <20240801.Ee3Cai7eeD1g@digikod.net>
 References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
- <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,102 +62,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com>
 X-Infomaniak-Routing: alpha
 
-On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
-> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
-> ports to forbid a malicious sandboxed process to impersonate a legitimate
-> server process. However, bind(2) might be used by (TCP) clients to set the
-> source port to a (legitimate) value. Controlling the ports that can be
-> used for listening would allow (TCP) clients to explicitly bind to ports
-> that are forbidden for listening.
+On Sun, Jul 28, 2024 at 08:25:58AM +0800, Mikhail Ivanov wrote:
+> Test checks that listen(2) doesn't wrongfully return -EACCES instead
+> of -EINVAL when trying to listen for an incorrect socket state.
 > 
-> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
-> access right that restricts listening on undesired ports with listen(2).
-> 
-> It's worth noticing that this access right doesn't affect changing
-> backlog value using listen(2) on already listening socket.
-> 
-> * Create new LANDLOCK_ACCESS_NET_LISTEN_TCP flag.
-> * Add hook to socket_listen(), which checks whether the socket is allowed
->   to listen on a binded local port.
-> * Add check_tcp_socket_can_listen() helper, which validates socket
->   attributes before the actual access right check.
-> * Update `struct landlock_net_port_attr` documentation with control of
->   binding to ephemeral port with listen(2) description.
-> * Change ABI version to 6.
-> 
-> Closes: https://github.com/landlock-lsm/linux/issues/15
 > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
->  include/uapi/linux/landlock.h                | 23 +++--
->  security/landlock/limits.h                   |  2 +-
->  security/landlock/net.c                      | 90 ++++++++++++++++++++
->  security/landlock/syscalls.c                 |  2 +-
->  tools/testing/selftests/landlock/base_test.c |  2 +-
->  5 files changed, 108 insertions(+), 11 deletions(-)
 
-> diff --git a/security/landlock/net.c b/security/landlock/net.c
-> index 669ba260342f..a29cb27c3f14 100644
-> --- a/security/landlock/net.c
-> +++ b/security/landlock/net.c
-> @@ -6,10 +6,12 @@
->   * Copyright © 2022-2023 Microsoft Corporation
->   */
->  
-> +#include "net/sock.h"
->  #include <linux/in.h>
->  #include <linux/net.h>
->  #include <linux/socket.h>
->  #include <net/ipv6.h>
-> +#include <net/tcp.h>
->  
->  #include "common.h"
->  #include "cred.h"
-> @@ -194,9 +196,97 @@ static int hook_socket_connect(struct socket *const sock,
->  					   LANDLOCK_ACCESS_NET_CONNECT_TCP);
+Good to have this test!
+
+> ---
+>  tools/testing/selftests/landlock/net_test.c | 65 +++++++++++++++++++++
+>  1 file changed, 65 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+> index b6fe9bde205f..a8385f1373f6 100644
+> --- a/tools/testing/selftests/landlock/net_test.c
+> +++ b/tools/testing/selftests/landlock/net_test.c
+> @@ -1644,6 +1644,71 @@ TEST_F(ipv4_tcp, with_fs)
+>  	EXPECT_EQ(-EACCES, bind_variant(bind_fd, &self->srv1));
 >  }
 >  
-> +/*
-> + * Checks that socket state and attributes are correct for listen.
-> + * It is required to not wrongfully return -EACCES instead of -EINVAL.
-> + *
-> + * This checker requires sock->sk to be locked.
-> + */
-> +static int check_tcp_socket_can_listen(struct socket *const sock)
+> +TEST_F(ipv4_tcp, listen_on_connected)
+
+We should use the "protocol" fixture and its variants instead to test
+with different protocols and also without sandboxing (which is crutial).
+
+I guess espintcp_listen should use "protocol" too.
+
+ipv4_tcp is to run tests that only make sense on an IPv4 socket, but
+when we test EINVAL, we should make sure Landlock doesn't introduce
+inconsistencies for other/unsupported protocols.
+
 > +{
-> +	struct sock *sk = sock->sk;
-> +	unsigned char cur_sk_state = sk->sk_state;
-> +	const struct tcp_ulp_ops *icsk_ulp_ops;
+> +	const struct landlock_ruleset_attr ruleset_attr = {
+> +		.handled_access_net = ACCESS_ALL,
+> +	};
+> +	const struct landlock_net_port_attr tcp_not_restricted_p0 = {
+> +		.allowed_access = ACCESS_ALL,
+> +		.port = self->srv0.port,
+> +	};
+> +	const struct landlock_net_port_attr tcp_denied_listen_p1 = {
+> +		.allowed_access = ACCESS_ALL & ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
+> +		.port = self->srv1.port,
+> +	};
+> +	int ruleset_fd;
+> +	int bind_fd, status;
+> +	pid_t child;
 > +
+> +	ruleset_fd =
+> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+> +	ASSERT_LE(0, ruleset_fd);
+> +
+> +	/* Allows all actions for the first port. */
+> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +				       &tcp_not_restricted_p0, 0));
+> +
+> +	/* Deny listen for the second port. */
 
-I think we can add this assert:
-lockdep_assert_held(&sk->sk_lock.slock);
+nit: Denies listening
 
-> +	/* Allows only unconnected TCP socket to listen (cf. inet_listen). */
-> +	if (sock->state != SS_UNCONNECTED)
-> +		return -EINVAL;
+> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+> +				       &tcp_denied_listen_p1, 0));
 > +
-> +	/*
-> +	 * Checks sock state. This is needed to ensure consistency with inet stack
-> +	 * error handling (cf. __inet_listen_sk).
-> +	 */
-> +	if (WARN_ON_ONCE(!((1 << cur_sk_state) & (TCPF_CLOSE | TCPF_LISTEN))))
-> +		return -EINVAL;
+> +	enforce_ruleset(_metadata, ruleset_fd);
+> +	EXPECT_EQ(0, close(ruleset_fd));
 > +
-> +	icsk_ulp_ops = inet_csk(sk)->icsk_ulp_ops;
+> +	/* Init listening socket. */
+
+nit: Initializes
+
+> +	bind_fd = socket_variant(&self->srv0);
+> +	ASSERT_LE(0, bind_fd);
+> +	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
+> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
 > +
-> +	/*
-> +	 * ULP (Upper Layer Protocol) stands for protocols which are higher than
-> +	 * transport protocol in OSI model. Linux has an infrastructure that
-> +	 * allows TCP sockets to support logic of some ULP (e.g. TLS ULP).
-> +	 *
-> +	 * Sockets can listen only if ULP control hook has clone method.
-> +	 */
-> +	if (icsk_ulp_ops && !icsk_ulp_ops->clone)
-> +		return -EINVAL;
-> +	return 0;
+> +	child = fork();
+> +	ASSERT_LE(0, child);
+> +	if (child == 0) {
+> +		int connect_fd;
+> +
+> +		/* Closes listening socket for the child. */
+> +		EXPECT_EQ(0, close(bind_fd));
+> +
+> +		connect_fd = socket_variant(&self->srv1);
+> +		ASSERT_LE(0, connect_fd);
+> +		EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
+> +
+> +		/* Tries to listen on connected socket. */
+> +		EXPECT_EQ(-EINVAL, listen_variant(connect_fd, backlog));
+> +
+> +		EXPECT_EQ(0, close(connect_fd));
+> +		_exit(_metadata->exit_code);
+> +		return;
+> +	}
+> +
+> +	EXPECT_EQ(child, waitpid(child, &status, 0));
+> +	EXPECT_EQ(1, WIFEXITED(status));
+> +	EXPECT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
+> +
+> +	EXPECT_EQ(0, close(bind_fd));
 > +}
+> +
+>  FIXTURE(port_specific)
+>  {
+>  	struct service_fixture srv0;
+> -- 
+> 2.34.1
+> 
+> 
 
