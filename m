@@ -1,176 +1,209 @@
-Return-Path: <netdev+bounces-115020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98F4E944E5F
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:47:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58DD5944E7A
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:51:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1E51C20809
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:47:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA32AB20DCA
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48061A6181;
-	Thu,  1 Aug 2024 14:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216F11A71E1;
+	Thu,  1 Aug 2024 14:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="jHKhb5BM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JbeyyyWd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD6A1A6178
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50CE8198A10;
+	Thu,  1 Aug 2024 14:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722523631; cv=none; b=O8vKEK2ppTlyTLXjHmbqLUmPaT3V7gWQyxA1p01ov2QT4acf0z/B4VeoyIqvNrrGjQsm8/Xt0uf7I03dQEsFV8VgR1TeQGZpdheFGaWC5v+3v+wdoiBp4dthoy8LPk7nmzq82IEz+skxIs3r/ui8Wu4dpsZb/RJH9ApuvtlNEg8=
+	t=1722523868; cv=none; b=CWNgCbFu7t+6mHSapo2KHWin7FJ0uuLMGhBWOE6G5QPQw+wczbZfwsqogjS0cwIX6vS9vKMPblSxEs/FQgknnS4PezC63KFgyu8r/eYd3tHBU6sJ74VexaPnmTaPB1qEUO5/yH7LIl2iqukwSTy5zDIBZl9i+EmOzAL1KfRzRmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722523631; c=relaxed/simple;
-	bh=ccAfHXjlpcxJd+RNPtZFU7WL4Ujx9L4oH+JZadgvssY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KoBI2hM3BWZLkEDJKqkEQhDJKJRL5hRQmvRGdJt1QumnNSDh/vnanl0DJDrxy99gCkvXnIw+kTribCiFztM+LJ8MJCeyP5cWx1lxCEiXK6TQR2ke8aiMSqWS7yIF8whwHxotsELwGCnGex/1AD+EdBvsieFH2pnyl1/wAzfQ1X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=jHKhb5BM; arc=none smtp.client-ip=84.16.66.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WZWyF2bxwzHTT;
-	Thu,  1 Aug 2024 16:47:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1722523621;
-	bh=U7ym2UVwNdA0ykceU4yRjRUwU9WZGnk7Uy9wId/ABIg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jHKhb5BM8ygsXvff3QsCr/HojLPrrK43NBNDkFe6jZ3BRkIB8slxhqWoHS+Ge1Znr
-	 W0t4hUSuH0/PZgxtPjbDqANxpEhfwjwQe78tCugX1yZu8pp/3OeOBhqGD5RhALp+wM
-	 SEyEP4R4RWMtcuBSDoET0FhI16o+m1GI87eLfHzw=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WZWyD6jgPz2FF;
-	Thu,  1 Aug 2024 16:47:00 +0200 (CEST)
-Date: Thu, 1 Aug 2024 16:46:56 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v1 5/9] selftests/landlock: Test listen on connected
- socket
-Message-ID: <20240801.Ee3Cai7eeD1g@digikod.net>
-References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
- <20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1722523868; c=relaxed/simple;
+	bh=3aBkTqTpqBRyLAJEM5v6QF4uvKlXcXc/YlfZJtmdnPc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tcF7lP6ua2M3le5O0ImzxokdgpFrlIWc+x2+5ytT0aBxWKH6onOny5PrN9LNyDWKFvT8XfxYx87KAgxvzZkvcq1nYEdS5vJym1A8ICF4iBDQP5YjJM/qMQXwszJVG8cDHSrDpLuuVmtI6TIWN2L417ZXtGsQWzSl8/7Z/2f+f90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JbeyyyWd; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3684eb5be64so3975463f8f.3;
+        Thu, 01 Aug 2024 07:51:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722523864; x=1723128664; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rczSTFdLOpaX7aUhoEqBv+g5Ojw1S2oguQ1RPZSdPN8=;
+        b=JbeyyyWdDFVMOs3gswZ7zIBmS4uUubVD4DcuPNUu+DuTIdE75sBIYsaWofOae3MEj8
+         3MC7x+ecMLaH0ycwkKiiaVXFhw1cZ2XI93qhTx/GFl3NyL4dig2lNzQYqus8zSreLhQV
+         0I0+U0XWYMmttbWBGaFsIwspDoQAwGG77cPSo3b6GiFVZ/AKViQB/4YZmzvC8jP8FWGK
+         HFOj+O8ydIjolfP9JbZfZl36ASdzE9LktWnF0BfgI8OwuPhVumz3yyIlrk6/3Yf/ylWo
+         CsQDsZCDgLQ05wPRK2234aSjA/q8M5MIshWnZCAyKiCLmLywsLkQeKHHIez4DRLcDo4U
+         Mx/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722523864; x=1723128664;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rczSTFdLOpaX7aUhoEqBv+g5Ojw1S2oguQ1RPZSdPN8=;
+        b=J0yIGdkO561ib6pjBXwd7MCOywlejJI/4lcrH4t4kGhrG+BQqwaD8qaLEilnRcdWQF
+         4IKD2wudHS7Zvpidf3K61qiXM5/hm9a38Y6ZI7S4TcorXTiz8EceJ1DMcS8YGIzoGpZD
+         1jiYKkFbXTCRDEN+9QmR6VUCZAq/LjsGV+kOrE+hrUcn4++02dAJTm2KLd9T8wtiYHEY
+         u4fyi4bDmyOCU5AHm0f/VMTpn9ZKjXM6DAUV3cv9ZJuoV3/LggTs5/2d9O4C5fgpjNG4
+         4AMiN/4jZHaESg+NQDfvOr62xJE0Ys5qIHqJNoC9fSu3MwvL9JQgWVYx32mwJXzhEy5h
+         telw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0PHpOJz5AuDNfyK5hP0sfJTlQIH5Grzn5nFs/6pkKCmT19sIvZ/4wTxeq3eYmpb3ggb7tO+hOITDQJnMSLSQFWEy/eNGyxokFLazMHIMl8Ja3Gdpgi4hnTPmdIGpqugcGOsZX
+X-Gm-Message-State: AOJu0YxxNUT7Rk62qojuJ9dbEZnoHFffmft2z94E+gTzidqVEWx99Eg6
+	oOmlWgfznJY5gvwUZGjxO58DN6sxmWGNeptZJ9dQO1Va0BQcKmUpRy3mlkKHy3LYflcJLBT2ZC3
+	yf2EmfgnZTXypMDcxlGcx/Y1rGO4TjTt2hvk=
+X-Google-Smtp-Source: AGHT+IFBcarHS8O1Pqb+2XFf22lRmwSFx41Gq01tcdJG7Q+ftLMblf/eBxn2kodE3JwR/SJEnUUR52D4GJl1AZJS99Y=
+X-Received: by 2002:adf:f952:0:b0:368:7583:54c7 with SMTP id
+ ffacd0b85a97d-36bbc0e66c0mr56885f8f.8.1722523864202; Thu, 01 Aug 2024
+ 07:51:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+References: <20240731124505.2903877-1-linyunsheng@huawei.com>
+ <20240731124505.2903877-2-linyunsheng@huawei.com> <CAKgT0Udj5Jskjvvba345DFkySuZeg927OHQya0rCcynMtmGg8g@mail.gmail.com>
+ <03c555c5-a25d-434a-aed4-0f2f7aa65adf@huawei.com>
+In-Reply-To: <03c555c5-a25d-434a-aed4-0f2f7aa65adf@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 1 Aug 2024 07:50:27 -0700
+Message-ID: <CAKgT0UfXn3By_oSmNKw28biUf_ixXHMgGW_0h_3TZFAoECfPjg@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 01/14] mm: page_frag: add a test module for page_frag
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 28, 2024 at 08:25:58AM +0800, Mikhail Ivanov wrote:
-> Test checks that listen(2) doesn't wrongfully return -EACCES instead
-> of -EINVAL when trying to listen for an incorrect socket state.
-> 
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+On Thu, Aug 1, 2024 at 5:58=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
+>
+> On 2024/8/1 2:29, Alexander Duyck wrote:
+> > On Wed, Jul 31, 2024 at 5:50=E2=80=AFAM Yunsheng Lin <linyunsheng@huawe=
+i.com> wrote:
+> >>
+> >> Basing on the lib/objpool.c, change it to something like a
+> >> ptrpool, so that we can utilize that to test the correctness
+> >> and performance of the page_frag.
+> >>
+> >> The testing is done by ensuring that the fragment allocated
+> >> from a frag_frag_cache instance is pushed into a ptrpool
+> >> instance in a kthread binded to a specified cpu, and a kthread
+> >> binded to a specified cpu will pop the fragment from the
+> >> ptrpool and free the fragment.
+> >>
+> >> We may refactor out the common part between objpool and ptrpool
+> >> if this ptrpool thing turns out to be helpful for other place.
+> >
+> > This isn't a patch where you should be introducing stuff you hope to
+> > refactor out and reuse later. Your objpoo/ptrpool stuff is just going
+> > to add bloat and overhead as you are going to have to do pointer
+> > changes to get them in and out of memory and you are having to scan
+> > per-cpu lists. You would be better served using a simple array as your
+> > threads should be stick to a consistent CPU anyway in terms of
+> > testing.
+> >
+> > I would suggest keeping this much more simple. Trying to pattern this
+> > after something like the dmapool_test code would be a better way to go
+> > for this. We don't need all this extra objpool overhead getting in the
+> > way of testing the code you should be focused on. Just allocate your
+> > array on one specific CPU and start placing and removing your pages
+> > from there instead of messing with the push/pop semantics.
+>
+> I am not sure if I understand what you meant here, do you meant something
+> like dmapool_test_alloc() does as something like below?
+>
+> static int page_frag_test_alloc(void **p, int blocks)
+> {
+>         int i;
+>
+>         for (i =3D 0; i < blocks; i++) {
+>                 p[i] =3D page_frag_alloc(&test_frag, test_alloc_len, GFP_=
+KERNEL);
+>
+>                 if (!p[i])
+>                         goto pool_fail;
+>         }
+>
+>         for (i =3D 0; i < blocks; i++)
+>                 page_frag_free(p[i]);
+>
+>         ....
+> }
+>
+> The above was my initial thinking too, I went to the ptrpool thing using
+> at least two CPUs as the below reason:
+> 1. Test the concurrent calling between allocing and freeing more throughl=
+y,
+>    for example, page->_refcount concurrent handling, cache draining and
+>    cache reusing code path will be tested more throughly.
+> 2. Test the performance impact of cache bouncing between different CPUs.
+>
+> I am not sure if there is a more lightweight implementation than ptrpool
+> to do the above testing more throughly.
 
-Good to have this test!
+You can still do that with a single producer single consumer ring
+buffer/array and not have to introduce a ton of extra overhead for
+some push/pop approach. There are a number of different
+implementations for such things throughout the kernel.
 
-> ---
->  tools/testing/selftests/landlock/net_test.c | 65 +++++++++++++++++++++
->  1 file changed, 65 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-> index b6fe9bde205f..a8385f1373f6 100644
-> --- a/tools/testing/selftests/landlock/net_test.c
-> +++ b/tools/testing/selftests/landlock/net_test.c
-> @@ -1644,6 +1644,71 @@ TEST_F(ipv4_tcp, with_fs)
->  	EXPECT_EQ(-EACCES, bind_variant(bind_fd, &self->srv1));
->  }
->  
-> +TEST_F(ipv4_tcp, listen_on_connected)
+>
+> >
+> > Lastly something that is a module only tester that always fails to
+> > probe doesn't sound like it really makes sense as a standard kernel
+>
+> I had the same feeling as you, but when doing testing, it seems
+> convenient enough to do a 'insmod xxx.ko' for testing without a
+> 'rmmod xxx.ko'
 
-We should use the "protocol" fixture and its variants instead to test
-with different protocols and also without sandboxing (which is crutial).
+It means this isn't a viable module though. If it supports insmod to
+trigger your tests you should let it succeed, and then do a rmmod to
+remove it afterwards. Otherwise it is a test module and belongs in the
+selftest block.
 
-I guess espintcp_listen should use "protocol" too.
+> > module. I still think it would make more sense to move it to the
+> > selftests tree and just have it build there as a module instead of
+>
+> I failed to find one example of test kernel module that is in the
+> selftests tree yet. If it does make sense, please provide an example
+> here, and I am willing to follow the pattern if there is one.
 
-ipv4_tcp is to run tests that only make sense on an IPv4 socket, but
-when we test EINVAL, we should make sure Landlock doesn't introduce
-inconsistencies for other/unsupported protocols.
+You must not have been looking very hard. A quick grep for
+"module_init" in the selftest folder comes up with
+"tools/testing/selftests/bpf/bpf_testmod/" containing an example of a
+module built in the selftests folder.
 
-> +{
-> +	const struct landlock_ruleset_attr ruleset_attr = {
-> +		.handled_access_net = ACCESS_ALL,
-> +	};
-> +	const struct landlock_net_port_attr tcp_not_restricted_p0 = {
-> +		.allowed_access = ACCESS_ALL,
-> +		.port = self->srv0.port,
-> +	};
-> +	const struct landlock_net_port_attr tcp_denied_listen_p1 = {
-> +		.allowed_access = ACCESS_ALL & ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
-> +		.port = self->srv1.port,
-> +	};
-> +	int ruleset_fd;
-> +	int bind_fd, status;
-> +	pid_t child;
-> +
-> +	ruleset_fd =
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> +	ASSERT_LE(0, ruleset_fd);
-> +
-> +	/* Allows all actions for the first port. */
-> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> +				       &tcp_not_restricted_p0, 0));
-> +
-> +	/* Deny listen for the second port. */
+> > trying to force it into the mm tree. The example of dmapool_test makes
+> > sense as it could be run at early boot to run the test and then it
+>
+> I suppose you meant dmapool is built-in to the kernel and run at early
+> boot? I am not sure what is the point of built-in for dmapool, as it
+> only do one-time testing, and built-in for dmapool only waste some
+> memory when testing is done.
 
-nit: Denies listening
+There are cases where one might want to test on a system w/o console
+access such as an embedded system, or in the case of an environment
+where people run without an initrd at all.
 
-> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> +				       &tcp_denied_listen_p1, 0));
-> +
-> +	enforce_ruleset(_metadata, ruleset_fd);
-> +	EXPECT_EQ(0, close(ruleset_fd));
-> +
-> +	/* Init listening socket. */
+> > just goes quiet. This module won't load and will always just return
+> > -EAGAIN which doesn't sound like a valid kernel module to me.
+>
+> As above, it seems convenient enough to do a 'insmod xxx.ko' for testing
+> without a 'rmmod xxx.ko'.
 
-nit: Initializes
-
-> +	bind_fd = socket_variant(&self->srv0);
-> +	ASSERT_LE(0, bind_fd);
-> +	EXPECT_EQ(0, bind_variant(bind_fd, &self->srv0));
-> +	EXPECT_EQ(0, listen_variant(bind_fd, backlog));
-> +
-> +	child = fork();
-> +	ASSERT_LE(0, child);
-> +	if (child == 0) {
-> +		int connect_fd;
-> +
-> +		/* Closes listening socket for the child. */
-> +		EXPECT_EQ(0, close(bind_fd));
-> +
-> +		connect_fd = socket_variant(&self->srv1);
-> +		ASSERT_LE(0, connect_fd);
-> +		EXPECT_EQ(0, connect_variant(connect_fd, &self->srv0));
-> +
-> +		/* Tries to listen on connected socket. */
-> +		EXPECT_EQ(-EINVAL, listen_variant(connect_fd, backlog));
-> +
-> +		EXPECT_EQ(0, close(connect_fd));
-> +		_exit(_metadata->exit_code);
-> +		return;
-> +	}
-> +
-> +	EXPECT_EQ(child, waitpid(child, &status, 0));
-> +	EXPECT_EQ(1, WIFEXITED(status));
-> +	EXPECT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
-> +
-> +	EXPECT_EQ(0, close(bind_fd));
-> +}
-> +
->  FIXTURE(port_specific)
->  {
->  	struct service_fixture srv0;
-> -- 
-> 2.34.1
-> 
-> 
+It is, but it isn't. The problem is it creates a bunch of ugliness in
+the build as you are a tristate that isn't a tristate as you are only
+building it if it is set to "m". There isn't anything like that
+currently in the mm tree.
 
