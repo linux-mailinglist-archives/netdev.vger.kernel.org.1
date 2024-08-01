@@ -1,134 +1,217 @@
-Return-Path: <netdev+bounces-114893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986E3944943
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:25:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 521D6944967
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E0161F230F1
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:25:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08C2E28210E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 10:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF9C170A34;
-	Thu,  1 Aug 2024 10:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85608187861;
+	Thu,  1 Aug 2024 10:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYyTNlaB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hs/VoQC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9F3446A1
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 10:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33A53BBE5
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 10:36:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722507949; cv=none; b=Senu93BABlGEjedYMY/2SdX3scDKAtUVpkCyORZVTp+DxNrtJ4gIXBlFU/gwLy+OIjfVYNuU6zNsvA4C3w8HvGVla713j6j2hOQyJI89gugGS/YBidZogEyEqNXt3i4mQ3RF1fR0aJO86v//HJgg+wbRDrMXQ8MAgLqxWchnA0E=
+	t=1722508586; cv=none; b=ticaRBS0ebRhn/xYZtUuPbeda7t40q5iWtDLpafYsJptayOtWyDC8qfwAWwDcd2/on0cAVxBZWiOA58ZSuNZzDuuqJKKPmTOrCvtPE/XFPukRZRKaD3cfsnhh+koaXQuV5C8kqyv3ShWIoR7KHzHXx51Xgy0DxSXW0uPpOg931s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722507949; c=relaxed/simple;
-	bh=iZClEU3Bl4WzVHBFC518QWMQW5wfXlFiHdPhgAH8iQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DF19VEXiH8lXZqZgLQHPxyWt0BO+pO074Wz79Q65seJNfyZl8c2BLh57Jo/tLbxY0aO27B4urFpCxOawOizWX9lImbU84ctYRXhSX/+wUKm4eOht2I991hdxVIn1FrsSk31Mr35LzrstumFRdo/GDlxPsNIrAn/I0OGg9dACC3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aYyTNlaB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722507944;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mQkkrAPQwecwOQ18uDWPmVdaGmQ67evbO7cOUB5GUDo=;
-	b=aYyTNlaBfjBcOb2+qxHZnQVtgq5luk/s9H9Ey9Y5U2DZ0p+TQSzoYmFLRI5IBQihedaWCg
-	ctIYplTpnxvHC6+derJZ5OA1rH/tW9fzZuWqSzkebOZeq6K0L5x0TrHT/ositUecC4Eer9
-	1r5WxBKbQoeEOgXgJ6kROSffwh4lKZg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-101-vVvw_QkRM5-0rcaY0tQ6Pw-1; Thu, 01 Aug 2024 06:25:43 -0400
-X-MC-Unique: vVvw_QkRM5-0rcaY0tQ6Pw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4210e98f8d7so8997035e9.3
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 03:25:43 -0700 (PDT)
+	s=arc-20240116; t=1722508586; c=relaxed/simple;
+	bh=K66gAp8SRsfpfuM3SHt00HYhvmX5sXJ/9hQegPDQEwo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=smNuyK3I3QAbkrmMZskEq/2ZiteqvOt2t2vKmND6dMmFKPRmHdKpI2h6YEYdFcAKnhKNcdY2ZUZkSH0SAUy4x9x0f6Ce8rqPpWu2F3wBxqrfCCrk9YTTa54nnyQSPPSVaKMytsfrKGPwuzch7OX5AFYeh/LtHUynTVcITf/GS44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hs/VoQC3; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664fc7c4e51so129017607b3.3
+        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 03:36:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722508584; x=1723113384; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OP6c+sS8ST+QgrxChdVqPzP1UOGKL00OxIAhJNniQNU=;
+        b=hs/VoQC3N5EmgH9n9Ws/TpRSfkbImcYp27d7RAX1hRiWpBZ3vNpBaEIPRzYbZycILA
+         Qv8D9AbV4dbG1VFHTxenkMZcFIXlKHr/sQ/g/y/shOQe5mu6VVO7HzGZA1WxaB7Mf2EZ
+         hroQ1Gli81GlzCiFlrKXUxWVBXx+16ni91yg9pQf7ALnQF8OqhrowdRClwrQmpwLWk1g
+         PRZNyeauIExz9XEL4y0aoJpVaxkswxQY6O8+uG3j4rsfvlNGUfngiJ3tf2hqlNsXO8nZ
+         vGsbt68/WNFDiEuIdOxexNLFU75uGQvv2+Q5CS15L5NQxhGyp0N/spFgI4escqpA4rMP
+         Vb9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722507942; x=1723112742;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mQkkrAPQwecwOQ18uDWPmVdaGmQ67evbO7cOUB5GUDo=;
-        b=LoeRQyDlGfeL1UAcSDq1fQQHVeg4bP9sUFgm3h7cMtJR8jZbd4W2VvVZ+AthBWM2yI
-         5V+qBO2lruCY8GS9lsfdho/eqYOLnRa1IHWXEpUmMf7nQU8zxIfci6Kum75SLEK3Ecq3
-         IJHjGq+MlZUfFP6Ok/kZ4zqhatmNlZePOwG6dt7I0OpL7qQETSHyTgtFW6QucY+iVcZq
-         WlyCtgpNzuBcG5fCzkboq4+gu1xoxSVypZY+vhlRrsfcDrtYHuFlEr4w9xmo3Wkl+FLd
-         b8LmRlsNXtHUKNc1+jtVo1uYZI3wWEiEg0fGYwd5nMCYqy00d01N/4zFNWLv8vVA4a0Y
-         E7cQ==
-X-Gm-Message-State: AOJu0YyDXJNPz8yJqYkyLviO8f72FZAxcbt1DmzPlZZ6EKbLl/26wE4M
-	MeuDGHn+wyoVwFFr56nZzayhUrzBfy1k4/nJIriEuVt7TTd9CILCqJj+0wf2VWIfh0tVBoYvAxM
-	WQyi3rGuKbB6z3++jv4rADEuZVGhhhR6VOvun0zWppLl5Q2s0WOtVsA==
-X-Received: by 2002:a5d:6d83:0:b0:368:4c5:af3 with SMTP id ffacd0b85a97d-36baaf9f521mr883922f8f.8.1722507942111;
-        Thu, 01 Aug 2024 03:25:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEtSclpr/Y80G4Oip8Taqi5hTXWiVLwJRu1yc7hHV2l4citaf760Mm1ZYZVZ0C78iEsrUtYg==
-X-Received: by 2002:a5d:6d83:0:b0:368:4c5:af3 with SMTP id ffacd0b85a97d-36baaf9f521mr883909f8f.8.1722507941562;
-        Thu, 01 Aug 2024 03:25:41 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1712:4410:9110:ce28:b1de:d919? ([2a0d:3344:1712:4410:9110:ce28:b1de:d919])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367fc6adsm18995045f8f.51.2024.08.01.03.25.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Aug 2024 03:25:41 -0700 (PDT)
-Message-ID: <f150dec8-7187-417a-a700-4ea7ce44f721@redhat.com>
-Date: Thu, 1 Aug 2024 12:25:39 +0200
+        d=1e100.net; s=20230601; t=1722508584; x=1723113384;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OP6c+sS8ST+QgrxChdVqPzP1UOGKL00OxIAhJNniQNU=;
+        b=tUsWeZejyA0RJntF9IdKEoKkCkP/nG8PQACIAikOcNIpihb9tvwfDjCFTh6axnqd1F
+         m+8TXX/bMjIbIjQ9tLLf14TZByNRxD+T/x3vtKz4PVY4rfcJNLwJDgpMkdTMaywxZmBz
+         5bjeCwr2AILiyZufIXpbR2iH3WL89W4kFR7h0eg3a5N9oqwTmAUHRGKpxp4HzpLGATO5
+         WPxP61iqE0+qAwHj5zixyI+27+bpR2QZPL0LCMSPJ+d+14UlqLaYS0VxeltkU2f/oacV
+         QKYmNKxj5OM5moEVszcYb9xv49ll4BM2l37yDt4LyRyf/98uOWsrE8/BFbIV5fm8LuA/
+         UuSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWi/Lmnr6xfsc8PPayDZIt3An2t4kNun+AyjuDFJ5ASGKmpqizYg0LYJBTxB23GpN2XEOsWUyEE+teOLgHOa+9G+6ImxYBw
+X-Gm-Message-State: AOJu0YxEVsUna+wQdjT9jWsL0bJdOYmCJYkRWj3yAAAJeZhZD4L/CJ5v
+	zy0khHGZpVGlUGyOpXdnhUnMjaXA5IDPCyWLl3GkwDi7SH2JUhRoBXWbP+PcpPtgdAVd7uqllkK
+	RYg==
+X-Google-Smtp-Source: AGHT+IF+eUivr2h0SH34s71+ADV9gRcCXE+IamWe/PIXPtHE74QITKrF4NakeUKYqgv1iKboSormAh7Fcxo=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:690c:289:b0:62c:ea0b:a447 with SMTP id
+ 00721157ae682-6874abdc8a7mr1021287b3.2.1722508583905; Thu, 01 Aug 2024
+ 03:36:23 -0700 (PDT)
+Date: Thu, 1 Aug 2024 12:36:21 +0200
+In-Reply-To: <0a3b8596-f3f3-f617-c40d-de54e8ff05f0@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V2 3/3] bonding: change ipsec_lock from spin lock to
- mutex
-To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jay Vosburgh <jv@jvosburgh.net>,
- Andy Gospodarek <andy@greyhouse.net>
-Cc: netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
- Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
- Hangbin Liu <liuhangbin@gmail.com>, Jianbo Liu <jianbol@nvidia.com>
-References: <20240801094914.1928768-1-tariqt@nvidia.com>
- <20240801094914.1928768-4-tariqt@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240801094914.1928768-4-tariqt@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
+ <ZqijJPrnCnGnVGkq@google.com> <0a3b8596-f3f3-f617-c40d-de54e8ff05f0@huawei-partners.com>
+Message-ID: <ZqtlJZMHVf-otlOq@google.com>
+Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, alx@kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/1/24 11:49, Tariq Toukan wrote:
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index e6514ef7ad89..0f8d1b29dc7f 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -436,41 +436,34 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
->   	if (!bond_dev)
->   		return -EINVAL;
->   
-> -	rcu_read_lock();
->   	bond = netdev_priv(bond_dev);
->   	slave = rcu_dereference(bond->curr_active_slave);
-> -	if (!slave) {
-> -		rcu_read_unlock();
+On Wed, Jul 31, 2024 at 08:20:41PM +0300, Mikhail Ivanov wrote:
+> 7/30/2024 11:24 AM, G=C3=BCnther Noack wrote:
+> > On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
+> > > LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindabl=
+e"
+> > > ports to forbid a malicious sandboxed process to impersonate a legiti=
+mate
+> > > server process. However, bind(2) might be used by (TCP) clients to se=
+t the
+> > > source port to a (legitimate) value. Controlling the ports that can b=
+e
+> > > used for listening would allow (TCP) clients to explicitly bind to po=
+rts
+> > > that are forbidden for listening.
+> > >=20
+> > > Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
+> > > access right that restricts listening on undesired ports with listen(=
+2).
+> >=20
+> > Nit: I would turn around the first two commit message paragraphs and de=
+scribe
+> > your changes first, before explaining the problems in the bind(2) suppo=
+rt.  I
+> > was initially a bit confused that the description started talking about
+> > LANDLOCK_ACCESS_NET_BIND_TCP.
+> >=20
+> > General recommendations at:
+> > https://www.kernel.org/doc/html/v6.10/process/submitting-patches.html#d=
+escribe-your-changes
+>=20
+> I consider the first paragraph as a problem statement for this patch.
+> According to linux recommendations problem should be established before
+> the description of changes. Do you think that the changes part should
+> stand before the problem anyway?
 
-I'm sorry, I probably was not clear with my question on the previous 
-revision.
+Up to you. To be fair, I'm sold on the approach in this patchset anyway :)
 
-I asked if this code is under RTNL lock already, if so we could replace 
-rcu_dereference with rtnl_dereference() and drop the rcu lock.
 
-You stated this block is not under the RTNL lock, so we still need the 
-rcu lock around rcu_dereference().
+> > When we have the documentation wording finalized,
+> > please send an update to the man pages as well,
+> > for this and other documentation updates.
+>=20
+> Should I send it after this patchset would be accepted?
 
-Same thing in bond_ipsec_del_sa().
+Yes, that would be the normal process which we have been following so far.
 
-Please have a run with CONFIG_PROVE_RCU, it should splat on such 
-dereference.
+(I don't like the process much either, because it decouples feature develop=
+ment
+so far from documentation writing, but it's what we have for now.)
 
-Thanks,
+An example patch which does that for the network bind(2) and connect(2) fea=
+tures
+(and where I would still like a review from Konstantin) is:
+https://lore.kernel.org/all/20240723101917.90918-1-gnoack@google.com/
 
-Paolo
 
+> > Small remarks on what I've done here:
+> >=20
+> > * I am avoiding the word "binding" when referring to the automatic assi=
+gnment to
+> >    an ephemeral port - IMHO, this is potentially confusing, since bind(=
+2) is not
+> >    explicitly called.
+> > * I am also dropping the "It should be noted" / "Note that" phrase, whi=
+ch is
+> >    frowned upon in man pages.
+>=20
+> Didn't know that, thanks
+
+Regarding "note that", see
+https://lore.kernel.org/all/0aafcdd6-4ac7-8501-c607-9a24a98597d7@gmail.com/
+https://lore.kernel.org/linux-man/20210729223535.qvyomfqvvahzmu5w@localhost=
+.localdomain/
+https://lore.kernel.org/linux-man/20230105225235.6cjtz6orjzxzvo6v@illithid/
+(The "Kemper notectomy")
+
+This came up in man page reviews, but we'll have an easier time keeping the
+kernel and man page documentation in sync if we adhere to man page style
+directly.  (The man page style is documented in man-pages(7) and contains s=
+ome
+groff-independent wording advice as well.)
+
+
+> > If I understand correctly, these are cases where we use TCP on top of p=
+rotocols
+> > that are not IP (or have an additional layer in the middle, like TLS?).=
+  This
+> > can not be recognized through the socket family or type?
+>=20
+> ULP can be used in the context of TCP protocols as an additional layer
+> (currently supported only by IP and MPTCP), so it cannot be recognized
+> with family or type. You can check this test [1] in which TCP IP socket
+> is created with ULP control hook.
+>=20
+> [1] https://lore.kernel.org/all/20240728002602.3198398-8-ivanov.mikhail1@=
+huawei-partners.com/
+
+Thanks, this is helpful.
+
+For reference, it seems that ULP were introduced in
+https://lore.kernel.org/all/20170614183714.GA80310@davejwatson-mba.dhcp.the=
+facebook.com/
+
+
+> > Do we have cases where we can run TCP on top of something else than pla=
+in IPv4
+> > or IPv6, where the clone method exists?
+>=20
+> Yeah, MPTCP protocol for example (see net/mptcp/subflow.c). ULP control
+> hook is supported only by IP and MPTCP, and in both cases
+> clone method is checked during listen(2) execution.
+
+
+> > Aren't the socket type and family checks duplicated with existing logic=
+ that we
+> > have for the connect(2) and bind(2) support?  Should it be deduplicated=
+, or is
+> > that too messy?
+>=20
+> bind(2) and connect(2) hooks also support AF_UNSPEC family, so I think
+> such helper is gonna complicate code a little bit. Also it can
+> complicate switch in current_check_access_socket().
+
+OK, sounds good. =F0=9F=91=8D
+
+=E2=80=94G=C3=BCnther
 
