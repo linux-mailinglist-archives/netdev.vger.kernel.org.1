@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-114766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2D76943FDB
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:54:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79900943FDC
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:54:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68DE11F223F9
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5B21C229A4
 	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 01:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CE51411E3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49A61411E7;
 	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSpq9c+7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a8ulwXHo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B1B13DDC6;
-	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3ED140E22
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722474637; cv=none; b=sInsHPsFtAl/qAxQ2VHsLxXc/9NKH9Q1gHvZ/7KVlptGF5Fn7DS8m5Qmj3NWJqwj7bytwHUQ8spk3ORjHs9K525ksJRvO4t6MgH7AbpTMHuQXDfpqxssOIEPmqOaUOu2fGysttVRSOrTWnmJ9BlP7sIo8DIWjvAPXsRpqfHTxu0=
+	t=1722474637; cv=none; b=N9ir/D6SRSHjjgqMMT7ik5+WkT6IteyAqupYxCtoKKLiw/f/xZYZ5bAQ7DfyaJUJzZQoEEpIJeeFOb2AgmLmUjvLbrZnM5vvV5Ug4sQkCERAve2Vmxpnz89uTr0h+tR6PpnUktVKG1+K09GfYpQXGgnBetNecUt8FjBPmbpUw80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722474637; c=relaxed/simple;
-	bh=iJtqiAXqX0LwxAhBTKTJEZ3kteVZpRMr4hNaCqlp3Z0=;
+	bh=R9tBx7ulIFoHU9TFRCFhG35DM+pO26fqQLqkm7P8bCI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PKazESFVwcPWXJAzza418/Mw1dcoVlk1yhPrvOCsWIpYb73yeCutbCdnK/s2K6MTskEzrpFktajGqhNvHeAZAdUWY8P2UkKabpnVHZJcMaSCWktN1/O1pAD/JSOvYuLH2tIKc2YsfYwLUXlIgQ3wDmoUAtYAcx1SH+JvxhRjOmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSpq9c+7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44D88C4AF0C;
+	 In-Reply-To:To:Cc; b=i8Shx9gLjQTJGfvtTsHdqcqslxVhfWT0YN53L922pc8X+LLhmPnpG1OvdB5+RE8C/yOXo/b1tAp3AjZ64QX/jA8kSdtAVDOBVL4xXUiRdVIqTGRa4/Gbu6qIns687MGiXpeIV7dGS4l4rOIlevxaWatQj1mCfmrWo7gu6o/m7bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a8ulwXHo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58C9BC4AF11;
 	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722474637;
-	bh=iJtqiAXqX0LwxAhBTKTJEZ3kteVZpRMr4hNaCqlp3Z0=;
+	bh=R9tBx7ulIFoHU9TFRCFhG35DM+pO26fqQLqkm7P8bCI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hSpq9c+7ucTqqSamea53A4yOmCM0BtaeXgsKY7gCYPqzUCBIJ9xLMyUO+15GxxKf1
-	 2D2Ovvzj5jTWMTuVqRZqjOsTnFjhnSAxE38s2mHeYjDsvVWBhKSLiWs0LvaAPo1//w
-	 G9XWDUDl8aCqLMmKpJEbZymEEtBsk0gLMPvshv5OUhNYE08UEwIvrZZbP6TQOhUKtS
-	 UlToWm1qXqQF6vCapVJp51OlMFndXIXwxDcgZ2m+7nXXKeFzO3LZiV0hnlCN5LjN1W
-	 uzP7m3usl/fnk3CvIzbj8DBd5BESdeXW8ymDR5mVGVKM90kAyoKW6zk2r/PlQwACX5
-	 q8eqW9dwoPqjQ==
+	b=a8ulwXHofTDorPDTLaCiDPWhq8uBtKB08tHnF0hwR4G5GVd/MuFBNNkNys9yh8PwR
+	 M1EmjpSrC6OZeu90CdXjngw20iZakbMyZE4mbeaL/PqDTg4UhJ5p6WnQOOUwWpLmFM
+	 BD9w/N+5aiY38or95HlvCDPGVG6ttzjG2U6hjiI90SdDZcjLn0LpXI8308+YiZmr/E
+	 ggvB/TAVtp3/6s8q6aeQcSjjg+E3ncoK0xsbKi0sdx4ryQrhezGAiRQE/BRg3lXMJL
+	 eDV3I/I0GqgqI/UXHmY4/TM6zsDpTN+ZKnv5e3EFsvdY31l2QmlOZhwT/XQU4FlkYX
+	 zVNgFewJ7kCbQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2E43AC6E396;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 498FBC6E398;
 	Thu,  1 Aug 2024 01:10:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,46 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v1] net: wan: fsl_qmc_hdlc: Convert carrier_lock spinlock
- to a mutex
+Subject: Re: [PATCH net] r8169: don't increment tx_dropped in case of
+ NETDEV_TX_BUSY
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172247463718.20901.3118468784661815872.git-patchwork-notify@kernel.org>
+ <172247463729.20901.9214004192278008480.git-patchwork-notify@kernel.org>
 Date: Thu, 01 Aug 2024 01:10:37 +0000
-References: <20240730063104.179553-1-herve.codina@bootlin.com>
-In-Reply-To: <20240730063104.179553-1-herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andriy.shevchenko@linux.intel.com,
- christophe.leroy@csgroup.eu, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, stable@vger.kernel.org
+References: <bbba9c48-8bac-4932-9aa1-d2ed63bc9433@gmail.com>
+In-Reply-To: <bbba9c48-8bac-4932-9aa1-d2ed63bc9433@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Jul 2024 08:31:04 +0200 you wrote:
-> The carrier_lock spinlock protects the carrier detection. While it is
-> hold, framer_get_status() is called witch in turn takes a mutex.
-> This is not correct and can lead to a deadlock.
+On Tue, 30 Jul 2024 21:51:52 +0200 you wrote:
+> The skb isn't consumed in case of NETDEV_TX_BUSY, therefore don't
+> increment the tx_dropped counter.
 > 
-> A run with PROVE_LOCKING enabled detected the issue:
->   [ BUG: Invalid wait context ]
->   ...
->   c204ddbc (&framer->mutex){+.+.}-{3:3}, at: framer_get_status+0x40/0x78
->   other info that might help us debug this:
->   context-{4:4}
->   2 locks held by ifconfig/146:
->   #0: c0926a38 (rtnl_mutex){+.+.}-{3:3}, at: devinet_ioctl+0x12c/0x664
->   #1: c2006a40 (&qmc_hdlc->carrier_lock){....}-{2:2}, at: qmc_hdlc_framer_set_carrier+0x30/0x98
+> Fixes: 188f4af04618 ("r8169: use NETDEV_TX_{BUSY/OK}")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v1] net: wan: fsl_qmc_hdlc: Convert carrier_lock spinlock to a mutex
-    https://git.kernel.org/netdev/net/c/c4d6a347ba7b
+  - [net] r8169: don't increment tx_dropped in case of NETDEV_TX_BUSY
+    https://git.kernel.org/netdev/net/c/d516b187a9cc
 
 You are awesome, thank you!
 -- 
