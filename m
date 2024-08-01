@@ -1,98 +1,124 @@
-Return-Path: <netdev+bounces-114794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE2439441D5
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 05:24:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4B89441FE
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 05:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C2A4B25033
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:24:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 628181F21EF0
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 03:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C9413CF9F;
-	Thu,  1 Aug 2024 03:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A86413C8FE;
+	Thu,  1 Aug 2024 03:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sv+rifGd"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="entvHzVG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962F31EB494;
-	Thu,  1 Aug 2024 03:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B540E1EB492;
+	Thu,  1 Aug 2024 03:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722482558; cv=none; b=OWXXDeNsIxtYFNaVSIK5+Mo8zUaKQTUYWnvAUKS4M2s9hmV2SXUFYAnHiap9U2BshCTzeMpGDfRYtY1kp3jm372CYVCN5M3pHhef86223LUYMAHYaqWfB36jfoiRyx5uneYRrxMLpnvs5ICOV2bHbuVK8sQN0072ZMhLxs+96So=
+	t=1722484153; cv=none; b=oE0G1z5B4zIZ1rBjaeVgJHVtErZSWe8VyNzNqicUEKqF6Ac9GrFalwbtXhjUlrZMzGLTL2M5TXqMSFNRc+DENEls9Us0h/9DXhohN9DRVgj8Giv0cwY6P5LJUskXD/sewPc8UnGfh9o1K4HluJqC4sWelQVxp3WUimpxiRM38DM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722482558; c=relaxed/simple;
-	bh=cwZNlFkg/6uwcZmn5bSEtGCnUEUd5RzuUF0gLreCNwE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cNzi2DS5bFWNv2BnxBldf675ygnvQP7FZTNEqcUqAQSANMvF5CQYd81uvVTUjdePdK8B+P0GGaxxz6zbUIQ7Vu/4q2ScEyg1Nh04BJK9mC61GzUi+NT5aI/HToTuNb/TJN7ja0AqW3RaijGMQRt9odYHQ6ZtViyih1mlsSt5Y+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sv+rifGd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8026DC116B1;
-	Thu,  1 Aug 2024 03:22:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722482558;
-	bh=cwZNlFkg/6uwcZmn5bSEtGCnUEUd5RzuUF0gLreCNwE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Sv+rifGdffMkhnY2qFffaLJTiAOLVRqb4P/j9gx/xSonU9bN0O2jJNa8DJ5Egblhn
-	 HhmTAfByfPx5ZYnFDLWJgN7yCV1fe9P6dxJI9OsEnstGE1uL60H7+uVA1MzLnZnDT9
-	 q7OXjpCwNa+c+CQetKRHWOUZeVcXoPJnDKlhwyQF/nifcm8M2k2rFMDblP5uWu1jlA
-	 mA+Bx4pcC3AxSwblGA6k0Tol+ohmM7e0iEqchtNH/6dIcPyPz/FOYN1tn3L9xl9f62
-	 f8XROjy1dC7Km6SRk4r+T+XeTnlcyi6ocpCGnNSVrELwqY9rP7xjfPoYh6JeLthYCW
-	 Mb5iqozqkwYpg==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	s=arc-20240116; t=1722484153; c=relaxed/simple;
+	bh=9ej2VIyOHYjd3QEyrOyewzphaHVD5p/LyehItNSoxfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SReRPBF4V3kaFMhpgnR2L5QnVsp9/48QfrHqMHVPhiSjJjHwiISSQwqEHoJgR+TK1ZgZNyiumJVgS6O9KtRIYOVKzP7OPAqgacDC0u/EHtrPJrd6YSQ0ZUWA/mrIDYJTltICzR1X9T+waD3pB571FVu6C1YKh77lOun56pjNgs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=entvHzVG; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id 1A35920B7165; Wed, 31 Jul 2024 20:49:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1A35920B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1722484145;
+	bh=3adnSLI18j54XBzRjMcz1DkYZ3QcEDWZpj4XNWwo1I4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=entvHzVGLPRXGY5QPMtAqcqN906PBEYCYRxHRPN0QFGZJDK80mn6ffaMzayOq6SMu
+	 +q+1EZwyyx5YDXkkpBzjVy2kTtKJiSDGL07KFuzfnYWoAiTSudeJ0JmiBTUin8qORe
+	 l7CF8XCWBUrluhiAupcfHa/mTwIvs/uTFh078UVI=
+Date: Wed, 31 Jul 2024 20:49:05 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Naman Jain <namjain@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: (subset) [PATCH v3 0/6] Bluetooth: hci_qca: use the power sequencer for wcn7850
-Date: Wed, 31 Jul 2024 22:22:34 -0500
-Message-ID: <172248255231.320687.3384796233476988761.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
-References: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Colin Ian King <colin.i.king@gmail.com>
+Subject: Re: [PATCH net-next v2] net: mana: Implement
+ get_ringparam/set_ringparam for mana
+Message-ID: <20240801034905.GA28115@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <f9dfaf0e-2f72-4917-be75-78856fb27712@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9dfaf0e-2f72-4917-be75-78856fb27712@linux.microsoft.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-
-On Tue, 09 Jul 2024 14:18:31 +0200, Bartosz Golaszewski wrote:
-> The following series extend the usage of the power sequencing subsystem
-> in the hci_qca driver.
+On Wed, Jul 31, 2024 at 02:19:34PM +0530, Naman Jain wrote:
 > 
-> The end goal is to convert the entire driver to be exclusively pwrseq-based
-> and simplify it in the process. However due to a large number of users we
-> need to be careful and consider every case separately.
 > 
-> [...]
+> On 7/30/2024 10:31 PM, Shradha Gupta wrote:
+> >Currently the values of WQs for RX and TX queues for MANA devices
+> >are hardcoded to default sizes.
+> >Allow configuring these values for MANA devices as ringparam
+> >configuration(get/set) through ethtool_ops.
+> >
+> >Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> >Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> >Reviewed-by: Long Li <longli@microsoft.com>
+> >---
+> >  Changes in v2:
+> >  * Removed unnecessary validations in mana_set_ringparam()
+> >  * Fixed codespell error
+> >  * Improved error message to indicate issue with the parameter
+> >---
+> >  drivers/net/ethernet/microsoft/mana/mana_en.c | 20 +++---
+> >  .../ethernet/microsoft/mana/mana_ethtool.c    | 66 +++++++++++++++++++
+> >  include/net/mana/mana.h                       | 21 +++++-
+> >  3 files changed, 96 insertions(+), 11 deletions(-)
+> >
+> 
+> From what I understand, we are adding support for "ethtool -G --set-
+> ring"  command.
+> Please correct me if I am wrong.
+> 
+> Maybe it would be good to capture the benefit/purpose of this patch in
+> the commit msg, as in which use-cases/scenarios we are now trying to
+> support that previously were not supported. The "why?" part basically.
 
-Applied, thanks!
+Hi Naman,
+Thanks for your comment. 
+It is a pretty standard support for network drivers to allow changing
+TX/RX queue sizes. We are working on improving customizations in MANA
+driver based on VM configurations. This patch is a part of that series.
+Hope that makes things more clear.
 
-[6/6] arm64: dts: qcom: sm8650-qrd: use the PMU to power up bluetooth
-      commit: 4e71c38244dbeb6619156b417d469771bba52b83
-
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+regards,
+Shradha
+> 
+> 
+> 
+> Regards,
+> Naman Jain
 
