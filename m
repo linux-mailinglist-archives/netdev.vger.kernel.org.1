@@ -1,121 +1,89 @@
-Return-Path: <netdev+bounces-114781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5EFA9440F4
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:23:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6F0E9440E9
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 04:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4336B32694
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:16:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72D1A283C25
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AABC1A71F4;
-	Thu,  1 Aug 2024 01:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E434313A256;
+	Thu,  1 Aug 2024 01:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RNg1moYP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JG4zqFyi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B9F1A6181
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 01:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF49D13A253
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 01:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722476434; cv=none; b=HFMSZYLO07biiATZkDekVc7mOSuQSB97WW2Zzx6x0VYH9U59VFcjNvbnbHNVB3IyCEHqr3jgCikuh3XQojR44QMSg2yfxbjwwaufyqAeKZ0/7agtkdnbaJIG2YYlUHeXI5u+4Rbw5p04F83IYf28J382q42+5N+9f1GDnT/4qqM=
+	t=1722477312; cv=none; b=QzCXBCBqIrMCbq3j3GcF34u7SmV5qm3XF87i57sCOHmd08eING0Cp4dNwK4qQVwwisn1O3liU5gjYEgpDTyOZsCgf6++Mi9SPcvR3CjG5X6X+cvqCjaNi6oasCOh6ezJ0K/uUDCE+YwGwTHVeyn5AGJu7jKwk5Jiyq3qxLq2Vpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722476434; c=relaxed/simple;
-	bh=zfO4LKkgYywvwUHXG+Uu7N48jFoUO2pJ61AB5E2nwHg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DxK81pufFE4Pwpe1vS5ABn1RGxulDuqq58inMAtorZvsxjeJKhSNiMNNIi7OQWrCPddG6dV90lzBI/FjOwAzPdNMBZGpWsYxP4ckJuVFinWJmTMaoM1GF6fHicQVzybU2xGA4jGzR4x4x9VM/rAvaLaXXeoGsPEw6/zw5vsbnb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RNg1moYP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8845CC32786;
-	Thu,  1 Aug 2024 01:40:33 +0000 (UTC)
+	s=arc-20240116; t=1722477312; c=relaxed/simple;
+	bh=+xe7UZEbvk5jH0emkNEWG2Q88Ul8OwU0VQoLZT30Vlo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bSKfj39LfK+7u/1PuWvKztrHkaWTCvdAXfB/7iV/31FuatmVjmtJkGrRQI4QxP11ZAInUoUa84vXhqInggmGCiVg759eRzASj1PXtNCkebJPpgO80V5oeZg2YVDNsakMdSKe3DvbRRO9eqxUsZQaQGAGns14L+ZXvFm6YhFqSLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JG4zqFyi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F256FC116B1;
+	Thu,  1 Aug 2024 01:55:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722476433;
-	bh=zfO4LKkgYywvwUHXG+Uu7N48jFoUO2pJ61AB5E2nwHg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RNg1moYPm3pET0+OzpPfienfAKzOVaq8GFnAfvY5FgJGPaBqATsiDbKEl8UoENPBK
-	 ltKUYySNyTTjAc9Oi5PbhMl7mvOMqRusy57WSmyDrg6Sn2cnKMboQRHPZRI7v9Hlup
-	 42+lTeaMFUZ7tNdbFWgX/9XxNkJTwxO31w/A1fKrPQY1pCEC8+SrEdDjfSrrKdDwbU
-	 kw1QeEWgKInHZ0xGil+UX7T9bDWOj0Mq7kw+FSQMBN/dwoRgmhx/18u/OPrAEBVBGo
-	 e7mD08BjAHVbr/nx7TctlnKhMGnjmNto1S5qbI/x3tz6WPQnyIA/6pDQx6RUKEYZgY
-	 mIuL68roJMouQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75BBEC4332F;
-	Thu,  1 Aug 2024 01:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1722477312;
+	bh=+xe7UZEbvk5jH0emkNEWG2Q88Ul8OwU0VQoLZT30Vlo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JG4zqFyi0NyHiPbKBVsouk+lahdLc28MPTLg8gmo2Tlkd5a4JmyM9SX/b7VRV1Rzj
+	 3iJbmUwKNqh7h22VauDdmiO6Z8JmOdU/OdU294C3wlvOEu09QeQaxPCkRcehbKcSl+
+	 q+JDGfACiYVlR2Kx7Tm1ShkodtAVgUDZxiEOv3fLfT1//mr28+iZKHq0DRmvhlqicM
+	 B7ClUZXlTZAaNHwGU9Te8pSAAwLhyM3Cl3ujFpmYzgVYPp6Fbb1Ak8+BwfKCdAwGqn
+	 H+MgeIHDpvP0pdpw3kj6JWQhhjABllANTelMSS+/2yihLqWP6eK76AGK98JkZW8Gdv
+	 CqfCdK6UVU9aA==
+Date: Wed, 31 Jul 2024 18:55:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
+Message-ID: <20240731185511.672d15ae@kernel.org>
+In-Reply-To: <29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
+References: <cover.1722357745.git.pabeni@redhat.com>
+	<75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
+	<29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/10] mlxsw: core_thermal: Small cleanups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172247643347.7213.6903623763816168922.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Aug 2024 01:40:33 +0000
-References: <cover.1722345311.git.petrm@nvidia.com>
-In-Reply-To: <cover.1722345311.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, vadimp@nvidia.com,
- idosch@nvidia.com, mlxsw@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 30 Jul 2024 15:58:11 +0200 you wrote:
-> Ido Schimmel says:
+On Wed, 31 Jul 2024 09:52:38 +0200 Paolo Abeni wrote:
+> On 7/30/24 22:39, Paolo Abeni wrote:
+> > Leverage a basic/dummy netdevsim implementation to do functional
+> > coverage for NL interface.
+> > 
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>  
 > 
-> Clean up various issues which I noticed while addressing feedback on a
-> different patchset.
+> FTR, it looks like the CI build went wild around this patch, but the 
+> failures look unrelated to the actual changes here. i.e.:
 > 
-> Ido Schimmel (10):
->   mlxsw: core_thermal: Call thermal_zone_device_unregister()
->     unconditionally
->   mlxsw: core_thermal: Remove unnecessary check
->   mlxsw: core_thermal: Remove another unnecessary check
->   mlxsw: core_thermal: Fold two loops into one
->   mlxsw: core_thermal: Remove unused arguments
->   mlxsw: core_thermal: Make mlxsw_thermal_module_{init, fini} symmetric
->   mlxsw: core_thermal: Simplify rollback
->   mlxsw: core_thermal: Remove unnecessary checks
->   mlxsw: core_thermal: Remove unnecessary assignments
->   mlxsw: core_thermal: Fix -Wformat-truncation warning
-> 
-> [...]
+> https://netdev.bots.linux.dev/static/nipa/875223/13747883/build_clang/stderr
 
-Here is the summary with links:
-  - [net-next,01/10] mlxsw: core_thermal: Call thermal_zone_device_unregister() unconditionally
-    https://git.kernel.org/netdev/net-next/c/a1bb54b1a066
-  - [net-next,02/10] mlxsw: core_thermal: Remove unnecessary check
-    https://git.kernel.org/netdev/net-next/c/4be011d76408
-  - [net-next,03/10] mlxsw: core_thermal: Remove another unnecessary check
-    https://git.kernel.org/netdev/net-next/c/2a1c9dcb52dd
-  - [net-next,04/10] mlxsw: core_thermal: Fold two loops into one
-    https://git.kernel.org/netdev/net-next/c/d81d71434036
-  - [net-next,05/10] mlxsw: core_thermal: Remove unused arguments
-    https://git.kernel.org/netdev/net-next/c/73c18f9998fd
-  - [net-next,06/10] mlxsw: core_thermal: Make mlxsw_thermal_module_{init, fini} symmetric
-    https://git.kernel.org/netdev/net-next/c/fb76ea1d4b12
-  - [net-next,07/10] mlxsw: core_thermal: Simplify rollback
-    https://git.kernel.org/netdev/net-next/c/e25f3040a619
-  - [net-next,08/10] mlxsw: core_thermal: Remove unnecessary checks
-    https://git.kernel.org/netdev/net-next/c/e7e3a450e552
-  - [net-next,09/10] mlxsw: core_thermal: Remove unnecessary assignments
-    https://git.kernel.org/netdev/net-next/c/ec672931d150
-  - [net-next,10/10] mlxsw: core_thermal: Fix -Wformat-truncation warning
-    https://git.kernel.org/netdev/net-next/c/b0d21321140c
+Could you dig deeper?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The scripts are doing incremental builds, and changes to Kconfig
+confuse them. You should be able to run the build script as a normal
+bash script, directly, it only needs a small handful of exported
+env variables.
 
+I have been trying to massage this for a while, my last change is:
+https://github.com/linux-netdev/nipa/commit/5bcb890cbfecd3c1727cec2f026360646a4afc62
 
 
