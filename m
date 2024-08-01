@@ -1,139 +1,132 @@
-Return-Path: <netdev+bounces-114939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDD93944B6C
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:37:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7085944B76
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:38:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AF831C233FA
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:37:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41B1CB20C56
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 12:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB00194AE6;
-	Thu,  1 Aug 2024 12:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135791A00F8;
+	Thu,  1 Aug 2024 12:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sudF5UQ/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iaRG94Rv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F17187FFD;
-	Thu,  1 Aug 2024 12:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A089187FFD
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 12:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722515818; cv=none; b=U2HDsQiw++iwfV3rCOLuYkV+ztiOyY+N7LqtTjJMxFT/9Wp7TRqHZqJPEUTNQs4EktGg+2lfqpqz9rRcWPlvVtd7HEObw4/14crdHoEPDME3sT3zje7lnDFO3hKIPPJkWMRMylCWcwA537WC/ksYtWWODEOEldIgyobTvPcPUPY=
+	t=1722515895; cv=none; b=sQdXB7MGP9oSZEV223EyFkA3PPvAVMLQ3PkyUWQZSJicgjA4y2hXCO2gef9SgiYqRbUQAF6HhDXCHFhyy9H7mrdcrnDhc7oTSb4N7y/7bffQ8srBkrlj3Ha51D1l9tkBfsyvU5/f9Mja/QeFbypRDNUUvv/GD6lRdODAgHFGKx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722515818; c=relaxed/simple;
-	bh=8y68VOu62Sd+8tUqQsxtJirVhBoDa7wrm3eIzLEYWdo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eb8Iw1etTcE6XarQNiuPGV7PYuK/EQVi+aqSx8gcwTmCiD7kNsT6IHjru0Wx0lR0+/QrLRFLFiyDb1uFhlE/DFSozTUsVXPbuxJeiYuiQWfEoT3vCKDOjp6N6d4X240DzZvohsaalMEyJQ1ZNvQPGuifUu5WsnO04LgYYWC6ZJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sudF5UQ/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=l6VKD7CEKUflJtsFY+ry8bBY+bZfcfkQ/rtFhvXEGno=; b=sudF5UQ/ATZEqEsORqsB48JYd3
-	eEFE6Ab2Ua06XdZhe1Fd7yNtxeHKlcYsRnw4kZjtgzc7rZ7/sjBr0NNk0Y7Whe7Gf0Vx4K3DR7Ngj
-	jy/whLW31gj2CuPST1s6wJL5dKzrCI/WG1Bnc7t4XwXdYtbouttKRnjZ7WpczUmh6P30=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sZV33-003m4h-Rc; Thu, 01 Aug 2024 14:36:49 +0200
-Date: Thu, 1 Aug 2024 14:36:49 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, sudongming1@huawei.com,
-	xujunsheng@huawei.com, shiyongbang@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next 05/10] net: hibmcge: Implement some .ndo
- functions
-Message-ID: <e57e3748-6ee5-42d5-8715-ec652fc6310f@lunn.ch>
-References: <20240731094245.1967834-1-shaojijie@huawei.com>
- <20240731094245.1967834-6-shaojijie@huawei.com>
- <0e497b6f-7ab0-4a43-afc6-c5ad205aa624@lunn.ch>
- <e8a56b1f-f3f3-4081-8c0d-4b829e659780@huawei.com>
- <ffd2d708-60fb-4049-8c1b-fcfe43a78d57@lunn.ch>
- <d5e9f50a-c3bd-4071-9de8-cc22cd0f5cfc@huawei.com>
+	s=arc-20240116; t=1722515895; c=relaxed/simple;
+	bh=qWURU8q2eehi2DoM1j1WnhP4LCxxD26U5ssz2nCeYsQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=X3QAtsiWq9cKFX0BlwwpiAizXPsZs/ktas7IiU0iFlxrooRV/SkuAlDOigTAencms1paAwzIsmF6gWa3nfeP6qpT9UnPOZwU/T+0cYyb4p/xSPYUujwt7KJjTyejgy7U2EgKdcOuf/yAgvVQVBtO1bBsb7UEaACrNYewB7i+C0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iaRG94Rv; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1722515883; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=NVZltom0B0Pttpv0J8vNgmpW8bzuitgaHFisNXxFNhU=;
+	b=iaRG94Rv5OhiPg83xjoeUos3/zfWllIvk9FHs25VIe+mFDeTIvPSkaBuqPrt3IHTUiAdqwLP75RLWx7p1o11g7Wu8vuZaacx0GFi80VbO9DcQhcOX/0AEoZQzBQFHLx7MpStN3nU9Fb/Gd9qh3ItENDKIDn7C515erVMSVYrcJU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067112;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0WBtRfL4_1722515881;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0WBtRfL4_1722515881)
+          by smtp.aliyun-inc.com;
+          Thu, 01 Aug 2024 20:38:02 +0800
+Message-ID: <1722515836.8565578-2-hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net v3 2/2] virtio-net: unbreak vq resizing when coalescing is not negotiated
+Date: Thu, 1 Aug 2024 20:37:16 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>,
+ virtualization@lists.linux.dev,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <20240801122739.49008-1-hengqi@linux.alibaba.com>
+ <20240801122739.49008-3-hengqi@linux.alibaba.com>
+ <20240801082947-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240801082947-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d5e9f50a-c3bd-4071-9de8-cc22cd0f5cfc@huawei.com>
 
-On Thu, Aug 01, 2024 at 08:33:38PM +0800, Jijie Shao wrote:
-> 
-> on 2024/8/1 20:18, Andrew Lunn wrote:
-> > On Thu, Aug 01, 2024 at 05:13:33PM +0800, Jijie Shao wrote:
-> > > on 2024/8/1 8:51, Andrew Lunn wrote:
-> > > > > +static int hbg_net_set_mac_address(struct net_device *dev, void *addr)
-> > > > > +{
-> > > > > +	struct hbg_priv *priv = netdev_priv(dev);
-> > > > > +	u8 *mac_addr;
-> > > > > +
-> > > > > +	mac_addr = ((struct sockaddr *)addr)->sa_data;
-> > > > > +	if (ether_addr_equal(dev->dev_addr, mac_addr))
-> > > > > +		return 0;
-> > > > > +
-> > > > > +	if (!is_valid_ether_addr(mac_addr))
-> > > > > +		return -EADDRNOTAVAIL;
-> > > > How does the core pass you an invalid MAC address?
-> > > According to my test,
-> > > in the 6.4 rc4 kernel version, invalid mac address is allowed to be configured.
-> > > An error is reported only when ifconfig ethx up.
-> > Ah, interesting.
-> > 
-> > I see a test in __dev_open(), which is what you are saying here. But i
-> > would also expect a test in rtnetlink, or maybe dev_set_mac_address().
-> > We don't want every driver having to repeat this test in their
-> > .ndo_set_mac_address, when it could be done once in the core.
-> > 
-> > 	Andrew
-> 
-> Hi:
-> I did the following test on my device:
-> 
-> insmod hibmcge.ko
-> hibmcge: no symbol version for module_layout
-> hibmcge: loading out-of-tree module taints kernel.
-> hibmcge: module verification failed: signature and/or required key missing - tainting kernel
-> hibmcge 0000:83:00.1: enabling device (0140 -> 0142)
-> Generic PHY mii-0000:83:00.1:02: attached PHY driver (mii_bus:phy_addr=mii-0000:83:00.1:02, irq=POLL)
-> hibmcge 0000:83:00.1 enp131s0f1: renamed from eth0
-> IPv6: ADDRCONF(NETDEV_CHANGE): enp131s0f1: link becomes ready
-> hibmcge 0000:83:00.1: link up!
-> 
-> ifconfig enp131s0f1 hw ether FF:FF:FF:FF:FF:FF
-> 
-> ip a
-> 6: enp131s0f1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
->     link/ether ff:ff:ff:ff:ff:ff brd ff:ff:ff:ff:ff:ff permaddr 08:02:00:00:08:08
-> ifconfig enp131s0f1 up
-> ifconfig enp131s0f1 down up
-> SIOCSIFFLAGS: Cannot assign requested address
-> hibmcge 0000:83:00.1: link down!
-> 
-> uname -a
-> Linux localhost.localdomain 6.4.0+ #1 SMP Fri Mar 15 14:44:20 CST 2024 aarch64 aarch64 aarch64 GNU/Linux
-> 
-> 
-> 
-> So I'm not sure what's wrong. I also implemented ndo_validate_addr by eth_validate_addr.
+On Thu, 1 Aug 2024 08:30:44 -0400, "Michael S. Tsirkin" <mst@redhat.com> wr=
+ote:
+> On Thu, Aug 01, 2024 at 08:27:39PM +0800, Heng Qi wrote:
+> > Don't break the resize action if the vq coalescing feature
+> > named VIRTIO_NET_F_VQ_NOTF_COAL is not negotiated.
+> >=20
+> > Fixes: f61fe5f081cf ("virtio-net: fix the vq coalescing setting for vq =
+resize")
+> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> > Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > Acked-by: Eugenio P=C3=A9 rez <eperezma@redhat.com>
+> > Acked-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> > v2->v3:
+> >   - Break out the feature check and the fix into separate patches.
+> >=20
+> > v1->v2:
+> >   - Rephrase the subject.
+> >   - Put the feature check inside the virtnet_send_{r,t}x_ctrl_coal_vq_c=
+md().
+> >=20
+> >  drivers/net/virtio_net.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index b1176be8fcfd..2b566d893ea3 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -3749,7 +3749,7 @@ static int virtnet_set_ringparam(struct net_devic=
+e *dev,
+> >  			err =3D virtnet_send_tx_ctrl_coal_vq_cmd(vi, i,
+> >  							       vi->intr_coal_tx.max_usecs,
+> >  							       vi->intr_coal_tx.max_packets);
+> > -			if (err)
+> > +			if (err && err !=3D -EOPNOTSUPP)
+> >  				return err;
+> >  		}
+> > =20
+> > @@ -3764,7 +3764,7 @@ static int virtnet_set_ringparam(struct net_devic=
+e *dev,
+> >  							       vi->intr_coal_rx.max_usecs,
+> >  							       vi->intr_coal_rx.max_packets);
+> >  			mutex_unlock(&vi->rq[i].dim_lock);
+> > -			if (err)
+> > +			if (err && err !=3D -EOPNOTSUPP)
+> >  				return err;
+>=20
+>=20
+> This needs a comment.
+>=20
 
-I agree. I don't see a test. Please could you include a patch to
-dev_set_mac_address() to validate the address there before calling
-into the driver. It might also be worth a search to see if anybody
-else has tried this before, and failed. There might be a good reason
-you cannot validate it.
+Since both the patch and the comment are small, I will send out the next ve=
+rsion
+soon and hope to get the understanding of the netdev maintainers.
 
-	Andrew
+Thanks.
+
+>=20
+> >  		}
+> >  	}
+> > --=20
+> > 2.32.0.3.g01195cf9f
+>=20
 
