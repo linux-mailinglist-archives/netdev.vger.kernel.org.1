@@ -1,65 +1,61 @@
-Return-Path: <netdev+bounces-114748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D2E943D3B
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:54:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E71F943D5D
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 02:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FBCA2862CE
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:54:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D68531C21445
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 00:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDE11C37AB;
-	Thu,  1 Aug 2024 00:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688351C579B;
+	Thu,  1 Aug 2024 00:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oSxL6Xsf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PsTuqunz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298F91C37A1;
-	Thu,  1 Aug 2024 00:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF171C5795;
+	Thu,  1 Aug 2024 00:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722471855; cv=none; b=DjllQifuj9nPg1hMNpU7Z1L12udj50eGcCqGmLUKVGW6h276Ougkr4Osm/6zh7Wkpt0681L1vy8TTghcFspBWz9TXBYhQJnEwr60ITQo1jlV3btqEqYfj7z4x4x11cnOXzrcznqrkm0r9t4pHT3AB7Md9Qb+8+SFlg6fJFmaHXU=
+	t=1722471877; cv=none; b=UXQLl/dd/6ZU67Pbi6rO9nqjv5jOA2krO0MIBGJBrwmYrOjYQ4C53ZMsc8czRJyB+Y4I6UDTA89/EZPSxLlE0E2OJawJV44O+YLMr3LOXCsPBUEY6mSHErYK8fXS+5HwZyXEb5yDIklp8TLWh+ev+BeqJhKDncnRiCiZFi9fifk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722471855; c=relaxed/simple;
-	bh=EX/ZEti9WyGQseeolRjW5OUiCOr5mK7TgYaQeLPsqw4=;
+	s=arc-20240116; t=1722471877; c=relaxed/simple;
+	bh=lCke2NneBJe6C4+wyrpyK6/0iAmf9yF+EZ/6rfo6XTg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LIzoc5Qb81+fDmboEOIebyPzxK9aTvxwqyCneUCBoO/TLOU5PPVaCI7JlIdbIYCZD+Kiv2zSyAumO9ZwyJEVqT9awWmHDORJbnEaogSLjCLpUrRcMUKWJ7M7uKIXH+mjDifruLBU2s8zBYtXtM9SggQjHwtDq6K+NtNPCrmpEKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oSxL6Xsf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E31A0C116B1;
-	Thu,  1 Aug 2024 00:24:12 +0000 (UTC)
+	 MIME-Version; b=mF1Pv57tRdk846+2Ctx7POzlGeeqE5fcZylaX4VfsMHdbXVWKPxfcQL/0IQt2Cm4SxpwhMG+Al7PrBIHOiklE0iR+zEst+Alj2LRW83XYKbr2caCiWbr5TIqbLigLlaOAZWlRK7G9WTybBDfCZq/xz+zeHe5+A1i6OeY0sszvIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PsTuqunz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 680CEC116B1;
+	Thu,  1 Aug 2024 00:24:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722471854;
-	bh=EX/ZEti9WyGQseeolRjW5OUiCOr5mK7TgYaQeLPsqw4=;
+	s=k20201202; t=1722471876;
+	bh=lCke2NneBJe6C4+wyrpyK6/0iAmf9yF+EZ/6rfo6XTg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oSxL6XsfzQE/m7jC2Z5jMmBq3GeX2zEzUMVx0Sw5DO30bZmy3mYtbzuolHG+0eVQ+
-	 uJtJplbZ2WW20Us9D9gfjXcidntAiGujpnWAvLc5bL/TUFlTOCszHqsmR5zDIbbnMO
-	 QUVrF8O3ySqLX0+g0sowNk0Hx7gRPajZG7PYrdeOEQuPfBz10iNCrEe27rGs9aIy3d
-	 TFE+FkXcPKO0V3IJaQB2UBU3gMd/Ug/cmO19UyST3+3kbdUC4Mp4bXqAc7mcJJnskY
-	 /30qNp6mzV2zTduYV6FeLNDRWWf8g1lPbUXOeIDKnFDvca6B7e6BIQZzrnsGv05vwx
-	 FXVqWTwYEHkeA==
+	b=PsTuqunz+UyyNuoZJbBR4ZP6B8d2yW6IVTrBf7cwxyASnb/QGKzWb8hO7SoYUqrE1
+	 7T6skoxMLkfPHNOTxTwprZ361lxAgJI14un3pTByS6OLxHw8oEUY4PYN8kogvAsLra
+	 ZA1LiRFihtI+PVRibuAIp8X5WKEhe9h9kxwGYDGJgPBdvxL6hWci2bc5MOudijB1C7
+	 7/hSjAOUibQECIg97w4ViC3mb7HY2JiR9vSsZNl/qOOZN35aKAE7WGK1ik8cW05cXy
+	 MT9HVG0l2m+mJzjtiw/zKIowJ36qNuERDXe0R+YrkkCoSueGUt55AP7TqWMd4hcY4K
+	 3E0+H/IVbtQIA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: yunshui <jiangyunshui@kylinos.cn>,
-	syzbot <syzkaller@googlegroups.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	bpf@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 38/83] bpf, net: Use DEV_STAT_INC()
-Date: Wed, 31 Jul 2024 20:17:53 -0400
-Message-ID: <20240801002107.3934037-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 49/83] wifi: cfg80211: make hash table duplicates more survivable
+Date: Wed, 31 Jul 2024 20:18:04 -0400
+Message-ID: <20240801002107.3934037-49-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240801002107.3934037-1-sashal@kernel.org>
 References: <20240801002107.3934037-1-sashal@kernel.org>
@@ -74,57 +70,128 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.43
 Content-Transfer-Encoding: 8bit
 
-From: yunshui <jiangyunshui@kylinos.cn>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit d9cbd8343b010016fcaabc361c37720dcafddcbe ]
+[ Upstream commit 7f12e26a194d0043441f870708093d9c2c3bad7d ]
 
-syzbot/KCSAN reported that races happen when multiple CPUs updating
-dev->stats.tx_error concurrently. Adopt SMP safe DEV_STATS_INC() to
-update the dev->stats fields.
+Jiazi Li reported that they occasionally see hash table duplicates
+as evidenced by the WARN_ON() in rb_insert_bss() in this code.  It
+isn't clear how that happens, nor have I been able to reproduce it,
+but if it does happen, the kernel crashes later, when it tries to
+unhash the entry that's now not hashed.
 
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: yunshui <jiangyunshui@kylinos.cn>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Link: https://lore.kernel.org/bpf/20240523033520.4029314-1-jiangyunshui@kylinos.cn
+Try to make this situation more survivable by removing the BSS from
+the list(s) as well, that way it's fully leaked here (as had been
+the intent in the hash insert error path), and no longer reachable
+through the list(s) so it shouldn't be unhashed again later.
+
+Link: https://lore.kernel.org/r/20231026013528.GA24122@Jiazi.Li
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Link: https://msgid.link/20240607181726.36835-2-johannes@sipsolutions.net
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/filter.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/wireless/scan.c | 46 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 34 insertions(+), 12 deletions(-)
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index afe38b8dee024..86aac8ccd855e 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2271,12 +2271,12 @@ static int __bpf_redirect_neigh_v6(struct sk_buff *skb, struct net_device *dev,
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index 74db51348a7ff..4d88e797ae49f 100644
+--- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -1562,7 +1562,7 @@ struct cfg80211_bss *cfg80211_get_bss(struct wiphy *wiphy,
+ }
+ EXPORT_SYMBOL(cfg80211_get_bss);
  
- 	err = bpf_out_neigh_v6(net, skb, dev, nh);
- 	if (unlikely(net_xmit_eval(err)))
--		dev->stats.tx_errors++;
-+		DEV_STATS_INC(dev, tx_errors);
- 	else
- 		ret = NET_XMIT_SUCCESS;
- 	goto out_xmit;
- out_drop:
--	dev->stats.tx_errors++;
-+	DEV_STATS_INC(dev, tx_errors);
- 	kfree_skb(skb);
- out_xmit:
- 	return ret;
-@@ -2378,12 +2378,12 @@ static int __bpf_redirect_neigh_v4(struct sk_buff *skb, struct net_device *dev,
+-static void rb_insert_bss(struct cfg80211_registered_device *rdev,
++static bool rb_insert_bss(struct cfg80211_registered_device *rdev,
+ 			  struct cfg80211_internal_bss *bss)
+ {
+ 	struct rb_node **p = &rdev->bss_tree.rb_node;
+@@ -1578,7 +1578,7 @@ static void rb_insert_bss(struct cfg80211_registered_device *rdev,
  
- 	err = bpf_out_neigh_v4(net, skb, dev, nh);
- 	if (unlikely(net_xmit_eval(err)))
--		dev->stats.tx_errors++;
-+		DEV_STATS_INC(dev, tx_errors);
- 	else
- 		ret = NET_XMIT_SUCCESS;
- 	goto out_xmit;
- out_drop:
--	dev->stats.tx_errors++;
-+	DEV_STATS_INC(dev, tx_errors);
- 	kfree_skb(skb);
- out_xmit:
- 	return ret;
+ 		if (WARN_ON(!cmp)) {
+ 			/* will sort of leak this BSS */
+-			return;
++			return false;
+ 		}
+ 
+ 		if (cmp < 0)
+@@ -1589,6 +1589,7 @@ static void rb_insert_bss(struct cfg80211_registered_device *rdev,
+ 
+ 	rb_link_node(&bss->rbn, parent, p);
+ 	rb_insert_color(&bss->rbn, &rdev->bss_tree);
++	return true;
+ }
+ 
+ static struct cfg80211_internal_bss *
+@@ -1615,6 +1616,34 @@ rb_find_bss(struct cfg80211_registered_device *rdev,
+ 	return NULL;
+ }
+ 
++static void cfg80211_insert_bss(struct cfg80211_registered_device *rdev,
++				struct cfg80211_internal_bss *bss)
++{
++	lockdep_assert_held(&rdev->bss_lock);
++
++	if (!rb_insert_bss(rdev, bss))
++		return;
++	list_add_tail(&bss->list, &rdev->bss_list);
++	rdev->bss_entries++;
++}
++
++static void cfg80211_rehash_bss(struct cfg80211_registered_device *rdev,
++                                struct cfg80211_internal_bss *bss)
++{
++	lockdep_assert_held(&rdev->bss_lock);
++
++	rb_erase(&bss->rbn, &rdev->bss_tree);
++	if (!rb_insert_bss(rdev, bss)) {
++		list_del(&bss->list);
++		if (!list_empty(&bss->hidden_list))
++			list_del_init(&bss->hidden_list);
++		if (!list_empty(&bss->pub.nontrans_list))
++			list_del_init(&bss->pub.nontrans_list);
++		rdev->bss_entries--;
++	}
++	rdev->bss_generation++;
++}
++
+ static bool cfg80211_combine_bsses(struct cfg80211_registered_device *rdev,
+ 				   struct cfg80211_internal_bss *new)
+ {
+@@ -1876,9 +1905,7 @@ __cfg80211_bss_update(struct cfg80211_registered_device *rdev,
+ 			bss_ref_get(rdev, bss_from_pub(tmp->pub.transmitted_bss));
+ 		}
+ 
+-		list_add_tail(&new->list, &rdev->bss_list);
+-		rdev->bss_entries++;
+-		rb_insert_bss(rdev, new);
++		cfg80211_insert_bss(rdev, new);
+ 		found = new;
+ 	}
+ 
+@@ -3111,19 +3138,14 @@ void cfg80211_update_assoc_bss_entry(struct wireless_dev *wdev,
+ 		if (!WARN_ON(!__cfg80211_unlink_bss(rdev, new)))
+ 			rdev->bss_generation++;
+ 	}
+-
+-	rb_erase(&cbss->rbn, &rdev->bss_tree);
+-	rb_insert_bss(rdev, cbss);
+-	rdev->bss_generation++;
++	cfg80211_rehash_bss(rdev, cbss);
+ 
+ 	list_for_each_entry_safe(nontrans_bss, tmp,
+ 				 &cbss->pub.nontrans_list,
+ 				 nontrans_list) {
+ 		bss = bss_from_pub(nontrans_bss);
+ 		bss->pub.channel = chan;
+-		rb_erase(&bss->rbn, &rdev->bss_tree);
+-		rb_insert_bss(rdev, bss);
+-		rdev->bss_generation++;
++		cfg80211_rehash_bss(rdev, bss);
+ 	}
+ 
+ done:
 -- 
 2.43.0
 
