@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-115010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F10944E27
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:35:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4D3944E28
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:36:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9655CB21293
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:35:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6215A1C23A8C
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04121A4F36;
-	Thu,  1 Aug 2024 14:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69C381A487B;
+	Thu,  1 Aug 2024 14:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ks0oF3uh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCLGZF5q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE8F1A4885
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A6416F0DF
+	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:35:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722522944; cv=none; b=IWA6ahl01QGZFGi5kQSKf7L2BPwkd2ZKTShGgKkMvr/hTkRpML1z0Lcrk6vXTRhBHBMdvr6RlP2I3P4uNX30+aEFrbGIKPwGg5S8Exx9JlLmsnTxlsjoHAEq46ROIQZludW6vlY19DDhEzWaKMwnkMnBhfZiOgJNpj5kYey8ADM=
+	t=1722522949; cv=none; b=Li1NcAQ1TLG94eJL1q6xiqpSXZldnMQFU4R8+f+DHDQTIaQOwfhVfHAcRDQ9V7VJKuvr2zPPH4Wbs9aQDvL2e27W8ojCUbBXx5BmHqVai19X8SUgft56SdMp35xRk489H5CDfQu9Cki2AcIwRvMbzjbmDqmwZ5NegNZNMvk/Hik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722522944; c=relaxed/simple;
-	bh=MdCYfXhI+5ylGk5FIhPJCeHlshTnPBveEQYvMXylFN8=;
+	s=arc-20240116; t=1722522949; c=relaxed/simple;
+	bh=hUCcjv8h/km/J2/tsWQEP1zCSdEjq81Cq6xpbTDO/Yc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BXqwXSIEY9bqsnTwoolB0ODowdG9eH40X0tAzIpggCu9fTXKtyAhWYjJ3dNFuZSedsLkbNf0wUAQJtUN5TLKmPb//vOR7oSdd8+2OMvFNEOt8U4v4+YqFqEPoonJQIeBV86g36r7LJcMKLept6S6l/iwCM/J566N4quJtfe95H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ks0oF3uh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B666BC32786;
-	Thu,  1 Aug 2024 14:35:43 +0000 (UTC)
+	 MIME-Version; b=ohdJMa88E+DD98ByYIsUdUC+UZXSNKxCNAesFZMKlYzsmn5SFSHWgzqW4UODDQ3AreekxeZamuMBoIs6vC+HmBf/zpKA2hUUBhgc/sMzL0aOL5+aOUnUM4PknlpOe5FIFENrxP/2y122bYwN9Gj8bLZjeZDUJ1tdgQ+uvbfbzv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCLGZF5q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F753C32786;
+	Thu,  1 Aug 2024 14:35:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722522944;
-	bh=MdCYfXhI+5ylGk5FIhPJCeHlshTnPBveEQYvMXylFN8=;
+	s=k20201202; t=1722522948;
+	bh=hUCcjv8h/km/J2/tsWQEP1zCSdEjq81Cq6xpbTDO/Yc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ks0oF3uhxGivw2b2OmB/yoapT1nLsPyHc1rGX/MtAW3KDJpLU+yI2DE6jHKYflBDm
-	 kTIEU43c3xrIoN50AmSKQEG5y8fDpIXEo5+kar9wmfbtxEgc6hN4B4SNsA1wimwbT+
-	 22gKcyAUCtcaPiw8cFzFZlkw+cHKyoqJJruAsV08l/XKTaMf1HYFlTj5dIAeDw3Fjl
-	 O7ACaB89QB4fIaGi312Ugr9c1Fm2146SolpBppk00KCfDgsqPbUnrM7U49EPOPXy4M
-	 VAr8HOSLWyiz5/KlqvYF905Jvkq0bow1jefc0dEQAQHavWhj6HMrhKX8FZLLvp8C1k
-	 Q4JhgNm/7L0Og==
+	b=ZCLGZF5qME0hCo79vylrCtE1OSow3Q8O4U7PvB5PdlEtWt4XjyA3fXEMywXvAVGNJ
+	 EOzw+d+m3IZ9UPeSiMXkQsW4SoAAvVnScwe866gXSrfIN9RBu3rHE5Hzo4tTGZKhBD
+	 WmO0W44BTBz8MBU9ltnFSvKNu5ZIa3Dc4gycouRx2T5WJfNeq7TlTW3Hc1bYQtuR/F
+	 ZwbAMUcw+h3+vUXOZ9TcSzCeu/V+fwpxW3y1xqdCtfTxX1sgQOW26KYcc2xvY2JdPD
+	 8r9x3JtaqCNTNODlk0LtKTjKP8lcpEEE+9zjZoORYAaHeHWu2+kd7KRBGs2eqg3jjB
+	 Qa/xOmVuGNv5Q==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: nbd@nbd.name,
@@ -58,9 +58,9 @@ Cc: nbd@nbd.name,
 	andrew@lunn.ch,
 	arnd@arndb.de,
 	horms@kernel.org
-Subject: [PATCH v2 net-next 3/8] net: airoha: Move irq_mask in airoha_qdma structure
-Date: Thu,  1 Aug 2024 16:35:05 +0200
-Message-ID: <1c8a06e8be605278a7b2f3cd8ac06e74bf5ebf2b.1722522582.git.lorenzo@kernel.org>
+Subject: [PATCH v2 net-next 4/8] net: airoha: Add airoha_qdma pointer in airoha_tx_irq_queue/airoha_queue structures
+Date: Thu,  1 Aug 2024 16:35:06 +0200
+Message-ID: <074565b82fd0ceefe66e186f21133d825dbd48eb.1722522582.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1722522582.git.lorenzo@kernel.org>
 References: <cover.1722522582.git.lorenzo@kernel.org>
@@ -72,236 +72,305 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-QDMA controllers have independent irq lines, so move irqmask in
-airoha_qdma structure. This is a preliminary patch to support multiple
-QDMA controllers.
+Move airoha_eth pointer in airoha_qdma structure from
+airoha_tx_irq_queue/airoha_queue ones. This is a preliminary patch to
+introduce support for multi-QDMA controllers available on EN7581.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
  drivers/net/ethernet/mediatek/airoha_eth.c | 84 +++++++++++-----------
- 1 file changed, 42 insertions(+), 42 deletions(-)
+ 1 file changed, 41 insertions(+), 43 deletions(-)
 
 diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index fc6712216c47..48d0b44e6d92 100644
+index 48d0b44e6d92..54515c8a8b03 100644
 --- a/drivers/net/ethernet/mediatek/airoha_eth.c
 +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -786,6 +786,11 @@ struct airoha_hw_stats {
+@@ -728,7 +728,7 @@ struct airoha_queue_entry {
+ };
+ 
+ struct airoha_queue {
+-	struct airoha_eth *eth;
++	struct airoha_qdma *qdma;
+ 
+ 	/* protect concurrent queue accesses */
+ 	spinlock_t lock;
+@@ -747,7 +747,7 @@ struct airoha_queue {
+ };
+ 
+ struct airoha_tx_irq_queue {
+-	struct airoha_eth *eth;
++	struct airoha_qdma *qdma;
+ 
+ 	struct napi_struct napi;
+ 	u32 *q;
+@@ -784,6 +784,7 @@ struct airoha_hw_stats {
+ };
+ 
  struct airoha_qdma {
++	struct airoha_eth *eth;
  	void __iomem *regs;
  
-+	/* protect concurrent irqmask accesses */
-+	spinlock_t irq_lock;
-+	u32 irqmask[QDMA_INT_REG_MAX];
-+	int irq;
-+
- 	struct airoha_tx_irq_queue q_tx_irq[AIROHA_NUM_TX_IRQ];
- 
- 	struct airoha_queue q_tx[AIROHA_NUM_TX_RING];
-@@ -812,11 +817,6 @@ struct airoha_eth {
- 	unsigned long state;
- 	void __iomem *fe_regs;
- 
--	/* protect concurrent irqmask accesses */
--	spinlock_t irq_lock;
--	u32 irqmask[QDMA_INT_REG_MAX];
--	int irq;
--
- 	struct reset_control_bulk_data rsts[AIROHA_MAX_NUM_RSTS];
- 	struct reset_control_bulk_data xsi_rsts[AIROHA_MAX_NUM_XSI_RSTS];
- 
-@@ -866,38 +866,37 @@ static u32 airoha_rmw(void __iomem *base, u32 offset, u32 mask, u32 val)
- #define airoha_qdma_clear(qdma, offset, val)			\
- 	airoha_rmw((qdma)->regs, (offset), (val), 0)
- 
--static void airoha_qdma_set_irqmask(struct airoha_eth *eth, int index,
-+static void airoha_qdma_set_irqmask(struct airoha_qdma *qdma, int index,
- 				    u32 clear, u32 set)
+ 	/* protect concurrent irqmask accesses */
+@@ -1388,8 +1389,8 @@ static int airoha_fe_init(struct airoha_eth *eth)
+ static int airoha_qdma_fill_rx_queue(struct airoha_queue *q)
  {
- 	unsigned long flags;
+ 	enum dma_data_direction dir = page_pool_get_dma_dir(q->page_pool);
+-	struct airoha_qdma *qdma = &q->eth->qdma[0];
+-	struct airoha_eth *eth = q->eth;
++	struct airoha_qdma *qdma = q->qdma;
++	struct airoha_eth *eth = qdma->eth;
+ 	int qid = q - &qdma->q_rx[0];
+ 	int nframes = 0;
  
--	if (WARN_ON_ONCE(index >= ARRAY_SIZE(eth->irqmask)))
-+	if (WARN_ON_ONCE(index >= ARRAY_SIZE(qdma->irqmask)))
- 		return;
- 
--	spin_lock_irqsave(&eth->irq_lock, flags);
-+	spin_lock_irqsave(&qdma->irq_lock, flags);
- 
--	eth->irqmask[index] &= ~clear;
--	eth->irqmask[index] |= set;
--	airoha_qdma_wr(&eth->qdma[0], REG_INT_ENABLE(index),
--		       eth->irqmask[index]);
-+	qdma->irqmask[index] &= ~clear;
-+	qdma->irqmask[index] |= set;
-+	airoha_qdma_wr(qdma, REG_INT_ENABLE(index), qdma->irqmask[index]);
- 	/* Read irq_enable register in order to guarantee the update above
- 	 * completes in the spinlock critical section.
- 	 */
--	airoha_qdma_rr(&eth->qdma[0], REG_INT_ENABLE(index));
-+	airoha_qdma_rr(qdma, REG_INT_ENABLE(index));
- 
--	spin_unlock_irqrestore(&eth->irq_lock, flags);
-+	spin_unlock_irqrestore(&qdma->irq_lock, flags);
- }
- 
--static void airoha_qdma_irq_enable(struct airoha_eth *eth, int index,
-+static void airoha_qdma_irq_enable(struct airoha_qdma *qdma, int index,
- 				   u32 mask)
+@@ -1457,8 +1458,8 @@ static int airoha_qdma_get_gdm_port(struct airoha_eth *eth,
+ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
  {
--	airoha_qdma_set_irqmask(eth, index, 0, mask);
-+	airoha_qdma_set_irqmask(qdma, index, 0, mask);
- }
+ 	enum dma_data_direction dir = page_pool_get_dma_dir(q->page_pool);
+-	struct airoha_qdma *qdma = &q->eth->qdma[0];
+-	struct airoha_eth *eth = q->eth;
++	struct airoha_qdma *qdma = q->qdma;
++	struct airoha_eth *eth = qdma->eth;
+ 	int qid = q - &qdma->q_rx[0];
+ 	int done = 0;
  
--static void airoha_qdma_irq_disable(struct airoha_eth *eth, int index,
-+static void airoha_qdma_irq_disable(struct airoha_qdma *qdma, int index,
- 				    u32 mask)
- {
--	airoha_qdma_set_irqmask(eth, index, mask, 0);
-+	airoha_qdma_set_irqmask(qdma, index, mask, 0);
- }
- 
- static void airoha_set_macaddr(struct airoha_eth *eth, const u8 *addr)
-@@ -1522,7 +1521,7 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
+@@ -1521,7 +1522,6 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
  static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
  {
  	struct airoha_queue *q = container_of(napi, struct airoha_queue, napi);
--	struct airoha_eth *eth = q->eth;
-+	struct airoha_qdma *qdma = &q->eth->qdma[0];
+-	struct airoha_qdma *qdma = &q->eth->qdma[0];
  	int cur, done = 0;
  
  	do {
-@@ -1531,7 +1530,7 @@ static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
+@@ -1530,14 +1530,13 @@ static int airoha_qdma_rx_napi_poll(struct napi_struct *napi, int budget)
  	} while (cur && done < budget);
  
  	if (done < budget && napi_complete(napi))
--		airoha_qdma_irq_enable(eth, QDMA_INT_REG_IDX1,
-+		airoha_qdma_irq_enable(qdma, QDMA_INT_REG_IDX1,
+-		airoha_qdma_irq_enable(qdma, QDMA_INT_REG_IDX1,
++		airoha_qdma_irq_enable(q->qdma, QDMA_INT_REG_IDX1,
  				       RX_DONE_INT_MASK);
  
  	return done;
-@@ -1718,7 +1717,7 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (done < budget && napi_complete(napi))
--		airoha_qdma_irq_enable(eth, QDMA_INT_REG_IDX0,
-+		airoha_qdma_irq_enable(qdma, QDMA_INT_REG_IDX0,
- 				       TX_DONE_INT_MASK(id));
- 
- 	return done;
-@@ -1927,13 +1926,13 @@ static int airoha_qdma_hw_init(struct airoha_eth *eth,
- 	int i;
- 
- 	/* clear pending irqs */
--	for (i = 0; i < ARRAY_SIZE(eth->irqmask); i++)
-+	for (i = 0; i < ARRAY_SIZE(qdma->irqmask); i++)
- 		airoha_qdma_wr(qdma, REG_INT_STATUS(i), 0xffffffff);
- 
- 	/* setup irqs */
--	airoha_qdma_irq_enable(eth, QDMA_INT_REG_IDX0, INT_IDX0_MASK);
--	airoha_qdma_irq_enable(eth, QDMA_INT_REG_IDX1, INT_IDX1_MASK);
--	airoha_qdma_irq_enable(eth, QDMA_INT_REG_IDX4, INT_IDX4_MASK);
-+	airoha_qdma_irq_enable(qdma, QDMA_INT_REG_IDX0, INT_IDX0_MASK);
-+	airoha_qdma_irq_enable(qdma, QDMA_INT_REG_IDX1, INT_IDX1_MASK);
-+	airoha_qdma_irq_enable(qdma, QDMA_INT_REG_IDX4, INT_IDX4_MASK);
- 
- 	/* setup irq binding */
- 	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
-@@ -1979,14 +1978,13 @@ static int airoha_qdma_hw_init(struct airoha_eth *eth,
- static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
- {
- 	struct airoha_eth *eth = dev_instance;
--	u32 intr[ARRAY_SIZE(eth->irqmask)];
--	struct airoha_qdma *qdma;
-+	struct airoha_qdma *qdma = &eth->qdma[0];
-+	u32 intr[ARRAY_SIZE(qdma->irqmask)];
- 	int i;
- 
--	qdma = &eth->qdma[0];
--	for (i = 0; i < ARRAY_SIZE(eth->irqmask); i++) {
-+	for (i = 0; i < ARRAY_SIZE(qdma->irqmask); i++) {
- 		intr[i] = airoha_qdma_rr(qdma, REG_INT_STATUS(i));
--		intr[i] &= eth->irqmask[i];
-+		intr[i] &= qdma->irqmask[i];
- 		airoha_qdma_wr(qdma, REG_INT_STATUS(i), intr[i]);
- 	}
- 
-@@ -1994,7 +1992,7 @@ static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
- 		return IRQ_NONE;
- 
- 	if (intr[1] & RX_DONE_INT_MASK) {
--		airoha_qdma_irq_disable(eth, QDMA_INT_REG_IDX1,
-+		airoha_qdma_irq_disable(qdma, QDMA_INT_REG_IDX1,
- 					RX_DONE_INT_MASK);
- 
- 		for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
-@@ -2014,7 +2012,7 @@ static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
- 			if (!(intr[0] & TX_DONE_INT_MASK(i)))
- 				continue;
- 
--			airoha_qdma_irq_disable(eth, QDMA_INT_REG_IDX0,
-+			airoha_qdma_irq_disable(qdma, QDMA_INT_REG_IDX0,
- 						TX_DONE_INT_MASK(i));
- 
- 			status = airoha_qdma_rr(qdma, REG_IRQ_STATUS(i));
-@@ -2029,12 +2027,18 @@ static irqreturn_t airoha_irq_handler(int irq, void *dev_instance)
- 	return IRQ_HANDLED;
  }
  
--static int airoha_qdma_init(struct airoha_eth *eth)
-+static int airoha_qdma_init(struct platform_device *pdev,
-+			    struct airoha_eth *eth)
+-static int airoha_qdma_init_rx_queue(struct airoha_eth *eth,
+-				     struct airoha_queue *q,
++static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
+ 				     struct airoha_qdma *qdma, int ndesc)
  {
- 	struct airoha_qdma *qdma = &eth->qdma[0];
- 	int err;
+ 	const struct page_pool_params pp_params = {
+@@ -1547,15 +1546,16 @@ static int airoha_qdma_init_rx_queue(struct airoha_eth *eth,
+ 		.dma_dir = DMA_FROM_DEVICE,
+ 		.max_len = PAGE_SIZE,
+ 		.nid = NUMA_NO_NODE,
+-		.dev = eth->dev,
++		.dev = qdma->eth->dev,
+ 		.napi = &q->napi,
+ 	};
++	struct airoha_eth *eth = qdma->eth;
+ 	int qid = q - &qdma->q_rx[0], thr;
+ 	dma_addr_t dma_addr;
  
--	err = devm_request_irq(eth->dev, eth->irq, airoha_irq_handler,
-+	spin_lock_init(&qdma->irq_lock);
-+	qdma->irq = platform_get_irq(pdev, 0);
-+	if (qdma->irq < 0)
-+		return qdma->irq;
-+
-+	err = devm_request_irq(eth->dev, qdma->irq, airoha_irq_handler,
- 			       IRQF_SHARED, KBUILD_MODNAME, eth);
- 	if (err)
- 		return err;
-@@ -2060,7 +2064,8 @@ static int airoha_qdma_init(struct airoha_eth *eth)
+ 	q->buf_size = PAGE_SIZE / 2;
+ 	q->ndesc = ndesc;
+-	q->eth = eth;
++	q->qdma = qdma;
+ 
+ 	q->entry = devm_kzalloc(eth->dev, q->ndesc * sizeof(*q->entry),
+ 				GFP_KERNEL);
+@@ -1595,7 +1595,7 @@ static int airoha_qdma_init_rx_queue(struct airoha_eth *eth,
+ 
+ static void airoha_qdma_cleanup_rx_queue(struct airoha_queue *q)
+ {
+-	struct airoha_eth *eth = q->eth;
++	struct airoha_eth *eth = q->qdma->eth;
+ 
+ 	while (q->queued) {
+ 		struct airoha_queue_entry *e = &q->entry[q->tail];
+@@ -1609,8 +1609,7 @@ static void airoha_qdma_cleanup_rx_queue(struct airoha_queue *q)
+ 	}
+ }
+ 
+-static int airoha_qdma_init_rx(struct airoha_eth *eth,
+-			       struct airoha_qdma *qdma)
++static int airoha_qdma_init_rx(struct airoha_qdma *qdma)
+ {
+ 	int i;
+ 
+@@ -1622,8 +1621,8 @@ static int airoha_qdma_init_rx(struct airoha_eth *eth,
+ 			continue;
+ 		}
+ 
+-		err = airoha_qdma_init_rx_queue(eth, &qdma->q_rx[i],
+-						qdma, RX_DSCP_NUM(i));
++		err = airoha_qdma_init_rx_queue(&qdma->q_rx[i], qdma,
++						RX_DSCP_NUM(i));
+ 		if (err)
+ 			return err;
+ 	}
+@@ -1639,9 +1638,9 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
+ 	int id, done = 0;
+ 
+ 	irq_q = container_of(napi, struct airoha_tx_irq_queue, napi);
+-	eth = irq_q->eth;
+-	qdma = &eth->qdma[0];
++	qdma = irq_q->qdma;
+ 	id = irq_q - &qdma->q_tx_irq[0];
++	eth = qdma->eth;
+ 
+ 	while (irq_q->queued > 0 && done < budget) {
+ 		u32 qid, last, val = irq_q->q[irq_q->head];
+@@ -1723,16 +1722,16 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
+ 	return done;
+ }
+ 
+-static int airoha_qdma_init_tx_queue(struct airoha_eth *eth,
+-				     struct airoha_queue *q,
++static int airoha_qdma_init_tx_queue(struct airoha_queue *q,
+ 				     struct airoha_qdma *qdma, int size)
+ {
++	struct airoha_eth *eth = qdma->eth;
+ 	int i, qid = q - &qdma->q_tx[0];
+ 	dma_addr_t dma_addr;
+ 
+ 	spin_lock_init(&q->lock);
+ 	q->ndesc = size;
+-	q->eth = eth;
++	q->qdma = qdma;
+ 	q->free_thr = 1 + MAX_SKB_FRAGS;
+ 
+ 	q->entry = devm_kzalloc(eth->dev, q->ndesc * sizeof(*q->entry),
+@@ -1761,11 +1760,11 @@ static int airoha_qdma_init_tx_queue(struct airoha_eth *eth,
  	return 0;
  }
  
--static int airoha_hw_init(struct airoha_eth *eth)
-+static int airoha_hw_init(struct platform_device *pdev,
-+			  struct airoha_eth *eth)
+-static int airoha_qdma_tx_irq_init(struct airoha_eth *eth,
+-				   struct airoha_tx_irq_queue *irq_q,
++static int airoha_qdma_tx_irq_init(struct airoha_tx_irq_queue *irq_q,
+ 				   struct airoha_qdma *qdma, int size)
  {
- 	int err;
+ 	int id = irq_q - &qdma->q_tx_irq[0];
++	struct airoha_eth *eth = qdma->eth;
+ 	dma_addr_t dma_addr;
  
-@@ -2076,7 +2081,7 @@ static int airoha_hw_init(struct airoha_eth *eth)
- 	if (err)
- 		return err;
+ 	netif_napi_add_tx(eth->napi_dev, &irq_q->napi,
+@@ -1777,7 +1776,7 @@ static int airoha_qdma_tx_irq_init(struct airoha_eth *eth,
  
--	return airoha_qdma_init(eth);
-+	return airoha_qdma_init(pdev, eth);
+ 	memset(irq_q->q, 0xff, size * sizeof(u32));
+ 	irq_q->size = size;
+-	irq_q->eth = eth;
++	irq_q->qdma = qdma;
+ 
+ 	airoha_qdma_wr(qdma, REG_TX_IRQ_BASE(id), dma_addr);
+ 	airoha_qdma_rmw(qdma, REG_TX_IRQ_CFG(id), TX_IRQ_DEPTH_MASK,
+@@ -1788,21 +1787,20 @@ static int airoha_qdma_tx_irq_init(struct airoha_eth *eth,
+ 	return 0;
  }
  
- static void airoha_hw_cleanup(struct airoha_eth *eth)
-@@ -2673,11 +2678,6 @@ static int airoha_probe(struct platform_device *pdev)
- 		return err;
+-static int airoha_qdma_init_tx(struct airoha_eth *eth,
+-			       struct airoha_qdma *qdma)
++static int airoha_qdma_init_tx(struct airoha_qdma *qdma)
+ {
+ 	int i, err;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(qdma->q_tx_irq); i++) {
+-		err = airoha_qdma_tx_irq_init(eth, &qdma->q_tx_irq[i],
+-					      qdma, IRQ_QUEUE_LEN(i));
++		err = airoha_qdma_tx_irq_init(&qdma->q_tx_irq[i], qdma,
++					      IRQ_QUEUE_LEN(i));
+ 		if (err)
+ 			return err;
  	}
  
--	spin_lock_init(&eth->irq_lock);
--	eth->irq = platform_get_irq(pdev, 0);
--	if (eth->irq < 0)
--		return eth->irq;
--
- 	eth->napi_dev = alloc_netdev_dummy(0);
- 	if (!eth->napi_dev)
- 		return -ENOMEM;
-@@ -2687,7 +2687,7 @@ static int airoha_probe(struct platform_device *pdev)
- 	strscpy(eth->napi_dev->name, "qdma_eth", sizeof(eth->napi_dev->name));
- 	platform_set_drvdata(pdev, eth);
+ 	for (i = 0; i < ARRAY_SIZE(qdma->q_tx); i++) {
+-		err = airoha_qdma_init_tx_queue(eth, &qdma->q_tx[i],
+-						qdma, TX_DSCP_NUM);
++		err = airoha_qdma_init_tx_queue(&qdma->q_tx[i], qdma,
++						TX_DSCP_NUM);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -1812,7 +1810,7 @@ static int airoha_qdma_init_tx(struct airoha_eth *eth,
  
--	err = airoha_hw_init(eth);
-+	err = airoha_hw_init(pdev, eth);
+ static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
+ {
+-	struct airoha_eth *eth = q->eth;
++	struct airoha_eth *eth = q->qdma->eth;
+ 
+ 	spin_lock_bh(&q->lock);
+ 	while (q->queued) {
+@@ -1829,9 +1827,9 @@ static void airoha_qdma_cleanup_tx_queue(struct airoha_queue *q)
+ 	spin_unlock_bh(&q->lock);
+ }
+ 
+-static int airoha_qdma_init_hfwd_queues(struct airoha_eth *eth,
+-					struct airoha_qdma *qdma)
++static int airoha_qdma_init_hfwd_queues(struct airoha_qdma *qdma)
+ {
++	struct airoha_eth *eth = qdma->eth;
+ 	dma_addr_t dma_addr;
+ 	u32 status;
+ 	int size;
+@@ -1869,8 +1867,7 @@ static int airoha_qdma_init_hfwd_queues(struct airoha_eth *eth,
+ 				 REG_LMGR_INIT_CFG);
+ }
+ 
+-static void airoha_qdma_init_qos(struct airoha_eth *eth,
+-				 struct airoha_qdma *qdma)
++static void airoha_qdma_init_qos(struct airoha_qdma *qdma)
+ {
+ 	airoha_qdma_clear(qdma, REG_TXWRR_MODE_CFG, TWRR_WEIGHT_SCALE_MASK);
+ 	airoha_qdma_set(qdma, REG_TXWRR_MODE_CFG, TWRR_WEIGHT_BASE_MASK);
+@@ -1920,8 +1917,7 @@ static void airoha_qdma_init_qos(struct airoha_eth *eth,
+ 			FIELD_PREP(SLA_SLOW_TICK_RATIO_MASK, 40));
+ }
+ 
+-static int airoha_qdma_hw_init(struct airoha_eth *eth,
+-			       struct airoha_qdma *qdma)
++static int airoha_qdma_hw_init(struct airoha_qdma *qdma)
+ {
+ 	int i;
+ 
+@@ -1958,7 +1954,7 @@ static int airoha_qdma_hw_init(struct airoha_eth *eth,
+ 		       GLOBAL_CFG_TX_WB_DONE_MASK |
+ 		       FIELD_PREP(GLOBAL_CFG_MAX_ISSUE_NUM_MASK, 2));
+ 
+-	airoha_qdma_init_qos(eth, qdma);
++	airoha_qdma_init_qos(qdma);
+ 
+ 	/* disable qdma rx delay interrupt */
+ 	for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
+@@ -2034,6 +2030,8 @@ static int airoha_qdma_init(struct platform_device *pdev,
+ 	int err;
+ 
+ 	spin_lock_init(&qdma->irq_lock);
++	qdma->eth = eth;
++
+ 	qdma->irq = platform_get_irq(pdev, 0);
+ 	if (qdma->irq < 0)
+ 		return qdma->irq;
+@@ -2043,19 +2041,19 @@ static int airoha_qdma_init(struct platform_device *pdev,
  	if (err)
- 		goto error;
+ 		return err;
+ 
+-	err = airoha_qdma_init_rx(eth, qdma);
++	err = airoha_qdma_init_rx(qdma);
+ 	if (err)
+ 		return err;
+ 
+-	err = airoha_qdma_init_tx(eth, qdma);
++	err = airoha_qdma_init_tx(qdma);
+ 	if (err)
+ 		return err;
+ 
+-	err = airoha_qdma_init_hfwd_queues(eth, qdma);
++	err = airoha_qdma_init_hfwd_queues(qdma);
+ 	if (err)
+ 		return err;
+ 
+-	err = airoha_qdma_hw_init(eth, qdma);
++	err = airoha_qdma_hw_init(qdma);
+ 	if (err)
+ 		return err;
  
 -- 
 2.45.2
