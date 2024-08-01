@@ -1,365 +1,225 @@
-Return-Path: <netdev+bounces-115045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA17C944F65
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:35:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13967944F71
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:38:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19BDF1C238A5
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:35:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 668DEB21017
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 15:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3DA1B010E;
-	Thu,  1 Aug 2024 15:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801C41B0125;
+	Thu,  1 Aug 2024 15:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="s2idSab8"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2058.outbound.protection.outlook.com [40.107.236.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4291A3BD7;
-	Thu,  1 Aug 2024 15:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722526500; cv=none; b=Qm7ITwjMocnHvHwDaO1wpv8mhKoNWmP+PULixEIU135zTUsONAFxAU72iWStj2LG3CE8nEn0iidozo+n+ZEbAmDxEZqZjsghY1awVz5KiA+a9eL0tWDL7rME4ZbzYwyvviq4Ksa9NfLPR+r21J0m2v0VDzkyDSCco2loEuTr/w8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722526500; c=relaxed/simple;
-	bh=2mn6d/7rh79jqnFJZzh6jVKmmzuCAKBUdubptx18axo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hYVvx1qsXH4BgtI+Zfokn0SaPrOSbiG/F7rfLG2/81w0Tcv1DEoYp7EyczwPeWA17zouTDnGs6cbGaVYJO0pwopMq36NH2mqikqw7FbmOoqnDAsno8OPQVNhi+7GS2RrnbEqMtV/gogPArud1rNZve21xTlDR9X1Jkuz7zTWS6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WZY184gK3z1L9Mn;
-	Thu,  1 Aug 2024 23:34:36 +0800 (CST)
-Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
-	by mail.maildlp.com (Postfix) with ESMTPS id 882ED180102;
-	Thu,  1 Aug 2024 23:34:49 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDBC81EB4AF;
+	Thu,  1 Aug 2024 15:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722526700; cv=fail; b=Ha+6uvYdjPaDE1SJMpylXYtdHIechR1+6nIm0Ur+SHsQ/294GXiWc4mBWEsPt/oUQNojLZIz6q7cMCpWO9w+JjyZHF17Ybk5ZItvieOBEerTndQHpo8ndFXBju/Q0GY5rHrY77icp+W7iHAvO2HoAXBtH6f0vKRlM4getJJFKi0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722526700; c=relaxed/simple;
+	bh=7HSixOMUq0HFsQlt6+Mx4ZGAji5Wa2qe1rbSTD9Vz8Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A1Q+1cCAGMbsrJeipPEI6nmsvwdEljChiI1o05jVmIcKE6TxRZ8EqXk57geEpjZ39rLvkbY9IiU/5WELqiiPaTUUI1PoJLPZZesFkjjpTuxlT32yoPu3iowqC2X6C6WK54mPkmI2LHz/o4vMTaLSNeRP8N8AH3LY/NA9Wweu918=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=s2idSab8; arc=fail smtp.client-ip=40.107.236.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SfRbm8PxNYUU3vnv2VCVZcWTMzz8y3kxvGZWmFzzFoqnUbx9+TGvDRc+N0aiZ4wD+ntI7y3a7ABjzvhne1wDs6bfjGiF21KE7o3OvRWzKXBJYO10cCksh1zZ/d151CxTJ54rc4i+kMExXkz/pR7Bp6BKGlMPww9aKai6Un/UBNeexIKD0csu/CgvcuB+0miyK3n6ftg3FaEwDBOITYxE3QbrgncIjFV7lIc7siyTAADlKMHGPBdHA//D7w8enWxx4LWKHiWs6d1UE/Jx27AWttUQ2vMHYOsMTWa3dL6kfC322nFeUuJkVsqrtjKcOPesAs42Di5S3p5YgdmqTlv1xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QUPH8YQZqhNqhb390PAn6d6Niy7HRnJK8goUEgp+j5s=;
+ b=qvYxwRe+QeE5IsHG2Q1s3sDETj51aUz1ka4JfdX6hOV1T4ux/0JERGPcjbtD6VPsVM1ZyKoeoeMTB4G2Zca2XNBBt1Anpee4KnCOJM0OE+6T+Ox3mmGXfcfezzmx1/L1iHel3qqBaOLvPyQkHLTJ/2WpnIsMUrnYyy/tcLlZL/rk5YbP16l/HItKAEv3Ypig0UbxfEqNeEORbaFlOT6GelyTkQL55ewrFv5hbVjUQ0lXy/HSSGZNYBP5BrS4k0E7QijICWQhDJXsPv1+WrBEECgw+HedB3wc+awzyf5aR9xeRrxBJ7HIrm+TxtzJGk9j4a5uyjwO7CyTskYIVcm1/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QUPH8YQZqhNqhb390PAn6d6Niy7HRnJK8goUEgp+j5s=;
+ b=s2idSab8H+Z+Na0jEdsmmrc6xvmdr17UMgfAtk8ZbCYud/MMPgm5LjqtDbA9bDkr0bTfMnPH1q/Rt4nNxzyBI6ScD/2mTvIbQFG1KYYwzyG5bPnlRPc9UIgcA6Ru85s+dLOvRMCmWoKPTb+74k6YQY3KdyPpzt2ICQb5ylBxsKSV78TIsqdVNFHAkUkq988geJHmEXn0k51zDEPxW5gj8d+6QqQtP8GANC/aQsqGo+R0FTb8YwvN2qUpCEGbBcusbOKFDJ/e2yeW25jXdwwJqwBK/zsJYY5/f8lBmwF4dIGkDAzWo09di+3eT9mYqoac2zRO5TvAWKr1vC+DuFB/0A==
+Received: from CH5P222CA0018.NAMP222.PROD.OUTLOOK.COM (2603:10b6:610:1ee::29)
+ by DS7PR12MB6047.namprd12.prod.outlook.com (2603:10b6:8:84::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Thu, 1 Aug
+ 2024 15:38:11 +0000
+Received: from CH3PEPF00000013.namprd21.prod.outlook.com
+ (2603:10b6:610:1ee:cafe::f4) by CH5P222CA0018.outlook.office365.com
+ (2603:10b6:610:1ee::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.23 via Frontend
+ Transport; Thu, 1 Aug 2024 15:38:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH3PEPF00000013.mail.protection.outlook.com (10.167.244.118) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.0 via Frontend Transport; Thu, 1 Aug 2024 15:38:11 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 1 Aug 2024
+ 08:37:54 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 1 Aug 2024 23:34:46 +0800
-Message-ID: <7c8ed332-c4ec-81e7-a94a-e1b62d820dd3@huawei-partners.com>
-Date: Thu, 1 Aug 2024 18:34:41 +0300
+ 15.2.1544.4; Thu, 1 Aug 2024 08:37:54 -0700
+Received: from dev-l-177.mtl.labs.mlnx (10.127.8.11) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 1 Aug 2024 08:37:52 -0700
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+CC: Dragos Tatulea <dtatulea@nvidia.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH vhost] vhost-vdpa: Fix invalid irq bypass unregister
+Date: Thu, 1 Aug 2024 18:37:22 +0300
+Message-ID: <20240801153722.191797-2-dtatulea@nvidia.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 2/9] landlock: Support TCP listen access-control
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
- <20240728002602.3198398-3-ivanov.mikhail1@huawei-partners.com>
- <20240731.AFooxaeR5mie@digikod.net>
- <68568a44-2079-33ac-592d-c2677acf50dd@huawei-partners.com>
- <20240801.EeshaeThai9j@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20240801.EeshaeThai9j@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- dggpemm500020.china.huawei.com (7.185.36.49)
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000013:EE_|DS7PR12MB6047:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74904c2e-cb39-47c0-d0d8-08dcb23ff37d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?F8g9b0FQsKonG7E8E5cm246c3+A1THMzzoSlwMPoQU3VBe8A4mNAmVIVuRAE?=
+ =?us-ascii?Q?/LZRcd1Xg+ONv7xQ8oAEP2ywJW69wD1GVkxSSfBkbhtA8j5twx5IzXWJX2Uu?=
+ =?us-ascii?Q?f6Zbck8PPJxkcJ4bCs9fzYKbKSUvi3R/gjSHJbwKFdERSBOB3eMSR0tFDHvj?=
+ =?us-ascii?Q?OZ+jjvsDTM3VbQZzcBInaIICiusceLYnyaqFN1uhajw0JjHuH51HV0ktxbrx?=
+ =?us-ascii?Q?NCHIWWQGeXba6zekRVIo/Z3cHZrWck13t+//SQaE10hp4EuXgEOJgqe6AHtW?=
+ =?us-ascii?Q?rVzQ5tDQfigytzMo8OrCYsrhvhWvOes76bmYcgLnKNc4MGqLZQKb5GIeTxHT?=
+ =?us-ascii?Q?Cy5XDdVb25JUWivv5B4y+kBoUzjmImPx1LdWhu45utixP0t1EMNa597f4/xG?=
+ =?us-ascii?Q?vjnufECEQE2qDtaf+jNXk7y7lRkI339hYn2Ng5ETEAvcgjYjVxXO6Ss73/b/?=
+ =?us-ascii?Q?KjeWLHzs14Xe9pYInFnWB89ojJz8OVC2pbGuE/dLA6Pi7zZ+Sk96XT/9btx0?=
+ =?us-ascii?Q?fzE44bS+pqYqcfPmoD0gfaUmc4YwxGdtk7PFsxLti/0HsBAOwCTkCTjYVlyV?=
+ =?us-ascii?Q?Q36X586X9To4ZXh2oMRUyHkxRCIaKkgWKxU83t6WqdlCfQeWJZR4PMSXvTcZ?=
+ =?us-ascii?Q?P6I2vw+8W03tP6QIy1FTBpP52Ls1/AYZnHO0sDzQ0EQF6yUYRysa2GhGwBqN?=
+ =?us-ascii?Q?MIE8pqXRFZNvP4nO3OwNQIsPkKb9fEr7XzpyjZq2EIK0RY/heD9PIt7Buh1D?=
+ =?us-ascii?Q?vwnTqKFkVUxs4gFeow8edNLaECFC5UJp7BYaYiDkIZ24epUYjRmfZI7Fwh76?=
+ =?us-ascii?Q?CeBc0UwVUxR+M1xZmUPQpmwQ6vkvzGx4ZJq0sX19YG2z6ctl6A354WDicM6G?=
+ =?us-ascii?Q?puR/9N+abgaC5cwM1bY3Zl9+asCMgEOfdcDQqa4r2SQNHZHzVTIzO7fMWPi3?=
+ =?us-ascii?Q?T5/rnxB7WYoe/JCqb/XPFunr7xWziLr/Rsv1mJiIjqPtDoz9NjAkEo7mpPro?=
+ =?us-ascii?Q?z8RMRbXV+WpuN2WahyzYY03+YgsjES/ad37jZ771uyP9Kz1R0ef2tOXeT5OZ?=
+ =?us-ascii?Q?CT6NC0T4DOsSUKlDPYI28ojnjDIQl8mL3R2pdVoYXad7t+FtYZx/fJCWF9vI?=
+ =?us-ascii?Q?bqS+HXCEZzxUjsfqLBc5nhxX04AU9o8PTXOAQD6JG5CNqHWK6N91DEcPGbAi?=
+ =?us-ascii?Q?HQqA4jb/PKw5oC+huQQfDPvyqnkqj3Tn+Zlwxi1VLJCwBvcPx3dBIxJofGC1?=
+ =?us-ascii?Q?Q3AjQDrXAAnMuIrsPzi9+GcaGx0jOIi/ADE2MAwGukf0YEkVi8l5Sho9d/2a?=
+ =?us-ascii?Q?cmcjUKYQnZYzShQB4X7oSF/6Xbk5AD2v6ZArjlQLcaZtFlmQE14yo2XsspjA?=
+ =?us-ascii?Q?JV63gQc+ERsZ/wzc4r5CFwcHBADYj5g0lOcOKPHuy+E+BHO6j7omSaKwQb/e?=
+ =?us-ascii?Q?Km0OTYEXoECDHNeTWG+DZUJV5jvh7alh?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 15:38:11.6154
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74904c2e-cb39-47c0-d0d8-08dcb23ff37d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000013.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6047
 
-8/1/2024 5:45 PM, Mickaël Salaün wrote:
-> On Thu, Aug 01, 2024 at 10:52:25AM +0300, Mikhail Ivanov wrote:
->> 7/31/2024 9:30 PM, Mickaël Salaün wrote:
->>> On Sun, Jul 28, 2024 at 08:25:55AM +0800, Mikhail Ivanov wrote:
->>>> LANDLOCK_ACCESS_NET_BIND_TCP is useful to limit the scope of "bindable"
->>>> ports to forbid a malicious sandboxed process to impersonate a legitimate
->>>> server process. However, bind(2) might be used by (TCP) clients to set the
->>>> source port to a (legitimate) value. Controlling the ports that can be
->>>> used for listening would allow (TCP) clients to explicitly bind to ports
->>>> that are forbidden for listening.
->>>>
->>>> Such control is implemented with a new LANDLOCK_ACCESS_NET_LISTEN_TCP
->>>> access right that restricts listening on undesired ports with listen(2).
->>>>
->>>> It's worth noticing that this access right doesn't affect changing
->>>> backlog value using listen(2) on already listening socket.
->>>>
->>>> * Create new LANDLOCK_ACCESS_NET_LISTEN_TCP flag.
->>>> * Add hook to socket_listen(), which checks whether the socket is allowed
->>>>     to listen on a binded local port.
->>>> * Add check_tcp_socket_can_listen() helper, which validates socket
->>>>     attributes before the actual access right check.
->>>> * Update `struct landlock_net_port_attr` documentation with control of
->>>>     binding to ephemeral port with listen(2) description.
->>>> * Change ABI version to 6.
->>>>
->>>> Closes: https://github.com/landlock-lsm/linux/issues/15
->>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->>>
->>> Thanks for this series!
->>>
->>> I cannot apply this patch series though, could you please provide the
->>> base commit?  BTW, this can be automatically put in the cover letter
->>> with the git format-patch's --base argument.
->>
->> base-commit: 591561c2b47b7e7225e229e844f5de75ce0c09ec
-> 
-> Thanks, the following commit makes this series to not apply.
+The following workflow triggers the crash referenced below:
 
-Sorry, you mean that the series are succesfully applied, right?
+1) vhost_vdpa_unsetup_vq_irq() unregisters the irq bypass producer
+   but the producer->token is still valid.
+2) vq context gets released and reassigned to another vq.
+3) That other vq registers it's producer with the same vq context
+   pointer as token in vhost_vdpa_setup_vq_irq().
+4) The original vq tries to unregister it's producer which it has
+   already unlinked in step 1. irq_bypass_unregister_producer() will go
+   ahead and unlink the producer once again. That happens because:
+      a) The producer has a token.
+      b) An element with that token is found. But that element comes
+         from step 3.
 
-> 
->>
->> Günther said that I should rebase to the latest commits, so I'll do
->> it in the next version of this patchset.
-> 
-> Yep, currently we're on v6.11-rc1, but please specify the base commit
-> each time.
+I see 3 ways to fix this:
+1) Fix the vhost-vdpa part. What this patch does. vfio has a different
+   workflow.
+2) Set the token to NULL directly in irq_bypass_unregister_producer()
+   after unlinking the producer. But that makes the API asymmetrical.
+3) Make irq_bypass_unregister_producer() also compare the pointer
+   elements not just the tokens and do the unlink only on match.
 
-ok
+Any thoughts?
 
-> 
->>
->>>
->>>> ---
->>>>    include/uapi/linux/landlock.h                | 23 +++--
->>>>    security/landlock/limits.h                   |  2 +-
->>>>    security/landlock/net.c                      | 90 ++++++++++++++++++++
->>>>    security/landlock/syscalls.c                 |  2 +-
->>>>    tools/testing/selftests/landlock/base_test.c |  2 +-
->>>>    5 files changed, 108 insertions(+), 11 deletions(-)
->>>>
->>>> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
->>>> index 68625e728f43..6b8df3293eee 100644
->>>> --- a/include/uapi/linux/landlock.h
->>>> +++ b/include/uapi/linux/landlock.h
->>>> @@ -104,13 +104,16 @@ struct landlock_net_port_attr {
->>>>    	/**
->>>>    	 * @port: Network port in host endianness.
->>>>    	 *
->>>> -	 * It should be noted that port 0 passed to :manpage:`bind(2)` will
->>>> -	 * bind to an available port from a specific port range. This can be
->>>> -	 * configured thanks to the ``/proc/sys/net/ipv4/ip_local_port_range``
->>>> -	 * sysctl (also used for IPv6). A Landlock rule with port 0 and the
->>>> -	 * ``LANDLOCK_ACCESS_NET_BIND_TCP`` right means that requesting to bind
->>>> -	 * on port 0 is allowed and it will automatically translate to binding
->>>> -	 * on the related port range.
->>>> +	 * It should be noted that some operations cause binding socket to a random
->>>> +	 * available port from a specific port range. This can be configured thanks
->>>> +	 * to the ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl (also used for
->>>> +	 * IPv6). Following operation requests are automatically translate to
->>>> +	 * binding on the related port range:
->>>> +	 *
->>>> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_BIND_TCP``
->>>> +	 *   right means that binding on port 0 is allowed.
->>>> +	 * - A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_LISTEN_TCP``
->>>> +	 *   right means listening without an explicit binding is allowed.
->>>>    	 */
->>>>    	__u64 port;
->>>>    };
->>>> @@ -251,7 +254,7 @@ struct landlock_net_port_attr {
->>>>     * DOC: net_access
->>>>     *
->>>>     * Network flags
->>>> - * ~~~~~~~~~~~~~~~~
->>>> + * ~~~~~~~~~~~~~
->>>>     *
->>>>     * These flags enable to restrict a sandboxed process to a set of network
->>>>     * actions. This is supported since the Landlock ABI version 4.
->>>> @@ -261,9 +264,13 @@ struct landlock_net_port_attr {
->>>>     * - %LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
->>>>     * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to
->>>>     *   a remote port.
->>>> + * - %LANDLOCK_ACCESS_NET_LISTEN_TCP: Listen for TCP socket connections on
->>>> + *   a local port. This access right is available since the sixth version
->>>> + *   of the Landlock ABI.
->>>>     */
->>>>    /* clang-format off */
->>>>    #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
->>>>    #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
->>>> +#define LANDLOCK_ACCESS_NET_LISTEN_TCP			(1ULL << 2)
->>>>    /* clang-format on */
->>>>    #endif /* _UAPI_LINUX_LANDLOCK_H */
->>>> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
->>>> index 4eb643077a2a..2ef147389474 100644
->>>> --- a/security/landlock/limits.h
->>>> +++ b/security/landlock/limits.h
->>>> @@ -22,7 +22,7 @@
->>>>    #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
->>>>    #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
->>>> -#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
->>>> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_LISTEN_TCP
->>>>    #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
->>>>    #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
->>>> diff --git a/security/landlock/net.c b/security/landlock/net.c
->>>> index 669ba260342f..a29cb27c3f14 100644
->>>> --- a/security/landlock/net.c
->>>> +++ b/security/landlock/net.c
->>>> @@ -6,10 +6,12 @@
->>>>     * Copyright © 2022-2023 Microsoft Corporation
->>>>     */
->>>> +#include "net/sock.h"
->>>
->>> These should not be quotes.
->>
->> will be fixed, thanks
->>
->>>
->>>>    #include <linux/in.h>
->>>>    #include <linux/net.h>
->>>>    #include <linux/socket.h>
->>>>    #include <net/ipv6.h>
->>>> +#include <net/tcp.h>
->>>>    #include "common.h"
->>>>    #include "cred.h"
->>>> @@ -194,9 +196,97 @@ static int hook_socket_connect(struct socket *const sock,
->>>>    					   LANDLOCK_ACCESS_NET_CONNECT_TCP);
->>>>    }
->>>> +/*
->>>> + * Checks that socket state and attributes are correct for listen.
->>>> + * It is required to not wrongfully return -EACCES instead of -EINVAL.
->>>> + *
->>>> + * This checker requires sock->sk to be locked.
->>>> + */
->>>> +static int check_tcp_socket_can_listen(struct socket *const sock)
->>>
->>> Is this function still useful with the listen LSM hook?
->>
->> Yeap, we need to validate socket structure before checking the access
->> right. You can see [1] and [2] where the behavior of this function is
->> tested.
->>
->> [1] https://lore.kernel.org/all/20240728002602.3198398-6-ivanov.mikhail1@huawei-partners.com/
->> [2] https://lore.kernel.org/all/20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com/
-> 
-> OK, that's good.
-> 
->>
->>>
->>>> +{
->>>> +	struct sock *sk = sock->sk;
->>>> +	unsigned char cur_sk_state = sk->sk_state;
->>>> +	const struct tcp_ulp_ops *icsk_ulp_ops;
->>>> +
->>>> +	/* Allows only unconnected TCP socket to listen (cf. inet_listen). */
->>>> +	if (sock->state != SS_UNCONNECTED)
->>>> +		return -EINVAL;
->>>> +
->>>> +	/*
->>>> +	 * Checks sock state. This is needed to ensure consistency with inet stack
->>>> +	 * error handling (cf. __inet_listen_sk).
->>>> +	 */
->>>> +	if (WARN_ON_ONCE(!((1 << cur_sk_state) & (TCPF_CLOSE | TCPF_LISTEN))))
->>>> +		return -EINVAL;
->>>> +
->>>> +	icsk_ulp_ops = inet_csk(sk)->icsk_ulp_ops;
->>>> +
->>>> +	/*
->>>> +	 * ULP (Upper Layer Protocol) stands for protocols which are higher than
->>>> +	 * transport protocol in OSI model. Linux has an infrastructure that
->>>> +	 * allows TCP sockets to support logic of some ULP (e.g. TLS ULP).
->>>> +	 *
->>>> +	 * Sockets can listen only if ULP control hook has clone method.
->>>> +	 */
->>>> +	if (icsk_ulp_ops && !icsk_ulp_ops->clone)
->>>> +		return -EINVAL;
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static int hook_socket_listen(struct socket *const sock, const int backlog)
->>>> +{
->>>
->>> Why can't we just call current_check_access_socket()?
->>
->> I've mentioned in the message of the previous commit that this method
->> has address checks for bind(2) and connect(2). In the case of listen(2)
->> port is extracted from the socket structure, so calling
->> current_check_access_socket() would be pointless.
-> 
-> Yep, I missed the check_access_socket() refactoring.
-> 
->>
->>>
->>>> +	int err = 0;
->>>> +	int family;
->>>> +	__be16 port;
->>>> +	struct sock *sk;
->>>> +	const struct landlock_ruleset *const dom = get_current_net_domain();
->>>> +
->>>> +	if (!dom)
->>>> +		return 0;
->>>> +	if (WARN_ON_ONCE(dom->num_layers < 1))
->>>> +		return -EACCES;
->>>> +
->>>> +	/* Checks if it's a (potential) TCP socket. */
->>>> +	if (sock->type != SOCK_STREAM)
->>>> +		return 0;
->>>> +
->>>> +	sk = sock->sk;
->>>> +	family = sk->__sk_common.skc_family;
->>>> +	/*
->>>> +	 * Socket cannot be assigned AF_UNSPEC because this type is used only
->>>> +	 * in the context of addresses.
->>>> +	 *
->>>> +	 * Doesn't restrict listening for non-TCP sockets.
->>>> +	 */
->>>> +	if (family != AF_INET && family != AF_INET6)
->>>> +		return 0;
->>>> +
->>>> +	lock_sock(sk);
->>>> +	/*
->>>> +	 * Calling listen(2) for a listening socket does nothing with its state and
->>>> +	 * only changes backlog value (cf. __inet_listen_sk). Checking of listen
->>>> +	 * access right is not required.
->>>> +	 */
->>>> +	if (sk->sk_state == TCP_LISTEN)
->>>> +		goto release_nocheck;
->>>> +
->>>> +	err = check_tcp_socket_can_listen(sock);
->>>> +	if (unlikely(err))
->>>> +		goto release_nocheck;
->>>> +
->>>> +	port = htons(inet_sk(sk)->inet_num);
->>>> +	release_sock(sk);
->>>> +	return check_access_socket(dom, port, LANDLOCK_ACCESS_NET_LISTEN_TCP);
->>>> +
->>>> +release_nocheck:
->>>> +	release_sock(sk);
->>>> +	return err;
->>>> +}
->>>> +
->>>>    static struct security_hook_list landlock_hooks[] __ro_after_init = {
->>>>    	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
->>>>    	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
->>>> +	LSM_HOOK_INIT(socket_listen, hook_socket_listen),
->>>>    };
->>>>    __init void landlock_add_net_hooks(void)
->>>> diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
->>>> index 03b470f5a85a..3752bcc033d4 100644
->>>> --- a/security/landlock/syscalls.c
->>>> +++ b/security/landlock/syscalls.c
->>>> @@ -149,7 +149,7 @@ static const struct file_operations ruleset_fops = {
->>>>    	.write = fop_dummy_write,
->>>>    };
->>>> -#define LANDLOCK_ABI_VERSION 5
->>>> +#define LANDLOCK_ABI_VERSION 6
->>>>    /**
->>>>     * sys_landlock_create_ruleset - Create a new ruleset
->>>> diff --git a/tools/testing/selftests/landlock/base_test.c b/tools/testing/selftests/landlock/base_test.c
->>>> index 3c1e9f35b531..52b00472a487 100644
->>>> --- a/tools/testing/selftests/landlock/base_test.c
->>>> +++ b/tools/testing/selftests/landlock/base_test.c
->>>> @@ -75,7 +75,7 @@ TEST(abi_version)
->>>>    	const struct landlock_ruleset_attr ruleset_attr = {
->>>>    		.handled_access_fs = LANDLOCK_ACCESS_FS_READ_FILE,
->>>>    	};
->>>> -	ASSERT_EQ(5, landlock_create_ruleset(NULL, 0,
->>>> +	ASSERT_EQ(6, landlock_create_ruleset(NULL, 0,
->>>>    					     LANDLOCK_CREATE_RULESET_VERSION));
->>>>    	ASSERT_EQ(-1, landlock_create_ruleset(&ruleset_attr, 0,
->>>> -- 
->>>> 2.34.1
->>>>
->>>>
->>
+Oops: general protection fault, probably for non-canonical address 0xdead000000000108: 0000 [#1] SMP
+CPU: 8 PID: 5190 Comm: qemu-system-x86 Not tainted 6.10.0-rc7+ #6
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+RIP: 0010:irq_bypass_unregister_producer+0xa5/0xd0
+RSP: 0018:ffffc900034d7e50 EFLAGS: 00010246
+RAX: dead000000000122 RBX: ffff888353d12718 RCX: ffff88810336a000
+RDX: dead000000000100 RSI: ffffffff829243a0 RDI: 0000000000000000
+RBP: ffff888353c42000 R08: ffff888104882738 R09: ffff88810336a000
+R10: ffff888448ab2050 R11: 0000000000000000 R12: ffff888353d126a0
+R13: 0000000000000004 R14: 0000000000000055 R15: 0000000000000004
+FS:  00007f9df9403c80(0000) GS:ffff88852cc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000562dffc6b568 CR3: 000000012efbb006 CR4: 0000000000772ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ? die_addr+0x36/0x90
+ ? exc_general_protection+0x1a8/0x390
+ ? asm_exc_general_protection+0x26/0x30
+ ? irq_bypass_unregister_producer+0xa5/0xd0
+ vhost_vdpa_setup_vq_irq+0x5a/0xc0 [vhost_vdpa]
+ vhost_vdpa_unlocked_ioctl+0xdcd/0xe00 [vhost_vdpa]
+ ? vhost_vdpa_config_cb+0x30/0x30 [vhost_vdpa]
+ __x64_sys_ioctl+0x90/0xc0
+ do_syscall_64+0x4f/0x110
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+RIP: 0033:0x7f9df930774f
+RSP: 002b:00007ffc55013080 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000562dfe134d20 RCX: 00007f9df930774f
+RDX: 00007ffc55013200 RSI: 000000004008af21 RDI: 0000000000000011
+RBP: 00007ffc55013200 R08: 0000000000000002 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000562dfe134360
+R13: 0000562dfe134d20 R14: 0000000000000000 R15: 00007f9df801e190
+
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+---
+ drivers/vhost/vdpa.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 478cd46a49ed..d4a7a3918d86 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -226,6 +226,7 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
+ 	struct vhost_virtqueue *vq = &v->vqs[qid];
+ 
+ 	irq_bypass_unregister_producer(&vq->call_ctx.producer);
++	vq->call_ctx.producer.token = NULL;
+ }
+ 
+ static int _compat_vdpa_reset(struct vhost_vdpa *v)
+-- 
+2.45.2
+
 
