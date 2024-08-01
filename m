@@ -1,64 +1,67 @@
-Return-Path: <netdev+bounces-114993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-114994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D9F944DB9
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:13:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE69944DC4
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 16:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A0DAB20E03
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:13:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96B7B1F2554E
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 14:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49DB11A4862;
-	Thu,  1 Aug 2024 14:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E415D1A489D;
+	Thu,  1 Aug 2024 14:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFgG1SCi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhxHll3f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E2228F3
-	for <netdev@vger.kernel.org>; Thu,  1 Aug 2024 14:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B478E171658;
+	Thu,  1 Aug 2024 14:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722521613; cv=none; b=hHF0cwg9FgmE587NqXctBn4rX4wKsDqlBziUaX7dS8KyTETTsPa9Yx+fP9/ze2OLeQLh/N0hi2OKXUfl8PAMT8HU73eLfMPuAkrHVtGK+6WA0uQmjafIzjtK9AYP1MDlUL88Coxb18HqduvvitlfkbIivhNfI612T71IAkmslW0=
+	t=1722521811; cv=none; b=eBNE/aPHDO8nwhNIzIMsZTsCO7MUh2ZhG1FQ36r983ulMSN6pt/fXrnY3lToTWgRR6dXnn1BWZklQIR+thNT4ZvR6Lwzha0qFgjEqOCsiz60lxYxpeDIrwi5m0+FlrFgK3bCUYorzL4vfKtSKAwXam5JBVYySgALSLgix1Bl0X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722521613; c=relaxed/simple;
-	bh=Eq/aNHDxaOY+V8tE16TNUHJ1VjAhDc5Cbsz9tdj07LI=;
+	s=arc-20240116; t=1722521811; c=relaxed/simple;
+	bh=veBPImXNnXaF06UW5uo2rMAiqAUxNKnWTRyP8Z1gAII=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ONzjWxCBZBTmGhLDgAuqiAh7b658rph/a41ckBWYNSTe4aEylpwm0jLeOeK5EOIx2CNqGypoVyJ5f9CUdTYEq04ZWls5fJFeM0BvWPzjgyqM7jmzcqps2UfnAn4ogDabZQw+QMx8qBq3YPwubDjlTvBZMa7raSrDj3xVZvJ9n6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFgG1SCi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B2E6C32786;
-	Thu,  1 Aug 2024 14:13:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Dzk6mcyi7sjQjMKIRTWbTK/euhbxoKFCT4+lkswCtwS0nES+5dE7GILnvU2p9XMR3HNQhfXiWq9Pmq9CAdh0He9vibbCERHoVyhgQmm+6VL2lJ/8Kr/F1kns31oNlfWGtqQZfFDQx9Wvi+mPmXTzBZEa7/RZ7fBLKpdbs6NAeoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhxHll3f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9009EC4AF0A;
+	Thu,  1 Aug 2024 14:16:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722521612;
-	bh=Eq/aNHDxaOY+V8tE16TNUHJ1VjAhDc5Cbsz9tdj07LI=;
+	s=k20201202; t=1722521811;
+	bh=veBPImXNnXaF06UW5uo2rMAiqAUxNKnWTRyP8Z1gAII=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EFgG1SCivUy5ObYkMX4OJCtMA+1JmXglJyJodcsoZq2KDbr+TZfWPqOD0rCDu5gbu
-	 KjrZkrUJtIdpPIyBpbnzi/HYbT2gFy14S28F2E/JMJpH34ZZLtIqB5+DyvBvxoHVC4
-	 m90a9fk7qNH8gOJV0zU2ynsLuHELTJVd9dCtrxg5ZEIkxiVjMyKhSfxLRXPQViQfxT
-	 tFk03E8lpWN3EckbB2KBeoxhYvr2ztpDwTXlVI+cleUFbEXohNjnaV9DTgxWaUH+w4
-	 VfmM7bx6gwWeYa4E2D228l7PR3/GaIe7d6ufEU0/uEHUSR/y4P7P/NbxhRHzlwdQBX
-	 2IWD2MJtKsaqQ==
-Date: Thu, 1 Aug 2024 07:13:31 -0700
+	b=QhxHll3fsZ8JoesX5+ACZDhxK4nZLYaUS8iZfa90yomDe64mXLbqtVaSZTSFTR9rl
+	 WZrwMkCEDstZh4k6GvyZzFasTC91fR6oRumqnCwgN95K4Pa44JyKd3od7hgEdbPVVY
+	 B9dXl0RUsr5zrfMx/gKZrW/bgSVtq9artXIzroXzRhHsz3dcuOO9wAmv+x0dE19v0b
+	 J0X+z0xykebFmadyAfRXPjsyjttxGy/MVQBm4UVmDXNRFSbIBTNdOCyvLt/kjDVFip
+	 yD58L4zFA8fnocixi1lU28YTEIO3DwcWKFffcTSYh8c5noooyyvM6Q0UaQXMYEaN+H
+	 jALbcIqUquANA==
+Date: Thu, 1 Aug 2024 07:16:49 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: "Keller, Jacob E" <jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "simon.horman@corigine.com" <simon.horman@corigine.com>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: Implement ethtool reset
- support
-Message-ID: <20240801071331.086a0864@kernel.org>
-In-Reply-To: <616bd069-51a0-4b05-96af-2d419961e0e5@intel.com>
-References: <20240730105121.78985-1-wojciech.drewek@intel.com>
-	<20240730065835.191bd1de@kernel.org>
-	<c0213cae-5e63-4fd7-81e7-37803806bde4@intel.com>
-	<20240731164716.63f3b5b7@kernel.org>
-	<616bd069-51a0-4b05-96af-2d419961e0e5@intel.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: Naman Jain <namjain@linux.microsoft.com>, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Long Li
+ <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>, Simon
+ Horman <horms@kernel.org>, Konstantin Taranov <kotaranov@microsoft.com>,
+ Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, Erick Archer
+ <erick.archer@outlook.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed
+ Zaki <ahmed.zaki@intel.com>, Colin Ian King <colin.i.king@gmail.com>
+Subject: Re: [PATCH net-next v2] net: mana: Implement
+ get_ringparam/set_ringparam for mana
+Message-ID: <20240801071649.386b4717@kernel.org>
+In-Reply-To: <20240801034905.GA28115@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
+	<f9dfaf0e-2f72-4917-be75-78856fb27712@linux.microsoft.com>
+	<20240801034905.GA28115@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,20 +71,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 1 Aug 2024 13:01:52 +0200 Wojciech Drewek wrote:
-> We've came up with below mapping:
-> 
-> PF reset:
-> ethtool --reset eth0 irq dma filter offload
-> (we reset all those components but only for the given PF)
-> 
-> CORE reset:
-> ethtool --reset eth0 irq-shared dma-shared filter-shared offload-shared ram-shared
-> (whole adapter is affected so we use shared versions + ram)
-> 
-> GLOBAL reset:
-> ethtool --reset eth0 irq-shared dma-shared filter-shared offload-shared mac-shared phy-shared ram-shared
-> (GLOBALR is CORER plus mac and phy components are also reinitialized)
+On Wed, 31 Jul 2024 20:49:05 -0700 Shradha Gupta wrote:
+> It is a pretty standard support for network drivers to allow changing
+> TX/RX queue sizes. We are working on improving customizations in MANA
+> driver based on VM configurations. This patch is a part of that series.
+> Hope that makes things more clear.
 
-SG!
+Simple reconfiguration must not run the risk of taking the system off
+network.
 
