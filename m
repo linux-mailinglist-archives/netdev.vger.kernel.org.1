@@ -1,375 +1,115 @@
-Return-Path: <netdev+bounces-115094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 603A094518F
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 19:36:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1672A9451A4
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 19:42:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 180B62843CF
-	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:36:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9660282EF3
+	for <lists+netdev@lfdr.de>; Thu,  1 Aug 2024 17:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0511B4C4E;
-	Thu,  1 Aug 2024 17:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ivh8FIMZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FE21B9B28;
+	Thu,  1 Aug 2024 17:42:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE2313D62B;
-	Thu,  1 Aug 2024 17:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3B5182D8;
+	Thu,  1 Aug 2024 17:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722533803; cv=none; b=c5Z9YGTvw/QjGkXWehdxCrICMjrFEMQ13iMF9usnu9sK4LQHNrt/qWNwyiqRp90kc2HMGwfPyKTqufTBzOwc3Ak5w4w47/f5l5097mycyDRiCbaUeIZVcWD6KxDVUW89BkBI0N6R6UKe9Ioah9zTLZ0ceU+ZQqlxf9gBI7IoXCs=
+	t=1722534152; cv=none; b=MfbK1n2pme4qt1dSMUrsV07c/b5M2ixiuudslq779N4IIIiG7Bjl9LMWSGUAJX0ENF5sE9tvPahTMiwnYmSR2RcQhF89IbRUJCOxyiCi0cRg77LgZOImp9lU6rxUqiC0seJ9IFUg0kbsv4F9g7nE28vyi3XC3LOhuZk2A7EUeQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722533803; c=relaxed/simple;
-	bh=6ZVlREg5BXL/EoXOJ2rnaDZF/rFMF02YBydQTjZeh64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kaAwpo5XnwHTZGGyhd5uJ2DA/jRbBf8LcheWiION3r8xZEL8S42w7lxcfVVKqEanCKvnZGkmor/15tE1vCNdsTPLcxuMFWhzZPEOjAWJeXq0CQKJkMEzNgBenlEmU1yyqvUElVFRzBBIyWbv/Ryj1oAojqDkkHiMHkl8rR6rbuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ivh8FIMZ; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e05e4c3228bso6031371276.0;
-        Thu, 01 Aug 2024 10:36:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722533801; x=1723138601; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dkeda4WMxjg+epSrNx4KCKRBP/x9ruE4N5/saWbuL1s=;
-        b=ivh8FIMZYnnw1nU9q5do51Nsep5egusCjfWEtcirXNsmzEgLoRlOKfCWttBDT75+aS
-         6Hi+QUmqErWgd9PJWFQbey/821bpu+/7vrzlp3hYUqW/thzlhtZIRWi581/kP3olUUE+
-         KdBnEJp6bHQzO37S1wOtXiBTDgipnt69Bbd10K/hZAVdB06EGybLa/mhrxBr/wXkLOAw
-         yWApjOM47p/5I9DDyQWx4Qli8JkzZqgRlT+F+3DtCs3pTFkKsUMBXIUT9JdV6/E+7M1N
-         01hyz1ETQ61DKVYfP1q4p6XwS0gzIQuHQRNbEJGIIqZ6GCRW3rfieMhzkssHy2raRR+L
-         kRrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722533801; x=1723138601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dkeda4WMxjg+epSrNx4KCKRBP/x9ruE4N5/saWbuL1s=;
-        b=do7sdBl4Tmyv02srwkIyWL6pkUmvJd6s/j24w5zGfAE05fCYNq9RNA2VQHi7wiNgUs
-         SmwBfvhjfzRNGgjtv3kn0MhOqxQoHIosqWlWpL+s8D1z9PZ5z5afRnYPHmkjQUaT5pVR
-         9byHaCIN2yj7K/64cZykmSjyNq7iVyOICvxNAlLUsHxyz1x/OmuWvPlFH5FenhsXrTQa
-         QVyCtdjMuVFkK6dUIlm1yQDyRMH7qqcOmaD2E85lcgY1GaVlyu+qwvbEZy6RgIzyHAX1
-         lRup1mpFHnxtewGHGdQIPudw4/gJR1sTn4wtzIyT2OsL5pKvK0fzPQshAlch3ymjt4m9
-         wiEA==
-X-Forwarded-Encrypted: i=1; AJvYcCXaOYiShESc5PvAAG1bbHq01Zt6AeslkUzaP4Xgmynwl0eBaM9YwfvSqNO/o3Jdk/YGpplYbvVhVgbS4cilkwr4eVM3L2R8Bz8CD+9wFo26KGP5aMUvOwmhxIGMlyKoMJWKsp33YWutdfXH
-X-Gm-Message-State: AOJu0YxuhKolqjqSa0KqLOy1H2cqqfAr+tlbWqH6M2BOUvOG8qKGMPn6
-	GEISH+FFIJ+J6hK/RyeVRIMnNnXAACyod5pTpfzKF/0L3f/dl07KvmTlNfshMv4+misZvWeFrm7
-	mRJrD2Sv7m2uikZ6o5nlC/l4n4UdFPA==
-X-Google-Smtp-Source: AGHT+IHAh1FTSSaRqGtcyuTtpXm8BVpnndG1OumyMGSiG1akAcrZ3HkFTv+BKGqDW1xJodRgK1UyO6DjTHZ4lfmTmk8=
-X-Received: by 2002:a05:6902:2605:b0:e0b:c94f:3040 with SMTP id
- 3f1490d57ef6-e0bde2f1ac9mr1104573276.27.1722533800595; Thu, 01 Aug 2024
- 10:36:40 -0700 (PDT)
+	s=arc-20240116; t=1722534152; c=relaxed/simple;
+	bh=cmfIGnKINzdZlBL5hIS52WEXlNaTuy02vwjO0xUPTfs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LwJ+4zQhEEhFlRAz2T0Q0ePq2pj9PaZE5NLrHvzI3oPF/RAl/MWZ7gso0Q1W5JJ6I4plNfSNj0IqbuzM/miTP0ofTd14kgR0+2tWljOB5/cIoqRE+RaFEnUI8NZLKY0Xg42FIUc2mAuG3tz72WEpjZBT2UnTozvfW/L4x83L6fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WZbqS4hJnznctB;
+	Fri,  2 Aug 2024 01:41:24 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 161531800A0;
+	Fri,  2 Aug 2024 01:42:26 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 2 Aug 2024 01:42:22 +0800
+Message-ID: <cc50cc99-a89b-9a02-e1a7-23fd5ef1093a@huawei-partners.com>
+Date: Thu, 1 Aug 2024 20:42:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730184120.4089835-1-zijianzhang@bytedance.com>
- <20240730184120.4089835-4-zijianzhang@bytedance.com> <66aabb616714_21c08c29432@willemb.c.googlers.com.notmuch>
- <570fe8a0-4b93-4f3d-a4d7-34a3a61167e4@bytedance.com>
-In-Reply-To: <570fe8a0-4b93-4f3d-a4d7-34a3a61167e4@bytedance.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 1 Aug 2024 13:36:04 -0400
-Message-ID: <CAF=yD-Jt6XWSCLfZE1C+9=vcXyG-XcC2q-7Ai-HHSUt=1OrWsg@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 3/3] selftests: add MSG_ZEROCOPY msg_control
- notification test
-To: Zijian Zhang <zijianzhang@bytedance.com>
-Cc: netdev@vger.kernel.org, linux-api@vger.kernel.org, almasrymina@google.com, 
-	edumazet@google.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, axboe@kernel.dk, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, cong.wang@bytedance.com, 
-	xiaochun.lu@bytedance.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 7/9] selftests/landlock: Test listen on ULP socket
+ without clone method
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240728002602.3198398-1-ivanov.mikhail1@huawei-partners.com>
+ <20240728002602.3198398-8-ivanov.mikhail1@huawei-partners.com>
+ <20240801.rae2can8ooT9@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240801.rae2can8ooT9@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Thu, Aug 1, 2024 at 1:30=E2=80=AFPM Zijian Zhang <zijianzhang@bytedance.=
-com> wrote:
->
-> On 7/31/24 3:32 PM, Willem de Bruijn wrote:
-> > zijianzhang@ wrote:
-> >> From: Zijian Zhang <zijianzhang@bytedance.com>
-> >>
-> >> We update selftests/net/msg_zerocopy.c to accommodate the new mechanis=
-m,
->
-> First of all, thanks for the detailed suggestions!
->
-> >
-> > Please make commit messages stand on their own. If someone does a git
-> > blame, make the message self explanatory. Replace "the new mechanism"
-> > with sendmsg SCM_ZC_NOTIFICATION.
-> >
-> > In patch 2 or as a separate patch 4, also add a new short section on
-> > this API in Documentation/networking/msg_zerocopy.rst. Probably with
-> > the same contents as a good explanation of the feature in the commit
-> > message of patch 2.
-> >
->
-> Agreed.
->
-> >> cfg_notification_limit has the same semantics for both methods. Test
-> >> results are as follows, we update skb_orphan_frags_rx to the same as
-> >> skb_orphan_frags to support zerocopy in the localhost test.
-> >>
-> >> cfg_notification_limit =3D 1, both method get notifications after 1 ca=
-lling
-> >> of sendmsg. In this case, the new method has around 17% cpu savings in=
- TCP
-> >> and 23% cpu savings in UDP.
-> >> +---------------------+---------+---------+---------+---------+
-> >> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-> >> +---------------------+---------+---------+---------+---------+
-> >> | ZCopy (MB)          | 7523    | 7706    | 7489    | 7304    |
-> >> +---------------------+---------+---------+---------+---------+
-> >> | New ZCopy (MB)      | 8834    | 8993    | 9053    | 9228    |
-> >> +---------------------+---------+---------+---------+---------+
-> >> | New ZCopy / ZCopy   | 117.42% | 116.70% | 120.88% | 126.34% |
-> >> +---------------------+---------+---------+---------+---------+
-> >>
-> >> cfg_notification_limit =3D 32, both get notifications after 32 calling=
- of
-> >> sendmsg, which means more chances to coalesce notifications, and less
-> >> overhead of poll + recvmsg for the original method. In this case, the =
-new
-> >> method has around 7% cpu savings in TCP and slightly better cpu usage =
-in
-> >> UDP. In the env of selftest, notifications of TCP are more likely to b=
-e
-> >> out of order than UDP, it's easier to coalesce more notifications in U=
-DP.
-> >> The original method can get one notification with range of 32 in a rec=
-vmsg
-> >> most of the time. In TCP, most notifications' range is around 2, so th=
-e
-> >> original method needs around 16 recvmsgs to get notified in one round.
-> >> That's the reason for the "New ZCopy / ZCopy" diff in TCP and UDP here=
-.
-> >> +---------------------+---------+---------+---------+---------+
-> >> | Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
-> >> +---------------------+---------+---------+---------+---------+
-> >> | ZCopy (MB)          | 8842    | 8735    | 10072   | 9380    |
-> >> +---------------------+---------+---------+---------+---------+
-> >> | New ZCopy (MB)      | 9366    | 9477    | 10108   | 9385    |
-> >> +---------------------+---------+---------+---------+---------+
-> >> | New ZCopy / ZCopy   | 106.00% | 108.28% | 100.31% | 100.01% |
-> >> +---------------------+---------+---------+---------+---------+
-> >>
-> >> In conclusion, when notification interval is small or notifications ar=
-e
-> >> hard to be coalesced, the new mechanism is highly recommended. Otherwi=
-se,
-> >> the performance gain from the new mechanism is very limited.
-> >>
-> >> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> >> Signed-off-by: Xiaochun Lu <xiaochun.lu@bytedance.com>
-> >
-> >> -static bool do_sendmsg(int fd, struct msghdr *msg, bool do_zerocopy, =
-int domain)
-> >> +static void add_zcopy_info(struct msghdr *msg)
-> >> +{
-> >> +    struct zc_info *zc_info;
-> >> +    struct cmsghdr *cm;
-> >> +
-> >> +    if (!msg->msg_control)
-> >> +            error(1, errno, "NULL user arg");
-> >
-> > Don't add precondition checks for code entirely under your control.
-> > This is not a user API.
-> >
->
-> Ack.
->
-> >> +    cm =3D (struct cmsghdr *)msg->msg_control;
-> >> +    cm->cmsg_len =3D CMSG_LEN(ZC_INFO_SIZE);
-> >> +    cm->cmsg_level =3D SOL_SOCKET;
-> >> +    cm->cmsg_type =3D SCM_ZC_NOTIFICATION;
-> >> +
-> >> +    zc_info =3D (struct zc_info *)CMSG_DATA(cm);
-> >> +    zc_info->size =3D ZC_NOTIFICATION_MAX;
-> >> +
-> >> +    added_zcopy_info =3D true;
-> >
-> > Just initialize every time? Is this here to reuse the same msg_control
-> > as long as metadata is returned?
-> >
->
-> Yes, the same msg_control will be reused.
->
-> The overall paradiagm is,
-> start:
->    sendmsg(..)
->    sendmsg(..)
->    ...          sends_since_notify sendmsgs in total
->
->    add_zcopy_info(..)
->    sendmsg(.., msg_control)
->    do_recv_completions_sendmsg(..)
->    goto start;
->
-> if (sends_since_notify + 1 >=3D cfg_notification_limit), add_zcopy_info
-> will be invoked, and the right next sendmsg will have the msg_control
-> passed in.
->
-> If (added_zcopy_info), do_recv_completions_sendmsg will be invoked,
-> and added_zcopy_info will be set to false in it.
+8/1/2024 6:08 PM, Mickaël Salaün wrote:
+> On Sun, Jul 28, 2024 at 08:26:00AM +0800, Mikhail Ivanov wrote:
+>> Test checks that listen(2) doesn't wrongfully return -EACCES instead of
+>> -EINVAL when trying to listen on a socket which is set to ULP that doesn't
+>> have clone method in inet_csk(sk)->icsk_ulp_ops (espintcp).
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   tools/testing/selftests/landlock/config     |  1 +
+>>   tools/testing/selftests/landlock/net_test.c | 38 +++++++++++++++++++++
+>>   2 files changed, 39 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
+>> index 0086efaa7b68..014401fe6114 100644
+>> --- a/tools/testing/selftests/landlock/config
+>> +++ b/tools/testing/selftests/landlock/config
+>> @@ -12,3 +12,4 @@ CONFIG_SHMEM=y
+>>   CONFIG_SYSFS=y
+>>   CONFIG_TMPFS=y
+>>   CONFIG_TMPFS_XATTR=y
+>> +CONFIG_INET_ESPINTCP=y
+>> \ No newline at end of file
+> 
+> There are missing dependencies, and also please sort entries. I think it should
+> be:
+> 
+>   CONFIG_CGROUPS=y
+>   CONFIG_CGROUP_SCHED=y
+>   CONFIG_INET=y
+> +CONFIG_INET_ESPINTCP=y
+> +CONFIG_INET_ESP=y
+>   CONFIG_IPV6=y
+> +CONFIG_IPV6_ESP=y
+> +CONFIG_INET6_ESPINTCP=y
+>   CONFIG_NET=y
+>   CONFIG_NET_NS=y
+>   CONFIG_OVERLAY_FS=y
+> 
+> This works with check-linux.sh from
+> https://github.com/landlock-lsm/landlock-test-tools
 
-This does not seem like it would need a global variable?
+Thanks, I'll fix this.
 
-> >> +}
-> >> +
-> >> +static bool do_sendmsg(int fd, struct msghdr *msg,
-> >> +                   enum notification_type do_zerocopy, int domain)
-> >>   {
-> >>      int ret, len, i, flags;
-> >>      static uint32_t cookie;
-> >> @@ -200,6 +233,12 @@ static bool do_sendmsg(int fd, struct msghdr *msg=
-, bool do_zerocopy, int domain)
-> >>                      msg->msg_controllen =3D CMSG_SPACE(sizeof(cookie)=
-);
-> >>                      msg->msg_control =3D (struct cmsghdr *)ckbuf;
-> >>                      add_zcopy_cookie(msg, ++cookie);
-> >> +            } else if (do_zerocopy =3D=3D MSG_ZEROCOPY_NOTIFY_SENDMSG=
- &&
-> >> +                       sends_since_notify + 1 >=3D cfg_notification_l=
-imit) {
-> >> +                    memset(&msg->msg_control, 0, sizeof(msg->msg_cont=
-rol));
-> >> +                    msg->msg_controllen =3D CMSG_SPACE(ZC_INFO_SIZE);
-> >> +                    msg->msg_control =3D (struct cmsghdr *)zc_ckbuf;
-> >> +                    add_zcopy_info(msg);
-> >>              }
-> >>      }
-> >>
-> >> @@ -218,7 +257,7 @@ static bool do_sendmsg(int fd, struct msghdr *msg,=
- bool do_zerocopy, int domain)
-> >>              if (do_zerocopy && ret)
-> >>                      expected_completions++;
-> >>      }
-> >> -    if (do_zerocopy && domain =3D=3D PF_RDS) {
-> >> +    if (msg->msg_control) {
-> >>              msg->msg_control =3D NULL;
-> >>              msg->msg_controllen =3D 0;
-> >>      }
-> >> @@ -466,6 +505,44 @@ static void do_recv_completions(int fd, int domai=
-n)
-> >>      sends_since_notify =3D 0;
-> >>   }
-> >>
-> >> +static void do_recv_completions2(void)
-> >
-> > functionname2 is very uninformative.
-> >
-> > do_recv_completions_sendmsg or so.
-> >
->
-> Ack.
->
-> >> +{
-> >> +    struct cmsghdr *cm =3D (struct cmsghdr *)zc_ckbuf;
-> >> +    struct zc_info *zc_info;
-> >> +    __u32 hi, lo, range;
-> >> +    __u8 zerocopy;
-> >> +    int i;
-> >> +
-> >> +    zc_info =3D (struct zc_info *)CMSG_DATA(cm);
-> >> +    for (i =3D 0; i < zc_info->size; i++) {
-> >> +            hi =3D zc_info->arr[i].hi;
-> >> +            lo =3D zc_info->arr[i].lo;
-> >> +            zerocopy =3D zc_info->arr[i].zerocopy;
-> >> +            range =3D hi - lo + 1;
-> >> +
-> >> +            if (cfg_verbose && lo !=3D next_completion)
-> >> +                    fprintf(stderr, "gap: %u..%u does not append to %=
-u\n",
-> >> +                            lo, hi, next_completion);
-> >> +            next_completion =3D hi + 1;
-> >> +
-> >> +            if (zerocopied =3D=3D -1) {
-> >> +                    zerocopied =3D zerocopy;
-> >> +            } else if (zerocopied !=3D zerocopy) {
-> >> +                    fprintf(stderr, "serr: inconsistent\n");
-> >> +                    zerocopied =3D zerocopy;
-> >> +            }
-> >> +
-> >> +            completions +=3D range;
-> >> +            sends_since_notify -=3D range;
-> >> +
-> >> +            if (cfg_verbose >=3D 2)
-> >> +                    fprintf(stderr, "completed: %u (h=3D%u l=3D%u)\n"=
-,
-> >> +                            range, hi, lo);
-> >> +    }
-> >> +
-> >> +    added_zcopy_info =3D false;
-> >> +}
-> >> +
-> >>   /* Wait for all remaining completions on the errqueue */
-> >>   static void do_recv_remaining_completions(int fd, int domain)
-> >>   {
-> >> @@ -553,11 +630,16 @@ static void do_tx(int domain, int type, int prot=
-ocol)
-> >>              else
-> >>                      do_sendmsg(fd, &msg, cfg_zerocopy, domain);
-> >>
-> >> -            if (cfg_zerocopy && sends_since_notify >=3D cfg_notificat=
-ion_limit)
-> >> +            if (cfg_zerocopy =3D=3D MSG_ZEROCOPY_NOTIFY_ERRQUEUE &&
-> >> +                sends_since_notify >=3D cfg_notification_limit)
-> >>                      do_recv_completions(fd, domain);
-> >>
-> >> +            if (cfg_zerocopy =3D=3D MSG_ZEROCOPY_NOTIFY_SENDMSG &&
-> >> +                added_zcopy_info)
-> >> +                    do_recv_completions2();
-> >> +
-> >>              while (!do_poll(fd, POLLOUT)) {
-> >> -                    if (cfg_zerocopy)
-> >> +                    if (cfg_zerocopy =3D=3D MSG_ZEROCOPY_NOTIFY_ERRQU=
-EUE)
-> >>                              do_recv_completions(fd, domain);
-> >>              }
-> >>
-> >> @@ -715,7 +797,7 @@ static void parse_opts(int argc, char **argv)
-> >>
-> >>      cfg_payload_len =3D max_payload_len;
-> >>
-> >> -    while ((c =3D getopt(argc, argv, "46c:C:D:i:l:mp:rs:S:t:vz")) !=
-=3D -1) {
-> >> +    while ((c =3D getopt(argc, argv, "46c:C:D:i:l:mnp:rs:S:t:vz")) !=
-=3D -1) {
-> >>              switch (c) {
-> >>              case '4':
-> >>                      if (cfg_family !=3D PF_UNSPEC)
-> >> @@ -749,6 +831,9 @@ static void parse_opts(int argc, char **argv)
-> >>              case 'm':
-> >>                      cfg_cork_mixed =3D true;
-> >>                      break;
-> >> +            case 'n':
-> >> +                    cfg_zerocopy =3D MSG_ZEROCOPY_NOTIFY_SENDMSG;
-> >> +                    break;
-> >
-> > How about -Z to make clear that this is still MSG_ZEROCOPY, just with
-> > a different notification mechanism.
-> >
-> > And perhaps add a testcase that exercises both this mechanism and
-> > existing recvmsg MSG_ERRQUEUE. As they should work in parallel and
-> > concurrently in a multithreaded environment.
-> >
->
-> -Z is more clear, and the hybrid testcase will be helpful.
->
-> Btw, before I put some efforts to solve the current issues, I think
-> I should wait for comments about api change from linux-api@vger.kernel.or=
-g?
-
-I'm not sure whether anyone on that list will give feedback.
-
-I would continue with revisions at a normal schedule, as long as that
-stays in the Cc.
+> 
+> IPv6 is currently not tested, which should be the case (with the "protocol"
+> variants).
 
