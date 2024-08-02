@@ -1,93 +1,98 @@
-Return-Path: <netdev+bounces-115372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83DC94608C
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:32:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D744E9460B4
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:44:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EC511F22450
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:32:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F73DB2364A
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D80175D48;
-	Fri,  2 Aug 2024 15:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B395B136327;
+	Fri,  2 Aug 2024 15:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xcrp3146"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N6BnkVgQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06981175D28;
-	Fri,  2 Aug 2024 15:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90803175D56
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 15:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722612748; cv=none; b=DaBr7pjH4OULKQe8wDv8MlHWI8f+ZEDciKQvjDImLpiou1szw9N5CoB1JH41yvI9+mCd6YYjMzMaKIWzNZ0rsR7MsQdzXAMEgqR8kA2UmrCkojdFEsT7PDBDVdnIicnu3I6GagCl1y/n9ZUO7kJiyUrKkkxmxSh4dCgeyuH0mrM=
+	t=1722613415; cv=none; b=fuVbv4k5WsmnK6iG30MOFBqg542m8GGL5dN9KPJHnZMmRkrM2UHiKQ9rrJMrQSW5UJTmKriXHJI8CyXPq3CHqlFLscpFkSGsMwu3wBJHChohpJ7KbdKDJpjnnUtajEw18JOA8LS7P8beMJ51z1LSSsF0GpQbn3tiIagwY5nPP5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722612748; c=relaxed/simple;
-	bh=9QxgLbIHkSOCEL3yRitF+A2vgV2hpriB4j1hLM8Q3AA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SCjJygaknd0RYSYZPgxLESYiht8nllkhA2MXCDFC0mhJbLbgon70IqaG8XQ4UhafR+eKP8dUpzOTz6QQKVCcjRmKCsw0uPYJyTYLD+HjSrhs2sMQbBIjKr/geQk4V4J41imo7UADSi1EhHlQDx12DJFCZmbBafkaDtSqQHgoL60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xcrp3146; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 384FCC32782;
-	Fri,  2 Aug 2024 15:32:27 +0000 (UTC)
+	s=arc-20240116; t=1722613415; c=relaxed/simple;
+	bh=xh19M0hf5gp2mMCQ6SAGxV6urD3d20jD25i5l7K9K1Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=DJdP5TFiSyMmNo3SDCjlH1dIl/anMz6nxf7cYVg5oK4ASSjyGLO+I9lBmY39CQidbRN53pU+/IdoNTZtjpU5nYjFeyzfCvnLmoOgG8Az4eDRy91RDuExWGjsJokhDQg3xypvFMDjr7RDmq4u/pXDLcmCovVM8W4aWXps/iS5odM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N6BnkVgQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E133EC4AF0A;
+	Fri,  2 Aug 2024 15:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722612747;
-	bh=9QxgLbIHkSOCEL3yRitF+A2vgV2hpriB4j1hLM8Q3AA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Xcrp314638hr71O6V74BTCkZ3hSz6vr9m2QFTmklNTSV0PixbH90C2Ly4KP1G5ul5
-	 KVTPam6R9g6xy95ECvSwB27+iqMbbcjrY6HxGvhHd3J0k26eCXeEd49QKiIlON+rzM
-	 uaS18SDb3Vwni3hRd6GGWIQ7JH9Ju5Tx1hUqx4U67ooYEoMIuaMCAWlCIfRh9qembq
-	 tgZMxmcsSvU49BUjLdrqMM48ScBi6wDSmPa1t1ASkGeApLP9tNYNEHka/ew2U8DQi5
-	 f3plp/fQ/uJRsLhjCzgR/iEYGx8a0YWvqI2y6AMjDEeLHAww5KMPEcpjTDmkWFKQLX
-	 gOVzgfY1XNxjA==
-Date: Fri, 2 Aug 2024 08:32:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Cc: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Mohammad Nassiri <mnassiri@ciena.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/7] net/selftests: TCP-AO selftests updates
-Message-ID: <20240802083226.4bb23562@kernel.org>
-In-Reply-To: <20240802081823.67a27db3@kernel.org>
-References: <20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com>
-	<20240802081823.67a27db3@kernel.org>
+	s=k20201202; t=1722613415;
+	bh=xh19M0hf5gp2mMCQ6SAGxV6urD3d20jD25i5l7K9K1Y=;
+	h=From:Date:Subject:To:Cc:From;
+	b=N6BnkVgQ7U+p0AiEgnRjr7MLDn0oyBFg7c65UrJBoCoBEHNxvcVScEoZL1RuCKtpi
+	 N6/DjGZ+fzktXtXTimMu9RkzS2xnbSNIQsA1L4dCb9dMQx4sOH1efWffnNNhY0ndRM
+	 TwP4AYcIcgkn6k1uWEdKnPCPcp9OjEOqMw0dcid9R3q3ZAslz4xp0SiexniPnBQxv4
+	 GC3h34PHWBMucIKZRDdcscLDHzV/BbZAp4BiQ53PJJfI/7/r9+iAJndsiaJ1pE00c7
+	 sB4LkWoWFRSMbbOIAO5pi1V9NEoOeRfhSQI1zKatrFHNkhFXYaMjXQlD8vXWfqdWfm
+	 Jkr7TlFbdhAGA==
+From: Simon Horman <horms@kernel.org>
+Date: Fri, 02 Aug 2024 16:43:17 +0100
+Subject: [PATCH net-next v2] eth: fbnic: select DEVLINK and PAGE_POOL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20240802-fbnic-select-v2-1-41f82a3e0178@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAJT+rGYC/x3MQQqDMBBG4avIrB0YQ0TrVYqLGH/bgTKWJIgg3
+ r2hy2/x3kUZSZFpai5KODTrbhWubSi+g73AulaTE+dlFMfbYho544NYeByC7+Sxdl56qsk3YdP
+ zv3uSobDhLDTf9w/0oWROaAAAAA==
+To: Jakub Kicinski <kuba@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Duyck <alexanderduyck@fb.com>, 
+ Kernel Test Robot <lkp@intel.com>, kernel-team@meta.com, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Fri, 2 Aug 2024 08:18:23 -0700 Jakub Kicinski wrote:
-> On Fri, 02 Aug 2024 10:23:24 +0100 Dmitry Safonov via B4 Relay wrote:
-> > First 4 patches are more-or-less cleanups/preparations.
-> > 
-> > Patch 5 was sent to me/contributed off-list by Mohammad, who wants 32-bit
-> > kernels to run TCP-AO.
-> > 
-> > Patch 6 is a workaround/fix for slow VMs. Albeit, I can't reproduce
-> > the issue, but I hope it will fix netdev flakes for connect-deny-*
-> > tests.  
-> 
-> Hm, could be a coincidence but we did hit:
-> 
-> # not ok 55 # error 381[unsigned-md5.c:24] Failed to add a VRF: -17
-> # not ok 56 # error 383[unsigned-md5.c:33] Failed to add a route to VRF: -22: Key was rejected by service
-> 
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsigned-md5-ipv6/stdout
-> 
-> in the first run after this got queued. But the retry worked:
-> 
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsigned-md5-ipv6-retry/stdout
+Build bot reports undefined references to devlink functions.
+And local testing revealed undefined references to page_pool functions.
 
-oooh another run, another (different) flake:
-https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710181/11-key-management-ipv4/stdout
+Based on a patch by Jakub Kicinski <kuba@kernel.org>
 
-I'll keep it around for another run, but looking less and less 
-like a coincidence :(
+Fixes: 1a9d48892ea5 ("eth: fbnic: Allocate core device specific structures and devlink interface")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202408011219.hiPmwwAs-lkp@intel.com/
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+-- 
+Changes since v1:
+* Also select PAGE_POOL
+* Link to v1: https://lore.kernel.org/netdev/20240802015924.624368-1-kuba@kernel.org/
+---
+ drivers/net/ethernet/meta/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
+index c002ede36402..85519690b837 100644
+--- a/drivers/net/ethernet/meta/Kconfig
++++ b/drivers/net/ethernet/meta/Kconfig
+@@ -23,6 +23,8 @@ config FBNIC
+ 	depends on !S390
+ 	depends on MAX_SKB_FRAGS < 22
+ 	depends on PCI_MSI
++	select NET_DEVLINK
++	select PAGE_POOL
+ 	select PHYLINK
+ 	help
+ 	  This driver supports Meta Platforms Host Network Interface.
+
 
