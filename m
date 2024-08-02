@@ -1,92 +1,70 @@
-Return-Path: <netdev+bounces-115247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2F8945980
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:05:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A7CE94598F
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B8961C23A4D
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:05:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA61EB22D4A
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A541C4605;
-	Fri,  2 Aug 2024 08:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g6QVwv3D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2B71C2327;
+	Fri,  2 Aug 2024 08:07:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE991C3F0B;
-	Fri,  2 Aug 2024 08:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B261C2320;
+	Fri,  2 Aug 2024 08:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722585875; cv=none; b=kN1ii1c2F75I2bRyIg1FLfT/xJtr6s3aUKyJo3spBCkP/S2+HzbVYbWRR2McSiZ9lPfUQcH/URqAJ/kfM9Gh1aSA4nYvoOhGEiLZU65CWeBSmRvQm3fJicUvrH+wleOIkFkpboBi8dK4jtaPZmS8fh71/VyPvmbKh0Fd3wsCEGY=
+	t=1722586059; cv=none; b=gXYhuzSdOaczflx8trxuNUG5fOD/vXa0Jx3XgvzOE7dmSlLpstxW62ksf8MoBPzOOSd51+W4HcokR05b8nem3XM5dLU7t5d6Lph4tPsynDq5ojWX9o+Hk7K/vo7+cWXvkbWh2kLcF+ziB76VKHLepxRhuIL2FmLwlrtvQeUzrLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722585875; c=relaxed/simple;
-	bh=wJ8CKjo99FdygF4Dyf6T71+jLKBvtf5FYO+XPBN2Cv4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GguPqw2WCi1ToSnavfJlUVB/QhY5/niq7OP5A8hJLZtRCo3nXQyCk3GPY8uEgCft+qZCrwfwnry2AIOiakgZfgemKVA6FN+4kpaxU2Yevh2uJS0wBe/vyRrXVltWx1GM8JJyWqr5I+PXVGKJhkwQdJ5u1WtTYuAVAFTvHZ6ZBew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g6QVwv3D; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1722586059; c=relaxed/simple;
+	bh=pbHBycrVCFDsyq1V5V6Iy22R6+v1Cwgyg0R8xo/haNM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ogpiz1HaIQGsj0ZxSXP4EwQA5L7nUqQHmJ3833nUAl01TOO+99B7E8SpimyEjYECyEzVrDNPwJxUnSBc6YKtEddz4dJzKq1nWhvuEYPwl+ei8qlHkgBkqx42gn/diqbuoX2YCdYirXmnpse7zdtNoHpwjKvM+fiFlisDfeuWnu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52efdf02d13so13006826e87.2;
-        Fri, 02 Aug 2024 01:04:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722585872; x=1723190672; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uCR2a8QUcsGwPUUS/KFvb11t9ihPQhvH+olYLUnMnJk=;
-        b=g6QVwv3DM2HHi1LwY1NptWNkmIVyJg/m7ZwsiNyFGaXV5DCySkYtBOO9Ze6dAShmMs
-         /gSFrI7pUJZMsjgGM/L2xYhkJCdrFJk6S0CJFznMBIZL3K4Z3Bty8mn6WEh6ivvH/qqO
-         rp2CSaRDiPLTJZwOVrLru3pw0NzKq7E4RagNXmaotYvjNLsluxtZpaNg4R0wIM29VE7j
-         7dsTW/D1gPjB1YmYme9HXYgRGmc38NuE47bcf6XLMrn6j+PQTPmQ48WqedV7427JPJpV
-         ltumsMVNqjmTiPrnSUzEejGsB4XYFx+TihtqMSIVJG1XWfYqZ+Ro/vGFYqwtubrragL2
-         RMCg==
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso10970997a12.1;
+        Fri, 02 Aug 2024 01:07:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722585872; x=1723190672;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uCR2a8QUcsGwPUUS/KFvb11t9ihPQhvH+olYLUnMnJk=;
-        b=mQpxsdEuhupubcTaK2yJcQDyaUEy3KwEZV9y+cHJjK5E17Rim6r1KYf9Ce8iOaSbyb
-         58KLlrhruuNcYHeHYiMPVs1KtGVD9bhDo1+gwm2am7QY8cUvwqKWjTK0xccpTHMzBxpo
-         wIVc5SUIAQVE3Q1V7jXP3DSovSQRYAa0jw2zk7dzjcnQ/0DdoTe/41LgOOHIU5Ma9dGq
-         vLkcUdxnstpDHrlqp2ocM3pmcgi/nTBFXGbNHHis5j9mC46WP7NJNvdRMNgzu0DWyqG+
-         K4Vn3A1tnyxBtGAWDI3JBzY5WnDsva64O4J9QcxU7VM3RjOKWfy4E8ngiSQ6/ROd6twp
-         p5eA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNHbd1u6VmW93B3v/h+8B+77H8s1XPoRxADeft73snfHyg30Nwyr7edzcedkIV5Nhyr+6mFBuHPJ6FBmoGJQ2vQg91vjn1ff+z/wJr
-X-Gm-Message-State: AOJu0Yy4WJ8eCKSSDnKO3TZOrFwu9d2GFWvpYNr3azjba07HmHR9wlUK
-	jvAukfuS4J0K4CSaESESHD82C2GiAD34cc1tOo6IIuwAo1H2m6m8jGv9r07L
-X-Google-Smtp-Source: AGHT+IFItHcRt/6EbjbqS01vh8MV12Glv+W1faYnKk4teDVR+zPHWe8r7SH/K9qlSdh2kEheHIWH7A==
-X-Received: by 2002:a05:6512:39d2:b0:52c:e091:66e4 with SMTP id 2adb3069b0e04-530bb3b461cmr2379189e87.44.1722585871529;
-        Fri, 02 Aug 2024 01:04:31 -0700 (PDT)
-Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba07e46sm163281e87.32.2024.08.02.01.04.30
+        d=1e100.net; s=20230601; t=1722586054; x=1723190854;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tW89l+b3r4SnTW2RmO8UaiObA20fmU+fo2Kiu5RwA4I=;
+        b=MRk9VmGAe6Qw8JkzgH5QOF9xfsDb1tZtSuL8+GE1z5y0yy1jqjF93m5qg6Ae2aTutn
+         RTBXRU4uI+I1t64zAbmQ7bjQUFI+G8iClyoUq4UiAeq1AjL147VioJeeUWjiKPil9YRm
+         /B0TXMTttgU7d+bOCAYvJ6TPfXF03UGPtrxw+xzn4uyzDXiaYpk9XGAH/Lh6dVeOSM5J
+         uYiKlFtmT/IMwwYaCccej7nvYdMBOd0mH5Q+qpUa+6m67+FOwriYwBeJvwH9pqsBSdoR
+         KwnCtJQ3hJVuGxdW10yJrjHirazoyy8BN3lwDL++QEG+IMPCvPYJWs++s2JEYtR2stK7
+         WyYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVArh1rGJTTiKEgAo14HyGoGrdKnay3lkkTfzR9tK9RyLI3DOQ8+MWxy8aDVPIZK1zO+Z4EEm8dAkCv/6dmFLTANBTxi5rguAFwYnQnmNexkiLP/KRVQACvrzJLE8lfC1awy1xN
+X-Gm-Message-State: AOJu0Yxsy0Nspnm8ICkBM8OXzvdbU8cyjcbwm12CBA7lfiuFkGfRTn2p
+	hjQkSgnlZuMURWckyqTInTfqZ1onJ50SXFk3Mm8gRKA7DMABxk8T0x+rRA==
+X-Google-Smtp-Source: AGHT+IHvnSTZ6l2PbLFq+BB6u0sWAuAYIh1kX9sMG5lkaGeQb5lploa9+GYusl3HDvtqVxGQXuqDYA==
+X-Received: by 2002:a17:907:9803:b0:a7a:be06:d8eb with SMTP id a640c23a62f3a-a7dc50a37f2mr208421266b.53.1722586053540;
+        Fri, 02 Aug 2024 01:07:33 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c67a43sm68767966b.96.2024.08.02.01.07.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 01:04:31 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+        Fri, 02 Aug 2024 01:07:33 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 6/6] net: phy: vitesse: repair vsc73xx autonegotiation
-Date: Fri,  2 Aug 2024 10:04:03 +0200
-Message-Id: <20240802080403.739509-7-paweldembicki@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240802080403.739509-1-paweldembicki@gmail.com>
-References: <20240802080403.739509-1-paweldembicki@gmail.com>
+	Paolo Abeni <pabeni@redhat.com>
+Cc: mpm@selenic.com,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: netconsole: Fix MODULE_AUTHOR format
+Date: Fri,  2 Aug 2024 01:07:23 -0700
+Message-ID: <20240802080723.1869111-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,67 +73,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the vsc73xx mdio bus work properly, the generic autonegotiation
-configuration works well.
+Update the MODULE_AUTHOR for netconsole, according to the format, as
+stated in module.h:
 
-Vsc73xx have auto MDI-X disabled by default in forced mode. This commit
-enables it.
+	use "Name <email>" or just "Name"
 
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+Suggested-by: Stephen Hemminger <stephen@networkplumber.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
-This patch came from net-next series[0].
-Changes since net-next:
-  - rebased to netdev/main only
+ drivers/net/netconsole.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[0] https://patchwork.kernel.org/project/netdevbpf/patch/20240729210615.279952-6-paweldembicki@gmail.com/
----
- drivers/net/phy/vitesse.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
-index 897b979ec03c..19b7bf189be5 100644
---- a/drivers/net/phy/vitesse.c
-+++ b/drivers/net/phy/vitesse.c
-@@ -60,6 +60,11 @@
- /* Vitesse Extended Page Access Register */
- #define MII_VSC82X4_EXT_PAGE_ACCESS	0x1f
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 9c09293b5258..ffedf7648bed 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -38,7 +38,7 @@
+ #include <linux/etherdevice.h>
+ #include <linux/utsname.h>
  
-+/* VSC73XX PHY_BYPASS_CTRL register*/
-+#define MII_VSC73XX_PHY_BYPASS_CTRL		MII_DCOUNTER
-+#define MII_PBC_FORCED_SPEED_AUTO_MDIX_DIS	BIT(7)
-+#define MII_VSC73XX_PBC_AUTO_NP_EXCHANGE_DIS	BIT(1)
-+
- /* Vitesse VSC8601 Extended PHY Control Register 1 */
- #define MII_VSC8601_EPHY_CTL		0x17
- #define MII_VSC8601_EPHY_CTL_RGMII_SKEW	(1 << 8)
-@@ -239,12 +244,20 @@ static int vsc739x_config_init(struct phy_device *phydev)
+-MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@selenic.com>");
++MODULE_AUTHOR("Matt Mackall <mpm@selenic.com>");
+ MODULE_DESCRIPTION("Console driver for network interfaces");
+ MODULE_LICENSE("GPL");
  
- static int vsc73xx_config_aneg(struct phy_device *phydev)
- {
--	/* The VSC73xx switches does not like to be instructed to
--	 * do autonegotiation in any way, it prefers that you just go
--	 * with the power-on/reset defaults. Writing some registers will
--	 * just make autonegotiation permanently fail.
--	 */
--	return 0;
-+	int ret;
-+
-+	/* Enable Auto MDI-X in forced 10/100 mode */
-+	if (phydev->autoneg != AUTONEG_ENABLE && phydev->speed <= SPEED_100) {
-+		ret = genphy_setup_forced(phydev);
-+
-+		if (ret < 0) /* error */
-+			return ret;
-+
-+		return phy_clear_bits(phydev, MII_VSC73XX_PHY_BYPASS_CTRL,
-+				      MII_PBC_FORCED_SPEED_AUTO_MDIX_DIS);
-+	}
-+
-+	return genphy_config_aneg(phydev);
- }
- 
- /* This adds a skew for both TX and RX clocks, so the skew should only be
 -- 
-2.34.1
+2.43.0
 
 
