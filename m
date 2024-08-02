@@ -1,99 +1,82 @@
-Return-Path: <netdev+bounces-115360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64BA2945FA3
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:49:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4FC4945FA2
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06627B20E39
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:49:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CAF61F2178E
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4C0200114;
-	Fri,  2 Aug 2024 14:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0261E4865;
+	Fri,  2 Aug 2024 14:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eme4P2Or"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kLAp8leG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4391F94C;
-	Fri,  2 Aug 2024 14:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299351F94C
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 14:48:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722610190; cv=none; b=G0erfm3UhNSLPh7zIMRa4H+f/HmWqts+TR0Ff0QKQJpEvv6Rc85mVO5h3rV9IGnEJXRb0NE1R4L1QOE2MZqrdWkGZiC4nw+nPYSuDgBoqOj2zBSjERgpo62jq7XI8ytiCZNDAo+KjD20eJuJt91COXw/m5z099YN0uMYVmwAMRA=
+	t=1722610105; cv=none; b=GAq+m51zGKqJKnZrOAW7otSwkxCwxXafkDoJE3yHCdFEpn/5+avvEEVPKCGGd45+jiaugtu9jBVCVqxQmy7uoJWwGt/8cs8djQbrzlNbFHfhZAThnsgcy80RIuKtMESG4feRIshKJZmrIPozUuGg9yGxIQrwqzvFhPV9iOgQ8+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722610190; c=relaxed/simple;
-	bh=C0gNPjyqqSGaw6+V9sZvTDgJk/TpHOmXXsbUVayAPRI=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=oSOKRhVnLI72v2ESFzDiAlDR/ou+5k6UiYYXiT2vggcVAkcUGGBTrF2tktjX6DgXGPWs6Y69rxK7hGtVTpIZSkzvVVUbMgwvbA6oTDZpjM1oK1QylYC6VuC+eIHQmY62kWJFEyBNUlT1Ua7Dr4u07Um1GeYuxr9Ceu2f08cG9dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eme4P2Or; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42122ac2f38so19942915e9.1;
-        Fri, 02 Aug 2024 07:49:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722610187; x=1723214987; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C0gNPjyqqSGaw6+V9sZvTDgJk/TpHOmXXsbUVayAPRI=;
-        b=eme4P2Or0OKxPBywIXzssf5bP1qBE23icBC05X+YoQwaUT+Yf0Ls+bnD0zOvAAS4Ck
-         9gY6U94C6TFgQwj24R6vbrgsapOZAUaOWtkk4dV3Qeo05VJp7gVSUQT2/3fU7RkArA7+
-         86UmZVo0w+lDncbaSdND3qfVLHLp6ySmu8iOM1Aou18hwgluzFr/tjVGUzVCly+VljMM
-         d5ChSkV8MZqRIDRSapRFPn/w4ZgKW138Iv5DESRfehyhJZCT8XgzX6qTBaFRLvgouSR+
-         QjFnGz/noqUrGIswqkVvOeZN1wGqjStnBemVOCx/y37p/2JXXs5AJNHiCnmq8t6p5clO
-         aIoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722610187; x=1723214987;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C0gNPjyqqSGaw6+V9sZvTDgJk/TpHOmXXsbUVayAPRI=;
-        b=kV+/3HFvujOPgSzZae9oU+vrsCBMpxoV5DBPsrGsSDYBEGppbvfwxtOSSY/byltZtT
-         05KxrqzfRE4K6I82Eo3jS1uEE9Bylm13SPBKIJDnzNu3EyClb9FDuIE6LLE7R1lSpq3C
-         BNO3XGmFvVKjqk/OpPJNhjnyqAZSDVzB4kZH94yWJPUpoupsNjhU3c4nf5B4MHCf9fp5
-         xGGnY/JROAYa4+vlwQr5TgXp19iJx9O453r0P6T8IpR8YevZn35k4j7+DCCC74legX9w
-         L4Mq2/aI74ZAlty1APk6CzIs8OFnPRnhLX3xJTZzpABMcgmhSVgncsFjpNCO58VHwCyn
-         iXGw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2eUMqWkSZCUFnH9Evk19oymomJgzsHFpvUW0jC+xo19BpYY2/yXgvXXZgdIODSETOR7eSDu95NkDVvu6V4tLJsqYmdtjOXEU5vCrN36wVzBzqC91KkYH5is7qYQGsKuDzfb3K3N3NmkH4jYyMRA9TD62tx+Pcpc1U6hPO+617nrTQObcG
-X-Gm-Message-State: AOJu0Yzeg1ZYMRq6dh6HKL4JXt9Ggw+luosoBVpC5zY4cCbNW/e/byW8
-	a35rbifCtKl2eka2UaFHdRJ5AVMVHOF0gzfSUOkJ8NUQxPm+Nb6Wb32BEARs
-X-Google-Smtp-Source: AGHT+IEshLaLaPr08jZ2Xb5zRgtgxOyOX6PcsquL7FGTTRvgGt+iVdx0Z/DglcsusFlSRBLs6hqa1A==
-X-Received: by 2002:a7b:c5c7:0:b0:427:ee01:ebf0 with SMTP id 5b1f17b1804b1-428e4714cfemr47246135e9.8.1722610186483;
-        Fri, 02 Aug 2024 07:49:46 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:e8ca:b31f:8686:afd3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8ad475sm97561165e9.13.2024.08.02.07.49.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 07:49:46 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,  "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo Abeni
- <pabeni@redhat.com>,  Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-  netdev@vger.kernel.org,  kernel-janitors@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] tools: ynl: remove extraneous ; after statements
-In-Reply-To: <20240802113436.448939-1-colin.i.king@gmail.com> (Colin Ian
-	King's message of "Fri, 2 Aug 2024 12:34:36 +0100")
-Date: Fri, 02 Aug 2024 15:45:56 +0100
-Message-ID: <m2ed77nftn.fsf@gmail.com>
-References: <20240802113436.448939-1-colin.i.king@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1722610105; c=relaxed/simple;
+	bh=6vOJfKxeHCTX5DPvS49P6LOIvobGGrzQSq2y97G5Ka8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WpuQnGxPPPZ6HbShUzspXccari9yo7hXBtGSSLxQ3OFI5pDMjjj5jG1DfZBz14+cLCaGyEdcKn3JTevJfoEqGcksfpiLiR3OmUwBOOmk2mDPYv0JJqZos/Jkvs+0hbhZpyGIuK4Mg+j6XHBzouH7ItCB34pehdE/qlvdcdYA1/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kLAp8leG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97607C32782;
+	Fri,  2 Aug 2024 14:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722610103;
+	bh=6vOJfKxeHCTX5DPvS49P6LOIvobGGrzQSq2y97G5Ka8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kLAp8leGmdSYZ5CF2JPUesQxKJTMZhKikhnktJ/MwA20YECnfpaEWgYBK3AZoyJmS
+	 /odRsdw6SkF457YIyxStPnorhO5wPFU4bw4MaamVqkhvYaHGXydQ2VPLNFd77pO9py
+	 xSOwYEfJGwy7zaUYkOIwExqDo58imAlPdBjtg5/oKKpie3reuplzLi1g0MZvt7xg/n
+	 F0pze3FRryzwsHXQapoki6CFSIsGt4H9X0WLM3YG7VxPuCji70N9UVWGaYrBc1UnMD
+	 tYal72+M5WLwvcOwyYarnR6rst+9vi7s4AU7naUMkUyfJLf08BbFf0plP+9kts7YlI
+	 Iy84tv+EfMnhA==
+Date: Fri, 2 Aug 2024 07:48:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next] net: skbuff: sprinkle more __GFP_NOWARN on
+ ingress allocs
+Message-ID: <20240802074822.403243ef@kernel.org>
+In-Reply-To: <CAL+tcoBNPUCCBhH_7iy4cNXQ0Mtrpe597DXos+s+NS7FVQ__zg@mail.gmail.com>
+References: <20240802001956.566242-1-kuba@kernel.org>
+	<CAL+tcoBNPUCCBhH_7iy4cNXQ0Mtrpe597DXos+s+NS7FVQ__zg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Colin Ian King <colin.i.king@gmail.com> writes:
+On Fri, 2 Aug 2024 12:52:06 +0800 Jason Xing wrote:
+> > and there's nothing we can do about that. So no point
+> > printing warnings.  
+> 
+> As you said, we cannot handle it because of that flag, but I wonder if
+> we at least let users/admins know about this failure, like: adding MIB
+> counter or trace_alloc_skb() tracepoint, which can also avoid printing
+> too many useless/necessary warnings. Or else, people won't know what
+> exactly happens in the kernel.
 
-> There are a couple of statements with two following semicolons,
-> replace these with just one semicolon.
->
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Hm, maybe... I prefer not to add counters and trace points upstream
+until they have sat for a few months in production and proven their
+usefulness.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+We also have a driver-level, per device counter already:
+https://docs.kernel.org/next/networking/netlink_spec/netdev.html#rx-alloc-fail-uint
+and I'm pretty sure system level OOM tracking will indicate severe
+OOM conditions as well.
 
