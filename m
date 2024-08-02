@@ -1,65 +1,55 @@
-Return-Path: <netdev+bounces-115165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AAF894553A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:19:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81FC794553F
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4B84284519
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:19:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BBD61F21A76
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FDF1C6B2;
-	Fri,  2 Aug 2024 00:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25BC4C66;
+	Fri,  2 Aug 2024 00:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zo7wb650"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pbU4PIay"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801471C696
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 00:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5EB28FA
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 00:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722557895; cv=none; b=kgMhDOztmPIoOdSuOuzKnQRVlbLUaWM/Ji/EIov8siTqoF5vDVmgM6p//7DTEKDSVsPvfnS12mQ9gs3qjhPEXCUOMf3j6G0r5kbyrhBKllqQNNO5P24KNkubb72pHRid47TpLsvCyuqtNKRvEilKQu2bI/8RmKiVegwB+RLXz2s=
+	t=1722557999; cv=none; b=kVWDFDNtKzGdt6AS7KSuLW0Gloavi6Z2BixWod1zWTGCgIVwbYmyDL1xisHA49Ze3TnCYBrN4fTFVPe68cw9kYU+zPHeLajPoRLWPwhKKD9gfoQn9qz8JK4WiQ0Td/QKf3fDGDxeZejh6u4aBiCuetW7F1Pez+TN3AE7mScp07I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722557895; c=relaxed/simple;
-	bh=b3hgfDNQN2cWEUV0sFZjJldp5uPhK/ZrgmFVYEhUuBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E4zJfqr+bjct5pi5b5iy8klaL4rVZ/jmEDWQ9InLHCJ+Dg2rSgr5t1oA5WxzxO9zvKHe61rzQBzgujhoJgNu3l7GuYnTBxqS6MgQFAeHvJvoQC0j0YL3S0kDXRV8mDX+v9epIkHaJ76BXJB1/aeWmz3g2V+M/wg9nawiRyS3zjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zo7wb650; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB036C4AF0E;
-	Fri,  2 Aug 2024 00:18:14 +0000 (UTC)
+	s=arc-20240116; t=1722557999; c=relaxed/simple;
+	bh=IyIfhXkFYvhnFpcSoip1XhHO0Pl4PCqPMI/jG1Sv7Xk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DigYzPr8bCw4eiBdj8G2ZHX94RhTLovFaQkAHGle836XtlB8I3fu6ln5VcAyVhb7/vup0xfWXULF+qqaHfksRyTtsKPjWpcZeikXyAOjtESypYgU09srKxjF/ZgUBEKGuoVzxTTpzuYsFd7kuh0GGbt/9qWr/X0p8S0S7ccYhoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pbU4PIay; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30557C32786;
+	Fri,  2 Aug 2024 00:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722557895;
-	bh=b3hgfDNQN2cWEUV0sFZjJldp5uPhK/ZrgmFVYEhUuBQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zo7wb650eAJq5QgqZTEJrCmT66FS6oHgNvJFEPpzuEu7FgnThEVCFYmzMxSJU2IYo
-	 KRBk5Qui+pMJvKx8DBoEK8qCsE/G+y12gC9/QLqFOiClLGDYqlIEdx/bQjZ5oT/hnu
-	 I0WBM4KnsSGMi6oaGHaoRwwSIwuypyZW5yUiJo3RkpXLGoYYJSmTiqK2F6h87zR47P
-	 nHhwOSzvHDJSgB3OwjtMsBerpKz/Sd5dJiMAcyIym9mntjMUYCBVr+ytzRyq8nNAfM
-	 kDvKmfeidldtebCWz/c6U9nVM3ny0v0QG17kKkD37BP1zufmqswrYYbcEBa/0k5rY8
-	 eblBORxZ/Mp8A==
+	s=k20201202; t=1722557999;
+	bh=IyIfhXkFYvhnFpcSoip1XhHO0Pl4PCqPMI/jG1Sv7Xk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pbU4PIay9cWiqaTiQWsauerjhDnUAvyTfVf2jAFfU96F3o/Hvg3XI2KueVlIO2ApX
+	 /ao5Ft7A+UMOt6glktxKGYglioV79Hv2M7XzblLAkqLY0ycUct0M2Iq+N87YRo4naf
+	 KYCYqKL6QdRwWBbLyEJtYHQn3aXxpJSligWukV0qvEfB81q7l9CWWj/w2p2phSiKBT
+	 VS1kiXjX4FU2lh3w2Ob2KtiA/Zak5Q+hMHxSFfW2xylBLRghdx9/hG5PIcwuwDqINL
+	 CsYU1cX+SdGo+Yzf0ISAaxAW32JklqU6VkkErDo6lAVYgsHjpqx5V+0DLZaGgiD9+D
+	 s5WSvjNyBg3KA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	dxu@dxuuu.xyz,
-	ecree.xilinx@gmail.com,
-	przemyslaw.kitszel@intel.com,
-	donald.hunter@gmail.com,
-	gal.pressman@linux.dev,
-	tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 12/12] selftests: drv-net: rss_ctx: test dumping RSS contexts
-Date: Thu,  1 Aug 2024 17:18:01 -0700
-Message-ID: <20240802001801.565176-13-kuba@kernel.org>
+Subject: [PATCH net-next] net: skbuff: sprinkle more __GFP_NOWARN on ingress allocs
+Date: Thu,  1 Aug 2024 17:19:56 -0700
+Message-ID: <20240802001956.566242-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240802001801.565176-1-kuba@kernel.org>
-References: <20240802001801.565176-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,129 +58,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a test for dumping RSS contexts. Make sure indir table
-and key are sane when contexts are created with various
-combination of inputs. Test the dump filtering by ifname
-and start-context.
+build_skb() and frag allocations done with GFP_ATOMIC will
+fail in real life, when system is under memory pressure,
+and there's nothing we can do about that. So no point
+printing warnings.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../selftests/drivers/net/hw/rss_ctx.py       | 70 ++++++++++++++++++-
- tools/testing/selftests/net/lib/py/ksft.py    |  6 ++
- 2 files changed, 74 insertions(+), 2 deletions(-)
+ net/core/skbuff.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-index 1da6b214f4fe..cbff3061abd7 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-@@ -3,7 +3,7 @@
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 83f8cd8aa2d1..de2a044cc665 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -314,8 +314,8 @@ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
+ 	fragsz = SKB_DATA_ALIGN(fragsz);
  
- import datetime
- import random
--from lib.py import ksft_run, ksft_pr, ksft_exit, ksft_eq, ksft_ge, ksft_lt
-+from lib.py import ksft_run, ksft_pr, ksft_exit, ksft_eq, ksft_ne, ksft_ge, ksft_lt
- from lib.py import NetDrvEpEnv
- from lib.py import EthtoolFamily, NetdevFamily
- from lib.py import KsftSkipEx
-@@ -302,6 +302,72 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
-     ksft_eq(carrier1 - carrier0, 0)
+ 	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+-	data = __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+-				       align_mask);
++	data = __page_frag_alloc_align(&nc->page, fragsz,
++				       GFP_ATOMIC | __GFP_NOWARN, align_mask);
+ 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
+ 	return data;
  
+@@ -330,7 +330,8 @@ void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
+ 		struct page_frag_cache *nc = this_cpu_ptr(&netdev_alloc_cache);
  
-+def test_rss_context_dump(cfg):
-+    """
-+    Test dumping RSS contexts. This tests mostly exercises the kernel APIs.
-+    """
-+
-+    # Get a random key of the right size
-+    data = get_rss(cfg)
-+    if 'rss-hash-key' in data:
-+        key_data = _rss_key_rand(len(data['rss-hash-key']))
-+        key = _rss_key_str(key_data)
-+    else:
-+        key_data = []
-+        key = "ba:ad"
-+
-+    ids = []
-+    try:
-+        ids.append(ethtool_create(cfg, "-X", f"context new"))
-+        defer(ethtool, f"-X {cfg.ifname} context {ids[-1]} delete")
-+
-+        ids.append(ethtool_create(cfg, "-X", f"context new weight 1 1"))
-+        defer(ethtool, f"-X {cfg.ifname} context {ids[-1]} delete")
-+
-+        ids.append(ethtool_create(cfg, "-X", f"context new hkey {key}"))
-+        defer(ethtool, f"-X {cfg.ifname} context {ids[-1]} delete")
-+    except CmdExitFailure:
-+        if not ids:
-+            raise KsftSkipEx("Unable to add any contexts")
-+        ksft_pr(f"Added only {len(ids)} out of 3 contexts")
-+
-+    expect_tuples = set([(cfg.ifname, -1)] + [(cfg.ifname, ctx_id) for ctx_id in ids])
-+
-+    # Dump all
-+    ctxs = cfg.ethnl.rss_get({}, dump=True)
-+    ctx_tuples = set([(c['header']['dev-name'], c.get('context', -1)) for c in ctxs])
-+    ksft_eq(expect_tuples, ctx_tuples)
-+
-+    # Sanity-check the results
-+    for data in ctxs:
-+        ksft_ne(set(data['indir']), {0}, "indir table is all zero")
-+        ksft_ne(set(data.get('hkey', [1])), {0}, "key is all zero")
-+
-+        # More specific checks
-+        if len(ids) > 1 and data.get('context') == ids[1]:
-+            ksft_eq(set(data['indir']), {0, 1},
-+                    "ctx1 - indir table mismatch")
-+        if len(ids) > 2 and data.get('context') == ids[2]:
-+            ksft_eq(data['hkey'], bytes(key_data), "ctx2 - key mismatch")
-+
-+    # Ifindex filter
-+    ctxs = cfg.ethnl.rss_get({'header': {'dev-name': cfg.ifname}}, dump=True)
-+    ctx_tuples = set([(c['header']['dev-name'], c.get('context', -1)) for c in ctxs])
-+    ksft_eq(expect_tuples, ctx_tuples)
-+
-+    # Skip ctx 0
-+    expect_tuples.remove((cfg.ifname, -1))
-+
-+    ctxs = cfg.ethnl.rss_get({'start-context': 1}, dump=True)
-+    ctx_tuples = set([(c['header']['dev-name'], c.get('context', -1)) for c in ctxs])
-+    ksft_eq(expect_tuples, ctx_tuples)
-+
-+    # And finally both with ifindex and skip main
-+    ctxs = cfg.ethnl.rss_get({'header': {'dev-name': cfg.ifname}, 'start-context': 1}, dump=True)
-+    ctx_tuples = set([(c['header']['dev-name'], c.get('context', -1)) for c in ctxs])
-+    ksft_eq(expect_tuples, ctx_tuples)
-+
-+
- def test_rss_context(cfg, ctx_cnt=1, create_with_cfg=None):
-     """
-     Test separating traffic into RSS contexts.
-@@ -542,7 +608,7 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
-         ksft_run([test_rss_key_indir, test_rss_queue_reconfigure,
-                   test_rss_resize, test_hitless_key_update,
-                   test_rss_context, test_rss_context4, test_rss_context32,
--                  test_rss_context_queue_reconfigure,
-+                  test_rss_context_dump, test_rss_context_queue_reconfigure,
-                   test_rss_context_overlap, test_rss_context_overlap2,
-                   test_rss_context_out_of_order, test_rss_context4_create_with_cfg],
-                  args=(cfg, ))
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index ed20508e1d71..2c31b61b6dcc 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -53,6 +53,12 @@ KSFT_RESULT_ALL = True
-         _fail("Check failed", a, "!=", b, comment)
+ 		fragsz = SKB_DATA_ALIGN(fragsz);
+-		data = __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC,
++		data = __page_frag_alloc_align(nc, fragsz,
++					       GFP_ATOMIC | __GFP_NOWARN,
+ 					       align_mask);
+ 	} else {
+ 		local_bh_disable();
+@@ -349,7 +350,7 @@ static struct sk_buff *napi_skb_cache_get(void)
+ 	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
+ 	if (unlikely(!nc->skb_count)) {
+ 		nc->skb_count = kmem_cache_alloc_bulk(net_hotdata.skbuff_cache,
+-						      GFP_ATOMIC,
++						      GFP_ATOMIC | __GFP_NOWARN,
+ 						      NAPI_SKB_CACHE_BULK,
+ 						      nc->skb_cache);
+ 		if (unlikely(!nc->skb_count)) {
+@@ -418,7 +419,8 @@ struct sk_buff *slab_build_skb(void *data)
+ 	struct sk_buff *skb;
+ 	unsigned int size;
  
+-	skb = kmem_cache_alloc(net_hotdata.skbuff_cache, GFP_ATOMIC);
++	skb = kmem_cache_alloc(net_hotdata.skbuff_cache,
++			       GFP_ATOMIC | __GFP_NOWARN);
+ 	if (unlikely(!skb))
+ 		return NULL;
  
-+def ksft_ne(a, b, comment=""):
-+    global KSFT_RESULT
-+    if a == b:
-+        _fail("Check failed", a, "==", b, comment)
-+
-+
- def ksft_true(a, comment=""):
-     if not a:
-         _fail("Check failed", a, "does not eval to True", comment)
+@@ -469,7 +471,8 @@ struct sk_buff *__build_skb(void *data, unsigned int frag_size)
+ {
+ 	struct sk_buff *skb;
+ 
+-	skb = kmem_cache_alloc(net_hotdata.skbuff_cache, GFP_ATOMIC);
++	skb = kmem_cache_alloc(net_hotdata.skbuff_cache,
++			       GFP_ATOMIC | __GFP_NOWARN);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
 -- 
 2.45.2
 
