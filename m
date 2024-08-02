@@ -1,84 +1,90 @@
-Return-Path: <netdev+bounces-115320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A2E945D3A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:26:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E75C945D41
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04174B20DA3
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:26:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C32282553
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90B91E2109;
-	Fri,  2 Aug 2024 11:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F91F1E212F;
+	Fri,  2 Aug 2024 11:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ED3xD3WQ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="kTWl68we"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282B61BE87A
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC271E2124
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722597982; cv=none; b=QXjPJxnhpXTKZ+7Y8UcEslLFqAZsq4WUPrURAwIt9GgoMt86dSuP4HVHNwSg13OQ3ieEHPqsEuxaN72UXYZAbub7DIbYL82eWZexz9u1nboN7lHFyq7ifDXrvRbt4Gba86f5j+av++dJt+1jBVr2ehtqabM3e0ulh+hoM9aZ/LY=
+	t=1722598073; cv=none; b=B3ONSEHUPbhS0qi9jBVdGYMgs9Uod87hn57EpyKqbZEjJ+ulwiz1NHDQ3nsdVbT+a1/qIlSKgM3Ndxpld8Iq02hI0xOI/3H99GoU6m0QH348a5UjdfI6FxxPIvNNKGq4r3HCZ2gw0WKv7BZzdC4YaejmWacD4XvkGJJc7e7uMpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722597982; c=relaxed/simple;
-	bh=r5bPLq7YVTWAbAepM2udvHq7wAklkSEMSNjaiuDyQdU=;
+	s=arc-20240116; t=1722598073; c=relaxed/simple;
+	bh=BE7dpG8W2PpOKUlssqTXhlePO4gl/CQaWw0AeimD9y4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TuS1fEPAFZf5D5OxBmjlIij+Gi4pf0naGbLMK3O0M87Vvv0LNtTocJS4h2GJIfkcKex8Y/FtdEjRb16noEEiLrbdnT5wSP79cc8hJJjm3lmETV6Xs0rmscW7j38/muhFvZerFgyWd4iaPpo+bgBaW3AEQ+FaGsvkXCul5jJkWO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ED3xD3WQ; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a79df5af51so5557533a12.0
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:26:20 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=M1TcWTEKsrPnGnwX+NFyK0Uy7DhN9P+2nXAjIS1TTMLxptvVVx1/8OO0D8N8YZtEIs4dRs1TImXw7UKoVxgtOGMfSbk4nPxx1Ep6H8sZd9RGPaKgpn9fjvFxV9aPhDG+J8ABmXxmUKxJB758hvMyYGrDuz+GK8w0B/0XONYXfcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=kTWl68we; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-428e1915e18so11822905e9.1
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:27:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722597979; x=1723202779; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9m07A/HbWuQ7grysUQ4vixCSF4Dg/OIQ2NT9plhBuz0=;
-        b=ED3xD3WQAUxatwK2JjAsEUuEaG8/PO8mJP2KNbTSFIM0KlhfMfRNxzcaUMJ1YCi0zE
-         w4Hf/IqCyz/8PHeuIUTpk6UUNxCrqZQtj2MOCy4M3DScKgHmMfbMMNtnFUaxRxfM+k5e
-         /a502LKjBeU8DbgH2hS5x0YO4n4+37rPC7BTiWS9xuP3SP5dNlfVeyXraHwJ1HizBpqc
-         1NXzlvt51CNiTqCWOXvWRKeCJ3E1QwWdPtSMnp/Y/uZ6oZYb8o5YYcAayLnaEEg4+ArB
-         8pa6mxkK7jvh6tr+ehR2J/aOagLOIJbNv2YMS4LTR8fZ7mwBS/Fxw9nvHR3vShtxA5y6
-         0RDA==
+        d=fastly.com; s=google; t=1722598070; x=1723202870; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=chN/5IqC5/jQjFOqjkhbCXjZQHoVidazye4I/EM8vkk=;
+        b=kTWl68wedmlpbnpxUW1ltHUuJHXQftgtls2Smo05lXtV3V9+3ayUXxSW9RM+b4GouV
+         PHJ3vc85V6PH8/jND8E535KkIzSXtY1qPUahm4bNZ14uBCZrPBH66XAM9ZPiOBbpAyjh
+         WGcdxFV7GuZu6KMawkBSmtkE8jg2FwScsSGfY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722597979; x=1723202779;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9m07A/HbWuQ7grysUQ4vixCSF4Dg/OIQ2NT9plhBuz0=;
-        b=aziV49q/V/QacS8HLhSKUsjQOijREh88s4RjFG91SZociks5r3jw26EUTImw0zqjEc
-         Z0i919i79FPvOrIO7gkcOB1wxCxr3q5h6jyu7cfona1V0IT0rQR1Qw72WehQ2O0L6wrL
-         gDAPJIJw67hjqv7wAnDTiu48KORpuB6KMd5O9eRdftCB9O2Ps9JS3P4ht+PSziiROms8
-         +2oO4Q0LCdG64wYE1diK473RsMCS8f4XmsDC8hoRO3Brep8T6XHYeuDefQUyNC+PmsRC
-         ViFMQnEmTXULbpInZNXHVjm9sdarf4NGRph/Bif95GAg2qwWemrVgEl5hO/x5LlTVQLa
-         0gZQ==
-X-Gm-Message-State: AOJu0Yy/9py/zpu3zOSkQdBfqGeOIcuIQL3shVhmkE0P+nSPBURiEfSY
-	dXaDaHSu35c77PnTReMDbb6FhpB9UQYOGn/AS4OvVypdCrqR2N6RcOxn8OyVIAM=
-X-Google-Smtp-Source: AGHT+IHc5rf0PMCHNXBF8/xiStf5aXoc7w3pseeGg2dtemLLlmV21RfY1JaOgP7oBgI7yOmhri2itA==
-X-Received: by 2002:a17:907:d8a:b0:a77:c051:36a9 with SMTP id a640c23a62f3a-a7dc5fb4baamr283353666b.9.1722597979275;
-        Fri, 02 Aug 2024 04:26:19 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c0c0e0sm89242166b.67.2024.08.02.04.26.18
+        d=1e100.net; s=20230601; t=1722598070; x=1723202870;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=chN/5IqC5/jQjFOqjkhbCXjZQHoVidazye4I/EM8vkk=;
+        b=k3VHkIYxBpOdICiyKOnw3RipE4sAA4KDyS+Lzwe0cFUhsNfTkLz3Yl5bc8WeJ43BH8
+         b4juTEl0wwsMokieYMdQlgTCSLML82lHcfAdhKyj8WBnfPYQvkkD11VKvESRyPzN/z2Q
+         Of22r5osqC6RwvD2claSkgx8iJtmqSjA3ibh/XtWXiTAgI+WyPzajilRQNGnEn1c0MYW
+         kGxVSo7umddg1sQ35T2RZgamksmZNQWUIkcntisscbzuo3I+CxSsJe0sznRKMr7AArG5
+         rlpHhVc3q0wYA2hRtP15vbsLau5+48pnR/CjMK9FNoNNGyGfblfSTwQ4pnx8xDiCT75D
+         1PFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXN0AjiRDCRZ+HHiixV3n3Smqye0ptV/nkbyUBdkZ5kpPpwSOQh2V+2O1tfL6hYgSCXbpNDaQTZko0yD0I3hRobqeaCKXvQ
+X-Gm-Message-State: AOJu0Yyxh0AEopPj9/JvHL2qVumNYqMXYKW8EyTcDFJ9YHZ6fn3xWKxK
+	wavq73KekQ0XJbvzRLU5l4I2Iw5CX0lZYMCoKUJaE3Sih227FFsttpZRZwORbWI=
+X-Google-Smtp-Source: AGHT+IH7hcdVBDXCsRevDN59P0EtrOCoyykAhwY0K0NGMZXYks/7iPTFXtJU/BBOxs8N4RGobZG6mA==
+X-Received: by 2002:a05:600c:5102:b0:428:52a:3580 with SMTP id 5b1f17b1804b1-428e6af4b58mr18796515e9.3.1722598069823;
+        Fri, 02 Aug 2024 04:27:49 -0700 (PDT)
+Received: from LQ3V64L9R2 ([62.30.8.232])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428e6e3c0b7sm29576275e9.23.2024.08.02.04.27.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:26:18 -0700 (PDT)
-Date: Fri, 2 Aug 2024 13:26:17 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-Message-ID: <ZqzCWQwACMQ3RQaw@nanopsycho.orion>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+        Fri, 02 Aug 2024 04:27:49 -0700 (PDT)
+Date: Fri, 2 Aug 2024 12:27:46 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
+	przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
+	gal.pressman@linux.dev, tariqt@nvidia.com,
+	willemdebruijn.kernel@gmail.com, saeedm@nvidia.com, leon@kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 03/12] eth: mlx5: allow disabling queues when
+ RSS contexts exist
+Message-ID: <ZqzCsvm8DW6PeKDQ@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
+	donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
+	willemdebruijn.kernel@gmail.com, saeedm@nvidia.com, leon@kernel.org,
+	linux-rdma@vger.kernel.org
+References: <20240802001801.565176-1-kuba@kernel.org>
+ <20240802001801.565176-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,34 +93,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+In-Reply-To: <20240802001801.565176-4-kuba@kernel.org>
 
-Tue, Jul 30, 2024 at 10:39:45PM CEST, pabeni@redhat.com wrote:
+On Thu, Aug 01, 2024 at 05:17:52PM -0700, Jakub Kicinski wrote:
+> Since commit 24ac7e544081 ("ethtool: use the rss context XArray
+> in ring deactivation safety-check") core will prevent queues from
+> being disabled while being used by additional RSS contexts.
+> The safety check is no longer necessary, and core will do a more
+> accurate job of only rejecting changes which can actually break
+> things.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: saeedm@nvidia.com
+> CC: tariqt@nvidia.com
+> CC: leon@kernel.org
+> CC: linux-rdma@vger.kernel.org
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 12 ------------
+>  1 file changed, 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+> index 36845872ae94..0b941482db30 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+> @@ -445,7 +445,6 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
+>  	unsigned int count = ch->combined_count;
+>  	struct mlx5e_params new_params;
+>  	bool arfs_enabled;
+> -	int rss_cnt;
+>  	bool opened;
+>  	int err = 0;
+>  
+> @@ -499,17 +498,6 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
+>  		goto out;
+>  	}
+>  
+> -	/* Don't allow changing the number of channels if non-default RSS contexts exist,
+> -	 * the kernel doesn't protect against set_channels operations that break them.
+> -	 */
+> -	rss_cnt = mlx5e_rx_res_rss_cnt(priv->rx_res) - 1;
+> -	if (rss_cnt) {
+> -		err = -EINVAL;
+> -		netdev_err(priv->netdev, "%s: Non-default RSS contexts exist (%d), cannot change the number of channels\n",
+> -			   __func__, rss_cnt);
+> -		goto out;
+> -	}
+> -
+>  	/* Don't allow changing the number of channels if MQPRIO mode channel offload is active,
+>  	 * because it defines a partition over the channels queues.
+>  	 */
+> -- 
+> 2.45.2
 
-[...]
-
->+const struct nla_policy net_shaper_ns_info_nl_policy[NET_SHAPER_A_WEIGHT + 1] = {
->+	[NET_SHAPER_A_HANDLE] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
->+	[NET_SHAPER_A_METRIC] = NLA_POLICY_MAX(NLA_U32, 1),
->+	[NET_SHAPER_A_BW_MIN] = { .type = NLA_UINT, },
->+	[NET_SHAPER_A_BW_MAX] = { .type = NLA_UINT, },
->+	[NET_SHAPER_A_BURST] = { .type = NLA_UINT, },
->+	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
->+	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
->+};
->+
->+const struct nla_policy net_shaper_ns_output_info_nl_policy[NET_SHAPER_A_PARENT + 1] = {
->+	[NET_SHAPER_A_PARENT] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
->+	[NET_SHAPER_A_HANDLE] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
->+	[NET_SHAPER_A_METRIC] = NLA_POLICY_MAX(NLA_U32, 1),
->+	[NET_SHAPER_A_BW_MIN] = { .type = NLA_UINT, },
->+	[NET_SHAPER_A_BW_MAX] = { .type = NLA_UINT, },
->+	[NET_SHAPER_A_BURST] = { .type = NLA_UINT, },
->+	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
->+	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
-
-Since this is the same set as above only extended by parent, wouldn't it
-be better to nest it and have it only once?
-
-[...]
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
