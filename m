@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-115398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999129462C2
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 19:55:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E204C9462CE
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 20:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABAAE1C20F0A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CAE91F2159C
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 18:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3B315C13D;
-	Fri,  2 Aug 2024 17:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215AC2837A;
+	Fri,  2 Aug 2024 18:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="et0HRwr9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ek60RuF/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29CF1537C0
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 17:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A07E1AE050
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 18:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722621329; cv=none; b=sXf9lquE0s3jQiRdXvQAMxDUYYPMjeV7wHgLjvbdOyRc0UuKCd2K+rhc9bqwltnNd+s/KqqH3F+0Z+NbS9EV+IhCnvojAmmn7gsJ4TBRve2pe86cO1QslWt5UVgNxYLo0haRgU8Aodes7IqweH7tL/sjr4M1NCIBnmJaspYACzc=
+	t=1722621672; cv=none; b=pO7GvYzjjaZDk2YpS/ZnfORJCVNFcqPhO12vPYfor0ON4MRffpGiIBovbdSSbKJkrUL/b9MhIApiEiE0EmLdkr1YkXdgvH3SOfsxzvxrD6MRy4+Q1PbcmeYwaJ3qaLxzENh/w2rNd6Q+r1rL5+Wn6WAsZLVoIIqyd+XZTV/nxEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722621329; c=relaxed/simple;
-	bh=BUt+yk47QC8u8sxCCzSSGLY3xmfY6eBtRyfTRA+BW70=;
+	s=arc-20240116; t=1722621672; c=relaxed/simple;
+	bh=NwqwjZ1ZkmCR5L3cE68C/lUHncA4QY/rihu4kv5E3Xo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uqk57Qnv8yP5t8gT/DRUYBuqtcoakm7A/YpX5HkLQIJJc7UdXPDOSyE6JFEhZ+V/PKYS1evBBiGRRlnFGKGR3ZqXrXfrH2N5CWctdCEfO+QJHQ3iuRs3lmJfJKh9cc1q81I+zjVSYTE9OZvckfx24GVMfsowsuQ9cCoud7TIAyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=et0HRwr9; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=egV+S6T7kpOPrIMCDaxrJNmEU3s4beX4YBZU+PWbibVn98qDcpJ6W2B6Cq/CAPlcWYTorn0iufS56Hsitp+YMEIF5FrpmoWvYuKwzxDAzZuaNaeZ32KvJZwO/bW0MRHh8Kd6NHXGNZpvnyS9lSI8XJdhYrMACrBZnnBybqE0Ue4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ek60RuF/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722621326;
+	s=mimecast20190719; t=1722621669;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mSKMynH7mqtKWkD5s3WwP3QMfudW/geCCwMv+N77MHg=;
-	b=et0HRwr9juix77jxhvxhU/qc/9OYLIvxDK71ZNCF/8dAAaiu+n5zpk+HYH4F6ZPzJ56ySJ
-	1L9oa3NvKOmbzgLIJOq4BUKGt2jDX1OiDaxeTs3bofSilX8NmYj61VV9ti+IoV8fnJdkuJ
-	eKn+9OXsccpaA5Ea79qrusvCy3hvQ34=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HVTfFpaLZUbOaQ0HJhEjOqrkLc8CExWlF+kJqRyqPAo=;
+	b=Ek60RuF/LgWh/BQpNK2GhOr2Jj2aYBjbVE8xweClLQOK8x+UNpuVSpZV+8mVPeNY/tLuYm
+	frou8eqsWDCYutwLqBUs+viquVlPle6JZ/Rr/8NhrVa9SqoE2IrYJdDhWdKcwvvcp6ugS/
+	coZFKDbemeGsLd4NJAhup/CaUDpGg58=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-468-8HmvNSiSPPiqcKz1w3GGdw-1; Fri, 02 Aug 2024 13:55:25 -0400
-X-MC-Unique: 8HmvNSiSPPiqcKz1w3GGdw-1
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6bb6731c1cdso84378476d6.3
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 10:55:25 -0700 (PDT)
+ us-mta-329-l4V9Y3ZROviQlgWd-HGzJA-1; Fri, 02 Aug 2024 14:01:08 -0400
+X-MC-Unique: l4V9Y3ZROviQlgWd-HGzJA-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a1d4238d65so959149885a.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 11:01:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722621325; x=1723226125;
+        d=1e100.net; s=20230601; t=1722621668; x=1723226468;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mSKMynH7mqtKWkD5s3WwP3QMfudW/geCCwMv+N77MHg=;
-        b=mOEKpo1LzIBJnIeG3EejyRhHMplPLPO9JV4kmt1i/aqd+hvH/42i74XhOq5m4ovu0r
-         qWwTOJpyTDog4OO4Gh2hgFVAriNtygErGc9ewAFsr+yRGjXKy+s05gujj/GWk+kjo3gx
-         cTwGX+dFRdXYGmukYE8WRpbrdOEnPZqB8wo/Z4NesQTFrrjyfeoqS2J7KPKhnlxUc5MW
-         HupwhiW5T5nFk4yu7rcZo9LshNglrvKvoBr6tmB74+umr5B2EDA3rAGPFNbF+G+kYRME
-         viu98VF762sKx+HPbg/i/HSRY2KQ6ksDLfWNqMlpMAJ6iJSUE2sFamylWwzfY12qIR01
-         G7Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiX9Gkbs1idqyNpKN8qGmnKYjA67WfJeOwRxeIo+qXDk4UV3wdw8MuPNAdUoBql0YFhebdAeZTI4Xtq6PumeC8GDsAs3Zp
-X-Gm-Message-State: AOJu0YzEktLilMRT/QAIZ00hTODLk0Nn09av1MYNhxQ5Sc29cpmEPxay
-	7ttwMBmmRhlVQVPTQmMIWVH8cLQQf7FX/2BfR3tlLCiaBF3f2jKEp7fSEAv/EvSg9PPwmZhYBMs
-	Ueic4P3EfsIDBWM2XBVJ1zRnHNbKHxPfNvuBYV8TZEdKo+Dmrjiag8g==
-X-Received: by 2002:a05:6214:4906:b0:6b7:a1aa:994f with SMTP id 6a1803df08f44-6bb984930cbmr43871626d6.45.1722621325081;
-        Fri, 02 Aug 2024 10:55:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGvfmiXBn0WLDUS/+iZqeB7tPbwkJPYVpv9lxcQTRxIly8p6qsOwWEvqQVQyo1Xl6zPYGN0/g==
-X-Received: by 2002:a05:6214:4906:b0:6b7:a1aa:994f with SMTP id 6a1803df08f44-6bb984930cbmr43871396d6.45.1722621324736;
-        Fri, 02 Aug 2024 10:55:24 -0700 (PDT)
+        bh=HVTfFpaLZUbOaQ0HJhEjOqrkLc8CExWlF+kJqRyqPAo=;
+        b=njzTZzg6VKpiDLrhq2XbEK6PrrtVS/W0xmBPspFus6RqWkQg70oYbRWb+Uj9QEwFHf
+         1rPZ4zjBwtxIDo2s025+mcgTXZSJFlVl9kJnKyvmHZZkpuAsZFLUp0RImqS03nPzOX4t
+         9ktANBJkI/X+ZGUmlPEHxtzfSvyY9vkL06ct8NQV5HYi3jCGbtk1MuJ4zPdbqrh3VopQ
+         jQyRWm2zzUuHUv0pUZ+ALYBK8j78VGX2MSIWDAIPTsQZFuP+nYmhZ2cRAdOyAXrjTdiA
+         CMr3Kzt236inmf99gBebuSL4oyMEcXUzf5/J3Q+FmMxDgMIFipVwXjuC3CcFvQ6cfTCi
+         vceQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmuQfo7WvdJN8QVnVvznXA9SVfxbpQdYiKaGq+wKWNsQNH6eTO9YsRWujh9pXhcCnWcQGESTGO1Okiz8gs4Aeh21s+cmoD
+X-Gm-Message-State: AOJu0YwD/8YSF+Q36792PVzt2U2wCFIdwKjirWrHKOp0/UbWC94yCo7k
+	9iotU7KxkqMD2Dj++pkSl4YMODl5cZ1FKnjujbhuQA2pd7jbvlVpV6H6h9wLDvFKWv1BYUQ070I
+	gX/jL3QSl5pAI4b/QoHPckg4pGL0+Wj9/2AWQ6/prV7+q/yGhLwL7AQ==
+X-Received: by 2002:a05:620a:46a4:b0:79f:735:4cfd with SMTP id af79cd13be357-7a34efaeea7mr554500385a.50.1722621667653;
+        Fri, 02 Aug 2024 11:01:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFQJErAfbeHi7Cr/9xQl9lT7goXT1BrY20xVWa1C2WQla2ME5KtsJNYLix6zqIYtiFu1FmZog==
+X-Received: by 2002:a05:620a:46a4:b0:79f:735:4cfd with SMTP id af79cd13be357-7a34efaeea7mr554496585a.50.1722621667225;
+        Fri, 02 Aug 2024 11:01:07 -0700 (PDT)
 Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c839787sm9000496d6.99.2024.08.02.10.55.23
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f6dca50sm107699185a.16.2024.08.02.11.01.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 10:55:24 -0700 (PDT)
-Date: Fri, 2 Aug 2024 12:55:22 -0500
+        Fri, 02 Aug 2024 11:01:06 -0700 (PDT)
+Date: Fri, 2 Aug 2024 13:01:04 -0500
 From: Andrew Halaney <ahalaney@redhat.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Serge Semin <fancer.lancer@gmail.com>, 
@@ -84,11 +84,11 @@ Cc: Serge Semin <fancer.lancer@gmail.com>,
 	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
 	Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 01/14] net: stmmac: qcom-ethqos: add
- ethqos_pcs_set_inband()
-Message-ID: <fc77km3ws5ucl7w2oyi3w6gvr6ovkzrt5tlhzh47qyowrak4hg@bqpjm5jgygbx>
+Subject: Re: [PATCH net-next 02/14] net: stmmac: replace ioaddr with
+ stmmac_priv for pcs_set_ane() method
+Message-ID: <idusdyewthu5q4j7awi3rc77ncdolt27ppq2pknrbynaobgztc@3xvnkeqml2bd>
 References: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
- <E1sZpnq-000eGq-U0@rmk-PC.armlinux.org.uk>
+ <E1sZpnw-000eGw-2F@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,11 +97,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1sZpnq-000eGq-U0@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1sZpnw-000eGw-2F@rmk-PC.armlinux.org.uk>
 
-On Fri, Aug 02, 2024 at 11:46:30AM GMT, Russell King (Oracle) wrote:
-> Add ethqos_pcs_set_inband() to improve readability, and to allow future
-> changes when phylink PCS support is properly merged.
+On Fri, Aug 02, 2024 at 11:46:36AM GMT, Russell King (Oracle) wrote:
+> Pass the stmmac_priv structure into the pcs_set_ane() MAC method rather
+> than having callers dereferencing this structure for the IO address.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
