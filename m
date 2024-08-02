@@ -1,143 +1,103 @@
-Return-Path: <netdev+bounces-115395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B88B9462AF
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 19:42:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DA19462B3
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 19:43:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B42281A87
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:42:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C6B31C20AC5
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D03B1AE029;
-	Fri,  2 Aug 2024 17:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CF51AE023;
+	Fri,  2 Aug 2024 17:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ml4ER3Q7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQQKQQRx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AACB1AE023
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 17:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271821AE024
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 17:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722620567; cv=none; b=XzmT218HZiAFmV1jH1AAXjWgQeGl1mMqIwy01Lsdl+PlHtrdL45D/ISUhUORyAfOqxDxn+fIjuArSx7xBIRDPuk390BaNRC0ThgMVMxPHt8aHs67BE1dBuk+NYrGymJ8DR04wDIB4EPhxCKJsK7Ni6Yx9DzsvbNbddci/3CT5lw=
+	t=1722620630; cv=none; b=P7wXJUVl+20uUf9aNyGTZHrVhxosOGUqNyERn1lJD8UGZzfGsgYKcL8rnyZjN6eWcWeUR+SuC0n12GB55oCFhdAQAaBU0VVB0wjKpuAU909QOxV/BFqNAOmrc8ma2w+qJtYc8WjwAcoGi3wA78u2tHMcJM1X8CZZWfry4IOq6HA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722620567; c=relaxed/simple;
-	bh=J79iXNK9epessJfAB5+RZWmf9kNmVC6v30LXTrozZ0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oB0AfDWO1G09liAIjDq3CIuXeY4ytVuvuBSibfNEC9GT8GJ+axnbtUL3TRP4lizkAYkkgKMva8J6SdnjOIor+WYi4pfz8mfQNpU/kESHZxE3ZD7PPiJofqfg3ES0I089ml40DaF0WwPZZEfBuvZq7CPAWac4PdJ/pN+U/hvKFWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ml4ER3Q7; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-367940c57ddso4237318f8f.3
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 10:42:44 -0700 (PDT)
+	s=arc-20240116; t=1722620630; c=relaxed/simple;
+	bh=QC2hbCCMVxlPpFDNFEw4sECI2USp4mx8vVQfabPaVgE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A05ur5+zM9vymppTvq4cxJ0mWIzgoWg9Nv4+2Mvj2NuzFmfb3b8C+COPE2J/h6RIw8zQ1SnWXvB1WvWiNTwuvDeEjkaxCm/MGZMdBvYZTZu/CJR+kbzsjBBy/7KuZ3CwMEp9RceNv72fddBrbv2cj1cNbkrvXVFbx4LAAqDCdCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQQKQQRx; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a61386so1021585a12.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 10:43:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722620563; x=1723225363; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Fo1Jw27d6kJ2c/4oihcpg8Bes1iWl/SxW8eqBhtNepU=;
-        b=ml4ER3Q7tKUmSLMK9/Y9lBOJC0jnhjkxL60V8daqCpgSL69KM4/QDmua/HZG1jNNEc
-         UubSMuhfpnN0fVosPv7rJQ51eSMek+ZnIJbGcDC1D4YkIEwZCknut3D8IrTkkr8Wz2M4
-         bfQhNaexlCxL2s2Gu5OVa0rqQBXYQXMWPfChKmQ5kdRJut3TwJUUcFfuskK2u2ob7vFm
-         NQJkxtQe8uSdPT0XlsdTT14MZey+8k/8vXY8D7yr1E62wZhz6Y/Sy8OqM/dpbLMvkcPQ
-         gVYrvSYJOOzGQZctkkYJv6yoROAzefotGS2sTknJ4eQAwcZ+dYxouUuQ2spI1gWf5D46
-         VAWQ==
+        d=gmail.com; s=20230601; t=1722620627; x=1723225427; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ec1bYTg1bnLZQJIeD1SL2fp09wnpy6Scrn+EDo5bQFM=;
+        b=TQQKQQRxVQbVZixezQ+3W+MVShR3XExRBRK7IXh3TiUKgWQK3ObWRq+s5iGuzkPTjr
+         Sy9E6CBm/b/XE8I61DVAAd2+BJbDHZeDgstW3UsjMfyJJOGbA+CtfecfEuGBKdbOCAjp
+         aL4OPFnP0ft79RfTFjXY9UtcSs44XcvlNBPKRQPD2/ISjfQ/eXDIQR84j4/RVFqDxjDP
+         6svt5ZaTjLIQLACQkHeaBksppHnzKmlTz2DvQA5K1pI0szNKtp2NWEXPoxGBsfysCaLL
+         fU11tHXOAkPY+B0MQbT0L/zdej1Dfc/QMNCp3rp4U2vZa9EH1VUtuqHstC3LQn/c3NpX
+         uUsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722620563; x=1723225363;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fo1Jw27d6kJ2c/4oihcpg8Bes1iWl/SxW8eqBhtNepU=;
-        b=tcHsh3AbSGte4kCGhceqCzsOlaTmlztAz62EYb8lTN4X6HlJH/+9law5lv5DCJD6m6
-         FLeDGayBpR1BCgFWUSkUNadUyOY2lYdLrUWGjh5BaMkn2L0qQ/sv4Op7b92V/t8hyOxF
-         bx7NRCbBtFUIrWPpzcEo4HKlzy22ENeEAxt2T17oEKrcWTN/bV7qZQFUrJJxSozNER5U
-         IsoJP93Tz7ihiHUAVXViZoMhQj5EAlhvMUSCI/yHG8/Exv544EKHA2dTtn3CINIjxU2E
-         3p/nu5aaR/ACZu49dVvdvK3XFOlKJSWtzmFTJbqvJV6KsqAX91q1XGeama6t6HWJPIuV
-         +FrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWK4o6qGT2Ex23DzZINpDABTmHWPmdtSTrEEWbULOUzhmEZ15efOUoGsnj1lsZqjz3ckvJd3Jo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/DWr2hcIEnFYHRcJZRsP/bnFOXgPwCVYiUmZXIpGgSmHHoX9b
-	gum9W31ioeqk8cmmgASeQaG+Hfiw7Hs8fBwXvFdEVlFiKyYvhIEOENZoLusA9QE=
-X-Google-Smtp-Source: AGHT+IGXsVHnYdTCw2tj0+vAdIxlzcZvHcvH/OjLs64ZjEQNrypWoVHtBio2oOUyzRbsNIVImEp+eQ==
-X-Received: by 2002:adf:f345:0:b0:368:3f13:22fe with SMTP id ffacd0b85a97d-36bbc0e5fa7mr3103764f8f.23.1722620562940;
-        Fri, 02 Aug 2024 10:42:42 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd06e100sm2438256f8f.98.2024.08.02.10.42.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 10:42:42 -0700 (PDT)
-Date: Fri, 2 Aug 2024 19:42:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
-Subject: Re: [PATCH net,v2] team: fix possible deadlock in
- team_port_change_check
-Message-ID: <Zq0akdhiSeoiOLsY@nanopsycho.orion>
-References: <CANn89iJDVNqnMiGYHGQissykzASK-DcLss6LDAZetnp34n1gxw@mail.gmail.com>
- <20240802162531.97752-1-aha310510@gmail.com>
+        d=1e100.net; s=20230601; t=1722620627; x=1723225427;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ec1bYTg1bnLZQJIeD1SL2fp09wnpy6Scrn+EDo5bQFM=;
+        b=pLpxhBrrP7OqHYfZsU7mPmWAzqSzxW3ub0zbP+XPVODNgGN50Daq1Mqau0X1Plg257
+         RKpuryyHU6zqNAYzz7dOgCT7QrLAFjrw030QuV8R7O6mfF8DXeJ64WsTrq+obhNshq5F
+         Ye6iFqO9PDSVYkShKGDDwOSXMI710y2DGemJeHobu73C2Vp/PwF+SzdJW2vx3nk1qdLJ
+         4uPrXdDe8Zf9xYuqlXkI5JwQaGILT/H/DsH+/DL+PgcAw11eLj1hmAoWfQp8Vcx9QtG/
+         qOzCD2Dv2wTMZ+xVN0BVLQEuhq3ffcYKl397Nrb+DBrd756E8wuKA5o8hLR1kDKnpOii
+         ITZw==
+X-Forwarded-Encrypted: i=1; AJvYcCXbWcyw5PgOjORFuVfGaG3OxoknD4WvuefzkAmtLgbAWGHm8/E11JX8TUZeyxICltQBKXIduqrJT/lWpZhgVutDG1caPCS+
+X-Gm-Message-State: AOJu0Yx9zkyAgISc62DtUY2famLhIG/UjavhEBVfYS9Adycq+pKmlH0x
+	8vJWgX9IjX97ti+yBgWAztgVIeXQ5DF7ipNIVl7zbY+I+xvANd4oZWrcs+v/J1pZLsq6lBGf2xb
+	pWiAqq3QNCizDAIjCCHg6phZ0pkI=
+X-Google-Smtp-Source: AGHT+IE5UAoR83ImNhZbRBbWSUz9lYEkiRHOr5+oty/Hjg4A6e2gjgDpZmhMtpwG4XrFXO3skqJQK/JGn62x9/9sjDo=
+X-Received: by 2002:a05:6402:5254:b0:5b8:d362:3f46 with SMTP id
+ 4fb4d7f45d1cf-5b8d362414bmr1787044a12.35.1722620627059; Fri, 02 Aug 2024
+ 10:43:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240802162531.97752-1-aha310510@gmail.com>
+References: <20240802102112.9199-1-kerneljasonxing@gmail.com> <20240802083012.062e2c0e@kernel.org>
+In-Reply-To: <20240802083012.062e2c0e@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 3 Aug 2024 01:43:07 +0800
+Message-ID: <CAL+tcoBRTctayHNc8x1psjXyt4FYDTqqNtmbZz8vApYsmTqBAQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/7] tcp: completely support active reset
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fri, Aug 02, 2024 at 06:25:31PM CEST, aha310510@gmail.com wrote:
->Eric Dumazet wrote:
->>
->> On Fri, Aug 2, 2024 at 5:00 PM Jeongjun Park <aha310510@gmail.com> wrote:
->> >
+On Fri, Aug 2, 2024 at 11:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri,  2 Aug 2024 18:21:05 +0800 Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > This time the patch series finally covers all the cases in the active
+> > reset logic. After this, we can know the related exact reason(s).
+>
+> What happened to waiting 24h before posting the next version? :|
 
-[..]
+Ah, sorry, I didn't calculate the accurate time, but I can make sure
+next time I will wait much longer and obey the rules.
 
->@@ -2501,6 +2470,11 @@ int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info)
-> 	int err;
-> 	LIST_HEAD(sel_opt_inst_list);
-> 
->+	if (!rtnl_is_locked()) {
-
-This is completely wrong, other thread may hold the lock.
-
-
->+		rtnl_lock();
-
-NACK! I wrote it in the other thread. Don't take rtnl for get options
-command. It is used for repeated fetch of stats. It's read only. Should
-be converted to RCU.
-
-Why are you so obsessed by this hypothetical syzcaller bug? Are you
-hitting this in real? If not, please let it go. I will fix it myself
-when I find some spare cycles.
-
-
-
-
->+		team->rtnl_locked = true;
->+	}
->+
-> 	team = team_nl_team_get(info);
-> 	if (!team)
-> 		return -EINVAL;
->@@ -2513,6 +2487,11 @@ int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info)
-> 
-> 	team_nl_team_put(team);
-> 
->+	if (team->rtnl_locked) {
->+		team->rtnl_locked = false;
->+		rtnl_unlock();
->+	}
->+
-> 	return err;
-> }
-> 
-
-[..]
+> --
+> pv-bot: 24h
 
