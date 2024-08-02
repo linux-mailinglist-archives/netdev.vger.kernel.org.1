@@ -1,294 +1,186 @@
-Return-Path: <netdev+bounces-115205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C939456B6
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 05:42:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D12009456C7
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 06:03:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A2191F23154
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 354B4285CCD
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 04:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE1D211C;
-	Fri,  2 Aug 2024 03:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9517B17BAB;
+	Fri,  2 Aug 2024 04:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZNo11l6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+wH4J5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F1A18B1A
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 03:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120A228FD;
+	Fri,  2 Aug 2024 04:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722570135; cv=none; b=EHErob9trw0Ha2pX6BMmF7ry9/gmXT75DBvOp0wElOnsFJN+xT5vXwgO20DoXEYHRhqTdQ/D8g4pdjOFJTAMfnXvdafWcw0/yOIKW2qZJxZZhNU3jrVksvN4Bb0IO/zneuUZkOwJYMjKvJEnq5HS3wgcXhjrq864A7rmSKUA/PM=
+	t=1722571389; cv=none; b=VXe0c3oCWc4c40PEDB7Aj6QZXCxgA5o65ydJb00pwKzJsyZ5YWX+sJ7julrJxD5yjRP/aqAikWzzuQUUqIVbHGVw0N2PWOW0WLDH5WuNA1sZWLkowzB5V14/7TLDikMEr5uexUMTXRFIltb89/QvyoKNTnvnaYduKPa1b6UWkVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722570135; c=relaxed/simple;
-	bh=hPoyjBdZjmFGySibSvx13EH3+vAmNm84KqW+f+HFYEA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oUvyvJtkz3Ve41kfuWMC5uoyIKiahdwFAtwOmEvgY4wCy8nHBhuuV6pfii3bBjxcIthMKy9mCBCyinUEQkZcnYXQn2k0svukqXLvklDgvfSz/tPBcAk12GQBQraQFODV2hCsj0q591xamukGl4cU635GCVCznaTfKmpMTzGJ5Gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TZNo11l6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722570132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jSVipcYTMq1UM5G2Tl6to6hqRsTiwB2iAEZ53b+0iWk=;
-	b=TZNo11l6f69lY1r0D3fJYjv4p11KV0RFC62mSUp1Wr/aP7ANb4xSOdIpnWfS2nB6XXbCtS
-	nZRLoSWE0ErjeQsnbrXJ6Ey6vByD7oMJMfuHyH8+c57xjpiGaSMIwkoCUo7Zov9yCqjcUm
-	/UYTJel/8xTICEzm3EZpI4Str+kU0yI=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-buwzn1BbM_2dkprHL-U5AA-1; Thu, 01 Aug 2024 23:42:11 -0400
-X-MC-Unique: buwzn1BbM_2dkprHL-U5AA-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-778702b9f8fso2201033a12.1
-        for <netdev@vger.kernel.org>; Thu, 01 Aug 2024 20:42:11 -0700 (PDT)
+	s=arc-20240116; t=1722571389; c=relaxed/simple;
+	bh=+BmkYUY4FplYkQ1Fdo4rcSxasEfFGNdydNASNR1GMSw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Fp79g8B74pi9iXILQF2CNYkgMGn31UIDkHVXIZ9yZdu/SWNt4nzvsJu3YqRVUKzgW2ZTIviD8NcmVTVYdQjzPei/y99wwPnHs7N67eGgtdJt0Pa0VAefELltdCYF7K2IVfecE/SGirA39zV+ExlzmG3LhK+5ob4kOZWzBsL96r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+wH4J5b; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-70d2b921c48so6135408b3a.1;
+        Thu, 01 Aug 2024 21:03:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722571387; x=1723176187; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=87jAKyalWQYEjkVcjCPIrit4kthuulRv/TtpkKf3Fj8=;
+        b=O+wH4J5bwcSpUQ37z8UdjKuJYrOfmYL32owv1Y5dwB/g4/FVKTjjtVNukKxPvvnYPR
+         fcBytZqKz88nMiP0pEbYwl+To86i9rGrnN4CFe3IVVGrFtNZ2PunJswaiGpFet5T5z9V
+         LmOnExlGWG2pXBLdMMUYJZy7iirO7KI1HrwNYiX0qCPgew7VnEbgCiYTWgtMSPE+r9O9
+         NVUmaDQ5KGQA8PqCApeSVJGT/6v9TeIQqITckACIdZiq6IxCxrcXa4ueT81ebCyl7ij9
+         ZPOK1MF6/lOzaRloLUMm+h68ulyYQVnbeY736C0ITJhX40VOSunz+DZSNRO8ZtjK4pqS
+         Ntxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722570129; x=1723174929;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jSVipcYTMq1UM5G2Tl6to6hqRsTiwB2iAEZ53b+0iWk=;
-        b=vBxLd6CA8XVcFKNk1Wum4Clgfd3QueNWjx4bpCSOjAuhu9MXl3kuneiPWDUeFGGp+/
-         Hf+yx2+HCw3YIimZxtqW0pUGHyXPm6tehBHJwanypXLdwswvBbwrMM+QtFj3LvPwnylN
-         sJLG88JaKi5vzhIfGPSXtBXwKpHm9tSGi8Xp1V4mV1R1JH70w7sFDNnRUO7fqbdmUQxd
-         awQBCJ/eAcc1/kYWgihMuM9Dfr5zxzXnJIlJIIP+2Twyw+vb9hEJJLcZvYlaJlDonXGT
-         wcLQ9ecfkq7ezVkkma/eYwEr3T0QWpuwGk6IYDLf5x57InQDSgPmoC8nlFLYIh56Imfo
-         qWwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWmxfvq2MwYg1ur9/3Y3mhv4YT/Y16UbO81IPNM4vipBAhe1AY2BKyVTvfgQ/eAybWnDTapl9uJvIawqBp/XuwjomNnIiOc
-X-Gm-Message-State: AOJu0YxFEeWBl+sSVlDWpUG8Qvm28SYa1aGZerRJWrKqa2J5A9Qnid5w
-	j7+T9PWc9abBcPlm6NWb15tDvzJS15ghqS+NL9yMOsuem7Mz8yTAoKysui1qBm05QKnJuK6xsRA
-	fwCCsvUORGoO28hL6eeic0wE7+kalSITt64EaimmaGKLGAGgYhzNhpKYXqK+n1wORsxadifcUTz
-	qkX/0wqpyl3StKcGsYWDF4opJMCO73
-X-Received: by 2002:a17:90a:3e84:b0:2c3:34f4:5154 with SMTP id 98e67ed59e1d1-2cff0904753mr5436702a91.1.1722570128815;
-        Thu, 01 Aug 2024 20:42:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOCcO7naxOX17lI/ZiRDsIY3QNQVXq1NBziW2DaddzwfsnicWbTq3qUXH+FPIvqoNRDUvQx81f5+kl5wC1yao=
-X-Received: by 2002:a17:90a:3e84:b0:2c3:34f4:5154 with SMTP id
- 98e67ed59e1d1-2cff0904753mr5436662a91.1.1722570128171; Thu, 01 Aug 2024
- 20:42:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722571387; x=1723176187;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=87jAKyalWQYEjkVcjCPIrit4kthuulRv/TtpkKf3Fj8=;
+        b=ewVhUnSiLoJiPRClLJSsoy/lWkFEUFb380Nn+KpITmknoJ57WglOvExLPC4+AKi+im
+         urg2OtGEzW1oAPlSI1TwibSYw059fEEzfUoXoYBgXgol208fIEt/fpQSZY4NxZb7arpC
+         REs26B3Gk5qudr8UWgAtlFw3CKjrbMFSOrDyWDHg5gfFgjOo3+874KeSVObeK9t7AqX7
+         ukDgvPlEg/RHoU9kWUfvxmeYgBJ32UmHw3W3MLY3dxyb+mgwLJy++vEXPuD7sIF28iqv
+         haJeznaphz4Cdf0Z9Pdu+7DzlpD4YkGLILywb3wT3piTemQIRHuCld3z96u/7hXQnKqe
+         QHbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtNy0PyIEpFv03Xu0CfPnEmx1Q5A1sOT/d0svuU8JRVWNaqY9CgS6KjWvkA3fEC4FsXeEJf3mdDhvN1Y8drimBznSuRE9jpwsv/jZsuur+blRt6u/LnkPQTS/6KjS36SwxYPo1eT2t3knBg96Gh6s4/BAvpn/ax8nBdZxz8Z2NgxGUc4GCoYYOu05z
+X-Gm-Message-State: AOJu0YyoT/7a8skOOJdwfmCOS1CjcvmJkYgcjq55zhFope1e0/2UfU2e
+	+/R656EmwLlGs+o89VLzM3trhk0C/N7MVNUUkcXKPeVME3QAb4DyDAxRNVPg
+X-Google-Smtp-Source: AGHT+IG52+8kacj0yZdlHx1LB4HGbf8WZV2BUzSpcQgNapmwB0WeLFpk3LWzvr/d88yI0SuUgYUahA==
+X-Received: by 2002:a05:6a00:914c:b0:706:284f:6a68 with SMTP id d2e1a72fcca58-7106d04618amr2607561b3a.23.1722571387151;
+        Thu, 01 Aug 2024 21:03:07 -0700 (PDT)
+Received: from tahera-OptiPlex-5000.tail3bf47f.ts.net ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7106ec41465sm542099b3a.60.2024.08.01.21.03.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 21:03:06 -0700 (PDT)
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: outreachy@lists.linux.dev
+Cc: mic@digikod.net,
+	gnoack@google.com,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bjorn3_gh@protonmail.com,
+	jannh@google.com,
+	netdev@vger.kernel.org,
+	Tahera Fahimi <fahimitahera@gmail.com>
+Subject: [PATCH v8 0/4] Landlock: Add abstract unix socket connect
+Date: Thu,  1 Aug 2024 22:02:32 -0600
+Message-Id: <cover.1722570749.git.fahimitahera@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801135639.11400-1-hengqi@linux.alibaba.com>
-In-Reply-To: <20240801135639.11400-1-hengqi@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 2 Aug 2024 11:41:57 +0800
-Message-ID: <CACGkMEtBeUnDeD0zYBvpwjhQ4Lv0dz8mBDQ_C-yP1VEaQdv-0A@mail.gmail.com>
-Subject: Re: [PATCH net-next] virtio_net: Prevent misidentified spurious
- interrupts from killing the irq
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 1, 2024 at 9:56=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> w=
-rote:
->
-> Michael has effectively reduced the number of spurious interrupts in
-> commit a7766ef18b33 ("virtio_net: disable cb aggressively") by disabling
-> irq callbacks before cleaning old buffers.
->
-> But it is still possible that the irq is killed by mistake:
->
->   When a delayed tx interrupt arrives, old buffers has been cleaned in
->   other paths (start_xmit and virtnet_poll_cleantx), then the interrupt i=
-s
->   mistakenly identified as a spurious interrupt in vring_interrupt.
->
->   We should refrain from labeling it as a spurious interrupt; otherwise,
->   note_interrupt may inadvertently kill the legitimate irq.
+This patch series adds scoping mechanism for abstract unix sockets.
+Closes: https://github.com/landlock-lsm/linux/issues/7
 
-I think the evil came from where we do free_old_xmit() in
-start_xmit(). I know it is for performance, but we may need to make
-the code work correctly instead of adding endless hacks. Personally, I
-think the virtio-net TX path is over-complicated. We probably pay too
-much (e.g there's netif_tx_lock in TX NAPI path) to try to "optimize"
-the performance.
+Problem
+=======
 
-How about just don't do free_old_xmit and do that solely in the TX NAPI?
+Abstract unix sockets are used for local inter-process communications
+independent of the filesystem. Currently, a sandboxed process can
+connect to a socket outside of the sandboxed environment, since Landlock
+has no restriction for connecting to an abstract socket address(see more
+details in [1,2]). Access to such sockets for a sandboxed process should
+be scoped the same way ptrace is limited.
 
->
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c     |  9 ++++++
->  drivers/virtio/virtio_ring.c | 53 ++++++++++++++++++++++++++++++++++++
->  include/linux/virtio.h       |  3 ++
->  3 files changed, 65 insertions(+)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 0383a3e136d6..6d8739418203 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2769,6 +2769,7 @@ static void virtnet_poll_cleantx(struct receive_que=
-ue *rq, int budget)
->                 do {
->                         virtqueue_disable_cb(sq->vq);
->                         free_old_xmit(sq, txq, !!budget);
-> +                       virtqueue_set_tx_oldbuf_cleaned(sq->vq, true);
->                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->
->                 if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
-> @@ -3035,6 +3036,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, =
-struct net_device *dev)
->
->                 free_old_xmit(sq, txq, false);
->
-> +               if (use_napi)
-> +                       virtqueue_set_tx_oldbuf_cleaned(sq->vq, true);
-> +
->         } while (use_napi && !xmit_more &&
->                unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->
-> @@ -3044,6 +3048,11 @@ static netdev_tx_t start_xmit(struct sk_buff *skb,=
- struct net_device *dev)
->         /* Try to transmit */
->         err =3D xmit_skb(sq, skb, !use_napi);
->
-> +       if (use_napi) {
-> +               virtqueue_set_tx_newbuf_sent(sq->vq, true);
-> +               virtqueue_set_tx_oldbuf_cleaned(sq->vq, false);
-> +       }
-> +
->         /* This should not happen! */
->         if (unlikely(err)) {
->                 DEV_STATS_INC(dev, tx_fifo_errors);
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index be7309b1e860..fb2afc716371 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -180,6 +180,11 @@ struct vring_virtqueue {
->          */
->         bool do_unmap;
->
-> +       /* Has any new data been sent? */
-> +       bool is_tx_newbuf_sent;
-> +       /* Is the old data recently sent cleaned up? */
-> +       bool is_tx_oldbuf_cleaned;
-> +
->         /* Head of free buffer list. */
->         unsigned int free_head;
->         /* Number we've added since last sync. */
-> @@ -2092,6 +2097,9 @@ static struct virtqueue *vring_create_virtqueue_pac=
-ked(
->         vq->use_dma_api =3D vring_use_dma_api(vdev);
->         vq->premapped =3D false;
->         vq->do_unmap =3D vq->use_dma_api;
-> +       vq->is_tx_newbuf_sent =3D false; /* Initially, no new buffer to s=
-end. */
-> +       vq->is_tx_oldbuf_cleaned =3D true; /* Initially, no old buffer to=
- clean. */
-> +
->
->         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_=
-DESC) &&
->                 !context;
-> @@ -2375,6 +2383,38 @@ bool virtqueue_notify(struct virtqueue *_vq)
->  }
->  EXPORT_SYMBOL_GPL(virtqueue_notify);
->
-> +/**
-> + * virtqueue_set_tx_newbuf_sent - set whether there is new tx buf to sen=
-d.
-> + * @_vq: the struct virtqueue
-> + *
-> + * If is_tx_newbuf_sent and is_tx_oldbuf_cleaned are both true, the
-> + * spurious interrupt is caused by polling TX vq in other paths outside
-> + * the tx irq callback.
-> + */
-> +void virtqueue_set_tx_newbuf_sent(struct virtqueue *_vq, bool val)
-> +{
-> +       struct vring_virtqueue *vq =3D to_vvq(_vq);
-> +
-> +       vq->is_tx_newbuf_sent =3D val;
-> +}
-> +EXPORT_SYMBOL_GPL(virtqueue_set_tx_newbuf_sent);
-> +
-> +/**
-> + * virtqueue_set_tx_oldbuf_cleaned - set whether there is old tx buf to =
-clean.
-> + * @_vq: the struct virtqueue
-> + *
-> + * If is_tx_oldbuf_cleaned and is_tx_newbuf_sent are both true, the
-> + * spurious interrupt is caused by polling TX vq in other paths outside
-> + * the tx irq callback.
-> + */
-> +void virtqueue_set_tx_oldbuf_cleaned(struct virtqueue *_vq, bool val)
-> +{
-> +       struct vring_virtqueue *vq =3D to_vvq(_vq);
-> +
-> +       vq->is_tx_oldbuf_cleaned =3D val;
-> +}
-> +EXPORT_SYMBOL_GPL(virtqueue_set_tx_oldbuf_cleaned);
-> +
->  /**
->   * virtqueue_kick - update after add_buf
->   * @vq: the struct virtqueue
-> @@ -2572,6 +2612,16 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
->         struct vring_virtqueue *vq =3D to_vvq(_vq);
->
->         if (!more_used(vq)) {
-> +               /* When the delayed TX interrupt arrives, the old buffers=
- are
-> +                * cleaned in other cases(start_xmit and virtnet_poll_cle=
-antx).
-> +                * We'd better not identify it as a spurious interrupt,
-> +                * otherwise note_interrupt may kill the interrupt.
-> +                */
-> +               if (unlikely(vq->is_tx_newbuf_sent && vq->is_tx_oldbuf_cl=
-eaned)) {
-> +                       vq->is_tx_newbuf_sent =3D false;
-> +                       return IRQ_HANDLED;
-> +               }
+[1] https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
+[2] https://lore.kernel.org/all/20231102.MaeWaepav8nu@digikod.net/
 
-This is the general virtio code, it's better to avoid any device specific l=
-ogic.
+Solution
+========
 
-> +
->                 pr_debug("virtqueue interrupt with no work for %p\n", vq)=
-;
->                 return IRQ_NONE;
->         }
-> @@ -2637,6 +2687,9 @@ static struct virtqueue *__vring_new_virtqueue(unsi=
-gned int index,
->         vq->use_dma_api =3D vring_use_dma_api(vdev);
->         vq->premapped =3D false;
->         vq->do_unmap =3D vq->use_dma_api;
-> +       vq->is_tx_newbuf_sent =3D false; /* Initially, no new buffer to s=
-end. */
-> +       vq->is_tx_oldbuf_cleaned =3D true; /* Initially, no old buffer to=
- clean. */
-> +
->
->         vq->indirect =3D virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_=
-DESC) &&
->                 !context;
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index ecc5cb7b8c91..ba3be9276c09 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -103,6 +103,9 @@ int virtqueue_resize(struct virtqueue *vq, u32 num,
->  int virtqueue_reset(struct virtqueue *vq,
->                     void (*recycle)(struct virtqueue *vq, void *buf));
->
-> +void virtqueue_set_tx_newbuf_sent(struct virtqueue *vq, bool val);
-> +void virtqueue_set_tx_oldbuf_cleaned(struct virtqueue *vq, bool val);
-> +
->  struct virtio_admin_cmd {
->         __le16 opcode;
->         __le16 group_type;
-> --
-> 2.32.0.3.g01195cf9f
->
+To solve this issue, we extend the user space interface by adding a new
+"scoped" field to Landlock ruleset attribute structure. This field can
+contains different rights to restrict different functionalities. For
+abstract unix sockets, we introduce
+"LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" field to specify that a ruleset
+will deny any connection from within the sandbox domain to its parent
+(i.e. any parent sandbox or non-sandbox processes).
+
+Example
+=======
+
+Starting a listening socket with socat(1):
+	socat abstract-listen:mysocket -
+
+Starting a sandboxed shell from $HOME with samples/landlock/sandboxer:
+	LL_FS_RO=/ LL_FS_RW=. LL_SCOPED="a" ./sandboxer /bin/bash
+
+If we try to connect to the listening socket, the connection would be
+refused.
+	socat - abstract-connect:mysocket --> fails
+
+
+Notes of Implementation
+=======================
+
+* Using the "scoped" field provides enough compatibility and flexibility
+  to extend the scoping mechanism for other IPCs(e.g. signals).
+
+* To access the domain of a socket, we use its credentials of the file's FD
+  which point to the credentials of the process that created the socket.
+  (see more details in [3]). Cases where the process using the socket has
+  a different domain than the process created it are covered in the 
+  unix_sock_special_cases test.
+
+[3]https://lore.kernel.org/all/20240611.Pi8Iph7ootae@digikod.net/
+
+
+Previous Versions
+=================
+v6: https://lore.kernel.org/all/Zn32CYZiu7pY+rdI@tahera-OptiPlex-5000/
+and https://lore.kernel.org/all/Zn32KKIJrY7Zi51K@tahera-OptiPlex-5000/
+v5: https://lore.kernel.org/all/ZnSZnhGBiprI6FRk@tahera-OptiPlex-5000/
+v4: https://lore.kernel.org/all/ZnNcE3ph2SWi1qmd@tahera-OptiPlex-5000/
+v3: https://lore.kernel.org/all/ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000/
+v2: https://lore.kernel.org/all/ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000/
+v1: https://lore.kernel.org/all/ZgXN5fi6A1YQKiAQ@tahera-OptiPlex-5000/
+
+Tahera Fahimi (4):
+  Landlock: Add abstract unix socket connect restriction
+  selftests/landlock: Abstract unix socket restriction tests
+  sample/Landlock: Support abstract unix socket restriction
+  Landlock: Document LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI
+    versioning
+
+ Documentation/userspace-api/landlock.rst      |   33 +-
+ include/uapi/linux/landlock.h                 |   30 +
+ samples/landlock/sandboxer.c                  |   56 +-
+ security/landlock/limits.h                    |    3 +
+ security/landlock/ruleset.c                   |    7 +-
+ security/landlock/ruleset.h                   |   23 +-
+ security/landlock/syscalls.c                  |   14 +-
+ security/landlock/task.c                      |  155 +++
+ tools/testing/selftests/landlock/base_test.c  |    2 +-
+ tools/testing/selftests/landlock/common.h     |   72 ++
+ tools/testing/selftests/landlock/fs_test.c    |   34 -
+ tools/testing/selftests/landlock/net_test.c   |   31 +-
+ .../landlock/scoped_abstract_unix_test.c      | 1136 +++++++++++++++++
+ 13 files changed, 1518 insertions(+), 78 deletions(-)
+ create mode 100644 tools/testing/selftests/landlock/scoped_abstract_unix_test.c
+
+-- 
+2.34.1
 
 
