@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-115270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E880D945B0F
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:33:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5867F945B1B
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B9FF1F231DC
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:33:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A39C1C22877
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAC01C3794;
-	Fri,  2 Aug 2024 09:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD2C1DAC43;
+	Fri,  2 Aug 2024 09:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sksh22t1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qbUfU+N1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24C41DAC4A
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 09:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7091BF304
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 09:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722591182; cv=none; b=IQ1IwHs+0q8rEteYe3aNY2IpN2lw/Mysco8mVLrMsSp0KZG558nXGCG7wQn4iRuFy6CgjqTs2l7eugkgmKGTIYJTYkuHIcCqV90iuY3m/wXLISGTqJZRHrbqTnwzsYWGinHfmkJeaJh+/Y5EEqnsZxbIKluRFrHXEiMlZQxgrgU=
+	t=1722591342; cv=none; b=rgzO1ZYatN8tLtOvbBxH9LOayJdOEyYfbOI54TZdNlVwv+6k/333grGLmNq55bqppk3HpYZP+5hN6IREZdWaQT1Kq1JG162rq5MMzj5PjUhfYGx6WmNHeI0Kx+QDZGWQH5ID8pJFPfmZa8MZg/iud57Ydq6v+Ovnn1eArmE3H5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722591182; c=relaxed/simple;
-	bh=AlUPv2MkLJg0dg+B90BqXCcrYz6UkUtfpeJsVH4Xl4A=;
+	s=arc-20240116; t=1722591342; c=relaxed/simple;
+	bh=XZHdqn60yF6PHpZ5aHi0tvgUiUW2wUIHbiPgkSq7mhk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dXQxbAm0BsbWy1b2pR7Xo82zg+FDkQS433MKMayy85xc/Y2Fp9Dx54NGGGtmrwBsQywqdXpo4dHeACIQJTa0lSD7OPWr/c7o+JOi+uRZ0O6HGAtwAIJkm1+UbDuh/Dvphxo8KzWR3g3tWh5By0voJQmXKD8VO9r43lLAUdKCbGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sksh22t1; arc=none smtp.client-ip=209.85.208.45
+	 To:Cc:Content-Type; b=tsADRbaMwCCavt/zyM+aT4/hP5xMow6MbhiAH1IqhQvCqAmrqhsmCAlGCPBiD1AoQJeKoDZX0bNmJkFQOsZxlknsM63ztoYpc3T/r37udUPO4qzuQhN9wQBe84hziDi4qrZh/AVlc+SW+4aV3wCrKV9QTaFeyrOGUtscgwg/L/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qbUfU+N1; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so48420a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 02:33:00 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42807cb6afdso208885e9.1
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 02:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722591179; x=1723195979; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722591339; x=1723196139; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QJLw42eX0x5diEp44ayZtOuH0SE7rg9/HVNWOPkzlp8=;
-        b=sksh22t1hT9fWZMLIJT4ywddkCv37bmmK49uVP6aCg4+4Cmq1i/ZjM86kVtwyNOzbl
-         MyBrXQEEozMdj8iZqne/zF2UzDSFfHhqDAfes9TS/0vtAltZzldb8HoXnFrPagqqTkbF
-         BpoIWSQnSPQ5AVToKKpsWizax61TnvypMMnXFEQdPP0ziRgi+ckPLiiGlCc7y/g1UFQj
-         wvnuYTEV7YV7pHyUWc1MVq6arKL6JwdQ4e1ETf69HL3g1B7EmhPeehL8FLGi5E+HZ64o
-         WAqecE9j+nzDPK0P/hMtL2Ngo6i0XJCf3twkbbG17wpzlTtfhOvkQBhrwkg00l/D7T15
-         w+5Q==
+        bh=XZHdqn60yF6PHpZ5aHi0tvgUiUW2wUIHbiPgkSq7mhk=;
+        b=qbUfU+N1AwXFRu8kZOuI97QuRi1V3jg2CORHXiQ97njNn2KT3CYDTf8SDWxRI3pkCb
+         3BCguc8K/O5OQ/8YeIL+KpWUH21o2JTGq5A4G36cEyDTgtJ8HPjblYedZW6GClmnCkEg
+         WwhMPs+OC5rZsTLKr7wJTFOcMtNx1O4OqXXILnXXdSU3JFDoiCRCZxOcy4vFXzvVErzb
+         mB5f/hcG5kaedeEyN1BUwZqnc7fd6PpUxl2M+1GVaN3pCJSthp3sGs19S9EaBvYOfOfC
+         AL1sVDyg0TMGDHYcmG/b52dOe7Eu0JFs94Tr954pTEzpL3LsY/yZlcQ3jpSqmdvrk3sB
+         0H/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722591179; x=1723195979;
+        d=1e100.net; s=20230601; t=1722591339; x=1723196139;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QJLw42eX0x5diEp44ayZtOuH0SE7rg9/HVNWOPkzlp8=;
-        b=QyRQmVu2ZybXC1udMUmRXIZO5tOoLxkGZsutuyUSjchH9iuyuFmkLaUFKprJ8ZtiIX
-         yRJ6gdYrk2ENf30FNwmbLM+V/gfodMEOApBozUPpksJjaAVI7HkJVsAg4Kblbj2GjPKK
-         D0pzUMwqhzn8UpQPwSc59UftSLhJXTZypZqS5TfODGBGKfGGrNnwuiTeq6/uy9OeL+4F
-         NbWVYaDWFCLte7c4rHTsi+idNdp4nwQKXsn2s3cYhTtdXBRn60Rlaj01NmCafhEdP2Xt
-         r1ydRZCi7o+m39DGDDqb2sLYd9YD/y7cTsiGKUMflUu6cWitMqi5+0LeBwAhGuqOERKv
-         X+6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUWWI2GYJ1Wh8X/o9MstJjBfsPdKJ2lx9c89nW8hmDmWK/uCf907TaDthc1Q1fgqKCy41OwvhWCaIW7ZDLwbjUay+Zt+ykE
-X-Gm-Message-State: AOJu0Yx30IG0R/Em6xjdP9zqNCFgYjogWzDI4smKRZm2SDo1kTqZt7TH
-	raATla0v5xfx1Ny4vgo4P7iNIi/JWCFxvPHisUJKqkuJR+JhMSvscOgWWUGGXr2cAxGmkuNCJBD
-	2UIYbUoJm6Sg0H4oZfgnevbl863yhYPhAVNQx
-X-Google-Smtp-Source: AGHT+IFgny2NzFbumeqzbvER3SREZ3wNxMj5Cw5GXaOsA2EbzcD+Ji9J2UYIcXkkbwcw2Umx8SvmjU8fAPkL/XeNAMI=
-X-Received: by 2002:a05:6402:358e:b0:58b:93:b624 with SMTP id
- 4fb4d7f45d1cf-5b870c69d67mr84363a12.1.1722591178614; Fri, 02 Aug 2024
- 02:32:58 -0700 (PDT)
+        bh=XZHdqn60yF6PHpZ5aHi0tvgUiUW2wUIHbiPgkSq7mhk=;
+        b=URXm2VXLTpiJLS1Soh+a6FQuOW8om66k+6HQsNR0IYKK7DVbYeUyrVVc5AvGOXD3mo
+         SIzsN6p1n4rVzhSXdIzvTzkhDlido6d1Mr5wXAWiRBK1LzNlKfs66hTYnu/nBlg6/fWw
+         pVvLP9uOlKUgq6E4pDPfHky4NQbKRhtq2eVECMqL5X+hA5tAKRE5HoW3TMoMNzvwqomg
+         xKowISx/9czR0J//gDqCsRaggTrReo3nJumNhaH2oc6N1K5w0H6X7mgW5YqoneI5ok3c
+         3MIBl/oV9Ks2o60OK8FUygijBPx8obhh23fP9PJj6SP2+qysf8CHphRsjKOa/Yd7zoM3
+         tC1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWMWOdxZhRrYWcJAh3KNYxKuyFI7b/wqtp9Lk7IMXyRPlnm7DL5IcKQ7dx5BbNP6tQDtKdaEWUltNjuXvxB+lxUh5bc8Zp/
+X-Gm-Message-State: AOJu0Yz9QhEmhHT9HHojrBaJCCVB8UW56w7cV9Fgki+1/RyU5y/sZwO3
+	+KVBKAdwFYnbErCUldCz2BHzVhz9G9SsLSF7WBn4kcdJT3e8RhK0FgYQ5v/fYiBkRKH05CNasAK
+	/TIEoqVaVURr3Dis0nJEOc9dbknOaz9l1jid5
+X-Google-Smtp-Source: AGHT+IHjUf4oahb1dp1J7DoabWxAycsCYh75rvfadKcbZw2pTRTIotD3kwILWrjO0X1Y2jFWhsxlQqQZ7ixmL7jpVVk=
+X-Received: by 2002:a05:600c:1d20:b0:428:e6eb:1340 with SMTP id
+ 5b1f17b1804b1-428e9a9d900mr831065e9.4.1722591339279; Fri, 02 Aug 2024
+ 02:35:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801145444.22988-1-kerneljasonxing@gmail.com> <20240801145444.22988-8-kerneljasonxing@gmail.com>
-In-Reply-To: <20240801145444.22988-8-kerneljasonxing@gmail.com>
+References: <20240801145444.22988-1-kerneljasonxing@gmail.com> <20240801145444.22988-6-kerneljasonxing@gmail.com>
+In-Reply-To: <20240801145444.22988-6-kerneljasonxing@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 2 Aug 2024 11:32:47 +0200
-Message-ID: <CANn89iLdtAKvat8bUwrpgQLqLeOTP6VKfU3WEJKcovRDysAE0Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 7/7] tcp: rstreason: let it work finally in tcp_send_active_reset()
+Date: Fri, 2 Aug 2024 11:35:28 +0200
+Message-ID: <CANn89i+gpyrzH_gd0oyrfnMovx0B6FWGS+7KKLydaKayFXh_sQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/7] tcp: rstreason: introduce
+ SK_RST_REASON_TCP_KEEPALIVE_TIMEOUT for active reset
 To: Jason Xing <kerneljasonxing@gmail.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
@@ -89,25 +90,17 @@ m> wrote:
 >
 > From: Jason Xing <kernelxing@tencent.com>
 >
-> Now it's time to let it work by using the 'reason' parameter in
-> the trace world :)
+> When we find keepalive timeout here, we should send an RST to the
+> other side.
 >
 > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/ipv4/tcp_output.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 16c48df8df4c..cdd0def14427 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -3649,7 +3649,7 @@ void tcp_send_active_reset(struct sock *sk, gfp_t p=
-riority,
->         /* skb of trace_tcp_send_reset() keeps the skb that caused RST,
->          * skb here is different to the troublesome skb, so use NULL
->          */
-> -       trace_tcp_send_reset(sk, NULL, SK_RST_REASON_NOT_SPECIFIED);
-> +       trace_tcp_send_reset(sk, NULL, reason);
+
+Note that this changelog does not really match the code.
+
+We were sending an RST already.
+
+Precise changelogs are needed to avoid extra work by stable teams,
+that can 'catch' things based on some keywords, not only Fixes: tags.
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
