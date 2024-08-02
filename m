@@ -1,76 +1,96 @@
-Return-Path: <netdev+bounces-115363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8BDA945FCE
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:02:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E790945FE9
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 615861F22BF4
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:02:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D6A28422C
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593082139B6;
-	Fri,  2 Aug 2024 15:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18F32139C8;
+	Fri,  2 Aug 2024 15:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8ykICnu"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="wN8R0xH/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35D8B2139A2
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 15:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2021B2101B7;
+	Fri,  2 Aug 2024 15:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722610910; cv=none; b=BlIecqaKtLGIB7DR8X+1JWXc7tvoyuXfHfCvvzVdyLYXGKzHhfS6UZ7R5VjmUnE2v6x79VXx35NMg+M1NPvQQomVKRGUNwWjxptJudI/PgHAHMCLZ1LwwOFDmUxZCL5s12wRvXoXhOihRTN4pUag85Cx/oWo3BCtW0JTwVAVgQ4=
+	t=1722611297; cv=none; b=ip1VT1hwY/51U6iHueNQNrNr7Q0vkVi6hgSO8BAMxdM+VcsgseBKMaVHQq4KL0do4OyvM6A/7Mq2fH0aNXAjUZ9wjHI25cyPijs+uaYJqwOBN1l324Thatlh8ybVlMTer6PMH019tdik6ooSl2CL9XjlNJh9opQNW5BHG7y/jQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722610910; c=relaxed/simple;
-	bh=ijYQDnHqWDf8gx+zcfEzq/82UW/8PtNr0g1u3y3auIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HWPJky0WDvGjtVXQitr/0MXhI0xFYJI2EvN5l+UI/A86LGN//HPXIx0d6I4kwNi2fRVfCmp6D7EJLNOR5eesf/DQyCzwqGaXJIQRKG+nIoMgtiFpyHy7K4vcaQpf5ICQXtwzovofjHE0JdAJ4pxa70mNpDo0Gl3HB+7PPCWJGUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8ykICnu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 831ACC32782;
-	Fri,  2 Aug 2024 15:01:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722610909;
-	bh=ijYQDnHqWDf8gx+zcfEzq/82UW/8PtNr0g1u3y3auIc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o8ykICnuQg+QbyDVGd+yzu5tiZ/4V6SrG8m5/y0sVaoTV/mW5qFiEyQBvCEUYqFaI
-	 FzkRofIzLFmGPP5hHAjy8TqHsRn5SGcr5eoAeH12JNtPmaH8PeVPX4n2pXKUH/zNPP
-	 t02B4DLv5efeXCjClW61uy/pDrNkrwFd9oItZijcU+VJNHy+Nq1jR9OKaOi98oCZEi
-	 UX8OmkyYydKkQw85878DK8fx+K9gcNmoOKgJdqdQcNX/4mAMnI60s7zEVBlIkp7okR
-	 LDFBA3nQmohmbOic9fd0TW6dPztrybAwbas2aJ9NaYyYs8w4PdDGotfAyYPraa+HfP
-	 OoMP9roag85NQ==
-Date: Fri, 2 Aug 2024 08:01:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, kernel test robot <lkp@intel.com>, alexanderduyck@fb.com
-Subject: Re: [PATCH net] eth: fbnic: select devlink
-Message-ID: <20240802080148.53366633@kernel.org>
-In-Reply-To: <20240802145038.GE2504122@kernel.org>
-References: <20240802015924.624368-1-kuba@kernel.org>
-	<20240802145038.GE2504122@kernel.org>
+	s=arc-20240116; t=1722611297; c=relaxed/simple;
+	bh=9YHLzEBPhAU5AwpROppk2stTQe7p9Sm7x8VdtUFvPA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m7h/eLtuqMmL0SNbr1p6zWm4LrkIKJSNfA6XbkC9Yl5dn+pygS7DCekfNDwzrO3KAKWjNzw6Z34NQ+nRqx+4hu1/LEj62X+8n65G31910bTHsd+zMXwhOs9y57BlRByQ2xzYwHeB0ptb04UW7/1y16P+xPgWjzpTULTx+lnbfP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=wN8R0xH/; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
+	by perceval.ideasonboard.com (Postfix) with ESMTPSA id B3F24524;
+	Fri,  2 Aug 2024 17:07:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1722611244;
+	bh=9YHLzEBPhAU5AwpROppk2stTQe7p9Sm7x8VdtUFvPA0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=wN8R0xH/4h5vT6keuaysM6cahOylGdms88O4eQlDOpVO/Gimy1l+Tq8Jf2VrH63Ve
+	 njCPmetacH0fLMeQ3Q3D9W1I15bXqzK4HesZRs+lA+EgTpi0WzXoj2DGdiX2tL+7HF
+	 CwIc3cLb04j7RGu8giXKun3HXgQB4en3xDz5lBQ0=
+Date: Fri, 2 Aug 2024 18:07:53 +0300
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc: Sakari Ailus <sakari.ailus@iki.fi>,
+	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
+Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
+Message-ID: <20240802150753.GC2725@pendragon.ideasonboard.com>
+References: <20240722111834.GC13497@pendragon.ideasonboard.com>
+ <CAPybu_1SiMmegv=4dys+1tzV6=PumKxfB5p12ST4zasCjwzS9g@mail.gmail.com>
+ <20240725200142.GF14252@pendragon.ideasonboard.com>
+ <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
+ <20240726105936.GC28621@pendragon.ideasonboard.com>
+ <CAPybu_1y7K940ndLZmy+QdfkJ_D9=F9nTPpp=-j9HYpg4AuqqA@mail.gmail.com>
+ <20240728171800.GJ30973@pendragon.ideasonboard.com>
+ <CAPybu_3M9GYNrDiqH1pXEvgzz4Wz_a672MCkNGoiLy9+e67WQw@mail.gmail.com>
+ <Zqol_N8qkMI--n-S@valkosipuli.retiisi.eu>
+ <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
 
-On Fri, 2 Aug 2024 15:50:38 +0100 Simon Horman wrote:
-> But while exercising this I noticed that PAGE_POOL is also needed,
-> which I locally resolved by adding:
-
-Oh, good catch. I'm a bit surprised how slow kbuild bot is :(
- 
-> 	select PAGE_POOL
+On Wed, Jul 31, 2024 at 03:15:39PM +0200, Daniel Vetter wrote:
+> On Wed, 31 Jul 2024 at 13:55, Sakari Ailus wrote:
+> > This is also very different from GPUs or accel devices that are built to be
+> > user-programmable. If I'd compare ISPs to different devices, then the
+> > closest match would probably be video codecs -- which also use V4L2.
 > 
-> I can provide a follow-up patch after this one is merged.
-> Or perhaps you can address this in a v2?
-> I have no preference either way.
+> Really just aside, but I figured I should correct this. DRM supports
+> plenty of video codecs. They're all tied to gpus, but the real reason
+> really is that the hw has decent command submission support so that
+> running the entire codec in userspace except the basic memory and
+> batch execution and synchronization handling in the kernel is a
+> feasible design. And actually good, because your kernel wont ever blow
+> up trying to parse complex media formats because it just doesn't.
 
-Please send your version with both selects, I'll mark mine as superseded
+I don't think V4L2 codecs parse the bitstream in the kernel either, at
+least not the recent ones.
+
+-- 
+Regards,
+
+Laurent Pinchart
 
