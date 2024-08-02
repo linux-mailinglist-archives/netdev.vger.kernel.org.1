@@ -1,88 +1,84 @@
-Return-Path: <netdev+bounces-115319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04DF4945D39
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:24:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A2E945D3A
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35C8D1C20C88
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:24:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04174B20DA3
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66461E2118;
-	Fri,  2 Aug 2024 11:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90B91E2109;
+	Fri,  2 Aug 2024 11:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="O/pGx1kP"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ED3xD3WQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D501C1E2105
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282B61BE87A
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722597828; cv=none; b=fNYnqpMtM5Pe0Ichf/u8l1SWOaXNsUj9KbkOYFnCk0bISflr6zNZQS7IC+zASxFAeCb0mPRuNuNu6nitaG2+TvHH9ikHW0zKkY8jJ+HUIDFp4y1wfHUU38KC/g7WBKQ+OVT63nEEwzNV4PIcMneNriT1xrYehKXmZzKQjDtAqEc=
+	t=1722597982; cv=none; b=QXjPJxnhpXTKZ+7Y8UcEslLFqAZsq4WUPrURAwIt9GgoMt86dSuP4HVHNwSg13OQ3ieEHPqsEuxaN72UXYZAbub7DIbYL82eWZexz9u1nboN7lHFyq7ifDXrvRbt4Gba86f5j+av++dJt+1jBVr2ehtqabM3e0ulh+hoM9aZ/LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722597828; c=relaxed/simple;
-	bh=Uk5QlZ/o+Y1LgMCy1yQr9gNrxEU9ASYAUhhbHpBCN60=;
+	s=arc-20240116; t=1722597982; c=relaxed/simple;
+	bh=r5bPLq7YVTWAbAepM2udvHq7wAklkSEMSNjaiuDyQdU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O0YE/idxBuFt26UHPMs/AEk7e4OxLVvWIhWlBQvhpDB/9jalkofJNT4hzPFfbF1s9/QWwtSqI+eP5fddF17Ec632GXGOzw9/IQtE9bzkAWHFPeDPVqQzRcXeZBfgs4LIM2u2CsumPVLDH9F4W54LmTDmzhNtR1L+7PwEd5cSjOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=O/pGx1kP; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso58623165e9.3
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:23:46 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=TuS1fEPAFZf5D5OxBmjlIij+Gi4pf0naGbLMK3O0M87Vvv0LNtTocJS4h2GJIfkcKex8Y/FtdEjRb16noEEiLrbdnT5wSP79cc8hJJjm3lmETV6Xs0rmscW7j38/muhFvZerFgyWd4iaPpo+bgBaW3AEQ+FaGsvkXCul5jJkWO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ED3xD3WQ; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a79df5af51so5557533a12.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:26:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1722597825; x=1723202625; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vOdNo47Fhx4KRjytkczL/7XqSaQmLUQjrAhWJDoAzcs=;
-        b=O/pGx1kPizaLipDXZ8JMk/MkRAasmTQ8VJBHUoxY9I9sSmNHMdO2BQrAV42xV7DDb9
-         QO4oVaaG9NzyWWjp021pAhPPH23wWvWU7wBxu1iCIAd6v8IVFUORPm1VoYdiremfIKYV
-         7BKVc0ccDZE4TvrMb+hns1fYmAwRLbY+CRj8Q=
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722597979; x=1723202779; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9m07A/HbWuQ7grysUQ4vixCSF4Dg/OIQ2NT9plhBuz0=;
+        b=ED3xD3WQAUxatwK2JjAsEUuEaG8/PO8mJP2KNbTSFIM0KlhfMfRNxzcaUMJ1YCi0zE
+         w4Hf/IqCyz/8PHeuIUTpk6UUNxCrqZQtj2MOCy4M3DScKgHmMfbMMNtnFUaxRxfM+k5e
+         /a502LKjBeU8DbgH2hS5x0YO4n4+37rPC7BTiWS9xuP3SP5dNlfVeyXraHwJ1HizBpqc
+         1NXzlvt51CNiTqCWOXvWRKeCJ3E1QwWdPtSMnp/Y/uZ6oZYb8o5YYcAayLnaEEg4+ArB
+         8pa6mxkK7jvh6tr+ehR2J/aOagLOIJbNv2YMS4LTR8fZ7mwBS/Fxw9nvHR3vShtxA5y6
+         0RDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722597825; x=1723202625;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vOdNo47Fhx4KRjytkczL/7XqSaQmLUQjrAhWJDoAzcs=;
-        b=bKv6YfW1fl0bSg1VPR+WQyhIY0XOhI0rfxLxaz6Fw4V8ZyBpzEc9D6AG9rPj9ZCRAX
-         ZlBzzqh4X5fVPYAOVAzyBPMqrTJbDxNAEMMJZkU7trQW8O5Iuug5gIdG0XcKme8s6RKm
-         x/Ud5aHdIPq4bkQoNphtYJWddRi1rpNMcqIJV9b4sQaXKKI5G3uhOABiO+xM8Lk3t26d
-         6kmbyKNxfY3KsInXUSvpvl2EmFBkJFLKunALIHErQeLa3YBmKO+QZMpaezAset7tZT7I
-         o2KRumXPtfZxH/IUEUdjM+rRzXeKfgHRMLrAExq78p9GGAQ7ee1NIbsJTbLiBz2Nzw6M
-         83/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUD9S6kVMM2tacWBB/OXnlIaw0+/cHCof9GM/5Anhh0KuE396U+NNk/BmThAqzHX8aT6ZabFZaRJJqEr1E/piqqqBejWTJT
-X-Gm-Message-State: AOJu0YzC8jUwN+eKvPg0lcDsPd7uzNfOKFc7CdnRJyaeGn3ocB28sHc0
-	z6uT2Kw1DBtzXsou5gMbCSo+5bmUnyrHS5kh0y47D4qyM1o8g96Ns8O/9H4t1dw=
-X-Google-Smtp-Source: AGHT+IEIKL9J9Rlk0ZXwhk+Crvyi5orv00/0yWHgsd0s5nSQA6xxO90I+TOR4qGrOGwtS+FmnE9e2w==
-X-Received: by 2002:a05:600c:46d5:b0:428:e820:37b6 with SMTP id 5b1f17b1804b1-428e8203ceamr18747765e9.31.1722597824965;
-        Fri, 02 Aug 2024 04:23:44 -0700 (PDT)
-Received: from LQ3V64L9R2 ([62.30.8.232])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8adc7dsm90595485e9.14.2024.08.02.04.23.43
+        d=1e100.net; s=20230601; t=1722597979; x=1723202779;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9m07A/HbWuQ7grysUQ4vixCSF4Dg/OIQ2NT9plhBuz0=;
+        b=aziV49q/V/QacS8HLhSKUsjQOijREh88s4RjFG91SZociks5r3jw26EUTImw0zqjEc
+         Z0i919i79FPvOrIO7gkcOB1wxCxr3q5h6jyu7cfona1V0IT0rQR1Qw72WehQ2O0L6wrL
+         gDAPJIJw67hjqv7wAnDTiu48KORpuB6KMd5O9eRdftCB9O2Ps9JS3P4ht+PSziiROms8
+         +2oO4Q0LCdG64wYE1diK473RsMCS8f4XmsDC8hoRO3Brep8T6XHYeuDefQUyNC+PmsRC
+         ViFMQnEmTXULbpInZNXHVjm9sdarf4NGRph/Bif95GAg2qwWemrVgEl5hO/x5LlTVQLa
+         0gZQ==
+X-Gm-Message-State: AOJu0Yy/9py/zpu3zOSkQdBfqGeOIcuIQL3shVhmkE0P+nSPBURiEfSY
+	dXaDaHSu35c77PnTReMDbb6FhpB9UQYOGn/AS4OvVypdCrqR2N6RcOxn8OyVIAM=
+X-Google-Smtp-Source: AGHT+IHc5rf0PMCHNXBF8/xiStf5aXoc7w3pseeGg2dtemLLlmV21RfY1JaOgP7oBgI7yOmhri2itA==
+X-Received: by 2002:a17:907:d8a:b0:a77:c051:36a9 with SMTP id a640c23a62f3a-a7dc5fb4baamr283353666b.9.1722597979275;
+        Fri, 02 Aug 2024 04:26:19 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c0c0e0sm89242166b.67.2024.08.02.04.26.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:23:44 -0700 (PDT)
-Date: Fri, 2 Aug 2024 12:23:41 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
-	przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
-	gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 01/12] selftests: drv-net: rss_ctx: add
- identifier to traffic comments
-Message-ID: <ZqzBvTmsmhPoLb_f@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-References: <20240802001801.565176-1-kuba@kernel.org>
- <20240802001801.565176-2-kuba@kernel.org>
+        Fri, 02 Aug 2024 04:26:18 -0700 (PDT)
+Date: Fri, 2 Aug 2024 13:26:17 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
+Message-ID: <ZqzCWQwACMQ3RQaw@nanopsycho.orion>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,36 +87,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240802001801.565176-2-kuba@kernel.org>
+In-Reply-To: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
 
-On Thu, Aug 01, 2024 at 05:17:50PM -0700, Jakub Kicinski wrote:
-> Include the "name" of the context in the comment for traffic
-> checks. Makes it easier to reason about which context failed
-> when we loop over 32 contexts (it may matter if we failed in
-> first vs last, for example).
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/drivers/net/hw/rss_ctx.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> index 011508ca604b..1da6b214f4fe 100755
-> --- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> +++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-> @@ -90,10 +90,10 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
->      ksft_ge(directed, 20000, f"traffic on {name}: " + str(cnts))
->      if params.get('noise'):
->          ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
-> -                "traffic on other queues:" + str(cnts))
-> +                f"traffic on other queues ({name})':" + str(cnts))
->      if params.get('empty'):
->          ksft_eq(sum(cnts[i] for i in params['empty']), 0,
-> -                "traffic on inactive queues: " + str(cnts))
-> +                f"traffic on inactive queues ({name}): " + str(cnts))
->  
->  
->  def test_rss_key_indir(cfg):
+Tue, Jul 30, 2024 at 10:39:45PM CEST, pabeni@redhat.com wrote:
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+[...]
+
+>+const struct nla_policy net_shaper_ns_info_nl_policy[NET_SHAPER_A_WEIGHT + 1] = {
+>+	[NET_SHAPER_A_HANDLE] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
+>+	[NET_SHAPER_A_METRIC] = NLA_POLICY_MAX(NLA_U32, 1),
+>+	[NET_SHAPER_A_BW_MIN] = { .type = NLA_UINT, },
+>+	[NET_SHAPER_A_BW_MAX] = { .type = NLA_UINT, },
+>+	[NET_SHAPER_A_BURST] = { .type = NLA_UINT, },
+>+	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
+>+	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
+>+};
+>+
+>+const struct nla_policy net_shaper_ns_output_info_nl_policy[NET_SHAPER_A_PARENT + 1] = {
+>+	[NET_SHAPER_A_PARENT] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
+>+	[NET_SHAPER_A_HANDLE] = NLA_POLICY_NESTED(net_shaper_handle_nl_policy),
+>+	[NET_SHAPER_A_METRIC] = NLA_POLICY_MAX(NLA_U32, 1),
+>+	[NET_SHAPER_A_BW_MIN] = { .type = NLA_UINT, },
+>+	[NET_SHAPER_A_BW_MAX] = { .type = NLA_UINT, },
+>+	[NET_SHAPER_A_BURST] = { .type = NLA_UINT, },
+>+	[NET_SHAPER_A_PRIORITY] = { .type = NLA_U32, },
+>+	[NET_SHAPER_A_WEIGHT] = { .type = NLA_U32, },
+
+Since this is the same set as above only extended by parent, wouldn't it
+be better to nest it and have it only once?
+
+[...]
 
