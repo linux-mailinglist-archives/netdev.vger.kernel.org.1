@@ -1,104 +1,98 @@
-Return-Path: <netdev+bounces-115434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A819465F8
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:47:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8BF19465FC
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B19281C21035
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 22:47:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04DBF1C21863
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 22:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B60A65E20;
-	Fri,  2 Aug 2024 22:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35FEB139D16;
+	Fri,  2 Aug 2024 22:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R7MjmMOO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmhwDZJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93DE1ABEB6
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 22:47:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046A81ABEDD;
+	Fri,  2 Aug 2024 22:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722638830; cv=none; b=rEsNVDxmtv1KRj+nGDR1gyWF8TXMnq1PRbBQu96YDx83bSpXVbi1AyrK3K/vbGlPZNVlXQB8mFk7rAIUpNsJQ+zRCDRIXMEgmUG3V9bO8nn/BhtKAfEAt/I/NN1pxSKsKPZsZIYsJHNa3igTnCmLQjuBVOEMGa4eXNYJjfcwdHg=
+	t=1722638913; cv=none; b=iVqBx0UGjpLxeu7+R6dNP22zhRvA+A+AitoqH7Pvua2LU0pUejCmhQvxaJMHjplCbc238yB62a8GAG/pO1QydGInV7yB5OdJLJHcmsJw9AYDKiBP0HqEib/8ARDmRaBBtBM8TJxgEjTsDdxY4LCZNNhv9eVQD5sK1ZwfBdisppk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722638830; c=relaxed/simple;
-	bh=THbTUedfPNKqjs96TIhUgzsZRFAOtZ7uuHKn4O5aN+w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gibwyonYn9sk5CLyIsZZvivHUZB9AykbmtliirA2Lxj3ukrFW03h/QELLX6z3UY9IJPxD/D9bfQM/bZhfyMUp7KMpJDIbyg75HgEwflNtBOFsS98YTdoXVSsQdJYabi6QicB8SKIZvxFFEQyrnRE7YPWvkr9qqGati31MDfqV9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=R7MjmMOO; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52f01ec08d6so12476339e87.2
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 15:47:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722638827; x=1723243627; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=THbTUedfPNKqjs96TIhUgzsZRFAOtZ7uuHKn4O5aN+w=;
-        b=R7MjmMOOKwoGcyWXPdAKmjHimBgssKNjw9vulms0y4bUDk887y2Dyb3sQSOuwk8n+4
-         nkRd0SSX+k9hauZhvhv1Mu4ObP3m1+X4RZwAhg2fw2DUkztNmV8zdxC3/RzTPae9ZNwf
-         enPSuIApxI0Mjdj41YsVXVvIrAuOMnOIhuXrruG1fg60AC4/S8IbK4ZYjs+5dUDlGqSw
-         54Ae0Dj8dOowo5KFG0HSoCxb5mVpKyDdXSxWj0d8H8Em/Ydc4tnQ0xR5GlkLBpIrZxXB
-         SKX7i7bgd/MqeNhde8RRxpW7zASaN+hZpJe+jTmaIlQ4Cxh/3GEhnVf5ZLgqxrrVozmX
-         7Z6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722638827; x=1723243627;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=THbTUedfPNKqjs96TIhUgzsZRFAOtZ7uuHKn4O5aN+w=;
-        b=uojpWwPEOM/xGOQkT5aNmF/bq21kAE6Em9rDvn7F/NOXFz0IaQc5LQkFzm0dKlWxlI
-         qpnvD2tP4rryWp81CwLyuk/kq7D4JfnomBWfMWip912QzVc3xvd5B1msPUOqWNAdqYCe
-         vgJQOkpWEjK2XwQKFoc5rPbtYAIUyzsrfDOkSOH27+WsMH+Q9odJEz6yqKvDcxczKpbx
-         GwO1dhyefgxgTQODgHrsCCBP+5ych1HdlMpRX3iLvtgwQfpViqPvrNsKkzDjk1bml+2v
-         /GTa0pnw1ig1fpn6ImRTkaHyi8+rGsAhh1lr+YVHr3j81sWilYK1JGiOJMSR74OG95qE
-         bs4Q==
-X-Gm-Message-State: AOJu0YzFNl89rY5XRcTHP+8VXhJHSR2+xcYElb4t8+WU+kdhMA9yhJks
-	k1fQCKCnRNI7XE3g0/0X1UmM3++xrvP3/knlhWkOAqQccVIqv1DeVJfxSG/jwXZJ/M2MsdPTPju
-	nc3DWa8IJirB3mY64TKvHel9Vz4nDogLRK6QMhg==
-X-Google-Smtp-Source: AGHT+IHaxphvvVOqZtyqFT8jtOs3FeykDhzmXg4r2inKAxkSbJwEECQUJ7Z9cz9h3d+4wk/yzyUeMpDU1gIrN18B/T4=
-X-Received: by 2002:a05:6512:128f:b0:52f:c24b:175f with SMTP id
- 2adb3069b0e04-530bb374350mr2990086e87.20.1722638826801; Fri, 02 Aug 2024
- 15:47:06 -0700 (PDT)
+	s=arc-20240116; t=1722638913; c=relaxed/simple;
+	bh=u1OvSoK1rFbwNdxFMjcrpR4gd5lDO5xx65Jvjp77uVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r3ol3y9C0rsn5n6hw6u/E5QImeS1dESajPtmYaNDbyvwpfzaz25Yoc/Z6Uv9YM6KtwKXrNzSbOiZ9Hdcq8dWxw5ZMYpNW/z9uAYrRHI1/dqoUcl+4T37MwA6HvGakskqUPUsR8zIBTGHxgeIdCuP16GrQsmrss4Es/z6XrEUgwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmhwDZJG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFB9C32782;
+	Fri,  2 Aug 2024 22:48:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722638912;
+	bh=u1OvSoK1rFbwNdxFMjcrpR4gd5lDO5xx65Jvjp77uVU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qmhwDZJGgTnu1+dpNZRrJeHfPTNenRtIC8SNAzseHLplj1qdOKt0FQZPQGlT15c8V
+	 8pj46mhNxENKcPsgA2mAz+0amh7io/z3VkHcuOMgN5xsaOeBWnYR3cgRswuh1IxzOK
+	 twMOW7zE2Bu1GrvvPya+EDlXdGALAdr23yxnCeB8yd/L085d9++zzqzU2gOd9rViso
+	 gWXEnKjXWao4MW1TpXUYsQzllc7Utkk30HZDwEHxg1rdP1VZ2ssK3b7scVBtTPHy2o
+	 zbELD7LwlL5KYu4zqdADVyBwlFIwYWdL5CQfE782dbdpLlfopUz0xfan84SMNvOlcr
+	 axu/1/O1tosjg==
+Date: Fri, 2 Aug 2024 15:48:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Serge Semin <fancer.lancer@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Alexei Starovoitov <ast@kernel.org>, Andrew
+ Halaney <ahalaney@redhat.com>, bpf@vger.kernel.org, Daniel Borkmann
+ <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, linux-arm-kernel@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo
+ Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RFC v3 0/14] net: stmmac: convert stmmac "pcs" to
+ phylink
+Message-ID: <20240802154830.7b147f75@kernel.org>
+In-Reply-To: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
+References: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729210200.279798-1-paweldembicki@gmail.com> <20240729210200.279798-2-paweldembicki@gmail.com>
-In-Reply-To: <20240729210200.279798-2-paweldembicki@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 3 Aug 2024 00:46:55 +0200
-Message-ID: <CACRpkdb_7R=B6Ud_PdbrPA4JQViMBLeyAqSbga7-Ljkq0T3M8A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/2] dt-bindings: net: dsa: vsc73xx: add {rx,tx}-internal-delay-ps
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 11:02=E2=80=AFPM Pawel Dembicki <paweldembicki@gmai=
-l.com> wrote:
+On Fri, 2 Aug 2024 11:45:21 +0100 Russell King (Oracle) wrote:
+> Subject: [PATCH RFC v3 0/14] net: stmmac: convert stmmac "pcs" to phylink
 
-> Add a schema validator to vitesse,vsc73xx.yaml for MAC-level RGMII delays
-> in the CPU port. Additionally, valid values for VSC73XX were defined,
-> and a common definition for the RX and TX valid range was created.
->
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+we have a build error here inside the tasty layered cake that is the op
+handling in this driver (from patch 2 to 13, inclusive):
 
-Elegant!
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+In file included from drivers/net/ethernet/stmicro/stmmac/common.h:26,
+                 from drivers/net/ethernet/stmicro/stmmac/stmmac.h:20,
+                 from drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c:=
+19:
+drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c: In function =E2=80=98=
+stmmac_ethtool_set_link_ksettings=E2=80=99:
+drivers/net/ethernet/stmicro/stmmac/hwif.h:15:17: error: too many arguments=
+ to function =E2=80=98priv->hw->mac->pcs_ctrl_ane=E2=80=99
+   15 |                 (__priv)->hw->__module->__cname((__arg0), ##__args)=
+; \
+      |                 ^
+drivers/net/ethernet/stmicro/stmmac/hwif.h:485:9: note: in expansion of mac=
+ro =E2=80=98stmmac_do_void_callback=E2=80=99
+  485 |         stmmac_do_void_callback(__priv, mac, pcs_ctrl_ane, __priv, =
+__args)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c:419:17: note: in expan=
+sion of macro =E2=80=98stmmac_pcs_ctrl_ane=E2=80=99
+  419 |                 stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, priv->hw=
+->ps, 0);
+      |                 ^~~~~~~~~~~~~~~~~~~
 
