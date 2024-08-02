@@ -1,116 +1,132 @@
-Return-Path: <netdev+bounces-115185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C17D94560A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:40:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A455945620
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:55:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1067C1F246B1
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:40:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BB6C1F23956
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C69B168DA;
-	Fri,  2 Aug 2024 01:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB38E56A;
+	Fri,  2 Aug 2024 01:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BleUUNCp"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IZVHZ0B2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F7212E71;
-	Fri,  2 Aug 2024 01:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFFD2572;
+	Fri,  2 Aug 2024 01:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722562833; cv=none; b=OjdBWxrnlj1kBu0cT/u1YpGM+i9a7WPZsf525NLT3iWGt8flRFuRXfiOHQ6GanKX2RC8dzb9PKGSiyOsDEfHKryF3ESpEMb385rwmC9AapNN/E25j6Lm2XwTumaRdVTNtD2wzRbjIpWCJoHPTuo84GSmtA8NuJiVVfzSugfQT+0=
+	t=1722563722; cv=none; b=LBHcGEOw0rM1TuWMkpsl6p4LY51foNsMLCIDlJUqPw7HP/cxLOlu1xIpRUKvT9EL8tDXWOjYRVerrT+wl8g+ARhxMd2/iIlGS4ITvH/zNKMhLzJAJ1juNI2rSJ4LloG1vd3iHISfpQMjPcvdMEuByj780GZbqg/jEEwDhQFlJ+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722562833; c=relaxed/simple;
-	bh=xYpZjisZm/f+NRI59T0R2ycx0HtLFJvMti3jCCvGcao=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lam9/7afdNV0Yrz9rQy05ssR8vySYqjO5DUPLUBgc/y0Uu2cIowmgcxwxijyMps6BMywFW/T1Gb1kSNEvHZJSvgSuDESbO6S//5NasRQeqHY/tamkAU5cGy7txpf0+siOLJC1m/5IpLP8BvoQERH4Xowy6keTCbl40C9NhLJxNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BleUUNCp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 70137C4AF0A;
-	Fri,  2 Aug 2024 01:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722562832;
-	bh=xYpZjisZm/f+NRI59T0R2ycx0HtLFJvMti3jCCvGcao=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BleUUNCpCd1yI6z6E/F9Z7d047NL3xN3dtKxncFEEN354CTO8xa1evWVSceCkn5KS
-	 1Hqc20G3mNGKTOZzCFKZiCj7Nx9C4AsmXZxLhUkt626N2hMlliwaubCVN1L/XgPLy2
-	 l+gAvlz9t1wnI1GC8HWylkLNimAbe8/FOOlZFqO6HBJoGvH7aKuqggdvybXWJyk57a
-	 +z3ux64+VeUmbzsxj6EIuLroBNdyrharesVwQ0LowARTrO+iJCeCx7tewk2tT8B4js
-	 t731V2LAiikbU0BozfFDH77BR1v5X3pfzZKnqeHXu7OiAjbm+Pwlb4rTtnWh15/ZdF
-	 xLFafnlaZ98Zg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5DB3BD0C60A;
-	Fri,  2 Aug 2024 01:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722563722; c=relaxed/simple;
+	bh=ZCvScViQqCucMKDq2Ql0ZIV1r1VqUzOfJvh/3tJyy94=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fJwtZi/fE4mVpTEVKDDEo5rffi44ayf1gUudugFVC6qVlqN/p2N2w6tspngdISdYvNtPI+dmbGN0+SiOCUAHqXFmZVh1xm5iEJLnY6Pt5h8rRh8aERZqmEObGosTcL/W+f8m82A806Pl4yJgzSZnVgGO0J8HGluLEvrKQuA2Fpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IZVHZ0B2; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1722563717; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=zsJ8qpiUqdp+eWJmsE2CmpJqsddXO5xbkozRYvCTCxs=;
+	b=IZVHZ0B2peq3F01RawE9f6QpjnlKL6IGzhvtbogomUFEt01R7ycDcdEcgtwB7+E+Qcydf9oCsxyzm4Io22EzDw/bz0JssW8hLzRVRcDsm17EtUHgLH2vw8u3Uvhen8yQlqD13CG1HUfi+V7Oru1WIiyxQTN1jKGBs98ssLK6wTw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033068173054;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WBvTFOd_1722563707;
+Received: from 30.221.130.78(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WBvTFOd_1722563707)
+          by smtp.aliyun-inc.com;
+          Fri, 02 Aug 2024 09:55:16 +0800
+Message-ID: <dedb6046-83a6-4bda-bf1d-ae77a8cda972@linux.alibaba.com>
+Date: Fri, 2 Aug 2024 09:55:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: delete buf_desc from buffer list under lock
+ protection
+To: shaozhengchao <shaozhengchao@huawei.com>, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240731093102.130154-1-guwen@linux.alibaba.com>
+ <ef374ef8-a19e-7b9b-67a1-5b89fb505545@huawei.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <ef374ef8-a19e-7b9b-67a1-5b89fb505545@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/7] mptcp: fix endpoints with 'signal' and 'subflow'
- flags
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172256283237.5499.17809617500066693516.git-patchwork-notify@kernel.org>
-Date: Fri, 02 Aug 2024 01:40:32 +0000
-References: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-0-c8a9b036493b@kernel.org>
-In-Reply-To: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-0-c8a9b036493b@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org
 
-Hello:
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 31 Jul 2024 13:05:52 +0200 you wrote:
-> When looking at improving the user experience around the MPTCP endpoints
-> setup, I noticed that setting an endpoint with both the 'signal' and the
-> 'subflow' flags -- as it has been done in the past by users according to
-> bug reports we got -- was resulting on only announcing the endpoint, but
-> not using it to create subflows: the 'subflow' flag was then ignored.
+On 2024/7/31 18:32, shaozhengchao wrote:
+> Hi Wen Gu:
+>    "The operations to link group buffer list should be protected by
+> sndbufs_lock or rmbs_lock" It seems that the logic is smooth. But will
+> this really happen? Because no process is in use with the link group,
+> does this mean that there is no concurrent scenario?
 > 
-> My initial thought was to modify IPRoute2 to warn the user when the two
-> flags were set, but it doesn't sound normal to ignore one of them. I
-> then looked at modifying the kernel not to allow having the two flags
-> set, but when discussing about that with Mat, we thought it was maybe
-> not ideal to do that, as there might be use-cases, we might break some
-> configs. Then I saw it was working before v5.17. So instead, I fixed the
-> support on the kernel side (patch 5) using Paolo's suggestion. This also
-> includes a fix on the options side (patch 1: for v5.11+), an explicit
-> deny of some options combinations (patch 2: for v5.18+), and some
-> refactoring (patches 3 and 4) to ease the inclusion of the patch 5.
+
+Hi Zhengchao,
+
+Yes, I am also very conflicted about whether to add lock protection.
+ From the code, it appears that when __smc_lgr_free_bufs is called, the
+link group has already been removed from the lgr_list, so theoretically
+there should be no contention (e.g. add to buf_list). However, in order
+to maintain consistency with other lgr buf_list operations and to guard
+against unforeseen or future changes, I have added lock protection here
+as well.
+
+Thanks!
+
+> Thank you
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,1/7] mptcp: fully established after ADD_ADDR echo on MPJ
-    https://git.kernel.org/netdev/net/c/d67c5649c154
-  - [net,2/7] mptcp: pm: deny endp with signal + subflow + port
-    https://git.kernel.org/netdev/net/c/8af1f11865f2
-  - [net,3/7] mptcp: pm: reduce indentation blocks
-    https://git.kernel.org/netdev/net/c/c95eb32ced82
-  - [net,4/7] mptcp: pm: don't try to create sf if alloc failed
-    https://git.kernel.org/netdev/net/c/cd7c957f936f
-  - [net,5/7] mptcp: pm: do not ignore 'subflow' if 'signal' flag is also set
-    https://git.kernel.org/netdev/net/c/85df533a787b
-  - [net,6/7] selftests: mptcp: join: ability to invert ADD_ADDR check
-    https://git.kernel.org/netdev/net/c/bec1f3b119eb
-  - [net,7/7] selftests: mptcp: join: test both signal & subflow
-    https://git.kernel.org/netdev/net/c/4d2868b5d191
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Zhengchao Shao
+> 
+> On 2024/7/31 17:31, Wen Gu wrote:
+>> The operations to link group buffer list should be protected by
+>> sndbufs_lock or rmbs_lock. So fix it.
+>>
+>> Fixes: 3e034725c0d8 ("net/smc: common functions for RMBs and send buffers")
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>   net/smc/smc_core.c | 10 ++++++++--
+>>   1 file changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+>> index 3b95828d9976..ecfea8c38da9 100644
+>> --- a/net/smc/smc_core.c
+>> +++ b/net/smc/smc_core.c
+>> @@ -1368,18 +1368,24 @@ static void __smc_lgr_free_bufs(struct smc_link_group *lgr, bool is_rmb)
+>>   {
+>>       struct smc_buf_desc *buf_desc, *bf_desc;
+>>       struct list_head *buf_list;
+>> +    struct rw_semaphore *lock;
+>>       int i;
+>>       for (i = 0; i < SMC_RMBE_SIZES; i++) {
+>> -        if (is_rmb)
+>> +        if (is_rmb) {
+>>               buf_list = &lgr->rmbs[i];
+>> -        else
+>> +            lock = &lgr->rmbs_lock;
+>> +        } else {
+>>               buf_list = &lgr->sndbufs[i];
+>> +            lock = &lgr->sndbufs_lock;
+>> +        }
+>> +        down_write(lock);
+>>           list_for_each_entry_safe(buf_desc, bf_desc, buf_list,
+>>                        list) {
+>>               list_del(&buf_desc->list);
+>>               smc_buf_free(lgr, is_rmb, buf_desc);
+>>           }
+>> +        up_write(lock);
+>>       }
+>>   }
 
