@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-115161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77658945536
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:18:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6C3945537
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:18:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1DBE28655A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:18:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DA14B228AE
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1EA134B1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0C6199A2;
 	Fri,  2 Aug 2024 00:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Omtp/Ffu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SM7ns7uq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA48517BA4
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 00:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A697618AED
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 00:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722557893; cv=none; b=Zki03vW9xK9FbFAZ4u+sIulJ90KdFNyeXdj91vPMyEZeNVHYwv6jKmu3+ZDR6o24sEHx5TokvvPL32DXqCJ3jppWxvbuj93iTZRFctbImThwL2fbWUBVqU6bKz+8Aab6Vr4HEdgzv9SZ8gEh9nXrK1Si5vMsdfdXv4B0YcMJOsw=
+	t=1722557893; cv=none; b=kHQ2y1QC72v74cYsdsiVOrhCc/gwT9Hu7abjIxTdomntBJ5G92GEr9UDiZcsppE2XoYumateCfNveHepPO7u4uuwi+5CA9hBb4tRzqqMX8HvaSzF9FzAh6+e22hzYlSKb17Pq044D7wUrFS/uw/S3TmBXSbmLud0UV4D0992wg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722557893; c=relaxed/simple;
-	bh=KRKB9Ys71uHjRH5eNayUyIisRFobsi8Z/AmWTs8wJcM=;
+	bh=dsI44HnnbM8/pEEg9gFV1THg4aAyCd5fuqN/kU8GyDA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IgCBkMgviCDNfaZ8Xlh/x2H6UUHZbyO+uWcUUca14o5If5QbWy/+XiRnmUQvcsCU5eCFU1n8R+IlsX/elE9h1KgraBenHMHfnjnxFOTuKJfqDV4hYHE28Jz0QAuaKG4gjZx3n0Utgwy88jZjniavPpECCbsWYyokadKBRrTUQH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Omtp/Ffu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7F1C4AF0D;
+	 MIME-Version; b=S7frw/ovXOW5etsesAHEtI+xHlatBaZIyHtMe0AshNdFfk7kLVxRRg8LwfDRRxQNWJjecVj3XeNLjmbyf5EqpA7pHfZZE/EORp3yfG+zAYlFp8Ejar0X4LAO8PDYReAqX0MjkMmVNedEx7xGBQMVO/hnZvX9V/qpBZQ9XjT4qzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SM7ns7uq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFA90C4AF0E;
 	Fri,  2 Aug 2024 00:18:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722557892;
-	bh=KRKB9Ys71uHjRH5eNayUyIisRFobsi8Z/AmWTs8wJcM=;
+	s=k20201202; t=1722557893;
+	bh=dsI44HnnbM8/pEEg9gFV1THg4aAyCd5fuqN/kU8GyDA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Omtp/Ffu269DysgFrqQQCGfLGmGAjG4z1adiaKNXJG/Zd7XivQVMjIAgfjkU2YeAV
-	 iIs/2+j+6G8EmKlAAyg1Pn90N0ms2tChaHmX7bZY7BCdkS9xb00xH6kAGWh5tEUOe6
-	 A8OjvUQqmLBrbJLG+ozwQ0JTOVBcWRyQfB9Nut3UrpXN0X/QL1n8P8rS6i8mBUpbM3
-	 b53i+jme1r3hmf1avJs9tCrzvPAnQusNCUgLL3/B2OUlyhUQaxPYhQ4CUz8PDVVOmX
-	 EApJMR9qrDC+BAn2P1ysmGAWRE2D6MtB09fPjrP7tlZ3rVALziIyZx8l5VeBatIrhR
-	 6j4l6sod9W5Ag==
+	b=SM7ns7uqhqnY+fXXrbFrmlFeLC23g00lCNySyPx1nsBozGZXmpnTzTm+P2h5rCdWO
+	 g2zohHopa0e4GQTnyIH8dI/CeyfD/nowVd+as3S+tbbQTg6+Vrmxof0om7nA0b9Lf7
+	 jXCZPTEj9lcuoJ6+pwYE2xJWKxABzSCPU2g/VGsFBT7FZXYVgwT6OQfeFkvyVLqadF
+	 /20Bgjx+00aC0qRXkfMTiz3nRTMkViM9l+86Rt7Tva3Iu6ppoQfj028UKKxbrt0JTy
+	 9QIKuG1IA2ec81OwJ0muEPpI8pdc6i6jwsLCVc3oFxsgQL9M8CVlHF6GKL2FVN1Thm
+	 HCMAxom1XdMFg==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc: netdev@vger.kernel.org,
 	tariqt@nvidia.com,
 	willemdebruijn.kernel@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 08/12] ethtool: rss: report info about additional contexts from XArray
-Date: Thu,  1 Aug 2024 17:17:57 -0700
-Message-ID: <20240802001801.565176-9-kuba@kernel.org>
+Subject: [PATCH net-next 09/12] ethtool: rss: support dumping RSS contexts
+Date: Thu,  1 Aug 2024 17:17:58 -0700
+Message-ID: <20240802001801.565176-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240802001801.565176-1-kuba@kernel.org>
 References: <20240802001801.565176-1-kuba@kernel.org>
@@ -68,76 +68,220 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-IOCTL already uses the XArray when reporting info about additional
-contexts. Do the same thing in netlink code.
+Now that we track RSS contexts in the core we can easily dump
+them. This is a major introspection improvement, as previously
+the only way to find all contexts would be to try all ids
+(of which there may be 2^32 - 1).
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/ethtool/rss.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ Documentation/netlink/specs/ethtool.yaml |   9 +-
+ net/ethtool/netlink.c                    |   2 +
+ net/ethtool/netlink.h                    |   2 +
+ net/ethtool/rss.c                        | 133 +++++++++++++++++++++++
+ 4 files changed, 144 insertions(+), 2 deletions(-)
 
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index ea21fe135b97..cf69eedae51d 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -1749,12 +1749,12 @@ doc: Partial family for Ethtool Netlink.
+ 
+       attribute-set: rss
+ 
+-      do: &rss-get-op
++      do:
+         request:
+           attributes:
+             - header
+             - context
+-        reply:
++        reply: &rss-reply
+           attributes:
+             - header
+             - context
+@@ -1762,6 +1762,11 @@ doc: Partial family for Ethtool Netlink.
+             - indir
+             - hkey
+             - input_xfrm
++      dump:
++        request:
++          attributes:
++            - header
++        reply: *rss-reply
+     -
+       name: plca-get-cfg
+       doc: Get PLCA params.
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index cb1eea00e349..041548e5f5e6 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -1128,6 +1128,8 @@ static const struct genl_ops ethtool_genl_ops[] = {
+ 	{
+ 		.cmd	= ETHTOOL_MSG_RSS_GET,
+ 		.doit	= ethnl_default_doit,
++		.start	= ethnl_rss_dump_start,
++		.dumpit	= ethnl_rss_dumpit,
+ 		.policy = ethnl_rss_get_policy,
+ 		.maxattr = ARRAY_SIZE(ethnl_rss_get_policy) - 1,
+ 	},
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 46ec273a87c5..919371383b23 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -464,6 +464,8 @@ int ethnl_tunnel_info_doit(struct sk_buff *skb, struct genl_info *info);
+ int ethnl_tunnel_info_start(struct netlink_callback *cb);
+ int ethnl_tunnel_info_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info);
++int ethnl_rss_dump_start(struct netlink_callback *cb);
++int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ 
+ extern const char stats_std_names[__ETHTOOL_STATS_CNT][ETH_GSTRING_LEN];
+ extern const char stats_eth_phy_names[__ETHTOOL_A_STATS_ETH_PHY_CNT][ETH_GSTRING_LEN];
 diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
-index 5c477cc36251..023782ca1230 100644
+index 023782ca1230..62e7b6fe605d 100644
 --- a/net/ethtool/rss.c
 +++ b/net/ethtool/rss.c
-@@ -82,7 +82,6 @@ rss_prepare_get(const struct rss_req_info *request, struct net_device *dev,
- 	rxfh.indir = data->indir_table;
- 	rxfh.key_size = data->hkey_size;
- 	rxfh.key = data->hkey;
--	rxfh.rss_context = request->rss_context;
- 
- 	ret = ops->get_rxfh(dev, &rxfh);
- 	if (ret)
-@@ -95,6 +94,41 @@ rss_prepare_get(const struct rss_req_info *request, struct net_device *dev,
- 	return ret;
+@@ -208,6 +208,139 @@ static void rss_cleanup_data(struct ethnl_reply_data *reply_base)
+ 	kfree(data->indir_table);
  }
  
-+static int
-+rss_prepare_ctx(const struct rss_req_info *request, struct net_device *dev,
-+		struct rss_reply_data *data, const struct genl_info *info)
++struct rss_nl_dump_ctx {
++	unsigned long		ifindex;
++	unsigned long		ctx_idx;
++
++	unsigned int		one_ifindex;
++};
++
++static struct rss_nl_dump_ctx *rss_dump_ctx(struct netlink_callback *cb)
 +{
-+	struct ethtool_rxfh_context *ctx;
-+	u32 total_size, indir_bytes;
-+	u8 *rss_config;
++	NL_ASSERT_DUMP_CTX_FITS(struct rss_nl_dump_ctx);
 +
-+	ctx = xa_load(&dev->ethtool->rss_ctx, request->rss_context);
-+	if (!ctx)
-+		return -ENOENT;
++	return (struct rss_nl_dump_ctx *)cb->ctx;
++}
 +
-+	data->indir_size = ctx->indir_size;
-+	data->hkey_size = ctx->key_size;
-+	data->hfunc = ctx->hfunc;
-+	data->input_xfrm = ctx->input_xfrm;
++int ethnl_rss_dump_start(struct netlink_callback *cb)
++{
++	const struct genl_info *info = genl_info_dump(cb);
++	struct rss_nl_dump_ctx *ctx = rss_dump_ctx(cb);
++	struct ethnl_req_info req_info = {};
++	struct nlattr **tb = info->attrs;
++	int ret;
 +
-+	indir_bytes = data->indir_size * sizeof(u32);
-+	total_size = indir_bytes + data->hkey_size;
-+	rss_config = kzalloc(total_size, GFP_KERNEL);
-+	if (!rss_config)
-+		return -ENOMEM;
-+
-+	data->indir_table = (u32 *)rss_config;
-+	memcpy(data->indir_table, ethtool_rxfh_context_indir(ctx), indir_bytes);
-+
-+	if (data->hkey_size) {
-+		data->hkey = rss_config + indir_bytes;
-+		memcpy(data->hkey, ethtool_rxfh_context_key(ctx),
-+		       data->hkey_size);
++	/* Filtering by context not supported */
++	if (tb[ETHTOOL_A_RSS_CONTEXT]) {
++		NL_SET_BAD_ATTR(info->extack, tb[ETHTOOL_A_RSS_CONTEXT]);
++		return -EINVAL;
 +	}
++
++	ret = ethnl_parse_header_dev_get(&req_info,
++					 tb[ETHTOOL_A_RSS_HEADER],
++					 sock_net(cb->skb->sk), cb->extack,
++					 false);
++	if (req_info.dev) {
++		ctx->one_ifindex = req_info.dev->ifindex;
++		ctx->ifindex = ctx->one_ifindex;
++		ethnl_parse_header_dev_put(&req_info);
++		req_info.dev = NULL;
++	}
++
++	return ret;
++}
++
++static int
++rss_dump_one_ctx(struct sk_buff *skb, struct netlink_callback *cb,
++		 struct net_device *dev, u32 rss_context)
++{
++	const struct genl_info *info = genl_info_dump(cb);
++	struct rss_reply_data data = {};
++	struct rss_req_info req = {};
++	void *ehdr;
++	int ret;
++
++	req.rss_context = rss_context;
++
++	ehdr = ethnl_dump_put(skb, cb, ETHTOOL_MSG_RSS_GET_REPLY);
++	if (!ehdr)
++		return -EMSGSIZE;
++
++	ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_RSS_HEADER);
++	if (ret < 0)
++		goto err_cancel;
++
++	if (!rss_context)
++		ret = rss_prepare_get(&req, dev, &data, info);
++	else
++		ret = rss_prepare_ctx(&req, dev, &data, info);
++	if (ret)
++		goto err_cancel;
++
++	ret = rss_fill_reply(skb, &req.base, &data.base);
++	if (ret)
++		goto err_cleanup;
++	genlmsg_end(skb, ehdr);
++
++	rss_cleanup_data(&data.base);
++	return 0;
++
++err_cleanup:
++	rss_cleanup_data(&data.base);
++err_cancel:
++	genlmsg_cancel(skb, ehdr);
++	return ret;
++}
++
++static int
++rss_dump_one_dev(struct sk_buff *skb, struct netlink_callback *cb,
++		 struct net_device *dev)
++{
++	struct rss_nl_dump_ctx *ctx = rss_dump_ctx(cb);
++	int ret;
++
++	if (!dev->ethtool_ops->get_rxfh)
++		return 0;
++
++	if (!ctx->ctx_idx) {
++		ret = rss_dump_one_ctx(skb, cb, dev, 0);
++		if (ret)
++			return ret;
++		ctx->ctx_idx++;
++	}
++
++	for (; xa_find(&dev->ethtool->rss_ctx, &ctx->ctx_idx,
++		       ULONG_MAX, XA_PRESENT); ctx->ctx_idx++) {
++		ret = rss_dump_one_ctx(skb, cb, dev, ctx->ctx_idx);
++		if (ret)
++			return ret;
++	}
++	ctx->ctx_idx = 0;
 +
 +	return 0;
 +}
 +
- static int
- rss_prepare_data(const struct ethnl_req_info *req_base,
- 		 struct ethnl_reply_data *reply_base,
-@@ -115,6 +149,7 @@ rss_prepare_data(const struct ethnl_req_info *req_base,
- 			return -EOPNOTSUPP;
- 
- 		data->no_key_fields = !ops->rxfh_per_ctx_key;
-+		return rss_prepare_ctx(request, dev, data, info);
- 	}
- 
- 	return rss_prepare_get(request, dev, data, info);
++int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
++{
++	struct rss_nl_dump_ctx *ctx = rss_dump_ctx(cb);
++	struct net *net = sock_net(skb->sk);
++	struct net_device *dev;
++	int ret = 0;
++
++	rtnl_lock();
++	for_each_netdev_dump(net, dev, ctx->ifindex) {
++		if (ctx->one_ifindex && ctx->one_ifindex != ctx->ifindex)
++			break;
++
++		ret = rss_dump_one_dev(skb, cb, dev);
++		if (ret)
++			break;
++	}
++	rtnl_unlock();
++
++	return ret;
++}
++
+ const struct ethnl_request_ops ethnl_rss_request_ops = {
+ 	.request_cmd		= ETHTOOL_MSG_RSS_GET,
+ 	.reply_cmd		= ETHTOOL_MSG_RSS_GET_REPLY,
 -- 
 2.45.2
 
