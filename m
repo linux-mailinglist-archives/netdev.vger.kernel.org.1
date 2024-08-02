@@ -1,150 +1,123 @@
-Return-Path: <netdev+bounces-115321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E75C945D41
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:28:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAC37945D49
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C32282553
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:28:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 178731C21339
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F91F1E212F;
-	Fri,  2 Aug 2024 11:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470171DF664;
+	Fri,  2 Aug 2024 11:34:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="kTWl68we"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MT3/jAxf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC271E2124
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8145D14D458;
+	Fri,  2 Aug 2024 11:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722598073; cv=none; b=B3ONSEHUPbhS0qi9jBVdGYMgs9Uod87hn57EpyKqbZEjJ+ulwiz1NHDQ3nsdVbT+a1/qIlSKgM3Ndxpld8Iq02hI0xOI/3H99GoU6m0QH348a5UjdfI6FxxPIvNNKGq4r3HCZ2gw0WKv7BZzdC4YaejmWacD4XvkGJJc7e7uMpM=
+	t=1722598482; cv=none; b=qo37PBVhvg6FBc5spE6hzXmyeFqiXL+QI5kDIqNvYpF0bOfcAhVYBJFN7GP9yanlb8Tjh9wg+JFwNMq5r+SgfW6RbOyoKdYoJtfSL9vxzfBbhG2jC2KVy9uq0YnGZib00CSFOAFhaxWb68+6j9fkQuYL5fl+irMfOXWcUynDGvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722598073; c=relaxed/simple;
-	bh=BE7dpG8W2PpOKUlssqTXhlePO4gl/CQaWw0AeimD9y4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M1TcWTEKsrPnGnwX+NFyK0Uy7DhN9P+2nXAjIS1TTMLxptvVVx1/8OO0D8N8YZtEIs4dRs1TImXw7UKoVxgtOGMfSbk4nPxx1Ep6H8sZd9RGPaKgpn9fjvFxV9aPhDG+J8ABmXxmUKxJB758hvMyYGrDuz+GK8w0B/0XONYXfcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=kTWl68we; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-428e1915e18so11822905e9.1
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:27:51 -0700 (PDT)
+	s=arc-20240116; t=1722598482; c=relaxed/simple;
+	bh=L4MVQUtTKPY9dp8vA/s2i1grzqz3BYHv2Nm1to54ulo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Zu1YZwcmhYw7Kte3BdnaMlqKZHFINv0w/VL5Q94QX7Rb1ZTj5CwTVUSkDRXdXMiNIWJH4VF6uX3rnjsuqA/y6Ku9RmMLvLeYM1TfOUbHMeKLQvfuOtNNmYGO3kbd1fKhyUncPutFAewJOSfpJyvkYsaHuM1JmIjnjGMeZDy4U34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MT3/jAxf; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f15790b472so21672541fa.0;
+        Fri, 02 Aug 2024 04:34:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1722598070; x=1723202870; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=chN/5IqC5/jQjFOqjkhbCXjZQHoVidazye4I/EM8vkk=;
-        b=kTWl68wedmlpbnpxUW1ltHUuJHXQftgtls2Smo05lXtV3V9+3ayUXxSW9RM+b4GouV
-         PHJ3vc85V6PH8/jND8E535KkIzSXtY1qPUahm4bNZ14uBCZrPBH66XAM9ZPiOBbpAyjh
-         WGcdxFV7GuZu6KMawkBSmtkE8jg2FwScsSGfY=
+        d=gmail.com; s=20230601; t=1722598478; x=1723203278; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RCKSxpXnDjRmdCG2DqAQpa2RCOpP1tO8Cjfgt5fm+ac=;
+        b=MT3/jAxf1bOA9MiKQ9Oz9E/qox8yKOKMmOqcEppKpGruStYACXi/1IdKHidcGrgzrs
+         ngKp/yuH7tV5sZrZ0Ez2T18JtGjFCHyoDrRYLfb5kKQ3QwMEXB1XXF8I1SFDGoLEKi/O
+         xe34rqMFhxHW1Mufz+4303T9nuJRHkwyuYuXiKZ+JclD98Feo24yy+1NVSWWTqJE3FhG
+         hXgM0TZO1EKr/3v1jLyXgWmWBETjBAKCsmHw2tqp8Y5hEkr+zbjiRBSDyE6s2CwyA9Sk
+         BeJmW5H+GDvYi01jleW2UF+SQXM47Kt6CmbNflhP0QWrGoIZkQsAvYy7eGbzH2XwKXtT
+         YnwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722598070; x=1723202870;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=chN/5IqC5/jQjFOqjkhbCXjZQHoVidazye4I/EM8vkk=;
-        b=k3VHkIYxBpOdICiyKOnw3RipE4sAA4KDyS+Lzwe0cFUhsNfTkLz3Yl5bc8WeJ43BH8
-         b4juTEl0wwsMokieYMdQlgTCSLML82lHcfAdhKyj8WBnfPYQvkkD11VKvESRyPzN/z2Q
-         Of22r5osqC6RwvD2claSkgx8iJtmqSjA3ibh/XtWXiTAgI+WyPzajilRQNGnEn1c0MYW
-         kGxVSo7umddg1sQ35T2RZgamksmZNQWUIkcntisscbzuo3I+CxSsJe0sznRKMr7AArG5
-         rlpHhVc3q0wYA2hRtP15vbsLau5+48pnR/CjMK9FNoNNGyGfblfSTwQ4pnx8xDiCT75D
-         1PFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXN0AjiRDCRZ+HHiixV3n3Smqye0ptV/nkbyUBdkZ5kpPpwSOQh2V+2O1tfL6hYgSCXbpNDaQTZko0yD0I3hRobqeaCKXvQ
-X-Gm-Message-State: AOJu0Yyxh0AEopPj9/JvHL2qVumNYqMXYKW8EyTcDFJ9YHZ6fn3xWKxK
-	wavq73KekQ0XJbvzRLU5l4I2Iw5CX0lZYMCoKUJaE3Sih227FFsttpZRZwORbWI=
-X-Google-Smtp-Source: AGHT+IH7hcdVBDXCsRevDN59P0EtrOCoyykAhwY0K0NGMZXYks/7iPTFXtJU/BBOxs8N4RGobZG6mA==
-X-Received: by 2002:a05:600c:5102:b0:428:52a:3580 with SMTP id 5b1f17b1804b1-428e6af4b58mr18796515e9.3.1722598069823;
-        Fri, 02 Aug 2024 04:27:49 -0700 (PDT)
-Received: from LQ3V64L9R2 ([62.30.8.232])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428e6e3c0b7sm29576275e9.23.2024.08.02.04.27.48
+        d=1e100.net; s=20230601; t=1722598478; x=1723203278;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RCKSxpXnDjRmdCG2DqAQpa2RCOpP1tO8Cjfgt5fm+ac=;
+        b=fCER/3uW8JGUa8u3ZGFtKShA1xFd6ycybCUE2laXQXarCunFk4Lf3YrL9QSIbdg+l2
+         EBbiEjPuxNcFwuWDlQMggedA3rlSmeNjfNnvwShE/iuKQfNQURJpPVNbOngpzw3vCS+Y
+         Nuz5FCysklyIMulStiUhf/86x0kX+xszrQ0OyVXkXoJ4/9RSZxiUnlRJpog4Rzce+kHR
+         LvIllTkHmiKQ8ln51ETvY1sfzvjmBL2d4f9TFPpmyG0d2IaHRUTPXjItVazh5bInSANa
+         L8Jjn7mfyNhSb4rlFho0ZxvwGX6qJeVEXgj3Ux1KUzfTecB57Lp2wMkXavYfi496Z3Uz
+         FJcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUk96YUV/jrZvQ3Q5TPwPcz2Zpjc7V+/YcPNLqnh3P+E9Z92BNWaPEdM/D4rl4yvpN8v9fxUbVFJuCi7+iq4KdboPmFAYV0+LqS0TUaKeZoAksVTMtBkJtPjNHPIFQnYgxE6GLQ
+X-Gm-Message-State: AOJu0Yznumoc6sHN69Q8Ad+6kNYctmCS58S3rrJg5gsetl72qEGmNrXI
+	QDMvd6CRE2m1YJusXCu8GNS8VSpwL2ajVkXiH9fiS35mQC3z4y0S
+X-Google-Smtp-Source: AGHT+IGFmILD9SkkgHGNoCdAcKU3pPU1aGdE3yMX57zm2eTssfo/sPK2LeYsFnpFS56ji2GjtvQAeQ==
+X-Received: by 2002:a2e:830f:0:b0:2ef:2658:98f2 with SMTP id 38308e7fff4ca-2f15ab0bf71mr22434751fa.33.1722598478047;
+        Fri, 02 Aug 2024 04:34:38 -0700 (PDT)
+Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282babaa2esm91752495e9.25.2024.08.02.04.34.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:27:49 -0700 (PDT)
-Date: Fri, 2 Aug 2024 12:27:46 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
-	przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
-	gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com, saeedm@nvidia.com, leon@kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 03/12] eth: mlx5: allow disabling queues when
- RSS contexts exist
-Message-ID: <ZqzCsvm8DW6PeKDQ@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com, saeedm@nvidia.com, leon@kernel.org,
-	linux-rdma@vger.kernel.org
-References: <20240802001801.565176-1-kuba@kernel.org>
- <20240802001801.565176-4-kuba@kernel.org>
+        Fri, 02 Aug 2024 04:34:37 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] tools: ynl: remove extraneous ; after statements
+Date: Fri,  2 Aug 2024 12:34:36 +0100
+Message-Id: <20240802113436.448939-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802001801.565176-4-kuba@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 01, 2024 at 05:17:52PM -0700, Jakub Kicinski wrote:
-> Since commit 24ac7e544081 ("ethtool: use the rss context XArray
-> in ring deactivation safety-check") core will prevent queues from
-> being disabled while being used by additional RSS contexts.
-> The safety check is no longer necessary, and core will do a more
-> accurate job of only rejecting changes which can actually break
-> things.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: saeedm@nvidia.com
-> CC: tariqt@nvidia.com
-> CC: leon@kernel.org
-> CC: linux-rdma@vger.kernel.org
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c | 12 ------------
->  1 file changed, 12 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> index 36845872ae94..0b941482db30 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
-> @@ -445,7 +445,6 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
->  	unsigned int count = ch->combined_count;
->  	struct mlx5e_params new_params;
->  	bool arfs_enabled;
-> -	int rss_cnt;
->  	bool opened;
->  	int err = 0;
->  
-> @@ -499,17 +498,6 @@ int mlx5e_ethtool_set_channels(struct mlx5e_priv *priv,
->  		goto out;
->  	}
->  
-> -	/* Don't allow changing the number of channels if non-default RSS contexts exist,
-> -	 * the kernel doesn't protect against set_channels operations that break them.
-> -	 */
-> -	rss_cnt = mlx5e_rx_res_rss_cnt(priv->rx_res) - 1;
-> -	if (rss_cnt) {
-> -		err = -EINVAL;
-> -		netdev_err(priv->netdev, "%s: Non-default RSS contexts exist (%d), cannot change the number of channels\n",
-> -			   __func__, rss_cnt);
-> -		goto out;
-> -	}
-> -
->  	/* Don't allow changing the number of channels if MQPRIO mode channel offload is active,
->  	 * because it defines a partition over the channels queues.
->  	 */
-> -- 
-> 2.45.2
+There are a couple of statements with two following semicolons,
+replace these with just one semicolon.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ tools/net/ynl/lib/ynl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
+index fcb18a5a6d70..e16cef160bc2 100644
+--- a/tools/net/ynl/lib/ynl.c
++++ b/tools/net/ynl/lib/ynl.c
+@@ -696,14 +696,14 @@ ynl_sock_create(const struct ynl_family *yf, struct ynl_error *yse)
+ 	addr.nl_family = AF_NETLINK;
+ 	if (bind(ys->socket, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+ 		__perr(yse, "unable to bind to a socket address");
+-		goto err_close_sock;;
++		goto err_close_sock;
+ 	}
+ 
+ 	memset(&addr, 0, sizeof(addr));
+ 	addrlen = sizeof(addr);
+ 	if (getsockname(ys->socket, (struct sockaddr *)&addr, &addrlen) < 0) {
+ 		__perr(yse, "unable to read socket address");
+-		goto err_close_sock;;
++		goto err_close_sock;
+ 	}
+ 	ys->portid = addr.nl_pid;
+ 	ys->seq = random();
+-- 
+2.39.2
+
 
