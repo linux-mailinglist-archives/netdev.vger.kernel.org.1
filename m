@@ -1,288 +1,154 @@
-Return-Path: <netdev+bounces-115335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCB5945E65
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:11:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51581945E70
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F6CD1F22041
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:11:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0757D284BC9
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8951F1E3CD4;
-	Fri,  2 Aug 2024 13:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C651E4841;
+	Fri,  2 Aug 2024 13:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmGWAdmY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vqc87/ps"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876F31DAC5F
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 13:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F421E3CC3
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 13:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722604289; cv=none; b=kDLoA3U0CJU4l5haMGWbMGHci5snRviAu2H8CeMs7bUbiLbWlsOsQDq4Au7i2bTVRPjY2pUrKAWV5dcQ6kotB1le7Rz5hetZMX9HtF2v4QTSrZ6nlCgo9E/tbfa5wMdgIfDfFU4egeFF23tA61BUOSYQ4W79FCW3VkRMSmzuSTw=
+	t=1722604485; cv=none; b=nBa4OmNLaI3LkNeQjSBJ36i28BVohk+f4mWxUcAP1mxQXOV92QwLyFQ19VH7yBbpxEUI3qi1Hiof94ha8HIK0Fffr/iVHWEDGFzIEslsiNc7P3E1Jqx0IBABn679P1Znxr/N8epnFEqaIvzMYMM5dk0jT6TjjkdZbf+9kIA+xjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722604289; c=relaxed/simple;
-	bh=GtqF0j81uMmMkn2DBIGrfJVpy/2P4u2KPrJ2tF75azA=;
+	s=arc-20240116; t=1722604485; c=relaxed/simple;
+	bh=mlVHMMZEWCwegHzSZJoPrbG16hagpjxEFmlG/bPjAc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mIy9diqi0Q2FzUEcUs6HHvMJBg9YekX2356RVg73zTFhLl63iStyhXKcVg4S8olcE9AKfQgODjK3DBJb5jf2LWIPhbA6VyqCDNfnVEBhaALEIrZyNs0lU40oheik00d8UAZB6wNIDZnC+A60f0SaW2fLHJv/8jet3eSwOPIonG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fmGWAdmY; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=s0Pb4v7vGzt4sX+rIlw/n16PuqSef860RabR4Hz0Q/sZbj9ti/ryfiFULKFCiZeweinds+QOBVXj3rK/sFgTS4CR6EhTWjBuaoggJzg9tI58t5tVP5C4nuoOwiOelt9zYkMZPLI86/lpKf3VPNtq2XPKedgqbDGic5kl3gzIVk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vqc87/ps; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722604286;
+	s=mimecast20190719; t=1722604482;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GA3gHcK7gQa0uIkgdjm6OGs+g7SAjt3707Vb593jBhc=;
-	b=fmGWAdmYIv0GkaxPqAiS07bevNN1hUn5B4oum+piyU35cTn+EaSCmrIsANJw4FhkkYUzo6
-	wPKX5K7ATX7MM99Ho8t9sbO+BOqD4cNWVntDpaJ1BOjiyVeFsImqyRqcmi2FfdCPhdacaS
-	tFLMwT9PP5z9weZxQYDa+frOvqMBDIo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5G+bWvjkV854PGv5nQauKmV3J78os2SxWsQ3vifFpzE=;
+	b=Vqc87/ps4K+/6g3OlrtyJ38wctRreGnEisPZKgTeVERxLMrx7VEnM/qfTbFOYFToKDNmzx
+	FeojJ7XgVGm7MXCYXdNAJkPH22mmXGwGXI5JrZykLpoIILBEUQT3MaW42CFeBHhbiFqB6Z
+	Qx4NjMVW4yDjrnFXnQGSznI31jwrRL8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-538-L7nW1GnlOpKIkutzFr3_Bw-1; Fri, 02 Aug 2024 09:11:25 -0400
-X-MC-Unique: L7nW1GnlOpKIkutzFr3_Bw-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36835f6ebdcso4975922f8f.1
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 06:11:25 -0700 (PDT)
+ us-mta-218-VoF76N55NYqOQiBNLBXukw-1; Fri, 02 Aug 2024 09:14:41 -0400
+X-MC-Unique: VoF76N55NYqOQiBNLBXukw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42820af1106so37585605e9.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 06:14:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722604282; x=1723209082;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GA3gHcK7gQa0uIkgdjm6OGs+g7SAjt3707Vb593jBhc=;
-        b=LZbZjfA8dqWAXigfuU3YHtZDItH5/avJ5husI1q/32OHXIZdHk1k8dVLTr26ULU41r
-         rXLCaPkAwGv9UmPw+ZdSW8JR+WPSNccQCAbVVhlLPrSRSaS1M0YxppyV1FF9YiXbQaoO
-         bO6LdX3tXSjqAIQRSJN9u4MntB1NZimDDJ91XzU4rKAdbQxAiRT+NiQRVFVG6nF4WN6d
-         yJ3qlMBdNRJvf0jNl8+OZcIpM+CxGDoGMXMq+C3rEg+KFRU5qdz4ZuwpSaJLcDlO8jUT
-         SYWYgBltprd40CHBaYTkNJW5DaEPzADr3tD7w0NCGdy0YZ2ZBEYqkmQ1pjYJO6m3eho5
-         WPtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWk/pHI60gCzCwjgSLZsfgb382DI5VEDE3AL7bsBzTO6TP1mMruBuvLW1T9unLpIzljRFmRmzJzBmMXQjWUDTjfYk0BL+98
-X-Gm-Message-State: AOJu0Yx8xdWCnUQbQ+XvC2Uyhq4x8KeseU1j24NOFf59psNx/iwsa2cR
-	md0+fSojizBKjdGEq+UYDCdYLI/1PU01dD4ekq/wJByKzZCp6HH4lrJaobr8diKv0mpSWowwSGp
-	tyS4vGrEStkOR7EYdLSYomuPhpCSTJDJowhkB8JzEUirjExfucdG2Kg==
-X-Received: by 2002:a05:6000:128b:b0:368:7f4f:9ead with SMTP id ffacd0b85a97d-36bbc0b4f07mr2127275f8f.7.1722604282246;
-        Fri, 02 Aug 2024 06:11:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGtON99eWGkJAzYau58ziGITYpzdcXfWosUZg+NokOApiXDyHx++P7yBUYwaqj9NjkxUyi1sQ==
-X-Received: by 2002:a05:6000:128b:b0:368:7f4f:9ead with SMTP id ffacd0b85a97d-36bbc0b4f07mr2127239f8f.7.1722604281315;
-        Fri, 02 Aug 2024 06:11:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722604480; x=1723209280;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5G+bWvjkV854PGv5nQauKmV3J78os2SxWsQ3vifFpzE=;
+        b=ibC4Jd/8pSNSSJgT9G/mNotCD2Y9xTVpeh4zm21hy8Jld3RXCB8qOdi3udxA2b4zon
+         qEy09kaylHV7MfkJQq+8bedeE2FU0LMn8ZmexwJufLAnl+OLVoAkK3vGjC8fvoyFknqF
+         LFAXrX8f4PqyNsAqcpJwKzO78840FyUHMowLrJEI1OVzu1ZUZ35W4FbLiiUNK1Bvz/bs
+         Xf7RdMt3yTuEZMudLQGRXctTjKXvLOczG+20G7poqs4iM76Pjxyn0kVRHauejDnfD0aS
+         OvrKV6TofGq46EkDieCTRnqN7TFE9c4cT1ekwHrnuhN/AAiXY09UZQ4smW7fLdVnhefv
+         v/uw==
+X-Forwarded-Encrypted: i=1; AJvYcCUb7l8G6rk7s+ATSH8uEOyPvGnJR2u3UPT39gNTP0Tvh60iUqBeUPo4odWbN+Uq0JYpGJ13z0bCs2dd5nzOMCCemhu7lVjw
+X-Gm-Message-State: AOJu0Ywd8GZXaClQ+zKwGtfz6wU1WM+QNLW3/48SfKvWCMKkljNlXlBW
+	xh+Mcx9NbCFnTvKOX9qadICUSXtjdfIi8dc3wzgpH7csJUm2waPtgeRIKLi+EyM0LIZAAPL9286
+	EP4MuUIANTYrbeU3UGqPzdGeZW9Bwhav0McY6DcmP4aSB3anW8JZO4w==
+X-Received: by 2002:a05:600c:3b27:b0:426:593c:935d with SMTP id 5b1f17b1804b1-428e6af7aeemr19557135e9.5.1722604479660;
+        Fri, 02 Aug 2024 06:14:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFuRmjRgLKWU2y9r5mwZaqHkfa4aoDytkkFpO3vmjIpfmO1Id6emUqbDV3bWzmGUtUR32/LqA==
+X-Received: by 2002:a05:600c:3b27:b0:426:593c:935d with SMTP id 5b1f17b1804b1-428e6af7aeemr19556785e9.5.1722604478820;
+        Fri, 02 Aug 2024 06:14:38 -0700 (PDT)
 Received: from redhat.com ([2.55.39.123])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd06d7cfsm1953780f8f.96.2024.08.02.06.11.16
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282bb97fbasm95238665e9.41.2024.08.02.06.14.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 06:11:19 -0700 (PDT)
-Date: Fri, 2 Aug 2024 09:11:15 -0400
+        Fri, 02 Aug 2024 06:14:37 -0700 (PDT)
+Date: Fri, 2 Aug 2024 09:14:28 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] virtio_net: Prevent misidentified spurious
- interrupts from killing the irq
-Message-ID: <20240802090822-mutt-send-email-mst@kernel.org>
-References: <20240801135639.11400-1-hengqi@linux.alibaba.com>
- <CACGkMEtBeUnDeD0zYBvpwjhQ4Lv0dz8mBDQ_C-yP1VEaQdv-0A@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Si-Wei Liu <si-wei.liu@oracle.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH vhost 0/7] vdpa/mlx5: Parallelize device suspend/resume
+Message-ID: <20240802091307-mutt-send-email-mst@kernel.org>
+References: <20240802072039.267446-1-dtatulea@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtBeUnDeD0zYBvpwjhQ4Lv0dz8mBDQ_C-yP1VEaQdv-0A@mail.gmail.com>
+In-Reply-To: <20240802072039.267446-1-dtatulea@nvidia.com>
 
-On Fri, Aug 02, 2024 at 11:41:57AM +0800, Jason Wang wrote:
-> On Thu, Aug 1, 2024 at 9:56 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
-> >
-> > Michael has effectively reduced the number of spurious interrupts in
-> > commit a7766ef18b33 ("virtio_net: disable cb aggressively") by disabling
-> > irq callbacks before cleaning old buffers.
-> >
-> > But it is still possible that the irq is killed by mistake:
-> >
-> >   When a delayed tx interrupt arrives, old buffers has been cleaned in
-> >   other paths (start_xmit and virtnet_poll_cleantx), then the interrupt is
-> >   mistakenly identified as a spurious interrupt in vring_interrupt.
-> >
-> >   We should refrain from labeling it as a spurious interrupt; otherwise,
-> >   note_interrupt may inadvertently kill the legitimate irq.
+On Fri, Aug 02, 2024 at 10:20:17AM +0300, Dragos Tatulea wrote:
+> This series parallelizes the mlx5_vdpa device suspend and resume
+> operations through the firmware async API. The purpose is to reduce live
+> migration downtime.
 > 
-> I think the evil came from where we do free_old_xmit() in
-> start_xmit(). I know it is for performance, but we may need to make
-> the code work correctly instead of adding endless hacks. Personally, I
-> think the virtio-net TX path is over-complicated. We probably pay too
-> much (e.g there's netif_tx_lock in TX NAPI path) to try to "optimize"
-> the performance.
+> The series starts with changing the VQ suspend and resume commands
+> to the async API. After that, the switch is made to issue multiple
+> commands of the same type in parallel.
 > 
-> How about just don't do free_old_xmit and do that solely in the TX NAPI?
+> Finally, a bonus improvement is thrown in: keep the notifierd enabled
+> during suspend but make it a NOP. Upon resume make sure that the link
+> state is forwarded. This shaves around 30ms per device constant time.
+> 
+> For 1 vDPA device x 32 VQs (16 VQPs), on a large VM (256 GB RAM, 32 CPUs
+> x 2 threads per core), the improvements are:
+> 
+> +-------------------+--------+--------+-----------+
+> | operation         | Before | After  | Reduction |
+> |-------------------+--------+--------+-----------|
+> | mlx5_vdpa_suspend | 37 ms  | 2.5 ms |     14x   |
+> | mlx5_vdpa_resume  | 16 ms  | 5 ms   |      3x   |
+> +-------------------+--------+--------+-----------+
+> 
+> Note for the maintainers:
+> The first patch contains changes for mlx5_core. This must be applied
+> into the mlx5-vhost tree [0] first. Once this patch is applied on
+> mlx5-vhost, the change has to be pulled from mlx5-vdpa into the vhost
+> tree and only then the remaining patches can be applied.
 
-Not getting interrupts is always better than getting interrupts.
-This is not new code, there are no plans to erase it all and start
-anew "to make it work correctly" - it's widely deployed,
-you will cause performance regressions and they are hard
-to debug.
+Or maintainer just acks it and I apply directly.
 
+Let me know when all this can happen.
 
-> >
-> > Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c     |  9 ++++++
-> >  drivers/virtio/virtio_ring.c | 53 ++++++++++++++++++++++++++++++++++++
-> >  include/linux/virtio.h       |  3 ++
-> >  3 files changed, 65 insertions(+)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 0383a3e136d6..6d8739418203 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -2769,6 +2769,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
-> >                 do {
-> >                         virtqueue_disable_cb(sq->vq);
-> >                         free_old_xmit(sq, txq, !!budget);
-> > +                       virtqueue_set_tx_oldbuf_cleaned(sq->vq, true);
-> >                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
-> >
-> >                 if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-> > @@ -3035,6 +3036,9 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-> >
-> >                 free_old_xmit(sq, txq, false);
-> >
-> > +               if (use_napi)
-> > +                       virtqueue_set_tx_oldbuf_cleaned(sq->vq, true);
-> > +
-> >         } while (use_napi && !xmit_more &&
-> >                unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
-> >
-> > @@ -3044,6 +3048,11 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-> >         /* Try to transmit */
-> >         err = xmit_skb(sq, skb, !use_napi);
-> >
-> > +       if (use_napi) {
-> > +               virtqueue_set_tx_newbuf_sent(sq->vq, true);
-> > +               virtqueue_set_tx_oldbuf_cleaned(sq->vq, false);
-> > +       }
-> > +
-> >         /* This should not happen! */
-> >         if (unlikely(err)) {
-> >                 DEV_STATS_INC(dev, tx_fifo_errors);
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index be7309b1e860..fb2afc716371 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -180,6 +180,11 @@ struct vring_virtqueue {
-> >          */
-> >         bool do_unmap;
-> >
-> > +       /* Has any new data been sent? */
-> > +       bool is_tx_newbuf_sent;
-> > +       /* Is the old data recently sent cleaned up? */
-> > +       bool is_tx_oldbuf_cleaned;
-> > +
-> >         /* Head of free buffer list. */
-> >         unsigned int free_head;
-> >         /* Number we've added since last sync. */
-> > @@ -2092,6 +2097,9 @@ static struct virtqueue *vring_create_virtqueue_packed(
-> >         vq->use_dma_api = vring_use_dma_api(vdev);
-> >         vq->premapped = false;
-> >         vq->do_unmap = vq->use_dma_api;
-> > +       vq->is_tx_newbuf_sent = false; /* Initially, no new buffer to send. */
-> > +       vq->is_tx_oldbuf_cleaned = true; /* Initially, no old buffer to clean. */
-> > +
-> >
-> >         vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
-> >                 !context;
-> > @@ -2375,6 +2383,38 @@ bool virtqueue_notify(struct virtqueue *_vq)
-> >  }
-> >  EXPORT_SYMBOL_GPL(virtqueue_notify);
-> >
-> > +/**
-> > + * virtqueue_set_tx_newbuf_sent - set whether there is new tx buf to send.
-> > + * @_vq: the struct virtqueue
-> > + *
-> > + * If is_tx_newbuf_sent and is_tx_oldbuf_cleaned are both true, the
-> > + * spurious interrupt is caused by polling TX vq in other paths outside
-> > + * the tx irq callback.
-> > + */
-> > +void virtqueue_set_tx_newbuf_sent(struct virtqueue *_vq, bool val)
-> > +{
-> > +       struct vring_virtqueue *vq = to_vvq(_vq);
-> > +
-> > +       vq->is_tx_newbuf_sent = val;
-> > +}
-> > +EXPORT_SYMBOL_GPL(virtqueue_set_tx_newbuf_sent);
-> > +
-> > +/**
-> > + * virtqueue_set_tx_oldbuf_cleaned - set whether there is old tx buf to clean.
-> > + * @_vq: the struct virtqueue
-> > + *
-> > + * If is_tx_oldbuf_cleaned and is_tx_newbuf_sent are both true, the
-> > + * spurious interrupt is caused by polling TX vq in other paths outside
-> > + * the tx irq callback.
-> > + */
-> > +void virtqueue_set_tx_oldbuf_cleaned(struct virtqueue *_vq, bool val)
-> > +{
-> > +       struct vring_virtqueue *vq = to_vvq(_vq);
-> > +
-> > +       vq->is_tx_oldbuf_cleaned = val;
-> > +}
-> > +EXPORT_SYMBOL_GPL(virtqueue_set_tx_oldbuf_cleaned);
-> > +
-> >  /**
-> >   * virtqueue_kick - update after add_buf
-> >   * @vq: the struct virtqueue
-> > @@ -2572,6 +2612,16 @@ irqreturn_t vring_interrupt(int irq, void *_vq)
-> >         struct vring_virtqueue *vq = to_vvq(_vq);
-> >
-> >         if (!more_used(vq)) {
-> > +               /* When the delayed TX interrupt arrives, the old buffers are
-> > +                * cleaned in other cases(start_xmit and virtnet_poll_cleantx).
-> > +                * We'd better not identify it as a spurious interrupt,
-> > +                * otherwise note_interrupt may kill the interrupt.
-> > +                */
-> > +               if (unlikely(vq->is_tx_newbuf_sent && vq->is_tx_oldbuf_cleaned)) {
-> > +                       vq->is_tx_newbuf_sent = false;
-> > +                       return IRQ_HANDLED;
-> > +               }
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/log/?h=mlx5-vhost
 > 
-> This is the general virtio code, it's better to avoid any device specific logic.
+> Dragos Tatulea (7):
+>   net/mlx5: Support throttled commands from async API
+>   vdpa/mlx5: Introduce error logging function
+>   vdpa/mlx5: Use async API for vq query command
+>   vdpa/mlx5: Use async API for vq modify commands
+>   vdpa/mlx5: Parallelize device suspend
+>   vdpa/mlx5: Parallelize device resume
+>   vdpa/mlx5: Keep notifiers during suspend but ignore
 > 
-> > +
-> >                 pr_debug("virtqueue interrupt with no work for %p\n", vq);
-> >                 return IRQ_NONE;
-> >         }
-> > @@ -2637,6 +2687,9 @@ static struct virtqueue *__vring_new_virtqueue(unsigned int index,
-> >         vq->use_dma_api = vring_use_dma_api(vdev);
-> >         vq->premapped = false;
-> >         vq->do_unmap = vq->use_dma_api;
-> > +       vq->is_tx_newbuf_sent = false; /* Initially, no new buffer to send. */
-> > +       vq->is_tx_oldbuf_cleaned = true; /* Initially, no old buffer to clean. */
-> > +
-> >
-> >         vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
-> >                 !context;
-> > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > index ecc5cb7b8c91..ba3be9276c09 100644
-> > --- a/include/linux/virtio.h
-> > +++ b/include/linux/virtio.h
-> > @@ -103,6 +103,9 @@ int virtqueue_resize(struct virtqueue *vq, u32 num,
-> >  int virtqueue_reset(struct virtqueue *vq,
-> >                     void (*recycle)(struct virtqueue *vq, void *buf));
-> >
-> > +void virtqueue_set_tx_newbuf_sent(struct virtqueue *vq, bool val);
-> > +void virtqueue_set_tx_oldbuf_cleaned(struct virtqueue *vq, bool val);
-> > +
-> >  struct virtio_admin_cmd {
-> >         __le16 opcode;
-> >         __le16 group_type;
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
+>  drivers/net/ethernet/mellanox/mlx5/core/cmd.c |  21 +-
+>  drivers/vdpa/mlx5/core/mlx5_vdpa.h            |   7 +
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c             | 435 +++++++++++++-----
+>  3 files changed, 333 insertions(+), 130 deletions(-)
+> 
+> -- 
+> 2.45.2
 
 
