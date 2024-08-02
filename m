@@ -1,101 +1,110 @@
-Return-Path: <netdev+bounces-115174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF6609455D0
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:58:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A23039455D6
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78659B22038
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:58:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC69DB217DA
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3617D79F0;
-	Fri,  2 Aug 2024 00:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E62CA2D;
+	Fri,  2 Aug 2024 01:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QBg2oTFn"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="flXP5mXa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0640817758;
-	Fri,  2 Aug 2024 00:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF742171BB;
+	Fri,  2 Aug 2024 01:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722560279; cv=none; b=sN6nhWSWRQginXUmVUALkRC5JFsmsRkKROam8wXWeOTMZlByjLcW0HKiWTF1rDJWkjVzVeW6ER/OW3Lbm6kSPWLWoy6lrdQatU4NSvz8y7n9jr4eYTKGHW8mewy3KCxxHX1Pqqgw4dhR5AFMmgj6kpdhyhLWYRliDypkFH8UEzc=
+	t=1722560589; cv=none; b=u6Wbf+QQpkv3GTJG7OMMekUIGR6+Vw9G1hnxghK8qDZALCI16fvDX0OgqzzPlRAhbT6SZqkbS4tw35+YQ4nQ6muJPtO7Xsbk4Orto1yQvtaaGhCGGa+KSccL/VNimdrQJlEzcYg/jhWrV6XIpfd2NfsPnZ7pZ5ruoAcNHyEVbhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722560279; c=relaxed/simple;
-	bh=MTaSJyGBiIzdMGc84TjF9+v49GKSVnCpV8/HKiLEJVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=udwZXn3UnSYayeq438g/3vpVBxS/1gOOorLIi5UGJPFyPxavDbw2xhKygNT3Z9KQdLiLokfAn9bqktcRQUl0o8dtxYnbdZm3EbeS1iPk4qEOSIsPhcleCtncq30lUQzalbw1UoJZR5mISmxnPIc9mtF8U4GXEbS3qoQNW+UbRSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QBg2oTFn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EFE2C32786;
-	Fri,  2 Aug 2024 00:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722560278;
-	bh=MTaSJyGBiIzdMGc84TjF9+v49GKSVnCpV8/HKiLEJVo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QBg2oTFnzq35PaCY+KM6z8eegHyrndOsaaeFoP7q+ZTnzWPRcfkCT5397TvNCPveY
-	 V3onjqNZn3QeYsho+3D77AbHeyqKdDTZCvPuC0Uw43Tsw1NI28LAF5jLVdaQgLXOMz
-	 pRnIXP2QmirdYXOSA1FR1XHDHzxN/6MHEsZVYQArfbMxgFLV1sryyHnVBkWgCyrKtW
-	 iPtMyU4W5tztq4HUipwxm+5zk1yeMnERVMfac9eJdXAAOhEYl5gnPwQt1f3SeKLFMD
-	 M6W1MO+FkTW3TACWGqenMNSMDUlwXLg6/mnksYMUYL7W6jpML3fA18Oc5SQe+/UKIi
-	 2V9xzc9Jr0XpQ==
-Date: Thu, 1 Aug 2024 17:57:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Allen <allen.lkml@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- jes@trained-monkey.org, kda@linux-powerpc.org, cai.huoqing@linux.dev,
- dougmill@linux.ibm.com, npiggin@gmail.com, christophe.leroy@csgroup.eu,
- aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com,
- tlfalcon@linux.ibm.com, cooldavid@cooldavid.org, marcin.s.wojtas@gmail.com,
- mlindner@marvell.com, stephen@networkplumber.org, nbd@nbd.name,
- sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- borisp@nvidia.com, bryan.whitehead@microchip.com,
- UNGLinuxDriver@microchip.com, louis.peens@corigine.com,
- richardcochran@gmail.com, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-acenic@sunsite.dk,
- linux-net-drivers@amd.com, netdev@vger.kernel.org, Sunil Goutham
- <sgoutham@marvell.com>
-Subject: Re: [net-next v3 05/15] net: cavium/liquidio: Convert tasklet API
- to new bottom half workqueue mechanism
-Message-ID: <20240801175756.71753263@kernel.org>
-In-Reply-To: <CAOMdWS+HJfjDpQX1yE+2O3nb1qAkQJC_GSiCjrrAJVrRB5r_rg@mail.gmail.com>
-References: <20240730183403.4176544-1-allen.lkml@gmail.com>
-	<20240730183403.4176544-6-allen.lkml@gmail.com>
-	<20240731190829.50da925d@kernel.org>
-	<CAOMdWS+HJfjDpQX1yE+2O3nb1qAkQJC_GSiCjrrAJVrRB5r_rg@mail.gmail.com>
+	s=arc-20240116; t=1722560589; c=relaxed/simple;
+	bh=dKJTM03keVfsRmbcnJBDmHSwgb9oVPMiUwVmGAsWZs8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=THiw+6WoLXv2uETv0BYIIH/eBIAcgAnmlE2YYti4GrgNfyuHFIRNhGQ2JX47kziRN/Fb2GtSLaZ1/0II2mR54ca97mHef2G/cvM4/aOfAhQKIgabeh1WPQnsPlM8jnhJ070WclWtzSo12c750mqHCTyZUDYEOTirmhyDIPJVKHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=flXP5mXa; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1722560588; x=1754096588;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ppqz0qBOe+1vbVD1zltSVM91NLyrfS7kjEtkva9EbhU=;
+  b=flXP5mXaUFGHU7/7CM2Lka/klWsSzMMNW/YAU3PDtY3FB8pxJHa3RDpX
+   jboMFcO2yKCSJoM7koMLLvLlM50mJqoEMo8RBlRRx4Ogd8N4Y43pVBRfd
+   uVdQdD8sFZ1+63j/5Gf7ENnT88mTL9EWgi/LqUu11JhGpYLe3GD2QVqYm
+   g=;
+X-IronPort-AV: E=Sophos;i="6.09,256,1716249600"; 
+   d="scan'208";a="746530064"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 01:03:02 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:32328]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.192:2525] with esmtp (Farcaster)
+ id d5c455eb-1462-420f-8b74-c2cf7f601752; Fri, 2 Aug 2024 01:03:01 +0000 (UTC)
+X-Farcaster-Flow-ID: d5c455eb-1462-420f-8b74-c2cf7f601752
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 2 Aug 2024 01:03:01 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.33) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 2 Aug 2024 01:02:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <0x7f454c46@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <stable@kernel.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net v3] net/tcp: Disable TCP-AO static key after RCU grace period
+Date: Thu, 1 Aug 2024 18:02:50 -0700
+Message-ID: <20240802010250.82312-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAJwJo6Z-qsZ9ZLV7qHrc=ujYT0Q2Ayod_C6e9kM+2QH48z650w@mail.gmail.com>
+References: <CAJwJo6Z-qsZ9ZLV7qHrc=ujYT0Q2Ayod_C6e9kM+2QH48z650w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWC004.ant.amazon.com (10.13.139.206) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, 1 Aug 2024 15:00:23 -0700 Allen wrote:
-> > Could you shed some light in the cover letter or this patch why
-> > tasklet_enable() is converted to enable_and_queue_work() at
-> > the face of it those two do not appear to do the same thing?  
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Fri, 2 Aug 2024 01:37:28 +0100
+> On Thu, 1 Aug 2024 at 01:13, Dmitry Safonov via B4 Relay
+> <devnull+0x7f454c46.gmail.com@kernel.org> wrote:
+> >
+> > From: Dmitry Safonov <0x7f454c46@gmail.com>
+> [..]
+> > Happened on netdev test-bot[1], so not a theoretical issue:
 > 
-> With the transition to workqueues, the implementation on the workqueue side is:
-> 
-> tasklet_enable() -> enable_work() + queue_work()
-> 
-> Ref: https://lore.kernel.org/all/20240227172852.2386358-7-tj@kernel.org/
-> 
-> enable_and_queue_work() is a helper which combines the two calls.
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=474a549ff4c989427a14fdab851e562c8a63fe24
-> 
-> Hope this answers your question.
+> Self-correction: I see a static_key fix in git.tip tree from a recent
+> regression, which could lead to the same kind of failure. So, I'm not
+> entirely sure the issue isn't theoretical.
+> https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=224fa3552029
 
-To an extent. tj says "unconditionally scheduling the work item after
-enable_work() returns %true should work for most users." 
-You need to include the explanation of the conversion not being 1:1 
-in the commit message, and provide some analysis why it's fine for this
-user.
+My syzkaller instances recently started to report similar splats over
+different places (TCP-AO/MD5, fl6, netfilter, perf, etc), and I was
+suspecting a bug in the jump label side.
+
+report19:2:jump_label: Fatal kernel bug, unexpected op at fl6_sock_lookup include/net/ipv6.h:414 [inline] [000000001bd3e3db] (e9 ee 00 00 00 != 0f 1f 44 00 00)) size:5 type:1
+report23:1:jump_label: Fatal kernel bug, unexpected op at nf_skip_egress include/linux/netfilter_netdev.h:136 [inline] [00000000c1241913] (e9 e9 0a 00 00 != 0f 1f 44 00 00)) size:5 type:1
+report45:2:jump_label: Fatal kernel bug, unexpected op at tcp_ao_required include/net/tcp.h:2776 [inline] [000000009a4b37e9] (eb 5a e8 e1 57 != 66 90 0f 1f 00)) size:2 type:1
+report49:3:jump_label: Fatal kernel bug, unexpected op at perf_sw_event include/linux/perf_event.h:1432 [inline] [00000000c1f7a26c] (eb 24 e9 63 fe != 66 90 0f 1f 00)) size:2 type:1
+report58:2:jump_label: Fatal kernel bug, unexpected op at tcp_md5_do_lookup include/net/tcp.h:1852 [inline] [00000000fbd24b58] (e9 8d 01 00 00 != 0f 1f 44 00 00)) size:5 type:1
+
+I'll cherry-pick the patch and see if it fixes them altogether.
+It will take few days.
+
+Thanks!
 
