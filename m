@@ -1,144 +1,104 @@
-Return-Path: <netdev+bounces-115433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9CE09465E2
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:24:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A819465F8
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DD2F281516
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 22:24:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B19281C21035
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 22:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92790130A5C;
-	Fri,  2 Aug 2024 22:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B60A65E20;
+	Fri,  2 Aug 2024 22:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gpoIgNLT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R7MjmMOO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F7F1757D
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 22:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93DE1ABEB6
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 22:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722637491; cv=none; b=PYpV7xq+rEr7GdMIgK/7BovOnL+7jDyQG+hESHr55pyI4C7kCRx39ckiUV1ik1NGQXqgipHA4o59CFR/y1gLgaZv2coG6oKgC0F1XdYG3TximAKB1jujvpTFVGC53mAjQsJpzBsvk1rZUVmaCfDkpc+DjK+8QpZT6zOQS4eZcX4=
+	t=1722638830; cv=none; b=rEsNVDxmtv1KRj+nGDR1gyWF8TXMnq1PRbBQu96YDx83bSpXVbi1AyrK3K/vbGlPZNVlXQB8mFk7rAIUpNsJQ+zRCDRIXMEgmUG3V9bO8nn/BhtKAfEAt/I/NN1pxSKsKPZsZIYsJHNa3igTnCmLQjuBVOEMGa4eXNYJjfcwdHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722637491; c=relaxed/simple;
-	bh=CwFj2BTTeV2viZrF++qumJ3j9hhSoclroxHUHO/9NIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iD5/pWwGqBADlkfavJDXFQrL5mRTJzhaeQE7UpKNUlFIxXd8ReadC2ZtMlK59KuwzY1lO50PQpKD2WfCWf+5uN/4kOTnopRTqSapFUQQF2/o+1lL9lweO3W66q0ZZ9MrrxjMWr1Ri/zpeZBmVEYyZoHerBiRV8rd92JkYBvb7uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gpoIgNLT; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722637490; x=1754173490;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CwFj2BTTeV2viZrF++qumJ3j9hhSoclroxHUHO/9NIE=;
-  b=gpoIgNLT5uaUT4LWCP4f1uMw7CPcAKJv02yG4uhz6a4tgFrzkkjxYNYv
-   G0xuATNqlpNYA0ODacJ82ucLAWCIiodTSMAjTW5dYllWbw9NbKH8Lasev
-   Sz3fQVyVqEQw4e9M4WMRYFEk5xT+Yppw4ST7QzeqqSChpTnwH6F6xiS24
-   2UHJA4E51dGvdERNIUPpqrEL2vunQ7QrSTqNaa0TGv9dRNf+2sA96Qzy5
-   UpxBfG9n3iNpu8zGNf2514Ekz9UT8PwJ/m3n+dZxgjx99MfRruzvu3ppQ
-   RWC/8pQtIJMho/16egEMvzwIkuiaHbvWWKt/XKoy1sLEMEKXTPkaKL1Aa
-   w==;
-X-CSE-ConnectionGUID: VhShy0j9S4+xuwX/7FnbeA==
-X-CSE-MsgGUID: EV7vzW0VTSqKglJk+JBAzQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11152"; a="20344464"
-X-IronPort-AV: E=Sophos;i="6.09,259,1716274800"; 
-   d="scan'208";a="20344464"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 15:24:49 -0700
-X-CSE-ConnectionGUID: pG6BUJZ7Sc2R1qQoiEngRg==
-X-CSE-MsgGUID: 7zSmFYD+SNi4BrTK1Ru0qQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,259,1716274800"; 
-   d="scan'208";a="55219901"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 02 Aug 2024 15:24:48 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sa0ha-000xVC-01;
-	Fri, 02 Aug 2024 22:24:46 +0000
-Date: Sat, 3 Aug 2024 06:24:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@chopps.org>
-Subject: Re: [PATCH ipsec-next v7 08/16] xfrm: iptfs: add user packet (tunnel
- ingress) handling
-Message-ID: <202408030653.77rcVK4C-lkp@intel.com>
-References: <20240801080314.169715-9-chopps@chopps.org>
+	s=arc-20240116; t=1722638830; c=relaxed/simple;
+	bh=THbTUedfPNKqjs96TIhUgzsZRFAOtZ7uuHKn4O5aN+w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gibwyonYn9sk5CLyIsZZvivHUZB9AykbmtliirA2Lxj3ukrFW03h/QELLX6z3UY9IJPxD/D9bfQM/bZhfyMUp7KMpJDIbyg75HgEwflNtBOFsS98YTdoXVSsQdJYabi6QicB8SKIZvxFFEQyrnRE7YPWvkr9qqGati31MDfqV9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=R7MjmMOO; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52f01ec08d6so12476339e87.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 15:47:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722638827; x=1723243627; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=THbTUedfPNKqjs96TIhUgzsZRFAOtZ7uuHKn4O5aN+w=;
+        b=R7MjmMOOKwoGcyWXPdAKmjHimBgssKNjw9vulms0y4bUDk887y2Dyb3sQSOuwk8n+4
+         nkRd0SSX+k9hauZhvhv1Mu4ObP3m1+X4RZwAhg2fw2DUkztNmV8zdxC3/RzTPae9ZNwf
+         enPSuIApxI0Mjdj41YsVXVvIrAuOMnOIhuXrruG1fg60AC4/S8IbK4ZYjs+5dUDlGqSw
+         54Ae0Dj8dOowo5KFG0HSoCxb5mVpKyDdXSxWj0d8H8Em/Ydc4tnQ0xR5GlkLBpIrZxXB
+         SKX7i7bgd/MqeNhde8RRxpW7zASaN+hZpJe+jTmaIlQ4Cxh/3GEhnVf5ZLgqxrrVozmX
+         7Z6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722638827; x=1723243627;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=THbTUedfPNKqjs96TIhUgzsZRFAOtZ7uuHKn4O5aN+w=;
+        b=uojpWwPEOM/xGOQkT5aNmF/bq21kAE6Em9rDvn7F/NOXFz0IaQc5LQkFzm0dKlWxlI
+         qpnvD2tP4rryWp81CwLyuk/kq7D4JfnomBWfMWip912QzVc3xvd5B1msPUOqWNAdqYCe
+         vgJQOkpWEjK2XwQKFoc5rPbtYAIUyzsrfDOkSOH27+WsMH+Q9odJEz6yqKvDcxczKpbx
+         GwO1dhyefgxgTQODgHrsCCBP+5ych1HdlMpRX3iLvtgwQfpViqPvrNsKkzDjk1bml+2v
+         /GTa0pnw1ig1fpn6ImRTkaHyi8+rGsAhh1lr+YVHr3j81sWilYK1JGiOJMSR74OG95qE
+         bs4Q==
+X-Gm-Message-State: AOJu0YzFNl89rY5XRcTHP+8VXhJHSR2+xcYElb4t8+WU+kdhMA9yhJks
+	k1fQCKCnRNI7XE3g0/0X1UmM3++xrvP3/knlhWkOAqQccVIqv1DeVJfxSG/jwXZJ/M2MsdPTPju
+	nc3DWa8IJirB3mY64TKvHel9Vz4nDogLRK6QMhg==
+X-Google-Smtp-Source: AGHT+IHaxphvvVOqZtyqFT8jtOs3FeykDhzmXg4r2inKAxkSbJwEECQUJ7Z9cz9h3d+4wk/yzyUeMpDU1gIrN18B/T4=
+X-Received: by 2002:a05:6512:128f:b0:52f:c24b:175f with SMTP id
+ 2adb3069b0e04-530bb374350mr2990086e87.20.1722638826801; Fri, 02 Aug 2024
+ 15:47:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801080314.169715-9-chopps@chopps.org>
+References: <20240729210200.279798-1-paweldembicki@gmail.com> <20240729210200.279798-2-paweldembicki@gmail.com>
+In-Reply-To: <20240729210200.279798-2-paweldembicki@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 3 Aug 2024 00:46:55 +0200
+Message-ID: <CACRpkdb_7R=B6Ud_PdbrPA4JQViMBLeyAqSbga7-Ljkq0T3M8A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] dt-bindings: net: dsa: vsc73xx: add {rx,tx}-internal-delay-ps
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
+On Mon, Jul 29, 2024 at 11:02=E2=80=AFPM Pawel Dembicki <paweldembicki@gmai=
+l.com> wrote:
 
-kernel test robot noticed the following build warnings:
+> Add a schema validator to vitesse,vsc73xx.yaml for MAC-level RGMII delays
+> in the CPU port. Additionally, valid values for VSC73XX were defined,
+> and a common definition for the RX and TX valid range was created.
+>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-[auto build test WARNING on klassert-ipsec-next/master]
-[also build test WARNING on netfilter-nf/main linus/master v6.11-rc1 next-20240802]
-[cannot apply to klassert-ipsec/master nf-next/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Elegant!
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Hopps/xfrm-config-add-CONFIG_XFRM_IPTFS/20240802-185628
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/20240801080314.169715-9-chopps%40chopps.org
-patch subject: [PATCH ipsec-next v7 08/16] xfrm: iptfs: add user packet (tunnel ingress) handling
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240803/202408030653.77rcVK4C-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240803/202408030653.77rcVK4C-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408030653.77rcVK4C-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   net/xfrm/xfrm_iptfs.c:32: warning: bad line: 
->> net/xfrm/xfrm_iptfs.c:41: warning: expecting prototype for IP(). Prototype was for IPTFS_DEFAULT_INIT_DELAY_USECS() instead
-
-
-vim +41 net/xfrm/xfrm_iptfs.c
-
-    21	
-    22	/**
-    23	 * IP-TFS default SA values (tunnel ingress/dir-out)
-    24	 *
-    25	 * IPTFS_DEFAULT_INIT_DELAY_USECS
-    26	 *        The default IPTFS initial output delay in microseconds. The initial
-    27	 *        output delay is the amount of time prior to servicing the output queue
-    28	 *        after queueing the first packet on said queue. This applies anytime
-    29	 *        the output queue was previously empty.
-    30	 *
-    31	 *        Default 0.
-    32	
-    33	 * IPTFS_DEFAULT_MAX_QUEUE_SIZE
-    34	 *        The default IPTFS max output queue size in octets. The output queue is
-    35	 *        where received packets destined for output over an IPTFS tunnel are
-    36	 *        stored prior to being output in aggregated/fragmented form over the
-    37	 *        IPTFS tunnel.
-    38	 *
-    39	 *        Default 1M.
-    40	 */
-  > 41	#define IPTFS_DEFAULT_INIT_DELAY_USECS	(0ull) /* no initial delay */
-    42	#define IPTFS_DEFAULT_MAX_QUEUE_SIZE	(1024 * 10240) /* 1MB */
-    43	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yours,
+Linus Walleij
 
