@@ -1,186 +1,134 @@
-Return-Path: <netdev+bounces-115287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B0D945BC8
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:06:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C29EF945BE1
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C80561C2151B
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:06:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07894B21B27
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A71DAC43;
-	Fri,  2 Aug 2024 10:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A86014C5A9;
+	Fri,  2 Aug 2024 10:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReqdFJ6q"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2740614B952
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 10:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25D514B962
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 10:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722593159; cv=none; b=Utw/WSFy7DIsNJ+d7gDgZmoIVYqsydYvB4s8kGtrigymumE3R6CXt5/ZampVgf+wIXZkwHrdLlpxzZHpcrHidWRTvLYTzXEmcFgxxUDwv5BOQ4PIx7thB6NeDdrWq76vRMZm29UNXnyO22Bx55gWIHEu7vVAb/dvF0JIDVd8yR4=
+	t=1722594081; cv=none; b=GDQ8lY56xsHgtTdJb1oGfke7XCvyX+TnnTYtLxPJd5bGnJVFLJ7rBGvjwbm2HCjWHIkYUL/TcgfpJCQ0iqcisaCHCeJMChksCbJsCedkiPaAgFfVUfqvpH1J+R+OKv+rvgMw5PanfwpFVHo7GYMBh6qtOb4LdXa9UfP1owdmtpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722593159; c=relaxed/simple;
-	bh=p8KHDp5T541LzcauHdbygkcHm9Fm1n44ZnrMVKkUu6w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gwaRyR2rosNwWjzAC8CNDgb4sLy8u56vxtV3q026WBggoGWteVfrtU6XC2vsXWKmie8yZ5GbhaaCSWjAG8XOc5osc9PF6Mx0cghfSzi4gXRQ9VadV25VIj9J+pEp5NAt8hEnXKscRRC1OfZQ1b1xKGUTlmbtInhu9j0XAnqTvz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Wb1gM2kRczcd3d
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 18:05:51 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0F1351800A1;
-	Fri,  2 Aug 2024 18:05:53 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 2 Aug 2024 18:05:52 +0800
-Message-ID: <877efebe-f316-4192-aada-dd2657b74125@huawei.com>
-Date: Fri, 2 Aug 2024 18:05:52 +0800
+	s=arc-20240116; t=1722594081; c=relaxed/simple;
+	bh=swtOBPZq4WvScvEVGeF9w9z0uTM2T95cCrLl5Z/X43A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QMS62kvJmELmUJx8uohnD47cUr3Khk6t1fBp+M60wPOGY+pRqCeDkuqJua7HKxEVcHXR8FN5vXJ0/zKLzyn6obu4Gkb6DkOWref5j9lhPMiO3csqpu17+xLyIStiiy/YpKywgw/HiTxKciEr4ZO5yCDkVDoXCdTrzfo0/5EHmGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReqdFJ6q; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7106cf5771bso959919b3a.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 03:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722594079; x=1723198879; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RB4Srv6NKyP3H06K6N5TpRjgW6p9XL6wJIbvbVXiEvI=;
+        b=ReqdFJ6qNygDhom5GyObKnKtxKlZev3Kr0kPfyB5Yw1RpCVzBoVOLUkTmQT5d+lukc
+         Mbhtbghb+sY9jzeoFYovZfPUS/3wMwvKv/oTjTvBkD5TRIwLAcG2rsu/bEv7uKv/OdSS
+         0pLR6vYOW6xNy5UxajwL+bSnn2Bs/WNEQ5Lxt0SFtaHJW7j5ZKJLqcrcSd8NZpxOXktE
+         DWZHxmEanl6s8okFWfgzs5jK6jdSWK+XF2JlVCfZtN/fZkwva+IU0yzcH2hW+tVSOXOk
+         vBo++nYTkDfAQm5uM2hh3T89JcIlWvmW85tLDiRWQVPx+jIqEVZmvUiTlumSLY/Iw21z
+         h0xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722594079; x=1723198879;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RB4Srv6NKyP3H06K6N5TpRjgW6p9XL6wJIbvbVXiEvI=;
+        b=PaHmhpJSUQFZ+LYxfsWc7jK9zySyHmaPR3af7davdS4mI4UPAT/gciV24kIohlP54U
+         ETd6fTTTK6TvpiTwwcIGRUZLe4GrhrYUkaKwk8rFRxIg8SpTG40QWcpfQCBzBav5D6kY
+         cARhUu2BJES6Vh7TRaHiIeau5OkvJoBYbXkxKg5nL5X51dBXSDze3R7gRvwDnJQ1Xnzo
+         DSH8XcotPbiCKvkqUIITfSOrDnsuxyeP0oJnKBrJ1wFr75UunjztgjU/jK9rnEwgQYen
+         FLdTRg2RC3GzD2j2+T5ETTRBAh3IX6KZDnvJ89KBiL9zALV+vuziSuVMZNL98Is+pEVm
+         Cp4w==
+X-Gm-Message-State: AOJu0YxOWmG3mpAGiunWCLAioPbj+pwjIXxrW8NGIKSOUMWRfstBktdE
+	96nfkoUUh5IRmALtYuuOsEDJ6vLedSeQ5FqlrGWAJoSz+hfbFXLQsbF3t2Dh
+X-Google-Smtp-Source: AGHT+IFG/66qpRDI0g/+GQfhHJf//q1fZmlOWKPszX43WIZwK73q/jlGJ0WIwzGTF2e3yURqMM0yEQ==
+X-Received: by 2002:a05:6a20:430d:b0:1c0:ebca:eaca with SMTP id adf61e73a8af0-1c699555468mr4620789637.12.1722594078960;
+        Fri, 02 Aug 2024 03:21:18 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7b763469e79sm1109050a12.26.2024.08.02.03.21.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 03:21:18 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	kuniyu@amazon.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v4 0/7] tcp: completely support active reset
+Date: Fri,  2 Aug 2024 18:21:05 +0800
+Message-Id: <20240802102112.9199-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
-	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil
- Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>
-References: <20240731124505.2903877-1-linyunsheng@huawei.com>
- <20240731124505.2903877-5-linyunsheng@huawei.com>
- <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
- <22fda86c-d688-42e7-99e8-e2f8fcf1a5ba@huawei.com>
- <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2024/8/1 23:21, Alexander Duyck wrote:
-> On Thu, Aug 1, 2024 at 6:01 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2024/8/1 2:13, Alexander Duyck wrote:
->>> On Wed, Jul 31, 2024 at 5:50 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>>>
->>>> Currently the page_frag API is returning 'virtual address'
->>>> or 'va' when allocing and expecting 'virtual address' or
->>>> 'va' as input when freeing.
->>>>
->>>> As we are about to support new use cases that the caller
->>>> need to deal with 'struct page' or need to deal with both
->>>> 'va' and 'struct page'. In order to differentiate the API
->>>> handling between 'va' and 'struct page', add '_va' suffix
->>>> to the corresponding API mirroring the page_pool_alloc_va()
->>>> API of the page_pool. So that callers expecting to deal with
->>>> va, page or both va and page may call page_frag_alloc_va*,
->>>> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
->>>>
->>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
->>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->>>> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
->>>
->>> I am naking this patch. It is a pointless rename that is just going to
->>> obfuscate the git history for these callers.
->>
->> I responded to your above similar comment in v2, and then responded more
->> detailedly in v11, both got not direct responding, it would be good to
->> have more concrete feedback here instead of abstract argument.
->>
->> https://lore.kernel.org/all/74e7259a-c462-e3c1-73ac-8e3f49fb80b8@huawei.com/
->> https://lore.kernel.org/all/11187fe4-9419-4341-97b5-6dad7583b5b6@huawei.com/
-> 
-> I will make this much more understandable. This patch is one of the
-> ones that will permanently block this set in my opinion. As such I
-> will never ack this patch as I see no benefit to it. Arguing with me
-> on this is moot as you aren't going to change my mind, and I don't
-> have all day to argue back and forth with you on every single patch.
+From: Jason Xing <kernelxing@tencent.com>
 
-Let's move on to more specific technical discussion then.
+This time the patch series finally covers all the cases in the active
+reset logic. After this, we can know the related exact reason(s).
 
-> 
-> As far as your API extension and naming maybe you should look like
-> something like bio_vec and borrow the naming from that since that is
-> essentially what you are passing back and forth is essentially that
-> instead of a page frag which is normally a virtual address.
+v4
+Link:
+1. revise the changelog to avoid future confusion in patch [5/7] (Eric)
+2. revise the changelog of patch [6/7] like above.
+3. add reviewed-by tags (Eric)
 
-I thought about adding something like bio_vec before, but I am not sure
-what you have in mind is somthing like I considered before?
-Let's say that we reuse bio_vec like something below for the new APIs:
+v3
+Link: https://lore.kernel.org/all/20240731120955.23542-1-kerneljasonxing@gmail.com/
+1. introduce TCP_DISCONNECT_WITH_DATA reason (Eric)
+2. use a better name 'TCP_KEEPALIVE_TIMEOUT' (Eric)
+3. add three reviewed-by tags (Eric)
 
-struct bio_vec {
-	struct page	*bv_page;
-	void		*va;
-	unsigned int	bv_len;
-	unsigned int	bv_offset;
-};
+v2
+Link: https://lore.kernel.org/all/20240730133513.99986-1-kerneljasonxing@gmail.com/
+1. use RFC 9293 in the comment and changelog instead of old RFC 793
+2. correct the comment and changelog in patch 5
 
-It seems we have the below options for the new API:
 
-option 1, it seems like a better option from API naming point of view, but
-it needs to return a bio_vec pointer to the caller, it seems we need to have
-extra space for the pointer, I am not sure how we can avoid the memory waste
-for sk_page_frag() case in patch 12:
-struct bio_vec *page_frag_alloc_bio(struct page_frag_cache *nc,
-				    unsigned int fragsz, gfp_t gfp_mask);
+Jason Xing (7):
+  tcp: rstreason: introduce SK_RST_REASON_TCP_ABORT_ON_CLOSE for active
+    reset
+  tcp: rstreason: introduce SK_RST_REASON_TCP_ABORT_ON_LINGER for active
+    reset
+  tcp: rstreason: introduce SK_RST_REASON_TCP_ABORT_ON_MEMORY for active
+    reset
+  tcp: rstreason: introduce SK_RST_REASON_TCP_STATE for active reset
+  tcp: rstreason: introduce SK_RST_REASON_TCP_KEEPALIVE_TIMEOUT for
+    active reset
+  tcp: rstreason: introduce SK_RST_REASON_TCP_DISCONNECT_WITH_DATA for
+    active reset
+  tcp: rstreason: let it work finally in tcp_send_active_reset()
 
-option 2, it need both the caller and callee to have a its own local space
-for 'struct bio_vec ', I am not sure if passing the content instead of
-the pointer of a struct through the function returning is the common pattern
-and if it has any performance impact yet:
-struct bio_vec page_frag_alloc_bio(struct page_frag_cache *nc,
-				   unsigned int fragsz, gfp_t gfp_mask);
+ include/net/rstreason.h | 39 +++++++++++++++++++++++++++++++++++++++
+ net/ipv4/tcp.c          | 19 +++++++++++--------
+ net/ipv4/tcp_output.c   |  2 +-
+ net/ipv4/tcp_timer.c    |  6 +++---
+ 4 files changed, 54 insertions(+), 12 deletions(-)
 
-option 3, the caller passes the pointer of 'struct bio_vec ' to the callee,
-and page_frag_alloc_bio() fills in the data, I am not sure what is the point
-of indirect using 'struct bio_vec ' instead of passing 'va' & 'fragsz' &
-'offset' through pointers directly:
-bool page_frag_alloc_bio(struct page_frag_cache *nc,
-			 unsigned int fragsz, gfp_t gfp_mask, struct bio_vec *bio);
-
-If one of the above option is something in your mind? Yes, please be more specific
-about which one is the prefer option, and why it is the prefer option than the one
-introduced in this patchset?
-
-If no, please be more specific what that is in your mind?
+-- 
+2.37.3
 
 
