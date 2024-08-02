@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-115316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED4A945D28
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:20:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F9A945D38
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E22B8282BD7
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:20:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E8A9B235B7
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458C71E2118;
-	Fri,  2 Aug 2024 11:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDEC1E212F;
+	Fri,  2 Aug 2024 11:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EhPYw3Af"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eSrXsJJ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB061D1F4B
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9907C1E210A
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722597635; cv=none; b=LYALqR6hgSneYQ5qhW0A5i/B5FpPavd7+MioHt8ARv6Bq/4a0FgqiKjDf3eh7CCVxjx5qEUIT7eRblnlH7fZc8bbIG/XACAZFNvV/gascU0tgTERy9/0w5+PlH5n3TZN6378FgLod7cbOv2LTfnRQiZmipTaVeRrxps8S4IVbDk=
+	t=1722597827; cv=none; b=OT5/0V9ZZ7F8oekOMOoGAQJmZ5jlK4Y5Z0Wb/BcPnNdIejZEKVDpZXKrQLD/XIGkcb9bWCsWvIJmcyibzMCp/WSLro36XSIW8JCBMcxCl0fe0kpOLHv2jDM8DPk/bgaPnQDXwENd8fNn7wzrjhHfUWqwFVnhysNIvP7Dwqjf/Eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722597635; c=relaxed/simple;
-	bh=ahVW27mFm4tKufePWHLVWyZ/GW++VPFGJbISeuzLUXE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=U8cyQof6Fnul4icfKzwOQOs1SBFJgftFysh6YytHqo0P9pEzcpCFtyW/uC4yzY8R/TXk59xaDQN1oq6wdfyA89kea9yt0SUZrFd5vfBWE5SxkVBMpWjQ2JeXHt2UO28qkGq/o4tj0QizSXIR6AzIQx6TYkYxuyVgxYnKqtdLXXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=EhPYw3Af; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5a79df5af51so5547999a12.0
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:20:33 -0700 (PDT)
+	s=arc-20240116; t=1722597827; c=relaxed/simple;
+	bh=VCMnpltAgLcnIlUjr6dJwB7StRfY7JdRLsILPreNNOs=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZYtFazv3FJfX19WLBQliXERgzGGbpRRkS0ljNpkJARUcu3JPdYljv7oiKoVfxfWET+9saXwuwbmYvMwEuVHL2ABOI+hH9xcBxSEtTdq1Kgm0BBW/F3eM98kvy3uKU+tkk1YKazZIMxz0y6tGDDNfhbEUWWq0Z/YJza4/fhKBvYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eSrXsJJ+; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f035ae0fd1so91382221fa.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:23:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1722597632; x=1723202432; darn=vger.kernel.org;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
+        d=gmail.com; s=20230601; t=1722597824; x=1723202624; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9bp0Lv7R938kb69AhH/RUpNk52nvW3s45fMjR04Xwyk=;
-        b=EhPYw3AfnSDv3su+CRVQe8k7E5rnxiU5b8+YpFSZmvuiGcZbmdVWTbFrkHnnkjUGm0
-         tkWa8H+9nxDRONfTJG2Zc1VPacyAqh/AlE/EjK1/fyc6Dde5Qf9VNXueahAPNi0gJ4aA
-         qTN8XDHGYER54a6BBF9DZb6Qs4iy9GZG4OiY3eVDOv6tSTGPuHi3FQdyuF1cozER2jvR
-         jqu4HUhOheHvw12f5Lc69QGIjLAy5xTBxSBKAa4nZx4RiXswwzCJYFPpoQmZNEKe1EGD
-         UvOwXSe9wq4dcgy6aoSB7WYCAYDLvuWSlk7+oIl2HAo0cOmUYzdoQ+iJgtJuWzRYrlcv
-         lv5Q==
+        bh=ONdrsL7JDomhRRs1wygKDPeZPHuYxZxLLbqcvLxVU1Q=;
+        b=eSrXsJJ+pWwOiW9Qg9HYyx0qL/aNFs2/k/bblGvZSAM6AcTaeUCh6vY3llFzdKUQQP
+         XMdTpPZO7NnDWXMkcl06VNQzhal5uamT5ifg0obubDLFRyIhcjyza9dpvnJW2zi6cLuC
+         GiMtegC5RPd41jkipliJOfO5pbweDKPqeFPagL7eFBEpIQ3OeSjwt7dmZ5CbADQBUWNJ
+         LpUkYtBUviDhvTAIQkMZ1P+X58SyaOamNR5oeqwG79gi4iD83rbroYIWAFwNYDpeNeID
+         FFOY1B+exNsAcuaSmHpvmdm5bw91XOtP2PzlKYedG/mjXkUO5bWgyT+V52afb+3kF0NT
+         t60w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722597632; x=1723202432;
-        h=mime-version:message-id:date:user-agent:references:in-reply-to
+        d=1e100.net; s=20230601; t=1722597824; x=1723202624;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9bp0Lv7R938kb69AhH/RUpNk52nvW3s45fMjR04Xwyk=;
-        b=fogPvBdNJ9WiQERVcszlMn7Nxn3jHICVN4kZBDodTcX3qpleFsO3Vz4D1lb+5+bFGS
-         p4dkZ/GBcT86EJnxrsPvA4tlzZOCk2rpwLn9N5rDAmhysHXtTWRgjP1bmauGwMF+B1Wl
-         sGvSbJlJN7RCY+vzn8iDF2LbWFzc19tEWvHDq5JC6EX99NMs5e5BbIGhl8xZ4xh7g764
-         +dK8nhTsQl84HdrAqSZkX5/Ih5k0StaQ4FlKct/eW5Z+WlnV6vIGKvrCRvTnFoZWcDjY
-         q7UtcZeLAkyJKPiqBNrXQuZRv4eNPxXL/rf5uey76FIBhhsVfOZPrb5tqIP/q1ouhHbp
-         ZUOw==
-X-Gm-Message-State: AOJu0Yw1l2EUJ8BnJQaRAIpEaklxXSpTtWHjMyg+uGr3WWvlRX9bS9oH
-	KOBZI6X4M/F+VoPm8fMJG0wOb4er7GqWLp4loj4gRXyd5bya2mCCzhq/S4dXwG0=
-X-Google-Smtp-Source: AGHT+IE8kXYEwxyh2rF5/J9aD7Dl1W5CwWPprLc67eBJ2XZXbvCKMs6cyZYrUE9gtmmuVgAEnzrQAQ==
-X-Received: by 2002:a17:906:dc90:b0:a7d:895b:fd with SMTP id a640c23a62f3a-a7dbcb9000fmr411014966b.6.1722597631730;
-        Fri, 02 Aug 2024 04:20:31 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e7fe3csm86590166b.162.2024.08.02.04.20.31
+        bh=ONdrsL7JDomhRRs1wygKDPeZPHuYxZxLLbqcvLxVU1Q=;
+        b=IsuDPO8B9H23S4zZLqoIM2Y0Xfim2gbfsf5eXYSAauRgpnwB71LsRNob2B6po7bZkP
+         wO3G7JSpY2bZYzA/ciCPmzJfoOW/3PqjNgJxKk4KJTJtEgtHDXeF0opTHPTH1fQ3eSwf
+         SufQzBvAdTGq2N2sUKBEs+QQ1icMIP2li04NBzs8y+540/muQVDaSgNSKCIsNCiDQl+O
+         HQorTLxz5YIF3UkXwHZqFsrPnRvSbHqjp36ejIxHxthOhCH0SeuJ0rmaM0EdXzSMmi1g
+         pOVr087U2ygAkjttrbIqSDZqn69qFYDlN1WhAWQmg76eL+jT9b+5aI65a3q2z+9CCYBL
+         nydQ==
+X-Gm-Message-State: AOJu0Yx7lfPXB49MOcbYJSqjKf0R4xkkv4QzKwb6lLdXvWL4dOMp/BGg
+	56ft54BqFD/PsR9uAjipKksxjiNhMXFrI13U8oVzjeozsQ7IZhIQ
+X-Google-Smtp-Source: AGHT+IHM7XUxrK6QlIpJnrFTESar/5ckjDHR8p4BCy1XGDYw3JgpQhl861vjXQrytqhtW/Jf3KDZ0g==
+X-Received: by 2002:a2e:9c8d:0:b0:2ef:2e8f:f3b3 with SMTP id 38308e7fff4ca-2f15aaa446emr21932071fa.21.1722597823339;
+        Fri, 02 Aug 2024 04:23:43 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:e8ca:b31f:8686:afd3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8ada30sm86787835e9.19.2024.08.02.04.23.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:20:31 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Willem
- de Bruijn <willemb@google.com>,  kernel-team@cloudflare.com,
-  syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2 0/2] Silence bad offload warning when sending UDP
- GSO with IPv6 extension headers
-In-Reply-To: <20240801183659.17c25cbd@kernel.org> (Jakub Kicinski's message of
-	"Thu, 1 Aug 2024 18:36:59 -0700")
-References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
-	<20240801183659.17c25cbd@kernel.org>
-User-Agent: mu4e 1.12.4; emacs 29.1
-Date: Fri, 02 Aug 2024 13:20:30 +0200
-Message-ID: <87ikwjyxvl.fsf@cloudflare.com>
+        Fri, 02 Aug 2024 04:23:42 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Jiri Pirko
+ <jiri@resnulli.us>,  Madhu Chittim <madhu.chittim@intel.com>,  Sridhar
+ Samudrala <sridhar.samudrala@intel.com>,  Simon Horman <horms@kernel.org>,
+  John Fastabend <john.fastabend@gmail.com>,  Sunil Kovvuri Goutham
+ <sgoutham@marvell.com>,  Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 06/12] netlink: spec: add shaper introspection support
+In-Reply-To: <8f7b753a8eb346d3f9ed2990f60f12d3bb5a6f4a.1722357745.git.pabeni@redhat.com>
+	(Paolo Abeni's message of "Tue, 30 Jul 2024 22:39:49 +0200")
+Date: Fri, 02 Aug 2024 12:21:47 +0100
+Message-ID: <m2r0b7np9w.fsf@gmail.com>
+References: <cover.1722357745.git.pabeni@redhat.com>
+	<8f7b753a8eb346d3f9ed2990f60f12d3bb5a6f4a.1722357745.git.pabeni@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,23 +88,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-On Thu, Aug 01, 2024 at 06:36 PM -07, Jakub Kicinski wrote:
-> On Thu, 01 Aug 2024 15:52:52 +0200 Jakub Sitnicki wrote:
->> This series addresses a recent regression report from syzbot [1].
->> Please see patch 1 description for details.
->
-> The test doesn't seem super happy in netdev CI:
->
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/709100/79-udpgso-sh/stdout
-> https://netdev-3.bots.linux.dev/vmksft-net/results/709101/78-udpgso-sh/stdout
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/708921/75-udpgso-sh/stdout
-> https://netdev-3.bots.linux.dev/vmksft-net/results/708921/78-udpgso-sh/stdout
+Paolo Abeni <pabeni@redhat.com> writes:
+> +      -
+> +        name: support-nesting
+> +        type: flag
+> +        doc: |
+> +          the device supports nesting shaper belonging to this scope
 
-Embarassing. I must have not recompiled the tests after tweaking it.
-Sorry for the oversight. I will deal with it.
+Nit: capitalize all the doc strings for consistency.
 
-Reproduces for me locally:
+> +          below 'detached' scoped shapers. Only 'queue' and 'detached'
+> +          scope and flag 'support-nesting'.
 
-[pid   507] setsockopt(4, SOL_IPV6, IPV6_HOPOPTS, NULL, 0) = 0
-[pid   507] recvfrom(3, 0x55fcf63813a0, 65535, 0, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+'and flag' looks like a typo. Do you mean 'can have flag'?
+
+> +    -
+> +      name: cap-get
+> +      doc: |
+> +        Get / Dump the shaper capabilities supported by the given device
+> +      attribute-set: capabilities
+> +
+> +      do:
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - scope
+> +        reply:
+> +          attributes: &cap-attrs
+> +            - support-metric-bps
+> +            - support-metric-pps
+> +            - support-nesting
+> +            - support-bw-min
+> +            - support-bw-max
+> +            - support-burst
+> +            - support-priority
+> +            - support-weight
+> +
+> +      dump:
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +        reply:
+> +          attributes: *cap-attrs
+
+scope is missing from the dump reply
 
