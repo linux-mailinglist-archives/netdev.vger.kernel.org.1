@@ -1,117 +1,109 @@
-Return-Path: <netdev+bounces-115424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF6C6946590
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 23:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 784B394659C
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 23:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99D9C1F2387B
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 21:50:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 222741F22F10
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 21:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D922C13B599;
-	Fri,  2 Aug 2024 21:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD0F13A3F9;
+	Fri,  2 Aug 2024 21:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MMAXPefh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGsVikAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5726976405
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 21:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3ED413A268;
+	Fri,  2 Aug 2024 21:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722635367; cv=none; b=oJ7+TZW0mmEL2ZgSnd1XMKZTwINsCK3VvIoREtwWC0AEkUK5K63TY/io4U8Zo7Pid0zZrKIEbVQ8pmnPBNN1OEnLDed+XsFbb+vHbjyWVpqW92VVEmBGwE+mDJtNw9MHntUh7kRaXvpEHT33pDXSWBMWoT42KQuYg5zWOY6mOUo=
+	t=1722635633; cv=none; b=A8JJZ76nvvCxbCGFRJwqwaDUGO58OKJg2+sqSKWvnodhg2TPgN+CnJ79jtqKnZ2aKAcnyybpsBEuR9OtRdNrhrCwc3QpGwOH0swm+xx9eYdMl00ZgnYTZmLLhrq2V/N7WmWaD4Vysgn1fED9CovEpp8Slkkjb4+DyFWKGcB1+3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722635367; c=relaxed/simple;
-	bh=R6Zb/F6ag2O9vZ0Pie9haG8wBF096YdqUXtCoy88kzw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uIKGGqtNoVADgU8gpyIn8GYnpVBNlP4a8DKk/mj7lYySE9Edp6OtV5/tpAjc0DNgAhnlSqDSESdXCDZmmQW9ci802BMNowflxlVM0T7td2AjHU2/NY++uIcj4WPGAGOe1fTFE1MBtsZztWqPPUwo7AW0GkHRuMeMPJT6or9ulbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MMAXPefh; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-70d399da0b5so7399923b3a.3
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 14:49:26 -0700 (PDT)
+	s=arc-20240116; t=1722635633; c=relaxed/simple;
+	bh=OaZmfObyG8RIuSIXZpApM2ZGi8H+ykIS3A7Hi5dZOng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HKd/N3LQRwCc+KhG+Of2LtRfouBrbU3JCRF/VizHStRDUbBb6zjghmUqQvhJnkxgAgJPuumj7BxNRh3aRjSEI3CLZxEX9WQwowoKX3BMI9Nt9WNE+Sbsxb9JcXMwsOMV5XmIvHI5pLyyq1dyugsF3o1i92s2lSqv/CsQUjL444I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NGsVikAL; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6b7a3b75133so62841656d6.2;
+        Fri, 02 Aug 2024 14:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722635366; x=1723240166; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M3xun6ZAo9oUFbxVpXf94TJW8gwMbVmF/wsipE1ixAQ=;
-        b=MMAXPefhQ7IMOrgPPXIVv0/B1WUHN//X1UtOiGwxOhvBG9+uFUX2tngB3UNjAoRJyr
-         J17snpyYCr6QpDL7/j+gkxnXGkXOztFU+j1L9+YdFNV0mBdwpIMYAJ7oJLunFnbY8SmZ
-         6YpCSr7S1ObOQKEe2eAlLke1X2MedZDkqVfh8=
+        d=gmail.com; s=20230601; t=1722635631; x=1723240431; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GceTv74Bj559z0JmK+lblKlugOtaOtEJSekU4nkUvCs=;
+        b=NGsVikAL81F1HB3HhWtyRGz9HsZQzjzIk/FqzD4Au4sCTuy1AJwtXjQV0UgeNEhLkb
+         LckyPenFwS+gFMq2qwVSgFEz0JVSkCar5r44ReujwyR+vmCU+M2obxtyNhypIiGxx/ZQ
+         w8kvECfz4BNRP9BmItPedy5iccOCWsa//eChkCukW9UMfUji2LvnwvymXKTgFYUXuTmH
+         priy4XrBeOH1GhXX98jPYJOoKYKPRlGFh3GjJ3qr0RddU7JW9bPwhood6SycboXij+QZ
+         dHmG6oYytpEuWwASmk1x3eaVUTjk+4uZtBpGE4zjQMu/QQWiwat/YIun/af3R3gqWKic
+         LFTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722635366; x=1723240166;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M3xun6ZAo9oUFbxVpXf94TJW8gwMbVmF/wsipE1ixAQ=;
-        b=YhSv/jrUS9xuuiP/Kmit0ZXL0xEZJSuoHzulMC//mbqRpuXMtSEb/Fvh2ejloo92tq
-         QPKNklRCH/R9OHanRKtaALVxeCbv6awyadkCbbP/q0734DOvyxS9WACWY7dcZJ7DVDdj
-         YWS065O2VJrkteY4yNN4aU2Cn/vgDr2SdgrqNaQfeC1b8BedsUCEKWCqR2zVJvIHXKV3
-         ZBqq4yH25SviHdTXA6cbWkW5DHoyfb00sSVENsLlqD7Bv2/VTMFlt/TdxeCzU1TMnzfQ
-         SrCL+jmOLtTajsololPScjTQf2lCe0FFwqPUDxOk6HB2duscSTQhGIV6rPOmp/dfLMNU
-         FFTQ==
-X-Gm-Message-State: AOJu0YwtE6auAb4PWSnvCTluf6g3UU1ouywyMN8EwsR/158NSFNVzK88
-	kg01nr5vKA7i7S+80ftkY1rnqfTaTOTkRj0Ev33esmWkrL1+3zEB1hti0/kdXqgSblNYLAOnQif
-	qE9icXP93CF4rWo2cF1aCgxnXo1rDAoRFSU6u
-X-Google-Smtp-Source: AGHT+IHEdcupwcgV7ddSI8MH7LC3yQiJWlc6iHg4NY7jwa0Xdj7aQ/eTSphT4Nip4j1IqjjX/NtSYYnTEN8JBwS7BjQ=
-X-Received: by 2002:a05:6a00:9187:b0:70e:9383:e166 with SMTP id
- d2e1a72fcca58-7106d047460mr5185025b3a.29.1722635365498; Fri, 02 Aug 2024
- 14:49:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722635631; x=1723240431;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GceTv74Bj559z0JmK+lblKlugOtaOtEJSekU4nkUvCs=;
+        b=qq4DkohattffyZEOhgaQmWlxY2msF8QypIE2NzEhx0SksAJIx+zTBkOnlpm0yNhg9R
+         ORf8oDXJ3RGadiHajkwIzQPP/UdW+VsFszCVF5w/sjRn1P0Ef1iSFu4TG4hyZOgP25of
+         dhpzIIXmScrKCge1FDSv31EA09N1OgDO7YlTfjiGpEnY6NvsElxxZuOC4bknx2Iv01bL
+         IB+X2NoqHaFtlFW6wGuTLI3Zo9fGipjpCSMvvK2jyLjvCzMPrUEJv8GIvsAL7Qj1Wb9b
+         jnXV+ciBRMwhurbAIDP0Sr5OQC5GpR8bJjKPPmC6kkS75Y2OLCQ/FxLRJW7bAlto4FqC
+         iqag==
+X-Forwarded-Encrypted: i=1; AJvYcCV7Hy1mFXtPMz15geV/7/9KoSdPRgWay2wZjEqzlM+iG6KhjVltST1pgXqziVkH+MDer8r9djz9G4MN32ZpSVcVos1kfi+Xan5aDGJYRdakah5lqpTp2XW9tSSdDjS43zLFT/ni
+X-Gm-Message-State: AOJu0YwwLMx6jbzlPkOW9Ji6JM69Tynf4IYP3sYrNHb/FAS7b+j6QDJi
+	/ECQsHLXCRuwlWgCfKI9wLdh9a5ZR5HsaHLb6lUuwYoRL93TRJ8t
+X-Google-Smtp-Source: AGHT+IGGtLIzikJjuZmrrT/xpFqJklxkSPlbCER54x1UIhW0jePnCTPyQ2rjPOg74x9QeyQJIGkg5A==
+X-Received: by 2002:a05:6214:43c9:b0:6b5:a5:f5f2 with SMTP id 6a1803df08f44-6bb98423b2cmr54369946d6.55.1722635630600;
+        Fri, 02 Aug 2024 14:53:50 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id 6a1803df08f44-6bb9c7b8826sm10525716d6.64.2024.08.02.14.53.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Aug 2024 14:53:49 -0700 (PDT)
+Message-ID: <b20a19cd-8428-4ff2-844c-c214a0099284@gmail.com>
+Date: Fri, 2 Aug 2024 14:53:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
- <20240802031822.1862030-3-jitendra.vegiraju@broadcom.com> <ZqyXfonFv1GNlbvK@shell.armlinux.org.uk>
-In-Reply-To: <ZqyXfonFv1GNlbvK@shell.armlinux.org.uk>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Fri, 2 Aug 2024 14:49:14 -0700
-Message-ID: <CAMdnO-+51MVQjdJAs5XXqcOzjK7=JZJ5KhELKcws8h3JgM7FOw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Integrate dwxgmac4 into
- stmmac hwif handling
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/6] net: dsa: vsc73xx: pass value in phy_write
+ operation
+To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Linus Walleij <linus.walleij@linaro.org>,
+ linux-kernel@vger.kernel.org
+References: <20240802080403.739509-1-paweldembicki@gmail.com>
+ <20240802080403.739509-3-paweldembicki@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240802080403.739509-3-paweldembicki@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 2, 2024 at 1:23=E2=80=AFAM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Thu, Aug 01, 2024 at 08:18:21PM -0700, jitendra.vegiraju@broadcom.com =
-wrote:
-> > +static u32 stmmac_get_user_version(struct stmmac_priv *priv, u32 id_re=
-g)
-> > +{
-> > +     u32 reg =3D readl(priv->ioaddr + id_reg);
-> > +
-> > +     if (!reg) {
-> > +             dev_info(priv->device, "User Version not available\n");
-> > +             return 0x0;
-> > +     }
-> > +
-> > +     return (reg & GENMASK(23, 16)) >> 16;
->
->         return FIELD_GET(GENMASK(23, 16), reg);
->
-> For even more bonus points, use a #define for the field mask.
-Thanks, I will make the change.
->
-> Thanks.
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On 8/2/24 01:03, Pawel Dembicki wrote:
+> In the 'vsc73xx_phy_write' function, the register value is missing,
+> and the phy write operation always sends zeros.
+> 
+> This commit passes the value variable into the proper register.
+> 
+> Fixes: 975ae7c69d51 ("net: phy: vitesse: Add support for VSC73xx")
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
+
 
