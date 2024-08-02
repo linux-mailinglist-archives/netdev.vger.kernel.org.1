@@ -1,93 +1,106 @@
-Return-Path: <netdev+bounces-115444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2776794662A
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 01:30:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE2D946633
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 01:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBAA41F22AB0
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 23:30:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29D0AB217B4
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 23:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B1713B797;
-	Fri,  2 Aug 2024 23:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FDE13A895;
+	Fri,  2 Aug 2024 23:35:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6TF++iG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jZo+zAY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33761ABEA4
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 23:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6347713A403;
+	Fri,  2 Aug 2024 23:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722641445; cv=none; b=M6gVIgnUQe7L8Ow/UUDue/wPCqKDyJ87BTN8JGNWnf/NW+7mW8iOzyV9n/FnjS3oBdouerK6vRNcZuWJrIam2jvpmwqToiqzPeKkjVj5OFJQrYtBc5EhYAGZCMrmuL/dGtpWZgY3VJTIuufjXEBVyO19y9l960kIQxlO3sC1LEQ=
+	t=1722641715; cv=none; b=qdacXva67Aavv/BMhhz3d8akBM64+ZsxVJ3dUmb8a1BtGkbOrDfxqkqDsprhoGgTPGsVakoY97UwxDWCEIfqVa3iP1P5NblX7Jnsp6Tx3QC3kV2opp9sBOj6ru3RcbSKqeJFxurBdsDLoGhN6tsPX5e1GFNF8RdfC/UJ7eysfkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722641445; c=relaxed/simple;
-	bh=dBNW9caHXAYXYFwPXe0QblWWWQ0PPfvqpkUO6BD4J3I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cDb2zzMiRc8tW0OnXe7bSyDDe7/CyUShx7reIAr9hms8iJ8bG/letTutqFwbZKy3pwMgKGVaa1Fs+Haq7r6mKv5EX/kVsLQY8G9mARA/+eXcY++zAs4OEeiCa99NgH3lli3GXcGd6p16jsuQLNq0jlGhGnP0vgWHkIEW8GYqMto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6TF++iG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 80B8EC4AF12;
-	Fri,  2 Aug 2024 23:30:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722641444;
-	bh=dBNW9caHXAYXYFwPXe0QblWWWQ0PPfvqpkUO6BD4J3I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q6TF++iGjFrH0D5a9GMRA36uAPU88Im/EWaGHYRVm+i80Z8u6yTsR6ESvmxMBnwx/
-	 UnZU1eZdjSkCFGzjVR9E4ZDSpNT1n1lCSUKQ5ofyQGe25ZODzWnxOpL0OSXDsreFXa
-	 o8HpURrdDg9EOeRUmDKpCPtke7U9pAUBQ2edi5sOzYYZ+N8PVgvi8vlcv+5a3yBxKs
-	 IWXExNKZQahOHH62hD+ncCC9aKGcVF7Tztw4X86AtZQ5r9lCVYZF6iigOTpMvLB/6Q
-	 2eCtF8W347QQkFqr+KTi1IPctWlsnCLuNPeFMTbCE1WO8rGXUIFg8g0f8Y3VCQm0YM
-	 jrG76Jo6KS+9w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78270C6E39A;
-	Fri,  2 Aug 2024 23:30:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722641715; c=relaxed/simple;
+	bh=G3ktvJyNjBf8TnIZVT0ANzoVJfwL/K+ywRnJK/gxEDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7pO5ZtKQI6L2nI9QO+Vlp/7IqFgRIREpD4rlYgT9YT72lTHYCQ3sZtLNxKPjlrCJT1WR+Q/UQiWqiU3U5NKxXqEHcetQsbgsANs/pVD0AgjDjbMyV08dModyPD+/fAjoJB30+6ph6EBm85fAI0OaDcMDbzI+geP8Cnd8roTzV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jZo+zAY/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=5DkwMmT+724knaZ9VDO6NBUm878zP+f3Gj+JqRDoYb4=; b=jZ
+	o+zAY/E26z8SYJlaY1NdcXN5ZdsteGlXOGVVEl58ck7he3bl8dwKSzkqxM2JxBzZufNDpBxdqAjKx
+	YsUO8TffUKTyo9JFLvmJ0qNABkbbu0/AEvdqsd/PvBoiko1eOqoxLx6gzPrdVO0SK+8AYhZyw0fmR
+	Zl1UvrZZp9emjUA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sa1nW-003tsy-KS; Sat, 03 Aug 2024 01:34:58 +0200
+Date: Sat, 3 Aug 2024 01:34:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Roy Lee <roy_lee@accton.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] tg3: Add param `short_preamble` to enable MDIO traffic
+ to external PHYs
+Message-ID: <d254d820-399d-4ac7-b9b0-e4b3668bbed3@lunn.ch>
+References: <20240802100448.10745-1-pmenzel@molgen.mpg.de>
+ <CACKFLikjqVZUXtWY5YBJPT56OqW0z00DxkaENzG74M64Rrr81w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: remove IFF_* re-definition
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172264144448.25502.3568302485144724156.git-patchwork-notify@kernel.org>
-Date: Fri, 02 Aug 2024 23:30:44 +0000
-References: <20240801163401.378723-1-kuba@kernel.org>
-In-Reply-To: <20240801163401.378723-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
+In-Reply-To: <CACKFLikjqVZUXtWY5YBJPT56OqW0z00DxkaENzG74M64Rrr81w@mail.gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  1 Aug 2024 09:34:01 -0700 you wrote:
-> We re-define values of enum netdev_priv_flags as preprocessor
-> macros with the same name. I guess this was done to avoid breaking
-> out of tree modules which may use #ifdef X for kernel compatibility?
-> Commit 7aa98047df95 ("net: move net_device priv_flags out from UAPI")
-> which added the enum doesn't say. In any case, the flags with defines
-> are quite old now, and defines for new flags don't get added.
-> OOT drivers have to resort to code greps for compat detection, anyway.
-> Let's delete these defines, save LoC, help LXR link to the right place.
+On Fri, Aug 02, 2024 at 12:51:15PM -0700, Michael Chan wrote:
+> On Fri, Aug 2, 2024 at 3:05 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
 > 
-> [...]
+> > diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+> > index 0ec5f01551f9..9b4ab201fd9a 100644
+> > --- a/drivers/net/ethernet/broadcom/tg3.c
+> > +++ b/drivers/net/ethernet/broadcom/tg3.c
+> > @@ -233,6 +233,10 @@ static int tg3_debug = -1; /* -1 == use TG3_DEF_MSG_ENABLE as value */
+> >  module_param(tg3_debug, int, 0);
+> >  MODULE_PARM_DESC(tg3_debug, "Tigon3 bitmapped debugging message enable value");
+> >
+> > +static int short_preamble = 0;
+> > +module_param(short_preamble, int, 0);
+> > +MODULE_PARM_DESC(short_preamble, "Enable short preamble.");
+> > +
+> 
+> Module parameters are generally not accepted.  If this is something
+> other devices can potentially use, it's better to use a more common
+> interface.
 
-Here is the summary with links:
-  - [net-next] net: remove IFF_* re-definition
-    https://git.kernel.org/netdev/net-next/c/49675f5bdf9a
++1
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Most systems supporting suppressed preamble do this using the DT
+property 'suppress-preamble'. See:
 
+Documentation/devicetree/bindings/net/mdio.yaml
+
+You could add an ACPI parameter for x86. You could also consider
+implementing clock-frequency if the MDIO bus master and all the
+devices on the bus support faster than 2.5MHz.
+
+	Andrew
 
 
