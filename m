@@ -1,113 +1,189 @@
-Return-Path: <netdev+bounces-115231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2299458AC
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:27:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1AE79458E4
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD8B3283F78
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 07:27:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A6231F23B07
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 07:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1241F1BF333;
-	Fri,  2 Aug 2024 07:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7317F1BF305;
+	Fri,  2 Aug 2024 07:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nqa43LUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C881BF31C
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 07:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1A7482EF
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 07:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722583590; cv=none; b=RMwbkM2XJ7OjsxiVVOUClwPBh9Nhwl6q2b5Klt2F4CygxL/TuNNbSJZPNORIqNBvqHwYEXec0yOA5sGg9S4nag+Ssc2zPl7bYNxmKdzJA7KI4Sn9jbWf86nmTyy97hhWJqksVD+zd4ET661UXVoiAN5v6R1ZMgBoQ6ROeXQOwgQ=
+	t=1722583911; cv=none; b=YzwmSj3yRAMMWE3CK3bMfWoB614uw+QL9uVaKYOyaEpRWaosIOfN8Y1HkIr9WUg4Pw1UYfllZF9kVANYttur4nHRgnYgwgrnej39M5fGeqyGZksZC+Vvu3pDCNDjFx0gMVYaaqdpKsdbvQx/kDEogHy4Q6zsG5UdUYNA0i0eELg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722583590; c=relaxed/simple;
-	bh=mXj5zq9cbihDCWhZIY+vpwJiaJLdPixCkZlSlmf5rT0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Kjqr3AcNWFhZaM9uUSqaX7YuDOUM1JRCqfCNKic0K3P5zbxkxwT5wXpy796+nOm928VKX6AgEMT/hxd3hlZRXkybNxUU0uffUmNVjX0YANwwVHBeju3Ss84fIUxykVCX9iaK9m66YY9reL8ZCP0JDZtgDP+u4+4ME4fkpBDq8bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39862b50109so113472105ab.3
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 00:26:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722583587; x=1723188387;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XrXByCznmhsppVEKcGZ/MFeTWBUrt3Wcq6+zhpOmQNM=;
-        b=eWvRj2ThvL+td9TD6yWWTvuKi/pZIHb7H1wUpjOEqvoBKiTEs9TreJLazb/OtiHN46
-         euZxzG1wOWCWqGFMy3nTwXxMXJjTGLFPNS7IqVLxiMlKnd30BV20sy2gMlc/acjJFd6b
-         aXk03fb4qhenck4bJZRmS5+5q5jQvL1E8D0K4FIHJ6Z/1CurvdfuGD6PEtF5t6g7MLAx
-         QaG81VV0wvbsOj5FNB2hueWkAS/As6wOncg5lPhSYmYbnehf6nA4KPQ13msG0eC+ntNE
-         n0ujU3ZPc7fgI3ZRD8XHKA7eGjw8DP96XC8m9tGmjhyq6C7fXTxoTomQeLph45u9xBiK
-         H18A==
-X-Forwarded-Encrypted: i=1; AJvYcCXXZFvZkJ0cDlBo2793r9/w1WTtd3LPt6IQaV6aL9Q/2aFLNaJgY05mV0vxzXNhn83Ju3ae0LpWcOQuglPu/2nwQ/quyc8s
-X-Gm-Message-State: AOJu0Ywl0vAOaqFIvLdUWYJZDtvRXK+FfWweWRkcmNY2ZsCXuxDUOtHd
-	+kIe8KSRUOLdbZw0fmIkJHpAX6GTWrY5mtMWqtZsP9nIXyx0TDtVgsawiIswgCL6TvPUulOXn1g
-	6vXo0cys4IZbXcze8tXNxqB+w2+NtCXjfJloTlZGIEl1AsKxrLoF3ORs=
-X-Google-Smtp-Source: AGHT+IFotTmT94wCutbGucYcHOJn2xrABFMGERzA2A3CFrqC1D4uiGnGJsP4CFNn5M23ICuawfJVIuNNKtn9+Od6xXoNbOQ5mlIz
+	s=arc-20240116; t=1722583911; c=relaxed/simple;
+	bh=9DFZsntO69vLTXgI4Wfi0cToeeZQEomTOnp3iVaRlvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XjmkUGHHv5sxSRlsxSwp2gHbzoRB5d1+yLqytC/N8RLrRLli7qwOL2/m9bfLLuBtz/zKbb1ssm/vp03rD/s8kIk+tgj/+6WOYdz9lK8Qr8mSJ8l0bpq0OvbzIqpcrM3YFcs058V0Vk+QhtCPL1uXh02GNTor/PD2uPtnrSckuBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nqa43LUL; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722583909; x=1754119909;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9DFZsntO69vLTXgI4Wfi0cToeeZQEomTOnp3iVaRlvI=;
+  b=Nqa43LULe04uvPrRu0A+c/Q348qg921cO+e0fi1DTrKweoo7LHMPvrwW
+   GLlk/OY5XBmys0BdDKUtLcLBkMNQnTvjHFCIRe0mJxiVSXLyjvX2dq+L1
+   b7Qakbmx+QihnO+gZyBxMzrXxzVdPMH5EIKRlEcf0GTFnngUvV2vWrZmU
+   qyY3irxWisN1IK+2vyJvDFFpfNpi8bCENKSOibBvJekkpvlSxPkbZ78N8
+   vSg+Jk3DfyLmEqNU9jgrEndK7J31w/Dg+a+86qj/N8+wvBhwHZ73g3gDW
+   bdEKlcpgryzH9GYpX9tCNxdEceelIX2TfLovEtWlB25vPZvsL3g83byDL
+   g==;
+X-CSE-ConnectionGUID: ttRNp9A9R3m1lxm04VAepA==
+X-CSE-MsgGUID: Ml+jKHBYSLWJ9zahF7MbHQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11151"; a="45991344"
+X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
+   d="scan'208";a="45991344"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:31:49 -0700
+X-CSE-ConnectionGUID: hd2/IfwMR4mztDJQQFAzKw==
+X-CSE-MsgGUID: Y8+1o2KiSXi2lIy3TxukvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
+   d="scan'208";a="54955477"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:31:45 -0700
+Date: Fri, 2 Aug 2024 09:30:07 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org, jiri@nvidia.com,
+	shayd@nvidia.com, wojciech.drewek@intel.com, horms@kernel.org,
+	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
+	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
+	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com
+Subject: Re: [PATCH net-next v2 00/15][pull request] ice: support devlink
+ subfunction
+Message-ID: <ZqyK/xHkGEFEX+8Q@mev-dev.igk.intel.com>
+References: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:216b:b0:396:1fc1:7034 with SMTP id
- e9e14a558f8ab-39b1f7a3de1mr2031555ab.0.1722583587642; Fri, 02 Aug 2024
- 00:26:27 -0700 (PDT)
-Date: Fri, 02 Aug 2024 00:26:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d668c8061eae3ecd@google.com>
-Subject: [syzbot] Monthly net report (Aug 2024)
-From: syzbot <syzbot+list8e95f1289d8f38f9e414@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
 
-Hello net maintainers/developers,
+On Wed, Jul 31, 2024 at 03:10:11PM -0700, Tony Nguyen wrote:
+> Michal Swiatkowski says:
+> 
+> Currently ice driver does not allow creating more than one networking
+> device per physical function. The only way to have more hardware backed
+> netdev is to use SR-IOV.
+> 
+> Following patchset adds support for devlink port API. For each new
+> pcisf type port, driver allocates new VSI, configures all resources
+> needed, including dynamically MSIX vectors, program rules and registers
+> new netdev.
+> 
+> This series supports only one Tx/Rx queue pair per subfunction.
+> 
+> Example commands:
+> devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
+> devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
+> devlink port function set pci/0000:31:00.1/1 state active
+> devlink port function del pci/0000:31:00.1/1
+> 
+> Make the port representor and eswitch code generic to support
+> subfunction representor type.
+> 
+> VSI configuration is slightly different between VF and SF. It needs to
+> be reflected in the code.
+> ---
+> v2:
+> - Add more recipients
+> 
+> v1: https://lore.kernel.org/netdev/20240729223431.681842-1-anthony.l.nguyen@intel.com/
+> 
+> The following are changes since commit 990c304930138dcd7a49763417e6e5313b81293e:
+>   Add support for PIO p flag
+> and are available in the git repository at:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+> 
+> Michal Swiatkowski (8):
+>   ice: treat subfunction VSI the same as PF VSI
+>   ice: make representor code generic
+>   ice: create port representor for SF
+>   ice: don't set target VSI for subfunction
+>   ice: check if SF is ready in ethtool ops
+>   ice: implement netdevice ops for SF representor
+>   ice: support subfunction devlink Tx topology
+>   ice: basic support for VLAN in subfunctions
+> 
+> Piotr Raczynski (7):
+>   ice: add new VSI type for subfunctions
+>   ice: export ice ndo_ops functions
+>   ice: add basic devlink subfunctions support
+>   ice: allocate devlink for subfunction
+>   ice: base subfunction aux driver
+>   ice: implement netdev for subfunction
+>   ice: allow to activate and deactivate subfunction
+> 
+>  drivers/net/ethernet/intel/ice/Makefile       |   2 +
+>  .../net/ethernet/intel/ice/devlink/devlink.c  |  47 ++
+>  .../net/ethernet/intel/ice/devlink/devlink.h  |   1 +
+>  .../ethernet/intel/ice/devlink/devlink_port.c | 503 ++++++++++++++++++
+>  .../ethernet/intel/ice/devlink/devlink_port.h |  46 ++
+>  drivers/net/ethernet/intel/ice/ice.h          |  19 +-
+>  drivers/net/ethernet/intel/ice/ice_base.c     |   5 +-
+>  drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   1 +
+>  drivers/net/ethernet/intel/ice/ice_eswitch.c  | 111 +++-
+>  drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c  |   7 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.c      |  52 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +
+>  drivers/net/ethernet/intel/ice/ice_main.c     |  66 ++-
+>  drivers/net/ethernet/intel/ice/ice_repr.c     | 211 ++++++--
+>  drivers/net/ethernet/intel/ice/ice_repr.h     |  22 +-
+>  drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 331 ++++++++++++
+>  drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  33 ++
+>  .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.c  |  21 +
+>  .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.h  |  13 +
+>  drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+>  drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+>  drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+>  drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
+>  .../net/ethernet/intel/ice/ice_vsi_vlan_ops.c |   4 +
+>  drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
+>  26 files changed, 1396 insertions(+), 137 deletions(-)
+>  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
+>  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+>  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.c
+>  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.h
+> 
+> -- 
+> 2.42.0
+> 
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+[offlist]
 
-During the period, 17 new issues were detected and 9 were fixed.
-In total, 110 issues are still open and 1486 have been fixed so far.
+Hi Tony,
 
-Some of the still happening issues:
+Am I correct that now I should send v6 to iwl (+CC netdev) when you
+remove the patchset from dev-queue? I am little confused with Jiri
+comment about versioning PR. I though it is usuall thing.
 
-Ref  Crashes Repro Title
-<1>  97695   Yes   possible deadlock in team_del_slave (3)
-                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-<2>  12003   Yes   unregister_netdevice: waiting for DEV to become free (8)
-                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-<3>  5132    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<4>  1530    Yes   WARNING in inet_sock_destruct (4)
-                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
-<5>  1221    Yes   WARNING in rcu_check_gp_start_stall
-                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
-<6>  683     Yes   general protection fault in skb_release_data (2)
-                   https://syzkaller.appspot.com/bug?extid=ccfa5775bc1bda21ddd1
-<7>  670     Yes   possible deadlock in team_port_change_check (2)
-                   https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
-<8>  588     Yes   WARNING in kcm_write_msgs
-                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
-<9>  543     Yes   INFO: task hung in synchronize_rcu (4)
-                   https://syzkaller.appspot.com/bug?extid=222aa26d0a5dbc2e84fe
-<10> 488     Yes   INFO: rcu detected stall in tc_modify_qdisc
-                   https://syzkaller.appspot.com/bug?extid=9f78d5c664a8c33f4cce
+I already have done the changes that Jiri asked for (and Maciej from
+previous version).
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Thanks,
+Michal
 
