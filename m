@@ -1,96 +1,104 @@
-Return-Path: <netdev+bounces-115250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F919459A3
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:09:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CAF79459A6
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 835001F222A3
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:09:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DF531C23679
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4531B1C2322;
-	Fri,  2 Aug 2024 08:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967961C0DF8;
+	Fri,  2 Aug 2024 08:10:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF133D6A;
-	Fri,  2 Aug 2024 08:09:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A7D3D6A
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 08:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722586147; cv=none; b=FvZqZNNrqXgzT0StVRsPQBQTLN2VRUqPg98GR5sRwo+xYYoAi5c4y04xFGxeIVxh40sQ7CPFooF22EIhEXcYwc9QpQWw6iGmmhRSSRvsHklfTtLT6fuvCskncPIMLl6WOky67mjTv6rZYtbsTkMSrXUejfL3jX8doYtF4Lh7v8w=
+	t=1722586252; cv=none; b=iJ7sYPw9ecVzJ32GvKnckJMzQnrRB5HuseJcNE+GDXdt4Y6GpmbvqltVAwAXzcBFa3HpK0IdqwQmmpq9+je4xL1cJMBNlH/GXtYPZNf/NHmtaX2KzEMcIFt4TnkCzX7nWn/nAhw9uFMN8qzGFP9XrdgFpXe1kbWMi9hXabP4Oho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722586147; c=relaxed/simple;
-	bh=Zp9EI5OCVN/DrlafofP7/8nWGubayZQSFeHZUyxUuPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DAsbfQCiZWd8X4uwuzBIRPPyqzhSbbyY63KAGgwBPlmtn8aJM1UjDKFuWYZdnssRqseyyrdI+zo8woRcwBMpmanLSITC25vIFqNMlvcf5O6QmspSspDDjZ1Z8/uat/H287S+iXl2EDZNKTxfAOkRP62Fd2PS5oUclphPtCoe8po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5a3b866ebc9so10970096a12.3;
-        Fri, 02 Aug 2024 01:09:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722586144; x=1723190944;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0k6PCzJzChjhZx4W9GMM2CEphZr+afr1YrAs2NqKqiY=;
-        b=voR7beevD70zaZapxJ4D7YJzl/s4/XqyzXUcGyyJq30FaQ2UwjsofqvR8RB6WOaRAG
-         huyQFFB4fhdDKQqVjdpgvVK/58N7UjNSF58szzSs0U9mEHExRRvJcj1Zxg9xslVCso3X
-         o094Vrei6WhvOSSL2DXiYlr2bCIfZv7jonctsZnkO2KJYRjmKNfjIokdXSOzjmV7qN5q
-         cZDBxT5z9hbODXBvBpftJxrCskWB/oTHDIcVMTLXe7YZ50GRIbMJN8yJSLiT2TTUvwZu
-         Q8mgbu9liPxuMd0t/3bJuV/mWbgcekYNJKOldZ0hCKERsrzba3Unt5FBFShzowahfJ1z
-         BSXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVd07E3iZxC57JhIMA3AEOPq6kqtfumiv6EnkVLm7BalnRm3jGKOOGFoJNQXN/rZqXjL5E/KrCJbzYAxZocuXhMR+f3LXDfe//NMPmrc29Eiti9t8slIlnGqhxAvLx1AcO4vl3uvsM8ply+sfGCDyEbIHWTJjLH15s+YlDhfDr5ZmmaZ286
-X-Gm-Message-State: AOJu0YyB5I2Qt573n59Mk+3kiGFlEs7vuysBaYUBafOtJEl1HZ7GFz9g
-	zQgL7bzLAJqr1QIF0d4IW3FklYj7PpyHRNV5bbESHk5pL2mBVY5b
-X-Google-Smtp-Source: AGHT+IHZNov+DE6EzlY3KLu7YZJLxLM4/IJbXU3Go/m5skcb3JZjpjdZVZ/u69FOmgTvF+GuH/+PAQ==
-X-Received: by 2002:aa7:c3cc:0:b0:5a2:cc1c:4d07 with SMTP id 4fb4d7f45d1cf-5b7f5414436mr1782480a12.27.1722586143435;
-        Fri, 02 Aug 2024 01:09:03 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b83be39fa9sm771885a12.82.2024.08.02.01.09.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 01:09:03 -0700 (PDT)
-Date: Fri, 2 Aug 2024 01:09:00 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	Shuah Khan <shuah@kernel.org>, thevlad@fb.com,
-	thepacketgeek@gmail.com, riel@surriel.com, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	paulmck@kernel.org, davej@codemonkey.org.uk,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/6] net: netconsole: selftests: Create a new
- netconsole selftest
-Message-ID: <ZqyUHN770pjSofTC@gmail.com>
-References: <20240801161213.2707132-1-leitao@debian.org>
- <20240801161213.2707132-2-leitao@debian.org>
- <20240801095322.6d9dec9c@kernel.org>
+	s=arc-20240116; t=1722586252; c=relaxed/simple;
+	bh=CuMgTyhRiXFGu/Wk31+CzmYjkWa9oQ3VXwtvzg+PBI0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=ZoJxufkkfI8ebOvQ/cOqDbK+okfOBSx8AT8WO8ts0Kr+4qd4aREpy0t+u0asFG7HlUwJ/ajDSjZZozx1Iv2PjZ+FHVzvP94Nds5XnYFRg9L69ZGZx3RygNM3X157JerSaIxmnmFXnBcM7jLUwvAWNXDaLI/20nMhHLTp2/DAjUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-80-s7rDkYwSMoizWbYGjzwnMg-1; Fri, 02 Aug 2024 09:10:42 +0100
+X-MC-Unique: s7rDkYwSMoizWbYGjzwnMg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 2 Aug
+ 2024 09:10:02 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 2 Aug 2024 09:10:02 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Simon Horman' <horms@kernel.org>, Herve Codina <herve.codina@bootlin.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, "Andy
+ Shevchenko" <andriy.shevchenko@linux.intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Thomas Petazzoni
+	<thomas.petazzoni@bootlin.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [PATCH net v1] net: wan: fsl_qmc_hdlc: Discard received CRC
+Thread-Topic: [PATCH net v1] net: wan: fsl_qmc_hdlc: Discard received CRC
+Thread-Index: AQHa4yXTTA/3x7b/50KM7uMtkj8Gw7ITnhqw
+Date: Fri, 2 Aug 2024 08:10:02 +0000
+Message-ID: <7659191688194f099cba22cc367c4eda@AcuMS.aculab.com>
+References: <20240730063133.179598-1-herve.codina@bootlin.com>
+ <20240731084443.GL1967603@kernel.org>
+In-Reply-To: <20240731084443.GL1967603@kernel.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801095322.6d9dec9c@kernel.org>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello Jakub,
+From: Simon Horman
+> Sent: 31 July 2024 09:45
+>=20
+> On Tue, Jul 30, 2024 at 08:31:33AM +0200, Herve Codina wrote:
+> > Received frame from QMC contains the CRC.
+> > Upper layers don't need this CRC and tcpdump mentioned trailing junk
+> > data due to this CRC presence.
+> >
+> > As some other HDLC driver, simply discard this CRC.
+>=20
+> It might be nice to specifically site an example.
+> But yes, I see this pattern in hdlc_rx_done().
 
-On Thu, Aug 01, 2024 at 09:53:22AM -0700, Jakub Kicinski wrote:
-> On Thu,  1 Aug 2024 09:11:58 -0700 Breno Leitao wrote:
-> >  .../net/netconsole/basic_integration_test.sh  | 153 ++++++++++++++++++
-> 
-> It needs to be included in a Makefile
-> If we only have one script I'd put it directly in .../net/, 
-> or drivers/netdevsim/? each target should technically have
-> a Kconfig, Makefile, settings, no point for a single script.
+Pretty much the only reason you'd want the received CRC is to do
+error recovery assuming a single short error burst.
+Not that I've ever seen a driver contain the required code.
+'Back of envelope' calculation: 32bit crc, 2kbyte frame, so 18bits
+of crc per data bit, sqrt for 'birthday paradox' - I bet you can
+recover 8-bit error bursts.
 
-Thanks for the feedback, I will wait a bit for more feedback, and then
-send a v2 where I would move the script back to .../net.
+=09David
 
---breno
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
