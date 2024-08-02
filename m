@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-115183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26119455F8
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:30:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5BC89455F6
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:30:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A940C1F2360A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:30:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0421C22E14
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0D7134AC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B5A125D5;
 	Fri,  2 Aug 2024 01:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FucAqN8C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/O2DXVd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AFEC156;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AC7B67E;
 	Fri,  2 Aug 2024 01:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722562232; cv=none; b=Ad8Hz7zCG6F1vkO0OjNzQKh9WJvqt2u+eR9pABU/Uvkj7fvFeXSnr5/g+ZiVkI+u7hfBA83RhfyxKOKyQ5Dm7L59n9L9wdrE047Xjt1KxULBqr7xapWwue9m+87mUf7vXpe3XujARTXxNdal3eArH6MeDNR27K85mfKaS7w4JLc=
+	t=1722562232; cv=none; b=AqXJjQFPnYZbLXqf4SN3HKoLIpKL8OovjnY4IDHH0o4SNtmuMeMFdiPv2Vp3lAztEGZCFcja4HzNdgZOwAbm0hZk6iM+qAP2l03ED5RuD9zP9Yb8R5kKeTB2cw5wejw0Mol+yLIkTr+13SA9iBJkYl4J1N7bH1IABQ2VGj5CmLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722562232; c=relaxed/simple;
-	bh=/NO8rLNeJv0cBnN2o+HO18XZtIgNLJjv8n2ZC5pYfOQ=;
+	bh=xkrYb/74Qs5cMpdVVt0r26rgrh1odkjHOIgVtqsMk+c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OrLmJ7RGoiEFj4pWUzl7rQQp6R5VOJHXM9jQg2Kp3VAnlghDGyWaSii3JjLnmUwydMQ8heWnboelYWiYv0/CBZUA4OEHH0q5lfuxfciMHsNTOW/BlcoOmdC1uCx2emrW9KCcrzI805ToFxrJLlF8xFJFr9XQuxY86aa5IL7Ce84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FucAqN8C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FC06C4AF11;
+	 In-Reply-To:To:Cc; b=Fr0WWnqb5uSEonZf02c/sQo9/+Y9a1AK67r3zYFhnWu12ilDVr2e4mTB2mmktw/lzGVS95nxmVdhPxuYVhswIYgoZkU7DxiAQoWYY4uLHDmKAMfJQ5wyRX9/AzFWHOZqNA1aWUSzYQbhkwKlpF2bRS7AAJtxh0Cz7VihbfZ/ROE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/O2DXVd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69E2CC4AF0F;
 	Fri,  2 Aug 2024 01:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722562231;
-	bh=/NO8rLNeJv0cBnN2o+HO18XZtIgNLJjv8n2ZC5pYfOQ=;
+	bh=xkrYb/74Qs5cMpdVVt0r26rgrh1odkjHOIgVtqsMk+c=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FucAqN8CoGrR75yWffAuL8JgHLygUaXU6HHfFymn5+DLVdBBTj9K4DhkoR/QMt1rT
-	 t6TxFne1AqKUhECL7MDZiyNdjt0LdNt6pK9w9LcS1nsQp5f5TFU0x1NnESBqE00CcU
-	 r88Kc5BEkTGVuiyfzOy2nRfsrdlCksKHQx/TbMTHs/USI6/8UEa4nyemA3Qwcsk5Po
-	 ADiq+hMJjZHUIzJQde3YH1wdryZkAIzkO/G+38kIbW+hfCED/GRpfqcvwfRpW6M6nb
-	 CsxwHaYdUukuEGJO51EcvcEFoROzZFdfoYoh2LbhvO/dTl4dQoiM4TKJrXoLA5Syrm
-	 PnzTlTZDJxvCA==
+	b=G/O2DXVd8NJDeMIRG5hQD48uqHN5rgEGg4hCPyMV79iBUg+Q1UkHc+iTbp6oxwpVJ
+	 jwTIYaK7C2u8Aj+nzJCIrgZik0hiBWaSW15MzGTr3oHKXzr1Zm5StY/On+YfI/s/G6
+	 1tTT7WWYq6x0TVSn+ovF5P6EGMTmkzpwt1tXJ9uYHH/7vX+3LviS4E6Q97/yPzSlu8
+	 Rc5QQYvDds1849A0NV/vBuLE36+zkFjm9mWxvWbqLH9IP07+63LKQ8TojwRlSodXgU
+	 LqH52sVOBnqM/AfmjAcovd9nXzZtO8VsfMdajNDok+iFND2iM3F+zzv+W6vmamdGiO
+	 uOagjOoSIpA9g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 70DF5D0C602;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56CC2D0C608;
 	Fri,  2 Aug 2024 01:30:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: qca807x: Drop unnecessary and broken DT
- validation
+Subject: Re: [PATCH net-next] net: Use of_property_read_bool()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172256223145.32676.8205372678905951335.git-patchwork-notify@kernel.org>
+ <172256223134.32676.16343976994355296820.git-patchwork-notify@kernel.org>
 Date: Fri, 02 Aug 2024 01:30:31 +0000
-References: <20240731201703.1842022-2-robh@kernel.org>
-In-Reply-To: <20240731201703.1842022-2-robh@kernel.org>
+References: <20240731191601.1714639-2-robh@kernel.org>
+In-Reply-To: <20240731191601.1714639-2-robh@kernel.org>
 To: Rob Herring <robh@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Cc: madalin.bucur@nxp.com, sean.anderson@seco.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, danishanwar@ti.com,
+ rogerq@kernel.org, radhey.shyam.pandey@amd.com, michal.simek@amd.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 31 Jul 2024 14:17:03 -0600 you wrote:
-> The check for "leds" and "gpio-controller" both being present is never
-> true because "leds" is a node, not a property. This could be fixed
-> with a check for child node, but there's really no need for the kernel
-> to validate a DT. Just continue ignoring the LEDs if GPIOs are present.
+On Wed, 31 Jul 2024 13:16:00 -0600 you wrote:
+> Use of_property_read_bool() to read boolean properties rather than
+> of_find_property(). This is part of a larger effort to remove callers
+> of of_find_property() and similar functions. of_find_property() leaks
+> the DT struct property and data pointers which is a problem for
+> dynamically allocated nodes which may be freed.
 > 
 > Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: qca807x: Drop unnecessary and broken DT validation
-    https://git.kernel.org/netdev/net-next/c/46e6acfe3501
+  - [net-next] net: Use of_property_read_bool()
+    https://git.kernel.org/netdev/net-next/c/5fe164fb0e6e
 
 You are awesome, thank you!
 -- 
