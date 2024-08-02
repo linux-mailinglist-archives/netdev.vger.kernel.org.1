@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-115244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2895194597A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:05:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23FBB94597D
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C1F21C2262E
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:05:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3555288D5D
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652951C379F;
-	Fri,  2 Aug 2024 08:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C79A1C3F15;
+	Fri,  2 Aug 2024 08:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efgOlOEs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ud29TvO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854421C232A;
-	Fri,  2 Aug 2024 08:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217871C37B4;
+	Fri,  2 Aug 2024 08:04:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722585871; cv=none; b=ug60vg3O7vbJ+oAWP7E/t4kjJGY8UFFPYodYh6vH+DRWzwTtv8udAHIuT7PFLm9NhwVGrwDLb5zh7NTRzErBOjutdrHJDSZcYRYEjak0KE/NzfrTJQEaFyKWuKgCVoa1DFKb0/WrhlLZzjx6p2UaqBcAbbEmFhFsXpATuQiy54Y=
+	t=1722585874; cv=none; b=rgsiM9rDBemjIR9E9BG3nq4t+0moMvq8XZW4VTQEwjUvf0WkFCozU8WwT8S7YPQV+m1/MBJ8eaKOEWViUlv5lkWmy3TjU/bht+ZfrN4K+TAxMz1aTJl37hVyo/XtzNr640fesvjzBHrOHG/Ft10JIBnbdHmIZeGLQ4CtFY3OLMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722585871; c=relaxed/simple;
-	bh=Gsn709wr5opjbZ8Ntr8HC7WPpT6a1GpYdFpfoRMZdw4=;
+	s=arc-20240116; t=1722585874; c=relaxed/simple;
+	bh=BAzeDWyhdsYxUDrMCciH1jpEOvGSYySqbFk6VBRmeao=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MnK6rLKypdCbayGdQWMd5pjLmr5eVuQnDtYPgNLXMEFL1/+zRPJiVlQv9ErtW1drLpouo2FNHGJ6cv/xe6oNLbdneVEh/nQqICwwAyD2rTU8n1VFSA1GCEnvVC4d8HRRkAQeBNzGnP5GqAEgHoqgUKggjv4UwpjcMPlkHaOniWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efgOlOEs; arc=none smtp.client-ip=209.85.167.45
+	 MIME-Version; b=B3DBZqynC3LtrFS2QCgm63eG2vSqscI4yTDlc24O8GOHgnnzrxtvGO015M7iA3A2tEDS3G9RXDLkn940JI7IXVtQRaGIPKAX3pjftbu9YT4YBT8DPdEWkbcTBogpB5c7ooAxmyRsfd63R78XpgcBSlvqGo7Whcpn3nAqoWgLfk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ud29TvO8; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52efa16aad9so11216578e87.0;
-        Fri, 02 Aug 2024 01:04:29 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-52efd08e6d9so11452337e87.1;
+        Fri, 02 Aug 2024 01:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722585867; x=1723190667; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722585869; x=1723190669; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V7VmA3/E7I7462QYgrQuUGgZ8QDhIU3xN9IszoRtcCM=;
-        b=efgOlOEsnom+kXuJVvFVfHlMrtXwPRfZNlAiDw/uN9/WKvij3YaIbevWS4MiIjTkAS
-         visYXYZO4ofMAaeIkkDirvc4GQseFstua/VOyt/BPWDPRVyc5TiBcWp7PMvOJrk7oGUu
-         TWgoeb4p5KrfejTWoJIxJIKj/0957ryYKwr6+roLI+C0rUnWxWopLjsoP34GV02Qdar+
-         bBMuG05/bBRStF4+ApW5jhhp4JjEOBznVOhinWCMQkgaqU55fs06ZplVeT85AC3NR1Xs
-         gfQXY7VMZrDSrEfwvPzFmbg74ehMWeZHEYKr1G+Qray+n0LnvU2rOvP4J5145LdeSTN6
-         ormA==
+        bh=yCs6h2UDX9N9y5d2OaQjEXDExrqKnK+N7jPDf8gyKrQ=;
+        b=Ud29TvO8MufODFWvOQvrSUhVwmlqegaHbJwx/qvrHBVOeErO3jyp0wDfSIsdQjBr3x
+         SJfu+zETRwgEZfg0pRTbNsOLpWXbJVxdRozNFpSheo4tgE8RDcRXFzbC9/7OC4BL89lO
+         yn2nV/azM1T/56HTYPDW4YcZhT9cjRcLhkE5+vX+f26jD2CuyAroRNxdnq34Ztasvk+i
+         fTFt84FsH5Ka5YOn0WpklDsEoBZOA+8lRfenU1BoGC9kMKBqXRlAQYHFZAUPeu1BM27y
+         uoCxWdpgU2hs0WrrHP3noI8XhTpo8cKAtMkV+nx3Y+L3oKJeZeqFaME8dtuteULMuOZw
+         5P+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722585867; x=1723190667;
+        d=1e100.net; s=20230601; t=1722585869; x=1723190669;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V7VmA3/E7I7462QYgrQuUGgZ8QDhIU3xN9IszoRtcCM=;
-        b=vncPSmp/wsYfkpgyuVqth94XdqdxLraBg/GlvzYmdJ74atY0ADqn5LfiJvc4Wg/ZZd
-         RLVZjJ9gEiaa2Rr+hdvr86OFiktONgoKaxxd1fL4jKH6ZJhFDUyz2+D8tiuThxN84YJ4
-         r5Q3CcZJKmFjcnjhpBEbxTLhLXQaHvrk3NInsaXWHWK3vQf615YuUfSe2X0aLKxMmAi/
-         M0YB4UImt1ktyOnfLvuMwGA/kdF24UCNvsSfjKZ8FagnCfYf9M2LVt1ZbyTKxkgH8ZPM
-         H5cOMBsWsVWGTVzE2oWEivltMksSTcyI2nnxNPQnPRFnE+B9M+7Dx+RUql0K09nKNQSz
-         PjCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2QDeeORia0ADBv4fmKGx0CIMOLVH7y+UumjOFmomavSX9LXcVP4ALV0P95wLBAzx3Qc2UPMZjWNkaI4VDTYt4VIMulG1Sz1FLsBKl
-X-Gm-Message-State: AOJu0YzhLydtiaOAPkTa6qlQPiGKrGICYZzEU0p5gFMC0qCi6Rt+Y5BC
-	nCxGlIHAWSjxLjCyqeY/qveV2f+K5TGWWQuXyA2SqXEhSBXyJaQggDhPxwB7
-X-Google-Smtp-Source: AGHT+IE1MH/X+gx660BxbBcm1KaFTmpiBxVNitGIKZI6pM+5fG7rVb40MpxxHzWt3gEoWX6/cebHLA==
-X-Received: by 2002:a05:6512:31c1:b0:516:d219:3779 with SMTP id 2adb3069b0e04-530bb39ba4emr1489973e87.58.1722585867062;
-        Fri, 02 Aug 2024 01:04:27 -0700 (PDT)
+        bh=yCs6h2UDX9N9y5d2OaQjEXDExrqKnK+N7jPDf8gyKrQ=;
+        b=m4xMwsjmdJ32G6nlKApYl4oKqvO4fztAcQW8uINpx3JIk+leCfFDc8LXY805jN3NVZ
+         kx8GoOc/MwATJk6+sMB/jmANnNbhod9NI1abCbG3d40njKTZ69TzhWoDzoW96fI3SYIh
+         sNwixGlLK2bo9R7QLP1hw8GIEclL2v5u0veMEsPcX5296EJ5AfhXj5Zehq9lo1zm9Pls
+         cF2qgcLp7Z0Z/nnU/zAsLid2ndkmy8E/H/OeWQUjXp10Iw0shOvq/ITLvsgWdIypNGVA
+         5beRJ4XqbxEwohg0kb+i6V5djmCHx3UHstWbbTnX+DOBcXanxrE8SbQGNcbRcolAP2ww
+         UQKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXC4hCoiUvQpRSVx+7tBcx4cIUzRpMmPY5Kbr9Y+cjIudI6dwRENjdVr7jg22JJPDT7IojxjiBek1ROChuj5Xr+EClnZEQf8r5wFcUq
+X-Gm-Message-State: AOJu0YyYRc2qhldgujCVESh0rZ5RHIOf66iuXUWD0ExQIsLLu5EVeSP7
+	+8M8aMhmWLTTJaTQSTpuCICIZqa+RL7eiqtao5cNgXWkXHKC7H+u0OIFjYnx
+X-Google-Smtp-Source: AGHT+IEKYC0SM3l4rjTZmoq/qNzRKfcs5ffYJ7UJacCjBqAIRiPXmN8aOWhLM0SmHt2cxPVwRe1kdw==
+X-Received: by 2002:a05:6512:2808:b0:52e:be30:7e7 with SMTP id 2adb3069b0e04-530bb39297dmr1503511e87.1.1722585868589;
+        Fri, 02 Aug 2024 01:04:28 -0700 (PDT)
 Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba07e46sm163281e87.32.2024.08.02.01.04.26
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba07e46sm163281e87.32.2024.08.02.01.04.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 01:04:26 -0700 (PDT)
+        Fri, 02 Aug 2024 01:04:28 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Pawel Dembicki <paweldembicki@gmail.com>,
@@ -81,9 +81,9 @@ Cc: Pawel Dembicki <paweldembicki@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	Linus Walleij <linus.walleij@linaro.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 3/6] net: dsa: vsc73xx: use defined values in phy operations
-Date: Fri,  2 Aug 2024 10:04:00 +0200
-Message-Id: <20240802080403.739509-4-paweldembicki@gmail.com>
+Subject: [PATCH net 4/6] net: dsa: vsc73xx: check busy flag in MDIO operations
+Date: Fri,  2 Aug 2024 10:04:01 +0200
+Message-Id: <20240802080403.739509-5-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240802080403.739509-1-paweldembicki@gmail.com>
 References: <20240802080403.739509-1-paweldembicki@gmail.com>
@@ -95,115 +95,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This commit changes magic numbers in phy operations.
-Some shifted registers was replaced with bitfield macros.
-
-No functional changes done.
+The VSC73xx has a busy flag used during MDIO operations. It is raised
+when MDIO read/write operations are in progress. Without it, PHYs are
+misconfigured and bus operations do not work as expected.
 
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+
 ---
 This patch came from net-next series[0].
 Changes since net-next:
-  - rebased to netdev/main only
+  - removed mutex
+  - used method poll.h to poll busy value in 'vsc73xx_mdio_busy_check'
+  - use 'vsc73xx_mdio_busy_check' for control if mdio is ready
 
 [0] https://patchwork.kernel.org/project/netdevbpf/patch/20240729210615.279952-6-paweldembicki@gmail.com/
 ---
- drivers/net/dsa/vitesse-vsc73xx-core.c | 45 ++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 33 ++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index 4b300c293dec..b6c46a3da9a5 100644
+index b6c46a3da9a5..42b4f312c418 100644
 --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
 +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -21,6 +21,7 @@
- #include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/bitops.h>
-+#include <linux/bitfield.h>
- #include <linux/if_bridge.h>
- #include <linux/if_vlan.h>
- #include <linux/etherdevice.h>
-@@ -40,6 +41,10 @@
- #define VSC73XX_BLOCK_ARBITER	0x5 /* Only subblock 0 */
- #define VSC73XX_BLOCK_SYSTEM	0x7 /* Only subblock 0 */
+@@ -317,6 +317,7 @@
+ #define IS_739X(a) (IS_7395(a) || IS_7398(a))
  
-+/* MII Block subblock */
-+#define VSC73XX_BLOCK_MII_INTERNAL	0x0 /* Internal MDIO subblock */
-+#define VSC73XX_BLOCK_MII_EXTERNAL	0x1 /* External MDIO subblock */
-+
- #define CPU_PORT	6 /* CPU port */
+ #define VSC73XX_POLL_SLEEP_US		1000
++#define VSC73XX_MDIO_POLL_SLEEP_US	5
+ #define VSC73XX_POLL_TIMEOUT_US		10000
  
- /* MAC Block registers */
-@@ -221,9 +226,22 @@
- #define VSC73XX_VLANACCESS_VLAN_TBL_CMD_CLEAR_TABLE	3
+ struct vsc73xx_counter {
+@@ -545,6 +546,22 @@ static int vsc73xx_detect(struct vsc73xx *vsc)
+ 	return 0;
+ }
  
- /* MII block 3 registers */
--#define VSC73XX_MII_STAT	0x0
--#define VSC73XX_MII_CMD		0x1
--#define VSC73XX_MII_DATA	0x2
-+#define VSC73XX_MII_STAT		0x0
-+#define VSC73XX_MII_CMD			0x1
-+#define VSC73XX_MII_DATA		0x2
++static int vsc73xx_mdio_busy_check(struct vsc73xx *vsc)
++{
++	int ret, err;
++	u32 val;
 +
-+#define VSC73XX_MII_STAT_BUSY		BIT(3)
-+#define VSC73XX_MII_STAT_READ		BIT(2)
-+#define VSC73XX_MII_STAT_WRITE		BIT(1)
++	ret = read_poll_timeout(vsc73xx_read, err,
++				err < 0 || !(val & VSC73XX_MII_STAT_BUSY),
++				VSC73XX_MDIO_POLL_SLEEP_US,
++				VSC73XX_POLL_TIMEOUT_US, false, vsc,
++				VSC73XX_BLOCK_MII, VSC73XX_BLOCK_MII_INTERNAL,
++				VSC73XX_MII_STAT, &val);
++	if (ret)
++		return ret;
++	return err;
++}
 +
-+#define VSC73XX_MII_CMD_SCAN		BIT(27)
-+#define VSC73XX_MII_CMD_OPERATION	BIT(26)
-+#define VSC73XX_MII_CMD_PHY_ADDR	GENMASK(25, 21)
-+#define VSC73XX_MII_CMD_PHY_REG		GENMASK(20, 16)
-+#define VSC73XX_MII_CMD_WRITE_DATA	GENMASK(15, 0)
-+
-+#define VSC73XX_MII_DATA_FAILURE	BIT(16)
-+#define VSC73XX_MII_DATA_READ_DATA	GENMASK(15, 0)
- 
- /* Arbiter block 5 registers */
- #define VSC73XX_ARBEMPTY		0x0c
-@@ -535,20 +553,24 @@ static int vsc73xx_phy_read(struct dsa_switch *ds, int phy, int regnum)
+ static int vsc73xx_phy_read(struct dsa_switch *ds, int phy, int regnum)
+ {
+ 	struct vsc73xx *vsc = ds->priv;
+@@ -552,6 +569,10 @@ static int vsc73xx_phy_read(struct dsa_switch *ds, int phy, int regnum)
+ 	u32 val;
  	int ret;
  
++	ret = vsc73xx_mdio_busy_check(vsc);
++	if (ret)
++		return ret;
++
  	/* Setting bit 26 means "read" */
--	cmd = BIT(26) | (phy << 21) | (regnum << 16);
--	ret = vsc73xx_write(vsc, VSC73XX_BLOCK_MII, 0, 1, cmd);
-+	cmd = VSC73XX_MII_CMD_OPERATION |
-+	      FIELD_PREP(VSC73XX_MII_CMD_PHY_ADDR, phy) |
-+	      FIELD_PREP(VSC73XX_MII_CMD_PHY_REG, regnum);
-+	ret = vsc73xx_write(vsc, VSC73XX_BLOCK_MII, VSC73XX_BLOCK_MII_INTERNAL,
-+			    VSC73XX_MII_CMD, cmd);
+ 	cmd = VSC73XX_MII_CMD_OPERATION |
+ 	      FIELD_PREP(VSC73XX_MII_CMD_PHY_ADDR, phy) |
+@@ -560,7 +581,11 @@ static int vsc73xx_phy_read(struct dsa_switch *ds, int phy, int regnum)
+ 			    VSC73XX_MII_CMD, cmd);
  	if (ret)
  		return ret;
- 	msleep(2);
--	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_MII, 0, 2, &val);
-+	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_MII, VSC73XX_BLOCK_MII_INTERNAL,
-+			   VSC73XX_MII_DATA, &val);
+-	msleep(2);
++
++	ret = vsc73xx_mdio_busy_check(vsc);
++	if (ret)
++		return ret;
++
+ 	ret = vsc73xx_read(vsc, VSC73XX_BLOCK_MII, VSC73XX_BLOCK_MII_INTERNAL,
+ 			   VSC73XX_MII_DATA, &val);
  	if (ret)
- 		return ret;
--	if (val & BIT(16)) {
-+	if (val & VSC73XX_MII_DATA_FAILURE) {
- 		dev_err(vsc->dev, "reading reg %02x from phy%d failed\n",
- 			regnum, phy);
- 		return -EIO;
- 	}
--	val &= 0xFFFFU;
-+	val &= VSC73XX_MII_DATA_READ_DATA;
+@@ -583,7 +608,11 @@ static int vsc73xx_phy_write(struct dsa_switch *ds, int phy, int regnum,
+ {
+ 	struct vsc73xx *vsc = ds->priv;
+ 	u32 cmd;
+-	int ret;
++	int ret = 0;
++
++	ret = vsc73xx_mdio_busy_check(vsc);
++	if (ret)
++		return ret;
  
- 	dev_dbg(vsc->dev, "read reg %02x from phy%d = %04x\n",
- 		regnum, phy, val);
-@@ -574,8 +596,11 @@ static int vsc73xx_phy_write(struct dsa_switch *ds, int phy, int regnum,
- 		return 0;
- 	}
- 
--	cmd = (phy << 21) | (regnum << 16) | val;
--	ret = vsc73xx_write(vsc, VSC73XX_BLOCK_MII, 0, 1, cmd);
-+	cmd = FIELD_PREP(VSC73XX_MII_CMD_PHY_ADDR, phy) |
-+	      FIELD_PREP(VSC73XX_MII_CMD_PHY_REG, regnum) |
-+	      FIELD_PREP(VSC73XX_MII_CMD_WRITE_DATA, val);
-+	ret = vsc73xx_write(vsc, VSC73XX_BLOCK_MII, VSC73XX_BLOCK_MII_INTERNAL,
-+			    VSC73XX_MII_CMD, cmd);
- 	if (ret)
- 		return ret;
- 
+ 	/* It was found through tedious experiments that this router
+ 	 * chip really hates to have it's PHYs reset. They
 -- 
 2.34.1
 
