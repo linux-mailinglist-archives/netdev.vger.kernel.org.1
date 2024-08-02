@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-115154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0318994552E
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:18:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 582CF94552F
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2E901F23861
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:18:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD3F11F238A9
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 00:18:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A454C9D;
-	Fri,  2 Aug 2024 00:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303C2A92D;
+	Fri,  2 Aug 2024 00:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l/37b1xA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fb1XKc/T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80B34C66
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 00:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0219474
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 00:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722557888; cv=none; b=ee3zH8NatRCT/EL3hNerS+4A3EL4GebmsywxcAMPBinyfFNveqmmzrQOODZnsra1XAfy0Pd/jTxKaTsq/TlzPP0qPi0azLM2FH+KlJDhKyvRfg0ZOHFLLvhPCMDNzu/m8uRDNIAZf2XMx/fUJWOhHRidHU9a2Tp/23Rz57xU608=
+	t=1722557889; cv=none; b=FdqGLc1Q/dDRhMW2A7evibpMdGjweWmhHQFNYhY5TU9OuNM+MWVmx0QffvgO4KUHz5vQ0vAg5nEhimSmbCsKkNt95A1dZ1KBuhUxIvyq5BvN/nDK1ooeANOzAv+KKOy8MxQgC0D2gmXeDIsIw6wBdkEqOFd3SdV0ZbQgt0LiFFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722557888; c=relaxed/simple;
-	bh=hFEqDxXlOsCbVq8aotSErKRovpoTO+FE8P1a1WMu+4c=;
+	s=arc-20240116; t=1722557889; c=relaxed/simple;
+	bh=kQhoIW+OBUkHTtcVjUMPCbxlYEoef/GWA+jQkTGVwJY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HsQkTk6Iyn5iqJWSAz1UzEJgRoTJ97+DOiNAoSm7puuWSxGdjCuOZ6nFPJMr2KDXEqa9bfWpiCMBTHs45DScxKnuc22M6NI7Rltd6UH8avPe7obanD9kgnScD2zyzcAUmLZGOqa6eIrZEL4B3Bov8bz1oOPp4wmCjLIwdBwxhKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l/37b1xA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51093C4AF0A;
+	 MIME-Version; b=nLfUjzuoOfZpmINzXuhfE2A8oKDxyTYmRFKhyMxl2ymhvgjaVc6Dn88aEIi64ua8xDNtT9u1ZecrURSoDrZO+5XgdByxZbF6wR9vvNvCoAY3G/aAw+HJVvmFSEbpOs53nxMAm9Nht6cQr7WxEmRcvAy2IBLwp89sv/kSwYKpATU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fb1XKc/T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3352C4AF0F;
 	Fri,  2 Aug 2024 00:18:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722557887;
-	bh=hFEqDxXlOsCbVq8aotSErKRovpoTO+FE8P1a1WMu+4c=;
+	s=k20201202; t=1722557888;
+	bh=kQhoIW+OBUkHTtcVjUMPCbxlYEoef/GWA+jQkTGVwJY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l/37b1xA5TTKQMOAW9w9u7GP+QqK99R9Jj5CZTvmpfOddX37nA72W4UwQOZV6Ocm6
-	 guMZTOKRAAw1csrIDPb8qGszLX1ZvwPjSSZxrUP/TkRTx9kN26wrZOkzM6cb5j0pJT
-	 s8QVA2WBaS98FKO30pV5agvbZhuNaIcDcnR1TrLZ3ra5Yu3YjGIYF3lOU+wfnoWwja
-	 JEmpQCv797AoP6y6y5mDuV8zutEpi7FsU6ulwYQSCuXXB+C+AG0ePLiITCDz30wBiJ
-	 EMnNdOmJuYMBrpN4StIUHJQKwHa81mGaGqoLMt5wPns9viv3Nb7zQx4oeSt33UCbLi
-	 bv2ra/Y1plQzA==
+	b=fb1XKc/TvO694aUYE6+nmiyxXaKCCrBLSjPWEr/9omNEl4TW5K0efL0aabZCzlhmA
+	 JmopDlPMsxoTrhasiBO4BZ5I5nMalV38r/zfHGvRt60G4YscEh50T7qG5MeO9c15fX
+	 sQ0Sp0mazh9BGTwBM38kb1McR3dixswQgf1psKAZIXmlgtXGgjG9BH0rl9EG+qkIOu
+	 1Q34TRW6alC5nli+aF+/dtX3/VyDzr3uvez93aoLh7N33E7A+3VeTMpHA1wKph0FDf
+	 Txi6lZdvScMEBWDz9I55WYLfqsfrzlykdu6GoB9BqcW2RSPD3YC/CEWsEH+zoBOvn7
+	 CnO1LTc2eXneQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -53,10 +53,12 @@ Cc: netdev@vger.kernel.org,
 	gal.pressman@linux.dev,
 	tariqt@nvidia.com,
 	willemdebruijn.kernel@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 01/12] selftests: drv-net: rss_ctx: add identifier to traffic comments
-Date: Thu,  1 Aug 2024 17:17:50 -0700
-Message-ID: <20240802001801.565176-2-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	marcin.s.wojtas@gmail.com,
+	linux@armlinux.org.uk
+Subject: [PATCH net-next 02/12] eth: mvpp2: implement new RSS context API
+Date: Thu,  1 Aug 2024 17:17:51 -0700
+Message-ID: <20240802001801.565176-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240802001801.565176-1-kuba@kernel.org>
 References: <20240802001801.565176-1-kuba@kernel.org>
@@ -68,33 +70,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Include the "name" of the context in the comment for traffic
-checks. Makes it easier to reason about which context failed
-when we loop over 32 contexts (it may matter if we failed in
-first vs last, for example).
+Implement the separate create/modify/delete ops for RSS.
+No deep changes, just split of the logic.
+
+No problems with IDs - even tho RSS tables are per device
+the driver already seems to allocate IDs linearly per port
+(there's a translation table from per-port context ID
+to device context ID).
+
+mvpp2 doesn't have a key for the hash, and indir table
+is always specified at creation by the core, so the only
+default we need to set for new contexts is hfunc.
+
+Compile-tested only.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/testing/selftests/drivers/net/hw/rss_ctx.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+CC: marcin.s.wojtas@gmail.com
+CC: linux@armlinux.org.uk
+---
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 81 ++++++++++++++-----
+ 1 file changed, 61 insertions(+), 20 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-index 011508ca604b..1da6b214f4fe 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
-@@ -90,10 +90,10 @@ from lib.py import ethtool, ip, defer, GenerateTraffic, CmdExitFailure
-     ksft_ge(directed, 20000, f"traffic on {name}: " + str(cnts))
-     if params.get('noise'):
-         ksft_lt(sum(cnts[i] for i in params['noise']), directed / 2,
--                "traffic on other queues:" + str(cnts))
-+                f"traffic on other queues ({name})':" + str(cnts))
-     if params.get('empty'):
-         ksft_eq(sum(cnts[i] for i in params['empty']), 0,
--                "traffic on inactive queues: " + str(cnts))
-+                f"traffic on inactive queues ({name}): " + str(cnts))
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+index 0d62a33afa80..e962959676ac 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -5696,40 +5696,77 @@ static int mvpp2_ethtool_get_rxfh(struct net_device *dev,
+ 	return ret;
+ }
  
+-static int mvpp2_ethtool_set_rxfh(struct net_device *dev,
+-				  struct ethtool_rxfh_param *rxfh,
+-				  struct netlink_ext_ack *extack)
++static bool mvpp2_ethtool_rxfh_okay(struct mvpp2_port *port,
++				    struct ethtool_rxfh_param *rxfh)
++{
++	if (!mvpp22_rss_is_supported(port))
++		return false;
++
++	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
++	    rxfh->hfunc != ETH_RSS_HASH_CRC32)
++		return false;
++
++	if (rxfh->key)
++		return false;
++
++	return true;
++}
++
++static int mvpp2_create_rxfh_context(struct net_device *dev,
++				     struct ethtool_rxfh_context *ctx,
++				     const struct ethtool_rxfh_param *rxfh,
++				     struct netlink_ext_ack *extack)
+ {
+ 	struct mvpp2_port *port = netdev_priv(dev);
+ 	u32 *rss_context = &rxfh->rss_context;
+ 	int ret = 0;
  
- def test_rss_key_indir(cfg):
+-	if (!mvpp22_rss_is_supported(port))
++	if (!mvpp2_ethtool_rxfh_okay(port, rxfh))
+ 		return -EOPNOTSUPP;
+ 
+-	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+-	    rxfh->hfunc != ETH_RSS_HASH_CRC32)
++	ctx->hfunc = ETH_RSS_HASH_CRC32;
++
++	ret = mvpp22_port_rss_ctx_create(port, rss_context);
++	if (ret)
++		return ret;
++
++	return mvpp22_port_rss_ctx_indir_set(port, *rss_context, rxfh->indir);
++}
++
++static int mvpp2_modify_rxfh_context(struct net_device *dev,
++				     struct ethtool_rxfh_context *ctx,
++				     const struct ethtool_rxfh_param *rxfh,
++				     struct netlink_ext_ack *extack)
++{
++	struct mvpp2_port *port = netdev_priv(dev);
++	int ret = 0;
++
++	if (!mvpp2_ethtool_rxfh_okay(port, rxfh))
+ 		return -EOPNOTSUPP;
+ 
+-	if (rxfh->key)
+-		return -EOPNOTSUPP;
+-
+-	if (*rss_context && rxfh->rss_delete)
+-		return mvpp22_port_rss_ctx_delete(port, *rss_context);
+-
+-	if (*rss_context == ETH_RXFH_CONTEXT_ALLOC) {
+-		ret = mvpp22_port_rss_ctx_create(port, rss_context);
+-		if (ret)
+-			return ret;
+-	}
+-
+ 	if (rxfh->indir)
+-		ret = mvpp22_port_rss_ctx_indir_set(port, *rss_context,
++		ret = mvpp22_port_rss_ctx_indir_set(port, rxfh->rss_context,
+ 						    rxfh->indir);
+-
+ 	return ret;
+ }
+ 
++static int mvpp2_remove_rxfh_context(struct net_device *dev,
++				     struct ethtool_rxfh_context *ctx,
++				     u32 rss_context,
++				     struct netlink_ext_ack *extack)
++{
++	struct mvpp2_port *port = netdev_priv(dev);
++
++	return mvpp22_port_rss_ctx_delete(port, rss_context);
++}
++
++static int mvpp2_ethtool_set_rxfh(struct net_device *dev,
++				  struct ethtool_rxfh_param *rxfh,
++				  struct netlink_ext_ack *extack)
++{
++	return mvpp2_modify_rxfh_context(dev, NULL, rxfh, extack);
++}
++
+ /* Device ops */
+ 
+ static const struct net_device_ops mvpp2_netdev_ops = {
+@@ -5750,6 +5787,7 @@ static const struct net_device_ops mvpp2_netdev_ops = {
+ 
+ static const struct ethtool_ops mvpp2_eth_tool_ops = {
+ 	.cap_rss_ctx_supported	= true,
++	.rxfh_max_context_id	= MVPP22_N_RSS_TABLES,
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+ 				     ETHTOOL_COALESCE_MAX_FRAMES,
+ 	.nway_reset		= mvpp2_ethtool_nway_reset,
+@@ -5772,6 +5810,9 @@ static const struct ethtool_ops mvpp2_eth_tool_ops = {
+ 	.get_rxfh_indir_size	= mvpp2_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh		= mvpp2_ethtool_get_rxfh,
+ 	.set_rxfh		= mvpp2_ethtool_set_rxfh,
++	.create_rxfh_context	= mvpp2_create_rxfh_context,
++	.modify_rxfh_context	= mvpp2_modify_rxfh_context,
++	.delete_rxfh_context	= mvpp2_delete_rxfh_context,
+ };
+ 
+ /* Used for PPv2.1, or PPv2.2 with the old Device Tree binding that
 -- 
 2.45.2
 
