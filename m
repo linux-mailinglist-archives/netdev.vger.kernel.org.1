@@ -1,82 +1,93 @@
-Return-Path: <netdev+bounces-115371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC2B94608B
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:31:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83DC94608C
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40B9E1C20B3D
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:31:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EC511F22450
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C52175D26;
-	Fri,  2 Aug 2024 15:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D80175D48;
+	Fri,  2 Aug 2024 15:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0jfeYrk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xcrp3146"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE866175D20
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 15:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06981175D28;
+	Fri,  2 Aug 2024 15:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722612697; cv=none; b=Gy4FEhBWu2+VTmV5z9qIOLGnrjdWYvvQ2Rpq7k7qkZ+Bg0JlraIZukbJAS2sHicdpRBv6boVGpgsjg1QPh2mapgqvLIzfiAHpnBfWG8hrDcsXgMlurXanDVCnReOG0+EGVO1P5TFoG9mC34woE4y2pGpwbcoEoInOdSnxp7vdmk=
+	t=1722612748; cv=none; b=DaBr7pjH4OULKQe8wDv8MlHWI8f+ZEDciKQvjDImLpiou1szw9N5CoB1JH41yvI9+mCd6YYjMzMaKIWzNZ0rsR7MsQdzXAMEgqR8kA2UmrCkojdFEsT7PDBDVdnIicnu3I6GagCl1y/n9ZUO7kJiyUrKkkxmxSh4dCgeyuH0mrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722612697; c=relaxed/simple;
-	bh=Q2EL8Vubkn7cUY9f5/AfEXR2r5J9stHFLifTmyWqEaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YCMXNPM1nva0o4gaqxf5MqWaIux2YpclRedg/lGka/WYMvWBCIZsx5X6tWaAswiNSAZaWKzRn0qpvmNVHjX6hkjZc5Dck+A916r9UeRtDg3E6wnALfN7qRe62I9HY3CIWgkthhCiA84BulxWw1Cx0a1Ld3SY1CSEeQjvB9nlQME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0jfeYrk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFBCAC32782;
-	Fri,  2 Aug 2024 15:31:35 +0000 (UTC)
+	s=arc-20240116; t=1722612748; c=relaxed/simple;
+	bh=9QxgLbIHkSOCEL3yRitF+A2vgV2hpriB4j1hLM8Q3AA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SCjJygaknd0RYSYZPgxLESYiht8nllkhA2MXCDFC0mhJbLbgon70IqaG8XQ4UhafR+eKP8dUpzOTz6QQKVCcjRmKCsw0uPYJyTYLD+HjSrhs2sMQbBIjKr/geQk4V4J41imo7UADSi1EhHlQDx12DJFCZmbBafkaDtSqQHgoL60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xcrp3146; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 384FCC32782;
+	Fri,  2 Aug 2024 15:32:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722612697;
-	bh=Q2EL8Vubkn7cUY9f5/AfEXR2r5J9stHFLifTmyWqEaE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F0jfeYrkJJZWA4wsL1+FvPLOmkHj1dKv/zzneQD4VBXv7EFCjTh8ILrDtDzpN6gzz
-	 TZdXeStwdTyK1+utYajvqjDzNVS4L/swRHwVmzgyAReu1L1LSaX9GnbTAemknVE/Pp
-	 9wUha623LhH05EaxfxZThwWlYIulLx/WohF/heJbZ/SlLoTisLC1R6kGVOjSbiv3R6
-	 ee3s63ATsZiP7MbFpPtYpETQLGBu25w/C09Fnty5urZsAQcbZvaVWYQpUH2ro/E798
-	 w9H0hIKvdviVNJfLVaWSNVIcZsNUTN7LJf1KrDF30SoQr/PUpp30txC+sd1iA4ST53
-	 WQTGhWM5vvrcg==
-Date: Fri, 2 Aug 2024 16:31:33 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, kernel test robot <lkp@intel.com>,
-	alexanderduyck@fb.com
-Subject: Re: [PATCH net] eth: fbnic: select devlink
-Message-ID: <20240802153133.GF2504122@kernel.org>
-References: <20240802015924.624368-1-kuba@kernel.org>
- <20240802145038.GE2504122@kernel.org>
- <20240802080148.53366633@kernel.org>
+	s=k20201202; t=1722612747;
+	bh=9QxgLbIHkSOCEL3yRitF+A2vgV2hpriB4j1hLM8Q3AA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xcrp314638hr71O6V74BTCkZ3hSz6vr9m2QFTmklNTSV0PixbH90C2Ly4KP1G5ul5
+	 KVTPam6R9g6xy95ECvSwB27+iqMbbcjrY6HxGvhHd3J0k26eCXeEd49QKiIlON+rzM
+	 uaS18SDb3Vwni3hRd6GGWIQ7JH9Ju5Tx1hUqx4U67ooYEoMIuaMCAWlCIfRh9qembq
+	 tgZMxmcsSvU49BUjLdrqMM48ScBi6wDSmPa1t1ASkGeApLP9tNYNEHka/ew2U8DQi5
+	 f3plp/fQ/uJRsLhjCzgR/iEYGx8a0YWvqI2y6AMjDEeLHAww5KMPEcpjTDmkWFKQLX
+	 gOVzgfY1XNxjA==
+Date: Fri, 2 Aug 2024 08:32:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Cc: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Mohammad Nassiri <mnassiri@ciena.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/7] net/selftests: TCP-AO selftests updates
+Message-ID: <20240802083226.4bb23562@kernel.org>
+In-Reply-To: <20240802081823.67a27db3@kernel.org>
+References: <20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com>
+	<20240802081823.67a27db3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802080148.53366633@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 02, 2024 at 08:01:48AM -0700, Jakub Kicinski wrote:
-> On Fri, 2 Aug 2024 15:50:38 +0100 Simon Horman wrote:
-> > But while exercising this I noticed that PAGE_POOL is also needed,
-> > which I locally resolved by adding:
-> 
-> Oh, good catch. I'm a bit surprised how slow kbuild bot is :(
->  
-> > 	select PAGE_POOL
+On Fri, 2 Aug 2024 08:18:23 -0700 Jakub Kicinski wrote:
+> On Fri, 02 Aug 2024 10:23:24 +0100 Dmitry Safonov via B4 Relay wrote:
+> > First 4 patches are more-or-less cleanups/preparations.
 > > 
-> > I can provide a follow-up patch after this one is merged.
-> > Or perhaps you can address this in a v2?
-> > I have no preference either way.
+> > Patch 5 was sent to me/contributed off-list by Mohammad, who wants 32-bit
+> > kernels to run TCP-AO.
+> > 
+> > Patch 6 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+> > the issue, but I hope it will fix netdev flakes for connect-deny-*
+> > tests.  
 > 
-> Please send your version with both selects, I'll mark mine as superseded
+> Hm, could be a coincidence but we did hit:
+> 
+> # not ok 55 # error 381[unsigned-md5.c:24] Failed to add a VRF: -17
+> # not ok 56 # error 383[unsigned-md5.c:33] Failed to add a route to VRF: -22: Key was rejected by service
+> 
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsigned-md5-ipv6/stdout
+> 
+> in the first run after this got queued. But the retry worked:
+> 
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsigned-md5-ipv6-retry/stdout
 
-Sure. I'll set myself as the author, to save negotiating about that,
-and as it's only two lines.  Do feel free to update as you see fit.
+oooh another run, another (different) flake:
+https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710181/11-key-management-ipv4/stdout
+
+I'll keep it around for another run, but looking less and less 
+like a coincidence :(
 
