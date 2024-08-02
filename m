@@ -1,185 +1,110 @@
-Return-Path: <netdev+bounces-115315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F43D945D1C
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:20:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ED4A945D28
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05A311F21A40
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:20:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E22B8282BD7
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1B41E210A;
-	Fri,  2 Aug 2024 11:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458C71E2118;
+	Fri,  2 Aug 2024 11:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="vvVzIzbV"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="EhPYw3Af"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DE01DF66B
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB061D1F4B
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 11:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722597604; cv=none; b=d0IO38q7JRdDryrDQaAcMMfI6hQT9fvmKcC6DiDHSK4FZVXp2cepVxjqptpzEBYqtNhClnuQqlkaF+Rxj6aHuJ0f7abA05xEk5zPXse0T0S5fQNVddWoytHsehmBX/QMv7cSqvPBO94MsEsifjXG7ljlgbW3a4/VLXY6jRhE+4Y=
+	t=1722597635; cv=none; b=LYALqR6hgSneYQ5qhW0A5i/B5FpPavd7+MioHt8ARv6Bq/4a0FgqiKjDf3eh7CCVxjx5qEUIT7eRblnlH7fZc8bbIG/XACAZFNvV/gascU0tgTERy9/0w5+PlH5n3TZN6378FgLod7cbOv2LTfnRQiZmipTaVeRrxps8S4IVbDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722597604; c=relaxed/simple;
-	bh=k9HyMzf4EzzZUVqnHBrs5Y3Cu2N6XjIRBhtcBznNbcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZL0OCtjE6AA0Einb2RmdeG6Mt98KKhFZCbz32gC1F7Zjd0DitutkLFMUIF85xQAuwlmJvLbmWEGVrTvPz4ym7LWE8GXlamiFCGGm8ccRhC+vXnuZB5v8tVxv6Rt+AGYlfLdAFESpDNeaK4oj8In5GOFl82aHOA1eHmi/PSickU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=vvVzIzbV; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso11164815a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:20:01 -0700 (PDT)
+	s=arc-20240116; t=1722597635; c=relaxed/simple;
+	bh=ahVW27mFm4tKufePWHLVWyZ/GW++VPFGJbISeuzLUXE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=U8cyQof6Fnul4icfKzwOQOs1SBFJgftFysh6YytHqo0P9pEzcpCFtyW/uC4yzY8R/TXk59xaDQN1oq6wdfyA89kea9yt0SUZrFd5vfBWE5SxkVBMpWjQ2JeXHt2UO28qkGq/o4tj0QizSXIR6AzIQx6TYkYxuyVgxYnKqtdLXXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=EhPYw3Af; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5a79df5af51so5547999a12.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 04:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722597600; x=1723202400; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UCRGPHH39h/JyZAxINtlp6O+Adb+Rq0MmzUnC+3zzG4=;
-        b=vvVzIzbVH4rHwLUkqdn40q140/7PtLy8Op+8UAQZTZTJBqm3ZYAI9H3ANM9oU7Aj4O
-         LrMOW/yGJnzypCc4yb4Bc2Q8ErQHvfglzvMQj0kDPEb+oAaxpxfGvlKmDdJdtPRraMn1
-         CrJ+EEOuxG4X2ZkM8W/nKW1QTQ5o7Q51CPUj/JxMjEQTZadQgH+HloZbMGfjgM6viuqh
-         LiQY5h3V+hCEl8sT9FUPHG73E7cUg1wIwoDrxjxacipLDCUkbrhHfxBpnbIf5Q1vvvYP
-         Eu1BlcN0jUi/U5RdN2U6RYJf8lKtB5dTgSVPrZdJx80S4trviuGcBvgmjUtYysggHq7M
-         GaKA==
+        d=cloudflare.com; s=google09082023; t=1722597632; x=1723202432; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9bp0Lv7R938kb69AhH/RUpNk52nvW3s45fMjR04Xwyk=;
+        b=EhPYw3AfnSDv3su+CRVQe8k7E5rnxiU5b8+YpFSZmvuiGcZbmdVWTbFrkHnnkjUGm0
+         tkWa8H+9nxDRONfTJG2Zc1VPacyAqh/AlE/EjK1/fyc6Dde5Qf9VNXueahAPNi0gJ4aA
+         qTN8XDHGYER54a6BBF9DZb6Qs4iy9GZG4OiY3eVDOv6tSTGPuHi3FQdyuF1cozER2jvR
+         jqu4HUhOheHvw12f5Lc69QGIjLAy5xTBxSBKAa4nZx4RiXswwzCJYFPpoQmZNEKe1EGD
+         UvOwXSe9wq4dcgy6aoSB7WYCAYDLvuWSlk7+oIl2HAo0cOmUYzdoQ+iJgtJuWzRYrlcv
+         lv5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722597600; x=1723202400;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1722597632; x=1723202432;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UCRGPHH39h/JyZAxINtlp6O+Adb+Rq0MmzUnC+3zzG4=;
-        b=diL86ykw2goO7TIkQ2xgLCGJ4X8ZGJKj9t61r/saGyY5/t8/UBG2loYbXhXv5Bcxut
-         Za4T4kyNjAeJ0AKUEWCd2K4p6aFNqweri7OkJFb8j8MSLsasc7q/0F7WqMjldsUsEJLS
-         pX8RPUZDY8HzFHPDLu11kkJ97Q9LYGBVXhnAUl7q3kuTdPkabWfGMIRrYdpHxYXLLJgm
-         GZjjsysOOn7YuQqBwj/hcRewUCfHQub84R2X6zE9S3mKkFwrxiXFXFg5HxX7txJJgzbc
-         CG3aDUb2UgJyHc5DF8Vf7SFnQ6pEydw9PjbLemb4wTu5vwB+wi2hchuIwo79p/yYBbom
-         LEgg==
-X-Gm-Message-State: AOJu0YxQodctBoFCGGvhPsg/HcFBTMcj4TK9rBWpa8QTN0YxMTQiOEPO
-	/A1PIwZwii7rS3cJyNUAukWu0c0p3XhlA/skzcr/d1J53rWchJ/VnkTQxdpzu6omsv6AGg/n409
-	m
-X-Google-Smtp-Source: AGHT+IGkAIZpv5vH7VaAdNLDJwW8A6UG7uIM6pNVAqK1i5EpJ0FJZAXQzjw/wfPIS325tA+XLQvigA==
-X-Received: by 2002:a05:6402:2032:b0:5a3:a4d7:caf5 with SMTP id 4fb4d7f45d1cf-5b7f5dc13cemr2006341a12.36.1722597599877;
-        Fri, 02 Aug 2024 04:19:59 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b83c22db71sm967763a12.94.2024.08.02.04.19.58
+        bh=9bp0Lv7R938kb69AhH/RUpNk52nvW3s45fMjR04Xwyk=;
+        b=fogPvBdNJ9WiQERVcszlMn7Nxn3jHICVN4kZBDodTcX3qpleFsO3Vz4D1lb+5+bFGS
+         p4dkZ/GBcT86EJnxrsPvA4tlzZOCk2rpwLn9N5rDAmhysHXtTWRgjP1bmauGwMF+B1Wl
+         sGvSbJlJN7RCY+vzn8iDF2LbWFzc19tEWvHDq5JC6EX99NMs5e5BbIGhl8xZ4xh7g764
+         +dK8nhTsQl84HdrAqSZkX5/Ih5k0StaQ4FlKct/eW5Z+WlnV6vIGKvrCRvTnFoZWcDjY
+         q7UtcZeLAkyJKPiqBNrXQuZRv4eNPxXL/rf5uey76FIBhhsVfOZPrb5tqIP/q1ouhHbp
+         ZUOw==
+X-Gm-Message-State: AOJu0Yw1l2EUJ8BnJQaRAIpEaklxXSpTtWHjMyg+uGr3WWvlRX9bS9oH
+	KOBZI6X4M/F+VoPm8fMJG0wOb4er7GqWLp4loj4gRXyd5bya2mCCzhq/S4dXwG0=
+X-Google-Smtp-Source: AGHT+IE8kXYEwxyh2rF5/J9aD7Dl1W5CwWPprLc67eBJ2XZXbvCKMs6cyZYrUE9gtmmuVgAEnzrQAQ==
+X-Received: by 2002:a17:906:dc90:b0:a7d:895b:fd with SMTP id a640c23a62f3a-a7dbcb9000fmr411014966b.6.1722597631730;
+        Fri, 02 Aug 2024 04:20:31 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e7fe3csm86590166b.162.2024.08.02.04.20.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:19:59 -0700 (PDT)
-Date: Fri, 2 Aug 2024 13:19:58 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-Message-ID: <ZqzA3rbIJmGjzIlU@nanopsycho.orion>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+        Fri, 02 Aug 2024 04:20:31 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Willem
+ de Bruijn <willemb@google.com>,  kernel-team@cloudflare.com,
+  syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2 0/2] Silence bad offload warning when sending UDP
+ GSO with IPv6 extension headers
+In-Reply-To: <20240801183659.17c25cbd@kernel.org> (Jakub Kicinski's message of
+	"Thu, 1 Aug 2024 18:36:59 -0700")
+References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
+	<20240801183659.17c25cbd@kernel.org>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Fri, 02 Aug 2024 13:20:30 +0200
+Message-ID: <87ikwjyxvl.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+Content-Type: text/plain
 
-Tue, Jul 30, 2024 at 10:39:45PM CEST, pabeni@redhat.com wrote:
+On Thu, Aug 01, 2024 at 06:36 PM -07, Jakub Kicinski wrote:
+> On Thu, 01 Aug 2024 15:52:52 +0200 Jakub Sitnicki wrote:
+>> This series addresses a recent regression report from syzbot [1].
+>> Please see patch 1 description for details.
+>
+> The test doesn't seem super happy in netdev CI:
+>
+> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/709100/79-udpgso-sh/stdout
+> https://netdev-3.bots.linux.dev/vmksft-net/results/709101/78-udpgso-sh/stdout
+> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/708921/75-udpgso-sh/stdout
+> https://netdev-3.bots.linux.dev/vmksft-net/results/708921/78-udpgso-sh/stdout
 
-[...]
+Embarassing. I must have not recompiled the tests after tweaking it.
+Sorry for the oversight. I will deal with it.
 
+Reproduces for me locally:
 
->+      -
->+        name: inputs
->+        type: nest
->+        multi-attr: true
->+        nested-attributes: ns-info
-
-Hmm, you sometimes use this "ns-" prefix. Why? Does it mean
-"net-shaper"?
-
-This results to:
-net_shaper_ns_info_nl_policy
-
-Wouldn't it be better to name it just "info":
-net_shaper_info_nl_policy
-
-And for ns-output-info, just "output-info":
-net_shaper_output_info_nl_policy
-
-?
-
-
->+        doc: |
->+           Describes a set of inputs shapers for a @group operation
->+      -
->+        name: output
->+        type: nest
->+        nested-attributes: ns-output-info
->+        doc: |
->+           Describes the output shaper for a @group operation
->+           Differently from @inputs and @shaper allow specifying
->+           the shaper parent handle, too.
->+
->+      -
->+        name: shaper
->+        type: nest
->+        nested-attributes: ns-info
->+        doc: |
->+           Describes a single shaper for a @set operation
->+  -
->+    name: handle
->+    subset-of: net-shaper
->+    attributes:
->+      -
->+        name: scope
->+      -
->+        name: id
->+  -
->+    name: ns-info
->+    subset-of: net-shaper
->+    attributes:
->+      -
->+        name: handle
->+      -
->+        name: metric
->+      -
->+        name: bw-min
->+      -
->+        name: bw-max
->+      -
->+        name: burst
->+      -
->+        name: priority
->+      -
->+        name: weight
->+  -
->+    name: ns-output-info
->+    subset-of: net-shaper
->+    attributes:
->+      -
->+        name: parent
->+      -
->+        name: handle
->+      -
->+        name: metric
->+      -
->+        name: bw-min
->+      -
->+        name: bw-max
->+      -
->+        name: burst
->+      -
->+        name: priority
->+      -
->+        name: weight
->+
-
-[...]
+[pid   507] setsockopt(4, SOL_IPV6, IPV6_HOPOPTS, NULL, 0) = 0
+[pid   507] recvfrom(3, 0x55fcf63813a0, 65535, 0, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
 
