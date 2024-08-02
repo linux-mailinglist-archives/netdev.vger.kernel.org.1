@@ -1,103 +1,117 @@
-Return-Path: <netdev+bounces-115277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F7DB945B4A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:42:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B36945B54
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B3B81F24405
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:42:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7092280D61
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFAA1DAC51;
-	Fri,  2 Aug 2024 09:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F151B3F31;
+	Fri,  2 Aug 2024 09:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IqM7FEQk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FFy+ivOs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F56256D
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 09:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CB4256D
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 09:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722591744; cv=none; b=hsPYrMe4AiK92X7FQMjHiSnq21yA483YNw5CoToQzFkwAs/uwjKyO6GHbz9GPg7PLezon4QAI3TQ0Yn4t1uImrM1L9OH5aarhyqJ6HZfhPTBXZxYBBF4UZvHWG9kz3+mZVzeaDyfD0boWymmJy23Rq/TQDaKg7qcQlke3CM3vGE=
+	t=1722591979; cv=none; b=ffu48pgcwMgqfzPMwHHxvY30lzIoszEkpyqGSvn10lbV//Mj2V6CZI15yltZGElrZXPLWh1IOzEMG1EheBpwRpG9PNuvmkxaUHHg7ohcM8w7PNPH+fExiPc5fP7sE8A+SKp9QoNHLVmZCIR9qan8z8sQCPUm9C/0nf9N7ZbvRjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722591744; c=relaxed/simple;
-	bh=rzqvTPucUOHePsBnwTFO4YPTZGqWKB3T985AtQaSS0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQZnVQTZxrHhyrUjsMdkOusNUjXIhgnj3eAX76SUO0nZ1SWaV/PX+Iipk87/EoStMjugpCK2HfusLpiGgnw9SXf2EqqHXB5tLlbS4+JyH3eyavnsYFruRmd6JEo8N3Pz11J2Qpyo37cbJf+gCxrFUUpw7XL+mmsSjR9zjoXNQNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IqM7FEQk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2700DC32782;
-	Fri,  2 Aug 2024 09:42:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722591744;
-	bh=rzqvTPucUOHePsBnwTFO4YPTZGqWKB3T985AtQaSS0o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IqM7FEQk0cByC1OLzEEf/hZXQDCtHLc0EYkB9scinDXdmnxQ10N3fQ7IZ/iScuDv5
-	 dQBrkDNptabp1ORELwMP/SZxU7UWzO8q7VU0vniVIcb5IwSLYR0+F9pw0eFeB8885j
-	 k9ZyTmunmKtegZyH06xLJMArpsCWINPylKgxx6erGg+r3/eroMzubBdHo2F03g4kfJ
-	 iOu1FDV/wKSC8pa3tAoUOxt06DlkiZ/h1cd/y3oYapC4qEop4pHFMqEJYGFaoXsZ8A
-	 So/pjrSbj0p3wc6hgkBUSpHmPerVoEAqHtlix4oVuQ2gbD6lyBjTN70sEjvkCdn42g
-	 x2x0oCPo/GTMQ==
-Date: Fri, 2 Aug 2024 10:42:19 +0100
-From: Simon Horman <horms@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>,
-	Per Liden <per.liden@nospam.ericsson.com>, netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net
-Subject: Re: [PATCH net-next v2] tipc: guard against string buffer overrun
-Message-ID: <20240802094219.GB2503418@kernel.org>
-References: <20240801-tipic-overrun-v2-1-c5b869d1f074@kernel.org>
+	s=arc-20240116; t=1722591979; c=relaxed/simple;
+	bh=i/Ser/7PUtUC4rWgMQwn1QNdnq9PP3CeuzzePam/HWc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sj4e7zW1M6Eiki3UKCcfA6oKSpgHufhlHza99ZE+wm3EzigGeX2vSzdl30OBoGlSwaCp0SJg5lb/WM9JyH8EMPhJS3ZLtBh8ga2g27GqXyeH0u3btFl2tlb0aWil9uqI+pEVNAYUT9EddvjeJhTcBkwcQj24Zk3aecwXe7gyR5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FFy+ivOs; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5a156557026so10490323a12.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 02:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722591976; x=1723196776; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i/Ser/7PUtUC4rWgMQwn1QNdnq9PP3CeuzzePam/HWc=;
+        b=FFy+ivOsBQFEDJ5pNS0CbErTDsy6qeEIQooaA2MXWdklYr9Ex6fnUUofo6q3GWySIJ
+         LezkTik2zI/TGfeZIa9mVMRVyR31nCFb3+cm6tLl2XD5E8wbMzR83BFZMstxY4Gm+hP7
+         MdzpBRAwaXXa3x9rU/u84gSNb9ZXkTYQtLnL5IoVLymKPX7u3qzptAdzJi1bTzelQkoP
+         6CwKgOhYWOkoTB0AujiD+xLq/ivxGoIs0KcZIZQNtCs/XSrEDUSf/mJdteyKVYfkC4bK
+         TQRV8UovLwmkou/fPbjV0txvhvfo4iAx0G+QfrcEHWmhCg8YY+sfyxMzHstFch1Y3UHI
+         Xaaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722591976; x=1723196776;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i/Ser/7PUtUC4rWgMQwn1QNdnq9PP3CeuzzePam/HWc=;
+        b=kvbYHl0Cj5dYE242T3llwDti6NIIPJ6VFda+aK21XS9X5G1GrpipWPqq7dU0My1h/i
+         sixcXO7cCrCcnuLwYTXMzZKprp1YIscaOfHgCapH6s/vmy4x3clHIEw9qox3Hk8zEaXR
+         QxoJql8VLzJxH26d0V4t8ywGE41T/aVYSh1D+gfEOn+6dGn+ZW2AwdwnJmwLS3BFWyUf
+         vu+7pv+n/hk2yWOTsxlkTzwVVXqpmzvu85Gz9aeu2ogEfcpHuWphWblCZq9Frj5wxgsj
+         x/wHcgOfHa03p7nZXeQhH92t/EezAaYPfTWF6ZpxjXgIdAIbv4DXZE6hQeisJATOfmA7
+         4TiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVX+nUW29aKcabYAQ8xE6EcvBHCZtk9gJvZQfQHc1DOWfcWFl4+n4F/Zjk1oAu8pXPsESX0q/s5FdI6iYGc8hArHjfhm5h
+X-Gm-Message-State: AOJu0YzKmQxG4XyRSaw26rwi4Ly2LCV4ca/+Rq/Xx4Ukg3oQvkOvaig2
+	/pHe7uCOlmUDQUDKz5VrsECZf/KOQj7yB14Da5IlS8nTmxSLmdlv6uxk6hMnsL6sVPh/jyixxES
+	XT6K1DJZ4EghfZsrEzEPFfEHxe2k=
+X-Google-Smtp-Source: AGHT+IE3oKP/ZG1r8uKgINUFggM9LogV+j3EcBdZROtDDdmm6ZL8rbAmDIPOfFLxQs6lo+OpxLjOO/ObGtTKutq+PxU=
+X-Received: by 2002:aa7:c50e:0:b0:5a4:6dec:cd41 with SMTP id
+ 4fb4d7f45d1cf-5b7f57f3a8dmr2170053a12.28.1722591975996; Fri, 02 Aug 2024
+ 02:46:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801-tipic-overrun-v2-1-c5b869d1f074@kernel.org>
+References: <20240801145444.22988-1-kerneljasonxing@gmail.com>
+ <20240801145444.22988-6-kerneljasonxing@gmail.com> <CANn89i+gpyrzH_gd0oyrfnMovx0B6FWGS+7KKLydaKayFXh_sQ@mail.gmail.com>
+In-Reply-To: <CANn89i+gpyrzH_gd0oyrfnMovx0B6FWGS+7KKLydaKayFXh_sQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 2 Aug 2024 17:45:36 +0800
+Message-ID: <CAL+tcoDpB34ucBe8AH8MAzDv8L-9o_u=Sg=9=rFyuOHP6bduiQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/7] tcp: rstreason: introduce
+ SK_RST_REASON_TCP_KEEPALIVE_TIMEOUT for active reset
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 01, 2024 at 07:35:37PM +0100, Simon Horman wrote:
-> Smatch reports that copying media_name and if_name to name_parts may
-> overwrite the destination.
-> 
->  .../bearer.c:166 bearer_name_validate() error: strcpy() 'media_name' too large for 'name_parts->media_name' (32 vs 16)
->  .../bearer.c:167 bearer_name_validate() error: strcpy() 'if_name' too large for 'name_parts->if_name' (1010102 vs 16)
-> 
-> This does seem to be the case so guard against this possibility by using
-> strscpy() and failing if truncation occurs.
-> 
-> Introduced by commit b97bf3fd8f6a ("[TIPC] Initial merge")
-> 
-> Compile tested only.
-> 
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
-> I am not marking this as a fix for net as I am not aware of this
-> actually breaking anything in practice. Thus, at this point I consider
-> it more of a clean-up than a bug fix.
-> ---
-> Changes in v2:
-> - Correct formatting and typo in subject (Thanks Jakub)
->   + The formatting problem was caused by tooling (b4)
->     so I reworded the subject as a work-around
+Hello Eric,
 
-Just to clarify. The formatting issue I was referring, is a double space
-in the subject [1], which seems to of occurred due to the subject being
-linewrapped and then unlinewrapped. However, in the light of a new day,
-it is not at all clear to me that b4 is the cause of the problem.
-So sorry for pointing my finger at it.
+On Fri, Aug 2, 2024 at 5:35=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Thu, Aug 1, 2024 at 4:55=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > When we find keepalive timeout here, we should send an RST to the
+> > other side.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>
+> Note that this changelog does not really match the code.
+>
+> We were sending an RST already.
+>
+> Precise changelogs are needed to avoid extra work by stable teams,
+> that can 'catch' things based on some keywords, not only Fixes: tags.
 
-[1] https://lore.kernel.org/netdev/20240731182356.01a4c2b8@kernel.org/
+Thanks for reminding me. I will revise the changelog.
 
-> - Added Acked-by tag from Jakub
-> - Link to v1: https://lore.kernel.org/r/20240731-tipic-overrun-v1-1-32ce5098c3e9@kernel.org
+>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-...
+Thanks!
 
