@@ -1,124 +1,118 @@
-Return-Path: <netdev+bounces-115354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F2D945F2B
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:15:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF78945F3E
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31B87B216A1
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:15:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 757802838A4
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E746453368;
-	Fri,  2 Aug 2024 14:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9426F1E4EF2;
+	Fri,  2 Aug 2024 14:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXcwHAF+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KfUWqUJp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD064EEC3;
-	Fri,  2 Aug 2024 14:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E8E1E4EEB
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 14:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722608138; cv=none; b=FiqKQfotFtNDlFGJfVKp/AUa9xsDgt935q2m2DsSse2i9jsYQlM1kXN+dx6w/w3d6Uhptnhtf8i/59X8qUqwDfN2Dd2KwVURDizv42/Nmq9Xln+jggRuzp8lyz60xwWPenRf//BI40wEu5MS8lmH0KkOM93N/Nu6Cxa0H/PHKjY=
+	t=1722608302; cv=none; b=GlAb3vXMCJV6aA2btZFPomwx7eT7Rqvv/hXSwvTNcJiNmFI0EopzmoiWYaD9uumz6DqhJi5g44I+xNREwYEtNAfZugpDCAcQclehGgDlBzWd/6PFi9qQ5YDcl8Wa5qskBPdkeM1ULl2VIb0Ta8jwrd80FZ5rf2ybjIMN54kQgws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722608138; c=relaxed/simple;
-	bh=m7Y6Di23g7SkOV8aRpP2zGN3zxD8WgaWmWu7uNswhkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sSVChDqasbn4XQkd4TB6PyOVlQzNIkwgTGPpBLy3zG4ZfiZQiMoTyvVMwkK6vnyDK+Cv54sf2ocLXsB/7PO9j/Xue7tAto+50YA1oYcLBVhTTvvxU5ukOQR1brAoGaaSQPmVY1xanLg///xlphrCti0NKjs9BKZTo/4QGAJ7VmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXcwHAF+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87CCDC32782;
-	Fri,  2 Aug 2024 14:15:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722608138;
-	bh=m7Y6Di23g7SkOV8aRpP2zGN3zxD8WgaWmWu7uNswhkY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iXcwHAF+9G8fepXOlBI2utRqIE5H+Asuk0HjM5Yi7KkAyLQ7KRip0tuD0oxuLH2/H
-	 VgFlHs7uJReqKusGxDkzMDqSTOg1kfQna22WogPwRoRBOw6nTs/Zh1GeDVv8HsyC2v
-	 w05Ba4iZjreC4DTfyOyE/SHRJdkjr4MuxQuzSyVlkEZHo4VinZyXPVTcwZOAagdc1K
-	 L2+jqejvXzUWzOnXYrPb9QOsWJI0ePJ1CtC/KsXdnC+rH7N7Q40EqpET225MEj2wJn
-	 uuTk3AIQm5lunR8PQFwJJM4dwHww8Sn+7GLFMTVxwCxrC+hf2RBPgF88t0wdC2X9OS
-	 qaQgXOv5DDE3g==
-Date: Fri, 2 Aug 2024 15:15:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: cooldavid@cooldavid.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
-Message-ID: <20240802141534.GA2504122@kernel.org>
-References: <20240802054421.5428-1-yyyynoom@gmail.com>
+	s=arc-20240116; t=1722608302; c=relaxed/simple;
+	bh=Z5c5T9SO1qEs+S4zGxk90PSnPZppHdEyEZ6FALk8OgI=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=R3JOqHJHURL8ifRTi6xghn5p/JRFzarnQArI5rovP9VVVPwa/hYAaQmAfB+VZdfnkM7Y8EwH0Gsm2mEy89IBH3v25UQimcogsj7A2IgHhzXpa3EjlNoiLSVEUdtPJhUFDlQ+1HUDDkjDNppKrNzdxuoCNU/Ue0ngqbj6EsbiFkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KfUWqUJp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722608299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UIDX8cy8H46a6mHnpLua2nDQ7obthpcuLcvJcSVXyfU=;
+	b=KfUWqUJpyjTkN2R7WvzmKWXObta/8RdJI8JhnYlEb7ikYdpEPYtFsqbrbLlDX5Iuzk489g
+	McSej9e0jgQ/3ncQ7YpPnhvZ3yGRg69lYtQBD+5Dw4H7liODIBSMTIK4Jb3YwF4hPBhCJa
+	sZpz4GczUUE/XUMJczKUHgwfkFySnVU=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-141-oNOQTMjXPXOFGGA7YhgjQw-1; Fri,
+ 02 Aug 2024 10:18:15 -0400
+X-MC-Unique: oNOQTMjXPXOFGGA7YhgjQw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 378B61955D48;
+	Fri,  2 Aug 2024 14:18:11 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3AFCD19560AE;
+	Fri,  2 Aug 2024 14:18:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240731190742.GS1967603@kernel.org>
+References: <20240731190742.GS1967603@kernel.org> <20240729162002.3436763-1-dhowells@redhat.com> <20240729162002.3436763-19-dhowells@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 18/24] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802054421.5428-1-yyyynoom@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <117845.1722608282.1@warthog.procyon.org.uk>
+Date: Fri, 02 Aug 2024 15:18:02 +0100
+Message-ID: <117846.1722608282@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Fri, Aug 02, 2024 at 02:44:21PM +0900, Moon Yeounsu wrote:
-> `ip_hdr(skb)->ihl << 2` are the same as `ip_hdrlen(skb)`
-> Therefore, we should use a well-defined function not a bit shift
-> to find the header length.
-> 
-> It also compress two lines at a single line.
-> 
-> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+Simon Horman <horms@kernel.org> wrote:
 
-Firstly, I think this clean-up is both correct and safe.  Safe because
-ip_hdrlen() only relies on ip_hdr(), which is already used in the same code
-path. And correct because ip_hdrlen multiplies ihl by 4, which is clearly
-equivalent to a left shift of 2 bits.
+> If the code ever reaches this line, then slice will be used
+> uninitialised below.
 
-However, I do wonder about the value of clean-ups for what appears to be a
-very old driver, which hasn't received a new feature for quite sometime
+It can't actually happen (or, at least, it shouldn't).  There are only three
+ways of obtaining data: downloading from the server
+(NETFS_DOWNLOAD_FROM_SERVER), reading from the cache (NETFS_READ_FROM_CACHE)
+and just clearing space (NETFS_FILL_WITH_ZEROES); each of those has its own
+if-statement that will set 'slice' or will switch the source to a different
+type that will set 'slice'.
 
-And further, I wonder if we should update this driver from "Maintained" to
-"Odd Fixes" as the maintainer, "Guo-Fu Tseng" <cooldavid@cooldavid.org>,
-doesn't seem to have been seen by lore since early 2020.
+The problem is that the compiler doesn't know this.
 
-https://lore.kernel.org/netdev/20200219034801.M31679@cooldavid.org/
+The check for NETFS_INVALID_READ is there just in case.  Possibly:
 
-> ---
->  drivers/net/ethernet/jme.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
-> index b06e24562973..83b185c995df 100644
-> --- a/drivers/net/ethernet/jme.c
-> +++ b/drivers/net/ethernet/jme.c
-> @@ -946,15 +946,13 @@ jme_udpsum(struct sk_buff *skb)
->  	if (skb->protocol != htons(ETH_P_IP))
->  		return csum;
->  	skb_set_network_header(skb, ETH_HLEN);
-> +
->  	if ((ip_hdr(skb)->protocol != IPPROTO_UDP) ||
-> -	    (skb->len < (ETH_HLEN +
-> -			(ip_hdr(skb)->ihl << 2) +
-> -			sizeof(struct udphdr)))) {
-> +	    (skb->len < (ETH_HLEN + (ip_hdrlen(skb)) + sizeof(struct udphdr)))) {
+		if (source == NETFS_INVALID_READ)
+			break;
 
-The parentheses around the call to ip_hdrlen are unnecessary.
-And this line is now too long: networking codes till prefers
-code to be 80 columns wide or less.
+could be replaced with a WARN_ON_ONCE() and an unconditional break.
 
->  		skb_reset_network_header(skb);
->  		return csum;
->  	}
-> -	skb_set_transport_header(skb,
-> -			ETH_HLEN + (ip_hdr(skb)->ihl << 2));
-> +	skb_set_transport_header(skb, ETH_HLEN + (ip_hdrlen(skb)));
+David
 
-Unnecessary parentheses here too.
-
->  	csum = udp_hdr(skb)->check;
->  	skb_reset_transport_header(skb);
->  	skb_reset_network_header(skb);
-
--- 
-pw-bot: cr
 
