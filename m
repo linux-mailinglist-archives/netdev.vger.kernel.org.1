@@ -1,108 +1,152 @@
-Return-Path: <netdev+bounces-115429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0CAB9465A6
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 23:57:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3B19465CA
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B051F22E28
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 21:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 451A31C20F82
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 22:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B298139597;
-	Fri,  2 Aug 2024 21:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A881ABEB5;
+	Fri,  2 Aug 2024 22:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQPzExsH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9XhZ9tV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F908120A;
-	Fri,  2 Aug 2024 21:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB96B67E
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 22:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722635874; cv=none; b=jpuxYSQfAyrIj/xh2Dsk+7xWFHW+bMgz7tB7OLcvw2psJ6ecJkbk4dqIPKQBaq1xPI1H19lGakFktMz1GGKOqU7f/1/WXbWyqbMOAHxPgLr0ZkSdsDI1emwtP6pCpcMU8ulJnkC6M5JWRDBcdk6uTHOo7nYiLNluBcFqiW7m9xM=
+	t=1722636081; cv=none; b=rd1h8FX14Et7f1dDgIntY4kzN8N/PBeAqMIyAgZ61ZVg1GSxdJ+3peJ5e1z+ewymtxdXEUxSSLs8gvdXiBJz3mDAUaE76oPMSmy+Aqpv//ZYWPTedz3F2D4pPOU7myjabZmxtwWCLKMgTspDPqFRWdGBoVK4WlMwZduDdsuugvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722635874; c=relaxed/simple;
-	bh=N/jzdE2JNfP8kPtcekX+ld+Ycjy6CXEvs3NSj7LtiBI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UFo+a1hbi2ns13+Mcs0f654iaC6CdLghBzKHODqVX90YIELm5llTKW9cgDcIYGXZp1uo/OQZSijaPbXnyH9aAPAJrvPq88heue4J2JBd23EoZNvnog8rZp39ZFkF1GRH2NiUdYnbI0BncVGPaArl749fz2FukaDLlQZPjBG6oQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eQPzExsH; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-44ff6f3c427so40966901cf.1;
-        Fri, 02 Aug 2024 14:57:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722635872; x=1723240672; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Yisz4Kz62zQUPtoQOO3Y0OYrQh+KvOxC9+yB/2FF7c=;
-        b=eQPzExsHhcmwqPdds8Dv2khY2OowgNyGpE8RYrEH7T8jdriQivyZxvHiuC1V8DkRw6
-         XA61hirzhzaQSOmZH0DCCJ0E67P2qem8geF4oBdx49XepXFE2vT3WgxftIn0GkivgQAa
-         ofkF7i3lcQuJwEUsUQ6J331wVyynL12BvkOgYP3LdHYb7qwR8LaEbFO5AIRFM12EygPj
-         eWeuY6b+N1ck2rZiUZC8Hr+wM9iml1GPZa5rZBPezSqb8k9WDjFrqL2l6RIwoJQF0XK3
-         CklCEpHQtfFGvR1DZSD4mO7MrTHRW2+66VSjqU98hx7icZSkq9fgURgb2d63pN89DVQV
-         TKRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722635872; x=1723240672;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Yisz4Kz62zQUPtoQOO3Y0OYrQh+KvOxC9+yB/2FF7c=;
-        b=c9bsgDcv9xtWjaKGekoMUZoNgiliR8zH2T1NHB/E5py6/s3HjGbGNlcinclIfGMmsS
-         VZFwdfwq6ruG1gC0RyDMi9POm0pX8w1pHB5deyveifN5O63TsfZMVgksefeqoQnlLGqA
-         BO+AHqlX7fbFNUbr9ZtcG8tYDPvmqXmbU1ZZ3UIf0xxLgYuoWMPuIV+TQ0XkPRVetkV/
-         /uAQoJ+ssAYMeJPS32sYuWNT4USAS6X4dY7olTT5BVXpfSgEa/IA844qQhurIKZDaqFg
-         S0Am1fsYmN1fIlsh7xJNB7zDFJ3fQ9A0lJ0CJ+GFxaXyt56l/cOLRG3LWnkmDOxvrzyT
-         Ax4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXDnrVF75PuoJqxF3hZxUw/YBf817WCKN9Ll70wkkDyUqNfIZ902/4aWe+i/A1FX+rdr3KGlL4AeDOB7qW8Cv1xT5QY909EvOAqeqYq95UO4Twh34Z+8WQ9iRCMz+LpkZt2rUAY
-X-Gm-Message-State: AOJu0Yzt7ijU9f3PzsXkff9B87zPyUrHy6La0L4c/4LYsuWVqakD8QbF
-	OTLYjflqud90TiM/TWxDZrHsJ6nqXlnNDcLQ7RsduXjBZiHZwg8V
-X-Google-Smtp-Source: AGHT+IFmdkNyrozE2ZfgDzqy38j0LNUKqFWzKOLzIx9aVoRU4Mqocs+swC217vp+5qkHW37ZrdcOtA==
-X-Received: by 2002:ac8:7f0a:0:b0:446:49f1:79a with SMTP id d75a77b69052e-45189287653mr69777701cf.24.1722635871789;
-        Fri, 02 Aug 2024 14:57:51 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id d75a77b69052e-4518a76c7dfsm10409591cf.88.2024.08.02.14.57.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Aug 2024 14:57:51 -0700 (PDT)
-Message-ID: <3248ea5b-5bb6-43d9-a7f4-dbae5193ec5b@gmail.com>
-Date: Fri, 2 Aug 2024 14:57:47 -0700
+	s=arc-20240116; t=1722636081; c=relaxed/simple;
+	bh=G27UDolD1S5o2vZ/rMFzMAHo0IPbs/4ZJwyreb5h0Qc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KKXnB6qqRwg5kKSqnXBiMGCSsgokeoIF8wG1CNURdPJm9BQdzGqc+fp6/7uTg+PBFjZUG5mTujGWIgQliL6GAXhSYSiLYopihypchmNmok8+B5FoSAFnkejc5tFlBF+SgcjWGWpv4fHJRpBLGkZtcgYXnITxzWz5fdmR1yTWK64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9XhZ9tV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55A87C4AF09;
+	Fri,  2 Aug 2024 22:01:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722636080;
+	bh=G27UDolD1S5o2vZ/rMFzMAHo0IPbs/4ZJwyreb5h0Qc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t9XhZ9tVZmObRYX80SRmNra3Mz5y6DWgEpg0K4MOY2Wsi4dtWmlcJ+n3MBsr0XBrS
+	 Q62Pa3Nemp/HS21+pJtEqhdS49da2R2b9vmhU4ya5ZlI+C/BNeQ3u11iCVXQu65KHo
+	 /DWqGdr3uJbC8VzMgEvP2+HEKwL+qvJyRIrrjeXGokosUvL5f72UyRoVf1tZDszmzQ
+	 ydG0d7L3hiyF+aCMzF2bN20MmleKZ++b/MttUWcKglwRs/fngmAhgvPM0drkh/DSqz
+	 8PRo8lrZaV++pMpi7xFhd7xcVVymUjodUW5e+tXGJgtSe5Z2OzMzq6AZdBCh8qqgr6
+	 uHUpg/xby3NKQ==
+Date: Fri, 2 Aug 2024 15:01:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 04/12] net-shapers: implement NL set and delete
+ operations
+Message-ID: <20240802150119.512821d6@kernel.org>
+In-Reply-To: <Zq0GJDGsfOt5MiAj@nanopsycho.orion>
+References: <cover.1722357745.git.pabeni@redhat.com>
+	<e79b8d955a854772b11b84997c4627794ad160ee.1722357745.git.pabeni@redhat.com>
+	<20240801080012.3bf4a71c@kernel.org>
+	<144865d1-d1ea-48b7-b4d6-18c4d30603a8@redhat.com>
+	<20240801083924.708c00be@kernel.org>
+	<Zq0GJDGsfOt5MiAj@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/6] net: dsa: vsc73xx: use defined values in phy
- operations
-To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Linus Walleij <linus.walleij@linaro.org>,
- linux-kernel@vger.kernel.org
-References: <20240802080403.739509-1-paweldembicki@gmail.com>
- <20240802080403.739509-4-paweldembicki@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240802080403.739509-4-paweldembicki@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 8/2/24 01:04, Pawel Dembicki wrote:
-> This commit changes magic numbers in phy operations.
-> Some shifted registers was replaced with bitfield macros.
+On Fri, 2 Aug 2024 18:15:32 +0200 Jiri Pirko wrote:
+> Thu, Aug 01, 2024 at 05:39:24PM CEST, kuba@kernel.org wrote:
+> >On Thu, 1 Aug 2024 17:25:50 +0200 Paolo Abeni wrote:  
+> >> When deleting a queue-level shaper, the orchestrator is "returning" the 
+> >> ownership of the queue from the container to the host. If the container   
 > 
-> No functional changes done.
+> What do you meam by "orchestrator" and "container" here? I'm missing
+> these from the picture.
+
+Container (as in docker) and orchestrator.
+
+> >> wants to move the queue around e.g. from:
+> >> 
+> >> q1 ----- \
+> >> q2 - \SP1/ RR1  
 > 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> What "sp" and "rr" stand for. What are the "scopes" of these?
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+"scopes" I agree are confusing, but:
 
+sp = strict priority
+rr = round robin
+
+> >> q3 - /        \
+> >>      q4 - \ RR2 -> RR(root)
+> >>      q5 - /    /
+> >>      q6 - \ RR3
+> >>      q7 - /
+> >> 
+> >> to:
+> >> 
+> >> q1 ----- \
+> >> q2 ----- RR1
+> >> q3 ---- /   \
+> >>      q4 - \ RR2 -> RR(root)
+> >>      q5 - /    /
+> >>      q6 - \ RR3
+> >>      q7 - /
+> >> 
+> >> It can do it with a group() operation:
+> >> 
+> >> group(inputs:[q2,q3],output:[RR1])  
+> >
+> >Isn't that a bit odd? The container was not supposed to know / care
+> >about RR1's existence. We achieve this with group() by implicitly
+> >inheriting the egress node if all grouped entities shared one.
+> >
+> >Delete IMO should act here like a "ungroup" operation, meaning that:
+> > 1) we're deleting SP1, not q1, q2  
+> 
+> Does current code support removing SP1? I mean, if the scope is
+> detached, I don't think so.
+
+that's my reading too, fwiw
+
+> > 2) inputs go "downstream" instead getting ejected into global level
+> >
+> >Also, in the first example from the cover letter we "set" a shaper on
+> >the queue, it feels a little ambiguous whether "delete queue" is
+> >purely clearing such per-queue shaping, or also has implications 
+> >for the hierarchy.
+> >
+> >Coincidentally, others may disagree, but I'd point to tests in patch 
+> >8 for examples of how the thing works, instead the cover letter samples.  
+> 
+> Examples in cover letter are generally beneficial. Don't remove them :)
+
+They are beneficial, but if I was to order the following three forms of
+documentation by priority:
+ - ReST under Documentation/
+ - clear selftests with comments
+ - cover letter
+I'm uncertain which will be first, but cover letter is definitely last
+:(
+
+With the examples in the cover letter its unclear what the expected
+start and end state are. And where the values come from. I feel like
+selftest would make it clearer.
+
+But I don't feel strongly. Such newfangled ideas will take a while to
+take root :)
 
