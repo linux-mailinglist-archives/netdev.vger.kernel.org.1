@@ -1,96 +1,114 @@
-Return-Path: <netdev+bounces-115364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E790945FE9
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:08:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBE9D945FEC
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D6A28422C
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:08:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92F18283F69
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18F32139C8;
-	Fri,  2 Aug 2024 15:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514202101A7;
+	Fri,  2 Aug 2024 15:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="wN8R0xH/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s0UMf1Aj"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2021B2101B7;
-	Fri,  2 Aug 2024 15:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B121F61C
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 15:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722611297; cv=none; b=ip1VT1hwY/51U6iHueNQNrNr7Q0vkVi6hgSO8BAMxdM+VcsgseBKMaVHQq4KL0do4OyvM6A/7Mq2fH0aNXAjUZ9wjHI25cyPijs+uaYJqwOBN1l324Thatlh8ybVlMTer6PMH019tdik6ooSl2CL9XjlNJh9opQNW5BHG7y/jQQ=
+	t=1722611349; cv=none; b=aVirH748EABbSXddRD3pikfih+gPyD63XcEAQdEbzxYXihNoi4SUZc7lMXVgxlX+gxJczespWgmi8Dx1ZTiXfTXPBzktXs4C3uadDKpu6ENTAIRyDs1d/hxDBkr4EzXih0ucf7iDPZHqKkjgL/IuFYF7QcaYvyzVhaha5M4xBDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722611297; c=relaxed/simple;
-	bh=9YHLzEBPhAU5AwpROppk2stTQe7p9Sm7x8VdtUFvPA0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m7h/eLtuqMmL0SNbr1p6zWm4LrkIKJSNfA6XbkC9Yl5dn+pygS7DCekfNDwzrO3KAKWjNzw6Z34NQ+nRqx+4hu1/LEj62X+8n65G31910bTHsd+zMXwhOs9y57BlRByQ2xzYwHeB0ptb04UW7/1y16P+xPgWjzpTULTx+lnbfP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=wN8R0xH/; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id B3F24524;
-	Fri,  2 Aug 2024 17:07:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1722611244;
-	bh=9YHLzEBPhAU5AwpROppk2stTQe7p9Sm7x8VdtUFvPA0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=wN8R0xH/4h5vT6keuaysM6cahOylGdms88O4eQlDOpVO/Gimy1l+Tq8Jf2VrH63Ve
-	 njCPmetacH0fLMeQ3Q3D9W1I15bXqzK4HesZRs+lA+EgTpi0WzXoj2DGdiX2tL+7HF
-	 CwIc3cLb04j7RGu8giXKun3HXgQB4en3xDz5lBQ0=
-Date: Fri, 2 Aug 2024 18:07:53 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc: Sakari Ailus <sakari.ailus@iki.fi>,
-	Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, jgg@nvidia.com
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <20240802150753.GC2725@pendragon.ideasonboard.com>
-References: <20240722111834.GC13497@pendragon.ideasonboard.com>
- <CAPybu_1SiMmegv=4dys+1tzV6=PumKxfB5p12ST4zasCjwzS9g@mail.gmail.com>
- <20240725200142.GF14252@pendragon.ideasonboard.com>
- <CAPybu_1hZfAqp2uFttgYgRxm_tYzJJr-U3aoD1WKCWQsHThSLw@mail.gmail.com>
- <20240726105936.GC28621@pendragon.ideasonboard.com>
- <CAPybu_1y7K940ndLZmy+QdfkJ_D9=F9nTPpp=-j9HYpg4AuqqA@mail.gmail.com>
- <20240728171800.GJ30973@pendragon.ideasonboard.com>
- <CAPybu_3M9GYNrDiqH1pXEvgzz4Wz_a672MCkNGoiLy9+e67WQw@mail.gmail.com>
- <Zqol_N8qkMI--n-S@valkosipuli.retiisi.eu>
- <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
+	s=arc-20240116; t=1722611349; c=relaxed/simple;
+	bh=Oyx3/fLLRUpO/0gYDH4iS0qvB9xDnhBmSVtxj1vVEHw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A7voRVFFY0OqdWcngZIKPFzFlu6SjY0TZWeagtntdSWJM4I74ThJH6nltvk0iaR0wnDgGSUdq/02KlrJ5HhMZuz2U89ZXe59mOHO1bPPRb92ms+reUE61F/M6O0n4eC3rXwdAznNcAZT5LiG22THdNtK906Hgat3aPrvoZKX3TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s0UMf1Aj; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so53083a12.1
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 08:09:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722611346; x=1723216146; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4uIHL/2EoHW5Yr0Fg7c9tyIJScX6QH3x22CFoveUg9A=;
+        b=s0UMf1Aj6KWfVxh6K3oFF4ZbOIqhk2hLBifE5w7wxHl1rFUN08cXJT64jRsvSdv00G
+         tMlRTT8GoaF5DFA1ejZkv8yx79oDL0lVc52a5gHdkVpyDbz24xCUdhvnW14n8E/MAi8B
+         im2spW/hDXJ6XdA/wW4JDZVoyWz6YjcaT69FqwH19e7HGaaVNaUOvJ07/61kIz+po8g0
+         5zypKbqtWzX7iju2AQnnlRWVczhi1BPPNDLJGh/0xqoqaV73HV6qi110AtVDpVQuBOAG
+         y37L4+4PJ+KjDLM+Yo82/MAn/sQwMWZFdkIjiiWCE0vZDCWB5GH+8hl3n1yP0/5aYIwl
+         b+wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722611346; x=1723216146;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4uIHL/2EoHW5Yr0Fg7c9tyIJScX6QH3x22CFoveUg9A=;
+        b=VId+9UAmoGMIxjvl/VlFTkotCwoKyo27ba4W3CBw8Fyijvvo86zW5LBMgXFtf4fpsT
+         393pnpTBiC29e3lQD905dV8JFBaFGYGlX54TrTAwSIsLfgbkPK64026HkaYkjk+Bg0rr
+         Ibz8kx4H0Ug9iF6zFRMWhWGFPsfmmoExbXRYT9Nc4va06V1R4Ddx9htwwHUuLW+w7oD4
+         m61UnH+V/DNI5A6gNBHTFk6oZraF6daF+/YegT4lNaAMmKbgQ8vdelQ9UEQhiVcuflEm
+         bkmBzGZo18yP2VSj8BxC3jGXtq+bl4LWo4GsSdy5eA9IRSw7ggKlAtDzWiMum6cA8uxu
+         onUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUABqmQ4Mfzr11GnmcPUyzE5ftMFWOP5bC0ehFF4Bl2ggop51DpXhC92t4ElsJarBIqPrOatmqIiXfwVuSlkRo3Ap3Echzv
+X-Gm-Message-State: AOJu0YwFKHnMvo7boVEUeEEb5o0Y1PqDqTIT59MGifqdjHfL70AXV+8P
+	vMtGv/KVUBzUtNgfJzSFnvp9HfOqlIctzsTLhzdkm6Wer7vvA45Tw8a+jlpU0y+jDznWeBjoKTf
+	X0XMXMTrYL82GO3kbQlPnCDZFFgH/WOlyxkBe
+X-Google-Smtp-Source: AGHT+IHb1floLS7qNFKs7sykGoRKqFvwZASVwNgyHcZ4Zdv/HAxiWgTUKuuRc0PVh6qh3sEAnaYKCdzOAHDCKnTUZfs=
+X-Received: by 2002:a05:6402:34c5:b0:5a0:d4ce:59a6 with SMTP id
+ 4fb4d7f45d1cf-5b869f00330mr145214a12.2.1722611345245; Fri, 02 Aug 2024
+ 08:09:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAKMK7uGx=VjHCo90htuTE6Oi0b8rt_0NrPsfbZwFKA304m7BdA@mail.gmail.com>
+References: <20240802145935.89292-1-aha310510@gmail.com>
+In-Reply-To: <20240802145935.89292-1-aha310510@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 2 Aug 2024 17:08:51 +0200
+Message-ID: <CANn89iJDVNqnMiGYHGQissykzASK-DcLss6LDAZetnp34n1gxw@mail.gmail.com>
+Subject: Re: [PATCH net,v2] team: fix possible deadlock in team_port_change_check
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 31, 2024 at 03:15:39PM +0200, Daniel Vetter wrote:
-> On Wed, 31 Jul 2024 at 13:55, Sakari Ailus wrote:
-> > This is also very different from GPUs or accel devices that are built to be
-> > user-programmable. If I'd compare ISPs to different devices, then the
-> > closest match would probably be video codecs -- which also use V4L2.
-> 
-> Really just aside, but I figured I should correct this. DRM supports
-> plenty of video codecs. They're all tied to gpus, but the real reason
-> really is that the hw has decent command submission support so that
-> running the entire codec in userspace except the basic memory and
-> batch execution and synchronization handling in the kernel is a
-> feasible design. And actually good, because your kernel wont ever blow
-> up trying to parse complex media formats because it just doesn't.
+On Fri, Aug 2, 2024 at 5:00=E2=80=AFPM Jeongjun Park <aha310510@gmail.com> =
+wrote:
+>
+> In do_setlink() , do_set_master() is called when dev->flags does not have
+> the IFF_UP flag set, so 'team->lock' is acquired and dev_open() is called=
+,
+> which generates the NETDEV_UP event. This causes a deadlock as it tries t=
+o
+> acquire 'team->lock' again.
+>
+> To fix this, we need to remove the unnecessary mutex_lock from all paths
+> protected by rtnl. This patch also includes patches for paths that are
+> already protected by rtnl and do not need the mutex_lock, in addition
+> to the root cause reported.
+>
+> Reported-by: syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
+> Fixes: 61dc3461b954 ("team: convert overall spinlock to mutex")
+> Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+> ---
 
-I don't think V4L2 codecs parse the bitstream in the kernel either, at
-least not the recent ones.
+This can not be right.
 
--- 
-Regards,
+You have to completely remove team->lock, otherwise paths not taking
+RTNL will race with ones holding RTNL.
 
-Laurent Pinchart
+Add ASSERT_RTNL() at the places we had a  mutex_lock(&team->lock), and
+see how it goes.
 
