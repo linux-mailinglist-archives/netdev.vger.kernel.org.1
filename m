@@ -1,160 +1,100 @@
-Return-Path: <netdev+bounces-115379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB8389461AA
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 18:16:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 829E39461C6
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 18:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71B941F21238
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:16:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC5C1C20DB8
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F2A1A83A8;
-	Fri,  2 Aug 2024 16:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3330D16BE04;
+	Fri,  2 Aug 2024 16:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0gYikyhT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jJCkUR0x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24431A83A1
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 16:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E6516BE02
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 16:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722615338; cv=none; b=IXcFPHooRdhyOcC974d+BH8D7DCrYvk8VL68fbSoSIwWifts9SzncvG0eZkR69f7mmun5NZnU8hbLn/mQhBdmteiaAUrHOQ5ODnzpd0y4xCFdac8isnmGN+44kMpxREkFzFAvqAdwik12lbwYV//4xLQ40e2J7HEff62ANVJrX0=
+	t=1722615909; cv=none; b=uHLdP6pFEVk9ohRC1/9og6efMmeNMa5xa1OcyeuNPpaIvMox2whb7qZy1JNX9LmS3/+4SebzWlQZF8MGW+hRYAAhtt3LRE45ZpMsXbYxYVHj13shMbCBnNqXjO7tfvhWodfp8kdrA0JQOwfd8dc1bvrpms3BdNJh0Y5Car1dnRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722615338; c=relaxed/simple;
-	bh=oAkLdxkWv0l+7HbjNR2Ld9gF2rjeT+QORflet7E6mXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=akc2tcouWHPUK5ghqWrAb04VgfQr1h3T0TZNp5Fdhnes7zWE7evjUrBQGrjxYD7LiEU4dgRhXsIE0u/nILauaSLzwpsmTPitwUsKgBzt1e2VCA8Q/dhNCj08iedOyFNdmPtgHR1pZMoURHVpHCm7YIu1EcWm4SHoGMhC3nhTpSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0gYikyhT; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-428e1915e18so14161825e9.1
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 09:15:36 -0700 (PDT)
+	s=arc-20240116; t=1722615909; c=relaxed/simple;
+	bh=A3oXqoSjCoqStGQatEhLnw4AJIuQLtvHAWqN3eGA6Mk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pdRxrR1SzS+jEv/++fyMocWFgI8mbTlVIOIPIGN8auwr5SRFLKSo9Hrf1NxVLQjvlxqOc3VNmjbWckr2ZVsZ2FdPNaR1xfdcdGv75TekM0mdhnHln0lwelvl/4BuJooyvTJZsuZ511avQfjnmg/7wNDwHtyLwqE5bqdmIBDJjuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jJCkUR0x; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-428e12f6e56so150425e9.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 09:25:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722615335; x=1723220135; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mIfLAoztfCJg5cZ2DunBMhevoQLG5ZbDJkvX8mLD1uc=;
-        b=0gYikyhTF3mFGdknb1AWo2goBgxVE0OkSiw5oMh6p12o4fWC6UkgqZnU932RulUU2p
-         Rg2nALjeWBaq148Ub+N3auKtA0cAsr3w+K/RGBilvYRFXWoSbrfCioJu/PUAk/eEGp+K
-         lcKrbC3jh7iBZbKLJ/SK0yN9wyVQaQ8hdTM+SGuTg76G99a+6NxsTy/KsfuV/Qnvpdbm
-         WKFoYHkHbJ28jZ9o3kdEhfF7wuicfVpq3rz/e9c6odv47x5nD3mn58N4tlnS9WRbqN69
-         IyysthOSniENSmKo4zq5HmVLxF3HUkNPhOFa2BgeXxkFjCp0YFZ2v0Kd5c4dYQJqwslM
-         1jQg==
+        d=google.com; s=20230601; t=1722615906; x=1723220706; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vb0FTmB8SfX+Sw0RQTwY2OY18Kw+COhw7jrMnQ7GKDo=;
+        b=jJCkUR0xxTj+8jslGrRJa0oEEc7gDCrNRvh2ptDXLURvjdFLV8naVVeSNmr2pakEnH
+         gVoHh5QdDsz2UTAM5kJdIzsNuDxGL8M08+lOdfnPVQJ4SLSi5nrejTYdfQyNEdzFMmYu
+         fOrbwCJac9gPX40ZMvSeHOjkQMCiYfAWT4eP8P6Xu/kILZ1KI1FqtE6NoA5vhyYasfe6
+         IdaTw5kkRKmrUoJTgrbr2qQU1aTqb5f+1WeFvI0EIP0d4D554E+gEt/eUvvIYcGHnEtp
+         v9pwiqcsmSBOkFnywzF94NwaUaQD7CxVYjNi7UzMtzHKma82z0JtxuFfoVWbMSC1yxvy
+         w62w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722615335; x=1723220135;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mIfLAoztfCJg5cZ2DunBMhevoQLG5ZbDJkvX8mLD1uc=;
-        b=dY3bZyrpGYl5h3hhuIPYs2Orh2r/3FRGiqeOkawaEaUVEK1nmfzWc9Qy1QFMAp+PEM
-         qFWldQ+ECnqBbKnIAbopGo+/48lwhxWWlrQOoD0jTu78E+ODJTmzzWADtaqvxKNxEypk
-         ZffjLb/S0tMdDzaNQ8l8752bMdc6USCZWAt57H/O1eLiG05/nDeoF31J+8jRQPCZQtQE
-         rwu65dMOyXWNm6EYaXaiLJxgUp863dLhG0Z3j2pEbR3MpS9u/r/qYUbpDHAfrU8D2J6F
-         1qP0CnRM54bRDaEsYFCjS4PF8z23sqPWTNUyDF6qe7fIR30KESNjNKrDI4l8vkLL1L9O
-         uHwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUwuNLt2IhteX53euoYrEfXl8i1Ola3Jht3a9/tT3OB5bDbFySj61/X4Pcz7J2CMWMI6HP/g8YNHtLh6J4lgzkCb/YzgSwT
-X-Gm-Message-State: AOJu0Yxjy8o8xaprLsHAIgEAzP5meIaqAWwWoTQzY4SMYezLLoGUdOVq
-	VOWg66P14L8CQSYMSbMVJesAMekvCYbFYjNVIRQQOGrkS7RClVf2on+wNRWAQY0=
-X-Google-Smtp-Source: AGHT+IH++rSlsuaM/tJv9OsBgmnpn6rJ3JUneTXnni5b0p4mV9rTxZLMshNx+eOyCIFqX5/GJeOZMg==
-X-Received: by 2002:a05:600c:4ed4:b0:428:1d27:f3db with SMTP id 5b1f17b1804b1-428e6b96374mr21708265e9.35.1722615334832;
-        Fri, 02 Aug 2024 09:15:34 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89aa9esm99226685e9.2.2024.08.02.09.15.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 09:15:33 -0700 (PDT)
-Date: Fri, 2 Aug 2024 18:15:32 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 04/12] net-shapers: implement NL set and delete
- operations
-Message-ID: <Zq0GJDGsfOt5MiAj@nanopsycho.orion>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <e79b8d955a854772b11b84997c4627794ad160ee.1722357745.git.pabeni@redhat.com>
- <20240801080012.3bf4a71c@kernel.org>
- <144865d1-d1ea-48b7-b4d6-18c4d30603a8@redhat.com>
- <20240801083924.708c00be@kernel.org>
+        d=1e100.net; s=20230601; t=1722615906; x=1723220706;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vb0FTmB8SfX+Sw0RQTwY2OY18Kw+COhw7jrMnQ7GKDo=;
+        b=oKbzLErfpNRDAfXw3GBOI/54uVmMCL27sfCGBuzK3JniWiWagIwxqm+OwHFsxmulaG
+         7ZlIGYnDM59pjYKDVQwYft8aF6xYZSFQyJLIv8msqMaVNdSff6CMt5VKlP9WVEtgCld9
+         GZGznJMnqpdmt/xhSvglUlsJ2WWCiRN4ygno0q0QMOd/4gebRct+FTKuZS8Ewuqg7hPO
+         KtqxxBpNC3fcDJAVSMEqOGDilsaAp0gAv0l2QLfFNfcBuO4zHPOIME9EbgwJRAUbbYk+
+         129S0N5mGitEZykreCsv88r5uf1Bq7+GW6AEiOyODjx3LcCmiOdnnwpVZPW4f9vojhHm
+         VKPw==
+X-Gm-Message-State: AOJu0YxY05/jsD5qyA2OQONK/Y2LCkKUeAv82GCOmATLPvr8mf8YGnAG
+	yQzzCEz1FhFovpvkgBEIJwzd7u1/brhGHbQp4Ab5cnDPdXtHluSlDmNrviD57pkxeDyORMi30kW
+	cFlkdQIMx82lUJGEsWym5Udo9X1nfs4k7Pmjk
+X-Google-Smtp-Source: AGHT+IH+oauFhrGk962P0GyLOjLr5EscUXKbwN+rSQJOLgHMAS/EKcyqui3OT6N8E3yVmftV8W+vR77X+z+SKOTUvgs=
+X-Received: by 2002:a05:600c:4f4f:b0:428:31c:5a4f with SMTP id
+ 5b1f17b1804b1-428e9c6d986mr1229975e9.3.1722615905086; Fri, 02 Aug 2024
+ 09:25:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801083924.708c00be@kernel.org>
+References: <20240801205619.987396-1-pkaligineedi@google.com> <20240802123303.GC2503418@kernel.org>
+In-Reply-To: <20240802123303.GC2503418@kernel.org>
+From: Praveen Kaligineedi <pkaligineedi@google.com>
+Date: Fri, 2 Aug 2024 09:24:53 -0700
+Message-ID: <CA+f9V1NeVd-t2y-MbFi-NhSpCS=sm5Mx9pRJG=u86UkRJx5cBQ@mail.gmail.com>
+Subject: Re: [PATCH net] gve: Fix use of netif_carrier_ok()
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, jeroendb@google.com, 
+	shailend@google.com, hramamurthy@google.com, jfraker@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thu, Aug 01, 2024 at 05:39:24PM CEST, kuba@kernel.org wrote:
->On Thu, 1 Aug 2024 17:25:50 +0200 Paolo Abeni wrote:
->> When deleting a queue-level shaper, the orchestrator is "returning" the 
->> ownership of the queue from the container to the host. If the container 
-
-What do you meam by "orchestrator" and "container" here? I'm missing
-these from the picture.
-
-
->> wants to move the queue around e.g. from:
->> 
->> q1 ----- \
->> q2 - \SP1/ RR1
-
-What "sp" and "rr" stand for. What are the "scopes" of these?
-
-
->> q3 - /        \
->>      q4 - \ RR2 -> RR(root)
->>      q5 - /    /
->>      q6 - \ RR3
->>      q7 - /
->> 
->> to:
->> 
->> q1 ----- \
->> q2 ----- RR1
->> q3 ---- /   \
->>      q4 - \ RR2 -> RR(root)
->>      q5 - /    /
->>      q6 - \ RR3
->>      q7 - /
->> 
->> It can do it with a group() operation:
->> 
->> group(inputs:[q2,q3],output:[RR1])
+> > -     if (netif_carrier_ok(priv->dev)) {
+> > +     if (netif_running(priv->dev)) {
+> >               err = gve_adjust_config(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+> >               return err;
+> >       }
 >
->Isn't that a bit odd? The container was not supposed to know / care
->about RR1's existence. We achieve this with group() by implicitly
->inheriting the egress node if all grouped entities shared one.
+> Hi Praveen,
 >
->Delete IMO should act here like a "ungroup" operation, meaning that:
-> 1) we're deleting SP1, not q1, q2
-
-Does current code support removing SP1? I mean, if the scope is
-detached, I don't think so.
-
-
-> 2) inputs go "downstream" instead getting ejected into global level
+> Not for this patch, but I am curious to know if this check is needed at
+> all, because gve_adjust_queues only seems to be called from
+> gve_set_channels if netif_running() (previously netif_carrier_ok()) is true
 >
->Also, in the first example from the cover letter we "set" a shaper on
->the queue, it feels a little ambiguous whether "delete queue" is
->purely clearing such per-queue shaping, or also has implications 
->for the hierarchy.
+> ...
 >
->Coincidentally, others may disagree, but I'd point to tests in patch 
->8 for examples of how the thing works, instead the cover letter samples.
-
-Examples in cover letter are generally beneficial. Don't remove them :)
-
-
->
->> That will implicitly also delete SP1.
+Thanks Simon. I am aware of it. I am planning to send a follow-up patch
+to net-next to remove the redundant check.
 
