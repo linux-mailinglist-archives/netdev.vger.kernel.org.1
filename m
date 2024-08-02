@@ -1,115 +1,124 @@
-Return-Path: <netdev+bounces-115352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 290CA945F1D
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:06:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F2D945F2B
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD18B1F219D6
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:06:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31B87B216A1
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4371E14A0A0;
-	Fri,  2 Aug 2024 14:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E746453368;
+	Fri,  2 Aug 2024 14:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IGim6D6D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iXcwHAF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2B81EEF9;
-	Fri,  2 Aug 2024 14:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD064EEC3;
+	Fri,  2 Aug 2024 14:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722607570; cv=none; b=FoXlIGXaLC2NXwRYavKPFSr1Djxq7QxIrZ9AFiXDL65lPHMGgbY1qtqWT4n9kCb3OdFCijc4qC2eUWOYwv8J+wkUPEJnX7OaUqSKA2fEzj1l3blAPsZiODTLUoPu/vsCWYT9Gvgr1SxnJuTmJ9PvdH2UN0TlF8hWt4PIuniZyIE=
+	t=1722608138; cv=none; b=FiqKQfotFtNDlFGJfVKp/AUa9xsDgt935q2m2DsSse2i9jsYQlM1kXN+dx6w/w3d6Uhptnhtf8i/59X8qUqwDfN2Dd2KwVURDizv42/Nmq9Xln+jggRuzp8lyz60xwWPenRf//BI40wEu5MS8lmH0KkOM93N/Nu6Cxa0H/PHKjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722607570; c=relaxed/simple;
-	bh=8zF24GN2W5KBBWa63gtA37RA2md7NaZA0+s4mCi4yqI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZO2bfyCpAFF96dw4rgCO8VRnbA5zM8mVwNd31nJbRvVgWSYGupGTW5sUVSIRHrx0wJ4fA3OHJ0qTjeA36YDdjkVtaSVgkLxXkKdlhccngIpP3uWrc1SYuRJYgH0U2KIkJDDe0pVvv7RvwIkUZlgNSWO5kpo9+aHtnly95WAJJ1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IGim6D6D; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722607559; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=v+0fUo/IafSdIF9EhnGJlHTdcHZLiaYxtFmsr78Hdmc=;
-	b=IGim6D6DVFOsEjBl0Fx0A37tTBTmD6jnD6l3dnqItxGGCWOB8DQdViEwoCCb/lxqUlWGCJiLAVYMtQzVdSjjoqPxhuhiLx25C4emeVk5f3AkDxKGqjTXHkbA+YSjL6FRISpQ69RUooJyDlTvqcynH0PhcrBIAcWfszZHpLOOtH0=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0WBxlBR3_1722607557;
-Received: from 30.120.147.143(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WBxlBR3_1722607557)
-          by smtp.aliyun-inc.com;
-          Fri, 02 Aug 2024 22:05:58 +0800
-Message-ID: <439a499a-13ae-47e7-af54-3d9f064766af@linux.alibaba.com>
-Date: Fri, 2 Aug 2024 22:05:57 +0800
+	s=arc-20240116; t=1722608138; c=relaxed/simple;
+	bh=m7Y6Di23g7SkOV8aRpP2zGN3zxD8WgaWmWu7uNswhkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sSVChDqasbn4XQkd4TB6PyOVlQzNIkwgTGPpBLy3zG4ZfiZQiMoTyvVMwkK6vnyDK+Cv54sf2ocLXsB/7PO9j/Xue7tAto+50YA1oYcLBVhTTvvxU5ukOQR1brAoGaaSQPmVY1xanLg///xlphrCti0NKjs9BKZTo/4QGAJ7VmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iXcwHAF+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87CCDC32782;
+	Fri,  2 Aug 2024 14:15:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722608138;
+	bh=m7Y6Di23g7SkOV8aRpP2zGN3zxD8WgaWmWu7uNswhkY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iXcwHAF+9G8fepXOlBI2utRqIE5H+Asuk0HjM5Yi7KkAyLQ7KRip0tuD0oxuLH2/H
+	 VgFlHs7uJReqKusGxDkzMDqSTOg1kfQna22WogPwRoRBOw6nTs/Zh1GeDVv8HsyC2v
+	 w05Ba4iZjreC4DTfyOyE/SHRJdkjr4MuxQuzSyVlkEZHo4VinZyXPVTcwZOAagdc1K
+	 L2+jqejvXzUWzOnXYrPb9QOsWJI0ePJ1CtC/KsXdnC+rH7N7Q40EqpET225MEj2wJn
+	 uuTk3AIQm5lunR8PQFwJJM4dwHww8Sn+7GLFMTVxwCxrC+hf2RBPgF88t0wdC2X9OS
+	 qaQgXOv5DDE3g==
+Date: Fri, 2 Aug 2024 15:15:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Moon Yeounsu <yyyynoom@gmail.com>
+Cc: cooldavid@cooldavid.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
+Message-ID: <20240802141534.GA2504122@kernel.org>
+References: <20240802054421.5428-1-yyyynoom@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: add the max value of fallback reason
- count
-To: Wenjia Zhang <wenjia@linux.ibm.com>, "D. Wythe"
- <alibuda@linux.alibaba.com>, Zhengchao Shao <shaozhengchao@huawei.com>,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: jaka@linux.ibm.com, tonylu@linux.alibaba.com, weiyongjun1@huawei.com,
- yuehaibing@huawei.com
-References: <20240801113549.98301-1-shaozhengchao@huawei.com>
- <a69bfb91-3cfa-4e98-b655-e8f0d462c55d@linux.alibaba.com>
- <4213b756-a92f-4be9-951d-893f4a6590b4@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <4213b756-a92f-4be9-951d-893f4a6590b4@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240802054421.5428-1-yyyynoom@gmail.com>
 
-
-
-On 2024/8/2 19:17, Wenjia Zhang wrote:
+On Fri, Aug 02, 2024 at 02:44:21PM +0900, Moon Yeounsu wrote:
+> `ip_hdr(skb)->ihl << 2` are the same as `ip_hdrlen(skb)`
+> Therefore, we should use a well-defined function not a bit shift
+> to find the header length.
 > 
+> It also compress two lines at a single line.
 > 
-> On 02.08.24 04:38, D. Wythe wrote:
->>
->>
->> On 8/1/24 7:35 PM, Zhengchao Shao wrote:
->>> The number of fallback reasons defined in the smc_clc.h file has reached
->>> 36. For historical reasons, some are no longer quoted, and there's 33
->>> actually in use. So, add the max value of fallback reason count to 50.
->>>
->>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->>> ---
->>>   net/smc/smc_stats.h | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/net/smc/smc_stats.h b/net/smc/smc_stats.h
->>> index 9d32058db2b5..ab5aafc6f44c 100644
->>> --- a/net/smc/smc_stats.h
->>> +++ b/net/smc/smc_stats.h
->>> @@ -19,7 +19,7 @@
->>>   #include "smc_clc.h"
->>> -#define SMC_MAX_FBACK_RSN_CNT 30
->>> +#define SMC_MAX_FBACK_RSN_CNT 50
->> It feels more like a fix ？
->>
->>>   enum {
->>>       SMC_BUF_8K,
->>
-> 
-> Hi Zhengchao,
-> 
-> IMO It should be 36 instead of 50 because of unnecessary smc_stats_fback element and  unnecessary scanning e.g. in smc_stat_inc_fback_rsn_cnt(). If there is any new reason code coming later, the one who are introducing the new reason code should update the the value correspondingly.
+> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
 
-I wonder if it is really necessary to expand to 50, since generally
-the reasons for fallback in a machine will be concentrated into a few,
-normally less than 10, so there is almost no case of using up all 30
-reason slots.
+Firstly, I think this clean-up is both correct and safe.  Safe because
+ip_hdrlen() only relies on ip_hdr(), which is already used in the same code
+path. And correct because ip_hdrlen multiplies ihl by 4, which is clearly
+equivalent to a left shift of 2 bits.
 
-Thanks!
+However, I do wonder about the value of clean-ups for what appears to be a
+very old driver, which hasn't received a new feature for quite sometime
 
-> Btw, I also it is a bug fix other than feature.
+And further, I wonder if we should update this driver from "Maintained" to
+"Odd Fixes" as the maintainer, "Guo-Fu Tseng" <cooldavid@cooldavid.org>,
+doesn't seem to have been seen by lore since early 2020.
+
+https://lore.kernel.org/netdev/20200219034801.M31679@cooldavid.org/
+
+> ---
+>  drivers/net/ethernet/jme.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 > 
-> Thanks,
-> Wenjia
+> diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
+> index b06e24562973..83b185c995df 100644
+> --- a/drivers/net/ethernet/jme.c
+> +++ b/drivers/net/ethernet/jme.c
+> @@ -946,15 +946,13 @@ jme_udpsum(struct sk_buff *skb)
+>  	if (skb->protocol != htons(ETH_P_IP))
+>  		return csum;
+>  	skb_set_network_header(skb, ETH_HLEN);
+> +
+>  	if ((ip_hdr(skb)->protocol != IPPROTO_UDP) ||
+> -	    (skb->len < (ETH_HLEN +
+> -			(ip_hdr(skb)->ihl << 2) +
+> -			sizeof(struct udphdr)))) {
+> +	    (skb->len < (ETH_HLEN + (ip_hdrlen(skb)) + sizeof(struct udphdr)))) {
+
+The parentheses around the call to ip_hdrlen are unnecessary.
+And this line is now too long: networking codes till prefers
+code to be 80 columns wide or less.
+
+>  		skb_reset_network_header(skb);
+>  		return csum;
+>  	}
+> -	skb_set_transport_header(skb,
+> -			ETH_HLEN + (ip_hdr(skb)->ihl << 2));
+> +	skb_set_transport_header(skb, ETH_HLEN + (ip_hdrlen(skb)));
+
+Unnecessary parentheses here too.
+
+>  	csum = udp_hdr(skb)->check;
+>  	skb_reset_transport_header(skb);
+>  	skb_reset_network_header(skb);
+
+-- 
+pw-bot: cr
 
