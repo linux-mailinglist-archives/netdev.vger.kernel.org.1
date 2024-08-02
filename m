@@ -1,72 +1,82 @@
-Return-Path: <netdev+bounces-115370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B5794608A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:30:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC2B94608B
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8446B283018
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:30:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40B9E1C20B3D
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B2D136351;
-	Fri,  2 Aug 2024 15:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C52175D26;
+	Fri,  2 Aug 2024 15:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LwqUFimT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F0jfeYrk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0D0EAD5
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 15:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE866175D20
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 15:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722612614; cv=none; b=dXCD0EuodBehMae0kDzSvTGvqlaJlhgfc/9rY7XZo6z6nzz1rxsuPJS7roItsKGLZQ7o2PhC0iMg1loCbdJzFqDT/b3fbvWuidHCNRGfJDzf2nGt6ECah4+pOl1HvYKxGYQngGWLEVsYq+nMFbA32BR8qyIy2LLbXYEhAhJKB3E=
+	t=1722612697; cv=none; b=Gy4FEhBWu2+VTmV5z9qIOLGnrjdWYvvQ2Rpq7k7qkZ+Bg0JlraIZukbJAS2sHicdpRBv6boVGpgsjg1QPh2mapgqvLIzfiAHpnBfWG8hrDcsXgMlurXanDVCnReOG0+EGVO1P5TFoG9mC34woE4y2pGpwbcoEoInOdSnxp7vdmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722612614; c=relaxed/simple;
-	bh=Ght40GavoZXveKLwYfGG1uBPwRHOQjoZgoymTL6G8gk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mmyr9uMzEXYqcOme6zlVsDxBJbD3DZ5uknyFaCJmsGh+a02OhsEg3ae/rM6PoLlVGQAJxLURFmL0Sg5uzk5I60B5QhIvLZfbgmR1X/vsS67DFoAmOxZT6i8LCq47QQ8ry9MLwxVFST9iKXJiKYvYMEI3qtiVjIP1t6mmIuJRVTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LwqUFimT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97C75C4AF0B;
-	Fri,  2 Aug 2024 15:30:13 +0000 (UTC)
+	s=arc-20240116; t=1722612697; c=relaxed/simple;
+	bh=Q2EL8Vubkn7cUY9f5/AfEXR2r5J9stHFLifTmyWqEaE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YCMXNPM1nva0o4gaqxf5MqWaIux2YpclRedg/lGka/WYMvWBCIZsx5X6tWaAswiNSAZaWKzRn0qpvmNVHjX6hkjZc5Dck+A916r9UeRtDg3E6wnALfN7qRe62I9HY3CIWgkthhCiA84BulxWw1Cx0a1Ld3SY1CSEeQjvB9nlQME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F0jfeYrk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFBCAC32782;
+	Fri,  2 Aug 2024 15:31:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722612614;
-	bh=Ght40GavoZXveKLwYfGG1uBPwRHOQjoZgoymTL6G8gk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LwqUFimTq+YqGJ7bpI1nrrGCGfm/e5bUOUmn9DtstmoDETdUy+AQOpnFug3Rtrxt1
-	 PlWrPw6r9Iv9U0N2WTaSuVjGmFBpVPtOOlMZG3Ex5EukzTy0/BLCRsdNp/6fG2dWyk
-	 rKd641+ok18GG1w/1XUwvaZnOZD0LlC2XNZW1ZgV6T/JC+2umfBfFLgHkdujmiCWm1
-	 oXD94/pXl7bcqP7wDVGOGWUdz5MmRVrfTjWZYY6kYRKUNfgD7GKF3z3qyliSd2MdGY
-	 R1gUXbLtEhnShNXl6f7dc1iMSLncKC3nSQ2WdHZVOt4R6dZGB8MT2fCdk/ltGaQpWG
-	 19SVL6Ch/hL1g==
-Date: Fri, 2 Aug 2024 08:30:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, Jason Xing
- <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v4 0/7] tcp: completely support active reset
-Message-ID: <20240802083012.062e2c0e@kernel.org>
-In-Reply-To: <20240802102112.9199-1-kerneljasonxing@gmail.com>
-References: <20240802102112.9199-1-kerneljasonxing@gmail.com>
+	s=k20201202; t=1722612697;
+	bh=Q2EL8Vubkn7cUY9f5/AfEXR2r5J9stHFLifTmyWqEaE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F0jfeYrkJJZWA4wsL1+FvPLOmkHj1dKv/zzneQD4VBXv7EFCjTh8ILrDtDzpN6gzz
+	 TZdXeStwdTyK1+utYajvqjDzNVS4L/swRHwVmzgyAReu1L1LSaX9GnbTAemknVE/Pp
+	 9wUha623LhH05EaxfxZThwWlYIulLx/WohF/heJbZ/SlLoTisLC1R6kGVOjSbiv3R6
+	 ee3s63ATsZiP7MbFpPtYpETQLGBu25w/C09Fnty5urZsAQcbZvaVWYQpUH2ro/E798
+	 w9H0hIKvdviVNJfLVaWSNVIcZsNUTN7LJf1KrDF30SoQr/PUpp30txC+sd1iA4ST53
+	 WQTGhWM5vvrcg==
+Date: Fri, 2 Aug 2024 16:31:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, kernel test robot <lkp@intel.com>,
+	alexanderduyck@fb.com
+Subject: Re: [PATCH net] eth: fbnic: select devlink
+Message-ID: <20240802153133.GF2504122@kernel.org>
+References: <20240802015924.624368-1-kuba@kernel.org>
+ <20240802145038.GE2504122@kernel.org>
+ <20240802080148.53366633@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240802080148.53366633@kernel.org>
 
-On Fri,  2 Aug 2024 18:21:05 +0800 Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Fri, Aug 02, 2024 at 08:01:48AM -0700, Jakub Kicinski wrote:
+> On Fri, 2 Aug 2024 15:50:38 +0100 Simon Horman wrote:
+> > But while exercising this I noticed that PAGE_POOL is also needed,
+> > which I locally resolved by adding:
 > 
-> This time the patch series finally covers all the cases in the active
-> reset logic. After this, we can know the related exact reason(s).
+> Oh, good catch. I'm a bit surprised how slow kbuild bot is :(
+>  
+> > 	select PAGE_POOL
+> > 
+> > I can provide a follow-up patch after this one is merged.
+> > Or perhaps you can address this in a v2?
+> > I have no preference either way.
+> 
+> Please send your version with both selects, I'll mark mine as superseded
 
-What happened to waiting 24h before posting the next version? :|
--- 
-pv-bot: 24h
+Sure. I'll set myself as the author, to save negotiating about that,
+and as it's only two lines.  Do feel free to update as you see fit.
 
