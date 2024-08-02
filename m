@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-115344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC421945ECC
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:40:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75DA2945ECD
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:40:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 905F61F221B0
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:40:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6829A1C20869
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5861E3CB1;
-	Fri,  2 Aug 2024 13:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550ED1E4859;
+	Fri,  2 Aug 2024 13:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LqebCF6N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IQ1hYnJU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A081E4A6
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 13:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69831E3CD5
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 13:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722606036; cv=none; b=XLEDYUPv5F9xAnbhbtmqOtYf/qIV29PBDYueAHOdQJOXLJRgEpZ1nyD069Ggj5WoqZPloWGy1VkZ2xOsBR0ftDK4txseoDUB58xaCzO68vcRbQsowv3rF3+zTX/8C/z6sH5SuBuVHcH3xie/c45Sr1WBsywmWQ45mwPoC59iR5c=
+	t=1722606038; cv=none; b=FNe4CfeRfCJ3kP8OaLKBxWlMbCcqspe0Z83b7LLapLL06rTzNKQ9dVKGUfgGfnXvu7JcnB06ezsjL8Lji4BeXJcrchdkxxRl33sCRuFKCY1tkpr/R4A/QOhsuOAh5DBPJaDhxYj/2UVB9/EacGmwmA8BHnly6pRTIKtkTEA+pO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722606036; c=relaxed/simple;
-	bh=VOTd7XaJNFqZBUg3gAXnma/E8h8HkYH0PyAsPFPXXow=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tBatVTe9igMQZiZtBpJ3HIiXbT13rF8SdkwvRJBcxx4joPSAH+/t8Bn9YhPz1UC7lzzj7/XWbhY57bLmjC4MbpCDu6pYA7ArN1L39rlq6XMAYb4DnblKM912bPunvRGOb/tocrXHavCfEDomFMj9d/48E3P5ilH2SxGVz7AJDkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LqebCF6N; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1722606038; c=relaxed/simple;
+	bh=spCrNzbGkK8/+ZHqzp4os4fkptzalQRSmeVLbxdO8gk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oEX1IW8ujY75Zoo63noCMwe/QVSbSjj1owiz+TSmuqiXSr1wXC01KoMTjesMNlbDCgyRYRC/GsXQb1A7u9jq7E2u+Jg/yCpsUYxbpz+1NQD1tjQuEkY43KsphLusDLeqnY3k2NuV2xak/bNPc8s5Q2rSq2cYb71TLh9CxjWjeig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IQ1hYnJU; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6698f11853aso155595767b3.0
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 06:40:34 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-65194ea3d4dso157926357b3.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 06:40:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722606034; x=1723210834; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4Vj6WkFEq/NfNec+kYpZsPerQBcnr3RPO860BU+6j+M=;
-        b=LqebCF6NCrEXhVIf6vIzotWY46WcitUI1jHrfEHstrD2/ykKQrlDwrPw8mYdzSOg42
-         V0vnUYm1EnIZsVgtlHPGGH+31dk6fvCZAxyNmHQjLN4GNhdiPBCqWkMDulkeIwR3KgRV
-         tSQrS6bXTezIRnJT58gnTPy9VcXAXet5/bDiAbRNQ22k8ubfGpf3+WJl3V5AS06GLPWz
-         iKgPjYTwP4ePKc2cjl0d/h/qfB9UPt69RqXzZg1TlNPrkiDKwV5dE0xq5aP2s5voQHUx
-         w2eEHkATzJt+3ldKOMUSIZNj21VgBloK3YzPaOqozQtDlkfD/ldy2XAmuKGpB6AAztJy
-         TYNw==
+        d=google.com; s=20230601; t=1722606035; x=1723210835; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=knorcKRv5dDMneA1GmD9DFCzjlihhkTLp7+wgFH0124=;
+        b=IQ1hYnJUjxdP2c7IQzbkAja7JBHtkig9RbNYlzNAJW2Iz9yNoUTdRW5FtsrOXydktQ
+         Lfc0vT4BVG8NeXjpIH3JrIPrqhCdkdcI8ygCiQ2KEeAKucjLQkk4Qg9lHU7bV05AHgBI
+         sqB/8009co7Qno1eZwnynEiDPEf5HPrbWGBJ1lEK/np+Ihl0zAtHQlmu/Ow6RonwYo80
+         K8wzpwQHVOGXRTPPHdGBlkjKmuIZ1i1/dFJtIAVmsba56+K3aG/9lK0fLL7s/bXhs+Ja
+         zCcSt9kxqw5rh6bhoZXJlznx3BJIwrW1itWU9jLclyqqz1I5ONd+np4LCq2q7M3CJEl0
+         6Fyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722606034; x=1723210834;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4Vj6WkFEq/NfNec+kYpZsPerQBcnr3RPO860BU+6j+M=;
-        b=xFXKbbJxmFUJ2hBod7HBusM37Sn4D9Aa7rvLR6nQg/c1H/Cjt3p7ZYc7+u1G3NwAhL
-         Zq5Ifcdjb0nCO1e8aZ4MXlMjTfTjK6lwcXi/Nm9df21hrvjvYeyjBHZPA8cES7rLBiOB
-         L7zwImap1NULK77mlWBmnBnax2M3XnPOo+4i2GtRwjxmmV8syAxiZRjgq7LaWnfwan5s
-         vGjn8KBmjjzd6chjXE1YEuLiyWTzTLHJyDDZhnVT1TCUr3NXSNJZF21al0Dk0/RLpInl
-         6nD+ErwYNG/qKFJ8kHdW4Xf2njl3Ta7DBHQxxnxWFlyd44edB2V3GdH5FiGc+wbb9NmV
-         qNlA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6Q9lsfJJaal0om4jDCPyZfCbp7HQY/13wFL7dyUkE8FHG+NdNTlr1AK/GCeo6BfglUp5BO192nEC3hNU0Mgdu/OJHygPa
-X-Gm-Message-State: AOJu0YzO1Ggm7VHI5X9YXsXCoNuRzDI4XpTgjWeoUrt/sv6w/VATfS5O
-	cc+RpvgOKatA0ICBkmYlzzzTiuj7KyT5ACtGdVzhKHzHSHuoR7ylXACNPUjNp9QooPhFGX8dYsr
-	XfRhqESjzTQ==
-X-Google-Smtp-Source: AGHT+IG2BQ3SRHk0AMIVerERp2PxCBtl2unOZwcLi7Kb7LIhgE70Gn5428nNXh+igRutQhWlilcxXLyR2Ogl+Q==
+        d=1e100.net; s=20230601; t=1722606035; x=1723210835;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=knorcKRv5dDMneA1GmD9DFCzjlihhkTLp7+wgFH0124=;
+        b=a/ixeKR0Qtc0yuNfSllatRAXxxpfQidg/sVOUr53d7xPfFcJv7kbY2Dx81/NNyA/RK
+         OyZSln95FYg23bERaKq03dYEOfPYjBfCTztd9sWWEOK6NLymBS6KsQTTeHQnU0djvELR
+         gYwoLge5HZHJ5stK3r7BO0kFGCyGxImfC3IdB3FBC2nkyPLYcI9Ix/295lc5sCMMwYPU
+         tXSWb5nsl/uTyE5xQZj/+KarlAW59MSFFggXPOrefonhmpBMDE7k59Uap7EWTBGZ4w9U
+         T33mSGQJvE9+VrrgibKsk9gJSh5ZWKXV9jFpsNlyTEmv24NZJD3aaM2EiTpp5+Al2n5d
+         GSTw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3ZmRFoehxZ8f5rTAkppMLYVADrIwM/0kmSXe1DgEp4Y8dqpA4P9OHDwVdPKCWL27P5Yb5zxTqm9OgOmXNCbCmXM+alr9U
+X-Gm-Message-State: AOJu0YyuY7GkAuXkKPr5T6kteSXs8jM2YiTt1Ql7SpcLcoxXOGfp+iPN
+	5Nv5n7hlyDQzVe9bBrpBpMzyqKzM+wx0dpSLo+0mcsMkUGjKNTjLi/im92FG5ww4qzstXSxrkQ4
+	+j//MiFpd1w==
+X-Google-Smtp-Source: AGHT+IE1WPfQR5vYwR+Idb2act7F8DUd0LNET6m+S6Z412VYPAWgltoYchFsRh1KOJYzP7eg/i9sL6LX6lYTZQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:154e:b0:e0b:bcd2:b2ee with SMTP
- id 3f1490d57ef6-e0bde290b7bmr6300276.6.1722606033812; Fri, 02 Aug 2024
- 06:40:33 -0700 (PDT)
-Date: Fri,  2 Aug 2024 13:40:24 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2b8b:b0:e05:eb99:5f84 with SMTP
+ id 3f1490d57ef6-e0bde3656a2mr5785276.4.1722606035605; Fri, 02 Aug 2024
+ 06:40:35 -0700 (PDT)
+Date: Fri,  2 Aug 2024 13:40:25 +0000
+In-Reply-To: <20240802134029.3748005-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240802134029.3748005-1-edumazet@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802134029.3748005-1-edumazet@google.com>
-Subject: [PATCH net-next 0/5] net: constify 'struct net' parameter of socket lookups
+Message-ID: <20240802134029.3748005-2-edumazet@google.com>
+Subject: [PATCH net-next 1/5] inet: constify inet_sk_bound_dev_eq() net parameter
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -81,31 +84,83 @@ Cc: David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemb@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-We should keep const qualifiers whenever possible.
+inet_sk_bound_dev_eq() and its callers do not modify the net structure.
 
-This series should remove the need for Tom patch in :
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/inet6_hashtables.h | 2 +-
+ include/net/inet_hashtables.h  | 2 +-
+ include/net/inet_sock.h        | 3 ++-
+ net/ipv4/inet_hashtables.c     | 2 +-
+ net/ipv6/inet6_hashtables.c    | 2 +-
+ 5 files changed, 6 insertions(+), 5 deletions(-)
 
-Link: https://lore.kernel.org/netdev/20240731172332.683815-2-tom@herbertland.com/
-
-Eric Dumazet (5):
-  inet: constify inet_sk_bound_dev_eq() net parameter
-  inet: constify 'struct net' parameter of various lookup helpers
-  udp: constify 'struct net' parameter of socket lookups
-  inet6: constify 'struct net' parameter of various lookup helpers
-  ipv6: udp: constify 'struct net' parameter of socket lookups
-
- include/linux/filter.h         |  4 ++--
- include/net/inet6_hashtables.h | 14 +++++++-------
- include/net/inet_hashtables.h  | 10 +++++-----
- include/net/inet_sock.h        |  3 ++-
- include/net/ipv6_stubs.h       |  2 +-
- include/net/udp.h              | 14 ++++++++------
- net/ipv4/inet_hashtables.c     | 12 ++++++------
- net/ipv4/udp.c                 |  8 ++++----
- net/ipv6/inet6_hashtables.c    | 15 ++++++++-------
- net/ipv6/udp.c                 |  8 ++++----
- 10 files changed, 47 insertions(+), 43 deletions(-)
-
+diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
+index 533a7337865a4308c073b30b69dae4dcf7e6b264..591cbf5e4d5f86375598b9622f616ac662b0fc4e 100644
+--- a/include/net/inet6_hashtables.h
++++ b/include/net/inet6_hashtables.h
+@@ -175,7 +175,7 @@ struct sock *inet6_lookup(struct net *net, struct inet_hashinfo *hashinfo,
+ 
+ int inet6_hash(struct sock *sk);
+ 
+-static inline bool inet6_match(struct net *net, const struct sock *sk,
++static inline bool inet6_match(const struct net *net, const struct sock *sk,
+ 			       const struct in6_addr *saddr,
+ 			       const struct in6_addr *daddr,
+ 			       const __portpair ports,
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index 7f1b384587437d06834bde554edd8df983fd64a4..1cc8b7ca20a10c1b0c8a6b9a029e5f8b4a1e846d 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -351,7 +351,7 @@ static inline struct sock *inet_lookup_listener(struct net *net,
+ 				   ((__force __u64)(__be32)(__saddr)))
+ #endif /* __BIG_ENDIAN */
+ 
+-static inline bool inet_match(struct net *net, const struct sock *sk,
++static inline bool inet_match(const struct net *net, const struct sock *sk,
+ 			      const __addrpair cookie, const __portpair ports,
+ 			      int dif, int sdif)
+ {
+diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+index f9ddd47dc4f8d989e1c966bf363ed846c0911639..394c3b66065e20d34594d6e2a2010c55bb457810 100644
+--- a/include/net/inet_sock.h
++++ b/include/net/inet_sock.h
+@@ -150,7 +150,8 @@ static inline bool inet_bound_dev_eq(bool l3mdev_accept, int bound_dev_if,
+ 	return bound_dev_if == dif || bound_dev_if == sdif;
+ }
+ 
+-static inline bool inet_sk_bound_dev_eq(struct net *net, int bound_dev_if,
++static inline bool inet_sk_bound_dev_eq(const struct net *net,
++					int bound_dev_if,
+ 					int dif, int sdif)
+ {
+ #if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 48d0d494185b19a5e7282ffb6b33051604c28c9f..3d913dbd028404b1a1bf4dc3f988133e4a1d52ec 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -310,7 +310,7 @@ inet_lhash2_bucket_sk(struct inet_hashinfo *h, struct sock *sk)
+ 	return inet_lhash2_bucket(h, hash);
+ }
+ 
+-static inline int compute_score(struct sock *sk, struct net *net,
++static inline int compute_score(struct sock *sk, const struct net *net,
+ 				const unsigned short hnum, const __be32 daddr,
+ 				const int dif, const int sdif)
+ {
+diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
+index 6db71bb1cd300a9a3d91a8d771db4521978bc5d6..f29f094e57a4a5da8b238246d437328569a165d3 100644
+--- a/net/ipv6/inet6_hashtables.c
++++ b/net/ipv6/inet6_hashtables.c
+@@ -89,7 +89,7 @@ struct sock *__inet6_lookup_established(struct net *net,
+ }
+ EXPORT_SYMBOL(__inet6_lookup_established);
+ 
+-static inline int compute_score(struct sock *sk, struct net *net,
++static inline int compute_score(struct sock *sk, const struct net *net,
+ 				const unsigned short hnum,
+ 				const struct in6_addr *daddr,
+ 				const int dif, const int sdif)
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
