@@ -1,126 +1,186 @@
-Return-Path: <netdev+bounces-115286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3190F945BC6
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:05:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B0D945BC8
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD38F282937
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:05:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C80561C2151B
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6C21DAC4C;
-	Fri,  2 Aug 2024 10:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A71DAC43;
+	Fri,  2 Aug 2024 10:05:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CD1A1C69D;
-	Fri,  2 Aug 2024 10:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2740614B952
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 10:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722593138; cv=none; b=pfcMqkzrcavMvPk9nAtJlcOf3KvJ/wCYtjGVqey+VkkAa7WYOydnDH6Fjulg7YhbQqYEW4QhMMUI1H/OUMvK3YoSf8fDHIjdCSZB8d3Z0W/pDYeZBCPpDIUFPz95sqzeqKVn1h2Y4WoD2UkgeMFFmuDr7o98NPR6GFygdRq3UmE=
+	t=1722593159; cv=none; b=Utw/WSFy7DIsNJ+d7gDgZmoIVYqsydYvB4s8kGtrigymumE3R6CXt5/ZampVgf+wIXZkwHrdLlpxzZHpcrHidWRTvLYTzXEmcFgxxUDwv5BOQ4PIx7thB6NeDdrWq76vRMZm29UNXnyO22Bx55gWIHEu7vVAb/dvF0JIDVd8yR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722593138; c=relaxed/simple;
-	bh=mVqPr5BeRaCt8ln7YVbvkUqRz3dKQwG7bFALGCRL7aQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JXSMURhvbprTgaStTzeqRyzo59ZQmdSDD2KQNiaaJsRZnouxt2bLRn6MqjtBPc/jkjUC+GxI/ZkrybMvubP3CU6Zczdf3oqqW8AHxSxmm9x053/rFny+dgxN7y6DiGQmFUR9e2gZt/A1MppqqjOCL4ex72kOM+px5JV/yoS4+hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from abreu.molgen.mpg.de (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 266F761E5FE01;
-	Fri,  2 Aug 2024 12:04:57 +0200 (CEST)
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Roy Lee <roy_lee@accton.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] tg3: Add param `short_preamble` to enable MDIO traffic to external PHYs
-Date: Fri,  2 Aug 2024 12:04:42 +0200
-Message-ID: <20240802100448.10745-1-pmenzel@molgen.mpg.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1722593159; c=relaxed/simple;
+	bh=p8KHDp5T541LzcauHdbygkcHm9Fm1n44ZnrMVKkUu6w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gwaRyR2rosNwWjzAC8CNDgb4sLy8u56vxtV3q026WBggoGWteVfrtU6XC2vsXWKmie8yZ5GbhaaCSWjAG8XOc5osc9PF6Mx0cghfSzi4gXRQ9VadV25VIj9J+pEp5NAt8hEnXKscRRC1OfZQ1b1xKGUTlmbtInhu9j0XAnqTvz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Wb1gM2kRczcd3d
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 18:05:51 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0F1351800A1;
+	Fri,  2 Aug 2024 18:05:53 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 2 Aug 2024 18:05:52 +0800
+Message-ID: <877efebe-f316-4192-aada-dd2657b74125@huawei.com>
+Date: Fri, 2 Aug 2024 18:05:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
+ page_frag API
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
+	<sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
+	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
+	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
+	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
+ Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
+	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Andrii
+ Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil
+ Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
+	<linux-nfs@vger.kernel.org>
+References: <20240731124505.2903877-1-linyunsheng@huawei.com>
+ <20240731124505.2903877-5-linyunsheng@huawei.com>
+ <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
+ <22fda86c-d688-42e7-99e8-e2f8fcf1a5ba@huawei.com>
+ <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-From: Roy Lee <roy_lee@accton.com>
+On 2024/8/1 23:21, Alexander Duyck wrote:
+> On Thu, Aug 1, 2024 at 6:01 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/8/1 2:13, Alexander Duyck wrote:
+>>> On Wed, Jul 31, 2024 at 5:50 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>>
+>>>> Currently the page_frag API is returning 'virtual address'
+>>>> or 'va' when allocing and expecting 'virtual address' or
+>>>> 'va' as input when freeing.
+>>>>
+>>>> As we are about to support new use cases that the caller
+>>>> need to deal with 'struct page' or need to deal with both
+>>>> 'va' and 'struct page'. In order to differentiate the API
+>>>> handling between 'va' and 'struct page', add '_va' suffix
+>>>> to the corresponding API mirroring the page_pool_alloc_va()
+>>>> API of the page_pool. So that callers expecting to deal with
+>>>> va, page or both va and page may call page_frag_alloc_va*,
+>>>> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
+>>>>
+>>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>>>> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+>>>
+>>> I am naking this patch. It is a pointless rename that is just going to
+>>> obfuscate the git history for these callers.
+>>
+>> I responded to your above similar comment in v2, and then responded more
+>> detailedly in v11, both got not direct responding, it would be good to
+>> have more concrete feedback here instead of abstract argument.
+>>
+>> https://lore.kernel.org/all/74e7259a-c462-e3c1-73ac-8e3f49fb80b8@huawei.com/
+>> https://lore.kernel.org/all/11187fe4-9419-4341-97b5-6dad7583b5b6@huawei.com/
+> 
+> I will make this much more understandable. This patch is one of the
+> ones that will permanently block this set in my opinion. As such I
+> will never ack this patch as I see no benefit to it. Arguing with me
+> on this is moot as you aren't going to change my mind, and I don't
+> have all day to argue back and forth with you on every single patch.
 
-Add parameter to enable *short preamble* for MAC, so MDIO access to some
-external PHY, like BCM54616, can be validated.
+Let's move on to more specific technical discussion then.
 
-Applies to the five platforms below, that have the ethernet controller
-BCM5720:
+> 
+> As far as your API extension and naming maybe you should look like
+> something like bio_vec and borrow the naming from that since that is
+> essentially what you are passing back and forth is essentially that
+> instead of a page frag which is normally a virtual address.
 
-as7116_54x, as7326_56x, as7716_32x-r0, as7716_32xb, and as7816_64x
+I thought about adding something like bio_vec before, but I am not sure
+what you have in mind is somthing like I considered before?
+Let's say that we reuse bio_vec like something below for the new APIs:
 
-Verified by mii-tool. (31 is the address of external phy).
+struct bio_vec {
+	struct page	*bv_page;
+	void		*va;
+	unsigned int	bv_len;
+	unsigned int	bv_offset;
+};
 
-    root@sonic:/home/admin# mii-tool -v eth0 -p 31
-    using the specified MII index 31.
-    eth0: negotiated, link ok
-    product info: vendor 00:d8:97, model 17 rev 2
-    basic mode: autonegotiation enabled
-    basic status: autonegotiation complete, link ok
-    capabilities: 1000baseT-HD 1000baseT-FD 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD
-    advertising: flow-control
-    link partner: 1000baseT-FD 100baseTx-FD 100baseTx-HD 10baseT-FD 10baseT-HD
+It seems we have the below options for the new API:
 
-Note, this upstreams a patch to the SONiC Linux kernel added in 2018
-[1][2][3].
+option 1, it seems like a better option from API naming point of view, but
+it needs to return a bio_vec pointer to the caller, it seems we need to have
+extra space for the pointer, I am not sure how we can avoid the memory waste
+for sk_page_frag() case in patch 12:
+struct bio_vec *page_frag_alloc_bio(struct page_frag_cache *nc,
+				    unsigned int fragsz, gfp_t gfp_mask);
 
-[1]: https://github.com/sonic-net/sonic-linux-kernel/pull/71/
-[2]: https://github.com/sonic-net/sonic-linux-kernel/commit/ad754bdcc094f6499b3fd6af067c828b0546f96c
-[3]: https://github.com/sonic-net/sonic-buildimage/pull/2318
+option 2, it need both the caller and callee to have a its own local space
+for 'struct bio_vec ', I am not sure if passing the content instead of
+the pointer of a struct through the function returning is the common pattern
+and if it has any performance impact yet:
+struct bio_vec page_frag_alloc_bio(struct page_frag_cache *nc,
+				   unsigned int fragsz, gfp_t gfp_mask);
 
-Signed-off-by: Roy Lee <roy_lee@accton.com>
-Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
- drivers/net/ethernet/broadcom/tg3.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+option 3, the caller passes the pointer of 'struct bio_vec ' to the callee,
+and page_frag_alloc_bio() fills in the data, I am not sure what is the point
+of indirect using 'struct bio_vec ' instead of passing 'va' & 'fragsz' &
+'offset' through pointers directly:
+bool page_frag_alloc_bio(struct page_frag_cache *nc,
+			 unsigned int fragsz, gfp_t gfp_mask, struct bio_vec *bio);
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 0ec5f01551f9..9b4ab201fd9a 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -233,6 +233,10 @@ static int tg3_debug = -1;	/* -1 == use TG3_DEF_MSG_ENABLE as value */
- module_param(tg3_debug, int, 0);
- MODULE_PARM_DESC(tg3_debug, "Tigon3 bitmapped debugging message enable value");
- 
-+static int short_preamble = 0;
-+module_param(short_preamble, int, 0);
-+MODULE_PARM_DESC(short_preamble, "Enable short preamble.");
-+
- #define TG3_DRV_DATA_FLAG_10_100_ONLY	0x0001
- #define TG3_DRV_DATA_FLAG_5705_10_100	0x0002
- 
-@@ -1493,6 +1497,11 @@ static void tg3_mdio_config_5785(struct tg3 *tp)
- static void tg3_mdio_start(struct tg3 *tp)
- {
- 	tp->mi_mode &= ~MAC_MI_MODE_AUTO_POLL;
-+
-+	if(short_preamble) {
-+	    tp->mi_mode |= MAC_MI_MODE_SHORT_PREAMBLE;
-+	}
-+
- 	tw32_f(MAC_MI_MODE, tp->mi_mode);
- 	udelay(80);
- 
--- 
-2.45.2
+If one of the above option is something in your mind? Yes, please be more specific
+about which one is the prefer option, and why it is the prefer option than the one
+introduced in this patchset?
+
+If no, please be more specific what that is in your mind?
 
 
