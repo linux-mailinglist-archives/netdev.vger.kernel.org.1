@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-115190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B98945648
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 04:26:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31215945654
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 04:38:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EF3D285833
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:26:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5197B1C22246
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C78C18AED;
-	Fri,  2 Aug 2024 02:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC941BC41;
+	Fri,  2 Aug 2024 02:38:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iI+Qc/fC"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="AJcNKghG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB050175A6;
-	Fri,  2 Aug 2024 02:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21359256D;
+	Fri,  2 Aug 2024 02:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722565566; cv=none; b=c6+AQWR08Y557o9HGOeoAaIjPwlbA3Na0JWG7ymWwR2PWAHvbFrZ/1jgkASwp1FhzazXR0b0UkMeDKmojn5qBV6TYqfwkfQem+hcgbPpdQ/S3uVCu8dGxijDdsvsK95hWysanE3UBymfN2ytC3AIjKoaMfoWIUze4H8ZBju72NU=
+	t=1722566291; cv=none; b=WreWsrbZEEpx6mDM87UdnKnMUNIhiBJ1COmePhILD1+C3fSCVyC32cjDE6qN+yl/V6YwpNAXsWBeXSK8eZwTDm2g/o7pcclyw2ZAazbFD0TN5XanE4kMR/WPvMRbcJb+y7GDG8z/tUZJlafg2OUow56Egg/z2PlPVJbTYCzXNkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722565566; c=relaxed/simple;
-	bh=VB6ZvOs/uC+yXp1dvVIc/2bgCRWtPF3r3G2M+Tb5e/o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q3HzZ1UuWDx+RNCIOnHNN9C/n44+vZlBFXrji7nj8bKSLo6Qiq7FFEnfvT6DWZC3rpwRoYGXbyunrxj0hGaZZMNAQ5i2K+k/CXGjyBkQMe6jdh0XGftfW/7W1F2K0SGAdTQPLLcJBsb+K9p/fZaHTtzjUxsWkuGIAS1urkMObKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iI+Qc/fC; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5d5c7f24382so4270358eaf.2;
-        Thu, 01 Aug 2024 19:26:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722565564; x=1723170364; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nfyuTMNPkDWCL9I5uMPFKxVk6+FwsBMNlzHehj0YZ/M=;
-        b=iI+Qc/fCmzvmx5lKVjRUS/QLgHQZkUOJWpTZzrPi+W5DYDIGBCLQSPG0aS1MMB1J+W
-         hdcfzm6qp3H4YcWSRRHjQo411JsKqN1YXVj9BJqmceMIwUQJXPk8DAbrexhiBNHPv/kZ
-         ASJnvqDxLoc5nuYdyeWZMVXf0kFSbgtrsjrpTUnfo+UOzB0CVRFUrCQ2cD20gBLiLBZD
-         U4fEXciQhjxpAO1P+Dmu1YzPGLpkBy2R3IWckCyJCzZQBmHCRxkg0uA9b0PVVRiNp4V7
-         rHzr23a6oWo4ZJH3ytR/7WzAuDu1CHoU7F+Zk1hE3yWDd4BZDN/MTREPhrffMwVVwq2W
-         p51g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722565564; x=1723170364;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nfyuTMNPkDWCL9I5uMPFKxVk6+FwsBMNlzHehj0YZ/M=;
-        b=FovegGt5R51nHW9XsNN09ZeV0eV7wi+kSx0vhEOgmTTaFBU1uusvYQRGTRWs8z6A2G
-         VzzjfK6pA/+h2IeBTInIqovNHcpJw/cAJ6OUaV+OIKUTpRFWbJJVHmgOibPIKlEZ5rak
-         jlsOua7oIEGb1uP3/qTmO7KJ8g28XR6qMobJ0oPCrZnI572WOGOGq1mu32K4gQJ4xf4r
-         dfTEx2kjbK2KKNN3AJZEdY1+2r8Gke1iSyNE8z501f7f9kUzvlGofLWSe9wgBUjBZQQB
-         paEXVjswv3+8WCesx3FZXFWGyWT62SuyRfEJoJBlNTlK9LZZszYkW9aW1DQQsJRjlDLO
-         bn4w==
-X-Forwarded-Encrypted: i=1; AJvYcCUka5ClYwGYdsY68HrsjzPY2F3nEr5/54jx890DnDzwUZhY8aF4OtFFuLlUk/F+FrqnaE/xx6qP6YkiOeq0OyHIswsM1Lar25Vk+nqo+KLL9j52AltAGaV6ffFB1dsBlZhFtWF6
-X-Gm-Message-State: AOJu0YwGfcuV7awrOu7Hwn6MgOkmUIrKVFXasNTgOqX+Bk3WPb4nqwU+
-	WN7mvd8XqF/DvzucHzfd6dCjS0SwjqXZ5O0CdoHvH4TlYwk0YRIeOlXrbQN8fILVPzWwnOnICYy
-	sV4MwhIv4Dkcj5gNIiZFbkK9iono=
-X-Google-Smtp-Source: AGHT+IHXXXnzi6E9XbW8sxSJCtKQmNHMsr6KIsZI/uoU9mSZgfdMXs+KgK6tJ0JfP9Dvfhl6dJza/sADFiddQgSeIfA=
-X-Received: by 2002:a05:6358:4907:b0:1a2:89:298c with SMTP id
- e5c5f4694b2df-1af3ba705cfmr176383555d.14.1722565563607; Thu, 01 Aug 2024
- 19:26:03 -0700 (PDT)
+	s=arc-20240116; t=1722566291; c=relaxed/simple;
+	bh=qsERdodKVvGHkmLwF7ZiXQoVYz+Du1NbfybhRREWwr8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hZyCk4olz9KWVm8I7InVeTZrj9CPCl4ZX8la65xzPw6ZbDjJKmlA/tlwsVM+z6zIomES2hElj4FWQ7L8UDMdsKMtFJew0U+qVZHXxVaG4qYb1ytXAQktM6+to34YbDPzvoggJRd16YC8yvfZ7bka/0bswRgIJaH8K4o2DCIDEn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=AJcNKghG; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1722566286; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=aWAgTe3/d2vuRvpihukkRtHTKAqcY/yAFBxhWx6czPY=;
+	b=AJcNKghGoiUO+XYPR2LMWS8yLLLJEgjFI7w4ST2Lw59ZwrvXlpyX/W+dR2PVEyZnf08HATnnHGEFmXt2hejC/t+Xh1RAtKwMwtXdEtDfN0O4pUSSfKUOaPkdacV5uR9H03GA70y34UvgUhRkyvBexX8Sdjd1CY0xUM9A1+otvA0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R941e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033045046011;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0WBvdzkc_1722566283;
+Received: from 30.221.149.103(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WBvdzkc_1722566283)
+          by smtp.aliyun-inc.com;
+          Fri, 02 Aug 2024 10:38:05 +0800
+Message-ID: <a69bfb91-3cfa-4e98-b655-e8f0d462c55d@linux.alibaba.com>
+Date: Fri, 2 Aug 2024 10:38:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801134709.1737190-2-yyyynoom@gmail.com> <20240801140633.GA2680@breakpoint.cc>
-In-Reply-To: <20240801140633.GA2680@breakpoint.cc>
-From: Moon Yeounsu <yyyynoom@gmail.com>
-Date: Fri, 2 Aug 2024 11:25:52 +0900
-Message-ID: <CAAjsZQxh4ykAHTdPryLyv1kePXGB6jZ-mCXjmiCsBusw5ZGQsQ@mail.gmail.com>
-Subject: Re: [PATCH] e1000e: use ip_hdrlen() instead of bit shift
-To: Florian Westphal <fw@strlen.de>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: add the max value of fallback reason
+ count
+To: Zhengchao Shao <shaozhengchao@huawei.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, tonylu@linux.alibaba.com,
+ guwen@linux.alibaba.com, weiyongjun1@huawei.com, yuehaibing@huawei.com
+References: <20240801113549.98301-1-shaozhengchao@huawei.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20240801113549.98301-1-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 1, 2024 at 11:06=E2=80=AFPM Florian Westphal <fw@strlen.de> wro=
-te:
-> This helper needs skb_network_header being set up correctly, are you
-> sure thats the case here?  ip pointer is fetched via data + 14 right
-> above, so it doesn't look like this would work.
-I read it once more carefully, and yes, you are right.
-Sorry for wasting your time...
-It is my first patch to the netdev subsystem.
-So... I was too excited. It's all my fault.
-Next time, I'll be careful and deliberate.
 
-Thank you for reviewing.
+
+On 8/1/24 7:35 PM, Zhengchao Shao wrote:
+> The number of fallback reasons defined in the smc_clc.h file has reached
+> 36. For historical reasons, some are no longer quoted, and there's 33
+> actually in use. So, add the max value of fallback reason count to 50.
+>
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> ---
+>   net/smc/smc_stats.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/smc/smc_stats.h b/net/smc/smc_stats.h
+> index 9d32058db2b5..ab5aafc6f44c 100644
+> --- a/net/smc/smc_stats.h
+> +++ b/net/smc/smc_stats.h
+> @@ -19,7 +19,7 @@
+>   
+>   #include "smc_clc.h"
+>   
+> -#define SMC_MAX_FBACK_RSN_CNT 30
+> +#define SMC_MAX_FBACK_RSN_CNT 50
+>   
+It feels more like a fix ？
+
+>   enum {
+>   	SMC_BUF_8K,
+
 
