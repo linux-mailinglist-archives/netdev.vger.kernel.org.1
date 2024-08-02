@@ -1,121 +1,359 @@
-Return-Path: <netdev+bounces-115188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D81945633
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 04:01:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB23945637
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 04:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E708B20DEF
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:01:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFB2EB22D61
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 02:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7798134BD;
-	Fri,  2 Aug 2024 02:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GO3I31WF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94AA15AC4;
+	Fri,  2 Aug 2024 02:06:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3393D68;
-	Fri,  2 Aug 2024 02:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6D91C698;
+	Fri,  2 Aug 2024 02:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722564073; cv=none; b=X3MO+1YtKVTWCGnkkQMs/feZOjeTDyiflAQYO4/8G9oqYU0Uk43yBSooSdJ7fsKTKyyZ3Y452ATI50GBS9h/S7UxWpEN4YYmCWq/Vi9l3hRB3k+Xspdqb2q61uxGbVZym7ojVgqtYkGZcQ1vF6tk3ET7Lt9wl2N31O3nrK5bVpc=
+	t=1722564399; cv=none; b=EXC+S7WPfpeINQIT9wItrs0KYLNsuwQJeVUMmjd+RAkLzVMz1yrcF73v12vc16EBfuOgF8CD/ahw5j6Sg0SazBb/iskO0MmFfyovL6yfyfTr+plL8A1a3fS8PrAtTtHZpKH03VHlaM/b8PxGTsCkRWIQTnPtYivHPNUhgBUvNlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722564073; c=relaxed/simple;
-	bh=DME/FcWpg1y22yW6VktfNpiVVplejRNksuU2BNddFm0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SdU+S0/dIcEn/L+KLLA/4ODsd6PEqkaVlMIdluS41BDh4nJK+owbv/AKukARn1FTCX1pPfwV5qzXzbxLPOKuZZey/bG8+eGJtm8Rmd2xLN8lrx028UDwQxgI/VSowbL91EC7ipj9ZphtX2GoLtmSwij5daZVVf4THMjzA7xKiy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GO3I31WF; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2cb81c0ecb4so2059693a91.0;
-        Thu, 01 Aug 2024 19:01:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722564072; x=1723168872; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jPu7+Zk7lvnbGrSwKxSxehNV5Y9nXc9e9et1xGEkKw=;
-        b=GO3I31WFZo0a+XBo1Ys8JeSgTFQFTSojS8JtBoL8pdSJWvmJkm7zcrum507sCyATSE
-         iO0822c0WunPrbWhTKJTSivf7hQv6PEjba4LZWmCZ/UOPl/E8h4ZPuIRv3agujk9RyN1
-         WXlXeH1PLm9I850YSS7ls4ERgvDWh4zTmNgZGq8fEMs9MwtQr6ay02MUGcNMV3DVnTzh
-         nLXGzg2siNIZErO2fuAryVrC7wDEw24GhhHH2QF0KX1tW8CjRgZC498YrG+Kcgn9sW3L
-         gbQ3kY4EFO0u4gnNaEAY+Pt/kmr1tIjP6NtFxOao4upKUklXnILv9wenJLK71XHCH4u1
-         FLFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722564072; x=1723168872;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6jPu7+Zk7lvnbGrSwKxSxehNV5Y9nXc9e9et1xGEkKw=;
-        b=m0OX56uV3BFUvqSTh6RRrpFKiScK8saLB/xcR5PI9GEL4/6GrVO7qttT80PO3BiJ8i
-         Ex+2H8C6zP61XiP1O1F8jdysfjMCoU0iBRwEt5xfV/245o0kIuWQkMjw3dvZqUojl2SX
-         nOMGG8NPoxfzNTrsCzM3i2Sh5WhivL2At16127j0x3722+LJazbyc+ovUjwBw9vfgmOH
-         Ewe0FKQrfafyQOluu3FeGa2AOgOVB0vzCHg8NRFwLj1KfHD89VrCsuPatwJdTELaHjGV
-         nw4UIAoWfcDG5MxkVE1q2X2XbVqmBztV8OQ2S5FP2J4v8QxhL2lgdkrJHhJGB/qYuZA1
-         owGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWvZLYNFpxfd/gB16qFPN46Np6m0bCkNq5X0iudClOZIG/e69cR0km26mx9TNs94SI4iQwqO56nXbv9dbhtIveJsYLpaLY2Uz7RpTlWEjjCeHj97eXw9zwzB9WsRvgjVxNGazLE
-X-Gm-Message-State: AOJu0YzpU6DDqVnrj5yvQpZVOPvh1ImJTak1tAwjItqIs4dt+5PhTpbE
-	4xCliC3Kphsb0Arf2H71xa4ciSepueRwQa9gwvR/9kDlQRQ/kKNhGXBcYXWUmAG+ooYUUMRyNol
-	kwCecimpDds+riFgUz98QVNFetMw=
-X-Google-Smtp-Source: AGHT+IHjGpzpgrv1AUBVEgNxsB96VHmMg0F97xvxdjInlzIReOvhWJNU6m6LqZlULDRI7gbYV1gnMdNzinP0BSVC+bk=
-X-Received: by 2002:a17:90a:ba97:b0:2c2:c3f5:33c3 with SMTP id
- 98e67ed59e1d1-2cff093a154mr5472664a91.6.1722564071378; Thu, 01 Aug 2024
- 19:01:11 -0700 (PDT)
+	s=arc-20240116; t=1722564399; c=relaxed/simple;
+	bh=IlocbmpmuX2SAx0WorxeajL8D2h54uVWAF0MWLK1Dqg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=Y9HJge3a6N9syVuR09EGt5+MSeBAdmoT/qXfY4jigAOaF6KJz+7BNC4CbWVSqWAVkEdIMXNof0a75qXrr5KThy1fVwlPdp+rIanFODDAxU0q9Vx24ByuFep06CRl6LhAvVy4Rc4/sTJ+lq21D+ZsOUWY1GlzX+/GOMqtZZ/JWyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WZq0H60cqz1xtyP;
+	Fri,  2 Aug 2024 10:04:47 +0800 (CST)
+Received: from kwepemf200007.china.huawei.com (unknown [7.202.181.233])
+	by mail.maildlp.com (Postfix) with ESMTPS id B38BD1A016C;
+	Fri,  2 Aug 2024 10:06:33 +0800 (CST)
+Received: from [10.67.121.184] (10.67.121.184) by
+ kwepemf200007.china.huawei.com (7.202.181.233) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 2 Aug 2024 10:06:32 +0800
+Message-ID: <f09f7df6-9d5e-410d-8409-006c3b6e995a@huawei.com>
+Date: Fri, 2 Aug 2024 10:06:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJwJo6Z-qsZ9ZLV7qHrc=ujYT0Q2Ayod_C6e9kM+2QH48z650w@mail.gmail.com>
- <20240802010250.82312-1-kuniyu@amazon.com>
-In-Reply-To: <20240802010250.82312-1-kuniyu@amazon.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Fri, 2 Aug 2024 03:00:59 +0100
-Message-ID: <CAJwJo6ajnzqS0mNwEJNEYo5HBryRNJOtZeK7aRVGWCdu5ovc0A@mail.gmail.com>
-Subject: Re: [PATCH net v3] net/tcp: Disable TCP-AO static key after RCU grace period
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stable@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG REPORT]net: page_pool: kernel crash at
+ iommu_get_dma_domain+0xc/0x20
+Content-Language: en-US
+From: Yonglong Liu <liuyonglong@huawei.com>
+To: Somnath Kotur <somnath.kotur@broadcom.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>, linyunsheng <linyunsheng@huawei.com>,
+	"shenjian (K)" <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>
+References: <0e54954b-0880-4ebc-8ef0-13b3ac0a6838@huawei.com>
+ <8743264a-9700-4227-a556-5f931c720211@huawei.com>
+ <e980d20f-ea8a-43e3-8d3f-179a269b5956@kernel.org>
+ <CAOBf=musxZcjYNHjdD+MGp0y6epnNO5ryC6JgeAJbP6YQ+sVUA@mail.gmail.com>
+ <d385bdba-65a0-4776-b950-9e62392f5115@huawei.com>
+In-Reply-To: <d385bdba-65a0-4776-b950-9e62392f5115@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemf200007.china.huawei.com (7.202.181.233)
 
-On Fri, 2 Aug 2024 at 02:03, Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+
+On 2024/7/31 19:32, Yonglong Liu wrote:
 >
-> From: Dmitry Safonov <0x7f454c46@gmail.com>
-> Date: Fri, 2 Aug 2024 01:37:28 +0100
-> > On Thu, 1 Aug 2024 at 01:13, Dmitry Safonov via B4 Relay
-> > <devnull+0x7f454c46.gmail.com@kernel.org> wrote:
-> > >
-> > > From: Dmitry Safonov <0x7f454c46@gmail.com>
-> > [..]
-> > > Happened on netdev test-bot[1], so not a theoretical issue:
-> >
-> > Self-correction: I see a static_key fix in git.tip tree from a recent
-> > regression, which could lead to the same kind of failure. So, I'm not
-> > entirely sure the issue isn't theoretical.
-> > https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=224fa3552029
+> On 2024/7/31 16:42, Somnath Kotur wrote:
+>> On Tue, Jul 30, 2024 at 10:51 PM Jesper Dangaard Brouer 
+>> <hawk@kernel.org> wrote:
+>>>
+>>>
+>>> On 30/07/2024 15.08, Yonglong Liu wrote:
+>>>> I found a bug when running hns3 driver with page pool enabled, the log
+>>>> as below:
+>>>>
+>>>> [ 4406.956606] Unable to handle kernel NULL pointer dereference at
+>>>> virtual address 00000000000000a8
+>>> struct iommu_domain *iommu_get_dma_domain(struct device *dev)
+>>> {
+>>>          return dev->iommu_group->default_domain;
+>>> }
+>>>
+>>> $ pahole -C iommu_group --hex | grep default_domain
+>>>          struct iommu_domain *      default_domain;   /* 0xa8   0x8 */
+>>>
+>>> Looks like iommu_group is a NULL pointer (that when deref member
+>>> 'default_domain' cause this fault).
+>>>
+>>>
+>>>> [ 4406.965379] Mem abort info:
+>>>> [ 4406.968160]   ESR = 0x0000000096000004
+>>>> [ 4406.971906]   EC = 0x25: DABT (current EL), IL = 32 bits
+>>>> [ 4406.977218]   SET = 0, FnV = 0
+>>>> [ 4406.980258]   EA = 0, S1PTW = 0
+>>>> [ 4406.983404]   FSC = 0x04: level 0 translation fault
+>>>> [ 4406.988273] Data abort info:
+>>>> [ 4406.991154]   ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+>>>> [ 4406.996632]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>>>> [ 4407.001681]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+>>>> [ 4407.006985] user pgtable: 4k pages, 48-bit VAs, 
+>>>> pgdp=0000202828326000
+>>>> [ 4407.013430] [00000000000000a8] pgd=0000000000000000,
+>>>> p4d=0000000000000000
+>>>> [ 4407.020212] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
+>>>> [ 4407.026454] Modules linked in: hclgevf xt_CHECKSUM ipt_REJECT
+>>>> nf_reject_ipv4 ip6table_mangle ip6table_nat iptable_mangle
+>>>> ip6table_filter ip6_tables hns_roce_hw_v2 hns3 hclge hnae3 xt_addrtype
+>>>> iptable_filter xt_conntrack overlay arm_spe_pmu arm_smmuv3_pmu
+>>>> hisi_uncore_hha_pmu hisi_uncore_ddrc_pmu hisi_uncore_l3c_pmu
+>>>> hisi_uncore_pmu fuse rpcrdma ib_isert iscsi_target_mod ib_iser 
+>>>> libiscsi
+>>>> scsi_transport_iscsi crct10dif_ce hisi_sec2 hisi_hpre hisi_zip
+>>>> hisi_sas_v3_hw xhci_pci sbsa_gwdt hisi_qm hisi_sas_main hisi_dma
+>>>> xhci_pci_renesas uacce libsas [last unloaded: hnae3]
+>>>> [ 4407.076027] CPU: 48 PID: 610 Comm: kworker/48:1
+>>>> [ 4407.093343] Workqueue: events page_pool_release_retry
+>>>> [ 4407.098384] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS
+>>>> BTYPE=--)
+>>>> [ 4407.105316] pc : iommu_get_dma_domain+0xc/0x20
+>>>> [ 4407.109744] lr : iommu_dma_unmap_page+0x38/0xe8
+>>>> [ 4407.114255] sp : ffff80008bacbc80
+>>>> [ 4407.117554] x29: ffff80008bacbc80 x28: 0000000000000000 x27:
+>>>> ffffc31806be7000
+>>>> [ 4407.124659] x26: ffff2020002b6ac0 x25: 0000000000000000 x24:
+>>>> 0000000000000002
+>>>> [ 4407.131762] x23: 0000000000000022 x22: 0000000000001000 x21:
+>>>> 00000000fcd7c000
+>>>> [ 4407.138865] x20: ffff0020c9882800 x19: ffff0020856f60c8 x18:
+>>>> ffff8000d3503c58
+>>>> [ 4407.145968] x17: 0000000000000000 x16: 1fffe00419521061 x15:
+>>>> 0000000000000001
+>>>> [ 4407.153073] x14: 0000000000000003 x13: 00000401850ae012 x12:
+>>>> 000006b10004e7fb
+>>>> [ 4407.160177] x11: 0000000000000067 x10: 0000000000000c70 x9 :
+>>>> ffffc3180405cd20
+>>>> [ 4407.167280] x8 : fefefefefefefeff x7 : 0000000000000001 x6 :
+>>>> 0000000000000010
+>>>> [ 4407.174382] x5 : ffffc3180405cce8 x4 : 0000000000000022 x3 :
+>>>> 0000000000000002
+>>>> [ 4407.181485] x2 : 0000000000001000 x1 : 00000000fcd7c000 x0 :
+>>>> 0000000000000000
+>>>> [ 4407.188589] Call trace:
+>>>> [ 4407.191027]  iommu_get_dma_domain+0xc/0x20
+>>>> [ 4407.195105]  dma_unmap_page_attrs+0x38/0x1d0
+>>>> [ 4407.199361]  page_pool_return_page+0x48/0x180
+>>>> [ 4407.203699]  page_pool_release+0xd4/0x1f0
+>>>> [ 4407.207692]  page_pool_release_retry+0x28/0xe8
+>>> I suspect that the DMA IOMMU part was deallocated and freed by the
+>>> driver even-though page_pool still have inflight packets.
+>> When you say driver, which 'driver' do you mean?
+>> I suspect this could be because of the VF instance going away with
+>> this cmd - disable the vf: echo 0 >
+>> /sys/class/net/eno1/device/sriov_numvfs, what do you think?
 >
-> My syzkaller instances recently started to report similar splats over
-> different places (TCP-AO/MD5, fl6, netfilter, perf, etc), and I was
-> suspecting a bug in the jump label side.
-
-I'm glad I dropped you a hint :-)
-
-> report19:2:jump_label: Fatal kernel bug, unexpected op at fl6_sock_lookup include/net/ipv6.h:414 [inline] [000000001bd3e3db] (e9 ee 00 00 00 != 0f 1f 44 00 00)) size:5 type:1
-> report23:1:jump_label: Fatal kernel bug, unexpected op at nf_skip_egress include/linux/netfilter_netdev.h:136 [inline] [00000000c1241913] (e9 e9 0a 00 00 != 0f 1f 44 00 00)) size:5 type:1
-> report45:2:jump_label: Fatal kernel bug, unexpected op at tcp_ao_required include/net/tcp.h:2776 [inline] [000000009a4b37e9] (eb 5a e8 e1 57 != 66 90 0f 1f 00)) size:2 type:1
-> report49:3:jump_label: Fatal kernel bug, unexpected op at perf_sw_event include/linux/perf_event.h:1432 [inline] [00000000c1f7a26c] (eb 24 e9 63 fe != 66 90 0f 1f 00)) size:2 type:1
-> report58:2:jump_label: Fatal kernel bug, unexpected op at tcp_md5_do_lookup include/net/tcp.h:1852 [inline] [00000000fbd24b58] (e9 8d 01 00 00 != 0f 1f 44 00 00)) size:5 type:1
+> I found that this happen when the vf enabled and running some packets, 
+> below is more infomation:
 >
-> I'll cherry-pick the patch and see if it fixes them altogether.
-> It will take few days.
+>
+> [ 4391.596558] pci 0000:7d:01.0: page_pool_release_retry() stalled 
+> pool shutdown: id 1145, 33 inflight 906 sec
+> [ 4397.111484] hns3 0000:bd:00.0: SRIOV setting: 0
+> [ 4397.118155] hns3 0000:bd:01.0 enp189s0f0v0: link down
+> [ 4397.416623] hns3 0000:bd:01.0: finished uninitializing hclgevf driver
+> [ 4397.480572] pci 0000:7d:01.0: page_pool_release_retry() stalled 
+> pool shutdown: id 1279, 98 inflight 362 sec
+> [ 4400.948362] hns3 0000:7d:00.0: SRIOV setting: 1
+> [ 4401.060569] pci 0000:7d:01.0: [19e5:a22f] type 00 class 0x020000 
+> PCIe Endpoint
+> [ 4401.067795] pci 0000:7d:01.0: enabling Extended Tags
+> [ 4401.073090] hns3 0000:7d:01.0: Adding to iommu group 48
+> [ 4401.078494] hns3 0000:7d:01.0: enabling device (0000 -> 0002)
+> [ 4401.084348] hns3 0000:7d:01.0: The firmware version is 1.20.0.17
+> [ 4401.102911] hns3 0000:7d:01.0: finished initializing hclgevf driver
+> [ 4401.111212] hns3 0000:7d:01.0: using random MAC address 
+> da:**:**:**:a3:47
+> [ 4401.138375] hns3 0000:7d:01.0 eno1v0: renamed from eth0
+> [ 4403.939449] hns3 0000:7d:01.0 eno1v0: link up
+> [ 4403.940237] 8021q: adding VLAN 0 to HW filter on device eno1v0
+> [ 4406.956606] Unable to handle kernel NULL pointer dereference at 
+> virtual address 00000000000000a8
+>
+>
+> another log:
+>
+> [11550.197002] hns3 0000:bd:01.0 enp189s0f0v0: link up
+> [11550.197034] hns3 0000:bd:01.0 enp189s0f0v0: net open
+> [11550.206910] 8021q: adding VLAN 0 to HW filter on device enp189s0f0v0
+> [11564.872929] page_pool_release_retry() stalled pool shutdown: id 
+> 2330, 99 inflight 60 sec
+> [11568.353723] hns3 0000:bd:01.0 enp189s0f0v0: net stop
+> [11568.360723] hns3 0000:bd:01.0 enp189s0f0v0: link down
+> [11568.519899] hns3 0000:bd:01.0 enp189s0f0v0: link up
+> [11568.519935] hns3 0000:bd:01.0 enp189s0f0v0: net open
+> [11568.529840] 8021q: adding VLAN 0 to HW filter on device enp189s0f0v0
+> [11589.640930] page_pool_release_retry() stalled pool shutdown: id 
+> 1996, 50 inflight 2054 sec
+> [11592.554875] hns3 0000:bd:01.0 enp189s0f0v0: net stop
+> [11592.560930] hns3 0000:bd:01.0 enp189s0f0v0: link down
+> [11596.684935] pci 0000:7d:01.0: [19e5:a22f] type 00 class 0x020000 
+> PCIe Endpoint
+> [11596.692140] pci 0000:7d:01.0: enabling Extended Tags
+> [11596.697324] hns3 0000:7d:01.0: Adding to iommu group 48
+> [11596.702988] hns3 0000:7d:01.0: enabling device (0000 -> 0002)
+> [11596.708808] hns3 0000:7d:01.0: The firmware version is 1.20.0.17
+> [11596.727263] hns3 0000:7d:01.0: finished initializing hclgevf driver
+> [11596.735561] hns3 0000:7d:01.0: using random MAC address 
+> 72:**:**:**:55:d7
+> [11596.760621] hns3 0000:7d:01.0 eno1v0: renamed from eth0
+> [11599.545341] hns3 0000:7d:01.0 eno1v0: link up
+> [11599.545409] hns3 0000:7d:01.0 eno1v0: net open
+> [11599.554858] 8021q: adding VLAN 0 to HW filter on device eno1v0
+> [11608.908922] Unable to handle kernel NULL pointer dereference at 
+> virtual address 00000000000000a8
+>
+I adds more debug info, and found that:
 
-Thanks!
+[ 4573.356891] pci 0000:7d:01.0: page_pool_release_retry() stalled pool 
+shutdown: id 1046, 82 inflight 60 sec, iommu_group=0x0
 
--- 
-             Dmitry
+The iommu_group will release whether the page_pool is using it or not, 
+so if once page_pool_return_page() was called(why does this occur when 
+the device is reloaded and packets are transmitted?) , this crash will 
+happen.
+
+I try the follow patch, but doesn't work :(
+
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index f4444b4e39e6..d03a87407ca8 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -21,6 +21,7 @@
+  #include <linux/poison.h>
+  #include <linux/ethtool.h>
+  #include <linux/netdevice.h>
++#include <linux/iommu.h>
+
+  #include <trace/events/page_pool.h>
+
+@@ -306,6 +307,9 @@ page_pool_create_percpu(const struct 
+page_pool_params *params, int cpuid)
+         if (err)
+                 goto err_uninit;
+
++       if (pool->dma_map)
++               iommu_group_get(pool->p.dev);
++
+         return pool;
+
+  err_uninit:
+@@ -974,8 +978,11 @@ static int page_pool_release(struct page_pool *pool)
+
+         page_pool_scrub(pool);
+         inflight = page_pool_inflight(pool, true);
+-       if (!inflight)
++       if (!inflight) {
+                 __page_pool_destroy(pool);
++               if (pool->dma_map)
++ iommu_group_put(pool->p.dev->iommu_group);
++       }
+
+         return inflight;
+  }
+
+
+>>> The page_pool bumps refcnt via get_device() + put_device() on the DMA
+>>> 'struct device', to avoid it going away, but I guess there is also some
+>>> IOMMU code that we need to make sure doesn't go away (until all 
+>>> inflight
+>>> pages are returned) ???
+>>>
+>>>
+>>>> [ 4407.212119] process_one_work+0x164/0x3e0
+>>>> [ 4407.216116]  worker_thread+0x310/0x420
+>>>> [ 4407.219851]  kthread+0x120/0x130
+>>>> [ 4407.223066]  ret_from_fork+0x10/0x20
+>>>> [ 4407.226630] Code: ffffc318 aa1e03e9 d503201f f9416c00 (f9405400)
+>>>> [ 4407.232697] ---[ end trace 0000000000000000 ]---
+>>>>
+>>>>
+>>>> The hns3 driver use page pool like this, just call once when the 
+>>>> driver
+>>>> initialize:
+>>>>
+>>>> static void hns3_alloc_page_pool(struct hns3_enet_ring *ring)
+>>>> {
+>>>>       struct page_pool_params pp_params = {
+>>>>           .flags = PP_FLAG_DMA_MAP | PP_FLAG_PAGE_FRAG |
+>>>>                   PP_FLAG_DMA_SYNC_DEV,
+>>>>           .order = hns3_page_order(ring),
+>>>>           .pool_size = ring->desc_num * hns3_buf_size(ring) /
+>>>>                   (PAGE_SIZE << hns3_page_order(ring)),
+>>>>           .nid = dev_to_node(ring_to_dev(ring)),
+>>>>           .dev = ring_to_dev(ring),
+>>>>           .dma_dir = DMA_FROM_DEVICE,
+>>>>           .offset = 0,
+>>>>           .max_len = PAGE_SIZE << hns3_page_order(ring),
+>>>>       };
+>>>>
+>>>>       ring->page_pool = page_pool_create(&pp_params);
+>>>>       if (IS_ERR(ring->page_pool)) {
+>>>>           dev_warn(ring_to_dev(ring), "page pool creation failed: 
+>>>> %ld\n",
+>>>>                PTR_ERR(ring->page_pool));
+>>>>           ring->page_pool = NULL;
+>>>>       }
+>>>> }
+>>>>
+>>>> And call page_pool_destroy(ring->page_pool)  when the driver 
+>>>> uninitialized.
+>>>>
+>>>>
+>>>> We use two devices, the net port connect directory, and the step of 
+>>>> the
+>>>> test case like below:
+>>>>
+>>>> 1. enable a vf of '7d:00.0':  echo 1 >
+>>>> /sys/class/net/eno1/device/sriov_numvfs
+>>>>
+>>>> 2. use iperf to produce some flows(the problem happens to the side 
+>>>> which
+>>>> runs 'iperf -s')
+>>>>
+>>>> 3. use ifconfig down/up to the vf
+>>>>
+>>>> 4. kill iperf
+>>>>
+>>>> 5. disable the vf: echo 0 > /sys/class/net/eno1/device/sriov_numvfs
+>>>>
+>>>> 6. run 1~5 with another port bd:00.0
+>>>>
+>>>> 7. repeat 1~6
+>>>>
+>>>>
+>>>> And when running this test case, we can found another related 
+>>>> message (I
+>>>> replaced pr_warn() to dev_warn()):
+>>>>
+>>>> pci 0000:7d:01.0: page_pool_release_retry() stalled pool shutdown: id
+>>>> 949, 98 inflight 1449 sec
+>>>>
+>>>>
+>>>> Even when stop the traffic, stop the test case, disable the vf, this
+>>>> message is still being printed.
+>>>>
+>>>> We must run the test case for about two hours to reproduce the 
+>>>> problem.
+>>>> Is there some advise to solve or debug the problem?
+>>>>
+>
 
