@@ -1,154 +1,214 @@
-Return-Path: <netdev+bounces-115310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8792945CA2
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:57:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86AA945C74
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31BC3B218CE
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:57:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93C8B28375C
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EEE1E2112;
-	Fri,  2 Aug 2024 10:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7081DE86A;
+	Fri,  2 Aug 2024 10:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DtmHklPd"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eI9fQ0y9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD581DF681;
-	Fri,  2 Aug 2024 10:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9312A14D2B7
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 10:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722596188; cv=none; b=NMgttN2Jg0phEv8BGo67dL4UgRU1jI1lm6n0q91ZOqeTFL5rxI0FEJM/lBfBIXdbrUvBCK0ByEkzuIUOKLZS5MjLKwe1Ahojm1WuxWXkuESAj27GEMMmu0hfZcYPGM0KyKtYOIhg3pPC9wwSzcigsmYhknerONq9XSehlFuhvxA=
+	t=1722595797; cv=none; b=pwpFLIvMIyYfjl4CrkJu0R/bxNM9FVh4Hmj0K2+x79VVBO+jn0b8YgsTWR/L9lL5GpfkWM7oTpANrdPBhZilARmBht+LypM8UClkZCrIot6R7ddHxDgWD7190k2f3zL4FIpB7O74McbZfqpExiuBkTEF2uBtTNMvw2CR8um4Aac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722596188; c=relaxed/simple;
-	bh=p0uIwvhdMslJ15HiYSN+8dwJcmTVSEEqrRqA5I6sMKM=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=UGONY+rdR+JZuN8kdUxihU19KeLukjmxHl52XIv/Z6+3PR0czyZn2E25fpYhF0F9gcvVmRE4odB8ipzRXtYXgvVwJ8j7bSMEkCB5SfphBMouhdtASm4u3Fh7teFg9KEyMeH2ZXYvjx3VqSPfmRypP/jEqBmn4CfiryUbinzIXUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DtmHklPd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2bZWIDKO7QK63SdQEWdaWdYkEx8EK7NXAOA4z7KnCes=; b=DtmHklPdtrhWJGHoRM2rYpDpWc
-	o3pZhqXOfXPwc2mgQ+g9tNH28IcRUfukvqDbvc3JG8OPxrXQ4uAusoGLDNRNuF2xzhzn46mWlkT9v
-	vzAO4K8JRfo2xQ3YEQjakvFUUTSTkgFbq+OgdXsPyg/gn/RB8Oof2ZeD4RrQ+ST4mb6GeETnK+8I+
-	3V0GpKr0t2MxgXEwhpX7Z2JFcztqbJtWeZokbG5d70Z7PM/Klovy6dFpOJjVnCjgbiJF39AEXOfsJ
-	7c7PGXbR+2a9GLerSZJq+ho6X2nqWnQps9M0o1ig9lEIGhEYiSgUNX/OPwhrAgV4uXcoJJTQvP5bc
-	gdUlgoQQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57304 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1sZpox-0006GF-2y;
-	Fri, 02 Aug 2024 11:47:41 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1sZpov-000eI5-KP; Fri, 02 Aug 2024 11:47:37 +0100
-In-Reply-To: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
-References: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
-From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
+	s=arc-20240116; t=1722595797; c=relaxed/simple;
+	bh=BMOSw0O9baXTXqBSXXYmmjtZgqYqxLS3PnpJx9b/H0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BlATgTjTm+rmbKrw2VqGqDR++qWxg6eSZnvfs2nCdtCR41BWcufyFdKl4EzuKTZUW7BvtYrnKJpivNxO1hyS5YUEncDReeI18QgbsI1itMDVoLN9zoaPEtX+MgdHtujXkwkJJn18cuL+AXpGmhoKcQZ5m6CkWYMl59jjH4kCDkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eI9fQ0y9; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-367940c57ddso4001116f8f.3
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 03:49:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722595793; x=1723200593; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q2/pTjwHdFWxaDItmhEBsOFFXmnEJFPoViM4aY7mBZ8=;
+        b=eI9fQ0y9/YPHCUuv+zyZVk3FfD8uFJE91a1cYxnTC+4yIyNmzLYMTDVCC5C2ZwEUHr
+         nftAjMAixiTJVywaFOkQZjhgvNil9/QXA0pyXcU6tZaZQ88LgMzveb1Gg6P0gzAFn6Ig
+         9Q5OMXvbHgf1hU5bdKz9gHY0rAhAcvHk9sNnDr1wV2K0I41icovWQGlkrekUoY/D0f0/
+         LuAuk65sv2Z0XqeEH4XMprJnFd0O/XJEX98k21nYKKKFWtLPfg7eoomQYn3ekUYVLqn/
+         C3WPdFX1CkMrqCYZbkpONxu6mqUZm/6IW4gHIEYJ9g9nNsFa0cvxe4wLtjBWO2TEqPLf
+         VZDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722595793; x=1723200593;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q2/pTjwHdFWxaDItmhEBsOFFXmnEJFPoViM4aY7mBZ8=;
+        b=C9uW56TmecFu/SYLIvMGbi79bkyq/wE+Z3cXTL/BqbCaZsbZxlPU7axSPUpUv3nVfv
+         GmA2HqPPosprmjSg359lGvN1J8/JuGcXTlA3Qfh5yAENdgYYqnoPCJQ8fqxnOAk6XDqd
+         XJB0fEpedIpQlNVViHRmSfdbnjYJLUk6Nb9ZPZJmtVSg5w2oBzOXra/w5Xg5PX8cuyys
+         KNv6oPqP72Zr6bp6+Mwryj+mS6UZsuKERMyfwlKM/i7dlxD8y+h4EiL6GbifnNFTlzv5
+         jVbqsvUN53aQv5v+I59h0zmIyBlNnxJJvD1mJTjQZW2g6ZtuHV3wtYQWRK6+YXkwR/bO
+         5QFA==
+X-Gm-Message-State: AOJu0YyUDA9dvI8bt9DPDNpgLXKKpTC9e90gs5oFNtllI1WIPFNOsdch
+	gbpcNPVD3dZZlfDtomap5FQD82N97FkgciefwaexeNTfm+rbzkp8ye6ngxyuqQo=
+X-Google-Smtp-Source: AGHT+IGoWNSu7JSzo/yVYVdi8UQ2q1j8HW+36/E/Zi6fvVF5oRGKJ/CFA0B84WZFIuuw+PyU3PGSqA==
+X-Received: by 2002:a05:6000:1faf:b0:368:d0d:a5d6 with SMTP id ffacd0b85a97d-36bbc1beb75mr2026661f8f.50.1722595792334;
+        Fri, 02 Aug 2024 03:49:52 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf0dc8fsm1668340f8f.6.2024.08.02.03.49.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 03:49:51 -0700 (PDT)
+Date: Fri, 2 Aug 2024 12:49:50 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next 14/14] net: stmmac: Activate Inband/PCS flag based on
- the selected iface
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
+Message-ID: <Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+ <ZquJWp8GxSCmuipW@nanopsycho.orion>
+ <8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1sZpov-000eI5-KP@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 02 Aug 2024 11:47:37 +0100
+In-Reply-To: <8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
 
-From: Serge Semin <fancer.lancer@gmail.com>
+Thu, Aug 01, 2024 at 05:12:01PM CEST, pabeni@redhat.com wrote:
+>On 8/1/24 15:10, Jiri Pirko wrote:
+>> Tue, Jul 30, 2024 at 10:39:45PM CEST, pabeni@redhat.com wrote:
+>> > +    type: enum
+>> > +    name: scope
+>> > +    doc: the different scopes where a shaper can be attached
+>> > +    render-max: true
+>> > +    entries:
+>> > +      - name: unspec
+>> > +        doc: The scope is not specified
+>> > +      -
+>> > +        name: port
+>> > +        doc: The root for the whole H/W
+>> 
+>> What is this "port"?
+>
+>~ a wire plug.
 
-The HWFEATURE.PCSSEL flag is set if the PCS block has been synthesized
-into the DW GMAC controller. It's always done if the controller supports
-at least one of the SGMII, TBI, RTBI PHY interfaces. If none of these
-interfaces support was activated during the IP-core synthesize the PCS
-block won't be activated either and the HWFEATURE.PCSSEL flag won't be
-set. Based on that the RGMII in-band status detection procedure
-implemented in the driver hasn't been working for the devices with the
-RGMII interface support and with none of the SGMII, TBI, RTBI PHY
-interfaces available in the device.
+What's "wire plug"? What of existing kernel objects this relates to? Is
+it a devlink port?
 
-Fix that just by dropping the dma_cap.pcs flag check from the conditional
-statement responsible for the In-band/PCS functionality activation. If the
-RGMII interface is supported by the device then the in-band link status
-detection will be also supported automatically (it's always embedded into
-the RGMII RTL code). If the SGMII interface is supported by the device
-then the PCS block will be supported too (it's unconditionally synthesized
-into the controller). The later is also correct for the TBI/RTBI PHY
-interfaces.
 
-Note while at it drop the netdev_dbg() calls since at the moment of the
-stmmac_check_pcs_mode() invocation the network device isn't registered. So
-the debug prints will be for the unknown/NULL device.
+>
+>> > +      -
+>> > +        name: netdev
+>> > +        doc: The main shaper for the given network device.
+>> > +      -
+>> > +        name: queue
+>> > +        doc: The shaper is attached to the given device queue.
+>> > +      -
+>> > +        name: detached
+>> > +        doc: |
+>> > +             The shaper is not attached to any user-visible network
+>> > +             device component and allows nesting and grouping of
+>> > +             queues or others detached shapers.
+>> 
+>> What is the purpose of the "detached" thing?
+>
+>I fear I can't escape reusing most of the wording above. 'detached' nodes
+>goal is to create groups of other shapers. i.e. queue groups,
+>allowing multiple levels nesting, i.e. to implement this kind of hierarchy:
+>
+>q1 ----- \
+>q2 - \SP / RR ------
+>q3 - /    	    \
+>	q4 - \ SP -> (netdev)
+>	q5 - /	    /
+>                   /
+>	q6 - \ RR
+>	q7 - /
+>
+>where q1..q7 are queue-level shapers and all the SP/RR are 'detached' one.
+>The conf. does not necessary make any functional sense, just to describe the
+>things.
 
-Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-[rmk: fix build errors, only use PCS for SGMII if priv->dma_cap.pcs is set]
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+Can you "attach" the "detached" ones? They are "detached" from what?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 3e43f2d6d49f..a9b5e2a34b10 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1133,18 +1133,10 @@ static void stmmac_check_pcs_mode(struct stmmac_priv *priv)
- {
- 	int interface = priv->plat->mac_interface;
- 
--	if (priv->dma_cap.pcs) {
--		if ((interface == PHY_INTERFACE_MODE_RGMII) ||
--		    (interface == PHY_INTERFACE_MODE_RGMII_ID) ||
--		    (interface == PHY_INTERFACE_MODE_RGMII_RXID) ||
--		    (interface == PHY_INTERFACE_MODE_RGMII_TXID)) {
--			netdev_dbg(priv->dev, "PCS RGMII support enabled\n");
--			priv->hw->pcs = STMMAC_PCS_RGMII;
--		} else if (interface == PHY_INTERFACE_MODE_SGMII) {
--			netdev_dbg(priv->dev, "PCS SGMII support enabled\n");
--			priv->hw->pcs = STMMAC_PCS_SGMII;
--		}
--	}
-+	if (phy_interface_mode_is_rgmii(interface))
-+		priv->hw->pcs = STMMAC_PCS_RGMII;
-+	else if (priv->dma_cap.pcs && interface == PHY_INTERFACE_MODE_SGMII)
-+		priv->hw->pcs = STMMAC_PCS_SGMII;
- }
- 
- /**
--- 
-2.30.2
 
+>
+>> > +    -
+>> > +      name: group
+>> > +      doc: |
+>> > +        Group the specified input shapers under the specified
+>> > +        output shaper, eventually creating the latter, if needed.
+>> > +        Input shapers scope must be either @queue or @detached.
+>> > +        Output shaper scope must be either @detached or @netdev.
+>> > +        When using an output @detached scope shaper, if the
+>> > +        @handle @id is not specified, a new shaper of such scope
+>> > +        is created and, otherwise the specified output shaper
+>> > +        must be already existing.
+>> 
+>> I'm lost. Could this designt be described in details in the doc I asked
+>> in the cover letter? :/ Please.
+>
+>I'm unsure if the context information here and in the previous replies helped
+>somehow.
+>
+>The group operation creates and configure a scheduling group, i.e. this
+>
+>q1 ----- \
+>q2 - \SP / RR ------
+>q3 - /    	    \
+>	q4 - \ SP -> (netdev)
+>	q5 - /	    /
+>                   /
+>	q6 - \ RR
+>	q7 - /
+>
+>can be create with:
+>
+>group(inputs:[q6, q7], output:[detached,parent:netdev])
+>group(inputs:[q4, q5], output:[detached,parent:netdev])
+>group(inputs:[q1], output:[detached,parent:netdev])
+>group(inputs:[q2,q3], output:[detached,parent:<the detached shaper create
+>above>])
+
+So by "inputs" and "output" you are basically building a tree. In
+devlink rate, we have leaf and node, which is in sync with standard tree
+terminology.
+
+If what you are building is tree, why don't you use the same
+terminology? If you are building tree, you just need to have the link to
+upper noded (output in your terminology). Why you have "inputs"? Isn't
+that redundant?
+
+If this is not tree, what's that? Can for example q6 be input of 2
+different groups? How is that supposed to work?
+
+
+>
+>I'm unsure if this the kind of info you are looking for?
+
+I'm trying to understand the design. Have to say I'm just confused :/
+
+
+>
+>Thanks,
+>
+>Paolo
+>
 
