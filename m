@@ -1,159 +1,198 @@
-Return-Path: <netdev+bounces-115235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 990EF945904
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:38:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D90AD945913
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52A642864C9
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 07:37:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C69F1F2321F
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 07:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527D51BE86D;
-	Fri,  2 Aug 2024 07:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBE0482CA;
+	Fri,  2 Aug 2024 07:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8pNbQAP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U/ww133O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A64E45020;
-	Fri,  2 Aug 2024 07:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39BD335C0
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 07:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722584275; cv=none; b=s5dpsZu8k4gAOMX3dQIKIauC2JouxnoAVSmpWRbEqhpysBXefnOG0lQBPP6NjlDPAh7+xeo04LYLTei4phlrdseMudxh/GJKJhSfhxDOFRfksbBfYwNid+lYaeT7e+2VvDS5Yu2KXGKbJ6/TNac7eVS4vJpxUbbTfamFVJGcKls=
+	t=1722584444; cv=none; b=lIEgmgK2tvZPPOexsiEhVVc6z7Lj6xuLojYcBbOSuiTGzcZxA/tRz1jfERO1YdwZwdPqENx2vfKLJWP8OxChHuJCkxiove4PQ10wdk3dMlV4WmdBtvS4Yz2xzfif8xe97B4xNqTc+5FcARMaZd5aaG49utbRtBbreEwLbQJj6hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722584275; c=relaxed/simple;
-	bh=442BEwgQZkNvyntWB/mlPJnY/PPnoqx1uEiiossTppU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uP2VJSMlEepnkrg+K9rwj8kpn/Dzo/5zVzVvy7CJ/l8D7/skxYGM+4JovN7ctYIYi7k9PQkfvIf+ASZvDWZ00cd/LinzARHGNRcqfJIX5eiL6bQYai8jp3edR1AICxSRNkAbfLiXba1UpRickH+xKeaBVrS+Leqt6D2JYFVW2iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i8pNbQAP; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52f01b8738dso8089125e87.1;
-        Fri, 02 Aug 2024 00:37:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722584271; x=1723189071; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VEul01c7Y76/vYgRcbl6yWvRBJXnnoj1/y3jzSU/8/8=;
-        b=i8pNbQAPDnn8RzniPSV4nRDgHa3MTkwnKDwB4Ts4KWgJNKmN/mTiOSFBM7x7Jf2/Sg
-         5FJkEOyvtCPDQzy1l3+CXTWLUCh/gnN4OBTEEXkJcXw/UaYSO/QBHUChyG1IhCp9t50E
-         RjMJ/FdSzAwex8GKGKnQMpnxX/PZPhGLi/sd4HW5bGkNv1dd7FR+UlV75WoFnYQotgrT
-         iAQLTIvld+1/Y5Mhn4e6IvAU0CQvSiRGSfdB7lROmoX3dpyYaiCALXl/sDq5s8QpN9gb
-         ztfnaPNxZK8yTBI9OMi6u4w1IefkKlXkhSLSyjkzqDjQ2SoxOF9yPULnDkz0EIGXwchO
-         qzfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722584271; x=1723189071;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VEul01c7Y76/vYgRcbl6yWvRBJXnnoj1/y3jzSU/8/8=;
-        b=TXrMBbJK8EKHMwiA6RHjrUpbgzCaylfiUhGG2+CB7W4yOIs04iZwX5S58QXVk0xSK1
-         du+83NjSb1IjsVQEQ9DOjmnp8KNGVGSsgAKkoENWlNTT9vv3ZCQEYEKWfs0elbkc8Ehq
-         j3DFww3NTuh62p7tcw1a0rUJhG5povrdkmUncomDu7Cw6GSMQYBRLGWI7YTf5hebauv0
-         NRYRtBKdQAC3dQ0pDkQo8I/JegokO4FVTPkiEbE8VoeHb802Qsu2WQ9hD/zOXPXE5bYW
-         m+pZX9rtOT3y51/+lKfsy6ccFImQQxvh0CSMu76uPzF5Pzy9GucEQdS5ZeO9qunwbpT/
-         Xkcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ6uMFjmkNQ8YLT9bnwb3hx16+FhPWOEXM7eqqtX6d4jQQTcJQYqo4URFnIjGN6h/pEuDR+SDeuIxJAYlutExT0/kNIrfWC8cUwguBFOzoBF8Jpf2M3zuqnQuXao+eudLU3Dr18JFyJh2zDkrp3kD6vL3orCdDDHZ+vLFBUEn7Jxd800iSJOad1tBpxf78+IlisNkIV3u/SXATMWZnr9QAjR55kPd7yincrKJhJtS4beTN4UmtHR/bnQ==
-X-Gm-Message-State: AOJu0YzRnkQ18SbQqMOu5LPZH83VObSqufhBVsgO6D2lIduTGKk37z1v
-	9w9qfigc7gMn6djLxSUP1Z2YF7Zn4yNWpVWB1nXjSABu515HvFWK
-X-Google-Smtp-Source: AGHT+IEHnlmTy7PUXPtQ9CQBEllQgwVpgIZH7F4dD5CQheEpZWQkcMNTvJS4jYPpRUf+JDphV9EeJw==
-X-Received: by 2002:a05:6512:b1a:b0:52e:9c69:b25b with SMTP id 2adb3069b0e04-530bb37c2a5mr1274908e87.28.1722584271076;
-        Fri, 02 Aug 2024 00:37:51 -0700 (PDT)
-Received: from [192.168.0.31] (84-115-213-37.cable.dynamic.surfer.at. [84.115.213.37])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd06df9esm1247001f8f.100.2024.08.02.00.37.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Aug 2024 00:37:50 -0700 (PDT)
-Message-ID: <9083938c-c2df-4429-904d-700e5021331c@gmail.com>
-Date: Fri, 2 Aug 2024 09:37:48 +0200
+	s=arc-20240116; t=1722584444; c=relaxed/simple;
+	bh=yf7JvjFb12zXoVgaLL+REN5LJTOUXS47VSPFf/+59z4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cXVBqIPtqvAJbGE48ijK/yWMivQ8Dz5RhCMtpY59SUBmw06MlVluoKqMdHxZFf7Pm0rG32iUHWUVVK/u1H/JPOuvTC6rRkOi9ub+WZIvqN5p0LF+98K4XIejkpTShfv5OQymQKLheTbthZClIhb6UsD78yr744MwNpJDpYDXDu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U/ww133O; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722584443; x=1754120443;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yf7JvjFb12zXoVgaLL+REN5LJTOUXS47VSPFf/+59z4=;
+  b=U/ww133OWBWFGrKLhhvbjHuO6bnvLGx5Y1MVdtsRMUA35gTeHCGteD+a
+   sGsVj1fE3SvRBQApjqZ1ZqUsrTR7L5ehwLvzp4GGCHDUwgpAqMyaGu1zv
+   NLeZjb2cVpHoCtWAkeAgS+WztJ3XIJdkKUzHgKbcnk1mSf0K7FdxN959A
+   ZTpg31maxGn5Tage852vrXY0fOMQBbcUVTCZtKzj324y7QBRDiyCqtwvs
+   pNcaHSDbvddUHAGsfMfAgI1xcZR4/C5fZ0aDPvOCHOfQ+A8WWhfyG5vRT
+   uW1dyXEsTIBNKYtHOyhUodvfOzrGCOXRi4oxv8GN131LH++iH+WU/d/1f
+   Q==;
+X-CSE-ConnectionGUID: n386TayiTDypti82Mkn8jQ==
+X-CSE-MsgGUID: XoAzflV9SO27tUtTG9V7Bg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11151"; a="20172521"
+X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
+   d="scan'208";a="20172521"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:40:42 -0700
+X-CSE-ConnectionGUID: RrT9810NSoCGpQgaot80Sw==
+X-CSE-MsgGUID: /K/yc8miRe6NoQcDm+qZ7w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
+   d="scan'208";a="55239813"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:40:38 -0700
+Date: Fri, 2 Aug 2024 09:38:55 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org, jiri@nvidia.com,
+	shayd@nvidia.com, wojciech.drewek@intel.com, horms@kernel.org,
+	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
+	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
+	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
+	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com
+Subject: Re: [PATCH net-next v2 00/15][pull request] ice: support devlink
+ subfunction
+Message-ID: <ZqyND4Z4217q+zE+@mev-dev.igk.intel.com>
+References: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
+ <ZqyK/xHkGEFEX+8Q@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: (subset) [PATCH v2 0/6] use device_for_each_child_node() to
- access device child nodes
-To: Lee Jones <lee@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
- Daniel Scally <djrscally@gmail.com>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Sakari Ailus <sakari.ailus@linux.intel.com>, Jean Delvare
- <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
- Pavel Machek <pavel@ucw.cz>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andreas Kemnade <andreas@kemnade.info>, linux-acpi@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org,
- linux-leds@vger.kernel.org, netdev@vger.kernel.org,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
-References: <20240721-device_for_each_child_node-available-v2-0-f33748fd8b2d@gmail.com>
- <172192488125.1053789.17350723750885690064.b4-ty@kernel.org>
- <094c7d7f-749f-4d8f-9254-f661090e4350@gmail.com>
- <20240801123901.GC6756@google.com>
-Content-Language: en-US, de-AT
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-In-Reply-To: <20240801123901.GC6756@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZqyK/xHkGEFEX+8Q@mev-dev.igk.intel.com>
 
-On 01/08/2024 14:39, Lee Jones wrote:
-> On Mon, 29 Jul 2024, Javier Carrasco wrote:
+On Fri, Aug 02, 2024 at 09:30:07AM +0200, Michal Swiatkowski wrote:
+> On Wed, Jul 31, 2024 at 03:10:11PM -0700, Tony Nguyen wrote:
+> > Michal Swiatkowski says:
+> > 
+> > Currently ice driver does not allow creating more than one networking
+> > device per physical function. The only way to have more hardware backed
+> > netdev is to use SR-IOV.
+> > 
+> > Following patchset adds support for devlink port API. For each new
+> > pcisf type port, driver allocates new VSI, configures all resources
+> > needed, including dynamically MSIX vectors, program rules and registers
+> > new netdev.
+> > 
+> > This series supports only one Tx/Rx queue pair per subfunction.
+> > 
+> > Example commands:
+> > devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
+> > devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
+> > devlink port function set pci/0000:31:00.1/1 state active
+> > devlink port function del pci/0000:31:00.1/1
+> > 
+> > Make the port representor and eswitch code generic to support
+> > subfunction representor type.
+> > 
+> > VSI configuration is slightly different between VF and SF. It needs to
+> > be reflected in the code.
+> > ---
+> > v2:
+> > - Add more recipients
+> > 
+> > v1: https://lore.kernel.org/netdev/20240729223431.681842-1-anthony.l.nguyen@intel.com/
+> > 
+> > The following are changes since commit 990c304930138dcd7a49763417e6e5313b81293e:
+> >   Add support for PIO p flag
+> > and are available in the git repository at:
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+> > 
+> > Michal Swiatkowski (8):
+> >   ice: treat subfunction VSI the same as PF VSI
+> >   ice: make representor code generic
+> >   ice: create port representor for SF
+> >   ice: don't set target VSI for subfunction
+> >   ice: check if SF is ready in ethtool ops
+> >   ice: implement netdevice ops for SF representor
+> >   ice: support subfunction devlink Tx topology
+> >   ice: basic support for VLAN in subfunctions
+> > 
+> > Piotr Raczynski (7):
+> >   ice: add new VSI type for subfunctions
+> >   ice: export ice ndo_ops functions
+> >   ice: add basic devlink subfunctions support
+> >   ice: allocate devlink for subfunction
+> >   ice: base subfunction aux driver
+> >   ice: implement netdev for subfunction
+> >   ice: allow to activate and deactivate subfunction
+> > 
+> >  drivers/net/ethernet/intel/ice/Makefile       |   2 +
+> >  .../net/ethernet/intel/ice/devlink/devlink.c  |  47 ++
+> >  .../net/ethernet/intel/ice/devlink/devlink.h  |   1 +
+> >  .../ethernet/intel/ice/devlink/devlink_port.c | 503 ++++++++++++++++++
+> >  .../ethernet/intel/ice/devlink/devlink_port.h |  46 ++
+> >  drivers/net/ethernet/intel/ice/ice.h          |  19 +-
+> >  drivers/net/ethernet/intel/ice/ice_base.c     |   5 +-
+> >  drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   1 +
+> >  drivers/net/ethernet/intel/ice/ice_eswitch.c  | 111 +++-
+> >  drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
+> >  drivers/net/ethernet/intel/ice/ice_ethtool.c  |   7 +-
+> >  drivers/net/ethernet/intel/ice/ice_lib.c      |  52 +-
+> >  drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +
+> >  drivers/net/ethernet/intel/ice/ice_main.c     |  66 ++-
+> >  drivers/net/ethernet/intel/ice/ice_repr.c     | 211 ++++++--
+> >  drivers/net/ethernet/intel/ice/ice_repr.h     |  22 +-
+> >  drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 331 ++++++++++++
+> >  drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  33 ++
+> >  .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.c  |  21 +
+> >  .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.h  |  13 +
+> >  drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+> >  drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
+> >  drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+> >  drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
+> >  .../net/ethernet/intel/ice/ice_vsi_vlan_ops.c |   4 +
+> >  drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
+> >  26 files changed, 1396 insertions(+), 137 deletions(-)
+> >  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
+> >  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
+> >  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.c
+> >  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.h
+> > 
+> > -- 
+> > 2.42.0
+> > 
 > 
->> On 25/07/2024 18:28, Lee Jones wrote:
->>> On Sun, 21 Jul 2024 17:19:00 +0200, Javier Carrasco wrote:
->>>> This series aims to clarify the use cases of:
->>>>
->>>> - device_for_each_child_node[_scoped]()
->>>> - fwnode_for_each_available_child_node[_scoped]()
->>>>
->>>> to access firmware nodes.
->>>>
->>>> [...]
->>>
->>> Applied, thanks!
->>>
->>> [3/6] leds: bd2606mvv: fix device child node usage in bd2606mvv_probe()
->>>       commit: 75d2a77327c4917bb66163eea0374bb749428e9c
->>> [4/6] leds: is31fl319x: use device_for_each_child_node_scoped() to access child nodes
->>>       commit: 0f5a3feb60aba5d74f0b655cdff9c35aca03e81b
->>> [5/6] leds: pca995x: use device_for_each_child_node() to access device child nodes
->>>       (no commit info)
->>>
->>> --
->>> Lee Jones [李琼斯]
->>>
->>
->> Hi Lee,
->>
->> could you please tell me where you applied them? I rebased onto
->> linux-next to prepare for v3, and these patches are still added on top
->> of it. Can I find them in some leds/ branch? Thank you.
+> [offlist]
+
+Sorry, for that, forgot to remove CC, before sending. Hope it is not a
+problem.
+
+Mail client should have feature like for attachments:
+"There is offlisti keyword, are you sure you want to CC someone" :p
+
 > 
-> Sorry, I was side-tracked before pushing.
+> Hi Tony,
 > 
-> Pushed now.  They should be in -next tomorrow.
+> Am I correct that now I should send v6 to iwl (+CC netdev) when you
+> remove the patchset from dev-queue? I am little confused with Jiri
+> comment about versioning PR. I though it is usuall thing.
 > 
-
-Thanks, I see
-
-[3/6] leds: bd2606mvv: fix device child node usage in bd2606mvv_probe()
-
-[4/6] leds: is31fl319x: use device_for_each_child_node_scoped() to
-access child nodes
-
-applied to -next, but
-
-[5/6] leds: pca995x: use device_for_each_child_node() to access device
-child nodes
-
-has not been applied yet.
+> I already have done the changes that Jiri asked for (and Maciej from
+> previous version).
+> 
+> Thanks,
+> Michal
 
