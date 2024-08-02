@@ -1,55 +1,71 @@
-Return-Path: <netdev+bounces-115375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F44E9460D0
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:48:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04AF1946125
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 17:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCBC7281B9F
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:48:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27EF51C213E3
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 15:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0550E136357;
-	Fri,  2 Aug 2024 15:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394B21537C0;
+	Fri,  2 Aug 2024 15:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQQS81qF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YV/dypFC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D221E136343;
-	Fri,  2 Aug 2024 15:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09C21A34D2;
+	Fri,  2 Aug 2024 15:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722613722; cv=none; b=PPcBTBftbWudU3m/mrbDZnpsiBGOwDBEWiUQTHqL1vNlhw62bDA50Mkx3Yr4QRYMezl0qo4OpjQrH1KrL/1Gi4VgLym4YKb6EURqiSxGJX/fEB6L61WKuYR182dGl8I2xleSOl2odacFo4eDEABU9qKgVI0ZT71NAfhSO7R8IBs=
+	t=1722614260; cv=none; b=rHgbRnEO6hKtVrKjwSx1GGbT/S1+n27DD3dJ9/1SNzYWAQbG8bKX56dmyOKlkRd5zOxNlKCoFlKkMMSUMzzBcixuS8uflxHHwUEm9IzcsWr4ZUVNc0RShPHnELeyWeovreFMc4XIhzBKwO8eCuHZhxIYS+s53aMAQIr/9du78CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722613722; c=relaxed/simple;
-	bh=Tyha5C4gVzz41FvnK6/fBCZ+kEp1ykWcmMMXkD85bjs=;
+	s=arc-20240116; t=1722614260; c=relaxed/simple;
+	bh=SygGhejwtugE49KfkjCbD9EIloYT99XipGcKa/8Qp3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ukLurwQhnJ24vZjJ4kiptq6L7gbo6cm147/QcpC19H5CcPIzz3T/3QjMPlic5XInXPVp7BENUXyxoT4sfJvsTqo9v/Hv0cZ4OaFu3UneOwsRp1EVaZQNzLbazitWjn6mJdsnMdfS0bT6RkCY/L3w+RX3ok2F//RoTL/md5PS1TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQQS81qF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1343C32782;
-	Fri,  2 Aug 2024 15:48:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8emdCg5Sy8QlvYi8CJ/bMu46XSTdtKMhy0HaEgKMQrajZ2p8Dbmva6m0qfMDDoLS9XyVUEuR6H4Fgi6in+JP+o4rqhcEWwlxvLL4nYtXChimzFXL/xeyP1yd/OW7zcsiC6QESGRsFpe1dpHlCGRH8owSwsFCrTNsoZPwnQG/oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YV/dypFC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA571C32782;
+	Fri,  2 Aug 2024 15:57:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722613722;
-	bh=Tyha5C4gVzz41FvnK6/fBCZ+kEp1ykWcmMMXkD85bjs=;
+	s=k20201202; t=1722614259;
+	bh=SygGhejwtugE49KfkjCbD9EIloYT99XipGcKa/8Qp3w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VQQS81qFSU5xugoq7RSuDa15HZdoOBrzwCwvMXmeTjAJED3ldTdM8uqdORAGQlmxb
-	 95nRVRJOVnFkP+U9+0mWNyIT2aQhP7JwGESy7mnN8WLh6UVupeQVPCzwInmEG+QCAQ
-	 DLNvLsv6KCQcZiKIhTQ2E7IihwGLDy2ABJTL2bwLBLXnuIzfypGz3evA4pNL1e+/6X
-	 A2dTrqNb20bAJPW6RRtXWz6V1bcSOgAjOJTModkDIuR+aYv4T61j5zj+69FxeiIGz1
-	 y1ieyC1o1ozhxwH5TqZYOto6z36bcVBJ/jl0P1UfH6VAxX3DgoK7l2YBPhrfdYKyPB
-	 +CE+mJyTcsDTw==
-Date: Fri, 2 Aug 2024 16:48:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, u.kleine-koenig@pengutronix.de,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ftgmac100: Get link speed and duplex for NC-SI
-Message-ID: <20240802154838.GG2504122@kernel.org>
-References: <20240802083332.2471281-1-jacky_chou@aspeedtech.com>
+	b=YV/dypFCvqgZ0QSl5sAYt59iH5qph/Em1mQCDHFp5p1EXgVTccPJze54MVp9Zr+/I
+	 JO8rEQ6tU+2BC7I4+NOVw53jOxNHRZ/LkzvFq8XpQzGw5LpzM6YVwTcKeFxDjjj/oJ
+	 IWwoJYKN4Ms3W2TVg8ro4CdBtyY3mIPUjpt6VFeFLEgDiyUttDt/NpVbFODhzh7l7q
+	 uAF2iOAUUaXBmjHcqwpa+PCo+a9VHO0vqV+xBgLijA/+2dIMbBiHfxE+klmdgCKqVE
+	 z/UKQx7S2bXzi4xvlL8fEnnVdEaVbH+aJoWCwsKAtoAfXYlolgjk/X29WsHcb9vDTK
+	 70B1ZSmRoiV7w==
+Date: Fri, 2 Aug 2024 18:57:34 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
+	Itay Avraham <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	patches@lists.linux.dev
+Subject: Re: [PATCH v2 5/8] fwctl: FWCTL_RPC to execute a Remote Procedure
+ Call to device firmware
+Message-ID: <20240802155734.GJ4209@unreal>
+References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+ <5-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+ <20240730080038.GA4209@unreal>
+ <20240801125829.GA2809814@nvidia.com>
+ <20240801172631.GI4209@unreal>
+ <20240802145946.000002e7@Huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,53 +74,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240802083332.2471281-1-jacky_chou@aspeedtech.com>
+In-Reply-To: <20240802145946.000002e7@Huawei.com>
 
-On Fri, Aug 02, 2024 at 04:33:32PM +0800, Jacky Chou wrote:
-> The ethtool of this driver uses the phy API of ethtool
-> to get the link information from PHY driver.
-> Because the NC-SI is forced on 100Mbps and full duplex,
-> the driver connects a fixed-link phy driver for NC-SI.
-> The ethtool will get the link information from the
-> fixed-link phy driver.
+On Fri, Aug 02, 2024 at 02:59:46PM +0100, Jonathan Cameron wrote:
+> On Thu, 1 Aug 2024 20:26:31 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
 > 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/ethernet/faraday/ftgmac100.c | 37 ++++++++++++++----------
->  1 file changed, 21 insertions(+), 16 deletions(-)
+> > On Thu, Aug 01, 2024 at 09:58:29AM -0300, Jason Gunthorpe wrote:
+> > > On Tue, Jul 30, 2024 at 11:00:38AM +0300, Leon Romanovsky wrote:  
+> > > > > +
+> > > > > +	void *inbuf __free(kvfree) =
+> > > > > +		kvzalloc(cmd->in_len, GFP_KERNEL | GFP_KERNEL_ACCOUNT);  
+> > > > 
+> > > > 
+> > > > <...>
+> > > >   
+> > > > > +	out_len = cmd->out_len;
+> > > > > +	void *outbuf __free(kvfree_errptr) = fwctl->ops->fw_rpc(
+> > > > > +		ucmd->uctx, cmd->scope, inbuf, cmd->in_len, &out_len);  
+> > > > 
+> > > > I was under impression that declaration of variables in C should be at the beginning
+> > > > of block. Was it changed for the kernel?  
+> > > 
+> > > Yes, the compiler check blocking variables in the body was disabled to
+> > > allow cleanup.h
+> > > 
+> > > Jonathan said this is the agreed coding style to use for this  
+> > 
+> > I'm said to hear that.
 > 
-> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-> index fddfd1dd5070..0c820997ef88 100644
-> --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> @@ -26,6 +26,7 @@
->  #include <linux/of_net.h>
->  #include <net/ip.h>
->  #include <net/ncsi.h>
-> +#include <linux/phy_fixed.h>
->  
->  #include "ftgmac100.h"
->  
-> @@ -50,6 +51,15 @@
->  #define FTGMAC_100MHZ		100000000
->  #define FTGMAC_25MHZ		25000000
->  
-> +/* For NC-SI to register a fixed-link phy device */
-> +struct fixed_phy_status ncsi_phy_status = {
-> +	.link = 1,
-> +	.speed = SPEED_100,
-> +	.duplex = DUPLEX_FULL,
-> +	.pause = 0,
-> +	.asym_pause = 0
-> +};
+> Was passing on a statement Linus made (not digging it out right now)
+> that he really wanted to be able see constructors and destructors
+> together.
 
-nit: This structure is only used in this file, so it should be static
+The thing is that we are talking about the same thing. I and Linus want
+to keep locality of variables declaration and initialization. I don't
+know the Linus's stance on it, but I'm sad that to achieve that for
+cleanup.h, very useful feature of GCC (keep variables at the beginning
+of the block) was disabled.
 
-> +
->  struct ftgmac100 {
->  	/* Registers */
->  	struct resource *res;
+Right now, you can declare variables in any place and it is harder to
+review the code now. It is a matter of time when we will see code like
+this and start to chase bugs introduced by this pattern:
 
--- 
-pw-bot: cr
+int f()
+{
+	<some code>
+	int i;
+	<some code>
+	return something;
+}
+
+Thanks
+
+> 
+> The other part is that in some cases you can end up with non
+> obvious ordering bugs because the cleanup is the reverse of the
+> declarations, not the constructors being called.
+> Whilst it is fairly easy to review for this, future code reorganization
+> may well lead to subtle bugs, typically in error paths etc.
+> 
+> Putting the declaration inline avoids this potential problem
+> 
+> Dan wrote a style guide proposal.
+> https://lore.kernel.org/all/171175585714.2192972.12661675876300167762.stgit@dwillia2-xfh.jf.intel.com/
+> [PATCH v3] cleanup: Add usage and style documentation
+> 
+> seems it died out without anyone applying it.  I've poked.
+> 
+> Jonathan
+> 
+> > 
+> > Thanks
+> > 
+> > > 
+> > > Jason  
+> > 
+> 
+> 
 
