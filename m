@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-115255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827989459E7
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:30:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5DF2945A01
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B12341C23108
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:30:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A1F2B237C3
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B9E1BF318;
-	Fri,  2 Aug 2024 08:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAlTSE9m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCE41C3787;
+	Fri,  2 Aug 2024 08:33:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE161BF30C;
-	Fri,  2 Aug 2024 08:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176A01C378A;
+	Fri,  2 Aug 2024 08:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722587432; cv=none; b=tfKowTjMV+HUD3HKRUgICDW/ZlKgKEkK+gBFPFyc1FClPAocd8sis/BDbhhzXgheEV3KJFZhvVI1LiSL6gwbxLrcXa5wQk4lMSMU3v0dx0MDK+1jfYcFR+lEXhGTIU++YKO5NhfHLDurRbXhXoZV+ieYJ7cI5RxW3p2gaEZhOEU=
+	t=1722587625; cv=none; b=svlKIanPbgBkmXPGsdrzRkCoEgtzJDgutl37YAt3USWKGOUbe8ZGSRCNSSD7mrja/dWhH3UaNSdvtWvEuxAMvN+W9viYz8awV12xvRAqQYtNOMQ8AvdsY9Q/QIIOlpDcpJMxSStn5au5htB1FVHuwVYbWJmLKbCDZtqzk+ExlnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722587432; c=relaxed/simple;
-	bh=6WMpdjlol5l0iHOC17lwxSuTbJY8SqxdvaO51gx5V64=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=k/iANKC6H0w/N2Abg57/pb4Ay/2UZH0OgHJ6uiCSi61ug+NOZiwt27w0vs07aJgIERdd053+K0pWsWyhT3bqO0ECjTy063i5WAxI/7rgFE2LO7xMESH1n4JND/jIHtAm7e0TeZbvWNnKnWaGv66pRaRIiUEMQur61gSQnMHooic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAlTSE9m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F27A4C4AF0A;
-	Fri,  2 Aug 2024 08:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722587432;
-	bh=6WMpdjlol5l0iHOC17lwxSuTbJY8SqxdvaO51gx5V64=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eAlTSE9m3F/pO+sxKo8tm4I5ZBhKX2unoAh/W3BWblqFUl3PBZZ8qlxA3/kMuTlzg
-	 DNd1rutEsB0bVKOALnvvFrRyK7z6UcGMlqnqu4GHlTIHpzavQj9w88rxo3KIXzqQsb
-	 z+4zy7ml2Zj3Hvcj0OHfLyf8e9p2QF+8UDenzuMw18SHgNS0CkbgWPWm06CPsL4qiN
-	 w321oZQ9JCk3SFA9E+YHGMHyqXTL5ZQuTRNTmdxiZWAwYhkRlsZHoLktrf+JRcCSI1
-	 UXeHTplMpsNMo3EY3CwrWn5z/PB+8dCZe2gIWjkviaJD7fBclOXOgul7nkxTle1eqh
-	 x53mV+nqUNJAw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0225C4332C;
-	Fri,  2 Aug 2024 08:30:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722587625; c=relaxed/simple;
+	bh=xhJCUY1IAZpwb5N/801Lqr7qkyKYMhiKioef15/Bbqo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sz3JQmnUQWg1QnF25KQU5SCaTPZwkEDnPT5b9OBWN9qgUJrHxKTEf2RbGnSr3IHIbNh8OoK2E6OyfE64EBe+zBp+kF/ulhKLJYA6Sfha/xEl5NBXmo7iLWwhxK+g0iK5CtzEjnjmBuphGapKqlYmzwnfQ/iKvugJ+FfgitW1fys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 2 Aug
+ 2024 16:33:32 +0800
+Received: from twmbx01.aspeed.com (192.168.10.10) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Fri, 2 Aug 2024 16:33:32 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jacky_chou@aspeedtech.com>,
+	<u.kleine-koenig@pengutronix.de>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH] net: ftgmac100: Get link speed and duplex for NC-SI
+Date: Fri, 2 Aug 2024 16:33:32 +0800
+Message-ID: <20240802083332.2471281-1-jacky_chou@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,50 +51,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] ioctl support for AF_VSOCK and
- virtio-based transports
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172258743191.4228.3464399584779982501.git-patchwork-notify@kernel.org>
-Date: Fri, 02 Aug 2024 08:30:31 +0000
-References: <20240730-ioctl-v4-0-16d89286a8f0@outlook.com>
-In-Reply-To: <20240730-ioctl-v4-0-16d89286a8f0@outlook.com>
-To: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>
-Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, stefanha@redhat.com, mst@redhat.com,
- jasowang@redhat.com, eperezma@redhat.com, xuanzhuo@linux.alibaba.com,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- luigi.leonardi@outlook.com, daan.j.demeyer@gmail.com
+Content-Type: text/plain
 
-Hello:
+The ethtool of this driver uses the phy API of ethtool
+to get the link information from PHY driver.
+Because the NC-SI is forced on 100Mbps and full duplex,
+the driver connects a fixed-link phy driver for NC-SI.
+The ethtool will get the link information from the
+fixed-link phy driver.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+---
+ drivers/net/ethernet/faraday/ftgmac100.c | 37 ++++++++++++++----------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
-On Tue, 30 Jul 2024 21:43:05 +0200 you wrote:
-> This patch series introduce the support for ioctl(s) in AF_VSOCK.
-> The only ioctl currently available is SIOCOUTQ, which returns
-> the number of unsent or unacked packets. It is available for
-> SOCK_STREAM, SOCK_SEQPACKET and SOCK_DGRAM.
-> 
-> As this information is transport-dependent, a new optional callback
-> is introduced: unsent_bytes.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4,1/3] vsock: add support for SIOCOUTQ ioctl
-    https://git.kernel.org/netdev/net-next/c/744500d81f81
-  - [net-next,v4,2/3] vsock/virtio: add SIOCOUTQ support for all virtio based transports
-    https://git.kernel.org/netdev/net-next/c/e6ab45005772
-  - [net-next,v4,3/3] test/vsock: add ioctl unsent bytes test
-    https://git.kernel.org/netdev/net-next/c/18ee44ce97c1
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index fddfd1dd5070..0c820997ef88 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -26,6 +26,7 @@
+ #include <linux/of_net.h>
+ #include <net/ip.h>
+ #include <net/ncsi.h>
++#include <linux/phy_fixed.h>
+ 
+ #include "ftgmac100.h"
+ 
+@@ -50,6 +51,15 @@
+ #define FTGMAC_100MHZ		100000000
+ #define FTGMAC_25MHZ		25000000
+ 
++/* For NC-SI to register a fixed-link phy device */
++struct fixed_phy_status ncsi_phy_status = {
++	.link = 1,
++	.speed = SPEED_100,
++	.duplex = DUPLEX_FULL,
++	.pause = 0,
++	.asym_pause = 0
++};
++
+ struct ftgmac100 {
+ 	/* Registers */
+ 	struct resource *res;
+@@ -1492,19 +1502,8 @@ static int ftgmac100_open(struct net_device *netdev)
+ 		return err;
+ 	}
+ 
+-	/* When using NC-SI we force the speed to 100Mbit/s full duplex,
+-	 *
+-	 * Otherwise we leave it set to 0 (no link), the link
+-	 * message from the PHY layer will handle setting it up to
+-	 * something else if needed.
+-	 */
+-	if (priv->use_ncsi) {
+-		priv->cur_duplex = DUPLEX_FULL;
+-		priv->cur_speed = SPEED_100;
+-	} else {
+-		priv->cur_duplex = 0;
+-		priv->cur_speed = 0;
+-	}
++	priv->cur_duplex = 0;
++	priv->cur_speed = 0;
+ 
+ 	/* Reset the hardware */
+ 	err = ftgmac100_reset_and_config_mac(priv);
+@@ -1532,9 +1531,6 @@ static int ftgmac100_open(struct net_device *netdev)
+ 		/* If we have a PHY, start polling */
+ 		phy_start(netdev->phydev);
+ 	} else if (priv->use_ncsi) {
+-		/* If using NC-SI, set our carrier on and start the stack */
+-		netif_carrier_on(netdev);
+-
+ 		/* Start the NCSI device */
+ 		err = ncsi_start_dev(priv->ndev);
+ 		if (err)
+@@ -1794,6 +1790,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 	struct net_device *netdev;
+ 	struct ftgmac100 *priv;
+ 	struct device_node *np;
++	struct phy_device *phydev;
+ 	int err = 0;
+ 
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+@@ -1879,6 +1876,14 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 			err = -EINVAL;
+ 			goto err_phy_connect;
+ 		}
++
++		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
++		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
++					 PHY_INTERFACE_MODE_MII);
++		if (err) {
++			dev_err(&pdev->dev, "Connecting PHY failed\n");
++			goto err_phy_connect;
++		}
+ 	} else if (np && of_phy_is_fixed_link(np)) {
+ 		struct phy_device *phy;
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
