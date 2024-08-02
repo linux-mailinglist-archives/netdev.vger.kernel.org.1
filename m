@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-115402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78953946356
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 20:45:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3644946365
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 20:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3309E2830EE
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 18:45:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DE1B1C21A73
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 18:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3F91547C9;
-	Fri,  2 Aug 2024 18:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16271547F8;
+	Fri,  2 Aug 2024 18:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FV45IUAw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBRV6dEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D4E1ABEA3
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 18:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8021547EF
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 18:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722624323; cv=none; b=TJjPyKZPDR+88WKBziXzlJuvxflLdWbKJlK4fTw4Q4DaZaI5iIqcTNdxcz3Q08qBcNeQdmcdh2CH6Jrs4zN2M8P3A/Sqe7eKEIOfKehAv7U7LyXu3nvjL9eX0hlJ3cZwmcziAskr8JhnTcg8IT0WUWZ59oJm/dmpUic3p0RlvqY=
+	t=1722624736; cv=none; b=CJwbHE0yUyqzHy2omZpFq1nHvy/MF8EJa7LAS522vakDOXJCMC8tdXAK6EYnANjBJ/IYmKpBxdKgdbGPl0zUgwExnIkwv5T4QZWJNk/v5lMEhOj7l1Uo/g6EJNwGfNlytPZCn4ACKBxxJs954Sixb8cWrUxS3/FhwhBR35uWZHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722624323; c=relaxed/simple;
-	bh=6VbM1xTfuy9x8nDg6/hr/99c0BITQcVEab1BgICHmjc=;
+	s=arc-20240116; t=1722624736; c=relaxed/simple;
+	bh=Rcqjex2lBU0wKQMtNrMiM+8XWMnqbPa1RsnpSfVQEtg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jUtc8hPHkvQPkxShzQxztU4zXwOnLIbN76vMEDNPWcVx0ywQjTe5WqNCJ7WlfnaE4BKouoR8bjMW+iy+xFMziW7BSzcjDMKu2xlDqXh9DMVdulPK9HFvg5gk3U5eOFU5/OXAI9S/hXebB0AVeHandX2c0FuDXP+MDbfJoxfNLJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FV45IUAw; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=eYFxY1LbCfGACWXxd5FarTp37EPy5rBRwF52HwdiJwbjY55WqAgVsJAxFPgYWxN01WML7I3XtAgoMGtnQIhNIbYEG3LmiIsq7DRIsiveRgo96NqCg/h/trgTYmKMWdk/nWceVxS1aVxqrPnjkpsrpPeJYPzoA9uWTCMb4WgNtOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DBRV6dEx; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722624319;
+	s=mimecast20190719; t=1722624734;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=K9JQ2Bf0SWejaUXaO1CuoWG99+H3ynJpTMEOSBOBAU8=;
-	b=FV45IUAwD8WubsDylMxR8c0XFfn49ELblSYswLBieXzaoXcJkbHjeHKTwnId8RxgpJyB56
-	AeV5ZT32hzOXS6wyllKA5aKuiRwr92RuAIh7uSzsyk5FCY9SdkBGRww+RVl+g1fw8H5TUf
-	UlacApqnMvqd62cGskYGfahp81V2qZI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CG1jgLVdC2fEObYmK2QTtuJTwCPC+G97aquoLWftjeI=;
+	b=DBRV6dExMHErpcwhj2TzP2IEfrBx76e5LCsZxfvfL+IhaNl7dMwsbsNIhqFLyZCelvgXdh
+	rotNQBU4RtC/QglzQrLUl4PIWq+YQnWKjJ+wlVbcNfX8FNQiXuEC0ugltSib0vqf/J3IdA
+	dOZA9sQT/N1/Ly9YlaUMr7W5Rgvfpus=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-98-TR3LQSi5O_ypKCkVspheTQ-1; Fri, 02 Aug 2024 14:45:18 -0400
-X-MC-Unique: TR3LQSi5O_ypKCkVspheTQ-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-44ff196bbfaso101901061cf.3
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 11:45:18 -0700 (PDT)
+ us-mta-537-kMcVAbSvNaSvEld5yvkDrQ-1; Fri, 02 Aug 2024 14:52:11 -0400
+X-MC-Unique: kMcVAbSvNaSvEld5yvkDrQ-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4501f170533so84151161cf.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 11:52:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722624318; x=1723229118;
+        d=1e100.net; s=20230601; t=1722624730; x=1723229530;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K9JQ2Bf0SWejaUXaO1CuoWG99+H3ynJpTMEOSBOBAU8=;
-        b=b7D/t4Z5pQT183g9H/U+KbI3ghZYk6Sh4aDqMhjhQvN9KoVcgPJhVStaB6rOEDuLvP
-         5vcF9yvrh1pMinSDuHImfwVjQ1d1GnBiDd9i/yACnEz+pbKC+Zx8S6cY+Wr3FcAwLfwh
-         Y3gC5VdzeNLuAd1TCWQ+vepmDzz9hKet/IpEhJBF/qZJyvBqhAdJ+4oj0/9M49sh11C4
-         9YEX/epAdA3xjghLqMK5JGmolNYPO1gV8ChKXM5F/1YxzbuOyvqy5CKpv0ZaP+8H6y2j
-         Yw8LeomMZ+wnwwbc+fBf0un/erJIBqaA/mLp3XmQ21GB3rWkTm+lBGUNOZyRCRWFXHIm
-         SXVA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpMo/X+DLc/l9eeSElTtqoawJNtvLBkkKYwFmDIDbEsa8zWebicZ1NOKb3zDnV4AAFgeQIHXR7B/KSstfIGh9YhSguQ3hX
-X-Gm-Message-State: AOJu0YyRwVL6So7kLobgduMdquxql3pKgmQ0J97AoeWEFrJ57LCFOpKQ
-	jR04QKhS5VlgC1EW9YjXqVXiBnAEHKjG+xk97AUyPR4gvEY7MIQw9SGJ4XvikRzCSr9Zk0DxB28
-	pb7PCaePi/7sCjajSVNoCs7+mMPuzH5fnWp4RrDv15aoHokcHjXIRbA==
-X-Received: by 2002:ac8:7fc4:0:b0:447:ee02:220 with SMTP id d75a77b69052e-451892ad6a7mr52630231cf.30.1722624317894;
-        Fri, 02 Aug 2024 11:45:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEVwPo418K/j4TSG5frJ/PeeWs9ccUUjf6b01FC1y1GFDXNXPuzIYaN0JC6zJzw9tCN9/UwJA==
-X-Received: by 2002:ac8:7fc4:0:b0:447:ee02:220 with SMTP id d75a77b69052e-451892ad6a7mr52629981cf.30.1722624317602;
-        Fri, 02 Aug 2024 11:45:17 -0700 (PDT)
+        bh=CG1jgLVdC2fEObYmK2QTtuJTwCPC+G97aquoLWftjeI=;
+        b=ME8jOrKdcWRoHXO1AsLPx1VxnSxZCrt8eehOVQK4WakYlf6KQA/BMyKMgti413Cx99
+         rO/Z/Px39WkLZXZb0OHAqfISMYDrrksTrP4GTQ1DvOsdsa24mvsIWaxGZvWVK07YsdHq
+         y0dpetZFuzTLsqIlo26xDw8qLMvWEutkIg8F3mbe+ZcdhKv8JP42CiRDMrCcCJZvSUnh
+         G9V+uUXI4fcJKZoR/i/QdKyo/su2RGL0aMpPK+xaovIlfiJCmvjblRuvmFkSSo2nmFQ0
+         iU0CugY5NW+CUlfc4z4dj5S0kgq/h6KAVI+Cb8/V9jbEExuI4xCPhqzyiiBXoY2rs9Du
+         rNNA==
+X-Forwarded-Encrypted: i=1; AJvYcCXiAtJgXtGIuw0xqfUAhV6zNtkBwOI0+fapjZJG9CmfshFt4LpErL3+vxUoKgD2XocW1LYEoZ7ThuZ1vN/YZ7ZOmhKYnwKo
+X-Gm-Message-State: AOJu0YxewZkXssfbsid88VOJQj9qFWqgWpQfHtrLQZadV/+ZguqyO+XS
+	hChlnHdHQI28W7kzR1P5rGgCNLxR5+b41h8e56TkGWpZ7XTnHapS61iIY4LqLSTeU6Onpw+6fS8
+	glQaD5kEt0jnjJ1qqR8c4RN3WVZEBq2HERO1p+TZpdCkRQyLwRZ8xow==
+X-Received: by 2002:a05:622a:34c:b0:447:d4ce:dd26 with SMTP id d75a77b69052e-451892c1523mr52041211cf.56.1722624730525;
+        Fri, 02 Aug 2024 11:52:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaUYKiXGc9VmWENZJ7EtnEJAQEzZy6OYbhTn3EVsmtVqd1bg6xDc1wbjVNcpxbrWR12YCYMA==
+X-Received: by 2002:a05:622a:34c:b0:447:d4ce:dd26 with SMTP id d75a77b69052e-451892c1523mr52040901cf.56.1722624730143;
+        Fri, 02 Aug 2024 11:52:10 -0700 (PDT)
 Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4518a757920sm9405371cf.67.2024.08.02.11.45.16
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4518a755579sm9510731cf.59.2024.08.02.11.52.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 11:45:17 -0700 (PDT)
-Date: Fri, 2 Aug 2024 13:45:14 -0500
+        Fri, 02 Aug 2024 11:52:09 -0700 (PDT)
+Date: Fri, 2 Aug 2024 13:52:07 -0500
 From: Andrew Halaney <ahalaney@redhat.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Serge Semin <fancer.lancer@gmail.com>, 
@@ -84,11 +84,11 @@ Cc: Serge Semin <fancer.lancer@gmail.com>,
 	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
 	Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH net-next 10/14] net: stmmac: move dwmac_ctrl_ane() into
- stmmac_pcs.c
-Message-ID: <4t4wd6bv3gzyzc4nbbszydnagvzgynluy2rb6jtfjxtidrmoqh@62cs3wx52pob>
+Subject: Re: [PATCH net-next 11/14] net: stmmac: pass stmmac_pcs into
+ dwmac_pcs_isr()
+Message-ID: <eyup477eanpmbgldj63cvwwkwqjshweqrve6u2enyzodoqillw@cuzhm7u37rz7>
 References: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
- <E1sZpob-000eHh-4p@rmk-PC.armlinux.org.uk>
+ <E1sZpog-000eHn-8r@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,19 +97,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1sZpob-000eHh-4p@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1sZpog-000eHn-8r@rmk-PC.armlinux.org.uk>
 
-On Fri, Aug 02, 2024 at 11:47:17AM GMT, Russell King (Oracle) wrote:
-> Move dwmac_ctrl_ane() into stmmac_pcs.c, changing its arguments to take
-> the stmmac_priv structure. Update it to use the previously provided
-> __dwmac_ctrl_ane() function, which makes use of the stmmac_pcs struct
-> and thus does not require passing the PCS base address offset.
-> 
-> This removes the core-specific functions, instead pointing the method
-> at the generic method in stmmac_pcs.c.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Fri, Aug 02, 2024 at 11:47:22AM GMT, Russell King (Oracle) wrote:
+> Pass the stmmac_pcs into dwmac_pcs_isr() so that we have the base
+> address of the PCS block available.
 
-Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
+nitpicky, but I think it would be nice say something like "stmmac_pcs
+already contains the base address of the PCS registers. Pass that in
+instead of recalculating the base address again" if I'm following the
+motivation correctly.
+
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+> index 083128e0013c..c73a08dab7b2 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+> @@ -61,18 +61,18 @@
+>  
+>  /**
+>   * dwmac_pcs_isr - TBI, RTBI, or SGMII PHY ISR
+> - * @ioaddr: IO registers pointer
+> + * @spcs: pointer to &struct stmmac_pcs
+>   * @reg: Base address of the AN Control Register.
+>   * @intr_status: GMAC core interrupt status
+>   * @x: pointer to log these events as stats
+>   * Description: it is the ISR for PCS events: Auto-Negotiation Completed and
+>   * Link status.
+>   */
+> -static inline void dwmac_pcs_isr(void __iomem *ioaddr, u32 reg,
+> +static inline void dwmac_pcs_isr(struct stmmac_pcs *spcs,
+>  				 unsigned int intr_status,
+>  				 struct stmmac_extra_stats *x)
+
+Please drop the reg variable from the kerneldoc, you've annihilated it!
+
+Thanks,
+Andrew
 
 
