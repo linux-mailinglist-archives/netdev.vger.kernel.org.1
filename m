@@ -1,83 +1,82 @@
-Return-Path: <netdev+bounces-115269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 783D9945B0A
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:33:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E880D945B0F
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 11:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 240DA1F223E6
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:33:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B9FF1F231DC
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16611DAC69;
-	Fri,  2 Aug 2024 09:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAC01C3794;
+	Fri,  2 Aug 2024 09:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q8NpzUZD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sksh22t1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0EA41DAC4A
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 09:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24C41DAC4A
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 09:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722591150; cv=none; b=BGGRa+B05BemIaT/RmaGHa9NaVA2XRm+nsQ67TwENx7FLv97szl2+IIQVjJhFpv2BgmCcuQOU4U9lfTmf4uO+FdMoXT0VadzdsKliIa+qUoAqVY2TN6jIBM8FL9nUn8u8xrwBZM/tSxyfFNwuVd0GGJHzCuNpmsTf1KrYMzsgtc=
+	t=1722591182; cv=none; b=IQ1IwHs+0q8rEteYe3aNY2IpN2lw/Mysco8mVLrMsSp0KZG558nXGCG7wQn4iRuFy6CgjqTs2l7eugkgmKGTIYJTYkuHIcCqV90iuY3m/wXLISGTqJZRHrbqTnwzsYWGinHfmkJeaJh+/Y5EEqnsZxbIKluRFrHXEiMlZQxgrgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722591150; c=relaxed/simple;
-	bh=Ht8WFx2TeLWnZO0kKiIAoygzBLZP0VV7Ohpp1lnmA+w=;
+	s=arc-20240116; t=1722591182; c=relaxed/simple;
+	bh=AlUPv2MkLJg0dg+B90BqXCcrYz6UkUtfpeJsVH4Xl4A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E/X/I4ZwhrA2H3EEIXMLIraiZRZEUPuVvRQNr0TtRe/hjDaQDByjBLXW4Y1Y/1gd/kEzAOfnLbPCt+vBaAjtoL7YOFHhRa8qwvSOYbA+q80+h5HFXBtLG5vzAcsZrVwGH9FpzO7rCWJmSVWBODVe26q7YZV8q1+raV4Ede3fIds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q8NpzUZD; arc=none smtp.client-ip=209.85.208.47
+	 To:Cc:Content-Type; b=dXQxbAm0BsbWy1b2pR7Xo82zg+FDkQS433MKMayy85xc/Y2Fp9Dx54NGGGtmrwBsQywqdXpo4dHeACIQJTa0lSD7OPWr/c7o+JOi+uRZ0O6HGAtwAIJkm1+UbDuh/Dvphxo8KzWR3g3tWh5By0voJQmXKD8VO9r43lLAUdKCbGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sksh22t1; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5a28b61b880so48429a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 02:32:28 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a18a5dbb23so48420a12.1
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 02:33:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722591147; x=1723195947; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722591179; x=1723195979; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ht8WFx2TeLWnZO0kKiIAoygzBLZP0VV7Ohpp1lnmA+w=;
-        b=q8NpzUZDbBacR8aih2sdjW0Un5DM4sW6CbIATp7vtK13PtmbxTXIb+Dg+aDsUAQuHX
-         dklQ2XbCq7G0eQICSD9HRozmCxaT5/WxoOIK/cf6EpncAe+swATaYBn5DzXQVGaP8Y39
-         bSKpSXocuR1kZVazdmsDDa+TPPiKUgB8o5LJZfOeL/GqNYltM8vZjKsUW1UvrHopRKpb
-         +zDcN7Hacc4B/BgypZ9/5xxuVZNidAQe1KPUnkDcRNyRtZUTso7te5ogWz4y77jHZt+q
-         5wnLkgU5vrYa6jBKkbLHKqRgf95AMW3e/W/fwApKBWSMpz1v9SsaXlxPTxeQWuZXnpno
-         qZdw==
+        bh=QJLw42eX0x5diEp44ayZtOuH0SE7rg9/HVNWOPkzlp8=;
+        b=sksh22t1hT9fWZMLIJT4ywddkCv37bmmK49uVP6aCg4+4Cmq1i/ZjM86kVtwyNOzbl
+         MyBrXQEEozMdj8iZqne/zF2UzDSFfHhqDAfes9TS/0vtAltZzldb8HoXnFrPagqqTkbF
+         BpoIWSQnSPQ5AVToKKpsWizax61TnvypMMnXFEQdPP0ziRgi+ckPLiiGlCc7y/g1UFQj
+         wvnuYTEV7YV7pHyUWc1MVq6arKL6JwdQ4e1ETf69HL3g1B7EmhPeehL8FLGi5E+HZ64o
+         WAqecE9j+nzDPK0P/hMtL2Ngo6i0XJCf3twkbbG17wpzlTtfhOvkQBhrwkg00l/D7T15
+         w+5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722591147; x=1723195947;
+        d=1e100.net; s=20230601; t=1722591179; x=1723195979;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ht8WFx2TeLWnZO0kKiIAoygzBLZP0VV7Ohpp1lnmA+w=;
-        b=Zh4Q6y8wY3bD/GE8CIz01BKcxUYaz6Y2QUJOGwI35px73uHbuCt1VFB1FE8abhMnT7
-         eq/5hx4C2ivnUR5l59sN//Pp27nMYlimBNrjHlkI0zrIUh1er7YaO7ET3kisC+Xy6Vl6
-         D08fFnjTkGtz+BWBdQHshIeyGRM7o9jyQ39J0xbyRaMzdp5lxHVHyKbBCBOLmcQKH48J
-         ArrmoIFJgBjXJFgrtwVRwYLEcp6DJ5+bLt23cpwsPtKjVwZs+3IsZzTIUQhFKwewnmBS
-         puCGVFKatrLXl1qKRj4jwr4Gy+Tw+Qhk9ker071Wy5dzUFcfHgFa25hO70//v8sa+OLP
-         b+5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWIBDtQxP/+PipudJHWP91sFPNoa6RisRHRVPyeyZBvJXphQF+N4rdl4ODeMImiJ/XL727cWaP5O9j66Yrs8wzEY6m2hS89
-X-Gm-Message-State: AOJu0Yy0i2qyknlddXqm8/30jzMYAUmmcn+2qh0/rK82k7Ol4TZlebm7
-	pPibsjg+vzRDFIZ0WqUo00XULGf/f15IJYEXZmYrYZpXmJYLclW0HtwqqZ3tdScDGdoHQ6TUu6G
-	BGLHwNN9c2bOAIcEAh5PZc8sbCjZ+/WCHqRNB
-X-Google-Smtp-Source: AGHT+IFm/QssIgS5q4ehMvGXLeWrdhE34gzLLyzjNcimpTY3e6scwoA6FCkQmn+Xj3fogyASh/YAI9ZGUQnUOhabUjE=
-X-Received: by 2002:a05:6402:50cf:b0:5aa:19b1:ffc7 with SMTP id
- 4fb4d7f45d1cf-5b869f0a43amr106202a12.2.1722591146865; Fri, 02 Aug 2024
- 02:32:26 -0700 (PDT)
+        bh=QJLw42eX0x5diEp44ayZtOuH0SE7rg9/HVNWOPkzlp8=;
+        b=QyRQmVu2ZybXC1udMUmRXIZO5tOoLxkGZsutuyUSjchH9iuyuFmkLaUFKprJ8ZtiIX
+         yRJ6gdYrk2ENf30FNwmbLM+V/gfodMEOApBozUPpksJjaAVI7HkJVsAg4Kblbj2GjPKK
+         D0pzUMwqhzn8UpQPwSc59UftSLhJXTZypZqS5TfODGBGKfGGrNnwuiTeq6/uy9OeL+4F
+         NbWVYaDWFCLte7c4rHTsi+idNdp4nwQKXsn2s3cYhTtdXBRn60Rlaj01NmCafhEdP2Xt
+         r1ydRZCi7o+m39DGDDqb2sLYd9YD/y7cTsiGKUMflUu6cWitMqi5+0LeBwAhGuqOERKv
+         X+6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUWWI2GYJ1Wh8X/o9MstJjBfsPdKJ2lx9c89nW8hmDmWK/uCf907TaDthc1Q1fgqKCy41OwvhWCaIW7ZDLwbjUay+Zt+ykE
+X-Gm-Message-State: AOJu0Yx30IG0R/Em6xjdP9zqNCFgYjogWzDI4smKRZm2SDo1kTqZt7TH
+	raATla0v5xfx1Ny4vgo4P7iNIi/JWCFxvPHisUJKqkuJR+JhMSvscOgWWUGGXr2cAxGmkuNCJBD
+	2UIYbUoJm6Sg0H4oZfgnevbl863yhYPhAVNQx
+X-Google-Smtp-Source: AGHT+IFgny2NzFbumeqzbvER3SREZ3wNxMj5Cw5GXaOsA2EbzcD+Ji9J2UYIcXkkbwcw2Umx8SvmjU8fAPkL/XeNAMI=
+X-Received: by 2002:a05:6402:358e:b0:58b:93:b624 with SMTP id
+ 4fb4d7f45d1cf-5b870c69d67mr84363a12.1.1722591178614; Fri, 02 Aug 2024
+ 02:32:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801145444.22988-1-kerneljasonxing@gmail.com> <20240801145444.22988-7-kerneljasonxing@gmail.com>
-In-Reply-To: <20240801145444.22988-7-kerneljasonxing@gmail.com>
+References: <20240801145444.22988-1-kerneljasonxing@gmail.com> <20240801145444.22988-8-kerneljasonxing@gmail.com>
+In-Reply-To: <20240801145444.22988-8-kerneljasonxing@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 2 Aug 2024 11:32:15 +0200
-Message-ID: <CANn89iKzMZhh9ivV6V_outTaTxLLvwp4iE_GjDWvX+Q49Nw7jQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 6/7] tcp: rstreason: introduce
- SK_RST_REASON_TCP_DISCONNECT_WITH_DATA for active reset
+Date: Fri, 2 Aug 2024 11:32:47 +0200
+Message-ID: <CANn89iLdtAKvat8bUwrpgQLqLeOTP6VKfU3WEJKcovRDysAE0Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 7/7] tcp: rstreason: let it work finally in tcp_send_active_reset()
 To: Jason Xing <kerneljasonxing@gmail.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org, 
@@ -90,10 +89,25 @@ m> wrote:
 >
 > From: Jason Xing <kernelxing@tencent.com>
 >
-> When user tries to disconnect a socket and there are more data written
-> into tcp write queue, we have to send an RST.
+> Now it's time to let it work by using the 'reason' parameter in
+> the trace world :)
 >
 > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  net/ipv4/tcp_output.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 16c48df8df4c..cdd0def14427 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -3649,7 +3649,7 @@ void tcp_send_active_reset(struct sock *sk, gfp_t p=
+riority,
+>         /* skb of trace_tcp_send_reset() keeps the skb that caused RST,
+>          * skb here is different to the troublesome skb, so use NULL
+>          */
+> -       trace_tcp_send_reset(sk, NULL, SK_RST_REASON_NOT_SPECIFIED);
+> +       trace_tcp_send_reset(sk, NULL, reason);
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
