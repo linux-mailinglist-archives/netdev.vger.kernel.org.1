@@ -1,181 +1,122 @@
-Return-Path: <netdev+bounces-115258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA43C945A43
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:48:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B7E945A4F
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:54:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E08C286D48
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:48:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 219A81F22C4C
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 08:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630201BF30D;
-	Fri,  2 Aug 2024 08:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480B91C3792;
+	Fri,  2 Aug 2024 08:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aw1vfFK9"
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="qMRdoGSz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35853132139;
-	Fri,  2 Aug 2024 08:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5991C232D
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 08:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722588512; cv=none; b=KdVS6QDetsbtNhaaZmoO82k2rDk+dE1whw5NS0dKg+ZuQDqoyl4shCUrk/N6heY7ehIwLLfOhvdE51eoAjF543JizgkmdGeak7YIjOjrfPH9qKkVTmY/vy7aZbqXgGwt92rVzN8mkgU/USiPRDxL/agRzcIAnqmy/LY2w3jTdg4=
+	t=1722588881; cv=none; b=oU20698zGl8nDhy23sTNzdO5O15URjXK9SSuoWNak/gThwBzmFPqJtyWYUU3NwxeypMvfzxu3M0mHf40TiH4AnNAvze9tQ/sbJu1UZefboLoJwJ6CKgNFUghkXLr3Yoccy7tO5lctxEZu2RYg5Wsa/9Uk+7OAx1evZJzIoXpgh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722588512; c=relaxed/simple;
-	bh=cQwlhsKmJKAFEKRQ/MzNl2oigPWjtiwSf5Pvm1J5Iuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CfjiHD4Egc67eRzD24+1Mm6Lhg+fAsSexBd9K9InweWa4mQjEEbKZ7YWUXV7S6LxyumKroLgZ+CPo+DGeMxIDg8rl42Q6peAJ5M/PYJDQZHl4tUzbeom+2qV/6z7pJNXH3JAer753MciZbvMVDEPDGI3q7nATjHt5T6nZIMb7N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aw1vfFK9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A5DC32782;
-	Fri,  2 Aug 2024 08:48:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722588511;
-	bh=cQwlhsKmJKAFEKRQ/MzNl2oigPWjtiwSf5Pvm1J5Iuo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Aw1vfFK9apg27Eh/1gmfHYfcrIr/w87XQZpiYjP8gCQ5ZEcbXaFOI1HcqQs26h5kw
-	 WIuXOdlbri6X9DdHtr4qUDDSEnXi6u6+Oc6JPO1PsY0gVwOmihazc0RSahOKFZioBJ
-	 Pmko/jMn6kt69UramvxjvdofOhgenLTw9Z8pzGvWc4pxjnodxDyBhxJQwUv7+xKWJD
-	 K5a/Z4C53jwoiD/1naccN5Q3IkuDF3sgzqJ5Du0wr5Twi0RYG+Upq1N5x31zsqKZFo
-	 khQtfpoXhLTd5Kdf0mlNZEdlywEPTxbZvp9p8ZzNAz0M67v1EItO/cN56OcTnHw7E+
-	 /v4bxQPRJdFnw==
-Message-ID: <79e327c5-f87f-4295-b461-81c09a699af6@kernel.org>
-Date: Fri, 2 Aug 2024 10:48:26 +0200
+	s=arc-20240116; t=1722588881; c=relaxed/simple;
+	bh=2tLyiqy1c6Ec2RTwu+vRdI20odKLB1Ri2YZc3q6e9K8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F3CElWU+PCtqoLd90f27KFue6AtzTxnNyqf8oRnZQ7IMU3oAZek8Zpe1A2LLG6ppT3c0yhG0zZbW9p1g2/4zhGO3oH2Jz0bPrFYAh+ElkNXayPOBTKXiNnjAat42/XZE7ZQW4tjG3Np4gHDXr5f/UeY++7gHO+KgbbEDub0B9VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=qMRdoGSz; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1ff1cd07f56so58659445ad.2
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 01:54:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1722588878; x=1723193678; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aPPcJGChXzWxSKC37YDmT/lmJurXmaDRiVHFrLrBrv8=;
+        b=qMRdoGSzQU/2K1rXtfR7NBAVYelVDhMqsk10zLRQWyVu6na0sESGWcDWkNz3R7t0pr
+         GE3tnOJARZwnxr1SCD8W1dbywROZE2xAII48Vl5SIjAcfUGZ3kLmNCX9yf60zDr91VXw
+         /xnDpKZMsCOhBr6mmriTp1lsLaaPASK172rQ0lz+0V9o4kZ1Y8zdbCnXjRnxT9N+0RFJ
+         K+cqYZpV8kx7LHq6M4lll3u9dJnMtqq8Z66UEO0pUVPH7zz8mdqTgFJYO/1oWhiK1DhX
+         snWttOXlxkIQXz6rWtuB7k+Wc//AjQPF8NVv/mGD1F6GZ7Y2eH6QnAdASwtnCfCoc7ut
+         GiOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722588878; x=1723193678;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aPPcJGChXzWxSKC37YDmT/lmJurXmaDRiVHFrLrBrv8=;
+        b=d4FV1oRBEOMzj66QtwlhfFzxBKX2X2kM5YHvpD41sO3sOyx7z3AVZUBd2fk6HtjhEc
+         E+gH9qFxAZ9b8tHB7RMlKpcO2WV5ePMRi6qrT/EkcH3/mVESytH0C871IrlaJCBbc0O/
+         Mi2u88VUvUaa6fftrhUj1qOuP7L88YgFKkx/IJ2JDtVjeQoXLXpcqyMQFvjOgkqx6z0b
+         wFcrDfpxzZyWcovOGUpLmEP88ZwqL214lQOan9BB/Auf+eW/FM8G8pbp9MBgydKPBRpf
+         W4QVbmZd5wAh1YzBlHIXE3ZlvBdEGOftBqVmqqOZt72WPm6kGpYsMcvzYG2bx2t5pNW9
+         GTcA==
+X-Gm-Message-State: AOJu0Yx7DW5YWadPNB/SWbX7VWUWMjhjzgOKpXHeSOSo0n6fsTarYWs9
+	fovacKiY0eFIsUeXItDb64wZTIE4F5lniYc/Vh96gRMLbxerR5++yAcDMlWpEno=
+X-Google-Smtp-Source: AGHT+IHik8xxOwOlBOeNsvN8UIni6eltN2TUYBce+ba9KYk4mfZ3W/xy1fXgAFr5UXlgHVmDpZLxZw==
+X-Received: by 2002:a17:903:2441:b0:1fb:8890:16b4 with SMTP id d9443c01a7336-1ff573c4f57mr35694665ad.48.1722588878419;
+        Fri, 02 Aug 2024 01:54:38 -0700 (PDT)
+Received: from localhost.localdomain ([2001:f70:2520:9500:7232:5bec:f586:e017])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f29d88sm12075985ad.8.2024.08.02.01.54.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 01:54:38 -0700 (PDT)
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+To: andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Subject: [PATCH] net: dsa: bcm_sf2: Fix a possible memory leak in bcm_sf2_mdio_register()
+Date: Fri,  2 Aug 2024 17:54:11 +0900
+Message-Id: <20240802085411.3549034-1-joe@pf.is.s.u-tokyo.ac.jp>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] tcp: limit wake-up for crossed SYN cases with
- SYN-ACK
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>
-Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>
-References: <20240801-upstream-net-next-20240801-tcp-limit-wake-up-x-syn-v1-1-3a87f977ad5f@kernel.org>
- <CANn89iK6PxVuPu_nwTBiHy8JLuX+RTvnNGC3m64nBN7j1eENxQ@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iK6PxVuPu_nwTBiHy8JLuX+RTvnNGC3m64nBN7j1eENxQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 01/08/2024 19:52, Eric Dumazet wrote:
-> On Thu, Aug 1, 2024 at 6:39 PM Matthieu Baerts (NGI0)
-> <matttbe@kernel.org> wrote:
->>
->> In TCP_SYN_RECV states, sk->sk_socket will be assigned in case of
->> marginal crossed SYN, but also in other cases, e.g.
->>
->>  - With TCP Fast Open, if the connection got accept()'ed before
->>    receiving the 3rd ACK ;
->>
->>  - With MPTCP, when accepting additional subflows to an existing MPTCP
->>    connection.
->>
->> In these cases, the switch to TCP_ESTABLISHED is done when receiving the
->> 3rd ACK, without the SYN flag then.
->>
->> To properly restrict the wake-up to crossed SYN cases as expected there,
->> it is then required to also limit the check to packets containing the
->> SYN-ACK flags.
->>
->> Without this modification, it looks like the wake-up was not causing any
->> visible issue with TFO and MPTCP, apart from not being needed. That's
->> why this patch doesn't contain a Cc to stable, and a Fixes tag.
->>
->> While at it, the attached comment has also been updated: sk->sk_sleep
->> has been removed in 2010, and replaced by sk->sk_wq in commit
->> 43815482370c ("net: sock_def_readable() and friends RCU conversion").
->>
->> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->> ---
->> Notes:
->>   - This is the same patch as the one suggested earlier in -net as part
->>     of another series, but targeting net-next (Eric), and with an
->>     updated commit message. The previous version was visible there:
->>     https://lore.kernel.org/20240718-upstream-net-next-20240716-tcp-3rd-ack-consume-sk_socket-v2-2-d653f85639f6@kernel.org/
->> ---
-> 
-> Note: I am not aware of any tests using FASYNC
-> 
-> sock_wake_async() / kill_fasync() are sending signals, not traditional wakeups.
+bcm_sf2_mdio_register() calls of_phy_find_device() and then
+phy_device_remove() in a loop to remove existing PHY devices.
+of_phy_find_device() eventually calls bus_find_device(), which calls
+get_device() on the returned struct device * to increment the refcount.
+The current implementation does not decrement the refcount, which causes
+memory leak.
 
-Thank you for the review and the explanation!
+This commit adds the missing phy_device_free() call to decrement the
+refcount via put_device() to balance the refcount.
 
-> Do we really want to potentially break some applications still using
-> pre-multi-thread era async io ?
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+---
+ drivers/net/dsa/bcm_sf2.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-They are potentially already broken if we don't test them :-D
-
-> Not that I really care, but I wonder why you care :)
-
-More seriously, I sent this patch, because in previous discussions about
-the crossed SYN case, Kuniyuki mentioned that he used the same condition
-as the one I modified here. I didn't see why it is needed to send such
-signal there for TFO and MPTCP cases, so I sent this patch. On the other
-hand, I suppose such old apps relying on FASYNC will not natively use
-TFO or MPTCP (except if they are forced externally).
-
-In other words, I'm not fixing a problem I saw here, I'm only
-restricting the condition to crossed SYN case, as mentioned in the
-linked comment, then excluding TFO and MPTCP cases that don't seem to
-require this signal at that moment. But then it's fine for me to drop
-this patch if you think it is not needed :)
-
-Cheers,
-Matt
+diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
+index ed1e6560df25..0e663ec0c12a 100644
+--- a/drivers/net/dsa/bcm_sf2.c
++++ b/drivers/net/dsa/bcm_sf2.c
+@@ -675,8 +675,10 @@ static int bcm_sf2_mdio_register(struct dsa_switch *ds)
+ 			of_remove_property(child, prop);
+ 
+ 		phydev = of_phy_find_device(child);
+-		if (phydev)
++		if (phydev) {
+ 			phy_device_remove(phydev);
++			phy_device_free(phydev);
++		}
+ 	}
+ 
+ 	err = mdiobus_register(priv->user_mii_bus);
 -- 
-Sponsored by the NGI0 Core fund.
+2.34.1
 
 
