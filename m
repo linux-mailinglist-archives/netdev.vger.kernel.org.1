@@ -1,130 +1,120 @@
-Return-Path: <netdev+bounces-115351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCAE4945F01
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:00:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34612945F21
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 16:09:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFEF3B23462
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 13:59:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B0E128441A
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 14:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D51F1E4861;
-	Fri,  2 Aug 2024 13:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D216D1E3CB8;
+	Fri,  2 Aug 2024 14:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="flc1ttft"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E891E484D;
-	Fri,  2 Aug 2024 13:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AE01EEF9;
+	Fri,  2 Aug 2024 14:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722607192; cv=none; b=P0kVjOQzJAi79WrvHeeOpJS/ZyOTMMtESEQPKuB5KU70OHMKan/pEuujN/brpHBAh12ENvQUpKMaw8IHA9qvz4KMPd4cKFIh8IoqpL7Ggds0FgicPj1hJFug/GNxsaSAIfKyTn+OWkOILk5CTk/ffQg2qwcNINrs3OPbt7p2Rd8=
+	t=1722607765; cv=none; b=JOjqXV7IUcXxKZ0eKDsk3rlhJAEm1Ff/OKqvZ5g46e0WL0Ze98jYIHcGfdpxnGLQwe5HC9fkXG6TivwlhvyML30Z/zTTO9Jh5VHsYc/kIC9ufBth4Y6nz9Yqt210n67Hsrrshiw0LSf9NZ9uIIU1AmddA6ySmNAkIFL3j1ixrNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722607192; c=relaxed/simple;
-	bh=wFa0Dd0QCPMjL3yKGIPRC3IqvgyKLQTUfaNKwswBGVY=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gbfijj7XUv2g8F7giJIB/deMric/UYGtgFAdeTaEiYPR9A4MSDm02texuR9yGBiHoo+qw5qTOStFPvTbg3s8xAalvVyMGETyvK5P45I3532H5AcVQGQKFp/pCio4+7x7g+O5FuJPSUVseqr5rgYTudqhbfg0czFjQVfoEoV0JmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wb6pG5ChXz6K9GR;
-	Fri,  2 Aug 2024 21:57:10 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4959C140B63;
-	Fri,  2 Aug 2024 21:59:48 +0800 (CST)
-Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 2 Aug
- 2024 14:59:47 +0100
-Date: Fri, 2 Aug 2024 14:59:46 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Jason Gunthorpe <jgg@nvidia.com>, Jonathan Corbet <corbet@lwn.net>, "Itay
- Avraham" <itayavr@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Andy Gospodarek
-	<andrew.gospodarek@broadcom.com>, Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>, "David Ahern" <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, "Jiri Pirko" <jiri@nvidia.com>, Leonid
- Bloch <lbloch@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<patches@lists.linux.dev>, Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v2 5/8] fwctl: FWCTL_RPC to execute a Remote Procedure
- Call to device firmware
-Message-ID: <20240802145946.000002e7@Huawei.com>
-In-Reply-To: <20240801172631.GI4209@unreal>
-References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-	<5-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
-	<20240730080038.GA4209@unreal>
-	<20240801125829.GA2809814@nvidia.com>
-	<20240801172631.GI4209@unreal>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1722607765; c=relaxed/simple;
+	bh=8aPj2nIntgmfW19Mn0CoHG78RbeTKwJCAKokFBJ3vFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GAAFsZH4fqOf+cAQbFpYC+/PmZTM2iiELi2Ku/cYzNWf1eWZcfMgbLeH81kIY7HCwTqZck4JJ3gI4odOkkJskwHB22aneqpMf7s6cbyN65Indsh+OFuHhG6oKDflsPXn4TU5Rh8SaAil5h3q74KlajTAbnaqnd/OyDeWBqo6fks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=flc1ttft; arc=none smtp.client-ip=80.12.242.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id ZsRVs1261jeEBZsRVs9mZU; Fri, 02 Aug 2024 15:35:39 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1722605739;
+	bh=bUGQWQ6HeX/0on+n88StgC2Xu31/KnbENv/BO2RPW38=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=flc1ttftNWKukhI3mogmvoyWlsRr8+1q8QhfP0zHSXxFdudDWO7mTH3h8fNMi5YSg
+	 E7EV+VLHI/0Kap4WSmbtoaIdzHLmIwijibFuriPEHEqBh68SaOBmL5BfZyohpX1upu
+	 ZvxowL/UjQmdyJ/S1Wm6orM9WvFxnwdw2/idRvTShCpJRPQ+rcrQj8YrK1gNhVerBi
+	 6EENmZ4T0RZ5mW6RywYq/gvmRmDaaMq1xRkeP6KQJ4QUi/eMfnx9Z/6f18bnFIxhK7
+	 BEJAlDyS/Db2zRZeDci7H3WKRC5/CWOBY1/EWvU7vRjnaBojlVwpE2xFjbdgxp0ze9
+	 hF6L0XUMMq/QQ==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Fri, 02 Aug 2024 15:35:39 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <e792d1b6-b9b5-4e90-801d-ad10893defc1@wanadoo.fr>
+Date: Fri, 2 Aug 2024 15:35:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
+To: Moon Yeounsu <yyyynoom@gmail.com>, cooldavid@cooldavid.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240802054421.5428-1-yyyynoom@gmail.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20240802054421.5428-1-yyyynoom@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 1 Aug 2024 20:26:31 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
-
-> On Thu, Aug 01, 2024 at 09:58:29AM -0300, Jason Gunthorpe wrote:
-> > On Tue, Jul 30, 2024 at 11:00:38AM +0300, Leon Romanovsky wrote:  
-> > > > +
-> > > > +	void *inbuf __free(kvfree) =
-> > > > +		kvzalloc(cmd->in_len, GFP_KERNEL | GFP_KERNEL_ACCOUNT);  
-> > > 
-> > > 
-> > > <...>
-> > >   
-> > > > +	out_len = cmd->out_len;
-> > > > +	void *outbuf __free(kvfree_errptr) = fwctl->ops->fw_rpc(
-> > > > +		ucmd->uctx, cmd->scope, inbuf, cmd->in_len, &out_len);  
-> > > 
-> > > I was under impression that declaration of variables in C should be at the beginning
-> > > of block. Was it changed for the kernel?  
-> > 
-> > Yes, the compiler check blocking variables in the body was disabled to
-> > allow cleanup.h
-> > 
-> > Jonathan said this is the agreed coding style to use for this  
+Le 02/08/2024 à 07:44, Moon Yeounsu a écrit :
+> `ip_hdr(skb)->ihl << 2` are the same as `ip_hdrlen(skb)`
+> Therefore, we should use a well-defined function not a bit shift
+> to find the header length.
 > 
-> I'm said to hear that.
-
-Was passing on a statement Linus made (not digging it out right now)
-that he really wanted to be able see constructors and destructors
-together.
-
-The other part is that in some cases you can end up with non
-obvious ordering bugs because the cleanup is the reverse of the
-declarations, not the constructors being called.
-Whilst it is fairly easy to review for this, future code reorganization
-may well lead to subtle bugs, typically in error paths etc.
-
-Putting the declaration inline avoids this potential problem
-
-Dan wrote a style guide proposal.
-https://lore.kernel.org/all/171175585714.2192972.12661675876300167762.stgit@dwillia2-xfh.jf.intel.com/
-[PATCH v3] cleanup: Add usage and style documentation
-
-seems it died out without anyone applying it.  I've poked.
-
-Jonathan
-
+> It also compress two lines at a single line.
 > 
-> Thanks
+> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+> ---
+>   drivers/net/ethernet/jme.c | 8 +++-----
+>   1 file changed, 3 insertions(+), 5 deletions(-)
 > 
-> > 
-> > Jason  
-> 
+
+Hi,
+
+> diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
+> index b06e24562973..83b185c995df 100644
+> --- a/drivers/net/ethernet/jme.c
+> +++ b/drivers/net/ethernet/jme.c
+> @@ -946,15 +946,13 @@ jme_udpsum(struct sk_buff *skb)
+>   	if (skb->protocol != htons(ETH_P_IP))
+>   		return csum;
+>   	skb_set_network_header(skb, ETH_HLEN);
+> +
+>   	if ((ip_hdr(skb)->protocol != IPPROTO_UDP) ||
+> -	    (skb->len < (ETH_HLEN +
+> -			(ip_hdr(skb)->ihl << 2) +
+> -			sizeof(struct udphdr)))) {
+> +	    (skb->len < (ETH_HLEN + (ip_hdrlen(skb)) + sizeof(struct udphdr)))) {
+
+The extra () around "ip_hdrlen(skb)" can be remove.
+Also maybe the ones around "ETH_HLEN + ip_hdrlen(skb)" could also be 
+removed.
+
+>   		skb_reset_network_header(skb);
+>   		return csum;
+>   	}
+> -	skb_set_transport_header(skb,
+> -			ETH_HLEN + (ip_hdr(skb)->ihl << 2));
+> +	skb_set_transport_header(skb, ETH_HLEN + (ip_hdrlen(skb)));
+
+Same here, the extra () around "ip_hdrlen(skb)" can be remove.
+
+CJ
+
+>   	csum = udp_hdr(skb)->check;
+>   	skb_reset_transport_header(skb);
+>   	skb_reset_network_header(skb);
 
 
