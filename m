@@ -1,158 +1,204 @@
-Return-Path: <netdev+bounces-115284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CE03945BB7
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:02:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D581945BBA
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 12:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 488331F2286E
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:02:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE9B9B218C6
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 10:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C99014D2B9;
-	Fri,  2 Aug 2024 10:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43551C0DC3;
+	Fri,  2 Aug 2024 10:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IdDm6r4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A353FE4A;
-	Fri,  2 Aug 2024 10:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1875136995;
+	Fri,  2 Aug 2024 10:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722592961; cv=none; b=jM6IT/f+gl2hJzFyTrty9nY9HNr5KetEdt5pUSt290iQ7mTVORv38i6HjwFQhKVF3GkqHTzROtzlOW37U4JB+BEbAU7X2Y4maAXDNQNTacVGkKAj9X3aWsIGcc8QSlDim+FlDwCqJWHjXE7DGrH+OqxyB+lqllfkowYZzcajJag=
+	t=1722592978; cv=none; b=MFupIwECtIDgyp81lqNBDxyx3WqsHNJpxsts2rc8YztRE2JmhoI9Fzb9I4Dc/gy7/RrsZkhedh1ulYqwMVdGXiUOeAwrjkrCx74yNnsRMAW1Cnjo+bdLVwZW0N874S5fihUN1E8yfgOu3ZKactjuVsn4jNnSNmF+D9uZiu/vG+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722592961; c=relaxed/simple;
-	bh=6fuHU3zKyucjPRppY7ryeQ8xR45IfbyE+zsi6YIETwY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mxohcZIIgwF29/bsRecAW43w7m1SpbPBThNghTkL9TUDKtZhGAjdBZV/pGYjtu625qTJAQKww+s3wdf06TZMrkDJzD8lF9WBfX9wtJyOkVFN+Lj6rxpjEVr3x4tqp2PnOujsZRFocD8rxnuxxSFpVnMSfTPBWq6uHTEpRt/0xfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wb1YS6lzPzfZ8C;
-	Fri,  2 Aug 2024 18:00:44 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6560418005F;
-	Fri,  2 Aug 2024 18:02:36 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 2 Aug 2024 18:02:36 +0800
-Message-ID: <c9cc66e0-195a-4db4-98b8-cdbb986e0619@huawei.com>
-Date: Fri, 2 Aug 2024 18:02:35 +0800
+	s=arc-20240116; t=1722592978; c=relaxed/simple;
+	bh=z9XwdJUQ9pMjbcF87NP4M00mVziyVUvEaICwAGH09hQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u4bweNu2qrwgQlwSOkCXCr5Pk4ImFrmV/zkzVK6yhSB/v8yUe9B+10OQDw6ZfyeF1YdnmzX8xAxmsliVKs5SPebxwbAqzmWZDsv61sJEiTmnzlCGi0umvTwC78vCKOnm9KL0wYLYhBK5pGBeT9kwVt0hQCYX3TUx/B5slBqijZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IdDm6r4u; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52efa16aad9so11341088e87.0;
+        Fri, 02 Aug 2024 03:02:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722592975; x=1723197775; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wZVHSXBYePrNzDvUHr9E39NsWzR6Its68DUoWo8U4b0=;
+        b=IdDm6r4uoUHY7IpW+GMQVEFq0HeWhN3eFSsMqA85PtrfwPMgrl3D7OPI9QvGSPUhfS
+         OuU0D7gzhtYMQJf5M6rUCxGz6iHPNNWxmsiIwJ05/qgC+RZgwAnqce9jHCAFKTpPFx9L
+         3LOjwmk4MqRpL/+iWMGMzwjDtRDHznKcoZK+iWZRhThVqq32TFSVCSGFCQm8qy9w77Uo
+         WP8Pv7B+YwEQZ9GPjEmjzygMf6JUOYeLvPCUrk9Tp8DlBIvOuYZqQVnDWojNUvtoIjmk
+         yCoc+a32aQx2c07Ub3FyJVKErYjowujuPIslNBd9wwdf0/dHkSXUG+ohVUUqczqnf6ob
+         5/Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722592975; x=1723197775;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wZVHSXBYePrNzDvUHr9E39NsWzR6Its68DUoWo8U4b0=;
+        b=PKjgMj7kgoDnIioP85KaAu6UkTWY8a1tqaQLgH+kvYqIkqw1wnKZXoKHXfErMgHK2J
+         llV1/R7vY5L9qiYrt3y8O+dPSlWznucgJausdSio6Njp/qjFO1SWsC6jbhLQkQhwlUwl
+         Fe4VL6dp/VNuDfmstglqEUP7SfESsXeVgFE43t8r6n3Hv3HKp9x6aADrPyY7ylIc2W7b
+         urMp371x+TeIB+cUm4veFfCP5ihXUyObkRNLCTzYHiNzMASjzzVjLhxHYryJqO8pQgGJ
+         JtH4KflzK8czo6fToDNycG5KdlYtImYBofoWiHhyhW0jIbBi+jnoKwNIPddYc3DTGwhS
+         dzog==
+X-Forwarded-Encrypted: i=1; AJvYcCWC2xagXfuQw5eHN/Hx5jV2f1kC55cya1flNEeZyPn894QhOuHd1pFVYDvVWRkvD1wFaQ9XXg++0lRBrl+MEbWAlvD9i98UxOogUxzMEbvhjkdYng5CNql62cbG5KVq8ZfF
+X-Gm-Message-State: AOJu0YwP3zydXc47C7NsIDPL2vsXM4FngfrONOK6YD61adKT3VshdAmi
+	IJKOaRJj71Kz8Z4PzAxGs9QMejGqszY9jBVVIVty0dVWTzGitHJEYR3G+xbm
+X-Google-Smtp-Source: AGHT+IF1UmlHhGYQVK/9XpRdhD/Aw56X/aI72duc6eMy8HIVqxE9ZpT4HSD4Bwp8nUlVnomP0I4Aog==
+X-Received: by 2002:ac2:4e14:0:b0:52f:cd03:a847 with SMTP id 2adb3069b0e04-530bb3a4f47mr1435029e87.61.1722592974390;
+        Fri, 02 Aug 2024 03:02:54 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba2a10asm189014e87.133.2024.08.02.03.02.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 03:02:53 -0700 (PDT)
+Date: Fri, 2 Aug 2024 13:02:50 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: jitendra.vegiraju@broadcom.com
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, 
+	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
+	andrew@lunn.ch, linux@armlinux.org.uk, horms@kernel.org, 
+	florian.fainelli@broadcom.com
+Subject: Re: [PATCH net-next v3 0/3] net: stmmac: Add PCI driver support for
+ BCM8958x
+Message-ID: <oul3ymxlfwlqc3wikwyfix5e2c7hozwfsdwswkdtayxd2zzphz@mld3uobyw5pv>
+References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 01/14] mm: page_frag: add a test module for
- page_frag
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
-References: <20240731124505.2903877-1-linyunsheng@huawei.com>
- <20240731124505.2903877-2-linyunsheng@huawei.com>
- <CAKgT0Udj5Jskjvvba345DFkySuZeg927OHQya0rCcynMtmGg8g@mail.gmail.com>
- <03c555c5-a25d-434a-aed4-0f2f7aa65adf@huawei.com>
- <CAKgT0UfXn3By_oSmNKw28biUf_ixXHMgGW_0h_3TZFAoECfPjg@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UfXn3By_oSmNKw28biUf_ixXHMgGW_0h_3TZFAoECfPjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
 
-On 2024/8/1 22:50, Alexander Duyck wrote:
+Hi Jitendra
 
->>
->> The above was my initial thinking too, I went to the ptrpool thing using
->> at least two CPUs as the below reason:
->> 1. Test the concurrent calling between allocing and freeing more throughly,
->>    for example, page->_refcount concurrent handling, cache draining and
->>    cache reusing code path will be tested more throughly.
->> 2. Test the performance impact of cache bouncing between different CPUs.
->>
->> I am not sure if there is a more lightweight implementation than ptrpool
->> to do the above testing more throughly.
+On Thu, Aug 01, 2024 at 08:18:19PM -0700, jitendra.vegiraju@broadcom.com wrote:
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
 > 
-> You can still do that with a single producer single consumer ring
-> buffer/array and not have to introduce a ton of extra overhead for
-> some push/pop approach. There are a number of different
-> implementations for such things throughout the kernel.
-
-if we limit that to single producer single consumer, it seems we can
-use ptr_ring to replace ptrpool.
-
+> This patchset adds basic PCI ethernet device driver support for Broadcom
+> BCM8958x Automotive Ethernet switch SoC devices.
 > 
->>
->>>
->>> Lastly something that is a module only tester that always fails to
->>> probe doesn't sound like it really makes sense as a standard kernel
->>
->> I had the same feeling as you, but when doing testing, it seems
->> convenient enough to do a 'insmod xxx.ko' for testing without a
->> 'rmmod xxx.ko'
+> This SoC device has PCIe ethernet MAC attached to an integrated ethernet
+> switch using XGMII interface. The PCIe ethernet controller is presented to
+> the Linux host as PCI network device.
 > 
-> It means this isn't a viable module though. If it supports insmod to
-> trigger your tests you should let it succeed, and then do a rmmod to
-> remove it afterwards. Otherwise it is a test module and belongs in the
-> selftest block.
+> The following block diagram gives an overview of the application.
+>              +=================================+
+>              |       Host CPU/Linux            |
+>              +=================================+
+>                         || PCIe
+>                         ||
+>         +==========================================+
+>         |           +--------------+               |
+>         |           | PCIE Endpoint|               |
+>         |           | Ethernet     |               |
+>         |           | Controller   |               |
+>         |           |   DMA        |               |
+>         |           +--------------+               |
+>         |           |   MAC        |   BCM8958X    |
+>         |           +--------------+   SoC         |
+>         |               || XGMII                   |
+>         |               ||                         |
+>         |           +--------------+               |
+>         |           | Ethernet     |               |
+>         |           | switch       |               |
+>         |           +--------------+               |
+>         |             || || || ||                  |
+>         +==========================================+
+>                       || || || || More external interfaces
 > 
->>> module. I still think it would make more sense to move it to the
->>> selftests tree and just have it build there as a module instead of
->>
->> I failed to find one example of test kernel module that is in the
->> selftests tree yet. If it does make sense, please provide an example
->> here, and I am willing to follow the pattern if there is one.
+> The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
+> driver uses common dwxgmac2 code where applicable.
+
+Thanks for submitting the series.
+
+I am curious how come Broadcom got to use an IP-core which hasn't
+been even announced by Synopsys. AFAICS the most modern DW XGMAC
+IP-core is of v3.xxa version:
+
+https://www.synopsys.com/dw/ipdir.php?ds=dwc_ether_xgmac
+
+Are you sure that your device isn't equipped with some another DW MAC
+IP-core, like DW 25G Ethernet MAC? (which BTW is equipped with a new
+Hyper DMA engine with a capability to have up to 128/256 channels with
+likely indirect addressing.) Do I miss something?
+
+* I'll join the patch set review after the weekend, sometime on the
+next week.
+
+-Serge(y)
+
+> Driver functionality specific to this MAC is implemented in dwxgmac4.c.
+> Management of integrated ethernet switch on this SoC is not handled by
+> the PCIe interface.
+> This SoC device has PCIe ethernet MAC directly attached to an integrated
+> ethernet switch using XGMII interface.
 > 
-> You must not have been looking very hard. A quick grep for
-> "module_init" in the selftest folder comes up with
-> "tools/testing/selftests/bpf/bpf_testmod/" containing an example of a
-> module built in the selftests folder.
-
-After close look, it seems it will be treated as third party module when
-adding a kernel module in tools/testing/selftests as there seems to be no
-config for it in Kconfig file and can only be compiled as a module not as
-built-in.
-
+> v2->v3:
+>    Addressed v2 comments from Andrew, Jakub, Russel and Simon.
+>    Based on suggestion by Russel and Andrew, added software node to create
+>    phylink in fixed-link mode.
+>    Moved dwxgmac4 specific functions to new files dwxgmac4.c and dwxgmac4.h
+>    in stmmac core module.
+>    Reorganized the code to use the existing glue logic support for xgmac in
+>    hwif.c and override ops functions for dwxgmac4 specific functions.
+>    The patch is split into three parts.
+>      Patch#1 Adds dma_ops for dwxgmac4 in stmmac core
+>      Patch#2 Hooks in the hardware interface handling for dwxgmac4
+>      Patch#3 Adds PCI driver for BCM8958x device
 > 
->>> trying to force it into the mm tree. The example of dmapool_test makes
->>> sense as it could be run at early boot to run the test and then it
->>
->> I suppose you meant dmapool is built-in to the kernel and run at early
->> boot? I am not sure what is the point of built-in for dmapool, as it
->> only do one-time testing, and built-in for dmapool only waste some
->> memory when testing is done.
+> v1->v2:
+>    Minor fixes to address coding style issues.
+>    Sent v2 too soon by mistake, without waiting for review comments.
+>    Received feedback on this version.
+>    https://lore.kernel.org/netdev/20240511015924.41457-1-jitendra.vegiraju@broadcom.com/
 > 
-> There are cases where one might want to test on a system w/o console
-> access such as an embedded system, or in the case of an environment
-> where people run without an initrd at all.
-
-I think moving it to tools/testing/selftests may defeat the above purpose.
-
+> v1:  
+>    https://lore.kernel.org/netdev/20240510000331.154486-1-jitendra.vegiraju@broadcom.com/
 > 
->>> just goes quiet. This module won't load and will always just return
->>> -EAGAIN which doesn't sound like a valid kernel module to me.
->>
->> As above, it seems convenient enough to do a 'insmod xxx.ko' for testing
->> without a 'rmmod xxx.ko'.
+> Jitendra Vegiraju (3):
+>   Add basic dwxgmac4 support to stmmac core
+>   Integrate dwxgmac4 into stmmac hwif handling
+>   Add PCI driver support for BCM8958x
 > 
-> It is, but it isn't. The problem is it creates a bunch of ugliness in
-
-Yes, it seems a bit ugly, but it supports the below perf cmd, I really
-would like to support the below case as it is very convenient.
-
-perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17
-
-> the build as you are a tristate that isn't a tristate as you are only
-> building it if it is set to "m". There isn't anything like that
-> currently in the mm tree.
-
-After moving page_frag_test to selftest, it is only bulit as module, I guess
-it is ok to return -EAGAIN?
+>  MAINTAINERS                                   |   8 +
+>  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+>  drivers/net/ethernet/stmicro/stmmac/Makefile  |   3 +-
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |   4 +
+>  .../net/ethernet/stmicro/stmmac/dwmac-brcm.c  | 517 ++++++++++++++++++
+>  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  31 ++
+>  .../net/ethernet/stmicro/stmmac/dwxgmac4.c    | 142 +++++
+>  .../net/ethernet/stmicro/stmmac/dwxgmac4.h    |  84 +++
+>  drivers/net/ethernet/stmicro/stmmac/hwif.c    |  26 +-
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h    |   1 +
+>  10 files changed, 825 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
+>  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwxgmac4.c
+>  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwxgmac4.h
+> 
+> -- 
+> 2.34.1
+> 
+> 
 
