@@ -1,75 +1,116 @@
-Return-Path: <netdev+bounces-115184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14696945604
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:37:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C17D94560A
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 03:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1AD7281DA4
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:37:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1067C1F246B1
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 01:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C630FB64E;
-	Fri,  2 Aug 2024 01:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C69B168DA;
+	Fri,  2 Aug 2024 01:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RassVBmd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BleUUNCp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15E523BE
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 01:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F7212E71;
+	Fri,  2 Aug 2024 01:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722562621; cv=none; b=geX/QUXQ7b43COP3p3JinOclu9yfnOHu8JJc86zVmaxIdNyc/J5AHmaxzH+PelP3FyYfd4553PwmNKOu6H2nXPy4wH5tciLDayJ0PD0UXRsjd0JE6Id9y33ILoeZzvXQk6UzyC8Fcf2RuSzk3SaoBg7bNboErDaUPYRoXpamynk=
+	t=1722562833; cv=none; b=OjdBWxrnlj1kBu0cT/u1YpGM+i9a7WPZsf525NLT3iWGt8flRFuRXfiOHQ6GanKX2RC8dzb9PKGSiyOsDEfHKryF3ESpEMb385rwmC9AapNN/E25j6Lm2XwTumaRdVTNtD2wzRbjIpWCJoHPTuo84GSmtA8NuJiVVfzSugfQT+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722562621; c=relaxed/simple;
-	bh=hxDbxNmJtDf3gQdGh/G+r7cz9bCNoOZ/xzfkI/2Qr14=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cQiTfsWZoTFq8lSWY2VcnJv8xDfg/IynAGf9TMmvj536kGyYUFD9frU6zpQcpyrXQYLrEW23ckDgiOgKndmewBeY62ioQs7eNkJeTwuQQCb0CIHXEwNBn354NXLOXKLVnA4Ugv6tpbQa3al6wr+f4vNSOVBiM2B1qvesX4+Hteg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RassVBmd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE129C32786;
-	Fri,  2 Aug 2024 01:37:00 +0000 (UTC)
+	s=arc-20240116; t=1722562833; c=relaxed/simple;
+	bh=xYpZjisZm/f+NRI59T0R2ycx0HtLFJvMti3jCCvGcao=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lam9/7afdNV0Yrz9rQy05ssR8vySYqjO5DUPLUBgc/y0Uu2cIowmgcxwxijyMps6BMywFW/T1Gb1kSNEvHZJSvgSuDESbO6S//5NasRQeqHY/tamkAU5cGy7txpf0+siOLJC1m/5IpLP8BvoQERH4Xowy6keTCbl40C9NhLJxNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BleUUNCp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 70137C4AF0A;
+	Fri,  2 Aug 2024 01:40:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722562621;
-	bh=hxDbxNmJtDf3gQdGh/G+r7cz9bCNoOZ/xzfkI/2Qr14=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RassVBmdB0BEtHo/BgnhvWKHyIE+7+uQgwnD9CW17vz2G7r+Ehwsm4ypeo6XWmCpb
-	 WOCf634+9ZacosI7nHswMEgQlovKFaVQZLzwOsr62PoUBkZElOV87E9lPOIt30kMJ8
-	 WyzELiXw4E06e3aNmoUxJaKt4nWs8LA1crbiMYN3hKUyP11RpXJWfM2B3JiL4mqkpF
-	 bnzdntYzHHp0h6yBjIAZptIjJHOYvRHSqNDas2d6ZjAehN42wvAVK7x1k7X1Do4ZKZ
-	 VdVNYZi/fk6BfLrmQzj5HUOvThgnaNJ1qs6glVbfB1OGsJDJscYgJtC1gDOVElX6ck
-	 uPJsjd2UGUdAw==
-Date: Thu, 1 Aug 2024 18:36:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Willem de
- Bruijn <willemb@google.com>, kernel-team@cloudflare.com,
- syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2 0/2] Silence bad offload warning when sending UDP
- GSO with IPv6 extension headers
-Message-ID: <20240801183659.17c25cbd@kernel.org>
-In-Reply-To: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
-References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
+	s=k20201202; t=1722562832;
+	bh=xYpZjisZm/f+NRI59T0R2ycx0HtLFJvMti3jCCvGcao=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BleUUNCpCd1yI6z6E/F9Z7d047NL3xN3dtKxncFEEN354CTO8xa1evWVSceCkn5KS
+	 1Hqc20G3mNGKTOZzCFKZiCj7Nx9C4AsmXZxLhUkt626N2hMlliwaubCVN1L/XgPLy2
+	 l+gAvlz9t1wnI1GC8HWylkLNimAbe8/FOOlZFqO6HBJoGvH7aKuqggdvybXWJyk57a
+	 +z3ux64+VeUmbzsxj6EIuLroBNdyrharesVwQ0LowARTrO+iJCeCx7tewk2tT8B4js
+	 t731V2LAiikbU0BozfFDH77BR1v5X3pfzZKnqeHXu7OiAjbm+Pwlb4rTtnWh15/ZdF
+	 xLFafnlaZ98Zg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5DB3BD0C60A;
+	Fri,  2 Aug 2024 01:40:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/7] mptcp: fix endpoints with 'signal' and 'subflow'
+ flags
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172256283237.5499.17809617500066693516.git-patchwork-notify@kernel.org>
+Date: Fri, 02 Aug 2024 01:40:32 +0000
+References: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-0-c8a9b036493b@kernel.org>
+In-Reply-To: <20240731-upstream-net-20240731-mptcp-endp-subflow-signal-v1-0-c8a9b036493b@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org
 
-On Thu, 01 Aug 2024 15:52:52 +0200 Jakub Sitnicki wrote:
-> This series addresses a recent regression report from syzbot [1].
-> Please see patch 1 description for details.
+Hello:
 
-The test doesn't seem super happy in netdev CI:
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/709100/79-udpgso-sh/stdout
-https://netdev-3.bots.linux.dev/vmksft-net/results/709101/78-udpgso-sh/stdout
-https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/708921/75-udpgso-sh/stdout
-https://netdev-3.bots.linux.dev/vmksft-net/results/708921/78-udpgso-sh/stdout
+On Wed, 31 Jul 2024 13:05:52 +0200 you wrote:
+> When looking at improving the user experience around the MPTCP endpoints
+> setup, I noticed that setting an endpoint with both the 'signal' and the
+> 'subflow' flags -- as it has been done in the past by users according to
+> bug reports we got -- was resulting on only announcing the endpoint, but
+> not using it to create subflows: the 'subflow' flag was then ignored.
+> 
+> My initial thought was to modify IPRoute2 to warn the user when the two
+> flags were set, but it doesn't sound normal to ignore one of them. I
+> then looked at modifying the kernel not to allow having the two flags
+> set, but when discussing about that with Mat, we thought it was maybe
+> not ideal to do that, as there might be use-cases, we might break some
+> configs. Then I saw it was working before v5.17. So instead, I fixed the
+> support on the kernel side (patch 5) using Paolo's suggestion. This also
+> includes a fix on the options side (patch 1: for v5.11+), an explicit
+> deny of some options combinations (patch 2: for v5.18+), and some
+> refactoring (patches 3 and 4) to ease the inclusion of the patch 5.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/7] mptcp: fully established after ADD_ADDR echo on MPJ
+    https://git.kernel.org/netdev/net/c/d67c5649c154
+  - [net,2/7] mptcp: pm: deny endp with signal + subflow + port
+    https://git.kernel.org/netdev/net/c/8af1f11865f2
+  - [net,3/7] mptcp: pm: reduce indentation blocks
+    https://git.kernel.org/netdev/net/c/c95eb32ced82
+  - [net,4/7] mptcp: pm: don't try to create sf if alloc failed
+    https://git.kernel.org/netdev/net/c/cd7c957f936f
+  - [net,5/7] mptcp: pm: do not ignore 'subflow' if 'signal' flag is also set
+    https://git.kernel.org/netdev/net/c/85df533a787b
+  - [net,6/7] selftests: mptcp: join: ability to invert ADD_ADDR check
+    https://git.kernel.org/netdev/net/c/bec1f3b119eb
+  - [net,7/7] selftests: mptcp: join: test both signal & subflow
+    https://git.kernel.org/netdev/net/c/4d2868b5d191
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
