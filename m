@@ -1,189 +1,134 @@
-Return-Path: <netdev+bounces-115232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AE79458E4
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:32:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7441C9458EE
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 09:35:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A6231F23B07
-	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 07:32:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12225B23B12
+	for <lists+netdev@lfdr.de>; Fri,  2 Aug 2024 07:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7317F1BF305;
-	Fri,  2 Aug 2024 07:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D096945020;
+	Fri,  2 Aug 2024 07:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nqa43LUL"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="hfJ/L3I5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1A7482EF
-	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 07:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D7641760
+	for <netdev@vger.kernel.org>; Fri,  2 Aug 2024 07:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722583911; cv=none; b=YzwmSj3yRAMMWE3CK3bMfWoB614uw+QL9uVaKYOyaEpRWaosIOfN8Y1HkIr9WUg4Pw1UYfllZF9kVANYttur4nHRgnYgwgrnej39M5fGeqyGZksZC+Vvu3pDCNDjFx0gMVYaaqdpKsdbvQx/kDEogHy4Q6zsG5UdUYNA0i0eELg=
+	t=1722584133; cv=none; b=Qfojm9Mp9uMK5zrKHXzYI3Sx421UGlXbb1SeaJUbzaSGXsyt1l6fOVxnsKkxxeN/EQBO7U3DnxL2HVSKdwBOieBhEngo4M4s4ve10f1Dw4gl/CwOtPNaL1ldLOsPz4J0CLYOE+lZs59MJNN6EmyR04hLYh5lnplLmzIuYoJaG5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722583911; c=relaxed/simple;
-	bh=9DFZsntO69vLTXgI4Wfi0cToeeZQEomTOnp3iVaRlvI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XjmkUGHHv5sxSRlsxSwp2gHbzoRB5d1+yLqytC/N8RLrRLli7qwOL2/m9bfLLuBtz/zKbb1ssm/vp03rD/s8kIk+tgj/+6WOYdz9lK8Qr8mSJ8l0bpq0OvbzIqpcrM3YFcs058V0Vk+QhtCPL1uXh02GNTor/PD2uPtnrSckuBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nqa43LUL; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722583909; x=1754119909;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9DFZsntO69vLTXgI4Wfi0cToeeZQEomTOnp3iVaRlvI=;
-  b=Nqa43LULe04uvPrRu0A+c/Q348qg921cO+e0fi1DTrKweoo7LHMPvrwW
-   GLlk/OY5XBmys0BdDKUtLcLBkMNQnTvjHFCIRe0mJxiVSXLyjvX2dq+L1
-   b7Qakbmx+QihnO+gZyBxMzrXxzVdPMH5EIKRlEcf0GTFnngUvV2vWrZmU
-   qyY3irxWisN1IK+2vyJvDFFpfNpi8bCENKSOibBvJekkpvlSxPkbZ78N8
-   vSg+Jk3DfyLmEqNU9jgrEndK7J31w/Dg+a+86qj/N8+wvBhwHZ73g3gDW
-   bdEKlcpgryzH9GYpX9tCNxdEceelIX2TfLovEtWlB25vPZvsL3g83byDL
-   g==;
-X-CSE-ConnectionGUID: ttRNp9A9R3m1lxm04VAepA==
-X-CSE-MsgGUID: Ml+jKHBYSLWJ9zahF7MbHQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11151"; a="45991344"
-X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
-   d="scan'208";a="45991344"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:31:49 -0700
-X-CSE-ConnectionGUID: hd2/IfwMR4mztDJQQFAzKw==
-X-CSE-MsgGUID: Y8+1o2KiSXi2lIy3TxukvQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
-   d="scan'208";a="54955477"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:31:45 -0700
-Date: Fri, 2 Aug 2024 09:30:07 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org, jiri@nvidia.com,
-	shayd@nvidia.com, wojciech.drewek@intel.com, horms@kernel.org,
-	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
-	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
-	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com
-Subject: Re: [PATCH net-next v2 00/15][pull request] ice: support devlink
- subfunction
-Message-ID: <ZqyK/xHkGEFEX+8Q@mev-dev.igk.intel.com>
-References: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1722584133; c=relaxed/simple;
+	bh=b2MqOARwJjplWCgMNBav9jyB/LS57clCBkTKxbuNVqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bgvaMIVWbJugUPOzWmlLhJQZSr+4Qkiskan/g90aUyoNIComGQRxCeino4SvkBbI7FiVdaY7+kHNYB0pezWcpJfV4SXtODuV93ywBpFY3iZBW/K4W9FmTJPilje4HPXUegGlpuxfKdYQP1PxEAlmiLu+rF76Rv8VpTfRtF0Jzfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=hfJ/L3I5; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:1:e533:7058:72ab:8493] (unknown [IPv6:2a02:8010:6359:1:e533:7058:72ab:8493])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 9F2B87D9B6;
+	Fri,  2 Aug 2024 08:35:24 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1722584124; bh=b2MqOARwJjplWCgMNBav9jyB/LS57clCBkTKxbuNVqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:From;
+	z=Message-ID:=20<d828df18-64ec-9ed2-8159-ae0cb01302be@katalix.com>|
+	 Date:=20Fri,=202=20Aug=202024=2008:35:24=20+0100|MIME-Version:=201
+	 .0|Subject:=20Re:=20RFC:=20l2tp:=20how=20to=20fix=20nested=20socke
+	 t=20lockdep=20splat|To:=20Eric=20Dumazet=20<edumazet@google.com>|C
+	 c:=20netdev@vger.kernel.org,=20davem@davemloft.net,=20kuba@kernel.
+	 org,=0D=0A=20pabeni@redhat.com,=20dsahern@kernel.org,=20jakub@clou
+	 dflare.com,=0D=0A=20tparkin@katalix.com|References:=20<20240801152
+	 704.24279-1-jchapman@katalix.com>=0D=0A=20<CANn89iJkFh4JmNO2gM-4c6
+	 sbqgdjFzdNZUc-b6jupTMpUaC1mQ@mail.gmail.com>|From:=20James=20Chapm
+	 an=20<jchapman@katalix.com>|In-Reply-To:=20<CANn89iJkFh4JmNO2gM-4c
+	 6sbqgdjFzdNZUc-b6jupTMpUaC1mQ@mail.gmail.com>;
+	b=hfJ/L3I5ETNDNshCP88DT1DKeO77G/ZiU4HfQcYxEvVlGywiKzZsps5/GR48H/LSo
+	 5ZXSFZNDI0KxQFFs20OXVzk98Kh1sX4PVgFxKI0kqqIQQfqh+diyFjh8wy5AzcZCFE
+	 wKGW2adHdwG72hOO2CGdTh/14QQfBBSFJYiZKTaLogUEWJHJXjco03TeO+Mmv4Xo0t
+	 DLSVquq0DirCzYkEJeUPafPBOw5Itn09a2xDXrgOzOfaBdDDDUMQychBxarFgf3fyb
+	 U2Pjwkl/gWPbav2QxmLwbcNku7eiPAdS7f4Ku2Y/o0rpRpvZ9noIh6DrlOCGZVbprg
+	 TDeH0EBVVEygA==
+Message-ID: <d828df18-64ec-9ed2-8159-ae0cb01302be@katalix.com>
+Date: Fri, 2 Aug 2024 08:35:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: RFC: l2tp: how to fix nested socket lockdep splat
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, jakub@cloudflare.com,
+ tparkin@katalix.com
+References: <20240801152704.24279-1-jchapman@katalix.com>
+ <CANn89iJkFh4JmNO2gM-4c6sbqgdjFzdNZUc-b6jupTMpUaC1mQ@mail.gmail.com>
+Content-Language: en-US
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+In-Reply-To: <CANn89iJkFh4JmNO2gM-4c6sbqgdjFzdNZUc-b6jupTMpUaC1mQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 31, 2024 at 03:10:11PM -0700, Tony Nguyen wrote:
-> Michal Swiatkowski says:
+On 01/08/2024 16:57, Eric Dumazet wrote:
+> On Thu, Aug 1, 2024 at 5:27 PM James Chapman <jchapman@katalix.com> wrote:
+>>
+>> When l2tp tunnels use a socket provided by userspace, we can hit lockdep splats like the below when data is transmitted through another (unrelated) userspace socket which then gets routed over l2tp.
+>>
+>> This issue was previously discussed here: https://lore.kernel.org/netdev/87sfialu2n.fsf@cloudflare.com/
+>>
+>> Is it reasonable to disable lockdep tracking of l2tp userspace tunnel sockets? Is there a better solution?
+>>
+>> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+>> index e22e2a45c925..ab7be05da7d4 100644
+>> --- a/net/l2tp/l2tp_core.c
+>> +++ b/net/l2tp/l2tp_core.c
+>> @@ -1736,6 +1736,16 @@ int l2tp_tunnel_register(struct l2tp_tunnel *tunnel, struct net *net,
+>>          }
+>>
+>>          sk->sk_allocation = GFP_ATOMIC;
+>> +
+>> +       /* If the tunnel socket is a userspace socket, disable lockdep
+>> +        * validation on the tunnel socket to avoid lockdep splats caused by
+>> +        * nested socket calls on the same lockdep socket class. This can
+>> +        * happen when data from a user socket is routed over l2tp, which uses
+>> +        * another userspace socket.
+>> +        */
+>> +       if (tunnel->fd >= 0)
+>> +               lockdep_set_novalidate_class(&sk->sk_lock.slock);
+>> +
 > 
-> Currently ice driver does not allow creating more than one networking
-> device per physical function. The only way to have more hardware backed
-> netdev is to use SR-IOV.
 > 
-> Following patchset adds support for devlink port API. For each new
-> pcisf type port, driver allocates new VSI, configures all resources
-> needed, including dynamically MSIX vectors, program rules and registers
-> new netdev.
+> I would rather use
 > 
-> This series supports only one Tx/Rx queue pair per subfunction.
+> // Must be different than SINGLE_DEPTH_NESTING
+> #define L2TP_DEPTH_NESTED 2
 > 
-> Example commands:
-> devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
-> devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
-> devlink port function set pci/0000:31:00.1/1 state active
-> devlink port function del pci/0000:31:00.1/1
+> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> index 5d2068b6c77859c0e2e3166afd8e2e1e32512445..4d747a0cf30c645e51c27e531d23db682259155f
+> 100644
+> --- a/net/l2tp/l2tp_core.c
+> +++ b/net/l2tp/l2tp_core.c
+> @@ -1171,7 +1171,7 @@ static int l2tp_xmit_core(struct l2tp_session
+> *session, struct sk_buff *skb, uns
+>          IPCB(skb)->flags &= ~(IPSKB_XFRM_TUNNEL_SIZE |
+> IPSKB_XFRM_TRANSFORMED | IPSKB_REROUTED);
+>          nf_reset_ct(skb);
 > 
-> Make the port representor and eswitch code generic to support
-> subfunction representor type.
+> -       bh_lock_sock_nested(sk);
+> +       spin_lock_nested(&sk->sk_lock.slock, L2TP_DEPTH_NESTING);
+>          if (sock_owned_by_user(sk)) {
+>                  kfree_skb(skb);
+>                  ret = NET_XMIT_DROP;
 > 
-> VSI configuration is slightly different between VF and SF. It needs to
-> be reflected in the code.
-> ---
-> v2:
-> - Add more recipients
-> 
-> v1: https://lore.kernel.org/netdev/20240729223431.681842-1-anthony.l.nguyen@intel.com/
-> 
-> The following are changes since commit 990c304930138dcd7a49763417e6e5313b81293e:
->   Add support for PIO p flag
-> and are available in the git repository at:
->   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
-> 
-> Michal Swiatkowski (8):
->   ice: treat subfunction VSI the same as PF VSI
->   ice: make representor code generic
->   ice: create port representor for SF
->   ice: don't set target VSI for subfunction
->   ice: check if SF is ready in ethtool ops
->   ice: implement netdevice ops for SF representor
->   ice: support subfunction devlink Tx topology
->   ice: basic support for VLAN in subfunctions
-> 
-> Piotr Raczynski (7):
->   ice: add new VSI type for subfunctions
->   ice: export ice ndo_ops functions
->   ice: add basic devlink subfunctions support
->   ice: allocate devlink for subfunction
->   ice: base subfunction aux driver
->   ice: implement netdev for subfunction
->   ice: allow to activate and deactivate subfunction
-> 
->  drivers/net/ethernet/intel/ice/Makefile       |   2 +
->  .../net/ethernet/intel/ice/devlink/devlink.c  |  47 ++
->  .../net/ethernet/intel/ice/devlink/devlink.h  |   1 +
->  .../ethernet/intel/ice/devlink/devlink_port.c | 503 ++++++++++++++++++
->  .../ethernet/intel/ice/devlink/devlink_port.h |  46 ++
->  drivers/net/ethernet/intel/ice/ice.h          |  19 +-
->  drivers/net/ethernet/intel/ice/ice_base.c     |   5 +-
->  drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   1 +
->  drivers/net/ethernet/intel/ice/ice_eswitch.c  | 111 +++-
->  drivers/net/ethernet/intel/ice/ice_eswitch.h  |  22 +-
->  drivers/net/ethernet/intel/ice/ice_ethtool.c  |   7 +-
->  drivers/net/ethernet/intel/ice/ice_lib.c      |  52 +-
->  drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +
->  drivers/net/ethernet/intel/ice/ice_main.c     |  66 ++-
->  drivers/net/ethernet/intel/ice/ice_repr.c     | 211 ++++++--
->  drivers/net/ethernet/intel/ice/ice_repr.h     |  22 +-
->  drivers/net/ethernet/intel/ice/ice_sf_eth.c   | 331 ++++++++++++
->  drivers/net/ethernet/intel/ice/ice_sf_eth.h   |  33 ++
->  .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.c  |  21 +
->  .../ethernet/intel/ice/ice_sf_vsi_vlan_ops.h  |  13 +
->  drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
->  drivers/net/ethernet/intel/ice/ice_txrx.c     |   2 +-
->  drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
->  drivers/net/ethernet/intel/ice/ice_vf_lib.c   |   4 +-
->  .../net/ethernet/intel/ice/ice_vsi_vlan_ops.c |   4 +
->  drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
->  26 files changed, 1396 insertions(+), 137 deletions(-)
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.c
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_vsi_vlan_ops.h
-> 
-> -- 
-> 2.42.0
-> 
+Thanks Eric. I'll submit a patch with this fix later.
 
-[offlist]
-
-Hi Tony,
-
-Am I correct that now I should send v6 to iwl (+CC netdev) when you
-remove the patchset from dev-queue? I am little confused with Jiri
-comment about versioning PR. I though it is usuall thing.
-
-I already have done the changes that Jiri asked for (and Maciej from
-previous version).
-
-Thanks,
-Michal
 
