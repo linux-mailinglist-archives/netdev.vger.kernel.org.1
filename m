@@ -1,305 +1,267 @@
-Return-Path: <netdev+bounces-115495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4322F946AC1
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 20:09:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A77D8946ACA
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 20:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39D671C20CA7
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 18:09:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB3771C206A5
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 18:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D4517C8B;
-	Sat,  3 Aug 2024 18:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B453215EA6;
+	Sat,  3 Aug 2024 18:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B1rEv1U0"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="yVv+xTCp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 973CE1799D
-	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 18:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF34A6FA8
+	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 18:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722708593; cv=none; b=Y3Pf0t3WDQYz4/HDy5zBSh0hiHJcsNZ20xLqaMBcrGEEuYbHkfDe5Px2hCumGxN+X54HTX/qsO2qSUBbZIkOjihrnm2kG+XXgyE/bZJEQlC7MmjjT/eH6X6bwMTo2WviCuBSJDye+biICn435W3jn+6S3chDquNUOseI4b02s/c=
+	t=1722708695; cv=none; b=M4DkOHcKz1JxpOcnLu2S0SXBVlukHwUWVbtetkHBozEH4Fv9VeHWQ80hZHkZ1XIKqzQoCcL+X7owF0ZVefn4t4DvGNqCSGM3+WqyPvbhnxNSdkMjSIywEDu6FX+rCON0tVzTOHgcFT+Gh4QJO4tm4L0KwREbXiQ7P78FRfOZt2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722708593; c=relaxed/simple;
-	bh=8McCiWm3vKi7832j/u0q6szlS0woc2ICJglvHOVT9nk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PHir3O+JcJy7JaZW2bDcyGQw3mGm4VBfMtFmhjf23p0213MMkZ9xkUIGCJ4YfvqHJ1ST2oC0svsLvlztpromys2pWjUGh+8xjKwgGcXlD+gHvjoOai5wNa3wOujYcWQkHQ60EumQGlYFTZ3b1K3nEMC7o2eKkF+dnTkmGI6EZKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B1rEv1U0; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4c32b96f-d962-4427-87c2-4953c91c9e43@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722708588;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vawbaZaNlrJ7EQQGbry712PsMIOP5IKqRzfxEy/UERA=;
-	b=B1rEv1U0meAPmKRX0yCnnOfLjXcwHnuxSRIM0cozVojWZcdichu0Le2TCs/sd2jUdTZtMp
-	02WMWy9ckNSByxYlbjjV60rIifr2+RRLIMDk2U8yOdw7QAHarh0BPNOCUG+PP3i0j7nbYH
-	6OeYehy2xDTHwK3coHqyrjY6Ae6KLd8=
-Date: Sun, 4 Aug 2024 02:09:21 +0800
+	s=arc-20240116; t=1722708695; c=relaxed/simple;
+	bh=85mzIHVbmDPqY5YzUVuesEGlJqqJKFDiJr87xUFtWO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WUp+njEEpY8mFjDrA1TJmw/aV/1OUfnTeZNtMFbNLOY+fc1Yi1zDZcGZY+zfrGaCuQy5TqvjpHc/zfc7hW7CJkJrnIOQFScKB65DolMSun7vzWnvONK9HtwPjAnWKu/IssVHuC34pV/SXTh99kmjxU32vW6rdHJLI8AkU5xyAu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=yVv+xTCp; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-428101fa30aso62307445e9.3
+        for <netdev@vger.kernel.org>; Sat, 03 Aug 2024 11:11:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1722708692; x=1723313492; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tYjcSPjVDWfsXNZ8//s5IwKpmiouYrrwAo6x+rTr3K4=;
+        b=yVv+xTCpqq7KhHT3AkXO89uXT/lZLSG0iyWHxQfgIMFatDOF7RAjE90Mk3I5Uqo0Fp
+         +PHs2V8QRXWHPHWH60N2PCy6TWvke5ZVRKFe14SAg6L0JPOmxllqXdtxEUtOE8YN2LBK
+         cQJhCZT3sWAc7dcJy5jEs+5KSBJ1g5AvZjubc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722708692; x=1723313492;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tYjcSPjVDWfsXNZ8//s5IwKpmiouYrrwAo6x+rTr3K4=;
+        b=rx+K5bXNxkU3Fc4deQewcWQX+1vnucdbBKTnGqFR2jaSXwIwW5tWp84o3Pz9a648PJ
+         xa7ohfegG0qyEWDe5ir4H6KK9gXK5Y0/A95/UH6J4dqAYcN2nX0BUiuaAs7gDWxrE10a
+         W5HZtSoE4aupQKpZ38oYMuwqOW/3QP9z8RnHNox5VLoCmFWwiWS8Nr3wQJ0bZytweUhF
+         J+AofUmk+uIXlo7+KTs9zBxcW7OVWLJLUeZE19xcgz4Rp55xwlksr80dR/6xGlYZ7Az0
+         s0cJ2J5L7cw4hmEzeElszp076uUusIh90jTARnMYphX9sTzEjYDUByNgbID79VBoSsW7
+         v8hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX9ErdLgefXWTwEeJzQI018bl1ai6++tGM8ZL7+BMcA4Y5rjHjITnp7qaO0DWpCBjJJ+cQDtsByeVWVJUgGXSEjQc6iIRKJ
+X-Gm-Message-State: AOJu0Yx/XAz8H/xyX/tJ/tFa68eSwcclrLnVwjjQ0dUbXG7Q2rBbDWGr
+	z9SfVJ2IJuZqcqImDFEkFJeKqt84V0RGIqC7s+ey66p3I4u/iQc79XPAc5utnC8=
+X-Google-Smtp-Source: AGHT+IFLB3u2Nf5Y0eIKVho5hdTAbx6xF0dA7eyXWE0JIGSZsUQ4WFj9jmCQH2I0xaBhMxNWiSofjA==
+X-Received: by 2002:a05:600c:45cd:b0:426:66e9:b844 with SMTP id 5b1f17b1804b1-428e6aeb0b3mr55176835e9.8.1722708691736;
+        Sat, 03 Aug 2024 11:11:31 -0700 (PDT)
+Received: from LQ3V64L9R2 ([2a04:4a43:869f:fd54:881:c465:d85d:e827])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf1e180sm4897288f8f.34.2024.08.03.11.11.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Aug 2024 11:11:31 -0700 (PDT)
+Date: Sat, 3 Aug 2024 19:11:28 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
+	przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
+	gal.pressman@linux.dev, tariqt@nvidia.com,
+	willemdebruijn.kernel@gmail.com
+Subject: Re: [PATCH net-next v2 09/12] ethtool: rss: support dumping RSS
+ contexts
+Message-ID: <Zq5y0DvXQpBdOEeA@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
+	donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
+	willemdebruijn.kernel@gmail.com
+References: <20240803042624.970352-1-kuba@kernel.org>
+ <20240803042624.970352-10-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2] net: mana: Implement
- get_ringparam/set_ringparam for mana
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
- Ajay Sharma <sharmaajay@microsoft.com>, Simon Horman <horms@kernel.org>,
- Konstantin Taranov <kotaranov@microsoft.com>,
- Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
- Erick Archer <erick.archer@outlook.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
- Colin Ian King <colin.i.king@gmail.com>
-References: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240803042624.970352-10-kuba@kernel.org>
 
-在 2024/7/31 1:01, Shradha Gupta 写道:
-> Currently the values of WQs for RX and TX queues for MANA devices
-> are hardcoded to default sizes.
-> Allow configuring these values for MANA devices as ringparam
-> configuration(get/set) through ethtool_ops.
+On Fri, Aug 02, 2024 at 09:26:21PM -0700, Jakub Kicinski wrote:
+> Now that we track RSS contexts in the core we can easily dump
+> them. This is a major introspection improvement, as previously
+> the only way to find all contexts would be to try all ids
+> (of which there may be 2^32 - 1).
 > 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Long Li <longli@microsoft.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->   Changes in v2:
->   * Removed unnecessary validations in mana_set_ringparam()
->   * Fixed codespell error
->   * Improved error message to indicate issue with the parameter
-> ---
->   drivers/net/ethernet/microsoft/mana/mana_en.c | 20 +++---
->   .../ethernet/microsoft/mana/mana_ethtool.c    | 66 +++++++++++++++++++
->   include/net/mana/mana.h                       | 21 +++++-
->   3 files changed, 96 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index d2f07e179e86..598ac62be47d 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -618,7 +618,7 @@ static int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu)
->   
->   	dev = mpc->ac->gdma_dev->gdma_context->dev;
->   
-> -	num_rxb = mpc->num_queues * RX_BUFFERS_PER_QUEUE;
-> +	num_rxb = mpc->num_queues * mpc->rx_queue_size;
->   
->   	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
->   	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
-> @@ -1899,14 +1899,15 @@ static int mana_create_txq(struct mana_port_context *apc,
->   		return -ENOMEM;
->   
->   	/*  The minimum size of the WQE is 32 bytes, hence
-> -	 *  MAX_SEND_BUFFERS_PER_QUEUE represents the maximum number of WQEs
-> +	 *  apc->tx_queue_size represents the maximum number of WQEs
->   	 *  the SQ can store. This value is then used to size other queues
->   	 *  to prevent overflow.
-> +	 *  Also note that the txq_size is always going to be MANA_PAGE_ALIGNED,
-> +	 *  as tx_queue_size is always a power of 2.
->   	 */
-> -	txq_size = MAX_SEND_BUFFERS_PER_QUEUE * 32;
-> -	BUILD_BUG_ON(!MANA_PAGE_ALIGNED(txq_size));
-> +	txq_size = apc->tx_queue_size * 32;
 
-Not sure if the following is needed or not.
-"
-WARN_ON(!MANA_PAGE_ALIGNED(txq_size));
-"
+Thanks for doing this important and extremely useful work. I am
+personally very excited to see this data available to userland.
 
-Zhu Yanjun
+[...]
 
->   
-> -	cq_size = MAX_SEND_BUFFERS_PER_QUEUE * COMP_ENTRY_SIZE;
-> +	cq_size = apc->tx_queue_size * COMP_ENTRY_SIZE;
->   	cq_size = MANA_PAGE_ALIGN(cq_size);
->   
->   	gc = gd->gdma_context;
-> @@ -2145,10 +2146,11 @@ static int mana_push_wqe(struct mana_rxq *rxq)
->   
->   static int mana_create_page_pool(struct mana_rxq *rxq, struct gdma_context *gc)
->   {
-> +	struct mana_port_context *mpc = netdev_priv(rxq->ndev);
->   	struct page_pool_params pprm = {};
->   	int ret;
->   
-> -	pprm.pool_size = RX_BUFFERS_PER_QUEUE;
-> +	pprm.pool_size = mpc->rx_queue_size;
->   	pprm.nid = gc->numa_node;
->   	pprm.napi = &rxq->rx_cq.napi;
->   	pprm.netdev = rxq->ndev;
-> @@ -2180,13 +2182,13 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
->   
->   	gc = gd->gdma_context;
->   
-> -	rxq = kzalloc(struct_size(rxq, rx_oobs, RX_BUFFERS_PER_QUEUE),
-> +	rxq = kzalloc(struct_size(rxq, rx_oobs, apc->rx_queue_size),
->   		      GFP_KERNEL);
->   	if (!rxq)
->   		return NULL;
->   
->   	rxq->ndev = ndev;
-> -	rxq->num_rx_buf = RX_BUFFERS_PER_QUEUE;
-> +	rxq->num_rx_buf = apc->rx_queue_size;
->   	rxq->rxq_idx = rxq_idx;
->   	rxq->rxobj = INVALID_MANA_HANDLE;
->   
-> @@ -2734,6 +2736,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
->   	apc->ndev = ndev;
->   	apc->max_queues = gc->max_num_queues;
->   	apc->num_queues = gc->max_num_queues;
-> +	apc->tx_queue_size = DEF_TX_BUFFERS_PER_QUEUE;
-> +	apc->rx_queue_size = DEF_RX_BUFFERS_PER_QUEUE;
->   	apc->port_handle = INVALID_MANA_HANDLE;
->   	apc->pf_filter_handle = INVALID_MANA_HANDLE;
->   	apc->port_idx = port_idx;
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> index 146d5db1792f..34707da6ff68 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -369,6 +369,70 @@ static int mana_set_channels(struct net_device *ndev,
->   	return err;
->   }
->   
-> +static void mana_get_ringparam(struct net_device *ndev,
-> +			       struct ethtool_ringparam *ring,
-> +			       struct kernel_ethtool_ringparam *kernel_ring,
-> +			       struct netlink_ext_ack *extack)
-> +{
-> +	struct mana_port_context *apc = netdev_priv(ndev);
+> diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
+> index 023782ca1230..62e7b6fe605d 100644
+> --- a/net/ethtool/rss.c
+> +++ b/net/ethtool/rss.c
+> @@ -208,6 +208,139 @@ static void rss_cleanup_data(struct ethnl_reply_data *reply_base)
+>  	kfree(data->indir_table);
+>  }
+>  
+> +struct rss_nl_dump_ctx {
+> +	unsigned long		ifindex;
+> +	unsigned long		ctx_idx;
 > +
-> +	ring->rx_pending = apc->rx_queue_size;
-> +	ring->tx_pending = apc->tx_queue_size;
-> +	ring->rx_max_pending = MAX_RX_BUFFERS_PER_QUEUE;
-> +	ring->tx_max_pending = MAX_TX_BUFFERS_PER_QUEUE;
+> +	unsigned int		one_ifindex;
+
+My apologies: I'm probably just not familiar enough with the code,
+but I'm having a hard time understanding what the purpose of
+one_ifindex is.
+
+I read both ethnl_rss_dump_start and ethnl_rss_dumpit, but I'm still
+not following what this is used for; it'll probably be obvious in
+retrospect once you explain it, but I suppose my feedback is that a
+comment or something would be really helpful :)
+
+> +};
+> +
+> +static struct rss_nl_dump_ctx *rss_dump_ctx(struct netlink_callback *cb)
+> +{
+> +	NL_ASSERT_DUMP_CTX_FITS(struct rss_nl_dump_ctx);
+> +
+> +	return (struct rss_nl_dump_ctx *)cb->ctx;
 > +}
 > +
-> +static int mana_set_ringparam(struct net_device *ndev,
-> +			      struct ethtool_ringparam *ring,
-> +			      struct kernel_ethtool_ringparam *kernel_ring,
-> +			      struct netlink_ext_ack *extack)
+> +int ethnl_rss_dump_start(struct netlink_callback *cb)
 > +{
-> +	struct mana_port_context *apc = netdev_priv(ndev);
-> +	u32 new_tx, new_rx;
-> +	u32 old_tx, old_rx;
-> +	int err1, err2;
+> +	const struct genl_info *info = genl_info_dump(cb);
+> +	struct rss_nl_dump_ctx *ctx = rss_dump_ctx(cb);
+> +	struct ethnl_req_info req_info = {};
+> +	struct nlattr **tb = info->attrs;
+> +	int ret;
 > +
-> +	old_tx = apc->tx_queue_size;
-> +	old_rx = apc->rx_queue_size;
-> +	new_tx = clamp_t(u32, ring->tx_pending, MIN_TX_BUFFERS_PER_QUEUE, MAX_TX_BUFFERS_PER_QUEUE);
-> +	new_rx = clamp_t(u32, ring->rx_pending, MIN_RX_BUFFERS_PER_QUEUE, MAX_RX_BUFFERS_PER_QUEUE);
-> +
-> +	if (!is_power_of_2(new_tx)) {
-> +		netdev_err(ndev, "%s:Tx:%d not supported. Needs to be a power of 2\n",
-> +			   __func__, new_tx);
+> +	/* Filtering by context not supported */
+> +	if (tb[ETHTOOL_A_RSS_CONTEXT]) {
+> +		NL_SET_BAD_ATTR(info->extack, tb[ETHTOOL_A_RSS_CONTEXT]);
 > +		return -EINVAL;
 > +	}
 > +
-> +	if (!is_power_of_2(new_rx)) {
-> +		netdev_err(ndev, "%s:Rx:%d not supported. Needs to be a power of 2\n",
-> +			   __func__, new_rx);
-> +		return -EINVAL;
+> +	ret = ethnl_parse_header_dev_get(&req_info,
+> +					 tb[ETHTOOL_A_RSS_HEADER],
+> +					 sock_net(cb->skb->sk), cb->extack,
+> +					 false);
+> +	if (req_info.dev) {
+> +		ctx->one_ifindex = req_info.dev->ifindex;
+> +		ctx->ifindex = ctx->one_ifindex;
+> +		ethnl_parse_header_dev_put(&req_info);
+> +		req_info.dev = NULL;
 > +	}
 > +
-> +	err1 = mana_detach(ndev, false);
-> +	if (err1) {
-> +		netdev_err(ndev, "mana_detach failed: %d\n", err1);
-> +		return err1;
-> +	}
+> +	return ret;
+> +}
 > +
-> +	apc->tx_queue_size = new_tx;
-> +	apc->rx_queue_size = new_rx;
-> +	err1 = mana_attach(ndev);
-> +	if (!err1)
+> +static int
+> +rss_dump_one_ctx(struct sk_buff *skb, struct netlink_callback *cb,
+> +		 struct net_device *dev, u32 rss_context)
+> +{
+> +	const struct genl_info *info = genl_info_dump(cb);
+> +	struct rss_reply_data data = {};
+> +	struct rss_req_info req = {};
+> +	void *ehdr;
+> +	int ret;
+> +
+> +	req.rss_context = rss_context;
+> +
+> +	ehdr = ethnl_dump_put(skb, cb, ETHTOOL_MSG_RSS_GET_REPLY);
+> +	if (!ehdr)
+> +		return -EMSGSIZE;
+> +
+> +	ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_RSS_HEADER);
+> +	if (ret < 0)
+> +		goto err_cancel;
+> +
+> +	if (!rss_context)
+> +		ret = rss_prepare_get(&req, dev, &data, info);
+> +	else
+> +		ret = rss_prepare_ctx(&req, dev, &data, info);
+> +	if (ret)
+> +		goto err_cancel;
+> +
+> +	ret = rss_fill_reply(skb, &req.base, &data.base);
+> +	if (ret)
+> +		goto err_cleanup;
+> +	genlmsg_end(skb, ehdr);
+> +
+> +	rss_cleanup_data(&data.base);
+> +	return 0;
+> +
+> +err_cleanup:
+> +	rss_cleanup_data(&data.base);
+> +err_cancel:
+> +	genlmsg_cancel(skb, ehdr);
+> +	return ret;
+> +}
+> +
+> +static int
+> +rss_dump_one_dev(struct sk_buff *skb, struct netlink_callback *cb,
+> +		 struct net_device *dev)
+> +{
+> +	struct rss_nl_dump_ctx *ctx = rss_dump_ctx(cb);
+> +	int ret;
+> +
+> +	if (!dev->ethtool_ops->get_rxfh)
 > +		return 0;
 > +
-> +	netdev_err(ndev, "mana_attach failed: %d\n", err1);
+> +	if (!ctx->ctx_idx) {
+> +		ret = rss_dump_one_ctx(skb, cb, dev, 0);
+> +		if (ret)
+> +			return ret;
+> +		ctx->ctx_idx++;
+> +	}
 > +
-> +	/* Try rolling back to the older values */
-> +	apc->tx_queue_size = old_tx;
-> +	apc->rx_queue_size = old_rx;
-> +	err2 = mana_attach(ndev);
-> +	if (err2)
-> +		netdev_err(ndev, "mana_reattach failed: %d\n", err2);
+> +	for (; xa_find(&dev->ethtool->rss_ctx, &ctx->ctx_idx,
+> +		       ULONG_MAX, XA_PRESENT); ctx->ctx_idx++) {
+> +		ret = rss_dump_one_ctx(skb, cb, dev, ctx->ctx_idx);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	ctx->ctx_idx = 0;
 > +
-> +	return err1;
+> +	return 0;
 > +}
 > +
->   const struct ethtool_ops mana_ethtool_ops = {
->   	.get_ethtool_stats	= mana_get_ethtool_stats,
->   	.get_sset_count		= mana_get_sset_count,
-> @@ -380,4 +444,6 @@ const struct ethtool_ops mana_ethtool_ops = {
->   	.set_rxfh		= mana_set_rxfh,
->   	.get_channels		= mana_get_channels,
->   	.set_channels		= mana_set_channels,
-> +	.get_ringparam          = mana_get_ringparam,
-> +	.set_ringparam          = mana_set_ringparam,
->   };
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> index 6439fd8b437b..8f922b389883 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -38,9 +38,21 @@ enum TRI_STATE {
->   
->   #define COMP_ENTRY_SIZE 64
->   
-> -#define RX_BUFFERS_PER_QUEUE 512
-> +/* This Max value for RX buffers is derived from __alloc_page()'s max page
-> + * allocation calculation. It allows maximum 2^(MAX_ORDER -1) pages. RX buffer
-> + * size beyond this value gets rejected by __alloc_page() call.
-> + */
-> +#define MAX_RX_BUFFERS_PER_QUEUE 8192
-> +#define DEF_RX_BUFFERS_PER_QUEUE 512
-> +#define MIN_RX_BUFFERS_PER_QUEUE 128
->   
-> -#define MAX_SEND_BUFFERS_PER_QUEUE 256
-> +/* This max value for TX buffers is derived as the maximum allocatable
-> + * pages supported on host per guest through testing. TX buffer size beyond
-> + * this value is rejected by the hardware.
-> + */
-> +#define MAX_TX_BUFFERS_PER_QUEUE 16384
-> +#define DEF_TX_BUFFERS_PER_QUEUE 256
-> +#define MIN_TX_BUFFERS_PER_QUEUE 128
->   
->   #define EQ_SIZE (8 * MANA_PAGE_SIZE)
->   
-> @@ -285,7 +297,7 @@ struct mana_recv_buf_oob {
->   	void *buf_va;
->   	bool from_pool; /* allocated from a page pool */
->   
-> -	/* SGL of the buffer going to be sent has part of the work request. */
-> +	/* SGL of the buffer going to be sent as part of the work request. */
->   	u32 num_sge;
->   	struct gdma_sge sgl[MAX_RX_WQE_SGL_ENTRIES];
->   
-> @@ -437,6 +449,9 @@ struct mana_port_context {
->   	unsigned int max_queues;
->   	unsigned int num_queues;
->   
-> +	unsigned int rx_queue_size;
-> +	unsigned int tx_queue_size;
+> +int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+> +{
+> +	struct rss_nl_dump_ctx *ctx = rss_dump_ctx(cb);
+> +	struct net *net = sock_net(skb->sk);
+> +	struct net_device *dev;
+> +	int ret = 0;
 > +
->   	mana_handle_t port_handle;
->   	mana_handle_t pf_filter_handle;
->   
-
+> +	rtnl_lock();
+> +	for_each_netdev_dump(net, dev, ctx->ifindex) {
+> +		if (ctx->one_ifindex && ctx->one_ifindex != ctx->ifindex)
+> +			break;
+> +
+> +		ret = rss_dump_one_dev(skb, cb, dev);
+> +		if (ret)
+> +			break;
+> +	}
+> +	rtnl_unlock();
+> +
+> +	return ret;
+> +}
+> +
+>  const struct ethnl_request_ops ethnl_rss_request_ops = {
+>  	.request_cmd		= ETHTOOL_MSG_RSS_GET,
+>  	.reply_cmd		= ETHTOOL_MSG_RSS_GET_REPLY,
+> -- 
+> 2.45.2
+> 
 
