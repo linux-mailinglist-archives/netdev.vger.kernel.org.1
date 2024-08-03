@@ -1,135 +1,135 @@
-Return-Path: <netdev+bounces-115459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0860946688
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 02:38:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 104FF94668E
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 02:50:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A51A21F21D7F
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:38:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A4F41C20EE3
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197004687;
-	Sat,  3 Aug 2024 00:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1923D8E;
+	Sat,  3 Aug 2024 00:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YU/Xi2+H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIS4+0yM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBAA380
-	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 00:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B46FB8;
+	Sat,  3 Aug 2024 00:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722645501; cv=none; b=Zn7fHzus9KzmaZPPtKBqvHjj46XCK2eq8r1gLPmmMgP0uR/U8EexK9NaFj7UrDLn7AfP9cv6Vm5GKsM5YBM0WWGceY37PPb+FSmX/SC2+IVQb799FXjaV6W1XPUEm9/Q0hBKKA4Kx3Rp5boN9BNggCIxkpatASb4jRYebc5q1r8=
+	t=1722646234; cv=none; b=UCfD8GYVDz2UxbyTb6AmNEuS4/d+FRM10cJeaLQtKVwyfzJx77FZqMdtrK/Cesp2ZbPZDWTnZyI2tZuuEVWl2g9q4q7YPLkE0WD3g25Bt3UeB4x8iQ13r4UuVLge7ML6gBg7VtzbMEqEQuXmX/kTq+QUThUj7PxdSCvmXhvl2aU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722645501; c=relaxed/simple;
-	bh=Ta+ZUXznjXU9N09+5dDO48gPUVR2yUVdotk8x9uYHxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ciu3rG+rFQgQLGC7Iauy/9fzGJX0gIpUFgNOnNZeYRo/YfMqrDO8/XNAWLPLcQNurVEPsfEbifR7ZRRJ5Kx4kmv96kuaxO0LnrtfYvYMaPGGm0CUWTQvOtmlQDuuGTsZEOaVRjQ5sTk36Hn3vPkNGJd6QzsVzjFpZlvOjqOergM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YU/Xi2+H; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722645498; x=1754181498;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ta+ZUXznjXU9N09+5dDO48gPUVR2yUVdotk8x9uYHxA=;
-  b=YU/Xi2+HfEJfji5LfPT6VSf0a0cuALocYn9FdwiwNRqxYmOXyORVSc9a
-   3mk+nar/xp48lglNdh0Z0LSQNM6eiEkEx3Qf2BLYkrG8ZtlAQ9XcN4C0d
-   y/JiQJDaCqfIE92um3zZCpRNQK/d5ICAG8lf42Ul5lgRArb8/n/Yi8i6J
-   M84TIMpJqQzxHv4wfBku561XSxqyySYQz2coIH8qnSSzu6Xr7hfOAzCvw
-   nfrS2MyacVC2QCSIa1EM4K9GyBiC8opyqlQYWBkro8Y07koas543ruJEd
-   AGev9rr+aJeBoJXwqh/3NORyKv20fcvCbUyuM5SbGzLFhFBzXO4WPE9c1
-   A==;
-X-CSE-ConnectionGUID: 2kzsoXEkTc6twuMIYxgpKA==
-X-CSE-MsgGUID: uzbcokCDQ4OxCCB6/Q3t2A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11152"; a="20852602"
-X-IronPort-AV: E=Sophos;i="6.09,259,1716274800"; 
-   d="scan'208";a="20852602"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 17:38:17 -0700
-X-CSE-ConnectionGUID: cSeISrtbR2iDamonOEKdtw==
-X-CSE-MsgGUID: h5qq0JQ8SiGrcn5lF0JVhg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,259,1716274800"; 
-   d="scan'208";a="60572725"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 02 Aug 2024 17:38:15 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sa2mj-000xck-1k;
-	Sat, 03 Aug 2024 00:38:13 +0000
-Date: Sat, 3 Aug 2024 08:38:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Christian Hopps <chopps@chopps.org>
-Subject: Re: [PATCH ipsec-next v7 12/16] xfrm: iptfs: handle received
- fragmented inner packets
-Message-ID: <202408030834.THon2krt-lkp@intel.com>
-References: <20240801080314.169715-13-chopps@chopps.org>
+	s=arc-20240116; t=1722646234; c=relaxed/simple;
+	bh=TKgDbZppliFfj6siqWPyZeGhtXYn1QemkYs5GVnMb84=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t+Jg+/a5qHNIqcfT0m5pwBj04TbvZM+8JvZeNmO72A+ObGDxrcWhOksAL2twpHKnZeEFYDA70uuNABPLtu1zlPKq0U6rnXF93Y4F7HUUZobV69MPo4y+Th6iqSo52h73JeG7i7n+TVqwpdbKRMYdUiRqCTu5PIJaypLGSMgmJhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIS4+0yM; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7a18ba4143bso6353446a12.2;
+        Fri, 02 Aug 2024 17:50:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722646231; x=1723251031; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ii9TRHHbYfqeTNA8urSRUIghL0nSQM2uHrE3DtyGbx0=;
+        b=gIS4+0yMBFCuAjHJ3eRIQJbXE2r1bJcdm0fw/E2hLHk7i826kNCGtJzgPWAncro34b
+         Q8bcQYCW0d4U+kzsSDXl+V2v1jO5oVAtJ/dnT71q0Qy2nKcQY9oVkCWP9dSE80X6Q6sw
+         TiIW5uBlVQ7118ugnHubpwm74MU3SbMX/HXzEKO32JHWYE1nXb+7sHlgP9F0gJPkSSp6
+         89JAhLExygqGk1q2xsVEV58Gt79MKyC1BWo1nLk7OK9aJHFvbJXZ9uZiIePcB2w2bZNT
+         xIkFtEGsp1m5MFfnrGJ/LZgZM/oh5xa8wXSyVaONsBVkOC9s/DfIgAXldxbFdufnV4mj
+         Y+xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722646231; x=1723251031;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ii9TRHHbYfqeTNA8urSRUIghL0nSQM2uHrE3DtyGbx0=;
+        b=vQbYMiomn6djMEwh+d+LedcncCYL6Xj0zT41UPEVTbZXGRpQ0TJyFxspUxOY7TC09u
+         U3R3pVSivL/91eD/KKiC7eB0sj7v1DssjKMFqRJVWpog72c8dbZUxGl/8N+Rq0fTcq32
+         +u6smKTDSWAvinvUBCf3ZB+wStvCyoaD55tLK0ZttoR8kC3ix0Gzs3dUf0XAVyz0CI3s
+         Rl+iwP9iSSoWjyU4oMiujRTrxi9ao/NoIqsaLhUWEZCpU8NcCs9XirEFuxOid8k4RG3r
+         e4Mq19p3Gu9UTVGunLphnhBDp/RgucG2/kQCpGKa/GPhn8ePBQn//lJ5QFBKtARN7Qmf
+         nc3A==
+X-Forwarded-Encrypted: i=1; AJvYcCVwzsVFVW0hUJwSO3wSjpna1pgQsH/xtr1tO3u1NZZ4abCAClQ1BO11dev8pQYGtHwq07U7+nme/D22qtRSgJa3UjBeI17XFV1M2ABy6l6vFqM3tf875JOhu9urcX5Lm2VRPdZkIOU3WGf7czhW9hFMCCk5Ln5vzSHSHpS8ob6m+E5CfMSX
+X-Gm-Message-State: AOJu0Yx7Y/K74IsSQKBY3gZgLZ5lkoGxSk8YTl+29YcSjDtJTqM/HN40
+	luwEOZo5Bhn4cwcrDXoyvDzv4TtqmX1VivTjsVf4u9vQVDIdB9pZQJDAxXqJ+11kmYD6vXfO4fc
+	NrNVcNiKlyonobKuBALjjgn8LLRI=
+X-Google-Smtp-Source: AGHT+IGS4mvqY8Wvdxe/ZNRlFzeeItVUD/tp7A8aKWLj/K9xpJDlvLtJUOmC2keDnxNAnMHO8RMvCbjb2AaWzLyNhxI=
+X-Received: by 2002:a05:6a20:1596:b0:1c3:f4b6:6c0d with SMTP id
+ adf61e73a8af0-1c6996aca7emr7300214637.52.1722646231208; Fri, 02 Aug 2024
+ 17:50:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801080314.169715-13-chopps@chopps.org>
+References: <20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com> <20240802081823.67a27db3@kernel.org>
+In-Reply-To: <20240802081823.67a27db3@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Sat, 3 Aug 2024 01:50:19 +0100
+Message-ID: <CAJwJo6b1UHoCuyzy4UnLRu1W-GWx5jM2RhoddbzzuWXaEVG5yA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/7] net/selftests: TCP-AO selftests updates
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
+Hi Jakub,
 
-kernel test robot noticed the following build warnings:
+On Fri, 2 Aug 2024 at 16:18, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Fri, 02 Aug 2024 10:23:24 +0100 Dmitry Safonov via B4 Relay wrote:
+> > First 4 patches are more-or-less cleanups/preparations.
+> >
+> > Patch 5 was sent to me/contributed off-list by Mohammad, who wants 32-b=
+it
+> > kernels to run TCP-AO.
+> >
+> > Patch 6 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+> > the issue, but I hope it will fix netdev flakes for connect-deny-*
+> > tests.
+>
+> Hm, could be a coincidence but we did hit:
+>
+> # not ok 55 # error 381[unsigned-md5.c:24] Failed to add a VRF: -17
+> # not ok 56 # error 383[unsigned-md5.c:33] Failed to add a route to VRF: =
+-22: Key was rejected by service
+>
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsign=
+ed-md5-ipv6/stdout
 
-[auto build test WARNING on klassert-ipsec-next/master]
-[also build test WARNING on netfilter-nf/main linus/master v6.11-rc1 next-20240802]
-[cannot apply to klassert-ipsec/master nf-next/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Yeah, I think I've seen that previously on netdev as well, but quite rarely=
+.
+Let me take a look and see why adding a VRF table sometimes fails with EEXI=
+ST.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Hopps/xfrm-config-add-CONFIG_XFRM_IPTFS/20240802-185628
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/20240801080314.169715-13-chopps%40chopps.org
-patch subject: [PATCH ipsec-next v7 12/16] xfrm: iptfs: handle received fragmented inner packets
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240803/202408030834.THon2krt-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240803/202408030834.THon2krt-lkp@intel.com/reproduce)
+> in the first run after this got queued. But the retry worked:
+>
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsign=
+ed-md5-ipv6-retry/stdout
+>
+> =F0=9F=A4=B7=EF=B8=8F
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408030834.THon2krt-lkp@intel.com/
+[from another email]
+> oooh another run, another (different) flake:
+> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710181/11-key-m=
+anagement-ipv4/stdout
 
-All warnings (new ones prefixed by >>):
+Yeah, this is related to this very patch set.
+Some more work clearly needed :-)
 
->> net/xfrm/xfrm_iptfs.c:37: warning: expecting prototype for IP(). Prototype was for IPTFS_DEFAULT_DROP_TIME_USECS() instead
-   net/xfrm/xfrm_iptfs.c:49: warning: bad line: 
-   net/xfrm/xfrm_iptfs.c:58: warning: expecting prototype for IP(). Prototype was for IPTFS_DEFAULT_INIT_DELAY_USECS() instead
-
-
-vim +37 net/xfrm/xfrm_iptfs.c
-
-    26	
-    27	/**
-    28	 * IP-TFS default SA values (tunnel egress/dir-in)
-    29	 *
-    30	 * IPTFS_DEFAULT_DROP_TIME_USECS
-    31	 *        The default IPTFS drop time in microseconds. The drop time is the amount
-    32	 *        of time before a missing out-of-order IPTFS tunnel packet is considered
-    33	 *        lost. See also the reorder window.
-    34	 *
-    35	 *        Default 1s (1000000).
-    36	 */
-  > 37	#define IPTFS_DEFAULT_DROP_TIME_USECS	(1000000000ull) /* 1s */
-    38	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+             Dmitry
 
