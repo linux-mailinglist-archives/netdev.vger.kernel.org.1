@@ -1,108 +1,305 @@
-Return-Path: <netdev+bounces-115494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79849946A80
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 17:55:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4322F946AC1
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 20:09:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A89EF1C209BF
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 15:55:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39D671C20CA7
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 18:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1161509A0;
-	Sat,  3 Aug 2024 15:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D4517C8B;
+	Sat,  3 Aug 2024 18:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OegF3oDw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B1rEv1U0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556F214F9F1
-	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 15:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 973CE1799D
+	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 18:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722700550; cv=none; b=Ob4a9vrYLLq9ka/GWv/ZGGFgqaYQqkI+85iNHpEw8b6hpIYGkdNIfZhjORV5DcWSry//L/7WGDjkYjMN2hMKqlZshMkP8gsB51qlxArnEe54AJE/Bjfy2Nl3xNXnbw+IYydYbSmBIenxJKKtGuMuI6ByJi7OBk3Ecz2MKi0pd7E=
+	t=1722708593; cv=none; b=Y3Pf0t3WDQYz4/HDy5zBSh0hiHJcsNZ20xLqaMBcrGEEuYbHkfDe5Px2hCumGxN+X54HTX/qsO2qSUBbZIkOjihrnm2kG+XXgyE/bZJEQlC7MmjjT/eH6X6bwMTo2WviCuBSJDye+biICn435W3jn+6S3chDquNUOseI4b02s/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722700550; c=relaxed/simple;
-	bh=u3EQ9Hj7ZpnXiYJks0rhhPCwobubc2eRs6Hz77ELYH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HTq3HRtjcNwDJUeEKxmKDd3RwNMDOQLqgv71bD10Od07Qew9+Q7E5/tSPgvwBhPriylr/hjBSG9LRzvjYHyL74HdRldiudA48/j4KFdBSCHYOzfXeStt6bs8BDnE7W9X3V1i3QwhggM6uCiX9uS1cENiBs9dzQ9FlBvfTgujtds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OegF3oDw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 181EDC4AF0A;
-	Sat,  3 Aug 2024 15:55:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722700549;
-	bh=u3EQ9Hj7ZpnXiYJks0rhhPCwobubc2eRs6Hz77ELYH4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OegF3oDwUVP7XT3NxlL4UZEkAs0U5hh1f3SZ8NmenH38ekuzrkAycs+uq0TPHc6nT
-	 P8pUo/E4xdWyH3lMV7gnKCsBL4iwjlcObPE8+nOHFZTQIGGny7A8175MQYSxRb2lNW
-	 bJ0hOifz2wRJ45FqUhxK+b4692iUxTQ54qKIOOm82W6mDCudxtrk0hTx6Ig9N7p9a9
-	 OIrehwUx1vk8386PKpfR0pneV5HLDkoCHTeQpOoPiIGbFLHMCslWIFDKR4cYxoo8qU
-	 ZyN5yIozgn0dJf7GnO/tc5snrIhsU7Ir4xl71AQIngiaY/cXyN0dznXjYFERd95Goq
-	 /Yj7p67ijxXEA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: nbd@nbd.name,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	lorenzo.bianconi83@gmai.com
-Subject: [PATCH net-next] net: airoha: honor reset return value in airoha_hw_init()
-Date: Sat,  3 Aug 2024 17:50:50 +0200
-Message-ID: <f49dc04a87653e0155f4fab3e3eb584785c8ad6a.1722699555.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1722708593; c=relaxed/simple;
+	bh=8McCiWm3vKi7832j/u0q6szlS0woc2ICJglvHOVT9nk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PHir3O+JcJy7JaZW2bDcyGQw3mGm4VBfMtFmhjf23p0213MMkZ9xkUIGCJ4YfvqHJ1ST2oC0svsLvlztpromys2pWjUGh+8xjKwgGcXlD+gHvjoOai5wNa3wOujYcWQkHQ60EumQGlYFTZ3b1K3nEMC7o2eKkF+dnTkmGI6EZKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B1rEv1U0; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4c32b96f-d962-4427-87c2-4953c91c9e43@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722708588;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vawbaZaNlrJ7EQQGbry712PsMIOP5IKqRzfxEy/UERA=;
+	b=B1rEv1U0meAPmKRX0yCnnOfLjXcwHnuxSRIM0cozVojWZcdichu0Le2TCs/sd2jUdTZtMp
+	02WMWy9ckNSByxYlbjjV60rIifr2+RRLIMDk2U8yOdw7QAHarh0BPNOCUG+PP3i0j7nbYH
+	6OeYehy2xDTHwK3coHqyrjY6Ae6KLd8=
+Date: Sun, 4 Aug 2024 02:09:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v2] net: mana: Implement
+ get_ringparam/set_ringparam for mana
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
+ Ajay Sharma <sharmaajay@microsoft.com>, Simon Horman <horms@kernel.org>,
+ Konstantin Taranov <kotaranov@microsoft.com>,
+ Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+ Erick Archer <erick.archer@outlook.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Colin Ian King <colin.i.king@gmail.com>
+References: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Take into account return value from reset_control_bulk_assert and
-reset_control_bulk_deassert routines in airoha_hw_init().
+在 2024/7/31 1:01, Shradha Gupta 写道:
+> Currently the values of WQs for RX and TX queues for MANA devices
+> are hardcoded to default sizes.
+> Allow configuring these values for MANA devices as ringparam
+> configuration(get/set) through ethtool_ops.
+> 
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Reviewed-by: Long Li <longli@microsoft.com>
+> ---
+>   Changes in v2:
+>   * Removed unnecessary validations in mana_set_ringparam()
+>   * Fixed codespell error
+>   * Improved error message to indicate issue with the parameter
+> ---
+>   drivers/net/ethernet/microsoft/mana/mana_en.c | 20 +++---
+>   .../ethernet/microsoft/mana/mana_ethtool.c    | 66 +++++++++++++++++++
+>   include/net/mana/mana.h                       | 21 +++++-
+>   3 files changed, 96 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> index d2f07e179e86..598ac62be47d 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> @@ -618,7 +618,7 @@ static int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu)
+>   
+>   	dev = mpc->ac->gdma_dev->gdma_context->dev;
+>   
+> -	num_rxb = mpc->num_queues * RX_BUFFERS_PER_QUEUE;
+> +	num_rxb = mpc->num_queues * mpc->rx_queue_size;
+>   
+>   	WARN(mpc->rxbufs_pre, "mana rxbufs_pre exists\n");
+>   	mpc->rxbufs_pre = kmalloc_array(num_rxb, sizeof(void *), GFP_KERNEL);
+> @@ -1899,14 +1899,15 @@ static int mana_create_txq(struct mana_port_context *apc,
+>   		return -ENOMEM;
+>   
+>   	/*  The minimum size of the WQE is 32 bytes, hence
+> -	 *  MAX_SEND_BUFFERS_PER_QUEUE represents the maximum number of WQEs
+> +	 *  apc->tx_queue_size represents the maximum number of WQEs
+>   	 *  the SQ can store. This value is then used to size other queues
+>   	 *  to prevent overflow.
+> +	 *  Also note that the txq_size is always going to be MANA_PAGE_ALIGNED,
+> +	 *  as tx_queue_size is always a power of 2.
+>   	 */
+> -	txq_size = MAX_SEND_BUFFERS_PER_QUEUE * 32;
+> -	BUILD_BUG_ON(!MANA_PAGE_ALIGNED(txq_size));
+> +	txq_size = apc->tx_queue_size * 32;
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/airoha_eth.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+Not sure if the following is needed or not.
+"
+WARN_ON(!MANA_PAGE_ALIGNED(txq_size));
+"
 
-diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index db4267225fa4..1fb46db0c1e9 100644
---- a/drivers/net/ethernet/mediatek/airoha_eth.c
-+++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -2071,13 +2071,21 @@ static int airoha_hw_init(struct platform_device *pdev,
- 	int err, i;
- 
- 	/* disable xsi */
--	reset_control_bulk_assert(ARRAY_SIZE(eth->xsi_rsts), eth->xsi_rsts);
-+	err = reset_control_bulk_assert(ARRAY_SIZE(eth->xsi_rsts),
-+					eth->xsi_rsts);
-+	if (err)
-+		return err;
-+
-+	err = reset_control_bulk_assert(ARRAY_SIZE(eth->rsts), eth->rsts);
-+	if (err)
-+		return err;
- 
--	reset_control_bulk_assert(ARRAY_SIZE(eth->rsts), eth->rsts);
--	msleep(20);
--	reset_control_bulk_deassert(ARRAY_SIZE(eth->rsts), eth->rsts);
- 	msleep(20);
-+	err = reset_control_bulk_deassert(ARRAY_SIZE(eth->rsts), eth->rsts);
-+	if (err)
-+		return err;
- 
-+	msleep(20);
- 	err = airoha_fe_init(eth);
- 	if (err)
- 		return err;
--- 
-2.45.2
+Zhu Yanjun
+
+>   
+> -	cq_size = MAX_SEND_BUFFERS_PER_QUEUE * COMP_ENTRY_SIZE;
+> +	cq_size = apc->tx_queue_size * COMP_ENTRY_SIZE;
+>   	cq_size = MANA_PAGE_ALIGN(cq_size);
+>   
+>   	gc = gd->gdma_context;
+> @@ -2145,10 +2146,11 @@ static int mana_push_wqe(struct mana_rxq *rxq)
+>   
+>   static int mana_create_page_pool(struct mana_rxq *rxq, struct gdma_context *gc)
+>   {
+> +	struct mana_port_context *mpc = netdev_priv(rxq->ndev);
+>   	struct page_pool_params pprm = {};
+>   	int ret;
+>   
+> -	pprm.pool_size = RX_BUFFERS_PER_QUEUE;
+> +	pprm.pool_size = mpc->rx_queue_size;
+>   	pprm.nid = gc->numa_node;
+>   	pprm.napi = &rxq->rx_cq.napi;
+>   	pprm.netdev = rxq->ndev;
+> @@ -2180,13 +2182,13 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
+>   
+>   	gc = gd->gdma_context;
+>   
+> -	rxq = kzalloc(struct_size(rxq, rx_oobs, RX_BUFFERS_PER_QUEUE),
+> +	rxq = kzalloc(struct_size(rxq, rx_oobs, apc->rx_queue_size),
+>   		      GFP_KERNEL);
+>   	if (!rxq)
+>   		return NULL;
+>   
+>   	rxq->ndev = ndev;
+> -	rxq->num_rx_buf = RX_BUFFERS_PER_QUEUE;
+> +	rxq->num_rx_buf = apc->rx_queue_size;
+>   	rxq->rxq_idx = rxq_idx;
+>   	rxq->rxobj = INVALID_MANA_HANDLE;
+>   
+> @@ -2734,6 +2736,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+>   	apc->ndev = ndev;
+>   	apc->max_queues = gc->max_num_queues;
+>   	apc->num_queues = gc->max_num_queues;
+> +	apc->tx_queue_size = DEF_TX_BUFFERS_PER_QUEUE;
+> +	apc->rx_queue_size = DEF_RX_BUFFERS_PER_QUEUE;
+>   	apc->port_handle = INVALID_MANA_HANDLE;
+>   	apc->pf_filter_handle = INVALID_MANA_HANDLE;
+>   	apc->port_idx = port_idx;
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> index 146d5db1792f..34707da6ff68 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> @@ -369,6 +369,70 @@ static int mana_set_channels(struct net_device *ndev,
+>   	return err;
+>   }
+>   
+> +static void mana_get_ringparam(struct net_device *ndev,
+> +			       struct ethtool_ringparam *ring,
+> +			       struct kernel_ethtool_ringparam *kernel_ring,
+> +			       struct netlink_ext_ack *extack)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
+> +
+> +	ring->rx_pending = apc->rx_queue_size;
+> +	ring->tx_pending = apc->tx_queue_size;
+> +	ring->rx_max_pending = MAX_RX_BUFFERS_PER_QUEUE;
+> +	ring->tx_max_pending = MAX_TX_BUFFERS_PER_QUEUE;
+> +}
+> +
+> +static int mana_set_ringparam(struct net_device *ndev,
+> +			      struct ethtool_ringparam *ring,
+> +			      struct kernel_ethtool_ringparam *kernel_ring,
+> +			      struct netlink_ext_ack *extack)
+> +{
+> +	struct mana_port_context *apc = netdev_priv(ndev);
+> +	u32 new_tx, new_rx;
+> +	u32 old_tx, old_rx;
+> +	int err1, err2;
+> +
+> +	old_tx = apc->tx_queue_size;
+> +	old_rx = apc->rx_queue_size;
+> +	new_tx = clamp_t(u32, ring->tx_pending, MIN_TX_BUFFERS_PER_QUEUE, MAX_TX_BUFFERS_PER_QUEUE);
+> +	new_rx = clamp_t(u32, ring->rx_pending, MIN_RX_BUFFERS_PER_QUEUE, MAX_RX_BUFFERS_PER_QUEUE);
+> +
+> +	if (!is_power_of_2(new_tx)) {
+> +		netdev_err(ndev, "%s:Tx:%d not supported. Needs to be a power of 2\n",
+> +			   __func__, new_tx);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!is_power_of_2(new_rx)) {
+> +		netdev_err(ndev, "%s:Rx:%d not supported. Needs to be a power of 2\n",
+> +			   __func__, new_rx);
+> +		return -EINVAL;
+> +	}
+> +
+> +	err1 = mana_detach(ndev, false);
+> +	if (err1) {
+> +		netdev_err(ndev, "mana_detach failed: %d\n", err1);
+> +		return err1;
+> +	}
+> +
+> +	apc->tx_queue_size = new_tx;
+> +	apc->rx_queue_size = new_rx;
+> +	err1 = mana_attach(ndev);
+> +	if (!err1)
+> +		return 0;
+> +
+> +	netdev_err(ndev, "mana_attach failed: %d\n", err1);
+> +
+> +	/* Try rolling back to the older values */
+> +	apc->tx_queue_size = old_tx;
+> +	apc->rx_queue_size = old_rx;
+> +	err2 = mana_attach(ndev);
+> +	if (err2)
+> +		netdev_err(ndev, "mana_reattach failed: %d\n", err2);
+> +
+> +	return err1;
+> +}
+> +
+>   const struct ethtool_ops mana_ethtool_ops = {
+>   	.get_ethtool_stats	= mana_get_ethtool_stats,
+>   	.get_sset_count		= mana_get_sset_count,
+> @@ -380,4 +444,6 @@ const struct ethtool_ops mana_ethtool_ops = {
+>   	.set_rxfh		= mana_set_rxfh,
+>   	.get_channels		= mana_get_channels,
+>   	.set_channels		= mana_set_channels,
+> +	.get_ringparam          = mana_get_ringparam,
+> +	.set_ringparam          = mana_set_ringparam,
+>   };
+> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+> index 6439fd8b437b..8f922b389883 100644
+> --- a/include/net/mana/mana.h
+> +++ b/include/net/mana/mana.h
+> @@ -38,9 +38,21 @@ enum TRI_STATE {
+>   
+>   #define COMP_ENTRY_SIZE 64
+>   
+> -#define RX_BUFFERS_PER_QUEUE 512
+> +/* This Max value for RX buffers is derived from __alloc_page()'s max page
+> + * allocation calculation. It allows maximum 2^(MAX_ORDER -1) pages. RX buffer
+> + * size beyond this value gets rejected by __alloc_page() call.
+> + */
+> +#define MAX_RX_BUFFERS_PER_QUEUE 8192
+> +#define DEF_RX_BUFFERS_PER_QUEUE 512
+> +#define MIN_RX_BUFFERS_PER_QUEUE 128
+>   
+> -#define MAX_SEND_BUFFERS_PER_QUEUE 256
+> +/* This max value for TX buffers is derived as the maximum allocatable
+> + * pages supported on host per guest through testing. TX buffer size beyond
+> + * this value is rejected by the hardware.
+> + */
+> +#define MAX_TX_BUFFERS_PER_QUEUE 16384
+> +#define DEF_TX_BUFFERS_PER_QUEUE 256
+> +#define MIN_TX_BUFFERS_PER_QUEUE 128
+>   
+>   #define EQ_SIZE (8 * MANA_PAGE_SIZE)
+>   
+> @@ -285,7 +297,7 @@ struct mana_recv_buf_oob {
+>   	void *buf_va;
+>   	bool from_pool; /* allocated from a page pool */
+>   
+> -	/* SGL of the buffer going to be sent has part of the work request. */
+> +	/* SGL of the buffer going to be sent as part of the work request. */
+>   	u32 num_sge;
+>   	struct gdma_sge sgl[MAX_RX_WQE_SGL_ENTRIES];
+>   
+> @@ -437,6 +449,9 @@ struct mana_port_context {
+>   	unsigned int max_queues;
+>   	unsigned int num_queues;
+>   
+> +	unsigned int rx_queue_size;
+> +	unsigned int tx_queue_size;
+> +
+>   	mana_handle_t port_handle;
+>   	mana_handle_t pf_filter_handle;
+>   
 
 
