@@ -1,132 +1,102 @@
-Return-Path: <netdev+bounces-115486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F62946909
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 12:23:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E5E94695C
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 13:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDDC21F216F2
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 10:23:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E13CB20D43
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 11:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E131136320;
-	Sat,  3 Aug 2024 10:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6254613699B;
+	Sat,  3 Aug 2024 11:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="UY9Mfeka"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="V5CAx7T2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476A14A2F;
-	Sat,  3 Aug 2024 10:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722680606; cv=none; b=eaLp8lhK0zxBfz1Z3FzddW+/wNRxKWVzTI62yfNv/fWmCGDgedqiaUX6NyZH+FJ/P2cKzcm2zZJuMnqsiK4KZDv2D6+VDbrfuPWjp8akPkRvfYiJFCmytR5hELAbGovToTXbJzpB/NkqIJL0sz1jbfF9H9H2T3M1uvMd46C79jU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722680606; c=relaxed/simple;
-	bh=F+Kwu+SL10Y+c1ALb7LvkbBlS65JjCffGIIlE1iRefY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E9Z9jgW/kDvlSfrppu/gu1rER/Bvev3xloVsbIc6RGj6kg+nMvzafVEjfmvcNayo1OvlsumcohMDTwOtykkOtWlE/VtDkvGBBeS6zz1UvKaVbnC7t1Ds+gXL3I9sNwYb8KQUEv/ctwc2WlJxbTTXbuq2yWVe1LmeeKNXG3aWp2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=UY9Mfeka; arc=none smtp.client-ip=80.12.242.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id aBthsTd1khajuaBthsjhx3; Sat, 03 Aug 2024 12:22:06 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1722680526;
-	bh=4MAfltrielFugt99roLwuy2ODnKgMwhqZafIG9rnCs4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=UY9Mfeka4XdaFLIk3XMaNqBrVaBs2WUcuCgU5wWXCWHFlfubaF1syagdIgGg6JvUu
-	 TD8lZxEU6THuz8wC2B+B+1nrubiUdzSWvwy1lTVlPUTbdgC2GQ7x1yh/qMxeofsiYZ
-	 2fu8cSwXoKf2k9kSLwRn0eU6wcGoHQsEgB3rCF9umrf692/WCq7iSutXVVxOON/I7i
-	 /1vHFY6mHDgWO17Iu7qnGEDYMWUBqIBtUl//aHYiHhBH/+uBfsx0HOh1/KA36UFQgH
-	 X7QubtPnRHH/oLFgu/QJXg75NnZHiX5eobUDwjVd4gQaa1TvPUaKYeqtsjNN6CRDo3
-	 dnl+3RL1vt8dA==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Sat, 03 Aug 2024 12:22:06 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <d00b1a28-24ae-4487-8a8a-b08a84a4ce4a@wanadoo.fr>
-Date: Sat, 3 Aug 2024 12:22:01 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128ADD53B
+	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 11:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722683194; cv=pass; b=Ts7DH1rQ4bPcpEf1I4oGGsI0YtrrK3P56FlbkKRlom/O8rjokNM3/xTWYZk74kV+68wK1ydpYG2n14bchvQZMg/UN6KJDlm/Mc8BcTWFmfN0UcVVQ0QBxwpHha6OlzQCdaCEL2GrBJgWGhL6W46HuGWtqjJNRBcvA/uy2A5MYAo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722683194; c=relaxed/simple;
+	bh=1wPl1b4f38KYOqA7vGEuJH8DmUfZfnZIjZRm0apTYSQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=TpMzCrczay2y0aAcRetV4998UidaKKhIWlzPJDYhc5NDOMeH7i6X86ClMLwePtI42JUYHCi5CAFusiLlvb93yqV2q2g3AvaOkzg+rC6Ro0wt1/YltPXmJ0dZ9PNv/t7uH56RnyUW+RRhmSi08xkwEHxBiNgnQ4LORJh8Y+KARfg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=V5CAx7T2; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: martin-eric.racine)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Wbfyl5mYpzyS6
+	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 14:06:23 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1722683183; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
+	bh=1wPl1b4f38KYOqA7vGEuJH8DmUfZfnZIjZRm0apTYSQ=;
+	b=V5CAx7T2uwQu44GTLCUVX4atwcshNIoRFdBvCD0EySqj4aHQ4eK86ScDBLHaCW/Gh/WDqz
+	+L/H4ze4MU1+c/rngUl5ii98Xt9ax9dUwlKE+aAxHBa1zai8vW67HYYVBZ4F3UeCcdUWUW
+	tQkbX3ltTRHcZpSRpuXLlGpD/0lVBVc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1722683183;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1wPl1b4f38KYOqA7vGEuJH8DmUfZfnZIjZRm0apTYSQ=;
+	b=uXCWbqR5uhSeuuOUXDURvKbBY5adhx5ODxe/gHFEncks0qAs3CmucjKN21CflhGQyS59Yg
+	O+yjn/pxCrjg2v11Zu6n3lpVy1CKdLbUeGR5yF9wsQ+uf3+Qz4TwZ4iJMu8eXL1mszfQHS
+	FSobmHgxnCe6HxCj638iT+wZqE1SRBM=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1722683183; a=rsa-sha256; cv=none;
+	b=ioOLr+5w6sN6F4jo5zk4bAHX64dpJmmBUE2034Iim9nxUBqzL+sELYHNW68MeytiMmemYO
+	qJgducSbKds1CrgjPJIsl3gs2EyRzdEZ1zJR9nkD/yKgThwnp9VhWekVW86CXd/LMg7vhU
+	ZXCpDh6QzHgFoYjxSqQIVqvbJARGOTI=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=martin-eric.racine smtp.mailfrom=martin-eric.racine@iki.fi
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-428035c0bb2so22815905e9.1
+        for <netdev@vger.kernel.org>; Sat, 03 Aug 2024 04:06:23 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxrdZmkWrGT7KCEQImjeWGnaI4jf1dLWHX/yxuNG8Cj3EMKTSoq
+	8csJsk4xajjjEwbn7KMcGcHk0BRp1cmd1gyISFbE0COoZbcE1iijY4t/Q8GVIG6PcW1s3jNHcOh
+	cFROLMWi9gdRKpE2hNPAgByyFjkQ=
+X-Google-Smtp-Source: AGHT+IFgIwIyh9qc9H+qkoTiZ80p2lqgb6ZiCaPIyZKAPFKl5h1GkAEp95gbCtDfHwz1fm8tsR2KWaA7G4RklNrEjyc=
+X-Received: by 2002:a05:600c:190e:b0:426:6327:5a16 with SMTP id
+ 5b1f17b1804b1-428e69f6157mr40006875e9.18.1722683183294; Sat, 03 Aug 2024
+ 04:06:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: ethernet: remove unnecessary parentheses
-To: Moon Yeounsu <yyyynoom@gmail.com>, cooldavid@cooldavid.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org
-References: <20240802054421.5428-1-yyyynoom@gmail.com>
- <20240803022949.28229-1-yyyynoom@gmail.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240803022949.28229-1-yyyynoom@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Reply-To: martin-eric.racine@iki.fi
+From: =?UTF-8?Q?Martin=2D=C3=89ric_Racine?= <martin-eric.racine@iki.fi>
+Date: Sat, 3 Aug 2024 14:06:11 +0300
+X-Gmail-Original-Message-ID: <CAPZXPQeO6BAznbh2+EyxTXLjcdqMe1yrGbPweRiVSy6zLnaErg@mail.gmail.com>
+Message-ID: <CAPZXPQeO6BAznbh2+EyxTXLjcdqMe1yrGbPweRiVSy6zLnaErg@mail.gmail.com>
+Subject: [iwlegacy] kernel oops
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Greetings,
 
-this is not how things work.
-This v2 depends on the previous v1. It shouldn't.
+As reported a while back at
+(https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D1062421) against
+kernel 6.5 (still present on kernel 6.9.12), iwlegacy ooopses on
+iwl4965 hardware.
 
-v2 should be a standalone patch which includes v1 and all modifications 
-done afterward.
+The bug report contains a lot of auto-collected information. Please
+ping me if anything else is needed.
 
-
-When you send a new patch you should:
-   - give an history of changes, below the ---. See [1]
-   - eventually give links to previous version
-   - your new version should not be threaded with the previous mails. It 
-should start a new thread.
-
-
-Le 03/08/2024 à 04:29, Moon Yeounsu a écrit :
-> remove unnecessary parentheses surrounding `ip_hdrlen()`,
-> And keep it under 80 columns long to follow the kernel coding style.
-> 
-> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
-> ---
-
-[1]: here.
-
-*As an example*, I would have done as follow, but there is no rule 
-(AFAIK) for this section.
-
-
-Changes in v2:
-   - Remove extra ()   [Christophe Jaillet, Simon Horman]
-   - Break long lines   [Simon Horman]
-
-v1: https://lore.kernel.org/all/20240802054421.5428-1-yyyynoom@gmail.com/
-
->   drivers/net/ethernet/jme.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
-> index 83b185c995df..d8be0e4dcb07 100644
-> --- a/drivers/net/ethernet/jme.c
-> +++ b/drivers/net/ethernet/jme.c
-> @@ -947,12 +947,12 @@ jme_udpsum(struct sk_buff *skb)
->   		return csum;
->   	skb_set_network_header(skb, ETH_HLEN);
->   
-> -	if ((ip_hdr(skb)->protocol != IPPROTO_UDP) ||
-> -	    (skb->len < (ETH_HLEN + (ip_hdrlen(skb)) + sizeof(struct udphdr)))) {
-> +	if (ip_hdr(skb)->protocol != IPPROTO_UDP ||
-> +	    skb->len < (ETH_HLEN + ip_hdrlen(skb) + sizeof(struct udphdr))) {
->   		skb_reset_network_header(skb);
->   		return csum;
->   	}
-> -	skb_set_transport_header(skb, ETH_HLEN + (ip_hdrlen(skb)));
-> +	skb_set_transport_header(skb, ETH_HLEN + ip_hdrlen(skb));
->   	csum = udp_hdr(skb)->check;
->   	skb_reset_transport_header(skb);
->   	skb_reset_network_header(skb);
-
-
+Thanks!
+Martin-=C3=89ric
 
