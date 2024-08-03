@@ -1,164 +1,159 @@
-Return-Path: <netdev+bounces-115481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0FF6946842
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 08:51:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CFA894686D
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 08:59:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4B321C20B31
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 06:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 372BD1F21566
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 06:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37DF7D401;
-	Sat,  3 Aug 2024 06:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444FA14D6F6;
+	Sat,  3 Aug 2024 06:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZM00vp/u"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="GDQslmXK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E16B23CB
-	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 06:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A8723CB
+	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 06:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722667902; cv=none; b=YJ0bhMEB+wY+zrIrOBL+ZgnUKrwMXTCfsi/jfGmOOs6S4frO0pFfjn0wQ/rTrb71PpJvbPNOgCGcdFkhNe3MrY4OhfHCX+L++lxz0luCcjRB49kJsHGK1Qgn4nqrpVZoQDSobMDHpv5ENoPjYkrTXxY5LWrCpXb0j/S7+TVZHdA=
+	t=1722668343; cv=none; b=mWlQpK5b4ilxOQ0F25zBiNQcYyitswHtX3Z6IXugoRARcilCNZoMDSeIppfoJ3BROyXrKKkNnV3xOAQll+fnK+zbHzkw0M+ms3eJEX0n1Tlet664Ve0HfL9tAtvG+Z7cGwBsVlVBvhSlrf6gCIa1SrMznKuymGHSDrN3eHeLsPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722667902; c=relaxed/simple;
-	bh=uleyU7zkiVlvxkjAj2rzgWy+yK3wNK3zxum2C1m++kA=;
+	s=arc-20240116; t=1722668343; c=relaxed/simple;
+	bh=xZMHYnEp9ACeLinOnxTuRVM6r3QO72tdIYq0FDV7YhM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MMoQY7GK+vBU7Ch2by+M1yYG0zRpBJbm+P9xsf0jdcxO98hu9Pcboe/wUB9O8N2/oiaz+V/uxP3fLpHOhzEVU+CJ9xaoQOgQUFH7MYk/BRLHWOR6wOZMCJ5Tyfvdo7LkmqsqFzDfysMAnzoN7ZQX52RIHcn7fDBH1MadFFwUiSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ZM00vp/u; arc=none smtp.client-ip=209.85.208.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=DDBh/Re5bDaUnrUoKQtx5LwY6VL5dUIWDc3GXAzQpjyd+s06D//IaVYxk4d55NMLxIpCEr5mi8S8u6bBwiknrmT7gaqwpLSrNbDuM+Y8yVsQ4r4smUhcqGr5uWAnh8422A9UopLjkUUTfVd9XIpvcOK4heGnl4cLgMyHNsHVyn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=GDQslmXK; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f0dfdc9e16so109569171fa.2
-        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 23:51:39 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-52ed741fe46so10136305e87.0
+        for <netdev@vger.kernel.org>; Fri, 02 Aug 2024 23:58:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722667898; x=1723272698; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1jt5lP+PY1t5tQI/CD9mWXG7Nv0yty0RhYyKPZQtUTE=;
-        b=ZM00vp/uWhSV5U+ArDKju4DS/DTe9r/Y/V6/qVA+ZNfFxN/zSVWzj4ga/coCXpAJ2V
-         4R3N4+mnh+FgJUOyym2ubkzub0enHc2lC6Ktz/PcMxywOsKFCrTBPHxE7F+A2vuZOMWD
-         xrIfYptOejkSuhM+VczdFIbxAXnAwf5ODExVQ4rgd2i3ruleEjTbd+qRYFA0G/lfqG65
-         4pzXcfAOhpbBiXBwwyq6FG1pQGH6QTA4X0j4DIjphnGT+JbcbxmuR2CjN9oDGS1aRNKT
-         4CrxwtZr1AvqzsE0gTbpBFKbMo+1KAH7izwqU+N6sKEUvl+ylV8jnOjOLxKIHwSe6Yj9
-         LBOg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1722668338; x=1723273138; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ng8ZLCpRwpNDRO9+xd5xTYxAZgsQpYwXSash6jlxffo=;
+        b=GDQslmXKpuORgoY3u0bw9gfR8L5g79nhczoYwXUo7Qbagb5mY/LAUh435HldOUZosa
+         6mSC2TT70kmrC2c8mxsQi0Aq68YMeRdQzwhmUQvzGT5VGUUS+hIHNM4iKjY20rLhgCcE
+         4G/OKU953O3+DJ9OnEETFyvzSlvpmEtbRzqkcgnaSkSswRlAgqRY7cAAZnwHod9Dsnlj
+         11X5rixv1s+27lKbwzeGa+ETP2r5WZpb/RSy3pTRkZZnhkse9YtClNi75s0e+fY100A2
+         ++3yuDrcj2tIUo0ykDPlrm/qqWJqYhG1NE7vV/aQS/3SU9YwqOf+p4YosQnTJClVNLmW
+         9XXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722667898; x=1723272698;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1jt5lP+PY1t5tQI/CD9mWXG7Nv0yty0RhYyKPZQtUTE=;
-        b=aCZEkqi8VbMDs8Qq0nlouJeDCgAClHqg7Arvr37hhIEHf2fPp0rEULYDM+xW92ewNA
-         LxvaZmzUpbOfVwtvr5RT87aYyeNvOGajmfAzesTl0M/1zHtFofA2CQoVCzl3bTqRJ1Th
-         Ba5v0d66YztEO7Xu9GvXOz19YOyzqrYZvUqwMrIrLIa0JMnqNOV84Pi2hcjxW5tFPS/s
-         UNI+05qYr2ltJM9Ua2mMt108RJwk3IPAmByZe1BPhHR9kih1dJ5ov5fSu79gkyH/rXrD
-         tFCeXjCXUBr/uAmRO3RHQ9F9J2TY2YVcv8vt7h3sehw5zhqxPur1GEgtxdImPSSPWVFn
-         qpsg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjGypgPVH5HJCrn37rklVjZW2s0ZAGHsAxFIHsTDxHFx4dYV1Z7L+zF++nKEUvi2LV3wUH4+A6Iaqn8mLNF73KdSFRtshL
-X-Gm-Message-State: AOJu0YyvlwM3f8xTTjbotiZ7pTebCFkoVHAlDNrD71ms86OmDSnFKHj7
-	KYEFKzbsVcRF2WsZW7L0EpqQ3ly54QO+39fKchttG/MTGcrizOKxP2JaspserVx6EIqY+a6obdY
-	I
-X-Google-Smtp-Source: AGHT+IFYLk/qX6EFl1Fi++CbL+WO5rnxnUjP7b7fbuUi3Lq6aeF7pO+HqCq80/484ZjnjyG1KWynbw==
-X-Received: by 2002:a2e:9d8a:0:b0:2ec:5c94:3d99 with SMTP id 38308e7fff4ca-2f15aa8340cmr38504171fa.2.1722667897891;
-        Fri, 02 Aug 2024 23:51:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722668338; x=1723273138;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ng8ZLCpRwpNDRO9+xd5xTYxAZgsQpYwXSash6jlxffo=;
+        b=FpSg4pFYesYNjYbADk7uMdIVrkKE3pn27ShLi9n2dVSd9MiEF9q8PlYrdc9z1gFX28
+         BSuAopz8OEPvO+0L4gGwaXY1o2JfkFrWSKkq2vkxMmV2o6AXglRVm+mDpiEoyaMIC/lO
+         NPfjVwIHXbHMk7DBYnhR7+nmBP5FXMwrZUso7Ln/aYDrBFKpLr4EDg3L9A332gmjkgWF
+         1Pzan9Ok2GQSwv7m1IZlxrtC3GGpo4wpzs3nk2kaGMv3QekU4q87aKSfE4MNkKhUaYrb
+         y1dbrCvvstR38OM+vXpuM0UTW20LxrpTo9qV0iHrrb8MO8d4c2XUlepRgwqvdbE/em3W
+         wVpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPyRJp2Xvd1lKCFyhd0Ij3JXWsHZVBNn3hBDZQfxr2auLvsBk26heVh43/9c0OE4ZfP90GGz94VCEIiBXFWtEEwDjV2u4A
+X-Gm-Message-State: AOJu0YzaCWudTIVkZxicKbqK+tlAdiucMYn+3hTwDFik6e+nEPUR4zxu
+	RDc4n8papp86fHPc6V8Ul76n+Vwq7KnHDuJiWKFCpoy9/z5b3OtE1udMOhpUeyo=
+X-Google-Smtp-Source: AGHT+IH+M0fjMuP4QYyjNbpxoo4tGJ632ILIVdkxBT+yyY3Gct8Gu6Hsvsa+d2Wksc2b54jC9krJCg==
+X-Received: by 2002:a05:6512:39c7:b0:52e:f2a6:8e1a with SMTP id 2adb3069b0e04-530bb3b6f59mr4145712e87.29.1722668337686;
+        Fri, 02 Aug 2024 23:58:57 -0700 (PDT)
 Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428240b3041sm118735015e9.0.2024.08.02.23.51.36
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b83b7245f8sm1991298a12.74.2024.08.02.23.58.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 23:51:37 -0700 (PDT)
-Date: Sat, 3 Aug 2024 08:51:35 +0200
+        Fri, 02 Aug 2024 23:58:56 -0700 (PDT)
+Date: Sat, 3 Aug 2024 08:58:55 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org, jiri@nvidia.com,
-	shayd@nvidia.com, wojciech.drewek@intel.com, horms@kernel.org,
-	sridhar.samudrala@intel.com, mateusz.polchlopek@intel.com,
-	kalesh-anakkur.purayil@broadcom.com, michal.kubiak@intel.com,
-	pio.raczynski@gmail.com, przemyslaw.kitszel@intel.com,
-	jacob.e.keller@intel.com, maciej.fijalkowski@intel.com
-Subject: Re: [PATCH net-next v2 00/15][pull request] ice: support devlink
- subfunction
-Message-ID: <Zq3Td6KFXa1xNxo5@nanopsycho.orion>
-References: <20240731221028.965449-1-anthony.l.nguyen@intel.com>
- <ZqucmBWrGM1KWUbX@nanopsycho.orion>
- <ZqxqlP2EQiTY+JFc@mev-dev.igk.intel.com>
- <ZqyDNU3H4LSgkrqR@nanopsycho.orion>
- <ZqyMQPNZQYXPgiQL@mev-dev.igk.intel.com>
- <6e5c9fd5-7d03-f56b-a3b9-3896fbb898ba@intel.com>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
+Subject: Re: [PATCH net,v2] team: fix possible deadlock in
+ team_port_change_check
+Message-ID: <Zq3VLwc51pmn9ToA@nanopsycho.orion>
+References: <Zq0akdhiSeoiOLsY@nanopsycho.orion>
+ <4E6F3146-AE8D-4C70-A068-A6EE8588F13D@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6e5c9fd5-7d03-f56b-a3b9-3896fbb898ba@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4E6F3146-AE8D-4C70-A068-A6EE8588F13D@gmail.com>
 
-Fri, Aug 02, 2024 at 07:38:34PM CEST, anthony.l.nguyen@intel.com wrote:
+Sat, Aug 03, 2024 at 03:36:48AM CEST, aha310510@gmail.com wrote:
 >
 >
->On 8/2/2024 12:35 AM, Michal Swiatkowski wrote:
->> On Fri, Aug 02, 2024 at 08:56:53AM +0200, Jiri Pirko wrote:
->> > Fri, Aug 02, 2024 at 07:11:48AM CEST, michal.swiatkowski@linux.intel.com wrote:
->> > > On Thu, Aug 01, 2024 at 04:32:56PM +0200, Jiri Pirko wrote:
->> > > > Thu, Aug 01, 2024 at 12:10:11AM CEST, anthony.l.nguyen@intel.com wrote:
->> > > > > Michal Swiatkowski says:
->> > > > > 
->> > > > > Currently ice driver does not allow creating more than one networking
->> > > > > device per physical function. The only way to have more hardware backed
->> > > > > netdev is to use SR-IOV.
->> > > > > 
->> > > > > Following patchset adds support for devlink port API. For each new
->> > > > > pcisf type port, driver allocates new VSI, configures all resources
->> > > > > needed, including dynamically MSIX vectors, program rules and registers
->> > > > > new netdev.
->> > > > > 
->> > > > > This series supports only one Tx/Rx queue pair per subfunction.
->> > > > > 
->> > > > > Example commands:
->> > > > > devlink port add pci/0000:31:00.1 flavour pcisf pfnum 1 sfnum 1000
->> > > > > devlink port function set pci/0000:31:00.1/1 hw_addr 00:00:00:00:03:14
->> > > > > devlink port function set pci/0000:31:00.1/1 state active
->> > > > > devlink port function del pci/0000:31:00.1/1
->> > > > > 
->> > > > > Make the port representor and eswitch code generic to support
->> > > > > subfunction representor type.
->> > > > > 
->> > > > > VSI configuration is slightly different between VF and SF. It needs to
->> > > > > be reflected in the code.
->> > > > > ---
->> > > > > v2:
->> > > > > - Add more recipients
->> > > > > 
->> > > > > v1: https://lore.kernel.org/netdev/20240729223431.681842-1-anthony.l.nguyen@intel.com/
->> > > > 
->> > > > I'm confused a bit. This is certainly not v2. I replied to couple
->> > > > versions before. There is no changelog. Hard to track changes :/
->> > > 
->> > > You can see all changes here:
->> > > https://lore.kernel.org/netdev/20240606112503.1939759-1-michal.swiatkowski@linux.intel.com/
->> > > 
->> > > This is pull request from Tony, no changes between it and version from
->> > > iwl.
->> > 
->> > Why the changelog can't be here too? It's still the same patchset, isn't
->> > it?
->> > 
+>> Jiri Pirko wrote:
 >> 
->> Correct it is the same patchset. I don't know, I though it is normal
->> that PR is starting from v1, feels like it was always like that.
->> Probably Tony is better person to ask about the process here.
+>> ﻿Fri, Aug 02, 2024 at 06:25:31PM CEST, aha310510@gmail.com wrote:
+>>> Eric Dumazet wrote:
+>>>> 
+>>>>> On Fri, Aug 2, 2024 at 5:00 PM Jeongjun Park <aha310510@gmail.com> wrote:
+>>>>>> 
+>>> 
+>>> [..]
+>>> 
+>>> @@ -2501,6 +2470,11 @@ int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info)
+>>>    int err;
+>>>    LIST_HEAD(sel_opt_inst_list);
+>>> 
+>>> +    if (!rtnl_is_locked()) {
+>> 
+>> This is completely wrong, other thread may hold the lock.
+>> 
+>> 
+>>> +        rtnl_lock();
+>> 
+>> NACK! I wrote it in the other thread. Don't take rtnl for get options
+>> command. It is used for repeated fetch of stats. It's read only. Should
+>> be converted to RCU.
+>> 
 >
->The previous patches were 'iwl-next', when we send to 'net-next' we reset the
->versions since it's going to a new list.
+>I see. But, in the current, when called through the following path:
+>team_nl_send_event_options_get()->
+>team_nl_send_options_get()->
+>team_nl_fill_one_option_get()
+>, it was protected through rtnl. Does this mean that rcu should be 
 
-I still see it in the same list. Same patchset.
+Not true. team_nl_send_event_options_get() is sometimes called without
+rtnl (from lb_stats_refresh() for example).
 
 
+>used instead of rtnl in this case as well?
 >
->Thanks,
->Tony
+>> Why are you so obsessed by this hypothetical syzcaller bug? Are you
+>> hitting this in real? If not, please let it go. I will fix it myself
+>> when I find some spare cycles.
+>
+>Sorry for the inconvenience, but I don't want to give up on this bug 
+>so easily since it is a valid bug that we have started analyzing 
+>anyway and the direction of how to fix it is clear. I hope you 
+>understand and I will send you a patch that uses rcu instead 
+
+I don't understand, sorry. Apparently you don't have any clue what you
+are doing and only waste people time. Can't you find another toy to
+play?
+
+Please add my
+Nacked-by: Jiri Pirko <jiri@nvidia.com>
+tag to your any future attempt, as I'm sure it won't be correct.
+
+Thanks!
+
+
+
+>of rtnl soon.
+>
+>Regards,
+>Jeongjun Park
 
