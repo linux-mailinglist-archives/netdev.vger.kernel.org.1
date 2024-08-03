@@ -1,139 +1,173 @@
-Return-Path: <netdev+bounces-115462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B0CD9466D0
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 03:37:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92A909466D6
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 03:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 162D4281A7B
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 01:37:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75FB2827D4
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 01:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710D45C99;
-	Sat,  3 Aug 2024 01:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DF76FBE;
+	Sat,  3 Aug 2024 01:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEFr+d8W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OGLP97zK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0580963A9;
-	Sat,  3 Aug 2024 01:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6330B6FB8;
+	Sat,  3 Aug 2024 01:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722649022; cv=none; b=jkYDVYM6/LqF5KEIuIWUkFgZidPcCsRqnvRlEEyp6jwP5jCvZxcIrF3QlxEB2difQ9hwJdMp7hyFq41mKCBlgUKKNsnBkWefU4CyrU+WOEaACTLnS95KIoRtaYnyLEyABto93sL66I+pBmuwhhO6mzXNZOAo78PUXV7IUgvu9R0=
+	t=1722649670; cv=none; b=oYga/sk+a9dBM2EFMsUXcgQDRT1QsVqIlKGtS7qMTHgPsB9tIDpDXOLEnHXkYNeUKLDvnNiFOt9iBbUZzOo6eA7eHy2n+h2e/kfZ5IlgHe6lWppycph4/Yk8sHf8aOF9QwA95+PpeKv/gZ0OwHr43cvVyTyAYks3tWLK4QfAjpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722649022; c=relaxed/simple;
-	bh=K2HHGi9RoMQ7R0r1f4FxrGm65Blcsn1Lhqfjck0GLVA=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=dDCYSd6lyvdNkj+Tw1X9P2hx51bZpiWcoKvxU0SKhbSZdWgwWIXqiCIgDEa++bhN3WSUxwXIZIasttyS4k/tk9RwKXpphqMUHfvROIpf84NbWh8UeF88V4WqeQFKyRWPnVJVIofl8OxO+TTkelccL1oPFbGFPDfMHtyrCySY3dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEFr+d8W; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1722649670; c=relaxed/simple;
+	bh=t2VWeekXhCE3HiK1BuWv+EKsOUefrqAE9gOuQimberk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s6NYMGUgBm3QaHqkTOtbaYMA86yeivacGExtWTOYGA7Y8OBBr7wzkirSUoW5rlOVzGZRyJwkK/QZgA1H2lJHzDhrprP1xPW2cA5mEJzwmYg8w9pA279IFpnTLP+EKuf5OwC1GxX8kfII0sszAms0H8MVd+DgECqQanL0IVd46hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OGLP97zK; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1fc611a0f8cso66718835ad.2;
-        Fri, 02 Aug 2024 18:37:00 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b797a2384cso46476026d6.0;
+        Fri, 02 Aug 2024 18:47:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722649020; x=1723253820; darn=vger.kernel.org;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qMNBxKV3UA5rVdp9noY4O0CwCdPc44C/wx8pr12McI8=;
-        b=SEFr+d8WL6QS0+SMsXaxCAcQCMA3R47b9/BY7Etv8haQHy30ou4q2SJEmEfA3ln6CL
-         V4yurYA2HbwDeTdU34Q/I4VgqH3xxDUQ0WaWkJ2lNN22uZXSbu7zAiBzDng0mUlLUW7O
-         mvogm1zjourOySyDVtM/CmFiQXubhI1Ski1Neq5Md+ztKC6Cw6XAVfIYIGHRZPMM6fwN
-         WFCcgQz87EX6Bf6bcQJSj1boIQNWFKmlvTeaYCTXY5kVY3zpwa9ruHOZn2n0AN+ZemM7
-         8NXgrJBZDbv/kjSRnVTFTbkNyOCyMPfmVzKj8tCelsaL7YnJBwCxvBuGMl9sjCpQhmn5
-         gL2g==
+        d=gmail.com; s=20230601; t=1722649666; x=1723254466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YEEm8/Hs3ohpTUNtHXlZQ1mhqG7WBPtOBKhP8yZksGM=;
+        b=OGLP97zKjdT8+s/liHirxfDSZLU6JIXcxgGArgv+/6dVAYeFgWJciV5UC17VOCex4K
+         5wFI5U/TqUY8F+0v9RNpDfNvn3XfClx7Btho+tEez3wW4uEWRMm+lKoDr30CzKdTwH+t
+         yChjqOQ/8pDfRXxGzjDWJ1A8nHt6vMjYQnL/8gOOY1lQVvfqXMeSKp63v6jyfBGhSfe9
+         //1YJ8SPf4GVFqyzMmBLA8lQq78GE0couBytZ7Nezgg0BSHdH4VlOMJsf4JMcErfTBIC
+         DCHFsfD9o8TsxsMnXd+FzY2i4JKuOpoyiHvW8n31dKcjqZKZSuEjWQKEThB4Leysuluj
+         p78A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722649020; x=1723253820;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1722649666; x=1723254466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qMNBxKV3UA5rVdp9noY4O0CwCdPc44C/wx8pr12McI8=;
-        b=w9I32YguNiQwfzTqOv1OsA3G3dahAft93ZpAaRLPRwO+6ivhX2fGYGgHK0evtM/sUI
-         UKyXItGXah3yFZMtnh6Utqz5d0Wnwzga+tzoE24qmAjbc7JDVTWglilu5LYh2czexjx7
-         6Kjsy+EMQ0KKkfJzoOipmTqB+dyN5dcReG1G+rrfyuax8lGjC0DySzPCZu9sVSJoLvJC
-         pfkIJ4JuoIvGUci+QakJ7wb+Uk92Dtx9DAcI85ddxHTxiyCXvJYS8RGLOgiWgHxgZUa7
-         lCwsUJDKwpSynrU6ZD/8wjTsuoWPOzGYRIc0LXPAGLKi1htikF7N60iR0UWchVS+MKBP
-         2n5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUOtimac2RciPqzok/Z3cdEhTYqkZxzqRujm4pv+ehdn6LHoGAMwEDfPPvbC+g6vpEGsVuq/nAs2lIjz6XhOEMT1M2cefG29bC6q/PVYrREay4Tjf7BjkOdmin5KacNEOLIXVq2
-X-Gm-Message-State: AOJu0Yzo7w8w6gfVG7KSP9RvWepf9Fj/tjULWq2U37EfrWSH0MhQCBsf
-	0aioYfValzeytCSFNKIR6WIu3JlapGYjsd5FBC5BG0BrDzw2oOFdpfZ+yYlt
-X-Google-Smtp-Source: AGHT+IHNGmTVSsGJLio2LdN68UqxKgxWi2kcgVkGmDU9K+iC0+KRFJqFI+H8YHtjSWKAt5+KoVUEZQ==
-X-Received: by 2002:a17:903:110f:b0:1fd:9238:40f with SMTP id d9443c01a7336-1ff57292c01mr60147295ad.22.1722649020254;
-        Fri, 02 Aug 2024 18:37:00 -0700 (PDT)
-Received: from smtpclient.apple ([2001:e60:a40b:be5c:2934:ccbd:6135:2b1d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5929407asm23677355ad.242.2024.08.02.18.36.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Aug 2024 18:36:59 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Jeongjun Park <aha310510@gmail.com>
+        bh=YEEm8/Hs3ohpTUNtHXlZQ1mhqG7WBPtOBKhP8yZksGM=;
+        b=AOg1qn9FlzCWhfA5ii5XDbqmGItG/g7GXWDMGMJlfaZGupeH/cIQYEWZKn79siLAz2
+         VgVZYWj5XSxcceC5bm5l0Fr3t+VBtWJt6E8CRFb4408dxDZ2OipKMHy69pBAhhvnzgDQ
+         o+tmE2VoaOG+XD021QEUqd1nqMQOhDYlrSH3D5Q5SiNaT91Qx1Fhx+NFZJNnXINJ6tbG
+         bwZBBTRiXo5KHnctKboulHpeK46E+AggY6C529n9V+xs1E/1NaX/pFuyZUNApjJKIHNU
+         D5CXax8ZxCOT59sdAm/BmZcddmhO3gAU/BFOW2BCAF7nwR7Q5S76LIRIMuz0rtvE8c3o
+         qmuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVTjQEwjdLyXSdZ3eucyIX9TIzqG9pqZKKahwDHVJjx2B21TBJGKESMNuoaam2/LgoPjTqgizdP7UPlrcFjXjND7ApfBZFNftsVLXCfC6V6TvOYFkU5+2QzTt5+xaQwgWt8JQDN
+X-Gm-Message-State: AOJu0YwvS+fqjSv4OOSZpTMb31Uzu8jKXGYFZTSGrG30oKd5xaypRKEc
+	setTztZS//DPwvFjEFQqTY64qfOEG4IytYOrT6U+/b2ZFDmBeifi8Q1CNT3sSaeK3gT/hXn/nPP
+	ddYFPQir4f89i686Ycy0t1lBOJxY=
+X-Google-Smtp-Source: AGHT+IFNI07BDiZ8oSdjhs6pn+ONrpHIV4Nj1RGsHnwJuNZjNHxNFkgIHCeMAgX9Nz2sY592BX1YSgFQ4mM6AGg6464=
+X-Received: by 2002:a05:6214:54c3:b0:6b5:3da3:adaa with SMTP id
+ 6a1803df08f44-6bb9830f93bmr62616156d6.3.1722649666256; Fri, 02 Aug 2024
+ 18:47:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH net,v2] team: fix possible deadlock in team_port_change_check
-Date: Sat, 3 Aug 2024 10:36:48 +0900
-Message-Id: <4E6F3146-AE8D-4C70-A068-A6EE8588F13D@gmail.com>
-References: <Zq0akdhiSeoiOLsY@nanopsycho.orion>
-Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+b668da2bc4cb9670bf58@syzkaller.appspotmail.com
-In-Reply-To: <Zq0akdhiSeoiOLsY@nanopsycho.orion>
-To: Jiri Pirko <jiri@resnulli.us>
-X-Mailer: iPhone Mail (21F90)
+MIME-Version: 1.0
+References: <20240802054421.5428-1-yyyynoom@gmail.com> <20240802141534.GA2504122@kernel.org>
+In-Reply-To: <20240802141534.GA2504122@kernel.org>
+From: Moon Yeounsu <yyyynoom@gmail.com>
+Date: Sat, 3 Aug 2024 10:47:35 +0900
+Message-ID: <CAAjsZQwKbp-3QgBj9KEUoqLvaE5pLX8wsLq01TDC8HdVp=8pLg@mail.gmail.com>
+Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
+To: Simon Horman <horms@kernel.org>
+Cc: cooldavid@cooldavid.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Aug 2, 2024 at 11:15=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Fri, Aug 02, 2024 at 02:44:21PM +0900, Moon Yeounsu wrote:
+> > `ip_hdr(skb)->ihl << 2` are the same as `ip_hdrlen(skb)`
+> > Therefore, we should use a well-defined function not a bit shift
+> > to find the header length.
+> >
+> > It also compress two lines at a single line.
+> >
+> > Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+>
+> Firstly, I think this clean-up is both correct and safe.  Safe because
+> ip_hdrlen() only relies on ip_hdr(), which is already used in the same co=
+de
+> path. And correct because ip_hdrlen multiplies ihl by 4, which is clearly
+> equivalent to a left shift of 2 bits.
+Firstly, Thank you for reviewing my patch!
+>
+> However, I do wonder about the value of clean-ups for what appears to be =
+a
+> very old driver, which hasn't received a new feature for quite sometime
+Oh, I don't know that...
+>
+> And further, I wonder if we should update this driver from "Maintained" t=
+o
+> "Odd Fixes" as the maintainer, "Guo-Fu Tseng" <cooldavid@cooldavid.org>,
+> doesn't seem to have been seen by lore since early 2020.
+>
+> https://lore.kernel.org/netdev/20200219034801.M31679@cooldavid.org/
+Then, how about deleting the file from the kernel if the driver isn't
+maintained?
+Many people think like that (At least I think so)
+There are files, and if there are issues, then have to fix them.
+Who can think unmanaged files remain in the kernel?
 
+> > ---
+> >  drivers/net/ethernet/jme.c | 8 +++-----
+> >  1 file changed, 3 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
+> > index b06e24562973..83b185c995df 100644
+> > --- a/drivers/net/ethernet/jme.c
+> > +++ b/drivers/net/ethernet/jme.c
+> > @@ -946,15 +946,13 @@ jme_udpsum(struct sk_buff *skb)
+> >       if (skb->protocol !=3D htons(ETH_P_IP))
+> >               return csum;
+> >       skb_set_network_header(skb, ETH_HLEN);
+> > +
+> >       if ((ip_hdr(skb)->protocol !=3D IPPROTO_UDP) ||
+> > -         (skb->len < (ETH_HLEN +
+> > -                     (ip_hdr(skb)->ihl << 2) +
+> > -                     sizeof(struct udphdr)))) {
+> > +         (skb->len < (ETH_HLEN + (ip_hdrlen(skb)) + sizeof(struct udph=
+dr)))) {
+>
+> The parentheses around the call to ip_hdrlen are unnecessary.
+> And this line is now too long: networking codes till prefers
+> code to be 80 columns wide or less.
+Okay, I'll keep the kernel coding style too!
+>
+> >               skb_reset_network_header(skb);
+> >               return csum;
+> >       }
+> > -     skb_set_transport_header(skb,
+> > -                     ETH_HLEN + (ip_hdr(skb)->ihl << 2));
+> > +     skb_set_transport_header(skb, ETH_HLEN + (ip_hdrlen(skb)));
+>
+> Unnecessary parentheses here too.
+Also fix it :)
+>
+> >       csum =3D udp_hdr(skb)->check;
+> >       skb_reset_transport_header(skb);
+> >       skb_reset_network_header(skb);
+>
+> --
+> pw-bot: cr
 
-> Jiri Pirko wrote:
->=20
-> =EF=BB=BFFri, Aug 02, 2024 at 06:25:31PM CEST, aha310510@gmail.com wrote:
->> Eric Dumazet wrote:
->>>=20
->>>> On Fri, Aug 2, 2024 at 5:00=E2=80=AFPM Jeongjun Park <aha310510@gmail.c=
-om> wrote:
->>>>>=20
->>=20
->> [..]
->>=20
->> @@ -2501,6 +2470,11 @@ int team_nl_options_get_doit(struct sk_buff *skb, s=
-truct genl_info *info)
->>    int err;
->>    LIST_HEAD(sel_opt_inst_list);
->>=20
->> +    if (!rtnl_is_locked()) {
->=20
-> This is completely wrong, other thread may hold the lock.
->=20
->=20
->> +        rtnl_lock();
->=20
-> NACK! I wrote it in the other thread. Don't take rtnl for get options
-> command. It is used for repeated fetch of stats. It's read only. Should
-> be converted to RCU.
->=20
+Thank you for paying attention to my patch! I'm a beginner who just
+came to the kernel.
+So... Sorry if I sounded presumptuous and didn't know much about kernels.
+But I don't understand why we have to pay attention to unmanaged kernel fil=
+es.
+And why do we have to check whether the file is managed or not?
 
-I see. But, in the current, when called through the following path:
-team_nl_send_event_options_get()->
-team_nl_send_options_get()->
-team_nl_fill_one_option_get()
-, it was protected through rtnl. Does this mean that rcu should be=20
-used instead of rtnl in this case as well?
-
-> Why are you so obsessed by this hypothetical syzcaller bug? Are you
-> hitting this in real? If not, please let it go. I will fix it myself
-> when I find some spare cycles.
-
-Sorry for the inconvenience, but I don't want to give up on this bug=20
-so easily since it is a valid bug that we have started analyzing=20
-anyway and the direction of how to fix it is clear. I hope you=20
-understand and I will send you a patch that uses rcu instead=20
-of rtnl soon.
-
-Regards,
-Jeongjun Park=
+Thank you for reading my email ^=EC=98=A4^
 
