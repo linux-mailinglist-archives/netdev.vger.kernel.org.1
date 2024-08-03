@@ -1,123 +1,116 @@
-Return-Path: <netdev+bounces-115498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F91946AD1
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 20:24:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94AFA946AD3
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 20:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94A2BB20EC2
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 18:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9901F215BB
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 18:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBA518633;
-	Sat,  3 Aug 2024 18:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47FE1BDDC;
+	Sat,  3 Aug 2024 18:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LkEh30BK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y6isJzkM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F271C182DB
-	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 18:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EE0134AB
+	for <netdev@vger.kernel.org>; Sat,  3 Aug 2024 18:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722709468; cv=none; b=VBx4QH4DJvIBxx2PnVFV5Cyc4dDinNvhiKs86z4U9UHV5ay2edEJw4n4vo8xupwHyfzOHiLfOc8dITAyhMLl2w07I4xEo5pZzQZnXeeHaDgUt4FQnd7QAIPu6iJArXRe+Bx5Jdwq+mrvgfwTQqZpZ+upf/MPYG4m035BsSkoh8c=
+	t=1722709555; cv=none; b=d5StinqT1/oDK91vr0cbDkqr0FQu3D8UaMmyi1k5Pd/bFgJRXvmshh17QEzIYhZb2Sg3V7KDJRny+maw2/Xdjp2jIyMteO67eJKzpuQXQnsUxPZsv3BNmZMjzgqqT3KEsIoNsOJmRuo8AnfW7Yds3TXy38Paasfdf9lFHm8S6FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722709468; c=relaxed/simple;
-	bh=ME+s3gtFfKN8DN5rKo8+CFG5vjgjAY/BtPYIP+kKzVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CDJi/8v5710Vzq3ftnUREwk4KwyzWkBA1X5R15ZFMrg41xBqjTFXxlx6HfjvpdxfNzIEYDlzEZma5pNX4UhRPMPCZLd8fetU575cJLnFcSWbzhLPHtniuDaq8/saIsAbyjKS53jPAl2doaL6aHeHEUiw8HpzmlSMUx3/b91acE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LkEh30BK; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3684407b2deso4784743f8f.1
-        for <netdev@vger.kernel.org>; Sat, 03 Aug 2024 11:24:26 -0700 (PDT)
+	s=arc-20240116; t=1722709555; c=relaxed/simple;
+	bh=CYEMquPpM5HiwNnRriYC2jCjJ4nXI+Mmr0Mm8HHv+Rc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ho4cxcrrE2xbkfR0wE055jKze7Og+Hu8Rxj9l/jftQuJ60Y1MgUpKHvsjWargdc8Am0uljHSgxzw9F6KliuXTa5d6N+gd95fADgGq1gIG/cGQerI2m0GvexswRzOU+VDE91RPj9Kq3SNadGVuLAh44yGAQD1gg581BakqdBPxr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--manojvishy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y6isJzkM; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--manojvishy.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso4183085a12.0
+        for <netdev@vger.kernel.org>; Sat, 03 Aug 2024 11:25:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1722709465; x=1723314265; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zBr5WkXrSporzFvj7+ZgDq7NawA3CvOoBxGxQfbusJ0=;
-        b=LkEh30BKYNtdZFESx6+azH3OnFHKp+fegDZXkqECfr8WYDy/R/7T4ZH8/WPb+9Jnop
-         nzs4TWWznJ/KdhkSBWkkO0NIK8BzMuU+h4V+Gxi7tLO9R3b83mo1+K/kFbUT43VGqzaA
-         Jd4e/nsRaKcTbvq08GEjGhBkFKP+XncHb+ghk=
+        d=google.com; s=20230601; t=1722709553; x=1723314353; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BH7TThbnnegkjaOojrrx2d8L5L525Fkrr+r8KP5JObU=;
+        b=Y6isJzkMnlsPwlrbvRqJqGSgXeE/ZvICp7Cgt1uw+k3sFbpSgZKWFgHUYoj/6atukK
+         pnFoVk4MGcMRmNMf7Es3LrRm3bmwX5PRkk8ulWke9lGI0gM6HuhLwEPMVcFwUjZqFCDR
+         h56hyKDc9cP4GPa84tRTg3Xn25J2s21syK91ACs5llksL7I99KE0UvGJ1MwxCPy5Ka7y
+         XOIeg/xlAOZmVdFyRrbWIrnAM4KaNOPCkm735Eb1/nke5XBAa4KTqotu3rs02UJeVxd4
+         JbJVFCwZWvu3XLp0wKHjxBscj8xUb9at6Dzg2AIAdCCVmFJO1yI4vb0I6JX30yFNpBFd
+         UWUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722709465; x=1723314265;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zBr5WkXrSporzFvj7+ZgDq7NawA3CvOoBxGxQfbusJ0=;
-        b=xGNqZ1LzeB2cTW/isA9s2XutcDZ/1uJnx9rtHyMk/VGDyVUBwhzIMoLukfjkESZKmJ
-         3L+SSnWeqG3O2QeMNpi5fyO/ikel1LS/6y7NhxJQAGenzFvj2irPSUnRQIa6kXF0WRIE
-         wMLtPyBsxncZ/aVeiasJN+frlUj1bNV7nGsz8vz2hjtas1IenpADqRoPwQQRDNVxlmrt
-         vZQkRtU6BSjaxlu457Wtaf+ZvQpkqsc8SynwgpE6bK+WDFuUrj5xllLe68lMdTpkpnwl
-         bCBwMvrxa8EEz/KDjHoqYH2Tmtbt2CmygPLiQ712ZzerzQARKagS2bx/OctsFOFdYJj7
-         KbUw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1PCsxyFaM+RRCDUfCCsl1+jC3k44o3EdIttv0edDmnYG9L0oNyEY3safVA8Wgo62AijIS+88tOeqQh/WpifLQm3OBw3KJ
-X-Gm-Message-State: AOJu0YxqtBhR28BCPEOsaQqQbU+sylIUDOltRgT2UlB7NRY18bvk7zsM
-	JtFRdONnMMUCEKx0B5oEgkkPRu5lRBOX6adN6P05pKG2FWsMDANSpzrKhBei6Kc=
-X-Google-Smtp-Source: AGHT+IHphvNOr3PmHSRqxafkCHOEE4+pj2H36XGf0P6nTTSTmVyDJzJKoEMLiH3uYSta0SnTltHF3Q==
-X-Received: by 2002:a5d:6d49:0:b0:368:36e6:b248 with SMTP id ffacd0b85a97d-36bbc0cc71cmr5215008f8f.23.1722709465074;
-        Sat, 03 Aug 2024 11:24:25 -0700 (PDT)
-Received: from LQ3V64L9R2 ([2a04:4a43:869f:fd54:881:c465:d85d:e827])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf1dcdesm4912713f8f.35.2024.08.03.11.24.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Aug 2024 11:24:24 -0700 (PDT)
-Date: Sat, 3 Aug 2024 19:24:22 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
-	przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
-	gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next v2 11/12] netlink: specs: decode indirection
- table as u32 array
-Message-ID: <Zq511qMYE-OFqkPc@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-References: <20240803042624.970352-1-kuba@kernel.org>
- <20240803042624.970352-12-kuba@kernel.org>
+        d=1e100.net; s=20230601; t=1722709553; x=1723314353;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BH7TThbnnegkjaOojrrx2d8L5L525Fkrr+r8KP5JObU=;
+        b=v+ZyxqwXeXUnRULohIjS8r2QjfK6y0jJzBT9LCz/ny4lTQZEfpgQvfnw8QqSOubE14
+         0cgLsvi13SQtjY7jrCECS0fuyUBlTUy25m3ziDaUkIPSy3RbJ9fjCWco/X7wYqkINyd2
+         57DdfL3AApIOLABVclznAhjsXXa0Z4zKd3YQYtPX0hApuCQqB6b/UKjncoXGezpCWXE1
+         ExXSc1yLTsfFmMDqfdgnU8N43KkfdJaLvcPv0ZYiwQUFZARIVbnqzNzmavpqifFNX74K
+         G127mwmk3CITM2fI/4iiXscIcaXRI2v8m77uryPMoGQTl8lkRlXbKMUWj+QR/sw6FSjW
+         crDw==
+X-Gm-Message-State: AOJu0YwsI7+cZpJzK8NuF2VAywGrG5hMf8caxz59V5qvWw+l5if78XM+
+	f8brqkuRZzOdfq292ChaVUavUY3mGR/ReyY48V5+oKncdGNn0Gm+BvUbcuT9WAGudbyu8zTD8tm
+	3boq90XwJ7G8JY3ED/Q==
+X-Google-Smtp-Source: AGHT+IHSIDEbxPmrzSc/pjlYK4UMHUzINsnlYy7PNW5MWeJ9ziiR25nb3zUlEws/rVyc2hSZI00CJMWWoyO5wg4u
+X-Received: from manojvishy.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:413f])
+ (user=manojvishy job=sendgmr) by 2002:a63:25c7:0:b0:7a0:b292:47cb with SMTP
+ id 41be03b00d2f7-7b6bb6842ffmr19853a12.0.1722709552310; Sat, 03 Aug 2024
+ 11:25:52 -0700 (PDT)
+Date: Sat,  3 Aug 2024 18:25:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240803042624.970352-12-kuba@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240803182548.2932270-1-manojvishy@google.com>
+Subject: [PATCH] idpf: Acquire the lock before accessing the xn->salt
+From: Manoj Vishwanathan <manojvishy@google.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Decotigny <decot@google.com>, Manoj Vishwanathan <manojvishy@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 02, 2024 at 09:26:23PM -0700, Jakub Kicinski wrote:
-> Indirection table is dumped as a raw u32 array, decode it.
-> It's tempting to decode hash key, too, but it is an actual
-> bitstream, so leave it be for now.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  Documentation/netlink/specs/ethtool.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index 4c2334c213b0..1bbeaba5c644 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -1022,6 +1022,7 @@ doc: Partial family for Ethtool Netlink.
->        -
->          name: indir
->          type: binary
-> +        sub-type: u32
->        -
->          name: hkey
->          type: binary
-> -- 
-> 2.45.2
-> 
+The transaction salt was being accessed
+before acquiring the idpf_vc_xn_lock when idpf has to forward the
+virtchnl reply
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+Signed-off-by: Manoj Vishwanathan <manojvishy@google.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index 70986e12da28..30eec674d594 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -612,14 +612,15 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *adapter,
+ 		return -EINVAL;
+ 	}
+ 	xn = &adapter->vcxn_mngr->ring[xn_idx];
++	idpf_vc_xn_lock(xn);
+ 	salt = FIELD_GET(IDPF_VC_XN_SALT_M, msg_info);
+ 	if (xn->salt != salt) {
+ 		dev_err_ratelimited(&adapter->pdev->dev, "Transaction salt does not match (%02x != %02x)\n",
+ 				    xn->salt, salt);
++		idpf_vc_xn_unlock(xn);
+ 		return -EINVAL;
+ 	}
+ 
+-	idpf_vc_xn_lock(xn);
+ 	switch (xn->state) {
+ 	case IDPF_VC_XN_WAITING:
+ 		/* success */
+-- 
+2.46.0.rc2.264.g509ed76dc8-goog
+
 
