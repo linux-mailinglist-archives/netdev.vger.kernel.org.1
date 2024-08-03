@@ -1,135 +1,115 @@
-Return-Path: <netdev+bounces-115460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 104FF94668E
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 02:50:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0AD79466AE
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 03:21:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A4F41C20EE3
-	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 00:50:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DEFFB213FF
+	for <lists+netdev@lfdr.de>; Sat,  3 Aug 2024 01:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1923D8E;
-	Sat,  3 Aug 2024 00:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0365695;
+	Sat,  3 Aug 2024 01:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIS4+0yM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mv50f3fq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B46FB8;
-	Sat,  3 Aug 2024 00:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B1DAD32;
+	Sat,  3 Aug 2024 01:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722646234; cv=none; b=UCfD8GYVDz2UxbyTb6AmNEuS4/d+FRM10cJeaLQtKVwyfzJx77FZqMdtrK/Cesp2ZbPZDWTnZyI2tZuuEVWl2g9q4q7YPLkE0WD3g25Bt3UeB4x8iQ13r4UuVLge7ML6gBg7VtzbMEqEQuXmX/kTq+QUThUj7PxdSCvmXhvl2aU=
+	t=1722648096; cv=none; b=CmF8zunohyUnKvPW74PZqDEeIvqEs+OD12tLVGFN7lztg5VYQ0bvauHTqL0gGlD+j9JeWx+ytuvontNq8EsadpNrGYcMHwHxkRAcHkBT1sMKpBhhRCEk/oEctDPkTL5WXFiRkXinWyALNAiAsiePtSKD4J5cDau0Po1LAlHPD5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722646234; c=relaxed/simple;
-	bh=TKgDbZppliFfj6siqWPyZeGhtXYn1QemkYs5GVnMb84=;
+	s=arc-20240116; t=1722648096; c=relaxed/simple;
+	bh=oAUjHZHU7593Kn1TaZZsRWcf0gpNtl99/cZMJoydQ5c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t+Jg+/a5qHNIqcfT0m5pwBj04TbvZM+8JvZeNmO72A+ObGDxrcWhOksAL2twpHKnZeEFYDA70uuNABPLtu1zlPKq0U6rnXF93Y4F7HUUZobV69MPo4y+Th6iqSo52h73JeG7i7n+TVqwpdbKRMYdUiRqCTu5PIJaypLGSMgmJhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIS4+0yM; arc=none smtp.client-ip=209.85.215.170
+	 To:Cc:Content-Type; b=CnSJCE4d5RefnquS9kWL9yWG2rPEtsLK5H1HjmlUw5zyBIBRDuaLS+pY7ADttPZLcWvp1uLbTeu57AS/tiLOSGn0hwY3QQaAz+W+9bTmVvXoTtbYv943xHlg6fbypwOGcoq3arIAa9W3hp7podHp3FRcL8MUA2TCgNgr2ybWecg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mv50f3fq; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7a18ba4143bso6353446a12.2;
-        Fri, 02 Aug 2024 17:50:31 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b79b93a4c9so33308816d6.1;
+        Fri, 02 Aug 2024 18:21:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722646231; x=1723251031; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722648094; x=1723252894; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ii9TRHHbYfqeTNA8urSRUIghL0nSQM2uHrE3DtyGbx0=;
-        b=gIS4+0yMBFCuAjHJ3eRIQJbXE2r1bJcdm0fw/E2hLHk7i826kNCGtJzgPWAncro34b
-         Q8bcQYCW0d4U+kzsSDXl+V2v1jO5oVAtJ/dnT71q0Qy2nKcQY9oVkCWP9dSE80X6Q6sw
-         TiIW5uBlVQ7118ugnHubpwm74MU3SbMX/HXzEKO32JHWYE1nXb+7sHlgP9F0gJPkSSp6
-         89JAhLExygqGk1q2xsVEV58Gt79MKyC1BWo1nLk7OK9aJHFvbJXZ9uZiIePcB2w2bZNT
-         xIkFtEGsp1m5MFfnrGJ/LZgZM/oh5xa8wXSyVaONsBVkOC9s/DfIgAXldxbFdufnV4mj
-         Y+xA==
+        bh=OK8R6WKVvITGMMXb99ClYH53cm1Liy2P3xPdyZF4WzI=;
+        b=Mv50f3fqCDKLWNbZo7GC18nBGkxH0UsJ/8WXdRlL4mSvExnniB7qQvW9kVMk/FIUFY
+         BFAYOO33d8ijTQPQrlX2Hra3xnyHY2zLB2GFLjhqIv3/o7mcKEP1KDPKQJFAo25aszcd
+         YgqwQV/f/NAs8mShh3r8bpAuT5Os/UZyLI/1WTmw3VrPAn67eH6g9DKGKoBQdyRYB0yz
+         8vT66NYyUFq5qKsscbKnsMNqiYBe74GOwCrctrOsXCSNOeCchWtgpvEv7IYzoNizy6fm
+         mS+S3d6GxBFLLu30ceO+rmnWMFjkH72EUAvmvaRpo66dyC0pdKUI038us8S2oC1SAq8Z
+         otQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722646231; x=1723251031;
+        d=1e100.net; s=20230601; t=1722648094; x=1723252894;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ii9TRHHbYfqeTNA8urSRUIghL0nSQM2uHrE3DtyGbx0=;
-        b=vQbYMiomn6djMEwh+d+LedcncCYL6Xj0zT41UPEVTbZXGRpQ0TJyFxspUxOY7TC09u
-         U3R3pVSivL/91eD/KKiC7eB0sj7v1DssjKMFqRJVWpog72c8dbZUxGl/8N+Rq0fTcq32
-         +u6smKTDSWAvinvUBCf3ZB+wStvCyoaD55tLK0ZttoR8kC3ix0Gzs3dUf0XAVyz0CI3s
-         Rl+iwP9iSSoWjyU4oMiujRTrxi9ao/NoIqsaLhUWEZCpU8NcCs9XirEFuxOid8k4RG3r
-         e4Mq19p3Gu9UTVGunLphnhBDp/RgucG2/kQCpGKa/GPhn8ePBQn//lJ5QFBKtARN7Qmf
-         nc3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwzsVFVW0hUJwSO3wSjpna1pgQsH/xtr1tO3u1NZZ4abCAClQ1BO11dev8pQYGtHwq07U7+nme/D22qtRSgJa3UjBeI17XFV1M2ABy6l6vFqM3tf875JOhu9urcX5Lm2VRPdZkIOU3WGf7czhW9hFMCCk5Ln5vzSHSHpS8ob6m+E5CfMSX
-X-Gm-Message-State: AOJu0Yx7Y/K74IsSQKBY3gZgLZ5lkoGxSk8YTl+29YcSjDtJTqM/HN40
-	luwEOZo5Bhn4cwcrDXoyvDzv4TtqmX1VivTjsVf4u9vQVDIdB9pZQJDAxXqJ+11kmYD6vXfO4fc
-	NrNVcNiKlyonobKuBALjjgn8LLRI=
-X-Google-Smtp-Source: AGHT+IGS4mvqY8Wvdxe/ZNRlFzeeItVUD/tp7A8aKWLj/K9xpJDlvLtJUOmC2keDnxNAnMHO8RMvCbjb2AaWzLyNhxI=
-X-Received: by 2002:a05:6a20:1596:b0:1c3:f4b6:6c0d with SMTP id
- adf61e73a8af0-1c6996aca7emr7300214637.52.1722646231208; Fri, 02 Aug 2024
- 17:50:31 -0700 (PDT)
+        bh=OK8R6WKVvITGMMXb99ClYH53cm1Liy2P3xPdyZF4WzI=;
+        b=q2EQF+YGzhffQewxINFkMeybs38ekuF/LCiuFk+kD26UZ5IaTS02zGx9IJCXENvNrd
+         gP1Sp4rZQxjd6WLXceIexlRiLmNdzSktthfzulEXzkY9EXDZ1SPxgVCGzLHVw9P9Zk/R
+         q425GRLeG4eeZG6pQjJFPbTKSKCf2Yto1vt4vJKhOWw1O6OPCi5cLPloFHp9ESMhUMXs
+         25kOvn3rdeMeMojty7/iTzpCMGv/h27NhHR8n6xfdGLxNVM8G4/vSfg+af++r60ntI01
+         Nr8V3tf4d5GN5E06ti9tj1JVy0BnLWzw4DviU+0UXYG8rohl26dD7xSwk1LmpEmfIL0/
+         EnUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUtKYvh3ZAbyOys6qGab9p+/CoonE/uVSLcEqhlmZMUAV2PUXvhkTTUKBfSMSZGif6/pbkRm0ETwkkiRw8ER9MKo7RO+OKQFv/1fLa215PeBcCZ22QPmpCzhfjdVLOmQa0osQ4K
+X-Gm-Message-State: AOJu0YyXjxT6+1J5AyTkwAmeVde5z1IOJL0gS6c4Xz6C5B+eJkoqjNM0
+	fw07tErrfRDC+5ryMFK1PY8a3rFs8+ldTr1X5JWLS9KmbHciHZYjLfQWIBFbKh9zQPY3Fd2LIPH
+	1EwJBGTUVg67CHP3XRQodLxMOPBo=
+X-Google-Smtp-Source: AGHT+IEs5qr/1OGdh5f3yXIJWBPZlp17YcBNAy/hBFJjK3i7ugTQ2RpD0VGSnquCh8VGJyegZ4mGkiQ9yDmNI99f6GM=
+X-Received: by 2002:a0c:edc7:0:b0:6b5:16f3:94a0 with SMTP id
+ 6a1803df08f44-6bb91e7433cmr112171576d6.18.1722648093894; Fri, 02 Aug 2024
+ 18:21:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com> <20240802081823.67a27db3@kernel.org>
-In-Reply-To: <20240802081823.67a27db3@kernel.org>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Sat, 3 Aug 2024 01:50:19 +0100
-Message-ID: <CAJwJo6b1UHoCuyzy4UnLRu1W-GWx5jM2RhoddbzzuWXaEVG5yA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/7] net/selftests: TCP-AO selftests updates
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240802054421.5428-1-yyyynoom@gmail.com> <e792d1b6-b9b5-4e90-801d-ad10893defc1@wanadoo.fr>
+In-Reply-To: <e792d1b6-b9b5-4e90-801d-ad10893defc1@wanadoo.fr>
+From: Moon Yeounsu <yyyynoom@gmail.com>
+Date: Sat, 3 Aug 2024 10:21:22 +0900
+Message-ID: <CAAjsZQz2orPoBS-yRYQcBEv3mzUHrAiyqB-jti5RTyx39HOVjA@mail.gmail.com>
+Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: cooldavid@cooldavid.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
-
-On Fri, 2 Aug 2024 at 16:18, Jakub Kicinski <kuba@kernel.org> wrote:
+On Fri, Aug 2, 2024 at 10:35=E2=80=AFPM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+> The extra () around "ip_hdrlen(skb)" can be remove.
+> Also maybe the ones around "ETH_HLEN + ip_hdrlen(skb)" could also be
+> removed.
+Okay, I'll send the next patch which the parenthesis are removed!
+But... The parenthesis around `ETH_HLEN + ip_hdrlen(skb) +
+sizeof(struct udphdr)`
+should be retained, because it makes a clear boundary.
 >
-> On Fri, 02 Aug 2024 10:23:24 +0100 Dmitry Safonov via B4 Relay wrote:
-> > First 4 patches are more-or-less cleanups/preparations.
-> >
-> > Patch 5 was sent to me/contributed off-list by Mohammad, who wants 32-b=
-it
-> > kernels to run TCP-AO.
-> >
-> > Patch 6 is a workaround/fix for slow VMs. Albeit, I can't reproduce
-> > the issue, but I hope it will fix netdev flakes for connect-deny-*
-> > tests.
+> >               skb_reset_network_header(skb);
+> >               return csum;
+> >       }
+> > -     skb_set_transport_header(skb,
+> > -                     ETH_HLEN + (ip_hdr(skb)->ihl << 2));
+> > +     skb_set_transport_header(skb, ETH_HLEN + (ip_hdrlen(skb)));
 >
-> Hm, could be a coincidence but we did hit:
+> Same here, the extra () around "ip_hdrlen(skb)" can be remove.
+I'll remove it also.
 >
-> # not ok 55 # error 381[unsigned-md5.c:24] Failed to add a VRF: -17
-> # not ok 56 # error 383[unsigned-md5.c:33] Failed to add a route to VRF: =
--22: Key was rejected by service
+> CJ
 >
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsign=
-ed-md5-ipv6/stdout
-
-Yeah, I think I've seen that previously on netdev as well, but quite rarely=
-.
-Let me take a look and see why adding a VRF table sometimes fails with EEXI=
-ST.
-
-> in the first run after this got queued. But the retry worked:
+> >       csum =3D udp_hdr(skb)->check;
+> >       skb_reset_transport_header(skb);
+> >       skb_reset_network_header(skb);
 >
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710001/4-unsign=
-ed-md5-ipv6-retry/stdout
->
-> =F0=9F=A4=B7=EF=B8=8F
 
-[from another email]
-> oooh another run, another (different) flake:
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/710181/11-key-m=
-anagement-ipv4/stdout
-
-Yeah, this is related to this very patch set.
-Some more work clearly needed :-)
-
-Thanks,
-             Dmitry
+Thank you for reviewing ^=EC=98=A4^
 
