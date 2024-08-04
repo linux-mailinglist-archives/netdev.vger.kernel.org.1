@@ -1,98 +1,150 @@
-Return-Path: <netdev+bounces-115547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13DAD946F9B
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 17:34:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3028946FAF
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 17:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84779281024
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 15:34:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE93F1C20D22
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 15:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3DE56766;
-	Sun,  4 Aug 2024 15:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6634D9FB;
+	Sun,  4 Aug 2024 15:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="peUNYM64"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRqILuTJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FFCA95B
-	for <netdev@vger.kernel.org>; Sun,  4 Aug 2024 15:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C2A1DFDE;
+	Sun,  4 Aug 2024 15:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722785694; cv=none; b=nW1NwsCBs9Jr56hLKBzMZJOlKTWB40tkfg6ZpqS0hDBPJFIQPZGgH3JlO1bVUr0wlnOkorfMIshBzy82M2vwouMpKM14GGVzLoGqmGb+8gZJEbfR8yhvYYtW2XAcCHhyykzY3axVIroW+3VCSQYc0tqg786XjZWZD9rQdoNWDzk=
+	t=1722786417; cv=none; b=BqavzQO5tzxpTzbUlrjpW6MVUQ0m6fpX1rmj0pmsG2pfzHcXsS2Cd4LyHLYVzH/OBz2vLMHHDKRoWecQBlZMt9lePyaKjdZy90fR1dk7eXPifYZVtJHTpTHFGbdVkdQ8IaGWGiEvuSrRk+fRsuJjg44PmDgPv8lFvLaU80GI09w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722785694; c=relaxed/simple;
-	bh=SXXO83FHXp1Gw9NCa8c/P9bTALIzk80749WB2aNwa9A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J/9xUHYdVBSmjHh4waA47Zul79BaDgfdFLCBbs76zK9Hj+QrwFyXzvMhJogoC+RlcBDzP+bf7/4mLkY3dsmkYBKn4XPqlzjIFMoEEDesF9M6XRBz1Zxxx+E5u9WLN/5vKfDWFsMaX8snw+kEMCaXSIYXS05Xo8EkzvKhIMJiCqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=peUNYM64; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 885A7C32786;
-	Sun,  4 Aug 2024 15:34:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722785693;
-	bh=SXXO83FHXp1Gw9NCa8c/P9bTALIzk80749WB2aNwa9A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=peUNYM64JFdjLHgl5my89w6OhhXe5VlRy3X0DKDKZ4z129zSw30aYhPK+OZlvjS5O
-	 2isBLDpDAfWQ/mONV8c09FPLgRix1DnjMSB39ALmfmUFBBXZnciz0DJFgbkku/+XBs
-	 ar2morbhRn3DrsNGBpknpcVR6sFCsPS5V8h5MVy7s0y5fJUUlQZ5oDPD2FIHK4b40z
-	 xRuiFvbCHrNosSFAktyvuUWk+n3kXvER3sc5Sz7IVMbPAM5sxYF+O4fRkzgv9i88YJ
-	 F7AZtFWUgHerRXeO6n/BhBm4oQX0XxGZSlXAedRqrlXHJ2UAl23Tox80zn4zBOWOLn
-	 jg3eAAzMlAfFw==
-Message-ID: <76127456-0d3e-4a44-8a4f-0f0823b4dd66@kernel.org>
-Date: Sun, 4 Aug 2024 09:34:52 -0600
+	s=arc-20240116; t=1722786417; c=relaxed/simple;
+	bh=0roKzM1fRBmXSj0WEesBXbXW+PAoYQryLclvNVrlveY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TMA2UNgeUA+W0nP+5r5nXwNf7pDrR4FGKGN7lIyiUXdKWixYu3rArb/btyyoB48tDG4URb4tjmoGzGkZvnoYQftx8oy9CMqJGo7m2qa/cbaRuonf0Sd0EQyVxrPnD2vzGbB7/sekR1mpserixxHCqj69Pbg+3uxZS5q09jPW0ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bRqILuTJ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3685a564bafso4913103f8f.3;
+        Sun, 04 Aug 2024 08:46:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722786413; x=1723391213; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mlp/x+HwXkbRiwsuFRhzSuMJwunaJ+O88frp4ecnldM=;
+        b=bRqILuTJ9PPp4BLPefQoAouBSRLDTByTXifWJevW0CP6NAJnjodbq/XOo7OMmR4CxS
+         AUW7DKTZ9v4r0Rhi9YlYIehtddhlwlLMRjjOmdk3TkyX0gUKcgm9cOS60qb8uMl/ycLm
+         N758lwdXAaiZR3gs1iNw8dbnLGtBe9W4VVKFPj7OcU7AShnhW1epgnKDghIRIWVTDtgz
+         5sTeE+I3O+nsvY1kMK/5e1MfU7f5RwzWiBS1QfYCfmAnwkrAeQkC5FwwrnkwzYQRTaij
+         hP2nNwR7im/EQ/+YIL+rBkwB5SuEVvWRJANwAsQX+km9kqhCe5WcN/rwXkjOgoGtu4Ij
+         GZ6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722786413; x=1723391213;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mlp/x+HwXkbRiwsuFRhzSuMJwunaJ+O88frp4ecnldM=;
+        b=EBi/J+DE6RL1cm974cypfO2l/F4kSV8FI0FtrMvloRuSZDVKWh0oROScc/iHvS5nv0
+         umvCNdUMfZjN0zx8Bx0H5aAHX+zUssF81RhcP8941viuHVRrZ6QEy+tfFDrdyc0/O0Jr
+         RCfccjNC61iTM5fA38WFnTc3kTNIDWoPvZr7e09PR8KpOXuMbiRDNLJD2FQDX2/sPO6X
+         EOfwFIdz7I+x/2lbyIWt5rGJAWhEp49iyxBMzkILwCMhcXr4InuR7sMlI9t5PLldltKa
+         C5xF3kdLW9UkxoBIpV3BpqLTfxmljqUvogdXq16gWTuS2k0I7UpFcuJJiWcuHfcIW6DF
+         JPdg==
+X-Forwarded-Encrypted: i=1; AJvYcCVV/T/EjNKqPZ+079gM0XKJe1qUZBT1Nn4J5ecAoLDkeTFwZ+0coRZsM0Hg4+L37x/zwSuRbwXJWmQCsSc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2XCfwCi4D4+7ptdy+UwWwbPVyd8R7KuT5jJBcQnl+Kk+Qr2VA
+	MRgHQdTTM9QMKpYitmHPjoimrV8z1Dbu1pwPZrtAdfB8L+X6Z/za8WZQEQ==
+X-Google-Smtp-Source: AGHT+IEezCcCjJ/kHEdUKrURcd9JboOtK0pJV49pF+mIsfjLELi4ryVv/+0pkHWdRe11tJvGc2X72A==
+X-Received: by 2002:adf:dd87:0:b0:367:f104:d9e8 with SMTP id ffacd0b85a97d-36bbc16102bmr6211959f8f.47.1722786413330;
+        Sun, 04 Aug 2024 08:46:53 -0700 (PDT)
+Received: from localhost.localdomain (93-103-32-68.dynamic.t-2.net. [93.103.32.68])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf0cc58sm7291079f8f.2.2024.08.04.08.46.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Aug 2024 08:46:52 -0700 (PDT)
+From: Uros Bizjak <ubizjak@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Uros Bizjak <ubizjak@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v2] net/chelsio/libcxgb: Add __percpu annotations to libcxgb_ppm.c
+Date: Sun,  4 Aug 2024 17:46:09 +0200
+Message-ID: <20240804154635.4249-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v3 2/2] tc: f_flower: add support for
- matching on tunnel metadata
-Content-Language: en-US
-To: Davide Caratti <dcaratti@redhat.com>,
- =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-Cc: aclaudi@redhat.com, Ilya Maximets <i.maximets@ovn.org>,
- echaudro@redhat.com, netdev@vger.kernel.org,
- Jamal Hadi Salim <jhs@mojatatu.com>, stephen@networkplumber.org
-References: <cover.1721119088.git.dcaratti@redhat.com>
- <0d692fe05a609beb1b932c2ce0787f01859b5651.1721119088.git.dcaratti@redhat.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <0d692fe05a609beb1b932c2ce0787f01859b5651.1721119088.git.dcaratti@redhat.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 7/16/24 2:57 AM, Davide Caratti wrote:
-> extend TC flower for matching on tunnel metadata.
-> 
-> Changes since v2:
->  - split uAPI changes and TC code in separate patches, as per David's request [2]
-> 
-> Changes since v1:
->  - fix incostintent naming in explain() and in tc-flower.8 (Asbjørn)
-> 
-> Changes since RFC:
->  - update uAPI bits to Asbjørn's most recent code [1]
->  - add 'tun' prefix to all flag names (Asbjørn)
->  - allow parsing 'enc_flags' multiple times, without clearing the match
->    mask every time, like happens for 'ip_flags' (Asbjørn)
->  - don't use "matches()" for parsing argv[]  (Stephen)
->  - (hopefully) improve usage() printout (Asbjørn)
->  - update man page
-> 
-> [1] https://lore.kernel.org/netdev/20240709163825.1210046-1-ast@fiberby.net/
-> [2] https://lore.kernel.org/netdev/cc73004c-9aa8-9cd3-b46e-443c0727c34d@kernel.org/
-> 
-> Signed-off-by: Davide Caratti <dcaratti@redhat.com>
-> ---
->  man/man8/tc-flower.8 | 28 ++++++++++++++++++++++++++--
->  tc/f_flower.c        | 38 +++++++++++++++++++++++++++++++++++++-
->  2 files changed, 63 insertions(+), 3 deletions(-)
-> 
+Compiling libcxgb_ppm.c results in several sparse warnings:
 
-applied to iproute2-next
+libcxgb_ppm.c:368:15: warning: incorrect type in assignment (different address spaces)
+libcxgb_ppm.c:368:15:    expected struct cxgbi_ppm_pool *pools
+libcxgb_ppm.c:368:15:    got void [noderef] __percpu *_res
+libcxgb_ppm.c:374:48: warning: incorrect type in initializer (different address spaces)
+libcxgb_ppm.c:374:48:    expected void const [noderef] __percpu *__vpp_verify
+libcxgb_ppm.c:374:48:    got struct cxgbi_ppm_pool *
+libcxgb_ppm.c:484:19: warning: incorrect type in assignment (different address spaces)
+libcxgb_ppm.c:484:19:    expected struct cxgbi_ppm_pool [noderef] __percpu *pool
+libcxgb_ppm.c:484:19:    got struct cxgbi_ppm_pool *[assigned] pool
+libcxgb_ppm.c:511:21: warning: incorrect type in argument 1 (different address spaces)
+libcxgb_ppm.c:511:21:    expected void [noderef] __percpu *__pdata
+libcxgb_ppm.c:511:21:    got struct cxgbi_ppm_pool *[assigned] pool
+
+Add __percpu annotation to *pools and *pool percpu pointers and to
+ppm_alloc_cpu_pool() function that returns percpu pointer to fix
+these warnings.
+
+Compile tested only, but there is no difference in the resulting object file.
+
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+v2: Limit source to less than 80 columns wide.
+---
+ drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
+index 854d87e1125c..2e3973a32d9d 100644
+--- a/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
++++ b/drivers/net/ethernet/chelsio/libcxgb/libcxgb_ppm.c
+@@ -342,10 +342,10 @@ int cxgbi_ppm_release(struct cxgbi_ppm *ppm)
+ }
+ EXPORT_SYMBOL(cxgbi_ppm_release);
+ 
+-static struct cxgbi_ppm_pool *ppm_alloc_cpu_pool(unsigned int *total,
+-						 unsigned int *pcpu_ppmax)
++static struct cxgbi_ppm_pool __percpu *
++ppm_alloc_cpu_pool(unsigned int *total, unsigned int *pcpu_ppmax)
+ {
+-	struct cxgbi_ppm_pool *pools;
++	struct cxgbi_ppm_pool __percpu *pools;
+ 	unsigned int ppmax = (*total) / num_possible_cpus();
+ 	unsigned int max = (PCPU_MIN_UNIT_SIZE - sizeof(*pools)) << 3;
+ 	unsigned int bmap;
+@@ -392,7 +392,7 @@ int cxgbi_ppm_init(void **ppm_pp, struct net_device *ndev,
+ 		   unsigned int iscsi_edram_size)
+ {
+ 	struct cxgbi_ppm *ppm = (struct cxgbi_ppm *)(*ppm_pp);
+-	struct cxgbi_ppm_pool *pool = NULL;
++	struct cxgbi_ppm_pool __percpu *pool = NULL;
+ 	unsigned int pool_index_max = 0;
+ 	unsigned int ppmax_pool = 0;
+ 	unsigned int ppod_bmap_size;
+-- 
+2.45.2
 
 
