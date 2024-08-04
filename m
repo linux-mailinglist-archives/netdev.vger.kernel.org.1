@@ -1,181 +1,181 @@
-Return-Path: <netdev+bounces-115513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D602A946CD9
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 08:48:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 561C1946D20
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 09:56:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3480D281764
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 06:48:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B11D1F21B1C
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 07:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6066ADF6C;
-	Sun,  4 Aug 2024 06:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2783B18EB1;
+	Sun,  4 Aug 2024 07:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a/yvpRTZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYbhDKuo"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D723FC2
-	for <netdev@vger.kernel.org>; Sun,  4 Aug 2024 06:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722754079; cv=fail; b=e+PJ2Ag9uymjcMutEGhXwRqY+FOes4w0nqMXl7FI3y8IpyOx9O0aqr+eygpT6GfIjXHJ7WDwN7Jp/OzVDPMnyemXycDNoR6raZQKcjmOlU1zUnf7x4wP7dKbapspxhYHHgBp+HI1UlZmLdrJ+LrIxeO3VoBe12nhRFJcYudjR04=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722754079; c=relaxed/simple;
-	bh=N21dl+Yr9ZJZE0wpFfuFSRyWYrRQmJ815fgjMTB4UXE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=l0AWKD51hmy/RV9AL5Vmv9EMwNA3BAz5ZeRKt1sSqOmJaOd1prjMOYoo9v03tUkXG6JkLSDf1PJU6fywBACRg6KP3Kk5cWqqqIg/DIkwjYsGZ//gaFb9icRTiLrWxBL+FAZJ994Y/zmnM+nzE1/nOTvIATjjx4XmaTlz8P1wtYw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a/yvpRTZ; arc=fail smtp.client-ip=40.107.236.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LCOgiqIdq6VBDMc+gf8ZlyoW8cxnHQckATqlRRm0/43Aam3uC0xpkPUjQhyhv2rVc0NOrDYU/YxNYuBFgGXK8Bo3Kofj+4jvjzPxCJ+ZXrtZH4HnzQho1Qm7uRpxFd96y6owplOKgy/eIk6iYqjdP1lmFrqedjqgBE044UG/RFFzC9BQea990L9PtC5tYSOwQuLdkrC5sAIEnxnPKcrbeDVJZX7nxfuSVilhFXA2iK1UcloO6smUDc9VDsv755bzN7cwC5twu7ttV2zFHgM7VKxSqPPRJVxL9WQ5Ttwh8J2wBiPoGUpANk2FN6vA1aw6pixZWZPQwNaQQuFnWDaVrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N21dl+Yr9ZJZE0wpFfuFSRyWYrRQmJ815fgjMTB4UXE=;
- b=W8pU6jh4OVQ5Vwg7ZwuW5JgUO4QkecrkIrxpevkj9d6R/1cYFnSthqjr8kEYrCLaU+DFBUVFIxGruYSUGTy8uLM53oxAS46Q1Q2iCB+dTg/LTPrJLfcTSAlRuV2Gx56bwQVf/Uj3R+0J8q5QXxxfLhXQd/MRO/gQLg3JO2GywwqAl8Jkf4JWNwJIIKc3ZR0GdAcBBcu4/rca+3Vr9IwL03DoXKkOVwTdrtmH6sRHuke4XZ5ZW1jWjIGyQtPTBFqmUCKnR6pp4qdpl+QrTV3qFLJBG90HYwna1mrla9jkddfhoQI8PfnsTB4+FLTKZa8cp+cgfuiSXTR/Wx3Qfef7Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N21dl+Yr9ZJZE0wpFfuFSRyWYrRQmJ815fgjMTB4UXE=;
- b=a/yvpRTZJ1qIFC0+1+Cq09ctP6TMKA+pHZd1TjLcvqeJKm/Hu8heFiWcC2OAspsaCm+HURawkeOWuu1zTBzdJJ5FGFbB1NZhtS81EHsnYC1lH5ghoY0483TYuKKWNB6zwBIKcyfdxjz3ThqChusyZ8MBBZzC1WnLllq9ywaY1ZsaLqrOtSvu8mJrbFZhD0HEqXC17G2kJ8a5WEfyemj/16+7Qb+hBhZxdtdcNJjEjzZvPUNF8ccrbF6spyTJt8QK4L3KcBmbk4v2ERwDifM9pe90s/ilVTuZloKPdbFJplMuztoeu1JyMkXonxghjtW1gBVQxotsXF2+ZWYEA1v07w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ2PR12MB8691.namprd12.prod.outlook.com (2603:10b6:a03:541::10)
- by MW4PR12MB7468.namprd12.prod.outlook.com (2603:10b6:303:212::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Sun, 4 Aug
- 2024 06:47:54 +0000
-Received: from SJ2PR12MB8691.namprd12.prod.outlook.com
- ([fe80::63d0:a045:4ab1:d430]) by SJ2PR12MB8691.namprd12.prod.outlook.com
- ([fe80::63d0:a045:4ab1:d430%7]) with mapi id 15.20.7828.023; Sun, 4 Aug 2024
- 06:47:54 +0000
-Message-ID: <2c5f20a3-7327-4e92-ad54-e8f43833ca13@nvidia.com>
-Date: Sun, 4 Aug 2024 09:47:44 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 05/12] eth: remove .cap_rss_ctx_supported from
- updated drivers
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
- donald.hunter@gmail.com, tariqt@nvidia.com, willemdebruijn.kernel@gmail.com,
- jdamato@fastly.com
-References: <20240803042624.970352-1-kuba@kernel.org>
- <20240803042624.970352-6-kuba@kernel.org>
-From: Gal Pressman <gal@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20240803042624.970352-6-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MM0P280CA0067.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:190:8::34) To SJ2PR12MB8691.namprd12.prod.outlook.com
- (2603:10b6:a03:541::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9169A7494;
+	Sun,  4 Aug 2024 07:56:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722758209; cv=none; b=Vbzqr869v0hhWbPqJ+v6DAgEuN7HFdqwL/zJgiYpwqFUTWq/q0z40lFkDBpY/ZgKdQV4CqD2TT++R/wmenm+irQUuCk5iGsObn7ckdTrXv9tlaERxowBgkdWKNiEnuyKIpqdzhMnOKLY5X6xonWutpXtcb+3DPsCYmuBW7haHA4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722758209; c=relaxed/simple;
+	bh=zfRBye9XjAyf1w+J+rLHJaLjVkIJJvi7H+/9DoIfN74=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H7Qfjq5dR8inYuZGd0hUxvjIjZSBazf0MHlS2PrNDyRoGBJJ3mD1GNUfgPEjGuLp5Dta6TxFGgeLrpsT8qqKMmbD1diDoDcb3olG+fCKFM32KBXxcVEwO98YSbe1etqesfrBoBLbSCn0y4WmLdwpHPlbDaRQPwViU/Z5kK8G8Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BYbhDKuo; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70d25b5b6b0so7060495b3a.2;
+        Sun, 04 Aug 2024 00:56:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722758207; x=1723363007; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jAUiIbA9M914l7SbVcGMcRn0qL18BQ5kTGC/RMGMPl4=;
+        b=BYbhDKuoSy5kiP/T/t8AYguX4K08c0CO5oMiU4u7FR4j2serqcH7dhWrta+zc/gvdf
+         PPRFkQgb9bOZZeox0WWrDlMmmo1U6n5nHgNG07zAaVg8gxMBPFvmXzdxMyOSRLq5+dfa
+         IE/KB0iGEbFX8cF0O+NXXos6Lqt9/orLctXpmUzjZXRk+Qn/d4B9VvKIecXTVQVXgNgg
+         RnRqDYjpfGHLnssnIOKx11agZsj/yVhg8/hr4MExjivL3Y4ZvYRbZk4HP4d99ft/imL2
+         czeTMqlqGNR+mkio4pi6FqZgbUgHTWy3gjqAB8TIdKOsDKc1H3d7jVXL0e9PL2XuhDhg
+         Kwxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722758207; x=1723363007;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jAUiIbA9M914l7SbVcGMcRn0qL18BQ5kTGC/RMGMPl4=;
+        b=amj4DBgEmB3OBlDs7Uz2Uof9sLAgcNUVZVH0qaSsHNKhczzoAPhvBOjtq5sVAPNRiG
+         n/Zs80wvdJJB4m1PMY81luR/2jLv6hBCyF5H4+2Q0JgAB++ulkRSUg7gOI/wOVt+0KIb
+         q+FPguNYfJnaFEkOtq8xuAt9UfYuoRq/GPDV/VuSI2ETEH+V91TWNj2wKf/ovUZXcIrs
+         iqGZPjK3AICX6yulmYegislt3KnpprQNL76+lbGLAFXZmna/B7fGyGVJDrEFl41QnyW/
+         YGCS8sA7GF/51pnlNcGrPe59FuYlqjeYOvRNS76ir9zuthEVBD4tJ8jJo+knD0+YRb2G
+         RZ6A==
+X-Forwarded-Encrypted: i=1; AJvYcCV9zWLqFm1r6T82ZQyjEdpuzqOTV7mJSGYB2e7icd+zJix4VavxkAvE6F74avuo46yijBHz9QaLsxxnHmsHTpDBAFVR2MjDVz1uR+jscSnFbvEaLLJWOZOzhohYeAtOpyOwutQNtp2WdO/tshcXSGS8lu0OSPhqVjv5N9erJxjUuoN/CBt45csMf5AKd/IuLWHQNK3aaQ/fnXGwdRb4wcGRpsSRtQKb0jh8sB+hq8EuYDxYpj7Mjsc4IM5GbgJFYttCdKovWK0SZ/9Gu5qf5qO/k/ffWGavNtu3JnR9yh3WYBGvPJolzwMelg9IT6SxPQelj5fjRw==
+X-Gm-Message-State: AOJu0YyyxaJ8rHcNZOXjPeuXE0bT1USDebXZE6P4HHNmclr609MHF+E3
+	vGhVHXnV8uYSpOJ19ejVt1RFqlr4CXVtqqqnkmEmLNkqfc5489rXDy2foJCcIy0=
+X-Google-Smtp-Source: AGHT+IGr87hL+CR9BQ4tkSVsGq67qKnz8TEMjj1/AcYNViYHS42eo8GA1J34i40o5jKuxGL8nismgw==
+X-Received: by 2002:a17:902:d08a:b0:1fd:9e6e:7c10 with SMTP id d9443c01a7336-1ff5748d30cmr59016425ad.41.1722758206776;
+        Sun, 04 Aug 2024 00:56:46 -0700 (PDT)
+Received: from localhost.localdomain ([39.144.105.172])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff59178248sm46387605ad.202.2024.08.04.00.56.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 04 Aug 2024 00:56:45 -0700 (PDT)
+From: Yafang Shao <laoar.shao@gmail.com>
+To: akpm@linux-foundation.org
+Cc: torvalds@linux-foundation.org,
+	ebiederm@xmission.com,
+	alexei.starovoitov@gmail.com,
+	rostedt@goodmis.org,
+	catalin.marinas@arm.com,
+	penguin-kernel@i-love.sakura.ne.jp,
+	linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	audit@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	Yafang Shao <laoar.shao@gmail.com>
+Subject: [PATCH v5 0/9] Improve the copy of task comm
+Date: Sun,  4 Aug 2024 15:56:10 +0800
+Message-Id: <20240804075619.20804-1-laoar.shao@gmail.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR12MB8691:EE_|MW4PR12MB7468:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81d2c52b-443c-4372-4564-08dcb4515e09
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TkNORGZ6STcreE44WkU4akRqM3ZxWWUyczVSQXRNOEI4WEc3U0tJaTVtZHNu?=
- =?utf-8?B?YVBBbDNLRHIva3dmejZoUklFS0xUZEpPQ0tiZXhiajBiMjJad1drK3NIRHlJ?=
- =?utf-8?B?V3pvRFBFVDQxa2dNU3hZRnFFa2ZDZHdvbzRqQnU1Z1UyUmZ1SUJaUzU4Si9u?=
- =?utf-8?B?Y3JqbzZoRE1KdFU4WkhlVWZ0emNlRkRPakpQUXJpMGxDUktMZnd0ckc5WStt?=
- =?utf-8?B?bWFNUW5pRldRRUdpZ0N5Z0JqaFNZVHJhREpqR1hiWWxVSjZhVkd4OER0ZEYy?=
- =?utf-8?B?a2dJRVFtUCtrNVkzenRSeGJodTM2eWx0c1RROWh2TWxxcVpaeG5EdTBKdjFo?=
- =?utf-8?B?Y3lvWVgxbTNCSG5wYmVYT0RjeWhIREFNb09na1ZvbzlvUEdMOTZBTVZ4NGNC?=
- =?utf-8?B?a3BYdWpzY1VrcEg3YURveEh6eEJsZ1NncUJTN1pFWUlQeHRldUVVMkw1ckpm?=
- =?utf-8?B?N3RwTnlKWERFY2hpSitBeUFIdVp5UUhTUHBxSWJHWnROSDFaa0VscTA1MXUr?=
- =?utf-8?B?SDZINnJvTmtTeGtjdWxYRHlwS3lsYUxVTDU1T1AraExBdGJ6cEVPQjVZY2pm?=
- =?utf-8?B?RG1FM09iM1ArNkQrNUhmWkZxL2R1T0RocEMyTlVvak5oSG1nR0Fyb3BLSUhw?=
- =?utf-8?B?ZHF1b0FncEoyV0ROeGFmMkFkQWViVm9qVFY1dHZOcWpZcHkvOGlEbnhBdkYy?=
- =?utf-8?B?VzVUMnN6MWlmcnZSTmdUOGhZVXpaUWoybDVjR29lZThHZE5aZ3dlSlV5R1RJ?=
- =?utf-8?B?Q25YY1htcExHSm1wVWVYUVZkRmZYOHlCL0NnZVJZeVpkdGNmOUZjMHZack5r?=
- =?utf-8?B?WkJmOVNjK2RCRWxMN0pmbyt4emxESDRDUHo1dnN6Tm96QzQvY004YytqejNn?=
- =?utf-8?B?dkpFRFB0RTBTZm02Qi83YTcxNHl3SE5KeVVzQzdQdDJUaHpDcjZKMm13VjR4?=
- =?utf-8?B?cGVQRmNES0k1Y09UU1QxL3djQzhBdGhTayttVkl5UWUrcm5kSVQwUDhWRGZE?=
- =?utf-8?B?WmFBckhGclZTU2pvRFVCbm1kTHVsQk9NTStnNGRqMnh3YUtiMEp1bmN6NlFY?=
- =?utf-8?B?VlFIcVRzT01DbWxBMGVyekNEZzBIOFcvdnBDdklkQTN0RkpDQnhDWWtOeXFJ?=
- =?utf-8?B?bG5kdlgvSitna0QxU2VWZWw3NDdHL2hNTitma2J5WjM0R3lOMGJCOFVlVCsx?=
- =?utf-8?B?b21vWEtvbTJIN0pmWEtDTkRBT3V2VlppUzZMNkdqSnd0dVEwYytnNmd5d1dV?=
- =?utf-8?B?RTc3aC9GTFRnRGRONytJazIyNitCZVc5UElHSDdIMWhsZFJZcDRuR01YT0Nt?=
- =?utf-8?B?NUlQcUM2MzE2UVZ6L0prU0pDRjErSHFCM3liZGhESEtTYWlsWG1leEpBbExu?=
- =?utf-8?B?ZEN6ZlBRc2Qzb2hJWHk1dmlDNUoyRXN0aUlWL0o1aWc0ZnVKRk0vZjhIZDNI?=
- =?utf-8?B?Rmg1QUt1MHNKeHBjbnBHc0wvbkxMdTcxZmZyTXEvSXl3SFo0T0R0SmhlaHlp?=
- =?utf-8?B?VmRLeTMvV1lXMStVQXc3M2pVa3B1VTgwTkVvRFpNYi83bHBKVmxKbkpUcTg2?=
- =?utf-8?B?OUh4ZEdFN0YxdGtJZGpOc3ZvOUw0dFlUZ2s3dUtQZmhGNVBoazRmSHNaSU5h?=
- =?utf-8?B?eFIrRStvTzhuMXVNMmFteDNmSHJkaFYwcGg1NlpuUTJFVS9GWVFyUDBHVnpP?=
- =?utf-8?B?UU5SNGRzd2FlTVVrQUQ4Y1dRZDN0MDBBNE5tTVZNUWJleHRraS9weDkwbzBr?=
- =?utf-8?B?bmR2b0Z1aWkxRjZtMmUxTzlmZUV3ZW5zdHNaU3lSZkJVMzZWbmIvTDRlbExJ?=
- =?utf-8?B?dWJqU0dPOFFwb2luaUFHQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8691.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N3VzTkJ4K25IM05FdC9zVysvQjkwWUp1TGtkTGdJZUZPYXR0d3RoZlhvcUpE?=
- =?utf-8?B?cUFydVFGSFI2NTN6WDBlenZ2WUN6eGMzMldXSXc0NlVrUHVxM2JyMGoxR2xn?=
- =?utf-8?B?MGdiU2RTS2JCODVEamZUdzVHRm4vTXY5U2QxaUZXTEJFRFF6Mjd3Z2ZRa3Bs?=
- =?utf-8?B?eWVEckZhakI1QjdKYk5udEtYVVY2QlQyWkNqNGlJMWhTTnRUclhNLytmMHdn?=
- =?utf-8?B?K0JOb0d0Ny9ibzVSblhNbmJvZ3BGNFlQUlFOaVRpR3VWV1YvQklZUERRK001?=
- =?utf-8?B?aTh2NkxDd0VYa1ArZWt0bElyY3lRMkgzckNYRlkrSkVvVTdmK055UFgxbS8x?=
- =?utf-8?B?ZGhsei9NZzNxam9KVUxMUXVTQ0dTZGt2bFdMV1BwbWYzRmtPTkJ5aHBvUHFk?=
- =?utf-8?B?cEhCdEZ4dGNuQkNrSFpWZlZKWlhwTnNPTm8zK1FLN2RWTzg0R2ptdDlQK3pI?=
- =?utf-8?B?bHlRWGlyMmVlYUQ5V09xSU0wajRzOVk4a3YyNVU2cVBHcWxqcEZHL2NTK3R2?=
- =?utf-8?B?STNlbEMvWTBwRUlyVGFOZmxITnBwM0hvTFhPR3NIRmFrUHYvSGxDenJPSE5m?=
- =?utf-8?B?d0plQ0R3Yk1DdlRHdzZpUWtJUnpqNUZUNkZlVUxVTFBVbWVKYUhFQkE3UEo2?=
- =?utf-8?B?T0JnSStPYlNlRVBsVGZvRTk2MnJuSk5aQ25iUlJza250STk5MWZPVHBaMW1O?=
- =?utf-8?B?a3VmWmwvczg5UGZkcmc5TzZwTDZUNGRYYUluZ08vNW1TUUJOVTd5ZEpKa1NC?=
- =?utf-8?B?WmpMcVhiNGtNUTZHb0xMdlZJSWJtOXFLRlVCZjR3Q1hZZnNUUFdUOTNmZmJW?=
- =?utf-8?B?bVpmdTFwSVp3Tk9NQWh0NmJIV2VqT1I2aXRNd1BROFp2dERBMlV3VGpQSXR3?=
- =?utf-8?B?dnliMjVLL0owNTViM0F0Yk5LT25pQ0Z5bUZqbU9Pek92akdTMVZjN3ExV0hw?=
- =?utf-8?B?bSs1Z2JnWjZiMUdISEcyTzcxN0NZazFiV2NNTllpOXU3RTRwaXR4cnB6VlRP?=
- =?utf-8?B?enV4ZCtLM0JXRThaS0ZDWXUvS0l5SjB5QXhQVExubFVudDFOSEY3c0xMT3lI?=
- =?utf-8?B?TzJTVXlsd0IxNmJ1THhvKzhkTjhqdndHZHBuaE1WNjV5ODBLVW4rR3M3NjZ5?=
- =?utf-8?B?TFNBbjFRTUdiVSs3aWxuTlhibkNwRm9MQnJkbXRXUThNWFBGbjBpdWw0dkZC?=
- =?utf-8?B?YjNndCsyZGxzbnM2cS8wZTBBZ1NOZ2x6ZG5RdVBRUGVqQStJMGVlN2hsd0pW?=
- =?utf-8?B?YVhMYVhNUFBVeS9NKzUwL0IvVk53ejB4OFRrOGxqNmRIOVlYdmc3NlRORXJv?=
- =?utf-8?B?NGI3eDhGWnFyc0pMUjZ2NnFtUG01WG1UV2pRNU43MTRNNzVrQ3pBMmpabURj?=
- =?utf-8?B?VThjNHJ6WHp3c2krVktzMnVNajJYL1RNY2ZWZkNnbjVVaHJwSVl2ZVNyMmtO?=
- =?utf-8?B?TzhZd2g5YXBNcXZJSE5yVmVSbHV3YUtTQ2MxUjVjcTZXUFFYYngxdDgvVVNB?=
- =?utf-8?B?ZXlKeGpNaWh4RjZkdW1NTDZMeWx1MmVBbEtLL2VJVFBubjkzRkYrVmU0SUU2?=
- =?utf-8?B?WnhPV2dKQzFDYzVBYldteFNYek44S21nM1h2UWpyaGxuV00zd05iUVRjMW50?=
- =?utf-8?B?bUxoOFd6aUk5VUVDZDBVNG5hZUI3VnlGVkYweDJJVDNHb2ZQQ0hvVFdKL3F4?=
- =?utf-8?B?LzZVNGJ0R1lTd00zMG1rRzhxcTVoN2tDTDhySktCUzFycFhNSm05RUFrRVk3?=
- =?utf-8?B?ZHo3VUJoS282Vnp5WWxveWJaQk9JUldnUnNnaHhBbkJoZC9ZbGR3Wm4wRVJ0?=
- =?utf-8?B?MjRDM2xGSHFYcFl2cE5ZQVVSUmUyc3hTNWYxdlVxL2JSckVleWZZdzVDR3Zm?=
- =?utf-8?B?bkNwZEZwWFhvM0FjNy9lTHcybFdXOHEva2VNY2RXZkErdmxKdVVmRmZXOHdh?=
- =?utf-8?B?SEliejh5MVpKVTNROVlrZHppOTN2eDNTT3BPR1YwWDRUNTZUcU9Oek5FbnFO?=
- =?utf-8?B?QUJGRHcyQnkzRjRaak1UV2RKSnBleENGeTBlcmtnQjJ3RWkxaGlDSWJFQTJW?=
- =?utf-8?B?NHZXNWVhQ0EvYXR6cC9CdkRUK2dyMERoSWdkSk1YSkYxc3JZZGN3amZSYUN3?=
- =?utf-8?Q?O+1c=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81d2c52b-443c-4372-4564-08dcb4515e09
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8691.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Aug 2024 06:47:54.5805
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XjfM799nnrPx8SFee1FJAFLHi7vPjmRwbq4rMk2ghPlIF4Co/J2MyLwwVlg+59Ss
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7468
+Content-Transfer-Encoding: 8bit
 
-On 03/08/2024 7:26, Jakub Kicinski wrote:
-> Remove .cap_rss_ctx_supported from drivers which moved to the new API.
-> This makes it easy to grep for drivers which still need to be converted.
+Using {memcpy,strncpy,strcpy,kstrdup} to copy the task comm relies on the
+length of task comm. Changes in the task comm could result in a destination
+string that is overflow. Therefore, we should explicitly ensure the destination
+string is always NUL-terminated, regardless of the task comm. This approach
+will facilitate future extensions to the task comm.
 
-Reviewed-by: Gal Pressman <gal@nvidia.com>
+As suggested by Linus [0], we can identify all relevant code with the
+following git grep command:
+
+  git grep 'memcpy.*->comm\>'
+  git grep 'kstrdup.*->comm\>'
+  git grep 'strncpy.*->comm\>'
+  git grep 'strcpy.*->comm\>'
+
+PATCH #2~#4:   memcpy
+PATCH #5~#6:   kstrdup
+PATCH #7:      strncpy
+PATCH #8~#9:   strcpy
+
+There is a BUILD_BUG_ON() inside get_task_comm(), so when you use
+get_task_comm(), it implies that the BUILD_BUG_ON() is necessary. However,
+we don't want to impose this restriction on code where the length can be
+changed, so we use __get_task_comm(), rather than the get_task_comm().
+
+One use case of get_task_comm() is in code that has already exposed the
+length to userspace. In such cases, we specifically add the BUILD_BUG_ON()
+to prevent developers from changing it. For more information, see
+commit 95af469c4f60 ("fs/binfmt_elf: replace open-coded string copy with
+get_task_comm").
+
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/all/CAHk-=wjAmmHUg6vho1KjzQi2=psR30+CogFd4aXrThr2gsiS4g@mail.gmail.com/ [0]
+
+Changes:
+v4->v5:
+- Drop changes in the mm/kmemleak.c as it was fixed by
+  commit 0b84780134fb ("mm/kmemleak: replace strncpy() with strscpy()")
+- Drop changes in kernel/tsacct.c as it was fixed by
+  commmit 0fe2356434e ("tsacct: replace strncpy() with strscpy()")
+
+v3->v4: https://lore.kernel.org/linux-mm/20240729023719.1933-1-laoar.shao@gmail.com/
+- Rename __kstrndup() to __kmemdup_nul() and define it inside mm/util.c
+  (Matthew)
+- Remove unused local varaible (Simon)
+
+v2->v3: https://lore.kernel.org/all/20240621022959.9124-1-laoar.shao@gmail.com/
+- Deduplicate code around kstrdup (Andrew)
+- Add commit log for dropping task_lock (Catalin)
+
+v1->v2: https://lore.kernel.org/bpf/20240613023044.45873-1-laoar.shao@gmail.com/
+- Add comment for dropping task_lock() in __get_task_comm() (Alexei)
+- Drop changes in trace event (Steven)
+- Fix comment on task comm (Matus)
+
+v1: https://lore.kernel.org/all/20240602023754.25443-1-laoar.shao@gmail.com/
+
+Yafang Shao (9):
+  fs/exec: Drop task_lock() inside __get_task_comm()
+  auditsc: Replace memcpy() with __get_task_comm()
+  security: Replace memcpy() with __get_task_comm()
+  bpftool: Ensure task comm is always NUL-terminated
+  mm/util: Fix possible race condition in kstrdup()
+  mm/util: Deduplicate code in {kstrdup,kstrndup,kmemdup_nul}
+  tracing: Replace strncpy() with __get_task_comm()
+  net: Replace strcpy() with __get_task_comm()
+  drm: Replace strcpy() with __get_task_comm()
+
+ drivers/gpu/drm/drm_framebuffer.c     |  2 +-
+ drivers/gpu/drm/i915/i915_gpu_error.c |  2 +-
+ fs/exec.c                             | 10 ++++-
+ include/linux/sched.h                 |  4 +-
+ kernel/auditsc.c                      |  6 +--
+ kernel/trace/trace.c                  |  2 +-
+ kernel/trace/trace_events_hist.c      |  2 +-
+ mm/util.c                             | 61 ++++++++++++---------------
+ net/ipv6/ndisc.c                      |  2 +-
+ security/lsm_audit.c                  |  4 +-
+ security/selinux/selinuxfs.c          |  2 +-
+ tools/bpf/bpftool/pids.c              |  2 +
+ 12 files changed, 49 insertions(+), 50 deletions(-)
+
+-- 
+2.34.1
 
