@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-115538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A40B4946EC2
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 14:50:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D3DD946EC1
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 14:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E45E1F21ED2
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 12:50:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D8D9B21257
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 12:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D06F25779;
-	Sun,  4 Aug 2024 12:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD391E493;
+	Sun,  4 Aug 2024 12:49:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651FE3987B
-	for <netdev@vger.kernel.org>; Sun,  4 Aug 2024 12:49:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9023525779
+	for <netdev@vger.kernel.org>; Sun,  4 Aug 2024 12:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722775771; cv=none; b=KfDbrbmqayDRqRWTvjbZweaSdICEu5Kbfw6kDjodWmyS/Bnl9QcCUZa9FX1UFvs4tHXp9Vf5WVv8YSmqoLNlNc8hbXRltXus/1nmx5pMYXMXkV0jlKeoHtZTc3i3P12stJoKrekJEiNPa0K/wAil/VTzAnud7FK7hYNNOfgkevg=
+	t=1722775765; cv=none; b=OddfwFr/QwRJhkW/yxwk7x13fjLwpq4M/bgPMhDhyPgNNC2rLr2O3z/1tx6OVxCAsIbaIROvZzYbBtcWpGnGXu174PZkAxOrcd2OijRk/ipWWeD6ni8L9y7I/9hic+JB0K1+i6hTzZC1Z3XybkR04/JpW8PXAsorAebAPMFJ99w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722775771; c=relaxed/simple;
-	bh=b+1uHv0SG+OnTMytTFsR1luKNtRgSPLhOtTOsDj6+KI=;
+	s=arc-20240116; t=1722775765; c=relaxed/simple;
+	bh=lIQY2254Zh7fpW8LwBTodAnfNc3/3g1wBZVNAwzgtqw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hy6l39lS0tqGO9MV4pzNR89cpOb/UvbnwGJmaC6X2xaHkSMZwRShfYs/XF/DTuIZYGrN+lRG5OusLHPf5Adm9KKc8ttRvuucQ192yiEcRfT5XnBoGh+InN8uxnX7VwA/MdHXDsMhk47v31OZq6nMq5Pz6Wr9aVU72UjEPH3M1z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.204.34.129
+	 MIME-Version; b=mU5XvrXZNaBeB75P8ukBvC2nn72h3NZG6ri9XT3/BD+2LM9ikMz6hnUa8rRyzIQGBkn5GtuMlQgbCHYL2MvD3B4M83PnXmRhLaBLng0E4Bar9s6i8/fC1J40+aJsY03mKF5kgGCb+D1Jaf2ZYPKdfcozbNvU6dpSmIn6+8tpL6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.169.211.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp85t1722775755t422fazw
-X-QQ-Originating-IP: dPWBiFTqWZjtl0bYA9JOe3fP62ZyuFM6Kpw1rgLijjg=
+X-QQ-mid: bizesmtp85t1722775757tickwbci
+X-QQ-Originating-IP: V6S8UTNw1jltEn/jDyWHShWQ63xCID0yJU6TsQuKyRw=
 Received: from localhost.localdomain ( [101.71.135.53])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 04 Aug 2024 20:49:13 +0800 (CST)
+	id ; Sun, 04 Aug 2024 20:49:16 +0800 (CST)
 X-QQ-SSF: 0001000000000000000000000000000
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 17940692144791991624
+X-BIZMAIL-ID: 12258759675836617230
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
 Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v5 08/10] net: libwx: add eswitch switch api for devlink ops
-Date: Sun,  4 Aug 2024 20:48:39 +0800
-Message-ID: <5DD6E0A4F173D3D3+20240804124841.71177-9-mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v5 09/10] net: txgbe: add devlink and devlink port created
+Date: Sun,  4 Aug 2024 20:48:40 +0800
+Message-ID: <9203F9254D59FF19+20240804124841.71177-10-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240804124841.71177-1-mengyuanlou@net-swift.com>
 References: <20240804124841.71177-1-mengyuanlou@net-swift.com>
@@ -58,133 +58,68 @@ Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
 Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 ---
- drivers/net/ethernet/wangxun/libwx/Makefile   |  3 +-
- .../net/ethernet/wangxun/libwx/wx_devlink.c   |  3 ++
- .../net/ethernet/wangxun/libwx/wx_eswitch.c   | 53 +++++++++++++++++++
- .../net/ethernet/wangxun/libwx/wx_eswitch.h   | 13 +++++
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  1 +
- 5 files changed, 72 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_eswitch.c
- create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_eswitch.h
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c    | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/Makefile b/drivers/net/ethernet/wangxun/libwx/Makefile
-index 643a5e947ba9..a7065ad924d1 100644
---- a/drivers/net/ethernet/wangxun/libwx/Makefile
-+++ b/drivers/net/ethernet/wangxun/libwx/Makefile
-@@ -4,4 +4,5 @@
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index c95d0611cf25..bf9756814f76 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -16,6 +16,7 @@
+ #include "../libwx/wx_hw.h"
+ #include "../libwx/wx_mbx.h"
+ #include "../libwx/wx_sriov.h"
++#include "../libwx/wx_devlink.h"
+ #include "txgbe_type.h"
+ #include "txgbe_hw.h"
+ #include "txgbe_phy.h"
+@@ -564,6 +565,13 @@ static int txgbe_probe(struct pci_dev *pdev,
+ 	wx->netdev = netdev;
+ 	wx->pdev = pdev;
  
- obj-$(CONFIG_LIBWX) += libwx.o
- 
--libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o wx_sriov.o wx_devlink.o
-+libwx-objs := wx_hw.o wx_lib.o wx_ethtool.o wx_mbx.o wx_sriov.o wx_devlink.o \
-+	      wx_eswitch.o
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_devlink.c b/drivers/net/ethernet/wangxun/libwx/wx_devlink.c
-index b39da37c0842..f37362af1449 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_devlink.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_devlink.c
-@@ -6,9 +6,12 @@
- 
- #include "wx_type.h"
- #include "wx_sriov.h"
-+#include "wx_eswitch.h"
- #include "wx_devlink.h"
- 
- static const struct devlink_ops wx_pf_devlink_ops = {
-+	.eswitch_mode_get = wx_eswitch_mode_get,
-+	.eswitch_mode_set = wx_eswitch_mode_set,
- };
- 
- static void wx_devlink_free(void *devlink_ptr)
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_eswitch.c b/drivers/net/ethernet/wangxun/libwx/wx_eswitch.c
-new file mode 100644
-index 000000000000..a426a352bf96
---- /dev/null
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_eswitch.c
-@@ -0,0 +1,53 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2019-2021, Intel Corporation. */
-+
-+#include <linux/pci.h>
-+
-+#include "wx_type.h"
-+#include "wx_eswitch.h"
-+#include "wx_devlink.h"
-+
-+int wx_eswitch_mode_set(struct devlink *devlink, u16 mode,
-+			struct netlink_ext_ack *extack)
-+{
-+	struct wx_dl_priv *dl_priv = devlink_priv(devlink);
-+	struct wx *wx = dl_priv->priv_wx;
-+
-+	if (wx->eswitch_mode == mode)
-+		return 0;
-+
-+	if (wx->num_vfs) {
-+		dev_info(&(wx)->pdev->dev,
-+			 "Change eswitch mode is allowed if there is no VFs.");
-+		return -EOPNOTSUPP;
++	wx->dl_priv = wx_create_devlink(&pdev->dev);
++	if (!wx->dl_priv) {
++		err = -ENOMEM;
++		goto err_pci_release_regions;
 +	}
 +
-+	switch (mode) {
-+	case DEVLINK_ESWITCH_MODE_LEGACY:
-+		dev_info(&(wx)->pdev->dev,
-+			 "PF%d changed eswitch mode to legacy",
-+			 wx->bus.func);
-+		NL_SET_ERR_MSG_MOD(extack, "Changed eswitch mode to legacy");
-+		break;
-+	case DEVLINK_ESWITCH_MODE_SWITCHDEV:
-+		dev_info(&(wx)->pdev->dev,
-+			 "Do not support switchdev in eswitch mode.");
-+		NL_SET_ERR_MSG_MOD(extack, "Do not support switchdev mode.");
-+		return -EINVAL;
-+	default:
-+		NL_SET_ERR_MSG_MOD(extack, "Unknown eswitch mode");
-+		return -EINVAL;
-+	}
-+
-+	wx->eswitch_mode = mode;
-+	return 0;
-+}
-+
-+int wx_eswitch_mode_get(struct devlink *devlink, u16 *mode)
-+{
-+	struct wx_dl_priv *dl_priv = devlink_priv(devlink);
-+	struct wx *wx = dl_priv->priv_wx;
-+
-+	*mode = wx->eswitch_mode;
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_eswitch.h b/drivers/net/ethernet/wangxun/libwx/wx_eswitch.h
-new file mode 100644
-index 000000000000..0323931e7df1
---- /dev/null
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_eswitch.h
-@@ -0,0 +1,13 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (C) 2019-2021, Intel Corporation. */
-+
-+#ifndef _WX_ESWITCH_H_
-+#define _WX_ESWITCH_H_
-+
-+#include <net/devlink.h>
-+
-+int wx_eswitch_mode_get(struct devlink *devlink, u16 *mode);
-+int wx_eswitch_mode_set(struct devlink *devlink, u16 mode,
-+			struct netlink_ext_ack *extack);
-+
-+#endif /* _WX_ESWITCH_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index a8722f69cebb..a3e103e0c365 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1141,6 +1141,7 @@ struct wx {
- 	/* devlink port data */
- 	struct devlink_port devlink_port;
- 	struct wx_dl_priv *dl_priv;
-+	u16 eswitch_mode;		/* current mode of eswitch */
++	wx->dl_priv->priv_wx = wx;
+ 	wx->msg_enable = (1 << DEFAULT_DEBUG_LEVEL_SHIFT) - 1;
  
- 	struct wx_bus_info bus;
- 	struct wx_mbx_info mbx;
+ 	wx->hw_addr = devm_ioremap(&pdev->dev,
+@@ -707,9 +715,14 @@ static int txgbe_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto err_free_misc_irq;
+ 
+-	err = register_netdev(netdev);
++	err = wx_devlink_create_pf_port(wx);
+ 	if (err)
+ 		goto err_remove_phy;
++	SET_NETDEV_DEVLINK_PORT(netdev, &wx->devlink_port);
++
++	err = register_netdev(netdev);
++	if (err)
++		goto err_devlink_create_pf_port;
+ 
+ 	pci_set_drvdata(pdev, wx);
+ 
+@@ -731,6 +744,8 @@ static int txgbe_probe(struct pci_dev *pdev,
+ 
+ 	return 0;
+ 
++err_devlink_create_pf_port:
++	devl_port_unregister(&wx->devlink_port);
+ err_remove_phy:
+ 	txgbe_remove_phy(txgbe);
+ err_free_misc_irq:
+@@ -767,6 +782,7 @@ static void txgbe_remove(struct pci_dev *pdev)
+ 	wx_disable_sriov(wx);
+ 	unregister_netdev(netdev);
+ 
++	devl_port_unregister(&wx->devlink_port);
+ 	txgbe_remove_phy(txgbe);
+ 	txgbe_free_misc_irq(txgbe);
+ 	wx_free_isb_resources(wx);
 -- 
 2.45.2
 
