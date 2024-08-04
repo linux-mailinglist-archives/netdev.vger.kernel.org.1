@@ -1,113 +1,104 @@
-Return-Path: <netdev+bounces-115526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A844B946E05
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 11:48:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42190946E46
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 12:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB1851C20A82
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 09:48:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD4D628164E
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 10:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BDB23759;
-	Sun,  4 Aug 2024 09:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B3D282E5;
+	Sun,  4 Aug 2024 10:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sC8kizr5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lg+qi+9z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE102261D;
-	Sun,  4 Aug 2024 09:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C884F22086;
+	Sun,  4 Aug 2024 10:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722764877; cv=none; b=COoOC5hXPvrJr3oAWLiSuUI59C0ulBQOorcCi3lkKbjRo4p0/o4tqB8nOL8EoqOgnsvW75eR430cY5gE3hgdAPMYHCHCM4NIOH83NCDC/vzxXxCAON4VfsKb5xANUC/p86fAzhxiKkjz/eD9ZNGR1uuE627FMj0j3sNPfNakceo=
+	t=1722766742; cv=none; b=B83pGVqblES8QzJJ5k1iKx0kBH/KYgUYtMllLGdKP29S2Xu/OYyk9Ig8CXtaY8nRa8FZ2n3J6oN5uNLsgnIpdLN0rewpBQgnf97faL+47rvwvoXiSedhn7tzn2ASWc1R71fyMRIcHuK3jJlpIcKscjGPA8ltw0VFBjBYaGLRtRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722764877; c=relaxed/simple;
-	bh=Y4yAUSj7QlQcoQO23GqfLCmwwtbokos9WK+Uvxuiluk=;
+	s=arc-20240116; t=1722766742; c=relaxed/simple;
+	bh=VqVDiHRGe7S5dUvDDN4PtPEzYktCtPFF85MFvcHUAds=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kt2GDhtGDGNnYULQcSSwd+ewfoTwlTDKf5aYIl8bRR41pJzyh84h4/8BImHWksY9FhY8seu8+0k+Q1+eLIl/Ayt8cOkiDDZYUtydfQ42hcm4SOWmelYpLrr3ATS2iSFk/gNqaal85EvRp6vsiiRiwAMQTPSg0lKJpqxitok87ME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sC8kizr5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2571C4AF0C;
-	Sun,  4 Aug 2024 09:47:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ncXFzwDbzbpPaBJCctqwgHdHTKfmhsHyIORG0j2412qmoKPCaeseZLpZbnhCenA9feS4ZI+DsSQFHK15nxdHDDOIthSWV6cr1kEpiNOKE2Rj3BtqtRUe+7xuXey6bwNdPfYxSQjuVnNV8zBff+lshlFlu2tKh6qDxXFrxQk4izE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lg+qi+9z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FB1C32786;
+	Sun,  4 Aug 2024 10:19:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722764877;
-	bh=Y4yAUSj7QlQcoQO23GqfLCmwwtbokos9WK+Uvxuiluk=;
+	s=k20201202; t=1722766742;
+	bh=VqVDiHRGe7S5dUvDDN4PtPEzYktCtPFF85MFvcHUAds=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sC8kizr5zjsY+Xtf1ki45epTasq37SPx/lADE2WXNHlexOHZagganrAH0grQ1QhBX
-	 X0O67lmLxCllk2DcPRP2DF1VIQ7CNEJYblTiXS4meoLmLysPajy5E2cmEt3oUnOWGm
-	 RQ0bH+384g3aKEQ9TTqRv4clfRWDGO4uT9+jaJjlUmaZqsNzkbWN1SahPoa+MDtbCN
-	 1+WVUtwab/lTFbRxOZsBtAzr1fH12Sc878eY1ZRrhg+SpcDXO0cyJ9Hi6cBFD6zDY+
-	 ulob7hlECqUapbuX7lwvHSvHPu0iFVvdBNAbU2s9/cGd2tpPZNGVWhK9CO0vI+lPqI
-	 dnmjqp9VbV6iQ==
-Date: Sun, 4 Aug 2024 10:47:51 +0100
+	b=lg+qi+9zrI/OEuRbbIEvrTbHXCMGbKim0Dz/yaLYD0Cwt4TJRS4JZjlB499FYmdsz
+	 B8FZBzOz4x5KES35ndcv1oGEyIU0OKG1h6KWEzNTALvhNKPB6/ztm59cmVJ/LzoCzJ
+	 Bf7eflWsUChlpaSDDL/yd0D8lBCOSLbrwrZGoOG7lPP1XW47/HOZNsPZJqm33CXzLO
+	 u/Og06ZQwqhPkDouuzsMVWjZ909eq1gdCDVG1zV2EuRe/TrW9kJV9d6M/NIfv5O2X8
+	 nV8m+rHr1GPs22tAskd6kxWpUbi55KZlVejpmqW8bjVi4KzTKnT0yFhgpCGHQ97aa4
+	 tZez5QLD7F0Bw==
+Date: Sun, 4 Aug 2024 11:18:58 +0100
 From: Simon Horman <horms@kernel.org>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Subject: Re: [PATCH net-next v2 6/7] selftests/net: Synchronize client/server
- before counters checks
-Message-ID: <20240804094751.GH2504122@kernel.org>
-References: <20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com>
- <20240802-tcp-ao-selftests-upd-6-12-v2-6-370c99358161@gmail.com>
+To: Moon Yeounsu <yyyynoom@gmail.com>
+Cc: cooldavid@cooldavid.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
+Message-ID: <20240804101858.GI2504122@kernel.org>
+References: <20240802054421.5428-1-yyyynoom@gmail.com>
+ <20240802141534.GA2504122@kernel.org>
+ <CAAjsZQwKbp-3QgBj9KEUoqLvaE5pLX8wsLq01TDC8HdVp=8pLg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240802-tcp-ao-selftests-upd-6-12-v2-6-370c99358161@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAjsZQwKbp-3QgBj9KEUoqLvaE5pLX8wsLq01TDC8HdVp=8pLg@mail.gmail.com>
 
-On Fri, Aug 02, 2024 at 10:23:30AM +0100, Dmitry Safonov via B4 Relay wrote:
-> From: Dmitry Safonov <0x7f454c46@gmail.com>
-> 
-> On tests that are expecting failure the timeout value is
-> TEST_RETRANSMIT_SEC == 1 second. Which is big enough for most of devices
-> under tests. But on a particularly slow machine/VM, 1 second might be
-> not enough for another thread to be scheduled and attempt to connect().
-> It is not a problem for tests that expect connect() to succeed as
-> the timeout value for them (TEST_TIMEOUT_SEC) is intentionally bigger.
-> 
-> One obvious way to solve this would be to increase TEST_RETRANSMIT_SEC.
-> But as all tests would increase the timeouts, that's going to sum up.
-> 
-> But here is less obvious way that keeps timeouts for expected connect()
-> failures low: just synchronize the two threads, which will assure that
-> before counter checks the other thread got a chance to run and timeout
-> on connect(). The expected increase of the related counter for listen()
-> socket will yet test the expected failure.
-> 
-> Never happens on my machine, but I suppose the majority of netdev's
-> connect-deny-* flakes [1] are caused by this.
-> 
-> Fixes:
+On Sat, Aug 03, 2024 at 10:47:35AM +0900, Moon Yeounsu wrote:
+> On Fri, Aug 2, 2024 at 11:15 PM Simon Horman <horms@kernel.org> wrote:
+> >
+> > On Fri, Aug 02, 2024 at 02:44:21PM +0900, Moon Yeounsu wrote:
+> > > `ip_hdr(skb)->ihl << 2` are the same as `ip_hdrlen(skb)`
+> > > Therefore, we should use a well-defined function not a bit shift
+> > > to find the header length.
+> > >
+> > > It also compress two lines at a single line.
+> > >
+> > > Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+> >
+> > Firstly, I think this clean-up is both correct and safe.  Safe because
+> > ip_hdrlen() only relies on ip_hdr(), which is already used in the same code
+> > path. And correct because ip_hdrlen multiplies ihl by 4, which is clearly
+> > equivalent to a left shift of 2 bits.
+> Firstly, Thank you for reviewing my patch!
+> >
+> > However, I do wonder about the value of clean-ups for what appears to be a
+> > very old driver, which hasn't received a new feature for quite sometime
+> Oh, I don't know that...
+> >
+> > And further, I wonder if we should update this driver from "Maintained" to
+> > "Odd Fixes" as the maintainer, "Guo-Fu Tseng" <cooldavid@cooldavid.org>,
+> > doesn't seem to have been seen by lore since early 2020.
+> >
+> > https://lore.kernel.org/netdev/20200219034801.M31679@cooldavid.org/
+> Then, how about deleting the file from the kernel if the driver isn't
+> maintained?
 
-Hi Dmitry,
+That is a bit more severe than marking it as being unmaintained
+in MAINTAINERS. But I do agree that it should be considered.
 
-I realise it probably wasn't intended to be a fixes tag,
-but it turns out to be an invalid one. Could you express this
-in a different way?
+> Many people think like that (At least I think so)
+> There are files, and if there are issues, then have to fix them.
+> Who can think unmanaged files remain in the kernel?
 
-> > # selftests: net/tcp_ao: connect-deny_ipv6
-> > # 1..21
-> > # # 462[lib/setup.c:243] rand seed 1720905426
-> > # TAP version 13
-> > # ok 1 Non-AO server + AO client
-> > # not ok 2 Non-AO server + AO client: TCPAOKeyNotFound counter did not increase: 0 <= 0
-> > # ok 3 AO server + Non-AO client
-> > # ok 4 AO server + Non-AO client: counter TCPAORequired increased 0 => 1
-> ...
-> 
-> [1]: https://netdev-3.bots.linux.dev/vmksft-tcp-ao/results/681741/6-connect-deny-ipv6/stdout
-> Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
-
-...
+And yet, they do exist. ☯
 
