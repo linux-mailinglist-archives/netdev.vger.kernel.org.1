@@ -1,104 +1,105 @@
-Return-Path: <netdev+bounces-115527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42190946E46
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 12:19:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6022F946E53
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 12:57:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD4D628164E
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 10:19:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECB9C1F213EE
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 10:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B3D282E5;
-	Sun,  4 Aug 2024 10:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAB825740;
+	Sun,  4 Aug 2024 10:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lg+qi+9z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbsRRRXo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C884F22086;
-	Sun,  4 Aug 2024 10:19:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B7CFC19;
+	Sun,  4 Aug 2024 10:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722766742; cv=none; b=B83pGVqblES8QzJJ5k1iKx0kBH/KYgUYtMllLGdKP29S2Xu/OYyk9Ig8CXtaY8nRa8FZ2n3J6oN5uNLsgnIpdLN0rewpBQgnf97faL+47rvwvoXiSedhn7tzn2ASWc1R71fyMRIcHuK3jJlpIcKscjGPA8ltw0VFBjBYaGLRtRk=
+	t=1722769041; cv=none; b=MiNmxtSUC/w81MOablCYZsQ5663cFaayXEbLY/3nlGp9TGNTeCoNrFTIsMdnIVJaRcardWsLbvcDBGnsGcGdOGzoEIlMJfGco5w3y5L1eDmQstwZbTCMHMmyJgcBa0c22EcG39mS6C1nGLfhJAFzma7sWO8XJa9P/tSSExcCuAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722766742; c=relaxed/simple;
-	bh=VqVDiHRGe7S5dUvDDN4PtPEzYktCtPFF85MFvcHUAds=;
+	s=arc-20240116; t=1722769041; c=relaxed/simple;
+	bh=y0m9oiFenxXdDWtXdFSZr3bbkXE/uGFAQ/hUHfimu3Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ncXFzwDbzbpPaBJCctqwgHdHTKfmhsHyIORG0j2412qmoKPCaeseZLpZbnhCenA9feS4ZI+DsSQFHK15nxdHDDOIthSWV6cr1kEpiNOKE2Rj3BtqtRUe+7xuXey6bwNdPfYxSQjuVnNV8zBff+lshlFlu2tKh6qDxXFrxQk4izE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lg+qi+9z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FB1C32786;
-	Sun,  4 Aug 2024 10:19:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=XxmHMdUHgTwcqL0EO02R5FR4EXtklb9qcSxf1GVTXk7LvHwsL+yd6AKe0Td9W62a69Efi98GnGJV0+hFxs71QsAntxVd4oMEbAJg+1HhU3dLWlf+Ej/zXuWV/p2/U56YR3f3t/PiU8PvMdYNZPn74wBRnckMDfkkBi94QhvFJs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbsRRRXo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A061C32786;
+	Sun,  4 Aug 2024 10:57:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722766742;
-	bh=VqVDiHRGe7S5dUvDDN4PtPEzYktCtPFF85MFvcHUAds=;
+	s=k20201202; t=1722769040;
+	bh=y0m9oiFenxXdDWtXdFSZr3bbkXE/uGFAQ/hUHfimu3Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lg+qi+9zrI/OEuRbbIEvrTbHXCMGbKim0Dz/yaLYD0Cwt4TJRS4JZjlB499FYmdsz
-	 B8FZBzOz4x5KES35ndcv1oGEyIU0OKG1h6KWEzNTALvhNKPB6/ztm59cmVJ/LzoCzJ
-	 Bf7eflWsUChlpaSDDL/yd0D8lBCOSLbrwrZGoOG7lPP1XW47/HOZNsPZJqm33CXzLO
-	 u/Og06ZQwqhPkDouuzsMVWjZ909eq1gdCDVG1zV2EuRe/TrW9kJV9d6M/NIfv5O2X8
-	 nV8m+rHr1GPs22tAskd6kxWpUbi55KZlVejpmqW8bjVi4KzTKnT0yFhgpCGHQ97aa4
-	 tZez5QLD7F0Bw==
-Date: Sun, 4 Aug 2024 11:18:58 +0100
+	b=QbsRRRXohFj9NyYKD0s3UBhjorJkG8tKQk9abYFTc8AdBGVob3OfX9p4YhV2FlChw
+	 Mw76awDgcQhtpb4TBHArHbepcdbLaUiPI7f2f7OCTLIEA7HKY64nXwclbVnFGiqeEt
+	 8k5r8KOX7aKZC4yA98BYwecPrBq4MkWc4HATJ0AGTkUPEnRkAmDPQO+A9uP4IK+YXq
+	 NtbeAntv1h1sE9a/jr1WjMcrm31um/nt6kVucjQjPIW2yjsKIeLlb8C6XWy7pUEkGh
+	 PV7dYToCi9s7reRR2PPoBAidaKiSfXx8RcK8Zb9TFATmkOb30Dgg9RkxfKL3mFtTgn
+	 odhjItB4FfIaw==
+Date: Sun, 4 Aug 2024 11:57:16 +0100
 From: Simon Horman <horms@kernel.org>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: cooldavid@cooldavid.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: use ip_hdrlen() instead of bit shift
-Message-ID: <20240804101858.GI2504122@kernel.org>
-References: <20240802054421.5428-1-yyyynoom@gmail.com>
- <20240802141534.GA2504122@kernel.org>
- <CAAjsZQwKbp-3QgBj9KEUoqLvaE5pLX8wsLq01TDC8HdVp=8pLg@mail.gmail.com>
+To: zhanghao <zhanghao1@kylinos.cn>
+Cc: bongsu.jeon@samsung.com, krzk@kernel.org,
+	syzbot+3da70a0abd7f5765b6ea@syzkaller.appspotmail.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] nfc: nci: Fix uninit-value in nci_rx_work()
+Message-ID: <20240804105716.GA2581863@kernel.org>
+References: <20240803121817.383567-1-zhanghao1@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAjsZQwKbp-3QgBj9KEUoqLvaE5pLX8wsLq01TDC8HdVp=8pLg@mail.gmail.com>
+In-Reply-To: <20240803121817.383567-1-zhanghao1@kylinos.cn>
 
-On Sat, Aug 03, 2024 at 10:47:35AM +0900, Moon Yeounsu wrote:
-> On Fri, Aug 2, 2024 at 11:15 PM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Fri, Aug 02, 2024 at 02:44:21PM +0900, Moon Yeounsu wrote:
-> > > `ip_hdr(skb)->ihl << 2` are the same as `ip_hdrlen(skb)`
-> > > Therefore, we should use a well-defined function not a bit shift
-> > > to find the header length.
-> > >
-> > > It also compress two lines at a single line.
-> > >
-> > > Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
-> >
-> > Firstly, I think this clean-up is both correct and safe.  Safe because
-> > ip_hdrlen() only relies on ip_hdr(), which is already used in the same code
-> > path. And correct because ip_hdrlen multiplies ihl by 4, which is clearly
-> > equivalent to a left shift of 2 bits.
-> Firstly, Thank you for reviewing my patch!
-> >
-> > However, I do wonder about the value of clean-ups for what appears to be a
-> > very old driver, which hasn't received a new feature for quite sometime
-> Oh, I don't know that...
-> >
-> > And further, I wonder if we should update this driver from "Maintained" to
-> > "Odd Fixes" as the maintainer, "Guo-Fu Tseng" <cooldavid@cooldavid.org>,
-> > doesn't seem to have been seen by lore since early 2020.
-> >
-> > https://lore.kernel.org/netdev/20200219034801.M31679@cooldavid.org/
-> Then, how about deleting the file from the kernel if the driver isn't
-> maintained?
+On Sat, Aug 03, 2024 at 08:18:17PM +0800, zhanghao wrote:
+> Commit e624e6c3e777 ("nfc: Add a virtual nci device driver")
+> calls alloc_skb() with GFP_KERNEL as the argument flags.The
+> allocated heap memory was not initialized.This causes KMSAN
+> to detect an uninitialized value.
+> 
+> Reported-by: syzbot+3da70a0abd7f5765b6ea@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3da70a0abd7f5765b6ea
 
-That is a bit more severe than marking it as being unmaintained
-in MAINTAINERS. But I do agree that it should be considered.
+Hi,
 
-> Many people think like that (At least I think so)
-> There are files, and if there are issues, then have to fix them.
-> Who can think unmanaged files remain in the kernel?
+I wonder if the problem reported above is caused by accessing packet
+data which is past the end of what is copied in virtual_ncidev_write().
+I.e. count is unusually short and this is not being detected.
 
-And yet, they do exist. ☯
+> Fixes: e624e6c3e777 ("nfc: Add a virtual nci device driver")
+> Link: https://lore.kernel.org/all/000000000000747dd6061a974686@google.com/T/
+> Signed-off-by: zhanghao <zhanghao1@kylinos.cn>
+> ---
+>  drivers/nfc/virtual_ncidev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+> index 6b89d596ba9a..ae1592db131e 100644
+> --- a/drivers/nfc/virtual_ncidev.c
+> +++ b/drivers/nfc/virtual_ncidev.c
+> @@ -117,7 +117,7 @@ static ssize_t virtual_ncidev_write(struct file *file,
+>  	struct virtual_nci_dev *vdev = file->private_data;
+>  	struct sk_buff *skb;
+>  
+> -	skb = alloc_skb(count, GFP_KERNEL);
+> +	skb = alloc_skb(count, GFP_KERNEL|__GFP_ZERO);
+>  	if (!skb)
+>  		return -ENOMEM;
+
+I'm not sure this helps wrt initialising the memory as immediately below there
+is;
+
+	if (copy_from_user(skb_put(skb, count), buf, count)) {
+		...
+
+Which I assume will initialise count bytes of skb data.
 
