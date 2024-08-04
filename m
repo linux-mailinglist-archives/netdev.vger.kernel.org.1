@@ -1,51 +1,50 @@
-Return-Path: <netdev+bounces-115539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E94A946EC3
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 14:50:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 788D9946F05
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 15:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 129671F21DAE
-	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 12:50:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 208DE2815D7
+	for <lists+netdev@lfdr.de>; Sun,  4 Aug 2024 13:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB1DC3B79C;
-	Sun,  4 Aug 2024 12:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBD5381B8;
+	Sun,  4 Aug 2024 13:31:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FcabtzNS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74761E4A4
-	for <netdev@vger.kernel.org>; Sun,  4 Aug 2024 12:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2121CAB1;
+	Sun,  4 Aug 2024 13:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722775777; cv=none; b=mzxphazGmYw8oUNrxzkEHZNHb2lt6AWUF1WbCcBk6SxcPqXVEihTe2JfiCTvi/6oIzmndv/OaB8+HyOFD5mNDtqpLQACia5wXOBKemzA17EJvceeecr22Ag5H8U5ZS9J9w28O7XFBPGe8yk4vTkeqeBjJ7UEJbb6JdL+C9qzz1I=
+	t=1722778283; cv=none; b=AggRqQgS91kpzEsFpdcK4/V/68wXoIfS35I+IgF/Ws4a4pugai7S6mauQQ7Vz/LtBxWSRZRU/YPXlz+X9QQ3I0Fiv9w7RKMdw675Nmwir7q4piX2fUUciMTBiBTwOKjpFS1x8TYACIojL4m+VekK3RMliTpSQNhDtlmlHXngkyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722775777; c=relaxed/simple;
-	bh=2A+RwIShvD4cRN08JBkelR/m1zf4BquEpodSKS4d/TI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CNy8HFTYtkavXSsIIAjvOEYWU5QJQ2dvTERyYW0n+AoXiIc+6WRCYJWAX0/51R4uUZy6cBZuQb9XBRZn0OLpGQ0dvl/aC2zq+oT5ds98Qjb3adWWJy4m9Int5KJmWV+wKEzdyECOXqiFQ6sHwUlj/8Q7htZ1gl9gJpdXXcisIH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp85t1722775763t96hp7eb
-X-QQ-Originating-IP: iQiBVI1j9ZEUd0AflhcxgB0HoAemAKekzD+NwxRMSnk=
-Received: from localhost.localdomain ( [101.71.135.53])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 04 Aug 2024 20:49:18 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 16245427423179570249
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v5 10/10] net: ngbe: add devlink and devlink port created
-Date: Sun,  4 Aug 2024 20:48:41 +0800
-Message-ID: <C6023F033917F553+20240804124841.71177-11-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240804124841.71177-1-mengyuanlou@net-swift.com>
-References: <20240804124841.71177-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1722778283; c=relaxed/simple;
+	bh=R/9rDAKgzpHP7rc6XdtV68Em3hKuTWFHq4VAoi/a5Yg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BKpzMjrwDjXRKyFnHosiUSU63SBDyPx679GJ5Yat20TNMxZNX3sThVculgU0Rr+5C7oiCPeshSB58p5Jh01fgg8NT6E9lMUWCOPbfjO+6169EuIwY2fWxmLPjs1J26GZnQpPPD0O96LmnGX+XToBe/GPj+5qI2THDSyG2x5Wuyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FcabtzNS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B7578C32786;
+	Sun,  4 Aug 2024 13:31:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722778282;
+	bh=R/9rDAKgzpHP7rc6XdtV68Em3hKuTWFHq4VAoi/a5Yg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FcabtzNSkCD7Qc8laLT9vqDaeYBOiNcPvcuBEcDliRfc992mw59vE4mpMoibMWhQ7
+	 bSQ2g0eF9okIHxC81qSmOxHhCjsDN3YY1DntJFQBp9Errf1piZtYqz3XdVYgIyio/I
+	 Pn+JGMeoWx+IkAKmUKNS73MoTIQemdo1HaDZQNanCG5TEVE0izojyYTetgOrTfznoa
+	 gA7fvbdsAcF17yoE+Onu3pVKPt9QZxayJyVYz2O5QjWc9OMSq2mvddFroTCSADFlaf
+	 MFAO98ksBE8qElsNGL/69/cEbl+ag4EiOqKu421FtqakIvABICy2SnjPMFOprOC5Tv
+	 V/0YQvFr1dq/w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A8BF1C433F2;
+	Sun,  4 Aug 2024 13:31:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,69 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+Subject: Re: [PATCH net v3] net/tcp: Disable TCP-AO static key after RCU grace
+ period
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172277828268.11367.13526771786927676907.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Aug 2024 13:31:22 +0000
+References: <20240801-tcp-ao-static-branch-rcu-v3-1-3ca33048c22d@gmail.com>
+In-Reply-To: <20240801-tcp-ao-static-branch-rcu-v3-1-3ca33048c22d@gmail.com>
+To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@kernel.org, 0x7f454c46@gmail.com
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Hello:
 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index a03a4b5f2766..784819f8fcd5 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -16,6 +16,7 @@
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_mbx.h"
- #include "../libwx/wx_sriov.h"
-+#include "../libwx/wx_devlink.h"
- #include "ngbe_type.h"
- #include "ngbe_mdio.h"
- #include "ngbe_hw.h"
-@@ -616,6 +617,13 @@ static int ngbe_probe(struct pci_dev *pdev,
- 	wx = netdev_priv(netdev);
- 	wx->netdev = netdev;
- 	wx->pdev = pdev;
-+
-+	wx->dl_priv = wx_create_devlink(&pdev->dev);
-+	if (!wx->dl_priv) {
-+		err = -ENOMEM;
-+		goto err_pci_release_regions;
-+	}
-+	wx->dl_priv->priv_wx = wx;
- 	wx->msg_enable = BIT(3) - 1;
- 
- 	wx->hw_addr = devm_ioremap(&pdev->dev,
-@@ -735,6 +743,10 @@ static int ngbe_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto err_clear_interrupt_scheme;
- 
-+	err = wx_devlink_create_pf_port(wx);
-+	if (err)
-+		goto err_devlink_create_pf_port;
-+
- 	err = register_netdev(netdev);
- 	if (err)
- 		goto err_register;
-@@ -744,6 +756,8 @@ static int ngbe_probe(struct pci_dev *pdev,
- 	return 0;
- 
- err_register:
-+	devl_port_unregister(&wx->devlink_port);
-+err_devlink_create_pf_port:
- 	phylink_destroy(wx->phylink);
- 	wx_control_hw(wx, false);
- err_clear_interrupt_scheme:
-@@ -775,6 +789,7 @@ static void ngbe_remove(struct pci_dev *pdev)
- 	netdev = wx->netdev;
- 	wx_disable_sriov(wx);
- 	unregister_netdev(netdev);
-+	devl_port_unregister(&wx->devlink_port);
- 	phylink_destroy(wx->phylink);
- 	pci_release_selected_regions(pdev,
- 				     pci_select_bars(pdev, IORESOURCE_MEM));
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 01 Aug 2024 01:13:28 +0100 you wrote:
+> From: Dmitry Safonov <0x7f454c46@gmail.com>
+> 
+> The lifetime of TCP-AO static_key is the same as the last
+> tcp_ao_info. On the socket destruction tcp_ao_info ceases to be
+> with RCU grace period, while tcp-ao static branch is currently deferred
+> destructed. The static key definition is
+> : DEFINE_STATIC_KEY_DEFERRED_FALSE(tcp_ao_needed, HZ);
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3] net/tcp: Disable TCP-AO static key after RCU grace period
+    https://git.kernel.org/netdev/net/c/14ab4792ee12
+
+You are awesome, thank you!
 -- 
-2.45.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
