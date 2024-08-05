@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-115787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A14947C57
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:01:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D977E947C0E
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:43:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2C871C211B9
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 14:01:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 165561C20E91
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B06D38DC3;
-	Mon,  5 Aug 2024 14:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B8C3A29C;
+	Mon,  5 Aug 2024 13:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cAJWJRks"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="EkmUXVx/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 902D717C64;
-	Mon,  5 Aug 2024 14:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646B738FA1;
+	Mon,  5 Aug 2024 13:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722866472; cv=none; b=E+AbmPSy5DEgFKIFIJ/pc44cgma13+ORyXd5QuYUG501S45TyVEix0d0BrUhIrLv7RZPilhgyQEIT+nzq1y7QDsUOLAkOHZVMAQuv5FRZj1i36B+LPZisQAbU3SuiVKRtIMaU5aDox140hE+XLrU94Z3ocrUwQ8IGA5J7tc3Xcw=
+	t=1722865373; cv=none; b=ZJ4exGLqz6PMKKz9tGLAjyBVkGOcLo2QBaPjXU0uJkIFSCV+dkpzcCirU9LhxbY2de7XybmnbFfjdB/nF2mwLzC03GbN1aCJHwp1ZgHCVSDy2lSbCbTx3eKBwKr0tgXvpptqxSbpWC4GD0rAIFwDBNGLdVcKvSu0CU/m0WQIBUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722866472; c=relaxed/simple;
-	bh=/jBv6+zQYz5Xnt2OI0F8VV6D+ZhfeD+JXXmuO5B4ttM=;
+	s=arc-20240116; t=1722865373; c=relaxed/simple;
+	bh=pyeOyZb4wdVKngAuWvkY1s62ITPe9pKZIYvqLBwFkq4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tafU3uvVRQ/CJ9qzV9Y+dqx9X0G+6UUJtQz5giD8/mcQ7VobPaLqT7MIu9E0knYgA8lk4PyVHhkyeW0Y0r2zyZeDUoiHn6uwVjsPy0n159qgamINl8obFBXk4GsHM+i9KeqlB15kXDNdRs54dYTAPgOwSzx+Bg7ada8wjeDvDPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=cAJWJRks; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=qwaq/QzgiCAl/S4h/8yVcJGopA5Kbv1RxnDz5VtDik7NUjALWTsnyjmvxTQ3F8HPv1LMy3b2KUUZjO0mVc2D8yAigfBvtcgteM+8QWgXtnDK/2l0a+unQQ/FntEIpUee7Il5jgfTVGEC15ezo79fRvOe1C2jzxVTsAUSPM7MzVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=EkmUXVx/; arc=none smtp.client-ip=67.231.148.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 475BVFTV021636;
-	Mon, 5 Aug 2024 06:42:35 -0700
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 475BVBg8021538;
+	Mon, 5 Aug 2024 06:42:47 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=o8ymvUvGRClq0Xhmh3raIbx7z
-	oL5etdJR0qeTeWCwUE=; b=cAJWJRksGhVpjQUZGuejMcCixdMso0D2zoAxxco/s
-	tiW95hyZzfRPZuWU5wJVYKkxaafi3qwX9/LDj1qOUsqlclDvv36iOd83VXDR0Lho
-	EfemcOcYsf2B7Xs+hyIi0FAyKsbcEIgJy53c/kT5xQFiLVZDy4oD+ww4MOa/L8TH
-	OSadhWuyBY/hoC3pBu5Pv01kSBJrrTO4HUX5OtlUMsG87+bVNrKIq+yxFMsy3pYp
-	USoayuiYb0A5zE3UIx9ZTfoMRS/KoRf6A0UWC8PlFNjk2SoVxspxjwBLSdYraMkj
-	jdBO+YUK3HzfZ+oEJY/tVv8gVXx7hYwDZPoFMzG3YjuxQ==
+	:references:subject:to; s=pfpt0220; bh=zmDQRbex59fLltI/bnTVP3snw
+	1zkiULM8MbjWF5s9xE=; b=EkmUXVx/bBktC2ShH7EN7n8fhx8OrKpHebmVHRIeH
+	hIR7VM3gbatdlV3gcn/xnlTlSuun1mwfHuLL+lSQh8wZqcF6BYyuX9EIR532clhq
+	V/kTmR1uoR/vwVfl9eKwy/Mg65cR3vpkbI69VmJHH4nNs97bNkoDEKI45pINgkGX
+	ZZCWnc0xp+atSb6NM1bRFe6x9WdMK2VTIpW5ldDNXeeQy6nRnGRqhqwUShbIaqa2
+	QvBAJF9zA59wQjrjIHHYWCl3B50E9NIL9Kv5MmjdCgEPXxwzRWoIvK0tdrlSoRr3
+	pZDucwSW9sSK1YHrglQXanVrM/VnfKuqejmPkMyK+0yLw==
 Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 40twxd0cm6-2
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 40twxd0cmk-9
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Aug 2024 06:42:35 -0700 (PDT)
+	Mon, 05 Aug 2024 06:42:47 -0700 (PDT)
 Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
  DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 5 Aug 2024 06:42:34 -0700
+ 15.2.1544.4; Mon, 5 Aug 2024 06:42:38 -0700
 Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
  (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 5 Aug 2024 06:42:34 -0700
+ Transport; Mon, 5 Aug 2024 06:42:38 -0700
 Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 3F66B5B6EBE;
-	Mon,  5 Aug 2024 06:18:53 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id F2D125B6EC2;
+	Mon,  5 Aug 2024 06:18:57 -0700 (PDT)
 From: Geetha sowjanya <gakula@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
         <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
         <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH v10 10/11] octeontx2-pf: Add devlink port support
-Date: Mon, 5 Aug 2024 18:48:14 +0530
-Message-ID: <20240805131815.7588-11-gakula@marvell.com>
+Subject: [net-next PATCH v10 11/11] octeontx2-pf: Implement offload stats ndo for representors
+Date: Mon, 5 Aug 2024 18:48:15 +0530
+Message-ID: <20240805131815.7588-12-gakula@marvell.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240805131815.7588-1-gakula@marvell.com>
 References: <20240805131815.7588-1-gakula@marvell.com>
@@ -75,144 +75,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-GUID: TYU2A5Nyc3dm1GzDfKRzT0Hr-_A4eYbT
-X-Proofpoint-ORIG-GUID: TYU2A5Nyc3dm1GzDfKRzT0Hr-_A4eYbT
+X-Proofpoint-GUID: IkIGLp4T3RQlAvDt6Sl6A0ANNIgJjbzO
+X-Proofpoint-ORIG-GUID: IkIGLp4T3RQlAvDt6Sl6A0ANNIgJjbzO
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-08-05_02,2024-08-02_01,2024-05-17_01
 
-Register devlink port for the rvu representors.
+Implement the offload stat ndo by fetching the HW stats
+of rx/tx queues attached to the representor.
 
 Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- .../net/ethernet/marvell/octeontx2/nic/rep.c  | 74 +++++++++++++++++++
- .../net/ethernet/marvell/octeontx2/nic/rep.h  |  2 +
- 2 files changed, 76 insertions(+)
+ .../marvell/octeontx2/nic/otx2_common.c       |  2 +
+ .../net/ethernet/marvell/octeontx2/nic/rep.c  | 41 +++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 4c11c420399b..b1251f80a569 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -83,6 +83,7 @@ int otx2_update_rq_stats(struct otx2_nic *pfvf, int qidx)
+ 	otx2_nix_rq_op_stats(&rq->stats, pfvf, qidx);
+ 	return 1;
+ }
++EXPORT_SYMBOL(otx2_update_rq_stats);
+ 
+ int otx2_update_sq_stats(struct otx2_nic *pfvf, int qidx)
+ {
+@@ -99,6 +100,7 @@ int otx2_update_sq_stats(struct otx2_nic *pfvf, int qidx)
+ 	otx2_nix_sq_op_stats(&sq->stats, pfvf, qidx);
+ 	return 1;
+ }
++EXPORT_SYMBOL(otx2_update_sq_stats);
+ 
+ void otx2_get_dev_stats(struct otx2_nic *pfvf)
+ {
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index c37cbf440235..6939f213f9f8 100644
+index 6939f213f9f8..d62aabf98833 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -28,6 +28,73 @@ MODULE_DESCRIPTION(DRV_STRING);
+@@ -28,6 +28,45 @@ MODULE_DESCRIPTION(DRV_STRING);
  MODULE_LICENSE("GPL");
  MODULE_DEVICE_TABLE(pci, rvu_rep_id_table);
  
-+static int rvu_rep_dl_port_fn_hw_addr_get(struct devlink_port *port,
-+					  u8 *hw_addr, int *hw_addr_len,
-+					  struct netlink_ext_ack *extack)
++static int
++rvu_rep_sp_stats64(const struct net_device *dev,
++		   struct rtnl_link_stats64 *stats)
 +{
-+	struct otx2_devlink *otx2_dl = devlink_priv(port->devlink);
-+	int rep_id = port->index;
-+	struct otx2_nic *priv;
-+	struct rep_dev *rep;
-+
-+	priv = otx2_dl->pfvf;
-+	rep = priv->reps[rep_id];
-+	ether_addr_copy(hw_addr, rep->mac);
-+	*hw_addr_len = ETH_ALEN;
-+	return 0;
-+}
-+
-+static int rvu_rep_dl_port_fn_hw_addr_set(struct devlink_port *port,
-+					  const u8 *hw_addr, int hw_addr_len,
-+					  struct netlink_ext_ack *extack)
-+{
-+	struct otx2_devlink *otx2_dl = devlink_priv(port->devlink);
-+	int rep_id = port->index;
-+	struct otx2_nic *priv;
-+	struct rep_dev *rep;
-+
-+	priv = otx2_dl->pfvf;
-+	rep = priv->reps[rep_id];
-+	eth_hw_addr_set(rep->netdev, hw_addr);
-+	ether_addr_copy(rep->mac, hw_addr);
-+	return 0;
-+}
-+
-+static const struct devlink_port_ops rvu_rep_dl_port_ops = {
-+	.port_fn_hw_addr_get = rvu_rep_dl_port_fn_hw_addr_get,
-+	.port_fn_hw_addr_set = rvu_rep_dl_port_fn_hw_addr_set,
-+};
-+
-+static void rvu_rep_devlink_port_unregister(struct rep_dev *rep)
-+{
-+	devlink_port_unregister(&rep->dl_port);
-+}
-+
-+static int rvu_rep_devlink_port_register(struct rep_dev *rep)
-+{
-+	struct devlink_port_attrs attrs = {};
++	struct rep_dev *rep = netdev_priv(dev);
 +	struct otx2_nic *priv = rep->mdev;
-+	struct devlink *dl = priv->dl->dl;
-+	int err;
++	struct otx2_rcv_queue *rq;
++	struct otx2_snd_queue *sq;
++	u16 qidx = rep->rep_id;
 +
-+	attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_PF;
-+	attrs.pci_vf.pf = rvu_get_pf(rep->pcifunc);
-+	attrs.pci_vf.vf = rep->pcifunc & RVU_PFVF_FUNC_MASK;
-+	if (attrs.pci_vf.vf)
-+		attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_VF;
++	otx2_update_rq_stats(priv, qidx);
++	rq = &priv->qset.rq[qidx];
 +
-+	devlink_port_attrs_set(&rep->dl_port, &attrs);
++	otx2_update_sq_stats(priv, qidx);
++	sq = &priv->qset.sq[qidx];
 +
-+	err = devl_port_register_with_ops(dl, &rep->dl_port, rep->rep_id,
-+					  &rvu_rep_dl_port_ops);
-+	if (err) {
-+		dev_err(rep->mdev->dev, "devlink_port_register failed: %d\n",
-+			err);
-+		return err;
-+	}
++	stats->tx_bytes = sq->stats.bytes;
++	stats->tx_packets = sq->stats.pkts;
++	stats->rx_bytes = rq->stats.bytes;
++	stats->rx_packets = rq->stats.pkts;
 +	return 0;
 +}
 +
- static int rvu_rep_get_repid(struct otx2_nic *priv, u16 pcifunc)
- {
- 	int rep_id;
-@@ -339,6 +406,7 @@ void rvu_rep_destroy(struct otx2_nic *priv)
- 	for (rep_id = 0; rep_id < priv->rep_cnt; rep_id++) {
- 		rep = priv->reps[rep_id];
- 		unregister_netdev(rep->netdev);
-+		rvu_rep_devlink_port_unregister(rep);
- 		free_netdev(rep->netdev);
- 	}
- 	kfree(priv->reps);
-@@ -381,6 +449,11 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
- 		snprintf(ndev->name, sizeof(ndev->name), "r%dp%d", rep_id,
- 			 rvu_get_pf(pcifunc));
- 
-+		err = rvu_rep_devlink_port_register(rep);
-+		if (err)
-+			goto exit;
++static bool
++rvu_rep_has_offload_stats(const struct net_device *dev, int attr_id)
++{
++	return attr_id == IFLA_OFFLOAD_XSTATS_CPU_HIT;
++}
 +
-+		SET_NETDEV_DEVLINK_PORT(ndev, &rep->dl_port);
- 		eth_hw_addr_random(ndev);
- 		err = register_netdev(ndev);
- 		if (err) {
-@@ -402,6 +475,7 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
- 	while (--rep_id >= 0) {
- 		rep = priv->reps[rep_id];
- 		unregister_netdev(rep->netdev);
-+		rvu_rep_devlink_port_unregister(rep);
- 		free_netdev(rep->netdev);
- 	}
- 	kfree(priv->reps);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.h b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
-index 0cefa482f83c..d81af376bf50 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
-@@ -34,10 +34,12 @@ struct rep_dev {
- 	struct net_device *netdev;
- 	struct rep_stats stats;
- 	struct delayed_work stats_wrk;
-+	struct devlink_port dl_port;
- 	u16 rep_id;
- 	u16 pcifunc;
- #define RVU_REP_VF_INITIALIZED		BIT_ULL(0)
- 	u8 flags;
-+	u8	mac[ETH_ALEN];
++static int
++rvu_rep_get_offload_stats(int attr_id, const struct net_device *dev,
++			  void *sp)
++{
++	if (attr_id == IFLA_OFFLOAD_XSTATS_CPU_HIT)
++		return rvu_rep_sp_stats64(dev, (struct rtnl_link_stats64 *)sp);
++
++	return -EINVAL;
++}
++
+ static int rvu_rep_dl_port_fn_hw_addr_get(struct devlink_port *port,
+ 					  u8 *hw_addr, int *hw_addr_len,
+ 					  struct netlink_ext_ack *extack)
+@@ -310,6 +349,8 @@ static const struct net_device_ops rvu_rep_netdev_ops = {
+ 	.ndo_start_xmit		= rvu_rep_xmit,
+ 	.ndo_get_stats64	= rvu_rep_get_stats64,
+ 	.ndo_change_mtu		= rvu_rep_change_mtu,
++	.ndo_has_offload_stats	= rvu_rep_has_offload_stats,
++	.ndo_get_offload_stats	= rvu_rep_get_offload_stats,
  };
  
- static inline bool otx2_rep_dev(struct pci_dev *pdev)
+ static int rvu_rep_napi_init(struct otx2_nic *priv,
 -- 
 2.25.1
 
