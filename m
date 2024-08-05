@@ -1,145 +1,108 @@
-Return-Path: <netdev+bounces-115909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7037948542
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 00:05:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F748948559
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 00:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44DA01F235CC
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 22:05:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26C761F23659
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 22:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A85416DECF;
-	Mon,  5 Aug 2024 22:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAE6155351;
+	Mon,  5 Aug 2024 22:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="IC3Ri1Q8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u2QT01w8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8116214C5A1
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 22:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B624D16C69C
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 22:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722895529; cv=none; b=dY0sU0lxzjol2/VvrFT3mHJMcqJzc/z0q3ACzoq1tOHMF7IooYq2CYL2xVW2Nn81szj3ptSrzOdGG8nHHyl6PZKfHnEPHHrtZYafXb6tSJcv6i2CmR3nPooM+m7ERa9HDjlw2hnHXu1UPbFva6PpJVQkrr0+4Lk1lGLnjLOLRV0=
+	t=1722895999; cv=none; b=kaLjB8Ak8oSR6UqOMi+Hgph6Jai3T6wTptVB8oCFfaQKrFt+oUlWHiAgFR+aApFjclQrtD641EFLx46PAb/MDnFVFc72A5vfoIfPzlSX5hOa63H17dyOnWepHx3nmveudj5Mh1So8fykI0LOWPqJrp8ABqIypPUbDLL0hzxfEGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722895529; c=relaxed/simple;
-	bh=OutB4SmwTuXnpzwnAeVCeLrkDUKImL5Zn0dp+2n7REs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oxhPECiA9FPs0tFPGo3eQXUc9TNGHEGtdOcHujjKSgRJwAiSVM72toUeBWHqZoRQ9Yf6M18QtLOhZjolVVzZJSgVnF4W5pp64EcwzR0y9gwC6kXXUk8FRmkk9CzaL+l7UHOaJiU+U+TfXJ11hD6Hjvz/fW+0UgyY9gjQ3F5TWro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=IC3Ri1Q8; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 475LvAQR014602;
-	Mon, 5 Aug 2024 15:05:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=M7SecbCtkGqGmalNbhYVkl6y9qy5wCiRCj4gU1HdodI=; b=
-	IC3Ri1Q8tyRBeVRILPORf4CsWTh5fsHzB9rKTGwmLtkqZiB3+itujXxmElRfnjG/
-	tg2y4GS1lvPwkbdM1FCi0+dptnckrtZQ2bONAVxwvTLIojv7ae3wdi0Sx1if2Ra0
-	IMaXdrX0SMAoMZX8JwPzaCeS9u34cGRksmK/Js3H/GVvARdqRjSGpbD5CZYU02wa
-	n7x+Kg5oGVQDdUlbTJhg1HJhHnpYvSe0LN0wgvxNT0UnfyqILMfZmBic87GOC8UD
-	CsEaz+o9QNC0y0KEPh3Z5mmgOEBP1bvTWJEMvig3E5nBlvoKg9gAyI4SEYLbjCT5
-	/ArVqNByUWd0rvDqdAPcPQ==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 40u3yys990-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 05 Aug 2024 15:05:12 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server id
- 15.2.1544.11; Mon, 5 Aug 2024 22:05:10 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        Jiri Slaby
-	<jirislaby@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net v2 2/2] docs: ABI: update OCP TimeCard sysfs entries
-Date: Mon, 5 Aug 2024 15:05:00 -0700
-Message-ID: <20240805220500.1808797-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240805220500.1808797-1-vadfed@meta.com>
-References: <20240805220500.1808797-1-vadfed@meta.com>
+	s=arc-20240116; t=1722895999; c=relaxed/simple;
+	bh=MTqToAMAS5seAlMMjWcQa3foMmzJs1DT59uR3j5i6t8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P6B2M+3JhH5p/oNVt8Ae1fjQhOwbuziw3ecKICgB7tZNoljpo90K7w+/3Vn3IWNPmf7xV5aAFJUB87p75eFyKpkqG8epboQDz7Rzw2/LuQgFzMGVEuJSqcvOZffpIvAnkRczoSbtPV40lEtlbWvJvIKMsQNRMFsB8/hxgoQob/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u2QT01w8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6732C32782;
+	Mon,  5 Aug 2024 22:13:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722895999;
+	bh=MTqToAMAS5seAlMMjWcQa3foMmzJs1DT59uR3j5i6t8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u2QT01w8rOdv3ckwzWTgOdF5rY7Arf6Q52D5FfPWxFj8Tgc4cb91MI70FbN6ggKcV
+	 exol07CahUZWOYBH+NmWhlGWeEd6pqwSQksKiwHxR/Kbh/YvsIk9MCUugkTIebZw7j
+	 ZO9xKnLxlcNj9J1YeXggq+H5mwzzfHHiS0PlK7QpC3CHpPSFrefivL9+og4Q4iE+Xa
+	 px8rWhrrv7A77J1NpUkCeFIAf0u2sq6DQmubAbDYymkq6zLJN0kuyOQL2PLevb4EiA
+	 3xqwP5h3Imr8j3QoO02/CAleUcdF78MhtrVP3TfZly6+FEA6nZU9HXNJK8nOL6xJFP
+	 0rFt2jk7LnAig==
+Date: Mon, 5 Aug 2024 15:13:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, donald.hunter@gmail.com, tariqt@nvidia.com,
+ willemdebruijn.kernel@gmail.com, jdamato@fastly.com, Ahmed Zaki
+ <ahmed.zaki@intel.com>
+Subject: Re: [PATCH net-next v2 00/12] ethtool: rss: driver tweaks and
+ netlink context dumps
+Message-ID: <20240805151317.5c006ff7@kernel.org>
+In-Reply-To: <05ae8316-d3aa-4356-98c6-55ed4253c8a7@nvidia.com>
+References: <20240803042624.970352-1-kuba@kernel.org>
+	<05ae8316-d3aa-4356-98c6-55ed4253c8a7@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 04hNv_JNORObIoCoqy0TnFl4eE4cZgMn
-X-Proofpoint-ORIG-GUID: 04hNv_JNORObIoCoqy0TnFl4eE4cZgMn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-05_10,2024-08-02_01,2024-05-17_01
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Update documentation according to the changes in the driver.
+On Sun, 4 Aug 2024 09:08:50 +0300 Gal Pressman wrote:
+> >    The only question here is how to handle all the tricky IOCTL
+> >    legacy. "No change" maps trivially to attribute not present.
+> >    "reset" (indir_size = 0) probably needs to be a new NLA_FLAG?  
+> 
+> FWIW, we have an incompatibility issue with the recent rxfh.input_xfrm
+> parameter.
+> 
+> In ethtool_set_rxfh():
+> 	/* If either indir, hash key or function is valid, proceed further.
+> 	 * Must request at least one change: indir size, hash key, function
+> 	 * or input transformation.
+> 	 */
+> 	if ((rxfh.indir_size &&
+> 	     rxfh.indir_size != ETH_RXFH_INDIR_NO_CHANGE &&
+> 	     rxfh.indir_size != dev_indir_size) ||
+> 	    (rxfh.key_size && (rxfh.key_size != dev_key_size)) ||
+> 	    (rxfh.indir_size == ETH_RXFH_INDIR_NO_CHANGE &&
+> 	     rxfh.key_size == 0 && rxfh.hfunc == ETH_RSS_HASH_NO_CHANGE &&
+> 	     rxfh.input_xfrm == RXH_XFRM_NO_CHANGE))
+> 		return -EINVAL;
+> 
+> When using a recent kernel with an old userspace ethtool,
+> rxfh.input_xfrm is treated as zero (which is different than
+> RXH_XFRM_NO_CHANGE) and passes the check, whereas the same command with
+> a recent userspace would result in an error.
+> This also makes it so old userspace always disables input_xfrm
+> unintentionally. I do not have any ideas on how to resolve this..
+> 
+> Regardless, I believe this check is wrong as it prevents us from
+> creating RSS context with no parameters (i.e. 'ethtool -X eth0 context
+> new', as done in selftests), it works by mistake with old userspace.
+> I plan to submit a patch soon to skip this check in case of context
+> creation.
 
-New attributes group tty is exposed and ttyGNSS, ttyGNSS2, ttyMAC and
-ttyNMEA are moved to this gruop. Also, these attributes are no more
-links to the devices but rather simple text files containing names of
-tty devices.
+I guess we just need to throw "&& !create" into the condition?
+Sounds good! We should probably split the "actual invalid" from 
+the "nothing specified" checks.
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- Documentation/ABI/testing/sysfs-timecard | 31 ++++++++++++++----------
- 1 file changed, 18 insertions(+), 13 deletions(-)
-
-diff --git a/Documentation/ABI/testing/sysfs-timecard b/Documentation/ABI/testing/sysfs-timecard
-index 220478156297..3ae41b7634ac 100644
---- a/Documentation/ABI/testing/sysfs-timecard
-+++ b/Documentation/ABI/testing/sysfs-timecard
-@@ -258,24 +258,29 @@ Description:	(RW) When retrieving the PHC with the PTP SYS_OFFSET_EXTENDED
- 		the estimated point where the FPGA latches the PHC time.  This
- 		value may be changed by writing an unsigned integer.
- 
--What:		/sys/class/timecard/ocpN/ttyGNSS
--What:		/sys/class/timecard/ocpN/ttyGNSS2
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty
-+Date:		August 2024
-+Contact:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-+Description:	(RO) Directory containing the sysfs nodes for TTY attributes
-+
-+What:		/sys/class/timecard/ocpN/tty/ttyGNSS
-+What:		/sys/class/timecard/ocpN/tty/ttyGNSS2
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	These optional attributes link to the TTY serial ports
--		associated with the GNSS devices.
-+Description:	(RO) These optional attributes contain names of the TTY serial
-+		ports associated with the GNSS devices.
- 
--What:		/sys/class/timecard/ocpN/ttyMAC
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty/ttyMAC
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	This optional attribute links to the TTY serial port
--		associated with the Miniature Atomic Clock.
-+Description:	(RO) This optional attribute contains name of the TTY serial
-+		port associated with the Miniature Atomic Clock.
- 
--What:		/sys/class/timecard/ocpN/ttyNMEA
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty/ttyNMEA
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	This optional attribute links to the TTY serial port
--		which outputs the PHC time in NMEA ZDA format.
-+Description:	(RO) This optional attribute contains name of the TTY serial
-+		port which outputs the PHC time in NMEA ZDA format.
- 
- What:		/sys/class/timecard/ocpN/utc_tai_offset
- Date:		September 2021
--- 
-2.43.5
-
+Also - curious what you'll put under Fixes, looks like a pretty 
+ancient bug :)
 
