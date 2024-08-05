@@ -1,78 +1,110 @@
-Return-Path: <netdev+bounces-115785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7184947C40
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:54:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F3E0947C4C
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:57:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B8F51F234DF
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:54:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB741C21BC8
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7383455E73;
-	Mon,  5 Aug 2024 13:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99837EEFD;
+	Mon,  5 Aug 2024 13:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kOuJVPdW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHNz8+TW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F51B6F2FA
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 13:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57F1139D13;
+	Mon,  5 Aug 2024 13:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722866063; cv=none; b=k9Q403A70+mKeaHRVDOfQkw0AFP+6VZvs/R6WNIS4Wi3Je+nXg7nnSU2HctEsTudebTWDtnLLy652UsRrIixqsJH3tJtFSQtsrFEWincsnDGqA6ytzrBCZjTOl4F1diaQT14oDdLo1uuATALbVGGiCqGuZdwB3YaJfW286pNNCU=
+	t=1722866208; cv=none; b=Gn8mCV/w2lQ2yVK/IaRweied48vKrc2VxQ5g2vyDwJf3fZr0fJdi5e5y5wf6ITuXPhrptSFsEK2LwIwNLEk3nQbal4ICGaWNVBL/T3geD521sViciNKWttv+apHxWgwVBSiUgA0xZx+ljebh7f6AnECuL3msWOfq/DqGX7q3o44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722866063; c=relaxed/simple;
-	bh=1x7zHYcB0a1JRiuPibAfhdq3Rksbg/wGsgxRfkkPES0=;
+	s=arc-20240116; t=1722866208; c=relaxed/simple;
+	bh=ZzRvUJNou+i5hkMbxOV7BIqtrsXZICZgOzgjNwX80rM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aVzeOIUbAhXuEhCrSGrNaT+xLR0sJtPR8c9pvvK7OnuSJV1NMRkHnDoULCP+AS3V9EuBU4Re/ITSx2MY0hQCuIUbg0jLeNF892PatPFH9dCd1/i/ALrZtxHm0OOR3t20vi4GLlYQatgQpNMolcSVqAae24LqcdVPr38F5NX8sUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kOuJVPdW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077ADC32782;
-	Mon,  5 Aug 2024 13:54:20 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJOSE2J9U/9/tzFSS4vtdzsJNWdUdUVVhfOHqXr9+YrP+yVWdeLg3kolbH3C+THA9liFRf3NR2uaJDQSYXZRGUKUNsmqLBzF2/ul31F2rpReUx2KaVn0tvATZYX2N7+hascdNRU8m6GNDPMfoTpttcexyQ/GIKexDMm9KvGi25s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHNz8+TW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FB60C32782;
+	Mon,  5 Aug 2024 13:56:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722866062;
-	bh=1x7zHYcB0a1JRiuPibAfhdq3Rksbg/wGsgxRfkkPES0=;
+	s=k20201202; t=1722866208;
+	bh=ZzRvUJNou+i5hkMbxOV7BIqtrsXZICZgOzgjNwX80rM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kOuJVPdWynRbc3j1j1v6taeLUoBwk2iq0nsl/Q/wB8SenEO0gfqPmyWuY/3+6TkzF
-	 Fo5how8fHcRmU72fJvHfrNiXWT7v2zQzTZxdJgykaY9wb1b/uzOjvCXl5P9YvOWto1
-	 aadATUiLYjMYHLpxft4OKkrYMAuetgqGvZXeJve4oxLPjiU/QQQHoHozyYJtigXQsl
-	 YBorYUoGRl8bef+sIMj4LyHGJxpC/1zsKOJkiufT/joZYfdwzsY4XnmYs1ueRoUpJm
-	 8iw1QkrS0mH8x1P/0oy939siS6WdS1m/JmvwkDMDdL86ZecMo++Ex2zwhOjBM1+9l4
-	 mrcYO9bwZUW/A==
-Date: Mon, 5 Aug 2024 14:54:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Tom Herbert <tom@herbertland.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 5/5] ipv6: udp: constify 'struct net' parameter
- of socket lookups
-Message-ID: <20240805135418.GF2636630@kernel.org>
-References: <20240802134029.3748005-1-edumazet@google.com>
- <20240802134029.3748005-6-edumazet@google.com>
+	b=XHNz8+TWZbjHPeLgerWFZ5aDNDyhFkHyfi+89/cAovwUMDba66piWWfnr2r1Nqub4
+	 Xk/PANpw88fjVLNhJkdpsm73V+8fhLSmGWZxPArhxrnOMrB8Oz1nYj1982qn6SybxJ
+	 E2SQBSj34ckGsSCFPlUtc4u+12ZWo5+9PkfsKMrk4xMP66n9t+gztwzOgIEhqm1u5F
+	 gZMZuoLBh+Gdw3fojqZqz3xKtdU3rBOpt5VD95sfSOYLIUNpl6559N4QYx6HLOWEkw
+	 o8vwEduvQSBk0rEZ3MRFLiYJDlNj+cBLICM2pVXkD7weoOdnc7uM4PTBqszE1wM7VM
+	 lU0XVI3cF3kgQ==
+Date: Mon, 5 Aug 2024 14:56:43 +0100
+From: Lee Jones <lee@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Marek Vasut <marex@denx.de>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, Rob Herring <robh@kernel.org>,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2] dt-bindings: leds: Document "netdev" trigger
+Message-ID: <20240805135643.GC1019230@google.com>
+References: <20240708114653.18566-1-marex@denx.de>
+ <20240725085042.GC501857@google.com>
+ <3c8bf807-8a8e-4704-a90a-d77ad3293b57@lunn.ch>
+ <20240801125309.GE6756@google.com>
+ <62cc3d64-c5e4-4af3-90ce-273ece6e8e57@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240802134029.3748005-6-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <62cc3d64-c5e4-4af3-90ce-273ece6e8e57@lunn.ch>
 
-On Fri, Aug 02, 2024 at 01:40:29PM +0000, Eric Dumazet wrote:
-> Following helpers do not touch their 'struct net' argument.
+On Thu, 01 Aug 2024, Andrew Lunn wrote:
+
+> On Thu, Aug 01, 2024 at 01:53:09PM +0100, Lee Jones wrote:
+> > On Thu, 25 Jul 2024, Andrew Lunn wrote:
+> > 
+> > > > > diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
+> > > > > index 8a3c2398b10ce..bf9a101e4d420 100644
+> > > > > --- a/Documentation/devicetree/bindings/leds/common.yaml
+> > > > > +++ b/Documentation/devicetree/bindings/leds/common.yaml
+> > > > > @@ -113,6 +113,8 @@ properties:
+> > > > >              # LED indicates NAND memory activity (deprecated),
+> > > > >              # in new implementations use "mtd"
+> > > > >            - nand-disk
+> > > > > +            # LED indicates network activity
+> > > > > +          - netdev
+> > > > 
+> > > > netdev is the description of the network development ML/repo, right?
+> > > > 
+> > > > Seems like an odd name for an OS agnostic property?
+> > > 
+> > > I agree that one meaning is the network development community within
+> > > Linux.
+> > > 
+> > > But it also means a network device, which is OS agnostic. I don't
+> > > really see it be any different to a memory technology device, mtd.
+> > 
+> > MTD is an acronym.
+> > 
+> > The only dodgy one I see in there is 'kbd-capslock'.
+> > 
+> > How about, now go with me here: 'network'?
 > 
-> - udp6_lib_lookup()
-> - __udp6_lib_lookup()
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> We could do, but we have to keep netdev around for backwards
+> compatibility. There are DT blobs using it which we cannot break.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Oh, this 'just' a documentation patch?  'netdev' is already in use?
 
+-- 
+Lee Jones [李琼斯]
 
