@@ -1,140 +1,137 @@
-Return-Path: <netdev+bounces-115858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3476894818D
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 20:28:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21221948193
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 20:31:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 823ABB203D1
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:28:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4C4E28E70A
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F0E15DBB2;
-	Mon,  5 Aug 2024 18:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A1E15FD12;
+	Mon,  5 Aug 2024 18:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LovWpel8"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="10vt2jvm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0149215F3EC
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 18:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87213A884
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 18:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722882520; cv=none; b=EoO9OUjZUKDhQfe1FkDkRo4otIdPnxHQfhT0Dl5ymJt7DVqBeN2IEz+WqfPmGGoKdVF2ioCyUG6uxvv8pLn4Ru8+Ype2os+oObeq4Bm6rSwg0NjFewCaW4KSXBuZXGhEKGxwLl4tETLbTGS4feS9EYzTWYRc2VHNUXEWv67dwZE=
+	t=1722882672; cv=none; b=T6C3wRvpfQGLtyHOK0KevazjCZCTld6K15DGRKawfQHx21ZplJaG0clrTBVUUJxLa+lDhMEMRhbDNBI5cRC1dpBG+t5CIQ8yOf0Ter8QekLpou3AFRR+tPLAWhuynVPZ9Utj3NfcnPVdCMmHAkcq6hFMTC8PYAc9NhknjuIb2Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722882520; c=relaxed/simple;
-	bh=NzXgBjLy6p27MPvhpT69OWo/cTM8xBWsyl55ISoj9PI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EbM2eLTDDIgLczBIHHMpb0shbyJ7wGF3Vb6bpoFxinGxqCnoefXEB26U/AsFnn82MRZSOqEldOkLl8u1J8HdPhOWLh9jLRAJ8zFgluSWnVRVLp+ZqI+Hz5rGM742TD+B1+/nwznvtSk3yuRJ6/ZUqYEjhlQEz/ofnX8Xu2V6oUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LovWpel8; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7a1e4c75488so647160785a.0
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 11:28:38 -0700 (PDT)
+	s=arc-20240116; t=1722882672; c=relaxed/simple;
+	bh=DhthJzQUgrAFURwHIvJzMMhEyam9emx1mKZe4wt+dcU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=stSCKmHceje7x+KJZU8saX6ul9BB81OUDV6rKkbwA7dI948FTGmiMsGljeDlCg60urZcgD+AvjEYVrQRIFSxpjtWfkQbTrAP3V3zzjq7vtRiJMx+Oaj5dEZU0HeqSu7F7fr0U9W8bk8mnfJvjJ9M3yyivdkHQHlsRD70b2jNwec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=10vt2jvm; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39b41306b4dso5173065ab.3
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 11:31:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722882518; x=1723487318; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gvSu5xfsyPDZIgK3/CJJN4E6ZY3Iw1MkaMwXugiDJrg=;
-        b=LovWpel8DgeP2Xu8+xOFGRoynxTdDwUdL5GLIggj1zcKKCW6lz2jBYgW78nB+1gvIn
-         bC8TfsefeEuUqiw7IM7p0r6aotUIIjTpENKuFilCRNBeR3Q7B8DJIpkUPOP0actzwTwe
-         rAHA39DZY23MzOxsuIpwiL4+7IZ/K0MR4cJ5k=
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1722882668; x=1723487468; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HBokw9oEyYRijU8V8MR0ptQT6J/uWSsuZHdUP+pag0s=;
+        b=10vt2jvmG+++8/EYrdLZPJv6mcId3n3HqEf83gNpZGTj7UIWjiJbbCM7opLJX6NUn+
+         Y1l0h1VcmUiamru8/YN5xR8T2bawZplfHPmUWg4bdtYfMSFnYsfk4m2vKj/47fwcezYs
+         b7HjX4GD+jvDw+OObqLwjqCWUmcLkS+Y7TcSOvSA55i3lIJiF7BfW4SGRJOe1Y2CDawn
+         8xYafdMWh6m3hTerAoC0qIgnzGPqLd6tlUJdmNtOAqwYwBKs8zYGhY98/l2ijP28ZVhX
+         nZITxuwc1aCq8ByErcxoyFpb5sOeejtI5FATaNEgg3Vjhowxiy7Xc7PolEE8bCtD4S4s
+         vhIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722882518; x=1723487318;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gvSu5xfsyPDZIgK3/CJJN4E6ZY3Iw1MkaMwXugiDJrg=;
-        b=mfnImocSAYLm5HjFlSvCP2r4iS45qrcHhPyAgY42ueVNXDhNybD/pLDhnzFGCAe8kB
-         X7acwHt9D6Ct4jOmYzNvONevfSCZTeBQd9JILAQRpIkPd05FmtgTWWweBPWZtswYIUcz
-         CeR/XfNDhYspYvOsVYbVjljt4CgviC1LsLWAYwTAHmrnaz+kF3cI5TRUfGRcES6l6woA
-         3v/exyyM2XaJIUjUFfWtcu6tYASQ4j4ok8yRXr2oI+LLFIuauZmC6WrZ17yTfPksoVki
-         GTR6IDiZlXdq8px80qcDnk5GEV6T5pSXlcf8rWPzexe+859TAzsLgUdvmZkDPFKTkPEC
-         HZAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWjRs4QITqzSW0UCmbuJ3oP/WBo1s4nfwD67M+2I17/0avl+ogrNgKhlHARCmqqcg8/8l6N5JFOs+bxZoIbMwRXaIwPqnXz
-X-Gm-Message-State: AOJu0YwdkiV0QNyUTjDjKKPQcIdyfB402cA9SwofgpPHWS2J9Bgp5VQ7
-	6DJ7zFqje7Zu07XN9nV1rnsPxQom0uEKj/Dd4DJXEUKluZsPOuFFkIvW3alPUA==
-X-Google-Smtp-Source: AGHT+IHJhJW1tqSKFEnh01b/GyBH9GRFYJidoQjbPNxY/i4WNwoxwpGPU9BDxg/b9qugDwkj25YxOQ==
-X-Received: by 2002:a05:620a:1910:b0:7a3:524f:7ef7 with SMTP id af79cd13be357-7a3524f826bmr1440847885a.12.1722882517847;
-        Mon, 05 Aug 2024 11:28:37 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4518a756b6bsm31450821cf.69.2024.08.05.11.28.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 11:28:37 -0700 (PDT)
-Message-ID: <1e7557b6-4b39-411d-b36b-8f05fa21eeba@broadcom.com>
-Date: Mon, 5 Aug 2024 11:28:32 -0700
+        d=1e100.net; s=20230601; t=1722882668; x=1723487468;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HBokw9oEyYRijU8V8MR0ptQT6J/uWSsuZHdUP+pag0s=;
+        b=CPe5984t3ow9qL11h4Od7i6Pa/hC3wqlU5grqGOMdT6rF1fiFhsiXKZH+laziWsFUe
+         V0O9RFJF8D3kXKRAmvB9QppjpHak98YR+mpkqpy9Sy24miYLzDIW3XRYkHbnBoEZpo2H
+         m9ieLEX9GAPyPX1hOAE4LC7RaLfYItg/DXa2FYS2kssnoMkDRaBQtrXDn9SLas4/lKZY
+         DM2iaE2NsBMd1F6cBN7Sfnh9YBZuOPuR98NKhDfAfIi9XQfb/ULPNkHo0jbhZtgROUfT
+         3yOb7E+EEAGR7GWHCbpqGGHB+tY9jC+ac8FUFcjKx5NBgY1AEA+7B5jdxFjtUzK+AHGv
+         x/7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXafb8NULj1HMdo+xTupjO2Z5wm92b+9xgXWTMEJeIO3LDmdi8jb1PLjvGeTLKB5PpSMFuz3qxTFFMbbRi1CW7D6twzMaOa
+X-Gm-Message-State: AOJu0YxZc3LjOFfHM/WQIL1DP53qgYKelZCrcAySC6zTo8AkZ4KjHelo
+	vgwsi+BylG8A5dvniwm9DUc4IHL+qiDp/ZfrW31ovLAHby+eK+NHTZ8/g2blASM=
+X-Google-Smtp-Source: AGHT+IEIYrl4tOpKOuu8cQDxHO7vGrhEGCxzt6s8+OkqVq51qI0Ood3dvQh4rwOjJ4Z2X9zNbWivyA==
+X-Received: by 2002:a05:6e02:1ca7:b0:397:d503:6216 with SMTP id e9e14a558f8ab-39b1fc33e2amr181609425ab.25.1722882668428;
+        Mon, 05 Aug 2024 11:31:08 -0700 (PDT)
+Received: from blmsp.fritz.box ([2001:4091:a245:8609:c1c4:a4f8:94c8:31f2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39b20a9af29sm30867925ab.13.2024.08.05.11.31.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 11:31:08 -0700 (PDT)
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>,
+	Judith Mendez <jm@ti.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Linux regression tracking <regressions@leemhuis.info>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/7] can: m_can: Fix polling and other issues
+Date: Mon,  5 Aug 2024 20:30:40 +0200
+Message-ID: <20240805183047.305630-1-msp@baylibre.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmgenet: Properly overlay PHY and MAC
- Wake-on-LAN capabilities
-To: Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org
-Cc: Doug Berger <opendmb@gmail.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, open list <linux-kernel@vger.kernel.org>
-References: <20240805172522.3114032-1-florian.fainelli@broadcom.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240805172522.3114032-1-florian.fainelli@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 8/5/24 10:25, Florian Fainelli wrote:
-> From: Florian Fainelli <f.fainelli@gmail.com>
-> 
-> Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
-> while others might be only supported by the PHY. Make sure that the .get_wol()
-> returns the union of both rather than only that of the PHY if the PHY supports
-> Wake-on-LAN.
-> 
-> Fixes: 7e400ff35cbe ("net: bcmgenet: Add support for PHY-based Wake-on-LAN")
-> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+Hi everyone,
 
-I will be resubmitting this one with the correct email, in 24 hours.
+these are a number of fixes for m_can that fix polling mode and some
+other issues that I saw while working on the code.
+
+Any testing and review is appreciated.
+
+Base
+----
+v6.11-rc1
+
+Changes in v2
+-------------
+ - Fixed one multiline comment
+ - Rebased to v6.11-rc1
+
+Previous versions
+-----------------
+ v1: https://lore.kernel.org/lkml/20240726195944.2414812-1-msp@baylibre.com/
+
+Best,
+Markus
+
+Markus Schneider-Pargmann (7):
+  can: m_can: Reset coalescing during suspend/resume
+  can: m_can: Remove coalesing disable in isr during suspend
+  can: m_can: Remove m_can_rx_peripheral indirection
+  can: m_can: Do not cancel timer from within timer
+  can: m_can: disable_all_interrupts, not clear active_interrupts
+  can: m_can: Reset cached active_interrupts on start
+  can: m_can: Limit coalescing to peripheral instances
+
+ drivers/net/can/m_can/m_can.c | 111 ++++++++++++++++++++--------------
+ 1 file changed, 66 insertions(+), 45 deletions(-)
+
 -- 
-Florian
+2.45.2
 
 
