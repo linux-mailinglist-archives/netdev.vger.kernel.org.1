@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-115868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16FA9481DF
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 20:42:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD90948213
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 21:10:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 577E31F21567
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:42:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4356B211F0
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C26315F3F8;
-	Mon,  5 Aug 2024 18:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0680016A397;
+	Mon,  5 Aug 2024 19:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nC3oh9sy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.redfish-solutions.com (mail.redfish-solutions.com [24.116.100.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EB115A874
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 18:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=24.116.100.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D452E2AD13
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 19:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722883352; cv=none; b=BRpY9TqiBYZVU/eqMi+nMLHE5GyJiIC/j10YfpaOKkAfJ/GjLUzl6ydiFXTbstCd1oHKCW0UxZDHkswmY7sQKXYq/9IaQaUWWAPvkyL+ixu30WzvRl8s+70ipQ4Fdv0BWHEzCRzSWFn9WDsPoLiozmthsQHrv+K7UEm6vmC0Nio=
+	t=1722885000; cv=none; b=CKsEb9rzaU/2UKB3T0f66pvtU1Xj5p2u9mINY6T2TJmBUhGsfvMuhIiAyJ2DnNjwhM645Z+CAue7QrJwXvzgImBILGX4xa6PWSobk8K+MQqTNDpQUmH/JB52KnB47af/j0WO4MT1hJOjagaTFWcA+sCCHhDE6/cyok6IvX1YXdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722883352; c=relaxed/simple;
-	bh=0jO9N31rcLhmvb7pRmrv3GHU6IFZPiaNIXWzruWUEfc=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=rFzJRn30QltAqnIa2CkLan6lTkkfhvF99gd+oMd1Yl9Yyl3lpYQG5Wc/AT1i34bUjM7xfQ9vTQ1cbYMUrN1+f/8tKm7b5Q7sPJUF0mVx3Izb5Vt6aEs6lTP+2GyYYX4XSzAv4Ch2s5L+FjwRVwBdv5nSGqQpjjlUJgnJFxAvRdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redfish-solutions.com; spf=pass smtp.mailfrom=redfish-solutions.com; arc=none smtp.client-ip=24.116.100.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=redfish-solutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redfish-solutions.com
-Received: from smtpclient.apple (Macmini2-6.redfish-solutions.com [192.168.8.9])
-	(authenticated bits=0)
-	by mail.redfish-solutions.com (8.17.2/8.16.1) with ESMTPSA id 475IgU1U311658
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 5 Aug 2024 12:42:30 -0600
-From: Philip Prindeville <philipp_subx@redfish-solutions.com>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1722885000; c=relaxed/simple;
+	bh=5MWJ+hkhvIBMmv6d0zCuMirXiJ9AU/CMw6EDAS06MCQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ajQyMTKAdbYnR5NwlYm4s6BRZuvUIWiARUKeCyEbjwFZmW5Hzs85O+Bpj/bLLlSH5VWfRlVXYIkyMubAo7K62an1ZwrzWBSGrtGs1WNdqdcjk29xgeeQUHVZQZmxwHCmSx8ZRNALTET+txOol0bWjpa+pvgwGWYonVeSHvayFrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nC3oh9sy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 289C8C32782;
+	Mon,  5 Aug 2024 19:10:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722885000;
+	bh=5MWJ+hkhvIBMmv6d0zCuMirXiJ9AU/CMw6EDAS06MCQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nC3oh9syqpKA1/6Z6ncLUiSZcJ0RY4XkOIaUIDmQDmcY+UuA8BPaWBpvLxncVVTVy
+	 jghLAHTNGGy+4W6t1xiJ3uei6RQYUygzg/XzyDCCI22Hdt9Im84v3YdZ5QltXtUR0k
+	 bLjreWCstR3lWrAX8JRiQxpj0J7QJJE1EvnklZzrcAO+la45KVosfqZ7xZqFfb7HZf
+	 mWmtCvzuMS55sxdwTjXoe4VTJwSr7FPIh8vJBbS1KMAm47bEBaYIlG/y6ndOieVnZ9
+	 UwkwW31/U1ce6OYqALsixTOYeIiVeavWcS3D2G+K6TSHqXkifXBySnm//gJ/8zDOgb
+	 Djk14xTfB+H2Q==
+Date: Mon, 5 Aug 2024 12:09:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nick Child <nnac123@linux.ibm.com>
+Cc: netdev@vger.kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
+ ricklind@us.ibm.com
+Subject: Re: [PATCH net-next 7/7] ibmvnic: Perform tx CSO during send scrq
+ direct
+Message-ID: <20240805120959.70608deb@kernel.org>
+In-Reply-To: <2ee7dd51-c45a-494e-ae24-b47fa938d321@linux.ibm.com>
+References: <20240801212340.132607-1-nnac123@linux.ibm.com>
+	<20240801212340.132607-8-nnac123@linux.ibm.com>
+	<20240802171531.101037f6@kernel.org>
+	<2ee7dd51-c45a-494e-ae24-b47fa938d321@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
-Subject: TAP programming and "br_xxx: received packet on br_xxx_tap0 with own
- address as source address"
-Message-Id: <629C1F6C-152A-4BFC-8A07-9F4E5B439325@redfish-solutions.com>
-Date: Mon, 5 Aug 2024 12:42:20 -0600
-To: netdev@vger.kernel.org
-X-Mailer: Apple Mail (2.3774.600.62)
-X-Scanned-By: MIMEDefang 3.4.1 on 192.168.8.3
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Mon, 5 Aug 2024 08:52:57 -0500 Nick Child wrote:
+> On 8/2/24 19:15, Jakub Kicinski wrote:
+> > On Thu,  1 Aug 2024 16:23:40 -0500 Nick Child wrote:  
+> >> This extra
+> >> precaution (requesting header info when the backing device may not use
+> >> it) comes at the cost of performance (using direct vs indirect hcalls
+> >> has a 30% delta in small packet RR transaction rate).  
+> > 
+> > What's "small" in this case? Non-GSO, or also less than MTU?  
+> 
+> I suppose "non-GSO" is the proper term. If a packet is non-GSO
+> then we are able to use the direct hcall. On the other hand,
+> if a packet is GSO then indirect must be used, we do not have the option 
+> of direct vs indirect.
 
-I=E2=80=99m working on an L3 (non-IP) tunneling protocol that then emits =
-the decapsulated payload with L2 wrappers.
-
-I=E2=80=99ve got a TAP interface on a bridge with an Ethernet interface =
-also bound to it [the bridge].
-
-My question is, which address to source the L2 packets out I=E2=80=99m =
-sending?  Do I use the Ethernet interface=E2=80=99s address, the =
-bridge=E2=80=99s address, or the TAP interface=E2=80=99s address?
-
-I=E2=80=99ve tried the latter two and in both cases I get some variation =
-of:
-
-br_xxx: received packet on br_xxx_tap0 with own address as source =
-address (addr:xx:xx:xx:xx:xx, vlan:0)
-
-What is the expected (correct) address to use in this paradigm?
-
-Looking at br_fdb_update() it looks like I can=E2=80=99t use *any* local =
-address, because they=E2=80=99ll all have BR_FDB_LOCAL set, won=E2=80=99t =
-they?  Maybe I=E2=80=99m reading this wrong.
-
-I=E2=80=99m using an embedded Linux distro that=E2=80=99s still at =
-5.15.19 so it would need to be applicable to that version.
-
-Thanks,
-
--Philip
-
+It'd be great to add more exact analysis to the commit message.
+Presumably the change is most likely to cause trouble in combination
+with large non-GSO frames. Could you measure the perf impact when TSO
+is disabled and MTU is 9k?
 
