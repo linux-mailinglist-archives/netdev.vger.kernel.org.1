@@ -1,61 +1,75 @@
-Return-Path: <netdev+bounces-115841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92361947FCC
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:00:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D52E0947FDF
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2E8F1C21152
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:00:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8858C1F2395F
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7193115DBBA;
-	Mon,  5 Aug 2024 17:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C8515DBBA;
+	Mon,  5 Aug 2024 17:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/0pGzr/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iTxfj5ic"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADE715B54F;
-	Mon,  5 Aug 2024 17:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B301591F0
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 17:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722877207; cv=none; b=ar4Z5jizzvlIh46FANR1JboV0p8VkS5nCJ/DfOvEAGNue33bAcYUDk/I6RPLs9C6fA8sRQIrWHAM0eN2iVIWkY558loHPmH6cqGq0jpkqHhJ1/1uKYEeDeJVHM4PD8+/OlGAFfjA1VxgSt64QR5BmuUTb1Or96P1XdcXhUqwLOA=
+	t=1722877437; cv=none; b=qtNx3ajzlplbZLH2IAreJAGfTHMLPRKgJcnzo6QdeRwojBF9LD/2Y57rtMWVOgwpULfJygXtZqg/Q7GkmQrPCxAwnWgWwEhEvNeso+vms6TZTB/zCWZJYyAtmOb3/MU67iEXXvUCI/F0ven5yAJ3e5oR7KfUfM3PpfJoe5vH6YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722877207; c=relaxed/simple;
-	bh=rMg8tq8sXoox5/aZPFwub+kNjISHhCSdM1/upF/TURs=;
+	s=arc-20240116; t=1722877437; c=relaxed/simple;
+	bh=sICeaCwcreil7xDpX/efNjG2755GKCVEPMbcnFP5EOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RNNX9N1ZMrQfZO8EeSwFEq9lW2GBr+9+zDIXWStK4/hoUyz2xgFingBjyibHxnjjY7yqyuEysmxmif0MbwSJN3OHPeYswu18buUWO9heyioYW3gnJdHX61h4+bAxbl3hLMG6pD0SNxWLdVWDyXA3yiX655MUKS+V7Dn1p+bMyq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C/0pGzr/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA9EC32782;
-	Mon,  5 Aug 2024 17:00:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722877206;
-	bh=rMg8tq8sXoox5/aZPFwub+kNjISHhCSdM1/upF/TURs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C/0pGzr/WpVGNgjl3o864EDH0YfyswghtP2JFPG/YAbOf2KUVfUyq7PGLM/NR6kOR
-	 87rpEvhMkovWxOOpoS26eZqCZkm32Hv/DNS/TGIDn0xQt+qVkV4Uv/pcKIRArODVGw
-	 XSZPJNefb/wzMP3nw6QOpaiSAt507npkIVj2jkaLp6W1HV++Ii2MPaQs2NtqPeILrA
-	 RJraREhJYnLWUApH7eLCjdjzggTVQb+kdONsXoXsbZ/VUHiC2QndgokX87ziDWrjoP
-	 pS0jGPK9IquwvcbIw+ZEt6KCx+dJnz61lAMX/kW0wfJPUZ1uAlRTBzsGUkcsX5xZZ+
-	 vIWJ3+BCyzOug==
-Date: Mon, 5 Aug 2024 18:00:02 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	dl-S32 <S32@nxp.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 4/6] net: stmmac: dwmac-s32cc: add basic NXP S32G/S32R
- glue
-Message-ID: <20240805170002.GM2636630@kernel.org>
-References: <AM9PR04MB85064D7EDF618DB5C34FB83BE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FcPCgo6ddFgbjRbiWVS3ad+YH+7l7mKCwXxv0uPZPDODJweWd12jUgQ+LF6o3zReFUU+EBK60aqOI6IQUH5F93nxQTJHt3VfjFXvDAdXFKHyhJXy/crJmbvjyMgahRAun7fCZbC1gjBoM/Duj3SHeTGlmIhRNzINoRtmTW/AdrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iTxfj5ic; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722877436; x=1754413436;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sICeaCwcreil7xDpX/efNjG2755GKCVEPMbcnFP5EOk=;
+  b=iTxfj5icTEGqzP9xvYVDO7OiZ3/hk4qZ10SEjsOtjSB0erUjMgjjgFNA
+   Vwd5/6xgdFbmzs8K4PoCG76D+PmD8Aib1ly2DN7UFOsL0/GNrPSHjZYUE
+   SfVvWVGyUpIAgsOoJm6ILCHGUFMD3tPeTIwkPGepJ/sXbkwJhmNgULg3o
+   JzrK3YvCrhBGU96b4kyWH8ez5/VVTOwNnoXI1/tZOordRjrBzLXz0OS34
+   +/BWvrH5RizmRA6LKDdgJdqm/96a9JqPzvlVvwrSQk6UnSOQGQ7cLoA0B
+   H2rL00+A0+aBqvlE3zXFyx+Ir/6++EhxqvvetkkxUBlOZAhMXP88o8O1g
+   A==;
+X-CSE-ConnectionGUID: PntKv1YkR321kfhG2FHt6g==
+X-CSE-MsgGUID: RPLmV3CCQW6Q+GH+nlRT6A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="20668780"
+X-IronPort-AV: E=Sophos;i="6.09,265,1716274800"; 
+   d="scan'208";a="20668780"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 10:03:55 -0700
+X-CSE-ConnectionGUID: ftnxINfxT5S96FKMAwushA==
+X-CSE-MsgGUID: DZyF6M1STAOXpYQuASEo8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,265,1716274800"; 
+   d="scan'208";a="61185797"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 05 Aug 2024 10:03:53 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sb17f-0003Gp-0v;
+	Mon, 05 Aug 2024 17:03:51 +0000
+Date: Tue, 6 Aug 2024 01:03:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: Re: [PATCH net-next v5 08/10] net: libwx: add eswitch switch api for
+ devlink ops
+Message-ID: <202408060023.UYl4fu6N-lkp@intel.com>
+References: <5DD6E0A4F173D3D3+20240804124841.71177-9-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,79 +78,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AM9PR04MB85064D7EDF618DB5C34FB83BE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
+In-Reply-To: <5DD6E0A4F173D3D3+20240804124841.71177-9-mengyuanlou@net-swift.com>
 
-On Sun, Aug 04, 2024 at 08:50:10PM +0000, Jan Petrous (OSS) wrote:
-> NXP S32G2xx/S32G3xx and S32R45 are automotive grade SoCs
-> that integrate one or two Synopsys DWMAC 5.10/5.20 IPs.
-> 
-> The basic driver supports only RGMII interface.
-> 
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+Hi Mengyuan,
 
-...
+kernel test robot noticed the following build errors:
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32cc.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32cc.c
+[auto build test ERROR on net-next/main]
 
-...
+url:    https://github.com/intel-lab-lkp/linux/commits/Mengyuan-Lou/net-libwx-Add-sriov-api-for-wangxun-nics/20240804-214836
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/5DD6E0A4F173D3D3%2B20240804124841.71177-9-mengyuanlou%40net-swift.com
+patch subject: [PATCH net-next v5 08/10] net: libwx: add eswitch switch api for devlink ops
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240806/202408060023.UYl4fu6N-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240806/202408060023.UYl4fu6N-lkp@intel.com/reproduce)
 
-> +static int s32cc_gmac_init(struct platform_device *pdev, void *priv)
-> +{
-> +	struct s32cc_priv_data *gmac = priv;
-> +	int ret;
-> +
-> +	ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_125M);
-> +	if (!ret)
-> +		ret = clk_prepare_enable(gmac->tx_clk);
-> +
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "Can't set tx clock\n");
-> +		return ret;
-> +	}
-> +
-> +	ret = clk_prepare_enable(gmac->rx_clk);
-> +	if (ret)
-> +		dev_dbg(&pdev->dev, "Can't set rx, clock source is disabled.\n");
-> +	else
-> +		gmac->rx_clk_enabled = true;
-> +
-> +	ret = s32cc_gmac_write_phy_intf_select(gmac);
-> +	if (ret) {
-> +		dev_err(&pdev->dev, "Can't set PHY interface mode\n");
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408060023.UYl4fu6N-lkp@intel.com/
 
-Should operations on tx_clk and rx_clk be unwound here?
+All errors (new ones prefixed by >>):
 
-Flagged by Smatch.
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_free':
+   wx_devlink.c:(.text+0x58): undefined reference to `devlink_unregister'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x6c): undefined reference to `devlink_free'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_pf_port':
+   wx_devlink.c:(.text+0xa0): undefined reference to `priv_to_devlink'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0xfc): undefined reference to `devlink_port_attrs_set'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x110): undefined reference to `devlink_port_register_with_ops'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_pf_port':
+   wx_devlink.c:(.text+0x174): undefined reference to `devl_port_unregister'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_create_devlink':
+   wx_devlink.c:(.text+0x2a0): undefined reference to `devlink_alloc_ns'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x2d4): undefined reference to `devlink_unregister'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x2dc): undefined reference to `devlink_free'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x304): undefined reference to `devlink_register'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x31c): undefined reference to `devlink_priv'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_vf_port':
+   wx_devlink.c:(.text+0x354): undefined reference to `priv_to_devlink'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x3d0): undefined reference to `devlink_port_attrs_set'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x3e8): undefined reference to `devl_port_register_with_ops'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_vf_port':
+   wx_devlink.c:(.text+0x47c): undefined reference to `devl_port_unregister'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_eswitch.o: in function `wx_eswitch_mode_set':
+>> wx_eswitch.c:(.text+0x1c): undefined reference to `devlink_priv'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_eswitch.o: in function `wx_eswitch_mode_get':
+   wx_eswitch.c:(.text+0x138): undefined reference to `devlink_priv'
 
-> +		return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-
-...
-
-> +static int s32cc_dwmac_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct plat_stmmacenet_data *plat;
-> +	struct s32cc_priv_data *gmac;
-> +	struct stmmac_resources res;
-> +	int ret;
-
-Please consider arranging local variables in Networking code
-in reverse xmas tree order - longest line to shortest.
-
-Flagged by: https://github.com/ecree-solarflare/xmastree
-
-> +
-> +	gmac = devm_kzalloc(&pdev->dev, sizeof(*gmac), GFP_KERNEL);
-> +	if (!gmac)
-> +		return PTR_ERR(gmac);
-
-This will return 0, perhaps return -ENOMEM ?
-
-Flagged by Smatch.
-
-...
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
