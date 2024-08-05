@@ -1,229 +1,192 @@
-Return-Path: <netdev+bounces-115614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BD39473C1
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 05:17:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4619473CA
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 05:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 240B01F20D3C
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 03:17:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E801C20C95
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 03:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D054613C9B3;
-	Mon,  5 Aug 2024 03:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8D013C9DE;
+	Mon,  5 Aug 2024 03:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CywZ+Xhh"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pwPmlPBP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5F53BBF7
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 03:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362563FBB2;
+	Mon,  5 Aug 2024 03:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722827850; cv=none; b=fps1J7MgjQ+b/zSUcWf2T8CqJASX2wlOHlGweKn16jAECPgIHaWr84hXpJ/AzCo3H+Bfv4kGSiy60c2/rjl9Gg7In5Ux/rsx5LnXgKZvnzjfezsDfx91ODDYcTOnbCDTO59ADk24qfXANpMwpkqkblfvANeC3kzKCzZwlHc6BYY=
+	t=1722828061; cv=none; b=Mmg6G8d8TeeZAHCwcuLtSTk8RcPGVdPQsVySjNNcNblKTbp9v/uZm+Q0QQNyUoDnbj3a1TIxo3bf3PdZSaAbfV2J4NubVckeKFR7jFk33vJKrtKolLiRfZpDb/de7t5zgo214ndfS8lbNARR6Mmp1rQwOgr3PwUQeGjWsySwjKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722827850; c=relaxed/simple;
-	bh=HWTzlxbLSR9s0+KuMLVg4GGTIeRTYe128A5WIkWNFwc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P8wxQ7pTcKXsHmyuWUrCxhQpj1x2nXOZksfdnFOj5NbiL/dFG6tppdgrNpxmDBsczEzN1z98jeAt//2awki94yPjWgt8PshM/WaPlwuYBRIHsniaPA6wKvecuGQRTQ5FNQ0+/DUyAfsBzd8J3QlJlN8wb7sAlCVJ9VKpYhK7L7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CywZ+Xhh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722827847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jZmGo3XfbtNpcJRA7Fn1zMK1Nav07/DYxRfLLC/gTe8=;
-	b=CywZ+XhhsrfSl+KBxvxmtignHdLEVZhK0Ha3nZCvg1joVlNTRZPg6RKkle18Jspw0wA7Lj
-	FBEAKzOFv5yRHa3z9aJgXczEfaSOL3u1NBSG+sZuHWe/WAeQKz27+s8q+IL2ZWrLbLdkro
-	vtL3SA19H+lltVojEKhziEIj8KbLF6c=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-dgcPLlAdOIOzW_yqFBAe1A-1; Sun, 04 Aug 2024 23:17:26 -0400
-X-MC-Unique: dgcPLlAdOIOzW_yqFBAe1A-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-6c8f99fef10so11751249a12.3
-        for <netdev@vger.kernel.org>; Sun, 04 Aug 2024 20:17:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722827845; x=1723432645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jZmGo3XfbtNpcJRA7Fn1zMK1Nav07/DYxRfLLC/gTe8=;
-        b=FgNyWtWw27NFrUHotU4WkPuw1mKfonBVm+EkNusi+pklaP4J3cNYwRO445X8x05Hgd
-         MgT+MtaHw4dLhQ+K2PMtbI4KCsn/PAaxsKcanTAa2YSbvuc5r5fyF7x1p1xQzjSRKXzT
-         RyNeNEFsnRh0ARt8zrr+eY6hEsdHBXBDYDcg0592nXPHFO/Y1SgaE80e+b24itnlfgRj
-         7UXOqeS0j+/DRjgjD2+oaYGPZ4zysIxSS/eOKA6k3jwfyFDLLxYtIB0/zqC/mQ+QmSJP
-         mKiS0exZG+OFnZYhSI4DL5YzR29ssDtPe3ssk69LOJYlTKI9p/v+m5Um+tX5gT8p/74V
-         flsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWR6rwdQD9xJ46QHDxca4/scqtv+b3Wf0g6ocDRqwUghM/TzLijmfAqJfJ4z/SYo9nLOMKctvD0EyQhqzNPhdaCUP3IEP2y
-X-Gm-Message-State: AOJu0YxdW8SwwVKAE6ad2PJZXhlCcrisaw7yXqVh/qkEMVKUaIWjwp4J
-	84kgZqLBczJlINkfDLVfs5s8hOzVMVppd01ll+dyVyae7scZ/PXwfDnZafaCCg3wOHM5BTCXzMA
-	4TwOlLW5+0zTOE2uolyuLim0PJMFpuSoxmVIPBsu5TVHL+qa0dXtZkzgmS5HNGNQKaLInwHUYml
-	kn/QKZ9TqWCOGhYuQfgKYwoVG8prUV
-X-Received: by 2002:a17:90a:a08e:b0:2c9:95ae:b0ac with SMTP id 98e67ed59e1d1-2cff958245bmr11111439a91.40.1722827845019;
-        Sun, 04 Aug 2024 20:17:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOfwNCgY5YLUhP/7xUiEpHpXVnCxUhXX352MzgNc8HM/UvylmZut+yOxshrN3S6IDoMY9FMpdvCM5saGz+Gz4=
-X-Received: by 2002:a17:90a:a08e:b0:2c9:95ae:b0ac with SMTP id
- 98e67ed59e1d1-2cff958245bmr11111416a91.40.1722827844369; Sun, 04 Aug 2024
- 20:17:24 -0700 (PDT)
+	s=arc-20240116; t=1722828061; c=relaxed/simple;
+	bh=RADyB9AX9RHj6sVPChsucFX1mp/fydlMgSftfKE3qlU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=s6V+ajZ1LxjnRGNrWl8Mb6ImOwcCUgjke7rGR9C4XSgfhPxqBq92uxwrmERFZHx/zAuzCoZ9CZsdOb0ukRCbBq+iZAINKAxYBQpDTyAD98Ka36QDYgRXgxKNl8BDSrA+Tf0tuqVPEslRHBojxoy3qNpDJJ6DbkGnquHgOc+Omfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pwPmlPBP; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4752WIZb007423;
+	Mon, 5 Aug 2024 03:20:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	JVTVNA0wbABh8whnmy3WGU6XEczeZEV1tFn7fMbdJWY=; b=pwPmlPBP6S6xLWHX
+	xvzEDo2nMcr9aNjhqGJFdMLYss2Jd6kyyIbOWdG6t/kNbg/sGBfCKGZGpLISFY9j
+	oC6+Pbdly7VwQAlXstfOYiokshEumK6fdKDuujLT0JBaJL25daerwM+h6Mqayskw
+	y+WlyYdm1SPBaqrcVltJwFv2JlTdzpTVG3xT3Aydrs+LY/pns5iCjq5lD4Febcvz
+	dngTgiMSzsEvafP1PwNbaoycFPsSo37M5s2gey8hXNV59a3CfOzEkzLNQ14zExEU
+	JGTsuJlYwo2EkLGocazMJ+FF7C2EejrMenQ56HosD1mH6U74pahwhStJ85YkU02Y
+	LloP2A==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40sdqk2m90-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 05 Aug 2024 03:20:53 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4753Krmx002670
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 5 Aug 2024 03:20:53 GMT
+Received: from [10.231.195.67] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 4 Aug 2024
+ 20:20:48 -0700
+Message-ID: <02a126c3-fb98-4f84-b4e0-86a2dc5b7b33@quicinc.com>
+Date: Mon, 5 Aug 2024 11:20:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801153722.191797-2-dtatulea@nvidia.com> <CACGkMEutqWK+N+yddiTsnVW+ZDwyM+EV-gYC8WHHPpjiDzY4_w@mail.gmail.com>
- <51e9ed8f37a1b5fbee9603905b925aedec712131.camel@nvidia.com>
-In-Reply-To: <51e9ed8f37a1b5fbee9603905b925aedec712131.camel@nvidia.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 5 Aug 2024 11:17:13 +0800
-Message-ID: <CACGkMEuHECjNVEu=QhMDCc5xT_ajaETqAxNFPfb2-_wRwgvyrA@mail.gmail.com>
-Subject: Re: [RFC PATCH vhost] vhost-vdpa: Fix invalid irq bypass unregister
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, 
-	"eperezma@redhat.com" <eperezma@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: ath12k: use 128 bytes aligned iova in transmit path
+ for WCN7850
+To: Kalle Valo <kvalo@kernel.org>
+CC: <ath12k@lists.infradead.org>, <linux-wireless@vger.kernel.org>,
+        <kernel@quicinc.com>, <netdev@vger.kernel.org>
+References: <20240715023814.20242-1-quic_bqiang@quicinc.com>
+ <87ed788enl.fsf@kernel.org>
+Content-Language: en-US
+From: Baochen Qiang <quic_bqiang@quicinc.com>
+In-Reply-To: <87ed788enl.fsf@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: UaDdTO4RzGeGeImt6nYVcydA7f1maQh0
+X-Proofpoint-GUID: UaDdTO4RzGeGeImt6nYVcydA7f1maQh0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-04_14,2024-08-02_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1011
+ spamscore=0 mlxlogscore=999 suspectscore=0 phishscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408050022
 
-On Fri, Aug 2, 2024 at 2:51=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com>=
- wrote:
->
-> On Fri, 2024-08-02 at 11:29 +0800, Jason Wang wrote:
-> > On Thu, Aug 1, 2024 at 11:38=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia=
-.com> wrote:
-> > >
-> > > The following workflow triggers the crash referenced below:
-> > >
-> > > 1) vhost_vdpa_unsetup_vq_irq() unregisters the irq bypass producer
-> > >    but the producer->token is still valid.
-> > > 2) vq context gets released and reassigned to another vq.
-> >
-> > Just to make sure I understand here, which structure is referred to as
-> > "vq context" here? I guess it's not call_ctx as it is a part of the vq
-> > itself.
-> >
-> > > 3) That other vq registers it's producer with the same vq context
-> > >    pointer as token in vhost_vdpa_setup_vq_irq().
-> >
-> > Or did you mean when a single eventfd is shared among different vqs?
-> >
-> Yes, that's what I mean: vq->call_ctx.ctx which is a eventfd_ctx.
->
-> But I don't think it's shared in this case, only that the old eventfd_ctx=
- value
-> is lingering in producer->token. And this old eventfd_ctx is assigned now=
- to
-> another vq.
 
-Just to make sure I understand the issue. The eventfd_ctx should be
-still valid until a new VHOST_SET_VRING_CALL().
 
-I may miss something but the only way to assign exactly the same
-eventfd_ctx value to another vq is where the guest tries to share the
-MSI-X vector among virtqueues, then qemu will use a single eventfd as
-the callback for multiple virtqueues. If this is true:
+On 8/1/2024 11:07 PM, Kalle Valo wrote:
+> Baochen Qiang <quic_bqiang@quicinc.com> writes:
+> 
+>> In transmit path, it is likely that the iova is not aligned to PCIe TLP
+>> max payload size, which is 128 for WCN7850. Normally in such cases hardware
+>> is expected to split the packet into several parts in a manner such that
+>> they, other than the first one, have aligned iova. However due to hardware
+>> limitations, WCN7850 does not behave like that properly with some specific
+>> unaligned iova in transmit path. This easily results in target hang in a
+>> KPI transmit test: packet send/receive failure, WMI command send timeout
+>> etc. Also fatal error seen in PCIe level:
+>>
+>> 	...
+>> 	Capabilities: ...
+>> 		...
+>> 		DevSta: ... FatalErr+ ...
+>> 		...
+>> 	...
+>>
+>> Work around this by manually moving/reallocating payload buffer such that
+>> we can map it to a 128 bytes aligned iova. The moving requires sufficient
+>> head room or tail room in skb: for the former we can do ourselves a favor
+>> by asking some extra bytes when registering with mac80211, while for the
+>> latter we can do nothing.
+>>
+>> Moving/reallocating buffer consumes additional CPU cycles, but the good news
+>> is that an aligned iova increases PCIe efficiency. In my tests on some X86
+>> platforms the KPI results are almost consistent.
+>>
+>> Since this is seen only with WCN7850, add a new hardware parameter to
+>> differentiate from others.
+>>
+>> Tested-on: WCN7850 hw2.0 PCI WLAN.HMT.1.0.c5-00481-QCAHMTSWPL_V1.0_V2.0_SILICONZ-3
+>>
+>> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+> 
+> [...]
+> 
+>> --- a/drivers/net/wireless/ath/ath12k/dp_tx.c
+>> +++ b/drivers/net/wireless/ath/ath12k/dp_tx.c
+>> @@ -162,6 +162,60 @@ static int ath12k_dp_prepare_htt_metadata(struct sk_buff *skb)
+>>  	return 0;
+>>  }
+>>  
+>> +static void ath12k_dp_tx_move_payload(struct sk_buff *skb,
+>> +				      unsigned long delta,
+>> +				      bool head)
+>> +{
+>> +	unsigned long len = skb->len;
+>> +
+>> +	if (head) {
+>> +		skb_push(skb, delta);
+>> +		memmove(skb->data, skb->data + delta, len);
+>> +		skb_trim(skb, len);
+>> +	} else {
+>> +		skb_put(skb, delta);
+>> +		memmove(skb->data + delta, skb->data, len);
+>> +		skb_pull(skb, delta);
+>> +	}
+>> +}
+> 
+> I'm nitpicking, but usually booleans like the head variable here don't
+> help with readability. Having two separate functions would be easier to
+> read, but this is fine as it's so small.
+> 
+>> @@ -279,6 +334,23 @@ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
+>>  		goto fail_remove_tx_buf;
+>>  	}
+>>  
+>> +	if (iova_mask &&
+>> +	    (unsigned long)skb->data & iova_mask) {
+>> +		ret = ath12k_dp_tx_align_payload(ab, &skb);
+>> +		if (ret) {
+>> +			dev_warn_once(ab->dev, "failed to align TX buffer %d\n", ret);
+> 
+> Why dev_warn_once()? I changed it to ath12k_warn() in the pending
+> branch.
+> 
+>> --- a/drivers/net/wireless/ath/ath12k/hw.h
+>> +++ b/drivers/net/wireless/ath/ath12k/hw.h
+>> @@ -96,6 +96,8 @@
+>>  #define ATH12K_M3_FILE			"m3.bin"
+>>  #define ATH12K_REGDB_FILE_NAME		"regdb.bin"
+>>  
+>> +#define PCIE_MAX_PAYLOAD_SIZE		128
+> 
+> PCIE prefix implies that this is in PCI subsystem. I renamed it to
+> ATH12K_PCIE_MAX_PAYLOAD_SIZE.
+> 
+> Please check my changes:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/ath/ath.git/commit/?h=pending&id=b603c1e0d94fb1eb0576ef48ebe37c8c1ce86328
+looks good to me, thanks.
 
-For bypass registering, only the first registering can succeed as the
-following registering will fail because the irq bypass manager already
-had exactly the same producer token.
-For registering, all unregistering can succeed:
-
-1) the first unregistering will do the real job that unregister the token
-2) the following unregistering will do nothing by iterating the
-producer token list without finding a match one
-
-Maybe you can show me the userspace behaviour (ioctls) when you see this?
-
-Thanks
-
->
-> > > 4) The original vq tries to unregister it's producer which it has
-> > >    already unlinked in step 1. irq_bypass_unregister_producer() will =
-go
-> > >    ahead and unlink the producer once again. That happens because:
-> > >       a) The producer has a token.
-> > >       b) An element with that token is found. But that element comes
-> > >          from step 3.
-> > >
-> > > I see 3 ways to fix this:
-> > > 1) Fix the vhost-vdpa part. What this patch does. vfio has a differen=
-t
-> > >    workflow.
-> > > 2) Set the token to NULL directly in irq_bypass_unregister_producer()
-> > >    after unlinking the producer. But that makes the API asymmetrical.
-> > > 3) Make irq_bypass_unregister_producer() also compare the pointer
-> > >    elements not just the tokens and do the unlink only on match.
-> > >
-> > > Any thoughts?
-> > >
-> > > Oops: general protection fault, probably for non-canonical address 0x=
-dead000000000108: 0000 [#1] SMP
-> > > CPU: 8 PID: 5190 Comm: qemu-system-x86 Not tainted 6.10.0-rc7+ #6
-> > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0=
--gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> > > RIP: 0010:irq_bypass_unregister_producer+0xa5/0xd0
-> > > RSP: 0018:ffffc900034d7e50 EFLAGS: 00010246
-> > > RAX: dead000000000122 RBX: ffff888353d12718 RCX: ffff88810336a000
-> > > RDX: dead000000000100 RSI: ffffffff829243a0 RDI: 0000000000000000
-> > > RBP: ffff888353c42000 R08: ffff888104882738 R09: ffff88810336a000
-> > > R10: ffff888448ab2050 R11: 0000000000000000 R12: ffff888353d126a0
-> > > R13: 0000000000000004 R14: 0000000000000055 R15: 0000000000000004
-> > > FS:  00007f9df9403c80(0000) GS:ffff88852cc00000(0000) knlGS:000000000=
-0000000
-> > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > CR2: 0000562dffc6b568 CR3: 000000012efbb006 CR4: 0000000000772ef0
-> > > PKRU: 55555554
-> > > Call Trace:
-> > >  <TASK>
-> > >  ? die_addr+0x36/0x90
-> > >  ? exc_general_protection+0x1a8/0x390
-> > >  ? asm_exc_general_protection+0x26/0x30
-> > >  ? irq_bypass_unregister_producer+0xa5/0xd0
-> > >  vhost_vdpa_setup_vq_irq+0x5a/0xc0 [vhost_vdpa]
-> > >  vhost_vdpa_unlocked_ioctl+0xdcd/0xe00 [vhost_vdpa]
-> > >  ? vhost_vdpa_config_cb+0x30/0x30 [vhost_vdpa]
-> > >  __x64_sys_ioctl+0x90/0xc0
-> > >  do_syscall_64+0x4f/0x110
-> > >  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> > > RIP: 0033:0x7f9df930774f
-> > > RSP: 002b:00007ffc55013080 EFLAGS: 00000246 ORIG_RAX: 000000000000001=
-0
-> > > RAX: ffffffffffffffda RBX: 0000562dfe134d20 RCX: 00007f9df930774f
-> > > RDX: 00007ffc55013200 RSI: 000000004008af21 RDI: 0000000000000011
-> > > RBP: 00007ffc55013200 R08: 0000000000000002 R09: 0000000000000000
-> > > R10: 0000000000000000 R11: 0000000000000246 R12: 0000562dfe134360
-> > > R13: 0000562dfe134d20 R14: 0000000000000000 R15: 00007f9df801e190
-> > >
-> > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > > ---
-> > >  drivers/vhost/vdpa.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > index 478cd46a49ed..d4a7a3918d86 100644
-> > > --- a/drivers/vhost/vdpa.c
-> > > +++ b/drivers/vhost/vdpa.c
-> > > @@ -226,6 +226,7 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhos=
-t_vdpa *v, u16 qid)
-> > >         struct vhost_virtqueue *vq =3D &v->vqs[qid];
-> > >
-> > >         irq_bypass_unregister_producer(&vq->call_ctx.producer);
-> > > +       vq->call_ctx.producer.token =3D NULL;
-> > >  }
-> > >
-> > >  static int _compat_vdpa_reset(struct vhost_vdpa *v)
-> > > --
-> > > 2.45.2
-> > >
-> >
-> Thanks
->
-
+> 
 
