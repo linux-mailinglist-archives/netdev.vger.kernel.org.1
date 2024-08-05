@@ -1,151 +1,170 @@
-Return-Path: <netdev+bounces-115671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B2394771B
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:23:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267DF947766
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6F70B21580
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:23:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C351C20DDB
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB9914D280;
-	Mon,  5 Aug 2024 08:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B9014A639;
+	Mon,  5 Aug 2024 08:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U8kbyMNM"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="P1Y3RjiD";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pqV+9Hl0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944A813D26B;
-	Mon,  5 Aug 2024 08:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7B713D882;
+	Mon,  5 Aug 2024 08:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722846214; cv=none; b=MvHduk1ltd+S0KsHdMHb0ElOnQIiBNvMv6oqxupdiRrHIicquD++yX/Tq8GSYwvnRxOcyH3fk5DW7xmlOwmrDbwip1Sa08J2neJR4GjQiUBJfMaM1QA1iXOet3wuMhLI6rqDQTpvS4TR5gq4njV7CbRWyTfCkRzDkhFOpkEDLUo=
+	t=1722847014; cv=none; b=Xpz9XMoJgbHyuXQKO0wdVARyMv02LTbWJhd1TJ09hQdFVmuLanIgyvKUOZ6NcYFkpDH7gqmQHkD/CZ8zoE7xUx7ITRttrRERBke8iIT7ACVuCYhfqr3HUHeK68xfH6qSkYHjN6yl8otP7+H2CErhqocM2mT0En7WTbsfmyeWn9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722846214; c=relaxed/simple;
-	bh=bPKmx/tAHgCR1rUrgpNdp5DjTRrC8+TNRyW72qLLc2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I6YwV4iKwZAJdIVKhSwOSDs+d3LrQX/s9d0JBULIDGuX2quVr1PEu+EgVDliMdlV/KtEBY8SsTfF4SbaJqmEyel2w85qdhPsZ7MO3HFbtPUKEyXElX0Fr26w6SQGllhm/xBvAKOi89eVKjRFz7mYLCg0K3WYoQGTGBel5tpRne8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=U8kbyMNM; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4758Mjfc027344;
-	Mon, 5 Aug 2024 08:23:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=X
-	LzBGo0fwAbtj6MJ0AMenJWD3iUI+Q2yHWMxW10eWHM=; b=U8kbyMNMojb8JUL45
-	Oc3AeCJrHCFFXO2Jr6byVCMN2v5FzxkXNAJGDfMU4gQosCB6I2Fnh+10xjqgGWUx
-	L6nT7LYNjnAjSJ4vIH4MYCH7MuEdXDtoR9bxfekHDRt+GLsoWPV6DZpvoUKsn7JM
-	PA5YnnBoIoq8Wl7DqRsO1TvU7NM92YULxapyUC60MZM/MjO+m2Js/CiogGRCgrqo
-	X2ccXV+RYoToTtlvQDK8i6uNX2UNyBmORKFkwzs2HR82v5IxIx2gBLQJ2lJ3zeAy
-	NvEhuLyRmUwhxySpztKe65ujJHcqyLjUG1x7ppqfeK+qMVTojOo969sDtKnoODy/
-	Hsn4g==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40tsxer5ga-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Aug 2024 08:23:22 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4758NLIW028173;
-	Mon, 5 Aug 2024 08:23:21 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40tsxer5g5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Aug 2024 08:23:21 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47546g1t006385;
-	Mon, 5 Aug 2024 08:23:20 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40t13m56fg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 05 Aug 2024 08:23:20 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4758NIJh57999780
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 5 Aug 2024 08:23:20 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 53ED458056;
-	Mon,  5 Aug 2024 08:23:18 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7F5CB5805A;
-	Mon,  5 Aug 2024 08:23:16 +0000 (GMT)
-Received: from [9.171.14.14] (unknown [9.171.14.14])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  5 Aug 2024 08:23:16 +0000 (GMT)
-Message-ID: <800b1186-2d87-4b20-9d38-b4fecde161f0@linux.ibm.com>
-Date: Mon, 5 Aug 2024 10:23:15 +0200
+	s=arc-20240116; t=1722847014; c=relaxed/simple;
+	bh=PjtUfg2dBkrxwoYebMLa4QJFsaKgxx/xvAKUDYqI72k=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mqP/FdU7St4irOn5uCrEFCz2iVWVGYhZXFksaEzhEpU3s4IE3orT1gd3KP2b6Dt+RsBJBX59Rs3K4ziCeTZGQoflHx6AsbsZqlhFc/p0T/rgNq0mO+0bIKVXlhTZhRQpjqNzlgy2BZvmk4cnDHuCm9K3yV3Ei6bcx+p2BqJ2G9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=P1Y3RjiD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pqV+9Hl0; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1722847010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RCsHJr1SeKMqzqkT0AejdrkUq3Lrh5QDrzPRJxr0exw=;
+	b=P1Y3RjiDmTGcQmSQQSM0W4znmGk/TCQCPnBQ2rnJqCyEd9NJYv6YQVAq1nZh5m8kru3laR
+	PNw4QQnbpuI2iI6MLvuDKCiAyBy8uSMcM//UM5D8wXXXQ/vZc3B1mJhqsZzSLe6saI7sZz
+	8oAuYEPtwizF+X3zGCW+nLJjExy+fmBoPTfUhbG+UL7yFLNPeClaIh3Ia7zwaic2DAAuWP
+	U8v0SWrugVSerc1SDFOGzTCK8SIdWgYAdhbKJex1enhxiV8r+2+Ufn1zXyLF+3ZqlVPUBP
+	AN25nlXKUC5QfZrlk7OKPeJoVAucipy4TXR35vAVKhbNvIRh6d2vKpbYO12O3g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1722847010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RCsHJr1SeKMqzqkT0AejdrkUq3Lrh5QDrzPRJxr0exw=;
+	b=pqV+9Hl0F6DWyoS2cDiBSEc2UWx8wdnbmtCzvRPcBe/wtKMCg8KJf5Dvywkt94TF+1U5Tf
+	P4Nyg+Tm/2f4e5Cw==
+To: syzbot <syzbot+41e4341f493f1155aa3d@syzkaller.appspotmail.com>,
+ anna-maria@linutronix.de, frederic@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+Cc: Johannes Berg <johannes@sipsolutions.net>, Kalle Valo
+ <kvalo@kernel.org>, linux-wireless@vger.kernel.org
+Subject: Re: [syzbot] [kernel?] WARNING in hrtimer_forward (3)
+In-Reply-To: <000000000000331d30061eeaf927@google.com>
+References: <000000000000331d30061eeaf927@google.com>
+Date: Mon, 05 Aug 2024 10:36:49 +0200
+Message-ID: <87plqn5psu.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: delete buf_desc from buffer list under lock
- protection
-To: Wen Gu <guwen@linux.alibaba.com>,
-        shaozhengchao
- <shaozhengchao@huawei.com>, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20240731093102.130154-1-guwen@linux.alibaba.com>
- <ef374ef8-a19e-7b9b-67a1-5b89fb505545@huawei.com>
- <dedb6046-83a6-4bda-bf1d-ae77a8cda972@linux.alibaba.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <dedb6046-83a6-4bda-bf1d-ae77a8cda972@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PFlZnaG5VPGS5Tib4Ium3cTkJIs7gNaH
-X-Proofpoint-ORIG-GUID: ifLCTVxFfKAnsx-FLFu0CAt-yu7ZxsJq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-04_14,2024-08-02_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- phishscore=0 suspectscore=0 mlxlogscore=795 mlxscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408050059
+Content-Type: text/plain
 
+On Mon, Aug 05 2024 at 00:53, syzbot wrote:
 
+Cc+ wireless folks.
 
-On 02.08.24 03:55, Wen Gu wrote:
-> 
-> 
-> On 2024/7/31 18:32, shaozhengchao wrote:
->> Hi Wen Gu:
->>    "The operations to link group buffer list should be protected by
->> sndbufs_lock or rmbs_lock" It seems that the logic is smooth. But will
->> this really happen? Because no process is in use with the link group,
->> does this mean that there is no concurrent scenario?
->>
-> 
-> Hi Zhengchao,
-> 
-> Yes, I am also very conflicted about whether to add lock protection.
->  From the code, it appears that when __smc_lgr_free_bufs is called, the
-> link group has already been removed from the lgr_list, so theoretically
-> there should be no contention (e.g. add to buf_list). However, in order
-> to maintain consistency with other lgr buf_list operations and to guard
-> against unforeseen or future changes, I have added lock protection here
-> as well.
-> 
-> Thanks!
-> 
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    3d650ab5e7d9 selftests/bpf: Fix a btf_dump selftest failure
+> git tree:       bpf-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17e154d3980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=5efb917b1462a973
+> dashboard link: https://syzkaller.appspot.com/bug?extid=41e4341f493f1155aa3d
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>
+> Unfortunately, I don't have any reproducer for this issue yet.
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/630e210de8d9/disk-3d650ab5.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/3576ca35748a/vmlinux-3d650ab5.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/5b33f099abfa/bzImage-3d650ab5.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+41e4341f493f1155aa3d@syzkaller.appspotmail.com
+>
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 11474 at kernel/time/hrtimer.c:1048 hrtimer_forward+0x210/0x2d0 kernel/time/hrtimer.c:1048
 
-I'm indeed in two minds about if I give you my reviewed-by especially on 
-the reason of unforeseen bugs. However, previously the most bugs on 
-locking we met in our code are almost because of deadlocks caused by too 
-much different locks introduced. Thus, I don't think this patch is 
-necessary at lease for now.
+That tries to forward a hrtimer which is currently enqueued.
+
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 11474 Comm: syz.2.2194 Not tainted 6.10.0-syzkaller-12666-g3d650ab5e7d9 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+> RIP: 0010:hrtimer_forward+0x210/0x2d0 kernel/time/hrtimer.c:1048
+> Code: 00 49 89 1e 48 8b 04 24 eb 07 e8 bb e7 12 00 31 c0 48 83 c4 30 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 a1 e7 12 00 90 <0f> 0b 90 eb e0 4c 89 f0 31 d2 49 f7 f4 48 89 04 24 49 89 c6 4d 0f
+> RSP: 0018:ffffc90000007bf8 EFLAGS: 00010246
+> RAX: ffffffff81809d7f RBX: 0000000000000001 RCX: ffff888026059e00
+> RDX: 0000000000000101 RSI: 0000000000000001 RDI: 0000000000000000
+> RBP: 00000042facd7bc5 R08: ffffffff81809c13 R09: 1ffffffff26e4d1f
+> R10: dffffc0000000000 R11: ffffffff81358260 R12: 00000000061a8000
+> R13: ffff88807db07080 R14: 000000000044e132 R15: 1ffff1100fb60e0c
+> FS:  00007fa65d4636c0(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f478b2356c0 CR3: 000000005beac000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+> Call Trace:
+>  <IRQ>
+>  hrtimer_forward_now include/linux/hrtimer.h:355 [inline]
+>  mac80211_hwsim_beacon+0x192/0x1f0 drivers/net/wireless/virtual/mac80211_hwsim.c:2354
+
+This is the timer callback. So something has re-started the timer before
+the soft interrupt was able to run ....
+
+>  __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
+>  __hrtimer_run_queues+0x59b/0xd50 kernel/time/hrtimer.c:1753
+>  hrtimer_run_softirq+0x19a/0x2c0 kernel/time/hrtimer.c:1770
+>  handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+>  __do_softirq kernel/softirq.c:588 [inline]
+>  invoke_softirq kernel/softirq.c:428 [inline]
+>  __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+>  irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+>  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+>  sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+>  </IRQ>
+>  <TASK>
+>  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+
+mac80211_hwsim_link_info_changed() and mac80211_hwsim_config() can
+re-start the timer concurrently to a running softirq callback. I can't
+see any serialization there.
+
+The check for hrtimer_queued() is not cutting it as that's a lockless
+check and becomes true when the timer is dequeued for expiry.
+
+So the following can happen:
+
+CPU0                            CPU1
+
+hrtimer_softirq()
+    lock_base();
+    dequeue_timer(t);
+    base->running = t;
+    unlock_base(t);
+                                if (!hrtimer_queued(t))
+    t->fn(t)				hrtimer_start(t);
+      ....
+      hrtimer_forward(t);       <- FAIL
+
+Replacing hrtimer_queued() with hrtimer_active() should solve the
+hrtimer race, but I wonder whether the concurrency between the soft
+interrupt and the config/info changes has other side effects.
 
 Thanks,
-Wenjia
+
+        tglx
 
