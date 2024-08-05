@@ -1,131 +1,190 @@
-Return-Path: <netdev+bounces-115652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742D59475DF
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:18:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72F369475EF
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30E962810A8
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 07:18:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94B101C2096D
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 07:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4F514658F;
-	Mon,  5 Aug 2024 07:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4B7149000;
+	Mon,  5 Aug 2024 07:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOj0OSHk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F3qFdGWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD8A6A01E;
-	Mon,  5 Aug 2024 07:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7AD4146A6F
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 07:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722842301; cv=none; b=oaCB8kL7SY7VtKP+5Yw7tsZTESC1wAkQrrfSgVmLTWGe1qhRC994HHezSX9PNhNIBxsbBKiWSAzwZWmbNZzpQy5OnYmv4wqkE8AIkGIeA/ZeR2BlRAWr8gS0XQyVeLqAf1OkPm38S58+GpUqs8bip3c1hwqiTZxOsW5XRyLuKq8=
+	t=1722842591; cv=none; b=J6qTpJiUsiV2ipbU+x8SSkLLUkFS3nDkXFVt58pV0aDTVIeymzr5zUZX9oGhRC1SsieABcjEJY5olWBranr2zMOgnCSb2jkNgziJXX2n8miyWn82m4gv3q4EZFG3nezSRXqy3SE1qxxvBGSxZVnoT+LfYQej97NwggXg7ZjiWDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722842301; c=relaxed/simple;
-	bh=fniE8tuhdokX16cHRGF9TxpDQlWgeT3TOL9mIKL38bU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WY35B54c4KFfC2qTZx2nC8zTGjqAkb7vShdOB0i9Bw4dv/q1URzUvjKvmQaffNd5BbeunlnXwW0UDXXa7nQ3mWd1r1aZZ5cQV3hl6Pxi2upnxdRl6b6J3oRDEFXm3H9HczUHzEMkrIofIOyEtsgDyYvYdekfVN0tp3hJELk2Esc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOj0OSHk; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2cf93dc11c6so6594063a91.1;
-        Mon, 05 Aug 2024 00:18:20 -0700 (PDT)
+	s=arc-20240116; t=1722842591; c=relaxed/simple;
+	bh=whviROFOksxKo0ATxUEhZYm+jGP5OEw5Ou1nGR5Chrw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q2rPR2WUbEndeUHY8A4tKNltk14FSm9nD+MuLYwWnv+kqosmywvy25bfAI8ddQO3NrTR8TRiYofiFlmBA+YivQAPq/5MpRnSdYvWRu7K8Yka6ZvaC8FKquHYS1L32czyiexjES8XYTw88URILyku669IypuGNkvyMEszT8/Cn68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F3qFdGWw; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5b9fe5ea355so7845a12.0
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 00:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722842299; x=1723447099; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/el0xGNFTdbbDtr5pZPM8/5Ct8VQl2stpFBoM0IeY1A=;
-        b=UOj0OSHk41vRFZGAve/q8+z2JmyneNPBw3Z/HW9RgG5K97+ts226S02fmD7cXO2eLO
-         wSem259a4jhElF+xo+F2s+lpf5Xn8rn8jaZciSxxb1s2qDXpfjj1OY3bVk/VXCsYawOu
-         0Mjro2ol/XAkqznh3/yhSvsXZsHRgLG5rKPLyrtVVAgPnERvv/fEVgfgbpY/AYBIqK14
-         bZ/8ggrNkmT1Ijx497KWkjtPL3Pjw1xV7XTy4z0dl2gnraaklLQmdVoGbKBiHzpZ/EjG
-         6YcivxtfgX41yphLMFek5EsQcFmMeQx2lsbxm5brktO+fUVdYq53Yf2z5Xx1SZEt6tGY
-         gGfA==
+        d=google.com; s=20230601; t=1722842588; x=1723447388; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DwtAi2JDzAVWKNytVgaFiG1iE0Nc4sSYXPYsvIjBKDU=;
+        b=F3qFdGWw+Y/IQTWYj4qv3v+EPp08fZT5hXyEHYd6qyG4rqWggSkTQmlXFR7YwCtyM7
+         GtYwIa8i1KaWvHpewTEs3rVeEosOGFHVM+Itn32KuscxPEop7oX9j/8a/x5lThqiP7KX
+         7yML8uzfe5BzC0x9fhMmONwuejwJEQeFSaekRITBQ+SwsTkP7/4ixQI6/4W1N6rIbisC
+         DxFXepKV/9fwjTsbA8vzPf3AOBAUSXu9774PnDgtY00yX4wEt4zeYf8IqgwJDK5hL4/1
+         WpVnGjkXLKN9mOmzNv98aROQ4jYG3xlBIUgxun4OwyOe8XScDghT0xf3IKrPKSiXI/A0
+         Qo3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722842299; x=1723447099;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/el0xGNFTdbbDtr5pZPM8/5Ct8VQl2stpFBoM0IeY1A=;
-        b=k+zno/p+Q0fJmH5I243cCU2bT0hV+r55Wl038HrCEtNnv4PvZ73d+PiLqaYQOObhad
-         T6kJIvcrTKIE3elFW33kTQZBhuq3VpG7Mls8J4ABJY1m3nLMOiO2RQlLegYgRqvP+C1/
-         xbK3ay9EIOxU9ecEmBbXyx1zymUgBfGyixRZxOItrPLeqKA5TXiC/C4i/uJxrsxN/hmb
-         d+r2fSxncTG5pdzuuMcBxrPZE+RR3+j1QtYhr18WiX3gUmFtLJsXF0Cr1S1wZuit4Hpk
-         4AmCKU9KgOxXOiO8ldEJy2FNcmgWmr95pp2BFycbV8qqmkrjOrPw5LXrIfAhsUfh4YMF
-         0y3w==
-X-Forwarded-Encrypted: i=1; AJvYcCViFzvMniDV4XPZ3U92fN5ZZ6WrFkutntwnyWkoFhBMhWZ4Rr3C0KkqczdE5zHPa/s6qRzkKCANiHoDH3PXYPAbVeSC1n5a6EML23wW6A4UPno36skqBY8pdzXikb1BxtpMiKBI
-X-Gm-Message-State: AOJu0Yz4Rza7tCWDdw9dPoWmWY3ZYM72rpqFXZ+AgXxI8zLwRBQiFBcx
-	CH3epJglEPXPFS5nEyv5HlOOJXj1IqbN8SROgCJIsFrFqThChxSF
-X-Google-Smtp-Source: AGHT+IHOjps80DUneOXvRsMhTqimZWaMVNi12LGFI9HVEfB5rRDEhUQya6OsdFDNELE3faQYIfKU/g==
-X-Received: by 2002:a17:90b:17cb:b0:2c9:321:1bf1 with SMTP id 98e67ed59e1d1-2cff955e51fmr13968237a91.39.1722842299500;
-        Mon, 05 Aug 2024 00:18:19 -0700 (PDT)
-Received: from 904-569.realtek.com.tw (59-124-166-19.hinet-ip.hinet.net. [59.124.166.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cffaf69d54sm6316927a91.12.2024.08.05.00.18.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Aug 2024 00:18:19 -0700 (PDT)
-From: hhorace <hhoracehsu@gmail.com>
-To: johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	hhorace <hhoracehsu@gmail.com>
-Subject: [PATCH] wifi: cfg80211: fix bug of mapping AF3x to incorrect User Priority
-Date: Mon,  5 Aug 2024 15:17:42 +0800
-Message-ID: <20240805071743.2112-1-hhoracehsu@gmail.com>
-X-Mailer: git-send-email 2.42.0.windows.2
+        d=1e100.net; s=20230601; t=1722842588; x=1723447388;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DwtAi2JDzAVWKNytVgaFiG1iE0Nc4sSYXPYsvIjBKDU=;
+        b=QA/VqKIqIf2dGRxWo1IkMoCwyqzktHYuPc+ZuQotbLQiuv1hFogOeAvnx1sDNFCnx5
+         3QpHSHQYOKjYs+tLIq1IvBsiixXyqaVhFIcvz8kxo0hkTEQwsK2XWPqb8KeHAVGO5m9f
+         bAsFLea/Hyz3BmOnkwaMYtA+AB4SGlA+yTJYodFm08+LlDTljY3zgbyq7aKZIsvE70Ya
+         r5OkFWe76J0z8d6AdD3JVXZT7k8pKauj7zP+j1z2K5zXuicFVI3ccM4wNukjbdZmjSrS
+         OjarB3GMi6FF1EGF9e9ZmLu257UXpE7+6iNHAGprNiXfPQF0eeVELgzK3xd1dUELsi8V
+         o97A==
+X-Forwarded-Encrypted: i=1; AJvYcCWniG3oH5x8A3Y+yloJcOVJpewyfoswG27D5uTOGRscc2gNSr1Qb09say7dy9Zmg2v09OHoj2FRLAe0yOHBeYWaeFfOCt3/
+X-Gm-Message-State: AOJu0YxzvfnErfeZ7lnlSxCSehtos+SVcJJJ5bz1o0Z1uI9HPG7dNJym
+	mAd15f634hJoIu/aBTWXDbrJtQXBxlzU1wlyvGt4QRCzWeD6sINbudKCtuxqv9xvN/BVm1cSFAC
+	oO5PLZhYJdYT8Q7U4qQl+04Puo3Ru7bBMICMa
+X-Google-Smtp-Source: AGHT+IEGUJM4hq/vsukiju3tD4QDurT9hpBRP4QGdwM3aICEZAEMueWtC90QZzuZKjFWZ9zdyjzgA/Cu+NVPKGJBXNc=
+X-Received: by 2002:a05:6402:270e:b0:5ac:4ce3:8f6a with SMTP id
+ 4fb4d7f45d1cf-5b9c68cf7f9mr209673a12.6.1722842587613; Mon, 05 Aug 2024
+ 00:23:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240801111611.84743-1-kuro@kuroa.me> <CANn89iKp=Mxu+kyB3cSB2sKevMJa6A3octSCJZM=oz4q+DC=bA@mail.gmail.com>
+ <CAL+tcoAHBSDLTNobA1MJ2itLja1xnWwmejDioPBQJh83oma55Q@mail.gmail.com> <CAL+tcoDnFCWpFvkjs=7r2C2L_1Fb_8X2J9S0pDNV1KfJKsFo+Q@mail.gmail.com>
+In-Reply-To: <CAL+tcoDnFCWpFvkjs=7r2C2L_1Fb_8X2J9S0pDNV1KfJKsFo+Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 5 Aug 2024 09:22:53 +0200
+Message-ID: <CANn89iLNnXEnaAY8xMQR6zeJPTd6ZxnJWo3vHE4d7oe9uXRMUg@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Xueming Feng <kuro@kuroa.me>, Lorenzo Colitti <lorenzo@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-According to RFC8325 4.3, Multimedia Streaming: AF31(011010, 26), 
-AF32(011100, 28), AF33(011110, 30) maps to User Priority = 4 
-and AC_VI (Video).
+On Mon, Aug 5, 2024 at 6:52=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Sat, Aug 3, 2024 at 11:48=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > Hello Eric,
+> >
+> > On Thu, Aug 1, 2024 at 9:17=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> > >
+> > > On Thu, Aug 1, 2024 at 1:17=E2=80=AFPM Xueming Feng <kuro@kuroa.me> w=
+rote:
+> > > >
+> > > > We have some problem closing zero-window fin-wait-1 tcp sockets in =
+our
+> > > > environment. This patch come from the investigation.
+> > > >
+> > > > Previously tcp_abort only sends out reset and calls tcp_done when t=
+he
+> > > > socket is not SOCK_DEAD aka. orphan. For orphan socket, it will onl=
+y
+> > > > purging the write queue, but not close the socket and left it to th=
+e
+> > > > timer.
+> > > >
+> > > > While purging the write queue, tp->packets_out and sk->sk_write_que=
+ue
+> > > > is cleared along the way. However tcp_retransmit_timer have early
+> > > > return based on !tp->packets_out and tcp_probe_timer have early
+> > > > return based on !sk->sk_write_queue.
+> > > >
+> > > > This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resche=
+d
+> > > > and socket not being killed by the timers. Converting a zero-window=
+ed
+> > > > orphan to a forever orphan.
+> > > >
+> > > > This patch removes the SOCK_DEAD check in tcp_abort, making it send
+> > > > reset to peer and close the socket accordingly. Preventing the
+> > > > timer-less orphan from happening.
+> > > >
+> > > > Fixes: e05836ac07c7 ("tcp: purge write queue upon aborting the conn=
+ection")
+> > > > Fixes: bffd168c3fc5 ("tcp: clear tp->packets_out when purging write=
+ queue")
+> > > > Signed-off-by: Xueming Feng <kuro@kuroa.me>
+> > >
+> > > This seems legit, but are you sure these two blamed commits added thi=
+s bug ?
+> > >
+> > > Even before them, we should have called tcp_done() right away, instea=
+d
+> > > of waiting for a (possibly long) timer to complete the job.
+> > >
+> > > This might be important when killing millions of sockets on a busy se=
+rver.
+> > >
+> > > CC Lorenzo
+> > >
+> > > Lorenzo, do you recall why your patch was testing the SOCK_DEAD flag =
+?
+> >
+> > I guess that one of possible reasons is to avoid double-free,
+> > something like this, happening in inet_csk_destroy_sock().
+> >
+> > Let me assume: if we call tcp_close() first under the memory pressure
+> > which means tcp_check_oom() returns true and then it will call
+> > inet_csk_destroy_sock() in __tcp_close(), later tcp_abort() will call
+> > tcp_done() to free the sk again in the inet_csk_destroy_sock() when
+> > not testing the SOCK_DEAD flag in tcp_abort.
+> >
+>
+> How about this one which can prevent double calling
+> inet_csk_destroy_sock() when we call destroy and close nearly at the
+> same time under that circumstance:
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index e03a342c9162..d5d3b21cc824 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -4646,7 +4646,7 @@ int tcp_abort(struct sock *sk, int err)
+>         local_bh_disable();
+>         bh_lock_sock(sk);
+>
+> -       if (!sock_flag(sk, SOCK_DEAD)) {
+> +       if (sk->sk_state !=3D TCP_CLOSE) {
+>                 if (tcp_need_reset(sk->sk_state))
+>                         tcp_send_active_reset(sk, GFP_ATOMIC,
+>                                               SK_RST_REASON_NOT_SPECIFIED=
+);
+>
+> Each time we call inet_csk_destroy_sock(), we must make sure we've
+> already set the state to TCP_CLOSE. Based on this, I think we can use
+> this as an indicator to avoid calling twice to destroy the socket.
 
-However, the original code remain the default three Most Significant
-Bits (MSBs) of the DSCP, which makes AF3x map to User Priority = 3
-and AC_BE (Best Effort).
+I do not think this will work.
 
-Signed-off-by: hhorace <hhoracehsu@gmail.com>
----
- net/wireless/util.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+With this patch, a listener socket will not get an error notification.
 
-diff --git a/net/wireless/util.c b/net/wireless/util.c
-index 082c6f9..4e04618 100644
---- a/net/wireless/util.c
-+++ b/net/wireless/util.c
-@@ -998,7 +998,6 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
- 	 * Diffserv Service Classes no update is needed:
- 	 * - Standard: DF
- 	 * - Low Priority Data: CS1
--	 * - Multimedia Streaming: AF31, AF32, AF33
- 	 * - Multimedia Conferencing: AF41, AF42, AF43
- 	 * - Network Control Traffic: CS7
- 	 * - Real-Time Interactive: CS4
-@@ -1026,6 +1025,12 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
- 		/* Broadcasting video: CS3 */
- 		ret = 4;
- 		break;
-+	case 26:
-+	case 28:
-+	case 30:
-+		/* Multimedia Streaming: AF31, AF32, AF33 */
-+		ret = 4;
-+		break;
- 	case 40:
- 		/* Signaling: CS5 */
- 		ret = 5;
--- 
-2.42.0.windows.2
-
+Ideally we need tests for this seldom used feature.
 
