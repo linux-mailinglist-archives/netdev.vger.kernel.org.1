@@ -1,212 +1,235 @@
-Return-Path: <netdev+bounces-115810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00756947DB5
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:08:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 273E7947DBF
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87C691F218A3
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:08:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78161F21674
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0CC13BC0C;
-	Mon,  5 Aug 2024 15:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0073213C81C;
+	Mon,  5 Aug 2024 15:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ViGl2BkL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyijvzCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837D013C81C;
-	Mon,  5 Aug 2024 15:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0B73F9D5
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 15:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722870527; cv=none; b=tkNuWDoG5VgVSC6zINq9qw7f6EhTxjNafFoIcixu5oS/Q7geCq9JnZGD6XOBY5WtIxuLhj+IU1T/6j5l4t++u/2xWQtyAoHLLFW26MoDV1YuJpsDZwlNB7kfksEkxU1K5gmkVnhIGh7Yxwqcga6q7VguWbAovqtn4ffWaudA3nQ=
+	t=1722870677; cv=none; b=mC31owLgP78g41N9jGYY7i+B/oPdORnunL/g+vz8BCVk+RJ5p4JuMnghlbcRcyU17dUeS/BCzG2zJoeJuEJp1fqCjY8bUnqVQ1GH1FPA4vo9vH1CinAE7jBVUDr3DxVmikQ5iWExwKWC/92ecjAVcUvWUS0vnh00RuHohIb+jI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722870527; c=relaxed/simple;
-	bh=wDFkb0BxIxOlQJsPJFBiPiCQWIb1ofqDpzdQDFiG/Ds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QwmoJVKQqrC+goVJENfitrJVkrKY7bvFPKjpTV0Le/t37UQgyUX6xpzOkgu/Cfl0Ee/DiOMeU8iS9WEU4+wl0fL54YSISgkvzKrBl5fuRYeaAObSPFkAxYTIHtkE6iEgPrtLLJMXVPdh+hTI2QFNjISLgqQyAWQRFg4U4CpOOtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ViGl2BkL; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=GKfjloD6oa4JOXSe00nlirkRPmxpIJuJ9zLXTqSQAPI=; b=ViGl2BkL5r4BIMOR6jnI4uLV52
-	VePlXnOarDVS1Nx3+Pes61PGKOmZNyyrQz4PxJrNzDyum7mAwZyrOEREG4J/zrFnA7BP4dDRBCI04
-	vVXWyHRvdlFKnPFIMZggeKkRwdxGKYYU++s25DqQb6jNFr7CJI7tMM/PlLO+zEBQmXZirY/8I/pEG
-	qB1SGx8OXmgLlX7G1i+9ubCGs1XS7Sg8bh5/k9bmHKEgaLn8OzqO04FCKMETecwKjB+zqSvgf8edQ
-	80dQZXD3t6uZSkyFrBnE3UF/GSXGvFSQMon3rakHzukhg3h0tJ7F45Iuwk1C9L+l440iOt5FQZsRO
-	2n6SCCcg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39576)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sazK3-0003Fw-2D;
-	Mon, 05 Aug 2024 16:08:31 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sazK6-0002S7-0D; Mon, 05 Aug 2024 16:08:34 +0100
-Date: Mon, 5 Aug 2024 16:08:33 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	dl-S32 <S32@nxp.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 4/6] net: stmmac: dwmac-s32cc: add basic NXP S32G/S32R
- glue
-Message-ID: <ZrDq8aZh4LY5Q0UY@shell.armlinux.org.uk>
-References: <AM9PR04MB85064D7EDF618DB5C34FB83BE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1722870677; c=relaxed/simple;
+	bh=HVMgTpGl8bhh7aJMDh2fTYiipBFwllthvdVQmG3ckak=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZVrwMUB7oDieaeapjXXkc592ICUDk6X4eRHy0oUJcJY/IS8uj23CyKICMukHtGcp136u9tlvckcmCKgbXCUVfhY0SOBlUX889IVW7tlHjibT+C7MvY3+38n30bUOK+a/P7ckjoERNvVrUROQdGr8m5OSZtzGcvF87Z1+sj0D+bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YyijvzCj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722870675;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JPD3uGCjSR2+POGyy3mC3vHskslm3ZxBw0trVqWqt3A=;
+	b=YyijvzCjQl1Rk8jgNaD+gC2JIi1ynMOVPnr9tSuV5sTk6/uuc+bA9DMuB/BL/vKTcsrPPX
+	dVhtZ102kUY6l2oVMGrsSc5RGVYhzfox4ikmCZzgHkUwMEd/XHzuEIxT9cP8w7/tda9nrs
+	AjELOyXyYfdpKjuC4sPCpDlWdRoe0ls=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-345--JwPDLYRM8O-JTpDrYGWuA-1; Mon, 05 Aug 2024 11:11:13 -0400
+X-MC-Unique: -JwPDLYRM8O-JTpDrYGWuA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42808f5d220so17791695e9.0
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 08:11:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722870672; x=1723475472;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JPD3uGCjSR2+POGyy3mC3vHskslm3ZxBw0trVqWqt3A=;
+        b=OcX2+pZ10MJLVcbD/bhqqMW9k09Coi0dUo7TQHGZDrjXSmhmzkddVna2ZV0BQtOA+V
+         x/iiD8Xduaz/rvD0KIG/4dgkZPxL1Umo1kz2e4mAwC1xHmCGtfqA8nEJR/sSjtKTpzMj
+         QFguDiNTNvvMkl3eFxY9x/ew1xaGjWQq4lhh4VwdWPym7+o9miNx7sTAn1O5wBJCzhAx
+         1r8bf7RT+Lhx0YyWwcw+TK0jNSOjKIgIi94KgThO2W7sxZ8iXYIK0iyXSuhAXmfNU8Q6
+         6o63DYwFOXl7a+GG7908/oyAz1cm3qc7W9wBocBnc2rjxTFK9YWHani2Jf/J6ZbiuOrW
+         wBhg==
+X-Gm-Message-State: AOJu0Yzh1PhrEsgrAIVdolDjzkWagevuNRIxXL5U0lZxbqxiuWtOpidi
+	AUJExFi8pzuEazqmSh1gvf84IsQGESRIMbLfMNL6O1r0b16dZzvKMJ01YyJvpZe19Jqg2Xyq+1J
+	8EYuP/M9NoStVv8s0iVhYYhFxO5xVZbg4oVkLuYATd3LMkGg4nqLxJQ==
+X-Received: by 2002:a05:600c:1c15:b0:426:668f:5ed7 with SMTP id 5b1f17b1804b1-428e6affdebmr56307775e9.2.1722870671939;
+        Mon, 05 Aug 2024 08:11:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLB0a+Qp+Vf3o8mqtAwxGnpq7VlkIXZh0Eh/af8CzJVQWb7DVGnHiUyqiB4/Dj7QVkby31zg==
+X-Received: by 2002:a05:600c:1c15:b0:426:668f:5ed7 with SMTP id 5b1f17b1804b1-428e6affdebmr56307545e9.2.1722870671384;
+        Mon, 05 Aug 2024 08:11:11 -0700 (PDT)
+Received: from [192.168.0.114] (146-241-0-122.dyn.eolo.it. [146.241.0.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282baba5f2sm203572045e9.26.2024.08.05.08.11.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Aug 2024 08:11:10 -0700 (PDT)
+Message-ID: <74a14ded-298f-4ccc-aa15-54070d3a35b7@redhat.com>
+Date: Mon, 5 Aug 2024 17:11:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM9PR04MB85064D7EDF618DB5C34FB83BE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
+To: Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
+ <ZquJWp8GxSCmuipW@nanopsycho.orion>
+ <8819eae1-8491-40f6-a819-8b27793f9eff@redhat.com>
+ <Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <Zqy5zhZ-Q9mPv2sZ@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Aug 04, 2024 at 08:50:10PM +0000, Jan Petrous (OSS) wrote:
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 05cc07b8f48c..31628c363d71 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -153,6 +153,17 @@ config DWMAC_RZN1
->  	  This selects the Renesas RZ/N1 SoC glue layer support for
->  	  the stmmac device driver. This support can make use of a custom MII
->  	  converter PCS device.
+Hi all,
 
-There should be a blank line here.
+(same remark of my previous email). My replies this week will be 
+delayed, please allow for some extra latency.
 
-> +config DWMAC_S32CC
-> +	tristate "NXP S32G/S32R GMAC support"
-> +	default ARCH_S32
-> +	depends on OF && (ARCH_S32 || COMPILE_TEST)
-...
+On 8/2/24 12:49, Jiri Pirko wrote:
+> Thu, Aug 01, 2024 at 05:12:01PM CEST, pabeni@redhat.com wrote:
+>> On 8/1/24 15:10, Jiri Pirko wrote:
+>>> Tue, Jul 30, 2024 at 10:39:45PM CEST, pabeni@redhat.com wrote:
+>>>> +    type: enum
+>>>> +    name: scope
+>>>> +    doc: the different scopes where a shaper can be attached
+>>>> +    render-max: true
+>>>> +    entries:
+>>>> +      - name: unspec
+>>>> +        doc: The scope is not specified
+>>>> +      -
+>>>> +        name: port
+>>>> +        doc: The root for the whole H/W
+>>>
+>>> What is this "port"?
+>>
+>> ~ a wire plug.
+> 
+> What's "wire plug"? What of existing kernel objects this relates to? Is
+> it a devlink port?
 
-> +static void s32cc_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
-> +{
-> +	struct s32cc_priv_data *gmac = priv;
-> +	int ret;
-> +
-> +	if (!gmac->rx_clk_enabled) {
-> +		ret = clk_prepare_enable(gmac->rx_clk);
-> +		if (ret) {
-> +			dev_err(gmac->dev, "Can't set rx clock\n");
-> +			return;
-> +		}
-> +		dev_dbg(gmac->dev, "rx clock enabled\n");
-> +		gmac->rx_clk_enabled = true;
-> +	}
-> +
-> +	switch (speed) {
-> +	case SPEED_1000:
-> +		dev_dbg(gmac->dev, "Set tx clock to 125M\n");
-> +		ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_125M);
-> +		break;
-> +	case SPEED_100:
-> +		dev_dbg(gmac->dev, "Set tx clock to 25M\n");
-> +		ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_25M);
-> +		break;
-> +	case SPEED_10:
-> +		dev_dbg(gmac->dev, "Set tx clock to 2.5M\n");
-> +		ret = clk_set_rate(gmac->tx_clk, GMAC_TX_RATE_2M5);
-> +		break;
-> +	default:
-> +		dev_err(gmac->dev, "Unsupported/Invalid speed: %d\n", speed);
-> +		return;
-> +	}
-> +
 
-We seem to have multiple cases of very similar logic in lots of stmmac
-platform drivers, and I think it's about time we said no more to this.
-So, what I think we should do is as follows:
+I'm sorry, my hasty translation of my native language was really 
+inaccurate. Let me re-phrase from scratch: that is actually the root of 
+the whole scheduling tree (yes, it's a tree) for a given network device.
 
-add the following helper - either in stmmac, or more generically
-(phylib? - in which case its name will need changing.)
+One source of confusion is that in a previous iteration we intended to 
+allow configuring even objects 'above' the network device level, but 
+such feature has been dropped.
 
-static long stmmac_get_rgmii_clock(int speed)
-{
-	switch (speed) {
-	case SPEED_10:
-		return 2500000;
+We could probably drop this scope entirely.
 
-	case SPEED_100:
-		return 25000000;
+>>>> +      -
+>>>> +        name: netdev
+>>>> +        doc: The main shaper for the given network device.
+>>>> +      -
+>>>> +        name: queue
+>>>> +        doc: The shaper is attached to the given device queue.
+>>>> +      -
+>>>> +        name: detached
+>>>> +        doc: |
+>>>> +             The shaper is not attached to any user-visible network
+>>>> +             device component and allows nesting and grouping of
+>>>> +             queues or others detached shapers.
+>>>
+>>> What is the purpose of the "detached" thing?
+>>
+>> I fear I can't escape reusing most of the wording above. 'detached' nodes
+>> goal is to create groups of other shapers. i.e. queue groups,
+>> allowing multiple levels nesting, i.e. to implement this kind of hierarchy:
+>>
+>> q1 ----- \
+>> q2 - \SP / RR ------
+>> q3 - /    	    \
+>> 	q4 - \ SP -> (netdev)
+>> 	q5 - /	    /
+>>                    /
+>> 	q6 - \ RR
+>> 	q7 - /
+>>
+>> where q1..q7 are queue-level shapers and all the SP/RR are 'detached' one.
+>> The conf. does not necessary make any functional sense, just to describe the
+>> things.
+> 
+> Can you "attach" the "detached" ones? They are "detached" from what?
 
-	case SPEED_1000:
-		return 125000000;
+I see such name is very confusing. An alternative one could be 'group', 
+but IIRC it was explicitly discarded while discussing a previous iteration.
 
-	default:
-		return -ENVAL;
-	}
-}
+The 'detached' name comes from the fact the such shapers are not a 
+direct representation of some well-known kernel object (queues, devices),
 
-Then, this can become:
+>>>> +    -
+>>>> +      name: group
+>>>> +      doc: |
+>>>> +        Group the specified input shapers under the specified
+>>>> +        output shaper, eventually creating the latter, if needed.
+>>>> +        Input shapers scope must be either @queue or @detached.
+>>>> +        Output shaper scope must be either @detached or @netdev.
+>>>> +        When using an output @detached scope shaper, if the
+>>>> +        @handle @id is not specified, a new shaper of such scope
+>>>> +        is created and, otherwise the specified output shaper
+>>>> +        must be already existing.
+>>>
+>>> I'm lost. Could this designt be described in details in the doc I asked
+>>> in the cover letter? :/ Please.
+>>
+>> I'm unsure if the context information here and in the previous replies helped
+>> somehow.
+>>
+>> The group operation creates and configure a scheduling group, i.e. this
+>>
+>> q1 ----- \
+>> q2 - \SP / RR ------
+>> q3 - /    	    \
+>> 	q4 - \ SP -> (netdev)
+>> 	q5 - /	    /
+>>                    /
+>> 	q6 - \ RR
+>> 	q7 - /
+>>
+>> can be create with:
+>>
+>> group(inputs:[q6, q7], output:[detached,parent:netdev])
+>> group(inputs:[q4, q5], output:[detached,parent:netdev])
+>> group(inputs:[q1], output:[detached,parent:netdev])
+>> group(inputs:[q2,q3], output:[detached,parent:<the detached shaper create
+>> above>])
+> 
+> So by "inputs" and "output" you are basically building a tree. In
+> devlink rate, we have leaf and node, which is in sync with standard tree
+> terminology.
+> 
+> If what you are building is tree, why don't you use the same
+> terminology? If you are building tree, you just need to have the link to
+> upper noded (output in your terminology). Why you have "inputs"? Isn't
+> that redundant?
 
-	long tx_clk_rate;
+The idea behind the inputs/outputs naming is to represent the data flow 
+towards the wire.
+I'm fine with the parent/children naming, but IIRC Jakub was not happy 
+with it. Is there any intermediate ground that could satisfy both of you?
 
-	...
+Thanks,
 
-	tx_clk_rate = stmmac_get_rgmii_clock(speed);
-	if (tx_clk_rate < 0) {
-		dev_err(gmac->dev, "Unsupported/Invalid speed: %d\n", speed);
-		return;
-	}
+Paolo
 
-	ret = clk_set_rate(gmac->tx_clk, tx_clk_rate);
-
-> +	if (ret)
-> +		dev_err(gmac->dev, "Can't set tx clock\n");
-> +}
-> +
-> +static int s32cc_dwmac_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct plat_stmmacenet_data *plat;
-> +	struct s32cc_priv_data *gmac;
-> +	struct stmmac_resources res;
-> +	int ret;
-> +
-> +	gmac = devm_kzalloc(&pdev->dev, sizeof(*gmac), GFP_KERNEL);
-> +	if (!gmac)
-> +		return PTR_ERR(gmac);
-> +
-> +	gmac->dev = &pdev->dev;
-> +
-> +	ret = stmmac_get_platform_resources(pdev, &res);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret,
-> +				     "Failed to get platform resources\n");
-> +
-> +	plat = devm_stmmac_probe_config_dt(pdev, res.mac);
-> +	if (IS_ERR(plat))
-> +		return dev_err_probe(dev, PTR_ERR(plat),
-> +				     "dt configuration failed\n");
-> +
-> +	/* PHY interface mode control reg */
-> +	gmac->ctrl_sts = devm_platform_get_and_ioremap_resource(pdev, 1, NULL);
-> +	if (IS_ERR_OR_NULL(gmac->ctrl_sts))
-> +		return dev_err_probe(dev, PTR_ERR(gmac->ctrl_sts),
-> +				     "S32CC config region is missing\n");
-
-Testing with IS_ERR() is all that's required here.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
