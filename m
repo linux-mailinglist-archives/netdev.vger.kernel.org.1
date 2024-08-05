@@ -1,227 +1,179 @@
-Return-Path: <netdev+bounces-115727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BCFD9479E9
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:34:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346839479F1
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA653281CAE
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:34:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5554B1C20F78
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6712154BFF;
-	Mon,  5 Aug 2024 10:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b="P3e6V+Rz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11AD15444E;
+	Mon,  5 Aug 2024 10:36:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10011301.me.com (pv50p00im-ztdg10011301.me.com [17.58.6.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AA154BE4
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 10:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0625E13CFAD
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 10:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722854055; cv=none; b=L0kGStw/KY4PrZk3mj1XoJnb0IL9uaL2LD0IS2Leg1nbCgnWM1Ydz8bMu1vdRWWMHh69ZyI3G7ctdQDzlOkRlRng2XXDEDkGVK6kvYYxdxyes+tCH8YiXhlEb7nffCQrUz7m7vmKJdxmzO3mC4As1Y62FYSFjv2gJAnZBvDCwIA=
+	t=1722854187; cv=none; b=ZWFIWRMwTUyEkypMWZUUDFPMsoO+IXs7nMSeYh9VUmJg1zs6WFkhR0EWRfmvehfu3iKZmhKWGpEQpmDvUVwlyilHWIZ65xsp9R3WkCNvU4Y+6TXFgWqcNLVPIczvT3uX1BSZic94L6cSsQ8ePHFRlgONMs1c6vNPzGvYXskoWJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722854055; c=relaxed/simple;
-	bh=cKReRH94wFKtKtVHMa/L36Kq71/L+wmMJYY5Az9XTAk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZMzX/zboYK48aqWrYXNVLNj5Xq7/OhiZ5qCIEwWmwhdR6k5O7jfW8OEMYWUZwbNEdn3xOEqnDXK2MvTjpCd3NYoM31JKh0/qnSjr238PW9tswqLOkV0bxp7IpQRp6zJ9AA/NKuQPNR49LiFUjvX9mdc4G72jydP9JhPkTbI/gJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me; spf=pass smtp.mailfrom=kuroa.me; dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b=P3e6V+Rz; arc=none smtp.client-ip=17.58.6.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuroa.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuroa.me; s=sig1;
-	t=1722854053; bh=ZkuzDnwnrzCgvULtBdEnjPEEk57f0Z+/bZicr5k01dU=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	b=P3e6V+Rz4yXjoMb+qo7xA4pQKBSnygPAmtqswZEwNt9IisPCrZtPSDFGxEv3L1p2z
-	 vLXNfRyNnflXVafIQjbYSot3HSi0ajDyRC/sKDKtpjxIG+hp7WkPi4j7HLKRse+xu3
-	 xlKnKXeeKrkMBS+5dUao/Do0bLaQcgJWhpJV2WkP84Ta5ZCcsLzbGMbe07/bFljQhB
-	 gaItykGoVgG9InVP2iwN9BQieP9774JG5aaqsiARDJRo1EPH2QoFb7jTc/TE4eTRVi
-	 NJRpmnpiq9TG9+f3/ek661WqtLY/7AxbGDMDpHWJxrHsw0XNT6EaRW9JeOqH+ZRPj/
-	 x4f9GQ7/Tbh9Q==
-Received: from tora.kuroa.me (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id AB6B6180167;
-	Mon,  5 Aug 2024 10:34:08 +0000 (UTC)
-From: Xueming Feng <kuro@kuroa.me>
-To: "David S . Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>,
-	Yuchung Cheng <ycheng@google.com>,
-	Soheil Hassas Yeganeh <soheil@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Xueming Feng <kuro@kuroa.me>
-Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
-Date: Mon,  5 Aug 2024 18:33:55 +0800
-Message-Id: <20240805103355.219228-1-kuro@kuroa.me>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1722854187; c=relaxed/simple;
+	bh=09xIWUUbCIfPCgwFvCyNajtJTFh115YN9IntR+f31Ps=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aNTiLqFEdL2SArsGZ2P5SdBZXr+j0bsuObgs7YM22NA7+zHLQUuohgoGCG+1n3XpeJbr9QZ5/3UonXif/Q+2yIN4NJQMp3wRMkigOkZtxV1TBawqqbRdL+zh96td1FHhc4ugq5oR4Vco8L/IWe8TKQj0vKoQ0nj0G9dGhJiY2pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39aebcdfc3eso152922785ab.3
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 03:36:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722854185; x=1723458985;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tHsAQDnbHN39bib66hk3EdMrTvNQUrabc32Jkwldir0=;
+        b=KtEmIjaDwHClyH+tHowex7AqyEMT0nk221sdzSKgdUKAYdRMYizGU5PNdN7EuyidBE
+         +qJj0MscrRVTDlBoN5r3ZlHNARTLb1ZeaHqcchk68BAStyZ5YCbvjU0bkYuuWVPNqTRC
+         7cEEUbCMIF3bbn1TLXSRPcLmMBCn/8A9bWr+9k1oAmb20m90CjzLrEJKAF98ov6Y27RP
+         Z+Qax/W0xpv/oopiRGQ83BQL7bbx6qXWTGjBl6WJ0dQUObNB/UbxxRPIBnv+Unmoj7zo
+         GSrJJTMXa3l1Cy1p/i0GWfEStAHJypT5GEwzqWB6qe3tYtXSfkZgxvCb69aewZTHH3aC
+         YG4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVMBLKB/BhVmCStLJ8L4rCsnZ/dg4+mWaBlPdGRBQgrKv4g4GcoUPr5VV18NobOM0xJxHmMANxR52deDOzvMSIAlRGFQM5G
+X-Gm-Message-State: AOJu0YwdGQ6XjdETHfFfKTLscqU01xL+1JPggj4TgFbSuuKISjyu3gE/
+	BX3E6aMt9T9JZh6ixJ9qXpZCZEi5RtgwSQwkZZRP8stqY3yZ2g7c7rYZiN79RAJNiRdhDqoQKiH
+	mU2vdAfMIT3zF6APAbg+hQgxb82D/9IRPjYdLCtFHQtqolDmTAIJXkpM=
+X-Google-Smtp-Source: AGHT+IG6G7otkSxeg7x+HWPj9fBF+IVbbcVkNK147qwDFYeiCLxik3hEUwkFUoULCK5957NsxRdNfstqyWvOtGJ+wO0oCtzaSoQx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: BiHjgtpnWJ65c25Vo619cE8FSclVg5gG
-X-Proofpoint-GUID: BiHjgtpnWJ65c25Vo619cE8FSclVg5gG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-04_14,2024-08-02_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030 malwarescore=0
- adultscore=0 phishscore=0 mlxscore=0 spamscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=964 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2308100000 definitions=main-2408050076
+X-Received: by 2002:a05:6e02:19cc:b0:396:2d57:b1cb with SMTP id
+ e9e14a558f8ab-39b1f78607dmr8504345ab.0.1722854185095; Mon, 05 Aug 2024
+ 03:36:25 -0700 (PDT)
+Date: Mon, 05 Aug 2024 03:36:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b3e63e061eed3f6b@google.com>
+Subject: [syzbot] [bpf?] BUG: spinlock recursion in bpf_lru_push_free
+From: syzbot <syzbot+d6fb861ed047a275747a@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 5, 2024 at 4:04 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
->
-> On Mon, Aug 5, 2024 at 3:23 PM Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > On Mon, Aug 5, 2024 at 6:52 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > >
-> > > On Sat, Aug 3, 2024 at 11:48 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > >
-> > > > Hello Eric,
-> > > >
-> > > > On Thu, Aug 1, 2024 at 9:17 PM Eric Dumazet <edumazet@google.com> wrote:
-> > > > >
-> > > > > On Thu, Aug 1, 2024 at 1:17 PM Xueming Feng <kuro@kuroa.me> wrote:
-> > > > > >
-> > > > > > We have some problem closing zero-window fin-wait-1 tcp sockets in our
-> > > > > > environment. This patch come from the investigation.
-> > > > > >
-> > > > > > Previously tcp_abort only sends out reset and calls tcp_done when the
-> > > > > > socket is not SOCK_DEAD aka. orphan. For orphan socket, it will only
-> > > > > > purging the write queue, but not close the socket and left it to the
-> > > > > > timer.
-> > > > > >
-> > > > > > While purging the write queue, tp->packets_out and sk->sk_write_queue
-> > > > > > is cleared along the way. However tcp_retransmit_timer have early
-> > > > > > return based on !tp->packets_out and tcp_probe_timer have early
-> > > > > > return based on !sk->sk_write_queue.
-> > > > > >
-> > > > > > This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resched
-> > > > > > and socket not being killed by the timers. Converting a zero-windowed
-> > > > > > orphan to a forever orphan.
-> > > > > >
-> > > > > > This patch removes the SOCK_DEAD check in tcp_abort, making it send
-> > > > > > reset to peer and close the socket accordingly. Preventing the
-> > > > > > timer-less orphan from happening.
-> > > > > >
-> > > > > > Fixes: e05836ac07c7 ("tcp: purge write queue upon aborting the connection")
-> > > > > > Fixes: bffd168c3fc5 ("tcp: clear tp->packets_out when purging write queue")
-> > > > > > Signed-off-by: Xueming Feng <kuro@kuroa.me>
-> > > > >
-> > > > > This seems legit, but are you sure these two blamed commits added this bug ?
+Hello,
 
-My bad, I wasn't sure about the intend of the original commit that did not
-handle orphan sockets at the time of blaming, should have asked.
+syzbot found the following issue on:
 
-> > > > >
-> > > > > Even before them, we should have called tcp_done() right away, instead
-> > > > > of waiting for a (possibly long) timer to complete the job.
-> > > > >
-> > > > > This might be important when killing millions of sockets on a busy server.
-> > > > >
-> > > > > CC Lorenzo
-> > > > >
-> > > > > Lorenzo, do you recall why your patch was testing the SOCK_DEAD flag ?
-> > > >
-> > > > I guess that one of possible reasons is to avoid double-free,
-> > > > something like this, happening in inet_csk_destroy_sock().
-> > > >
-> > > > Let me assume: if we call tcp_close() first under the memory pressure
-> > > > which means tcp_check_oom() returns true and then it will call
-> > > > inet_csk_destroy_sock() in __tcp_close(), later tcp_abort() will call
-> > > > tcp_done() to free the sk again in the inet_csk_destroy_sock() when
-> > > > not testing the SOCK_DEAD flag in tcp_abort.
-> > > >
-> > >
-> > > How about this one which can prevent double calling
-> > > inet_csk_destroy_sock() when we call destroy and close nearly at the
-> > > same time under that circumstance:
-> > >
-> > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > index e03a342c9162..d5d3b21cc824 100644
-> > > --- a/net/ipv4/tcp.c
-> > > +++ b/net/ipv4/tcp.c
-> > > @@ -4646,7 +4646,7 @@ int tcp_abort(struct sock *sk, int err)
-> > >         local_bh_disable();
-> > >         bh_lock_sock(sk);
-> > >
-> > > -       if (!sock_flag(sk, SOCK_DEAD)) {
-> > > +       if (sk->sk_state != TCP_CLOSE) {
-> > >                 if (tcp_need_reset(sk->sk_state))
-> > >                         tcp_send_active_reset(sk, GFP_ATOMIC,
-> > >                                               SK_RST_REASON_NOT_SPECIFIED);
-> > >
-> > > Each time we call inet_csk_destroy_sock(), we must make sure we've
-> > > already set the state to TCP_CLOSE. Based on this, I think we can use
-> > > this as an indicator to avoid calling twice to destroy the socket.
-> >
-> > I do not think this will work.
-> >
-> > With this patch, a listener socket will not get an error notification.
-> 
-> Oh, you're right.
-> 
-> I think we can add this particular case in the if or if-else statement
-> to handle.
-> 
-> Thanks,
-> Jason
+HEAD commit:    3d650ab5e7d9 selftests/bpf: Fix a btf_dump selftest failure
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13a4c1a1980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5efb917b1462a973
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6fb861ed047a275747a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Summarizing above conversation, I've made a v2-ish patch, which should
-handles the double abort, and removes redundent tcp_write_queue_purge.
-Please take a look, in the meanwhile, I will see if I can make a test 
-for tcp_abort. If this looks good, I will make a formal v2 patch.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Any advice is welcomed. (Including on how to use this mail thread, I don't
-have much experience with it.)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/630e210de8d9/disk-3d650ab5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3576ca35748a/vmlinux-3d650ab5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5b33f099abfa/bzImage-3d650ab5.xz
 
-Signed-off-by: Xueming Feng <kuro@kuroa.me>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d6fb861ed047a275747a@syzkaller.appspotmail.com
+
+BUG: spinlock recursion on CPU#1, syz.4.1173/11483
+ lock: 0xffff888046908300, .magic: dead4ead, .owner: syz.4.1173/11483, .owner_cpu: 1
+CPU: 1 UID: 0 PID: 11483 Comm: syz.4.1173 Not tainted 6.10.0-syzkaller-12666-g3d650ab5e7d9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+ debug_spin_lock_before kernel/locking/spinlock_debug.c:87 [inline]
+ do_raw_spin_lock+0x227/0x370 kernel/locking/spinlock_debug.c:115
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
+ _raw_spin_lock_irqsave+0xe1/0x120 kernel/locking/spinlock.c:162
+ bpf_lru_list_push_free kernel/bpf/bpf_lru_list.c:318 [inline]
+ bpf_common_lru_push_free kernel/bpf/bpf_lru_list.c:538 [inline]
+ bpf_lru_push_free+0x1a7/0xb60 kernel/bpf/bpf_lru_list.c:561
+ htab_lru_map_delete_elem+0x613/0x700 kernel/bpf/hashtab.c:1475
+ bpf_prog_6f5f05285f674219+0x43/0x4c
+ bpf_dispatcher_nop_func include/linux/bpf.h:1252 [inline]
+ __bpf_prog_run include/linux/filter.h:691 [inline]
+ bpf_prog_run include/linux/filter.h:698 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2406 [inline]
+ bpf_trace_run2+0x2ec/0x540 kernel/trace/bpf_trace.c:2447
+ trace_contention_begin+0x117/0x140 include/trace/events/lock.h:95
+ __pv_queued_spin_lock_slowpath+0x114/0xdc0 kernel/locking/qspinlock.c:402
+ pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
+ queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ lockdep_lock+0x1b0/0x2b0 kernel/locking/lockdep.c:143
+ graph_lock kernel/locking/lockdep.c:169 [inline]
+ lookup_chain_cache_add kernel/locking/lockdep.c:3803 [inline]
+ validate_chain+0x21d/0x5900 kernel/locking/lockdep.c:3836
+ __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+ htab_lock_bucket+0x1a4/0x370 kernel/bpf/hashtab.c:167
+ htab_lru_map_delete_node+0x161/0x840 kernel/bpf/hashtab.c:817
+ __bpf_lru_list_shrink_inactive kernel/bpf/bpf_lru_list.c:225 [inline]
+ __bpf_lru_list_shrink+0x156/0x9d0 kernel/bpf/bpf_lru_list.c:271
+ bpf_lru_list_pop_free_to_local kernel/bpf/bpf_lru_list.c:345 [inline]
+ bpf_common_lru_pop_free kernel/bpf/bpf_lru_list.c:452 [inline]
+ bpf_lru_pop_free+0xd84/0x1a70 kernel/bpf/bpf_lru_list.c:504
+ prealloc_lru_pop kernel/bpf/hashtab.c:308 [inline]
+ __htab_lru_percpu_map_update_elem+0x242/0x9b0 kernel/bpf/hashtab.c:1355
+ bpf_percpu_hash_update+0x11a/0x200 kernel/bpf/hashtab.c:2421
+ bpf_map_update_value+0x347/0x540 kernel/bpf/syscall.c:181
+ generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1889
+ bpf_map_do_batch+0x3e0/0x690 kernel/bpf/syscall.c:5218
+ __sys_bpf+0x377/0x810
+ __do_sys_bpf kernel/bpf/syscall.c:5817 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5815 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5815
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fed319779f9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fed327ee048 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007fed31b05f80 RCX: 00007fed319779f9
+RDX: 0000000000000038 RSI: 0000000020000580 RDI: 000000000000001a
+RBP: 00007fed319e58ee R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fed31b05f80 R15: 00007ffcf9a1d7f8
+ </TASK>
+
+
 ---
- net/ipv4/tcp.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e03a342c9162..039a9c9301b7 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4614,6 +4614,10 @@ int tcp_abort(struct sock *sk, int err)
- {
- 	int state = inet_sk_state_load(sk);
- 
-+	/* Avoid force-closing the same socket twice. */
-+	if (state == TCP_CLOSE) {
-+		return 0;
-+	}
- 	if (state == TCP_NEW_SYN_RECV) {
- 		struct request_sock *req = inet_reqsk(sk);
- 
-@@ -4646,16 +4650,13 @@ int tcp_abort(struct sock *sk, int err)
- 	local_bh_disable();
- 	bh_lock_sock(sk);
- 
--	if (!sock_flag(sk, SOCK_DEAD)) {
--		if (tcp_need_reset(sk->sk_state))
--			tcp_send_active_reset(sk, GFP_ATOMIC,
--					      SK_RST_REASON_NOT_SPECIFIED);
--		tcp_done_with_error(sk, err);
--	}
-+	if (tcp_need_reset(sk->sk_state))
-+		tcp_send_active_reset(sk, GFP_ATOMIC,
-+					SK_RST_REASON_NOT_SPECIFIED);
-+	tcp_done_with_error(sk, err);
- 
- 	bh_unlock_sock(sk);
- 	local_bh_enable();
--	tcp_write_queue_purge(sk);
- 	if (!has_current_bpf_ctx())
- 		release_sock(sk);
- 	return 0;
--- 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
