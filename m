@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-115706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788B7947974
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:24:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8545994797C
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA7541C211D3
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:24:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F5F328160C
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0304515C15A;
-	Mon,  5 Aug 2024 10:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8684415E5BB;
+	Mon,  5 Aug 2024 10:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUiDXu22"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+FZoTC+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE64815B99D;
-	Mon,  5 Aug 2024 10:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55646156C62;
+	Mon,  5 Aug 2024 10:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722853266; cv=none; b=mFHpxzcDFwTCnbv78pMkZZ3FZB4viM5Ud0gcL5EjYN2N8Ex08QVO+EvPd9Vi9WxsDulLoyq6ukTzzz91BextsNxojbGHFMLJApEKRoYOswrcBP41Ij67AYcqW8tYUbFCr1JE5fqopOKUYyxQOP8FbFHfCIbJitflmhtfJOTS9YQ=
+	t=1722853269; cv=none; b=ZzTFwMAMh7tIxtZGNH/N8EOjZrZc1iBtPqjZQzcIk7s+PBtIiZtfdp+50edbmQxqJiM4g/u6DbG8Eo4rhxQ9saSqPKnr0MN1153Wfbdsj7LpT3jeJgKDmR3+fvf3ubC/Sn/QDWsyQn7+obeFD98Ebg+KVESC9B8CzoNS/52Hn20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722853266; c=relaxed/simple;
-	bh=9Fik8RXRQRa2crOyQlS1nroMylh+Z+5N4egxIxbBjx0=;
+	s=arc-20240116; t=1722853269; c=relaxed/simple;
+	bh=/O2/TlWp3zMCUKUw2fsXXmxsmDVNGJDzCxv0rpypKf4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=klEUddxaW82RF5V5MCaxOGSlNJIxJRs8FwkX065DXaemjPUvzpH7yelKg+qyLAuAXHnzr3r2g7X9pjTpZ7IU6bNk/J6W25+IMFTihWWq9/LsnqRsmY9SUQF1Q4P0oseHfMbBXzCg7+5Yx0Cm7i7RUUcJUcLZ04nWsMfLkRROzec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUiDXu22; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FB14C32782;
-	Mon,  5 Aug 2024 10:21:04 +0000 (UTC)
+	 MIME-Version; b=f6IyuTtz3edn9roO9NsENopudVKa4RmIOki87cE04KdKiHCuNBOEJJ/PxsKi+QVLMkZwRYYbBkLkPjUGDb6Ejg/v2vosZtlkvQGfiMxcLpD9tnoVlWZDzVZbUT2cvagbayG+XTsnkvwpzj3+n3OBB4O8nYtFdFILbDeZfnGJxQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+FZoTC+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E40A4C4AF10;
+	Mon,  5 Aug 2024 10:21:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722853266;
-	bh=9Fik8RXRQRa2crOyQlS1nroMylh+Z+5N4egxIxbBjx0=;
+	s=k20201202; t=1722853269;
+	bh=/O2/TlWp3zMCUKUw2fsXXmxsmDVNGJDzCxv0rpypKf4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eUiDXu22uB+jbLMph18hBLd/KCcOpYlxMPBisM53NfJD624xvBT1xw5G0sB7ATIAg
-	 78zkxf2hgsDgGOaRgopFdiJuMsGQJ5l7921xAAnYhmGXQIQiHmExHcncJUw8KGMJaJ
-	 Dk0mRDZIg3RuwZDfBtgyXJrMibNd3Nk3hI5V/Uzspymd8d5sTKncay2pPY1D4374RL
-	 V0j4Tg+tZ516U3PEzWv0t5v2TG2tlPWsTcjRgGXhbhgnFpK1ckm+ZOBELLESiGGjFo
-	 f2NgbJuSLg+OISfrxIQ1j9B+3AR2a0sqE8Dcfsqx4Q87QXz4/j2upBKjTccoCPJnVx
-	 UBXeHhIN/Lc6A==
+	b=N+FZoTC+68x2Ffbm/j8evQ8oJ0Bu+jSjLMPny1gejiLok5T0S8NhgAhA7iv5a4+uX
+	 8bqlzR8jbcE6J3DZfcyERozXAncaedmmJu9C9Uhd0RGJDYH/s28lR0++hH1IGC21GM
+	 3ichC/HKPZADvktqDBT/iz4trfEKKuSKqKKolynWhfPvf6A1DSPmJx+mpwgI9eupUK
+	 hJKZi2+3hMoT2vaAUFWp5AeA5mN4QGVH1EBRvsdZPL4FG9URkXZ58Sal2RdNy/DciZ
+	 T3E7+ebGh84DfyVd0WAXzJ46PL+yjXbKoFxQ2Nh5K1cJdecy8Fowit5s3rwy9Ux1ZE
+	 6MAnm8zSmiImw==
 From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
 To: gregkh@linuxfoundation.org
 Cc: linux-serial@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
+	Andreas Koensgen <ajk@comnets.uni-bremen.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	linux-hams@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 08/13] mctp: serial: propagage new tty types
-Date: Mon,  5 Aug 2024 12:20:41 +0200
-Message-ID: <20240805102046.307511-9-jirislaby@kernel.org>
+Subject: [PATCH 09/13] 6pack: remove sixpack::rbuff
+Date: Mon,  5 Aug 2024 12:20:42 +0200
+Message-ID: <20240805102046.307511-10-jirislaby@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240805102046.307511-1-jirislaby@kernel.org>
 References: <20240805102046.307511-1-jirislaby@kernel.org>
@@ -67,108 +67,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In tty, u8 is now used for data, ssize_t for sizes (with possible
-negative error codes). Propagate these types (and use unsigned in
-next_chunk_len()) to mctp.
+It's unused (except allocation and free).
 
 Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Matt Johnston <matt@codeconstruct.com.au>
+Cc: Andreas Koensgen <ajk@comnets.uni-bremen.de>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-hams@vger.kernel.org
 Cc: netdev@vger.kernel.org
 ---
- drivers/net/mctp/mctp-serial.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ drivers/net/hamradio/6pack.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-serial.c
-index 5bf6fdff701c..78bd59b0930d 100644
---- a/drivers/net/mctp/mctp-serial.c
-+++ b/drivers/net/mctp/mctp-serial.c
-@@ -64,18 +64,18 @@ struct mctp_serial {
- 	u16			txfcs, rxfcs, rxfcs_rcvd;
- 	unsigned int		txlen, rxlen;
- 	unsigned int		txpos, rxpos;
--	unsigned char		txbuf[BUFSIZE],
-+	u8			txbuf[BUFSIZE],
- 				rxbuf[BUFSIZE];
- };
+diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
+index 6ed38a3cdd73..29906901a734 100644
+--- a/drivers/net/hamradio/6pack.c
++++ b/drivers/net/hamradio/6pack.c
+@@ -88,7 +88,6 @@ struct sixpack {
+ 	struct net_device	*dev;		/* easy for intr handling  */
  
--static bool needs_escape(unsigned char c)
-+static bool needs_escape(u8 c)
+ 	/* These are pointers to the malloc()ed frame buffers. */
+-	unsigned char		*rbuff;		/* receiver buffer	*/
+ 	int			rcount;         /* received chars counter  */
+ 	unsigned char		*xbuff;		/* transmitter buffer	*/
+ 	unsigned char		*xhead;         /* next byte to XMIT */
+@@ -544,7 +543,7 @@ static inline int tnc_init(struct sixpack *sp)
+  */
+ static int sixpack_open(struct tty_struct *tty)
  {
- 	return c == BYTE_ESC || c == BYTE_FRAME;
- }
+-	char *rbuff = NULL, *xbuff = NULL;
++	char *xbuff = NULL;
+ 	struct net_device *dev;
+ 	struct sixpack *sp;
+ 	unsigned long len;
+@@ -574,10 +573,8 @@ static int sixpack_open(struct tty_struct *tty)
  
--static int next_chunk_len(struct mctp_serial *dev)
-+static unsigned int next_chunk_len(struct mctp_serial *dev)
- {
--	int i;
-+	unsigned int i;
+ 	len = dev->mtu * 2;
  
- 	/* either we have no bytes to send ... */
- 	if (dev->txpos == dev->txlen)
-@@ -99,7 +99,7 @@ static int next_chunk_len(struct mctp_serial *dev)
- 	return i;
- }
- 
--static int write_chunk(struct mctp_serial *dev, unsigned char *buf, int len)
-+static ssize_t write_chunk(struct mctp_serial *dev, u8 *buf, size_t len)
- {
- 	return dev->tty->ops->write(dev->tty, buf, len);
- }
-@@ -108,9 +108,10 @@ static void mctp_serial_tx_work(struct work_struct *work)
- {
- 	struct mctp_serial *dev = container_of(work, struct mctp_serial,
- 					       tx_work);
--	unsigned char c, buf[3];
- 	unsigned long flags;
--	int len, txlen;
-+	ssize_t txlen;
-+	unsigned int len;
-+	u8 c, buf[3];
- 
- 	spin_lock_irqsave(&dev->lock, flags);
- 
-@@ -293,7 +294,7 @@ static void mctp_serial_rx(struct mctp_serial *dev)
- 	dev->netdev->stats.rx_bytes += dev->rxlen;
- }
- 
--static void mctp_serial_push_header(struct mctp_serial *dev, unsigned char c)
-+static void mctp_serial_push_header(struct mctp_serial *dev, u8 c)
- {
- 	switch (dev->rxpos) {
- 	case 0:
-@@ -323,7 +324,7 @@ static void mctp_serial_push_header(struct mctp_serial *dev, unsigned char c)
+-	rbuff = kmalloc(len + 4, GFP_KERNEL);
+ 	xbuff = kmalloc(len + 4, GFP_KERNEL);
+-
+-	if (rbuff == NULL || xbuff == NULL) {
++	if (xbuff == NULL) {
+ 		err = -ENOBUFS;
+ 		goto out_free;
  	}
- }
+@@ -586,7 +583,6 @@ static int sixpack_open(struct tty_struct *tty)
  
--static void mctp_serial_push_trailer(struct mctp_serial *dev, unsigned char c)
-+static void mctp_serial_push_trailer(struct mctp_serial *dev, u8 c)
- {
- 	switch (dev->rxpos) {
- 	case 0:
-@@ -347,7 +348,7 @@ static void mctp_serial_push_trailer(struct mctp_serial *dev, unsigned char c)
- 	}
- }
+ 	sp->tty = tty;
  
--static void mctp_serial_push(struct mctp_serial *dev, unsigned char c)
-+static void mctp_serial_push(struct mctp_serial *dev, u8 c)
- {
- 	switch (dev->rxstate) {
- 	case STATE_IDLE:
-@@ -394,7 +395,7 @@ static void mctp_serial_tty_receive_buf(struct tty_struct *tty, const u8 *c,
- 					const u8 *f, size_t len)
- {
- 	struct mctp_serial *dev = tty->disc_data;
--	int i;
-+	size_t i;
+-	sp->rbuff	= rbuff;
+ 	sp->xbuff	= xbuff;
  
- 	if (!netif_running(dev->netdev))
- 		return;
+ 	sp->mtu		= AX25_MTU + 73;
+@@ -631,7 +627,6 @@ static int sixpack_open(struct tty_struct *tty)
+ 
+ out_free:
+ 	kfree(xbuff);
+-	kfree(rbuff);
+ 
+ 	free_netdev(dev);
+ 
+@@ -676,7 +671,6 @@ static void sixpack_close(struct tty_struct *tty)
+ 	del_timer_sync(&sp->resync_t);
+ 
+ 	/* Free all 6pack frame buffers after unreg. */
+-	kfree(sp->rbuff);
+ 	kfree(sp->xbuff);
+ 
+ 	free_netdev(sp->dev);
 -- 
 2.46.0
 
