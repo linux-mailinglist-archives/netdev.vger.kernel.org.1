@@ -1,55 +1,57 @@
-Return-Path: <netdev+bounces-115839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D75DF947F86
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:43:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58707947F8D
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BD7C1C210DD
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:43:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E6941F235AE
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A44D15C12C;
-	Mon,  5 Aug 2024 16:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BEA715C146;
+	Mon,  5 Aug 2024 16:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BqpewI9O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utcxyWms"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759743E479
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 16:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A491547E7;
+	Mon,  5 Aug 2024 16:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722876233; cv=none; b=WokrLoA4Sah6Vqr/UCJwUsuFHjmnpF3j57gQYraYTk1JijZbzwyQ5ZEBRzdBy/pwRXgqFNlEi/vChqcbGIoO4Fq3L/5i/pAcLbRebbBPRhozCVuLTnao2oKH8XHWJN3+HW0Rw8ck4wRrGsFOT433jtea+mdHuWVuSww268YNDN4=
+	t=1722876347; cv=none; b=LssGl0hP/YKZP+o7PFzCm4HZGlQJyAZvpYo/PSXR/C6fpbRHVFQTcsorzKHl6k8nplqnWuhT82dWRmcPyPy5NTG1T2r9jaa7+c+xDPATzZvUWaIxBtb8wFGQy43qs5Jm+I+21UZgf4tmrb34Jbd3/xRLLFR+BmNSVnAa+e4vmo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722876233; c=relaxed/simple;
-	bh=IYzpIwgA749ubwDygqpbEn776r+mWf0oLwip73DVMlE=;
+	s=arc-20240116; t=1722876347; c=relaxed/simple;
+	bh=26RdvaSTj/TLBYMyGJi/WjjDOj+f+vioOGEuWpEo9Wk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y9/9ELjFUhQ4V6EXccHlpxispJMoqaEcXLUMk90dstN5mpy+KSKA6QLWK3oUNE9mGsQX8Y07OXMw//sIR7aPGsRmIZNMMzh3AOY67Y4dnGfrkAlPJ9ha0V3Ggo4soNVQlZTuyKp3DihlZdtlkcj+qbKWji0RBGN2VpLX37QsL2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BqpewI9O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F14CC32782;
-	Mon,  5 Aug 2024 16:43:52 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDHbaMyeCJZfps64xdvr/Z65Wl3+bDvMkt8BfrTP6WHfd4RYIwrIF+lMPDgLOEggO2b+NNFSYV8KaykNac9xmz/v5dcGV56e/zowSq8N3QV8cPSCounBSQqzI9JTUCzkSeDtH/bv7k4PhZ5TJzpGS6c+uQNw+4bdeEVM64r0y2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utcxyWms; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B95C32782;
+	Mon,  5 Aug 2024 16:45:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722876233;
-	bh=IYzpIwgA749ubwDygqpbEn776r+mWf0oLwip73DVMlE=;
+	s=k20201202; t=1722876346;
+	bh=26RdvaSTj/TLBYMyGJi/WjjDOj+f+vioOGEuWpEo9Wk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BqpewI9OOvyZmfgD1idpqNKZ7lOkuYQKrPv0AlOxNsweZOIlvylqzPmj4qN7Zd22K
-	 3OY2j3RGR3Qk7dSYmf3lYWzGat8HxrVr9YcvTUDPk2D1lKr6xzloo/0JxTPh8WD2EU
-	 xHp9txoKRPAwYF6QA3s3N67qsJ0KfOuq7j689NpQNY+AKjXEBERZkw2FvSSFphVsY0
-	 ACtQ9wjeGNNwI7FMVEDhIwJ0ehPPVnPLzQeBWP24hEPNIR032CsCLDWl40dG0u3mfS
-	 z6yLf22RQShthmoyUXlkUIE7dzVan/nggkTVA4mz90fYz7dCF3bYsfpxR0mmBIPRxS
-	 glOQ+eEJEa/iQ==
-Date: Mon, 5 Aug 2024 17:43:50 +0100
+	b=utcxyWmsNMJx26OShO80X/NAFJKxHTUCe8BSPuoI15R6VNT8OHIvkGr4mN1WU9inn
+	 mYLUkrnwggiFrTbYBj7TCoSRwS5KrgbAdSXA31A9KOlvDY2fJ8KEnNqlkad9kZQZ1e
+	 3doFdpll7up9P4jOzNU9l6ePJ7DUeM1z8WRUQv3n1kVMOLhAPvSl2jPhYarp1sOwQM
+	 REZugAp56JGZm3ivJbAzcJHAymO4htynGZHrFnqhNtonmDQWbrpUOzi5FMRYmR3ffU
+	 SUK4C6SMzHidGKTgTH4fHKQ95OSRbdS332v4SHaYVtvduGLb3pkPeieajs0EtNa5mk
+	 4/e18xHTXlraQ==
+Date: Mon, 5 Aug 2024 17:45:43 +0100
 From: Simon Horman <horms@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 08/10] net: libwx: add eswitch switch api for
- devlink ops
-Message-ID: <20240805164350.GK2636630@kernel.org>
-References: <20240804124841.71177-1-mengyuanlou@net-swift.com>
- <5DD6E0A4F173D3D3+20240804124841.71177-9-mengyuanlou@net-swift.com>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2] net/chelsio/libcxgb: Add __percpu annotations to
+ libcxgb_ppm.c
+Message-ID: <20240805164543.GL2636630@kernel.org>
+References: <20240804154635.4249-1-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,94 +60,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5DD6E0A4F173D3D3+20240804124841.71177-9-mengyuanlou@net-swift.com>
+In-Reply-To: <20240804154635.4249-1-ubizjak@gmail.com>
 
-On Sun, Aug 04, 2024 at 08:48:39PM +0800, Mengyuan Lou wrote:
+On Sun, Aug 04, 2024 at 05:46:09PM +0200, Uros Bizjak wrote:
+> Compiling libcxgb_ppm.c results in several sparse warnings:
+> 
+> libcxgb_ppm.c:368:15: warning: incorrect type in assignment (different address spaces)
+> libcxgb_ppm.c:368:15:    expected struct cxgbi_ppm_pool *pools
+> libcxgb_ppm.c:368:15:    got void [noderef] __percpu *_res
+> libcxgb_ppm.c:374:48: warning: incorrect type in initializer (different address spaces)
+> libcxgb_ppm.c:374:48:    expected void const [noderef] __percpu *__vpp_verify
+> libcxgb_ppm.c:374:48:    got struct cxgbi_ppm_pool *
+> libcxgb_ppm.c:484:19: warning: incorrect type in assignment (different address spaces)
+> libcxgb_ppm.c:484:19:    expected struct cxgbi_ppm_pool [noderef] __percpu *pool
+> libcxgb_ppm.c:484:19:    got struct cxgbi_ppm_pool *[assigned] pool
+> libcxgb_ppm.c:511:21: warning: incorrect type in argument 1 (different address spaces)
+> libcxgb_ppm.c:511:21:    expected void [noderef] __percpu *__pdata
+> libcxgb_ppm.c:511:21:    got struct cxgbi_ppm_pool *[assigned] pool
+> 
+> Add __percpu annotation to *pools and *pool percpu pointers and to
+> ppm_alloc_cpu_pool() function that returns percpu pointer to fix
+> these warnings.
+> 
+> Compile tested only, but there is no difference in the resulting object file.
+> 
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v2: Limit source to less than 80 columns wide.
 
-Each patch needs a patch description describing not just what is done
-but why.
+Thanks for the update.
 
-Also, please seed the CC list for patch submissions
-using get_maintainer this.patch. I believe that b4
-will do that for you.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
-
-...
-
->  static void wx_devlink_free(void *devlink_ptr)
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_eswitch.c b/drivers/net/ethernet/wangxun/libwx/wx_eswitch.c
-> new file mode 100644
-> index 000000000000..a426a352bf96
-> --- /dev/null
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_eswitch.c
-> @@ -0,0 +1,53 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (C) 2019-2021, Intel Corporation. */
-
-Are you sure Intel holds the copyright on this code?
-
-> +
-> +#include <linux/pci.h>
-> +
-> +#include "wx_type.h"
-> +#include "wx_eswitch.h"
-> +#include "wx_devlink.h"
-> +
-> +int wx_eswitch_mode_set(struct devlink *devlink, u16 mode,
-> +			struct netlink_ext_ack *extack)
-> +{
-> +	struct wx_dl_priv *dl_priv = devlink_priv(devlink);
-> +	struct wx *wx = dl_priv->priv_wx;
-> +
-> +	if (wx->eswitch_mode == mode)
-> +		return 0;
-> +
-> +	if (wx->num_vfs) {
-> +		dev_info(&(wx)->pdev->dev,
-> +			 "Change eswitch mode is allowed if there is no VFs.");
-
-maybe: Changing eswitch mode is only allowed if there are no VFs.
-
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	switch (mode) {
-> +	case DEVLINK_ESWITCH_MODE_LEGACY:
-> +		dev_info(&(wx)->pdev->dev,
-> +			 "PF%d changed eswitch mode to legacy",
-> +			 wx->bus.func);
-> +		NL_SET_ERR_MSG_MOD(extack, "Changed eswitch mode to legacy");
-> +		break;
-> +	case DEVLINK_ESWITCH_MODE_SWITCHDEV:
-> +		dev_info(&(wx)->pdev->dev,
-> +			 "Do not support switchdev in eswitch mode.");
-> +		NL_SET_ERR_MSG_MOD(extack, "Do not support switchdev mode.");
-
-maybe: eswitch mode switchdev is not supported
-
-I am curious to know if you are planning to implement eswitch mode in the
-near future.  If not, is wx_eswitch_mode_set() needed: it seems unused in
-this patchset: it should probably be added in a patchset that uses it.
-
-> +		return -EINVAL;
-> +	default:
-> +		NL_SET_ERR_MSG_MOD(extack, "Unknown eswitch mode");
-> +		return -EINVAL;
-> +	}
-> +
-> +	wx->eswitch_mode = mode;
-> +	return 0;
-> +}
-> +
-> +int wx_eswitch_mode_get(struct devlink *devlink, u16 *mode)
-> +{
-> +	struct wx_dl_priv *dl_priv = devlink_priv(devlink);
-> +	struct wx *wx = dl_priv->priv_wx;
-> +
-> +	*mode = wx->eswitch_mode;
-> +	return 0;
-> +}
-
-...
 
