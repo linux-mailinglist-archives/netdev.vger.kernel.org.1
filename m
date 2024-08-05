@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-115920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22453948664
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:54:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E48E948666
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C98F21F23CD9
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:54:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A72E41C222DD
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2AE16F26F;
-	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0264816FF48;
+	Mon,  5 Aug 2024 23:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXz7yv/I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjcHlIg4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657B014B06C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63B716F850;
 	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722902057; cv=none; b=ehtajq2rQae7JzWlDDpupY2YYDDcT2D6VU9d6dlw+V2pJNa+VRh7mPbGVn8Wx0xAAUdKIWsF3IRSpEjDOh/0Uc7G7avd1vLAQ3c9CDbQahu+jvi21e9gosMHDOT59mjdMXtIlocwatZnDkumJCA1tt2t7RvBuQZfTB1JaIqY+vg=
+	t=1722902057; cv=none; b=ImXuVL9C4g6uu2tmyqu9MbfO8M0ooQmLrAKR6lywx2K/bs2iHj4JlwRNiQceVCQsqokI6kyDe46d+2v2PrZbPkp9Fcx3rZlQst9MQejWZ7fFuhpNtb6ywoSCdORSCFVt4pR58DtDqoH04raU1Kp/mSvdo9AYydTToAFpeq16pMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722902057; c=relaxed/simple;
-	bh=aDDyWum/RdGNYK5afYA6i1DTP/tBbriSvjj5iiczVac=;
+	bh=YOacJKFxKyNVmQpresSsfetJyoR67HqF+afcKUIrj5E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SeGOt6X+5SoJPzNtigp+TxQmFJJelfDbXNT0A6q7su1YnjE2L4NqvOkd2UK46iIJ/BicIWSw0kzlADZC7KDKHgYLK1rBMM/B4XX7rPUjCiSwYda1l8WeQLvRV488xzBmiAys1AH6Hnz+TfFo93ZmMUEW9wMfhhUuq2C4IVa8cII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXz7yv/I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44328C4AF0B;
+	 In-Reply-To:To:Cc; b=W92KBv4mDXe/Qe83wCuVjdZlBrgMGzsgiEEaXYbgCpPV2/RAC1/iAWrxKZpdjQtpZS4rnZR7IUH8knTAzrkCqXJwjkjxAICivsnOJG2l8esTBi0PeP39456Fy840AB9VwTEQjcsX5fAlB5tMcOZ1u7Vt5ZVSt8AFuldVmDreysA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjcHlIg4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4FB1BC4AF12;
 	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722902057;
-	bh=aDDyWum/RdGNYK5afYA6i1DTP/tBbriSvjj5iiczVac=;
+	bh=YOacJKFxKyNVmQpresSsfetJyoR67HqF+afcKUIrj5E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dXz7yv/Io6QrVNxsM0JL4QpoGMNo2sYX6Es1CEPOBPJfG9Jjsa0UJqAtYWWBqQeCj
-	 9vkplca+B5zlNDJgHYVb5/3BwwbM0Jl7uAqqPSRn+Ls1DcQ6gyQXYqkfozA39Fn/c5
-	 mWNlO3zmVf0zLKvKVOTRcc9XRmTz7FF2b3M8ifFOI6jkk88BhA74QA8je2Fs0KueFI
-	 zwbEPDBqW/9wklB6NDa0L1RatukjuvnUqDLJAQTTE3bfNW4gtYCi1epPmenE0lglPU
-	 98bmtchjhMs4wmQ6JIMRUaOxiuwFBFNWtiYLhI3yhZv5DbaVUfC3YyeqYHf8T6267G
-	 tYNy5iaUBjuDw==
+	b=kjcHlIg4uykzAIDVqCMRcH9/SpjV/Yq9Tn1Z8PTQx75B58Ach6dg/9mh9ST1G91N5
+	 AKWo23dAt3aC6uQP2pv+ISwTu47xXyunHbRzuswSSYyXgib2bntYVuv9+s4OG/GbAj
+	 RmfU8LRn9dUeiQR29idL+b+77dYVNXaBO8ULmmw+xdweVTtaIBlrN/KjNaBi5NbAMC
+	 5Ke6GGJsYOotrV6qPCgcXT1MiWWABsxQJZFuQFRJN4Jt90mcI66+s8q/6hrdQIWdEB
+	 V+OJ2TCGOXoncFuGBEFDfhz1FNW6wUeLq2mcH1nxhge8543oxujECJCLVfHp77DyDc
+	 JhZslccrVE5oQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 343A6C433E9;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3D430D20ABC;
 	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,45 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V3 0/3] mlx5 PTM cross timestamping support
+Subject: Re: [PATCH][next] tools: ynl: remove extraneous ; after statements
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172290205721.12421.3111275453782018152.git-patchwork-notify@kernel.org>
+ <172290205724.12421.5395655484283570485.git-patchwork-notify@kernel.org>
 Date: Mon, 05 Aug 2024 23:54:17 +0000
-References: <20240730134055.1835261-1-tariqt@nvidia.com>
-In-Reply-To: <20240730134055.1835261-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, jstultz@google.com, tglx@linutronix.de,
- anna-maria@linutronix.de, frederic@kernel.org, linux-kernel@vger.kernel.org,
- bhelgaas@google.com, linux-pci@vger.kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- cjubran@nvidia.com, bshapira@nvidia.com, rrameshbabu@nvidia.com
+References: <20240802113436.448939-1-colin.i.king@gmail.com>
+In-Reply-To: <20240802113436.448939-1-colin.i.king@gmail.com>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, nicolas.dichtel@6wind.com,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Jul 2024 16:40:51 +0300 you wrote:
-> Hi,
+On Fri,  2 Aug 2024 12:34:36 +0100 you wrote:
+> There are a couple of statements with two following semicolons,
+> replace these with just one semicolon.
 > 
-> This is V3. You can find V2 as part of a larger series here:
-> https://lore.kernel.org/netdev/d1dba3e1-2ecc-4fdf-a23b-7696c4bccf45@gmail.com/T/
-> 
-> This patchset by Rahul and Carolina adds PTM (Precision Time Measurement)
-> support to the mlx5 driver.
-> 
-> [...]
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> ---
+>  tools/net/ynl/lib/ynl.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [net-next,V3,1/3] net/mlx5: Add support for MTPTM and MTCTR registers
-    https://git.kernel.org/netdev/net-next/c/7e45c1e9edc0
-  - [net-next,V3,2/3] net/mlx5: Add support for enabling PTM PCI capability
-    https://git.kernel.org/netdev/net-next/c/bec6d85d43eb
-  - [net-next,V3,3/3] net/mlx5: Implement PTM cross timestamping support
-    https://git.kernel.org/netdev/net-next/c/d17125fb0923
+  - [next] tools: ynl: remove extraneous ; after statements
+    https://git.kernel.org/netdev/net-next/c/e8fc78eb658a
 
 You are awesome, thank you!
 -- 
