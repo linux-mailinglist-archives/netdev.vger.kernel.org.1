@@ -1,101 +1,175 @@
-Return-Path: <netdev+bounces-115808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C661947DA1
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:04:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD0F5947DA9
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5273B1C203BC
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:04:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDE341C2184F
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC4913C683;
-	Mon,  5 Aug 2024 15:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C5014885C;
+	Mon,  5 Aug 2024 15:07:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpWaIJAp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TF1Q4GEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206396F2F6;
-	Mon,  5 Aug 2024 15:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E8A13C81C
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 15:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722870290; cv=none; b=lkMahnCLSppImajjKWgn8naQ51Erf87Th6JL3A4kURAFgTmxNghOakfGLoam5M9Pni7wyMnZjAMYCdBQi+8Cx1jbo9En0MK6c3Km2/f9dJ0Pzl0zjgFSvBwiaT3n5nExA7ukqDmW8DSPA1aU5jfLeJBKUMFaSCxxsuWBYK20O50=
+	t=1722870460; cv=none; b=DqaNtlufnSMiq3yVQHFZvxcyiSq5N/x70au0m+VgrRdcFAajW+vCkKzWdi4YaIKSuIWVoBDQVH2JA8jAG4kTp9kAJlT5vW3pVJs4Z74x2NpPXogNzE7Z41S+a44quetC3bfaLVytxGBjCFGD2t573K7sbiZDj8xihH8ku2fmkAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722870290; c=relaxed/simple;
-	bh=/Gqb82182GJ7ifqE0uk/Nla2L7+0JFR4zbzbtq/Xhqs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZQoGtLJPRsCZfkDSI0JMVuHXMVswsGLca3w3RFN2Msu6ZQbiNY/Z6P5lyMwwPnYrCKArhWa/eWBQ45W6I7MPFodfJbc18/wToK1gqy2VbT7nszkEILFxrm/dTg4I3u6gZZhu/rwcSMWhO+7H8yWldVbmNrRdaF/gAlRLCzDHcKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpWaIJAp; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52efa98b11eso1721336e87.2;
-        Mon, 05 Aug 2024 08:04:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722870287; x=1723475087; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Gqb82182GJ7ifqE0uk/Nla2L7+0JFR4zbzbtq/Xhqs=;
-        b=lpWaIJAp16ZMjI+8rwHTpDmsJhEmuF1rk2fVVRqGM/4YqO/i4MImA1kqlBBd2U6B+g
-         XUYvDgPUtBjeIDVcbwFfqXSd8yg3Uy29IhcNH8GB0of/g9B0WnDOCs11mXb3J+y5Cst+
-         tV37Z7S8T6hPCB2YBr2ahO1JffLLS1Z4xeA7gNXHwJNXgyCSSVS1X08CdxdA2/SCD5QP
-         HNEZZKW4fuDK8UCYAZXLrC1pc+tz8hNhUHL9TkefYeZKATAJ+wgj1UQjV0W43VVtltYk
-         OlJmrBRMTrMg2uQMaZHcZPWmWR+HnxD+fghg1rwGTL/IZYyt9WDkp/i39AAgt6NjD4Ka
-         2GcA==
+	s=arc-20240116; t=1722870460; c=relaxed/simple;
+	bh=0xb13Rbxh+eEDlGrDAAI13sTfjjWJqfDXdmfsixf78s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oFDw/++hkmgBoB3kbcZ/1wQtjgae1jf3QHKutRk8aPkAypLqvugRtcGW1zDuZsPvKSdcxAwHvfRQ98zYBdHorEljSvnwAtEslrfCcwN1BelHmunh0URC/SSWf2Zh8ShYk2s/r601DCpVIKCP2fJQ1EgdUSRlNsHG9XKSu+wGGSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TF1Q4GEu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722870457;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o4HYh4hoxDN/J50E0Jnd1FVXoMrne/Iur0T/sKC6Q7c=;
+	b=TF1Q4GEuPjdGa+mNgFC4Ca/WeSMRgSZ7D0bH0feXHlt0+3mXCNDU7dQwZUO9Em66n6bjZt
+	M1/RTL7TN6uSgJ4MrjHEZmVDeA74xUhGajIyt2QvuwWs3vwg3pnoMEjqMy5zbUNuSip3yu
+	qysp8B+CeOyCy9UP9G8O/RKb/onyLd8=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-211-FNRPpkW8Pw2GURVLPCWPQg-1; Mon, 05 Aug 2024 11:07:36 -0400
+X-MC-Unique: FNRPpkW8Pw2GURVLPCWPQg-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7a1d0b29198so1178513885a.2
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 08:07:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722870287; x=1723475087;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Gqb82182GJ7ifqE0uk/Nla2L7+0JFR4zbzbtq/Xhqs=;
-        b=ADUtiH9P7BztbxBvNKXs1SIMSBR0PbyBaXrkKNxzstmfQn/QttN98xmbCQYF8j8Ptg
-         tcNlJfdBOt2TaPfpJqabp/OD9YaeNKxl2FsdsqXVYd0BUck+wB3gYtFt0WIPPAqVhZMX
-         VVcIB09FGOjV3eV2fGq86dpnDU/nJVoRJ0X39VH7Ng6oFAFwDx6p+I3IWs7YV/hVAh0E
-         w//F6z9bUd9wNhzdghqvg/t0hxUOFYmHsWKS8urKUm/1myp/cinv1+dgUCRjFJC+ayXv
-         kvNlsCq3BepzAlZZyWSs76IUtzK3q5t4SHATMCwxKsgBY83+3XzzQM9JWeMtqunBQXKP
-         kiKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUuSySQw8o1UwAwi1sfSLde5J3XRUg6uSFCAuF1iis3fTY8vmcPkMonWDLEuKX8WtZ7PSBlTrpEQY/tqbRopVZanWFeF6eGyX1Bepykp7umIr3Z0FGSitP5HyUZ/KSDBPI2fZNu
-X-Gm-Message-State: AOJu0Yzes7TA+F7lEE2+yMKnskkMs+os60U/R9YN0YYFkd2Nw5icYKRR
-	6Fn1pXoQ1w/hbJTK7hQl1PqwdV5ow4LIfQExzc1fhwICLJjYiIwrZ6qTjl8Y8JyoaJoMlBXGxdT
-	lfslnxvesBX6wwLiuaT5nZvVjwRI=
-X-Google-Smtp-Source: AGHT+IHtXF/b+BdgRW8ydHE95gguroW5hoRvA3hMIjAViRuKfUcgtBZQtCBnMeKEeFvh1998hhv6k2Xrmz0ePllO4Kk=
-X-Received: by 2002:a05:6512:3ca4:b0:52e:ccf4:c222 with SMTP id
- 2adb3069b0e04-530bb3b7bdemr4459342e87.9.1722870286858; Mon, 05 Aug 2024
- 08:04:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722870455; x=1723475255;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o4HYh4hoxDN/J50E0Jnd1FVXoMrne/Iur0T/sKC6Q7c=;
+        b=gfV6nmEKGCVFO+poxPH2UdzYUhs7k/OCNX1Wbd9dz9ZNJyvkILUGrFTAoGNeJzM0Oj
+         owAQP77Wa9Z/opqmlZyYyk5q9s7WkJQInzUT0MsiYSp9H/VIL+9A8goSVLvoKJdUYCGL
+         UNmKzBMRfxAJDNljY+TAt0UDwgWMs4AkoXEBvZgcaI2OeaJyMgsab5Op/OC7lstp/Qyy
+         oyR9D2WwwX7eaGasPaGvSlIc5CK4VtrZhcC0wv78UZ3mxRxAJDVO+qr7O9sgbQDRpVcK
+         KPcykscOmty9qNFwEHc4oj3yc7f03h68PdjFBVvSfUWavvhYaJV4S5xIofULzphQJZKJ
+         o2qg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGXK5Z0OxrPK5tuDRP3oCq6wM9TCoUvJgBi3ekWJ7wcaI8sZNMkIBRYEvFOXxcqYuO3e+o/QrE4gRTxkVzW5kr6FMQNEi5
+X-Gm-Message-State: AOJu0Yy2pTbZ2rwvkyRAnHUOPWF+0WGy35czuKo5gsWOUCU8rmf0bjMr
+	kjzgprOh5NzhuVch0fjT/eQF7Po/5ezmkubRb7RePKhIkDpIhj7r8Z9jeGzbXtolAgECLEsO4qy
+	V0w19ipTLPIoGKh+7SWM9mVEBzDe1DShA/p4BFKeYpKOawRhRcLYIOQ==
+X-Received: by 2002:a05:620a:29cb:b0:79d:5b8b:7ad0 with SMTP id af79cd13be357-7a34efca052mr1437714085a.65.1722870455365;
+        Mon, 05 Aug 2024 08:07:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyKUHpuaat+IlBO9jx6OMHcFHgn9Vn6iJEHthO0hM/eX95XRxJJxYlt4N6aAWmvQ48FL1ypg==
+X-Received: by 2002:a05:620a:29cb:b0:79d:5b8b:7ad0 with SMTP id af79cd13be357-7a34efca052mr1437711685a.65.1722870455002;
+        Mon, 05 Aug 2024 08:07:35 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::13])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f78adadsm360064485a.123.2024.08.05.08.07.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 08:07:34 -0700 (PDT)
+Date: Mon, 5 Aug 2024 10:07:32 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Serge Semin <fancer.lancer@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Jose Abreu <joabreu@synopsys.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 13/14] net: stmmac: remove obsolete pcs methods
+ and associated code
+Message-ID: <hrvupeqc2pgoqa7ecg5rtg657eyxwpe4eg7xl4o3ij4upqxyvt@iwplq3uo72kt>
+References: <Zqy4wY0Of8noDqxt@shell.armlinux.org.uk>
+ <E1sZpoq-000eHy-GR@rmk-PC.armlinux.org.uk>
+ <ij562xfhvgxmvpgh2l6rhsvcpi43yvvkvef4wgpjupwusi6uwy@cpnkopeu7cpc>
+ <Zq0yAjzrpIEhcHBZ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240805145735.2385752-1-csokas.bence@prolan.hu>
-In-Reply-To: <20240805145735.2385752-1-csokas.bence@prolan.hu>
-From: Fabio Estevam <festevam@gmail.com>
-Date: Mon, 5 Aug 2024 12:04:35 -0300
-Message-ID: <CAOMZO5BzcZR8PwKKwBssQq_wAGzVgf1ffwe_nhpQJjviTdxy-w@mail.gmail.com>
-Subject: Re: [PATCH] net: fec: Stop PPS on driver remove
-To: =?UTF-8?B?Q3PDs2vDoXMsIEJlbmNl?= <csokas.bence@prolan.hu>
-Cc: imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zq0yAjzrpIEhcHBZ@shell.armlinux.org.uk>
 
-On Mon, Aug 5, 2024 at 11:59=E2=80=AFAM Cs=C3=B3k=C3=A1s, Bence <csokas.ben=
-ce@prolan.hu> wrote:
+On Fri, Aug 02, 2024 at 08:22:42PM GMT, Russell King (Oracle) wrote:
+> On Fri, Aug 02, 2024 at 02:02:25PM -0500, Andrew Halaney wrote:
+> > On Fri, Aug 02, 2024 at 11:47:32AM GMT, Russell King (Oracle) wrote:
+> > > The pcs_ctrl_ane() method is no longer required as this will be handled
+> > > by the mac_pcs phylink_pcs instance. Remove these methods, their common
+> > > implementation, the pcs_link, pcs_duplex and pcs_speed members of
+> > > struct stmmac_extra_stats, and stmmac_has_mac_phylink_select_pcs().
+> > >
+> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> >
+> > ...
+> >
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > index 3c8ae3753205..799af80024d2 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > @@ -321,48 +321,6 @@ static int stmmac_ethtool_get_link_ksettings(struct net_device *dev,
+> > >  {
+> > >  	struct stmmac_priv *priv = netdev_priv(dev);
+> > >
+> > > -	if (!(priv->plat->flags & STMMAC_FLAG_HAS_INTEGRATED_PCS) &&
+> >
+> > This change effectively makes the INTEGRATED_PCS flag useless, I think
+> > we should remove it entirely.
 >
-> PPS was not stopped in `fec_ptp_stop()`, called when
-> the adapter was removed. Consequentially, you couldn't
-> safely reload the driver with the PPS signal on.
+> I'm hoping the ethqos folk are going to test this patch series and tell
+> me whether it works for them - specifically Sneh Shah who added
 >
-> Signed-off-by: Cs=C3=B3k=C3=A1s, Bence <csokas.bence@prolan.hu>
+> 	net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII
+>
+> which directly configures the PCS bypassing phylink. Specifically,
+> if this in stmmac_check_pcs_mode():
+>
+> 	priv->dma_cap.pcs && interface == PHY_INTERFACE_MODE_SGMII
+>
+> is true for this device, then we may be in for problems. Since
+> priv->dma_cap.pcs comes from hardware, it's impossible to tell
+> unless one has that hardware.
 
-It seems this one deserves a Fixes tag.
+Hopefully we get a response there. For what its worth I have a
+access to the sa8775p-ride.dts board in a remote lab and
+dma_cap.pcs is definitely set for this integration of the IP
+on sa8775p. The only upstream described boards are:
 
-Reviewed-by: Fabio Estevam <festevam@gmail.com>
+    1) sa8775p-ride
+    2) sa8775p-ride-r3
+
+The difference is that "r3" is the latest spin of the board, with some
+Aquantia phys attached to the 2 stmmac MACs on the board instead of the
+Marvell 88EA1512 phys on the former. My understanding is that's to
+evaluate 2500 Mbps speeds (the 88EA1512 only goes up to 1000 Mbps).
+
+The "r3" board's Aquantia aqr115c's are capable of 2500 Mbps, but are
+"overclock SGMII". The "r3" describes the phy interface as 2500base-x,
+with no in-band signalling (since the "OCSGMII" is hacked up and doesn't
+really do the in-band signalling you've described in the past). That's
+all based on Bart's commit message adding support for that in:
+
+    0ebc581f8a4b7 net: phy: aquantia: add support for aqr115c
+
+I think Sneh also had access to a board with the sa8775p in a fixed-link
+configuration doing 2500 Mbps, but that's not described upstream at the
+moment. I believe that was the board that originally motivated the patch
+you highlighted from him.
+
+At the very least Bartosz and I tested this and things didn't break
+noticeably for the 2 boards I listed above... so that's good :)
+
+Hope that helps,
+Andrew
+
 
