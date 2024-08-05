@@ -1,110 +1,140 @@
-Return-Path: <netdev+bounces-115618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292839473F9
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 05:48:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4048F947418
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 06:02:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A67A3281454
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 03:48:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7875B1C20FD7
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 04:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF58B139D00;
-	Mon,  5 Aug 2024 03:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B78C142E70;
+	Mon,  5 Aug 2024 04:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NrDJ9Dof"
+	dkim=pass (1024-bit key) header.d=kaechele.ca header.i=@kaechele.ca header.b="OF1LGJsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC3217C;
-	Mon,  5 Aug 2024 03:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail.kaechele.ca (mail.kaechele.ca [54.39.219.105])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5157639;
+	Mon,  5 Aug 2024 04:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.39.219.105
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722829707; cv=none; b=MMOsBGWXjj7ovcc0H7w3hJId70IMx33s5GdxyiXwD0sJQFwbE3Udfz+eP0mTnFrcPLxHQy0KhA4Es920RIznXPE+jYmRQqxHS4S6EYcebZh6Pa8L/uB/qLsaNVVR0hrEKo9IXQ8KdugD78YoLF6ECvxDYao0TLTDNhQbEk/TSGs=
+	t=1722830508; cv=none; b=ep+nZc6WERgg7IMr9VVdZL5r7kX8Jhh7EJaUz/H/Q/h85w0ufjcB38usCd+xR24bbvM4Lvugs2A/wnqo+o/08upXQ8idRgIfuS9cXcI5ubfx28iO8BuRzlscHt8uRUIiX5utRqYsl0mJk1seDTG1hwV4rBMSO8hQ5IK//GEJHq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722829707; c=relaxed/simple;
-	bh=Kr8VkxqwdLJEc+8lOx1IkDrCAtqFKqHlW/+7miCSysE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nH24TebcwgE3Wzkh/WIF0giEtPLkSrwaSCqkR00Ev0/GmrPdO+voHAuRmXUA2PhpFnEPhJeJ2nteetyvSDi02KDC3cP78QbFwdETnEkcjoqG6ltOEYbu+pUDWTFv4ABIg7hdxQJAfr7DxKRjOhcjv91hclUe7NVe7G8r6187nTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NrDJ9Dof; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id E3DB920B7165; Sun,  4 Aug 2024 20:48:19 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E3DB920B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1722829699;
-	bh=FPsbgCxMbUXjFs/OhpM8wOzYmZyMHdRgGS32F/SfBnc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NrDJ9DofGmKuoc8YEMfKljJv5hpwMUL1rMOloJcJ/RxcsgsqKcuTDvx5rjdbyKT/W
-	 FKEY/7l+sTWJaKTthE5gB+3qAfuAH0QOje3itL83xSSq+mTGJCqItnF/A+qjKRQ913
-	 5iBjhiD8A+/uz93Xk+LcwHId6lKrl99qZRvV2sjo=
-Date: Sun, 4 Aug 2024 20:48:19 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Colin Ian King <colin.i.king@gmail.com>
-Subject: Re: [PATCH net-next v2] net: mana: Implement
- get_ringparam/set_ringparam for mana
-Message-ID: <20240805034819.GA13225@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1722358895-13430-1-git-send-email-shradhagupta@linux.microsoft.com>
- <4c32b96f-d962-4427-87c2-4953c91c9e43@linux.dev>
- <20240803113154.67a37efb@hermes.local>
+	s=arc-20240116; t=1722830508; c=relaxed/simple;
+	bh=07+1FVUgYC9ex4rTFJDQlLyNZWVcelgysbLKsmkJBqw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rzxpd93TIDsv4bAdO1PSS0Z0J6sVFOZOFjH0oTWvv6hth1m6weVsXFT3FWhMzneBwwk1XheEJtKAB4rBFPuLQEHS4gmO69MQBhdKIWIoV62fOUNzAEwlGA350VqYKzC7k0d/ko6LsN2w0lJNuz6XjY3iMH651ecNDsKgwsk4YSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaechele.ca; spf=pass smtp.mailfrom=kaechele.ca; dkim=pass (1024-bit key) header.d=kaechele.ca header.i=@kaechele.ca header.b=OF1LGJsi; arc=none smtp.client-ip=54.39.219.105
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaechele.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaechele.ca
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C5067C005F;
+	Mon,  5 Aug 2024 00:01:59 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaechele.ca; s=201907;
+	t=1722830523; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=GsQnhxsqicayvGUucI+ZWGDAQY9dTcFVmUnm38tQ6lo=;
+	b=OF1LGJsioPiIYWkr11cBsPOSimABMCK3Nb9UjZA9q7p+f4fuNp1OSYFbfH+eCe1GuquS5l
+	QphP3P0i1ItRDdVDOSbD7Ura+z9RehCwow5JcrQIQ6vssHQu2TG0gwSMwIW+8glWEj4uZP
+	kPTuSBdtFG6YP4zWIO8zmeRPMemZzBU=
+From: Felix Kaechele <felix@kaechele.ca>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <jjohnson@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Rocky Liao <quic_rjliao@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ath10k@lists.infradead.org,
+	linux-mmc@vger.kernel.org
+Subject: [PATCH 0/4] Add support for QCA9379 hw1.0 SDIO WiFi/BT
+Date: Mon,  5 Aug 2024 00:01:27 -0400
+Message-ID: <20240805040131.450412-1-felix@kaechele.ca>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240803113154.67a37efb@hermes.local>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Sat, Aug 03, 2024 at 11:31:54AM -0700, Stephen Hemminger wrote:
-> On Sun, 4 Aug 2024 02:09:21 +0800
-> Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
-> 
-> > >   
-> > >   	/*  The minimum size of the WQE is 32 bytes, hence
-> > > -	 *  MAX_SEND_BUFFERS_PER_QUEUE represents the maximum number of WQEs
-> > > +	 *  apc->tx_queue_size represents the maximum number of WQEs
-> > >   	 *  the SQ can store. This value is then used to size other queues
-> > >   	 *  to prevent overflow.
-> > > +	 *  Also note that the txq_size is always going to be MANA_PAGE_ALIGNED,
-> > > +	 *  as tx_queue_size is always a power of 2.
-> > >   	 */
-> > > -	txq_size = MAX_SEND_BUFFERS_PER_QUEUE * 32;
-> > > -	BUILD_BUG_ON(!MANA_PAGE_ALIGNED(txq_size));
-> > > +	txq_size = apc->tx_queue_size * 32;  
-> > 
-> > Not sure if the following is needed or not.
-> > "
-> > WARN_ON(!MANA_PAGE_ALIGNED(txq_size));
-> > "
-> > 
-> > Zhu Yanjun
-> 
-> On many systems warn is set to panic the system.
-> Any constraint like this should be enforced where user input
-> is managed. In this patch, that would be earlier in mana_set_ringparam().
-> Looking there, the only requirement is that txq_size is between
-> the min/max buffers per queue and a power of 2.
+Add support for Qualcomm QCA9379-3 SDIO based adapters.
 
-Thanks Stephen, that's right.
+The Bluetooth part is straightforward. It simply adds a DT compatible
+string to the existing driver.
+
+The WiFi part is a followup to the RFC I sent back in February [0], that
+didn't receive any comments.
+
+Since then I aligned the patch closer to what the driver does for the
+QCA6174 rather than the QCA9377, as the latter hasn't been touched in a
+while.
+With that the driver no longer throws errors for non-existent calibration
+data.
+
+The roaming and group re-keying issues still persist, but may not be
+specific to this chipset, as this (or a similar issue) is apparently seen
+on other chipsets as well [1].
+The user impact of this issue is an intermittent loss of connectivity
+while the adapter re-associates. Other than that the connection is
+stable.
+
+I have tested this patch on a Lenovo ThinkSmart View (CD-18781Y) that
+comes with a LITEON WCBN3510A module. The firmware and boardfile used for
+testing was pulled from the original Android image. A file at
+/modem/verinfo/ver_info.txt on the Android image identifies the WiFi
+part as "WLAN.NPL.1.6-00163-QCANPLSWPZ-1" and the Bluetooth part as
+"BTFM.NPL.1.0.4-00002-QCABTFMSWPZ-1".
+
+No firmware files are currently available from public repositories, but
+they should available from the vendor website [2] for customers that have
+the according access.
+
+I can submit the boardfile to the ath10k list once this patch is
+accepted. The one that is included with the Android system image has a
+sha256sum of 65767cca6a1ff88a9899235acdeeed1e9447a2f16f41d38052202835d5bda7d4.
+
+If someone from Qualcomm could add both the WiFi and BT firmwares to the
+linux-firmware repositories that would be much appreciated.
+I'm happy to test any firmware before submission, if desired.
+
+Thanks,
+Felix
+
+[0]: https://lore.kernel.org/ath10k/20240229032700.414415-1-felix@kaechele.ca/T/
+[1]: https://lore.kernel.org/ath10k/c407064a-1c2f-46ec-ac57-32bf9cf6f5c6@gmail.com/T/
+[2]: https://www.qualcomm.com/products/technology/wi-fi/qca9379#Software
+
+Felix Kaechele (4):
+  mmc: sdio: add Qualcomm QCA9379-3 SDIO id
+  wifi: ath10k: add support for QCA9379 hw1.0 SDIO
+  dt-bindings: net: bluetooth: qualcomm: add QCA9379 compatible
+  Bluetooth: hci_qca: add compatible for QCA9379
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     |  2 +
+ drivers/bluetooth/hci_qca.c                   |  1 +
+ drivers/net/wireless/ath/ath10k/core.c        | 37 +++++++++++++++++++
+ drivers/net/wireless/ath/ath10k/hw.h          | 10 +++++
+ drivers/net/wireless/ath/ath10k/pci.c         |  2 +
+ drivers/net/wireless/ath/ath10k/sdio.c        |  5 ++-
+ drivers/net/wireless/ath/ath10k/targaddrs.h   |  3 ++
+ include/linux/mmc/sdio_ids.h                  |  1 +
+ 8 files changed, 60 insertions(+), 1 deletion(-)
+
+
+base-commit: aefacd7c75edfaf6690819c1990b851f4c7b50cf
+-- 
+2.45.2
+
 
