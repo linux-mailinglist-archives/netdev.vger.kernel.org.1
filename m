@@ -1,112 +1,158 @@
-Return-Path: <netdev+bounces-115669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 451749476E4
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:08:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D52C947710
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A342B22D7F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:08:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D75C1281A60
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B18214B09C;
-	Mon,  5 Aug 2024 08:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7242814BF8D;
+	Mon,  5 Aug 2024 08:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwZxJGhG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2JhqSMw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2729145FE2
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 08:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EAA149C45;
+	Mon,  5 Aug 2024 08:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722845229; cv=none; b=QTde2rAHDajKXqlkAuXEsnau9jqB20Js6fX3TJeFcmlKV49n8pduUxjtYWHXQrsE8Jv+ypQZiA9ao7md5Dfl+K76ORBqJBWL6jZz7DqYevXNWlPZ1RgKaT+QB0ephIvolSxWALBDYpHk23wb04Wdcfo5ySiUr5s9ZPZ/GvcFYMU=
+	t=1722846020; cv=none; b=aT31cBxX6Jks9eMyroFYY5tmCWbNXWqkPI90C/4sVIK/wCYPBRFHstO430Poydz5mHjXHEMooYozlc6CQDkYCQTzIReWQ6Wx+REbR7/+vfS/tXUq4OQzwabGuU6ruxq8gn/gkI9rhA7F36MTxcE7+0xnBMM+ynaZrZt2aKy8B48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722845229; c=relaxed/simple;
-	bh=phuPVwD+wfac66YATqtp7KK0hsJ1HIi7c+DdxjIUmH4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VDTE5cYU8tmVN2VgVHCh+VdRKUe6MEWTmwiD953+wEnwmNXVf/BaypvXmtMWq6XqQLA5ONgD5nwCD8SmaVqX5Oz+u/INqJu09DI5uCI1t7j5qH/mrHYu2utPiwpU2LxX/CKaocbqVQycEGCc2lWoiih1GWXR/+vhnQA3qLEM0TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QwZxJGhG; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-81f9339e534so370505939f.3
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 01:07:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722845227; x=1723450027; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=phuPVwD+wfac66YATqtp7KK0hsJ1HIi7c+DdxjIUmH4=;
-        b=QwZxJGhGKrxu5KNA5mzrrI1OeTxNDB8bQvxNlz672ewxiMpUY/mZSrogD59p8N2t6V
-         b6Lyb9CECigGa27wt+MAKXt3BDy7OwBHpXjqmIR4PE/R86bnRK8pfmEdmm0HMQ7TmacI
-         xhidvZXWDIPm60JPiuwWj8uHeLoaSF48PXmZrhh2sNrlkAcoIInp+1lU64nCi9PEZMdZ
-         42dsWy4YNzQaMc2MlgTpy77Bqgj3qiKuZT4wk7/CNqCK8jDMgV9vJ9rsuS/YSOXd5xuZ
-         FI4ZUKUU/fErxRsHaEVPZHpdQlR8aHidP60X37UjdE09LUfwQ99hLzdgrewIl53oMQv5
-         h50g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722845227; x=1723450027;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=phuPVwD+wfac66YATqtp7KK0hsJ1HIi7c+DdxjIUmH4=;
-        b=VO1UIbR9ftr4W/xbxp9HBPg5//TsPLm8LGFE6V4z1Lz7cWdh91W3FnkWm/5NDICp8f
-         xACS471X1b529N3UBCuJrsIWfOnwyYBKPggNk3oqb7dTzgnhQAEA5U9Du0uDhhJhzfpo
-         qwTiiUwCSBLePv99jGmJ5We1jXPlsiviWVK9k69tJhg31kZmi4wDmZ2+gfpwJLJSNgqe
-         zPYhS4KRtHSR0zcYYS81RTfYo2RurdxqCGJmHQGeeDLVV5/oSYb+Pw+GQ3do36k+8juB
-         ZSKYhKpHKHKwQJVUpHo+nTGvv4NrE5iAXut1m8yPGWUYVWUU6+1hc1NtpapU6s2jFeDh
-         TL/w==
-X-Forwarded-Encrypted: i=1; AJvYcCX9CWDLwiTivNPijU9EjsHw875v7ZW6YKiO0cYALGSTfx+V/doZlVT+p6n7Bd9M08kzZ31rfSuFHlyIQC3Q9aUGYnwSqDaz
-X-Gm-Message-State: AOJu0YzKERjxA9TGKK58L9WnVCq62jKCf80yALTU3EqtqXIcQTQ4sGX0
-	fXiCaUFCQ138IxiBvDf8t80uvi8rSWyrg3S9Rs3s/wtX6F/KkQuJ9X03ZoGS2tk36zgStPP90FT
-	W3qHyuV5WzG8e3dl5cUktGHSoQXc=
-X-Google-Smtp-Source: AGHT+IERlTM+Tgfv9Rh0G7iiUx9D/lHy7eAx5+6wceSN5emHRtrmZTCXP148POpZRdB0EckTIAUsx+uNp2yqmrnGwlw=
-X-Received: by 2002:a92:de10:0:b0:39a:12d7:2849 with SMTP id
- e9e14a558f8ab-39b44b54d34mr3288975ab.5.1722845226978; Mon, 05 Aug 2024
- 01:07:06 -0700 (PDT)
+	s=arc-20240116; t=1722846020; c=relaxed/simple;
+	bh=wmW9uKSb/2SP16SrvbJjH83JY/E4lBeMVQe2z/6uRjA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OMVhoUixshh+iKXIGU2jSDHEkoAcVeXFsZ2/seJ9L5g3MwDFirATCOCY0eHtBjKxYwLT9/iFgDZB615FDzQvfbH4o72nnyzxmL7z28Xm2bFH1d/r+GWuOTk2U4H52soRUF7/YZN7g2U24V4mLIrtQBs5S4Mvp+bV6O5dztzxRzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2JhqSMw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51C2FC32782;
+	Mon,  5 Aug 2024 08:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722846019;
+	bh=wmW9uKSb/2SP16SrvbJjH83JY/E4lBeMVQe2z/6uRjA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=K2JhqSMwwZ8/QOqbW2z24A69QE2LKeq77pogtoozix5anJLdQzeonjm2LoPajQfIZ
+	 nqylIoAZzEh09TD54hvDIXt1C0v+ACyuPfec/M2c4o8RdA2g0w8SHwpIkjbYN9xMnB
+	 er+6CkbjyitB5FnDChNaVg+2wcRPoXlQUDkAib2plzLHjl4STJzIEcZ9D3zIKmRRfS
+	 /ztT+v6XTT/RUZsAICzX46uChxYO8yWjOxESCw5FfQ/z8AGVDJkyby36Nr9ZyR+884
+	 razxShdh6YS4V/Hq3hEquRjIFvfvGw944WXMlvpnjRIb0pEnCXlWNTu2VbBRVhzCs4
+	 nmcqHa9JxDULw==
+Message-ID: <d4d60cab-1872-4063-8b2f-a4ca0afd2718@kernel.org>
+Date: Mon, 5 Aug 2024 10:20:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802001956.566242-1-kuba@kernel.org> <CAL+tcoBNPUCCBhH_7iy4cNXQ0Mtrpe597DXos+s+NS7FVQ__zg@mail.gmail.com>
- <20240802074822.403243ef@kernel.org>
-In-Reply-To: <20240802074822.403243ef@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 5 Aug 2024 16:06:31 +0800
-Message-ID: <CAL+tcoAokKv9SLrNJksz5Vpgwb_Z4qCPfadFWJnnaBdnBj1xcA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: skbuff: sprinkle more __GFP_NOWARN on
- ingress allocs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nfc: nci: Fix uninit-value in nci_rx_work()
+To: Simon Horman <horms@kernel.org>, zhanghao <zhanghao1@kylinos.cn>
+Cc: bongsu.jeon@samsung.com,
+ syzbot+3da70a0abd7f5765b6ea@syzkaller.appspotmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240803121817.383567-1-zhanghao1@kylinos.cn>
+ <20240804105716.GA2581863@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240804105716.GA2581863@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 2, 2024 at 10:48=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 2 Aug 2024 12:52:06 +0800 Jason Xing wrote:
-> > > and there's nothing we can do about that. So no point
-> > > printing warnings.
-> >
-> > As you said, we cannot handle it because of that flag, but I wonder if
-> > we at least let users/admins know about this failure, like: adding MIB
-> > counter or trace_alloc_skb() tracepoint, which can also avoid printing
-> > too many useless/necessary warnings. Or else, people won't know what
-> > exactly happens in the kernel.
->
-> Hm, maybe... I prefer not to add counters and trace points upstream
-> until they have sat for a few months in production and proven their
-> usefulness.
->
-> We also have a driver-level, per device counter already:
-> https://docs.kernel.org/next/networking/netlink_spec/netdev.html#rx-alloc=
--fail-uint
-> and I'm pretty sure system level OOM tracking will indicate severe
-> OOM conditions as well.
+On 04/08/2024 12:57, Simon Horman wrote:
+> On Sat, Aug 03, 2024 at 08:18:17PM +0800, zhanghao wrote:
+>> Commit e624e6c3e777 ("nfc: Add a virtual nci device driver")
+>> calls alloc_skb() with GFP_KERNEL as the argument flags.The
+>> allocated heap memory was not initialized.This causes KMSAN
+>> to detect an uninitialized value.
+>>
+>> Reported-by: syzbot+3da70a0abd7f5765b6ea@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=3da70a0abd7f5765b6ea
+> 
+> Hi,
+> 
+> I wonder if the problem reported above is caused by accessing packet
+> data which is past the end of what is copied in virtual_ncidev_write().
+> I.e. count is unusually short and this is not being detected.
+> 
+>> Fixes: e624e6c3e777 ("nfc: Add a virtual nci device driver")
+>> Link: https://lore.kernel.org/all/000000000000747dd6061a974686@google.com/T/
+>> Signed-off-by: zhanghao <zhanghao1@kylinos.cn>
+>> ---
+>>  drivers/nfc/virtual_ncidev.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+>> index 6b89d596ba9a..ae1592db131e 100644
+>> --- a/drivers/nfc/virtual_ncidev.c
+>> +++ b/drivers/nfc/virtual_ncidev.c
+>> @@ -117,7 +117,7 @@ static ssize_t virtual_ncidev_write(struct file *file,
+>>  	struct virtual_nci_dev *vdev = file->private_data;
+>>  	struct sk_buff *skb;
+>>  
+>> -	skb = alloc_skb(count, GFP_KERNEL);
+>> +	skb = alloc_skb(count, GFP_KERNEL|__GFP_ZERO);
+>>  	if (!skb)
+>>  		return -ENOMEM;
+> 
+> I'm not sure this helps wrt initialising the memory as immediately below there
+> is;
+> 
+> 	if (copy_from_user(skb_put(skb, count), buf, count)) {
+> 		...
+> 
+> Which I assume will initialise count bytes of skb data.
 
-Thanks for your explanation. I see.
+Yeah, this looks like hiding the real issue.
+
+Best regards,
+Krzysztof
+
 
