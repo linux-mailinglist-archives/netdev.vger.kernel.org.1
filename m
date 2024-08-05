@@ -1,118 +1,92 @@
-Return-Path: <netdev+bounces-115607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1CF49472B0
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 02:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 045B89472E2
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 03:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 971F41F2272F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 00:57:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5C581F210CA
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 01:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CA327456;
-	Mon,  5 Aug 2024 00:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE08B5589B;
+	Mon,  5 Aug 2024 01:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cjVUFEEe"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D59FD53B;
-	Mon,  5 Aug 2024 00:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5512B9D4;
+	Mon,  5 Aug 2024 01:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722819420; cv=none; b=vDOc+FwvhLh1qrELP+I872UELkvhC0/cLcLWhHAlkMlLPM2mEpXqCx+Yardxwr+v9P22YbTg4vyN3n2aHyTi+womxlfUK2uQRFS80cX60NXIUIs7OzYPdw6IUEPnI8Fa9Zh46NMAAdU9364rn9aIEw10FniuNQXaYnV/KPBZEu0=
+	t=1722820255; cv=none; b=hhTNxmKLQ5dbavHWMhnHTxCWnFz7960apYc9ztJ2qygQRkjb3yg5RlxgJXS17jDk5fronk8C4G+1he0ZEpIiUct+1kqE9jKglF+INQ7Rpd92DaroYGMetLeZxklcACjkgLKdxaX95c0GTbxYfOmpNeSpgWETEkzV947pWraMU6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722819420; c=relaxed/simple;
-	bh=/Bu5vvVJrkQ5m+U11rKwuSTgdqBZvYO0/N/fbgg+pDw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ZR7L9CvTA0ETOvHV5aRF0baXEX8X3I5726RYLrtmak97EP8wA53OyQRNeZT+6khhACPOOGfCuUeU6btNa+wY20EGbCs4F8bzpN8yMzXi51VPunVMIN8u9oL2ixPuYUibknlEvs1DmlsirqHRlNdHytJ1wjK5E9p/T0P5Tj8dHs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WcdK96zPKzndpx;
-	Mon,  5 Aug 2024 08:55:41 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6AABA180087;
-	Mon,  5 Aug 2024 08:56:48 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 5 Aug 2024 08:56:47 +0800
-Message-ID: <ee560f28-0ff3-276c-1e4b-d72bd5a6fa4c@huawei.com>
-Date: Mon, 5 Aug 2024 08:56:47 +0800
+	s=arc-20240116; t=1722820255; c=relaxed/simple;
+	bh=Ntytnd3LjnnSWdcMbN61cNqRWuC4RpkfoypY5EK7dDg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PUdPesWQraPfvdmzpx9eGYg0a7GgDFoin/qSH9uaBOjSY2PwddFSJIDv2G+nPfLpdicWH9/sn2TLLS48Z3SrHzqMWNyDl36jlJmDmuNmuprQzuCEMvRh2DzNSylUiNKHFvE1v0xBJRiJM8gOBXVQsLmyUIasu/zObwm/LjKSfE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cjVUFEEe; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0TelagZdMac9NaG9bZqYHLjxFGgrFK4T4W00FD9MX9E=; b=cjVUFEEeLWDeZdx2G1rpvm1i3z
+	zXJzIIi+np3VDjZ7E4Tk7y8N+M+4Xzt483zfRqTwVUuAshei8gfqBaOPwsDvfCA1MpDWtXyEW6nrJ
+	Y6u/rPu3HmafRfom5427n4kE+BJvz6wECfdPrXQvDcF/t64knmYlYnO7O7kl4Mb9bq/8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1samFO-004047-ES; Mon, 05 Aug 2024 03:10:50 +0200
+Date: Mon, 5 Aug 2024 03:10:50 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
+	benno.lossin@proton.me, aliceryhl@google.com
+Subject: Re: [PATCH net-next v3 0/6] net: phy: add Applied Micro QT2025 PHY
+ driver
+Message-ID: <174bf437-5adf-4ebf-b909-036d6443dcf5@lunn.ch>
+References: <20240804233835.223460-1-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net-next] net/smc: add the max value of fallback reason
- count
-To: Wenjia Zhang <wenjia@linux.ibm.com>, "D. Wythe"
-	<alibuda@linux.alibaba.com>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <jaka@linux.ibm.com>, <tonylu@linux.alibaba.com>,
-	<guwen@linux.alibaba.com>, <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
-References: <20240801113549.98301-1-shaozhengchao@huawei.com>
- <a69bfb91-3cfa-4e98-b655-e8f0d462c55d@linux.alibaba.com>
- <4213b756-a92f-4be9-951d-893f4a6590b4@linux.ibm.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <4213b756-a92f-4be9-951d-893f4a6590b4@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240804233835.223460-1-fujita.tomonori@gmail.com>
 
-Hi Wenjia:
-     I will fix it in V2.
+On Mon, Aug 05, 2024 at 08:38:29AM +0900, FUJITA Tomonori wrote:
+> This patchset adds a PHY driver for Applied Micro Circuits Corporation
+> QT2025.
+> 
+> The first patch adds Rust equivalent to include/linux/sizes.h, makes
+> code more readable. The 2-5th patches update the PHYLIB Rust bindings.
+> 
+> QT2025 PHY support was implemented as a part of an Ethernet driver for
+> Tehuti Networks TN40xx chips. Multiple vendors (DLink, Asus, Edimax,
+> QNAP, etc) developed adapters based on TN40xx chips. Tehuti Networks
+> went out of business and the driver wasn't merged into mainline. But
+> it's still distributed with some of the hardware (and also available
+> on some vendor sites).
+> 
+> The original driver handles multiple PHY hardware (AMCC QT2025, TI
+> TLK10232, Aqrate AQR105, and Marvell MV88X3120, MV88X3310, and
+> MV88E2010). I divided the original driver into MAC and PHY drivers and
+> implemented a QT2025 PHY driver in Rust.
+> 
+> The MAC driver for Tehuti Networks TN40xx chips was already merged in
+> 6.11-rc1. The MAC and this PHY drivers have been tested with Edimax
+> EN-9320SFP+ 10G network adapter.
 
-Thank you
+Sorry about being slow reviewing this. I will get to it by the middle
+of the week.
 
-Zhengchao Shao
-
-On 2024/8/2 19:17, Wenjia Zhang wrote:
-> 
-> 
-> On 02.08.24 04:38, D. Wythe wrote:
->>
->>
->> On 8/1/24 7:35 PM, Zhengchao Shao wrote:
->>> The number of fallback reasons defined in the smc_clc.h file has reached
->>> 36. For historical reasons, some are no longer quoted, and there's 33
->>> actually in use. So, add the max value of fallback reason count to 50.
->>>
->>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->>> ---
->>>   net/smc/smc_stats.h | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/net/smc/smc_stats.h b/net/smc/smc_stats.h
->>> index 9d32058db2b5..ab5aafc6f44c 100644
->>> --- a/net/smc/smc_stats.h
->>> +++ b/net/smc/smc_stats.h
->>> @@ -19,7 +19,7 @@
->>>   #include "smc_clc.h"
->>> -#define SMC_MAX_FBACK_RSN_CNT 30
->>> +#define SMC_MAX_FBACK_RSN_CNT 50
->> It feels more like a fix ？
->>
->>>   enum {
->>>       SMC_BUF_8K,
->>
-> 
-> Hi Zhengchao,
-> 
-> IMO It should be 36 instead of 50 because of unnecessary smc_stats_fback 
-> element and  unnecessary scanning e.g. in smc_stat_inc_fback_rsn_cnt(). 
-> If there is any new reason code coming later, the one who are 
-> introducing the new reason code should update the the value 
-> correspondingly.
-> Btw, I also it is a bug fix other than feature.
-> 
-> Thanks,
-> Wenjia
+	Andrew
 
