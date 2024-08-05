@@ -1,201 +1,157 @@
-Return-Path: <netdev+bounces-115667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82819476DE
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:07:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A62499476E3
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 191C6B22463
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:07:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C457281087
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E344914B084;
-	Mon,  5 Aug 2024 08:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79EF14A634;
+	Mon,  5 Aug 2024 08:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j5ZSFCbn"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="S4iKi1uw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2059.outbound.protection.outlook.com [40.107.223.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF0E14A639;
-	Mon,  5 Aug 2024 08:04:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722845089; cv=none; b=inAoUyuXZVdOx8yA6dMkl7wJGZXla5KgbO4b2zOqsrg/D7qORrN2/J3OmMwQ3fdl0X3YsReY2aMI4O90vbzm4sY13UpB9GE6FgxDUjwHRWKBg4bap92kk/YBAjiZ/W/CUChBeHwVbuUbQkjl/jBPhuSBzCzhOeKw/KDN/46LptU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722845089; c=relaxed/simple;
-	bh=OH9eMFxXkTz3nZUDCbKgTQLCvQ/Ah5RpkU7tEaQnWIk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bA7/U1w/ILGfs7wrk1kIelZBzm69hsBIWKAvgariwtUKUyaoFqXFzpGztBP8OcKinlQ0Q2Xf0EH37wqoCxJtOr0MgFHZUEA4+jGwHdHv6wpDmCTKfqOoYoIuXjLNoZi3DP907iY7RKvgutmWFlsyf2+tCtBhuxVOmFfA9VFNz1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j5ZSFCbn; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-39b3c36d247so4393635ab.3;
-        Mon, 05 Aug 2024 01:04:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722845087; x=1723449887; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vV2EB2MiXTNRu5sSGmUBTQgjztxQtI0naxCItk5VCMw=;
-        b=j5ZSFCbn3lQL585lXmG41GYwGQC2tUll+LQds8l7ofcJNnTS4c19s3CwWDtGD+B5cD
-         6Telq1HHT+85tk+d0smfKGblwMYorB5stqJPPFooDYrRl98ywHUaN4swXRJ0ieFy0f6o
-         Ha+8NZMLIyUhBmozgO2iZw21pLT/BV7UgXF5f166ssC0PFXEYRphTwWH1PQ1OzSjIM/D
-         bmZ0eG4PUe+FeJHD1jzWpL3Qj7feOhi+ML6f1l87AQMY5YilhEXH2e5IK0fWKe9g8psT
-         VGObsTh/oPKIF5g707MDczMSiO0ylufeskhU3icVcM8bESf7wVTjYQpbMOLLoXrx2xPM
-         HXNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722845087; x=1723449887;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vV2EB2MiXTNRu5sSGmUBTQgjztxQtI0naxCItk5VCMw=;
-        b=KUxyrOeHIxRUdOiuXk5274lNV7Q1N1fBJyBZN6Hm5leueanHZAfJPuiQlZPdno8mab
-         6FWEXBOHoM8bdMq/E9VQk1NU+kv+p2SdnSIu5cRDbZGydzdwlcm7/FOpLqDz7s2g2t+m
-         5uZyT9H31Ow1wr18Ft5TYlp94lsc/QWtdkRV+K9zzsU4uCymjlUSvlqSphHCHkDZJolS
-         oZp+ypGoWs9yLFEZqzHfEqI4t1Xo0+c1TI7n3voK2FMvUeq/oJ0M6/dqR5uh1/lPIMvQ
-         f7LZFZkcdpTaGGz9vIkJs0Tkwn0UtsT+d/hug2n8Jq8RpxQftua1KNZm6t/spAO/cnwl
-         uBAw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaTWrhpexUKROZX3BVsNzLdL+CPIEUf3c59zhJJEzy78QbXOYogM2wMxBv310hNLWmPIuJWX/HW8jF/rU=@vger.kernel.org, AJvYcCXd1PfO953vK7Vueeqwi68gQ2BUFZUhFUK2HouhfRWcYNwOW/I7x4kYCJcVVMlGilitIX8MnYIM@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUPecak1x0PgPh6/pA/5RTXnxaIDIlzNXVPdO+XCtQdKOMeyf+
-	t/KyhHiKMlFRB+/DEdBmHALIdTp0fYoERvLndfYUE/VDTpG5jjygejcx2laZ8f0ItZO2m91rIKU
-	QK61Ii3LG9PK8m8DcX822fg2TFog=
-X-Google-Smtp-Source: AGHT+IFeJY5Nm8n1uDPCqlH+FYmRO8SXNlBC2mlab/7R7Rz2br2uDNHs1mCUAIkxvIr+ha3f5H+37kP4wUNJxSZjqVc=
-X-Received: by 2002:a92:d604:0:b0:382:f728:6ce5 with SMTP id
- e9e14a558f8ab-39b1fc3834amr110689185ab.27.1722845087396; Mon, 05 Aug 2024
- 01:04:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A681143C4B
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 08:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722845214; cv=fail; b=F3A1xrzWKZ65tRKN/Tr8EYRpOXJmDy4ACMCx2Y6jmOQkkaL0r1K6Og6HJFkK9N/mbv2c/87qIDfetZrB0hJe62TGvAZvyYuB/0Ml8WghD+xxKZgUggFcQWcBJQ32bP06AEU3AP0Ju3+w6vVHk7+aVTvYm31r0hYF9qh/Lxm+aT4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722845214; c=relaxed/simple;
+	bh=BgM809vKgIxKeybE04zU8tRE8gkplUZNYkgRiBCnLPY=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=bJDe4tVNOFIrWkAT/Poik8qvN2gUorUoFMrzBJ3gHy8lyDztymFjXr7X7+2b+Glr1dUAKJt7433KWrQZOvSw4ITU7knqjCD6s/V3ezP1vGVUNeLRDKNp7gFKjosRzarUeytXXGSnQcvdj39kdPed6GPeFN+/PsJ8sMwSa8IFwZo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=S4iKi1uw; arc=fail smtp.client-ip=40.107.223.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=oEMbKMjJysrakoXkbzjTnABsgQX8zpeFxSR7PQ/c/GsUlEnu7l6gwbQZb7azbDkU0hpDr/2lG5jfNmck4fJ0YOLOxJ69a02eZN3ATBitKZeZnVqQq7ArIE2Y7gtkuR1091mJoiDIoRKDQANeJfekSwBKfteE+FGA8cGS6sRbiY1BuJ1YzZE+4+0PE8+VRqAUONj6yU+OQd5QJ4H1tSTr11hYmgIP7VQM56XIuFJo0mni0P9HMDb7L8pSksjOAnc/k9oq2BCkdmC8CM9ghqn/tRYrx41RyQtq1ZTHDINz64DSV4pt7i9btsYQJ+oI2NhSPnIqgNXqKz/5VqFAK9mx0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BgM809vKgIxKeybE04zU8tRE8gkplUZNYkgRiBCnLPY=;
+ b=zRZuJ4qjpekD15J3d84zRyKyuxSGO3WsK7NMS9EkbUJ4gaZbLBxVVneZvL92gCHBoCWruunNUIJqcdyMNlWtFdM2BNHOvQ1K9pbKJisriUBFe8ClbMVMlUq+u3JNr1rlvL+O7uT4ktDAA722l0LWsFoa8Tn9VmOmTyRDnaRPKE9M1yh/hXGTLmEFyLK1jz66bgKiH+gYeDB5FD2eOukJPHWI917tSFyxw6doHA3lEa/z2eV+8ysvf+OpaO5YB2buw5d62KovL2plp+Ml2zT6xyuQkBDIuaqo2FawxMze81L4rfYfFnluGAkG2a6kHtnCrr+CjR8c5KMHqi5HYfuMwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BgM809vKgIxKeybE04zU8tRE8gkplUZNYkgRiBCnLPY=;
+ b=S4iKi1uwR9mETf8chH7jTTJj5cCz9UjoKtMlR34SWbY8MD6l023ABQ9CVeeVP5hB4ckG38eS8NeqbplfQ50+ejslhHk3AWMrV522UjXAgs1VftA1f7wcGlhLvy4sGUFRJaua4T1gQCR6+6n8tu+fVO1wjtBkRO1zFvA8xSPNxDcH3JJBRddy5niJTSso5YeeCwCAHsKUY27HU4+xCbdvZNpPaY1rxTdJbuApc6mI+Ip8NAK2XDvaa+W9V3oIjb+fJ0UdvN2FrYz07NK5u97kKPaQIK1DBFM5nnlSDuJJyVq6uiPTKvSNO1e20VQ1l8Kqlq2tTje8fiHr/r3W12jywg==
+Received: from MN2PR06CA0010.namprd06.prod.outlook.com (2603:10b6:208:23d::15)
+ by IA1PR12MB6435.namprd12.prod.outlook.com (2603:10b6:208:3ad::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27; Mon, 5 Aug
+ 2024 08:06:48 +0000
+Received: from BL02EPF0001A101.namprd05.prod.outlook.com
+ (2603:10b6:208:23d:cafe::2a) by MN2PR06CA0010.outlook.office365.com
+ (2603:10b6:208:23d::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26 via Frontend
+ Transport; Mon, 5 Aug 2024 08:06:48 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF0001A101.mail.protection.outlook.com (10.167.241.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Mon, 5 Aug 2024 08:06:48 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 5 Aug 2024
+ 01:06:30 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 5 Aug 2024
+ 01:06:25 -0700
+References: <cover.1722519021.git.petrm@nvidia.com>
+ <20240801155207.1b1c7db9@kernel.org>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
+	<dsahern@kernel.org>, Donald Sharp <sharpd@nvidia.com>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 0/6] net: nexthop: Increase weight to u16
+Date: Mon, 5 Aug 2024 10:06:17 +0200
+In-Reply-To: <20240801155207.1b1c7db9@kernel.org>
+Message-ID: <87bk275r7n.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801111611.84743-1-kuro@kuroa.me> <CANn89iKp=Mxu+kyB3cSB2sKevMJa6A3octSCJZM=oz4q+DC=bA@mail.gmail.com>
- <CAL+tcoAHBSDLTNobA1MJ2itLja1xnWwmejDioPBQJh83oma55Q@mail.gmail.com>
- <CAL+tcoDnFCWpFvkjs=7r2C2L_1Fb_8X2J9S0pDNV1KfJKsFo+Q@mail.gmail.com> <CANn89iLNnXEnaAY8xMQR6zeJPTd6ZxnJWo3vHE4d7oe9uXRMUg@mail.gmail.com>
-In-Reply-To: <CANn89iLNnXEnaAY8xMQR6zeJPTd6ZxnJWo3vHE4d7oe9uXRMUg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 5 Aug 2024 16:04:10 +0800
-Message-ID: <CAL+tcoADT8EnQdFctCHab0B6cf9WyhFoAzNMxOA+JraRuTfUug@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
-To: Eric Dumazet <edumazet@google.com>
-Cc: Xueming Feng <kuro@kuroa.me>, Lorenzo Colitti <lorenzo@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A101:EE_|IA1PR12MB6435:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5571ee7-356a-4cb4-c9bf-08dcb5258e4d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?VniEzmbR33lQVc1MSFcbqyWMQdlU2SOAl2fgDlv1/TGk4C+B0i6FkMCO9mHY?=
+ =?us-ascii?Q?zEJjauOu0Vyocw7uMTqHHnscTD/+h44a/kJWnUiYx1nHiLzmYQWyYp1Vog2Q?=
+ =?us-ascii?Q?9mb+l7sl67HCDzn6bldsI0OI8BxgWFbtjohQ1G/FbGKXNFXt1bpdOoJfvp+k?=
+ =?us-ascii?Q?hQIKzDm+ycZluBFrA68zRirKRUlER2Voy7uSgytZlisJFSFh6KeECGKEApZu?=
+ =?us-ascii?Q?83GcvWNNFKL9eI1AwonZgU1qr5p46knqnmqS3ndaefGDcNK6Ef1s9Vz6RuGM?=
+ =?us-ascii?Q?BokRDjRr2cuQh99gGMg2khZ+UlOw3G6Ie71Ou6NdE/kQNszcvhRRNXf1Bft/?=
+ =?us-ascii?Q?DTVWvXTpNqOkXxUDfEQgZbrxGm04L3rndCx68g1RyVgnVUh8CHpxvd0yv594?=
+ =?us-ascii?Q?nvjU7XrvSM4N8OHAf0FYszDjrJSJajKqIHnIrHaZMd3fS6ZsJ3x4ble1HnAf?=
+ =?us-ascii?Q?jWyqI2TBYNvb4sXMKBXkaq3SPUBu4ZJJTDH55//pIpRRbcS8PV8aQ1akLWcS?=
+ =?us-ascii?Q?cVF0N90JbeMHN+YQs3LTbeoWnTLtJSNwWC44zJmjrlCr0MbTn3Vqq7gNckoj?=
+ =?us-ascii?Q?WcUYE7iZHYA/pHNyghKiUR/6XAqOqow3W4W9G84Exf1YcaeZAog1d0TJcD94?=
+ =?us-ascii?Q?7lmIQHMOqOovQqPy6oJfA0mFrifBNxThncs0qjos0NDZBujZFjLYydq+UTLj?=
+ =?us-ascii?Q?Pln8w6jyvQx5mw0of+DPmSpMrgBnBLlzA6sal42tbArjVgUHziC2eFkdalq3?=
+ =?us-ascii?Q?Tz9JTgtFXM/9ijyogCcfnp4ulVWYj4WbJjOKuyOJW52js8u+zBn2dzp1GXac?=
+ =?us-ascii?Q?+6J3+Tg7pA2wbN1i8xofUBBWcsGdVF6Rj2C4eQ4MU4/Jk/NEQmdQhJFxsFO9?=
+ =?us-ascii?Q?1kp7t5xzM8DcLZipGnJN2WXjlg6Z/Q5TS2JnN/Hb74PXTzNz8rHzcJn4hyub?=
+ =?us-ascii?Q?cJJjRaQjE2Aaqfcfjdj6a4eXhuVjHpvKxhdKpRRhajCRQlZR2ZLlxdfj8DXc?=
+ =?us-ascii?Q?txfP4k4fo2HUUo2tRRmL3aNhTpMd+2pimpvJ2xHh/pfrncTPEsNlz3mvEuBY?=
+ =?us-ascii?Q?8QfHo5V/+1u2y/ms3O9MLpGhaE9h/Q/QRpprMJpenKAVdfiTcvwHxV59xyyh?=
+ =?us-ascii?Q?VaQwfIjAlb+orSn3eXlItA1p8WfEo1+7koYHtD/fXbYVRViMzF/QyXTV9eN0?=
+ =?us-ascii?Q?J/x1huS/ATp/Ntg82IidABSQPoEa0QU4B3EzSlfcV20jWBJfSx2cg9uZpMh0?=
+ =?us-ascii?Q?Jd8MWr2tcjvaRncftpO3Keg2voQVo44LNo3UVf3C7/pQgYDRnDUSnsrVWe2g?=
+ =?us-ascii?Q?e29Rab4HlNIuta5A5IddmV+9vYhaX2WIaCf/hYSA9grlUiNBfz/dZrk71HKv?=
+ =?us-ascii?Q?9GC8tMoVcyvA/ZRAXyl8yPPu2LHBb/mZIC21OwrRo4vqopr+JSt3Fv0+hBLJ?=
+ =?us-ascii?Q?Af0xdkkqAaHtJ7XIS5+topCDcmUBNKTg?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2024 08:06:48.3599
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5571ee7-356a-4cb4-c9bf-08dcb5258e4d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A101.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6435
 
-On Mon, Aug 5, 2024 at 3:23=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
+
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> On Thu, 1 Aug 2024 18:23:56 +0200 Petr Machata wrote:
+>> Patches #3 to #6 add selftests.
 >
-> On Mon, Aug 5, 2024 at 6:52=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Sat, Aug 3, 2024 at 11:48=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > Hello Eric,
-> > >
-> > > On Thu, Aug 1, 2024 at 9:17=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > > >
-> > > > On Thu, Aug 1, 2024 at 1:17=E2=80=AFPM Xueming Feng <kuro@kuroa.me>=
- wrote:
-> > > > >
-> > > > > We have some problem closing zero-window fin-wait-1 tcp sockets i=
-n our
-> > > > > environment. This patch come from the investigation.
-> > > > >
-> > > > > Previously tcp_abort only sends out reset and calls tcp_done when=
- the
-> > > > > socket is not SOCK_DEAD aka. orphan. For orphan socket, it will o=
-nly
-> > > > > purging the write queue, but not close the socket and left it to =
-the
-> > > > > timer.
-> > > > >
-> > > > > While purging the write queue, tp->packets_out and sk->sk_write_q=
-ueue
-> > > > > is cleared along the way. However tcp_retransmit_timer have early
-> > > > > return based on !tp->packets_out and tcp_probe_timer have early
-> > > > > return based on !sk->sk_write_queue.
-> > > > >
-> > > > > This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resc=
-hed
-> > > > > and socket not being killed by the timers. Converting a zero-wind=
-owed
-> > > > > orphan to a forever orphan.
-> > > > >
-> > > > > This patch removes the SOCK_DEAD check in tcp_abort, making it se=
-nd
-> > > > > reset to peer and close the socket accordingly. Preventing the
-> > > > > timer-less orphan from happening.
-> > > > >
-> > > > > Fixes: e05836ac07c7 ("tcp: purge write queue upon aborting the co=
-nnection")
-> > > > > Fixes: bffd168c3fc5 ("tcp: clear tp->packets_out when purging wri=
-te queue")
-> > > > > Signed-off-by: Xueming Feng <kuro@kuroa.me>
-> > > >
-> > > > This seems legit, but are you sure these two blamed commits added t=
-his bug ?
-> > > >
-> > > > Even before them, we should have called tcp_done() right away, inst=
-ead
-> > > > of waiting for a (possibly long) timer to complete the job.
-> > > >
-> > > > This might be important when killing millions of sockets on a busy =
-server.
-> > > >
-> > > > CC Lorenzo
-> > > >
-> > > > Lorenzo, do you recall why your patch was testing the SOCK_DEAD fla=
-g ?
-> > >
-> > > I guess that one of possible reasons is to avoid double-free,
-> > > something like this, happening in inet_csk_destroy_sock().
-> > >
-> > > Let me assume: if we call tcp_close() first under the memory pressure
-> > > which means tcp_check_oom() returns true and then it will call
-> > > inet_csk_destroy_sock() in __tcp_close(), later tcp_abort() will call
-> > > tcp_done() to free the sk again in the inet_csk_destroy_sock() when
-> > > not testing the SOCK_DEAD flag in tcp_abort.
-> > >
-> >
-> > How about this one which can prevent double calling
-> > inet_csk_destroy_sock() when we call destroy and close nearly at the
-> > same time under that circumstance:
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index e03a342c9162..d5d3b21cc824 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -4646,7 +4646,7 @@ int tcp_abort(struct sock *sk, int err)
-> >         local_bh_disable();
-> >         bh_lock_sock(sk);
-> >
-> > -       if (!sock_flag(sk, SOCK_DEAD)) {
-> > +       if (sk->sk_state !=3D TCP_CLOSE) {
-> >                 if (tcp_need_reset(sk->sk_state))
-> >                         tcp_send_active_reset(sk, GFP_ATOMIC,
-> >                                               SK_RST_REASON_NOT_SPECIFI=
-ED);
-> >
-> > Each time we call inet_csk_destroy_sock(), we must make sure we've
-> > already set the state to TCP_CLOSE. Based on this, I think we can use
-> > this as an indicator to avoid calling twice to destroy the socket.
->
-> I do not think this will work.
->
-> With this patch, a listener socket will not get an error notification.
+> Could you share the iproute2 patches?
 
-Oh, you're right.
-
-I think we can add this particular case in the if or if-else statement
-to handle.
-
-Thanks,
-Jason
+https://github.com/pmachata/iproute2/commits/nhgw16/
 
