@@ -1,283 +1,244 @@
-Return-Path: <netdev+bounces-115654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54980947609
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:29:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B44D94761F
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 458711C2037E
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 07:29:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D509A2812EB
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 07:34:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D921494C7;
-	Mon,  5 Aug 2024 07:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="lc7C07YU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621B3149009;
+	Mon,  5 Aug 2024 07:34:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2075.outbound.protection.outlook.com [40.107.22.75])
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2122.outbound.protection.outlook.com [40.107.215.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76824146A6F;
-	Mon,  5 Aug 2024 07:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B36333CA;
+	Mon,  5 Aug 2024 07:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.122
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722842969; cv=fail; b=exKFWLleRTZEDfgPVyVguBn6XwoxDHVkQJZerUqewKP2yNIZ57Gjyk6y6D7hti6+un/kNHRulLzIFJQ1HPHr4LdJLukOOPzvmCgqoWBuBZZSzQn80ic2uqB8K9zHPa2obbWDtx7RLXRIqYx4/ueZxnWDjxFsgSXqH/jqXUOxZcM=
+	t=1722843285; cv=fail; b=u/5HUk/yQL3pFp3JDKzQvGa3EQDED43k70NPKRzccTL6mXeiz+Z3dOku/mBvwHvanY25srczbIz6Rglr/P0mFEXKnJ8jphQuRazF1+JoQ6jNIW9YWHSU6nB3Q6pJQxG+EdbBZr4rZ458YhkEMY8Den1kYP72w824hmLedOI4O3w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722842969; c=relaxed/simple;
-	bh=Bey2wTsh247RYis5iJgXYFgmow3OoMMU7j+04Qm8urA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nFqNlp+zpCvdNo2gEYVmw0JKgsJvtPaGx9dOwuacCpHACnfD36fgPJUY3qcRlwbZfBNm3Bp/ulE2Jkrkhn6GiM89EoeugFnz/K832BTw3Nn41LdrmdlxL332+3fTX+ASKcNO+sZm+5VnljUi6exXrzDiNR57YYM8KYSYGKJpsVU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=lc7C07YU; arc=fail smtp.client-ip=40.107.22.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1722843285; c=relaxed/simple;
+	bh=C30uLWdglNxBzumGBgsA0GivE4Gw1GpMMTWIu+/Yw5U=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=JroVZJMbYNTmzmnBlVmErjRksGoYu6urvgT4sP6r2su22OMovO42FkbGIwexGOXnFYxRD8b5D0+74rfFp5Qeh39zWw6NkRs7cX1YWHv3fd2EwZvxppNy16aILCANG30tXD1hvHFGI+jJVJtQwMTt0b06O4pQY4Zpm6+TUC/CbQs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com; spf=pass smtp.mailfrom=wesion.com; arc=fail smtp.client-ip=40.107.215.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesion.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wesion.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o0XI3fdmfBaAU+cbfmnGlpZKKLj0mCG1qjS2sIINlb0pzjsUlKqw8VCgV8mbYT9MZT97yWINP7ECFMBzcbcej9eWrh7/POSWkvi9g2bqYO3xlNsAEfMHwGBEgR2VFCp/c2oNTb1UtoMdTGCHKbWYv+pmCjXahvMmt0seB7SduCPtwaE2S8jCoGcX3Rh1viO9Op9R+S3iqm49Dtd8hcApb8phBiorvSb8+sTnSqoAe/Cp5l+SH0kkDc3S8BrxDDfuBUCYg6DmTK+Xr6KJ4zbS3hWD9EFPl6ic6F6vSt84aUBHSMDkd2e6f6kWFWJ1pKyjbNzSoob/h2IOOWs6gWHRlA==
+ b=nIWmO8g1b7oOWMafEzCDYPtA2shOK0n6xJJ9d+wQwHZiVWwGyfGv8yUa2QbobKQgWEXljC2+ygUmuf9FVTDYp3WGZ+2W2CTI6P8coJGvKNTf7iU/PE3DV1sdXErBFn18vtUdJ51Z7Vr3XtdwH7VWaJOc8xMxVyt2v4U2H1ZQ1RCM5ns86/5PM4CfDy3SXjg+PEphhWAT02AlN7672lHc2EWbhjgKS5sshyzIM/G4qXbH/DBwOBXjOxELxGz/ggIjK06/aJK4NlLIc6WEp5sONkzufYoGfS5xxQF3WCqnU+tdKANHurYtfcsY7J5iaCHwIAzYt4lkrWY8VG5pjZv9tw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2LOwqvEeVnuGFKadPR7e1WceNXRPY4y45jbdrlzADqQ=;
- b=k/3nlBkJlSxJOZVApbuG03LutGK8z4lbW+N/DENe54AV+iNmwsQt9P3mzdQusHDc+dHef6WxDzJCGdHYHWKsozL0j7dHtxkG1i0HWLo25vVUpAacJx7IppTqCnTL7ZxrZQHNRKUv8fYWugM5gItkeyk8oBVFwyrXm4e9SKvKzpExr2Y4LofHxE9wTNGoVZgmO/d0JO8b7uT3VqSaLsgT3PsCnN0jbD428YbfNQHHkuFQT4P/1AocsUlxmIb/IkxNBA1n+HKw0GEa/ByNQKULLOnwTCd0QSI0OEicHIy9pQsaXzWqInghH/3h4SiERcRJBR/uqMy1Cv2YuYfCkVqWGw==
+ bh=pbmv7CYQnne+n5iC/mAJMihfRBti3RW0UrXg360vIHg=;
+ b=CW/iSUBjAqOyt8aXsJvlBY2A6EiqhB7GU+lDu72U/0ZOPXcu47KJpFu+iOFgIDNUIzm9GxQDkw0sYq18he5MUfGXrdaiI0lchQYtimhWCSu0jHFq0LB7B5AG9g7QwpBcgWR9BqPrsGqPsKGE297j60d2CKpuMBh91RVPfq+o6OV9+ElR/1FtrbODd3pR2bwKmMrSuz7LUueNw7TTTc8bxOtEN+To4f6rutuAY8sdxX/yGj62Km24O54ezMO7Yct6wMqTI8B07J1yH1mM26pOZYHz3Wh9my8RDlWOtHxhhUr/Sxlu8DrDF1lejwRojjdX7sv2jN+Wt6vKPn3V9CI9DA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2LOwqvEeVnuGFKadPR7e1WceNXRPY4y45jbdrlzADqQ=;
- b=lc7C07YU/kypk6etYY0AESMVcpdrNVyTLSvfrVpWFXd+hM5pVlA4zjr32g1FI36TxrtdNBWwC9Kuma7drq1dJDUMv17ksYjrMtmNXgFZIHjgD4IbTlcXpu1RwKiYAuio2yke8lpsmQvX2siVQiK6zBIMaoSv46wwd6YtmS83X+2Pbvs1Co7O8fEgtSvZI//Uvk+oYD0QIPCwVjLEyIZao7mj93MPDiZdj7Mkn2Azugu40C+v9tncYGDuq68oSTJYG9yo5CCW3it+uzT22udY86s51WI4HED+ifNn7zEIIZI4HZSrAoE9VeIldGFRDlNG9HNqy4MA6Ga8NKlpEH4nbA==
-Received: from AM9PR04MB8506.eurprd04.prod.outlook.com (2603:10a6:20b:431::16)
- by AM8PR04MB7284.eurprd04.prod.outlook.com (2603:10a6:20b:1dc::8) with
+ smtp.mailfrom=wesion.com; dmarc=pass action=none header.from=wesion.com;
+ dkim=pass header.d=wesion.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wesion.com;
+Received: from TYZPR03MB7001.apcprd03.prod.outlook.com (2603:1096:400:26a::14)
+ by JH0PR03MB8052.apcprd03.prod.outlook.com (2603:1096:990:37::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.25; Mon, 5 Aug
- 2024 07:29:24 +0000
-Received: from AM9PR04MB8506.eurprd04.prod.outlook.com
- ([fe80::5f7:9bab:66a3:fe27]) by AM9PR04MB8506.eurprd04.prod.outlook.com
- ([fe80::5f7:9bab:66a3:fe27%4]) with mapi id 15.20.7828.024; Mon, 5 Aug 2024
- 07:29:24 +0000
-From: Jan Petrous <jan.petrous@nxp.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>, "Jan Petrous (OSS)"
-	<jan.petrous@oss.nxp.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
-CC: dl-S32 <S32@nxp.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, Claudiu Manoil
-	<claudiu.manoil@nxp.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [EXT] Re: [PATCH 3/6] dt-bindings: net: Add DT bindings for DWMAC
- on NXP S32G/R
-Thread-Topic: [EXT] Re: [PATCH 3/6] dt-bindings: net: Add DT bindings for
- DWMAC on NXP S32G/R
-Thread-Index: AdrmrOTtkwWMBqX8SE2obTTIuZV8xgASOM0AAANymxAAAPvSgAAAWrmg
-Date: Mon, 5 Aug 2024 07:29:24 +0000
-Message-ID:
- <AM9PR04MB850675227C85B6B941842B7AE2BE2@AM9PR04MB8506.eurprd04.prod.outlook.com>
-References:
- <AM9PR04MB85066A2A4D7A2419C1CFC24CE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <059e0b5e-7893-4c67-89d6-77c7cc87eccc@kernel.org>
- <AM9PR04MB8506FC5070BEEE98400247B0E2BE2@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <8c78325a-a0c1-4bc9-88dd-3e52296dd656@kernel.org>
-In-Reply-To: <8c78325a-a0c1-4bc9-88dd-3e52296dd656@kernel.org>
-Accept-Language: cs-CZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8506:EE_|AM8PR04MB7284:EE_
-x-ms-office365-filtering-correlation-id: ac0e0f77-6080-410f-c3e7-08dcb52054b5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?85sAUbvSONeWoLAH+5hPcb2Ni0WGGkt1K4/IMlhlUKGpfkqWYzfshS0eBMku?=
- =?us-ascii?Q?M9D3QfB86LG78dErrbwMrGB/javIAuI/2/lw2RzYPDCS9jr6MiwOzEx+Kq78?=
- =?us-ascii?Q?6A6tYvQQh+zOocUIhDPrpk/Wml9yLfpQy+6l4dGNwWLvXwNJ9BLZBmBhKGpq?=
- =?us-ascii?Q?gQkDXIzMKViUfuOtcjZjku6RS0vw4Sn6utq6MrKaJE7LuYY/KI6Q8WBW4SYq?=
- =?us-ascii?Q?zkT0BQS/fiMERqo6HIFJW5HUMUZsCVkGixtF+fn8nMMrGxoIY4fjYIoJiPLm?=
- =?us-ascii?Q?L+jha18OIRaOAI8I29RTgCV9tpdx6wrJ6yCpKXGosCNQ5Wd7SAH+PnkintDN?=
- =?us-ascii?Q?e0HOaIbVrcTrX9jzGiu60xaWIvcMraM5JXY5BDpb2Zit4iMPdG1xsrEoGPs+?=
- =?us-ascii?Q?J5Q15833oLgyZBq/jVHg6RkCKA9eACbRT7puMcZKZEcMQx7Cuw68wmfB572B?=
- =?us-ascii?Q?I9CbxunnOrnDpHhedMcylTdvHD8VTOSPn9b1rqCdvE0ZO2rr71MbD0ixoK0X?=
- =?us-ascii?Q?Ztbe4XzmvCexEjx4TiWIcuFHdau6WiC/3pHn9uyjhQEvC1w8nsWBtBKtZQ2J?=
- =?us-ascii?Q?D3E2rdBKo23N1k1BdsvVY+vG1yMYe5hRJvX/BlkrtKCPds+8zPAIXIOCt9IA?=
- =?us-ascii?Q?dyluMsBZeWPQUPZP1GOM0TL0Iqp4p3cI7VQ3VhXTPouLiBvY+CMv3IkznHNL?=
- =?us-ascii?Q?TM43T0H+dD3LPLHzMTSxn3olpoQ79yMTFu71kzEUluNKaoYSEycE3bBwf2OW?=
- =?us-ascii?Q?WBya6H8kdVbKp0m5nixBkN1pYKyeYqLu4rP7HlamEtoqsSxc2FXmaMpVehEU?=
- =?us-ascii?Q?lR/aAkeS4+qUQncsQWxyzFqZyo70iU1AZ8FZ6p0XxezEbJ8sTy1uM0UBzMM1?=
- =?us-ascii?Q?+JnKE7MvbjclhVKRk0JQiCk4KsuEShzkrX02WbEfwDPIYCO7jpykdSGSKJ0t?=
- =?us-ascii?Q?ATVTKF7xKi06MABEyJ2CTFe3GjsslhQPuuCaBWz9mGnvwxSXkDuRQ/DNia8+?=
- =?us-ascii?Q?PlyDZ71/QTCE0RR7US0YX8LYpS2d/8/ngqtq7xFrqWf9Sa0GCwFesFXFxqWe?=
- =?us-ascii?Q?pUJoEolzIKQj33WMSTV6Wq45RS5JeFzwjiVwGe8T9QFR+p37oqCrNzH5ETdh?=
- =?us-ascii?Q?vxDEInP7r2gbnmoIGp5RhkWEIXwSwC+5C0YmWlMAk7vfndk2d21pA4V1QAjU?=
- =?us-ascii?Q?dX7IXRBwCF/v+aIhmMCqcIH9Q/vcHrWZaz50finRlYNxCpJn5uotsf2e3iU0?=
- =?us-ascii?Q?H+nL2i3g/O9fKuMHDzPMKbk9kuZ0YD7aFWcgv8rDB+g45OzOtHRZt75zRwk+?=
- =?us-ascii?Q?cy6O7FwYpvMmyIWVgKj8mePuRgpQA4Rf2DiH4MfbUP1YfYEBSHMzZ3bmJri4?=
- =?us-ascii?Q?PmC9uDE5mXloR47p15b9v/M4WS04Hzo/bD4wfkg9BDmr0m5QzQ=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8506.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?aYJTz9cBzGN5JbMHYRJr20Bkp4ACnrzPgRP6eOYftx/wpBfBWaxdVUwVTymT?=
- =?us-ascii?Q?R1mUcAEK2giUnmZfqNqUi9o49OJAQ3bVnc/K5uAH7DY82+tr/mqcqr1w+KMB?=
- =?us-ascii?Q?u66dGsFJWZTfKaDb1yOG0sddXcmW19+D7ArdfWAyrOtq+HhAeY6vPwaLbUNo?=
- =?us-ascii?Q?eijh7lJ1ksthAwiCHRuv4BXu6V4qj5kEy1Hy+pNRm5cChtFpKcjIAtuWKdeL?=
- =?us-ascii?Q?EXS+2xxZuWbt6JlPnyWpH25R58IRvjixKLk0xbmjtnRr7aP2lr02Y1Adrh/o?=
- =?us-ascii?Q?E82ZI+FwDDc+RkXc7u6TZBUcM+Z6j80gEptwQsZMmx5ZMpnirBnSdE7dk/Kd?=
- =?us-ascii?Q?6lJ+CkuBgMqAqel6A+vEeafB8BxGyUsZSCkvUTULyxBIb9PAvCWOb+99qp/0?=
- =?us-ascii?Q?AyrA6ZJu5R6LOZ02KM9YW13x/dyjRKvQkWviPPM4vTOPsH0tn2HJOHVYnzui?=
- =?us-ascii?Q?fmMbTUzhuHyCIcQphXIjRxcQE+FfDfHnEORIaWtd/NYBjaGbAqTKNgZ8aKYR?=
- =?us-ascii?Q?FvGCYH8OGPrgn5r0M7mUWLjxx8Ct2bczOGxnz9cUgYEPyjkMd5NAjoaEjdKh?=
- =?us-ascii?Q?8AXNS3OKlaCEN4q/FlgzUXEdjDw2bObEW+Xf+JPPNXuMFXw1qikOM7oLnlkv?=
- =?us-ascii?Q?5dGACqDIccsO5x47LIrGvRTKI7ghtbsz/zIcJqZ041UbnkkSSVqTfWZonLne?=
- =?us-ascii?Q?S8tuAGipbn9eNngQkX6n+Mdip887VV5SdDbc0EJZL5mUqUJiFKlbV4IuojfM?=
- =?us-ascii?Q?/7yN957Wrztyagg0z4aHoXznvoF9mTWQx6GCj8cct2PUcInL13pk0h58IfjY?=
- =?us-ascii?Q?JHl7dx++JU1g/hpiCIqoez6NxkuSq6dBZJFbCgEN85/A3EL806Ycbf9QvO7Z?=
- =?us-ascii?Q?cg6kBGVYhxxWN/cPCfU5QAhiFvioMhIL7jY2dF57j1KZ5ZxWdY9sRggslxWf?=
- =?us-ascii?Q?FyzLj27fB/YbD1zmyIgj+1V/BW5Q6ilf73MNMHQ6kjHAdj3HPvt331+DpZcs?=
- =?us-ascii?Q?efiCt0CztZSTJugqc0eSyqnP9oxagDFG5VV7GrqYGr2Zgwt/JFX2x9LVaL91?=
- =?us-ascii?Q?bvT/4SrT01k7s/3fMWq/XmSCHYGifwkNCcqDbV7UcPICXsb3u3jqUR4jqMKA?=
- =?us-ascii?Q?2jBAyHN0CRYrsO25OQPnoYYBLbb7j4YPrwVmisHPvAg6w2Xe/U94t3eBU8Dk?=
- =?us-ascii?Q?1jzUJ/Aa570VcEGbwKIMH3qovC+memTrruNlXP0sVPvvVYw2ZW7LWU4rljtk?=
- =?us-ascii?Q?H1wWfrd5BRgKl/4Pm6m+vem5RAIgf/9S5QNJsKpOkLAE5WAHN3VBMNO5LqXB?=
- =?us-ascii?Q?iTeMXn5JysjCLWhYICf4z3sW6I6SyOknY+MGDaYMKX7Sy34ykAM2RGr8Id9J?=
- =?us-ascii?Q?rC9S/m8/bJmt443bLXzRSQ7lZF6R3jxvlOmOvf9oPARYPQmAF9ZFKTWY2D1Z?=
- =?us-ascii?Q?UFQ88UcaW02dHLgN/0+HT44MEzaSldBy4mODNK/IyQQWtLL1+GaG4NNXU857?=
- =?us-ascii?Q?pF0BKRTjYmGIKTOyvJdLto9ZwBniQIU9WH0Kx7ScGBlT5BafCtrOfNVQLK04?=
- =?us-ascii?Q?8SUgJlg9x1rFXRNmVO0QU3mswrK6y6Qy834rsM2n?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 2024 07:34:37 +0000
+Received: from TYZPR03MB7001.apcprd03.prod.outlook.com
+ ([fe80::78dd:5e68:1a9c:36c0]) by TYZPR03MB7001.apcprd03.prod.outlook.com
+ ([fe80::78dd:5e68:1a9c:36c0%6]) with mapi id 15.20.7828.024; Mon, 5 Aug 2024
+ 07:34:37 +0000
+From: Jacobe Zang <jacobe.zang@wesion.com>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	heiko@sntech.de,
+	kvalo@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	conor+dt@kernel.org,
+	arend.vanspriel@broadcom.com
+Cc: efectn@protonmail.com,
+	dsimic@manjaro.org,
+	jagan@edgeble.ai,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	arend@broadcom.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	megi@xff.cz,
+	duoming@zju.edu.cn,
+	bhelgaas@google.com,
+	minipli@grsecurity.net,
+	brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com,
+	nick@khadas.com,
+	Jacobe Zang <jacobe.zang@wesion.com>
+Subject: [PATCH v8 0/5] Add AP6275P wireless support
+Date: Mon,  5 Aug 2024 15:34:20 +0800
+Message-Id: <20240805073425.3492078-1-jacobe.zang@wesion.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SGXP274CA0010.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::22)
+ To TYZPR03MB7001.apcprd03.prod.outlook.com (2603:1096:400:26a::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR03MB7001:EE_|JH0PR03MB8052:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24e3839e-0996-413b-e7d5-08dcb5210f4e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|366016|7416014|376014|1800799024|38350700014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?k3fZRlU8YtGxBk+MCikHPDAIgflyM6x8O0JojDGcOi7H7GVpkOqvmcjyNDJy?=
+ =?us-ascii?Q?uXK5d200z2jKPX9bqlNXSjmO2AkCsSDlXYa2RmNVru//+o5PgYhFKCjKZEud?=
+ =?us-ascii?Q?3CDebajWQRNzEP+vxwn51Icj0JoEFTjni587Pjt0sk5F9ka7To7JDK7JOsFC?=
+ =?us-ascii?Q?qRtLkSZ1/ZO22lOK3kn05q3EDY+s6pdpeoUnO6LnMBYrryw3xCr6oP6M4LTI?=
+ =?us-ascii?Q?hJC1Ec+p6BO/f7ryOz359NRnwLvwA0+Pwe6jJu3G45nHHDRH20zX9Pel0u5i?=
+ =?us-ascii?Q?Xe01KaX60uwfffSKqjpwIzigPlXD29BNPh8cYET2uWNLf+OtZxb6hGUyI0ag?=
+ =?us-ascii?Q?G7LjuW93AYrZM4xMTOytppAQiXoyp7aJo+wZrIeAWcxVCWhCH7U1xmROO2u/?=
+ =?us-ascii?Q?uV+/pzptyDkMzX4Dy8YdUzIjWxwmCD06wo4tBDRMirSYUd+HszDNVzSX5V4E?=
+ =?us-ascii?Q?5jvEHB4/g5XogvcOTRTqyyvu0hing0kb7bpHGssGvXjzYzJ7RfWdEB12FdiW?=
+ =?us-ascii?Q?ierU4UIa51IAAzce0MkJJEi5FIxVXtqGJuVPu2AT9y9vgxQdv0AcJ2Ho4+RP?=
+ =?us-ascii?Q?FCffCk7MIkUMXzL88XvEWFsDryprm0wsPC3pqI5jPoX7VnUT4SLfClsS6rdp?=
+ =?us-ascii?Q?DbQ4qwBVpaPoCN3acG5f8yu0Xqn3mhsrPHDC58h+HG1ccnn50humlStQTicN?=
+ =?us-ascii?Q?/td0Eyx6iq1VEK5p/f0Y5xheWnoEispVO58Rsm9/RoGCeNViCP2SclMOaG7x?=
+ =?us-ascii?Q?NHvJUZkgkpHuHdwAYn5iKQ26g774UmfpmWeQe3gj7/JXCgAhV/Zyd9wNkAhe?=
+ =?us-ascii?Q?fBy3DkZRO9+JRgyzru3+KiXmkyEJI4PYnyxhttRrIr6NTk5b9hw67G7JDbFC?=
+ =?us-ascii?Q?9YRo8Bfq+olIB6VW5gASbgVAdzJzUO6mM5vOOEVUluywPJu8Ynm7PT3scVe6?=
+ =?us-ascii?Q?MG+GHi5JbjI+otRlS3Un995R8NsXV1mfKos3J+gcMbjEEerotAnapmYZigqI?=
+ =?us-ascii?Q?d/beBsSG2ktq4LJaxclzXI9L3bWAinDB3/oJ9JMIvUeezQtXiV4sWTYJowW7?=
+ =?us-ascii?Q?T9v8MYExlW0npfczx/X3S0ZS7hjaw5YrEh9nfDMzhSQ3vbx39Y8GWXYNFKes?=
+ =?us-ascii?Q?OVM67a2cbPf1Pewv+UsW1pj/nczdBznmFw94kRj0uLIsVttNZ96txDxr1e3J?=
+ =?us-ascii?Q?Zrj3wL/O1qSsFBwqNqy2uVxJfuYQr458mDXjJoG5+jgh1UmjpRaikvHmdtaG?=
+ =?us-ascii?Q?CLdURlfF9s0CGanKSnh4YVCDXdqyLeWL4NJW8RlChwm1/EsRvPk20fwhlA/8?=
+ =?us-ascii?Q?Jq2XGLLICzaff/1bj3BqlgmGXarPymiLZH1qDWkdto9ZuUI7MURpN6bj7+aN?=
+ =?us-ascii?Q?IUWx85E=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR03MB7001.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(7416014)(376014)(1800799024)(38350700014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kp6C3vyh0PQPWPkVW/NHK6Stj7SSjL538GOrDVs0FjhdpgOuV3aIyGFucBJE?=
+ =?us-ascii?Q?oTqBnlHKtwMquv9AJlVtkhQivFEwtq3cbnpHdo5yhJdJ1bHaZVvOaso9DuML?=
+ =?us-ascii?Q?gzjYe2pAco0Xb+bIQDBCe4u3Kqrl4gJDGRWrBW41wHG/JiRzlVMux0GO4/py?=
+ =?us-ascii?Q?eKchYvCvMqWN2PwN9U75+EnL4PYfgJhQSaW2oEB2evvKohZP1wHNZeoFqWeE?=
+ =?us-ascii?Q?edLSi3aWSxSWlaJK5cipZDdVvkFC+aIu/TlYZCI4H2jDK8OEJhNziHdhy6Tv?=
+ =?us-ascii?Q?NAigofpn9+Bz93TQbVrfm7OrbMaC1b2rKfYVOS17iDTYLfAKMP3kHbBmHryd?=
+ =?us-ascii?Q?7i1zggsfk+JnISCKb7R+TI12OnKvjDGzXiXQ64eQuJjlzfCtOpEpqrjXYsZD?=
+ =?us-ascii?Q?yMyIYVedxPTs0EMhUy5dZxey7t+f/HZAdkt6Qxp7eRqzMTc3q4taCBH+5KT3?=
+ =?us-ascii?Q?ajsovxQen2MQQhvqD3oCLwLDH8Iol5Z12b2D497N4NOpQj5e5uP1OPDZWH4w?=
+ =?us-ascii?Q?TfLITmkYNfdFuLl1RBuNC3o+1vLzd/V1fqRwzM0f1LSZ16L+Jije39xNy8GB?=
+ =?us-ascii?Q?WpiyoDnTyOzla0FZNbbxlRkhVlWwl7rCCsnPZ1yafTfS8bp5yAwuYXT6yRxT?=
+ =?us-ascii?Q?XkkUNwt7ZSpPlELDj9feTOLRbqGwkF49lIj2JFMidTCToPRQBFufk23za/Sn?=
+ =?us-ascii?Q?fsrQ6cNsygfpFRRAP9sKU/Qj95KWUqw/KVkXHWno2lviSSNNozEfpQFFf/Ix?=
+ =?us-ascii?Q?BVdoLBNve/kRKNl11LfAzS8pXUuD3myQMVIVbc31NZZKgBbQ7oRq/acCiznz?=
+ =?us-ascii?Q?flCJ4D2NxxxMiu10fJfcWup03YSvq3drU7/2r+XIQa0N4e7VAkSttdwtJTdh?=
+ =?us-ascii?Q?EYpCx2Dvgd1L9+6Px8ZceTS6Psb7cZ1KLevBgHqfhCBhtwYiDr6g8GuzzeJW?=
+ =?us-ascii?Q?L6NVhUmHdKEAJihgHHzzInutAPJFkX0GQC05hU4uIvZIc8nQwmrKcXBkJzNc?=
+ =?us-ascii?Q?aYVtg9drhODXQb/etg7Hk7xhVFby0gQ1U+4hFmQC2jOiYWR+AxNZkXlyf29o?=
+ =?us-ascii?Q?4N9lzVut3U1y7J923M2X8bfGZ6t9O241BSZVPaGTA/U31YpIfdHjmM90/Qyx?=
+ =?us-ascii?Q?xAUQfZOoE5j0Z8PIrjy93TYXlUK8GwdscBcSDfk0x4JOyUZmon+Rr8xdehHq?=
+ =?us-ascii?Q?h1h0OFsxgCedh1dt/yS65fwTj8FcFi1ZHVyQgeZ9Jn81vt1NGoVr/+haII//?=
+ =?us-ascii?Q?RtKIc1G27PseRpasL4CpL8G9ZOOdWqCn71b5w+quX4Lwnu+eXN+u+fMn9CxZ?=
+ =?us-ascii?Q?NEpWBZiro3LBZTtCSuDHw0E74YQUimnq2sUc4SaqYPYyGhjo4kX5v2kbSZdc?=
+ =?us-ascii?Q?1GgnDbTOF8ni+F8KwCmRr1WffoSGFPky6Oy6D9N/j3hlYVr5dSvyaK3NVDXW?=
+ =?us-ascii?Q?JV+R0rudbBGjeqFGE4K54PEIBNmkFFZr6FUYqti/sdSPCbxqtDpH0WbvEcd3?=
+ =?us-ascii?Q?AdYuvmWXk/iVLtoHmhxGzuUTjqMVxFwxKGxv/TEGJ2Fv9fMQjqra/eQPw5Sa?=
+ =?us-ascii?Q?2Haipjw55xVEg/TqE7HB/B7ybNBVLkPfKIwMFqZI?=
+X-OriginatorOrg: wesion.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24e3839e-0996-413b-e7d5-08dcb5210f4e
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR03MB7001.apcprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8506.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac0e0f77-6080-410f-c3e7-08dcb52054b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2024 07:29:24.4054
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2024 07:34:37.7321
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: O0IaloqvYRne2lbTOwApP6cI9/XtYjO53HhnTIounabzX8zCLWcBZALr7GiI2hl1Vtz/54iX8nZsb6etAj8Eqg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7284
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2dc3bd76-7ac2-4780-a5b7-6c6cc6b5af9b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wh+jFt4eRm0rRGEViBU4bG48bQpPx+/hZ6aEgKKlSOZUwpq6G2WpVPvSPKhndOIXYrNSOqPHOZVHVwd4S3l2kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR03MB8052
 
-> From: Krzysztof Kozlowski <krzk@kernel.org>
-> Sent: Monday, 5 August, 2024 9:17
-> To: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>; Maxime Coquelin
-> <mcoquelin.stm32@gmail.com>; Alexandre Torgue
-> <alexandre.torgue@foss.st.com>
-> Cc: dl-S32 <S32@nxp.com>; linux-kernel@vger.kernel.org; linux-stm32@st-
-> md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org; Claudiu
-> Manoil <claudiu.manoil@nxp.com>; netdev@vger.kernel.org
-> Subject: Re: [EXT] Re: [PATCH 3/6] dt-bindings: net: Add DT bindings for
-> DWMAC on NXP S32G/R
->=20
-> Caution: This is an external email. Please take care when clicking links =
-or
-> opening attachments. When in doubt, report the message using the 'Report
-> this email' button
->=20
->=20
-> On 05/08/2024 09:10, Jan Petrous (OSS) wrote:
-> >> From: Krzysztof Kozlowski <krzk@kernel.org>
-> >> Sent: Monday, 5 August, 2024 7:10
-> >> To: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>; Maxime Coquelin
-> >> <mcoquelin.stm32@gmail.com>; Alexandre Torgue
-> >> <alexandre.torgue@foss.st.com>
-> >> Cc: dl-S32 <S32@nxp.com>; linux-kernel@vger.kernel.org; linux-stm32@st=
--
-> >> md-mailman.stormreply.com; linux-arm-kernel@lists.infradead.org;
-> Claudiu
-> >> Manoil <claudiu.manoil@nxp.com>; netdev@vger.kernel.org
-> >> Subject: [EXT] Re: [PATCH 3/6] dt-bindings: net: Add DT bindings for
-> DWMAC
-> >> on NXP S32G/R
-> >>
-> >> On 04/08/2024 22:49, Jan Petrous (OSS) wrote:
-> >>> Add basic description for DWMAC ethernet IP on NXP S32G2xx, S32G3xx
-> >>> and S32R45 automotive series SoCs.
-> >>>
-> >>> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-> >>
-> >> <form letter>
-> >> Please use scripts/get_maintainers.pl to get a list of necessary peopl=
-e
-> >> and lists to CC. It might happen, that command when run on an older
-> >> kernel, gives you outdated entries. Therefore please be sure you base
-> >> your patches on recent Linux kernel.
-> >>
-> >> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-> >> people, so fix your workflow. Tools might also fail if you work on som=
-e
-> >> ancient tree (don't, instead use mainline) or work on fork of kernel
-> >> (don't, instead use mainline). Just use b4 and everything should be
-> >> fine, although remember about `b4 prep --auto-to-cc` if you added new
-> >> patches to the patchset.
-> >>
-> >> You missed at least devicetree list (maybe more), so this won't be
-> >> tested by automated tooling. Performing review on untested code might =
-be
-> >> a waste of time.
-> >>
-> >> Please kindly resend and include all necessary To/Cc entries.
-> >> </form letter>
-> >
-> > Does it mean that scripts/get_maintainer.pl doesn't care about devicetr=
-ee
-> ML?
-> > I just tried to recheck, but it still shows me the list I used original=
-ly:
->=20
-> It cares and always provides it.
->=20
-> >
-> > $ ll outgoing/*.patch
-> > -rw-rw-r-- 1 hop hop 1998 srp  4 11:33 outgoing/0000-cover-letter.patch
-> > -rw-rw-r-- 1 hop hop 2518 srp  4 11:33 outgoing/0001-net-driver-stmmac-
-> extend-CSR-calc-support.patch
-> > -rw-rw-r-- 1 hop hop 2794 srp  4 11:33 outgoing/0002-net-stmmac-Expand-
-> clock-rate-variables.patch
-> > -rw-rw-r-- 1 hop hop 4427 srp  4 11:33 outgoing/0003-dt-bindings-net-Ad=
-d-
-> DT-bindings-for-DWMAC-on-NXP-S32.patch
-> > -rw-rw-r-- 1 hop hop 8610 srp  4 11:33 outgoing/0004-net-stmmac-dwmac-
-> s32cc-add-basic-NXP-S32G-S32R-glue-.patch
-> > -rw-rw-r-- 1 hop hop 1143 srp  4 11:33 outgoing/0005-MAINTAINERS-Add-
-> Jan-Petrous-as-the-NXP-S32G-R-DWMAC-.patch
-> > -rw-rw-r-- 1 hop hop 1805 srp  4 11:33 outgoing/0006-net-stmmac-dwmac-
-> s32cc-Read-PTP-clock-rate-when-read.patch
-> > $ ./scripts/get_maintainer.pl outgoing/*.patch
-> > Maxime Coquelin <mcoquelin.stm32@gmail.com> (maintainer:ARM/STM32
-> ARCHITECTURE)
-> > Alexandre Torgue <alexandre.torgue@foss.st.com>
-> (maintainer:ARM/STM32 ARCHITECTURE)
-> > "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-> (commit_signer:1/1=3D100%,authored:1/1=3D100%,added_lines:46/46=3D100%,ad=
-d
-> ed_lines:61/61=3D100%,added_lines:69/69=3D100%,added_lines:165/165=3D100%=
-,a
-> dded_lines:298/298=3D100%,added_lines:35/35=3D100%,added_lines:51/51=3D10=
-0
-> %)
-> > linux-kernel@vger.kernel.org (open list)
-> > linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32
-> ARCHITECTURE)
-> > linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32
-> ARCHITECTURE)
->=20
-> Read the form letter carefully. There are several instructions
-> mentioned. Above commands look sensible but if it still does not work
-> for you, then I suspect you develop on some old, vendor tree.
->=20
+These add AP6275P wireless support on Khadas Edge2. Enable 32k clock
+for Wi-Fi module and extend the hardware IDs table in the brcmfmac
+driver for it to attach.
 
-Thanks. Of course it was on my side, sorry. I will resend v2 with wider aud=
-ience.
+Changes in v8:
+ - Add appropriate errno's for return values that will be
+    send to bus when error occurred.
+ 
+ - Link to v7: https://lore.kernel.org/all/20240802025715.2360456-1-jacobe.zang@wesion.com/
 
-/Jan
+Changes in v7:
+ - Change brcmf_of_probe prototypes from void to int, add appropriate errno's for return
+    value, move clock check to the end of brcmf_of_probe
+ - Add "brcm,bcm4329-fmac" compatible for wifi node
+
+ - Link to v6: https://lore.kernel.org/all/20240731061132.703368-1-jacobe.zang@wesion.com/
+
+Changes in v6:
+ - Move "brcm,bcm4329-fmac" check to the top of brcmf_of_probe in of.c
+ - Add return if clk didn't set in DTS
+
+ -Link to v5: https://lore.kernel.org/all/20240730033053.4092132-1-jacobe.zang@wesion.com/
+
+Changes in v5:
+ - Add more commit message to the clock in bindings
+ - Use IS_ERR_OR_NULL as a judgment condition of clk
+
+ - Link to v4: https://lore.kernel.org/all/20240729070102.3770318-1-jacobe.zang@wesion.com/
+
+Changes in v4:
+ - Change clock description in dt-bindings
+ - Move enable clk from pcie.c to of.c
+ - Add compatible for wifi node in DTS
+ - Add random seed flag for firmware download
+
+ - Link to v3: https://lore.kernel.org/all/20240630073605.2164346-1-jacobe.zang@wesion.com/
+
+Changes in v3:
+ - Dropped redundant parts in dt-bindings.
+ - Change driver patch title prefix as 'wifi: brcmfmac:'.
+ - Change DTS Wi-Fi node clock-name as 'lpo'.
+ 
+ - Link to v2: https://lore.kernel.org/all/20240624081906.1399447-1-jacobe.zang@wesion.com/
+
+Changes in v2:
+ - Add SoB tags for original developer.
+ - Add dt-bindings for pci14e4,449d and clocks.
+ - Replace dev_info to brcmf_dbg in pcie.c
+
+ - Link to v1: https://lore.kernel.org/all/20240620020015.4021696-1-jacobe.zang@wesion.com/
+
+Jacobe Zang (5):
+  dt-bindings: net: wireless: brcm4329-fmac: add pci14e4,449d
+  dt-bindings: net: wireless: brcm4329-fmac: add clock description for
+    AP6275P
+  arm64: dts: rockchip: Add AP6275P wireless support to Khadas Edge 2
+  wifi: brcmfmac: Add optional lpo clock enable support
+  wifi: brcmfmac: add flag for random seed during firmware download
+
+ .../net/wireless/brcm,bcm4329-fmac.yaml       |  9 +++
+ .../dts/rockchip/rk3588s-khadas-edge2.dts     | 16 ++++++
+ .../broadcom/brcm80211/brcmfmac/bcmsdh.c      |  4 ++
+ .../broadcom/brcm80211/brcmfmac/common.c      |  6 +-
+ .../wireless/broadcom/brcm80211/brcmfmac/of.c | 28 +++++++---
+ .../wireless/broadcom/brcm80211/brcmfmac/of.h |  9 +--
+ .../broadcom/brcm80211/brcmfmac/pcie.c        | 55 ++++++++++++++++---
+ .../broadcom/brcm80211/brcmfmac/sdio.c        | 18 ++++--
+ .../broadcom/brcm80211/brcmfmac/usb.c         |  3 +
+ .../broadcom/brcm80211/include/brcm_hw_ids.h  |  2 +
+ 10 files changed, 123 insertions(+), 27 deletions(-)
+
+-- 
+2.34.1
 
 
