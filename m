@@ -1,62 +1,74 @@
-Return-Path: <netdev+bounces-115870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8FC94825F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 21:37:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EABB94826D
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 21:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A1C4281AE2
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:36:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD73D1F2197A
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C18516B386;
-	Mon,  5 Aug 2024 19:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE9B16BE14;
+	Mon,  5 Aug 2024 19:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bsJXMnqk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+TBG7AP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FBF15D5D9
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 19:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E71616B3B8;
+	Mon,  5 Aug 2024 19:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722886617; cv=none; b=ojPq6kizjWk3O0F1IeXlqu1/WPuzGvK+sOj+mlnr8HqbbitafMxWPwroT1BF19zAmAwKyIwgRaBz6vkbYEkkgdRvricJAy7b0MhAlW0CmNlRpeXuapigxv6eEWHNrbkAJUPfyFAWBTZV0vQ0rA+36lcHk/E9aw0vwzWvxNAddi8=
+	t=1722886789; cv=none; b=ixVz69H6hjdcRJX2TxEOEmLyBFfqlfsizcg68/Bc2rOxK1ZvJSTbYCjVqoALVB5ygvHelnyS+lXnCOvI/dVXzYmXJi5P5YGhZb4BlBaC5gbXKO9MqYKElcZDzGC9tQlM81cuGbWZQxrcSX4Cg6OJRU/d+N+/52HHNB6IM7GJFfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722886617; c=relaxed/simple;
-	bh=pIcM5w2TFsSg88YIZUckwkTNlIUnea7FVhbhsN0NvRg=;
+	s=arc-20240116; t=1722886789; c=relaxed/simple;
+	bh=5gi+2Mvn0ix7ok44OzuyN0ail4x5h1C+o3N8wqrERvw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iAQyCvYos98IdjYv/eV6leMyw4JS7wJlyxxEa1rP8VRIDczHLeiXduDfNbu6eJplp8TqllVrcAIQSqNwaIhTjaeTugsVL3iFNO6adNzROBqCv2zjS+fje+EMLNei5/Xmjz3v6n3Bc7XIofPZnjYFRs6wsp9pq+w1vwxhnoJbaYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bsJXMnqk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6239FC32782;
-	Mon,  5 Aug 2024 19:36:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qjGlOHYiuSkHln/Bzw8eIZKxBVeSPZhgzXfuAunNrT/vH6vfGpt2CIA1LCBf+ghXQ+GFH4d6wb5mNYvtjoyUMUQpwKRDp3kUuQUs2/kIeEUmgsMWL9emn8sM3T0LwSZJOOCa7CQI7tbmnmqN9pJdbglqrgpTQhdJJsPI95XFbtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y+TBG7AP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B089C32782;
+	Mon,  5 Aug 2024 19:39:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722886616;
-	bh=pIcM5w2TFsSg88YIZUckwkTNlIUnea7FVhbhsN0NvRg=;
+	s=k20201202; t=1722886788;
+	bh=5gi+2Mvn0ix7ok44OzuyN0ail4x5h1C+o3N8wqrERvw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bsJXMnqk1gDMgagmFYE4110Ixi9pLoh2Xi+57ZML8MqONLAbhu4pUR7fPffG03IOX
-	 PleBesrHRssLQpKJbyv/MVT4VzfM2CrZh7cL9JsL7yHydYApugLFD8JykA8kqDAaav
-	 BW3jPxA20cpoGwUwv8GC99N9V7qNvihQyK5M6Z7OWvMKF2qFqMqKnj0elI/AdnJJlv
-	 C2xGMcTlPvJg+SN+QQqPxbrpdUilg211MTtX/1TxhFgiwo8GCGQjJmqqOvFEkKPpuv
-	 E1mIL8+/qb2eaBkKs5WGR81VtbD/vDvIKVVJ7/2ciHxICfHu8yQQPE5tKSQ+3EdVYj
-	 B1aZiVz4kwwfA==
-Date: Mon, 5 Aug 2024 12:36:55 -0700
+	b=Y+TBG7APWQjKmrmb4BLRjw5D1qEjcKGa4IH1w+r0MEW+DYX6ucK7SEK/vmAfgSchv
+	 pC0EtvWpLTV9M3Fcd5Bpkgdc3o98SxD2dX3bDounXMRbIbGm40KzD54ZvYpStYBGFO
+	 gqenEVbS3KTdFt3jrG+1YD7OyNatuCr2qOa7UY+84efjy1H4+N7eeuZ1SXPvT3KMrz
+	 THa+4tM8EEVRri03AONTq/8iQpysDJ5qDGI/HVpl3m/yhQvn7BQudhgCaFcrV1I2by
+	 5pc83Do9uwIj8V+HbG+2HPtZEtwZbmdfvVHFD0x0JxWpUBWvF/ZkaPXGXJdBERM3jW
+	 sPGwZroiBxTpQ==
+Date: Mon, 5 Aug 2024 12:39:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Jiri Pirko
- <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>, John Fastabend
- <john.fastabend@gmail.com>, Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
-Message-ID: <20240805123655.50588fa7@kernel.org>
-In-Reply-To: <20240805142253.GG2636630@kernel.org>
-References: <cover.1722357745.git.pabeni@redhat.com>
-	<75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
-	<29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
-	<20240731185511.672d15ae@kernel.org>
-	<20240805142253.GG2636630@kernel.org>
+To: Allen <allen.lkml@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ jes@trained-monkey.org, kda@linux-powerpc.org, cai.huoqing@linux.dev,
+ dougmill@linux.ibm.com, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+ aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com,
+ tlfalcon@linux.ibm.com, cooldavid@cooldavid.org, marcin.s.wojtas@gmail.com,
+ mlindner@marvell.com, stephen@networkplumber.org, nbd@nbd.name,
+ sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ borisp@nvidia.com, bryan.whitehead@microchip.com,
+ UNGLinuxDriver@microchip.com, louis.peens@corigine.com,
+ richardcochran@gmail.com, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-acenic@sunsite.dk,
+ linux-net-drivers@amd.com, netdev@vger.kernel.org, Sunil Goutham
+ <sgoutham@marvell.com>
+Subject: Re: [net-next v3 05/15] net: cavium/liquidio: Convert tasklet API
+ to new bottom half workqueue mechanism
+Message-ID: <20240805123946.015b383f@kernel.org>
+In-Reply-To: <CAOMdWSKRFXFdi4SF20LH528KcXtxD+OL=HzSh9Gzqy9HCqkUGw@mail.gmail.com>
+References: <20240730183403.4176544-1-allen.lkml@gmail.com>
+	<20240730183403.4176544-6-allen.lkml@gmail.com>
+	<20240731190829.50da925d@kernel.org>
+	<CAOMdWS+HJfjDpQX1yE+2O3nb1qAkQJC_GSiCjrrAJVrRB5r_rg@mail.gmail.com>
+	<20240801175756.71753263@kernel.org>
+	<CAOMdWSKRFXFdi4SF20LH528KcXtxD+OL=HzSh9Gzqy9HCqkUGw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,34 +78,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 5 Aug 2024 15:22:53 +0100 Simon Horman wrote:
-> On Wed, Jul 31, 2024 at 06:55:11PM -0700, Jakub Kicinski wrote:
-> > On Wed, 31 Jul 2024 09:52:38 +0200 Paolo Abeni wrote:  
-> > > FTR, it looks like the CI build went wild around this patch, but the 
-> > > failures look unrelated to the actual changes here. i.e.:
-> > > 
-> > > https://netdev.bots.linux.dev/static/nipa/875223/13747883/build_clang/stderr  
-> > 
-> > Could you dig deeper?
-> > 
-> > The scripts are doing incremental builds, and changes to Kconfig
-> > confuse them. You should be able to run the build script as a normal
-> > bash script, directly, it only needs a small handful of exported
-> > env variables.
-> > 
-> > I have been trying to massage this for a while, my last change is:
-> > https://github.com/linux-netdev/nipa/commit/5bcb890cbfecd3c1727cec2f026360646a4afc62
-> >   
+On Mon, 5 Aug 2024 10:23:41 -0700 Allen wrote:
+> Sure, please review the explanation below and let me
+> know if it is clear enough:
 > 
-> Thanks Jakub,
+> tasklet_enable() is used to enable a tasklet, which defers
+> work to be executed in an interrupt context. It relies on the
+> tasklet mechanism for deferred execution.
 > 
-> I am looking into this.
-> So far I believe it relate to a Kconfig change activating new code.
-> But reproducing the problem is proving a little tricky.
+> enable_and_queue_work() combines enabling the work with
+> scheduling it on a workqueue. This approach not only enables
+> the work but also schedules it for execution by the workqueue
+> system, which is more flexible and suitable for tasks needing
+> process context rather than interrupt context.
+> 
+> enable_and_queue_work() internally calls enable_work() to enable
+> the work item and then uses queue_work() to add it to the workqueue.
+> This ensures that the work item is both enabled and explicitly
+> scheduled for execution within the workqueue system's context.
+> 
+> As mentioned, "unconditionally scheduling the work item after
+> enable_work() returns true should work for most users." This
+> ensures that the work is consistently scheduled for execution,
+> aligning with the typical workqueue usage pattern. Most users
+> expect that enabling a work item implies it will be scheduled for
+> execution without additional conditional logic.
 
-Have you tried twiddling / exporting FIRST_IN_SERIES ?
-
-See here for the 4 possible exports the test will look at:
-
-https://github.com/linux-netdev/nipa/blob/6112db7d472660450c69457c98ab37b431063301/core/test.py#L124
+This looks good for the explanation of the APIs, but you need to 
+add another paragraph explaining why the conversion is correct
+for the given user. Basically whether the callback is safe to 
+be called even if there's no work. 
 
