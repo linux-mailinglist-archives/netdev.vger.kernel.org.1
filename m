@@ -1,63 +1,56 @@
-Return-Path: <netdev+bounces-115874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFDCE94839A
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 22:37:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC93A9483BE
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 22:55:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674ED1F2145F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 20:37:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DC18283FC9
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 20:55:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7340D14A4C9;
-	Mon,  5 Aug 2024 20:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5370514E2E8;
+	Mon,  5 Aug 2024 20:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gH/gyd0M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz6GlXX/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD4D13E881
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 20:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FABD1684B9
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 20:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722890224; cv=none; b=o7AhC3LUNdeLMiPLD/rU1o/zkJGXiEf+x8q0PjUygmp/M3/d3Gw0+0KaKtEqfSiHJicWpzKjc37kVKuM+KC6s2J+rtPEodbBk3BcW4NEUHoRWGXuUVh0FiBJfnuQmt672HS0CZ0C+ZFQri51WSrMIOBer1DxwVYVI49vp3Bb/O8=
+	t=1722891297; cv=none; b=GM1ppQU+5DehGXoMH372rDa9dRrLbk076GhELM7HOfJ79mtlEp0QSuCOXmC4ePjrzyHFCml7vY8mm/+gaFjekShAjnrIwhVv1hIwGLPi8DRIePPONdsdvpr+zzBVD7KGW8Xejy5RW3VZH+sJLfKIamtloceY99VuyImEOreEyLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722890224; c=relaxed/simple;
-	bh=FZXrL5H/ygeKGitASkUubBdqJ+TA33dLAOi7WhcmGak=;
+	s=arc-20240116; t=1722891297; c=relaxed/simple;
+	bh=GxZ2czJs3+sMc+NvjhuzVUPDLvNKRaTE5kEYsOO02f0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TXBacsE84ZFvyq5J3TrBZ38XEDVSad6v9VKomzJkk2Un2YRn2ut5mIgfSagTS32vhbVAYxxPQXJwxpfCI3AY0pPFt1/7iSFEY8YSXlS7HeJRJmVfReLXrOHK5h0C4zvmCmWgElbeLzNpMOhpe9QgVaonj1cZfT1fszbj8wnEuBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gH/gyd0M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4E3C32782;
-	Mon,  5 Aug 2024 20:37:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Gne3RsDMdhvhuL1v4bOlUT5mS7GvvwQZOLG7meZ//E1eB7GVmZmBaBx9SYJ4kTQ127mgio0YCi/xNKdo8Ut6tt/ObEZO33JYPyt2XGGTLIzpknB2ne9v/Fcb7AfGy3vCyPsmwNYYGOA/K7WbR6IpNECxIEXoMVS+M6b8lKHXOHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz6GlXX/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 864AFC32782;
+	Mon,  5 Aug 2024 20:54:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722890223;
-	bh=FZXrL5H/ygeKGitASkUubBdqJ+TA33dLAOi7WhcmGak=;
+	s=k20201202; t=1722891296;
+	bh=GxZ2czJs3+sMc+NvjhuzVUPDLvNKRaTE5kEYsOO02f0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gH/gyd0MEmby1fwbrxEGaL4Ow4m/qEXQV2pI3hzq1U21qOCKsJ/cvLG9IBsXfv3wR
-	 fKhOslsdF6vwpvOFM9IcUm1u50skhX7w9FyWsUMYbj7bV/Z9gZXCwcDxkia9hNsHcA
-	 6a1mu0Nns8zbjDIZxrK3ujiC1cE02sZIdoFvTp+PyT45Uf89xBnA/R/wW3CQVgyjC9
-	 uBLcDL06o+cbLyBiLmKTFcQNipnOQ0grE0G+1LlGCk+RIFhARWMQSMzSYvMCC29/lV
-	 adjlGfgMwmNNaqM5TgfuXDtt+QB/7mPOgNr6iihrbl0PXopP8wF9PsZjNRrJhCJyai
-	 uxQv7sx+Djsww==
-Date: Mon, 5 Aug 2024 13:37:02 -0700
+	b=oz6GlXX/F0COCaikRLtDSityjOfLXGKg0bQG8P/bwaBn4vSIEsvyNSmytH/7khLwK
+	 5dj09rG0aVPtiKO3PhL/qHRAa2qnXc+oKKDbPeqxXZu5G23kn/EHHLuSPjN7zcdO/F
+	 JxHV4F28R74p471cTy9eyDKmpXFUVhl+7D78IpMREhEMH+Hg4NqNkmU+Z3dLFkp4a7
+	 xGt29Wcw1yvs7WmPvPWI1XtGoZ7ZtdRgcoM7Ge60vggnctTYQNLqBT9oE9RRkAVAL4
+	 nENxum1HQnl35QqBUF8BzXqFslBnjaOkXLX8o+jgEuh47hwzxKc5eeevGSH8l1dvfd
+	 iWSN2sYUJKhyQ==
+Date: Mon, 5 Aug 2024 13:54:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, Jiri
- Pirko <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>, Sridhar
- Samudrala <sridhar.samudrala@intel.com>, Simon Horman <horms@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Sunil Kovvuri Goutham
- <sgoutham@marvell.com>, Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-Message-ID: <20240805133702.0f7f222c@kernel.org>
-In-Reply-To: <e971cd64-9cbf-46d2-89fc-008548d1d211@redhat.com>
-References: <cover.1722357745.git.pabeni@redhat.com>
-	<13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
-	<m25xslp8nh.fsf@gmail.com>
-	<07bae4f7-4450-4ec5-a2fe-37b563f6105d@redhat.com>
-	<m2v80jnpkd.fsf@gmail.com>
-	<e971cd64-9cbf-46d2-89fc-008548d1d211@redhat.com>
+To: o.rempel@pengutronix.de, lukma@denx.de
+Cc: Martin Whitaker <foss@martin-whitaker.me.uk>, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
+Subject: Re: Regression in KSZ9477 dsa driver - KSZ9567 et al. do not
+ support EEE
+Message-ID: <20240805135455.389c906b@kernel.org>
+In-Reply-To: <137ce1ee-0b68-4c96-a717-c8164b514eec@martin-whitaker.me.uk>
+References: <137ce1ee-0b68-4c96-a717-c8164b514eec@martin-whitaker.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,39 +60,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 5 Aug 2024 16:35:29 +0200 Paolo Abeni wrote:
-> > Perhaps the API would be better if you had:
-> > 
-> > - shaper-new
-> > - shaper-delete
-> > - shaper-get/dump
-> > - shaper-set
-> > - group-new
-> > - group-delete
-> > - group-get/dump
-> > - group-set
-> > 
-> > If you went with Jakub's suggestion to give every shaper n x inputs and
-> > an output, then you could recombine groups and shapers and just have 4
-> > ops. And you could rename 'detached' to 'shaper' so that an attachment
-> > is one of port, netdev, queue or shaper.  
+On Mon, 5 Aug 2024 13:15:49 +0100 Martin Whitaker wrote:
+> I have an embedded processor board running Linux that incorporates a
+> KSZ9567 ethernet switch. When using Linux 6.1 I can establish a stable
+> connection between two of these boards. When using Linux 6.6, the link
+> repeatedly drops and reconnects every few seconds.
 > 
-> I'm unsure I read the above correctly, and I'm unsure it's in the same 
-> direction of Jakub's suggestion. AFACS the above is basically the same 
-> interface we proposed in the past iteration and was explicitly nacked 
-> from Jakub,
+>  From bisection, this bug was introduced in the patch series "net: add
+> EEE support for KSZ9477 switch family" which was merged in commit
+> 9b0bf4f77162.
+> 
+> As noted in the errata for these devices, EEE support is not fully
+> operational in the KSZ9477, KSZ9567, KSZ9896, and KSZ9897 devices,
+> causing link drops when connected to another device that supports EEE.
+> 
+> A fix for this regression was merged in commit 08c6d8bae48c2, but only
+> for the KSZ9477. This fix should be extended to the other affected
+> devices as follows:
 
-To be clear I was against the low level twiddling APIs, where one has to
-separately create a mux/group/scheduler and "move" all its children
-under it one by one. (due to the problems it creates with atomic
-transitions between configurations).
+Thanks for the analysis, adding to CC the folks who wrote the commits
+you mention.
 
-Having shapers separate from the scheduling hierarchy doesn't seem bad,
-tho I haven't gone thru all the considerations in my head.
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> b/drivers/net/dsa/microchip/ksz_common.c
+> index 419476d07fa2..091dae6ac921 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -2346,6 +2346,9 @@ static u32 ksz_get_phy_flags(struct dsa_switch
+> *ds, int port)
+>                          return MICREL_KSZ8_P1_ERRATA;
+>                  break;
+>          case KSZ9477_CHIP_ID:
+> +       case KSZ9567_CHIP_ID:
+> +       case KSZ9896_CHIP_ID:
+> +       case KSZ9897_CHIP_ID:
+>                  /* KSZ9477 Errata DS80000754C
+>                   *
+>                   * Module 4: Energy Efficient Ethernet (EEE) feature
+> select must
+> 
+> I have verified this fixes the bug for the KSZ9567 on my board.
+> 
 
-> Additionally, one of the constraint to be addressed here is allowing to 
-> setup/configures all the nodes in a 'group' with a single operation, to 
-> deal with H/W limitations. How would the above address such constraint?
-
-FWIW I think the naming is the major source of confusion :(
 
