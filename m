@@ -1,120 +1,121 @@
-Return-Path: <netdev+bounces-115676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CCFF9477C1
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:59:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0B59477CD
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 11:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D64BE281178
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:59:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBD29B20AA7
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EBE14F9D7;
-	Mon,  5 Aug 2024 08:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AC71514E1;
+	Mon,  5 Aug 2024 08:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="IY6zwe1V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IaYJTBYA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D1614F13E;
-	Mon,  5 Aug 2024 08:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D631514DA
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 08:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722848259; cv=none; b=CDlCwCCq1qyf7pvzCh2MzxTK36uV02Lmnj4yJx0Cm60OhHMe56w+UNhLE08J6tqorfbyRmfOdjQ11qds5uYzGjZj8qqXE3NbpszMSIqA8doQr6sfrmahUQ7qUWZZB5nzrVVnBuQkNm+idvhSZlFC3qf/XDFaXHUIXGwoPAxmJYk=
+	t=1722848305; cv=none; b=gVrm1/ZECnt8slMUmbc4/9uPRJ7ZS4xNylFWctetftmeXlRdKgFkqcCglvqygYQ49Wq3tdxi6oq+4EvrMN+iqubKjXK9p8iyEnMvgleiTW9QwfDgNSaXKa58gPbhOzZFLyiRqfLcUou6Iea/GWNq6yvDYqz6HY/VfGEHoTi8v9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722848259; c=relaxed/simple;
-	bh=nXSKsJljPyQG2KjxP/RwqDOocnbp100QJWnOIcLrmDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FTaX3h0XfGRh+EkD6krtHMXQx3WQhqtX51Z8zpyAQCiv8cnjzI688rt5+9XxUOvdh79OAxZbX6ZJm7U3nrKhfo3ZvoPK8/u2/IF+hctLRVoMGEYRtTzavzSCSvEsQu5Rml7Zl/G/czZh/OUZGGeyIlN2O5OO6kf8ps3bfAd9vz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=IY6zwe1V; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from fedor-21d0 (unknown [5.228.116.177])
-	by mail.ispras.ru (Postfix) with ESMTPSA id E493740737D6;
-	Mon,  5 Aug 2024 08:47:24 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru E493740737D6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1722847645;
-	bh=Z7DF68oI2SzqdSro69T/JCd/OeieWIA/rbRyTPztJUc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IY6zwe1Vm+PWAzF+cfL6r8t2zDqQF+iHfcZiPwziJdL6iB5uJe1FJKQJvxRMmHysw
-	 wgby3H3g9l6ckD7yIwGd3sqlQvTXwXE+xvGQWA1bqRPaGSfVy6ighxBD/XPO72YedW
-	 J2KeSXG5eH6Y8Ldd9Zawn26lIchKq8nedMl3Kqqc=
-Date: Mon, 5 Aug 2024 11:47:12 +0300
-From: Fedor Pchelkin <pchelkin@ispras.ru>
-To: Krzysztof Kozlowski <krzk@kernel.org>, 
-	Aleksandr Mishin <amishin@t-argos.ru>
-Cc: Samuel Ortiz <sameo@linux.intel.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [lvc-project] [PATCH] nfc: pn533: Add poll mod list filling check
-Message-ID: <20240805-feadcc5dfd3905e1110a5068-pchelkin@ispras.ru>
-References: <20240702093924.12092-1-amishin@t-argos.ru>
- <d146fb2c-50bb-4339-b330-155f22879446@kernel.org>
- <4899faf4-14cc-4e68-86e5-8745b38e5ab1@t-argos.ru>
- <ed68c600-aca8-4773-94e3-92347e79877c@kernel.org>
+	s=arc-20240116; t=1722848305; c=relaxed/simple;
+	bh=EOtMhBGe4zDybAWzBAaC+OjORVJ+E9Wd5wLlM6WJNwI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aCn8CkSnJ0RyTAYnAgNq3vOs6gStYki1y4iOE1KlpCB9CmvbD1fPT7OLj1TSb9nX6KiBMRJqVb5RPUIHDw+/rbVqw9Hp5c1rPoFP0kC/eoVAMHyzEuYRVsPMgtEtA2bJiiT6MvfIN1kNYT4Z0x+TkoM35EB7a8BAF1HzD10Gaq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IaYJTBYA; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b7922ed63so15268039276.0
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 01:58:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722848303; x=1723453103; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CsHW4k0e3zT9MBWbBKI8L62qPb1qmcR1MYe/7rji8gQ=;
+        b=IaYJTBYAUNgzaFDeLa2q29zYXhYF36vaotDyqNLIx5mm+NVLCTpVXCZ/f9diYQxMXI
+         uQd2XlmHL/nrz8RZzY0Zsi4EKxny90U9kAS0fRFpttgI95nkLSFAhMHczvpzyri1jX5R
+         8Sa275AHhNDJcmiRdhoBurbKFYP7nZgDM1R0IgSf4QmZJqlT2KwJT8OpghNVNxTQBmYk
+         +jZS913CXthzndOldWO244VnQaoBzozANnGnVXXTjRwO8A2wNcasbslSuFrCNHhPqV7H
+         eOnWYK67JCttIh0uWjOXGDIWpgGyL2tpVhc/t3Rp5/WspIx3Oaf/HFjnW6naaidDjCqC
+         ELwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722848303; x=1723453103;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CsHW4k0e3zT9MBWbBKI8L62qPb1qmcR1MYe/7rji8gQ=;
+        b=lx2L8D95ux7frXTj7p0dLfrJ44ldQkKBTOtFqulcinEJnHxxAGffqt3KYPKmwpJHCY
+         2BSldKQJFonwI7UlAMMfQC0cGlxiTxkLsDY4Z8pM/M+nkD+c5a5NqTeCVgPj+rtVSm83
+         IdWcN/vRh/3AmVeFIzT6Ce3zV+DgT7HAoORZUNLpkJqRtpUv9gaHeIGp2tbCEMglazpC
+         NsIUqZOpaDHSzxGLyC17SOmMnrs3HD6V/q3tDBg+MTIIWUwG+CTSUbSREUXHMXbe4B3Y
+         ptLRy+w2oyrZtGEbak0eMdsnKdgDYSsddIvilhqw6B3uxG9rdM82rg1ZVrmvt5A128GK
+         IY4A==
+X-Gm-Message-State: AOJu0Yw1g2OOHlHhz+oK/nOWU693eWugWkQA3CnOrZPPxWy63cWqjOX1
+	EERlsrIru4OCsdzOFXzi725gGxZoGhcawVI2lkS5qd8Z4tmMRLPqK4ywjJot/4d5YfuNTiXrs8T
+	GTXXstKy6OA==
+X-Google-Smtp-Source: AGHT+IEDNbsMk+dSnXsX9LR1zT3zG8cu9oqrRpOURB5it7LYkItnrbdWnPA+lyagOQDH/tZM9DhmTXn6mkga0A==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2b8b:b0:e05:eb99:5f84 with SMTP
+ id 3f1490d57ef6-e0bde3656a2mr19557276.4.1722848303346; Mon, 05 Aug 2024
+ 01:58:23 -0700 (PDT)
+Date: Mon,  5 Aug 2024 08:58:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ed68c600-aca8-4773-94e3-92347e79877c@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240805085821.1616528-1-edumazet@google.com>
+Subject: [PATCH net] net: linkwatch: use system_unbound_wq
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 04. Jul 14:07, Krzysztof Kozlowski wrote:
-> On 03/07/2024 09:26, Aleksandr Mishin wrote:
-> > 
-> > 
-> > On 03.07.2024 8:02, Krzysztof Kozlowski wrote:
-> >> On 02/07/2024 11:39, Aleksandr Mishin wrote:
-> >>> In case of im_protocols value is 1 and tm_protocols value is 0 this
-> >>
-> >> Which im protocol has value 1 in the mask?
-> >>
-> >> The pn533_poll_create_mod_list() handles all possible masks, so your
-> >> case is just not possible to happen.
-> > 
-> > Exactly. pn533_poll_create_mod_list() handles all possible specified 
-> > masks. No im protocol has value 1 in the mask. In case of 'im_protocol' 
-> 
-> Which cannot happen.
-> 
-> > parameter has value of 1, no mod will be added. So dev->poll_mod_count 
-> > will remain 0.
-> 
-> Which cannot happen.
-> 
-> > I assume 'im_protocol' parameter is "external" to this driver, it comes 
-> > from outside and can contain any value, so driver has to be able to 
-> > protect itself from incorrect values.
-> 
-> Did you read what I wrote? It cannot happen.
+linkwatch_event() grabs possibly very contended RTNL mutex.
 
-An important thing which unfortunately wasn't mentioned in commit log is
-that these protocol values actually come from userspace via Netlink
-interface (NFC_CMD_START_POLL operation). So a broken or malicious program
-may pass a message containing a "bad" combination of protocol parameter
-values so that dev->poll_mod_count is not incremented inside
-pn533_poll_create_mod_list(), thus leading to division by zero.
+system_wq is not suitable for such work.
 
-nfc_genl_start_poll()
-  nfc_start_poll()
-    ->start_poll()
-    pn533_start_poll()
+Inspired by many noisy syzbot reports.
 
-Looking at pn533_poll_create_mod_list() source code, seems there may be a
-number of such "bad" combinations: e.g. when passed tm_protocols is 0 and
-im_protocols is 1.
+3 locks held by kworker/0:7/5266:
+ #0: ffff888015480948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
+ #0: ffff888015480948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
+ #1: ffffc90003f6fd00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
+ , at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
+ #2: ffffffff8fa6f208 (rtnl_mutex){+.+.}-{3:3}, at: linkwatch_event+0xe/0x60 net/core/link_watch.c:276
 
-CAP_NET_ADMIN is currently required to perform device control operations
-but it's not a point for the situation to be neglected.
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/link_watch.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regarding the patch, maybe it'd be better to include the check inside
-pn533_poll_create_mod_list() itself and return an error? That'd be more
-convenient if someday this function would be called elsewhere in the code
-and dev->poll_mod_count must still be guaranteed to be incremented at
-least once.
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index 8ec35194bfcb8574f53a9fd28f0cb2ebfe9a3f2e..ab150641142aa1545c71fc5d3b11db33c70cf437 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -148,9 +148,9 @@ static void linkwatch_schedule_work(int urgent)
+ 	 * override the existing timer.
+ 	 */
+ 	if (test_bit(LW_URGENT, &linkwatch_flags))
+-		mod_delayed_work(system_wq, &linkwatch_work, 0);
++		mod_delayed_work(system_unbound_wq, &linkwatch_work, 0);
+ 	else
+-		schedule_delayed_work(&linkwatch_work, delay);
++		queue_delayed_work(system_unbound_wq, &linkwatch_work, delay);
+ }
+ 
+ 
+-- 
+2.46.0.rc2.264.g509ed76dc8-goog
+
 
