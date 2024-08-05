@@ -1,156 +1,227 @@
-Return-Path: <netdev+bounces-115726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E91B9479CD
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:29:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BCFD9479E9
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94EAF1F22259
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:29:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA653281CAE
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 10:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26527159568;
-	Mon,  5 Aug 2024 10:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6712154BFF;
+	Mon,  5 Aug 2024 10:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TrRFl9qs"
+	dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b="P3e6V+Rz"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from pv50p00im-ztdg10011301.me.com (pv50p00im-ztdg10011301.me.com [17.58.6.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA1D15A84E;
-	Mon,  5 Aug 2024 10:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AA154BE4
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 10:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722853557; cv=none; b=LR94Sctyd1pMRcGs8Ep1+xX3F4zuovZT6b3lbOYIHwy7z+yzfC/1Bc/Mexo/iqGQTi1pDym4wTYny7tk4k0APvyP2Rz4SVdX1Uskfnsl9D0edisxsSOGrElvjUAGs/rSli6cAxDmgJfDsWKiRh0lhkCoXCUT8bvZbzjhZqhuvGY=
+	t=1722854055; cv=none; b=L0kGStw/KY4PrZk3mj1XoJnb0IL9uaL2LD0IS2Leg1nbCgnWM1Ydz8bMu1vdRWWMHh69ZyI3G7ctdQDzlOkRlRng2XXDEDkGVK6kvYYxdxyes+tCH8YiXhlEb7nffCQrUz7m7vmKJdxmzO3mC4As1Y62FYSFjv2gJAnZBvDCwIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722853557; c=relaxed/simple;
-	bh=bChlo37KtePbk/JIXsBBt2KGiCgH1m93Kf8uViSeDvA=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=dlRls76EWppfT/FDDWVEi9XsNLujwjP9YWBRzb2HcRWxXiKL8wmeG4EilyDhG99qxLY1GpCcBRNui8NNw1D+CU7y+zv2WIAT2IBjiQkc3g8RBCbXvXXsx8qyxmcF25hJtGD1kU7d9caRvJM9RC0ro3D04BMTlApdtyrH2WhfaCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TrRFl9qs; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Z8gY6jZiiMLzyoWt7ctY5h/IUzzdZpexpgOZkbqhuD8=; b=TrRFl9qsHvPDsSkdT7MH5ntAuR
-	/N4NTQPn0pPysHsFWRRjfOgF0b2SJi21zUd/h3C9oHG4WDfqQ+0PPn7s1PlcD6qELAoBy0IvWZ0a+
-	6H1v3VbdQxe+UkK7dGcvq6wWTw6glLRFNH3lwn13Kr8RcThuC6iDDYJ+Co4MQ87+jbavmlg6FaWdi
-	aD3KVU9AhVIA9urpCmC1dXBqypyUFNHWlSruaIwnMU6LapXoqVLjV+870yJNlUPdnanwGn3ePtqp9
-	EuDYt8t+hj/afFyrJO+h+OTSQn43pIn6jF153IXWLxj4/fJcdhsmCB1T1boKxU22qSO7UXFQD6jr2
-	LAy5eXnQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:49728 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1sauuN-0002fY-1w;
-	Mon, 05 Aug 2024 11:25:43 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1sauuS-000tvz-6E; Mon, 05 Aug 2024 11:25:48 +0100
-In-Reply-To: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
-References: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
-From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	s=arc-20240116; t=1722854055; c=relaxed/simple;
+	bh=cKReRH94wFKtKtVHMa/L36Kq71/L+wmMJYY5Az9XTAk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZMzX/zboYK48aqWrYXNVLNj5Xq7/OhiZ5qCIEwWmwhdR6k5O7jfW8OEMYWUZwbNEdn3xOEqnDXK2MvTjpCd3NYoM31JKh0/qnSjr238PW9tswqLOkV0bxp7IpQRp6zJ9AA/NKuQPNR49LiFUjvX9mdc4G72jydP9JhPkTbI/gJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me; spf=pass smtp.mailfrom=kuroa.me; dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b=P3e6V+Rz; arc=none smtp.client-ip=17.58.6.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuroa.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuroa.me; s=sig1;
+	t=1722854053; bh=ZkuzDnwnrzCgvULtBdEnjPEEk57f0Z+/bZicr5k01dU=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+	b=P3e6V+Rz4yXjoMb+qo7xA4pQKBSnygPAmtqswZEwNt9IisPCrZtPSDFGxEv3L1p2z
+	 vLXNfRyNnflXVafIQjbYSot3HSi0ajDyRC/sKDKtpjxIG+hp7WkPi4j7HLKRse+xu3
+	 xlKnKXeeKrkMBS+5dUao/Do0bLaQcgJWhpJV2WkP84Ta5ZCcsLzbGMbe07/bFljQhB
+	 gaItykGoVgG9InVP2iwN9BQieP9774JG5aaqsiARDJRo1EPH2QoFb7jTc/TE4eTRVi
+	 NJRpmnpiq9TG9+f3/ek661WqtLY/7AxbGDMDpHWJxrHsw0XNT6EaRW9JeOqH+ZRPj/
+	 x4f9GQ7/Tbh9Q==
+Received: from tora.kuroa.me (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id AB6B6180167;
+	Mon,  5 Aug 2024 10:34:08 +0000 (UTC)
+From: Xueming Feng <kuro@kuroa.me>
+To: "David S . Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sneh Shah <quic_snehshah@quicinc.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH RFC net-next v4 14/14] net: stmmac: Activate Inband/PCS flag
- based on the selected iface
+	Eric Dumazet <edumazet@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>,
+	Jason Xing <kerneljasonxing@gmail.com>
+Cc: Neal Cardwell <ncardwell@google.com>,
+	Yuchung Cheng <ycheng@google.com>,
+	Soheil Hassas Yeganeh <soheil@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Xueming Feng <kuro@kuroa.me>
+Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
+Date: Mon,  5 Aug 2024 18:33:55 +0800
+Message-Id: <20240805103355.219228-1-kuro@kuroa.me>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1sauuS-000tvz-6E@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 05 Aug 2024 11:25:48 +0100
+X-Proofpoint-ORIG-GUID: BiHjgtpnWJ65c25Vo619cE8FSclVg5gG
+X-Proofpoint-GUID: BiHjgtpnWJ65c25Vo619cE8FSclVg5gG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-04_14,2024-08-02_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030 malwarescore=0
+ adultscore=0 phishscore=0 mlxscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 mlxlogscore=964 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2308100000 definitions=main-2408050076
 
-From: Serge Semin <fancer.lancer@gmail.com>
+On Mon, Aug 5, 2024 at 4:04 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
+>
+> On Mon, Aug 5, 2024 at 3:23 PM Eric Dumazet <edumazet@google.com> wrote:
+> >
+> > On Mon, Aug 5, 2024 at 6:52 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
+> > >
+> > > On Sat, Aug 3, 2024 at 11:48 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
+> > > >
+> > > > Hello Eric,
+> > > >
+> > > > On Thu, Aug 1, 2024 at 9:17 PM Eric Dumazet <edumazet@google.com> wrote:
+> > > > >
+> > > > > On Thu, Aug 1, 2024 at 1:17 PM Xueming Feng <kuro@kuroa.me> wrote:
+> > > > > >
+> > > > > > We have some problem closing zero-window fin-wait-1 tcp sockets in our
+> > > > > > environment. This patch come from the investigation.
+> > > > > >
+> > > > > > Previously tcp_abort only sends out reset and calls tcp_done when the
+> > > > > > socket is not SOCK_DEAD aka. orphan. For orphan socket, it will only
+> > > > > > purging the write queue, but not close the socket and left it to the
+> > > > > > timer.
+> > > > > >
+> > > > > > While purging the write queue, tp->packets_out and sk->sk_write_queue
+> > > > > > is cleared along the way. However tcp_retransmit_timer have early
+> > > > > > return based on !tp->packets_out and tcp_probe_timer have early
+> > > > > > return based on !sk->sk_write_queue.
+> > > > > >
+> > > > > > This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resched
+> > > > > > and socket not being killed by the timers. Converting a zero-windowed
+> > > > > > orphan to a forever orphan.
+> > > > > >
+> > > > > > This patch removes the SOCK_DEAD check in tcp_abort, making it send
+> > > > > > reset to peer and close the socket accordingly. Preventing the
+> > > > > > timer-less orphan from happening.
+> > > > > >
+> > > > > > Fixes: e05836ac07c7 ("tcp: purge write queue upon aborting the connection")
+> > > > > > Fixes: bffd168c3fc5 ("tcp: clear tp->packets_out when purging write queue")
+> > > > > > Signed-off-by: Xueming Feng <kuro@kuroa.me>
+> > > > >
+> > > > > This seems legit, but are you sure these two blamed commits added this bug ?
 
-The HWFEATURE.PCSSEL flag is set if the PCS block has been synthesized
-into the DW GMAC controller. It's always done if the controller supports
-at least one of the SGMII, TBI, RTBI PHY interfaces. If none of these
-interfaces support was activated during the IP-core synthesize the PCS
-block won't be activated either and the HWFEATURE.PCSSEL flag won't be
-set. Based on that the RGMII in-band status detection procedure
-implemented in the driver hasn't been working for the devices with the
-RGMII interface support and with none of the SGMII, TBI, RTBI PHY
-interfaces available in the device.
+My bad, I wasn't sure about the intend of the original commit that did not
+handle orphan sockets at the time of blaming, should have asked.
 
-Fix that just by dropping the dma_cap.pcs flag check from the conditional
-statement responsible for the In-band/PCS functionality activation. If the
-RGMII interface is supported by the device then the in-band link status
-detection will be also supported automatically (it's always embedded into
-the RGMII RTL code). If the SGMII interface is supported by the device
-then the PCS block will be supported too (it's unconditionally synthesized
-into the controller). The later is also correct for the TBI/RTBI PHY
-interfaces.
+> > > > >
+> > > > > Even before them, we should have called tcp_done() right away, instead
+> > > > > of waiting for a (possibly long) timer to complete the job.
+> > > > >
+> > > > > This might be important when killing millions of sockets on a busy server.
+> > > > >
+> > > > > CC Lorenzo
+> > > > >
+> > > > > Lorenzo, do you recall why your patch was testing the SOCK_DEAD flag ?
+> > > >
+> > > > I guess that one of possible reasons is to avoid double-free,
+> > > > something like this, happening in inet_csk_destroy_sock().
+> > > >
+> > > > Let me assume: if we call tcp_close() first under the memory pressure
+> > > > which means tcp_check_oom() returns true and then it will call
+> > > > inet_csk_destroy_sock() in __tcp_close(), later tcp_abort() will call
+> > > > tcp_done() to free the sk again in the inet_csk_destroy_sock() when
+> > > > not testing the SOCK_DEAD flag in tcp_abort.
+> > > >
+> > >
+> > > How about this one which can prevent double calling
+> > > inet_csk_destroy_sock() when we call destroy and close nearly at the
+> > > same time under that circumstance:
+> > >
+> > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > index e03a342c9162..d5d3b21cc824 100644
+> > > --- a/net/ipv4/tcp.c
+> > > +++ b/net/ipv4/tcp.c
+> > > @@ -4646,7 +4646,7 @@ int tcp_abort(struct sock *sk, int err)
+> > >         local_bh_disable();
+> > >         bh_lock_sock(sk);
+> > >
+> > > -       if (!sock_flag(sk, SOCK_DEAD)) {
+> > > +       if (sk->sk_state != TCP_CLOSE) {
+> > >                 if (tcp_need_reset(sk->sk_state))
+> > >                         tcp_send_active_reset(sk, GFP_ATOMIC,
+> > >                                               SK_RST_REASON_NOT_SPECIFIED);
+> > >
+> > > Each time we call inet_csk_destroy_sock(), we must make sure we've
+> > > already set the state to TCP_CLOSE. Based on this, I think we can use
+> > > this as an indicator to avoid calling twice to destroy the socket.
+> >
+> > I do not think this will work.
+> >
+> > With this patch, a listener socket will not get an error notification.
+> 
+> Oh, you're right.
+> 
+> I think we can add this particular case in the if or if-else statement
+> to handle.
+> 
+> Thanks,
+> Jason
 
-Note while at it drop the netdev_dbg() calls since at the moment of the
-stmmac_check_pcs_mode() invocation the network device isn't registered. So
-the debug prints will be for the unknown/NULL device.
+Summarizing above conversation, I've made a v2-ish patch, which should
+handles the double abort, and removes redundent tcp_write_queue_purge.
+Please take a look, in the meanwhile, I will see if I can make a test 
+for tcp_abort. If this looks good, I will make a formal v2 patch.
 
-Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-[rmk: fix build errors, only use PCS for SGMII if priv->dma_cap.pcs is set]
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Any advice is welcomed. (Including on how to use this mail thread, I don't
+have much experience with it.)
+
+Signed-off-by: Xueming Feng <kuro@kuroa.me>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+ net/ipv4/tcp.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index a57f5028d8aa..4fd9daecef09 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1133,18 +1133,10 @@ static void stmmac_check_pcs_mode(struct stmmac_priv *priv)
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e03a342c9162..039a9c9301b7 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4614,6 +4614,10 @@ int tcp_abort(struct sock *sk, int err)
  {
- 	int interface = priv->plat->mac_interface;
+ 	int state = inet_sk_state_load(sk);
  
--	if (priv->dma_cap.pcs) {
--		if ((interface == PHY_INTERFACE_MODE_RGMII) ||
--		    (interface == PHY_INTERFACE_MODE_RGMII_ID) ||
--		    (interface == PHY_INTERFACE_MODE_RGMII_RXID) ||
--		    (interface == PHY_INTERFACE_MODE_RGMII_TXID)) {
--			netdev_dbg(priv->dev, "PCS RGMII support enabled\n");
--			priv->hw->pcs = STMMAC_PCS_RGMII;
--		} else if (interface == PHY_INTERFACE_MODE_SGMII) {
--			netdev_dbg(priv->dev, "PCS SGMII support enabled\n");
--			priv->hw->pcs = STMMAC_PCS_SGMII;
--		}
++	/* Avoid force-closing the same socket twice. */
++	if (state == TCP_CLOSE) {
++		return 0;
++	}
+ 	if (state == TCP_NEW_SYN_RECV) {
+ 		struct request_sock *req = inet_reqsk(sk);
+ 
+@@ -4646,16 +4650,13 @@ int tcp_abort(struct sock *sk, int err)
+ 	local_bh_disable();
+ 	bh_lock_sock(sk);
+ 
+-	if (!sock_flag(sk, SOCK_DEAD)) {
+-		if (tcp_need_reset(sk->sk_state))
+-			tcp_send_active_reset(sk, GFP_ATOMIC,
+-					      SK_RST_REASON_NOT_SPECIFIED);
+-		tcp_done_with_error(sk, err);
 -	}
-+	if (phy_interface_mode_is_rgmii(interface))
-+		priv->hw->pcs = STMMAC_PCS_RGMII;
-+	else if (priv->dma_cap.pcs && interface == PHY_INTERFACE_MODE_SGMII)
-+		priv->hw->pcs = STMMAC_PCS_SGMII;
- }
++	if (tcp_need_reset(sk->sk_state))
++		tcp_send_active_reset(sk, GFP_ATOMIC,
++					SK_RST_REASON_NOT_SPECIFIED);
++	tcp_done_with_error(sk, err);
  
- /**
+ 	bh_unlock_sock(sk);
+ 	local_bh_enable();
+-	tcp_write_queue_purge(sk);
+ 	if (!has_current_bpf_ctx())
+ 		release_sock(sk);
+ 	return 0;
 -- 
-2.30.2
-
 
