@@ -1,317 +1,184 @@
-Return-Path: <netdev+bounces-115824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B93947ED3
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:59:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5543947EDC
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 683B9283E8F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:59:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E81611C21D6F
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7534015B147;
-	Mon,  5 Aug 2024 15:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C78B15B99D;
+	Mon,  5 Aug 2024 15:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AYnUREM/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RCXywq9t"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2070.outbound.protection.outlook.com [40.107.95.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D73914901F;
-	Mon,  5 Aug 2024 15:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722873542; cv=fail; b=rQ3DUIjQasg6OacTB1oCH6jkf8jfny+hW6uqeT1Go8pnDmUhrITC3+Esj3CoBUhnwVR5wUwLmFSIQdIJwAt0zEdOUZNuQITqHY7nCQGjqCItD/IW1cNy/B91haKXFhXMh2aO3f1fYBzxpDNz3uLv2aULl/J9u023BfMr+12098Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722873542; c=relaxed/simple;
-	bh=GF5dRs/qrIIT8HD8HT5gf1nXZhfSUhZq1B7kvQFGuws=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=qd/xuzmnSeIpXUd54Nyv+kHLUc6STqG6JOexuAN5HioIqKfxp8CqUnVFeykbNPMnv1rLYX2RWmGoY5o7YhyWecNGnp+4GjqV42vTJBu5m1Za8KuQMOQibmjEFUcCZnN7swROxnmtWIFyoNpAKuZcwJnq9S82nLdQC9/Z9JBvIIw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AYnUREM/; arc=fail smtp.client-ip=40.107.95.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qiZEPzh52g8jomLtbqxQe4NHG4KVt8b3s0eAyVZXvOWXDWFQQQzWNZJ+hSQLqvUjChWz7A9yF0ceAElP3+lHiXXsRkz7LcnVhWiF76VnBi58+AEShpx3S3ZZuVI/epDC2HecqetLIHZGPjmx9RjSNQMWPbtR/DI5bGVz8lRPstyHriXozOjXRFuppVjwuNfH2OfdBI3DpBpVlC9TgiW1w9lj1jn2PcmBs2DMBGJsXGPqypyxaPIJhB162Bc7J8OQTlLifA/lcG7w/lJTWlSalif6I+0/avM7hhAvQLo0sJU7K7IKdgT0E/o2dSjfjNRtNe7EqlaurANBd/swq1rTVg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NdhNQTVxiXjEiB784v4IrWFcPeVV9s8m4MLZL6IOUEY=;
- b=i05fwbU6hRKo+0u1xV5LgzfyV9aYBsgVD5hrheaRI+Gs2S/N9K5ziITyVXoXZfuxCQNrFhX33Ng5No4ZeTxx4PKMxCj8ap3gpFcEHHA9aee6Z/hqjtdgY/rHcgud7VV6FJP06s546JqNknd9G48is6dWmtcmTL6yJuGvmekIlI+enhd6affDW942cJTMMtY2AodogBgit585sYjfirjpHxmpMF888TZKe2V9HRCTna16VpmHn13UV93IvL6NLYyvwZEa1vY3g4l+Cv3/ZPNGa0mYkD4+YsLT3pQEOBK3fFJ0ntVdImmu0vkBhmJuIlNmovX1l2BxwrlJ17d+QR87+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NdhNQTVxiXjEiB784v4IrWFcPeVV9s8m4MLZL6IOUEY=;
- b=AYnUREM/Yif254KQBZS3tXPOl4JsJIyMmHoKSoybX4QqaPCdspFcCcQ6tdvscqYJD86ZWAcch2hiJQjRG8vw00PojOlUXF6Xx08e6lHCP7fMliQZqmfbi09sVG1eJ+EovZfi2w8pXthwcrVz5sZnUMSmNFEZm600IKWLI33EdJ3u5jKgyuL2SouPrudYpGAkjNy0P8/iQ0uI62bsaLPhrDhjTCjfaENG4Tjp0VOEDEIkZE5ifBbvMC95VZZCMZgGm6htugYj1P8L5LIt8mMmlrK6Obfys9j+MN0iiMSyXPGdFlUYoVACF8HuWRebwjrZ6o5JjwSi+BaH3PvjPVoqtQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
- by CH2PR12MB4136.namprd12.prod.outlook.com (2603:10b6:610:a4::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Mon, 5 Aug
- 2024 15:58:55 +0000
-Received: from CY8PR12MB8297.namprd12.prod.outlook.com
- ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
- ([fe80::b313:73f4:6e6b:74a4%7]) with mapi id 15.20.7828.023; Mon, 5 Aug 2024
- 15:58:55 +0000
-Message-ID: <cc771916-62fe-4f6b-88d2-9c17dff65523@nvidia.com>
-Date: Mon, 5 Aug 2024 17:58:50 +0200
-User-Agent: Mozilla Thunderbird
-From: Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [RFC PATCH vhost] vhost-vdpa: Fix invalid irq bypass unregister
-To: Jason Wang <jasowang@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "eperezma@redhat.com"
- <eperezma@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20240801153722.191797-2-dtatulea@nvidia.com>
- <CACGkMEutqWK+N+yddiTsnVW+ZDwyM+EV-gYC8WHHPpjiDzY4_w@mail.gmail.com>
- <51e9ed8f37a1b5fbee9603905b925aedec712131.camel@nvidia.com>
- <CACGkMEuHECjNVEu=QhMDCc5xT_ajaETqAxNFPfb2-_wRwgvyrA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CACGkMEuHECjNVEu=QhMDCc5xT_ajaETqAxNFPfb2-_wRwgvyrA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0322.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::15) To CY8PR12MB8297.namprd12.prod.outlook.com
- (2603:10b6:930:79::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD1015B995
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 15:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722873569; cv=none; b=Tgs4J1TCkcot1P4jYoSfexBzbYYG6TWEZe9o2b2L++tnGZ5zHOQcphTVTj6rj0wA8h6TKYzn1D+0ybquAv0DYKS1hQ2GxjYv1j6O2gSIl5zLUg6U4NDnZZ+VRWF4uNnBpKaKuFa5w0f0EAyX1I4E2agRRHtM9OxNsSJ7sTuaUDc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722873569; c=relaxed/simple;
+	bh=yyFHHJLs5XMnsATcmDV5xwsL/52ewonO/mr4v7WU8VE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VuoS6IQ7G3t+b9frFqGBuBKvii967uXNTj0hQbRXZW3TU8JR5qqrJygFuJkavMLiHmvrAavR+cCKEFwkpj2QEZrFtYewTzwdPHXvGSviW4RXT9MtTNvKm3PxziLWTAoU/fEaDT37glYoDQqlHld3tUur4Edq4tn7Fd7jAJ0wW3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=RCXywq9t; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a7aabb71bb2so1309097166b.2
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 08:59:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1722873566; x=1723478366; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Dblc/r7f8uhc3yu/sQ/4f4uPAPMTaEkolU/TBHtbGk=;
+        b=RCXywq9tZ+wR2Qe2U2hViTTQ8bpolSIUjHXjThypEaCXefRucyvrX2tmjoLBk5wokL
+         VSn9kIoPMoRVNomvDNONJXC6EeXv0OBQNH3hy9JU9E/RWRcte/AejDWhcpAPH3SaE4lF
+         ZCa1L8sXM0IYLWDiBhCSCYaf9pPaRKWfpEqVEz6r1sUItyLGhTVc7zcYbY9oO0iGwOk1
+         GTt02sUxATr8rPGWkGjEUzKLqNK1fzZwxwaugxgxRjbTEY/29VfiVejP8JmeL98WPBhB
+         VAduHK+cnfkPbWfGd8ppN4CawyzLIuAvHczmmrzjd2CPuBB9aK/bfoQZPkSjF7m/8Umi
+         OCbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722873566; x=1723478366;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6Dblc/r7f8uhc3yu/sQ/4f4uPAPMTaEkolU/TBHtbGk=;
+        b=rD4xW4RKOAn9OIXrDy16ej+cb9urUwfqM5jZkVpaavwQnuKw+as1V5YySXSKeVPulC
+         gn1SPs4U8IhnjV0Oa9dpb8r9l5yeLH02MhF1ReJed/6Kqbj1MFrT1b6QtfQfGzV8aRTj
+         jaVQh6ocz9ZHQnRuBiL5RQ2rAAGrTYz1i7bnYHpKedruqlq8XELAHU1Umzb3X6SFn9PD
+         vdLAk0rfe9N24Zwp41c/e8z81QaDwjnQ785bo2IZY/H89Xt9AfzsrHCw9bZbpB38MXN0
+         zuMZxOpRFsF6mwGFb4Lnb14s1O9Ah38C8mje5kkp3zi/vW7RcPCGSRYsAJpnQt/y43VZ
+         h6Lw==
+X-Gm-Message-State: AOJu0Yw9S02Wngb6XsBDLKWNq89JLgC8vwaim820hNTc8u2fXen768dj
+	YfzveJxSucgQyePHX1ohXhkA0rJjhdV3KREIR4W94iNxDuI2qsj5xhvoQbN88Ks=
+X-Google-Smtp-Source: AGHT+IG/NaSvZzKXJ84M/pgzNsoZuPet3t04ozqaaREZpA5iXl0iehAG+8uAWAzWMZXZlMmgIcSt4w==
+X-Received: by 2002:a17:906:6a11:b0:a7a:b43e:86e4 with SMTP id a640c23a62f3a-a7dc4e68c0fmr924194466b.27.1722873566093;
+        Mon, 05 Aug 2024 08:59:26 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2387::38a:2f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c61575sm467111766b.92.2024.08.05.08.59.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 08:59:25 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Willem de Bruijn <willemb@google.com>,
+  kernel-team@cloudflare.com,
+  syzbot+e15b7e15b8a751a91d9a@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2 1/2] gso: Skip bad offload detection when device
+ supports requested GSO
+In-Reply-To: <66b0e0d3c2119_2f5edf294c1@willemb.c.googlers.com.notmuch>
+	(Willem de Bruijn's message of "Mon, 05 Aug 2024 10:25:23 -0400")
+References: <20240801-udp-gso-egress-from-tunnel-v2-0-9a2af2f15d8d@cloudflare.com>
+	<20240801-udp-gso-egress-from-tunnel-v2-1-9a2af2f15d8d@cloudflare.com>
+	<CAF=yD-JaeHASZacOPk=k2gzpfY7OzMwDPr99FMfthMS0w9S7bA@mail.gmail.com>
+	<87ed73z3oe.fsf@cloudflare.com>
+	<66b0e0d3c2119_2f5edf294c1@willemb.c.googlers.com.notmuch>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Mon, 05 Aug 2024 17:59:24 +0200
+Message-ID: <8734njyn8j.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|CH2PR12MB4136:EE_
-X-MS-Office365-Filtering-Correlation-Id: aee732df-05ad-4139-1a3d-08dcb5678226
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?alRld0VkeThlTDdzMExsSXRMSTA3UkwxSUd4aUcyWEcwTUhkYzd5aXR0QStC?=
- =?utf-8?B?eGRBeWJDcjMzanFnSDIzZDdCSXE5NUVkb2I2RXhRTXBkZkloLzdGTHRBdDF5?=
- =?utf-8?B?Vm5YbVhKaHBQNjZNRmhWa2ZER0tRL1h5cmNVeXlyZGp2dXUwVEVVMUoyK2d1?=
- =?utf-8?B?VlNOQW1VL2c0N2dLMFZUS2Q5dkRHNHRGcDdoWEdYV2pmd0N5MzFEZ1Y5MEt5?=
- =?utf-8?B?b2VEczQyVTJGcDRvWld2a3FRYXp3c2p0VlhKYUN4VnlXL3JCd3cvMFcvaEN3?=
- =?utf-8?B?M2g0QzA3QkV0SHNmTExZY1h2REZKaDhHOUNQbFd5R3FYNnJKYVB1MlV3WCt4?=
- =?utf-8?B?c2ViNmg2VHh3cEtWSXk4UURxcUtDQjRyc2x6M3NlTWdDUnhzeHJUeWdXUWN0?=
- =?utf-8?B?Tklkdnc1U3BMOVd5a21OWXdwTlRya0l1QVpJSy9qT1U4dHdHTFFBbm5PMXFG?=
- =?utf-8?B?Vk40Q1ZhQkpzN1ZRUDN0c2dCUllQOGQydCtZbzhSQjl1YU9pY0tFTDh2N282?=
- =?utf-8?B?c254L1hZZWdKb2N3SWU2eXZLSk8xKzM5Q1d2dGJoVzF5YkVKcVlaUHFnU0k4?=
- =?utf-8?B?MFh0VzBQRE5KZEJsTjRkL05ZL2hRTDMwMzZHRmZIZ3hhWHVPSWd0anphVEJ6?=
- =?utf-8?B?MHdvZHVNVTZPb2h0bWYrUk5oRWFmYTAxSnRWT0UyWk9NNUdoZXdDN29KRmNE?=
- =?utf-8?B?UExXZnV4ZHpvSTA2a2k4OC9jKzFubXJxbi9KK2JKMjV5TW13OXRCSUp5dUpu?=
- =?utf-8?B?NS9qVWZrS2RxU3U0SGhXR0NjbHJ4aEZvZTdEcXBjKytIUXc2SmhmTW9neFJo?=
- =?utf-8?B?UjhZbGdVYXk2bElFRm9qZDZvbS9XaTNPbURMYmtSUFBadmgrQTZMdEJMb2Rp?=
- =?utf-8?B?TUFVbW5pUzdES1Z1S294V2hPUzVOQ1pGeG1GRlowWHcxMEExNWVWVkZ6R0pz?=
- =?utf-8?B?Z1RuK0hLRGpLa3Q2QTgwNnJwSlllbHBMQndRbEo0MFQ3ZTQ4Q25teVZnUlk1?=
- =?utf-8?B?dzdwck1yTy94YUlqSU1nMU9UdVlxcUJUbFFaL0FwVWg4WGtpRjFhbzYrMUhJ?=
- =?utf-8?B?aXZrcnZDT1Q4bGMwVE9sSFJsVVpPYWhZOXh6WXNFV2RRZ3RtUlZvUS9BNFZl?=
- =?utf-8?B?b3BMRFhYTUlrWmdWSWM3WjAyQ00rSExNQkJ6aWdRcEphdU5sa2ZNNGpVTmJE?=
- =?utf-8?B?eXIzZDNTaTNDNjRURFp5d2VzRzdpSEgrZ0FDdDdmUXVPeklQMzZYOXIxWnU3?=
- =?utf-8?B?TTNJTDdrMTdyQlVjRjltQU5QTStlR3ZIQW4rcEN6SzRPSHJ6L1ZSQXZJKzc2?=
- =?utf-8?B?eFdHRHV0NEZ3MEk2WHl3VytxTFluaVF6bkJWbjNNdWZSU2o5bC9rWGFpcnJr?=
- =?utf-8?B?M2kzaXk4Q0ljenZWVm9kSnhlY0pqaXpaZVlIeEVVMmZwTERTV1BXdkZBR0dX?=
- =?utf-8?B?WURsODRTKzd0OVBmMjB3dlRKcDAvOWJsNStvTEF4UU14MlRWaU5ZV3k2S3ly?=
- =?utf-8?B?Q042SXZvWTlzekFVZ3c0d1lKcW56ZVYxdHdYMGYwY2lxaHNPd3h4NWx3UHJ1?=
- =?utf-8?B?NnBnMzl6SSs3bHBxaDVpTlNONjVlLzZoY2xtQm1EUlBaN21YeWlVOWFNYnNp?=
- =?utf-8?B?N1p3OVdrRkxBdlYyTzFMZmRhQU1IamtKTHpyMVVKVHY2UUFtSks0REhBNHJL?=
- =?utf-8?B?SldsOFNzMnF3cEpnZlFrbC9tMDVFRjN1YmJGVnBaOVhlaTRPb0c4T29PVzF6?=
- =?utf-8?B?ZW16T0VaYWorZHREeWwzUmZpNlUxMUEzcFN2V0RpMHMrTTc5TEE3dmFma0Zu?=
- =?utf-8?B?L2JDejFuTFpFYlNFcWROUT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZXJVemdQbEl6dGVOSGNlVUNFOElrVWthWEMyeW9EYzlQL1RCR0Y3Q3ZVZU41?=
- =?utf-8?B?ak5HZ1dRMHRKK2wvYmY2ZXlvS01RZ2FuOHByeUpDYzU2aVFPOU5DRjhEUmt6?=
- =?utf-8?B?aTVoeHYvUDZpVnRML2s2YkN3THhwS296MUhpMllPTm1DbTkwMnM2T3JCL3VT?=
- =?utf-8?B?c2dqandTNG05RGl5Y0drdVpHVXE3ZnlxTm9uLzFyVElZbXkyRCtnNlNXcDA3?=
- =?utf-8?B?eE82Z2hmdW1CUHlaNkRtdUlVYUFpTDFvK0hndldZRjBNYXRueFNBNytIaUla?=
- =?utf-8?B?SEIvM0JNTU1DaHYyRG5wZzlaUWJVZUZBSzU4VXdVYlpFckhCSWVFY3BBSE1M?=
- =?utf-8?B?eXlRSjAraHc2TnlyMUluYUNqcGFPdE9JWnR3VzdsK1ZYeGp4cEQyVXlKb1Z1?=
- =?utf-8?B?VmRiOG5HMlNXSUJVYmw5eHlDUkVVaDQxT1NITktHb2dKMGhaWnlWdnBXK1ZQ?=
- =?utf-8?B?RXZjZkFnNzA1V3RlVGRRdy9zOTN5MEo3TDU1U3RFNnFGTXJjUXFWV3NGRVBS?=
- =?utf-8?B?dmxuUzlCUUVadUlIOUJlcXFqc0dFZHVkeHIvQUFzbVBOZ0JjWUhUMkk5bktq?=
- =?utf-8?B?bHRLOUhnRnl0ME5wS2xjQzVmeUVLMXZneDgzRm5VRksyV0c4RHo5UU5wb3JE?=
- =?utf-8?B?SFRscnpjeU1udzUwMVlnc3ZqZTNNR1dVakJlYkpQVjYvRlNSSy91YWJacE1Y?=
- =?utf-8?B?d21EU1ZoS3pLUE9KWmxkU3NLaVhqTHNSNnl1NWhRZkF6bGJaUCtpLzIxMmVB?=
- =?utf-8?B?SEt1aDlDb3ltUk9MUjhMbjNUSmJsaUlkTUZQTHNaOERoWWhSaG1TaGpVL20v?=
- =?utf-8?B?TDJscXdPRG56dllPczltSXlsTW5JS0tOSXVhSDNwNVB2QmlWWkl3WW1acHht?=
- =?utf-8?B?alZ4N3o5Q2tTbzM2M2NmUjRRZHVRS3IvQmdiUk5DNUJ1TGxiUFBGYkhBOHdR?=
- =?utf-8?B?bDFKL2llc0NJcHhHTUxHY09jRi8vSVhDV2ZGcXhWd0JFY3A2VVRNOXpGT0Nh?=
- =?utf-8?B?RkZaRjAzaVRNQWdrUHNFeTcrZzFCTmozUk9ncU5QVzVVRU1CWk43RkloS3Js?=
- =?utf-8?B?ZU9KQ1Y4SVlNYTFKK2tQNlgzQXd4VVh4SGR3cTR5ckFNN1piMERIV05aMzNJ?=
- =?utf-8?B?NVE1ZUlzUUt0SVJqUE05QWpxSjdId3NsT0pldkJrOEZxRTRFWTNDM1dDS3h4?=
- =?utf-8?B?SkdZWFlPMUYxQUdxUXA5aDdlb0k4Vm5vTWl3dCt5Sm1Ldk1lSUVhdk5yWmZ0?=
- =?utf-8?B?d2ZxTVFmR2FDcE9yZkVZclp2NEZmUDROQ1QyTW1Sczl3MkhJM0tWNUZCallR?=
- =?utf-8?B?SWdYYU5oQmVIM1YwWmZma1pnMkNVaGZRY3FqYkVESE1EZlFLRFRyTUVaeHZ5?=
- =?utf-8?B?a3hXYTVGVzl4R0xGbEdDNkR6Mnp5RnppaTdPR091QU91NFhzTWlEc2VGTDVa?=
- =?utf-8?B?TFYyVTdVbzF4aWl6UGdTMWJENkdPRjV6L0E2VFN1QnhES1A1YjRUTVYyYWJJ?=
- =?utf-8?B?REUyeUVvNituRkkvS1BKdEZwbWFjMXBOdkxIc2U1c0M0UG55UDhXM3pLZ2w5?=
- =?utf-8?B?Mk4zRHJoazgzY0cvV29JbTR3Yy9aMGpUMjZ3bjRieE13YmRUZVhDdmludjYw?=
- =?utf-8?B?aFNQKzhHY1gyVFJjdkxKd3lVRm04bCt4OXB0bkpiRVhaRFNJN3hTMERGcS9R?=
- =?utf-8?B?ems0L2JvZ2xFTzJ1SkZGaUI0MFBYYWVCUUtId21HT3l2Wll6cnIrWERJRmFF?=
- =?utf-8?B?K3FxUWlMR2ZHREk4elFTVU5Yd0R5cjdKcXFhNVhkdlRpdGx0cXU5N1picE5x?=
- =?utf-8?B?YmVjaDE0akx1aEFqMTJILzJkRjljSVErQzlNRlBONlVWZWwzUTkzUUtZUmNx?=
- =?utf-8?B?TWZ2VzIrVDNzbGIxbjhvQVNqd1o5ek8yZzdydlBScXVwOVQ0NCtSVjRPdEdq?=
- =?utf-8?B?TXBiajBuRzFmWExyUStsYjM1NjNSOXc5T3dsSDFhMkFVT2ZUcWtaMEw3QXIz?=
- =?utf-8?B?TlZDelNwWmV2UHNWVi9teXF5cDQ3dTBHeEgwdHhNQzBXTmpqVTlQenY4b0JJ?=
- =?utf-8?B?amtzZFFCNG5FUXhRVVRqVjFGZXNDWHZkSGd6MDZCMnNNcjhLUlRLQ2FOWnZT?=
- =?utf-8?Q?p18yq4vAl6FT7/9buDaMPhoXN?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aee732df-05ad-4139-1a3d-08dcb5678226
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2024 15:58:55.1732
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +gyny5/qg6xKGCT5w9JyqMP9BgwRtduRh7Df2KQBILhCvYb96AJkHTW6OnEIYs6HAgJZKZ6xj45yhP2GFt2MFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4136
+Content-Type: text/plain
 
-On 05.08.24 05:17, Jason Wang wrote:
-> On Fri, Aug 2, 2024 at 2:51 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>
->> On Fri, 2024-08-02 at 11:29 +0800, Jason Wang wrote:
->>> On Thu, Aug 1, 2024 at 11:38 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
->>>>
->>>> The following workflow triggers the crash referenced below:
->>>>
->>>> 1) vhost_vdpa_unsetup_vq_irq() unregisters the irq bypass producer
->>>>    but the producer->token is still valid.
->>>> 2) vq context gets released and reassigned to another vq.
->>>
->>> Just to make sure I understand here, which structure is referred to as
->>> "vq context" here? I guess it's not call_ctx as it is a part of the vq
->>> itself.
->>>
->>>> 3) That other vq registers it's producer with the same vq context
->>>>    pointer as token in vhost_vdpa_setup_vq_irq().
->>>
->>> Or did you mean when a single eventfd is shared among different vqs?
->>>
->> Yes, that's what I mean: vq->call_ctx.ctx which is a eventfd_ctx.
->>
->> But I don't think it's shared in this case, only that the old eventfd_ctx value
->> is lingering in producer->token. And this old eventfd_ctx is assigned now to
->> another vq.
-> 
-> Just to make sure I understand the issue. The eventfd_ctx should be
-> still valid until a new VHOST_SET_VRING_CALL().
-> 
-I think it's not about the validity of the eventfd_ctx. More about
-the lingering ctx value of the producer after vhost_vdpa_unsetup_vq_irq().
-That value is the eventfd ctx, but it could be anything else really...
+On Mon, Aug 05, 2024 at 10:25 AM -04, Willem de Bruijn wrote:
+> Jakub Sitnicki wrote:
+>> On Thu, Aug 01, 2024 at 03:13 PM -04, Willem de Bruijn wrote:
 
+[...]
 
-> I may miss something but the only way to assign exactly the same
-> eventfd_ctx value to another vq is where the guest tries to share the
-> MSI-X vector among virtqueues, then qemu will use a single eventfd as
-> the callback for multiple virtqueues. If this is true:
-> 
-I don't think this is the case. I see the issue happening when running qemu vdpa
-live migration tests on the same host. From a vdpa device it's basically a device
-starting on a VM over and over.
+>> > It's a bit odd, in that the ip_summed == CHECKSUM_NONE ends up just
+>> > being ignored and devices are trusted to always be able to checksum
+>> > offload when they can segment offload -- even when the device does not
+>> > advertise checksum offload.
+>> >
+>> > I think we should have a follow-on that makes advertising
+>> > NETIF_F_GSO_UDP_L4 dependent on having at least one of the
+>> > NETIF_F_*_CSUM bits set (handwaving over what happens when only
+>> > advertising NETIF_F_IP_CSUM or NETIF_F_IPV6_CSUM).
+>> 
+>> I agree. I've also gained some clarity as to how the fix should
+>> look. Let's circle back to it, if we still think it's relevant once we
+>> hash out the fix.
+>> 
+>> After spending some quality time debugging the addded regression test
+>> [1], I've realized this fix is wrong.
+>> 
+>> You see, with commit 10154dbded6d ("udp: Allow GSO transmit from devices
+>> with no checksum offload"), I've opened up the UDP_SEGMENT API to two
+>> uses, which I think should not be allowed:
+>> 
+>> 1. Hardware USO for IPv6 dgrams with extension headers
+>> 
+>> Previously that led to -EIO, because __ip6_append_data won't annotate
+>> such packets as CHECKSUM_PARTIAL.
+>> 
+>> I'm guessing that we do this because some drivers that advertise csum
+>> offload can't actually handle checksumming when extension headers are
+>> present.
+>> 
+>> Extension headers are not part of IPv6 pseudo header, but who knows what
+>> limitations NIC firmwares have.
+>> 
+>> Either way, changing it just like that sounds risky, so I think we need
+>> to fall back to software USO with software checksum in this case.
+>> 
+>> Alternatively, we could catch it in the udp layer and error out with EIO
+>> as ealier. But that shifts some burden onto the user space (detect and
+>> segment before sendmsg()).
+>> 
+>> 2. Hardware USO when hardware csum is unsupported / disabled
+>> 
+>> That sounds like a pathological device configuration case, but since it
+>> is possible today with some drivers to disable csum offload for one IP
+>> version and not the other, it seems safest to just handle that
+>> gracefully.
+>> 
+>> I don't know why one might want to do that. Perhaps as a workaround for
+>> some firmware bug while waiting for a fix?
+>
+> I doubt that this is actually used. But today it can be configured.
+>
+> Which is why I suggested making NETIF_F_GSO_UDP_L4 dependent on csum
+> offload (in netdev_fix_features). I doubt that that will break any
+> real user.
 
-> For bypass registering, only the first registering can succeed as the
-> following registering will fail because the irq bypass manager already
-> had exactly the same producer token.
-> For registering, all unregistering can succeed:
-> 
-> 1) the first unregistering will do the real job that unregister the token
-> 2) the following unregistering will do nothing by iterating the
-> producer token list without finding a match one
-> 
-> Maybe you can show me the userspace behaviour (ioctls) when you see this?
-> 
-Sure, what would you need? qemu traces?
+Sounds like a plan. If we're talking about simply disabling GSO_UDP_L4
+whenever either NETIF_F_IP_CSUM or NETIF_F_IPV6_CSUM is "off", then that
+is straightforward. And the NETIF_F_HW_CSUM dependency is clear.
 
-Thanks,
-Dragos
+I could even piggy back it on this series, at the risk of additional
+iterations.
 
-> Thanks
-> 
->>
->>>> 4) The original vq tries to unregister it's producer which it has
->>>>    already unlinked in step 1. irq_bypass_unregister_producer() will go
->>>>    ahead and unlink the producer once again. That happens because:
->>>>       a) The producer has a token.
->>>>       b) An element with that token is found. But that element comes
->>>>          from step 3.
->>>>
->>>> I see 3 ways to fix this:
->>>> 1) Fix the vhost-vdpa part. What this patch does. vfio has a different
->>>>    workflow.
->>>> 2) Set the token to NULL directly in irq_bypass_unregister_producer()
->>>>    after unlinking the producer. But that makes the API asymmetrical.
->>>> 3) Make irq_bypass_unregister_producer() also compare the pointer
->>>>    elements not just the tokens and do the unlink only on match.
->>>>
->>>> Any thoughts?
->>>>
->>>> Oops: general protection fault, probably for non-canonical address 0xdead000000000108: 0000 [#1] SMP
->>>> CPU: 8 PID: 5190 Comm: qemu-system-x86 Not tainted 6.10.0-rc7+ #6
->>>> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
->>>> RIP: 0010:irq_bypass_unregister_producer+0xa5/0xd0
->>>> RSP: 0018:ffffc900034d7e50 EFLAGS: 00010246
->>>> RAX: dead000000000122 RBX: ffff888353d12718 RCX: ffff88810336a000
->>>> RDX: dead000000000100 RSI: ffffffff829243a0 RDI: 0000000000000000
->>>> RBP: ffff888353c42000 R08: ffff888104882738 R09: ffff88810336a000
->>>> R10: ffff888448ab2050 R11: 0000000000000000 R12: ffff888353d126a0
->>>> R13: 0000000000000004 R14: 0000000000000055 R15: 0000000000000004
->>>> FS:  00007f9df9403c80(0000) GS:ffff88852cc00000(0000) knlGS:0000000000000000
->>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> CR2: 0000562dffc6b568 CR3: 000000012efbb006 CR4: 0000000000772ef0
->>>> PKRU: 55555554
->>>> Call Trace:
->>>>  <TASK>
->>>>  ? die_addr+0x36/0x90
->>>>  ? exc_general_protection+0x1a8/0x390
->>>>  ? asm_exc_general_protection+0x26/0x30
->>>>  ? irq_bypass_unregister_producer+0xa5/0xd0
->>>>  vhost_vdpa_setup_vq_irq+0x5a/0xc0 [vhost_vdpa]
->>>>  vhost_vdpa_unlocked_ioctl+0xdcd/0xe00 [vhost_vdpa]
->>>>  ? vhost_vdpa_config_cb+0x30/0x30 [vhost_vdpa]
->>>>  __x64_sys_ioctl+0x90/0xc0
->>>>  do_syscall_64+0x4f/0x110
->>>>  entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>>> RIP: 0033:0x7f9df930774f
->>>> RSP: 002b:00007ffc55013080 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
->>>> RAX: ffffffffffffffda RBX: 0000562dfe134d20 RCX: 00007f9df930774f
->>>> RDX: 00007ffc55013200 RSI: 000000004008af21 RDI: 0000000000000011
->>>> RBP: 00007ffc55013200 R08: 0000000000000002 R09: 0000000000000000
->>>> R10: 0000000000000000 R11: 0000000000000246 R12: 0000562dfe134360
->>>> R13: 0000562dfe134d20 R14: 0000000000000000 R15: 00007f9df801e190
->>>>
->>>> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
->>>> ---
->>>>  drivers/vhost/vdpa.c | 1 +
->>>>  1 file changed, 1 insertion(+)
->>>>
->>>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->>>> index 478cd46a49ed..d4a7a3918d86 100644
->>>> --- a/drivers/vhost/vdpa.c
->>>> +++ b/drivers/vhost/vdpa.c
->>>> @@ -226,6 +226,7 @@ static void vhost_vdpa_unsetup_vq_irq(struct vhost_vdpa *v, u16 qid)
->>>>         struct vhost_virtqueue *vq = &v->vqs[qid];
->>>>
->>>>         irq_bypass_unregister_producer(&vq->call_ctx.producer);
->>>> +       vq->call_ctx.producer.token = NULL;
->>>>  }
->>>>
->>>>  static int _compat_vdpa_reset(struct vhost_vdpa *v)
->>>> --
->>>> 2.45.2
->>>>
->>>
->> Thanks
->>
-> 
+>  
+>> In this scenario I think we also need to fall back to software USO and
+>> checksum.
+>> 
+>> Code-wise that could look like below. WDYT?
+>
+> Since this only affects USO, can we fix this is in __udp_gso_segment.
+> Basically, not taking the NETIF_F_GSO_ROBUST path.
+>
+> skb_segment is so complicated already. Whatever we can do to avoid
+> adding to that.
 
+skb_segment is a complex beast. No disagreement there.
+
+Keeping the changes down seems doable. We can drive skb_segment to
+compute the checksum, when we know that's needed (because IPv6 extension
+headers are present -> ip_summed is CHECKSUM_NONE) by masking off csum
+flags. Thanks for the suggestion.
+
+[...]
 
