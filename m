@@ -1,138 +1,110 @@
-Return-Path: <netdev+bounces-115835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BCED947F69
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:34:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D94E3947F81
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:40:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E6828388B
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:34:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68286284A24
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE21815CD58;
-	Mon,  5 Aug 2024 16:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD4915DBBA;
+	Mon,  5 Aug 2024 16:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ooMfse3W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKTeE3s0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8F215C128
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 16:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A49515D5D9
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 16:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722875651; cv=none; b=nZ6wuNbWoTYhvpmjfIq8m4G4jK3fmEn+cFnMCK/+l5fZ8jK5UVItmMwbXYd4nW+4+ngxU1YoDvawKMPwi3ig4b594nzCfbGPPb5sbTZBgH6c8DUyae40HUVhbDtP6QYF8rlVpN2nR7qrY6uLoE2FEWT7mFe7HnM8aGq7OjvkKo0=
+	t=1722876018; cv=none; b=fCEPJ/CsBlRBCXDk/NkSgYcRKiTeNoLZL0uWtSIvwbBF2aMVYDk9Wt4aeOHf2nz86IaH8cAihL3VS6QJHLc/ZNZPdccYEd4exSnNvJM/0keOVz6nh1fpfgsJ94GjIrRSes2lDblh5sbWqcLboW0VZoxT2n4j09dv63iBKC3l1Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722875651; c=relaxed/simple;
-	bh=WShIfcyB1WIBp1LMFRNAOGPYq4so52JcsO4pudunr3k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KiBLZz3edfXfrV1B9Wt12daM8g+IyuaGFDZ2joGTCbwSGp5UNBSnlhfeKkwWxiX3FUJ1WWIK28KDNCzW2x8a4QvvyYMQdXTyd4DplNISXWZZvIla/y/PKbIy3rLdoxbgs3HMXuMJf/i2HNRQr+J4FTy/Ifnm3MsMXiKnlA3COBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ooMfse3W; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-450217eaa62so53391751cf.3
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 09:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722875649; x=1723480449; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WShIfcyB1WIBp1LMFRNAOGPYq4so52JcsO4pudunr3k=;
-        b=ooMfse3WVKfuxOLSSKdlcT9aqFqVw/RtyRXpOBsgOCTn9wKceQcM71mSUyFUCGbjdh
-         26+ROdikowegVtjSUS4uWVUhtc95hLL23dlnWFj8cp65MVc4drKNIX9u43DWF2Bats8h
-         t0heAI4eFDoxqmiGWoYtMgQD56gP+7qgIFOqzvLbDpke6iJR6YapJ+kA8HjUL+DyHiKy
-         +7NkKP96kiTMdLcfY8EpRMfItKrh6siytmWkC/b0tGgiJkDeyeXjOqlFRgZJ9luyNyNG
-         6FpewpnZhlzpQ9biBgMEY7x44yXFsfP3XIyl2lb1fAFA0jwMYwVdtCGFuyqF5RwPlBAL
-         hg0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722875649; x=1723480449;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WShIfcyB1WIBp1LMFRNAOGPYq4so52JcsO4pudunr3k=;
-        b=nyXlbXTuqfdqCVT637xeG3rixg+tiAQqiYqvrXnDWBQ6sd7+TnjU1QojKRHxj4xfiG
-         Z5d7Is+jdmabsR362LOM+kfXug9MfWFbA3yd3LcJGCzhGkW1rvDmGuNDYUsvL/IqydW1
-         aARFpKC+iBUanBSJX5A64WutvgcsCRc+E3Q6rxRJquJyfVxNX8lxM3LYjDM0m52IHOT/
-         e4EhO9O0sVZTbwbFs5ZsBA/iPy2lkez+vbg/Eu63bAUkWCl55AHigsYfiZcdHYjxRL3/
-         Z5oV9hOADuN74dTFQZskr65zs2xj7d0tSxmJ7cuM6nJm24IFm960suyCNJ/CdLTMUP1w
-         01RA==
-X-Forwarded-Encrypted: i=1; AJvYcCWja22RxlkBHxfONaVRLX/ExSaI94FAPqiUsadY+Oey3gTvYDIMxexM5AmK0qSq2w9Uh5DQcM3y2vQfmAieioBree9u+JCn
-X-Gm-Message-State: AOJu0YyBDOAMXh+DF1iNPMYJyQOXH0pAZVZecbBJXw5NXUZx2xgIVUpz
-	dknbeFUKdDGm1ik4VuNAw4HNo4pd4oCytNYz6BNcyMvYsdc222468x8MnYbIJuqBzgUxRM3FW0q
-	hF4bvu9oA6dQz7zleU3Apt63HY+T6P44e3E+i
-X-Google-Smtp-Source: AGHT+IE3X2dzKDTfvW579W1ONWZvzHmSuPdaFYmL6fjjzD5I45yXHVQPoF1XfHnvXWK/VzgEqMK+gXEJqks0i1Xyhdk=
-X-Received: by 2002:a05:6214:4412:b0:6b5:7e97:7151 with SMTP id
- 6a1803df08f44-6bb98345fa9mr131458736d6.17.1722875648824; Mon, 05 Aug 2024
- 09:34:08 -0700 (PDT)
+	s=arc-20240116; t=1722876018; c=relaxed/simple;
+	bh=D2OJdYw4N78p79wCAbLLNCrwucCs5Nyx4B8zLV9tEjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FrHR3wNZpheoMl5RkAUEZ23969/1Q3BGovYYFJ/BwmvE2FuO1LrxUu8PAGoUnF1pt72dhdu3n3/wk6YW8EFJK+gNr3hoXlol/zjUuoyBcOI97PclSIil2wrM+1sP8ekRwbHA2mDpxGdJ4Q1Y5EZzq2XBFGWqWl0u/RsaH9GG4CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pKTeE3s0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A87AC32782;
+	Mon,  5 Aug 2024 16:40:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722876018;
+	bh=D2OJdYw4N78p79wCAbLLNCrwucCs5Nyx4B8zLV9tEjA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pKTeE3s0ihxnAuh4FBbF550U91QQb5hWg35p/QgYrZM1kZoF/GZKqJjOMjIXEQTvp
+	 JKymI2Ey7c+MlLpeq0sHaO6G4kELQPgoKd717j1s0QrXroEXBwUSSEX9JRNN7LpRC3
+	 jq8eseYQqBx7mmciU5vKTEItj6j0yg4BPidG5XmLa8shqCBheiZlkB1PozcKw+VnS/
+	 CRkf86MLg64/ZSWBs2RxeTGL4BP4oj2R5br0JhJd/g+vn89jQS5Bx3dB4f9i9ttsvx
+	 3bLrdXWNL+xKmd7CAIHhV4etloClrMmQO4oX1tOPK5+jRrGrFJ6NOnJ61FCHzWkaXJ
+	 mQ/BnE/zlhCpg==
+Date: Mon, 5 Aug 2024 17:40:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 00/10] add sriov support for wangxun NICs
+Message-ID: <20240805164015.GH2636630@kernel.org>
+References: <598334BC407FB6F6+20240804124841.71177-1-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730022623.98909-4-almasrymina@google.com> <5d3c74da-7d44-4b88-8961-60f21f84f0ac@web.de>
-In-Reply-To: <5d3c74da-7d44-4b88-8961-60f21f84f0ac@web.de>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 5 Aug 2024 12:33:55 -0400
-Message-ID: <CAHS8izPxfCv1VMFBK1FahGTjVmUSSfrabgY5y6V+XtaszoHQ4w@mail.gmail.com>
-Subject: Re: [PATCH net-next v17 03/14] netdev: support binding dma-buf to netdevice
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Daniel Vetter <daniel.vetter@ffwll.ch>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, LKML <linux-kernel@vger.kernel.org>, 
-	Andreas Larsson <andreas@gaisler.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Christoph Hellwig <hch@infradead.org>, David Ahern <dsahern@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Wei <dw@davidwei.uk>, 
-	Donald Hunter <donald.hunter@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Helge Deller <deller@gmx.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Jakub Kicinski <kuba@kernel.org>, 
-	"James E. J. Bottomley" <James.Bottomley@hansenpartnership.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Jeroen de Borst <jeroendb@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Matt Turner <mattst88@gmail.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Richard Henderson <richard.henderson@linaro.org>, Shailend Chand <shailend@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Shuah Khan <shuah@kernel.org>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <598334BC407FB6F6+20240804124841.71177-1-mengyuanlou@net-swift.com>
 
-On Tue, Jul 30, 2024 at 4:38=E2=80=AFAM Markus Elfring <Markus.Elfring@web.=
-de> wrote:
->
-> =E2=80=A6
-> > +++ b/include/net/devmem.h
-> > @@ -0,0 +1,115 @@
-> =E2=80=A6
-> > +#ifndef _NET_DEVMEM_H
-> > +#define _NET_DEVMEM_H
-> =E2=80=A6
->
-> I suggest to omit leading underscores from such identifiers.
-> https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+=
-define+a+reserved+identifier
->
+On Sun, Aug 04, 2024 at 08:48:31PM +0800, Mengyuan Lou wrote:
+> Add sriov_configure for ngbe and txgbe drivers.
+> Reallocate queue and irq resources when sriov is enabled.
+> Add wx_msg_task in interrupts handler, which is used to process the
+> configuration sent by vfs.
+> Add ping_vf for wx_pf to tell vfs about pf link change.
+> Make devlink allocation function generic to use it for PF and for VF.
+> Add PF/VF devlink port creation. It will be used to set/get VFs.
 
-I was gonna apply this change, but I ack'd existing files and I find
-that all of them include leading underscores, including some very
-recently added files like net/core/page_pool_priv.h.
+I think it would be good to summarise the overall status of SR-IOV support
+with this patch, and what follow-up work is planned. As Jakub mentioned [1]
+this does not seem complete as is.
 
-I would prefer to stick to existing conventions if that's OK, unless
-there is widespread agreement to the contrary.
+[1] https://lore.kernel.org/netdev/988BFB51-32C8-499C-837D-91CC1C0FFE42@net-swift.com/
 
---=20
-Thanks,
-Mina
+I mean, I understand the NDOs were removed from the patchset (see more on
+that below) but there needs to be a plan to support users of this device
+in a meaningful way.
+
+> 
+> v5:
+> - Add devlink allocation which will be used to add uAPI.
+> - Remove unused EXPORT_SYMBOL.
+> - Unify some functions return styles in patch 1 and patch 4.
+> - Make the code line less than 80 columns.
+> v4:
+> https://lore.kernel.org/netdev/3601E5DE87D2BC4F+20240604155850.51983-1-mengyuanlou@net-swift.com/
+> - Move wx_ping_vf to patch 6.
+> - Modify return section format in Kernel docs.
+> v3:
+> https://lore.kernel.org/netdev/587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com/
+> - Do not accept any new implementations of the old SR-IOV API.
+> - So remove ndo_vf_xxx in these patches. Switch mode ops will be added
+> - in vf driver which will be submitted later.
+
+FYI, this policy was recently significantly relaxed [2]:
+
+[2] https://lore.kernel.org/netdev/20240620002741.1029936-1-kuba@kernel.org/
+
+> v2:
+> https://lore.kernel.org/netdev/EF19E603F7CCA7B9+20240403092714.3027-1-mengyuanlou@net-swift.com/
+> - Fix some used uninitialised.
+> - Use poll + yield with delay instead of busy poll of 10 times in
+>  mbx_lock obtain.
+> - Split msg_task and flow into separate patches.
+> v1:
+> https://lore.kernel.org/netdev/DA3033FE3CCBBB84+20240307095755.7130-1-mengyuanlou@net-swift.com/
+
+...
 
