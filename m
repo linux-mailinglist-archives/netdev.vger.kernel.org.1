@@ -1,217 +1,187 @@
-Return-Path: <netdev+bounces-115798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59FBC947CF1
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:36:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38B77947CF2
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B18F3B2177B
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 14:36:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3C31281116
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 14:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEA3762D2;
-	Mon,  5 Aug 2024 14:35:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D602313AA45;
+	Mon,  5 Aug 2024 14:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SK7uKspC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdhHm6rr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3FE159217
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 14:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2596A762D2
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 14:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722868538; cv=none; b=jpW7L2/KCFTptYVhBd599Sdaz3kvQS9jw8NBAmZsrahoYha9z3t7B/ruVzKFYawctoha42bjjoTHUFeDGRAG6fqXYPNUnPu2Dk8g2H6kWIOc98wFVhEu7l8IElT7voMh8KgYea1qdDmUHnjd296eDyh/JSLb4GLcXuK6dA/t/sA=
+	t=1722868593; cv=none; b=CG/vlMweIBVesCeLRc4WsMr7PVKyzy+4vCks2nVb+wxfQwtUjMVjlBI5SKC3vHByOkNdchHutB0sLpLE9X2XtzsE1hNJk3shCxbDG9zHLiuqLbMLd3R/fYvHpsJ6d9GfFAuX/+5ND6bGmNOOMtUemp5Wcct3aalLwwMvH/mQM5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722868538; c=relaxed/simple;
-	bh=nLqDGAaoPV1ls6Na4nPfEc0tAiCTzqxwc7qBaBbXkyg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NSpajXpT1TjP3W8L3txPyNrGxC9r12WEpX4gMDMxmmWBN655j7xYUeYeqS8Iui9uGfU5J9iFan4WwCGPEz+hDH6KcKfi1oOK3ITcsEa7xdJn34gEgnao4CGu+lMjWqCNU8hSZslvdaXF7zFqSPBfAgRDPq/XcQmLHG6aLWu4wWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SK7uKspC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722868535;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uetgKu07sTScp6T9LqoWY4ycV7y20tNtEFZYGj7KqxQ=;
-	b=SK7uKspCtCJHiznIaVGC4G465ljk8dN+/GJdn2ysAQ7z675uh/X259Q6ejUEoGlNTdz2vy
-	mFigK4jLmsn1BSOHiNvc+rTRAlL5jXxSinJacBilzkw4niU7i6lD5pAMBk9gyrLyR9O9Fn
-	W8LzFsACWT3D6ydvT/IzQLJxHjkaGI8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-aYngrK8bPeCkj7C1fItCYg-1; Mon, 05 Aug 2024 10:35:34 -0400
-X-MC-Unique: aYngrK8bPeCkj7C1fItCYg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4280b24ec7bso13661475e9.3
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 07:35:34 -0700 (PDT)
+	s=arc-20240116; t=1722868593; c=relaxed/simple;
+	bh=QbPN+VHk5miEBdKmS19c2tuDDaUNF0rJfI3MqfpwNT8=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=e/S5RFka75qfeLci+8/8R5pp0WbjivcaTE2iSkiRQB88/ZxWfNMoMAnuhf1WQt2BdCVHeCSorCdx6mi9N1xFFBGf6eoNd1YqyUBzrgLhUf6S/uEJOgJMSihOl9zehfuD1NbOS6HuKZwxFv1RsQvO68T3faASVMrNq8IOQq3UCNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdhHm6rr; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-428e0d184b4so30187495e9.2
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 07:36:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722868590; x=1723473390; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dkC6dpV3xYYRfuyLIwnQpX8ThFeeS8fkJYPGY6EQ4o0=;
+        b=bdhHm6rr+fOyPS6SWL1zESWDs9YgFSgvOzOlLUBQ0+vj0mpcxyeZiyCUlVSqP507VU
+         GeQlO1TbtD7Lr9OP4F+XOWZtw3GlB5QhmHw9tqg5h/92hF7Umt2IOmkZI0cS0z8h1lDD
+         40ytuUuZn0FeuzWJiGRszudNDIyUiolzkVcSRhRUWIHJ6e/AvCQyN9N5mB7MfRHFIAMd
+         f5Z8w4Z2c1+BiMu2vGoZrdaSwNXeOw3H632ZFrm977z414kZDsRuP8eXUaedJflabI3K
+         lUixfCEYvDmmO07drcnu/vfIHpgy8L7ak2vThUcep0AzeAWuw6Yekxsi3b/qLijNlLDB
+         90Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722868532; x=1723473332;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1722868590; x=1723473390;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uetgKu07sTScp6T9LqoWY4ycV7y20tNtEFZYGj7KqxQ=;
-        b=YBmJQ6khBd8ivlQSxBd7As7hy42UUlOjTOj4NbqjSdh0ippVs2JSFRg/JxufXiqGrF
-         3TcSj2ljsLt9UXD05HRdCKkZzIhgCVU1pCT5d1t9QP67cxTSVCdQvDlA96rtD4+fwk24
-         WSypF1COr7jSOGc/x5XCsC5sma1tOgW+0X73qHdvov3P4ubVEAVuwA79lKBH80IaEvSz
-         zrc66VWei99zqpt4UJjJVpM/0evIC0Ywl62KAsrpptT5+aRxZBcZywv6qrqipvhWARS6
-         wBfbY7EZb5KXquxBz58t1CNPmmT7y5aMULAkW77s+60OBCmC/ww3iYiuEmndsruD/HoU
-         AaPg==
-X-Gm-Message-State: AOJu0Yzlfhir4dTmHCa4DIfhw3K8w9WJVhx4ubF7wtPotu1JeAtDywoS
-	1pJL0+cIFtgyoYhN9bRmILBwcLpO/OUb2WqnIPy98zSu9GHhlisR5LIHLpWlDWlo5bTyindRBZN
-	iV4es6TVDOCnjDSPpRvmh4nCFPwS+HBqXiMT6V6OHc/UK9oto4m7tdbLlNQLPA6FC
-X-Received: by 2002:a05:600c:3b21:b0:426:6cd1:d116 with SMTP id 5b1f17b1804b1-428e6b803abmr53478945e9.3.1722868532452;
-        Mon, 05 Aug 2024 07:35:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOjPoTxSMRIu0HmlVT5NK/yUw9vhX5FDFDos+nSLFbwKDTTo6lQW8OtQrgNTS7BZ+j03JcZw==
-X-Received: by 2002:a05:600c:3b21:b0:426:6cd1:d116 with SMTP id 5b1f17b1804b1-428e6b803abmr53478735e9.3.1722868531775;
-        Mon, 05 Aug 2024 07:35:31 -0700 (PDT)
-Received: from [192.168.0.114] (146-241-0-122.dyn.eolo.it. [146.241.0.122])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282baba4f1sm201303055e9.23.2024.08.05.07.35.30
+        bh=dkC6dpV3xYYRfuyLIwnQpX8ThFeeS8fkJYPGY6EQ4o0=;
+        b=VHO0FY3nsvgWzl+OsJIhtKJuNRjMDdtFmc5P1o1QFwgaBkK3Dyw35Hmz0mACntuMsS
+         ojVtQGXoFEgSGyAWYODXhz0cq4drRcOcSxxrXXY7B809lhNk4pKW1priZPT1dLxxORlL
+         1uOhgh6hNhQ+KfiDdp5yq2kKpddafApsfTyRDtMpkf2n1mm6q+yyONzzZW1aqAN0oQEr
+         JHPCCL32NNjvkQkyNfmQfzXpR/M3L0aPi1u7DAI7w53m7C72zHLOUE1JjSQVgBZpWRQx
+         LummH6CM1+/kiji4zj6PztH3Rxw6+IDXZK0ByrxFrMFOBeue1SLqkMTwhfS4st8/DW2s
+         OnKg==
+X-Gm-Message-State: AOJu0Yz3hCdukuQZpWuSV5wktbQz4845aV3/vBXlV8nBNy2MwATCAIVV
+	7xWJCfiqfm97P+DrCtWeVoT7fxXrMvItTsCXz6AJboEZ74tuLkxb
+X-Google-Smtp-Source: AGHT+IHVZTyR9Z5qYQcJhqeJ7b6+uXUxYw6ZeXh66lh9lW3173GDeo8LznWSuOQQNiVESfuwVDbr1Q==
+X-Received: by 2002:a05:600c:4f53:b0:426:5416:67d7 with SMTP id 5b1f17b1804b1-428e6b7f149mr80285915e9.27.1722868589990;
+        Mon, 05 Aug 2024 07:36:29 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0295fasm9947680f8f.59.2024.08.05.07.36.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 07:35:31 -0700 (PDT)
-Message-ID: <e971cd64-9cbf-46d2-89fc-008548d1d211@redhat.com>
-Date: Mon, 5 Aug 2024 16:35:29 +0200
+        Mon, 05 Aug 2024 07:36:29 -0700 (PDT)
+Subject: Re: [PATCH net-next v2 06/12] ethtool: rss: don't report key if
+ device doesn't support it
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ dxu@dxuuu.xyz, przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
+ gal.pressman@linux.dev, tariqt@nvidia.com, willemdebruijn.kernel@gmail.com,
+ jdamato@fastly.com
+References: <20240803042624.970352-1-kuba@kernel.org>
+ <20240803042624.970352-7-kuba@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <2af37636-de5d-913d-4ccf-9388f1cfbd26@gmail.com>
+Date: Mon, 5 Aug 2024 15:36:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/12] netlink: spec: add shaper YAML spec
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-References: <cover.1722357745.git.pabeni@redhat.com>
- <13747e9505c47d88c22a12a372ea94755c6ba3b2.1722357745.git.pabeni@redhat.com>
- <m25xslp8nh.fsf@gmail.com> <07bae4f7-4450-4ec5-a2fe-37b563f6105d@redhat.com>
- <m2v80jnpkd.fsf@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <m2v80jnpkd.fsf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20240803042624.970352-7-kuba@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 
-Hi all,
+On 03/08/2024 05:26, Jakub Kicinski wrote:
+> marvell/otx2 and mvpp2 do not support setting different
+> keys for different RSS contexts. Contexts have separate
+> indirection tables but key is shared with all other contexts.
+> This is likely fine, indirection table is the most important
+> piece.
 
-My replies this week will be delayed, please allow for some extra latency.
+Since drivers that do not support this are the odd ones out,
+ would it be better to invert the sense of the flag?  Or is
+ this to make sure that driver authors who don't think/know
+ about the distinction automatically get safe behaviour?
 
-On 8/2/24 13:15, Donald Hunter wrote:
-> Paolo Abeni <pabeni@redhat.com> writes:
+> Don't report the key-related parameters from such drivers.
+> This prevents driver-errors, e.g. otx2 always writes
+> the main key, even when user asks to change per-context key.
+> The second reason is that without this change tracking
+> the keys by the core gets complicated. Even if the driver
+> correctly reject setting key with rss_context != 0,
+> change of the main key would have to be reflected in
+> the XArray for all additional contexts.
 > 
->> On 7/31/24 23:13, Donald Hunter wrote:
->>> Paolo Abeni <pabeni@redhat.com> writes:
->>>
->>>> +        name: inputs
->>>> +        type: nest
->>>> +        multi-attr: true
->>>> +        nested-attributes: ns-info
->>>> +        doc: |
->>>> +           Describes a set of inputs shapers for a @group operation
->>> The @group renders exactly as-is in the generated htmldocs. There may be
->>> a more .rst friendly markup you can use that will render better.
->>
->> Uhm... AFAICS the problem is the target (e.g. 'group') is outside the htmldoc section itself, I
->> can't find any existing markup to serve this purpose well. What about sticking to quotes ''
->> everywhere?
->>
->> FTR, I used @ following the kdoc style.
+> Since the additional contexts don't have their own keys
+> not including the attributes (in Netlink speak) seems
+> intuitive. ethtool CLI seems to deal with it just fine.
 > 
-> Yeah, I was just thinking of using .rst markup like ``code`` or
-> `italics`, but the meaning of @ is pretty obvious when reading the spec.
-> If you stick with @ then we could always teach ynl-to-rst to render it
-> as ``code``.
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+...
+> diff --git a/drivers/net/ethernet/sfc/ef100_ethtool.c b/drivers/net/ethernet/sfc/ef100_ethtool.c
+> index 746b5314acb5..127b9d6ade6f 100644
+> --- a/drivers/net/ethernet/sfc/ef100_ethtool.c
+> +++ b/drivers/net/ethernet/sfc/ef100_ethtool.c
+> @@ -58,6 +58,7 @@ const struct ethtool_ops ef100_ethtool_ops = {
+>  
+>  	.get_rxfh_indir_size	= efx_ethtool_get_rxfh_indir_size,
+>  	.get_rxfh_key_size	= efx_ethtool_get_rxfh_key_size,
+> +	.rxfh_per_ctx_key	= 1,
 
-I'm fine with using @ everywhere.
+I would prefer 'true' for the sfc drivers, I think that
+ better fits the general style of our code.
 
->> [...]
->>>> +    -
->>>> +      name: group
->>>> +      doc: |
->>>> +        Group the specified input shapers under the specified
->>>> +        output shaper, eventually creating the latter, if needed.
->>>> +        Input shapers scope must be either @queue or @detached.
->>> It says above that you cannot create a detached shaper, so how do you
->>> create one to use as an input shaper here? Is this group op more like a
->>> multi-create op?
->>
->> The group operation has the main goal of configuring a single WRR or SP scheduling group
->> atomically. It can creates the needed shapers as needed, see below.
->>
->> The need for such operation sparks from some H/W constraints:
->>
->> https://lore.kernel.org/netdev/9dd818dc-1fef-4633-b388-6ce7272f9cb4@lunn.ch/
->>
->>>> +        Output shaper scope must be either @detached or @netdev.
->>>> +        When using an output @detached scope shaper, if the
->>>> +        @handle @id is not specified, a new shaper of such scope
->>>> +        is created and, otherwise the specified output shaper
->>>> +        must be already existing.
->>>> +        The operation is atomic, on failures the extack is set
->>>> +        accordingly and no change is applied to the device
->>>> +        shaping configuration, otherwise the output shaper
->>>> +        handle is provided as reply.
->>>> +      attribute-set: net-shaper
->>>> +      flags: [ admin-perm ]
->>> Does there need to be a reciprocal 'ungroup' operation? Without it,
->>> create / group / delete seems like they will have ambiguous semantics.
->>
->> I guess we need a better description. Can you please tell where/how the current one is
->> ambiguous?
-> 
-> My expectation for 'group' would be to group existing things, with a
-> reciprocal 'ungroup' operation. I think you intend 'group' to both be
-> able to group existing shapers/groups and create a group of shapers.
-> 
-> Am I right in saying that delete lets you delete something from a group
-> (with side-effect of deleting group if it becomes empty), or delete a
-> whole group?
+>  	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
+>  	.get_rxfh		= efx_ethtool_get_rxfh,
+>  	.set_rxfh		= efx_ethtool_set_rxfh,
+> diff --git a/drivers/net/ethernet/sfc/ethtool.c b/drivers/net/ethernet/sfc/ethtool.c
+> index 15245720c949..e4d86123b797 100644
+> --- a/drivers/net/ethernet/sfc/ethtool.c
+> +++ b/drivers/net/ethernet/sfc/ethtool.c
+> @@ -267,6 +267,7 @@ const struct ethtool_ops efx_ethtool_ops = {
+>  	.set_rxnfc		= efx_ethtool_set_rxnfc,
+>  	.get_rxfh_indir_size	= efx_ethtool_get_rxfh_indir_size,
+>  	.get_rxfh_key_size	= efx_ethtool_get_rxfh_key_size,
+> +	.rxfh_per_ctx_key	= 1,
+>  	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
+>  	.get_rxfh		= efx_ethtool_get_rxfh,
+>  	.set_rxfh		= efx_ethtool_set_rxfh,
+> diff --git a/drivers/net/ethernet/sfc/siena/ethtool.c b/drivers/net/ethernet/sfc/siena/ethtool.c
+> index 4c182d4edfc2..6d4e5101433a 100644
+> --- a/drivers/net/ethernet/sfc/siena/ethtool.c
+> +++ b/drivers/net/ethernet/sfc/siena/ethtool.c
+> @@ -241,6 +241,7 @@ static int efx_ethtool_get_ts_info(struct net_device *net_dev,
+>  
+>  const struct ethtool_ops efx_siena_ethtool_ops = {
+>  	.cap_rss_ctx_supported	= true,
+> +	.rxfh_per_ctx_key	= true,
 
-In the current incarnation, delete() on the whole group is explicitly 
-forbidden. Jakub suggested we should allow such behavior for the 
-delegation use-case.
+For the record, Siena hardware doesn't actually support
+ custom RSS contexts; the code is only present in the
+ driver as a holdover from when Siena and EF10 used the
+ same driver.  Trying to actually use them on Siena will
+ fail -EOPNOTSUPP.[1]
+I'll send a patch to rip it out.
 
-> It feels a lot like each of 'set', 'group' and 'delete' are doing
-> multiple things and the interaction between them all becomes challenging
-> to describe, or to handle all the corner case > I think part of the
-> problem is the mixed terminology of input, output for groups, handle,
-> parent for shapers and using detached to differentiate from 'implicitly
-> attached to a resource'.
-> 
-> Perhaps the API would be better if you had:
-> 
-> - shaper-new
-> - shaper-delete
-> - shaper-get/dump
-> - shaper-set
-> - group-new
-> - group-delete
-> - group-get/dump
-> - group-set
-> 
-> If you went with Jakub's suggestion to give every shaper n x inputs and
-> an output, then you could recombine groups and shapers and just have 4
-> ops. And you could rename 'detached' to 'shaper' so that an attachment
-> is one of port, netdev, queue or shaper.
+>  	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>  				     ETHTOOL_COALESCE_USECS_IRQ |
+>  				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 55c9f613ab64..16f72a556fe9 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -731,6 +731,8 @@ struct kernel_ethtool_ts_info {
+>   *	do not have to set this bit.
+>   * @cap_rss_sym_xor_supported: indicates if the driver supports symmetric-xor
+>   *	RSS.
+> + * @rxfh_per_ctx_key: device supports setting different RSS key for each
+> + *	additional context.
 
-I'm unsure I read the above correctly, and I'm unsure it's in the same 
-direction of Jakub's suggestion. AFACS the above is basically the same 
-interface we proposed in the past iteration and was explicitly nacked 
-from Jakub,
+This comment should really make clear that it covers hfunc and
+ input_xfrm as well, not just the key itself.
 
-Additionally, one of the constraint to be addressed here is allowing to 
-setup/configures all the nodes in a 'group' with a single operation, to 
-deal with H/W limitations. How would the above address such constraint?
+-ed
 
-Thanks,
-
-Paolo
-
+[1]: https://elixir.bootlin.com/linux/v6.10.3/source/drivers/net/ethernet/sfc/siena/ethtool_common.c#L1234
 
