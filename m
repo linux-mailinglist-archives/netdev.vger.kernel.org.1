@@ -1,92 +1,105 @@
-Return-Path: <netdev+bounces-115608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 045B89472E2
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 03:11:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009A094735C
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 04:27:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5C581F210CA
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 01:11:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CAEAB20C4E
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 02:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE08B5589B;
-	Mon,  5 Aug 2024 01:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C954D8B6;
+	Mon,  5 Aug 2024 02:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cjVUFEEe"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YSb7lF5y"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5512B9D4;
-	Mon,  5 Aug 2024 01:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4478812;
+	Mon,  5 Aug 2024 02:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722820255; cv=none; b=hhTNxmKLQ5dbavHWMhnHTxCWnFz7960apYc9ztJ2qygQRkjb3yg5RlxgJXS17jDk5fronk8C4G+1he0ZEpIiUct+1kqE9jKglF+INQ7Rpd92DaroYGMetLeZxklcACjkgLKdxaX95c0GTbxYfOmpNeSpgWETEkzV947pWraMU6Y=
+	t=1722824866; cv=none; b=pXYL7KX18y3G3D1gQ0E/rJFa5UMDY4h+GBErwfrPQ2zNHotTiYDwZMedpYjKTOuM+s/0FWjC8gW3k3gHVxyPNzLyKdx8FNP6RaVU0SlCiNMyzbHdxwhoEgxBUNDDarxKZS19SvyZ/dmiPYOhMSNQgjZxiJApd19pS5sLUuOMK84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722820255; c=relaxed/simple;
-	bh=Ntytnd3LjnnSWdcMbN61cNqRWuC4RpkfoypY5EK7dDg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PUdPesWQraPfvdmzpx9eGYg0a7GgDFoin/qSH9uaBOjSY2PwddFSJIDv2G+nPfLpdicWH9/sn2TLLS48Z3SrHzqMWNyDl36jlJmDmuNmuprQzuCEMvRh2DzNSylUiNKHFvE1v0xBJRiJM8gOBXVQsLmyUIasu/zObwm/LjKSfE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cjVUFEEe; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0TelagZdMac9NaG9bZqYHLjxFGgrFK4T4W00FD9MX9E=; b=cjVUFEEeLWDeZdx2G1rpvm1i3z
-	zXJzIIi+np3VDjZ7E4Tk7y8N+M+4Xzt483zfRqTwVUuAshei8gfqBaOPwsDvfCA1MpDWtXyEW6nrJ
-	Y6u/rPu3HmafRfom5427n4kE+BJvz6wECfdPrXQvDcF/t64knmYlYnO7O7kl4Mb9bq/8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1samFO-004047-ES; Mon, 05 Aug 2024 03:10:50 +0200
-Date: Mon, 5 Aug 2024 03:10:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu, miguel.ojeda.sandonis@gmail.com,
-	benno.lossin@proton.me, aliceryhl@google.com
-Subject: Re: [PATCH net-next v3 0/6] net: phy: add Applied Micro QT2025 PHY
- driver
-Message-ID: <174bf437-5adf-4ebf-b909-036d6443dcf5@lunn.ch>
-References: <20240804233835.223460-1-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1722824866; c=relaxed/simple;
+	bh=Nbcpp1mi3tkTAlg9aNv1i2peykMwdpVfHKmbKC4agbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=p9RYXJSq/n01g+hSafqVNpTsBu98OdJyFli8fz/lB7ElQxp94Kz1rc3sZMVuoQBeSxjEFrcbgPrHOIzqKp/zM+KXtuNWNdEyuIoDgeillEEzYzErw/GG1aBPEkI9DqImpPO4GvxrnrdtJLdRErmYjzQs1XlObhUMaBooHqkCYrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=YSb7lF5y; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1722824859;
+	bh=J3xQI0ahLIVagsKkWY0tlAm8MaGOr+zf4EVx9sAqUg0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=YSb7lF5yCWHpVAjEeZeI5zTkXuJ+dVRW8nvw+oEqJ4v5v50K6ngijECwIxqCWVJ/h
+	 7wtl3CkL3H4s1jwFrCppZ7jXBlgCzBmKsj3TRSCD6Vo/3W2U6g8MtKbYCw7jad9a/1
+	 7aZZFhbTiA6sIVmCM5JOs++4tNePxfKy9c/eqzThFHE/TKMy8GrZ0KHon32LPo36YN
+	 m4U8KXHs3HbVUfev8xkJPEkqZFm5102Cqh6no+7u9QKhVffDj74HDD+y86lG7pkOVY
+	 qDeh9o7PB8H1KpUSHvu3O4TakxMeqxwZs5M96vr/wVJwjkjWbZHbOpDS0uddpgZchl
+	 NxqVTPP0JOziw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WcgMH20TPz4wcl;
+	Mon,  5 Aug 2024 12:27:38 +1000 (AEST)
+Date: Mon, 5 Aug 2024 12:27:37 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the net-next tree
+Message-ID: <20240805122737.328eaa96@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240804233835.223460-1-fujita.tomonori@gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/wyKcAysSlnEeVb39fniN.2x";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Mon, Aug 05, 2024 at 08:38:29AM +0900, FUJITA Tomonori wrote:
-> This patchset adds a PHY driver for Applied Micro Circuits Corporation
-> QT2025.
-> 
-> The first patch adds Rust equivalent to include/linux/sizes.h, makes
-> code more readable. The 2-5th patches update the PHYLIB Rust bindings.
-> 
-> QT2025 PHY support was implemented as a part of an Ethernet driver for
-> Tehuti Networks TN40xx chips. Multiple vendors (DLink, Asus, Edimax,
-> QNAP, etc) developed adapters based on TN40xx chips. Tehuti Networks
-> went out of business and the driver wasn't merged into mainline. But
-> it's still distributed with some of the hardware (and also available
-> on some vendor sites).
-> 
-> The original driver handles multiple PHY hardware (AMCC QT2025, TI
-> TLK10232, Aqrate AQR105, and Marvell MV88X3120, MV88X3310, and
-> MV88E2010). I divided the original driver into MAC and PHY drivers and
-> implemented a QT2025 PHY driver in Rust.
-> 
-> The MAC driver for Tehuti Networks TN40xx chips was already merged in
-> 6.11-rc1. The MAC and this PHY drivers have been tested with Edimax
-> EN-9320SFP+ 10G network adapter.
+--Sig_/wyKcAysSlnEeVb39fniN.2x
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Sorry about being slow reviewing this. I will get to it by the middle
-of the week.
+Hi all,
 
-	Andrew
+The following commit is also in the net tree as a different commit
+(but the same patch):
+
+  c4b28e5699d2 ("net: pse-pd: tps23881: Fix the device ID check")
+
+This is commit
+
+  89108cb5c285 ("net: pse-pd: tps23881: Fix the device ID check")
+
+in the net tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/wyKcAysSlnEeVb39fniN.2x
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmawOJkACgkQAVBC80lX
+0GznIQf+Ii0Z5YWznXk28sHF6ZZ8kcVt2U+v4yqNyq17xQPeq7eKlwAIidW1uKmN
+eW6GCNnGOMRKARr++iPW7gmrc/xehXFtUNmvrRufOxV13Hd5C4r0nFoFntPdgcoK
+Z9nPiOYrJR6zziS+tpeFvrmXIHF6dtxGZh0EN0Mv9DmiyiOhdBnJt5TbzYC6ojNO
+4gVajGqh5Fh3M2eicOypGzkN1ZBnPNR8jOqRfl/p09x+Ajkyw9Ps8Uo0Rq19oT6s
+iIvRZaloIugXwU/O4R/3D1TlSKdXUp3AXksa5P4ytEZyFlhfb5yIFq/YbPuZ0vVJ
+brMtalEFJ7iZiBqS3vsoh/OiErt05Q==
+=36Lx
+-----END PGP SIGNATURE-----
+
+--Sig_/wyKcAysSlnEeVb39fniN.2x--
 
