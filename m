@@ -1,129 +1,178 @@
-Return-Path: <netdev+bounces-115814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 448CD947DDC
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:19:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 116E9947D21
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:50:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1F71F2355C
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:19:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6495EB21424
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 14:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C04A15B56E;
-	Mon,  5 Aug 2024 15:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD72813AD26;
+	Mon,  5 Aug 2024 14:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QaFSo8yy"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB0A15B554
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 15:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF01327456;
+	Mon,  5 Aug 2024 14:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722871126; cv=none; b=LnJZ86d64rZcfdvp3tcEFtRuXXL4xvv75xBG84CnzzAOT6v2v43YWloSXukfVdgBi0ehOPumEz7W+iY5VCxifwQOLATuCUUhoxJeB5EPhdkJrlNwvJv1+4qF4Xu4RkbHkLhaHKsaSlN6RrCsFMNUa/WiierEXLEuXhZ3x/Ecfao=
+	t=1722869413; cv=none; b=LHLM1IDr2k01fvybggE1tfZYNY0Js8pgBiMECpMDuuOa0NlHsrfuYi+NqS3sWFp7iORfmkeEebsCItlHfG9fbarpKYepnpfq4ddw8kSS82WpEJGhK5NSk9HdWkkNYZYySaU/hQvuZzUGot7SIiUoLpWFZEYIAIwLzd9jUlh/s/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722871126; c=relaxed/simple;
-	bh=lvYPe5JkM3Jsviw05x2n8vRfc/U+/nszrW8Yv9RWPpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gv7bTQoUSgwHymzmJf3NGZH6FVKsEtWBkTx9e39iI12qas3ADloWCUJxMM09khykIFIGee7DijfOACo/JaHPdIPwr5KH6FODgQGHYu8bKUgJWlW4lnxrAb3m4wyt4VZt57s+XBcEjr8dnEhmBNdjS+qXIABr/oj4W4wWhB76wmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sazTY-0000aP-8t; Mon, 05 Aug 2024 17:18:20 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sazTW-004k74-RH; Mon, 05 Aug 2024 17:18:18 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 4DF043172CF;
-	Mon, 05 Aug 2024 14:48:16 +0000 (UTC)
-Date: Mon, 5 Aug 2024 16:48:15 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	haibo.chen@nxp.com, imx@lists.linux.dev, han.xu@nxp.com
-Subject: Re: [PATCH v4 0/2] can: fsl,flexcan: add imx95 wakeup
-Message-ID: <20240805-succinct-didactic-vicugna-e5449a-mkl@pengutronix.de>
-References: <20240731-flexcan-v4-0-82ece66e5a76@nxp.com>
+	s=arc-20240116; t=1722869413; c=relaxed/simple;
+	bh=e2XChZutQiZV3eV2TsEMr6wB2G5qocswctw5/nIP66E=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uiPNNvKQ9u/mmVhz7vyUyKLFzgpKTeLcmdFyuwdwxG1KvongnSWVSvVbUWpmJK2R3sEgn5E4HMuCiHcmDQel/KbKD1dsGfldI8HSm3iaIYJpWCDhdurlPgTis5JDbopjAq88uRPBfF2hAqA0Rael6/+zFnBfvgwjjPQ7KxC+ep0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QaFSo8yy; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-58ef19aa69dso10836485a12.3;
+        Mon, 05 Aug 2024 07:50:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722869410; x=1723474210; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ljthz2dQuk3rQ+R3lwybi0Jem8M58ZqE9rA2r3Unn78=;
+        b=QaFSo8yyNpagwx9myFEHCBatDWkZ1slE7HhJ/0eZMGJoy8iceK3DncdfA2FcCretLf
+         VzbAA5zhoaIvweRrwtb0h1NIxsp/6g2BxsO8MFA1ukys7zoRIZ6XK6vd8DnT5/6rCKVH
+         5g+0UUo6kL2YZxIyv2UJlvPp6v7itXnP6kd+cLt14mQeoWME32UIK2ZhsYeOzL3mNzDg
+         xiuIRREL7ZPWiBEXZE0Z7RJnP9BhZjl/Zj1dvvuji8uA5fu2s0dIP43wbsUIgA+HdQm7
+         4lOtufrYfHtsWihPhworfws6ow92tiz8k8dIIl3VZVxBtg17fVYBc19cqmikZAEPf1FO
+         mUjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722869410; x=1723474210;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ljthz2dQuk3rQ+R3lwybi0Jem8M58ZqE9rA2r3Unn78=;
+        b=r5zVqXzp+gdPO9hwBJX5ODgX7eQ33x4y3MaVHXYSiYDTQdFDjDMCBOQ4uVwb2IVhtQ
+         icmdX5Nnf8WdcznQFL/rqv16uHcyD5G+PNTJwIrTVwmQheGjZjH25kZ4KulQ24RNu9/X
+         e8zXw+Ip2k6yRYBNbnCDDegQf2fCVH7/qEhGUKawHEyWueHGI0YnaXfUbnXYTW4ymz8T
+         vSAwMIcF6qeJKSL9tjqXa+E6rPPySgvrbpRPD78PF+b3xtAcKttJKPOcZkgMB/p1aQ30
+         rL97X2l+CUpKkkt0TzR55b+jPqmHg/K6rXVixMN5tf4Helb2MTKnBINQVZCdKiYrkf/N
+         eI4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXCN0dvnNrJoC5z74jTNqSXsX4hG02Q8dhLeeyeFoY7OGZOEIZyInBJLWHZru50CL8PMnNPXXPXuci4bpqm1ZPBgbQzrtvYEYiS+Wa+TjBj2+K5QFP0iUlwrMY7yVbbN95Vlpkf1VRbZ/Y+BuVdH7XHBVV8LkeH+BjEWqm8FiFFilOFCJEe1FUbO2L4iKFPo0F/430PwTVzmTyR21a5
+X-Gm-Message-State: AOJu0YwW6MArmCNNv9mXf8fSCsRK91fG88IPW2LjXpaA3+JYAss7UsVE
+	PcX0qxgw8eYcBnoiBB5gUAW5XmlHZS+5+hVMIk7jicIkdNn5/FgMefgKH3Nq
+X-Google-Smtp-Source: AGHT+IG1N3aoOhQBtDgIkdWBGPMaaGv1AodMjqsazNsb7LVP7tCkKAAnsXIXhM4sUGVzTUTKPB1Acw==
+X-Received: by 2002:a05:6402:148c:b0:5b9:3846:8bb9 with SMTP id 4fb4d7f45d1cf-5b9384693abmr5399294a12.10.1722869409505;
+        Mon, 05 Aug 2024 07:50:09 -0700 (PDT)
+Received: from [127.0.1.1] (91-118-163-37.static.upcbusiness.at. [91.118.163.37])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b83b82f308sm5004088a12.63.2024.08.05.07.50.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 07:50:08 -0700 (PDT)
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Subject: [PATCH v3 0/4] use device_for_each_child_node() to access device
+ child nodes
+Date: Mon, 05 Aug 2024 16:49:43 +0200
+Message-Id: <20240805-device_for_each_child_node-available-v3-0-48243a4aa5c0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="i3ptc3rbvj5qf52i"
-Content-Disposition: inline
-In-Reply-To: <20240731-flexcan-v4-0-82ece66e5a76@nxp.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIfmsGYC/42OSwrDIBBAr1Jc1+Ivn3bVe5QiRscoJLFokZaQu
+ 9cECllm+WaG92ZGCaKHhG6nGUXIPvkwFeDnE9JOTT1gbwojRpggDaHYlCMN0oYoQWkntfODkVM
+ wgFVWflDdAJhqClqJrhbXChXVK4L1ny3zeBZ2Pr1D/G7VTNfpP1AfC2SKCW4Vt01NKxBU3/ux7
+ C46jGgNZLaTsoNfZ1aklvNGtNa0HTN76bIsP+mrwbQtAQAA
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Daniel Scally <djrscally@gmail.com>, 
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
+ Sakari Ailus <sakari.ailus@linux.intel.com>, 
+ Jean Delvare <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>, 
+ Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, 
+ Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andreas Kemnade <andreas@kemnade.info>
+Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-hwmon@vger.kernel.org, linux-leds@vger.kernel.org, 
+ netdev@vger.kernel.org, Javier Carrasco <javier.carrasco.cruz@gmail.com>, 
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+X-Mailer: b4 0.14-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722869407; l=2974;
+ i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
+ bh=e2XChZutQiZV3eV2TsEMr6wB2G5qocswctw5/nIP66E=;
+ b=ZuHNNlHXc6sQtn3WJk8SBGaxbxD4yTcx/hgqlMP+Ca9wWPKxugXH1pEVTvteQMydxrBdKad+0
+ 8rgtvuNxp6oCh+94zKShrK2Zh21OvfLFMak8er6EZiYjS3j/0SOU9x1
+X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
+ pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
 
+This series aims to clarify the use cases of:
 
---i3ptc3rbvj5qf52i
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+- device_for_each_child_node[_scoped]()
+- fwnode_for_each_available_child_node[_scoped]()
 
-On 31.07.2024 20:00:24, Frank Li wrote:
-> To: Marc Kleine-Budde <mkl@pengutronix.de>
-> To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-> To: David S. Miller <davem@davemloft.net>
-> To: Eric Dumazet <edumazet@google.com>
-> To: Jakub Kicinski <kuba@kernel.org>
-> To: Paolo Abeni <pabeni@redhat.com>
-> To: Rob Herring <robh@kernel.org>
-> To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> To: Conor Dooley <conor+dt@kernel.org>
-> Cc: linux-can@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: haibo.chen@nxp.com
-> Cc: imx@lists.linux.dev
-> Cc: han.xu@nxp.com
->=20
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+to access firmware nodes.
 
-Added to linux-can-next.
+There have been multiple discussions [1][2] about what the first macro
+implies in the sense of availability, and a number of users have opted
+for the second macro in cases where the first one should have been
+preferred.
 
-Thanks,
-Marc
+The second macro is intended to be used over child nodes of a firmware
+node, not direct child nodes of the device node. Instead, those users
+retrieve the fwnode member from the device struct just to have access to
+a macro that explicitly indicates node availability.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+That workaround is not necessary because `device_for_each_child_node()`
+implies availability for the existing backends (ACPI, DT, swnode).
 
---i3ptc3rbvj5qf52i
-Content-Type: application/pgp-signature; name="signature.asc"
+This series does not cover other points discussed in [2] like addressing
+uses of `fwnode_for_each_child_node()` where `device_*` should have been
+used, using the `_avaialble_` variant of the fwnode loop whenever
+possible, or adding new `_scoped` macros. Such points will be covered by
+subsequent series to keep focus on the "availability" issue.
 
------BEGIN PGP SIGNATURE-----
+The conversion has been validated with an LTC2992 hwmon sensor, which is
+one of the affected drivers. The rest of the drivers could only be
+compiled and checked with static-analysis tools.
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaw5i0ACgkQKDiiPnot
-vG820Af/YitgSU5McIXL4Xj9VvsbaznGIpvqeB/FJPifibKVNOxtEWHQGdKmrE04
-p/AaYxH+d9pegXTCh4swRkcr1Z2xehUTRhH0Y+LksJpUTxcQZ3bgXXXkw820NcEx
-cEyLB6FsX51oV2twn5Grryb46dY3pmN+sYbyoisYIftJNV+uguNmG4f4fRyyOob2
-/vypmstlC6dRFy/QMud9wC57iRFkT4wv7sq1ZMe1cdNeW9U9FTXjoQkVqtzoZi6c
-R+iU6RuSolTdSK+rgiatlOs1JihcMqoxKGtJ4bkeCJ79anBWNrpwFgI5o4N8ksYg
-TShdt8HLpYWPFdsir/zyCdnSF869og==
-=3OT+
------END PGP SIGNATURE-----
+Link: https://lore.kernel.org/all/20211205190101.26de4a57@jic23-huawei/ [1]
+Link: https://lore.kernel.org/all/20240523-fwnode_for_each_available_child_node_scoped-v2-0-701f3a03f2fb@gmail.com/ [2]
 
---i3ptc3rbvj5qf52i--
+Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+---
+Changes in v3:
+- Rebase to next/20240805 and drop applied patches.
+- mvpp2: fix typos in commit description.
+- mvpp2: add patch to use port_count instead of node iteration.
+- Link to v2: https://lore.kernel.org/r/20240721-device_for_each_child_node-available-v2-0-f33748fd8b2d@gmail.com
+
+Changes in v2:
+- [1/6] property.h: drop "if found" from the description of
+  device_for_each_child_node()
+- [3/6] bd2607mvv.c: fix child node usage.
+- Link to v1: https://lore.kernel.org/r/20240706-device_for_each_child_node-available-v1-0-8a3f7615e41c@gmail.com
+
+---
+Javier Carrasco (4):
+      device property: document device_for_each_child_node macro
+      leds: pca995x: use device_for_each_child_node() to access device child nodes
+      net: mvpp2: use port_count to remove ports
+      net: mvpp2: use device_for_each_child_node() to access device child nodes
+
+ drivers/leds/leds-pca995x.c                     | 15 ++++--------
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 31 +++++++------------------
+ include/linux/property.h                        | 10 ++++++++
+ 3 files changed, 24 insertions(+), 32 deletions(-)
+---
+base-commit: d6dbc9f56c3a70e915625b6f1887882c23dc5c91
+change-id: 20240701-device_for_each_child_node-available-1c1eca4b6495
+
+Best regards,
+-- 
+Javier Carrasco <javier.carrasco.cruz@gmail.com>
+
 
