@@ -1,82 +1,118 @@
-Return-Path: <netdev+bounces-115917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DDFD948645
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:42:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A1D94865B
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28B13284547
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:42:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34BA7B2164F
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F161B15ECF8;
-	Mon,  5 Aug 2024 23:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32BF16B386;
+	Mon,  5 Aug 2024 23:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3M83ikP"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="tDWbuVGc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6179273FD;
-	Mon,  5 Aug 2024 23:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3C914F9F1;
+	Mon,  5 Aug 2024 23:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722901342; cv=none; b=OJNHyz4SOCLvsNKs93bWc2l/XSgpovsq6zH07XklwogeRnISTS0vH14MY7QASWH90tI9BwEGV7gyp5bgoqZo0g/clAl4uBt/h43MMxR9Nao58DyaOt9kpGsfTNE35/W/Fwh11cTA+DiKDFfq1Vk2rkg1SyK5Fm5d9YHq0zcUiI0=
+	t=1722901951; cv=none; b=ckebVAnpQzH/myQMZok4puC7KcoQZt6vMrUDIcwNL8ZuEt+1jKf2XmTC64htLrnQhT4SxugGf8LlM1EpbW+mwvWdfu7DOBHHR3bdVI9zqvqqBZ0zU6M4eHrxymtPwpR0Du6PH2YHoCbVvrnEfnm8nbk88Vl7sAKMZpj7sXOVhWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722901342; c=relaxed/simple;
-	bh=G/COHNNxGTwTS8EumnD5M8lzCmJxcbhA3j3Mp4sbq0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WQkUeocAwHXxKgSwoajv6PT9DeTsFebd4jV5B5ER9ohLMkxvd82WHQc2cWdR3KoZwW7Pl7oQrsfboaBj0NnhorNhvirbcQYGKszf4P8yu+/7imTvp7GeSsTKbMo4y/uUSIGQ+C8Kv5O2kcllwnHYEApamgVpuT5uSioYUbLrvAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I3M83ikP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 957CEC32782;
-	Mon,  5 Aug 2024 23:42:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722901342;
-	bh=G/COHNNxGTwTS8EumnD5M8lzCmJxcbhA3j3Mp4sbq0w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I3M83ikPp9B/cv0IcgPvs9xmF7faQfOvVtKdUC2EN+sg4JY9gVVYq69wkg8cR9OQh
-	 7laDCbutZJzmcykLr6pE/GQMTTIg1/WgWcbrOM78LAyc6krE0OKL5vceMbCZ+5UeE1
-	 S9Jp85UhoJrxMYyUJqJoMng8OCbUY5Bw06nFFHVPT4majZXxA04DzlShhlFQMJ/uPX
-	 9HvfVSogcXH/ijv9zR7Asrz4xyry9U6bUQgB4E7Tao6z3NB/hnfHmg14fykYnPx1IO
-	 0GfoOoqWgO8Nt77xiphxleccFHR2mcYPNy1YW4um00mKNfo8ShwWWAdawIOgUGy+Da
-	 vzhSelSJW1/3g==
-Date: Mon, 5 Aug 2024 16:42:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, arinc.unal@arinc9.com, daniel@makrotopia.org,
- dqfext@gmail.com, sean.wang@mediatek.com, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- lorenzo.bianconi83@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, devicetree@vger.kernel.org, upstream@airoha.com
-Subject: Re: [PATCH v2 net-next 0/2] Add support for EN7581 to mt7530 driver
-Message-ID: <20240805164220.3d6bc554@kernel.org>
-In-Reply-To: <cover.1722496682.git.lorenzo@kernel.org>
-References: <cover.1722496682.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1722901951; c=relaxed/simple;
+	bh=IiotENmGMhEqWE+2OSLc/NaCKxXivBFJS6vpsBuFquU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hDGOnGKyXLxd9152DBRBS7qQf+l0fuv9+UD5csajWzPVbIQ4/tS/EMSB9sFt9kbT/NBXCAL53SIk4pzVjAUfA2atdTNf1Y5yGfz3W65nJB3Jd28GfMK7368ONW45u/qNUvrGBJaNwh7CXqSoqhr5rXUFYVwjyt0n8wCNOjry5XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=tDWbuVGc; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1722901949; x=1754437949;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IiotENmGMhEqWE+2OSLc/NaCKxXivBFJS6vpsBuFquU=;
+  b=tDWbuVGcxE6u3xRR1T1o+NdnNOPaW4C/76Zp9FPe9ExT3F0RYxJcvIyQ
+   hdSXmirFmWlgiXiXNfc7z2DERoEGriBJB883/VvREBzwkesKy9P7WSTUq
+   BE0Lru6Qi/1o8MgfSqxJ7ufiz+LNO8JcQuyalrPeMarCmrJZ94F+5a2IB
+   Rx6yASzZI9bP9BibPEwsvyp1SdGr9Kkb6jseCeytwMk75+i8zp22VkaXY
+   6KiV1z6GCoAERoeW0+qGK2jpB/QAVhn8xP6JQBKIqviUwrJiTjjYlnbnk
+   Peie1tOalojoCdD06iVkFIE7XcwKCs8qCiL562RrAsqUe6MOMvGXDsZKK
+   Q==;
+X-CSE-ConnectionGUID: 83RCjsVzTiGAx36Wh2MyMg==
+X-CSE-MsgGUID: /7xA2csLQHWFaCDgfTIU6w==
+X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
+   d="scan'208";a="197550953"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Aug 2024 16:52:21 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 5 Aug 2024 16:51:55 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Mon, 5 Aug 2024 16:51:55 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vivien Didelot <vivien.didelot@gmail.com>, Florian Fainelli
+	<f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
+CC: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
+Subject: [PATCH net v2] net: dsa: microchip: Fix Wake-on-LAN check to not return an error
+Date: Mon, 5 Aug 2024 16:52:00 -0700
+Message-ID: <20240805235200.24982-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Thu,  1 Aug 2024 09:35:10 +0200 Lorenzo Bianconi wrote:
-> Add EN7581 support to MT7530 DSA driver.
-> 
-> Changes since v1:
-> - get rid of mac_port_config callback for EN7581
-> - introduce en7581_mac_port_get_caps callback
-> - introduce MT753X_FORCE_MODE(id) macro
-> - fix compatible property in mt7530.yaml
+From: Tristram Ha <tristram.ha@microchip.com>
 
-Looks like this got applied as 3608d6aca5e7 ("Merge branch 'dsa-en7581'
-into main"). I think due to some script misbehavior it has the wrong
-cover letter on the merge, but the code matches this series.
+The wol variable in ksz_port_set_mac_address() is declared with random
+data, but the code in ksz_get_wol call may not be executed so the
+WAKE_MAGIC check may be invalid resulting in an error message when
+setting a MAC address after starting the DSA driver.
 
-Thanks!
+Fixes: 3b454b6390c3 ("net: dsa: microchip: ksz9477: Add Wake on Magic Packet support")
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+v2
+- Update with Oleksij's suggestion
+
+ drivers/net/dsa/microchip/ksz_common.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index b074b4bb0629..b120e66d5669 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -3764,6 +3764,11 @@ static int ksz_port_set_mac_address(struct dsa_switch *ds, int port,
+ 		return -EBUSY;
+ 	}
+ 
++	/* Need to initialize variable as the code to fill in settings may
++	 * not be executed.
++	 */
++	wol.wolopts = 0;
++
+ 	ksz_get_wol(ds, dp->index, &wol);
+ 	if (wol.wolopts & WAKE_MAGIC) {
+ 		dev_err(ds->dev,
+-- 
+2.34.1
+
 
