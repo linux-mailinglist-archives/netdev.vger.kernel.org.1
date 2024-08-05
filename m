@@ -1,102 +1,107 @@
-Return-Path: <netdev+bounces-115740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D501947A68
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:35:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D968947A6F
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E72A1C21179
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 11:35:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A3DF281C63
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 11:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B94E154BE7;
-	Mon,  5 Aug 2024 11:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B705315666C;
+	Mon,  5 Aug 2024 11:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fzIHncxx"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="Qa3Juw/+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827821547F2
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 11:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D591C155743
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 11:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722857701; cv=none; b=p+k8y/5gVfpU2uMBC003+fItovJ9zWZ7SmZyJ+hEu9wzB1IeB8zXTGNPlTL/gqM2Sow49Vu9ATwBUHzJP3jwAHF9txT6g2pUk6uV+yKxi5P6RS7ZsLHWIjRP32peexkAxm88olji47ko813+lesX7lsDQVdC9QNOIEIMA1T5WWQ=
+	t=1722857742; cv=none; b=CpdlP3QFPFT1G4fRv9p3X8nK9Blh7KOr99CP2tI8TUajcLw/4hzMBN7Y9a8HiJxynqGG3KaFVBIlkSXAaftRV7moDtS8HyjnqPGhwnsV7WwZWbTUffyLgFZDelOQCAoMIpKqEn3huVYQpbwaZvUMLmKQhi/zSt5UexOPWXWx/hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722857701; c=relaxed/simple;
-	bh=6Y4JDKG4aHSH1MqHkQvzFTtsjH60Vyfah5Bchm8bGY0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Up7jZs7PrvqToI4cJ6f+vIFmqCM4meV6EDl/AKdN2IR61conHt/u6copQd09f0VkJ7JXI8bc07QSCa5Wlzffj6PAqW7Ax47qynGJ5qBkDmCL1jzBwPpcej6cBFWyzmcvLmysZRX0wNifE+n6uOdeUqOoAWgay5xpQR/9UzxjN0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fzIHncxx; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4280bbdad3dso70399365e9.0
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 04:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722857698; x=1723462498; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qXroJrPLEL3BlwT1EdHgkZ71OMvWXEukJn8uQuZmPws=;
-        b=fzIHncxxs3l1hFb3CT+l7UT2QXIcz2BrGbMWvJmif7XrbYpf1cLnkZmb0va1lB2HDP
-         m5ROW7czm8/wV49P3ySGIz6QaimwTUj0+CGGWFnm68mxELSwsCdUPtBTD1A9s8R54oow
-         5eo/qwOUFSQIwGy0PekjoT9zwNnCiK+KDa4LfMXFPmOK/IIV//jFStHL7q8EevldiPiU
-         TEQFRZpsNqiwhwj/cSwfeWKjcyL+MltJnlWKBOswVcaxhL8E1o+pMaXVMp0pOmCoHYql
-         bW9F0b1BdByZNRRMZXdKvNvdM0bqhPCneqbG+wqd10oUry4AqhSer97kCI4Da7mV2jH/
-         SGgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722857698; x=1723462498;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qXroJrPLEL3BlwT1EdHgkZ71OMvWXEukJn8uQuZmPws=;
-        b=c7Qyp47BygNsm9GbOHH5EtZWqkJjCr9PwKur/AIUNTU3NO6+LCcBIJWQQtGEFfHKMc
-         Lk3+s4j6BIK/m3teofIhRwvn2gSpmwsQ5O/9ePc+lXYF4edO7jA1YZjtBQSYcB1tCnQi
-         wat/LxDW//03Ez7ExC5l7EQdMEo8/u2hv8gyJKsjJ7arf0+iC0lDXlDbidajDcd4MnXq
-         PiX2wKT1cR9wTlQg7nCkt+k/L5BG40jzKuPeD5yNEiKmu5wfiwktrb04nPNGyA8OAbGn
-         MTK2gcLQVITJOSZSIy8DCPzFowt/v6OWowjMY62LuWnkrOAU3lV7upDuRYpaH0Ed+39t
-         7GJw==
-X-Gm-Message-State: AOJu0Yz4KTamYB3Ceofa253FJwSHML1S5QR/tRuXfNxjuF7Bz59XXZJD
-	91xRau8GxsHxQUzwu+6d27xMSSs6yfVUZ0xdxMOhF+fbyz2fqGka
-X-Google-Smtp-Source: AGHT+IExwXV/EmLGBTmYIWgVGAJdcjBPCsrINKhKlLPmxwHkEmZCkHPlu+z/ZC4wgiphJf0lGPmgrA==
-X-Received: by 2002:a05:600c:470d:b0:428:10ec:e5ca with SMTP id 5b1f17b1804b1-428e6b0870emr69870985e9.14.1722857697786;
-        Mon, 05 Aug 2024 04:34:57 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282bb98109sm192991415e9.39.2024.08.05.04.34.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 04:34:57 -0700 (PDT)
-Subject: Re: [PATCH net-next v2 05/12] eth: remove .cap_rss_ctx_supported from
- updated drivers
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- dxu@dxuuu.xyz, przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
- gal.pressman@linux.dev, tariqt@nvidia.com, willemdebruijn.kernel@gmail.com,
- jdamato@fastly.com
-References: <20240803042624.970352-1-kuba@kernel.org>
- <20240803042624.970352-6-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <8550a5d0-a9e6-ec96-8072-20a069713f1e@gmail.com>
-Date: Mon, 5 Aug 2024 12:34:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1722857742; c=relaxed/simple;
+	bh=QXZyng/tUeIvLBk/wMdEksOX6GZ0b3apLidcra68gLo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hAuVX2owug8uf12YRVWtd82988P25sOC67WmfJL2ryv0F+HJMaSx3EvHhlVWFT0oPdkFJ59e6XBz5Tt3OINfoogqlNuQP1zQU89HbT+X8Gwa/lSHpEcFgu3UDKPjstr1u2YhVCijzE+9zNw1Cp4BcBNhEgoojv3fRYLxSW7FTec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=Qa3Juw/+; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from katalix.com (unknown [IPv6:2a02:8010:6359:1:326:9405:f27f:a659])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id EB95A7D9B6;
+	Mon,  5 Aug 2024 12:35:33 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1722857734; bh=QXZyng/tUeIvLBk/wMdEksOX6GZ0b3apLidcra68gLo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:From;
+	z=From:=20James=20Chapman=20<jchapman@katalix.com>|To:=20netdev@vge
+	 r.kernel.org|Cc:=20davem@davemloft.net,=0D=0A=09edumazet@google.co
+	 m,=0D=0A=09kuba@kernel.org,=0D=0A=09pabeni@redhat.com,=0D=0A=09dsa
+	 hern@kernel.org,=0D=0A=09tparkin@katalix.com|Subject:=20[PATCH=20n
+	 et-next=200/9]=20l2tp:=20misc=20improvements|Date:=20Mon,=20=205=2
+	 0Aug=202024=2012:35:24=20+0100|Message-Id:=20<cover.1722856576.git
+	 .jchapman@katalix.com>|MIME-Version:=201.0;
+	b=Qa3Juw/+Xh/bj95H7U6WieRZWnu0qwGh3oVTCxspDv76VTVSQeavt0zN5Mrt5HUc1
+	 IjfIj/Ka6ehhMHc4oS8NrA0ylRoj/a1K5LTmMzgQsTiLN2HwH6nP5Vj62k6AE28ZSr
+	 IEqjMGVwOIk9x3PfY5azRNBS0UJz8i0RiWvCGaNeodZoELV8yf9mGLhjRTvTpTswjM
+	 JJYEvPzaj7MNLYu5jBGczZ1lL6iUiSnL2Mtmo+YsRy4ZX8b+SMJrTjGw8orJGChraZ
+	 abmx214YLTVqTABvudqqsCItZU+rRqbH24UNF+cfTlBjpfbwXiN590Km42loL2EV/7
+	 AX3BV1ulAD1oQ==
+From: James Chapman <jchapman@katalix.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	tparkin@katalix.com
+Subject: [PATCH net-next 0/9] l2tp: misc improvements
+Date: Mon,  5 Aug 2024 12:35:24 +0100
+Message-Id: <cover.1722856576.git.jchapman@katalix.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240803042624.970352-6-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 03/08/2024 05:26, Jakub Kicinski wrote:
-> Remove .cap_rss_ctx_supported from drivers which moved to the new API.
-> This makes it easy to grep for drivers which still need to be converted.
-> 
-> Reviewed-by: Joe Damato <jdamato@fastly.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+This series makes several improvements to l2tp:
 
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+ * update documentation to be consistent with recent l2tp changes.
+ * move l2tp_ip socket tables to per-net data.
+ * fix handling of hash key collisions in l2tp_v3_session_get
+ * implement and use get-next APIs for management and procfs/debugfs.
+ * improve l2tp refcount helpers.
+ * use per-cpu dev->tstats in l2tpeth devices.
+ * fix a lockdep splat.
+ * fix a race between l2tp_pre_exit_net and pppol2tp_release.
+
+James Chapman (9):
+  documentation/networking: update l2tp docs
+  l2tp: move l2tp_ip and l2tp_ip6 data to pernet
+  l2tp: fix handling of hash key collisions in l2tp_v3_session_get
+  l2tp: add tunnel/session get_next helpers
+  l2tp: use get_next APIs for management requests and procfs/debugfs
+  l2tp: improve tunnel/session refcount helpers
+  l2tp: l2tp_eth: use per-cpu counters from dev->tstats
+  l2tp: fix lockdep splat
+  l2tp: flush workqueue before draining it
+
+ Documentation/networking/l2tp.rst |  54 ++++-----
+ net/l2tp/l2tp_core.c              | 192 ++++++++++++++++++++++--------
+ net/l2tp/l2tp_core.h              |  11 +-
+ net/l2tp/l2tp_debugfs.c           |  24 ++--
+ net/l2tp/l2tp_eth.c               |  42 +++----
+ net/l2tp/l2tp_ip.c                | 114 +++++++++++++-----
+ net/l2tp/l2tp_ip6.c               | 116 +++++++++++++-----
+ net/l2tp/l2tp_netlink.c           |  72 ++++++-----
+ net/l2tp/l2tp_ppp.c               |  62 +++++-----
+ 9 files changed, 440 insertions(+), 247 deletions(-)
+
+-- 
+2.34.1
+
 
