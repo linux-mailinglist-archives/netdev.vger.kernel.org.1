@@ -1,233 +1,175 @@
-Return-Path: <netdev+bounces-115883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F419483FE
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:18:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2579948414
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:22:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFCED1C21F36
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 21:18:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5068B1F233C5
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 21:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0983216C692;
-	Mon,  5 Aug 2024 21:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 888BB16C867;
+	Mon,  5 Aug 2024 21:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PPNMW4Wp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C6414B082
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 21:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FC613C90F;
+	Mon,  5 Aug 2024 21:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722892707; cv=none; b=rdCMiKZeW+99qMw81P02Chst2i8N8NoR6fsjwJ/4tQrgSXBbISIk+0mlJ0MXKdc0ldR8pFc0fEc9Lt0dUD9K/yOe0BbILu7Zm6j6kqgi3HhHRWZQfaCs8eTWDe5RBwrAUb6tEzNYVnuOqcLeyf0Chuhd5cyKkU2qyEf2GcFTpfQ=
+	t=1722892920; cv=none; b=eboWkwI1HE5ajQL3F61NSvawNau6liBJNk1lg28UO33wjjte/RISvlEwAm44tGw8yDEB2l1FTA4Z+yYLLiFkYHI9r9ruF6ESDAlj7oGh1mCC+DVS7hrYeVDkQ/bLJ+Ygw3XkI8CKKY8K9FRZMD9rPjhYTwjoGSGBu5JSQcKkCyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722892707; c=relaxed/simple;
-	bh=Ug6FaoRd1uVVKcuV5Y3oTyiTBb1rMmAfNk+8mRk1Nws=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aO0E3e4AWsn6d8nltOz/CYWQiM+eOszn/cDsqWuH2YKNpybchyn0jjlmVP/7Fc+s9lGoTN/fJE2xaD7cB9HNvispMIRygA1Xnf6w6Lag0+Lie3kKotCHUtYOfA/3C141ZgoWqh12C2AGJlggW6Hfhs4APPFtLGmPXyBcuIqkAao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-8223aed78e2so4411539f.0
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 14:18:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722892705; x=1723497505;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XV2MHzz7ZUZ/ujiLmFN67qyBq0+q1jtkQs1WR9aYyGc=;
-        b=Xu85FWuSdqie8BVnCLTTQRwPCxMiUWkLx9lAoUz3kkyMA0Mwn99ahirNQq6U7QKlnN
-         1BPs/RZ3PL6D154Xv6jnWeOj3QPNCn+qCGhc1PDMQGe8z4JlkBMJpvEJttv//+JDBIf+
-         s47IjWwa9wVTMM4NFZ7PdIfyg5ZitFE9EBW4raAYe39xYbHdoDpYg6rTD08nYR0AFwWT
-         O1IxJOofIZMYvIzhyKWVLzfDPMGyIMYt6OBWg39KhHiHa3M2bG2k9E0glTLZZzucmACL
-         6i30EwP+4XvlTY2KXITLPxmewEpKfL7RsjWRq1xmy6p2iqiSHdPZMeb2akgnxZBrU+d/
-         vsNw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhPt0Ie7TylVzM3qaT85ooPzwylPvZUGhEIi/g8yXrNxC0XUznNLhpuSmZrZIsTBAZIY0KuquYd/UnCtAxKIxzVGQ5l/TO
-X-Gm-Message-State: AOJu0YyngTdE1+wxSTkKsIij5YRyPBAhnzuUl5dhXr/oPen8Toxj9KMF
-	tjtJ8e5nRQAS7wxpqYN3kUdNtquko4twDbDa83AhVFD6iNeIB50AjSB3UoNWx5QA4SQidsrFgH6
-	csRA/GTybNQMSzOtZAyyQ73jSg/smbztA8DI7smDLysLCyZGK/Xyu/1g=
-X-Google-Smtp-Source: AGHT+IEDuMqczrZgHPmUtDl4vUoyicAQZ6yt3rIFV42BelIcmnMHtwxfc12jJaU2IbtkeyJ6KbjDImmQFg54+Ib/xLBoA9RqWdcZ
+	s=arc-20240116; t=1722892920; c=relaxed/simple;
+	bh=pdDwVx0SrBv9fI/ED8pF9vvZBPQg58jos493b7/rXlk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rx8AP5mCvHA85jb7WnMTGpi5TlPLmlVT8x/auoBnH43acbfGV0uEFXMHXDFvOK3GsHJNCCgnDZtW1NE0ICXfqoJf3Tgwy4uQktdODD7YntjV8O6n5/QytHULQh9tQGrNIlwcw90bG9n+v+xpeZ9UtLUaHCdFwJBedR/XG4/wEos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PPNMW4Wp; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722892918; x=1754428918;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pdDwVx0SrBv9fI/ED8pF9vvZBPQg58jos493b7/rXlk=;
+  b=PPNMW4WpLzzAjLW/i4WOmfbR6/dDs0BHMShm2HlZtM/1Rbeb3PMFSgvx
+   Ug3hXBLn9GVufiMdPy1hUFmhMxE1ZZH5qXoVypn9LH2u64cawzIr2kAQa
+   A9f7wBeW0+cbjT4wWl5/okmLFidZ/yVbVKV4mBM2DEwIjSz7T4ul4xI8Z
+   CDiT6VjPqXiehEbLulOgSjQdQEUIKq4sclrX6dJZH6eQLyrJVQZe2hCxD
+   C3wkKMlXxZsmxTqKialGp/Mt+w1MWgJ05o4la++U39+nHODqhLgoJrUiz
+   F3w9Zb1PgzeBr6FD4aS1oHvKCQnlO+mvGoZ279o9yhdo6W6B5FzoBVNiO
+   w==;
+X-CSE-ConnectionGUID: Bd+uK6FPSfG2qouVjquScQ==
+X-CSE-MsgGUID: Pfk6U7yGR1CP04jOTtWeYA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="21004375"
+X-IronPort-AV: E=Sophos;i="6.09,265,1716274800"; 
+   d="scan'208";a="21004375"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 14:21:57 -0700
+X-CSE-ConnectionGUID: J+G+E7ZORWWBYKLcXODpcQ==
+X-CSE-MsgGUID: g7bPm9ThSTKNBR9V1eXsGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,265,1716274800"; 
+   d="scan'208";a="56501977"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 14:21:53 -0700
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 9D60F11F965;
+	Tue,  6 Aug 2024 00:21:49 +0300 (EEST)
+Date: Mon, 5 Aug 2024 21:21:49 +0000
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>, Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andreas Kemnade <andreas@kemnade.info>, linux-acpi@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH v3 1/4] device property: document
+ device_for_each_child_node macro
+Message-ID: <ZrFCbVdFIvgX-iXq@kekkonen.localdomain>
+References: <20240805-device_for_each_child_node-available-v3-0-48243a4aa5c0@gmail.com>
+ <20240805-device_for_each_child_node-available-v3-1-48243a4aa5c0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:410b:b0:4c2:7945:5a32 with SMTP id
- 8926c6da1cb9f-4c8d56c392amr821838173.5.1722892705302; Mon, 05 Aug 2024
- 14:18:25 -0700 (PDT)
-Date: Mon, 05 Aug 2024 14:18:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000af9991061ef63774@google.com>
-Subject: [syzbot] [can?] WARNING: refcount bug in j1939_session_put
-From: syzbot <syzbot+ad601904231505ad6617@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
-	kuba@kernel.org, leitao@debian.org, linux-can@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mkl@pengutronix.de, netdev@vger.kernel.org, 
-	o.rempel@pengutronix.de, pabeni@redhat.com, robin@protonic.nl, 
-	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240805-device_for_each_child_node-available-v3-1-48243a4aa5c0@gmail.com>
 
-Hello,
+Hi Javier,
 
-syzbot found the following issue on:
+Thanks for the patch.
 
-HEAD commit:    743ff02152bc ethtool: Don't check for NULL info in prepare..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=146ac8d3980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5efb917b1462a973
-dashboard link: https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=131875c9980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1741f94b980000
+On Mon, Aug 05, 2024 at 04:49:44PM +0200, Javier Carrasco wrote:
+> There have been some misconceptions about this macro, which iterates
+> over available child nodes from different backends.
+> 
+> As that is not obvious by its name, some users have opted for the
+> `fwnode_for_each_available_child_node()` macro instead.
+> That requires an unnecessary, explicit access to the fwnode member
+> of the device structure.
+> 
+> Passing the device to `device_for_each_child_node()` is shorter,
+> reflects more clearly the nature of the child nodes, and renders the
+> same result.
+> 
+> In general, `fwnode_for_each_available_child_node()` should be used
+> whenever the parent node of the children to iterate over is a firmware
+> node, and not the device itself.
+> 
+> Document the `device_for_each_child node(dev, child)` macro to clarify
+> its functionality.
+> 
+> Suggested-by: Jonathan Cameron <jic23@kernel.org>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+> ---
+>  include/linux/property.h | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/include/linux/property.h b/include/linux/property.h
+> index 61fc20e5f81f..da8f1208de38 100644
+> --- a/include/linux/property.h
+> +++ b/include/linux/property.h
+> @@ -171,6 +171,16 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
+>  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+>  						 struct fwnode_handle *child);
+>  
+> +/**
+> + * device_for_each_child_node - iterate over available child nodes of a device
+> + * @dev: Pointer to the struct device
+> + * @child: Pointer to an available child node in each loop iteration
+> + *
+> + * Unavailable nodes are skipped i.e. this macro is implicitly _available_.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/69cb8d5cd046/disk-743ff021.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8f52c95a23c5/vmlinux-743ff021.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/93f2f40e650b/bzImage-743ff021.xz
+Is it?
 
-The issue was bisected to:
+I think this was brought up previously but I understand there's an
+available check on OF but not on ACPI, so on OF the availability-agnostic
+and availability-aware variants are the same.
 
-commit c9c0ee5f20c593faf289fa8850c3ed84031dd12a
-Author: Breno Leitao <leitao@debian.org>
-Date:   Mon Jul 29 10:47:40 2024 +0000
+Both in OF and ACPI a node that's been marked not available simply isn't
+there so as far as I understand, the semantics are the same. There's a
+difference though: in OF every node can be tested for availability whereas
+on ACPI only device nodes can (there are data nodes, too, for which the
+availability test is always false as it's pointless to test them in the
+first place).
 
-    net: skbuff: Skip early return in skb_unref when debugging
+So overall I guess the code is mostly ok be but the caller does need to be
+careful with the differences.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16b7066d980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=15b7066d980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b7066d980000
+> + * The reference to the child node must be dropped on early exits.
+> + * See fwnode_handle_put().
+> + * For a scoped version of this macro, use device_for_each_child_node_scoped().
+> + */
+>  #define device_for_each_child_node(dev, child)				\
+>  	for (child = device_get_next_child_node(dev, NULL); child;	\
+>  	     child = device_get_next_child_node(dev, child))
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
-Fixes: c9c0ee5f20c5 ("net: skbuff: Skip early return in skb_unref when debugging")
+-- 
+Kind regards,
 
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 0 PID: 5233 at lib/refcount.c:28 refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
-Modules linked in:
-CPU: 0 UID: 0 PID: 5233 Comm: syz-executor339 Not tainted 6.10.0-syzkaller-12610-g743ff02152bc #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-RIP: 0010:refcount_warn_saturate+0x15a/0x1d0 lib/refcount.c:28
-Code: 00 17 40 8c e8 67 97 a5 fc 90 0f 0b 90 90 eb 99 e8 1b 89 e3 fc c6 05 76 7d 31 0b 01 90 48 c7 c7 60 17 40 8c e8 47 97 a5 fc 90 <0f> 0b 90 90 e9 76 ff ff ff e8 f8 88 e3 fc c6 05 50 7d 31 0b 01 90
-RSP: 0018:ffffc900000076a0 EFLAGS: 00010246
-RAX: adacdd6de1fa9d00 RBX: ffff88802c47c224 RCX: ffff8880234fda00
-RDX: 0000000080000101 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000003 R08: ffffffff81559432 R09: 1ffff1101724519a
-R10: dffffc0000000000 R11: ffffed101724519b R12: ffff88807d01a468
-R13: ffff88802c47c224 R14: 1ffff1100fa03498 R15: ffff88807d01a400
-FS:  0000555569709380(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000000 CR3: 000000001eb56000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- kfree_skb_reason include/linux/skbuff.h:1260 [inline]
- kfree_skb include/linux/skbuff.h:1269 [inline]
- j1939_session_destroy net/can/j1939/transport.c:282 [inline]
- __j1939_session_release net/can/j1939/transport.c:294 [inline]
- kref_put include/linux/kref.h:65 [inline]
- j1939_session_put+0x1e7/0x440 net/can/j1939/transport.c:299
- j1939_tp_cmd_recv net/can/j1939/transport.c:2113 [inline]
- j1939_tp_recv+0x7fe/0x1050 net/can/j1939/transport.c:2161
- j1939_can_recv+0x732/0xb20 net/can/j1939/main.c:108
- deliver net/can/af_can.c:572 [inline]
- can_rcv_filter+0x359/0x7f0 net/can/af_can.c:606
- can_receive+0x31c/0x470 net/can/af_can.c:663
- can_rcv+0x144/0x260 net/can/af_can.c:687
- __netif_receive_skb_one_core net/core/dev.c:5660 [inline]
- __netif_receive_skb+0x2e0/0x650 net/core/dev.c:5774
- process_backlog+0x662/0x15b0 net/core/dev.c:6107
- __napi_poll+0xcb/0x490 net/core/dev.c:6771
- napi_poll net/core/dev.c:6840 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:6962
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0xd8/0x140 kernel/locking/spinlock.c:194
-Code: 9c 8f 44 24 20 42 80 3c 23 00 74 08 4c 89 f7 e8 0e 9c 3b f6 f6 44 24 21 02 75 52 41 f7 c7 00 02 00 00 74 01 fb bf 01 00 00 00 <e8> 63 c1 a3 f5 65 8b 05 64 b7 44 74 85 c0 74 43 48 c7 04 24 0e 36
-RSP: 0018:ffffc900035378c0 EFLAGS: 00000206
-RAX: adacdd6de1fa9d00 RBX: 1ffff920006a6f1c RCX: ffffffff81701f3a
-RDX: dffffc0000000000 RSI: ffffffff8bead5a0 RDI: 0000000000000001
-RBP: ffffc90003537950 R08: ffffffff9351e8e7 R09: 1ffffffff26a3d1c
-R10: dffffc0000000000 R11: fffffbfff26a3d1d R12: dffffc0000000000
-R13: 1ffff920006a6f18 R14: ffffc900035378e0 R15: 0000000000000246
- j1939_sk_send_loop net/can/j1939/socket.c:1164 [inline]
- j1939_sk_sendmsg+0xe01/0x14c0 net/can/j1939/socket.c:1277
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
- ___sys_sendmsg net/socket.c:2651 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2680
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd558d90e09
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe518919c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fd558d90e09
-RDX: 0000000000000000 RSI: 0000000020000280 RDI: 0000000000000003
-RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffe51891a20
-R13: 00007fd558dde406 R14: 0000000000000003 R15: 00007ffe51891a00
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	9c                   	pushf
-   1:	8f 44 24 20          	pop    0x20(%rsp)
-   5:	42 80 3c 23 00       	cmpb   $0x0,(%rbx,%r12,1)
-   a:	74 08                	je     0x14
-   c:	4c 89 f7             	mov    %r14,%rdi
-   f:	e8 0e 9c 3b f6       	call   0xf63b9c22
-  14:	f6 44 24 21 02       	testb  $0x2,0x21(%rsp)
-  19:	75 52                	jne    0x6d
-  1b:	41 f7 c7 00 02 00 00 	test   $0x200,%r15d
-  22:	74 01                	je     0x25
-  24:	fb                   	sti
-  25:	bf 01 00 00 00       	mov    $0x1,%edi
-* 2a:	e8 63 c1 a3 f5       	call   0xf5a3c192 <-- trapping instruction
-  2f:	65 8b 05 64 b7 44 74 	mov    %gs:0x7444b764(%rip),%eax        # 0x7444b79a
-  36:	85 c0                	test   %eax,%eax
-  38:	74 43                	je     0x7d
-  3a:	48                   	rex.W
-  3b:	c7                   	.byte 0xc7
-  3c:	04 24                	add    $0x24,%al
-  3e:	0e                   	(bad)
-  3f:	36                   	ss
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Sakari Ailus
 
