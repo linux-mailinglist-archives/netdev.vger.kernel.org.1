@@ -1,110 +1,112 @@
-Return-Path: <netdev+bounces-115786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3E0947C4C
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:57:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA65C947C65
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:02:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB741C21BC8
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:56:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DB89284E27
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 14:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99837EEFD;
-	Mon,  5 Aug 2024 13:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F2439FD8;
+	Mon,  5 Aug 2024 14:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHNz8+TW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BRVQ6iXl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57F1139D13;
-	Mon,  5 Aug 2024 13:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DC91E49F;
+	Mon,  5 Aug 2024 14:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722866208; cv=none; b=Gn8mCV/w2lQ2yVK/IaRweied48vKrc2VxQ5g2vyDwJf3fZr0fJdi5e5y5wf6ITuXPhrptSFsEK2LwIwNLEk3nQbal4ICGaWNVBL/T3geD521sViciNKWttv+apHxWgwVBSiUgA0xZx+ljebh7f6AnECuL3msWOfq/DqGX7q3o44=
+	t=1722866539; cv=none; b=M6l0qnN+idZ0DLIQp/HH7DAdaKVJwyJIpEWRdp2ZNRXWR4dsiCmqcz1qBemEEuD+8sVP+bHd+y+nsxht5KiQ31ghaaNTKTq56BMX+GzpfpojzxQPLnmjvI1DZONJ8D9F6bI/iVjM2rIxDu0B7a7Fvl5VxDwY3OJ1hpy8qxkt6AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722866208; c=relaxed/simple;
-	bh=ZzRvUJNou+i5hkMbxOV7BIqtrsXZICZgOzgjNwX80rM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJOSE2J9U/9/tzFSS4vtdzsJNWdUdUVVhfOHqXr9+YrP+yVWdeLg3kolbH3C+THA9liFRf3NR2uaJDQSYXZRGUKUNsmqLBzF2/ul31F2rpReUx2KaVn0tvATZYX2N7+hascdNRU8m6GNDPMfoTpttcexyQ/GIKexDMm9KvGi25s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHNz8+TW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FB60C32782;
-	Mon,  5 Aug 2024 13:56:45 +0000 (UTC)
+	s=arc-20240116; t=1722866539; c=relaxed/simple;
+	bh=Xdb1Mt9ezMRarreL/m2dFU89KsI90nKFmRWbmyikT6c=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=c6YOSfYSIR0wYjAorZUi0mOYQ2rklb91VgKInT7svkvDLPadwYkIp1OIPZ6NdM5dTsm+HcKX0Wh8SsKyXiCLjRBYlVztM0yXTL21XAY+5a1MB+QI72P3qWljES5WaX6SPVRwNyHU4wcOEJ+mtPJf1JTzn1ePtTOMyGbSvcDWqhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BRVQ6iXl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE26BC32782;
+	Mon,  5 Aug 2024 14:02:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722866208;
-	bh=ZzRvUJNou+i5hkMbxOV7BIqtrsXZICZgOzgjNwX80rM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XHNz8+TWZbjHPeLgerWFZ5aDNDyhFkHyfi+89/cAovwUMDba66piWWfnr2r1Nqub4
-	 Xk/PANpw88fjVLNhJkdpsm73V+8fhLSmGWZxPArhxrnOMrB8Oz1nYj1982qn6SybxJ
-	 E2SQBSj34ckGsSCFPlUtc4u+12ZWo5+9PkfsKMrk4xMP66n9t+gztwzOgIEhqm1u5F
-	 gZMZuoLBh+Gdw3fojqZqz3xKtdU3rBOpt5VD95sfSOYLIUNpl6559N4QYx6HLOWEkw
-	 o8vwEduvQSBk0rEZ3MRFLiYJDlNj+cBLICM2pVXkD7weoOdnc7uM4PTBqszE1wM7VM
-	 lU0XVI3cF3kgQ==
-Date: Mon, 5 Aug 2024 14:56:43 +0100
-From: Lee Jones <lee@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Marek Vasut <marex@denx.de>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, Rob Herring <robh@kernel.org>,
-	linux-leds@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] dt-bindings: leds: Document "netdev" trigger
-Message-ID: <20240805135643.GC1019230@google.com>
-References: <20240708114653.18566-1-marex@denx.de>
- <20240725085042.GC501857@google.com>
- <3c8bf807-8a8e-4704-a90a-d77ad3293b57@lunn.ch>
- <20240801125309.GE6756@google.com>
- <62cc3d64-c5e4-4af3-90ce-273ece6e8e57@lunn.ch>
+	s=k20201202; t=1722866538;
+	bh=Xdb1Mt9ezMRarreL/m2dFU89KsI90nKFmRWbmyikT6c=;
+	h=From:Date:Subject:To:Cc:From;
+	b=BRVQ6iXl8CrluO2yu2+8aENwTsbHB+7M/rTYWCexfqsJD7bKsQwP7AWJK9HYHap3x
+	 lTw1yxeeDHdqUYxB8vYLiStgCLWWV2ovh4t19Q/85qZovoi/GwOPxC75I1QTRXXW7O
+	 vM9FRUFWFvOnK+PkmD8oNJfwrRPiYpdjbVIW2x33F+k0lqQGJjO0Fjy+jInrVSuIy7
+	 nB+AYVeYV+d6Fjz+VFIMHNxva2PtWb7lYEUqgG1SqVLu1D5vuz3k9cLhin3SPZZ14S
+	 xt0VxSFlvuAkDE31rwokz78YmKDIGQaCRiZilxH6sRuCc5T3EyTDZo2pSPqTBrebaU
+	 Cif4Dv4EeM/Yw==
+From: Simon Horman <horms@kernel.org>
+Date: Mon, 05 Aug 2024 15:01:58 +0100
+Subject: [PATCH v2] can: m_can: Release irq on error in m_can_open
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <62cc3d64-c5e4-4af3-90ce-273ece6e8e57@lunn.ch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240805-mcan-irq-v2-1-7154c0484819@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAFXbsGYC/23Myw6CMBCF4Vchs7amN6xx5XsYFtgOMFELTk2jI
+ X13K2uX/8nJt0JCJkxwalZgzJRojjX0rgE/9XFEQaE2aKmtdEaKh++jIH4KY/FoTTi4qzNQ7wv
+ jQO+NunS1J0qvmT+bnNVv/YNkJZQYrPOIbXC69ecbcsT7fuYRulLKF087Lu2hAAAA
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+ Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Vivek Yadav <vivek.2311@samsung.com>, 
+ linux-can@vger.kernel.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Thu, 01 Aug 2024, Andrew Lunn wrote:
+It appears that the irq requested in m_can_open() may be leaked
+if an error subsequently occurs: if m_can_start() fails.
 
-> On Thu, Aug 01, 2024 at 01:53:09PM +0100, Lee Jones wrote:
-> > On Thu, 25 Jul 2024, Andrew Lunn wrote:
-> > 
-> > > > > diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
-> > > > > index 8a3c2398b10ce..bf9a101e4d420 100644
-> > > > > --- a/Documentation/devicetree/bindings/leds/common.yaml
-> > > > > +++ b/Documentation/devicetree/bindings/leds/common.yaml
-> > > > > @@ -113,6 +113,8 @@ properties:
-> > > > >              # LED indicates NAND memory activity (deprecated),
-> > > > >              # in new implementations use "mtd"
-> > > > >            - nand-disk
-> > > > > +            # LED indicates network activity
-> > > > > +          - netdev
-> > > > 
-> > > > netdev is the description of the network development ML/repo, right?
-> > > > 
-> > > > Seems like an odd name for an OS agnostic property?
-> > > 
-> > > I agree that one meaning is the network development community within
-> > > Linux.
-> > > 
-> > > But it also means a network device, which is OS agnostic. I don't
-> > > really see it be any different to a memory technology device, mtd.
-> > 
-> > MTD is an acronym.
-> > 
-> > The only dodgy one I see in there is 'kbd-capslock'.
-> > 
-> > How about, now go with me here: 'network'?
-> 
-> We could do, but we have to keep netdev around for backwards
-> compatibility. There are DT blobs using it which we cannot break.
+Address this by calling free_irq in the unwind path for
+such cases.
 
-Oh, this 'just' a documentation patch?  'netdev' is already in use?
+Flagged by Smatch.
+Compile tested only.
 
--- 
-Lee Jones [李琼斯]
+Fixes: eaacfeaca7ad ("can: m_can: Call the RAM init directly from m_can_chip_config")
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+Changes in v2:
+- Added Acked-by from Marc Kleine-Budde
+- Dropped RFC designation
+- Link to v1: https://lore.kernel.org/r/20240730-mcan-irq-v1-1-f47cee5d725c@kernel.org
+---
+ drivers/net/can/m_can/m_can.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+index 14b231c4d7ec..205a6cb4470f 100644
+--- a/drivers/net/can/m_can/m_can.c
++++ b/drivers/net/can/m_can/m_can.c
+@@ -2009,7 +2009,7 @@ static int m_can_open(struct net_device *dev)
+ 	/* start the m_can controller */
+ 	err = m_can_start(dev);
+ 	if (err)
+-		goto exit_irq_fail;
++		goto exit_start_fail;
+ 
+ 	if (!cdev->is_peripheral)
+ 		napi_enable(&cdev->napi);
+@@ -2018,6 +2018,9 @@ static int m_can_open(struct net_device *dev)
+ 
+ 	return 0;
+ 
++exit_start_fail:
++	if (cdev->is_peripheral || dev->irq)
++		free_irq(dev->irq, dev);
+ exit_irq_fail:
+ 	if (cdev->is_peripheral)
+ 		destroy_workqueue(cdev->tx_wq);
+
 
