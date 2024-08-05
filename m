@@ -1,106 +1,95 @@
-Return-Path: <netdev+bounces-115684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F84C947850
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 11:31:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D4D594787C
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 11:36:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80F361C20C14
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:31:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D8051C21219
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 09:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D381149000;
-	Mon,  5 Aug 2024 09:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EAC14F9D4;
+	Mon,  5 Aug 2024 09:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="embq8jYu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MVj8qL3i"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3472E78C8D;
-	Mon,  5 Aug 2024 09:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1982414C5AF;
+	Mon,  5 Aug 2024 09:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722850306; cv=none; b=Apgu0Rj72N4xfnz7o9no/mYi5vUJV/FbAeshmxZAzgmvjDW/7BB5nsW38WUktHLQRKZW6CuvKScQ7Mqb8P2XQ78Zv9i5Ipk7l99t4PnfeYSD5A02Rs+p8mCN2Vj35/oYtDI4V7DculgtFLZhABr+tuwgfFLYVZtyiD9aLxTFBms=
+	t=1722850566; cv=none; b=qGkwGDgI0NwXUThz0UELWK66HS1xkJpXzJicixbYtYJm2ADwqWFL1nYSjCRglRRT4LSg8hHuXiF3OKuowIxNJ1GbkKviaeMjTAStOJjFr0x/xZ7xEDvSgO+eXxy9rwR6VayayVy7x9YyeMVCwg9yEu6xjvcdQrYDwKBkahZAMy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722850306; c=relaxed/simple;
-	bh=ViMlkbBmo+7tcYzwIwPmqnXP4I4BJO9NmfXvpG2LM4w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q1glLAyscT5/FrhxNHlOrVePCEd0HsY2fTr+vLzYe+VPZkCztlSSmdF+zUt0BEMsmuR6EMSHPp0rrukFi9QOy8JAvLWnUmZdQFrJzio2Z/dChDq2vJgmorTGuQoXB2KmIoi5gntBOEhzfsXrR3gbjqNWOonVhasSsdHEX7MwYpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=embq8jYu; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722850295; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=NBzq6oBAHcsHmslfkpNOLi2FmYuc3exFGZXrcXvviH0=;
-	b=embq8jYuFNaMayWcZ91qnYSU51wmoeTbvQlm3mldlPvpr9FoIIMa5UkrHeZsKkput/9uy3TF7Z3To67UB74A35o6hQZ98WbstJpIux5ormE6i2/LkA1BFEE6M/0Hh2D242lMmquCwUjdbOANdgwrrtQbir2WFqVN/1v39YRuj3A=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WC7j0KH_1722850293;
-Received: from 30.221.129.243(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WC7j0KH_1722850293)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Aug 2024 17:31:34 +0800
-Message-ID: <b55a530a-4b22-453e-84dc-0bd5583aced6@linux.alibaba.com>
-Date: Mon, 5 Aug 2024 17:31:32 +0800
+	s=arc-20240116; t=1722850566; c=relaxed/simple;
+	bh=2bhgdALTqEX3RTZsyFzr/KHTebMxOVLhVwovoaQlv38=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=jfFi29CGG0Iq2YvTzAKBTDkEPpDwYTT7ddFaBWwE6aRe8sP7fctavOP41OJwAoe/tB1CSXiNwqiXfeZzGzlk9/WKaeqyQYfrOoEXDYxhOsKJizAwVWY87WYMPhc6N1a2HOS0KpBDy4kmaFYgG5zZdYw0ewVLEqsT5DdDRUeiBe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MVj8qL3i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F8D3C4AF0E;
+	Mon,  5 Aug 2024 09:36:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722850565;
+	bh=2bhgdALTqEX3RTZsyFzr/KHTebMxOVLhVwovoaQlv38=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=MVj8qL3iInDFRXnFmKrd2vCR61SNYQ0jVxSvwkLFVP/CiDdb9OaO+1JeVe0HfKwvO
+	 xLKSzHeLEbH296/blWQlgKsMqZjUtPwCgHYtve/0qyOkg6wEKGHtKirCFLnRkCsudG
+	 S/E/BvO23UFMb0icp1Av+2ceCt59LnjP2loseZyPZT1/riGt6X1a/H31UVmPW0gA7z
+	 QGup3AQGe4zkY7AXYal+1P1lC08yngbm4EcY2dkWKvY7HChsjntQOo4hWzlSiwa5hp
+	 1YAr2tPUHpFHyIQCqGUuF7pM8IfKk4T5f8FxGUXVfPasHnboQzFSdiGmF3wFRVI3M8
+	 TtivFF5mxZu/g==
+From: Kalle Valo <kvalo@kernel.org>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Baochen Qiang <quic_bqiang@quicinc.com>,  <ath12k@lists.infradead.org>,
+  <linux-wireless@vger.kernel.org>,  <kernel@quicinc.com>,
+  <netdev@vger.kernel.org>
+Subject: Re: [PATCH] wifi: ath12k: use 128 bytes aligned iova in transmit
+ path for WCN7850
+References: <20240715023814.20242-1-quic_bqiang@quicinc.com>
+	<87ed788enl.fsf@kernel.org>
+	<90077fb2-42e0-42ab-b5a1-b4b73ff201d5@quicinc.com>
+Date: Mon, 05 Aug 2024 12:36:02 +0300
+In-Reply-To: <90077fb2-42e0-42ab-b5a1-b4b73ff201d5@quicinc.com> (Jeff
+	Johnson's message of "Thu, 1 Aug 2024 11:04:18 -0700")
+Message-ID: <87jzgv71ml.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: delete buf_desc from buffer list under lock
- protection
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
- shaozhengchao <shaozhengchao@huawei.com>, jaka@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240731093102.130154-1-guwen@linux.alibaba.com>
- <ef374ef8-a19e-7b9b-67a1-5b89fb505545@huawei.com>
- <dedb6046-83a6-4bda-bf1d-ae77a8cda972@linux.alibaba.com>
- <800b1186-2d87-4b20-9d38-b4fecde161f0@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <800b1186-2d87-4b20-9d38-b4fecde161f0@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+Jeff Johnson <quic_jjohnson@quicinc.com> writes:
 
+>>> @@ -279,6 +334,23 @@ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_vif *arvif,
+>>>  		goto fail_remove_tx_buf;
+>>>  	}
+>>>  
+>>> +	if (iova_mask &&
+>>> +	    (unsigned long)skb->data & iova_mask) {
+>>> +		ret = ath12k_dp_tx_align_payload(ab, &skb);
+>>> +		if (ret) {
+>>> +			dev_warn_once(ab->dev, "failed to align TX buffer %d\n", ret);
+>> 
+>> Why dev_warn_once()? I changed it to ath12k_warn() in the pending
+>> branch.
+>
+> My concern was that if this is an ongoing issue that you'd end up spamming the
+> kernel log. But I guess the rate limiting will reduce the spam to no more than
+> 10 logs in a 5 second interval
 
-On 2024/8/5 16:23, Wenjia Zhang wrote:
-> 
-> 
-> On 02.08.24 03:55, Wen Gu wrote:
->>
->>
->> On 2024/7/31 18:32, shaozhengchao wrote:
->>> Hi Wen Gu:
->>>    "The operations to link group buffer list should be protected by
->>> sndbufs_lock or rmbs_lock" It seems that the logic is smooth. But will
->>> this really happen? Because no process is in use with the link group,
->>> does this mean that there is no concurrent scenario?
->>>
->>
->> Hi Zhengchao,
->>
->> Yes, I am also very conflicted about whether to add lock protection.
->>  From the code, it appears that when __smc_lgr_free_bufs is called, the
->> link group has already been removed from the lgr_list, so theoretically
->> there should be no contention (e.g. add to buf_list). However, in order
->> to maintain consistency with other lgr buf_list operations and to guard
->> against unforeseen or future changes, I have added lock protection here
->> as well.
->>
->> Thanks!
->>
-> 
-> I'm indeed in two minds about if I give you my reviewed-by especially on the reason of unforeseen bugs. However, previously the most bugs on locking we met in our code are almost because of deadlocks caused by too much different locks introduced. Thus, I don't think this patch is necessary at lease 
-> for now.
-> 
+Yeah, ratelimiting used by ath12k_warn() should be safe. It would be
+consistent to have ath12k_warn_once() instead of using dev_warn_once()
+but in this it's better to print the warning more than once so that
+users don't miss it.
 
-OK, let's handle it when it causes actual problems. Thanks!
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-> Thanks,
-> Wenjia
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
