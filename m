@@ -1,138 +1,129 @@
-Return-Path: <netdev+bounces-115642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88109947560
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:39:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B04947570
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B1021F21869
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 06:39:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9421F217D7
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 06:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376AD1494CD;
-	Mon,  5 Aug 2024 06:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E949F1448EF;
+	Mon,  5 Aug 2024 06:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqQEtJmF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P1BYl6xT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C64F1422D8;
-	Mon,  5 Aug 2024 06:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 225F713D539
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 06:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722839976; cv=none; b=bw7uMAletTFU2TkasBPDH5svjsYLG9YravhSbfoUzqOh1Lae2LueMDlEvnxKVpgKxpM/hOzyRKxWPJZnFZu2ybXdO9nApu1sxUFf3y5hZndoVHPJeY4s8C6+rxXIHsXTt7nwkm0SH1enx9s5s3+WhaCcWyjKAeE6+Sah6oiMqoo=
+	t=1722840026; cv=none; b=lPgWoOfQs7nKrrR350uehE0gVHeQGzNDej3M4fF0mbpOZlPJPu0OHzPQbs3bP5kcEKXf20hXhwjOwAJnw2olbneaxYTamuSGSuh/svJ0fRfkWbhEhH+GeBouMBtgYmPxVfH0HmzbG7AVbKsZ5t/pioOrAfnFLkbQmNvjmYu3bnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722839976; c=relaxed/simple;
-	bh=Hp+akOIA5r7pKUvBUtgBx9Zv5qT2Ir2O//4P0GbFEq0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IF0XD8VcVR22PjkgN7PL/ZsB/1zlkmAx1YJ9ISpYk1f9jUJAFHaGjhmYgrqyzsVFJApBm6r3q5xi+zY5d3vExp2/UZqcBjen4AV0G2QM7lUksH+kZmCRZbvSVwB0B0mZ1VRypp18UIck8+OsI5sjL3pKnGk8yQFE4E0lOTmyOAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cqQEtJmF; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a7a81bd549eso913771866b.3;
-        Sun, 04 Aug 2024 23:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722839971; x=1723444771; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hp+akOIA5r7pKUvBUtgBx9Zv5qT2Ir2O//4P0GbFEq0=;
-        b=cqQEtJmFSRm5LnPbsKT/AIjlDm4j7R8prPb+u9N2nPYpgq9FAl3dHinXrjP/HPxj08
-         LuZn20WHDCzyzNXSB4apJAhnvE9K9pNZIRvCflVEKSU5Dl13eW7ageQ1grX/Y0G4RmMc
-         CAT/H1oywg8LYgW5h1T714Rj6s14N3/e2QakpGou1iG4mBf/mQRxEloEJvmXT18yx80h
-         fZlXA2Yiu8UViqzbyNIGu9DUiCgxy0OcsHruBUeC7eylo1ZC3T3rq1ywgZskF9eHWZgV
-         D+lP9auQov1yB3zdU1Zn4Hx2HQwwgon83Va9gwNb9fOwg9hmLJIgqiBBeThtvIHEIuil
-         vEEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722839971; x=1723444771;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hp+akOIA5r7pKUvBUtgBx9Zv5qT2Ir2O//4P0GbFEq0=;
-        b=fVZP6PTcKuRsASgkAgwIC8vnpQrUnxIhz4Wbk8A/YJlz9R6R/23Bq6QOF5jzYiEUR6
-         +MVryJd4nqiDc1HlzLCXVkw2SCUa9275yl2/Nr4Fm3lLz9cfmNbj+3He48nQgdNHEfJT
-         CcoGf3qwu9Yq3E4pBi2QafeKYlLvYCUGkMgwZn7/2UvsC5hChdyc8/fm6YdJM+dO75Y3
-         9UohP12f7c99Dv+C85u3w/qfOZJ/wqq0//MM7S/Ha94apD8Yv/cjpvFfHVIiKOdDWrhq
-         j97H2F/TVrWzPggRkPv+9j6T///nnbP2SV/FUp6YPlKnl5PCUSLKfcUyYLZnz0whOxwu
-         wWFA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7N1K3P4E4quQ5LfR82addNMjchGpEYTLdEedkWoEw2HcNSwGRuhC0tvjx8bSldYo5wko6iS2tQKvqdJ8=@vger.kernel.org, AJvYcCWbODC2TUw0TE/3ilzxOvkThc1PNulgDq9wUo3/vHl1qGPq+wFoapbnmEMcdCGfZuMBaEDHWyFC@vger.kernel.org, AJvYcCXZutLzy3lRh5XXszuDWTri81OPqoaKuVghGyR/fsAvcy9YXaSG/X7qYdxnJANyZWSWEoD+SlTv@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzUmdPaBKAEIUOgw6jA7VTs5jsNJ4wpWSK/2Q0jnjyQq6hDsii
-	tO2DiT18i+IPVxx9AT5Ei+afgUUJb8H2qNVcfF0ko4KeLr8mKYb4GM/cUr+qAVWYtf5GoJ3ehcY
-	XipI0uxwpd2sp89JU5qH7jYhiySw=
-X-Google-Smtp-Source: AGHT+IHZKPc6hfq2+btXaQ5oS/nApElkaZfbe6yjBvGYeX2+PIMlwiIHY20xhepwtJAtoPF5hDV6P/eLwPk4IsLmXpU=
-X-Received: by 2002:a17:907:60cd:b0:a7d:c46b:2241 with SMTP id
- a640c23a62f3a-a7dc4fae424mr899245066b.29.1722839970855; Sun, 04 Aug 2024
- 23:39:30 -0700 (PDT)
+	s=arc-20240116; t=1722840026; c=relaxed/simple;
+	bh=Hc0DKJ+K/2FIRa7TAVEZH9jo99UD0sZM1KT8VTALwmo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ql4/9fFLzGREWtNvGdRjAKH39ooWVxUyuFki6rhBDAg8/xPilVH8o1ooHlJCmZM+/DHGwtnMGV5YMuge+F1dSaRTyZ1gNaNkOpZ9kqT4e9t9k7f617xDTBxromfGwC4Xga7hrdJv8TCpXvCIcBZcinp++59LGCbcHGRDBGDk0OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P1BYl6xT; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722840025; x=1754376025;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Hc0DKJ+K/2FIRa7TAVEZH9jo99UD0sZM1KT8VTALwmo=;
+  b=P1BYl6xT/WI/Krm7FxL3NySrtPkP9yrT263sZz/j948jQ+nUuZtZVwGB
+   rxAs7rLR4nTO3bmi8Y2b2aqnXFBJkGhAIC7/Yabm/eT1R63Bh5IpS6BE3
+   zC6iFPF86MSUPm6h8a836H+TAv/UdXt0gJRVikwNmxR91ivhYvjcg10IC
+   wwXaAtZ9GZiAjl/t0jGuFgKwjVEQ/9Bs1i+9wAWOoeTB9VC+d6y6bNCW7
+   6FsL1i+ciGxLz9ZH+F0nO05PZvI4v1EUjB/JPkxrnqVMfbITBL/ZgwOQ1
+   I2Xqam5APTwcR1Ups/Fe/tb/OlhD0/kixzqQiWjwwHlZNeymQUkio4Xfc
+   Q==;
+X-CSE-ConnectionGUID: FCk+gglVToyQl1V0sQwyPw==
+X-CSE-MsgGUID: uww0fIBPTNme89EOXSP3yA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11154"; a="31412944"
+X-IronPort-AV: E=Sophos;i="6.09,263,1716274800"; 
+   d="scan'208";a="31412944"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2024 23:40:24 -0700
+X-CSE-ConnectionGUID: OJKOyiOOQuCW1Mrta3Ls3A==
+X-CSE-MsgGUID: phGUJvFGRE2GaG6YLmaXfw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,263,1716274800"; 
+   d="scan'208";a="60429873"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa005.fm.intel.com with ESMTP; 04 Aug 2024 23:40:23 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sarOD-0001kq-2E;
+	Mon, 05 Aug 2024 06:40:18 +0000
+Date: Mon, 5 Aug 2024 14:40:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: Re: [PATCH net-next v5 07/10] net: libwx: allocate devlink for
+ devlink port
+Message-ID: <202408051455.A9boD1Oe-lkp@intel.com>
+References: <5CCBD90FF2823C29+20240804124841.71177-8-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGRfhukVR4V9GFmdV71QfM2OLW3G=BQoOM1U1cK0ENFZvLTLyw@mail.gmail.com>
- <CACGkMEvpB0zP+okrst-_mAxKq2eVwpdxQ5WTA07FBzRrs3uGaA@mail.gmail.com>
-In-Reply-To: <CACGkMEvpB0zP+okrst-_mAxKq2eVwpdxQ5WTA07FBzRrs3uGaA@mail.gmail.com>
-From: Blake Sperling <breakingspell@gmail.com>
-Date: Mon, 5 Aug 2024 01:38:54 -0500
-Message-ID: <CAGRfhukK6CWpyViK-O67OCXu9=7SGnOwSg=Lv91jum8dF-RKKg@mail.gmail.com>
-Subject: Re: [REGRESSION] [PATCH v2] net: missing check virtio
-To: Jason Wang <jasowang@redhat.com>
-Cc: arefev@swemel.ru, edumazet@google.com, eperezma@redhat.com, 
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org, mst@redhat.com, 
-	netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	xuanzhuo@linux.alibaba.com, stable@vger.kernel.org, 
-	regressions@lists.linux.dev, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5CCBD90FF2823C29+20240804124841.71177-8-mengyuanlou@net-swift.com>
 
-Hello Jason,
+Hi Mengyuan,
 
-Willem's patch works, right on the mark. Confirmed the guest
-performance is back to normal.
+kernel test robot noticed the following build errors:
 
-Thanks, and sorry for the noise!
+[auto build test ERROR on net-next/main]
 
-On Mon, Aug 5, 2024 at 1:17=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Mon, Aug 5, 2024 at 2:10=E2=80=AFPM Blake Sperling <breakingspell@gmai=
-l.com> wrote:
-> >
-> > Hello, I noticed a regression from v.6.6.43 to v6.6.44 caused by this c=
-ommit.
-> >
-> > When using virtio NIC with a QEMU/KVM Windows guest, network traffic fr=
-om the VM stalls in the outbound (upload) direction.This affects remote acc=
-ess and file shares most noticeably, and the inbound (download) direction d=
-oes not have the issue.
-> >
-> > iperf3 will show consistent results, 0 bytes/sec when initiating a test=
- within the guest to a server on LAN, and reverse will be full speed. Nothi=
-ng out of the ordinary in host dmesg or guest Event Viewer while the behavi=
-or is being displayed.
-> >
-> > Crucially, this only seems to affect Windows guests, Ubuntu guest with =
-the same NIC configuration tests fine both directions.
-> > I wonder if NetKVM guest drivers may be related, the current latest ver=
-sion of the drivers (v248) did not make a difference, but it is several mon=
-ths old.
-> >
-> > Let me know if there are any further tests or info I can provide, thank=
-s!
->
-> Does Willem's patch fix the issue?
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=
-=3D89add40066f9ed9abe5f7f886fe5789ff7e0c50e
->
-> Thanks
->
+url:    https://github.com/intel-lab-lkp/linux/commits/Mengyuan-Lou/net-libwx-Add-sriov-api-for-wangxun-nics/20240804-214836
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/5CCBD90FF2823C29%2B20240804124841.71177-8-mengyuanlou%40net-swift.com
+patch subject: [PATCH net-next v5 07/10] net: libwx: allocate devlink for devlink port
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240805/202408051455.A9boD1Oe-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240805/202408051455.A9boD1Oe-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408051455.A9boD1Oe-lkp@intel.com/
 
---=20
+All errors (new ones prefixed by >>):
 
--Blake Sperling
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_free':
+>> wx_devlink.c:(.text+0x58): undefined reference to `devlink_unregister'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0x6c): undefined reference to `devlink_free'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_pf_port':
+>> wx_devlink.c:(.text+0xa0): undefined reference to `priv_to_devlink'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0xfc): undefined reference to `devlink_port_attrs_set'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0x110): undefined reference to `devlink_port_register_with_ops'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_pf_port':
+>> wx_devlink.c:(.text+0x174): undefined reference to `devl_port_unregister'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_create_devlink':
+>> wx_devlink.c:(.text+0x2a0): undefined reference to `devlink_alloc_ns'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0x2d4): undefined reference to `devlink_unregister'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x2dc): undefined reference to `devlink_free'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0x304): undefined reference to `devlink_register'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0x31c): undefined reference to `devlink_priv'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_vf_port':
+   wx_devlink.c:(.text+0x354): undefined reference to `priv_to_devlink'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x3d0): undefined reference to `devlink_port_attrs_set'
+>> loongarch64-linux-ld: wx_devlink.c:(.text+0x3e8): undefined reference to `devl_port_register_with_ops'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_vf_port':
+   wx_devlink.c:(.text+0x47c): undefined reference to `devl_port_unregister'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
