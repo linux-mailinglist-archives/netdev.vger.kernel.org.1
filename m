@@ -1,117 +1,92 @@
-Return-Path: <netdev+bounces-115647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F72E947580
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:43:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54007947584
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 08:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24A3BB21537
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 06:43:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F29B31F21AB9
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 06:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F74149009;
-	Mon,  5 Aug 2024 06:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E1314A618;
+	Mon,  5 Aug 2024 06:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pILr2IVP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZ3VSoO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6CD145A0B
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 06:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3762E14A606;
+	Mon,  5 Aug 2024 06:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722840154; cv=none; b=uuhEE7HlTJM1X0tkDCPFSZMoVsDbP2N69HtEpL3Eqqzd13J2vvcyABojxwFQ4uZ7Tdu2fo8lhuT84Nf7/yHswzL5UgafEAoz0qs2+P69UAeI4SKSbkKA0cwlGH4CPD5FI1+Bgxr6FCwMws4q46Q6IjlQsTlooucgQE16+uI7fxw=
+	t=1722840157; cv=none; b=MgHlp2jZDY3hM5ZyBuHuDDxG16PnY+VbosuNFSQrTz85MCH5fzfmM5a75cm5R0bpFtIixque/0ZJ5eqVjiWHY2bwtk1i16FCYXMsEViiBuNM+17RR/gtBSfU//OQmU23pY50WGXXVR4qfapBMKMHsru88WeoBHtpUOrh0WEQI7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722840154; c=relaxed/simple;
-	bh=YzPGDXjl+eDy+6N4e8OZmZe9l2E04UtisDrDRuOId4c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZzDTbvm2TE0tGQnVVPPrdYQk9+Iuqb8kR68Dw/zIZoEdRa0071bKH4DqA392bFgWPzh/E1gIRtcRRuWADJLvxwsHNp/Z8kTMyxomd2cb6w4wsGVK2mflHYfmor/BSretPye0FdD87mdi+kIHlLjKx/oNLhp89t7fv/Md/QgciOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pILr2IVP; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a7a83a968ddso1341808466b.0
-        for <netdev@vger.kernel.org>; Sun, 04 Aug 2024 23:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722840151; x=1723444951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YzPGDXjl+eDy+6N4e8OZmZe9l2E04UtisDrDRuOId4c=;
-        b=pILr2IVPBECX0PblY0vj7LFrh+7TTUotBCORKq1T4giRMbvpuA5PnpHu2czvf+S+Mr
-         QUM/4ThUIg6ApD+kdtX5BIrACOzCEz3bOku3yKRWrt/wKNkKs1SEpt8Foon9842Oqu+P
-         S4HgXBSVDu1sizLfUccOfp/4EQG6BHfM/XSQg6zuXne2/7lDPwW3YbSpsPFCeJgcOuJb
-         GNlUf1DEhQuIDhdjBYCIDDxJKPQQ6y/0cSux34dZPq7IlVkkacp96ypN3ixLf93MJc6J
-         AkEw7Ppi9DBKo8F9O4bNVLTE1nWR2D6f4Av3Kh510hRHv06pDnYYbfGdKEK6zaQELqdl
-         8sjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722840151; x=1723444951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YzPGDXjl+eDy+6N4e8OZmZe9l2E04UtisDrDRuOId4c=;
-        b=L9jCDxe7czRf+f0NOQriL60pRYE6u8D6C0UoNcOu0IgXgoODnpBb0Sagzq7DkGwJqF
-         uTpKwfXX9/iLefUMChZNFYDJfr/45FMGZjae8yJ77xljBZ4fRDJ8oQUPTxQ8JEhZ9PY8
-         vj6Mt6HfBlmnPdaVBuQnKCOR5270jtEgwFWUVUZGpk/ItCNszjGsjzR3ekLuHi0Tbnc1
-         Q/HHmGZcx3En+zZ38Vew4h5VztlcPQkodoxKb0B3W/vQ7ktKZRDc1ISz2zhgNAnlmFfP
-         sjXbsEmJDU0cFpU0HWPphyv1z/cw39TdTs2JB9lbG+mf2CO7NxhO02K+nxVR1LdCgy04
-         fEDg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTrS/ncyVgDROuRoCiBddF87iUPeqp0FwkA9/yAfXRFPDwKSIhaRsCSVW+VTGJtIAtv8YPBVtby/C2zgdZc9tbpztTVLyt
-X-Gm-Message-State: AOJu0YyMMKb4gGiKaMZa5HATwH+Ai8qmeW7dbHnd1zPE88Cs62zmlRJg
-	8ywarK5uhkBI2IWitsjgkUhFbxWDfhkV1YSdv5eblXwp+AGjGgmWXIkJluF0hAGXKYcDyPuYbZp
-	D+OEYpQU20U1k/xqdqqVdch0+lXe3ZHznF7YI
-X-Google-Smtp-Source: AGHT+IH15Ujg8tPz1fJtw9Huyg2yIRaAIJXfYpvCzwAb670F2TzQXL6sR1QEXEtpyqaAojAbleCRXilC6e87NM5eCSg=
-X-Received: by 2002:a17:907:97c2:b0:a7d:3cf6:48d1 with SMTP id
- a640c23a62f3a-a7dc4ffe3b0mr675122166b.32.1722840150244; Sun, 04 Aug 2024
- 23:42:30 -0700 (PDT)
+	s=arc-20240116; t=1722840157; c=relaxed/simple;
+	bh=/x+BC882axidh+jiBZz2JrkoPRpTk9KLc9FmsPQGlaA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ivzL6t66hhs7LnNr6/8Pgx0bK/qU9vJxP1jpf8dWfa1OtQA/msi5SN83ccUT3Vx4l+ex/z++BbmcVwxPPUeTvJ9+BD01TS/80EkKlOQh/dx9w8lE3rMWMA2Hid58Eyi0fUwgcfGBMss3zyVYZRuGyzcMRhNJ/EVjeBCRIk8acw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZ3VSoO8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E03CC32782;
+	Mon,  5 Aug 2024 06:42:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722840156;
+	bh=/x+BC882axidh+jiBZz2JrkoPRpTk9KLc9FmsPQGlaA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AZ3VSoO8C5j7vvbEaj1zRHMCWruptt4vrVEfW/iC14cotzHFxcv1nBuxH3nDVbiOJ
+	 YueY15BpPY+mNspkkoPw23HYWIsO3q6dm6z3wc+N3w1Al8liu+kYcrcKV03u+hnNBM
+	 XeNFDSXpTJYQCq3pX/9o9zZXdff1NzxxWH/eLK+/Tmsck4TKq383ddAad43V4f4rsx
+	 nlFwy9yEISEawTRpFuB5Dtm+t4XrzqOSIEspY23yyXCCmNhvjtDsB5VNHJ3n6ktZcZ
+	 Q5ofzwWzuweVRCE3CSyiU5yKtyu2csTqGgemgpnG/lnZ6JsQeEwnPWOCuEzsJ/loVa
+	 aU9FYGuF3IjAg==
+Message-ID: <b6196edc-4e14-41e9-826e-7b58f9753ef5@kernel.org>
+Date: Mon, 5 Aug 2024 09:42:28 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801111611.84743-1-kuro@kuroa.me> <CANn89iKp=Mxu+kyB3cSB2sKevMJa6A3octSCJZM=oz4q+DC=bA@mail.gmail.com>
-In-Reply-To: <CANn89iKp=Mxu+kyB3cSB2sKevMJa6A3octSCJZM=oz4q+DC=bA@mail.gmail.com>
-From: Lorenzo Colitti <lorenzo@google.com>
-Date: Mon, 5 Aug 2024 15:42:19 +0900
-Message-ID: <CAKD1Yr1O+ZHg_oVYu39z=qKPC2CX7P56ewRLWOkvXqvekKk6uA@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
-To: Eric Dumazet <edumazet@google.com>
-Cc: Xueming Feng <kuro@kuroa.me>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
-	Soheil Hassas Yeganeh <soheil@google.com>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/6] dt-bindings: soc: ti: pruss: Add documentation for
+ PA_STATS support
+To: MD Danish Anwar <danishanwar@ti.com>, Suman Anna <s-anna@ti.com>,
+ Sai Krishna <saikrishnag@marvell.com>, Jan Kiszka <jan.kiszka@siemens.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, Diogo Ivo <diogo.ivo@siemens.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Santosh Shilimkar <ssantosh@kernel.org>, Nishanth Menon <nm@ti.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Tero Kristo <kristo@kernel.org>, srk@ti.com,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <20240729113226.2905928-1-danishanwar@ti.com>
+ <20240729113226.2905928-2-danishanwar@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240729113226.2905928-2-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 1, 2024 at 10:11=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
-> > This patch removes the SOCK_DEAD check in tcp_abort, making it send
-> > reset to peer and close the socket accordingly. Preventing the
-> > timer-less orphan from happening.
-> > [...]
->
-> This seems legit, but are you sure these two blamed commits added this bu=
-g ?
->
-> Even before them, we should have called tcp_done() right away, instead
-> of waiting for a (possibly long) timer to complete the job.
->
-> This might be important when killing millions of sockets on a busy server=
-.
->
-> CC Lorenzo
->
-> Lorenzo, do you recall why your patch was testing the SOCK_DEAD flag ?
 
-I think I took it from the original tcp_nuke_addr implementation that
-Android used before SOCK_DESTROY and tcp_abort were written. The
-oldest reference I could find to that code is this commit that went
-into 2.6.39 (!), which already had that check.
 
-https://android.googlesource.com/kernel/common/+/06611218f86dc353d5dd0cb5ac=
-ac32a0863a2ae5
+On 29/07/2024 14:32, MD Danish Anwar wrote:
+> Add documentation for pa-stats node which is syscon regmap for
+> PA_STATS registers. This will be used to dump statistics maintained by
+> ICSSG firmware.
+> 
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-I expect the check was intended to prevent force-closing the same socket tw=
-ice.
+Reviewed-by: tags should come after Author's Signed-off-by:
+
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
