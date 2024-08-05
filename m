@@ -1,149 +1,118 @@
-Return-Path: <netdev+bounces-115845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54B6948032
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:24:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3F8948037
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 19:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EE32B21FB2
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:24:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8365E1F232D9
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 17:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C994C15DBB9;
-	Mon,  5 Aug 2024 17:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFAF15E5CB;
+	Mon,  5 Aug 2024 17:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yc7/O15p"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="n5zHDR3W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.smtp-ext.broadcom.com (saphodev.broadcom.com [192.19.144.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C032C684;
-	Mon,  5 Aug 2024 17:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0913C15ECC2;
+	Mon,  5 Aug 2024 17:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722878635; cv=none; b=n1TacUDXH45Bhj1uYdzuuHcQzGRuSUV4LObf5IsOj2W9b40W6o0UFFhJtu9+le3B6+yFSDvrWlr+2LnnnaeYmlmU5axKZF2h7fZgu+F1YcNwpsmng8Kya8eN0aPrTfw9VbLN33mUfhyQ4WNdRNv8IaQ/IlKCFb0dwYaMjjLxMag=
+	t=1722878736; cv=none; b=CV73n1yRDT4Asw49SE8B05OBRIlZ36eT1nz+hR2Qpx9dTjyLUGOvVbR+uRE0TP5QbxbCjW+LuuBURySdA/2qWQVSw+clyHGKhE9iqb1IXpKJHRwCgGp4RLEdxYv1LHikqrDR4xgVy3r9FhIl42xXaAX+j8yxTJY+NFYt8HuqIfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722878635; c=relaxed/simple;
-	bh=7hNRCBLZkQk3ywBVBEc77QdTfOxU80m/Duk6D3Qhh14=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pJnSI3nOdRt/g6VHZNbuuuCUzRRh614ZmkL0UwZqCM6S5I4DrIN95dzQClH+1GF9nOZ41/QaaavOEFHSIIk1HEx8Xv+6HgFYwnGEq7HPBNNyo3+mFjzPqWhuXfj+3v304ezm8UvkoiHW4yZZ6SCZI+kUVBYXd5D7JL4ZbNiXVQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yc7/O15p; arc=none smtp.client-ip=209.85.222.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-821b8d887b8so2727546241.2;
-        Mon, 05 Aug 2024 10:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722878633; x=1723483433; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7hNRCBLZkQk3ywBVBEc77QdTfOxU80m/Duk6D3Qhh14=;
-        b=Yc7/O15pUbHsK0DELpDVMkyEcGFbOpPeWXh0HWVj9Q26DT54yxyqOFPDnsGlN8uzPt
-         OcbqJHb8fmGVuIeXk0Ww62Vi0ZqnMcESfkyRT+a6pCmiNbIaLY631NInMsp/bXZgaOBV
-         NDMbBsdLe6Y/YaHOZzq/ISG/DOJdsK5e4R/xIH99E5YaIIzNGbMQ0O59cdYJRLlmps+c
-         0p+dENsoj+GpLgVuQiX7Jx/Al130phWqz9WlhN91BLs3NvLkq79DrQvo1LQXqCNpjGkU
-         tvetMk3ZbiF6ye+LbCDm5uus3iBKQoq+prEZ10iGhSq3EIB+yFEqbsNsmrelr6Da4Bk2
-         pqyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722878633; x=1723483433;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7hNRCBLZkQk3ywBVBEc77QdTfOxU80m/Duk6D3Qhh14=;
-        b=kDzRx9sCRHqbmcjgtHx2efgdrfzb9PgPHFKqb8kN1VUYR/B1Ixue4UP+8Vi05IF4gk
-         8dZN7miCTf3SWQ4CgJOVhGi2rra6qPW2K1WDidXIpaBm7DF2xFbep0Q0Zw/d8E0V/imQ
-         uVOQ3WgElVETJ0L9L/r8WoYqqGqOcbqeakCnUiuP5VG6pmAl+xz5dpqHSRZNEfGWbR+m
-         CtAZZFf5JY/XaviOG62II2Zg3hwCY9+xnyEwIq4PyIGYJYoGZZeCwGw/8B5qyhZDLo6N
-         iQmVZmhMPErk01H4KfS+GJmFfqmtlYecXUmnG6D2eoXn5VGptcDVKnnJDTB0y7lcYX04
-         UX+g==
-X-Forwarded-Encrypted: i=1; AJvYcCW4OCYWPKWu9YgyEjDrSKLGxi4nq+wMVF9ADqcQLP5Lw4yWThi/shQ636uPp9H5vHeC9ClB+4g2259oP7TZOKOlxKctl7t6B/NK2TPsgXXDS1NQ7cUCSvUHe/UxIUm6dvdlH9z7bjOwxdkG2jRuswG2P2Xm0oi+pyBGaTb01FudqA==
-X-Gm-Message-State: AOJu0YxCg/TSGoAs6YTM6+te98XSni4tb2rvh1siRFHYehhLypTjlWPx
-	vdb2O6wr5EZgq8AbCsS7EhXfOp9FNFioOHbu9upsFxRtj+jFlCc3R8LvlmtX5Cxv+bJtwrbEDrl
-	/oMWe0277ajde6iGFi1d3zgl5OcE=
-X-Google-Smtp-Source: AGHT+IG97v5P+HaGuI1kZV1qk5BoG6Y1rXq3GRd/+BCg8egfsMOWRyHK8qM2C46BAklCGORmSX2XH7yhxlNvbJsKEd8=
-X-Received: by 2002:a05:6122:252a:b0:4f2:f055:b7a0 with SMTP id
- 71dfb90a1353d-4f8a0046cbfmr9640483e0c.12.1722878632861; Mon, 05 Aug 2024
- 10:23:52 -0700 (PDT)
+	s=arc-20240116; t=1722878736; c=relaxed/simple;
+	bh=DQVPx+SOwk2yMJ3OToQWa+B7sNes5WowJhkrFAOuTEQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HfaQ60NEsXzijTwAZv1hLT95GU1Qu88F9u9OidISL29310HrfgI6MkcxnZ2+ASmciH2tYlaZEgMm5UtnQd+NmhkumZu5ogFVt6+UCBwTKIcMN5zhut99yLnOkV2s33tL85iuExW5UHUK11qZtSCbZqGYwGOHoZY/bo6DGxLZaM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=n5zHDR3W; arc=none smtp.client-ip=192.19.144.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 84C68C0000F1;
+	Mon,  5 Aug 2024 10:25:27 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 84C68C0000F1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1722878727;
+	bh=DQVPx+SOwk2yMJ3OToQWa+B7sNes5WowJhkrFAOuTEQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=n5zHDR3WO2A3THxtXyHEn/C+604uyLR6W90U3OfBbVRS1xNdv8g+M5sRd3OAykYq3
+	 dQSEH89EVpAkULgqq6ZNh+y/OPzHXaj0j404l1WG3IkySYWlq8VUq56tZoU4E6toqR
+	 wfJU3tdvBfdzFVAYCOqtJCm+payyzylr2zVmte1Q=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id DADBF18041CAC4;
+	Mon,  5 Aug 2024 10:25:24 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] net: bcmgenet: Properly overlay PHY and MAC Wake-on-LAN capabilities
+Date: Mon,  5 Aug 2024 10:25:22 -0700
+Message-Id: <20240805172522.3114032-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730183403.4176544-1-allen.lkml@gmail.com>
- <20240730183403.4176544-6-allen.lkml@gmail.com> <20240731190829.50da925d@kernel.org>
- <CAOMdWS+HJfjDpQX1yE+2O3nb1qAkQJC_GSiCjrrAJVrRB5r_rg@mail.gmail.com> <20240801175756.71753263@kernel.org>
-In-Reply-To: <20240801175756.71753263@kernel.org>
-From: Allen <allen.lkml@gmail.com>
-Date: Mon, 5 Aug 2024 10:23:41 -0700
-Message-ID: <CAOMdWSKRFXFdi4SF20LH528KcXtxD+OL=HzSh9Gzqy9HCqkUGw@mail.gmail.com>
-Subject: Re: [net-next v3 05/15] net: cavium/liquidio: Convert tasklet API to
- new bottom half workqueue mechanism
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, jes@trained-monkey.org, kda@linux-powerpc.org, 
-	cai.huoqing@linux.dev, dougmill@linux.ibm.com, npiggin@gmail.com, 
-	christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org, 
-	naveen.n.rao@linux.ibm.com, nnac123@linux.ibm.com, tlfalcon@linux.ibm.com, 
-	cooldavid@cooldavid.org, marcin.s.wojtas@gmail.com, mlindner@marvell.com, 
-	stephen@networkplumber.org, nbd@nbd.name, sean.wang@mediatek.com, 
-	Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, matthias.bgg@gmail.com, 
-	angelogioacchino.delregno@collabora.com, borisp@nvidia.com, 
-	bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com, 
-	louis.peens@corigine.com, richardcochran@gmail.com, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-acenic@sunsite.dk, linux-net-drivers@amd.com, netdev@vger.kernel.org, 
-	Sunil Goutham <sgoutham@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> > > Could you shed some light in the cover letter or this patch why
-> > > tasklet_enable() is converted to enable_and_queue_work() at
-> > > the face of it those two do not appear to do the same thing?
-> >
-> > With the transition to workqueues, the implementation on the workqueue side is:
-> >
-> > tasklet_enable() -> enable_work() + queue_work()
-> >
-> > Ref: https://lore.kernel.org/all/20240227172852.2386358-7-tj@kernel.org/
-> >
-> > enable_and_queue_work() is a helper which combines the two calls.
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=474a549ff4c989427a14fdab851e562c8a63fe24
-> >
-> > Hope this answers your question.
->
-> To an extent. tj says "unconditionally scheduling the work item after
-> enable_work() returns %true should work for most users."
-> You need to include the explanation of the conversion not being 1:1
-> in the commit message, and provide some analysis why it's fine for this
-> user.
+From: Florian Fainelli <f.fainelli@gmail.com>
 
+Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
+while others might be only supported by the PHY. Make sure that the .get_wol()
+returns the union of both rather than only that of the PHY if the PHY supports
+Wake-on-LAN.
 
-Sure, please review the explanation below and let me
-know if it is clear enough:
+Fixes: 7e400ff35cbe ("net: bcmgenet: Add support for PHY-based Wake-on-LAN")
+Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-tasklet_enable() is used to enable a tasklet, which defers
-work to be executed in an interrupt context. It relies on the
-tasklet mechanism for deferred execution.
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
+index 1248792d7fd4..0715ea5bf13e 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
+@@ -42,19 +42,15 @@ void bcmgenet_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	struct device *kdev = &priv->pdev->dev;
+ 
+-	if (dev->phydev) {
++	if (dev->phydev)
+ 		phy_ethtool_get_wol(dev->phydev, wol);
+-		if (wol->supported)
+-			return;
+-	}
+ 
+-	if (!device_can_wakeup(kdev)) {
+-		wol->supported = 0;
+-		wol->wolopts = 0;
++	/* MAC is not wake-up capable, return what the PHY does */
++	if (!device_can_wakeup(kdev))
+ 		return;
+-	}
+ 
+-	wol->supported = WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
++	/* Overlay MAC capabilities with that of the PHY queried before */
++	wol->supported |= WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
+ 	wol->wolopts = priv->wolopts;
+ 	memset(wol->sopass, 0, sizeof(wol->sopass));
+ 
+-- 
+2.34.1
 
-enable_and_queue_work() combines enabling the work with
-scheduling it on a workqueue. This approach not only enables
-the work but also schedules it for execution by the workqueue
-system, which is more flexible and suitable for tasks needing
-process context rather than interrupt context.
-
-enable_and_queue_work() internally calls enable_work() to enable
-the work item and then uses queue_work() to add it to the workqueue.
-This ensures that the work item is both enabled and explicitly
-scheduled for execution within the workqueue system's context.
-
-As mentioned, "unconditionally scheduling the work item after
-enable_work() returns true should work for most users." This
-ensures that the work is consistently scheduled for execution,
-aligning with the typical workqueue usage pattern. Most users
-expect that enabling a work item implies it will be scheduled for
-execution without additional conditional logic.
-
-Thanks,
-- Allen
 
