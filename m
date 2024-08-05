@@ -1,169 +1,262 @@
-Return-Path: <netdev+bounces-115776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3852947C27
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:46:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0CD947C2E
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94A0A285AE4
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33046285CC1
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA36381DF;
-	Mon,  5 Aug 2024 13:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8E538F91;
+	Mon,  5 Aug 2024 13:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="czY74J83"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AjnSR5La"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E9C175A5
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 13:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722865583; cv=none; b=qKbWzz0HXS6E/8DSHzwsPWnNl4huhMDerHkd+D2Q0LtpHbVqrMQLkptKsDKdYMlHnWXigRH9keWLcqKQf4hnFO/boche23JE1+ZkQdijOpk6H+ko0Bk6xX1XWWRTGlEPUSPP1xyok8heOFkmn2wKv1YfwMVqFS2PZy6SiS7Mb/4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722865583; c=relaxed/simple;
-	bh=+t4Pq1jNolGbzWRb4tnaIRG2SI14L4cljaguo+v9RcQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b8r4Xv8xFwQify47PxerK+Se8ftKdYUl0l4bKUH4yaMbmwoAzwOTCncY7cfDu3RMKP+N7o3jRvSMegWQm3qeOeIbMAk8FBISD+LznuS0vbTwN+CLOmSJFvLNaFsZx3HlkRKGgSsPpBOmrY0hOC0J8Ck+FuHYtBmrhlpGQiQxv/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=czY74J83; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE73C2FC
+	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 13:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722865781; cv=fail; b=NXi0SdK7rIstvw2QaaEhdZzPMp7T31faBFwGASseILGNUMwLst+hBIfUOlomy4/coyQNitLvftPg8NLrADYrZB5YQg++t8n/L6cX23aoVuNTYtQtj3rvbBb4e/8nIMmK52VsUUQOJMYYPgPcPSSZ8FyN6jeM5fxHpuA5VfIapyo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722865781; c=relaxed/simple;
+	bh=mMjvI0uRLyPFAUxUAaRXrBUPeYdTaveWHcgxBvTEvfI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=H7bDKpovUFJ+f6SozBj89Qpg+VdxZY/c5neoWb8enVt0Msyu88IlIT5d/eDEGktk9vnhYDQIp6+TCGew6J8figwG9fzo1zj8AYx7/g0MrrrMMsbZJJTCN2TL0bQroZ8nOXKK78Ddb7+e5aXwhT8VAyVpDYXoW+vzxZDq8DOddzI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AjnSR5La; arc=fail smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722865581; x=1754401581;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+t4Pq1jNolGbzWRb4tnaIRG2SI14L4cljaguo+v9RcQ=;
-  b=czY74J83YRKmOlb09KJW7ssLDeMD73lQ9enu1yH4F8jMk5p7b5VgMi1w
-   2NMpV36bWL9h5d7wnlbuNLwFLYflX/DjVljNKdLyskmsIeM+nN7rUV71T
-   /XdQE2Nb7wG9T9f1/iFzWOmWY50tP0CZXk4DNPKXwhCtSuP2eNStHq++i
-   hFCLVeKrQjL4Wx0UWZ68hWglQIo/3pyTByXzCPzSf6NLiWoxfAmoMvKig
-   o79WMbtMfWycGX26Pgs1B5c+bHSUqaV9fkbql6gLo3SBD+e0xh0KWU0Na
-   aRBy1/m+AxDxvpb0M6CCiWNrh4cmTbwlU6YdFR/8i73EXRjrfngxDtKOr
-   A==;
-X-CSE-ConnectionGUID: DttKBLmQQrCi024paLnVTg==
-X-CSE-MsgGUID: I3MXL7hTTPqYSbf7iHqNsg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="43352099"
+  t=1722865780; x=1754401780;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mMjvI0uRLyPFAUxUAaRXrBUPeYdTaveWHcgxBvTEvfI=;
+  b=AjnSR5LaLFPEWEVXaAf5o2fQ3nsKEduwrqbcgCan8Otv3hsXHk9plb6i
+   5xWcrbyUUhFIGocGSVRe8Pgd7nO/vwIA8W7YJ9egXmRJ33vfVqVC+q7pP
+   Laa4M73XWb9ljUC7HJeldMd+rtysfqQV7YZ5S8SzQ/XZJ4hnoSLpg0u0i
+   7EiIHmumjAjIm/A7zPMk3L4w03b49jMh4bF9qRKhLWlNyhmrLRZxomh1d
+   2J3T4DSM0dz+tPDwQuaGgKQAzlEyshOr7OER85qmal21qADEDsG4Z33ug
+   v+cBT2eyWtMevsDhAcYv92uObKoC3tfeaKDWdHVjXKLQZRV54B118yCXd
+   Q==;
+X-CSE-ConnectionGUID: psdchjErRiOiOmBdjJzo1g==
+X-CSE-MsgGUID: lPxTtmmYTc+mNaUfiI4Kcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="31986329"
 X-IronPort-AV: E=Sophos;i="6.09,264,1716274800"; 
-   d="scan'208";a="43352099"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 06:46:20 -0700
-X-CSE-ConnectionGUID: 79w0iuq4Sdy4BnGpJNLmbQ==
-X-CSE-MsgGUID: p/bj29U6S3eOwzsFrXW/dQ==
+   d="scan'208";a="31986329"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 06:49:39 -0700
+X-CSE-ConnectionGUID: req+B3LkTQm+SFGb9Apqsw==
+X-CSE-MsgGUID: GxsFPvNNTwSjoOtnXdHU7g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,264,1716274800"; 
-   d="scan'208";a="55841179"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa007.fm.intel.com with ESMTP; 05 Aug 2024 06:46:19 -0700
-Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id DC14D27BD9;
-	Mon,  5 Aug 2024 14:46:17 +0100 (IST)
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com
-Subject: [PATCH iwl-net] ice: Flush FDB entries before reset
-Date: Mon,  5 Aug 2024 15:43:50 +0200
-Message-Id: <20240805134350.132357-1-wojciech.drewek@intel.com>
-X-Mailer: git-send-email 2.40.1
+   d="scan'208";a="79443181"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Aug 2024 06:49:38 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 5 Aug 2024 06:49:37 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 5 Aug 2024 06:49:37 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.170)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 5 Aug 2024 06:49:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iNqmyKRaUTY1+CNOlocF/bFv/fwylPPoyGYpDodB/TYUwxHPA08msZy6b7YTqYsRc05qrXjcmPRSp7MTNb7dmc8UkjdbncYr1HfYMbljsdwYOU7MTP82W2jz6aSsYhEKSnaij+gRFk2HE+TghHkf2oUZOFit7kg27Bp8cVYTTwzVTyOevU1EWvPXswSVn9lNXJoZVUMhX9NLK0WM85ECGYZGwHMkc5bVTxSwPuZ95R8dnmaBn98zxDIEFDGaQk70Q8rD0R6+JW3Ya7uBCLl4PY+jkbb8mad8i4U2xnvKvxiKv7v8bSjgobxRaHxw2Z0nU/dwQqG47bmvLGXK2nv0aw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=00pWC5vNRygsb4HMwCg55bykFI7bRTjYA7U6GY5zd2M=;
+ b=A0QUePU6cpi76jEP9rWAPcfw4qn7Bc2qBLOG7FQs3GKFOjiRmADvDrtwIJJurcNi9oTlL2HVymVJ1JpJUj6yGUSYWvUnYGaypLielIQabr0nUcHK/RGgGs36XC2sCVYwQe6E+KeEOuE0zpPvnev2t1BZwM01MWXhQRFU/K+M48doKPy3zEIcdTLiYzh0ABiNN3aUKGF+XhzR4QE0MUul7OF04KMIGmqKMarQ11CpJCyXf+eFkdQMA27+BTXsEjnI/yI3doGSvCrKxDSVUiISbOrZlsl5jNrH/R13Z/u2a5qu6o3qPdn3Aorqs//PT3LMTVWVb2l0l2M2nQHoOh7efA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SJ0PR11MB6694.namprd11.prod.outlook.com (2603:10b6:a03:44d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.23; Mon, 5 Aug
+ 2024 13:49:30 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%7]) with mapi id 15.20.7828.023; Mon, 5 Aug 2024
+ 13:49:29 +0000
+Message-ID: <959e5cd6-21d9-4397-a22e-4e383083c186@intel.com>
+Date: Mon, 5 Aug 2024 15:49:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2] ice: Implement ethtool reset support
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <horms@kernel.org>,
+	<netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+References: <20240805124651.125761-1-wojciech.drewek@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240805124651.125761-1-wojciech.drewek@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI2P293CA0009.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::6) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ0PR11MB6694:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ed2cda2-08e2-49b3-7bb8-08dcb5556dc4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R1NVTHVrcmVoTVluUi9scVZNbmlaTERGVmUrb1NjeGRKQ2VvcWM2Skg4cUR6?=
+ =?utf-8?B?a2ppUTQzVEFhQytwaU9KdDlLSlFrOXFOY25CaHNQbk1LYWpNUDh0ejhuQUdO?=
+ =?utf-8?B?dHVuQ3NDanlhRmhhWklzN1lPRXNqanY0TFVMTHcxdUZNaldFMTh6VVJERjh4?=
+ =?utf-8?B?UWIrV0F5R2NDTDJOckhWek8yak5GNmw3N25MRTlmTGwxVEFCZEVtNkhXSXhi?=
+ =?utf-8?B?NmlsdVV2ZC9KR0FLYzdRNXhnUEQ0OHErUlZFTTdEbGVSWmQyd1VPcXZUbHlE?=
+ =?utf-8?B?Yk1GSmtOKy96QjBjWkttV3UvdnJkbCtZVU1hSzBNbEpqODdBT3hhLzBmeWVa?=
+ =?utf-8?B?eWNmc0hNaXBwMXZ3TVd2R3drRnBwTHduZXNmQ1R5ZS8zODBFNkdsK0I4RVB1?=
+ =?utf-8?B?M1dFNWxJWi95dE1nQnQ3M25uN0ZYZ2RwSDVlQnhoczl4WDZac25KNURpUG1I?=
+ =?utf-8?B?TjdxQ2lmcGU4TlVPQWh0a2dsbXd3cmVqdnNkN21MV2s2Z2QzVVBwK3pRbnkz?=
+ =?utf-8?B?b1Z6UzBFOC8yeEdtUkRSc29LWndYMDNxQTh2UmgzNzdaaHJJWS9pSmp4L29r?=
+ =?utf-8?B?OVdydGZPSkdvMjRocFR2bFlkN3hvTHBHY0JnU0p0Z1dJUGl0cU1uOUp5Y2F4?=
+ =?utf-8?B?ZzZaT2crYVF1WWV3eWZsa1g2d1hWT0ZOL0hNbytDN3FKTjBVTm9DWkpMMHRV?=
+ =?utf-8?B?MXoyU1pCTlMzLzBzb1loR1pqemsveUpDNlNMVFZHeEE5STdPUXhKQWs4eTFu?=
+ =?utf-8?B?b3dZdkhqTFdiMTdDNDhNcGlYZVo4Yml5TnJjZXZodGdUczZwR2lNcEF3cGdB?=
+ =?utf-8?B?TnZ6ZS9QZTd0NlhxMVBEeXZkZDYvTlZ5MG9tWVQrbU5FZTZtOExTNEx5R0pC?=
+ =?utf-8?B?cDI5QW8wdHhkYW1SbGFtRlhBSy94OVlwRkVuc0tXYXdMcmNiWVNzb0ZqZTZZ?=
+ =?utf-8?B?YUgzN1ZCL2prWkc3bWNOUWVDTGNkanVKNjFsL1JHMFpOUVptMFdEN0lYYkZt?=
+ =?utf-8?B?V2s1ZUJSYzZBUDNtMXBVRVMxNE5Nd3ZHWU1ySTJzNU5kWVJremtlTmRKY2xK?=
+ =?utf-8?B?V2UyQTBQaXNmOU9Oc0FOcXgyTVhBZUtxblFxaUgyeWJuTUJ2cHovbUhIem1F?=
+ =?utf-8?B?UFFhYzU5WmJKRmZoZ2ZJZlVrb3h6UVRVdkwydkJkcDFXSElLdG54YkRwc3Qx?=
+ =?utf-8?B?bWNwUkdEWklLSUJQZ2h5WUx0S3NpUHVZb3pGV001YjVrbmtFSE1WRnV6RVVk?=
+ =?utf-8?B?TStJV0NVclE0eGNuZmVXaFBJWnN0Vm12MUtJZjBvb2VCNzZMcmR5eGtNYUtt?=
+ =?utf-8?B?VWZKUlRnai9BaXdNS2FGT0hMODRlUWl6ek42N0JIR0NiQ1ZyV3RZOWtxTmF6?=
+ =?utf-8?B?TEVnSmI5a0xGTGdoUXJFczZBVkZnUjE2V2NkN212VXVFb3FrQ3VsOGcvRjZN?=
+ =?utf-8?B?UWhXbFRzb210VGxicFhYV0lqWXg3RHEyMTRUMmtIUG95OGg4R1FSTnQxU0t0?=
+ =?utf-8?B?QkhJTkJMWHN6YnRDQWYyVmNoaUhlREJwekxOOXhtMkpRNDA5bmFMU2t5endW?=
+ =?utf-8?B?Rml6WklzaXppVXJicGpBU0lKamcwQVV4cDdyWjZPbXBjVE9EcmV3UC9KcEU1?=
+ =?utf-8?B?NGxJQ3NqVzNqMmw0cE5BNzFueTNRdVBMMXJqK25keHEza2UyMktLVzlDRm82?=
+ =?utf-8?B?TFpQZ3orbUxyYXpRQ09nWGxTVkdqOGZmdXZFL0x3V0dxdHZVUVpJeUh4WGcw?=
+ =?utf-8?B?eHQ3NDl1aEU1aGRla3hncGFOV1crR2pGOXRYZlNhSnVpVUJxN1pkTEV5Tytn?=
+ =?utf-8?B?N0pobGM1bkNuT08zSzY2dz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QzMvcjRGRHUwS3dlOSttR1dkQUVZdHRvQWRVVlNiKzJyM0U0ZDFwbUhaNjN0?=
+ =?utf-8?B?d2p0cjlidXdUU2VJZEFzb0tqMC9veUxXS1o3UjN1SFhOME8yL1hKREI5RzNv?=
+ =?utf-8?B?b3ZYUHFHKzdwQTkwejlWMUxSNExGOVZuVW91UytKZkdWQjJWZ2VzaWhmWGFI?=
+ =?utf-8?B?ZERYOWFUdW5UOExCSkR2UzRHUjRudXVzaGovYSsxemUwc29KRkVOM1ZtQU55?=
+ =?utf-8?B?UWowRUhOR0ZKazVYRk1qZ3dCZDhuTFh6aHVXaWw5Q2lnMmxualNENCtHNGdE?=
+ =?utf-8?B?V2pDTkpyVkl0QmJqa2xhdXRqbEZrNUY0b2VseXNmVG5YekhndlUrTTJyMUVi?=
+ =?utf-8?B?eUJ1QTVSeFd1dnpFTU03Zy9ZcS81R1JlalRnYkl3TzU5dmljZENwZ0pGZStU?=
+ =?utf-8?B?cys3V2dYZ084RGRPQVVBWjRLZHBIbUVEVmpYbTRyb3V4R1pYV0dNVzRrVll0?=
+ =?utf-8?B?eXRybDR6V3pMS2dESGNZNTdYRzlsTFN1TGVEa0VqeDVuYnp2eVVSRUpzQmsy?=
+ =?utf-8?B?cDRPUGdBYmVTcTdQcjYwUUFPQ0YzRmhmNjhJYmVUaThVRkJIYnlLUTI5RUt1?=
+ =?utf-8?B?VzZOdEEwYVZoZGRnR25pM2FKaWJBemY3NnNESG5yTGw4QVJSS1hRWVNrc2I0?=
+ =?utf-8?B?TGpBQ1dEaUtlOHl1VlgyQVYzYitaZXZ2WEliVmdtOGh3bFdnYlpVaG1jU21O?=
+ =?utf-8?B?eVlrMUlnQStEeHV0V0Z4SzJOTmxNUlhSblA5d05WSkVQLzVnVVBWSmN1cktM?=
+ =?utf-8?B?VTVCM055S3F2bjZOWUdaeC9KTzlaYzhaTjJoaUhHR3lOaEpydFE0bUd1amc2?=
+ =?utf-8?B?VkNnZHY2Y0dXQmcxSGhMR2U4dElxbHBjaEFiRWpjRkVpK2JWNEJpQmtwa0NG?=
+ =?utf-8?B?VVViYWE0RmdaTjZRK3hBZ0NTL3Z6Smx1Q01jNVRYL1ZsWld2cHgxY3RrNG1x?=
+ =?utf-8?B?VVIrUXhXVzg3Yk03NUhsR2pWaDJkVmU3NkNJK09OdDQrZWJ3b2pORy9PNXlh?=
+ =?utf-8?B?dDlnMHM1aVByUnMwVmZLSUZlNzBQRHdTWnJ4ckF5TDRLZEl3R0EvYS92RFRT?=
+ =?utf-8?B?N21DRTBTWHpDYkhYSHNEdDJrWWhLbW9RUzg0eXo0STdydGcvMFg5MUE2SUMx?=
+ =?utf-8?B?YzhVT0FMRHZ3YkFra3FrWXlXSkhVZ3RSQmtuWkFmRVQvWWw4SEZTb3htcmlH?=
+ =?utf-8?B?Q2kxNThoMnlHQ1FFVFRmQmJKdEErdFFROWxuRFFpRUhFU1F2OGprSW9iUjRW?=
+ =?utf-8?B?YWtHaVF2NFIxNFk1bTE3dTNjMW9kZWdUUUwreVo1VGVYQVVGUjhKSkZFVFRU?=
+ =?utf-8?B?MzBhZ0kveDdBMFVRQzM1QXduZ21obmc4MTlBbmE1dGRpMjBEdjJxMVVjOXpQ?=
+ =?utf-8?B?Mlo0NENxbnYvZElNVjdyVHVLQzIwN1ZiZm41bC9Gb0JpRWgveWR1RTkvbmYv?=
+ =?utf-8?B?ejcrczY5eUV1a2s2Rjc5bWtPL2o4SFFPRTBaTEZQeTR6dTlYQ1N5RCt2QjhK?=
+ =?utf-8?B?eWFsRSt5bDliYkJXcm1idW1lem9tM1pTbE53SmtRcFFOZzF6bk5sbm0xdXVK?=
+ =?utf-8?B?Q1dCeEtsVlE0dnduazV2WjE5c3VqWjJQaTArdERBZTVQaklTd3NFcW5CKzJN?=
+ =?utf-8?B?Vk9idUhpVk5Nak9odGtaYm1acVE5RGxoL1poTHpiZ215b1Ywb01Dd293TnpH?=
+ =?utf-8?B?YXRNKzNZc25UNjBjckUrckQxRDR6VjVjdEd6eSt5NFIyb0w3TExwWWxBSnE0?=
+ =?utf-8?B?dXhuWWhBdm5kWjJVdnhEUUVYOHhVZEdNMDk2TDV6NFRGU2h2VU1RWU1jTVZY?=
+ =?utf-8?B?QnlCb29iSitlc2g4ZUdiS1ZqQXZmeGlDZ3pZWEZPRFBrc1lOaDJVMWtKcXNw?=
+ =?utf-8?B?MUIva2dTWFUrRVhrdm9kTEtCNFdubEViUmY2dWMvWmpOK3ZMYkhhZ0lCN25s?=
+ =?utf-8?B?bEpVU0s2eHV2bk5peFRJSytGd25vL25ueGlNSnptbVJZb3JzbkdENU16WnR1?=
+ =?utf-8?B?cjQraXpzZlJuTVltYWNKQ1BUUTdCZGZQN3ZCS1lsaDF5MnRDYW5rSXlwdHpB?=
+ =?utf-8?B?bDZxR2JPSis0VW1MaW9jUmtKQW1ZSXViNXN1RnNZU3MrWXFkaTdrSkN5c2hW?=
+ =?utf-8?B?bWNEaENRZi9RQXpWczM0cXkxNnJWbjRVR2tPdlpZZlVXMkpoc2E4Z1pmRUZr?=
+ =?utf-8?B?a0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ed2cda2-08e2-49b3-7bb8-08dcb5556dc4
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2024 13:49:29.9058
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +Z9oQeBGbXwp/LGO/XfwvDf4/YZVYYJTkdwYQRMJI51FfChH99R93/5o0y/Pn5M4IwmIYOwHzKx/yIHlJjcMNDssoJ1ge8l7Vpu05zWmI0Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6694
+X-OriginatorOrg: intel.com
 
-Triggering the reset while in switchdev mode causes
-errors[1]. Rules are already removed by this time
-because switch content is flushed in case of the reset.
-We can avoid these errors by clearing the rules
-early in the reset flow. Remove unnecessary
-ice_clear_sw_switch_recipes.
+On 8/5/24 14:46, Wojciech Drewek wrote:
+> Enable ethtool reset support. Ethtool reset flags are mapped to the
+> E810 reset type:
+> PF reset:
+>    $ ethtool --reset <ethX> irq dma filter offload
+> CORE reset:
+>    $ ethtool --reset <ethX> irq-shared dma-shared filter-shared \
+>      offload-shared ram-shared
+> GLOBAL reset:
+>    $ ethtool --reset <ethX> irq-shared dma-shared filter-shared \
+>      offload-shared mac-shared phy-shared ram-shared
+> 
+> Calling the same set of flags as in PF reset case on port representor
+> triggers VF reset.
+> 
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
-[1]
-ice 0000:01:00.0: Failed to delete FDB forward rule, err: -2
-ice 0000:01:00.0: Failed to delete FDB guard rule, err: -2
+> +/**
+> + * ice_repr_ethtool_reset - triggers a VF reset
+> + * @dev: network interface device structure
+> + * @flags: set of reset flags
+> + *
+> + * Return: 0 on success,
+> + * -EOPNOTSUPP when using unsupported set of flags
+> + * -EBUSY when VF is not ready for reset.
 
-Fixes: 7c945a1a8e5f ("ice: Switchdev FDB events support")
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
----
- .../net/ethernet/intel/ice/ice_eswitch_br.c   |  2 +-
- .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
- drivers/net/ethernet/intel/ice/ice_main.c     | 24 +++----------------
- 3 files changed, 5 insertions(+), 22 deletions(-)
+nit: technically it could return also -EIO, -EINVAL, or -EFAULT if VF 
+reset fails
+I don't know if this list needs to be exhaustive though
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-index f5aceb32bf4d..814df3419d63 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-@@ -582,7 +582,7 @@ ice_eswitch_br_switchdev_event(struct notifier_block *nb,
- 	return NOTIFY_DONE;
- }
- 
--static void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge)
-+void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge)
- {
- 	struct ice_esw_br_fdb_entry *entry, *tmp;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
-index c15c7344d7f8..66a2c804338f 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
-@@ -117,5 +117,6 @@ void
- ice_eswitch_br_offloads_deinit(struct ice_pf *pf);
- int
- ice_eswitch_br_offloads_init(struct ice_pf *pf);
-+void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge);
- 
- #endif /* _ICE_ESWITCH_BR_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 8f02b33adad1..fd27c7995d60 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -520,25 +520,6 @@ static void ice_pf_dis_all_vsi(struct ice_pf *pf, bool locked)
- 		pf->vf_agg_node[node].num_vsis = 0;
- }
- 
--/**
-- * ice_clear_sw_switch_recipes - clear switch recipes
-- * @pf: board private structure
-- *
-- * Mark switch recipes as not created in sw structures. There are cases where
-- * rules (especially advanced rules) need to be restored, either re-read from
-- * hardware or added again. For example after the reset. 'recp_created' flag
-- * prevents from doing that and need to be cleared upfront.
-- */
--static void ice_clear_sw_switch_recipes(struct ice_pf *pf)
--{
--	struct ice_sw_recipe *recp;
--	u8 i;
--
--	recp = pf->hw.switch_info->recp_list;
--	for (i = 0; i < ICE_MAX_NUM_RECIPES; i++)
--		recp[i].recp_created = false;
--}
--
- /**
-  * ice_prepare_for_reset - prep for reset
-  * @pf: board private structure
-@@ -575,8 +556,9 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	mutex_unlock(&pf->vfs.table_lock);
- 
- 	if (ice_is_eswitch_mode_switchdev(pf)) {
--		if (reset_type != ICE_RESET_PFR)
--			ice_clear_sw_switch_recipes(pf);
-+		rtnl_lock();
-+		ice_eswitch_br_fdb_flush(pf->eswitch.br_offloads->bridge);
-+		rtnl_unlock();
- 	}
- 
- 	/* release ADQ specific HW and SW resources */
--- 
-2.40.1
+> + */
+> +static int ice_repr_ethtool_reset(struct net_device *dev, u32 *flags)
+> +{
+> +	struct ice_repr *repr = ice_netdev_to_repr(dev);
+> +	struct ice_vf *vf;
+> +
+> +	if (repr->type != ICE_REPR_TYPE_VF ||
+> +	    *flags != ICE_ETHTOOL_VFR)
+> +		return -EOPNOTSUPP;
+> +
+> +	vf = repr->vf;
+> +
+> +	if (ice_check_vf_ready_for_cfg(vf))
+> +		return -EBUSY;
+> +
+> +	*flags = 0;
+
+I'm fine with zeroing the flags here even if the reset fails afterwards
+
+> +
+> +	return ice_reset_vf(vf, ICE_VF_RESET_VFLR | ICE_VF_RESET_LOCK);
+> +}
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
 
