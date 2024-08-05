@@ -1,112 +1,101 @@
-Return-Path: <netdev+bounces-115923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5138F94866A
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:55:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22453948664
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 073D51F23CB9
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:55:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C98F21F23CD9
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A2516BE32;
-	Mon,  5 Aug 2024 23:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2AE16F26F;
+	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCDYhmwz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXz7yv/I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3129416F850;
-	Mon,  5 Aug 2024 23:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657B014B06C;
+	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722902062; cv=none; b=j+9vEwFzy+si0yZQgI5oQQjLShTpQm8+eMYei897B2F7ZPXCibWtWuuzSM52QSSFFPTniNZ+ecgkKbUs8qd6Cq2BQvSZpvOMuhPGcSzx9Pk1Df5RumLtGmvuEds2Sa2WaX7Ea5onqXGlyGJcLToSLMAL0XofdmZIlJNfYA/t5EY=
+	t=1722902057; cv=none; b=ehtajq2rQae7JzWlDDpupY2YYDDcT2D6VU9d6dlw+V2pJNa+VRh7mPbGVn8Wx0xAAUdKIWsF3IRSpEjDOh/0Uc7G7avd1vLAQ3c9CDbQahu+jvi21e9gosMHDOT59mjdMXtIlocwatZnDkumJCA1tt2t7RvBuQZfTB1JaIqY+vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722902062; c=relaxed/simple;
-	bh=CN5YyONF5oxc/Hb/WMwxJ5h5JLKd/ev5Wby6OiPK5xQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BVGeWb+wxwSXNSac/zOeUc2z9g/5tj616b8WNEW/kDWOcPAT/0JZEH7WSEz0WkL/q/Oll/Yrv0ZrmAxYymu4CIfN2VaL1maTxr0Cw11QY2ZH5EKV5pZ7xT8o35ssoiHW04SGO6fLD0Z/yj/K6gXMnpojJDYT4NkENh+LvM4cTQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WCDYhmwz; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a1d81dc0beso656385a.2;
-        Mon, 05 Aug 2024 16:54:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722902060; x=1723506860; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YWc14kDySKSh3sWURkdqCJobA5WfeILUoFE6tZ15XEA=;
-        b=WCDYhmwzABz614P0Qosmh3ONC6pys18xp2ycw6Md5jP7P3zxhIgRPt1tN1TpxsnvXX
-         74/yfwm7m3YxBS6IT6wJeKu1xTicifTS9zSasLX+i7Ce+kERI42jV7zGybWU5sn3KaKW
-         vESA59FmQ51s6tP2XNIluk5iYKzmbhouQrsBt/70EUfHerYQvoNGh+ZSL8y958o6WD5D
-         GDy2KLI8UubXxEzvDfzLtgfK6p6C+JwJ/+YhkhI7ZxrDgUzUUjOZAbdJtiyJ+2upv+8Q
-         7TY50s/nFCXkUpMhB3pbXgfCrdgvXWVATYVKxjSNaMBvrkysv8iPPalJZBMxMQbyIPm8
-         guCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722902060; x=1723506860;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YWc14kDySKSh3sWURkdqCJobA5WfeILUoFE6tZ15XEA=;
-        b=iXBihcYHKJg/LnEDOwX5hofA38s6Boo/FoUjHlZciO7WLSsgiIt1M1sWuIHVa/lq1j
-         WlEls0wvUn29JHqWVOuxXrrqaZQ2mrCam9pB66z5L4Dp6TuUQylgdUKZKBQ7Wpm62wYz
-         cVype5pvoyhvMvdQydCM4onQStlKpNjJm5Ze0DijX36bQqIEfksNLUHs3e98VzdgfU6z
-         PqbEGPnDlB7Adg+MC0TI0STIgD0MIsB3btrpwLQ36LlOiFfKIJslmYngIppJLeCEM8Gu
-         Sv3WTO3ln1+tqq3k9ddCyB1wu5Oj/gZZOTIyTyDoVasfKgu6JZ8FBaL95mUw/IUtEpvh
-         Orvg==
-X-Forwarded-Encrypted: i=1; AJvYcCXc9pCbjk3M7k+FiiU6hHpYMyksXITQ1XzDMJG2CYB6XN2TZYKowMuLnYsGGCZMrQlgtdACbflEtF9fpd42SOXGEpmtBWdig7vDG4tebl60MAig4KPB4LI+TbzevWSdxQxat3E5
-X-Gm-Message-State: AOJu0Ywv/NzrFxyBgsEMKA5e+Hra2U7x5qOpifGsqm9SrSbrQE4VKLym
-	1x23QKVjeWBvskgCzXcXcePK2+Qv60wVuZc1v9FUfkVooZr59LHo
-X-Google-Smtp-Source: AGHT+IHKkWH1gJGXMhBpgClsAu3LULO2nfx28Yb5L5lMQtQQZncx/n5DKnhJ5pPu3TC7uyyrVuYadQ==
-X-Received: by 2002:a05:620a:28d5:b0:7a2:c6f:fa4b with SMTP id af79cd13be357-7a34ef0aae2mr1714810585a.21.1722902060058;
-        Mon, 05 Aug 2024 16:54:20 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id af79cd13be357-7a34f78adadsm395310085a.123.2024.08.05.16.54.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 16:54:18 -0700 (PDT)
-Message-ID: <5446a293-b5cb-4d1d-b82e-6a63aed03b2a@gmail.com>
-Date: Mon, 5 Aug 2024 16:54:15 -0700
+	s=arc-20240116; t=1722902057; c=relaxed/simple;
+	bh=aDDyWum/RdGNYK5afYA6i1DTP/tBbriSvjj5iiczVac=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SeGOt6X+5SoJPzNtigp+TxQmFJJelfDbXNT0A6q7su1YnjE2L4NqvOkd2UK46iIJ/BicIWSw0kzlADZC7KDKHgYLK1rBMM/B4XX7rPUjCiSwYda1l8WeQLvRV488xzBmiAys1AH6Hnz+TfFo93ZmMUEW9wMfhhUuq2C4IVa8cII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXz7yv/I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44328C4AF0B;
+	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722902057;
+	bh=aDDyWum/RdGNYK5afYA6i1DTP/tBbriSvjj5iiczVac=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dXz7yv/Io6QrVNxsM0JL4QpoGMNo2sYX6Es1CEPOBPJfG9Jjsa0UJqAtYWWBqQeCj
+	 9vkplca+B5zlNDJgHYVb5/3BwwbM0Jl7uAqqPSRn+Ls1DcQ6gyQXYqkfozA39Fn/c5
+	 mWNlO3zmVf0zLKvKVOTRcc9XRmTz7FF2b3M8ifFOI6jkk88BhA74QA8je2Fs0KueFI
+	 zwbEPDBqW/9wklB6NDa0L1RatukjuvnUqDLJAQTTE3bfNW4gtYCi1epPmenE0lglPU
+	 98bmtchjhMs4wmQ6JIMRUaOxiuwFBFNWtiYLhI3yhZv5DbaVUfC3YyeqYHf8T6267G
+	 tYNy5iaUBjuDw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 343A6C433E9;
+	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: dsa: microchip: Fix Wake-on-LAN check to not
- return an error
-To: Tristram.Ha@microchip.com, Woojung Huh <woojung.huh@microchip.com>,
- Andrew Lunn <andrew@lunn.ch>, Vivien Didelot <vivien.didelot@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240805235200.24982-1-Tristram.Ha@microchip.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240805235200.24982-1-Tristram.Ha@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next V3 0/3] mlx5 PTM cross timestamping support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172290205721.12421.3111275453782018152.git-patchwork-notify@kernel.org>
+Date: Mon, 05 Aug 2024 23:54:17 +0000
+References: <20240730134055.1835261-1-tariqt@nvidia.com>
+In-Reply-To: <20240730134055.1835261-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com, jstultz@google.com, tglx@linutronix.de,
+ anna-maria@linutronix.de, frederic@kernel.org, linux-kernel@vger.kernel.org,
+ bhelgaas@google.com, linux-pci@vger.kernel.org, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ cjubran@nvidia.com, bshapira@nvidia.com, rrameshbabu@nvidia.com
 
-On 8/5/24 16:52, Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <tristram.ha@microchip.com>
-> 
-> The wol variable in ksz_port_set_mac_address() is declared with random
-> data, but the code in ksz_get_wol call may not be executed so the
-> WAKE_MAGIC check may be invalid resulting in an error message when
-> setting a MAC address after starting the DSA driver.
-> 
-> Fixes: 3b454b6390c3 ("net: dsa: microchip: ksz9477: Add Wake on Magic Packet support")
-> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
-> Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Hello:
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 30 Jul 2024 16:40:51 +0300 you wrote:
+> Hi,
+> 
+> This is V3. You can find V2 as part of a larger series here:
+> https://lore.kernel.org/netdev/d1dba3e1-2ecc-4fdf-a23b-7696c4bccf45@gmail.com/T/
+> 
+> This patchset by Rahul and Carolina adds PTM (Precision Time Measurement)
+> support to the mlx5 driver.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,V3,1/3] net/mlx5: Add support for MTPTM and MTCTR registers
+    https://git.kernel.org/netdev/net-next/c/7e45c1e9edc0
+  - [net-next,V3,2/3] net/mlx5: Add support for enabling PTM PCI capability
+    https://git.kernel.org/netdev/net-next/c/bec6d85d43eb
+  - [net-next,V3,3/3] net/mlx5: Implement PTM cross timestamping support
+    https://git.kernel.org/netdev/net-next/c/d17125fb0923
+
+You are awesome, thank you!
 -- 
-Florian
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
