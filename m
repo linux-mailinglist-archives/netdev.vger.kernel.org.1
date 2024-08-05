@@ -1,55 +1,46 @@
-Return-Path: <netdev+bounces-115763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9309E947BBD
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 15:22:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3C9947AFC
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 14:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 547212828C6
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 13:22:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D5E4B20B44
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 12:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E5015B12F;
-	Mon,  5 Aug 2024 13:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b="HxBoQTwQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9F2156C7B;
+	Mon,  5 Aug 2024 12:19:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53652155C8D
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 13:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF8E155A5F;
+	Mon,  5 Aug 2024 12:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722864128; cv=none; b=B3N2yTqqL/WOPPy2lVfarr8l4Q9zx9ChkqjtN/3BqQhJOUiFVoMiBtM6k2/7yjZfvioU2Ap17MGFD3x0bGOr2Xg2n3O0kMy6gj5pBvlqHB6gRvZQvdd14mycr6XRCsDw++qYAd4AURrm3Pyv6qwcg+yOClnwePzmcqnjTiR27ak=
+	t=1722860377; cv=none; b=u9I0xPDfSsjiH//tlGrkCTUn6mGG+YbiSL8SSpPQ5X2r9mEU89G6tdcnjQ8DUlm1UnQToNKmWzc2RW3fqdpXpnzBeYhJPqdmNZoR9xmzXowoo9UJJ+Afs/pYrldgI5eYVuYIk/DqIhRPR5BVFq+8ufGYvdiTrTdWS1460/64pJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722864128; c=relaxed/simple;
-	bh=ywrtWyTkHrolhdaQJmvhHb0TuH29ZfZXsYPlFF31k68=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=tQ4wnFtFrgk/vwB2Aoa3pjtvz43LtTg33WR+BWunoBBQeNB/0Z1iLrCwgLnBGY9IkWc+MCwVKnBlWRpNXnMi43IGu/JiAuU8pTVAJHvGC1IPKeeK7cR5J45sHl0mwRkWEa6ncP+vWaPsk4h7ylmITw6B2szvBxZGZNy50wAO7YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk; spf=pass smtp.mailfrom=martin-whitaker.me.uk; dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b=HxBoQTwQ; arc=none smtp.client-ip=212.227.17.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=martin-whitaker.me.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=martin-whitaker.me.uk; s=s1-ionos; t=1722864123; x=1723468923;
-	i=foss@martin-whitaker.me.uk;
-	bh=2MNO3RvovrFrgLkKy2lBh0vmYh5cPpd9PTY49aq8YtE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:From:To:Cc:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=HxBoQTwQsruOzicZXQ6qxEHQLucdhQaMw4RPM3j4Zur8dZ1DnpnECiNR73EdrqHK
-	 KV2QpX+oZwqhjZSPM0AReu4pR3GSSZG8BzLbj3x70KS1ZX3KxajJc9hkHdvX7m8XA
-	 aBwImmSXmeTvq4GlVjRBPwswSwVKKG4qLaXNMCU5qjuRit63lfagNntDYuAPPPU3p
-	 RX2Xo3MX+HIYAmwwX3fUxpp5PqFqXjknGm/cWaVAbb2PSiY5X3C8ztGctjZJjT1B6
-	 8Ra4ounYqrd7EpeA0lIoFjTMhdeyFMqkAFLUmK6VKWtoHOqAqmmaPvv+DbFYtwWDf
-	 eo9yy1vdiKN2AF7A4g==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from [192.168.1.14] ([194.120.133.17]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.179]) with ESMTPSA (Nemesis) id
- 1MsYzF-1sMAkr0uWh-00tkPD; Mon, 05 Aug 2024 14:13:14 +0200
-Message-ID: <137ce1ee-0b68-4c96-a717-c8164b514eec@martin-whitaker.me.uk>
-Date: Mon, 5 Aug 2024 13:15:49 +0100
+	s=arc-20240116; t=1722860377; c=relaxed/simple;
+	bh=9kKtwZPzto+3iu+ozE9odzsSQasOgtHx3JeB+HXuNTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jEx0YS6BdgUbdfrE4b9NJMmlneZSJR037okbUeYgIjHIMHs/DWadyvDQXaRgSeyaPageLKA9F4s1pwrjPNrBZZCgh2Z6UcYlsI28R1Cx/0pVk/YFBl1HOGea2w4yMDtf7EuY+9KNJkkzWYy4T7eAsTr5Hf7O3ZrWJiDpKt1Tlio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WcwTt2lxxz1L9qR;
+	Mon,  5 Aug 2024 20:19:14 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 594ED180105;
+	Mon,  5 Aug 2024 20:19:32 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 5 Aug 2024 20:19:32 +0800
+Message-ID: <ad84acd2-36ba-433c-bdf7-c16c0d992e1c@huawei.com>
+Date: Mon, 5 Aug 2024 20:19:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,65 +48,129 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Martin Whitaker <foss@martin-whitaker.me.uk>
-Content-Language: en-GB
-To: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com
-Cc: netdev@vger.kernel.org
-Subject: Regression in KSZ9477 dsa driver - KSZ9567 et al. do not support EEE
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:lPtD4XMmDQTyYZQEpUXp5qLvJBaJDN3IkpY8DTHaxf81N1GmLo5
- tmW1WqSH8zZ0OstT/5adsI77+qsoTy28jG+eVk0qpDir6uSvqF0CrsLlyCMBn5+5LtRbpRP
- PPPGls8O654KHbQvKAOQLbKvUWz4Ht65lKTx/W7ysebFr5d9sDHDAbTsDhgYpOxHZnF7TwA
- OQSQu3D44/6Go+GYJQfuw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:RIv0shssj6Q=;ZjjQZqGNxYSENHjcbZo7DkX+CKu
- VN+FwO5E0SPBPfCT/wX8fpTjzFApQkM/DBH2+cmzaPTO+DtI2Qh5AbacNjjk/PX9/gUwGveYz
- KjcVFNX9EGCBb/ZrNnb293Uai4cyJKAhZbM0dr5pFNak0N2TWQmdV3qO+mkYiogRCsfO3azAL
- GXuph7G5981xhXtDesrs6VzuId8dygVqoCxJ5QA/EK4FRrukJqgnZicMarpwImvRypV6Woqzj
- lvfY/i1fz5GFLkXr+zvYJ0sRWLLDoYmRpsqpJMUjZscXtgDUOwF9djbiv3kCm5KbJsZ5SeUdg
- /cVMhVyF/tJ6qzK88rJvX+aQinPU1Lqixcck1acSTeTl7ukbqTnXDAZM8zf2wbH3YXm+XJOXr
- Pc9Tom0UdY1XG33EVUud69uASlbefCUtfcmKpMEPMNEf+6xUJCXf1Ph+S72lDZCUeTO8UdSOJ
- bhYd6utOu2d+RQMe3Ono/ymIkVmiq5WyvZCGKcqXWEVr+lDLFWbqdmH08arUT3zq+J2sID0E1
- x4bGUwQ9bsGmer6+7Vmt/Z6CCrYewrCppqh9jLDj5c9WTkT/Pepka4CzFAgwAFtLlNtx5PBBn
- d7G2FY6BrjvfioOVZtxh5Al7IpRGH3698AvvtxzzYr5DTAm1PgAxzhZC98NcLUhtL+V5/rD0c
- fVusjDKxcoWLjuWKRVIfcT/W0OYZd4GttwYgM1gLi5eRjE0WU45dhtcmOsFk2XUcE+SnSM/JP
- mktgx6Y7IbxHgiN9uh1uE0/5cNFu0QprVqsX5vOVaKVLAg+of5ZF0M=
+Subject: Re: [BUG REPORT]net: page_pool: kernel crash at
+ iommu_get_dma_domain+0xc/0x20
+To: Somnath Kotur <somnath.kotur@broadcom.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>
+CC: Yonglong Liu <liuyonglong@huawei.com>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, <pabeni@redhat.com>,
+	<ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>, "shenjian (K)" <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>, <joro@8bytes.org>, <will@kernel.org>,
+	<robin.murphy@arm.com>, <iommu@lists.linux.dev>
+References: <0e54954b-0880-4ebc-8ef0-13b3ac0a6838@huawei.com>
+ <8743264a-9700-4227-a556-5f931c720211@huawei.com>
+ <e980d20f-ea8a-43e3-8d3f-179a269b5956@kernel.org>
+ <CAOBf=musxZcjYNHjdD+MGp0y6epnNO5ryC6JgeAJbP6YQ+sVUA@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAOBf=musxZcjYNHjdD+MGp0y6epnNO5ryC6JgeAJbP6YQ+sVUA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-I have an embedded processor board running Linux that incorporates a
-KSZ9567 ethernet switch. When using Linux 6.1 I can establish a stable
-connection between two of these boards. When using Linux 6.6, the link
-repeatedly drops and reconnects every few seconds.
+On 2024/7/31 16:42, Somnath Kotur wrote:
+> On Tue, Jul 30, 2024 at 10:51 PM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+>>
 
- From bisection, this bug was introduced in the patch series "net: add
-EEE support for KSZ9477 switch family" which was merged in commit
-9b0bf4f77162.
++cc iommu maintainers and list
 
-As noted in the errata for these devices, EEE support is not fully
-operational in the KSZ9477, KSZ9567, KSZ9896, and KSZ9897 devices,
-causing link drops when connected to another device that supports EEE.
+>>
+>> On 30/07/2024 15.08, Yonglong Liu wrote:
+>>> I found a bug when running hns3 driver with page pool enabled, the log
+>>> as below:
+>>>
+>>> [ 4406.956606] Unable to handle kernel NULL pointer dereference at
+>>> virtual address 00000000000000a8
+>>
+>> struct iommu_domain *iommu_get_dma_domain(struct device *dev)
+>> {
+>>         return dev->iommu_group->default_domain;
+>> }
+>>
+>> $ pahole -C iommu_group --hex | grep default_domain
+>>         struct iommu_domain *      default_domain;   /*  0xa8   0x8 */
+>>
+>> Looks like iommu_group is a NULL pointer (that when deref member
+>> 'default_domain' cause this fault).
+>>
+>>
+>>> [ 4406.965379] Mem abort info:
+>>> [ 4406.968160]   ESR = 0x0000000096000004
+>>> [ 4406.971906]   EC = 0x25: DABT (current EL), IL = 32 bits
+>>> [ 4406.977218]   SET = 0, FnV = 0
+>>> [ 4406.980258]   EA = 0, S1PTW = 0
+>>> [ 4406.983404]   FSC = 0x04: level 0 translation fault
+>>> [ 4406.988273] Data abort info:
+>>> [ 4406.991154]   ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+>>> [ 4406.996632]   CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+>>> [ 4407.001681]   GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+>>> [ 4407.006985] user pgtable: 4k pages, 48-bit VAs, pgdp=0000202828326000
+>>> [ 4407.013430] [00000000000000a8] pgd=0000000000000000,
+>>> p4d=0000000000000000
+>>> [ 4407.020212] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
+>>> [ 4407.026454] Modules linked in: hclgevf xt_CHECKSUM ipt_REJECT
+>>> nf_reject_ipv4 ip6table_mangle ip6table_nat iptable_mangle
+>>> ip6table_filter ip6_tables hns_roce_hw_v2 hns3 hclge hnae3 xt_addrtype
+>>> iptable_filter xt_conntrack overlay arm_spe_pmu arm_smmuv3_pmu
+>>> hisi_uncore_hha_pmu hisi_uncore_ddrc_pmu hisi_uncore_l3c_pmu
+>>> hisi_uncore_pmu fuse rpcrdma ib_isert iscsi_target_mod ib_iser libiscsi
+>>> scsi_transport_iscsi crct10dif_ce hisi_sec2 hisi_hpre hisi_zip
+>>> hisi_sas_v3_hw xhci_pci sbsa_gwdt hisi_qm hisi_sas_main hisi_dma
+>>> xhci_pci_renesas uacce libsas [last unloaded: hnae3]
+>>> [ 4407.076027] CPU: 48 PID: 610 Comm: kworker/48:1
+>>> [ 4407.093343] Workqueue: events page_pool_release_retry
+>>> [ 4407.098384] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS
+>>> BTYPE=--)
+>>> [ 4407.105316] pc : iommu_get_dma_domain+0xc/0x20
+>>> [ 4407.109744] lr : iommu_dma_unmap_page+0x38/0xe8
+>>> [ 4407.114255] sp : ffff80008bacbc80
+>>> [ 4407.117554] x29: ffff80008bacbc80 x28: 0000000000000000 x27:
+>>> ffffc31806be7000
+>>> [ 4407.124659] x26: ffff2020002b6ac0 x25: 0000000000000000 x24:
+>>> 0000000000000002
+>>> [ 4407.131762] x23: 0000000000000022 x22: 0000000000001000 x21:
+>>> 00000000fcd7c000
+>>> [ 4407.138865] x20: ffff0020c9882800 x19: ffff0020856f60c8 x18:
+>>> ffff8000d3503c58
+>>> [ 4407.145968] x17: 0000000000000000 x16: 1fffe00419521061 x15:
+>>> 0000000000000001
+>>> [ 4407.153073] x14: 0000000000000003 x13: 00000401850ae012 x12:
+>>> 000006b10004e7fb
+>>> [ 4407.160177] x11: 0000000000000067 x10: 0000000000000c70 x9 :
+>>> ffffc3180405cd20
+>>> [ 4407.167280] x8 : fefefefefefefeff x7 : 0000000000000001 x6 :
+>>> 0000000000000010
+>>> [ 4407.174382] x5 : ffffc3180405cce8 x4 : 0000000000000022 x3 :
+>>> 0000000000000002
+>>> [ 4407.181485] x2 : 0000000000001000 x1 : 00000000fcd7c000 x0 :
+>>> 0000000000000000
+>>> [ 4407.188589] Call trace:
+>>> [ 4407.191027]  iommu_get_dma_domain+0xc/0x20
+>>> [ 4407.195105]  dma_unmap_page_attrs+0x38/0x1d0
+>>> [ 4407.199361]  page_pool_return_page+0x48/0x180
+>>> [ 4407.203699]  page_pool_release+0xd4/0x1f0
+>>> [ 4407.207692]  page_pool_release_retry+0x28/0xe8
+>>
+>> I suspect that the DMA IOMMU part was deallocated and freed by the
+>> driver even-though page_pool still have inflight packets.
+> When you say driver, which 'driver' do you mean?
+> I suspect this could be because of the VF instance going away with
+> this cmd - disable the vf: echo 0 >
+> /sys/class/net/eno1/device/sriov_numvfs, what do you think?
+>>
+>> The page_pool bumps refcnt via get_device() + put_device() on the DMA
+>> 'struct device', to avoid it going away, but I guess there is also some
+>> IOMMU code that we need to make sure doesn't go away (until all inflight
+>> pages are returned) ???
 
-A fix for this regression was merged in commit 08c6d8bae48c2, but only
-for the KSZ9477. This fix should be extended to the other affected
-devices as follows:
+I guess the above is why thing went wrong here, the question is which
+IOMMU code need to be called here to stop them from going away.
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c
-b/drivers/net/dsa/microchip/ksz_common.c
-index 419476d07fa2..091dae6ac921 100644
-=2D-- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2346,6 +2346,9 @@ static u32 ksz_get_phy_flags(struct dsa_switch
-*ds, int port)
-                         return MICREL_KSZ8_P1_ERRATA;
-                 break;
-         case KSZ9477_CHIP_ID:
-+       case KSZ9567_CHIP_ID:
-+       case KSZ9896_CHIP_ID:
-+       case KSZ9897_CHIP_ID:
-                 /* KSZ9477 Errata DS80000754C
-                  *
-                  * Module 4: Energy Efficient Ethernet (EEE) feature
-select must
-
-I have verified this fixes the bug for the KSZ9567 on my board.
+What I am also curious is that there should be a pool of allocated iova in
+iommu that is corresponding to the in-flight page for page_pool, shouldn't
+iommu wait for the corresponding allocated iova to be freed similarly as
+page_pool does for it's in-flight pages?
 
