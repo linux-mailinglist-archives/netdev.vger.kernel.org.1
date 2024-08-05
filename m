@@ -1,149 +1,144 @@
-Return-Path: <netdev+bounces-115833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00661947F3F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:23:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D070F947F48
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 18:24:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FF8E282792
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:23:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E0F01C21119
+	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 16:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5878615D5D8;
-	Mon,  5 Aug 2024 16:23:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69ED115E5CB;
+	Mon,  5 Aug 2024 16:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISfsfpKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7511915C14B
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 16:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3972515C12F;
+	Mon,  5 Aug 2024 16:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722875019; cv=none; b=a9pOa4BzFnenxoB6/UtEIazO2JEWHRjuAPBxEE2alkq8+FiWfzOZPWKmQteTRl8IbRcrKyIzX1G3JeAJv37T08X2+yxw1b861683GXhspOfkNsVbG3cTTyHKHZXm60ZF6tOXBowqfQE8wJI96rsmYonsQTSo+bPU0s+yYeA08vw=
+	t=1722875074; cv=none; b=Sp2ep5PyW4+T/JoZMIOBAeXK/yeegJYKYVVVp7SVTJ9Ztyzz1jfOF3OMntqZtxdgQ3/5+r40JAfBRkaPJjIPj76h+p+Ar/IWMQWpFVK6UXIG29l7aTocppLpHSlVqGVeC+0/7z0jXOTfacGVk4WCUHdx++cVoTW5MdVbMYmQ0r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722875019; c=relaxed/simple;
-	bh=PEMEOMWCp5/tFfsda7z8jK3ZnwSyWrntpuX+k3ze0FQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iKQCk9iMi+FsveIg5nuihclJgRT4SX/JHU95fcOPHTbrLgUvWZb2BzEBgZNAq3tcLoojK0GVo9O6+9R8hGrSUDyD2Wy15KlumxUzEX7Z356sQBkSv6DP38f+zOtb4Fwz8BH2XtuKy8fqwATYX7gSt3v+33dS1uHm+22XFNJhU7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sb0Uh-00075l-N7
-	for netdev@vger.kernel.org; Mon, 05 Aug 2024 18:23:35 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sb0Uh-004kle-0h
-	for netdev@vger.kernel.org; Mon, 05 Aug 2024 18:23:35 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id ACE9C3173E2
-	for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 16:23:34 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 0592B3173C2;
-	Mon, 05 Aug 2024 16:23:32 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 1fd71a0e;
-	Mon, 5 Aug 2024 16:23:31 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Mon, 05 Aug 2024 18:23:21 +0200
-Subject: [PATCH 2/2] can: mcp251xfd: mcp251xfd_ring_init(): check
- TX-coalescing configuration
+	s=arc-20240116; t=1722875074; c=relaxed/simple;
+	bh=Ye5K+2WX+QVln0pMQeyafCRvdteEp2wVQ6NkGAh738E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=KNdl0WniyOsRI3fkhSvxS9/yDrP/eZnBM1jwhHAdNh8X4c1G5OaLf7pyMEOqPEu8rowMi6h0mj2+muk7Xl83xrl508v/n5K1V7ikDzDFXM6aosXGMzoGFjD/Stq4IzNlu76XAyQ5PylqtdIskXxEHbIua+VVH6Wq3u2k+RP/TaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISfsfpKg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4AFAC4AF0E;
+	Mon,  5 Aug 2024 16:24:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722875073;
+	bh=Ye5K+2WX+QVln0pMQeyafCRvdteEp2wVQ6NkGAh738E=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ISfsfpKg6BlZu/rxLShqd/U4pzi9REHRbp8SbY1G4eRIJlx621TBuiEmxH9g5Oq52
+	 B9PwFN85pWscEmFnLtOV+cbw/WfFd7W+dmgbeRBtpxhM9P7wv5DByd9UICtp7gQIQP
+	 SSrrlLxq3cn1yXCrw3l7zWTpwyuVKmQVgeK5FEkI6UP2apJi5AbyksENuCaDGlhlrl
+	 axO/79MFpFKpGRZlhVXDuvR8kctNUZPL2TUshhAB5tBWJdL249dvoX07JGWNNFIObA
+	 T+m1/x1ur+JpVg1z5eXS9veaXkct4I/CBgP9iYHg9siZHMKLumU68OKlzol+i83Seo
+	 W28vxppEwXuew==
+Date: Mon, 5 Aug 2024 10:24:30 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Potnuri Bharat Teja <bharat@chelsio.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] cxgb4: Avoid -Wflex-array-member-not-at-end warning
+Message-ID: <ZrD8vpfiYugd0cPQ@cute>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240805-mcp251xfd-fix-ringconfig-v1-2-72086f0ca5ee@pengutronix.de>
-References: <20240805-mcp251xfd-fix-ringconfig-v1-0-72086f0ca5ee@pengutronix.de>
-In-Reply-To: <20240805-mcp251xfd-fix-ringconfig-v1-0-72086f0ca5ee@pengutronix.de>
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Thomas Kopp <thomas.kopp@microchip.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
- Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1856; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=PEMEOMWCp5/tFfsda7z8jK3ZnwSyWrntpuX+k3ze0FQ=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBmsPyAzhilXHlO6oxOzg0A8c9h0F9536GELXa1j
- 3ycIzi8c4iJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZrD8gAAKCRAoOKI+ei28
- b3TZB/9JT0Tkb4c3aoQAdICWytGuvH79wIkROi1i/RfnZ5SYmhusvPgka+MsHSyWXT92THXmaR+
- FFhVmVlJoXQiOaABsI+IbotpeDTmXuzh8iUSQ/niavxiy5w9ugO13vUF9BGsuCH1Nqe5zT515Xv
- ev6eZIk721u0JDOBi9Y0cIQLPHiSLphuNnsxa/7KyqKZ3E0n+7kHNXfgDbXI+VBjhikv+aQNDSW
- wGF9zzMvmUvcoe4ZjJ3Bg/Nbl/HlntH6BOGPwdB9glP/kQQ3ChAdUCb/nYq5bBIhLIYXdW2xIHu
- JNtyPe/oPMD+5HYM8cQxhopuOr3yJ2V/0KQji9h99jj1bl/G
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-When changing the interface from CAN-CC to CAN-FD mode the old
-coalescing parameters are re-used. This might cause problem, as the
-configured parameters are too big for CAN-FD mode.
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-During testing an invalid TX coalescing configuration has been seen.
-The problem should be been fixed in the previous patch, but add a
-safeguard here to ensure that the number of TEF coalescing buffers (if
-configured) is exactly the half of all TEF buffers.
+So, in order to avoid ending up with a flexible-array member in the
+middle of multiple other structs, we use the `__struct_group()`
+helper to create a new tagged `struct tc_u32_sel_hdr`. This structure
+groups together all the members of the flexible `struct tc_u32_sel`
+except the flexible array.
 
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+As a result, the array is effectively separated from the rest of the
+members without modifying the memory layout of the flexible structure.
+We then change the type of the middle struct member currently causing
+trouble from `struct tc_u32_sel` to `struct tc_u32_sel_hdr`.
+
+This approach avoids having to implement `struct tc_u32_sel_hdr`
+as a completely separate structure, thus preventing having to maintain
+two independent but basically identical structures, closing the door
+to potential bugs in the future.
+
+So, with these changes, fix the following warning:
+drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32_parse.h:245:27: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 ---
- drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ .../chelsio/cxgb4/cxgb4_tc_u32_parse.h        |  2 +-
+ include/uapi/linux/pkt_cls.h                  | 23 +++++++++++--------
+ 2 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c
-index f72582d4d3e8..83c18035b2a2 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c
-@@ -290,7 +290,7 @@ int mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
- 	const struct mcp251xfd_rx_ring *rx_ring;
- 	u16 base = 0, ram_used;
- 	u8 fifo_nr = 1;
--	int i;
-+	int err = 0, i;
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32_parse.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32_parse.h
+index 9050568a034c..64663112cad8 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32_parse.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_u32_parse.h
+@@ -242,7 +242,7 @@ struct cxgb4_next_header {
+ 	 * field's value to jump to next header such as IHL field
+ 	 * in IPv4 header.
+ 	 */
+-	struct tc_u32_sel sel;
++	struct tc_u32_sel_hdr sel;
+ 	struct tc_u32_key key;
+ 	/* location of jump to make */
+ 	const struct cxgb4_match_field *jump;
+diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
+index d36d9cdf0c00..2c32080416b5 100644
+--- a/include/uapi/linux/pkt_cls.h
++++ b/include/uapi/linux/pkt_cls.h
+@@ -246,16 +246,19 @@ struct tc_u32_key {
+ };
  
- 	netdev_reset_queue(priv->ndev);
- 
-@@ -386,10 +386,18 @@ int mcp251xfd_ring_init(struct mcp251xfd_priv *priv)
- 		netdev_err(priv->ndev,
- 			   "Error during ring configuration, using more RAM (%u bytes) than available (%u bytes).\n",
- 			   ram_used, MCP251XFD_RAM_SIZE);
--		return -ENOMEM;
-+		err = -ENOMEM;
- 	}
- 
--	return 0;
-+	if (priv->tx_obj_num_coalesce_irq &&
-+	    priv->tx_obj_num_coalesce_irq * 2 != priv->tx->obj_num) {
-+		netdev_err(priv->ndev,
-+			   "Error during ring configuration, number of TEF coalescing buffers (%u) must be half of TEF buffers (%u).\n",
-+			   priv->tx_obj_num_coalesce_irq, priv->tx->obj_num);
-+		err = -EINVAL;
-+	}
+ struct tc_u32_sel {
+-	unsigned char		flags;
+-	unsigned char		offshift;
+-	unsigned char		nkeys;
+-
+-	__be16			offmask;
+-	__u16			off;
+-	short			offoff;
+-
+-	short			hoff;
+-	__be32			hmask;
++	/* New members MUST be added within the __struct_group() macro below. */
++	__struct_group(tc_u32_sel_hdr, hdr, /* no attrs */,
++		unsigned char		flags;
++		unsigned char		offshift;
++		unsigned char		nkeys;
 +
-+	return err;
- }
++		__be16			offmask;
++		__u16			off;
++		short			offoff;
++
++		short			hoff;
++		__be32			hmask;
++	);
+ 	struct tc_u32_key	keys[];
+ };
  
- void mcp251xfd_ring_free(struct mcp251xfd_priv *priv)
-
 -- 
-2.43.0
-
+2.34.1
 
 
