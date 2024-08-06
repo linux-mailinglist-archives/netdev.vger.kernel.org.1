@@ -1,243 +1,217 @@
-Return-Path: <netdev+bounces-116264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7EF7949AFA
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:09:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C546949B29
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:15:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9F2E1C220E9
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:09:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47F8C287802
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3A2171E68;
-	Tue,  6 Aug 2024 22:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F23017332A;
+	Tue,  6 Aug 2024 22:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SNuh8x3U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NuzCxNvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618BB16CD11
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 22:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9322C171E5A;
+	Tue,  6 Aug 2024 22:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722982181; cv=none; b=B6vFIhGVI5kquzgHonn/qTyymxaDwl4TMVnaIz3QKJPCXOzYdffE9ZRsNfjfIPInu5eGhyhb6q14zcaamBGQA+LGCmoHVtS79084jNy9TQFALK1eQOa8VW6g0f2dQWrXFtBXnHI3rTLkCflsjs2k6f/Gd48QAoSptFXxU3GvBYc=
+	t=1722982502; cv=none; b=qmy5cPRzoIXTbHZ4rueFHI9PrjUL5KDO2udbDic6qt7uUgOB+SJ1HzwKi35QqKSu4wxozQS4TdaCY0ApP1Wyw72gxKyLrxaQEync2QbtFL+qSZniTuqjCcbtKejHOUq4aM1pY7uU9SxzCzW3ZDruOJVZAKoSBECbJays2cfcuTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722982181; c=relaxed/simple;
-	bh=GSjSLjQAJkp5McZkWVtEllhDgA+NMi5790KOCvBjozg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JGr35ZgRDKgF9sjwjy+rORkDA3CDPdqDwbz5FkobdiysFC4F0XC5dQU+CNmP7XFGXXJoqgR04OemLDLxJueSjdC3n1cNTTVnM/+lModx9wyTSDN3cECcxfMxzzfatK62EopoRa0a0GEKMBfpWiHEdK9Ek/Dja/qQ9hFqhWk4S0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SNuh8x3U; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722982180; x=1754518180;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GSjSLjQAJkp5McZkWVtEllhDgA+NMi5790KOCvBjozg=;
-  b=SNuh8x3UmSGMPDoBcH2vz0JNXcXD5exhWnW7hcqW+cezCxgOi+Z5PCSQ
-   5gZq/KEOVCm9H+eNidYJUdrOW9A5YI1lTHJTRxfeqPlnqe5N4BhhxQxr/
-   0eS3jI09d0TCRHZhq7Drpr3acDNgtFT13rZA4MXYewHqmUDPdVVO0I/N1
-   oCST4C/WASFh93v5bQD8uBhigoGJBT3Gdbd2dwcZbzVLOCifDLfLthmf0
-   zcMmRDyvQ24koLS+viujDOQyEfKVrOjINFz5+Y1bfrDdh3OA8ny0Y5gcY
-   K6Xma8rojwhN8kU7UU7HwD1w7pp5WeDcT+EkvTOkYFbTcHZAaZQvnfzr0
-   g==;
-X-CSE-ConnectionGUID: WA+BCEWtTg69odcIwWsjHA==
-X-CSE-MsgGUID: Z7GDzIc4ReOJVK9aoxx7tg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="21172205"
-X-IronPort-AV: E=Sophos;i="6.09,268,1716274800"; 
-   d="scan'208";a="21172205"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 15:09:38 -0700
-X-CSE-ConnectionGUID: BPRl6doCRJ22Aj2ZRJwK8A==
-X-CSE-MsgGUID: CbC0tQcqQfiFSo2+qgJIxw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,268,1716274800"; 
-   d="scan'208";a="56297929"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 06 Aug 2024 15:09:37 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Krishneil Singh <krishneil.k.singh@intel.com>
-Subject: [PATCH net 3/3] idpf: fix UAFs when destroying the queues
-Date: Tue,  6 Aug 2024 15:09:22 -0700
-Message-ID: <20240806220923.3359860-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240806220923.3359860-1-anthony.l.nguyen@intel.com>
-References: <20240806220923.3359860-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1722982502; c=relaxed/simple;
+	bh=m5BjGQn0ztYT3NKsuxQ229IfQyV8rqnP0MJCBdsv/DQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Va/0sVbBput+MIxCUXRCO81sxwZf4UtAl3C+v7wU28iFytSGw8FLPO3+zDhJUuH5aYSGJtO0mvrixXx80OzS5xiYAJr3f+eJXEsubHsAsM9daq7BfKr+7yp0kJwXRm8laZZQ221YPVL6Yb5Le0n+W5vgUuO7OwZhM65LB8yTpMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NuzCxNvx; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52f04b4abdcso1691126e87.2;
+        Tue, 06 Aug 2024 15:15:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722982499; x=1723587299; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yXjtb86nnXZiK+81bTmuvRngQoj2Z9OAz1cGyJKoh3A=;
+        b=NuzCxNvxHGPPsuNlQjMj1Dwg03s3RXkAl4sEcRZOsjeh40b6vg1/7r57ae6Bk0Q9NM
+         NoH7T5WjwDC4ys5733nwz8244eKZ7vxp5QlICXMtB0nC4tRA3dTZeQLNqIY12BYrqIxI
+         JKB04vkA66S3n3ALdsw5t5Vkp4YaHfRal4LFwhyI38Tn8BrREqnXzXjJ1KT7YCgTRe3n
+         mHpnWA9fi9AONRf/cs3Kc/4Z2M+PjYxRWeBeUUaCC40aCocLG97w9mksG9h127R3lyQf
+         UZ3JWgBVDA3yWVKUC9xAeH1XX3XJbe5Lzl+MKX++YA6Wpc3SFOvldsDX5zklghKLgtE1
+         yREg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722982499; x=1723587299;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yXjtb86nnXZiK+81bTmuvRngQoj2Z9OAz1cGyJKoh3A=;
+        b=siZiHvUo5WsTfVxv9sQbCDixKPAKzzVs8pBfvOxV5bAkEmVX97Wgd7tIWMfZAJzwH1
+         bjEgo7iwckcG8rW2rNxyY8t/Wd98Uqx7wga10OB8llpnJV8kom5dkU7Bn06wmqrdQ8gN
+         hYZUQRSNX+4GHHky9EsddVpruM5daCX3Oi0tcCOI0BX4Ju1mFng5ryWcOBF5PjVLUass
+         JpdtuMEndM9q4WAyg52yhPkHMo9l9Sfo92XYUDCI93gWYlfG8tBEcpmhWcYH6E9dSlTX
+         3Nn9ZWaWP+mBijrKSuICHImc3RULLD50DYeSPsQSokzs0lwDJ+ZPPd4f/b1m4PfUBNAT
+         aETA==
+X-Forwarded-Encrypted: i=1; AJvYcCXIKf/C63jRROk/GU/rAx0VYWfsGmED0Xxwb5DLPHswtkFx2us7zoCXOBbjGHa4Y74GibNTF0e2iD5QOdlcSC3RWXoZgGKyCpRTxVIN6/6KpojlLVWj5pPo0WybDc+E1r0J
+X-Gm-Message-State: AOJu0YxS068XnFDrshJ2Xz5jgPzqbJ6IHs+8XutTg16no+MRlixKEREu
+	tXSzwlrUz3fgMPzylrLXE+UNzejczY/qgXYMXEuJ6LEZe5hX7IGhMwlwCo+z
+X-Google-Smtp-Source: AGHT+IEKpr1UFCKDIwWRxjnU/uCMgSVrE+o0Upo4NwXVrAnyDnyihhz4pz3m7yaMLFIsDF1d0jQ75A==
+X-Received: by 2002:a05:6512:3c98:b0:52b:c27c:ea1f with SMTP id 2adb3069b0e04-530bb39bf01mr11779826e87.55.1722982498234;
+        Tue, 06 Aug 2024 15:14:58 -0700 (PDT)
+Received: from mobilestation ([95.79.225.241])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530de457b3csm3663e87.161.2024.08.06.15.14.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 15:14:57 -0700 (PDT)
+Date: Wed, 7 Aug 2024 01:14:55 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: jitendra.vegiraju@broadcom.com
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, 
+	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
+	andrew@lunn.ch, linux@armlinux.org.uk, horms@kernel.org, 
+	florian.fainelli@broadcom.com
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Integrate dwxgmac4 into
+ stmmac hwif handling
+Message-ID: <o4dgczjefqjek3iqw2y3ca7pwolj5e6otjyuinpuvkwcli5xei@dzehe7xde44x>
+References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
+ <20240802031822.1862030-3-jitendra.vegiraju@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240802031822.1862030-3-jitendra.vegiraju@broadcom.com>
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
+On Thu, Aug 01, 2024 at 08:18:21PM -0700, jitendra.vegiraju@broadcom.com wrote:
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> 
+> Integrate dwxgmac4 support into stmmac hardware interface handling.
+> A dwxgmac4 is an xgmac device and hence it inherits properties from
+> existing stmmac_hw table entry.
+> The quirks handling facility is used to update dma_ops field to
+> point to dwxgmac400_dma_ops when the user version field matches.
+> 
+> Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/common.h |  4 +++
+>  drivers/net/ethernet/stmicro/stmmac/hwif.c   | 26 +++++++++++++++++++-
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h   |  1 +
+>  3 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> index cd36ff4da68c..9bf278e11704 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> @@ -37,11 +37,15 @@
+>  #define DWXGMAC_CORE_2_10	0x21
+>  #define DWXGMAC_CORE_2_20	0x22
+>  #define DWXLGMAC_CORE_2_00	0x20
 
-The second tagged commit started sometimes (very rarely, but possible)
-throwing WARNs from
-net/core/page_pool.c:page_pool_disable_direct_recycling().
-Turned out idpf frees interrupt vectors with embedded NAPIs *before*
-freeing the queues making page_pools' NAPI pointers lead to freed
-memory before these pools are destroyed by libeth.
-It's not clear whether there are other accesses to the freed vectors
-when destroying the queues, but anyway, we usually free queue/interrupt
-vectors only when the queues are destroyed and the NAPIs are guaranteed
-to not be referenced anywhere.
+> +#define DWXGMAC_CORE_4_00	0x40
 
-Invert the allocation and freeing logic making queue/interrupt vectors
-be allocated first and freed last. Vectors don't require queues to be
-present, so this is safe. Additionally, this change allows to remove
-that useless queue->q_vector pointer cleanup, as vectors are still
-valid when freeing the queues (+ both are freed within one function,
-so it's not clear why nullify the pointers at all).
+DW25GMAC_CORE_4_00?
 
-Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
-Fixes: 90912f9f4f2d ("idpf: convert header split mode to libeth + napi_build_skb()")
-Reported-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c  | 24 ++++++++++-----------
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 24 +--------------------
- 2 files changed, 13 insertions(+), 35 deletions(-)
+>  
+>  /* Device ID */
+>  #define DWXGMAC_ID		0x76
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 10b884dd3475..0b6c8fd5bc90 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -900,8 +900,8 @@ static void idpf_vport_stop(struct idpf_vport *vport)
- 
- 	vport->link_up = false;
- 	idpf_vport_intr_deinit(vport);
--	idpf_vport_intr_rel(vport);
- 	idpf_vport_queues_rel(vport);
-+	idpf_vport_intr_rel(vport);
- 	np->state = __IDPF_VPORT_DOWN;
- }
- 
-@@ -1349,43 +1349,43 @@ static int idpf_vport_open(struct idpf_vport *vport)
- 	/* we do not allow interface up just yet */
- 	netif_carrier_off(vport->netdev);
- 
--	err = idpf_vport_queues_alloc(vport);
--	if (err)
--		return err;
--
- 	err = idpf_vport_intr_alloc(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to allocate interrupts for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto queues_rel;
-+		return err;
- 	}
- 
-+	err = idpf_vport_queues_alloc(vport);
-+	if (err)
-+		goto intr_rel;
-+
- 	err = idpf_vport_queue_ids_init(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize queue ids for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	err = idpf_vport_intr_init(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize interrupts for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	err = idpf_rx_bufs_init_all(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize RX buffers for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	err = idpf_queue_reg_init(vport);
- 	if (err) {
- 		dev_err(&adapter->pdev->dev, "Failed to initialize queue registers for vport %u: %d\n",
- 			vport->vport_id, err);
--		goto intr_rel;
-+		goto queues_rel;
- 	}
- 
- 	idpf_rx_init_buf_tail(vport);
-@@ -1452,10 +1452,10 @@ static int idpf_vport_open(struct idpf_vport *vport)
- 	idpf_send_map_unmap_queue_vector_msg(vport, false);
- intr_deinit:
- 	idpf_vport_intr_deinit(vport);
--intr_rel:
--	idpf_vport_intr_rel(vport);
- queues_rel:
- 	idpf_vport_queues_rel(vport);
-+intr_rel:
-+	idpf_vport_intr_rel(vport);
- 
- 	return err;
- }
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index a2f9f252694a..585c3dadd9bf 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3576,9 +3576,7 @@ static void idpf_vport_intr_napi_dis_all(struct idpf_vport *vport)
-  */
- void idpf_vport_intr_rel(struct idpf_vport *vport)
- {
--	int i, j, v_idx;
--
--	for (v_idx = 0; v_idx < vport->num_q_vectors; v_idx++) {
-+	for (u32 v_idx = 0; v_idx < vport->num_q_vectors; v_idx++) {
- 		struct idpf_q_vector *q_vector = &vport->q_vectors[v_idx];
- 
- 		kfree(q_vector->complq);
-@@ -3593,26 +3591,6 @@ void idpf_vport_intr_rel(struct idpf_vport *vport)
- 		free_cpumask_var(q_vector->affinity_mask);
- 	}
- 
--	/* Clean up the mapping of queues to vectors */
--	for (i = 0; i < vport->num_rxq_grp; i++) {
--		struct idpf_rxq_group *rx_qgrp = &vport->rxq_grps[i];
--
--		if (idpf_is_queue_model_split(vport->rxq_model))
--			for (j = 0; j < rx_qgrp->splitq.num_rxq_sets; j++)
--				rx_qgrp->splitq.rxq_sets[j]->rxq.q_vector = NULL;
--		else
--			for (j = 0; j < rx_qgrp->singleq.num_rxq; j++)
--				rx_qgrp->singleq.rxqs[j]->q_vector = NULL;
--	}
--
--	if (idpf_is_queue_model_split(vport->txq_model))
--		for (i = 0; i < vport->num_txq_grp; i++)
--			vport->txq_grps[i].complq->q_vector = NULL;
--	else
--		for (i = 0; i < vport->num_txq_grp; i++)
--			for (j = 0; j < vport->txq_grps[i].num_txq; j++)
--				vport->txq_grps[i].txqs[j]->q_vector = NULL;
--
- 	kfree(vport->q_vectors);
- 	vport->q_vectors = NULL;
- }
--- 
-2.42.0
+What is the device ID in your case? Does it match to DWXGMAC_ID?
 
+>  #define DWXLGMAC_ID		0x27
+>  
+> +/* User Version */
+> +#define DWXGMAC_USER_VER_X22	0x22
+> +
+>  #define STMMAC_CHAN0	0	/* Always supported and default for all chips */
+>  
+>  /* TX and RX Descriptor Length, these need to be power of two.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> index 29367105df54..713cb5aa2c3e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+> @@ -36,6 +36,18 @@ static u32 stmmac_get_dev_id(struct stmmac_priv *priv, u32 id_reg)
+>  	return (reg & GENMASK(15, 8)) >> 8;
+>  }
+>  
+
+> +static u32 stmmac_get_user_version(struct stmmac_priv *priv, u32 id_reg)
+> +{
+> +	u32 reg = readl(priv->ioaddr + id_reg);
+> +
+> +	if (!reg) {
+> +		dev_info(priv->device, "User Version not available\n");
+> +		return 0x0;
+> +	}
+> +
+> +	return (reg & GENMASK(23, 16)) >> 16;
+> +}
+> +
+
+The User Version is purely a vendor-specific stuff defined on the
+IP-core synthesis stage. Moreover I don't see you'll need it anyway.
+
+>  static void stmmac_dwmac_mode_quirk(struct stmmac_priv *priv)
+>  {
+>  	struct mac_device_info *mac = priv->hw;
+> @@ -82,6 +94,18 @@ static int stmmac_dwmac4_quirks(struct stmmac_priv *priv)
+>  	return 0;
+>  }
+>  
+
+> +static int stmmac_dwxgmac_quirks(struct stmmac_priv *priv)
+> +{
+> +	struct mac_device_info *mac = priv->hw;
+> +	u32 user_ver;
+> +
+> +	user_ver = stmmac_get_user_version(priv, GMAC4_VERSION);
+> +	if (priv->synopsys_id == DWXGMAC_CORE_4_00 &&
+> +	    user_ver == DWXGMAC_USER_VER_X22)
+> +		mac->dma = &dwxgmac400_dma_ops;
+> +	return 0;
+> +}
+> +
+>  static int stmmac_dwxlgmac_quirks(struct stmmac_priv *priv)
+>  {
+>  	priv->hw->xlgmac = true;
+> @@ -256,7 +280,7 @@ static const struct stmmac_hwif_entry {
+>  		.mmc = &dwxgmac_mmc_ops,
+>  		.est = &dwmac510_est_ops,
+>  		.setup = dwxgmac2_setup,
+> -		.quirks = NULL,
+> +		.quirks = stmmac_dwxgmac_quirks,
+
+Why? You can just introduce a new stmmac_hw[] entry with the DW
+25GMAC-specific stmmac_dma_ops instance specified.
+
+-Serge(y)
+
+>  	}, {
+>  		.gmac = false,
+>  		.gmac4 = false,
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> index e53c32362774..6213c496385c 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+> @@ -683,6 +683,7 @@ extern const struct stmmac_desc_ops dwxgmac210_desc_ops;
+>  extern const struct stmmac_mmc_ops dwmac_mmc_ops;
+>  extern const struct stmmac_mmc_ops dwxgmac_mmc_ops;
+>  extern const struct stmmac_est_ops dwmac510_est_ops;
+> +extern const struct stmmac_dma_ops dwxgmac400_dma_ops;
+>  
+>  #define GMAC_VERSION		0x00000020	/* GMAC CORE Version */
+>  #define GMAC4_VERSION		0x00000110	/* GMAC4+ CORE Version */
+> -- 
+> 2.34.1
+> 
+> 
 
