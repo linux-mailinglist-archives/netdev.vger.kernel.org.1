@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-116113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FAB0949216
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:51:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D41949219
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9A752815B9
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:51:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87B082815B9
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C4C20010C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F91B200123;
 	Tue,  6 Aug 2024 13:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="j33B+fju"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SuoI6EPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2055.outbound.protection.outlook.com [40.107.94.55])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DB51BE875
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 13:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32B91E7A5F
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 13:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722952234; cv=fail; b=d//BckQZiv2q9eG2If0K2FPxmd6X357yKBLsc9Li+ubDDQGBN/9njOHhVqCDcp3OMLA/ZzS8SPkt86CML36cac4rBXfRaBLa0BMndAMxYr9UgAvlVi4egXG0FSgb0C8Q8SS+Mce+KxCJYuJQg7yoMNjbTe27vhvnsBWeGs4UAB8=
+	t=1722952234; cv=fail; b=oRLwy9I6czKygCpsysb+vbS59/lKZ7faCreGUEdYh9BXZ+y5FxTGmcdcbi9o66h3B9tOUsIoh7i2x0suhbZ3Lu25zPJklA03b+DNgnrz3xRfOcPYFQ00HMGz4bz8Cdap+QqP5fMitqPxJZS/FWtUhYFPvk4bbzoQ/+eRc9AA1Uw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722952234; c=relaxed/simple;
-	bh=damO4B68FeDBBgvNcV6B59CjpW5vBS7D/m+DIiSv7Gc=;
+	bh=iPWqiGATDiJrnc5jka4NQyTmbRxkEhEVJn6wj733bbQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JSqE9xtDkZEo21DQ33o4YqNtlZiJBtvelJtM7p1WiCRNeR9dmK1M6MkYIz1Dj4TfitRKrwRzREpFZBXBfr5PhDIsiy3uzJ3KD3phClH0xQesBL0J/Xad2vpKqn4L5aYIceRg5+KeZX/3Sxw7fCvPIVuUziEh8qi5tpR/Q0u7Mtk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=j33B+fju; arc=fail smtp.client-ip=40.107.94.55
+	 MIME-Version:Content-Type; b=HlXSgk2jlNJSb8AVRz4Mxphc2DtT7OMTy18hy+o9SISxy6EITCs9fG9XfNU27COg/zf8D91z7yNMECNOQUQMzce9L+EWjzLYb6FMIE4UZlrsu21sPnGQlH9/UfBViXWuzQ1ryAmDPcl1ClVaer3jFD2rqpImuRkGzXTmyV8oje0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SuoI6EPr; arc=fail smtp.client-ip=40.107.92.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r5wrn16VPFi8oNQNK0fBmLlLiMcvbxn5H5LBkVAeOV0RSPbItwA+JdJzmll+ZaGEjs7Zw+DfV0UeTEdJx0PPIDTnomwqWLuP09J1e1024rQ+aCePKjWUm4B4KJ8OAjnOOg0DmiRccLmpB4io5+kKmGj1pXfrEp11soeTsJjmbJfzEPqNYIS8jBTNavcS1HSgO6i99mhnuVS6G6KtM5uoOJdgjHR6J+5p/y2s11LlzrbrvTWK1df/VJMhsuksx0tT4onCY6XfMYH3/0xvUiw36IJLa42+VwklPjYHxaHiPZGGmotRj63EVJZLEsl9d+/nw9ItYYu0AQA7p4i9fNKSkw==
+ b=Ch3IcQCIHdyHqDNGqLNf48fnWvDTEbgkH2SKQRoX9gu15PqJTQ1qNlzHLbKf7XIr80GvJH2wPRqc0fua5t33GLQDcIPSjdJU92TBqQgXTtLwBDGZsilaZ2CLxDslJq/cWtWdSKO/5i3VIZjkpBq006AQPbZ6obLw/nm30Hn2DI5rfWvAag5Hr6iz1aIkS1SOuoo8Yjl6c4XRezLzK6FcRHphq3Jcxkn/NyXEuTSE9EVsk/09Alo6COvTjWZRyEZUsGvfX2M9yFd9OnMWF3PweUAACWVvdUCnsLXmIq4iuemx1LZOzS7ti0XG0omb2fUVbe2jwb50Mj0jzqdnxENKaw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vSOqis10XSa2hlFQiWocg5SmOiC1mkHyTaiKGHbxKFw=;
- b=SJajkULcOQM5new+JTB639OUuPKx50QiHYEuwnV/qXaublPGNRWrFYj13S/nJwHV2Jbi89uXG9/ouLwgXCEwpxjYfYfYg5gsilFpeYq+U4omVVc6DZhWbMOJgtKT0KnaFH9usmg2GcQ22r1xpCQjqBx8WwYXIPKnsqjxcWSSuWraaasinN6A8T96BOCFvFdpENougJXh37bWg/2CXhB/Dx89kuKYfTIIuGwKTWI8T4QsRxmeWdnObk0UKbToi0PD2iI9N0S9t/+HTjXj60ClWPAQTQROBUVnS90Hx7sNqM3ruT9XZ8vqBBZjBO93hUMbdwcEJ33T4izPQA/yPXGsoQ==
+ bh=QrB9R4qAMr79k1w7qBpIVigR5lEYuJU82VeMTLLKn58=;
+ b=JnWd1QMv2ZJ23YcK3m5Rf7vXFcVmClpzo1wel/zkq/ZfE0J74EUuRnRVqwGtyukl4DMiPEKhcpU9zkB/TNYOeiNBZSvuO6aBkq6NlmIQuDJu+G4wAKpCHiPMty0782KCzqGC1OmS2uo9FyTJYoHI3Dv6Brs25zBjaxnqX8/syzdhZlihgn/87g+mfPdF49TLHy0tuqgCMMZNq8xBR3bGeYAKTpMemOxVQz7Cfnnnq9z0nTahmCsSoc9tkKEvXa1zHuagxpATgg0RjmwrhLleC5Psfe9/3F/IeoElFf2BwcgxINDghMDEirBe+XmMDMjV1f0cFzgX8itjqb8ZlDn88Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vSOqis10XSa2hlFQiWocg5SmOiC1mkHyTaiKGHbxKFw=;
- b=j33B+fjuhSh3ukDViq3Gf5XjA0g7DOAvN4eNqoBXc/cNI6QrASg54FPQFqGOVEwGs3hTpHxZscAbONmD8UUbETPWR0fayzN4vpaidxN1fO7G7R+oRAk3cllWnhoRNRtfvyP+vVJ0i1bmC3j4diST7hxwZhyKvHgBPUXJ2s35CBQsGjrWZjljmEWeiwrCF3JTDzcJ59EIQ4RiV6VleSsrJlroULh0Rhzt6ITgfQG7MSsAhNFeKq8ohoHBkCP2GTTJZH1RCB1APWpKJfdPklukRDmaCjiB2SouXnvEJbtvgXnLBpUd4WHu4ijHeATF3MUYHfYRH3vgO89rDXLp+e6BSQ==
-Received: from CH0PR03CA0438.namprd03.prod.outlook.com (2603:10b6:610:10e::14)
- by DS0PR12MB6488.namprd12.prod.outlook.com (2603:10b6:8:c3::13) with
+ bh=QrB9R4qAMr79k1w7qBpIVigR5lEYuJU82VeMTLLKn58=;
+ b=SuoI6EPrdJ+4eaBDNmR2OJvet+XaLG/IzCnkgX7HcIb/oZ+Qd1iN98YIygV5ZtVD2FwSLJgyIRm9DtO6YREyTL1pphOshKQzcjlIgxMwykT4CDfTBmK67frzxEj5PcPzOpHo8KIN0QLXNqiHTzMaB+jwzOd9eKk03THfV1lnSnWhMm5jZIKhgYJ0VbMcB/WAMVgQd3IA6Eyrmnii8p3gb4ARgxLLZgZOcIuNYeJZhZWC6LwoK6DXDShrRmN8I3fz1OOWK/U4unWBfzYgxZd0agdAc/pOQHSPB1HNHd/OnWgDjnq39gFIwyG2fVm+vj9sHfNGRy3onUCIY/mcPHopnA==
+Received: from CH2PR07CA0028.namprd07.prod.outlook.com (2603:10b6:610:20::41)
+ by SN7PR12MB6792.namprd12.prod.outlook.com (2603:10b6:806:267::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Tue, 6 Aug
- 2024 13:50:28 +0000
-Received: from CH2PEPF0000009D.namprd02.prod.outlook.com
- (2603:10b6:610:10e:cafe::6f) by CH0PR03CA0438.outlook.office365.com
- (2603:10b6:610:10e::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.23; Tue, 6 Aug
+ 2024 13:50:29 +0000
+Received: from CH2PEPF000000A0.namprd02.prod.outlook.com
+ (2603:10b6:610:20:cafe::e1) by CH2PR07CA0028.outlook.office365.com
+ (2603:10b6:610:20::41) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.28 via Frontend
- Transport; Tue, 6 Aug 2024 13:50:28 +0000
+ Transport; Tue, 6 Aug 2024 13:50:29 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,30 +64,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.118.232 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.118.232) by
- CH2PEPF0000009D.mail.protection.outlook.com (10.167.244.25) with Microsoft
+ CH2PEPF000000A0.mail.protection.outlook.com (10.167.244.26) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.20.7849.8 via Frontend Transport; Tue, 6 Aug 2024 13:50:28 +0000
 Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
  (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 6 Aug 2024
- 05:59:49 -0700
+ 05:59:52 -0700
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
  drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 6 Aug 2024 05:59:49 -0700
+ 15.2.1544.4; Tue, 6 Aug 2024 05:59:52 -0700
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
  (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 6 Aug 2024 05:59:46 -0700
+ Transport; Tue, 6 Aug 2024 05:59:49 -0700
 From: Tariq Toukan <tariqt@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jianbo Liu
-	<jianbol@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net-next 04/11] net/mlx5e: TC, Offload rewrite and mirror to both internal and external dests
-Date: Tue, 6 Aug 2024 15:57:57 +0300
-Message-ID: <20240806125804.2048753-5-tariqt@nvidia.com>
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Carolina Jubran
+	<cjubran@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: [PATCH net-next 05/11] net/mlx5e: Be consistent with bitmap handling of link modes
+Date: Tue, 6 Aug 2024 15:57:58 +0300
+Message-ID: <20240806125804.2048753-6-tariqt@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240806125804.2048753-1-tariqt@nvidia.com>
 References: <20240806125804.2048753-1-tariqt@nvidia.com>
@@ -102,112 +101,126 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009D:EE_|DS0PR12MB6488:EE_
-X-MS-Office365-Filtering-Correlation-Id: bfce4146-e70e-4500-3392-08dcb61ebb44
+X-MS-TrafficTypeDiagnostic: CH2PEPF000000A0:EE_|SN7PR12MB6792:EE_
+X-MS-Office365-Filtering-Correlation-Id: 64c120a9-24da-4441-b661-08dcb61ebb2b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RV/jnw7YxBDuq560ddCteIzNeUTkEnQvBba+DSValMZho1YUooo7TzYAylpJ?=
- =?us-ascii?Q?WckcQEqLk+IQXW5N4hFNMSPcpdTlp/lQDAFZf4/FLyda5jlj5/yihmTVoVDE?=
- =?us-ascii?Q?/OWwf2JoEhlSuckRMEs/qB0xeMtOl48IfGZw7hoeAJ5L5AKoXSLunV/yWDdK?=
- =?us-ascii?Q?dxzNZK3AFzSTMTZO1lqvQP0s2oifYB4eDOJorTZCZe5glIqwH2+YqLLMrY9j?=
- =?us-ascii?Q?42Z7q6oXJuKZt74VPMFUvWJqbJQ8mHRCfaEC7Xaq7n/qYyZWVYoEh5+e41E0?=
- =?us-ascii?Q?lXCyLDERha0DyPTBXk//Ha4vZ1LgKt6lKHSGmcNY2j+pLyLtJJIa1O+puTRF?=
- =?us-ascii?Q?43dbOba6GmB2odfo/ffQrEGsshmYnk/amqvhH/rbYI6fs40BsTsd9DqnoYDc?=
- =?us-ascii?Q?OITKjB32rTETjzXN0N9d/hHbIqf5HeGxrYmcIsDrv5Mlwu9613EFkuaJsCML?=
- =?us-ascii?Q?3DT2F6JJ0vdzjuHQlsSb0yJ+lFhzoGba5xyKj5r5jyrL9hXRLWwgZOsfsMAA?=
- =?us-ascii?Q?ywl+ifE3SCWhZtAlw2p4gJeef4XzYkDNt7ggKX3BOAls7AZnzp50D305ddJY?=
- =?us-ascii?Q?o5qLYx4Tqm5o3+QneS+93w56ghANoxa+bL4ohAJbrngfBmyqS4krMNSbVTrf?=
- =?us-ascii?Q?vm7Tk4ZAGC0wlHCN/gH5hc0pPBpbvYgJdHjU7QKjuL23DsZqeaRHbzFVkn7M?=
- =?us-ascii?Q?MgB6YV9cbehOuGQdcLPeJ3hP7D5j5l95znIOiRl9f1Q13Whm1CgwnABb3ybX?=
- =?us-ascii?Q?bGYyH3cBM1JMAf+lszHr9T0XW+yXpBwSidKa6mc+lUuLzz+9eQdbfJDmdJuL?=
- =?us-ascii?Q?ZWAYR6pJYaJZ6BirSXrZXStqXAY70XMxtd9fJgYf4CjKUcRZfmbwdRRdrB41?=
- =?us-ascii?Q?2vkB3CirOy05AS+GHENNnbzLlVlQ8mJjpvOVCGvc62maSr1cKn74iMM6K1f+?=
- =?us-ascii?Q?y7uVAzJ98J9u6sRoKCRgAdIHWs7eJ9pQXEISDcLlF8gJDRGNLn0oE7ZAmKYu?=
- =?us-ascii?Q?iyNOzxnsqRr1zZcP4aRgXKwTFRlxDWfYpkIZH4+z18LL4TrZHZXYgFg2UZFF?=
- =?us-ascii?Q?j9rM4CLcy5gH4AUjGaBANSpQBiQIwJ+65h99ST5NUqEBq3tP/0ViihxjFhGR?=
- =?us-ascii?Q?wbRRo1S4J3P+hi/NLXcXvJ6+N5KuZ3NKecZAQNojmMmINC8psSMn+lAPAEqC?=
- =?us-ascii?Q?zdIa5JL4eZpaHkZeprcXV+cP1UJsieFPVl158imVl2oR6fySJHjUb2s9D4GX?=
- =?us-ascii?Q?Plhw/q9Q1OunX7GnPd7JIIAUrEgCN338x9p6hKkU10GkBZVJ2fM5YSsNCVOa?=
- =?us-ascii?Q?C7qs9/iRRkI//oWtm45nC3ElEgMJ202xilJ5dris2dOTocqqm0C6kT/6WE/o?=
- =?us-ascii?Q?XFpe6KNYutaU2ui9aJsXejgWlZp9UAKNKvYtqMpPJH5+l4HULwx7R70Sj470?=
- =?us-ascii?Q?zKsxzAcqoHlXIGe68WerLsIKwjIj4RgT?=
+	=?us-ascii?Q?RMdNVcQWRrInZbrm5ia/DPzy8yEiRMmdF1BmDCwLMd0JgMwwmAwdhLUV/uCj?=
+ =?us-ascii?Q?tFicQgilToQNzNIPnSIMTscRoDXqsE5l9a6favN/3l2Fsoh3nOIcjfARXuYi?=
+ =?us-ascii?Q?1tCNSGRD/3Nhr5KKMiY3Z4aZ+70WQ2MLRplTF4umX9W+q9AOvCeCLuh/uv8g?=
+ =?us-ascii?Q?f33gtl0nm4sBhd+5W6u18GfXy/0BgGA3DA4P3C2EV4RrSjMq9h8bIRa/Lsuh?=
+ =?us-ascii?Q?otYrhYbaEKiVavJivGIAKP+4gCrB3N+yns+ReEJI1CrOAzrVuwhxDxE8iyDZ?=
+ =?us-ascii?Q?CdLVdzQKoQYoJ1M7hoGJHbNkRWwwHaXopKHTXFyOZvpIFIpH2FQpcQRblYMW?=
+ =?us-ascii?Q?be3wnhEqRTwafQPnu0HfOtFL7R7Yafgw4qRboGJvlMp3vsko03BYFB2gYYCy?=
+ =?us-ascii?Q?N4fe6u7yIYveSBW/8g2r8I3bt9qhZdwPkKjT162QZkKcUltMmYJf8V37xvAu?=
+ =?us-ascii?Q?BXFANK2lEXCXIXmcvx4UUz3xJmYS0Dz4RMe0tcWOAx63wIPV2kkJloyIROqV?=
+ =?us-ascii?Q?jyQUuMvTEiYpKmr5B0yh2IO3U3++ZTUpKq8X0I8dBsfB1i/Is25BNxdtrxaV?=
+ =?us-ascii?Q?KiQSSEFPLOkSrfxU9FkDEZglLZFynBKjb6b0lD5BRcp4rPeXXSSNq6ghwX+E?=
+ =?us-ascii?Q?wo9CiWdtxzqKZCZp2/4U8Vcrak4TYGzxAJVXkvRBJFeqvMT7PQUCP+wS9yZi?=
+ =?us-ascii?Q?eIdcFrqIBYslL99EtO8HnXBq+ST3ZyMfNrPJde2I3NCK3NBp7dKCwByS6WNc?=
+ =?us-ascii?Q?bKbyfYsEwD7VCSSEa68PHT9kxFeG4BzyphDmpnS4JaRRDEWiFkcQwt0bs3Z7?=
+ =?us-ascii?Q?8z+xXjl30nni/4zgJ/t+XeQp4++NswixyYcpbqOIQfbfmV+igLXJhdDNzynR?=
+ =?us-ascii?Q?jHvxPf6vm4iETHf7Y1oClToNsIoCF8/lgFsYHS41bR7AgmhL23+vpBPcxlMN?=
+ =?us-ascii?Q?W5ZQ2vhBHXUOWhl3k35XbGnImC8U1OyAD+8hNlQ5oV0lGagb/HofEzAxCODq?=
+ =?us-ascii?Q?IqrJ27qoB0hT0FEd5x6Cy2mM3a0avWvQn69dJ9Sq/cjVOlw1XDy0oIrLg24j?=
+ =?us-ascii?Q?dqjyh2IVg/kStjRtwovXJ52Is2GIpAvQmifmZT9LE5FKn4rFX7uu/VFzmZeH?=
+ =?us-ascii?Q?szBHhr0TvtW8BzAW9U6Db1M2W5/wnLL5MUtiWB4c8i5iuuGzSLzAPirsahoD?=
+ =?us-ascii?Q?nw7AjAZ5Nax9BfURV+0dY4rU4RiaZDDiEB/WA7MKrf64vguSmt05maI1G9lW?=
+ =?us-ascii?Q?vbmzh8iULlxVmkla1LzOUrgVd77GL17zrGk9JaYaFz7JLUuWHWrlcHSiqWjV?=
+ =?us-ascii?Q?ev1HvUpPBJswc8PvoQaFqDyHFv00//yPaT8Wv59G1MlnIT5CrBspWraKENCY?=
+ =?us-ascii?Q?Hb1RHgcOQp9D7MznU26SbmcX9Ac09phE7MheDWnRtTHA2lMDXCPSWWKLSAxC?=
+ =?us-ascii?Q?r8oINU9joNpvarGd8TkH1UOqlflGBsyD?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 13:50:28.5444
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 13:50:28.3371
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfce4146-e70e-4500-3392-08dcb61ebb44
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64c120a9-24da-4441-b661-08dcb61ebb2b
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009D.namprd02.prod.outlook.com
+	CH2PEPF000000A0.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6488
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6792
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Gal Pressman <gal@nvidia.com>
 
-Firmware has the limitation that it cannot offload a rule with rewrite
-and mirror to internal and external destinations simultaneously.
+Use the bitmap operations when accessing the advertised/supported link
+modes and remove places that access them as arrays of unsigned longs
+(underlying implementation of the bitmap), this makes the code much more
+readable and clear.
 
-This patch adds a workaround to this issue. Here the destination array
-is split again, just like what's done in previous commit, but after
-the action indexed by split_count - 1. An extra rule is added for the
-leftover destinations. Such rule can be offloaded, even there are
-destinations to both internal and external destinations, because the
-header rewrite is left in the original FTE.
-
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 23 +++++++++----------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index a28bf05d98f1..6b3b1afe8312 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -1742,12 +1742,17 @@ has_encap_dests(struct mlx5_flow_attr *attr)
- static int
- extra_split_attr_dests_needed(struct mlx5e_tc_flow *flow, struct mlx5_flow_attr *attr)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index 36845872ae94..5fd81253d6b9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -83,17 +83,15 @@ struct ptys2ethtool_config ptys2ext_ethtool_table[MLX5E_EXT_LINK_MODES_NUMBER];
+ 	({                                                              \
+ 		struct ptys2ethtool_config *cfg;                        \
+ 		const unsigned int modes[] = { __VA_ARGS__ };           \
+-		unsigned int i, bit, idx;                               \
++		unsigned int i;                                         \
+ 		cfg = &ptys2##table##_ethtool_table[reg_];		\
+ 		bitmap_zero(cfg->supported,                             \
+ 			    __ETHTOOL_LINK_MODE_MASK_NBITS);            \
+ 		bitmap_zero(cfg->advertised,                            \
+ 			    __ETHTOOL_LINK_MODE_MASK_NBITS);            \
+ 		for (i = 0 ; i < ARRAY_SIZE(modes) ; ++i) {             \
+-			bit = modes[i] % 64;                            \
+-			idx = modes[i] / 64;                            \
+-			__set_bit(bit, &cfg->supported[idx]);           \
+-			__set_bit(bit, &cfg->advertised[idx]);          \
++			bitmap_set(cfg->supported, modes[i], 1);        \
++			bitmap_set(cfg->advertised, modes[i], 1);       \
+ 		}                                                       \
+ 	})
+ 
+@@ -1299,7 +1297,8 @@ static u32 mlx5e_ethtool2ptys_adver_link(const unsigned long *link_modes)
+ 	u32 i, ptys_modes = 0;
+ 
+ 	for (i = 0; i < MLX5E_LINK_MODES_NUMBER; ++i) {
+-		if (*ptys2legacy_ethtool_table[i].advertised == 0)
++		if (bitmap_empty(ptys2legacy_ethtool_table[i].advertised,
++				 __ETHTOOL_LINK_MODE_MASK_NBITS))
+ 			continue;
+ 		if (bitmap_intersects(ptys2legacy_ethtool_table[i].advertised,
+ 				      link_modes,
+@@ -1313,18 +1312,18 @@ static u32 mlx5e_ethtool2ptys_adver_link(const unsigned long *link_modes)
+ static u32 mlx5e_ethtool2ptys_ext_adver_link(const unsigned long *link_modes)
  {
-+	bool int_dest = false, ext_dest = false;
- 	struct mlx5_esw_flow_attr *esw_attr;
-+	int i;
+ 	u32 i, ptys_modes = 0;
+-	unsigned long modes[2];
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(modes);
  
- 	if (flow->attr != attr ||
- 	    !list_is_first(&attr->list, &flow->attrs))
- 		return 0;
+ 	for (i = 0; i < MLX5E_EXT_LINK_MODES_NUMBER; ++i) {
+-		if (ptys2ext_ethtool_table[i].advertised[0] == 0 &&
+-		    ptys2ext_ethtool_table[i].advertised[1] == 0)
++		if (bitmap_empty(ptys2ext_ethtool_table[i].advertised,
++				 __ETHTOOL_LINK_MODE_MASK_NBITS))
+ 			continue;
+-		memset(modes, 0, sizeof(modes));
++		bitmap_zero(modes, __ETHTOOL_LINK_MODE_MASK_NBITS);
+ 		bitmap_and(modes, ptys2ext_ethtool_table[i].advertised,
+ 			   link_modes, __ETHTOOL_LINK_MODE_MASK_NBITS);
  
-+	if (flow_flag_test(flow, SLOW))
-+		return 0;
-+
- 	esw_attr = attr->esw_attr;
- 	if (!esw_attr->split_count ||
- 	    esw_attr->split_count == esw_attr->out_count - 1)
-@@ -1758,6 +1763,18 @@ extra_split_attr_dests_needed(struct mlx5e_tc_flow *flow, struct mlx5_flow_attr
- 	     MLX5_ESW_DEST_CHAIN_WITH_SRC_PORT_CHANGE))
- 		return esw_attr->split_count + 1;
- 
-+	for (i = esw_attr->split_count; i < esw_attr->out_count; i++) {
-+		/* external dest with encap is considered as internal by firmware */
-+		if (esw_attr->dests[i].vport == MLX5_VPORT_UPLINK &&
-+		    !(esw_attr->dests[i].flags & MLX5_ESW_DEST_ENCAP_VALID))
-+			ext_dest = true;
-+		else
-+			int_dest = true;
-+
-+		if (ext_dest && int_dest)
-+			return esw_attr->split_count;
-+	}
-+
- 	return 0;
- }
- 
+-		if (modes[0] == ptys2ext_ethtool_table[i].advertised[0] &&
+-		    modes[1] == ptys2ext_ethtool_table[i].advertised[1])
++		if (bitmap_equal(modes, ptys2ext_ethtool_table[i].advertised,
++				 __ETHTOOL_LINK_MODE_MASK_NBITS))
+ 			ptys_modes |= MLX5E_PROT_MASK(i);
+ 	}
+ 	return ptys_modes;
 -- 
 2.44.0
 
