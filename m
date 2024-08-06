@@ -1,145 +1,220 @@
-Return-Path: <netdev+bounces-116270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EBE949B8A
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:51:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4DA6949BA0
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:56:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B668028474B
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:51:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7DD91C220D1
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B7B178397;
-	Tue,  6 Aug 2024 22:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3003171E5F;
+	Tue,  6 Aug 2024 22:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gK9VOtEJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S3qtiVBz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5B1178381;
-	Tue,  6 Aug 2024 22:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2008C374C4
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 22:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722984620; cv=none; b=pzODR4dl52FFdxK9GwLR4EYj9TXOBqGA+wqbmPYq+ED3sXecvV3W1xMer0aDWzSmcJoA7UE1Fiv1NtEYYpxyUjx4qwODNKBmSNGXN4uwoiCoZx++e4QwUhSFIggmaxBu8SOqmH//gZCwRThb4B7219w4XMYg0StAD08LMJnJP8Q=
+	t=1722984986; cv=none; b=ScO1TCN1DySEEEAHyEBS8rQ5uYPQeM9kmtLASiHyn5ibsYRJBlKhH2FDV84azTl3QBv6CmBuacD1EFZ0vLFotlAF+tEVroGX8nDAHCEG/F1vrI8VvVY/gGyJ8PpRJ1pTdDUF9HFQ8RxPfGKoEkZlSZEBHCEv0o0qI997b1DOgRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722984620; c=relaxed/simple;
-	bh=3b3HeWBqA+k/ZS8D7tL/hj7cKIV21t1HBhctoaBI+7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xifaey0Ktz2v0Wi6efPVxesxXNhQI70jWGz3RY6IE+VXgOyCzpCAXyL68Sxo7rqFpspCiCLvKvQCnk0svGe0+xoNrU8bkndhDwiwyycRUno5O7RXKf/cIhTHNdnTqjwu45UVBHamuwVO51gbu9axrcL1RL5U72pDhAzW1RTxLpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gK9VOtEJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB15C4AF16;
-	Tue,  6 Aug 2024 22:50:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722984620;
-	bh=3b3HeWBqA+k/ZS8D7tL/hj7cKIV21t1HBhctoaBI+7w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gK9VOtEJv7MRsheqgdSoDQiYYeqWfF7V1TmwbNaCJKmEuu7I5sZfSX/yU3ofcZDTX
-	 mF9/dcQnaL8RHeWkcV+vHLpVxJ5JaNHI0zXRIUACB/qFWIgnqBbenoC47AkgJ2bBJv
-	 GJr8ctTceWV4og1UW/N96D56wNFkK7rhtE8DlOKehdPxc0oVDUXWPhphMNbhcHtFtk
-	 H7Hg5AUimYfSWuXBCyVnNhnkcNxQ/kYxBXcC5LERb0+qFthODMma+lzynqd0kY4uYz
-	 Mp7GMTU0S8OeX3LEb75hdxVKRrwxhND4a5wzRPKHtsoQRbuvuhywJ4OvP+mm7f6y1a
-	 PZrWyslQ8dRvA==
-From: Namhyung Kim <namhyung@kernel.org>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>
-Cc: Ian Rogers <irogers@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-perf-users@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 07/10] tools/include: Sync network socket headers with the kernel sources
-Date: Tue,  6 Aug 2024 15:50:10 -0700
-Message-ID: <20240806225013.126130-8-namhyung@kernel.org>
-X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-In-Reply-To: <20240806225013.126130-1-namhyung@kernel.org>
-References: <20240806225013.126130-1-namhyung@kernel.org>
+	s=arc-20240116; t=1722984986; c=relaxed/simple;
+	bh=aNMyv5u4iRth1dAkJiP4aTC7V9ydb+rlkqz1X9ydnK8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QEiSfaXvYRmztco/okyCzpSswPXCDXZMtzPiewiwjbxg5lhta5R8tEeYO6YnPRc8B3stXD9PC9fdurrLtYAUuAGcymXu1Bd8jp5mRETGHcrUSrqETBFVreZCEpQ2Txdb6pX84HeHyq6V1y3BMYh9JcRdqAwIXyd9nmlsqHu4zlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S3qtiVBz; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5a1b073d7cdso25204a12.0
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 15:56:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722984983; x=1723589783; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m+9ez+DbuNqwjVco5Cgno4xixSp6vmg4G3LS18N1p4E=;
+        b=S3qtiVBz3NevpePd8EjFKTdC55ANdENHbW0XA6hIefCNnHE+PoKlb8JxN2XX7kBRSf
+         kd/eiYQb0vim3dovCh8YgMBZ6YPL8R+C/O6pEJ8l2M52cCwE9OWw5kg5TVM7wvAJsYLn
+         RPdImw1WU5b9nlloKhnSBkQN6ZxLmrQRkbStgZPui/Qi71G4Ln6v5oYghrIwquuBAiTK
+         ww74bTH0k21pebOVk4OAIr2JTQFcqBuhq/7ahIF0SD7B6XlcinLJoY/IGfnRZUOTPVQB
+         t9JJUHoz8KYhOLzzGpGzV7gNtU6mbEigGnYovLkw4jq5crOtC38kSWrEI5x7mo98VFqg
+         i+Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722984983; x=1723589783;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m+9ez+DbuNqwjVco5Cgno4xixSp6vmg4G3LS18N1p4E=;
+        b=Ru3zpTx3ZPAH74fT8oPTJiSYYj1p2jeIndyGC2SceZ6KnM1bfvOL/ldHbm1BPg39VJ
+         GCigmOlttV7D3x8RFS1BuYJ8jkWK+kH8EyzZRn+6NLPwQgVKaktb7rCOJPnL7mMbft25
+         509mmZ37fS3rhYF5GMzmCRBihYEbBdAf1XYhcLndLmdEeopZcf6yjIh2ThHnSt7EtVZS
+         eA/FeZR4r2uonxJ6lDnY+t/FvS/afU2MZn9+Soiy9mJnUy1yUe4neUWehoQcoleWawCZ
+         50Vg7O7Y+oQnayvYWSxo6ixfhF3ePsK0hcPWix9kHRZpZcfQTNimcSU39j06apcY9fxu
+         7SfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWpwqP6Fydxs/OzWJKlfEIRwrETV02GmzOTpaBjGc4MOCx430ZRm9QG5kmUxu02RUeSvzqSyFt3u+v9obhWDM1iA+mvr01
+X-Gm-Message-State: AOJu0YxYPLSgg18dOgzTO3yPQ9XcDVoM6jaOiZqeI6js68XBZtLxiJ6O
+	GL9qBzNDqSNg19ZIb27UyA6no+nEZw8VyQKubb+/mVMEEy7E72v8wXwUWUHSw7PsZ0mUVOlgJN0
+	9KO/PRzqpcu3p6VBUqMSDj/Q8PowUGwkfUijo
+X-Google-Smtp-Source: AGHT+IHdmoaV9xaEO4CcjSrPjVW5K+oaFl6xpiEgDz/ZpLfq51hclYinP1LbziYkKWQvucGfpgIXsD28vskGEw7k1zU=
+X-Received: by 2002:a05:6402:51cb:b0:5a0:d4ce:59a6 with SMTP id
+ 4fb4d7f45d1cf-5bba2837e46mr75708a12.2.1722984982752; Tue, 06 Aug 2024
+ 15:56:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1722966592.git.fahimitahera@gmail.com> <49557e48c1904d2966b8aa563215d2e1733dad95.1722966592.git.fahimitahera@gmail.com>
+ <CAG48ez3o9fmqz5FkFh3YoJs_jMdtDq=Jjj-qMj7v=CxFROq+Ew@mail.gmail.com> <ZrKc4i1PhdMwA77h@tahera-OptiPlex-5000>
+In-Reply-To: <ZrKc4i1PhdMwA77h@tahera-OptiPlex-5000>
+From: Jann Horn <jannh@google.com>
+Date: Wed, 7 Aug 2024 00:55:46 +0200
+Message-ID: <CAG48ez2OmOdMo7TCn4M8tSPSdXVwMDty6fMsHc9Q+NFQ-sfBUA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] Landlock: Add signal control
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, mic@digikod.net, gnoack@google.com, 
+	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bjorn3_gh@protonmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-To pick up changes from:
+Hi!
 
-  d25a92ccae6b net/smc: Introduce IPPROTO_SMC
-  060f4ba6e403 io_uring/net: move charging socket out of zc io_uring
-  bb6aaf736680 net: Split a __sys_listen helper for io_uring
-  dc2e77979412 net: Split a __sys_bind helper for io_uring
+On Wed, Aug 7, 2024 at 12:00=E2=80=AFAM Tahera Fahimi <fahimitahera@gmail.c=
+om> wrote:
+> On Tue, Aug 06, 2024 at 08:56:15PM +0200, Jann Horn wrote:
+> > On Tue, Aug 6, 2024 at 8:11=E2=80=AFPM Tahera Fahimi <fahimitahera@gmai=
+l.com> wrote:
+> > > +       if (is_scoped)
+> > > +               return 0;
+> > > +
+> > > +       return -EPERM;
+> > > +}
+> > > +
+> > > +static int hook_file_send_sigiotask(struct task_struct *tsk,
+> > > +                                   struct fown_struct *fown, int sig=
+num)
+> > > +{
+> > > +       bool is_scoped;
+> > > +       const struct landlock_ruleset *dom, *target_dom;
+> > > +       struct task_struct *result =3D get_pid_task(fown->pid, fown->=
+pid_type);
+> >
+> > I'm not an expert on how the fowner stuff works, but I think this will
+> > probably give you "result =3D NULL" if the file owner PID has already
+> > exited, and then the following landlock_get_task_domain() would
+> > probably crash? But I'm not entirely sure about how this works.
+> I considered since the file structure can always be obtained, then the
+> file owner PID always exist.
 
-This should be used to beautify socket syscall arguments and it addresses
-these tools/perf build warnings:
+I think the file owner "struct pid" always exists here; but I think
+the PID does not necessarily point to a task_struct.
 
-  Warning: Kernel ABI header differences:
-  diff -u tools/include/uapi/linux/in.h include/uapi/linux/in.h
-  diff -u tools/perf/trace/beauty/include/linux/socket.h include/linux/socket.h
+I think you can have a scenario where userspace does something like this:
 
-Please see tools/include/uapi/README for details (it's in the first patch
-of this series).
+int fd =3D <open some file descriptor somehow>;
+fcntl(fd, F_SETOWN, <PID of some other process>);
+pid_t child_pid =3D fork();
+if (child_pid =3D=3D 0) {
+  /* this executes in the child process */
+  sleep(5);
+  <do something on the fd that triggers send_sigio() or send_sigurg()>
+  sleep(5);
+  exit(0);
+}
+/* this continues executing in the parent process */
+exit(0);
 
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Namhyung Kim <namhyung@kernel.org>
----
- tools/include/uapi/linux/in.h                  | 2 ++
- tools/perf/trace/beauty/include/linux/socket.h | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+At the fcntl(fd, F_SETOWN, ...) call, a reference-counted reference to
+the "struct pid" of the parent process will be stored in the file
+(this happens in "f_modown", which increments the reference count of
+the "struct pid" using "get_pid(...)"). But when the parent process
+exits, the pointer from the parent's "struct pid" to the parent's
+"task_struct" is removed, and the "task_struct" will eventually be
+deleted from memory.
 
-diff --git a/tools/include/uapi/linux/in.h b/tools/include/uapi/linux/in.h
-index e682ab628dfa..d358add1611c 100644
---- a/tools/include/uapi/linux/in.h
-+++ b/tools/include/uapi/linux/in.h
-@@ -81,6 +81,8 @@ enum {
- #define IPPROTO_ETHERNET	IPPROTO_ETHERNET
-   IPPROTO_RAW = 255,		/* Raw IP packets			*/
- #define IPPROTO_RAW		IPPROTO_RAW
-+  IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
-+#define IPPROTO_SMC		IPPROTO_SMC
-   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
- #define IPPROTO_MPTCP		IPPROTO_MPTCP
-   IPPROTO_MAX
-diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
-index 89d16b90370b..df9cdb8bbfb8 100644
---- a/tools/perf/trace/beauty/include/linux/socket.h
-+++ b/tools/perf/trace/beauty/include/linux/socket.h
-@@ -76,7 +76,7 @@ struct msghdr {
- 	__kernel_size_t	msg_controllen;	/* ancillary data buffer length */
- 	struct kiocb	*msg_iocb;	/* ptr to iocb for async requests */
- 	struct ubuf_info *msg_ubuf;
--	int (*sg_from_iter)(struct sock *sk, struct sk_buff *skb,
-+	int (*sg_from_iter)(struct sk_buff *skb,
- 			    struct iov_iter *from, size_t length);
- };
- 
-@@ -442,11 +442,14 @@ extern int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
- extern int __sys_socket(int family, int type, int protocol);
- extern struct file *__sys_socket_file(int family, int type, int protocol);
- extern int __sys_bind(int fd, struct sockaddr __user *umyaddr, int addrlen);
-+extern int __sys_bind_socket(struct socket *sock, struct sockaddr_storage *address,
-+			     int addrlen);
- extern int __sys_connect_file(struct file *file, struct sockaddr_storage *addr,
- 			      int addrlen, int file_flags);
- extern int __sys_connect(int fd, struct sockaddr __user *uservaddr,
- 			 int addrlen);
- extern int __sys_listen(int fd, int backlog);
-+extern int __sys_listen_socket(struct socket *sock, int backlog);
- extern int __sys_getsockname(int fd, struct sockaddr __user *usockaddr,
- 			     int __user *usockaddr_len);
- extern int __sys_getpeername(int fd, struct sockaddr __user *usockaddr,
--- 
-2.46.0.rc2.264.g509ed76dc8-goog
+So when, at a later time, something triggers send_sigio() or
+send_sigurg() and enters this LSM hook, I think
+"get_pid_task(fown->pid, fown->pid_type)" can return NULL.
 
+> I can check if we can use the credentials
+> stored in struct file instead.
+
+(sort of relevant: The manpage
+https://man7.org/linux/man-pages/man2/fcntl.2.html says "Note: The
+F_SETOWN operation records the caller's credentials at the time of the
+fcntl() call, and it is these saved credentials that are used for the
+permission checks.")
+
+You mean the credentials in the "f_cred" member of "struct file", right? If=
+ so:
+
+I don't think Landlock can use the existing credentials stored in
+file->f_cred for this. Consider the following scenario:
+
+1. A process (with no landlock restrictions so far) opens a file. At
+this point, the caller's credentials (which indicate no landlock
+restrictions) are recorded in file->f_cred.
+2. The process installs a landlock filter that restricts the ability
+to send signals. (This changes the credentials pointer of the process
+to a new set of credentials that points to the new landlock domain.)
+3. Malicious code starts executing in the sandboxed process.
+4. The malicious code uses F_SETOWN on the already-open file.
+5. Something causes sending of a signal via send_sigio() or
+send_sigurg() on this file.
+
+In this scenario, if the LSM hook used the landlock restrictions
+attached to file->f_cred, it would think the operation is not filtered
+by any landlock domain.
+
+> > I think the intended way to use this hook would be to instead use the
+> > "file_set_fowner" hook to record the owning domain (though the setup
+> > for that is going to be kind of a pain...), see the Smack and SELinux
+> > definitions of that hook. Or alternatively maybe it would be even
+> > nicer to change the fown_struct to record a cred* instead of a uid and
+> > euid and then use the domain from those credentials for this hook...
+> > I'm not sure which of those would be easier.
+> Because Landlock does not use any security blob for this purpose, I am
+> not sure how to record the owner's doamin.
+
+I think landlock already has a landlock_file_security blob attached to
+"struct file" that you could use to store an extra landlock domain
+pointer for this, kinda like the "fown_sid" in SELinux? But doing this
+for landlock would be a little more annoying because you'd have to
+store a reference-counted pointer to the landlock domain in the
+landlock_file_security blob, so you'd have to make sure to also
+decrement the reference count when the file is freed (with the
+file_free_security hook), and you'd have to use locking (or atomic
+operations) to make sure that two concurrent file_set_fowner calls
+don't race in a dangerous way...
+
+So I think it's fairly straightforward, but it would be kinda ugly.
+
+> The alternative way looks nice.
+
+Yeah, I agree that it looks nicer. (If you decide to implement it by
+refactoring the fown_struct, it would be a good idea to make that a
+separate patch in your patch series - partly because that way, the
+maintainers of that fs/fcntl.c code can review just the refactoring,
+and partly just because splitting logical changes into separate
+patches makes it easier to review the individual patches.)
+
+> > > +       /* rcu is already locked! */
+> > > +       dom =3D landlock_get_task_domain(result);
+> > > +       target_dom =3D landlock_get_task_domain(tsk);
+> > > +       is_scoped =3D domain_IPC_scope(dom, target_dom, LANDLOCK_SCOP=
+ED_SIGNAL);
+> > > +       put_task_struct(result);
+> > > +       if (is_scoped)
+> > > +               return 0;
+> > > +       return -EPERM;
+> > > +}
 
