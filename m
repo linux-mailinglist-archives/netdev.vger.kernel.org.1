@@ -1,237 +1,175 @@
-Return-Path: <netdev+bounces-116138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00B49493F9
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:57:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8A094940F
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EF251C21504
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:57:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25A2281D18
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56F31D54F9;
-	Tue,  6 Aug 2024 14:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570341BC08F;
+	Tue,  6 Aug 2024 15:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rV4GqNrJ"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="ZYCmt8/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0C71BC08F;
-	Tue,  6 Aug 2024 14:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5724018D653
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722956270; cv=none; b=ZGNcfpwbPzRRqQRRNSikM7NT27x2TsvM+23w77Wtcg/zjw4CuBZJWDDjd9j/Bq6chh7JJ7RJC0OGyK3Msw6akbQLrwotUeIdsX9njcFVun6i+6nvQNiWtmEM0fuUhk5e+8j4uUj80YwVIXBMg5tb8nWRHj/kEJCs0cNuj79veFo=
+	t=1722956530; cv=none; b=tNF9DqmNAqgb3M5WVZCaHyn7pt1HOKyX+1AuEzW/LbsAPeTblqLoP5FIVUhW4Rl8ce94c/t3dk+nm6tUbcFy1VzyrcJCHBsxuBxwoxKYRVrUgcy8NamFmFI6UN7+EM4UqU9k9wNZsVASEQ1DzYjnyoeB5BjBqt7vE6O9Js0PA9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722956270; c=relaxed/simple;
-	bh=WvUKeYGEnDCMv+ueazaSl3PBo1+JLiRTjhrQ6VKYw0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dnNfSHwymi0GpJFC1Ub3ZzGQwQPnW+fBpE5IcaYZPqSKCw8RzigMqSOx4CeCjOfivaOMDOFWM99pMeeZ3XmDUi2MC39Za8DF70yvBU/VSxI375EcbQfycX+ToGWBWD59OoYkNxalzdKJR43MSLord1yedjwOTA0SBTvNHLsb2SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rV4GqNrJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3AADC4AF12;
-	Tue,  6 Aug 2024 14:57:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722956270;
-	bh=WvUKeYGEnDCMv+ueazaSl3PBo1+JLiRTjhrQ6VKYw0Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rV4GqNrJfetI/fwIhKY+0Wo5JSVDXU4OgOt9bnDmMHKmri6JYdaWmUF5bZxtGCEQB
-	 e4yzlsC5qpzB6Xn6lDkrKsrqxpHikymw0WYNJUcspOQNFGWJ0FRtP02OM9AMAZQrl0
-	 L7rop4/B1k0t6PoOat3/X9rRz4Q0UK7KQkMnxP4KAIIlTUXRyKKS+FhWqKt90Na8OW
-	 qOzEnC6xD8dmQGece5TAEWe6zkiIGooO62y0PCNkQRI3Dvx7aLQbylH67f5LYO1r5R
-	 Ab6Z/OcZTY5VHXQOCEggiW+zfKaHT4NIfsQmMZm9XWmuZvfFoJ9j+yQ3J0r0yUWn5G
-	 QzinxQ5lWN3BA==
-Date: Tue, 6 Aug 2024 08:57:48 -0600
-From: Rob Herring <robh@kernel.org>
-To: Swathi K S <swathi.ks@samsung.com>
-Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, conor+dt@kernel.org,
-	richardcochran@gmail.com, mcoquelin.stm32@gmail.com, andrew@lunn.ch,
-	alim.akhtar@samsung.com, linux-fsd@tesla.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-samsung-soc@vger.kernel.org, alexandre.torgue@foss.st.com,
-	peppe.cavallaro@st.com, joabreu@synopsys.com, rcsekar@samsung.com,
-	ssiddha@tesla.com, jayati.sahu@samsung.com,
-	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
-	gost.dev@samsung.com
-Subject: Re: [PATCH v4 1/4] dt-bindings: net: Add FSD EQoS device tree
- bindings
-Message-ID: <20240806145748.GA1502402-robh@kernel.org>
-References: <20240730091648.72322-1-swathi.ks@samsung.com>
- <CGME20240730092855epcas5p49902519f31bddcfe7da8f4b96a7d0527@epcas5p4.samsung.com>
- <20240730091648.72322-2-swathi.ks@samsung.com>
+	s=arc-20240116; t=1722956530; c=relaxed/simple;
+	bh=grLCEFMWacuVjzTT+kELouyRVgjKdlzMIEXuG8Ba9nA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rC5uxPYFCm0jPNjex4JplRfohaYjviXjtc8uNhZMqoD8jfDpqQNqTfj02r3FoFG6RYU8/WYdPP1rqeUQde9iSXRErKcWpuy9w4Tegkq0wBrYHMaaKZGhirTCFyDnX1kv3IvHhnYzymFpdvgoBlQ2tCHTNc2kv1pTaQLeopcvnNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=ZYCmt8/C; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com [209.85.167.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 4D5573F1EF
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:02:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1722956523;
+	bh=jhY/iAGFtGz8gkbOZN5MeWQH+e0m91DhNqvU5T5zzp4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=ZYCmt8/CbIdp8WP0k1re/0+NOe3+4nYo4UWE7nsrWSYoF8GCfkZGHCHcKU1Tbjjkq
+	 65y8QDHCjnsiz4tr8hRhcAqjB/w3THzxI0RUHz093SYokatlujepNPQsaQiyMHoMip
+	 //RygbQkFAxDpg+Co3u4gbx02k/C9P6i3ZBC/sOzUWPxNdEyugmscXfvTsr0908OLS
+	 WKBa/XzXIPcU0EVnUDBaKWQruQbQoMbjubWVndSS1zJH7O0UpO5wCI7iutCyxhilFv
+	 NWYi4s8TmuvcUe90tXSMrIwNMCh5RFU2MPxVVk4fP+NqHaAlZir5BDJPebrgBaMzug
+	 XJk30vzsmvYMA==
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52efce218feso1115441e87.1
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 08:02:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722956522; x=1723561322;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jhY/iAGFtGz8gkbOZN5MeWQH+e0m91DhNqvU5T5zzp4=;
+        b=VpiOF8sYquNEejux+Z8qXLyJMe71pWQGr8ICpLDiXFNddd+7Qr8zekCFwy+bEoOJV3
+         3ifpJ8bgYyRpK+qmvG6ihcXKF8g9d25Cm8PmAloNvHrrzJZ/oZOmbHlOAxxmDNI7jFcO
+         PEHS6SP7b53FGmv2Ho0YZF+Nbqcb22NQiROKoFoOb5fsw3ORrDfP06cugCbq96+Jg6Di
+         p3Hf3hfD+sc+eDy8xmTVTOrS71qHm2wlnCkW9qt2a+h1AjSVnhRqQ41oV5EQc6Wyix0r
+         yIaOVQ87qXaU5I8rbtIW7HjpubG/jVnNd1BcaQyHATG1Ydl7mA+NthJkGtrOBebzVSqN
+         2CQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnP8XRKbPQzghwAY1DJ8a+mVBDm5W4FVYHvQiUmxwnswbl2YVKMLpJZdljuk/C6TScGbSCz5O3JDfaDX9YusRq8Jau+xul
+X-Gm-Message-State: AOJu0YylZbidDdzHM3uHm7mkD3vSxQYRNxnJQI0VlgeuJJKwrVwiCKkC
+	zOqGX0ee3J3BV1wyQgT7gQ1DiFH1MlEjzqMPfnO7o43zACq11wDJwVqagLX97CnQEPq8X9LOyIh
+	U16v9uNxeJkXvm7tPKwbpgjcbNygGHDjAcJXmyrqO7/phoXOixAPaGlXcu748tZMXd2Jp8EuCF3
+	jQQ6bX
+X-Received: by 2002:a05:6512:12d2:b0:530:ab68:25e6 with SMTP id 2adb3069b0e04-530bb395e96mr10009281e87.48.1722956522159;
+        Tue, 06 Aug 2024 08:02:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEif65fL/GscmO4p1g1gNA0DbXGZyCAeXXHdeLEknaHECNqFC4iyrr1IIYBeFlsxYm4CIeOsQ==
+X-Received: by 2002:a05:6512:12d2:b0:530:ab68:25e6 with SMTP id 2adb3069b0e04-530bb395e96mr10009243e87.48.1722956521339;
+        Tue, 06 Aug 2024 08:02:01 -0700 (PDT)
+Received: from framework-canonical.station (net-93-66-99-124.cust.vodafonedsl.it. [93.66.99.124])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0295fasm13112722f8f.59.2024.08.06.08.02.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 08:02:01 -0700 (PDT)
+From: Massimiliano Pellizzer <massimiliano.pellizzer@canonical.com>
+To: kernel-team@lists.ubuntu.com
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [SRU][J][PATCH 1/2] rxrpc: Fix delayed ACKs to not set the reference serial number
+Date: Tue,  6 Aug 2024 17:01:39 +0200
+Message-ID: <20240806150149.1609414-2-massimiliano.pellizzer@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240806150149.1609414-1-massimiliano.pellizzer@canonical.com>
+References: <20240806150149.1609414-1-massimiliano.pellizzer@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730091648.72322-2-swathi.ks@samsung.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 30, 2024 at 02:46:45PM +0530, Swathi K S wrote:
-> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
-> Ethernet YAML schema to enable the DT validation.
-> 
-> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
-> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
-> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   |  5 +-
->  .../devicetree/bindings/net/tesla,ethqos.yaml | 91 +++++++++++++++++++
->  2 files changed, 94 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/tesla,ethqos.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 3eb65e63fdae..0da11fe98cec 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -98,6 +98,7 @@ properties:
->          - snps,dwxgmac-2.10
->          - starfive,jh7100-dwmac
->          - starfive,jh7110-dwmac
-> +        - tesla,fsd-ethqos
->  
->    reg:
->      minItems: 1
-> @@ -121,7 +122,7 @@ properties:
->  
->    clocks:
->      minItems: 1
-> -    maxItems: 8
-> +    maxItems: 10
->      additionalItems: true
->      items:
->        - description: GMAC main clock
-> @@ -133,7 +134,7 @@ properties:
->  
->    clock-names:
->      minItems: 1
-> -    maxItems: 8
-> +    maxItems: 10
->      additionalItems: true
->      contains:
->        enum:
-> diff --git a/Documentation/devicetree/bindings/net/tesla,ethqos.yaml b/Documentation/devicetree/bindings/net/tesla,ethqos.yaml
-> new file mode 100644
-> index 000000000000..9246b0395126
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/tesla,ethqos.yaml
-> @@ -0,0 +1,91 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/tesla,ethqos.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: FSD Ethernet Quality of Service
-> +
-> +maintainers:
-> +  - Swathi K S <swathi.ks@samsung.com>
-> +
-> +description:
-> +  dwmmac based tesla ethernet devices which support Gigabit
-> +  ethernet.
+From: David Howells <dhowells@redhat.com>
 
-Please write complete sentences.
+Fix the construction of delayed ACKs to not set the reference serial number
+as they can't be used as an RTT reference.
 
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    const: tesla,fsd-ethqos.yaml
+Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(backported from e7870cf13d20f56bfc19f9c3e89707c69cf104ef)
+[mpellizzer: removed the "ackr_serial" field from
+the struct "rxrpc_call" and adjusted the code accordingly]
+CVE-2024-26677
+Signed-off-by: Massimiliano Pellizzer <massimiliano.pellizzer@canonical.com>
+---
+ net/rxrpc/ar-internal.h | 1 -
+ net/rxrpc/call_event.c  | 2 --
+ net/rxrpc/output.c      | 2 +-
+ 3 files changed, 1 insertion(+), 4 deletions(-)
 
-???
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index e0123efa2a62..cf1cc9c14a79 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -671,7 +671,6 @@ struct rxrpc_call {
+ 
+ 	/* Receive-phase ACK management (ACKs we send). */
+ 	u8			ackr_reason;	/* reason to ACK */
+-	rxrpc_serial_t		ackr_serial;	/* serial of packet being ACK'd */
+ 	rxrpc_seq_t		ackr_highest_seq; /* Higest sequence number received */
+ 	atomic_t		ackr_nr_unacked; /* Number of unacked packets */
+ 	atomic_t		ackr_nr_consumed; /* Number of packets needing hard ACK */
+diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+index 2a93e7b5fbd0..b6cde05d832d 100644
+--- a/net/rxrpc/call_event.c
++++ b/net/rxrpc/call_event.c
+@@ -67,13 +67,11 @@ static void __rxrpc_propose_ACK(struct rxrpc_call *call, u8 ack_reason,
+ 	if (ack_reason == call->ackr_reason) {
+ 		if (RXRPC_ACK_UPDATEABLE & (1 << ack_reason)) {
+ 			outcome = rxrpc_propose_ack_update;
+-			call->ackr_serial = serial;
+ 		}
+ 		if (!immediate)
+ 			goto trace;
+ 	} else if (prior > rxrpc_ack_priority[call->ackr_reason]) {
+ 		call->ackr_reason = ack_reason;
+-		call->ackr_serial = serial;
+ 	} else {
+ 		outcome = rxrpc_propose_ack_subsume;
+ 	}
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index 08c117bc083e..a007c2ebe311 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -87,7 +87,7 @@ static size_t rxrpc_fill_out_ack(struct rxrpc_connection *conn,
+ 		return 0;
+ 
+ 	/* Barrier against rxrpc_input_data(). */
+-	serial = call->ackr_serial;
++	serial = 0;
+ 	hard_ack = READ_ONCE(call->rx_hard_ack);
+ 	top = smp_load_acquire(&call->rx_top);
+ 	*_hard_ack = hard_ack;
+-- 
+2.43.0
 
-Filename matching compatible means for compatible string 
-"tesla,fsd-ethqos" the filename should be tesla,fsd-ethqos.yaml.
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    minItems: 5
-> +    maxItems: 10
-> +
-> +  clock-names:
-> +    minItems: 5
-> +    maxItems: 10
-> +
-> +  iommus:
-> +    maxItems: 1
-> +
-> +  phy-mode:
-> +    $ref: ethernet-controller.yaml#/properties/phy-connection-type
-
-No need for this. phy-mode should already be included by snps,dwmac.yaml 
-including ethernet-controller.yaml.
-
-Though you may want to define what subset of modes are valid.
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +  - clocks
-> +  - clock-names
-> +  - iommus
-> +  - phy-mode
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/clock/fsd-clk.h>
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +    ethernet_1: ethernet@14300000 {
-
-Drop unused label.
-
-> +              compatible = "tesla,fsd-ethqos";
-> +              reg = <0x0 0x14300000 0x0 0x10000>;
-> +              interrupts = <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>;
-> +              clocks = <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_PTP_REF_I>,
-> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_ACLK_I>,
-> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_HCLK_I>,
-> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_RGMII_CLK_I>,
-> +                       <&clock_peric PERIC_EQOS_TOP_IPCLKPORT_CLK_RX_I>,
-> +                       <&clock_peric PERIC_BUS_D_PERIC_IPCLKPORT_EQOSCLK>,
-> +                       <&clock_peric PERIC_BUS_P_PERIC_IPCLKPORT_EQOSCLK>,
-> +                       <&clock_peric PERIC_EQOS_PHYRXCLK_MUX>,
-> +                       <&clock_peric PERIC_EQOS_PHYRXCLK>,
-> +                       <&clock_peric PERIC_DOUT_RGMII_CLK>;
-> +              clock-names = "ptp_ref",
-> +                            "master_bus",
-> +                            "slave_bus",
-> +                            "tx",
-> +                            "rx",
-> +                            "master2_bus",
-> +                            "slave2_bus",
-> +                            "eqos_rxclk_mux",
-> +                            "eqos_phyrxclk",
-> +                            "dout_peric_rgmii_clk";
-> +              pinctrl-names = "default";
-> +              pinctrl-0 = <&eth1_tx_clk>, <&eth1_tx_data>, <&eth1_tx_ctrl>,
-> +                          <&eth1_phy_intr>, <&eth1_rx_clk>, <&eth1_rx_data>,
-> +                          <&eth1_rx_ctrl>, <&eth1_mdio>;
-> +              iommus = <&smmu_peric 0x0 0x1>;
-> +              phy-mode = "rgmii-id";
-> +    };
-> +
-> +...
-> -- 
-> 2.17.1
-> 
 
