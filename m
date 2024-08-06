@@ -1,128 +1,111 @@
-Return-Path: <netdev+bounces-115927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0745948687
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:09:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF5E9486A3
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27057B22AA4
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 00:08:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26821F224CA
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 00:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D41382;
-	Tue,  6 Aug 2024 00:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCAA663C;
+	Tue,  6 Aug 2024 00:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vIP70mpk"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MMaCtAK8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D09910F2
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 00:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BF78F62
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 00:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722902934; cv=none; b=ufmBUYRP/PLCgcNCRQmbNQ0FQpibx/Mv4AoxdKxWnxGJdjKAPoFt6eLAax3wSR5vEuslMbyMAGkq6EMXWfQA/eQppBz9g4O6eICGtS37h8a/xH9NGui4DqD0OOxF2qyMLfy7pnIzP5UFBQwmOgQU332/aQFLaY8wFrLQtwoOsUY=
+	t=1722904603; cv=none; b=qWY7qDdjz6kvkuEZrMRUyrZo3wFU8UM+IDeEXIuzsvbYayvs4Q42i6olzHV1rvYjZUIXrlhlKKMI/DjH/4x3yPyavZT5j38eNDbl5xFqCB6G143rA9+zwm+iaW3jUupjuuw5YK/snyeIralVcJjE1cjS2JJvULf05ZXf43Lb5CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722902934; c=relaxed/simple;
-	bh=id93RYs/lU5oHEk+irFWG21CXN9q+Dq6PobT0MiN8Ak=;
+	s=arc-20240116; t=1722904603; c=relaxed/simple;
+	bh=7nXzsm5lZsyoe2KYHR7mAFN5Di2jrUPt9eEDIzEOn2E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KAFSZx+8qQP4VyVnoF+I/MBr6dLNU/vxHdPaRif8QjuYVDstR9NIBVf/OrglQPgjLmOcK8pmH4bLiU3nBpE6ahwSbm0ARJqh7uqJcOpVk+m+S7wI7lvMNgTE8ZdGLUHmzVphiV99dSrwlv66KALDnq0wlt0z2xxmXLXDThu7VUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vIP70mpk; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42803bbf842so737705e9.1
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 17:08:52 -0700 (PDT)
+	 To:Cc:Content-Type; b=qGq68QafP51GkzKh3XoUbxiIuzLUWSvBUaf5LJ/M02ZobMHwaHoyueCjky0kJbS1uzBc3eqTm6CeXVtM5b7c99F9MjPbQjJxm81JMBi8wqAi9/eh3CBKHs5ZSqW5nFya4RKBL+SB34ifw0J5vf2j9OpSMxP7QKFG/aLF109syJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MMaCtAK8; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2cb55ff1007so42364a91.0
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 17:36:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722902931; x=1723507731; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1722904602; x=1723509402; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lueg1q4xlgPhZs2h4MMpkKE7k8YaeEuFiyFdK1WNg6Q=;
-        b=vIP70mpkZgEW5iF21ILOLWTbCOz2+bX+Z1ePEeMfGbDa7y5GpxpQQuLnSdFt4x7Kri
-         +PjuLKlKJecXvsoRX+ZTLrex0D19AnVdJEe9zKZX0sO/RuB1tsivj3BExT2050xzRhOB
-         KTzsAp+e8Qs1PH2rPg16/YXBrtZNbEW2jwiddR737VuKiP6AcNp/MfSuF5c5vru5a6Yf
-         mFm//kx/U3xDk26fhTzCsj0GvSHR8R0OcvwXoDl2Z5sTAxtpAbpg0ggkVWdHiDE9F2l+
-         4bK69oA59Mr2ivCvWl8GO+kc1ujIL4JzmWT+96VBeCbQ5Px3IvueeX5ADPbOPLP9iq9h
-         Pkkg==
+        bh=4pplKHmr8EQUNWlMcxLWDiYQCbu1qDuf1WOvlJRSkiA=;
+        b=MMaCtAK8q57Ma7YRldYy3uVY3Fr9DqeSpUx3n7E2+vQJlD9m2yOQum+p2Fo6bU6ITd
+         H54CeLH+0uMzkH7yghHL/lC6jAr+Yln6N2WY0u79Ucx9IhJzzccLxvN7ztadbcAr8w9j
+         wsynwBuCQK/FwTB8M3GLK2oTwM/qzlLFEtR2I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722902931; x=1723507731;
+        d=1e100.net; s=20230601; t=1722904602; x=1723509402;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Lueg1q4xlgPhZs2h4MMpkKE7k8YaeEuFiyFdK1WNg6Q=;
-        b=pF3bZUiQPdjtheu9UeuVQaTNi/COqJfbfxcJGCFCMqHGyr7ZhS4oItCuHAJxRQBLSS
-         1RvRBwBhp0C68HtR8MU04tmEoZOtqInKbN72iy9Wm71RrnYrnfTDjeLv1NXXW1KJrlCj
-         j9MD72oT4PgHIfJpSCNptWmTNB9XJKSwaj9ob+Y29k57tr/Q9OmdwwOOAXnMXd+BCrYt
-         +3pg8ygPL/qLBR1rMs+m/CRBMat+Qixy+Ry3Eubhwxqs9G0AQnBkJZiICN19Tdni/DHc
-         kSoK9RFO2h3lRtPoE6nP3bDxt9rN4UgsY/6Nry4tH/Hubcpa9O57lR4qtNeiA6JDEB91
-         Iesg==
-X-Forwarded-Encrypted: i=1; AJvYcCUW89XPxh3cY8XGEM788CTZVWed0ZjQEFLtAUYGon2+b6GcxAFe3Biuw2H83QzCf58waZeTEn5dPLAizcH52cjdmq/1zqjs
-X-Gm-Message-State: AOJu0YzmmyOFeYjIQrICbrIsQ9KRLsHzwBFzLShordF8KH/tYPtBXDn5
-	Mdbtmmcasums7tlCalH8fFOBcecQ3qRXSTub/HmI9BqMgoZoWWMj5EQIov9I1DPDUO3z9f1uLhe
-	uUMKF2iCoH7vIsZODAHF00xPHnLVYtFpz+NO4
-X-Google-Smtp-Source: AGHT+IGQxS7iLcNY74cLYwfTXuwXC826pFXBavPYiL1sqN/UjItjZWqEcN1imyVVwlCQTsqPxsxi8dUscOpU3R2+cKc=
-X-Received: by 2002:a5d:5343:0:b0:368:4d4e:407c with SMTP id
- ffacd0b85a97d-36bbc118084mr11413694f8f.33.1722902930537; Mon, 05 Aug 2024
- 17:08:50 -0700 (PDT)
+        bh=4pplKHmr8EQUNWlMcxLWDiYQCbu1qDuf1WOvlJRSkiA=;
+        b=BzH+JmthkCzG41EVZhKH4GTLYsK9JkyfDay3pOKQOYVV3N3abLKdpA5cEN4qFk9ICY
+         eKV9DfvkHgbbFq1Mr6Wkw581PkO+umXu5S0+o1trknTELHo9lZdPqipuPEhi8nnTvPem
+         sQ+5CqbB8H5XcIwzMZx3br7b4bXAMT/Vn5848+C+eDZz5T0geGtIJqdjcZueQ5sSQlo+
+         pxS6G1w0f1ieHXZfJcn7wdmJZWV2ivpqRZLGD1+ZTIzQv78+AcXII4N4VUHPefLNoKb+
+         VBsk4j4PU1gDvqm764juYh3v3hJ6rI9Vz1vnKqmtrnAo7hyYMoAp1D0FdJWY5KuvGHZe
+         gxlQ==
+X-Gm-Message-State: AOJu0YwG5BJfdrsVwzqS6hPNB6R22cfwAjTumPnOqymGXuj6uACr8UjL
+	JATE1Kj/VfXwHNR2zt6W7lHpLfDi0Uaa4rHtIkXG8fSni5IR/ejUusnRknNNafLmaD7/IfL4JDO
+	yFMYj8zrEME5DZZYOQuj3P1IBPOvJW5P3HSro
+X-Google-Smtp-Source: AGHT+IHB9BEhSWGe9GLNuS6Dm7ZTZZe2UpxioIrIh4RcepSEQAn5YPOgfkAxaCARqqd+KnKQ1tppT5pDOwojFV3vL6o=
+X-Received: by 2002:a17:90b:3643:b0:2cf:ce3a:4fef with SMTP id
+ 98e67ed59e1d1-2cff9445836mr12346878a91.19.1722904601682; Mon, 05 Aug 2024
+ 17:36:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802012834.1051452-1-pkaligineedi@google.com>
- <20240802012834.1051452-2-pkaligineedi@google.com> <20240802161335.0e23e9ec@kernel.org>
-In-Reply-To: <20240802161335.0e23e9ec@kernel.org>
-From: Ziwei Xiao <ziweixiao@google.com>
-Date: Mon, 5 Aug 2024 17:08:39 -0700
-Message-ID: <CAG-FcCMSDjMi-EkRRF1MNhaLxr27PJhWnDpMzjaqxp-+3kq8yw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] gve: Add RSS device option
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, willemb@google.com, 
-	jeroendb@google.com, shailend@google.com, hramamurthy@google.com, 
-	jfraker@google.com
+References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
+ <20240802031822.1862030-3-jitendra.vegiraju@broadcom.com> <1e6e6eaa-3fd3-4820-bc1d-b1c722610e2f@lunn.ch>
+In-Reply-To: <1e6e6eaa-3fd3-4820-bc1d-b1c722610e2f@lunn.ch>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Mon, 5 Aug 2024 17:36:30 -0700
+Message-ID: <CAMdnO-J-G2mUw=RySEMSUj8QmY7CyFe=Si1-Ez9PAuF+knygWQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Integrate dwxgmac4 into
+ stmmac hwif handling
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 2, 2024 at 4:13=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+Hi Andrew,
+On Fri, Aug 2, 2024 at 3:59=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> On Thu,  1 Aug 2024 18:28:33 -0700 Praveen Kaligineedi wrote:
-> > @@ -45,7 +45,8 @@ void gve_parse_device_option(struct gve_priv *priv,
-> >                            struct gve_device_option_dqo_qpl **dev_op_dq=
-o_qpl,
-> >                            struct gve_device_option_buffer_sizes **dev_=
-op_buffer_sizes,
-> >                            struct gve_device_option_flow_steering **dev=
-_op_flow_steering,
-> > -                          struct gve_device_option_modify_ring **dev_o=
-p_modify_ring)
-> > +                          struct gve_device_option_modify_ring **dev_o=
-p_modify_ring,
-> > +                          struct gve_device_option_rss_config **dev_op=
-_rss_config)
-> >  {
-> >       u32 req_feat_mask =3D be32_to_cpu(option->required_features_mask)=
-;
-> >       u16 option_length =3D be16_to_cpu(option->option_length);
+> > +     user_ver =3D stmmac_get_user_version(priv, GMAC4_VERSION);
+> > +     if (priv->synopsys_id =3D=3D DWXGMAC_CORE_4_00 &&
+> > +         user_ver =3D=3D DWXGMAC_USER_VER_X22)
+> > +             mac->dma =3D &dwxgmac400_dma_ops;
 >
+> I know nothing about this hardware....
 >
-> > @@ -867,6 +887,8 @@ static void gve_enable_supported_features(struct gv=
-e_priv *priv,
-> >                                         *dev_op_buffer_sizes,
-> >                                         const struct gve_device_option_=
-flow_steering
-> >                                         *dev_op_flow_steering,
-> > +                                       const struct gve_device_option_=
-rss_config
-> > +                                       *dev_op_rss_config,
-> >                                         const struct gve_device_option_=
-modify_ring
-> >                                         *dev_op_modify_ring)
+> Does priv->synopsys_id =3D=3D DWXGMAC_CORE_4_0 not imply
+> dwxgmac400_dma_ops?
 >
-> Any reason these two functions order the arguments differently?
-Will update it in v2 so that the arguments order will be the same for
-those functions. Thanks!
+> Could a user synthesise DWXGMAC_CORE_4_00 without using
+> dwxgmac400_dma_ops? Could dwxgmac500_dma_ops or dwxgmac100_dma_ops be
+> used?
+Yes, the user can choose between Enhanced DMA , Hyper DMA , Normal DMA.
+This SoC support has chosen Hyper DMA for future expandability.
+
+>
+>         Andrew
 
