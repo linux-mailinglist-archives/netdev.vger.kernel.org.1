@@ -1,79 +1,85 @@
-Return-Path: <netdev+bounces-116207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFDB7949785
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:25:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E4B949790
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BDC7283DFA
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:25:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6B5A284025
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FBF96F2E6;
-	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14B07580A;
+	Tue,  6 Aug 2024 18:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HuLFwHdB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StgNTP1m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CCC28DD1;
-	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCD96F2E6
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 18:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722968732; cv=none; b=tWJAIBd6KfRRPa7h8BLnE5fdNyhrVf+ZAHFf/WPz3qn/McDeufXRV8ha59phXdP7PvyJ7g5wXOxdn8BuEErig5QmGxyUecFmFJ83Dd3rWu6iJeo89Kf1IXVQn+ncmr9dhEKOxk05jUm+c/m6gXe/9Ke0e55/qcYdDoWWQ3s7liQ=
+	t=1722968915; cv=none; b=TUuZz+YrbamRxEx3SsflbTokar0CsAS04YcVYP+RW/NP+QlYe3715UXc8jKbfDJ2Qtj1zSRSe4riDhO/MofDGHHrh43OHjF2z7yZy1HTvn+ZB0P5eNN2xIraZACDdcg9p66uSnE8xEfyBSYKmwit6iUf67r3b7TfSF0/WLoa0a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722968732; c=relaxed/simple;
-	bh=iU42ztsF59RemOZGmfY9bIY+jPcLw4R8DUsI3VzS39Y=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DHKIdFns1AkoLH2WReKpO24xbD7VswVj/lPOdPCLVDuWBb0hL0/iPRGuVrnTjnEj/dfgEHshDIIBAgSassUao77pXX2GH9fJcO1V/hDXc7RDFY5ISDRV32Z+qdRSCWfSfln3kBLeQlo31w3jLTw6eLPSF1ZiBWm4E2dyJ40iKUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HuLFwHdB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41DB8C32786;
-	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
+	s=arc-20240116; t=1722968915; c=relaxed/simple;
+	bh=f0WDRopsWj2uC2yh0QGpC1n22vlXbgyiCXLo+BUCAQk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e98nO+VHKhA5sPP1pZEVAM6S56dWrCVzcr+sV+C0HeK72cpD7yO+vL4STuAmYILoebYb+9XNRcW/uDE+w5ZKIt5ol3nDmvcSltUp5cZmiNXmg7/CR47BIEpUKB0G6JmjH53K1mYlz4Xu+zGEvhAjrO8aJG9SdL3IXNpVAAtv9Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StgNTP1m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0443C32786;
+	Tue,  6 Aug 2024 18:28:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722968732;
-	bh=iU42ztsF59RemOZGmfY9bIY+jPcLw4R8DUsI3VzS39Y=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=HuLFwHdBoQA2ubJAqanE2ACb+DrYwGWc/hkRREtpq/34TCH/0pHBbQ3FEVm/C7F7t
-	 qwtcgEPysgBxWIIQdnqRb0sancQfuhFz1Dvs/1yfTv7lfXCqzzKa+wW1Phj7JoyGpg
-	 lxizAKOfUUcFyl4U3BUWr5aDGPXlFwA/rl1KO48tPMbxCFdXMmWHPogVLSHqZ0jewg
-	 Lh5AozScJTZc2Pj48KLmNky4mH9zcsgedGLKzOFtCENarbR5vvBpQnSz0xoMu4tE5j
-	 WOEeIh8FlLjxXMU8qJJxknY1qO9DObu+KKDcEwaFzuEhQSK3jjMFF0sRWN+hUhHLFi
-	 gsCEEcVgW2WDQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D9F3822F99;
-	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: bugfix
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240806135722-mutt-send-email-mst@kernel.org>
-References: <20240806135722-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240806135722-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 0823dc64586ba5ea13a7d200a5d33e4c5fa45950
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d4560686726f7a357922f300fc81f5964be8df04
-Message-Id: <172296873074.1388134.15266811486107132547.pr-tracker-bot@kernel.org>
-Date: Tue, 06 Aug 2024 18:25:30 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dtatulea@nvidia.com, jasowang@redhat.com, mst@redhat.com, stable@vger.kernel.org
+	s=k20201202; t=1722968915;
+	bh=f0WDRopsWj2uC2yh0QGpC1n22vlXbgyiCXLo+BUCAQk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=StgNTP1mQBl5UATdMsEhNUX3DPfcYmMMtD4iU/KbyXSyRQ6ChYScdsyV6woaaxoPX
+	 t/eLX7xF0FEDkpEHkT4krfFTM0QUSP20hqd3wZt8A9nJW42nB8PTVWjPHAj/raGivL
+	 +tXtI6RzfcNyglIkinLDzmxgzA313tX+XmUrj3MCZUyBNlPKGjVjZSZSB8ML0Po2a+
+	 QqOE88lXsgDdibdMpgeNlGB2B0o2s84OYaXg1229YepAkxlVJWtxMET6nvMhLv+LkU
+	 mQR03cj4bJe3HtXuKuCu+El78vwkFcQhoBY8qKOisiX515LWCk6ZLoiBp9GJWO8WYH
+	 JY212War4n5wg==
+Date: Tue, 6 Aug 2024 11:28:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, dxu@dxuuu.xyz, przemyslaw.kitszel@intel.com,
+ donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
+ willemdebruijn.kernel@gmail.com, jdamato@fastly.com
+Subject: Re: [PATCH net-next v2 12/12] selftests: drv-net: rss_ctx: test
+ dumping RSS contexts
+Message-ID: <20240806112833.6a9d7826@kernel.org>
+In-Reply-To: <915e5b8f-24c6-025e-97a3-3cd10a5018e1@gmail.com>
+References: <20240803042624.970352-1-kuba@kernel.org>
+	<20240803042624.970352-13-kuba@kernel.org>
+	<915e5b8f-24c6-025e-97a3-3cd10a5018e1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Tue, 6 Aug 2024 13:57:22 -0400:
+On Tue, 6 Aug 2024 17:48:27 +0100 Edward Cree wrote:
+> > +    expect_tuples = set([(cfg.ifname, -1)] + [(cfg.ifname, ctx_id) for ctx_id in ids])
+> > +
+> > +    # Dump all
+> > +    ctxs = cfg.ethnl.rss_get({}, dump=True)
+> > +    ctx_tuples = set([(c['header']['dev-name'], c.get('context', -1)) for c in ctxs])  
+> 
+> Won't this return all ctxes on all netdevs in the system?
+> 
+> > +    ksft_eq(expect_tuples, ctx_tuples)  
+> 
+> Whereas expect_tuples only contains cfg.ifname, so this
+>  assertion will fail if you have more than one RSS-
+>  supporting netdev.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d4560686726f7a357922f300fc81f5964be8df04
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+And RSS contexts are actively used on another interface, yes.
+Will fix. More importantly we should check that there are no
+duplicates.
 
