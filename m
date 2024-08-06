@@ -1,119 +1,118 @@
-Return-Path: <netdev+bounces-116198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F28594972B
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:57:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747A894972F
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246981F22A98
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:57:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F02A282E0F
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C407347C;
-	Tue,  6 Aug 2024 17:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1FD78C9D;
+	Tue,  6 Aug 2024 17:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QF44wfjL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cq2YwrtQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (saphodev.broadcom.com [192.19.144.205])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B09D381C4;
-	Tue,  6 Aug 2024 17:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2447441A
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 17:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722967032; cv=none; b=QV4EiGJX/hokHBliVUmMn72rBo32U7+1/+aCj50iIJTFROdTOT9f14VxIHP2NpLx0XB2XCDo+FZEbt+S65Fhfdr2ZrzmBVVEsafrkoTPjmxJwlduWBWNloO5fhzmia7e8rroUNEbAl1jqlmoG6psRBfgYPBMoXZeIA0VqwUoGEc=
+	t=1722967055; cv=none; b=OK6Dt0Iar6GENE2FXXcmZcqne8lrnwyXi5jrY+Q1O4ZslQXbn8Qg3SThQ2QQSRp8E9ToOQqDqcWuAFfrgR3qVvwsSdtSTFtrtnYkWJPlGEhTIyCSalMCl6gPQC+MSwkoyJkBTTSPNzi6uLiLRkIbmWG7zcPopa7WU+SrtHshOqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722967032; c=relaxed/simple;
-	bh=lB7A8e4Ovq/7ddI2/3L5U//TjfEpAgLmMbHp5KMmNzY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ESInWpbiYN9/lpssD/b1VpiKetEcGaV9MTMjY8PQh5fSbCowiSj0YqoQ/i30QT0C50hwkrpPfdrHPpfyhy2KSkXXvRrT7/2jOOh8HJi4a69WL55iMrU6UPHgBxo3hApia5JSb33B8603AI+cbCo2vDoJEJ1/U4MDo3LgXWBECW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QF44wfjL; arc=none smtp.client-ip=192.19.144.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 919AFC0000D8;
-	Tue,  6 Aug 2024 10:57:03 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 919AFC0000D8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1722967023;
-	bh=lB7A8e4Ovq/7ddI2/3L5U//TjfEpAgLmMbHp5KMmNzY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QF44wfjLGrt1lZTxZVTcbR2IlJ1KQSjad2Z2Auz7QE+pjofsSNwC6+zR8bdcHtrS4
-	 k2v5x4Dm7Oqcq0vH3PaJHpr/FWX+eKmZf4l9vEHFGKOg4NuGd+4Sjq3SRiKuNWAoQ4
-	 F9rYQC/htNBuG1pE3JSFoHDfhGLgKs/voECi3SXY=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id E5F2018041CAC4;
-	Tue,  6 Aug 2024 10:57:00 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net v2] net: bcmgenet: Properly overlay PHY and MAC Wake-on-LAN capabilities
-Date: Tue,  6 Aug 2024 10:56:59 -0700
-Message-Id: <20240806175659.3232204-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1722967055; c=relaxed/simple;
+	bh=Y3kpDopP34wSS4aefVZmlrz8cQFzCX6exogFHU3d/Qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=p2f7Iuvs5IIcyfZGKCC/oipOWS6hd0nauz1X3kpb7eUMUPQmw/ozS0RDL4D1Y0W9Grhm3sYgN5kzKI8V3QP8WnvV807mTPb0DMAjGzZt12A7NbZS4JIQuV4SfdyGnnEWhV3tONXqvNbok7LzEgMINMtLGbzzWQhQmcphmNdJjrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cq2YwrtQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722967052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=PCE6y3gd/ZLdIqr+zXDfXpXA+sJAwSBPUwATht6B/14=;
+	b=cq2YwrtQUSQuJy88eUgMerq+vAf1L694K8+XCQ1wrdkY7a9Td2kVc4n7HjOqk4FKIsKIkI
+	F4mJwnNM41nhJH4XnjdoHnYZ8AemtrWJgAa+2aI6u29u/+oHIwVQjqxqg4j+cExDcdQ8pr
+	7M8GGPKmGPCpQi7ttfaTvoC106Xm7Ro=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-149-gkJU0zfuPGSxvVgCgW1U8g-1; Tue, 06 Aug 2024 13:57:29 -0400
+X-MC-Unique: gkJU0zfuPGSxvVgCgW1U8g-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5bb35b28f82so681919a12.2
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 10:57:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722967048; x=1723571848;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PCE6y3gd/ZLdIqr+zXDfXpXA+sJAwSBPUwATht6B/14=;
+        b=odU0faSdnAVOy8Mbr8zagpVST+z4l3LxqA8S8gk4BDF/uDO0+K7ltbX3S5glGpv4Ye
+         C5D5efuCdcLD0Y+n74jjI96tVBdsMe4vp8/awJURCzp2O8VXq/Ay0o1UL9q2d/2GxDtR
+         wn3mXT3Hd4k0jLmYhN5DMkUYk3qNx/42/NGJAkj86vy5FUMAFChiWTY/WwbRfjVfcaY9
+         Fqwwfyo6dPZWq851u/NgrM7HsAwJIPkkYDKUrEXhuod/gizLmKwqzwf/06ZZEn21vZob
+         GdnO9EfO3jjPUXXZFcDKnj/HX5T05eLpW2eEiInIiENapwNBbHs4t1KIq/udoaXo9fr8
+         8v5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVCuXPse2Vjzgmih3m7plCqAsGWzBrtVE17Y7IyPLucNE1tvnS9a0YZ0+nttpUOKkkQgWSCsrUHLKMMlGd+wvdAK3jijGYr
+X-Gm-Message-State: AOJu0YwXrnKTGSCIwvdZgpXBYKlXGVJQuwLrT7v/pV2oN6eMDHJitx5F
+	kDDaOM2KX5jtmK9iP41R7a2oljNLS+EyR+mI67gvtdNOqRNgo96Z5BwS0pI/9ZA28Vhu0XmORnl
+	w+C9YRlAIrumTbshMAPwuNgBGHzh1QuJV5flbuB/sCcfHnfmcbnO1MQ==
+X-Received: by 2002:aa7:dcd9:0:b0:5a1:40d9:6a46 with SMTP id 4fb4d7f45d1cf-5b7f5dc5d68mr10453926a12.36.1722967048117;
+        Tue, 06 Aug 2024 10:57:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF9wiBpXfkiQpEvZZyARq7/ap2Ik8pTsT+kT/0l0ZHqK+AvR7K5fHmkyUYpLFX0WwVH0aYZHw==
+X-Received: by 2002:aa7:dcd9:0:b0:5a1:40d9:6a46 with SMTP id 4fb4d7f45d1cf-5b7f5dc5d68mr10453907a12.36.1722967047202;
+        Tue, 06 Aug 2024 10:57:27 -0700 (PDT)
+Received: from redhat.com ([2.55.35.170])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ba442ed7f1sm4421307a12.81.2024.08.06.10.57.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 10:57:26 -0700 (PDT)
+Date: Tue, 6 Aug 2024 13:57:22 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dtatulea@nvidia.com, jasowang@redhat.com, mst@redhat.com,
+	stable@vger.kernel.org
+Subject: [GIT PULL] virtio: bugfix
+Message-ID: <20240806135722-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 
-Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
-while others might be only supported by the PHY. Make sure that the .get_wol()
-returns the union of both rather than only that of the PHY if the PHY supports
-Wake-on-LAN.
+The following changes since commit 6d834691da474ed1c648753d3d3a3ef8379fa1c1:
 
-Fixes: 7e400ff35cbe ("net: bcmgenet: Add support for PHY-based Wake-on-LAN")
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
-Changes in v2:
+  virtio_pci_modern: remove admin queue serialization lock (2024-07-17 05:43:21 -0400)
 
-- corrected email address
+are available in the Git repository at:
 
- drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-index 1248792d7fd4..0715ea5bf13e 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-@@ -42,19 +42,15 @@ void bcmgenet_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	struct device *kdev = &priv->pdev->dev;
- 
--	if (dev->phydev) {
-+	if (dev->phydev)
- 		phy_ethtool_get_wol(dev->phydev, wol);
--		if (wol->supported)
--			return;
--	}
- 
--	if (!device_can_wakeup(kdev)) {
--		wol->supported = 0;
--		wol->wolopts = 0;
-+	/* MAC is not wake-up capable, return what the PHY does */
-+	if (!device_can_wakeup(kdev))
- 		return;
--	}
- 
--	wol->supported = WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
-+	/* Overlay MAC capabilities with that of the PHY queried before */
-+	wol->supported |= WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
- 	wol->wolopts = priv->wolopts;
- 	memset(wol->sopass, 0, sizeof(wol->sopass));
- 
--- 
-2.34.1
+for you to fetch changes up to 0823dc64586ba5ea13a7d200a5d33e4c5fa45950:
+
+  vhost-vdpa: switch to use vmf_insert_pfn() in the fault handler (2024-07-26 03:26:02 -0400)
+
+----------------------------------------------------------------
+virtio: bugfix
+
+Fixes a single, long-standing issue with kick pass-through vdpa.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Jason Wang (1):
+      vhost-vdpa: switch to use vmf_insert_pfn() in the fault handler
+
+ drivers/vhost/vdpa.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
 
