@@ -1,241 +1,422 @@
-Return-Path: <netdev+bounces-116190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32449496B8
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:28:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D12979496F2
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8921A288B2B
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:28:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 551211F24487
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C446BFB0;
-	Tue,  6 Aug 2024 17:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B23B381C4;
+	Tue,  6 Aug 2024 17:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FAXvUE0K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+YdayeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E98F5339D;
-	Tue,  6 Aug 2024 17:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E469770F3;
+	Tue,  6 Aug 2024 17:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722965320; cv=none; b=gHLTCYKB0RwoHLVQqOv2vooqfwrqbZF2n1E64HmNJh8AgHEKSRnw+4Za25TxYR5gGk7Qrv9oDgdbN7ZqjwJhUWGLrDtqJxCKSW7hxxeyP4s0dGgDiHAznRRTCflV9ughUc1QiizD3HJMHvvfe9k179eY+qTuXnHqlK6ElP4xLeA=
+	t=1722965651; cv=none; b=aROc2Cj6QTlcF9UnfjiK8kqHqwPrgMm51sklqujvnua8ZYCZvMWMdBgtcD/wSNDIYhuugi1SgxHhcFB+Zyeg8GY/aZ+t3ZChwXSg2+u6XnGRrvYhHOtWncRh5lbYvfgk/vLEZZ6JF8udGdZmesUwdOTnyBWhdA1oHC3RbQ45zmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722965320; c=relaxed/simple;
-	bh=Qi5WxmMVqmR0matvwiMljokUy+VSTuQ68dFhDYopPqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=T01016j0dgpAEoRn+WCPGEvcPtTnuAFP4m0fZ8oNhJMMIV8I+NYT9AKfoU2RTaku6YGfcH/aVRDiVgz3DQL6VXlO12CWqqAGl0zsk3BtReSAZd6CAhhtDTgTWmVT8boJhScLjQ+NPos4OcehdzegcSSqbkRl9u/YfWqKGre9RcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FAXvUE0K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A25ADC32786;
-	Tue,  6 Aug 2024 17:28:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722965320;
-	bh=Qi5WxmMVqmR0matvwiMljokUy+VSTuQ68dFhDYopPqQ=;
-	h=Date:From:To:Cc:Subject:From;
-	b=FAXvUE0KIKhlW+bPfH7nEjVfB9pnfTRAVLFxq3YBnRaBNeyQInhLUDkVNQ1Yne4fy
-	 1rji3IM/XkY/aW1PHguSfjzwzQu98iEfNi5pJJ3IUWyIkZ2yNjX/LoJRXFU5dO5thy
-	 QDjrU5CIX1ZsXeIt25qlgPx4T8POowARlFSSu32UltQi9hmb751L6+Dnoz1HzEqmAm
-	 dUZ7DRZuCUXA7cCWOngjT52mIrgqZxCQWprWnfRYF5/GqtCVIGmtwAcYK/b3UKXLSz
-	 pQp9ukAAaey9TMGScKUWq38FHIr/ODo+01aCy7rH6Q8pEXYnzbVNa3tBkdjai/iDOo
-	 Hd3b4NCiL9SPA==
-Date: Tue, 6 Aug 2024 19:28:34 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: akpm@linux-foundation.org, alexei.starovoitov@gmail.com, 
-	audit@vger.kernel.org, bpf@vger.kernel.org, catalin.marinas@arm.com, 
-	dri-devel@lists.freedesktop.org, ebiederm@xmission.com, laoar.shao@gmail.com, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp, 
-	rostedt@goodmis.org, selinux@vger.kernel.org, serge@hallyn.com
-Subject: Re: [PATCH v5 0/9] Improve the copy of task comm
-Message-ID: <2jxak5v6dfxlpbxhpm3ey7oup4g2lnr3ueurfbosf5wdo65dk4@srb3hsk72zwq>
+	s=arc-20240116; t=1722965651; c=relaxed/simple;
+	bh=YYt3i1QwaVLEEfc9XdjMd+mLpl+pnz3P4xY+TvknjRI=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0+ODSylsRjX4kbva8We3PK8JYZG34wB6jSQlCZRh0VMqsIL31LwZUFRnke///iVKwipYlihsP8nq7hVB2YZ92jP9YLEAUi8lgbP8xFUByD4pDThCihf/pHtRfruNfiYYZcPL0zdxz3rXXVQh5ubMciwOF75pCExYMx4fhMjqls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+YdayeX; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-651da7c1531so7117077b3.0;
+        Tue, 06 Aug 2024 10:34:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722965648; x=1723570448; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=x/dijiz0EH92ZFCcCib2UX6qOQ2ginxd/v4yrYrYTM4=;
+        b=T+YdayeXn5jzQPqYHL4s86lSPdXZOcHa2wThfPi6ixKXiCOy6NkfCywoI2nnw/E8YZ
+         ouSJ5hDVSM2jjBrcnHnyghoJZFhXs77F4kGCVsxd0OJl3YXrQ4eCu0B00mKyhGC2BJ1b
+         0+4MhfCltwfjILI6xA05C454Xdl4ofcVXbav8bmHUe3spEpdU+kar0YZGVcMRflfKIZ0
+         GGFdD+LUlc48gE8B4eyRrsCm0R71/aWwHRZ8en2yCtXHalTSCjF9of2uaxY0WmxSY2aO
+         O2mf9uQRpqXEYCO261hj6A0T+rLHVSFLDP5nbG2SzviYanpsX5bPQi86FYWFmKp6Ny+P
+         lNtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722965648; x=1723570448;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x/dijiz0EH92ZFCcCib2UX6qOQ2ginxd/v4yrYrYTM4=;
+        b=Ol0Mvmn46HBmyQ10yWjX8LpSnzmjGYDOYwjIKDGcjmejZEtdKfzwKeyIq+b63noCkQ
+         +5Zbvrz1Eh2I1ORJ6LsTvppTglUnKCOroBSlHU6w3umeCOws7Kgc1/OUwVG/Pw1PubQk
+         WWhoirRaaGcGqybxQPSx8MS5FJd+D6uMgZmRwbSuHOQSx5BHqw7uGhzRjkRcZroYjlGZ
+         FmYUVgMtk1jG+/qVnIBMjdw5KDrazjMvtIGFrxH/sWirEetvUtc6+Obc/rlZYxNpfi6l
+         vm7KhyXuKcvUssjtQSWZ0Xy1jO/vjcGv4y/D3IZ18ei9f9fHDy6u/hFJCeyl+2rXGo46
+         bWUA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7G1RlXRL1c3FMwXrOFln7zsKF4IHEjitlHSL/a6J0Tw7DcXhtGaFKO3aUE3+yZnRdeW8x4NfpdLDLrbJzNMOKZyUN3W+s
+X-Gm-Message-State: AOJu0YwoWtJGrtsIfbsz7jqTT4725itXVNyS2Ou+5FXxewz1a4x5qo1h
+	NYGci/HSosnqzlPXLpD3B65V5DqoYYfumE99c2bMV2os1XW7emaJZr+IRA==
+X-Google-Smtp-Source: AGHT+IHWLSaNIVrQIOJDYWP+LhgakR9Vk3J9gR3irIr/Ht1U3T4MeVRvDSTpH3gz5YgFxF3cA40ZjQ==
+X-Received: by 2002:a0d:e087:0:b0:647:88ba:f91b with SMTP id 00721157ae682-68960777bcemr162128477b3.11.1722965647999;
+        Tue, 06 Aug 2024 10:34:07 -0700 (PDT)
+Received: from fan ([50.205.20.42])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-68a10659fdasm15936567b3.63.2024.08.06.10.34.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 10:34:07 -0700 (PDT)
+From: Fan Ni <nifan.cxl@gmail.com>
+X-Google-Original-From: Fan Ni <fan.ni@samsung.com>
+Date: Tue, 6 Aug 2024 10:33:38 -0700
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, martin.habets@xilinx.com,
+	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, richard.hughes@amd.com,
+	Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v2 10/15] cxl: define a driver interface for DPA
+ allocation
+Message-ID: <ZrJecn2KNn_5_Xef@fan>
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-11-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="d4izvc7wnp2wjet3"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240715172835.24757-11-alejandro.lucero-palau@amd.com>
 
+On Mon, Jul 15, 2024 at 06:28:30PM +0100, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Region creation involves finding available DPA (device-physical-address)
+> capacity to map into HPA (host-physical-address) space. Given the HPA
+> capacity constraint, define an API, cxl_request_dpa(), that has the
+> flexibility to  map the minimum amount of memory the driver needs to
+> operate vs the total possible that can be mapped given HPA availability.
+> 
+> Factor out the core of cxl_dpa_alloc, that does free space scanning,
+> into a cxl_dpa_freespace() helper, and use that to balance the capacity
+> available to map vs the @min and @max arguments to cxl_request_dpa.
+> 
+> Based on https://lore.kernel.org/linux-cxl/168592149709.1948938.8663425987110396027.stgit@dwillia2-xfh.jf.intel.com/T/#m4271ee49a91615c8af54e3ab20679f8be3099393
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+> ---
+>  drivers/cxl/core/core.h            |   1 +
+>  drivers/cxl/core/hdm.c             | 153 +++++++++++++++++++++++++----
+>  drivers/net/ethernet/sfc/efx.c     |   2 +
+>  drivers/net/ethernet/sfc/efx_cxl.c |  18 +++-
+>  drivers/net/ethernet/sfc/efx_cxl.h |   1 +
+>  include/linux/cxl_accel_mem.h      |   7 ++
+>  6 files changed, 161 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/core.h b/drivers/cxl/core/core.h
+> index 625394486459..a243ff12c0f4 100644
+> --- a/drivers/cxl/core/core.h
+> +++ b/drivers/cxl/core/core.h
+> @@ -76,6 +76,7 @@ int cxl_dpa_set_mode(struct cxl_endpoint_decoder *cxled,
+>  		     enum cxl_decoder_mode mode);
+>  int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, unsigned long long size);
+>  int cxl_dpa_free(struct cxl_endpoint_decoder *cxled);
+> +int cxl_dpa_free(struct cxl_endpoint_decoder *cxled);
 
---d4izvc7wnp2wjet3
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: akpm@linux-foundation.org, alexei.starovoitov@gmail.com, 
-	audit@vger.kernel.org, bpf@vger.kernel.org, catalin.marinas@arm.com, 
-	dri-devel@lists.freedesktop.org, ebiederm@xmission.com, laoar.shao@gmail.com, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-security-module@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, penguin-kernel@i-love.sakura.ne.jp, 
-	rostedt@goodmis.org, selinux@vger.kernel.org, serge@hallyn.com
-Subject: Re: [PATCH v5 0/9] Improve the copy of task comm
-MIME-Version: 1.0
+Function declared twice here.
 
-Hi Linus,
-
-Serge let me know about this thread earlier today.
-
-On 2024-08-05, Linus Torvalds <torvalds@linux-foundation.org> wrote:
-> On Mon, 5 Aug 2024 at 20:01, Yafang Shao <laoar.shao@gmail.com> wrote:
-> >
-> > One concern about removing the BUILD_BUG_ON() is that if we extend
-> > TASK_COMM_LEN to a larger size, such as 24, the caller with a
-> > hardcoded 16-byte buffer may overflow.
->=20
-> No, not at all. Because get_task_comm() - and the replacements - would
-> never use TASK_COMM_LEN.
->=20
-> They'd use the size of the *destination*. That's what the code already do=
-es:
->=20
->   #define get_task_comm(buf, tsk) ({                      \
->   ...
->         __get_task_comm(buf, sizeof(buf), tsk);         \
->=20
-> note how it uses "sizeof(buf)".
-
-In shadow.git, we also implemented macros that are named after functions
-and calculate the appropriate number of elements internally.
-
-	$ grepc -h STRNCAT .
-	#define STRNCAT(dst, src)  strncat(dst, src, NITEMS(src))
-	$ grepc -h STRNCPY .
-	#define STRNCPY(dst, src)  strncpy(dst, src, NITEMS(dst))
-	$ grepc -h STRTCPY .
-	#define STRTCPY(dst, src)  strtcpy(dst, src, NITEMS(dst))
-	$ grepc -h STRFTIME .
-	#define STRFTIME(dst, fmt, tm)  strftime(dst, NITEMS(dst), fmt, tm)
-	$ grepc -h DAY_TO_STR .
-	#define DAY_TO_STR(str, day, iso)   day_to_str(NITEMS(str), str, day, iso)
-
-They're quite useful, and when implementing them we found and fixed
-several bugs thanks to them.
-
-> Now, it might be a good idea to also verify that 'buf' is an actual
-> array, and that this code doesn't do some silly "sizeof(ptr)" thing.
-
-I decided to use NITEMS() instead of sizeof() for that reason.
-(NITEMS() is just our name for ARRAY_SIZE().)
-
-	$ grepc -h NITEMS .
-	#define NITEMS(a)            (SIZEOF_ARRAY((a)) / sizeof((a)[0]))
-
-> We do have a helper for that, so we could do something like
->=20
->    #define get_task_comm(buf, tsk) \
->         strscpy_pad(buf, __must_be_array(buf)+sizeof(buf), (tsk)->comm)
-
-We have SIZEOF_ARRAY() for when you want the size of an array:
-
-	$ grepc -h SIZEOF_ARRAY .
-	#define SIZEOF_ARRAY(a)      (sizeof(a) + must_be_array(a))
-
-However, I don't think you want sizeof().  Let me explain why:
-
--  Let's say you want to call wcsncpy(3) (I know nobody should be using
-   that function, not strncpy(3), but I'm using it as a standard example
-   of a wide-character string function).
-
-   You should call wcsncpy(dst, src, NITEMS(dst)).
-   A call wcsncpy(dst, src, sizeof(dst)) is bogus, since the argument is
-   the number of wide characters, not the number of bytes.
-
-   When translating that to normal characters, you want conceptually the
-   same operation, but on (normal) characters.  That is, you want
-   strncpy(dst, src, NITEMS(dst)).  While strncpy(3) with sizeof() works
-   just fine because sizeof(char)=3D=3D1 by definition, it is conceptually
-   wrong to use it.
-
-   By using NITEMS() (i.e., ARRAY_SIZE()), you get the __must_be_array()
-   check for free.
-
-In the end, SIZEOF_ARRAY() is something we very rarely use.  It's there
-only used in the following two cases at the moment:
-
-	#define NITEMS(a)            (SIZEOF_ARRAY((a)) / sizeof((a)[0]))
-	#define MEMZERO(arr)  memzero(arr, SIZEOF_ARRAY(arr))
-
-Does that sound convincing?
-
-For memcpy(3) for example, you do want sizeof(), because you're copying
-raw bytes, but with strings, in which characters are conceptually
-meaningful elements, NITEMS() makes more sense.
-
-BTW, I'm working on a __lengthof__ operator that will soon allow using
-it on function parameters declared with array notation.  That is,
-
-	size_t
-	f(size_t n, int a[n])
-	{
-		return __lengthof__(a);  // This will return n.
-	}
-
-If you're interested in it, I'm developing and discussing it here:
-<https://inbox.sourceware.org/gcc-patches/20240806122218.3827577-1-alx@kern=
-el.org/>
-
->=20
-> as a helper macro for this all.
->=20
-> (Although I'm not convinced we generally want the "_pad()" version,
-> but whatever).
-
-We had problems with it in shadow recently.  In user-space, it's similar
-to strncpy(3) (at least if you wrap it in a macro that makes sure that
-it terminates the string with a null byte).
-
-We had a lot of uses of strncpy(3), from old times where that was used
-to copy strings with truncation.  I audited all of that code (and
-haven't really finished yet), and translated to calls similar to
-strscpy(9) (we call it strtcpy(), as it _t_runcates).  The problem was
-that in some cases the padding was necessary, and in others it was not,
-and it was very hard to distinguish those.
-
-I recommend not zeroing strings unnecessarily, since that will make it
-hard to review the code later.  E.g., twenty years from now, someone
-takes a piece of code with a _pad() call, and has no clue if the zeroing
-was for a reason, or for no reason.
-
-On the other hand, not zeroing may make it easier to explot bugs, so
-whatever you think best.  In the kernel you may need to be more worried
-than in user space.  Whatever.  :)
-
->=20
->                     Linus
-
-Have a lovely day!
-Alex
-
-
---=20
-<https://www.alejandro-colomar.es/>
-
---d4izvc7wnp2wjet3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmayXTwACgkQnowa+77/
-2zKkGg//QGKZL+2Xhpb6wdoKoQMt5Ixm8AxcrhEng31CT2FlaXxnveqkjC9CXsUS
-hvuVRQFMFyhrARydHNtx/Ps5q5f/TSv4qX+5PI6hBFPAIJOuHCh2UfXqPEMrCXb5
-iAhq73HPqXL20Igr1+n9W9buunf2ow4fBxTsK+7eMZCPnTAuS3lMkRpmne8d7ks1
-iOHorYSEbJYJqWUyOCq7i/KNufR7nALJzBHzqPcAE47Gsp0/N0DA/NEzO6zbCRS4
-HLODuEC8T6iWnEh+qoBTS0Gn1ksmVNCQPVyLj4OurtSYeX0pGL6NQWxKjMgxCaQ9
-r0rN2v+o8ULJIOBI1ZVKAqlXZdPxtPpwPxyim82IB5Mok0bkqGSZQYMqEL27YkK0
-k/Ec5R/AkO8Zhc/i3YFzTwa8peXA9s4D2xFCB/hYTdTNL138ugVV1fevoPo6qt9t
-eqA/fKesf5pK9OXftXBdqHNqsDGe6Ps76ahK9FsQNj0ZEi1JLTmWoEGRQMHQ6iZ+
-yXlgOkn3625L2Q0Qofv3x943QicRe8eahFyW/YV7a+8B+n7PP9RQEo95DTv1QjGU
-wCP6XYatwx1uKgauYWE2if5RiXyhsUBbCjEAUrXTmLBAxk/5zJ+vSpDl3j3fr4D0
-hm5Pe6kB02HnX7NQKrnlgmPJi7PhBVGSRSDc+Lj4r4q7e3BYDuY=
-=TwdF
------END PGP SIGNATURE-----
-
---d4izvc7wnp2wjet3--
+Fan
+>  resource_size_t cxl_dpa_size(struct cxl_endpoint_decoder *cxled);
+>  resource_size_t cxl_dpa_resource_start(struct cxl_endpoint_decoder *cxled);
+>  
+> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
+> index 4af9225d4b59..3e53ae222d40 100644
+> --- a/drivers/cxl/core/hdm.c
+> +++ b/drivers/cxl/core/hdm.c
+> @@ -3,6 +3,7 @@
+>  #include <linux/seq_file.h>
+>  #include <linux/device.h>
+>  #include <linux/delay.h>
+> +#include <linux/cxl_accel_mem.h>
+>  
+>  #include "cxlmem.h"
+>  #include "core.h"
+> @@ -420,6 +421,7 @@ int cxl_dpa_free(struct cxl_endpoint_decoder *cxled)
+>  	up_write(&cxl_dpa_rwsem);
+>  	return rc;
+>  }
+> +EXPORT_SYMBOL_NS_GPL(cxl_dpa_free, CXL);
+>  
+>  int cxl_dpa_set_mode(struct cxl_endpoint_decoder *cxled,
+>  		     enum cxl_decoder_mode mode)
+> @@ -467,30 +469,17 @@ int cxl_dpa_set_mode(struct cxl_endpoint_decoder *cxled,
+>  	return rc;
+>  }
+>  
+> -int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, unsigned long long size)
+> +static resource_size_t cxl_dpa_freespace(struct cxl_endpoint_decoder *cxled,
+> +					 resource_size_t *start_out,
+> +					 resource_size_t *skip_out)
+>  {
+>  	struct cxl_memdev *cxlmd = cxled_to_memdev(cxled);
+>  	resource_size_t free_ram_start, free_pmem_start;
+> -	struct cxl_port *port = cxled_to_port(cxled);
+>  	struct cxl_dev_state *cxlds = cxlmd->cxlds;
+> -	struct device *dev = &cxled->cxld.dev;
+>  	resource_size_t start, avail, skip;
+>  	struct resource *p, *last;
+> -	int rc;
+> -
+> -	down_write(&cxl_dpa_rwsem);
+> -	if (cxled->cxld.region) {
+> -		dev_dbg(dev, "decoder attached to %s\n",
+> -			dev_name(&cxled->cxld.region->dev));
+> -		rc = -EBUSY;
+> -		goto out;
+> -	}
+>  
+> -	if (cxled->cxld.flags & CXL_DECODER_F_ENABLE) {
+> -		dev_dbg(dev, "decoder enabled\n");
+> -		rc = -EBUSY;
+> -		goto out;
+> -	}
+> +	lockdep_assert_held(&cxl_dpa_rwsem);
+>  
+>  	for (p = cxlds->ram_res.child, last = NULL; p; p = p->sibling)
+>  		last = p;
+> @@ -528,14 +517,45 @@ int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, unsigned long long size)
+>  			skip_end = start - 1;
+>  		skip = skip_end - skip_start + 1;
+>  	} else {
+> -		dev_dbg(dev, "mode not set\n");
+> -		rc = -EINVAL;
+> +		avail = 0;
+> +	}
+> +
+> +	if (!avail)
+> +		return 0;
+> +	if (start_out)
+> +		*start_out = start;
+> +	if (skip_out)
+> +		*skip_out = skip;
+> +	return avail;
+> +}
+> +
+> +int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, unsigned long long size)
+> +{
+> +	struct cxl_port *port = cxled_to_port(cxled);
+> +	struct device *dev = &cxled->cxld.dev;
+> +	resource_size_t start, avail, skip;
+> +	int rc;
+> +
+> +	down_write(&cxl_dpa_rwsem);
+> +	if (cxled->cxld.region) {
+> +		dev_dbg(dev, "EBUSY, decoder attached to %s\n",
+> +			     dev_name(&cxled->cxld.region->dev));
+> +		rc = -EBUSY;
+>  		goto out;
+>  	}
+>  
+> +	if (cxled->cxld.flags & CXL_DECODER_F_ENABLE) {
+> +		dev_dbg(dev, "EBUSY, decoder enabled\n");
+> +		rc = -EBUSY;
+> +		goto out;
+> +	}
+> +
+> +	avail = cxl_dpa_freespace(cxled, &start, &skip);
+> +
+>  	if (size > avail) {
+>  		dev_dbg(dev, "%pa exceeds available %s capacity: %pa\n", &size,
+> -			cxl_decoder_mode_name(cxled->mode), &avail);
+> +			     cxled->mode == CXL_DECODER_RAM ? "ram" : "pmem",
+> +			     &avail);
+>  		rc = -ENOSPC;
+>  		goto out;
+>  	}
+> @@ -550,6 +570,99 @@ int cxl_dpa_alloc(struct cxl_endpoint_decoder *cxled, unsigned long long size)
+>  	return devm_add_action_or_reset(&port->dev, cxl_dpa_release, cxled);
+>  }
+>  
+> +static int find_free_decoder(struct device *dev, void *data)
+> +{
+> +	struct cxl_endpoint_decoder *cxled;
+> +	struct cxl_port *port;
+> +
+> +	if (!is_endpoint_decoder(dev))
+> +		return 0;
+> +
+> +	cxled = to_cxl_endpoint_decoder(dev);
+> +	port = cxled_to_port(cxled);
+> +
+> +	if (cxled->cxld.id != port->hdm_end + 1) {
+> +		return 0;
+> +	}
+> +	return 1;
+> +}
+> +
+> +/**
+> + * cxl_request_dpa - search and reserve DPA given input constraints
+> + * @endpoint: an endpoint port with available decoders
+> + * @mode: DPA operation mode (ram vs pmem)
+> + * @min: the minimum amount of capacity the call needs
+> + * @max: extra capacity to allocate after min is satisfied
+> + *
+> + * Given that a region needs to allocate from limited HPA capacity it
+> + * may be the case that a device has more mappable DPA capacity than
+> + * available HPA. So, the expectation is that @min is a driver known
+> + * value for how much capacity is needed, and @max is based the limit of
+> + * how much HPA space is available for a new region.
+> + *
+> + * Returns a pinned cxl_decoder with at least @min bytes of capacity
+> + * reserved, or an error pointer. The caller is also expected to own the
+> + * lifetime of the memdev registration associated with the endpoint to
+> + * pin the decoder registered as well.
+> + */
+> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_port *endpoint,
+> +					     bool is_ram,
+> +					     resource_size_t min,
+> +					     resource_size_t max)
+> +{
+> +	struct cxl_endpoint_decoder *cxled;
+> +	enum cxl_decoder_mode mode;
+> +	struct device *cxled_dev;
+> +	resource_size_t alloc;
+> +	int rc;
+> +
+> +	if (!IS_ALIGNED(min | max, SZ_256M))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	down_read(&cxl_dpa_rwsem);
+> +
+> +	cxled_dev = device_find_child(&endpoint->dev, NULL, find_free_decoder);
+> +	if (!cxled_dev)
+> +		cxled = ERR_PTR(-ENXIO);
+> +	else
+> +		cxled = to_cxl_endpoint_decoder(cxled_dev);
+> +
+> +	up_read(&cxl_dpa_rwsem);
+> +
+> +	if (IS_ERR(cxled))
+> +		return cxled;
+> +
+> +	if (is_ram)
+> +		mode = CXL_DECODER_RAM;
+> +	else
+> +		mode = CXL_DECODER_PMEM;
+> +
+> +	rc = cxl_dpa_set_mode(cxled, mode);
+> +	if (rc)
+> +		goto err;
+> +
+> +	down_read(&cxl_dpa_rwsem);
+> +	alloc = cxl_dpa_freespace(cxled, NULL, NULL);
+> +	up_read(&cxl_dpa_rwsem);
+> +
+> +	if (max)
+> +		alloc = min(max, alloc);
+> +	if (alloc < min) {
+> +		rc = -ENOMEM;
+> +		goto err;
+> +	}
+> +
+> +	rc = cxl_dpa_alloc(cxled, alloc);
+> +	if (rc)
+> +		goto err;
+> +
+> +	return cxled;
+> +err:
+> +	put_device(cxled_dev);
+> +	return ERR_PTR(rc);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_request_dpa, CXL);
+> +
+>  static void cxld_set_interleave(struct cxl_decoder *cxld, u32 *ctrl)
+>  {
+>  	u16 eig;
+> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+> index cb3f74d30852..9cfe29002d98 100644
+> --- a/drivers/net/ethernet/sfc/efx.c
+> +++ b/drivers/net/ethernet/sfc/efx.c
+> @@ -901,6 +901,8 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
+>  
+>  	efx_fini_io(efx);
+>  
+> +	efx_cxl_exit(efx);
+> +
+>  	pci_dbg(efx->pci_dev, "shutdown successful\n");
+>  
+>  	efx_fini_devlink_and_unlock(efx);
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 6d49571ccff7..b5626d724b52 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -84,12 +84,28 @@ void efx_cxl_init(struct efx_nic *efx)
+>  		goto out;
+>  	}
+>  
+> -	if (max < EFX_CTPIO_BUFFER_SIZE)
+> +	if (max < EFX_CTPIO_BUFFER_SIZE) {
+>  		pci_info(pci_dev, "CXL accel not enough free HPA space %llu < %u\n",
+>  				  max, EFX_CTPIO_BUFFER_SIZE);
+> +		goto out;
+> +	}
+> +
+> +	cxl->cxled = cxl_request_dpa(cxl->endpoint, true, EFX_CTPIO_BUFFER_SIZE,
+> +				     EFX_CTPIO_BUFFER_SIZE);
+> +	if (IS_ERR(cxl->cxled))
+> +		pci_info(pci_dev, "CXL accel request DPA failed");
+>  out:
+>  	cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
+>  }
+>  
+> +void efx_cxl_exit(struct efx_nic *efx)
+> +{
+> +	struct efx_cxl *cxl = efx->cxl;
+> +
+> +	if (cxl->cxled)
+> +		cxl_dpa_free(cxl->cxled);
+> + 
+> + 	return;
+> + }
+>  
+>  MODULE_IMPORT_NS(CXL);
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.h b/drivers/net/ethernet/sfc/efx_cxl.h
+> index 76c6794c20d8..59d5217a684c 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.h
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.h
+> @@ -26,4 +26,5 @@ struct efx_cxl {
+>  };
+>  
+>  void efx_cxl_init(struct efx_nic *efx);
+> +void efx_cxl_exit(struct efx_nic *efx);
+>  #endif
+> diff --git a/include/linux/cxl_accel_mem.h b/include/linux/cxl_accel_mem.h
+> index f3e77688ffe0..d4ecb5bb4fc8 100644
+> --- a/include/linux/cxl_accel_mem.h
+> +++ b/include/linux/cxl_accel_mem.h
+> @@ -2,6 +2,7 @@
+>  /* Copyright(c) 2024 Advanced Micro Devices, Inc. */
+>  
+>  #include <linux/cdev.h>
+> +#include <linux/pci.h>
+>  
+>  #ifndef __CXL_ACCEL_MEM_H
+>  #define __CXL_ACCEL_MEM_H
+> @@ -41,4 +42,10 @@ struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_port *endpoint,
+>  					       int interleave_ways,
+>  					       unsigned long flags,
+>  					       resource_size_t *max);
+> +
+> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_port *endpoint,
+> +					     bool is_ram,
+> +					     resource_size_t min,
+> +					     resource_size_t max);
+> +int cxl_dpa_free(struct cxl_endpoint_decoder *cxled);
+>  #endif
+> -- 
+> 2.17.1
+> 
 
