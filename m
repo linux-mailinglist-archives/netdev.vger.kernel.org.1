@@ -1,184 +1,145 @@
-Return-Path: <netdev+bounces-116269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 200DF949B7F
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:43:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05EBE949B8A
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:51:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 437791C22A4E
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:43:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B668028474B
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F3E173345;
-	Tue,  6 Aug 2024 22:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B7B178397;
+	Tue,  6 Aug 2024 22:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="JDXTHnKO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hyqm8j8E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gK9VOtEJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow4-smtp.messagingengine.com (flow4-smtp.messagingengine.com [103.168.172.139])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB52A17166E
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 22:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5B1178381;
+	Tue,  6 Aug 2024 22:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722984217; cv=none; b=ITfA9i3ULZI9npwvggFo0u+78awVkjoVKASmGv/16n2pZqbvwfVIly+wlQl9vVxiEOtiQWFqq/RH2ITI1uPN/y6tFcupw3sRb84QDKSofJxukbsOcDW6QxehgHBhEeAU7UjvbFITICoiKOuhflyQyDpzSbFKWaUHSriAjGhu7fY=
+	t=1722984620; cv=none; b=pzODR4dl52FFdxK9GwLR4EYj9TXOBqGA+wqbmPYq+ED3sXecvV3W1xMer0aDWzSmcJoA7UE1Fiv1NtEYYpxyUjx4qwODNKBmSNGXN4uwoiCoZx++e4QwUhSFIggmaxBu8SOqmH//gZCwRThb4B7219w4XMYg0StAD08LMJnJP8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722984217; c=relaxed/simple;
-	bh=J40VHMMWkh0kl6kCZd8XyxdOnEYP0+e9B8ZAIHuW8rA=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Lq71oPsh6MSFbGL8IvrpAkJuF6DhcQmVU28Kj6Lvd7MedI+OrsHccSFMqGJJkYTSs+5z+Wvg4wurQqXHBwn+KrRDNfYfRteHCGDT9PEcX5aw4siZT6YgP04IE2B9XHWhX9eMCSAhxguEYJXDpA82UoWFhasji5q/wHLP6gj83BY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=JDXTHnKO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hyqm8j8E; arc=none smtp.client-ip=103.168.172.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailflow.nyi.internal (Postfix) with ESMTP id DE0CD201012;
-	Tue,  6 Aug 2024 18:43:33 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Tue, 06 Aug 2024 18:43:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm1; t=1722984213; x=1722987813; bh=IuiNZDC4U1bd3gBKrqgwl
-	Txcb4/QWZaEfGNRECGqOyQ=; b=JDXTHnKOyxwCXnsogrYDFwk5HOp/yD3sJSr6F
-	NSVVlaPuFp3tJtDOiZ2A7PRAdKetUe35Ol3gByaPOPBk7gXl0QPv1NVmK0QXBHGP
-	rvYQAVg1g8MwHj7WLwPOTki7yOpzIvehRvzbHa6no9J7M9MJ8jrhnOa880mBaIaW
-	MBbza2B7kNDO9DGj9DYDHuI76Ye73scvONYYogRyMExrNUNR6NBuRm+Rsd8Xlz6T
-	inU63q0Us0Y1XbY43RodQGxvL144lEwUIXwNkACxeWyXWkvNBT2/FcM9qs5O8mRf
-	zx22G1fZpw56vPyEXmnUmM7Mx1ut3oqBdMF1R81Q0/oGNvCEA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1722984213; x=1722987813; bh=IuiNZDC4U1bd3gBKrqgwlTxcb4/Q
-	WZaEfGNRECGqOyQ=; b=hyqm8j8EwMUBxzFq69nKybB0giG2yaqllyxmUfhUsquG
-	K7h/xHj6Ng3PaKtASMah4UFcNyH5Nz+MsvTKQ7RW1AvJh+Dm0eOdef2uaYz93mhA
-	H+iFy3EMwPKOEzwnETdfb+2AryUD0K8ElO1QUhRHA19AXXzyzyrW3xYED7907NrB
-	rOLLBQToKorSZVtc6dm01ITBEhvRTR/KUmmaYsCUdrDk+R1I2lpY4V2Go9izcZk+
-	PSsDjnggWRVFg3lCQrFy3rv3iZzvY6kjcFjB32zvRJMjeoOD03aHukp1VA/HCHJD
-	Zr2FALpi14whuxuyXbBX1zBlVSU6a5fkIzhA0L4e6g==
-X-ME-Sender: <xms:FaeyZlCpv_z5EJZ6-CKIT0bUvxM7QpyTHkPOPI6GFagoCufhug5FFA>
-    <xme:FaeyZjgTb43H7hHU4Up7gBxEB54BOilhUQn7WTS2JrImgNF3ePoBQJ_tFu0aPGjmr
-    unWh3zyTpalmhSqSso>
-X-ME-Received: <xmr:FaeyZgnXj0IlFpwg5_LcdI7gMF_s3umfyFGSIkCs6EmvBAsy7WvtnzESy3bMDe-hgw_SJQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrkeelgdduhecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicu
-    gghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtth
-    gvrhhnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteef
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvh
-    esjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtoheptd
-X-ME-Proxy: <xmx:FaeyZvwQoOEkzpxX-gD7z_NYutGylRJMUxL3sPWVjKemWlZH0-MyHQ>
-    <xmx:FaeyZqRn_UxuiqwjxWoNboWM3UnAKOq5FJxcLk0qivhA6GOkqTehzw>
-    <xmx:FaeyZiYVGbcLZNqLS96RhEkjXKtRj9wjRZFDEgJmexlRjNppx9UbOg>
-    <xmx:FaeyZrS2U2Qcp-sRLbFBcNrrdJorQH1tb3L1tIulaI7E5alH7NzRNA>
-    <xmx:FaeyZoBPa3xmm9Y4U_-NZgnGPlWGDC95e0uE61ERcdiCQF--MvqJX6kp>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 6 Aug 2024 18:43:33 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 3661B9FCB8; Tue,  6 Aug 2024 15:43:32 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 356739FBA2;
-	Tue,  6 Aug 2024 15:43:32 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Simon Horman <horms@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Andy Gospodarek <andy@greyhouse.net>,
-    Nathan Chancellor <nathan@kernel.org>,
-    Nick Desaulniers <ndesaulniers@google.com>,
-    Bill Wendling <morbo@google.com>,
-    Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
-    llvm@lists.linux.dev
-Subject: Re: [PATCH net-next] bonding: Pass string literal as format argument
- of alloc_ordered_workqueue()
-In-reply-to: <20240806-bonding-fmt-v1-1-e75027e45775@kernel.org>
-References: <20240806-bonding-fmt-v1-1-e75027e45775@kernel.org>
-Comments: In-reply-to Simon Horman <horms@kernel.org>
-   message dated "Tue, 06 Aug 2024 10:56:52 +0100."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1722984620; c=relaxed/simple;
+	bh=3b3HeWBqA+k/ZS8D7tL/hj7cKIV21t1HBhctoaBI+7w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Xifaey0Ktz2v0Wi6efPVxesxXNhQI70jWGz3RY6IE+VXgOyCzpCAXyL68Sxo7rqFpspCiCLvKvQCnk0svGe0+xoNrU8bkndhDwiwyycRUno5O7RXKf/cIhTHNdnTqjwu45UVBHamuwVO51gbu9axrcL1RL5U72pDhAzW1RTxLpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gK9VOtEJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB15C4AF16;
+	Tue,  6 Aug 2024 22:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722984620;
+	bh=3b3HeWBqA+k/ZS8D7tL/hj7cKIV21t1HBhctoaBI+7w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gK9VOtEJv7MRsheqgdSoDQiYYeqWfF7V1TmwbNaCJKmEuu7I5sZfSX/yU3ofcZDTX
+	 mF9/dcQnaL8RHeWkcV+vHLpVxJ5JaNHI0zXRIUACB/qFWIgnqBbenoC47AkgJ2bBJv
+	 GJr8ctTceWV4og1UW/N96D56wNFkK7rhtE8DlOKehdPxc0oVDUXWPhphMNbhcHtFtk
+	 H7Hg5AUimYfSWuXBCyVnNhnkcNxQ/kYxBXcC5LERb0+qFthODMma+lzynqd0kY4uYz
+	 Mp7GMTU0S8OeX3LEb75hdxVKRrwxhND4a5wzRPKHtsoQRbuvuhywJ4OvP+mm7f6y1a
+	 PZrWyslQ8dRvA==
+From: Namhyung Kim <namhyung@kernel.org>
+To: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Ian Rogers <irogers@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-perf-users@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 07/10] tools/include: Sync network socket headers with the kernel sources
+Date: Tue,  6 Aug 2024 15:50:10 -0700
+Message-ID: <20240806225013.126130-8-namhyung@kernel.org>
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+In-Reply-To: <20240806225013.126130-1-namhyung@kernel.org>
+References: <20240806225013.126130-1-namhyung@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3239344.1722984212.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Aug 2024 15:43:32 -0700
-Message-ID: <3239345.1722984212@famine>
+Content-Transfer-Encoding: 8bit
 
-Simon Horman <horms@kernel.org> wrote:
+To pick up changes from:
 
->Recently I noticed that both gcc-14 and clang-18 report that passing
->a non-string literal as the format argument of alloc_ordered_workqueue
->is potentially insecure.
->
->F.e. clang-18 says:
->
->.../bond_main.c:6384:37: warning: format string is not a string literal (=
-potentially insecure) [-Wformat-security]
-> 6384 |         bond->wq =3D alloc_ordered_workqueue(bond_dev->name, WQ_M=
-EM_RECLAIM);
->      |                                            ^~~~~~~~~~~~~~
->.../workqueue.h:524:18: note: expanded from macro 'alloc_ordered_workqueu=
-e'
->  524 |         alloc_workqueue(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags),=
- 1, ##args)
->      |                         ^~~
->.../bond_main.c:6384:37: note: treat the string as an argument to avoid t=
-his
-> 6384 |         bond->wq =3D alloc_ordered_workqueue(bond_dev->name, WQ_M=
-EM_RECLAIM);
->      |                                            ^
->      |                                            "%s",
->..../workqueue.h:524:18: note: expanded from macro 'alloc_ordered_workque=
-ue'
->  524 |         alloc_workqueue(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags),=
- 1, ##args)
->      |                         ^
->
->Perhaps it is always the case where the contents of bond_dev->name is
->safe to pass as the format argument. That is, in my understanding, it
->never contains any format escape sequences.
->
->But, it seems better to be safe than sorry. And, as a bonus, compiler
->output becomes less verbose by addressing this issue as suggested by
->clang-18.
->
->Signed-off-by: Simon Horman <horms@kernel.org>
+  d25a92ccae6b net/smc: Introduce IPPROTO_SMC
+  060f4ba6e403 io_uring/net: move charging socket out of zc io_uring
+  bb6aaf736680 net: Split a __sys_listen helper for io_uring
+  dc2e77979412 net: Split a __sys_bind helper for io_uring
 
-Acked-by: Jay Vosburgh <jv@jvosburgh.net>
+This should be used to beautify socket syscall arguments and it addresses
+these tools/perf build warnings:
 
->---
-> drivers/net/bonding/bond_main.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 1cd92c12e782..f9633a6f8571 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -6338,7 +6338,8 @@ static int bond_init(struct net_device *bond_dev)
-> =
+  Warning: Kernel ABI header differences:
+  diff -u tools/include/uapi/linux/in.h include/uapi/linux/in.h
+  diff -u tools/perf/trace/beauty/include/linux/socket.h include/linux/socket.h
 
-> 	netdev_dbg(bond_dev, "Begin bond_init\n");
-> =
+Please see tools/include/uapi/README for details (it's in the first patch
+of this series).
 
->-	bond->wq =3D alloc_ordered_workqueue(bond_dev->name, WQ_MEM_RECLAIM);
->+	bond->wq =3D alloc_ordered_workqueue("%s", WQ_MEM_RECLAIM,
->+					   bond_dev->name);
-> 	if (!bond->wq)
-> 		return -ENOMEM;
-> =
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Namhyung Kim <namhyung@kernel.org>
+---
+ tools/include/uapi/linux/in.h                  | 2 ++
+ tools/perf/trace/beauty/include/linux/socket.h | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
->
+diff --git a/tools/include/uapi/linux/in.h b/tools/include/uapi/linux/in.h
+index e682ab628dfa..d358add1611c 100644
+--- a/tools/include/uapi/linux/in.h
++++ b/tools/include/uapi/linux/in.h
+@@ -81,6 +81,8 @@ enum {
+ #define IPPROTO_ETHERNET	IPPROTO_ETHERNET
+   IPPROTO_RAW = 255,		/* Raw IP packets			*/
+ #define IPPROTO_RAW		IPPROTO_RAW
++  IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
++#define IPPROTO_SMC		IPPROTO_SMC
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
+   IPPROTO_MAX
+diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
+index 89d16b90370b..df9cdb8bbfb8 100644
+--- a/tools/perf/trace/beauty/include/linux/socket.h
++++ b/tools/perf/trace/beauty/include/linux/socket.h
+@@ -76,7 +76,7 @@ struct msghdr {
+ 	__kernel_size_t	msg_controllen;	/* ancillary data buffer length */
+ 	struct kiocb	*msg_iocb;	/* ptr to iocb for async requests */
+ 	struct ubuf_info *msg_ubuf;
+-	int (*sg_from_iter)(struct sock *sk, struct sk_buff *skb,
++	int (*sg_from_iter)(struct sk_buff *skb,
+ 			    struct iov_iter *from, size_t length);
+ };
+ 
+@@ -442,11 +442,14 @@ extern int __sys_accept4(int fd, struct sockaddr __user *upeer_sockaddr,
+ extern int __sys_socket(int family, int type, int protocol);
+ extern struct file *__sys_socket_file(int family, int type, int protocol);
+ extern int __sys_bind(int fd, struct sockaddr __user *umyaddr, int addrlen);
++extern int __sys_bind_socket(struct socket *sock, struct sockaddr_storage *address,
++			     int addrlen);
+ extern int __sys_connect_file(struct file *file, struct sockaddr_storage *addr,
+ 			      int addrlen, int file_flags);
+ extern int __sys_connect(int fd, struct sockaddr __user *uservaddr,
+ 			 int addrlen);
+ extern int __sys_listen(int fd, int backlog);
++extern int __sys_listen_socket(struct socket *sock, int backlog);
+ extern int __sys_getsockname(int fd, struct sockaddr __user *usockaddr,
+ 			     int __user *usockaddr_len);
+ extern int __sys_getpeername(int fd, struct sockaddr __user *usockaddr,
+-- 
+2.46.0.rc2.264.g509ed76dc8-goog
+
 
