@@ -1,104 +1,114 @@
-Return-Path: <netdev+bounces-116189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD0C949689
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:18:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7203C9496BD
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E98391F2407A
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:18:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FF541C2136A
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6163B47A4C;
-	Tue,  6 Aug 2024 17:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FBB59155;
+	Tue,  6 Aug 2024 17:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hrXaQzV5"
+	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="eQx3WLkf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from qs51p00im-qukt01072501.me.com (qs51p00im-qukt01072501.me.com [17.57.155.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4315A0F5;
-	Tue,  6 Aug 2024 17:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC7C7603F
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 17:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722964719; cv=none; b=XTrZbRrhN9hZQNjE5HwrzIFNOkeQaf34Z1O3tHcOnZlzXo0YEH0LdU8vrDvsBYGEcQAgbu/R7gQmsGZzmCDPKInAMZjvMf4fbjbJFPf3raj6fpRi5qFrpSWuBCaQ64BASIOhUv1jZHpkaW/Vys5BnN8vPUWD7LDpehA2e6JxOP0=
+	t=1722965329; cv=none; b=lFECi2gToPeYda0+gYOziT9OYYBMDMZ0dDDug+AkBhnpfg6EPpMoGwGOEE/3720P67Tu8n9xGghPf/cgfXf8JEobaY+nH/MJhpSQr0Bp9k0Z1FdYQASrioCBd5SF7ADPZxD++78xDU1cNkfrdcXdmBkfJak6/aYx9EX/0QyoSI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722964719; c=relaxed/simple;
-	bh=1GTwqbPu1DRXS3CHjodb5Z+0yALaqUARNmOxa7+ibwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vr5bAK1v+TeOxGZou4fFQHSa/8ouMEapV2Iy/wQwcYsF9fHEjFKiny4aHHy99UPNRDJa/4MFtHG3Z0hkqV+bCoazwOOWHXF4IHOW9C7/vWsnc8ZI8VSM+nYOq2dm1ZQzWzwTTPQndKgG3k/bHulEOoGzdPWmAo5nk89F6oFBT3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hrXaQzV5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61097C4AF0C;
-	Tue,  6 Aug 2024 17:18:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722964718;
-	bh=1GTwqbPu1DRXS3CHjodb5Z+0yALaqUARNmOxa7+ibwQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hrXaQzV5OLp1cBVoU02ep1rK415nwGP5UokWusAETNjwR76LaVhzspMByRxFuJWsT
-	 0fa2JgpjZ/J8Ac2HOsooKsQvvlPplyo2HhJv+OZoSY//oGoaDzdm7hpNqkGoePKvYg
-	 QoenUig9vGTPTMOLejYETyF1ICj2e+LQKM04cnTMnh9eKw+apMNA8bFXI7fBNzl5Zi
-	 9vKqZL3t7zaWQl6v1DBpMcig/FEhR8l5plJ302fo2bhExWaLnO9F+/BuYYQau7fZ9U
-	 OruGOAdoSqo7zExTwgHjz2mJfvDv1QH0MPmnmNSCikEh1vMgMbDR2AefhnGXyU6sJp
-	 /deUODRHopq2Q==
-Date: Tue, 6 Aug 2024 11:18:37 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	linux-can@vger.kernel.org, Duy Nguyen <duy.nguyen.rh@renesas.com>,
-	Eric Dumazet <edumazet@google.com>, devicetree@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-renesas-soc@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1722965329; c=relaxed/simple;
+	bh=8EnOfnQc5awRMnkFtVV217X1/jCf5ygnJDCReCt8/BY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aGCBjpkF39cLtssSrh8lszFBsOKtsFn2Q3HNasCmsGFbkxU/Dr3ZURCQJQvbIQKno1bKuAjYYvmrfOCCcmBZY+TQfAMqY4hO10Z+tgOOQGU+lRsmmFdZJ30DsRtLo82VpdyEhvm6KE2Yn9KzMZKQOzo4xRz4/LYeMLP8HHI21kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=eQx3WLkf; arc=none smtp.client-ip=17.57.155.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
+	t=1722965326; bh=I54BpuHlFXJ14PzdceLKFzF/ikAKzgpc8iyj+Ds8T8Y=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=eQx3WLkf6F+07Ojqz3zk3dmHGdgRIezrIDpxO9QtQpSWJ8P7KADfhgA+nE0xDFq2B
+	 VjgVa9G8jQBnGxbnUzLFIlW+v7O/802JRW2H0RPbja5Indhj777RrNQ0M+lPd1TGYT
+	 O+iyxj1NlmvEZolyI34a5yflxPTuybuvmGXvlEC46BQotoecUYmJgvMJUoB1WB6t4q
+	 F50Cf8XLITx4s+eO+0kDYIPQMITYK8q3YosYOCdJ2q/Vpp/+5Hx4jvA8rlPlqLo1Qt
+	 ZBfDYtVO5686kQksi1G9hm15UWb/w42rf0w0Q5whvuJqa1+FOy7MOWj22bLiLeiP9S
+	 A6tDQJ3gHFoHQ==
+Received: from fossa.se1.pen.gy (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01072501.me.com (Postfix) with ESMTPSA id 88716440429;
+	Tue,  6 Aug 2024 17:28:43 +0000 (UTC)
+From: Foster Snowhill <forst@pen.gy>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>
-Subject: Re: [PATCH v3] dt-bindings: can: renesas,rcar-canfd: Document R-Car
- V4M support
-Message-ID: <172296471618.1826539.5724224646610844294.robh@kernel.org>
-References: <68b5f910bef89508e3455c768844ebe859d6ff1d.1722520779.git.geert+renesas@glider.be>
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Georgi Valkov <gvalkov@gmail.com>,
+	Oliver Neukum <oneukum@suse.com>,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH net-next 1/5] usbnet: ipheth: race between ipheth_close and error handling
+Date: Tue,  6 Aug 2024 19:28:05 +0200
+Message-ID: <20240806172809.675044-1-forst@pen.gy>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <68b5f910bef89508e3455c768844ebe859d6ff1d.1722520779.git.geert+renesas@glider.be>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: xKZZWHYtk5nDuCNqkQSujrzv2VdPu78K
+X-Proofpoint-ORIG-GUID: xKZZWHYtk5nDuCNqkQSujrzv2VdPu78K
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-06_14,2024-08-06_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030 mlxscore=0 suspectscore=0
+ adultscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2408060123
 
+From: Oliver Neukum <oneukum@suse.com>
 
-On Thu, 01 Aug 2024 16:03:17 +0200, Geert Uytterhoeven wrote:
-> From: Duy Nguyen <duy.nguyen.rh@renesas.com>
-> 
-> Document support for the CAN-FD Interface on the Renesas R-Car V4M
-> (R8A779H0) SoC, which supports up to four channels.
-> 
-> The CAN-FD module on R-Car V4M is very similar to the one on R-Car V4H,
-> but differs in some hardware parameters, as reflected by the Parameter
-> Status Information part of the Global IP Version Register.  However,
-> none of this parameterization should have any impact on the driver, as
-> the driver does not access any register that is impacted by the
-> parameterization (except for the number of channels).
-> 
-> Signed-off-by: Duy Nguyen <duy.nguyen.rh@renesas.com>
-> [geert: Clarify R-Car V4M differences]
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> v3:
->   - Add more clarification,
-> 
-> v2:
->   - Drop RFC state now it works.
-> 
-> Changes compared to the BSP:
->   - Restrict number of channels to four.
-> ---
->  .../bindings/net/can/renesas,rcar-canfd.yaml  | 22 ++++++++++++++-----
->  1 file changed, 16 insertions(+), 6 deletions(-)
-> 
+ipheth_sndbulk_callback() can submit carrier_work
+as a part of its error handling. That means that
+the driver must make sure that the work is cancelled
+after it has made sure that no more URB can terminate
+with an error condition.
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Hence the order of actions in ipheth_close() needs
+to be inverted.
+
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Signed-off-by: Foster Snowhill <forst@pen.gy>
+Tested-by: Georgi Valkov <gvalkov@gmail.com>
+---
+v1:
+  No code changes. Fixed two "ipeth" -> "ipheth" typos in commit msg.
+RFC: https://lore.kernel.org/netdev/20231121144330.3990-1-oneukum@suse.com/
+---
+ drivers/net/usb/ipheth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
+index 687d70cfc556..6eeef10edada 100644
+--- a/drivers/net/usb/ipheth.c
++++ b/drivers/net/usb/ipheth.c
+@@ -475,8 +475,8 @@ static int ipheth_close(struct net_device *net)
+ {
+ 	struct ipheth_device *dev = netdev_priv(net);
+ 
+-	cancel_delayed_work_sync(&dev->carrier_work);
+ 	netif_stop_queue(net);
++	cancel_delayed_work_sync(&dev->carrier_work);
+ 	return 0;
+ }
+ 
+-- 
+2.45.1
 
 
