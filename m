@@ -1,260 +1,135 @@
-Return-Path: <netdev+bounces-116125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8361C9492E1
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:23:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3274949307
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:29:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A68C71C21898
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:23:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02227B256CC
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05BD18D649;
-	Tue,  6 Aug 2024 14:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F2617AE0D;
+	Tue,  6 Aug 2024 14:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XiVaPlN5"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E163B18D624;
-	Tue,  6 Aug 2024 14:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AA917ADF2
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 14:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722954204; cv=none; b=qMpHmYL51W/v4SZwiOVQ6NTR6kkwvkLkP1vE0amMh4020comf7rNTf75JzZOHDCqQm+APHhKbnx+rqUrtBdwOx0DME9N4R2nAemEsiC5uzPMe0i+azvMrxnh8dMTzfMHsv4sK5duHfJEQhtlInW0WN+HJcJvLRqdYy7qDluT0EI=
+	t=1722954295; cv=none; b=pbkVqshp78dnb2qgtj7/Flu1v58dkghN2axXiLlLrXjT1jDkVHfNmg88l8kTSS7m6HtHUknMPcT+G0p7lvPQeCYp1VOagDVmkac8QMZr4aFFcxoJRXcurLU0gkSu8fd/MjuoQlVsL4pnuFNzQYdR65LALHGXsu+Llb9WUr7fLPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722954204; c=relaxed/simple;
-	bh=U91EeTuop3DyOCAzp3imMwkzZUlrRzys7Mo8oCZ2ESI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lzu6GRfvqp14XpLB0ym/Ea59MXpVpaqGCVidcQMXmEAnaq0NlZMNoWWYLqiPtV3oqETi8F7XtmPMaPy8VdNsWZa/rXz43Fhkn+jtYgIyPfzolpEjuunbUbFmOb3QFfPtMxMQ/M+nmsIDtwZQYiA+0q9C7mJnhOuT1mmvqdjpzgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 250AFFEC;
-	Tue,  6 Aug 2024 07:23:47 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DEB23F6A8;
-	Tue,  6 Aug 2024 07:23:19 -0700 (PDT)
-Message-ID: <2d3dc395-58f1-47bc-8d95-c8c65b474988@arm.com>
-Date: Tue, 6 Aug 2024 15:23:18 +0100
+	s=arc-20240116; t=1722954295; c=relaxed/simple;
+	bh=/NqAG7/b27BPMkRaReA9ge8tM6v7+Nc4S8oBmIAnTLw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=a+uRUXBH0wsbqKu+vhUQiGPN2yI0M3q7AgnEVTFTOoloZqjE7SQgus+/iCuFZZBf90b5w1sZKqsxJOAxUMNYGobtEdHLqZMGwbekheh+b/aHiFXVCfi8X2F3fack7ZEa7r2v8MpQAZNICtCOU4jFMD9iwhPKc23QZS3xJPjElhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XiVaPlN5; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-428163f7635so5492475e9.2
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 07:24:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722954292; x=1723559092; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nUlHNxzLDKqpktPXfQvKNC6NIPx4e9AlQs9rsdGWOVg=;
+        b=XiVaPlN5y0AgWQ6N7jP93sqideia3bfnyfDyhiNZv8Wb32ueHZwIfhpB4b3xWSvnFv
+         lWhxitiG+AgWMjOT8n4iVGKPyuo0LhhOUSoC7HMeZYmiy2rKyC0+/pUq4AB9MNIIqhz1
+         GBDExFvUwpmp6FdO2AlNJNiQbSmOYEzA3sXwSZ0eOUn3eukdFGMWE3Nl4SBiYcyqAXzr
+         AFX1cEyjQEYJDQbyKLYdhx7BvhEP5TtBvdfrojVOy1aSVfbj5K3mQZ2KqhdxlQChk0m3
+         bW9Ljl/x0nMFNSfeWlEAg0379pn7LaRBEtP6aYQ5QudzvgiPR06tU5xqk5QI+DBzZRlU
+         qavA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722954292; x=1723559092;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nUlHNxzLDKqpktPXfQvKNC6NIPx4e9AlQs9rsdGWOVg=;
+        b=g6dRL6qJqn2PKl2tU3q7BRpR844kByagYp5oQPeSuwIDF3SznRnDN2Vadw2ysd5sy2
+         OVSxsUW8TeG008qJWJyplAPreftg47n5Bjsk3Ttwkm0BTStnujYuUVFAPVaAway3NdLi
+         NdcJbiDPwmPxMQyj08XW0pntlwYJDZ/rhpCeWPWW+7KALXk1WFTRgPUxSSbaG50kN+ez
+         STp8dkjFSlfErOOxhrMMjXfAbsZnvh4/3VmLQ0B3de12jVPpFoiu+IOQG8n+yFQDR4EL
+         KIn2QDJ2/N4z8SjLtxrKC5E3Me7o1pw+YYLqoGLKBs0+kSMS29xoYOU6742+vYgp6rBo
+         Byow==
+X-Gm-Message-State: AOJu0Yy/j2cMwDwujXHJiDkdL+8mgIoG1RHWXpJSOV7WY2spPPtO1oAb
+	+Zjz8fM1uP85d74V7igxffHZR3e+5o2q9r+uUH2PtbIKvlrHl1sGlIRBHQ==
+X-Google-Smtp-Source: AGHT+IH1w/k7DpxFgizLPF3TC5/3iYa0EBLE9GCcNnmAMcNC+7SNybZ9yaCnUWxCllG9nPdkt9x9UA==
+X-Received: by 2002:a05:600c:4f90:b0:426:5416:67e0 with SMTP id 5b1f17b1804b1-428e6b831a1mr99233405e9.31.1722954292044;
+        Tue, 06 Aug 2024 07:24:52 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282baba5f2sm244751565e9.26.2024.08.06.07.24.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Aug 2024 07:24:51 -0700 (PDT)
+Subject: Re: [PATCH net-next v2 09/12] ethtool: rss: support dumping RSS
+ contexts
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ dxu@dxuuu.xyz, przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
+ gal.pressman@linux.dev, tariqt@nvidia.com, willemdebruijn.kernel@gmail.com,
+ jdamato@fastly.com
+References: <20240803042624.970352-1-kuba@kernel.org>
+ <20240803042624.970352-10-kuba@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <ff8dea3e-ff4e-af27-4b96-3fcf1092cc52@gmail.com>
+Date: Tue, 6 Aug 2024 15:24:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG REPORT]net: page_pool: kernel crash at
- iommu_get_dma_domain+0xc/0x20
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
- Yonglong Liu <liuyonglong@huawei.com>,
- Somnath Kotur <somnath.kotur@broadcom.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, pabeni@redhat.com, ilias.apalodimas@linaro.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, linyunsheng <linyunsheng@huawei.com>,
- "shenjian (K)" <shenjian15@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, iommu@lists.linux.dev,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, linux-acpi@vger.kernel.org
-References: <0e54954b-0880-4ebc-8ef0-13b3ac0a6838@huawei.com>
- <8743264a-9700-4227-a556-5f931c720211@huawei.com>
- <e980d20f-ea8a-43e3-8d3f-179a269b5956@kernel.org>
- <CAOBf=musxZcjYNHjdD+MGp0y6epnNO5ryC6JgeAJbP6YQ+sVUA@mail.gmail.com>
- <d385bdba-65a0-4776-b950-9e62392f5115@huawei.com>
- <f09f7df6-9d5e-410d-8409-006c3b6e995a@huawei.com>
- <8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org>
-From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20240803042624.970352-10-kuba@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-In-Reply-To: <8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 06/08/2024 10:51 am, Jesper Dangaard Brouer wrote:
-[...]
->> The iommu_group will release whether the page_pool is using it or not, 
->> so if once page_pool_return_page() was called(why does this occur when 
->> the device is reloaded and packets are transmitted?) , this crash will 
->> happen.
->>
->> I try the follow patch, but doesn't work :(
->>
+On 03/08/2024 05:26, Jakub Kicinski wrote:
+> Now that we track RSS contexts in the core we can easily dump
+> them. This is a major introspection improvement, as previously
+> the only way to find all contexts would be to try all ids
+> (of which there may be 2^32 - 1).
 > 
-> The idea of taking a refcnt on IOMMU to avoid dev->iommu_group getting
-> freed, make sense to me.
-> 
-> The question is if API iommu_group_get() and iommu_group_put() is the
-> correct API to use in this case?
-> 
->> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
->> index f4444b4e39e6..d03a87407ca8 100644
->> --- a/net/core/page_pool.c
->> +++ b/net/core/page_pool.c
->> @@ -21,6 +21,7 @@
->>   #include <linux/poison.h>
->>   #include <linux/ethtool.h>
->>   #include <linux/netdevice.h>
->> +#include <linux/iommu.h>
->>
-> 
-> The page_pool already have a system/workqueue that waits for inflight
-> "packet" pages, and calls struct device API get_device() and put_device().
-> 
-> Why didn't the patch add code together with struct device API?
-> Like this:
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+...
+> +	if (!ctx->ctx_idx) {
+> +		ret = rss_dump_one_ctx(skb, cb, dev, 0);
+> +		if (ret)
+> +			return ret;
+> +		ctx->ctx_idx++;
+> +	}
 
-Now do the one where there is no IOMMU, and dma_unmap_page() corrupts 
-random unrelated memory because the mapped DMA address was relative to 
-dev->dma_range_map which has since become NULL.
+Maybe comment this block with something like "context 0 is
+ not stored in the XArray" to make clear why this is split
+ out from a loop that looks like it should be able to handle
+ it.
 
-In other words, no, hacking one particular IOMMU API symptom does not 
-solve the fundamental lifecycle problem that you have here.
+> +
+> +	for (; xa_find(&dev->ethtool->rss_ctx, &ctx->ctx_idx,
+> +		       ULONG_MAX, XA_PRESENT); ctx->ctx_idx++) {
+> +		ret = rss_dump_one_ctx(skb, cb, dev, ctx->ctx_idx);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	ctx->ctx_idx = 0;
 
-Thanks,
-Robin.
+Feels like there has to be a way to do this with
+ xa_for_each_start()?  Something like (untested):
 
-> 
-> $ git diff
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 2abe6e919224..686ff1d31aff 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -265,8 +265,10 @@ static int page_pool_init(struct page_pool *pool,
->          /* Driver calling page_pool_create() also call 
-> page_pool_destroy() */
->          refcount_set(&pool->user_cnt, 1);
-> 
-> -       if (pool->dma_map)
-> +       if (pool->dma_map) {
-> +               iommu_group_get(pool->p.dev);
->                  get_device(pool->p.dev);
-> +       }
-> 
->          return 0;
->   }
-> @@ -275,8 +277,10 @@ static void page_pool_uninit(struct page_pool *pool)
->   {
->          ptr_ring_cleanup(&pool->ring, NULL);
-> 
-> -       if (pool->dma_map)
-> +       if (pool->dma_map) {
-> +               iommu_group_put(pool->p.dev->iommu_group);
->                  put_device(pool->p.dev);
-> +       }
-> 
-> 
-> --Jesper
-> 
->>   #include <trace/events/page_pool.h>
->>  > @@ -306,6 +307,9 @@ page_pool_create_percpu(const struct
->> page_pool_params *params, int cpuid)
->>          if (err)
->>                  goto err_uninit;
->>
->> +       if (pool->dma_map)
->> +               iommu_group_get(pool->p.dev);
->> +
->>          return pool;
->>
->>   err_uninit:
->> @@ -974,8 +978,11 @@ static int page_pool_release(struct page_pool *pool)
->>
->>          page_pool_scrub(pool);
->>          inflight = page_pool_inflight(pool, true);
->> -       if (!inflight)
->> +       if (!inflight) {
->>                  __page_pool_destroy(pool);
->> +               if (pool->dma_map)
->> + iommu_group_put(pool->p.dev->iommu_group);
->> +       }
->>
->>          return inflight;
->>   }
->>
->>
->>>>> The page_pool bumps refcnt via get_device() + put_device() on the DMA
->>>>> 'struct device', to avoid it going away, but I guess there is also 
->>>>> some
->>>>> IOMMU code that we need to make sure doesn't go away (until all 
->>>>> inflight
->>>>> pages are returned) ???
->>>>>
->>>>>
->>>>>> [ 4407.212119] process_one_work+0x164/0x3e0
->>>>>> [ 4407.216116]  worker_thread+0x310/0x420
->>>>>> [ 4407.219851]  kthread+0x120/0x130
->>>>>> [ 4407.223066]  ret_from_fork+0x10/0x20
->>>>>> [ 4407.226630] Code: ffffc318 aa1e03e9 d503201f f9416c00 (f9405400)
->>>>>> [ 4407.232697] ---[ end trace 0000000000000000 ]---
->>>>>>
->>>>>>
->>>>>> The hns3 driver use page pool like this, just call once when the 
->>>>>> driver
->>>>>> initialize:
->>>>>>
->>>>>> static void hns3_alloc_page_pool(struct hns3_enet_ring *ring)
->>>>>> {
->>>>>>       struct page_pool_params pp_params = {
->>>>>>           .flags = PP_FLAG_DMA_MAP | PP_FLAG_PAGE_FRAG |
->>>>>>                   PP_FLAG_DMA_SYNC_DEV,
->>>>>>           .order = hns3_page_order(ring),
->>>>>>           .pool_size = ring->desc_num * hns3_buf_size(ring) /
->>>>>>                   (PAGE_SIZE << hns3_page_order(ring)),
->>>>>>           .nid = dev_to_node(ring_to_dev(ring)),
->>>>>>           .dev = ring_to_dev(ring),
->>>>>>           .dma_dir = DMA_FROM_DEVICE,
->>>>>>           .offset = 0,
->>>>>>           .max_len = PAGE_SIZE << hns3_page_order(ring),
->>>>>>       };
->>>>>>
->>>>>>       ring->page_pool = page_pool_create(&pp_params);
->>>>>>       if (IS_ERR(ring->page_pool)) {
->>>>>>           dev_warn(ring_to_dev(ring), "page pool creation failed: 
->>>>>> %ld\n",
->>>>>>                PTR_ERR(ring->page_pool));
->>>>>>           ring->page_pool = NULL;
->>>>>>       }
->>>>>> }
->>>>>>
->>>>>> And call page_pool_destroy(ring->page_pool)  when the driver 
->>>>>> uninitialized.
->>>>>>
->>>>>>
->>>>>> We use two devices, the net port connect directory, and the step 
->>>>>> of the
->>>>>> test case like below:
->>>>>>
->>>>>> 1. enable a vf of '7d:00.0':  echo 1 >
->>>>>> /sys/class/net/eno1/device/sriov_numvfs
->>>>>>
->>>>>> 2. use iperf to produce some flows(the problem happens to the side 
->>>>>> which
->>>>>> runs 'iperf -s')
->>>>>>
->>>>>> 3. use ifconfig down/up to the vf
->>>>>>
->>>>>> 4. kill iperf
->>>>>>
->>>>>> 5. disable the vf: echo 0 > /sys/class/net/eno1/device/sriov_numvfs
->>>>>>
->>>>>> 6. run 1~5 with another port bd:00.0
->>>>>>
->>>>>> 7. repeat 1~6
->>>>>>
->>>>>>
->>>>>> And when running this test case, we can found another related 
->>>>>> message (I
->>>>>> replaced pr_warn() to dev_warn()):
->>>>>>
->>>>>> pci 0000:7d:01.0: page_pool_release_retry() stalled pool shutdown: id
->>>>>> 949, 98 inflight 1449 sec
->>>>>>
->>>>>>
->>>>>> Even when stop the traffic, stop the test case, disable the vf, this
->>>>>> message is still being printed.
->>>>>>
->>>>>> We must run the test case for about two hours to reproduce the 
->>>>>> problem.
->>>>>> Is there some advise to solve or debug the problem?
->>>>>>
->>>
-> 
+	struct ethtool_rxfh_context *rss_ctx;
+
+	xa_for_each_start(&dev->ethtool->rss_ctx, ctx->ctx_idx,
+			  rss_ctx, ctx->ctx_idx) {
+		ret = rss_dump_one_ctx(skb, cb, dev, ctx->ctx_idx);
+		if (ret)
+			return ret;
+	}
+	ctx->ctx_idx = 0;
 
