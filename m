@@ -1,119 +1,131 @@
-Return-Path: <netdev+bounces-116005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8CE4948C3C
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:38:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2F1948C47
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0C1D287786
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:38:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C9491C23031
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900DA1BD4E7;
-	Tue,  6 Aug 2024 09:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529A51BDA99;
+	Tue,  6 Aug 2024 09:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="de6pn6Aj"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fvzfpPGJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C5A5464E;
-	Tue,  6 Aug 2024 09:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF821BDA84;
+	Tue,  6 Aug 2024 09:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722937104; cv=none; b=CnGaZwGceTsk1P/8XMrb8IgSnTv+GSC2siGFV5/7iYMAnwN44KmqGCRrqU3ySRdU3MigjJQnQogqYOfKOM1ufLgdW6RS75GSGpvvqSyCDdAF6yk4jRH0L+lTOjl1HiDbZBcudapvv03QP9lATAEjHjsacoiQAx9jEtLs0OKeVHk=
+	t=1722937392; cv=none; b=dMJPIdV4kTyWFa2uZe90s9r9BbqbTw94Fi6Un481deRJUniutvO23LB45fIQngUYbKJoalAU4Q+Enqqz3P06bQxC4URvAW358Yz0dUj0yTOsIe8VnkSWda91kXo8Jt0qYAueECi3c686TZe9Yryw0NzzaISg3nog5md4Q5/7c8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722937104; c=relaxed/simple;
-	bh=+CZrvZF9AsOMY/QciGzdbapwCV3JoModRyHZCE+zn2U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aYugbkG1XfZQXV+POrWv0Pe+3ew7U6lnuZjUW5whyNgozT7QPv8u7kRorNqzjZgHO5gw2U92nchjh2AEul7RfFow9RL9dBH0zl7iX3bxpYII5uquA3Xa/TBe7LnGpwUhosMFM/4cTvQeYQe+5kdRdejFjey+EthEmCpok7j3I1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=de6pn6Aj; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f183f4fa63so5851711fa.1;
-        Tue, 06 Aug 2024 02:38:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722937101; x=1723541901; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DJhPkSNhDdfLFx2gYQV1ujLSQnU42/h3Hyy/L0QOLPU=;
-        b=de6pn6AjqjU7EPg3fqlukGfH1cs8Zm7j1IEpm+o7xei6JovXE7zF9leZBoESgzPsOg
-         RXY3Ha8FUMTlsugP4V2MDYhCYL5at5JatGKa90oOM8HQWaS5uVx50HDIaRzFTaChIXBE
-         pbPVsTpg/cX1AUq0+3db54NhkAUiQp7dNaX17En+PA5ewGDDRGtmZ/8N07m5+oohSSpb
-         WLe0u3xeW5DA2eWBynNfyf+uCZDC2tbKol02aypZThIlNlrX1RLMjU+m5R6pe+S6wEvk
-         P8fpE7TwDWq6vcRtRHaUIKIa2nfHzfMC0928ue9/wmNVGSH4m4ALtx7IYe/tl/+/Ac6z
-         8Y+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722937101; x=1723541901;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DJhPkSNhDdfLFx2gYQV1ujLSQnU42/h3Hyy/L0QOLPU=;
-        b=vdGixwDj4p/osTU3G5ydBa15bERtPGthsMM7gqAOF3Rw6hk3ULFaulrWvPVL000vgv
-         8acjw6w3dC9MCamHwKho7WSxDgH4rga9b5OV8O/6twW4FuufgMmkbNxZPvgfIMG3iEaO
-         hDItUtqi5wNlK7m4n6aw1dlRrTIRbgR3ymRhk48fSrdSWRDlV8lBH6r3xh0dTPzSOCnZ
-         HSKPexcUGxNEmTcko99QE4djrZ3ovgmxmwewhuhBzNYsygIbiyx7pjVXUhEOWC7Edv4v
-         hW4IFPzzIXr2rtRSz2PQYGgRoWetRX6TuIrNtNvKzH6QrUnLOCNCz+9TGLn18z0oSIdi
-         QDdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVYq0/LzcPbHVb4/gmZwJSQbDk4y2B3FDw/ffo1CxQvMUkKPKfruBPUFGBpNKbAR2WVL8tcEY4pooIHXewF92MqXxZnn3GpNZDaTKq5a53xh20kWA+zvj0dPUjwZhpczzlP4Gdh
-X-Gm-Message-State: AOJu0YznpfeKCuI2LLUNC0ucnkEpJcKxL9QvxUkkKp/grgXMyjC+fv3F
-	pHBaei6yb8uKyhg3Wm6a40ZeLTf4ytJ2a4PU2/tIMmarexiRM9Wx
-X-Google-Smtp-Source: AGHT+IFR0d9IbwmBLkFeFJ77ILOonBUYi8sHr7IcC+G13t/ZZueEUcGtc9YhZIfAx/55SH5oSzfzsw==
-X-Received: by 2002:a2e:bc23:0:b0:2ef:2b70:5372 with SMTP id 38308e7fff4ca-2f157662670mr54682171fa.12.1722937100530;
-        Tue, 06 Aug 2024 02:38:20 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f15e272eeesm14033861fa.128.2024.08.06.02.38.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 02:38:20 -0700 (PDT)
-Date: Tue, 6 Aug 2024 12:38:17 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	dl-S32 <S32@nxp.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 1/6] net: driver: stmmac: extend CSR calc support
-Message-ID: <mn4c5yw3eodduysjaxvt5qpsfm55auumin3jabmu6zymeskdsb@7hvc4qrw6gsn>
-References: <AM9PR04MB850628457377A486554D718AE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <8aa45bc5-b819-4979-80b5-6d90a772b117@lunn.ch>
+	s=arc-20240116; t=1722937392; c=relaxed/simple;
+	bh=omalze2Bu4iTxukzVIDOxtrfHbB5LbPErAxWcpq9vdM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FhxODzyidkJ3zi1ms5LQYavs+zmpW+PPw76X2Uv1U7RMWwgfm2oh6MtyaSeUvHF4+Sa6GdvnWtVvfre48Y72GEOwGr1ZC1vrNHY6c1GX3S2Egu4eoSs0e8vbFluDgofek8++uU2beC6KPvpNr7ilFtl3Ri3rOJ14gSXrnhZ40Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fvzfpPGJ; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4769BwND012988;
+	Tue, 6 Aug 2024 02:43:01 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=5
+	Agl40LLFB+MRtquRidYE5l/zqA/1VfO5ifHr76CpR4=; b=fvzfpPGJnSj/IQLYN
+	GP/53Ny7+r8jKL+F7kYNyZvaakWD0zYhEchiU/rzxGIr2+tZI/gjYf6NIJGy7r4g
+	3kpsxMUOlS05kqEmazgtEHRDAsou+iGc1Q+LZX+HsG6LA53DBknRmszgjyBn9uNz
+	kA6OXWKIKu0a/wmheZRC1ilpddWdyI1T4HfvKq63h0BdBpLi6EKc6VLniBN4rSBD
+	T0AdX2loxYDQnU+vJji/Ya90VZvZqOGGzJb2gz3a4FhMaV/1cYQOI5sKJw59ynFt
+	I7+rvKcgUcuFgT4zNLV24CsmVwGD2RsdUx3ppCNju4sBvgZaQ9oRkGHfqZVNYTV+
+	9nizQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 40uh0603vv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Aug 2024 02:43:01 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 6 Aug 2024 02:43:00 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 6 Aug 2024 02:43:00 -0700
+Received: from [10.9.8.37] (EL-LT0043.marvell.com [10.9.8.37])
+	by maili.marvell.com (Postfix) with ESMTP id 25D203F70BD;
+	Tue,  6 Aug 2024 02:42:57 -0700 (PDT)
+Message-ID: <0d0a030c-b1ba-77a7-71f5-55448f6797f6@marvell.com>
+Date: Tue, 6 Aug 2024 11:42:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8aa45bc5-b819-4979-80b5-6d90a772b117@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] [PATCH][next] net: atlantic: Aavoid
+ -Wflex-array-member-not-at-end warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-hardening@vger.kernel.org>
+References: <ZrDwoVKH8d6TdVxn@cute>
+Content-Language: en-US
+From: Igor Russkikh <irusskikh@marvell.com>
+In-Reply-To: <ZrDwoVKH8d6TdVxn@cute>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: oe-13ZfwP1zmYsCuprxFON-PezLvGPkZ
+X-Proofpoint-GUID: oe-13ZfwP1zmYsCuprxFON-PezLvGPkZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-06_07,2024-08-02_01,2024-05-17_01
 
-Hi Andrew
 
-On Mon, Aug 05, 2024 at 01:11:16AM +0200, Andrew Lunn wrote:
-> >  #define	STMMAC_CSR_20_35M	0x2	/* MDC = clk_scr_i/16 */
-> >  #define	STMMAC_CSR_35_60M	0x3	/* MDC = clk_scr_i/26 */
-> >  #define	STMMAC_CSR_150_250M	0x4	/* MDC = clk_scr_i/102 */
-> > -#define	STMMAC_CSR_250_300M	0x5	/* MDC = clk_scr_i/122 */
-> > +#define	STMMAC_CSR_250_300M	0x5	/* MDC = clk_scr_i/124 */
-> 
-> That should probably be called out in the commit message. It is not a
-> fix as such, since it is just a comment, but as a reviewer i had a
-> double take when i noticed this.,
 
-Yes, this seems like a typo. I've checked the divider semantic in the DW
-GMAC 3.50a/3.73a and DW QoS Eth 5.10a HW databooks. Both of them expect the
-clk_scr_i ref clock being divided by 124. So the 122 value was
-incorrect.
+On 8/5/2024 5:32 PM, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally. Move the conflicting declaration to
+> the end of the structure. Notice that `struct hw_atl_utils_fw_rpc` ends in
+> a flexible-array member
+> 
+> Fix the following warnings:
+> 
+> drivers/net/ethernet/aquantia/atlantic/aq_hw.h:197:36: warning: structure
+> containing a flexible array member is not at the end of another structure
+> [-Wflex-array-member-not-at-end]
+> 
+> drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_hw.h:197:36: warning:
+> structure containing a flexible array member is not at the end of another
+> structure [-Wflex-array-member-not-at-end]
 
--Serge(y)
+Hi Gustavo!
 
-> 
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
-> 
+I was abit curious about this variable length structure, because it looks strange and not actually used by driver.
+
+I've cross checked, and its really some outdated declaration. The structure is never used as as a flex sized struct.
+
+So better would be to do just this:
+
+--- a/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.h
++++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl/hw_atl_utils.h
+@@ -226,7 +226,6 @@ struct __packed offload_info {
+        struct offload_port_info ports;
+        struct offload_ka_info kas;
+        struct offload_rr_info rrs;
+-       u8 buf[];
+ };
+
+Let me know if you want to submit this, or I can do this as well.
+
+Regards,
+  Igor
 
