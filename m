@@ -1,112 +1,128 @@
-Return-Path: <netdev+bounces-115932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1D19486D7
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 03:02:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE849486E7
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 03:14:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 360C2284852
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:02:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B2E2839E5
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761588F77;
-	Tue,  6 Aug 2024 01:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397EE63D5;
+	Tue,  6 Aug 2024 01:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IPcLEKr8"
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="mjmcjfip"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529408F62
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 01:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C984C6FBF
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 01:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722906119; cv=none; b=s3/g5HE3X2OLHY+JH0ZqX6sH2dArZaw9SRFSjIbM3rXSvWrI9faTtmnh96hppXVEqffamaeebDFhf1DPh6G/SHNFowxowtLXHBJAZrn6b0Kb34avSv28a1ousvH5DVnW5JWw/f7XV8Pz6zvVV5OGsTDSRdAw1KN3TVI7VnFxE7g=
+	t=1722906843; cv=none; b=LuqIfZ1xZkM5vRAkBJpN9X5mOTUUOCBnPEQN+o+NjLfj5OUxBMiOiqSNVmvj/11FAZAb9x2y1HzaAjSBDas+sQ6430p8WrjbfEXsiz2FvaZakW91g+KMwscK0E2b7nac/pQaZTs7S5kVHcAUwn4ryBdWOmJY2N79vGlq066+/LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722906119; c=relaxed/simple;
-	bh=qTxGSVbgiyiaXipIZz9MBRcX5H1+S15LdEjJoBA63X0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lclbrNx/uRuJ++i6ItMTlROiRfIk+UFZnNulB24A2Xa/LDHs1XdL7FFoJRpVRQCqMil605eCo/rYtJb9zGbnx0DKlle52CPK2nDnUkjYuMpTNI/dqum1w7Ry8v3Smk8JjqHosFKf2Z9xI2n0dXXAoOLHuFGLb3wx1en1HD2EfHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IPcLEKr8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722906116;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qTxGSVbgiyiaXipIZz9MBRcX5H1+S15LdEjJoBA63X0=;
-	b=IPcLEKr8UbFnXEB9VDzhKYOcWSA3Ug9ZxI863P88iyPa4eD1UJe3FCRxS5q1kKusxscZNm
-	q4NItGdAsFqO2Z4h5O8j3sGwAiqMCDR6rGBEiiGeJzkO07qOggbP3gZo2k1a5cQGpKB8Ra
-	xm1TBW9ZfOaCCoQgk0ZN/J70M5NBlYg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-149-X4vm6ILfNom7QCrc8-U_ZQ-1; Mon, 05 Aug 2024 21:01:53 -0400
-X-MC-Unique: X4vm6ILfNom7QCrc8-U_ZQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5a37b858388so8504a12.1
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 18:01:52 -0700 (PDT)
+	s=arc-20240116; t=1722906843; c=relaxed/simple;
+	bh=VhOpaUB++nSS8JaN1KKzR/SOFXteJzmkPDgJvfcxzJI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oslkfRwlv/y9OMxBCVMmr+QDWrvuPpBLJSG97fD7rVULXLBvgZqbKQjSqvKvtuZmQQhfRql0hxX+1WlEg5FLe2iR5v58UWswnOsnxPJVv7ez1uQf0XS0qarjFHQoKQ0lAyxul04QIxv3dPnP02wqy0C9+p0g/qHrJgRTfi4ocxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=mjmcjfip; arc=none smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3d9e13ef8edso7173b6e.2
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 18:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1722906840; x=1723511640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AcP/ndjRlzAp+Mjtn/zIgfE1/PAubr4JGIESnJdralo=;
+        b=mjmcjfipuwthLoJQpEeeeBqgCzWf9HUV/UZp0cPbLjsfmnITm5nSdwLDzvJl7nu62f
+         AO6ozOCt1oBZeYMP2Ckg+/5H2sXcWaQ1/Zr5y49nhOpAksNvP8QrWKTU0y3zKppXRlff
+         rbrVNzc4ssmb5WR82fC+WSrUiNo44PrCeb9ThzqcSbCUx84Wz92W5zEntUaZKV+5MqBe
+         h7PjC/0ZcjPN6sLytddN6L45HPwDvkYrXbGomxlkEDHrk+oC30/NSl71QGBptDKScqqH
+         58MYNnQazt3GWBQMivrxK5nF2mt4uAlC5Wl/H3Q3S+BPlFRyLl6p8/RbzsGC7U6cQLr5
+         P/2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722906112; x=1723510912;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1722906840; x=1723511640;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qTxGSVbgiyiaXipIZz9MBRcX5H1+S15LdEjJoBA63X0=;
-        b=GNK8quxanOtDSjP/X7JkVAfC5FZnOVTeoRXFvWadg1Pk+mt4qJdCqqZI3xt7vCmlmJ
-         bvyH0zC1oXGPwVsOmxR4TfCjDnzTKeD9BcSrik/4u4EroYr/nokQ/CQ1lWo/IyEQ2gRs
-         YyWmv7qW5PG+1rZoZNEvnqL7rq8MR/3JEACVp19SHjBZAHVZZg0Vt6l4h0OzZqsdHxZJ
-         7UINSNk//QHEMIvkmIIfZtngMG6GXTL+8Zf/9KZJl6naK6dwcCGWNOgs6Dsl6p5lA9Us
-         cOPRJ8K+/iN+hWw+Rm88fdGHksGzJ3zyXkQbpYBQNpZ+wbVOlw8MZcqAIGm52iqr2agf
-         pB9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWV1MYf/KM7aUN+zrEOxFB678s5WY0DV6abBh+ejVEP9jWuAaW7FiOIFDZStB/QJSlEvx25Vkr+gucJX7ZWVvXPJ46t28Fu
-X-Gm-Message-State: AOJu0YwfLSFt6Nb80Kpg//CyzRIPMU4nQfbNQ1FYgG9PKiaGdos8pgQU
-	UWUiMr9WqW5kkxshcQ1WgiiMX9AsOwRUAfWkYD49y+JN/cPrUMt4OUDuk5MX3HhlaGLo0UuLJes
-	N7+PmvetBIdl29nmSEJPtZCc+aSRsACqj9brZK48q+pNgBIIrHAQZSWCnt7luj1xMOB8XUH4Zi5
-	1+0JjHJ7jS0OJI7c5ZTqtxpnGbVh2+
-X-Received: by 2002:a17:907:968b:b0:a7d:c9c6:a692 with SMTP id a640c23a62f3a-a7dc9c6a8a1mr1079876166b.51.1722906111939;
-        Mon, 05 Aug 2024 18:01:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHCS+070//FntlKwTGaK5hUCETtQAofF2eG5Bcd+y4osVs63OeNK9ZqLrHX5n/FYiicIZxurJMhQLS+TMSS+R0=
-X-Received: by 2002:a17:907:968b:b0:a7d:c9c6:a692 with SMTP id
- a640c23a62f3a-a7dc9c6a8a1mr1079873566b.51.1722906111375; Mon, 05 Aug 2024
- 18:01:51 -0700 (PDT)
+        bh=AcP/ndjRlzAp+Mjtn/zIgfE1/PAubr4JGIESnJdralo=;
+        b=IfePHlspibobmJLTfhCwX6BWzoqCJt3fO2sAYN9za6KVVtJljlpBHjAMiV3xwJW5AE
+         kKap2qV5T1XbOUkSM1+kBi0BNh/lo9iT3b1oWJtQTsPxA/G2EUdPEvKB0Oz4ppAWCSb9
+         VR9InmNbUhOgd92ev5NU0XdfB5luWzSqxTDeqvnWBm94iAZZQSiWY/nwMdfJfiq3/CgW
+         LRmvPmgSLYux8jYrcwstxFdurUNm/ES0Lxgu9qJaCtzaFCPpCCFIfefWCXuBZtjwOnBJ
+         7cq2mb5sD2p9O6XwK3Ax1Cg+5CP5BPNN4/O8TDizLfU+c9VpDbsPsI7UjU6hVDfmwgWT
+         8QdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpLjNv3Kbbcs2zW3zR+yEqUvZ1BZuFzpcdsyBGjLFh8XuO4Zv2PnCxHYSv1dZchNhc6U56nWY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbXljN7zZkRA5R7CbIFcaQGCFL0VkDxOSQJf1igS/HgBi3lwOX
+	o9uYx0Daj30FXBnj51plBmsPCxZBc5loH8GtB+tvDorOHCgIfSC4/p1EnngMk8c=
+X-Google-Smtp-Source: AGHT+IGumus0X8RT7dPenHfw3+Bwaxk8Eq/hghdfXqTKFrXe8YIsKd7n4qBIHjulQ5aQt5HmQpoDXg==
+X-Received: by 2002:a05:6808:301e:b0:3da:a032:24c5 with SMTP id 5614622812f47-3db5580dd35mr14499433b6e.22.1722906839847;
+        Mon, 05 Aug 2024 18:13:59 -0700 (PDT)
+Received: from localhost.localdomain ([2001:f70:2520:9500:a63a:9060:e0f5:20f7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7b763a3fa2asm6083546a12.50.2024.08.05.18.13.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 18:13:59 -0700 (PDT)
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+To: f.fainelli@gmail.com,
+	andrew@lunn.ch,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Subject: [PATCH v2] net: dsa: bcm_sf2: Fix a possible memory leak in bcm_sf2_mdio_register()
+Date: Tue,  6 Aug 2024 10:13:27 +0900
+Message-Id: <20240806011327.3817861-1-joe@pf.is.s.u-tokyo.ac.jp>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731071406.1054655-1-lulu@redhat.com> <469ea3da-04d5-45fe-86a4-cf21de07b78e@gmail.com>
-In-Reply-To: <469ea3da-04d5-45fe-86a4-cf21de07b78e@gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 6 Aug 2024 09:01:14 +0800
-Message-ID: <CACLfguXqdBDXy7C=1JLJkvABHSF+vJwfZf6LTHaC6PZTReaGUg@mail.gmail.com>
-Subject: Re: [PATCH v3] vdpa: Add support for setting the MAC address and MTU
- in vDPA tool.
-To: David Ahern <dsahern@gmail.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Sun, 4 Aug 2024 at 23:32, David Ahern <dsahern@gmail.com> wrote:
->
-> On 7/31/24 1:14 AM, Cindy Lu wrote:
-> > Add a new function in vDPA tool to support set MAC address and MTU.
-> > Currently, the kernel only supports setting the MAC address. MTU support
-> > will be added to the kernel later.
-> >
-> > Update the man page to include usage for setting the MAC address. Usage
-> > for setting the MTU will be added after the kernel supports MTU setting.
-> >
->
-> What's the status of the kernel patch? I do not see
-> VDPA_CMD_DEV_ATTR_SET in net-next for 6.11.
->
-hi David
-The kernel patch has received ACK, but it hasn't been merged yet.
+bcm_sf2_mdio_register() calls of_phy_find_device() and then
+phy_device_remove() in a loop to remove existing PHY devices.
+of_phy_find_device() eventually calls bus_find_device(), which calls
+get_device() on the returned struct device * to increment the refcount.
+The current implementation does not decrement the refcount, which causes
+memory leak.
 
-https://lore.kernel.org/netdev/20240731031653.1047692-1-lulu@redhat.com/T/
-thanks
-cindy
+This commit adds the missing phy_device_free() call to decrement the
+refcount via put_device() to balance the refcount.
+
+Fixes: 771089c2a485 ("net: dsa: bcm_sf2: Ensure that MDIO diversion is used")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+---
+Changes in v2:
+- Add a Fixes tag.
+---
+ drivers/net/dsa/bcm_sf2.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
+index ed1e6560df25..0e663ec0c12a 100644
+--- a/drivers/net/dsa/bcm_sf2.c
++++ b/drivers/net/dsa/bcm_sf2.c
+@@ -675,8 +675,10 @@ static int bcm_sf2_mdio_register(struct dsa_switch *ds)
+ 			of_remove_property(child, prop);
+ 
+ 		phydev = of_phy_find_device(child);
+-		if (phydev)
++		if (phydev) {
+ 			phy_device_remove(phydev);
++			phy_device_free(phydev);
++		}
+ 	}
+ 
+ 	err = mdiobus_register(priv->user_mii_bus);
+-- 
+2.34.1
 
 
