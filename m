@@ -1,140 +1,112 @@
-Return-Path: <netdev+bounces-115931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D0C9486C8
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:57:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1D19486D7
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 03:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BC29B226E4
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 00:57:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 360C2284852
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D63AD5B;
-	Tue,  6 Aug 2024 00:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761588F77;
+	Tue,  6 Aug 2024 01:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OPkonNMT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IPcLEKr8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09A08F62
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 00:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529408F62
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 01:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722905816; cv=none; b=Kh3jM7GYt7wHVE3y3qORfde+N4HcyCskUPYrmqtUd3XI4Es15ZMOuAzVcJqlecN4xj+6yePAWCWoQ9DitI8PSxMHTm5ZvXc6JnggEj8wpoY28G9tuCkpvXO7chlRMyw57NcR2bn1OhmPtIOWhUTmzvZ0teN1iG05Pn4h6JRG8/I=
+	t=1722906119; cv=none; b=s3/g5HE3X2OLHY+JH0ZqX6sH2dArZaw9SRFSjIbM3rXSvWrI9faTtmnh96hppXVEqffamaeebDFhf1DPh6G/SHNFowxowtLXHBJAZrn6b0Kb34avSv28a1ousvH5DVnW5JWw/f7XV8Pz6zvVV5OGsTDSRdAw1KN3TVI7VnFxE7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722905816; c=relaxed/simple;
-	bh=6HShHmlRyYqJF/lxnIFN4K3F8WqEOdQKxFsFbLvdtw8=;
+	s=arc-20240116; t=1722906119; c=relaxed/simple;
+	bh=qTxGSVbgiyiaXipIZz9MBRcX5H1+S15LdEjJoBA63X0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OIwI8nA8gVmhObV+PB7YHbBWnIUkRdNqMlgv/zj0hzpnxBbQdvZ6Y0coej9rYjPR72lAlQQduMVSzVeSPEjtCUCIxaTZfE4vg/9E6rwVdCiQxMsOtUj92Fbg8L2UsMgKOZucvgO0EvYM1vgJjrdSBdp8Bg4fA8c4ElX3gFrn2EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OPkonNMT; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7afd1aeac83so4773636a12.0
-        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 17:56:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1722905814; x=1723510614; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cwZE/zSStAB+5qTNzY+sgOE4dLh2iH+ZCrAOz5MqluM=;
-        b=OPkonNMTCbUaQjlp/hYRtVAs3NLgY487CMYEaTPhlkNHIYs0C8sp0/Jk0wTeKdFs+h
-         AlcpvguvdcufBk6u4nPcL3k59teNqabuTYJ2KtH0kWtmb9j9JxXB1w3PY33HDtdp7c2/
-         /Nwm45rJcag2GxIs+46+hKyAsGuSNFgGpMQkc=
+	 To:Cc:Content-Type; b=lclbrNx/uRuJ++i6ItMTlROiRfIk+UFZnNulB24A2Xa/LDHs1XdL7FFoJRpVRQCqMil605eCo/rYtJb9zGbnx0DKlle52CPK2nDnUkjYuMpTNI/dqum1w7Ry8v3Smk8JjqHosFKf2Z9xI2n0dXXAoOLHuFGLb3wx1en1HD2EfHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IPcLEKr8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722906116;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qTxGSVbgiyiaXipIZz9MBRcX5H1+S15LdEjJoBA63X0=;
+	b=IPcLEKr8UbFnXEB9VDzhKYOcWSA3Ug9ZxI863P88iyPa4eD1UJe3FCRxS5q1kKusxscZNm
+	q4NItGdAsFqO2Z4h5O8j3sGwAiqMCDR6rGBEiiGeJzkO07qOggbP3gZo2k1a5cQGpKB8Ra
+	xm1TBW9ZfOaCCoQgk0ZN/J70M5NBlYg=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-149-X4vm6ILfNom7QCrc8-U_ZQ-1; Mon, 05 Aug 2024 21:01:53 -0400
+X-MC-Unique: X4vm6ILfNom7QCrc8-U_ZQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5a37b858388so8504a12.1
+        for <netdev@vger.kernel.org>; Mon, 05 Aug 2024 18:01:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722905814; x=1723510614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cwZE/zSStAB+5qTNzY+sgOE4dLh2iH+ZCrAOz5MqluM=;
-        b=iisiYTtIMbh9zuWiEUNjKpP4wzwq0nGG3TpaVv8MuW5wfg5RGFzFfL/det/J2zq5Jv
-         54/13BerJDA7JmtaBIP1g2TaIgN++LsmQszdIyMplbRqaMSxw126hvfZ56WyionfVO5n
-         KzzF1hCWfe0RIzZLLVXZMlm9QZ3C11GzzaEfAGaNmISuOuxWtiY6MjOn7pFo/HvA7ucq
-         LEru6QsLN8SG01vossx5yFLjx218jQxbXW/bCA5y9sGRGpSIB5jQVQ+poIHI65fqJtG2
-         KVmdtXuNW4C6MBdmxjY3o3u4n1flbbo04L6IqJhjGS4oB1afBiyH1hk13nVUgnoC6P0I
-         9Z1A==
-X-Gm-Message-State: AOJu0YwCMRoPZFQj+gpJ5I8JQpZ+RfzOiCe9VZ5uqSwpaGIgQdEb86vo
-	3rgK98M+0rgz2bd93BqAItfh51+SZN06TItMeiUjShay9MS6K4N0DjBJHmF/O/ToLYqu8rhPOtg
-	Nzjkbl+M8WOiib6/SWKVJh/6dB1cgATtzWPne
-X-Google-Smtp-Source: AGHT+IGZVfnAL4deG58bXtCU7sw5xKt90hQmxfCrSSa168DCHBbwU9Bq+DV2ARTPO9PPCNOlMLXxjgCi5lM49HFN9Vc=
-X-Received: by 2002:a17:90b:4a8b:b0:2c7:49b4:7e3a with SMTP id
- 98e67ed59e1d1-2cff09346a1mr22627395a91.7.1722905814228; Mon, 05 Aug 2024
- 17:56:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722906112; x=1723510912;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qTxGSVbgiyiaXipIZz9MBRcX5H1+S15LdEjJoBA63X0=;
+        b=GNK8quxanOtDSjP/X7JkVAfC5FZnOVTeoRXFvWadg1Pk+mt4qJdCqqZI3xt7vCmlmJ
+         bvyH0zC1oXGPwVsOmxR4TfCjDnzTKeD9BcSrik/4u4EroYr/nokQ/CQ1lWo/IyEQ2gRs
+         YyWmv7qW5PG+1rZoZNEvnqL7rq8MR/3JEACVp19SHjBZAHVZZg0Vt6l4h0OzZqsdHxZJ
+         7UINSNk//QHEMIvkmIIfZtngMG6GXTL+8Zf/9KZJl6naK6dwcCGWNOgs6Dsl6p5lA9Us
+         cOPRJ8K+/iN+hWw+Rm88fdGHksGzJ3zyXkQbpYBQNpZ+wbVOlw8MZcqAIGm52iqr2agf
+         pB9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWV1MYf/KM7aUN+zrEOxFB678s5WY0DV6abBh+ejVEP9jWuAaW7FiOIFDZStB/QJSlEvx25Vkr+gucJX7ZWVvXPJ46t28Fu
+X-Gm-Message-State: AOJu0YwfLSFt6Nb80Kpg//CyzRIPMU4nQfbNQ1FYgG9PKiaGdos8pgQU
+	UWUiMr9WqW5kkxshcQ1WgiiMX9AsOwRUAfWkYD49y+JN/cPrUMt4OUDuk5MX3HhlaGLo0UuLJes
+	N7+PmvetBIdl29nmSEJPtZCc+aSRsACqj9brZK48q+pNgBIIrHAQZSWCnt7luj1xMOB8XUH4Zi5
+	1+0JjHJ7jS0OJI7c5ZTqtxpnGbVh2+
+X-Received: by 2002:a17:907:968b:b0:a7d:c9c6:a692 with SMTP id a640c23a62f3a-a7dc9c6a8a1mr1079876166b.51.1722906111939;
+        Mon, 05 Aug 2024 18:01:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCS+070//FntlKwTGaK5hUCETtQAofF2eG5Bcd+y4osVs63OeNK9ZqLrHX5n/FYiicIZxurJMhQLS+TMSS+R0=
+X-Received: by 2002:a17:907:968b:b0:a7d:c9c6:a692 with SMTP id
+ a640c23a62f3a-a7dc9c6a8a1mr1079873566b.51.1722906111375; Mon, 05 Aug 2024
+ 18:01:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240802031822.1862030-1-jitendra.vegiraju@broadcom.com>
- <20240802031822.1862030-4-jitendra.vegiraju@broadcom.com> <c2e2f11a-89d8-42fa-a655-972a4ab372da@lunn.ch>
-In-Reply-To: <c2e2f11a-89d8-42fa-a655-972a4ab372da@lunn.ch>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Mon, 5 Aug 2024 17:56:43 -0700
-Message-ID: <CAMdnO-JBznFpExduwCAm929N73Z_p4S4_nzRaowL9SzseqC6LA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add PCI driver support for BCM8958x
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
+References: <20240731071406.1054655-1-lulu@redhat.com> <469ea3da-04d5-45fe-86a4-cf21de07b78e@gmail.com>
+In-Reply-To: <469ea3da-04d5-45fe-86a4-cf21de07b78e@gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 6 Aug 2024 09:01:14 +0800
+Message-ID: <CACLfguXqdBDXy7C=1JLJkvABHSF+vJwfZf6LTHaC6PZTReaGUg@mail.gmail.com>
+Subject: Re: [PATCH v3] vdpa: Add support for setting the MAC address and MTU
+ in vDPA tool.
+To: David Ahern <dsahern@gmail.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 2, 2024 at 4:08=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Sun, 4 Aug 2024 at 23:32, David Ahern <dsahern@gmail.com> wrote:
 >
-> > Management of integrated ethernet switch on this SoC is not handled by
-> > the PCIe interface.
+> On 7/31/24 1:14 AM, Cindy Lu wrote:
+> > Add a new function in vDPA tool to support set MAC address and MTU.
+> > Currently, the kernel only supports setting the MAC address. MTU support
+> > will be added to the kernel later.
+> >
+> > Update the man page to include usage for setting the MAC address. Usage
+> > for setting the MTU will be added after the kernel supports MTU setting.
+> >
 >
-> MDIO? SPI? I2C?
+> What's the status of the kernel patch? I do not see
+> VDPA_CMD_DEV_ATTR_SET in net-next for 6.11.
 >
-The device uses SPI interface. The switch has internal ARM M7 for
-controller firmware.
+hi David
+The kernel patch has received ACK, but it hasn't been merged yet.
 
-> > +#define XGMAC_PCIE_MISC_MII_CTRL                     0x4
-> > +#define XGMAC_PCIE_MISC_MII_CTRL_VALUE                       0x7
->
-> Could you replace these magic values with actual definitions. What
-> does 7 mean?
->
-Thanks, I will fix the macros.
+https://lore.kernel.org/netdev/20240731031653.1047692-1-lulu@redhat.com/T/
+thanks
+cindy
 
-> > +#define XGMAC_PCIE_MISC_PCIESS_CTRL                  0x8
-> > +#define XGMAC_PCIE_MISC_PCIESS_CTRL_VALUE            0x200
->
-> > +static int num_instances;
->
-> > +     /* This device is directly attached to the switch chip internal t=
-o the
-> > +      * SoC using XGMII interface. Since no MDIO is present, register
-> > +      * fixed-link software_node to create phylink.
-> > +      */
-> > +     if (num_instances =3D=3D 0) {
-> > +             ret =3D software_node_register_node_group(fixed_link_node=
-_group);
-> > +             if (ret) {
-> > +                     dev_err(&pdev->dev,
-> > +                             "%s: failed to register software node\n",
-> > +                             __func__);
-> > +                     return ret;
-> > +             }
-> > +     }
-> > +     num_instances++;
->
-> So all the instances of the MAC share one fixed link? That is pretty
-> unusual. In DT, each would have its own. Have you reviewed the
-> implications of this?
->
-Our thinking was that since the software node is only used for static
-node data to populate phylink config, a per device node is not
-required.
-We tested with multiple devices and repeated PCI remove/rescan operations.
-However, It does make sense to be consistent with the DT usage model.
-We will add the per device node entry in the next patch update.
->         Andrew
 
