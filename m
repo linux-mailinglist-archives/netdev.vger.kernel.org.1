@@ -1,213 +1,151 @@
-Return-Path: <netdev+bounces-116100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E311949177
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:30:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A899491AE
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AEAB1C23ADE
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:30:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51B6AB20D13
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966C41D61B3;
-	Tue,  6 Aug 2024 13:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CC11C2324;
+	Tue,  6 Aug 2024 13:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIdxqp1N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RnMD4qTF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4F31D2F4E;
-	Tue,  6 Aug 2024 13:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB371DDF5
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 13:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722950936; cv=none; b=ivKW+jfFJz586pUDthyeIZlrRtC/y0LnUyN6lrXp23VyCMZjsH9OabVXmIHR27oqWdE2UujJoE78ZMYWskAhfxmBOJE9WKgAQumUWfgoyyukzI3V+RsYIVGoPbXkLLcwk3ocndVjdFPFzyXoFSwKvPE+CY9kUrpiTOBFFBnP/MM=
+	t=1722950901; cv=none; b=qa0tNCuoPgxAXxV7FQtllHPI3mnOLA792AgGvL2G1W75uyzwip8Q7F6bBtHakroVviR4mJ8a1f4vKwQEZomeqO/C6GjoKd38HLCsY6d+c22FzzIt2YwC5Mtt9azBkh5jiYcjRqO7CyRKjTEWQDDyoc3Xu89/OtGLh4mqAbK5fMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722950936; c=relaxed/simple;
-	bh=Oy5VK+J9SJzFKJSgznA+kp9C9cF+F9I7pfuj42UXu6M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=liFrpEkBB8QskIifBHCKIAkJHE0MlGDzpmahCQ84Lr8kQskKTQNOpNwzLmPSPNyWBZw9S1TI25blHBrEggGUMbiojsKSbsrfiBr1RSoGW3RpQOBmx8J7sgYQFjiAq9VY0zIP6KyeZQNA1a2Tb7hG1GBvdBLhgCKZq8+SGSvjaU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIdxqp1N; arc=none smtp.client-ip=209.85.208.50
+	s=arc-20240116; t=1722950901; c=relaxed/simple;
+	bh=fLvIWTlzRTsZs87wYNpxFa+mx78IMbmxxIGlBKyjUFw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=gZsOrWFgUNNmYsRf/gcAns7Cw0t3QEEOTncd+aZHkVEMx/NlvQVyLewX4F8cKazKkUR6/79HTR9PwHGV947ayQMXBZOxXzYrL3nYF+7Dgix0QUEzv9RFvdYxcMPYjjEVLc6Q0kTUq9cxcqXMuhWcGjDzzSSDVGaTu1/3ZNahYKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RnMD4qTF; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5b7b6a30454so1008481a12.2;
-        Tue, 06 Aug 2024 06:28:54 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3687fb526b9so313276f8f.0
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 06:28:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722950933; x=1723555733; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w49WuvPRHENEHIOBXjssOrgW46Ua4jNhfekHObaq3gM=;
-        b=eIdxqp1Nno7bRCkExM1tPO9zw7R5TrjXDK/scjolfVyVquWLkTtBGGDziKkq/MMeDd
-         MH46IPg2hVD2D1n9MJQSjUX95Rfr61Mns6q8mq20JFrXznucPa8G8k3xUgI1RfYAoM5H
-         VgxT1Av8CxK9Br4UFLPGni6JojEOrsJQltVDD9zC9Q8B61xMncDnWISoL1TTczvS1bs2
-         QcmZIRorHoK645Ks0LiSk4des+W6C49ENFDjrLYlFaMLErq1PofMcYqL0LBsEZMxH5LD
-         lIe4z45jpebnvL61gpmb+dT9m8lLS3ULBhVTzCwkfoHr2eVaOpjWcrRgwZ2wuvLB7W0O
-         KhDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722950933; x=1723555733;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1722950898; x=1723555698; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w49WuvPRHENEHIOBXjssOrgW46Ua4jNhfekHObaq3gM=;
-        b=IZ2S7s4S229sXVXC6lcCmAqCdtz0ZmoghlJ2wp4SSuvCVSoQhQkWItcCyydZA5VfxY
-         xBL7xUqTCfy2xGYDZVxN0Bj0VEz0NqIMQFVzzjOaxjhEnqA0UsCbVkbOg11SBOPyUFHQ
-         ibKIj0V0OCZjNCz/hY/gHn55BmKMgtUVD/n+Fh5tqD0nU/affqC3hQgpkbtGUQF3wbPw
-         qxRwqQ0wIthg08ktRZ0YknjSDlCCSkU/slsq2AA1spdaKsoQzJeVWPbyHk4AR7tmnkc9
-         auXnMzKekIcOLQVdBv5WlEIH5dZ7J8Q8isLGt0Mpsj91rMJMIr1JIX2f1pZdtfRTgP6q
-         vV7w==
-X-Forwarded-Encrypted: i=1; AJvYcCWn2qQ5loNHlqp+t8R175kdtFQZR7KovBrxD7jGGmsxa4wGguDYNYmwEk4VPYKH6b9MMWTx3AicN7eIfTzlI6QcQH9yGo1BjfuCWr3d4BM2zbM4enP8JAEqGvak0eUZx/ullTyV6yXd2LThFGO2tpKM6f+h3mtKb+m7tr24K/JqBg==
-X-Gm-Message-State: AOJu0YwCJiqM5+vrXb6mYaYA1C8hSFyh0bJRrse9o3Rny9EqpbT9Ez31
-	2uVc8fZL/x+nlXLGDzkgWXFcwzXUSo9NadrOddHsRhJZOCFWE9Qj
-X-Google-Smtp-Source: AGHT+IGxV+ISuGgORGRSPMwY7Nw46x5tF8+NUOXAr5pk0dni48nHLr/FmB62p3Ie8N8c7CQuNmEZTw==
-X-Received: by 2002:a05:6402:1244:b0:5a1:225b:4233 with SMTP id 4fb4d7f45d1cf-5b7f531468amr10906863a12.23.1722950932990;
-        Tue, 06 Aug 2024 06:28:52 -0700 (PDT)
-Received: from lapsy144.cern.ch ([2001:1458:204:1::102:a6a])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b83a153f77sm5910172a12.53.2024.08.06.06.28.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 06:28:52 -0700 (PDT)
-From: vtpieter@gmail.com
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	David S Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marek Vasut <marex@denx.de>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Woojung Huh <Woojung.Huh@microchip.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Subject: [PATCH net-next v3 5/5] net: dsa: microchip: apply KSZ87xx family fixes wrt datasheet
-Date: Tue,  6 Aug 2024 15:25:57 +0200
-Message-ID: <20240806132606.1438953-6-vtpieter@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240806132606.1438953-1-vtpieter@gmail.com>
-References: <20240806132606.1438953-1-vtpieter@gmail.com>
+        bh=rOHryhkj8Fg/bdp09KCKi4YeVq6T/vjtDm8nZiRH5V8=;
+        b=RnMD4qTFnd9TsBLPsjsA5VbALlHjHBq/G+r2F79CcgoOPrSZ+x+GzuVIlzN4Ju+oJ+
+         O4/+SGRsRWHH6m+NBdJH9VKQrjGaUqGpBQ6YNtSOtqRj1Dasnxx8vVurZQjiVJ8YnIe7
+         ysrzW1jNbPd6wRQUb9G/wkdl+22X4N7aAFJw1MSsuYeOrvrpBAoAcCKytUg/ogFPv9H9
+         FwlWe9KaBH9gbVWY3ktCiimSX2jY72klVOrTwa0jKmRJ3Au0xiakwKIENbCgaIYLvKG5
+         nSXu/hxzm3W9qorD2drp+wFM5tnnfefcLz67qJwYB+a5YrT4yCU0KI+tHi5ioUdJ+gTL
+         ptjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722950898; x=1723555698;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rOHryhkj8Fg/bdp09KCKi4YeVq6T/vjtDm8nZiRH5V8=;
+        b=WhcUe/BUFofwyiA5H+JLRD6Uda/pYzKpWvfcw8Lx5ppzI6rucsHN2QwFF51w3aaRaq
+         NvlU6t+N4+0nhX3++ck+tobf4ha+A0KyoTqVvgF/DxGJolpZ4JoE+th4U29e/JVcfmul
+         oZF+iBi4FtC71Vh64UA9Wj3MhEBnAEhEK/KOraGKSSYW/tfvFwG434KPLxVou3gW9+lt
+         P8i1vtCGwj3CWbT8Ei4WW6PmuGp5FQsuHeb57UbCb+J/KmNlkL6DPluK5O/3aa/WkyqX
+         tJ4ttJS9+8aBvuSKO4FvCgiselCrqrFeMvBwrc6eV+9gXpDcdyxk+2ZUQZzTloG7U/GD
+         dojg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTLxcfEFxAmvS2/YBVHZv23E1klZ++uVd4WSKxoxzSUkFswvwcQdoJkwURAjrT/IjyidouH5IyTEzqT5PB943r5YjOZQ/B
+X-Gm-Message-State: AOJu0Ywr4/Gb25BAjRsXJ3WlMZUWAQ8EeiycRJBBvvQtocK1PS+z4RQk
+	Si10E+bg3QE8i5M9uungPeuG7y/Z3gZa45PCfaaAj2y2Ie09wfuW
+X-Google-Smtp-Source: AGHT+IE5nYv48id5TGBtGOA9h9qMlBZ55kQ/PsVK4LcEj4SuuPNhLRNNI/HYbY1D2+g/1J/jLhzwTQ==
+X-Received: by 2002:a5d:5f86:0:b0:368:445e:91cc with SMTP id ffacd0b85a97d-36bbc0e40bcmr11690685f8f.21.1722950898217;
+        Tue, 06 Aug 2024 06:28:18 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd06e0f5sm12985702f8f.104.2024.08.06.06.28.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Aug 2024 06:28:17 -0700 (PDT)
+Subject: Re: [PATCH net-next v2 02/12] eth: mvpp2: implement new RSS context
+ API
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, dxu@dxuuu.xyz, przemyslaw.kitszel@intel.com,
+ donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
+ willemdebruijn.kernel@gmail.com, jdamato@fastly.com,
+ marcin.s.wojtas@gmail.com, linux@armlinux.org.uk
+References: <20240803042624.970352-1-kuba@kernel.org>
+ <20240803042624.970352-3-kuba@kernel.org>
+ <1683568d-41b5-ffc8-2b08-ac734fe993a7@gmail.com>
+ <20240805142930.45a80248@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <52cbca9f-503f-25b4-aabf-461d09f41e9f@gmail.com>
+Date: Tue, 6 Aug 2024 14:28:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240805142930.45a80248@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+On 05/08/2024 22:29, Jakub Kicinski wrote:
+> On Mon, 5 Aug 2024 12:25:28 +0100 Edward Cree wrote:
+>>> mvpp2 doesn't have a key for the hash, it defaults to
+>>> an empty/previous indir table.  
+>>
+>> Given that, should this be after patch #6?  So as to make it
+>>  obviously correct not to populate ethtool_rxfh_context_key(ctx)
+>>  with the default context's key.
+> 
+> It's a bit different. Patch 6 is about devices which have a key but 
+> the same key is used for all contexts. mvpp2 has no key at all
+> even for context 0 (get_rxfh_key_size is not defined).
 
-The KSZ87xx switches have 32 entries and not 8. This fixes -ENOSPC
-errors from ksz8_add_sta_mac when configured as a bridge.
+Oh, I see.  Clarify that in the commit message, perhaps?
 
-Add a new ksz87xx_dev_ops structure to be able to use the
-ksz_r_mib_stat64 pointer for this family; this corrects a wrong
-mib->counters cast to ksz88xx_stats_raw. This fixes iproute2
-statistics.
+>>> @@ -5750,6 +5792,7 @@ static const struct net_device_ops mvpp2_netdev_ops = {
+>>>  
+>>>  static const struct ethtool_ops mvpp2_eth_tool_ops = {
+>>>  	.cap_rss_ctx_supported	= true,
+>>> +	.rxfh_max_context_id	= MVPP22_N_RSS_TABLES,  
+>>
+>> Max ID is inclusive, not exclusive, so I think this should be
+>>  MVPP22_N_RSS_TABLES - 1?
+> 
+> I totally did check this before sending:
+> 
+>  * @rxfh_max_context_id: maximum (exclusive) supported RSS context ID.  If this
+>  *	is zero then the core may choose any (nonzero) ID, otherwise the core
+>  *	will only use IDs strictly less than this value, as the @rss_context
+>  *	argument to @create_rxfh_context and friends.
+> 
+> But you're right, the code acts as if it was inclusive :S
 
-Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
----
- drivers/net/dsa/microchip/ksz_common.c | 47 ++++++++++++++++++++++----
- 1 file changed, 41 insertions(+), 6 deletions(-)
+Mea culpa, clearly when I was porting to XArray I must have
+ confused myself over this.
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index c2079e39fbd5..dd141a31b26d 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -312,6 +312,41 @@ static const struct ksz_dev_ops ksz8_dev_ops = {
- 	.pme_pwrite8 = ksz8_pme_pwrite8,
- };
- 
-+static const struct ksz_dev_ops ksz87xx_dev_ops = {
-+	.setup = ksz8_setup,
-+	.get_port_addr = ksz8_get_port_addr,
-+	.cfg_port_member = ksz8_cfg_port_member,
-+	.flush_dyn_mac_table = ksz8_flush_dyn_mac_table,
-+	.port_setup = ksz8_port_setup,
-+	.r_phy = ksz8_r_phy,
-+	.w_phy = ksz8_w_phy,
-+	.r_mib_cnt = ksz8_r_mib_cnt,
-+	.r_mib_pkt = ksz8_r_mib_pkt,
-+	.r_mib_stat64 = ksz_r_mib_stats64,
-+	.freeze_mib = ksz8_freeze_mib,
-+	.port_init_cnt = ksz8_port_init_cnt,
-+	.fdb_dump = ksz8_fdb_dump,
-+	.fdb_add = ksz8_fdb_add,
-+	.fdb_del = ksz8_fdb_del,
-+	.mdb_add = ksz8_mdb_add,
-+	.mdb_del = ksz8_mdb_del,
-+	.vlan_filtering = ksz8_port_vlan_filtering,
-+	.vlan_add = ksz8_port_vlan_add,
-+	.vlan_del = ksz8_port_vlan_del,
-+	.mirror_add = ksz8_port_mirror_add,
-+	.mirror_del = ksz8_port_mirror_del,
-+	.get_caps = ksz8_get_caps,
-+	.config_cpu_port = ksz8_config_cpu_port,
-+	.enable_stp_addr = ksz8_enable_stp_addr,
-+	.reset = ksz8_reset_switch,
-+	.init = ksz8_switch_init,
-+	.exit = ksz8_switch_exit,
-+	.change_mtu = ksz8_change_mtu,
-+	.pme_write8 = ksz8_pme_write8,
-+	.pme_pread8 = ksz8_pme_pread8,
-+	.pme_pwrite8 = ksz8_pme_pwrite8,
-+};
-+
- static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
- 					struct phy_device *phydev,
- 					unsigned int mode,
-@@ -1262,12 +1297,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.dev_name = "KSZ8795",
- 		.num_vlans = 4096,
- 		.num_alus = 0,
--		.num_statics = 8,
-+		.num_statics = 32,
- 		.cpu_ports = 0x10,	/* can be configured as cpu port */
- 		.port_cnt = 5,		/* total cpu and user ports */
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz87xx_dev_ops,
- 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
- 		.ksz87xx_eee_link_erratum = true,
- 		.mib_names = ksz9477_mib_names,
-@@ -1303,12 +1338,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.dev_name = "KSZ8794",
- 		.num_vlans = 4096,
- 		.num_alus = 0,
--		.num_statics = 8,
-+		.num_statics = 32,
- 		.cpu_ports = 0x10,	/* can be configured as cpu port */
- 		.port_cnt = 5,		/* total cpu and user ports */
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz87xx_dev_ops,
- 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
- 		.ksz87xx_eee_link_erratum = true,
- 		.mib_names = ksz9477_mib_names,
-@@ -1330,12 +1365,12 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.dev_name = "KSZ8765",
- 		.num_vlans = 4096,
- 		.num_alus = 0,
--		.num_statics = 8,
-+		.num_statics = 32,
- 		.cpu_ports = 0x10,	/* can be configured as cpu port */
- 		.port_cnt = 5,		/* total cpu and user ports */
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
--		.ops = &ksz8_dev_ops,
-+		.ops = &ksz87xx_dev_ops,
- 		.phylink_mac_ops = &ksz8_phylink_mac_ops,
- 		.ksz87xx_eee_link_erratum = true,
- 		.mib_names = ksz9477_mib_names,
--- 
-2.43.0
+> Coincidentally, the default also appears exclusive:
+> 
+> 	u32 limit = ops->rxfh_max_context_id ?: U32_MAX;
+> 
+> U32_MAX can't be used, it has special meaning:
+> 
+> #define ETH_RXFH_CONTEXT_ALLOC		0xffffffff
 
+Given that both the default and drivers look more reasonable
+ with an exclusive than an inclusive limit (I assume most
+ drivers with a limit will have an N, like mvpp2 does, rather
+ than a MAX), I guess we should change the code to match the
+ doc rather than the other way around.
+
+> These seem like net-worthy fixes, no?
+
+Yep, agreed.  I'll send a patch.
 
