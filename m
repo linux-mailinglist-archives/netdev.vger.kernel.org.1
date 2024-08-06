@@ -1,175 +1,133 @@
-Return-Path: <netdev+bounces-116141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8046949435
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:08:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB4D94941A
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67FE11F215B0
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:08:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA2641F226DC
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35021EA0C7;
-	Tue,  6 Aug 2024 15:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001FB1EA0A0;
+	Tue,  6 Aug 2024 15:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="TNQC634U"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="RkDqvkkN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706CB1BC08F
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489DD1D54FB;
+	Tue,  6 Aug 2024 15:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722956904; cv=none; b=ov6z4zb0i8Vuz8Qqk5zsrlgdfkthlLjRNtb5sqjRI05FeAWZDdn74nh+ii1imkGBIld3nwfjRx7qoSM2vDvJyGle1ppUma4BJaqk0Tclh7VqnpXqROqJ0NxN8hDzdrckgJrvBguDjWNH2MK5wpHXLvVSxb5x3AZ56+frwiXT2mA=
+	t=1722956643; cv=none; b=t8tfsZen/o6zXDdprzq84n4JAfgMKprfd0H6VSbDchbGRo+8zo18Is9d2lkbGWx6FzHTudSDlt5+OJq8qsmODUbwWMgIWN+F9bOsDWD8kFr6rNRabG38rxUbiPDeR2aSOmg6LoAIgJD1u3TXJaHNfhMzDLPN7ERVHyuDx/5MGtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722956904; c=relaxed/simple;
-	bh=7S9JCqqIq8A37uOjHMXLk/ibZjCEak0KO8UDCikOMAA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qa5YTPc2em54DPFP2nVKdJUAlhsiZuX9r59AhekHDAl4M7gfr7Y67jnF1BUirBnALiYicBwceOIFk0ovTV7UqH8TM89MnYi1At6uGi0EFN8ALHGyeiSlFNmNzP56IQrBAqJNDJoYtvJxJQQBJMP6ZQZMuJvev06TZyNA9PBfaqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=TNQC634U; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 8AE32400E1
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:08:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1722956900;
-	bh=DAlWRC3ee6ki+FbK9OgSi8f71N/oAs1WYuE0UkbI6C0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=TNQC634UBCO7XXiGFBmVqxwNCMaMEIngPbAOJoGo3/CKAKw13aV+CNsGdTGFxomKp
-	 Op7qdynxF8Ko07elH0ixboG7uJQI3LBQrqVGDSNPJuUIfss42DChUnDv8MwsiCBqcQ
-	 Qw0u4HeqtzbefNylGoyszpf73/F7pgtbfNWBOnaVHcOOeAQPpP4x8WyUcc8zkCGkgZ
-	 n6fwptuFbfcLjCwL8pfadHEGAOGsN/GgavWlfVknN8kQUIajg668AkBiwJort7vlhR
-	 w89tBBsQGnDxZrrKokbr8LGI3TAtAR/sWGzTWp5UUMei1s2AszPkPfQSkfKFPQe3n1
-	 A/yxdcmLOxo7A==
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42820c29a76so5454355e9.2
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 08:08:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722956899; x=1723561699;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DAlWRC3ee6ki+FbK9OgSi8f71N/oAs1WYuE0UkbI6C0=;
-        b=Ny4o+w7Xr/bsc6qQmIiMekfRz+2RZx8xPO7e17AQheS2mMY9JFPl95T2b1y4m8+i8I
-         IxsNKEYenc33OuBWihw8wsfIJcMyWmATrD1d2srBXujvjVmQ80Ef8Jl6mkzH8+/V3034
-         Q/YTHecj8mIcISQr53X9p3Xcl9ZXv09JH77GqvgRLl8qed3m9jxkLIN4mrpidmkcnnDe
-         XnlnjuVRi24LNEjJc/nSh95VGVh62loitvg4Xwkj3voEyukV27xdKEJ8TZwckl2I+jR4
-         y9ktza3WrmiY5WDjZHsG7WaEwBgry7OGuPyXcpX1GMD4FZsA2+dqL+9TSuX1KcDpAGQb
-         p6qw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVGw9NvNAcb0f6VTJQGJEYvz9mn9wdf3ugol8vG7gzLY5XsBUX876Cmi0F/sa6mBwFfUmgsBXjVj4/5aeWJaoSPvMmcC+L
-X-Gm-Message-State: AOJu0YxB9Sd0XHfGhSzq/a2pY2nlSyJI+Km82dxqHWQ+5ojg9EtBa2V4
-	EzBZf8pyok5WNO+VjDDuOVRijDfNnQkI1yjS0XWcDuwUw5aA6k6N/V0deqVJbUgzeRiMXQ8N18x
-	SXIcRXHWvnvzKR9MKp/eUuNAxnZO+yYehHgKaAy7JAMr1VBvpIVUmmrR0X7SnEudJ77xWoO6J6F
-	9uEQ==
-X-Received: by 2002:a5d:5e0f:0:b0:36b:bce6:2ab7 with SMTP id ffacd0b85a97d-36bbce62d02mr10057310f8f.33.1722956524238;
-        Tue, 06 Aug 2024 08:02:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQk+dKfniqRVJqxrWANNrVfoADt72pTXBGIvQ+HEs3G+2ACSJ4I2nPxt2y80mI6ZFIEekDVQ==
-X-Received: by 2002:a5d:5e0f:0:b0:36b:bce6:2ab7 with SMTP id ffacd0b85a97d-36bbce62d02mr10057201f8f.33.1722956522250;
-        Tue, 06 Aug 2024 08:02:02 -0700 (PDT)
-Received: from framework-canonical.station (net-93-66-99-124.cust.vodafonedsl.it. [93.66.99.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0295fasm13112722f8f.59.2024.08.06.08.02.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 08:02:01 -0700 (PDT)
-From: Massimiliano Pellizzer <massimiliano.pellizzer@canonical.com>
-To: kernel-team@lists.ubuntu.com
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: [SRU][F][PATCH 1/2] rxrpc: Fix delayed ACKs to not set the reference serial number
-Date: Tue,  6 Aug 2024 17:01:40 +0200
-Message-ID: <20240806150149.1609414-3-massimiliano.pellizzer@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240806150149.1609414-1-massimiliano.pellizzer@canonical.com>
-References: <20240806150149.1609414-1-massimiliano.pellizzer@canonical.com>
+	s=arc-20240116; t=1722956643; c=relaxed/simple;
+	bh=vXK0BUzSSbknlVaLGfcKkPDJgP2UcBjdICOwO3I5IJU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H5r/fEgrBn0e47DkkmFKpPuWtP9xU4S48c+rxckwDaIYRwpZnYyS89zGgWb8GJzixsJsDJDAbDYoxkMKZNJaWVwCTdWlLCbYd/cPcULjv4bhLYMStPOSGAHh1Iywx3sRZZgJe+q0ECy2dX8Vds8oEy5W4cyTaVzF3agkFrPFcgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=RkDqvkkN; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 476F3fDN106327;
+	Tue, 6 Aug 2024 10:03:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1722956621;
+	bh=H7hluvR91GwUos3RLVo/gNL6S3yfN5RfkN4cbUfh3qk=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=RkDqvkkN/qd6naQNMmEmJIsZBiv9iBTixgy8aE2W1RJTXbHVcXOKK9wIdJiGAGYDt
+	 SAwKiXKAEyvhWVg68bPMEYUcFt9LZQJizpccQu/xs4Ooedgyqojpg/HKAS8M0TrAWb
+	 Er09X5GcbhAcqEF9cFReSPnk0qHHiS6xkYioe3fY=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 476F3fHq022247
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 6 Aug 2024 10:03:41 -0500
+Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 6
+ Aug 2024 10:03:41 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 6 Aug 2024 10:03:41 -0500
+Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 476F3fg8106848;
+	Tue, 6 Aug 2024 10:03:41 -0500
+Date: Tue, 6 Aug 2024 10:03:41 -0500
+From: Nishanth Menon <nm@ti.com>
+To: Roger Quadros <rogerq@kernel.org>
+CC: MD Danish Anwar <danishanwar@ti.com>, Suman Anna <s-anna@ti.com>,
+        Sai
+ Krishna <saikrishnag@marvell.com>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Dan
+ Carpenter <dan.carpenter@linaro.org>,
+        Diogo Ivo <diogo.ivo@siemens.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Kory Maincent
+	<kory.maincent@bootlin.com>,
+        Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew@lunn.ch>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Santosh
+ Shilimkar <ssantosh@kernel.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Tero
+ Kristo <kristo@kernel.org>,
+        <srk@ti.com>, Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v4 1/6] dt-bindings: soc: ti: pruss: Add documentation
+ for PA_STATS support
+Message-ID: <20240806150341.evrprkjp3hb6d74p@mockup>
+References: <20240729113226.2905928-1-danishanwar@ti.com>
+ <20240729113226.2905928-2-danishanwar@ti.com>
+ <b6196edc-4e14-41e9-826e-7b58f9753ef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <b6196edc-4e14-41e9-826e-7b58f9753ef5@kernel.org>
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-From: David Howells <dhowells@redhat.com>
+On 09:42-20240805, Roger Quadros wrote:
+> 
+> 
+> On 29/07/2024 14:32, MD Danish Anwar wrote:
+> > Add documentation for pa-stats node which is syscon regmap for
+> > PA_STATS registers. This will be used to dump statistics maintained by
+> > ICSSG firmware.
+> > 
+> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> Reviewed-by: tags should come after Author's Signed-off-by:
+> 
+> > Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> 
+> Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
-Fix the construction of delayed ACKs to not set the reference serial number
-as they can't be used as an RTT reference.
+If the net maintainers are OK, they could potentially take the binding
+patch along with the driver mods corresponding to this - I am a bit
+unsure of picking up a binding if the driver implementation is heading
+the wrong way.
 
-Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
-Signed-off-by: David S. Miller <davem@davemloft.net>
-(backported from e7870cf13d20f56bfc19f9c3e89707c69cf104ef)
-[mpellizzer: removed the "ackr_serial" field from
-the struct "rxrpc_call" and adjusted the code accordingly]
-CVE-2024-26677
-Signed-off-by: Massimiliano Pellizzer <massimiliano.pellizzer@canonical.com>
----
- net/rxrpc/ar-internal.h | 1 -
- net/rxrpc/call_event.c  | 2 --
- net/rxrpc/output.c      | 2 +-
- 3 files changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index cb174f699665..5039613ad0e1 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -667,7 +667,6 @@ struct rxrpc_call {
- 
- 	/* Receive-phase ACK management (ACKs we send). */
- 	u8			ackr_reason;	/* reason to ACK */
--	rxrpc_serial_t		ackr_serial;	/* serial of packet being ACK'd */
- 	rxrpc_seq_t		ackr_highest_seq; /* Higest sequence number received */
- 	atomic_t		ackr_nr_unacked; /* Number of unacked packets */
- 	atomic_t		ackr_nr_consumed; /* Number of packets needing hard ACK */
-diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-index b5f173960725..c08715be8e9a 100644
---- a/net/rxrpc/call_event.c
-+++ b/net/rxrpc/call_event.c
-@@ -67,13 +67,11 @@ static void __rxrpc_propose_ACK(struct rxrpc_call *call, u8 ack_reason,
- 	if (ack_reason == call->ackr_reason) {
- 		if (RXRPC_ACK_UPDATEABLE & (1 << ack_reason)) {
- 			outcome = rxrpc_propose_ack_update;
--			call->ackr_serial = serial;
- 		}
- 		if (!immediate)
- 			goto trace;
- 	} else if (prior > rxrpc_ack_priority[call->ackr_reason]) {
- 		call->ackr_reason = ack_reason;
--		call->ackr_serial = serial;
- 	} else {
- 		outcome = rxrpc_propose_ack_subsume;
- 	}
-diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 09fcc54245c7..8816aaa98287 100644
---- a/net/rxrpc/output.c
-+++ b/net/rxrpc/output.c
-@@ -87,7 +87,7 @@ static size_t rxrpc_fill_out_ack(struct rxrpc_connection *conn,
- 		return 0;
- 
- 	/* Barrier against rxrpc_input_data(). */
--	serial = call->ackr_serial;
-+	serial = 0;
- 	hard_ack = READ_ONCE(call->rx_hard_ack);
- 	top = smp_load_acquire(&call->rx_top);
- 	*_hard_ack = hard_ack;
 -- 
-2.43.0
-
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
