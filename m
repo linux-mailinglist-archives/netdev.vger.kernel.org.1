@@ -1,204 +1,151 @@
-Return-Path: <netdev+bounces-116093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8A794913B
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:25:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BED494919C
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07D7F1C23623
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:25:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39FB6B23AF4
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:28:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE60E1D1F46;
-	Tue,  6 Aug 2024 13:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BD31D1F76;
+	Tue,  6 Aug 2024 13:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="atmaUxUE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TFNrbT3F"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7171D1734
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 13:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EA31D1F52;
+	Tue,  6 Aug 2024 13:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722950701; cv=none; b=Rp6HQdQxzExeu77quIltDc+OCTRU8OA+0wxQMOMC8qYmjRDZoo9bPZbYymdGDP9w8IGg+GsMNj4QbMtKaAqWz3zQeOrbgTfERBiF/h3gM2TSS+5Yy+YXGEM5Tm4i2vokDdM07rFqf2f392l9pbv6T07TMvfBKzGl8qFdJ4YNIdU=
+	t=1722950904; cv=none; b=ZJ8eWi3a94RWinU1eG9lkqmF8nqiFmsncNZx7PtFOYBM5Phc4G4qHNiRd52jOgqxgUMe+zXoWLpBaK/+BijwJa9zZvdhXwJZQjB/kaGqH339tVOavCu4m/lBXRAU+xaAFvU3/b7lAu1/pt/4SmT6oakaDD4MhZ87SoI3PAONuXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722950701; c=relaxed/simple;
-	bh=obls5/IgJLkBnpI0rNRP8IYmmKd6T44gBryyeBO291c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ir85WY0XjoJYVk8tq3TBpCDLLbbFqoljLB48cAj+y+q7yS4kZKmLuQIn6k7OqnLCrMlqUqvXRTW1RerWtm6gLpJOT88O3j3hwylalQhuj2f1Ogig49AOUx6cmkjNH386Zv6UEN1w1W4R88U/fQG5KEYYMPD7LxwbJZFq1/PUyiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=atmaUxUE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722950699;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=agmgz/g9lzLW/r/AK60PBJWPhqm4LcY7bcQWWV6msjw=;
-	b=atmaUxUEIIJuvbBhKECQIgU37u0VxLCKYxYFzSK/0hSRGS8kyLZrjnMBzh0wql0FKXmd3x
-	kxsSfvMjxOr4RNJi3AlhF0vsCgUf6ljzi3jQ+bA8OCxH0MA3rX2NaNFUSDqjsEHoZu8xoq
-	XnUKLIYL3Jm2H+V4R2sVnYSrdjdg9pY=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-114-XLT0r1Z_OoyD21ymdCW5-A-1; Tue, 06 Aug 2024 09:24:57 -0400
-X-MC-Unique: XLT0r1Z_OoyD21ymdCW5-A-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef23b417bcso7484871fa.0
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 06:24:56 -0700 (PDT)
+	s=arc-20240116; t=1722950904; c=relaxed/simple;
+	bh=FgWKi1Gnb5JFoFlrMb1EsfWKD+ToCo4W60+JCXA3pqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nm8KAmQToq0bnp+oUQrPfEhi+whZrgj6Zw6y+9SVN+ikI29o8r6/EmSbISiH4XHRW6Rp/Sey07Z3ituYvnv49CPMH0a/Bk0O91pjJuHDfYD3W0pAirxPU96QNM6xE4hWoQqnHFoZaq/UwXiHpPVv2ul4A+eq2tRUZIkkvCqzBWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TFNrbT3F; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f040733086so7833681fa.1;
+        Tue, 06 Aug 2024 06:28:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722950901; x=1723555701; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L6pVyMvtl8KE6yUdCoRoqyMAV95L9NT5XCcL2mYypwo=;
+        b=TFNrbT3Fet60M1TvdJ+tEOk8S236wP9R4tmw1aFwEPkaE6bJD1yn0IICpp/1e0+8Ox
+         9jyAh9N4FIOUXYgeOawwfSGrNGPdvX3UispAYmsyfMPrtc7POWMa0FUQ4EibIIGa42GP
+         YvKzl/NpZO3tTe2oIFyJHLg/Rh6dgB1vrZoY20OMqcX1W+ybetFMEdNNHx8/gwGx4Xte
+         PZEEcttXNltW8/Q99oqslotQ9imMEs9j1E2fQnpc2KaIrED+ZzXuwAY/Z5QHwvm23yAs
+         zg9ih3guSNYWkqOq9XQHg5HN9RfnzrYrC+pUvcITUdMx0usNnXIORacXhECTQ9d/1+K1
+         4WNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722950695; x=1723555495;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=agmgz/g9lzLW/r/AK60PBJWPhqm4LcY7bcQWWV6msjw=;
-        b=S4PVsZdyrDZzliW5lN4QdD3j96MR8H8uAEm1wiTfSMkcV7FP2yPb48vqkV3hDzQa2H
-         nP7ZgwYKGE5XPEsBcxFbM5f64+qJTc8D2PcT8lCmOl6ek9EtJIug03/kx2GJrnS4GWe+
-         B81ldOmrwWO9DSCwEhHQcgQDSsdn5dtziOnzsJ7bMe9g2bq6a3cDpMI5kyX7HKJX6zO6
-         PBP7jQ0FhglwtC0hHFCecVNrmwgy5bj7vEpkBVvZdSfX/GZyK1NamUQjvp+ujE0rULbf
-         cdv5mMoQqVFm2X3MO3mjUaq9zoe6/YC/6pBXHUEcwxHWNWB2kGn3KEh6kw3x33yCqFTR
-         jhKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUO697jKox8g3BZKG0qgM1tVMhGT0t9AQacj3zLrNz+1pPBn+/TSb5UhIJH1yhqJ2heZGRKKJ4iK4mqsyqdyi9Yd+gljOH9
-X-Gm-Message-State: AOJu0YwlRFzFO25aQtZC4xtsSjXvLlEteqH2SbPVtGb5Ifkm+KWyZKjR
-	1HKTBAG/jhSI7d7EKI03Ik/WHYPDjU6vVX92aFhxRoCCPoRtkGvb1RaJWrqZu7w6dRCF8Tf+xn5
-	7uORQXbRzC215litmnQS8ppVW31YDxKCxqlECqxlUYwu+UVC03TqWfw==
-X-Received: by 2002:a2e:8515:0:b0:2ef:2cdb:5053 with SMTP id 38308e7fff4ca-2f15aafdb02mr99183071fa.37.1722950695466;
-        Tue, 06 Aug 2024 06:24:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0K+acf4m4pFDrvN4mHJ+0yCLE9V9JfbfpalO3TIOCh61979EdH8ikEP6MLMjXlMuiamw1uA==
-X-Received: by 2002:a2e:8515:0:b0:2ef:2cdb:5053 with SMTP id 38308e7fff4ca-2f15aafdb02mr99182711fa.37.1722950694440;
-        Tue, 06 Aug 2024 06:24:54 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:175:c9eb:d9d4:606a:87dc:59c7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282bb98109sm240561445e9.39.2024.08.06.06.24.51
+        d=1e100.net; s=20230601; t=1722950901; x=1723555701;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L6pVyMvtl8KE6yUdCoRoqyMAV95L9NT5XCcL2mYypwo=;
+        b=ZNVZqQbzCqAyxWf+3+t/sL4BEQ9hIAQ8pQSc8ajOm24SIvgk+1Iz6xDpBTg2D3lNlR
+         mqIECl/jWDJo9KERCOuzpWvAlCn6IcEN8nPb5NH+NdK/Y+K3BsBmVHklrskL9EUXjHvI
+         Qxqz23nPT4Hz2pE01RQ3TU4IxfD+nd8H0CZmBSkFeAxLX6X3RBQTn9WJCAB9RsKkFwxk
+         c2wvRfBaaEt5PpQpZjNI4HNhJo0VZgFllBeBXhEzz2zndDho+L3yNgixiZiQVx1SvGbD
+         HazzmjS5O+qNx8j02UkNK2y6j9xhtAz7fC7RIhB8iAljKP7SlBGeXwreRr+39Bau+xkO
+         kPDw==
+X-Forwarded-Encrypted: i=1; AJvYcCU++KtMYMS/UHWa2GzlDLHQnBE099gf+nkRRVO6jhdGCKR6B5A1ZCkU1Q19yKsUZPODO2rZ6yyZyuTZrZGsTUXLMvMvwGC6VLh0OcBhkfsio/VlyJmnvUnq9nMx2X6PGm6FIhGcgNg5jFt79/iI7NJowMbNCpbiBltfsG5XZNnFdw==
+X-Gm-Message-State: AOJu0YzKNe16QNEU2qLOVazSDu2iNjhdC59g4ZJ9qgXWIz0rvvTEef0o
+	x6WJWmBd0ZqvnF6g2V1OpeEIxmBH+KUnN9Ki0xe1vB1pOTss0rav
+X-Google-Smtp-Source: AGHT+IH7Z6IrVx/WW+2TEoBllCHiUpkOqSv3MvKUVwBEKYJuGe/tKKZDSRVwQUGtr5muMVCgGLm2WQ==
+X-Received: by 2002:a2e:87c3:0:b0:2ee:7bcd:a52 with SMTP id 38308e7fff4ca-2f15ab53020mr95966751fa.46.1722950900079;
+        Tue, 06 Aug 2024 06:28:20 -0700 (PDT)
+Received: from lapsy144.cern.ch ([2001:1458:204:1::102:a6a])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b83a153f77sm5910172a12.53.2024.08.06.06.28.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 06:24:53 -0700 (PDT)
-Date: Tue, 6 Aug 2024 09:24:47 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+        Tue, 06 Aug 2024 06:28:19 -0700 (PDT)
+From: vtpieter@gmail.com
+To: Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David S Miller <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] virtio_net: Prevent misidentified spurious
- interrupts from killing the irq
-Message-ID: <20240806091923-mutt-send-email-mst@kernel.org>
-References: <20240801135639.11400-1-hengqi@linux.alibaba.com>
- <CACGkMEtBeUnDeD0zYBvpwjhQ4Lv0dz8mBDQ_C-yP1VEaQdv-0A@mail.gmail.com>
- <20240802090822-mutt-send-email-mst@kernel.org>
- <CACGkMEvPdiKS7+S5Btk+uMwtwRnPfTd6Brwz2acgBfNAnTXMFA@mail.gmail.com>
- <20240805015308-mutt-send-email-mst@kernel.org>
- <CACGkMEsL6fyf9ecY8_LpT5_=hHKFzW7==4DBer_w9xEpGUkRtw@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marek Vasut <marex@denx.de>
+Cc: Woojung Huh <Woojung.Huh@microchip.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Subject: [PATCH net-next v3 0/5] net: dsa: microchip: ksz8795: add Wake on LAN support
+Date: Tue,  6 Aug 2024 15:25:52 +0200
+Message-ID: <20240806132606.1438953-1-vtpieter@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEsL6fyf9ecY8_LpT5_=hHKFzW7==4DBer_w9xEpGUkRtw@mail.gmail.com>
 
-On Tue, Aug 06, 2024 at 11:18:14AM +0800, Jason Wang wrote:
-> On Mon, Aug 5, 2024 at 2:29 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Mon, Aug 05, 2024 at 11:26:56AM +0800, Jason Wang wrote:
-> > > On Fri, Aug 2, 2024 at 9:11 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Fri, Aug 02, 2024 at 11:41:57AM +0800, Jason Wang wrote:
-> > > > > On Thu, Aug 1, 2024 at 9:56 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
-> > > > > >
-> > > > > > Michael has effectively reduced the number of spurious interrupts in
-> > > > > > commit a7766ef18b33 ("virtio_net: disable cb aggressively") by disabling
-> > > > > > irq callbacks before cleaning old buffers.
-> > > > > >
-> > > > > > But it is still possible that the irq is killed by mistake:
-> > > > > >
-> > > > > >   When a delayed tx interrupt arrives, old buffers has been cleaned in
-> > > > > >   other paths (start_xmit and virtnet_poll_cleantx), then the interrupt is
-> > > > > >   mistakenly identified as a spurious interrupt in vring_interrupt.
-> > > > > >
-> > > > > >   We should refrain from labeling it as a spurious interrupt; otherwise,
-> > > > > >   note_interrupt may inadvertently kill the legitimate irq.
-> > > > >
-> > > > > I think the evil came from where we do free_old_xmit() in
-> > > > > start_xmit(). I know it is for performance, but we may need to make
-> > > > > the code work correctly instead of adding endless hacks. Personally, I
-> > > > > think the virtio-net TX path is over-complicated. We probably pay too
-> > > > > much (e.g there's netif_tx_lock in TX NAPI path) to try to "optimize"
-> > > > > the performance.
-> > > > >
-> > > > > How about just don't do free_old_xmit and do that solely in the TX NAPI?
-> > > >
-> > > > Not getting interrupts is always better than getting interrupts.
-> > >
-> > > Not sure. For example letting 1 cpu to do the transmission without the
-> > > dealing of xmit skbs should give us better performance.
-> >
-> > Hmm. It's a subtle thing. I suspect until certain limit
-> > (e.g. ping pong test) free_old_xmit will win anyway.
-> 
-> Not sure I understand here.
+From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 
-If you transmit 1 packet and then wait for another one anyway,
-you are better off just handling the tx interrupt.
+Add WoL support for KSZ8795 family of switches. This code was tested
+with a KSZ8794 chip.
+
+Strongly based on existing KSZ9477 code which has now been moved to
+ksz_common instead of duplicating, as proposed during the review of
+the v1 version of this patch.
+
+In addition to the device-tree addition and the actual code, there's
+an additional patch that fixes some bugs found when further testing
+DSA with this KSZ8794 chip.
+
+Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+---
+v3:
+ - ensure each patch separately compiles & works
+ - additional return value checks where possible
+ - drop v2 patch 5/5 (net: dsa: microchip: check erratum workaround through indirect register read)
+ - add new patch that fixes KSZ87xx bugs wrt datasheet
+
+v2: https://lore.kernel.org/netdev/20240731103403.407818-1-vtpieter@gmail.com/
+ - generalize instead of duplicate, much improved
+ - variable declaration reverse Christmas tree
+ - ksz8_handle_global_errata: return -EIO in case of indirect write failure
+ - ksz8_ind_read8/write8: document functions
+ - ksz8_handle_wake_reason: no need for additional write to clear
+ - fix wakeup_source origin comments
+v1: https://lore.kernel.org/netdev/20240717193725.469192-1-vtpieter@gmail.com/
+
+Pieter Van Trappen (5):
+  dt-bindings: net: dsa: microchip: add microchip,pme-active-high flag
+  net: dsa: microchip: move KSZ9477 WoL functions to ksz_common
+  net: dsa: microchip: generalize KSZ9477 WoL functions at ksz_common
+  net: dsa: microchip: add WoL support for KSZ87xx family
+  net: dsa: microchip: apply KSZ87xx family fixes wrt datasheet
+
+ .../bindings/net/dsa/microchip,ksz.yaml       |   5 +
+ drivers/net/dsa/microchip/ksz8.h              |   3 +
+ drivers/net/dsa/microchip/ksz8795.c           |  94 +++++-
+ drivers/net/dsa/microchip/ksz9477.c           | 197 +------------
+ drivers/net/dsa/microchip/ksz9477.h           |   5 -
+ drivers/net/dsa/microchip/ksz9477_reg.h       |  12 -
+ drivers/net/dsa/microchip/ksz_common.c        | 267 ++++++++++++++++--
+ drivers/net/dsa/microchip/ksz_common.h        |  31 +-
+ 8 files changed, 385 insertions(+), 229 deletions(-)
 
 
-> >
-> > > > This is not new code, there are no plans to erase it all and start
-> > > > anew "to make it work correctly" - it's widely deployed,
-> > > > you will cause performance regressions and they are hard
-> > > > to debug.
-> > >
-> > > I actually meant the TX NAPI mode, we tried to hold the TX lock in the
-> > > TX NAPI, which turns out to slow down both the transmission and the
-> > > NAPI itself.
-> > >
-> > > Thanks
-> >
-> > We do need to synchronize anyway though, virtio expects drivers to do
-> > their own serialization of vq operations.
-> 
-> Right, but currently add and get needs to be serialized which is a
-> bottleneck. I don't see any issue to parallelize that.
-
-Do you see this in traces?
-
-> > You could try to instead move
-> > skbs to some kind of array under the tx lock, then free them all up
-> > later after unlocking tx.
-> >
-> > Can be helpful for batching as well?
-> 
-> It's worth a try and see.
-
-Why not.
-
-> >
-> >
-> > I also always wondered whether it is an issue that free_old_xmit
-> > just polls vq until it is empty, without a limit.
-> 
-> Did you mean schedule a NAPI if free_old_xmit() exceeds the NAPI quota?
-
-yes
-
-> > napi is supposed to poll until a limit is reached.
-> > I guess not many people have very deep vqs.
-> 
-> Current NAPI weight is 64, so I think we can meet it in stressful workload.
-> 
-> Thanks
-
-yes, but it's just a random number.  since we hold the tx lock,
-we get at most vq size bufs, so it's limited.
-
-> >
-> > --
-> > MST
-> >
+base-commit: eec9de0354105527e31394c0ed4b8c54fb1fe1dd
+-- 
+2.43.0
 
 
