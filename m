@@ -1,87 +1,119 @@
-Return-Path: <netdev+bounces-116197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D839496F6
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:35:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F28594972B
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185501F213DE
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:35:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246981F22A98
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502556F06D;
-	Tue,  6 Aug 2024 17:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C407347C;
+	Tue,  6 Aug 2024 17:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AraJaUcK"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QF44wfjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.smtp-ext.broadcom.com (saphodev.broadcom.com [192.19.144.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2194B62A02;
-	Tue,  6 Aug 2024 17:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B09D381C4;
+	Tue,  6 Aug 2024 17:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722965722; cv=none; b=PMrGkqBxKMgYocoUr0WuwCZ6jN8oJ6AI24WQ+HgPsWLaI+vkQXs1JCtyHG7DKYyIT8ZsNDtDsmXrbuECNXebHPr/IvESN7G0d6JZ5etgPlfAPoX77fcU/4hMYE4Nz+8gRD3wQgNdc9eIe18L4Jo/cyUarozHbldnWS1FGhNlyv4=
+	t=1722967032; cv=none; b=QV4EiGJX/hokHBliVUmMn72rBo32U7+1/+aCj50iIJTFROdTOT9f14VxIHP2NpLx0XB2XCDo+FZEbt+S65Fhfdr2ZrzmBVVEsafrkoTPjmxJwlduWBWNloO5fhzmia7e8rroUNEbAl1jqlmoG6psRBfgYPBMoXZeIA0VqwUoGEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722965722; c=relaxed/simple;
-	bh=sbFiD0UTPz3Xhgo7u+pcibnbth29PoEv4oSZWuoSTH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cic3d1jpaOxmkDWrXshqXf17PvASGJGLOwcAge0F0dnemBRh5/5cn1SpLWqXY1Iy9AL1PvZnX0XEzovzMYhx7rmszKPE6z6u1l6/rAN+yy59csIQKx3ClIhG1AUd4DckF7mJg2kovj+hAwVkR37P04dzHMBbEbj8YpnssvCBg8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AraJaUcK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CBBBC4AF0E;
-	Tue,  6 Aug 2024 17:35:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722965721;
-	bh=sbFiD0UTPz3Xhgo7u+pcibnbth29PoEv4oSZWuoSTH0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AraJaUcKzqP3jBmRFw6xv4VnTrnEVv1aMvKj0UsGZVEII5DF5HuwCnr7knf3XnQns
-	 rGNx6IM+xauv2tAmu3bgXTiYlquGu3Rlgl1Aug6P7gqabxD/ZdnN1xxJewPvM4FjC5
-	 J7M15LPoteevpcLEvidwur5kSOEmiHcEKRXZAkyxqsOlV1e6syhXlwJ3zMjU20Av48
-	 LswP5i2igU9+OlMAaDpL0rOMJUrMFDv3RwF/UrbSkMNiqBskdCE5w0geB6Y7r2g+vG
-	 aOcB8T5te3zffbvfnUKz57/V6bXG786oDFRNVZPrw8GdMQq2QIh2VS6GJBI2HdsQqd
-	 bq1OZqSiR54pQ==
-Date: Tue, 6 Aug 2024 11:35:20 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Detlev Casanova <detlev.casanova@collabora.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	linux-kernel@vger.kernel.org, David Wu <david.wu@rock-chips.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>, Jose Abreu <joabreu@synopsys.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1722967032; c=relaxed/simple;
+	bh=lB7A8e4Ovq/7ddI2/3L5U//TjfEpAgLmMbHp5KMmNzY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ESInWpbiYN9/lpssD/b1VpiKetEcGaV9MTMjY8PQh5fSbCowiSj0YqoQ/i30QT0C50hwkrpPfdrHPpfyhy2KSkXXvRrT7/2jOOh8HJi4a69WL55iMrU6UPHgBxo3hApia5JSb33B8603AI+cbCo2vDoJEJ1/U4MDo3LgXWBECW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QF44wfjL; arc=none smtp.client-ip=192.19.144.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 919AFC0000D8;
+	Tue,  6 Aug 2024 10:57:03 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 919AFC0000D8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1722967023;
+	bh=lB7A8e4Ovq/7ddI2/3L5U//TjfEpAgLmMbHp5KMmNzY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QF44wfjLGrt1lZTxZVTcbR2IlJ1KQSjad2Z2Auz7QE+pjofsSNwC6+zR8bdcHtrS4
+	 k2v5x4Dm7Oqcq0vH3PaJHpr/FWX+eKmZf4l9vEHFGKOg4NuGd+4Sjq3SRiKuNWAoQ4
+	 F9rYQC/htNBuG1pE3JSFoHDfhGLgKs/voECi3SXY=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id E5F2018041CAC4;
+	Tue,  6 Aug 2024 10:57:00 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	linux-rockchip@lists.infradead.org
-Subject: Re: [PATCH 2/2] dt-bindings: net: Add rk3576 dwmac bindings
-Message-ID: <172296571928.1850493.16580227879384063021.robh@kernel.org>
-References: <20240802173918.301668-1-detlev.casanova@collabora.com>
- <20240802173918.301668-3-detlev.casanova@collabora.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net v2] net: bcmgenet: Properly overlay PHY and MAC Wake-on-LAN capabilities
+Date: Tue,  6 Aug 2024 10:56:59 -0700
+Message-Id: <20240806175659.3232204-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802173918.301668-3-detlev.casanova@collabora.com>
+Content-Transfer-Encoding: 8bit
 
+Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
+while others might be only supported by the PHY. Make sure that the .get_wol()
+returns the union of both rather than only that of the PHY if the PHY supports
+Wake-on-LAN.
 
-On Fri, 02 Aug 2024 13:38:03 -0400, Detlev Casanova wrote:
-> Add a rockchip,rk3576-gmac compatible for supporting the 2 gmac
-> devices on the rk3576.
-> 
-> Signed-off-by: Detlev Casanova <detlev.casanova@collabora.com>
-> ---
->  Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 2 ++
->  1 file changed, 2 insertions(+)
-> 
+Fixes: 7e400ff35cbe ("net: bcmgenet: Add support for PHY-based Wake-on-LAN")
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+Changes in v2:
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+- corrected email address
+
+ drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
+index 1248792d7fd4..0715ea5bf13e 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
+@@ -42,19 +42,15 @@ void bcmgenet_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	struct device *kdev = &priv->pdev->dev;
+ 
+-	if (dev->phydev) {
++	if (dev->phydev)
+ 		phy_ethtool_get_wol(dev->phydev, wol);
+-		if (wol->supported)
+-			return;
+-	}
+ 
+-	if (!device_can_wakeup(kdev)) {
+-		wol->supported = 0;
+-		wol->wolopts = 0;
++	/* MAC is not wake-up capable, return what the PHY does */
++	if (!device_can_wakeup(kdev))
+ 		return;
+-	}
+ 
+-	wol->supported = WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
++	/* Overlay MAC capabilities with that of the PHY queried before */
++	wol->supported |= WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
+ 	wol->wolopts = priv->wolopts;
+ 	memset(wol->sopass, 0, sizeof(wol->sopass));
+ 
+-- 
+2.34.1
 
 
