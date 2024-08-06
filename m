@@ -1,86 +1,74 @@
-Return-Path: <netdev+bounces-115934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB566948760
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 04:16:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D47C948788
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 04:24:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 960E328582B
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:16:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF14B1C22225
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:24:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DA4AD5E;
-	Tue,  6 Aug 2024 02:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E393BBEB;
+	Tue,  6 Aug 2024 02:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLOX3o62"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3M8ygwe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920976FC3;
-	Tue,  6 Aug 2024 02:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742903BBC1
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 02:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722910607; cv=none; b=hqzvugwaAGauumTMSBMZmPiFpfxv0E5NCQ589th3rnQg/rvhe9y/T1BKq0/OKDGOr+OCuT9O9juGKu7YrD2/la30e8a9bOU2txOfk21b+hcWN8Hk/4oDBjooDd7id0KPShc0+8HtIyZUtf/6fyL8uTuUIp1NkklsVsy9PaY4OPs=
+	t=1722910962; cv=none; b=ltQz6mM4UD3Yegf/8P/8rZ+psLUpAXRB4jlVBiM2NR/ZVrM85YgWCfnj9P+nBivjbri5RYDbBfuIfNewirsMy4DORKN5Xd4YQ2NclLZQwveIddJjeWBz3JYa1rhsbqO5ENAhESO0AvsDUwJVwf4pdWGOvSztWaDXjwMBSMCmJMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722910607; c=relaxed/simple;
-	bh=ebSWJSj/buxW44/rQoQph4W+aePCGg6KpmYyKZK1snY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qR5CMqjd+kA3skC3drdhC1mH8ZRI5VALyKXqrN9iaVtkaspQDcAidubL6o+0JUtCOiV57ZcDna+9aq8ALjQl9AlecrochmeIf7yzC8O/OxR1DVh+XogY/ow0iY4v0I+anVfII58KIclkZywJFAvHy36JCT42uT677aYj/8Wa+SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLOX3o62; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fdacc4129fso56835ad.1;
-        Mon, 05 Aug 2024 19:16:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722910605; x=1723515405; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l7mvtGZEsuHPzWX3pW4fYKh4Cjh9maArqhFHH/gvuGQ=;
-        b=XLOX3o62pxoWuviVbBdJtPthPCgPAfXVRvQoyWVxmzUshThtmNwBdZJvc0lrzU4Owq
-         2wD4tg7YxS/deJujva6dqirXdDjVqsAn68t3bxsz26VPbYbRJkaeCAZGFanQ2mZ1ArYM
-         YcsUfITjsl6NyPoMx3WymRZIYj5VavOCDuN0Z0ENFEGQU0ssPDwsagVL5G3pcnPS/m25
-         7unbNMRIKhpAvyCfZyAZaJfIl58xhIXEgpIebY6ID/0Qdxob2uFpOXURhnpw3NyJoKde
-         lYUWB4XOw+kI40mlSN6LRwVUYQGM85uDMFUwoczIUplfGTQYITiI7U9DZFX77cjo1wLZ
-         2VXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722910605; x=1723515405;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l7mvtGZEsuHPzWX3pW4fYKh4Cjh9maArqhFHH/gvuGQ=;
-        b=WAddRhowbTRVn8FzmALfpz9ic4LIhZ8dbhd6iq+tmN+Gq+26WX4F1mOrY69LJE0yrt
-         49EeVC6ZxqisFVIR4DbEOz61V687dQajGZiEbzMlju9D1ORzFYz2Kpo+z+HhksIbgxhQ
-         aXoNwazHvsulrz5M4mz3oZPfrh4YSH0o+iaFiuwkN0qxavUiLpoqpZISXcdATNNSAgYk
-         V0GoQk5wqqPVfogabqDeykHNGhFkKEMQ4xGAEQVj3usQ5yLUP2/jWlWcDR4Uasxp9QK+
-         G9eG3HICDLHSvztPipseCTTPYxaxrqxlW/rXwPbH+D9B47TWnFpEIx/+19o6+f8Yt0Lp
-         93Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCU5vCn+nH0Jc0anXn3dsMsIRlhSfn3xe4/wcdbFCIpni2i/W+LerRJFhwpcRZ+VFXlOt1wn9ktH@vger.kernel.org, AJvYcCV+tp1bWEwre5ziu3gqZsZYtU2w1jymHluNxd2zeOZrPPHENlm0Jfoze0M9Veoy9q77nfr+0uG8EB+mlto=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1nVpI3er4OuPAJLeRxjcBoBafW2aKF4RLS1TpJIa8aV/bIGM8
-	QXl8U8qQcSpXpnomxPqasvQ1mui+Ny8zyrDrWaWe1aptFNUqra2I
-X-Google-Smtp-Source: AGHT+IFGIIZ+nhDuGefYZ1y1WVR21yakH6dk3osLDORN1mCGnbZ1+JngnuuwyDq0uaosvESzYiK9fg==
-X-Received: by 2002:a17:902:d505:b0:1f7:3ed:e7b2 with SMTP id d9443c01a7336-1ff570f16cfmr91474625ad.0.1722910604865;
-        Mon, 05 Aug 2024 19:16:44 -0700 (PDT)
-Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:3668:14ca:30e:638f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff5929ac42sm76095385ad.267.2024.08.05.19.16.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Aug 2024 19:16:44 -0700 (PDT)
-From: Fabio Estevam <festevam@gmail.com>
-To: kuba@kernel.org
-Cc: wei.fang@nxp.com,
-	shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com,
-	davem@davemloft.net,
+	s=arc-20240116; t=1722910962; c=relaxed/simple;
+	bh=IjcxerJ/w6zcO7CVkbRCQGN7PjVXJe410ca6cXuzOXs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nsVVBjOdOuSGMMRa13ZxNXAisqkMSChVs+2lbJG6Lq+AD9fJI/RpIqQMEglTHBgLaGvT6NQfBG4BurrAOT1vKuq6v1gXRmG8MIob1Z8hRdD/f8fmvd1Uf9SvggKBmZ4U166j201VOXDHc38sXbhFjb0dkXzlqSFzWuJdHwmwBbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f3M8ygwe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722910959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TcO4aBso1n53Fet0M+rmhmrd08KI6fj16ZgsqCTvwbk=;
+	b=f3M8ygweqonBSgbkiFTGn26W5Xzjs6NKf5nud6FZt7303gBIQ8nz07UgZtK9EEcdo1mygQ
+	f5gXQFC8rcl7raMqDcI3WCslFVPSPPVk0pFbEIolkbkuTt+5Fs/fyXiR/Vn7+FbWBxIYqq
+	5pOTY1fmYLjw3XaJbpr4tPDDAb22JaQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-3iluJ8VwOOGUfcVqimD1kg-1; Mon,
+ 05 Aug 2024 22:22:36 -0400
+X-MC-Unique: 3iluJ8VwOOGUfcVqimD1kg-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93CF31955F3B;
+	Tue,  6 Aug 2024 02:22:34 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.112.187])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0B21D1956046;
+	Tue,  6 Aug 2024 02:22:27 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com
+Cc: davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	imx@lists.linux.dev,
+	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fabio Estevam <festevam@denx.de>
-Subject: [PATCH net-next] net: fec: Switch to RUNTIME/SYSTEM_SLEEP_PM_OPS()
-Date: Mon,  5 Aug 2024 23:16:28 -0300
-Message-Id: <20240806021628.2524089-1-festevam@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	inux-kernel@vger.kernel.org
+Subject: [PATCH net-next V6 0/4] virtio-net: synchronize op/admin state
+Date: Tue,  6 Aug 2024 10:22:20 +0800
+Message-ID: <20240806022224.71779-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,83 +76,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: Fabio Estevam <festevam@denx.de>
+Hi All:
 
-Replace SET_RUNTIME_PM_OPS()/SET SYSTEM_SLEEP_PM_OPS() with their modern
-RUNTIME_PM_OPS() and SYSTEM_SLEEP_PM_OPS() alternatives.
+This series tries to synchronize the operstate with the admin state
+which allows the lower virtio-net to propagate the link status to the
+upper devices like macvlan.
 
-The combined usage of pm_ptr() and RUNTIME_PM_OPS/SYSTEM_SLEEP_PM_OPS()
-allows the compiler to evaluate if the runtime suspend/resume() functions
-are used at build time or are simply dead code.
+This is done by toggling carrier during ndo_open/stop while doing
+other necessary serialization about the carrier settings during probe.
 
-This allows removing the __maybe_unused notation from the runtime
-suspend/resume() functions.
+While at it, also fix a race between probe and ndo_set_features as we
+didn't initalize the guest offload setting under rtnl lock.
 
-Signed-off-by: Fabio Estevam <festevam@denx.de>
----
- drivers/net/ethernet/freescale/fec_main.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Changes since V5:
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index a923cb95cdc6..8c3bf0faba63 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -4606,7 +4606,7 @@ fec_drv_remove(struct platform_device *pdev)
- 	free_netdev(ndev);
- }
- 
--static int __maybe_unused fec_suspend(struct device *dev)
-+static int fec_suspend(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct fec_enet_private *fep = netdev_priv(ndev);
-@@ -4659,7 +4659,7 @@ static int __maybe_unused fec_suspend(struct device *dev)
- 	return 0;
- }
- 
--static int __maybe_unused fec_resume(struct device *dev)
-+static int fec_resume(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct fec_enet_private *fep = netdev_priv(ndev);
-@@ -4714,7 +4714,7 @@ static int __maybe_unused fec_resume(struct device *dev)
- 	return ret;
- }
- 
--static int __maybe_unused fec_runtime_suspend(struct device *dev)
-+static int fec_runtime_suspend(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct fec_enet_private *fep = netdev_priv(ndev);
-@@ -4725,7 +4725,7 @@ static int __maybe_unused fec_runtime_suspend(struct device *dev)
- 	return 0;
- }
- 
--static int __maybe_unused fec_runtime_resume(struct device *dev)
-+static int fec_runtime_resume(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct fec_enet_private *fep = netdev_priv(ndev);
-@@ -4746,14 +4746,14 @@ static int __maybe_unused fec_runtime_resume(struct device *dev)
- }
- 
- static const struct dev_pm_ops fec_pm_ops = {
--	SET_SYSTEM_SLEEP_PM_OPS(fec_suspend, fec_resume)
--	SET_RUNTIME_PM_OPS(fec_runtime_suspend, fec_runtime_resume, NULL)
-+	SYSTEM_SLEEP_PM_OPS(fec_suspend, fec_resume)
-+	RUNTIME_PM_OPS(fec_runtime_suspend, fec_runtime_resume, NULL)
- };
- 
- static struct platform_driver fec_driver = {
- 	.driver	= {
- 		.name	= DRIVER_NAME,
--		.pm	= &fec_pm_ops,
-+		.pm	= pm_ptr(&fec_pm_ops),
- 		.of_match_table = fec_dt_ids,
- 		.suppress_bind_attrs = true,
- 	},
+- Fix sevreal typos
+- Include a new patch to synchronize probe with ndo_set_features
+
+Changes since V4:
+
+- do not update settings during ndo_open()
+- do not try to canel config noticiation during probe() as core make
+  sure the config notificaiton won't be triggered before probe is
+  done.
+- Tweak sevreal comments.
+
+Changes since V3:
+
+- when driver tries to enable config interrupt, check pending
+  interrupt and execute the nofitication change callback if necessary
+- do not unconditonally trigger the config space read
+- do not set LINK_UP flag in ndo_open/close but depends on the
+  notification change
+- disable config change notification until ndo_open()
+- read the link status under the rtnl_lock() to prevent a race with
+  ndo_open()
+
+Changes since V2:
+
+- introduce config_driver_disabled and helpers
+- schedule config change work unconditionally
+
+Thanks
+
+Jason Wang (4):
+  virtio: rename virtio_config_enabled to virtio_config_core_enabled
+  virtio: allow driver to disable the configure change notification
+  virtio-net: synchronize operstate with admin state on up/down
+  virtio-net: synchronize probe with ndo_set_features
+
+ drivers/net/virtio_net.c | 78 +++++++++++++++++++++++++---------------
+ drivers/virtio/virtio.c  | 59 +++++++++++++++++++++++-------
+ include/linux/virtio.h   | 11 ++++--
+ 3 files changed, 105 insertions(+), 43 deletions(-)
+
 -- 
-2.34.1
+2.31.1
 
 
