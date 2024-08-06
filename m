@@ -1,90 +1,83 @@
-Return-Path: <netdev+bounces-116016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0901D948C9C
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:09:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC60948CB0
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3559E1C223D1
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:09:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21D8E28501D
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37331BE22F;
-	Tue,  6 Aug 2024 10:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2511BDA86;
+	Tue,  6 Aug 2024 10:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="r3M817kq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mCehmxG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DF91BDAB9
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7E5EADC;
+	Tue,  6 Aug 2024 10:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722938974; cv=none; b=nNy0EP/nfdJx2f84zS6/LYyUdLf/trD8YCDNIr4dTvlp9eR4Y+hleTcyqSEDDnp5eNEui905Z2D+iKZI1mHCIbCE4kS5TAeJUARQhDnNFEmSdV4HbBdSFz5kHSIZ+wikAljj3AEq6wBPyXHBOb1IXY1pOzciJDF7of46DEnBIhY=
+	t=1722939479; cv=none; b=McaP/K4bmisQICIM4hbyH4qYp6ArZZwdBlf5wsetmBjOXPCfUnGjuBZWfKurnpiEkXKr4NumqM3vl7Vu5wReyWZ2S75xKyB06X7vd++I2KbYr9UQ+4wrEOQXX7BZvy2RyIwbJ8fK/+9o9NC32G2jrFrGkWfu0g0RHq5Ta2sl4Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722938974; c=relaxed/simple;
-	bh=NNVqekhksHIFyingNLsCyWirDE7OXVrw5s/4rQWlfBg=;
+	s=arc-20240116; t=1722939479; c=relaxed/simple;
+	bh=cDS0bvDeWHq+/jB+Y3bTQlTMD3033YsDpQQp+IMKXPk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pkpc+mt4GBGCUNcTU3BvZmTSJNRVqkpJ2x6zjtu3Oj78BgT8guUzdUqvayXR94hW8rZKf+gLF1U5S+4Gbo/28k/yntNVJFZtvLYE9TlhQXj0fsOHH7vc1Xr4OOFQ1hUTncZMpgC3XYve2gqKHx5YxBzgpl53hoVwOg3BkyADCWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=r3M817kq; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-368313809a4so3769355f8f.0
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 03:09:32 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LMxvoPi9JlHPMz2F1Q50SW4pEfnRWS9IkyYgK4sHEZi3GqIGtCzW22tOH7e8JT9OMuJ1NgHTI52mhRyIrtN6XjZd3C9mMICKOPQxJCsalgwX/4CQWXgMdCPfq2yGayHe1XEti059L7YX/qxUQb6SNuNH5Amv3OPLHBk5+nZLRM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mCehmxG5; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52f00ad303aso863433e87.2;
+        Tue, 06 Aug 2024 03:17:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1722938971; x=1723543771; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oPmv+UtoaFxUR6KHcBAgf4txeNozDfhLAPq/8XXH/6M=;
-        b=r3M817kqWcehTIgGZz9E8IYviZ53XXnFPdcLdMlyRiOgivREIxYtYM2roKgViD4ncU
-         Takw2acA2vYlbg0b7nEHd0iljXhQMT1lVzz5dEjM5hu6YEATRNdOvJxozX96CAxZdpeB
-         UOfyB96MUZzoMUYpDNSVCOGyX+MUUW5FO3yXk=
+        d=gmail.com; s=20230601; t=1722939476; x=1723544276; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GWXCoJ7rYq4RnfaGfXCHjKin4v2Wy0/q7H4yQqP9Ac4=;
+        b=mCehmxG5iW6Ql/P1X4t/02oalM9rqc9hPKKl199aTjd+f2nvL17JmKLVkExcY13V4n
+         TGsf0f08iMfBkAYJkYGhfeBriPdWut307vDo1BXkCaxWiTHaUT83z84KkOg1AUQu9ViJ
+         xKitqanNZC9Mh+N6o4VnyP4F3kiPqAgtxGAvSFG6Dh9eKc576jJxtZ+mmTWu+9SFEwBj
+         mfdAg3YUyJ5+loSlQ5ZUPphXchrIFzUhHPU42q3Tenmw8uQewD3iQy9zbngjJiO8FQ7m
+         QUbICmX4Ae2gEaCgaJaEZsb+3jMzbcaoUAqckSwfuXdVe4E40r+dDvJSD53TaUh4m+CJ
+         d0aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722938971; x=1723543771;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oPmv+UtoaFxUR6KHcBAgf4txeNozDfhLAPq/8XXH/6M=;
-        b=f8DqfrYSxb3LXaM7Kq4tNYZAfPBCfWpPI7yrMZjoSqZnVzRjBXCDof2X0ExObdMOcy
-         o33lnGp4P5SnanDhKuLr9wfCiqVyrtRbwtICxFuyFaIyrv/N6Iwt8XxVW95smTgQcifA
-         YI97DB63ndnB+nE7Cqx51LnXJUKaqI+wD4bFD1VHw5z+RpyV/5UCB9Q2GYNvHTe0bgki
-         FXrxXth0yl+oOpS+f+CnE31AKvwxFK17q5JZy0WLfBXtZinCf7VehwfvLaIaKVZwWT4h
-         bGSKwNQvndqf2ECgSj+lGhVhEW3mIEsP5An2Plm0eWon1NWm32Emi5IT7mLL4HkUsdxU
-         Vrqg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4OBAV76Zufb3WYD5phlSMwjUMyD1JpY8JMskngFys57qtBOirVIP6ST1E5J056sIuSHFupMfMkBVox6+sr9n+D9FcxD/n
-X-Gm-Message-State: AOJu0YzIeOrPvW185XwHqGG8/SDvNaM84joLDm3YW7pYDwrCkh/ge+ZO
-	YosB+4PQdHiAUoBAeB0nGpwYNYefpnndOa4aCBb25jfFaGMJ/bGWk5abYj4Dskc=
-X-Google-Smtp-Source: AGHT+IFLUKnbjZUaig+nsjJoNwSXw3spy99rW9QLigG9jiDJiQ63O36N6NVYLESiybDlvgyTITjT0g==
-X-Received: by 2002:adf:e3c1:0:b0:367:89ae:c204 with SMTP id ffacd0b85a97d-36bb35aa98bmr11475548f8f.12.1722938971101;
-        Tue, 06 Aug 2024 03:09:31 -0700 (PDT)
-Received: from LQ3V64L9R2.home ([80.208.222.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428e6e0357asm176363235e9.12.2024.08.06.03.09.30
+        d=1e100.net; s=20230601; t=1722939476; x=1723544276;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GWXCoJ7rYq4RnfaGfXCHjKin4v2Wy0/q7H4yQqP9Ac4=;
+        b=n8QiRsXQNjudjP14XoKP4MGwF7EaXrfeW3CgZg1ljWfd4efXtJMQxS7Rld7nMCn1+2
+         72ydy7l2n/jJyCYY8os3z2c75w8Qrbz9UvKddasrFveTLz7I1hQURK8AZzXCkPgxnYdk
+         xXVd1iX1wKLOlXcfC7hDbADQsYmZtKVUxeeRjcw3dKfwp/aBHOZaGDvnDIJFO9o+Bhn4
+         TM43a6LlrwOymauPjV71L1wIYrskfp0GvLb0zBTuTd+WdWtjyQnO4IrKvnrZInDprN/y
+         s7cSBooHunw3I4o5PPFe7YzsxtK3BM8baa+Z2/6k6eB0d+vsFwbDXrYHsIva2tVE2d25
+         qdPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOVR9n62LNp5QejNiAYwlLAx8F4y5FUlzIbnqGVz7WKf3OWG7zr4X+yTsBKYs6ZG5KIQ7SoMsrbMNRVKMelxARoi7728VOuEQeP1PuSbES6B3wfMxrKStlUXGxuquKvYAF0WxY
+X-Gm-Message-State: AOJu0YwZ9eQjnTUMfpRkw6IKEP88rLmIA9TqOgEgp7mvwE2tADLkYivE
+	ix0UPXUBuWyt3xqwjThwqNtCcFQMX/kXFAxELE+juiDZ8IFRkwDg
+X-Google-Smtp-Source: AGHT+IHzsWMpgZJ3RQ+PF9fvZCYjeTmSj6mhWqMiOTlM0IENo7LW4n77skqeBowAwJ40wPFgndSJ+g==
+X-Received: by 2002:a05:6512:b08:b0:52e:9694:3f98 with SMTP id 2adb3069b0e04-530bb3a05c4mr9527838e87.27.1722939475747;
+        Tue, 06 Aug 2024 03:17:55 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba0fee7sm1421223e87.66.2024.08.06.03.17.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 03:09:30 -0700 (PDT)
-Date: Tue, 6 Aug 2024 11:09:28 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, dxu@dxuuu.xyz, ecree.xilinx@gmail.com,
-	przemyslaw.kitszel@intel.com, donald.hunter@gmail.com,
-	gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next v2 09/12] ethtool: rss: support dumping RSS
- contexts
-Message-ID: <ZrH2WFeyZeFfk3K9@LQ3V64L9R2.home>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	dxu@dxuuu.xyz, ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
-	willemdebruijn.kernel@gmail.com
-References: <20240803042624.970352-1-kuba@kernel.org>
- <20240803042624.970352-10-kuba@kernel.org>
- <Zq5y0DvXQpBdOEeA@LQ3V64L9R2>
- <20240805145933.3ac6ae7a@kernel.org>
+        Tue, 06 Aug 2024 03:17:55 -0700 (PDT)
+Date: Tue, 6 Aug 2024 13:17:52 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, dl-S32 <S32@nxp.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 2/6] net: stmmac: Expand clock rate variables
+Message-ID: <ciueb72cjvfkmo3snnb5zcrfqtbum5x54kgurkkouwe6zrdrjj@vi54y7cczow3>
+References: <AM9PR04MB85062693F5ACB16F411FD0CFE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,56 +86,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240805145933.3ac6ae7a@kernel.org>
+In-Reply-To: <AM9PR04MB85062693F5ACB16F411FD0CFE2BD2@AM9PR04MB8506.eurprd04.prod.outlook.com>
 
-On Mon, Aug 05, 2024 at 02:59:33PM -0700, Jakub Kicinski wrote:
-> On Sat, 3 Aug 2024 19:11:28 +0100 Joe Damato wrote:
-> > > +struct rss_nl_dump_ctx {
-> > > +	unsigned long		ifindex;
-> > > +	unsigned long		ctx_idx;
-> > > +
-> > > +	unsigned int		one_ifindex;  
-> > 
-> > My apologies: I'm probably just not familiar enough with the code,
-> > but I'm having a hard time understanding what the purpose of
-> > one_ifindex is.
-> > 
-> > I read both ethnl_rss_dump_start and ethnl_rss_dumpit, but I'm still
-> > not following what this is used for; it'll probably be obvious in
-> > retrospect once you explain it, but I suppose my feedback is that a
-> > comment or something would be really helpful :)
+On Sun, Aug 04, 2024 at 08:49:49PM +0000, Jan Petrous (OSS) wrote:
+> The clock API clk_get_rate() returns unsigned long value.
+> Expand affected members of stmmac platform data.
 > 
-> Better name would probably help, but can't think of any.
-> 
-> User can (optionally) pass an ifindex/ifname to the dump, to dump
-> contexts only for the specified ifindex. If they do we "preset"
-> the ifindex and one_ifindex:
- 
-> +	if (req_info.dev) {
-> +		ctx->one_ifindex = req_info.dev->ifindex;
-> +		ctx->ifindex = ctx->one_ifindex;
-> +		ethnl_parse_header_dev_put(&req_info);
-> +		req_info.dev = NULL;
-> +	}
-> 
-> and then the iteration is stopped after first full pass:
-> 
-> +	rtnl_lock();
-> +	for_each_netdev_dump(net, dev, ctx->ifindex) {
-> +		if (ctx->one_ifindex && ctx->one_ifindex != ctx->ifindex)
-> +			break;
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 
-Ah, OK; that all makes sense. Thanks for the explanation.
+Since you are fixing this anyway, please convert the
+stmmac_clk_csr_set() and dwmac4_core_init() methods to defining the
+unsigned long clk_rate local variables.
 
-> Unfortunately we don't have any best practice for handling filtering 
-> in dumps. I find this cleaner than approaches I previously tried, but
-> we'll see if it stands the test of time.
+After taking the above into account feel free to add:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+-Serge(y)
+
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 2 +-
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c   | 2 +-
+>  include/linux/stmmac.h                                  | 6 +++---
+>  3 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> I'll add the following comment:
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> index 901a3c1959fa..2a5b38723635 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> @@ -777,7 +777,7 @@ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
+>  		netdev_err(priv->dev, "Failed to max out clk_ptp_ref: %d\n", err);
+>  	plat_dat->clk_ptp_rate = clk_get_rate(plat_dat->clk_ptp_ref);
+>  
+> -	netdev_dbg(priv->dev, "PTP rate %d\n", plat_dat->clk_ptp_rate);
+> +	netdev_dbg(priv->dev, "PTP rate %lu\n", plat_dat->clk_ptp_rate);
+>  }
+>  
+>  static int qcom_ethqos_probe(struct platform_device *pdev)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index ad868e8d195d..b1e4df1a86a0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -639,7 +639,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+>  		dev_info(&pdev->dev, "PTP uses main clock\n");
+>  	} else {
+>  		plat->clk_ptp_rate = clk_get_rate(plat->clk_ptp_ref);
+> -		dev_dbg(&pdev->dev, "PTP rate %d\n", plat->clk_ptp_rate);
+> +		dev_dbg(&pdev->dev, "PTP rate %lu\n", plat->clk_ptp_rate);
+>  	}
+>  
+>  	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
+> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> index 7caaa5ae6674..47a763699916 100644
+> --- a/include/linux/stmmac.h
+> +++ b/include/linux/stmmac.h
+> @@ -279,8 +279,8 @@ struct plat_stmmacenet_data {
+>  	struct clk *stmmac_clk;
+>  	struct clk *pclk;
+>  	struct clk *clk_ptp_ref;
+> -	unsigned int clk_ptp_rate;
+> -	unsigned int clk_ref_rate;
+> +	unsigned long clk_ptp_rate;
+> +	unsigned long clk_ref_rate;
+>  	unsigned int mult_fact_100ns;
+>  	s32 ptp_max_adj;
+>  	u32 cdc_error_adj;
+> @@ -292,7 +292,7 @@ struct plat_stmmacenet_data {
+>  	int mac_port_sel_speed;
+>  	int has_xgmac;
+>  	u8 vlan_fail_q;
+
+> -	unsigned int eee_usecs_rate;
+> +	unsigned long eee_usecs_rate;
+
+Sigh... One another Intel clumsy stuff: this field is initialized by
+the Intel glue-drivers and utilized in there only. Why on earth has it
+been added to the generic plat_stmmacenet_data structure?.. The
+only explanation is that the Intel developers were lazy to refactor
+the glue-driver a bit so the to be able to reach the platform data at
+the respective context.
+
+-Serge(y)
+
+>  	struct pci_dev *pdev;
+>  	int int_snapshot_num;
+>  	int msi_mac_vec;
+> -- 
+> 2.45.2
 > 
-> 	/* User wants to dump contexts for one ifindex only */
-
-Sounds good. If you like, you can also add:
-
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+> 
 
