@@ -1,272 +1,94 @@
-Return-Path: <netdev+bounces-116010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961B7948C86
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:03:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00666948C88
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B5311C22EC7
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:03:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6B611F24A75
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3741BDA82;
-	Tue,  6 Aug 2024 10:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b="IgyGz0wm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A90C1BE23A;
+	Tue,  6 Aug 2024 10:03:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-hyfv10011601.me.com (pv50p00im-hyfv10011601.me.com [17.58.6.43])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49C016C84B
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A871C1BE24B
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722938595; cv=none; b=hMw6BfGIVZYIDgbf9d2B5hw4LXDRol6ewOeLJbCXdq15iwofpeF0V7W/ZZshd58MPqcCmbCazoXs7xlvmf2VtscqWPBCZNTTPHpYZkF1qPxM3Fo4B3qgve+ejtMF+uIHpxV5+jWdqtJkkGw0hTHgdsuCvIRRA+gBff655KZpqZM=
+	t=1722938600; cv=none; b=TB6Bb0hHEnqv1xrapZ1hx0Ark29FS+nAuWyzIV3L2xqjfQD8v6Ize6OkX4s+n2NZcfLqPUuNe21zohp0KT+LJjF2cknch9a2dOzcSOm6Nibf2tVqwAblk7v1MP1h12bwB10Vra2RgXa+QSVt7tz1i3NG2oUk7UmY3fnzK51Gmx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722938595; c=relaxed/simple;
-	bh=tPEY8FH7pC+XAmhlSC2BDJ5yBwXnESNFS2JByPJJKy4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jZXjoa3vKz+BhS0eFosMYcsqGZvYQwz2pzBA2N1nW4V1YX2tVPydvJRErmr3Y+DFCQuwoJ3Dbg8YmHZ1xpasreBBWIxtVEJc1J+39OsQRW/kmEgC55VGbnyhLrJvhFlS66vSPPJbmhd6NVto9DzWHTG6P80snncAdGpEgg30QTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me; spf=pass smtp.mailfrom=kuroa.me; dkim=pass (2048-bit key) header.d=kuroa.me header.i=@kuroa.me header.b=IgyGz0wm; arc=none smtp.client-ip=17.58.6.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kuroa.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuroa.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuroa.me; s=sig1;
-	t=1722938592; bh=5TqGQ7w9LqLiwZDmaHj/t61mVV5jyAU/chLz+dQjHXY=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	b=IgyGz0wmsjipzw3Zd0UyFMzLA/vlK3x0evgvMzmaKO6N4EFQusmkwktZLMeSiIvFF
-	 G8WNOd3Ei+c5WEiVMm20l86yWblNuHFXhdmy2rjwj6eC94GCn+3H8HWPbH22pVhYln
-	 KEyLizbJ6Ir3QacQu6dDtT/48BWWkexKALyOTyoI7Z8qmoIWqhvmEdJYrn2W3nC+yn
-	 Vm3mN9VQrx4/IbBsd1SIgWFW6NJcT/WBfhVoq0BfkkOTDypzyqYBJNUEmtQVuNjpsG
-	 j4MpzSEQRzvfxUkk8bj2FKw7LDnAfJLh2tNKRIZHtXQsfCPo13xYLMHUDO+IesyfE5
-	 ENq7D79DZ97mg==
-Received: from tora.kuroa.me (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-hyfv10011601.me.com (Postfix) with ESMTPSA id 30B8CC801F6;
-	Tue,  6 Aug 2024 10:03:06 +0000 (UTC)
-From: Xueming Feng <kuro@kuroa.me>
-To: "David S . Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>,
-	Yuchung Cheng <ycheng@google.com>,
-	Soheil Hassas Yeganeh <soheil@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Xueming Feng <kuro@kuroa.me>
-Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
-Date: Tue,  6 Aug 2024 18:02:43 +0800
-Message-Id: <20240806100243.269219-1-kuro@kuroa.me>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <CAL+tcoB7F3Aviygmxc_DhfLRQN8c=cdn-_1QrXhEWFpyeAQRDw@mail.gmail.com>
-References: <CAL+tcoB7F3Aviygmxc_DhfLRQN8c=cdn-_1QrXhEWFpyeAQRDw@mail.gmail.com>
+	s=arc-20240116; t=1722938600; c=relaxed/simple;
+	bh=Ps1wwGlQ1i0N4A4gT/Dw9C18xNP/2VEgmmtKTYvIdvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iSQggYiX5BDORHPkDC+diVPbUtRHm5fskc+P0VZlSchjHKjYPyx1J1j8sKBE+evHUITUgDByHioZuYp6tO43qxofpZT8H13rUrj0fGof2cPT4Jdf9hK7QzJrAhy3/3U70CQt9tqe3Bx3jnacBjnD74IUHyuutVKEZA2Iy7qtkYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sbH20-0008Sp-KJ; Tue, 06 Aug 2024 12:03:04 +0200
+Date: Tue, 6 Aug 2024 12:03:04 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Christian Hopps <chopps@chopps.org>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, devel@linux-ipsec.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
+ larger than MTU user packets
+Message-ID: <20240806100304.GA32447@breakpoint.cc>
+References: <20240804203346.3654426-1-chopps@chopps.org>
+ <20240804203346.3654426-11-chopps@chopps.org>
+ <Zq__9Z4ckXNdR-Ec@hog>
+ <m2a5hr7iek.fsf@ja-home.int.chopps.org>
+ <ZrHjByjZnnDgjvfo@hog>
+ <m2le1aouzf.fsf@ja-home.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: d0Jc43gl5kjEbNtf8-RiKSy3kNb55GHt
-X-Proofpoint-GUID: d0Jc43gl5kjEbNtf8-RiKSy3kNb55GHt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-06_08,2024-08-02_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- suspectscore=0 spamscore=0 mlxscore=0 malwarescore=0 clxscore=1030
- adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408060070
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m2le1aouzf.fsf@ja-home.int.chopps.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Aug 5, 2024 at 7:14 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
-
-> On Mon, Aug 5, 2024 at 6:34 PM Xueming Feng <kuro@kuroa.me> wrote:
-> >
-> > On Mon, Aug 5, 2024 at 4:04 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > >
-> > > On Mon, Aug 5, 2024 at 3:23 PM Eric Dumazet <edumazet@google.com> wrote:
+Christian Hopps <chopps@chopps.org> wrote:
+> > > > > +	if (!l3resv) {
+> > > > > +		resv = XFRM_IPTFS_MIN_L2HEADROOM;
+> > > > > +	} else {
+> > > > > +		resv = skb_headroom(tpl);
+> > > > > +		if (resv < XFRM_IPTFS_MIN_L3HEADROOM)
+> > > > > +			resv = XFRM_IPTFS_MIN_L3HEADROOM;
+> > > > > +	}
+> > > > > +
+> > > > > +	skb = alloc_skb(len + resv, GFP_ATOMIC);
+> > > > > +	if (!skb) {
+> > > > > +		XFRM_INC_STATS(dev_net(tpl->dev), LINUX_MIB_XFRMNOSKBERROR);
 > > > >
-> > > > On Mon, Aug 5, 2024 at 6:52 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > > >
-> > > > > On Sat, Aug 3, 2024 at 11:48 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > > > > >
-> > > > > > Hello Eric,
-> > > > > >
-> > > > > > On Thu, Aug 1, 2024 at 9:17 PM Eric Dumazet <edumazet@google.com> wrote:
-> > > > > > >
-> > > > > > > On Thu, Aug 1, 2024 at 1:17 PM Xueming Feng <kuro@kuroa.me> wrote:
-> > > > > > > >
-> > > > > > > > We have some problem closing zero-window fin-wait-1 tcp sockets in our
-> > > > > > > > environment. This patch come from the investigation.
-> > > > > > > >
-> > > > > > > > Previously tcp_abort only sends out reset and calls tcp_done when the
-> > > > > > > > socket is not SOCK_DEAD aka. orphan. For orphan socket, it will only
-> > > > > > > > purging the write queue, but not close the socket and left it to the
-> > > > > > > > timer.
-> > > > > > > >
-> > > > > > > > While purging the write queue, tp->packets_out and sk->sk_write_queue
-> > > > > > > > is cleared along the way. However tcp_retransmit_timer have early
-> > > > > > > > return based on !tp->packets_out and tcp_probe_timer have early
-> > > > > > > > return based on !sk->sk_write_queue.
-> > > > > > > >
-> > > > > > > > This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resched
-> > > > > > > > and socket not being killed by the timers. Converting a zero-windowed
-> > > > > > > > orphan to a forever orphan.
-> > > > > > > >
-> > > > > > > > This patch removes the SOCK_DEAD check in tcp_abort, making it send
-> > > > > > > > reset to peer and close the socket accordingly. Preventing the
-> > > > > > > > timer-less orphan from happening.
-> > > > > > > >
-> > > > > > > > Fixes: e05836ac07c7 ("tcp: purge write queue upon aborting the connection")
-> > > > > > > > Fixes: bffd168c3fc5 ("tcp: clear tp->packets_out when purging write queue")
-> > > > > > > > Signed-off-by: Xueming Feng <kuro@kuroa.me>
-> > > > > > >
-> > > > > > > This seems legit, but are you sure these two blamed commits added this bug ?
-> >
-> > My bad, I wasn't sure about the intend of the original commit that did not
-> > handle orphan sockets at the time of blaming, should have asked.
-> >
-> > > > > > >
-> > > > > > > Even before them, we should have called tcp_done() right away, instead
-> > > > > > > of waiting for a (possibly long) timer to complete the job.
-> > > > > > >
-> > > > > > > This might be important when killing millions of sockets on a busy server.
-> > > > > > >
-> > > > > > > CC Lorenzo
-> > > > > > >
-> > > > > > > Lorenzo, do you recall why your patch was testing the SOCK_DEAD flag ?
-> > > > > >
-> > > > > > I guess that one of possible reasons is to avoid double-free,
-> > > > > > something like this, happening in inet_csk_destroy_sock().
-> > > > > >
-> > > > > > Let me assume: if we call tcp_close() first under the memory pressure
-> > > > > > which means tcp_check_oom() returns true and then it will call
-> > > > > > inet_csk_destroy_sock() in __tcp_close(), later tcp_abort() will call
-> > > > > > tcp_done() to free the sk again in the inet_csk_destroy_sock() when
-> > > > > > not testing the SOCK_DEAD flag in tcp_abort.
-> > > > > >
-> > > > >
-> > > > > How about this one which can prevent double calling
-> > > > > inet_csk_destroy_sock() when we call destroy and close nearly at the
-> > > > > same time under that circumstance:
-> > > > >
-> > > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > > > > index e03a342c9162..d5d3b21cc824 100644
-> > > > > --- a/net/ipv4/tcp.c
-> > > > > +++ b/net/ipv4/tcp.c
-> > > > > @@ -4646,7 +4646,7 @@ int tcp_abort(struct sock *sk, int err)
-> > > > >         local_bh_disable();
-> > > > >         bh_lock_sock(sk);
-> > > > >
-> > > > > -       if (!sock_flag(sk, SOCK_DEAD)) {
-> > > > > +       if (sk->sk_state != TCP_CLOSE) {
-> > > > >                 if (tcp_need_reset(sk->sk_state))
-> > > > >                         tcp_send_active_reset(sk, GFP_ATOMIC,
-> > > > >                                               SK_RST_REASON_NOT_SPECIFIED);
-> > > > >
-> > > > > Each time we call inet_csk_destroy_sock(), we must make sure we've
-> > > > > already set the state to TCP_CLOSE. Based on this, I think we can use
-> > > > > this as an indicator to avoid calling twice to destroy the socket.
-> > > >
-> > > > I do not think this will work.
-> > > >
-> > > > With this patch, a listener socket will not get an error notification.
-> > >
-> > > Oh, you're right.
-> > >
-> > > I think we can add this particular case in the if or if-else statement
-> > > to handle.
-> > >
-> > > Thanks,
-> > > Jason
-> >
-> > Summarizing above conversation, I've made a v2-ish patch, which should
-> > handles the double abort, and removes redundent tcp_write_queue_purge.
-> > Please take a look, in the meanwhile, I will see if I can make a test
-> > for tcp_abort. If this looks good, I will make a formal v2 patch.
-> >
-> > Any advice is welcomed. (Including on how to use this mail thread, I don't
-> > have much experience with it.)
-> >
-> > Signed-off-by: Xueming Feng <kuro@kuroa.me>
-> > ---
-> >  net/ipv4/tcp.c | 15 ++++++++-------
-> >  1 file changed, 8 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index e03a342c9162..039a9c9301b7 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -4614,6 +4614,10 @@ int tcp_abort(struct sock *sk, int err)
-> >  {
-> >         int state = inet_sk_state_load(sk);
-> >
-> > +       /* Avoid force-closing the same socket twice. */
-> > +       if (state == TCP_CLOSE) {
-> > +               return 0;
-> > +       }
+> > > > Hmpf, so we've gone from incrementing the wrong counter to
+> > > > incrementing a new counter that doesn't have a precise meaning.
+> > > 
+> > > The new "No SKB" counter is supposed to mean "couldn't get an SKB",
+> > > given plenty of other errors are logged under "OutErr" or "InErr"
+> > > i'm not sure what level of precision you're looking for here. :)
+> > 
+> > OutErr and InErr would be better than that new counter IMO.
 > 
-> No need to add brackets here.
+> Why?
 > 
-> And I don't think it's a correct position to test and return because
-> we need to take care of the race condition when accessing lock_sock()
-> by tcp_abort() and __tcp_close(). What if tcp_abort() just passes the
-> check and then tcp_close() rapidly grabs the socket lock and sets the
-> state to TCP_CLOSE?
+> My counter tracks the SKB depletion failure that is actually happening. Would you have me now pass in the direction argument just so I can tick the correct overly general MIB counter that provides less value to the user in identifying the actual problem? How is that good design?
+> 
+> I'm inclined to just delete the thing altogether rather than block on this thing that will almost never happen.
 
-Below is the patch changed according to your advice. The test now happens
-after the lock_sock and will return -ENOENT if the socket has already been
-closed by someone else.
+Makes sense to me, skb allocation failure is transient anyway, there is
+no action that could be taken if this error counter is incrementing.
 
-About the tests, I have some script that helps me to test the situation.
-But after reading about KUnit framework, I could not find any current 
-example for TCP testing. Could anyone enlighten me?
-
-
-Signed-off-by: Xueming Feng <kuro@kuroa.me>
----
- net/ipv4/tcp.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index e03a342c9162..831a18dc7aa6 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4637,6 +4637,13 @@ int tcp_abort(struct sock *sk, int err)
- 		/* Don't race with userspace socket closes such as tcp_close. */
- 		lock_sock(sk);
- 
-+	/* Avoid closing the same socket twice. */
-+	if (sk->sk_state == TCP_CLOSE) {
-+		if (!has_current_bpf_ctx())
-+			release_sock(sk);
-+		return -ENOENT;
-+	}
-+
- 	if (sk->sk_state == TCP_LISTEN) {
- 		tcp_set_state(sk, TCP_CLOSE);
- 		inet_csk_listen_stop(sk);
-@@ -4646,16 +4653,13 @@ int tcp_abort(struct sock *sk, int err)
- 	local_bh_disable();
- 	bh_lock_sock(sk);
- 
--	if (!sock_flag(sk, SOCK_DEAD)) {
--		if (tcp_need_reset(sk->sk_state))
--			tcp_send_active_reset(sk, GFP_ATOMIC,
--					      SK_RST_REASON_NOT_SPECIFIED);
--		tcp_done_with_error(sk, err);
--	}
-+	if (tcp_need_reset(sk->sk_state))
-+		tcp_send_active_reset(sk, GFP_ATOMIC,
-+				      SK_RST_REASON_NOT_SPECIFIED);
-+	tcp_done_with_error(sk, err);
- 
- 	bh_unlock_sock(sk);
- 	local_bh_enable();
--	tcp_write_queue_purge(sk);
- 	if (!has_current_bpf_ctx())
- 		release_sock(sk);
- 	return 0;
--- 
+You might want to pass GFP_ATOMIC | __GFP_NOWARN to alloc_skb() to avoid
+any splats given this is a high-volume allocation.
 
