@@ -1,104 +1,82 @@
-Return-Path: <netdev+bounces-116211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FB469497C9
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:56:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E5E9497E7
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 21:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A3C9B22271
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:56:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D73281C61
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 19:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E207CF30;
-	Tue,  6 Aug 2024 18:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4724F8A0;
+	Tue,  6 Aug 2024 19:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="GVcCwj3G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JDJCbWcc"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7548933086;
-	Tue,  6 Aug 2024 18:56:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EDB18D62B;
+	Tue,  6 Aug 2024 19:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722970593; cv=none; b=Ggm0N4L+vb21CQuhuTjsIZdK8k23H/hdcqfSqyK2y71lCEuaYzwkUO8PZRi5NPhK5PCh4Q7q+NEj6QafW1BqCD9uZARv3Vodu8n2JQlhQcKfTWeavLZ5HW8KegYbUQ2HhI9rgRrpNH+Kzn9O4YO5yI33VYomdSZLoCUPCYCOt5w=
+	t=1722970838; cv=none; b=IBiyEGQMmyAtfontwJxIK4BjpjjNH/X38KMdBoP1JiD1oawlDzZnQs9ztrA5E/KsMrMBBcMSb5s+qFum//O6YhLnucI/SOA2aMWH1Ix8IbKpF4QeUAzKphaCC/rqkNNzvcCP/SwEv+e91B8pYVTsHFwgZAXtqPZqQN7xwZgp6Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722970593; c=relaxed/simple;
-	bh=cC2lYjJPOeCXoHkjABZhWFF525BVkW0UMBevjJbsMX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b3HCt5XgSAjo6mFUryCVttJUaVYSxVRNsb+OnFT4rizQpsMmhw9VMeqSN2HiLaUTbajNHgHYj3HXL+6sO8w5aQ5uCJyxIdPfWJjCn0YspwJBp0viy7xox+NNoX4yX3tGTmp1+QjSrrTnmD40+5ahkMH/5sPfWIKkKSyyDQiSolw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=GVcCwj3G; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=4QvL4Jpw3sWWcTod5vrw50TbAHneXynBbbFzWGbutx0=; b=GVcCwj3Gq9bsNgfn1o6TjClFyh
-	u4x+Y+jCz/o1aUHRdU7z3odrKI7aqY1Wppyxek0zYktl/d9HRIpZ8qUiFpnAKoROmkKwn0wKfm8Dl
-	fSnasluhuD9guL9rMUi/8T12i82E5BlQ5KmJ39etn7UoPrPoPGqOOk6Ud6ueQd2XZSNB6ySVVDoTd
-	WDlGO3+tWytNAlWaTL90lrUvXgjVcdBX8EednBPbkjpxafm466rFZn5fczyHzb+iT7gEK6+TP5VhK
-	bE2qUpf8kkN1cG1Z5k3WxzcWjfMxfy98Si2V05qGWtSwKaYz0ChH+kBpwccHpfqxviI4sfI4ZmvmK
-	/feOO63w==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sbPMC-000000022Sq-0GHK;
-	Tue, 06 Aug 2024 18:56:28 +0000
-Date: Tue, 6 Aug 2024 19:56:28 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-fsdevel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>, bpf@vger.kernel.org,
-	Amir Goldstein <amir73il@gmail.com>, kvm@vger.kernel.org,
-	cgroups@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCHSET][RFC] struct fd and memory safety
-Message-ID: <20240806185628.GR5334@ZenIV>
-References: <20240730050927.GC5334@ZenIV>
- <20240806175859.GT676757@ziepe.ca>
+	s=arc-20240116; t=1722970838; c=relaxed/simple;
+	bh=Xaguw25vGST+m4rKcPcqkDDVvJTgQ1ZajBE1ca0YgEM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j4YWwJUEWtu6VwuWyIVbORfgfW9SI0pX+GTkxnT4lPlrrsAmr7+zWW6qw5gm7BhlrzIAmGuBMwYcN7UobCws2aRADzDG0AI3B5ahPtQQ+8QtesHuK4TOcjrSDfVrYkD+dQi/aNAldSoxOTqLP+ueVuZSCKFV053s4Z5tLEI1GMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JDJCbWcc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05224C32786;
+	Tue,  6 Aug 2024 19:00:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722970838;
+	bh=Xaguw25vGST+m4rKcPcqkDDVvJTgQ1ZajBE1ca0YgEM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JDJCbWcc1n6PKSb7QjkQhoWp+rSou41n3Q0l2EBZR401u/nymzYvafmEUCIZbL/LQ
+	 N/Tle52QhuBW81tPQjuaJKlrrFgWquGXsQVx6qFM0SCe2JDxxeCm/h3xOYM1Ojnex5
+	 hCKBXc5WTk52mXfMcY0w1Boc1iFpbIhJlg40Md9viQ9Z7C3Q5NMfTPGaqcwAadT3/o
+	 Ya+3dozMvxit2N2zwcwir5EMzYGqbo2VogZLVqutbQCix/NNVTwnA0e0ezROyzmaVZ
+	 r8bmR0YJlT1fhNo+u3OXrhbNPxKz82P1CB/zSvLieyMtjmCDrkFZ/MB1i4V7YakcXD
+	 Ou8Sy+N8tVn1g==
+Date: Tue, 6 Aug 2024 12:00:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Randy Li <ayaka@soulik.info>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ jasowang@redhat.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: tuntap: add ioctl() TUNGETQUEUEINDEX
+ to fetch queue index
+Message-ID: <20240806120037.76a279fe@kernel.org>
+In-Reply-To: <20240801134929.206678-1-ayaka@soulik.info>
+References: <20240801134929.206678-1-ayaka@soulik.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240806175859.GT676757@ziepe.ca>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 06, 2024 at 02:58:59PM -0300, Jason Gunthorpe wrote:
-> On Tue, Jul 30, 2024 at 06:09:27AM +0100, Al Viro wrote:
-> 
-> > 	* ib_uverbs_open_xrcd().  FWIW, a closer look shows that the
-> > damn thing is buggy - it accepts _any_ descriptor and pins the associated
-> > inode.  mount tmpfs, open a file there, feed it to that, unmount and
-> > watch the show...
-> 
-> What happens? There is still an igrab() while it is in the red black
-> tree?
+On Thu,  1 Aug 2024 21:49:21 +0800 Randy Li wrote:
+> +		if(put_user(tfile->queue_index, (unsigned int __user*)argp))
 
-... which does not render the mount busy.
+Checkpatch has some legitimate complains about this line:
 
-> > AFAICS, that's done for the sake of libibverbs and
-> > I've no idea how it's actually used - all examples I'd been able to
-> > find use -1 for descriptor here.  Needs to be discussed with infiniband
-> > folks (Sean Hefty?).  For now, leave that as-is.
-> 
-> The design seems insane, but it is what it is from 20 years ago..
-> 
-> Userspace can affiliate this "xrc domain" with a file in the
-> filesystem. Any file. That is actually a deliberate part of the API.
-> 
-> This is done as some ugly way to pass xrc domain object from process A
-> to process B. IIRC the idea is process A will affiliate the object
-> with a file and then B will be able to access the shared object if B
-> is able to open the file.
-> 
-> It looks like the code keeps a red/black tree of this association, and
-> holds an igrab while the inode is in that tree..
+ERROR: "(foo*)" should be "(foo *)"
+#58: FILE: drivers/net/tun.c:3160:
++		if(put_user(tfile->queue_index, (unsigned int __user*)argp))
 
-You need a mount (or file) reference to prevent fs destruction by umount.
-igrab() pins an _inode_, but the caller must arrange for the hosting
-filesystem to stay alive.
+ERROR: space required before the open parenthesis '('
+#58: FILE: drivers/net/tun.c:3160:
++		if(put_user(tfile->queue_index, (unsigned int __user*)argp))
+
+
+Assuming Willem is okay with the feature, please add appropriate tests
+in tools/testing/selftests/net/tap.c
+-- 
+pw-bot: cr
 
