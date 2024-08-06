@@ -1,209 +1,114 @@
-Return-Path: <netdev+bounces-115999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59852948BE1
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:04:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D814948BF8
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D4361C2342C
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:04:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB0971F21EB2
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CAF16A95B;
-	Tue,  6 Aug 2024 09:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABD71BD034;
+	Tue,  6 Aug 2024 09:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="a78hC5os"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZlsZzwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE13146A6F;
-	Tue,  6 Aug 2024 09:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3E11BCA06;
+	Tue,  6 Aug 2024 09:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722935041; cv=none; b=byJb63OfJJuQ2c0aZ9u/OUh8Uf5D/Fcl3QYz+ip0KkmqBAswcn4rXmUW+ZmQg576R6GYn18J9Y+l8RwBfNoqeipsdrDQOyo7c0Ht7zJJbWUp23ZJUhlX8dqVWCBElXJVA0VUkSwu+MGNExCh7w9hYZOjr1fNIVsc0uGZ9GcidCY=
+	t=1722935329; cv=none; b=R8bwGS3cL0R3JVFeLstg90/ZBykXxwUqY40xyfOa8PB3b6KzRfKdsh59avSMpdW+t9Zbsu5gqhYh5oVwGBzWepe+cTM2YwcJqbO62KuUocC0GiM3n4pE76UiFuu9dTMr8QDhppEowrZHZD+Id1u/HkHdtkElSMDHXpPv7la8H90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722935041; c=relaxed/simple;
-	bh=QUs/mtg1M0nKkGv9wzMY/JHT+ula+pf+wIBXs+MKVdE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K1EqMXG6Jm3I4+u1stxWZrhy0+pz1l+lDTdyZcpzUETyD8BEYM7EKf6GmWtg4QRwfaWJ0+KU6Toh1cCj9ZRjSJ6hXwm2iGbNy8vC4Vlt0dXgChipEvxvO2Xx6NvQv3cv3kkFsBJgKxsN5Q2T45ACqVLE/OXDXzsf9f280KCyr/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=a78hC5os; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 475MgNY7027196;
-	Tue, 6 Aug 2024 09:03:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=YovUT7xaTMua48TJpa1rlx5iN5zPetc2W8m
-	ov6k3AQM=; b=a78hC5osfhzH9EQryZiTbZs+ujlVMlisGMhx5lXYES7Nok1tear
-	+MEZ58JRFRlGgAyF7Ou8K4dgv61lrCOT8miH58Wk/w0hmoXnjK4jTecuYf2ClcR2
-	u9oUHY8tWAUW0NTuqMxnrLM5NpJGde2Hw1n/3S/CHnNyUQdWizV+PROKgHir5yI5
-	RDIG94fsPkw8ydnE6YKnSHf/HY9Fqgbw5eLf5+JFDhJSz4S7sqFwZA704HZS9iPX
-	x/sJ9PYU6H1L8QwC270PWelOiRCKbp/FBIYq9MitjDjJdDDxrNcFS7eVQrJ/UBW1
-	sgf2f1BcK9uTngFaVh5y7cjsFl19sXVcSDg==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40scx6pt75-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 09:03:47 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTP id 47693gv2023927;
-	Tue, 6 Aug 2024 09:03:42 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 40sdmm01fk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 09:03:42 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 47693gRT023922;
-	Tue, 6 Aug 2024 09:03:42 GMT
-Received: from hu-devc-hyd-u20-c-new.qualcomm.com (hu-anupkulk-hyd.qualcomm.com [10.147.247.84])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 47693gDm023920
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 09:03:42 +0000
-Received: by hu-devc-hyd-u20-c-new.qualcomm.com (Postfix, from userid 4405423)
-	id 9B5D22108C; Tue,  6 Aug 2024 14:33:41 +0530 (+0530)
-From: Anup Kulkarni <quic_anupkulk@quicinc.com>
-To: mkl@pengutronix.de, manivannan.sadhasivam@linaro.org,
-        thomas.kopp@microchip.com, mailhol.vincent@wanadoo.fr,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-can@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: quic_msavaliy@quicinc.com, quic_vdadhani@quicinc.com,
-        Anup Kulkarni <quic_anupkulk@quicinc.com>
-Subject: [PATCH v1] can: mcp251xfd: Enable transceiver using gpio
-Date: Tue,  6 Aug 2024 14:33:39 +0530
-Message-Id: <20240806090339.785712-1-quic_anupkulk@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1722935329; c=relaxed/simple;
+	bh=PNIhN1OA39eePQKFIv/4WBPmd1br52RQkAIJIsKUxJs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BlhB7wa9aIH208c+iOhSHpW1q56Y/yHj29W0uCaS/Gv7wgub/LPTtpKHLfRuFPTOTH6abjE98cH0qqbYkamZTZyeY4xSqPoA8p/G4Qu+h1yrZiG1LWfd+UMonxD75n8avDocH65YV6JAR/50L7bTQ6+cH29Lm9TeTHI6r5UhaVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZlsZzwm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92DD2C32786;
+	Tue,  6 Aug 2024 09:08:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722935328;
+	bh=PNIhN1OA39eePQKFIv/4WBPmd1br52RQkAIJIsKUxJs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jZlsZzwmemXD2j1kwHnE9TY/Utd7B01BX4iN2z19YzeCTF2VGhQkNqM2SLYysbP9t
+	 vdVN0Fd+9mCOENATjsiSUck0RG+rMNdNtiVkA1pCdfzH5ilZauHsiy6J/vCmOrkUeA
+	 gIf/+srKRV+l7rX+wFBmnWgH+9c7U9GnAHv63PxfquUw+1RTUOlGNIrYZv7GQJcIlo
+	 YEgrm1rfhCLj5MQrGSN5J2fG5Vwdo/BiaigDm9LUpNa64Mv9pdabvNDnwX9LTBMdQP
+	 nEVablE52ycG054zZn99VnDZ/xjCtGvgDWtk0zRn4Niu2xqup1Ve5EPk6sCjd4qZLP
+	 IpbPhvCQ9nY+w==
+Date: Tue, 6 Aug 2024 10:08:44 +0100
+From: Simon Horman <horms@kernel.org>
+To: hhorace <hhoracehsu@gmail.com>
+Cc: johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	Guillaume Nault <gnault@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [PATCH] wifi: cfg80211: fix bug of mapping AF3x to incorrect
+ User Priority
+Message-ID: <20240806090844.GR2636630@kernel.org>
+References: <20240805071743.2112-1-hhoracehsu@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: LdWfWdB54Lj6MssZ8O-Cii23-6d07SJ7
-X-Proofpoint-GUID: LdWfWdB54Lj6MssZ8O-Cii23-6d07SJ7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-06_07,2024-08-02_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 bulkscore=0 clxscore=1011 suspectscore=0 phishscore=0
- spamscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501
- mlxlogscore=965 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408060064
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240805071743.2112-1-hhoracehsu@gmail.com>
 
-Ensure the CAN transceiver is active during mcp251xfd_open() and
-inactive during mcp251xfd_close() by utilizing
-mcp251xfd_transceiver_mode(). Adjust GPIO_0 to switch between
-NORMAL and STANDBY modes of transceiver.
++ Guillaume and Ido
 
-Signed-off-by: Anup Kulkarni <quic_anupkulk@quicinc.com>
----
- .../net/can/spi/mcp251xfd/mcp251xfd-core.c    | 32 +++++++++++++++++++
- drivers/net/can/spi/mcp251xfd/mcp251xfd.h     |  7 ++++
- 2 files changed, 39 insertions(+)
+On Mon, Aug 05, 2024 at 03:17:42PM +0800, hhorace wrote:
+> According to RFC8325 4.3, Multimedia Streaming: AF31(011010, 26), 
+> AF32(011100, 28), AF33(011110, 30) maps to User Priority = 4 
+> and AC_VI (Video).
+> 
+> However, the original code remain the default three Most Significant
+> Bits (MSBs) of the DSCP, which makes AF3x map to User Priority = 3
+> and AC_BE (Best Effort).
+> 
+> Signed-off-by: hhorace <hhoracehsu@gmail.com>
 
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-index 3e7526274e34..3b56dc1721a5 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
-@@ -153,6 +153,25 @@ static inline int mcp251xfd_vdd_disable(const struct mcp251xfd_priv *priv)
- 	return regulator_disable(priv->reg_vdd);
- }
- 
-+static int
-+mcp251xfd_transceiver_mode(const struct mcp251xfd_priv *priv,
-+			   const enum mcp251xfd_xceiver_mode mode)
-+{
-+	int val, pmode, latch;
-+
-+	if (mode == MCP251XFD_XCVR_NORMAL_MODE) {
-+		pmode = MCP251XFD_REG_IOCON_PM0;
-+		latch = 0;
-+	} else if (mode == MCP251XFD_XCVR_STBY_MODE) {
-+		pmode = MCP251XFD_REG_IOCON_PM0;
-+		latch = MCP251XFD_REG_IOCON_LAT0;
-+	} else {
-+		return -EINVAL;
-+	}
-+	val = (pmode | latch) << priv->transceiver_pin;
-+	return regmap_write(priv->map_reg, MCP251XFD_REG_IOCON, val);
-+}
-+
- static inline int
- mcp251xfd_transceiver_enable(const struct mcp251xfd_priv *priv)
- {
-@@ -1620,6 +1639,10 @@ static int mcp251xfd_open(struct net_device *ndev)
- 	if (err)
- 		goto out_transceiver_disable;
- 
-+	err = mcp251xfd_transceiver_mode(priv, MCP251XFD_XCVR_NORMAL_MODE);
-+	if (err)
-+		goto out_transceiver_disable;
-+
- 	clear_bit(MCP251XFD_FLAGS_DOWN, priv->flags);
- 	can_rx_offload_enable(&priv->offload);
- 
-@@ -1668,6 +1691,7 @@ static int mcp251xfd_open(struct net_device *ndev)
- 
- static int mcp251xfd_stop(struct net_device *ndev)
- {
-+	int err;
- 	struct mcp251xfd_priv *priv = netdev_priv(ndev);
- 
- 	netif_stop_queue(ndev);
-@@ -1678,6 +1702,9 @@ static int mcp251xfd_stop(struct net_device *ndev)
- 	free_irq(ndev->irq, priv);
- 	destroy_workqueue(priv->wq);
- 	can_rx_offload_disable(&priv->offload);
-+	err = mcp251xfd_transceiver_mode(priv, MCP251XFD_XCVR_STBY_MODE);
-+	if (err)
-+		return err;
- 	mcp251xfd_chip_stop(priv, CAN_STATE_STOPPED);
- 	mcp251xfd_transceiver_disable(priv);
- 	mcp251xfd_ring_free(priv);
-@@ -2051,6 +2078,11 @@ static int mcp251xfd_probe(struct spi_device *spi)
- 					     "Failed to get clock-frequency!\n");
- 	}
- 
-+	err = device_property_read_u32(&spi->dev, "gpio-transceiver-pin", &priv->transceiver_pin);
-+		if (err)
-+			return dev_err_probe(&spi->dev, err,
-+					     "Failed to get gpio transceiver pin!\n");
-+
- 	/* Sanity check */
- 	if (freq < MCP251XFD_SYSCLOCK_HZ_MIN ||
- 	    freq > MCP251XFD_SYSCLOCK_HZ_MAX) {
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-index dcbbd2b2fae8..14b086814bdb 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
-@@ -614,6 +614,12 @@ enum mcp251xfd_flags {
- 	__MCP251XFD_FLAGS_SIZE__
- };
- 
-+enum mcp251xfd_xceiver_mode {
-+	MCP251XFD_XCVR_NORMAL_MODE,
-+	MCP251XFD_XCVR_STBY_MODE,
-+	MCP251XFD_XCVR_MODE_NONE
-+};
-+
- struct mcp251xfd_priv {
- 	struct can_priv can;
- 	struct can_rx_offload offload;
-@@ -670,6 +676,7 @@ struct mcp251xfd_priv {
- 
- 	struct mcp251xfd_devtype_data devtype_data;
- 	struct can_berr_counter bec;
-+	u32 transceiver_pin;
- };
- 
- #define MCP251XFD_IS(_model) \
--- 
-2.25.1
+Adding Guillaume and Ido as this relates to DSCP.
 
+> ---
+>  net/wireless/util.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/wireless/util.c b/net/wireless/util.c
+> index 082c6f9..4e04618 100644
+> --- a/net/wireless/util.c
+> +++ b/net/wireless/util.c
+> @@ -998,7 +998,6 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
+>  	 * Diffserv Service Classes no update is needed:
+>  	 * - Standard: DF
+>  	 * - Low Priority Data: CS1
+> -	 * - Multimedia Streaming: AF31, AF32, AF33
+>  	 * - Multimedia Conferencing: AF41, AF42, AF43
+>  	 * - Network Control Traffic: CS7
+>  	 * - Real-Time Interactive: CS4
+> @@ -1026,6 +1025,12 @@ unsigned int cfg80211_classify8021d(struct sk_buff *skb,
+>  		/* Broadcasting video: CS3 */
+>  		ret = 4;
+>  		break;
+> +	case 26:
+> +	case 28:
+> +	case 30:
+> +		/* Multimedia Streaming: AF31, AF32, AF33 */
+> +		ret = 4;
+> +		break;
+>  	case 40:
+>  		/* Signaling: CS5 */
+>  		ret = 5;
+> -- 
+> 2.42.0.windows.2
+> 
+> 
 
