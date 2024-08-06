@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-115967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10AAB948A67
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:48:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A060948A71
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9AEF1F25947
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:48:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B8801C23074
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B89C1BD00A;
-	Tue,  6 Aug 2024 07:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CDE1BD4F0;
+	Tue,  6 Aug 2024 07:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04275165EF5
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11391BBBE3
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722930466; cv=none; b=IjXkhon0WYjmzv/9lBypdFaQCeYaz/JoygBGT3RS0QiOb8q2SL+m1thnp1bgLRB2WnyhzksjYO1mO7O1L0P0CzH6bhYRlQu3J6U4TeLXecryqvCOA02wbtvRnrBSJh6t17NCjZVUSvJ3CzmcUiEY+ClyPUzIT/MzCV/KslEfkZo=
+	t=1722930466; cv=none; b=hDi6SBJejnfC6dKRPrMA0y5N5xfVB60qIN/PjgLJ75Yln2b1ehpqg6n/bvWPc9XW5s6L8Uh5yeWJNYukIjz2C9dXDvD76E571XPSKHspOz6QwKTKY/xXG/1avEO/WslVUrQ0JO2wuhFh6//SbhnT1KjO1MxJI8PLF3zNRYZUBpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722930466; c=relaxed/simple;
-	bh=AVUfVHPlIf7yQgBJq8Kk4t5geAImLHHOoeqz9mfknRg=;
+	bh=Xl8L1A+Io853XBdQS0p+W7orlcacQ3c/seOqzpZ5fGs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aL31XvP4iWn3MVbMJkX/YEDkUsI5KWxmhc/q6IT48rpMUg7xn0sQY5j8o4Q0t/tavahRq0eUfNgbxGAXtAZDjbIAHH6ODtDPYPLl/TWVhgRYaAc6tP6dKWt3BHiFavKZJOALs18ZfJ7Piob5cXscgkzDIzijLybPpTnrQkt5cWg=
+	 MIME-Version; b=bvLpWvgQx5yT2GC19QIDMOWFrqKB5MwrDuHaRuYE5nSZNJbB+Qq9Pd6S4AL3pNLkbNm4uqFnJOMXe2RbknwAG05lCF2tBtcj/HkEGh7jClzvHZYmsJyfhkX9j7Z+ZOmHSWXTe4E1WEGQFm91pcRbnq0uq5w1dWyTXJ2k8mKLfxA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,25 +33,25 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sbEuy-00045U-6L
-	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:40 +0200
+	id 1sbEv0-00047B-KZ
+	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:42 +0200
 Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sbEuu-004trg-TV
-	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:36 +0200
+	id 1sbEuv-004tt5-Ok
+	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:37 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 854E43179C7
-	for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 07:47:36 +0000 (UTC)
+	by bjornoya.blackshift.org (Postfix) with SMTP id 375B53179E5
+	for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 07:47:37 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id E5529317974;
-	Tue, 06 Aug 2024 07:47:33 +0000 (UTC)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 0830A317978;
+	Tue, 06 Aug 2024 07:47:34 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id a123d63c;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 32071db1;
 	Tue, 6 Aug 2024 07:47:33 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -62,9 +62,9 @@ Cc: davem@davemloft.net,
 	Jimmy Assarsson <extja@kvaser.com>,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 06/20] can: kvaser_usb: Add helper functions to convert device timestamp into ktime
-Date: Tue,  6 Aug 2024 09:41:57 +0200
-Message-ID: <20240806074731.1905378-7-mkl@pengutronix.de>
+Subject: [PATCH net-next 07/20] can: kvaser_usb: hydra: kvaser_usb_hydra_ktime_from_rx_cmd: Drop {rx_} in function name
+Date: Tue,  6 Aug 2024 09:41:58 +0200
+Message-ID: <20240806074731.1905378-8-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240806074731.1905378-1-mkl@pengutronix.de>
 References: <20240806074731.1905378-1-mkl@pengutronix.de>
@@ -82,88 +82,51 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Jimmy Assarsson <extja@kvaser.com>
 
-Add helper function kvaser_usb_ticks_to_ktime() that converts from
-device ticks to ktime.
-And kvaser_usb_timestamp{48,64}_to_ktime() that converts from device
-48-bit or 64-bit timestamp, to ktime.
+Rename function, since this function will be used for more than just the
+rx commands.
 
 Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
 Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Link: https://lore.kernel.org/all/20240701154936.92633-2-extja@kvaser.com
+Link: https://lore.kernel.org/all/20240701154936.92633-3-extja@kvaser.com
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/usb/kvaser_usb/kvaser_usb.h   | 24 +++++++++++++++++++
- .../net/can/usb/kvaser_usb/kvaser_usb_hydra.c | 10 ++++----
- 2 files changed, 28 insertions(+), 6 deletions(-)
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb.h b/drivers/net/can/usb/kvaser_usb/kvaser_usb.h
-index ff10b3790d84..4256a0caae20 100644
---- a/drivers/net/can/usb/kvaser_usb/kvaser_usb.h
-+++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb.h
-@@ -22,6 +22,8 @@
-  */
- 
- #include <linux/completion.h>
-+#include <linux/ktime.h>
-+#include <linux/math64.h>
- #include <linux/spinlock.h>
- #include <linux/types.h>
- #include <linux/usb.h>
-@@ -216,4 +218,26 @@ int kvaser_usb_can_rx_over_error(struct net_device *netdev);
- 
- extern const struct can_bittiming_const kvaser_usb_flexc_bittiming_const;
- 
-+static inline ktime_t kvaser_usb_ticks_to_ktime(const struct kvaser_usb_dev_cfg *cfg,
-+						u64 ticks)
-+{
-+	return ns_to_ktime(div_u64(ticks * 1000, cfg->timestamp_freq));
-+}
-+
-+static inline ktime_t kvaser_usb_timestamp48_to_ktime(const struct kvaser_usb_dev_cfg *cfg,
-+						      const __le16 *timestamp)
-+{
-+	u64 ticks = le16_to_cpu(timestamp[0]) |
-+		    (u64)(le16_to_cpu(timestamp[1])) << 16 |
-+		    (u64)(le16_to_cpu(timestamp[2])) << 32;
-+
-+	return kvaser_usb_ticks_to_ktime(cfg, ticks);
-+}
-+
-+static inline ktime_t kvaser_usb_timestamp64_to_ktime(const struct kvaser_usb_dev_cfg *cfg,
-+						      __le64 timestamp)
-+{
-+	return kvaser_usb_ticks_to_ktime(cfg, le64_to_cpu(timestamp));
-+}
-+
- #endif /* KVASER_USB_H */
 diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
-index c7ba768dfe17..ad1c6101a0cd 100644
+index ad1c6101a0cd..84f1f1f9c107 100644
 --- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
 +++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c
-@@ -526,19 +526,17 @@ static ktime_t
- kvaser_usb_hydra_ktime_from_rx_cmd(const struct kvaser_usb_dev_cfg *cfg,
- 				   const struct kvaser_cmd *cmd)
- {
--	u64 ticks;
-+	ktime_t hwtstamp = 0;
- 
- 	if (cmd->header.cmd_no == CMD_EXTENDED) {
- 		struct kvaser_cmd_ext *cmd_ext = (struct kvaser_cmd_ext *)cmd;
- 
--		ticks = le64_to_cpu(cmd_ext->rx_can.timestamp);
-+		hwtstamp = kvaser_usb_timestamp64_to_ktime(cfg, cmd_ext->rx_can.timestamp);
- 	} else {
--		ticks = le16_to_cpu(cmd->rx_can.timestamp[0]);
--		ticks += (u64)(le16_to_cpu(cmd->rx_can.timestamp[1])) << 16;
--		ticks += (u64)(le16_to_cpu(cmd->rx_can.timestamp[2])) << 32;
-+		hwtstamp = kvaser_usb_timestamp48_to_ktime(cfg, cmd->rx_can.timestamp);
- 	}
- 
--	return ns_to_ktime(div_u64(ticks * 1000, cfg->timestamp_freq));
-+	return hwtstamp;
+@@ -522,9 +522,8 @@ kvaser_usb_hydra_net_priv_from_cmd(const struct kvaser_usb *dev,
+ 	return priv;
  }
  
- static int kvaser_usb_hydra_send_simple_cmd(struct kvaser_usb *dev,
+-static ktime_t
+-kvaser_usb_hydra_ktime_from_rx_cmd(const struct kvaser_usb_dev_cfg *cfg,
+-				   const struct kvaser_cmd *cmd)
++static ktime_t kvaser_usb_hydra_ktime_from_cmd(const struct kvaser_usb_dev_cfg *cfg,
++					       const struct kvaser_cmd *cmd)
+ {
+ 	ktime_t hwtstamp = 0;
+ 
+@@ -1232,7 +1231,7 @@ static void kvaser_usb_hydra_rx_msg_std(const struct kvaser_usb *dev,
+ 	stats = &priv->netdev->stats;
+ 
+ 	flags = cmd->rx_can.flags;
+-	hwtstamp = kvaser_usb_hydra_ktime_from_rx_cmd(dev->cfg, cmd);
++	hwtstamp = kvaser_usb_hydra_ktime_from_cmd(dev->cfg, cmd);
+ 
+ 	if (flags & KVASER_USB_HYDRA_CF_FLAG_ERROR_FRAME) {
+ 		kvaser_usb_hydra_error_frame(priv, &cmd->rx_can.err_frame_data,
+@@ -1300,7 +1299,7 @@ static void kvaser_usb_hydra_rx_msg_ext(const struct kvaser_usb *dev,
+ 		KVASER_USB_KCAN_DATA_DLC_SHIFT;
+ 
+ 	flags = le32_to_cpu(cmd->rx_can.flags);
+-	hwtstamp = kvaser_usb_hydra_ktime_from_rx_cmd(dev->cfg, std_cmd);
++	hwtstamp = kvaser_usb_hydra_ktime_from_cmd(dev->cfg, std_cmd);
+ 
+ 	if (flags & KVASER_USB_HYDRA_CF_FLAG_ERROR_FRAME) {
+ 		kvaser_usb_hydra_error_frame(priv, &cmd->rx_can.err_frame_data,
 -- 
 2.43.0
 
