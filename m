@@ -1,116 +1,172 @@
-Return-Path: <netdev+bounces-116012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10E1948C8F
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:04:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 323B6948C94
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:07:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B97F1C2273F
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:04:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC5E6287F77
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F751BD51B;
-	Tue,  6 Aug 2024 10:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1FD11BDA8F;
+	Tue,  6 Aug 2024 10:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TRBQw3cG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="N0iksUdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2069.outbound.protection.outlook.com [40.107.237.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20D6166F21;
-	Tue,  6 Aug 2024 10:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722938692; cv=none; b=FW3vdPVqszLtcCEOu0SiNYAY5ECqFg6aVqL+uQVFy5RqJJMLKqHtA3Uo5/BfJ+HVPvKyvGm9QtxPQ5YfA8S7Q3BfxLJ3Bl4Ya7jqDKaM1vgAaIsFJ6eL1oP3HrXr5zGFnKU663tiwJPumChyoWswT53zIznK7wQX8yWIeWfq0ro=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722938692; c=relaxed/simple;
-	bh=CHbBbDInhI9vxwv7ajOuUGTdkhQnZ6srl1aXJqEvsf8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=okHqaS78nOYfDUissrIDizlKg9PcwHqBdf3q31ns2DDDonehs+DiuIeyXZBEhwxjR/yzcRfYEEeRK02+eMUVdEggNNRdRLJrjhHrDVuz2kp0DYasyzF2yAb/s+ruchyvQmsmvQgCZSw6+7hqh+2dpCD6g4d0NyCGs9nEISP31pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=TRBQw3cG; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4763frEC016897;
-	Tue, 6 Aug 2024 03:04:47 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=3
-	q52b0RqkoMwoJM2pZd1yPQFArILO0Z6Xi+RWOWg51w=; b=TRBQw3cGgfQumRl4x
-	33GiTg4w+EPBPs0vtPINAvAJLzLVXEd7Rol6TBtCvzeB1LHamOQb0ktTlCjzaHSz
-	Qz2y/bltINH73P6is9wSM3NnL8nJGJ+ygbcpDuTnAhNsplULq5Rh2sVGx7iAvWbr
-	tgbIYSgRU3G8dZXse+WVowlXTCcnxf4eVMVtyIszWgK+PMdD/V/Ph1lCV8uufi3Z
-	B4M59TFSILD49rf5WTkyYyzwh2Dj6NNyCkt+8RWJ5wRbQYNQdpind7ftWAOWAn/w
-	ePQpKGT/otgJ72NtqZbDq+wifLGc6GxyDiBePHxJx0dxQt1kcr4pwrdr9NYBqHp1
-	0sCqA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 40uc5f14hw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 03:04:47 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 6 Aug 2024 03:04:46 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 6 Aug 2024 03:04:46 -0700
-Received: from [10.9.8.37] (EL-LT0043.marvell.com [10.9.8.37])
-	by maili.marvell.com (Postfix) with ESMTP id D0CC75B695A;
-	Tue,  6 Aug 2024 03:04:44 -0700 (PDT)
-Message-ID: <c6863fe5-a1f6-7bba-3f26-a1bda9141914@marvell.com>
-Date: Tue, 6 Aug 2024 12:04:43 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1567A161900
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722938838; cv=fail; b=TypkNkgzQrIq0Gq8SAiAeGC5DI3OI0ZbfQt9UUTZUBsECIG0k5KdKnJfiazBGsao/0QM0aotdrB7gH4qtzgT24RfUwtjc82XrGugE03hpxPo01E3fMVtQnV4ruBryzEV362LKanaIa+o9ozeQBLGoe8VCqhdRMKsrO9tQ4xQC7E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722938838; c=relaxed/simple;
+	bh=TMXycArs13paSSs7QwWBMjJKSYdb2UmDQZs6wJhiAto=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=RDX/qeDqEKHyZE3N4PIAOOOANAUKmJt8yLuHJ71RMLzGMBfSzyR5MTxcIPw1gAMQ0NrLrrV7vbgBbhrGJAo79HhusiNF8SjjD+nGl7m9QfLaQg+/jek6uo71cdrrrkDO5U5BcyN87YB1UlP9wnUiCjVksSfHwYMgSRpBixi87hw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=N0iksUdA; arc=fail smtp.client-ip=40.107.237.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tlgGbZRdnDYJRP0fxixIEvg1+xsmPqkmlT6XN5vpqyJqnrJK/OoQJq0rg2OgqUMyVdclmYWEJBOw15kj96oUpbqqsPhOTr/tkhNkpYR+/m0xU2hvZFTkvvJ1AHhg7AQJO3V9girdtnhO4GMK72WaFM25zFHPfK0aS8Z2Yi9h8IfOmHsl9j2jCzTUlzKO5LN98X4hWKsu8F12ENYCcf/oHGFVgc+tFRi7EoU0qtzmUP7pcCm7X25mvFU7K2eHc4M1yWF07NxLYkPYoKOpY/Fc7adiZ/z3iRICoFYrOWrgn1efmhTKwhdiVf84F7r35XTt5btd9VpLfBxM/cxqjRA6QQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zsgx/fdDh7SZq2A6NzLJwOiDVr+E34P3LEzQcCqE11c=;
+ b=BfUmTg7o0laKyWuJzRkUH+tRUsvaAJcn3AQN9LxStV5HwagyRjjP4lvX5+qDsdw4YnNyfY6M1YTAooGqBXnHpGtRZc31brhLSl+8LTEKE4xLXUMckpXlIHkzk1+9lTZvoiJgT8mQcKkE93SzFLDfUx8cqek+JjRPbG89fu/v3gL2esvOVbs9jSckt2ZsldT5nDOY5ToNsH3eAgLQ9Bq/QHmHYo0TjkiO7AdybGuAtTMVH0DF159FV173F8C3hVXtd9JybJDG5shH82GlRUj74c+npm73IwYBxqCQllHVt4i/blzuDG4hgekkpiIuOVZO/4hYCNhpv62lHyKg3ESsEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zsgx/fdDh7SZq2A6NzLJwOiDVr+E34P3LEzQcCqE11c=;
+ b=N0iksUdAwGtt9eWG4TfYrQgVzGkl9sLk6TBFqXj+XG68daDV9iM3jWMKTc8NEgO0g/jCOAenXcXoxd1PRYutwfen0r+cNt9IKdmJ3gZ+FGXa2+YkOZ70dxLl1FOH5dr+C09jQd+QH+p4SG07BKw+R2l+Yig3d9zy9+x+DZTFa2r8+lM1981Q+8ICuYhRutjA9FhsBYL6yZpr7t8R+pr9H1MFmIEy1/inFIyjsEPCI4vOnCKq2MQ6AbeZckL74IREHLekhIWdZ/pRVv4o1FNl1d3iUorDEmQboYIx1o0DplfWtkeleULUl1qdLUzhaWY79Sosv7BL/+F6TRgUwpzYow==
+Received: from CH2PR11CA0002.namprd11.prod.outlook.com (2603:10b6:610:54::12)
+ by SJ0PR12MB7083.namprd12.prod.outlook.com (2603:10b6:a03:4ae::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Tue, 6 Aug
+ 2024 10:07:13 +0000
+Received: from DS2PEPF0000343E.namprd02.prod.outlook.com
+ (2603:10b6:610:54:cafe::45) by CH2PR11CA0002.outlook.office365.com
+ (2603:10b6:610:54::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27 via Frontend
+ Transport; Tue, 6 Aug 2024 10:07:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF0000343E.mail.protection.outlook.com (10.167.18.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Tue, 6 Aug 2024 10:07:13 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 6 Aug 2024
+ 03:07:00 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 6 Aug 2024
+ 03:06:55 -0700
+References: <cover.1722519021.git.petrm@nvidia.com>
+ <ba50a38cbf211cc98bdbebfda53226a1785f73e7.1722519021.git.petrm@nvidia.com>
+ <20240805152344.2aa5f237@kernel.org>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
+	<dsahern@kernel.org>, Donald Sharp <sharpd@nvidia.com>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 1/6] net: nexthop: Add flag to assert that
+ NHGRP reserved fields are zero
+Date: Tue, 6 Aug 2024 11:48:21 +0200
+In-Reply-To: <20240805152344.2aa5f237@kernel.org>
+Message-ID: <878qxanex2.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] net: atlantic: PHC time jumps ~4 seconds there and
- back on AQC107
-Content-Language: en-US
-To: Martin Pecka <peckama2@fel.cvut.cz>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Dmitrii Bezrukov
-	<dbezrukov@marvell.com>,
-        Jackson Pooyappadam <jpooyappadam@marvell.com>
-References: <def1073b-8997-48cd-adf3-e834662881de@fel.cvut.cz>
- <CO1PR18MB4713F904116EA5127017A3C0B7AE2@CO1PR18MB4713.namprd18.prod.outlook.com>
- <57f07825-b838-4f1a-b91c-1fd944ac928c@fel.cvut.cz>
-From: Igor Russkikh <irusskikh@marvell.com>
-In-Reply-To: <57f07825-b838-4f1a-b91c-1fd944ac928c@fel.cvut.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: Tqn1LhoEZB0vw-quaS8RMO_ajEJyZ-bj
-X-Proofpoint-GUID: Tqn1LhoEZB0vw-quaS8RMO_ajEJyZ-bj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-06_08,2024-08-02_01,2024-05-17_01
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF0000343E:EE_|SJ0PR12MB7083:EE_
+X-MS-Office365-Filtering-Correlation-Id: 33cbaaec-5465-4432-b546-08dcb5ff8aee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?k3+r4xLgbLiJCGTsw9zKdxaTguEY4Ib4dQanjTvnA4S7h9yvKVseRZn7YS6e?=
+ =?us-ascii?Q?p4ItcFx/nUYQOOwPtkoCvbrBzg4c6m0QyiwWfWtX9K7yU2q46qmQCt/mFxy9?=
+ =?us-ascii?Q?wtlWiJ0dHf3zjX6S0debqXEba0x5TNTOVGMqlGEjM5f4JHrufwvOrNbVpdNG?=
+ =?us-ascii?Q?WhUNAAkVQXe6nbkaKoeR0ohhg6kA2vC2nrSPG6CDAC/HcBcY5GYakYFkidG7?=
+ =?us-ascii?Q?4T00Uk0LYAgd2xZ8PWcrtbAGIwMKBOmF+YC9Apv2R/yy/huA0ngkpLj20+Cv?=
+ =?us-ascii?Q?sa2YJIt6+tW7EvF3H3myEL81y7/r3DiImwCsVVf69RyfrrM/wQ0oLdZgF0nY?=
+ =?us-ascii?Q?gtHxipYAqpiNpxZtmkoptsyZbX1G7xdzcNwMrIWG4iQF3iYHz4uhcRAWh76g?=
+ =?us-ascii?Q?M9t/nzom01nB198IVjXXhqb8FNSGKtl4MnjSt/K40myQ9z0s1il7ifcVjgKs?=
+ =?us-ascii?Q?gY5zf0Q9uVCimOk35hLcxRkE5d9nYhxgHHBpNza4Y5YXCC5XXYqLwYHn+jL+?=
+ =?us-ascii?Q?RJj5A1Db0QgcoMHeF5OXMgb7SHTntG6bpydowCo0oIHD86DrIhB5aeTu+3z5?=
+ =?us-ascii?Q?nhGF91Tp7QYdSM5T/BDmn3FZIMnDc7rpuXCDX62Z4vM3DY4MzgZ/m1xNAkLP?=
+ =?us-ascii?Q?5s4NqHkqA0blymOHvxDu4ZEJYSrKFdq6AtbuteDrFW2gXYjt8L0Kfw6PN2dL?=
+ =?us-ascii?Q?60fCyZ4w7GSlIQU4WVnv7AAcmcmHRFx1K7CsKgDk1iQSL4wD64uVshhAQtqQ?=
+ =?us-ascii?Q?sUvOlvBY8rhkEUXZCI5Fh35NIce+fzy2MHdMhHJtuWLy/PX7XTQojeZw6/yQ?=
+ =?us-ascii?Q?FKU8SuobFakWV4cO95Kq6TUfs9+9rX5hdZ0GYBsDQIrsprTqcSuuQoPoksMY?=
+ =?us-ascii?Q?DMTnsZomowo1Hy8QJsheYnHOYus/CCyNW2E4LtQvN8hhZrkaXuYHCgoilGjB?=
+ =?us-ascii?Q?tkeuhAZNm0Xr+l+/SmDZI9Qd3fj5Rqui8p7V3UfQezZKQcq55VZbxCXd2ZSL?=
+ =?us-ascii?Q?NY5siE/e49b5vvDzpIyWHnHFU0UF/CnsOCq+V6X/WPjEUNufp3Bo59G66gbe?=
+ =?us-ascii?Q?ln3yb8I4xrXoYjLv9p/i9unaAVPW1yH7xVvygjv6N0Wgw3fiT90LG7iumHIv?=
+ =?us-ascii?Q?RiMLkCWTVew0JDMOb0zZFwYiKLb/iTZLeAnYn1D7o0XlLK+kTNaim0y4ORii?=
+ =?us-ascii?Q?/KBaytiIc4ejD0asrD2QjEJSdSTZryH1KV4GrO0P1Dpme4b0A3W4FK3dBL1c?=
+ =?us-ascii?Q?7+pAnqijMgPmJpsalsXlCK6d/K/qDVn55TgDQaCkwb53sgqFn7XR63IUjpHf?=
+ =?us-ascii?Q?z7EN0VbgotdwdtIil+X+V/F9Pqhe+h/tZpfN5FB54SX1G6NcWnTfVtNDbWgr?=
+ =?us-ascii?Q?RrmTsuR9jMIsNcrfMxXjNGJ5AFzlS1P9MXWGHSCJ7ntr0c2Z45WJtF5ok5B5?=
+ =?us-ascii?Q?vD+HUtkZvrMabECNr0NbtomnZQS73vM+?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 10:07:13.0393
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33cbaaec-5465-4432-b546-08dcb5ff8aee
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF0000343E.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7083
 
 
-Hi Martin,
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Sorry was on vacation so dropped out a bit.
+> On Thu, 1 Aug 2024 18:23:57 +0200 Petr Machata wrote:
+>> diff --git a/include/uapi/linux/nexthop.h b/include/uapi/linux/nexthop.h
+>> index dd8787f9cf39..2ed643207847 100644
+>> --- a/include/uapi/linux/nexthop.h
+>> +++ b/include/uapi/linux/nexthop.h
+>> @@ -33,6 +33,9 @@ enum {
+>>  #define NHA_OP_FLAG_DUMP_STATS		BIT(0)
+>>  #define NHA_OP_FLAG_DUMP_HW_STATS	BIT(1)
+>>  
+>> +/* Response OP_FLAGS. */
+>> +#define NHA_OP_FLAG_RESP_GRP_RESVD_0	BIT(0)
+>
+> I guess these are op flags, so nobody should have a need to store them,
+> but having bits mean different things in and out make decoding and
+> binding generation much harder. Let's not do this unless absolutely
+> necessary. Perhaps you can start defining response flags from the
+> "other end", i.e. bit 31? Chances are the two sides will never "meet".
 
-On 7/21/2024 3:11 PM, Martin Pecka wrote:
-> Thanks for the quick response, Igor.
-> 
->> AQC107 is now in low maintenance mode in Marvell, and you are right this are of FW is not well documented.
-> Off-topic: Interesting, given the number of devices out there using AQC107...
->> One suggestion. Have you tried playing with -R (slave update rate)? Increasing it?
-> Tried it now and it seems it has no clear influence. I tested with -R 10 and -R 0.1 and in neither case were the time jumps more or less frequent.
->> I have a feeling the fact it happens periodically and then restores has something to do with "rounding" or NS calculations. Surprisingly uint32 fits 4 Billions of NS which is around 4 seconds...
-> 
-> I was also wondering whether the ~4B value could be some overflow. But the following investigation shows it is most probably not the case.
-
-Thank you very much for the logs and the analysis.
-I will try to investigate more with the data I have why this may happen.
-
-The complex thing is that parts of ptp alignment calculations are happening in driver, and then some logic goes into the firmware/hardware.
-
-Short term, I would say, your workaround with cutting negative mac_adj may have sense, until the real root cause is known.
-
-Regards,
-  Igor
+OK.
 
