@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-116262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67EC4949AF7
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:09:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D319949AF8
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80F5C1C21D8F
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:09:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17BDA28226F
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0538216F8FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C303F171098;
 	Tue,  6 Aug 2024 22:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fT4ocHuK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ka0jjhP0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A99159571
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 22:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C22D16B75B;
+	Tue,  6 Aug 2024 22:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722982179; cv=none; b=WlmDGyURADhIcMXvSayDNXRMyAgGPeYZanPdfBqBQK4zNXCIVJ2QPZ0qYOVFfWT+sphGiAnA8Ysg6Oki89Fq3SnuFTdy86A+it2thIMIXs2OtdSQmph5DUZa4t3IfZI0B/kQN1guyxQwozF1DA81+t1NnCGPTE5A47Wvu+9uGtY=
+	t=1722982180; cv=none; b=U+MOqYGDtaRjOsFvIAhPfRPQgqSNxPB90ta0yc6vmzEspwAjOyjufCqQZ/CJjHjAMFZfPvc+CAHE2u0rkxGJlJEEbAWujMvarQZivWH3x1P9LgGlBviFD+I4u8pijtNsAWWIN69+tnwMB27x1TFL1d3ySRE2p7eXdMfGtwYg4xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722982179; c=relaxed/simple;
-	bh=OmLSRVe6aq5J6ZQgkRNEgUYOX0q+oqc/0aCHnTZ9Xys=;
+	s=arc-20240116; t=1722982180; c=relaxed/simple;
+	bh=dT153xs/qwEfmlJ+ZgCCDVJ/hlCQl8Ti9arrnK2GHb0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sKHPJExst/DNP3QAP8aMOTLhNOliqf7nI+srAEHzixryPi9G9eUP0Nzv0/28iCpOLq4GTiL9LCDWJUUWhyqIslH1B5h2Hoo7fmPXzPRfoO+VG4kz3YtZ72Z52riY6VCnVuFxtQYOjVPfgiNo3sCZzGrGdpgHW6n4IfgR/iFZRz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fT4ocHuK; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=rKUgude6mOYPm5wlXNH6iNx/YicLGskXwgimpXlRfD/mTcTjkz7CBzT7gG+b/GUVyH17mJMtyI9AYBFefVOnEndo/DTcdLSk/NQBP4Mz+C/n4pfv2inMWb1o1POHBpk7rYKPzzsK5buc74yY6Rxxw83WvEjBbZaxO+x4Gz/B9Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ka0jjhP0; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722982179; x=1754518179;
+  t=1722982180; x=1754518180;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OmLSRVe6aq5J6ZQgkRNEgUYOX0q+oqc/0aCHnTZ9Xys=;
-  b=fT4ocHuK5WcEJybXCdIm8SR8jxu8yTKWmNAr9qhvJSdvyYx3uKTpB2fL
-   wrnbkIbhGeZqNBAxVbsD8EGpax/3r7KEE7NA5RVNJTVyXm5JzGaZ5y/dz
-   7CD1US8ReMzz4fMGHw8fX066nSxQpfCzbBqRgY/3c+A85o/geKACmkBH7
-   UlaFXilu8C7nb9a6cbTyK5KMyw12ffvFaqog1IvCw3uymLY6wBIoQ85gS
-   YinndGR8bzRu1Gk3gOIOA2R9pmShR4CkMxT6hwIvsEi1UmlU+vb5TWnVC
-   E4x61u8orBDxfDG9CVg3kbbi1/3gU8NYxf/rpI3x188T5QcbXmJeDWJ/w
-   A==;
-X-CSE-ConnectionGUID: SVPzo7wJRYmalNCj/dU5pg==
-X-CSE-MsgGUID: QTTxHy7tQaqrXhmUcPQ69A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="21172193"
+  bh=dT153xs/qwEfmlJ+ZgCCDVJ/hlCQl8Ti9arrnK2GHb0=;
+  b=Ka0jjhP0cdt7PEt5tzhQHcGNNxE2KN9kMO4bt7xabO7jeGCHOZrjjZve
+   LLbHLbs1df/1d9fh83aZrY/vVhgbdiqKeEeDpc8WHhcpCC0i8fhNde+tT
+   PMLvMGK8KFrz1FmN+R8x+6hIt9jgCTXGuB1Y6NSDgbG8so1OdZtOUKv+M
+   u2Co8qd8M5mX+0PQWSmAHF6rrAo8CBx/Ci+dIwhRW7hDSP2qy+4fAkwdT
+   9CZHocRh97kl6qGCMkt7Bsps9s9an2qqPRak1q/WAV6FxeKLUD+Y78oHN
+   r/6yfS0I5ZET5AhDxWMi2QRGUPhvAoJiEH3HvJC7fUfRTyg7PPceYzO3m
+   w==;
+X-CSE-ConnectionGUID: 0CX0T7VsTpagfGnVxe7MmA==
+X-CSE-MsgGUID: RE6DQa4lQF2mjm1N9L2SVQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="21172198"
 X-IronPort-AV: E=Sophos;i="6.09,268,1716274800"; 
-   d="scan'208";a="21172193"
+   d="scan'208";a="21172198"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 15:09:37 -0700
-X-CSE-ConnectionGUID: WbcRhqdJR86bBblbMv0jXg==
-X-CSE-MsgGUID: 2c/eklsnRAaiCj/6iewqAg==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 15:09:38 -0700
+X-CSE-ConnectionGUID: qKptz/5FShCzcPbEQhKpjA==
+X-CSE-MsgGUID: IVSaxke3QRSPif3NY5s1Xw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,268,1716274800"; 
-   d="scan'208";a="56297911"
+   d="scan'208";a="56297920"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa006.fm.intel.com with ESMTP; 06 Aug 2024 15:09:36 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -64,13 +64,16 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+Cc: Michal Kubiak <michal.kubiak@intel.com>,
 	anthony.l.nguyen@intel.com,
+	stable@vger.kernel.org,
+	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Krishneil Singh <krishneil.k.singh@intel.com>
-Subject: [PATCH net 1/3] idpf: fix memory leaks and crashes while performing a soft reset
-Date: Tue,  6 Aug 2024 15:09:20 -0700
-Message-ID: <20240806220923.3359860-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 2/3] idpf: fix memleak in vport interrupt configuration
+Date: Tue,  6 Aug 2024 15:09:21 -0700
+Message-ID: <20240806220923.3359860-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240806220923.3359860-1-anthony.l.nguyen@intel.com>
 References: <20240806220923.3359860-1-anthony.l.nguyen@intel.com>
@@ -82,126 +85,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
+From: Michal Kubiak <michal.kubiak@intel.com>
 
-The second tagged commit introduced a UAF, as it removed restoring
-q_vector->vport pointers after reinitializating the structures.
-This is due to that all queue allocation functions are performed here
-with the new temporary vport structure and those functions rewrite
-the backpointers to the vport. Then, this new struct is freed and
-the pointers start leading to nowhere.
+The initialization of vport interrupt consists of two functions:
+ 1) idpf_vport_intr_init() where a generic configuration is done
+ 2) idpf_vport_intr_req_irq() where the irq for each q_vector is
+   requested.
 
-But generally speaking, the current logic is very fragile. It claims
-to be more reliable when the system is low on memory, but in fact, it
-consumes two times more memory as at the moment of running this
-function, there are two vports allocated with their queues and vectors.
-Moreover, it claims to prevent the driver from running into "bad state",
-but in fact, any error during the rebuild leaves the old vport in the
-partially allocated state.
-Finally, if the interface is down when the function is called, it always
-allocates a new queue set, but when the user decides to enable the
-interface later on, vport_open() allocates them once again, IOW there's
-a clear memory leak here.
+The first function used to create a base name for each interrupt using
+"kasprintf()" call. Unfortunately, although that call allocated memory
+for a text buffer, that memory was never released.
 
-Just don't allocate a new queue set when performing a reset, that solves
-crashes and memory leaks. Readd the old queue number and reopen the
-interface on rollback - that solves limbo states when the device is left
-disabled and/or without HW queues enabled.
+Fix this by removing creating the interrupt base name in 1).
+Instead, always create a full interrupt name in the function 2), because
+there is no need to create a base name separately, considering that the
+function 2) is never called out of idpf_vport_intr_init() context.
 
-Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-Fixes: e4891e4687c8 ("idpf: split &idpf_queue into 4 strictly-typed queue structures")
+Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
+Cc: stable@vger.kernel.org # 6.7
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+Reviewed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 30 +++++++++++-----------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 5dbf2b4ba1b0..10b884dd3475 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1335,9 +1335,8 @@ static void idpf_rx_init_buf_tail(struct idpf_vport *vport)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index af2879f03b8d..a2f9f252694a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3780,13 +3780,15 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
  /**
-  * idpf_vport_open - Bring up a vport
-  * @vport: vport to bring up
-- * @alloc_res: allocate queue resources
+  * idpf_vport_intr_req_irq - get MSI-X vectors from the OS for the vport
+  * @vport: main vport structure
+- * @basename: name for the vector
   */
--static int idpf_vport_open(struct idpf_vport *vport, bool alloc_res)
-+static int idpf_vport_open(struct idpf_vport *vport)
+-static int idpf_vport_intr_req_irq(struct idpf_vport *vport, char *basename)
++static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
  {
- 	struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
  	struct idpf_adapter *adapter = vport->adapter;
-@@ -1350,11 +1349,9 @@ static int idpf_vport_open(struct idpf_vport *vport, bool alloc_res)
- 	/* we do not allow interface up just yet */
- 	netif_carrier_off(vport->netdev);
++	const char *drv_name, *if_name, *vec_name;
+ 	int vector, err, irq_num, vidx;
+-	const char *vec_name;
++
++	drv_name = dev_driver_string(&adapter->pdev->dev);
++	if_name = netdev_name(vport->netdev);
  
--	if (alloc_res) {
--		err = idpf_vport_queues_alloc(vport);
--		if (err)
--			return err;
--	}
-+	err = idpf_vport_queues_alloc(vport);
-+	if (err)
-+		return err;
+ 	for (vector = 0; vector < vport->num_q_vectors; vector++) {
+ 		struct idpf_q_vector *q_vector = &vport->q_vectors[vector];
+@@ -3804,8 +3806,8 @@ static int idpf_vport_intr_req_irq(struct idpf_vport *vport, char *basename)
+ 		else
+ 			continue;
  
- 	err = idpf_vport_intr_alloc(vport);
- 	if (err) {
-@@ -1539,7 +1536,7 @@ void idpf_init_task(struct work_struct *work)
- 	np = netdev_priv(vport->netdev);
- 	np->state = __IDPF_VPORT_DOWN;
- 	if (test_and_clear_bit(IDPF_VPORT_UP_REQUESTED, vport_config->flags))
--		idpf_vport_open(vport, true);
-+		idpf_vport_open(vport);
+-		name = kasprintf(GFP_KERNEL, "%s-%s-%d", basename, vec_name,
+-				 vidx);
++		name = kasprintf(GFP_KERNEL, "%s-%s-%s-%d", drv_name, if_name,
++				 vec_name, vidx);
  
- 	/* Spawn and return 'idpf_init_task' work queue until all the
- 	 * default vports are created
-@@ -1898,9 +1895,6 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 		goto free_vport;
- 	}
+ 		err = request_irq(irq_num, idpf_vport_intr_clean_queues, 0,
+ 				  name, q_vector);
+@@ -4326,7 +4328,6 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
+  */
+ int idpf_vport_intr_init(struct idpf_vport *vport)
+ {
+-	char *int_name;
+ 	int err;
  
--	err = idpf_vport_queues_alloc(new_vport);
--	if (err)
--		goto free_vport;
- 	if (current_state <= __IDPF_VPORT_DOWN) {
- 		idpf_send_delete_queues_msg(vport);
- 	} else {
-@@ -1932,17 +1926,23 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 
- 	err = idpf_set_real_num_queues(vport);
+ 	err = idpf_vport_intr_init_vec_idx(vport);
+@@ -4340,11 +4341,7 @@ int idpf_vport_intr_init(struct idpf_vport *vport)
  	if (err)
--		goto err_reset;
-+		goto err_open;
+ 		goto unroll_vectors_alloc;
  
- 	if (current_state == __IDPF_VPORT_UP)
--		err = idpf_vport_open(vport, false);
-+		err = idpf_vport_open(vport);
- 
- 	kfree(new_vport);
- 
- 	return err;
- 
- err_reset:
--	idpf_vport_queues_rel(new_vport);
-+	idpf_send_add_queues_msg(vport, vport->num_txq, vport->num_complq,
-+				 vport->num_rxq, vport->num_bufq);
-+
-+err_open:
-+	if (current_state == __IDPF_VPORT_UP)
-+		idpf_vport_open(vport);
-+
- free_vport:
- 	kfree(new_vport);
- 
-@@ -2171,7 +2171,7 @@ static int idpf_open(struct net_device *netdev)
- 	idpf_vport_ctrl_lock(netdev);
- 	vport = idpf_netdev_to_vport(netdev);
- 
--	err = idpf_vport_open(vport, true);
-+	err = idpf_vport_open(vport);
- 
- 	idpf_vport_ctrl_unlock(netdev);
+-	int_name = kasprintf(GFP_KERNEL, "%s-%s",
+-			     dev_driver_string(&vport->adapter->pdev->dev),
+-			     vport->netdev->name);
+-
+-	err = idpf_vport_intr_req_irq(vport, int_name);
++	err = idpf_vport_intr_req_irq(vport);
+ 	if (err)
+ 		goto unroll_vectors_alloc;
  
 -- 
 2.42.0
