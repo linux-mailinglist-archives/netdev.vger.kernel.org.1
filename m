@@ -1,86 +1,75 @@
-Return-Path: <netdev+bounces-115961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB77F9489DB
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4C9948A1F
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829BD1F22608
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:14:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED0081F24DBF
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:28:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDA9166F0C;
-	Tue,  6 Aug 2024 07:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFEF1BC9E2;
+	Tue,  6 Aug 2024 07:28:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="Omfr31xh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gZspuas8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354EE165F1C
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:14:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5D816BE26
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:28:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722928467; cv=none; b=EoYiTMxxJ7eu9/tnlxZXzpF8J/botyW/k+I6sMKa3N/l07RcGHtkmWq1rRreYCwubpE5xfIRwhryDg3GPLau4JxM+kNsqcLUKjFDkcIi5aFz4anOZyVi93NqKdOeVGE+yrJxCxypMihSgExVVvIpiXe2ZoY0gKwUdpXBe4C0qZA=
+	t=1722929315; cv=none; b=ZWDmr0PXeMx/oqliHT+eTBMP16RdQS1D9eO/1kU/pl0TO20summDx+hphRWYpnG34iWvwgREYd4AjEpMTwKH9k1+nkdVoSTb9tCoS82o5Ds9HbmH81xJLMkLBPPjhlYhLPS3uKV9e4o2xuVku7rRPyafeftD9h8uG8DH7hVOTfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722928467; c=relaxed/simple;
-	bh=3E98Eu1FQ6+6jyk4/YZ+6HHm8hP2V0WB/HfY10KRV2s=;
+	s=arc-20240116; t=1722929315; c=relaxed/simple;
+	bh=X5MxvYqyqa8+gt0e4dKG0jl6xjg2wgYTpRdkMjdK9BY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QD1KI0anSL98G6r8eqyTPgNYjeCD8tfn/0w/bUrkzzgUIZb3/9RQtNVgC1NN7uvrfh8AOZTsBdMjKEKReQWByBPpHKciknn7NoGiUqrxCX0Fsk2Xg3Ale0EB+p/iZM7n8kx62BzG92Zn+vNnd7o3iZpqRAoYQWLpaOTsEuK8WWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=Omfr31xh; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5a2c49d5af3so95192a12.2
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 00:14:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ffwll.ch; s=google; t=1722928463; x=1723533263; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YoILIVGqnvyXue9wibe7yNdf+HXnnRRR2apk4zDrIOU=;
-        b=Omfr31xhZ+9STHQfF8waRi781X/stfs6DNfAYfXoAxD2BEgaGKJ/yu/AnKJlJdwpkA
-         VVag4UFJ+1UYd9x2vGHkG6GZlf3Vy1+zcp6KN5jGosGI8sFfZgLXvX2ReYZgeyxLzJGl
-         MTd5qzW87aJ4a+hPqzbGA4mX+vODIeZ4tKtXE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722928463; x=1723533263;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YoILIVGqnvyXue9wibe7yNdf+HXnnRRR2apk4zDrIOU=;
-        b=T168noOE2WBXZV0n1gIThdWika+U9GU7rPAW/zh1scWhatsjm5WMBhoIYi9U3vIz+P
-         kQk4ZAgPqzawpF0pWhVtLQ77a3c2ZqSJWd2EXxI0QkBuOO/9XlfehiZZXN4XiGaOUxVL
-         YlvSQCcyAy8+/8LeACEAw44aSeQ0QVdfvh8rqm07AzcCsnCiiWE0IoRZQkfUIfdWBLvy
-         9pTZDWzNUWL8GTz9YZTuvL1ThQeWTCQWVNqHvbkKQ5uelfKXaOICrgND5H7G9tLbpV5L
-         6lWOaXtr1WDBCtiEWncFzq77Ekh81QCi8Xxy/BHrwh3+zVHIZR6LBBzBhsnbUXZf/69l
-         3/tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXqjVQQnjZIhrzqXLT9Zj6jujVl0Jny62eFuGJ1mE0AHagNYBOX2dDT4CYCBb4zS4KPaIyn18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvAubNBlxRj2h4AwGVG346lIDnjeKLaMhHoHkmGHDjmBVn3yHd
-	I9m45ZtFlRB7oWw6W4e3WpiCl/+QSJiHkBi6Z56ipBmFIwZuysvpbsRiUM518P4=
-X-Google-Smtp-Source: AGHT+IFt0UubU9tRXKmN+PsjgMssVL3mvxSBP75ERwo+mokToAjh3r5kkW9RxlPq16mZ3FsLBnNkIQ==
-X-Received: by 2002:a17:906:bc0b:b0:a7a:9a78:4b5e with SMTP id a640c23a62f3a-a7dc50ff341mr496151166b.8.1722928463251;
-        Tue, 06 Aug 2024 00:14:23 -0700 (PDT)
-Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e80e5fsm519934866b.161.2024.08.06.00.14.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 00:14:22 -0700 (PDT)
-Date: Tue, 6 Aug 2024 09:14:20 +0200
-From: Daniel Vetter <daniel.vetter@ffwll.ch>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	shiju.jose@huawei.com, Borislav Petkov <bp@alien8.de>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-Message-ID: <ZrHNTBJV5aybQrum@phenom.ffwll.local>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch>
- <20240729134512.0000487f@Huawei.com>
- <20240729154203.GF3371438@nvidia.com>
- <66a81996d4154_2142c29464@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <ZqiSfC5--4q2UFGk@phenom.ffwll.local>
- <20240801142223.GM3371438@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AYFDL4RccomtC9StEmRFFgONbaWbk2m4cprQoL5njP5TN+9jr8WDiCvcvdc9dmUIBoL5xemY5KqugmlFtx24Ge8UxmhGYHkvDsLPGdWXZ71Dw0E4aGnC0rcYp8qdbIX2a+x/DEq4UibT9RdWI3YFFxjnVgSZm7TtzecGmxRswW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gZspuas8; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722929313; x=1754465313;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=X5MxvYqyqa8+gt0e4dKG0jl6xjg2wgYTpRdkMjdK9BY=;
+  b=gZspuas8GfFrXyjYEumWTqhpmZP8BKZCNmGMjVEiBB+1TixikbXSRv+M
+   p98K0qX17jXo6c7T3Q3OjPm1PiHykMJbkfaOw7cPZiCnk6nxp6Cb/2afb
+   +VbCZ6tfR4wW4jzGQATHxYk4GUhvRHQhZ05tX2WAr589P1CGBg8M2TK9/
+   8TgU4GE56a5sNZlf1rhnDgnDI4b2i1vojZaBbj83KaEGI893K42ocGQ/5
+   64IvtpKre8IqTq+8+YktsFD3LEwlBS219Nov61zTl0YgZiulWzOjHtV+E
+   XWz1T3EAR5o2eerwVopIs3ouvHs9adu/IFFdwWe0O633pbFzc2TNj18rP
+   g==;
+X-CSE-ConnectionGUID: 7wqKijoTQoyWSRj7M53Yaw==
+X-CSE-MsgGUID: DQV6kF//SrurlS1qcq13MQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="21105988"
+X-IronPort-AV: E=Sophos;i="6.09,267,1716274800"; 
+   d="scan'208";a="21105988"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 00:28:31 -0700
+X-CSE-ConnectionGUID: XJvRG46AQ/Wpb0wEmWwNiQ==
+X-CSE-MsgGUID: 02wJFl/uS5GyjAMM/nlB9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,267,1716274800"; 
+   d="scan'208";a="79678735"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 06 Aug 2024 00:28:30 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sbEcN-0004GK-1y;
+	Tue, 06 Aug 2024 07:28:27 +0000
+Date: Tue, 6 Aug 2024 15:27:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: Re: [PATCH net-next v5 09/10] net: txgbe: add devlink and devlink
+ port created
+Message-ID: <202408061505.h7AJKdXp-lkp@intel.com>
+References: <9203F9254D59FF19+20240804124841.71177-10-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,48 +78,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240801142223.GM3371438@nvidia.com>
-X-Operating-System: Linux phenom 6.9.10-amd64 
+In-Reply-To: <9203F9254D59FF19+20240804124841.71177-10-mengyuanlou@net-swift.com>
 
-On Thu, Aug 01, 2024 at 11:22:23AM -0300, Jason Gunthorpe wrote:
-> On Tue, Jul 30, 2024 at 09:13:00AM +0200, Daniel Vetter wrote:
-> > I think a solid consensus on the topics above would be really useful for
-> > gpu/accel too. We're still busy with more pressing community/ecosystem
-> > building needs, but gpu fw has become rather complex and it's not
-> > stopping. And there's random other devices attached too nowadays, so fwctl
-> > makes a ton of sense.
-> 
-> Yeah, I'm pretty sure GPU is going to need fwctl too, the GPU's are
-> going to have the same issues as NIC does. I see people are already
-> struggling with topics like how to get debug traces out of the GPU FW.
-> 
-> > But for me the more important stuff would be some clear guidelines like
-> > what should be in other more across-devices subsystems like edac (or other
-> > ras features), what should be in functional subsystems like netdev, rdma,
-> > gpu/accel, ... whatever else, and what should be exposed through some
-> > special purpose subsystems like hwmon.
-> 
-> In my mind the most important part is that fwctl is not exclusive, the
-> FW interface and things being manipulated must be sharable or blocked
-> from fwctl. We should never get in a situation where a fwctl
-> implementation becomes a reason we cannot have a functional subsystem
-> interface.
+Hi Mengyuan,
 
-Hm still not clear to me how you want to achive that, but I guess best
-I'll jump over to the fwctl thread and ask about those details there.
+kernel test robot noticed the following build errors:
 
-> > We've got plenty of experience in enforcing such a community contract with
-> > vendors, but the hard part is creating a clear and ideally concise
-> > documentation page I can just point vendors at as the ground truth.
-> 
-> Well, I tried with the documentation in the fwctl patch series..
-> 
-> https://lore.kernel.org/linux-rdma/6-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com/
+[auto build test ERROR on net-next/main]
 
-I'll head over and drop some acks and comments.
--Sima
+url:    https://github.com/intel-lab-lkp/linux/commits/Mengyuan-Lou/net-libwx-Add-sriov-api-for-wangxun-nics/20240804-214836
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/9203F9254D59FF19%2B20240804124841.71177-10-mengyuanlou%40net-swift.com
+patch subject: [PATCH net-next v5 09/10] net: txgbe: add devlink and devlink port created
+config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240806/202408061505.h7AJKdXp-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240806/202408061505.h7AJKdXp-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408061505.h7AJKdXp-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_free':
+   wx_devlink.c:(.text+0x58): undefined reference to `devlink_unregister'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x6c): undefined reference to `devlink_free'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_pf_port':
+   wx_devlink.c:(.text+0xa0): undefined reference to `priv_to_devlink'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0xfc): undefined reference to `devlink_port_attrs_set'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x110): undefined reference to `devlink_port_register_with_ops'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_pf_port':
+   wx_devlink.c:(.text+0x174): undefined reference to `devl_port_unregister'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_create_devlink':
+   wx_devlink.c:(.text+0x2a0): undefined reference to `devlink_alloc_ns'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x2d4): undefined reference to `devlink_unregister'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x2dc): undefined reference to `devlink_free'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x304): undefined reference to `devlink_register'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x31c): undefined reference to `devlink_priv'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_vf_port':
+   wx_devlink.c:(.text+0x354): undefined reference to `priv_to_devlink'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x3d0): undefined reference to `devlink_port_attrs_set'
+   loongarch64-linux-ld: wx_devlink.c:(.text+0x3e8): undefined reference to `devl_port_register_with_ops'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_vf_port':
+   wx_devlink.c:(.text+0x47c): undefined reference to `devl_port_unregister'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_eswitch.o: in function `wx_eswitch_mode_set':
+   wx_eswitch.c:(.text+0x1c): undefined reference to `devlink_priv'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_eswitch.o: in function `wx_eswitch_mode_get':
+   wx_eswitch.c:(.text+0x138): undefined reference to `devlink_priv'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/txgbe/txgbe_main.o: in function `txgbe_remove':
+>> txgbe_main.c:(.text+0xf4): undefined reference to `devl_port_unregister'
+   loongarch64-linux-ld: drivers/net/ethernet/wangxun/txgbe/txgbe_main.o: in function `txgbe_probe':
+   txgbe_main.c:(.text+0x834): undefined reference to `devl_port_unregister'
+
 -- 
-Daniel Vetter
-Software Engineer, Intel Corporation
-http://blog.ffwll.ch
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
