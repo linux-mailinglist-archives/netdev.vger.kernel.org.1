@@ -1,137 +1,150 @@
-Return-Path: <netdev+bounces-115962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4C9948A1F
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:28:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC60F948A30
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:34:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED0081F24DBF
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:28:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C50BB248BE
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFEF1BC9E2;
-	Tue,  6 Aug 2024 07:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4280166F1D;
+	Tue,  6 Aug 2024 07:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gZspuas8"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="FbjRBqio"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5D816BE26
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D437A15F3EC
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722929315; cv=none; b=ZWDmr0PXeMx/oqliHT+eTBMP16RdQS1D9eO/1kU/pl0TO20summDx+hphRWYpnG34iWvwgREYd4AjEpMTwKH9k1+nkdVoSTb9tCoS82o5Ds9HbmH81xJLMkLBPPjhlYhLPS3uKV9e4o2xuVku7rRPyafeftD9h8uG8DH7hVOTfI=
+	t=1722929687; cv=none; b=ReZYmsk2WwvxR56ufFSQt+TyGv5wUyb6roZEvmxTRHVLTW5q/IFHZ2u2UucClEquyeqNJNtaxrYTdKoa0u++ePmPYbH95KLTHz1q2jJuIAd/u6nzv7Zlj4KTcHjxM/8Cz74jUc5jY+dpwqSm0bgxZonSVfEzfHL+4WK60ynte6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722929315; c=relaxed/simple;
-	bh=X5MxvYqyqa8+gt0e4dKG0jl6xjg2wgYTpRdkMjdK9BY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AYFDL4RccomtC9StEmRFFgONbaWbk2m4cprQoL5njP5TN+9jr8WDiCvcvdc9dmUIBoL5xemY5KqugmlFtx24Ge8UxmhGYHkvDsLPGdWXZ71Dw0E4aGnC0rcYp8qdbIX2a+x/DEq4UibT9RdWI3YFFxjnVgSZm7TtzecGmxRswW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gZspuas8; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722929313; x=1754465313;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=X5MxvYqyqa8+gt0e4dKG0jl6xjg2wgYTpRdkMjdK9BY=;
-  b=gZspuas8GfFrXyjYEumWTqhpmZP8BKZCNmGMjVEiBB+1TixikbXSRv+M
-   p98K0qX17jXo6c7T3Q3OjPm1PiHykMJbkfaOw7cPZiCnk6nxp6Cb/2afb
-   +VbCZ6tfR4wW4jzGQATHxYk4GUhvRHQhZ05tX2WAr589P1CGBg8M2TK9/
-   8TgU4GE56a5sNZlf1rhnDgnDI4b2i1vojZaBbj83KaEGI893K42ocGQ/5
-   64IvtpKre8IqTq+8+YktsFD3LEwlBS219Nov61zTl0YgZiulWzOjHtV+E
-   XWz1T3EAR5o2eerwVopIs3ouvHs9adu/IFFdwWe0O633pbFzc2TNj18rP
-   g==;
-X-CSE-ConnectionGUID: 7wqKijoTQoyWSRj7M53Yaw==
-X-CSE-MsgGUID: DQV6kF//SrurlS1qcq13MQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="21105988"
-X-IronPort-AV: E=Sophos;i="6.09,267,1716274800"; 
-   d="scan'208";a="21105988"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 00:28:31 -0700
-X-CSE-ConnectionGUID: XJvRG46AQ/Wpb0wEmWwNiQ==
-X-CSE-MsgGUID: 02wJFl/uS5GyjAMM/nlB9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,267,1716274800"; 
-   d="scan'208";a="79678735"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 06 Aug 2024 00:28:30 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sbEcN-0004GK-1y;
-	Tue, 06 Aug 2024 07:28:27 +0000
-Date: Tue, 6 Aug 2024 15:27:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next v5 09/10] net: txgbe: add devlink and devlink
- port created
-Message-ID: <202408061505.h7AJKdXp-lkp@intel.com>
-References: <9203F9254D59FF19+20240804124841.71177-10-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1722929687; c=relaxed/simple;
+	bh=55gWQtAXMFTTpi7jpzXMXqKEJTXZZmmHsBtPR9LbyxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KpeyGdNK+xLwORPjDrAGrzE0tdcMSB4u9sosdern3b9YV5lZWs8Se3uFtyj10KB/Zvt9TgLKT7caB4Ujm7aYLZd2FBI35dXE6cjln35ctaARScvx8YeDyqWsB14LV1XfrmuVzwOHxKigDA8yrT0+hp48ciuXLhZBaVwqpYOfT9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=FbjRBqio; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2f035ae1083so3814771fa.3
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 00:34:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1722929684; x=1723534484; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cojje0NgqQhFEUPTcwEliyWCA6eVmhHl0uuQefpE1jk=;
+        b=FbjRBqioc1AL10u2/Qr3e7cVX85tnocqPHOL3DHc56SpC+30wx4ZAmJ0sGKlGKGVoY
+         hX2KTy+ebTIZQeqr/lYAbtaIsNzJRb81g5swaP2jXnvYuFtbBNurpCm5oHN0lUTDvrfV
+         r8/FPM7PPsQPZ2/Kck+n1+lfsgF79xBIPng9Bcu6/MUufEHT0lGJ47pctHoFq1ksRoCm
+         SijuxRQIkP8c+Tb5fyNEl+EknIwv2q5ip8HYWOT/e+tdg6q4XO4XFcOLaRNOVh86DYr/
+         s5mpIbdS4Teo2JvAeXPUgWiPdtxDUpPopjM0bbnIpLd1lwaQY7ZSm5sBEzHIPODs/QWS
+         V9jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722929684; x=1723534484;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cojje0NgqQhFEUPTcwEliyWCA6eVmhHl0uuQefpE1jk=;
+        b=CytBUNzbPa3d230a3g8ezLU/yZUW9Q8K2q6kDbU5Ct19C6CMnnYiUqjrJqhxv0A/Rj
+         91iConomCBkiSIyd/FhEkNhY4sunSKmbGFpWWIOxD4UpunP6C8iHtukP39chy7A+9esS
+         l4ZiubRupUdlt50OHorRvl6/ShRiAT/Mrbwfx5xLkrRWOjX/EMCLYfYqKM6jvfxJvoWH
+         MIJtkaYse2iUppLazUJ7al3s0BJ7lwvoA1eWHx618eXt74ZCsJSzx3d5Z+xJwzaq+kGM
+         fsPIVXoXdOy+QYZeF2CE4ceYhhnXqIZrz7YcPralL+XBoQ0W6amxnpGFw6KfPSfCrXfr
+         ImKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoA4iWO+wG4MpeJhqnOT2ZyrfHVe7X81SzVbGiIYmD7W/68j1aQsxX1W4ZG5u6KbeZ/kuDdaCphD8ZlH//B8wEaFs4qrrH
+X-Gm-Message-State: AOJu0YwRYr9X4HZInL1ZMsqR1RWrPpgYQAjM/05PTsEkkCp8Wo4Vmq0F
+	K2n0vDx6l5HvIJztV3TUEYekXR/x1Y4Hwj964kSl72aTibny6Tnbl8vPaenOz0Ob+vAoAYucknp
+	7
+X-Google-Smtp-Source: AGHT+IEKUUDFBc25n+DfFynKB6ukFiPCNzwQXURUKaLlve+6TgRpyJmxzz/8c7Kqgmg1asqozL2iEA==
+X-Received: by 2002:a2e:97ce:0:b0:2ef:2e6b:4102 with SMTP id 38308e7fff4ca-2f15ab38302mr84697931fa.43.1722929683713;
+        Tue, 06 Aug 2024 00:34:43 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:400c:6f2d:f80c:1b34? ([2a01:e0a:b41:c160:400c:6f2d:f80c:1b34])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8adaadsm229930205e9.12.2024.08.06.00.34.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Aug 2024 00:34:43 -0700 (PDT)
+Message-ID: <3bcdec5a-a93c-45c4-83a1-e941a39cf1fd@6wind.com>
+Date: Tue, 6 Aug 2024 09:34:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9203F9254D59FF19+20240804124841.71177-10-mengyuanlou@net-swift.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] selftests: forwarding: lib.sh: ignore "Address
+ not found"
+To: Geliang Tang <geliang@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>,
+ Hangbin Liu <liuhangbin@gmail.com>, Benjamin Poirier <bpoirier@nvidia.com>,
+ Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <764585b6852537a93c6fba3260e311b79280267a.1722917654.git.tanggeliang@kylinos.cn>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <764585b6852537a93c6fba3260e311b79280267a.1722917654.git.tanggeliang@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Mengyuan,
+Le 06/08/2024 à 06:20, Geliang Tang a écrit :
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+> 
+> So many "Address not found" messages occur at the end of forwarding tests
+> when using "ip address del" command for an invalid address:
+> 
+> TEST: FDB limits interacting with FDB type local                    [ OK ]
+> Error: ipv4: Address not found.
+> 
+> ... ...
+> TEST: IGMPv3 S,G port entry automatic add to a *,G port             [ OK ]
+> Error: ipv4: Address not found.
+> Error: ipv6: address not found.
+> 
+> ... ...
+> TEST: Isolated port flooding                                        [ OK ]
+> Error: ipv4: Address not found.
+> Error: ipv6: address not found.
+> 
+> ... ...
+> TEST: Externally learned FDB entry - ageing & roaming               [ OK ]
+> Error: ipv4: Address not found.
+> Error: ipv6: address not found.
+> 
+> This patch gnores these messages and redirects them to /dev/null in
+typo: s/gnores/ignores or 'hides'
 
-kernel test robot noticed the following build errors:
+Nicolas
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Mengyuan-Lou/net-libwx-Add-sriov-api-for-wangxun-nics/20240804-214836
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/9203F9254D59FF19%2B20240804124841.71177-10-mengyuanlou%40net-swift.com
-patch subject: [PATCH net-next v5 09/10] net: txgbe: add devlink and devlink port created
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240806/202408061505.h7AJKdXp-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240806/202408061505.h7AJKdXp-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408061505.h7AJKdXp-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_free':
-   wx_devlink.c:(.text+0x58): undefined reference to `devlink_unregister'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x6c): undefined reference to `devlink_free'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_pf_port':
-   wx_devlink.c:(.text+0xa0): undefined reference to `priv_to_devlink'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0xfc): undefined reference to `devlink_port_attrs_set'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x110): undefined reference to `devlink_port_register_with_ops'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_pf_port':
-   wx_devlink.c:(.text+0x174): undefined reference to `devl_port_unregister'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_create_devlink':
-   wx_devlink.c:(.text+0x2a0): undefined reference to `devlink_alloc_ns'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x2d4): undefined reference to `devlink_unregister'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x2dc): undefined reference to `devlink_free'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x304): undefined reference to `devlink_register'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x31c): undefined reference to `devlink_priv'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_create_vf_port':
-   wx_devlink.c:(.text+0x354): undefined reference to `priv_to_devlink'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x3d0): undefined reference to `devlink_port_attrs_set'
-   loongarch64-linux-ld: wx_devlink.c:(.text+0x3e8): undefined reference to `devl_port_register_with_ops'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_devlink.o: in function `wx_devlink_destroy_vf_port':
-   wx_devlink.c:(.text+0x47c): undefined reference to `devl_port_unregister'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_eswitch.o: in function `wx_eswitch_mode_set':
-   wx_eswitch.c:(.text+0x1c): undefined reference to `devlink_priv'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/libwx/wx_eswitch.o: in function `wx_eswitch_mode_get':
-   wx_eswitch.c:(.text+0x138): undefined reference to `devlink_priv'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/txgbe/txgbe_main.o: in function `txgbe_remove':
->> txgbe_main.c:(.text+0xf4): undefined reference to `devl_port_unregister'
-   loongarch64-linux-ld: drivers/net/ethernet/wangxun/txgbe/txgbe_main.o: in function `txgbe_probe':
-   txgbe_main.c:(.text+0x834): undefined reference to `devl_port_unregister'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> __addr_add_del().
+> 
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> ---
+>  tools/testing/selftests/net/forwarding/lib.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index ff96bb7535ff..8670b6053cde 100644
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -839,7 +839,7 @@ __addr_add_del()
+>  	array=("${@}")
+>  
+>  	for addrstr in "${array[@]}"; do
+> -		ip address $add_del $addrstr dev $if_name
+> +		ip address $add_del $addrstr dev $if_name &> /dev/null
+>  	done
+>  }
+>  
 
