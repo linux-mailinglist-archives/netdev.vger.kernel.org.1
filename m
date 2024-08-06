@@ -1,130 +1,132 @@
-Return-Path: <netdev+bounces-116052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7870948DBC
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:33:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1EB3948DC2
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:34:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8B201C221E4
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:33:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 632C81F251BE
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 226C21C3F36;
-	Tue,  6 Aug 2024 11:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB2E1C2303;
+	Tue,  6 Aug 2024 11:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="QNrgN4nQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OccmPPtx"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A541C3F2C
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 11:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722943960; cv=none; b=Fm5PhdHoXSKWhS+jLwfzbII1HN3/68rKqvUqYlA/gV9WToDnuWza/7mEnWgOoOtJtXVc6X7HCnZxmoNyjR01xH8WwHL2H0s0JUUUhMiOrT5gxKs/jXTg6Ib71aSaNDS4YiwEkUanapI9cTVDnw9tlQxQ8ogz3ZdGtwjp4oJOURo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722943960; c=relaxed/simple;
-	bh=Q241oUaMGFlSJQ9vHQUogcqqVHQq5Smd38ZvTH+jYf0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrhEOsedbxssDEX7+BQ+6lOxbOOuc4HehrfABLxGoFNmoj0xQml5p3C3vI/KMTcZ1T+18MItamg8PmvzfN9rQF7qwCHg44otjz1L5FW5d8rHWyyU3/mrzTHBK/vf7Q9DLqRjKvQdX2VsijClPE4YWoYnr8Fg1NcgOBy6HB1OC4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=QNrgN4nQ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 6F5FF20539;
-	Tue,  6 Aug 2024 13:32:35 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H0tWupvw3IEF; Tue,  6 Aug 2024 13:32:34 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D289F201A0;
-	Tue,  6 Aug 2024 13:32:34 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D289F201A0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1722943954;
-	bh=hbBqENPToFTZTB/vSmNx9Rm3WbF7XygdemLWbYkeES4=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=QNrgN4nQbl19d0jwr2Of9FU+3udzdXa4+PTzElXA1EDUry1UXWJuhnt9XzM2PFqz1
-	 7jkIYIsdcOl2V/Uw86R8H66SgBzcGElLycGZXFskEqoq1JWjhes+Vn80JzFNR1rLtY
-	 IPT5vixoyklDlL2Fk4B9j2j5hcAgWRvRjIcB6h4QA/uW069zQhImgtP0wZx39XiWvL
-	 8hBjwwCnkJh2NfhkbAu6+jiHw5Rgz71j7idoqzkwcsLYTgZYPHpTb7jrnzMvtZJeTU
-	 CLAd18jVuaZVm2alXasxlnDN7oEEBL+7v2gu+MCWwFdwbRA2WXns1vO1gu1nmfg+E3
-	 jjuookFq+YF1A==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 6 Aug 2024 13:32:34 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 6 Aug
- 2024 13:32:34 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id EC3C53182977; Tue,  6 Aug 2024 13:32:33 +0200 (CEST)
-Date: Tue, 6 Aug 2024 13:32:33 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: Christian Hopps <chopps@chopps.org>, <devel@linux-ipsec.org>,
-	<netdev@vger.kernel.org>, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-Message-ID: <ZrIJ0d6x3pTslQKn@gauss3.secunet.de>
-References: <20240804203346.3654426-1-chopps@chopps.org>
- <20240804203346.3654426-11-chopps@chopps.org>
- <Zq__9Z4ckXNdR-Ec@hog>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A725E143C4B;
+	Tue,  6 Aug 2024 11:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722944087; cv=none; b=gBkZ3FfsFwpE4nVqYPpg/ugg8A87UqVKL7kgNZJC08q7Fy4q5J0AZA1iyMiOF7ADwwc1t6UrO8BJfPNu0Den1ta4wzWOeEgQ3P8ikyqPvqz4v0ptZUM8aHiP+wq3tR1VKzE0+Nf0wdvo0FjgWcaUST73ArPQkz5MsF6c+VoSB60=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722944087; c=relaxed/simple;
+	bh=5D6t1pzUECN2HDNf/G0lGVaxJ+7VHir8lRNzXGlGqno=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mT12g3lacd1rc2UzC9WyJizJHiz7cvDTOL3tPVSg+B/QlyRlai3PDaD6q8fRrW6R/tMdq3/ENzXYp9DdXLDmP7IG8zH0CW0mCjbVf6/Kyh+sQogAvhAFrdpPmEqX4Wl/PK2TmxiZ9MUKhs805ooDxe68ttn9wVBAN+pn+FuNPkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OccmPPtx; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-81f83b14d65so21313439f.1;
+        Tue, 06 Aug 2024 04:34:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722944085; x=1723548885; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ddo7iby93cbpq3DE6A/Zpe9D+vuWQ4i5A2oEF0e6FcQ=;
+        b=OccmPPtxsdjT5rfvGgP+Jcd92JPPFGOmgmQuEgSHbm1spzppug6R3OAekclVBhZmuv
+         iWo55/EgBcjWYNGYmleC86eygLFhIhBIdGilruUpxDR4cc+MiQwKFKDj6UydlqyJLWfB
+         eE0FA79crsYCJy3bMoL+1/yNVJ63dnZToqoh+py1zm9NXsPRwfRCQYgsTsyCqTXLaiyC
+         y8FMk17ujqCBDr3M2i6rkxJU7svft1AscooAwwVSoXMEgY9SZkZ10dAKzggOH64SoPVi
+         wEqaEdubSEFf3uqN2WuR+0eZi9r2EjLZymSIoTh/ywnCNcpQ1340uoZ3XYzX//9NGE9o
+         d7xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722944085; x=1723548885;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ddo7iby93cbpq3DE6A/Zpe9D+vuWQ4i5A2oEF0e6FcQ=;
+        b=lyrQ7h4kkzpgPn+wLNnHHKRSGkI57nNzqh6QPFymuGvy2Gw5tyw+qwrba3lfyv06IU
+         TKbHIS1S0N6P/k6mArAdNH0Gq1rYhlx6qa58xsFR8ayytqOaIlTmYmk40WLQkRrxReGi
+         tz4gnNji6iy2BtRoeQMWvpLBe8ZVkUwQ+pQn5JGnHskR5tElo/b3R5SDpWxJpm3jOnww
+         mRoSmp+9fVEFNYjwZfZ8n+dFTsw5xLBni5YOmIzooOMXlBQnKuVss3T9bUk1gQwvLF6l
+         CHpamZBYhjzil/odtUG3CTv5z/K5lrcBRDEHjT5vZxWV44482fhAdNQFCLaAu8wsUd9N
+         PZcw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdXNgMIcDTWRGuryJJ7ypuKhC6iY8nACLKLMOkSf6c5xjXftOSoE/Mj77vfJLAlNKF1TeG8aB+82BLBnUR4cxc5V0DOIBxOxv/p60SamgTdLefwgSamW0+ku3wGg48GLAd9l6T
+X-Gm-Message-State: AOJu0YxSIBX0wTowlBT9I44eWIBlJaVABL/KuXfaIDdXlXOCdjJMc9tN
+	tS342VQGBgnle8t7MUTJXmvvXwpHoaxryypLaThp9t2ObG1/MHySwu7kHToTPS4zwdNkgBe6bGV
+	FNEo6Mp1evGvdbOwK889XfCm0bys=
+X-Google-Smtp-Source: AGHT+IElc5Bl6Zr8a3XieILg1Ia3IaiOdB1V9UU4mnkozO5WCwSzYCm7Lfxoxqij21VfMYYTZ5JE7YyF43fdhCnXWLk=
+X-Received: by 2002:a92:d84a:0:b0:376:1cf6:6be4 with SMTP id
+ e9e14a558f8ab-39b1fb874a7mr176368565ab.14.1722944084674; Tue, 06 Aug 2024
+ 04:34:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Zq__9Z4ckXNdR-Ec@hog>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+References: <CAL+tcoB7F3Aviygmxc_DhfLRQN8c=cdn-_1QrXhEWFpyeAQRDw@mail.gmail.com>
+ <20240806100243.269219-1-kuro@kuroa.me>
+In-Reply-To: <20240806100243.269219-1-kuro@kuroa.me>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 6 Aug 2024 19:34:06 +0800
+Message-ID: <CAL+tcoB2yXa=jj4TgLV7R0-wHW-9taW7o_eBjB85Ne=kdNa2XA@mail.gmail.com>
+Subject: Re: [PATCH net] tcp: fix forever orphan socket caused by tcp_abort
+To: Xueming Feng <kuro@kuroa.me>
+Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Lorenzo Colitti <lorenzo@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Aug 05, 2024 at 12:25:57AM +0200, Sabrina Dubroca wrote:
-> 
-> > +/**
-> > + * skb_copy_bits_seq - copy bits from a skb_seq_state to kernel buffer
-> > + * @st: source skb_seq_state
-> > + * @offset: offset in source
-> > + * @to: destination buffer
-> > + * @len: number of bytes to copy
-> > + *
-> > + * Copy @len bytes from @offset bytes into the source @st to the destination
-> > + * buffer @to. `offset` should increase (or be unchanged) with each subsequent
-> > + * call to this function. If offset needs to decrease from the previous use `st`
-> > + * should be reset first.
-> > + *
-> > + * Return: 0 on success or a negative error code on failure
-> > + */
-> > +static int skb_copy_bits_seq(struct skb_seq_state *st, int offset, void *to,
-> > +			     int len)
-> 
-> Probably belongs in net/core/skbuff.c, although I'm really not
-> convinced copying data around is the right way to implement the type
-> of packet splitting IPTFS does (which sounds a bit like a kind of
-> GSO).
+[...]
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index e03a342c9162..831a18dc7aa6 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -4637,6 +4637,13 @@ int tcp_abort(struct sock *sk, int err)
+>                 /* Don't race with userspace socket closes such as tcp_close. */
+>                 lock_sock(sk);
+>
+> +       /* Avoid closing the same socket twice. */
+> +       if (sk->sk_state == TCP_CLOSE) {
+> +               if (!has_current_bpf_ctx())
+> +                       release_sock(sk);
+> +               return -ENOENT;
 
-I tried to come up with a 'GSO like' variant of this when I did the
-initial review last year at the IPsec workshop. But it turned out
-that things will get even more complicated as they are now.
-We did some performance tests and it was quite compareable to
-tunnel mode, so for a first implementation I'd be ok with the
-copy variant.
+I'm not quite sure about this.
 
+> +       }
+> +
+>         if (sk->sk_state == TCP_LISTEN) {
+>                 tcp_set_state(sk, TCP_CLOSE);
+>                 inet_csk_listen_stop(sk);
+> @@ -4646,16 +4653,13 @@ int tcp_abort(struct sock *sk, int err)
+>         local_bh_disable();
+>         bh_lock_sock(sk);
+>
+> -       if (!sock_flag(sk, SOCK_DEAD)) {
+> -               if (tcp_need_reset(sk->sk_state))
+> -                       tcp_send_active_reset(sk, GFP_ATOMIC,
+> -                                             SK_RST_REASON_NOT_SPECIFIED);
+> -               tcp_done_with_error(sk, err);
+> -       }
+> +       if (tcp_need_reset(sk->sk_state))
+> +               tcp_send_active_reset(sk, GFP_ATOMIC,
+> +                                     SK_RST_REASON_NOT_SPECIFIED);
+> +       tcp_done_with_error(sk, err);
+>
+>         bh_unlock_sock(sk);
+>         local_bh_enable();
+> -       tcp_write_queue_purge(sk);
 
-> And there are helpers in net/core/skbuff.c (such as
-> pskb_carve/pskb_extract) that seem to do similar things to what you
-> need here, without as much data copying.
+On the whole, it looks fine to me. Please let maintainer take a look
+at it finally.
 
-In case we have helpers that will fit here, we should use them of
-course.
-
+Thanks!
 
