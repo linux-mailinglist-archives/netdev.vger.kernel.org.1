@@ -1,141 +1,116 @@
-Return-Path: <netdev+bounces-116163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABBC5949561
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:16:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B322F949562
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80C51C21A96
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:16:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E05D1F25687
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0CB18D655;
-	Tue,  6 Aug 2024 16:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A953C28366;
+	Tue,  6 Aug 2024 16:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SPHoym0O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akRZe5/W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243A8175A5
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 16:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6E718D635;
+	Tue,  6 Aug 2024 16:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722960979; cv=none; b=Gg/J84iWMx/loxi/37qINFtTFV7nd7VfeX6T9qPVaXoZ8qOeICTBvXBMX1BbKyVF1babex0lF+fGrhJY+ML0e7XR7XWyKSZA/NC/b7M7FIAMEFq89ZCAwuHT+BYYiO4Ac7MUq2Hh3jIHCAXJUvgkBanIU7Mm4PibTIrlrZwk+m4=
+	t=1722961006; cv=none; b=Xs2/VjxZADoxKhE6GnqSYreWNbUSJQ/DlIrhH77VdsnLNaxdLBAJU4Nt3ms4JE4tucpnx1Z2yOUEQmdPDPk5B5iZd2gp6zWu9X6xAmh5PReE7gauyAjPnYZ7LGDQxCc3JB6B2xEVi1+go6Dxzkay1OTAj0g1DvqanCvrWSSZ46A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722960979; c=relaxed/simple;
-	bh=hrj3SvLmgQkqGsmFcPvJZajN5YJLzpXWgVXiFh3C2dc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=S9U9GOC2BL3/3i15mGxodJrYv3OGgLsYOQ0Qdi3WN7pZWNMCvwVXZ4cliy+hqFh/mdURsHXB8nNwan9uypRiWuQ9F+DCZ5QODqpxCP3sYC6FcPyPYAkw1heVC/xPUd7t7AyWvlhhRsFoeVJvljmq1rr1T+TV3c25KYmP3ibfsNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SPHoym0O; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476AnQQ1012124;
-	Tue, 6 Aug 2024 16:15:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nJ1gVROkRY1YddUF9i6SHRozU4ezt6vYywqujaHPf0I=; b=SPHoym0ODp/Ztwm5
-	YmflM2Mg96LqENMSwbmYiLq2FnkXElPIaej5sERkK7vRKQDJaME486tgktWiJk3Y
-	ZpP2Y6tX2qS5H4IJ9FMUDV2HbG/PK4gGcPNTEm8kioiV8z18Y1oqgrIxE4tXvMaJ
-	9ijSKZ6sbeu/6684sg8CEvx//8HHJ60dZB5ybtv2HYEsql3ygFJj5RPWVeApdB+Z
-	tcSmhOW9l/Y9hY2COQ8iMD6UEvziJBT9THrICmxjlB9QQerxWyjfVxl/uRS7GFzV
-	8tgjgR/+rXE1dJtvrsAISRzjFfwyXodgdJzVQlExoREbl2oYsgBGm/pZC2aL5y8R
-	N5dPqQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40scx6r4un-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 16:15:42 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 476GFeiS022110
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 6 Aug 2024 16:15:40 GMT
-Received: from [10.110.125.90] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 6 Aug 2024
- 09:15:40 -0700
-Message-ID: <c555f616-64a8-4453-bab4-a4589f428331@quicinc.com>
-Date: Tue, 6 Aug 2024 09:15:21 -0700
+	s=arc-20240116; t=1722961006; c=relaxed/simple;
+	bh=jnuGjpSlRgXaxM1DiEgYo6h/HWBTsRwnVZ+eWoy0F/A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A2Ez1YhNULjydnMCVCLDhT/z6EqBkMKhPmSAop17t8P30+vEz4qWtMtFlk8BKedgclq3Wt+nm8unlaktBC3+S776FiQ5D8aN+LNIOe0PLE7adBvNs92f2VRniDkv8IxUlyYyRD3rBaO/Y7qDmiSwlllCdXV7OfMILeF8py5m8/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=akRZe5/W; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42812945633so6597735e9.0;
+        Tue, 06 Aug 2024 09:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722961003; x=1723565803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dhUOJdnJc/hLxeOGAR1Kh5usonvobTBrTqOyTUajamc=;
+        b=akRZe5/WAWpO6faWdpGCaoOJHnKHr2VHmpCY38Dm/P0VUm2RdVdwJP9TtDB5vzujLR
+         FgPZAPnU+EKiBYepIXMBXTiTBzcOie8Va8JnEJAD4UAo5ThG0xLnlr9tj9Qw9hMBLEdB
+         d2ILwM8/Vbznq+WDKFV4y9wolW0H04Da0pEmCFLiYAoc6pbPaZm4mZlHzEWaRo6NjzaU
+         +FGFekK22tgVrxsd8NT9v2Y4syy2yYUgopCZWeg1iimeKUbCjAHwnRrT577IgPqPMXJ8
+         Eyq3suS1DXeea4ce8Rck+JKpz60vRkdIT8cgKWQeoQ9XfpSppqsoWfSSJLLTWYGqiHjK
+         cMtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722961003; x=1723565803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dhUOJdnJc/hLxeOGAR1Kh5usonvobTBrTqOyTUajamc=;
+        b=TYr2xEZ8jDCtW2vUBxyviLQYnQczBOGFxS+V/lQEtmBNWDuSlMufuU4atenBqIHLm9
+         lHTYJlktecJO8NdPVnlVbLw9PYDWXbQhvU7pru3qAcLLr1cIFuumDEGKFmly8glMEOUl
+         DVOp31NXC8LSq/DCzGRAqxr9lWcn2csO6wz2xpQKPtTFbXTOyrFW0Ue/N9Q7CkUFv42S
+         8AFbnljL9UyheTZlIr2HHW2iuFD1azfhV9dusETt8CAy1KOYGIyZz7NwD81vw48wjCA8
+         nNZ/45sj45xsYbyvzjM5jI/HuKsHGDM83ZXjTzzu3SN1hNWt36o6f2VnieaXfh+sbpEi
+         XVig==
+X-Forwarded-Encrypted: i=1; AJvYcCUqt8BTgHWS5Mn4SLXmYB7esNbXnGVe3D/eBaSDT+Z7HBzmLJ3yGQxL8tUcBxnTt9EkesX+4fkMc97jHRJaAvvN@vger.kernel.org, AJvYcCXYHStfFogXp/sOJ4oU/UK5lWoWTLXxVS0npbv7Ka0Mi42UXeE61iCnyd82KHFF6Zzh9lDYyGw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyq+hAhdYj/AGFq2zOr5qNLq5Lo1zgJed/D7fEcd8iXTXoG8I7K
+	TOLcKMVPxXEiZKqtkYurAXWJsDkTxJl3Gs8bor/IokRrPmfa/wYG
+X-Google-Smtp-Source: AGHT+IHyZYFc0tvUMw+IBvf4k3gdwtogqjANprD55ohy3QMIdpgiIeIvTD/pXFNTuyHrr/kbJYENGA==
+X-Received: by 2002:a05:600c:3549:b0:426:59fe:ac2e with SMTP id 5b1f17b1804b1-428e6b789acmr109725775e9.29.1722961003082;
+        Tue, 06 Aug 2024 09:16:43 -0700 (PDT)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:464:e826:cfe4:a57a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-428e6cd8d67sm189464635e9.0.2024.08.06.09.16.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 09:16:42 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH nf v1] netfilter: flowtable: initialise extack before use
+Date: Tue,  6 Aug 2024 17:16:37 +0100
+Message-ID: <20240806161637.42647-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: stmmac: dwmac4: fix PCS duplex mode decode
-Content-Language: en-US
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-        Serge Semin
-	<fancer.lancer@gmail.com>
-CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Andrew Halaney <ahalaney@redhat.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <E1sOz2O-00Gm9W-B7@rmk-PC.armlinux.org.uk>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <E1sOz2O-00Gm9W-B7@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: vNtgtUVSJpqfpfdgpOBx1Rag6wYKGnDA
-X-Proofpoint-GUID: vNtgtUVSJpqfpfdgpOBx1Rag6wYKGnDA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-06_12,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 bulkscore=0 clxscore=1011 suspectscore=0 phishscore=0
- spamscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408060114
+Content-Transfer-Encoding: 8bit
 
+Fix missing initialisation of extack in flow offload.
 
+Fixes: c29f74e0df7a ("netfilter: nf_flow_table: hardware offload support")
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ net/netfilter/nf_flow_table_offload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 7/3/2024 5:24 AM, Russell King (Oracle) wrote:
-> dwmac4 was decoding the duplex mode from the GMAC_PHYIF_CONTROL_STATUS
-> register incorrectly, using GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK (value 1)
-> rather than GMAC_PHYIF_CTRLSTATUS_LNKMOD (bit 16). Fix this.
-> 
-> Thanks to Abhishek Chauhan for providing a response on this issue.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> index b25774d69195..26d837554a2d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> @@ -791,7 +791,7 @@ static void dwmac4_phystatus(void __iomem *ioaddr, struct stmmac_extra_stats *x)
->  		else
->  			x->pcs_speed = SPEED_10;
->  
-> -		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK);
-> +		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD);
->  
->  		pr_info("Link is Up - %d/%s\n", (int)x->pcs_speed,
->  			x->pcs_duplex ? "Full" : "Half");
+diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flow_table_offload.c
+index ff1a4e36c2b5..e06bc36f49fe 100644
+--- a/net/netfilter/nf_flow_table_offload.c
++++ b/net/netfilter/nf_flow_table_offload.c
+@@ -841,8 +841,8 @@ static int nf_flow_offload_tuple(struct nf_flowtable *flowtable,
+ 				 struct list_head *block_cb_list)
+ {
+ 	struct flow_cls_offload cls_flow = {};
++	struct netlink_ext_ack extack = {};
+ 	struct flow_block_cb *block_cb;
+-	struct netlink_ext_ack extack;
+ 	__be16 proto = ETH_P_ALL;
+ 	int err, i = 0;
+ 
+-- 
+2.45.2
 
-Thanks Russell for taking care of this change. 
-
-Can you please add my Reviewed-by: Abhishek Chauhan <quic_abchauha@quicinc.com> on the latest series. 
-
-Thanks 
-ABC
 
