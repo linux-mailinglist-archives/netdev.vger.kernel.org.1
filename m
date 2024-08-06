@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-116139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8A094940F
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:02:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8046949435
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25A2281D18
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:02:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67FE11F215B0
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570341BC08F;
-	Tue,  6 Aug 2024 15:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35021EA0C7;
+	Tue,  6 Aug 2024 15:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="ZYCmt8/C"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="TNQC634U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5724018D653
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706CB1BC08F
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722956530; cv=none; b=tNF9DqmNAqgb3M5WVZCaHyn7pt1HOKyX+1AuEzW/LbsAPeTblqLoP5FIVUhW4Rl8ce94c/t3dk+nm6tUbcFy1VzyrcJCHBsxuBxwoxKYRVrUgcy8NamFmFI6UN7+EM4UqU9k9wNZsVASEQ1DzYjnyoeB5BjBqt7vE6O9Js0PA9w=
+	t=1722956904; cv=none; b=ov6z4zb0i8Vuz8Qqk5zsrlgdfkthlLjRNtb5sqjRI05FeAWZDdn74nh+ii1imkGBIld3nwfjRx7qoSM2vDvJyGle1ppUma4BJaqk0Tclh7VqnpXqROqJ0NxN8hDzdrckgJrvBguDjWNH2MK5wpHXLvVSxb5x3AZ56+frwiXT2mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722956530; c=relaxed/simple;
-	bh=grLCEFMWacuVjzTT+kELouyRVgjKdlzMIEXuG8Ba9nA=;
+	s=arc-20240116; t=1722956904; c=relaxed/simple;
+	bh=7S9JCqqIq8A37uOjHMXLk/ibZjCEak0KO8UDCikOMAA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rC5uxPYFCm0jPNjex4JplRfohaYjviXjtc8uNhZMqoD8jfDpqQNqTfj02r3FoFG6RYU8/WYdPP1rqeUQde9iSXRErKcWpuy9w4Tegkq0wBrYHMaaKZGhirTCFyDnX1kv3IvHhnYzymFpdvgoBlQ2tCHTNc2kv1pTaQLeopcvnNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=ZYCmt8/C; arc=none smtp.client-ip=185.125.188.122
+	 MIME-Version; b=Qa5YTPc2em54DPFP2nVKdJUAlhsiZuX9r59AhekHDAl4M7gfr7Y67jnF1BUirBnALiYicBwceOIFk0ovTV7UqH8TM89MnYi1At6uGi0EFN8ALHGyeiSlFNmNzP56IQrBAqJNDJoYtvJxJQQBJMP6ZQZMuJvev06TZyNA9PBfaqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=TNQC634U; arc=none smtp.client-ip=185.125.188.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com [209.85.167.72])
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 4D5573F1EF
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:02:03 +0000 (UTC)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 8AE32400E1
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:08:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1722956523;
-	bh=jhY/iAGFtGz8gkbOZN5MeWQH+e0m91DhNqvU5T5zzp4=;
+	s=20210705; t=1722956900;
+	bh=DAlWRC3ee6ki+FbK9OgSi8f71N/oAs1WYuE0UkbI6C0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=ZYCmt8/CbIdp8WP0k1re/0+NOe3+4nYo4UWE7nsrWSYoF8GCfkZGHCHcKU1Tbjjkq
-	 65y8QDHCjnsiz4tr8hRhcAqjB/w3THzxI0RUHz093SYokatlujepNPQsaQiyMHoMip
-	 //RygbQkFAxDpg+Co3u4gbx02k/C9P6i3ZBC/sOzUWPxNdEyugmscXfvTsr0908OLS
-	 WKBa/XzXIPcU0EVnUDBaKWQruQbQoMbjubWVndSS1zJH7O0UpO5wCI7iutCyxhilFv
-	 NWYi4s8TmuvcUe90tXSMrIwNMCh5RFU2MPxVVk4fP+NqHaAlZir5BDJPebrgBaMzug
-	 XJk30vzsmvYMA==
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52efce218feso1115441e87.1
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 08:02:03 -0700 (PDT)
+	b=TNQC634UBCO7XXiGFBmVqxwNCMaMEIngPbAOJoGo3/CKAKw13aV+CNsGdTGFxomKp
+	 Op7qdynxF8Ko07elH0ixboG7uJQI3LBQrqVGDSNPJuUIfss42DChUnDv8MwsiCBqcQ
+	 Qw0u4HeqtzbefNylGoyszpf73/F7pgtbfNWBOnaVHcOOeAQPpP4x8WyUcc8zkCGkgZ
+	 n6fwptuFbfcLjCwL8pfadHEGAOGsN/GgavWlfVknN8kQUIajg668AkBiwJort7vlhR
+	 w89tBBsQGnDxZrrKokbr8LGI3TAtAR/sWGzTWp5UUMei1s2AszPkPfQSkfKFPQe3n1
+	 A/yxdcmLOxo7A==
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42820c29a76so5454355e9.2
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 08:08:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722956522; x=1723561322;
+        d=1e100.net; s=20230601; t=1722956899; x=1723561699;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jhY/iAGFtGz8gkbOZN5MeWQH+e0m91DhNqvU5T5zzp4=;
-        b=VpiOF8sYquNEejux+Z8qXLyJMe71pWQGr8ICpLDiXFNddd+7Qr8zekCFwy+bEoOJV3
-         3ifpJ8bgYyRpK+qmvG6ihcXKF8g9d25Cm8PmAloNvHrrzJZ/oZOmbHlOAxxmDNI7jFcO
-         PEHS6SP7b53FGmv2Ho0YZF+Nbqcb22NQiROKoFoOb5fsw3ORrDfP06cugCbq96+Jg6Di
-         p3Hf3hfD+sc+eDy8xmTVTOrS71qHm2wlnCkW9qt2a+h1AjSVnhRqQ41oV5EQc6Wyix0r
-         yIaOVQ87qXaU5I8rbtIW7HjpubG/jVnNd1BcaQyHATG1Ydl7mA+NthJkGtrOBebzVSqN
-         2CQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnP8XRKbPQzghwAY1DJ8a+mVBDm5W4FVYHvQiUmxwnswbl2YVKMLpJZdljuk/C6TScGbSCz5O3JDfaDX9YusRq8Jau+xul
-X-Gm-Message-State: AOJu0YylZbidDdzHM3uHm7mkD3vSxQYRNxnJQI0VlgeuJJKwrVwiCKkC
-	zOqGX0ee3J3BV1wyQgT7gQ1DiFH1MlEjzqMPfnO7o43zACq11wDJwVqagLX97CnQEPq8X9LOyIh
-	U16v9uNxeJkXvm7tPKwbpgjcbNygGHDjAcJXmyrqO7/phoXOixAPaGlXcu748tZMXd2Jp8EuCF3
-	jQQ6bX
-X-Received: by 2002:a05:6512:12d2:b0:530:ab68:25e6 with SMTP id 2adb3069b0e04-530bb395e96mr10009281e87.48.1722956522159;
+        bh=DAlWRC3ee6ki+FbK9OgSi8f71N/oAs1WYuE0UkbI6C0=;
+        b=Ny4o+w7Xr/bsc6qQmIiMekfRz+2RZx8xPO7e17AQheS2mMY9JFPl95T2b1y4m8+i8I
+         IxsNKEYenc33OuBWihw8wsfIJcMyWmATrD1d2srBXujvjVmQ80Ef8Jl6mkzH8+/V3034
+         Q/YTHecj8mIcISQr53X9p3Xcl9ZXv09JH77GqvgRLl8qed3m9jxkLIN4mrpidmkcnnDe
+         XnlnjuVRi24LNEjJc/nSh95VGVh62loitvg4Xwkj3voEyukV27xdKEJ8TZwckl2I+jR4
+         y9ktza3WrmiY5WDjZHsG7WaEwBgry7OGuPyXcpX1GMD4FZsA2+dqL+9TSuX1KcDpAGQb
+         p6qw==
+X-Forwarded-Encrypted: i=1; AJvYcCWVGw9NvNAcb0f6VTJQGJEYvz9mn9wdf3ugol8vG7gzLY5XsBUX876Cmi0F/sa6mBwFfUmgsBXjVj4/5aeWJaoSPvMmcC+L
+X-Gm-Message-State: AOJu0YxB9Sd0XHfGhSzq/a2pY2nlSyJI+Km82dxqHWQ+5ojg9EtBa2V4
+	EzBZf8pyok5WNO+VjDDuOVRijDfNnQkI1yjS0XWcDuwUw5aA6k6N/V0deqVJbUgzeRiMXQ8N18x
+	SXIcRXHWvnvzKR9MKp/eUuNAxnZO+yYehHgKaAy7JAMr1VBvpIVUmmrR0X7SnEudJ77xWoO6J6F
+	9uEQ==
+X-Received: by 2002:a5d:5e0f:0:b0:36b:bce6:2ab7 with SMTP id ffacd0b85a97d-36bbce62d02mr10057310f8f.33.1722956524238;
+        Tue, 06 Aug 2024 08:02:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFQk+dKfniqRVJqxrWANNrVfoADt72pTXBGIvQ+HEs3G+2ACSJ4I2nPxt2y80mI6ZFIEekDVQ==
+X-Received: by 2002:a5d:5e0f:0:b0:36b:bce6:2ab7 with SMTP id ffacd0b85a97d-36bbce62d02mr10057201f8f.33.1722956522250;
         Tue, 06 Aug 2024 08:02:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEif65fL/GscmO4p1g1gNA0DbXGZyCAeXXHdeLEknaHECNqFC4iyrr1IIYBeFlsxYm4CIeOsQ==
-X-Received: by 2002:a05:6512:12d2:b0:530:ab68:25e6 with SMTP id 2adb3069b0e04-530bb395e96mr10009243e87.48.1722956521339;
-        Tue, 06 Aug 2024 08:02:01 -0700 (PDT)
 Received: from framework-canonical.station (net-93-66-99-124.cust.vodafonedsl.it. [93.66.99.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0295fasm13112722f8f.59.2024.08.06.08.02.00
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0295fasm13112722f8f.59.2024.08.06.08.02.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 06 Aug 2024 08:02:01 -0700 (PDT)
 From: Massimiliano Pellizzer <massimiliano.pellizzer@canonical.com>
@@ -86,9 +86,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	netdev@vger.kernel.org
-Subject: [SRU][J][PATCH 1/2] rxrpc: Fix delayed ACKs to not set the reference serial number
-Date: Tue,  6 Aug 2024 17:01:39 +0200
-Message-ID: <20240806150149.1609414-2-massimiliano.pellizzer@canonical.com>
+Subject: [SRU][F][PATCH 1/2] rxrpc: Fix delayed ACKs to not set the reference serial number
+Date: Tue,  6 Aug 2024 17:01:40 +0200
+Message-ID: <20240806150149.1609414-3-massimiliano.pellizzer@canonical.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240806150149.1609414-1-massimiliano.pellizzer@canonical.com>
 References: <20240806150149.1609414-1-massimiliano.pellizzer@canonical.com>
@@ -127,10 +127,10 @@ Signed-off-by: Massimiliano Pellizzer <massimiliano.pellizzer@canonical.com>
  3 files changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index e0123efa2a62..cf1cc9c14a79 100644
+index cb174f699665..5039613ad0e1 100644
 --- a/net/rxrpc/ar-internal.h
 +++ b/net/rxrpc/ar-internal.h
-@@ -671,7 +671,6 @@ struct rxrpc_call {
+@@ -667,7 +667,6 @@ struct rxrpc_call {
  
  	/* Receive-phase ACK management (ACKs we send). */
  	u8			ackr_reason;	/* reason to ACK */
@@ -139,7 +139,7 @@ index e0123efa2a62..cf1cc9c14a79 100644
  	atomic_t		ackr_nr_unacked; /* Number of unacked packets */
  	atomic_t		ackr_nr_consumed; /* Number of packets needing hard ACK */
 diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
-index 2a93e7b5fbd0..b6cde05d832d 100644
+index b5f173960725..c08715be8e9a 100644
 --- a/net/rxrpc/call_event.c
 +++ b/net/rxrpc/call_event.c
 @@ -67,13 +67,11 @@ static void __rxrpc_propose_ACK(struct rxrpc_call *call, u8 ack_reason,
@@ -157,7 +157,7 @@ index 2a93e7b5fbd0..b6cde05d832d 100644
  		outcome = rxrpc_propose_ack_subsume;
  	}
 diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
-index 08c117bc083e..a007c2ebe311 100644
+index 09fcc54245c7..8816aaa98287 100644
 --- a/net/rxrpc/output.c
 +++ b/net/rxrpc/output.c
 @@ -87,7 +87,7 @@ static size_t rxrpc_fill_out_ack(struct rxrpc_connection *conn,
