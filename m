@@ -1,131 +1,105 @@
-Return-Path: <netdev+bounces-116146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C0594945D
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:20:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A410E949463
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 17:22:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D78F71C21107
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:20:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63AE7288627
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4978E15E88;
-	Tue,  6 Aug 2024 15:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567ED1799B;
+	Tue,  6 Aug 2024 15:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u131cLA8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RofHcO+1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2529218D63A
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CE22AE90
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 15:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722957645; cv=none; b=hX9jaB8MdkhRvq3iBa68ct/2a05DmYFFx1VhIXueOWfd/RmiRNgxrJ3OAaTmg/hGjOBvPsAXrxJY7sJr5eXBQCJLGen9ekwlHq2iN2MR++EjMu7S0FgrH34YjJfMARsqbnHm7gF3z5s8u4CqD277UfJhC7feshgJ2qHEQPnN5Go=
+	t=1722957723; cv=none; b=T2F1haN+Y7ePmMow4XY5b7SPuv8ad8nYaZqFVQR/NcZnJVGTilomLu46eRYD+hINtgUU6ydpV8+jXdc7MagXKhBtQDyWK/XGjedUsz9jNNTBty5rHf/jZTxnXJkRoJQtYSxYSbOilPUyOVjusvmaM3OcNdERIa8uHgFu2SNF5WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722957645; c=relaxed/simple;
-	bh=9eCXM6rjQCeQizhfYMpyhL9T0I8ql/d3q/guQlfcN8I=;
+	s=arc-20240116; t=1722957723; c=relaxed/simple;
+	bh=CBb0eaN4TE+QDnqSpzr0kfw6IPFa55GuKRu5iD9ELuI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uSw1gM0dC1NJj/d13wIQvH+z5VpufMi7BkuMpTBqwLudDFMoSCr09c3Xh6KEOlvY4xtB9T3AHg5MYxorjXa3RWeZj61+USA9ECwSLT4cmIFIcYwO1glaX6y7/NFaru8KEclYrC+N5lriajpOyRwjNbSoWHKayMv5MPTCA1WDfNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u131cLA8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33714C4AF0C;
-	Tue,  6 Aug 2024 15:20:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=a88URS71YPUKygo7pFoI6upRnuuz2WvejH4YUyyfRYWO6SjVAYkYYwD387XEivBu8K0vVH+eJFfPEsD3n00CzcROsN4NtGgaCLPiAqAGJD72zwH0gzUwF83g10wlpwEaMmthib4SDXBvIHSgBmU+82HRqzzx6SyBfgDTleVje8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RofHcO+1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E19C32786;
+	Tue,  6 Aug 2024 15:22:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722957644;
-	bh=9eCXM6rjQCeQizhfYMpyhL9T0I8ql/d3q/guQlfcN8I=;
+	s=k20201202; t=1722957722;
+	bh=CBb0eaN4TE+QDnqSpzr0kfw6IPFa55GuKRu5iD9ELuI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u131cLA8pL8ghEhBjqCt41B9uGlsBaMvThZugLolK81kGbotMUBW9RTAq+RU36xzc
-	 js7OafmQtKWxcxSPoyXEDDykdWdqTwo6GejIsedH9eWZaSQq/qk2lVmkMxdVjxtiSg
-	 6y9DTloBAoudi5/tglBIHj41NBOBVTYt7nxCYTQaW4qctt5UZO9KZ1SljFViP5kn6v
-	 zKJfCIdKVO3umD/gMQHLNmP5224s9yqOiI7pBGobGBqIVmFLZJh+QZciphk9N7vrft
-	 TMba0VChOUAeD+7/F9I1Gx1R7PZOk20Lf3UOZBT4+DsFf3FZFr2BwvVV5YSpBflzVB
-	 E8/NsOVdqSJRw==
-Date: Tue, 6 Aug 2024 16:20:42 +0100
+	b=RofHcO+1WA2wm1J1tSftUpoc8OP5fJSMvsxtKuaKC32Fdm6WWz4fcsr23hUPXEv7+
+	 aLUDd33ICbr0UWwXO1Syl6BTitTEg9pIKQddHuAXx6HIgd40iP5WbC+5eHzJxqjqcg
+	 po3OTPBjfwOFFfDo50xRXYnO4zJkLckkjnvvcOkNqYVqZuSmjm1lZOtl77aP7XvjwN
+	 kO2sLGMpbvAn7yAGpwMkBnNkM7Og0NcPZObHtMXEgCeitvPI0xs3kmgxN+THk/BAFs
+	 UvdSIYYGM+Elcyii4GtFexRjcStl6EJAxz1ytNqo3BOKTolP5/kX7f+HEUGeq9DPKR
+	 nQfaV0qzJXiNg==
+Date: Tue, 6 Aug 2024 16:21:58 +0100
 From: Simon Horman <horms@kernel.org>
-To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 00/10] add sriov support for wangxun NICs
-Message-ID: <20240806152042.GY2636630@kernel.org>
-References: <598334BC407FB6F6+20240804124841.71177-1-mengyuanlou@net-swift.com>
- <20240805164015.GH2636630@kernel.org>
- <AADA412A-F7C4-4B73-A23A-ECD68ABFC060@net-swift.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: Re: [PATCH v3 08/12] testing: net-drv: add basic shaper test
+Message-ID: <20240806152158.GZ2636630@kernel.org>
+References: <cover.1722357745.git.pabeni@redhat.com>
+ <75fbd18f79badee2ba4303e48ce0e7922e5421d1.1722357745.git.pabeni@redhat.com>
+ <29a85a62-439c-4716-abd8-a9dd8ed9e60c@redhat.com>
+ <20240731185511.672d15ae@kernel.org>
+ <20240805142253.GG2636630@kernel.org>
+ <20240805123655.50588fa7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <AADA412A-F7C4-4B73-A23A-ECD68ABFC060@net-swift.com>
+In-Reply-To: <20240805123655.50588fa7@kernel.org>
 
-On Tue, Aug 06, 2024 at 05:37:36PM +0800, mengyuanlou@net-swift.com wrote:
-> 
-> 
-> > 2024年8月6日 00:40，Simon Horman <horms@kernel.org> 写道：
+On Mon, Aug 05, 2024 at 12:36:55PM -0700, Jakub Kicinski wrote:
+> On Mon, 5 Aug 2024 15:22:53 +0100 Simon Horman wrote:
+> > On Wed, Jul 31, 2024 at 06:55:11PM -0700, Jakub Kicinski wrote:
+> > > On Wed, 31 Jul 2024 09:52:38 +0200 Paolo Abeni wrote:  
+> > > > FTR, it looks like the CI build went wild around this patch, but the 
+> > > > failures look unrelated to the actual changes here. i.e.:
+> > > > 
+> > > > https://netdev.bots.linux.dev/static/nipa/875223/13747883/build_clang/stderr  
+> > > 
+> > > Could you dig deeper?
+> > > 
+> > > The scripts are doing incremental builds, and changes to Kconfig
+> > > confuse them. You should be able to run the build script as a normal
+> > > bash script, directly, it only needs a small handful of exported
+> > > env variables.
+> > > 
+> > > I have been trying to massage this for a while, my last change is:
+> > > https://github.com/linux-netdev/nipa/commit/5bcb890cbfecd3c1727cec2f026360646a4afc62
+> > >   
 > > 
-> > On Sun, Aug 04, 2024 at 08:48:31PM +0800, Mengyuan Lou wrote:
-> >> Add sriov_configure for ngbe and txgbe drivers.
-> >> Reallocate queue and irq resources when sriov is enabled.
-> >> Add wx_msg_task in interrupts handler, which is used to process the
-> >> configuration sent by vfs.
-> >> Add ping_vf for wx_pf to tell vfs about pf link change.
-> >> Make devlink allocation function generic to use it for PF and for VF.
-> >> Add PF/VF devlink port creation. It will be used to set/get VFs.
+> > Thanks Jakub,
 > > 
-> > I think it would be good to summarise the overall status of SR-IOV support
-> > with this patch, and what follow-up work is planned. As Jakub mentioned [1]
-> > this does not seem complete as is.
-> > 
+> > I am looking into this.
+> > So far I believe it relate to a Kconfig change activating new code.
+> > But reproducing the problem is proving a little tricky.
 > 
-> Ok，got it.
+> Have you tried twiddling / exporting FIRST_IN_SERIES ?
+> 
+> See here for the 4 possible exports the test will look at:
+> 
+> https://github.com/linux-netdev/nipa/blob/6112db7d472660450c69457c98ab37b431063301/core/test.py#L124
 
-Thanks.
-
-Did you get my 2nd point below?
-This seems relevant to you:
-- https://lore.kernel.org/netdev/20240620002741.1029936-1-kuba@kernel.org/
-
-> 
-> > [1] https://lore.kernel.org/netdev/988BFB51-32C8-499C-837D-91CC1C0FFE42@net-swift.com/
-> > 
-> > I mean, I understand the NDOs were removed from the patchset (see more on
-> > that below) but there needs to be a plan to support users of this device
-> > in a meaningful way.
-> > 
-> >> 
-> >> v5:
-> >> - Add devlink allocation which will be used to add uAPI.
-> >> - Remove unused EXPORT_SYMBOL.
-> >> - Unify some functions return styles in patch 1 and patch 4.
-> >> - Make the code line less than 80 columns.
-> >> v4:
-> >> https://lore.kernel.org/netdev/3601E5DE87D2BC4F+20240604155850.51983-1-mengyuanlou@net-swift.com/
-> >> - Move wx_ping_vf to patch 6.
-> >> - Modify return section format in Kernel docs.
-> >> v3:
-> >> https://lore.kernel.org/netdev/587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com/
-> >> - Do not accept any new implementations of the old SR-IOV API.
-> >> - So remove ndo_vf_xxx in these patches. Switch mode ops will be added
-> >> - in vf driver which will be submitted later.
-> > 
-> > FYI, this policy was recently significantly relaxed [2]:
-> > 
-> > [2] https://lore.kernel.org/netdev/20240620002741.1029936-1-kuba@kernel.org/
-> > 
-> >> v2:
-> >> https://lore.kernel.org/netdev/EF19E603F7CCA7B9+20240403092714.3027-1-mengyuanlou@net-swift.com/
-> >> - Fix some used uninitialised.
-> >> - Use poll + yield with delay instead of busy poll of 10 times in
-> >> mbx_lock obtain.
-> >> - Split msg_task and flow into separate patches.
-> >> v1:
-> >> https://lore.kernel.org/netdev/DA3033FE3CCBBB84+20240307095755.7130-1-mengyuanlou@net-swift.com/
-> > 
-> > ...
-> > 
-> > 
-> 
+Thanks, I will look into that.
 
