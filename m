@@ -1,107 +1,97 @@
-Return-Path: <netdev+bounces-115921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EF3C948665
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 01:54:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50871948679
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:01:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C9D1C2229F
-	for <lists+netdev@lfdr.de>; Mon,  5 Aug 2024 23:54:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877E6285BE2
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 00:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C013616F84A;
-	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9053329A1;
+	Tue,  6 Aug 2024 00:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVCqiGxA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V52gv7Rc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F2316EC0B
-	for <netdev@vger.kernel.org>; Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B98DA35
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 00:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722902057; cv=none; b=VNhgShJoiV5BN+nz9aTUG4HucmS5cXWKwxd454U60hUzixTbkbHLvhFp9g2/TECcs7b2wI0zKX01wsZRO4R0XHCi0rmf9QqUyNp1jH81kHsxwcAcWp0nIeQrQLtxBjEnk0Sml9ZoQjQ9v6nNtdTdnyipkzYWplzYMLyptr+t+Mw=
+	t=1722902459; cv=none; b=PhT8AvKq357dUIqhDT62PJfWFrC4JO2+VDInCwFLS91FSyjsRFUt4HXyQTW1Pkv1nvd67OEPE/NU3PDt96rdjegLEQd2HdCqxs3fgX3BfGv8Fkvb0nSZxr56yglUW9rYlfgnrqUPxZZKnbDL89kVizwolOXQCWkcCmyTT90Jz4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722902057; c=relaxed/simple;
-	bh=dvH6/QudHLzD5qiK/eFsE9fqoFYLkJMF9CXnIXjBJew=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dn/960efmZu+TFz+TRsSxLjEwXLhiFHJxZ2fsoULo2fuZoo6XiXxRodfc3P/dLOFLNXnrXcYkWjATWZ31StdnktVNdGj3+6m4XK9qUd0P2UUty4UGLKs6qopqJz4ly4/vjF6LE17L7+aak2mseySexpD2fP3N+PdqE2GLjr864E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVCqiGxA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 36565C4AF0E;
-	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
+	s=arc-20240116; t=1722902459; c=relaxed/simple;
+	bh=5e3wZ7gyXtsPvm0P1NvePliPNLmjTKINaC6NltjfTW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m+lKRggsdkhx3UA3HL/nBdUC02oGbtyIiouMtR3uJiVdOTJoDplnAhDGWyyL5aR0OrEU1J/wCAdy1qS8lMIYRZRGMes2roip0TPubRyOL17UMJoNGee1RjPIqPLBFz/bNvnjam50a/WE80g46StkSu4tOLiqMIELS1GLRZ0wqZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V52gv7Rc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3DDFC32782;
+	Tue,  6 Aug 2024 00:00:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722902057;
-	bh=dvH6/QudHLzD5qiK/eFsE9fqoFYLkJMF9CXnIXjBJew=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EVCqiGxAh3hkMdUJ4cq0dcwCGR3cX49hzxJjhq5/zlM1MLuBw9OkxrwTuZDCZYDLk
-	 6rnEuT78HIz2cgcueTnDYMW9w/6oOnkxLssqC834WDFbSqbMR0T4CJvD/mGUcJbwHi
-	 woKXJgY47SuxDKOOx/4EazW3O87SiCgL8jNwWrNsuU8/CJ5lGq+EW3YDqXWZ6D+yyp
-	 ZcJCIEtsi9OaXpCXKU8dE0FAlyYXnlGd3rqoEQKA/3mQBdBMTBVoNlC0w9CPZzQ70i
-	 DBRW+fhu5tDVWmtxHiBVcqH5WPiCvrrKHsinTS0vttehcbB57QmJo0FMH5RVHAeY/3
-	 S2AFHfsoF0/Yw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2D110C43140;
-	Mon,  5 Aug 2024 23:54:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1722902459;
+	bh=5e3wZ7gyXtsPvm0P1NvePliPNLmjTKINaC6NltjfTW4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V52gv7RcGpIRlZXzUfZtmXKvNw0lcjEEd81iLQD2pMnMSD782PkMH7kwlsS2vw1WJ
+	 mx6QJF33O7N1xHZDioSXJtRRyJS7qF9A3cG3oCLLdkzyDf7qJh4CLVMLz6klGzmS7l
+	 wB+hoU2UxZv8FnOUF2DTjkhtJQCRo8BM0Pkt4Eu6FTUSyzGloqoHCH70z/fxgS3r/P
+	 DLo7VcrYaAloAbu++49qgAnqPtsA++p3GkJou6yUzZs8R3lozPOOfxxz2Emlm9Kk3g
+	 pAL6GVcDPMqNMBuePrzWYA8FWzCwLFrLaLC3QuKTPVuwwWEBxdFT3xsIMtq8UU4xGz
+	 KrBfWUXHT+x2Q==
+Date: Mon, 5 Aug 2024 17:00:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Tom Herbert <tom@herbertland.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, lvc-project@linuxtesting.org,
+ syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+Subject: Re: [PATCH] net: kcm: use previously opened message only once
+Message-ID: <20240805170057.60b06b2c@kernel.org>
+In-Reply-To: <20240801130833.680962-1-dmantipov@yandex.ru>
+References: <20240801130833.680962-1-dmantipov@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] net: constify 'struct net' parameter of socket
- lookups
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172290205718.12421.6044942659385972337.git-patchwork-notify@kernel.org>
-Date: Mon, 05 Aug 2024 23:54:17 +0000
-References: <20240802134029.3748005-1-edumazet@google.com>
-In-Reply-To: <20240802134029.3748005-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, willemb@google.com, tom@herbertland.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  2 Aug 2024 13:40:24 +0000 you wrote:
-> We should keep const qualifiers whenever possible.
+On Thu,  1 Aug 2024 16:08:33 +0300 Dmitry Antipov wrote:
+> When syzkaller reproducer injects 'alloc_skb()' failure at line
+> 817, 'kcm_sendmsg()' may return with partial message saved at
+> 'kcm->seq_skb'. Next call of this function will try to build the
+> next message starting from the saved one, but should do it only
+> once. Otherwise a complete mess in skb management causes an
+> undefined behavior of any kind, including UAFs reported by KASAN.
 > 
-> This series should remove the need for Tom patch in :
+> Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
+> Reported-by: syzbot+b72d86aa5df17ce74c60@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=b72d86aa5df17ce74c60
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> ---
+>  net/kcm/kcmsock.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Link: https://lore.kernel.org/netdev/20240731172332.683815-2-tom@herbertland.com/
-> 
-> Eric Dumazet (5):
->   inet: constify inet_sk_bound_dev_eq() net parameter
->   inet: constify 'struct net' parameter of various lookup helpers
->   udp: constify 'struct net' parameter of socket lookups
->   inet6: constify 'struct net' parameter of various lookup helpers
->   ipv6: udp: constify 'struct net' parameter of socket lookups
-> 
-> [...]
+> diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+> index 2f191e50d4fc..fa5ce5c88045 100644
+> --- a/net/kcm/kcmsock.c
+> +++ b/net/kcm/kcmsock.c
+> @@ -766,6 +766,8 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>  	if (kcm->seq_skb) {
+>  		/* Previously opened message */
+>  		head = kcm->seq_skb;
+> +		/* ...should be used only once */
+> +		kcm->seq_skb = NULL;
+>  		skb = kcm_tx_msg(head)->last_skb;
+>  		goto start;
+>  	}
 
-Here is the summary with links:
-  - [net-next,1/5] inet: constify inet_sk_bound_dev_eq() net parameter
-    https://git.kernel.org/netdev/net-next/c/a2dc7bee4f77
-  - [net-next,2/5] inet: constify 'struct net' parameter of various lookup helpers
-    https://git.kernel.org/netdev/net-next/c/d4433e8b405a
-  - [net-next,3/5] udp: constify 'struct net' parameter of socket lookups
-    https://git.kernel.org/netdev/net-next/c/b9abcbb1239c
-  - [net-next,4/5] inet6: constify 'struct net' parameter of various lookup helpers
-    https://git.kernel.org/netdev/net-next/c/10b2a44ccb0c
-  - [net-next,5/5] ipv6: udp: constify 'struct net' parameter of socket lookups
-    https://git.kernel.org/netdev/net-next/c/87d973e8ddee
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Not sure how much this matters but if we clear seq_skb then handling
+here:
+https://elixir.bootlin.com/linux/v6.10-rc4/source/net/kcm/kcmsock.c#L940
+will work differently.
 
