@@ -1,133 +1,86 @@
-Return-Path: <netdev+bounces-115948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BEB2948875
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 06:44:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E07948880
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 06:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F1131F23775
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 04:44:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1155BB22274
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 04:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0871BA87B;
-	Tue,  6 Aug 2024 04:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB0415B57F;
+	Tue,  6 Aug 2024 04:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1HSiPX1"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="bJV6MkHZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF01B663;
-	Tue,  6 Aug 2024 04:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18EEAA35;
+	Tue,  6 Aug 2024 04:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722919435; cv=none; b=uxzjpwavtA9CLxCGnL84Rd6TNPUZAN+k5qtO3TwWhmOF8huZE6wK2hIQCjeWkwpSK1Ko/zMHIIx4TRNDzCThq0VSO6RbKSR8dP1OC4ad6FZTMnOyaY54LemwGstsfbh8zIOXsvvbjYbMBkUqEN1soQlg8TLJ0o/E2ckKBuFblmw=
+	t=1722919887; cv=none; b=Z91jM1UC4Gfn/Rt57iJ09CwggOhml63yw9MJ4DyPhT4iEqEzCzl2UMNp5NA3ISZ3/N8r41LY9mbqR7K9mVpuI3I6fWxrRHI01pC0sLUiKxee445Ox2aNyu38nlezoG2WUVZkQw4snfPWSfQg9Zhz4xnAAjgmZprtNBB0xbm4KP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722919435; c=relaxed/simple;
-	bh=6pLFgKtSxEZKAmcpzacBafyKJDI4FEaQQ0HURf4ACl4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=txWaPCiZKDHlPWANB7vHiiGT0UftjfkQNSpK3Ay9QkHOIjTEfQdvdkjxHFwA2IJ0wGbIexKBQh3EKpnv0VWfTAFatDQixIPVsoRD81VzGf4bo1FFxeB9WE828Ko8zJmJHmJujYreMpJpGkuk/7m5qfSip5ptCoLCVfEiF/78tb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1HSiPX1; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3684bea9728so72992f8f.3;
-        Mon, 05 Aug 2024 21:43:53 -0700 (PDT)
+	s=arc-20240116; t=1722919887; c=relaxed/simple;
+	bh=TbiCSzBYmLGldS+dmeAtupFPU6qc4zR+8Bsz3z9h/+k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=d7F+dr2N3j+XV+kf67Zpazw8KKDDLOI9VYiyWQ5g69bF5VoWgN5VQYEeFRw3wBFw/p435KqMiwUfwNb/RV5zA6cBPdy4y6LJOU1U1J6pnypRYwclmtcpo8FXsuDt+jrq0kTAVhBFihF6F1q5okN6IWg9VOfVeXBom1xwoEYe/Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=bJV6MkHZ; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722919432; x=1723524232; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6kU1s5BI+S/YW2maSR9DltJXUSi9EBeGhP3JD4j+dAU=;
-        b=I1HSiPX1KO/5L5W2/zvhBY6q4hN6B4U2YYE7xZf0UyhdjRkN92SKWF//glTGZzNcth
-         cKgJg2GntVs03uovkDeNTGiu3gKRnOczjkv0HYwFu0B8c8ut5PF4uVDtVhWOzSxzH0w2
-         ZQlmzJ81ylPXM2fn0pZ3pqwXHjetktbbyhO8FRkLcqIoTiJwcp9xWiGIDXZB+qUmH9lB
-         nNPCtVBxKVb9Avc/T19auHRdclJ4DkV02vcIS3PfQ8wzDY9yHUAtXRxkjHNlc3g/qQwA
-         vKEs2v4i7FYYDVxfuuRTnxFjUhvmjc3N02CKRrStlbDCNtmHxCMRE3tECawRtbv+X9tk
-         GCKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722919432; x=1723524232;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6kU1s5BI+S/YW2maSR9DltJXUSi9EBeGhP3JD4j+dAU=;
-        b=k9eG2wOZHey3432lpu0YZImT4WjtI3CwrY2XcKMUx7NcAbWhHdvcdLR1rtdxDN2dHj
-         GTtscH0yoM+NhL4flxA6OU4BQG5pWI22I86yF6PeLAj5LuAlZNoN0OYEtVhcUHJne2VL
-         iTvW5OeBpjidKvf2nePP/gwHx0r5wOJqIY8YQuEagTIr6tfw9T+22SeDJEH0mFD6IiHx
-         1YnXypMtHwq7KveWqjKib+KgzzkVDqrcgKcGJjaIb7Cmuj9pHJ8WKFvSxDWqnwCAsOnd
-         KUA6tO/GA6Jzy74Ftr/DZgfWa4H7yeltfRYslX0gVV/mFEGGmTSoFVkxh2s1tU2igHlj
-         52sg==
-X-Forwarded-Encrypted: i=1; AJvYcCXl8Fjrs8G2pB3dHTnT4itovxtgtr2AAuD1GNPzTOwGbh7XO+Ru+LERuY2F4FYeVCqMLBkROIF+KlE3ui1XDh/Avx+bJSmiBC8xVxctc6kuH4uO4WAr8cLRDOFHWaGbidcRsp49boa/nt20M91BAFzj9K0Qphn9wCcnmhZiKC8g
-X-Gm-Message-State: AOJu0YxiMVtwm/LRAV6I6Epe3YSBp8+2ahYftr7pyQiyOSYBb73lHFPg
-	cIx/dJ+kYJaHg9JuBRMIi6Ro9wBgne/bXWgnyTqNhdN362qdmkBQ
-X-Google-Smtp-Source: AGHT+IED5Mx/PH30QMfFytykQ+7Wd5RiJ81T0D1gDX1QjsZH+etLQy9U23ziQnfhYSWJoGvsN6FS7g==
-X-Received: by 2002:a5d:6c62:0:b0:369:cbd0:61ff with SMTP id ffacd0b85a97d-36bbc0c4fadmr12473218f8f.9.1722919431435;
-        Mon, 05 Aug 2024 21:43:51 -0700 (PDT)
-Received: from [192.168.0.107] ([77.124.98.185])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0261c2sm11647460f8f.57.2024.08.05.21.43.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 21:43:51 -0700 (PDT)
-Message-ID: <4f42fac4-2a4e-426a-be86-1f4bb79987b4@gmail.com>
-Date: Tue, 6 Aug 2024 07:43:48 +0300
+	d=codeconstruct.com.au; s=2022a; t=1722919876;
+	bh=TbiCSzBYmLGldS+dmeAtupFPU6qc4zR+8Bsz3z9h/+k=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=bJV6MkHZ6WYaBPBYchyIajSGJZNJrWj7uGfIJamq2Kb+WpWNDKf7Z4ujV2zchFnof
+	 Q9TU31oTSLGjlsyyI9DC53OApA5lz57r+tFi+O454oWqMdD67dLKg2f3QWE9Dli6yG
+	 x8Sref3r/Z+Mwsxirc8ILUzrDYHZ8MVZfURYgENeOvniUkn1o7ptaPXg/LKTXcs9zc
+	 qzKP4kRK9NEU4iitAj0zGsRzfU95cNjNtvgSj9AYwrq1yXn605YnEax0tosh4/pHyP
+	 8lz3x7pSS5UsAhNNqtx0tx97DN1YSnRB6ortzVmeqqyn/kBSl3PFWj98mc2sNI53Kj
+	 JceIFBQL+u0kQ==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id BD3EA65665;
+	Tue,  6 Aug 2024 12:51:15 +0800 (AWST)
+Message-ID: <532223445d395ac6ac5da0e34d00c0edb9ffd998.camel@codeconstruct.com.au>
+Subject: Re: [PATCH 08/13] mctp: serial: propagage new tty types
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>, gregkh@linuxfoundation.org
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, Matt
+ Johnston <matt@codeconstruct.com.au>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  netdev@vger.kernel.org
+Date: Tue, 06 Aug 2024 12:51:15 +0800
+In-Reply-To: <20240805102046.307511-9-jirislaby@kernel.org>
+References: <20240805102046.307511-1-jirislaby@kernel.org>
+	 <20240805102046.307511-9-jirislaby@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug report] NFS patch breaks TLS device-offloaded TX zerocopy
-To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
- Anna Schumaker <Anna.Schumaker@Netapp.com>,
- Trond Myklebust <trondmy@kernel.org>, linux-nfs@vger.kernel.org,
- Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Networking <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-References: <aeea3ae5-5c0b-48fa-942b-4d17acfd8cba@gmail.com>
- <77fb3db5-7a59-4879-b9c2-d3408fcf67e8@grimberg.me>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <77fb3db5-7a59-4879-b9c2-d3408fcf67e8@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+
+Hi Jiri,
+
+> In tty, u8 is now used for data, ssize_t for sizes (with possible
+> negative error codes). Propagate these types (and use unsigned in
+> next_chunk_len()) to mctp.
+
+All good on my side, thanks!
+
+Reviewed-by: Jeremy Kerr <jk@codeconstruct.com.au>
+
+I assume you're looking to merge as a series through tty, is that
+right?
+
+Cheers,
 
 
-
-On 05/08/2024 14:43, Sagi Grimberg wrote:
-> 
-> 
-> 
-> On 05/08/2024 13:40, Tariq Toukan wrote:
->> Hi,
->>
->> A recent patch [1] to 'fs' broke the TX TLS device-offloaded flow 
->> starting from v6.11-rc1.
->>
->> The kernel crashes. Different runs result in different kernel traces.
->> See below [2].
->> All of them disappear once patch [1] is reverted.
->>
->> The issues appears only with "sendfile on and zerocopy on".
->> We couldn't repro with "sendfile off", or with "sendfile on and 
->> zerocopy off".
->>
->> The repro test is as simple as a repeated client/server communication 
->> (wrk/nginx), with sendfile on and zc on, and with "tls-hw-tx-offload: 
->> on".
->>
->> $ for i in `seq 10`; do wrk -b::2:2:2:3 -t10 -c100 -d15 --timeout 5s 
->> https://[::2:2:2:2]:20448/16000b.img; done
->>
->> We can provide more details if needed, to help with the analysis and 
->> debug.
-> 
-> Does tls sw (i.e. no offload) also break?
-> 
-
-No it doesn't.
-Only the "sendfile with ZC" flow of the TX device-offloaded TLS.
+Jeremy
 
