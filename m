@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-116121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8259492A0
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:07:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A46EC9492B3
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D661F20DD2
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:07:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A4141F22038
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F150F18D642;
-	Tue,  6 Aug 2024 14:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B7F18D635;
+	Tue,  6 Aug 2024 14:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mirt+YFq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coF4VlFn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC6618D63C
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 14:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41C718D631
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 14:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722953224; cv=none; b=e3yCwVonfjJmyR1F3hFesf/vbiU1ZZG/UIwjNdszTGkvf+fA3lwez38oJ3v/26zEuiPAew9G5AJE/z8UhtPM3nDh8naRy72mxYGLLvw2xoJ5Enx2Tm/eTkI7a53wi9XNHxrDjtzwyMWRO7KM6p+1N8qfQswL8scxsQwbWUMShH0=
+	t=1722953492; cv=none; b=TR/mooqxrPbweTxENl8VJ33RYyBORJz0sYCsCu2+8B1Dijrx+dSSHTV8to3pl8tWlMqmFgXtVRq7ouPGzjDGadiHyIoO7CdGU2lC+H8UvFde6UMgckAvJWTCHpVA9Fyz2mZQ+cS0sL8dAXznsTb9sARbJ9x/8gmf638Dy1EhmDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722953224; c=relaxed/simple;
-	bh=C3lr3tWkqWjRNpwTIO6l3ZCzqFh0K0pNhEqTjz0pQnY=;
+	s=arc-20240116; t=1722953492; c=relaxed/simple;
+	bh=x+MUouu3lN4W35kzOSr/iPomJLHZuTkyLqRUUWyk3+8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kmzk9KwkksKCN8EMrhXpCCbXnEUYH6HZI0jtIkXfA6OQFD1L79wuOKKNMefnJgqV06xWs9ZZ/OcokeqmzNlYLiIzRcBW6A2gtncRxdwGdcENkBU02riTjQGSYLcm4Eogrf5kSqtp8VsRROLRnovjmuTad2urzALJe2FA+JP8G7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mirt+YFq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3282C4AF09;
-	Tue,  6 Aug 2024 14:07:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Nu+Ei+bFjyD7zHQ/7MAHMBJZ5YJ1Va+9j8Y2afW6yTjWaUxNPOGH08CkDq7/o74Tg6RL+NmhG2wzWTq1AiwFbvA62PTFtDbld7lqy7wJOvhc3n1QzHFp8znpcHB47g9lOb8B+ka/Zgb+Dv2I/G5ON9PlzSVBh+t5or8Od1YoK40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coF4VlFn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE11C32786;
+	Tue,  6 Aug 2024 14:11:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722953224;
-	bh=C3lr3tWkqWjRNpwTIO6l3ZCzqFh0K0pNhEqTjz0pQnY=;
+	s=k20201202; t=1722953492;
+	bh=x+MUouu3lN4W35kzOSr/iPomJLHZuTkyLqRUUWyk3+8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Mirt+YFqlvjx5cXSM+z5M8PTQQrKOhHuybjU7rvKC7yw9kJGGJfUw3YO4R2ehkqPo
-	 Y1bpGSgPmMMo67D+0qeg8vfJkhuCIMoiuzLulAwS8XAi679qvSZsRUzLZ0D4BZCUta
-	 QNq+oXo5ysBo/GgzWZZJ6KQS0ukXAfQ9xf4E6K8wwcj8Md3U3eY6Id6I3pzdC9ICfP
-	 jB22K4R4MmRIspMntkASbJdqNnAbxV0gLseCdS5/Dzm5+Zi3jnTYI9dDY2hT3jjiQz
-	 nfdcb75J+FCgHNb+joM2IoJqXBxH+IH4F3GlcJzLU7L61e5xcT8L0z9zWltSpHnJVd
-	 rjaN6mv8MvmoA==
-Date: Tue, 6 Aug 2024 07:07:02 -0700
+	b=coF4VlFn6GloVa+blD09EGYLcwRDsTMsImzSy/TzsKJiXdDQCRIOHSfjAIbtS8fye
+	 7SEUvxZKm09721M6j3bc/kEp9l/QTs+Fu0L/aki3EmH7SttaTyFbyOnBpb3GwXAsnw
+	 ltC3B52nzIxhwlNs9ZO6AriIbEzMaKv5PKrDOkqBfsayhpKHGkg/SQ6TEh1aQ6q6Fv
+	 g58xmYX2vUstfVm+Tc7f3EvFZNwCxyQ7uyL/e2fPbZDhyDqXMlyZSrVaSQDrgt5Ka0
+	 cFh1CXJ4oPWl/erRXtlXp/BafPIZJPu5efJ0u+cK7hiXAg/qPGwAmYYQmuMe3ZHq0+
+	 omni6o3uS2v9w==
+Date: Tue, 6 Aug 2024 07:11:30 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Edward Cree <ecree.xilinx@gmail.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
  pabeni@redhat.com, dxu@dxuuu.xyz, przemyslaw.kitszel@intel.com,
  donald.hunter@gmail.com, gal.pressman@linux.dev, tariqt@nvidia.com,
- willemdebruijn.kernel@gmail.com, jdamato@fastly.com
-Subject: Re: [PATCH net-next v2 06/12] ethtool: rss: don't report key if
- device doesn't support it
-Message-ID: <20240806070702.3359e2fe@kernel.org>
-In-Reply-To: <2af37636-de5d-913d-4ccf-9388f1cfbd26@gmail.com>
+ willemdebruijn.kernel@gmail.com, jdamato@fastly.com,
+ marcin.s.wojtas@gmail.com, linux@armlinux.org.uk
+Subject: Re: [PATCH net-next v2 02/12] eth: mvpp2: implement new RSS context
+ API
+Message-ID: <20240806071130.5f456ec0@kernel.org>
+In-Reply-To: <52cbca9f-503f-25b4-aabf-461d09f41e9f@gmail.com>
 References: <20240803042624.970352-1-kuba@kernel.org>
-	<20240803042624.970352-7-kuba@kernel.org>
-	<2af37636-de5d-913d-4ccf-9388f1cfbd26@gmail.com>
+	<20240803042624.970352-3-kuba@kernel.org>
+	<1683568d-41b5-ffc8-2b08-ac734fe993a7@gmail.com>
+	<20240805142930.45a80248@kernel.org>
+	<52cbca9f-503f-25b4-aabf-461d09f41e9f@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,95 +67,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-[found this stuck in my outgoing mail :S]
-
-On Mon, 5 Aug 2024 15:36:28 +0100 Edward Cree wrote:
-> On 03/08/2024 05:26, Jakub Kicinski wrote:
-> > marvell/otx2 and mvpp2 do not support setting different
-> > keys for different RSS contexts. Contexts have separate
-> > indirection tables but key is shared with all other contexts.
-> > This is likely fine, indirection table is the most important
-> > piece.  
-> 
-> Since drivers that do not support this are the odd ones out,
->  would it be better to invert the sense of the flag?  Or is
->  this to make sure that driver authors who don't think/know
->  about the distinction automatically get safe behaviour?
-
-Yes, I wanted the 0 / default / sloppy choice to be the safe one.
-As annoying as it is to have to set it in most drivers, I still
-prefer that to the inevitable false-negatives.
-
-> > Don't report the key-related parameters from such drivers.
-> > This prevents driver-errors, e.g. otx2 always writes
-> > the main key, even when user asks to change per-context key.
-> > The second reason is that without this change tracking
-> > the keys by the core gets complicated. Even if the driver
-> > correctly reject setting key with rss_context != 0,
-> > change of the main key would have to be reflected in
-> > the XArray for all additional contexts.
+On Tue, 6 Aug 2024 14:28:16 +0100 Edward Cree wrote:
+> > Coincidentally, the default also appears exclusive:
 > > 
-> > Since the additional contexts don't have their own keys
-> > not including the attributes (in Netlink speak) seems
-> > intuitive. ethtool CLI seems to deal with it just fine.
+> > 	u32 limit = ops->rxfh_max_context_id ?: U32_MAX;
 > > 
-> > Reviewed-by: Joe Damato <jdamato@fastly.com>
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
-> ...
-> > diff --git a/drivers/net/ethernet/sfc/ef100_ethtool.c b/drivers/net/ethernet/sfc/ef100_ethtool.c
-> > index 746b5314acb5..127b9d6ade6f 100644
-> > --- a/drivers/net/ethernet/sfc/ef100_ethtool.c
-> > +++ b/drivers/net/ethernet/sfc/ef100_ethtool.c
-> > @@ -58,6 +58,7 @@ const struct ethtool_ops ef100_ethtool_ops = {
-> >  
-> >  	.get_rxfh_indir_size	= efx_ethtool_get_rxfh_indir_size,
-> >  	.get_rxfh_key_size	= efx_ethtool_get_rxfh_key_size,
-> > +	.rxfh_per_ctx_key	= 1,  
+> > U32_MAX can't be used, it has special meaning:
+> > 
+> > #define ETH_RXFH_CONTEXT_ALLOC		0xffffffff  
 > 
-> I would prefer 'true' for the sfc drivers, I think that
->  better fits the general style of our code.
+> Given that both the default and drivers look more reasonable
+>  with an exclusive than an inclusive limit (I assume most
+>  drivers with a limit will have an N, like mvpp2 does, rather
+>  than a MAX), I guess we should change the code to match the
+>  doc rather than the other way around.
 
-Sure thing.
-
-> >  	.rxfh_priv_size		= sizeof(struct efx_rss_context_priv),
-> >  	.get_rxfh		= efx_ethtool_get_rxfh,
-> >  	.set_rxfh		= efx_ethtool_set_rxfh,
-
-> > diff --git a/drivers/net/ethernet/sfc/siena/ethtool.c b/drivers/net/ethernet/sfc/siena/ethtool.c
-> > index 4c182d4edfc2..6d4e5101433a 100644
-> > --- a/drivers/net/ethernet/sfc/siena/ethtool.c
-> > +++ b/drivers/net/ethernet/sfc/siena/ethtool.c
-> > @@ -241,6 +241,7 @@ static int efx_ethtool_get_ts_info(struct net_device *net_dev,
-> >  
-> >  const struct ethtool_ops efx_siena_ethtool_ops = {
-> >  	.cap_rss_ctx_supported	= true,
-> > +	.rxfh_per_ctx_key	= true,  
-> 
-> For the record, Siena hardware doesn't actually support
->  custom RSS contexts; the code is only present in the
->  driver as a holdover from when Siena and EF10 used the
->  same driver.  Trying to actually use them on Siena will
->  fail -EOPNOTSUPP.[1]
-> I'll send a patch to rip it out.
-
-Ack, will drop this chunk to avoid conflicts, then.
-
-> >  	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
-> >  				     ETHTOOL_COALESCE_USECS_IRQ |
-> >  				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
-> > diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> > index 55c9f613ab64..16f72a556fe9 100644
-> > --- a/include/linux/ethtool.h
-> > +++ b/include/linux/ethtool.h
-> > @@ -731,6 +731,8 @@ struct kernel_ethtool_ts_info {
-> >   *	do not have to set this bit.
-> >   * @cap_rss_sym_xor_supported: indicates if the driver supports symmetric-xor
-> >   *	RSS.
-> > + * @rxfh_per_ctx_key: device supports setting different RSS key for each
-> > + *	additional context.  
-> 
-> This comment should really make clear that it covers hfunc and
->  input_xfrm as well, not just the key itself.
-
-Ack.
+Somewhat unclear, because context 0 may not count, so to speak.
+At least for bnxt using inclusive max context worked well.
+But no preference, with the (obvious?) caveat that if we change 
+the definition of the field to be exclusive we should rename it.
 
