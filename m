@@ -1,119 +1,162 @@
-Return-Path: <netdev+bounces-116069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B6D948F0B
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:33:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9142948F44
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:40:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AE7E1F21414
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:33:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58334B268EA
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61EC01C461F;
-	Tue,  6 Aug 2024 12:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C295C1C7B7E;
+	Tue,  6 Aug 2024 12:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="h/57+CeY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPXeFIzs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2991DDF5
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 12:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB3A1C68B7;
+	Tue,  6 Aug 2024 12:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722947590; cv=none; b=laKSOoH0Vw9JAm/NpSIeFsRE2RtfHJCqhuXaeCaGphJZjgm91559s8xJ/OaD+zvQ0S0ZCiUCW58zq6JX1F5rY4hMPtvQjGlnNoRB872a0h+BO2GrDEHs9vib9QgfllzbkppiFXGHb3x4VmDZ19Fe4Dy5X3FSRZ/tT+psoPdWD6U=
+	t=1722947978; cv=none; b=j+jta3PWy1rnaz4cUuBmGalC+u/YKSPrEvN5TTvv+I9KJOKGcBeBb9eVX76dU0cgISvFshWK1JmmHJYR5G1UPyi73juGHXIgtOX2TsVIwi62HiJcyPkhXhUGbD22gl9ynGM76D5odyw2hIeUVS7xRnVCZIm/XZZvZ/Wh62BOxBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722947590; c=relaxed/simple;
-	bh=hLDHnjRdPnpaeg167MxCyofiZQOaLsJlLf+Rmw4qk3M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uGmCPJGSn4aXf2SHN8xUBAnGynkpe6Jq41RsNwm+EnoZsjJM8Ci2lBe5UyYhaSaVWuGZ3H6xEbqEvoFW5HVUfT+BVqFyhnRjMbamw2yGJf6UdVCiGUywi+GHWgiOzPg8iX0MPpxg9fh+3CQjBeH5wcnkPML/tn8NObjHGSK8Pdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=h/57+CeY; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-710afd56c99so354829b3a.0
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 05:33:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1722947587; x=1723552387; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AT7QwYWK8WZyIEtyo3//GG8heHvMwjuLkdYziSoLjUo=;
-        b=h/57+CeYAWdfu365BOQ6Xxc2IhfE3gf2v9om5XyaVH+zMxhTZyrfVAd63mbXzj4qEf
-         Q95+ZeSAqx59QW0Z8pO54tBttZJREbOEuPG0t+qG1wyFGjzdL0h6txUi5Bd+UUL4Bt7d
-         anUs70yV/hEzj9WKZsl3csdVs7eL7xvQz7FKI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722947587; x=1723552387;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AT7QwYWK8WZyIEtyo3//GG8heHvMwjuLkdYziSoLjUo=;
-        b=knEJj4irrmUW/wlSKnSlxJiX/DPjHr6wrJpnYWngtcwfskffwxlM0kytM5z9sd0hb8
-         UjAnsq9F18lIwES267pRuis8DrXCwGW6w6mya4uQAW9xqQYDtITH5yweuFuy03U2MjQc
-         aE5zFq5j8Nw29cjIJxMM8FYOI8dPOFDGxVZDtkIT8JrSiaio/zE16vAA+c+vjypMdtaf
-         dioI67xxmKVadpL2L3nMGd5zHOvfB8D7WUpbsLiTYBzpM0SVTdaD/zOVnE2/3cEgaH0K
-         ltA4kfVQPcbNt+EzWqx+T8wUzwIdCCLbIbv/r8FgnokAX+cCsXiQm3CfLftMFYcL1KTS
-         W6qA==
-X-Gm-Message-State: AOJu0YxlNqaz0MymA0KC2Umj866kgBR4li2+z4IFsDO/CjC6bksrdxrM
-	1fQ0psT3HViWHM0ZAauvxYOASKu6F8RHskjAUP2U/rOg4ySVSZ6WD11IE2CAAl4=
-X-Google-Smtp-Source: AGHT+IHrUqiuFtCV3WrfhBJ4arzdppGltRltfSkrJGcbzB3/8Mb8Oiy5ACComQJXPWx7LLJfKZ66aQ==
-X-Received: by 2002:a05:6a21:788a:b0:1c4:d14f:248f with SMTP id adf61e73a8af0-1c69a5f0268mr22605294637.13.1722947586715;
-        Tue, 06 Aug 2024 05:33:06 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7106ed16cb3sm7141271b3a.179.2024.08.06.05.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 05:33:06 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	stable@vger.kernel.org,
-	Joe Damato <jdamato@fastly.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net] eventpoll: Annotate data-race of busy_poll_usecs
-Date: Tue,  6 Aug 2024 12:33:01 +0000
-Message-Id: <20240806123301.167557-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1722947978; c=relaxed/simple;
+	bh=eMNJjAYkh3YJudnzeODeG6NqHgyfSSZdW118XbHW6XE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gwK+DyVti9bmKoYMVA3TQZRi+RVcJVmaftrjIm1U8o/6jcVAM+r5tlmDdmqPdDZvuklMgzuV1zNca/3SBe63VG6bBUu3gmsTtfRgDwc+hdf8+AjHdNF+EQHruolQregrYgx1RdN6zHTQC1knxyqmfC1G30fk4jt4MGvsfaihCbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPXeFIzs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A55BDC4AF10;
+	Tue,  6 Aug 2024 12:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722947978;
+	bh=eMNJjAYkh3YJudnzeODeG6NqHgyfSSZdW118XbHW6XE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gPXeFIzsRzcyrz0Sc20Nf3wCzKS0TfphZoXELNTp8pBaduiPip83RFA8vZNoMMWnn
+	 LucecaWesGGmRFJrJWVPFgO8dQ6sDcl8OZYCNpKgbtdAuUM+xJGNVlFMxpeLaS0K0A
+	 Uh1h7e6EDGbhhkju4vFYWoPfxN2chPQ4i/9pm0QqUI6ojKKt2s0zQLcnyGp6Bt3pgV
+	 6XgRgQ0I2bju+Fs9WOCxiI4dIhvc/R5ldBXIZov3e3s+WetWo6Bwrdib1sDW7ckhhV
+	 NWkQOnxP0yOeyubdZHLSd6YhIxJeOQSzpaf93ptS3QhUB3tyMdde++KTY7UHB96R1S
+	 rcepJeyk1UR0w==
+Message-ID: <ae46118f-a692-4362-8e6b-4ef8c6369541@kernel.org>
+Date: Tue, 6 Aug 2024 14:39:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] arm: dts: st: Add MECIO1 and MECT1S board variants
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>
+Cc: David Jander <david@protonic.nl>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240806120332.405064-1-o.rempel@pengutronix.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240806120332.405064-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Martin Karsten <mkarsten@uwaterloo.ca>
+On 06/08/2024 14:03, Oleksij Rempel wrote:
+> From: David Jander <david@protonic.nl>
+> 
+> Introduce device tree support for the MECIO1 and MECT1S board variants.
+> MECIO1 is an I/O and motor control board used in blood sample analysis
+> machines. MECT1S is a 1000Base-T1 switch for internal machine networks
+> of blood sample analysis machines.
+> 
+> Signed-off-by: David Jander <david@protonic.nl>
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  .../devicetree/bindings/arm/stm32/stm32.yaml  |   8 +
+>  arch/arm/boot/dts/st/Makefile                 |   3 +
+>  arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts |  48 ++
+>  arch/arm/boot/dts/st/stm32mp151c-mect1s.dts   | 297 ++++++++++
+>  arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts |  48 ++
+>  .../arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi | 533 ++++++++++++++++++
+>  6 files changed, 937 insertions(+)
+>  create mode 100644 arch/arm/boot/dts/st/stm32mp151c-mecio1r0.dts
+>  create mode 100644 arch/arm/boot/dts/st/stm32mp151c-mect1s.dts
+>  create mode 100644 arch/arm/boot/dts/st/stm32mp153c-mecio1r1.dts
+>  create mode 100644 arch/arm/boot/dts/st/stm32mp15x-mecio1-io.dtsi
+> 
+> diff --git a/Documentation/devicetree/bindings/arm/stm32/stm32.yaml b/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
+> index 58099949e8f3a..703d4b574398d 100644
+> --- a/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
+> +++ b/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
 
-A struct eventpoll's busy_poll_usecs field can be modified via a user
-ioctl at any time. All reads of this field should be annotated with
-READ_ONCE.
+Please run scripts/checkpatch.pl and fix reported warnings. Then please
+run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
+Some warnings can be ignored, especially from --strict run, but the code
+here looks like it needs a fix. Feel free to get in touch if the warning
+is not clear.
 
-Fixes: 85455c795c07 ("eventpoll: support busy poll per epoll instance")
-Cc: stable@vger.kernel.org
-Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-Reviewed-by: Joe Damato <jdamato@fastly.com>
----
- fs/eventpoll.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> @@ -54,6 +54,8 @@ properties:
+>        - description: ST STM32MP151 based Boards
+>          items:
+>            - enum:
+> +              - prt,mecio1r0 # Protonic MECIO1r0
+> +              - prt,mect1s   # Protonic MECT1S
+>                - prt,prtt1a   # Protonic PRTT1A
+>                - prt,prtt1c   # Protonic PRTT1C
 
-diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-index f53ca4f7fced..6d0e2f547ae7 100644
---- a/fs/eventpoll.c
-+++ b/fs/eventpoll.c
-@@ -420,7 +420,7 @@ static bool busy_loop_ep_timeout(unsigned long start_time,
- 
- static bool ep_busy_loop_on(struct eventpoll *ep)
- {
--	return !!ep->busy_poll_usecs || net_busy_loop_on();
-+	return !!READ_ONCE(ep->busy_poll_usecs) || net_busy_loop_on();
- }
- 
- static bool ep_busy_loop_end(void *p, unsigned long start_time)
--- 
-2.25.1
+...
+
+
+Best regards,
+Krzysztof
 
 
