@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-115966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C09C948A62
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:47:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E9D948A6C
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 09:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D6ED1C2155D
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:47:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5373F286308
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 07:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374EE1BC067;
-	Tue,  6 Aug 2024 07:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A24A1BD013;
+	Tue,  6 Aug 2024 07:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF9315D1
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411941BA880
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 07:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722930465; cv=none; b=k7wD3/RyZQ+kW1ce77UL3QuJzYTcDxzs6cht43AOmhqzq2Yn0XstFbg9vPRLGz5gRoekggLoJ1X+qk74JCDZf4WZpoGt0clZ4SMF2JGevqFOPJaxlg9Jmju4BpK8E/krDicFVdKvqgWRv2v2t7vQiWYgo224PFTWaDBY4ngm4vA=
+	t=1722930466; cv=none; b=Mkvf+gcmGfun2jWq+0CePHHLwuwYqR33JlYt77Qa6UpVyVgvzE3VYU49CQs6LVqmrihns80DQBmblxgVHLxI6hYhsdzfFlHkG/VVW9A6rTdKPejVzJqe0H/JAI1AZI4MNZY6JjxFXbg7CpgVXdhjRvMz1t9W4VgY1ChZRwoqt5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722930465; c=relaxed/simple;
-	bh=Da3kVtIjlALHgMjCzc1vZivGXeRyeYrKqXkq3NEXIUU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qrRI3rzZg55M41LCdy0ybAulnNHhpQ8gaXMrP0ShsJIpHn6JMsCEHurUW5ZxbE4DKKzX4P5/2gKZ/MNz1k3nNrkbXaEYlVYUne9mClO8tIVXuCjaYXgPS/sA7qUrKo+qc03MFNCom2VGi4SiDzmlwaZ3MU6fwwKuyKr1I669Hh0=
+	s=arc-20240116; t=1722930466; c=relaxed/simple;
+	bh=h/9hIEHIKrxey86A0dFWcUfr+38201w2cema3doQP+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NtG+/TnsZC8K/MyvWEgyWM9Z5QqOkzIxSAqN7fVec1TrE1zfCIjUObrod24e71K1iFwkEKCX17oqncuYsPEj+lTZYGgMI3PdeWTkvFkmE8iYxH3gf4xl0YJ4NPbM8n509HJnj3o7W+X9OsNX9gsTDSDBMWtufL2X15nUhXgyS98=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,128 +33,88 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sbEut-00041k-IX
-	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:35 +0200
+	id 1sbEuv-00043U-1V
+	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:37 +0200
 Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sbEut-004ton-18
+	id 1sbEut-004tpw-S6
 	for netdev@vger.kernel.org; Tue, 06 Aug 2024 09:47:35 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id B43A131798D
-	for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 07:47:34 +0000 (UTC)
+	by bjornoya.blackshift.org (Postfix) with SMTP id 8B1B43179A7
+	for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 07:47:35 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 7E23031796B;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 95C2831796C;
 	Tue, 06 Aug 2024 07:47:33 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id ce9302f2;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 62b77d5e;
 	Tue, 6 Aug 2024 07:47:32 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH net-next 0/20] pull-request: can-next 2024-08-06
-Date: Tue,  6 Aug 2024 09:41:51 +0200
-Message-ID: <20240806074731.1905378-1-mkl@pengutronix.de>
+	kernel@pengutronix.de,
+	Frank Li <Frank.Li@nxp.com>,
+	Rob Herring <robh@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net-next 01/20] dt-bindings: can: fsl,flexcan: add common 'can-transceiver' for fsl,flexcan
+Date: Tue,  6 Aug 2024 09:41:52 +0200
+Message-ID: <20240806074731.1905378-2-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240806074731.1905378-1-mkl@pengutronix.de>
+References: <20240806074731.1905378-1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello netdev-team,
+From: Frank Li <Frank.Li@nxp.com>
 
-this is a pull request of 20 patches for net-next/master.
+Add common 'can-transceiver' children node for fsl,flexcan.
 
-The first patch is by Frank Li and adds the can-transceiver property
-to the flexcan device-tree bindings.
+Fix below warning:
+arch/arm64/boot/dts/freescale/fsl-ls1028a-rdb.dtb: can@2180000: 'can-transceiver' does not match any of the regexes: 'pinctrl-[0-9]+'
+        from schema $id: http://devicetree.org/schemas/net/can/fsl,flexcan.yaml#
 
-Haibo Chen contributes 2 patches for the flexcan driver to add wakeup
-support for the imx95.
-
-The 2 patches by Stefan Mätje for the esd_402_pci driver clean up the
-driver and add support for the one-shot mode.
-
-The last 15 patches are by Jimmy Assarsson and add hardware timestamp
-support for all devices covered by the kvaser_usb driver.
-
-regards,
-Marc
-
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Link: https://lore.kernel.org/all/20240629021754.3583641-1-Frank.Li@nxp.com
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
-The following changes since commit 3608d6aca5e793958462e6e01a8cdb6c6e8088d0:
+ Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-  Merge branch 'dsa-en7581' into main (2024-08-04 15:22:31 +0100)
+diff --git a/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml b/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
+index f197d9b516bb..a4261a201fdb 100644
+--- a/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
++++ b/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
+@@ -80,6 +80,10 @@ properties:
+       node then controller is assumed to be little endian. If this property is
+       present then controller is assumed to be big endian.
+ 
++  can-transceiver:
++    $ref: can-transceiver.yaml#
++    unevaluatedProperties: false
++
+   fsl,stop-mode:
+     description: |
+       Register bits of stop mode control.
 
-are available in the Git repository at:
+base-commit: 3608d6aca5e793958462e6e01a8cdb6c6e8088d0
+-- 
+2.43.0
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.12-20240806
-
-for you to fetch changes up to fa3c40b9d540948884a7ae2205c247729e9f9f8f:
-
-  Merge patch series "can: kvaser_usb: Add hardware timestamp support to all devices" (2024-08-05 17:39:05 +0200)
-
-----------------------------------------------------------------
-linux-can-next-for-6.12-20240806
-
-----------------------------------------------------------------
-Frank Li (1):
-      dt-bindings: can: fsl,flexcan: add common 'can-transceiver' for fsl,flexcan
-
-Haibo Chen (2):
-      dt-bindings: can: fsl,flexcan: move fsl,imx95-flexcan standalone
-      can: flexcan: add wakeup support for imx95
-
-Jimmy Assarsson (15):
-      can: kvaser_usb: Add helper functions to convert device timestamp into ktime
-      can: kvaser_usb: hydra: kvaser_usb_hydra_ktime_from_rx_cmd: Drop {rx_} in function name
-      can: kvaser_usb: hydra: Add struct for Tx ACK commands
-      can: kvaser_usb: hydra: Set hardware timestamp on transmitted packets
-      can: kvaser_usb: leaf: Add struct for Tx ACK commands
-      can: kvaser_usb: leaf: Assign correct timestamp_freq for kvaser_usb_leaf_imx_dev_cfg_{16,24,32}mhz
-      can: kvaser_usb: leaf: Replace kvaser_usb_leaf_m32c_dev_cfg with kvaser_usb_leaf_m32c_dev_cfg_{16,24,32}mhz
-      can: kvaser_usb: leaf: kvaser_usb_leaf_tx_acknowledge: Rename local variable
-      can: kvaser_usb: leaf: Add hardware timestamp support to leaf based devices
-      can: kvaser_usb: leaf: Add structs for Tx ACK and clock overflow commands
-      can: kvaser_usb: leaf: Store MSB of timestamp
-      can: kvaser_usb: leaf: Add hardware timestamp support to usbcan devices
-      can: kvaser_usb: Remove KVASER_USB_QUIRK_HAS_HARDWARE_TIMESTAMP
-      can: kvaser_usb: Remove struct variables kvaser_usb_{ethtool,netdev}_ops
-      can: kvaser_usb: Rename kvaser_usb_{ethtool,netdev}_ops_hwts to kvaser_usb_{ethtool,netdev}_ops
-
-Marc Kleine-Budde (3):
-      Merge patch series "can: fsl,flexcan: add imx95 wakeup"
-      Merge patch series "can: esd_402_pci: Do cleanup; Add one-shot mode"
-      Merge patch series "can: kvaser_usb: Add hardware timestamp support to all devices"
-
-Stefan Mätje (2):
-      can: esd_402_pci: Rename esdACC CTRL register macros
-      can: esd_402_pci: Add support for one-shot mode
-
- .../devicetree/bindings/net/can/fsl,flexcan.yaml   |   8 +-
- drivers/net/can/esd/esd_402_pci-core.c             |   5 +-
- drivers/net/can/esd/esdacc.c                       |  55 +++++-----
- drivers/net/can/esd/esdacc.h                       |  36 ++++---
- drivers/net/can/flexcan/flexcan-core.c             |  50 +++++++--
- drivers/net/can/flexcan/flexcan.h                  |   2 +
- drivers/net/can/usb/kvaser_usb/kvaser_usb.h        |  26 ++++-
- drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   |  21 +---
- drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c  |  41 +++++---
- drivers/net/can/usb/kvaser_usb/kvaser_usb_leaf.c   | 114 ++++++++++++++++++---
- 10 files changed, 255 insertions(+), 103 deletions(-)
 
 
