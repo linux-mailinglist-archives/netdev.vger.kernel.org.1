@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-116088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B272949091
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:15:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D58F9490A0
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 15:16:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C945B27708
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:15:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BB8B1C236B5
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:16:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FA91D414A;
-	Tue,  6 Aug 2024 13:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6961D47C2;
+	Tue,  6 Aug 2024 13:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="muz36Tcd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H++nrYr4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F521D4142;
-	Tue,  6 Aug 2024 13:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEC81D4174;
+	Tue,  6 Aug 2024 13:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722950011; cv=none; b=rkUk0hmB4SEBcmvxZau4d17q+1GNnTWoARTj0qYm3IOqYLAZp4djHp0aBjIOpFraPhkEYfZnuioJwhKqDwIeGAS/kgcEvvJkN13iNTgYHvSlthv/WQVK4JrVL86nHl6cTra00jMf7hDKQ3lNlrQA926gkKumTIeQL0U7c/OEeX8=
+	t=1722950015; cv=none; b=pF9fnRrvSD6T6Q5wZu8lMDr1ruS/7touzB4K4PrZuxRw8FtgxB09MytLlwhRKwlk9M2CuaVRuntv/gIgkgWvbxx2/RyDPUIUppPQ6BP9q/yaop76/9hjnrrDl8lkgeCg3aq8czR12ReyNOLZ6lH7xVkIQ67GL8/bYBPBUncvpHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722950011; c=relaxed/simple;
-	bh=tpJ6HRHvdzGj4qFRuoUwc+Xi1PWZVyJf4WSGrHJGRng=;
+	s=arc-20240116; t=1722950015; c=relaxed/simple;
+	bh=In6QrPvQnSDhQJM97UyCLeQgTMymS/F0mWTXu7iL4fo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gGu95u+OhbWTuNZ4ilGqYfSyBLqaPEqwaQ1qLZ8AysKHOXTISL/d/PnP6wmoAOFMED67P8I+rKUZnz/AZb+6xTLH7diKqyL+QBK7/sNljDSfe31rl6c8C73iOf7JYvoWB4i1k6uuU0YXYUuxKr3Mg6qQj4cOMr8oyon6OZ+D/ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=muz36Tcd; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=petp+PDkPkBx2khpvz4UlAMUHstutij3bZ5G1fzf22O+7EWo8KSL5LBPwTgEuxf/icnxyW69T1nA12usxo8KzXPtqrHMVYhI+qrRzEQhzaXrOV6ajAkXrn5hD0mNXKfTpkf9qzgy0jFEaEKnc06sEqkZK8WfWAdMnYVIWxObYJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H++nrYr4; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722950010; x=1754486010;
+  t=1722950013; x=1754486013;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tpJ6HRHvdzGj4qFRuoUwc+Xi1PWZVyJf4WSGrHJGRng=;
-  b=muz36Tcdc50jrnuj6gQ6Ho4A9fo56EVbmZeh5D6ck1Omy6yeOReRVXYe
-   Bpi8SOdHpIXt3537ZLVZslfmrBkIa55hAIaAehbdto3Ohbshj/WTylp1g
-   x0mAa4UY+4c0eU6msDS1ZUHFqhYLc1T9rn9i/4HATpoYEDXoMLZoVJYd7
-   aqZDXsYhy76+FecIBFnoD5/tiq0898O8QAJmDGO9asXIXPkz220whg7wh
-   ge0EyKCGmAZNszG/hY4rpuRV0LPV2s4XgzK8MkmkjX880GD4n8lSnnDl2
-   B7mKVz/mezcjr20G+yddWtptfbMKRiO/nfo5EPdUAo529RowD2fTxtY6+
-   w==;
-X-CSE-ConnectionGUID: na3URCdFTxSRNhrgY3iaNw==
-X-CSE-MsgGUID: WKxtHO6GQ9Stt7hF3CId2A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="20842134"
+  bh=In6QrPvQnSDhQJM97UyCLeQgTMymS/F0mWTXu7iL4fo=;
+  b=H++nrYr4nnofgoOrKkNVZKdFDqAbTrbQzPpAGMNjwkQqEpEGNyISQ8A1
+   TnpwkJVK257eYYW0sgrI1R4X/vo9tOryaWUyOHVlEp+QQplm6pAq7jG6z
+   H0CZjcNhogMeNAzHdjtzrPvbylnyU0+DrKW0jcqSu+ItpIQp0fHSvSwxZ
+   Q0JoOjwxNqhVxFLxukKudZtyHTlGWO286B/Xnr01QoyWZDoZK68RV9jUc
+   I0iCHUeO5fQLR13Kz9TTPRk1U9/U5fGReH1uiXw3kW1fdLL8vbo/hKkQp
+   x9KphDaqR0TjMrKpH4Vyy3ztt4XEhSbldVj4dpvgeJByaFtuDt/Hp9atg
+   g==;
+X-CSE-ConnectionGUID: jCnTYenFSDGIs4yPDEkZuA==
+X-CSE-MsgGUID: 6ePn1RUHRxWSt9A9DlXW0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="20842146"
 X-IronPort-AV: E=Sophos;i="6.09,267,1716274800"; 
-   d="scan'208";a="20842134"
+   d="scan'208";a="20842146"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 06:13:29 -0700
-X-CSE-ConnectionGUID: 8b7wVvi6QBitGXj/3KZWHA==
-X-CSE-MsgGUID: AfPCn/xoQkG2mtANgN/v3w==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 06:13:32 -0700
+X-CSE-ConnectionGUID: OleXau5/Qy+Gs3X6kJrlVA==
+X-CSE-MsgGUID: Cj0QYa8jQS2rfFWTRUdL7w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,267,1716274800"; 
-   d="scan'208";a="56475822"
+   d="scan'208";a="56475826"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa009.fm.intel.com with ESMTP; 06 Aug 2024 06:13:26 -0700
+  by fmviesa009.fm.intel.com with ESMTP; 06 Aug 2024 06:13:30 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -71,11 +71,10 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH iwl-next 7/9] idpf: fix netdev Tx queue stop/wake
-Date: Tue,  6 Aug 2024 15:12:38 +0200
-Message-ID: <20240806131240.800259-8-aleksander.lobakin@intel.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next 8/9] idpf: enable WB_ON_ITR
+Date: Tue,  6 Aug 2024 15:12:39 +0200
+Message-ID: <20240806131240.800259-9-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240806131240.800259-1-aleksander.lobakin@intel.com>
 References: <20240806131240.800259-1-aleksander.lobakin@intel.com>
@@ -87,139 +86,204 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Kubiak <michal.kubiak@intel.com>
+From: Joshua Hay <joshua.a.hay@intel.com>
 
-netif_txq_maybe_stop() returns -1, 0, or 1, while
-idpf_tx_maybe_stop_common() says it returns 0 or -EBUSY. As a result,
-there sometimes are Tx queue timeout warnings despite that the queue
-is empty or there is at least enough space to restart it.
-Make idpf_tx_maybe_stop_common() inline and returning true or false,
-handling the return of netif_txq_maybe_stop() properly. Use a correct
-goto in idpf_tx_maybe_stop_splitq() to avoid stopping the queue or
-incrementing the stops counter twice.
+Tell hardware to write back completed descriptors even when interrupts
+are disabled. Otherwise, descriptors might not be written back until
+the hardware can flush a full cacheline of descriptors. This can cause
+unnecessary delays when traffic is light (or even trigger Tx queue
+timeout).
 
-Fixes: 6818c4d5b3c2 ("idpf: add splitq start_xmit")
+The example scenario to reproduce the Tx timeout if the fix is not
+applied:
+  - configure at least 2 Tx queues to be assigned to the same q_vector,
+  - generate a huge Tx traffic on the first Tx queue
+  - try to send a few packets using the second Tx queue.
+In such a case Tx timeout will appear on the second Tx queue because no
+completion descriptors are written back for that queue while interrupts
+are disabled due to NAPI polling.
+
+Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
 Fixes: a5ab9ee0df0b ("idpf: add singleq start_xmit and napi poll")
-Cc: stable@vger.kernel.org # 6.7+
+Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
+Co-developed-by: Michal Kubiak <michal.kubiak@intel.com>
 Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  9 ++++-
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  4 +++
- drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 35 +++++--------------
- 3 files changed, 21 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   | 27 ++++++++++++++++++-
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |  2 ++
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  6 ++++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  7 ++++-
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |  2 ++
+ 5 files changed, 41 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 2478f71adb95..df3574ac58c2 100644
+index df3574ac58c2..b4a87f8661a8 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
 +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -1020,7 +1020,6 @@ void idpf_tx_dma_map_error(struct idpf_tx_queue *txq, struct sk_buff *skb,
- 			   struct idpf_tx_buf *first, u16 ring_idx);
- unsigned int idpf_tx_desc_count_required(struct idpf_tx_queue *txq,
- 					 struct sk_buff *skb);
--int idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q, unsigned int size);
- void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue);
- netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
- 				  struct idpf_tx_queue *tx_q);
-@@ -1029,4 +1028,12 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rxq,
- 				      u16 cleaned_count);
- int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off);
+@@ -349,9 +349,11 @@ struct idpf_vec_regs {
+  * struct idpf_intr_reg
+  * @dyn_ctl: Dynamic control interrupt register
+  * @dyn_ctl_intena_m: Mask for dyn_ctl interrupt enable
++ * @dyn_ctl_intena_msk_m: Mask for dyn_ctl interrupt enable mask
+  * @dyn_ctl_itridx_s: Register bit offset for ITR index
+  * @dyn_ctl_itridx_m: Mask for ITR index
+  * @dyn_ctl_intrvl_s: Register bit offset for ITR interval
++ * @dyn_ctl_wb_on_itr_m: Mask for WB on ITR feature
+  * @rx_itr: RX ITR register
+  * @tx_itr: TX ITR register
+  * @icr_ena: Interrupt cause register offset
+@@ -360,9 +362,11 @@ struct idpf_vec_regs {
+ struct idpf_intr_reg {
+ 	void __iomem *dyn_ctl;
+ 	u32 dyn_ctl_intena_m;
++	u32 dyn_ctl_intena_msk_m;
+ 	u32 dyn_ctl_itridx_s;
+ 	u32 dyn_ctl_itridx_m;
+ 	u32 dyn_ctl_intrvl_s;
++	u32 dyn_ctl_wb_on_itr_m;
+ 	void __iomem *rx_itr;
+ 	void __iomem *tx_itr;
+ 	void __iomem *icr_ena;
+@@ -383,6 +387,7 @@ struct idpf_intr_reg {
+  * @intr_reg: See struct idpf_intr_reg
+  * @napi: napi handler
+  * @total_events: Number of interrupts processed
++ * @wb_on_itr: WB on ITR enabled or not
+  * @tx_dim: Data for TX net_dim algorithm
+  * @tx_itr_value: TX interrupt throttling rate
+  * @tx_intr_mode: Dynamic ITR or not
+@@ -413,6 +418,7 @@ struct idpf_q_vector {
+ 	__cacheline_group_begin_aligned(read_write);
+ 	struct napi_struct napi;
+ 	u16 total_events;
++	bool wb_on_itr;
  
-+static inline bool idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q,
-+					     u32 needed)
+ 	struct dim tx_dim;
+ 	u16 tx_itr_value;
+@@ -431,7 +437,7 @@ struct idpf_q_vector {
+ 	cpumask_var_t affinity_mask;
+ 	__cacheline_group_end_aligned(cold);
+ };
+-libeth_cacheline_set_assert(struct idpf_q_vector, 104,
++libeth_cacheline_set_assert(struct idpf_q_vector, 112,
+ 			    424 + 2 * sizeof(struct dim),
+ 			    8 + sizeof(cpumask_var_t));
+ 
+@@ -989,6 +995,25 @@ static inline void idpf_tx_splitq_build_desc(union idpf_tx_flex_desc *desc,
+ 		idpf_tx_splitq_build_flow_desc(desc, params, td_cmd, size);
+ }
+ 
++/**
++ * idpf_vport_intr_set_wb_on_itr - enable descriptor writeback on disabled interrupts
++ * @q_vector: pointer to queue vector struct
++ */
++static inline void idpf_vport_intr_set_wb_on_itr(struct idpf_q_vector *q_vector)
 +{
-+	return !netif_subqueue_maybe_stop(tx_q->netdev, tx_q->idx,
-+					  IDPF_DESC_UNUSED(tx_q),
-+					  needed, needed);
++	struct idpf_intr_reg *reg;
++
++	if (q_vector->wb_on_itr)
++		return;
++
++	q_vector->wb_on_itr = true;
++	reg = &q_vector->intr_reg;
++
++	writel(reg->dyn_ctl_wb_on_itr_m | reg->dyn_ctl_intena_msk_m |
++	       (IDPF_NO_ITR_UPDATE_IDX << reg->dyn_ctl_itridx_s),
++	       reg->dyn_ctl);
 +}
 +
- #endif /* !_IDPF_TXRX_H_ */
+ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget);
+ void idpf_vport_init_num_qs(struct idpf_vport *vport,
+ 			    struct virtchnl2_create_vport *vport_msg);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_dev.c
+index 3df9935685e9..6c913a703df6 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_dev.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_dev.c
+@@ -97,8 +97,10 @@ static int idpf_intr_reg_init(struct idpf_vport *vport)
+ 		intr->dyn_ctl = idpf_get_reg_addr(adapter,
+ 						  reg_vals[vec_id].dyn_ctl_reg);
+ 		intr->dyn_ctl_intena_m = PF_GLINT_DYN_CTL_INTENA_M;
++		intr->dyn_ctl_intena_msk_m = PF_GLINT_DYN_CTL_INTENA_MSK_M;
+ 		intr->dyn_ctl_itridx_s = PF_GLINT_DYN_CTL_ITR_INDX_S;
+ 		intr->dyn_ctl_intrvl_s = PF_GLINT_DYN_CTL_INTERVAL_S;
++		intr->dyn_ctl_wb_on_itr_m = PF_GLINT_DYN_CTL_WB_ON_ITR_M;
+ 
+ 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
+ 					       IDPF_PF_ITR_IDX_SPACING);
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index 947d3ff9677c..5ba360abbe66 100644
+index 5ba360abbe66..dfd7cf1d9aa0 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -375,6 +375,10 @@ netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
- 				      IDPF_TX_DESCS_FOR_CTX)) {
- 		idpf_tx_buf_hw_update(tx_q, tx_q->next_to_use, false);
+@@ -1120,8 +1120,10 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
+ 						    &work_done);
  
-+		u64_stats_update_begin(&tx_q->stats_sync);
-+		u64_stats_inc(&tx_q->q_stats.q_busy);
-+		u64_stats_update_end(&tx_q->stats_sync);
-+
- 		return NETDEV_TX_BUSY;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index fd44a65a0537..26ef064972d4 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2127,29 +2127,6 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
- 	desc->flow.qw1.compl_tag = cpu_to_le16(params->compl_tag);
- }
- 
--/**
-- * idpf_tx_maybe_stop_common - 1st level check for common Tx stop conditions
-- * @tx_q: the queue to be checked
-- * @size: number of descriptors we want to assure is available
-- *
-- * Returns 0 if stop is not needed
-- */
--int idpf_tx_maybe_stop_common(struct idpf_tx_queue *tx_q, unsigned int size)
--{
--	struct netdev_queue *nq;
--
--	if (likely(IDPF_DESC_UNUSED(tx_q) >= size))
--		return 0;
--
--	u64_stats_update_begin(&tx_q->stats_sync);
--	u64_stats_inc(&tx_q->q_stats.q_busy);
--	u64_stats_update_end(&tx_q->stats_sync);
--
--	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
--
--	return netif_txq_maybe_stop(nq, IDPF_DESC_UNUSED(tx_q), size, size);
--}
--
- /**
-  * idpf_tx_maybe_stop_splitq - 1st level check for Tx splitq stop conditions
-  * @tx_q: the queue to be checked
-@@ -2161,7 +2138,7 @@ static int idpf_tx_maybe_stop_splitq(struct idpf_tx_queue *tx_q,
- 				     unsigned int descs_needed)
- {
- 	if (idpf_tx_maybe_stop_common(tx_q, descs_needed))
--		goto splitq_stop;
-+		goto out;
- 
- 	/* If there are too many outstanding completions expected on the
- 	 * completion queue, stop the TX queue to give the device some time to
-@@ -2180,10 +2157,12 @@ static int idpf_tx_maybe_stop_splitq(struct idpf_tx_queue *tx_q,
- 	return 0;
- 
- splitq_stop:
-+	netif_stop_subqueue(tx_q->netdev, tx_q->idx);
-+
-+out:
- 	u64_stats_update_begin(&tx_q->stats_sync);
- 	u64_stats_inc(&tx_q->q_stats.q_busy);
- 	u64_stats_update_end(&tx_q->stats_sync);
--	netif_stop_subqueue(tx_q->netdev, tx_q->idx);
- 
- 	return -EBUSY;
- }
-@@ -2206,7 +2185,11 @@ void idpf_tx_buf_hw_update(struct idpf_tx_queue *tx_q, u32 val,
- 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
- 	tx_q->next_to_use = val;
- 
--	idpf_tx_maybe_stop_common(tx_q, IDPF_TX_DESC_NEEDED);
-+	if (idpf_tx_maybe_stop_common(tx_q, IDPF_TX_DESC_NEEDED)) {
-+		u64_stats_update_begin(&tx_q->stats_sync);
-+		u64_stats_inc(&tx_q->q_stats.q_busy);
-+		u64_stats_update_end(&tx_q->stats_sync);
+ 	/* If work not completed, return budget and polling will return */
+-	if (!clean_complete)
++	if (!clean_complete) {
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 		return budget;
 +	}
  
- 	/* Force memory writes to complete before letting h/w
- 	 * know there are new descriptors to fetch.  (Only
+ 	work_done = min_t(int, work_done, budget - 1);
+ 
+@@ -1130,6 +1132,8 @@ int idpf_vport_singleq_napi_poll(struct napi_struct *napi, int budget)
+ 	 */
+ 	if (likely(napi_complete_done(napi, work_done)))
+ 		idpf_vport_intr_update_itr_ena_irq(q_vector);
++	else
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 
+ 	return work_done;
+ }
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 26ef064972d4..7af4ec83fd0a 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3710,6 +3710,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
+ 	/* net_dim() updates ITR out-of-band using a work item */
+ 	idpf_net_dim(q_vector);
+ 
++	q_vector->wb_on_itr = false;
+ 	intval = idpf_vport_intr_buildreg_itr(q_vector,
+ 					      IDPF_NO_ITR_UPDATE_IDX, 0);
+ 
+@@ -4012,8 +4013,10 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
+ 	clean_complete &= idpf_tx_splitq_clean_all(q_vector, budget, &work_done);
+ 
+ 	/* If work not completed, return budget and polling will return */
+-	if (!clean_complete)
++	if (!clean_complete) {
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 		return budget;
++	}
+ 
+ 	work_done = min_t(int, work_done, budget - 1);
+ 
+@@ -4022,6 +4025,8 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
+ 	 */
+ 	if (likely(napi_complete_done(napi, work_done)))
+ 		idpf_vport_intr_update_itr_ena_irq(q_vector);
++	else
++		idpf_vport_intr_set_wb_on_itr(q_vector);
+ 
+ 	/* Switch to poll mode in the tear-down path after sending disable
+ 	 * queues virtchnl message, as the interrupts will be disabled after
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+index 629cb5cb7c9f..99b8dbaf4225 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_vf_dev.c
+@@ -97,7 +97,9 @@ static int idpf_vf_intr_reg_init(struct idpf_vport *vport)
+ 		intr->dyn_ctl = idpf_get_reg_addr(adapter,
+ 						  reg_vals[vec_id].dyn_ctl_reg);
+ 		intr->dyn_ctl_intena_m = VF_INT_DYN_CTLN_INTENA_M;
++		intr->dyn_ctl_intena_msk_m = VF_INT_DYN_CTLN_INTENA_MSK_M;
+ 		intr->dyn_ctl_itridx_s = VF_INT_DYN_CTLN_ITR_INDX_S;
++		intr->dyn_ctl_wb_on_itr_m = VF_INT_DYN_CTLN_WB_ON_ITR_M;
+ 
+ 		spacing = IDPF_ITR_IDX_SPACING(reg_vals[vec_id].itrn_index_spacing,
+ 					       IDPF_VF_ITR_IDX_SPACING);
 -- 
 2.45.2
 
