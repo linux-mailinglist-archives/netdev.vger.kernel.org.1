@@ -1,61 +1,69 @@
-Return-Path: <netdev+bounces-116031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08624948D4E
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:57:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDD8948D5C
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 13:00:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A5EE1C23731
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:57:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19B262883FD
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 11:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F131C231F;
-	Tue,  6 Aug 2024 10:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84C61C0DF8;
+	Tue,  6 Aug 2024 11:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=compton.nu header.i=tom@compton.nu header.b="WWGOsyQR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584011C0DD7
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from gosford.compton.nu (gosford.compton.nu [217.169.17.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D15716DC07;
+	Tue,  6 Aug 2024 11:00:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.169.17.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722941854; cv=none; b=lICbPC/RiUQuTpSyzn6vjjmQCO7fOjY48dpRF8bF8gmntkWnXJ2ZU4OcDZes49ZzJmjCAHCEaM65++C6u7l2ei1jLA2IkFJ8Ws+h61hyj9nn91yJkfEYm9T8hNPR93ZIXFDHZv8p1TdkO/55/CT/6qNsWWm7mENa1bkok4Uhxac=
+	t=1722942013; cv=none; b=uLPtFFcis0Vkf3aJo6r0FdpwJwQNNAteuarRRJh9/4Kf+FZIbRaiyfIEPd0ZfI0w+lEuPRZImYQWAsGuLFfSbpJZvjNAuRXKVVdSCMFeAr8SOK5qk9xM6SPk7dY2g5JywuoVDuhmJvup9Y48deE9sC+X6aW6ORY27L1ueNzFweY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722941854; c=relaxed/simple;
-	bh=Key5+Wre6qPxtBgQlVgpSZerMpU+dkIcFgYeqR+kJGc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ddADZ8Wm9GlfuzECKYMUTimR8TZU+MbZiLG84f7krK7UNW0sRe58KvHqDlK7y6cNiiEIL8MEad8VqBffGU+a/YFL5niWQPJs8H0Lct2jF5mh9ZvMIKQOI7rNZBX0nlWc1e42uvS4dpHA6tGbRpXmk+AJlYl0CDKzPdOFrsOH1o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.71])
-	by gateway (Coremail) with SMTP id _____8AxjpuTAbJmXa8IAA--.2393S3;
-	Tue, 06 Aug 2024 18:57:23 +0800 (CST)
-Received: from localhost.localdomain (unknown [223.64.68.71])
-	by front1 (Coremail) with SMTP id qMiowMBxNOKMAbJmp_cFAA--.31158S5;
-	Tue, 06 Aug 2024 18:57:23 +0800 (CST)
-From: Yanteng Si <siyanteng@loongson.cn>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	fancer.lancer@gmail.com,
-	diasyzhang@tencent.com
-Cc: Yanteng Si <siyanteng@loongson.cn>,
-	Jose.Abreu@synopsys.com,
-	chenhuacai@kernel.org,
-	linux@armlinux.org.uk,
-	guyinggang@loongson.cn,
-	netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com,
-	si.yanteng@linux.dev,
-	Huacai Chen <chenhuacai@loongson.cn>
-Subject: [PATCH net-next v16 03/14] net: stmmac: Export dwmac1000_dma_ops
-Date: Tue,  6 Aug 2024 18:57:06 +0800
-Message-Id: <6a7e95ed51773cd57770fb8934725edc3fd07e7d.1722924540.git.siyanteng@loongson.cn>
-X-Mailer: git-send-email 2.31.4
-In-Reply-To: <cover.1722924540.git.siyanteng@loongson.cn>
-References: <cover.1722924540.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1722942013; c=relaxed/simple;
+	bh=K+q601JkCTnwIUvBbNbmIGhA+FM9h0Z4Dmi+fgenXjg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NgmPqDR6+nJvzkOo6KrsFR2IxpJuToyZ0Psoh1mEdL+K3yNIlQHiegh7XaJNq/g5pCTTLL335IAmfE7ryMiUO33te/Si801CVnW9oUrp463LpgrhA6BQldnRazHKfRNZL4xA4hyQ+XjE78XhzIl0cbtnft6fv6HzOQUJmPZHCNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=compton.nu; spf=pass smtp.mailfrom=compton.nu; dkim=pass (2048-bit key) header.d=compton.nu header.i=tom@compton.nu header.b=WWGOsyQR; arc=none smtp.client-ip=217.169.17.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=compton.nu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=compton.nu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=compton.nu;
+	s=20200130; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
+	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Vx/8NUHHR7uGlkEW5lOU5IjJ2dWZYtOJ1SSV9gYHE2Q=; i=tom@compton.nu;
+	t=1722942011; x=1724151611; b=WWGOsyQRmJpreD969qnHeJpsnUIBDPSa3FgzsWnKUEgFNO+
+	AJTNYTAK0tBSs3BU6nItjA1ls2U0cY0XssRsZEo6ldT9vnsIXdgBNS7CtMNIWrWdfOuxIRFt1Qxrl
+	8lM3Iecc0uqcCBascOPQRt24KS3RSzpJvaO8i5IX9aQ/6GJVvkmmGnIz9BMI6bkacIgzc606hl0EQ
+	GxpftvM5SdxGlKDVOT+AsQFRH74/VUcfotJCAs1bvaHGc2BPJoTun84Sqr7+TGePDEXcS/z1XXiaC
+	RPhsPVkVkxBL5OWL7iAbMkvm18gD1ohM06rpO6QP9+cx+OTWWb4QKvSuURyk62cA==;
+Authentication-Results: gosford.compton.nu;
+	iprev=pass (bericote.compton.nu) smtp.remote-ip=2001:8b0:bd:1:1881:14ff:fe46:3cc7
+Received: from bericote.compton.nu ([2001:8b0:bd:1:1881:14ff:fe46:3cc7]:45800)
+	by gosford.compton.nu with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98)
+	(envelope-from <tom@compton.nu>)
+	id 1sbHtJ-0000000GZcr-3n3r;
+	Tue, 06 Aug 2024 11:58:13 +0100
+Received: from tom by bericote.compton.nu with local (Exim 4.98)
+	(envelope-from <tom@compton.nu>)
+	id 1sbHtJ-0000000DoED-3Bna;
+	Tue, 06 Aug 2024 11:58:09 +0100
+From: Tom Hughes <tom@compton.nu>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	netfilter-devel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Tom Hughes <tom@compton.nu>
+Subject: [PATCH] netfilter: allow ipv6 fragments to arrive on different devices
+Date: Tue,  6 Aug 2024 11:57:51 +0100
+Message-ID: <20240806105751.3291225-1-tom@compton.nu>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,51 +71,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMBxNOKMAbJmp_cFAA--.31158S5
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7Gr4fZryUAw47Jw15ur4fXrc_yoW8Jr1fpF
-	W7A34j9rZ7Kw18Z3WDJw1DXFy5Way5KFW7ua1xAryfuFnrKa4Ygr9xKFWjgryUXFZYqFy2
-	qr4jkry3C3W5CwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUD529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWr
-	XVW3AwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26ryj6F1UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
-	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0XdjtUUUUU==
 
-Export the DW GMAC DMA-ops descriptor so one could be available in
-the low-level platform drivers. It will be utilized to override some
-callbacks in order to handle the LS2K2000 GNET device specifics. The
-GNET controller support is being added in one of the following up
-commits.
+Commit 264640fc2c5f4 ("ipv6: distinguish frag queues by device
+for multicast and link-local packets") modified the ipv6 fragment
+reassembly logic to distinguish frag queues by device for multicast
+and link-local packets but in fact only the main reassembly code
+limits the use of the device to those address types and the netfilter
+reassembly code uses the device for all packets.
 
-Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-Acked-by: Huacai Chen <chenhuacai@loongson.cn>
-Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+This means that if fragments of a packet arrive on different interfaces
+then netfilter will fail to reassemble them and the fragments will be
+expired without going any further through the filters.
+
+Signed-off-by: Tom Hughes <tom@compton.nu>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/ipv6/netfilter/nf_conntrack_reasm.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-index b3d7eff53b18..118a22406a2e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-@@ -296,3 +296,4 @@ const struct stmmac_dma_ops dwmac1000_dma_ops = {
- 	.get_hw_feature = dwmac1000_get_hw_feature,
- 	.rx_watchdog = dwmac1000_rx_watchdog,
- };
-+EXPORT_SYMBOL_GPL(dwmac1000_dma_ops);
+diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
+index 6f0844c9315d..4120e67a8ce6 100644
+--- a/net/ipv6/netfilter/nf_conntrack_reasm.c
++++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
+@@ -154,6 +154,10 @@ static struct frag_queue *fq_find(struct net *net, __be32 id, u32 user,
+ 	};
+ 	struct inet_frag_queue *q;
+ 
++	if (!(ipv6_addr_type(&hdr->daddr) & (IPV6_ADDR_MULTICAST |
++					    IPV6_ADDR_LINKLOCAL)))
++		key.iif = 0;
++
+ 	q = inet_frag_find(nf_frag->fqdir, &key);
+ 	if (!q)
+ 		return NULL;
 -- 
-2.31.4
+2.45.2
 
 
