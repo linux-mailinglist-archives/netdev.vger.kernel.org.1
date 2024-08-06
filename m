@@ -1,106 +1,141 @@
-Return-Path: <netdev+bounces-116162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DC6949543
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:08:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABBC5949561
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F2731F267BD
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:08:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80C51C21A96
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 16:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB263A267;
-	Tue,  6 Aug 2024 16:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0CB18D655;
+	Tue,  6 Aug 2024 16:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZzELewlD"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SPHoym0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7368527466
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 16:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243A8175A5
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 16:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722960460; cv=none; b=D57cHI9dcFVlDLSPJzOjqp8SEccCuJjoz3+1VdzDsrDnHNVkYKSMwC7oW94VLYoIXdf2mR4zOx+KAEvpVwE4izNfbMd5sDsBh67RCBzS6kGEdxLqvj+znw8QOSF3CiAjGR1keSD4sLqPAqkt+jzVzEgnGSw1CtxJWC3GiLwSx+M=
+	t=1722960979; cv=none; b=Gg/J84iWMx/loxi/37qINFtTFV7nd7VfeX6T9qPVaXoZ8qOeICTBvXBMX1BbKyVF1babex0lF+fGrhJY+ML0e7XR7XWyKSZA/NC/b7M7FIAMEFq89ZCAwuHT+BYYiO4Ac7MUq2Hh3jIHCAXJUvgkBanIU7Mm4PibTIrlrZwk+m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722960460; c=relaxed/simple;
-	bh=UDWWmRE+xMMUUJ/1cLaONknX2wree4fqwDyz4S4KReY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=hHyKFJaNY7xmV0FgLvhO5mmi+rJFMBdjpLghZ8wIzbE66oJXY5iTBzQiCOu7Ozl49EJxY6ZaxdyQD9BlpCmrGEBThm7WyGQUbO7KpWqJ7ZXuGs+nAidhGbsw/W0aSzWtafthKzPTpQiksqz5ynZKtdLeD9DUiPvEb+pKkJ0Gznc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZzELewlD; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f149845fbaso9179991fa.3
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 09:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722960456; x=1723565256; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UA7vzvBPHn9h+tl0kUbpv8e+uf0r/+Ug8uEBTZW7ZeY=;
-        b=ZzELewlD9OeCm1GWthFLAbnGqmOE1bZ2dbSitP5JqE8WC1M+Wu07YpAP85xz2odYJf
-         MAM7cbEyQw+5nUGzZo+iBdUGYADMGQHSMsdyfslvX1Nz2lSDb2mXxutpLUHgQ6k+zvD7
-         HiQbep5lxtDjYPVvOq1Ey3xmD0mGkpayi9We78KbEGbhiBqFKtO99nNJW5NGYmycsj3D
-         sH/qD/MbuFnNFFi9vuaLJpRLETvp2rktCmZ0Wh0VGy/5gsjcoy2fptrDWETV3syQh//P
-         epKo/Ct9BHdYTexzddEn62KMJPBZt6WKFaBmztSk8Xt2g1PZY+soSnJgGI6ONeVm39p3
-         PwZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722960456; x=1723565256;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UA7vzvBPHn9h+tl0kUbpv8e+uf0r/+Ug8uEBTZW7ZeY=;
-        b=Yk7/BiQYKNzVJJqnFPusC3x+XXp0CV6L68N11iyLZBvLVPoXas9RTM5tyHXgxoGsf/
-         QrfaNU7H24HPHRd0EBs4ZMzDX6qOhIpOuOJ25uS1pI3cOJzhjjig+pnDr8hxY6TmLtA9
-         jiWgeShv+cv4Ud/hC+Iu1fpaz1X3wOlOIkJKNr3ojc+BZ/gXUl1kXcLRiXi5P7F3/GSs
-         AbPN/RjFA/1HT+Ww+3Dv0iVB0eFv74XQgrOuHbRx5JUUIObX2szXOFU93xXBHNBPWvWD
-         pgYDhVdMZbiJJovssEMsezfCIOXDtjak/tg7VVu0oHnab/gE1AdSWBPJb8AvMq7VfOl0
-         PgDQ==
-X-Gm-Message-State: AOJu0YzBr+O6wYwH0otElcQ/lwHMb5ADds2gdRDxVEvZ2lBJkxodKjvo
-	NdIYKojY2D88EKgAI9wFpV2Qv7g4aS2NMP3E7j7Nsp/H/QRC3PaaJn6MPQ==
-X-Google-Smtp-Source: AGHT+IGpvrcWEi5tc5C8Kux/42Lsg98Mxxcoj75P9Ba7dKXlS76mWYG36+9llMU04uP2EUO4xrGn3A==
-X-Received: by 2002:a2e:6a12:0:b0:2ef:290e:4a2b with SMTP id 38308e7fff4ca-2f15aaf64a8mr106745881fa.38.1722960456109;
-        Tue, 06 Aug 2024 09:07:36 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89a878sm250139385e9.8.2024.08.06.09.07.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Aug 2024 09:07:35 -0700 (PDT)
-Subject: Re: [PATCH net] net: ethtool: fix off-by-one error in max RSS context
- IDs
-To: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org
-References: <20240806160126.551306-1-edward.cree@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <242fd732-0962-ef5e-a3fc-fe8007a521f9@gmail.com>
-Date: Tue, 6 Aug 2024 17:07:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1722960979; c=relaxed/simple;
+	bh=hrj3SvLmgQkqGsmFcPvJZajN5YJLzpXWgVXiFh3C2dc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=S9U9GOC2BL3/3i15mGxodJrYv3OGgLsYOQ0Qdi3WN7pZWNMCvwVXZ4cliy+hqFh/mdURsHXB8nNwan9uypRiWuQ9F+DCZ5QODqpxCP3sYC6FcPyPYAkw1heVC/xPUd7t7AyWvlhhRsFoeVJvljmq1rr1T+TV3c25KYmP3ibfsNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SPHoym0O; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476AnQQ1012124;
+	Tue, 6 Aug 2024 16:15:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	nJ1gVROkRY1YddUF9i6SHRozU4ezt6vYywqujaHPf0I=; b=SPHoym0ODp/Ztwm5
+	YmflM2Mg96LqENMSwbmYiLq2FnkXElPIaej5sERkK7vRKQDJaME486tgktWiJk3Y
+	ZpP2Y6tX2qS5H4IJ9FMUDV2HbG/PK4gGcPNTEm8kioiV8z18Y1oqgrIxE4tXvMaJ
+	9ijSKZ6sbeu/6684sg8CEvx//8HHJ60dZB5ybtv2HYEsql3ygFJj5RPWVeApdB+Z
+	tcSmhOW9l/Y9hY2COQ8iMD6UEvziJBT9THrICmxjlB9QQerxWyjfVxl/uRS7GFzV
+	8tgjgR/+rXE1dJtvrsAISRzjFfwyXodgdJzVQlExoREbl2oYsgBGm/pZC2aL5y8R
+	N5dPqQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40scx6r4un-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Aug 2024 16:15:42 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 476GFeiS022110
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 6 Aug 2024 16:15:40 GMT
+Received: from [10.110.125.90] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 6 Aug 2024
+ 09:15:40 -0700
+Message-ID: <c555f616-64a8-4453-bab4-a4589f428331@quicinc.com>
+Date: Tue, 6 Aug 2024 09:15:21 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240806160126.551306-1-edward.cree@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: stmmac: dwmac4: fix PCS duplex mode decode
+Content-Language: en-US
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+        Serge Semin
+	<fancer.lancer@gmail.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Andrew Halaney <ahalaney@redhat.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <E1sOz2O-00Gm9W-B7@rmk-PC.armlinux.org.uk>
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <E1sOz2O-00Gm9W-B7@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: vNtgtUVSJpqfpfdgpOBx1Rag6wYKGnDA
+X-Proofpoint-GUID: vNtgtUVSJpqfpfdgpOBx1Rag6wYKGnDA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-06_12,2024-08-06_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 bulkscore=0 clxscore=1011 suspectscore=0 phishscore=0
+ spamscore=0 adultscore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408060114
 
-On 06/08/2024 17:01, edward.cree@amd.com wrote:
-> From: Edward Cree <ecree.xilinx@gmail.com>
-> 
-> Both ethtool_ops.rxfh_max_context_id and the default value used when
->  it's not specified are supposed to be exclusive maxima (the former
->  is documented as such; the latter, U32_MAX, cannot be used as an ID
->  since it equals ETH_RXFH_CONTEXT_ALLOC), but xa_alloc() expects an
->  inclusive maximum.
-> Subtract one from 'limit' to produce an inclusive maximum, and pass
->  that to xa_alloc().  Special-case limit==0 to avoid overflow.
-> 
-> Fixes: 6603754cd914 ("net: ethtool: let the core choose RSS context IDs")
 
-Whoops, that should have been
-Fixes: 847a8ab18676 ("net: ethtool: let the core choose RSS context IDs")
+
+On 7/3/2024 5:24 AM, Russell King (Oracle) wrote:
+> dwmac4 was decoding the duplex mode from the GMAC_PHYIF_CONTROL_STATUS
+> register incorrectly, using GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK (value 1)
+> rather than GMAC_PHYIF_CTRLSTATUS_LNKMOD (bit 16). Fix this.
+> 
+> Thanks to Abhishek Chauhan for providing a response on this issue.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> index b25774d69195..26d837554a2d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> @@ -791,7 +791,7 @@ static void dwmac4_phystatus(void __iomem *ioaddr, struct stmmac_extra_stats *x)
+>  		else
+>  			x->pcs_speed = SPEED_10;
+>  
+> -		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD_MASK);
+> +		x->pcs_duplex = (status & GMAC_PHYIF_CTRLSTATUS_LNKMOD);
+>  
+>  		pr_info("Link is Up - %d/%s\n", (int)x->pcs_speed,
+>  			x->pcs_duplex ? "Full" : "Half");
+
+Thanks Russell for taking care of this change. 
+
+Can you please add my Reviewed-by: Abhishek Chauhan <quic_abchauha@quicinc.com> on the latest series. 
+
+Thanks 
+ABC
 
