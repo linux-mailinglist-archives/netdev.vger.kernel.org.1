@@ -1,283 +1,144 @@
-Return-Path: <netdev+bounces-116201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1D69949749
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:08:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B572949750
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20A721C21146
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:08:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 089A01F21FBC
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CAC481D5;
-	Tue,  6 Aug 2024 18:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8491E376E6;
+	Tue,  6 Aug 2024 18:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XwIOFLNt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llxD0DCb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BEA40875;
-	Tue,  6 Aug 2024 18:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0392F129A7E;
+	Tue,  6 Aug 2024 18:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722967696; cv=none; b=WpLKuyg53hSS2SK8KYyY2pNCRtKH8byuzB9NtNqsUe1qRqmI1xarMnsFd5miXLHg9nAOGSzP2YnIUOiXGeog9JrEEAOsjNLpwxn1qGOQ2UmWGe6G+AXHrjDpudcevb9DwUCygqHcFXtx3DnUGN0aAo4c/G/MC+YqitKyOTHYD90=
+	t=1722967879; cv=none; b=USU40iYQ1QfNCDMTrchGYkmcC/9FAv4a9c/5TfOSnlJp5aVejzCld4moRFCHp8B6NVzMLOuMBYKIFITD4Q/IzQdhBG1QL2LE/W2/ycxV2bqOWqujz2OxMUOJ3wVY1UXYJiCtZoy4g9wti6VaTD0a6TRk9T1f4XQub9VUNNANNs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722967696; c=relaxed/simple;
-	bh=Pio7eRsl6VoHHo6puRlzv4zHn+1CVPdub+C7U9Kagxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=TaFVHU/aZp2FU6hd6Da6ulbjE8rqraLq43KQGeTS4lSw/wNfdmZobSuP3GYgP2uAdchab3w7jT5nI52KRfcsARsRFVr/LNLtGDWnQrFltHr/zrfiYUgaPPjUlO5RR4++a5E6QGd/rkTe9fnsXndHmJZBZ5qOvCzSiC/sz2O5SNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XwIOFLNt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6948C32786;
-	Tue,  6 Aug 2024 18:08:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722967695;
-	bh=Pio7eRsl6VoHHo6puRlzv4zHn+1CVPdub+C7U9Kagxk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=XwIOFLNtUlDroHzZABNmcYxAgszzcVKJPvG8vl5YoRyX2QqXUdOpjoGVeo9O7D1Vz
-	 FdI52FqxhlPMtT4XSdgSFS5xuhsGkFemJGPuxX1XETTbjiy3bNyYwJ8H//9xPpNwqC
-	 m7uiiEwJ6gHbE5Hjtbq7YqY4ABpdCean6Vtoq76LQouWOT7AMvaEmKmsCJjKN57rWx
-	 8e9/4tWMBFlGPSrN8g1Xhx4iJK7k/2q20k3CfKpx+b3w3Er9W8WHDmrsIcIUrbCem1
-	 j/B7DfPmn8ObOK0PSZSkzgJVf0GabeLFbcK4sF+JD2U2smpJar1umAJB3JS4yCIKJw
-	 gJkOhNKoP6dGw==
-Date: Tue, 6 Aug 2024 12:08:12 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Kalle Valo <kvalo@kernel.org>,
-	Stanislav Yakovlev <stas.yakovlev@gmail.com>,
-	Ajay Singh <ajay.kathat@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-	libertas-dev@lists.infradead.org, netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] wifi: radiotap: Avoid -Wflex-array-member-not-at-end
- warnings
-Message-ID: <ZrJmjM4izqDqwIrc@cute>
+	s=arc-20240116; t=1722967879; c=relaxed/simple;
+	bh=0ewYccFC+gUsRirqVBgroPLIdoo7vvA0gP/+dnGxjmI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uVJwcU0gNnMXh+GYxxnQDcWH86lIxbDCAi6ETgqekD+Q08/S2xQQFFghB+jNI1TtgCR3PZp7wRakPR3vLvbFOchAS/GOCHYn+OOwUDfFrHo0DXJFumNL+PLHmTBcMEF+UMLitOsF4D597aoaoLS/UBg2/foSA60ZU4cM/KfV5yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=llxD0DCb; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ab09739287so540017a12.3;
+        Tue, 06 Aug 2024 11:11:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722967877; x=1723572677; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0RBuTc6tLdIB/+vTHorcWL7vaqZKWklEKUMNzfbf8ug=;
+        b=llxD0DCb7doM12SRnYegKIeI/9wZUOFzdiBB70JeQM6anDyRjhCjP+zA7xJKOmdXLT
+         8YeNB/zXI5zJzyDJKkYiZCuHrfe85iEpDjkPwAuolkXlT6ZRRwyX6ZrMENABc9t8ZWB7
+         jJEux8hr1ZZKX4h8gra/wQuem4vvoCP7eSonhFyqrS5ULiPhfiUfR386QmFux3/wYE4w
+         qwnDC5n7rPAYtxAWn4Il5YWObu7QAa1Ge4IEsBl0s/h9/3mf1uiWJuSo1nM9iWgl/s9g
+         Te/2hnt2rih9zOJueKbDyJm6/8/JNWHAA9ZtZNalTPg/x+VRlIDf4ZRq/bOVAj3KoLG7
+         wJbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722967877; x=1723572677;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0RBuTc6tLdIB/+vTHorcWL7vaqZKWklEKUMNzfbf8ug=;
+        b=Ax2f834C39qQZI9nmY5QGov+wSHHKmDjI7LpdRUyth0jyRZ8fQdPBln8s1pKFQs140
+         t51vXbAUN5286SV27uDGBo7eEBAaQ0gTzh2RhMCrduIdYPn0++vor10Ajwkuu8O7tmAc
+         NKFWtPcnCRJSWSPAOxqYZGdVyEbYJ5lULCSP6XC44gFatF3/0u24KCVIwbktZs6avOoe
+         BNJEElZBDtRyloLBGDqVlRX3X1Teki9ee0IboBdTyNLxZ6YJV0w+2DVv4aab6jmtiJI9
+         dQlZe67w4/ZGkZMLIQqsOj7piK8S3afYh9i0t//aYqMmIAZD5owR4DuWsMQ+aSTPIrgj
+         J/og==
+X-Forwarded-Encrypted: i=1; AJvYcCXndjYN9tDi1WPcBvb1Vz9JK8nL2PrY4z+GboL8VhrVDcMtn/l7/2m+qE7bKMa4PjvHLgVhqM9edYFO0F8BDZcAa+TAfNrGuQPvNOWkQoOK40ugrT66kKrFyUIiKqdgusdRf7aqWdJ7n7VZTproGPh+Oxkq76x9rGVvuDmhuaLZnStnb/d7GNQWzv3I
+X-Gm-Message-State: AOJu0Yx+eeNYgDGANOzwYxnovpPDZrjfByBdobCdBfwJKSxdNbrlzB+l
+	h1yEezWu+ANP+hTThTSU/A0Pr0+ndlXbBXks4wIQkuFLjU4ZYsag
+X-Google-Smtp-Source: AGHT+IEMFDWxG3XriWekADN9wxkPJTTGnTZ26Onx658MWf6fTZ3OlRburIFFPLH7N2CuvRHyAkCeBA==
+X-Received: by 2002:a17:902:d501:b0:1fd:9105:7dd3 with SMTP id d9443c01a7336-1ff5750acd3mr176378275ad.64.1722967877035;
+        Tue, 06 Aug 2024 11:11:17 -0700 (PDT)
+Received: from tahera-OptiPlex-5000.tail3bf47f.ts.net ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cfdc45b51esm12829504a91.32.2024.08.06.11.11.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 11:11:16 -0700 (PDT)
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: outreachy@lists.linux.dev
+Cc: mic@digikod.net,
+	gnoack@google.com,
+	paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bjorn3_gh@protonmail.com,
+	jannh@google.com,
+	netdev@vger.kernel.org,
+	Tahera Fahimi <fahimitahera@gmail.com>
+Subject: [PATCH v2 0/4] Landlock: Signal Scoping Support
+Date: Tue,  6 Aug 2024 12:10:39 -0600
+Message-Id: <cover.1722966592.git.fahimitahera@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
+This patch series adds scoping mechanism for signals.
+Closes: https://github.com/landlock-lsm/linux/issues/8
 
-So, in order to avoid ending up with a flexible-array member in the
-middle of multiple other structs, we use the `__struct_group()`
-helper to create a new tagged `struct ieee80211_radiotap_header_hdr`.
-This structure groups together all the members of the flexible
-`struct ieee80211_radiotap_header` except the flexible array.
+Problem
+=======
 
-As a result, the array is effectively separated from the rest of the
-members without modifying the memory layout of the flexible structure.
-We then change the type of the middle struct members currently causing
-trouble from `struct ieee80211_radiotap_header` to `struct
-ieee80211_radiotap_header_hdr`.
+A sandboxed process is currently not restricted from sending signals
+(e.g. SIGKILL) to processes outside the sandbox since Landlock has
+no restriction on signals(see more details in [1]).
 
-We also want to ensure that in case new members need to be added to the
-flexible structure, they are always included within the newly created
-tagged struct. For this, we use `static_assert()`. This ensures that the
-memory layout for both the flexible structure and the new tagged struct
-is the same after any changes.
+A simple way to apply this restriction would be to scope signals the
+same way abstract unix sockets are restricted.
 
-This approach avoids having to implement `struct ieee80211_radiotap_header_hdr`
-as a completely separate structure, thus preventing having to maintain
-two independent but basically identical structures, closing the door
-to potential bugs in the future.
+[1]https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
 
-So, with these changes, fix the following warnings:
-drivers/net/wireless/ath/wil6210/txrx.c:309:50: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/intel/ipw2x00/ipw2100.c:2521:50: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/intel/ipw2x00/ipw2200.h:1146:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/intel/ipw2x00/libipw.h:595:36: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/marvell/libertas/radiotap.h:34:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/marvell/libertas/radiotap.h:5:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/microchip/wilc1000/mon.c:10:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/microchip/wilc1000/mon.c:15:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/virtual/mac80211_hwsim.c:758:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/wireless/virtual/mac80211_hwsim.c:767:42: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+Solution
+========
 
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- drivers/net/wireless/ath/wil6210/txrx.c       |  2 +-
- drivers/net/wireless/intel/ipw2x00/ipw2100.c  |  2 +-
- drivers/net/wireless/intel/ipw2x00/ipw2200.h  |  2 +-
- .../net/wireless/marvell/libertas/radiotap.h  |  4 +-
- drivers/net/wireless/microchip/wilc1000/mon.c |  4 +-
- drivers/net/wireless/virtual/mac80211_hwsim.c |  4 +-
- include/net/ieee80211_radiotap.h              | 43 +++++++++++--------
- 7 files changed, 33 insertions(+), 28 deletions(-)
+To solve this issue, we extend the "scoped" field in the Landlock
+ruleset attribute structure by introducing "LANDLOCK_SCOPED_SIGNAL"
+field to specify that a ruleset will deny sending any signals from
+within the sandbox domain to its parent(i.e. any parent sandbox or
+non-sandbox processes).
 
-diff --git a/drivers/net/wireless/ath/wil6210/txrx.c b/drivers/net/wireless/ath/wil6210/txrx.c
-index f29ac6de7139..b7cc29939d59 100644
---- a/drivers/net/wireless/ath/wil6210/txrx.c
-+++ b/drivers/net/wireless/ath/wil6210/txrx.c
-@@ -306,7 +306,7 @@ static void wil_rx_add_radiotap_header(struct wil6210_priv *wil,
- 				       struct sk_buff *skb)
- {
- 	struct wil6210_rtap {
--		struct ieee80211_radiotap_header rthdr;
-+		struct ieee80211_radiotap_header_hdr rthdr;
- 		/* fields should be in the order of bits in rthdr.it_present */
- 		/* flags */
- 		u8 flags;
-diff --git a/drivers/net/wireless/intel/ipw2x00/ipw2100.c b/drivers/net/wireless/intel/ipw2x00/ipw2100.c
-index b6636002c7d2..9d5524c8e95d 100644
---- a/drivers/net/wireless/intel/ipw2x00/ipw2100.c
-+++ b/drivers/net/wireless/intel/ipw2x00/ipw2100.c
-@@ -2518,7 +2518,7 @@ static void isr_rx_monitor(struct ipw2100_priv *priv, int i,
- 	 * to build this manually element by element, we can write it much
- 	 * more efficiently than we can parse it. ORDER MATTERS HERE */
- 	struct ipw_rt_hdr {
--		struct ieee80211_radiotap_header rt_hdr;
-+		struct ieee80211_radiotap_header_hdr rt_hdr;
- 		s8 rt_dbmsignal; /* signal in dbM, kluged to signed */
- 	} *ipw_rt;
- 
-diff --git a/drivers/net/wireless/intel/ipw2x00/ipw2200.h b/drivers/net/wireless/intel/ipw2x00/ipw2200.h
-index 8ebf09121e17..becdd3bc5235 100644
---- a/drivers/net/wireless/intel/ipw2x00/ipw2200.h
-+++ b/drivers/net/wireless/intel/ipw2x00/ipw2200.h
-@@ -1143,7 +1143,7 @@ struct ipw_prom_priv {
-  * structure is provided regardless of any bits unset.
-  */
- struct ipw_rt_hdr {
--	struct ieee80211_radiotap_header rt_hdr;
-+	struct ieee80211_radiotap_header_hdr rt_hdr;
- 	u64 rt_tsf;      /* TSF */	/* XXX */
- 	u8 rt_flags;	/* radiotap packet flags */
- 	u8 rt_rate;	/* rate in 500kb/s */
-diff --git a/drivers/net/wireless/marvell/libertas/radiotap.h b/drivers/net/wireless/marvell/libertas/radiotap.h
-index 1ed5608d353f..95b427196f5a 100644
---- a/drivers/net/wireless/marvell/libertas/radiotap.h
-+++ b/drivers/net/wireless/marvell/libertas/radiotap.h
-@@ -2,7 +2,7 @@
- #include <net/ieee80211_radiotap.h>
- 
- struct tx_radiotap_hdr {
--	struct ieee80211_radiotap_header hdr;
-+	struct ieee80211_radiotap_header_hdr hdr;
- 	u8 rate;
- 	u8 txpower;
- 	u8 rts_retries;
-@@ -31,7 +31,7 @@ struct tx_radiotap_hdr {
- #define IEEE80211_FC_DSTODS          0x0300
- 
- struct rx_radiotap_hdr {
--	struct ieee80211_radiotap_header hdr;
-+	struct ieee80211_radiotap_header_hdr hdr;
- 	u8 flags;
- 	u8 rate;
- 	u8 antsignal;
-diff --git a/drivers/net/wireless/microchip/wilc1000/mon.c b/drivers/net/wireless/microchip/wilc1000/mon.c
-index 03b7229a0ff5..56cdc7a193dd 100644
---- a/drivers/net/wireless/microchip/wilc1000/mon.c
-+++ b/drivers/net/wireless/microchip/wilc1000/mon.c
-@@ -7,12 +7,12 @@
- #include "cfg80211.h"
- 
- struct wilc_wfi_radiotap_hdr {
--	struct ieee80211_radiotap_header hdr;
-+	struct ieee80211_radiotap_header_hdr hdr;
- 	u8 rate;
- } __packed;
- 
- struct wilc_wfi_radiotap_cb_hdr {
--	struct ieee80211_radiotap_header hdr;
-+	struct ieee80211_radiotap_header_hdr hdr;
- 	u8 rate;
- 	u8 dump;
- 	u16 tx_flags;
-diff --git a/drivers/net/wireless/virtual/mac80211_hwsim.c b/drivers/net/wireless/virtual/mac80211_hwsim.c
-index d86e6ff4523d..6ab0f3a6f26c 100644
---- a/drivers/net/wireless/virtual/mac80211_hwsim.c
-+++ b/drivers/net/wireless/virtual/mac80211_hwsim.c
-@@ -763,7 +763,7 @@ static const struct rhashtable_params hwsim_rht_params = {
- };
- 
- struct hwsim_radiotap_hdr {
--	struct ieee80211_radiotap_header hdr;
-+	struct ieee80211_radiotap_header_hdr hdr;
- 	__le64 rt_tsft;
- 	u8 rt_flags;
- 	u8 rt_rate;
-@@ -772,7 +772,7 @@ struct hwsim_radiotap_hdr {
- } __packed;
- 
- struct hwsim_radiotap_ack_hdr {
--	struct ieee80211_radiotap_header hdr;
-+	struct ieee80211_radiotap_header_hdr hdr;
- 	u8 rt_flags;
- 	u8 pad;
- 	__le16 rt_channel;
-diff --git a/include/net/ieee80211_radiotap.h b/include/net/ieee80211_radiotap.h
-index 91762faecc13..029137023779 100644
---- a/include/net/ieee80211_radiotap.h
-+++ b/include/net/ieee80211_radiotap.h
-@@ -24,31 +24,36 @@
-  * struct ieee80211_radiotap_header - base radiotap header
-  */
- struct ieee80211_radiotap_header {
--	/**
--	 * @it_version: radiotap version, always 0
--	 */
--	uint8_t it_version;
--
--	/**
--	 * @it_pad: padding (or alignment)
--	 */
--	uint8_t it_pad;
--
--	/**
--	 * @it_len: overall radiotap header length
--	 */
--	__le16 it_len;
--
--	/**
--	 * @it_present: (first) present word
--	 */
--	__le32 it_present;
-+	/* New members MUST be added within the __struct_group() macro below. */
-+	__struct_group(ieee80211_radiotap_header_hdr, hdr, __packed,
-+		/**
-+		 * @it_version: radiotap version, always 0
-+		 */
-+		uint8_t it_version;
-+
-+		/**
-+		 * @it_pad: padding (or alignment)
-+		 */
-+		uint8_t it_pad;
-+
-+		/**
-+		 * @it_len: overall radiotap header length
-+		 */
-+		__le16 it_len;
-+
-+		/**
-+		 * @it_present: (first) present word
-+		 */
-+		__le32 it_present;
-+	);
- 
- 	/**
- 	 * @it_optional: all remaining presence bitmaps
- 	 */
- 	__le32 it_optional[];
- } __packed;
-+static_assert(offsetof(struct ieee80211_radiotap_header, it_optional) == sizeof(struct ieee80211_radiotap_header_hdr),
-+	      "struct member likely outside of __struct_group()");
- 
- /* version is always 0 */
- #define PKTHDR_RADIOTAP_VERSION	0
+Example
+=======
+
+Create a sansboxed shell and pass the character "s" to LL_SCOPED:
+LL_FD_RO=/ LL_FS_RW=. LL_SCOPED="s" ./sandboxer /bin/bash
+Try to send a signal(like SIGTRAP) to a process ID <PID> through:
+kill -SIGTRAP <PID>
+The sandboxed process should not be able to send the signal.
+
+Tahera Fahimi (4):
+  Landlock: Add signal control
+  selftest/Landlock: Signal restriction tests
+  sample/Landlock: Support signal scoping restriction
+  Landlock: Document LANDLOCK_SCOPED_SIGNAL
+
+ Documentation/userspace-api/landlock.rst      |  27 +-
+ include/uapi/linux/landlock.h                 |   3 +
+ samples/landlock/sandboxer.c                  |  13 +-
+ security/landlock/limits.h                    |   2 +-
+ security/landlock/task.c                      |  43 +++
+ tools/testing/selftests/landlock/base_test.c  |   2 +-
+ .../selftests/landlock/scoped_signal_test.c   | 303 ++++++++++++++++++
+ 7 files changed, 376 insertions(+), 17 deletions(-)
+ create mode 100644 tools/testing/selftests/landlock/scoped_signal_test.c
+
 -- 
 2.34.1
 
