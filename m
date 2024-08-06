@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-115935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-115936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D47C948788
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 04:24:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE66294878B
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 04:24:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF14B1C22225
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:24:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C9B8B24842
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 02:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E393BBEB;
-	Tue,  6 Aug 2024 02:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1F13D984;
+	Tue,  6 Aug 2024 02:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3M8ygwe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ob1c3wKF"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742903BBC1
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 02:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED083F9EC
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 02:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722910962; cv=none; b=ltQz6mM4UD3Yegf/8P/8rZ+psLUpAXRB4jlVBiM2NR/ZVrM85YgWCfnj9P+nBivjbri5RYDbBfuIfNewirsMy4DORKN5Xd4YQ2NclLZQwveIddJjeWBz3JYa1rhsbqO5ENAhESO0AvsDUwJVwf4pdWGOvSztWaDXjwMBSMCmJMQ=
+	t=1722910971; cv=none; b=EOA2b2RRxtM4nsem2p+PdcIyQ/FvlAlddJHaN06594FFU8PJwn0xxkpDIFSOPiir1wgFWM+Q4LkhrYIbNleEOGxzxLdfqtxBhjbj7ds3/ol/KBG4ud0aBCH7ixjTKSICstWaZ7/mBHawQV5SFo7epN9TOeH2iJWyC2c06xNl7wQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722910962; c=relaxed/simple;
-	bh=IjcxerJ/w6zcO7CVkbRCQGN7PjVXJe410ca6cXuzOXs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nsVVBjOdOuSGMMRa13ZxNXAisqkMSChVs+2lbJG6Lq+AD9fJI/RpIqQMEglTHBgLaGvT6NQfBG4BurrAOT1vKuq6v1gXRmG8MIob1Z8hRdD/f8fmvd1Uf9SvggKBmZ4U166j201VOXDHc38sXbhFjb0dkXzlqSFzWuJdHwmwBbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f3M8ygwe; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1722910971; c=relaxed/simple;
+	bh=eYihf3op2OHUAz1BNkShdp05oFbUZonOr+MDyhBI/Ng=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=owhfegZQroeCXJzeHJZsxtYjbwitFG353xCi+qCuqdFgcPQ66pa4ZP4umGOhVJndG6fFTZnbs6w/I/3VM1OK/A26hfyK2486S7XORA/GaH+Reay38J1GwGBgMD3qTGyjJedtwyDBbcWH3jw6OjFK4e8eRg1amSeeETPIGj/LDgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ob1c3wKF; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722910959;
+	s=mimecast20190719; t=1722910969;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TcO4aBso1n53Fet0M+rmhmrd08KI6fj16ZgsqCTvwbk=;
-	b=f3M8ygweqonBSgbkiFTGn26W5Xzjs6NKf5nud6FZt7303gBIQ8nz07UgZtK9EEcdo1mygQ
-	f5gXQFC8rcl7raMqDcI3WCslFVPSPPVk0pFbEIolkbkuTt+5Fs/fyXiR/Vn7+FbWBxIYqq
-	5pOTY1fmYLjw3XaJbpr4tPDDAb22JaQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RWxz1G3y/9OaIyC01/ouvZE4hcE+DwSqP63LEoUSwSA=;
+	b=Ob1c3wKF/oV/k49GMbadUWCVWWVRacu/1kdX5hPaV5s8U1se++r3/ozLXNQliZJTlTGwQV
+	xsVJCXf7VVStdpb4jCTVpAAYIt3ON4/RqkpEAyOfyEsIbGcsF1UH2ioEXumB450tRwCe8R
+	bSLgkhgXFNrDUSjKWjh6o4LIq+DsRAs=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-400-3iluJ8VwOOGUfcVqimD1kg-1; Mon,
- 05 Aug 2024 22:22:36 -0400
-X-MC-Unique: 3iluJ8VwOOGUfcVqimD1kg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-0Qhq3f1BNLuzC-TPKqhlRw-1; Mon,
+ 05 Aug 2024 22:22:44 -0400
+X-MC-Unique: 0Qhq3f1BNLuzC-TPKqhlRw-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93CF31955F3B;
-	Tue,  6 Aug 2024 02:22:34 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9750A1955D55;
+	Tue,  6 Aug 2024 02:22:42 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.72.112.187])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0B21D1956046;
-	Tue,  6 Aug 2024 02:22:27 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 43ACE19560AE;
+	Tue,  6 Aug 2024 02:22:34 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: mst@redhat.com,
 	jasowang@redhat.com,
@@ -65,10 +67,14 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org,
-	inux-kernel@vger.kernel.org
-Subject: [PATCH net-next V6 0/4] virtio-net: synchronize op/admin state
-Date: Tue,  6 Aug 2024 10:22:20 +0800
-Message-ID: <20240806022224.71779-1-jasowang@redhat.com>
+	inux-kernel@vger.kernel.org,
+	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
+	Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+Subject: [PATCH net-next V6 1/4] virtio: rename virtio_config_enabled to virtio_config_core_enabled
+Date: Tue,  6 Aug 2024 10:22:21 +0800
+Message-ID: <20240806022224.71779-2-jasowang@redhat.com>
+In-Reply-To: <20240806022224.71779-1-jasowang@redhat.com>
+References: <20240806022224.71779-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,60 +84,129 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi All:
+Following patch will allow the config interrupt to be disabled by a
+specific driver via another boolean. So this patch renames
+virtio_config_enabled and relevant helpers to
+virtio_config_core_enabled.
 
-This series tries to synchronize the operstate with the admin state
-which allows the lower virtio-net to propagate the link status to the
-upper devices like macvlan.
+Cc: Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>
+Cc: Gia-Khanh Nguyen <gia-khanh.nguyen@oracle.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/virtio/virtio.c | 22 +++++++++++-----------
+ include/linux/virtio.h  |  4 ++--
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-This is done by toggling carrier during ndo_open/stop while doing
-other necessary serialization about the carrier settings during probe.
-
-While at it, also fix a race between probe and ndo_set_features as we
-didn't initalize the guest offload setting under rtnl lock.
-
-Changes since V5:
-
-- Fix sevreal typos
-- Include a new patch to synchronize probe with ndo_set_features
-
-Changes since V4:
-
-- do not update settings during ndo_open()
-- do not try to canel config noticiation during probe() as core make
-  sure the config notificaiton won't be triggered before probe is
-  done.
-- Tweak sevreal comments.
-
-Changes since V3:
-
-- when driver tries to enable config interrupt, check pending
-  interrupt and execute the nofitication change callback if necessary
-- do not unconditonally trigger the config space read
-- do not set LINK_UP flag in ndo_open/close but depends on the
-  notification change
-- disable config change notification until ndo_open()
-- read the link status under the rtnl_lock() to prevent a race with
-  ndo_open()
-
-Changes since V2:
-
-- introduce config_driver_disabled and helpers
-- schedule config change work unconditionally
-
-Thanks
-
-Jason Wang (4):
-  virtio: rename virtio_config_enabled to virtio_config_core_enabled
-  virtio: allow driver to disable the configure change notification
-  virtio-net: synchronize operstate with admin state on up/down
-  virtio-net: synchronize probe with ndo_set_features
-
- drivers/net/virtio_net.c | 78 +++++++++++++++++++++++++---------------
- drivers/virtio/virtio.c  | 59 +++++++++++++++++++++++-------
- include/linux/virtio.h   | 11 ++++--
- 3 files changed, 105 insertions(+), 43 deletions(-)
-
+diff --git a/drivers/virtio/virtio.c b/drivers/virtio/virtio.c
+index a9b93e99c23a..b24f08ff2a8c 100644
+--- a/drivers/virtio/virtio.c
++++ b/drivers/virtio/virtio.c
+@@ -127,7 +127,7 @@ static void __virtio_config_changed(struct virtio_device *dev)
+ {
+ 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+ 
+-	if (!dev->config_enabled)
++	if (!dev->config_core_enabled)
+ 		dev->config_change_pending = true;
+ 	else if (drv && drv->config_changed)
+ 		drv->config_changed(dev);
+@@ -143,17 +143,17 @@ void virtio_config_changed(struct virtio_device *dev)
+ }
+ EXPORT_SYMBOL_GPL(virtio_config_changed);
+ 
+-static void virtio_config_disable(struct virtio_device *dev)
++static void virtio_config_core_disable(struct virtio_device *dev)
+ {
+ 	spin_lock_irq(&dev->config_lock);
+-	dev->config_enabled = false;
++	dev->config_core_enabled = false;
+ 	spin_unlock_irq(&dev->config_lock);
+ }
+ 
+-static void virtio_config_enable(struct virtio_device *dev)
++static void virtio_config_core_enable(struct virtio_device *dev)
+ {
+ 	spin_lock_irq(&dev->config_lock);
+-	dev->config_enabled = true;
++	dev->config_core_enabled = true;
+ 	if (dev->config_change_pending)
+ 		__virtio_config_changed(dev);
+ 	dev->config_change_pending = false;
+@@ -322,7 +322,7 @@ static int virtio_dev_probe(struct device *_d)
+ 	if (drv->scan)
+ 		drv->scan(dev);
+ 
+-	virtio_config_enable(dev);
++	virtio_config_core_enable(dev);
+ 
+ 	return 0;
+ 
+@@ -340,7 +340,7 @@ static void virtio_dev_remove(struct device *_d)
+ 	struct virtio_device *dev = dev_to_virtio(_d);
+ 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+ 
+-	virtio_config_disable(dev);
++	virtio_config_core_disable(dev);
+ 
+ 	drv->remove(dev);
+ 
+@@ -455,7 +455,7 @@ int register_virtio_device(struct virtio_device *dev)
+ 		goto out_ida_remove;
+ 
+ 	spin_lock_init(&dev->config_lock);
+-	dev->config_enabled = false;
++	dev->config_core_enabled = false;
+ 	dev->config_change_pending = false;
+ 
+ 	INIT_LIST_HEAD(&dev->vqs);
+@@ -512,14 +512,14 @@ int virtio_device_freeze(struct virtio_device *dev)
+ 	struct virtio_driver *drv = drv_to_virtio(dev->dev.driver);
+ 	int ret;
+ 
+-	virtio_config_disable(dev);
++	virtio_config_core_disable(dev);
+ 
+ 	dev->failed = dev->config->get_status(dev) & VIRTIO_CONFIG_S_FAILED;
+ 
+ 	if (drv && drv->freeze) {
+ 		ret = drv->freeze(dev);
+ 		if (ret) {
+-			virtio_config_enable(dev);
++			virtio_config_core_enable(dev);
+ 			return ret;
+ 		}
+ 	}
+@@ -578,7 +578,7 @@ int virtio_device_restore(struct virtio_device *dev)
+ 	if (!(dev->config->get_status(dev) & VIRTIO_CONFIG_S_DRIVER_OK))
+ 		virtio_device_ready(dev);
+ 
+-	virtio_config_enable(dev);
++	virtio_config_core_enable(dev);
+ 
+ 	return 0;
+ 
+diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+index ecc5cb7b8c91..98db6390c1be 100644
+--- a/include/linux/virtio.h
++++ b/include/linux/virtio.h
+@@ -115,7 +115,7 @@ struct virtio_admin_cmd {
+  * struct virtio_device - representation of a device using virtio
+  * @index: unique position on the virtio bus
+  * @failed: saved value for VIRTIO_CONFIG_S_FAILED bit (for restore)
+- * @config_enabled: configuration change reporting enabled
++ * @config_core_enabled: configuration change reporting enabled by core
+  * @config_change_pending: configuration change reported while disabled
+  * @config_lock: protects configuration change reporting
+  * @vqs_list_lock: protects @vqs.
+@@ -132,7 +132,7 @@ struct virtio_admin_cmd {
+ struct virtio_device {
+ 	int index;
+ 	bool failed;
+-	bool config_enabled;
++	bool config_core_enabled;
+ 	bool config_change_pending;
+ 	spinlock_t config_lock;
+ 	spinlock_t vqs_list_lock;
 -- 
 2.31.1
 
