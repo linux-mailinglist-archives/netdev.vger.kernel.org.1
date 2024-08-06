@@ -1,167 +1,141 @@
-Return-Path: <netdev+bounces-116067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73A6948EF9
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:23:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13DA0948F00
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 14:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DDCF28EE51
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 947EA28F322
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6A81C232A;
-	Tue,  6 Aug 2024 12:23:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EAA1C232A;
+	Tue,  6 Aug 2024 12:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MJE+gEWQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1Jx+n+W"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6461D52B;
-	Tue,  6 Aug 2024 12:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1461BD015
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 12:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722947005; cv=none; b=WLJOfA3j8fNoOPuNuS21cj+Zm7kgHD4FTuMFr3He2p6bags+FPzFn/cRNzyxRlZ2QSRCQL4+J9buPn3zj3jWt3cR+11xQOVa+PcuYmhfuQD8phLCoUya1mxW1i0/5ANjK4PBhjbVjpSoob3gwKPGUnCx5Mxw6lXor7ErkoQjUN4=
+	t=1722947109; cv=none; b=jf3dbOUgsLRcsSSWAbvvlKlW5Blx30fNuMhJ/b2pOHxKxm1P3EC2Rvp0fWoPCmnBheK2UdYfY7sfbt5NtZIz2bA20lX0nc9TfMGBz2ukWbAsvGpnz8/XMSXwr9SRnxl3g3Ju+I3gdVni2gzV0gZPxc1aQxXfyNnfD6ee7CskwE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722947005; c=relaxed/simple;
-	bh=iE3v+w7X+H3QuCcpXjbNjpyhJCKEIZz/vtYpJzTQTHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RU/jqZhF+5CdWVpIk3WlJCbnmIz1TIKRU0u0PTBS8ROWGtilUQg2sZ8WcSTlvDydnuNAkhEdjPF8wLhIFa8RGuLwTpbkIRDwTNqdVR8o3oza9V0495nJ6ouJEbMu+YMIsI8k+Xw+0+HX7TtvA3s9Q1BmoCaTFcE6bRlkjGkRAKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MJE+gEWQ; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1722946993; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=PbvzMj1t65Zcd3dfiP3XdKCisD7bYocW3FUMZdTjJfM=;
-	b=MJE+gEWQzIqGgyVes3GZ4qZyhozZ/BMlFZzWzNnaUkzG/YKZp7XwP8twxdDzvIcYBP/upGAd0Y7U5VHSfZt/s9NG3AeZNY5f/oYVJo+cSHS87s0/vG2QVOgNugp4pjTAOXtgaC5Ca77DZBsGrXIHYGo6maq6/qOqUOdz4LcqdZk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WCFQHBI_1722946992;
-Received: from 30.221.130.83(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCFQHBI_1722946992)
-          by smtp.aliyun-inc.com;
-          Tue, 06 Aug 2024 20:23:13 +0800
-Message-ID: <b655fdb9-1d3f-4547-98f3-178ae4027bb3@linux.alibaba.com>
-Date: Tue, 6 Aug 2024 20:23:11 +0800
+	s=arc-20240116; t=1722947109; c=relaxed/simple;
+	bh=Zu5nxB10vxcRfClXXeGH1h4cUWEuoT+5MdHAObYksrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rU9Wut/06gVOj35bvETvK3Hcxf+9iNIm2zmc2fLP95hH5NDDrYNMU6FzBAJbnuBcFVCgtxMq2f6TDC00DunzTOUfSWGrAf/HwRUEq7bv/pipEOrNxAbd9KLdR2yzPVpXhIsXYv/+rxqQbs9nd4IRlGqCVYxsiq1T00eCEnJN4gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D1Jx+n+W; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722947106;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PactkZyJX0Ag5OakZPEWVf1Vde5VXyxtGsMlaDiA2ks=;
+	b=D1Jx+n+WLgy/rmeHRaN1b9yxx7t881oFAd5qiTFcCVd7ayTFQ/PEeycYgEr9p7ews+JNnj
+	50dk3+df1/ZBXYvKg4jjz6vmO+1WV79S77ALG8JA0SSf+XhZVfGGUNXSyHORRog/6rMqKl
+	xDdD28T6U0SaqKuGudSy+wcgPVxKEto=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-358-cJ_PPKrwOqefzjhlvnuI_w-1; Tue, 06 Aug 2024 08:25:05 -0400
+X-MC-Unique: cJ_PPKrwOqefzjhlvnuI_w-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-427ffa0c9c7so6854425e9.1
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 05:25:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722947104; x=1723551904;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PactkZyJX0Ag5OakZPEWVf1Vde5VXyxtGsMlaDiA2ks=;
+        b=a9/sTVXnxwp+FkNAvVRHHIZusbk96aZQVZCJOg7Lc0NBdY5amhYjDYqmrB9pZP/PtF
+         ukXj4oQ26G6kyla7v3u5Pu6HgUPYEscHTT/eP/OmJbFaEixzwX9Mu3DjS0JP/VA4Xx1a
+         ZkSDSphIDTj40BhZ1XEgWCywRdZxUEb14xCqQiEdTHqf1mZSNlW+/mmOXY2s4g0gxu++
+         F5Il9yJ+pQeC1jCKmaovQ8X1Fo39wWcEdKEBt3RBo9JIRO0hvuDKSSnPrYXAvY1TiT3R
+         +Rsho1wXNzVpUhpyhslBCHbRWUm0qtl94mMVluHz1UMD9OTILVkhDNdizCOTPQOABOMq
+         nEqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzDYzasBZ7bGXmtZdfXkv9qaeJWKBxE59rG31PHKgF72EOWLqlrJ3E24e+6LZNnKibo/s1AL/IRIm37UmLdk/M62MxEHyf
+X-Gm-Message-State: AOJu0YzUiGTtHqyrRUGsPex8tXp2MYVQbGhGXuvBuqQrt1dzgfzTsNDF
+	lxHnXq/LWQrjk61xz421PqH4sq3vPr3aV1rQFx9augg96SYFPSDHdjPCTl5j70WHhGud8Ur3NdF
+	q03mGrs/NLVKA6XmS5L4cw/XuE7e9KYbIQu/ryuh+TfXIsl0awIodhg==
+X-Received: by 2002:a05:600c:3b16:b0:426:6822:5aa8 with SMTP id 5b1f17b1804b1-428e6b2a6ffmr145329775e9.18.1722947103947;
+        Tue, 06 Aug 2024 05:25:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzVU9aAZD5lCQaBSPg04gI2QuPw/TNVwvVCA7OZglja6VMFhHphFFZfNM7ojHYJSFxf3gR6Q==
+X-Received: by 2002:a05:600c:3b16:b0:426:6822:5aa8 with SMTP id 5b1f17b1804b1-428e6b2a6ffmr145329395e9.18.1722947103082;
+        Tue, 06 Aug 2024 05:25:03 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:175:c9eb:d9d4:606a:87dc:59c7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89aa4bsm241485275e9.7.2024.08.06.05.25.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 05:25:02 -0700 (PDT)
+Date: Tue, 6 Aug 2024 08:24:57 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	inux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next V6 4/4] virtio-net: synchronize probe with
+ ndo_set_features
+Message-ID: <20240806082436-mutt-send-email-mst@kernel.org>
+References: <20240806022224.71779-1-jasowang@redhat.com>
+ <20240806022224.71779-5-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net/smc: introduce statistics for allocated
- ringbufs of link group
-To: Simon Horman <horms@kernel.org>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240805090551.80786-1-guwen@linux.alibaba.com>
- <20240805090551.80786-2-guwen@linux.alibaba.com>
- <20240806104925.GS2636630@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20240806104925.GS2636630@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240806022224.71779-5-jasowang@redhat.com>
 
+On Tue, Aug 06, 2024 at 10:22:24AM +0800, Jason Wang wrote:
+> We calculate guest offloads during probe without the protection of
+> rtnl_lock. This lead to race between probe and ndo_set_features. Fix
+> this by moving the calculation under the rtnl_lock.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
 
+Fixes tag pls?
 
-On 2024/8/6 18:49, Simon Horman wrote:
-> On Mon, Aug 05, 2024 at 05:05:50PM +0800, Wen Gu wrote:
->> Currently we have the statistics on sndbuf/RMB sizes of all connections
->> that have ever been on the link group, namely smc_stats_memsize. However
->> these statistics are incremental and since the ringbufs of link group
->> are allowed to be reused, we cannot know the actual allocated buffers
->> through these. So here introduces the statistic on actual allocated
->> ringbufs of the link group, it will be incremented when a new ringbuf is
->> added into buf_list and decremented when it is deleted from buf_list.
->>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
->>   include/uapi/linux/smc.h |  4 ++++
->>   net/smc/smc_core.c       | 52 ++++++++++++++++++++++++++++++++++++----
->>   net/smc/smc_core.h       |  2 ++
->>   3 files changed, 54 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/uapi/linux/smc.h b/include/uapi/linux/smc.h
->> index b531e3ef011a..d27b8dc50f90 100644
->> --- a/include/uapi/linux/smc.h
->> +++ b/include/uapi/linux/smc.h
->> @@ -127,6 +127,8 @@ enum {
->>   	SMC_NLA_LGR_R_NET_COOKIE,	/* u64 */
->>   	SMC_NLA_LGR_R_PAD,		/* flag */
->>   	SMC_NLA_LGR_R_BUF_TYPE,		/* u8 */
->> +	SMC_NLA_LGR_R_SNDBUF_ALLOC,	/* u64 */
->> +	SMC_NLA_LGR_R_RMB_ALLOC,	/* u64 */
->>   	__SMC_NLA_LGR_R_MAX,
->>   	SMC_NLA_LGR_R_MAX = __SMC_NLA_LGR_R_MAX - 1
->>   };
->> @@ -162,6 +164,8 @@ enum {
->>   	SMC_NLA_LGR_D_V2_COMMON,	/* nest */
->>   	SMC_NLA_LGR_D_EXT_GID,		/* u64 */
->>   	SMC_NLA_LGR_D_PEER_EXT_GID,	/* u64 */
->> +	SMC_NLA_LGR_D_SNDBUF_ALLOC,	/* u64 */
->> +	SMC_NLA_LGR_D_DMB_ALLOC,	/* u64 */
->>   	__SMC_NLA_LGR_D_MAX,
->>   	SMC_NLA_LGR_D_MAX = __SMC_NLA_LGR_D_MAX - 1
->>   };
->> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
->> index 71fb334d8234..73c7999fc74f 100644
->> --- a/net/smc/smc_core.c
->> +++ b/net/smc/smc_core.c
->> @@ -221,6 +221,37 @@ static void smc_lgr_unregister_conn(struct smc_connection *conn)
->>   	write_unlock_bh(&lgr->conns_lock);
->>   }
->>   
->> +/* must be called under lgr->{sndbufs|rmbs} lock */
->> +static inline void smc_lgr_buf_list_add(struct smc_link_group *lgr,
->> +					bool is_rmb,
->> +					struct list_head *buf_list,
->> +					struct smc_buf_desc *buf_desc)
+> ---
+>  drivers/net/virtio_net.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> Please do not use the inline keyword in .c files unless there is a
-> demonstrable reason to do so, e.g. performance. Rather, please allow
-> the compiler to inline functions as it sees fit.
-> 
-> The inline keyword in .h files is, of course, fine.
-> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index fc5196ca8d51..1d86aa07c871 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -6596,6 +6596,11 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  		netif_carrier_on(dev);
+>  	}
+>  
+> +	for (i = 0; i < ARRAY_SIZE(guest_offloads); i++)
+> +		if (virtio_has_feature(vi->vdev, guest_offloads[i]))
+> +			set_bit(guest_offloads[i], &vi->guest_offloads);
+> +	vi->guest_offloads_capable = vi->guest_offloads;
+> +
+>  	rtnl_unlock();
+>  
+>  	err = virtnet_cpu_notif_add(vi);
+> @@ -6604,11 +6609,6 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  		goto free_unregister_netdev;
+>  	}
+>  
+> -	for (i = 0; i < ARRAY_SIZE(guest_offloads); i++)
+> -		if (virtio_has_feature(vi->vdev, guest_offloads[i]))
+> -			set_bit(guest_offloads[i], &vi->guest_offloads);
+> -	vi->guest_offloads_capable = vi->guest_offloads;
+> -
+>  	pr_debug("virtnet: registered device %s with %d RX and TX vq's\n",
+>  		 dev->name, max_queue_pairs);
+>  
+> -- 
+> 2.31.1
 
-Yes.. I forgot to remove 'inline' when I moved these two helpers
-from .h file to .c file. I will fix this in next version.
-
-Thank you!
-
->> +{
->> +	list_add(&buf_desc->list, buf_list);
->> +	if (is_rmb) {
->> +		lgr->alloc_rmbs += buf_desc->len;
->> +		lgr->alloc_rmbs +=
->> +			lgr->is_smcd ? sizeof(struct smcd_cdc_msg) : 0;
->> +	} else {
->> +		lgr->alloc_sndbufs += buf_desc->len;
->> +	}
->> +}
->> +
->> +/* must be called under lgr->{sndbufs|rmbs} lock */
->> +static inline void smc_lgr_buf_list_del(struct smc_link_group *lgr,
->> +					bool is_rmb,
->> +					struct smc_buf_desc *buf_desc)
-> 
-> Ditto.
-> 
->> +{
->> +	list_del(&buf_desc->list);
->> +	if (is_rmb) {
->> +		lgr->alloc_rmbs -= buf_desc->len;
->> +		lgr->alloc_rmbs -=
->> +			lgr->is_smcd ? sizeof(struct smcd_cdc_msg) : 0;
->> +	} else {
->> +		lgr->alloc_sndbufs -= buf_desc->len;
->> +	}
->> +}
->> +
-> 
-> ...
-> 
 
