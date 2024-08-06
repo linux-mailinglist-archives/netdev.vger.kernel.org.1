@@ -1,123 +1,97 @@
-Return-Path: <netdev+bounces-116243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC159498C3
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:02:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65603949908
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:28:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58770283626
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:02:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 958E61C21485
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC51E154C11;
-	Tue,  6 Aug 2024 20:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429A815B12B;
+	Tue,  6 Aug 2024 20:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9WcwxM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793C37580A
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 20:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1D540875
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 20:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722974562; cv=none; b=B9tu+mt3mvjKiJrsUqgwGHoV7wF012DSK1vqAPahL0nyFWlGHvlW0BOuzRjUD9VXbucmrYV8WDRWsdvflZ6b9azLdiW7ZSAwL4FsM8tl4HiTunY73+M15C+8ziAPsdn9J2zuYIv5hGjCDIh8suiHFjQOV1Y5EXe49Ro0cYrKi4U=
+	t=1722976077; cv=none; b=Tgp3K5U3dotHQSXqEOwtJ21s1dLG9F/RxKNu1VhV6AhQhvaIwktj/WTKdLZFoHNHnbiYSIx0BNaPoQUCTgLR9AQvL4EAfbYk17OzpKIe21w05JR0QLvY6ruCprlgzepTSJui9GvdyfFrkGNj2JWkAoW+7XVldXxkBxAmUoLj6d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722974562; c=relaxed/simple;
-	bh=26g9Ojmfp/XWsHZOBrHzTOF07DGuNxqX2cmP6duZhec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5Ew3VOQVQraGLwl88SOuD0vXBzAcFXeoN2XX4JH1E0oUIoMpVMd7nrt6XCVs+5Nv2DTyHYOLDqgp9R4xSO+VC5UdpXS5E5iVqDwQoHzmAWbLJNftVkWD+82Kt+Guxc1ir/SDdw+ro2vmgRSoS9G+PJAthE4BKkmZDupE1uOyFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sbQO2-0006ca-Cw; Tue, 06 Aug 2024 22:02:26 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sbQO0-0051lx-Pq; Tue, 06 Aug 2024 22:02:24 +0200
-Received: from pengutronix.de (p5de45302.dip0.t-ipconnect.de [93.228.83.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 6C38431837B;
-	Tue, 06 Aug 2024 20:02:24 +0000 (UTC)
-Date: Tue, 6 Aug 2024 22:02:24 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Anup Kulkarni <quic_anupkulk@quicinc.com>
-Cc: manivannan.sadhasivam@linaro.org, thomas.kopp@microchip.com, 
-	mailhol.vincent@wanadoo.fr, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, quic_msavaliy@quicinc.com, quic_vdadhani@quicinc.com
-Subject: Re: [PATCH v1] can: mcp251xfd: Enable transceiver using gpio
-Message-ID: <20240806-industrious-augmented-crane-44239a-mkl@pengutronix.de>
-References: <20240806090339.785712-1-quic_anupkulk@quicinc.com>
+	s=arc-20240116; t=1722976077; c=relaxed/simple;
+	bh=FKSDW+ZR4DSreRKvARM/cUtSxbMj2F4rhzWq8rgeAbc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FXBYBB9KFwggtrkfe3Th8xdP0LSW/O4BNq3Kzgc2BYHe6GmTj+0Ofl5R/46dhZitSLOlM0n3ibwXloE7/U2hCdA5X3nNlzpROh9TFSSWaRJpoucTjPKAww/2lfOLD8OFXdmqAKB+iIx62P3sdla0LSjXVvWwpH3SAi3Z5QBQtSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9WcwxM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD02FC32786;
+	Tue,  6 Aug 2024 20:27:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722976076;
+	bh=FKSDW+ZR4DSreRKvARM/cUtSxbMj2F4rhzWq8rgeAbc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=M9WcwxM4KoGAdrYMzt61t8JM7oIAsO0GR1En2VkGZtPxybTkNGXYWhociEKUjr9+F
+	 3i17s+tpguTWPyRwvtjk+nzSvy/KjI7B53UMsWL8LDbPyCl4hTfuoZhOksSVacal2e
+	 aaDDjXsCevdSAELPlmFcbdpz189oosiKIS9Zaw09bCUtjx4TwYHdmm/dALmsEl1uu6
+	 0u6Cw3ap75LbyMWJVRBFQzDqpFArna6Crt4R2l+ghKL5s9GHJ011F9yVbJ20C4/o0N
+	 FJ5xvA0TfYruKLJEJs+f0LgSZCu2dHhFrleBAv9VTOCcGP9o+qH5n7eqJ0le6wSeXS
+	 lDRQ5ftF4d5NA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE06B39D6562;
+	Tue,  6 Aug 2024 20:27:56 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2namxbm3ltw7rz3l"
-Content-Disposition: inline
-In-Reply-To: <20240806090339.785712-1-quic_anupkulk@quicinc.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: linkwatch: use system_unbound_wq
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172297607550.1692635.2271755679626099885.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Aug 2024 20:27:55 +0000
+References: <20240805085821.1616528-1-edumazet@google.com>
+In-Reply-To: <20240805085821.1616528-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  5 Aug 2024 08:58:21 +0000 you wrote:
+> linkwatch_event() grabs possibly very contended RTNL mutex.
+> 
+> system_wq is not suitable for such work.
+> 
+> Inspired by many noisy syzbot reports.
+> 
+> 3 locks held by kworker/0:7/5266:
+>  #0: ffff888015480948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
+>  #0: ffff888015480948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
+>  #1: ffffc90003f6fd00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
+>  , at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
+>  #2: ffffffff8fa6f208 (rtnl_mutex){+.+.}-{3:3}, at: linkwatch_event+0xe/0x60 net/core/link_watch.c:276
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: linkwatch: use system_unbound_wq
+    https://git.kernel.org/netdev/net/c/3e7917c0cdad
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---2namxbm3ltw7rz3l
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 06.08.2024 14:33:39, Anup Kulkarni wrote:
-> Ensure the CAN transceiver is active during mcp251xfd_open() and
-> inactive during mcp251xfd_close() by utilizing
-> mcp251xfd_transceiver_mode(). Adjust GPIO_0 to switch between
-> NORMAL and STANDBY modes of transceiver.
-
-There is still the gpio support patch pending, which I have to review
-and test.
-
-https://lore.kernel.org/all/20240522-mcp251xfd-gpio-feature-v3-0-8829970269=
-c5@ew.tq-group.com/
-
-After this has been merged, we can have a look at this patch.
-
-It might actually not be needed anymore, as we can describe a CAN
-transceiver switched by a GPIO in the DT. Hopefully we don't run into
-some crazy circular dependencies or similar issues.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---2namxbm3ltw7rz3l
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmaygUwACgkQKDiiPnot
-vG9+QQgAggrdk32CWlLAoZBayn4qT025uirjqvwMZlzCEGSvX9lMXPfzM1dnOwRh
-8IK+cKSJMGE3ntnzj/2MSlm9P/PPgNvoysPDzDgf82FYiVRMzl5EWFXZQxeh3kLT
-ORG/syZSKhSvI+EfKRV9vVF7jPUi4Ibkvk8dvfNSvY9NZEiimHnH4YFXwe5guaRt
-xBmx37tijZDyHprPDD4TAUmUk9v5dXu7rjZDAbBZwayhRyD4ShSnEfu1vmr8bWaI
-hg2pT9jpQSWXaaPk02EoTb6yfh8GcFT3TfnBdpajWJMdZ0Pz/4jzihR7UKkwI0q1
-qASw8iKfTE3sO2ALEdyuRqmaM0ZQjA==
-=rN/9
------END PGP SIGNATURE-----
-
---2namxbm3ltw7rz3l--
 
