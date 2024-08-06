@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-116244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65603949908
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:28:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF4C7949909
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 22:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 958E61C21485
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:28:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFCDC1C2212E
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429A815B12B;
-	Tue,  6 Aug 2024 20:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F14B155C97;
+	Tue,  6 Aug 2024 20:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9WcwxM4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrUZz06T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1D540875
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 20:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7591440875;
+	Tue,  6 Aug 2024 20:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722976077; cv=none; b=Tgp3K5U3dotHQSXqEOwtJ21s1dLG9F/RxKNu1VhV6AhQhvaIwktj/WTKdLZFoHNHnbiYSIx0BNaPoQUCTgLR9AQvL4EAfbYk17OzpKIe21w05JR0QLvY6ruCprlgzepTSJui9GvdyfFrkGNj2JWkAoW+7XVldXxkBxAmUoLj6d4=
+	t=1722976081; cv=none; b=jF5bKqY3ADJnMbvLqV4y+Lq3fNSIqCtFG5Q7V7v/Y0+6y9ZgF1gZ4BPkSg9SQOPKUp7a5aH7z/uN7RD9DdOviY2Uf5s/PGX2AYNQu55oUCQijdfoURHT9FzMZLsrfgZGYxBzsRvDD1X7Etw6sMlDXTqk/GyGYW+4bXY5qdFQ2kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722976077; c=relaxed/simple;
-	bh=FKSDW+ZR4DSreRKvARM/cUtSxbMj2F4rhzWq8rgeAbc=;
+	s=arc-20240116; t=1722976081; c=relaxed/simple;
+	bh=PoyDOtS7MnlY8J10/7ZLaQYnqWZiUxqKFsv2laWRwKo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FXBYBB9KFwggtrkfe3Th8xdP0LSW/O4BNq3Kzgc2BYHe6GmTj+0Ofl5R/46dhZitSLOlM0n3ibwXloE7/U2hCdA5X3nNlzpROh9TFSSWaRJpoucTjPKAww/2lfOLD8OFXdmqAKB+iIx62P3sdla0LSjXVvWwpH3SAi3Z5QBQtSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9WcwxM4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD02FC32786;
-	Tue,  6 Aug 2024 20:27:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hm9uqpD/8vks6edJFZCWPd+PTEGDxMNRnWXGohiNXwpVuGSkXoxGh/nIz6S86MC1FkG4Y7eqPNtM5k8mDrJ0guoZFA2Z7YjS7BkgC/u3FK+YH6i1oopFvUv134bMXq3hMJWVIRXOuvUgwqU5G0NwdptjLPPccuwtW042G18/FU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CrUZz06T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00595C32786;
+	Tue,  6 Aug 2024 20:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722976076;
-	bh=FKSDW+ZR4DSreRKvARM/cUtSxbMj2F4rhzWq8rgeAbc=;
+	s=k20201202; t=1722976081;
+	bh=PoyDOtS7MnlY8J10/7ZLaQYnqWZiUxqKFsv2laWRwKo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=M9WcwxM4KoGAdrYMzt61t8JM7oIAsO0GR1En2VkGZtPxybTkNGXYWhociEKUjr9+F
-	 3i17s+tpguTWPyRwvtjk+nzSvy/KjI7B53UMsWL8LDbPyCl4hTfuoZhOksSVacal2e
-	 aaDDjXsCevdSAELPlmFcbdpz189oosiKIS9Zaw09bCUtjx4TwYHdmm/dALmsEl1uu6
-	 0u6Cw3ap75LbyMWJVRBFQzDqpFArna6Crt4R2l+ghKL5s9GHJ011F9yVbJ20C4/o0N
-	 FJ5xvA0TfYruKLJEJs+f0LgSZCu2dHhFrleBAv9VTOCcGP9o+qH5n7eqJ0le6wSeXS
-	 lDRQ5ftF4d5NA==
+	b=CrUZz06TwdkPJ98kwp0q9ok4TfSl073/0t83kOWB5usq3fqNXB6GYArTWxPffQYX3
+	 JOJCyYYupWdQELGurfas5XcVsYwlAdX3HmPrldcNtfQaOnpMVRRxos+a8mEBvnfcEg
+	 5l+Is/Am6Z4PYuZURfgoogxe+okPSyu/xpv3YJ0m2uJaBltj0jCyx8ZqPQtIiCYbEb
+	 hv1jaDipNlNx4vhxk7BzOrFnojaagFxF0Oxs7Qc++3wEhdIs91uvch4TISWZ8KuerT
+	 sJLvwVDpOYkobcC70YD069vHJOeTc1oduOe+OxzrjLhV7IDH2/VQya8bVtrD4q1Icl
+	 hEP143O5AGeow==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE06B39D6562;
-	Tue,  6 Aug 2024 20:27:56 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF383824F34;
+	Tue,  6 Aug 2024 20:28:00 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: linkwatch: use system_unbound_wq
+Subject: Re: [PATCH net-next] net: veth: Disable netpoll support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172297607550.1692635.2271755679626099885.git-patchwork-notify@kernel.org>
-Date: Tue, 06 Aug 2024 20:27:55 +0000
-References: <20240805085821.1616528-1-edumazet@google.com>
-In-Reply-To: <20240805085821.1616528-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com
+ <172297607950.1692635.16720160332883646837.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Aug 2024 20:27:59 +0000
+References: <20240805094012.1843247-1-leitao@debian.org>
+In-Reply-To: <20240805094012.1843247-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, leit@meta.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  5 Aug 2024 08:58:21 +0000 you wrote:
-> linkwatch_event() grabs possibly very contended RTNL mutex.
+On Mon,  5 Aug 2024 02:40:11 -0700 you wrote:
+> The current implementation of netpoll in veth devices leads to
+> suboptimal behavior, as it triggers warnings due to the invocation of
+> __netif_rx() within a softirq context. This is not compliant with
+> expected practices, as __netif_rx() has the following statement:
 > 
-> system_wq is not suitable for such work.
-> 
-> Inspired by many noisy syzbot reports.
-> 
-> 3 locks held by kworker/0:7/5266:
->  #0: ffff888015480948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3206 [inline]
->  #0: ffff888015480948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x90a/0x1830 kernel/workqueue.c:3312
->  #1: ffffc90003f6fd00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3207 [inline]
->  , at: process_scheduled_works+0x945/0x1830 kernel/workqueue.c:3312
->  #2: ffffffff8fa6f208 (rtnl_mutex){+.+.}-{3:3}, at: linkwatch_event+0xe/0x60 net/core/link_watch.c:276
+> 	lockdep_assert_once(hardirq_count() | softirq_count());
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: linkwatch: use system_unbound_wq
-    https://git.kernel.org/netdev/net/c/3e7917c0cdad
+  - [net-next] net: veth: Disable netpoll support
+    https://git.kernel.org/netdev/net-next/c/45160cebd6ac
 
 You are awesome, thank you!
 -- 
