@@ -1,117 +1,113 @@
-Return-Path: <netdev+bounces-116026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B17A0948D48
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:56:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B43948D49
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:56:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31331C224F0
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:56:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43542B24AB8
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207211C0DCC;
-	Tue,  6 Aug 2024 10:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A6E1C0DD3;
+	Tue,  6 Aug 2024 10:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="V6aedmQz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CTfbe3gi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AB11BD015
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751721C0DCC
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722941760; cv=none; b=dtFHYsoHITR335Oe50EeYnDT9Nb40ErQl+d+R6sguaTdSIh6y1DXAUNMOB7gisfjBY/xhlc6dRwLsrCTXZsqT0vWXM8d2SM8BLqyTBlnnzca9bFr9JTI56z6IEBwK8j/lkK1aB10wWzcGkigfDEtptOZ9ehsX2Vacx1ubp0XgUA=
+	t=1722941769; cv=none; b=nuxytAWJ7Hj2QXum0C+7uQQtTwqsOcFidEs5vz/TQ2KMO4eUEK15PVQOT2rbEDLCjp/4pHfRfRx6sOL2bKW1+S43h2KSAJM5MaABurLuE5/EE5cy/dXawZXfSYYrO7OY83RM1pwFX9zd8sZWjNKWjw5XYhddWUFfCutA/Dh1zBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722941760; c=relaxed/simple;
-	bh=VUb+OiMIzldvBddl22qgZ5q44Sc6Y9OF1U+iB37E934=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g7kaaPkS6xbf07nj16uEnzOP3mHjbbF/Rl9OxqI0oHUL1k0JRGquP4e5aR6Xw6YotLdT+St7xmIPE33wnH0dsQDrG1Hc0BwPnzTJyFGb9Lb/s1jX6SjYbqJyyrEFfOhwWrAEqvrkfeBCcRRDawa+3pfzVBHP2qkQD543FULFllk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=V6aedmQz; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-36ba3b06186so255583f8f.2
-        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 03:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1722941756; x=1723546556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ah1OeNL1GOaIuH3FhDmNjN62yMaxK8CYHJAcPTan14w=;
-        b=V6aedmQz09LMhcWKbXVnxN7I8vPE/+7xmZk6xO1vrLybdsbIsqrg7JIAYofP7MxlDT
-         z9ZHI5MyYpLtMcyrMfWqabJnEg/Qt35W3phEaztl4gQUvFF6UOTMhUQnyw0PEMTikVDy
-         KXUKXID3l8WRyh8ob6zBz2OhkyxHydCuxC1hqgeZX9eLRwsxPTLobI2WMHkyrSs9O5pp
-         8+xm02i5d3rdEpGF4b9zzAO0TUd7LFfTaJGMBkMmD8tJtOk3ebUvYM+Z+tghY8war3uP
-         3kpS+IBY3py1Sjee1PmJx/QILVs1RZschD5qViGnl0TZSiBP572ZGUxovSpM1GTu6ZYs
-         Szsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722941756; x=1723546556;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ah1OeNL1GOaIuH3FhDmNjN62yMaxK8CYHJAcPTan14w=;
-        b=adN19bPA22brjMi7CFStBMfEw5glnfJ4Z1HvPMDHwTj+3cHYlSDuyyrZF/EizM5wGB
-         hfSri7wU1K2d63PzrI9WUFhbgsd4Jo6sCRSKtEuXhSvzTpIJhro33wv0hVhZTQopzoAe
-         i2abQIkx49n1THheUomxjsmWOZG6KGoKfpPtgEcXkMW7skBownnJApeJ+1/4LsiISdAA
-         WL5xpUVowSNfle/IemlPPrpfMCxirOVekdAgE5hcOuC0FpuVfbyViEeL3QslvKLykYG4
-         Oe665rKyz98nWV2f20fWbE8Ieies2fZyeznSlMScHHKEQX1K7fQ59VMHNdGGIvSStnlP
-         6Lpw==
-X-Gm-Message-State: AOJu0YzZWPvYL7aTY0vjhc0rizgSVOHxf4iHV5XdyfVwn/uj5SBUJuAo
-	DFbJpTX6CCDsNWO6Oyj6DFozcC+217ldhxsgzcARfEv1QW3YDXTDy+CbZSEm7O5NFFDCiRdeg40
-	3
-X-Google-Smtp-Source: AGHT+IG9BYGXiMvIYVMEaBc+IaNs10Rvw6rTZLWQCsNiuy7+Mnh24NYW8+5feJw5sqNaMOXqbD48+w==
-X-Received: by 2002:a5d:62c8:0:b0:366:ef25:de51 with SMTP id ffacd0b85a97d-36bbc1bd492mr10845232f8f.49.1722941755837;
-        Tue, 06 Aug 2024 03:55:55 -0700 (PDT)
-Received: from debil.. ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0597a7sm12674250f8f.75.2024.08.06.03.55.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 03:55:55 -0700 (PDT)
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	daniel@iogearbox.net,
-	dsahern@kernel.org,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH iproute2-next] ip/netkit: print peer policy
-Date: Tue,  6 Aug 2024 13:55:48 +0300
-Message-ID: <20240806105548.3297249-1-razor@blackwall.org>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1722941769; c=relaxed/simple;
+	bh=4r6g+j1HuQHkPiMvEa2TStWpC2Wt8o8YOGOxGc9nMrY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ZgvZ/aMf8V0Ry+tbHwArCgSeh2ksVbfDxoYFyFyKOInzZ6Um9VDaRtMg0w4DEm7CBuCeMYtdtpZNpC4iOIUDry9rn/84X930blZflUBPC0AzLy5bMOJ0S0yDsg/YerdZor9ZPZ94RePxrAaCopPQTN98MvOi3tZ+u8FgdTHSQQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CTfbe3gi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CB6FC32786;
+	Tue,  6 Aug 2024 10:56:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722941769;
+	bh=4r6g+j1HuQHkPiMvEa2TStWpC2Wt8o8YOGOxGc9nMrY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=CTfbe3gih/rWMZpAmZUqZooktNp+oKf/Qx+DbDXX4IicA9GIvDITr1TXn4m71Ntht
+	 gu2mNsPQ7kPpXbbkjcJg92JoTsNC4Jt/T1xedKWTbWEwhP4dNpCyWqI1mwRRik+adm
+	 U5zA/Sqx+3DuuNwL3o2xZf0qq+vr9W8SzF/M6/F7pYK/N4ijRRMQn9Ss/BBCmK0Pq8
+	 /28JGYlSCty4VcuMnQEHd0bsermxWvApdb9E4ocZO4/kSQlCS/QCJCz+Fjgfs11yya
+	 3IuelS78VoF+h4yqMvSHsofcrJ7IHej2j/s/2Xd0DLYT9DghAwJo3LHe1hd2dwzJur
+	 ZEUn9WxR9AJgA==
+From: Simon Horman <horms@kernel.org>
+Date: Tue, 06 Aug 2024 11:56:01 +0100
+Subject: [PATCH net-next] bnx2x: Provide declaration of dmae_reg_go_c in
+ header
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240806-bnx2x-dec-v1-1-ae844ec785e4@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAEABsmYC/x3MTQqAIBBA4avErBsw+7OuEi1Sp5rNFBohRHdPW
+ n7weA9ECkwRxuKBQDdHPiSjKgtw+yIbIfts0Eo3yqgWrSSd0JPDtjPKV7br68FA7s9AK6f/NYH
+ QhULpgvl9P/daaRdlAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Sudarsana Kalluru <skalluru@marvell.com>, 
+ Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-Print also the peer policy, example:
-$ ip -d l sh dev netkit0
-...
- netkit mode l2 type primary policy blackhole peer policy forward
-...
+Provide declaration of dmae_reg_go_c in header.
+This symbol is defined in bnx2x_main.c.
+And used in that file and bnx2x_stats.c.
 
-Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+However, Sparse complains that there is no declaration
+of the symbol in dmae_reg_go_c nor is the symbol static.
+
+ .../bnx2x_main.c:291:11: warning: symbol 'dmae_reg_go_c' was not declared. Should it be static?
+
+Address this by moving the declaration from bnx2x_stats.c to bnx2x_reg.h.
+
+No functional change intended.
+Compile tested only.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
 ---
- ip/iplink_netkit.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_reg.h   | 2 ++
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c | 2 --
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/ip/iplink_netkit.c b/ip/iplink_netkit.c
-index a838a41078f9..49550a2e74ca 100644
---- a/ip/iplink_netkit.c
-+++ b/ip/iplink_netkit.c
-@@ -166,6 +166,12 @@ static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		print_string(PRINT_ANY, "policy", "policy %s ",
- 			     netkit_print_policy(policy));
- 	}
-+	if (tb[IFLA_NETKIT_PEER_POLICY]) {
-+		__u32 policy = rta_getattr_u32(tb[IFLA_NETKIT_PEER_POLICY]);
-+
-+		print_string(PRINT_ANY, "peer_policy", "peer policy %s ",
-+			     netkit_print_policy(policy));
-+	}
- }
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_reg.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_reg.h
+index 4e9215bce4ad..a018f251d198 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_reg.h
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_reg.h
+@@ -868,6 +868,8 @@
+ #define DORQ_REG_VF_TYPE_VALUE_0				 0x170258
+ #define DORQ_REG_VF_USAGE_CT_LIMIT				 0x170340
  
- static void netkit_print_help(struct link_util *lu,
--- 
-2.44.0
++extern const u32 dmae_reg_go_c[];
++
+ /* [RW 4] Initial activity counter value on the load request; when the
+    shortcut is done. */
+ #define DORQ_REG_SHRT_ACT_CNT					 0x170070
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
+index 2bb133ae61c3..ba6729f2f9c0 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_stats.c
+@@ -23,8 +23,6 @@
+ #include "bnx2x_cmn.h"
+ #include "bnx2x_sriov.h"
+ 
+-extern const u32 dmae_reg_go_c[];
+-
+ /* Statistics */
+ 
+ /*
 
 
