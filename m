@@ -1,196 +1,318 @@
-Return-Path: <netdev+bounces-116209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09749949796
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:31:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8232C9497C7
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 20:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B94E2284D33
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:31:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 050541F2456E
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 18:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E3D74C1B;
-	Tue,  6 Aug 2024 18:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC3E73477;
+	Tue,  6 Aug 2024 18:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ghpys+yy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jUdXpiVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED0780024
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 18:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312448F77;
+	Tue,  6 Aug 2024 18:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722969089; cv=none; b=rtogYr300wU0wd8178lQvKd0JIwCR6aHCQzSezfZcHNzCY9Vdif9WgUZrj0jMQR+/TFz4hQk95U0qnINWv4RRltvjMwdPHkudRAfp35DhT2zN0v5RP+nE7XJB2mvLFSEVzHxA9CjUlwb8oXHA9BwtlUIum3pNi/q8KBgsj52/4E=
+	t=1722970573; cv=none; b=ER4lE0bLUGZp0Kt8OqcradNLrUA2L6cuALkdhuT3VncjbL24ecE0zLdFrHRMmsbvWwzINmz+ze7rZ1afJF96JsNdh3fVPmUo3gOEGtIC5IU1hF3ix6meG8Hvi8nrJXyLh8D7vTx/5/BQEHXxrlzStSI+2WaGgRcufC+AwEhisR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722969089; c=relaxed/simple;
-	bh=gDFa+FKa5f3vrHKuqvFzBtyjVbQxMNl64L/P91eLMdI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Y3ZW6WpEvLnO4x3hRNd6S+W0/YU4GQLnJm8dHPGX0F3Q27qmXSHoOxHSHlk7paBOqi+v7RxOQMX0L0aVZBwwyF+kB/FLbmFdjQLwpOjIYwTfjHLzXXBY6M69mBHUh+cHr1d6f2f8NeAK9kwaGIXb7wG2pMVR0Xzkj9eQLZiKtDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ghpys+yy; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d7591a8b-f546-4742-a24c-6fefa876cf4c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722969084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+6CrD7owATAmOySky9OSR3ONjlv0xP6/AXzwWJC+46A=;
-	b=Ghpys+yySSdYNwrxrxpK/Qnah0Oo7xOivfxEKaJiSOsmLT1ky4kVS5SHe1nNh9JnghJUEf
-	pK/kZLmjIuuOpwUOOFtSZSponIqTQF121eUr4nB+mVvxNsPB43wo5Yvo8D68MHzNcHQgKg
-	e1Zdvi47h/0nw7v5pULsJSkHL6sQEHw=
-Date: Tue, 6 Aug 2024 11:31:16 -0700
+	s=arc-20240116; t=1722970573; c=relaxed/simple;
+	bh=THNYFhk/xMl+vqWgBJbr90t5dkzSKwtKiudHlGJQB8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a1gJF7H+lT+QnEckNoSSHh2hwLsrkIxHQpPHxQ+f74S+VgwJgdrkty0X8chlTVdjH+G+RYh0906c5DzzSnQhMv1LMODAjt7HP+nxilB5GBxkfanel7ffxCHM+hCCvw0qyQ6IBnakyYH+vMogSgZrErwNBNnNSpN6vE3nx8/PM3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jUdXpiVZ; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2f032cb782dso9113991fa.3;
+        Tue, 06 Aug 2024 11:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722970569; x=1723575369; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pf9/0bfQnePOOTaXBk6YMsUHrh8Q8JuFZwwu+99uXH4=;
+        b=jUdXpiVZVNN/ya4cntwMQ8mF+eVrSX4OEXX/I48vO/Dd9ADsbBMgfw85osWgTcUajz
+         YPhwri5O9lBGrjKn64k5AI2asWqywYnu066pBxraSaO8u8jfBzLhpZooDB327tm479S1
+         uuvTu0ucjBKVA7gaFGTkT0Wh7hRMr9GSR8+wWgq87P3hMCtDsdeq1zyi1AaerPJg4C8i
+         4xmGumgPTeNbZihl0qZHyYdO1jTyz+7LyqMph4TIlkGlsuAbz4gp9eysJF5wHGTgjmUU
+         B5XHO1cRtWBcqO/Z59UmZrXVzkmEczqwoGdz/7r2cgRm/tngBmngo/K2eD6wvMFzi/6M
+         ezEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722970569; x=1723575369;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Pf9/0bfQnePOOTaXBk6YMsUHrh8Q8JuFZwwu+99uXH4=;
+        b=MfftDmULGUujuoZLeyUsh3kvKWU41/oSYf2tJxyQjx+nSStwIS4TSeF24pNQiwHo+O
+         0Ks565tY37AnOiK0U3o4YZ08otcrJOKBxqwvopHKhSd5bcP8FHb/z2miWKMuuvCCSVuF
+         jf9h4RZ0wzpBKRfbkCOUy+FUnDGPa033kuFDmztL2k8fCG17k+cmEth2j4AB1OH/cLps
+         kAM4yeqKQD8bB643E4WrAADwa6NF0m9VLoFBaeig7cLDi0nkfAPWf94F+CTb4YNa0dP3
+         uWSaExXj95w2jw6UQHHlmvoc4SK3nBhIs2rM994qC4FAcG3OLFa2GFRRdcJIQrPWPwTh
+         4qjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX1bG6DH/HJBpuyhKdijlosgmiCeocJnarm02twrXSwXBAyV7MDz1wQxWsy+4VyZIUcsRdyan8E0pqDVE96KJYd2oM6mLTRn+4XQsj2EtgYF9MRimmFlpRHgLXcd0ILuX6Xp0GBXOZyMS3o8axClSxpIF8NInciOa9BqQ==
+X-Gm-Message-State: AOJu0YxTRp1JCME2G1Sl4bnqNXoGZQG0FhbqxGCQ9XyDOB+kpN/RfTPr
+	gYian136xDx9pk9NBo4OLjUWo789XiUyyfbhPwn+iukJHw3kmu7L
+X-Google-Smtp-Source: AGHT+IE4j3d2MbABxSDMFiENvEQ+bNAsQAZt/hODsl/X0IxURgYF6oPEul6YrvfjSgyayvsvcJx8vg==
+X-Received: by 2002:a05:651c:218:b0:2ef:2608:2e47 with SMTP id 38308e7fff4ca-2f15aa92e41mr117683181fa.13.1722970568665;
+        Tue, 06 Aug 2024 11:56:08 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f15e187584sm15388571fa.4.2024.08.06.11.56.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 11:56:07 -0700 (PDT)
+Date: Tue, 6 Aug 2024 21:56:04 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrew Halaney <ahalaney@redhat.com>, bpf@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jose Abreu <joabreu@synopsys.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	Sneh Shah <quic_snehshah@quicinc.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RFC net-next v4 00/14] net: stmmac: convert stmmac "pcs"
+ to phylink
+Message-ID: <rq2wbrm2q3bizgxcnl6kmdiycpldjl6rllsqqgpzfhsfodnd3o@ymdfbxq2gj5j>
+References: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [syzbot] [bpf?] BUG: spinlock recursion in bpf_lru_push_free
-Content-Language: en-GB
-To: syzbot <syzbot+d6fb861ed047a275747a@syzkaller.appspotmail.com>,
- andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com
-References: <000000000000b3e63e061eed3f6b@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <000000000000b3e63e061eed3f6b@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
 
+Hi Russell
 
-On 8/5/24 3:36 AM, syzbot wrote:
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    3d650ab5e7d9 selftests/bpf: Fix a btf_dump selftest failure
+On Mon, Aug 05, 2024 at 11:24:01AM +0100, Russell King (Oracle) wrote:
+> Hi,
+> 
+> Changes since version 3:
+> - added Andrew's reviewed-bys
+> - fixed kernel-doc for dwmac_pcs_isr()
+> - updated patch 11 commit message
+> - fixed build error reported by Jakub
+> - add Sneh Shah to Cc list (for testing 2.5G modes)
+> 
+> Bartosz - I know you've given your tested-by this morning, I will be
+> adding that after posting this series, so please don't think it's been
+> lost!
 
-The failure is not due to this patch.
+Got this series tested on my DW GMAC v3.73a + Micrel KSZ9031RNX PHY
+with the in-band link status management enabled. The same positive result
+as before, on v1-v2:
+[  294.651324] stmmaceth 1f060000.ethernet eth1: configuring for inband/rgmii-rxid link mode
+[  294.582498] stmmaceth 1f060000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-0
+[  294.594308] stmmaceth 1f060000.ethernet eth1: PHY [stmmac-1:03] driver [RTL8211E Gigabit Ethernet] (irq=POLL)
+[  294.605453] dwmac1000: Master AXI performs any burst length
+[  294.611899] stmmaceth 1f060000.ethernet: invalid port speed
+[  294.618229] stmmaceth 1f060000.ethernet eth1: No Safety Features support found
+[  294.626412] stmmaceth 1f060000.ethernet eth1: No MAC Management Counters available
+[  294.634912] stmmaceth 1f060000.ethernet eth1: IEEE 1588-2008 Advanced Timestamp supported
+[  294.644380] stmmaceth 1f060000.ethernet eth1: registered PTP clock
+[  294.651324] stmmaceth 1f060000.ethernet eth1: configuring for inband/rgmii-rxid link mode
+...
+[  298.772917] stmmaceth 1f060000.ethernet eth1: Link is Up - 1Gbps/Full - flow control rx/tx
 
-> git tree:       bpf-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=13a4c1a1980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=5efb917b1462a973
-> dashboard link: https://syzkaller.appspot.com/bug?extid=d6fb861ed047a275747a
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/630e210de8d9/disk-3d650ab5.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/3576ca35748a/vmlinux-3d650ab5.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/5b33f099abfa/bzImage-3d650ab5.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+d6fb861ed047a275747a@syzkaller.appspotmail.com
->
-> BUG: spinlock recursion on CPU#1, syz.4.1173/11483
+So feel free to add:
+Tested-by: Serge Semin <fancer.lancer@gmail.com>
 
-Actually this is a known issue and has been reported a few times in the past.
+Please note the warning: "stmmaceth 1f060000.ethernet: invalid port
+speed" in the log above. This is a false negative warning since my
+network devices isn't of MAC2MAC-type and there is no snps,ps-speed
+property in my dts. So having the priv->hw.ps set to zero should be
+fine. That said I guess we need to add the warning fix to the 14/14
+patch which would permit the plat_stmmacenet_data::mac_port_sel_speed
+field being zero.
 
->   lock: 0xffff888046908300, .magic: dead4ead, .owner: syz.4.1173/11483, .owner_cpu: 1
-> CPU: 1 UID: 0 PID: 11483 Comm: syz.4.1173 Not tainted 6.10.0-syzkaller-12666-g3d650ab5e7d9 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-> Call Trace:
->   <TASK>
->   __dump_stack lib/dump_stack.c:93 [inline]
->   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
->   debug_spin_lock_before kernel/locking/spinlock_debug.c:87 [inline]
->   do_raw_spin_lock+0x227/0x370 kernel/locking/spinlock_debug.c:115
->   __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
->   _raw_spin_lock_irqsave+0xe1/0x120 kernel/locking/spinlock.c:162
->   bpf_lru_list_push_free kernel/bpf/bpf_lru_list.c:318 [inline]
->   bpf_common_lru_push_free kernel/bpf/bpf_lru_list.c:538 [inline]
->   bpf_lru_push_free+0x1a7/0xb60 kernel/bpf/bpf_lru_list.c:561
->   htab_lru_map_delete_elem+0x613/0x700 kernel/bpf/hashtab.c:1475
->   bpf_prog_6f5f05285f674219+0x43/0x4c
->   bpf_dispatcher_nop_func include/linux/bpf.h:1252 [inline]
->   __bpf_prog_run include/linux/filter.h:691 [inline]
->   bpf_prog_run include/linux/filter.h:698 [inline]
->   __bpf_trace_run kernel/trace/bpf_trace.c:2406 [inline]
->   bpf_trace_run2+0x2ec/0x540 kernel/trace/bpf_trace.c:2447
->   trace_contention_begin+0x117/0x140 include/trace/events/lock.h:95
+> 
+> Previous cover messages from earlier posts below:
+> 
+> This is version 3 of the series switching stmmac to use phylink PCS
+> isntead of going behind phylink's back.
+> 
+> Changes since version 2:
+> - Adopted some of Serge's feedback.
+> - New patch: adding ethqos_pcs_set_inband() for qcom-ethqos so we
+>   have one place to modify for AN control rather than many.
+> - New patch: pass the stmmac_priv structure into the pcs_set_ane()
+>   method.
+> - New patch: remove pcs_get_adv_lp() early, as this is only for TBI
+>   and RTBI, support for which we dropped in an already merged patch.
+> - Provide stmmac_pcs structure to encapsulate the pointer to
+>   stmmac_priv, PCS MMIO address pointer and phylink_pcs structure.
+> - Restructure dwmac_pcs_config() so we can eventually share code
+>   with dwmac_ctrl_ane().
+> - New patch: move dwmac_ctrl_ane() into stmmac_pcs.c, and share code.
+> - New patch: pass the stmmac_pcs structure into dwmac_pcs_isr().
+> - New patch: similar to Serge's patch, rename the PCS registers, but
+>   use STMMAC_PCS_ as the prefix rather than just PCS_ which is too
+>   generic.
+> - New patch: incorporate "net: stmmac: Activate Inband/PCS flag
+>   based on the selected iface" from Serge.
+> 
+> On the subject of whether we should have two PCS instances, I
+> experimented with that and have now decided against it. Instead,
+> dwmac_pcs_config() now tests whether we need to fiddle with the
+> PCS control register or not.
+> 
 
-The tracepoint trace_contention_begin is the reason for spinlock recursion.
-The trace_contention_begin is in
-   queued_spin_lock_slowpath(...) {
-     ...
-     trace_contention_begin(lock, LCB_F_SPIN);
-     ...
-   }
+> Note that I prefer not to have multiple layers of indirection, but
+> instead prefer a library-style approach, which is why I haven't
+> turned the PCS support into something that's self contained with
+> a method in the MAC driver to grab the RGSMII status.
 
-And the bpf prog attached to trace_contention_begin() will go though spin_lock path again
-and this may cause dead lock.
+I understand the reason of your choice in this case. As a result a
+some part of my changes haven't been merged in into your series. But I
+deliberately selected the approach with having the simple PCS
+HW-interface callbacks utilized for a self-contained internal PCS
+implementation. Here is why:
+1. Signify that the DW GMAC and DW QoS Eth internal PCSs are the
+same.
+2. Reduce the amount of code.
+3. Collects the entire PCS implementation in a single place which
+improves the code readability.
+4. The PCS ops initialization is implemented in the same way as the
+PTP, MMC and EST (and likely FPE in some time in future), in the
+hwif.c and the interface/core callbacks in the dedicated files
+(stmmac_ptp.c, mmc_core.c, stmmac_est.c, etc). So the PCS
+implementation would be in general unified with what has been done for
+PTP/MMC/EST/etc. 
+5. ...
 
+Taking that into account I am still convinced that my approach worth
+to be implemented. Hope you won't mind, if after your series is merged
+in I'll submit another patch set which would introduce some of my
+PCS-changes not included into your patch set. Like this:
+1. Move the mac_device_info instance to being defined in the
+stmmac_priv structure (new patch, so to drop the stmmac_priv pointer
+from stmmac_pcs).
+2. Introduce stmmac_priv::pcsaddr (to have the PCS CSR base address
+defined in the same way as for PTP/MMC/EST/etc).
+3. Provide the HWIF ops:
+   stmmac_pcs_ops {
+        pcs_get_config_reg;
+        pcs_enable_irq;
+        pcs_disable_irq;
+   } for DW GMAC and DW QoS Eth.
+4. Move PCS implementation to stmmac_pcs.c
+5. Direct using the plat_stmmacenet_data::mac_port_sel_speed field
+instead of the mac_device_info::ps.
+6. Some more cleanups like converting the struct stmmac_hwif_entry
+field from void-pointers to the typed-pointers, ...
 
->   __pv_queued_spin_lock_slowpath+0x114/0xdc0 kernel/locking/qspinlock.c:402
->   pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
->   queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
->   queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
->   lockdep_lock+0x1b0/0x2b0 kernel/locking/lockdep.c:143
->   graph_lock kernel/locking/lockdep.c:169 [inline]
->   lookup_chain_cache_add kernel/locking/lockdep.c:3803 [inline]
->   validate_chain+0x21d/0x5900 kernel/locking/lockdep.c:3836
->   __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
->   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
->   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
->   _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
->   htab_lock_bucket+0x1a4/0x370 kernel/bpf/hashtab.c:167
->   htab_lru_map_delete_node+0x161/0x840 kernel/bpf/hashtab.c:817
->   __bpf_lru_list_shrink_inactive kernel/bpf/bpf_lru_list.c:225 [inline]
->   __bpf_lru_list_shrink+0x156/0x9d0 kernel/bpf/bpf_lru_list.c:271
->   bpf_lru_list_pop_free_to_local kernel/bpf/bpf_lru_list.c:345 [inline]
->   bpf_common_lru_pop_free kernel/bpf/bpf_lru_list.c:452 [inline]
->   bpf_lru_pop_free+0xd84/0x1a70 kernel/bpf/bpf_lru_list.c:504
->   prealloc_lru_pop kernel/bpf/hashtab.c:308 [inline]
->   __htab_lru_percpu_map_update_elem+0x242/0x9b0 kernel/bpf/hashtab.c:1355
->   bpf_percpu_hash_update+0x11a/0x200 kernel/bpf/hashtab.c:2421
->   bpf_map_update_value+0x347/0x540 kernel/bpf/syscall.c:181
->   generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1889
->   bpf_map_do_batch+0x3e0/0x690 kernel/bpf/syscall.c:5218
->   __sys_bpf+0x377/0x810
->   __do_sys_bpf kernel/bpf/syscall.c:5817 [inline]
->   __se_sys_bpf kernel/bpf/syscall.c:5815 [inline]
->   __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5815
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fed319779f9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fed327ee048 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-> RAX: ffffffffffffffda RBX: 00007fed31b05f80 RCX: 00007fed319779f9
-> RDX: 0000000000000038 RSI: 0000000020000580 RDI: 000000000000001a
-> RBP: 00007fed319e58ee R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 000000000000000b R14: 00007fed31b05f80 R15: 00007ffcf9a1d7f8
->   </TASK>
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+-Serge(y)
+
+> 
+> -----
+> 
+> This is version 2 of the series switching stmmac to use phylink PCS
+> instead of going behind phylink's back.
+> 
+> Changes since version 1:
+> - Addition of patches from Serge Semin to allow RGMII to use the
+>   "PCS" code even if priv->dma_cap.pcs is not set (including tweaks
+>   by me.)
+> - Restructuring of the patch set to be a more logical split.
+> - Leave the pcs_ctrl_ane methods until we've worked out what to do
+>   with the qcom-ethqos driver (this series may still end up breaking
+>   it, but at least we will now successfully compile.)
+> 
+> A reminder that what I want to hear from this patch set are the results
+> of testing - and thanks to Serge, the RGMII paths were exercised, but
+> I have not had any results for the SGMII side of this.
+> 
+> There are still a bunch of outstanding questions:
+> 
+> - whether we should be using two separate PCS instances, one for
+>   RGMII and another for SGMII. If the PCS hardware is not present,
+>   but are using RGMII mode, then we probably don't want to be
+>   accessing the registers that would've been there for SGMII.
+> - what the three interrupts associated with the PCS code actually
+>   mean when they fire.
+> - which block's status we're reading in the pcs_get_state() method,
+>   and whether we should be reading that for both RGMII and SGMII.
+> - whether we need to activate phylink's inband mode in more cases
+>   (so that the PCS/MAC status gets read and used for the link.)
+> 
+> There's probably more questions to be asked... but really the critical
+> thing is to shake out any breakage from making this conversion. Bear
+> in mind that I have little knowledge of this hardware, so this
+> conversion has been done somewhat blind using only what I can observe
+> from the current driver.
+> 
+> ------
+> 
+> As I noted recently in a thread (and was ignored) stmmac sucks. (I
+> won't hide my distain for drivers that make my life as phylink
+> maintainer more difficult!)
+> 
+> One of the contract conditions for using phylink is that the driver
+> will _not_ mess with the netif carrier. stmmac developers/maintainers
+> clearly didn't read that, because stmmac messes with the netif
+> carrier, which destroys phylink's guarantee that it'll make certain
+> calls in a particular order (e.g. it won't call mac_link_up() twice
+> in a row without an intervening mac_link_down().) This is clearly
+> stated in the phylink documentation.
+> 
+> Thus, this patch set attempts to fix this. Why does it mess with the
+> netif carrier? It has its own independent PCS implementation that
+> completely bypasses phylink _while_ phylink is still being used.
+> This is not acceptable. Either the driver uses phylink, or it doesn't
+> use phylink. There is no half-way house about this. Therefore, this
+> driver needs to either be fixed, or needs to stop using phylink.
+> 
+> Since I was ignored when I brought this up, I've hacked together the
+> following patch set - and it is hacky at the moment. It's also broken
+> because of recentl changes involving dwmac-qcom-ethqos.c - but there
+> isn't sufficient information in the driver for me to fix this. The
+> driver appears to use SGMII at 2500Mbps, which simply does not exist.
+> What interface mode (and neg_mode) does phylink pass to pcs_config()
+> in each of the speeds that dwmac-qcom-ethqos.c is interested in.
+> Without this information, I can't do that conversion. So for the
+> purposes of this, I've just ignored dwmac-qcom-ethqos.c (which means
+> it will fail to build.)
+> 
+> The patch splitup is not ideal, but that's not what I'm interested in
+> here. What I want to hear is the results of testing - does this switch
+> of the RGMII/SGMII "pcs" stuff to a phylink_pcs work for this driver?
+> 
+> Please don't review the patches, but you are welcome to send fixes to
+> them. Once we know that the overall implementation works, then I'll
+> look at how best to split the patches. In the mean time, the present
+> form is more convenient for making changes and fixing things.
+> 
+> There is still more improvement that's needed here.
+> 
+> Thanks.
+> 
+>  drivers/net/ethernet/stmicro/stmmac/Makefile       |   2 +-
+>  drivers/net/ethernet/stmicro/stmmac/common.h       |  25 ++--
+>  .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    |  13 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwmac1000.h    |  13 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac1000_core.c   | 110 +++++++-------
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4.h       |  13 +-
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c  |  99 +++++++------
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h         |  24 ++--
+>  .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   | 111 +-------------
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  30 +---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c   |  63 ++++++++
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h   | 160 ++++++++++-----------
+>  12 files changed, 306 insertions(+), 357 deletions(-)
+>  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.c
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
