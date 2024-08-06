@@ -1,172 +1,117 @@
-Return-Path: <netdev+bounces-116025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4329948D3E
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:52:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B17A0948D48
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 12:56:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30571C236A4
-	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:52:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31331C224F0
+	for <lists+netdev@lfdr.de>; Tue,  6 Aug 2024 10:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544221C2312;
-	Tue,  6 Aug 2024 10:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207211C0DCC;
+	Tue,  6 Aug 2024 10:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V84xQF8W"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="V6aedmQz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCCD1C2311
-	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AB11BD015
+	for <netdev@vger.kernel.org>; Tue,  6 Aug 2024 10:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722941529; cv=none; b=jtWvCAly1xOP/C+EOLvw+FmvjHadqgiwdp1h3Pn2z0u1SvePYjLYvYv3xsHe99JFj90hADMQufp4ova8hATaXTM63BVj+ZfwI3rlN3HaZROAWrq2fYYLKrSD79UcJQ9ZT5wOguQmbF+38LvKIjJE/GOo/TZACqNQYzmtPDGrR5s=
+	t=1722941760; cv=none; b=dtFHYsoHITR335Oe50EeYnDT9Nb40ErQl+d+R6sguaTdSIh6y1DXAUNMOB7gisfjBY/xhlc6dRwLsrCTXZsqT0vWXM8d2SM8BLqyTBlnnzca9bFr9JTI56z6IEBwK8j/lkK1aB10wWzcGkigfDEtptOZ9ehsX2Vacx1ubp0XgUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722941529; c=relaxed/simple;
-	bh=+al5FmN+16P24jfwWkecabgEd+xqc7Jwsjs9HXuUbLk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hcK2gF9sjYKtGyx0osGzwl+DvWXC1Rqwh6lVpXACb/pZldnpV2KvqMxLRPv1Z0fu6s8OryPaRb1S/xbxOsVyEvbRnshX9Ae359K/VCYH35m2RjzYapfC+a6+gr5x2bPkv9wq6oGPdwFGHFwyWAzWG0o2j9rH2jagx/uACUz4t7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V84xQF8W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A801C32786;
-	Tue,  6 Aug 2024 10:52:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722941528;
-	bh=+al5FmN+16P24jfwWkecabgEd+xqc7Jwsjs9HXuUbLk=;
-	h=From:Date:Subject:To:Cc:From;
-	b=V84xQF8WVMRn5GhPF31w6xnhf43JeB3DthohuV5AVuCLVj88AtBm6+BTKq8fkyReE
-	 WcaMuePO+aQn+mODpPaKBKFG9zt2JiIQAUyWJ3sKq2mYfNALh607fH+UiGmnKcJZqZ
-	 L5fVHFawgDE0fJuMMaVCfv9cSqv5HC6dE067ZlC5hYzi9rpucGdBHHMzsBVDWjzS/x
-	 5980q/y7dTm7s9ez/ZKetHlv6XXTMPaKq0oTcH1oeO2BZOfUdm7zOl3C6+3F/aA5wi
-	 RWkMvfsDJm6VcP5e30cMNBLYyAuT9dTo5CVlRbxSZJU++lzl+RT7sRehkuy1qjn4F8
-	 UCiro8FbDQiqw==
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 06 Aug 2024 11:52:01 +0100
-Subject: [PATCH net-next] net: stmmac: xgmac: use const char arrays for
- string constants
+	s=arc-20240116; t=1722941760; c=relaxed/simple;
+	bh=VUb+OiMIzldvBddl22qgZ5q44Sc6Y9OF1U+iB37E934=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g7kaaPkS6xbf07nj16uEnzOP3mHjbbF/Rl9OxqI0oHUL1k0JRGquP4e5aR6Xw6YotLdT+St7xmIPE33wnH0dsQDrG1Hc0BwPnzTJyFGb9Lb/s1jX6SjYbqJyyrEFfOhwWrAEqvrkfeBCcRRDawa+3pfzVBHP2qkQD543FULFllk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=V6aedmQz; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-36ba3b06186so255583f8f.2
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 03:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1722941756; x=1723546556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ah1OeNL1GOaIuH3FhDmNjN62yMaxK8CYHJAcPTan14w=;
+        b=V6aedmQz09LMhcWKbXVnxN7I8vPE/+7xmZk6xO1vrLybdsbIsqrg7JIAYofP7MxlDT
+         z9ZHI5MyYpLtMcyrMfWqabJnEg/Qt35W3phEaztl4gQUvFF6UOTMhUQnyw0PEMTikVDy
+         KXUKXID3l8WRyh8ob6zBz2OhkyxHydCuxC1hqgeZX9eLRwsxPTLobI2WMHkyrSs9O5pp
+         8+xm02i5d3rdEpGF4b9zzAO0TUd7LFfTaJGMBkMmD8tJtOk3ebUvYM+Z+tghY8war3uP
+         3kpS+IBY3py1Sjee1PmJx/QILVs1RZschD5qViGnl0TZSiBP572ZGUxovSpM1GTu6ZYs
+         Szsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722941756; x=1723546556;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ah1OeNL1GOaIuH3FhDmNjN62yMaxK8CYHJAcPTan14w=;
+        b=adN19bPA22brjMi7CFStBMfEw5glnfJ4Z1HvPMDHwTj+3cHYlSDuyyrZF/EizM5wGB
+         hfSri7wU1K2d63PzrI9WUFhbgsd4Jo6sCRSKtEuXhSvzTpIJhro33wv0hVhZTQopzoAe
+         i2abQIkx49n1THheUomxjsmWOZG6KGoKfpPtgEcXkMW7skBownnJApeJ+1/4LsiISdAA
+         WL5xpUVowSNfle/IemlPPrpfMCxirOVekdAgE5hcOuC0FpuVfbyViEeL3QslvKLykYG4
+         Oe665rKyz98nWV2f20fWbE8Ieies2fZyeznSlMScHHKEQX1K7fQ59VMHNdGGIvSStnlP
+         6Lpw==
+X-Gm-Message-State: AOJu0YzZWPvYL7aTY0vjhc0rizgSVOHxf4iHV5XdyfVwn/uj5SBUJuAo
+	DFbJpTX6CCDsNWO6Oyj6DFozcC+217ldhxsgzcARfEv1QW3YDXTDy+CbZSEm7O5NFFDCiRdeg40
+	3
+X-Google-Smtp-Source: AGHT+IG9BYGXiMvIYVMEaBc+IaNs10Rvw6rTZLWQCsNiuy7+Mnh24NYW8+5feJw5sqNaMOXqbD48+w==
+X-Received: by 2002:a5d:62c8:0:b0:366:ef25:de51 with SMTP id ffacd0b85a97d-36bbc1bd492mr10845232f8f.49.1722941755837;
+        Tue, 06 Aug 2024 03:55:55 -0700 (PDT)
+Received: from debil.. ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0597a7sm12674250f8f.75.2024.08.06.03.55.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 03:55:55 -0700 (PDT)
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	daniel@iogearbox.net,
+	dsahern@kernel.org,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH iproute2-next] ip/netkit: print peer policy
+Date: Tue,  6 Aug 2024 13:55:48 +0300
+Message-ID: <20240806105548.3297249-1-razor@blackwall.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240806-xgmac-const-char-arrays-v1-1-8d91ec885d45@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAFAAsmYC/x2MQQqDMBAAvyJ77kJMQyP9ivQQ49buoavsBomIf
- 2/ocWBmTjBSJoNnd4LSzsarNOhvHeRPkoWQ58bgnQ9ucA+syzdlzKtYwWYoJtV0GIbYz8Pdxyn
- EDK3elN5c/+cRhAoK1QKv6/oBrfzMJnMAAAA=
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jiri Slaby <jirislaby@kernel.org>, Jose Abreu <joabreu@synopsys.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org
-X-Mailer: b4 0.14.0
+Content-Transfer-Encoding: 8bit
 
-Jiri Slaby advises me that the preferred mechanism for declaring
-string constants is static char arrays, so use that here.
+Print also the peer policy, example:
+$ ip -d l sh dev netkit0
+...
+ netkit mode l2 type primary policy blackhole peer policy forward
+...
 
-This mostly reverts
-commit 1692b9775e74 ("net: stmmac: xgmac: use #define for string constants")
-
-That commit was a fix for
-commit 46eba193d04f ("net: stmmac: xgmac: fix handling of DPP safety error for DMA channels").
-The fix being replacing const char * with #defines in order to address
-compilation failures observed on GCC 6 through 10.
-
-Compile tested only.
-No functional change intended.
-
-Suggested-by: Jiri Slaby <jirislaby@kernel.org>
-Link: https://lore.kernel.org/netdev/485dbc5a-a04b-40c2-9481-955eaa5ce2e2@kernel.org/
-Signed-off-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    | 69 +++++++++++-----------
- 1 file changed, 34 insertions(+), 35 deletions(-)
+ ip/iplink_netkit.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index f196cd99d510..cbf2dd976ab1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -846,42 +846,41 @@ static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
- 	{ false, "UNKNOWN", "Unknown Error" }, /* 31 */
- };
+diff --git a/ip/iplink_netkit.c b/ip/iplink_netkit.c
+index a838a41078f9..49550a2e74ca 100644
+--- a/ip/iplink_netkit.c
++++ b/ip/iplink_netkit.c
+@@ -166,6 +166,12 @@ static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 		print_string(PRINT_ANY, "policy", "policy %s ",
+ 			     netkit_print_policy(policy));
+ 	}
++	if (tb[IFLA_NETKIT_PEER_POLICY]) {
++		__u32 policy = rta_getattr_u32(tb[IFLA_NETKIT_PEER_POLICY]);
++
++		print_string(PRINT_ANY, "peer_policy", "peer policy %s ",
++			     netkit_print_policy(policy));
++	}
+ }
  
--#define DPP_RX_ERR "Read Rx Descriptor Parity checker Error"
--#define DPP_TX_ERR "Read Tx Descriptor Parity checker Error"
--
-+static const char dpp_rx_err[] = "Read Rx Descriptor Parity checker Error";
-+static const char dpp_tx_err[] = "Read Tx Descriptor Parity checker Error";
- static const struct dwxgmac3_error_desc dwxgmac3_dma_dpp_errors[32] = {
--	{ true, "TDPES0", DPP_TX_ERR },
--	{ true, "TDPES1", DPP_TX_ERR },
--	{ true, "TDPES2", DPP_TX_ERR },
--	{ true, "TDPES3", DPP_TX_ERR },
--	{ true, "TDPES4", DPP_TX_ERR },
--	{ true, "TDPES5", DPP_TX_ERR },
--	{ true, "TDPES6", DPP_TX_ERR },
--	{ true, "TDPES7", DPP_TX_ERR },
--	{ true, "TDPES8", DPP_TX_ERR },
--	{ true, "TDPES9", DPP_TX_ERR },
--	{ true, "TDPES10", DPP_TX_ERR },
--	{ true, "TDPES11", DPP_TX_ERR },
--	{ true, "TDPES12", DPP_TX_ERR },
--	{ true, "TDPES13", DPP_TX_ERR },
--	{ true, "TDPES14", DPP_TX_ERR },
--	{ true, "TDPES15", DPP_TX_ERR },
--	{ true, "RDPES0", DPP_RX_ERR },
--	{ true, "RDPES1", DPP_RX_ERR },
--	{ true, "RDPES2", DPP_RX_ERR },
--	{ true, "RDPES3", DPP_RX_ERR },
--	{ true, "RDPES4", DPP_RX_ERR },
--	{ true, "RDPES5", DPP_RX_ERR },
--	{ true, "RDPES6", DPP_RX_ERR },
--	{ true, "RDPES7", DPP_RX_ERR },
--	{ true, "RDPES8", DPP_RX_ERR },
--	{ true, "RDPES9", DPP_RX_ERR },
--	{ true, "RDPES10", DPP_RX_ERR },
--	{ true, "RDPES11", DPP_RX_ERR },
--	{ true, "RDPES12", DPP_RX_ERR },
--	{ true, "RDPES13", DPP_RX_ERR },
--	{ true, "RDPES14", DPP_RX_ERR },
--	{ true, "RDPES15", DPP_RX_ERR },
-+	{ true, "TDPES0", dpp_tx_err },
-+	{ true, "TDPES1", dpp_tx_err },
-+	{ true, "TDPES2", dpp_tx_err },
-+	{ true, "TDPES3", dpp_tx_err },
-+	{ true, "TDPES4", dpp_tx_err },
-+	{ true, "TDPES5", dpp_tx_err },
-+	{ true, "TDPES6", dpp_tx_err },
-+	{ true, "TDPES7", dpp_tx_err },
-+	{ true, "TDPES8", dpp_tx_err },
-+	{ true, "TDPES9", dpp_tx_err },
-+	{ true, "TDPES10", dpp_tx_err },
-+	{ true, "TDPES11", dpp_tx_err },
-+	{ true, "TDPES12", dpp_tx_err },
-+	{ true, "TDPES13", dpp_tx_err },
-+	{ true, "TDPES14", dpp_tx_err },
-+	{ true, "TDPES15", dpp_tx_err },
-+	{ true, "RDPES0", dpp_rx_err },
-+	{ true, "RDPES1", dpp_rx_err },
-+	{ true, "RDPES2", dpp_rx_err },
-+	{ true, "RDPES3", dpp_rx_err },
-+	{ true, "RDPES4", dpp_rx_err },
-+	{ true, "RDPES5", dpp_rx_err },
-+	{ true, "RDPES6", dpp_rx_err },
-+	{ true, "RDPES7", dpp_rx_err },
-+	{ true, "RDPES8", dpp_rx_err },
-+	{ true, "RDPES9", dpp_rx_err },
-+	{ true, "RDPES10", dpp_rx_err },
-+	{ true, "RDPES11", dpp_rx_err },
-+	{ true, "RDPES12", dpp_rx_err },
-+	{ true, "RDPES13", dpp_rx_err },
-+	{ true, "RDPES14", dpp_rx_err },
-+	{ true, "RDPES15", dpp_rx_err },
- };
- 
- static void dwxgmac3_handle_dma_err(struct net_device *ndev,
+ static void netkit_print_help(struct link_util *lu,
+-- 
+2.44.0
 
 
