@@ -1,157 +1,155 @@
-Return-Path: <netdev+bounces-116586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE24294B180
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:38:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB6A94B183
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41F5AB244B7
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:38:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A462B248FE
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9EF145B39;
-	Wed,  7 Aug 2024 20:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14BA145B38;
+	Wed,  7 Aug 2024 20:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="E+eKG3g1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b96naOm6"
+	dkim=pass (2048-bit key) header.d=beims.me header.i=@beims.me header.b="CEx/5bhW";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="H3H9+oWz"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow8-smtp.messagingengine.com (flow8-smtp.messagingengine.com [103.168.172.143])
+Received: from fout5-smtp.messagingengine.com (fout5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7053B63CB;
-	Wed,  7 Aug 2024 20:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B933F13DDC0;
+	Wed,  7 Aug 2024 20:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723063107; cv=none; b=kCX8YP7bBLLAtG15np1YTFmTi+ELHMFklQXs19Bi1PWjns/ehdn+IcxhLnXMIZQRtbAXiso+zIC/cNaW6FxSEGFYXkh/bMnTE7ChYMNURbvbAu7Bod71DBtu+N8lL1D5xhwbpwOe5oBj0t5e8Mi2P0N06igxLlrSnM3ke4VMY8w=
+	t=1723063214; cv=none; b=GsdWM0mvs8riHhcM05RcQ9dLu8FC5ZUtneZtmV9UZg8sFuT2c6ync0iKjI0Ydqdi1fUQbL6t6pB5UGaryVi5Aa4Oceq/YTBDiK0U7FY6t0XjlW9/fWu06onaJm3M4VcEhV+hyXHdLuCPKlXHNveUp/EY8tdFDRnn4UoYimeLWXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723063107; c=relaxed/simple;
-	bh=uKf+fXnSqFS/bfmB6/2soazJM9laLMq3cqYVbv0cfa4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=okuajIQ20zp8obPLAMl3eXvoRV20L8nC4G8tttPk2vIyfFO6rFHeD3LiqgzeYPpkQEklWAmrF5kYJY5JdXkV8j9Q45is9bDpDReH9mLFJbDP45gRS0WE6VJnwwKt6w35tbcPkuTdPh3X2rOvRccPY99FNxWRm8G0H5TGvvhTuQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=E+eKG3g1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=b96naOm6; arc=none smtp.client-ip=103.168.172.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailflow.nyi.internal (Postfix) with ESMTP id 6FC3B200CD6;
-	Wed,  7 Aug 2024 16:38:24 -0400 (EDT)
-Received: from wimap24 ([10.202.2.84])
-  by compute3.internal (MEProxy); Wed, 07 Aug 2024 16:38:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	s=arc-20240116; t=1723063214; c=relaxed/simple;
+	bh=blkBUwuYNV1jdiG9n3ec84ATSv7sX+2uYwyxvMbrnlQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kl/AfW0WQrk+CKdkyiGLLRZGyyRkoL4wsjwihFeV0gWRIYoUpqzVMs5pCr6Mz9pCnzVs1sbkRJtVaqQMtItc14gu50NcAeHLhnpwNJV8Axu9/ZH6HqnwsAENdC3PdP2KDVBcGSqfoQdiVeP0U1ykYztryVCdk5jkQXEgsKAlNVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=beims.me; spf=pass smtp.mailfrom=beims.me; dkim=pass (2048-bit key) header.d=beims.me header.i=@beims.me header.b=CEx/5bhW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=H3H9+oWz; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=beims.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=beims.me
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailfout.nyi.internal (Postfix) with ESMTP id EA886138DD80;
+	Wed,  7 Aug 2024 16:40:10 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Wed, 07 Aug 2024 16:40:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=beims.me; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1723063104;
-	 x=1723070304; bh=jyuTeJGDcuQF3lzGu4CM7mjVX08aa1yYpmFdb0KuMkg=; b=
-	E+eKG3g18OxvHvRzsf6ur2aTpQZ9AzI8YfWphmPd0cP/woMQ4Y3QVK1CWtwyfC0y
-	cHTeaFxhMH1uSN585hjjDqb87LprAEz9VK+9wE/aaFBd7xWr105XIJW2HiO3CCBT
-	YUhe5sKACQ2+4qxt6XjnpRHJuImN2bklW8zmfcEAFP7Lou43NRM5qKq7IDAugdai
-	IYwG14dKzFFps6YPHSCr8q3rMVjgC39MnFUcYuPCpyq6euXGEsVrw9WBPuceev/e
-	X1NgaLyTbyhKd84J12Ahg8rIJO1jqyZ0gWDxM/DU4rzl1Ec33URQG7nXdRjdZ8vH
-	rYKBskImd2bUqczPtF0xdQ==
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1723063210;
+	 x=1723149610; bh=gcQqS4Nvw3oVR6X1QO70/HzE1Wr/SNsmwf90YobtWTs=; b=
+	CEx/5bhW09PdllSKPc+RQvB5sAQJMIjAModMHZtf4adcZIN8reAKRDrVEze8nw25
+	4MQaxdsW3+nB2G/MnTTrXmrkSxUFGoAoPI8SsiB+vyfmYyiavhWpHYkWaSA/o+Pt
+	QLMEV54ZFxTABaNEIR3Uj9qN1AHK5owOMQ1bPeTZGYlsbcdjChtrtWTynfsoZyB3
+	jBnoeq49u213jL1aIkhfPtyeVBwMwf6I913s+NeQfMWlb45gqR9ZPwDzi55lzvZl
+	aMQavA6w1jbbrIie/fKVguBH7PXoMD/pYTa41hHHQga8ZqC6r5v5r+sf3yvYCJxC
+	o2WZaNZKyN/s8GJr+k1VNg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1723063104; x=
-	1723070304; bh=jyuTeJGDcuQF3lzGu4CM7mjVX08aa1yYpmFdb0KuMkg=; b=b
-	96naOm6Tmp/fSG/qTnRg0+F8M1bkR3E6CbDhH/DghMASO9cQQZXdb+LxscNKRR+9
-	7Fk34G4TL+jkTV6cjuk1odFzQ1NlafI85IkaEBBVXbJELeIamzWo5vQoPavmZTfY
-	EGzqi+M7c6MwPerN2+6XDk2A51wIsc06LLhESfT3n6f9myyWLNa39joOmjaiSdLt
-	SzS10PV4vNew1tgyh0/ihr7Ntoyai8cLMI1B3uhwDG/7G0ganJJiQD826YGpf2KG
-	2ihMc9VIedRkjSJ8h41pV7ucNf0knq9CR0h2UorMPi98cUM3wsY95XiAAvnhtdyQ
-	Yxn+V/lEX1dz2j6fa+wjQ==
-X-ME-Sender: <xms:P9uzZoVoJoJIjaEe5XEiV6Vz5awp6yXK3aNbyHjzzdb688Le77cVyg>
-    <xme:P9uzZska1OThlfuL529FWZ7jFVAvlL_-1R36To_6GXNnKTB-FP2Sqy5ZaGcAdLlLS
-    9zEmspZ_yWq253PvA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrledtgdduheduucetufdoteggodetrfdotf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1723063210; x=
+	1723149610; bh=gcQqS4Nvw3oVR6X1QO70/HzE1Wr/SNsmwf90YobtWTs=; b=H
+	3H9+oWzmCH7q+Ht+i284uG0J0DLScMPq8j3wo05s2VPr9hCz5ekfk3M9abJy/6T6
+	gYfyOgL3ClHTGKm6yYuuk/XoluWUEd5VYVRj2m1NF5Livx/tNhySzaKFRA8a93DI
+	6gyzsqB9gGUhVJXZziIUBNpM9x31n7f6pzJyfESW1HTJTIsGwaxDNkYcpMrY+S4v
+	XnrG91BxWxOfpFlooTyxg03IY+Jie5Wy7TiZFptqVjtfH3sQZbQP5yQcKcm0hotn
+	ldSUIH5cu5iJYqqXaNA5PA7/GSGAnEpYb1BoDvzs5xDFccTx7svffXRqGUspwPqy
+	fIchm5WXpXQPOKicbPqUw==
+X-ME-Sender: <xms:qtuzZjFxgfhhUOupIBdlvye-FdoN4-RZy68WKu30K6XIcnIURiZpgw>
+    <xme:qtuzZgVU8TnmjI28CmY8MMMb3LhV3XlatXn69r2iOYFYnrpdqu-S3Kb2-xvwDmb8V
+    bf--woQ3lAjpxiEvFQ>
+X-ME-Received: <xmr:qtuzZlKcOT-pYdn4gO3k-5o3FhIvMrID9a8XLwng6iNqNC7eXhENzs7whupchc6MDg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrledtgdduhedvucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredt
-    redttdenucfhrhhomhepfdffrghnihgvlhcuighufdcuoegugihusegugihuuhhurdighi
-    iiqeenucggtffrrghtthgvrhhnpeegleeifffhudduueekhfeifefgffegudelveejfeff
-    ueekgfdtledvvdeffeeiudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggprhgtphhtthhopedt
-X-ME-Proxy: <xmx:P9uzZsZVDPXINqpCub6toZIfUIDIuTh3l6jzddHJgnwx2_r89u3NLg>
-    <xmx:P9uzZnXVu3YW6dwEw3EnpmWxOTpqjh1vEfBYofPdY4Wfly-3pdODuA>
-    <xmx:P9uzZinF4Mlz89xrmdz6CAXUdJY2qvYf7M_Iu_78yJQ_n0TQTC1o9Q>
-    <xmx:P9uzZsdkibaV9xNpNuXB04-0ANSmk58v-xCPvUz-06Pb_akK4WqliA>
-    <xmx:QNuzZgtMODcHgERAtcl3T8Em_VIMuS7bsgnj1q6tBLy5D_CdPIoIaSjn>
-Feedback-ID: i6a694271:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 9567E25E006A; Wed,  7 Aug 2024 16:38:23 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdejnecuhfhrohhmpeftrghf
+    rggvlhcuuegvihhmshcuoehrrghfrggvlhessggvihhmshdrmhgvqeenucggtffrrghtth
+    gvrhhnpeejieejvdelgeduveejgeeltdevieefteejleeiieejgeeihfelleehtdegudei
+    ieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehrrg
+    hfrggvlhessggvihhmshdrmhgvpdhnsggprhgtphhtthhopedt
+X-ME-Proxy: <xmx:qtuzZhGndCpJc4kIoZyNZ_3CzsB9hxJ3vmFRpVJQKINWz7yZYf5-mg>
+    <xmx:qtuzZpUstN_arVCzhotyH2QspzMCki5qg_QDHYcE3JEsuIegV1R8kg>
+    <xmx:qtuzZsN1B_CjUqx0l31gl5PFWCHaRzD-232qDIghDfQRIwlNNR_TJA>
+    <xmx:qtuzZo3nWwPreQ_Vk0OzFcT1NwFGl3I0WHxkDXJH5WBOQ3Oeh1Etsw>
+    <xmx:qtuzZuWw737ZV9JHTniMVYgh5NPYY0TFgxQy0RdnNxflmjnYac4Zudlj>
+Feedback-ID: idc214666:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 7 Aug 2024 16:40:07 -0400 (EDT)
+Message-ID: <48d37621-13d4-42e0-8cd2-c4b031149b1e@beims.me>
+Date: Wed, 7 Aug 2024 17:40:06 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 07 Aug 2024 13:38:03 -0700
-From: "Daniel Xu" <dxu@dxuuu.xyz>
-To: "Alexander Lobakin" <alexandr.lobakin@intel.com>,
- "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>
-Cc: "Larysa Zaremba" <larysa.zaremba@intel.com>,
- "Michal Swiatkowski" <michal.swiatkowski@linux.intel.com>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- =?UTF-8?Q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>,
- "Magnus Karlsson" <magnus.karlsson@intel.com>,
- "Maciej Fijalkowski" <maciej.fijalkowski@intel.com>,
- "Jonathan Lemon" <jonathan.lemon@gmail.com>,
- "toke@redhat.com" <toke@redhat.com>, "Lorenzo Bianconi" <lorenzo@kernel.org>,
- "David Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Jesse Brandeburg" <jesse.brandeburg@intel.com>,
- "John Fastabend" <john.fastabend@gmail.com>,
- "Yajun Deng" <yajun.deng@linux.dev>, "Willem de Bruijn" <willemb@google.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
-Message-Id: <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
-In-Reply-To: <20220628194812.1453059-33-alexandr.lobakin@intel.com>
-References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
- <20220628194812.1453059-33-alexandr.lobakin@intel.com>
-Subject: Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to GRO from
- netif_receive_skb_list()
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 3/4] net: fec: make PPS channel configurable
+Content-Language: pt-BR
+To: Francesco Dolcini <francesco@dolcini.it>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: Francesco Dolcini <francesco.dolcini@toradex.com>, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240807144349.297342-1-francesco@dolcini.it>
+ <20240807144349.297342-4-francesco@dolcini.it>
+From: Rafael Beims <rafael@beims.me>
+In-Reply-To: <20240807144349.297342-4-francesco@dolcini.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Alexander,
-
-On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
-> cpumap has its own BH context based on kthread. It has a sane batch
-> size of 8 frames per one cycle.
-> GRO can be used on its own, adjust cpumap calls to the
-> upper stack to use GRO API instead of netif_receive_skb_list() which
-> processes skbs by batches, but doesn't involve GRO layer at all.
-> It is most beneficial when a NIC which frame come from is XDP
-> generic metadata-enabled, but in plenty of tests GRO performs better
-> than listed receiving even given that it has to calculate full frame
-> checksums on CPU.
-> As GRO passes the skbs to the upper stack in the batches of
-> @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
-> device where the frame comes from, it is enough to disable GRO
-> netdev feature on it to completely restore the original behaviour:
-> untouched frames will be being bulked and passed to the upper stack
-> by 8, as it was with netif_receive_skb_list().
+On 07/08/2024 11:43, Francesco Dolcini wrote:
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
 >
-> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+> Depending on the SoC where the FEC is integrated into the PPS channel
+> might be routed to different timer instances. Make this configurable
+> from the devicetree.
+>
+> When the related DT property is not present fallback to the previous
+> default and use channel 0.
+>
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
 > ---
->  kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 38 insertions(+), 5 deletions(-)
+>   drivers/net/ethernet/freescale/fec_ptp.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
 >
-
-AFAICT the cpumap + GRO is a good standalone improvement. I think
-cpumap is still missing this.
-
-I have a production use case for this now. We want to do some intelligent
-RX steering and I think GRO would help over list-ified receive in some cases.
-We would prefer steer in HW (and thus get existing GRO support) but not all
-our NICs support it. So we need a software fallback.
-
-Are you still interested in merging the cpumap + GRO patches?
-
-Thanks,
-Daniel
+> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+> index 6f0f8bf61752..8e17fd0c8e6d 100644
+> --- a/drivers/net/ethernet/freescale/fec_ptp.c
+> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
+> @@ -529,8 +529,6 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
+>   	unsigned long flags;
+>   	int ret = 0;
+>   
+> -	fep->pps_channel = DEFAULT_PPS_CHANNEL;
+> -
+>   	if (rq->type == PTP_CLK_REQ_PPS) {
+>   		fep->reload_period = PPS_OUPUT_RELOAD_PERIOD;
+>   
+> @@ -712,12 +710,16 @@ void fec_ptp_init(struct platform_device *pdev, int irq_idx)
+>   {
+>   	struct net_device *ndev = platform_get_drvdata(pdev);
+>   	struct fec_enet_private *fep = netdev_priv(ndev);
+> +	struct device_node *np = fep->pdev->dev.of_node;
+>   	int irq;
+>   	int ret;
+>   
+>   	fep->ptp_caps.owner = THIS_MODULE;
+>   	strscpy(fep->ptp_caps.name, "fec ptp", sizeof(fep->ptp_caps.name));
+>   
+> +	fep->pps_channel = DEFAULT_PPS_CHANNEL;
+> +	of_property_read_u32(np, "fsl,pps-channel", &fep->pps_channel);
+> +
+>   	fep->ptp_caps.max_adj = 250000000;
+>   	fep->ptp_caps.n_alarm = 0;
+>   	fep->ptp_caps.n_ext_ts = 0;
+Tested-by: rafael.beims@toradex.com
 
