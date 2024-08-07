@@ -1,186 +1,157 @@
-Return-Path: <netdev+bounces-116585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FE4994B176
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:36:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE24294B180
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2AF7B21C08
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:36:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41F5AB244B7
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0369145A07;
-	Wed,  7 Aug 2024 20:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9EF145B39;
+	Wed,  7 Aug 2024 20:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YqBP6XIP"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="E+eKG3g1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b96naOm6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from flow8-smtp.messagingengine.com (flow8-smtp.messagingengine.com [103.168.172.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A9E1411DF
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 20:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7053B63CB;
+	Wed,  7 Aug 2024 20:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723062988; cv=none; b=nghhAVyYSADMpzArBszewn33Nu3i62W8sbw9HAU33A0+nFTe0JQ3RpGujsTL/usuZoN/pl0hSCb8GNBOFyoOnrEVbF31Xj5DbPbD+er0nngCVOTDmQVDFSxTANHwPJ57yhV2VNSbhNGrCBsaa62fFjvyyJm524qd7knnz7F2jEg=
+	t=1723063107; cv=none; b=kCX8YP7bBLLAtG15np1YTFmTi+ELHMFklQXs19Bi1PWjns/ehdn+IcxhLnXMIZQRtbAXiso+zIC/cNaW6FxSEGFYXkh/bMnTE7ChYMNURbvbAu7Bod71DBtu+N8lL1D5xhwbpwOe5oBj0t5e8Mi2P0N06igxLlrSnM3ke4VMY8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723062988; c=relaxed/simple;
-	bh=bbCc2pCRg3JOqn02+cskHNGVFdHAHz0drvc2iVTuwbY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FZXQrnrqF5jIxMkkTaowyGrfwn9KvHlPRSeaFleNGIV7Q8hyRnwzLWpQ76WxBijrLHANa+woOSlZP8OOh6fl/5b7A7+zU7SAo8qnZrMeUomTWvU7OEYRfS8DQv6ssgL3DoTH9y7eEJ7cnu7blIsi6wb7eJn3/rUXH2drxeslXMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YqBP6XIP; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723062987; x=1754598987;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bbCc2pCRg3JOqn02+cskHNGVFdHAHz0drvc2iVTuwbY=;
-  b=YqBP6XIP/3runQSqoxeCe2O8Q+98PnTNCKTUewR0aWGoKSUFxZzfAcZy
-   CpxdFgAlkVjARXNJXhQ6EoVVdLbYgNuJqVgfHOQKKYdqbYZTTetIL1vbK
-   I8GpkNcInHsdfSiSezwjKR/LGNb5bi9PCSv1zi7b58tirAvL75hBcLsLV
-   3JwNWXwvZoafrEkjGRujIINU+77d/Fqmw0dEaML3+UBxU8URjV/3KHME/
-   +6m9eCGtJDZes2qiLFuinq8HqwelG2Gv0v1LAMLP8nvY894S/8iJBKvnC
-   m1uMVCPkSpn82vHuNWuFc7qV7DuvDY/A34T57DZB+YnZWDZN8xfoEjSow
-   Q==;
-X-CSE-ConnectionGUID: RzhY7718TpmlBx1b+hg3HQ==
-X-CSE-MsgGUID: BhWxQ9tlQQir/dZKgAK4rg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="21308617"
-X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="21308617"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 13:36:27 -0700
-X-CSE-ConnectionGUID: bx5jcwhmTR6NufMHKRgHiQ==
-X-CSE-MsgGUID: cGrqd3shSYix0yAqKLfnpw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,270,1716274800"; 
-   d="scan'208";a="56656629"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 07 Aug 2024 13:36:24 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sbnOQ-0005hQ-0M;
-	Wed, 07 Aug 2024 20:36:22 +0000
-Date: Thu, 8 Aug 2024 04:36:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phylib: do not disable autoneg for fixed
- speeds >= 1G
-Message-ID: <202408080419.a2PXcqh8-lkp@intel.com>
-References: <E1sbdxI-0024Eo-HE@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1723063107; c=relaxed/simple;
+	bh=uKf+fXnSqFS/bfmB6/2soazJM9laLMq3cqYVbv0cfa4=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=okuajIQ20zp8obPLAMl3eXvoRV20L8nC4G8tttPk2vIyfFO6rFHeD3LiqgzeYPpkQEklWAmrF5kYJY5JdXkV8j9Q45is9bDpDReH9mLFJbDP45gRS0WE6VJnwwKt6w35tbcPkuTdPh3X2rOvRccPY99FNxWRm8G0H5TGvvhTuQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=E+eKG3g1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=b96naOm6; arc=none smtp.client-ip=103.168.172.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 6FC3B200CD6;
+	Wed,  7 Aug 2024 16:38:24 -0400 (EDT)
+Received: from wimap24 ([10.202.2.84])
+  by compute3.internal (MEProxy); Wed, 07 Aug 2024 16:38:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1723063104;
+	 x=1723070304; bh=jyuTeJGDcuQF3lzGu4CM7mjVX08aa1yYpmFdb0KuMkg=; b=
+	E+eKG3g18OxvHvRzsf6ur2aTpQZ9AzI8YfWphmPd0cP/woMQ4Y3QVK1CWtwyfC0y
+	cHTeaFxhMH1uSN585hjjDqb87LprAEz9VK+9wE/aaFBd7xWr105XIJW2HiO3CCBT
+	YUhe5sKACQ2+4qxt6XjnpRHJuImN2bklW8zmfcEAFP7Lou43NRM5qKq7IDAugdai
+	IYwG14dKzFFps6YPHSCr8q3rMVjgC39MnFUcYuPCpyq6euXGEsVrw9WBPuceev/e
+	X1NgaLyTbyhKd84J12Ahg8rIJO1jqyZ0gWDxM/DU4rzl1Ec33URQG7nXdRjdZ8vH
+	rYKBskImd2bUqczPtF0xdQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1723063104; x=
+	1723070304; bh=jyuTeJGDcuQF3lzGu4CM7mjVX08aa1yYpmFdb0KuMkg=; b=b
+	96naOm6Tmp/fSG/qTnRg0+F8M1bkR3E6CbDhH/DghMASO9cQQZXdb+LxscNKRR+9
+	7Fk34G4TL+jkTV6cjuk1odFzQ1NlafI85IkaEBBVXbJELeIamzWo5vQoPavmZTfY
+	EGzqi+M7c6MwPerN2+6XDk2A51wIsc06LLhESfT3n6f9myyWLNa39joOmjaiSdLt
+	SzS10PV4vNew1tgyh0/ihr7Ntoyai8cLMI1B3uhwDG/7G0ganJJiQD826YGpf2KG
+	2ihMc9VIedRkjSJ8h41pV7ucNf0knq9CR0h2UorMPi98cUM3wsY95XiAAvnhtdyQ
+	Yxn+V/lEX1dz2j6fa+wjQ==
+X-ME-Sender: <xms:P9uzZoVoJoJIjaEe5XEiV6Vz5awp6yXK3aNbyHjzzdb688Le77cVyg>
+    <xme:P9uzZska1OThlfuL529FWZ7jFVAvlL_-1R36To_6GXNnKTB-FP2Sqy5ZaGcAdLlLS
+    9zEmspZ_yWq253PvA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrledtgdduheduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    gfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredt
+    redttdenucfhrhhomhepfdffrghnihgvlhcuighufdcuoegugihusegugihuuhhurdighi
+    iiqeenucggtffrrghtthgvrhhnpeegleeifffhudduueekhfeifefgffegudelveejfeff
+    ueekgfdtledvvdeffeeiudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggprhgtphhtthhopedt
+X-ME-Proxy: <xmx:P9uzZsZVDPXINqpCub6toZIfUIDIuTh3l6jzddHJgnwx2_r89u3NLg>
+    <xmx:P9uzZnXVu3YW6dwEw3EnpmWxOTpqjh1vEfBYofPdY4Wfly-3pdODuA>
+    <xmx:P9uzZinF4Mlz89xrmdz6CAXUdJY2qvYf7M_Iu_78yJQ_n0TQTC1o9Q>
+    <xmx:P9uzZsdkibaV9xNpNuXB04-0ANSmk58v-xCPvUz-06Pb_akK4WqliA>
+    <xmx:QNuzZgtMODcHgERAtcl3T8Em_VIMuS7bsgnj1q6tBLy5D_CdPIoIaSjn>
+Feedback-ID: i6a694271:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 9567E25E006A; Wed,  7 Aug 2024 16:38:23 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1sbdxI-0024Eo-HE@rmk-PC.armlinux.org.uk>
+Date: Wed, 07 Aug 2024 13:38:03 -0700
+From: "Daniel Xu" <dxu@dxuuu.xyz>
+To: "Alexander Lobakin" <alexandr.lobakin@intel.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>
+Cc: "Larysa Zaremba" <larysa.zaremba@intel.com>,
+ "Michal Swiatkowski" <michal.swiatkowski@linux.intel.com>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ =?UTF-8?Q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>,
+ "Magnus Karlsson" <magnus.karlsson@intel.com>,
+ "Maciej Fijalkowski" <maciej.fijalkowski@intel.com>,
+ "Jonathan Lemon" <jonathan.lemon@gmail.com>,
+ "toke@redhat.com" <toke@redhat.com>, "Lorenzo Bianconi" <lorenzo@kernel.org>,
+ "David Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Jesse Brandeburg" <jesse.brandeburg@intel.com>,
+ "John Fastabend" <john.fastabend@gmail.com>,
+ "Yajun Deng" <yajun.deng@linux.dev>, "Willem de Bruijn" <willemb@google.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, xdp-hints@xdp-project.net
+Message-Id: <cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com>
+In-Reply-To: <20220628194812.1453059-33-alexandr.lobakin@intel.com>
+References: <20220628194812.1453059-1-alexandr.lobakin@intel.com>
+ <20220628194812.1453059-33-alexandr.lobakin@intel.com>
+Subject: Re: [PATCH RFC bpf-next 32/52] bpf, cpumap: switch to GRO from
+ netif_receive_skb_list()
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Hi Russell,
+Hi Alexander,
 
-kernel test robot noticed the following build errors:
+On Tue, Jun 28, 2022, at 12:47 PM, Alexander Lobakin wrote:
+> cpumap has its own BH context based on kthread. It has a sane batch
+> size of 8 frames per one cycle.
+> GRO can be used on its own, adjust cpumap calls to the
+> upper stack to use GRO API instead of netif_receive_skb_list() which
+> processes skbs by batches, but doesn't involve GRO layer at all.
+> It is most beneficial when a NIC which frame come from is XDP
+> generic metadata-enabled, but in plenty of tests GRO performs better
+> than listed receiving even given that it has to calculate full frame
+> checksums on CPU.
+> As GRO passes the skbs to the upper stack in the batches of
+> @gro_normal_batch, i.e. 8 by default, and @skb->dev point to the
+> device where the frame comes from, it is enough to disable GRO
+> netdev feature on it to completely restore the original behaviour:
+> untouched frames will be being bulked and passed to the upper stack
+> by 8, as it was with netif_receive_skb_list().
+>
+> Signed-off-by: Alexander Lobakin <alexandr.lobakin@intel.com>
+> ---
+>  kernel/bpf/cpumap.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 38 insertions(+), 5 deletions(-)
+>
 
-[auto build test ERROR on net-next/main]
+AFAICT the cpumap + GRO is a good standalone improvement. I think
+cpumap is still missing this.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-phylib-do-not-disable-autoneg-for-fixed-speeds-1G/20240807-185909
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/E1sbdxI-0024Eo-HE%40rmk-PC.armlinux.org.uk
-patch subject: [PATCH net-next] net: phylib: do not disable autoneg for fixed speeds >= 1G
-config: i386-buildonly-randconfig-004-20240808 (https://download.01.org/0day-ci/archive/20240808/202408080419.a2PXcqh8-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080419.a2PXcqh8-lkp@intel.com/reproduce)
+I have a production use case for this now. We want to do some intelligent
+RX steering and I think GRO would help over list-ified receive in some cases.
+We would prefer steer in HW (and thus get existing GRO support) but not all
+our NICs support it. So we need a software fallback.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408080419.a2PXcqh8-lkp@intel.com/
+Are you still interested in merging the cpumap + GRO patches?
 
-All errors (new ones prefixed by >>):
-
->> drivers/net/phy/phy_device.c:2124:34: error: passing 'const unsigned long *' to parameter of type 'unsigned long *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
-    2124 |         adv = linkmode_adv_to_mii_adv_t(advert);
-         |                                         ^~~~~~
-   include/linux/mii.h:143:60: note: passing argument to parameter 'advertising' here
-     143 | static inline u32 linkmode_adv_to_mii_adv_t(unsigned long *advertising)
-         |                                                            ^
-   drivers/net/phy/phy_device.c:2147:39: error: passing 'const unsigned long *' to parameter of type 'unsigned long *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
-    2147 |         adv = linkmode_adv_to_mii_ctrl1000_t(advert);
-         |                                              ^~~~~~
-   include/linux/mii.h:218:65: note: passing argument to parameter 'advertising' here
-     218 | static inline u32 linkmode_adv_to_mii_ctrl1000_t(unsigned long *advertising)
-         |                                                                 ^
->> drivers/net/phy/phy_device.c:2401:4: error: call to undeclared function 'linkmode_set'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-    2401 |                         linkmode_set(set->bit, fixed_advert);
-         |                         ^
-   3 errors generated.
-
-
-vim +2124 drivers/net/phy/phy_device.c
-
-  2107	
-  2108	/**
-  2109	 * genphy_config_advert - sanitize and advertise auto-negotiation parameters
-  2110	 * @phydev: target phy_device struct
-  2111	 * @advert: auto-negotiation parameters to advertise
-  2112	 *
-  2113	 * Description: Writes MII_ADVERTISE with the appropriate values,
-  2114	 *   after sanitizing the values to make sure we only advertise
-  2115	 *   what is supported.  Returns < 0 on error, 0 if the PHY's advertisement
-  2116	 *   hasn't changed, and > 0 if it has changed.
-  2117	 */
-  2118	static int genphy_config_advert(struct phy_device *phydev,
-  2119					const unsigned long *advert)
-  2120	{
-  2121		int err, bmsr, changed = 0;
-  2122		u32 adv;
-  2123	
-> 2124		adv = linkmode_adv_to_mii_adv_t(advert);
-  2125	
-  2126		/* Setup standard advertisement */
-  2127		err = phy_modify_changed(phydev, MII_ADVERTISE,
-  2128					 ADVERTISE_ALL | ADVERTISE_100BASE4 |
-  2129					 ADVERTISE_PAUSE_CAP | ADVERTISE_PAUSE_ASYM,
-  2130					 adv);
-  2131		if (err < 0)
-  2132			return err;
-  2133		if (err > 0)
-  2134			changed = 1;
-  2135	
-  2136		bmsr = phy_read(phydev, MII_BMSR);
-  2137		if (bmsr < 0)
-  2138			return bmsr;
-  2139	
-  2140		/* Per 802.3-2008, Section 22.2.4.2.16 Extended status all
-  2141		 * 1000Mbits/sec capable PHYs shall have the BMSR_ESTATEN bit set to a
-  2142		 * logical 1.
-  2143		 */
-  2144		if (!(bmsr & BMSR_ESTATEN))
-  2145			return changed;
-  2146	
-  2147		adv = linkmode_adv_to_mii_ctrl1000_t(advert);
-  2148	
-  2149		err = phy_modify_changed(phydev, MII_CTRL1000,
-  2150					 ADVERTISE_1000FULL | ADVERTISE_1000HALF,
-  2151					 adv);
-  2152		if (err < 0)
-  2153			return err;
-  2154		if (err > 0)
-  2155			changed = 1;
-  2156	
-  2157		return changed;
-  2158	}
-  2159	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Daniel
 
