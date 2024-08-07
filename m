@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-116382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6007494A40B
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:18:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E23394A410
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:19:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD033280CB8
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECBB8B24B64
 	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78351D2788;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4D91D1F73;
 	Wed,  7 Aug 2024 09:17:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C711D174D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91E81D1743;
 	Wed,  7 Aug 2024 09:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723022245; cv=none; b=c8T+HRBioIiwm0bwHZ1/cPwKPXSmFyH+OOnZn0fPwG+1hvkUnltXriRLjKSlEdNKqzh8yGBTsTGWcLofrI7j31KIQPh3GAgDV8xA8DHnI5Ux4KSzhcXn+ASBnSGEZFOsU4ddyyo4wIFU2t8NIPqwvEuTj/4WOxskm4GNvlwSzmE=
+	t=1723022245; cv=none; b=gqsuZmnqsK7Hv6g8wFL9KQzeGwmVJMz0lxH6MhZ216aSX3nqoSlVQzu6PZl170nHTui1D6w7HpLQHjZVgPsBJgyQcZJ1gjp6bHKsZoId1Ug3J74nGrEEPgxbWlfbvZ//AcJMWuwMnWOo56t/iA+LGtumiyb+OZVL/eNj7xXOnrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723022245; c=relaxed/simple;
-	bh=nMXJenmlaaysU0JQZeH02SdjKwMQW62YdqF+yVs0neI=;
+	bh=yTCdFjdAxkHmRI9W2QxfvJzihYP6I5yvau0CWdwzpiQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b9qVnlElbCgxW+lsLUh54C+blWTuIy8xhBCw3Ej2C/99rV5+7laTbks1yHphrDVizlP8Cw4yY26AcQ9yyiLsoWdxbiNJmzN+AMR4h/MzK1VFejD6dtWzVIWkK0rNvPMGmKUVut7o4lLRC260vWnN+nqo4IFzvKcNqaiDb5PRhuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+	 MIME-Version; b=ucksGjj22EIp2fTHCL3IR8w/cf7Xn7lNySw3TTFXWli52EAMk2Xz875hkcRB1JjWuz6rrvW1KG/UshPeReZ+MubthqDfYWvj0h0c0MPn/HtkuUmi/FD8T79i1YNNhFMBd3JtM/IqcUylSuy5CSCehVi3ALEs4dhDuvBspI3YNx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a7a81bd549eso126348966b.3;
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a7b2dbd81e3so207381566b.1;
         Wed, 07 Aug 2024 02:17:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1723022242; x=1723627042;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9PEQPsLBLzyzK/qbQY0aDtr7vNIA7SxB8GpCInNcz9w=;
-        b=FZIxFpMs4aVNSizyXjhvnUygxp3uleByH5UVh7F73FIogsXCHMO3z5xEbTIh44xtQo
-         tDJj5Gett+MMxMbFfo80BasNPc5g9kczye1XON9y7H6tG5Ko6XWXJzRgYu4Pe7KM+g8s
-         k4SV5lJchjGKk3dC+a4nUVhqCE08FTnbqG5tdgc9yql702AnhYcWlpdM1quKFv9y8O0Y
-         eGby3HulU5pEk0bWfCHKgbLsxm1XwwjaiIPxUrNzX6mRG4eXBp/K0ga1FcNEFEsK04h0
-         tjO5XGlvrL/ikcqozpLsGdyLGZwdmvxNUugeQpmuPXrYADUUMgXEo09qWKvM/jqm7C+S
-         DKPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXttAVzgCTTS+8+5u4erelOcbGxn6ODqhHSDJX2tZDvsF8s0tv1Bg70AFYJQuf+Z4qPD9OeFxkcWP6PLtxoQx9s24ZZkLa67g0EV+YKrktAinLEdZRi1rwpdRTq6uPiuNJu08d
-X-Gm-Message-State: AOJu0Yxh6lKrkFKEmU5vt2Jep3RtkXMU5qmKX4FKC9JMQAn27L7A46Fn
-	+1SCgDvRxG4tjAxOYJtp7YiHo0SxFH0If0S4WEyswamCZ2Vz3sqp
-X-Google-Smtp-Source: AGHT+IGYrrtSvr2abXg42nbVFcuir0UM8yhOizms5GHi/6Q5PfKCLl++XRJ41cKAbXlqIl2mKZstTA==
-X-Received: by 2002:a17:907:7b87:b0:a72:4281:bc72 with SMTP id a640c23a62f3a-a7dc51014efmr1346148666b.63.1723022240389;
-        Wed, 07 Aug 2024 02:17:20 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c0cc2asm622541566b.63.2024.08.07.02.17.19
+        bh=kVSTja/S5Oln97aB6kFN81pfMbhMbR37wyk8sMAq4/s=;
+        b=AxWgYZ3PKb57vRCyKU0CJAiTdqiY4gY2FiiazwfLXcE7B1zRF09xFVVm/20X6S5pVK
+         7tCt4Vn92gST9KbJ2bQGgK68hrKdvwQHdcjQarjtzf47GEZgnT7V7HOJAuxOxTKsjOxO
+         lWNm7HNJTDBPZ7YvJgk7q7lVh2tH4UU9X1syW3idr28iZJgOIEoRvEEYPo0ZSWfka00q
+         3PwVnp6a/pbDUfoEbGssDUejdk1FyM/3e2qOcICAvT4hEMztBe49JBprDBdYazP1+Uf3
+         I0wie2HvMj6HCnSSORSbXEesBXbq5dB4c06U7jeaziGygMloKFlt54tKiJ7NVtDflvcS
+         7iqA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5/TIY1GHx4GYTx77L0NQEiR25snejZJ42EjTnp+rYbqGzHPc8Ap2OP2cg51DHflgtoZz121eKc4d+iQKORs8sAKAx1MnSiQDCJorsIhkaUz6rHEjGt4+ZEZ9ds0xSSmpgHz/4
+X-Gm-Message-State: AOJu0YzUmtM7KZfMvyr4O7ALnAYIG81TdQqsDC/gHXesNrFx7pq3qxJW
+	lKjLC57/A6V1xENFR0ImV1SZUAu6qrbS6WJUboI5mJ+1ISIgUflm
+X-Google-Smtp-Source: AGHT+IGVdO3FE6qqMZblUZHBU3xxPe+gkyCq9/NsIDkefGo5oJJGZifguTy0GzwccAd+JkLcECzD6g==
+X-Received: by 2002:a17:907:968b:b0:a7a:952b:95ae with SMTP id a640c23a62f3a-a7dc509f900mr1346526566b.47.1723022242011;
+        Wed, 07 Aug 2024 02:17:22 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc96c8b49sm621728666b.0.2024.08.07.02.17.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 02:17:20 -0700 (PDT)
+        Wed, 07 Aug 2024 02:17:21 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -66,9 +66,9 @@ Cc: thevlad@fb.com,
 	linux-kernel@vger.kernel.org,
 	paulmck@kernel.org,
 	davej@codemonkey.org.uk
-Subject: [PATCH net-next v2 3/5] net: netconsole: Standardize variable naming
-Date: Wed,  7 Aug 2024 02:16:49 -0700
-Message-ID: <20240807091657.4191542-4-leitao@debian.org>
+Subject: [PATCH net-next v2 4/5] net: netconsole: Unify Function Return Paths
+Date: Wed,  7 Aug 2024 02:16:50 -0700
+Message-ID: <20240807091657.4191542-5-leitao@debian.org>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240807091657.4191542-1-leitao@debian.org>
 References: <20240807091657.4191542-1-leitao@debian.org>
@@ -80,178 +80,152 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Update variable names from err to ret in cases where the variable may
-return non-error values.
+The return flow in netconsole's dynamic functions is currently
+inconsistent. This patch aims to streamline and standardize the process
+by ensuring that the mutex is unlocked before returning the ret value.
 
-This change facilitates a forthcoming patch that relies on ret being
-used consistently to handle return values, regardless of whether they
-indicate an error or not.
+Additionally, this update includes a minor functional change where
+certain strnlen() operations are performed with the
+dynamic_netconsole_mutex locked. This adjustment is not anticipated to
+cause any issues, however, it is crucial to document this change for
+clarity.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c | 50 ++++++++++++++++++++--------------------
- 1 file changed, 25 insertions(+), 25 deletions(-)
+ drivers/net/netconsole.c | 38 +++++++++++++++-----------------------
+ 1 file changed, 15 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index b4d2ef109e31..0e43b5088bbb 100644
+index 0e43b5088bbb..69eeab4a1e26 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -336,14 +336,14 @@ static ssize_t enabled_store(struct config_item *item,
- 	struct netconsole_target *nt = to_target(item);
- 	unsigned long flags;
- 	bool enabled;
--	ssize_t err;
-+	ssize_t ret;
- 
- 	mutex_lock(&dynamic_netconsole_mutex);
--	err = kstrtobool(buf, &enabled);
--	if (err)
-+	ret = kstrtobool(buf, &enabled);
-+	if (ret)
- 		goto out_unlock;
- 
--	err = -EINVAL;
-+	ret = -EINVAL;
- 	if (enabled == nt->enabled) {
- 		pr_info("network logging has already %s\n",
- 			nt->enabled ? "started" : "stopped");
-@@ -365,8 +365,8 @@ static ssize_t enabled_store(struct config_item *item,
- 		 */
- 		netpoll_print_options(&nt->np);
- 
--		err = netpoll_setup(&nt->np);
--		if (err)
-+		ret = netpoll_setup(&nt->np);
-+		if (ret)
- 			goto out_unlock;
- 
- 		nt->enabled = true;
-@@ -386,7 +386,7 @@ static ssize_t enabled_store(struct config_item *item,
- 	return strnlen(buf, count);
- out_unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
--	return err;
-+	return ret;
- }
- 
- static ssize_t release_store(struct config_item *item, const char *buf,
-@@ -394,18 +394,18 @@ static ssize_t release_store(struct config_item *item, const char *buf,
- {
- 	struct netconsole_target *nt = to_target(item);
- 	bool release;
--	ssize_t err;
-+	ssize_t ret;
- 
- 	mutex_lock(&dynamic_netconsole_mutex);
- 	if (nt->enabled) {
- 		pr_err("target (%s) is enabled, disable to update parameters\n",
- 		       config_item_name(&nt->group.cg_item));
--		err = -EINVAL;
-+		ret = -EINVAL;
- 		goto out_unlock;
+@@ -382,8 +382,7 @@ static ssize_t enabled_store(struct config_item *item,
+ 		netpoll_cleanup(&nt->np);
  	}
  
--	err = kstrtobool(buf, &release);
--	if (err)
-+	ret = kstrtobool(buf, &release);
-+	if (ret)
- 		goto out_unlock;
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
+ out_unlock:
+ 	mutex_unlock(&dynamic_netconsole_mutex);
+ 	return ret;
+@@ -410,8 +409,7 @@ static ssize_t release_store(struct config_item *item, const char *buf,
  
  	nt->release = release;
-@@ -414,7 +414,7 @@ static ssize_t release_store(struct config_item *item, const char *buf,
- 	return strnlen(buf, count);
+ 
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
  out_unlock:
  	mutex_unlock(&dynamic_netconsole_mutex);
--	return err;
-+	return ret;
- }
- 
- static ssize_t extended_store(struct config_item *item, const char *buf,
-@@ -422,18 +422,18 @@ static ssize_t extended_store(struct config_item *item, const char *buf,
- {
- 	struct netconsole_target *nt = to_target(item);
- 	bool extended;
--	ssize_t err;
-+	ssize_t ret;
- 
- 	mutex_lock(&dynamic_netconsole_mutex);
- 	if (nt->enabled) {
- 		pr_err("target (%s) is enabled, disable to update parameters\n",
- 		       config_item_name(&nt->group.cg_item));
--		err = -EINVAL;
-+		ret = -EINVAL;
- 		goto out_unlock;
- 	}
- 
--	err = kstrtobool(buf, &extended);
--	if (err)
-+	ret = kstrtobool(buf, &extended);
-+	if (ret)
+ 	return ret;
+@@ -437,9 +435,7 @@ static ssize_t extended_store(struct config_item *item, const char *buf,
  		goto out_unlock;
  
  	nt->extended = extended;
-@@ -442,7 +442,7 @@ static ssize_t extended_store(struct config_item *item, const char *buf,
- 	return strnlen(buf, count);
+-
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
  out_unlock:
  	mutex_unlock(&dynamic_netconsole_mutex);
--	return err;
-+	return ret;
- }
- 
- static ssize_t dev_name_store(struct config_item *item, const char *buf,
-@@ -469,7 +469,7 @@ static ssize_t local_port_store(struct config_item *item, const char *buf,
+ 	return ret;
+@@ -481,8 +477,7 @@ static ssize_t local_port_store(struct config_item *item, const char *buf,
+ 	ret = kstrtou16(buf, 10, &nt->np.local_port);
+ 	if (ret < 0)
+ 		goto out_unlock;
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
+ out_unlock:
+ 	mutex_unlock(&dynamic_netconsole_mutex);
+ 	return ret;
+@@ -504,8 +499,7 @@ static ssize_t remote_port_store(struct config_item *item,
+ 	ret = kstrtou16(buf, 10, &nt->np.remote_port);
+ 	if (ret < 0)
+ 		goto out_unlock;
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
+ out_unlock:
+ 	mutex_unlock(&dynamic_netconsole_mutex);
+ 	return ret;
+@@ -515,6 +509,7 @@ static ssize_t local_ip_store(struct config_item *item, const char *buf,
  		size_t count)
  {
  	struct netconsole_target *nt = to_target(item);
--	ssize_t rv = -EINVAL;
 +	ssize_t ret = -EINVAL;
  
  	mutex_lock(&dynamic_netconsole_mutex);
  	if (nt->enabled) {
-@@ -478,21 +478,21 @@ static ssize_t local_port_store(struct config_item *item, const char *buf,
- 		goto out_unlock;
+@@ -541,17 +536,17 @@ static ssize_t local_ip_store(struct config_item *item, const char *buf,
+ 			goto out_unlock;
  	}
  
--	rv = kstrtou16(buf, 10, &nt->np.local_port);
--	if (rv < 0)
-+	ret = kstrtou16(buf, 10, &nt->np.local_port);
-+	if (ret < 0)
- 		goto out_unlock;
- 	mutex_unlock(&dynamic_netconsole_mutex);
- 	return strnlen(buf, count);
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
  out_unlock:
  	mutex_unlock(&dynamic_netconsole_mutex);
--	return rv;
+-	return -EINVAL;
 +	return ret;
  }
  
- static ssize_t remote_port_store(struct config_item *item,
- 		const char *buf, size_t count)
+ static ssize_t remote_ip_store(struct config_item *item, const char *buf,
+ 	       size_t count)
  {
  	struct netconsole_target *nt = to_target(item);
--	ssize_t rv = -EINVAL;
 +	ssize_t ret = -EINVAL;
  
  	mutex_lock(&dynamic_netconsole_mutex);
  	if (nt->enabled) {
-@@ -501,14 +501,14 @@ static ssize_t remote_port_store(struct config_item *item,
- 		goto out_unlock;
+@@ -578,11 +573,10 @@ static ssize_t remote_ip_store(struct config_item *item, const char *buf,
+ 			goto out_unlock;
  	}
  
--	rv = kstrtou16(buf, 10, &nt->np.remote_port);
--	if (rv < 0)
-+	ret = kstrtou16(buf, 10, &nt->np.remote_port);
-+	if (ret < 0)
- 		goto out_unlock;
- 	mutex_unlock(&dynamic_netconsole_mutex);
- 	return strnlen(buf, count);
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
  out_unlock:
  	mutex_unlock(&dynamic_netconsole_mutex);
--	return rv;
+-	return -EINVAL;
 +	return ret;
  }
  
- static ssize_t local_ip_store(struct config_item *item, const char *buf,
+ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
+@@ -590,6 +584,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
+ {
+ 	struct netconsole_target *nt = to_target(item);
+ 	u8 remote_mac[ETH_ALEN];
++	ssize_t ret = -EINVAL;
+ 
+ 	mutex_lock(&dynamic_netconsole_mutex);
+ 	if (nt->enabled) {
+@@ -604,11 +599,10 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
+ 		goto out_unlock;
+ 	memcpy(nt->np.remote_mac, remote_mac, ETH_ALEN);
+ 
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return strnlen(buf, count);
++	ret = strnlen(buf, count);
+ out_unlock:
+ 	mutex_unlock(&dynamic_netconsole_mutex);
+-	return -EINVAL;
++	return ret;
+ }
+ 
+ struct userdatum {
+@@ -700,9 +694,7 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
+ 	ud = to_userdata(item->ci_parent);
+ 	nt = userdata_to_target(ud);
+ 	update_userdata(nt);
+-
+-	mutex_unlock(&dynamic_netconsole_mutex);
+-	return count;
++	ret = count;
+ out_unlock:
+ 	mutex_unlock(&dynamic_netconsole_mutex);
+ 	return ret;
 -- 
 2.43.5
 
