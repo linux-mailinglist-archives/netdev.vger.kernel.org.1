@@ -1,77 +1,126 @@
-Return-Path: <netdev+bounces-116579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2B2694B084
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 21:40:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9240994B0D9
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2F411C21BD0
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 19:40:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D5D6281B7D
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B59B14389E;
-	Wed,  7 Aug 2024 19:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s3gSTMnD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE66145354;
+	Wed,  7 Aug 2024 20:02:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB9C58203
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 19:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE5484A51;
+	Wed,  7 Aug 2024 20:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723059640; cv=none; b=RXWZIken8NcA6xG0inT9pRyqVdb/sPcH4lv9jUqNtIV3mixQBHNn7MxMwtr5rfagddj7oGFXatHdlTYodM2Ht+H6HOxs0lWLH+7XqFlAfNWaWN4paN0Wku/MAgGP1aTvKmoVztWH44QT8kvnwkbaOuDP2PVgJSf2no2EmjmdVJk=
+	t=1723060965; cv=none; b=LIbHYuDOKRasz0EoGJCpAuqL8D+Yx7NwzPbcqgD1esQ+6g1KZWfTL8L6P5rethmtiYndObRQdRbfz8HdtSc6p0S5Mb6CldEiKLgqbmptuN1TZXtqdKXWDJ0GkK/AX5OS80jkMUL4+mpM5GvrlBlYscIUjNHxwAstK2vnpSTxOa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723059640; c=relaxed/simple;
-	bh=LHzWTiXFQIvJakM1Tsf+MFzjnXSWw0wzTubbmvLa+BY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SMpfmbM/uy34kuYZv12NnFlHzHVIaXt2Ga53aUKPCg+I/CqXFczVNc8VAHweVn5cNRPPk+DP90AzUJq9qypLBwrXTW/tTUY/Lc9a4RPUvsTJm0V50j2pjVyefFbp1HuGI1Tw2Ydix7c0IdMtl/POPN3ChPCZosV0iSzMx59j6d4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s3gSTMnD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pLZ+9WZd1+RjbszYR81XZrOAyP9iEWN/bxaHACCq2GI=; b=s3gSTMnD5thDuQo0J8vugHipyq
-	IiwhnPWzyQUSljfHuQ6mtpAVwO7MytPtD1sJbS6e+eBQi9G2LgivfI4bADUU28hhkjgSuBE+TlN/w
-	+QypCBcxl45VCK6pzrd4b0workuWQf/893H7gQaVWhuogRwBjNZnu11wOV6cY16ksRcA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sbmWR-004EDY-7H; Wed, 07 Aug 2024 21:40:35 +0200
-Date: Wed, 7 Aug 2024 21:40:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] net: mediatek: use ethtool_puts
-Message-ID: <34ec4fe3-cbd9-4ed4-b92e-9b5acc2296f1@lunn.ch>
-References: <20240807190042.6016-1-rosenp@gmail.com>
+	s=arc-20240116; t=1723060965; c=relaxed/simple;
+	bh=6E6ue2xLntVa0zLAon87+tkD4nau8DimoBNDAvRZzrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VD+9AqXeN0AIhIkH4fA3qFPcMRSiGM4AFswMYopf3R/iSIhRkolZCXC1rp6nlNZBWZQho8UyS5woxTxVbhDAHyAkIwkY9nDb130YOfJeKBbXRsgSFGl8yj2ze0hOwKLYTZLi6wCklLvNGQ+/Nfp6/qxz2BoGuuUzkNAqDfQ5NEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E624C32781;
+	Wed,  7 Aug 2024 20:02:42 +0000 (UTC)
+Date: Wed, 7 Aug 2024 16:02:41 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Liju-clr Chen <liju-clr.chen@mediatek.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Richard Cochran
+ <richardcochran@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Yingshiuan Pan <Yingshiuan.Pan@mediatek.com>, Ze-yu Wang
+ <Ze-yu.Wang@mediatek.com>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>,
+ <linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-mediatek@lists.infradead.org>, Shawn Hsiao
+ <shawn.hsiao@mediatek.com>, PeiLun Suei <PeiLun.Suei@mediatek.com>,
+ Chi-shen Yeh <Chi-shen.Yeh@mediatek.com>, Kevenny Hsieh
+ <Kevenny.Hsieh@mediatek.com>
+Subject: Re: [PATCH v12 20/24] virt: geniezone: Add tracing support for hyp
+ call and vcpu exit_reason
+Message-ID: <20240807160241.2370ae9b@gandalf.local.home>
+In-Reply-To: <20240730082436.9151-21-liju-clr.chen@mediatek.com>
+References: <20240730082436.9151-1-liju-clr.chen@mediatek.com>
+	<20240730082436.9151-21-liju-clr.chen@mediatek.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240807190042.6016-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 07, 2024 at 12:00:34PM -0700, Rosen Penev wrote:
-> Allows simplifying get_strings and avoids manual pointer manipulation.
+On Tue, 30 Jul 2024 16:24:32 +0800
+Liju-clr Chen <liju-clr.chen@mediatek.com> wrote:
 
-Please run ./scripts/get_maintainers.pl on this patch, to get a list
-of people you should Cc:
+> From: Liju Chen <liju-clr.chen@mediatek.com>
+>=20
+> Add tracepoints for hypervisor calls and VCPU exit reasons in GenieZone
+> driver. It aids performance debugging by providing more information
+> about hypervisor operations and VCPU behavior.
+>=20
+> Command Usage:
+> echo geniezone:* >> /sys/kernel/tracing/set_event
+> echo 1 > /sys/kernel/tracing/tracing_on
+> echo 0 > /sys/kernel/tracing/tracing_on
+> cat /sys/kernel/tracing/trace
+>=20
+> For example:
+> crosvm_vcpu0-4874    [007] .....    94.757349: mtk_hypcall_enter: id=3D0x=
+fb001005
+> crosvm_vcpu0-4874    [007] .....    94.760902: mtk_hypcall_leave: id=3D0x=
+fb001005 invalid=3D0
+> crosvm_vcpu0-4874    [007] .....    94.760902: mtk_vcpu_exit: vcpu exit_r=
+eason=3DIRQ(0x92920003)
+>=20
+> This example tracks a hypervisor function call by an ID (`0xbb001005`)
+> from initiation to termination, which is supported (invalid=3D0). A vCPU
+> exit is triggered by an Interrupt Request (IRQ) (exit reason: 0x92920003).
+>=20
+> /* VM exit reason */
+> enum {
+> 	GZVM_EXIT_UNKNOWN =3D 0x92920000,
+> 	GZVM_EXIT_MMIO =3D 0x92920001,
+> 	GZVM_EXIT_HYPERCALL =3D 0x92920002,
+> 	GZVM_EXIT_IRQ =3D 0x92920003,
+> 	GZVM_EXIT_EXCEPTION =3D 0x92920004,
+> 	GZVM_EXIT_DEBUG =3D 0x92920005,
+> 	GZVM_EXIT_FAIL_ENTRY =3D 0x92920006,
+> 	GZVM_EXIT_INTERNAL_ERROR =3D 0x92920007,
+> 	GZVM_EXIT_SYSTEM_EVENT =3D 0x92920008,
+> 	GZVM_EXIT_SHUTDOWN =3D 0x92920009,
+> 	GZVM_EXIT_GZ =3D 0x9292000a,
+> };
+>=20
+> Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
+> Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
 
-https://docs.kernel.org/process/submitting-patches.html
+=46rom a tracing POV, I don't see any issues with this patch.
 
-The change itself looks O.K, but we should try to solve the processes
-problems.
+Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-    Andrew
+-- Steve
 
----
-pw-bot: cr
+
+> ---
+>  arch/arm64/geniezone/vm.c          |  4 ++
+>  drivers/virt/geniezone/gzvm_vcpu.c |  3 ++
+>  include/trace/events/geniezone.h   | 84 ++++++++++++++++++++++++++++++
+>  3 files changed, 91 insertions(+)
+>  create mode 100644 include/trace/events/geniezone.h
+
 
