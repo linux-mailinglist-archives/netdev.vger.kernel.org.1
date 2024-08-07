@@ -1,219 +1,90 @@
-Return-Path: <netdev+bounces-116443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E2894A668
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:55:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A73D94A67F
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:00:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3711A280238
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:55:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F96D1C208CC
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9581DF694;
-	Wed,  7 Aug 2024 10:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QDEeBrdS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F571C9DDA;
+	Wed,  7 Aug 2024 11:00:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED561DE862
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 10:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FF713A3F0
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 11:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723028128; cv=none; b=tJnMpJWc4ikCm3QKFkS0XCrnHo0DnZ74Rxfv9IGB5RyGMgauOvz6y89u6pDvaAlYCENcb7ihUTrjvzGeq5QG2N3nxfNHZ4g7Mags2CmB5o45fYNEobYw0TRx3ZTblmSMX1zfuA6sNLhYvFFZvV4+0q3nVEWbfb8to2/9AMVEq6s=
+	t=1723028441; cv=none; b=rzA5fP+Ku/MBdk6vzqzEdATe60YIwPRhkmCQrvdO6ofEkELYrqfg4QsiUVGGZizDUdbd1haeV/Esb0gQnt6g9Ri7ECtPba3NVGJdR+hLDagkAkdeAt40bBoKSxTa6s+wlm+YLlgxBN1DspHgprxXshh3R11wqeU6ZL1faCJK074=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723028128; c=relaxed/simple;
-	bh=KH602mCFdxejIJTl3iLMySBJCqqCzdk6KQPH1exe3oM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=vC1Si3sE5i2S93f0koKCDEcuKc3HFq0stWYqsK04LEiLpXorqBdmH6NlTT9w/tIuUKRheK6xJUqH5Mbd4hQ1mqqtCG146FV4HtVRikPzglUyb3sLOWjerIoGCSvKpXL/x3uLsrwEN3rog+/5Wb+0tjGoFfO7zVEkxORpmanL198=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QDEeBrdS; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723028126; x=1754564126;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KH602mCFdxejIJTl3iLMySBJCqqCzdk6KQPH1exe3oM=;
-  b=QDEeBrdSQSfy1/aeMfZktJW4XfK+osVOdStU65BN4XEGF1/Oolj1neTE
-   LOEjH6HI/Nb3H+BmaL1pXjHFob1zuKJ4Ll7byK632jnFWfF/t19axBHSj
-   WCYT+ktqFotVsftstHfDE6tHZDJwlCzFSfQ9rtIi3uQxn0lo+7Tsz8Dn4
-   QtvGQIvYhWi1Y++3kL7RzbKJ5i+wihhuwV6nLj6BUTPaKJydBjmfyNhD0
-   AxWO34FlOwJgX07uJBO1b6vBAEEsRaGK1DHgS2AGKBYDczfUW8pHnE5iJ
-   cppjsSOsyjgHsoQhqgkny6ChySI+bEV2zYfrLt+DXjqHMxS4NcH19vyWW
-   g==;
-X-CSE-ConnectionGUID: 6LADuNK5S1m3zijxiu8lxQ==
-X-CSE-MsgGUID: lWkbBq0SRKCPurXFWy+GRg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="31664524"
-X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
-   d="scan'208";a="31664524"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 03:55:23 -0700
-X-CSE-ConnectionGUID: 3BEQ1czcSnilL5OEQFv01g==
-X-CSE-MsgGUID: vfHfRGUqRRO07gD+o6oDrw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
-   d="scan'208";a="87757423"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa001.fm.intel.com with ESMTP; 07 Aug 2024 03:55:21 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	luizcap@redhat.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH iwl-net 3/3] ice: fix truesize operations for PAGE_SIZE >= 8192
-Date: Wed,  7 Aug 2024 12:53:26 +0200
-Message-Id: <20240807105326.86665-4-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240807105326.86665-1-maciej.fijalkowski@intel.com>
-References: <20240807105326.86665-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1723028441; c=relaxed/simple;
+	bh=axNJP5qiBgK+XS2ALwsBZvxAcJM36prJcR6hc5fVZKU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=CCjkCMJvb1U+aZBONYmQQnEWdoRrVct324P3SluEGoSpEuWEDZIkharBnrKv+LSbBSA8jtQzeRSa4XfIw5NwdWpVxnZaecYFMDBbF9i0EQ9I26oZhsL/VJHwOZHzAkaCRlUCp4hWk/68WlrLMEv+1YpUM9HAcdTMubcwl895LCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wf6Xm65wPz1j6Q2;
+	Wed,  7 Aug 2024 18:55:52 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id A777314010C;
+	Wed,  7 Aug 2024 19:00:35 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 7 Aug 2024 19:00:35 +0800
+Message-ID: <523894ab-2d38-415f-8306-c0d1abd911ec@huawei.com>
+Date: Wed, 7 Aug 2024 19:00:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
+ avoid IOMMU crashes
+To: Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>, Yonglong Liu
+	<liuyonglong@huawei.com>
+References: <20240806151618.1373008-1-kuba@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20240806151618.1373008-1-kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-When working on multi-buffer packet on arch that has PAGE_SIZE >= 8192,
-truesize is calculated and stored in xdp_buff::frame_sz per each
-processed Rx buffer. This means that frame_sz will contain the truesize
-based on last received buffer, but commit 1dc1a7e7f410 ("ice:
-Centrallize Rx buffer recycling") assumed this value will be constant
-for each buffer, which breaks the page recycling scheme and mess up the
-way we update the page::page_offset.
+On 2024/8/6 23:16, Jakub Kicinski wrote:
+> There appears to be no clean way to hold onto the IOMMU, so page pool
+> cannot outlast the driver which created it. We have no way to stall
+> the driver unregister, but we can use netdev unregistration as a proxy.
+> 
+> Note that page pool pages may last forever, we have seen it happen
+> e.g. when application leaks a socket and page is stuck in its rcv queue.
 
-To fix this, let us work on constant truesize when PAGE_SIZE >= 8192
-instead of basing this on size of a packet read from Rx descriptor. This
-way we can simplify the code and avoid calculating truesize per each
-received frame and on top of that when using
-xdp_update_skb_shared_info(), current formula for truesize update will
-be valid.
+We saw some page_pool pages might last forever too, but were not sure
+if it was the same reason as above? Are there some cmds/ways to debug
+if a application leaks a socket and page is stuck in its rcv queue?
 
-This means ice_rx_frame_truesize() can be removed altogether.
-Furthermore, first call to it within ice_clean_rx_irq() for 4k PAGE_SIZE
-was redundant as xdp_buff::frame_sz is initialized via xdp_init_buff()
-in ice_vsi_cfg_rxq(). This should have been removed at the point where
-xdp_buff struct started to be a member of ice_rx_ring and it was no
-longer a stack based variable.
-
-There are two fixes tags as my understanding is that the first one
-exposed us to broken truesize and page_offset handling and then second
-introduced broken skb_shared_info update in ice_{construct,build}_skb().
-
-Reported-and-tested-by: Luiz Capitulino <luizcap@redhat.com>
-Closes: https://lore.kernel.org/netdev/8f9e2a5c-fd30-4206-9311-946a06d031bb@redhat.com/
-Fixes: 1dc1a7e7f410 ("ice: Centrallize Rx buffer recycling")
-Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_base.c | 21 ++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_txrx.c | 33 -----------------------
- 2 files changed, 20 insertions(+), 34 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 1facf179a96f..f448d3a84564 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -512,6 +512,25 @@ static void ice_xsk_pool_fill_cb(struct ice_rx_ring *ring)
- 	xsk_pool_fill_cb(ring->xsk_pool, &desc);
- }
- 
-+/**
-+ * ice_get_frame_sz - calculate xdp_buff::frame_sz
-+ * @rx_ring: the ring being configured
-+ *
-+ * Return frame size based on underlying PAGE_SIZE
-+ */
-+static unsigned int ice_get_frame_sz(struct ice_rx_ring *rx_ring)
-+{
-+	unsigned int frame_sz;
-+
-+#if (PAGE_SIZE >= 8192)
-+	frame_sz = rx_ring->rx_buf_len;
-+#else
-+	frame_sz = ice_rx_pg_size(rx_ring) / 2;
-+#endif
-+
-+	return frame_sz;
-+}
-+
- /**
-  * ice_vsi_cfg_rxq - Configure an Rx queue
-  * @ring: the ring being configured
-@@ -576,7 +595,7 @@ static int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
- 		}
- 	}
- 
--	xdp_init_buff(&ring->xdp, ice_rx_pg_size(ring) / 2, &ring->xdp_rxq);
-+	xdp_init_buff(&ring->xdp, ice_get_frame_sz(ring), &ring->xdp_rxq);
- 	ring->xdp.data = NULL;
- 	ring->xdp_ext.pkt_ctx = &ring->pkt_ctx;
- 	err = ice_setup_rx_ctx(ring);
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 4b690952bb40..c9bc3f1add5d 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -521,30 +521,6 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
- 	return -ENOMEM;
- }
- 
--/**
-- * ice_rx_frame_truesize
-- * @rx_ring: ptr to Rx ring
-- * @size: size
-- *
-- * calculate the truesize with taking into the account PAGE_SIZE of
-- * underlying arch
-- */
--static unsigned int
--ice_rx_frame_truesize(struct ice_rx_ring *rx_ring, const unsigned int size)
--{
--	unsigned int truesize;
--
--#if (PAGE_SIZE < 8192)
--	truesize = ice_rx_pg_size(rx_ring) / 2; /* Must be power-of-2 */
--#else
--	truesize = rx_ring->rx_offset ?
--		SKB_DATA_ALIGN(rx_ring->rx_offset + size) +
--		SKB_DATA_ALIGN(sizeof(struct skb_shared_info)) :
--		SKB_DATA_ALIGN(size);
--#endif
--	return truesize;
--}
--
- /**
-  * ice_run_xdp - Executes an XDP program on initialized xdp_buff
-  * @rx_ring: Rx ring
-@@ -1154,11 +1130,6 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 	bool failure;
- 	u32 first;
- 
--	/* Frame size depend on rx_ring setup when PAGE_SIZE=4K */
--#if (PAGE_SIZE < 8192)
--	xdp->frame_sz = ice_rx_frame_truesize(rx_ring, 0);
--#endif
--
- 	xdp_prog = READ_ONCE(rx_ring->xdp_prog);
- 	if (xdp_prog) {
- 		xdp_ring = rx_ring->xdp_ring;
-@@ -1217,10 +1188,6 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 			hard_start = page_address(rx_buf->page) + rx_buf->page_offset -
- 				     offset;
- 			xdp_prepare_buff(xdp, hard_start, offset, size, !!offset);
--#if (PAGE_SIZE > 4096)
--			/* At larger PAGE_SIZE, frame_sz depend on len size */
--			xdp->frame_sz = ice_rx_frame_truesize(rx_ring, size);
--#endif
- 			xdp_buff_clear_frags_flag(xdp);
- 		} else if (ice_add_xdp_frag(rx_ring, xdp, rx_buf, size)) {
- 			break;
--- 
-2.34.1
+> Hopefully this is fine in this particular case, as we will only stall
+> unregistering of devices which want the page pool to manage the DMA
+> mapping for them, i.e. HW backed netdevs. And obviously keeping
+> the netdev around is preferable to a crash.
+> 
+> More work is needed for weird drivers which share one pool among
+> multiple netdevs, as they are not allowed to set the pp->netdev
+> pointer. We probably need to add a bit that says "don't expose
+> to uAPI for them".
+> 
 
 
