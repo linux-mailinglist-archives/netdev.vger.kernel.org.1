@@ -1,46 +1,48 @@
-Return-Path: <netdev+bounces-116343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48E9B94A14D
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:03:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8FF94A156
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D3251C22503
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:03:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0F081F2716C
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6D81BE22E;
-	Wed,  7 Aug 2024 07:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D891C4612;
+	Wed,  7 Aug 2024 07:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1bZ8v97"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29A11917F1
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 07:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BEF1C37B9;
+	Wed,  7 Aug 2024 07:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723014196; cv=none; b=Qp5SLxamE9NkhS5dbyvmNvkqCUsDJJI6iUEh3mu5qVGIopxZggP+vhEy4tFqe3snigzmyGwEl9k0u4Hx+OpFWNlPiQ2MZ/cxdGIGE3x+CF9eZKW46hWCdUn8sC4xtOgLdmFO5fMx9K9TkeU0lnhM0wmKqjjB6JlH38eYMfLjlt8=
+	t=1723014372; cv=none; b=lCjUUpRjd521wyI6ghTntKZvatCNQVexCrKAzpezCBCnAu4X3t4Nvxubj+U6DAzGA1/+ojgPJ/H28ZlJI3ZGv8jU2S1QccCU3QI1ilt+9+ORrQc1lbdRGQyE15MS795yKrmqYQNZOtU3veWB7psyHWik24MFmCkejFFs3SsRa00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723014196; c=relaxed/simple;
-	bh=YE4k56g6DgMQxpi+wLSJMLVjkDhQPb6aBweCOh3dGr0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TE2ccCIPzP9UZI6RmoxDUj7Cy7tN88+TCfkRmdRGoUensFjcmHntiJHLU9HMgFRBmuFP5ePO0CooqZHDW8zAdGf/I38KAjfqecCfMq4dt1FZKJqGKeIQOXhaDjleyWLhUgUqpcOPHr054nGN9MRFr3Ctrxcikg3xISfMXJ1LCrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Wf1Gm5k5kz1S7Ck;
-	Wed,  7 Aug 2024 14:58:24 +0800 (CST)
-Received: from kwepemf200007.china.huawei.com (unknown [7.202.181.233])
-	by mail.maildlp.com (Postfix) with ESMTPS id E0D84180044;
-	Wed,  7 Aug 2024 15:03:07 +0800 (CST)
-Received: from [10.67.121.184] (10.67.121.184) by
- kwepemf200007.china.huawei.com (7.202.181.233) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 7 Aug 2024 15:03:07 +0800
-Message-ID: <e4b58020-4ff8-44bc-9779-54bc9e1bf593@huawei.com>
-Date: Wed, 7 Aug 2024 15:03:06 +0800
+	s=arc-20240116; t=1723014372; c=relaxed/simple;
+	bh=LnwyqeKWUJeVVtgYbUdGOIDZEmxBbivJVk+fCFggxWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BWADFYOy9w0PkND0IgL77x+MEL/Gry3tAceOCOjZ8A3vnU+pYBk2d+8tNKmsw1r3JY2yy88CnMuF65y+Is2jvHA05g96InIqC+Bu3cQFhPX0OXhFgw7RRsaZmIiCg/OW4NS0RVtKeZKb6tTHqJE+RpLEDiy9bVKEzL1RPYztGg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1bZ8v97; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93AF3C32782;
+	Wed,  7 Aug 2024 07:06:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723014372;
+	bh=LnwyqeKWUJeVVtgYbUdGOIDZEmxBbivJVk+fCFggxWk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=d1bZ8v97SuOKK3hmyukDVfZ7Aa4PHU0Hyj+C3DF8DIAMKcSBQhAi83CsJ7+O4lxTa
+	 pmlQKi0o25Wajxs8k7lYtTZIJYMFXvmU2SlXJ7uyfn5NlcHpfGoJT6FgL01G9UUUna
+	 YUUPdgB9yNpFyL1XRJJ6NzactXBEG6S8Qg0H4Zmdg95m4+D55lN1i51Bfo3bHTDhMv
+	 f61b7Fp5qbYcQlyLa/qVHaYI9k7Bl8U2VPsdy8COA6yniCXeSZEJEvLjBotlhee6Lq
+	 JBDsgIHznVZhYAD/83gwmRw3CklgnmB8iN5UCAVbsccsXDmzAKF85Cecml4usbW52Q
+	 HODqnd+iUGyMg==
+Message-ID: <40031203-63c6-46b5-b647-d344d4503bb7@kernel.org>
+Date: Wed, 7 Aug 2024 09:06:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,162 +50,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
- avoid IOMMU crashes
+Subject: Re: [PATCH v3 17/17] dt-bindings: net: wireless: cc33xx: Add
+ ti,cc33xx.yaml
+To: Michael Nemanov <michael.nemanov@ti.com>, Kalle Valo <kvalo@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Sabeeh Khan <sabeeh-khan@ti.com>
+References: <20240806170018.638585-1-michael.nemanov@ti.com>
+ <20240806170018.638585-18-michael.nemanov@ti.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin
-	<linyunsheng@huawei.com>
-References: <20240806151618.1373008-1-kuba@kernel.org>
-From: Yonglong Liu <liuyonglong@huawei.com>
-In-Reply-To: <20240806151618.1373008-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240806170018.638585-18-michael.nemanov@ti.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemf200007.china.huawei.com (7.202.181.233)
 
-I tested this patch, have the same crash as I reported...
+On 06/08/2024 19:00, Michael Nemanov wrote:
 
-On 2024/8/6 23:16, Jakub Kicinski wrote:
-> There appears to be no clean way to hold onto the IOMMU, so page pool
-> cannot outlast the driver which created it. We have no way to stall
-> the driver unregister, but we can use netdev unregistration as a proxy.
->
-> Note that page pool pages may last forever, we have seen it happen
-> e.g. when application leaks a socket and page is stuck in its rcv queue.
-> Hopefully this is fine in this particular case, as we will only stall
-> unregistering of devices which want the page pool to manage the DMA
-> mapping for them, i.e. HW backed netdevs. And obviously keeping
-> the netdev around is preferable to a crash.
->
-> More work is needed for weird drivers which share one pool among
-> multiple netdevs, as they are not allowed to set the pp->netdev
-> pointer. We probably need to add a bit that says "don't expose
-> to uAPI for them".
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Untested, but I think it would work.. if it's not too controversial.
->
-> CC: Jesper Dangaard Brouer <hawk@kernel.org>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Yonglong Liu <liuyonglong@huawei.com>
-> CC: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->   include/linux/netdevice.h |  4 ++++
->   net/core/page_pool_user.c | 44 +++++++++++++++++++++++++++++++--------
->   2 files changed, 39 insertions(+), 9 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 0ef3eaa23f4b..c817bde7bacc 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -2342,6 +2342,8 @@ struct net_device {
->   	struct lock_class_key	*qdisc_tx_busylock;
->   	bool			proto_down;
->   	bool			threaded;
-> +	/** @pp_unreg_pending: page pool code is stalling unregister */
-> +	bool			pp_unreg_pending;
->   
->   	struct list_head	net_notifier_list;
->   
-> @@ -2371,6 +2373,8 @@ struct net_device {
->   #if IS_ENABLED(CONFIG_PAGE_POOL)
->   	/** @page_pools: page pools created for this netdevice */
->   	struct hlist_head	page_pools;
-> +	/** @pp_dev_tracker: ref tracker for page pool code stalling unreg */
-> +	netdevice_tracker	pp_dev_tracker;
->   #endif
->   
->   	/** @irq_moder: dim parameters used if IS_ENABLED(CONFIG_DIMLIB). */
-> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-> index 3a3277ba167b..1a4135f01130 100644
-> --- a/net/core/page_pool_user.c
-> +++ b/net/core/page_pool_user.c
-> @@ -349,22 +349,36 @@ static void page_pool_unreg_netdev_wipe(struct net_device *netdev)
->   	struct page_pool *pool;
->   	struct hlist_node *n;
->   
-> -	mutex_lock(&page_pools_lock);
->   	hlist_for_each_entry_safe(pool, n, &netdev->page_pools, user.list) {
->   		hlist_del_init(&pool->user.list);
->   		pool->slow.netdev = NET_PTR_POISON;
->   	}
-> -	mutex_unlock(&page_pools_lock);
->   }
->   
-> -static void page_pool_unreg_netdev(struct net_device *netdev)
-> +static void page_pool_unreg_netdev_stall(struct net_device *netdev)
-> +{
-> +	if (!netdev->pp_unreg_pending) {
-> +		netdev_hold(netdev, &netdev->pp_dev_tracker, GFP_KERNEL);
-> +		netdev->pp_unreg_pending = true;
-> +	} else {
-> +		netdev_warn(netdev,
-> +			    "page pool release stalling device unregister");
-> +	}
-> +}
+Thank you for your patch. There is something to discuss/improve.
+
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - ti,cc3300
+> +      - ti,cc3301
+> +      - ti,cc3350
+> +      - ti,cc3351
 > +
-> +static void page_pool_unreg_netdev_unstall(struct net_device *netdev)
-> +{
-> +	netdev_put(netdev, &netdev->pp_dev_tracker);
-> +	netdev->pp_unreg_pending = false;
-> +}
+> +  reg:
+> +    description:
+> +      must be set to 2
+
+Then just const: 2 and drop free form text.
+
+> +    maxItems: 1
 > +
-> +static void page_pool_unreg_netdev_reparent(struct net_device *netdev)
->   {
->   	struct page_pool *pool, *last;
->   	struct net_device *lo;
->   
->   	lo = dev_net(netdev)->loopback_dev;
->   
-> -	mutex_lock(&page_pools_lock);
->   	last = NULL;
->   	hlist_for_each_entry(pool, &netdev->page_pools, user.list) {
->   		pool->slow.netdev = lo;
-> @@ -375,7 +389,6 @@ static void page_pool_unreg_netdev(struct net_device *netdev)
->   	if (last)
->   		hlist_splice_init(&netdev->page_pools, &last->user.list,
->   				  &lo->page_pools);
-> -	mutex_unlock(&page_pools_lock);
->   }
->   
->   static int
-> @@ -383,17 +396,30 @@ page_pool_netdevice_event(struct notifier_block *nb,
->   			  unsigned long event, void *ptr)
->   {
->   	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
-> +	struct page_pool *pool;
-> +	bool has_dma;
->   
->   	if (event != NETDEV_UNREGISTER)
->   		return NOTIFY_DONE;
->   
-> -	if (hlist_empty(&netdev->page_pools))
-> +	if (hlist_empty(&netdev->page_pools) && !netdev->pp_unreg_pending)
->   		return NOTIFY_OK;
->   
-> -	if (netdev->ifindex != LOOPBACK_IFINDEX)
-> -		page_pool_unreg_netdev(netdev);
-> -	else
-> +	mutex_lock(&page_pools_lock);
-> +	has_dma = false;
-> +	hlist_for_each_entry(pool, &netdev->page_pools, user.list)
-> +		has_dma |= pool->slow.flags & PP_FLAG_DMA_MAP;
+> +  interrupts:
+> +    description:
+> +      The out-of-band interrupt line.
+> +      Can be IRQ_TYPE_EDGE_RISING or IRQ_TYPE_LEVEL_HIGH.
+> +      If property is omitted, SDIO in-band IRQ will be used.
+> +    maxItems: 1
 > +
-> +	if (has_dma)
-> +		page_pool_unreg_netdev_stall(netdev);
-> +	else if (netdev->pp_unreg_pending)
-> +		page_pool_unreg_netdev_unstall(netdev);
-> +	else if (netdev->ifindex == LOOPBACK_IFINDEX)
->   		page_pool_unreg_netdev_wipe(netdev);
-> +	else /* driver doesn't let page pools manage DMA addrs */
-> +		page_pool_unreg_netdev_reparent(netdev);
-> +	mutex_unlock(&page_pools_lock);
+> +required:
+> +  - compatible
+> +  - reg
 > +
->   	return NOTIFY_OK;
->   }
->   
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +
+> +    // SDIO example:
+
+Drop, obvious.
+
+> +    mmc {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        wifi@1{
+
+Missing space.
+
+Also, this does not match reg. Test your DTS with W=1 and FIX ALL warnings.
+
+Best regards,
+Krzysztof
+
 
