@@ -1,134 +1,122 @@
-Return-Path: <netdev+bounces-116361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB93A94A230
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:57:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C30C894A242
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D81411C23A12
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:57:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 002091C23065
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F431C8FD7;
-	Wed,  7 Aug 2024 07:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1161C823C;
+	Wed,  7 Aug 2024 07:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="j0CEZs2d"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RdzdZWBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4D51C4612;
-	Wed,  7 Aug 2024 07:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE5C144D29;
+	Wed,  7 Aug 2024 07:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723017441; cv=none; b=CjYmA7AdwodxJlbnkVMCnXecuZTZY7T+6uR0rt8DUTMOKzbDsIQNV7ZmNNt/n3yR79rfDlrmWYKVdXIqooOZGAlmaCB24W5/LdC5NMMsid3rjiK/2+bgMr9vWBfCGgKfyfwbK8l7+cD35w5my0+TvLPgWg5yPpBfqiO6H98UPnw=
+	t=1723017588; cv=none; b=Ndz1uSoU4+dGwchtMxwTvDAm4YfGWMGCoOytjC8izthl2Hv3vdY1w2q9BuQwFDhyOQjXs9S5IZ5OAH9Whf2D5ISk4JgYcDjsqVX8EFwytVEiTjNI/pHmy4Lvt/Qgu+cy7Pymvy7DvzFGtBmMaeSNfOdcxIK5pUR1h058vGMpROM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723017441; c=relaxed/simple;
-	bh=/7N5Tz0sKSwu2LMtRaCxEH9+r1pKfsmhpHHKOWcdgUY=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A0752oikjt0ckT3sHcRd94wSYSXLazTbBp1Ip3mB56cYwtS2eXdvtQRRbmozFPWxKMQSOnZgRdPOnd32fmXnMmpfMdK/Ij1tThDmWE6nOF8fu9WLc+mYHXO3Ao7YsvSWvIiRXdf7aytxQOaKOHDeBXBLdUj0sGCb2BHOcmKw49I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=j0CEZs2d; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723017438; x=1754553438;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=/7N5Tz0sKSwu2LMtRaCxEH9+r1pKfsmhpHHKOWcdgUY=;
-  b=j0CEZs2d+WLipY1Cmyr8RnMHbqVG56JCEa/or9XUFcsVS85XvtveoIfQ
-   1HfjouYb0CSY4OVNd/dLuz7tYzVbwM77gkyvr3uC2ZQgztrd+03r8CqYg
-   2HtJLfJc56TWwSxsnDdr/8Yja1O5QL5ChJGkuJnvWbEUYTek+Uykogw49
-   1txNgx1i//B+nWPFL3JfJWtEx15F5RAwPhtJP5UUb48u7ZTKdBOgqKOf/
-   ylVHk7Hu6YBzouVB1dUdGXje2lSYr2EMOWnUerefXrTBbAqjZH7u9Ikd0
-   kFoFynO/ZPJDFhp66vhGurc93UrypS/cw1GIuG9/eH7GavTSvWMXqTO6u
-   w==;
-X-CSE-ConnectionGUID: unfEUC1JS0q1rSj3dRuITA==
-X-CSE-MsgGUID: 0PR5oX/8QSOGT9IPxT48bg==
-X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
-   d="scan'208";a="33069002"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Aug 2024 00:57:12 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 7 Aug 2024 00:57:10 -0700
-Received: from DEN-DL-M31857.microsemi.net (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 7 Aug 2024 00:57:07 -0700
-Message-ID: <34471ead9073e0d424bb815cdc833d3ca9b94d3d.camel@microchip.com>
-Subject: Re: [PATCH v4 4/8] reset: mchp: sparx5: Add MCHP_LAN966X_PCI
- dependency
-From: Steen Hegelund <steen.hegelund@microchip.com>
-To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
-	<geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, "Simon
- Horman" <horms@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Andrew
- Lunn" <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>, "Allan
- Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
-	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Date: Wed, 7 Aug 2024 09:57:06 +0200
-In-Reply-To: <20240805101725.93947-5-herve.codina@bootlin.com>
-References: <20240805101725.93947-1-herve.codina@bootlin.com>
-	 <20240805101725.93947-5-herve.codina@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1723017588; c=relaxed/simple;
+	bh=zYzAtRiF4orYxRvBpY+VuFup2ncaBYONQVFwZPWHuas=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mrka5x27Ncj2zUaXYj/mNUYy2pEG4wgJ5vGloJa/VfzcHAHux8An5Oj8cy7XVEzXf+p/k0Yowt3+QccFqle19Gb5+eWE56HOYsOqH2sR15KUXK69rOjAcdGkYXSdGgSNk2ghizGkIvkKHIObwJFcwSPoZ3xgsQTj6F067he1MCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RdzdZWBW; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1723017582; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=vvvjupWc4j10IBI8L7PaFxsixpLd56P6tlLAVeyw3XM=;
+	b=RdzdZWBWpjYtOjCVWfmbi3HBHIszuwwt9j4z3fQ/IXcfPT/ydWzLG4rlK3a9AWU4UneHF0uPGkQesJIK7/IGr+mBz+AY/E25GolrERwd674sR7uo3RU5ufCa2VZC1lwnjYRR3LH+UOv4dn/8kwyWGV16CKVRh5xMqjQL3bVwaKQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033037067109;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0WCIDror_1723017579;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WCIDror_1723017579)
+          by smtp.aliyun-inc.com;
+          Wed, 07 Aug 2024 15:59:42 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2 0/2] net/smc: introduce ringbufs usage statistics
+Date: Wed,  7 Aug 2024 15:59:37 +0800
+Message-Id: <20240807075939.57882-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Herve,
+Currently, we have histograms that show the sizes of ringbufs that ever
+used by SMC connections. However, they are always incremental and since
+SMC allows the reuse of ringbufs, we cannot know the actual amount of
+ringbufs being allocated or actively used.
 
-On Mon, 2024-08-05 at 12:17 +0200, Herve Codina wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you
-> know the content is safe
->=20
-> The sparx5 reset controller depends on the SPARX5 architecture or the
-> LAN966x SoC.
->=20
-> This reset controller can be used by the LAN966x PCI device and so it
-> needs to be available when the LAN966x PCI device is enabled.
->=20
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
-> =C2=A0drivers/reset/Kconfig | 2 +-
-> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
-> index 67bce340a87e..5b5a4d99616e 100644
-> --- a/drivers/reset/Kconfig
-> +++ b/drivers/reset/Kconfig
-> @@ -134,7 +134,7 @@ config RESET_LPC18XX
->=20
-> =C2=A0config RESET_MCHP_SPARX5
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool "Microchip Sparx5 reset d=
-river"
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on ARCH_SPARX5 || SOC_LAN96=
-6 || COMPILE_TEST
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on ARCH_SPARX5 || SOC_LAN96=
-6 || MCHP_LAN966X_PCI ||
-> COMPILE_TEST
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default y if SPARX5_SWITCH
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select MFD_SYSCON
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 help
-> --
-> 2.45.0
->=20
+So this patch set introduces statistics for the amount of ringbufs that
+actually allocated by link group and actively used by connections of a
+certain net namespace, so that we can react based on these memory usage
+information, e.g. active fallback to TCP.
 
-Looks good to me.
+With appropriate adaptations of smc-tools, we can obtain these ringbufs
+usage information:
 
-Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+$ smcr -d linkgroup
+LG-ID    : 00000500
+LG-Role  : SERV
+LG-Type  : ASYML
+VLAN     : 0
+PNET-ID  :
+Version  : 1
+Conns    : 0
+Sndbuf   : 12910592 B    <-
+RMB      : 12910592 B    <-
 
-BR
-Steen
+or
+
+$ smcr -d stats
+[...]
+RX Stats
+  Data transmitted (Bytes)      869225943 (869.2M)
+  Total requests                 18494479
+  Buffer usage  (Bytes)          12910592 (12.31M)  <-
+  [...]
+
+TX Stats
+  Data transmitted (Bytes)    12760884405 (12.76G)
+  Total requests                 36988338
+  Buffer usage  (Bytes)          12910592 (12.31M)  <-
+  [...]
+[...]
+
+Wen Gu (2):
+  net/smc: introduce statistics for allocated ringbufs of link group
+  net/smc: introduce statistics for ringbufs usage of net namespace
+
+ include/uapi/linux/smc.h |  6 ++++
+ net/smc/smc_core.c       | 72 ++++++++++++++++++++++++++++++++++------
+ net/smc/smc_core.h       |  2 ++
+ net/smc/smc_stats.c      |  8 +++++
+ net/smc/smc_stats.h      | 28 +++++++++++-----
+ 5 files changed, 96 insertions(+), 20 deletions(-)
+
+-- 
+2.32.0.3.g01195cf9f
+
 
