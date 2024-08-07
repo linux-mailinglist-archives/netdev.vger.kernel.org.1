@@ -1,124 +1,169 @@
-Return-Path: <netdev+bounces-116387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F6A894A481
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:38:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98EB994A4BA
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D22D3280FCB
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:38:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 636A7B26764
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2471D0DC1;
-	Wed,  7 Aug 2024 09:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9036F1D0DC8;
+	Wed,  7 Aug 2024 09:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="V2MnRUJ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1668E1C9DC8
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 09:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136A8801;
+	Wed,  7 Aug 2024 09:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723023492; cv=none; b=JpF8wOGQiey3WBZ4H/h1UT+Bb6wJlGMhNvEUtKTUlYg+YFLfti5ZJxmPmmW7j6nvdxI5J0o1JqpkU7wZnpc7bbIfo1b9564vutxmT2wY980AcgGZOdXySuUzkn6aClPD14ac4ShRMeWlihDBjkNGgphqMOyN29Q0+PlCxINTbWo=
+	t=1723024188; cv=none; b=eFmHbxriHlK4wNaX1QEY6LkGk34zhZYbv/ZL1dCNlOdhaTMgXSgBfFeDmX4YqS7wt0XT0QtkmhjWmbnW53ylX9j15tbVYVdaMhOFuMvo44hQBUJr21oeBbVRYF9j5BZiCfvmC+ElpoDVNOLhrgmh4YIF1NdwZ4mWeoDsgYP23W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723023492; c=relaxed/simple;
-	bh=Rs33dyjAvVlGc5O6g7CUWWZS4Bvxw/wNFjp4a0QHVWY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QkLyKvcuxHpMDknXTUR0I/DVJ2k/2qG+7X8aHzwYA92tZhx7qX577TdtThGEw1wuFS/+k8m3AbzTVtuPpxiggoXGfQcnJg1xRZBs0k4LEOhscp1fmmU4WIk5obH/4RgwvV/snmI+6A7BiJ8XHqPWwYOz6OBRe2OpX/f6nRZxc6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1sbd7K-000899-AN; Wed, 07 Aug 2024 11:38:02 +0200
-Message-ID: <20dc2cd4-7684-4894-9db3-23c3f4abd661@pengutronix.de>
-Date: Wed, 7 Aug 2024 11:38:00 +0200
+	s=arc-20240116; t=1723024188; c=relaxed/simple;
+	bh=p5E9zKddV2feWg3wZzHXjmOXnbNEA6sewjjyQImkQDw=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ncTjm88tEZMPTZBvmbUuzypyv4Tf9XfaMz55Yn8/qOdcU66Tym9o4dn60XuX/lHJcalwWXPOYxmk90q10QqSoSMc8NmTIxT1Uo1hvX+Syc4F3Th5NqGxxdnUiEgCo6fhDG9hmbDQS3IhKLFd+W0YpcZRf8xm12B8WiwGX0TPESw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=V2MnRUJ0; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1723024186; x=1754560186;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=p5E9zKddV2feWg3wZzHXjmOXnbNEA6sewjjyQImkQDw=;
+  b=V2MnRUJ0DxvB7WERxDMXSYZrFkPLDsvIMFu3ccF8wpepfRLmu/tDbZeC
+   WkZWbiAaNZBzpAYJMGDW2vYCWpC2bDUrWCMZio1DCkSMjmKkqRQ1cUQRh
+   EnOHzmV8OAcxfqXDDsRY0P5coBcn0HKFk3C0bcU4Rj+usXGWLjvhFZPk7
+   16lxAdzARkk543VUZHmhJnPBcj3ap0egNF6TvmknVARKR30rtSSg7v/5u
+   J+vFt1J0tl9yK91o0aR0XMJatb/fYc2BADpOqa9OW+74nRY+eIuarJ4sW
+   w3xP9jlk/6C4DrHc9Gtm0ZaH+5NLnfm5xWJj1ReT8xERCFlWwaSZNCT6A
+   Q==;
+X-CSE-ConnectionGUID: 84YL2YxrTjaVTxV9Ds3KIA==
+X-CSE-MsgGUID: dX1L9EdXR1qffcjUQ4NgVQ==
+X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
+   d="scan'208";a="30861844"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Aug 2024 02:49:39 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 7 Aug 2024 02:49:01 -0700
+Received: from DEN-DL-M31857.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 7 Aug 2024 02:48:56 -0700
+Message-ID: <33d1dabf26457f0a43c78a35ac1d8bcf35f15bc5.camel@microchip.com>
+Subject: Re: [PATCH v4 6/8] reset: mchp: sparx5: Release syscon when not use
+ anymore
+From: Steen Hegelund <steen.hegelund@microchip.com>
+To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
+	<geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, "Simon
+ Horman" <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+	<dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>, Daniel Machon
+	<daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>, Rob Herring
+	<robh@kernel.org>, Saravana Kannan <saravanak@google.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Andrew
+ Lunn" <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
+	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?ISO-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>
+Date: Wed, 7 Aug 2024 11:48:56 +0200
+In-Reply-To: <20240805101725.93947-7-herve.codina@bootlin.com>
+References: <20240805101725.93947-1-herve.codina@bootlin.com>
+	 <20240805101725.93947-7-herve.codina@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] arm: dts: st: stm32mp151a-prtt1l: Fix QSPI
- configuration
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel@pengutronix.de,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20240806120517.406714-1-o.rempel@pengutronix.de>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20240806120517.406714-1-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello Oleksij,
+Hi Herve,
 
-On 06.08.24 14:05, Oleksij Rempel wrote:
-> Rename 'pins1' to 'pins' in the qspi_bk1_pins_a node to correct the
-> subnode name. The previous name caused the configuration to be
-> applied to the wrong subnode, resulting in QSPI not working properly.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+On Mon, 2024-08-05 at 12:17 +0200, Herve Codina wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you
+> know the content is safe
+>=20
+> From: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
+>=20
+> The sparx5 reset controller does not release syscon when it is not
+> used
+> anymore.
+>=20
+> This reset controller is used by the LAN966x PCI device driver.
+> It can be removed from the system at runtime and needs to release its
+> consumed syscon on removal.
+>=20
+> Use the newly introduced devm_syscon_regmap_lookup_by_phandle() in
+> order
+> to get the syscon and automatically release it on removal.
+>=20
+> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 > ---
->  arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi b/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
-> index 3938d357e198f..4db684478c320 100644
-> --- a/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
-> +++ b/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
-> @@ -123,7 +123,7 @@ flash@0 {
->  };
->  
->  &qspi_bk1_pins_a {
-> -	pins1 {
-> +	pins {
+> =C2=A0drivers/reset/reset-microchip-sparx5.c | 8 ++------
+> =C2=A01 file changed, 2 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/drivers/reset/reset-microchip-sparx5.c
+> b/drivers/reset/reset-microchip-sparx5.c
+> index 69915c7b4941..c4fe65291a43 100644
+> --- a/drivers/reset/reset-microchip-sparx5.c
+> +++ b/drivers/reset/reset-microchip-sparx5.c
+> @@ -65,15 +65,11 @@ static const struct reset_control_ops
+> sparx5_reset_ops =3D {
+> =C2=A0static int mchp_sparx5_map_syscon(struct platform_device *pdev, cha=
+r
+> *name,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct regmap **target)
+> =C2=A0{
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct device_node *syscon_np;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct device *dev =3D &pdev->dev;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct regmap *regmap;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int err;
+>=20
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 syscon_np =3D of_parse_phandle(pdev=
+->dev.of_node, name, 0);
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!syscon_np)
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 return -ENODEV;
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 regmap =3D syscon_node_to_regmap(sy=
+scon_np);
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 of_node_put(syscon_np);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 regmap =3D devm_syscon_regmap_looku=
+p_by_phandle(dev, dev-
+> >of_node, name);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (IS_ERR(regmap)) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 err =3D PTR_ERR(regmap);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 dev_err(&pdev->dev, "No '%s' map: %d\n", name, err);
+> --
+> 2.45.0
+>=20
 
-As you have seen such device tree overriding is error prone and would
-be entirely avoidable if specifying full board-specific pinctrl groups
-was allowed for the stm32 platforms instead of override-and-pray.
+Looks good to me.
 
-Anyways, there's better syntax for such overriding now:
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 
-  &{qspi_blk1_pins_a/pins}
-
-which would cause a compilation error if pins was renamed again.
-
->  		bias-pull-up;
-
-There's bias-disable in stm32mp15-pinctrl.dtsi. You may want to add
-a /delete-property/ for that to make sure, it's not up to the driver
-which one has priority.
-
->  		drive-push-pull;
->  		slew-rate = <1>;
-
-These are already in qspi_bk1_pins_a. If repeating those is ok, why
-not go a step further and just duplicate the pinmux property and stay
-clear of this issue altogether, provided Alex is amenable to changing
-his mind regarding pinctrl groups in board device trees.
-
-
-Cheers,
-Ahmad
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+BR
+Steen
 
 
