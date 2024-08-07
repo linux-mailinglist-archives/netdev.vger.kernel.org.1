@@ -1,90 +1,161 @@
-Return-Path: <netdev+bounces-116497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09EBB94A92E
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:58:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 466FC94A93D
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B02E1F294C3
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:58:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1923282D7F
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D4E200138;
-	Wed,  7 Aug 2024 13:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA2020125A;
+	Wed,  7 Aug 2024 13:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HEpCA+Wq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ObuB9HND"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A3120012B;
-	Wed,  7 Aug 2024 13:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D71DE84C
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 13:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723039079; cv=none; b=WrsD5pwh03kYymiFNFQ1T4l1pH8ZY6HOUpsueh7GoWCiQdAgahphJ+U6Jg3EyPIDQ5NrSX30haKwNgYj9/JyGQuEr/iwUMx3qZzYVjaosIgQJeiOuGPzwuPGVV9GD+LwyXByzgBjyAb6xOUQ6H/ZUxLpdEPLkmlIRShA4L0sgMM=
+	t=1723039155; cv=none; b=OOrKnqFrkQhj9wWS8fJcyquR0b43V+7WbJfHtHxcLFrhGxbEsHH6AgzE9YztBlBYC/ViQ5S5bTksINKtMxcm4L4wLBRUzMfW0jht7aFTjaTxjxqIAOCFuwZUeT19LcgWiaKEMeGQqjZ7omtoXKv9CQijDUVFjWNdSl9R3Fp2nFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723039079; c=relaxed/simple;
-	bh=CCQCZ71qXiqhU3eno5AZEBoHx6KAPM1o/3yJygdVuA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WbcpxCXxLS4mafuqEtB7FeoDZAUAUx/4/4k5tcbi+qHTr9e2b7hTvYdYJQDtnd9J51fRHBzamoZ9DOQwR4OyY90i/32x9+yfXYwr3DOGEZc/1L60FDSAUhC+btNpmxrOyPkLpoaGY1qvUMjnleK7gDXFRYGerc4B524BEiNGI6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HEpCA+Wq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7fbD49ri0vKahZfkFcLs5AsG3uCibmwewh1+ZOt+Ies=; b=HEpCA+WqzL01yE/+x6Xmgfx7Pa
-	c8XuQV6uuS1H+aDwRNyk9fiT2VnnX85zzGkAnxqIp1/DXhw554d6tfaSMi7eXuDRzVB+l+Sa7aiAQ
-	3IUV1C1l2Y80R2wsY99X/WJX1iBF3nce47ROBI4GmdwyRSim8gJpOZRiPxkp8fNXRdWU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sbhAl-004CuG-66; Wed, 07 Aug 2024 15:57:51 +0200
-Date: Wed, 7 Aug 2024 15:57:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: sungem_phy: Constify struct mii_phy_def
-Message-ID: <34d55ac2-83ca-4463-bfb6-35e431340df7@lunn.ch>
-References: <54c3b30930f80f4895e6fa2f4234714fdea4ef4e.1723033266.git.christophe.jaillet@wanadoo.fr>
+	s=arc-20240116; t=1723039155; c=relaxed/simple;
+	bh=lct0/IrGdUeEYVTsKHLQO3M/5ke7ClgEwI5CCKE6YFo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CqX8+3GaPD3eBId7ne6wgSiKgYgFmRiXAZBkuVU7084Gk8sM81BMby/TMNhlBKF/QRc3XcrS0VcEef2KYG6bKHQf4EvPd0EYe3ebqoPU811tZns/7fAS/mkPZYp4hFO2Ap8tMdwh5suMFPEZOx3rflsQTtxrbwrSddYvPPEzOOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ObuB9HND; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-39aeccc6377so6834335ab.1
+        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 06:59:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723039151; x=1723643951; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X1flWmxLbYXXUagOIem+EphM7m8Y4jtSRpnH9NCz+jY=;
+        b=ObuB9HNDjZfG8vgNcpqYe/ZSihmx4vBgzOqU5gfJlnVJX1IuU8TcKi2LEYWrp3Idb7
+         3jLE3NvbYPM6mUIzx0qVfM7grZoiOWs4QJpYatUw9Uyb/S1t3OFOCEimnuqbjwoHyo2i
+         NaGhTg/FBmW3X0bc9DcsTzQqIN9i/Mhk73uLxPcAZlxo2v30oU6tupGfGB312l1qTcpl
+         7t2sOWgMilLnctslZgc9qk/DRQtNG8Ey8sFBTJOEOKijiMPAJwnQKf+/HhhOf+Ljxovi
+         gwX3Ex3dfF1AlqT2FQ/WveTbg/INrvqACv5Adnbj7S3Wx728k78f+mXSd9TC9KXRHeJ+
+         BraA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723039151; x=1723643951;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X1flWmxLbYXXUagOIem+EphM7m8Y4jtSRpnH9NCz+jY=;
+        b=rQC8PO8EHG1n9ESSlri3irQhAYQ6pW/vQAlGUdUGOBKPNkgOFvZiyMnrq2aUohqTkq
+         46L2scZX3YwmrMblQzTEdLDnlCPyc9Lp1DdqVo8buB7YEMQq43DrSEIbvn8YpyGXY7KR
+         MHT4IPk/vETLM6WHKcL8Oc8WJTSmhlvn4wgfLIL2LUlSIeSSP00WIXorJD1t5KKxC6//
+         +rGy624ZOQZmaQ7HPxfVW4iQ5G6sVA/K3dm2L299N4umS96PtqOdztwRnLriIFKa9I6b
+         4djK3s7HLQNuua2pM6wxTh5wib14l8mqoe83sJ1UurkFx0MCP3PdA45lTp7ImfOGRCEc
+         Vlsg==
+X-Gm-Message-State: AOJu0Yw0BVloomrcmSM0F0B8VXCi+YkHQyYzjLJ9groY85ESWjdmgDEb
+	zzmV1PP/2AQGAQEuE4cx3D3RJLFJbFdSEZADDrMJ4JkvVl+7gLJ+zFKxvxuJ+qMEtUtsmquucNo
+	g+etm8UahjBKIvRG/whtodqRU6ENISXCCAAiE
+X-Google-Smtp-Source: AGHT+IHXwhuBIWXAr9+rqAVj9ybqWN6IUBNOCPPWvXr/K0p1tiWm4jxxDzzxlTYTXdIzQQUo7ABUBNWy4cb5eb7S6WQ=
+X-Received: by 2002:a92:6610:0:b0:399:2c60:9951 with SMTP id
+ e9e14a558f8ab-39b1fbf5c86mr195350285ab.20.1723039151511; Wed, 07 Aug 2024
+ 06:59:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54c3b30930f80f4895e6fa2f4234714fdea4ef4e.1723033266.git.christophe.jaillet@wanadoo.fr>
+References: <20240803182548.2932270-1-manojvishy@google.com>
+ <20240805182159.3547482-1-manojvishy@google.com> <04affbd5-828a-4327-8b84-8767c1c139f1@intel.com>
+In-Reply-To: <04affbd5-828a-4327-8b84-8767c1c139f1@intel.com>
+From: Manoj Vishwanathan <manojvishy@google.com>
+Date: Wed, 7 Aug 2024 06:58:59 -0700
+Message-ID: <CA+M8utN7FbwMF5QN8O0a0Qnd3ykQwq7O4QkHMVEaBj2jE9BEYw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH] [PATCH iwl-net] idpf: Acquire the lock
+ before accessing the xn->salt
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, David Decotigny <decot@google.com>, linux-kernel@vger.kernel.org, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	intel-wired-lan@lists.osuosl.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 07, 2024 at 02:22:26PM +0200, Christophe JAILLET wrote:
-> 'struct mii_phy_def' are not modified in this driver.
-> 
-> Constifying these structures moves some data to a read-only section, so
-> increase overall security.
-> 
-> While at it fix the checkpatch warning related to this patch (some missing
-> newlines and spaces around *)
-> 
-> On a x86_64, with allmodconfig:
-> Before:
-> ======
->   27709	    928	      0	  28637	   6fdd	drivers/net/sungem_phy.o
-> 
-> After:
-> =====
->    text	   data	    bss	    dec	    hex	filename
->   28157	    476	      0	  28633	   6fd9	drivers/net/sungem_phy.o
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Thanks Przemek & Olek for your quick feedback and responses.
+Hi Olek,
+I can add more details about the issue we faced in the commit message.
+The bug we had here was a virtchnl delay leading to the xn->salt
+mismatch. This could be due to several factors including default CPU
+bounded kworker workqueue for virtchnl message processing being
+starved by aggressive userspace load causing the virtchnl to be
+delayed. While debugging this issue, this locking order  appeared like
+a potential issue, hence the change was made.
+But, this change is more a clean up we felt based on concurrent access
+to the virtchnl transaction struct and does not fix the issue. This is
+more of the patch to do the right thing before we access the "xn".
+I wanted to start with a first patch to the community for acceptance
+followed by a series of other patches that are general clean up or
+improvements to IDPF in general. Will follow with with [PATCH v3]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Thanks,
+Manoj
 
-    Andrew
+On Wed, Aug 7, 2024 at 4:05=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Manoj Vishwanathan <manojvishy@google.com>
+> Date: Mon,  5 Aug 2024 18:21:59 +0000
+>
+> > The transaction salt was being accessed before acquiring the
+> > idpf_vc_xn_lock when idpf has to forward the virtchnl reply.
+>
+> You need to explain in details here what issue you have faced due to
+> that, how to reproduce it and how this fix does help.
+> Otherwise, it's impossible to suggest what is happening and how to test
+> whether the fix is correct.
+>
+> >
+> > Fixes: 34c21fa894a1a (=E2=80=9Cidpf: implement virtchnl transaction man=
+ager=E2=80=9D)
+> > Signed-off-by: Manoj Vishwanathan <manojvishy@google.com>
+> > ---
+> >  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/=
+net/ethernet/intel/idpf/idpf_virtchnl.c
+> > index 70986e12da28..30eec674d594 100644
+> > --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> > +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> > @@ -612,14 +612,15 @@ idpf_vc_xn_forward_reply(struct idpf_adapter *ada=
+pter,
+> >               return -EINVAL;
+> >       }
+> >       xn =3D &adapter->vcxn_mngr->ring[xn_idx];
+> > +     idpf_vc_xn_lock(xn);
+> >       salt =3D FIELD_GET(IDPF_VC_XN_SALT_M, msg_info);
+>
+> The lock can be taken here after the FIELD_GET(), not before, to reduce
+> the critical/locked section execution time.
+>
+> >       if (xn->salt !=3D salt) {
+> >               dev_err_ratelimited(&adapter->pdev->dev, "Transaction sal=
+t does not match (%02x !=3D %02x)\n",
+> >                                   xn->salt, salt);
+> > +             idpf_vc_xn_unlock(xn);
+> >               return -EINVAL;
+> >       }
+> >
+> > -     idpf_vc_xn_lock(xn);
+> >       switch (xn->state) {
+> >       case IDPF_VC_XN_WAITING:
+> >               /* success */
+>
+> Thanks,
+> Olek
 
