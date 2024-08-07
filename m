@@ -1,99 +1,134 @@
-Return-Path: <netdev+bounces-116360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2020F94A20D
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:55:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB93A94A230
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:57:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACE4CB21120
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:55:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D81411C23A12
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106891B86DC;
-	Wed,  7 Aug 2024 07:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F431C8FD7;
+	Wed,  7 Aug 2024 07:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8MipSkl"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="j0CEZs2d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F078F77;
-	Wed,  7 Aug 2024 07:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4D51C4612;
+	Wed,  7 Aug 2024 07:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723017302; cv=none; b=UR8KOwFbWuT2X3loUZ7q4XXq+++fKbKR+ANWvQjSfgZi5YAXrGb/m9Pb5V7cMSGOyOt0EjPy/H1eKHLkD1ID/uBFQjzbIyxuPgDPZJo2cNTS+w67ErtMGF+AfdRipwW7paY7b8Vbk0wtW1ncmzDVwFbZpGQL/FXgdfKwTcTGRfY=
+	t=1723017441; cv=none; b=CjYmA7AdwodxJlbnkVMCnXecuZTZY7T+6uR0rt8DUTMOKzbDsIQNV7ZmNNt/n3yR79rfDlrmWYKVdXIqooOZGAlmaCB24W5/LdC5NMMsid3rjiK/2+bgMr9vWBfCGgKfyfwbK8l7+cD35w5my0+TvLPgWg5yPpBfqiO6H98UPnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723017302; c=relaxed/simple;
-	bh=tbSVvBJrKpKZYHMMO3k9qkkDhVu+yFSA902cq6e8cuA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GIvOE4qYc/HRopYzqeQMFySVeF6D7Q/Q3CBMLnMseYLx4ietQpwT+QXBgMl+AYqiCK2ZX7sjd8+LJ9DqLw7xHvpmY7hvD7SfzmALbLAkWou8w6T0AlY0NItiSjE4fM0lvUHszdFxM4957BfqJOgcfmVWe0oHEWNOKnbjfwFhm7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8MipSkl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBDA3C32782;
-	Wed,  7 Aug 2024 07:54:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723017301;
-	bh=tbSVvBJrKpKZYHMMO3k9qkkDhVu+yFSA902cq6e8cuA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=r8MipSklzXdqHEJmosIKpVi7oI0cQaqmTpkqsGa2JduhLM1aqV1Esspf0MHeRzFAt
-	 Dyl+mufOx8j19bhXcKAVe7vjACW1fYDidRR7ZbHB8ddoeCuHlP5I4T/5g6zIlKPJuG
-	 NsXCozjZKtH9fpV15u9unHsXrPA9iT9ZAy9kFNQqwTuYuCMYXPi9lvXD1gUOHq6fJF
-	 TBgs1E7w9YwcmQpHKEP7DrKhmZxgM2W5GzULStQx1n/rLVuUC01S3evYhxR4KRQKom
-	 X3eGy/DwOnLwNy75F5Of50CSWxdMrBK8pVThWMmk3ZdJ6W8ad4ZyxP+qdhN99rNt3k
-	 rbnPYYppqWoqQ==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kyle Swenson <kyle.swenson@est.tech>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: pse-pd: tps23881: include missing bitfield.h header
-Date: Wed,  7 Aug 2024 09:54:22 +0200
-Message-Id: <20240807075455.2055224-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1723017441; c=relaxed/simple;
+	bh=/7N5Tz0sKSwu2LMtRaCxEH9+r1pKfsmhpHHKOWcdgUY=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A0752oikjt0ckT3sHcRd94wSYSXLazTbBp1Ip3mB56cYwtS2eXdvtQRRbmozFPWxKMQSOnZgRdPOnd32fmXnMmpfMdK/Ij1tThDmWE6nOF8fu9WLc+mYHXO3Ao7YsvSWvIiRXdf7aytxQOaKOHDeBXBLdUj0sGCb2BHOcmKw49I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=j0CEZs2d; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1723017438; x=1754553438;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=/7N5Tz0sKSwu2LMtRaCxEH9+r1pKfsmhpHHKOWcdgUY=;
+  b=j0CEZs2d+WLipY1Cmyr8RnMHbqVG56JCEa/or9XUFcsVS85XvtveoIfQ
+   1HfjouYb0CSY4OVNd/dLuz7tYzVbwM77gkyvr3uC2ZQgztrd+03r8CqYg
+   2HtJLfJc56TWwSxsnDdr/8Yja1O5QL5ChJGkuJnvWbEUYTek+Uykogw49
+   1txNgx1i//B+nWPFL3JfJWtEx15F5RAwPhtJP5UUb48u7ZTKdBOgqKOf/
+   ylVHk7Hu6YBzouVB1dUdGXje2lSYr2EMOWnUerefXrTBbAqjZH7u9Ikd0
+   kFoFynO/ZPJDFhp66vhGurc93UrypS/cw1GIuG9/eH7GavTSvWMXqTO6u
+   w==;
+X-CSE-ConnectionGUID: unfEUC1JS0q1rSj3dRuITA==
+X-CSE-MsgGUID: 0PR5oX/8QSOGT9IPxT48bg==
+X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
+   d="scan'208";a="33069002"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Aug 2024 00:57:12 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 7 Aug 2024 00:57:10 -0700
+Received: from DEN-DL-M31857.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 7 Aug 2024 00:57:07 -0700
+Message-ID: <34471ead9073e0d424bb815cdc833d3ca9b94d3d.camel@microchip.com>
+Subject: Re: [PATCH v4 4/8] reset: mchp: sparx5: Add MCHP_LAN966X_PCI
+ dependency
+From: Steen Hegelund <steen.hegelund@microchip.com>
+To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
+	<geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, "Simon
+ Horman" <horms@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Andrew
+ Lunn" <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
+	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Date: Wed, 7 Aug 2024 09:57:06 +0200
+In-Reply-To: <20240805101725.93947-5-herve.codina@bootlin.com>
+References: <20240805101725.93947-1-herve.codina@bootlin.com>
+	 <20240805101725.93947-5-herve.codina@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hi Herve,
 
-Using FIELD_GET() fails in configurations that don't already include
-the header file indirectly:
+On Mon, 2024-08-05 at 12:17 +0200, Herve Codina wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you
+> know the content is safe
+>=20
+> The sparx5 reset controller depends on the SPARX5 architecture or the
+> LAN966x SoC.
+>=20
+> This reset controller can be used by the LAN966x PCI device and so it
+> needs to be available when the LAN966x PCI device is enabled.
+>=20
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> ---
+> =C2=A0drivers/reset/Kconfig | 2 +-
+> =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
+> index 67bce340a87e..5b5a4d99616e 100644
+> --- a/drivers/reset/Kconfig
+> +++ b/drivers/reset/Kconfig
+> @@ -134,7 +134,7 @@ config RESET_LPC18XX
+>=20
+> =C2=A0config RESET_MCHP_SPARX5
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool "Microchip Sparx5 reset d=
+river"
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on ARCH_SPARX5 || SOC_LAN96=
+6 || COMPILE_TEST
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on ARCH_SPARX5 || SOC_LAN96=
+6 || MCHP_LAN966X_PCI ||
+> COMPILE_TEST
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default y if SPARX5_SWITCH
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select MFD_SYSCON
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 help
+> --
+> 2.45.0
+>=20
 
-drivers/net/pse-pd/tps23881.c: In function 'tps23881_i2c_probe':
-drivers/net/pse-pd/tps23881.c:755:13: error: implicit declaration of function 'FIELD_GET' [-Wimplicit-function-declaration]
-  755 |         if (FIELD_GET(TPS23881_REG_DEVID_MASK, ret) != TPS23881_DEVICE_ID) {
-      |             ^~~~~~~~~
+Looks good to me.
 
-Fixes: 89108cb5c285 ("net: pse-pd: tps23881: Fix the device ID check")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/pse-pd/tps23881.c | 1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 
-diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index f90db758554b..2ea75686a319 100644
---- a/drivers/net/pse-pd/tps23881.c
-+++ b/drivers/net/pse-pd/tps23881.c
-@@ -5,6 +5,7 @@
-  * Copyright (c) 2023 Bootlin, Kory Maincent <kory.maincent@bootlin.com>
-  */
- 
-+#include <linux/bitfield.h>
- #include <linux/delay.h>
- #include <linux/firmware.h>
- #include <linux/i2c.h>
--- 
-2.39.2
-
+BR
+Steen
 
