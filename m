@@ -1,106 +1,77 @@
-Return-Path: <netdev+bounces-116580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82FB194B0CA
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 21:56:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B2694B084
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 21:40:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36FE9283F78
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 19:56:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2F411C21BD0
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 19:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4E51448C7;
-	Wed,  7 Aug 2024 19:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B59B14389E;
+	Wed,  7 Aug 2024 19:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s3gSTMnD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B47E4653A
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 19:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB9C58203
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 19:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723060578; cv=none; b=YohpAAoa6C00kORI6qb1qapSmoCxsnxfYaaesZ86jJv5rcqgkRqGFUJec/sejj5kIO9+s0wbvLSTNWYO5JG3agP2mJ/6LxDuAkdff2ftyp6tkj2qy2zUE7pkPwIj6l+FSbxqf12/zUltwd8tFntBQIDnvB9saILoTMOTRY+eQcU=
+	t=1723059640; cv=none; b=RXWZIken8NcA6xG0inT9pRyqVdb/sPcH4lv9jUqNtIV3mixQBHNn7MxMwtr5rfagddj7oGFXatHdlTYodM2Ht+H6HOxs0lWLH+7XqFlAfNWaWN4paN0Wku/MAgGP1aTvKmoVztWH44QT8kvnwkbaOuDP2PVgJSf2no2EmjmdVJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723060578; c=relaxed/simple;
-	bh=If9wF05b76ZddojDo1fl4RVjjNKRx+prRlgapJ85VmU=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=C2BFHGXLeENQ1tyFDlkq624y+sDgzZEqrSbTL8B8FZ6kSGnQXfya/c71DxZCFrqvOosD2+XkSoJZW2yl6CyMmrlfyBdBTsJStOhHPRe4o8cmEVqekMbAD1s1T/ZtOupdX0aEEii5KgoZKQEgHNR5L0Lr0N13YJePcrh8vGy/4sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id B4BA87D0C1;
-	Wed,  7 Aug 2024 19:56:15 +0000 (UTC)
-References: <20240804203346.3654426-1-chopps@chopps.org>
- <20240804203346.3654426-11-chopps@chopps.org> <Zq__9Z4ckXNdR-Ec@hog>
- <ZrIJ0d6x3pTslQKn@gauss3.secunet.de>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, Christian Hopps
- <chopps@chopps.org>, devel@linux-ipsec.org, netdev@vger.kernel.org,
- Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v8 10/16] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-Date: Wed, 07 Aug 2024 15:40:14 -0400
-In-reply-to: <ZrIJ0d6x3pTslQKn@gauss3.secunet.de>
-Message-ID: <m2jzgsnm3l.fsf@ja-home.int.chopps.org>
+	s=arc-20240116; t=1723059640; c=relaxed/simple;
+	bh=LHzWTiXFQIvJakM1Tsf+MFzjnXSWw0wzTubbmvLa+BY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SMpfmbM/uy34kuYZv12NnFlHzHVIaXt2Ga53aUKPCg+I/CqXFczVNc8VAHweVn5cNRPPk+DP90AzUJq9qypLBwrXTW/tTUY/Lc9a4RPUvsTJm0V50j2pjVyefFbp1HuGI1Tw2Ydix7c0IdMtl/POPN3ChPCZosV0iSzMx59j6d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s3gSTMnD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pLZ+9WZd1+RjbszYR81XZrOAyP9iEWN/bxaHACCq2GI=; b=s3gSTMnD5thDuQo0J8vugHipyq
+	IiwhnPWzyQUSljfHuQ6mtpAVwO7MytPtD1sJbS6e+eBQi9G2LgivfI4bADUU28hhkjgSuBE+TlN/w
+	+QypCBcxl45VCK6pzrd4b0workuWQf/893H7gQaVWhuogRwBjNZnu11wOV6cY16ksRcA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sbmWR-004EDY-7H; Wed, 07 Aug 2024 21:40:35 +0200
+Date: Wed, 7 Aug 2024 21:40:35 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] net: mediatek: use ethtool_puts
+Message-ID: <34ec4fe3-cbd9-4ed4-b92e-9b5acc2296f1@lunn.ch>
+References: <20240807190042.6016-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240807190042.6016-1-rosenp@gmail.com>
 
+On Wed, Aug 07, 2024 at 12:00:34PM -0700, Rosen Penev wrote:
+> Allows simplifying get_strings and avoids manual pointer manipulation.
 
-Steffen Klassert <steffen.klassert@secunet.com> writes:
+Please run ./scripts/get_maintainers.pl on this patch, to get a list
+of people you should Cc:
 
-> On Mon, Aug 05, 2024 at 12:25:57AM +0200, Sabrina Dubroca wrote:
->>
->> > +/**
->> > + * skb_copy_bits_seq - copy bits from a skb_seq_state to kernel buffer
->> > + * @st: source skb_seq_state
->> > + * @offset: offset in source
->> > + * @to: destination buffer
->> > + * @len: number of bytes to copy
->> > + *
->> > + * Copy @len bytes from @offset bytes into the source @st to the destination
->> > + * buffer @to. `offset` should increase (or be unchanged) with each subsequent
->> > + * call to this function. If offset needs to decrease from the previous use `st`
->> > + * should be reset first.
->> > + *
->> > + * Return: 0 on success or a negative error code on failure
->> > + */
->> > +static int skb_copy_bits_seq(struct skb_seq_state *st, int offset, void *to,
->> > +			     int len)
->>
->> Probably belongs in net/core/skbuff.c, although I'm really not
->> convinced copying data around is the right way to implement the type
->> of packet splitting IPTFS does (which sounds a bit like a kind of
->> GSO).
->
-> I tried to come up with a 'GSO like' variant of this when I did the
-> initial review last year at the IPsec workshop. But it turned out
-> that things will get even more complicated as they are now.
-> We did some performance tests and it was quite compareable to
-> tunnel mode, so for a first implementation I'd be ok with the
-> copy variant.
->
->
->> And there are helpers in net/core/skbuff.c (such as
->> pskb_carve/pskb_extract) that seem to do similar things to what you
->> need here, without as much data copying.
->
-> In case we have helpers that will fit here, we should use them of
-> course.
+https://docs.kernel.org/process/submitting-patches.html
 
-FWIW, The reason I didn't use pskb_extract() rather than the simple iptfs_copy_create_frag() is because pskb_extract uses skb_clone on the original skb then pskb_carve() to narrow the (copied) data pointers to a subset of the original. The new skb data is read-only which does not work for us.
+The change itself looks O.K, but we should try to solve the processes
+problems.
 
-Each of these new skbs are IP-TFS tunnel packets and as such we need to push and write IPTFS+ESP+IP+Ethernet headers on them. In order to make pskb_extract()s skbs writable we would have to allocate new buffer space and copy the data turning them into a writeable skb buffer, and now we're doing something more complex and more cpu intensive to arrive back to what iptfs_copy_create_frag() did simply and straight-forwardly to begin with.
+    Andrew
 
-Thanks,
-Chris.
+---
+pw-bot: cr
 
