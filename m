@@ -1,166 +1,215 @@
-Return-Path: <netdev+bounces-116377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3246394A402
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:17:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E888394A418
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C0851C2085A
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:17:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD6C9B2927A
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07271CCB29;
-	Wed,  7 Aug 2024 09:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="xeEtXVae"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4A41CCB28;
+	Wed,  7 Aug 2024 09:17:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E5A1CCB27;
-	Wed,  7 Aug 2024 09:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43A31C8245;
+	Wed,  7 Aug 2024 09:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723022210; cv=none; b=isL1Kzen5b4diIT6AO3KcqGjZ9lkbZ2HIj33wblmTVCjZrmrO0rFRVJknwTcLA7Pdw/JyW57KQsO7+aY/ApyAjJjNgsO6hWyMdi/VdolfR8uUoOjADMjztZ08G6J0//NN4p8K+ObyAYIzcYezeWU9M+fZ0/qBL4BS/FNs7w8Kn4=
+	t=1723022235; cv=none; b=KZL62ZGK2NC884r3BkubyvV55syIUzCURezALDLidTqydspVHTsFk1cAmaGmmGmH6/jUyLR4SeM6tMxmcyQF81cNz9vhwHxpjrgN+34P3JzOPa9dHBHxRG2ncb+H1GpHDeHhXqekXz7mTEb+211bvXq5ycERGC++gzP9f18YDZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723022210; c=relaxed/simple;
-	bh=c/slf/jw/OchoUyvGIOG9Xcv1iNRWWO2Xh+P4JpQCLQ=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nKu2UFLhwfJ1629D/ApKGvGAWAKQkp5Jm5Ew1DmUc5C+44l/p1dSAQ6PGgetzQe1/Wy7evEaCSImEpbXbwc9ZkUB89iIhdotMBinTW6Q9O6/d8BrTroDa4EBJOEojuBxsNOM3sXSVXUBy4Eq74tbxOxBTDzd5zxmhRwTwzcI0+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=xeEtXVae; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1723022209; x=1754558209;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=c/slf/jw/OchoUyvGIOG9Xcv1iNRWWO2Xh+P4JpQCLQ=;
-  b=xeEtXVaeeytfiZvrmFuN4PO3/ey0/FREfZUd0lKl6/KC0VHOp9Qynu1e
-   YEXl3ylFeISMeMUdQbuwqpVl4nJLkeInp/+GuCvXVFyZxq5/PMGMH1T1x
-   6vxJYAf7gVp2u5FyK7yXKRSIt3qRHqzh0SFUDjA5khKtmHtoHK9PwoVsW
-   1rfa2U8+k3d1hBaa59V4GLJu+G0FnoqHlKMb9Ds964+byUy+jIQ9jgauG
-   k2gCRENhpsNTeHsAnzyj1eUSO3k64MnBtiEU3vTOeN24oDQcrkEL8c9A/
-   Du4Xq0isQmKuC4CoA2fib2qaJSfKxmd+OEg0ADttqCMqdFDIo30Ft+x/l
-   A==;
-X-CSE-ConnectionGUID: eofU3f1ZQCKrHjE+RvmBAQ==
-X-CSE-MsgGUID: sAfpxfwFR/Khxbw6o7ocXw==
-X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
-   d="scan'208";a="30199139"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Aug 2024 02:15:45 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 7 Aug 2024 02:15:04 -0700
-Received: from DEN-DL-M31857.microsemi.net (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 7 Aug 2024 02:14:59 -0700
-Message-ID: <442332f001bf81a1cd8733d5c2ae94d344e5a286.camel@microchip.com>
-Subject: Re: [PATCH v4 5/8] reset: mchp: sparx5: Allow building as a module
-From: Steen Hegelund <steen.hegelund@microchip.com>
-To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
-	<geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, "Simon
- Horman" <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
-	<arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
-	<dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>, Rob Herring
-	<robh@kernel.org>, Saravana Kannan <saravanak@google.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Andrew
- Lunn" <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>, "Allan
- Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
-	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	=?ISO-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>
-Date: Wed, 7 Aug 2024 11:14:58 +0200
-In-Reply-To: <20240805101725.93947-6-herve.codina@bootlin.com>
-References: <20240805101725.93947-1-herve.codina@bootlin.com>
-	 <20240805101725.93947-6-herve.codina@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1723022235; c=relaxed/simple;
+	bh=3e+vHqi+9lGms/J7VdIUNzaJqPVVYb4q/s3IB2R546g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bo/z0ZJj3ZUFNw90SLffYCiZ3YEsIb9BnrDJfxi2AaVK5dQ1AMoUr4ftw37VDoCes0sH7nTEv8nkHn8BIYOa1RCEoassdlVVFdo29/AWMz4Kny9RRFHIIZhB2ZkHG8LoXkoAw7fAlV+0l/dxT2FAKwLrcz9Meeg3gQgV4/JiQKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a7ac469e4c4so113086166b.0;
+        Wed, 07 Aug 2024 02:17:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723022232; x=1723627032;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Bf26F/9A9E4kz+Y75NOFq4Jn25o57n/ul71pdkaicr8=;
+        b=GTZQ4dCJuTjemdH5WWM7/hFRu3Vv87uL1Ul29MZoVR1SELAMmLxKZmhRucKm4Bjd4F
+         giUCYB9Ze7p9vbRTokqR03HH3OgNFX6ylkD2T5UJYims7KBJx6CHbjN6TJB2lfDfs5UF
+         fweRfodr+r2wY93guC++wucaU5ZVSCsNX4KejHSBxqabyASjcqGL0K+krz4pGO1bWRH3
+         NqPJrg89RRAIvG1J0/nQjQ0BFrAAQXrP12ZUtBXK8uFY2b1yiVjw3qImQXk99CTX+Vgb
+         wqoBVNehtAfyaLRoFnErXNJ4wB1l3duZJsNltLD+76dGGFdWhK5wBNus3LZz9S7IC1k2
+         sCzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVLhQJDOjVVINKmN1ztoM/9LmiDhfqZZa+qtQg9kwbJl2/B2h4ojzBILxMDC6KTmo4RUprSz8nnGmb84dFpBuDhKoRpke3KEAEs1v4ZgGFAMRblnVS4h9rrJXjKuH+81dBS+lC7
+X-Gm-Message-State: AOJu0YzVTZk4PvXZwfL724tDZrmrQFPUF1uWnjSljghIhK32BazbwNrq
+	0YlDtG6X5njyPLEvM0LzhuI1PAnh5y5ql5mxiSYuBif18ttHfAsT
+X-Google-Smtp-Source: AGHT+IGEePJIL7rxrPd2G7hGtahmgWDdy0/uyZavyu8WsDIaLl8mfydGtKE1y5GgXEfm2frvmBbT0g==
+X-Received: by 2002:a17:907:806:b0:a7a:bae8:f2b5 with SMTP id a640c23a62f3a-a807916ffafmr122303966b.36.1723022231632;
+        Wed, 07 Aug 2024 02:17:11 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9ec4a8dsm619420066b.190.2024.08.07.02.17.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 02:17:11 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: thevlad@fb.com,
+	thepacketgeek@gmail.com,
+	riel@surriel.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	paulmck@kernel.org,
+	davej@codemonkey.org.uk
+Subject: [PATCH net-next v2 0/5] net: netconsole: Fix netconsole unsafe locking
+Date: Wed,  7 Aug 2024 02:16:46 -0700
+Message-ID: <20240807091657.4191542-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Herve,
+Problem:
+=======
 
-On Mon, 2024-08-05 at 12:17 +0200, Herve Codina wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you
-> know the content is safe
->=20
-> From: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
->=20
-> This reset controller can be used by the LAN966x PCI device.
->=20
-> The LAN966x PCI device driver can be built as a module and this reset
-> controller driver has no reason to be a builtin driver in that case.
->=20
-> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
-> =C2=A0drivers/reset/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 2 +-
-> =C2=A0drivers/reset/reset-microchip-sparx5.c | 2 ++
-> =C2=A02 files changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/reset/Kconfig b/drivers/reset/Kconfig
-> index 5b5a4d99616e..88350aa8a51c 100644
-> --- a/drivers/reset/Kconfig
-> +++ b/drivers/reset/Kconfig
-> @@ -133,7 +133,7 @@ config RESET_LPC18XX
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 This enables the r=
-eset controller driver for NXP
-> LPC18xx/43xx SoCs.
->=20
-> =C2=A0config RESET_MCHP_SPARX5
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool "Microchip Sparx5 reset driver=
-"
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tristate "Microchip Sparx5 reset dr=
-iver"
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on ARCH_SPARX5 || SOC_=
-LAN966 || MCHP_LAN966X_PCI ||
-> COMPILE_TEST
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default y if SPARX5_SWITCH
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select MFD_SYSCON
-> diff --git a/drivers/reset/reset-microchip-sparx5.c
-> b/drivers/reset/reset-microchip-sparx5.c
-> index 636e85c388b0..69915c7b4941 100644
-> --- a/drivers/reset/reset-microchip-sparx5.c
-> +++ b/drivers/reset/reset-microchip-sparx5.c
-> @@ -158,6 +158,7 @@ static const struct of_device_id
-> mchp_sparx5_reset_of_match[] =3D {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { }
-> =C2=A0};
-> +MODULE_DEVICE_TABLE(of, mchp_sparx5_reset_of_match);
->=20
-> =C2=A0static struct platform_driver mchp_sparx5_reset_driver =3D {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .probe =3D mchp_sparx5_reset_p=
-robe,
-> @@ -180,3 +181,4 @@ postcore_initcall(mchp_sparx5_reset_init);
->=20
-> =C2=A0MODULE_DESCRIPTION("Microchip Sparx5 switch reset driver");
-> =C2=A0MODULE_AUTHOR("Steen Hegelund <steen.hegelund@microchip.com>");
-> +MODULE_LICENSE("GPL");
-> --
-> 2.45.0
->=20
+The current locking mechanism in netconsole is unsafe and suboptimal due
+to the following issues:
 
-Looks good to me.
+1) Lock Release and Reacquisition Mid-Loop:
 
-Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+In netconsole_netdev_event(), the target_list_lock is released and
+reacquired within a loop, potentially causing collisions and cleaning up
+targets that are being enabled.
 
-BR
-Steen
+	int netconsole_netdev_event()
+	{
+	...
+		spin_lock_irqsave(&target_list_lock, flags);
+		list_for_each_entry(nt, &target_list, list) {
+			spin_unlock_irqrestore(&target_list_lock, flags);
+			__netpoll_cleanup(&nt->np);
+			spin_lock_irqsave(&target_list_lock, flags);
+		}
+		spin_lock_irqsave(&target_list_lock, flags);
+	...
+	}
+
+2) Non-Atomic Cleanup Operations:
+
+In enabled_store(), the cleanup of structures is not atomic, risking
+cleanup of structures that are in the process of being enabled.
+
+	size_t enabled_store()
+	{
+	...
+		spin_lock_irqsave(&target_list_lock, flags);
+		nt->enabled = false;
+		spin_unlock_irqrestore(&target_list_lock, flags);
+		netpoll_cleanup(&nt->np);
+	...
+	}
+
+
+These issues stem from the following limitations in netconsole's locking
+design:
+
+1) write_{ext_}msg() functions:
+
+	a) Cannot sleep
+	b) Must iterate through targets and send messages to all enabled entries.
+	c) List iteration is protected by target_list_lock spinlock.
+
+2) Network event handling in netconsole_netdev_event():
+
+	a) Needs to sleep
+	b) Requires iteration over the target list (holding
+	   target_list_lock spinlock).
+	c) Some events necessitate netpoll struct cleanup, which *needs*
+	   to sleep.
+
+The target_list_lock needs to be used by non-sleepable functions while
+also protecting operations that may sleep, leading to the current unsafe
+design.
+
+
+Solution:
+========
+
+1) Dual Locking Mechanism:
+	- Retain current target_list_lock for non-sleepable use cases.
+	- Introduce target_cleanup_list_lock (mutex) for sleepable
+	  operations.
+
+2) Deferred Cleanup:
+	- Implement atomic, deferred cleanup of structures using the new
+	  mutex (target_cleanup_list_lock).
+	- Avoid the `goto` in the middle of the list_for_each_entry
+
+3) Separate Cleanup List:
+	- Create target_cleanup_list for deferred cleanup, protected by
+	  target_cleanup_list_lock.
+	- This allows cleanup() to sleep without affecting message
+	  transmission.
+	- When iterating over targets, move devices needing cleanup to
+	  target_cleanup_list.
+	- Handle cleanup under the target_cleanup_list_lock mutex.
+
+4) Make a clear locking hierarchy
+
+	- The target_cleanup_list_lock takes precedence over target_list_lock.
+
+	- Major Workflow Locking Sequences:
+		a) Network Event Affecting Netpoll (netconsole_netdev_event):
+			rtnl -> target_cleanup_list_lock -> target_list_lock
+
+		b) Message Writing (write_msg()):
+			console_lock -> target_list_lock
+
+		c) Configfs Target Enable/Disable (enabled_store()):
+			dynamic_netconsole_mutex -> target_cleanup_list_lock -> target_list_lock
+
+
+This hierarchy ensures consistent lock acquisition order across
+different operations, preventing deadlocks and maintaining proper
+synchronization. The target_cleanup_list_lock's higher priority allows
+for safe deferred cleanup operations without interfering with regular
+message transmission protected by target_list_lock.  Each workflow
+follows a specific locking sequence, ensuring that operations like
+network event handling, message writing, and target management are
+properly synchronized and do not conflict with each other.
+
+
+Changelog:
+
+v2:
+  * The selftest has been removed from the patchset because veth is now
+    IFF_DISABLE_NETPOLL. A new test will be sent separately.
+
+v1:
+  * https://lore.kernel.org/all/20240801161213.2707132-1-leitao@debian.org/
+
+Breno Leitao (5):
+  net: netpoll: extract core of netpoll_cleanup
+  net: netconsole: Correct mismatched return types
+  net: netconsole: Standardize variable naming
+  net: netconsole: Unify Function Return Paths
+  net: netconsole: Defer netpoll cleanup to avoid lock release during
+    list traversal
+
+ drivers/net/netconsole.c | 173 ++++++++++++++++++++++++---------------
+ include/linux/netpoll.h  |   1 +
+ net/core/netpoll.c       |  12 ++-
+ 3 files changed, 118 insertions(+), 68 deletions(-)
+
+-- 
+2.43.5
+
 
