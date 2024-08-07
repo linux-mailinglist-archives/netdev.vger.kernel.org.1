@@ -1,155 +1,195 @@
-Return-Path: <netdev+bounces-116587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB6A94B183
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:40:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B52CB94B192
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:46:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A462B248FE
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:40:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 390D41F2121A
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14BA145B38;
-	Wed,  7 Aug 2024 20:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADB3145FED;
+	Wed,  7 Aug 2024 20:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=beims.me header.i=@beims.me header.b="CEx/5bhW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="H3H9+oWz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R3SgN3x+"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout5-smtp.messagingengine.com (fout5-smtp.messagingengine.com [103.168.172.148])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B933F13DDC0;
-	Wed,  7 Aug 2024 20:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DE5145A1D
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 20:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723063214; cv=none; b=GsdWM0mvs8riHhcM05RcQ9dLu8FC5ZUtneZtmV9UZg8sFuT2c6ync0iKjI0Ydqdi1fUQbL6t6pB5UGaryVi5Aa4Oceq/YTBDiK0U7FY6t0XjlW9/fWu06onaJm3M4VcEhV+hyXHdLuCPKlXHNveUp/EY8tdFDRnn4UoYimeLWXE=
+	t=1723063613; cv=none; b=s8HPTtKPITnc46waykXgy0qt8aMrWMWEYNOJhNzRIl6OEOi93oPvm9SzmbDLrxfbkCsqdLJX97rPkXSiPtVGpbE5kuocu53ItMOQ83Cjz7snS826wb3QUg9eLRgRDgXHk72LxmFOXti4etNgzanNjVyAxi24iuasrEU2+bQ1hmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723063214; c=relaxed/simple;
-	bh=blkBUwuYNV1jdiG9n3ec84ATSv7sX+2uYwyxvMbrnlQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kl/AfW0WQrk+CKdkyiGLLRZGyyRkoL4wsjwihFeV0gWRIYoUpqzVMs5pCr6Mz9pCnzVs1sbkRJtVaqQMtItc14gu50NcAeHLhnpwNJV8Axu9/ZH6HqnwsAENdC3PdP2KDVBcGSqfoQdiVeP0U1ykYztryVCdk5jkQXEgsKAlNVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=beims.me; spf=pass smtp.mailfrom=beims.me; dkim=pass (2048-bit key) header.d=beims.me header.i=@beims.me header.b=CEx/5bhW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=H3H9+oWz; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=beims.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=beims.me
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfout.nyi.internal (Postfix) with ESMTP id EA886138DD80;
-	Wed,  7 Aug 2024 16:40:10 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Wed, 07 Aug 2024 16:40:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=beims.me; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1723063210;
-	 x=1723149610; bh=gcQqS4Nvw3oVR6X1QO70/HzE1Wr/SNsmwf90YobtWTs=; b=
-	CEx/5bhW09PdllSKPc+RQvB5sAQJMIjAModMHZtf4adcZIN8reAKRDrVEze8nw25
-	4MQaxdsW3+nB2G/MnTTrXmrkSxUFGoAoPI8SsiB+vyfmYyiavhWpHYkWaSA/o+Pt
-	QLMEV54ZFxTABaNEIR3Uj9qN1AHK5owOMQ1bPeTZGYlsbcdjChtrtWTynfsoZyB3
-	jBnoeq49u213jL1aIkhfPtyeVBwMwf6I913s+NeQfMWlb45gqR9ZPwDzi55lzvZl
-	aMQavA6w1jbbrIie/fKVguBH7PXoMD/pYTa41hHHQga8ZqC6r5v5r+sf3yvYCJxC
-	o2WZaNZKyN/s8GJr+k1VNg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1723063210; x=
-	1723149610; bh=gcQqS4Nvw3oVR6X1QO70/HzE1Wr/SNsmwf90YobtWTs=; b=H
-	3H9+oWzmCH7q+Ht+i284uG0J0DLScMPq8j3wo05s2VPr9hCz5ekfk3M9abJy/6T6
-	gYfyOgL3ClHTGKm6yYuuk/XoluWUEd5VYVRj2m1NF5Livx/tNhySzaKFRA8a93DI
-	6gyzsqB9gGUhVJXZziIUBNpM9x31n7f6pzJyfESW1HTJTIsGwaxDNkYcpMrY+S4v
-	XnrG91BxWxOfpFlooTyxg03IY+Jie5Wy7TiZFptqVjtfH3sQZbQP5yQcKcm0hotn
-	ldSUIH5cu5iJYqqXaNA5PA7/GSGAnEpYb1BoDvzs5xDFccTx7svffXRqGUspwPqy
-	fIchm5WXpXQPOKicbPqUw==
-X-ME-Sender: <xms:qtuzZjFxgfhhUOupIBdlvye-FdoN4-RZy68WKu30K6XIcnIURiZpgw>
-    <xme:qtuzZgVU8TnmjI28CmY8MMMb3LhV3XlatXn69r2iOYFYnrpdqu-S3Kb2-xvwDmb8V
-    bf--woQ3lAjpxiEvFQ>
-X-ME-Received: <xmr:qtuzZlKcOT-pYdn4gO3k-5o3FhIvMrID9a8XLwng6iNqNC7eXhENzs7whupchc6MDg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrledtgdduhedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdejnecuhfhrohhmpeftrghf
-    rggvlhcuuegvihhmshcuoehrrghfrggvlhessggvihhmshdrmhgvqeenucggtffrrghtth
-    gvrhhnpeejieejvdelgeduveejgeeltdevieefteejleeiieejgeeihfelleehtdegudei
-    ieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehrrg
-    hfrggvlhessggvihhmshdrmhgvpdhnsggprhgtphhtthhopedt
-X-ME-Proxy: <xmx:qtuzZhGndCpJc4kIoZyNZ_3CzsB9hxJ3vmFRpVJQKINWz7yZYf5-mg>
-    <xmx:qtuzZpUstN_arVCzhotyH2QspzMCki5qg_QDHYcE3JEsuIegV1R8kg>
-    <xmx:qtuzZsN1B_CjUqx0l31gl5PFWCHaRzD-232qDIghDfQRIwlNNR_TJA>
-    <xmx:qtuzZo3nWwPreQ_Vk0OzFcT1NwFGl3I0WHxkDXJH5WBOQ3Oeh1Etsw>
-    <xmx:qtuzZuWw737ZV9JHTniMVYgh5NPYY0TFgxQy0RdnNxflmjnYac4Zudlj>
-Feedback-ID: idc214666:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 7 Aug 2024 16:40:07 -0400 (EDT)
-Message-ID: <48d37621-13d4-42e0-8cd2-c4b031149b1e@beims.me>
-Date: Wed, 7 Aug 2024 17:40:06 -0300
+	s=arc-20240116; t=1723063613; c=relaxed/simple;
+	bh=LPGe+4xDjATxjh9iTefGBBR1J/WXWbEMEzjnPpFNqmc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b+liGrq34tuqyBbb/blZCNkczR89U6JXXw+qlySgoSAwHs5i3VnzrstwpkBQlpt7CB0KkaM7+r9/pPxbHJar5TiNdK5y24g7v02RUoXpQKNvL+SK4qtyquLk29UZ9fENnLlRx7Vq2yGOSLcyeBLBfowNyNp0S0HVLIZ0qNfgdwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R3SgN3x+; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723063611; x=1754599611;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LPGe+4xDjATxjh9iTefGBBR1J/WXWbEMEzjnPpFNqmc=;
+  b=R3SgN3x+6OoLH/D41J2hrEXQ+EKmzMM5+0lS/0THu7DZyfCAvBtJr3+F
+   LSh1eRxl79WpTu0AlNK1MdGbblqLOQKk93tZFfdhjPYaqq5j1FvHvJ2MU
+   ruMxCip/x9VDuezm16eJ4MKAyXC0dRoH5Y6kO1bOUk/1ulDizYTIG04oT
+   1zFpFCJxI0MrHGD59CiEjRrf17XCnFHqzVkSjgYcPv++ZtwdFSpupYuWf
+   kEgDzUtBqfh79403kQJ+3DVkdosYBTe45bhF2cZb4HAQ8LarYJ6CYuHL4
+   EeD05nbdI0Fg9sxeSkvpmtJ+h0xiurD43k3RspdrvSPHMIH9wLzmczk9F
+   Q==;
+X-CSE-ConnectionGUID: vaJu59+lQlGzZ31vhCOpVQ==
+X-CSE-MsgGUID: c8Wv+59LSP6pBJB8iU5oUQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="38665538"
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="38665538"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 13:46:50 -0700
+X-CSE-ConnectionGUID: hKbPJqmOQ7G+bNXEBBxw3g==
+X-CSE-MsgGUID: bTZxIMj7RNu1vx6xn6taAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="61918545"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 07 Aug 2024 13:46:47 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sbnYS-0005i0-2p;
+	Wed, 07 Aug 2024 20:46:44 +0000
+Date: Thu, 8 Aug 2024 04:46:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phylib: do not disable autoneg for fixed
+ speeds >= 1G
+Message-ID: <202408080457.vhF74DGf-lkp@intel.com>
+References: <E1sbdxI-0024Eo-HE@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 3/4] net: fec: make PPS channel configurable
-Content-Language: pt-BR
-To: Francesco Dolcini <francesco@dolcini.it>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Francesco Dolcini <francesco.dolcini@toradex.com>, imx@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240807144349.297342-1-francesco@dolcini.it>
- <20240807144349.297342-4-francesco@dolcini.it>
-From: Rafael Beims <rafael@beims.me>
-In-Reply-To: <20240807144349.297342-4-francesco@dolcini.it>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1sbdxI-0024Eo-HE@rmk-PC.armlinux.org.uk>
 
-On 07/08/2024 11:43, Francesco Dolcini wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
->
-> Depending on the SoC where the FEC is integrated into the PPS channel
-> might be routed to different timer instances. Make this configurable
-> from the devicetree.
->
-> When the related DT property is not present fallback to the previous
-> default and use channel 0.
->
-> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
-> ---
->   drivers/net/ethernet/freescale/fec_ptp.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
-> index 6f0f8bf61752..8e17fd0c8e6d 100644
-> --- a/drivers/net/ethernet/freescale/fec_ptp.c
-> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
-> @@ -529,8 +529,6 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
->   	unsigned long flags;
->   	int ret = 0;
->   
-> -	fep->pps_channel = DEFAULT_PPS_CHANNEL;
-> -
->   	if (rq->type == PTP_CLK_REQ_PPS) {
->   		fep->reload_period = PPS_OUPUT_RELOAD_PERIOD;
->   
-> @@ -712,12 +710,16 @@ void fec_ptp_init(struct platform_device *pdev, int irq_idx)
->   {
->   	struct net_device *ndev = platform_get_drvdata(pdev);
->   	struct fec_enet_private *fep = netdev_priv(ndev);
-> +	struct device_node *np = fep->pdev->dev.of_node;
->   	int irq;
->   	int ret;
->   
->   	fep->ptp_caps.owner = THIS_MODULE;
->   	strscpy(fep->ptp_caps.name, "fec ptp", sizeof(fep->ptp_caps.name));
->   
-> +	fep->pps_channel = DEFAULT_PPS_CHANNEL;
-> +	of_property_read_u32(np, "fsl,pps-channel", &fep->pps_channel);
-> +
->   	fep->ptp_caps.max_adj = 250000000;
->   	fep->ptp_caps.n_alarm = 0;
->   	fep->ptp_caps.n_ext_ts = 0;
-Tested-by: rafael.beims@toradex.com
+Hi Russell,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-phylib-do-not-disable-autoneg-for-fixed-speeds-1G/20240807-185909
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/E1sbdxI-0024Eo-HE%40rmk-PC.armlinux.org.uk
+patch subject: [PATCH net-next] net: phylib: do not disable autoneg for fixed speeds >= 1G
+config: arc-randconfig-001-20240808 (https://download.01.org/0day-ci/archive/20240808/202408080457.vhF74DGf-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080457.vhF74DGf-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408080457.vhF74DGf-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   drivers/net/phy/phy_device.c: In function 'genphy_config_advert':
+>> drivers/net/phy/phy_device.c:2124:41: warning: passing argument 1 of 'linkmode_adv_to_mii_adv_t' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    2124 |         adv = linkmode_adv_to_mii_adv_t(advert);
+         |                                         ^~~~~~
+   In file included from include/uapi/linux/mdio.h:15,
+                    from include/linux/mdio.h:9,
+                    from drivers/net/phy/phy_device.c:23:
+   include/linux/mii.h:143:60: note: expected 'long unsigned int *' but argument is of type 'const long unsigned int *'
+     143 | static inline u32 linkmode_adv_to_mii_adv_t(unsigned long *advertising)
+         |                                             ~~~~~~~~~~~~~~~^~~~~~~~~~~
+>> drivers/net/phy/phy_device.c:2147:46: warning: passing argument 1 of 'linkmode_adv_to_mii_ctrl1000_t' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+    2147 |         adv = linkmode_adv_to_mii_ctrl1000_t(advert);
+         |                                              ^~~~~~
+   include/linux/mii.h:218:65: note: expected 'long unsigned int *' but argument is of type 'const long unsigned int *'
+     218 | static inline u32 linkmode_adv_to_mii_ctrl1000_t(unsigned long *advertising)
+         |                                                  ~~~~~~~~~~~~~~~^~~~~~~~~~~
+   drivers/net/phy/phy_device.c: In function '__genphy_config_aneg':
+>> drivers/net/phy/phy_device.c:2401:25: error: implicit declaration of function 'linkmode_set'; did you mean 'linkmode_subset'? [-Werror=implicit-function-declaration]
+    2401 |                         linkmode_set(set->bit, fixed_advert);
+         |                         ^~~~~~~~~~~~
+         |                         linkmode_subset
+   cc1: some warnings being treated as errors
+
+
+vim +2401 drivers/net/phy/phy_device.c
+
+  2359	
+  2360	/**
+  2361	 * __genphy_config_aneg - restart auto-negotiation or write BMCR
+  2362	 * @phydev: target phy_device struct
+  2363	 * @changed: whether autoneg is requested
+  2364	 *
+  2365	 * Description: If auto-negotiation is enabled, we configure the
+  2366	 *   advertising, and then restart auto-negotiation.  If it is not
+  2367	 *   enabled, then we write the BMCR.
+  2368	 */
+  2369	int __genphy_config_aneg(struct phy_device *phydev, bool changed)
+  2370	{
+  2371		__ETHTOOL_DECLARE_LINK_MODE_MASK(fixed_advert);
+  2372		const struct phy_setting *set;
+  2373		unsigned long *advert;
+  2374		int err;
+  2375	
+  2376		err = genphy_c45_an_config_eee_aneg(phydev);
+  2377		if (err < 0)
+  2378			return err;
+  2379		else if (err)
+  2380			changed = true;
+  2381	
+  2382		err = genphy_setup_master_slave(phydev);
+  2383		if (err < 0)
+  2384			return err;
+  2385		else if (err)
+  2386			changed = true;
+  2387	
+  2388		if (phydev->autoneg == AUTONEG_ENABLE) {
+  2389			/* Only allow advertising what this PHY supports */
+  2390			linkmode_and(phydev->advertising, phydev->advertising,
+  2391				     phydev->supported);
+  2392			advert = phydev->advertising;
+  2393		} else if (phydev->speed < SPEED_1000) {
+  2394			return genphy_setup_forced(phydev);
+  2395		} else {
+  2396			linkmode_zero(fixed_advert);
+  2397	
+  2398			set = phy_lookup_setting(phydev->speed, phydev->duplex,
+  2399						 phydev->supported, true);
+  2400			if (set)
+> 2401				linkmode_set(set->bit, fixed_advert);
+  2402	
+  2403			advert = fixed_advert;
+  2404		}
+  2405	
+  2406		err = genphy_config_advert(phydev, advert);
+  2407		if (err < 0) /* error */
+  2408			return err;
+  2409		else if (err)
+  2410			changed = true;
+  2411	
+  2412		return genphy_check_and_restart_aneg(phydev, changed);
+  2413	}
+  2414	EXPORT_SYMBOL(__genphy_config_aneg);
+  2415	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
