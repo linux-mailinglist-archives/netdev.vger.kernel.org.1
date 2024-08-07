@@ -1,108 +1,177 @@
-Return-Path: <netdev+bounces-116470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 070AB94A892
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:27:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6784694A89D
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2C5E1F25728
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:27:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 036C6B2440F
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE021E7A4A;
-	Wed,  7 Aug 2024 13:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 731FE1E7A53;
+	Wed,  7 Aug 2024 13:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IU1XCW/D"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QKrFc1+1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3A61E6738;
-	Wed,  7 Aug 2024 13:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68E61BDAB0;
+	Wed,  7 Aug 2024 13:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723037271; cv=none; b=ZU8iRGAH0wE2jgKcgbjjD6EKF5F+NZkBJQAgDkEj/IrPI5kLxSJI1e2OB8EBsMH5bqc/sADYxKcUZ/kQIGmzRDQcbkU6AXb53VqLqfZzS4WicfOwpfwoQS7FLq3bWsPHRI/fYmOeh7kvoN9SwznOzuv/fVdSv1F6tkjZef+s+cg=
+	t=1723037384; cv=none; b=eTFm6R2COhlBG3CEkfji2ZwNvXfMkMU2ELnrTWEe2qx8rncNlpTcYDvZuyZGCwgvw9ggWrQ4aJWx3/fjiLr5wVwLzrTOrhzaINw/R1Kltfpf76JzeQidYfS7e11EzntVNRX8E8AUxwwD3fig1IpUF3jzwtl6xpvNmLxPQHG8B/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723037271; c=relaxed/simple;
-	bh=OADje7zt8dY9Vw2o86Ho381UgUDbTseWM16A5rJV8f0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZjogVvDiXAHVYlb+p6s6Fo9uBUn3CLcBzGHYRNwD9qfqav6s1mLzzR9dX/4nni8D2eHJqNPMAmUhbyLZ2zNGUOsWqc0aEmCWbXfXSTG/LOLJ8iTJ+bJblHH6pvHaXoc0THGnTbeh+YuQpXQddg9BUL3V3GkYQK1a37/bl0cmx1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IU1XCW/D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ABB6C32782;
-	Wed,  7 Aug 2024 13:27:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723037270;
-	bh=OADje7zt8dY9Vw2o86Ho381UgUDbTseWM16A5rJV8f0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IU1XCW/D6wOEwJcQtvuddIih6pY5hqO+GhjH9X+ewtQcpYnB0Y48f/8su+gb/ptew
-	 Pq6CW7/SMiXzEXzOhvSI9UHmFuTXWh3SFp/onAqKyioaX9MAGG9t0thw/5isrH6xt6
-	 WuvGUfqyLCK0ZAWtGwXR0oNsOzJYoXxody01XDvOtaXSWZaPi/Qf1RGDCHrhe7nVqk
-	 tyffwT0A2YgPKjUth5a0pM/AfK7nIjZ+cstwKuHWhmIpCzxYCkVNSrtjRNtMTq7RKB
-	 AELnht5eip8je6Ctavbs0M3RuzKicTBWkh5eDkzF9tFI5qjjxEwxC8afQNzl45RR+j
-	 rmZTzDarW0GWw==
-Date: Wed, 7 Aug 2024 09:27:48 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Siddh Raman Pant <siddh.raman.pant@oracle.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"pablo@netfilter.org" <pablo@netfilter.org>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: CVE-2024-39503: netfilter: ipset: Fix race between namespace
- cleanup and gc in the list:set type
-Message-ID: <ZrN2VCc9hM_mahCS@sashalap>
-References: <2024071204-CVE-2024-39503-e604@gregkh>
- <c44971f608d7d1d2733757112ef6fca87b004d17.camel@oracle.com>
+	s=arc-20240116; t=1723037384; c=relaxed/simple;
+	bh=qM9AJoWa5VmLYkAsAiKwksrHXv6FKgyEFWqPkI2GMqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uU9roS21g7mC+2Zb6R9AWTp4usfu79HF2wCJBEec129f4pusLr+LnUI5glG4J+PYvzV4sVTHFO/LKAa/tkaZ6JmnPbF9KhB2T3bDRgZ2UJkGeXOelrHD4/QBeUDugWr4V8+nrB7uJhhDAMGIj86ibHkOSct+xGkWKX9OL0xSwy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QKrFc1+1; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1BF49FF803;
+	Wed,  7 Aug 2024 13:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1723037373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cVTsGVO8WsmaD67opd83BfGFsRJNsmaLrq0szd22Jso=;
+	b=QKrFc1+1fIuGLesvgymIYwFwPnJVb+rjl/ZP2BoUrhJkQHOAu3stwDe1XaFP5f1eyJMV7Z
+	wFUrzvoCkJYAueAKr2mIol3f3K3XFnHB3lxhNmt73ny2WI/AA+vHckq86dKEJbVn8ZVTVP
+	fopVlsEIQ58rnvRhdDkm7fmuAUlvS2UPUxpGQt4oct1orI9nBrxSWPSwmG9Ie8+QR78NQ+
+	VQLK1LZZBKe5OaArKNDpzmXOn7Q0AyHGbd1bW8c7tpMilCRP7IHd69jdY9f1enEjVKs75E
+	WeC790m5b+uinjI8a4yCuVB45CSGfeUpl4gkjgfMvqsnv0jz1uiwlbo14cMdBg==
+Date: Wed, 7 Aug 2024 15:29:27 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Simon Horman
+ <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ devicetree@vger.kernel.org, Allan Nielsen <allan.nielsen@microchip.com>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
+ <clement.leger@bootlin.com>
+Subject: Re: [PATCH v4 3/8] mfd: syscon: Add reference counting and device
+ managed support
+Message-ID: <20240807152927.22e40284@bootlin.com>
+In-Reply-To: <CAHp75VfKXEyHF25xRq8EDp5SeBdyPHLgzw=4s1xkjer=sNu7aw@mail.gmail.com>
+References: <20240805101725.93947-1-herve.codina@bootlin.com>
+	<20240805101725.93947-4-herve.codina@bootlin.com>
+	<CAHp75VfKXEyHF25xRq8EDp5SeBdyPHLgzw=4s1xkjer=sNu7aw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <c44971f608d7d1d2733757112ef6fca87b004d17.camel@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Wed, Aug 07, 2024 at 06:42:14AM +0000, Siddh Raman Pant wrote:
->On Fri, 12 Jul 2024 14:21:09 +0200, Greg Kroah-Hartman wrote:
->> In the Linux kernel, the following vulnerability has been resolved:
->>
->> netfilter: ipset: Fix race between namespace cleanup and gc in the list:set type
->>
->> Lion Ackermann reported that there is a race condition between namespace cleanup
->> in ipset and the garbage collection of the list:set type. The namespace
->> cleanup can destroy the list:set type of sets while the gc of the set type is
->> waiting to run in rcu cleanup. The latter uses data from the destroyed set which
->> thus leads use after free. The patch contains the following parts:
->>
->> - When destroying all sets, first remove the garbage collectors, then wait
->>   if needed and then destroy the sets.
->> - Fix the badly ordered "wait then remove gc" for the destroy a single set
->>   case.
->> - Fix the missing rcu locking in the list:set type in the userspace test
->>   case.
->> - Use proper RCU list handlings in the list:set type.
->>
->> The patch depends on c1193d9bbbd3 (netfilter: ipset: Add list flush to cancel_gc).
->
->This commit does not exist in stable kernels. Please backport it.
->
->	netfilter: ipset: Add list flush to cancel_gc
->	
->	Flushing list in cancel_gc drops references to other lists right away,
->	without waiting for RCU to destroy list. Fixes race when referenced
->	ipsets can't be destroyed while referring list is scheduled for destroy.
->
->Since this is missing, the CVE fix potentially introduced new races as
->it makes use of RCU.
+Hi Andy,
 
-Indeed, looks like it was missing on older trees. I'll queue it up.
+On Mon, 5 Aug 2024 22:20:56 +0200
+Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
 
-Thanks!
+> On Mon, Aug 5, 2024 at 12:19 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> >
+> > From: Clément Léger <clement.leger@bootlin.com>
+> >
+> > Syscon releasing is not supported.
+> > Without release function, unbinding a driver that uses syscon whether
+> > explicitly or due to a module removal left the used syscon in a in-use
+> > state.
+> >
+> > For instance a syscon_node_to_regmap() call from a consumer retrieve a  
+> 
+> retrieves?
 
--- 
-Thanks,
-Sasha
+Indeed, will be fixed.
+
+> 
+> > syscon regmap instance. Internally, syscon_node_to_regmap() can create
+> > syscon instance and add it to the existing syscon list. No API is
+> > available to release this syscon instance, remove it from the list and
+> > free it when it is not used anymore.
+> >
+> > Introduce reference counting in syscon in order to keep track of syscon
+> > usage using syscon_{get,put}() and add a device managed version of
+> > syscon_regmap_lookup_by_phandle(), to automatically release the syscon
+> > instance on the consumer removal.  
+> 
+> ...
+> 
+> > -       if (!syscon)
+> > +       if (!syscon) {
+> >                 syscon = of_syscon_register(np, check_res);
+> > +               if (IS_ERR(syscon))
+> > +                       return ERR_CAST(syscon);
+> > +       } else {
+> > +               syscon_get(syscon);
+> > +       }  
+> 
+>   if (syscon)
+>     return syscon_get();
+> 
+> ?
+> 
+> > +       return syscon;  
+
+Yes and further more, I will remove also the unneeded IS_ERR() and ERR_CAST().
+This will lead to just:
+
+	if (syscon)
+		return syscon_get(syscon);
+
+	return of_syscon_register(np, check_res);
+
+> 
+> ...
+> 
+> > +static struct regmap *__devm_syscon_get(struct device *dev,
+> > +                                       struct syscon *syscon)
+> > +{
+> > +       struct syscon **ptr;
+> > +
+> > +       if (IS_ERR(syscon))
+> > +               return ERR_CAST(syscon);
+> > +
+> > +       ptr = devres_alloc(devm_syscon_release, sizeof(struct syscon *), GFP_KERNEL);
+> > +       if (!ptr) {
+> > +               syscon_put(syscon);
+> > +               return ERR_PTR(-ENOMEM);
+> > +       }
+> > +
+> > +       *ptr = syscon;
+> > +       devres_add(dev, ptr);
+> > +
+> > +       return syscon->regmap;  
+> 
+> Can't the devm_add_action_or_reset() be used in this case? If so,
+> perhaps a comment to explain why?
+
+There is no reason to avoid the use of devm_add_action_or_reset() here.
+So, I will use it in the next iteration.
+
+Thanks for your review.
+
+Best regards,
+Hervé
 
