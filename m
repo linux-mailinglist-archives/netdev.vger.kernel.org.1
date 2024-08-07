@@ -1,124 +1,134 @@
-Return-Path: <netdev+bounces-116460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B64E894A7AD
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:28:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1951494A7B3
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E75A31C2192E
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:28:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 528FF1C21B44
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F10B1E4F18;
-	Wed,  7 Aug 2024 12:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0571E4F1C;
+	Wed,  7 Aug 2024 12:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Z4vW7fBv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InALkeYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from msa.smtpout.orange.fr (smtp-74.smtpout.orange.fr [80.12.242.74])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61CC1C57BE;
-	Wed,  7 Aug 2024 12:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971171E2101;
+	Wed,  7 Aug 2024 12:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723033698; cv=none; b=i19/Zz9RMX2ow/PvdWRBcwlHFy8PPciIqOvOXCfhe0uTLwFzz3U0AM63pyNuc2SS3xBK01n3dzlh8v8VOw3UcQE9e4ou0Pd/A3nqWrzJTxs/owuo43On3swgrJEo60wE52hILvK+ZuMi+E0qOGBZrLRNofO6UjD8vUbKweNToDM=
+	t=1723033789; cv=none; b=gmjLz8pHQ69fdjveLvpyhqqoZYTup70wQgIbIkGizTKCYRomFtZyWqrJdUIqAPB3NzqeLipFvCfyeKPxUWzq+5h9AIXmaGwTgjgEh9NEucoP3CHztOnpSSsY+tupYuiZ1cBe8YeHym7EZOP4tnV4q1ED9lARNNczNdbWfi+EtOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723033698; c=relaxed/simple;
-	bh=SqMOCythxzQqCY+lWdjHygqsO5tL4QYBop/gjmsZfiU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tzGEsvlV7poQtLGllkt7S6cjl1FbZU9dvJ2vLWsBvNxv06K7oCQ2AV36LKs7/PERWQuPrpp4Oez0RzRtwaNL49uYr+Gqr+UMh76XXuVEJ1XTjA7yqMb1O1JLABPVvNX/TGzj0btFctceu0ZC7ciUhIzvMW9qwQENxxWn9BVJU2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Z4vW7fBv; arc=none smtp.client-ip=80.12.242.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id bflusC0EbxIArbflusddu3; Wed, 07 Aug 2024 14:28:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1723033688;
-	bh=2vfZY3nddFhtxMjpMQJnJki0lc7IKZ7yCee76VY1+lc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Z4vW7fBv9P6cCalwXwfo0IZdQsh3aTjSlixk50mEaEfD6x0Uz9q0jAJ9uvhirQgjt
-	 uyjwtw4Wp56pjt29vfmQJjO+coX3AL1ZdAKEcyg6Juqrpg/XfrdehdqHWSnqo6fLyk
-	 tG6Fh99+Ue/Wx3jjfFlhaA3i2yozPpB8xqx9DE8ieb/edMvTIAUiYuKm3Bd/OCJXNF
-	 i6epJxHeBjeWfkyebIQMJrJlqb9MT4CwXMGKXlyFr0WFnYyisvlTBD8VSOzO/wufqY
-	 k2x/Utnbqd6fsN67zKzkZCnPhg5dI0Bn++iL0ze+LjKRzVyfPiezmAF0MuuVEqp+S8
-	 Mk2gqosrYeW7A==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 07 Aug 2024 14:28:08 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <4850b81e-d426-4abd-87f8-2712cd0b5de4@wanadoo.fr>
-Date: Wed, 7 Aug 2024 14:28:06 +0200
+	s=arc-20240116; t=1723033789; c=relaxed/simple;
+	bh=pgiw/PXddMIrw7PyP7Ctp5k5rWWWnsIDF+Ip6XS+nU4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZzoORiD1yz9tT3ci4ojS6G3PoP5o69TTrCXcG82pT891swkeglRd1vt3XIminrliQw3W2VGIluoUm/ZppkMpewdlUIibTlmI+IM+tmjfq5BfBLbSHsj60KcJ+9ZmqajG02lL2AVg0a6PmiJi6LQ7MbTUoNg7kQ5w5bYJuQaEP+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InALkeYZ; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1ff4568676eso18167975ad.0;
+        Wed, 07 Aug 2024 05:29:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723033787; x=1723638587; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kx32xTT3Lmjn28QqG28xI58RScq11tK0yTOGRh/oOE4=;
+        b=InALkeYZdPu7jCgUElCeuRW7/X+R2krN6fMJH1gEVVsB4UbInj2c0Ooarc6fN/k8kT
+         ievk/lYeMiUhSnFjtq95iG5YMMJdslV66z1UhXW2s/2zVZ0zOwYpnf3706VEHtyUHWfv
+         kcongexK6KJxH2NXVnLNhRPoPS4Vefe9fGl/Jtxm7RmrISF02ThK9/0U3ciltXsBsv34
+         kQRcC8JrARXadCNmLanmPKcvX5RsBajVkOpjqXSP+nkFBXhqnA21g7NtiR69Uxnvqgfe
+         BszFKuqyaZzbp5H3eaRDeLm1pZR4u1fJltd41WhCyVRM7GeEKbUF4T54smQiVMufSdD8
+         lAJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723033787; x=1723638587;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kx32xTT3Lmjn28QqG28xI58RScq11tK0yTOGRh/oOE4=;
+        b=dYaYB9tsDZMnUYEr2Zn1rBpLaIUDm3SQcms18AUNb+t4BmtRygAm34TSQ5ADdHIZfv
+         7JbGWDNGqh5fMyUruvdNVwCpADdHW1xkpspC7Sj0wFAbmd0S43J3U+qF6Nfq9IquJ4oJ
+         G9S3AdE1xiGXoI6XabmOoT+oNkLGuj2UI08mi2bY4JFIll1I94uO/pOIH8++KsSPCQvF
+         NAIEzzqhyQNzgSKoSLIwIY7PJfotoVIAE8bimmQLdQNyQfHsCELmTUHWHvicCeOCsSUg
+         ayPwFZLB6heBDkYFfDFhmoVlZdqr/fNSNXZIZO/nkslPllT05OTrKv6x+fSyqoUY/2SL
+         Yw5w==
+X-Forwarded-Encrypted: i=1; AJvYcCW8Pyla9kVCKpvfKinCIe7OwyKSGaKmR2P/BnEI8xXZsDtI/6FPmdzrSq1eu/AvRdutV7OybMtJMf86addMoOGp3dtJscYXwSGnepnQ9EdPiva/OlqCwcooKwmjOxvJBmEiBXuA0sd1b0RLrf1YX4iOjlb4jAffpVz6ZWRD5D5mMXiTRFKjI+0QmnVMPFZ3wbHgo1hJuBn15XeXMg==
+X-Gm-Message-State: AOJu0YxCV01I5As8SLNZieWb0JM8BSnXPIR4YpwQvjSQxQAfDgFxl4vc
+	NIjTLNUYMjJESwKprCWoxWM/bcwCmgl4iaVtUSKRXF8ULiXgAnvweg+Ajf7To1BVChgAefpto2w
+	50daulzASN3fXqoJ/7iJ/+q9a2AA=
+X-Google-Smtp-Source: AGHT+IHX/Io8BGEe/ckylAL2OpQEtD0KNkWtQjYnygkiTok5unepYcDXoXJVkqfRWDMR5n7NAPzxYbxjWVzJl5nWASc=
+X-Received: by 2002:a17:903:41d2:b0:1fd:9d0c:9996 with SMTP id
+ d9443c01a7336-1ff572d4738mr263854185ad.35.1723033786674; Wed, 07 Aug 2024
+ 05:29:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: ethernet: use ip_hdrlen() instead of bit shift
-To: Moon Yeounsu <yyyynoom@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240807100721.101498-1-yyyynoom@gmail.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240807100721.101498-1-yyyynoom@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240806193622.GA74589@bhelgaas> <20240807084348.12304-1-mattc@purestorage.com>
+ <alpine.DEB.2.21.2408070956520.61955@angie.orcam.me.uk>
+In-Reply-To: <alpine.DEB.2.21.2408070956520.61955@angie.orcam.me.uk>
+From: "Oliver O'Halloran" <oohall@gmail.com>
+Date: Wed, 7 Aug 2024 22:29:35 +1000
+Message-ID: <CAOSf1CHo66dxmChrx97+tfKSE=JM_NzrgdUF_Y4kFabnu3qotQ@mail.gmail.com>
+Subject: Re: PCI: Work around PCIe link training failures
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Matthew W Carlis <mattc@purestorage.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	linux-pci@vger.kernel.org, mahesh@linux.ibm.com, edumazet@google.com, 
+	sr@denx.de, leon@kernel.org, linux-rdma@vger.kernel.org, helgaas@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, Jim Wilson <wilson@tuliptree.org>, 
+	linuxppc-dev@lists.ozlabs.org, npiggin@gmail.com, alex.williamson@redhat.com, 
+	Bjorn Helgaas <bhelgaas@google.com>, mika.westerberg@linux.intel.com, 
+	david.abdurachmanov@gmail.com, saeedm@nvidia.com, 
+	linux-kernel@vger.kernel.org, lukas@wunner.de, netdev@vger.kernel.org, 
+	pali@kernel.org, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 07/08/2024 à 12:07, Moon Yeounsu a écrit :
-> `ip_hdr(skb)->ihl << 2` is the same as `ip_hdrlen(skb)`
-> Therefore, we should use a well-defined function not a bit shift
-> to find the header length.
-> 
-> It also compresses two lines to a single line.
-> 
-> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+On Wed, Aug 7, 2024 at 9:14=E2=80=AFPM Maciej W. Rozycki <macro@orcam.me.uk=
+> wrote:
+>
+> On Wed, 7 Aug 2024, Matthew W Carlis wrote:
+>
+> > > it does seem like this series made wASMedia ASM2824 work better but
+> > > caused regressions elsewhere, so maybe we just need to accept that
+> > > ASM2824 is slightly broken and doesn't work as well as it should.
+> >
+> > One of my colleagues challenged me to provide a more concrete example
+> > where the change will cause problems. One such configuration would be n=
+ot
+> > implementing the Power Controller Control in the Slot Capabilities Regi=
+ster.
+> > Then, Powering off the slot via out-of-band interfaces would result in =
+the
+> > kernel forcing the DSP to Gen1 100% of the time as far as I can tell.
+> > The aspect of this force to Gen1 that is the most concerning to my team=
+ is
+> > that it isn't cleaned up even if we replaced the EP with some other EP.
+>
+>  Why does that happen?
+>
+>  For the quirk to trigger, the link has to be down and there has to be th=
+e
+> LBMS Link Status bit set from link management events as per the PCIe spec
+> while the link was previously up, and then both of that while rescanning
+> the PCIe device in question, so there's a lot of conditions to meet.  Is
+> it the case that in your setup there is no device at this point, but one
+> gets plugged in later?
 
-Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-
-> ---
-> v1: use ip_hdrlen() instead of bit shift
-> Reference: https://lore.kernel.org/all/20240802054421.5428-1-yyyynoom@gmail.com/
-> 
-> v2: remove unnecessary parentheses
-> - Remove extra () [Christophe Jaillet, Simon Horman]
-> - Break long lines [Simon Horman]
-> Reference: https://lore.kernel.org/all/20240803022949.28229-1-yyyynoom@gmail.com/
-> 
-> v3: create a standalone patch
-> - Start with a new thread
-> - Include the change logs,
-> - Create a standalone patch [Christophe Jaillet]
-> 
->   drivers/net/ethernet/jme.c | 10 ++++------
->   1 file changed, 4 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
-> index b06e24562973..d8be0e4dcb07 100644
-> --- a/drivers/net/ethernet/jme.c
-> +++ b/drivers/net/ethernet/jme.c
-> @@ -946,15 +946,13 @@ jme_udpsum(struct sk_buff *skb)
->   	if (skb->protocol != htons(ETH_P_IP))
->   		return csum;
->   	skb_set_network_header(skb, ETH_HLEN);
-> -	if ((ip_hdr(skb)->protocol != IPPROTO_UDP) ||
-> -	    (skb->len < (ETH_HLEN +
-> -			(ip_hdr(skb)->ihl << 2) +
-> -			sizeof(struct udphdr)))) {
-> +
-> +	if (ip_hdr(skb)->protocol != IPPROTO_UDP ||
-> +	    skb->len < (ETH_HLEN + ip_hdrlen(skb) + sizeof(struct udphdr))) {
->   		skb_reset_network_header(skb);
->   		return csum;
->   	}
-> -	skb_set_transport_header(skb,
-> -			ETH_HLEN + (ip_hdr(skb)->ihl << 2));
-> +	skb_set_transport_header(skb, ETH_HLEN + ip_hdrlen(skb));
->   	csum = udp_hdr(skb)->check;
->   	skb_reset_transport_header(skb);
->   	skb_reset_network_header(skb);
-
+My read was that Matt is essentially doing a surprise hot-unplug by
+removing power to the card without notifying the OS. I thought the
+LBMS bit wouldn't be set in that case since the link goes down rather
+than changes speed, but the spec is a little vague and that appears to
+be happening in Matt's testing. It might be worth disabling the
+workaround if the port has the surprise hotplug capability bit set.
+It's fairly common for ports on NVMe drive backplanes to have it set
+and a lot of people would be unhappy about those being forced to Gen 1
+by accident.
 
