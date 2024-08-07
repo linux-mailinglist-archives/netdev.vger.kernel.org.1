@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-116627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F82594B36E
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:13:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E61C94B371
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A35A41C20C78
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:13:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F0E4B21F05
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F38155A59;
-	Wed,  7 Aug 2024 23:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66BC9155CBD;
+	Wed,  7 Aug 2024 23:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oD6psJ8D"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BA91iDZy"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A581553BC
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 23:13:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F35155A21
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 23:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723072418; cv=none; b=PgFtUXbI75aAZx5FV0BHMXrPTtQb3evC/3LdgPoHgz2rFebLE98DCbee6+w0VMrv4pk/dutjqwmj38p3znnGlscaPOol3g+OeBi7sknccevLQAtshVyFyTVVaafvLzTptvWLSGtYH2YYajylfIIPAHxk5RSVCWaBnB2c3zyNVCw=
+	t=1723072419; cv=none; b=At0AUmTiR9WyomAzPho2WFbds8/wlAouIO5O97NOfVKQ49qsFtVbiVdeZ7cCqjfN3ab1Cc4Nh0zt0hpdwMOcOVZwTKhCpPnAq2kDPsIRGBFchkqXU5IP4iPonfxc/V9FsiKXaUQtVdyWONxmYiOVUR0PF9jKSD/Vy9EYFtF2oZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723072418; c=relaxed/simple;
-	bh=gYW1Mz/N9tELiFPT0gvgddfr/2nTZcI9aC+jVh1t2Mk=;
+	s=arc-20240116; t=1723072419; c=relaxed/simple;
+	bh=+sgRE3ATJn+TS8TiBRcbN9sQCHaISZPkexzHT2Sa89Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PviUCe5S4rE33SKd2OgDg39Udplckh0fEmZVZAVxK6TS7sk5a3X+Y9LSLXNlGIY0dX0eyWkCY5bl7XbozuvWhQhialnMel2sMff0vuEno7DuoHKyEdUsRJTdFCbrwBTRq5fucKofW9Q9Z2twuaXb8bvivjjTPuQ9Id+0Jehpn38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oD6psJ8D; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=TNDEar2MvAWbiRW0pYr5TJIiFshvqUIlMa2rGADMGL4ujT5FrVfQKA1i/6Cr2yhOGVZUPdekBC9rL9A017A075UXJj2E41VjGX7MOqi7azcZqysfJLhji+LSM7Y07Nrc4ARWqzdZ6+HFbCtAx8gm1CItl8RdR6GZPsfNob5rNfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BA91iDZy; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723072416; x=1754608416;
+  t=1723072418; x=1754608418;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gYW1Mz/N9tELiFPT0gvgddfr/2nTZcI9aC+jVh1t2Mk=;
-  b=oD6psJ8DX1s5yM4H8+OR9fFbYT1GubVZaLDfFHltMhkCWIlIe9lJBrSu
-   jfXyJaqEYKmfjl9S43qKzeNhsRSwdhCzzL31QuwTPk7zi9zBIOBT69co9
-   4RnxTH8bVigVBsd8fwyyHh79Zb9N0RGY6t7QG+UAfR88V1DWY3l+AxTjc
-   f3fdG7KNB1l2sxBfrxgxwBnrl2aFri/+xCjD6NzZwn/NvyUWyPG/GuwYD
-   IrbaTEf6fCYK6rApIaleCPoa9+iqBKOP9HWncV13PnePK7rdHhASD7VGV
-   CB1xqkKf0QAt97etjaMcCFKrSmdL356LWcoBJgJCnPSxHwj6VCdvZC0sc
-   w==;
-X-CSE-ConnectionGUID: Bc7B/8OZTxeV3I46+cOj0Q==
-X-CSE-MsgGUID: YMNs4VhyRFKp2/h/qS39AA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="32577308"
+  bh=+sgRE3ATJn+TS8TiBRcbN9sQCHaISZPkexzHT2Sa89Y=;
+  b=BA91iDZydrKCf1yMXnxvs2LHUlLLYLAHgKslz8LxLkjpozb3dis572nS
+   8ej6vs6Ao3rU7kdEED7Cagu60kLZHu0WmUqQqiob+M5TwkTzu/jjK9GFd
+   ouS7R+X+cnIevHL6A0qgnnEq6frY5vyNSzZOYRBc5zt0XrvH+tsESknnW
+   ASAWd40dbQauEHnR0CCenl4PqLefn6EcazoELG0g54PTo81ljiEq6gYb2
+   Y7T4SAWuja4sBhN/pJdWpPQBbODSAwEhu7cgLK1Juu4PVCobY10njxjbX
+   sjzSx4PiMGF4FwnsRDZslu+8bCNHNSUcjU8OVpYukUluQ4Wpab7s+taW5
+   g==;
+X-CSE-ConnectionGUID: 8/uhVFuJRrmYcDw8CA8UuQ==
+X-CSE-MsgGUID: R/k56QpvQ0CHT3MDh0zxRg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="32577313"
 X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
-   d="scan'208";a="32577308"
+   d="scan'208";a="32577313"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
   by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 16:13:34 -0700
-X-CSE-ConnectionGUID: 3bCYnsRVSiWur9MlCXyXvw==
-X-CSE-MsgGUID: 52YMflCxRUW7mmEgrNHAug==
+X-CSE-ConnectionGUID: FtMIhrW1T0yNHB7F7FGZ5A==
+X-CSE-MsgGUID: EFq5rzRIRYWTOtvnBJJYZw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
-   d="scan'208";a="61956622"
+   d="scan'208";a="61956625"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa004.jf.intel.com with ESMTP; 07 Aug 2024 16:13:34 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -72,9 +72,9 @@ Cc: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
 	horms@kernel.org,
 	rodrigo.cadore@l-acoustics.com,
 	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net 2/4] igc: Fix qbv_config_change_errors logics
-Date: Wed,  7 Aug 2024 16:13:26 -0700
-Message-ID: <20240807231329.3827092-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 3/4] igc: Fix reset adapter logics when tx mode change
+Date: Wed,  7 Aug 2024 16:13:27 -0700
+Message-ID: <20240807231329.3827092-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240807231329.3827092-1-anthony.l.nguyen@intel.com>
 References: <20240807231329.3827092-1-anthony.l.nguyen@intel.com>
@@ -88,124 +88,98 @@ Content-Transfer-Encoding: 8bit
 
 From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 
-When user issues these cmds:
-1. Either a) or b)
-   a) mqprio with hardware offload disabled
-   b) taprio with txtime-assist feature enabled
-2. etf
-3. tc qdisc delete
-4. taprio with base time in the past
+Following the "igc: Fix TX Hang issue when QBV Gate is close" changes,
+remaining issues with the reset adapter logic in igc_tsn_offload_apply()
+have been observed:
 
-At step 4, qbv_config_change_errors wrongly increased by 1.
+1. The reset adapter logics for i225 and i226 differ, although they should
+   be the same according to the guidelines in I225/6 HW Design Section
+   7.5.2.1 on software initialization during tx mode changes.
+2. The i225 resets adapter every time, even though tx mode doesn't change.
+   This occurs solely based on the condition  igc_is_device_id_i225() when
+   calling schedule_work().
+3. i226 doesn't reset adapter for tsn->legacy tx mode changes. It only
+   resets adapter for legacy->tsn tx mode transitions.
+4. qbv_count introduced in the patch is actually not needed; in this
+   context, a non-zero value of qbv_count is used to indicate if tx mode
+   was unconditionally set to tsn in igc_tsn_enable_offload(). This could
+   be replaced by checking the existing register
+   IGC_TQAVCTRL_TRANSMIT_MODE_TSN bit.
 
-Excerpt from IEEE 802.1Q-2018 8.6.9.3.1:
-"If AdminBaseTime specifies a time in the past, and the current schedule
-is running, then: Increment ConfigChangeError counter"
+This patch resolves all issues and enters schedule_work() to reset the
+adapter only when changing tx mode. It also removes reliance on qbv_count.
 
-qbv_config_change_errors should only increase if base time is in the past
-and no taprio is active. In user perspective, taprio was not active when
-first triggered at step 4. However, i225/6 reuses qbv for etf, so qbv is
-enabled with a dummy schedule at step 2 where it enters
-igc_tsn_enable_offload() and qbv_count got incremented to 1. At step 4, it
-enters igc_tsn_enable_offload() again, qbv_count is incremented to 2.
-Because taprio is running, tc_setup_type is TC_SETUP_QDISC_ETF and
-qbv_count > 1, qbv_config_change_errors value got incremented.
+qbv_count field will be removed in a future patch.
 
-This issue happens due to reliance on qbv_count field where a non-zero
-value indicates that taprio is running. But qbv_count increases
-regardless if taprio is triggered by user or by other tsn feature. It does
-not align with qbv_config_change_errors expectation where it is only
-concerned with taprio triggered by user.
+Test ran:
 
-Fixing this by relocating the qbv_config_change_errors logic to
-igc_save_qbv_schedule(), eliminating reliance on qbv_count and its
-inaccuracies from i225/6's multiple uses of qbv feature for other TSN
-features.
+1. Verify reset adapter behaviour in i225/6:
+   a) Enrol a new GCL
+      Reset adapter observed (tx mode change legacy->tsn)
+   b) Enrol a new GCL without deleting qdisc
+      No reset adapter observed (tx mode remain tsn->tsn)
+   c) Delete qdisc
+      Reset adapter observed (tx mode change tsn->legacy)
 
-The new function created: igc_tsn_is_taprio_activated_by_user() uses
-taprio_offload_enable field to indicate that the current running taprio
-was triggered by user, instead of triggered by non-qbv feature like etf.
+2. Tested scenario from "igc: Fix TX Hang issue when QBV Gate is closed"
+   to confirm it remains resolved.
 
-Fixes: ae4fe4698300 ("igc: Add qbv_config_change_errors counter")
+Fixes: 175c241288c0 ("igc: Fix TX Hang issue when QBV Gate is closed")
 Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c |  8 ++++++--
- drivers/net/ethernet/intel/igc/igc_tsn.c  | 16 ++++++++--------
- drivers/net/ethernet/intel/igc/igc_tsn.h  |  1 +
- 3 files changed, 15 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/intel/igc/igc_tsn.c | 24 +++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 8daf938afc36..dfd6c00b4205 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6315,12 +6315,16 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
- 	if (!validate_schedule(adapter, qopt))
- 		return -EINVAL;
- 
-+	igc_ptp_read(adapter, &now);
-+
-+	if (igc_tsn_is_taprio_activated_by_user(adapter) &&
-+	    is_base_time_past(qopt->base_time, &now))
-+		adapter->qbv_config_change_errors++;
-+
- 	adapter->cycle_time = qopt->cycle_time;
- 	adapter->base_time = qopt->base_time;
- 	adapter->taprio_offload_enable = true;
- 
--	igc_ptp_read(adapter, &now);
--
- 	for (n = 0; n < qopt->num_entries; n++) {
- 		struct tc_taprio_sched_entry *e = &qopt->entries[n];
- 
 diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 46d4c3275bbb..8ed7b965484d 100644
+index 8ed7b965484d..ada751430517 100644
 --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
 +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -87,6 +87,14 @@ static void igc_tsn_restore_retx_default(struct igc_adapter *adapter)
- 	wr32(IGC_RETX_CTL, retxctl);
+@@ -49,6 +49,13 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
+ 	return new_flags;
  }
  
-+bool igc_tsn_is_taprio_activated_by_user(struct igc_adapter *adapter)
++static bool igc_tsn_is_tx_mode_in_tsn(struct igc_adapter *adapter)
 +{
 +	struct igc_hw *hw = &adapter->hw;
 +
-+	return (rd32(IGC_BASET_H) || rd32(IGC_BASET_L)) &&
-+		adapter->taprio_offload_enable;
++	return !!(rd32(IGC_TQAVCTRL) & IGC_TQAVCTRL_TRANSMIT_MODE_TSN);
 +}
 +
- /* Returns the TSN specific registers to their default values after
-  * the adapter is reset.
-  */
-@@ -296,14 +304,6 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
- 		s64 n = div64_s64(ktime_sub_ns(systim, base_time), cycle);
+ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
+ {
+ 	struct igc_hw *hw = &adapter->hw;
+@@ -365,15 +372,22 @@ int igc_tsn_reset(struct igc_adapter *adapter)
+ 	return err;
+ }
  
- 		base_time = ktime_add_ns(base_time, (n + 1) * cycle);
--
--		/* Increase the counter if scheduling into the past while
--		 * Gate Control List (GCL) is running.
--		 */
--		if ((rd32(IGC_BASET_H) || rd32(IGC_BASET_L)) &&
--		    (adapter->tc_setup_type == TC_SETUP_QDISC_TAPRIO) &&
--		    (adapter->qbv_count > 1))
--			adapter->qbv_config_change_errors++;
- 	} else {
- 		if (igc_is_device_id_i226(hw)) {
- 			ktime_t adjust_time, expires_time;
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h b/drivers/net/ethernet/intel/igc/igc_tsn.h
-index b53e6af560b7..98ec845a86bf 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.h
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.h
-@@ -7,5 +7,6 @@
- int igc_tsn_offload_apply(struct igc_adapter *adapter);
- int igc_tsn_reset(struct igc_adapter *adapter);
- void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter);
-+bool igc_tsn_is_taprio_activated_by_user(struct igc_adapter *adapter);
+-int igc_tsn_offload_apply(struct igc_adapter *adapter)
++static bool igc_tsn_will_tx_mode_change(struct igc_adapter *adapter)
+ {
+-	struct igc_hw *hw = &adapter->hw;
++	bool any_tsn_enabled = !!(igc_tsn_new_flags(adapter) &
++				  IGC_FLAG_TSN_ANY_ENABLED);
++
++	return (any_tsn_enabled && !igc_tsn_is_tx_mode_in_tsn(adapter)) ||
++	       (!any_tsn_enabled && igc_tsn_is_tx_mode_in_tsn(adapter));
++}
  
- #endif /* _IGC_BASE_H */
+-	/* Per I225/6 HW Design Section 7.5.2.1, transmit mode
+-	 * cannot be changed dynamically. Require reset the adapter.
++int igc_tsn_offload_apply(struct igc_adapter *adapter)
++{
++	/* Per I225/6 HW Design Section 7.5.2.1 guideline, if tx mode change
++	 * from legacy->tsn or tsn->legacy, then reset adapter is needed.
+ 	 */
+ 	if (netif_running(adapter->netdev) &&
+-	    (igc_is_device_id_i225(hw) || !adapter->qbv_count)) {
++	    igc_tsn_will_tx_mode_change(adapter)) {
+ 		schedule_work(&adapter->reset_task);
+ 		return 0;
+ 	}
 -- 
 2.42.0
 
