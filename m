@@ -1,95 +1,132 @@
-Return-Path: <netdev+bounces-116373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3434E94A2FD
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:35:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4FB794A342
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3577281B13
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 08:35:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAB9EB27F19
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 08:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DA21422D6;
-	Wed,  7 Aug 2024 08:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623CC1C9DE9;
+	Wed,  7 Aug 2024 08:43:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="p7U6K7sM"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="OQ/7Q8u4"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D5E18D640;
-	Wed,  7 Aug 2024 08:35:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A558C1C9DDB
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 08:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723019719; cv=none; b=EOesbeT76nSNcuCKE0gw24IODpVTM5duX3z6cDCywREuRIfwssfc2oRs/FZK5zqDy+kj8lOq0CKnu6ULz4NNQkAP7Fm+pKAht3k6UvX+7grvqx4SMN5bEARPC23JUazTcGIkkLF4NhwoNrlTBVKY/5gGJ+QpK4tat7J2R76SPOs=
+	t=1723020239; cv=none; b=Zy4XN72wm0bY7YiObO1tThVP9I0Kp4DBWakzmvASPjRGdh39K/mwuZt8nWGHWaXkSSlU1GUqon8f6cu1J7fgDkLGVN3HckNxdxhEmhcz5as9ihnwYqlwoVX2+9w9ybR/cpo9FizfIEpVOR4e+YScruoQXJhMrrlMI9KA+VFUwSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723019719; c=relaxed/simple;
-	bh=CFIVoZfM0mdsYSyF0ORbV4gOz1SQzIjEY1X6zrYWV4A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hoMKeh+k4kA7V4iEQrcf8YypLrRGS/ADo58N1Zvwb9gE3LNmbMc46++KjCjC5/rCOelCeXblQI9CEXQIns/avLYBAQ1auuw8sqGzAjpjwh7W7/HKWY30GUs/Hswtm5LXavqoD1GE7orNCWX+tyVMBr5k4P2+bwh7pSg3VbWSRcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=p7U6K7sM; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id E3485A0CEC;
-	Wed,  7 Aug 2024 10:35:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=+4q3VBIj2FO2RpMFosL0
-	eyJHJ3IvPI+U7bKp+4E1ccE=; b=p7U6K7sMxMZ0AFW5Yn+HFKukr1JDWBeh002u
-	0BDDhPnnuUjlkDOkX1DAlIBFkC1yTZ9yuNRm0o/DmVuZzyCUjZ+hQZRTxnG1kA25
-	OhHz2Q4oHimzVdtG7Tb6WDLXQxZidQfDhzraiikGst+pSXV9aFzgorBUiaKGbeho
-	K2O+ro7GOSHjo7S7PZrgFFDf8IoRjwTqq0Nu5Ix8+G/fTgpb0W6PYAK93JuEOnCe
-	9QHUoG0eQJrVYdob8DxbxyNod6RTxaAaLWe6n8cx3qenUKjFA1RJrA2ojKOpIY1Y
-	Ts4cHXoEPMbXMU7VXtepXeaxNwIkEBhKeg/DGG+D5zFyrnIPJUF9MejDbQdXLzx9
-	hCOmLMiEnRQCAByBfcr3YuatvtmOhhugMBP55FFtZy7avgubU+pH0eXuZoIah/2u
-	Q5k2EZ1+xROyu7XwZdjDDpUBNAqEkrhiHflPznrGASjsjJPkBSjK23YK4exICDF+
-	RsQawH7IHfir+c+fWLOX/5Y6LOa9nDnxScj5MQZ51MHw645qg1iEL+lb1eNrU8kY
-	bBkEEabQM/GUBt8WE5zVuqaF9KJnAcwmax6nfW7e8dOBHZOcJ60pWecORgg+Gnl5
-	9fPcGexuMAesuxzh20uo+oYMc3/RSaXLaP6jwzs39W00/WeOz64NUCKJ/Z5GwbMT
-	ILXo6Ns=
-Message-ID: <317c3565-b1ea-4cce-a4e7-a52e62ee9f6a@prolan.hu>
-Date: Wed, 7 Aug 2024 10:35:14 +0200
+	s=arc-20240116; t=1723020239; c=relaxed/simple;
+	bh=4BstarA/azTj0MQhXEHPNbE5+HYWrDilUXJZYFWQ+iw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=WtCmJ7GQlRL8Ki3IobwCjDPgxGlcu45QFf+RLju4TCd3FIgsZRWqvKP3qPzGD/2bpzyVgJKfI2tWisufFFDwn6kAlB5h0SOpTvD+6bt0/5rTp79+ei4QSi4+uZVcn6yn8GU6SoQtv8SkrhNl4BP1UXRG0CcvCAvXrGzSlOH6hpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=OQ/7Q8u4; arc=none smtp.client-ip=209.85.210.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-704466b19c4so840070a34.0
+        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 01:43:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1723020237; x=1723625037; darn=vger.kernel.org;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Iw7Tv+YETDv5W6d9wVYOGpd/7bHckBYfrgRk1yNks+I=;
+        b=OQ/7Q8u4/rKgMnmfsm92qJn7lrBnkLHDS7V3j1hcMV81mDoVvMWsnxQROcu0pJMJGj
+         EI08rcLDW3Eyfc3NPVQZBrC8vDKHYTY1tWy6Hp7oC1MNfThqO9lHJajnYRIHx55rVXwx
+         zg6xupztTNS25AZY12LDyIRaWcNlBIeVMGs2sfP4hqj7E9PUgypFUBQPatUkQzlNVE5W
+         lNuNBNZAj5dKHPLNoR67BDKudufTdASj2yVN3ShiXyLPuEAxPtWmBgt6Aahj5fsSuY2l
+         j6F0rq+zMhRNHWg46KQmQl2nGVpmMdJ5QGPAg1aRgHR8A9/ihe9zinHGNO/hs7I9Kx6N
+         6TyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723020237; x=1723625037;
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Iw7Tv+YETDv5W6d9wVYOGpd/7bHckBYfrgRk1yNks+I=;
+        b=XD6CrgAjTax593dTlv1uj12wc3/oM6ko3oJ1VWtqf1GlwNsH0YCyOMlGTAN5uUH/1R
+         Q5hxyGIVt8ei1q2uXNWli3O+E5tRiENSUAJCgJo4awCz6pOnw9wk8aS+5CwZr7GtUaMM
+         BZU63dRZOZ0Urx9pHMZlKAG9UMLp80pXuQP6vlf1q1R8ZhsBFjj0BhImXR+ZOwB+l5NC
+         qO8YVz90ZvjXWi2r9d+zT7xNQLn70SyQAlcEQ98SdKRSZsqAL4yQ3jhig+3JcLQeNCmT
+         6Lefrh2+7HXvClV7xWh1o982aWtFlfRLMGt+jcFV7aYFyAdKHJUIw6mUhINl1sxx4F2O
+         9M+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWboxywOWZcc3zefhwd3izhJh0ezpWEBC7iRbYQlQLU5lgwTZctGH8Mg5eqYBsmB4H/YYAsIg9QwyfAh+ln2sqHGUW+Ty3x
+X-Gm-Message-State: AOJu0YwkGzqESR5SarLjZ3hiU1tj3E37ubNKA3SYN6+SEXkennAVu6kt
+	UvwEt/jOyO8e7Ii2JrghUJQXbkP/+ld2xJp8FdluMQyUCLVJUtjWAU+Eq8twOws=
+X-Google-Smtp-Source: AGHT+IHGDJwgvu27ZoxkF/Iz1RMQROmHIKs8TmuQAxLdh09B6CWq3+c9Jjh5o5EFESeTZQUuMmrUsQ==
+X-Received: by 2002:a05:6358:418f:b0:1ac:660a:8a69 with SMTP id e5c5f4694b2df-1af3baf62a6mr2337848555d.18.1723020236454;
+        Wed, 07 Aug 2024 01:43:56 -0700 (PDT)
+Received: from dev-mattc2.dev.purestorage.com ([208.88.159.128])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-7b7654bf852sm6742435a12.90.2024.08.07.01.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 01:43:55 -0700 (PDT)
+From: Matthew W Carlis <mattc@purestorage.com>
+To: helgaas@kernel.org
+Cc: alex.williamson@redhat.com,
+	bhelgaas@google.com,
+	davem@davemloft.net,
+	david.abdurachmanov@gmail.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	leon@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	lukas@wunner.de,
+	macro@orcam.me.uk,
+	mahesh@linux.ibm.com,
+	mattc@purestorage.com,
+	mika.westerberg@linux.intel.com,
+	netdev@vger.kernel.org,
+	npiggin@gmail.com,
+	oohall@gmail.com,
+	pabeni@redhat.com,
+	pali@kernel.org,
+	saeedm@nvidia.com,
+	sr@denx.de,
+	wilson@tuliptree.org
+Subject: PCI: Work around PCIe link training failures
+Date: Wed,  7 Aug 2024 02:43:48 -0600
+Message-Id: <20240807084348.12304-1-mattc@purestorage.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20240806193622.GA74589@bhelgaas>
+References: <20240806193622.GA74589@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH resubmit net 1/2] net: fec: Forward-declare
- `fec_ptp_read()`
-To: Jakub Kicinski <kuba@kernel.org>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Frank Li <Frank.li@nxp.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
-References: <20240807082918.2558282-1-csokas.bence@prolan.hu>
-Content-Language: en-US
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-In-Reply-To: <20240807082918.2558282-1-csokas.bence@prolan.hu>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2980D94854617461
 
-Aw, crop, I meant to say -v2 instead of "resubmit"... That's what 
-happens if you mindlessly re-use format-patch commands :/ I hope it 
-doesn't bother you _too_ much...
+On Tues, 06 Aug 2024 Bjorn Helgaas wrote:
+> it does seem like this series made wASMedia ASM2824 work better but
+> caused regressions elsewhere, so maybe we just need to accept that
+> ASM2824 is slightly broken and doesn't work as well as it should.
 
-On 8/7/24 10:29, Csókás, Bence wrote:
-> This function is used in `fec_ptp_enable_pps()` through
-> struct cyclecounter read(). Forward declarations make
-> it clearer, what's happening.
-> 
-> Fixes: 61d5e2a251fb ("fec: Fix timer capture timing in `fec_ptp_enable_pps()`")
-> Suggested-by: Frank Li <Frank.li@nxp.com>
-> Link: https://lore.kernel.org/netdev/20240805144754.2384663-1-csokas.bence@prolan.hu/T/#ma6c21ad264016c24612048b1483769eaff8cdf20
-> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+One of my colleagues challenged me to provide a more concrete example
+where the change will cause problems. One such configuration would be not
+implementing the Power Controller Control in the Slot Capabilities Register.
+Then, Powering off the slot via out-of-band interfaces would result in the
+kernel forcing the DSP to Gen1 100% of the time as far as I can tell. 
+The aspect of this force to Gen1 that is the most concerning to my team is
+that it isn't cleaned up even if we replaced the EP with some other EP.
 
+I was curious about the PCIe devices mentioned in the commit because I
+look at crazy malfunctioning devices too often so I pasted the following:
+"Delock Riser Card PCI Expres 41433" into Google. 
+I'm not really a physical layer guy, but is it possible that the reported
+issue be due to signal integrity? I'm not sure if sending PCIe over a USB
+cable is "reliable".
+
+I've never worked with an ASMedia switch and don't have a reliable way to
+reproduce anything like the interaction between the two device at hand. As
+much as I hate to make the request my thinking is that the patch should be
+reverted until there is a solution that doesn't leave the link forced to
+Gen1 forever for every EP thereafter.
+
+- Matt
 
