@@ -1,160 +1,436 @@
-Return-Path: <netdev+bounces-116474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B1F994A8D4
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:46:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F2A94A8D6
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ADA02872E8
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:46:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB98728729B
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A576200138;
-	Wed,  7 Aug 2024 13:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JP7HPeqX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AEC1EA0DC;
+	Wed,  7 Aug 2024 13:46:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8AC200111
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 13:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAF11EA0C3
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 13:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723038358; cv=none; b=fu/+5b6oZmKak8e4fmjoo7rPbvd2KpRlYhjuc3QwzM2yVTyiNFMIoEz+lrE7HWLE1HcXELOHaDgspWsuFxSYcsmkpXGF7ONrNnQ5hIrMdAjRCw3oE1xjIwt+UVQJ8sDHKVHIHvVSamrJMdkXbRJzBgdBjWaH1b85XkpTbVVC/dE=
+	t=1723038368; cv=none; b=MRd121eLjev0ifoCiaFyZGW6sNEUubiUU6mzmaz/PgNGVS71Z9l/HDmepv/CMk0XObOlCZCm+l4D8F48ReoH4zfdssyV9tjFYIe5zPMDyNc+U5EtFaFY9dE+gEhZspCXqRHgcuWZxj+NzOHmUd3+Gqi7zbZjFRg+qiN9DhHFJFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723038358; c=relaxed/simple;
-	bh=LxhoI9D8h91IiIrVyC3rOcVzclZdpcN98zJjVnIiLmQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R3VU6xFn7+2Qfr/ZzRot3o8fbz/FtkXZ2DcruBPVW7y5Cs8LWsFtoOpgnF6ykwGEm94hPCSMr9CD5/wzCxaM6VtMoM9vlq7LCq5IO9v4H/YH7K3DCFCP1Mm00H/33HpagwgrRP29UisZu+kQG1p2Haox3susSuLvviuT+VCWJXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JP7HPeqX; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5a28b61b880so33495a12.1
-        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 06:45:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723038355; x=1723643155; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qjk1I5coQs/nVar1+nTAzLmrHbTNOYHZ49zPGhWaB7k=;
-        b=JP7HPeqXt/WwVK4cF5gS7/mx011EwuSzT9V7Rls0BiRkliH1uLWKTDi9smWa110A3e
-         4x8laQZnPNMQLPWS/+i5YxXxb6Jyn0mjS057S5zkMB8TsPgFvKRPZcR9lSwiG/xfChS9
-         Z+KOn6voZOPUB5lN78UvBs/BBN3ezwJfYq7Ffk2gmRE11gL5DPOBb42sxr4NY5ZGjAv/
-         KF1tsveQWB4f1pIl1kBH9Jf2R2pfAqtzhbOmltOHjRzIS/L/qDcyZ0Cq3axHVVvHxqQ3
-         ryq8nfULMlCzA3BnE5HrG+KS2AWW8WA53B0f9d6U1i58Z7r0EeJMD3CXpkbd0fAmjASB
-         N/QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723038355; x=1723643155;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qjk1I5coQs/nVar1+nTAzLmrHbTNOYHZ49zPGhWaB7k=;
-        b=kpcDOvX659kOSNg09+WTxG6VaUw2pjpyT1vWLeXrxjunbC4ymNfe70AaMRyFlZlw4n
-         drtI9tiUAakg4koC17g1udZ3XreDQhwuG/Bb7veelMB44A+5Djfnz1Mad2+DO6GZghG0
-         q9VlmV6tpdYMb7vBPZjudzzUthauNt3lJXcwxzULakAUVW+RwcUU+THP45fQNyT3wN9F
-         /d6yQmJ/VuN6JdXAuv7KDgeq318D7iwM+5z6bQUv8jxrWwssR+MT5HjaAJOZAc9YDfyh
-         n3hnkz7Mlw59wwfEZlsNfJQFS1q1lyj4GmvmPINawaHNmvAZNhT1i9SiP0SlMSHPZGiK
-         QOiA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0hErd1/vLBezTIslhTUi5CLDYS+odqhX4zYGNPEnW7RGdo8hiAvNOVL4exBl0s634CQlDfpo+rD6bDny3bCwpJUYzDDJq
-X-Gm-Message-State: AOJu0Yz/7pKld+kBgY03WuKDg2HaZ5vJZAB7YN7rFqXl1xFrtNN+0WZH
-	0cH7+Et9voQQUbgvS68g1W7QmCqZ5COuW7GOpGFSGQLPWEsumLHGAlJA2KrrRQ6wT7I9gEcrsGf
-	nv/UaDMXoLtoXbOTh2eTh++cm+PUTWzLxwHq3
-X-Google-Smtp-Source: AGHT+IGAwcSTpPPUvxvQtsojcOYxgyANBUtDcjLr//Ggm8SyirsP1mGKn0OgYNXn2QkdUw9HzCo+aw1tSHDVijLU5vU=
-X-Received: by 2002:a05:6402:35d4:b0:5aa:19b1:ffc7 with SMTP id
- 4fb4d7f45d1cf-5bba2837dccmr204357a12.2.1723038354385; Wed, 07 Aug 2024
- 06:45:54 -0700 (PDT)
+	s=arc-20240116; t=1723038368; c=relaxed/simple;
+	bh=uXWUVovSNKyzEgaxGgiSRlHiPM6sKgYto1c4mboUXS0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z0J2lrynjjCjb2akgtZSbLnTTLP51U+jM8vZb7qQhbxBzOKbs/zn9oxBYCw8lmGbbWjEWsMlTzggIa5k/gOJKf82KENtKuIA9+YdF/iea91AbylK49JXT5YkiqKHu5ADQDRDSZwg7S45XYi4Gl9FUeQl3QMMXaDUDZlJ1tyBLtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [223.64.68.71])
+	by gateway (Coremail) with SMTP id _____8Cxe+qSerNmI3YKAA--.32708S3;
+	Wed, 07 Aug 2024 21:45:54 +0800 (CST)
+Received: from localhost.localdomain (unknown [223.64.68.71])
+	by front1 (Coremail) with SMTP id qMiowMBxZOCFerNmgR0IAA--.41201S2;
+	Wed, 07 Aug 2024 21:45:47 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	fancer.lancer@gmail.com,
+	diasyzhang@tencent.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@kernel.org,
+	linux@armlinux.org.uk,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com,
+	si.yanteng@linux.dev
+Subject: [PATCH net-next v17 00/14] stmmac: Add Loongson platform support
+Date: Wed,  7 Aug 2024 21:45:27 +0800
+Message-Id: <cover.1723014611.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1722570749.git.fahimitahera@gmail.com> <e8da4d5311be78806515626a6bd4a16fe17ded04.1722570749.git.fahimitahera@gmail.com>
- <20240803.iefooCha4gae@digikod.net> <20240806.nookoChoh2Oh@digikod.net>
- <CAG48ez2ZYzB+GyDLAx7y2TobE=MLXWucQx0qjitfhPSDaaqjiA@mail.gmail.com> <20240807.mieloh8bi8Ae@digikod.net>
-In-Reply-To: <20240807.mieloh8bi8Ae@digikod.net>
-From: Jann Horn <jannh@google.com>
-Date: Wed, 7 Aug 2024 15:45:18 +0200
-Message-ID: <CAG48ez3_u5ZkVY31h4J6Shap9kEsgDiLxF+s10Aea52EkrDMJg@mail.gmail.com>
-Subject: Re: [PATCH v8 1/4] Landlock: Add abstract unix socket connect restriction
-To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc: Tahera Fahimi <fahimitahera@gmail.com>, outreachy@lists.linux.dev, gnoack@google.com, 
-	paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bjorn3_gh@protonmail.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBxZOCFerNmgR0IAA--.41201S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9fXoW3tw43ur4fJw4rAr1UZr45twc_yoW8Gw1kZo
+	WfuF4fZr4Yyw18uFs2gFyDJFy5XFy5X3Z5tFZ7Cw45AanavFWDJ3s8G393Xa45AFyFgFy3
+	A34rG3y7trWxtF4rl-sFpf9Il3svdjkaLaAFLSUrUUUU5b8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYA7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Jw0_WrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
+	0EwIxGrwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+	xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8TCJPUUUUU==
 
-On Wed, Aug 7, 2024 at 9:21=E2=80=AFAM Micka=C3=ABl Sala=C3=BCn <mic@digiko=
-d.net> wrote:
-> On Tue, Aug 06, 2024 at 10:46:43PM +0200, Jann Horn wrote:
-> > I think adding something like this change on top of your code would
-> > make it more concise (though this is entirely untested):
-> >
-> > --- /tmp/a      2024-08-06 22:37:33.800158308 +0200
-> > +++ /tmp/b      2024-08-06 22:44:49.539314039 +0200
-> > @@ -15,25 +15,12 @@
-> >           * client_layer must be a signed integer with greater capacity=
- than
-> >           * client->num_layers to ensure the following loop stops.
-> >           */
-> >          BUILD_BUG_ON(sizeof(client_layer) > sizeof(client->num_layers)=
-);
-> >
-> > -        if (!server) {
-> > -                /*
-> > -                 * Walks client's parent domains and checks that none =
-of these
-> > -                 * domains are scoped.
-> > -                 */
-> > -                for (; client_layer >=3D 0; client_layer--) {
-> > -                        if (landlock_get_scope_mask(client, client_lay=
-er) &
-> > -                            scope)
-> > -                                return true;
-> > -                }
-> > -                return false;
-> > -        }
->
-> This loop is redundant with the following one, but it makes sure there
-> is no issue nor inconsistencies with the server or server_walker
-> pointers.  That's the only approach I found to make sure we don't go
-> through a path that could use an incorrect pointer, and makes the code
-> easy to review.
+v17:
+* As Serge's comments:
+    Add return 0 for _dt_config().
+    Get back the conditional MSI-clear method execution.
 
-My view is that this is a duplication of logic for one particular
-special case - after all, you can also end up walking up to the same
-state (client_layer=3D=3D-1, server_layer=3D=3D-1, client_walker=3D=3DNULL,
-server_walker=3D=3DNULL) with the loop at the bottom.
+v16:
+* As Serge's comments:
+   Move the of_node_put(plat->mdio_node) call to the DT-config/clear methods.
+   Drop 'else if'.
+* Modify the commit message of 7/14. (LS2K CPU -> LS2K SOC)
 
-But I guess my preference for more concise code is kinda subjective -
-if you prefer the more verbose version, I'm fine with that too.
+V15:
+* Drop return that will not be executed.
+* Move pdev from patch 12 to patch 13 to pass W=1 builds.
 
-> > -
-> > -        server_layer =3D server->num_layers - 1;
-> > -        server_walker =3D server->hierarchy;
-> > +        server_layer =3D server ? (server->num_layers - 1) : -1;
-> > +        server_walker =3D server ? server->hierarchy : NULL;
->
-> We would need to change the last loop to avoid a null pointer deref.
+RFC v15:
+* As Serge's comments:
+   Extend the commit message.(patch 7 and patch 11)
+   Add fixes tag for patch 8.
+   Add loongson_dwmac_dt_clear() patch.
+   Modify loongson_dwmac_msi_config().
+   ...
+* Pick Huacai's Acked-by tag.
+* Pick Serge's Reviewed-by tag.
+* I have already contacted the author(ZhangQing) of the module,
+  so I copied her valid email: diasyzhang@tencent.com.
 
-Why? The first loop would either exit or walk the client_walker up
-until client_layer is -1 and client_walker is NULL; the second loop
-wouldn't do anything because the walkers are at the same layer; the
-third loop's body wouldn't be executed because client_layer is -1.
+Note: 
+I replied to the comments on v14 last Sunday, but all of Loongson's
+email servers failed to deliver. The network administrator told me
+today that he has fixed the problem and re-delivered all the failed
+emails, but I did not see them on the mailing list. I hope they will
+not suddenly appear in everyone's mailbox one day. I apologize for
+this. (The email content mainly agrees with Serge's suggestion.)
 
-The case where the server is not in any Landlock domain is just one
-subcase of the more general case "client and server do not have a
-common ancestor domain".
+v14:
 
-> >
-> >          /*
-> >           * Walks client's parent domains down to the same hierarchy le=
-vel as
-> >           * the server's domain, and checks that none of these client's=
- parent
-> >           * domains are scoped.
-> >
+Because Loongson GMAC can be also found with the 8-channels AV feature
+enabled, we'll need to reconsider the patches logic and thus the
+commit logs too. As Serge's comments and Russell's comments:
+[PATCH net-next v14 01/15] net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+[PATCH net-next v14 02/15] net: stmmac: Add multi-channel support
+[PATCH net-next v14 03/15] net: stmmac: Export dwmac1000_dma_ops
+[PATCH net-next v14 04/15] net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size init
+[PATCH net-next v14 05/15] net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+[PATCH net-next v14 06/15] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
+[PATCH net-next v14 07/15] net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
++-> Init the plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
+    in the loongson_gmac_data() method.
+[PATCH net-next v14 08/15] net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+[PATCH net-next v14 09/15] net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+[PATCH net-next v14 10/15] net: stmmac: dwmac-loongson: Introduce PCI device info data
++-> Make sure the setup() method is called after the pci_enable_device()
+    invocation.
+[PATCH net-next v14 11/15] net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
++-> Introduce the loongson_dwmac_dt_config() method here instead of
+    doing that in a separate patch.
++-> Add loongson_dwmac_acpi_config() which would just get the IRQ from
+    the pdev->irq field and make sure it is valid.
+[PATCH net-next v14 12/15] net: stmmac: Fixed failure to set network speed to 1000.
++-> Drop the patch as Russell's comments, At the same time, he provided another
+    better repair suggestion, and I decided to send it separately after the
+    patch set was merged. See:
+    <https://lore.kernel.org/netdev/ZoW1fNqV3PxEobFx@shell.armlinux.org.uk/>
+[PATCH net-next v14 13/15] net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
++-> This is former "net: stmmac: dwmac-loongson: Add Loongson GNET
+    support" patch, but which adds the support of the Loongson GMAC with the
+    8-channels AV-feature available.
++-> loongson_dwmac_intx_config() shall be dropped due to the
+    loongson_dwmac_acpi_config() method added in the PATCH 11/15.
++-> Make sure loongson_data::loongson_id is initialized before the
+    stmmac_pci_info::setup() is called.
++-> Move the rx_queues_to_use/tx_queues_to_use and coe_unsupported
+    fields initialization to the loongson_gmac_data() method.
++-> As before, call the loongson_dwmac_msi_config() method if the multi-channels
+    Loongson MAC has been detected.
++-> Move everything GNET-specific to the next patch.
+[PATCH net-next v14 14/15] net: stmmac: dwmac-loongson: Add Loongson GNET support
++-> Everything Loonsgson GNET-specific is supposed to be added in the
+    framework of this patch:
+    + PCI_DEVICE_ID_LOONGSON_GNET macro
+    + loongson_gnet_fix_speed() method
+    + loongson_gnet_data() method
+    + loongson_gnet_pci_info data
+    + The GNET-specific part of the loongson_dwmac_setup() method.
+    + ...
+[PATCH net-next v14 15/15] net: stmmac: dwmac-loongson: Add loongson module author
+
+Other's:
+Pick Serge's Reviewed-by tag.
+
+v13:
+
+* Sorry, we have clarified some things in the past 10 days. I did not
+ give you a clear reply to the following questions in v12, so I need
+ to reply again:
+
+ 1. The current LS2K2000 also have a GMAC(and two GNET) that supports 8
+    channels, so we have to reconsider the initialization of
+    tx/rx_queues_to_use into probe();
+
+ 2. In v12, we disagreed on the loongson_dwmac_msi_config method, but I changed
+    it based on Serge's comments(If I understand correctly):
+	if (dev_of_node(&pdev->dev)) {
+		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+	}
+
+	if (ld->loongson_id == DWMAC_CORE_LS2K2000) {
+		ret = loongson_dwmac_msi_config(pdev, plat, &res);
+	} else {
+		ret = loongson_dwmac_intx_config(pdev, plat, &res);
+	}
+
+ 3. Our priv->dma_cap.pcs is false, so let's use PHY_INTERFACE_MODE_NA;
+
+ 4. Our GMAC does not support Delay, so let's use PHY_INTERFACE_MODE_RGMII_ID,
+    the current dts is wrong, a fix patch will be sent to the LoongArch list
+    later.
+
+Others:
+* Re-split a part of the patch (it seems we do this with every version);
+* Copied Serge's comments into the commit message of patch;
+* Fixed the stmmac_dma_operation_mode() method;
+* Changed some code comments.
+
+v12:
+* The biggest change is the re-splitting of patches.
+* Add a "gmac_version" in loongson_data, then we only
+  read it once in the _probe().
+* Drop Serge's patch.
+* Rebase to the latest code state.
+* Fixed the gnet commit message.
+
+v11:
+* Break loongson_phylink_get_caps(), fix bad logic.
+* Remove a unnecessary ";".
+* Remove some unnecessary "{}".
+* add a blank.
+* Move the code of fix _force_1000 to patch 6/6.
+
+The main changes occur in these two functions:
+loongson_dwmac_probe();
+loongson_dwmac_setup();
+
+v10:
+As Andrew's comment:
+* Add a #define for the 0x37.
+* Add a #define for Port Select.
+
+others:
+* Pick Serge's patch, This patch resulted from the process
+  of reviewing our patch set.
+* Based on Serge's patch, modify our loongson_phylink_get_caps().
+* Drop patch 3/6, we need mac_interface.
+* Adjusted the code layout of gnet patch.
+* Corrected several errata in commit message.
+* Move DISABLE_FORCE flag to loongson_gnet_data().
+
+v9:
+We have not provided a detailed list of equipment for a long time,
+and I apologize for this. During this period, I have collected some
+information and now present it to you, hoping to alleviate the pressure
+of review.
+
+1. IP core
+We now have two types of IP cores, one is 0x37, similar to dwmac1000;
+The other is 0x10.  Compared to 0x37, we split several DMA registers
+from one to two, and it is not worth adding a new entry for this.
+According to Serge's comment, we made these devices work by overwriting
+priv->synopsys_id = 0x37 and mac->dma = <LS_dma_ops>.
+
+1.1.  Some more detailed information
+The number of DMA channels for 0x37 is 1; The number of DMA channels
+for 0x10 is 8.  Except for channel 0, otherchannels do not support
+sending hardware checksums. Supported AV features are Qav, Qat, and Qas,
+and the rest are consistent with 3.73.
+
+2. DEVICE
+We have two types of devices,
+one is GMAC, which only has a MAC chip inside and needs an external PHY
+chip;
+the other is GNET, which integrates both MAC and PHY chips inside.
+
+2.1.  Some more detailed information
+GMAC device: LS7A1000, LS2K1000, these devices do not support any pause
+mode.
+gnet device: LS7A2000, LS2K2000, the chip connection between the mac and
+             phy of these devices is not normal and requires two rounds of
+             negotiation; LS7A2000 does not support half-duplex and
+multi-channel;
+             to enable multi-channel on LS2K2000, you need to turn off
+hardware checksum.
+**Note**: Only the LS2K2000's IP core is 0x10, while the IP cores of other
+devices are 0x37.
+
+3. TABLE
+
+device    type    pci_id    ip_core
+ls7a1000  gmac    7a03      0x35/0x37
+ls2k1000  gmac    7a03      0x35/0x37
+ls7a2000  gnet    7a13      0x37
+ls2k2000  gnet    7a13      0x10
+-----------------------------------------------
+Changes:
+
+* passed the CI
+  <https://github.com/linux-netdev/nipa/blob/main/tests/patch/checkpatch
+  /checkpatch.sh>
+* reverse xmas tree order.
+* Silence build warning.
+* Re-split the patch.
+* Add more detailed commit message.
+* Add more code comment.
+* Reduce modification of generic code.
+* using the GNET-specific prefix.
+* define a new macro for the GNET MAC.
+* Use an easier way to overwrite mac.
+* Removed some useless printk.
+
+
+v8:
+* The biggest change is according to Serge's comment in the previous
+  edition:
+   Seeing the patch in the current state would overcomplicate the generic
+   code and the only functions you need to update are
+   dwmac_dma_interrupt()
+   dwmac1000_dma_init_channel()
+   you can have these methods re-defined with all the Loongson GNET
+   specifics in the low-level platform driver (dwmac-loongson.c). After
+   that you can just override the mac_device_info.dma pointer with a
+   fixed stmmac_dma_ops descriptor. Here is what should be done for that:
+
+   1. Keep the Patch 4/9 with my comments fixed. First it will be partly
+   useful for your GNET device. Second in general it's a correct
+   implementation of the normal DW GMAC v3.x multi-channels feature and
+   will be useful for the DW GMACs with that feature enabled.
+
+   2. Create the Loongson GNET-specific
+   stmmac_dma_ops.dma_interrupt()
+   stmmac_dma_ops.init_chan()
+   methods in the dwmac-loongson.c driver. Don't forget to move all the
+   Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
+
+   3. Create a Loongson GNET-specific platform setup method with the next
+   semantics:
+      + allocate stmmac_dma_ops instance and initialize it with
+        dwmac1000_dma_ops.
+      + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+        the pointers to the methods defined in 2.
+      + allocate mac_device_info instance and initialize the
+        mac_device_info.dma field with a pointer to the new
+        stmmac_dma_ops instance.
+      + call dwmac1000_setup() or initialize mac_device_info in a way
+        it's done in dwmac1000_setup() (the later might be better so you
+        wouldn't need to export the dwmac1000_setup() function).
+      + override stmmac_priv.synopsys_id with a correct value.
+
+   4. Initialize plat_stmmacenet_data.setup() with the pointer to the
+   method created in 3.
+
+* Others:
+  Re-split the patch.
+  Passed checkpatch.pl test.
+
+v7:
+* Refer to andrew's suggestion:
+  - Add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX #define's, etc.
+
+* Others:
+  - Using --subject-prefix="PATCH net-next vN" to indicate that the
+    patches are for the networking tree.
+  - Rebase to the latest networking tree:
+    <git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git>
+
+
+v6:
+
+* Refer to Serge's suggestion:
+  - Add new platform feature flag:
+    include/linux/stmmac.h:
+    +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+
+  - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
+     drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
+     +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000      /* ...*/
+     #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+     ...
+
+  - Drop all of redundant changes that don't require the
+    prototypes being converted to accepting the stmmac_priv
+    pointer.
+
+* Refer to andrew's suggestion:
+  - Drop white space changes.
+  - break patch up into lots of smaller parts.
+     Some small patches have been put into another series as a preparation
+     see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
+     
+     *note* : This series of patches relies on the three small patches above.
+* others
+  - Drop irq_flags changes.
+  - Changed patch order.
+
+
+v4 -> v5:
+
+* Remove an ugly and useless patch (fix channel number).
+* Remove the non-standard dma64 driver code, and also remove
+  the HWIF entries, since the associated custom callbacks no
+  longer exist.
+* Refer to Serge's suggestion: Update the dwmac1000_dma.c to
+  support the multi-DMA-channels controller setup.
+
+See:
+v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
+v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
+v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
+v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+
+Yanteng Si (14):
+  net: stmmac: Move the atds flag to the stmmac_dma_cfg structure
+  net: stmmac: Add multi-channel support
+  net: stmmac: Export dwmac1000_dma_ops
+  net: stmmac: dwmac-loongson: Drop duplicated hash-based filter size
+    init
+  net: stmmac: dwmac-loongson: Drop pci_enable/disable_msi calls
+  net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device
+    identification
+  net: stmmac: dwmac-loongson: Detach GMAC-specific platform data init
+  net: stmmac: dwmac-loongson: Init ref and PTP clocks rate
+  net: stmmac: dwmac-loongson: Add phy_interface for Loongson GMAC
+  net: stmmac: dwmac-loongson: Introduce PCI device info data
+  net: stmmac: dwmac-loongson: Add DT-less GMAC PCI-device support
+  net: stmmac: dwmac-loongson: Add Loongson Multi-channels GMAC support
+  net: stmmac: dwmac-loongson: Add Loongson GNET support
+  net: stmmac: dwmac-loongson: Add loongson module author
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 597 +++++++++++++++---
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   4 +-
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  35 +-
+ .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  27 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  30 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |   5 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  19 +-
+ include/linux/stmmac.h                        |   1 +
+ 12 files changed, 605 insertions(+), 120 deletions(-)
+
+-- 
+2.31.4
+
 
