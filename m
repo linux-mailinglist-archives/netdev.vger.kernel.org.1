@@ -1,270 +1,213 @@
-Return-Path: <netdev+bounces-116383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B605894A40E
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:19:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E9B94A434
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 437761F2147E
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:19:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC6F01F25889
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9A61D3630;
-	Wed,  7 Aug 2024 09:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D6D1D1728;
+	Wed,  7 Aug 2024 09:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ruz/HlMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D5E1D278E;
-	Wed,  7 Aug 2024 09:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A1D811E2;
+	Wed,  7 Aug 2024 09:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723022249; cv=none; b=RKj6mYSAtJnhlGPFnNl3OEnjsvisbKa/9JTIz/KsiUgMLd2mQz5DXI5HFDfvAOffej+gmVLT+pNhkjUlcFgKeepelNtWnwm/bur257oGSIPcgRaZt0/47UXDuI6BYwCt8PdaNnZSXvNEtC/DD7Ai2xAhM2JcgSjdGWHFNTtpBd4=
+	t=1723022485; cv=none; b=CDdo9awRC1li5wJlPh1YaLQd8cx/4x/gTrwd0MvWJn94s7YKg0bI/FBuL4nPn5ymGjfQxX3ozt5h7o0oGD5wLWyzAt0wAjl8Y/uYuKQA2uwzdw+r1OX/QdjwHbMe9WU0xoLUJhdmXC6cdyi4re1GL/QdzM833ocX8+xYV1qb4aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723022249; c=relaxed/simple;
-	bh=DjV5baq+7emiAISHcO2h0Kq+q/DrmV9u/Jbl/R+3iow=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FINMRp9sflDxzEaeSvJk8+BHCoV/QuURR7dOouvArTDkEs+Pa24tZj5jw97wkO0FChXA4LLRYTes8UvLjbB+lbKCKFYSzbD/Ai9X9IbU/keav6OLwopoKGt8iZA0LsfOaHMkyrp9lvE7o8bV4hg1fRZs/KPBH3NNIJ+wlWRWqz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5b8c2a611adso2159308a12.1;
-        Wed, 07 Aug 2024 02:17:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723022244; x=1723627044;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+Xn0gxmB3HHe9Nvo5kpK9WFXqf56bqn8ETol42PpP3k=;
-        b=IzcFXJoZE9IcOscF65C5O7uFWLuspHqIDE3LU22TMSexNaUQU9sxv3Uam3sJ2YtuTK
-         ZtOn7/bK1/7z7nPr1vcSewuxNKwVN32m0N/SIITtb5tyv1o2aucBNypGm4ykiUKjqnz/
-         7a+BcJ0d4e66iNJdGfpEKoaPUXMFVzqDzI2/Q8dssgno6YDwbfr4JI0xGrZBlQBf1tkH
-         v5PovFmRUMWh6r08w9vZi+OlgtcUyDitNIisgq6COBwRwR9oqRypzQhBj/c99eD3yEAW
-         692NYfeAS6pIuP1A6vHGVkq3/oqx7eXl95rPskn3EyFdyMioM2GUO3LLM8PgRMezRm1d
-         8l4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUf6bMSUFmNSaJ3I9nFRGcBb3btYwCzN+r7KdZAz7I2JbdI5wsoWiEdsObixBd9c3yBULMIqYEdkuBPaAWyRMSBKC06La0DGlEopM6OQUXzdAg1D2j+8Mxo/f0nhI/0RQVxFjRd
-X-Gm-Message-State: AOJu0YxpTFV322I+bBT++vhQceJy+LmardnMgzKXdGLpwQnH/u92m5JZ
-	QFTNNIy9ryrbn9utnYMCt6FbRfoRYLbT25C9jXrjxpsPNR19Oj3C
-X-Google-Smtp-Source: AGHT+IHzdDAFb8v0s0v7I8cBUsIbYqlqHNziXDCUKd32gALUFrd9ILKr+uu4L9hrm7Dn7LT39dOKlQ==
-X-Received: by 2002:a50:8ad0:0:b0:5b9:1009:f42d with SMTP id 4fb4d7f45d1cf-5b91009f9femr9791270a12.32.1723022243846;
-        Wed, 07 Aug 2024 02:17:23 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b839b2b556sm6794533a12.25.2024.08.07.02.17.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 02:17:23 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: thevlad@fb.com,
-	thepacketgeek@gmail.com,
-	riel@surriel.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	paulmck@kernel.org,
-	davej@codemonkey.org.uk
-Subject: [PATCH net-next v2 5/5] net: netconsole: Defer netpoll cleanup to avoid lock release during list traversal
-Date: Wed,  7 Aug 2024 02:16:51 -0700
-Message-ID: <20240807091657.4191542-6-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240807091657.4191542-1-leitao@debian.org>
-References: <20240807091657.4191542-1-leitao@debian.org>
+	s=arc-20240116; t=1723022485; c=relaxed/simple;
+	bh=1PARSFOj65zj7l+TTRB9rEeci9uaa8EB/eDQlYX4Dbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=huTopYgpnQYy+BPloCKwIifVbF4S0aS3Gz4Ys53rRMWqg2EuzUuyyScXBZxT84ol8WvKsCeKA1Y0AfVvR9rUgGM5HCjCTYhkbS1b+CsuPo/35OUuctUoOgIlXx3mInO+wyAxzV7jHui0eFO6p0HiDhGNlyvtIzrqzbym7r3NHCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ruz/HlMf; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/S2HbQbKCvoRKCalpj7tukbXlDtRqceNWh29Ov9kqRk=; b=ruz/HlMfGDxAGOSawPrT7yXv4W
+	7+OT/Zhroaw41ZQ+0L/8PWuUHylYAShBLlxvdDIzMT32/00eQTmhogBZslu0y9WcSvg9KWSVf6V1J
+	GXJHSC0u23FsYJS8xMihPElo0G9+x5JgPYIi3XJJg6i57akXi2lSLXDw2Chv/Q0E4aOfPB884PMS6
+	QyyAyffINECZOlZ08gFB3lRrOV5fwctcsIxIsaCWY+CIR0qpUxaVQdBC6dK9VMka16x2fKXgaKRqh
+	5o6NHZp0pMu3SgQ5mcLpo8jFH4MezpsJHN6FL8EAvm3l2leojTLM0jFuo3GQ2/s5ef0J3cvNNDfKm
+	kFAUVsGg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51116)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sbcqx-0006km-0V;
+	Wed, 07 Aug 2024 10:21:07 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sbcqx-0004Bw-NV; Wed, 07 Aug 2024 10:21:07 +0100
+Date: Wed, 7 Aug 2024 10:21:07 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrew Halaney <ahalaney@redhat.com>, bpf@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sneh Shah <quic_snehshah@quicinc.com>,
+	Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RFC net-next v4 00/14] net: stmmac: convert stmmac "pcs"
+ to phylink
+Message-ID: <ZrM8g5KoaBi5L00b@shell.armlinux.org.uk>
+References: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
+ <rq2wbrm2q3bizgxcnl6kmdiycpldjl6rllsqqgpzfhsfodnd3o@ymdfbxq2gj5j>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <rq2wbrm2q3bizgxcnl6kmdiycpldjl6rllsqqgpzfhsfodnd3o@ymdfbxq2gj5j>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Current issue:
-- The `target_list_lock` spinlock is held while iterating over
-  target_list() entries.
-- Mid-loop, the lock is released to call __netpoll_cleanup(), then
-  reacquired.
-- This practice compromises the protection provided by
-  `target_list_lock`.
+On Tue, Aug 06, 2024 at 09:56:04PM +0300, Serge Semin wrote:
+> Hi Russell
+> 
+> Got this series tested on my DW GMAC v3.73a + Micrel KSZ9031RNX PHY
+> with the in-band link status management enabled. The same positive result
+> as before, on v1-v2:
+> [  294.651324] stmmaceth 1f060000.ethernet eth1: configuring for inband/rgmii-rxid link mode
+> [  294.582498] stmmaceth 1f060000.ethernet eth1: Register MEM_TYPE_PAGE_POOL RxQ-0
+> [  294.594308] stmmaceth 1f060000.ethernet eth1: PHY [stmmac-1:03] driver [RTL8211E Gigabit Ethernet] (irq=POLL)
+> [  294.605453] dwmac1000: Master AXI performs any burst length
+> [  294.611899] stmmaceth 1f060000.ethernet: invalid port speed
+> [  294.618229] stmmaceth 1f060000.ethernet eth1: No Safety Features support found
+> [  294.626412] stmmaceth 1f060000.ethernet eth1: No MAC Management Counters available
+> [  294.634912] stmmaceth 1f060000.ethernet eth1: IEEE 1588-2008 Advanced Timestamp supported
+> [  294.644380] stmmaceth 1f060000.ethernet eth1: registered PTP clock
+> [  294.651324] stmmaceth 1f060000.ethernet eth1: configuring for inband/rgmii-rxid link mode
+> ...
+> [  298.772917] stmmaceth 1f060000.ethernet eth1: Link is Up - 1Gbps/Full - flow control rx/tx
+> 
+> So feel free to add:
+> Tested-by: Serge Semin <fancer.lancer@gmail.com>
 
-Reason for current design:
-1. __netpoll_cleanup() may sleep, incompatible with holding a spinlock.
-2. target_list_lock must be a spinlock because write_msg() cannot sleep.
-   (See commit b5427c27173e ("[NET] netconsole: Support multiple logging
-    targets"))
+Thanks.
 
-Defer the cleanup of the netpoll structure to outside the
-target_list_lock() protected area. Create another list
-(target_cleanup_list) to hold the entries that need to be cleaned up,
-and clean them using a mutex (target_cleanup_list_lock).
+> Please note the warning: "stmmaceth 1f060000.ethernet: invalid port
+> speed" in the log above. This is a false negative warning since my
+> network devices isn't of MAC2MAC-type and there is no snps,ps-speed
+> property in my dts. So having the priv->hw.ps set to zero should be
+> fine. That said I guess we need to add the warning fix to the 14/14
+> patch which would permit the plat_stmmacenet_data::mac_port_sel_speed
+> field being zero.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/netconsole.c | 83 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 67 insertions(+), 16 deletions(-)
+I think this is a separate issue - one which exists even today with
+the stmmac driver as this code hasn't changed. Maybe it should be a
+separate patch targetting the net tree?
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 69eeab4a1e26..70e85b1a4ee8 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -37,6 +37,7 @@
- #include <linux/configfs.h>
- #include <linux/etherdevice.h>
- #include <linux/utsname.h>
-+#include <linux/rtnetlink.h>
- 
- MODULE_AUTHOR("Matt Mackall <mpm@selenic.com>");
- MODULE_DESCRIPTION("Console driver for network interfaces");
-@@ -72,9 +73,16 @@ __setup("netconsole=", option_setup);
- 
- /* Linked list of all configured targets */
- static LIST_HEAD(target_list);
-+/* target_cleanup_list is used to track targets that need to be cleaned outside
-+ * of target_list_lock. It should be cleaned in the same function it is
-+ * populated.
-+ */
-+static LIST_HEAD(target_cleanup_list);
- 
- /* This needs to be a spinlock because write_msg() cannot sleep */
- static DEFINE_SPINLOCK(target_list_lock);
-+/* This needs to be a mutex because netpoll_cleanup might sleep */
-+static DEFINE_MUTEX(target_cleanup_list_lock);
- 
- /*
-  * Console driver for extended netconsoles.  Registered on the first use to
-@@ -210,6 +218,46 @@ static struct netconsole_target *alloc_and_init(void)
- 	return nt;
- }
- 
-+/* Clean up every target in the cleanup_list and move the clean targets back to
-+ * the main target_list.
-+ */
-+static void netconsole_process_cleanups_core(void)
-+{
-+	struct netconsole_target *nt, *tmp;
-+	unsigned long flags;
-+
-+	/* The cleanup needs RTNL locked */
-+	ASSERT_RTNL();
-+
-+	mutex_lock(&target_cleanup_list_lock);
-+	list_for_each_entry_safe(nt, tmp, &target_cleanup_list, list) {
-+		/* all entries in the cleanup_list needs to be disabled */
-+		WARN_ON_ONCE(nt->enabled);
-+		do_netpoll_cleanup(&nt->np);
-+		/* moved the cleaned target to target_list. Need to hold both
-+		 * locks
-+		 */
-+		spin_lock_irqsave(&target_list_lock, flags);
-+		list_move(&nt->list, &target_list);
-+		spin_unlock_irqrestore(&target_list_lock, flags);
-+	}
-+	WARN_ON_ONCE(!list_empty(&target_cleanup_list));
-+	mutex_unlock(&target_cleanup_list_lock);
-+}
-+
-+/* Do the list cleanup with the rtnl lock hold.  rtnl lock is necessary because
-+ * netdev might be cleaned-up by calling __netpoll_cleanup(),
-+ */
-+static void netconsole_process_cleanups(void)
-+{
-+	/* rtnl lock is called here, because it has precedence over
-+	 * target_cleanup_list_lock mutex and target_cleanup_list
-+	 */
-+	rtnl_lock();
-+	netconsole_process_cleanups_core();
-+	rtnl_unlock();
-+}
-+
- #ifdef	CONFIG_NETCONSOLE_DYNAMIC
- 
- /*
-@@ -376,13 +424,20 @@ static ssize_t enabled_store(struct config_item *item,
- 		 * otherwise we might end up in write_msg() with
- 		 * nt->np.dev == NULL and nt->enabled == true
- 		 */
-+		mutex_lock(&target_cleanup_list_lock);
- 		spin_lock_irqsave(&target_list_lock, flags);
- 		nt->enabled = false;
-+		/* Remove the target from the list, while holding
-+		 * target_list_lock
-+		 */
-+		list_move(&nt->list, &target_cleanup_list);
- 		spin_unlock_irqrestore(&target_list_lock, flags);
--		netpoll_cleanup(&nt->np);
-+		mutex_unlock(&target_cleanup_list_lock);
- 	}
- 
- 	ret = strnlen(buf, count);
-+	/* Deferred cleanup */
-+	netconsole_process_cleanups();
- out_unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
- 	return ret;
-@@ -942,7 +997,7 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 				   unsigned long event, void *ptr)
- {
- 	unsigned long flags;
--	struct netconsole_target *nt;
-+	struct netconsole_target *nt, *tmp;
- 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
- 	bool stopped = false;
- 
-@@ -950,9 +1005,9 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 	      event == NETDEV_RELEASE || event == NETDEV_JOIN))
- 		goto done;
- 
-+	mutex_lock(&target_cleanup_list_lock);
- 	spin_lock_irqsave(&target_list_lock, flags);
--restart:
--	list_for_each_entry(nt, &target_list, list) {
-+	list_for_each_entry_safe(nt, tmp, &target_list, list) {
- 		netconsole_target_get(nt);
- 		if (nt->np.dev == dev) {
- 			switch (event) {
-@@ -962,25 +1017,16 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 			case NETDEV_RELEASE:
- 			case NETDEV_JOIN:
- 			case NETDEV_UNREGISTER:
--				/* rtnl_lock already held
--				 * we might sleep in __netpoll_cleanup()
--				 */
- 				nt->enabled = false;
--				spin_unlock_irqrestore(&target_list_lock, flags);
--
--				__netpoll_cleanup(&nt->np);
--
--				spin_lock_irqsave(&target_list_lock, flags);
--				netdev_put(nt->np.dev, &nt->np.dev_tracker);
--				nt->np.dev = NULL;
-+				list_move(&nt->list, &target_cleanup_list);
- 				stopped = true;
--				netconsole_target_put(nt);
--				goto restart;
- 			}
- 		}
- 		netconsole_target_put(nt);
- 	}
- 	spin_unlock_irqrestore(&target_list_lock, flags);
-+	mutex_unlock(&target_cleanup_list_lock);
-+
- 	if (stopped) {
- 		const char *msg = "had an event";
- 
-@@ -999,6 +1045,11 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 			dev->name, msg);
- 	}
- 
-+	/* Process target_cleanup_list entries. By the end, target_cleanup_list
-+	 * should be empty
-+	 */
-+	netconsole_process_cleanups_core();
-+
- done:
- 	return NOTIFY_DONE;
- }
+> > Previous cover messages from earlier posts below:
+> > 
+> > This is version 3 of the series switching stmmac to use phylink PCS
+> > isntead of going behind phylink's back.
+> > 
+> > Changes since version 2:
+> > - Adopted some of Serge's feedback.
+> > - New patch: adding ethqos_pcs_set_inband() for qcom-ethqos so we
+> >   have one place to modify for AN control rather than many.
+> > - New patch: pass the stmmac_priv structure into the pcs_set_ane()
+> >   method.
+> > - New patch: remove pcs_get_adv_lp() early, as this is only for TBI
+> >   and RTBI, support for which we dropped in an already merged patch.
+> > - Provide stmmac_pcs structure to encapsulate the pointer to
+> >   stmmac_priv, PCS MMIO address pointer and phylink_pcs structure.
+> > - Restructure dwmac_pcs_config() so we can eventually share code
+> >   with dwmac_ctrl_ane().
+> > - New patch: move dwmac_ctrl_ane() into stmmac_pcs.c, and share code.
+> > - New patch: pass the stmmac_pcs structure into dwmac_pcs_isr().
+> > - New patch: similar to Serge's patch, rename the PCS registers, but
+> >   use STMMAC_PCS_ as the prefix rather than just PCS_ which is too
+> >   generic.
+> > - New patch: incorporate "net: stmmac: Activate Inband/PCS flag
+> >   based on the selected iface" from Serge.
+> > 
+> > On the subject of whether we should have two PCS instances, I
+> > experimented with that and have now decided against it. Instead,
+> > dwmac_pcs_config() now tests whether we need to fiddle with the
+> > PCS control register or not.
+> > 
+> 
+> > Note that I prefer not to have multiple layers of indirection, but
+> > instead prefer a library-style approach, which is why I haven't
+> > turned the PCS support into something that's self contained with
+> > a method in the MAC driver to grab the RGSMII status.
+> 
+> I understand the reason of your choice in this case. As a result a
+> some part of my changes haven't been merged in into your series. But I
+> deliberately selected the approach with having the simple PCS
+> HW-interface callbacks utilized for a self-contained internal PCS
+> implementation. Here is why:
+> 1. Signify that the DW GMAC and DW QoS Eth internal PCSs are the
+> same.
+> 2. Reduce the amount of code.
+> 3. Collects the entire PCS implementation in a single place which
+> improves the code readability.
+> 4. The PCS ops initialization is implemented in the same way as the
+> PTP, MMC and EST (and likely FPE in some time in future), in the
+> hwif.c and the interface/core callbacks in the dedicated files
+> (stmmac_ptp.c, mmc_core.c, stmmac_est.c, etc). So the PCS
+> implementation would be in general unified with what has been done for
+> PTP/MMC/EST/etc. 
+> 5. ...
+> 
+> Taking that into account I am still convinced that my approach worth
+> to be implemented. Hope you won't mind, if after your series is merged
+> in I'll submit another patch set which would introduce some of my
+> PCS-changes not included into your patch set. Like this:
+> 1. Move the mac_device_info instance to being defined in the
+> stmmac_priv structure (new patch, so to drop the stmmac_priv pointer
+> from stmmac_pcs).
+> 2. Introduce stmmac_priv::pcsaddr (to have the PCS CSR base address
+> defined in the same way as for PTP/MMC/EST/etc).
+> 3. Provide the HWIF ops:
+>    stmmac_pcs_ops {
+>         pcs_get_config_reg;
+>         pcs_enable_irq;
+>         pcs_disable_irq;
+>    } for DW GMAC and DW QoS Eth.
+> 4. Move PCS implementation to stmmac_pcs.c
+> 5. Direct using the plat_stmmacenet_data::mac_port_sel_speed field
+> instead of the mac_device_info::ps.
+> 6. Some more cleanups like converting the struct stmmac_hwif_entry
+> field from void-pointers to the typed-pointers, ...
+
+I guessed that you would dig your heals in over this, and want to do
+it your own way despite all the points I raised against your patch
+series on my previous posting arguing against much of this.
+
+So, at this point I give up with this patch series - clearly there is
+no room for discussion about the way forward, and you want to do it
+your way no matter what.
+
 -- 
-2.43.5
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
