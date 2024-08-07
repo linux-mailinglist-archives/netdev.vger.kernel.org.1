@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-116508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E3C94A9B4
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:15:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0213C94A9B5
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B24828476D
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:15:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81F8E1F2A312
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8387A15C;
-	Wed,  7 Aug 2024 14:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAEFD5473E;
+	Wed,  7 Aug 2024 14:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="T+Wodajq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JT6ED+P7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2051.outbound.protection.outlook.com [40.107.244.51])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2070.outbound.protection.outlook.com [40.107.93.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50FC79DC7
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 14:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB30F4AED1
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 14:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.70
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723040086; cv=fail; b=qLb1u0lyCDh6lXMq30aRSRaf3r6uSJtoJf2nIhGts507INgAwfv6312EZaHNbxzHw3mfsUpi9L95tLyAhoQO+nXjIlHl5l0vMPSYRKYt97wvmPbwZ0Kr/XXUdNsBn7LjVHJL4+IwkehJUhSbFpF1nQE++WSAgSacqwGLOcaC7AY=
+	t=1723040095; cv=fail; b=tXj8HBS6yx1AGYLeEQY4KkvfDmy9l8lbA8ulmnpvN7XFRii7crradj13xng9oMrKA4Npegn7IMBzYkMAjj4AFcoqkDspf7FnTfvXPbRcTQXi+KBML30D1yqp8St8XN1cvfNIlKgqJkxtyFtyRM/G2/14PQb6ti5hr+a6nIOCPt4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723040086; c=relaxed/simple;
-	bh=9qGDhISJtwGHPlymcD5XtK7W9tPZZUCFKo04MWALO5c=;
+	s=arc-20240116; t=1723040095; c=relaxed/simple;
+	bh=9VxgnFTpEZIzf2GqBuv2unGsG1sVzfJI6mo+XG4e7Ko=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZxDC1VBS86+lvYiHwzyL8Z5sIN3JB9C85VT9wDdQdBXYW2WqzDLP3ewvcUG0Oahv/PqpXsAWBFsek9mM/RcCT22gbVbhF7c1BRS4Qg1SgH+tSxCbBmtr2UC2Hpd8kU2T0IJA7ZU0sPeztfc1SauEZFLxnWglq2Eg4lEiYI90EL0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=T+Wodajq; arc=fail smtp.client-ip=40.107.244.51
+	 MIME-Version:Content-Type; b=m3NK95Ex+sW217u0ZT3qFmKUgyT+0pdeNeWe1gVX9kNwg8xM4n+F2VwwgUxK4ULSaXOqOUQGGN0VCGVL1gOUjE4W2Fg8qi9O0xFlIuqdY3G2HjS0ko9RdfB/IfCoXW/EtPAhe/KlvH6bKPq8fkhyiNg+T7Glp3KmN9bxNd8XEEU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JT6ED+P7; arc=fail smtp.client-ip=40.107.93.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LuYQVwYqkUduXqxJPYQftxlCUoeNX8PyJorjHMvPzpelGlodP35+PIc3mPBE0l4Xd6toAhya5atXind3psVOQWan+3+ZhOeaHekDBGIxjsx+LlMNEy5H3JE+8AdHDneO+B0qvOfaKiR1VhbgXuKLgLF/wieb1iIkERYcs7C1MKn7YEeE1FpwD4FSh/z+DesAVmwn4vtEMOZEyXSsBGjcwxScQz+NJCRPVpyyEC8WnWfvwswUONAY/ICgraHRYdaw4mMwwk/dMvkNRkiC+NA9944useU0lf218l5DJYieg2SDhmdGu/AT43LjbKEmYeYLFHkHPVNpsGAqHU44ebUcYg==
+ b=wHPn2Veozc25LXXNvFcitjbb9rkXnZN+PTAHQKGhe+aAuPFOL++xLQoLexmti8TMO1zXGk2FPBumhkJEkKKi7PuyblbTM/oEXS4BboBRBekGqwhzKvcFuG+if2uVjS9qhKwThlVcNhlO12s6vok03l/cMVpjfETBlo3EIF4kwfGFz+iaR4r0t52GT4BIYXudsNT6d5xBdP2nRWrzoNPqi3Jo8NdBzxEHSESNFXQVJHD0iKqdjEEZRokfue8Q18VamlDnMwL9xkCbmSGQg2EN2Xhl37v5E0m4eMv16gBBhhCTs5O89OnKFo91iPowAJx6QQkNGxrd2yKLePIqljZ+6w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tX2uBN0mJWCzzXI8w2mQSiIxArKCz2G+Zpu3qlVS/Oc=;
- b=p2olj1zh1jpwU5mBzFTO/3WTeMu2DlfDYPV2vnrOy8WiXJvy7H5AjRguK8OD1NTwk1bTduXZycbSalY8tZXz1KaYkQIBPBbwXEGIX9zuewGxWisxVNAcV3BWdlqoq4mTHdUeeMpTRA9TMe3jjNiOTF4cuy1auAlYnR44RvfjO4ssEYoXs61necx1/iqu82WuPyBCQcplQU0xAIG0R/jffPMPhVFpoBW812xH5Zns8ag+i64CJ3NZlsLOq02G3a+eomgevHbmexeiAW/FZebozqTdaNChMarwjXEaNIsO8CBJb+Dtb65kWXOWI79yx4JKsCRRiF5WWMpO13TIdVJFbQ==
+ bh=BD9D5g7wPFyoMWxJhHTuaePtksyLnJAfZjWpYga524s=;
+ b=ZiWcJ330BivqOv7wdXOnYZzqPNz76XgJtolSvT3cL0+zDuWhH57SeYqG36BL3BdJHNjOiLufaG7uJOXWzx4YJvfCSDHXoO4e+TpdvTFGjNaSGPaqV17tXwPDITxf9CTJXiQVbryCkAgVgbTD+k1RM/9ER2RqvtwWjC+OY6+2L4aacKnaMCX+GRjJsbM1JsuvvwwGaoPDXtu+9FLI8f9M51ZJfs/HbygDiDKQXnW237gTlaR/GiDqqVENJjqtGxoX/082PKlL1F5xfIuc7PaEOrLKUle6jYvF/y305cIHgWS4crpzG1uCxfX/EwEfkLsLDSpKQMu0mJyFxPuWa27mng==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tX2uBN0mJWCzzXI8w2mQSiIxArKCz2G+Zpu3qlVS/Oc=;
- b=T+Wodajqg1tgX+E2aV8tH1ajoXIBFAqnrHbQLvHMKYYnbNrqVApLglmqla0XH6OjyZPQnGBG/hvzGvPAOj+67paBTP4QO0ZjGe03gQyusGq5khMB+ep3ae96ISfVJdMOag31B7wMKU9w5o9jCL9+f+jbix/P0Y3D/Erp3RFq7uYQuJOcJeVPBXKzAtsS7VHbofQ7+lgiQ2bGuJWBEQGzLa9ac5MYS7oZH432Q/mdhpZaGoaMBO28AEsPxVyOSzyQn5XzxQ9HacTsyAOb8ySBONUNrHBQOPwNhYE3Fa0uVHh0RRMn/c4+t7cPslzHBne2W2JMxwYitCC9o0C3JVGqmg==
-Received: from CYZPR02CA0007.namprd02.prod.outlook.com (2603:10b6:930:a1::24)
- by PH0PR12MB7815.namprd12.prod.outlook.com (2603:10b6:510:28a::15) with
+ bh=BD9D5g7wPFyoMWxJhHTuaePtksyLnJAfZjWpYga524s=;
+ b=JT6ED+P7w2xWmNgESQsXNt8Izdx/T3LKY43r/0UDEpMw0ZZJbZq9TvPPONGnY/IRcwTHVif9XTng0y84Xs6jZHdqyu5DQG7B3WngWGV/Jfmq3qn6unEkJtlXvkUOJjnBHePmzU/EncvO1Uj2cg2oh7hSQ5h8qZZw2agQsx1Ig7qPPvKQc+1fSD8LpGmdeV9SQ87zBzo0MM2ptHe6D0BxkZ+5vOhOdiYUt5I3U6kOhqJp7fWqfovEEfp0dPTTnqv56CLc5JUhDwfoRLex+UxdHPJ/TQidek8MyYUKuJeZTQqKkSkHMwtMlsPUsvG+qpjeUj9UoairWmOEJZ1zAL2vpQ==
+Received: from CH2PR08CA0015.namprd08.prod.outlook.com (2603:10b6:610:5a::25)
+ by SJ0PR12MB5676.namprd12.prod.outlook.com (2603:10b6:a03:42e::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.23; Wed, 7 Aug
- 2024 14:14:38 +0000
-Received: from CY4PEPF0000EDD5.namprd03.prod.outlook.com
- (2603:10b6:930:a1:cafe::ef) by CYZPR02CA0007.outlook.office365.com
- (2603:10b6:930:a1::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.14 via Frontend
- Transport; Wed, 7 Aug 2024 14:14:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 7 Aug
+ 2024 14:14:50 +0000
+Received: from DS2PEPF00003439.namprd02.prod.outlook.com
+ (2603:10b6:610:5a:cafe::67) by CH2PR08CA0015.outlook.office365.com
+ (2603:10b6:610:5a::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.29 via Frontend
+ Transport; Wed, 7 Aug 2024 14:14:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EDD5.mail.protection.outlook.com (10.167.241.201) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00003439.mail.protection.outlook.com (10.167.18.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7828.19 via Frontend Transport; Wed, 7 Aug 2024 14:14:37 +0000
+ 15.20.7849.8 via Frontend Transport; Wed, 7 Aug 2024 14:14:49 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 7 Aug 2024
- 07:14:21 -0700
+ 07:14:28 -0700
 Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 7 Aug 2024
- 07:14:15 -0700
+ 07:14:22 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -83,9 +83,9 @@ CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "David
  Ahern" <dsahern@kernel.org>, Donald Sharp <sharpd@nvidia.com>, Simon Horman
 	<horms@kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	<mlxsw@nvidia.com>
-Subject: [PATCH net-next v2 2/6] net: nexthop: Increase weight to u16
-Date: Wed, 7 Aug 2024 16:13:47 +0200
-Message-ID: <483e2fcf4beb0d9135d62e7d27b46fa2685479d4.1723036486.git.petrm@nvidia.com>
+Subject: [PATCH net-next v2 3/6] selftests: router_mpath: Sleep after MZ
+Date: Wed, 7 Aug 2024 16:13:48 +0200
+Message-ID: <8b1971d948273afd7de2da3d6a2ba35200540e55.1723036486.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1723036486.git.petrm@nvidia.com>
 References: <cover.1723036486.git.petrm@nvidia.com>
@@ -101,277 +101,125 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD5:EE_|PH0PR12MB7815:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdcab629-a7a6-4c4a-fe61-08dcb6eb454c
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003439:EE_|SJ0PR12MB5676:EE_
+X-MS-Office365-Filtering-Correlation-Id: ce439836-b82c-4a47-5be6-08dcb6eb4c54
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?tiYgbRw2asWuVSj8p8eZV/hpkST5j3WbjgxXbBQPga3rx02VJC+HfwMBCwlt?=
- =?us-ascii?Q?LGTgqurIIcBedQ33As1I6zjPkBLct9eiwRv+7QdUfNLlCqknsnfLfo1qfZ8w?=
- =?us-ascii?Q?h3DK4Ju93N+QYdtKNzlVT2N5HZMTsJ5gygXIKilLCPUkbIaKzqdwePWPYNNq?=
- =?us-ascii?Q?H4Fh6v4pDqvSmnWT5Du5Cvjk90SMyFut8j31LUxIuyHG8xGwws2SqBZv7fhP?=
- =?us-ascii?Q?iG6r2xF9Lis7wa2WhjAbjXmpcbsrUd8Go0mgPjjKH6Xpy2xjFqYjO+/ciGam?=
- =?us-ascii?Q?P9e8KpNdg8gIrjE8S06rPf29PqoeF01yx2oO0L7WR1AFbngGeErRG5gliQaQ?=
- =?us-ascii?Q?qN0m0n0MEibtltsCdMMjL7lbydeD7e+mAIkrJO6Zp45VPsSrWyTE1od3HKJm?=
- =?us-ascii?Q?mCJtLdu2hs357nNTP2Tf9YSlz5OqFkKXhAgwlRxMku1YwuhXMqpI/vDi9ixD?=
- =?us-ascii?Q?6s5hOCJiWTmSjY9uBG7ixxC1DA+IG4geVw9vwHx0D86/KERTKEqN9kaT4lwD?=
- =?us-ascii?Q?Wzwdh9/Fuc1bJOCJwz2ABdTmcPap33uq2uMNjQJx8VNDwCv5tJSgSNMzutmO?=
- =?us-ascii?Q?pv3qrvbkbFCD5R//A+TbQp8duTh6flU/vOLBQ0AgNBGBvfd8u50Yy3JhEuht?=
- =?us-ascii?Q?npVZ3z6TR5rtIn1xX1XxT/Oe08OiHxKFo85ONyjwnuL+PHAp22tex39JTHUl?=
- =?us-ascii?Q?cFuN9n0z7Gx7c2447BZ7E3z/h21coQYXb+z2ma+Oug2X6apJuT1x42SUDTjj?=
- =?us-ascii?Q?oGei4ycot6a19ORe2W0Gx7oqBjLd/IxJ6n+gW20em4pa38zvGO/GiSd98T/Q?=
- =?us-ascii?Q?jguDgJKla6TIGgyzQ/Xu+T6E3kcR/2r5O9v1Scdkkvqvpzir5HvkGFSgkWok?=
- =?us-ascii?Q?53A6FAb8/EtluSPAxIi0t2wSFkKKimM/N1On94obtpzz2G6u/AdDXKcSaz9c?=
- =?us-ascii?Q?SXPLxg3TDTRfZ+RN9npst32FbtIV6fUwe+/8ww+KY2d45eVJ58q6MVKcubha?=
- =?us-ascii?Q?/hJoB6hs6Vbb96CzEvlra5MYUfPcjbHhqLR9IOtcWoOGB/NePFk47BiDXekE?=
- =?us-ascii?Q?3NUrnw+gkFXgl7JJeIDOMVACa1XPQHHwVTg8r1OQajLjwe2bzuho96MEF2SA?=
- =?us-ascii?Q?iK//HjPmfAivUPHmelKMsO3W7u4u9CFvDcWvGsQNR11hJCvyxkPIvrRk07SZ?=
- =?us-ascii?Q?0vAotk4HzzkhKCcOZ9u1QO0M4YsAjogbMWWyY5pnX5v9DsZWbzTxReqXbl4N?=
- =?us-ascii?Q?0BQr2/kbRSnSt/euyeMcpW+ZeES7OqANz/fmZKpyJGGzzALnT2wJGyhmT8Sa?=
- =?us-ascii?Q?6IKv2Qpxix+vVFSO8sxtmsH3nZ5Qr2QVCB6SrbSi/rWP42r0eOcyoxZqCb1A?=
- =?us-ascii?Q?F8rVzgrIpJn4tFNOl6+B1S4dEmFJJ/ef4YPt/6ez/Is2N3wTxmgKpns5o0Xe?=
- =?us-ascii?Q?bRu0N7X/ae28KjYntiWbvHroHsFq0c9x?=
+	=?us-ascii?Q?kq2n+/P5odSwcRhPT1cKB57aEwZpxWMw02s/eaSDmU9a8N6eGuQ1VOglcLr0?=
+ =?us-ascii?Q?G4aeoFfdZiARJn5ezjmT6tHAWsYFDqon10OMx6b/NLYcb/AV7VOuGPyeL6lB?=
+ =?us-ascii?Q?KiRuxfSUh2q7s0LatheluQKzKiMncBrBzh6ABrgBHxeCtrke4fQ/PLr0bO/7?=
+ =?us-ascii?Q?+JH1nu64BRoo9pytR+PeUZbUolpS9PhcOkA8LrITENi9qC2vWwf0+beTkHEX?=
+ =?us-ascii?Q?mOzRgGeP7yFu/oCi7VDA+17RweGsMAujFWOSzDgEXxl337jYQN7QECylTw9g?=
+ =?us-ascii?Q?SAG1DoffpaJM0wFL0qniqGvU1sv34EZq/SZstzv+w4DXbmvTg55GeVjTK4VU?=
+ =?us-ascii?Q?bK8lbpe+10Ut7rOTasEii/JyQ4XWeSkYzRa/lGKGbK8S9Rx/rfCjafDvZJsS?=
+ =?us-ascii?Q?0AqZAYkDMc64hhMWJZ6Q5kszUcfOMmVjuH9kBhAsHaLgz2Cs6rDtEE2ZSd3Z?=
+ =?us-ascii?Q?zfQ0vLw2OMjXlJSwOMZxGmEIrszbXyHcTGULbDgOUVGv1DAY6ddvv+9B0yPG?=
+ =?us-ascii?Q?ZOw78mGnLATchGryYVnNXkr9lk5LNUj388rOwVp9ZaRolyvOJcXYRxiBZZGm?=
+ =?us-ascii?Q?5CB/SxJuqNPm1Izai98NDO3sZgKHiuj+RAEH45oC9SZiyn/O43mKWvrQoH2W?=
+ =?us-ascii?Q?S9s1TLJBMweJwZ/Fi1wpO6jcl4xtI+fFXgKpRNG+xnZUWGg+5GFUTQW5BYTr?=
+ =?us-ascii?Q?K9L2iOcZfRVr8kEA7funeT3BlyB7dVWyGpZNPvwf9bbz8UTZHi5z5HYKJBE3?=
+ =?us-ascii?Q?837l+v01GaCDL0GAuRHuijXsKhGD0o00k4AlQ7S0Y5ZQKXSC/h/028kzxp3i?=
+ =?us-ascii?Q?xP9A5ysH2l7zChFiX99TsIhI08FnrUthR13ag54FWH8tES9jdYyXYsaXnrlK?=
+ =?us-ascii?Q?lePCKwfUqvmNG2OsB6I+gffHBvGT14c8PLuLZKDqxXxCRNi/wN+3VfHVsAtB?=
+ =?us-ascii?Q?EvjdpHWZB2nfzyjss27Alt7AcZE+lMdEt0ojhkcs03SxyzXZbQyOidokUfJJ?=
+ =?us-ascii?Q?ATZTRK0jKIZZBNBG6nBkF/pk9hLB2Bv5rpRJ7DdD/RqsuBDuw4eGdbr1VgeU?=
+ =?us-ascii?Q?lpr+4vag7zGW0Tbb+IU4+O0967bs7Dh8y+UlIChwFJMJJh/u1KFNyvBl0HAc?=
+ =?us-ascii?Q?Mk1Zddq8Pm0eS04NXQVoij983owsabDaaqmw3CxGU42jGFjPyN1FqLztT6e6?=
+ =?us-ascii?Q?IQP1l1ZeF3+odAZY6oHJSC2py/6bwzJOUroxKujEQj8b8e5hFt7CJu1Qc2Ca?=
+ =?us-ascii?Q?xvsX0xx/LcOt974ylFgLLQiaV77UCcPaXUtPdLi51qDP2Lzci4uoEoQenCQB?=
+ =?us-ascii?Q?SkIWsKvZFS6SQgxNgO4Hx5XVbnbtgqkz2SFblx5GPB7qm+n/mEnooe8sIsg6?=
+ =?us-ascii?Q?hESSGHJupEkr9DcOwxhCFGqEXnUqWoEEAwLi7xGzsXWb+mr0EMHOgFr70eMT?=
+ =?us-ascii?Q?icLj65Gjk+wnlsqN2OMOsmqg57nsC+V4?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 14:14:37.4917
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 14:14:49.2372
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdcab629-a7a6-4c4a-fe61-08dcb6eb454c
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce439836-b82c-4a47-5be6-08dcb6eb4c54
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD5.namprd03.prod.outlook.com
+	DS2PEPF00003439.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7815
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5676
 
-In CLOS networks, as link failures occur at various points in the network,
-ECMP weights of the involved nodes are adjusted to compensate. With high
-fan-out of the involved nodes, and overall high number of nodes,
-a (non-)ECMP weight ratio that we would like to configure does not fit into
-8 bits. Instead of, say, 255:254, we might like to configure something like
-1000:999. For these deployments, the 8-bit weight may not be enough.
-
-To that end, in this patch increase the next hop weight from u8 to u16.
-
-Increasing the width of an integral type can be tricky, because while the
-code still compiles, the types may not check out anymore, and numerical
-errors come up. To prevent this, the conversion was done in two steps.
-First the type was changed from u8 to a single-member structure, which
-invalidated all uses of the field. This allowed going through them one by
-one and audit for type correctness. Then the structure was replaced with a
-vanilla u16 again. This should ensure that no place was missed.
-
-The UAPI for configuring nexthop group members is that an attribute
-NHA_GROUP carries an array of struct nexthop_grp entries:
-
-	struct nexthop_grp {
-		__u32	id;	  /* nexthop id - must exist */
-		__u8	weight;   /* weight of this nexthop */
-		__u8	resvd1;
-		__u16	resvd2;
-	};
-
-The field resvd1 is currently validated and required to be zero. We can
-lift this requirement and carry high-order bits of the weight in the
-reserved field:
-
-	struct nexthop_grp {
-		__u32	id;	  /* nexthop id - must exist */
-		__u8	weight;   /* weight of this nexthop */
-		__u8	weight_high;
-		__u16	resvd2;
-	};
-
-Keeping the fields split this way was chosen in case an existing userspace
-makes assumptions about the width of the weight field, and to sidestep any
-endianness issues.
-
-The weight field is currently encoded as the weight value minus one,
-because weight of 0 is invalid. This same trick is impossible for the new
-weight_high field, because zero must mean actual zero. With this in place:
-
-- Old userspace is guaranteed to carry weight_high of 0, therefore
-  configuring 8-bit weights as appropriate. When dumping nexthops with
-  16-bit weight, it would only show the lower 8 bits. But configuring such
-  nexthops implies existence of userspace aware of the extension in the
-  first place.
-
-- New userspace talking to an old kernel will work as long as it only
-  attempts to configure 8-bit weights, where the high-order bits are zero.
-  Old kernel will bounce attempts at configuring >8-bit weights.
-
-Renaming reserved fields as they are allocated for some purpose is commonly
-done in Linux. Whoever touches a reserved field is doing so at their own
-risk. nexthop_grp::resvd1 in particular is currently used by at least
-strace, however they carry an own copy of UAPI headers, and the conversion
-should be trivial. A helper is provided for decoding the weight out of the
-two fields. Forcing a conversion seems preferable to bending backwards and
-introducing anonymous unions or whatever.
+In the context of an offloaded datapath, it may take a while for the ip
+link stats to be updated. This causes the test to fail when MZ_DELAY is too
+low. Sleep after the packets are sent for the link stats to get up to date.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
+ tools/testing/selftests/net/forwarding/router_mpath_nh.sh     | 2 ++
+ tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh | 2 ++
+ tools/testing/selftests/net/forwarding/router_multipath.sh    | 2 ++
+ 3 files changed, 6 insertions(+)
 
-Notes:
-    v2:
-    - s/endianes/endianness/
-
- include/net/nexthop.h        |  4 ++--
- include/uapi/linux/nexthop.h |  7 ++++++-
- net/ipv4/nexthop.c           | 37 ++++++++++++++++++++++--------------
- 3 files changed, 31 insertions(+), 17 deletions(-)
-
-diff --git a/include/net/nexthop.h b/include/net/nexthop.h
-index 68463aebcc05..d9fb44e8b321 100644
---- a/include/net/nexthop.h
-+++ b/include/net/nexthop.h
-@@ -105,7 +105,7 @@ struct nh_grp_entry_stats {
- struct nh_grp_entry {
- 	struct nexthop	*nh;
- 	struct nh_grp_entry_stats __percpu	*stats;
--	u8		weight;
-+	u16		weight;
+diff --git a/tools/testing/selftests/net/forwarding/router_mpath_nh.sh b/tools/testing/selftests/net/forwarding/router_mpath_nh.sh
+index 2ba44247c60a..c5a30f8f55b5 100755
+--- a/tools/testing/selftests/net/forwarding/router_mpath_nh.sh
++++ b/tools/testing/selftests/net/forwarding/router_mpath_nh.sh
+@@ -243,6 +243,7 @@ multipath4_test()
  
- 	union {
- 		struct {
-@@ -192,7 +192,7 @@ struct nh_notifier_single_info {
- };
+ 	ip vrf exec vrf-h1 $MZ $h1 -q -p 64 -A 192.0.2.2 -B 198.51.100.2 \
+ 		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
++	sleep 1
  
- struct nh_notifier_grp_entry_info {
--	u8 weight;
-+	u16 weight;
- 	struct nh_notifier_single_info nh;
- };
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+@@ -276,6 +277,7 @@ multipath6_test()
  
-diff --git a/include/uapi/linux/nexthop.h b/include/uapi/linux/nexthop.h
-index f4f060a87cc2..bc49baf4a267 100644
---- a/include/uapi/linux/nexthop.h
-+++ b/include/uapi/linux/nexthop.h
-@@ -16,10 +16,15 @@ struct nhmsg {
- struct nexthop_grp {
- 	__u32	id;	  /* nexthop id - must exist */
- 	__u8	weight;   /* weight of this nexthop */
--	__u8	resvd1;
-+	__u8	weight_high;	/* high order bits of weight */
- 	__u16	resvd2;
- };
+ 	$MZ $h1 -6 -q -p 64 -A 2001:db8:1::2 -B 2001:db8:2::2 \
+ 		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
++	sleep 1
  
-+static inline __u16 nexthop_grp_weight(const struct nexthop_grp *entry)
-+{
-+	return ((entry->weight_high << 8) | entry->weight) + 1;
-+}
-+
- enum {
- 	NEXTHOP_GRP_TYPE_MPATH,  /* hash-threshold nexthop group
- 				  * default type if not specified
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 23caa13bf24d..9db10d409074 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -872,6 +872,7 @@ static int nla_put_nh_group(struct sk_buff *skb, struct nexthop *nh,
- 	size_t len = nhg->num_nh * sizeof(*p);
- 	struct nlattr *nla;
- 	u16 group_type = 0;
-+	u16 weight;
- 	int i;
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+diff --git a/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh b/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
+index cd9e346436fc..bd35fe8be9aa 100755
+--- a/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
++++ b/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
+@@ -244,6 +244,7 @@ multipath4_test()
  
- 	*resp_op_flags |= NHA_OP_FLAG_RESP_GRP_RESVD_0;
-@@ -890,9 +891,12 @@ static int nla_put_nh_group(struct sk_buff *skb, struct nexthop *nh,
+ 	ip vrf exec vrf-h1 $MZ $h1 -q -p 64 -A 192.0.2.2 -B 198.51.100.2 \
+ 		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
++	sleep 1
  
- 	p = nla_data(nla);
- 	for (i = 0; i < nhg->num_nh; ++i) {
-+		weight = nhg->nh_entries[i].weight - 1;
-+
- 		*p++ = (struct nexthop_grp) {
- 			.id = nhg->nh_entries[i].nh->id,
--			.weight = nhg->nh_entries[i].weight - 1,
-+			.weight = weight,
-+			.weight_high = weight >> 8,
- 		};
- 	}
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+@@ -274,6 +275,7 @@ multipath6_l4_test()
  
-@@ -1286,11 +1290,14 @@ static int nh_check_attr_group(struct net *net,
+ 	$MZ $h1 -6 -q -p 64 -A 2001:db8:1::2 -B 2001:db8:2::2 \
+ 		-d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
++	sleep 1
  
- 	nhg = nla_data(tb[NHA_GROUP]);
- 	for (i = 0; i < len; ++i) {
--		if (nhg[i].resvd1 || nhg[i].resvd2) {
--			NL_SET_ERR_MSG(extack, "Reserved fields in nexthop_grp must be 0");
-+		if (nhg[i].resvd2) {
-+			NL_SET_ERR_MSG(extack, "Reserved field in nexthop_grp must be 0");
- 			return -EINVAL;
- 		}
--		if (nhg[i].weight > 254) {
-+		if (nexthop_grp_weight(&nhg[i]) == 0) {
-+			/* 0xffff got passed in, representing weight of 0x10000,
-+			 * which is too heavy.
-+			 */
- 			NL_SET_ERR_MSG(extack, "Invalid value for weight");
- 			return -EINVAL;
- 		}
-@@ -1886,9 +1893,9 @@ static void nh_res_table_cancel_upkeep(struct nh_res_table *res_table)
- static void nh_res_group_rebalance(struct nh_group *nhg,
- 				   struct nh_res_table *res_table)
- {
--	int prev_upper_bound = 0;
--	int total = 0;
--	int w = 0;
-+	u16 prev_upper_bound = 0;
-+	u32 total = 0;
-+	u32 w = 0;
- 	int i;
+ 	t1_rp12=$(link_stats_tx_packets_get $rp12)
+ 	t1_rp13=$(link_stats_tx_packets_get $rp13)
+diff --git a/tools/testing/selftests/net/forwarding/router_multipath.sh b/tools/testing/selftests/net/forwarding/router_multipath.sh
+index e2be354167a1..46f365b557b7 100755
+--- a/tools/testing/selftests/net/forwarding/router_multipath.sh
++++ b/tools/testing/selftests/net/forwarding/router_multipath.sh
+@@ -180,6 +180,7 @@ multipath4_test()
  
- 	INIT_LIST_HEAD(&res_table->uw_nh_entries);
-@@ -1898,11 +1905,12 @@ static void nh_res_group_rebalance(struct nh_group *nhg,
+        ip vrf exec vrf-h1 $MZ $h1 -q -p 64 -A 192.0.2.2 -B 198.51.100.2 \
+ 	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
++       sleep 1
  
- 	for (i = 0; i < nhg->num_nh; ++i) {
- 		struct nh_grp_entry *nhge = &nhg->nh_entries[i];
--		int upper_bound;
-+		u16 upper_bound;
-+		u64 btw;
+        t1_rp12=$(link_stats_tx_packets_get $rp12)
+        t1_rp13=$(link_stats_tx_packets_get $rp13)
+@@ -217,6 +218,7 @@ multipath6_test()
  
- 		w += nhge->weight;
--		upper_bound = DIV_ROUND_CLOSEST(res_table->num_nh_buckets * w,
--						total);
-+		btw = ((u64)res_table->num_nh_buckets) * w;
-+		upper_bound = DIV_ROUND_CLOSEST_ULL(btw, total);
- 		nhge->res.wants_buckets = upper_bound - prev_upper_bound;
- 		prev_upper_bound = upper_bound;
+        $MZ $h1 -6 -q -p 64 -A 2001:db8:1::2 -B 2001:db8:2::2 \
+ 	       -d $MZ_DELAY -t udp "sp=1024,dp=0-32768"
++       sleep 1
  
-@@ -1968,8 +1976,8 @@ static void replace_nexthop_grp_res(struct nh_group *oldg,
- 
- static void nh_hthr_group_rebalance(struct nh_group *nhg)
- {
--	int total = 0;
--	int w = 0;
-+	u32 total = 0;
-+	u32 w = 0;
- 	int i;
- 
- 	for (i = 0; i < nhg->num_nh; ++i)
-@@ -1977,7 +1985,7 @@ static void nh_hthr_group_rebalance(struct nh_group *nhg)
- 
- 	for (i = 0; i < nhg->num_nh; ++i) {
- 		struct nh_grp_entry *nhge = &nhg->nh_entries[i];
--		int upper_bound;
-+		u32 upper_bound;
- 
- 		w += nhge->weight;
- 		upper_bound = DIV_ROUND_CLOSEST_ULL((u64)w << 31, total) - 1;
-@@ -2719,7 +2727,8 @@ static struct nexthop *nexthop_create_group(struct net *net,
- 			goto out_no_nh;
- 		}
- 		nhg->nh_entries[i].nh = nhe;
--		nhg->nh_entries[i].weight = entry[i].weight + 1;
-+		nhg->nh_entries[i].weight = nexthop_grp_weight(&entry[i]);
-+
- 		list_add(&nhg->nh_entries[i].nh_list, &nhe->grp_list);
- 		nhg->nh_entries[i].nh_parent = nh;
- 	}
+        t1_rp12=$(link_stats_tx_packets_get $rp12)
+        t1_rp13=$(link_stats_tx_packets_get $rp13)
 -- 
 2.45.2
 
