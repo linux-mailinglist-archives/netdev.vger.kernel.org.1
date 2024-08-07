@@ -1,167 +1,374 @@
-Return-Path: <netdev+bounces-116395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69BC394A524
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:10:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1881194A520
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:10:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 140591F22E3C
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:10:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 963561F21A49
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C021D618A;
-	Wed,  7 Aug 2024 10:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4373F1D3633;
+	Wed,  7 Aug 2024 10:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TUPmhRdW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB041D4152
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 10:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C19F1C6899;
+	Wed,  7 Aug 2024 10:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723025421; cv=none; b=NGjNlmHd5+eAm1ddG6N5kOIGYlZI5Ey7KKSUULXUWNGiSY1DTmQyHMWAdmImo311I03kD6WMps2LkZ/LyNNTvSJi7krRkgWSApU5eCRCHTLztVFphYyeuHhSjxzC/gZL1utGm1EgIzfo/64squGZ+up8UhgroIimINbOlSzO0sI=
+	t=1723025416; cv=none; b=kRCch11xVMBJn936x0toT5sfSLAcItxTLE3jub6sfY9yJYnS/eQQxOaNvME8biqssA2BBRixi3vCnouZd7U8DWYRmCjThrJRGqkwC5n4PmDHO8uL05EZlPW5uZTADSXMPCsVNaiA6c2EYRG1epfwgkowq9WCt9Pp5W9OC/VmvHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723025421; c=relaxed/simple;
-	bh=yZeCnmZYMwImeB4xu3FPMvANHS+xa6i/tCMLylDza/g=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Tfl7E1wZ+Q+YrKR4C21S79e0gUq6LKOrKeJEGUmYDfOxpROsdlI3mhTdhwOsQtM37eJoDC6i2EEfEyT/rp5FKYNKp0deAjS894AHdcBhQjXQMFT+9h5f5HEu54FOKh73ywGjTn5S33EbFqjxfk/tjpi7PQmrpWBOFaHUzeBeQis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz9t1723025388tu9rrb5
-X-QQ-Originating-IP: o+EIrn3g2jm+FqYElk0oGIMunx4cOEUea6rTpKdOTK0=
-Received: from smtpclient.apple ( [60.186.245.110])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 07 Aug 2024 18:09:47 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 12219116204641391119
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1723025416; c=relaxed/simple;
+	bh=3geILOQKguehSc6CHYFbtZK9lmxQOnTTa3CMyswIst4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QfLrY3GQ4Uka9aykRWFuoP73fzYsez9Q5avIKEBtP1QBZo5OlExY1Q65OdY7a74vxgUDnlWm2McnJRzfvCugZbxO9A2hnYop8cLSsgo3J++2utPRHKIonoKfQz5jOYGfoukGh5zNGjAvjAUzd86dG5kLSbzw87urV2sabGQAvew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TUPmhRdW; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7C0821BF203;
+	Wed,  7 Aug 2024 10:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1723025403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k5BGqJI/ev/belov1hsrruBFGrYZxU1Unm6iwJDXADo=;
+	b=TUPmhRdWjO9JNhnOiRGL61xQIzPr5WsceG2EwvtaTxyj8uRQI95g+daK4eu9DM/BqXSzkK
+	8YNzgK3ImrLELTqobMwZ/7xfMMBl6IFDXVPea6GvQP1qbhCHCdSQz47hWiYHt8v01wasRY
+	rpWo2J0qeMP0Vm7L4lv4eMnRdSe5tz26dB7dL6Hs8hGtkQ2Dpdigm7AhZIAriO7AUQOX5A
+	jCYfHm2gS+/o+Od7CegM/vgVVOCdlKaneFthnJMxnu4l90ya2cMtx8lJPk9zFz/psPQVvc
+	9jH5QhFLfBwlPgLTYF8Ufg8xQzJOxvngmPLExruVRGcVqdLvMB1Pfv7l2G6ThQ==
+Date: Wed, 7 Aug 2024 12:09:56 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Simon Horman
+ <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ devicetree@vger.kernel.org, Allan Nielsen <allan.nielsen@microchip.com>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v4 1/8] misc: Add support for LAN966x PCI device
+Message-ID: <20240807120956.30c8264e@bootlin.com>
+In-Reply-To: <CAHp75VdtFET87R9DZbz27vEeyv4K5bn7mxDCnBVdpFVJ=j6qtg@mail.gmail.com>
+References: <20240805101725.93947-1-herve.codina@bootlin.com>
+	<20240805101725.93947-2-herve.codina@bootlin.com>
+	<CAHp75VdtFET87R9DZbz27vEeyv4K5bn7mxDCnBVdpFVJ=j6qtg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3814.100.5\))
-Subject: Re: [PATCH net-next v5 00/10] add sriov support for wangxun NICs
-From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-In-Reply-To: <20240806152042.GY2636630@kernel.org>
-Date: Wed, 7 Aug 2024 18:09:37 +0800
-Cc: netdev@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <6834953C-A0D6-466B-B09E-6CDE028B7FB9@net-swift.com>
-References: <598334BC407FB6F6+20240804124841.71177-1-mengyuanlou@net-swift.com>
- <20240805164015.GH2636630@kernel.org>
- <AADA412A-F7C4-4B73-A23A-ECD68ABFC060@net-swift.com>
- <20240806152042.GY2636630@kernel.org>
-To: Simon Horman <horms@kernel.org>
-X-Mailer: Apple Mail (2.3814.100.5)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
+Hi Andy,
 
+On Mon, 5 Aug 2024 22:13:38 +0200
+Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
 
-> 2024=E5=B9=B48=E6=9C=886=E6=97=A5 23:20=EF=BC=8CSimon Horman =
-<horms@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Tue, Aug 06, 2024 at 05:37:36PM +0800, mengyuanlou@net-swift.com =
-wrote:
->>=20
->>=20
->>> 2024=E5=B9=B48=E6=9C=886=E6=97=A5 00:40=EF=BC=8CSimon Horman =
-<horms@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->>>=20
->>> On Sun, Aug 04, 2024 at 08:48:31PM +0800, Mengyuan Lou wrote:
->>>> Add sriov_configure for ngbe and txgbe drivers.
->>>> Reallocate queue and irq resources when sriov is enabled.
->>>> Add wx_msg_task in interrupts handler, which is used to process the
->>>> configuration sent by vfs.
->>>> Add ping_vf for wx_pf to tell vfs about pf link change.
->>>> Make devlink allocation function generic to use it for PF and for =
-VF.
->>>> Add PF/VF devlink port creation. It will be used to set/get VFs.
->>>=20
->>> I think it would be good to summarise the overall status of SR-IOV =
-support
->>> with this patch, and what follow-up work is planned. As Jakub =
-mentioned [1]
->>> this does not seem complete as is.
->>>=20
->>=20
->> Ok=EF=BC=8Cgot it.
->=20
-> Thanks.
->=20
-> Did you get my 2nd point below?
-> This seems relevant to you:
-> - =
-https://lore.kernel.org/netdev/20240620002741.1029936-1-kuba@kernel.org/
+> On Mon, Aug 5, 2024 at 12:19 PM Herve Codina <herve.codina@bootlin.com> wrote:
+> >
+> > Add a PCI driver that handles the LAN966x PCI device using a device-tree
+> > overlay. This overlay is applied to the PCI device DT node and allows to
+> > describe components that are present in the device.
+> >
+> > The memory from the device-tree is remapped to the BAR memory thanks to
+> > "ranges" properties computed at runtime by the PCI core during the PCI
+> > enumeration.
+> >
+> > The PCI device itself acts as an interrupt controller and is used as the
+> > parent of the internal LAN966x interrupt controller to route the
+> > interrupts to the assigned PCI INTx interrupt.  
+> 
+> ...
+> 
+> + device.h
 
-Before send v5=EF=BC=8CI have seen this doc.
-So I try to add devlink port apis at v5. =20
+Will be added.
 
-But looks like it needs to be done in a new way.
+> 
+> > +#include <linux/irq.h>
+> > +#include <linux/irqdomain.h>
+> > +#include <linux/module.h>
+> > +#include <linux/of_platform.h>  
+> 
+> > +#include <linux/pci.h>  
+> 
+> > +#include <linux/pci_ids.h>  
+> 
+> AFAIU pci_ids..h is guaranteed to be included by pci.h, but having it
+> here explicitly doesn't make it worse, so up to you.
 
->=20
->>=20
->>> [1] =
-https://lore.kernel.org/netdev/988BFB51-32C8-499C-837D-91CC1C0FFE42@net-sw=
-ift.com/
->>>=20
->>> I mean, I understand the NDOs were removed from the patchset (see =
-more on
->>> that below) but there needs to be a plan to support users of this =
-device
->>> in a meaningful way.
->>>=20
+I will keep pci_ids.h
 
+> 
+> > +#include <linux/slab.h>  
+> 
+> ...
+> 
+> > +static irqreturn_t pci_dev_irq_handler(int irq, void *data)
+> > +{
+> > +       struct pci_dev_intr_ctrl *intr_ctrl = data;
+> > +       int ret;
+> > +
+> > +       ret = generic_handle_domain_irq(intr_ctrl->irq_domain, 0);
+> > +       return IRQ_RETVAL(!ret);  
+> 
+> Hmm... I dunno if it was me who suggested IRQ_RETVAL() here, but it
+> usually makes sense for the cases where ret is not inverted.
+> 
+> Perhaps
+> 
+>   if (ret)
+>     return NONE;
+>   return HANDLED;
+> 
+> is slightly better in this case?
 
+Right. I will use a more compact version:
+  return ret ? IRQ_NONE : IRQ_HANDLED;
 
->>>>=20
->>>> v5:
->>>> - Add devlink allocation which will be used to add uAPI.
->>>> - Remove unused EXPORT_SYMBOL.
->>>> - Unify some functions return styles in patch 1 and patch 4.
->>>> - Make the code line less than 80 columns.
->>>> v4:
->>>> =
-https://lore.kernel.org/netdev/3601E5DE87D2BC4F+20240604155850.51983-1-men=
-gyuanlou@net-swift.com/
->>>> - Move wx_ping_vf to patch 6.
->>>> - Modify return section format in Kernel docs.
->>>> v3:
->>>> =
-https://lore.kernel.org/netdev/587FAB7876D85676+20240415110225.75132-1-men=
-gyuanlou@net-swift.com/
->>>> - Do not accept any new implementations of the old SR-IOV API.
->>>> - So remove ndo_vf_xxx in these patches. Switch mode ops will be =
-added
->>>> - in vf driver which will be submitted later.
->>>=20
->>> FYI, this policy was recently significantly relaxed [2]:
->>>=20
->>> [2] =
-https://lore.kernel.org/netdev/20240620002741.1029936-1-kuba@kernel.org/
->>>=20
->>>> v2:
->>>> =
-https://lore.kernel.org/netdev/EF19E603F7CCA7B9+20240403092714.3027-1-meng=
-yuanlou@net-swift.com/
->>>> - Fix some used uninitialised.
->>>> - Use poll + yield with delay instead of busy poll of 10 times in
->>>> mbx_lock obtain.
->>>> - Split msg_task and flow into separate patches.
->>>> v1:
->>>> =
-https://lore.kernel.org/netdev/DA3033FE3CCBBB84+20240307095755.7130-1-meng=
-yuanlou@net-swift.com/
->>>=20
->>> ...
->>>=20
->>>=20
->>=20
->=20
+> 
+> > +}  
+> 
+> ...
+> 
+> > +static struct pci_dev_intr_ctrl *pci_dev_create_intr_ctrl(struct pci_dev *pdev)
+> > +{
+> > +       struct pci_dev_intr_ctrl *intr_ctrl;
+> > +       struct fwnode_handle *fwnode;
+> > +       int ret;  
+> 
+> > +       if (!pdev->irq)
+> > +               return ERR_PTR(-EOPNOTSUPP);  
+> 
+> Before even trying to get it via APIs? (see below as well)
+> Also, when is it possible to have 0 here?
 
+pdev->irq can be 0 if the PCI device did not request any IRQ
+(i.e. PCI_INTERRUPT_PIN in PCI config header is 0).
+
+I use that to check whether or not INTx is supported.
+
+Even if this code is present in the LAN966x PCI driver, it can be use as a
+starting point for other drivers and may be moved to a common part in the
+future.
+
+Do you think I should remove it ?
+
+If keeping it is fine, I will add a comment.
+
+> 
+> > +       fwnode = dev_fwnode(&pdev->dev);
+> > +       if (!fwnode)
+> > +               return ERR_PTR(-ENODEV);
+> > +
+> > +       intr_ctrl = kmalloc(sizeof(*intr_ctrl), GFP_KERNEL);  
+> 
+> Hmm... Why not use __free()?
+
+Well, just because I am not used to using __free() and I didn't think
+about it.
+
+I will use it in the next operation.
+
+> 
+> > +       if (!intr_ctrl)
+> > +               return ERR_PTR(-ENOMEM);
+> > +
+> > +       intr_ctrl->pci_dev = pdev;
+> > +
+> > +       intr_ctrl->irq_domain = irq_domain_create_linear(fwnode, 1, &pci_dev_irq_domain_ops,
+> > +                                                        intr_ctrl);
+> > +       if (!intr_ctrl->irq_domain) {
+> > +               pci_err(pdev, "Failed to create irqdomain\n");
+> > +               ret = -ENOMEM;
+> > +               goto err_free_intr_ctrl;
+> > +       }  
+> 
+> > +       ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_INTX);
+> > +       if (ret < 0) {
+> > +               pci_err(pdev, "Unable alloc irq vector (%d)\n", ret);
+> > +               goto err_remove_domain;
+> > +       }  
+> 
+> I am wondering if you even need this in case you want solely INTx.
+
+I have the feeling that it is needed.
+pci_alloc_irq_vectors() will call pci_intx() which in turn enables INT
+clearing PCI_COMMAND_INTX_DISABLE flag in the PCI_COMMAND config word.
+
+> 
+> > +       intr_ctrl->irq = pci_irq_vector(pdev, 0);  
+> 
+> Don't remember documentation by heart for this, but the implementation
+> suggests that it can be called without the above for retrieving INTx.
+
+So, with the above said, I will keep both pci_alloc_irq_vectors() and
+pci_irq_vector() calls.
+
+> 
+> > +       ret = request_irq(intr_ctrl->irq, pci_dev_irq_handler, IRQF_SHARED,
+> > +                         dev_name(&pdev->dev), intr_ctrl);  
+> 
+> pci_name() ? (IIRC the macro name)
+
+Indeed, will be changed.
+
+> 
+> > +       if (ret) {
+> > +               pci_err(pdev, "Unable to request irq %d (%d)\n", intr_ctrl->irq, ret);
+> > +               goto err_free_irq_vector;
+> > +       }
+> > +
+> > +       return intr_ctrl;
+> > +
+> > +err_free_irq_vector:
+> > +       pci_free_irq_vectors(pdev);
+> > +err_remove_domain:
+> > +       irq_domain_remove(intr_ctrl->irq_domain);
+> > +err_free_intr_ctrl:
+> > +       kfree(intr_ctrl);
+> > +       return ERR_PTR(ret);
+> > +}  
+> 
+> ...
+> 
+> > +static void devm_pci_dev_remove_intr_ctrl(void *data)
+> > +{  
+> 
+> > +       struct pci_dev_intr_ctrl *intr_ctrl = data;  
+> 
+> It can be eliminated
+> 
+> static void devm_pci_...(void *intr_ctrl)
+
+I will update.
+
+> 
+> > +       pci_dev_remove_intr_ctrl(intr_ctrl);
+> > +}  
+> 
+> ...
+> 
+> > +static int lan966x_pci_load_overlay(struct lan966x_pci *data)
+> > +{
+> > +       u32 dtbo_size = __dtbo_lan966x_pci_end - __dtbo_lan966x_pci_begin;
+> > +       void *dtbo_start = __dtbo_lan966x_pci_begin;
+> > +       int ret;
+> > +
+> > +       ret = of_overlay_fdt_apply(dtbo_start, dtbo_size, &data->ovcs_id, dev_of_node(data->dev));
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       return 0;  
+> 
+> return of_overlay_fdt_apply() ?
+
+Yes indeed.
+
+> 
+> > +}  
+> 
+> ...
+> 
+> > +static int lan966x_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> > +{
+> > +       struct device *dev = &pdev->dev;
+> > +       struct lan966x_pci *data;
+> > +       int ret;
+> > +
+> > +       /*
+> > +        * On ACPI system, fwnode can point to the ACPI node.
+> > +        * This driver needs an of_node to be used as the device-tree overlay
+> > +        * target. This of_node should be set by the PCI core if it succeeds in
+> > +        * creating it (CONFIG_PCI_DYNAMIC_OF_NODES feature).
+> > +        * Check here for the validity of this of_node.
+> > +        */
+> > +       if (!dev_of_node(dev)) {  
+> 
+> > +               dev_err(dev, "Missing of_node for device\n");
+> > +               return -EINVAL;  
+> 
+> return dev_err_probe() ?
+
+Yes, I will update.
+
+> 
+> > +       }
+> > +
+> > +       /* Need to be done before devm_pci_dev_create_intr_ctrl.
+> > +        * It allocates an IRQ and so pdev->irq is updated.
+> > +        */
+> > +       ret = pcim_enable_device(pdev);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       ret = devm_pci_dev_create_intr_ctrl(pdev);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
+> > +       if (!data)
+> > +               return -ENOMEM;
+> > +
+> > +       pci_set_drvdata(pdev, data);
+> > +       data->dev = dev;
+> > +
+> > +       ret = lan966x_pci_load_overlay(data);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       pci_set_master(pdev);
+> > +
+> > +       ret = of_platform_default_populate(dev_of_node(dev), NULL, dev);
+> > +       if (ret)
+> > +               goto err_unload_overlay;
+> > +
+> > +       return 0;
+> > +
+> > +err_unload_overlay:
+> > +       lan966x_pci_unload_overlay(data);
+> > +       return ret;
+> > +}  
+> 
+> ...
+> 
+> > +#include <dt-bindings/clock/microchip,lan966x.h>
+> > +#include <dt-bindings/interrupt-controller/irq.h>
+> > +#include <dt-bindings/mfd/atmel-flexcom.h>
+> > +#include <dt-bindings/phy/phy-lan966x-serdes.h>  
+> 
+> > +#include <dt-bindings/gpio/gpio.h>  
+> 
+> Alphabetical order?
+
+Yes indeed.
+
+Thanks for the review.
+
+Best regards,
+Hervé
 
