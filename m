@@ -1,126 +1,204 @@
-Return-Path: <netdev+bounces-116277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55CBA949CAD
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 02:13:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 570B2949CC4
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 02:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07830285237
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:13:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D9D9284401
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 00:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE117801;
-	Wed,  7 Aug 2024 00:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458DE8C07;
+	Wed,  7 Aug 2024 00:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="pdw2tj/1";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="IquJ2VbS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ic00qvMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC40F163;
-	Wed,  7 Aug 2024 00:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768B85811A;
+	Wed,  7 Aug 2024 00:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722989608; cv=none; b=UJtLoNooY6/Yn430vbrwWIxeBiv9Oaqvsug30bM3dtFFRe8Rhe8+SREaiFtS2zNuSj6xn3y78F+4mFqfWneRqbhftKg7/zHqeMNtw3Ex3ZexWMXtqEUo2Jm98+kc9mAQolmWl0V/CP3fLcbmXRI9/10FDZ8UrZVDPIOhI3pglw0=
+	t=1722990294; cv=none; b=roDL/98TOI+rADP48rdsgnKjOe50ijZpwW7IcSqrMMmDnDT+ZHtIUYRfbwgHFBscR/5yUAhOPvaeSWQ6JHeUVYe5zob/YXW4pMmDZN6eWz03LEvsUsDyuniqpjO8X1KWLbKNP5OEwSSW+/GozmnD0UhfrqdR605HQvTNzwHPai4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722989608; c=relaxed/simple;
-	bh=pWY8kLMzQJ5yjAJwQI9LxYd4wKj8auV2/jFjArIg7Sk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=MXgdpIWA/sUBqHc+9u+6+u3jGf7XqFU3BEF3GGO9YfOKK18EA3Z5ubbxsKkQiY0rR/sXz3zhtWSxdKsCc4Bk3kIoxQ4pnSaatBCrf9B1mudrPOdABmwU4PFyGcMaa6ylmFOc05Agzn+ZKpA4bTTSkkn1YmMG6sPTVigooYYhgaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=pdw2tj/1; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=IquJ2VbS; arc=none smtp.client-ip=96.44.175.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1722989605;
-	bh=pWY8kLMzQJ5yjAJwQI9LxYd4wKj8auV2/jFjArIg7Sk=;
-	h=Date:From:To:Subject:In-Reply-To:References:Message-ID:From;
-	b=pdw2tj/1Fqd0lo2/wI3FAzaTYDdFobrvoVdwcI1d7IbuClBo1cYy835n3aGr5kreW
-	 RsrXWszgfsLcMbNgc2XxNLTAo3BV8tDkLmEDCy6PouOj6KFKBCCqPsNCYJzvOyFNrf
-	 kOeGoeTCgXq/E7GbBBfB2epRNFdG0u5L/a8m6cPE=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 1D4DA1281E30;
-	Tue, 06 Aug 2024 20:13:25 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id u4ZFp3uHMyH6; Tue,  6 Aug 2024 20:13:25 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1722989604;
-	bh=pWY8kLMzQJ5yjAJwQI9LxYd4wKj8auV2/jFjArIg7Sk=;
-	h=Date:From:To:Subject:In-Reply-To:References:Message-ID:From;
-	b=IquJ2VbSdCmnoW7UZVKs1NB9r3MqBX1tc+w7wOycpGwFb1VY228YEUOPaasj8uJCT
-	 p3KyuLMt6wMFQ7WUjoQu+J8syo7Q4HJ+AQJRQhfR0p/ee6hxAy9ZpEAw5Os1QQxLEL
-	 iUIApDFpQ8QjjqzlQxQ059GsNBOoT3w1PRnmKjt0=
-Received: from [127.0.0.1] (wsip-70-191-149-15.dc.dc.cox.net [70.191.149.15])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 546B012806C0;
-	Tue, 06 Aug 2024 20:13:24 -0400 (EDT)
-Date: Tue, 06 Aug 2024 20:13:18 -0400
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Dan Williams <dan.j.williams@intel.com>, Jason Gunthorpe <jgg@nvidia.com>
-CC: Greg KH <gregkh@linuxfoundation.org>,
- Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- ksummit@lists.linux.dev, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [MAINTAINERS SUMMIT] Device Passthrough Considered Harmful?
-User-Agent: K-9 Mail for Android
-In-Reply-To: <66b2ba7150128_c1448294fe@dwillia2-xfh.jf.intel.com.notmuch>
-References: <668c67a324609_ed99294c0@dwillia2-xfh.jf.intel.com.notmuch> <20240726142731.GG28621@pendragon.ideasonboard.com> <66a43c48cb6cc_200582942d@dwillia2-mobl3.amr.corp.intel.com.notmuch> <20240728111826.GA30973@pendragon.ideasonboard.com> <2024072802-amendable-unwatched-e656@gregkh> <2b4f6ef3fc8e9babf3398ed4a301c2e4964b9e4a.camel@HansenPartnership.com> <2024072909-stopwatch-quartet-b65c@gregkh> <206bf94bb2eb7ca701ffff0d9d45e27a8b8caed3.camel@HansenPartnership.com> <20240801144149.GO3371438@nvidia.com> <66b2ba7150128_c1448294fe@dwillia2-xfh.jf.intel.com.notmuch>
-Message-ID: <328C1186-268E-49E9-A31C-40BFF9554C49@HansenPartnership.com>
+	s=arc-20240116; t=1722990294; c=relaxed/simple;
+	bh=B4s8mM7+iW7R/mJdPqaO3BtAqINuxt72Z3f+NHC+gLA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rZjcX97vj8ZzDkO/Mm7YNcIqFsiR1cKulzPPnkvpMAZsPT5t7W/gXiN2Q2+WeW8QGGW+WB7B9aDsCQqV/hAmTifhlgTa/ywYAzU0Y3D6G9blVvoqa29vrwQtmykdt3bvTZvPBwR2XlDOS/2TnYLYY84f9B8CNLvmRFc56L9vuUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ic00qvMO; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-428243f928cso8240225e9.3;
+        Tue, 06 Aug 2024 17:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722990290; x=1723595090; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rlJ8Qxx96uqoC0wa/4DCn4PPHCu0sUK/relMLFXVHZk=;
+        b=Ic00qvMOhKHQDSUBrWqCctrZQrtLd2fgot86Hz9ChLDkGkE7QjCzNIvplyn8TUO4CM
+         9pC9h7zSRFnPqy5dz6EVoWrFENis4SbzMXVvu0TkrVuYKihRLdOn0niqNXVIU5zkxCYg
+         kwW5yUxEW8HcNS1YB8+4JvC4tZ9McF3GSEkcf1uc1zgpllPjhwf8YzoAcfAKzigtIvPr
+         i84o2yLbDhqdEMJ6lVQi18490rl5wlVoetQGaWHJJ3gPy2c6cE92CB48aQR4MoDSyPvE
+         ZYaovk7a/hCQFJ3E1Fjnrx3xU6kBKKmQM1ixOQMvx0tpRsm+KTz+Clx5onThSlpSJW6C
+         OwOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722990290; x=1723595090;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rlJ8Qxx96uqoC0wa/4DCn4PPHCu0sUK/relMLFXVHZk=;
+        b=S4qmj+h22AACCxstvrmxrSfHGPykALL70cRP/IEaRivx/0v6nK0NOqN7TcZiih6Xuh
+         CW5be7/xdfJTQid8i54Eqh/GYBJkVO/Mt0IqdBgAwhHhoDwiuHP+MIQctt1kZZSyfRPQ
+         CNfeVUyqSJ1AyZX1uU7pn1mu3XDapNxai2K6iLbLZB2Nzc3hRxdvX7eTZvsllNty1yso
+         UiBoNEHiZEtweRvMLJWpp4L0A1LtPDloFQfKvNaSDJnjRVcRYRrp0TPhpdgnenn346MD
+         ylO0zpfCCKDFtSegoEkJmnFPboo1Fe0y9TydyfiLVbUZn5neJZYbjBq87WWNleLtRpS/
+         DIdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuqonZ+A+AZyZO/YtJVg1NazfFemyy2MHQ5lB5/kWt7KOduUclRNk9r5AOZukBhDnFW55cnyY8J/iZ/7nywaTJWrqhIGhNf32KihAwuVqE
+X-Gm-Message-State: AOJu0Yzojzb+/lVw2+SQr1TQZXUBB/1ZWoOO0ZcSZyO4FeO7iMesMGZy
+	Pi2v4rE68PQZ6nKA+We/Ay0207TJBoWyz2pzlEFV6hKZqVWEh42wYhKAZATu
+X-Google-Smtp-Source: AGHT+IGdlDA4sF2ZIa1sRjJI8B+Jb9yPHf2rt5XTiWkN+N6bF1x+qfzaVHADSWOLC8KlnIZSBp2/ag==
+X-Received: by 2002:a05:600c:3585:b0:426:6945:75b8 with SMTP id 5b1f17b1804b1-428e6b93fcbmr111346975e9.31.1722990289951;
+        Tue, 06 Aug 2024 17:24:49 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-013.fbsv.net. [2a03:2880:31ff:d::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290598e970sm2844925e9.24.2024.08.06.17.24.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 17:24:49 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: shuah@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	petrm@nvidia.com,
+	dw@davidwei.uk,
+	przemyslaw.kitszel@intel.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v2] selftests: net: py: support verbose printing, display executed commands
+Date: Tue,  6 Aug 2024 17:24:45 -0700
+Message-ID: <20240807002445.3833895-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On August 6, 2024 8:06:09 PM EDT, Dan Williams <dan=2Ej=2Ewilliams@intel=2E=
-com> wrote:
->Jason Gunthorpe wrote:
->> On Wed, Jul 31, 2024 at 08:33:36AM -0400, James Bottomley wrote:
->>=20
->> > For the specific issue of discussing fwctl, the Plumbers session woul=
-d
->> > be better because it can likely gather all interested parties=2E
->>=20
->> Keep in mind fwctl is already at the end of a long journey of
->> conference discussions and talks spanning 3 years back now=2E It now
->> represents the generalized consensus between multiple driver
->> maintainers for at least one side of the debate=2E
->>=20
->> There was also a fwctl presentation at netdev conf a few weeks ago=2E
->>=20
->> In as far as the cross-subsystem NAK, I don't expect more discussion
->> to result in any change to people's opinions=2E RDMA side will continue
->> to want access to the shared device FW, and netdev side will continue
->> to want to deny access to the shared device FW=2E
->
->As I mentioned before, this is what I hoped to mediate=2E The on-list
->discussion has seem to hit a deficit of trust roadblock, not a deficit
->of technical merit=2E
->
->All I can say is the discussion is worth a try=2E With respect to a
->precedent for a stalemate moving forward, I point to the MGLRU example=2E
->That proposal had all of the technical merit on the list, but was not
->making any clear progress to being merged=2E It was interesting to watch
->that all thaw in real time at LSF/MM (2022) where in person
->collaboration yielded strategy concessions, and mutual understanding
->that email was never going to produce=2E
+Add verbosity support to show the commands executed while
+running tests. Enable verbosity if either an environment
+variable 'VERBOSE' is set to a non-zero number or it is defined
+in a config file under driver tests as discussed here:
+https://github.com/linux-netdev/nipa/wiki/Running-driver-tests.
 
-Well, plumbers stands ready=2E  We're out of A/V rooms, but if you can do =
-your own A/V with one of the owl cameras we can do a BoF session that can b=
-e open to remote participants as well=2E  I'll be happy to do the setup=2E
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+---
+Changes in v2:
+- change verbosity_ctl to set_verbosity
+- remove redundency in the code
 
-Regards,
+v1: https://lore.kernel.org/netdev/20240715030723.1768360-1-mohsin.bashr@gmail.com
 
-James
+ .../selftests/drivers/net/lib/py/env.py       |  6 ++++-
+ .../testing/selftests/net/lib/py/__init__.py  |  4 +++
+ tools/testing/selftests/net/lib/py/utils.py   | 26 +++++++++++++++++++
+ 3 files changed, 35 insertions(+), 1 deletion(-)
 
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index 1ea9bb695e94..c7cf52d9b988 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -5,7 +5,7 @@ import time
+ from pathlib import Path
+ from lib.py import KsftSkipEx, KsftXfailEx
+ from lib.py import ksft_setup
+-from lib.py import cmd, ethtool, ip
++from lib.py import cmd, ethtool, ip, set_verbosity
+ from lib.py import NetNS, NetdevSimDev
+ from .remote import Remote
+ 
+@@ -31,6 +31,10 @@ def _load_env_file(src_path):
+             if len(pair) != 2:
+                 raise Exception("Can't parse configuration line:", full_file)
+             env[pair[0]] = pair[1]
++
++    env_level = env.get('VERBOSE')
++    set_verbosity(env_level)
++
+     return ksft_setup(env)
+ 
+ 
+diff --git a/tools/testing/selftests/net/lib/py/__init__.py b/tools/testing/selftests/net/lib/py/__init__.py
+index b6d498d125fe..eb4860dea26a 100644
+--- a/tools/testing/selftests/net/lib/py/__init__.py
++++ b/tools/testing/selftests/net/lib/py/__init__.py
+@@ -1,8 +1,12 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
++import os
+ from .consts import KSRC
+ from .ksft import *
+ from .netns import NetNS
+ from .nsim import *
+ from .utils import *
+ from .ynl import NlError, YnlFamily, EthtoolFamily, NetdevFamily, RtnlFamily
++
++env_level = os.environ.get('VERBOSE')
++set_verbosity(env_level)
+diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+index 72590c3f90f1..d475f131a598 100644
+--- a/tools/testing/selftests/net/lib/py/utils.py
++++ b/tools/testing/selftests/net/lib/py/utils.py
+@@ -8,11 +8,35 @@ import socket
+ import subprocess
+ import time
+ 
++VERBOSITY_LEVEL = 0
++
+ 
+ class CmdExitFailure(Exception):
+     pass
+ 
+ 
++def set_verbosity(level=None):
++    global VERBOSITY_LEVEL
++
++    if level is not None:
++        try:
++            level = int(level)
++        except ValueError as e:
++            print(f'Ignoring \'VERBOSE\'. Unknown value \'{level}\'')
++            level = 0
++
++        VERBOSITY_LEVEL = level
++
++    return VERBOSITY_LEVEL
++
++
++def verbose(*objs, **kwargs):
++    global VERBOSITY_LEVEL
++
++    if VERBOSITY_LEVEL >= 1:
++        print(*objs, **kwargs)
++
++
+ class cmd:
+     def __init__(self, comm, shell=True, fail=True, ns=None, background=False, host=None, timeout=5):
+         if ns:
+@@ -22,6 +46,8 @@ class cmd:
+         self.stderr = None
+         self.ret = None
+ 
++        verbose("#cmd|", comm)
++
+         self.comm = comm
+         if host:
+             self.proc = host.cmd(comm)
+-- 
+2.43.5
+
 
