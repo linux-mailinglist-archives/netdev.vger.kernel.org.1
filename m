@@ -1,118 +1,83 @@
-Return-Path: <netdev+bounces-116551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0BDE94ADDB
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:16:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69B5194ADE4
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:18:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 686581F21F26
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:16:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 061F51F22A1B
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FBB12FF72;
-	Wed,  7 Aug 2024 16:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353FE13A257;
+	Wed,  7 Aug 2024 16:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrmDWbuk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ue2pIJz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C9612FF7B
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 16:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0785383CD9;
+	Wed,  7 Aug 2024 16:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723047389; cv=none; b=Ws4bOlSlZH8KKC1WaAkQ2Yktt4nctZZh3zRClaHfGNx9E3gDcxT5OVYo6nmYJRevBUGLJWIDf9lpdaiRhiSf7+I5q/FJyY/DcjbZXpSSodw1c3FaQlWbpf1NBTSUeD4ycIG2lxHxEbATZfnZG1DKzTXX7IRIV5Adp7hHiLKUs9A=
+	t=1723047504; cv=none; b=VcOm98/N1YVXDNUiJS31KywufSkmsHSpJn7nPKrMXag+l4NaO7eM8TNZXhaWL/7V5UxmmQzqbSt8UWW5f1dH83DyRApy/O8op/YdjsQl4aHb1wOZwutg5sAhiazAxGOOuY3DkxtVHfy1sZvd5gkKAfAN4DAx9HJ/l4QfmSvfUvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723047389; c=relaxed/simple;
-	bh=sTFXq9o/Kw6reKXAJIeC0dhguOp+sNVnUSbKN/bGzu4=;
+	s=arc-20240116; t=1723047504; c=relaxed/simple;
+	bh=ADvqYf2IAgJCxvm3IizYlbyKRZJMCiNMRngX7iDTyYI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nkijrVoHnAI+43ZreYBK4oMjBExxgXF1WeZn+Rllkb0Y4gKhsgOlWTWZ1YYEWqT3UYNH3hpkSM2MYkz3CXJXpMKu8KXXNaIkXc1pQLWJKTsRLecVIUYkc/HXbSdter2sZ/poSSGaL2dbsIixZlWIi3VMMpffA0ZJuSU9bfxHfck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VrmDWbuk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723047385;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fAagdNuIXlb/vJ1xLFkszZv7WfOecHpqqTnZjQT3Wm4=;
-	b=VrmDWbukrRzFTfIhzabSwCTsGC2D/+nsMoc/5IImHpKENX7sJhgw0U3NBsMLSsfgGvY2Ly
-	vH8XMq4+8rP+v0y92PnlYsv8HOsaxKkC3dh9qFaq09ehtdxIM7Zq1qSrCxSG90MonKR134
-	N7LiwkoZqmlNfHP3y8UHzAVP3OMIqUw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-696-f71GHZWQNLuhs1Fyn0Bu0A-1; Wed,
- 07 Aug 2024 12:16:02 -0400
-X-MC-Unique: f71GHZWQNLuhs1Fyn0Bu0A-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A2F7D19560A6;
-	Wed,  7 Aug 2024 16:15:53 +0000 (UTC)
-Received: from calimero.vinschen.de (unknown [10.39.192.194])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 00E9A19560AE;
-	Wed,  7 Aug 2024 16:15:53 +0000 (UTC)
-Received: by calimero.vinschen.de (Postfix, from userid 500)
-	id 9665DA80E8E; Wed,  7 Aug 2024 18:15:50 +0200 (CEST)
-Date: Wed, 7 Aug 2024 18:15:50 +0200
-From: Corinna Vinschen <vinschen@redhat.com>
-To: christopher.s.hall@intel.com
-Cc: intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
-	vinicius.gomes@intel.com, netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	rodrigo.cadore@l-acoustics.com
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 1/5] igc: Ensure the PTM
- cycle is reliably triggered
-Message-ID: <ZrOdthE36RQy78fx@calimero.vinschen.de>
-Mail-Followup-To: christopher.s.hall@intel.com,
-	intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
-	vinicius.gomes@intel.com, netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	rodrigo.cadore@l-acoustics.com
-References: <20240807003032.10300-1-christopher.s.hall@intel.com>
- <20240807003032.10300-2-christopher.s.hall@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EdXYktfBZhEOrr3qqZKPD8OersXLNbhuI9Jx9tN8OS2WThkPSHJu5eipxrpU4O46OygvwKDjbcMnI5vhir/51qwqUAWGsmGky5+whChueGUJCQUM25WqcU+LwX+EwHfkCRGcTpsmt9hleJNQZDpZqU95yCE6PJ9qu+dLsUsIm1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ue2pIJz3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC9BEC4AF09;
+	Wed,  7 Aug 2024 16:18:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723047503;
+	bh=ADvqYf2IAgJCxvm3IizYlbyKRZJMCiNMRngX7iDTyYI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ue2pIJz3gmbllMOBW8CqCREpLWkxsS8EDIwd/HaU4KNA31Ev52DOxOnmSGLE7MADC
+	 mFwEQJjR4THVKhZZdzZidsIRykKt83xzMpwZE//guDTWa/hVg33+G7qhNsVIzoDPbT
+	 TSTQtjl/QXBezsUZriHk3wErSefEpddqvTFGzvSR1Cv6tV+OnylLTFMdQ+o/bCo0kf
+	 tXYx9jKkqrEieP0CNpLTnqpiVln5dwxup0B3IafWDla2xhw51Q+5bpfs5etc+XXgj5
+	 y3sYUGnPIHuxeTQM2YZ6K1tsyfGvVrXTlxtms647Df9kt2fhiWak58QD7w9fh+7IVw
+	 mFMpyd6v12frA==
+Date: Wed, 7 Aug 2024 17:18:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] sched: act_ct: avoid
+ -Wflex-array-member-not-at-end warning
+Message-ID: <20240807161819.GA3006561@kernel.org>
+References: <ZrDxUhm5bqCKU9a9@cute>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240807003032.10300-2-christopher.s.hall@intel.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <ZrDxUhm5bqCKU9a9@cute>
 
-Hi Christopher,
+On Mon, Aug 05, 2024 at 09:35:46AM -0600, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
+> 
+> Move the conflicting declaration to the end of the structure. Notice
+> that `struct zones_ht_key` is a flexible structure --a structure that
+> contains a flexible-array member.
+> 
+> Fix the following warning:
+> net/sched/act_ct.c:57:29: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-On Aug  6 17:30, christopher.s.hall@intel.com wrote:
-> From: Christopher S M Hall <christopher.s.hall@intel.com>
-> 
-> Writing to clear the PTM status 'valid' bit while the PTM cycle is
-> triggered results in unreliable PTM operation. To fix this, clear the
-> PTM 'trigger' and status after each PTM transaction.
-> 
-> The issue can be reproduced with the following:
-> 
-> $ sudo phc2sys -R 1000 -O 0 -i tsn0 -m
-> 
-> Note: 1000 Hz (-R 1000) is unrealistically large, but provides a way to
-> quickly reproduce the issue.
-> 
-> PHC2SYS exits with:
-> 
-> "ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
->   fails
-
-It would be great to add the problems encountered with kdump to the
-commit message as well, as discussed with Vinicius, wouldn't it?
-
-If you need a description, I can provide one.
-
-
-Thanks,
-Corinna
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
