@@ -1,90 +1,86 @@
-Return-Path: <netdev+bounces-116546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025F294ADAE
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:09:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0DC94ADD6
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:13:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A0291F20F1B
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:09:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E39DBB2D48F
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2F013DBB7;
-	Wed,  7 Aug 2024 16:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E6313B58E;
+	Wed,  7 Aug 2024 16:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MEVWoJzu"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PpAYUZ5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2083.outbound.protection.outlook.com [40.107.223.83])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2084.outbound.protection.outlook.com [40.107.237.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782FD13B295
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 16:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C7213DBA7
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 16:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723046825; cv=fail; b=VXn4eeCEw+uN/bdmQIgUCflm95YszSPnGDvtWM55FY3BEXfBTwbr2EaI2At3jvi0UnEIYcoFqTxRSrQFExBTOpqNAa7tsN8fuBm5xO1gjxiyk/q9aqu1fh25OV97B27jn8J+ys+z9o6EWKIXFvI/+tXHNU3qusJ51IKaYQqqYNw=
+	t=1723046833; cv=fail; b=Khl7LQrM8eGhEiSu2cH+MeM0w/W1cDX9uiFwUTCvVWby8YUDrByB0DVo6N3xCEMho5bFkhA/xT8w31Iwg0BbTE36DNeSL7/NXuRMIUEIBHF8N3SqaY+gMV/mSeB3xIQrt4MJLaJF7qxr99sl421hRG+c2yKk9szJ3wTwKrFZVFA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723046825; c=relaxed/simple;
-	bh=HWiZ2stvWVrisEeADF526g1VXHYia3k++32mzkrN4hk=;
+	s=arc-20240116; t=1723046833; c=relaxed/simple;
+	bh=Ovheq94mjdMTrxQBr0Vq6mSPay+HXzi9EjlbQeb1q/M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ls9vqKH6mipJ36oWCrKEw+qlJItkbvmPXIgyowv/itXdBSk3+NgQPChksRucrR2PWkPZH25Kc4ZJHxTkhYG2WmFKR1VoYWi2/FYQ9UZWk3cXcq5tBDNAzxXm/LyW/0l71k3Kk2HNjJvMR8lw6GWJ9SMDNY4dmzM17F6K2Ua4WAs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MEVWoJzu; arc=fail smtp.client-ip=40.107.223.83
+	 MIME-Version:Content-Type; b=sCvsDcvF3xpcNi4edL969k1FPlmx+CrdthkZHvk7smz866DALKfBVHWT+54LvpTHa6KQsKmbvzTezHtFYcfHSK1XXwtq83v5UbljAgPoU9UVOgvhJ0wy87R749iPFXt1Ad/Zf3KFPRzdAbaAXKeLZoD568NBCWmHenaNky14VV0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PpAYUZ5T; arc=fail smtp.client-ip=40.107.237.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=whE0yDmxjgsOXYC0fJXD4kWp/f2imMIMQce7RpvnSkMl6dQZ8E10aPpIHtcT0lnKYmrGgsNabzqkWzc3uf2zY34c71GyxBcPOdI6k8EwzsbDbssUDKpDUrmFFm9hcgna58jBNf2WaP/PkX9dkf5bCFkxYLWpBwxqIuDkbkEkCRzjVt9s/Js1CID0tEh4/2UtP8Kg535lyRu2jN+6yJFLDczDmI0ii2bsyDi4Fp1qqvSx0KXCJg52JxQk1Svhq7jifdm0fB3YNhmg/nEHxOZnMUEHomOFie4j2O3yr2Vfv2OcqwDfR+EPjVq71tzI80s8J05weEKsDqOtEvXcRbH9gQ==
+ b=Hx+mzZMMgFxgpKwLSlBmWwEEH4F2ix5SU4DZGgkIEJAlYB8uHPTABs0Yo6YiSCrZKm57mHqQTAFtT3gjKya+6EOezorBPU16z4TGtF4UXbWkWuXCfjiLo/w1BrIAaUsyjvCkcS6mJ0xfKu63eEUV7MnIl+s4I5U0hxRuoM7UXOIcR0M9WmgOlyPq0bBO2sy1scBSOnyz1KWs+WDf97ITEuBde+eOnbJh7nEmuqYH9QBYJHbOpkHSLtC4VBbJpTcD60aZSuVzrO9SH1yDV4UmFGLhcHfdSSeYX20j/1MND0hhkz2nzvj7pKzh5VW/JivSPX4EStlcGzML7eKjElnVpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v4ZPnKyMSPAeEubhxvmwOVLa/2OGOAJ8JJWg8fgkbtI=;
- b=W0go7wVt1fUd1ZoN7gKsLz2tdCEOQWRhWG9xQkSBswe+lWqgNpzAr+9BxmaDwgoNVVC9Wv7cKaSduHoYFKBtm38RcbO2T8+LPL7sGxlKAMBiJTXwnjemGEgV1STa/+esl+f4XRqRtA5GxxUx50l2Vt8LeHgVVTZoxXclJgnywDEMUEPLdXbbqlorqTKNEQbvCqlus4Oqbx6wGPrA2fw7BT3565xgqpuBVivB0+klO6MYtKr/MifHt8pN/Tqbw2IsmTTG1+OCoO5V1vqYLTSQ9m71cFGjDXuglwoVNpKFR68RTuOcRco8Vqh3n/rth4SQNEuFCO6MKGJkYr7qCk/Lkg==
+ bh=W5DdQ65MeH007xEL2asjCl22eEoBUDK1g0zUpUQlEVs=;
+ b=LjZIkQukpFHn9OneO47gc+eiDA1BEGMPELg7QOj/VbzNKGNJWLxsaWgEtc4sK06cU9t9UFzO1GL1Ct3wTPuhPRFu9D994MnoIpSXHUUWjYjOd/4a/Vjt7ypoeTfOiMnAhLF7bvxbaP17T4yFRz5Ee35DkFL0M9xn89WSACpNpo1XLv1eXUIDHtLrdeYvNoBr98gmV1rJvaJOwlbH+KUKUTPSx7qcbq3+1o8ykJpBSyW9h6U1yja+wnr02EHKLY+DA0lSvpTOq0Lr33llhxi/jQSgSCN2XjE9POYuJgvqsLroW4bt52wiPnjXbPE3dXchQ+BD7kSC+2hQ4g2zOHWmEw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v4ZPnKyMSPAeEubhxvmwOVLa/2OGOAJ8JJWg8fgkbtI=;
- b=MEVWoJzuhxKJA7e9AHqnKlTEZym93DPbtQ8G47zn7NEmYRDwQFgmcKyLDr5qtYMrR7c7vqEiUmO22riZDLfC2Kxwh+4GNPxnZ50mr6DqswgWWYqT8QutI2iFZvp9eLO67UBMDuV7RN7G/5SqX9WFUQASoeIAY5KUpU12eclMObg=
-Received: from PH7PR03CA0026.namprd03.prod.outlook.com (2603:10b6:510:339::11)
- by CY8PR12MB7268.namprd12.prod.outlook.com (2603:10b6:930:54::20) with
+ bh=W5DdQ65MeH007xEL2asjCl22eEoBUDK1g0zUpUQlEVs=;
+ b=PpAYUZ5T7XDDMvWXMSqSfWCNEnQTsUXJLD84MBbu1GGOLweowOnTGo58Ce3OcNzS4ccvfak3VnhTGV6peC9OgJ8YX7ntS1YG8/zqOlI9hhEYQ8yzxxNG1yoQJI1o5cTHRAjX/6abVSpCH5jBbXSiTrqr+oTV8jKq1+ATRrgvPrM=
+Received: from DS7PR03CA0341.namprd03.prod.outlook.com (2603:10b6:8:55::23) by
+ PH7PR12MB6564.namprd12.prod.outlook.com (2603:10b6:510:210::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13; Wed, 7 Aug
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Wed, 7 Aug
  2024 16:06:58 +0000
-Received: from CY4PEPF0000EE3F.namprd03.prod.outlook.com
- (2603:10b6:510:339:cafe::ee) by PH7PR03CA0026.outlook.office365.com
- (2603:10b6:510:339::11) with Microsoft SMTP Server (version=TLS1_2,
+Received: from DS3PEPF000099D9.namprd04.prod.outlook.com
+ (2603:10b6:8:55:cafe::af) by DS7PR03CA0341.outlook.office365.com
+ (2603:10b6:8:55::23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.30 via Frontend
- Transport; Wed, 7 Aug 2024 16:06:57 +0000
+ Transport; Wed, 7 Aug 2024 16:06:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CY4PEPF0000EE3F.mail.protection.outlook.com (10.167.242.17) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099D9.mail.protection.outlook.com (10.167.17.10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7828.19 via Frontend Transport; Wed, 7 Aug 2024 16:06:56 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7849.8 via Frontend Transport; Wed, 7 Aug 2024 16:06:57 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 7 Aug
  2024 11:06:56 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 7 Aug
- 2024 11:06:55 -0500
 Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Wed, 7 Aug 2024 11:06:55 -0500
+ Transport; Wed, 7 Aug 2024 11:06:56 -0500
 From: <edward.cree@amd.com>
 To: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
 	<pabeni@redhat.com>
 CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net 1/2] net: ethtool: fix off-by-one error in max RSS context IDs
-Date: Wed, 7 Aug 2024 17:06:12 +0100
-Message-ID: <5a2d11a599aa5b0cc6141072c01accfb7758650c.1723045898.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v2 net 2/2] net: ethtool: check rxfh_max_num_contexts != 1 at register time
+Date: Wed, 7 Aug 2024 17:06:13 +0100
+Message-ID: <c07725b3a3d0b0a63b85e230f9c77af59d4d07f8.1723045898.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1723045898.git.ecree.xilinx@gmail.com>
 References: <cover.1723045898.git.ecree.xilinx@gmail.com>
@@ -96,139 +92,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB05.amd.com: edward.cree@amd.com does not designate
+Received-SPF: None (SATLEXMB04.amd.com: edward.cree@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3F:EE_|CY8PR12MB7268:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81c14b70-76e0-4ff0-84ae-08dcb6faf640
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D9:EE_|PH7PR12MB6564:EE_
+X-MS-Office365-Filtering-Correlation-Id: 087147b0-bda3-4084-d9e9-08dcb6faf6b7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mTDRPe9/OZXlfyGiqPgCPzwxN6WdHFO1MCIPBgXsC0nhCg4fvpidNeS4Ag2u?=
- =?us-ascii?Q?Er0XD4pdjlvX+cnIHiRKO0cMP4KQyNizchUQkN6qxyt46HUMdSOj1Fkf5ZhI?=
- =?us-ascii?Q?ecNiyOyBagezb4Qf2TnGO2X50EikHcmlOr/T4vRW4LFXK2vb4CS2f+uGp9yB?=
- =?us-ascii?Q?FqFR/H0mymqDtALgrxLs5nsyDEmBQQN0Bbf8sMJdHqskUgcl/RawAtxeQ9uF?=
- =?us-ascii?Q?l92rb8wwHXAb/5ozENqM5YsNDojgOAvobeCQm3k9DBak7f8hQcK5wsltLVMX?=
- =?us-ascii?Q?SqP51NiesqgcpJ68ygon+fr8epiDusGwiBVppZo7pS6V8iOHskXBZO86uvSH?=
- =?us-ascii?Q?stfwhoy0i/7uT+JQ0zhFvlu6xFU5JQhSY7PfTZ/OnpbCyChl1PefZ1T48hTZ?=
- =?us-ascii?Q?WtVWvfTjVUw396WrwLosLMwtUObqsXdTzaVSM25XkmaQ8/P+xiDzfQomacow?=
- =?us-ascii?Q?Mx5TEvB5eVmJCicmkQApFkhU//VZ7wxhFp6ao2CrKAgA8l9CE0iIZbz6LRH/?=
- =?us-ascii?Q?O3XHASR28WzQpvXDLdhg2ofdKNaMPcdRbw/XDLa6h3UIEwz07+TJuqEI+o38?=
- =?us-ascii?Q?F61+vkF+xvcOEhYyVzghzuHEWZeK+JfJgRzOSBQ4ZKjokZTSi07qfe4UdrG3?=
- =?us-ascii?Q?RQtmkKjY7CkVCAUbeWPe3PUjGMZCKubw9bcuEq4nMx2VtiRXvyQOV1iZJJAV?=
- =?us-ascii?Q?TNI4tqimX4I3rwNe59a5HTACMLOdksJymJ/7GIXZ1vx2LduYBlSCIzHuHA5X?=
- =?us-ascii?Q?RAWCJqcW06hc6f9cstNtcA7IcvLxXERSw1TLCimLIJ8YmTavn4vDvxIqL7DL?=
- =?us-ascii?Q?UtbwhFXKz7R4m3SjpzkwZPl06BbBwvqbQl1BcxOQOdpDsoyf5bI0EOwmv8f4?=
- =?us-ascii?Q?MBd9zOei71viZax6YpEVAc3ks65GcK144Ak9LYCj66pzjn00bjsL/d4gVawd?=
- =?us-ascii?Q?dgpqqrI+dUSIHwT5BHZAQW7Zuu1V+G7BDTFRZPKb6JIcxNCNWNzh3eOKwSW/?=
- =?us-ascii?Q?tu6chp/avXR8C0QKlSj3yrjWlrQCVqu/ADrOk3iJ8z6e9KiRkT+PNca/V7q+?=
- =?us-ascii?Q?NPYbgwP9aRjmP/FEkhDovIaUGwdZ61iNPLXKSbi9JCulaHJECqSQm7pdRFj+?=
- =?us-ascii?Q?JAJmNZKzCDU636ERHJMBWmLbIPua4sGHpaF8/I6EysjTPBd6i/JFGCsh6Eqc?=
- =?us-ascii?Q?0lWEwQzihHmNtkTS1CARwWjtjD4xE7W7vgQ88MF7kXWQ2IRTQbLRidgjk02S?=
- =?us-ascii?Q?EdsSrRYTOduZ9AaQ5RptRT2Euxz59ZrtjBDSodu+RXn4bBA0RiPjf+p756Sv?=
- =?us-ascii?Q?/4h9cMjAsbq8+OlItQWMWRImS4CA2jHc89nxFjhKRmk1dbRPNxBylZBV6j/W?=
- =?us-ascii?Q?bajMym9bzjJ9wInDq6e4M9SdKFED18uSn0GsMmqr59SBTAsCnPZpUqWJB/KK?=
- =?us-ascii?Q?+yun+1DPW2yEkZVhXthuoqFv2+W/e3OB?=
+	=?us-ascii?Q?Gf0Wh6h0VDx3j4abDT6/Er5OjkAYEwWVOiHrthh6QxuC8fzTF8CS3Ki5jAMh?=
+ =?us-ascii?Q?uEn4UJ8S9XKPVcaa+HbA1IYN92MQopeYfYWAZjNglFmc+G3yBYjcSBzZfAgH?=
+ =?us-ascii?Q?lBlDqLjBTFlF+TxJaJcS9mvTIkvNJdlUVAKBSOeR3Ggaqg9udqN9lPMaIIjQ?=
+ =?us-ascii?Q?3BMCKo1gqSw36OHYL7b7112Vql0Vef0qx/6+4j2lUDv2u2wQ7la/pzSjSvrq?=
+ =?us-ascii?Q?ypx2qFIYLUHxHpP1Q7uy2+snWULNq/DJ8PNC6d4js3KYUJtyjh20DdGp/rh7?=
+ =?us-ascii?Q?GAP0kx8ZqqIZhb3/KCimolSS4rvfqJWqDxbfKRNM+wOxuZX9fFsXqJx/2p73?=
+ =?us-ascii?Q?Tmkj+1Cy4tp3QlgpoZjllvpRXI7w04FiMJMVoNpFwn4w2+PBwk1cJkmMdcrM?=
+ =?us-ascii?Q?g6U2VBgWRDVfj0yjpON6yY/pdSOiwFnJJuXoc2SSKjMF5WWwn58TxtD5/RYr?=
+ =?us-ascii?Q?j8FPjj2uhTqWz2aaOkym/7pzbnvOVaVNFQwxv9r5RpJv3C8BWpcOiLYm0fiR?=
+ =?us-ascii?Q?qPoQLj4IlEqtms9sHU5XZMrWJeRAOqY33dpEjKmv8WzXO96gvyKsWOK4t8it?=
+ =?us-ascii?Q?W4r0ee6ol0rzDCNLR8HNZM5zWwJ+x81GtOrCVgjE/7OLiaPCpKyWUWtSrvC2?=
+ =?us-ascii?Q?AJ5AYRHX18kDYnj1LEJjBHDFYRRLMp1Fe5NEbcheInXjdRhTqk5EZeawJ4lB?=
+ =?us-ascii?Q?eS5zRTRCbQkp0QR+6gVgtpHsMuNEYqAwqAqfJxRpnX1WLfteJkI2z/0ZoqxY?=
+ =?us-ascii?Q?o5kU+yoeHbbCfoaK1RtviponCZ7XQbPpidf+ZK+OsJJp/KJ49mnTd18rWmPr?=
+ =?us-ascii?Q?MsVDbVtwsX4JCfsK4M2sPeGWxNgCTIm60+ES8N24OFl93xjKt/o1XPzD1jSQ?=
+ =?us-ascii?Q?cHcsAFwt6d5MVA8h9XwaJsGwEsTCWDqjNiPQ2Z7OqY/drQyQF8QpHWauviFN?=
+ =?us-ascii?Q?mVAQC09Ja3ciGMw9w8ut2o+t5xjNK3nxGC6F4XH8efI2/+6rjDskp79U/yLl?=
+ =?us-ascii?Q?69CDGWUfDfI7Muf7aqam5xiyrIfr7D1tdDRWfQPK8IbrJqmxpU58zpw9QZ6S?=
+ =?us-ascii?Q?XDZcgpq2jORmg8Zjgw7OkMDgOFBrcj18uw8lIrvgg9+AADBpsEX1RFGRIJHc?=
+ =?us-ascii?Q?VxChlpYqwObNpPVdbkFYvPe2+ZEJuqXN3EsAEcmIhNP9sssBNHzeXxpT3lXG?=
+ =?us-ascii?Q?MY4Grhxn81971G7+PqA/sTXu0bkUIXq6/IXKcXIZ7mZCp7UL7H6n2D0SgHID?=
+ =?us-ascii?Q?YIbeD6r2pGy3Qtgb1N7DR5mLSNBa0V6uMXuNcMGoqjA7Y9Q7nuXe4RpLGIlY?=
+ =?us-ascii?Q?IK0AGLMUbV1BUOJjFB5yL/uaeztTiSAR1+cj7xCbjOBFhYTNat8L3vdJocbK?=
+ =?us-ascii?Q?XEcJAKhVRhcPNY5ayzoFXMye2BeuDl0SwHUC4FRpQto136Fpliu+HXpKPso0?=
+ =?us-ascii?Q?gb4CMV0gVN9PwhIgsxgsDVLvs6VUKb1S?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 16:06:56.8021
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 16:06:57.6153
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81c14b70-76e0-4ff0-84ae-08dcb6faf640
+X-MS-Exchange-CrossTenant-Network-Message-Id: 087147b0-bda3-4084-d9e9-08dcb6faf6b7
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3F.namprd03.prod.outlook.com
+	DS3PEPF000099D9.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7268
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6564
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-Both ethtool_ops.rxfh_max_context_id and the default value used when
- it's not specified are supposed to be exclusive maxima (the former
- is documented as such; the latter, U32_MAX, cannot be used as an ID
- since it equals ETH_RXFH_CONTEXT_ALLOC), but xa_alloc() expects an
- inclusive maximum.
-Subtract one from 'limit' to produce an inclusive maximum, and pass
- that to xa_alloc().
-Increase bnxt's max by one to prevent a (very minor) regression, as
- BNXT_MAX_ETH_RSS_CTX is an inclusive max.  This is safe since bnxt
- is not actually hard-limited; BNXT_MAX_ETH_RSS_CTX is just a
- leftover from old driver code that managed context IDs itself.
-Rename rxfh_max_context_id to rxfh_max_num_contexts to make its
- semantics (hopefully) more obvious.
+A value of 1 doesn't make sense, as it implies the only allowed
+ context ID is 0, which is reserved for the default context - in
+ which case the driver should just not claim to support custom
+ RSS contexts at all.
 
-Fixes: 847a8ab18676 ("net: ethtool: let the core choose RSS context IDs")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  2 +-
- include/linux/ethtool.h                           | 10 +++++-----
- net/ethtool/ioctl.c                               |  5 +++--
- 3 files changed, 9 insertions(+), 8 deletions(-)
+ net/ethtool/common.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index ab8e3f197e7b..9dadc89378f0 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -5290,7 +5290,7 @@ void bnxt_ethtool_free(struct bnxt *bp)
- const struct ethtool_ops bnxt_ethtool_ops = {
- 	.cap_link_lanes_supported	= 1,
- 	.cap_rss_ctx_supported		= 1,
--	.rxfh_max_context_id		= BNXT_MAX_ETH_RSS_CTX,
-+	.rxfh_max_num_contexts		= BNXT_MAX_ETH_RSS_CTX + 1,
- 	.rxfh_indir_space		= BNXT_MAX_RSS_TABLE_ENTRIES_P5,
- 	.rxfh_priv_size			= sizeof(struct bnxt_rss_ctx),
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 303fda54ef17..989c94eddb2b 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -736,10 +736,10 @@ struct kernel_ethtool_ts_info {
-  * @rxfh_key_space: same as @rxfh_indir_space, but for the key.
-  * @rxfh_priv_size: size of the driver private data area the core should
-  *	allocate for an RSS context (in &struct ethtool_rxfh_context).
-- * @rxfh_max_context_id: maximum (exclusive) supported RSS context ID.  If this
-- *	is zero then the core may choose any (nonzero) ID, otherwise the core
-- *	will only use IDs strictly less than this value, as the @rss_context
-- *	argument to @create_rxfh_context and friends.
-+ * @rxfh_max_num_contexts: maximum (exclusive) supported RSS context ID.
-+ *	If this is zero then the core may choose any (nonzero) ID, otherwise
-+ *	the core will only use IDs strictly less than this value, as the
-+ *	@rss_context argument to @create_rxfh_context and friends.
-  * @supported_coalesce_params: supported types of interrupt coalescing.
-  * @supported_ring_params: supported ring params.
-  * @get_drvinfo: Report driver/device information. Modern drivers no
-@@ -954,7 +954,7 @@ struct ethtool_ops {
- 	u32	rxfh_indir_space;
- 	u16	rxfh_key_space;
- 	u16	rxfh_priv_size;
--	u32	rxfh_max_context_id;
-+	u32	rxfh_max_num_contexts;
- 	u32	supported_coalesce_params;
- 	u32	supported_ring_params;
- 	void	(*get_drvinfo)(struct net_device *, struct ethtool_drvinfo *);
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 8ca13208d240..a8e276ecf723 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1449,12 +1449,13 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 		}
- 
- 		if (ops->create_rxfh_context) {
--			u32 limit = ops->rxfh_max_context_id ?: U32_MAX;
-+			u32 limit = ops->rxfh_max_num_contexts ?: U32_MAX;
- 			u32 ctx_id;
- 
- 			/* driver uses new API, core allocates ID */
- 			ret = xa_alloc(&dev->ethtool->rss_ctx, &ctx_id, ctx,
--				       XA_LIMIT(1, limit), GFP_KERNEL_ACCOUNT);
-+				       XA_LIMIT(1, limit - 1),
-+				       GFP_KERNEL_ACCOUNT);
- 			if (ret < 0) {
- 				kfree(ctx);
- 				goto out;
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 07032babd1b6..5f714bbbef19 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -654,6 +654,8 @@ int ethtool_check_ops(const struct ethtool_ops *ops)
+ {
+ 	if (WARN_ON(ops->set_coalesce && !ops->supported_coalesce_params))
+ 		return -EINVAL;
++	if (WARN_ON(ops->rxfh_max_num_contexts == 1))
++		return -EINVAL;
+ 	/* NOTE: sufficiently insane drivers may swap ethtool_ops at runtime,
+ 	 * the fact that ops are checked at registration time does not
+ 	 * mean the ops attached to a netdev later on are sane.
 
