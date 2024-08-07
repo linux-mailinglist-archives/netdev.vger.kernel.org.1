@@ -1,158 +1,122 @@
-Return-Path: <netdev+bounces-116589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A67E94B19C
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:50:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E2294B1B4
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:01:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2A42835BC
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:50:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5848B1F22BF4
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 21:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B78145FFA;
-	Wed,  7 Aug 2024 20:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDC2148833;
+	Wed,  7 Aug 2024 21:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b="GD9nAnNn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kqNU4+96"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136C5145B39
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 20:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C821422D5;
+	Wed,  7 Aug 2024 21:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723063839; cv=none; b=IvOIO7GhrCXAmPAcqPWHbmePoWOEZobejAvl4ChEzTQav8n3GSDReCLIiY576jk2DhVbSo4Jv5BGCP3jkWwFNq/wqoWN4mVUgqQVpdGbTO0KNOasA691J6mVvwitUpb9BJrAwbAsxtS7pkxZwEimVXOrdKuHtM43P3H96NuJhhQ=
+	t=1723064472; cv=none; b=PcmJJ6XhpZtJjZDXDFjJW9ZI099OfJiiUzuBHCMyxCkZIBT9rmQzI9o8xgV++WBFsdeFKm9kd4tRz9dS5E9tB5SGSW5x5IJkkec1hHrSWoqImsB3xzEKB44Nsv9L1AUeZvGs+rwNLg0oG9ldGLeDu0wSYE1z//icy2XSqkqXBKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723063839; c=relaxed/simple;
-	bh=f+v4f3mK6kHMcO8CYtGze601q5qgBWUYTCFJnozwiEg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vr06WzDYremcA75vjRjGs+GzDTgkTsmHcOuHyRpfK4TwvLNPsj6yJ83BIdxQYAMTX5Zc3ZEmOZhJ6spmq04Ckh4/l5AuAvm+cGLcQOeTeoBtFL3O5ucbvfuhVErebalsXmACyQerKC/HS3NzuDphdQDZTaqHcnN+rfTVQ7gY9SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk; spf=pass smtp.mailfrom=martin-whitaker.me.uk; dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b=GD9nAnNn; arc=none smtp.client-ip=212.227.17.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=martin-whitaker.me.uk
+	s=arc-20240116; t=1723064472; c=relaxed/simple;
+	bh=fzJi4vne43VEz1FdDXI81C6wJWDcd4tnB3M183hqPn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZIUnrBzw3PZtheURttaVrjcKACyyY2YUfDqRWOGYNMgGP4bcHtWkQnmhY2lbirNG/u1NW82DRCZBlZKYIR9DHDwOjK+IKg5CTRCDQseO5XbUhdjHpaeAzwz+23kFDPx9dsEyHNLYg1B78rqMpc4S9stHLLMRHR6BOgfEu2/PQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kqNU4+96; arc=none smtp.client-ip=209.85.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4f6be9d13cdso97674e0c.3;
+        Wed, 07 Aug 2024 14:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=martin-whitaker.me.uk; s=s1-ionos; t=1723063819; x=1723668619;
-	i=foss@martin-whitaker.me.uk;
-	bh=TzO/kkw4/fm/ZdXC5cXInzKhtvW3MnTisW67XRRFAFk=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=GD9nAnNn4GuOAXVlrsJAWFrEJXDWUXYAupyp1DCCPsFYEGKPK3OT1XCM9d7oUp82
-	 cLlhGE+CqkxFbfWgxvwO+bkz/irkG/hsyjBsw8aNMs6qW+pTY5bjsqr8LvbMBxlRr
-	 48CVSBEIAV+5s/Tb4Qps8YmE0GO+04opIZ3u2dVlJPQTdBhYp6tCYoI2H8Pkj+V5x
-	 IuwM8IZlEQd61a5obGjHIpX69bAABtzinAQgTq+O8go4UmyByr7RUym8OhG3LU3vY
-	 0BDg5JFoqesiSw+XF6Wz0ghReF0wdhzNANwLfWX+x4tVetBUHtBjABMH4a5Vf81E4
-	 wDwlhtmZA0mkZmdSSg==
-X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
-Received: from thor.lan ([194.120.133.17]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.179]) with ESMTPSA (Nemesis) id
- 1M8QFi-1sXNlb2Zhg-000ULR; Wed, 07 Aug 2024 22:50:19 +0200
-From: Martin Whitaker <foss@martin-whitaker.me.uk>
-To: netdev@vger.kernel.org
-Cc: UNGLinuxDriver@microchip.com,
-	Woojung.Huh@microchip.com,
-	o.rempel@pengutronix.de,
-	lukma@denx.de,
-	Arun.Ramadoss@microchip.com,
-	kuba@kernel.org,
-	Martin Whitaker <foss@martin-whitaker.me.uk>
-Subject: [PATCH net] net: dsa: microchip: disable EEE for KSZ8567/KSZ9567/KSZ9896/KSZ9897.
-Date: Wed,  7 Aug 2024 21:52:09 +0100
-Message-ID: <20240807205209.21464-1-foss@martin-whitaker.me.uk>
-X-Mailer: git-send-email 2.41.1
+        d=gmail.com; s=20230601; t=1723064469; x=1723669269; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5REQGrZj3ljHT9VgSTZ7Q1MOiyGSO0dvGiTO97nTy7k=;
+        b=kqNU4+96yFIRlatA3Yqz71DoUubwKT+Roga5MouImrtUY5o7hGjCJuhDwm3pFKy655
+         BhxnnMI1IhqkxbgT5F0aE81fDxFqXX1hLVGRxtHdlRrMHGwKyraBFPZuMAuD0LBi68c9
+         PZ5FBx8p+5XmcTqq3IiyL5Qcnh08ZOtRJbEqijuOcREL/NxqM5TonpUnO4M7UgkA1YGt
+         Wg5vwsn5Lbz7DGLvyjiejcZKtTdfM/HemIerNCQRkq6twKplkJDc4sJj0ZL+S1cnoI9y
+         /hoexfGIvRAx3AzIOX6l2Mw8ZbmW6stPfqr/qBqYjMMNBsH6MbBYnAkLRK8WaZDY40TW
+         hO0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723064469; x=1723669269;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5REQGrZj3ljHT9VgSTZ7Q1MOiyGSO0dvGiTO97nTy7k=;
+        b=SsqGrJsEupdj+zoebqu3MVDDjfh3zYUthsK4bpdSbi/MFbZggqba0dsjFYegN9R8YO
+         e4OVOmBqX1K+dus/kNPeqBOOl1fvAUVqNwFvnq8INcnBF7wyKVEgQmZvo9gV9GLzawMU
+         tY78zkaykAf1og7V0+aU8eb3/4lzCh12e87011Qfq/OY3jNT63ajj8tpdcgBJWMrmAFI
+         qCQj7L/tYDGnIlYk9E8HTo9kGOW9vHAXOS5w93STWeQiNp6N3BPshMjccCkKW9vEKbZc
+         v6meRkZPrb3auaLeU1ahENrX8k2TZuXsV/ysb06mT0OEhURXmnDwEkdXm1n9JdkAw6wJ
+         Clcg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQTpAke3i9O71nZ/FBW4P902FoXS6G1Js9Qs7dU2JujQ3FCFRpqOTOCVs2tL8eu5d4mIdVq/IyQtz7xgup/EfUpaTshAGa
+X-Gm-Message-State: AOJu0YzINReZ6Fw9/gBTlLqt8dlgKBTbeRPdG0JSl2geaU86HQr1tBET
+	gchPE/LLBEzLTRXTF7ZrY5ZfreeV3t/xp0eZ8m56NAwXAothR+NQ
+X-Google-Smtp-Source: AGHT+IGtFUNqoVpQ3WTYE9dBxGNBrCVMyYyt5mh2kcWnjW8Fjxb8+/c7KoPShnEREXkI0zpS/3U/LA==
+X-Received: by 2002:a05:6122:1ac6:b0:4f2:ec14:3b6 with SMTP id 71dfb90a1353d-4f89ff8fa32mr18321710e0c.6.1723064469105;
+        Wed, 07 Aug 2024 14:01:09 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f8a1a35bddsm1600471e0c.1.2024.08.07.14.01.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 14:01:08 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-07-26
+Date: Wed,  7 Aug 2024 17:01:03 -0400
+Message-ID: <20240807210103.142483-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:xFeTaqKwZo3anhq6ZWylFt0u5I2Ccsw6ewugUom/ftLa4CjvGKa
- uO0QvTFNpq53mISlaXQB1Un+S3d87mIjSzwIDUByTI22XBNhIVdGfMjADz3ualswmPDOS3V
- JuZx3ZfKWXuIwzbRzUqV3S7VIhoJOD6katNgNalR91Xe7R03ViPy+tffZJrublTjjmTFYFN
- 62g0+chfReHqBrOsxSvrg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:tQOhKtcQszI=;ufTgSl9lGkE0zDFawkfPW7pkceI
- DcQ26zsNkIe3Gy3I/oqsInll/XjAwtWv0IjmnJiPL3OXbT4e9JO/YQwejc2A8LJbn9ndWf0ny
- pmbUU5CeYxyYkxrEsHKs8yYXaA4xgNnEiQFit/YCruxHv5Zwt90hX4R4+TQn4x/63RIJnHcbN
- C74deFRP0jVePWzZI3Yf7JlVoy7iEY9ckM4doImA/X9mHKSrO6eR1WzR64dy/FlxydJLFSIH2
- +B5MoQIfR28pfECw7Q4D3/JMVTP0Gf8aupfrd1Ibf/F1OBxR7+OBJGlhUZrwdkV9iJlP7SOHC
- KFu5UvCs3ndgn8ey0NJC2AIc3npnzVvHhJySyTq/tWGe0Vkia+QyTyB+9dZY5ReWYnAukGO4X
- ZbhA9bgjZk98hkGQDajCVS/8pWtql15AaqK6w8aRdJXQOpmOJPIlTuBH/IJ9+/hBiQ/Nt/50R
- OGrtAdTSBwOyHCtOFYgZW+x7oqigQbrqFYmyt5qDd22kTPaLhcT/TyRmeHecvmFzrGXZMHlgx
- ibRj/iI5DVAKxlWKP1PkRoTevbjytoJldXP1CpiHKOwrDdkofzQEw9iYgDuR1Rd3oDSKCQiQB
- okeGZkEB7hS5sXBcg26zR96y8aGhhQHYj/p6YFvLIO3pxO1r26BK11dXRGGEGGGVzLyrLL9Wu
- rP0MccFivw7ZUTTWSX4wIuY14z9XU/6egbe3wEB8jvj2Sdx9spbsKrxU+uVfMD7OJFZE51PgV
- gSu1k+9hfXpnRrxajEGT15Leqo+/39o6tPR+Trk8HHfjL5Q/U++JlQ=
+Content-Transfer-Encoding: 8bit
 
-As noted in the device errata [1-8], EEE support is not fully operational
-in the KSZ8567, KSZ9477, KSZ9567, KSZ9896, and KSZ9897 devices, causing
-link drops when connected to another device that supports EEE. The patch
-series "net: add EEE support for KSZ9477 switch family" merged in commit
-9b0bf4f77162 caused EEE support to be enabled in these devices. A fix for
-this regression for the KSZ9477 alone was merged in commit 08c6d8bae48c2.
-This patch extends this fix to the other affected devices.
+The following changes since commit 1ca645a2f74a4290527ae27130c8611391b07dbf:
 
-[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ8567R-Errata-DS80000752.pdf
-[2] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ8567S-Errata-DS80000753.pdf
-[3] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ9477S-Errata-DS80000754.pdf
-[4] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ9567R-Errata-DS80000755.pdf
-[5] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ9567S-Errata-DS80000756.pdf
-[6] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ9896C-Errata-DS80000757.pdf
-[7] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ9897R-Errata-DS80000758.pdf
-[8] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/Errata/KSZ9897S-Errata-DS80000759.pdf
+  net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19:35:08 -0700)
 
-Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") # for KSZ8=
-567/KSZ9567/KSZ9896/KSZ9897
-Link: https://lore.kernel.org/netdev/137ce1ee-0b68-4c96-a717-c8164b514eec@=
-martin-whitaker.me.uk/
-Signed-off-by: Martin Whitaker <foss@martin-whitaker.me.uk>
-=2D--
- drivers/net/dsa/microchip/ksz_common.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+are available in the Git repository at:
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/micr=
-ochip/ksz_common.c
-index b074b4bb0629..cebc6eaa932b 100644
-=2D-- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2578,7 +2578,11 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds,=
- int port)
- 		if (!port)
- 			return MICREL_KSZ8_P1_ERRATA;
- 		break;
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
-+	case KSZ9567_CHIP_ID:
-+	case KSZ9896_CHIP_ID:
-+	case KSZ9897_CHIP_ID:
- 		/* KSZ9477 Errata DS80000754C
- 		 *
- 		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
-@@ -2588,6 +2592,13 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds,=
- int port)
- 		 *   controls. If not disabled, the PHY ports can auto-negotiate
- 		 *   to enable EEE, and this feature can cause link drops when
- 		 *   linked to another device supporting EEE.
-+		 *
-+		 * The same item appears in the errata for the KSZ9567, KSZ9896,
-+		 * and KSZ9897.
-+		 *
-+		 * A similar item appears in the errata for the KSZ8567, but
-+		 * provides an alternative workaround. For now, use the simple
-+		 * workaround of disabling the EEE feature for this device too.
- 		 */
- 		return MICREL_NO_EEE;
- 	}
-=2D-
-2.41.1
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-08-07
+
+for you to fetch changes up to b5431dc2803ac159d6d4645ae237d15c3cb252db:
+
+  Bluetooth: hci_sync: avoid dup filtering when passive scanning with adv monitor (2024-08-07 16:36:01 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - hci_sync: avoid dup filtering when passive scanning with adv monitor
+ - hci_qca: don't call pwrseq_power_off() twice for QCA6390
+ - hci_qca: fix QCA6390 support on non-DT platforms
+ - hci_qca: fix a NULL-pointer derefence at shutdown
+ - l2cap: always unlock channel in l2cap_conless_channel()
+
+----------------------------------------------------------------
+Anton Khirnov (1):
+      Bluetooth: hci_sync: avoid dup filtering when passive scanning with adv monitor
+
+Bartosz Golaszewski (3):
+      Bluetooth: hci_qca: don't call pwrseq_power_off() twice for QCA6390
+      Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
+      Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
+
+Dmitry Antipov (1):
+      Bluetooth: l2cap: always unlock channel in l2cap_conless_channel()
+
+ drivers/bluetooth/hci_qca.c | 19 +++++++++----------
+ net/bluetooth/hci_sync.c    | 14 ++++++++++++++
+ net/bluetooth/l2cap_core.c  |  1 +
+ 3 files changed, 24 insertions(+), 10 deletions(-)
 
