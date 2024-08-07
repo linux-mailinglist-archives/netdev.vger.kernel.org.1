@@ -1,162 +1,247 @@
-Return-Path: <netdev+bounces-116635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2FA94B3AC
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:36:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB3B94B3DE
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:47:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11B831F22741
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:36:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30621C20803
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB7F154C10;
-	Wed,  7 Aug 2024 23:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6585315099D;
+	Wed,  7 Aug 2024 23:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UM2X/B9A"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QJ48A+MN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 070E82B9A1;
-	Wed,  7 Aug 2024 23:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1FD84037;
+	Wed,  7 Aug 2024 23:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723073790; cv=none; b=nZ9Ah/P06eRJRku+2Wpws4wdDsD0qz1fouSCZeWK3t488VnkCoP83lTnfipBnGwLhtBx1WTbKmrrwqHH8/fh55RFvZNTNQAcAJ8LqbXSvB7idLl+GS7ZtZZxL/koRmEbWjXwQ+7sJgmSft3u0h7AN079PJfJauHzBzJ2I8+ZB4A=
+	t=1723074449; cv=none; b=i/5Geac+p/cSqhwRaeXLZyWoHiHmV00J/eDF2qRAxDfHHW+ZMArcsmsfneH/LmNJok89iEPA8KbE2Oy8QClA/f6s3fEwFVQ06ABGZEnTWN1BAz1BbbsqWvK9aPwEcTgb6187NRzpi0yyn01Pq8F9kf6rbUjzMKtzzgpK5XiNkAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723073790; c=relaxed/simple;
-	bh=qSbCFaZH+G6lzKlJZVve6DFWjFuUgcmFFYwA/SjX21I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O68UGB+Vosq376VXJET/IdpGwBQXBbc9EB/DqlacGnC2Dr1nm2x1qpMm4A75DCIm//GMx1yh/zQ5YCHHMflD++acGPDPxUz9Kp32H5Mh1Jv0UkWiLZfy/DbHRJ3Sp1xXJZKnCsHQsmNSHyelm3rom6Sv5JbC3klWwxWjhOsQdJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UM2X/B9A; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1fc587361b6so4444325ad.2;
-        Wed, 07 Aug 2024 16:36:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723073788; x=1723678588; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3bI2iAB50s/sgrD0as33mPKfx3YGxvdhWBB75P/hORk=;
-        b=UM2X/B9AUArun2CGL5B/ESsIFSOoyLs0To6tWh8SYpQYvrrlnbI50iF4CW0EkPtAz6
-         /GzYN/nc01O0RP5UBzVjkGu4c7Jzfkrvr9hLYag5E9gHWdGOZ+Z+kduaAdoyLpY/eFLW
-         5qkTL1HrPxy0wCOkSOguQr55AdxqToKw/mrcsau9aBAHxMyfCdBR5FGPDi2ubApgNAMY
-         sKMTKrsKC3brwbLWTHibplXcfIMJSK8bO6DuyCgoC724umxRae/k/9EH0+P5/ZAoLies
-         Mcz61uoTfaHpQU1jVXTE5ILf6l2U5DXiDkPen5LaeXImjwEOPw8WUMmWgSpuzRNLYEa6
-         lOcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723073788; x=1723678588;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3bI2iAB50s/sgrD0as33mPKfx3YGxvdhWBB75P/hORk=;
-        b=FVpeu0gd3qEmKySFyburBwbV4qYlwzvodoYX8oUIpGuD+JTUv8p2cuA1FfRk8f7Hlv
-         rFzwDR4RR02fOELdatpZMSicJIUSSFNJT+VusXLe6OZFHx6etmSKdPVBJB2Cr2JHeAst
-         wXNjk/EN/b8z0XAgmXOPuDfq/kLv9YOuzUwpSrWvU1h7cjnPYr3qo5Gh4UrH1bUhqZkK
-         6oYwL74EyQtwV3Wd923zRnOzq1KTOV/gVrKO5aNsky2Ws+xHtn9s9bWSwm5HVy1YXMVL
-         dg0x8HTC8px2JBxzO0WHyVVrnygNrf0XJ0Igddm9gkJ/5zrY8eYLzJZCKPj+iisObgkt
-         Qy0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVBlEEeP6SjdesdhuXrBW51/9XruKTHmUi6lwBcVa7FboYNOmE9UflZhCh9O7pxIvNTCGXfqbjq+B0CTWb+Kl6R9lnTRRW8l+C/gZFBn0vU2BrskAZMKygKsdPN47x3lUzN9bv8tFu2D0j7WBhy4KEEAdClN+TYem4kns1CER+EQKk1Epnh0frbvsei
-X-Gm-Message-State: AOJu0YyScqRMvQUTzLIWh4rTUjFBrEnaZfZ18Q7LwCgcusiC85caL6q/
-	5fpQFeQCCN6cGhkSBTcM+QlAtI8YWZabanIQFi4qoKJEY7FmepD5VuuaaUhi
-X-Google-Smtp-Source: AGHT+IHvCp3huaVdNK2AR/421T2J1J8zVwb1EDAWJDXPQ4FGbjP9mkC7qxfimpUomsC/h8MQ6DOH6g==
-X-Received: by 2002:a17:902:d2ca:b0:1fb:8a3b:ee9a with SMTP id d9443c01a7336-200952e28admr2942865ad.61.1723073788023;
-        Wed, 07 Aug 2024 16:36:28 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff59176eb6sm112030645ad.196.2024.08.07.16.36.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 16:36:27 -0700 (PDT)
-Date: Wed, 7 Aug 2024 17:36:25 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: Jann Horn <jannh@google.com>, outreachy@lists.linux.dev,
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
-	serge@hallyn.com, linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] Landlock: Add signal control
-Message-ID: <ZrQE+d2b/FWxIPoA@tahera-OptiPlex-5000>
-References: <cover.1722966592.git.fahimitahera@gmail.com>
- <49557e48c1904d2966b8aa563215d2e1733dad95.1722966592.git.fahimitahera@gmail.com>
- <CAG48ez3o9fmqz5FkFh3YoJs_jMdtDq=Jjj-qMj7v=CxFROq+Ew@mail.gmail.com>
- <CAG48ez1jufy8iwP=+DDY662veqBdv9VbMxJ69Ohwt8Tns9afOw@mail.gmail.com>
- <20240807.Yee4al2lahCo@digikod.net>
+	s=arc-20240116; t=1723074449; c=relaxed/simple;
+	bh=/qm83qDVxnY3QrhFxh2kmo0YUOGlFKEd9jGuhFx0DZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=snE3qgMZOiVO5yZF1jPMrpo1+XL3ROZEwHg9WF4qDRkKCRxp3aOB84/6cWkoS8vPnrih4Q9KwsJdZo5iXMp3iDOMmaMk+WFHjktnKmKf9OV4Ch8peq/fkh30nIqoRSbrwMnCu7QUy6ZBzemeWcfPanqA7ZKJx+marXSm3WLzd9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QJ48A+MN; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 477Jh3f5000990;
+	Wed, 7 Aug 2024 23:46:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	mgbchAj6xcR2jFXLYmMGd4v6aq2N9KiFTX1IIgdca7w=; b=QJ48A+MNaGvSmfTw
+	YQsIzjqomBiC8XLpiFuqSs3SHBajHCFzPHVyP5kIx2J6TdDZShIXypzTg2Fx7jYJ
+	FonydqI34elfCglK12A2Bxg106DWGqK7EvkFHRYOcwH1KCPetx6jciOA3TVnxGEf
+	yQZUZq+FsAUGRvu8syhd2MEfQz+tFmCXav99tF6CNP52mSyRce1NoC+J7OrgQvpo
+	mVMco+jIbXv9DWyYRMfIfJQTudvENmyBtIaC0Rxkzt3PwdjgFLUXSc2sV6rEKsIt
+	QMTEDUZQKyITDr4zYb67LGLNIfaqmssRnrMZXnT/l6+OzM+s1RUykjl+630qfFSW
+	OkJ9xw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40vfav0df2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 23:46:55 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 477NksMn011658
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 7 Aug 2024 23:46:54 GMT
+Received: from [10.110.61.128] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 7 Aug 2024
+ 16:46:51 -0700
+Message-ID: <eddef7d0-9e3d-4c3f-8457-54b2eb8a3947@quicinc.com>
+Date: Wed, 7 Aug 2024 16:46:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240807.Yee4al2lahCo@digikod.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/2] net: stmmac: Add interconnect support
+To: Serge Semin <fancer.lancer@gmail.com>
+CC: Vinod Koul <vkoul@kernel.org>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>, <kernel@quicinc.com>,
+        Andrew Halaney <ahalaney@redhat.com>, Andrew Lunn
+	<andrew@lunn.ch>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>
+References: <20240708-icc_bw_voting_from_ethqos-v4-0-c6bc3db86071@quicinc.com>
+ <20240708-icc_bw_voting_from_ethqos-v4-2-c6bc3db86071@quicinc.com>
+ <zsdjc53fxh44bpra5cfishtvmyok2rprbtnbthimnu6quxkxyj@kvtijkxylwb3>
+Content-Language: en-US
+From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+In-Reply-To: <zsdjc53fxh44bpra5cfishtvmyok2rprbtnbthimnu6quxkxyj@kvtijkxylwb3>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 9hjmxXrOpSYZifNt35BEWYmSC-EDuTnJ
+X-Proofpoint-GUID: 9hjmxXrOpSYZifNt35BEWYmSC-EDuTnJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-07_14,2024-08-07_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 mlxscore=0 bulkscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 clxscore=1011 spamscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408070166
 
-On Wed, Aug 07, 2024 at 08:16:47PM +0200, Mickaël Salaün wrote:
-> On Tue, Aug 06, 2024 at 11:55:27PM +0200, Jann Horn wrote:
-> > On Tue, Aug 6, 2024 at 8:56 PM Jann Horn <jannh@google.com> wrote:
-> > > On Tue, Aug 6, 2024 at 8:11 PM Tahera Fahimi <fahimitahera@gmail.com> wrote:
-> > > > Currently, a sandbox process is not restricted to send a signal
-> > > > (e.g. SIGKILL) to a process outside of the sandbox environment.
-> > > > Ability to sending a signal for a sandboxed process should be
-> > > > scoped the same way abstract unix sockets are scoped. Therefore,
-> > > > we extend "scoped" field in a ruleset with
-> > > > "LANDLOCK_SCOPED_SIGNAL" to specify that a ruleset will deny
-> > > > sending any signal from within a sandbox process to its
-> > > > parent(i.e. any parent sandbox or non-sandboxed procsses).
-> > [...]
-> > > > +       if (is_scoped)
-> > > > +               return 0;
-> > > > +
-> > > > +       return -EPERM;
-> > > > +}
-> > > > +
-> > > > +static int hook_file_send_sigiotask(struct task_struct *tsk,
-> > > > +                                   struct fown_struct *fown, int signum)
+
+
+On 8/1/2024 11:32 AM, Serge Semin wrote:
+> Hi Sagar
 > 
-> I was wondering if we should handle this case, but I guess it makes
-> sense to have a consistent policy for all kind of user-triggerable
-> signals.
+> On Mon, Jul 08, 2024 at 02:30:01PM -0700, Sagar Cheluvegowda wrote:
+>> Add interconnect support to vote for bus bandwidth based
+>> on the current speed of the driver.
+>> Adds support for two different paths - one from ethernet to
+>> DDR and the other from CPU to ethernet, Vote from each
+>> interconnect client is aggregated and the on-chip interconnect
+>> hardware is configured to the most appropriate bandwidth profile.
+>>
+>> Suggested-by: Andrew Halaney <ahalaney@redhat.com>
+>> Signed-off-by: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
+>> ---
+>>  drivers/net/ethernet/stmicro/stmmac/stmmac.h          |  1 +
+>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     |  8 ++++++++
+>>  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 12 ++++++++++++
+>>  include/linux/stmmac.h                                |  2 ++
+>>  4 files changed, 23 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+>> index b23b920eedb1..56a282d2b8cd 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+>> @@ -21,6 +21,7 @@
+>>  #include <linux/ptp_clock_kernel.h>
+>>  #include <linux/net_tstamp.h>
+>>  #include <linux/reset.h>
+>> +#include <linux/interconnect.h>
+>>  #include <net/page_pool/types.h>
+>>  #include <net/xdp.h>
+>>  #include <uapi/linux/bpf.h>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> index b3afc7cb7d72..ec7c61ee44d4 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> @@ -985,6 +985,12 @@ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+>>  	}
+>>  }
+>>  
+>> +static void stmmac_set_icc_bw(struct stmmac_priv *priv, unsigned int speed)
+>> +{
 > 
-> > > > +{
-> > > > +       bool is_scoped;
-> > > > +       const struct landlock_ruleset *dom, *target_dom;
-> > > > +       struct task_struct *result = get_pid_task(fown->pid, fown->pid_type);
-> > >
-> > > I'm not an expert on how the fowner stuff works, but I think this will
-> > > probably give you "result = NULL" if the file owner PID has already
-> > > exited, and then the following landlock_get_task_domain() would
-> > > probably crash? But I'm not entirely sure about how this works.
-> > >
-> > > I think the intended way to use this hook would be to instead use the
-> > > "file_set_fowner" hook to record the owning domain (though the setup
-> > > for that is going to be kind of a pain...), see the Smack and SELinux
-> > > definitions of that hook. Or alternatively maybe it would be even
-> > > nicer to change the fown_struct to record a cred* instead of a uid and
-> > > euid and then use the domain from those credentials for this hook...
-> > > I'm not sure which of those would be easier.
-> > 
-> > (For what it's worth, I think the first option would probably be
-> > easier to implement and ship for now, since you can basically copy
-> > what Smack and SELinux are already doing in their implementations of
-> > these hooks. I think the second option would theoretically result in
-> > nicer code, but it might require a bit more work, and you'd have to
-> > include the maintainers of the file locking code in the review of such
-> > refactoring and have them approve those changes. So if you want to get
-> > this patchset into the kernel quickly, the first option might be
-> > better for now?)
-> > 
+>> +	icc_set_bw(priv->plat->axi_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
+>> +	icc_set_bw(priv->plat->ahb_icc_path, Mbps_to_icc(speed), Mbps_to_icc(speed));
 > 
-> I agree, let's extend landlock_file_security with a new "fown" pointer
-> to a Landlock domain. We'll need to call landlock_get_ruleset() in
-> hook_file_send_sigiotask(), and landlock_put_ruleset() in a new
-> hook_file_free_security().
-I think we should add a new hook (hook_file_set_owner()) to initialize
-the "fown" pointer and call landlock_get_ruleset() in that? If we do not
-have hook_file_set_owner to store domain in "fown", can you please give
-me a hint on where to do that?
-Thanks 
-> I would be nice to to replace the redundant informations in fown_struct
-> but that can wait.
+> I've got two questions in this regard:
+> 
+> 1. Don't we need to call icc_enable()/icc_disable() in someplace in
+> the driver? For instance the CPU-MEM path must be enabled before even
+> the stmmac_dvr_probe() is called, otherwise the CSR won't be
+> accessible. Right? For the same reason the CPU-MEM bandwidth should be
+> set in sync with that.
+> 
+> 2. Why is the CPU-MAC speed is specified to match the Ethernet link
+> speed? It doesn't seem reasonable. It's the CSR's access speed and
+> should be done as fast as possible. Shouldn't it?
+> 
+>> +}
+
+I am having internal discussions with clocks team, I will revert back soon with answers.
+>> +
+>>  static void stmmac_mac_link_down(struct phylink_config *config,
+>>  				 unsigned int mode, phy_interface_t interface)
+>>  {
+>> @@ -1080,6 +1086,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>>  	if (priv->plat->fix_mac_speed)
+>>  		priv->plat->fix_mac_speed(priv->plat->bsp_priv, speed, mode);
+>>  
+>> +	stmmac_set_icc_bw(priv, speed);
+>> +
+>>  	if (!duplex)
+>>  		ctrl &= ~priv->hw->link.duplex;
+>>  	else
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+>> index 54797edc9b38..201f9dea6da9 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+>> @@ -642,6 +642,18 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+>>  		dev_dbg(&pdev->dev, "PTP rate %d\n", plat->clk_ptp_rate);
+>>  	}
+>>  
+>> +	plat->axi_icc_path = devm_of_icc_get(&pdev->dev, "mac-mem");
+>> +	if (IS_ERR(plat->axi_icc_path)) {
+>> +		ret = ERR_CAST(plat->axi_icc_path);
+>> +		goto error_hw_init;
+>> +	}
+>> +
+>> +	plat->ahb_icc_path = devm_of_icc_get(&pdev->dev, "cpu-mac");
+>> +	if (IS_ERR(plat->ahb_icc_path)) {
+>> +		ret = ERR_CAST(plat->ahb_icc_path);
+>> +		goto error_hw_init;
+>> +	}
+>> +
+>>  	plat->stmmac_rst = devm_reset_control_get_optional(&pdev->dev,
+>>  							   STMMAC_RESOURCE_NAME);
+>>  	if (IS_ERR(plat->stmmac_rst)) {
+>> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+>> index f92c195c76ed..385f352a0c23 100644
+>> --- a/include/linux/stmmac.h
+>> +++ b/include/linux/stmmac.h
+>> @@ -283,6 +283,8 @@ struct plat_stmmacenet_data {
+>>  	struct reset_control *stmmac_rst;
+>>  	struct reset_control *stmmac_ahb_rst;
+>>  	struct stmmac_axi *axi;
+> 
+>> +	struct icc_path *axi_icc_path;
+> 
+> The MAC<->MEM interface isn't always AXI (it can be AHB or custom) and
+> 
+>> +	struct icc_path *ahb_icc_path;
+> 
+> the CPU<->MAC isn't always AHB (it can also be APB, AXI, custom). So
+> the more generic naming would be:
+> 
+> axi_icc_path -> dma_icc_path
+> and
+> ahb_icc_path -> csr_icc_path
+> 
+> -Serge(y)
+> 
+>>  	int has_gmac4;
+>>  	int rss_en;
+>>  	int mac_port_sel_speed;
+>>
+>> -- 
+>> 2.34.1
+>>
+>>
 
