@@ -1,181 +1,230 @@
-Return-Path: <netdev+bounces-116292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5207B949DC0
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 04:26:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A36949DC2
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 04:28:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED1FD1F24156
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 02:26:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A1C5B22092
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 02:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E8518FDD5;
-	Wed,  7 Aug 2024 02:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbKZ4Nv6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0056017BB1D;
+	Wed,  7 Aug 2024 02:28:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3DF18FDC9
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 02:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1B115D5DA
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 02:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722997596; cv=none; b=idd5StRx4EklXm6pjWcYOMnDoB6BSAq1SpUNHiwC1iZWW0UHB8N3DupYyTTnI87exSNH0a6D1hZpMXdbdngeWVIucfoExg97C8xaWOYvJBnnk8tptK8TcigjZzK6fgh7/tkGuFBrXCegNatidaqKphUUwONic6/TtmB76zWcgKs=
+	t=1722997704; cv=none; b=VDKeckSUf3cqg4qsAN6HzGDvRRkusiBleqo7PJhB6aCw/OoKBBj+2swfB9NbwCKKTm2nb96SOtYwZTXZIUEq/do8LFHAOJWE8nQMShI75I+cthT48xs5tVLh/RemMMZkUxADMMvvVLQPrkqYv1ED1BANy0bRkicC8gUgzH6sSpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722997596; c=relaxed/simple;
-	bh=QGyvh5EcTDRd1Lr7lcs2sKAsd1Mza/UZQ3OvxOiRJvE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uSeEx/wTnkvTwql3WLab/0xwqG2KNxve0InimBhWb674nk9K8dY97+NxGQ9AP/0NyX39dwy9R0LkFxCkrgw7U1z/CRfc2UP3yEQxi3v4iEX9JAbHOUlykqjsq88POw9DuAhNbinm8KtAelhqjA5ErloYDnYKQXXmHGiF7XHJJh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XbKZ4Nv6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F1D9C4AF0D;
-	Wed,  7 Aug 2024 02:26:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722997595;
-	bh=QGyvh5EcTDRd1Lr7lcs2sKAsd1Mza/UZQ3OvxOiRJvE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XbKZ4Nv65ryvSNPknMmYI3uNIqI+IJAMzABYzzcZuNchHCQDLzTqwQjkzBPoxva1P
-	 3SwKrOf3hw19+Vbz6SDBdge9rSKAmaECMQHnK8U0Ngnc6FvE796ae5UbKO0VF2/Cjm
-	 gthML8V/iBTt03ZgpYVctdkjgEOQ7XNqP8ueU2filSOb2MNVQMBt8VefimXIWarOkG
-	 F6HpOvKM+ehZRan/GNuJDoSj1SnfgfaSdsTvhEdlnFfB8BYDubcN/EnHCvxdTn08jY
-	 7eZFMM45RhEZLxLHJH7i2tYQYLnGGFqR0vIP+UCOlA50YV2o0p8BQYZZ4zk9Wy7D+O
-	 k2MRkAlAI5Rgg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	alexanderduyck@fb.com,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 2/2] eth: fbnic: add support for basic qstats
-Date: Tue,  6 Aug 2024 19:26:31 -0700
-Message-ID: <20240807022631.1664327-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240807022631.1664327-1-kuba@kernel.org>
-References: <20240807022631.1664327-1-kuba@kernel.org>
+	s=arc-20240116; t=1722997704; c=relaxed/simple;
+	bh=EpVgDADjB4ANAZA0IVfz8OYkF0lVVjRdBzBcsG76NCU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=gscK9+fF7FLMYRwVOkYmjBTC34hHl8F/nFBVxm3HERoGtRDJvTq4rO21ch/pZYb6eup5VmvLIPPppcAR0YIsYz20LQ77ktmymd7i8j1Zf/aIg103YqRobDHtXhTPjFjtQl8Vk+row3DjdokDk+HG8D60ay8FmKK2immyeoQNh1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-81f959826ccso173378439f.3
+        for <netdev@vger.kernel.org>; Tue, 06 Aug 2024 19:28:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722997702; x=1723602502;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b63ulpSsTJ/M3oHsfyP9cG1id9lbFxZe5s9TDNIe39I=;
+        b=EmpYUaA6kMQOrnueQCVJP+B7kUy44+3e5t4QXIZmMuk+jsaJz75sR8VtXii1Bpi4sb
+         B1OTuFQaqYtOdPCSXjpYUbaSNdJOzy2n7G1NLE/LlaT+nooTZGpHwktpC2/Usx9O+Mkc
+         EmXPZoH6drQ/oC7NOQGSHE9WkiRcGUQwkH+qK1thBZaosFvebfSHvcgGFXQbELUYCLv0
+         HRypWrg97zGN0lNsbvozdjGzyOd43lJzJG2HcV9mLLvnrQL5iXJr0GxRI4j/rvO4kXBV
+         DGzS73Ib75UaXLjOur0DiLovGRC8c8dI4FbuNPeVgQNUWoudUIaTbFkW9aeBGdz4duUD
+         Piyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmpEIO7H7HMFi3gZOKLKfBayJ2jHKjQBp+P5usrFAmnV6K+YNPBZS8frIsnC3Jld7QwaY6xrzOVaTqlxM7ibf+yj5EdLzk
+X-Gm-Message-State: AOJu0Yz215442C4xVj64hd3jtsHXSlcgLVS2HXAgoVkz8afxXs8yXcLm
+	xmNa5OAc6f1Wfu6HUEuinOavIoKaKsNsohExA3m9s+T7SIynaelMIchXq9o2kfKi4Tg/kAfOXCM
+	Dm+0Wlb8AleX4B30YaJN9dLdRy81hvhZxz79t7eZjI5BAqa4jHKda0kk=
+X-Google-Smtp-Source: AGHT+IF+2n7zn1UfCFOp6DlJf8yHFKu+OeqlDS+oZR+GYXF9k4iHMjrhU+HvfHdld3YLfNtgxmOXqDf/ZpuKeuOtBmhjaBq0/Uup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:410b:b0:4c0:9a3e:c264 with SMTP id
+ 8926c6da1cb9f-4c8d560a101mr652771173.2.1722997702349; Tue, 06 Aug 2024
+ 19:28:22 -0700 (PDT)
+Date: Tue, 06 Aug 2024 19:28:22 -0700
+In-Reply-To: <00000000000007103b061af41e81@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ff6cbe061f0ea910@google.com>
+Subject: Re: [syzbot] [wireless?] INFO: rcu detected stall in ieee80211_handle_queued_frames
+From: syzbot <syzbot+1c991592da3ef18957c0@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Stanislav Fomichev <sdf@fomichev.me>
+syzbot has found a reproducer for the following issue on:
 
-Implement netdev_stat_ops and export the basic per-queue stats.
+HEAD commit:    eb5e56d14912 Merge tag 'platform-drivers-x86-v6.11-2' of g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11536623980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9358cc4a2e37fd30
+dashboard link: https://syzkaller.appspot.com/bug?extid=1c991592da3ef18957c0
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1766fe4b980000
 
-This interface expect users to set the values that are used
-either to zero or to some other preserved value (they are 0xff by
-default). So here we export bytes/packets/drops from tx and rx_stats
-plus set some of the values that are exposed by queue stats
-to zero.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e2044b21f4b5/disk-eb5e56d1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ad2274fd812e/vmlinux-eb5e56d1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/dd82f6220580/bzImage-eb5e56d1.xz
 
-  $ cd tools/testing/selftests/drivers/net && ./stats.py
-  [...]
-  Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1c991592da3ef18957c0@syzkaller.appspotmail.com
 
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-.... } 3872 jiffies s: 3369 root: 0x1/.
+rcu: blocking rcu_node structures (internal RCU debug):
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 5298 Comm: kworker/0:3 Not tainted 6.11.0-rc2-syzkaller-00011-geb5e56d14912 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:__sanitizer_cov_trace_pc+0x0/0x70 kernel/kcov.c:200
+Code: 89 fb e8 23 00 00 00 48 8b 3d bc 7c 74 0c 48 89 de 5b e9 43 61 58 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <f3> 0f 1e fa 48 8b 04 24 65 48 8b 0c 25 00 d7 03 00 65 8b 15 a0 60
+RSP: 0018:ffffc90000005af0 EFLAGS: 00000002
+RAX: 0000000000010302 RBX: ffffc90000005b68 RCX: ffffffff91523000
+RDX: ffff88802a1f1e00 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 0000000000000001 R08: ffffffff814115f8 R09: ffffffff814130bf
+R10: 0000000000000003 R11: ffff88802a1f1e00 R12: ffff88802a1f1e00
+R13: ffffffff817f1c90 R14: dffffc0000000000 R15: 1ffff92000000b6d
+FS:  0000000000000000(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f729d8d2000 CR3: 000000000e534000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <IRQ>
+ unwind_get_return_address+0x71/0xc0 arch/x86/kernel/unwind_orc.c:369
+ arch_stack_walk+0x125/0x1b0 arch/x86/kernel/stacktrace.c:26
+ stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4189
+ kmalloc_noprof include/linux/slab.h:681 [inline]
+ dummy_urb_enqueue+0x7d/0x760 drivers/usb/gadget/udc/dummy_hcd.c:1271
+ usb_hcd_submit_urb+0x36c/0x1e80 drivers/usb/core/hcd.c:1533
+ __usb_hcd_giveback_urb+0x42c/0x6e0 drivers/usb/core/hcd.c:1650
+ dummy_timer+0x830/0x45a0 drivers/usb/gadget/udc/dummy_hcd.c:1987
+ __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
+ __hrtimer_run_queues+0x59b/0xd50 kernel/time/hrtimer.c:1753
+ hrtimer_interrupt+0x396/0x990 kernel/time/hrtimer.c:1815
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+ __sysvec_apic_timer_interrupt+0x110/0x3f0 arch/x86/kernel/apic/apic.c:1049
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0x52/0xc0 arch/x86/kernel/apic/apic.c:1043
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:_ieee802_11_parse_elems_full+0xbda/0x4a40 net/mac80211/parse.c:346
+Code: 24 a0 03 00 00 4c 89 ee 48 8b 54 24 40 e8 9e 7d 84 f9 89 c3 43 0f b6 04 3e 84 c0 0f 85 20 33 00 00 89 9c 24 a0 03 00 00 eb 16 <e8> f1 fc 67 f6 eb 15 e8 ea fc 67 f6 49 bf 00 00 00 00 00 fc ff df
+RSP: 0018:ffffc90000006880 EFLAGS: 00000246
+RAX: 0000000000000301 RBX: 0000000000000000 RCX: ffff88802a1f1e00
+RDX: ffff88802a1f1e00 RSI: 0000000000000003 RDI: 0000000000000040
+RBP: ffffc90000006c90 R08: ffffffff8b2b78b7 R09: 1ffff92000000d7c
+R10: dffffc0000000000 R11: fffff52000000d7d R12: ffff888056ebf32f
+R13: ffff888056ebf32f R14: 0000000000000003 R15: dffffc0000000000
+ ieee802_11_parse_elems_full+0xdff/0x2880 net/mac80211/parse.c:984
+ ieee802_11_parse_elems_crc net/mac80211/ieee80211_i.h:2361 [inline]
+ ieee802_11_parse_elems net/mac80211/ieee80211_i.h:2368 [inline]
+ ieee80211_inform_bss+0x15f/0x1080 net/mac80211/scan.c:79
+ rdev_inform_bss net/wireless/rdev-ops.h:418 [inline]
+ cfg80211_inform_single_bss_data+0xe93/0x2030 net/wireless/scan.c:2335
+ cfg80211_inform_bss_data+0x3dd/0x5a70 net/wireless/scan.c:3159
+ cfg80211_inform_bss_frame_data+0x3b8/0x720 net/wireless/scan.c:3254
+ ieee80211_bss_info_update+0x8a7/0xbc0 net/mac80211/scan.c:226
+ ieee80211_scan_rx+0x526/0x9c0 net/mac80211/scan.c:340
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5225 [inline]
+ ieee80211_rx_list+0x2b02/0x3780 net/mac80211/rx.c:5462
+ ieee80211_rx_napi+0x18a/0x3c0 net/mac80211/rx.c:5485
+ ieee80211_rx include/net/mac80211.h:5124 [inline]
+ ieee80211_handle_queued_frames+0xe7/0x1e0 net/mac80211/main.c:439
+ tasklet_action_common+0x321/0x4d0 kernel/softirq.c:785
+ handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:check_kcov_mode kernel/kcov.c:175 [inline]
+RIP: 0010:write_comp_data kernel/kcov.c:236 [inline]
+RIP: 0010:__sanitizer_cov_trace_const_cmp8+0x2f/0x90 kernel/kcov.c:311
+Code: 8b 04 24 65 48 8b 0c 25 00 d7 03 00 65 8b 05 c0 5b 70 7e a9 00 01 ff 00 74 10 a9 00 01 00 00 74 57 83 b9 1c 16 00 00 00 74 4e <8b> 81 f8 15 00 00 83 f8 03 75 43 48 8b 91 00 16 00 00 44 8b 89 fc
+RSP: 0018:ffffc900041660f8 EFLAGS: 00000246
+RAX: 0000000000000001 RBX: fffffffffffe6fc8 RCX: ffff88802a1f1e00
+RDX: ffff88802a1f1e00 RSI: fffffffffffe6fc8 RDI: 0000000000000001
+RBP: ffffc900041662b0 R08: ffffffff81748c01 R09: ffffffff81748a2e
+R10: 0000000000000003 R11: ffff88802a1f1e00 R12: dffffc0000000000
+R13: 00000000000008f4 R14: 1ffff9200082cc43 R15: 0000000000000002
+ desc_read_finalized_seq kernel/printk/printk_ringbuffer.c:1894 [inline]
+ prb_read kernel/printk/printk_ringbuffer.c:1922 [inline]
+ _prb_read_valid+0x461/0xac0 kernel/printk/printk_ringbuffer.c:2113
+ prb_read_valid+0xa9/0xf0 kernel/printk/printk_ringbuffer.c:2182
+ printk_get_next_message+0x1ee/0xbe0 kernel/printk/printk.c:2895
+ console_emit_next_record kernel/printk/printk.c:2950 [inline]
+ console_flush_all+0x410/0xfd0 kernel/printk/printk.c:3049
+ console_unlock+0x13b/0x4d0 kernel/printk/printk.c:3118
+ vprintk_emit+0x5a6/0x770 kernel/printk/printk.c:2348
+ dev_vprintk_emit+0x2ae/0x330 drivers/base/core.c:4909
+ dev_printk_emit+0xdd/0x120 drivers/base/core.c:4920
+ _dev_info+0x122/0x170 drivers/base/core.c:4978
+ line6_probe+0x997/0xbc0 sound/usb/line6/driver.c:809
+ usb_probe_interface+0x645/0xbb0 drivers/usb/core/driver.c:399
+ really_probe+0x2b8/0xad0 drivers/base/dd.c:657
+ __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:799
+ driver_probe_device+0x50/0x430 drivers/base/dd.c:829
+ __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:957
+ bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:457
+ __device_attach+0x333/0x520 drivers/base/dd.c:1029
+ bus_probe_device+0x189/0x260 drivers/base/bus.c:532
+ device_add+0x856/0xbf0 drivers/base/core.c:3679
+ usb_set_configuration+0x1976/0x1fb0 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0x88/0x140 drivers/usb/core/generic.c:254
+ usb_probe_device+0x1b8/0x380 drivers/usb/core/driver.c:294
+ really_probe+0x2b8/0xad0 drivers/base/dd.c:657
+ __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:799
+ driver_probe_device+0x50/0x430 drivers/base/dd.c:829
+ __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:957
+ bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:457
+ __device_attach+0x333/0x520 drivers/base/dd.c:1029
+ bus_probe_device+0x189/0x260 drivers/base/bus.c:532
+ device_add+0x856/0xbf0 drivers/base/core.c:3679
+ usb_new_device+0x104a/0x19a0 drivers/usb/core/hub.c:2651
+ hub_port_connect drivers/usb/core/hub.c:5521 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5661 [inline]
+ port_event drivers/usb/core/hub.c:5821 [inline]
+ hub_event+0x2d6a/0x5150 drivers/usb/core/hub.c:5903
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
 ---
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 67 +++++++++++++++++++
- 1 file changed, 67 insertions(+)
-
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index a048e4a617eb..571374361259 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -4,6 +4,7 @@
- #include <linux/etherdevice.h>
- #include <linux/ipv6.h>
- #include <linux/types.h>
-+#include <net/netdev_queues.h>
- 
- #include "fbnic.h"
- #include "fbnic_netdev.h"
-@@ -395,6 +396,71 @@ static const struct net_device_ops fbnic_netdev_ops = {
- 	.ndo_get_stats64	= fbnic_get_stats64,
- };
- 
-+static void fbnic_get_queue_stats_rx(struct net_device *dev, int idx,
-+				     struct netdev_queue_stats_rx *rx)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+	struct fbnic_ring *rxr = fbn->rx[idx];
-+	struct fbnic_queue_stats *stats;
-+	unsigned int start;
-+	u64 bytes, packets;
-+
-+	if (!rxr)
-+		return;
-+
-+	stats = &rxr->stats;
-+	do {
-+		start = u64_stats_fetch_begin(&stats->syncp);
-+		bytes = stats->bytes;
-+		packets = stats->packets;
-+	} while (u64_stats_fetch_retry(&stats->syncp, start));
-+
-+	rx->bytes = bytes;
-+	rx->packets = packets;
-+}
-+
-+static void fbnic_get_queue_stats_tx(struct net_device *dev, int idx,
-+				     struct netdev_queue_stats_tx *tx)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+	struct fbnic_ring *txr = fbn->tx[idx];
-+	struct fbnic_queue_stats *stats;
-+	unsigned int start;
-+	u64 bytes, packets;
-+
-+	if (!txr)
-+		return;
-+
-+	stats = &txr->stats;
-+	do {
-+		start = u64_stats_fetch_begin(&stats->syncp);
-+		bytes = stats->bytes;
-+		packets = stats->packets;
-+	} while (u64_stats_fetch_retry(&stats->syncp, start));
-+
-+	tx->bytes = bytes;
-+	tx->packets = packets;
-+}
-+
-+static void fbnic_get_base_stats(struct net_device *dev,
-+				 struct netdev_queue_stats_rx *rx,
-+				 struct netdev_queue_stats_tx *tx)
-+{
-+	struct fbnic_net *fbn = netdev_priv(dev);
-+
-+	tx->bytes = fbn->tx_stats.bytes;
-+	tx->packets = fbn->tx_stats.packets;
-+
-+	rx->bytes = fbn->rx_stats.bytes;
-+	rx->packets = fbn->rx_stats.packets;
-+}
-+
-+static const struct netdev_stat_ops fbnic_stat_ops = {
-+	.get_queue_stats_rx	= fbnic_get_queue_stats_rx,
-+	.get_queue_stats_tx	= fbnic_get_queue_stats_tx,
-+	.get_base_stats		= fbnic_get_base_stats,
-+};
-+
- void fbnic_reset_queues(struct fbnic_net *fbn,
- 			unsigned int tx, unsigned int rx)
- {
-@@ -453,6 +519,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 	fbd->netdev = netdev;
- 
- 	netdev->netdev_ops = &fbnic_netdev_ops;
-+	netdev->stat_ops = &fbnic_stat_ops;
- 
- 	fbn = netdev_priv(netdev);
- 
--- 
-2.45.2
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
