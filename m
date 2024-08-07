@@ -1,476 +1,253 @@
-Return-Path: <netdev+bounces-116346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFDE294A16B
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:13:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F5F94A171
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:15:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F61A1C22577
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:13:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D7A72830C8
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:15:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F4A1C4612;
-	Wed,  7 Aug 2024 07:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2C5198A21;
+	Wed,  7 Aug 2024 07:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hFGPHx0j"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PmhUtXZJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C521C4601;
-	Wed,  7 Aug 2024 07:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4712E745CB
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 07:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723014777; cv=none; b=llnMXyEAWgJS1xSKVHfMizzFidbQakpM5ON10KVFhuCmwnazv1tv1VBitdnOSGRE0HczkvFcfAdUqepVLZrmI9Y3kPscmsF7hjgfJRJ66Rn/sRcpozaDBjkc3z3uJYJ6HlNtyP+EmPLBSg6iXv+0HCcGtTYNxGwKMCJKhaaeY8c=
+	t=1723014944; cv=none; b=u8AhuwyjBw48BJ8+l1rb9vuLgzB4gQHJ5RCWbnZSQ/KqFssUNx1YJgzdb30uCDxRleYc6nGS3Rdq6cYe2DY+Sa8fR7t8kmjXqo3lYcUvWq1yee7LW8fU4yvAXvZT/w232OxI7d0RpQI799ERveeo6qSQbxO6ihdoAhtqUjfRxzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723014777; c=relaxed/simple;
-	bh=lCiE5ym/oCHFgZrrUzyDhcsP7DhZ6ALw+YqZgLBCark=;
+	s=arc-20240116; t=1723014944; c=relaxed/simple;
+	bh=pLe7E9aaNY0TWy69yuvvKq6Qq1S+odBH/Mgkx5n42mg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mBvy/UwuW6tpCHuvAh9bnSmJ5nj2fq3b/W28mG3JjAtdA8D2KJnNl4nz9PyvCKkE9dSCNsOyP50RBKv8uK7lEGswZBdUPL8MjtRqDLU3v+zrWwKR7nBbj1r8rz0GHsMxo4HV/b/C7x1hcKy3Ha2F1nIx9G42aVxxQ2Qyr1Ek2+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hFGPHx0j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBBBEC32782;
-	Wed,  7 Aug 2024 07:12:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723014776;
-	bh=lCiE5ym/oCHFgZrrUzyDhcsP7DhZ6ALw+YqZgLBCark=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hFGPHx0jLVGEUFj47JkFUsCVaOXmPDPXsk5BclQOV4bXqukUlv4es6cEIHAIjosE5
-	 3bhlPka42+xGq/6WyF6b9qY4dhwhU7PBLpVrIjtnOyMXjHcmaqjPuqWuU6Ql6bCXfB
-	 FYUHgb0zsbFayB+bbg0ubQp07tufp/8aqSmEKYbcPUjixqgs+nWAe/q67wRqqBgU7U
-	 fl34CzsMhONWHh01sU/hJPQfOHsMsuEhsishqNHqiUH2t8oJBadF837KPwpRl0zuGR
-	 JdOd/eIagXfLqVCE/A9p45ajMb6G2uEwwtMbMOHev7ETnaqxzU2eZTuPs8EKv+wBBn
-	 O4ywvTp5kKRiA==
-Message-ID: <5020193f-64f5-48ff-8597-8e6a5ca0fb36@kernel.org>
-Date: Wed, 7 Aug 2024 09:12:49 +0200
+	 In-Reply-To:Content-Type; b=Fe62wouAeGk0O2MSw3fCCZu5wJyzWb2XZr8dgcNQcd27/80FgmyHVmec3zyhLAqSFFUzADsAJ1N+q4zYtdQBsPecebYG8fCjufXcPxyjVxZTIK9xYKXqyWNi9a6gnvy2M5X80gDX9pzbRt2D1UjsPm/qV74hZa0QCFbZ+yLM7NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PmhUtXZJ; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <35e9ba13-cbd6-4ecd-a8e4-5f4acb40d9b8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723014939;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C5kjWz+KJm/pCpzpaTO1D6hGWXgahTZ/5aDEaomL05Y=;
+	b=PmhUtXZJuZ+C7wSYmQt0QNJ876VN7RLJ5SWDeOWtIBf2TeIeFIR6HNcmTXeTfu72cC6UOo
+	6TCgxdFex4g/9y77C5MHGs8CJchyum2684MVtG4DQhWYmtacJgZDEAU6yfGfDu/owzBBLc
+	G5Egi2RbrOIJj0AqamRMuamdnc6JFHY=
+Date: Wed, 7 Aug 2024 15:15:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/17] wifi: cc33xx: Add sdio.c, io.c, io.h
-To: Michael Nemanov <michael.nemanov@ti.com>, Kalle Valo <kvalo@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Sabeeh Khan <sabeeh-khan@ti.com>
-References: <20240806170018.638585-1-michael.nemanov@ti.com>
- <20240806170018.638585-4-michael.nemanov@ti.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next v16 12/14] net: stmmac: dwmac-loongson: Add
+ Loongson Multi-channels GMAC support
+To: Serge Semin <fancer.lancer@gmail.com>, Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, diasyzhang@tencent.com,
+ Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
+ Huacai Chen <chenhuacai@loongson.cn>
+References: <cover.1722924540.git.siyanteng@loongson.cn>
+ <bd73bc86c1387f9786c610ab55b3c4dd47b907c2.1722924540.git.siyanteng@loongson.cn>
+ <4hqv526s32ldakdd3f6ue26q2sajdreyfdrivlwpmhpovwcjns@n7t7u2yqceaw>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240806170018.638585-4-michael.nemanov@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 06/08/2024 19:00, Michael Nemanov wrote:
-> sdio.c implements SDIO transport functions. These are bound into
-> struct cc33xx_if_operations and accessed via io.h in order to abstract
-> multiple transport interfaces such as SPI in the future.
-> The CC33xx driver supports the SDIO in-band IRQ option so the IRQ from
-> the device received here as well.
-> Unlike wl1xxx products, there is no longer mapping between
-> HW and SDIO / SPI address space of any kind.
-> There are only 3 valid addresses for control, data and status
-> transactions each with a predefined structure.
-> 
-> Signed-off-by: Michael Nemanov <michael.nemanov@ti.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: YanTeng Si <si.yanteng@linux.dev>
+In-Reply-To: <4hqv526s32ldakdd3f6ue26q2sajdreyfdrivlwpmhpovwcjns@n7t7u2yqceaw>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
 
-...
+在 2024/8/7 3:17, Serge Semin 写道:
+> On Tue, Aug 06, 2024 at 07:00:22PM +0800, Yanteng Si wrote:
+>> The Loongson DWMAC driver currently supports the Loongson GMAC
+>> devices (based on the DW GMAC v3.50a/v3.73a IP-core) installed to the
+>> LS2K1000 SoC and LS7A1000 chipset. But recently a new generation
+>> LS2K2000 SoC was released with the new version of the Loongson GMAC
+>> synthesized in. The new controller is based on the DW GMAC v3.73a
+>> IP-core with the AV-feature enabled, which implies the multi
+>> DMA-channels support. The multi DMA-channels feature has the next
+>> vendor-specific peculiarities:
+>>
+>> 1. Split up Tx and Rx DMA IRQ status/mask bits:
+>>         Name              Tx          Rx
+>>    DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
+>>    DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
+>>    DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
+>>    DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
+>>    DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
+>> 2. Custom Synopsys ID hardwired into the GMAC_VERSION.SNPSVER register
+>> field. It's 0x10 while it should have been 0x37 in accordance with
+>> the actual DW GMAC IP-core version.
+>> 3. There are eight DMA-channels available meanwhile the Synopsys DW
+>> GMAC IP-core supports up to three DMA-channels.
+>> 4. It's possible to have each DMA-channel IRQ independently delivered.
+>> The MSI IRQs must be utilized for that.
+>>
+>> Thus in order to have the multi-channels Loongson GMAC controllers
+>> supported let's modify the Loongson DWMAC driver in accordance with
+>> all the peculiarities described above:
+>>
+>> 1. Create the multi-channels Loongson GMAC-specific
+>>     stmmac_dma_ops::dma_interrupt()
+>>     stmmac_dma_ops::init_chan()
+>>     callbacks due to the non-standard DMA IRQ CSR flags layout.
+>> 2. Create the Loongson DWMAC-specific platform setup() method
+>> which gets to initialize the DMA-ops with the dwmac1000_dma_ops
+>> instance and overrides the callbacks described in 1. The method also
+>> overrides the custom Synopsys ID with the real one in order to have
+>> the rest of the HW-specific callbacks correctly detected by the driver
+>> core.
+>> 3. Make sure the platform setup() method enables the flow control and
+>> duplex modes supported by the controller.
+>>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Acked-by: Huacai Chen <chenhuacai@loongson.cn>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> ---
+>>
+>> ...
+>>
+>> +
+>> +static int loongson_dwmac_msi_config(struct pci_dev *pdev,
+>> +				     struct plat_stmmacenet_data *plat,
+>> +				     struct stmmac_resources *res)
+>> +{
+>> +	int i, ret, vecs;
+>> +
+>> +	vecs = roundup_pow_of_two(CHANNEL_NUM * 2 + 1);
+>> +	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
+>> +	if (ret < 0) {
+>> +		dev_warn(&pdev->dev, "Failed to allocate MSI IRQs\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	res->irq = pci_irq_vector(pdev, 0);
+>> +
+>> +	for (i = 0; i < plat->rx_queues_to_use; i++) {
+>> +		res->rx_irq[CHANNEL_NUM - 1 - i] =
+>> +			pci_irq_vector(pdev, 1 + i * 2);
+>> +	}
+>> +
+>> +	for (i = 0; i < plat->tx_queues_to_use; i++) {
+>> +		res->tx_irq[CHANNEL_NUM - 1 - i] =
+>> +			pci_irq_vector(pdev, 2 + i * 2);
+>> +	}
+>> +
+>> +	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void loongson_dwmac_msi_clear(struct pci_dev *pdev)
+>> +{
+>> +	pci_free_irq_vectors(pdev);
+>> +}
+>> +
+>>   static int loongson_dwmac_dt_config(struct pci_dev *pdev,
+>>   				    struct plat_stmmacenet_data *plat,
+>>   				    struct stmmac_resources *res)
+>> @@ -146,6 +450,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	struct plat_stmmacenet_data *plat;
+>>   	struct stmmac_pci_info *info;
+>>   	struct stmmac_resources res;
+>> +	struct loongson_data *ld;
+>>   	int ret, i;
+>>   
+>>   	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+>> @@ -162,6 +467,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	if (!plat->dma_cfg)
+>>   		return -ENOMEM;
+>>   
+>> +	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
+>> +	if (!ld)
+>> +		return -ENOMEM;
+>> +
+>>   	/* Enable pci device */
+>>   	ret = pci_enable_device(pdev);
+>>   	if (ret) {
+>> @@ -184,6 +493,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	memset(&res, 0, sizeof(res));
+>>   	res.addr = pcim_iomap_table(pdev)[0];
+>>   
+>> +	plat->bsp_priv = ld;
+>> +	plat->setup = loongson_dwmac_setup;
+>> +	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+>> +
+>>   	info = (struct stmmac_pci_info *)id->driver_data;
+>>   	ret = info->setup(pdev, plat);
+>>   	if (ret)
+>> @@ -196,6 +509,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   	if (ret)
+>>   		goto err_disable_device;
+>>   
+>> +	/* Use the common MAC IRQ if per-channel MSIs allocation failed */
+>> +	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
+>> +		loongson_dwmac_msi_config(pdev, plat, &res);
+>> +
+>>   	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>>   	if (ret)
+>>   		goto err_plat_clear;
+>> @@ -205,6 +522,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>   err_plat_clear:
+>>   	if (dev_of_node(&pdev->dev))
+>>   		loongson_dwmac_dt_clear(pdev, plat);
+>> +	loongson_dwmac_msi_clear(pdev);
+> Em, why have you dropped the if-statement here? That has caused the
+> Simon note to be posted. Please get it back:
+> +	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
+> +		loongson_dwmac_msi_clear(pdev);
+OK.
+>
+>>   err_disable_device:
+>>   	pci_disable_device(pdev);
+>>   	return ret;
+>> @@ -214,12 +532,15 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+>>   {
+>>   	struct net_device *ndev = dev_get_drvdata(&pdev->dev);
+>>   	struct stmmac_priv *priv = netdev_priv(ndev);
+>> +	struct loongson_data *ld;
+>>   	int i;
+>>   
+>> +	ld = priv->plat->bsp_priv;
+>>   	stmmac_dvr_remove(&pdev->dev);
+>>   
+>>   	if (dev_of_node(&pdev->dev))
+>>   		loongson_dwmac_dt_clear(pdev, priv->plat);
+>> +	loongson_dwmac_msi_clear(pdev);
+> Ditto. Please get back the conditional MSI-clear method execution:
+> +
+> +	if (ld->loongson_id == DWMAC_CORE_LS_MULTICHAN)
+> +		loongson_dwmac_msi_clear(pdev);
+>
+> * Note the empty line above the if-statement.
 
-> +
-> +#include <linux/mmc/sdio_func.h>
-> +#include <linux/mmc/host.h>
-> +#include <linux/gpio.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/of_irq.h>
-> +
-> +#include "cc33xx.h"
-> +#include "io.h"
-> +
-> +#ifndef SDIO_VENDOR_ID_TI
-> +#define SDIO_VENDOR_ID_TI		0x0097
-> +#endif
-> +
-> +#define SDIO_DEVICE_ID_CC33XX_NO_EFUSE	0x4076
-> +#define SDIO_DEVICE_ID_TI_CC33XX	0x4077
-> +
-> +static bool dump;
-
-Drop.
-
-> +
-> +struct cc33xx_sdio_glue {
-> +	struct device *dev;
-> +	struct platform_device *core;
-> +};
-> +
-> +static const struct sdio_device_id cc33xx_devices[] = {
-> +	{ SDIO_DEVICE(SDIO_VENDOR_ID_TI, SDIO_DEVICE_ID_TI_CC33XX) },
-> +	{ SDIO_DEVICE(SDIO_VENDOR_ID_TI, SDIO_DEVICE_ID_CC33XX_NO_EFUSE) },
-> +	{}
-> +};
-> +MODULE_DEVICE_TABLE(sdio, cc33xx_devices);
-
-Keep all tables next to each other - bottom of the driver. Spreading
-same type of structures over the file does not help in review.
-
-> +
+OK, Thanks!
 
 
-> +
-> +static struct cc33xx_if_operations sdio_ops_gpio_irq = {
+Thanks,
 
-Why this is not const?
+Yanteng
 
-> +	.interface_claim	= cc33xx_sdio_claim,
-> +	.interface_release	= cc33xx_sdio_release,
-> +	.read			= cc33xx_sdio_raw_read,
-> +	.write			= cc33xx_sdio_raw_write,
-> +	.power			= cc33xx_sdio_set_power,
-> +	.set_block_size	= cc33xx_sdio_set_block_size,
-> +	.set_irq_handler	= cc33xx_set_irq_handler,
-> +	.disable_irq		= cc33xx_disable_line_irq,
-> +	.enable_irq		= cc33xx_enable_line_irq,
-> +};
-> +
-> +static struct cc33xx_if_operations sdio_ops_inband_irq = {
-> +	.interface_claim	= cc33xx_sdio_claim,
-> +	.interface_release	= cc33xx_sdio_release,
-> +	.read			= cc33xx_sdio_raw_read,
-> +	.write			= cc33xx_sdio_raw_write,
-> +	.power			= cc33xx_sdio_set_power,
-> +	.set_block_size	= cc33xx_sdio_set_block_size,
-> +	.set_irq_handler	= cc33xx_set_irq_handler,
-> +	.disable_irq		= cc33xx_sdio_disable_irq,
-> +	.enable_irq		= cc33xx_sdio_enable_irq,
-> +};
-> +
-> +#ifdef CONFIG_OF
-> +static const struct cc33xx_family_data cc33xx_data = {
-> +	.name = "cc33xx",
-> +	.cfg_name = "ti-connectivity/cc33xx-conf.bin",
-> +	.nvs_name = "ti-connectivity/cc33xx-nvs.bin",
-> +};
-> +
-> +static const struct of_device_id cc33xx_sdio_of_match_table[] = {
-> +	{ .compatible = "ti,cc3300", .data = &cc33xx_data },
-> +	{ .compatible = "ti,cc3301", .data = &cc33xx_data },
-> +	{ .compatible = "ti,cc3350", .data = &cc33xx_data },
-> +	{ .compatible = "ti,cc3351", .data = &cc33xx_data },
-> +	{ }
-> +};
-
-
-Eh? What happened here? So devices are compatibles thus make them
-compatible in the bindings.
-
-> +
-> +static int sdio_cc33xx_probe(struct sdio_func *func,
-> +			     const struct sdio_device_id *id)
-> +{
-> +	struct cc33xx_platdev_data *pdev_data;
-> +	struct cc33xx_sdio_glue *glue;
-> +	struct resource res[1];
-> +	mmc_pm_flag_t mmcflags;
-> +	int ret = -ENOMEM;
-> +	int gpio_irq, wakeirq, irq_flags;
-> +	const char *chip_family;
-> +
-> +	/* We are only able to handle the wlan function */
-> +	if (func->num != 0x02)
-> +		return -ENODEV;
-> +
-> +	pdev_data = devm_kzalloc(&func->dev, sizeof(*pdev_data), GFP_KERNEL);
-> +	if (!pdev_data)
-> +		return -ENOMEM;
-> +
-> +	glue = devm_kzalloc(&func->dev, sizeof(*glue), GFP_KERNEL);
-> +	if (!glue)
-> +		return -ENOMEM;
-> +
-> +	glue->dev = &func->dev;
-> +
-> +	/* Grab access to FN0 for ELP reg. */
-> +	func->card->quirks |= MMC_QUIRK_LENIENT_FN0;
-> +
-> +	/* Use block mode for transferring over one block size of data */
-> +	func->card->quirks |= MMC_QUIRK_BLKSZ_FOR_BYTE_MODE;
-> +
-> +	ret = cc33xx_probe_of(&func->dev, &gpio_irq, &wakeirq, pdev_data);
-> +	if (ret)
-> +		goto out;
-> +
-> +	/* if sdio can keep power while host is suspended, enable wow */
-> +	mmcflags = sdio_get_host_pm_caps(func);
-> +	dev_dbg(glue->dev, "sdio PM caps = 0x%x\n", mmcflags);
-> +
-> +	sdio_set_drvdata(func, glue);
-> +
-> +	/* Tell PM core that we don't need the card to be powered now */
-> +	pm_runtime_put_noidle(&func->dev);
-> +
-> +	chip_family = "cc33xx";
-
-That's usless assignment.
-> +
-> +	glue->core = platform_device_alloc(chip_family, PLATFORM_DEVID_AUTO);
-> +	if (!glue->core) {
-> +		dev_err(glue->dev, "can't allocate platform_device");
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	glue->core->dev.parent = &func->dev;
-> +
-> +	if (gpio_irq) {
-> +		dev_info(glue->dev, "Using GPIO as IRQ\n");
-
-Drop. Driver should be silent.
-
-> +
-> +		irq_flags = irqd_get_trigger_type(irq_get_irq_data(gpio_irq));
-> +
-> +		irq_set_status_flags(gpio_irq, IRQ_NOAUTOEN);
-> +
-> +		if (irq_flags & (IRQF_TRIGGER_HIGH | IRQF_TRIGGER_LOW))
-> +			irq_flags |= IRQF_ONESHOT;
-> +
-> +		ret = request_threaded_irq(gpio_irq, gpio_irq_hard_handler,
-> +					   gpio_irq_thread_handler,
-> +					   irq_flags, glue->core->name, func);
-> +		if (ret) {
-> +			dev_err(glue->dev, "can't register GPIO IRQ handler\n");
-> +			goto out_dev_put;
-> +		}
-> +
-> +		pdev_data->gpio_irq_num = gpio_irq;
-> +
-> +		if ((mmcflags & MMC_PM_KEEP_POWER) &&
-> +		    (enable_irq_wake(gpio_irq) == 0))
-> +			pdev_data->pwr_in_suspend = true;
-> +
-> +		pdev_data->if_ops = &sdio_ops_gpio_irq;
-> +	} else {
-> +		dev_info(glue->dev, "Using SDIO in-band IRQ\n");
-> +
-> +		pdev_data->if_ops = &sdio_ops_inband_irq;
-> +	}
-> +
-> +	if (wakeirq > 0) {
-> +		res[0].start = wakeirq;
-> +		res[0].flags = IORESOURCE_IRQ |
-> +			irqd_get_trigger_type(irq_get_irq_data(wakeirq));
-> +		res[0].name = "wakeirq";
-> +
-> +		ret = platform_device_add_resources(glue->core, res, 1);
-> +		if (ret) {
-> +			dev_err(glue->dev, "can't add resources\n");
-> +			goto out_dev_put;
-> +		}
-> +	}
-> +
-> +	ret = platform_device_add_data(glue->core, pdev_data,
-> +				       sizeof(*pdev_data));
-> +	if (ret) {
-> +		dev_err(glue->dev, "can't add platform data\n");
-> +		goto out_dev_put;
-> +	}
-> +
-> +	ret = platform_device_add(glue->core);
-> +	if (ret) {
-> +		dev_err(glue->dev, "can't add platform device\n");
-> +		goto out_dev_put;
-> +	}
-> +	return 0;
-> +
-> +out_dev_put:
-> +	platform_device_put(glue->core);
-> +
-> +	if (pdev_data->gpio_irq_num)
-> +		free_irq(pdev_data->gpio_irq_num, func);
-> +
-> +out:
-> +	return ret;
-> +}
-> +
-> +static void sdio_cc33xx_remove(struct sdio_func *func)
-> +{
-> +	struct cc33xx_sdio_glue *glue = sdio_get_drvdata(func);
-> +	struct platform_device *pdev = glue->core;
-> +	struct cc33xx_platdev_data *pdev_data = dev_get_platdata(&pdev->dev);
-> +
-> +	/* Undo decrement done above in sdio_cc33xx_probe */
-> +	pm_runtime_get_noresume(&func->dev);
-> +
-> +	platform_device_unregister(glue->core);
-> +
-> +	if (pdev_data->gpio_irq_num) {
-> +		free_irq(pdev_data->gpio_irq_num, func);
-> +		if (pdev_data->pwr_in_suspend)
-> +			disable_irq_wake(pdev_data->gpio_irq_num);
-> +	} else {
-> +		sdio_claim_host(func);
-> +		sdio_release_irq(func);
-> +		sdio_release_host(func);
-> +	}
-> +}
-> +
-> +#ifdef CONFIG_PM
-> +static int cc33xx_suspend(struct device *dev)
-> +{
-> +	/* Tell MMC/SDIO core it's OK to power down the card
-> +	 * (if it isn't already), but not to remove it completely
-> +	 */
-> +	struct sdio_func *func = dev_to_sdio_func(dev);
-> +	struct cc33xx_sdio_glue *glue = sdio_get_drvdata(func);
-> +	struct cc33xx *cc = platform_get_drvdata(glue->core);
-> +	mmc_pm_flag_t sdio_flags;
-> +	int ret = 0;
-> +
-> +	if (!cc) {
-> +		dev_err(dev, "no wilink module was probed\n");
-> +		goto out;
-> +	}
-> +
-> +	dev_dbg(dev, "cc33xx suspend. keep_device_power: %d\n",
-> +		cc->keep_device_power);
-> +
-> +	if (cc->keep_device_power) {
-> +		sdio_flags = sdio_get_host_pm_caps(func);
-> +
-> +		if (!(sdio_flags & MMC_PM_KEEP_POWER)) {
-> +			dev_err(dev, "can't keep power while host is suspended\n");
-> +			ret = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		/* keep power while host suspended */
-> +		ret = sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
-> +		if (ret) {
-> +			dev_err(dev, "error while trying to keep power\n");
-> +			goto out;
-> +		}
-> +	}
-> +out:
-> +	return ret;
-> +}
-> +
-> +static int cc33xx_resume(struct device *dev)
-> +{
-> +	dev_dbg(dev, "cc33xx resume\n");
-
-I asked to drop such silly confirmation messages. Kernel has already
-infrastructure for this.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct dev_pm_ops cc33xx_sdio_pm_ops = {
-> +	.suspend	= cc33xx_suspend,
-> +	.resume		= cc33xx_resume,
-> +};
-> +
-> +static struct sdio_driver cc33xx_sdio_driver = {
-> +	.name		= "cc33xx_sdio",
-> +	.id_table	= cc33xx_devices,
-> +	.probe		= sdio_cc33xx_probe,
-> +	.remove		= sdio_cc33xx_remove,
-> +	.drv = {
-> +		.pm = &cc33xx_sdio_pm_ops,
-> +	},
-> +};
-> +#else
-
-No, that's terrible, you cannot have two drivers! Look how drivers are
-doing - there is a wrapper or just use maybe_unused.
-
-> +static struct sdio_driver cc33xx_sdio_driver = {
-> +	.name		= "cc33xx_sdio",
-> +	.id_table	= cc33xx_devices,
-> +	.probe		= sdio_cc33xx_probe,
-> +	.remove		= sdio_cc33xx_remove,
-> +};
-> +#endif /* CONFIG_PM */
-> +
-> +static int __init sdio_cc33xx_init(void)
-> +{
-> +	return sdio_register_driver(&cc33xx_sdio_driver);
-> +}
-> +
-> +static void __exit sdio_cc33xx_exit(void)
-> +{
-> +	sdio_unregister_driver(&cc33xx_sdio_driver);
-> +}
-> +
-> +module_init(sdio_cc33xx_init);
-> +module_exit(sdio_cc33xx_exit);
-
-Look at other drivers how they do it - there is a wrapper.
-
-> +
-> +module_param(dump, bool, 0600);
-> +MODULE_PARM_DESC(dump, "Enable sdio read/write dumps.");
-
-This should be rather debug interface, not module param.
-
-> +
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_DESCRIPTION("SDIO transport for Texas Instruments CC33xx WLAN driver");
-> +MODULE_AUTHOR("Michael Nemanov <michael.nemanov@ti.com>");
-> +MODULE_AUTHOR("Sabeeh Khan <sabeeh-khan@ti.com>");
-
-Best regards,
-Krzysztof
-
+>
+> -Serge(y)
+>
+>>   
+>>   	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
+>>   		if (pci_resource_len(pdev, i) == 0)
+>> -- 
+>> 2.31.4
+>>
 
