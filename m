@@ -1,109 +1,123 @@
-Return-Path: <netdev+bounces-116324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651A4949F2B
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:29:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137E4949F47
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:43:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1BF8287745
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 05:29:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4813287DA1
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 05:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201F818EFFF;
-	Wed,  7 Aug 2024 05:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506911953A9;
+	Wed,  7 Aug 2024 05:42:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE35801
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 05:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A8F19408D
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 05:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723008550; cv=none; b=n/ZdOOfrgQ7j5LAhngzaMj7VU3Ohk4sK0FEzwSoVyiJkGctx2oQSrpUNk+QapTsr97FeqTzM9EKSFvK2L9K4lpQjDyLlW2QtQxQv759wi6QOxUbPKk9gsu7MqGcTSe/UGJaFTb1c3/sxVrDj1gusscJKZQ+QeeejAb1Gu8G030s=
+	t=1723009378; cv=none; b=nO04f/VskSTPIMielACu1MqLE2aqE9ikmcTA2HRwx11WkTV/9qy3TbQII5NE7IBVpHjwKG+Gf++8UlQlcgOdGcaDlidWxXCqyN+P3lnptWntyqnTt9t1meqm1g939oqwFbDjI7QuJJ16obT7L8eekSHpEXkOIq4xrWUmruQi/7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723008550; c=relaxed/simple;
-	bh=GsX/VlGw9zFguEQ5Bhn6H3AAYM2djEcPB7s4LVQYrIc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zq5YeEBxcbkTGAW5Q8kdemlqL7AJBqJFWoo2bcwUCBu9AmegDoOC7UMIJQL5l+P7XNX6Gf1CkLWOt4/qDDEIOHPIUcE0J0UejkHnHIGMxgbpHhw374lgHYPGPaRvn62JkHB+FJj09iBmtGc6J/CU6rS7xtxql/irS3W0prM9SfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.3] (ip5f5af7d2.dynamic.kabel-deutschland.de [95.90.247.210])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 78B0761E5FE01;
-	Wed,  7 Aug 2024 07:28:41 +0200 (CEST)
-Message-ID: <9a23f5ec-190c-4525-b2fb-e10fc55b60f6@molgen.mpg.de>
-Date: Wed, 7 Aug 2024 07:28:40 +0200
+	s=arc-20240116; t=1723009378; c=relaxed/simple;
+	bh=xnGsP+1OdZJxHM1PrvNg7PQYCLUaOKJl4KoZSAwAWtY=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=L670WDZ1wz/yms3n58C/HuqkxDwTEH7HtLuY2bjMsHcJxclv9mWMCmRNHezPtgdz2k2zEEQf6EwsBOGAl+kbs8HwoHE9YX5Lq+avyuXZxt6/82bchjEs9UUJG9TKv+1LlV6yqy9EwjlYel6tks2t6D2KnIhsIryrGNUWq3HPIPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpsz11t1723009338th3cm3
+X-QQ-Originating-IP: ELvYu1tqzvdSVucL1tR6r9E6YFk07zADEw2nScpqwGQ=
+Received: from smtpclient.apple ( [60.186.245.110])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 07 Aug 2024 13:42:16 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 6930022033209959896
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1 4/5] igc: Reduce retry count
- to a more reasonable number
-To: Christopher S M Hall <christopher.s.hall@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
- vinschen@redhat.com, vinicius.gomes@intel.com, netdev@vger.kernel.org,
- rodrigo.cadore@l-acoustics.com
-References: <20240807003032.10300-1-christopher.s.hall@intel.com>
- <20240807003032.10300-5-christopher.s.hall@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240807003032.10300-5-christopher.s.hall@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-Dear Christopher,
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3814.100.5\))
+Subject: Re: [PATCH net] net: ngbe: Fix phy mode set to external phy
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <1e537389-7f4b-4918-9353-09f0e16af9f8@intel.com>
+Date: Wed, 7 Aug 2024 13:42:06 +0800
+Cc: netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4CF76B28-E242-47B2-B62C-4CB8EBE44E92@net-swift.com>
+References: <C1587837D62D1BC0+20240806082520.29193-1-mengyuanlou@net-swift.com>
+ <1e537389-7f4b-4918-9353-09f0e16af9f8@intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+X-Mailer: Apple Mail (2.3814.100.5)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
 
-Thank you for your patch.
 
-In the summary, I’d add specific values:
+> 2024=E5=B9=B48=E6=9C=886=E6=97=A5 19:13=EF=BC=8CPrzemek Kitszel =
+<przemyslaw.kitszel@intel.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On 8/6/24 10:25, Mengyuan Lou wrote:
+>> When use rgmmi to attach to external phy, set
+>> PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
+>> And it is does matter to internal phy.
+>=20
+> 107=E2=94=82  * @PHY_INTERFACE_MODE_RGMII: Reduced gigabit =
+media-independent interface
+> 108=E2=94=82  * @PHY_INTERFACE_MODE_RGMII_ID: RGMII with Internal =
+RX+TX delay
+> 109=E2=94=82  * @PHY_INTERFACE_MODE_RGMII_RXID: RGMII with Internal RX =
+delay
+> 110=E2=94=82  * @PHY_INTERFACE_MODE_RGMII_TXID: RGMII with Internal RX =
+delay
+>=20
+> Your change effectively disables Internal Tx delay, but your commit
+> message does not tell about that. It also does not tell about why,
+> nor what is wrong in current behavior.
+>=20
 
-igc: Reduce retry count to from 100 to reasonable 8
-
-
-Am 07.08.24 um 02:30 schrieb christopher.s.hall@intel.com:
-> From: Christopher S M Hall <christopher.s.hall@intel.com>
-> 
-> Setting the retry count to 8x is more than sufficient. 100x is unreasonable
->  and would indicate broken hardware/firmware.
-
-I’d remove the leading space.
-
-Is using a 100 causing so much more delay and debugging an issue is harder?
-
-> Fixes: a90ec8483732 ("igc: Add support for PTP getcrosststamp()")
-> Signed-off-by: Christopher S M Hall <christopher.s.hall@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_ptp.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-> index fb885fcaa97c..f770e39650ef 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-> @@ -1008,8 +1008,8 @@ static int igc_phc_get_syncdevicetime(ktime_t *device,
->   	u32 stat, t2_curr_h, t2_curr_l;
->   	struct igc_adapter *adapter = ctx;
->   	struct igc_hw *hw = &adapter->hw;
-> -	int err, count = 100;
->   	ktime_t t1, t2_curr;
-> +	int err, count = 8;
-
-Is there data available that no more than 8 retries were needed?
-
->   	/* Doing this in a loop because in the event of a
->   	 * badly timed (ha!) system clock adjustment, we may
+I will add it, when wangxun em Nics are used as a Mac to attach to =
+external phy.
+We should disable tx delay.
 
 
-Kind regards,
+>> Fixes: a1cf597b99a7 ("net: ngbe: Add ngbe mdio bus driver.")
+>=20
 
-Paul
+Fixes: bc2426d74aa3 ("net: ngbe: convert phylib to phylink")
+
+I just want to fix it both in a1cf597b99a7 and bc2426d74aa3 commits.
+How can I do it.
+
+> This commit indeed has introduced the line you are changing,
+> but without explanation, this is not a bugfix.
+>=20
+>> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+>> ---
+>>  drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c =
+b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+>> index ba33a57b42c2..be99ef5833da 100644
+>> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+>> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+>> @@ -218,7 +218,7 @@ int ngbe_phy_connect(struct wx *wx)
+>>   ret =3D phy_connect_direct(wx->netdev,
+>>   wx->phydev,
+>>   ngbe_handle_link_change,
+>> - PHY_INTERFACE_MODE_RGMII_ID);
+>> + PHY_INTERFACE_MODE_RGMII_RXID);
+>>   if (ret) {
+>>   wx_err(wx, "PHY connect failed.\n");
+>>   return ret;
+>=20
+
 
