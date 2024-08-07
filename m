@@ -1,143 +1,203 @@
-Return-Path: <netdev+bounces-116591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D2894B1C9
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:12:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C6F94B1DA
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C92D1F229F2
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 21:12:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD6071F22394
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 21:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F243148FFF;
-	Wed,  7 Aug 2024 21:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gcT0qlXs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DAC14EC47;
+	Wed,  7 Aug 2024 21:14:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8484582D66
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 21:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E6D149DE4
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 21:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723065161; cv=none; b=C5ZlbcHGp5+yrQAHrhSRJqv7bKaTdUnIN+i2E5urHPGMAdEjyLrOqf5LGbfIg8af+vaUqXlcsTxRKiGxBL1z0OxK4HWlz8mAbXQQ2Dx18kscXFZiIuB4w6nU3vUC9kFkuNMmcufhNeFFCD3oXW518ZL5c0H0h/lhpj8UWGNYKAI=
+	t=1723065261; cv=none; b=DZYdihvrZhZyRMdCHyVRuemcUZVtUNWzwdkgxX+74F8Wf9dpjKJm39wVNiVr8W5ys+xsJ3VWVZezEMzgbmSPuqD00xoxLaDPUAkgW/cFpvguEmE4hkWcz5ZbCuhoWQ7MzWtzjyYj9j/xK2+lqs6WZ5AFpobx578FMatf2sn/ovw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723065161; c=relaxed/simple;
-	bh=qo8nZsm6qR+4IT+p5NEYEC9kk0HDmIkwnZdYcMGrcj0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k1YTkEZZa4Y2AgJZ5QtnYa3ovhmbXdluyHFa+nD6CUFOYwzTz2WjVYVVzXDLm+dmio1OX/OUcCcY4NkTdvsBcVf958mwlEdmnI8mrHjJ24C0VaGn7WCghKCy9P+qZwuGFFMIFGYMONY3ZLLzqRWyiU3zYw0C0NADKj0RV8yQ9qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gcT0qlXs; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f15dd0b489so2931221fa.3
-        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 14:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723065158; x=1723669958; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dfjw8iC34PrA5PHgz75UyLcqswZzkWFzyqGWptq5768=;
-        b=gcT0qlXsWpBud/L4/7c5+qN5lfpGZFM5Otz7pjuh/wAyuRUIcObiaEaqFvxaYO8HAx
-         n+EwecogWJK/NeNcpZiMK29FMJBg3VkhhvHodr4/63hfJuvBejPNBYv1NNimrVImJFnh
-         d8s/snLAuZ8XPe8rOeN0SD5PSIIoz6ahEp4VUKUHCOXdfEkLjZWOopT6rgQF2w8Js/2G
-         kzsoP+gIO61bkt7S7pjDmYoSbPtg860YpwSRYkzZKvJZ9oe2FV/1ZLgMWjeMHQKBxWR6
-         pYycsvtMoKE6yW0DVSuiBiqVAakxLRkK+K7T789zfQYl5yW/SC+9m+sHum6KtumAszlJ
-         Z1Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723065158; x=1723669958;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dfjw8iC34PrA5PHgz75UyLcqswZzkWFzyqGWptq5768=;
-        b=d0q9VWjWMmWDvp+lG4YROiG1N+Rzsjlu8fyXy6yJoWp+RR3wqQ2TESwJUqqfpcKnol
-         awS+shRRAtcIHkH8JK+FAakC9jtY9qlYqsfCaiCr+FVN3bej1pRhd1yLcHXPvSAskGtg
-         HIRYbz/oW4viR+rfK5BmBZT08OF5nYWnGJfMw12Qe9NTHW4VpKOqSR61xgKBjzrLdkyc
-         Yp+6kLArDSrxYUNhii/7PPL++xabwFkem8qMKeiOsrnVgG0I0wtM28fKn8R4daTPM19H
-         NYjArjzcqvrTA8QInznR9nhZmyuYclbSHkSBSjY9C/8B/t4TGfpeITl5KddVhCRa1VZq
-         PT7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXbbO1erVk3S7n+kIC2Tk1F4+MWVSqKV30ZCobuLh6jh2oqDBD5N8QgLVFloETW+6LJwuWRTe2pV8F+S3ECgJqNRiDYEgEC
-X-Gm-Message-State: AOJu0YwBdwkcbQZxnJZj1+28QmAaKrd9iFfg8xi49dSN3dbW1kXEoV6M
-	XvZp7Yf49U03Og4rujan6P/XrheR15MDRyFEDgtzNxAzsyKKBNc1At0L9Z4wVvmG6bwTtMmH3Q6
-	BIDGG5oJ2j12Yt1dnGP2o87PsIOM=
-X-Google-Smtp-Source: AGHT+IGLHyPSErT6XbM7Pthz1NGSMWPxH4uBFOjmVIvQPaaG2NXzSfEaGlZVl5vIP1t++h/q/XQKvHCHb9gGrKDdkBg=
-X-Received: by 2002:a2e:9c48:0:b0:2eb:68d0:88be with SMTP id
- 38308e7fff4ca-2f15aa8736amr130598781fa.12.1723065157219; Wed, 07 Aug 2024
- 14:12:37 -0700 (PDT)
+	s=arc-20240116; t=1723065261; c=relaxed/simple;
+	bh=ua5Db5PD8j+O8Z9xH5fu26afq+jy5oIdU2A1rjGhuSk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u0KnV1c8UzNtLNXhMp0VwcKigLW1TNCX3FljYgR533vbP6CJQPwU7PhZ4VJE1kNfU78siGth7/tTi/RAgXlMZph4hAV7asQM3QREQHVAbYFpJoYKl2OJzzZyjb02wUhAMwts5Ba6BytEFiijciy4mXAzjZciUZ6Le/MwZlGVvdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 5C3BD7D0C1;
+	Wed,  7 Aug 2024 21:14:18 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: devel@linux-ipsec.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org,
+	Christian Hopps <chopps@chopps.org>,
+	Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Antony Antony <antony@phenome.org>
+Subject: [PATCH ipsec-next v9 00/17] Add IP-TFS mode to xfrm
+Date: Wed,  7 Aug 2024 17:13:14 -0400
+Message-ID: <20240807211331.1081038-1-chopps@chopps.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240806-mvpp2-namelen-v1-1-6dc773653f2f@kernel.org>
-In-Reply-To: <20240806-mvpp2-namelen-v1-1-6dc773653f2f@kernel.org>
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Date: Wed, 7 Aug 2024 23:12:24 +0200
-Message-ID: <CAHzn2R2HCBEGgOf-8530zUsamL4T2XRLFVB420TtcbVWSBJMKg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: mvpp2: Increase size of queue_name buffer
-To: Simon Horman <horms@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-wt., 6 sie 2024 o 13:28 Simon Horman <horms@kernel.org> napisa=C5=82(a):
->
-> Increase size of queue_name buffer from 30 to 31 to accommodate
-> the largest string written to it. This avoids truncation in
-> the possibly unlikely case where the string is name is the
-> maximum size.
->
-> Flagged by gcc-14:
->
->   .../mvpp2_main.c: In function 'mvpp2_probe':
->   .../mvpp2_main.c:7636:32: warning: 'snprintf' output may be truncated b=
-efore the last format character [-Wformat-truncation=3D]
->    7636 |                  "stats-wq-%s%s", netdev_name(priv->port_list[0=
-]->dev),
->         |                                ^
->   .../mvpp2_main.c:7635:9: note: 'snprintf' output between 10 and 31 byte=
-s into a destination of size 30
->    7635 |         snprintf(priv->queue_name, sizeof(priv->queue_name),
->         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    7636 |                  "stats-wq-%s%s", netdev_name(priv->port_list[0=
-]->dev),
->         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~
->    7637 |                  priv->port_count > 1 ? "+" : "");
->         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> Introduced by commit 118d6298f6f0 ("net: mvpp2: add ethtool GOP statistic=
-s").
-> I am not flagging this as a bug as I am not aware that it is one.
->
-> Compile tested only.
->
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
->  drivers/net/ethernet/marvell/mvpp2/mvpp2.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/eth=
-ernet/marvell/mvpp2/mvpp2.h
-> index e809f91c08fb..9e02e4367bec 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-> @@ -1088,7 +1088,7 @@ struct mvpp2 {
->         unsigned int max_port_rxqs;
->
->         /* Workqueue to gather hardware statistics */
-> -       char queue_name[30];
-> +       char queue_name[31];
->         struct workqueue_struct *stats_queue;
->
->         /* Debugfs root entry */
->
+* Summary of Changes:
 
-Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
+(AggFrag encapsulation) has been standardized in RFC9347.
 
-Thanks!
+  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+
+This feature supports demand driven (i.e., non-constant send rate)
+IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
+payload type supports aggregation and fragmentation of the inner IP
+packet stream which in turn yields higher small-packet bandwidth as well
+as reducing MTU/PMTU issues. Congestion control is unimplementated as
+the send rate is demand driven rather than constant.
+
+In order to allow loading this fucntionality as a module a set of
+callbacks xfrm_mode_cbs has been added to xfrm as well.
+
+Patchset Changes:
+-----------------
+
+  include/linux/skbuff.h     |    1 +
+  include/net/xfrm.h         |   44 +
+  include/uapi/linux/in.h    |    2 +
+  include/uapi/linux/ip.h    |   16 +
+  include/uapi/linux/ipsec.h |    3 +-
+  include/uapi/linux/snmp.h  |    2 +
+  include/uapi/linux/xfrm.h  |    9 +-
+  net/core/skbuff.c          |    7 +-
+  net/ipv4/esp4.c            |    3 +-
+  net/ipv6/esp6.c            |    3 +-
+  net/netfilter/nft_xfrm.c   |    3 +-
+  net/xfrm/Kconfig           |   16 +
+  net/xfrm/Makefile          |    1 +
+  net/xfrm/trace_iptfs.h     |  218 ++++
+  net/xfrm/xfrm_compat.c     |   10 +-
+  net/xfrm/xfrm_device.c     |    4 +-
+  net/xfrm/xfrm_input.c      |   18 +-
+  net/xfrm/xfrm_iptfs.c      | 2822 ++++++++++++++++++++++++++++++++++++++++++++
+  net/xfrm/xfrm_output.c     |    6 +
+  net/xfrm/xfrm_policy.c     |   26 +-
+  net/xfrm/xfrm_proc.c       |    2 +
+  net/xfrm/xfrm_state.c      |   84 ++
+  net/xfrm/xfrm_user.c       |   77 ++
+  23 files changed, 3357 insertions(+), 20 deletions(-)
+
+Patchset Structure:
+-------------------
+
+The first 7 commits are changes to the xfrm infrastructure to support
+the callbacks as well as more generic IP-TFS additions that may be used
+outside the actual IP-TFS implementation.
+
+  - net: refactor common skb header copy code for re-use
+  - xfrm: config: add CONFIG_XFRM_IPTFS
+  - include: uapi: add ip_tfs_*_hdr packet formats
+  - include: uapi: add IPPROTO_AGGFRAG for AGGFRAG in ESP
+  - xfrm: netlink: add config (netlink) options
+  - xfrm: add mode_cbs module functionality
+  - xfrm: add generic iptfs defines and functionality
+
+The last 10 commits constitute the IP-TFS implementation constructed in
+layers to make review easier. The first 9 commits all apply to a single
+file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
+header file along with the use of these new tracepoint calls.
+
+  - xfrm: iptfs: add new iptfs xfrm mode impl
+  - xfrm: iptfs: add user packet (tunnel ingress) handling
+  - xfrm: iptfs: share page fragments of inner packets
+  - xfrm: iptfs: add fragmenting of larger than MTU user packets
+  - xfrm: iptfs: add basic receive packet (tunnel egress) handling
+  - xfrm: iptfs: handle received fragmented inner packets
+  - xfrm: iptfs: add reusing received skb for the tunnel egress packet
+  - xfrm: iptfs: add skb-fragment sharing code
+  - xfrm: iptfs: handle reordering of received packets
+  - xfrm: iptfs: add tracepoint functionality
+
+Patchset History:
+-----------------
+
+RFCv1 (11/10/2023)
+
+RFCv1 -> RFCv2 (11/12/2023)
+
+  Updates based on feedback from Simon Horman, Antony,
+  Michael Richardson, and kernel test robot.
+
+RFCv2 -> v1 (2/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, kernel test robot
+
+v1 -> v2 (5/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
+
+  o Add handling of new netlink SA direction attribute (Antony).
+  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
+    into 9+1 distinct layered functionality commits for aiding review.
+  - xfrm: fix return check on clone() callback
+  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
+  - iptfs: remove unneeded skb free count variable
+  - iptfs: remove unused variable and "breadcrumb" for future code.
+  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
+  - iptfs: remove some BUG_ON() assertions questioned in review.
+
+v2->v3
+  - Git User Glitch
+
+v2->v4 (6/17/2024)
+
+  - iptfs: copy only the netlink attributes to user based on the
+    direction of the SA.
+
+  - xfrm: stats: in the output path check for skb->dev == NULL prior to
+    setting xfrm statistics on dev_net(skb->dev) as skb->dev may be NULL
+    for locally generated packets.
+
+  - xfrm: stats: fix an input use case where dev_net(skb->dev) is used
+    to inc stats after skb is possibly NULL'd earlier. Switch to using
+    existing saved `net` pointer.
+
+v4->v5 (7/14/2024)
+  - uapi: add units to doc comments
+  - iptfs: add MODULE_DESCRIPTION()
+  - squash nl-direction-update commit
+
+v5->v6 (7/31/2024)
+  * sysctl: removed IPTFS sysctl additions
+  - xfrm: use array of pointers vs structs for mode callbacks
+  - iptfs: eliminate a memleak during state alloc failure
+  - iptfs: free send queue content on SA delete
+  - add some kdoc and comments
+  - cleanup a couple formatting choices per Steffen
+
+v6->v7 (8/1/2024)
+  - Rebased on latest ipsec-next
+
+v7->v8 (8/4/2024)
+  - Use lock and rcu to load iptfs module -- copy existing use pattern
+  - fix 2 warnings from the kernel bot
+
+v8->v9 (8/7/2024)
+  - factor common code from skbuff.c:__copy_skb_header into ___copy_skb_header
+    and use in iptfs rather that copying any code.
+  - change all BUG_ON to WARN_ON_ONCE
+  - remove unwanted new NOSKB xfrm MIB error counter
+  - remove unneeded copy or share choice function
+  - ifdef CONFIG_IPV6 around IPv6 function
 
