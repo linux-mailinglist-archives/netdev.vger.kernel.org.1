@@ -1,155 +1,132 @@
-Return-Path: <netdev+bounces-116569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B403694AF47
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 19:58:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE69F94AF7F
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0C02839ED
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 17:58:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78899283D81
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 18:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825D213EFEF;
-	Wed,  7 Aug 2024 17:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB7518EBF;
+	Wed,  7 Aug 2024 18:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JfQpXxZY"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="vK+s93Bm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [45.157.188.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE6E13E41F;
-	Wed,  7 Aug 2024 17:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D3F142915
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 18:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723053471; cv=none; b=YPYErrhhN944vn/AXjvqNR5LCRVntxZMjuTosSDvU32aC3SsHWrMetogBoDVqiFRN/mrD5Wg5rWwn7TURmTMUyLDVWkL4Qtg7+CRftltv6yIFmG8CboxEEaBjzSxNmCotmHzyVoOKus6lwswH48vCxyryDtNThHQKtg3JaNZ42c=
+	t=1723054624; cv=none; b=N40TZKr9J1jgWUgE4tQ0ZcFTy0s+48lggQt4PEeTKui6TjviTg6DGfjFBXn9vUEtcUH0Mnae0XsZ37fPOqeg5SL1NO21l2AY2kEDTvT6c8/b2ttX2ePtDmvB6PJb38rEjxga7TSYnGaKQW6HfuRJPrZgJbx8Noh4KsXEimyO4Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723053471; c=relaxed/simple;
-	bh=EJaNkWx/y6M/BndspDA0u/hBD5TnejbZPqX+oXi3PFY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qX78u7WmVtZT/Nhp15Ss9GKyDfZ6TfYB83QWaoIFxeg+U/QapBL/atCTJ74IyryhJOXy5ajj2KMCCK9c8a29PZ4F7WBQVyt6OQeAF8oxF/8wmcT3WJMGj6X7G8Btzzg+OTd48gLF5P/KAQi7k5I+Zu2cWSbPTSV21m/HmQZkHZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JfQpXxZY; arc=none smtp.client-ip=209.85.161.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5d5af743b8fso81350eaf.3;
-        Wed, 07 Aug 2024 10:57:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723053469; x=1723658269; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JIYZPj0XxrcTT0DiLPDJV5xAwl/g4Iu8eyMqfnptQAM=;
-        b=JfQpXxZYpM3KM9KIgCg4VQViugOl6NQwa0wMLxKm2KS0eDMM2boHjpajSXm8beWU1K
-         ubiXPT4t6WjBvGodll+dZBcSpNDLax1ppVM0VdmXcMLq2N+rrx1o859jHLBPQOp3KvLn
-         uG1K8/nSFmjshilKPvdTPgqd9Vo/THsJjl+hNUPWUHj5sCd0lz9EZx95h9oAbdZ1OyeL
-         8MkM6f8swRVX7j5QKwUjoYgZngm79uFmepReH4u1jpu6wpfRQPeccii+NRrsTgGcTaqv
-         jJV19+19UC2LMMh1i11KRPtxqCY4FLLi0TsJsO4vgSvUdgrCFyf7mi5XPL1CIOmZAqUF
-         zF3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723053469; x=1723658269;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JIYZPj0XxrcTT0DiLPDJV5xAwl/g4Iu8eyMqfnptQAM=;
-        b=coao2iHR0lki/EDEQ32UjDp6bz9dSuJaFAtbPCI6ooeWpi19mPjt1S7XC7ORv1XAfm
-         C2qp75g89E7Js7fDZAhnoYO5X9vlY6V0g86kwNR5fwvUQRU6jgWyleKkxqAzPf/lC0dP
-         dPS9xxRbA7tZopzpfMNZiuAXrXLeHPbAbhtLner6UcwWKVvw3gxeZrTzmhYOsMzX04/B
-         G8JSQ9P496eO9/pkRUThFVZSMaXI9XTDeeJvODQfti4LI9qsWil619B8BtFO2IfKhtcn
-         vldFxtxLPVjXjfOFqXRzrJNhOeUX5se93t5J37TvIylzTBrmniV0jPV5+Hdn9uQfTHgK
-         QX3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXAkG7eTnfOxWDVqQ9YyYvejugMvBfuYjrN8LkLrQhUaAZTynFWsD/mMtTLHnW1rI2MYkHauJ1tPZ9P5EaqZvbagLQ+zR8oWTfcn5gZkqlUZBi2bacfFJAmw424NWt+zbWXUKVJ95PVcgCCaWgrDRNF6dGfSPvwWpW0JpxH9tiacfogE9M5
-X-Gm-Message-State: AOJu0Yy17RwdbLok+Ii2sO5NUmWCdJGmQ1m6Vl/1rNYhlxt0f+Lh8BFu
-	sDSQngyQQmC7vBfkF+cVj77DEb7w6cWzYHXRAelsqxrz0BbIv0Yt
-X-Google-Smtp-Source: AGHT+IH97XDaol1t2S2FYFv+WYC75ETsVyeFNRfItRFLlIPkRstLsyqQlWf9Oz8ZC2b+2yulKgvC0A==
-X-Received: by 2002:a05:6358:6481:b0:1ac:f722:4c1 with SMTP id e5c5f4694b2df-1af3bac737emr1583733055d.24.1723053468467;
-        Wed, 07 Aug 2024 10:57:48 -0700 (PDT)
-Received: from dev0.. ([49.43.168.245])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c211cf0726sm204429a12.16.2024.08.07.10.57.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 10:57:48 -0700 (PDT)
-From: Abhinav Jain <jain.abhinav177@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: skhan@linuxfoundation.org,
-	javier.carrasco.cruz@gmail.com,
-	Abhinav Jain <jain.abhinav177@gmail.com>
-Subject: [PATCH v4 2/2] selftests: net: Add on/off checks for non-fixed features of interface
-Date: Wed,  7 Aug 2024 17:57:17 +0000
-Message-Id: <20240807175717.7775-3-jain.abhinav177@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240807175717.7775-1-jain.abhinav177@gmail.com>
-References: <20240807175717.7775-1-jain.abhinav177@gmail.com>
+	s=arc-20240116; t=1723054624; c=relaxed/simple;
+	bh=t0UbQCNoIRW1BDPtlmscIk4bNj5SvbNJmJAQ2vzhIc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HFi/HywQhIX5QbW2FJjeptTJuflh+7yU4UmYwsjFD3BVZ6qe//T6H98Iqc7SOLQtB8T+3ppgfDbLN+eL95jmiAp4ELFxURlWkSN/6dfw9JotWLCWEAIqXL8afYA0y2FEeZwWvcMBalQKP0lpNvw/GDjphcL+qhJqngYmXoUjLvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=vK+s93Bm; arc=none smtp.client-ip=45.157.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WfJKd1mlCzktY;
+	Wed,  7 Aug 2024 20:16:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1723054613;
+	bh=e4v4cHOXu3daGmidLDolI+XJc3ecJMkNhgA4af0TWPg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vK+s93BmP2oAOoj2R9uGVJ7Br4v+ZNBu36lRhvJPJET0Y85vV2KMDzm/WEfoA9Urc
+	 ZrkUXZlJobyUnFsDFM8Zxc07xn6rO9p1lPqc0RhQtDBet2XsN12CPuGDP9ebGpoxuu
+	 fv+ETOOBKBQraJiyFD8Oc0StWnt68JlhkUcw9wxI=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WfJKb6kN3zr9f;
+	Wed,  7 Aug 2024 20:16:51 +0200 (CEST)
+Date: Wed, 7 Aug 2024 20:16:47 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Jann Horn <jannh@google.com>
+Cc: Tahera Fahimi <fahimitahera@gmail.com>, outreachy@lists.linux.dev, 
+	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] Landlock: Add signal control
+Message-ID: <20240807.Yee4al2lahCo@digikod.net>
+References: <cover.1722966592.git.fahimitahera@gmail.com>
+ <49557e48c1904d2966b8aa563215d2e1733dad95.1722966592.git.fahimitahera@gmail.com>
+ <CAG48ez3o9fmqz5FkFh3YoJs_jMdtDq=Jjj-qMj7v=CxFROq+Ew@mail.gmail.com>
+ <CAG48ez1jufy8iwP=+DDY662veqBdv9VbMxJ69Ohwt8Tns9afOw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAG48ez1jufy8iwP=+DDY662veqBdv9VbMxJ69Ohwt8Tns9afOw@mail.gmail.com>
+X-Infomaniak-Routing: alpha
 
-Implement on/off testing for all non-fixed features via while loop.
-Save the initial state so that it can be restored after on/off checks.
+On Tue, Aug 06, 2024 at 11:55:27PM +0200, Jann Horn wrote:
+> On Tue, Aug 6, 2024 at 8:56 PM Jann Horn <jannh@google.com> wrote:
+> > On Tue, Aug 6, 2024 at 8:11 PM Tahera Fahimi <fahimitahera@gmail.com> wrote:
+> > > Currently, a sandbox process is not restricted to send a signal
+> > > (e.g. SIGKILL) to a process outside of the sandbox environment.
+> > > Ability to sending a signal for a sandboxed process should be
+> > > scoped the same way abstract unix sockets are scoped. Therefore,
+> > > we extend "scoped" field in a ruleset with
+> > > "LANDLOCK_SCOPED_SIGNAL" to specify that a ruleset will deny
+> > > sending any signal from within a sandbox process to its
+> > > parent(i.e. any parent sandbox or non-sandboxed procsses).
+> [...]
+> > > +       if (is_scoped)
+> > > +               return 0;
+> > > +
+> > > +       return -EPERM;
+> > > +}
+> > > +
+> > > +static int hook_file_send_sigiotask(struct task_struct *tsk,
+> > > +                                   struct fown_struct *fown, int signum)
 
-Signed-off-by: Abhinav Jain <jain.abhinav177@gmail.com>
----
- tools/testing/selftests/net/netdevice.sh | 37 +++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+I was wondering if we should handle this case, but I guess it makes
+sense to have a consistent policy for all kind of user-triggerable
+signals.
 
-diff --git a/tools/testing/selftests/net/netdevice.sh b/tools/testing/selftests/net/netdevice.sh
-index 279c44271047..c47fb984616d 100755
---- a/tools/testing/selftests/net/netdevice.sh
-+++ b/tools/testing/selftests/net/netdevice.sh
-@@ -124,7 +124,42 @@ kci_netdev_ethtool()
- 		return 1
- 	fi
- 	echo "PASS: $netdev: ethtool list features"
--	#TODO for each non fixed features, try to turn them on/off
-+
-+	while read -r FEATURE VALUE FIXED; do
-+		[ "$FEATURE" != "Features" ] || continue # Skip "Features"
-+		[ "$FIXED" != "[fixed]" ] || continue # Skip fixed features
-+		feature="${FEATURE%:*}"
-+
-+		initial_state=$(ethtool -k "$netdev" | grep "$feature:" \
-+			| awk '{print $2}')
-+		ethtool --offload "$netdev" "$feature" off
-+		if [ $? -eq 0 ]; then
-+			echo "PASS: $netdev: Turned off feature: $feature"
-+		else
-+			echo "FAIL: $netdev: Failed to turn off feature:" \
-+				"$feature"
-+		fi
-+
-+		ethtool --offload "$netdev" "$feature" on
-+		if [ $? -eq 0 ]; then
-+			echo "PASS: $netdev: Turned on feature: $feature"
-+		else
-+			echo "FAIL: $netdev: Failed to turn on feature:" \
-+				"$feature"
-+		fi
-+
-+		#restore the feature to its initial state
-+		ethtool --offload "$netdev" "$feature" "$initial_state"
-+		if [ $? -eq 0 ]; then
-+			echo "PASS: $netdev: Restore feature $feature" \
-+				"to initial state $initial_state"
-+		else
-+			echo "FAIL: $netdev: Failed to restore feature" \
-+				"$feature to default $initial_state"
-+		fi
-+
-+	done < "$TMP_ETHTOOL_FEATURES"
-+
- 	rm "$TMP_ETHTOOL_FEATURES"
- 
- 	kci_netdev_ethtool_test 74 'dump' "ethtool -d $netdev"
--- 
-2.34.1
+> > > +{
+> > > +       bool is_scoped;
+> > > +       const struct landlock_ruleset *dom, *target_dom;
+> > > +       struct task_struct *result = get_pid_task(fown->pid, fown->pid_type);
+> >
+> > I'm not an expert on how the fowner stuff works, but I think this will
+> > probably give you "result = NULL" if the file owner PID has already
+> > exited, and then the following landlock_get_task_domain() would
+> > probably crash? But I'm not entirely sure about how this works.
+> >
+> > I think the intended way to use this hook would be to instead use the
+> > "file_set_fowner" hook to record the owning domain (though the setup
+> > for that is going to be kind of a pain...), see the Smack and SELinux
+> > definitions of that hook. Or alternatively maybe it would be even
+> > nicer to change the fown_struct to record a cred* instead of a uid and
+> > euid and then use the domain from those credentials for this hook...
+> > I'm not sure which of those would be easier.
+> 
+> (For what it's worth, I think the first option would probably be
+> easier to implement and ship for now, since you can basically copy
+> what Smack and SELinux are already doing in their implementations of
+> these hooks. I think the second option would theoretically result in
+> nicer code, but it might require a bit more work, and you'd have to
+> include the maintainers of the file locking code in the review of such
+> refactoring and have them approve those changes. So if you want to get
+> this patchset into the kernel quickly, the first option might be
+> better for now?)
+> 
 
+I agree, let's extend landlock_file_security with a new "fown" pointer
+to a Landlock domain. We'll need to call landlock_get_ruleset() in
+hook_file_send_sigiotask(), and landlock_put_ruleset() in a new
+hook_file_free_security().
+
+I would be nice to to replace the redundant informations in fown_struct
+but that can wait.
 
