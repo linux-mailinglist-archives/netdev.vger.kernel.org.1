@@ -1,85 +1,79 @@
-Return-Path: <netdev+bounces-116630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2254A94B37C
-	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:15:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAFA894B36D
+	for <lists+netdev@lfdr.de>; Thu,  8 Aug 2024 01:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC7DB283B2F
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328B3282D28
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 23:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97EE1552F5;
-	Wed,  7 Aug 2024 23:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBB7155352;
+	Wed,  7 Aug 2024 23:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="pDX7mK7a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R27r+0X9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-240.mail.qq.com (out203-205-221-240.mail.qq.com [203.205.221.240])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB34250EC;
-	Wed,  7 Aug 2024 23:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C5E155333
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 23:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723072513; cv=none; b=sAgYZVHfcVeMc1cyjz6KjR245Ibv4aOdHhE5gEVwNUQ3/b8VznHAUFIaUHFtSiuzTwlapnRPq4Ge5Wn8dZIgYmLKKqJNDwMgVF7zgHFSNapUDgm81gzg/3qinhaWXM8lb5nCAkyJwZ6rucFtcljyXmBu5qcluScQLP696jwyTig=
+	t=1723072415; cv=none; b=uLUSS0gHNj9TkUGbMRhvZUB3s4f2cfda6AvXQsjLF3Tb+Y/leRhzLkkC9dEiSVhnFfhVRh9Tzyg0A9p5LMXF5fDJnI0nrCT7h4gF9xGV/Q4AyWVRDUOHpZisXEfrOv8EQGflll5e1EyiLmnWo2CbaPU7PKkADoXWN8WaWcx7GRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723072513; c=relaxed/simple;
-	bh=sHhvml+mYSmDdgcMWP6jiNbju26OB7L8+gCQGhqWQvM=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=Jum7QnRUd3Nl1XWAELa5x6iVoS7oo3ZL0iHF+JbTqZ299xvNraif9AHrq0ORuoNZhQvxLv6Y+5J+OB34BIN5eDEK2JZXmn4n3uyZZ23hAuLMM9T+Sffo3V5ziwtmuWLDqrekQbnlxxnVCwxOVX0PWWMkv/jeyVSd1kIp6AI8p5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=pDX7mK7a; arc=none smtp.client-ip=203.205.221.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1723072508; bh=ld/aFBFO32VUAPp/57mNfqYKOGvt7MOQE+FG0HbCxC0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=pDX7mK7aO9uhDzvwcEJMuq5c3QpLUQj9kjZc9dta2Grmh/WmPiACxHiZ8f4SDKZIu
-	 z2VGD55acHzj+YQc502Bo99eel44anwDm0y9zcqp3cpcUGmmiJx++cd6QoFxZkiEhw
-	 kvz1FyfoOLUl48ukWbDgpforjnzHOTrMXtpwK89M=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
-	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
-	id 2312EEAA; Thu, 08 Aug 2024 07:08:49 +0800
-X-QQ-mid: xmsmtpt1723072129t5xidoyw0
-Message-ID: <tencent_1F473700968236B84AEA74ED76FF67023C09@qq.com>
-X-QQ-XMAILINFO: NMGzQWUSIfvTPOzuldNXnGeJ7s36h2U6hmp3yD4Ek7o1PE6XcYfGd+vnsxex9Q
-	 n3r13Pr88qwieI7NVZ1HudXOvKJEnpIFUicyKUOi5tbvz4PiwZHkJGnWQreHJIxPg65isn0ceO78
-	 lxku6wsjZZ6hMAvAf2MIC4xNYumSIubWYMJnlulXkJXEtx7X3HtkyGE4KPVtI3PC9/knpugv3Dy/
-	 sNo5WJ6hEmsHk7KSKVSVpBxK7eT4KXC2z4FIoFFyJs/WxOVftmYVZzfCfwGVfNJOqOtyBIh3vLhW
-	 S59vz0WSqdp5jc3avP+qfBz2jwAXwPOYpwYtYka3Owbvun6ax8uuh5JLPbLez433BT4RheechQRn
-	 PTjC6MrFLZv06LxoZBpse2Lm818ORfeJXk9Th5D0pbtWB0L44NPASsg7hO5DQwg6U/LVwRjBl9n8
-	 jx4q2HzCaQD8XLkHzRMb8ne7E8+YfYLLvWWti80+QA2Fs63Lptcd+BF3rF5TAj3WkTbHgDUO/a6d
-	 1Bbovs/mykw1uVNIypV529y4F445C5BTChCS0ZcHBP6kDNooZti2pQ0U29shZLVKJNV5WqIpnnzj
-	 a33hPlPRgVURReUFVammnPAzptiJN87tHrdcTireTFJ7L2Rx77x+ojGfuGklWg6r8GxAxb3eEiTd
-	 Q8McnoGFJdTW1vtvB0Vvs8+jb9dKcCiO9t3DKJR4ZGcc+QSVEqXsQ/e6w90+pJ9iFA8og+K7m58A
-	 R6jt4XxpK57mdX/ZA8FJzHGj/C927SvWHUdUeqGqUxa7rskXuf38PPKbB2bO3pjByvyBieCl8zP7
-	 IdKwWIUTFwJxwSe8JYI5mqdRKImByCxdGJVpvlrcRMMFVc+WSDBcKux+P0ErL1S1U/gCfIEQ3MAW
-	 MBrMEJkCm21bJpMkaB356/5Jh/LjfIGlyihAGKKC+zyG26DBHc0mtmflAqDQWx3Y2i5yGDuRBA8g
-	 sSH99ARedaeVFJuQqkhT9bTT/AStzH
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	kernel@pengutronix.de,
-	leitao@debian.org,
-	linux-can@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mkl@pengutronix.de,
-	netdev@vger.kernel.org,
-	o.rempel@pengutronix.de,
+	s=arc-20240116; t=1723072415; c=relaxed/simple;
+	bh=HhnzU76tuaB06hf9r/QBxA0q6YiilDErfM57/qL/dM4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RYwpM5Yl+bLKoC3yFCWNaHx6WQZ6cztUcrMhA0HXWk6KVZZ3L/D0TFIp/KqFoFnLUlmTsQEg7NtTLG4aWLPkTtwhFfZIWQtWrNOz6RvZYZ8gmKaYLxv7iGH6Zk2lzoaxcGeDKYIKhva+pczY8Os+A3/my26vjReqpEBXKhwFdbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R27r+0X9; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723072414; x=1754608414;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HhnzU76tuaB06hf9r/QBxA0q6YiilDErfM57/qL/dM4=;
+  b=R27r+0X96eGXLFinqXt5J2OWtYJRymZ4Zv0sHqmUSNpxPJuR9T9o7oxf
+   sgyjxB8MWkkpOEa8VCUb5A/TJS8SkojjZqChRm9067z4xRpBmukEls76v
+   C7nfTFsdx0UPIvrG2tlO/KWgu17Snxzf/KZMAJaqLNe48+77Vk5JxRA7R
+   8mFm3q6lW8mLU9BHFiWgueinfs0kjuyQvTiYts6hhkNL2Hy/ACUp5EibH
+   5PHBWNS/HziYmp6s1ZEHfhWmTvv2P/mJEYCP0WPkajRXczbh7p0hmZBys
+   +xCblgBeDA4afNDsDR7KtBoXbQyQ/hHNTJtE0d1rOoBTK2o7Kc2exJx8n
+   w==;
+X-CSE-ConnectionGUID: FuZNPfEgRi+R/dtz7/JJ+g==
+X-CSE-MsgGUID: ndu7Q0PjTDW0U5Xn51hmYw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="32577300"
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="32577300"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 16:13:34 -0700
+X-CSE-ConnectionGUID: 7H53JrMaRhqv3TNSuhpKew==
+X-CSE-MsgGUID: Gv2GO4YMTXi04b58Gh5bnA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="61956617"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa004.jf.intel.com with ESMTP; 07 Aug 2024 16:13:34 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	robin@protonic.nl,
-	socketcan@hartkopp.net,
-	syzbot+ad601904231505ad6617@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH net-next V2] can: j1939: fix uaf warning in j1939_session_destroy
-Date: Thu,  8 Aug 2024 07:08:49 +0800
-X-OQ-MSGID: <20240807230848.594339-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240807071655.5b230108@kernel.org>
-References: <20240807071655.5b230108@kernel.org>
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	faizal.abdul.rahim@linux.intel.com,
+	vinicius.gomes@intel.com,
+	sasha.neftin@intel.com,
+	richardcochran@gmail.com,
+	horms@kernel.org,
+	rodrigo.cadore@l-acoustics.com
+Subject: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates 2024-08-07 (igc)
+Date: Wed,  7 Aug 2024 16:13:24 -0700
+Message-ID: <20240807231329.3827092-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,68 +82,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The root cause of this problem is when both of the following conditions
-are met simultaneously:
-[1] Introduced commit c9c0ee5f20c5, There are following rules:
-In debug builds (CONFIG_DEBUG_NET set), the reference count is always
-decremented, even when it's 1.
+This series contains updates to igc driver only.
 
-[2] When executing sendmsg, the newly created session did not increase the
-skb reference count, only added skb to the session's skb_queue.
+Faizal adjusts the size of the MAC internal buffer on i226 devices to
+resolve an errata for leaking packet transmits. He also corrects a
+condition in which qbv_config_change_errors are incorrectly counted.
+Lastly, he adjusts the conditions for resetting the adapter when
+changing TSN Tx mode and corrects the conditions in which gtxoffset
+register is set.
 
-The solution is:
-When creating a new session, do not add the skb to the skb_queue.
-Instead, when using skb, uniformly use j1939_session_skb_queue to add
-the skb to the queue and increase the skb reference count through it.
+The following are changes since commit 1ca645a2f74a4290527ae27130c8611391b07dbf:
+  net: usb: qmi_wwan: add MeiG Smart SRM825L
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
 
-Reported-and-tested-by: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/can/j1939/socket.c    | 7 ++++---
- net/can/j1939/transport.c | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
+Faizal Rahim (4):
+  igc: Fix packet still tx after gate close by reducing i226 MAC retry
+    buffer
+  igc: Fix qbv_config_change_errors logics
+  igc: Fix reset adapter logics when tx mode change
+  igc: Fix qbv tx latency by setting gtxoffset
 
-diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
-index 305dd72c844c..ec78bee1bfa6 100644
---- a/net/can/j1939/socket.c
-+++ b/net/can/j1939/socket.c
-@@ -1170,10 +1170,11 @@ static int j1939_sk_send_loop(struct j1939_priv *priv,  struct sock *sk,
- 					break;
- 				}
- 			}
--		} else {
--			skcb->offset = session->total_queued_size;
--			j1939_session_skb_queue(session, skb);
- 		}
-+		/* Session is ready, add it to skb queue and increase ref count.
-+		 */
-+		skcb->offset = session->total_queued_size;
-+		j1939_session_skb_queue(session, skb);
- 
- 		todo_size -= segment_size;
- 		session->total_queued_size += segment_size;
-diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
-index 4be73de5033c..dd503bc3adb5 100644
---- a/net/can/j1939/transport.c
-+++ b/net/can/j1939/transport.c
-@@ -1505,7 +1505,6 @@ static struct j1939_session *j1939_session_new(struct j1939_priv *priv,
- 	session->state = J1939_SESSION_NEW;
- 
- 	skb_queue_head_init(&session->skb_queue);
--	skb_queue_tail(&session->skb_queue, skb);
- 
- 	skcb = j1939_skb_to_cb(skb);
- 	memcpy(&session->skcb, skcb, sizeof(session->skcb));
-@@ -1548,6 +1547,7 @@ j1939_session *j1939_session_fresh_new(struct j1939_priv *priv,
- 		kfree_skb(skb);
- 		return NULL;
- 	}
-+	j1939_session_skb_queue(session, skb);
- 
- 	/* alloc data area */
- 	skb_put(skb, size);
+ drivers/net/ethernet/intel/igc/igc_defines.h |  6 ++
+ drivers/net/ethernet/intel/igc/igc_main.c    |  8 ++-
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 76 ++++++++++++++++----
+ drivers/net/ethernet/intel/igc/igc_tsn.h     |  1 +
+ 4 files changed, 75 insertions(+), 16 deletions(-)
+
 -- 
-2.43.0
+2.42.0
 
 
