@@ -1,98 +1,116 @@
-Return-Path: <netdev+bounces-116353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDFA994A197
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:24:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2F2094A1B8
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:29:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8756285101
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:24:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30A542869D1
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92771C7B7D;
-	Wed,  7 Aug 2024 07:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GA1snIiW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83921C9DC7;
+	Wed,  7 Aug 2024 07:29:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED521C6890;
-	Wed,  7 Aug 2024 07:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFE91C9DC9
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 07:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723015457; cv=none; b=mW8YEQXL1xLiSz6mKtK/8CM9NJgAZeTf53E+szPhg9HQCGldvUvYgChDiuvc2s1/0r4RnjjSKqxbqj4e2Iv7V3QzuwacZbAQUiZ9DhIdiZ7QtD6bTQ9/qJMibfJZUtVxcabG4LdrV0yB/RgYWeNZG19EHVJ9chhWZJ1Uhc8J6C8=
+	t=1723015744; cv=none; b=SamVWgv75LMPqUTYtqsW+z8zgDP0WX7je/dFcjauXUEv5SX8PzzhxdZ9xmcgKlmvlSr/j6ufzRTk4lnAwPNbKlJ19RfaAxUHo5rOZT7wBfHRAvguk9LaRKNQUnJG0Mz2+fZdNjLCieGqtFk0v5lDgpiI58EJ6a4JXcvbOHuYgW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723015457; c=relaxed/simple;
-	bh=/1ACmVmn+d0im98aAJLAH949L5nHjlBCDiUz+YcaGYw=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=G0roEflG+TsRs5wlZ6z+KKyTWU2IlbmUBZTeScN0PPFxaF1uB3l+/7ATxD5fqulHLiWR/1kRMj9FVu74EoRRIDFPWqANSj68pi1opRPndhWGtY6vbtoqsd4bXncOW+RvZgxPYa12CcdiBFMMLHksh+A4lKXmlriydu3kWh4HO78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GA1snIiW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C1CC32782;
-	Wed,  7 Aug 2024 07:24:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723015457;
-	bh=/1ACmVmn+d0im98aAJLAH949L5nHjlBCDiUz+YcaGYw=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=GA1snIiWGJeW2K0zNHnTIHKgRwj3cHXuukxEc1jkxmflMX/py5bm6ClUvC0ISq7Dd
-	 HIOsZ+HCd4JdIk2du5vXHlZC6GDjKqkjwVAkS/JI1GGFwLn+d7dU/R19UEiP9479Il
-	 nfJ1KC/T+f0gAShaWDbrM3WkIhkqyHKtRmMkmD0K06S1OSuvjM4FF3Lx0LdoScCRoN
-	 u+RkcvcdYTyWH49YmntHXJUQWAzipJxV0BeN4sD5YbVKYkXwBM3RNedSt3Bj7PTAfA
-	 pV5qWA/RZIYdqHoMwyDVFNTxMRrs4JfKtYCS6yw9M2yXpWAka2VlTGhpaseKsmAhAw
-	 Zy1Zwb1QQrtEQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,  hhorace <hhoracehsu@gmail.com>,
-  johannes@sipsolutions.net,  davem@davemloft.net,  edumazet@google.com,
-  kuba@kernel.org,  pabeni@redhat.com,  linux-kernel@vger.kernel.org,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,  Ido Schimmel
- <idosch@nvidia.com>
-Subject: Re: [PATCH] wifi: cfg80211: fix bug of mapping AF3x to incorrect
- User Priority
-References: <20240805071743.2112-1-hhoracehsu@gmail.com>
-	<20240806090844.GR2636630@kernel.org> <ZrIDQq1g6w/zO25l@debian>
-Date: Wed, 07 Aug 2024 10:24:13 +0300
-In-Reply-To: <ZrIDQq1g6w/zO25l@debian> (Guillaume Nault's message of "Tue, 6
-	Aug 2024 13:04:34 +0200")
-Message-ID: <87ttfwiyn6.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1723015744; c=relaxed/simple;
+	bh=K9KE/qGEs1iTRcCyvVqFyOMSijGdCKvdiLUygORqCJ8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y+E9e+oSD/hJtpbwN86hxtfFB34Zg/eeLbdhjEuCB3eO2R46+6K9Bmgo0IdMHsoBPjx2ogkzZSbiwzbGkVi7i6sbYCg6LGpv3QPTJ84ibxxL2wymvscW87y+ReZV6OpTl5uq94IVBHRz98myDLBUukOdbn58aan/WMgr7EXLXSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sbb6C-0006Ki-Rh; Wed, 07 Aug 2024 09:28:44 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sbb6B-0058k4-LQ; Wed, 07 Aug 2024 09:28:43 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sbb6B-00DdFI-1u;
+	Wed, 07 Aug 2024 09:28:43 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 1/2] dt-bindings: arm: stm32: Add compatible strings for Protonic boards
+Date: Wed,  7 Aug 2024 09:28:41 +0200
+Message-Id: <20240807072842.3249106-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Guillaume Nault <gnault@redhat.com> writes:
+Add compatible strings for Protonic MECIO1r0 and MECT1S boards to the
+STM32MP151-based boards section and Protonic MECIO1r1 board to the
+STM32MP153-based boards section.
 
-> On Tue, Aug 06, 2024 at 10:08:44AM +0100, Simon Horman wrote:
->> + Guillaume and Ido
->> 
->> On Mon, Aug 05, 2024 at 03:17:42PM +0800, hhorace wrote:
->> > According to RFC8325 4.3, Multimedia Streaming: AF31(011010, 26), 
->> > AF32(011100, 28), AF33(011110, 30) maps to User Priority = 4 
->> > and AC_VI (Video).
->> > 
->> > However, the original code remain the default three Most Significant
->> > Bits (MSBs) of the DSCP, which makes AF3x map to User Priority = 3
->> > and AC_BE (Best Effort).
->> > 
->> > Signed-off-by: hhorace <hhoracehsu@gmail.com>
->> 
->> Adding Guillaume and Ido as this relates to DSCP.
->
-> Thanks. The patch looks good to me (only missing a Fixes tag).
->
-> Just a note to hhorace: the entry for CS5 (case 40) is useless as CS5
-> is 101000. So the value of the 3 high order bits already is 5 (in case
-> you want to make a followup patch for net-next).
+MECIO1 is an I/O and motor control board used in blood sample analysis
+machines. MECT1S is a 1000Base-T1 switch for internal machine networks
+of blood sample analysis machines.
 
-Minor clarification: cfg80211 patches go to wireless-next, not net-next.
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ Documentation/devicetree/bindings/arm/stm32/stm32.yaml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
+diff --git a/Documentation/devicetree/bindings/arm/stm32/stm32.yaml b/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
+index 58099949e8f3a..703d4b574398d 100644
+--- a/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
++++ b/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
+@@ -54,6 +54,8 @@ properties:
+       - description: ST STM32MP151 based Boards
+         items:
+           - enum:
++              - prt,mecio1r0 # Protonic MECIO1r0
++              - prt,mect1s   # Protonic MECT1S
+               - prt,prtt1a   # Protonic PRTT1A
+               - prt,prtt1c   # Protonic PRTT1C
+               - prt,prtt1s   # Protonic PRTT1S
+@@ -71,6 +73,12 @@ properties:
+           - const: dh,stm32mp151a-dhcor-som
+           - const: st,stm32mp151
+ 
++      - description: ST STM32MP153 based Boards
++        items:
++          - enum:
++              - prt,mecio1r1   # Protonic MECIO1r1
++          - const: st,stm32mp153
++
+       - description: DH STM32MP153 DHCOM SoM based Boards
+         items:
+           - const: dh,stm32mp153c-dhcom-drc02
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.39.2
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
