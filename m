@@ -1,68 +1,81 @@
-Return-Path: <netdev+bounces-116358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEFB094A1F1
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:44:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B71394A1F8
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 09:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E2F91C23338
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:44:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2CDD1F226FC
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 07:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3221C7B77;
-	Wed,  7 Aug 2024 07:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA871C57A0;
+	Wed,  7 Aug 2024 07:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mu6zHR4L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KGuYFa0h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA2322EE5;
-	Wed,  7 Aug 2024 07:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDFE18D651;
+	Wed,  7 Aug 2024 07:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723016673; cv=none; b=q058bTgLiIYHhPurnnQL3EBeP+KJd7ThiOpTdmIQvtncXNPJAf+hLdHOO7gKDE7lJqOydoanOMWkdwPm4/edxNtm4xPAzFkXHE3Bq+fqFumnsQqtROIZATTgi94TS9FV5P4bnB6ZkRPzYKv+OxNB/2c24lwygqVBCSfUPW0zuYM=
+	t=1723016884; cv=none; b=MuEhZHQIZvt93g0JT7P43XlyA87w/t3Zl51kUAPMSAjFD6iRrxyf9xJFgCDEz5Wb1TnmTpyOGaft5UR+VYdZAah0HeRtNHKShbyXndIkFyRoXqiZ13XuGfSKKaSPaYaSArAHvLTV26J37KgbGciUt34nshV9PdLgG+KuvK4zbNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723016673; c=relaxed/simple;
-	bh=+pIWFznFFBdtsY4jys5bAc3rIq9i0mVsC5Uci68Jjpo=;
+	s=arc-20240116; t=1723016884; c=relaxed/simple;
+	bh=KOntnmL5V9k9tJeYTDbi+yWu/u8mY1h1WypQDPeLepg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=snF20xBD4e8AHK2rQ/Xu0TbnvdbPyLJa4MkftXvaQ962yvljbpvPTBguTyNDMpxJQSzxCfsuNQQx9uN+v57/4EmLx+m2z8IY0RaedNGJiZIEQv/55vHROAl3xqsD4LSRQ2mGzBlcQRQJx3ip0x2cAQ+WQoPtQlTUQGIsetfzGSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mu6zHR4L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9BBFC32782;
-	Wed,  7 Aug 2024 07:44:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723016671;
-	bh=+pIWFznFFBdtsY4jys5bAc3rIq9i0mVsC5Uci68Jjpo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mu6zHR4LkxW7exTjoDAKLD8glCoTDeurk8lBsAFNP9psRxCLQmdYOl1lkDLbaF9Fl
-	 2YsjxHJN2xgKY1/HkHi/DtybaZC0k2QNhgm2dYg/3UALnaTi2tVaa1Y8IYR9blYK1d
-	 Bw+TZUPnmRw9P0JkH328vgAuOu4JZDHxaduLF7mrHi/h/NQSNNILvl59V2z4/BVCk1
-	 0VocsdeAm/KEG6b9pLADWzwDetFoLSqHXg5LGnHHib02h9/n+TTHXedOCbYDQtVo37
-	 wVZzbkttn5rF+q6tJq3PxRoD3G8eAy4tH2rKL7iDqqj6iA7xaIS8dVfW+BVv9TYJmc
-	 M2AsBUEcHqFpQ==
-Date: Wed, 7 Aug 2024 10:44:21 +0300
-From: Oded Gabbay <ogabbay@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Itay Avraham <itayavr@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Christoph Hellwig <hch@infradead.org>, Jiri Pirko <jiri@nvidia.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
-	patches@lists.linux.dev
-Subject: Re: [PATCH v2 5/8] fwctl: FWCTL_RPC to execute a Remote Procedure
- Call to device firmware
-Message-ID: <ZrMl1bkPP-3G9B4N@T14sgabbay.>
-References: <0-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
- <5-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UC0A4Eh6N3cKY+P+dRXH4Vye3ScYdSVWiO+s6OLLskd8hRjPW8SjVxfTXbnWLVK8K004+ZQ8F4286uvVBB1hCfG8ge2KKIKFuOX1WOnz6NbPbzUSeUeiaNA+IiKEHywSPUe1NZupXR8pjUcli4egIY6QjwvKpkynFgcTBrK5/6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KGuYFa0h; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723016881; x=1754552881;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KOntnmL5V9k9tJeYTDbi+yWu/u8mY1h1WypQDPeLepg=;
+  b=KGuYFa0h+K0hUxqsTaPZ/86H+b3pf2VtOP1UclMRkmqb6ajMX7wCoiH1
+   xZuNZFKAwu1N+8C8CFO+/TRuLFdXQDo0qdB778lI8VRbxiIWqs8IMDKEO
+   DVkLUASS/qgOgAPhOyEA1EzOFq5FZXLxrNIzoPFZVbzXW13qejI6rlGHq
+   9l35tDKyU40xFAW0nX+M/lAw+2r0gDy9Mr0SsszQSvzWYjOIYnnWK30yv
+   XSmapmV7UJMp+ogp4ss1XfUgXKezDUhtKtbiAAlOO+83y2BDbu38qv4Ec
+   RHCky94rZHc8iJ0BTTPlNNqqBb51JL6P0xOW2zFkorw+Xgd2INbgFfiRJ
+   w==;
+X-CSE-ConnectionGUID: y13Nu30QRCqzhJejDOMkZw==
+X-CSE-MsgGUID: zDZeTAJxSVumqWyRl5vXSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="24950365"
+X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
+   d="scan'208";a="24950365"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 00:48:00 -0700
+X-CSE-ConnectionGUID: eo17zUZSREGWtjlFCdcs+g==
+X-CSE-MsgGUID: 95mssAqLTe2KQc4AdlUGzQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
+   d="scan'208";a="61591264"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 07 Aug 2024 00:47:55 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sbbOi-0005De-1Y;
+	Wed, 07 Aug 2024 07:47:52 +0000
+Date: Wed, 7 Aug 2024 15:47:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Anup Kulkarni <quic_anupkulk@quicinc.com>, mkl@pengutronix.de,
+	manivannan.sadhasivam@linaro.org, thomas.kopp@microchip.com,
+	mailhol.vincent@wanadoo.fr, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	quic_msavaliy@quicinc.com, quic_vdadhani@quicinc.com,
+	Anup Kulkarni <quic_anupkulk@quicinc.com>
+Subject: Re: [PATCH v1] can: mcp251xfd: Enable transceiver using gpio
+Message-ID: <202408071217.7AvSrhxI-lkp@intel.com>
+References: <20240806090339.785712-1-quic_anupkulk@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,251 +84,221 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5-v2-940e479ceba9+3821-fwctl_jgg@nvidia.com>
+In-Reply-To: <20240806090339.785712-1-quic_anupkulk@quicinc.com>
 
-On Mon, Jun 24, 2024 at 07:47:29PM -0300, Jason Gunthorpe wrote:
-> Add the FWCTL_RPC ioctl which allows a request/response RPC call to device
-> firmware. Drivers implementing this call must follow the security
-> guidelines under Documentation/userspace-api/fwctl.rst
->
-> The core code provides some memory management helpers to get the messages
-> copied from and back to userspace. The driver is responsible for
-> allocating the output message memory and delivering the message to the
-> device.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/fwctl/main.c       | 62 +++++++++++++++++++++++++++++++++++
->  include/linux/fwctl.h      |  5 +++
->  include/uapi/fwctl/fwctl.h | 66 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 133 insertions(+)
->
-> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
-> index f1dec0b590aee4..9506b993a1a56d 100644
-> --- a/drivers/fwctl/main.c
-> +++ b/drivers/fwctl/main.c
-> @@ -8,16 +8,20 @@
->  #include <linux/slab.h>
->  #include <linux/container_of.h>
->  #include <linux/fs.h>
-> +#include <linux/sizes.h>
->
->  #include <uapi/fwctl/fwctl.h>
->
->  enum {
->  	FWCTL_MAX_DEVICES = 256,
-> +	MAX_RPC_LEN = SZ_2M,
->  };
->  static dev_t fwctl_dev;
->  static DEFINE_IDA(fwctl_ida);
-> +static unsigned long fwctl_tainted;
->
->  DEFINE_FREE(kfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T));
-> +DEFINE_FREE(kvfree_errptr, void *, if (!IS_ERR_OR_NULL(_T)) kvfree(_T));
->
->  struct fwctl_ucmd {
->  	struct fwctl_uctx *uctx;
-> @@ -75,9 +79,66 @@ static int fwctl_cmd_info(struct fwctl_ucmd *ucmd)
->  	return ucmd_respond(ucmd, sizeof(*cmd));
->  }
->
-> +static int fwctl_cmd_rpc(struct fwctl_ucmd *ucmd)
-> +{
-> +	struct fwctl_device *fwctl = ucmd->uctx->fwctl;
-> +	struct fwctl_rpc *cmd = ucmd->cmd;
-> +	size_t out_len;
-> +
-> +	if (cmd->in_len > MAX_RPC_LEN || cmd->out_len > MAX_RPC_LEN)
-> +		return -EMSGSIZE;
-> +
-> +	switch (cmd->scope) {
-> +	case FWCTL_RPC_CONFIGURATION:
-> +	case FWCTL_RPC_DEBUG_READ_ONLY:
-> +		break;
-> +
-> +	case FWCTL_RPC_DEBUG_WRITE_FULL:
-> +		if (!capable(CAP_SYS_RAWIO))
-> +			return -EPERM;
-> +		fallthrough;
-> +	case FWCTL_RPC_DEBUG_WRITE:
-> +		if (!test_and_set_bit(0, &fwctl_tainted)) {
-> +			dev_warn(
-> +				&fwctl->dev,
-> +				"%s(%d): has requested full access to the physical device device",
-> +				current->comm, task_pid_nr(current));
-> +			add_taint(TAINT_FWCTL, LOCKDEP_STILL_OK);
-> +		}
-> +		break;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	};
-> +
-> +	void *inbuf __free(kvfree) =
-> +		kvzalloc(cmd->in_len, GFP_KERNEL | GFP_KERNEL_ACCOUNT);
-> +	if (!inbuf)
-> +		return -ENOMEM;
-> +	if (copy_from_user(inbuf, u64_to_user_ptr(cmd->in), cmd->in_len))
-> +		return -EFAULT;
-> +
-> +	out_len = cmd->out_len;
-> +	void *outbuf __free(kvfree_errptr) = fwctl->ops->fw_rpc(
-> +		ucmd->uctx, cmd->scope, inbuf, cmd->in_len, &out_len);
-Hi Jason,
-First of all, great work. I fully support this direction. Although I'm not
-working anymore in Habana, I would have definitely moved to this interface
-instead of the custom one we implemented in our driver. I believe this can
-be of use for other accel drivers as well.
+Hi Anup,
 
-Complex devices which contains multiple IPs and FWs, like Habana's Gaudi,
-have some RPCs to the firmware which are not related to the funcationality
-of the IP drivers (the compute and networking drivers in our case).
+kernel test robot noticed the following build warnings:
 
-Spreading the RPCs between the drivers required to separate it also among
-the different user-spaces libraries, as each subsystem has its own user-space.
+[auto build test WARNING on mkl-can-next/testing]
+[also build test WARNING on net-next/main net/main linus/master v6.11-rc2 next-20240806]
+[cannot apply to mani-mhi/mhi-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Disconnecting the RPCs from the drivers and providing a generic interface will
-allow to have a single user-space library which will be able to communicate
-with the firmware for all the IPs in the device. In Habana's case, it was
-mainly for monitoring and debugging purposes.
+url:    https://github.com/intel-lab-lkp/linux/commits/Anup-Kulkarni/can-mcp251xfd-Enable-transceiver-using-gpio/20240806-175105
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git testing
+patch link:    https://lore.kernel.org/r/20240806090339.785712-1-quic_anupkulk%40quicinc.com
+patch subject: [PATCH v1] can: mcp251xfd: Enable transceiver using gpio
+config: x86_64-buildonly-randconfig-001-20240806 (https://download.01.org/0day-ci/archive/20240807/202408071217.7AvSrhxI-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240807/202408071217.7AvSrhxI-lkp@intel.com/reproduce)
 
-I do have one question about the rpc ioctl. Are you assuming that the rpc
-is synchronous (we send a message to the firmware and block until we get the
-reply)? If so, what happen if we have an async RPC implementation
-inside the driver? How would you recommend to handle it?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408071217.7AvSrhxI-lkp@intel.com/
 
-Thanks,
-Oded
+All warnings (new ones prefixed by >>):
 
-> +	if (IS_ERR(outbuf))
-> +		return PTR_ERR(outbuf);
-> +	if (outbuf == inbuf) {
-> +		/* The driver can re-use inbuf as outbuf */
-> +		inbuf = NULL;
-> +	}
-> +
-> +	if (copy_to_user(u64_to_user_ptr(cmd->out), outbuf,
-> +			 min(cmd->out_len, out_len)))
-> +		return -EFAULT;
-> +
-> +	cmd->out_len = out_len;
-> +	return ucmd_respond(ucmd, sizeof(*cmd));
-> +}
-> +
->  /* On stack memory for the ioctl structs */
->  union ucmd_buffer {
->  	struct fwctl_info info;
-> +	struct fwctl_rpc rpc;
->  };
->
->  struct fwctl_ioctl_op {
-> @@ -98,6 +159,7 @@ struct fwctl_ioctl_op {
->  	}
->  static const struct fwctl_ioctl_op fwctl_ioctl_ops[] = {
->  	IOCTL_OP(FWCTL_INFO, fwctl_cmd_info, struct fwctl_info, out_device_data),
-> +	IOCTL_OP(FWCTL_RPC, fwctl_cmd_rpc, struct fwctl_rpc, out),
->  };
->
->  static long fwctl_fops_ioctl(struct file *filp, unsigned int cmd,
-> diff --git a/include/linux/fwctl.h b/include/linux/fwctl.h
-> index 9a906b861acf3a..294cfbf63306a2 100644
-> --- a/include/linux/fwctl.h
-> +++ b/include/linux/fwctl.h
-> @@ -26,6 +26,9 @@ struct fwctl_uctx;
->   *	out_device_data. On input length indicates the size of the user buffer
->   *	on output it indicates the size of the memory. The driver can ignore
->   *	length on input, the core code will handle everything.
-> + * @fw_rpc: Implement FWCTL_RPC. Deliver rpc_in/in_len to the FW and return
-> + *	the response and set out_len. rpc_in can be returned as the response
-> + *	pointer. Otherwise the returned pointer is freed with kvfree().
->   */
->  struct fwctl_ops {
->  	enum fwctl_device_type device_type;
-> @@ -33,6 +36,8 @@ struct fwctl_ops {
->  	int (*open_uctx)(struct fwctl_uctx *uctx);
->  	void (*close_uctx)(struct fwctl_uctx *uctx);
->  	void *(*info)(struct fwctl_uctx *uctx, size_t *length);
-> +	void *(*fw_rpc)(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
-> +			void *rpc_in, size_t in_len, size_t *out_len);
->  };
->
->  /**
-> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
-> index 39db9f09f8068e..8bde0d4416fd55 100644
-> --- a/include/uapi/fwctl/fwctl.h
-> +++ b/include/uapi/fwctl/fwctl.h
-> @@ -67,4 +67,70 @@ struct fwctl_info {
->  };
->  #define FWCTL_INFO _IO(FWCTL_TYPE, FWCTL_CMD_INFO)
->
-> +/**
-> + * enum fwctl_rpc_scope - Scope of access for the RPC
-> + */
-> +enum fwctl_rpc_scope {
-> +	/**
-> +	 * @FWCTL_RPC_CONFIGURATION: Device configuration access scope
-> +	 *
-> +	 * Read/write access to device configuration. When configuration
-> +	 * is written to the device remains in a fully supported state.
-> +	 */
-> +	FWCTL_RPC_CONFIGURATION = 0,
-> +	/**
-> +	 * @FWCTL_RPC_DEBUG_READ_ONLY: Read only access to debug information
-> +	 *
-> +	 * Readable debug information. Debug information is compatible with
-> +	 * kernel lockdown, and does not disclose any sensitive information. For
-> +	 * instance exposing any encryption secrets from this information is
-> +	 * forbidden.
-> +	 */
-> +	FWCTL_RPC_DEBUG_READ_ONLY = 1,
-> +	/**
-> +	 * @FWCTL_RPC_DEBUG_WRITE: Writable access to lockdown compatible debug information
-> +	 *
-> +	 * Allows write access to data in the device which may leave a fully
-> +	 * supported state. This is intended to permit intensive and possibly
-> +	 * invasive debugging. This scope will taint the kernel.
-> +	 */
-> +	FWCTL_RPC_DEBUG_WRITE = 2,
-> +	/**
-> +	 * @FWCTL_RPC_DEBUG_WRITE_FULL: Writable access to all debug information
-> +	 *
-> +	 * Allows read/write access to everything. Requires CAP_SYS_RAW_IO, so
-> +	 * it is not required to follow lockdown principals. If in doubt
-> +	 * debugging should be placed in this scope. This scope will taint the
-> +	 * kernel.
-> +	 */
-> +	FWCTL_RPC_DEBUG_WRITE_FULL = 3,
-> +};
-> +
-> +/**
-> + * struct fwctl_rpc - ioctl(FWCTL_RPC)
-> + * @size: sizeof(struct fwctl_rpc)
-> + * @scope: One of enum fwctl_rpc_scope, required scope for the RPC
-> + * @in_len: Length of the in memory
-> + * @out_len: Length of the out memory
-> + * @in: Request message in device specific format
-> + * @out: Response message in device specific format
-> + *
-> + * Deliver a Remote Procedure Call to the device FW and return the response. The
-> + * call's parameters and return are marshaled into linear buffers of memory. Any
-> + * errno indicates that delivery of the RPC to the device failed. Return status
-> + * originating in the device during a successful delivery must be encoded into
-> + * out.
-> + *
-> + * The format of the buffers matches the out_device_type from FWCTL_INFO.
-> + */
-> +struct fwctl_rpc {
-> +	__u32 size;
-> +	__u32 scope;
-> +	__u32 in_len;
-> +	__u32 out_len;
-> +	__aligned_u64 in;
-> +	__aligned_u64 out;
-> +};
-> +#define FWCTL_RPC _IO(FWCTL_TYPE, FWCTL_CMD_RPC)
-> +
->  #endif
-> --
-> 2.45.2
->
->
+>> drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c:2081:69: warning: variable 'priv' is uninitialized when used here [-Wuninitialized]
+    2081 |         err = device_property_read_u32(&spi->dev, "gpio-transceiver-pin", &priv->transceiver_pin);
+         |                                                                            ^~~~
+   drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c:2035:29: note: initialize the variable 'priv' to silence this warning
+    2035 |         struct mcp251xfd_priv *priv;
+         |                                    ^
+         |                                     = NULL
+   1 warning generated.
+
+
+vim +/priv +2081 drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c
+
+  2031	
+  2032	static int mcp251xfd_probe(struct spi_device *spi)
+  2033	{
+  2034		struct net_device *ndev;
+  2035		struct mcp251xfd_priv *priv;
+  2036		struct gpio_desc *rx_int;
+  2037		struct regulator *reg_vdd, *reg_xceiver;
+  2038		struct clk *clk;
+  2039		bool pll_enable = false;
+  2040		u32 freq = 0;
+  2041		int err;
+  2042	
+  2043		if (!spi->irq)
+  2044			return dev_err_probe(&spi->dev, -ENXIO,
+  2045					     "No IRQ specified (maybe node \"interrupts-extended\" in DT missing)!\n");
+  2046	
+  2047		rx_int = devm_gpiod_get_optional(&spi->dev, "microchip,rx-int",
+  2048						 GPIOD_IN);
+  2049		if (IS_ERR(rx_int))
+  2050			return dev_err_probe(&spi->dev, PTR_ERR(rx_int),
+  2051					     "Failed to get RX-INT!\n");
+  2052	
+  2053		reg_vdd = devm_regulator_get_optional(&spi->dev, "vdd");
+  2054		if (PTR_ERR(reg_vdd) == -ENODEV)
+  2055			reg_vdd = NULL;
+  2056		else if (IS_ERR(reg_vdd))
+  2057			return dev_err_probe(&spi->dev, PTR_ERR(reg_vdd),
+  2058					     "Failed to get VDD regulator!\n");
+  2059	
+  2060		reg_xceiver = devm_regulator_get_optional(&spi->dev, "xceiver");
+  2061		if (PTR_ERR(reg_xceiver) == -ENODEV)
+  2062			reg_xceiver = NULL;
+  2063		else if (IS_ERR(reg_xceiver))
+  2064			return dev_err_probe(&spi->dev, PTR_ERR(reg_xceiver),
+  2065					     "Failed to get Transceiver regulator!\n");
+  2066	
+  2067		clk = devm_clk_get_optional(&spi->dev, NULL);
+  2068		if (IS_ERR(clk))
+  2069			return dev_err_probe(&spi->dev, PTR_ERR(clk),
+  2070					     "Failed to get Oscillator (clock)!\n");
+  2071		if (clk) {
+  2072			freq = clk_get_rate(clk);
+  2073		} else {
+  2074			err = device_property_read_u32(&spi->dev, "clock-frequency",
+  2075						       &freq);
+  2076			if (err)
+  2077				return dev_err_probe(&spi->dev, err,
+  2078						     "Failed to get clock-frequency!\n");
+  2079		}
+  2080	
+> 2081		err = device_property_read_u32(&spi->dev, "gpio-transceiver-pin", &priv->transceiver_pin);
+  2082			if (err)
+  2083				return dev_err_probe(&spi->dev, err,
+  2084						     "Failed to get gpio transceiver pin!\n");
+  2085	
+  2086		/* Sanity check */
+  2087		if (freq < MCP251XFD_SYSCLOCK_HZ_MIN ||
+  2088		    freq > MCP251XFD_SYSCLOCK_HZ_MAX) {
+  2089			dev_err(&spi->dev,
+  2090				"Oscillator frequency (%u Hz) is too low or high.\n",
+  2091				freq);
+  2092			return -ERANGE;
+  2093		}
+  2094	
+  2095		if (freq <= MCP251XFD_SYSCLOCK_HZ_MAX / MCP251XFD_OSC_PLL_MULTIPLIER)
+  2096			pll_enable = true;
+  2097	
+  2098		ndev = alloc_candev(sizeof(struct mcp251xfd_priv),
+  2099				    MCP251XFD_TX_OBJ_NUM_MAX);
+  2100		if (!ndev)
+  2101			return -ENOMEM;
+  2102	
+  2103		SET_NETDEV_DEV(ndev, &spi->dev);
+  2104	
+  2105		ndev->netdev_ops = &mcp251xfd_netdev_ops;
+  2106		ndev->irq = spi->irq;
+  2107		ndev->flags |= IFF_ECHO;
+  2108	
+  2109		priv = netdev_priv(ndev);
+  2110		spi_set_drvdata(spi, priv);
+  2111		priv->can.clock.freq = freq;
+  2112		if (pll_enable)
+  2113			priv->can.clock.freq *= MCP251XFD_OSC_PLL_MULTIPLIER;
+  2114		priv->can.do_set_mode = mcp251xfd_set_mode;
+  2115		priv->can.do_get_berr_counter = mcp251xfd_get_berr_counter;
+  2116		priv->can.bittiming_const = &mcp251xfd_bittiming_const;
+  2117		priv->can.data_bittiming_const = &mcp251xfd_data_bittiming_const;
+  2118		priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
+  2119			CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTING |
+  2120			CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO |
+  2121			CAN_CTRLMODE_CC_LEN8_DLC;
+  2122		set_bit(MCP251XFD_FLAGS_DOWN, priv->flags);
+  2123		priv->ndev = ndev;
+  2124		priv->spi = spi;
+  2125		priv->rx_int = rx_int;
+  2126		priv->clk = clk;
+  2127		priv->pll_enable = pll_enable;
+  2128		priv->reg_vdd = reg_vdd;
+  2129		priv->reg_xceiver = reg_xceiver;
+  2130		priv->devtype_data = *(struct mcp251xfd_devtype_data *)spi_get_device_match_data(spi);
+  2131	
+  2132		/* Errata Reference:
+  2133		 * mcp2517fd: DS80000792C 5., mcp2518fd: DS80000789E 4.,
+  2134		 * mcp251863: DS80000984A 4.
+  2135		 *
+  2136		 * The SPI can write corrupted data to the RAM at fast SPI
+  2137		 * speeds:
+  2138		 *
+  2139		 * Simultaneous activity on the CAN bus while writing data to
+  2140		 * RAM via the SPI interface, with high SCK frequency, can
+  2141		 * lead to corrupted data being written to RAM.
+  2142		 *
+  2143		 * Fix/Work Around:
+  2144		 * Ensure that FSCK is less than or equal to 0.85 *
+  2145		 * (FSYSCLK/2).
+  2146		 *
+  2147		 * Known good combinations are:
+  2148		 *
+  2149		 * MCP	ext-clk	SoC			SPI			SPI-clk		max-clk	parent-clk	config
+  2150		 *
+  2151		 * 2518	20 MHz	allwinner,sun8i-h3	allwinner,sun8i-h3-spi	 8333333 Hz	 83.33%	600000000 Hz	assigned-clocks = <&ccu CLK_SPIx>
+  2152		 * 2518	40 MHz	allwinner,sun8i-h3	allwinner,sun8i-h3-spi	16666667 Hz	 83.33%	600000000 Hz	assigned-clocks = <&ccu CLK_SPIx>
+  2153		 * 2517	40 MHz	atmel,sama5d27		atmel,at91rm9200-spi	16400000 Hz	 82.00%	 82000000 Hz	default
+  2154		 * 2518	40 MHz	atmel,sama5d27		atmel,at91rm9200-spi	16400000 Hz	 82.00%	 82000000 Hz	default
+  2155		 * 2518	40 MHz	fsl,imx6dl		fsl,imx51-ecspi		15000000 Hz	 75.00%	 30000000 Hz	default
+  2156		 * 2517	20 MHz	fsl,imx8mm		fsl,imx51-ecspi		 8333333 Hz	 83.33%	 16666667 Hz	assigned-clocks = <&clk IMX8MM_CLK_ECSPIx_ROOT>
+  2157		 *
+  2158		 */
+  2159		priv->spi_max_speed_hz_orig = spi->max_speed_hz;
+  2160		priv->spi_max_speed_hz_slow = min(spi->max_speed_hz,
+  2161						  freq / 2 / 1000 * 850);
+  2162		if (priv->pll_enable)
+  2163			priv->spi_max_speed_hz_fast = min(spi->max_speed_hz,
+  2164							  freq *
+  2165							  MCP251XFD_OSC_PLL_MULTIPLIER /
+  2166							  2 / 1000 * 850);
+  2167		else
+  2168			priv->spi_max_speed_hz_fast = priv->spi_max_speed_hz_slow;
+  2169		spi->max_speed_hz = priv->spi_max_speed_hz_slow;
+  2170		spi->bits_per_word = 8;
+  2171		spi->rt = true;
+  2172		err = spi_setup(spi);
+  2173		if (err)
+  2174			goto out_free_candev;
+  2175	
+  2176		err = mcp251xfd_regmap_init(priv);
+  2177		if (err)
+  2178			goto out_free_candev;
+  2179	
+  2180		err = can_rx_offload_add_manual(ndev, &priv->offload,
+  2181						MCP251XFD_NAPI_WEIGHT);
+  2182		if (err)
+  2183			goto out_free_candev;
+  2184	
+  2185		err = mcp251xfd_register(priv);
+  2186		if (err) {
+  2187			dev_err_probe(&spi->dev, err, "Failed to detect %s.\n",
+  2188				      mcp251xfd_get_model_str(priv));
+  2189			goto out_can_rx_offload_del;
+  2190		}
+  2191	
+  2192		return 0;
+  2193	
+  2194	out_can_rx_offload_del:
+  2195		can_rx_offload_del(&priv->offload);
+  2196	out_free_candev:
+  2197		spi->max_speed_hz = priv->spi_max_speed_hz_orig;
+  2198	
+  2199		free_candev(ndev);
+  2200	
+  2201		return err;
+  2202	}
+  2203	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
