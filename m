@@ -1,134 +1,155 @@
-Return-Path: <netdev+bounces-116461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1951494A7B3
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:29:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E55F94A7E5
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:41:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 528FF1C21B44
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:29:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08A07285018
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0571E4F1C;
-	Wed,  7 Aug 2024 12:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4381E6722;
+	Wed,  7 Aug 2024 12:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InALkeYZ"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="NYcehtKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971171E2101;
-	Wed,  7 Aug 2024 12:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9CC1E6723;
+	Wed,  7 Aug 2024 12:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723033789; cv=none; b=gmjLz8pHQ69fdjveLvpyhqqoZYTup70wQgIbIkGizTKCYRomFtZyWqrJdUIqAPB3NzqeLipFvCfyeKPxUWzq+5h9AIXmaGwTgjgEh9NEucoP3CHztOnpSSsY+tupYuiZ1cBe8YeHym7EZOP4tnV4q1ED9lARNNczNdbWfi+EtOA=
+	t=1723034457; cv=none; b=iqUPc4dkGJ9oUUMhyXprbBICi3uZy8LlHgPM5q1AkKo4B4oP4MfUzuw986gNdOQntvRlVQtOkJ1gdp/plyB6HisYgBOA0XoMI2XkuOi/F6a6kabg3CQR7PUuRBQnMO54dhNvtJkIM1re1klgzOsT7FveQlyQhG6+fju2yY/aMLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723033789; c=relaxed/simple;
-	bh=pgiw/PXddMIrw7PyP7Ctp5k5rWWWnsIDF+Ip6XS+nU4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZzoORiD1yz9tT3ci4ojS6G3PoP5o69TTrCXcG82pT891swkeglRd1vt3XIminrliQw3W2VGIluoUm/ZppkMpewdlUIibTlmI+IM+tmjfq5BfBLbSHsj60KcJ+9ZmqajG02lL2AVg0a6PmiJi6LQ7MbTUoNg7kQ5w5bYJuQaEP+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=InALkeYZ; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1ff4568676eso18167975ad.0;
-        Wed, 07 Aug 2024 05:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723033787; x=1723638587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kx32xTT3Lmjn28QqG28xI58RScq11tK0yTOGRh/oOE4=;
-        b=InALkeYZdPu7jCgUElCeuRW7/X+R2krN6fMJH1gEVVsB4UbInj2c0Ooarc6fN/k8kT
-         ievk/lYeMiUhSnFjtq95iG5YMMJdslV66z1UhXW2s/2zVZ0zOwYpnf3706VEHtyUHWfv
-         kcongexK6KJxH2NXVnLNhRPoPS4Vefe9fGl/Jtxm7RmrISF02ThK9/0U3ciltXsBsv34
-         kQRcC8JrARXadCNmLanmPKcvX5RsBajVkOpjqXSP+nkFBXhqnA21g7NtiR69Uxnvqgfe
-         BszFKuqyaZzbp5H3eaRDeLm1pZR4u1fJltd41WhCyVRM7GeEKbUF4T54smQiVMufSdD8
-         lAJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723033787; x=1723638587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kx32xTT3Lmjn28QqG28xI58RScq11tK0yTOGRh/oOE4=;
-        b=dYaYB9tsDZMnUYEr2Zn1rBpLaIUDm3SQcms18AUNb+t4BmtRygAm34TSQ5ADdHIZfv
-         7JbGWDNGqh5fMyUruvdNVwCpADdHW1xkpspC7Sj0wFAbmd0S43J3U+qF6Nfq9IquJ4oJ
-         G9S3AdE1xiGXoI6XabmOoT+oNkLGuj2UI08mi2bY4JFIll1I94uO/pOIH8++KsSPCQvF
-         NAIEzzqhyQNzgSKoSLIwIY7PJfotoVIAE8bimmQLdQNyQfHsCELmTUHWHvicCeOCsSUg
-         ayPwFZLB6heBDkYFfDFhmoVlZdqr/fNSNXZIZO/nkslPllT05OTrKv6x+fSyqoUY/2SL
-         Yw5w==
-X-Forwarded-Encrypted: i=1; AJvYcCW8Pyla9kVCKpvfKinCIe7OwyKSGaKmR2P/BnEI8xXZsDtI/6FPmdzrSq1eu/AvRdutV7OybMtJMf86addMoOGp3dtJscYXwSGnepnQ9EdPiva/OlqCwcooKwmjOxvJBmEiBXuA0sd1b0RLrf1YX4iOjlb4jAffpVz6ZWRD5D5mMXiTRFKjI+0QmnVMPFZ3wbHgo1hJuBn15XeXMg==
-X-Gm-Message-State: AOJu0YxCV01I5As8SLNZieWb0JM8BSnXPIR4YpwQvjSQxQAfDgFxl4vc
-	NIjTLNUYMjJESwKprCWoxWM/bcwCmgl4iaVtUSKRXF8ULiXgAnvweg+Ajf7To1BVChgAefpto2w
-	50daulzASN3fXqoJ/7iJ/+q9a2AA=
-X-Google-Smtp-Source: AGHT+IHX/Io8BGEe/ckylAL2OpQEtD0KNkWtQjYnygkiTok5unepYcDXoXJVkqfRWDMR5n7NAPzxYbxjWVzJl5nWASc=
-X-Received: by 2002:a17:903:41d2:b0:1fd:9d0c:9996 with SMTP id
- d9443c01a7336-1ff572d4738mr263854185ad.35.1723033786674; Wed, 07 Aug 2024
- 05:29:46 -0700 (PDT)
+	s=arc-20240116; t=1723034457; c=relaxed/simple;
+	bh=YehjdJhVQfE1SmMkcg6Vh92i4QqpLbWygY3qyRqS24M=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=GC42cO7majJ8Bf712GFIb3dpU0OkXsUWfEvrS0vCQ0+Nm1MhuEPPHhqSMs3WWgmsG+Mmn+AS+y4akPJRZyw9yU/4ocf9LskT7FCcalMUyK5go2C9pSMpxrEkuKdOUIk29TgUUEaXwIlAhOGtkTuxEp2csGAKeflYI+x8IZoLfRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=NYcehtKO; arc=none smtp.client-ip=203.205.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1723034151; bh=O8EFHvhwR3zwhlu6IVyc3fhL292dVDPjyYhLVFCwx/U=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=NYcehtKOF5ngNu+W+izX80ZjT6s4vNFNY316+dqjPH/hWOTyrGPHcuPl3QtW0CFFZ
+	 UARTf8oW298PRDgjePGIR2IYe92O2JBFM8yYxnfvf5T1X1k9EUFmLrSSdhgzus8fig
+	 PKq7Tcv2oBSOHcdwDPOy2D0ZNk5rTguFfMdUrzu8=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
+	id 8EF23485; Wed, 07 Aug 2024 20:35:47 +0800
+X-QQ-mid: xmsmtpt1723034147tl0ll2659
+Message-ID: <tencent_BB8B66363CC7375A97D436964A80745F7709@qq.com>
+X-QQ-XMAILINFO: M/NR0wiIuy70Tm+qlsdo2pf6f8nFpD+KrPBYeIwgja1uUH6yN6aCauzhpeBrNS
+	 /bvbDYlXxThybRPDEIo+E8MEER5lBoWsY5uF1tmy9Gm0+4BZql9jxcPM67GqsJbtziDFg8goENk5
+	 INYeTNB2tNc07Fx8I23cQ39bJ3xGkjJ6pCaFjkzNhpS/leH1q0DW65VDdGH6UEjhGq+uwFIqpaD3
+	 Crik8uYze2DfCfArnPZWHeTmG9QoDZytieWydhd7ulLPzxPrnZkhppD+Nk7mODMAPqrFVkg9IDpq
+	 rWwmxjntkuPXk0m9eSMu+T6S02gQ/QQ3+eJMkXfLwjCtdN19K9Rmyui0p8a3YL4jb8fJ3uPD6IHI
+	 sYZuKW8mlkKWeZ/RmRSbtccHfp3iWlXZT5fRbL9xUSxXb7QmxBLDfaktWIF7HhJhd+eJaSgYs6kM
+	 aRRKzPGWBMow5MRCPxsWZnHw4GEp4tl4/Y1c9nRA1hhS8kQuxZO9LG9u2Nd1PsRGyqAaJAfiPaoX
+	 YJBMEsOG9JQ657PKqs/ADl92szjk8gIgz0ATMy9CHbYri2+PrBbDUOlMuXZOpk0df8mbqNXkzRET
+	 II3HYVhbHraY2e/+wKQfy6KLYKfb85zhwnnY4/h4S8aqRrl37nlmY8B50u2qJNnN4RCBtUYx5WPS
+	 8mWC/5NyG4dwHKYfeigYhRRVXfaHDmVGzmp4ZShQFYnZngZDkSNVwhQrpPvE2isKbuWIfcIBRLGa
+	 oBlXvTv+P1M258CwHAvnBzRqiME+ajR3TX7ePO1Wryw/q2PisSks6Yjs5imZIAzONM+whnBkHgmj
+	 EoqyHtFFcQuhQ8L57+dhUUJ0ctknxSsrbuS3jpZWPiHCxpJ45arVnTi8Chz5Zyv3o35B7JO+5rGx
+	 hqJ8HMmzcyFwfftKfwSFTQShKjxIc0zOoIIjt7qKQQy2iwCpWl7MA5ITR5AEZRFPTkj3K3OU4v3x
+	 a5mgk5ABM=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kernel@pengutronix.de,
+	kuba@kernel.org,
+	leitao@debian.org,
+	linux-can@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mkl@pengutronix.de,
+	netdev@vger.kernel.org,
+	o.rempel@pengutronix.de,
+	pabeni@redhat.com,
+	robin@protonic.nl,
+	socketcan@hartkopp.net,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH net-next] can: j1939: fix uaf in j1939_session_destroy
+Date: Wed,  7 Aug 2024 20:35:47 +0800
+X-OQ-MSGID: <20240807123546.460919-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000af9991061ef63774@google.com>
+References: <000000000000af9991061ef63774@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240806193622.GA74589@bhelgaas> <20240807084348.12304-1-mattc@purestorage.com>
- <alpine.DEB.2.21.2408070956520.61955@angie.orcam.me.uk>
-In-Reply-To: <alpine.DEB.2.21.2408070956520.61955@angie.orcam.me.uk>
-From: "Oliver O'Halloran" <oohall@gmail.com>
-Date: Wed, 7 Aug 2024 22:29:35 +1000
-Message-ID: <CAOSf1CHo66dxmChrx97+tfKSE=JM_NzrgdUF_Y4kFabnu3qotQ@mail.gmail.com>
-Subject: Re: PCI: Work around PCIe link training failures
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: Matthew W Carlis <mattc@purestorage.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	linux-pci@vger.kernel.org, mahesh@linux.ibm.com, edumazet@google.com, 
-	sr@denx.de, leon@kernel.org, linux-rdma@vger.kernel.org, helgaas@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, Jim Wilson <wilson@tuliptree.org>, 
-	linuxppc-dev@lists.ozlabs.org, npiggin@gmail.com, alex.williamson@redhat.com, 
-	Bjorn Helgaas <bhelgaas@google.com>, mika.westerberg@linux.intel.com, 
-	david.abdurachmanov@gmail.com, saeedm@nvidia.com, 
-	linux-kernel@vger.kernel.org, lukas@wunner.de, netdev@vger.kernel.org, 
-	pali@kernel.org, "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 7, 2024 at 9:14=E2=80=AFPM Maciej W. Rozycki <macro@orcam.me.uk=
-> wrote:
->
-> On Wed, 7 Aug 2024, Matthew W Carlis wrote:
->
-> > > it does seem like this series made wASMedia ASM2824 work better but
-> > > caused regressions elsewhere, so maybe we just need to accept that
-> > > ASM2824 is slightly broken and doesn't work as well as it should.
-> >
-> > One of my colleagues challenged me to provide a more concrete example
-> > where the change will cause problems. One such configuration would be n=
-ot
-> > implementing the Power Controller Control in the Slot Capabilities Regi=
-ster.
-> > Then, Powering off the slot via out-of-band interfaces would result in =
-the
-> > kernel forcing the DSP to Gen1 100% of the time as far as I can tell.
-> > The aspect of this force to Gen1 that is the most concerning to my team=
- is
-> > that it isn't cleaned up even if we replaced the EP with some other EP.
->
->  Why does that happen?
->
->  For the quirk to trigger, the link has to be down and there has to be th=
-e
-> LBMS Link Status bit set from link management events as per the PCIe spec
-> while the link was previously up, and then both of that while rescanning
-> the PCIe device in question, so there's a lot of conditions to meet.  Is
-> it the case that in your setup there is no device at this point, but one
-> gets plugged in later?
+The root cause of this problem is when both of the following conditions
+are met simultaneously:
+[1] Introduced commit c9c0ee5f20c5, There are following rules:
+In debug builds (CONFIG_DEBUG_NET set), the reference count is always
+decremented, even when it's 1.
 
-My read was that Matt is essentially doing a surprise hot-unplug by
-removing power to the card without notifying the OS. I thought the
-LBMS bit wouldn't be set in that case since the link goes down rather
-than changes speed, but the spec is a little vague and that appears to
-be happening in Matt's testing. It might be worth disabling the
-workaround if the port has the surprise hotplug capability bit set.
-It's fairly common for ports on NVMe drive backplanes to have it set
-and a lot of people would be unhappy about those being forced to Gen 1
-by accident.
+[2] When executing sendmsg, the newly created session did not increase the
+skb reference count, only added skb to the session's skb_queue.
+
+The solution is:
+When creating a new session, do not add the skb to the skb_queue.
+Instead, when using skb, uniformly use j1939_session_skb_queue to add
+the skb to the queue and increase the skb reference count through it.
+
+Fixes: c9c0ee5f20c5 ("net: skbuff: Skip early return in skb_unref when debugging")
+Reported-and-tested-by: syzbot+ad601904231505ad6617@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/can/j1939/socket.c    | 7 ++++---
+ net/can/j1939/transport.c | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
+index 305dd72c844c..ec78bee1bfa6 100644
+--- a/net/can/j1939/socket.c
++++ b/net/can/j1939/socket.c
+@@ -1170,10 +1170,11 @@ static int j1939_sk_send_loop(struct j1939_priv *priv,  struct sock *sk,
+ 					break;
+ 				}
+ 			}
+-		} else {
+-			skcb->offset = session->total_queued_size;
+-			j1939_session_skb_queue(session, skb);
+ 		}
++		/* Session is ready, add it to skb queue and increase ref count.
++		 */
++		skcb->offset = session->total_queued_size;
++		j1939_session_skb_queue(session, skb);
+ 
+ 		todo_size -= segment_size;
+ 		session->total_queued_size += segment_size;
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+index 4be73de5033c..dd503bc3adb5 100644
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -1505,7 +1505,6 @@ static struct j1939_session *j1939_session_new(struct j1939_priv *priv,
+ 	session->state = J1939_SESSION_NEW;
+ 
+ 	skb_queue_head_init(&session->skb_queue);
+-	skb_queue_tail(&session->skb_queue, skb);
+ 
+ 	skcb = j1939_skb_to_cb(skb);
+ 	memcpy(&session->skcb, skcb, sizeof(session->skcb));
+@@ -1548,6 +1547,7 @@ j1939_session *j1939_session_fresh_new(struct j1939_priv *priv,
+ 		kfree_skb(skb);
+ 		return NULL;
+ 	}
++	j1939_session_skb_queue(session, skb);
+ 
+ 	/* alloc data area */
+ 	skb_put(skb, size);
+-- 
+2.43.0
+
 
