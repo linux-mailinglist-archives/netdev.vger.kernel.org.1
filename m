@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-116446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F172294A6B5
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:10:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9266294A6BC
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 13:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A69351F2125D
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:10:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2C05B21D48
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 11:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51931E2890;
-	Wed,  7 Aug 2024 11:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104C01E2134;
+	Wed,  7 Aug 2024 11:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cmkx/22q"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C5C1E211D
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 11:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D314F1B8EAA;
+	Wed,  7 Aug 2024 11:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723029039; cv=none; b=euvvGLnts6K69fH2pWmiJDOseF0lTP8XMJTsFv5aHuXZ321wsRE3U/jP7hsAN8GHoYbx8zoL2hPZnQE/A58kW1waJYtWNMT0J6bC49lHPal1pTdpsm2yk/fgys74+W4phi1jZuKcC5LsBMLlm31nVkAjyR8odmeTLLILx1ocp+c=
+	t=1723029257; cv=none; b=MN38R2yItb7lKW+jLqyGaAMKIYZ7uarVEAqA4HBTPqybnYcA7n+VoKWnHMZNmK8Fu3xpPnyxZutpagEVOQB3GkLbfuPyCGRkDeyKBKN1f3fVH9NwyvyfA6s9W0b+tl8BARlA9nlz/44rGJcEhgL1Ptsd6VY+F27M23nip7QMyX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723029039; c=relaxed/simple;
-	bh=w/33/4xPAAyjcsz8TUb0CK3jGN3A18eYdaVHZPd7ki8=;
+	s=arc-20240116; t=1723029257; c=relaxed/simple;
+	bh=zqpqUonVOPKz1vwkSnNtCE4Cyy7xTfZIEwVrxcqnQuU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pqalkevEYZat6NCRyav8S1EooRlBGIQ/CNlJF9KaEvq+OeVIWR60ocE7/DuHv+82hFAJKoONFuRf4BtTC8FmyNASZ2wTyHBQMEs/WAyG8eJRxYZvsnY3bsUAjgMw/LAm6GhtwauJORv3g4qEMVDTXgEdXgQ6n5SDIKbCyz5RCMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sbeYk-00079C-Us; Wed, 07 Aug 2024 13:10:26 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sbeYj-005B53-UC; Wed, 07 Aug 2024 13:10:25 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sbeYj-006vAm-2d;
-	Wed, 07 Aug 2024 13:10:25 +0200
-Date: Wed, 7 Aug 2024 13:10:25 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=GK2DpKNeeTdt/fE+heHAqMkO2vOeeFtkFuMZUF1+UaB2qkF/U30iM2TMg4LyNJbWsFBYGCrHHnXvtl/N9JLEtsTujbQRU07oddno2bpcncyvx/ngNpwJo4AHPY1gKShXfpYWRMaGyePSmrUcvVlpRaKSN1eDhmNERsic8r9Hx88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cmkx/22q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3710C32782;
+	Wed,  7 Aug 2024 11:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1723029256;
+	bh=zqpqUonVOPKz1vwkSnNtCE4Cyy7xTfZIEwVrxcqnQuU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cmkx/22q6Yu5iUxqv41dONrmrFFRKEthaWSHnzAx+uJpTFOfy4RBBa3+PwSDXCns6
+	 fTFqgd0F16MHA8hEvMjH//BFp1Rq881m2N0pHW+WiyCFPkPFRq/J63L1YKMUN6uHe3
+	 OQ5XknIG78HfjJifkI/U32Cl7FLeFNkxd+WWfBPE=
+Date: Wed, 7 Aug 2024 13:14:13 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andreas Koensgen <ajk@comnets.uni-bremen.de>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Douglas Anderson <dianders@chromium.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] net: phy: dp83tg720: Add cable testing
- support
-Message-ID: <ZrNWIfcCjHm4G4d9@pengutronix.de>
-References: <20240807093251.3308737-1-o.rempel@pengutronix.de>
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jeremy Kerr <jk@codeconstruct.com.au>, linux-hams@vger.kernel.org,
+	Matt Johnston <matt@codeconstruct.com.au>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Hurley <peter@hurleysoftware.com>
+Subject: Re: [PATCH 00/13] tty: random fixes and cleanups
+Message-ID: <2024080750-percent-tuesday-9dff@gregkh>
+References: <20240805102046.307511-1-jirislaby@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,38 +64,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240807093251.3308737-1-o.rempel@pengutronix.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240805102046.307511-1-jirislaby@kernel.org>
 
-
-On Wed, Aug 07, 2024 at 11:32:51AM +0200, Oleksij Rempel wrote:
-> Introduce cable testing support for the DP83TG720 PHY. This implementation
-> is based on the "DP83TG720S-Q1: Configuring for Open Alliance Specification
-> Compliance (Rev. B)" application note.
+On Mon, Aug 05, 2024 at 12:20:33PM +0200, Jiri Slaby (SUSE) wrote:
+> Hi,
 > 
-> The feature has been tested with cables of various lengths:
-> - No cable: 1m till open reported.
-> - 5 meter cable: reported properly.
-> - 20 meter cable: reported as 19m.
-> - 40 meter cable: reported as cable ok.
+> this is a series of locally accumulated patches over past months.
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
- 
-There is missing PHY_POLL_CABLE_TEST, i'll send v2 soon.
+> The series:
+> * makes mctp and 6pack use u8s,
+> * cleans up 6pack a bit,
+> * fixes two coverity reports,
+> * uses guard() to make some of the tty function easier to follow.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+This series breaks the build for me:
+
+drivers/tty/serial/serial_core.c: In function ‘uart_suspend_port’:
+drivers/tty/serial/serial_core.c:2400:17: error: label ‘unlock’ used but not defined
+ 2400 |                 goto unlock;
+      |                 ^~~~
+make[5]: *** [scripts/Makefile.build:244: drivers/tty/serial/serial_core.o] Error 1
+make[5]: *** Waiting for unfinished jobs....
+
+
 
