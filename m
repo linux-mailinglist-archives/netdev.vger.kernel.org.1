@@ -1,186 +1,95 @@
-Return-Path: <netdev+bounces-116464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E149C94A81F
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:56:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD7C694A828
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6123E1F22046
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:56:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C4CC281BE4
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 12:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191791E6742;
-	Wed,  7 Aug 2024 12:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6721E6747;
+	Wed,  7 Aug 2024 12:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="P2RZQvx9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="F5T0QIp2";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="P2RZQvx9";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="F5T0QIp2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Bn9v3zEq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4FE1E3CBE;
-	Wed,  7 Aug 2024 12:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1B71C579A
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 12:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723035398; cv=none; b=AAvR37xwf4j+APbMbBp9wYAoiMZyXiVDQRU9jkS7zcR+jTK9gi9qYUpCIwydw7HW0dCleLE5vwwhn5hs3dikAGIAUUzXNndcYXCqdS48uT7qneoauhOGxyeTY5TyzJwsci12H7OVPcTCRAsZ8LmyNsTECVb4oXyTbH3FgvLEseU=
+	t=1723035541; cv=none; b=O0dRdFGf7DrWtltae5TLyXyEyHToeHC3gqrgWnpTbDb/L1y8cAHkI70rPdfEfts/p2gXOSUk8+gKTNiyvZJdcjz2V3QOJNqrtvO2/ZiD91ucP0KJOU6DmiZVIVNlJ1g9HUFVxpaWMRt37fyZUkh6cHKqOeHsyBa3yJLuZIMBZmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723035398; c=relaxed/simple;
-	bh=jAP3UPV8S7dAg52wzDeIKI73r8ibmTUCvbRmjAy8WdA=;
+	s=arc-20240116; t=1723035541; c=relaxed/simple;
+	bh=DK5cWL/KqLXUk++8jZBNtKO2ex2GLezTyAluO66Tp3A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hiyHaYRTEvs5NsFXZwb09JIsjoW3sClzt9SYv3gKxG7h+iUVWOrlDbNrYx+fGD8cgc2P973hOmLJsEzCrGNNGX7O0OafscUQ/OgFsIrXnzVG3v0S+kEXRSu+zcvZezbqOvINUvApUeNuSvFIIWguqe0DR42USDwYh3LLYJdBYlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=P2RZQvx9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=F5T0QIp2; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=P2RZQvx9; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=F5T0QIp2; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1532B1F396;
-	Wed,  7 Aug 2024 12:56:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1723035394; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ef6g7R8oFl691anvsvAI4zaSbxmFbfpd2rm1KW+VcIg=;
-	b=P2RZQvx9cv0poYr2J5oIp+sNFASV09NUbDlv3rsVT987H1s8Dui6fVYAdgI/rbwfDegpzi
-	2fU6W9iRgUzXqznyfAIxtwX7mqG5O70wRKAer5+++Ysz+q60avrywH0OMuMrA6OqjLqgpU
-	IMU5neRLwWRJzm+59HJLycBNZ4yZTRs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1723035394;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ef6g7R8oFl691anvsvAI4zaSbxmFbfpd2rm1KW+VcIg=;
-	b=F5T0QIp2RkOQJd63D7qqB+fi5ZcpQ2pMyJ+YpAsFoQQGIgCV3QmvOdLrhm/RVwMzqddUpN
-	bmBNwW1Rq0EMHZAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=P2RZQvx9;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=F5T0QIp2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1723035394; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ef6g7R8oFl691anvsvAI4zaSbxmFbfpd2rm1KW+VcIg=;
-	b=P2RZQvx9cv0poYr2J5oIp+sNFASV09NUbDlv3rsVT987H1s8Dui6fVYAdgI/rbwfDegpzi
-	2fU6W9iRgUzXqznyfAIxtwX7mqG5O70wRKAer5+++Ysz+q60avrywH0OMuMrA6OqjLqgpU
-	IMU5neRLwWRJzm+59HJLycBNZ4yZTRs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1723035394;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ef6g7R8oFl691anvsvAI4zaSbxmFbfpd2rm1KW+VcIg=;
-	b=F5T0QIp2RkOQJd63D7qqB+fi5ZcpQ2pMyJ+YpAsFoQQGIgCV3QmvOdLrhm/RVwMzqddUpN
-	bmBNwW1Rq0EMHZAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0A85913297;
-	Wed,  7 Aug 2024 12:56:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 7kiQAgJvs2a1SgAAD6G6ig
-	(envelope-from <jack@suse.cz>); Wed, 07 Aug 2024 12:56:34 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id BBFA2A0762; Wed,  7 Aug 2024 14:56:33 +0200 (CEST)
-Date: Wed, 7 Aug 2024 14:56:33 +0200
-From: Jan Kara <jack@suse.cz>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, sdf@google.com, edumazet@google.com,
-	kuba@kernel.org, mkarsten@uwaterloo.ca,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH net-next] eventpoll: Don't re-zero eventpoll fields
-Message-ID: <20240807125633.dlwr6rx6yzl4ippv@quack3>
-References: <20240807105231.179158-1-jdamato@fastly.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZjlmLzYuD6+TwOb91x4y6cjlsgkKax+kgktq2gs/XceA4yZSYfO+yvte1UVYat6nX/yxkZacpVaT1OSc+OfGHf+WoiyV/I5LClnFQpsZkuYveS1sErRmpJc6Ib6P20pDh7rrvcvbrCGuYspufWsMqf7PwJUH/n2FoOo7WxNjv1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Bn9v3zEq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=MHAEn2K/oYC2/Qg1ValvHBCEafHwfqv3I4V/YKEikFA=; b=Bn
+	9v3zEqvYLmzxPped0G9Jd3964pg3jPNyK2+vEtkE45ijFl9VxVF1k0LnUoecTr2JvtqoDxodWJKSc
+	LBfsS3VfnHQPKaAiN9UYhNh9KnrnDWiLvP3DvEvZJv/Q3p2IUW5m0h5Y2gfYOA16VA1Zfo5u300/s
+	YwQI5Xx6RJuyvoE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sbgFc-004CXW-Vg; Wed, 07 Aug 2024 14:58:48 +0200
+Date: Wed, 7 Aug 2024 14:58:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ngbe: Fix phy mode set to external phy
+Message-ID: <c98c7d2b-d159-4306-bd26-2999be45e1d0@lunn.ch>
+References: <C1587837D62D1BC0+20240806082520.29193-1-mengyuanlou@net-swift.com>
+ <1e537389-7f4b-4918-9353-09f0e16af9f8@intel.com>
+ <4CF76B28-E242-47B2-B62C-4CB8EBE44E92@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240807105231.179158-1-jdamato@fastly.com>
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:dkim,suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	MISSING_XM_UA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.01
-X-Rspamd-Queue-Id: 1532B1F396
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4CF76B28-E242-47B2-B62C-4CB8EBE44E92@net-swift.com>
 
-On Wed 07-08-24 10:52:31, Joe Damato wrote:
-> Remove redundant and unnecessary code.
+On Wed, Aug 07, 2024 at 01:42:06PM +0800, mengyuanlou@net-swift.com wrote:
 > 
-> ep_alloc uses kzalloc to create struct eventpoll, so there is no need to
-> set fields to defaults of 0. This was accidentally introduced in commit
-> 85455c795c07 ("eventpoll: support busy poll per epoll instance") and
-> expanded on in follow-up commits.
 > 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Reviewed-by: Martin Karsten <mkarsten@uwaterloo.ca>
-
-Looks good. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/eventpoll.c | 5 -----
->  1 file changed, 5 deletions(-)
+> > 2024年8月6日 19:13，Przemek Kitszel <przemyslaw.kitszel@intel.com> 写道：
+> > 
+> > On 8/6/24 10:25, Mengyuan Lou wrote:
+> >> When use rgmmi to attach to external phy, set
+> >> PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
+> >> And it is does matter to internal phy.
+> > 
+> > 107│  * @PHY_INTERFACE_MODE_RGMII: Reduced gigabit media-independent interface
+> > 108│  * @PHY_INTERFACE_MODE_RGMII_ID: RGMII with Internal RX+TX delay
+> > 109│  * @PHY_INTERFACE_MODE_RGMII_RXID: RGMII with Internal RX delay
+> > 110│  * @PHY_INTERFACE_MODE_RGMII_TXID: RGMII with Internal RX delay
+> > 
+> > Your change effectively disables Internal Tx delay, but your commit
+> > message does not tell about that. It also does not tell about why,
+> > nor what is wrong in current behavior.
+> > 
 > 
-> diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-> index f53ca4f7fced..6c0a1e9715ea 100644
-> --- a/fs/eventpoll.c
-> +++ b/fs/eventpoll.c
-> @@ -2200,11 +2200,6 @@ static int do_epoll_create(int flags)
->  		error = PTR_ERR(file);
->  		goto out_free_fd;
->  	}
-> -#ifdef CONFIG_NET_RX_BUSY_POLL
-> -	ep->busy_poll_usecs = 0;
-> -	ep->busy_poll_budget = 0;
-> -	ep->prefer_busy_poll = false;
-> -#endif
->  	ep->file = file;
->  	fd_install(fd, file);
->  	return fd;
-> -- 
-> 2.25.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> I will add it, when wangxun em Nics are used as a Mac to attach to external phy.
+> We should disable tx delay.
+
+Why should you disable TX delay?
+
+What is providing that delay? Something needs to add a 2ns delay. Does
+the PCB have an extra long clock line?
+
+    Andrew
 
