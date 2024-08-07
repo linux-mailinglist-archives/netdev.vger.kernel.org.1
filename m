@@ -1,183 +1,217 @@
-Return-Path: <netdev+bounces-116533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637F994AC5B
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 17:14:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8932094ACD7
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 17:26:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B00D283499
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:14:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E18BB2C2D2
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 15:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598DD839E4;
-	Wed,  7 Aug 2024 15:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E7584D02;
+	Wed,  7 Aug 2024 15:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="rYBtNKuO"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="M3oedXTz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fae.mail.infomaniak.ch (smtp-8fae.mail.infomaniak.ch [83.166.143.174])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2063.outbound.protection.outlook.com [40.107.105.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBF2374CC
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 15:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723043662; cv=none; b=XR2tKfAzCdpel6M5cy/Uq3Enrai5qoqFEegj+vf2cq66NzTF+ySA77GGse3N5mylW4ffot1rqFBcU8dv0tly7k8YeIvhF0N2Vkj6/aiAqVZ5jD3PGnW/w9chN0oLS0hau16Fp/l9c7EJ+YoCOrA11hs+5bPGyNeHeqqAqA7Nhzo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723043662; c=relaxed/simple;
-	bh=7Tp7ucPRBB+fxNVCk+S6+A1Ke54+/R0646GFqWL9qn4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G+2QFB4pgM7f0zdcUyMP2T2nVT6sdQvQyZSNN2CJOV0ZtaElTwXPIGbCsjA0PhVzM4mMODU81P4w3NAFppzSyDalWtjW55Oa8IAQCg5dp0yACK3KdVYiNihabfaOXtjFbunFXkylQt5C5ngU40M5sJ9CG7WlndChWf/d+CPu7aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=rYBtNKuO; arc=none smtp.client-ip=83.166.143.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WfDGw22cQzZmq;
-	Wed,  7 Aug 2024 17:14:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1723043656;
-	bh=pq3zt1F/Me0xMXRivd/QVwEg5HhWQNAo2gPJVW36cf0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rYBtNKuOKL0yiW00PYl6421y8XjnBnDBCEJpko4v43xJ6mQwQ9SOQTaUXLIMlmQ1P
-	 OIatPJxYzx3Bf6VbZhBAPa14loezCF81H2GCBe6Cz8jQbVRIMsTL7/5rvXrh3KFT2o
-	 3QZPIHdSqNDGmOOwI13T4mycAEHExensALzCujnM=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WfDGv43T6zT9w;
-	Wed,  7 Aug 2024 17:14:15 +0200 (CEST)
-Date: Wed, 7 Aug 2024 17:14:11 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
-	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v8 4/4] Landlock: Document
- LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI versioning
-Message-ID: <20240807.uLohy7ohYo8A@digikod.net>
-References: <cover.1722570749.git.fahimitahera@gmail.com>
- <bbb4af1cb0933fea3307930a74258b8f78cba084.1722570749.git.fahimitahera@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1271B79949;
+	Wed,  7 Aug 2024 15:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723044277; cv=fail; b=OkFpEhoi9VdexlidmwUTJVQOaXmoOCh7wCRhUzk+PG6NyN2ImJScGNA7/FhFKFh6djthZLKD2QmNyzANZc8C1KA8q19earqjL2o0aW7RHhSOeH+2AkxaDmzT417eyrEV49ccY88vn2Zsr4j94JYCBlSfZw2OWBrDzVKBkxJf98c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723044277; c=relaxed/simple;
+	bh=SWfM2TnM2T9iYuycrBMsX+l7siNgUpdx/x9ZxX259HI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=nYUwqx1ZGCJ3R97+m83/zPAMzWLmj5eOpwSRhGOAL5mSCNNR2sflg8dTbRB1N8rPiCygliRaHm4PMwTaJdsg/bI6sfRRlv+TaMWOTSkZySR9/oY8Wrw9Y549ZVCCudnHSWDLyt2fmxyg/w5rS98cmBp6YqVIrWCMKlCJT5WFdZQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=M3oedXTz; arc=fail smtp.client-ip=40.107.105.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qpMNJmAarxY1ka1sndsMGIzXJUtLcYyaaDmlGVHF24f3yPTFjUL5jyphx4R2vLvlPaL0JObobdVntIDhyVMgwQZUq3FuIz0TodFUiv7Twr5yCbJuic86LCqg42L2qwWqFgYu7EdvwO2U1Zr3pM+mm8bSAtyqwUIjif3SL9Td4BhTO+27hZcEFH0EBcdlB831N+8byedWhI6aZUO/8zUXhHWZBXgsD1DmuZjQ6S5ghX4splBS+mtnvkIEjhdpwsCgKKta39ndL1CNE4b8jArxW2wU/sNW431klKEahveLZn5U2jL10LvtIurKppSVLxRmqJ4LNR3NbEpRMWeYvRQzIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2iqPg0csbPubyW7t7U6GA76CzeHD4MyI6iEbm3Qw7xg=;
+ b=xCBX9V9GZH0TceDZCNRKdyCBjAQ5x6KlkDCA+1306AmCi6Q1sPu9TYqOU4YZ9K0RSTe2AIVlTI0BYM2/9ACll+XV9Tknb0+2ee90lhc8YntRd1UwnGrbCeC2n+rnjjnF/g6BNBEbRVVHSA8S9dTDz6tL3IbkTOBsG4t9nRh1zdEHqo/4O4QGKjrzZwz9FiQ7t9+jiIISaBawgjdp0v6Wqg/MaLvBWNK1gA/kgpG4KPgrHHzuQscqNJo3BHDaPdybn0rgchQCRlhoiWrB1Uo8l/AUvOGzZjv7V8BzTUFIIQ5eDix/1MhK3hUmAc7qa55cV+p4NBaR/32g7T/L4c+9IQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2iqPg0csbPubyW7t7U6GA76CzeHD4MyI6iEbm3Qw7xg=;
+ b=M3oedXTzUbry0zTKn1rb2AIlSR77UemBYyybGXJCb1UB7czd/eemLct5A/Ewd7KM4q3bVXtI8UFlcsJaK5LUXw71hekoPple5hGQutqd+v6ZO9UkQ+yapL6LWYWycfZ6wkJCTIlRKqzTCNnDtGnxOjk97jSSW74xeba2fmTF9glwiHNwrCM6u/Y4FndA1g6iJh0tp/zHjpim4CJxiqNGnQGf5R5xHaBX4AGVMGBYRJOVyEnMgl3ZHoTTnMkoKBNKaA2ThT/DJGi3p6UrM36P1KlW4duKW3nyeLLd9qycUM/iWkGAWAfoTTYuLOHiv/szhUnIXmminTnl+qEO0SsE2g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
+ by DB9PR04MB8281.eurprd04.prod.outlook.com (2603:10a6:10:25f::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27; Wed, 7 Aug
+ 2024 15:24:31 +0000
+Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06]) by PAXPR04MB9642.eurprd04.prod.outlook.com
+ ([fe80::9126:a61e:341d:4b06%5]) with mapi id 15.20.7828.023; Wed, 7 Aug 2024
+ 15:24:31 +0000
+Date: Wed, 7 Aug 2024 11:24:23 -0400
+From: Frank Li <Frank.li@nxp.com>
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	imx@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/4] net: fec: refactor PPS channel configuration
+Message-ID: <ZrORp3VU7GFd+4R8@lizhi-Precision-Tower-5810>
+References: <20240807144349.297342-1-francesco@dolcini.it>
+ <20240807144349.297342-3-francesco@dolcini.it>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240807144349.297342-3-francesco@dolcini.it>
+X-ClientProxiedBy: BYAPR02CA0020.namprd02.prod.outlook.com
+ (2603:10b6:a02:ee::33) To PAXPR04MB9642.eurprd04.prod.outlook.com
+ (2603:10a6:102:240::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <bbb4af1cb0933fea3307930a74258b8f78cba084.1722570749.git.fahimitahera@gmail.com>
-X-Infomaniak-Routing: alpha
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|DB9PR04MB8281:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5fc22f23-d365-4e75-a31a-08dcb6f508fc
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|52116014|7416014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+ =?us-ascii?Q?2MkIb9Dahv75qqVxRPnulH6sKbbUxH8KiWId90OgVyVTLCH9EZvdsTg02y/v?=
+ =?us-ascii?Q?yZdFezWa/l8Hz8BUr8gyOGgIFtoGF+1pywbIqZBbfXUzkvSG90ZXimzgBkRX?=
+ =?us-ascii?Q?PnUfph0ceIIqf3BzDnvIWR+mGQf0fmxAJXNi3YenKYXdJl+cmekawKG7blkH?=
+ =?us-ascii?Q?nZw02sxzOICUpsaMC6jABu3lR2iTirGd/oK1ekZOgMewaoIJmdfXz+FFuE9C?=
+ =?us-ascii?Q?Vp9mfx6uxe3gQpCEuWpTdOLpyhnzszNsRqphy6kQJlbfRmzPtiTSn3MAYbQB?=
+ =?us-ascii?Q?k/OAFNHVWK/KllQzjMWGKufEwnTWFOYnwVu8eU++toKTfr85G0eraZhCrXGi?=
+ =?us-ascii?Q?2yWMlTTvCUsa4gWfI50H/fWIh0JpeiCNNiVdVc5A+craN6uC7PNJaVcJP1Yj?=
+ =?us-ascii?Q?BmkgPBRJntM51r8ryogztstimJdvo/3iUHgvCASeNbtKBjxNA5qN90Yw1tJO?=
+ =?us-ascii?Q?Uss1K2WZda/3ZsqwgA/VUV7FsyRdEHjxKoLZQhlUtGlWydbzkw6azBpgffyz?=
+ =?us-ascii?Q?jTyRCqBmvz0DY4xEeS3syAbeAudafmMlSEo/0Zpi3oU5+WnKeqaIXtFu2m0n?=
+ =?us-ascii?Q?r0yMqpdKIb5CdTBrnF5KyjG/dtrIvWEgm1JyRKuhWfFP0BtGqJsLNcfgtuP9?=
+ =?us-ascii?Q?FHzgrdLEtxA6eSBDMbKduIrB58Yap93EwG6t0R9fwgURjCY+c4gJgI5VB4VU?=
+ =?us-ascii?Q?X5bX5cX67HzPyNew8Idc3his4fAFNANwcbQLImLWbg3B0AUCMl4NHXaE+nAy?=
+ =?us-ascii?Q?ElbETIDiU/uTULLoKgHg8VNLOxbeVa7Kw/2ubDXTlLnReV8ofdQrUOTxhf7c?=
+ =?us-ascii?Q?VdrPqrVceDwRwoqhbxfDAhg4N8A3+un3gGJSGfs0FA41WshZJG5vl4nRDcqH?=
+ =?us-ascii?Q?USG3DOZtu/Tz32pvLClw1um+IlI7TME2MvNpsHKR8KFSOJHltA+nIBv8VoPr?=
+ =?us-ascii?Q?aQbWjMuiXLk0casKUg08W8h5P2XCIU/+kkl4FNJetglWW/0lmULhvJUPNLZm?=
+ =?us-ascii?Q?qe3U7VWyka3HeFkC6Spk3SdWJzJ8nGuU7O28qFGgRoJdWjfoFCr5eT2DiLY9?=
+ =?us-ascii?Q?nSSzMkAPlkNRIs3mR/lOLRRgzcp2uBjhOTTZB3tMtFwVEOtCpQzeoMzSZAUu?=
+ =?us-ascii?Q?zL06mEou+ySiB+Gp1GDAo/Yy/ZooFH4MloLedf7NoozKdMYrSiWXrXRg2V2s?=
+ =?us-ascii?Q?Tf3wOV+KLPe26psl/LPKqQgQGb89noirL8wetqUQAZ4r1ib8hN6W5gdMq+fv?=
+ =?us-ascii?Q?yHSV2t0/6Sx+XXsX+yZwh2cEgcIMWAbKeUn0HJexOiy54U+JkerFYJN+/li2?=
+ =?us-ascii?Q?j9OdEE7p0Zu0n5ihjhKAUzPf6FfvTJ84yKNU/G0pyEmsR2kfyTqdPC2LVFTa?=
+ =?us-ascii?Q?aQee2BPchn999CDlDf96FUVX37fkURHAc1Sak4Iajd+Ar7U13g=3D=3D?=
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(7416014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?EdLTclGg/x8a6J/DIVi/sxu/Gf8b730j2sHTuhSv2wzjAnaviRqmII/OyJJ0?=
+ =?us-ascii?Q?/SHfXAqBv1C7FToZfrsIFgZjAyCoNUIAa+CHok9EpEgEecWvDS7IgcE1RQ+f?=
+ =?us-ascii?Q?Ysp+AkLULdVVuU5rKCE/gJJoScsI7p7uEYRioaKRbVSvYxuQwTqrbqUpNQwH?=
+ =?us-ascii?Q?H+VjDFpLPBebLiBEIh6cW2b5/Ylnwume/M8N5AlXOfPV5Vnbjpa3Gl4N4OdP?=
+ =?us-ascii?Q?+bbq0Ope/SKuXu1bUqo7+9x1VaxSEQzEw/QSAC494daqWdrtdILw379tlOex?=
+ =?us-ascii?Q?Ino8v/dXBqybgPvSn3LKiEGZlxaEQG2xU9wYk/64yBviYfRfNtB7ihFdAF3x?=
+ =?us-ascii?Q?sw4Afahh98caLtj1O24S/y8PeEDUZZcoBfUDhXtXu7bUVcvb6GAMXKYJoi8R?=
+ =?us-ascii?Q?n0Ua3uSLdOmwyw+L3Q+BQ/a/QBrqyJ+tsxWHN7rq2lMtXOHsaEEl7STE8L3V?=
+ =?us-ascii?Q?6belPIz8l1+5JlcAsloy2Semp40HcLzOmMYex+ygmmKXEQurzLbilr70MayG?=
+ =?us-ascii?Q?/w89+9ZKJma+QNRZJMizFPeCqAmEwEoCFDTrnA2zu7TpDE9qq1UyhlZ06aBE?=
+ =?us-ascii?Q?fm5FyT8gkp18uZZnlQdaX+Bb0Wo7vEDmwUrxKU16ky6rjhSuIbKvNJABfZgY?=
+ =?us-ascii?Q?+oEHcHMVw0+HOZy1E/guBLTul3Gsvk1zR+7vSMniHtDVhzmdrK/ThhorQd/B?=
+ =?us-ascii?Q?gdv0RNj1ycpW8eKt5apr5pBNnCTVgR6owMjfIhIzSVTnaXJr+4ryaXphKIU/?=
+ =?us-ascii?Q?4RAyvLOppCl5HkcvmFFNTsKBhOcsTBGqA2B6F1hZBItcT8mRi8g/I9rLYdOA?=
+ =?us-ascii?Q?ValR2EjHG7rtsmsRZv4N0WZPhsmqntZDWkVjKz/x/+RBa86tjxDngsPsqs4k?=
+ =?us-ascii?Q?3u98goL+Fc2J5Q0pv8GFrNq+MqKqjUwH7WyTmdQfQHzXE0zAG5C2k4+0mRxf?=
+ =?us-ascii?Q?RYLTkSn8tdjRF77hYrxqvxGJOUyDhLQetIiv5lrkeL97pnt5bEgrki4bmmaq?=
+ =?us-ascii?Q?MvRfNvVoh7LmrwSUqK23eO6yO0ZlPXGQP82WluMlFgKMmPD1mp4fkTGVa01e?=
+ =?us-ascii?Q?Z7BCcfaTKwDA1ZgBVQkD3v7yHVfOV1ojMCDPypTJAR5MmfIwWZyhXM7GR/C9?=
+ =?us-ascii?Q?GyTFobr1VzG/Ap/tcZEzs+d/Vo6x7MasnTDQP4ssfaCfa6tffzm5aJl5v992?=
+ =?us-ascii?Q?HfLRNZs0GcJpOgxYibiUhTNgnNEHQzjIl66pX7ozyNGfEk2Y8DyY+4N2SGwd?=
+ =?us-ascii?Q?RUnliZ8/MZY4bLv71Dw5xuL0g2Zr/maLg2iWc156XVNPIqvIvxKoI1Z9jGGN?=
+ =?us-ascii?Q?AUcUgZ11Sy7DJjdviP0VOE1q0PLBR51kxg/sJigvhchihrMFb9IffxO6fQYO?=
+ =?us-ascii?Q?tbhLC1xznNg2OPq64TtUtxaNoJDkMRcqQrKltLcRuAvR+zz5lQPjgYXwBGhb?=
+ =?us-ascii?Q?Kjq5El0z0+hEd5HOUjbVohmkDwq5zUR4E73a48UHg3Xk88TfMRsGfFhjmPom?=
+ =?us-ascii?Q?Jsx4nm3dffouuplypYDcwpLHaQK1OUFFCU7gGxmuWMT3eqYYSfm5wY/Qb+U7?=
+ =?us-ascii?Q?FSnsma0BDW8+A1F24l0=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fc22f23-d365-4e75-a31a-08dcb6f508fc
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 15:24:31.4984
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DslkKCPYUcyC+QveiquVpaAh+rAxM6eXo738AlwEfxGzXwRn0ck3eveAcQNCJXOTBmsN+iWnbXwpKBlURLeFhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8281
 
-On Thu, Aug 01, 2024 at 10:02:36PM -0600, Tahera Fahimi wrote:
-> Introducing LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET as an IPC scoping
-> mechanism in Landlock ABI version 6, and updating ruleset_attr,
-> Landlock ABI version, and access rights code blocks based on that.
-> 
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+On Wed, Aug 07, 2024 at 04:43:47PM +0200, Francesco Dolcini wrote:
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
+>
+> Preparation patch to allow for PPS channel configuration, no functional
+> change intended.
+>
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+
+Reviewed-by: Frank Li <Frank.Li@nxp.com>
+
 > ---
-> v8:
-> - Improving documentation by specifying differences between scoped and
->   non-scoped domains.
-> - Adding review notes of version 7.
-> - Update date
-> v7:
-> - Add "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" explanation to IPC scoping
->   section and updating ABI to version 6.
-> - Adding "scoped" attribute to the Access rights section.
-> - In current limitation, unnamed sockets are specified as sockets that
->   are not restricted.
-> - Update date
-> ---
->  Documentation/userspace-api/landlock.rst | 33 ++++++++++++++++++++++--
->  1 file changed, 31 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/userspace-api/landlock.rst
-> index 07b63aec56fa..d602567b5139 100644
-> --- a/Documentation/userspace-api/landlock.rst
-> +++ b/Documentation/userspace-api/landlock.rst
-> @@ -8,7 +8,7 @@ Landlock: unprivileged access control
->  =====================================
->  
->  :Author: Mickaël Salaün
-> -:Date: April 2024
-> +:Date: August 2024
->  
->  The goal of Landlock is to enable to restrict ambient rights (e.g. global
->  filesystem or network access) for a set of processes.  Because Landlock
-> @@ -81,6 +81,8 @@ to be explicit about the denied-by-default access rights.
->          .handled_access_net =
->              LANDLOCK_ACCESS_NET_BIND_TCP |
->              LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +        .scoped =
-> +            LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET,
->      };
->  
->  Because we may not know on which kernel version an application will be
-> @@ -119,6 +121,9 @@ version, and only use the available subset of access rights:
->      case 4:
->          /* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
->          ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
-> +    case 5:
-> +        /* Removes LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET for ABI < 6 */
-> +        ruleset_attr.scoped &= ~LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET;
->      }
->  
->  This enables to create an inclusive ruleset that will contain our rules.
-> @@ -306,6 +311,23 @@ To be allowed to use :manpage:`ptrace(2)` and related syscalls on a target
->  process, a sandboxed process should have a subset of the target process rules,
->  which means the tracee must be in a sub-domain of the tracer.
->  
-> +IPC Scoping
-> +-----------
+>  drivers/net/ethernet/freescale/fec_ptp.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+> index e32f6724f568..6f0f8bf61752 100644
+> --- a/drivers/net/ethernet/freescale/fec_ptp.c
+> +++ b/drivers/net/ethernet/freescale/fec_ptp.c
+> @@ -84,8 +84,7 @@
+>  #define FEC_CC_MULT	(1 << 31)
+>  #define FEC_COUNTER_PERIOD	(1 << 31)
+>  #define PPS_OUPUT_RELOAD_PERIOD	NSEC_PER_SEC
+> -#define FEC_CHANNLE_0		0
+> -#define DEFAULT_PPS_CHANNEL	FEC_CHANNLE_0
+> +#define DEFAULT_PPS_CHANNEL	0
+>
+>  #define FEC_PTP_MAX_NSEC_PERIOD		4000000000ULL
+>  #define FEC_PTP_MAX_NSEC_COUNTER	0x80000000ULL
+> @@ -530,8 +529,9 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
+>  	unsigned long flags;
+>  	int ret = 0;
+>
+> +	fep->pps_channel = DEFAULT_PPS_CHANNEL;
 > +
-> +Similar to the implicit `Ptrace restrictions`_, we may want to further restrict
-> +interactions between sandboxes. Each Landlock domain can be explicitly scoped
-> +for a set of actions by specifying it on a ruleset. For example, if a sandboxed
-> +process should not be able to :manpage:`connect(2)` to a non-sandboxed process
-> +through abstract :manpage:`unix(7)` sockets, we can specify such restriction
-> +with ``LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET``.
-> +
-> +A sandboxed process can connect to a non-sandboxed process when its domain is
-> +not scoped. If a process's domain is scoped, it can only connect to processes in
-
-...it can only connect to sockets created by proccesses in the same
-scoped domain.
-
-> +the same scoped domain.
-> +
-> +IPC scoping does not support Landlock rules, so if a domain is scoped, no rules
-> +can be added to allow accessing to a resource outside of the scoped domain.
-> +
->  Truncating files
->  ----------------
->  
-> @@ -404,7 +426,7 @@ Access rights
->  -------------
->  
->  .. kernel-doc:: include/uapi/linux/landlock.h
-> -    :identifiers: fs_access net_access
-> +    :identifiers: fs_access net_access scope
->  
->  Creating a new ruleset
->  ----------------------
-> @@ -541,6 +563,13 @@ earlier ABI.
->  Starting with the Landlock ABI version 5, it is possible to restrict the use of
->  :manpage:`ioctl(2)` using the new ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right.
->  
-> +Abstract Unix sockets Restriction  (ABI < 6)
-
-Let's follow the capitalization used by man pages: "UNIX" instead of
-"Unix".
-
-> +--------------------------------------------
-> +
-> +With ABI version 6, it is possible to restrict connection to an abstract Unix socket
-> +through ``LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET``, thanks to the ``scoped`` ruleset
-> +attribute.
-> +
->  .. _kernel_support:
->  
->  Kernel support
-> -- 
-> 2.34.1
-> 
+>  	if (rq->type == PTP_CLK_REQ_PPS) {
+> -		fep->pps_channel = DEFAULT_PPS_CHANNEL;
+>  		fep->reload_period = PPS_OUPUT_RELOAD_PERIOD;
+>
+>  		ret = fec_ptp_enable_pps(fep, on);
+> @@ -542,10 +542,9 @@ static int fec_ptp_enable(struct ptp_clock_info *ptp,
+>  		if (rq->perout.flags)
+>  			return -EOPNOTSUPP;
+>
+> -		if (rq->perout.index != DEFAULT_PPS_CHANNEL)
+> +		if (rq->perout.index != fep->pps_channel)
+>  			return -EOPNOTSUPP;
+>
+> -		fep->pps_channel = DEFAULT_PPS_CHANNEL;
+>  		period.tv_sec = rq->perout.period.sec;
+>  		period.tv_nsec = rq->perout.period.nsec;
+>  		period_ns = timespec64_to_ns(&period);
+> --
+> 2.39.2
+>
 
