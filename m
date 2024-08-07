@@ -1,72 +1,100 @@
-Return-Path: <netdev+bounces-116516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8028D94AA15
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:27:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E6994AA1B
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 16:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A1CA1F239A0
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:27:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2D571F24EB3
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 14:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8A061FC4;
-	Wed,  7 Aug 2024 14:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF2975817;
+	Wed,  7 Aug 2024 14:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKooXb+T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TaM8UTfW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9649057CB1
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 14:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB6C6F30E;
+	Wed,  7 Aug 2024 14:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723040831; cv=none; b=t8VNWN61X/2r6lmc5QgrJl22VsmJkcaUCgucU0/kVMuxvM7p0yHu/mKUU/+jWOoJ1b/0DH2ZT6A/EXtmSN1zrx3eGN8ykCa/BqUVMrm3+te2C1BtTgMWqsFSkrMS/kTMIc2EtibCvEhrxzLWA520+T4Pvo2nnDf4iV9PoW/WnCg=
+	t=1723040961; cv=none; b=Wi/0ZgPZ62YecIAahFAVr440dlhGM0EYbgbjvYG64l/KyJ6WMqsCMxvn3tvSHxI2v5C5S1mFsRWaKQQWNcvcU+uOSC3d+Y3nqLbGWoTxLwpAkiySNsxk5qR7hXi2b+NtnmSlUdyqB5b7Z8CLrxH7OHIjGZkwMUlZajfGeosXXs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723040831; c=relaxed/simple;
-	bh=xw1kJizDT2lrJ5gcxhvayJ1sfmmm76z8c2OGO+GxpUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N8kdyYcB9IL6nIrBKMqAPCe6VNdZ+IiGwxKAIZqlg2a09BLfzNYERJ29tdeaAbUQ8Z+2Qld5Z8NW/+GnYGEhCpIqAB/qZpyMfHQtzBZQOsRAT6Z6W2rBhmEB9W9G/jOMpwo2sYhEtPYHWrxWvXWPoF2P2PUTYxIAO+8R1J3D+EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKooXb+T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D212BC32781;
-	Wed,  7 Aug 2024 14:27:10 +0000 (UTC)
+	s=arc-20240116; t=1723040961; c=relaxed/simple;
+	bh=1c1Vw1Y3wDE2nnNr4XeVDLbR5X7Ybtyob5X9ATir400=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bKy8t1iGskjWwCPuvyQSeuyF57sp/eFdVQZLehGJQePbW8APlD+nq/d7niiF011a/hxnJ4DREXKoWDQdORN6cP1mXm+2XTxorV82V6DuR2bno3I2c4QNLwS0e4RWU8nlm4WMOSZKflaahLWPi51yl4wIDDI3ZQKMr8Lw3zQQnrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TaM8UTfW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E6DC32781;
+	Wed,  7 Aug 2024 14:29:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723040831;
-	bh=xw1kJizDT2lrJ5gcxhvayJ1sfmmm76z8c2OGO+GxpUI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IKooXb+T2ST766DazzRiD5bwhj6RJ4e30G0b+AyCSnCkSt0/DMuRYzybLHnPmUXdK
-	 aQBtNp2aAnZnkZByuCad5fzapG0jI87mclxZMPgoHrl99EDccs9zgMSTrEg56DHAXI
-	 2h69d4+908/zDuC9j3NvaPKmNHSR1ZGBhsbYmKZFm3/9uvexAhYC0SyZA6gtAvREJA
-	 DZZHxJ9WnLq6IUIo9FXpD10/9V5h49uNbJxNoE5rhvXCAr/xUrT31H7p1s/x7+MmY1
-	 CbDJv4IT6L8TF7R2SXQ3QzeV9I+gnwD7ymLPMIfv0PEdc/CDZos2sybiKkC1B52TfW
-	 Say+44lxrYyWQ==
-Date: Wed, 7 Aug 2024 07:27:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yonglong Liu <liuyonglong@huawei.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng
- Lin <linyunsheng@huawei.com>
-Subject: Re: [RFC net] net: make page pool stall netdev unregistration to
- avoid IOMMU crashes
-Message-ID: <20240807072710.0e7934e1@kernel.org>
-In-Reply-To: <e4b58020-4ff8-44bc-9779-54bc9e1bf593@huawei.com>
-References: <20240806151618.1373008-1-kuba@kernel.org>
-	<e4b58020-4ff8-44bc-9779-54bc9e1bf593@huawei.com>
+	s=k20201202; t=1723040961;
+	bh=1c1Vw1Y3wDE2nnNr4XeVDLbR5X7Ybtyob5X9ATir400=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TaM8UTfWrH88zcE0C3pA5l5f08rB1sESch4y+uc4LhGLz4F9feWm0rdN6q9PcljAp
+	 mF0MvdyICrrGU/WSBfp3v1skYNUJJ+1+DqdC2z4nsq06ssSTgm/iKFno0Q6+SaBpox
+	 DO3r6/9xGb9pc13HbitMxdHvd16EWGK7bvRKUsiQjP6Mhj3pRnsdWQnDaub84uPg5W
+	 tLKebGXFUSQ6TXBwGXZZFwJLpCeny4XANUHFUFBvXncBBJDY++wipbVE878yIxPm7q
+	 yYh6Ic0ieX8z8HhwqC8411VReOFY/99EPD69BeR0cwySG6L94rQLIT+CyI738j/wls
+	 +Az2BI3Zmciwg==
+From: Christian Brauner <brauner@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	edumazet@google.com,
+	kuba@kernel.org,
+	mkarsten@uwaterloo.ca,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH net-next] eventpoll: Don't re-zero eventpoll fields
+Date: Wed,  7 Aug 2024 16:29:07 +0200
+Message-ID: <20240807-zugeparkt-andacht-adb372d9e470@brauner>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240807105231.179158-1-jdamato@fastly.com>
+References: <20240807105231.179158-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1142; i=brauner@kernel.org; h=from:subject:message-id; bh=1c1Vw1Y3wDE2nnNr4XeVDLbR5X7Ybtyob5X9ATir400=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaRtbtnJkje7bE2XPdd3tTbNhD7BW5OXyS+Z6hF8/pAhQ 4rhtp7OjlIWBjEuBlkxRRaHdpNwueU8FZuNMjVg5rAygQxh4OIUgIlMq2X4zWKxf3oPg9Mpv6h9 Wcu5f3yp1thokT1jR9gjBrUZXm3bpzMy3N9a8ehF0esbs39/Zw04/3j79Gyd6VMee6soHODZd5V jATMA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Wed, 7 Aug 2024 15:03:06 +0800 Yonglong Liu wrote:
-> I tested this patch, have the same crash as I reported...
+On Wed, 07 Aug 2024 10:52:31 +0000, Joe Damato wrote:
+> Remove redundant and unnecessary code.
+> 
+> ep_alloc uses kzalloc to create struct eventpoll, so there is no need to
+> set fields to defaults of 0. This was accidentally introduced in commit
+> 85455c795c07 ("eventpoll: support busy poll per epoll instance") and
+> expanded on in follow-up commits.
+> 
+> [...]
 
-Which driver, this is only gonna work if the driver hooks the netdev 
-to the page pool. Which is still rare for drivers lacking community
-involvement.
+Applied to the vfs.misc.jeff branch of the vfs/vfs.git tree.
+Patches in the vfs.misc.jeff branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs.misc.jeff
+
+[1/1] eventpoll: Don't re-zero eventpoll fields
+      https://git.kernel.org/vfs/vfs/c/394923595c20
 
