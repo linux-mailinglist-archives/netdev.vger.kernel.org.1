@@ -1,205 +1,113 @@
-Return-Path: <netdev+bounces-116366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ABA394A25C
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:06:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9D494A273
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 10:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC60E1C21094
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 08:06:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F9B41F25C17
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 08:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD431C7B94;
-	Wed,  7 Aug 2024 08:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93BB1C9DE8;
+	Wed,  7 Aug 2024 08:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="F4Tprxxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D467A19A28F
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 08:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5AF13F435;
+	Wed,  7 Aug 2024 08:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723017988; cv=none; b=kUxJVKdwnLzyil9rHxu/hstJZ/NlblozJlcXta33M+Tb/F/lnv4Gl6jX1BL9/iLjRIfEOgPbiDTSk1TlXZ/sSXkncTiK1Z9tr7bLqAymEpiNx6KZzXHNwoNo91PBxwJ//Nx/2bJTZw0+yHJ0DouhLGdTQ2t3pzbHTW8a/iqkTl8=
+	t=1723018284; cv=none; b=q0VG2aOMtDfsn12KarPjSeVRCFRJ5PdhokWpWPamof6Ik9F6Y5f0A1ImJkk0ZzTeUzRQYbTHKyhTwOTEkXxIW9WKNA6E3WVMoJcKYMnCOPlvnXWnK/R7vJ+HkgwH1dnDBgUH53/7EByioao3LDSrRQw15tnWB/XTTxtYpRS2UPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723017988; c=relaxed/simple;
-	bh=OLJC7WIi/YVvouXXbG+qgsD5JqDKLtG4xt3AZpMVPRk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=jVioh14+3K5/xqwzOA3JJfDqRpm0r9m6gXKjDFEMvrP4YL3N7L3OqHU1tx9RmnChKmFgqVDlSajPBi45gUXdoRUPfboNDSS0+sic2Yr70gEUPREaZuYdvZP1+NtQwIaJQyc3ypL1G2BJK+SoHfs7yH2JhPmyxQchPiPlzFJxGi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81f7fb0103fso69183739f.0
-        for <netdev@vger.kernel.org>; Wed, 07 Aug 2024 01:06:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723017985; x=1723622785;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NPyDpF/qZao+PcJQw2T5V5PZGFz/IsS/WZWVVXORGyg=;
-        b=tIuKUdvYMgMEFseKw4d5TSiqqG+J8Zw30EEPgFMAl1Dm+v6KaaKGIDWXfHtSUmrrCu
-         qwY7scHWV+cCIe/7gUTt7wHWvLHMLGJXXtafFvDCzeN9tlpN2r14FOXXE5k7E/AP/AlY
-         azF/ygHLO1Uox6FO7XzIH+Aa/7JXDYSZbvnR7clBGnqaWjEaB6KodMZANOcb97I4ei/O
-         P+GxtP8vqcJH93j7FTWOS2qqrq7eJdUcdp1c0woNHkVyXk9OaKhNgqRsrIudgQmJM4c7
-         5Zox0f1HJuf6uFZbuaAqbQzl30RoGD9s7KrVAPYI8xHzxKmPo9+eGdK2aNTLKqoVx+wj
-         fDdg==
-X-Forwarded-Encrypted: i=1; AJvYcCXtWeQFMoQ8TYWvWI/NschlJ5asYT0G7hv6O2GHN7flfjTW9YNe6in2HkR07MCFem5fkFN/7zWjUjIEWwNwOAnHsQIJFD1M
-X-Gm-Message-State: AOJu0Yyoh0gZsDFLhi8OGg19qX+H0WWA6WQOhrJ7kyRbc/SrqIPR6EwE
-	6qmscQMcXluU2X2+2BLdGVBMfVLo3RP+rTcgl8VF7Iog2Mc42rRAuHcmhpuVnhzPR+aGZRFyZCE
-	54mQW4V4Zwmej8KUTcpkn3Qosi6yJ3+N0/0wbrmClkmoDACZX0ypHwOQ=
-X-Google-Smtp-Source: AGHT+IFw+lvtHH6wNrzOeeyoYZiaO+QYbVDCZhZAUINvkHpl5igpuymwK5YKiXATXg7FIVANLp0knbBD12+6VLYWJdDgLPwp3r0L
+	s=arc-20240116; t=1723018284; c=relaxed/simple;
+	bh=O7WCjeIvWkbZgBS6vM4vQIgl4u3loiquJKhsttv30Po=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FfJCYBR5I6Bk5wJxmr9G/gydn9vMG5dR12NvH8yLlpinQQKsa46F67Mk6zV6ob2nZObQJEkCfFlIisIUgkjg0QWjAc1wmNQaItt3j0Ir7yOMRBSnDdHWVekjHUfLA2D5oKp2IPf7GXqKClcgAYkTiRgU/pxOWXcBL6M0tL4lUNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=F4Tprxxe; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 0EB16A05B2;
+	Wed,  7 Aug 2024 10:11:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=KEun1WLwGlElpIBwl7qA
+	hygYiEvU6poeyl+GGcKm/bA=; b=F4TprxxeNJ+M6GhE6PQniqBPwzBMc+icwTzv
+	1BIsuzc2IezHaUkTzzuaZLcrvQwHj3yP92v4f8oKOabIhQCZkI5kUyaiir2vQEoM
+	15RwQPKIuaC2zhXaO2iLINuGGtd7+4j1c0l/wEK9VbZSwFrpkXUiqslxlbxzVsjZ
+	J1n73dXoH9jLgU2qnaURR3/otgTfqd5XPDk68AeLpKDP2NtMzOCsoJ0N0EDjMGhj
+	/xqsCQ+9oJplBg1/3t3AlwIGRBhATFg7z99983wmrme/8KpoMdB3nL3MyophbCXH
+	MbR3Eb1Ey2D8O1vA+4GSsOWnxybyG6yZfxsdca+8l3cBMTmAuY9ThL6wVPcvuCen
+	yp/zJLHZFNSKAEs6GCAYHRdPJRo83L0iAMWtHI9NCZxJlfvT4Yu6uXgiwHKZGgVq
+	gEDFV6CwniZaR+RkDRl7dSfoa9Elxhv67f7bzzuIYnonewjVehgFv5h8PPHaSXfw
+	lwMk23fJWLzzyW1ZV0OaaPscbnKPegqlg/ciBrz5j9KHUdDLqNkGZdFAKl2WR0Ky
+	S8W4FykvWAl7U+ICYzy4v6o39GHNMnaKeHArD6Z2xPXIKakuqDuiBU+WyBBQMtYr
+	zOOYaCpNYIBBkI9gbhuOOQIkvdGU9wYBlJfBsnfkeqA1UAwojDLdhWOlcB/9hgXI
+	i4AOvXk=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: Fugang Duan <B38611@freescale.com>, "David S. Miller"
+	<davem@davemloft.net>, Lucas Stach <l.stach@pengutronix.de>,
+	<imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Fabio
+ Estevam" <festevam@gmail.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH resubmit net] net: fec: Stop PPS on driver remove
+Date: Wed, 7 Aug 2024 10:09:56 +0200
+Message-ID: <20240807080956.2556602-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240805145735.2385752-1-csokas.bence@prolan.hu>
+References: <20240805145735.2385752-1-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c23:b0:395:fa9a:3187 with SMTP id
- e9e14a558f8ab-39b54502233mr1235635ab.3.1723017985247; Wed, 07 Aug 2024
- 01:06:25 -0700 (PDT)
-Date: Wed, 07 Aug 2024 01:06:25 -0700
-In-Reply-To: <0000000000002e944b061bcfd65f@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f3e751061f136220@google.com>
-Subject: Re: [syzbot] [net?] [s390?] possible deadlock in smc_vlan_by_tcpsk
-From: syzbot <syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, guwen@linux.alibaba.com, jaka@linux.ibm.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1723018272;VERSION=7975;MC=1504705215;ID=810479;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D94854617461
 
-syzbot has found a reproducer for the following issue on:
+PPS was not stopped in `fec_ptp_stop()`, called when
+the adapter was removed. Consequentially, you couldn't
+safely reload the driver with the PPS signal on.
 
-HEAD commit:    d4560686726f Merge tag 'for_linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=119f30f5980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=505ed4a1dd93463a
-dashboard link: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17e2fc5d980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16307a7d980000
+Fixes: 32cba57ba74b ("net: fec: introduce fec_ptp_stop and use in probe fail path")
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-d4560686.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3304e311b45d/vmlinux-d4560686.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c5fa8d141fd4/bzImage-d4560686.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.11.0-rc2-syzkaller-00013-gd4560686726f #0 Not tainted
-------------------------------------------------------
-syz-executor492/5336 is trying to acquire lock:
-ffffffff8fa20ee8 (rtnl_mutex){+.+.}-{3:3}, at: smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1853
-
-but task is already holding lock:
-ffff888033d60258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1607 [inline]
-ffff888033d60258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: smc_connect+0xd5/0x760 net/smc/af_smc.c:1650
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (sk_lock-AF_INET6){+.+.}-{0:0}:
-       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3543
-       lock_sock include/net/sock.h:1607 [inline]
-       sockopt_lock_sock net/core/sock.c:1061 [inline]
-       sockopt_lock_sock+0x54/0x70 net/core/sock.c:1052
-       do_ipv6_setsockopt+0x216a/0x47b0 net/ipv6/ipv6_sockglue.c:567
-       ipv6_setsockopt+0xe3/0x1a0 net/ipv6/ipv6_sockglue.c:993
-       udpv6_setsockopt+0x7d/0xd0 net/ipv6/udp.c:1702
-       do_sock_setsockopt+0x222/0x480 net/socket.c:2324
-       __sys_setsockopt+0x1a4/0x270 net/socket.c:2347
-       __do_sys_setsockopt net/socket.c:2356 [inline]
-       __se_sys_setsockopt net/socket.c:2353 [inline]
-       __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2353
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3133 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3252 [inline]
-       validate_chain kernel/locking/lockdep.c:3868 [inline]
-       __lock_acquire+0x24ed/0x3cb0 kernel/locking/lockdep.c:5142
-       lock_acquire kernel/locking/lockdep.c:5759 [inline]
-       lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
-       smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1853
-       __smc_connect+0x44d/0x4830 net/smc/af_smc.c:1522
-       smc_connect+0x2fc/0x760 net/smc/af_smc.c:1702
-       __sys_connect_file+0x15f/0x1a0 net/socket.c:2061
-       __sys_connect+0x149/0x170 net/socket.c:2078
-       __do_sys_connect net/socket.c:2088 [inline]
-       __se_sys_connect net/socket.c:2085 [inline]
-       __x64_sys_connect+0x72/0xb0 net/socket.c:2085
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(sk_lock-AF_INET6);
-                               lock(rtnl_mutex);
-                               lock(sk_lock-AF_INET6);
-  lock(rtnl_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz-executor492/5336:
- #0: ffff888033d60258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1607 [inline]
- #0: ffff888033d60258 (sk_lock-AF_INET6){+.+.}-{0:0}, at: smc_connect+0xd5/0x760 net/smc/af_smc.c:1650
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5336 Comm: syz-executor492 Not tainted 6.11.0-rc2-syzkaller-00013-gd4560686726f #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:119
- check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2186
- check_prev_add kernel/locking/lockdep.c:3133 [inline]
- check_prevs_add kernel/locking/lockdep.c:3252 [inline]
- validate_chain kernel/locking/lockdep.c:3868 [inline]
- __lock_acquire+0x24ed/0x3cb0 kernel/locking/lockdep.c:5142
- lock_acquire kernel/locking/lockdep.c:5759 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
- smc_vlan_by_tcpsk+0x251/0x620 net/smc/smc_core.c:1853
- __smc_connect+0x44d/0x4830 net/smc/af_smc.c:1522
- smc_connect+0x2fc/0x760 net/smc/af_smc.c:1702
- __sys_connect_file+0x15f/0x1a0 net/socket.c:2061
- __sys_connect+0x149/0x170 net/socket.c:2078
- __do_sys_connect net/socket.c:2088 [inline]
- __se_sys_connect net/socket.c:2085 [inline]
- __x64_sys_connect+0x72/0xb0 net/socket.c:2085
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f6fc285ad49
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffeaafd57c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f6fc285ad49
-RDX: 000000000000001c RSI: 0000000020000200 RDI: 0000000000000004
-RBP: 00000000000f4240 R08: 0000000000000001 R09: 0000000000000001
-R10: 0000000000000001 R11: 0000000000000246 R12: 00007ffeaafd5820
-R13: 00007f6fc28a8406 R14: 0000000000000003 R15: 00007ffeaafd5800
- </TASK>
-
-
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
+Link: https://lore.kernel.org/netdev/CAOMZO5BzcZR8PwKKwBssQq_wAGzVgf1ffwe_nhpQJjviTdxy-w@mail.gmail.com/T/#m01dcb810bfc451a492140f6797ca77443d0cb79f
+Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ drivers/net/ethernet/freescale/fec_ptp.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+index e32f6724f568..2e4f3e1782a2 100644
+--- a/drivers/net/ethernet/freescale/fec_ptp.c
++++ b/drivers/net/ethernet/freescale/fec_ptp.c
+@@ -775,6 +775,9 @@ void fec_ptp_stop(struct platform_device *pdev)
+ 	struct net_device *ndev = platform_get_drvdata(pdev);
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+ 
++	if (fep->pps_enable)
++		fec_ptp_enable_pps(fep, 0);
++
+ 	cancel_delayed_work_sync(&fep->time_keep);
+ 	hrtimer_cancel(&fep->perout_timer);
+ 	if (fep->ptp_clock)
+-- 
+2.34.1
+
+
 
