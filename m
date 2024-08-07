@@ -1,195 +1,158 @@
-Return-Path: <netdev+bounces-116588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-116589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52CB94B192
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:46:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A67E94B19C
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 22:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 390D41F2121A
-	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:46:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2A42835BC
+	for <lists+netdev@lfdr.de>; Wed,  7 Aug 2024 20:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADB3145FED;
-	Wed,  7 Aug 2024 20:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B78145FFA;
+	Wed,  7 Aug 2024 20:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R3SgN3x+"
+	dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b="GD9nAnNn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DE5145A1D
-	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 20:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136C5145B39
+	for <netdev@vger.kernel.org>; Wed,  7 Aug 2024 20:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723063613; cv=none; b=s8HPTtKPITnc46waykXgy0qt8aMrWMWEYNOJhNzRIl6OEOi93oPvm9SzmbDLrxfbkCsqdLJX97rPkXSiPtVGpbE5kuocu53ItMOQ83Cjz7snS826wb3QUg9eLRgRDgXHk72LxmFOXti4etNgzanNjVyAxi24iuasrEU2+bQ1hmA=
+	t=1723063839; cv=none; b=IvOIO7GhrCXAmPAcqPWHbmePoWOEZobejAvl4ChEzTQav8n3GSDReCLIiY576jk2DhVbSo4Jv5BGCP3jkWwFNq/wqoWN4mVUgqQVpdGbTO0KNOasA691J6mVvwitUpb9BJrAwbAsxtS7pkxZwEimVXOrdKuHtM43P3H96NuJhhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723063613; c=relaxed/simple;
-	bh=LPGe+4xDjATxjh9iTefGBBR1J/WXWbEMEzjnPpFNqmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b+liGrq34tuqyBbb/blZCNkczR89U6JXXw+qlySgoSAwHs5i3VnzrstwpkBQlpt7CB0KkaM7+r9/pPxbHJar5TiNdK5y24g7v02RUoXpQKNvL+SK4qtyquLk29UZ9fENnLlRx7Vq2yGOSLcyeBLBfowNyNp0S0HVLIZ0qNfgdwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R3SgN3x+; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723063611; x=1754599611;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LPGe+4xDjATxjh9iTefGBBR1J/WXWbEMEzjnPpFNqmc=;
-  b=R3SgN3x+6OoLH/D41J2hrEXQ+EKmzMM5+0lS/0THu7DZyfCAvBtJr3+F
-   LSh1eRxl79WpTu0AlNK1MdGbblqLOQKk93tZFfdhjPYaqq5j1FvHvJ2MU
-   ruMxCip/x9VDuezm16eJ4MKAyXC0dRoH5Y6kO1bOUk/1ulDizYTIG04oT
-   1zFpFCJxI0MrHGD59CiEjRrf17XCnFHqzVkSjgYcPv++ZtwdFSpupYuWf
-   kEgDzUtBqfh79403kQJ+3DVkdosYBTe45bhF2cZb4HAQ8LarYJ6CYuHL4
-   EeD05nbdI0Fg9sxeSkvpmtJ+h0xiurD43k3RspdrvSPHMIH9wLzmczk9F
-   Q==;
-X-CSE-ConnectionGUID: vaJu59+lQlGzZ31vhCOpVQ==
-X-CSE-MsgGUID: c8Wv+59LSP6pBJB8iU5oUQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="38665538"
-X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
-   d="scan'208";a="38665538"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 13:46:50 -0700
-X-CSE-ConnectionGUID: hKbPJqmOQ7G+bNXEBBxw3g==
-X-CSE-MsgGUID: bTZxIMj7RNu1vx6xn6taAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
-   d="scan'208";a="61918545"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by orviesa004.jf.intel.com with ESMTP; 07 Aug 2024 13:46:47 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sbnYS-0005i0-2p;
-	Wed, 07 Aug 2024 20:46:44 +0000
-Date: Thu, 8 Aug 2024 04:46:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phylib: do not disable autoneg for fixed
- speeds >= 1G
-Message-ID: <202408080457.vhF74DGf-lkp@intel.com>
-References: <E1sbdxI-0024Eo-HE@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1723063839; c=relaxed/simple;
+	bh=f+v4f3mK6kHMcO8CYtGze601q5qgBWUYTCFJnozwiEg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vr06WzDYremcA75vjRjGs+GzDTgkTsmHcOuHyRpfK4TwvLNPsj6yJ83BIdxQYAMTX5Zc3ZEmOZhJ6spmq04Ckh4/l5AuAvm+cGLcQOeTeoBtFL3O5ucbvfuhVErebalsXmACyQerKC/HS3NzuDphdQDZTaqHcnN+rfTVQ7gY9SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk; spf=pass smtp.mailfrom=martin-whitaker.me.uk; dkim=pass (2048-bit key) header.d=martin-whitaker.me.uk header.i=foss@martin-whitaker.me.uk header.b=GD9nAnNn; arc=none smtp.client-ip=212.227.17.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=martin-whitaker.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=martin-whitaker.me.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=martin-whitaker.me.uk; s=s1-ionos; t=1723063819; x=1723668619;
+	i=foss@martin-whitaker.me.uk;
+	bh=TzO/kkw4/fm/ZdXC5cXInzKhtvW3MnTisW67XRRFAFk=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=GD9nAnNn4GuOAXVlrsJAWFrEJXDWUXYAupyp1DCCPsFYEGKPK3OT1XCM9d7oUp82
+	 cLlhGE+CqkxFbfWgxvwO+bkz/irkG/hsyjBsw8aNMs6qW+pTY5bjsqr8LvbMBxlRr
+	 48CVSBEIAV+5s/Tb4Qps8YmE0GO+04opIZ3u2dVlJPQTdBhYp6tCYoI2H8Pkj+V5x
+	 IuwM8IZlEQd61a5obGjHIpX69bAABtzinAQgTq+O8go4UmyByr7RUym8OhG3LU3vY
+	 0BDg5JFoqesiSw+XF6Wz0ghReF0wdhzNANwLfWX+x4tVetBUHtBjABMH4a5Vf81E4
+	 wDwlhtmZA0mkZmdSSg==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from thor.lan ([194.120.133.17]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.179]) with ESMTPSA (Nemesis) id
+ 1M8QFi-1sXNlb2Zhg-000ULR; Wed, 07 Aug 2024 22:50:19 +0200
+From: Martin Whitaker <foss@martin-whitaker.me.uk>
+To: netdev@vger.kernel.org
+Cc: UNGLinuxDriver@microchip.com,
+	Woojung.Huh@microchip.com,
+	o.rempel@pengutronix.de,
+	lukma@denx.de,
+	Arun.Ramadoss@microchip.com,
+	kuba@kernel.org,
+	Martin Whitaker <foss@martin-whitaker.me.uk>
+Subject: [PATCH net] net: dsa: microchip: disable EEE for KSZ8567/KSZ9567/KSZ9896/KSZ9897.
+Date: Wed,  7 Aug 2024 21:52:09 +0100
+Message-ID: <20240807205209.21464-1-foss@martin-whitaker.me.uk>
+X-Mailer: git-send-email 2.41.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1sbdxI-0024Eo-HE@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:xFeTaqKwZo3anhq6ZWylFt0u5I2Ccsw6ewugUom/ftLa4CjvGKa
+ uO0QvTFNpq53mISlaXQB1Un+S3d87mIjSzwIDUByTI22XBNhIVdGfMjADz3ualswmPDOS3V
+ JuZx3ZfKWXuIwzbRzUqV3S7VIhoJOD6katNgNalR91Xe7R03ViPy+tffZJrublTjjmTFYFN
+ 62g0+chfReHqBrOsxSvrg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:tQOhKtcQszI=;ufTgSl9lGkE0zDFawkfPW7pkceI
+ DcQ26zsNkIe3Gy3I/oqsInll/XjAwtWv0IjmnJiPL3OXbT4e9JO/YQwejc2A8LJbn9ndWf0ny
+ pmbUU5CeYxyYkxrEsHKs8yYXaA4xgNnEiQFit/YCruxHv5Zwt90hX4R4+TQn4x/63RIJnHcbN
+ C74deFRP0jVePWzZI3Yf7JlVoy7iEY9ckM4doImA/X9mHKSrO6eR1WzR64dy/FlxydJLFSIH2
+ +B5MoQIfR28pfECw7Q4D3/JMVTP0Gf8aupfrd1Ibf/F1OBxR7+OBJGlhUZrwdkV9iJlP7SOHC
+ KFu5UvCs3ndgn8ey0NJC2AIc3npnzVvHhJySyTq/tWGe0Vkia+QyTyB+9dZY5ReWYnAukGO4X
+ ZbhA9bgjZk98hkGQDajCVS/8pWtql15AaqK6w8aRdJXQOpmOJPIlTuBH/IJ9+/hBiQ/Nt/50R
+ OGrtAdTSBwOyHCtOFYgZW+x7oqigQbrqFYmyt5qDd22kTPaLhcT/TyRmeHecvmFzrGXZMHlgx
+ ibRj/iI5DVAKxlWKP1PkRoTevbjytoJldXP1CpiHKOwrDdkofzQEw9iYgDuR1Rd3oDSKCQiQB
+ okeGZkEB7hS5sXBcg26zR96y8aGhhQHYj/p6YFvLIO3pxO1r26BK11dXRGGEGGGVzLyrLL9Wu
+ rP0MccFivw7ZUTTWSX4wIuY14z9XU/6egbe3wEB8jvj2Sdx9spbsKrxU+uVfMD7OJFZE51PgV
+ gSu1k+9hfXpnRrxajEGT15Leqo+/39o6tPR+Trk8HHfjL5Q/U++JlQ=
 
-Hi Russell,
+As noted in the device errata [1-8], EEE support is not fully operational
+in the KSZ8567, KSZ9477, KSZ9567, KSZ9896, and KSZ9897 devices, causing
+link drops when connected to another device that supports EEE. The patch
+series "net: add EEE support for KSZ9477 switch family" merged in commit
+9b0bf4f77162 caused EEE support to be enabled in these devices. A fix for
+this regression for the KSZ9477 alone was merged in commit 08c6d8bae48c2.
+This patch extends this fix to the other affected devices.
 
-kernel test robot noticed the following build errors:
+[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ8567R-Errata-DS80000752.pdf
+[2] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ8567S-Errata-DS80000753.pdf
+[3] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ9477S-Errata-DS80000754.pdf
+[4] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ9567R-Errata-DS80000755.pdf
+[5] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ9567S-Errata-DS80000756.pdf
+[6] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ9896C-Errata-DS80000757.pdf
+[7] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ9897R-Errata-DS80000758.pdf
+[8] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/Errata/KSZ9897S-Errata-DS80000759.pdf
 
-[auto build test ERROR on net-next/main]
+Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") # for KSZ8=
+567/KSZ9567/KSZ9896/KSZ9897
+Link: https://lore.kernel.org/netdev/137ce1ee-0b68-4c96-a717-c8164b514eec@=
+martin-whitaker.me.uk/
+Signed-off-by: Martin Whitaker <foss@martin-whitaker.me.uk>
+=2D--
+ drivers/net/dsa/microchip/ksz_common.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Russell-King-Oracle/net-phylib-do-not-disable-autoneg-for-fixed-speeds-1G/20240807-185909
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/E1sbdxI-0024Eo-HE%40rmk-PC.armlinux.org.uk
-patch subject: [PATCH net-next] net: phylib: do not disable autoneg for fixed speeds >= 1G
-config: arc-randconfig-001-20240808 (https://download.01.org/0day-ci/archive/20240808/202408080457.vhF74DGf-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080457.vhF74DGf-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408080457.vhF74DGf-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   drivers/net/phy/phy_device.c: In function 'genphy_config_advert':
->> drivers/net/phy/phy_device.c:2124:41: warning: passing argument 1 of 'linkmode_adv_to_mii_adv_t' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2124 |         adv = linkmode_adv_to_mii_adv_t(advert);
-         |                                         ^~~~~~
-   In file included from include/uapi/linux/mdio.h:15,
-                    from include/linux/mdio.h:9,
-                    from drivers/net/phy/phy_device.c:23:
-   include/linux/mii.h:143:60: note: expected 'long unsigned int *' but argument is of type 'const long unsigned int *'
-     143 | static inline u32 linkmode_adv_to_mii_adv_t(unsigned long *advertising)
-         |                                             ~~~~~~~~~~~~~~~^~~~~~~~~~~
->> drivers/net/phy/phy_device.c:2147:46: warning: passing argument 1 of 'linkmode_adv_to_mii_ctrl1000_t' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-    2147 |         adv = linkmode_adv_to_mii_ctrl1000_t(advert);
-         |                                              ^~~~~~
-   include/linux/mii.h:218:65: note: expected 'long unsigned int *' but argument is of type 'const long unsigned int *'
-     218 | static inline u32 linkmode_adv_to_mii_ctrl1000_t(unsigned long *advertising)
-         |                                                  ~~~~~~~~~~~~~~~^~~~~~~~~~~
-   drivers/net/phy/phy_device.c: In function '__genphy_config_aneg':
->> drivers/net/phy/phy_device.c:2401:25: error: implicit declaration of function 'linkmode_set'; did you mean 'linkmode_subset'? [-Werror=implicit-function-declaration]
-    2401 |                         linkmode_set(set->bit, fixed_advert);
-         |                         ^~~~~~~~~~~~
-         |                         linkmode_subset
-   cc1: some warnings being treated as errors
-
-
-vim +2401 drivers/net/phy/phy_device.c
-
-  2359	
-  2360	/**
-  2361	 * __genphy_config_aneg - restart auto-negotiation or write BMCR
-  2362	 * @phydev: target phy_device struct
-  2363	 * @changed: whether autoneg is requested
-  2364	 *
-  2365	 * Description: If auto-negotiation is enabled, we configure the
-  2366	 *   advertising, and then restart auto-negotiation.  If it is not
-  2367	 *   enabled, then we write the BMCR.
-  2368	 */
-  2369	int __genphy_config_aneg(struct phy_device *phydev, bool changed)
-  2370	{
-  2371		__ETHTOOL_DECLARE_LINK_MODE_MASK(fixed_advert);
-  2372		const struct phy_setting *set;
-  2373		unsigned long *advert;
-  2374		int err;
-  2375	
-  2376		err = genphy_c45_an_config_eee_aneg(phydev);
-  2377		if (err < 0)
-  2378			return err;
-  2379		else if (err)
-  2380			changed = true;
-  2381	
-  2382		err = genphy_setup_master_slave(phydev);
-  2383		if (err < 0)
-  2384			return err;
-  2385		else if (err)
-  2386			changed = true;
-  2387	
-  2388		if (phydev->autoneg == AUTONEG_ENABLE) {
-  2389			/* Only allow advertising what this PHY supports */
-  2390			linkmode_and(phydev->advertising, phydev->advertising,
-  2391				     phydev->supported);
-  2392			advert = phydev->advertising;
-  2393		} else if (phydev->speed < SPEED_1000) {
-  2394			return genphy_setup_forced(phydev);
-  2395		} else {
-  2396			linkmode_zero(fixed_advert);
-  2397	
-  2398			set = phy_lookup_setting(phydev->speed, phydev->duplex,
-  2399						 phydev->supported, true);
-  2400			if (set)
-> 2401				linkmode_set(set->bit, fixed_advert);
-  2402	
-  2403			advert = fixed_advert;
-  2404		}
-  2405	
-  2406		err = genphy_config_advert(phydev, advert);
-  2407		if (err < 0) /* error */
-  2408			return err;
-  2409		else if (err)
-  2410			changed = true;
-  2411	
-  2412		return genphy_check_and_restart_aneg(phydev, changed);
-  2413	}
-  2414	EXPORT_SYMBOL(__genphy_config_aneg);
-  2415	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/micr=
+ochip/ksz_common.c
+index b074b4bb0629..cebc6eaa932b 100644
+=2D-- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2578,7 +2578,11 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds,=
+ int port)
+ 		if (!port)
+ 			return MICREL_KSZ8_P1_ERRATA;
+ 		break;
++	case KSZ8567_CHIP_ID:
+ 	case KSZ9477_CHIP_ID:
++	case KSZ9567_CHIP_ID:
++	case KSZ9896_CHIP_ID:
++	case KSZ9897_CHIP_ID:
+ 		/* KSZ9477 Errata DS80000754C
+ 		 *
+ 		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
+@@ -2588,6 +2592,13 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds,=
+ int port)
+ 		 *   controls. If not disabled, the PHY ports can auto-negotiate
+ 		 *   to enable EEE, and this feature can cause link drops when
+ 		 *   linked to another device supporting EEE.
++		 *
++		 * The same item appears in the errata for the KSZ9567, KSZ9896,
++		 * and KSZ9897.
++		 *
++		 * A similar item appears in the errata for the KSZ8567, but
++		 * provides an alternative workaround. For now, use the simple
++		 * workaround of disabling the EEE feature for this device too.
+ 		 */
+ 		return MICREL_NO_EEE;
+ 	}
+=2D-
+2.41.1
 
